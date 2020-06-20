@@ -1,49 +1,101 @@
 import { getConnection } from 'typeorm'
 import AddressMeta from "database/address/meta"
-import Script from "models/chain/script"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
+import { Indexer } from '@ckb-lumos/indexer'
 
 
 export default class IndexerCacheService {
-  private addressMeta: AddressMeta
+  private addressMetas: AddressMeta[]
   private rpcService: RpcService
+  private indexer: Indexer
+  private walletId: string
 
-  constructor(addressMeta: AddressMeta, rpcService: RpcService) {
-    this.addressMeta = addressMeta
+  constructor(
+    walletId: string,
+    addressMetas: AddressMeta[],
+    rpcService: RpcService,
+    indexer: Indexer
+  ) {
+    for (const addressMeta of addressMetas) {
+      if (addressMeta.walletId !== walletId) {
+        throw new Error(`address ${addressMeta.address} does not belong to wallet id ${walletId}`)
+      }
+    }
+
+    this.walletId = walletId
+    this.addressMetas = addressMetas
     this.rpcService = rpcService
+    this.indexer = indexer
   }
 
-  private async countTxHashes(lockScript: Script): Promise<number> {
+  private async countTxHashes(): Promise<number> {
     return getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        lockHash: lockScript.computeHash()
+        walletId: this.walletId
       })
       .getCount()
   }
 
-  private async getTxHashes(lockScript: Script): Promise<IndexerTxHashCache[]> {
+  private async getTxHashes(): Promise<IndexerTxHashCache[]> {
     return getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        lockHash: lockScript.computeHash()
+        walletId: this.walletId
       })
       .getMany()
   }
 
-  public async upsertTxHashes(txHashes: string[], lockScript: Script): Promise<string[]> {
-    const txCount = await this.countTxHashes(lockScript)
-    if (txHashes.length === txCount) {
+  public async upsertTxHashes(): Promise<string[]> {
+    const mappingsByTxHash = new Map()
+    for (const addressMeta of this.addressMetas) {
+      const lockScripts = [
+        addressMeta.generateDefaultLockScript()
+      ]
+
+      for (const lockScript of lockScripts) {
+        const fetchedTxHashes = this.indexer.getTransactionsByLockScript({
+          code_hash: lockScript.codeHash,
+          hash_type: lockScript.hashType,
+          args: lockScript.args
+        })
+
+        if (!fetchedTxHashes || !fetchedTxHashes.length) {
+          continue
+        }
+
+        for (const txHash of fetchedTxHashes) {
+          if (!mappingsByTxHash.get(txHash)) {
+            mappingsByTxHash.set(txHash, [])
+          }
+
+          const mappings = mappingsByTxHash.get(txHash)
+          mappings.push({
+            address: addressMeta.address,
+            lockHash: lockScript.computeHash()
+          })
+        }
+      }
+    }
+
+    const fetchedTxHashes = [...mappingsByTxHash.keys()]
+    const fetchedTxHashCount = fetchedTxHashes
+      .reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash).length, 0)
+
+    const txCount = await this.countTxHashes()
+    if (fetchedTxHashCount === txCount) {
       return []
     }
-    const txMetasCaches = await this.getTxHashes(lockScript)
+
+    const txMetasCaches = await this.getTxHashes()
     const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
 
-    const cachedTxHashesSet = new Set(cachedTxHashes);
-    const newTxHashes = txHashes.filter(hash => !cachedTxHashesSet.has(hash))
+    const cachedTxHashesSet = new Set(cachedTxHashes)
+
+    const newTxHashes = fetchedTxHashes.filter(hash => !cachedTxHashesSet.has(hash))
 
     if (!newTxHashes.length) {
       return []
@@ -53,7 +105,7 @@ export default class IndexerCacheService {
       newTxHashes.map(async hash => {
         const txWithStatus = await this.rpcService.getTransaction(hash)
         if (!txWithStatus) {
-          throw new Error(`failed to fetch transaction for hash ${hash}`)
+          return
         }
         const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
         txWithStatus!.transaction.blockNumber = blockHeader?.number
@@ -63,21 +115,31 @@ export default class IndexerCacheService {
       })
     )
 
-    for (const {transaction, txStatus} of arrayOfTxWithStatus.flat()) {
-      await getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(IndexerTxHashCache)
-        .values({
-          txHash: transaction.hash,
-          blockNumber: transaction.blockNumber,
-          blockHash: txStatus.blockHash!,
-          blockTimestamp: transaction.timestamp,
-          lockHash: lockScript.computeHash(),
-          address: this.addressMeta.address,
-          isProcessed: false
-        })
-        .execute()
+    for (const txWithStatus of arrayOfTxWithStatus.flat()) {
+      if (!txWithStatus) {
+        continue
+      }
+
+      const {transaction, txStatus} = txWithStatus
+      const mappings = mappingsByTxHash.get(transaction.hash)
+
+      for (const {lockHash, address} of mappings) {
+        await getConnection()
+          .createQueryBuilder()
+          .insert()
+          .into(IndexerTxHashCache)
+          .values({
+            txHash: transaction.hash,
+            blockNumber: transaction.blockNumber,
+            blockHash: txStatus.blockHash!,
+            blockTimestamp: transaction.timestamp,
+            lockHash,
+            address,
+            walletId: this.walletId,
+            isProcessed: false
+          })
+          .execute()
+      }
     }
 
     return newTxHashes
@@ -92,7 +154,7 @@ export default class IndexerCacheService {
       })
       .where({
         blockNumber: blockNumber,
-        address: this.addressMeta.address,
+        walletId: this.walletId,
       })
       .execute()
   }
@@ -103,7 +165,7 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .where({
         isProcessed: false,
-        address: this.addressMeta.address
+        walletId: this.walletId
       })
       .orderBy('blockNumber', 'ASC')
       .getOne()
@@ -118,7 +180,7 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .where({
         blockNumber,
-        address: this.addressMeta.address
+        walletId: this.walletId
       })
       .getMany()
   }

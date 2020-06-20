@@ -9,6 +9,7 @@ import RpcService from '../../src/services/rpc-service';
 
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
+const stubbedGetTransactionsByLockScriptFn = jest.fn()
 
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
   () => ({
@@ -17,17 +18,25 @@ const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
   })
 )
 
+const stubbedIndexerConstructor = jest.fn().mockImplementation(
+  () => ({
+    getTransactionsByLockScript: stubbedGetTransactionsByLockScriptFn
+  })
+)
+
 const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedGetHeaderFn.mockReset()
+  stubbedGetTransactionsByLockScriptFn.mockReset()
 }
 
 describe('indexer cache service', () => {
   let indexerCacheService: IndexerCacheService
   let rpcService: RpcService
 
+  const walletId = '1'
   const address = {
-    walletId: '1',
+    walletId,
     address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     path: "m/44'/309'/0'/0/0",
     addressType: AddressType.Receiving,
@@ -41,6 +50,7 @@ describe('indexer cache service', () => {
     version: AddressVersion.Testnet,
   }
   const addressMeta = AddressMeta.fromObject(address)
+  const addressMetas = [addressMeta]
 
   const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
   const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
@@ -67,55 +77,84 @@ describe('indexer cache service', () => {
     await connection.synchronize(true)
 
     resetMocks()
-    stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
-    stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
-    stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
-    stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
-    stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
-    stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
 
     rpcService = new stubbedRPCServiceConstructor()
-    indexerCacheService = new IndexerCacheService(addressMeta, rpcService)
+    indexerCacheService = new IndexerCacheService(walletId, addressMetas, rpcService, stubbedIndexerConstructor())
   })
 
-  describe('#upsertTxHashes', () => {
-    describe('when no tx hashes cache exists', () => {
-      it('saves all tx hashes', async () => {
-        const savedTxHashes = await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
-        const caches = await getConnection()
-          .getRepository(IndexerTxHashCache)
-          .find()
-        expect(caches).toHaveLength(3)
-        expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
-        expect(caches.filter(cache => cache.txHash === txHashes[1])).toHaveLength(1)
-        expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
-        expect(savedTxHashes).toEqual(txHashes)
+  describe('#constructor', () => {
+    describe('when an address does not belong to a wallet', () => {
+      it('throws error', () => {
+        expect(() => {
+          new IndexerCacheService('walletId', addressMetas, rpcService, stubbedIndexerConstructor())
+        }).toThrow(new Error('address ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83 does not belong to wallet id walletId'))
       });
     });
-    describe('when some of tx hashes cache exists', () => {
+  });
+
+  describe('#upsertTxHashes', () => {
+    describe('when there are tx hashes from indexer', () => {
+      let initTxHashes: any
       beforeEach(async () => {
-        await indexerCacheService.upsertTxHashes([txHashes[0]], addressMeta.generateDefaultLockScript())
-        const caches = await getConnection()
-          .getRepository(IndexerTxHashCache)
-          .find()
-        expect(caches).toHaveLength(1)
-        expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
+        stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+          fakeTx1.transaction.hash,
+          fakeTx3.transaction.hash,
+        ])
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+        initTxHashes = await indexerCacheService.upsertTxHashes()
       });
-      it('saves the new ones', async () => {
-        const savedTxHashes = await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
-        const caches = await getConnection()
-        .getRepository(IndexerTxHashCache)
-        .find()
-        expect(caches).toHaveLength(3)
-        expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
-        expect(caches.filter(cache => cache.txHash === txHashes[1])).toHaveLength(1)
-        expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
-        expect(savedTxHashes).toEqual([txHashes[1], txHashes[2]])
+      describe('when no tx hashes cache exists', () => {
+        it('saves all tx hashes', async () => {
+          const caches = await getConnection()
+            .getRepository(IndexerTxHashCache)
+            .find()
+          expect(caches).toHaveLength(2)
+          expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
+          expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
+          expect(initTxHashes).toEqual([txHashes[0], txHashes[2]])
+        });
+      });
+      describe('when some of tx hashes cache exists', () => {
+        beforeEach(async () => {
+          stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+            fakeTx1.transaction.hash,
+            fakeTx2.transaction.hash,
+            fakeTx3.transaction.hash,
+          ])
+          stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
+          stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+        });
+        it('saves the new ones', async () => {
+          const savedTxHashes = await indexerCacheService.upsertTxHashes()
+          const caches = await getConnection()
+            .getRepository(IndexerTxHashCache)
+            .find()
+          expect(caches).toHaveLength(3)
+          expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
+          expect(caches.filter(cache => cache.txHash === txHashes[1])).toHaveLength(1)
+          expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
+          expect(savedTxHashes).toEqual([txHashes[1]])
+        });
       });
     });
     describe('when all of tx hashes cache exists', () => {
       beforeEach(async () => {
-        await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+          fakeTx1.transaction.hash,
+          fakeTx2.transaction.hash,
+          fakeTx3.transaction.hash,
+        ])
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+
+        await indexerCacheService.upsertTxHashes()
         const caches = await getConnection()
           .getRepository(IndexerTxHashCache)
           .find()
@@ -123,7 +162,13 @@ describe('indexer cache service', () => {
       });
       it('should not do any new inserts', async () => {
         resetMocks()
-        const savedTxHashes = await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+          fakeTx1.transaction.hash,
+          fakeTx2.transaction.hash,
+          fakeTx3.transaction.hash,
+        ])
+
+        const savedTxHashes = await indexerCacheService.upsertTxHashes()
         const caches = await getConnection()
           .getRepository(IndexerTxHashCache)
           .find()
@@ -137,7 +182,19 @@ describe('indexer cache service', () => {
   });
   describe('#updateProcessedTxHashes', () => {
     beforeEach(async () => {
-      await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+      stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+        fakeTx1.transaction.hash,
+        fakeTx2.transaction.hash,
+        fakeTx3.transaction.hash,
+      ])
+      stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
+      stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
+      stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+      stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
+      stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+      stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+
+      await indexerCacheService.upsertTxHashes()
       await indexerCacheService.updateProcessedTxHashes(fakeBlock2.number)
     });
 
@@ -152,7 +209,19 @@ describe('indexer cache service', () => {
   describe('#nextUnprocessedTxsGroupedByBlockNumber', () => {
     describe('when there are caches', () => {
       beforeEach(async () => {
-        await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+          fakeTx1.transaction.hash,
+          fakeTx2.transaction.hash,
+          fakeTx3.transaction.hash,
+        ])
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+
+        await indexerCacheService.upsertTxHashes()
       });
       describe('with all unprocessed transactions', () => {
         it('returns the tx hashes for the next block number', async () => {
@@ -183,7 +252,19 @@ describe('indexer cache service', () => {
     });
     describe('when all transactions are processed', () => {
       beforeEach(async () => {
-        await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([
+          fakeTx1.transaction.hash,
+          fakeTx2.transaction.hash,
+          fakeTx3.transaction.hash,
+        ])
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
+        stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+        stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+
+        await indexerCacheService.upsertTxHashes()
         await getConnection()
           .createQueryBuilder()
           .update(IndexerTxHashCache)
