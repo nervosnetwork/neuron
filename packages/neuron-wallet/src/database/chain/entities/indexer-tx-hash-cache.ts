@@ -27,6 +27,13 @@ export default class IndexerTxHashCache extends BaseEntity {
   address!: string
 
   @Column({
+    type: "character",
+    length: 32,
+  })
+  @Index()
+  walletId!: string
+
+  @Column({
     type: "varchar",
     length: 20,
   })
