@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import logger from 'electron-log'
 import { queue } from 'async'
-import { Indexer, Tip } from '@ckb-lumos/indexer'
+import { Indexer, Tip, CellCollector, CollectorQueries } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -9,6 +9,7 @@ import { Address } from 'database/address/address-dao'
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
+import Script from 'models/chain/script'
 
 export default class IndexerConnector {
   private indexer: Indexer
@@ -136,5 +137,29 @@ export default class IndexerConnector {
 
   public notifyCurrentBlockNumberProcessed() {
     this.processNextBlockNumberQueue.push()
+  }
+
+  public async getLiveCellsByScript(lock: Script | null, type: Script | null) {
+    if (!lock && !type) {
+      throw new Error(`at least one parameter is required`)
+    }
+
+    const queries: CollectorQueries = {}
+    if (lock) {
+      queries.lock = {
+        code_hash: lock.codeHash,
+        hash_type: lock.hashType,
+        args: lock.args
+      }
+    }
+    if (type) {
+      queries.type = {
+        code_hash: type.codeHash,
+        hash_type: type.hashType,
+        args: type.args
+      }
+    }
+    
+    return new CellCollector(this.indexer, queries).collect();
   }
 }
