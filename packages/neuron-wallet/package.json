@@ -21,7 +21,7 @@
     "start:dev": "yarn run build && electron .",
     "build": "ttsc && ncp ./src/block-sync-renderer/index.html ./dist/block-sync-renderer/index.html",
     "clean": "rimraf dist/*",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --collect-coverage",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
     "rebuild:nativemodules": "electron-builder install-app-deps"
