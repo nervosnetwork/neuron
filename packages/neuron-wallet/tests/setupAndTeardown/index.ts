@@ -1,6 +1,5 @@
 import initDB from "../../src/database/chain/ormconfig"
 import { getConnection } from 'typeorm'
-// import accounts from './accounts.fixture'
 import { TransactionPersistor } from '../../src/services/tx'
 import AssetAccount from "../../src/models/asset-account"
 import OutputEntity from "../../src/database/chain/entities/output"
