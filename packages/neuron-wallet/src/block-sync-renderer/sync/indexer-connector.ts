@@ -122,6 +122,10 @@ export default class IndexerConnector {
   }
 
   private async upsertTxHashes(): Promise<string[]> {
+    const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
+    if (nextUnprocessedBlock) {
+      return []
+    }
     const arrayOfInsertedTxHashes = await Promise.all(
       [...this.addressesByWalletId.entries()].map(([walletId, addressMetas]) => {
         const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)

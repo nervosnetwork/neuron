@@ -120,6 +120,34 @@ export default class Queue {
 
     console.log('check and save =======================')
     console.time('queue')
+
+    console.time('get tx queue')
+    const fetchTxQueue = queue(async (task: any) => {
+      const {txHash} = task
+
+      const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
+      cachedPreviousTxs.set(txHash, previousTxWithStatus)
+    }, 100)
+
+    const txHashSet = new Set()
+    for (const [, tx] of transactions.entries()) {
+      for (const [, input] of tx.inputs.entries()) {
+        const previousTxHash = input.previousOutput!.txHash
+        if (previousTxHash === `0x${'0'.repeat(64)}`) {
+          continue;
+        }
+
+        if (txHashSet.has(previousTxHash)) {
+          continue;
+        }
+
+        fetchTxQueue.push({txHash: previousTxHash})
+        txHashSet.add(previousTxHash)
+      }
+    }
+    await fetchTxQueue.drain()
+    console.timeEnd('get tx queue')
+
     for (const [, tx] of transactions.entries()) {
       console.time('check address')
       const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
@@ -131,33 +159,13 @@ export default class Queue {
       console.timeEnd('check address')
       if (shouldSave) {
         console.time('process inputs')
-        const fetchTxQueue = queue(async (task: any) => {
-          const {txHash} = task
-          const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
-          cachedPreviousTxs.set(txHash, previousTxWithStatus)
-        }, 100)
-
-        for (const [, input] of tx.inputs.entries()) {
-          const previousTxHash = input.previousOutput!.txHash
-          if (previousTxHash === `0x${'0'.repeat(64)}`) {
-            continue;
-          }
-
-          fetchTxQueue.push({txHash: previousTxHash})
-        }
-        await fetchTxQueue.drain()
-
         for (const [inputIndex, input] of tx.inputs.entries()) {
           const previousTxHash = input.previousOutput!.txHash
-          if (previousTxHash === `0x${'0'.repeat(64)}`) {
-            continue;
-          }
-          let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
+          const previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
           if (!previousTxWithStatus) {
-            previousTxWithStatus = await this.rpcService.getTransaction(previousTxHash)
-            console.log('get tx', previousTxWithStatus)
-            cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
+            continue
           }
+
           const previousTx = previousTxWithStatus!.transaction
           const previousOutput = previousTx.outputs![+input.previousOutput!.index]
           const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]

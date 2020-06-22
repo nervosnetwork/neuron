@@ -203,6 +203,7 @@ describe('queue', () => {
           stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
           stubbedTransactionsSubject.next(fakeTxs)
           await flushPromises()
+          await flushPromises()
         });
         it('check infos by hashes derived from addresses', () => {
           const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
