@@ -88,9 +88,6 @@ export class TransactionsService {
         )
           .orderBy('tx.timestamp', 'DESC')
           .getRawMany().then(txs => txs.map(tx => tx.txHash))
-        console.log({
-          allTxHashes, lockHashes
-        })
       } else {
         return {
           totalCount: 0,
