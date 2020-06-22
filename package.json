@@ -33,7 +33,7 @@
     "test": "lerna run --parallel test",
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run rebuild:nativemodules && yarn run rebuild:neondeps",
-    "rebuild:neondeps": "`electron-build-env neon build @ckb-lumos/indexer --release`",
+    "rebuild:neondeps": "electron-build-env neon build @ckb-lumos/indexer --release",
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "husky": {
