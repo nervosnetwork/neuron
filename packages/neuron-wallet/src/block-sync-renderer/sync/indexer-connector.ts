@@ -48,7 +48,6 @@ export default class IndexerConnector {
         logger.error(err)
       })
 
-      // check unprocessed instead?
       this.processNextBlockNumberQueue.push(null)
       await this.processNextBlockNumberQueue.drain()
 
