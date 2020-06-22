@@ -118,10 +118,6 @@ export default class Queue {
   private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
 
-    console.log('check and save =======================')
-    console.time('queue')
-
-    console.time('get tx queue')
     const fetchTxQueue = queue(async (task: any) => {
       const {txHash} = task
 
@@ -146,19 +142,15 @@ export default class Queue {
       }
     }
     await fetchTxQueue.drain()
-    console.timeEnd('get tx queue')
 
     for (const [, tx] of transactions.entries()) {
-      console.time('check address')
       const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
         this.anyoneCanPayLockHashes,
         tx,
         this.multiSignBlake160s
       ).addresses()
-      console.timeEnd('check address')
       if (shouldSave) {
-        console.time('process inputs')
         for (const [inputIndex, input] of tx.inputs.entries()) {
           const previousTxHash = input.previousOutput!.txHash
           const previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
@@ -188,27 +180,16 @@ export default class Queue {
             }
           }
         }
-        console.timeEnd('process inputs')
-
-        console.log('saving inputs', tx.inputs.length)
-        console.log('saving outputs', tx.outputs.length)
-        console.time('save fetch tx')
         await TransactionPersistor.saveFetchTx(tx)
-        console.timeEnd('save fetch tx')
-        console.time('update used address')
         const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
         await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
-        console.timeEnd('update used address')
-        console.time('check asset account')
         for (const info of anyoneCanPayInfos) {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
-        console.timeEnd('check asset account')
       }
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
     cachedPreviousTxs.clear()
-    console.timeEnd('queue')
   }
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
@@ -216,17 +197,3 @@ export default class Queue {
     ipcRenderer.invoke('synced-block-number-updated', (this.currentBlockNumber - BigInt(1)).toString())
   }
 }
-
-// const deleteFolderRecursive = function(dirPath) {
-//   if (fs.existsSync(dirPath)) {
-//     fs.readdirSync(dirPath).forEach((file, index) => {
-//       const curPath = path.join(dirPath, file);
-//       if (fs.lstatSync(curPath).isDirectory()) { // recurse
-//         deleteFolderRecursive(curPath);
-//       } else { // delete file
-//         fs.unlinkSync(curPath);
-//       }
-//     });
-//     fs.rmdirSync(dirPath);
-//   }
-// };
