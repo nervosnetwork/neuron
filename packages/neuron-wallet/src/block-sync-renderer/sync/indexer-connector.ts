@@ -55,9 +55,7 @@ export default class IndexerConnector {
       while (this.pollingIndexer) {
         this.indexerTip = this.indexer.tip()
 
-        console.time('tx hash')
         const newInserts = await this.upsertTxHashes()
-        console.timeEnd('tx hash')
 
         const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock()
         if (nextUnprocessedBlockTip) {
@@ -71,7 +69,6 @@ export default class IndexerConnector {
         }
 
         if (newInserts.length) {
-          console.log('hashinsert', newInserts.length)
           this.processNextBlockNumberQueue.push(null)
           await this.processNextBlockNumberQueue.drain()
         }
@@ -136,10 +133,7 @@ export default class IndexerConnector {
   }
 
   private async processNextBlockNumber() {
-    console.time('next')
     const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
-    console.timeEnd('next')
-    console.log('next count', txsInNextUnprocessedBlockNumber.length)
     if (txsInNextUnprocessedBlockNumber.length) {
       this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
     }
