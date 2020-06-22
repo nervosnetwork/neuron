@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.31.0-rc2",
+  "version": "0.31.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -77,7 +77,7 @@
     "jest-when": "^2.7.2",
     "lint-staged": "9.2.5",
     "neon-cli": "^0.4.0",
-    "neuron-ui": "0.31.0-rc2",
+    "neuron-ui": "0.31.0",
     "rimraf": "3.0.0",
     "ts-transformer-imports": "0.4.3",
     "ttypescript": "1.5.10"
