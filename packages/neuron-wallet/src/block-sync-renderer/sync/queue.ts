@@ -19,6 +19,7 @@ import { Address as AddressInterface } from 'database/address/address-dao'
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
+import IndexerCacheService from './indexer-cache-service'
 
 export default class Queue {
   private lockHashes: string[]
@@ -196,6 +197,7 @@ export default class Queue {
         }
         console.timeEnd('check asset account')
       }
+      await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
     cachedPreviousTxs.clear()
     console.timeEnd('queue')

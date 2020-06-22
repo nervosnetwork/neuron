@@ -70,6 +70,19 @@ export default class IndexerCacheService {
     }
   }
 
+  public static async updateCacheProcessed(txHash: string) {
+    await getConnection()
+      .createQueryBuilder()
+      .update(IndexerTxHashCache)
+      .set({
+        isProcessed: true
+      })
+      .where({
+        txHash
+      })
+      .execute()
+  }
+
   public async upsertTxHashes(): Promise<string[]> {
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
@@ -89,15 +102,6 @@ export default class IndexerCacheService {
         }
 
         for (const txHash of fetchedTxHashes) {
-          // if (!mappingsByTxHash.get(txHash)) {
-          //   mappingsByTxHash.set(txHash, [])
-          // }
-
-          // const mappings = mappingsByTxHash.get(txHash)
-          // mappings.push({
-          //   address: addressMeta.address,
-          //   lockHash: lockScript.computeHash()
-          // })
           mappingsByTxHash.set(txHash, [{
             address: addressMeta.address,
             lockHash: lockScript.computeHash()

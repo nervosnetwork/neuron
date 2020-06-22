@@ -26,6 +26,7 @@ const stubbedAddressesFn = jest.fn()
 const stubbedSaveFetchFn = jest.fn()
 const stubbedUpdateUsedAddressesFn = jest.fn()
 const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
+const stubbedUpdateCacheProcessedFn = jest.fn()
 
 const stubbedTxAddressFinder = jest.fn().mockImplementation(
   (...args) => {
@@ -55,12 +56,14 @@ const resetMocks = () => {
   stubbedUpdateUsedAddressesFn.mockReset()
   stubbedGetTransactionFn.mockReset()
   stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
+  stubbedUpdateCacheProcessedFn.mockReset()
 }
 
 const flushPromises = () => new Promise(setImmediate);
 
 const generateFakeTx = (id: string) => {
   const fakeTx = new Transaction('')
+  fakeTx.hash = 'hash1'
   fakeTx.inputs = [
     new Input(new OutPoint('0x' + id.repeat(64), '0'))
   ]
@@ -151,17 +154,16 @@ describe('queue', () => {
     jest.doMock('../../src/block-sync-renderer/sync/tx-address-finder', () => {
       return stubbedTxAddressFinder
     });
+    jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
+      return { updateCacheProcessed: stubbedUpdateCacheProcessedFn }
+    });
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
-    // jest.useFakeTimers()
-  });
-  afterEach(() => {
-    // jest.clearAllTimers()
   });
   describe('#start', () => {
     beforeEach(async () => {
       stubbedGenesisBlockHashFn.mockResolvedValue('fakegenesisblockhash')
-      stubbedGetChainFn.mockReturnValue(fakeChain)
+      stubbedGetChainFn.mockResolvedValue(fakeChain)
       await queue.start()
     });
     it('inits IndexerConnector', () => {
@@ -193,12 +195,12 @@ describe('queue', () => {
           fakeTxWithStatus2
         ]
         beforeEach(async () => {
-          stubbedAddressesFn.mockReturnValue([
+          stubbedAddressesFn.mockResolvedValue([
             true,
             addresses.map(addressMeta => addressMeta.address),
             []
           ])
-          stubbedGetTransactionFn.mockReturnValue(fakeTxWithStatus1)
+          stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
           stubbedTransactionsSubject.next(fakeTxs)
           await flushPromises()
         });
@@ -230,6 +232,9 @@ describe('queue', () => {
             fakeTxWithStatus1.transaction.blockNumber
           )
         });
+        it('updates tx hash cache to be processed', () => {
+          expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
+        })
         describe('when involves ACP', () => {
           it('updates ACP blake160s', () => {
 

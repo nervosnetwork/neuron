@@ -327,4 +327,48 @@ describe('indexer cache service', () => {
       });
     });
   });
+  describe('#updateCacheProcessed', () => {
+    describe('when there are unprocessed tx hash cache', () => {
+      beforeEach(async () => {
+        when(stubbedGetTransactionsByLockScriptFn)
+          .calledWith(formattedScript)
+          .mockReturnValueOnce([
+            fakeTx1.transaction.hash,
+            fakeTx2.transaction.hash,
+            fakeTx3.transaction.hash,
+          ])
+        when(stubbedGetTransactionFn)
+          .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
+          .calledWith(fakeTx2.transaction.hash).mockReturnValueOnce(fakeTx2)
+          .calledWith(fakeTx3.transaction.hash).mockReturnValueOnce(fakeTx3)
+        when(stubbedGetHeaderFn)
+          .calledWith(fakeBlock1.hash).mockReturnValueOnce(fakeBlock1)
+          .calledWith(fakeBlock2.hash).mockReturnValue(fakeBlock2)
+
+        await indexerCacheService.upsertTxHashes()
+
+        const caches = await getConnection()
+          .getRepository(IndexerTxHashCache)
+          .find()
+        const processedCaches = caches.filter(cache => !cache.isProcessed)
+        expect(processedCaches).toHaveLength(3)
+
+        for (const hash of [
+          fakeTx1.transaction.hash,
+          fakeTx3.transaction.hash,
+        ]) {
+          await IndexerCacheService.updateCacheProcessed(hash)
+        }
+      });
+      it('updates isProcessed to be true', async () => {
+        const caches = await getConnection()
+          .getRepository(IndexerTxHashCache)
+          .find()
+        const processedCaches = caches.filter(cache => cache.isProcessed)
+        expect(processedCaches).toHaveLength(2)
+        expect(processedCaches.filter(cache => cache.txHash === fakeTx1.transaction.hash)).toHaveLength(1)
+        expect(processedCaches.filter(cache => cache.txHash === fakeTx3.transaction.hash)).toHaveLength(1)
+      });
+    });
+  });
 })
