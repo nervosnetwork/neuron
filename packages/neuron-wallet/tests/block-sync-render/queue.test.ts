@@ -19,6 +19,7 @@ const stubbedTxAddressFinderConstructor = jest.fn()
 
 const stubbedConnectFn = jest.fn()
 const stubbedGetChainFn = jest.fn()
+const stubbedGenesisBlockHashFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
 const stubbedIpcRenderInvokeFn = jest.fn()
 const stubbedAddressesFn = jest.fn()
@@ -38,13 +39,15 @@ const stubbedTxAddressFinder = jest.fn().mockImplementation(
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
   () => ({
     getChain: stubbedGetChainFn,
-    getTransaction: stubbedGetTransactionFn
+    getTransaction: stubbedGetTransactionFn,
+    genesisBlockHash: stubbedGenesisBlockHashFn
   })
 )
 
 const resetMocks = () => {
   stubbedConnectFn.mockReset()
   stubbedGetChainFn.mockReset()
+  stubbedGenesisBlockHashFn.mockReset()
   stubbedIndexerConnectorConstructor.mockReset()
   stubbedIpcRenderInvokeFn.mockReset()
   stubbedAddressesFn.mockReset()
@@ -157,6 +160,7 @@ describe('queue', () => {
   });
   describe('#start', () => {
     beforeEach(async () => {
+      stubbedGenesisBlockHashFn.mockResolvedValue('fakegenesisblockhash')
       stubbedGetChainFn.mockReturnValue(fakeChain)
       await queue.start()
     });

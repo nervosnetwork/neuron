@@ -1,9 +1,10 @@
 import { getConnection } from 'typeorm'
+import { queue } from 'async'
 import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
 import { Indexer } from '@ckb-lumos/indexer'
-
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
@@ -49,6 +50,26 @@ export default class IndexerCacheService {
       .getMany()
   }
 
+  public static async nextUnprocessedBlock(): Promise<{blockNumber: string, blockHash: string} | undefined> {
+    const result = await getConnection()
+      .getRepository(IndexerTxHashCache)
+      .createQueryBuilder()
+      .where({
+        isProcessed: false
+      })
+      .orderBy('blockNumber', 'ASC')
+      .getOne()
+
+    if (!result) {
+      return
+    }
+
+    return {
+      blockNumber: result.blockNumber.toString(),
+      blockHash: result.blockHash
+    }
+  }
+
   public async upsertTxHashes(): Promise<string[]> {
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
@@ -68,15 +89,19 @@ export default class IndexerCacheService {
         }
 
         for (const txHash of fetchedTxHashes) {
-          if (!mappingsByTxHash.get(txHash)) {
-            mappingsByTxHash.set(txHash, [])
-          }
+          // if (!mappingsByTxHash.get(txHash)) {
+          //   mappingsByTxHash.set(txHash, [])
+          // }
 
-          const mappings = mappingsByTxHash.get(txHash)
-          mappings.push({
+          // const mappings = mappingsByTxHash.get(txHash)
+          // mappings.push({
+          //   address: addressMeta.address,
+          //   lockHash: lockScript.computeHash()
+          // })
+          mappingsByTxHash.set(txHash, [{
             address: addressMeta.address,
             lockHash: lockScript.computeHash()
-          })
+          }])
         }
       }
     }
@@ -101,25 +126,24 @@ export default class IndexerCacheService {
       return []
     }
 
-    const arrayOfTxWithStatus = await Promise.all(
-      newTxHashes.map(async hash => {
-        const txWithStatus = await this.rpcService.getTransaction(hash)
-        if (!txWithStatus) {
-          return
-        }
-        const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-        txWithStatus!.transaction.blockNumber = blockHeader?.number
-        txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-        txWithStatus!.transaction.timestamp = blockHeader?.timestamp
-        return txWithStatus
-      })
-    )
-
-    for (const txWithStatus of arrayOfTxWithStatus.flat()) {
+    const txsWithStatus: TransactionWithStatus[] = []
+    const fetchBlockDetailsQueue = queue(async (hash: string) => {
+      const txWithStatus = await this.rpcService.getTransaction(hash)
       if (!txWithStatus) {
-        continue
+        return
       }
+      const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
+      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
+      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
 
+      txsWithStatus.push(txWithStatus)
+    }, 100)
+
+    fetchBlockDetailsQueue.push(newTxHashes)
+    await fetchBlockDetailsQueue.drain()
+
+    for (const txWithStatus of txsWithStatus) {
       const {transaction, txStatus} = txWithStatus
       const mappings = mappingsByTxHash.get(transaction.hash)
 
@@ -130,7 +154,7 @@ export default class IndexerCacheService {
           .into(IndexerTxHashCache)
           .values({
             txHash: transaction.hash,
-            blockNumber: transaction.blockNumber,
+            blockNumber: parseInt(transaction.blockNumber!),
             blockHash: txStatus.blockHash!,
             blockTimestamp: transaction.timestamp,
             lockHash,

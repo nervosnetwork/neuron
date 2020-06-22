@@ -5,7 +5,7 @@ import { AddressPrefix, AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/database/address/address-dao'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
-import AddressMeta from '../../src/database/address/meta'
+// import AddressMeta from '../../src/database/address/meta'
 
 const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
@@ -14,37 +14,7 @@ const stubbedGetHeaderFn = jest.fn()
 const stubbedUpsertTxHashesFn = jest.fn()
 const stubbedNextUnprocessedTxsGroupedByBlockNumberFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
-
-const stubbedIndexerConstructor = jest.fn().mockImplementation(
-  () => ({
-    startForever: stubbedStartForeverFn,
-    tip: stubbedTipFn,
-  })
-)
-
-const stubbedIndexerCacheService = jest.fn().mockImplementation(
-  () => ({
-    upsertTxHashes: stubbedUpsertTxHashesFn,
-    nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
-  })
-)
-
-const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
-  () => ({
-    getTransaction: stubbedGetTransactionFn,
-    getHeader: stubbedGetHeaderFn
-  })
-)
-
-const resetMocks = () => {
-  stubbedTipFn.mockReset()
-  stubbedStartForeverFn.mockReset()
-  stubbedGetTransactionFn.mockReset()
-  stubbedGetHeaderFn.mockReset()
-  stubbedUpsertTxHashesFn.mockReset()
-  stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
-  stubbedLoggerErrorFn.mockReset()
-}
+const stubbedNextUnprocessedBlock = jest.fn()
 
 const flushPromises = () => new Promise(setImmediate);
 
@@ -62,7 +32,47 @@ describe('unit tests for IndexerConnector', () => {
   const nodeUrl = 'http://nodeurl:8114'
   const indexerFolderPath = '/indexer/data/path'
   let stubbedIndexerConnector: any
+
+  let stubbedIndexerConstructor: any
+  let stubbedIndexerCacheService: any
+  let stubbedRPCServiceConstructor: any
+
+  const resetMocks = () => {
+    stubbedTipFn.mockReset()
+    stubbedStartForeverFn.mockReset()
+    stubbedGetTransactionFn.mockReset()
+    stubbedGetHeaderFn.mockReset()
+    stubbedUpsertTxHashesFn.mockReset()
+    stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
+    stubbedLoggerErrorFn.mockReset()
+    stubbedNextUnprocessedBlock.mockReset()
+  }
+
   beforeEach(() => {
+    resetMocks()
+    jest.useFakeTimers()
+    stubbedIndexerConstructor = jest.fn().mockImplementation(
+      () => ({
+        startForever: stubbedStartForeverFn,
+        tip: stubbedTipFn,
+      })
+    )
+
+    stubbedIndexerCacheService = jest.fn().mockImplementation(
+      () => ({
+        upsertTxHashes: stubbedUpsertTxHashesFn,
+        nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
+      })
+    )
+    stubbedIndexerCacheService.nextUnprocessedBlock = stubbedNextUnprocessedBlock
+
+    stubbedRPCServiceConstructor = jest.fn().mockImplementation(
+      () => ({
+        getTransaction: stubbedGetTransactionFn,
+        getHeader: stubbedGetHeaderFn
+      })
+    )
+
     jest.doMock('@ckb-lumos/indexer', () => {
       return {
         Indexer : stubbedIndexerConstructor
@@ -78,8 +88,6 @@ describe('unit tests for IndexerConnector', () => {
       return stubbedIndexerCacheService
     });
     stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
-    resetMocks()
-    jest.useFakeTimers()
   });
   afterEach(() => {
     jest.clearAllTimers()
@@ -98,6 +106,7 @@ describe('unit tests for IndexerConnector', () => {
     const fakeTip2 = {block_number: '2', block_hash: 'hash2'}
     const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
     const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
+    const fakeBlock3 = {number: '3', hash: '3', timestamp: '3'}
     const fakeTx1 = {
       transaction: {hash: 'hash1', blockNumber: fakeBlock1.number, blockTimestamp: new Date(1)},
       txStatus: {status: 'committed', blockHash: fakeBlock1.hash}
@@ -159,9 +168,6 @@ describe('unit tests for IndexerConnector', () => {
     const addressesToWatch = [addressObj1, addressObj2]
 
     beforeEach(() => {
-      stubbedTipFn.mockReturnValueOnce(fakeTip1)
-      stubbedTipFn.mockReturnValueOnce(fakeTip2)
-
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
     });
     describe('starts lumos indexer', () => {
@@ -178,10 +184,11 @@ describe('unit tests for IndexerConnector', () => {
       describe('#transactionsSubject', () => {
         let transactionsSubject: any
         beforeEach(() => {
+          indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
           transactionsSubject = indexerConnector.transactionsSubject
         });
 
-        describe('when there are transactions for an address', () => {
+        describe('when there are transactions', () => {
           let txObserver: any
           beforeEach(() => {
             stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
@@ -199,6 +206,27 @@ describe('unit tests for IndexerConnector', () => {
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
           });
+          describe('attempts to upsert tx hash caches', () => {
+            beforeEach(async () => {
+              await connectIndexer(indexerConnector)
+            });
+            it('upserts tx hash caches', () => {
+              // expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+              //   walletId1,
+              //   [AddressMeta.fromObject(addressObj1)],
+              //   stubbedRPCServiceConstructor(),
+              //   stubbedIndexerConstructor()
+              // )
+              // expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+              //   walletId2,
+              //   [AddressMeta.fromObject(addressObj2)],
+              //   stubbedRPCServiceConstructor(),
+              //   stubbedIndexerConstructor()
+              // )
+
+              expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
+            })
+          });
           describe('when loaded block number is already in order', () => {
             beforeEach(async () => {
               when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
@@ -211,23 +239,8 @@ describe('unit tests for IndexerConnector', () => {
                 ])
 
               await connectIndexer(indexerConnector)
+              await flushPromises()
             });
-            it('upserts tx hash caches', () => {
-              expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-                walletId1,
-                [AddressMeta.fromObject(addressObj1)],
-                stubbedRPCServiceConstructor(),
-                stubbedIndexerConstructor()
-              )
-              expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-                walletId2,
-                [AddressMeta.fromObject(addressObj2)],
-                stubbedRPCServiceConstructor(),
-                stubbedIndexerConstructor()
-              )
-
-              expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
-            })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
@@ -245,23 +258,24 @@ describe('unit tests for IndexerConnector', () => {
                 ])
 
               await connectIndexer(indexerConnector)
+              await flushPromises()
             });
-            it('upserts tx hash caches', () => {
-              expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-                walletId1,
-                [AddressMeta.fromObject(addressObj1)],
-                stubbedRPCServiceConstructor(),
-                stubbedIndexerConstructor()
-              )
-              expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-                walletId2,
-                [AddressMeta.fromObject(addressObj2)],
-                stubbedRPCServiceConstructor(),
-                stubbedIndexerConstructor()
-              )
+            // it('upserts tx hash caches', () => {
+            //   expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+            //     walletId1,
+            //     [AddressMeta.fromObject(addressObj1)],
+            //     stubbedRPCServiceConstructor(),
+            //     stubbedIndexerConstructor()
+            //   )
+            //   expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+            //     walletId2,
+            //     [AddressMeta.fromObject(addressObj2)],
+            //     stubbedRPCServiceConstructor(),
+            //     stubbedIndexerConstructor()
+            //   )
 
-              expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
-            })
+            //   expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
+            // })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
@@ -288,7 +302,6 @@ describe('unit tests for IndexerConnector', () => {
         describe('failure cases', () => {
           let txObserver: any
           beforeEach(async () => {
-
             stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
             when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
               .calledWith().mockResolvedValue([fakeTxHashCache3])
@@ -298,6 +311,7 @@ describe('unit tests for IndexerConnector', () => {
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             await connectIndexer(indexerConnector)
+            await flushPromises()
           });
           it('throws error when there no transaction matched to a hash from #processNextBlockNumberQueue', () => {
             expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(new Error('failed to fetch transaction for hash hash3'))
@@ -311,21 +325,48 @@ describe('unit tests for IndexerConnector', () => {
           indexerConnector.blockTipSubject.subscribe(tip => {
             tipObserver(tip)
           })
+          stubbedTipFn.mockReturnValueOnce(fakeTip1)
+          stubbedTipFn.mockReturnValueOnce(fakeTip2)
           stubbedGetTransactionFn.mockResolvedValue(fakeTx3)
           stubbedGetHeaderFn.mockResolvedValue(fakeBlock2)
-          stubbedUpsertTxHashesFn.mockReturnValue([])
+          stubbedUpsertTxHashesFn.mockResolvedValue([])
           stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
+          stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
           await connectIndexer(indexerConnector)
         });
-        describe('when the block tip is higher than previous one', () => {
-          it('observed new tips', async () => {
-            jest.advanceTimersByTime(5000)
-            await flushPromises()
-
-            expect(tipObserver).toHaveBeenCalledTimes(2)
-            expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
-            expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
-          })
+        it('observes an indexer tip', () => {
+          expect(tipObserver).toHaveBeenCalledTimes(1)
+          expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
+        });
+        describe('fast forward the interval time', () => {
+          describe('when there is no unprocessed blocks', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
+              jest.advanceTimersByTime(5000)
+              await flushPromises()
+            });
+            it('observes another indexer tip', async () => {
+              expect(tipObserver).toHaveBeenCalledTimes(2)
+              expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
+            })
+          });
+          describe('when there are unprocessed blocks', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedBlock.mockResolvedValue({
+                blockNumber: fakeBlock3.number,
+                blockHash: fakeBlock3.hash,
+              })
+              jest.advanceTimersByTime(5000)
+              await flushPromises()
+            });
+            it('observes next unprocessed block tip', async () => {
+              expect(tipObserver).toHaveBeenCalledTimes(2)
+              expect(tipObserver).toHaveBeenCalledWith({
+                block_number: fakeBlock3.number,
+                block_hash: fakeBlock3.hash,
+              })
+            })
+          });
         });
       });
     })

@@ -208,7 +208,7 @@ describe('indexer cache service', () => {
       const caches = await getConnection()
         .getRepository(IndexerTxHashCache)
         .find()
-      const cachesByBlock2 = caches.filter(cache => cache.isProcessed && cache.blockNumber === fakeBlock2.number)
+      const cachesByBlock2 = caches.filter(cache => cache.isProcessed && cache.blockNumber === parseInt(fakeBlock2.number))
       expect(cachesByBlock2).toHaveLength(2)
     })
   });
@@ -236,7 +236,7 @@ describe('indexer cache service', () => {
         it('returns the tx hashes for the next block number', async () => {
           const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
           expect(txHashes).toHaveLength(1)
-          expect(txHashes![0].blockNumber).toEqual(fakeBlock1.number)
+          expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock1.number))
         });
       });
       describe('with some processed transactions', () => {
@@ -255,7 +255,7 @@ describe('indexer cache service', () => {
         it('returns the tx hashes for the next block number', async () => {
           const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
           expect(txHashes).toHaveLength(2)
-          expect(txHashes![0].blockNumber).toEqual(fakeBlock2.number)
+          expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock2.number))
         });
       });
     });
@@ -288,6 +288,42 @@ describe('indexer cache service', () => {
       it('returns empty array when no unprocessed transactions', async () => {
         const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
         expect(txHashes).toEqual([])
+      });
+    });
+  });
+  describe('#nextUnprocessedBlock', () => {
+    beforeEach(async () => {
+      when(stubbedGetTransactionsByLockScriptFn)
+        .calledWith(formattedScript)
+        .mockReturnValueOnce([fakeTx1.transaction.hash])
+      when(stubbedGetTransactionFn)
+        .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
+      when(stubbedGetHeaderFn)
+        .calledWith(fakeBlock1.hash).mockReturnValueOnce(fakeBlock1)
+
+      await indexerCacheService.upsertTxHashes()
+    });
+    describe('when has unprocessed blocks', () => {
+      it('returns next unprocessed block number', async () => {
+        const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
+        expect(nextUnprocessedBlock).toEqual({
+          blockNumber: fakeBlock1.number, blockHash: fakeBlock1.hash
+        })
+      });
+    });
+    describe('when has no unprocessed blocks', () => {
+      beforeEach(async () => {
+        await getConnection()
+          .createQueryBuilder()
+          .update(IndexerTxHashCache)
+          .set({
+            isProcessed: true
+          })
+          .execute()
+      });
+      it('returns undefined', async () => {
+        const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
+        expect(nextUnprocessedBlock).toEqual(undefined)
       });
     });
   });

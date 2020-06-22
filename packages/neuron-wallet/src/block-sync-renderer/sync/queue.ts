@@ -53,12 +53,10 @@ export default class Queue {
   }
 
   public async start() {
-    const { app } = env
-    const chain = await this.rpcService.getChain()
     const indexedDataPath = path.resolve(
-      app.getPath('userData'),
-      chain.replace('ckb_', ''),
+      env.fileBasePath,
       './indexer_data',
+      await this.rpcService.genesisBlockHash()
     )
 
     this.indexerConnector = new IndexerConnector(
@@ -119,14 +117,35 @@ export default class Queue {
   private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
 
+    console.log('check and save =======================')
+    console.time('queue')
     for (const [, tx] of transactions.entries()) {
+      console.time('check address')
       const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
         this.anyoneCanPayLockHashes,
         tx,
         this.multiSignBlake160s
       ).addresses()
+      console.timeEnd('check address')
       if (shouldSave) {
+        console.time('process inputs')
+        const fetchTxQueue = queue(async (task: any) => {
+          const {txHash} = task
+          const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
+          cachedPreviousTxs.set(txHash, previousTxWithStatus)
+        }, 100)
+
+        for (const [, input] of tx.inputs.entries()) {
+          const previousTxHash = input.previousOutput!.txHash
+          if (previousTxHash === `0x${'0'.repeat(64)}`) {
+            continue;
+          }
+
+          fetchTxQueue.push({txHash: previousTxHash})
+        }
+        await fetchTxQueue.drain()
+
         for (const [inputIndex, input] of tx.inputs.entries()) {
           const previousTxHash = input.previousOutput!.txHash
           if (previousTxHash === `0x${'0'.repeat(64)}`) {
@@ -135,6 +154,7 @@ export default class Queue {
           let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
           if (!previousTxWithStatus) {
             previousTxWithStatus = await this.rpcService.getTransaction(previousTxHash)
+            console.log('get tx', previousTxWithStatus)
             cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
           }
           const previousTx = previousTxWithStatus!.transaction
@@ -159,16 +179,26 @@ export default class Queue {
             }
           }
         }
+        console.timeEnd('process inputs')
 
+        console.log('saving inputs', tx.inputs.length)
+        console.log('saving outputs', tx.outputs.length)
+        console.time('save fetch tx')
         await TransactionPersistor.saveFetchTx(tx)
+        console.timeEnd('save fetch tx')
+        console.time('update used address')
         const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
         await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
+        console.timeEnd('update used address')
+        console.time('check asset account')
         for (const info of anyoneCanPayInfos) {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
+        console.timeEnd('check asset account')
       }
     }
     cachedPreviousTxs.clear()
+    console.timeEnd('queue')
   }
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {

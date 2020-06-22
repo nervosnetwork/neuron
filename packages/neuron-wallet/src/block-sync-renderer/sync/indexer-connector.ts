@@ -43,23 +43,35 @@ export default class IndexerConnector {
       this.indexer.startForever()
       this.pollingIndexer = true
 
-      this.processNextBlockNumberQueue = queue(async () => this.processNextBlockNumber())
+      this.processNextBlockNumberQueue = queue(async () => this.processNextBlockNumber(), 1)
       this.processNextBlockNumberQueue.error((err: any) => {
         logger.error(err)
       })
 
       // check unprocessed instead?
       this.processNextBlockNumberQueue.push(null)
-      // await this.processNextBlockNumberQueue.drain()
+      await this.processNextBlockNumberQueue.drain()
 
       while (this.pollingIndexer) {
         this.indexerTip = this.indexer.tip()
-        this.blockTipSubject.next(this.indexerTip)
 
         console.time('tx hash')
         const newInserts = await this.upsertTxHashes()
         console.timeEnd('tx hash')
+
+        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock()
+        if (nextUnprocessedBlockTip) {
+          this.blockTipSubject.next({
+            block_number: nextUnprocessedBlockTip.blockNumber,
+            block_hash: nextUnprocessedBlockTip.blockHash,
+          })
+        }
+        else if (this.indexerTip) {
+          this.blockTipSubject.next(this.indexerTip)
+        }
+
         if (newInserts.length) {
+          console.log('hashinsert', newInserts.length)
           this.processNextBlockNumberQueue.push(null)
           await this.processNextBlockNumberQueue.drain()
         }
@@ -85,10 +97,10 @@ export default class IndexerConnector {
         return parseInt(a.blockTimestamp) - parseInt(b.blockTimestamp)
       })
       .reduce((grouped, txHashCache) => {
-        if (!grouped.get(txHashCache.blockNumber)) {
-          grouped.set(txHashCache.blockNumber, [])
+        if (!grouped.get(txHashCache.blockNumber.toString())) {
+          grouped.set(txHashCache.blockNumber.toString(), [])
         }
-        grouped.get(txHashCache.blockNumber)!.push(txHashCache)
+        grouped.get(txHashCache.blockNumber.toString())!.push(txHashCache)
 
         return grouped
       }, new Map<string, Array<IndexerTxHashCache>>())
@@ -130,19 +142,27 @@ export default class IndexerConnector {
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
-    return await Promise.all(
-      txHashes.map(async hash => {
-        const txWithStatus = await this.rpcService.getTransaction(hash)
-        if (!txWithStatus) {
-          throw new Error(`failed to fetch transaction for hash ${hash}`)
-        }
-        const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-        txWithStatus!.transaction.blockNumber = blockHeader?.number
-        txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-        txWithStatus!.transaction.timestamp = blockHeader?.timestamp
-        return txWithStatus
-      })
-    )
+    const txsWithStatus: TransactionWithStatus[] = []
+    const fetchTxsWithStatusQueue = queue(async (hash: string) => {
+      const txWithStatus = await this.rpcService.getTransaction(hash)
+      if (!txWithStatus) {
+        throw new Error(`failed to fetch transaction for hash ${hash}`)
+      }
+      const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
+      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
+      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
+      txsWithStatus.push(txWithStatus)
+    }, 1)
+
+    fetchTxsWithStatusQueue.push(txHashes)
+
+    await new Promise((resolve, reject) => {
+      fetchTxsWithStatusQueue.drain(resolve)
+      fetchTxsWithStatusQueue.error(reject)
+    })
+
+    return txsWithStatus
   }
 
   public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
