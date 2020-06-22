@@ -11,7 +11,10 @@ import { OutputStatus } from "../../src/models/chain/output"
 import SudtTokenInfoEntity from "../../src/database/chain/entities/sudt-token-info"
 import TransactionEntity from "../../src/database/chain/entities/transaction"
 import { TransactionStatus } from "../../src/models/chain/transaction"
-import { createAccounts, loadAccounts } from '../setupAndTeardown'
+import { createAccounts } from '../setupAndTeardown'
+import accounts from '../setupAndTeardown/accounts.fixture'
+
+const [assetAccount, ckbAssetAccount] = accounts
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -74,8 +77,6 @@ describe('AssetAccountService', () => {
     await connection.synchronize(true)
     done()
   })
-
-  const [assetAccount, ckbAssetAccount] = loadAccounts()
 
   it("test for save relation", async () => {
     const entity = AssetAccountEntity.fromModel(assetAccount)

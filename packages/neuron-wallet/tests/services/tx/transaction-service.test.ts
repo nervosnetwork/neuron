@@ -3,14 +3,14 @@ import fs from 'fs'
 import path from 'path'
 import TransactionService, { SearchType } from '../../../src/services/tx/transaction-service'
 import { TransactionStatus } from '../../../src/models/chain/transaction'
-import { saveTransactions, loadTransactions, initConnection, closeConnection, saveAccounts } from '../../setupAndTeardown'
-
-const transactions = loadTransactions()
+import { saveTransactions, initConnection, closeConnection, saveAccounts } from '../../setupAndTeardown'
+import accounts from '../../setupAndTeardown/accounts.fixture'
+import transactions from '../../setupAndTeardown/transactions.fixture'
 
 describe('Test transaction service', () => {
   beforeEach(async () => {
     await initConnection()
-    await saveAccounts()
+    await saveAccounts(accounts)
     return saveTransactions(transactions)
   })
 

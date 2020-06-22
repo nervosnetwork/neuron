@@ -3,9 +3,9 @@ import { TransactionPersistor } from "../../../src/services/tx"
 import initConnection from "../../../src/database/chain/ormconfig"
 import TransactionEntity from "../../../src/database/chain/entities/transaction"
 import { getConnection } from "typeorm"
-import { loadTransactions } from '../../setupAndTeardown'
+import transactions from '../../setupAndTeardown/transactions.fixture'
 
-const [tx, tx2] = loadTransactions()
+const [tx, tx2] = transactions
 
 describe('TransactionPersistor', () => {
   beforeAll(async done => {

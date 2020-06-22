@@ -1,7 +1,6 @@
 import initDB from "../../src/database/chain/ormconfig"
 import { getConnection } from 'typeorm'
-import transactions from './transactions'
-import accounts from './accounts'
+// import accounts from './accounts.fixture'
 import { TransactionPersistor } from '../../src/services/tx'
 import AssetAccount from "../../src/models/asset-account"
 import OutputEntity from "../../src/database/chain/entities/output"
@@ -15,20 +14,12 @@ export const closeConnection = () => {
   return getConnection().close()
 }
 
-export const loadTransactions = () => {
-  return transactions
-}
-
 export const saveTransactions = async (txs: any) => {
   for (const tx of txs) {
     // TODO: do not use private methods
     // @ts-ignore: Private method
     await TransactionPersistor.saveWithFetch(tx)
   }
-}
-
-export const loadAccounts = () => {
-  return accounts
 }
 
 export const createAccounts = async (assetAccounts: AssetAccount[], outputEntities: OutputEntity[]) => {
@@ -47,7 +38,7 @@ export const createAccounts = async (assetAccounts: AssetAccount[], outputEntiti
   return accountIds
 }
 
-export const saveAccounts = async () => {
+export const saveAccounts = async (accounts: AssetAccount[]) => {
   for (const account of accounts) {
     const entity = AssetAccountEntity.fromModel(account)
     await getConnection().manager.save([entity.sudtTokenInfo, entity])
