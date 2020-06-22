@@ -239,7 +239,7 @@ describe('indexer cache service', () => {
           expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock1.number))
         });
       });
-      describe('with some processed transactions', () => {
+      describe('with some blocks has been fully processed', () => {
         beforeEach(async () => {
           await getConnection()
             .createQueryBuilder()
@@ -256,6 +256,26 @@ describe('indexer cache service', () => {
           const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
           expect(txHashes).toHaveLength(2)
           expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock2.number))
+        });
+        describe('when some transactions has been partially processed in a block', () => {
+          beforeEach(async () => {
+            await getConnection()
+              .createQueryBuilder()
+              .update(IndexerTxHashCache)
+              .where({
+                txHash: fakeTx2.transaction.hash
+              })
+              .set({
+                isProcessed: true
+              })
+              .execute()
+          })
+          it('returns the unprocessed tx hash in the next block number', async () => {
+            const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
+            expect(txHashes).toHaveLength(1)
+            expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock2.number))
+            expect(txHashes![0].txHash).toEqual(fakeTx3.transaction.hash)
+          });
         });
       });
     });

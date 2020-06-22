@@ -208,6 +208,7 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .where({
         blockNumber,
+        isProcessed: false,
         walletId: this.walletId
       })
       .getMany()
