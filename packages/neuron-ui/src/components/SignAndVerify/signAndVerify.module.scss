@@ -172,7 +172,16 @@ $inputHeight: 26px;
 }
 
 .passwordDialog {
-  width: 400px;
+  @include dialog-container;
+  padding: 30px 50px;
+
+  &::backdrop {
+    @include overlay;
+  }
+
+  .actions {
+    @include dialog-footer;
+  }
 
   h2 {
     @include bold-text;
@@ -184,10 +193,6 @@ $inputHeight: 26px;
 
   input {
     margin: auto;
-  }
-
-  .actions {
-    @include dialog-footer;
   }
 }
 
