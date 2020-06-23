@@ -9,7 +9,6 @@ import Transaction from './entities/transaction'
 import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
-import LiveCell from './entities/live-cell'
 import AssetAccount from './entities/asset-account'
 import SudtTokenInfo from './entities/sudt-token-info'
 import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
@@ -32,6 +31,7 @@ import { AddTypeToInput1587371249814 } from './migrations/1587371249814-AddTypeT
 import { FlattenLockAndType1587375230126 } from './migrations/1587375230126-FlattenLockAndType'
 import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSudtTokenInfo'
 import { RemoveAssetAccountWalletID1589273902050 } from './migrations/1589273902050-RemoveAssetAccountWalletID'
+import { RemoveLiveCell1592781363749 } from './migrations/1592781363749-RemoveLiveCell'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -51,7 +51,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ...connectionOptions,
     type: 'sqlite',
     database,
-    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell, SudtTokenInfo, IndexerTxHashCache],
+    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, SudtTokenInfo, IndexerTxHashCache],
     migrations: [
       InitMigration1566959757554,
       AddTypeAndHasData1567144517514,
@@ -71,6 +71,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       FlattenLockAndType1587375230126,
       AddSudtTokenInfo1587523557249,
       RemoveAssetAccountWalletID1589273902050,
+      RemoveLiveCell1592781363749,
     ],
     logging,
     maxQueryExecutionTime: 30

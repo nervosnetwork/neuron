@@ -15,12 +15,6 @@ export default class ChainCleaner {
     await getConnection().createQueryBuilder()
       .delete()
       .from(SyncInfoEntity)
-      .where(
-        `name != :name`,
-        {
-          name: SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER,
-        }
-      )
       .execute()
   }
 }
