@@ -1,6 +1,6 @@
 import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
-import { LomosCell } from 'services/indexer-service'
+import { LumosCell } from 'services/indexer-service'
 
 export default class LiveCell {
   public txHash: string
@@ -48,7 +48,7 @@ export default class LiveCell {
     return undefined
   }
 
-  public static fromLomus(cell: LomosCell): LiveCell {
+  public static fromLumos(cell: LumosCell): LiveCell {
     const type = cell.cell_output.type ? new Script(
       cell.cell_output.type.code_hash,
       cell.cell_output.type.args,

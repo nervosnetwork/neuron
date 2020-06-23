@@ -4,7 +4,7 @@ import { Indexer, CollectorQueries, CellCollector } from "@ckb-lumos/indexer";
 import Script from "models/chain/script";
 import NetworksService from './networks';
 
-export interface LomosCell {
+export interface LumosCell {
   block_hash: string
   out_point: { 
     tx_hash: string
