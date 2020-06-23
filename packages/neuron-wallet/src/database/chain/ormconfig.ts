@@ -32,6 +32,7 @@ import { FlattenLockAndType1587375230126 } from './migrations/1587375230126-Flat
 import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSudtTokenInfo'
 import { RemoveAssetAccountWalletID1589273902050 } from './migrations/1589273902050-RemoveAssetAccountWalletID'
 import { RemoveLiveCell1592781363749 } from './migrations/1592781363749-RemoveLiveCell'
+import { AddIndexerTxHashCache1592727615004 } from './migrations/1592727615004-AddIndexerTxHashCache'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -72,6 +73,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddSudtTokenInfo1587523557249,
       RemoveAssetAccountWalletID1589273902050,
       RemoveLiveCell1592781363749,
+      AddIndexerTxHashCache1592727615004,
     ],
     logging,
     maxQueryExecutionTime: 30

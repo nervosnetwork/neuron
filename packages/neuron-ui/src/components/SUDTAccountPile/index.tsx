@@ -36,7 +36,7 @@ const SUDTAccountPile = ({
   return (
     <div role="presentation" className={styles.container} onClick={onClick} data-id={accountId} data-role="container">
       <div className={styles.avatar}>
-        <SUDTAvatar accountName={accountName} />
+        <SUDTAvatar name={accountName} />
       </div>
       <div className={styles.accountName}>
         <span>{accountName || DEFAULT_SUDT_FIELDS.accountName}</span>

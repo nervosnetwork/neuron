@@ -1,6 +1,6 @@
-import { Subject } from 'rxjs'
 import logger from 'electron-log'
-import { queue } from 'async'
+import { Subject } from 'rxjs'
+import { queue, AsyncQueue } from 'async'
 import { Indexer, Tip } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -13,16 +13,29 @@ import IndexerCacheService from './indexer-cache-service'
 export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
-  private addressesMetas: AddressMeta[] = []
+  private addressesByWalletId: Map<string, AddressMeta[]>
   private pollingIndexer: boolean = false
-  private processNextBlockNumberQueue: any
+  private processNextBlockNumberQueue: AsyncQueue<null> | undefined
+  private indexerTip: Tip | undefined
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
   constructor(addresses: Address[], nodeUrl: string, indexerFolderPath: string) {
     this.indexer = new Indexer(nodeUrl, indexerFolderPath)
     this.rpcService = new RpcService(nodeUrl)
-    this.addressesMetas = addresses.map(address => AddressMeta.fromObject(address))
+
+    this.addressesByWalletId = addresses
+      .map(address => AddressMeta.fromObject(address))
+      .reduce((addressesByWalletId, addressMeta) => {
+        if (!addressesByWalletId.has(addressMeta.walletId)) {
+          addressesByWalletId.set(addressMeta.walletId, [])
+        }
+
+        const addressMetas = addressesByWalletId.get(addressMeta.walletId)
+        addressMetas!.push(addressMeta)
+
+        return addressesByWalletId
+      }, new Map<string, AddressMeta[]>())
   }
 
   public async connect() {
@@ -30,18 +43,32 @@ export default class IndexerConnector {
       this.indexer.startForever()
       this.pollingIndexer = true
 
-      this.processNextBlockNumberQueue = queue(async () => this.processNextBlockNumber())
-      this.processNextBlockNumberQueue.error((err: any, task: any) => {
-        logger.error(err, task)
+      this.processNextBlockNumberQueue = queue(async () => this.processNextBlockNumber(), 1)
+      this.processNextBlockNumberQueue.error((err: any) => {
+        logger.error(err)
       })
 
+      this.processNextBlockNumberQueue.push(null)
+      await this.processNextBlockNumberQueue.drain()
+
       while (this.pollingIndexer) {
-        const lastIndexerTip = this.indexer.tip()
-        this.blockTipSubject.next(lastIndexerTip)
+        this.indexerTip = this.indexer.tip()
 
         const newInserts = await this.upsertTxHashes()
+
+        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock()
+        if (nextUnprocessedBlockTip) {
+          this.blockTipSubject.next({
+            block_number: nextUnprocessedBlockTip.blockNumber,
+            block_hash: nextUnprocessedBlockTip.blockHash,
+          })
+        }
+        else if (this.indexerTip) {
+          this.blockTipSubject.next(this.indexerTip)
+        }
+
         if (newInserts.length) {
-          this.processNextBlockNumberQueue.push()
+          this.processNextBlockNumberQueue.push(null)
           await this.processNextBlockNumberQueue.drain()
         }
 
@@ -55,20 +82,21 @@ export default class IndexerConnector {
 
   private async getTxsInNextUnprocessedBlockNumber() {
     const txHashCachesByNextBlockNumberAndAddress = await Promise.all(
-      this.addressesMetas.map(async addressMeta => {
-        const indexerCacheService = new IndexerCacheService(addressMeta, this.rpcService)
+      [...this.addressesByWalletId.entries()].map(async ([walletId, addressMetas]) => {
+        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
         return indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
       })
     )
-
     const groupedTxHashCaches = txHashCachesByNextBlockNumberAndAddress
       .flat()
-      .sort((a, b) => a.blockTimestamp.getTime() - b.blockTimestamp.getTime())
+      .sort((a, b) => {
+        return parseInt(a.blockTimestamp) - parseInt(b.blockTimestamp)
+      })
       .reduce((grouped, txHashCache) => {
-        if (!grouped.get(txHashCache.blockNumber)) {
-          grouped.set(txHashCache.blockNumber, [])
+        if (!grouped.get(txHashCache.blockNumber.toString())) {
+          grouped.set(txHashCache.blockNumber.toString(), [])
         }
-        grouped.get(txHashCache.blockNumber)!.push(txHashCache)
+        grouped.get(txHashCache.blockNumber.toString())!.push(txHashCache)
 
         return grouped
       }, new Map<string, Array<IndexerTxHashCache>>())
@@ -89,23 +117,15 @@ export default class IndexerConnector {
     return txsInNextUnprocessedBlockNumber
   }
 
-  private async upsertTxHashes() {
+  private async upsertTxHashes(): Promise<string[]> {
+    const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
+    if (nextUnprocessedBlock) {
+      return []
+    }
     const arrayOfInsertedTxHashes = await Promise.all(
-      this.addressesMetas.map(async addressMeta => {
-        const defaultLockScript = addressMeta.generateDefaultLockScript()
-
-        const txHashes = this.indexer.getTransactionsByLockScript({
-          code_hash: defaultLockScript.codeHash,
-          hash_type: defaultLockScript.hashType,
-          args: defaultLockScript.args
-        })
-
-        if (!txHashes) {
-          return []
-        }
-
-        const indexerCacheService = new IndexerCacheService(addressMeta, this.rpcService)
-        return await indexerCacheService.upsertTxHashes(txHashes, defaultLockScript)
+      [...this.addressesByWalletId.entries()].map(([walletId, addressMetas]) => {
+        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
+        return indexerCacheService.upsertTxHashes()
       })
     )
     return arrayOfInsertedTxHashes.flat()
@@ -119,22 +139,34 @@ export default class IndexerConnector {
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
-    return await Promise.all(
-      txHashes.map(async hash => {
-        const txWithStatus = await this.rpcService.getTransaction(hash)
-        if (!txWithStatus) {
-          throw new Error(`failed to fetch transaction for hash ${hash}`)
-        }
-        const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-        txWithStatus!.transaction.blockNumber = blockHeader?.number
-        txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-        txWithStatus!.transaction.timestamp = blockHeader?.timestamp
-        return txWithStatus
-      })
-    )
+    const txsWithStatus: TransactionWithStatus[] = []
+    const fetchTxsWithStatusQueue = queue(async (hash: string) => {
+      const txWithStatus = await this.rpcService.getTransaction(hash)
+      if (!txWithStatus) {
+        throw new Error(`failed to fetch transaction for hash ${hash}`)
+      }
+      const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
+      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
+      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
+      txsWithStatus.push(txWithStatus)
+    }, 1)
+
+    fetchTxsWithStatusQueue.push(txHashes)
+
+    await new Promise((resolve, reject) => {
+      fetchTxsWithStatusQueue.drain(resolve)
+      fetchTxsWithStatusQueue.error(reject)
+    })
+
+    return txsWithStatus
   }
 
-  public notifyCurrentBlockNumberProcessed() {
-    this.processNextBlockNumberQueue.push()
+  public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
+    for (const [walletId, addressMetas] of this.addressesByWalletId.entries()) {
+      const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
+      await indexerCacheService.updateProcessedTxHashes(blockNumber)
+    }
+    this.processNextBlockNumberQueue!.push(null)
   }
 }

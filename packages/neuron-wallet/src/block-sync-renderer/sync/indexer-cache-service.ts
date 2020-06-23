@@ -1,83 +1,173 @@
 import { getConnection } from 'typeorm'
+import { queue } from 'async'
 import AddressMeta from "database/address/meta"
-import Script from "models/chain/script"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
-
+import { Indexer } from '@ckb-lumos/indexer'
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export default class IndexerCacheService {
-  private addressMeta: AddressMeta
+  private addressMetas: AddressMeta[]
   private rpcService: RpcService
+  private indexer: Indexer
+  private walletId: string
 
-  constructor(addressMeta: AddressMeta, rpcService: RpcService) {
-    this.addressMeta = addressMeta
+  constructor(
+    walletId: string,
+    addressMetas: AddressMeta[],
+    rpcService: RpcService,
+    indexer: Indexer
+  ) {
+    for (const addressMeta of addressMetas) {
+      if (addressMeta.walletId !== walletId) {
+        throw new Error(`address ${addressMeta.address} does not belong to wallet id ${walletId}`)
+      }
+    }
+
+    this.walletId = walletId
+    this.addressMetas = addressMetas
     this.rpcService = rpcService
+    this.indexer = indexer
   }
 
-  private async countTxHashes(lockScript: Script): Promise<number> {
+  private async countTxHashes(): Promise<number> {
     return getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        lockHash: lockScript.computeHash()
+        walletId: this.walletId
       })
       .getCount()
   }
 
-  private async getTxHashes(lockScript: Script): Promise<IndexerTxHashCache[]> {
+  private async getTxHashes(): Promise<IndexerTxHashCache[]> {
     return getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        lockHash: lockScript.computeHash()
+        walletId: this.walletId
       })
       .getMany()
   }
 
-  public async upsertTxHashes(txHashes: string[], lockScript: Script): Promise<string[]> {
-    const txCount = await this.countTxHashes(lockScript)
-    if (txHashes.length === txCount) {
+  public static async nextUnprocessedBlock(): Promise<{blockNumber: string, blockHash: string} | undefined> {
+    const result = await getConnection()
+      .getRepository(IndexerTxHashCache)
+      .createQueryBuilder()
+      .where({
+        isProcessed: false
+      })
+      .orderBy('blockNumber', 'ASC')
+      .getOne()
+
+    if (!result) {
+      return
+    }
+
+    return {
+      blockNumber: result.blockNumber.toString(),
+      blockHash: result.blockHash
+    }
+  }
+
+  public static async updateCacheProcessed(txHash: string) {
+    await getConnection()
+      .createQueryBuilder()
+      .update(IndexerTxHashCache)
+      .set({
+        isProcessed: true
+      })
+      .where({
+        txHash
+      })
+      .execute()
+  }
+
+  public async upsertTxHashes(): Promise<string[]> {
+    const mappingsByTxHash = new Map()
+    for (const addressMeta of this.addressMetas) {
+      const lockScripts = [
+        addressMeta.generateDefaultLockScript()
+      ]
+
+      for (const lockScript of lockScripts) {
+        const fetchedTxHashes = this.indexer.getTransactionsByLockScript({
+          code_hash: lockScript.codeHash,
+          hash_type: lockScript.hashType,
+          args: lockScript.args
+        })
+
+        if (!fetchedTxHashes || !fetchedTxHashes.length) {
+          continue
+        }
+
+        for (const txHash of fetchedTxHashes) {
+          mappingsByTxHash.set(txHash, [{
+            address: addressMeta.address,
+            lockHash: lockScript.computeHash()
+          }])
+        }
+      }
+    }
+
+    const fetchedTxHashes = [...mappingsByTxHash.keys()]
+    const fetchedTxHashCount = fetchedTxHashes
+      .reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash).length, 0)
+
+    const txCount = await this.countTxHashes()
+    if (fetchedTxHashCount === txCount) {
       return []
     }
-    const txMetasCaches = await this.getTxHashes(lockScript)
+
+    const txMetasCaches = await this.getTxHashes()
     const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
 
-    const cachedTxHashesSet = new Set(cachedTxHashes);
-    const newTxHashes = txHashes.filter(hash => !cachedTxHashesSet.has(hash))
+    const cachedTxHashesSet = new Set(cachedTxHashes)
+
+    const newTxHashes = fetchedTxHashes.filter(hash => !cachedTxHashesSet.has(hash))
 
     if (!newTxHashes.length) {
       return []
     }
 
-    const arrayOfTxWithStatus = await Promise.all(
-      newTxHashes.map(async hash => {
-        const txWithStatus = await this.rpcService.getTransaction(hash)
-        if (!txWithStatus) {
-          throw new Error(`failed to fetch transaction for hash ${hash}`)
-        }
-        const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-        txWithStatus!.transaction.blockNumber = blockHeader?.number
-        txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-        txWithStatus!.transaction.timestamp = blockHeader?.timestamp
-        return txWithStatus
-      })
-    )
+    const txsWithStatus: TransactionWithStatus[] = []
+    const fetchBlockDetailsQueue = queue(async (hash: string) => {
+      const txWithStatus = await this.rpcService.getTransaction(hash)
+      if (!txWithStatus) {
+        return
+      }
+      const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
+      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
+      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
 
-    for (const {transaction, txStatus} of arrayOfTxWithStatus.flat()) {
-      await getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(IndexerTxHashCache)
-        .values({
-          txHash: transaction.hash,
-          blockNumber: transaction.blockNumber,
-          blockHash: txStatus.blockHash!,
-          blockTimestamp: transaction.timestamp,
-          lockHash: lockScript.computeHash(),
-          address: this.addressMeta.address,
-          isProcessed: false
-        })
-        .execute()
+      txsWithStatus.push(txWithStatus)
+    }, 100)
+
+    fetchBlockDetailsQueue.push(newTxHashes)
+    await fetchBlockDetailsQueue.drain()
+
+    for (const txWithStatus of txsWithStatus) {
+      const {transaction, txStatus} = txWithStatus
+      const mappings = mappingsByTxHash.get(transaction.hash)
+
+      for (const {lockHash, address} of mappings) {
+        await getConnection()
+          .createQueryBuilder()
+          .insert()
+          .into(IndexerTxHashCache)
+          .values({
+            txHash: transaction.hash,
+            blockNumber: parseInt(transaction.blockNumber!),
+            blockHash: txStatus.blockHash!,
+            blockTimestamp: transaction.timestamp,
+            lockHash,
+            address,
+            walletId: this.walletId,
+            isProcessed: false
+          })
+          .execute()
+      }
     }
 
     return newTxHashes
@@ -92,7 +182,7 @@ export default class IndexerCacheService {
       })
       .where({
         blockNumber: blockNumber,
-        address: this.addressMeta.address,
+        walletId: this.walletId,
       })
       .execute()
   }
@@ -103,7 +193,7 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .where({
         isProcessed: false,
-        address: this.addressMeta.address
+        walletId: this.walletId
       })
       .orderBy('blockNumber', 'ASC')
       .getOne()
@@ -118,7 +208,8 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .where({
         blockNumber,
-        address: this.addressMeta.address
+        isProcessed: false,
+        walletId: this.walletId
       })
       .getMany()
   }

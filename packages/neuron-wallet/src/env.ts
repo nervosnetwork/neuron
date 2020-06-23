@@ -1,9 +1,7 @@
-import { app as electronApp, remote } from 'electron'
 import os from 'os'
-import * as path from 'path'
+import path from 'path'
 import dotenv from 'dotenv'
-
-dotenv.config()
+import { app as electronApp, remote } from 'electron'
 
 const app = electronApp ?? (remote?.app) ?? {
   getPath(aPath: string): string {
@@ -18,6 +16,11 @@ const app = electronApp ?? (remote?.app) ?? {
 
 const isTestMode = process.env.NODE_ENV === 'test'
 const isDevMode = !app.isPackaged && !isTestMode
+
+if (isDevMode) {
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env.development.local') })
+}
+dotenv.config({ path: path.join(__dirname, '..', '.env') })
 
 const fileBase = (() => {
   if (isTestMode) {

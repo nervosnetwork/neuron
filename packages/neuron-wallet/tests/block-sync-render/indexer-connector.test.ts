@@ -1,52 +1,20 @@
+import { when } from 'jest-when'
 import path from 'path'
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix, AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/database/address/address-dao'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
-import AddressMeta from '../../src/database/address/meta'
+// import AddressMeta from '../../src/database/address/meta'
 
 const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
-const stubbedGetTransactionsByLockScriptFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
 const stubbedUpsertTxHashesFn = jest.fn()
 const stubbedNextUnprocessedTxsGroupedByBlockNumberFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
-
-const stubbedIndexerConstructor = jest.fn().mockImplementation(
-  () => ({
-    startForever: stubbedStartForeverFn,
-    tip: stubbedTipFn,
-    getTransactionsByLockScript: stubbedGetTransactionsByLockScriptFn
-  })
-)
-
-const stubbedIndexerCacheService = jest.fn().mockImplementation(
-  () => ({
-    upsertTxHashes: stubbedUpsertTxHashesFn,
-    nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
-  })
-)
-
-const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
-  () => ({
-    getTransaction: stubbedGetTransactionFn,
-    getHeader: stubbedGetHeaderFn
-  })
-)
-
-const resetMocks = () => {
-  stubbedTipFn.mockReset()
-  stubbedStartForeverFn.mockReset()
-  stubbedGetTransactionFn.mockReset()
-  stubbedGetHeaderFn.mockReset()
-  stubbedGetTransactionsByLockScriptFn.mockReset()
-  stubbedUpsertTxHashesFn.mockReset()
-  stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
-  stubbedLoggerErrorFn.mockReset()
-}
+const stubbedNextUnprocessedBlock = jest.fn()
 
 const flushPromises = () => new Promise(setImmediate);
 
@@ -64,7 +32,47 @@ describe('unit tests for IndexerConnector', () => {
   const nodeUrl = 'http://nodeurl:8114'
   const indexerFolderPath = '/indexer/data/path'
   let stubbedIndexerConnector: any
+
+  let stubbedIndexerConstructor: any
+  let stubbedIndexerCacheService: any
+  let stubbedRPCServiceConstructor: any
+
+  const resetMocks = () => {
+    stubbedTipFn.mockReset()
+    stubbedStartForeverFn.mockReset()
+    stubbedGetTransactionFn.mockReset()
+    stubbedGetHeaderFn.mockReset()
+    stubbedUpsertTxHashesFn.mockReset()
+    stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
+    stubbedLoggerErrorFn.mockReset()
+    stubbedNextUnprocessedBlock.mockReset()
+  }
+
   beforeEach(() => {
+    resetMocks()
+    jest.useFakeTimers()
+    stubbedIndexerConstructor = jest.fn().mockImplementation(
+      () => ({
+        startForever: stubbedStartForeverFn,
+        tip: stubbedTipFn,
+      })
+    )
+
+    stubbedIndexerCacheService = jest.fn().mockImplementation(
+      () => ({
+        upsertTxHashes: stubbedUpsertTxHashesFn,
+        nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
+      })
+    )
+    stubbedIndexerCacheService.nextUnprocessedBlock = stubbedNextUnprocessedBlock
+
+    stubbedRPCServiceConstructor = jest.fn().mockImplementation(
+      () => ({
+        getTransaction: stubbedGetTransactionFn,
+        getHeader: stubbedGetHeaderFn
+      })
+    )
+
     jest.doMock('@ckb-lumos/indexer', () => {
       return {
         Indexer : stubbedIndexerConstructor
@@ -80,36 +88,25 @@ describe('unit tests for IndexerConnector', () => {
       return stubbedIndexerCacheService
     });
     stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
-    resetMocks()
-    jest.useFakeTimers()
   });
   afterEach(() => {
     jest.clearAllTimers()
   });
 
   describe('#constructor', () => {
-    describe('when success', () => {
-      beforeEach(() => {
-        new stubbedIndexerConnector([], nodeUrl, indexerFolderPath)
-      });
-      it('init with a node url and indexer folder path', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, path.join(indexerFolderPath))
-      });
+    beforeEach(() => {
+      new stubbedIndexerConnector([], nodeUrl, indexerFolderPath)
     });
-    describe('when failed', () => {
-      it('throws an error when failed to init indexer folder', () => {
-
-      });
-      it('throws an error when failed to start indexer', () => {
-
-      })
-    })
+    it('init with a node url and indexer folder path', () => {
+      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, path.join(indexerFolderPath))
+    });
   });
   describe('#connect', () => {
     const fakeTip1 = {block_number: '1', block_hash: 'hash1'}
     const fakeTip2 = {block_number: '2', block_hash: 'hash2'}
     const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
     const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
+    const fakeBlock3 = {number: '3', hash: '3', timestamp: '3'}
     const fakeTx1 = {
       transaction: {hash: 'hash1', blockNumber: fakeBlock1.number, blockTimestamp: new Date(1)},
       txStatus: {status: 'committed', blockHash: fakeBlock1.hash}
@@ -138,10 +135,12 @@ describe('unit tests for IndexerConnector', () => {
       lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
     }
     const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
-    const addressObj: Address = {
+    const walletId1 = 'walletid1'
+    const walletId2 = 'walletid2'
+    const addressObj1: Address = {
       address,
       blake160: '0x',
-      walletId: '',
+      walletId: walletId1,
       path: '',
       addressType: AddressType.Receiving,
       addressIndex: 0,
@@ -152,12 +151,23 @@ describe('unit tests for IndexerConnector', () => {
       balance: '',
       version: AddressVersion.Testnet
     }
-    const addressesToWatch = [addressObj, addressObj]
+    const addressObj2: Address = {
+      address,
+      blake160: '0x',
+      walletId: walletId2,
+      path: '',
+      addressType: AddressType.Receiving,
+      addressIndex: 0,
+      txCount: 0,
+      liveBalance: '',
+      sentBalance: '',
+      pendingBalance: '',
+      balance: '',
+      version: AddressVersion.Testnet
+    }
+    const addressesToWatch = [addressObj1, addressObj2]
 
     beforeEach(() => {
-      stubbedTipFn.mockReturnValueOnce(fakeTip1)
-      stubbedTipFn.mockReturnValueOnce(fakeTip2)
-
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
     });
     describe('starts lumos indexer', () => {
@@ -174,51 +184,63 @@ describe('unit tests for IndexerConnector', () => {
       describe('#transactionsSubject', () => {
         let transactionsSubject: any
         beforeEach(() => {
+          indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
           transactionsSubject = indexerConnector.transactionsSubject
         });
 
-        describe('when there are transactions for an address', () => {
+        describe('when there are transactions', () => {
           let txObserver: any
           beforeEach(() => {
-            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
-            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+            stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
+            stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx3.transaction.hash])
 
-            stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
-            stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+            when(stubbedGetTransactionFn)
+              .calledWith(fakeTx1.transaction.hash).mockResolvedValueOnce(fakeTx1)
+              .calledWith(fakeTx2.transaction.hash).mockResolvedValueOnce(fakeTx2)
+              .calledWith(fakeTx3.transaction.hash).mockResolvedValueOnce(fakeTx3)
 
-            stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
-            stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
-            stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
-
-            stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
-            stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
-            stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+            when(stubbedGetHeaderFn)
+              .calledWith(fakeBlock1.hash).mockResolvedValueOnce(fakeBlock1)
+              .calledWith(fakeBlock2.hash).mockResolvedValueOnce(fakeBlock2)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
           });
-          describe('when loaded block number is already in order', () => {
+          describe('attempts to upsert tx hash caches', () => {
             beforeEach(async () => {
-              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
-                fakeTxHashCache1,
-                fakeTxHashCache2,
-              ])
-              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
-                fakeTxHashCache3
-              ])
-
               await connectIndexer(indexerConnector)
             });
             it('upserts tx hash caches', () => {
-              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
-                [fakeTx1.transaction.hash, fakeTx2.transaction.hash],
-                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
-              )
-              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
-                [fakeTx3.transaction.hash],
-                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
-              )
+              // expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+              //   walletId1,
+              //   [AddressMeta.fromObject(addressObj1)],
+              //   stubbedRPCServiceConstructor(),
+              //   stubbedIndexerConstructor()
+              // )
+              // expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+              //   walletId2,
+              //   [AddressMeta.fromObject(addressObj2)],
+              //   stubbedRPCServiceConstructor(),
+              //   stubbedIndexerConstructor()
+              // )
+
+              expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
             })
+          });
+          describe('when loaded block number is already in order', () => {
+            beforeEach(async () => {
+              when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
+                .calledWith().mockResolvedValueOnce([
+                  fakeTxHashCache1,
+                ])
+                .calledWith().mockResolvedValueOnce([
+                  fakeTxHashCache2,
+                  fakeTxHashCache3
+                ])
+
+              await connectIndexer(indexerConnector)
+              await flushPromises()
+            });
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
@@ -226,26 +248,34 @@ describe('unit tests for IndexerConnector', () => {
           });
           describe('when loaded block number is not in order', () => {
             beforeEach(async () => {
-              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
-                fakeTxHashCache3
-              ])
-              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
-                fakeTxHashCache1,
-                fakeTxHashCache2
-              ])
+              when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
+                .calledWith().mockResolvedValueOnce([
+                  fakeTxHashCache2,
+                  fakeTxHashCache3
+                ])
+                .calledWith().mockResolvedValueOnce([
+                  fakeTxHashCache1,
+                ])
 
               await connectIndexer(indexerConnector)
+              await flushPromises()
             });
-            it('upserts tx hash caches', () => {
-              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
-                [fakeTx1.transaction.hash, fakeTx2.transaction.hash],
-                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
-              )
-              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
-                [fakeTx3.transaction.hash],
-                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
-              )
-            })
+            // it('upserts tx hash caches', () => {
+            //   expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+            //     walletId1,
+            //     [AddressMeta.fromObject(addressObj1)],
+            //     stubbedRPCServiceConstructor(),
+            //     stubbedIndexerConstructor()
+            //   )
+            //   expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
+            //     walletId2,
+            //     [AddressMeta.fromObject(addressObj2)],
+            //     stubbedRPCServiceConstructor(),
+            //     stubbedIndexerConstructor()
+            //   )
+
+            //   expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
+            // })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
@@ -256,7 +286,7 @@ describe('unit tests for IndexerConnector', () => {
           let txObserver: any
           let errSpy: any
           beforeEach(async () => {
-            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce(undefined)
+            stubbedUpsertTxHashesFn.mockResolvedValue([])
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             errSpy = await connectIndexer(indexerConnector)
@@ -265,25 +295,26 @@ describe('unit tests for IndexerConnector', () => {
           it('should not emit transactions', () => {
             expect(txObserver).toHaveBeenCalledTimes(0)
           });
-          it('should not attempt getting transactions in next unprocessed block number', () => {
-            expect(stubbedNextUnprocessedTxsGroupedByBlockNumberFn).toHaveBeenCalledTimes(0)
+          it('attempts checking transactions in next unprocessed block number', () => {
+            expect(stubbedNextUnprocessedTxsGroupedByBlockNumberFn).toHaveBeenCalled()
           })
         });
         describe('failure cases', () => {
           let txObserver: any
-          // let errSpy: any
           beforeEach(async () => {
-            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
-            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([fakeTxHashCache3])
-            stubbedGetTransactionFn.mockReturnValueOnce(undefined)
+            stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+            when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
+              .calledWith().mockResolvedValue([fakeTxHashCache3])
+            when(stubbedGetTransactionFn)
+              .calledWith(fakeTxHashCache1.txHash).mockResolvedValueOnce(undefined)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             await connectIndexer(indexerConnector)
             await flushPromises()
           });
-          it('throws error when there no transaction matched to a hash', () => {
-            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(new Error('failed to fetch transaction for hash hash3'), undefined)
+          it('throws error when there no transaction matched to a hash from #processNextBlockNumberQueue', () => {
+            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(new Error('failed to fetch transaction for hash hash3'))
           });
         });
       });
@@ -294,40 +325,50 @@ describe('unit tests for IndexerConnector', () => {
           indexerConnector.blockTipSubject.subscribe(tip => {
             tipObserver(tip)
           })
-          stubbedGetTransactionFn.mockReturnValue(fakeTx3)
-          stubbedGetTransactionsByLockScriptFn.mockReturnValue([fakeTx3.transaction.hash])
-          stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([])
+          stubbedTipFn.mockReturnValueOnce(fakeTip1)
+          stubbedTipFn.mockReturnValueOnce(fakeTip2)
+          stubbedGetTransactionFn.mockResolvedValue(fakeTx3)
+          stubbedGetHeaderFn.mockResolvedValue(fakeBlock2)
+          stubbedUpsertTxHashesFn.mockResolvedValue([])
+          stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
+          stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
           await connectIndexer(indexerConnector)
-          await flushPromises()
         });
-        describe('when the block tip is higher than previous one', () => {
-          it('observed new tips', async () => {
-            jest.advanceTimersByTime(5000)
-            await flushPromises()
-
-            expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
-            expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
-          })
+        it('observes an indexer tip', () => {
+          expect(tipObserver).toHaveBeenCalledTimes(1)
+          expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
+        });
+        describe('fast forward the interval time', () => {
+          describe('when there is no unprocessed blocks', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
+              jest.advanceTimersByTime(5000)
+              await flushPromises()
+            });
+            it('observes another indexer tip', async () => {
+              expect(tipObserver).toHaveBeenCalledTimes(2)
+              expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
+            })
+          });
+          describe('when there are unprocessed blocks', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedBlock.mockResolvedValue({
+                blockNumber: fakeBlock3.number,
+                blockHash: fakeBlock3.hash,
+              })
+              jest.advanceTimersByTime(5000)
+              await flushPromises()
+            });
+            it('observes next unprocessed block tip', async () => {
+              expect(tipObserver).toHaveBeenCalledTimes(2)
+              expect(tipObserver).toHaveBeenCalledWith({
+                block_number: fakeBlock3.number,
+                block_hash: fakeBlock3.hash,
+              })
+            })
+          });
         });
       });
-      describe('when the block tip is less or equal to previous one', () => {
-        it('should not emit new block tip', () => {
-
-        })
-      });
-    })
-  });
-  describe('#unsubscribeAll()', () => {
-    it('unsubscribe for an address', () => {
-
-    })
-  });
-  describe('#stop', () => {
-
-  });
-  describe('#clearIndexerData', () => {
-    it('deletes the indexer data folder based on the current mode environment', () => {
-
     })
   });
 });

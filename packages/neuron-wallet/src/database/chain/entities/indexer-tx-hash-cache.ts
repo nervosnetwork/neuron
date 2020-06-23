@@ -27,11 +27,15 @@ export default class IndexerTxHashCache extends BaseEntity {
   address!: string
 
   @Column({
-    type: "varchar",
-    length: 20,
+    type: "character",
+    length: 32,
   })
   @Index()
-  blockNumber!: string
+  walletId!: string
+
+  @Column()
+  @Index()
+  blockNumber!: number
 
   @Column({
     type: "character",
@@ -44,7 +48,7 @@ export default class IndexerTxHashCache extends BaseEntity {
     type: 'varchar',
   })
   @Index()
-  blockTimestamp!: Date
+  blockTimestamp!: string
 
   @Column()
   @Index()

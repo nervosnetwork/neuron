@@ -19,11 +19,14 @@ const stubbedTxAddressFinderConstructor = jest.fn()
 
 const stubbedConnectFn = jest.fn()
 const stubbedGetChainFn = jest.fn()
+const stubbedGenesisBlockHashFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
 const stubbedIpcRenderInvokeFn = jest.fn()
 const stubbedAddressesFn = jest.fn()
 const stubbedSaveFetchFn = jest.fn()
 const stubbedUpdateUsedAddressesFn = jest.fn()
+const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
+const stubbedUpdateCacheProcessedFn = jest.fn()
 
 const stubbedTxAddressFinder = jest.fn().mockImplementation(
   (...args) => {
@@ -37,25 +40,30 @@ const stubbedTxAddressFinder = jest.fn().mockImplementation(
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
   () => ({
     getChain: stubbedGetChainFn,
-    getTransaction: stubbedGetTransactionFn
+    getTransaction: stubbedGetTransactionFn,
+    genesisBlockHash: stubbedGenesisBlockHashFn
   })
 )
 
 const resetMocks = () => {
   stubbedConnectFn.mockReset()
   stubbedGetChainFn.mockReset()
+  stubbedGenesisBlockHashFn.mockReset()
   stubbedIndexerConnectorConstructor.mockReset()
   stubbedIpcRenderInvokeFn.mockReset()
   stubbedAddressesFn.mockReset()
   stubbedSaveFetchFn.mockReset()
   stubbedUpdateUsedAddressesFn.mockReset()
   stubbedGetTransactionFn.mockReset()
+  stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
+  stubbedUpdateCacheProcessedFn.mockReset()
 }
 
 const flushPromises = () => new Promise(setImmediate);
 
 const generateFakeTx = (id: string) => {
   const fakeTx = new Transaction('')
+  fakeTx.hash = 'hash1'
   fakeTx.inputs = [
     new Input(new OutPoint('0x' + id.repeat(64), '0'))
   ]
@@ -67,6 +75,7 @@ const generateFakeTx = (id: string) => {
       )
     })
   ]
+  fakeTx.blockNumber = '1'
   const fakeTxWithStatus = {
     transaction: fakeTx,
     txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed)
@@ -112,7 +121,8 @@ describe('queue', () => {
         return {
           connect: stubbedConnectFn,
           blockTipSubject: stubbedBlockTipSubject,
-          transactionsSubject: stubbedTransactionsSubject
+          transactionsSubject: stubbedTransactionsSubject,
+          notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn,
         }
       }
     )
@@ -144,16 +154,16 @@ describe('queue', () => {
     jest.doMock('../../src/block-sync-renderer/sync/tx-address-finder', () => {
       return stubbedTxAddressFinder
     });
+    jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
+      return { updateCacheProcessed: stubbedUpdateCacheProcessedFn }
+    });
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
-    // jest.useFakeTimers()
-  });
-  afterEach(() => {
-    // jest.clearAllTimers()
   });
   describe('#start', () => {
     beforeEach(async () => {
-      stubbedGetChainFn.mockReturnValue(fakeChain)
+      stubbedGenesisBlockHashFn.mockResolvedValue('fakegenesisblockhash')
+      stubbedGetChainFn.mockResolvedValue(fakeChain)
       await queue.start()
     });
     it('inits IndexerConnector', () => {
@@ -185,13 +195,14 @@ describe('queue', () => {
           fakeTxWithStatus2
         ]
         beforeEach(async () => {
-          stubbedAddressesFn.mockReturnValue([
+          stubbedAddressesFn.mockResolvedValue([
             true,
             addresses.map(addressMeta => addressMeta.address),
             []
           ])
-          stubbedGetTransactionFn.mockReturnValue(fakeTxWithStatus1)
+          stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
           stubbedTransactionsSubject.next(fakeTxs)
+          await flushPromises()
           await flushPromises()
         });
         it('check infos by hashes derived from addresses', () => {
@@ -217,6 +228,14 @@ describe('queue', () => {
             )
           }
         });
+        it('notify indexer connector of processed block number', () => {
+          expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
+            fakeTxWithStatus1.transaction.blockNumber
+          )
+        });
+        it('updates tx hash cache to be processed', () => {
+          expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
+        })
         describe('when involves ACP', () => {
           it('updates ACP blake160s', () => {
 

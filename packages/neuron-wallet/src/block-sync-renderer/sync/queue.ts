@@ -2,7 +2,7 @@ import env from 'env'
 import { ipcRenderer } from 'electron'
 
 import path from 'path'
-import { queue } from 'async'
+import { queue, AsyncQueue } from 'async'
 
 import { TransactionPersistor } from 'services/tx'
 import WalletService from 'services/wallets'
@@ -11,7 +11,6 @@ import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import CommonUtils from 'utils/common'
-import RangeForCheck from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -20,6 +19,7 @@ import { Address as AddressInterface } from 'database/address/address-dao'
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
+import IndexerCacheService from './indexer-cache-service'
 
 export default class Queue {
   private lockHashes: string[]
@@ -27,10 +27,8 @@ export default class Queue {
   private addresses: AddressInterface[]
   private rpcService: RpcService
   private indexerConnector: IndexerConnector | undefined
+  private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
   private currentBlockNumber = BigInt(0)
-  private rangeForCheck: RangeForCheck
-
-  private stopped: boolean = false
   private inProcess: boolean = false
 
   private multiSignBlake160s: string[]
@@ -41,7 +39,6 @@ export default class Queue {
     this.url = url
     this.addresses = addresses
     this.rpcService = new RpcService(url)
-    this.rangeForCheck = new RangeForCheck(url)
     this.assetAccountInfo = new AssetAccountInfo()
 
     this.lockHashes = AddressParser.batchToLockHash(
@@ -57,12 +54,10 @@ export default class Queue {
   }
 
   public async start() {
-    const { app } = env
-    const chain = await this.rpcService.getChain()
     const indexedDataPath = path.resolve(
-      app.getPath('userData'),
-      chain.replace('ckb_', ''),
+      env.fileBasePath,
       './indexer_data',
+      await this.rpcService.genesisBlockHash()
     )
 
     this.indexerConnector = new IndexerConnector(
@@ -75,12 +70,17 @@ export default class Queue {
       this.updateCurrentBlockNumber(BigInt(tip.block_number))
     });
 
-    const checkAndSaveQueue = queue(async (task: any) => {
+    this.checkAndSaveQueue = queue(async (task: any) => {
       const {transactions} = task
       await this.checkAndSave(transactions)
+
+      const firstTx = transactions.shift()
+      if (firstTx) {
+        await this.indexerConnector!.notifyCurrentBlockNumberProcessed(firstTx.blockNumber!)
+      }
     })
 
-    checkAndSaveQueue.error((err: any, task: any) => {
+    this.checkAndSaveQueue.error((err: any, task: any) => {
       console.error(err, task)
     })
 
@@ -91,7 +91,7 @@ export default class Queue {
             transactionWithStatus => transactionWithStatus.transaction
           )
         }
-        checkAndSaveQueue.push(task)
+        this.checkAndSaveQueue!.push(task)
       })
 
   }
@@ -118,6 +118,31 @@ export default class Queue {
   private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
 
+    const fetchTxQueue = queue(async (task: any) => {
+      const {txHash} = task
+
+      const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
+      cachedPreviousTxs.set(txHash, previousTxWithStatus)
+    }, 100)
+
+    const txHashSet = new Set()
+    for (const [, tx] of transactions.entries()) {
+      for (const [, input] of tx.inputs.entries()) {
+        const previousTxHash = input.previousOutput!.txHash
+        if (previousTxHash === `0x${'0'.repeat(64)}`) {
+          continue;
+        }
+
+        if (txHashSet.has(previousTxHash)) {
+          continue;
+        }
+
+        fetchTxQueue.push({txHash: previousTxHash})
+        txHashSet.add(previousTxHash)
+      }
+    }
+    await fetchTxQueue.drain()
+
     for (const [, tx] of transactions.entries()) {
       const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
@@ -128,14 +153,11 @@ export default class Queue {
       if (shouldSave) {
         for (const [inputIndex, input] of tx.inputs.entries()) {
           const previousTxHash = input.previousOutput!.txHash
-          if (previousTxHash === `0x${'0'.repeat(64)}`) {
-            continue;
-          }
-          let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
+          const previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
           if (!previousTxWithStatus) {
-            previousTxWithStatus = await this.rpcService.getTransaction(previousTxHash)
-            cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
+            continue
           }
+
           const previousTx = previousTxWithStatus!.transaction
           const previousOutput = previousTx.outputs![+input.previousOutput!.index]
           const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
@@ -158,7 +180,6 @@ export default class Queue {
             }
           }
         }
-
         await TransactionPersistor.saveFetchTx(tx)
         const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
         await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
@@ -166,6 +187,7 @@ export default class Queue {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
       }
+      await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
     cachedPreviousTxs.clear()
   }
@@ -175,17 +197,3 @@ export default class Queue {
     ipcRenderer.invoke('synced-block-number-updated', (this.currentBlockNumber - BigInt(1)).toString())
   }
 }
-
-// const deleteFolderRecursive = function(dirPath) {
-//   if (fs.existsSync(dirPath)) {
-//     fs.readdirSync(dirPath).forEach((file, index) => {
-//       const curPath = path.join(dirPath, file);
-//       if (fs.lstatSync(curPath).isDirectory()) { // recurse
-//         deleteFolderRecursive(curPath);
-//       } else { // delete file
-//         fs.unlinkSync(curPath);
-//       }
-//     });
-//     fs.rmdirSync(dirPath);
-//   }
-// };

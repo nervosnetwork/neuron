@@ -1,0 +1,150 @@
+{
+  "0 CKB": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "0",
+        "description": "description"
+      },
+      "includeSUDT": false
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,+0.00000000,\"description\"\n"
+  },
+  "Receive CKB": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "900000000",
+        "description": "description"
+      },
+      "includeSUDT": false
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Receive,+9.00000000,\"description\"\n"
+  },
+  "SEND CKB": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description"
+      },
+      "includeSUDT": false
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,\"description\"\n"
+  },
+  "Nervos DAO": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": true,
+        "value": "-900000000",
+        "description": "description"
+      },
+      "includeSUDT": false
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-9.00000000,\"description\"\n"
+  },
+  "Show sUDT without sUDT tx": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description"
+      },
+      "includeSUDT": true
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,,\"description\"\n"
+  },
+  "Receive unknown UDT": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": true,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {},
+          "amount": "100000"
+        }
+      },
+      "includeSUDT": true
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Receive,,--,\"description\"\n"
+  },
+  "Send unknown UDT": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": true,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {},
+          "amount": "-100000"
+        }
+      },
+      "includeSUDT": true
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Send,,--,\"description\"\n"
+  },
+  "Receive known UDT": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": true,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "UDT",
+            "decimal": "10"
+          },
+          "amount": "100000"
+        }
+      },
+      "includeSUDT": true
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Receive,,+0.00001 UDT,\"description\"\n"
+  },
+  "Send known UDT": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": true,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "UDT",
+            "decimal": "10"
+          },
+          "amount": "-100000"
+        }
+      },
+      "includeSUDT": true
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Send,,-0.00001 UDT,\"description\"\n"
+  }
+}
