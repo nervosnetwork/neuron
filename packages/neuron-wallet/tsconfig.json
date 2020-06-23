@@ -13,9 +13,6 @@
     },
     "plugins": [
       { "transform": "ts-transformer-imports" }
-    ],
-    "lib": [
-      "es2019"
     ]
   },
   "include": ["src/**/*"]
