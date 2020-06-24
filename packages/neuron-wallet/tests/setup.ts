@@ -22,3 +22,5 @@ Object.defineProperty(window, "XMLHttpRequest", jest.fn(() => ({
   readyState: mockedXMLHttpRequest.readyState,
   responseText: mockedXMLHttpRequest.responseText
 })));
+
+jest.mock('levelup')
