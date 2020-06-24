@@ -10,7 +10,6 @@ import RpcService from 'services/rpc-service'
 import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import CommonUtils from 'utils/common'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -29,7 +28,6 @@ export default class Queue {
   private indexerConnector: IndexerConnector | undefined
   private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
   private currentBlockNumber = BigInt(0)
-  private inProcess: boolean = false
 
   private multiSignBlake160s: string[]
   private anyoneCanPayLockHashes: string[]
@@ -97,22 +95,16 @@ export default class Queue {
   }
 
   public stop = () => {
+    this.indexerConnector!.pollingIndexer = false
   }
 
-  public waitForDrained = async (timeout: number = 5000) => {
-    const startAt: number = +new Date()
-    while (this.inProcess) {
-      const now: number = +new Date()
-      if (now - startAt > timeout) {
-        return
-      }
-      await CommonUtils.sleep(50)
-    }
+  public waitForDrained = async () => {
+    await this.checkAndSaveQueue?.drain()
   }
 
-  public stopAndWait = async (timeout: number = 5000) => {
+  public stopAndWait = async () => {
     this.stop()
-    await this.waitForDrained(timeout)
+    await this.waitForDrained()
   }
 
   private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
