@@ -5,7 +5,7 @@ import { AddressPrefix, AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/database/address/address-dao'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
-// import AddressMeta from '../../src/database/address/meta'
+import { flushPromises } from '../test-utils'
 
 const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
@@ -15,8 +15,6 @@ const stubbedUpsertTxHashesFn = jest.fn()
 const stubbedNextUnprocessedTxsGroupedByBlockNumberFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
 const stubbedNextUnprocessedBlock = jest.fn()
-
-const flushPromises = () => new Promise(setImmediate);
 
 const connectIndexer = async (indexerConnector: IndexerConnector) => {
   const connectPromise = indexerConnector.connect()
@@ -211,19 +209,6 @@ describe('unit tests for IndexerConnector', () => {
               await connectIndexer(indexerConnector)
             });
             it('upserts tx hash caches', () => {
-              // expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-              //   walletId1,
-              //   [AddressMeta.fromObject(addressObj1)],
-              //   stubbedRPCServiceConstructor(),
-              //   stubbedIndexerConstructor()
-              // )
-              // expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-              //   walletId2,
-              //   [AddressMeta.fromObject(addressObj2)],
-              //   stubbedRPCServiceConstructor(),
-              //   stubbedIndexerConstructor()
-              // )
-
               expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
             })
           });
@@ -260,22 +245,6 @@ describe('unit tests for IndexerConnector', () => {
               await connectIndexer(indexerConnector)
               await flushPromises()
             });
-            // it('upserts tx hash caches', () => {
-            //   expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-            //     walletId1,
-            //     [AddressMeta.fromObject(addressObj1)],
-            //     stubbedRPCServiceConstructor(),
-            //     stubbedIndexerConstructor()
-            //   )
-            //   expect(stubbedIndexerCacheService).toHaveBeenCalledWith(
-            //     walletId2,
-            //     [AddressMeta.fromObject(addressObj2)],
-            //     stubbedRPCServiceConstructor(),
-            //     stubbedIndexerConstructor()
-            //   )
-
-            //   expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
-            // })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])

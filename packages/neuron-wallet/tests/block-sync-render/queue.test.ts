@@ -13,6 +13,7 @@ import Input from '../../src/models/chain/input'
 import Output from '../../src/models/chain/output'
 import OutPoint from '../../src/models/chain/out-point'
 import Script, {ScriptHashType} from '../../src/models/chain/script'
+import { flushPromises } from '../test-utils'
 
 const stubbedIndexerConnectorConstructor = jest.fn()
 const stubbedTxAddressFinderConstructor = jest.fn()
@@ -58,8 +59,6 @@ const resetMocks = () => {
   stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
   stubbedUpdateCacheProcessedFn.mockReset()
 }
-
-const flushPromises = () => new Promise(setImmediate);
 
 const generateFakeTx = (id: string) => {
   const fakeTx = new Transaction('')
@@ -112,6 +111,7 @@ describe('queue', () => {
 
   beforeEach(async () => {
     resetMocks()
+    jest.useFakeTimers()
 
     stubbedBlockTipSubject = new Subject<Tip>()
     stubbedTransactionsSubject = new Subject<Array<TransactionWithStatus>>()
@@ -160,6 +160,9 @@ describe('queue', () => {
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
   });
+  afterEach(() => {
+    jest.clearAllTimers()
+  });
   describe('#start', () => {
     beforeEach(async () => {
       stubbedGenesisBlockHashFn.mockResolvedValue('fakegenesisblockhash')
@@ -202,7 +205,6 @@ describe('queue', () => {
           ])
           stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
           stubbedTransactionsSubject.next(fakeTxs)
-          await flushPromises()
           await flushPromises()
         });
         it('check infos by hashes derived from addresses', () => {
