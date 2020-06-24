@@ -90,7 +90,7 @@ describe('queue', () => {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
   const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
-  const addressMeta: Address = {
+  const addressInfo: Address = {
     address,
     blake160: '0xfakeblake160',
     walletId: '',
@@ -104,7 +104,7 @@ describe('queue', () => {
     balance: '',
     version: AddressVersion.Testnet
   }
-  const addresses = [addressMeta]
+  const addresses = [addressInfo]
 
   let stubbedBlockTipSubject: any
   let stubbedTransactionsSubject: any
