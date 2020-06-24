@@ -11,7 +11,6 @@ import Output, { OutputStatus } from '../../../src/models/chain/output'
 import BlockHeader from '../../../src/models/chain/block-header'
 import MultiSign from '../../../src/models/multi-sign'
 import SystemScriptInfo from '../../../src/models/system-script-info'
-import LiveCellEntity from '../../../src/database/chain/entities/live-cell'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
@@ -19,6 +18,7 @@ import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-util
 import { CapacityNotEnough } from '../../../src/exceptions/wallet'
 import LiveCell from '../../../src/models/chain/live-cell'
 import AddressGenerator from '../../../src/models/address-generator'
+import IndexerService, { LumosCell } from '../../../src/services/indexer-service'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -64,6 +64,46 @@ const tipTimestamp = '1580599200000'
 const tipEpoch = '0x7080018000001'
 const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0x' + '0'.repeat(64), '0', tipEpoch)
 
+class MockIndexerService {
+  private cache: LumosCell[]
+
+  constructor() {
+    this.cache = new Array()
+  }
+
+  public addCells(cell: LumosCell[]) {
+    this.cache.push(...cell)
+  }
+
+  public clear() {
+    this.cache = new Array()
+  }
+
+  private toScript(lumosCell: { code_hash: any; args: any; hash_type: any }) {
+    return new Script(
+      lumosCell.code_hash,
+      lumosCell.args,
+      lumosCell.hash_type === 'data' ? ScriptHashType.Data : ScriptHashType.Type,
+    )
+  }
+
+  public async getLiveCellsByScript(lock: Script | null, type: Script | null, _data: string | null) {
+    const result = []
+    for (const cell of this.cache) {
+      if (lock != null && lock.computeHash() != this.toScript(cell.cell_output.lock).computeHash()) {
+        continue
+      }
+      if (type != null && (!cell.cell_output.type || type.computeHash() != this.toScript(cell.cell_output.type).computeHash())) {
+        continue
+      }
+      result.push(cell)
+    }
+
+    return result
+  }
+}
+const indexerService = new MockIndexerService()
+
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
     await initConnection('0x1234')
@@ -87,6 +127,11 @@ describe('TransactionGenerator', () => {
     mockTipHeader.mockReturnValue(blockHeader)
     // @ts-ignore: Private method
     TransactionGenerator.getTipHeader = mockTipHeader.bind(TransactionGenerator)
+
+    indexerService.clear()
+    const mockIndexerService = jest.fn()
+    mockIndexerService.mockRejectedValue(indexerService)
+    IndexerService.getInstance = mockIndexerService
   })
 
   afterAll(async () => {
@@ -912,28 +957,34 @@ describe('TransactionGenerator', () => {
       capacity: string,
       amount: string | undefined = undefined,
       tokenID: string | undefined = undefined,
-      lockScript: Script = bobAnyoneCanPayLockScript,
-      blockNumber: string = '1',
+      lockScript: Script = bobAnyoneCanPayLockScript
     ) => {
-      const liveCell = new LiveCellEntity()
-      liveCell.txHash = Buffer.from(randomHex().slice(2), 'hex')
-      liveCell.outputIndex = 0
-      liveCell.capacity = capacity
-      liveCell.lockCodeHash = Buffer.from(lockScript.codeHash.slice(2), 'hex')
-      liveCell.lockArgs = Buffer.from(lockScript.args.slice(2), 'hex')
-      liveCell.lockHashType = lockScript.hashType === 'data' ? '1' : '2'
-      liveCell.lockHash = Buffer.from(lockScript.computeHash().slice(2), 'hex')
-      liveCell.createdBlockNumber = blockNumber
-      const data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'
-      liveCell.data = Buffer.from(data.slice(2), 'hex')
-
+      const liveCell = {
+        block_hash: randomHex(),
+        out_point: {
+          tx_hash: randomHex(),
+          index: '0x0'
+        },
+        cell_output: {
+          capacity: capacity,
+          lock: { 
+            code_hash: lockScript.codeHash,
+            args: lockScript.args,
+            hash_type: lockScript.hashType.toString(),
+          },
+        },
+        data: '0x'
+      }
       if (tokenID) {
         const typeScript = assetAccountInfo.generateSudtScript(tokenID)
-        liveCell.typeCodeHash = Buffer.from(typeScript.codeHash.slice(2), 'hex')
-        liveCell.typeArgs = Buffer.from(typeScript.args.slice(2), 'hex')
-        liveCell.typeHashType = typeScript.hashType === 'data' ? '1' : '2'
-        liveCell.typeHash = Buffer.from(typeScript.computeHash().slice(2), 'hex')
+        // @ts-ignore
+        liveCell.cell_output.type = { 
+          code_hash: typeScript.codeHash,
+          args: typeScript.args,
+          hash_type: typeScript.hashType.toString(),
+        }
       }
+      liveCell.data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'
 
       return liveCell
     }
@@ -949,11 +1000,11 @@ describe('TransactionGenerator', () => {
     describe('generateAnyoneCanPayToCKBTx, with feeRate 1000', () => {
       const feeRate = '1000'
       it('capacity 70, enough for fee', async () => {
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('70')),
           generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -964,7 +1015,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           (1 * 10**8).toString(),
           bob.blake160,
@@ -993,12 +1044,12 @@ describe('TransactionGenerator', () => {
       })
 
       it('send from one account', async () => {
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('70')),
           generateLiveCell(toShannon('70'), undefined, undefined, davidAnyoneCanPayLockScript),
           generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1011,7 +1062,7 @@ describe('TransactionGenerator', () => {
         try {
           await TransactionGenerator.generateAnyoneCanPayToCKBTx(
             [bob.lockHash, david.lockHash],
-            [bobAnyoneCanPayLockScript.computeHash()],
+            [bobAnyoneCanPayLockScript],
             targetOutput,
             (10 * 10**8).toString(),
             bob.blake160,
@@ -1025,12 +1076,12 @@ describe('TransactionGenerator', () => {
       })
 
       it('2 capacity 62, enough for send, 1 not enough for fee', async () => {
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('62')),
           generateLiveCell(toShannon('62')),
           generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1041,7 +1092,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           (1 * 10**8).toString(),
           bob.blake160,
@@ -1071,11 +1122,11 @@ describe('TransactionGenerator', () => {
       })
 
       it('1 capacity 62, enough for send, not enough for fee, need normal cell', async () => {
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('62')),
           generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1086,7 +1137,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           (1 * 10**8).toString(),
           bob.blake160,
@@ -1116,11 +1167,11 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 61, not enough for send', async () => {
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('61')),
           generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1133,7 +1184,7 @@ describe('TransactionGenerator', () => {
         try {
           await TransactionGenerator.generateAnyoneCanPayToCKBTx(
             [bob.lockHash],
-            [bobAnyoneCanPayLockScript.computeHash()],
+            [bobAnyoneCanPayLockScript],
             targetOutput,
             (1 * 10**8).toString(),
             bob.blake160,
@@ -1147,11 +1198,11 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 70, send all', async () => {
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('70')),
           generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1162,7 +1213,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           'all',
           bob.blake160,
@@ -1196,13 +1247,13 @@ describe('TransactionGenerator', () => {
       const feeRate = '1000'
       it('capacity 150, enough for fee', async () => {
         const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('150'), '1000', tokenID),
           targetLiveCellEntity
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
-        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+        const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
         const targetOutput: Output = Output.fromObject({
           capacity: targetLiveCell.capacity,
@@ -1213,7 +1264,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           '100',
           bob.blake160,
@@ -1248,14 +1299,14 @@ describe('TransactionGenerator', () => {
 
       it('send from one account', async () => {
         const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('150'), '100', tokenID),
           generateLiveCell(toShannon('150'), '100', tokenID, davidAnyoneCanPayLockScript),
           targetLiveCellEntity
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
-        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+        const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
         const targetOutput: Output = Output.fromObject({
           capacity: targetLiveCell.capacity,
@@ -1268,7 +1319,7 @@ describe('TransactionGenerator', () => {
         try {
           await TransactionGenerator.generateAnyoneCanPayToSudtTx(
             [bob.lockHash, david.lockHash],
-            [bobAnyoneCanPayLockScript.computeHash()],
+            [bobAnyoneCanPayLockScript],
             targetOutput,
             '101',
             bob.blake160,
@@ -1284,13 +1335,13 @@ describe('TransactionGenerator', () => {
 
       it('capacity 142 , enough for send, 1 not enough for fee', async () => {
         const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('142'), '1000', tokenID),
           targetLiveCellEntity
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
-        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+        const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
         const targetOutput: Output = Output.fromObject({
           capacity: targetLiveCell.capacity,
@@ -1301,7 +1352,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           '100',
           bob.blake160,
@@ -1341,14 +1392,14 @@ describe('TransactionGenerator', () => {
 
       it('capacity 143 / 142 , enough for send, 1 not enough for fee', async () => {
         const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('143'), '50', tokenID),
           generateLiveCell(toShannon('142'), '1000', tokenID),
           targetLiveCellEntity
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
-        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+        const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
         const targetOutput: Output = Output.fromObject({
           capacity: targetLiveCell.capacity,
@@ -1359,7 +1410,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           '100',
           bob.blake160,
@@ -1405,13 +1456,13 @@ describe('TransactionGenerator', () => {
 
       it('amount 50, not enough for send', async () => {
         const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('142'), '50', tokenID),
           targetLiveCellEntity
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
-        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+        const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
         const targetOutput: Output = Output.fromObject({
           capacity: targetLiveCell.capacity,
@@ -1424,7 +1475,7 @@ describe('TransactionGenerator', () => {
         try {
           await TransactionGenerator.generateAnyoneCanPayToSudtTx(
             [bob.lockHash],
-            [bobAnyoneCanPayLockScript.computeHash()],
+            [bobAnyoneCanPayLockScript],
             targetOutput,
             '100',
             bob.blake160,
@@ -1439,13 +1490,13 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000, amount = all', async () => {
         const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-        const liveCells: LiveCellEntity[] = [
+        const liveCells: LumosCell[] = [
           generateLiveCell(toShannon('1000'), '1000', tokenID),
           targetLiveCellEntity
         ]
-        await getConnection().manager.save(liveCells)
+        indexerService.addCells(liveCells)
 
-        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+        const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
         const targetOutput: Output = Output.fromObject({
           capacity: targetLiveCell.capacity,
@@ -1456,7 +1507,7 @@ describe('TransactionGenerator', () => {
 
         const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
           [bob.lockHash],
-          [bobAnyoneCanPayLockScript.computeHash()],
+          [bobAnyoneCanPayLockScript],
           targetOutput,
           'all',
           bob.blake160,
