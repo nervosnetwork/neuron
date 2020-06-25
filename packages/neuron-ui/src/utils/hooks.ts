@@ -13,7 +13,7 @@ import {
 } from 'states'
 import { epochParser, RoutePath, GenesisBlockHash, ChainType } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
-import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
+import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, validateDecimal } from 'utils/validators'
 
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
@@ -240,7 +240,7 @@ export const useSUDTAccountInfoErrors = ({
       symbol: { params: { symbol, isCKB }, validator: verifySymbol },
       tokenId: { params: { tokenId, isCKB }, validator: verifyTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: verifyTokenName },
-      decimal: { params: { decimal }, validator: verifyDecimal },
+      decimal: { params: { decimal }, validator: validateDecimal },
     }
 
     Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {

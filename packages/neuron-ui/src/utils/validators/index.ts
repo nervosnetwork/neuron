@@ -14,15 +14,8 @@ import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException } from 'exceptions'
+import { MAX_SUDT_TOKEN_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_SUDT_ACCOUNT_NAME_LENGTH } from '../const'
 import {
-  MIN_DECIMAL,
-  MAX_DECIMAL,
-  MAX_SUDT_TOKEN_NAME_LENGTH,
-  MAX_SYMBOL_LENGTH,
-  MAX_SUDT_ACCOUNT_NAME_LENGTH,
-} from '../const'
-import {
-  DecimalRangeException,
   FieldInvalidException,
   FieldUsedException,
   FieldTooLongException,
@@ -367,18 +360,5 @@ export const verifySymbol = ({
   }
   if ([...symbol].some(char => char.charCodeAt(0) > 127)) {
     throw new FieldInvalidException(fieldName)
-  }
-}
-
-export const verifyDecimal = ({ decimal, required = false }: { decimal: string; required?: boolean }) => {
-  const fieldName = 'decimal'
-  if (!decimal && required) {
-    throw new FieldRequiredException(fieldName)
-  }
-  if (Number.isNaN(+decimal) || !Number.isInteger(+decimal)) {
-    throw new FieldInvalidException(fieldName)
-  }
-  if (+decimal < MIN_DECIMAL || +decimal > MAX_DECIMAL) {
-    throw new DecimalRangeException()
   }
 }
