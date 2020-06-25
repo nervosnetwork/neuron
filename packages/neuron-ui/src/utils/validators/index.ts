@@ -56,48 +56,6 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
 }
 
 // done
-export const verifySUDTAddress = ({
-  address,
-  codeHash,
-  isMainnet = true,
-  required = false,
-}: {
-  address: string
-  codeHash: string
-  isMainnet?: boolean
-  required?: boolean
-}) => {
-  const fieldName = 'address'
-  if (address) {
-    const error = new FieldInvalidException(fieldName)
-    if (!verifyAddress(address, isMainnet)) {
-      throw error
-    }
-    try {
-      // verify anyone can pay for now
-      const parsed = ckbCore.utils.parseAddress(address, 'hex')
-      if (!parsed.startsWith(LONG_TYPE_PREFIX)) {
-        throw error
-      }
-      const CODE_HASH_LENGTH = 64
-      const codeHashOfAddr = parsed.slice(4, 4 + CODE_HASH_LENGTH)
-      if (codeHash && codeHashOfAddr !== codeHash.slice(2)) {
-        throw error
-      }
-      const ARGS_LENGTH = 40
-      const minimums = parsed.slice(4 + CODE_HASH_LENGTH + ARGS_LENGTH)
-      if (minimums && ((minimums.length !== 2 && minimums.length !== 4) || Number.isNaN(+`0x${minimums}`))) {
-        throw error
-      }
-    } catch {
-      throw error
-    }
-  } else if (required) {
-    throw new FieldRequiredException(fieldName)
-  }
-}
-
-// done
 export const verifyAmountRange = (amount: string = '', extraSize: number = 0) => {
   return BigInt(CKBToShannonFormatter(amount)) >= BigInt((MIN_AMOUNT + extraSize) * SHANNON_CKB_RATIO)
 }

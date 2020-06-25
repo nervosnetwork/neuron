@@ -18,7 +18,7 @@ import {
 } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
-  verifySUDTAddress,
+  validateSUDTAddress,
   verifySUDTAmount,
   isMainnet as isMainnetUtil,
   shannonToCKBFormatter,
@@ -150,7 +150,7 @@ const SUDTSend = () => {
   const errors: { [Fields.Address]: string; [Fields.Amount]: string } = useMemo(() => {
     const errMap = { address: '', amount: '' }
     try {
-      verifySUDTAddress({
+      validateSUDTAddress({
         address: sendState.address,
         codeHash: anyoneCanPayScript?.codeHash ?? '',
         isMainnet,
