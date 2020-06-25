@@ -1,6 +1,5 @@
 // REFACTOR: throw exceptions directly
 import {
-  MAX_NETWORK_NAME_LENGTH,
   MIN_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH,
   MIN_AMOUNT,
@@ -213,24 +212,4 @@ export const verifyTransactionOutputs = (items: Readonly<State.Output[]> = [], i
     }
     return false
   })
-}
-
-// done
-export const verifyNetworkName = (name: string, usedNames: string[]) => {
-  if (!name) {
-    return {
-      code: ErrorCode.FieldRequired,
-    }
-  }
-  if (usedNames.includes(name)) {
-    return {
-      code: ErrorCode.FieldUsed,
-    }
-  }
-  if (name.length > MAX_NETWORK_NAME_LENGTH) {
-    return {
-      code: ErrorCode.FieldTooLong,
-    }
-  }
-  return true
 }

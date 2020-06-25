@@ -2,7 +2,7 @@ import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 import { FieldRequiredException, FieldUsedException, FieldTooLongException } from 'exceptions'
 
 export const validateNetworkName = (name: string, usedNames: string[]) => {
-  const FIELD_NAME = 'network-name'
+  const FIELD_NAME = 'name'
   if (!name) {
     throw new FieldRequiredException(FIELD_NAME)
   }
