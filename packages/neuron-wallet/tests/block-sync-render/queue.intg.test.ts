@@ -93,8 +93,6 @@ describe('integration tests for sync pipeline', () => {
     }
   }
 
-  // const fakeTip1 = {block_number: '1', block_hash: 'hash1'}
-  // const fakeTip2 = {block_number: '2', block_hash: 'hash2'}
   const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
 
   const fakeTx1 = generateTxWithStatus('1', fakeBlock1)

@@ -36,6 +36,11 @@ export default class IndexerConnector {
 
         return addressesByWalletId
       }, new Map<string, AddressMeta[]>())
+
+    this.processNextBlockNumberQueue = queue(async () => this.processTxsInNextBlockNumber(), 1)
+    this.processNextBlockNumberQueue.error((err: any) => {
+      logger.error(err)
+    })
   }
 
   public async connect() {
@@ -43,13 +48,7 @@ export default class IndexerConnector {
       this.indexer.startForever()
       this.pollingIndexer = true
 
-      this.processNextBlockNumberQueue = queue(async () => this.processNextBlockNumber(), 1)
-      this.processNextBlockNumberQueue.error((err: any) => {
-        logger.error(err)
-      })
-
-      this.processNextBlockNumberQueue.push(null)
-      await this.processNextBlockNumberQueue.drain()
+      await this.processNextBlockNumber()
 
       while (this.pollingIndexer) {
         this.indexerTip = this.indexer.tip()
@@ -68,8 +67,7 @@ export default class IndexerConnector {
         }
 
         if (newInserts.length) {
-          this.processNextBlockNumberQueue.push(null)
-          await this.processNextBlockNumberQueue.drain()
+          await this.processNextBlockNumber()
         }
 
         await CommonUtils.sleep(5000)
@@ -132,6 +130,11 @@ export default class IndexerConnector {
   }
 
   private async processNextBlockNumber() {
+    this.processNextBlockNumberQueue!.push(null)
+    await this.processNextBlockNumberQueue!.drain()
+  }
+
+  private async processTxsInNextBlockNumber() {
     const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
     if (txsInNextUnprocessedBlockNumber.length) {
       this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
