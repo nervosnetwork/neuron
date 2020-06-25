@@ -99,7 +99,12 @@ export default class Queue {
   }
 
   public waitForDrained = async () => {
-    await this.checkAndSaveQueue?.drain()
+    return new Promise(resolve => {
+      if (!this.checkAndSaveQueue?.idle()) {
+        return resolve()
+      }
+      this.checkAndSaveQueue?.drain(resolve)
+    })
   }
 
   public stopAndWait = async () => {
@@ -117,6 +122,11 @@ export default class Queue {
       cachedPreviousTxs.set(txHash, previousTxWithStatus)
     }, 100)
 
+    const drainFetchTxQueue = new Promise((resolve, reject) => {
+      fetchTxQueue.error(reject)
+      fetchTxQueue.drain(resolve)
+    })
+
     const txHashSet = new Set()
     for (const [, tx] of transactions.entries()) {
       for (const [, input] of tx.inputs.entries()) {
@@ -133,7 +143,10 @@ export default class Queue {
         txHashSet.add(previousTxHash)
       }
     }
-    await fetchTxQueue.drain()
+
+    if (!fetchTxQueue.idle()) {
+      await drainFetchTxQueue
+    }
 
     for (const [, tx] of transactions.entries()) {
       const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(

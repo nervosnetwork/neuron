@@ -145,7 +145,11 @@ export default class IndexerCacheService {
     }, 100)
 
     fetchBlockDetailsQueue.push(newTxHashes)
-    await fetchBlockDetailsQueue.drain()
+
+    await new Promise((resolve, reject) => {
+      fetchBlockDetailsQueue.error(reject)
+      fetchBlockDetailsQueue.drain(resolve)
+    })
 
     for (const txWithStatus of txsWithStatus) {
       const {transaction, txStatus} = txWithStatus
