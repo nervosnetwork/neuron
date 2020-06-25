@@ -11,22 +11,23 @@ export const validateSUDTAmount = ({
   required: boolean
 }) => {
   const fieldName = 'amount'
+
   if (!amount && required) {
     throw new FieldRequiredException(fieldName)
   }
+
   if (amount === '0') {
     throw new AmountZeroException()
   }
+
   if (Number.isNaN(+amount) || +amount < 0) {
     throw new FieldInvalidException(fieldName)
   }
-  try {
-    if (sudtAmountToValue(amount, decimal) === undefined) {
-      throw new FieldInvalidException(fieldName)
-    }
-  } catch {
+
+  if (sudtAmountToValue(amount, decimal) === undefined) {
     throw new FieldInvalidException(fieldName)
   }
+
   return true
 }
 

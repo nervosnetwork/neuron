@@ -19,7 +19,7 @@ import {
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
   validateSUDTAddress,
-  verifySUDTAmount,
+  validateSUDTAmount,
   isMainnet as isMainnetUtil,
   shannonToCKBFormatter,
   sudtValueToAmount,
@@ -160,7 +160,7 @@ const SUDTSend = () => {
       errMap.address = t(err.message, err.i18n)
     }
     try {
-      verifySUDTAmount({ amount: sendState.amount, decimal: accountInfo?.decimal ?? '32', required: false })
+      validateSUDTAmount({ amount: sendState.amount, decimal: accountInfo?.decimal ?? '32', required: false })
       const value = sudtAmountToValue(sendState.amount, accountInfo?.decimal ?? '32')
       const total = accountInfo?.balance ?? '0'
       if (total && value && BigInt(total) < BigInt(value)) {

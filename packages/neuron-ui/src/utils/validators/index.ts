@@ -3,10 +3,7 @@ import { MIN_AMOUNT, SINCE_FIELD_SIZE, MAX_DECIMAL_DIGITS, SHANNON_CKB_RATIO } f
 import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
-import { FieldRequiredException } from 'exceptions'
-import { FieldInvalidException, AmountZeroException } from '../../exceptions'
 
-import { sudtAmountToValue } from '../formatters'
 //
 export * from './address'
 export * from './amount'
@@ -75,35 +72,6 @@ export const verifyAmount = (amount: string = '0') => {
     return { code: ErrorCode.NotNegative }
   }
   return true
-}
-
-// done
-export const verifySUDTAmount = ({
-  amount,
-  decimal,
-  required = false,
-}: {
-  amount: string
-  decimal: string
-  required: boolean
-}) => {
-  const fieldName = 'amount'
-  if (!amount && required) {
-    throw new FieldRequiredException(fieldName)
-  }
-  if (amount === '0') {
-    throw new AmountZeroException()
-  }
-  if (Number.isNaN(+amount) || +amount < 0) {
-    throw new FieldInvalidException(fieldName)
-  }
-  try {
-    if (sudtAmountToValue(amount, decimal) === undefined) {
-      throw new FieldInvalidException(fieldName)
-    }
-  } catch {
-    throw new FieldInvalidException(fieldName)
-  }
 }
 
 // done
