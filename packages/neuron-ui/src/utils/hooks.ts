@@ -14,7 +14,7 @@ import {
 import { epochParser, RoutePath, GenesisBlockHash, ChainType } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import {
-  verifyTokenId,
+  validateTokenId,
   validateSUDTAccountName,
   validateSymbol,
   validateTokenName,
@@ -244,7 +244,7 @@ export const useSUDTAccountInfoErrors = ({
         validator: validateSUDTAccountName,
       },
       symbol: { params: { symbol, isCKB }, validator: validateSymbol },
-      tokenId: { params: { tokenId, isCKB }, validator: verifyTokenId },
+      tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
     }

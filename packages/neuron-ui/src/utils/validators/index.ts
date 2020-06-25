@@ -7,8 +7,6 @@ import {
   SINCE_FIELD_SIZE,
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
-  DEFAULT_SUDT_FIELDS,
-  TOKEN_ID_LENGTH,
 } from 'utils/const'
 import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
@@ -255,31 +253,4 @@ export const verifyURL = (url: string) => {
     }
   }
   return true
-}
-
-// done
-export const verifyTokenId = ({
-  tokenId,
-  isCKB = false,
-  required = false,
-}: {
-  tokenId: string
-  isCKB: boolean
-  required: boolean
-}) => {
-  if (!tokenId && required) {
-    throw new FieldRequiredException('token-id')
-  }
-
-  if (isCKB && tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId) {
-    return
-  }
-
-  if (tokenId.startsWith('0x') && tokenId.length === TOKEN_ID_LENGTH && !Number.isNaN(+tokenId)) {
-    return
-  }
-
-  if (tokenId) {
-    throw new FieldInvalidException('token-id')
-  }
 }
