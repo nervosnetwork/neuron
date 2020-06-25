@@ -17,7 +17,7 @@ import {
   verifyTokenId,
   validateSUDTAccountName,
   validateSymbol,
-  verifyTokenName,
+  validateTokenName,
   validateDecimal,
 } from 'utils/validators'
 
@@ -245,7 +245,7 @@ export const useSUDTAccountInfoErrors = ({
       },
       symbol: { params: { symbol, isCKB }, validator: validateSymbol },
       tokenId: { params: { tokenId, isCKB }, validator: verifyTokenId },
-      tokenName: { params: { tokenName, isCKB }, validator: verifyTokenName },
+      tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
     }
 

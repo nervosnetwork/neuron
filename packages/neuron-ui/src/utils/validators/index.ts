@@ -14,13 +14,7 @@ import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException } from 'exceptions'
-import { MAX_SUDT_TOKEN_NAME_LENGTH } from '../const'
-import {
-  FieldInvalidException,
-  FieldTooLongException,
-  ValueReservedException,
-  AmountZeroException,
-} from '../../exceptions'
+import { FieldInvalidException, AmountZeroException } from '../../exceptions'
 
 import { sudtAmountToValue } from '../formatters'
 //
@@ -287,27 +281,5 @@ export const verifyTokenId = ({
 
   if (tokenId) {
     throw new FieldInvalidException('token-id')
-  }
-}
-
-// done
-export const verifyTokenName = ({
-  tokenName,
-  required = false,
-  isCKB = false,
-}: {
-  tokenName: string
-  required?: boolean
-  isCKB?: boolean
-}) => {
-  const fieldName = 'token-name'
-  if (!tokenName && required) {
-    throw new FieldRequiredException(fieldName)
-  }
-  if (!isCKB && [DEFAULT_SUDT_FIELDS.tokenName, DEFAULT_SUDT_FIELDS.CKBTokenName].includes(tokenName)) {
-    throw new ValueReservedException(tokenName)
-  }
-  if (tokenName.length > MAX_SUDT_TOKEN_NAME_LENGTH) {
-    throw new FieldTooLongException(fieldName, MAX_SUDT_TOKEN_NAME_LENGTH)
   }
 }
