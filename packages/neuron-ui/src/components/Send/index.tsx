@@ -33,7 +33,7 @@ import {
   verifyTransactionOutputs,
   verifyAmount,
   verifyAmountRange,
-  verifyAddress,
+  validateAddress,
 } from 'utils'
 
 import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
@@ -131,14 +131,10 @@ const Send = () => {
       }
       if (address !== undefined) {
         const chainType = network ? network.chain : ''
-        if (address === '') {
-          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
-        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
-          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
-        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
-          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
-        } else if (!verifyAddress(address)) {
-          addrErrorCode = `${ErrorCode.FieldInvalid}`
+        try {
+          validateAddress(address, chainType === MAINNET_TAG)
+        } catch (err) {
+          addrErrorCode = `${err.code}`
         }
       }
 

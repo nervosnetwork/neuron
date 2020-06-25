@@ -12,7 +12,7 @@ import {
   shannonToCKBFormatter,
   calculateFee,
   verifyTransactionOutputs,
-  verifyAddress,
+  validateAddress,
 } from 'utils'
 import i18n from 'utils/i18n'
 
@@ -330,10 +330,13 @@ export const useInitialize = (
             )
           )
           for (let i = 0; i < codes.length; i++) {
-            if (codes[i] && codes[i]!.data && verifyAddress(codes[i]!.data)) {
+            try {
+              validateAddress(codes[i]?.data ?? '')
               updateTransactionOutput('address')(+idx)(codes[i]!.data)
               ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
               return
+            } catch {
+              // ignore
             }
           }
           showErrorMessage(i18n.t('messages.error'), i18n.t('messages.no-valid-addresses-found'))

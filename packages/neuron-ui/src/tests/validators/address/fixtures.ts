@@ -8,6 +8,13 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
+  'Should throw an error when address is empty': {
+    params: {
+      address: '',
+      isMainnet: true,
+    },
+    exception: ErrorCode.AddressIsEmpty,
+  },
   'Should throw an error when mainnet address required but a testnet one is provided': {
     params: {
       address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2jd',
