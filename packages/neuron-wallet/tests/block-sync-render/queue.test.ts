@@ -13,6 +13,7 @@ import Input from '../../src/models/chain/input'
 import Output from '../../src/models/chain/output'
 import OutPoint from '../../src/models/chain/out-point'
 import Script, {ScriptHashType} from '../../src/models/chain/script'
+import { flushPromises } from '../test-utils'
 
 const stubbedIndexerConnectorConstructor = jest.fn()
 const stubbedTxAddressFinderConstructor = jest.fn()
@@ -59,8 +60,6 @@ const resetMocks = () => {
   stubbedUpdateCacheProcessedFn.mockReset()
 }
 
-const flushPromises = () => new Promise(setImmediate);
-
 const generateFakeTx = (id: string) => {
   const fakeTx = new Transaction('')
   fakeTx.hash = 'hash1'
@@ -91,7 +90,7 @@ describe('queue', () => {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
   const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
-  const addressMeta: Address = {
+  const addressInfo: Address = {
     address,
     blake160: '0xfakeblake160',
     walletId: '',
@@ -105,13 +104,14 @@ describe('queue', () => {
     balance: '',
     version: AddressVersion.Testnet
   }
-  const addresses = [addressMeta]
+  const addresses = [addressInfo]
 
   let stubbedBlockTipSubject: any
   let stubbedTransactionsSubject: any
 
   beforeEach(async () => {
     resetMocks()
+    jest.useFakeTimers()
 
     stubbedBlockTipSubject = new Subject<Tip>()
     stubbedTransactionsSubject = new Subject<Array<TransactionWithStatus>>()
@@ -160,6 +160,9 @@ describe('queue', () => {
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
   });
+  afterEach(() => {
+    jest.clearAllTimers()
+  });
   describe('#start', () => {
     beforeEach(async () => {
       stubbedGenesisBlockHashFn.mockResolvedValue('fakegenesisblockhash')
@@ -202,7 +205,6 @@ describe('queue', () => {
           ])
           stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
           stubbedTransactionsSubject.next(fakeTxs)
-          await flushPromises()
           await flushPromises()
         });
         it('check infos by hashes derived from addresses', () => {

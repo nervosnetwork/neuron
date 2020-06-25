@@ -14,9 +14,9 @@ export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
-  private pollingIndexer: boolean = false
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
   private indexerTip: Tip | undefined
+  public pollingIndexer: boolean = false
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
