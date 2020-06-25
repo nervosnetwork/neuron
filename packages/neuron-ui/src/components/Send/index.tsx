@@ -23,17 +23,16 @@ import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
-  ErrorCode,
   CONSTANTS,
   shannonToCKBFormatter,
   localNumberFormatter,
   getCurrentUrl,
   getSyncStatus,
-  verifyTotalAmount,
   verifyTransactionOutputs,
   validateAmount,
   validateAmountRange,
   validateAddress,
+  validateTotalAmount,
 } from 'utils'
 
 import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
@@ -100,9 +99,13 @@ const Send = () => {
   )
 
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
-  const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
-    ? errorMessage
-    : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
+
+  let errorMessageUnderTotal = errorMessage
+  try {
+    validateTotalAmount(totalAmount, fee, balance)
+  } catch (err) {
+    errorMessageUnderTotal = t(err.message)
+  }
 
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
   const network = networks.find(n => n.id === networkID)

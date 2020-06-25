@@ -107,14 +107,6 @@ export const verifySUDTAmount = ({
 }
 
 // done
-export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
-  if (BigInt(balance) < BigInt(0)) {
-    return false
-  }
-  return BigInt(totalAmount) + BigInt(fee) <= BigInt(balance)
-}
-
-// done
 export const verifyTransactionOutputs = (items: Readonly<State.Output[]> = [], ignoreLastAmount: boolean = false) => {
   return !items.some((item, i) => {
     const extraSize = item.date ? SINCE_FIELD_SIZE : 0

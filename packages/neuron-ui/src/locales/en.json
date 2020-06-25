@@ -384,7 +384,7 @@
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
         "307": "Please enter a testnet address",
-        "308": "Balance is not enough"
+        "308": "Amount is not enough"
       }
     },
     "sync": {
