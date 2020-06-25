@@ -80,12 +80,14 @@ export enum ErrorCode {
   NoWhiteSpaces = 209,
   ValueReserved = 210,
   AmountZero = 211,
+  FieldTooSimple = 212,
   FieldIrremovable = 301,
   FieldNotFound = 303,
   CameraUnavailable = 304,
   AddressIsEmpty = 305,
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
+  BalanceNotEnough = 308,
 }
 
 export enum SyncStatus {

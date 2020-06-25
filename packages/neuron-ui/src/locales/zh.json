@@ -377,12 +377,14 @@
         "209": "$t(messages.fields.{{fieldName}})不能包含空格。",
         "210": "\"{{value}}\" 是特殊值, 请重新输入。",
         "211": "金额不能为 0",
+        "212": "$t(messages.fields.{{fieldName}}) 太简单",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
         "303": "未找到$t(messages.fields.{{fieldName}})。",
         "304": "摄像头不可用或被禁用。",
         "305": "$t(messages.fields.address)不能为空。",
         "306": "请输入主网地址",
-        "307": "请输入测试网地址"
+        "307": "请输入测试网地址",
+        "308": "余额不足"
       }
     },
     "sync": {
