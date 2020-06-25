@@ -14,10 +14,9 @@ import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException } from 'exceptions'
-import { MAX_SUDT_TOKEN_NAME_LENGTH, MAX_SUDT_ACCOUNT_NAME_LENGTH } from '../const'
+import { MAX_SUDT_TOKEN_NAME_LENGTH } from '../const'
 import {
   FieldInvalidException,
-  FieldUsedException,
   FieldTooLongException,
   ValueReservedException,
   AmountZeroException,
@@ -310,30 +309,5 @@ export const verifyTokenName = ({
   }
   if (tokenName.length > MAX_SUDT_TOKEN_NAME_LENGTH) {
     throw new FieldTooLongException(fieldName, MAX_SUDT_TOKEN_NAME_LENGTH)
-  }
-}
-
-// done
-export const verifySUDTAccountName = ({
-  name = '',
-  exists = [],
-  required = false,
-}: {
-  name: string
-  exists?: string[]
-  required?: boolean
-}) => {
-  const fieldName = 'account-name'
-  if (!name && required) {
-    throw new FieldRequiredException(fieldName)
-  }
-  if (name === DEFAULT_SUDT_FIELDS.accountName) {
-    throw new ValueReservedException(name)
-  }
-  if (name.length > MAX_SUDT_ACCOUNT_NAME_LENGTH) {
-    throw new FieldTooLongException(fieldName, MAX_SUDT_ACCOUNT_NAME_LENGTH)
-  }
-  if (exists.includes(name)) {
-    throw new FieldUsedException(fieldName)
   }
 }
