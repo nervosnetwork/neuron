@@ -2,7 +2,7 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import TransactionService, { SearchType } from '../../../src/services/tx/transaction-service'
-import { TransactionStatus } from '../../../src/models/chain/transaction'
+import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import { saveTransactions, initConnection, closeConnection, saveAccounts } from '../../setupAndTeardown'
 import accounts from '../../setupAndTeardown/accounts.fixture'
 import transactions from '../../setupAndTeardown/transactions.fixture'
@@ -19,123 +19,279 @@ describe('Test TransactionService', () => {
   })
 
   describe('#filterSearchType(searchValue)', () => {
-    it('Should return SearchType.Empty when the search value is empty', () => {
-      const actual = TransactionService.filterSearchType('')
-      expect(actual).toBe(SearchType.Empty)
+    const stubProvider = {
+      searchValue: ''
+    }
+
+    afterEach(() => {
+      stubProvider.searchValue = ''
     })
 
-    it('Should return SearchType.Address when the search value is an address', () => {
-      const MAINNET_ADDRESS = 'ckb1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
-      const TESTNET_ADDRESS = 'ckt1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
-      const ADDRESSES = [MAINNET_ADDRESS, TESTNET_ADDRESS]
-      ADDRESSES.forEach(addr => {
-        expect(TransactionService.filterSearchType(addr)).toBe(SearchType.Address)
+    describe('When the search value is empty', () => {
+      beforeEach(() => {
+        const SEARCH_VALUE = ''
+        stubProvider.searchValue = SEARCH_VALUE
+      })
+
+      it('Should return SearchType.Empty', () => {
+        const actual = TransactionService.filterSearchType(stubProvider.searchValue)
+        expect(actual).toBe(SearchType.Empty)
       })
     })
 
-    it('Should return SearchType.TxHash when the search value is a transaction hash', () => {
-      const TX_HASH = '0x884c79635976a09d1bee84a4bbcc19454cbeb05e831b1d87cb39e20c73e63833'
-      const actual = TransactionService.filterSearchType(TX_HASH)
-      expect(actual).toBe(SearchType.TxHash)
+    describe('When the search value is an address', () => {
+      const MAINNET_ADDRESS = 'ckb1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
+      const TESTNET_ADDRESS = 'ckt1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
+      const fixtures = [['Mainnet', MAINNET_ADDRESS], ['Testnet', TESTNET_ADDRESS]]
+
+      test.each(fixtures)('Should return SearchType.Address When search value is a %s address', (_type, addr) => {
+        stubProvider.searchValue = addr
+        const actual = TransactionService.filterSearchType(stubProvider.searchValue)
+        expect(actual).toBe(SearchType.Address)
+      })
     })
 
-    it('Should return SearchType.Date when the search value is a date string', () => {
-      const DATE = '2019-02-09'
-      const actual = TransactionService.filterSearchType(DATE)
-      expect(actual).toBe(SearchType.Date)
+    describe('When the search value is a transaction hash', () => {
+      beforeEach(() => {
+        const TX_HASH = '0x884c79635976a09d1bee84a4bbcc19454cbeb05e831b1d87cb39e20c73e63833'
+        stubProvider.searchValue = TX_HASH
+      })
+
+      it('Should return SearchType.TxHash', () => {
+        const actual = TransactionService.filterSearchType(stubProvider.searchValue)
+        expect(actual).toBe(SearchType.TxHash)
+      })
     })
 
-    it('Should return SearchType.TokenInfo when the search value is not matched', () => {
-      const VALUE = 'unknown'
-      const actual = TransactionService.filterSearchType(VALUE)
-      expect(actual).toBe(SearchType.TokenInfo)
+    describe('When the search value is a date string', () => {
+      beforeEach(() => {
+        const DATE = '2019-02-09'
+        stubProvider.searchValue = DATE
+      })
+
+      it('Should return SearchType.Date', () => {
+        const actual = TransactionService.filterSearchType(stubProvider.searchValue)
+        expect(actual).toBe(SearchType.Date)
+      })
+    })
+
+    describe('When the search value is not matched', () => {
+      beforeEach(() => {
+        const VALUE = 'unknown'
+        stubProvider.searchValue = VALUE
+      })
+
+      it('Should return SearchType.TokenInfo', () => {
+        const actual = TransactionService.filterSearchType(stubProvider.searchValue)
+        expect(actual).toBe(SearchType.TokenInfo)
+      })
     })
   })
 
   describe('#blake160sOfTx(transaction)', () => {
-    it('Should return an array of blake160', () => {
-      const res = TransactionService.blake160sOfTx(transactions[0])
-      expect(res).toEqual([
-        '0x36c329ed630d6ce750712a477543672adab57f4c',
-        '0xe2193df51d78411601796b35b17b4f8f2cd85bd0'
-      ])
+    const stubProvider: { tx: Transaction | undefined } = {
+      tx: undefined
+    }
+
+    afterEach(() => {
+      stubProvider.tx = undefined
+    })
+
+    describe('When tx has 2 outputs', () => {
+      beforeEach(() => {
+        const TX = transactions[0]
+        stubProvider.tx = TX
+      })
+
+      it('Should return an array of blake160', () => {
+        const res = TransactionService.blake160sOfTx(stubProvider.tx!)
+        expect(res).toEqual([
+          '0x36c329ed630d6ce750712a477543672adab57f4c',
+          '0xe2193df51d78411601796b35b17b4f8f2cd85bd0'
+        ])
+      })
     })
   })
 
   describe('#getCountByLockHashesAndStatus(lockHashList, status)', () => {
-    it('Should return a map of <lockHash, count> when lockHash and status are both matched', async () => {
-      const lockHash = '0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d'
-      const lockHashList = new Set([lockHash])
-      const status = new Set([TransactionStatus.Success])
-      const actual = await TransactionService.getCountByLockHashesAndStatus(lockHashList, status)
-      expect(actual).toEqual(new Map([[lockHash, 2]]))
+    const stubProvider = {
+      lockHashList: new Set<string>(),
+      status: new Set<TransactionStatus>()
+    }
+
+    afterEach(() => {
+      stubProvider.lockHashList = new Set()
+      stubProvider.status = new Set()
     })
 
-    it('Should return an empty map when either lockHash or status are matched', async () => {
-      const lockHash = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-      const lockHashList = new Set([lockHash])
-      const status = new Set([TransactionStatus.Success])
-      const actual = await TransactionService.getCountByLockHashesAndStatus(lockHashList, status)
-      expect(actual).toEqual(new Map())
+    describe('When lockHash and status are both matched', () => {
+      const LOCK_HASH = '0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d'
+      const STATUS = TransactionStatus.Success
+
+      beforeEach(() => {
+        stubProvider.lockHashList = new Set([LOCK_HASH])
+        stubProvider.status = new Set([STATUS])
+      })
+
+      it('Should return a map of <lockHash, count>', async () => {
+        const actual = await TransactionService.getCountByLockHashesAndStatus(stubProvider.lockHashList, stubProvider.status)
+        expect(actual).toEqual(new Map([[LOCK_HASH, 2]]))
+      })
+    })
+
+    describe('When either lockHash or status is not matched', () => {
+      beforeEach(() => {
+        const LOCK_HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+        const STATUS = TransactionStatus.Success
+        stubProvider.lockHashList = new Set([LOCK_HASH])
+        stubProvider.status = new Set([STATUS])
+      })
+
+      it('Should return an empty map', async () => {
+        const actual = await TransactionService.getCountByLockHashesAndStatus(stubProvider.lockHashList, stubProvider.status)
+        expect(actual).toEqual(new Map())
+      })
     })
   })
 
   describe('#updateDescription(hash, description)', () => {
-    it('Should update the description when the tx exists', async () => {
-      const DESCRIPTION = 'new description'
-      const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
-      const origin = await TransactionService.get(HASH)
-      expect(origin!.description).toBe('')
-      await TransactionService.updateDescription(HASH, DESCRIPTION)
-      const updated = await TransactionService.get(HASH)
-      expect(updated!.description).toBe(DESCRIPTION)
+    const stubProvider = {
+      hash: '',
+      description: ''
+    }
+
+    afterEach(() => {
+      stubProvider.hash = ''
+      stubProvider.description = ''
     })
 
-    it('Should return undefined when the tx doesn\'t exist', async () => {
-      const DESCRIPTION = 'new description'
-      const HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-      const actual = await TransactionService.updateDescription(HASH, DESCRIPTION)
-      expect(actual).toBeUndefined()
+    describe('When the transaction exists', () => {
+
+      beforeEach(() => {
+        const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
+        const DESCRIPTION = 'new description'
+        stubProvider.hash = HASH
+        stubProvider.description = DESCRIPTION
+      })
+
+      it('Should update the description', async () => {
+        const origin = await TransactionService.get(stubProvider.hash)
+        expect(origin!.description).toBe('')
+        await TransactionService.updateDescription(stubProvider.hash, stubProvider.description)
+        const updated = await TransactionService.get(stubProvider.hash)
+        expect(updated!.description).toBe(stubProvider.description)
+      })
+    })
+
+    describe('When the transaction doesn\'t exist', () => {
+      beforeEach(() => {
+        const HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+        const DESCRIPTION = 'new description'
+        stubProvider.hash = HASH
+        stubProvider.description = DESCRIPTION
+      })
+
+      it('Should return undefined', async () => {
+        const actual = await TransactionService.updateDescription(stubProvider.hash, stubProvider.description)
+        expect(actual).toBeUndefined()
+      })
     })
   })
 
   describe('#get(hash)', () => {
-    it('Should return a transaction when the transaction exists', async () => {
-      const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
-      const actual = await TransactionService.get(HASH)
-      expect(actual).not.toBeUndefined()
+    const stubProvider = {
+      hash: ''
+    }
+
+    afterEach(() => {
+      stubProvider.hash = ''
     })
 
-    it('Should return undefined when the transaction doesn\'t exist', async () => {
-      const HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-      const actual = await TransactionService.get(HASH)
-      expect(actual).toBeUndefined()
+    describe('When the transaction exists', () => {
+      beforeEach(() => {
+        const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
+        stubProvider.hash = HASH
+      })
+
+      it('Should return a transaction', async () => {
+        const actual = await TransactionService.get(stubProvider.hash)
+        expect(actual).not.toBeUndefined()
+      })
+    })
+
+    describe('When the transaction doesn\'t exist', () => {
+      beforeEach(() => {
+        const HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+        stubProvider.hash = HASH
+      })
+
+      it('Should return undefined', async () => {
+        const actual = await TransactionService.get(stubProvider.hash)
+        expect(actual).toBeUndefined()
+      })
     })
   })
 
   describe('#exportTransactions({ walletID, filePath })', () => {
-    const filePath = path.resolve(os.tmpdir(), 'export-transaction.csv')
+    const stubProvider = {
+      filePath: path.resolve(os.tmpdir(), 'export-transaction.csv'),
+      walletID: ''
+    }
+
     afterEach(() => {
-      fs.unlinkSync(filePath)
+      fs.unlinkSync(stubProvider.filePath)
+      stubProvider.walletID = ''
     })
-    it('Should return the total count when it\'s called successfully', async () => {
-      const actual = await TransactionService.exportTransactions({ walletID: 'wallet id', filePath })
-      expect(actual).toBe(0)
+
+    describe('When the method is called successfully', () => {
+      beforeEach(() => {
+        const WALLET_ID = 'wallet id'
+        stubProvider.walletID = WALLET_ID
+      })
+
+      it('Should return the total count', async () => {
+        const actual = await TransactionService.exportTransactions({ walletID: stubProvider.walletID, filePath: stubProvider.filePath })
+        expect(actual).toBe(0)
+      })
     })
   })
 
   describe('#getAllByAddresses({ pageNo, pageSize, addresses, walletID }, searchValue)', () => {
     // TODO: validate complex sudt transaction, nervos dao transaction
-    const addresses: string[] = [
+    const ADDRESSES: string[] = [
       'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
       'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
     ]
+    const stubProvider: {
+      walletID: string,
+      pageNo: number,
+      pageSize: number,
+      addresses: string[],
+      searchValue: string
+    } = {
+      walletID: '',
+      pageNo: 1,
+      pageSize: 15,
+      addresses: ADDRESSES,
+      searchValue: ''
+    }
 
-    describe('When search without searchValue', () => {
+    afterEach(() => {
+      stubProvider.walletID = ''
+      stubProvider.pageNo = 1
+      stubProvider.pageSize = 15
+      stubProvider.addresses = ADDRESSES
+      stubProvider.searchValue = ''
+    })
+
+    describe('When search with an empty search value', () => {
+      beforeEach(() => {
+        const EMPTY_SEARCH_VALUE = ''
+        stubProvider.searchValue = EMPTY_SEARCH_VALUE
+      })
+
       it('Should return transactions', async () => {
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' }
-        )
+        const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
         const expectedTxs = [...transactions].reverse()
 
         expect(actual.totalCount).toBe(expectedTxs.length)
@@ -148,107 +304,140 @@ describe('Test TransactionService', () => {
     })
 
     describe('When search with a transaction hash', () => {
-      it('Should return an array of a transaction when the transaction hash hits', async () => {
-        const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
-        const actual = await TransactionService.getAllByAddresses({ pageNo: 1, pageSize: 15, addresses, walletID: '' }, HASH)
-        const expectedTxs = [transactions[0]]
+      describe('When hash hits', () => {
+        beforeEach(() => {
+          const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
+          stubProvider.searchValue = HASH
+        })
 
-        expect(actual.totalCount).toBe(expectedTxs.length)
-        expect(actual.items).toEqual(expectedTxs.map(tx => expect.objectContaining({
-          version: tx.version,
-          description: tx.description,
-          hash: tx.hash,
-          blockHash: undefined,
-          blockNumber: null,
-          value: '100000000000',
-          type: 'receive',
+        it('Should return an array of a transaction', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+          const expectedTxs = [transactions[0]]
 
-          status: 'success',
-          sudtInfo: undefined,
-          nervosDao: false
-        })))
+          expect(actual.totalCount).toBe(expectedTxs.length)
+          expect(actual.items).toEqual(expectedTxs.map(tx => expect.objectContaining({
+            version: tx.version,
+            description: tx.description,
+            hash: tx.hash,
+            blockHash: undefined,
+            blockNumber: null,
+            value: '100000000000',
+            type: 'receive',
+            status: 'success',
+            sudtInfo: undefined,
+            nervosDao: false
+          })))
+        })
       })
-      it('Should return an empty array when the transaction hash misses', async () => {
-        const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a865790f'
-        const actual = await TransactionService.getAllByAddresses({ pageNo: 1, pageSize: 15, addresses, walletID: '' }, HASH)
 
-        expect(actual.totalCount).toBe(0)
-        expect(actual.items).toEqual([])
+      describe('When hash misses', () => {
+        beforeEach(() => {
+          const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a865790f'
+          stubProvider.searchValue = HASH
+        })
+
+        it('Should return an empty array', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+          expect(actual.totalCount).toBe(0)
+          expect(actual.items).toEqual([])
+        })
       })
     })
 
     describe('When search with an address', () => {
-      it('Should return an array of several transactions when the address hits', async () => {
-        const ADDRESS = 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          ADDRESS
-        )
-        expect(actual.totalCount).toBe(2)
+      describe('When address hits', () => {
+        beforeEach(() => {
+          const ADDRESS = 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
+          stubProvider.searchValue = ADDRESS
+        })
+
+        it('Should return an array of several transactions', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+          expect(actual.totalCount).toBe(2)
+        })
       })
 
-      it('Should return an empty array when the address misses', async () => {
-        const ADDRESS = 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqs7zmeg8'
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          ADDRESS
-        )
-        expect(actual.totalCount).toBe(0)
-        expect(actual.items).toEqual([])
+      describe('When address misses', () => {
+        beforeEach(() => {
+          const ADDRESS = 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqs7zmeg8'
+          stubProvider.searchValue = ADDRESS
+        })
+
+        it('Should return an empty array', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+          expect(actual.totalCount).toBe(0)
+          expect(actual.items).toEqual([])
+        })
       })
     })
 
     describe('When search with a date string', () => {
-      it('Should return an array of several transactions when the date hits', async () => {
-        const now = new Date()
-        const year = now.getFullYear()
-        const month = `${now.getMonth() + 1}`.padStart(2, '0')
-        const date = `${now.getDate()}`.padStart(2, '0')
-        const DATE = `${year}-${month}-${date}`
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          DATE
-        )
-        expect(actual.totalCount).toBe(3)
+      describe('When date hits', () => {
+        beforeEach(() => {
+          const now = new Date()
+          const year = now.getFullYear()
+          const month = `${now.getMonth() + 1}`.padStart(2, '0')
+          const date = `${now.getDate()}`.padStart(2, '0')
+          const DATE = `${year}-${month}-${date}`
+          stubProvider.searchValue = DATE
+        })
+
+        it('Should return an array of several transactions', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+          expect(actual.totalCount).toBe(3)
+        })
       })
 
-      it('Should return an empty array when the date misses', async () => {
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          '1970-01-01'
-        )
-        expect(actual.totalCount).toBe(0)
-        expect(actual.items).toEqual([])
+      describe('When date misses', () => {
+        beforeEach(() => {
+          const DATE = '1970-01-01'
+          stubProvider.searchValue = DATE
+        })
+
+        it('Should return an empty array', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue,)
+          expect(actual.totalCount).toBe(0)
+          expect(actual.items).toEqual([])
+        })
       })
     })
 
     // TODO: validate after moduling the method
     describe('When search with token info', () => {
-      it('Should return an array of several transactions when the token name hits', async () => {
-        const TOKEN_NAME = accounts[0].tokenName
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          TOKEN_NAME,
-        )
-        expect(actual.totalCount).toBe(1)
+      describe('When token name hits', () => {
+        beforeEach(() => {
+          const TOKEN_NAME = accounts[0].tokenName
+          stubProvider.searchValue = TOKEN_NAME
+        })
+
+        it('Should return an array of several transactions', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue,)
+          expect(actual.totalCount).toBe(1)
+        })
       })
 
-      it('Should return an array of several transactions when the account name hits', async () => {
-        const ACCOUNT_NAME = accounts[0].accountName
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          ACCOUNT_NAME
-        )
-        expect(actual.totalCount).toBe(1)
+      describe('When account name hits', () => {
+        beforeEach(() => {
+          const ACCOUNT_NAME = accounts[0].accountName
+          stubProvider.searchValue = ACCOUNT_NAME
+        })
+
+        it('Should return an array of several transactions', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+          expect(actual.totalCount).toBe(1)
+        })
       })
 
-      it('Should return an empty array when neither token name nor account name hit', async () => {
-        const NAME = 'Non-exist token/account name'
-        const actual = await TransactionService.getAllByAddresses(
-          { pageNo: 1, pageSize: 15, addresses, walletID: '' },
-          NAME,
-        )
-        expect(actual.totalCount).toBe(0)
+      describe('When neither token name nor account name hit', () => {
+        beforeEach(() => {
+          const NAME = 'Non-exist token/account name'
+          stubProvider.searchValue = NAME
+        })
+
+        it('Should return an empty array', async () => {
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue,)
+          expect(actual.totalCount).toBe(0)
+        })
       })
     })
   })
