@@ -31,8 +31,8 @@ import {
   getSyncStatus,
   verifyTotalAmount,
   verifyTransactionOutputs,
-  verifyAmount,
-  verifyAmountRange,
+  validateAmount,
+  validateAmountRange,
   validateAddress,
 } from 'utils'
 
@@ -40,7 +40,7 @@ import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const { MAX_DECIMAL_DIGITS, MAINNET_TAG, SINCE_FIELD_SIZE } = CONSTANTS
+const { MAINNET_TAG, SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -117,30 +117,31 @@ const Send = () => {
 
   const outputErrors = useMemo(() => {
     return outputs.map(({ address, amount, date }) => {
-      let amountErrorCode = ''
-      let addrErrorCode = ''
-      const extraSize = date ? SINCE_FIELD_SIZE : 0
+      let amountError: (Error & { i18n: any }) | undefined
+      let addrError: (Error & { i18n: any }) | undefined
 
-      const amountVeriMsg = verifyAmount(amount)
       if (amount !== undefined) {
-        if (typeof amountVeriMsg === 'object') {
-          amountErrorCode = `${amountVeriMsg.code}`
-        } else if (!verifyAmountRange(amount, extraSize)) {
-          amountErrorCode = extraSize ? `${ErrorCode.LocktimeAmountTooSmall}` : `${ErrorCode.AmountTooSmall}`
+        try {
+          const extraSize = date ? SINCE_FIELD_SIZE : 0
+          validateAmount(amount)
+          validateAmountRange(amount, extraSize)
+        } catch (err) {
+          amountError = err
         }
       }
+
       if (address !== undefined) {
         const chainType = network ? network.chain : ''
         try {
           validateAddress(address, chainType === MAINNET_TAG)
         } catch (err) {
-          addrErrorCode = `${err.code}`
+          addrError = err
         }
       }
 
       return {
-        addrErrorCode,
-        amountErrorCode,
+        addrError,
+        amountError,
       }
     })
   }, [outputs, network])
@@ -164,17 +165,23 @@ const Send = () => {
             if (undefined === item || undefined === idx) {
               return null
             }
-            const errorMsg = outputErrors[idx].addrErrorCode
-              ? t(`messages.codes.${outputErrors[idx].addrErrorCode}`, {
-                  fieldName: 'address',
-                  fieldValue: item.address || '',
-                })
-              : undefined
+            const outputError = outputErrors[idx]
+
+            const amountErrorMsg = outputError.amountError
+              ? t(outputError.amountError.message, outputError.amountError.i18n)
+              : ''
+
+            const addrErrorMsg = outputError.addrError
+              ? t(outputError.addrError.message, outputError.addrError.i18n)
+              : ''
+
             const fullAddrInfo =
-              !errorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH ? t('messages.full-addr-info') : ''
+              !addrErrorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH
+                ? t('messages.full-addr-info')
+                : ''
 
             let locktimeAble = false
-            if (!errorMsg && item.address && item.address.length === SHORT_ADDR_LENGTH) {
+            if (!addrErrorMsg && item.address && item.address.length === SHORT_ADDR_LENGTH) {
               try {
                 const parsed = ckbCore.utils.bytesToHex(ckbCore.utils.parseAddress(item.address))
                 if (parsed.startsWith(LOCKTIMEABLE_PREFIX)) {
@@ -197,7 +204,7 @@ const Send = () => {
                   onChange={onItemChange}
                   required
                   maxLength={100}
-                  error={errorMsg}
+                  error={addrErrorMsg}
                   autoFocus
                 />
                 {fullAddrInfo ? (
@@ -218,16 +225,7 @@ const Send = () => {
                   disabled={item.disabled}
                   required
                   suffix="CKB"
-                  error={
-                    outputErrors[idx].amountErrorCode
-                      ? t(`messages.codes.${outputErrors[idx].amountErrorCode}`, {
-                          fieldName: 'amount',
-                          fieldValue: localNumberFormatter(item.amount),
-                          amount: localNumberFormatter(item.amount),
-                          length: MAX_DECIMAL_DIGITS,
-                        })
-                      : ''
-                  }
+                  error={amountErrorMsg}
                 />
                 <button
                   data-idx={idx}

@@ -18,8 +18,15 @@ export class AmountZeroException extends Error {
 
 export class AmountTooSmallException extends RangeError {
   public code = ErrorCode.AmountTooSmall
-  constructor() {
+  public i18n = {
+    amount: '',
+    required: '',
+  }
+
+  constructor(amount: string, required: string) {
     super(`${I18N_PATH}${ErrorCode.AmountTooSmall}`)
+    this.i18n.amount = amount
+    this.i18n.required = required
   }
 }
 
@@ -27,10 +34,14 @@ export class AmountDecimalExceedException extends RangeError {
   public code = ErrorCode.DecimalExceed
   public i18n = {
     fieldName: 'amount',
+    fieldValue: '',
+    length: '',
   }
 
-  constructor() {
+  constructor(value: string, length: number) {
     super(`${I18N_PATH}${ErrorCode.DecimalExceed}`)
+    this.i18n.fieldValue = value
+    this.i18n.length = `${length}`
   }
 }
 
@@ -38,10 +49,12 @@ export class AmountNegativeException extends RangeError {
   public code = ErrorCode.NotNegative
   public i18n = {
     fieldName: 'amount',
+    fieldValue: '',
   }
 
-  constructor() {
+  constructor(value: string) {
     super(`${I18N_PATH}${ErrorCode.NotNegative}`)
+    this.i18n.fieldValue = value
   }
 }
 

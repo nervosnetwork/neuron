@@ -359,7 +359,7 @@
       "codes": {
         "-3": "",
         "100": "餘額不足。",
-        "101": "金額 {{amount}} CKB太小，請輸入一個不小於 61 CKB 的值。",
+        "101": "金額 {{amount}} CKB太小，請輸入一個不小於 {{required}} CKB 的值。",
         "102": "$t(messages.fields.{{fieldName}})無效。",
         "103": "$t(messages.fields.keystore-password)不正確。",
         "104": "未連接到節點，請重啓 Neuron。",

@@ -11,7 +11,7 @@ export const validateAddress = (address: string, isMainnet?: boolean): boolean =
   const FIELD_NAME = 'address'
 
   if (typeof address !== 'string') {
-    throw new FieldInvalidException(FIELD_NAME)
+    throw new FieldInvalidException(FIELD_NAME, `${address}`)
   }
 
   if (!address) {
@@ -31,7 +31,7 @@ export const validateAddress = (address: string, isMainnet?: boolean): boolean =
   try {
     parsed = ckbCore.utils.parseAddress(address, 'hex')
   } catch (err) {
-    throw new FieldInvalidException(FIELD_NAME)
+    throw new FieldInvalidException(FIELD_NAME, address)
   }
 
   if (parsed.startsWith(LONG_DATA_PREFIX) || parsed.startsWith(LONG_TYPE_PREFIX)) {
@@ -39,7 +39,7 @@ export const validateAddress = (address: string, isMainnet?: boolean): boolean =
   }
 
   if (!parsed.startsWith(SHORT_ADDR_00_PREFIX) || address.length !== SHORT_ADDR_00_LENGTH) {
-    throw new FieldInvalidException(FIELD_NAME)
+    throw new FieldInvalidException(FIELD_NAME, address)
   }
 
   return true

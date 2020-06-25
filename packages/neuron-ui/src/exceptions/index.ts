@@ -12,12 +12,14 @@ export class FieldInvalidException extends Error {
   public code = ErrorCode.FieldInvalid
   public i18n: {
     fieldName: string
+    fieldValue: string
   }
 
-  constructor(fieldName: string) {
+  constructor(fieldName: string, fieldValue = '') {
     super(`${I18N_PATH}${ErrorCode.FieldInvalid}`)
     this.i18n = {
       fieldName,
+      fieldValue,
     }
   }
 }
