@@ -5,7 +5,7 @@ export const validateURL = (url: string) => {
     throw new FieldRequiredException('remote')
   }
   if (!/^https?:\/\//.test(url)) {
-    throw new URLProtocolRequiredException()
+    throw new URLProtocolRequiredException(url)
   }
   if (/\s/.test(url)) {
     throw new URLNoWhiteSpacesException()

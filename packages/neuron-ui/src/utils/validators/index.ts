@@ -234,23 +234,3 @@ export const verifyNetworkName = (name: string, usedNames: string[]) => {
   }
   return true
 }
-
-// done
-export const verifyURL = (url: string) => {
-  if (!url) {
-    return {
-      code: ErrorCode.FieldRequired,
-    }
-  }
-  if (!/^https?:\/\//.test(url)) {
-    return {
-      code: ErrorCode.ProtocolRequired,
-    }
-  }
-  if (/\s/.test(url)) {
-    return {
-      code: ErrorCode.NoWhiteSpaces,
-    }
-  }
-  return true
-}

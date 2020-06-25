@@ -6,10 +6,12 @@ export class URLProtocolRequiredException extends Error {
   public code = ErrorCode.ProtocolRequired
   public i18n = {
     fieldName: 'remote',
+    fieldValue: '',
   }
 
-  constructor() {
+  constructor(url: string) {
     super(`${I18N_PATH}${ErrorCode.ProtocolRequired}`)
+    this.i18n.fieldValue = url
   }
 }
 

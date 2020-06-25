@@ -6,7 +6,7 @@ import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 
-import { CONSTANTS, useGoBack, verifyNetworkName, verifyURL } from 'utils'
+import { CONSTANTS, useGoBack, verifyNetworkName, validateURL } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { useOnSubmit } from './hooks'
 import styles from './networkEditor.module.scss'
@@ -62,21 +62,23 @@ const NetworkEditor = () => {
         dataset: { field = '' },
       } = e.target as HTMLInputElement
       let error = ''
-      if (field === 'name') {
-        const res = verifyNetworkName(value, usedNetworkNames)
-        if (typeof res === 'object') {
-          error = t(`messages.codes.${res.code}`, {
-            fieldName: 'name',
-            fieldValue: '',
-            length: MAX_NETWORK_NAME_LENGTH,
-          })
+      try {
+        if (field === 'name') {
+          const res = verifyNetworkName(value, usedNetworkNames)
+          if (typeof res === 'object') {
+            error = t(`messages.codes.${res.code}`, {
+              fieldName: 'name',
+              fieldValue: '',
+              length: MAX_NETWORK_NAME_LENGTH,
+            })
+          }
+        } else if (field === 'url') {
+          validateURL(value)
         }
-      } else if (field === 'url') {
-        const res = verifyURL(value)
-        if (typeof res === 'object') {
-          error = t(`messages.codes.${res.code}`, { fieldName: 'remote', fieldValue: value })
-        }
+      } catch (err) {
+        error = t(err.message, err.i18n)
       }
+
       setEditor(state => ({
         ...state,
         [field]: value,
