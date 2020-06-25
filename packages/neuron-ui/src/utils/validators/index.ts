@@ -14,7 +14,7 @@ import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException } from 'exceptions'
-import { MAX_SUDT_TOKEN_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_SUDT_ACCOUNT_NAME_LENGTH } from '../const'
+import { MAX_SUDT_TOKEN_NAME_LENGTH, MAX_SUDT_ACCOUNT_NAME_LENGTH } from '../const'
 import {
   FieldInvalidException,
   FieldUsedException,
@@ -335,30 +335,5 @@ export const verifySUDTAccountName = ({
   }
   if (exists.includes(name)) {
     throw new FieldUsedException(fieldName)
-  }
-}
-
-// done
-export const verifySymbol = ({
-  symbol,
-  required = false,
-  isCKB = false,
-}: {
-  symbol: string
-  required?: boolean
-  isCKB?: boolean
-}) => {
-  const fieldName = 'symbol'
-  if (!symbol && required) {
-    throw new FieldRequiredException(fieldName)
-  }
-  if (!isCKB && [DEFAULT_SUDT_FIELDS.symbol, DEFAULT_SUDT_FIELDS.CKBSymbol].includes(symbol)) {
-    throw new ValueReservedException(symbol)
-  }
-  if (symbol.length > MAX_SYMBOL_LENGTH) {
-    throw new FieldTooLongException(fieldName, MAX_SYMBOL_LENGTH)
-  }
-  if ([...symbol].some(char => char.charCodeAt(0) > 127)) {
-    throw new FieldInvalidException(fieldName)
   }
 }
