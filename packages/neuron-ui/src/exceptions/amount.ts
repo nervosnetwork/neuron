@@ -18,15 +18,14 @@ export class AmountZeroException extends Error {
 
 export class AmountTooSmallException extends RangeError {
   public code = ErrorCode.AmountTooSmall
-  public i18n = {
-    amount: '',
-    required: '',
+  public i18n: {
+    amount: string
+    required: string
   }
 
   constructor(amount: string, required: string) {
     super(`${I18N_PATH}${ErrorCode.AmountTooSmall}`)
-    this.i18n.amount = amount
-    this.i18n.required = required
+    this.i18n = { amount, required }
   }
 }
 

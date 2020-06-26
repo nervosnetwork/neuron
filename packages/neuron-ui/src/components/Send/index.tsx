@@ -131,8 +131,8 @@ const Send = () => {
 
   const outputErrors = useMemo(() => {
     return outputs.map(({ address, amount, date }) => {
-      let amountError: (Error & { i18n: any }) | undefined
-      let addrError: (Error & { i18n: any }) | undefined
+      let amountError: (Error & { i18n: { [key: string]: string } }) | undefined
+      let addrError: (Error & { i18n: { [key: string]: string } }) | undefined
 
       if (amount !== undefined) {
         try {

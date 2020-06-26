@@ -45,10 +45,7 @@ export class FieldTooLongException extends Error {
 
   constructor(fieldName: string, length: number) {
     super(`${I18N_PATH}${ErrorCode.FieldTooLong}`)
-    this.i18n = {
-      fieldName,
-      length,
-    }
+    this.i18n = { fieldName, length }
   }
 }
 
@@ -61,24 +58,19 @@ export class FieldTooShortException extends Error {
 
   constructor(fieldName: string, length: number) {
     super(`${I18N_PATH}${ErrorCode.FieldTooShort}`)
-    this.i18n = {
-      fieldName,
-      length,
-    }
+    this.i18n = { fieldName, length }
   }
 }
 
 export class FieldTooSimpleException extends Error {
   public code = ErrorCode.FieldTooSimple
-  public i18n = {
-    fieldName: '',
+  public i18n: {
+    fieldName: string
   }
 
   constructor(fieldName: string) {
     super(`${I18N_PATH}${ErrorCode.FieldTooSimple}`)
-    this.i18n = {
-      fieldName,
-    }
+    this.i18n = { fieldName }
   }
 }
 
@@ -90,9 +82,7 @@ export class FieldUsedException extends Error {
 
   constructor(fieldName: string) {
     super(`${I18N_PATH}${ErrorCode.FieldUsed}`)
-    this.i18n = {
-      fieldName,
-    }
+    this.i18n = { fieldName }
   }
 }
 
@@ -109,12 +99,12 @@ export class DecimalRangeException extends RangeError {
 
 export class ValueReservedException extends Error {
   public code = ErrorCode.ValueReserved
-  public i18n = {
-    value: '',
+  public i18n: {
+    value: string
   }
 
   constructor(value: string) {
     super(`${I18N_PATH}${ErrorCode.ValueReserved}`)
-    this.i18n.value = value
+    this.i18n = { value }
   }
 }
