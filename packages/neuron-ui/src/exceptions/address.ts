@@ -5,7 +5,7 @@ const I18N_PATH = `messages.codes.`
 export class MainnetAddressRequiredException extends Error {
   public code = ErrorCode.MainnetAddressRequired
   constructor() {
-    super(`messages.odes.${ErrorCode.MainnetAddressRequired}`)
+    super(`${I18N_PATH}${ErrorCode.MainnetAddressRequired}`)
   }
 }
 
