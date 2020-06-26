@@ -6,12 +6,12 @@ import { validateAddress } from './address'
 export const validateSUDTAddress = ({
   address,
   codeHash = '',
-  isMainnet = true,
+  isMainnet,
   required = false,
 }: {
   address: string
   codeHash?: string
-  isMainnet?: boolean
+  isMainnet: boolean
   required?: boolean
 }) => {
   const FIELD_NAME = 'address'

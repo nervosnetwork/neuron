@@ -7,7 +7,7 @@ import {
 } from 'exceptions'
 import { SHORT_ADDR_00_LENGTH, SHORT_ADDR_00_PREFIX, LONG_DATA_PREFIX, LONG_TYPE_PREFIX } from 'utils/const'
 
-export const validateAddress = (address: string, isMainnet?: boolean): boolean => {
+export const validateAddress = (address: string, isMainnet: boolean): boolean => {
   const FIELD_NAME = 'address'
 
   if (typeof address !== 'string') {

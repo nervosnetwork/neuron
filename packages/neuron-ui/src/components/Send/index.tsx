@@ -28,18 +28,19 @@ import {
   localNumberFormatter,
   getCurrentUrl,
   getSyncStatus,
-  verifyTransactionOutputs,
+  validateOutputs,
   validateAmount,
   validateAmountRange,
   validateAddress,
   validateTotalAmount,
+  isMainnet as isMainnetUtil,
 } from 'utils'
 
 import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const { MAINNET_TAG, SINCE_FIELD_SIZE } = CONSTANTS
+const { SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -55,6 +56,7 @@ const Send = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
+  const isMainnet = isMainnetUtil(networks, networkID)
   const {
     outputs,
     fee,
@@ -74,7 +76,7 @@ const Send = () => {
     isSendMax,
     onSendMaxClick,
     onScan,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
+  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
@@ -98,7 +100,17 @@ const Send = () => {
     [updateTransactionOutput]
   )
 
-  useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
+  useOnTransactionChange(
+    walletID,
+    outputs,
+    send.price,
+    isMainnet,
+    dispatch,
+    isSendMax,
+    setTotalAmount,
+    setErrorMessage,
+    t
+  )
 
   let errorMessageUnderTotal = errorMessage
   try {
@@ -108,7 +120,6 @@ const Send = () => {
   }
 
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
-  const network = networks.find(n => n.id === networkID)
 
   const syncStatus = getSyncStatus({
     tipBlockNumber,
@@ -134,9 +145,8 @@ const Send = () => {
       }
 
       if (address !== undefined) {
-        const chainType = network ? network.chain : ''
         try {
-          validateAddress(address, chainType === MAINNET_TAG)
+          validateAddress(address, isMainnet)
         } catch (err) {
           addrError = err
         }
@@ -147,7 +157,7 @@ const Send = () => {
         amountError,
       }
     })
-  }, [outputs, network])
+  }, [outputs, isMainnet])
 
   return (
     <form onSubmit={onSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
@@ -193,6 +203,25 @@ const Send = () => {
               } catch {
                 // ignore this
               }
+            }
+
+            let isMaxBtnDisabled = false
+            let isAddOneBtnDisabled = false
+
+            try {
+              validateOutputs(outputs, isMainnet, true)
+            } catch {
+              isMaxBtnDisabled = true
+            }
+
+            try {
+              if (isSendMax) {
+                isAddOneBtnDisabled = true
+              } else {
+                validateOutputs(outputs, isMainnet, false)
+              }
+            } catch {
+              isAddOneBtnDisabled = true
             }
 
             return (
@@ -247,7 +276,7 @@ const Send = () => {
                     className={styles.maxBtn}
                     type="primary"
                     onClick={onSendMaxClick}
-                    disabled={!verifyTransactionOutputs(outputs, true)}
+                    disabled={isMaxBtnDisabled}
                     label="Max"
                     data-is-on={isSendMax}
                   />
@@ -268,7 +297,7 @@ const Send = () => {
                   {idx === outputs.length - 1 ? (
                     <button
                       type="button"
-                      disabled={!verifyTransactionOutputs(outputs, false) || isSendMax}
+                      disabled={isAddOneBtnDisabled}
                       onClick={() => addTransactionOutput()}
                       aria-label={t('send.add-one')}
                       className={styles.iconBtn}
