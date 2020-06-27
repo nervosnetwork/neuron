@@ -1,7 +1,7 @@
 import logger from 'electron-log'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
-import { Indexer, Tip } from '@ckb-lumos/indexer'
+import { Indexer, Tip, CollectorQueries, CellCollector } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -76,6 +76,46 @@ export default class IndexerConnector {
       logger.error(error)
       throw error
     }
+  }
+
+  public async getLiveCellsByScript(params: any) {
+    const { lock, type, data } = params
+    if (!lock && !type) {
+      throw new Error('at least one parameter is required')
+    }
+
+    const queries: CollectorQueries = {}
+    if (lock) {
+      queries.lock = {
+        code_hash: lock.codeHash,
+        hash_type: lock.hashType,
+        args: lock.args
+      }
+    }
+    if (type) {
+      queries.type = {
+        code_hash: type.codeHash,
+        hash_type: type.hashType,
+        args: type.args
+      }
+    }
+    //this is an required property, which should exist in the lumos interface
+    //@ts-ignore
+    queries.data = data || null
+
+    const collector = new CellCollector(this.indexer, queries)
+
+    const result = []
+    for await (const cell of collector.collect()) {
+      //somehow the lumos indexer returns an invalid hash type "lock" for hash type "data"
+      //for now we have to fix it here
+      const cellOutput: any = cell.cell_output
+      if (cellOutput.type?.hash_type === 'lock') {
+        cellOutput.type.hash_type = 'data'
+      }
+      result.push(cell)
+    }
+    return result
   }
 
   private async getTxsInNextUnprocessedBlockNumber() {
