@@ -238,47 +238,7 @@ describe('queue', () => {
         it('updates tx hash cache to be processed', () => {
           expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
         })
-        describe('when involves ACP', () => {
-          it('updates ACP blake160s', () => {
-
-          });
-          it('saves asset accounts', () => {
-
-          });
-        });
-        describe('when involves DAO', () => {
-
-        });
       });
-      // describe('processes transactions from multiple events', () => {
-      //   const fakeTxWithStatus1 = generateFakeTx('1')
-      //   const fakeTxWithStatus2 = generateFakeTx('2')
-
-      //   const fakeTxs = [
-      //     fakeTxWithStatus2
-      //   ]
-      //   beforeEach(async () => {
-      //     stubbedAddressesFn.mockReturnValue([
-      //       true,
-      //       addresses.map(addressMeta => addressMeta.address),
-      //       []
-      //     ])
-      //     stubbedGetTransactionFn.mockReturnValue(fakeTxWithStatus1)
-      //     stubbedTransactionsSubject.next(fakeTxs)
-      //     await flushPromises()
-      //   });
-      //   it('handles multiple async emits in order', async () => {
-      //     for (const {transaction} of fakeTxs) {
-      //       expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
-      //     }
-      //   });
-      // });
     });
-  });
-  describe('#stop', () => {
-
-  });
-  describe('#stopAndWait', () => {
-
   });
 });
