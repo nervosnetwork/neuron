@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { Address, AddressVersion } from 'database/address/address-dao'
@@ -11,6 +11,7 @@ import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import AssetAccountInfo from 'models/asset-account-info'
+import { LumosCell } from 'services/indexer-service'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
@@ -120,4 +121,16 @@ export const killBlockSyncTask = () => {
     logger.info('Sync:\tkill background process')
     backgroundWindow.close()
   }
+}
+
+export const queryIndexer = async (query: any): Promise<LumosCell[]> => {
+  return new Promise(resolve => {
+    ipcMain.once('block-sync:query-indexer', (_event, results) => {
+      resolve(results)
+    });
+    backgroundWindow!.webContents.send(
+      "block-sync:query-indexer",
+      query
+    )
+  })
 }

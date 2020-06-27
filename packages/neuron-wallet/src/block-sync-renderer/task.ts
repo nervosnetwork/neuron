@@ -19,6 +19,12 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, a
   syncQueue.start()
 })
 
+ipcRenderer.on('block-sync:query-indexer', async (_, params) => {
+  const indexerConnector = syncQueue?.getIndexerConnector()
+  const liveCells = await indexerConnector?.getLiveCellsByScript(params)
+  ipcRenderer.send('block-sync:query-indexer', liveCells)
+})
+
 window.addEventListener('beforeunload', () => {
   unregisterTxStatusListener()
 

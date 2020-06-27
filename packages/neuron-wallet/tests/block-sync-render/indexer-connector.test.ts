@@ -15,6 +15,7 @@ const stubbedUpsertTxHashesFn = jest.fn()
 const stubbedNextUnprocessedTxsGroupedByBlockNumberFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
 const stubbedNextUnprocessedBlock = jest.fn()
+const stubbedCellCellectFn = jest.fn()
 
 const connectIndexer = async (indexerConnector: IndexerConnector) => {
   const connectPromise = indexerConnector.connect()
@@ -34,6 +35,7 @@ describe('unit tests for IndexerConnector', () => {
   let stubbedIndexerConstructor: any
   let stubbedIndexerCacheService: any
   let stubbedRPCServiceConstructor: any
+  let stubbedCellCollectorConstructor: any
 
   const resetMocks = () => {
     stubbedTipFn.mockReset()
@@ -44,48 +46,58 @@ describe('unit tests for IndexerConnector', () => {
     stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
     stubbedLoggerErrorFn.mockReset()
     stubbedNextUnprocessedBlock.mockReset()
+    stubbedCellCellectFn.mockReset()
   }
+
+  stubbedIndexerConstructor = jest.fn().mockImplementation(
+    () => ({
+      startForever: stubbedStartForeverFn,
+      tip: stubbedTipFn,
+    })
+  )
+
+  stubbedIndexerCacheService = jest.fn().mockImplementation(
+    () => ({
+      upsertTxHashes: stubbedUpsertTxHashesFn,
+      nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
+    })
+  )
+  stubbedIndexerCacheService.nextUnprocessedBlock = stubbedNextUnprocessedBlock
+
+  stubbedRPCServiceConstructor = jest.fn().mockImplementation(
+    () => ({
+      getTransaction: stubbedGetTransactionFn,
+      getHeader: stubbedGetHeaderFn
+    })
+  )
+
+  stubbedCellCollectorConstructor = jest.fn().mockImplementation(
+    () => ({
+      collect: stubbedCellCellectFn
+    })
+  )
+
+  jest.doMock('@ckb-lumos/indexer', () => {
+    return {
+      Indexer : stubbedIndexerConstructor,
+      CellCollector: stubbedCellCollectorConstructor
+    }
+  });
+  jest.doMock('services/rpc-service', () => {
+    return stubbedRPCServiceConstructor
+  });
+  jest.doMock('electron-log', () => {
+    return {error: stubbedLoggerErrorFn}
+  });
+  jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
+    return stubbedIndexerCacheService
+  });
+  stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
 
   beforeEach(() => {
     resetMocks()
     jest.useFakeTimers()
-    stubbedIndexerConstructor = jest.fn().mockImplementation(
-      () => ({
-        startForever: stubbedStartForeverFn,
-        tip: stubbedTipFn,
-      })
-    )
 
-    stubbedIndexerCacheService = jest.fn().mockImplementation(
-      () => ({
-        upsertTxHashes: stubbedUpsertTxHashesFn,
-        nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
-      })
-    )
-    stubbedIndexerCacheService.nextUnprocessedBlock = stubbedNextUnprocessedBlock
-
-    stubbedRPCServiceConstructor = jest.fn().mockImplementation(
-      () => ({
-        getTransaction: stubbedGetTransactionFn,
-        getHeader: stubbedGetHeaderFn
-      })
-    )
-
-    jest.doMock('@ckb-lumos/indexer', () => {
-      return {
-        Indexer : stubbedIndexerConstructor
-      }
-    });
-    jest.doMock('services/rpc-service', () => {
-      return stubbedRPCServiceConstructor
-    });
-    jest.doMock('electron-log', () => {
-      return {error: stubbedLoggerErrorFn}
-    });
-    jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
-      return stubbedIndexerCacheService
-    });
-    stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
   });
   afterEach(() => {
     jest.clearAllTimers()
@@ -336,6 +348,97 @@ describe('unit tests for IndexerConnector', () => {
               })
             })
           });
+        });
+      });
+    })
+    describe('#getLiveCellsByScript', () => {
+      let fakeCell1: any, fakeCell2: any
+      let cells: any
+      describe('when success', () => {
+        const query = {
+          lock: {
+            hashType: 'data',
+            codeHash: '0xcode',
+            args: '0x'
+          },
+          type: {
+            hashType: 'lock',
+            codeHash: '0xcode',
+            args: '0x'
+          },
+        }
+
+        beforeEach(async () => {
+          fakeCell1 = {
+            cell_output: {
+              lock: {
+                hash_type: 'type',
+                code_hash: '0xcode',
+                args: '0x1'
+              },
+              type: {
+                hash_type: 'data',
+                code_hash: '0xcode',
+                args: '0x1'
+              }
+            }
+          }
+          fakeCell2 = {
+            cell_output: {
+              lock: {
+                hash_type: 'type',
+                code_hash: '0xcode',
+                args: '0x2'
+              },
+              type: {
+                hash_type: 'lock',
+                code_hash: '0xcode',
+                args: '0x2'
+              }
+            }
+          }
+          const fakeCells = [fakeCell1, fakeCell2]
+
+          stubbedCellCellectFn.mockReturnValueOnce(
+            [
+              new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[0])))),
+              new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
+            ]
+          )
+
+          cells = await indexerConnector.getLiveCellsByScript(query)
+        });
+        it('transform the query parameter', () => {
+          expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
+            lock: {
+              hash_type: query.lock.hashType,
+              code_hash: query.lock.codeHash,
+              args: query.lock.args,
+            },
+            type: {
+              hash_type: query.type.hashType,
+              code_hash: query.type.codeHash,
+              args: query.type.args,
+            },
+            data: null
+          })
+        })
+        it('returns live cells with property value fix', async () => {
+          fakeCell2.cell_output.type.hash_type = 'data'
+          expect(cells).toEqual([fakeCell1, fakeCell2])
+        })
+      });
+      describe('when fails', () => {
+        describe('when both type and lock parameter is not specified', () => {
+          it('throws error', async () => {
+            let err
+            try {
+              await indexerConnector.getLiveCellsByScript({})
+            } catch (error) {
+              err = error
+            }
+            expect(err).toEqual(new Error('at least one parameter is required'))
+          })
         });
       });
     })

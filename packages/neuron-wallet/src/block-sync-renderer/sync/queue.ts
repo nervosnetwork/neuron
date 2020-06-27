@@ -94,6 +94,10 @@ export default class Queue {
 
   }
 
+  public getIndexerConnector(): IndexerConnector {
+    return this.indexerConnector!
+  }
+
   public stop = () => {
     this.indexerConnector!.pollingIndexer = false
   }

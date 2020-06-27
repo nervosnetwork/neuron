@@ -2,12 +2,10 @@ import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
 import SyncedBlockNumberSubject from 'models/subjects/node'
 import logger from 'utils/logger'
-import AssetAccountInfo from 'models/asset-account-info'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
   #blockNumberEntity: SyncInfoEntity | undefined = undefined
-  #liveCellBlockNumberEntity: SyncInfoEntity | undefined = undefined
   #nextBlock: bigint | undefined = undefined
 
   private static lastSavedBlock: bigint = BigInt(-1)
@@ -19,11 +17,6 @@ export default class SyncedBlockNumber {
     }
 
     const blockNumber = BigInt((await this.blockNumber()).value)
-    const liveCellBlockNumber = BigInt((await this.liveCellBlockNumber()).value)
-
-    if (liveCellBlockNumber < blockNumber) {
-      return liveCellBlockNumber
-    }
     return blockNumber
   }
 
@@ -45,12 +38,6 @@ export default class SyncedBlockNumber {
       blockNumberEntity.value = current.toString()
       getConnection().manager.save(blockNumberEntity)
 
-      let liveCellBlockNumberEntity = await this.liveCellBlockNumber()
-      if (current > BigInt(liveCellBlockNumberEntity.value)) {
-        liveCellBlockNumberEntity.value = current.toString()
-        await getConnection().manager.save(liveCellBlockNumberEntity)
-      }
-
       logger.info("Database:\tsaved synced block #" + current.toString())
     }
   }
@@ -71,39 +58,5 @@ export default class SyncedBlockNumber {
     }
 
     return this.#blockNumberEntity
-  }
-
-  private async liveCellBlockNumber(): Promise<SyncInfoEntity> {
-    const assetAccountInfo = new AssetAccountInfo()
-
-    if (!this.#liveCellBlockNumberEntity) {
-      this.#liveCellBlockNumberEntity = await getConnection()
-        .getRepository(SyncInfoEntity)
-        .findOne({
-          name: SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER,
-        })
-    }
-
-    if (!this.#liveCellBlockNumberEntity) {
-      this.#liveCellBlockNumberEntity = new SyncInfoEntity()
-      this.#liveCellBlockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
-      const sudtDeployHeight = assetAccountInfo.sudtDeployHeight.toString()
-      if (sudtDeployHeight !== "-1") {
-        this.#liveCellBlockNumberEntity.value = sudtDeployHeight
-      } else {
-        const currentBlockNumber = await getConnection()
-          .getRepository(SyncInfoEntity)
-          .findOne({
-            name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
-          })
-        if (currentBlockNumber) {
-          this.#liveCellBlockNumberEntity.value = currentBlockNumber.value
-        } else {
-          this.#liveCellBlockNumberEntity.value = "0"
-        }
-      }
-    }
-
-    return this.#liveCellBlockNumberEntity
   }
 }

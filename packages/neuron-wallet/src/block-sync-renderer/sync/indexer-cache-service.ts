@@ -87,7 +87,9 @@ export default class IndexerCacheService {
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
-        addressMeta.generateDefaultLockScript()
+        addressMeta.generateDefaultLockScript(),
+        addressMeta.generateSingleMultiSignLockScript(),
+        addressMeta.generateACPLockScript()
       ]
 
       for (const lockScript of lockScripts) {

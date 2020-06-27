@@ -608,7 +608,7 @@ export class TransactionGenerator {
   // anyone-can-pay lock, CKB
   public static async generateAnyoneCanPayToCKBTx(
     defaultLockHashes: string[],
-    anyoneCanPayLockHashes: string[],
+    anyoneCanPayLocks: Script[],
     targetOutput: Output,
     capacity: 'all' | string,
     changeBlake160: string,
@@ -643,7 +643,7 @@ export class TransactionGenerator {
     const baseSize: number = TransactionSize.tx(tx)
     const result = await (capacity === 'all' ?
       CellsService.gatherAnyoneCanPaySendAllCKBInputs(
-        anyoneCanPayLockHashes,
+        anyoneCanPayLocks,
         fee,
         feeRate,
         baseSize,
@@ -651,7 +651,7 @@ export class TransactionGenerator {
       CellsService.gatherAnyoneCanPayCKBInputs(
         capacity,
         defaultLockHashes,
-        anyoneCanPayLockHashes,
+        anyoneCanPayLocks,
         changeBlake160,
         fee,
         feeRate,
@@ -683,7 +683,7 @@ export class TransactionGenerator {
   // amount: 'all' or integer
   public static async generateAnyoneCanPayToSudtTx(
     defaultLockHashes: string[],
-    anyoneCanPayLockHashes: string[],
+    anyoneCanPayLocks: Script[],
     targetOutput: Output,
     amount: 'all' | string,
     changeBlake160: string,
@@ -722,8 +722,8 @@ export class TransactionGenerator {
     const result = await CellsService.gatherSudtInputs(
       amount,
       defaultLockHashes,
-      anyoneCanPayLockHashes,
-      targetOutput.typeHash!,
+      anyoneCanPayLocks,
+      targetOutput.type!,
       changeBlake160,
       fee,
       feeRate,

@@ -143,7 +143,7 @@ const MainContent = () => {
 
   const toggleSUDT = useCallback(
     (chainType: ChainType) => {
-      if (ChainType.TESTNET !== chainType && isCurrentSUDT) {
+      if (![ChainType.TESTNET, ChainType.DEVNET].includes(chainType) && isCurrentSUDT) {
         history.replace(mainContents[0].path)
       }
     },
