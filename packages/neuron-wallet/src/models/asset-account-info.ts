@@ -26,7 +26,7 @@ export default class AssetAccountInfo {
     // dev chain: using testnet config
     if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
       this.sudtInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!), 
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!),
           process.env.MAINNET_SUDT_DEP_TYPE! as DepType),
         codeHash: process.env.MAINNET_SUDT_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
@@ -39,7 +39,7 @@ export default class AssetAccountInfo {
       }
     } else {
       this.sudtInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!), 
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
           process.env.TESTNET_SUDT_DEP_TYPE! as DepType),
         codeHash: process.env.TESTNET_SUDT_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType

@@ -57,7 +57,7 @@ export default class AnyoneCanPayService {
     // find target output
     const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
       targetAnyoneCanPayLockScript,
-      isCKB ? assetAccountInfo.generateSudtScript(tokenID) : null
+      isCKB ? null : assetAccountInfo.generateSudtScript(tokenID)
     )
 
     if (!targetOutputLiveCell) {

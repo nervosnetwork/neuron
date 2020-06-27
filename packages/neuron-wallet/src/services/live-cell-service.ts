@@ -27,7 +27,6 @@ export default class LiveCellService {
 
     const typeHash = type ? type.computeHash() : ""
     for (let i = 0; i < result.length; i++) {
-      // @ts-ignore
       const item = LiveCell.fromLumos(result[i]);
       if (type) {
         if (typeHash === item.typeHash) {
