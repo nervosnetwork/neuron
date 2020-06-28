@@ -3869,7 +3869,7 @@
   dependencies:
     "@types/jest" "*"
 
-"@types/jest-when@^2.7.1":
+"@types/jest-when@2.7.1":
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/@types/jest-when/-/jest-when-2.7.1.tgz#0b04a33a48a17370c390e9830a975822b3ac5e32"
   integrity sha512-PRrGzDkU859cdkFL2KwWN4fRLRDGIUkRNT0StbthhKmj+naU4wImpoJeMnhjprvSou4pKAzU0dKfdQvjceJVhg==
@@ -8318,7 +8318,7 @@ ejs@^3.0.1:
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-3.0.1.tgz#30c8f6ee9948502cc32e85c37a3f8b39b5a614a5"
   integrity sha512-cuIMtJwxvzumSAkqaaoGY/L6Fc/t6YvoP9/VIaK0V/CyqKLEQ8sqODmYfy/cjXEdZ9+OOL8TecbJu+1RsofGDw==
 
-electron-build-env@^0.2.0:
+electron-build-env@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/electron-build-env/-/electron-build-env-0.2.0.tgz#5649ee3e5fd006e267086caa945b77a1fa220b92"
   integrity sha1-VknuPl/QBuJnCGyqlFt3ofoiC5I=
@@ -14046,7 +14046,7 @@ neo-async@^2.5.0, neo-async@^2.6.0, neo-async@^2.6.1:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
-neon-cli@^0.4.0:
+neon-cli@0.4.0, neon-cli@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/neon-cli/-/neon-cli-0.4.0.tgz#d89e0a55b8db577324af70470e2b4e67157205f6"
   integrity sha512-66HhHb8rk+zHSG64CI6jhyOQqpibBAald8ObdQPCjXcCjzSEVnkQHutUE8dyNlHRNT7xLfrZGkDbtwrYh2p+6w==

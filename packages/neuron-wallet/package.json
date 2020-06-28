@@ -25,7 +25,8 @@
     "test:watch": "jest --watch",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
-    "rebuild:nativemodules": "electron-builder install-app-deps"
+    "rebuild:nativemodules": "electron-builder install-app-deps && yarn rebuild:neondeps",
+    "rebuild:neondeps": "electron-build-env neon build -p ../../node_modules/@ckb-lumos/indexer --release"
   },
   "lint-staged": {
     "src/**/*.ts": [
