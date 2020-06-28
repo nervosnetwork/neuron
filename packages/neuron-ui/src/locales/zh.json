@@ -407,6 +407,7 @@
       "free": "当前可用",
       "locked": "已锁定",
       "deposit": "存入",
+      "deposit-rules": "存款规则",
       "copy-balance": "复制余额",
       "deposit-records": "存入",
       "completed-records": "已解锁",

@@ -407,6 +407,7 @@
       "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
+      "deposit-rules": "Deposit rules",
       "copy-balance": "Copy Balance",
       "deposit-records": "Deposits",
       "completed-records": "Completed",
