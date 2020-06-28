@@ -106,7 +106,7 @@ describe('Test exporting history', () => {
       })
     })
 
-    describe('When it\'s Mainnet', () => {
+    describe('When it\'s Testnet', () => {
       beforeEach(() => {
         stubProvider.chainType = TESTNET_CHAIN_TYPE
       })
