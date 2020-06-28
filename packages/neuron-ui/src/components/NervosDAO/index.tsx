@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import appState from 'states/init/app'
@@ -15,6 +15,8 @@ import {
   getSyncStatus,
 } from 'utils'
 
+import { openExternal } from 'services/remote'
+
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
@@ -26,6 +28,9 @@ import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
 const { MIN_DEPOSIT_AMOUNT } = CONSTANTS
+
+const DAO_DOCS_URL =
+  'https://docs.nervos.org/references/neuron-wallet-guide.html#how-to-deposit-your-nervos-ckbyte-tokens-into-nervos-dao'
 
 const NervosDAO = () => {
   const [focusedRecord, setFocusedRecord] = useState('')
@@ -105,6 +110,10 @@ const NervosDAO = () => {
     walletID: wallet.id,
     setActiveRecord,
   })
+
+  const handleOpenRules = useCallback(() => {
+    openExternal(DAO_DOCS_URL)
+  }, [])
 
   const onSlide = hooks.useOnSlide({ updateDepositValue, maxDepositAmount })
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
@@ -328,6 +337,15 @@ const NervosDAO = () => {
           label={t('nervos-dao.deposit')}
         />
       </div>
+      <span
+        onClick={handleOpenRules}
+        onKeyPress={handleOpenRules}
+        role="link"
+        tabIndex={0}
+        className={styles.depositRules}
+      >
+        {t('nervos-dao.deposit-rules')}
+      </span>
       <div className={styles.records}>{MemoizedRecords}</div>
       {MemoizedDepositDialog}
       {MemoizedWithdrawDialog}
