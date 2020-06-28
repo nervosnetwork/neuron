@@ -359,7 +359,7 @@
       "codes": {
         "-3": "",
         "100": "Amount is not enough.",
-        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB.",
+        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
         "103": "$t(messages.fields.keystore-password) is incorrect.",
         "104": "Fail to connect to the node, please restart Neuron.",
@@ -377,12 +377,14 @@
         "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
         "210": "\"{{value}}\" is reserved, please use another one.",
         "211": "The amount cannot be 0",
+        "212": "$t(messages.fields.{{fieldName}}) is too simple",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
-        "307": "Please enter a testnet address"
+        "307": "Please enter a testnet address",
+        "308": "Amount is not enough"
       }
     },
     "sync": {
