@@ -23,6 +23,9 @@ describe('Test exporting history', () => {
   })
 
   beforeEach(async () => {
+    stubProvider.walletID = WALLET_ID
+    stubProvider.chainType = MAINNET_CHAIN_TYPE
+    stubProvider.filePath = FILE_PATH
     await initConnection()
     return saveTransactions(transactions)
   })
@@ -33,9 +36,6 @@ describe('Test exporting history', () => {
     } catch {
       // ignore
     }
-    stubProvider.walletID = WALLET_ID
-    stubProvider.chainType = MAINNET_CHAIN_TYPE
-    stubProvider.filePath = FILE_PATH
     return closeConnection()
   })
 
