@@ -40,7 +40,7 @@ export default class LiveCellService {
     return null
   }
 
-  public async getByLockScriptAndTypeScript(lock: Script | null, type: Script | null) {
+  public async getManyByLockScriptAndTypeScript(lock: Script | null, type: Script | null) {
     const result = await this.indexer.getLiveCellsByScript(lock, type, null)
 
     const cells = []
@@ -61,13 +61,13 @@ export default class LiveCellService {
     return cells
   }
 
-  public async getByLockScriptsAndTypeScript(locks: Script[], type: Script | null) {
+  public async getManyByLockScriptsAndTypeScript(locks: Script[], type: Script | null) {
     const result = []
 
     for (const lock of locks) {
-      const cells = await this.getByLockScriptAndTypeScript(lock, type)
-      for (const cell of cells) {
-        result.push(cell)
+      const cells = await this.getManyByLockScriptAndTypeScript(lock, type)
+      if (cells.length > 0) {
+        result.push(...cells)
       }
     }
 

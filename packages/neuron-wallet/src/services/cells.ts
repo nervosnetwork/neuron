@@ -437,7 +437,7 @@ export default class CellsService {
 
     // only live cells, skip which has data or type
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
 
     const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
     const capacityInt = capacity === 'all' ? (allCapacity - BigInt(anyoneCanPayLockLiveCells.length) * BigInt(61 * 10**8)) : BigInt(capacity)
@@ -554,7 +554,7 @@ export default class CellsService {
 
     // only live cells, skip which has data or type
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
 
     if (anyoneCanPayLockLiveCells.length === 0) {
       throw new CapacityNotEnough()
@@ -632,7 +632,7 @@ export default class CellsService {
     let needFee = BigInt(0)
 
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getByLockScriptsAndTypeScript(anyoneCanPayLocks, type)
+    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, type)
 
     const allAmount: bigint = anyoneCanPayLockLiveCells.map(
       c => BufferUtils.parseAmountFromSUDTData(c.data)).reduce((result, c) => result + c, BigInt(0)
