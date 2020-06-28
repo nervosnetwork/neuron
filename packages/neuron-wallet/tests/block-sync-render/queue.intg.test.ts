@@ -322,7 +322,7 @@ describe('integration tests for sync pipeline', () => {
         expect(caches.filter(cache => cache.txHash === fakeTx.transaction.hash && cache.isProcessed)).toHaveLength(1)
       }
     });
-    describe('inserts related outputs', () => {
+    describe('handles outputs', () => {
       let outputs: OutputEntity[] = []
       beforeEach(async () => {
         outputs = await getConnection()
