@@ -67,7 +67,7 @@ stages:
   - job: win
     displayName: Windows
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'vs2017-win2016'
     strategy:
       matrix:
         node_12_x:
@@ -77,11 +77,14 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - pwsh: | 
-        npm config set msbuild_path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"
-        npm config set msvs_version 2017
-        npm install -g node-gyp@latest
-        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+    - script: |
+        powershell -Command "$ProgressPreference = 'SilentlyContinue'; iwr -outf %TEMP%\LLVM-8.0.0-win64.exe https://rust-lang-ci2.s3.amazonaws.com/rust-ci-mirror/LLVM-8.0.0-win64.exe"
+        set CLANG_DIR=%CD%\citools\clang-rust
+        start "" /WAIT %TEMP%\LLVM-8.0.0-win64.exe /S /NCRC /D=%CLANG_DIR%
+        echo ##vso[task.prependpath]%CLANG_DIR%/bin
+      condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+      displayName: Install clang (Windows)
+    - pwsh: |
         npm install -g lerna
         npm run bootstrap
         $env:CI=false
