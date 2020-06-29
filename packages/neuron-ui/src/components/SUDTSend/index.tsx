@@ -218,6 +218,7 @@ const SUDTSend = () => {
       .catch((err: Error) => {
         setRemoteError(err.message)
       })
+    // eslint-disable-next-line
   }, [
     walletId,
     sendState.address,
