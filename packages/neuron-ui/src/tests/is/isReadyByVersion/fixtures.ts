@@ -6,13 +6,6 @@ const fixtures = {
     },
     expected: true,
   },
-  'Should return true when last version is not a number': {
-    params: {
-      lastVersion: NaN,
-      targetVersion: 0.32,
-    },
-    expected: true,
-  },
   'Should return false when last version > target version': {
     params: {
       lastVersion: 0.32,

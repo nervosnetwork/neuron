@@ -11,7 +11,7 @@ export const isSuccessResponse = (res: Pick<ControllerResponse, 'status'>): res 
 }
 
 export const isReadyByVersion = (targetVersion: number, lastVersion: number | null) => {
-  if (lastVersion === null || Number.isNaN(+lastVersion)) {
+  if (lastVersion === null) {
     return true
   }
   if (lastVersion < targetVersion) {
