@@ -29,7 +29,7 @@ const connectIndexer = async (indexerConnector: IndexerConnector) => {
 
 describe('unit tests for IndexerConnector', () => {
   const nodeUrl = 'http://nodeurl:8114'
-  const indexerFolderPath = process.platform === 'win32' ? '\\indexer\\data\\path' : '/indexer/data/path'
+  const indexerFolderPath = path.join('indexer', 'data', 'path')
   let stubbedIndexerConnector: any
 
   let stubbedIndexerConstructor: any
