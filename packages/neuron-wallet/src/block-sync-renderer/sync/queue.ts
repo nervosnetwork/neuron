@@ -52,9 +52,10 @@ export default class Queue {
   }
 
   public async start() {
+    const LUMOS_INDEXER_DB_FOLDER = 'indexer_data'
     const indexedDataPath = path.resolve(
       env.fileBasePath,
-      './indexer_data',
+      LUMOS_INDEXER_DB_FOLDER,
       await this.rpcService.genesisBlockHash()
     )
 
