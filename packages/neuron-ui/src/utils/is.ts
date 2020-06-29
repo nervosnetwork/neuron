@@ -9,3 +9,13 @@ export const isMainnet = (networks: Readonly<State.Network[]>, networkID: string
 export const isSuccessResponse = (res: Pick<ControllerResponse, 'status'>): res is SuccessFromController => {
   return res.status === ResponseCode.SUCCESS
 }
+
+export const isReadyByVersion = (targetVersion: number, lastVersion: number | null) => {
+  if (lastVersion === null) {
+    return true
+  }
+  if (lastVersion < targetVersion) {
+    return true
+  }
+  return false
+}

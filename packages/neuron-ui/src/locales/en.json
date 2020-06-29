@@ -290,6 +290,7 @@
     "common": {
       "or": "or",
       "ok": "Ok",
+      "dismiss": "Dismiss",
       "confirm": "Confirm",
       "open": "Open",
       "cancel": "Cancel",
@@ -335,6 +336,7 @@
       "full-addr-info": "Additional software or dApp interface might be required to operate the assets on this address. Please double check its validity.",
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
+      "rebuild-sync": "To achieve better user experience, Neuron has adopted a brand new index mechanism, which demands a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
