@@ -1,3 +1,4 @@
+import path from 'path'
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/indexer'
 import { AddressType } from '../../src/models/keys/address'
@@ -170,17 +171,10 @@ describe('queue', () => {
       await queue.start()
     });
     it('inits IndexerConnector', () => {
-      let expectPathRegex
-      if (process.platform === 'win32') {
-        expectPathRegex = expect.stringMatching(/test\\indexer_data/)
-      }
-      else {
-        expectPathRegex = expect.stringMatching(/test\/indexer_data/)
-      }
       expect(stubbedIndexerConnectorConstructor).toHaveBeenCalledWith(
         addresses,
         fakeNodeUrl,
-        expectPathRegex
+        expect.stringMatching(new RegExp('test' + path.sep + 'indexer_data'))
       )
     });
     it('connects indexer', () => {
