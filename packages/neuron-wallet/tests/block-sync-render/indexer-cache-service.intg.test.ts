@@ -5,7 +5,7 @@ import IndexerCacheService from '../../src/block-sync-renderer/sync/indexer-cach
 import AddressMeta from '../../src/database/address/meta';
 import { AddressType } from '../../src/models/keys/address';
 import { AddressVersion } from '../../src/database/address/address-dao';
-import IndexerTxHashCache from '../../dist/database/chain/entities/indexer-tx-hash-cache';
+import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache';
 import RpcService from '../../src/services/rpc-service';
 
 const stubbedGetTransactionFn = jest.fn()
