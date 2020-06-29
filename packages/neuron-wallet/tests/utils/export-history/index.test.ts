@@ -39,7 +39,7 @@ describe('Test exporting history', () => {
     return closeConnection()
   })
 
-  describe('When wallet id is missing', () => {
+  describe('when wallet id is missing', () => {
     beforeEach(() => {
       stubProvider.walletID = ''
     })
@@ -54,12 +54,12 @@ describe('Test exporting history', () => {
     })
   })
 
-  describe('When filePath is missing', () => {
+  describe('when filePath is missing', () => {
     beforeEach(() => {
       stubProvider.filePath = ''
     })
 
-    it('Should throw an error', async () => {
+    it('should throw an error', async () => {
       expect.assertions(1)
       try {
         await exportHistory(stubProvider)
@@ -69,35 +69,38 @@ describe('Test exporting history', () => {
     })
   })
 
-  describe('When file exists', () => {
-    const originalExistsSync = fs.existsSync
-    const originalUnlinkSync = fs.unlinkSync
+  describe('when file exists', () => {
+
+    let existsSyncSpy: any
+    let unlinkSyncSpy: any
+    beforeEach(() => {
+      existsSyncSpy = jest.spyOn(fs, 'existsSync')
+      existsSyncSpy.mockReturnValueOnce(true)
+
+      unlinkSyncSpy = jest.spyOn(fs, 'unlinkSync')
+      unlinkSyncSpy.mockReturnValue(true)
+    })
 
     afterAll(() => {
-      fs.existsSync = originalExistsSync
-      fs.unlinkSync = originalUnlinkSync
+      existsSyncSpy.mockRestore()
+      unlinkSyncSpy.mockRestore()
     })
 
-    beforeEach(() => {
-      fs.existsSync = jest.fn(originalExistsSync).mockReturnValueOnce(true)
-      fs.unlinkSync = jest.fn(originalUnlinkSync).mockReturnValue()
-    })
-
-    it('Should remove file first', async () => {
+    it('should remove file first', async () => {
       expect.assertions(2)
       await exportHistory(stubProvider)
-      expect(fs.existsSync).toHaveBeenCalledWith(stubProvider.filePath)
-      expect(fs.unlinkSync).toHaveBeenCalledWith(stubProvider.filePath)
+      expect(existsSyncSpy).toHaveBeenCalledWith(stubProvider.filePath)
+      expect(unlinkSyncSpy).toHaveBeenCalledWith(stubProvider.filePath)
     })
   })
 
-  describe('When no transactions exported', () => {
-    describe('When it\'s Mainnet', () => {
+  describe('when no transactions exported', () => {
+    describe('when it\'s Mainnet', () => {
       beforeEach(() => {
         stubProvider.chainType = MAINNET_CHAIN_TYPE
       })
 
-      it('Should export table header without sudt column', async () => {
+      it('should export table header without sudt column', async () => {
         expect.assertions(2)
         const totalCount = await exportHistory(stubProvider)
         const actual = fs.readFileSync(stubProvider.filePath, 'utf8')
@@ -106,12 +109,12 @@ describe('Test exporting history', () => {
       })
     })
 
-    describe('When it\'s Testnet', () => {
+    describe('when it\'s Testnet', () => {
       beforeEach(() => {
         stubProvider.chainType = TESTNET_CHAIN_TYPE
       })
 
-      it('Should export table header containing sudt column', async () => {
+      it('should export table header containing sudt column', async () => {
         expect.assertions(2)
         const totalCount = await exportHistory(stubProvider)
         const actual = fs.readFileSync(stubProvider.filePath, 'utf8')
@@ -121,7 +124,7 @@ describe('Test exporting history', () => {
     })
   })
 
-  describe('When several transactions exported', () => {
+  describe('when several transactions exported', () => {
     const originalAllAddressesByWalletID = AddressService.allAddressesByWalletId
 
     beforeAll(() => {
@@ -135,7 +138,7 @@ describe('Test exporting history', () => {
       AddressService.allAddressesByWalletId = originalAllAddressesByWalletID
     })
 
-    it('Should export table with records', async () => {
+    it('should export table with records', async () => {
       expect.assertions(2)
       const expectedTotalCount = 3
       const totalCount = await exportHistory(stubProvider)
