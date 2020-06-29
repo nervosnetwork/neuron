@@ -23,4 +23,12 @@ Object.defineProperty(window, "XMLHttpRequest", jest.fn(() => ({
   responseText: mockedXMLHttpRequest.responseText
 })));
 
-jest.mock('levelup')
+jest.mock('levelup', () => {
+  return () => ({
+    get: () => {
+      return new Promise(resolve => {
+        resolve('description')
+      })
+    }
+  })
+})
