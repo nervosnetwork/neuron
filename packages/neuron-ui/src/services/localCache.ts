@@ -1,3 +1,5 @@
+import { SYNC_REBUILD_SINCE_VERSION } from 'utils/const'
+
 export enum LocalCacheKey {
   Addresses = 'addresses',
   Networks = 'networks',
@@ -5,6 +7,7 @@ export enum LocalCacheKey {
   CurrentWallet = 'currentWallet',
   CurrentNetworkID = 'currentNetworkID',
   CacheClearDate = 'cacheClearDate',
+  SyncRebuildNotification = 'syncRebuildNotification',
 }
 
 export const addresses = {
@@ -116,12 +119,12 @@ export const cacheClearDate = {
   },
 }
 
-export default {
-  LocalCacheKey,
-  addresses,
-  networks,
-  wallets,
-  currentWallet,
-  currentNetworkID,
-  cacheClearDate,
+export const syncRebuildNotification = {
+  save: () => {
+    window.localStorage.setItem(LocalCacheKey.SyncRebuildNotification, SYNC_REBUILD_SINCE_VERSION)
+    return true
+  },
+  load: () => {
+    return window.localStorage.getItem(LocalCacheKey.SyncRebuildNotification)
+  },
 }

@@ -11,7 +11,7 @@ import {
   dismissNotification,
   dismissGlobalDialog,
 } from 'states'
-import { useOnLocaleChange } from 'utils'
+import { useOnLocaleChange, useGlobalNotifications } from 'utils'
 
 import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
@@ -76,6 +76,7 @@ export const NoticeContent = () => {
   const dispatch = useDispatch()
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
+  useGlobalNotifications(dispatch)
 
   const notificationsInDesc = useMemo(() => [...notifications].reverse(), [notifications])
   const notification: State.Message | undefined = notificationsInDesc[0]
