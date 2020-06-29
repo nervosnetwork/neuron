@@ -76,7 +76,7 @@
     "electron-builder": "22.4.0",
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.2.1",
-    "jest-when": "^2.7.2",
+    "jest-when": "2.7.2",
     "lint-staged": "9.2.5",
     "neon-cli": "0.4.0",
     "neuron-ui": "0.31.0",
