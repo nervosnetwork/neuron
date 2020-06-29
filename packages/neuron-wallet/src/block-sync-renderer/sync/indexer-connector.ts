@@ -10,6 +10,12 @@ import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 
+export interface LumosCellQuery {
+  lock: {codeHash: string, hashType: string, args: string} | null,
+  type: {codeHash: string, hashType: string, args: string} | null,
+  data: string | null
+}
+
 export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
@@ -78,8 +84,8 @@ export default class IndexerConnector {
     }
   }
 
-  public async getLiveCellsByScript(params: any) {
-    const { lock, type, data } = params
+  public async getLiveCellsByScript(query: LumosCellQuery) {
+    const { lock, type, data } = query
     if (!lock && !type) {
       throw new Error('at least one parameter is required')
     }

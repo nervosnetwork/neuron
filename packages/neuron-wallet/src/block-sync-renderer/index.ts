@@ -12,9 +12,11 @@ import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCell } from 'services/indexer-service'
+import { LumosCellQuery } from './sync/indexer-connector'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
+let indexerQueryId: number = 0
 
 const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
   const addrs = AddressService.allAddresses()
@@ -123,14 +125,16 @@ export const killBlockSyncTask = () => {
   }
 }
 
-export const queryIndexer = async (query: any): Promise<LumosCell[]> => {
+export const queryIndexer = (query: LumosCellQuery): Promise<LumosCell[]> => {
+  indexerQueryId ++
   return new Promise(resolve => {
-    ipcMain.once('block-sync:query-indexer', (_event, results) => {
+    ipcMain.once(`block-sync:query-indexer:${indexerQueryId}`, (_event, results) => {
       resolve(results)
     });
     backgroundWindow!.webContents.send(
       "block-sync:query-indexer",
-      query
+      query,
+      indexerQueryId
     )
   })
 }

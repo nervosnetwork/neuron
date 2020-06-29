@@ -4,6 +4,7 @@ import { Address as AddressInterface } from 'database/address/address-dao'
 import Queue from './sync/queue'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import logger from 'utils/logger'
+import { LumosCellQuery } from './sync/indexer-connector'
 
 let syncQueue: Queue | null
 
@@ -19,10 +20,10 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, a
   syncQueue.start()
 })
 
-ipcRenderer.on('block-sync:query-indexer', async (_, params) => {
+ipcRenderer.on('block-sync:query-indexer', async (_, query: LumosCellQuery, queryId) => {
   const indexerConnector = syncQueue?.getIndexerConnector()
-  const liveCells = await indexerConnector?.getLiveCellsByScript(params)
-  ipcRenderer.send('block-sync:query-indexer', liveCells)
+  const liveCells = await indexerConnector?.getLiveCellsByScript(query)
+  ipcRenderer.send(`block-sync:query-indexer:${queryId}`, liveCells)
 })
 
 window.addEventListener('beforeunload', () => {

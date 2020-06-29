@@ -1,5 +1,6 @@
 import Script from "models/chain/script";
 import { queryIndexer } from 'block-sync-renderer/index'
+import { LumosCellQuery } from "block-sync-renderer/sync/indexer-connector";
 
 export interface LumosCell {
   block_hash: string
@@ -41,7 +42,8 @@ export default class IndexerService {
       throw new Error('at least one parameter is required')
     }
 
-    const liveCells: LumosCell[] = await queryIndexer({lock, type, data})
+    const query: LumosCellQuery = {lock, type, data}
+    const liveCells: LumosCell[] = await queryIndexer(query)
     return liveCells
   }
 }

@@ -4,7 +4,7 @@ import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix, AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/database/address/address-dao'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
+import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
 import { flushPromises } from '../test-utils'
 
 const stubbedStartForeverFn = jest.fn()
@@ -355,7 +355,7 @@ describe('unit tests for IndexerConnector', () => {
       let fakeCell1: any, fakeCell2: any
       let cells: any
       describe('when success', () => {
-        const query = {
+        const query: LumosCellQuery = {
           lock: {
             hashType: 'data',
             codeHash: '0xcode',
@@ -366,6 +366,7 @@ describe('unit tests for IndexerConnector', () => {
             codeHash: '0xcode',
             args: '0x'
           },
+          data: null
         }
 
         beforeEach(async () => {
@@ -411,14 +412,14 @@ describe('unit tests for IndexerConnector', () => {
         it('transform the query parameter', () => {
           expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
             lock: {
-              hash_type: query.lock.hashType,
-              code_hash: query.lock.codeHash,
-              args: query.lock.args,
+              hash_type: query.lock!.hashType,
+              code_hash: query.lock!.codeHash,
+              args: query.lock!.args,
             },
             type: {
-              hash_type: query.type.hashType,
-              code_hash: query.type.codeHash,
-              args: query.type.args,
+              hash_type: query.type!.hashType,
+              code_hash: query.type!.codeHash,
+              args: query.type!.args,
             },
             data: null
           })
@@ -433,7 +434,7 @@ describe('unit tests for IndexerConnector', () => {
           it('throws error', async () => {
             let err
             try {
-              await indexerConnector.getLiveCellsByScript({})
+              await indexerConnector.getLiveCellsByScript({lock: null, type: null, data: null})
             } catch (error) {
               err = error
             }
