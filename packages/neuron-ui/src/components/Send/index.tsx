@@ -23,24 +23,24 @@ import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
-  ErrorCode,
   CONSTANTS,
   shannonToCKBFormatter,
   localNumberFormatter,
   getCurrentUrl,
   getSyncStatus,
-  verifyTotalAmount,
-  verifyTransactionOutputs,
-  verifyAmount,
-  verifyAmountRange,
-  verifyAddress,
+  validateOutputs,
+  validateAmount,
+  validateAmountRange,
+  validateAddress,
+  validateTotalAmount,
+  isMainnet as isMainnetUtil,
 } from 'utils'
 
 import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const { MAX_DECIMAL_DIGITS, MAINNET_TAG, SINCE_FIELD_SIZE } = CONSTANTS
+const { SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -56,6 +56,7 @@ const Send = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
+  const isMainnet = isMainnetUtil(networks, networkID)
   const {
     outputs,
     fee,
@@ -75,7 +76,7 @@ const Send = () => {
     isSendMax,
     onSendMaxClick,
     onScan,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
+  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
@@ -99,13 +100,26 @@ const Send = () => {
     [updateTransactionOutput]
   )
 
-  useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
-  const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
-    ? errorMessage
-    : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
+  useOnTransactionChange(
+    walletID,
+    outputs,
+    send.price,
+    isMainnet,
+    dispatch,
+    isSendMax,
+    setTotalAmount,
+    setErrorMessage,
+    t
+  )
+
+  let errorMessageUnderTotal = errorMessage
+  try {
+    validateTotalAmount(totalAmount, fee, balance)
+  } catch (err) {
+    errorMessageUnderTotal = t(err.message)
+  }
 
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
-  const network = networks.find(n => n.id === networkID)
 
   const syncStatus = getSyncStatus({
     tipBlockNumber,
@@ -117,37 +131,33 @@ const Send = () => {
 
   const outputErrors = useMemo(() => {
     return outputs.map(({ address, amount, date }) => {
-      let amountErrorCode = ''
-      let addrErrorCode = ''
-      const extraSize = date ? SINCE_FIELD_SIZE : 0
+      let amountError: (Error & { i18n: { [key: string]: string } }) | undefined
+      let addrError: (Error & { i18n: { [key: string]: string } }) | undefined
 
-      const amountVeriMsg = verifyAmount(amount)
       if (amount !== undefined) {
-        if (typeof amountVeriMsg === 'object') {
-          amountErrorCode = `${amountVeriMsg.code}`
-        } else if (!verifyAmountRange(amount, extraSize)) {
-          amountErrorCode = extraSize ? `${ErrorCode.LocktimeAmountTooSmall}` : `${ErrorCode.AmountTooSmall}`
+        try {
+          const extraSize = date ? SINCE_FIELD_SIZE : 0
+          validateAmount(amount)
+          validateAmountRange(amount, extraSize)
+        } catch (err) {
+          amountError = err
         }
       }
+
       if (address !== undefined) {
-        const chainType = network ? network.chain : ''
-        if (address === '') {
-          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
-        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
-          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
-        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
-          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
-        } else if (!verifyAddress(address)) {
-          addrErrorCode = `${ErrorCode.FieldInvalid}`
+        try {
+          validateAddress(address, isMainnet)
+        } catch (err) {
+          addrError = err
         }
       }
 
       return {
-        addrErrorCode,
-        amountErrorCode,
+        addrError,
+        amountError,
       }
     })
-  }, [outputs, network])
+  }, [outputs, isMainnet])
 
   return (
     <form onSubmit={onSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
@@ -168,17 +178,23 @@ const Send = () => {
             if (undefined === item || undefined === idx) {
               return null
             }
-            const errorMsg = outputErrors[idx].addrErrorCode
-              ? t(`messages.codes.${outputErrors[idx].addrErrorCode}`, {
-                  fieldName: 'address',
-                  fieldValue: item.address || '',
-                })
-              : undefined
+            const outputError = outputErrors[idx]
+
+            const amountErrorMsg = outputError.amountError
+              ? t(outputError.amountError.message, outputError.amountError.i18n)
+              : ''
+
+            const addrErrorMsg = outputError.addrError
+              ? t(outputError.addrError.message, outputError.addrError.i18n)
+              : ''
+
             const fullAddrInfo =
-              !errorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH ? t('messages.full-addr-info') : ''
+              !addrErrorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH
+                ? t('messages.full-addr-info')
+                : ''
 
             let locktimeAble = false
-            if (!errorMsg && item.address && item.address.length === SHORT_ADDR_LENGTH) {
+            if (!addrErrorMsg && item.address && item.address.length === SHORT_ADDR_LENGTH) {
               try {
                 const parsed = ckbCore.utils.bytesToHex(ckbCore.utils.parseAddress(item.address))
                 if (parsed.startsWith(LOCKTIMEABLE_PREFIX)) {
@@ -187,6 +203,25 @@ const Send = () => {
               } catch {
                 // ignore this
               }
+            }
+
+            let isMaxBtnDisabled = false
+            let isAddOneBtnDisabled = false
+
+            try {
+              validateOutputs(outputs, isMainnet, true)
+            } catch {
+              isMaxBtnDisabled = true
+            }
+
+            try {
+              if (isSendMax) {
+                isAddOneBtnDisabled = true
+              } else {
+                validateOutputs(outputs, isMainnet, false)
+              }
+            } catch {
+              isAddOneBtnDisabled = true
             }
 
             return (
@@ -201,7 +236,7 @@ const Send = () => {
                   onChange={onItemChange}
                   required
                   maxLength={100}
-                  error={errorMsg}
+                  error={addrErrorMsg}
                   autoFocus
                 />
                 {fullAddrInfo ? (
@@ -222,16 +257,7 @@ const Send = () => {
                   disabled={item.disabled}
                   required
                   suffix="CKB"
-                  error={
-                    outputErrors[idx].amountErrorCode
-                      ? t(`messages.codes.${outputErrors[idx].amountErrorCode}`, {
-                          fieldName: 'amount',
-                          fieldValue: localNumberFormatter(item.amount),
-                          amount: localNumberFormatter(item.amount),
-                          length: MAX_DECIMAL_DIGITS,
-                        })
-                      : ''
-                  }
+                  error={amountErrorMsg}
                 />
                 <button
                   data-idx={idx}
@@ -250,7 +276,7 @@ const Send = () => {
                     className={styles.maxBtn}
                     type="primary"
                     onClick={onSendMaxClick}
-                    disabled={!verifyTransactionOutputs(outputs, true)}
+                    disabled={isMaxBtnDisabled}
                     label="Max"
                     data-is-on={isSendMax}
                   />
@@ -271,7 +297,7 @@ const Send = () => {
                   {idx === outputs.length - 1 ? (
                     <button
                       type="button"
-                      disabled={!verifyTransactionOutputs(outputs, false) || isSendMax}
+                      disabled={isAddOneBtnDisabled}
                       onClick={() => addTransactionOutput()}
                       aria-label={t('send.add-one')}
                       className={styles.iconBtn}

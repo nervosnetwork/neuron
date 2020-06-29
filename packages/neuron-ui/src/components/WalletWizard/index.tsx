@@ -16,7 +16,7 @@ import {
   ErrorCode,
   CONSTANTS,
   isSuccessResponse,
-  verifyPasswordComplexity,
+  validatePasswordComplexity,
 } from 'utils'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import i18n from 'utils/i18n'
@@ -284,7 +284,13 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
   const message = 'wizard.set-wallet-name-and-password'
 
   const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
-  const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
+  const isPwdComplex = useMemo(() => {
+    try {
+      return validatePasswordComplexity(password)
+    } catch {
+      return false
+    }
+  }, [password])
   const isPwdSame = useMemo(() => password && password === confirmPassword, [password, confirmPassword])
   const disableNext = !(isNameUnused && isPwdComplex && isPwdSame) || loading
 

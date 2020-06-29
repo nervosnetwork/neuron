@@ -1,16 +1,25 @@
 import { ErrorCode } from 'utils/enums'
 import { MIN_DECIMAL, MAX_DECIMAL } from 'utils/const'
 
+export * from './address'
+export * from './amount'
+export * from './url'
+export * from './password'
+
+const I18N_PATH = `messages.codes.`
+
 export class FieldInvalidException extends Error {
   public code = ErrorCode.FieldInvalid
   public i18n: {
     fieldName: string
+    fieldValue: string
   }
 
-  constructor(fieldName: string) {
-    super(`messages.codes.${ErrorCode.FieldInvalid}`)
+  constructor(fieldName: string, fieldValue = '') {
+    super(`${I18N_PATH}${ErrorCode.FieldInvalid}`)
     this.i18n = {
       fieldName,
+      fieldValue,
     }
   }
 }
@@ -22,7 +31,7 @@ export class FieldRequiredException extends Error {
   }
 
   constructor(fieldName: string) {
-    super(`messages.codes.${ErrorCode.FieldRequired}`)
+    super(`${I18N_PATH}${ErrorCode.FieldRequired}`)
     this.i18n = { fieldName }
   }
 }
@@ -35,11 +44,33 @@ export class FieldTooLongException extends Error {
   }
 
   constructor(fieldName: string, length: number) {
-    super(`messages.codes.${ErrorCode.FieldTooLong}`)
-    this.i18n = {
-      fieldName,
-      length,
-    }
+    super(`${I18N_PATH}${ErrorCode.FieldTooLong}`)
+    this.i18n = { fieldName, length }
+  }
+}
+
+export class FieldTooShortException extends Error {
+  public code = ErrorCode.FieldTooShort
+  public i18n: {
+    fieldName: string
+    length: number
+  }
+
+  constructor(fieldName: string, length: number) {
+    super(`${I18N_PATH}${ErrorCode.FieldTooShort}`)
+    this.i18n = { fieldName, length }
+  }
+}
+
+export class FieldTooSimpleException extends Error {
+  public code = ErrorCode.FieldTooSimple
+  public i18n: {
+    fieldName: string
+  }
+
+  constructor(fieldName: string) {
+    super(`${I18N_PATH}${ErrorCode.FieldTooSimple}`)
+    this.i18n = { fieldName }
   }
 }
 
@@ -50,10 +81,8 @@ export class FieldUsedException extends Error {
   }
 
   constructor(fieldName: string) {
-    super(`messages.codes.${ErrorCode.FieldUsed}`)
-    this.i18n = {
-      fieldName,
-    }
+    super(`${I18N_PATH}${ErrorCode.FieldUsed}`)
+    this.i18n = { fieldName }
   }
 }
 
@@ -68,35 +97,14 @@ export class DecimalRangeException extends RangeError {
   }
 }
 
-export class AmountNotEnoughException extends Error {
-  public code = ErrorCode.AmountNotEnough
-  constructor() {
-    super(`messages.codes.${ErrorCode.AmountNotEnough}`)
-  }
-}
-
-export class AmountZeroException extends Error {
-  public code = ErrorCode.AmountZero
-  constructor() {
-    super(`messages.codes.${ErrorCode.AmountZero}`)
-  }
-}
-
 export class ValueReservedException extends Error {
   public code = ErrorCode.ValueReserved
-  public i18n = {
-    value: '',
+  public i18n: {
+    value: string
   }
 
   constructor(value: string) {
-    super(`messages.codes.${ErrorCode.ValueReserved}`)
-    this.i18n.value = value
-  }
-}
-
-export class PasswordIncorrectException extends Error {
-  public code = ErrorCode.PasswordIncorrect
-  constructor() {
-    super(`messages.codes.${ErrorCode.PasswordIncorrect}`)
+    super(`${I18N_PATH}${ErrorCode.ValueReserved}`)
+    this.i18n = { value }
   }
 }
