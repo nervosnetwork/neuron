@@ -54,6 +54,16 @@
     flex: 1;
     flex-direction: column;
     justify-content: flex-end;
+    &[data-magnitude=true] {
+      div[class^=visibleItemLabel] {
+        font-size: 0.75rem;
+      }
+      button{
+        transform: scale(0.75);
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    }
   }
 }
 
