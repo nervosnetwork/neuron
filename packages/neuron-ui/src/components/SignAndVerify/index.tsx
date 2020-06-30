@@ -42,6 +42,7 @@ const PasswordDialog = ({ dialogRef, onCancel, onSubmit }: PasswordDialogProps) 
       setPassword('')
       setError('')
     }
+    // eslint-disable-next-line
   }, [dialogRef.current && dialogRef.current.open, setPassword, setError])
 
   const handleInputChange = useCallback(
@@ -65,7 +66,7 @@ const PasswordDialog = ({ dialogRef, onCancel, onSubmit }: PasswordDialogProps) 
       .finally(() => {
         setLoading(false)
       })
-  }, [setLoading, onSubmit, password, disabled, setPassword])
+  }, [setLoading, onSubmit, password, disabled])
 
   return (
     <dialog ref={dialogRef} className={styles.passwordDialog}>
@@ -180,7 +181,7 @@ const SignAndVerify = () => {
         showErrorMessage(t('messages.error'), typeof res.message === 'string' ? res.message : res.message.content!)
       }
     })
-  }, [])
+  }, [t])
 
   const handlePasswordDialogOpen = useCallback(() => {
     setRequestPassword(true)

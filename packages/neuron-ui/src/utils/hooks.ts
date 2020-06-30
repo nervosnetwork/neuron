@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
+import { syncRebuildNotification } from 'services/localCache'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -11,8 +12,15 @@ import {
   updateAddressDescription,
   setCurrentWallet,
 } from 'states'
-import { epochParser, RoutePath, GenesisBlockHash, ChainType } from 'utils'
-import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
+import {
+  epochParser,
+  RoutePath,
+  GenesisBlockHash,
+  ChainType,
+  isReadyByVersion,
+  calculateClaimEpochValue,
+  CONSTANTS,
+} from 'utils'
 import {
   validateTokenId,
   validateSUDTAccountName,
@@ -438,4 +446,19 @@ export const useChainTypeByGenesisBlockHash = (url: string | null, cb: (chainTyp
       }
     }
   }, [url, cb])
+}
+
+export const useGlobalNotifications = (
+  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>
+) => {
+  useEffect(() => {
+    const lastVersion = syncRebuildNotification.load()
+    if (isReadyByVersion(+CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion ? +lastVersion : null)) {
+      syncRebuildNotification.save()
+      dispatch({
+        type: AppActions.SetGlobalDialog,
+        payload: 'rebuild-sync',
+      })
+    }
+  }, [dispatch])
 }
