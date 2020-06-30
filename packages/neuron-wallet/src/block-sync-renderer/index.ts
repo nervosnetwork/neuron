@@ -28,12 +28,14 @@ const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: 
   await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
 }
 
-AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
-  // Force rescan when address is imported and there's no previous records (from existing identical wallet)
-  const shouldRescan = addresses.some(address => address.isImporting === true)
-  killBlockSyncTask()
-  await createBlockSyncTask(shouldRescan)
-})
+if (BrowserWindow) {
+  AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
+    // Force rescan when address is imported and there's no previous records (from existing identical wallet)
+    const shouldRescan = addresses.some(address => address.isImporting === true)
+    killBlockSyncTask()
+    await createBlockSyncTask(shouldRescan)
+  })
+}
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
   const previousNetwork = network
@@ -65,6 +67,7 @@ export const createBlockSyncTask = async (rescan = false) => {
 
   if (rescan) {
     await new SyncedBlockNumber().setNextBlock(BigInt(0))
+    //remove indexer_data folder
   }
 
   if (backgroundWindow) {
