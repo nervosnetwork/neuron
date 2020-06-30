@@ -1,7 +1,6 @@
 import Script, { ScriptHashType } from './script'
-import LiveCellEntity from 'database/chain/entities/live-cell'
-import HexUtils from 'utils/hex'
 import OutPoint from './out-point'
+import { LumosCell } from 'services/indexer-service'
 
 export default class LiveCell {
   public txHash: string
@@ -49,23 +48,24 @@ export default class LiveCell {
     return undefined
   }
 
-  public static fromEntity(entity: LiveCellEntity): LiveCell {
-    const type = entity.typeCodeHash ? new Script(
-      HexUtils.fromBuffer(entity.typeCodeHash),
-      HexUtils.fromBuffer(entity.typeArgs!),
-      entity.typeHashType === '1' ? ScriptHashType.Data : ScriptHashType.Type
+  public static fromLumos(cell: LumosCell): LiveCell {
+    const type = cell.cell_output.type ? new Script(
+      cell.cell_output.type.code_hash,
+      cell.cell_output.type.args,
+      cell.cell_output.type.hash_type === 'data' ? ScriptHashType.Data : ScriptHashType.Type,
     ) : null
+
     return new LiveCell(
-      HexUtils.fromBuffer(entity.txHash),
-      entity.outputIndex.toString(),
-      entity.capacity,
+      cell.out_point.tx_hash,
+      cell.out_point.index,
+      cell.cell_output.capacity,
       new Script(
-        HexUtils.fromBuffer(entity.lockCodeHash),
-        HexUtils.fromBuffer(entity.lockArgs),
-        entity.lockHashType === '1' ? ScriptHashType.Data : ScriptHashType.Type,
+        cell.cell_output.lock.code_hash,
+        cell.cell_output.lock.args,
+        cell.cell_output.lock.hash_type === 'data' ? ScriptHashType.Data : ScriptHashType.Type,
       ),
       type,
-      HexUtils.fromBuffer(entity.data)
+      cell.data ? cell.data : '0x'
     )
   }
 }

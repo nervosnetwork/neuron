@@ -11,7 +11,6 @@ import AssetAccountEntity from 'database/chain/entities/asset-account'
 import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
 import exportTransactions from 'utils/export-history'
 
-
 export interface TransactionsByAddressesParam {
   pageNo: number
   pageSize: number
@@ -348,6 +347,26 @@ export class TransactionsService {
     })
 
     return result
+  }
+
+  public static async checkNonExistTransactionsByHashes(hashes: string[]) {
+    const results = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .select("tx.hash", "hash")
+      .where('tx.hash IN (:...hashes)', { hashes })
+      .getRawMany()
+
+    const existHashesSet = new Set(results.map(result => result.hash))
+    const nonExistHashes: string[] = []
+
+    for (const hash of hashes) {
+      if (!existHashesSet.has(hash)) {
+        nonExistHashes.push(hash)
+      }
+    }
+
+    return nonExistHashes
   }
 
   public static async updateDescription(hash: string, description: string) {

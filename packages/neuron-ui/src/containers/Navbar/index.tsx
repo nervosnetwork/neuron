@@ -70,7 +70,7 @@ const Navbar = () => {
 
   const toggleSUDT = useCallback(
     (chainType: ChainType) => {
-      setShowSUDT(ChainType.TESTNET === chainType)
+      setShowSUDT(ChainType.MAINNET !== chainType)
     },
     [setShowSUDT]
   )

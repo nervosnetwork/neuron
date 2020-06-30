@@ -3,7 +3,6 @@ import SystemScriptInfo from "models/system-script-info"
 import AssetAccountInfo from "models/asset-account-info"
 import AddressParser from "models/address-parser"
 import { TransactionGenerator } from "./tx"
-import LiveCellEntity from "database/chain/entities/live-cell"
 import { getConnection } from "typeorm"
 import Output from "models/chain/output"
 import LiveCell from "models/chain/live-cell"
@@ -11,6 +10,8 @@ import Transaction from "models/chain/transaction"
 import AssetAccountEntity from "database/chain/entities/asset-account"
 import { TargetOutputNotFoundError } from "exceptions"
 import { AcpSendSameAccountError } from "exceptions"
+import Script from "models/chain/script"
+import LiveCellService from "./live-cell-service"
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -49,28 +50,19 @@ export default class AnyoneCanPayService {
 
     const allBlake160s = AddressService.allBlake160sByWalletId(walletID)
     const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
-    const anyoneCanPayLockHashes: string[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()]
+    const anyoneCanPayLocks: Script[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)]
 
-    const typeHash = isCKB ? null : assetAccountInfo.generateSudtScript(tokenID).computeHash()
+    const liveCellService = LiveCellService.getInstance();
 
     // find target output
-    const targetOutputEntity: LiveCellEntity | undefined = await getConnection()
-      .getRepository(LiveCellEntity)
-      .createQueryBuilder('live_cell')
-      .where({
-        lockHash: Buffer.from(
-          targetAnyoneCanPayLockScript.computeHash().slice(2),
-          'hex'
-        ),
-        typeHash: typeHash ? Buffer.from(typeHash.slice(2), 'hex') : null,
-        usedBlockNumber: null, // live cells
-      })
-      .getOne()
+    const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
+      targetAnyoneCanPayLockScript,
+      isCKB ? null : assetAccountInfo.generateSudtScript(tokenID)
+    )
 
-    if (!targetOutputEntity) {
+    if (!targetOutputLiveCell) {
       throw new TargetOutputNotFoundError()
     }
-    const targetOutputLiveCell: LiveCell = LiveCell.fromEntity(targetOutputEntity)
     const targetOutput: Output = Output.fromObject({
       capacity: targetOutputLiveCell.capacity,
       lock: targetOutputLiveCell.lock(),
@@ -83,7 +75,7 @@ export default class AnyoneCanPayService {
 
     const tx = isCKB ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
       defaultLockHashes,
-      anyoneCanPayLockHashes,
+      anyoneCanPayLocks,
       targetOutput,
       capacityOrAmount,
       changeBlake160,
@@ -91,7 +83,7 @@ export default class AnyoneCanPayService {
       fee
     ) : await TransactionGenerator.generateAnyoneCanPayToSudtTx(
       defaultLockHashes,
-      anyoneCanPayLockHashes,
+      anyoneCanPayLocks,
       targetOutput,
       capacityOrAmount,
       changeBlake160,
