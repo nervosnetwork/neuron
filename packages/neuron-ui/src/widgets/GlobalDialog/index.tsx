@@ -21,7 +21,7 @@ const RebuildSync = ({ onDismiss }: { onDismiss: React.MouseEventHandler }) => {
       {t('messages.rebuild-sync')
         .split('\n')
         .map(s => (
-          <p>{s}</p>
+          <p key={s}>{s}</p>
         ))}
       <div style={{ textAlign: 'center' }}>
         <Button type="primary" label={t('common.dismiss')} onClick={onDismiss} />
