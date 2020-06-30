@@ -171,10 +171,18 @@ describe('queue', () => {
       await queue.start()
     });
     it('inits IndexerConnector', () => {
+      let expectPathRegex
+      if (process.platform === 'win32') {
+        expectPathRegex = expect.stringMatching(/test\\indexer_data/)
+      }
+      else {
+        expectPathRegex = expect.stringMatching(/test\/indexer_data/)
+      }
+
       expect(stubbedIndexerConnectorConstructor).toHaveBeenCalledWith(
         addresses,
         fakeNodeUrl,
-        expect.stringMatching(new RegExp('test' + path.sep + 'indexer_data'))
+        expectPathRegex
       )
     });
     it('connects indexer', () => {
