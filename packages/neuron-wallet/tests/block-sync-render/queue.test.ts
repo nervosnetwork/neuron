@@ -1,4 +1,3 @@
-import path from 'path'
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/indexer'
 import { AddressType } from '../../src/models/keys/address'
