@@ -4,10 +4,10 @@
       "loading-wallets": "錢包加載中"
     },
     "contextmenu": {
-      "cut": "剪切",
+      "cut": "剪下",
       "copy": "複製",
-      "paste": "粘貼",
-      "selectall": "全部選中"
+      "paste": "貼上",
+      "selectall": "全選"
     },
     "navbar": {
       "overview": "總覽",
@@ -76,7 +76,7 @@
       "wallet-suffix": "錢包 {{suffix}}",
       "write-down-seed": "請記下您的助記詞並保存到安全的地方",
       "new-name": "輸入新的錢包名稱",
-      "complex-password": "密碼為 8 至 50 比特由大寫字母、小寫字母、數位、特殊符號中至少三類字元組成的字串。",
+      "complex-password": "密碼為 8 至 50 字元由大寫字母、小寫字母、數位、特殊符號中至少三種字元組成的字串。",
       "same-password": "兩次輸入密碼應一致"
     },
     "import-keystore": {
@@ -118,7 +118,7 @@
       "price": "單價",
       "pick-price": "快速選擇單價",
       "total-cycles": "RISC-V Cycles 總數",
-      "scan-screen-qr-code": "掃描荧幕上的二維碼",
+      "scan-screen-qr-code": "掃描螢幕上的二維碼",
       "set-locktime": "設置鎖定時間",
       "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
       "release-on": "鎖定至"
@@ -159,27 +159,26 @@
       "blockNumber": "區塊高度",
       "basic-information": "基本資訊",
       "search": {
-        "button": "蒐索",
-        "placeholder": "使用交易雜湊、地址或日期(yyyy-mm-dd)進行蒐索"
+        "button": "搜索",
+        "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)進行搜索"
       },
       "export-history": "導出交易歷史",
       "confirmations": "確認次數",
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",
-      "copy-transaction-hash": "複製交易雜湊",
       "no-txs": "沒有交易記錄",
       "view-in-explorer": "瀏覽器",
       "view-in-explorer-button-title": "瀏覽器中查看詳情",
       "view-detail": "詳情",
       "view-detail-button-title": "查看詳情",
-      "copy-tx-hash": "複製交易 Hash",
+      "copy-tx-hash": "複製交易哈希",
       "copy-balance": "複製餘額",
       "copy-address": "複製地址"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
       "date": "時間",
-      "transaction-hash": "交易雜湊",
+      "transaction-hash": "交易哈希",
       "block-number": "區塊高度",
       "goBack": "返回",
       "index": "序號",
@@ -217,14 +216,14 @@
         "network": "網絡"
       },
       "general": {
-        "clear-cache": "清空緩存",
-        "clearing-cache": "清空中…",
-        "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清空緩存，Neuron 會重新同步所有塊數據。",
+        "clear-cache": "清理緩存",
+        "clearing-cache": "清理中…",
+        "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清理緩存，Neuron 會重新同步所有塊數據。",
         "show": "顯示",
         "hide": "隱藏",
         "version": "版本",
         "language": "語言",
-        "cache-cleared-on": "上次清空緩存時間 {{date}}",
+        "cache-cleared-on": "上次清理緩存時間 {{date}}",
         "apply": "應用"
       },
       "wallet-manager": {
@@ -244,9 +243,9 @@
       "network": {
         "online": "線上",
         "offline": "離線",
-        "add-network": "添加網絡",
+        "add-network": "添加網路",
         "edit-network": {
-          "title": "添加或編輯網絡",
+          "title": "添加或編輯網路",
           "rpc-url": "RPC地址",
           "name": "名稱"
         },
@@ -299,7 +298,7 @@
         "on": "開",
         "off": "關"
       },
-      "copy-tx-hash": "複製交易 Hash",
+      "copy-tx-hash": "複製交易哈希",
       "copy-address": "複製地址",
       "select": "選擇",
       "backup": "備份",
@@ -327,9 +326,9 @@
       "delete-wallet-successfully": "已删除錢包",
       "create-network-successfully": "已添加新節點",
       "update-network-successfully": "已更新節點資訊",
-      "clear-cache-successfully": "已清空數據緩存",
-      "addr-copied": "已複製地址到剪貼板",
-      "qrcode-copied": "已複製二維碼到剪貼板",
+      "clear-cache-successfully": "已清理數據緩存",
+      "addr-copied": "已複製地址到剪貼簿",
+      "qrcode-copied": "已複製二維碼到剪貼簿",
       "view-the-run-node-doc": "打開瀏覽器查看檔案",
       "remain-ckb-for-withdraw": "建議保留部分 CKB 作為提現手續費",
       "no-valid-addresses-found": "未找到有效地址",
@@ -365,9 +364,9 @@
         "102": "$t(messages.fields.{{fieldName}})無效。",
         "103": "$t(messages.fields.keystore-password)不正確。",
         "104": "未連接到節點，請重啓 Neuron。",
-        "105": "您需要有足够的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
-        "106": "您需要有足够的餘額來支付找零(至少61 CKBytes)，或者拖動滑塊到最右端發送全部餘額。",
-        "107": "金額 {{amount}} CKB 太小，含锁定時間转账需要輸入一個不小於 69 CKB 的值。",
+        "105": "您需要有足夠的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
+        "106": "您需要有足夠的餘額來支付找零(至少61 CKBytes)，或者拖動滑塊到最右端發送全部餘額。",
+        "107": "金額 {{amount}} CKB 太小，含鎖定時間轉帳需要輸入一個不小於 69 CKB 的值。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太長，其長度應不超過 {{length}}。",
@@ -403,7 +402,7 @@
       "previous-page": "上一頁",
       "next-page": "下一頁",
       "first-page": "首頁",
-      "last-page": "尾頁",
+      "last-page": "末頁",
       "page": "頁碼",
       "selected": "當前頁"
     },
@@ -518,7 +517,7 @@
     "special-assets": {
       "title": "自定義資產",
       "date": "日期",
-      "capacity": "金额",
+      "capacity": "金額",
       "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "未識別資產",

@@ -84,7 +84,7 @@ const TransactionList = ({
           },
         },
         {
-          label: t('history.copy-transaction-hash'),
+          label: t('history.copy-tx-hash'),
           click: () => {
             window.clipboard.writeText(hash)
           },
