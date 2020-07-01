@@ -192,6 +192,6 @@ export default class Queue {
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    ipcRenderer.invoke('synced-block-number-updated', (this.currentBlockNumber - BigInt(1)).toString())
+    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
   }
 }
