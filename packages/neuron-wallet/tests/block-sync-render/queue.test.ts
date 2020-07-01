@@ -184,7 +184,7 @@ describe('queue', () => {
           stubbedBlockTipSubject.next({block_number: '3', block_hash: '0x'})
         });
         it('notify latest block numbers', () => {
-          expect(stubbedIpcRenderInvokeFn).toHaveBeenCalledWith('synced-block-number-updated', '2')
+          expect(stubbedIpcRenderInvokeFn).toHaveBeenCalledWith('synced-block-number-updated', '3')
         })
       });
     })
