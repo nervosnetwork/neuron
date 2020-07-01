@@ -11,8 +11,8 @@ import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import AssetAccountInfo from 'models/asset-account-info'
-import { LumosCell } from 'services/indexer-service'
-import { LumosCellQuery } from './sync/indexer-connector'
+import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
+import IndexerFolderManager from './sync/indexer-folder-manager'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
@@ -62,12 +62,12 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   }
 }
 
-export const createBlockSyncTask = async (rescan = false) => {
+export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   await CommonUtils.sleep(2000) // Do not start too fast
 
-  if (rescan) {
+  if (clearIndexerFolder) {
     await new SyncedBlockNumber().setNextBlock(BigInt(0))
-    //remove indexer_data folder
+    IndexerFolderManager.resetIndexerData()
   }
 
   if (backgroundWindow) {

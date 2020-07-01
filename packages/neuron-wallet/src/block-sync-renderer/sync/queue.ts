@@ -1,9 +1,5 @@
-import env from 'env'
 import { ipcRenderer } from 'electron'
-
-import path from 'path'
 import { queue, AsyncQueue } from 'async'
-
 import { TransactionPersistor } from 'services/tx'
 import WalletService from 'services/wallets'
 import RpcService from 'services/rpc-service'
@@ -52,17 +48,9 @@ export default class Queue {
   }
 
   public async start() {
-    const LUMOS_INDEXER_DB_FOLDER = 'indexer_data'
-    const indexedDataPath = path.resolve(
-      env.fileBasePath,
-      LUMOS_INDEXER_DB_FOLDER,
-      await this.rpcService.genesisBlockHash()
-    )
-
     this.indexerConnector = new IndexerConnector(
       this.addresses,
-      this.url,
-      indexedDataPath
+      this.url
     )
     this.indexerConnector.connect()
     this.indexerConnector.blockTipSubject.subscribe(tip => {

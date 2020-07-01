@@ -7,10 +7,10 @@ import AddressDao from 'database/address/address-dao'
 import i18n from 'locales/i18n'
 
 export default class SyncController {
-  public async clearCache() {
+  public async clearCache(clearIndexerFolder: boolean = false) {
     const confirmed = await this.confirmToClear()
     if (confirmed) {
-      await this.doClearTask()
+      await this.doClearTask(clearIndexerFolder)
       return {
         status: ResponseCode.Success,
         result: true
@@ -53,10 +53,10 @@ export default class SyncController {
     }
   }
 
-  private doClearTask = async () => {
+  private doClearTask = async (clearIndexerFolder: boolean) => {
     killBlockSyncTask()
     AddressDao.resetAddresses()
     await ChainCleaner.clean()
-    await createBlockSyncTask(true)
+    await createBlockSyncTask(clearIndexerFolder)
   }
 }

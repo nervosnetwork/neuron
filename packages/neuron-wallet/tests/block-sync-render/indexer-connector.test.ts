@@ -104,11 +104,32 @@ describe('unit tests for IndexerConnector', () => {
   });
 
   describe('#constructor', () => {
-    beforeEach(() => {
-      new stubbedIndexerConnector([], nodeUrl, indexerFolderPath)
+    describe('when init with indexer folder path', () => {
+      beforeEach(() => {
+        new stubbedIndexerConnector([], nodeUrl, indexerFolderPath)
+      });
+      it('inits lumos indexer with a node url and indexer folder path', () => {
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, path.join(indexerFolderPath))
+      });
     });
-    it('init with a node url and indexer folder path', () => {
-      expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, path.join(indexerFolderPath))
+    describe('when init without indexer folder path', () => {
+      beforeEach(() => {
+        new stubbedIndexerConnector([], nodeUrl)
+      });
+      it('inits lumos indexer with a node url and a default indexer folder path', () => {
+        let expectPathRegex
+        if (process.platform === 'win32') {
+          expectPathRegex = expect.stringMatching(/test\\indexer_data/)
+        }
+        else {
+          expectPathRegex = expect.stringMatching(/test\/indexer_data/)
+        }
+
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(
+          nodeUrl,
+          expectPathRegex
+        )
+      })
     });
   });
   describe('#connect', () => {
@@ -280,21 +301,20 @@ describe('unit tests for IndexerConnector', () => {
             expect(stubbedNextUnprocessedTxsGroupedByBlockNumberFn).toHaveBeenCalled()
           })
         });
-        describe('failure cases', () => {
+        describe('failure cases when there no transaction matched to a hash from #processNextBlockNumberQueue', () => {
           let txObserver: any
           beforeEach(async () => {
             stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
-            when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
-              .calledWith().mockResolvedValue([fakeTxHashCache3])
+            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([fakeTxHashCache3])
             when(stubbedGetTransactionFn)
-              .calledWith(fakeTxHashCache1.txHash).mockResolvedValueOnce(undefined)
+              .calledWith(fakeTxHashCache3.txHash).mockResolvedValueOnce(undefined)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             await connectIndexer(indexerConnector)
             await flushPromises()
           });
-          it('throws error when there no transaction matched to a hash from #processNextBlockNumberQueue', () => {
+          it('throws error', async () => {
             expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(new Error('failed to fetch transaction for hash hash3'))
           });
         });

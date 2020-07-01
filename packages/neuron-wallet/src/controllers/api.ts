@@ -328,8 +328,8 @@ export default class ApiController {
       showWindow(`#/settings/${params.tab}`, i18n.t(SETTINGS_WINDOW_TITLE), { width: 900 })
     })
 
-    handle('clear-cache', async () => {
-      return new SyncController().clearCache()
+    handle('clear-cache', async (_, params: {resetIndexerData: boolean } | null) => {
+      return new SyncController().clearCache(params?.resetIndexerData)
     })
 
     // Sign and Verify
