@@ -9,11 +9,34 @@ import { Address } from 'database/address/address-dao'
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
+import IndexerFolderManager from './indexer-folder-manager'
 
 export interface LumosCellQuery {
   lock: {codeHash: string, hashType: string, args: string} | null,
   type: {codeHash: string, hashType: string, args: string} | null,
   data: string | null
+}
+
+export interface LumosCell {
+  block_hash: string
+  out_point: {
+    tx_hash: string
+    index: string
+  }
+  cell_output: {
+    capacity: string
+    lock: {
+      code_hash: string
+      args: string
+      hash_type: string
+    }
+    type?: {
+      code_hash: string
+      args: string
+      hash_type: string
+    }
+  }
+  data?: string
 }
 
 export default class IndexerConnector {
@@ -26,7 +49,11 @@ export default class IndexerConnector {
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
-  constructor(addresses: Address[], nodeUrl: string, indexerFolderPath: string) {
+  constructor(
+    addresses: Address[],
+    nodeUrl: string,
+    indexerFolderPath: string = IndexerFolderManager.IndexerDataFolderPath
+  ) {
     this.indexer = new Indexer(nodeUrl, indexerFolderPath)
     this.rpcService = new RpcService(nodeUrl)
 

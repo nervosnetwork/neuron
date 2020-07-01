@@ -12278,7 +12278,7 @@ jest-watcher@^24.3.0, jest-watcher@^24.9.0:
     jest-util "^24.9.0"
     string-length "^2.0.0"
 
-jest-when@^2.7.2:
+jest-when@2.7.2:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/jest-when/-/jest-when-2.7.2.tgz#b7b4225e8882bd84a1cfd09216b2c63d22f892bd"
   integrity sha512-GuVzimG0wW18A5JlYwhHrvuwmWRAQpsnilRVdJktvrZX5V0++al1f/iwITE7+Cud8Rbw/U2eka4tyy7kvxIWnw==

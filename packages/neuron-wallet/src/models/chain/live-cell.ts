@@ -1,6 +1,6 @@
 import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
-import { LumosCell } from 'services/indexer-service'
+import { LumosCell } from 'block-sync-renderer/sync/indexer-connector'
 
 export default class LiveCell {
   public txHash: string
