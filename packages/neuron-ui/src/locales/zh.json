@@ -166,13 +166,12 @@
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
-      "copy-transaction-hash": "复制交易哈希",
       "no-txs": "没有交易记录",
       "view-in-explorer": "浏览器",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
-      "copy-tx-hash": "复制交易 Hash",
+      "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
       "copy-address": "复制地址"
     },
@@ -299,7 +298,7 @@
         "on": "开",
         "off": "关"
       },
-      "copy-tx-hash": "复制交易 Hash",
+      "copy-tx-hash": "复制交易哈希",
       "copy-address": "复制地址",
       "select": "选择",
       "backup": "备份",
