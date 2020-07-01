@@ -15,6 +15,9 @@ pr:
     include:
       - '*'
 
+variables:
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
 stages:
 - stage: unit_tests
   displayName: Unit Tests
@@ -32,6 +35,14 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
+    - task: Cache@0
+      inputs:
+        key: yarn bootstrap | $(Agent.OS) | yarn.lock
+        path: $(YARN_CACHE_FOLDER)
+        restoreKeys: |
+          yarn bootstrap | $(Agent.OS)
+          yarn bootstrap
+      displayName: Cache Yarn packages
     - script: |
         yarn global add lerna
         yarn bootstrap
