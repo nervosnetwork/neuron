@@ -1,8 +1,8 @@
-import i18n from 'locales/i18n'
+import { t } from 'locales/i18n'
 
 export class FailToCreateMnemonic extends Error {
   constructor() {
-    super(i18n.t('messages.failed-to-create-mnemonic'))
+    super(t('messages.failed-to-create-mnemonic'))
   }
 }
 

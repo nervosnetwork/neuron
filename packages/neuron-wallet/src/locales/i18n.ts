@@ -3,6 +3,8 @@ import zh from './zh'
 import en from './en'
 import zhTW from './zh-tw'
 
+export { t } from 'i18next'
+
 i18n.init({
   resources: {
     en,
