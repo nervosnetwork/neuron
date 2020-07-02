@@ -39,9 +39,6 @@ stages:
       inputs:
         key: yarn bootstrap | $(Agent.OS) | yarn.lock
         path: $(YARN_CACHE_FOLDER)
-        restoreKeys: |
-          yarn bootstrap | $(Agent.OS)
-          yarn bootstrap
       displayName: Cache Yarn packages
     - script: |
         yarn global add lerna
@@ -68,9 +65,7 @@ stages:
       inputs:
         key: yarn bootstrap | $(Agent.OS) | yarn.lock
         path: $(YARN_CACHE_FOLDER)
-        restoreKeys: |
-          yarn bootstrap | $(Agent.OS)
-          yarn bootstrap
+      displayName: Cache Yarn packages
     - script: |
         yarn global add lerna
         yarn bootstrap
@@ -99,9 +94,7 @@ stages:
       inputs:
         key: yarn bootstrap | $(Agent.OS) | yarn.lock
         path: $(YARN_CACHE_FOLDER)
-        restoreKeys: |
-          yarn bootstrap | $(Agent.OS)
-          yarn bootstrap
+      displayName: Cache Yarn packages
     - script: |
         powershell -Command "choco install llvm; refreshenv"
       displayName: 'Install clang (Windows)'
