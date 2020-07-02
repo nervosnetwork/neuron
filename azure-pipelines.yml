@@ -36,16 +36,35 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - task: Cache@0
+    - task: Cache@2
       inputs:
         key: yarn bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
     - script: |
         yarn global add lerna
-        yarn bootstrap
-        CI=false yarn build
-      name: Bootstrap
+      displayName: 'Install lerna'
+    - script: |
+        yarn lerna:bootstrap
+        yarn lerna:link
+      name: InstallDeps
+      displayName: 'Install dependencies'
+    - task: Cache@2
+      inputs:
+        key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
+        path: $(ROOT_NODE_MODULES_FOLDER)
+        cacheHitVar: BUILD_NATIVE_MODULES_CACHE_RESTORED
+      displayName: Cache built native modules
+    - script: |
+        yarn rebuild:nativemodules
+      condition: ne(variables.BUILD_NATIVE_MODULES_CACHE_RESTORED, 'true')
+      name: RebuildNativeModules
+      displayName: Rebuild native modules
+    - script: |
+        set CI=false
+        yarn build
+      name: BuildNeuronCode
+      displayName: Build from Neuron source code
     - script: CI=true yarn test
       name: Test
 
@@ -62,16 +81,35 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - task: Cache@0
+    - task: Cache@2
       inputs:
         key: yarn bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
-      displayName: Cache Yarn packages
+      displayName: Cache yarn packages
     - script: |
         yarn global add lerna
-        yarn bootstrap
-        CI=false yarn build
-      name: Bootstrap
+      displayName: 'Install lerna'
+    - script: |
+        yarn lerna:bootstrap
+        yarn lerna:link
+      name: InstallDeps
+      displayName: 'Install dependencies'
+    - task: Cache@2
+      inputs:
+        key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
+        path: $(ROOT_NODE_MODULES_FOLDER)
+        cacheHitVar: BUILD_NATIVE_MODULES_CACHE_RESTORED
+      displayName: Cache built native modules
+    - script: |
+        yarn rebuild:nativemodules
+      condition: ne(variables.BUILD_NATIVE_MODULES_CACHE_RESTORED, 'true')
+      name: RebuildNativeModules
+      displayName: Rebuild native modules
+    - script: |
+        set CI=false
+        yarn build
+      name: BuildNeuronCode
+      displayName: Build from Neuron source code
     - script: |
         export DISPLAY=':99.0'
         Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -91,11 +129,11 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - task: Cache@0
+    - task: Cache@2
       inputs:
         key: yarn lerna:bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
-      displayName: Cache Yarn packages
+      displayName: Cache yarn packages
     - script: |
         powershell -Command "choco install llvm; refreshenv"
       displayName: 'Install clang (Windows)'
@@ -106,7 +144,7 @@ stages:
         yarn lerna:link
       name: InstallDeps
       displayName: 'Install dependencies'
-    - task: Cache@0
+    - task: Cache@2
       inputs:
         key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(ROOT_NODE_MODULES_FOLDER)
