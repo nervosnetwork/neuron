@@ -20,8 +20,8 @@ variables:
   ROOT_NODE_MODULES_FOLDER: $(System.DefaultWorkingDirectory)/node_modules
 
 stages:
-- stage: unit_tests
-  displayName: Unit Tests
+- stage: tests
+  displayName: Tests
   jobs:
   - job: mac
     displayName: macOS
@@ -64,9 +64,9 @@ stages:
         set CI=false
         yarn build
       name: BuildNeuronCode
-      displayName: Build from Neuron source code
+      displayName: Build Neuron source code
     - script: CI=true yarn test
-      name: Test
+      name: Tests
 
   - job: linux
     displayName: Linux
@@ -109,7 +109,7 @@ stages:
         set CI=false
         yarn build
       name: BuildNeuronCode
-      displayName: Build from Neuron source code
+      displayName: Build Neuron source code
     - script: |
         export DISPLAY=':99.0'
         Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -159,7 +159,7 @@ stages:
         set CI=false
         yarn build
       name: BuildNeuronCode
-      displayName: Build from Neuron source code
+      displayName: Build Neuron source code
     - script: |
         set CI=true
         yarn test
