@@ -96,11 +96,6 @@ stages:
         key: yarn lerna:bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
-    - task: Cache@0
-      inputs:
-        key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
-        path: $(ROOT_NODE_MODULES_FOLDER)
-      displayName: Cache built modules
     - script: |
         powershell -Command "choco install llvm; refreshenv"
       displayName: 'Install clang (Windows)'
@@ -111,6 +106,11 @@ stages:
         yarn lerna:link
       name: InstallDeps
       displayName: 'Install dependencies'
+    - task: Cache@0
+      inputs:
+        key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
+        path: $(ROOT_NODE_MODULES_FOLDER)
+      displayName: Cache built modules
     - script: |
         yarn rebuild:nativemodules
         set CI=false
