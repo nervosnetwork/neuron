@@ -35,7 +35,6 @@ const History = () => {
   const { search } = useLocation()
   const [isExporting, setIsExporting] = useState(false)
   const isMainnet = isMainnetUtil(networks, networkID)
-  const COUNT_THRESHOLD = 10000
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
   const onSearch = useCallback(() => history.push(`${RoutePath.History}?keywords=${keywords}`), [history, keywords])
@@ -101,7 +100,7 @@ const History = () => {
           ) : null}
         </div>
         {totalCount ? null : <div className={styles.noTxs}>{t('history.no-txs')}</div>}
-        <div className={styles.pagination} data-magnitude={totalCount >= COUNT_THRESHOLD}>
+        <div className={styles.pagination}>
           {totalCount ? (
             <Pagination
               selectedPageIndex={pageNo - 1}
