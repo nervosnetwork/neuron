@@ -109,6 +109,8 @@ stages:
     - script: |
         yarn lerna:bootstrap
         yarn lerna:link
+      name: Install dependencies
+    - script: |
         yarn rebuild:nativemodules
         set CI=false
         yarn build
