@@ -7,8 +7,14 @@ export class TransactionNotFound extends Error {
 }
 
 export class CapacityTooSmall extends Error {
+  public code = 114
+  public i18n: {
+    bytes: string
+  }
+
   constructor(bytes: string = '61') {
     super(i18n.t('messages.capacity-too-small', { bytes }))
+    this.i18n = { bytes }
   }
 }
 

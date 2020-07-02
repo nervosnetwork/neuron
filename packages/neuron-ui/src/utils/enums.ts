@@ -68,6 +68,11 @@ export enum ErrorCode {
   LocktimeAmountTooSmall = 107,
   AddressNotFound = 108,
   CapacityNotEnough = 109,
+  LiveCapacityNotEnough = 110,
+  CurrentWalletNotSet = 111,
+  WalletNotFound = 112,
+  InvalidKeystore = 113,
+  CapacityTooSmall = 114,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
