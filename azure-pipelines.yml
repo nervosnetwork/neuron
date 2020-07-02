@@ -175,6 +175,8 @@ stages:
         versionSpec: 12.x
       displayName: 'Install Node.js'
     - script: |
+        powershell -Command "choco install llvm; refreshenv"
+    - script: |
         yarn global add lerna
         yarn bootstrap
       name: Bootstrap
