@@ -64,6 +64,13 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
+    - task: Cache@0
+      inputs:
+        key: yarn bootstrap | $(Agent.OS) | yarn.lock
+        path: $(YARN_CACHE_FOLDER)
+        restoreKeys: |
+          yarn bootstrap | $(Agent.OS)
+          yarn bootstrap
     - script: |
         yarn global add lerna
         yarn bootstrap
@@ -88,6 +95,13 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
+    - task: Cache@0
+      inputs:
+        key: yarn bootstrap | $(Agent.OS) | yarn.lock
+        path: $(YARN_CACHE_FOLDER)
+        restoreKeys: |
+          yarn bootstrap | $(Agent.OS)
+          yarn bootstrap
     - script: |
         powershell -Command "choco install llvm; refreshenv"
       displayName: 'Install clang (Windows)'
