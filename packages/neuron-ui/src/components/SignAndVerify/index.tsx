@@ -17,7 +17,7 @@ import Spinner from 'widgets/Spinner'
 import DownArrow from 'widgets/Icons/DownArrow.png'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
-import VerificationWarningIcon from 'widgets/Icons/VerificationWarning.png'
+import VerificationWarningIcon from 'widgets/Icons/Warning.png'
 
 import styles from './signAndVerify.module.scss'
 
