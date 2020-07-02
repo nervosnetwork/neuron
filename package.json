@@ -22,7 +22,10 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap && lerna link",
+    "bootstrap": "yarn lerna:bootstrap && yarn lerna:link && yarn rebuild:nativemodules",
+    "lerna:bootstrap": "lerna bootstrap",
+    "lerna:link": "lerna link",
+    "rebuild:nativemodules": "lerna run rebuild:nativemodules",
     "start:ui": "cd packages/neuron-ui && yarn run start",
     "start:wallet": "cd packages/neuron-wallet && yarn run start:dev",
     "start": "concurrently \"cross-env BROWSER=none yarn run start:ui\" \"wait-on http://localhost:3000 && yarn run start:wallet\"",
@@ -32,7 +35,6 @@
     "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "test": "lerna run --parallel test",
     "lint": "lerna run --stream lint",
-    "postinstall": "lerna run rebuild:nativemodules",
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "husky": {

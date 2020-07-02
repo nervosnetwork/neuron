@@ -17,6 +17,7 @@ pr:
 
 variables:
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+  ROOT_NODE_MODULES_FOLDER: $(System.DefaultWorkingDirectory)/node_modules
 
 stages:
 - stage: unit_tests
@@ -92,16 +93,23 @@ stages:
       displayName: 'Install Node.js'
     - task: Cache@0
       inputs:
-        key: yarn bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
+        key: yarn lerna:bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
+    - task: Cache@1
+      inputs:
+        key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
+        path: $(ROOT_NODE_MODULES_FOLDER)
+      displayName: Cache built modules
     - script: |
         powershell -Command "choco install llvm; refreshenv"
       displayName: 'Install clang (Windows)'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |
-        yarn bootstrap
+        yarn lerna:bootstrap
+        yarn lerna:link
+        yarn rebuild:nativemodules
         set CI=false
         yarn build
       name: Build
