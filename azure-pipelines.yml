@@ -96,7 +96,7 @@ stages:
         key: yarn lerna:bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
-    - task: Cache@1
+    - task: Cache@0
       inputs:
         key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(ROOT_NODE_MODULES_FOLDER)
