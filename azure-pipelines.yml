@@ -37,7 +37,7 @@ stages:
       displayName: 'Install Node.js'
     - task: Cache@0
       inputs:
-        key: yarn bootstrap | $(Agent.OS) | yarn.lock
+        key: yarn bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
     - script: |
@@ -63,7 +63,7 @@ stages:
       displayName: 'Install Node.js'
     - task: Cache@0
       inputs:
-        key: yarn bootstrap | $(Agent.OS) | yarn.lock
+        key: yarn bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
     - script: |
@@ -92,7 +92,7 @@ stages:
       displayName: 'Install Node.js'
     - task: Cache@0
       inputs:
-        key: yarn bootstrap | $(Agent.OS) | yarn.lock
+        key: yarn bootstrap | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(YARN_CACHE_FOLDER)
       displayName: Cache Yarn packages
     - script: |
