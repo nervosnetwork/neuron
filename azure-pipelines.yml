@@ -110,12 +110,18 @@ stages:
       inputs:
         key: yarn rebuild:nativemodules | $(Agent.OS) | yarn.lock, package.json, packages/neuron-wallet/package.json, packages/neuron-ui/package.json
         path: $(ROOT_NODE_MODULES_FOLDER)
-      displayName: Cache built modules
+        cacheHitVar: BUILD_NATIVE_MODULES_CACHE_RESTORED
+      displayName: Cache built native modules
     - script: |
         yarn rebuild:nativemodules
+      condition: ne(variables.BUILD_NATIVE_MODULES_CACHE_RESTORED, 'true')
+      name: RebuildNativeModules
+      displayName: Rebuild native modules
+    - script: |
         set CI=false
         yarn build
-      name: Build
+      name: BuildNeuronCode
+      displayName: Build from Neuron source code
     - script: |
         set CI=true
         yarn test
