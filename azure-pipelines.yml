@@ -110,6 +110,7 @@ stages:
         yarn lerna:bootstrap
         yarn lerna:link
       name: InstallDeps
+      displayName: 'Install dependencies'
     - script: |
         yarn rebuild:nativemodules
         set CI=false
