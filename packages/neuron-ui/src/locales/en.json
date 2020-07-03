@@ -266,7 +266,7 @@
             "label": "Refresh"
           },
           "rebuild": {
-            "label": "Fully rebuild indexing (cost extra 30 ~ 50 min)"
+            "label": "Fully rebuild index (cost extra 30 ~ 50 min)"
           }
         },
         "buttons": {
