@@ -1,0 +1,75 @@
+@import '../../styles//mixin.scss';
+
+.clearCache {
+  &.detail {
+    grid-area: clear-cache-detail;
+    .date {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      height: 1.125rem;
+      margin-bottom: 5px;
+    }
+    .desc {
+      display: flex;
+      font-size: 0.6875rem;
+      color: #666;
+    }
+    svg {
+      height: 0.6875rem;
+      width: 0.6875rem;
+      filter: grayscale(1) opacity(0.6);
+      margin: 2px 5px 0 0;
+    }
+  }
+  &.action {
+    grid-area: clear-cache-action;
+  }
+}
+
+.dialog {
+  @include dialog-container;
+  padding: 30px 50px 30px 110px;
+
+  &::backdrop {
+    @include overlay;
+  }
+  .warningIcon {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    height: 60px;
+  }
+  .title {
+    @include dialog-title;
+    margin-bottom: 5px;
+  }
+  .message {
+    @include semi-bold-text;
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 5px;
+    margin: 15px 0;
+    font-size: 14px;
+    input {
+      margin: auto;
+      filter: hue-rotate(291deg) brightness(1.21);
+    }
+    label {
+      line-height: 1em;
+      font-weight: 200;
+    }
+  }
+
+  .footer {
+    @include dialog-footer;
+    button {
+      margin-left: 10px;
+      min-width: auto;
+      width: 100px;
+    }
+  }
+}

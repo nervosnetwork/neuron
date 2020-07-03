@@ -258,6 +258,22 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)"
+      },
+      "clear-cache": {
+        "title": "Clear Cache",
+        "detail": "Are you sure to clear cache?",
+        "options": {
+          "refresh": {
+            "label": "Refresh"
+          },
+          "rebuild": {
+            "label": "Fully rebuild indexing (cost extra 30 ~ 50 min)"
+          }
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "ok": "OK"
+        }
       }
     },
     "password-request": {

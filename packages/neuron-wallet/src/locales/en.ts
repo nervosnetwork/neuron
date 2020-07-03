@@ -141,15 +141,6 @@ export default {
           'install-and-exit': 'Install and Exit'
         }
       },
-      'clear-cache': {
-        title: 'Clear Cache',
-        message: 'Clear Cache',
-        detail: 'Are you sure to clear cache? It will take about 2 hours to rebuild the full cache.',
-        buttons: {
-          cancel: 'Cancel',
-          ok: 'OK'
-        }
-      }
     },
     prompt: {
       password: {

@@ -1,14 +1,13 @@
 import React, { useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ProgressIndicator } from 'office-ui-fabric-react'
+import ClearCache from 'components/ClearCache'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import Dropdown from 'widgets/Dropdown'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-import { StateDispatch, addPopup } from 'states'
-import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache, setLocale, getVersion } from 'services/remote'
-import { cacheClearDate } from 'services/localCache'
-import { CONSTANTS, isSuccessResponse } from 'utils'
+import { StateDispatch } from 'states'
+import { checkForUpdates, downloadUpdate, installUpdate, setLocale, getVersion } from 'services/remote'
+import { CONSTANTS } from 'utils'
 
 import styles from './style.module.scss'
 
@@ -78,29 +77,11 @@ interface GeneralSettingProps {
 
 const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
   const [t, i18n] = useTranslation()
-  const [clearingCache, setClearingCache] = useState(false)
   const [lng, setLng] = useState(i18n.language)
-  const [clearedDate, setClearedDate] = useState(cacheClearDate.load())
 
   const checkUpdates = useCallback(() => {
     checkForUpdates()
   }, [])
-
-  const clearCache = useCallback(() => {
-    setClearingCache(true)
-    clearCellCache()
-      .then(res => {
-        if (isSuccessResponse(res) && res.result) {
-          addPopup('clear-cache-successfully')(dispatch)
-          const date = new Date().toISOString().slice(0, 10)
-          cacheClearDate.save(date)
-          setClearedDate(date)
-        }
-      })
-      .finally(() => {
-        setClearingCache(false)
-      })
-  }, [dispatch, setClearedDate])
 
   const onApplyLanguage = useCallback(() => {
     setLocale(lng as typeof LOCALES[number])
@@ -147,29 +128,7 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
           />
         ) : null}
       </div>
-
-      <div className={`${styles.clearCache} ${styles.detail}`}>
-        {clearedDate ? (
-          <div className={styles.date}>{t('settings.general.cache-cleared-on', { date: clearedDate })}</div>
-        ) : null}
-        <div className={styles.desc}>
-          <Attention />
-          {t('settings.general.clear-cache-description')}
-        </div>
-      </div>
-      <div className={`${styles.clearCache} ${styles.action}`}>
-        <Button type="default" label={t(`settings.general.clear-cache`)} onClick={clearCache} disabled={clearingCache}>
-          {clearingCache ? (
-            <Spinner
-              styles={{ root: { marginRight: 5 } }}
-              label={t('settings.general.clear-cache')}
-              labelPosition="right"
-            />
-          ) : (
-            (t('settings.general.clear-cache') as string)
-          )}
-        </Button>
-      </div>
+      <ClearCache dispatch={dispatch} />
       <div className={`${styles.language} ${styles.label}`}>{t('settings.general.language')}</div>
       <div className={`${styles.language} ${styles.select}`}>
         <Dropdown
