@@ -2,7 +2,13 @@ import { BehaviorSubject } from 'rxjs'
 import ProcessUtils from 'utils/process'
 import { remote } from 'electron'
 
-export const ConnectionStatusSubject = new BehaviorSubject<boolean>(false)
+export const ConnectionStatusSubject = new BehaviorSubject<{
+  url: string,
+  connected: boolean
+}>({
+  url: '',
+  connected: false
+})
 
 export default class SyncedBlockNumberSubject {
   private static subject = new BehaviorSubject<string>('0')

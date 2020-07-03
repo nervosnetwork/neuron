@@ -64,7 +64,7 @@ export type StateAction =
   | { type: AppActions.UpdateGeneratedTx; payload: any }
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
-  | { type: AppActions.SetGlobalDialog; payload: 'unlock-success' | null }
+  | { type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }
   | { type: AppActions.AddNotification; payload: State.Message }
   | { type: AppActions.DismissNotification; payload: number } // payload: timestamp
   | { type: AppActions.ClearNotificationsOfCode; payload: ErrorCode } // payload: code
@@ -117,7 +117,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       Object.assign(state.chain, {
         networkID,
         transactions,
-        connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Connecting,
+        connectionStatus: connectionStatus?.connected ? ConnectionStatus.Online : ConnectionStatus.Connecting,
         tipBlockNumber: syncedBlockNumber,
       })
       Object.assign(state.settings, { networks, wallets })

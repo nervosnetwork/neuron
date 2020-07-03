@@ -16,7 +16,7 @@ const NetworkStatus = ({
   networkName = null,
   tipBlockNumber,
   syncedBlockNumber,
-  connectionStatus = ConnectionStatus.Offline,
+  connectionStatus = ConnectionStatus.Connecting,
   onAction,
   syncStatus = SyncStatus.SyncNotStart,
 }: NetworkStatusProps) => {

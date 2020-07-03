@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.31.0",
+  "version": "0.32.0-beta.1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -21,10 +21,12 @@
     "start:dev": "yarn run build && electron .",
     "build": "ttsc && ncp ./src/block-sync-renderer/index.html ./dist/block-sync-renderer/index.html",
     "clean": "rimraf dist/*",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --collect-coverage",
+    "test:watch": "jest --watch",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
-    "rebuild:nativemodules": "electron-builder install-app-deps"
+    "rebuild:nativemodules": "electron-builder install-app-deps && yarn rebuild:neondeps",
+    "rebuild:neondeps": "electron-build-env neon build -p ../../node_modules/@ckb-lumos/indexer --release"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -33,9 +35,11 @@
     ]
   },
   "dependencies": {
+    "@ckb-lumos/indexer": "0.3.0",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",
     "archiver": "3.1.1",
+    "async": "3.2.0",
     "bn.js": "4.11.8",
     "chalk": "3.0.0",
     "dotenv": "8.2.0",
@@ -57,8 +61,10 @@
   "devDependencies": {
     "@nervosnetwork/ckb-types": "0.32.0",
     "@types/archiver": "3.1.0",
+    "@types/async": "3.2.3",
     "@types/electron-devtools-installer": "2.2.0",
     "@types/elliptic": "6.4.9",
+    "@types/jest-when": "2.7.1",
     "@types/leveldown": "4.0.2",
     "@types/levelup": "4.3.0",
     "@types/sqlite3": "3.1.5",
@@ -66,11 +72,14 @@
     "axios": "0.19.0",
     "devtron": "1.4.0",
     "electron": "7.1.14",
+    "electron-build-env": "0.2.0",
     "electron-builder": "22.4.0",
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.2.1",
+    "jest-when": "2.7.2",
     "lint-staged": "9.2.5",
-    "neuron-ui": "0.31.0",
+    "neon-cli": "0.4.0",
+    "neuron-ui": "0.32.0-beta.1",
     "rimraf": "3.0.0",
     "ts-transformer-imports": "0.4.3",
     "ttypescript": "1.5.10"

@@ -14,9 +14,10 @@ import MultiSign from 'models/multi-sign'
 import InputEntity from 'database/chain/entities/input'
 import BufferUtils from 'utils/buffer'
 import LiveCell from 'models/chain/live-cell'
-import LiveCellEntity from 'database/chain/entities/live-cell'
 import Output from 'models/chain/output'
 import SystemScriptInfo from 'models/system-script-info'
+import Script from 'models/chain/script'
+import LiveCellService from './live-cell-service'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -420,7 +421,7 @@ export default class CellsService {
   public static async gatherAnyoneCanPayCKBInputs(
     capacity: 'all' | string,
     defaultLockHashes: string[],
-    anyoneCanPayLockHashes: string[],
+    anyoneCanPayLocks: Script[],
     changeBlake160: string,
     fee: string = '0',
     feeRate: string = '0',
@@ -435,22 +436,13 @@ export default class CellsService {
     let needFee = BigInt(0)
 
     // only live cells, skip which has data or type
-    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
-    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
-      .getRepository(LiveCellEntity)
-      .find({
-        where: {
-          lockHash: In(anyoneCanPayLockHashBuffers),
-          typeHash: null,
-          usedBlockNumber: null,
-        },
-      })
-    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+    const liveCellService = LiveCellService.getInstance()
+    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
 
     const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
     const capacityInt = capacity === 'all' ? (allCapacity - BigInt(anyoneCanPayLockLiveCells.length) * BigInt(61 * 10**8)) : BigInt(capacity)
 
-    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+    if (anyoneCanPayLockLiveCells.length === 0) {
       throw new CapacityNotEnough()
     }
 
@@ -549,7 +541,7 @@ export default class CellsService {
   }
 
   public static async gatherAnyoneCanPaySendAllCKBInputs(
-    anyoneCanPayLockHashes: string[],
+    anyoneCanPayLocks: Script[],
     fee: string = '0',
     feeRate: string = '0',
     baseSize: number = 0,
@@ -561,19 +553,10 @@ export default class CellsService {
     let needFee = BigInt(0)
 
     // only live cells, skip which has data or type
-    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
-    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
-      .getRepository(LiveCellEntity)
-      .find({
-        where: {
-          lockHash: In(anyoneCanPayLockHashBuffers),
-          typeHash: null,
-          usedBlockNumber: null,
-        },
-      })
-    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+    const liveCellService = LiveCellService.getInstance()
+    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
 
-    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+    if (anyoneCanPayLockLiveCells.length === 0) {
       throw new CapacityNotEnough()
     }
 
@@ -633,8 +616,8 @@ export default class CellsService {
   public static async gatherSudtInputs(
     amount: 'all' | string,
     defaultLockHashes: string[],
-    anyoneCanPayLockHashes: string[],
-    typeHash: string,
+    anyoneCanPayLocks: Script[],
+    type: Script,
     changeBlake160: string,
     fee: string = '0',
     feeRate: string = '0',
@@ -648,24 +631,15 @@ export default class CellsService {
 
     let needFee = BigInt(0)
 
-    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
-    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
-      .getRepository(LiveCellEntity)
-      .find({
-        where: {
-          lockHash: In(anyoneCanPayLockHashBuffers),
-          typeHash: Buffer.from(typeHash.slice(2), 'hex'),
-          usedBlockNumber: null,
-        },
-      })
-    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+    const liveCellService = LiveCellService.getInstance()
+    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, type)
 
     const allAmount: bigint = anyoneCanPayLockLiveCells.map(
       c => BufferUtils.parseAmountFromSUDTData(c.data)).reduce((result, c) => result + c, BigInt(0)
     )
     const amountInt = amount === 'all' ? allAmount : BigInt(amount)
 
-    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+    if (anyoneCanPayLockLiveCells.length === 0) {
       throw new CapacityNotEnough()
     }
 

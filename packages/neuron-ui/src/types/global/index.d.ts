@@ -39,3 +39,7 @@ declare module '*.png' {
 }
 
 declare module '*.scss'
+
+declare namespace Fixture {
+  export type Validator<V, E = number | null> = [string, Parameters<V>, E]
+}

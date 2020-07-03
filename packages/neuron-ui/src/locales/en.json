@@ -166,7 +166,6 @@
       "confirmations": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
-      "copy-transaction-hash": "Copy Transaction Hash",
       "no-txs": "No Transaction History",
       "view-in-explorer": "Explorer",
       "view-in-explorer-button-title": "View on explorer",
@@ -259,6 +258,21 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)"
+      },
+      "clear-cache": {
+        "title": "Clear Cache",
+        "options": {
+          "refresh": {
+            "label": "Refresh"
+          },
+          "rebuild": {
+            "label": "Fully rebuild index (cost extra 30 ~ 50 min)"
+          }
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "ok": "OK"
+        }
       }
     },
     "password-request": {
@@ -290,6 +304,7 @@
     "common": {
       "or": "or",
       "ok": "Ok",
+      "dismiss": "Dismiss",
       "confirm": "Confirm",
       "open": "Open",
       "cancel": "Cancel",
@@ -335,6 +350,7 @@
       "full-addr-info": "Additional software or dApp interface might be required to operate the assets on this address. Please double check its validity.",
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
+      "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -359,13 +375,20 @@
       "codes": {
         "-3": "",
         "100": "Amount is not enough.",
-        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB.",
+        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
         "103": "$t(messages.fields.keystore-password) is incorrect.",
         "104": "Fail to connect to the node, please restart Neuron.",
         "105": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
         "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
         "107": "The amount {{amount}} CKB is too small, transfer with locktime requires an amount no less than 69 CKB.",
+        "108": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
+        "109": "Insufficient balance.",
+        "110": "Insufficient available balance, please try again when last transaction has been confirmed.",
+        "111": "Current wallet is not set.",
+        "112": "Wallet {{id}} not found.",
+        "113": "Keystore is invalid, please check your file integrity.",
+        "114": "The minimal transfer balance is {{bytes}} CKBytes.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",
@@ -377,12 +400,14 @@
         "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
         "210": "\"{{value}}\" is reserved, please use another one.",
         "211": "The amount cannot be 0",
+        "212": "$t(messages.fields.{{fieldName}}) is too simple",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
-        "307": "Please enter a testnet address"
+        "307": "Please enter a testnet address",
+        "308": "Amount is not enough"
       }
     },
     "sync": {
@@ -407,6 +432,7 @@
       "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
+      "deposit-rules": "Deposit rules",
       "copy-balance": "Copy Balance",
       "deposit-records": "Deposits",
       "completed-records": "Completed",

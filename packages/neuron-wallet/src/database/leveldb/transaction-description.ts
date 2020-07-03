@@ -9,7 +9,7 @@ const makeKey = (walletID: string, txHash: string): string => {
 }
 
 export const get = async (walletID: string, txHash: string) => {
-  return maindb.get(makeKey(walletID, txHash)).catch(() => (''))
+  return maindb.get(makeKey(walletID, txHash), { asBuffer: false }).catch(() => '')
 }
 
 export const set = (walletID: string, txHash: string, description: string) => {

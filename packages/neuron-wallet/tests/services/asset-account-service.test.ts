@@ -11,6 +11,10 @@ import { OutputStatus } from "../../src/models/chain/output"
 import SudtTokenInfoEntity from "../../src/database/chain/entities/sudt-token-info"
 import TransactionEntity from "../../src/database/chain/entities/transaction"
 import { TransactionStatus } from "../../src/models/chain/transaction"
+import { createAccounts } from '../setupAndTeardown'
+import accounts from '../setupAndTeardown/accounts.fixture'
+
+const [assetAccount, ckbAssetAccount] = accounts
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -23,7 +27,13 @@ const toShannon = (ckb: string|number) => `${ckb}${'0'.repeat(8)}`
 
 const blake160 = '0x' + '0'.repeat(40)
 const assetAccountInfo = new AssetAccountInfo()
-const generateOutput = (tokenID: string = 'CKBytes', txStatus: TransactionStatus = TransactionStatus.Success, blockNumber = '0', capacity = '1000') => {
+const generateOutput = (
+  tokenID: string = 'CKBytes',
+  txStatus: TransactionStatus = TransactionStatus.Success,
+  blockNumber = '0',
+  capacity = '1000',
+  tokenAmount = '100'
+) => {
   const outputEntity = new OutputEntity()
   outputEntity.outPointTxHash = randomHex()
   outputEntity.outPointIndex = '0'
@@ -41,7 +51,7 @@ const generateOutput = (tokenID: string = 'CKBytes', txStatus: TransactionStatus
     outputEntity.typeArgs = type.args
     outputEntity.typeHashType = type.hashType
     outputEntity.typeHash = type.computeHash()
-    outputEntity.data = BufferUtils.writeBigUInt128LE(BigInt(100))
+    outputEntity.data = BufferUtils.writeBigUInt128LE(BigInt(tokenAmount))
   }
   const tx = new TransactionEntity()
   tx.hash = outputEntity.outPointTxHash
@@ -54,21 +64,7 @@ const generateOutput = (tokenID: string = 'CKBytes', txStatus: TransactionStatus
   outputEntity.transaction = tx
   return outputEntity
 }
-const createAccounts = async (assetAccounts: AssetAccount[], outputEntities: OutputEntity[]) => {
-  const entities = assetAccounts.map(aa => AssetAccountEntity.fromModel(aa))
-  const accountIds = []
-  for (const entity of entities) {
-    await getConnection().manager.save([entity.sudtTokenInfo])
-    const [assetAccount] = await getConnection().manager.save([entity])
-    accountIds.push(assetAccount.id)
-  }
 
-  for (const o of outputEntities) {
-    await getConnection().manager.save([o.transaction, o])
-  }
-
-  return accountIds
-}
 const tokenID = '0x' + '0'.repeat(64)
 
 describe('AssetAccountService', () => {
@@ -86,26 +82,6 @@ describe('AssetAccountService', () => {
     const connection = getConnection()
     await connection.synchronize(true)
     done()
-  })
-
-  const assetAccount = AssetAccount.fromObject({
-    tokenID: 'tokenID',
-    symbol: 'symbol',
-    tokenName: 'tokenName',
-    decimal: '0',
-    balance: '0',
-    accountName: 'accountName',
-    blake160: '0x' + '0'.repeat(40)
-  })
-
-  const ckbAssetAccount = AssetAccount.fromObject({
-    tokenID: 'CKBytes',
-    symbol: 'CKB',
-    tokenName: 'CKBytes',
-    decimal: '8',
-    balance: '0',
-    accountName: 'accountName',
-    blake160: '0x' + '0'.repeat(40)
   })
 
   it("test for save relation", async () => {
@@ -208,9 +184,10 @@ describe('AssetAccountService', () => {
 
   describe('#getAll', () => {
     let anyoneCanPayLockHashes: string[]
+    const tokenID = '0x' + '0'.repeat(64)
+
     describe('with both sUDT and CKB accounts', () => {
       beforeEach(async () => {
-        const tokenID = '0x' + '0'.repeat(64)
         anyoneCanPayLockHashes = [
           assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
         ]
@@ -252,6 +229,7 @@ describe('AssetAccountService', () => {
     });
 
     describe('with only one newly created CKB cell under a ACP lock', () => {
+      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         const minCapacity = toShannon(61)
         anyoneCanPayLockHashes = [
@@ -279,6 +257,7 @@ describe('AssetAccountService', () => {
       })
     });
     describe('with no CKB cells under a ACP lock', () => {
+      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         anyoneCanPayLockHashes = [
           assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
@@ -305,6 +284,7 @@ describe('AssetAccountService', () => {
     });
 
     describe('with more than one CKB cells under a ACP lock', () => {
+      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         const minCapacity = toShannon(61)
         anyoneCanPayLockHashes = [
@@ -333,6 +313,73 @@ describe('AssetAccountService', () => {
         expect(result.length).toEqual(1)
         expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(100))
       });
+    });
+
+    describe('with only one newly created UDT cell under a ACP lock', () => {
+      let anyoneCanPayLockHashes: string[]
+      let result: any[]
+      beforeEach(async () => {
+        const minCapacity = toShannon(61)
+        anyoneCanPayLockHashes = [
+          assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
+        ]
+        const assetAccounts = [
+          AssetAccount.fromObject({
+            tokenID,
+            symbol: 'sUDT',
+            tokenName: 'sUDT',
+            decimal: '0',
+            balance: '0',
+            accountName: 'sUDT',
+            blake160,
+          }),
+        ]
+        const outputs = [generateOutput(tokenID, undefined, undefined, minCapacity, '0')]
+        await createAccounts(assetAccounts, outputs)
+        result = await AssetAccountService.getAll([blake160], anyoneCanPayLockHashes)
+      });
+      it('returns the sUDT asset account', () => {
+        expect(result.length).toEqual(1)
+      })
+      it('available balance equals to 0', async () => {
+        expect(result.find(a => a.tokenID === tokenID)?.balance).toEqual('0')
+      })
+    });
+
+    describe('with asset accounts having no live cells', () => {
+      let anyoneCanPayLockHashes: string[]
+      let result: any[]
+      beforeEach(async () => {
+        anyoneCanPayLockHashes = [
+          assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
+        ]
+        const assetAccounts = [
+          AssetAccount.fromObject({
+            tokenID,
+            symbol: 'sUDT',
+            tokenName: 'sUDT',
+            decimal: '0',
+            balance: '0',
+            accountName: 'sUDT',
+            blake160,
+          }),
+          AssetAccount.fromObject({
+            tokenID: 'CKBytes',
+            symbol: 'ckb',
+            tokenName: 'ckb',
+            decimal: '0',
+            balance: '0',
+            accountName: 'ckb',
+            blake160,
+          }),
+        ]
+        const outputs: any[] = []
+        await createAccounts(assetAccounts, outputs)
+        result = await AssetAccountService.getAll([blake160], anyoneCanPayLockHashes)
+      });
+      it('returns 0 asset accounts', () => {
+        expect(result.length).toEqual(0)
+      })
     });
   })
 
@@ -722,5 +769,34 @@ describe('AssetAccountService', () => {
 
       expect(result.length).toEqual(2)
     })
+  })
+
+  describe('Test Token Info List', () => {
+    beforeEach(async () => {
+      const tokens = [
+        {
+          tokenID: 'CKBytes',
+          symbol: 'ckb',
+          tokenName: 'ckb',
+          decimal: '0',
+        },
+        {
+          tokenID: tokenID,
+          symbol: 'udt',
+          tokenName: 'udt',
+          decimal: '0',
+        }
+      ]
+      const repo = getConnection().getRepository(SudtTokenInfoEntity)
+      await repo.save(tokens)
+    })
+
+    it('Get token info list', async () => {
+      const list = await AssetAccountService.getTokenInfoList()
+      expect(list.length).toEqual(2)
+      expect(list.find(item => item.tokenID === 'CKBytes')).toBeTruthy()
+      expect(list.find(item => item.tokenID === tokenID)).toBeTruthy()
+    })
+
   })
 })

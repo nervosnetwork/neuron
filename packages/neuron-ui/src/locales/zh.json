@@ -166,13 +166,12 @@
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
-      "copy-transaction-hash": "复制交易哈希",
       "no-txs": "没有交易记录",
       "view-in-explorer": "浏览器",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
-      "copy-tx-hash": "复制交易 Hash",
+      "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
       "copy-address": "复制地址"
     },
@@ -259,6 +258,21 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)"
+      },
+      "clear-cache": {
+        "title": "清除缓存",
+        "options": {
+          "refresh": {
+            "label": "刷新缓存"
+          },
+          "rebuild": {
+            "label": "重建索引 (需要 30 ~ 50 分钟)"
+          }
+        },
+        "buttons": {
+          "cancel": "取消",
+          "ok": "确认"
+        }
       }
     },
     "password-request": {
@@ -290,6 +304,7 @@
     "common": {
       "or": "或",
       "ok": "确认",
+      "dismiss": "关闭",
       "confirm": "确认",
       "open": "打开",
       "cancel": "取消",
@@ -298,7 +313,7 @@
         "on": "开",
         "off": "关"
       },
-      "copy-tx-hash": "复制交易 Hash",
+      "copy-tx-hash": "复制交易哈希",
       "copy-address": "复制地址",
       "select": "选择",
       "backup": "备份",
@@ -335,6 +350,7 @@
       "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
       "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
       "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
+      "rebuild-sync": "为了提供更好的用户体验，Neuron 采取了新的索引方案，该方案需要一次性重构缓存数据库(预期同步时间为 30~60 分钟)。\n抱歉给您带来不便。",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -359,13 +375,20 @@
       "codes": {
         "-3": "",
         "100": "余额不足。",
-        "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 61 CKB 的值。",
+        "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 {{required}} CKB 的值。",
         "102": "$t(messages.fields.{{fieldName}})无效。",
         "103": "$t(messages.fields.keystore-password) 不正确。",
         "104": "未连接到节点，请重启 Neuron。",
         "105": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
         "106": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者拖动滑块到最右端发送全部余额。",
         "107": "金额 {{amount}} CKB 太小, 含锁定时间转账需要输入一个不小于 69 CKB 的值。",
+        "108": "当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。",
+        "109": "余额不足。",
+        "110": "可用余额不足，请等待上一笔交易上链。",
+        "111": "未设置当前钱包。",
+        "112": "未找到钱包 {{id}}。",
+        "113": "Keystore 格式不正确，请检查文件完整性。",
+        "114": "最小转账金额为 {{bytes}} CKBytes。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}。",
@@ -377,12 +400,14 @@
         "209": "$t(messages.fields.{{fieldName}})不能包含空格。",
         "210": "\"{{value}}\" 是特殊值, 请重新输入。",
         "211": "金额不能为 0",
+        "212": "$t(messages.fields.{{fieldName}}) 太简单",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
         "303": "未找到$t(messages.fields.{{fieldName}})。",
         "304": "摄像头不可用或被禁用。",
         "305": "$t(messages.fields.address)不能为空。",
         "306": "请输入主网地址",
-        "307": "请输入测试网地址"
+        "307": "请输入测试网地址",
+        "308": "余额不足"
       }
     },
     "sync": {
@@ -407,6 +432,7 @@
       "free": "当前可用",
       "locked": "已锁定",
       "deposit": "存入",
+      "deposit-rules": "存款规则",
       "copy-balance": "复制余额",
       "deposit-records": "存入",
       "completed-records": "已解锁",

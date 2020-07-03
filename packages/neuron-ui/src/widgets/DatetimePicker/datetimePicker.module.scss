@@ -8,7 +8,7 @@ $width: 374px;
     width: $width;
     padding: 20px 0;
     border: 1px solid #eee;
-    box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
+    border-color: #eee transparent;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -114,7 +114,7 @@ $width: 374px;
         color: #000;
 
         font-size: 12px;
-        margin: auto 3px;
+        margin: auto 10px;
 
         &:not(.p-disabled):hover {
           color: #fff;
@@ -136,10 +136,6 @@ $width: 374px;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(2px);
-
-  .calendar {
-    display: none;
-  }
 
   .popup {
     display: flex;
@@ -189,12 +185,6 @@ $width: 374px;
     input {
       border-color: var(--nervos-green);
     }
-
-    &[data-status='edit'] {
-      .calendar {
-        display: flex;
-      }
-    }
   }
 
   .actions {
@@ -212,12 +202,10 @@ $width: 374px;
     @include regular-text;
     width: $width;
     font-size: 0.75rem;
-    letter-spacing: 0.5px;
 
     h5 {
       font-size: 0.875rem;
       font-weight: 600;
-      letter-spacing: 0.7px;
       padding: 0;
       margin: 22px auto 6px auto;
     }

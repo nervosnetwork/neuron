@@ -6,7 +6,7 @@ $infoHeight: 1.75rem;
   grid-template:
     'title title title' auto
     'free network-alert deposit' auto
-    'locked . deposit' auto
+    'locked . deposit-rules' auto
     'apc . .' auto
     'records records records' auto/
     minmax(350px, 500px) 35px 1fr;
@@ -83,6 +83,16 @@ $infoHeight: 1.75rem;
       @include disabled-button;
     }
   }
+}
+
+.depositRules {
+  grid-area: deposit-rules;
+  align-self: flex-end;
+  justify-self: flex-end;
+  color: #666;
+  font-size: 0.6875rem;
+  height: 1rem;
+  text-decoration: underline;
 }
 
 .records {

@@ -1,9 +1,14 @@
-import { remote } from 'electron'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+import path from 'path'
+import https from 'https'
+import http from 'http'
+import { remote, dialog, shell } from 'electron'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
-import https from 'https'
-import http from 'http'
+import env from 'env'
+import i18n from 'locales/i18n'
 import { ShouldBeTypeOf } from 'exceptions'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
@@ -38,7 +43,7 @@ class NodeService {
 
   public ckb: CKB = new CKB('')
 
-  constructor() {
+  constructor () {
     this.start()
     this.syncConnectionStatus()
     CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
@@ -58,8 +63,11 @@ class NodeService {
     const realtimeSync = this.connectionStatusSubject.pipe(distinctUntilChanged())
     merge(periodSync, realtimeSync)
       .pipe(debounceTime(500))
-      .subscribe(connectionStatus => {
-        ConnectionStatusSubject.next(connectionStatus)
+      .subscribe(connected => {
+        ConnectionStatusSubject.next({
+          url: this.ckb.node.url,
+          connected,
+        })
       })
   }
 
@@ -138,12 +146,65 @@ class NodeService {
       return false
     } catch (err) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
-      return startCkbNode().then(()=> true).catch(err => {
-        logger.info('CKB:\tfail to start bundled CKB with error:')
-        logger.error(err)
-        return false
-      })
+      const isReadyToStart = await this.detectDependency()
+      return isReadyToStart ? this.startNode() : this.showGuideDialog()
     }
+  }
+
+  private showGuideDialog = () => {
+    const I18N_PATH = `messageBox.ckb-dependency`
+    return dialog.showMessageBox({
+      type: 'info',
+      buttons: ['skip', 'install-and-exit'].map(label => i18n.t(`${I18N_PATH}.buttons.${label}`)),
+      defaultId: 1,
+      title: i18n.t(`${I18N_PATH}.title`),
+      message: i18n.t(`${I18N_PATH}.message`),
+      detail: i18n.t(`${I18N_PATH}.detail`),
+      cancelId: 0,
+      noLink: true,
+    }).then(({ response }) => {
+      switch (response) {
+        case 1: {
+          // open browser and shutdown
+          const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
+          shell.openExternal(VC_REDIST_URL)
+          env.app.quit()
+          return false
+        }
+        case 0:
+        default: {
+          // dismiss dialog and continue
+          return this.startNode()
+        }
+      }
+    })
+  }
+
+  private detectDependency = async () => {
+    if (process.platform !== 'win32') {
+      return true
+    }
+    const execPromise = promisify(exec)
+    const arches = process.arch === 'x64' ? ['x86', 'x64'] : ['x64']
+    const queries = arches.map(arch =>
+      `REG QUERY ` +
+      [`HKEY_LOCAL_MACHINE`, `SOFTWARE`, `Microsoft`, `VisualStudio`, `14.0`, `VC`, `Runtimes`, arch].join(path.sep))
+    const vcredists = await Promise.all(
+      queries.map(
+        query => execPromise(query)
+          .then(({ stdout }) => !!stdout)
+          .catch(() => false)
+      )
+    )
+    return vcredists.includes(true)
+  }
+
+  private startNode = () => {
+    return startCkbNode().then(() => true).catch(err => {
+      logger.info('CKB:\tfail to start bundled CKB with error:')
+      logger.error(err)
+      return false
+    })
   }
 }
 

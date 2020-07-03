@@ -27,34 +27,45 @@ const SYNC_INTERVAL_TIME = 4000
 const CONNECTING_BUFFER = 15_000
 let CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
 
+const isCurrentUrl = (url: string) => {
+  const id = currentNetworkIDCache.load()
+  const list = networksCache.load()
+  const cached = list.find(n => n.id === id)?.remote
+  return cached === url
+}
+
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {
     let timer: NodeJS.Timeout
     const syncBlockchainInfo = () => {
       Promise.all([getTipHeader(), getBlockchainInfo()])
         .then(([header, chainInfo]) => {
-          dispatch({
-            type: AppActions.UpdateChainInfo,
-            payload: {
-              tipBlockNumber: `${BigInt(header.number)}`,
-              tipBlockHash: header.hash,
-              tipBlockTimestamp: +header.timestamp,
-              chain: chainInfo.chain,
-              difficulty: BigInt(chainInfo.difficulty),
-              epoch: chainInfo.epoch,
-            },
-          })
+          if (isCurrentUrl(chainURL)) {
+            dispatch({
+              type: AppActions.UpdateChainInfo,
+              payload: {
+                tipBlockNumber: `${BigInt(header.number)}`,
+                tipBlockHash: header.hash,
+                tipBlockTimestamp: +header.timestamp,
+                chain: chainInfo.chain,
+                difficulty: BigInt(chainInfo.difficulty),
+                epoch: chainInfo.epoch,
+              },
+            })
 
-          dispatch({
-            type: AppActions.ClearNotificationsOfCode,
-            payload: ErrorCode.NodeDisconnected,
-          })
+            dispatch({
+              type: AppActions.ClearNotificationsOfCode,
+              payload: ErrorCode.NodeDisconnected,
+            })
+          }
         })
         .catch(() => {
-          dispatch({
-            type: NeuronWalletActions.UpdateConnectionStatus,
-            payload: Date.now() > CONNECTING_DEADLINE ? ConnectionStatus.Offline : ConnectionStatus.Connecting,
-          })
+          if (isCurrentUrl(chainURL)) {
+            dispatch({
+              type: NeuronWalletActions.UpdateConnectionStatus,
+              payload: Date.now() > CONNECTING_DEADLINE ? ConnectionStatus.Offline : ConnectionStatus.Connecting,
+            })
+          }
         })
     }
     clearInterval(timer!)
@@ -163,14 +174,16 @@ export const useSubscription = ({
       currentNetworkIDCache.save(currentNetworkID)
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
-      let payload = status ? ConnectionStatus.Online : ConnectionStatus.Offline
-      if (payload === ConnectionStatus.Offline && Date.now() <= CONNECTING_DEADLINE) {
-        payload = ConnectionStatus.Connecting
+      if (isCurrentUrl(status.url)) {
+        let payload = status.connected ? ConnectionStatus.Online : ConnectionStatus.Offline
+        if (payload === ConnectionStatus.Offline && Date.now() <= CONNECTING_DEADLINE) {
+          payload = ConnectionStatus.Connecting
+        }
+        dispatch({
+          type: NeuronWalletActions.UpdateConnectionStatus,
+          payload,
+        })
       }
-      dispatch({
-        type: NeuronWalletActions.UpdateConnectionStatus,
-        payload,
-      })
     })
 
     const syncedBlockNumberSubscription = SyncedBlockNumberSubject.subscribe(syncedBlockNumber => {

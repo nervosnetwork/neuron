@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
+import { syncRebuildNotification } from 'services/localCache'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -11,9 +12,22 @@ import {
   updateAddressDescription,
   setCurrentWallet,
 } from 'states'
-import { epochParser, RoutePath, GenesisBlockHash, ChainType } from 'utils'
-import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
-import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
+import {
+  epochParser,
+  RoutePath,
+  GenesisBlockHash,
+  ChainType,
+  isReadyByVersion,
+  calculateClaimEpochValue,
+  CONSTANTS,
+} from 'utils'
+import {
+  validateTokenId,
+  validateSUDTAccountName,
+  validateSymbol,
+  validateTokenName,
+  validateDecimal,
+} from 'utils/validators'
 
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
@@ -235,12 +249,12 @@ export const useSUDTAccountInfoErrors = ({
     const dataToValidate = {
       accountName: {
         params: { name: accountName, exists: existingAccountNames },
-        validator: verifySUDTAccountName,
+        validator: validateSUDTAccountName,
       },
-      symbol: { params: { symbol, isCKB }, validator: verifySymbol },
-      tokenId: { params: { tokenId, isCKB }, validator: verifyTokenId },
-      tokenName: { params: { tokenName, isCKB }, validator: verifyTokenName },
-      decimal: { params: { decimal }, validator: verifyDecimal },
+      symbol: { params: { symbol, isCKB }, validator: validateSymbol },
+      tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
+      tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
+      decimal: { params: { decimal }, validator: validateDecimal },
     }
 
     Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
@@ -432,4 +446,19 @@ export const useChainTypeByGenesisBlockHash = (url: string | null, cb: (chainTyp
       }
     }
   }, [url, cb])
+}
+
+export const useGlobalNotifications = (
+  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>
+) => {
+  useEffect(() => {
+    const lastVersion = syncRebuildNotification.load()
+    if (isReadyByVersion(+CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion ? +lastVersion : null)) {
+      syncRebuildNotification.save()
+      dispatch({
+        type: AppActions.SetGlobalDialog,
+        payload: 'rebuild-sync',
+      })
+    }
+  }, [dispatch])
 }

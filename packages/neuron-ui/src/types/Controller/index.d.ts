@@ -281,4 +281,21 @@ declare namespace Controller {
       walletID: string
     }
   }
+
+  namespace GetTokenInfoList {
+    interface TokenInfo {
+      tokenID: string
+      symbol: string
+      tokenName: string
+      decimal: string
+    }
+    type Response = TokenInfo[]
+  }
+
+  namespace ClearCache {
+    interface Params {
+      resetIndexerData: boolean
+    }
+    type Response = boolean
+  }
 }

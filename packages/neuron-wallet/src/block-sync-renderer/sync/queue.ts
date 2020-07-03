@@ -1,251 +1,197 @@
 import { ipcRenderer } from 'electron'
-import { BehaviorSubject, Subscription } from 'rxjs'
-
+import { queue, AsyncQueue } from 'async'
 import { TransactionPersistor } from 'services/tx'
-import NodeService from 'services/node'
 import WalletService from 'services/wallets'
 import RpcService from 'services/rpc-service'
 import OutPoint from 'models/chain/out-point'
-import Block from 'models/chain/block'
-import BlockHeader from 'models/chain/block-header'
+import Transaction from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import ArrayUtils from 'utils/array'
-import CommonUtils from 'utils/common'
-import logger from 'utils/logger'
-import RangeForCheck, { CheckResultType } from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
-import { LiveCellPersistor } from 'services/tx/livecell-persistor'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
+import { Address as AddressInterface } from 'database/address/address-dao'
+import AddressParser from 'models/address-parser'
+import MultiSign from 'models/multi-sign'
+import IndexerConnector from './indexer-connector'
+import IndexerCacheService from './indexer-cache-service'
 
 export default class Queue {
   private lockHashes: string[]
+  private url: string
+  private addresses: AddressInterface[]
   private rpcService: RpcService
-
+  private indexerConnector: IndexerConnector | undefined
+  private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
   private currentBlockNumber = BigInt(0)
-  private endBlockNumber = BigInt(0)
-  private rangeForCheck: RangeForCheck
-
-  private fetchSize: number = 4
-
-  private tipNumberSubject: BehaviorSubject<string>
-  private tipNumberListener: Subscription | undefined
-
-  private stopped: boolean = false
-  private inProcess: boolean = false
-
-  private yieldTime = 1
 
   private multiSignBlake160s: string[]
-
-  private assetAccountInfo: AssetAccountInfo | undefined
-
   private anyoneCanPayLockHashes: string[]
+  private assetAccountInfo: AssetAccountInfo
 
-  constructor(url: string, lockHashes: string[], anyoneCanPayLockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
-    this.lockHashes = lockHashes
-    this.currentBlockNumber = startBlockNumber
+  constructor(url: string, addresses: AddressInterface[]) {
+    this.url = url
+    this.addresses = addresses
     this.rpcService = new RpcService(url)
-    this.rangeForCheck = new RangeForCheck(url)
-    this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
-    this.multiSignBlake160s = multiSignBlake160s
-    this.anyoneCanPayLockHashes = anyoneCanPayLockHashes
+    this.assetAccountInfo = new AssetAccountInfo()
 
-    try {
-      this.assetAccountInfo = new AssetAccountInfo()
-    } catch(e) {
-      logger.info(`instance AssetAccountInfo error: ${e}`)
-    }
+    this.lockHashes = AddressParser.batchToLockHash(
+      this.addresses.map(meta => meta.address)
+    )
+
+    const multiSign = new MultiSign()
+    const blake160s = this.addresses.map(meta => meta.blake160)
+    this.multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
+    this.anyoneCanPayLockHashes = blake160s.map(
+      b => this.assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
+    )
   }
 
-  public start = async () => {
-    await this.expandToTip(await this.rpcService.getTipBlockNumber())
+  public async start() {
+    this.indexerConnector = new IndexerConnector(
+      this.addresses,
+      this.url
+    )
+    this.indexerConnector.connect()
+    this.indexerConnector.blockTipSubject.subscribe(tip => {
+      this.updateCurrentBlockNumber(BigInt(tip.block_number))
+    });
 
-    this.tipNumberListener = this.tipNumberSubject.subscribe(async num => {
-      if (num) {
-        await this.expandToTip(num)
+    this.checkAndSaveQueue = queue(async (task: any) => {
+      const {transactions} = task
+      await this.checkAndSave(transactions)
+
+      const firstTx = transactions.shift()
+      if (firstTx) {
+        await this.indexerConnector!.notifyCurrentBlockNumberProcessed(firstTx.blockNumber!)
       }
     })
 
-    while (!this.stopped) {
-      try {
-        this.inProcess = true
+    this.checkAndSaveQueue.error((err: any, task: any) => {
+      console.error(err, task)
+    })
 
-        if (this.lockHashes.length !== 0) {
-          const startNumber = this.currentBlockNumber
-          const endNumber = this.currentBlockNumber + BigInt(this.fetchSize)
-          const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
-
-          if (realEndNumber >= this.endBlockNumber) {
-            this.yieldTime = 1000
-          } else {
-            this.yieldTime = 1
-          }
-
-          if (realEndNumber >= startNumber) {
-            const rangeArr = ArrayUtils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
-            await this.pipeline(rangeArr)
-          }
+    this.indexerConnector.transactionsSubject
+      .subscribe(transactions => {
+        const task = {
+          transactions: transactions.map(
+            transactionWithStatus => transactionWithStatus.transaction
+          )
         }
-      } catch (err) {
-        if (err.message.startsWith('connect ECONNREFUSED')) {
-          logger.debug(`Sync:\terror:`, err)
-        } else {
-          logger.error(`Sync:\terror:`, err)
-        }
-      } finally {
-        await CommonUtils.sleep(this.yieldTime)
-        this.inProcess = false
-      }
-    }
+        this.checkAndSaveQueue!.push(task)
+      })
+
+  }
+
+  public getIndexerConnector(): IndexerConnector {
+    return this.indexerConnector!
   }
 
   public stop = () => {
-    if (this.tipNumberListener) {
-      this.tipNumberListener.unsubscribe()
-    }
-    this.stopped = true
+    this.indexerConnector!.pollingIndexer = false
   }
 
-  public waitForDrained = async (timeout: number = 5000) => {
-    const startAt: number = +new Date()
-    while (this.inProcess) {
-      const now: number = +new Date()
-      if (now - startAt > timeout) {
-        return
+  public waitForDrained = async () => {
+    return new Promise(resolve => {
+      if (!this.checkAndSaveQueue?.idle()) {
+        return resolve()
       }
-      await CommonUtils.sleep(50)
-    }
+      this.checkAndSaveQueue?.drain(resolve)
+    })
   }
 
-  public stopAndWait = async (timeout: number = 5000) => {
+  public stopAndWait = async () => {
     this.stop()
-    await this.waitForDrained(timeout)
+    await this.waitForDrained()
   }
 
-  public pipeline = async (blockNumbers: string[]) => {
-    // 1. get blocks
-    const blocks: Block[] = await this.rpcService.getRangeBlocks(blockNumbers)
-    const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
-
-    // 2. check blockHeaders
-    const checkResult = await this.checkBlockHeader(blockHeaders)
-
-    if (checkResult.type === CheckResultType.FirstNotMatch) {
-      return
-    }
-
-    // 3. check and save
-    await this.checkAndSave(blocks)
-
-    // 4. update currentBlockNumber
-    const lastBlock = blocks[blocks.length - 1]
-    this.updateCurrentBlockNumber(BigInt(lastBlock.header.number) + BigInt(1))
-
-    // 5. update range
-    this.rangeForCheck.pushRange(blockHeaders)
-  }
-
-  private skipLiveCell = async (blockNumber: string) => {
-    if (!this.assetAccountInfo) {
-      return true
-    }
-    const lastBlockNumber = await LiveCellPersistor.lastBlockNumber()
-    return BigInt(lastBlockNumber) - LiveCellPersistor.CONFIRMATION_THRESHOLD > BigInt(blockNumber)
-  }
-
-  private checkAndSave = async (blocks: Block[]): Promise<void> => {
+  private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
-    const skipLiveCell = await this.skipLiveCell(blocks[0].header.number)
 
-    for (const block of blocks) {
-      if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
-        logger.info(`Sync:\tscanning from block #${block.header.number}`)
-      }
-      for (const [i, tx] of block.transactions.entries()) {
-        if (!skipLiveCell) {
-          await LiveCellPersistor.saveTxLiveCells(tx, this.assetAccountInfo!.anyoneCanPayCodeHash)
+    const fetchTxQueue = queue(async (task: any) => {
+      const {txHash} = task
+
+      const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
+      cachedPreviousTxs.set(txHash, previousTxWithStatus)
+    }, 100)
+
+    const drainFetchTxQueue = new Promise((resolve, reject) => {
+      fetchTxQueue.error(reject)
+      fetchTxQueue.drain(resolve)
+    })
+
+    const txHashSet = new Set()
+    for (const [, tx] of transactions.entries()) {
+      for (const [, input] of tx.inputs.entries()) {
+        const previousTxHash = input.previousOutput!.txHash
+        if (previousTxHash === `0x${'0'.repeat(64)}`) {
+          continue;
         }
-        const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
-          this.lockHashes,
-          this.anyoneCanPayLockHashes,
-          tx,
-          this.multiSignBlake160s
-        ).addresses()
-        if (shouldSave) {
-          if (i > 0) {
-            for (const [inputIndex, input] of tx.inputs.entries()) {
-              const previousTxHash = input.previousOutput!.txHash
-              let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
-              if (!previousTxWithStatus) {
-                previousTxWithStatus = await this.rpcService.getTransaction(previousTxHash)
-                cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
-              }
-              const previousTx = previousTxWithStatus!.transaction
-              const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-              const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
-              input.setLock(previousOutput.lock)
-              previousOutput.type && input.setType(previousOutput.type)
-              input.setData(previousOutputData)
-              input.setCapacity(previousOutput.capacity)
-              input.setInputIndex(inputIndex.toString())
 
-              if (
-                previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
-                previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
-              ) {
-                const output = tx.outputs![inputIndex]
-                if (output) {
-                  output.setDepositOutPoint(new OutPoint(
-                    input.previousOutput!.txHash,
-                    input.previousOutput!.index,
-                  ))
-                }
-              }
+        if (txHashSet.has(previousTxHash)) {
+          continue;
+        }
+
+        fetchTxQueue.push({txHash: previousTxHash})
+        txHashSet.add(previousTxHash)
+      }
+    }
+
+    if (!fetchTxQueue.idle()) {
+      await drainFetchTxQueue
+    }
+
+    for (const [, tx] of transactions.entries()) {
+      const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
+        this.lockHashes,
+        this.anyoneCanPayLockHashes,
+        tx,
+        this.multiSignBlake160s
+      ).addresses()
+      if (shouldSave) {
+        for (const [inputIndex, input] of tx.inputs.entries()) {
+          const previousTxHash = input.previousOutput!.txHash
+          const previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
+          if (!previousTxWithStatus) {
+            continue
+          }
+
+          const previousTx = previousTxWithStatus!.transaction
+          const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+          const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
+          input.setLock(previousOutput.lock)
+          previousOutput.type && input.setType(previousOutput.type)
+          input.setData(previousOutputData)
+          input.setCapacity(previousOutput.capacity)
+          input.setInputIndex(inputIndex.toString())
+
+          if (
+            previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
+            previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+          ) {
+            const output = tx.outputs![inputIndex]
+            if (output) {
+              output.setDepositOutPoint(new OutPoint(
+                input.previousOutput!.txHash,
+                input.previousOutput!.index,
+              ))
             }
           }
-          await TransactionPersistor.saveFetchTx(tx)
-          const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
-          await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
-          for (const info of anyoneCanPayInfos) {
-            await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
-          }
+        }
+        await TransactionPersistor.saveFetchTx(tx)
+        const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
+        await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
+        for (const info of anyoneCanPayInfos) {
+          await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
       }
+      await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
     cachedPreviousTxs.clear()
   }
 
-  private checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
-    const checkResult = this.rangeForCheck.check(blockHeaders)
-    if (!checkResult.success) {
-      if (checkResult.type === CheckResultType.FirstNotMatch) {
-        const range = await this.rangeForCheck.getRange(this.currentBlockNumber)
-        const rangeFirstBlockHeader: BlockHeader = range[0]
-        this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
-        this.rangeForCheck.clearRange()
-        await AssetAccountService.checkAndDeleteWhenFork(rangeFirstBlockHeader.number, this.anyoneCanPayLockHashes)
-        await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
-        if (!this.assetAccountInfo) {
-          await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)
-        }
-      }
-
-      throw new Error(`chain forked: ${checkResult.type}`)
-    }
-
-    return checkResult
-  }
-
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    ipcRenderer.invoke('synced-block-number-updated', (this.currentBlockNumber - BigInt(1)).toString())
-  }
-
-  private async expandToTip(tipNumber: string) {
-    if (BigInt(tipNumber) > BigInt(0)) {
-      this.endBlockNumber = BigInt(tipNumber)
-    }
+    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
   }
 }

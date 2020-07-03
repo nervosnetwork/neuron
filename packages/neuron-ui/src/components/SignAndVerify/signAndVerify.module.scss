@@ -2,6 +2,9 @@
 $inputHeight: 26px;
 
 .container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   .title {
     @include bold-text;
     font-size: 1.375rem;
@@ -19,7 +22,7 @@ $inputHeight: 26px;
     font-weight: 600;
   }
 
-  input,
+  .addrInput,
   textarea {
     @include regular-text;
     font-size: 12px !important;
@@ -29,15 +32,18 @@ $inputHeight: 26px;
     border: 1px solid #000;
     padding: 6px 12px;
     box-sizing: border-box;
-    margin-bottom: 18px;
   }
 
   textarea {
-    height: 74px;
+    flex: 1;
+    margin-bottom: 18px;
   }
 
-  input {
+  .addrInput {
     height: $inputHeight;
+  }
+  .signatureField [class^='textField_input']:focus-within {
+    border-color: #000;
   }
 }
 
@@ -52,6 +58,7 @@ $inputHeight: 26px;
 
 .address {
   position: relative;
+  margin-bottom: 18px;
 
   .dropdownBtn {
     position: absolute;
@@ -139,6 +146,7 @@ $inputHeight: 26px;
     }
 
     .addrList {
+      z-index: 1;
       max-height: 180px;
       opacity: 1;
     }
@@ -165,7 +173,16 @@ $inputHeight: 26px;
 }
 
 .passwordDialog {
-  width: 400px;
+  @include dialog-container;
+  padding: 30px 50px;
+
+  &::backdrop {
+    @include overlay;
+  }
+
+  .actions {
+    @include dialog-footer;
+  }
 
   h2 {
     @include bold-text;
@@ -177,10 +194,6 @@ $inputHeight: 26px;
 
   input {
     margin: auto;
-  }
-
-  .actions {
-    @include dialog-footer;
   }
 }
 

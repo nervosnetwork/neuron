@@ -262,7 +262,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: hasCurrentWallet,
         click: () => {
           const currentWallet = walletsService.getCurrent()
-          showWindow(`#/sign-verify/${currentWallet!.id}`, i18n.t(`messageBox.sign-and-verify.title`))
+          showWindow(`#/sign-verify/${currentWallet!.id}`, i18n.t(`messageBox.sign-and-verify.title`), {
+            width: 900,
+          })
         }
       }
     ]

@@ -1,7 +1,7 @@
 import os from 'os'
 import path from 'path'
-import { app as electronApp, remote } from 'electron'
 import dotenv from 'dotenv'
+import { app as electronApp, remote } from 'electron'
 
 const app = electronApp ?? (remote?.app) ?? {
   getPath(aPath: string): string {

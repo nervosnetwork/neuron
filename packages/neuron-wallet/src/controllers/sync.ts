@@ -5,12 +5,8 @@ import { ResponseCode } from 'utils/const'
 import AddressDao from 'database/address/address-dao'
 
 export default class SyncController {
-  public async clearCache() {
-    killBlockSyncTask()
-    AddressDao.resetAddresses()
-    await ChainCleaner.clean()
-    await createBlockSyncTask(true)
-
+  public async clearCache(clearIndexerFolder: boolean = false) {
+    await this.doClearTask(clearIndexerFolder)
     return {
       status: ResponseCode.Success,
       result: true
@@ -27,5 +23,12 @@ export default class SyncController {
         currentBlockNumber: current.toString(),
       },
     }
+  }
+
+  private doClearTask = async (clearIndexerFolder: boolean) => {
+    killBlockSyncTask()
+    AddressDao.resetAddresses()
+    await ChainCleaner.clean()
+    await createBlockSyncTask(clearIndexerFolder)
   }
 }

@@ -54,21 +54,27 @@ export default class AssetAccountService {
 
     // key: blake160:tokenID(typeArgs | CKBytes)
     // value: total balance
-    const sumOfAmountMap = new Map<string, bigint>()
+    const totalBalanceMap = new Map<string, bigint>()
+    const totalCKBAmountMap = new Map<string, bigint>()
     outputs.forEach(output => {
       const blake160 = output.lockArgs
       const tokenID = output.typeArgs || 'CKBytes'
       const isCKB = !output.typeArgs
       const key = generateSumAmountMapKey(blake160, tokenID)
-      const old = sumOfAmountMap.get(key) || BigInt(0)
+
+      const lastCKBAmount = totalCKBAmountMap.get(key) || BigInt(0)
+      totalCKBAmountMap.set(key, lastCKBAmount + BigInt(output.sumOfCapacity))
+
+      const lastBalance = totalBalanceMap.get(key) || BigInt(0)
+
       if (isCKB) {
-        sumOfAmountMap.set(key, old + BigInt(output.sumOfCapacity))
+        totalBalanceMap.set(key, lastBalance + BigInt(output.sumOfCapacity))
       } else {
         const sumOfAmount = (output.dataArray as string)
           .split(',')
           .map(data => BufferUtils.parseAmountFromSUDTData(data.trim()))
           .reduce((result, c) => result + c, BigInt(0))
-        sumOfAmountMap.set(key, old + sumOfAmount)
+        totalBalanceMap.set(key, lastBalance + sumOfAmount)
       }
     })
 
@@ -76,13 +82,13 @@ export default class AssetAccountService {
       .filter(aa => {
         const tokenID = determineTokenID(aa)
         const key = generateSumAmountMapKey(aa.blake160, tokenID)
-        return sumOfAmountMap.get(key)
+        return totalCKBAmountMap.get(key)
       })
       .map(aa => {
         const model = aa.toModel()
         const tokenID = determineTokenID(aa)
         const key = generateSumAmountMapKey(aa.blake160, tokenID)
-        const totalBalance = sumOfAmountMap.get(key) || BigInt(0)
+        const totalBalance = totalBalanceMap.get(key) || BigInt(0)
 
         if (tokenID === 'CKBytes') {
           const reservedBalance = BigInt(MIN_CELL_CAPACITY)
@@ -350,5 +356,10 @@ export default class AssetAccountService {
       assetAccount.sudtTokenInfo.decimal = params.decimal
     }
     return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
+  }
+
+  public static getTokenInfoList() {
+    const repo = getConnection().getRepository(SudtTokenInfoEntity)
+    return repo.find().then(list => list.map(item => item.toModel()))
   }
 }

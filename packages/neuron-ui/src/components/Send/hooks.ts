@@ -11,8 +11,8 @@ import {
   CKBToShannonFormatter,
   shannonToCKBFormatter,
   calculateFee,
-  verifyTransactionOutputs,
-  verifyAddress,
+  validateOutputs,
+  validateAddress,
 } from 'utils'
 import i18n from 'utils/i18n'
 
@@ -34,6 +34,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   setTotalAmount,
   setErrorMessage,
   updateTransactionOutput,
+  isMainnet,
   dispatch,
   t,
 }: {
@@ -43,6 +44,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   setTotalAmount: Function
   setErrorMessage: Function
   updateTransactionOutput?: Function
+  isMainnet: boolean
   dispatch: StateDispatch
   t: TFunction
 }) => {
@@ -57,7 +59,8 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
       console.warn(err)
     }
   }
-  if (verifyTransactionOutputs(items, type === 'all')) {
+  try {
+    validateOutputs(items, isMainnet, type === 'all')
     const realParams = {
       walletID,
       items: items.map(item => ({
@@ -100,6 +103,8 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
         setErrorMessage(err.message)
         return undefined
       })
+  } catch {
+    // ignore
   }
   dispatch({
     type: AppActions.UpdateGeneratedTx,
@@ -146,6 +151,7 @@ const useOnTransactionChange = (
   walletID: string,
   items: State.Output[],
   price: string,
+  isMainnet: boolean,
   dispatch: StateDispatch,
   isSendMax: boolean,
   setTotalAmount: Function,
@@ -169,21 +175,26 @@ const useOnTransactionChange = (
         price,
         setTotalAmount,
         setErrorMessage,
+        isMainnet,
         dispatch,
         t,
       })
     }, 300)
-  }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage, t])
+  }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage, t, isMainnet])
 }
 
-const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =>
+const useOnSubmit = (items: Readonly<State.Output[]>, isMainnet: boolean, dispatch: StateDispatch) =>
   useCallback(
     (e: React.FormEvent) => {
       const {
-        dataset: { walletId },
+        dataset: { walletId, status },
       } = e.target as HTMLFormElement
       e.preventDefault()
-      if (verifyTransactionOutputs(items)) {
+      if (status !== 'ready') {
+        return
+      }
+      try {
+        validateOutputs(items, isMainnet)
         dispatch({
           type: AppActions.RequestPassword,
           payload: {
@@ -191,9 +202,11 @@ const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =
             actionType: 'send',
           },
         })
+      } catch {
+        // ignore
       }
     },
-    [dispatch, items]
+    [dispatch, items, isMainnet]
   )
 
 const useOnItemChange = (updateTransactionOutput: Function) =>
@@ -258,6 +271,7 @@ export const useInitialize = (
   generatedTx: any | null,
   price: string,
   sending: boolean,
+  isMainnet: boolean,
   dispatch: React.Dispatch<any>,
   t: TFunction
 ) => {
@@ -279,7 +293,7 @@ export const useInitialize = (
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
   const onDescriptionChange = useSendDescriptionChange(dispatch)
-  const onSubmit = useOnSubmit(items, dispatch)
+  const onSubmit = useOnSubmit(items, isMainnet, dispatch)
   const onClear = useClear(dispatch)
 
   const updateSendingAllTransaction = useCallback(() => {
@@ -290,6 +304,7 @@ export const useInitialize = (
       setTotalAmount,
       setErrorMessage,
       updateTransactionOutput,
+      isMainnet,
       dispatch,
       t,
     }).then(tx => {
@@ -297,7 +312,7 @@ export const useInitialize = (
         setIsSendMax(false)
       }
     })
-  }, [walletID, updateTransactionOutput, price, items, dispatch, t])
+  }, [walletID, updateTransactionOutput, price, items, dispatch, t, isMainnet])
 
   const onSendMaxClick = useCallback(() => {
     if (!isSendMax) {
@@ -327,10 +342,13 @@ export const useInitialize = (
             )
           )
           for (let i = 0; i < codes.length; i++) {
-            if (codes[i] && codes[i]!.data && verifyAddress(codes[i]!.data)) {
+            try {
+              validateAddress(codes[i]?.data ?? '', isMainnet)
               updateTransactionOutput('address')(+idx)(codes[i]!.data)
               ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
               return
+            } catch {
+              // ignore
             }
           }
           showErrorMessage(i18n.t('messages.error'), i18n.t('messages.no-valid-addresses-found'))
@@ -338,7 +356,7 @@ export const useInitialize = (
         }, 100)
       }
     },
-    [updateTransactionOutput]
+    [updateTransactionOutput, isMainnet]
   )
 
   useEffect(() => {

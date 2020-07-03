@@ -86,6 +86,7 @@ declare namespace State {
   }
 
   type AlertDialog = Readonly<{ title: string; message: string }> | null
+  type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
 
   interface App {
     readonly tipBlockNumber: string
@@ -102,7 +103,7 @@ declare namespace State {
     }
     readonly popups: Readonly<Popup[]>
     readonly notifications: Readonly<Message[]>
-    readonly globalDialog: 'unlock-success' | null
+    readonly globalDialog: GlobalDialogType
     readonly alertDialog: AlertDialog
     readonly loadings: Readonly<{
       sending: boolean

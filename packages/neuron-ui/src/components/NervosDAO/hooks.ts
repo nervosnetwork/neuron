@@ -11,7 +11,7 @@ import {
   CKBToShannonFormatter,
   shannonToCKBFormatter,
   isSuccessResponse,
-  verifyAmount,
+  validateAmount,
 } from 'utils'
 
 import {
@@ -146,9 +146,10 @@ export const useUpdateDepositValue = ({
         setErrorMessage('')
         clearGeneratedTx()
 
-        const verifyRes = verifyAmount(amount)
-        if (verifyRes !== true) {
-          setErrorMessage(t(`messages.codes.${verifyRes.code}`, { fieldName: 'deposit', length: MAX_DECIMAL_DIGITS }))
+        try {
+          validateAmount(amount)
+        } catch (err) {
+          setErrorMessage(t(`messages.codes.${err.code}`, { fieldName: 'deposit', length: MAX_DECIMAL_DIGITS }))
           return
         }
 

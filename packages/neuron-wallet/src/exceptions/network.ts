@@ -1,20 +1,20 @@
-import i18n from 'locales/i18n'
+import { t } from 'locales/i18n'
 
 export class NetworkNotFound extends Error {
   constructor(id: string) {
-    super(i18n.t('messages.network-not-found', { id }))
+    super(t('messages.network-not-found', { id }))
   }
 }
 
 export class DefaultNetworkUnremovable extends Error {
   constructor() {
-    super(i18n.t('messages.default-network-unremovable'))
+    super(t('messages.default-network-unremovable'))
   }
 }
 
 export class CurrentNetworkNotSet extends Error {
   constructor() {
-    super(i18n.t('messages.current-network-not-set'))
+    super(t('messages.current-network-not-set'))
   }
 }
 

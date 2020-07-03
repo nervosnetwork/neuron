@@ -1,15 +1,14 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { action } from '@storybook/addon-actions'
 import GlobalDialog from 'widgets/GlobalDialog'
 
 const stories = storiesOf('Global Dialog', module)
-stories.add('Basic', () => {
-  return (
-    <GlobalDialog
-      type="unlock-success"
-      onDismiss={() => {
-        console.info('dismiss')
-      }}
-    />
-  )
+
+const types: State.GlobalDialogType[] = ['unlock-success', 'rebuild-sync', null]
+
+types.forEach(type => {
+  stories.add(type || 'Null', () => {
+    return <GlobalDialog type={type} onDismiss={action('Dismiss')} />
+  })
 })

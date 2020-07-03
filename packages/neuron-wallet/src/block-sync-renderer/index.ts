@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { Address, AddressVersion } from 'database/address/address-dao'
@@ -10,11 +10,13 @@ import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
-import MultiSign from 'models/multi-sign'
 import AssetAccountInfo from 'models/asset-account-info'
+import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
+import IndexerFolderManager from './sync/indexer-folder-manager'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
+let indexerQueryId: number = 0
 
 const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
   const addrs = AddressService.allAddresses()
@@ -26,12 +28,14 @@ const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: 
   await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
 }
 
-AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
-  // Force rescan when address is imported and there's no previous records (from existing identical wallet)
-  const shouldRescan = addresses.some(address => address.isImporting === true)
-  killBlockSyncTask()
-  await createBlockSyncTask(shouldRescan)
-})
+if (BrowserWindow) {
+  AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
+    // Force rescan when address is imported and there's no previous records (from existing identical wallet)
+    const shouldRescan = addresses.some(address => address.isImporting === true)
+    killBlockSyncTask()
+    await createBlockSyncTask(shouldRescan)
+  })
+}
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
   const previousNetwork = network
@@ -58,11 +62,12 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   }
 }
 
-export const createBlockSyncTask = async (rescan = false) => {
+export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   await CommonUtils.sleep(2000) // Do not start too fast
 
-  if (rescan) {
+  if (clearIndexerFolder) {
     await new SyncedBlockNumber().setNextBlock(BigInt(0))
+    IndexerFolderManager.resetIndexerData()
   }
 
   if (backgroundWindow) {
@@ -98,22 +103,12 @@ export const createBlockSyncTask = async (rescan = false) => {
       // re init txCount in addresses if switch network
       await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
       if (backgroundWindow) {
-        const lockHashes = AddressService.allLockHashes()
-        const blake160s = AddressService.allAddresses().map(address => address.blake160)
-        const multiSign = new MultiSign()
-        const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
-        const assetAccountInfo = new AssetAccountInfo(network.genesisHash)
-        const anyoneCanPayLockHashes: string[] = blake160s
-          .map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
-
+        const addressesMetas = AddressService.allAddresses()
         backgroundWindow.webContents.send(
           "block-sync:start",
           network.remote,
           network.genesisHash,
-          lockHashes,
-          anyoneCanPayLockHashes,
-          startBlockNumber,
-          multiSignBlake160s
+          addressesMetas
         )
       }
     }
@@ -131,4 +126,18 @@ export const killBlockSyncTask = () => {
     logger.info('Sync:\tkill background process')
     backgroundWindow.close()
   }
+}
+
+export const queryIndexer = (query: LumosCellQuery): Promise<LumosCell[]> => {
+  indexerQueryId ++
+  return new Promise(resolve => {
+    ipcMain.once(`block-sync:query-indexer:${indexerQueryId}`, (_event, results) => {
+      resolve(results)
+    });
+    backgroundWindow!.webContents.send(
+      "block-sync:query-indexer",
+      query,
+      indexerQueryId
+    )
+  })
 }

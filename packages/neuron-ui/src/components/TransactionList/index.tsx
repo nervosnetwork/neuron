@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from 'office-ui-fabric-react'
 import { ReactComponent as Detail } from 'widgets/Icons/Detail.svg'
 import TextField from 'widgets/TextField'
-import CKBAvatar from 'widgets/Icons/CKBAvatar.png'
+import { ReactComponent as CKBAvatar } from 'widgets/Icons/Nervos.svg'
 import { ReactComponent as Success } from 'widgets/Icons/Success.svg'
 import { ReactComponent as Pending } from 'widgets/Icons/Pending.svg'
 import { ReactComponent as Failure } from 'widgets/Icons/Failure.svg'
@@ -84,7 +84,7 @@ const TransactionList = ({
           },
         },
         {
-          label: t('history.copy-transaction-hash'),
+          label: t('history.copy-tx-hash'),
           click: () => {
             window.clipboard.writeText(hash)
           },
@@ -189,7 +189,11 @@ const TransactionList = ({
               onKeyPress={() => {}}
             >
               <div className={styles.avatar}>
-                {tx.sudtInfo?.sUDT ? <SUDTAvatar name={name} type="token" /> : <img src={CKBAvatar} alt="avatar" />}
+                {tx.sudtInfo?.sUDT ? (
+                  <SUDTAvatar name={name} type="token" style={{ width: '30px', height: '30px' }} />
+                ) : (
+                  <CKBAvatar />
+                )}
               </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
               <CopyZone className={styles.amount} content={amount.replace(/[^\d\\.+-]/g, '')}>

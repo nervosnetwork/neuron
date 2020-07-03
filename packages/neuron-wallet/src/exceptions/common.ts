@@ -1,25 +1,25 @@
-import i18n from 'locales/i18n'
+import { t } from 'locales/i18n'
 
 export class InvalidName extends Error {
   constructor(field: string) {
-    super(i18n.t('messages.invalid-name', { field }))
+    super(t('messages.invalid-name', { field }))
   }
 }
 
 export class UsedName extends Error {
   constructor(field: string) {
-    super(i18n.t('messages.used-name', { field }))
+    super(t('messages.used-name', { field }))
   }
 }
 export class IsRequired extends Error {
   constructor(field: string) {
-    super(i18n.t('messages.is-required', { field }))
+    super(t('messages.is-required', { field }))
   }
 }
 
 export class MissingRequiredArgument extends Error {
   constructor() {
-    super(i18n.t('messages.missing-required-argument'))
+    super(t('messages.missing-required-argument'))
   }
 }
 
@@ -30,19 +30,19 @@ export class ServiceHasNoResponse extends Error {
 }
 export class InvalidFormat extends Error {
   constructor(field: string) {
-    super(i18n.t('messages.invalid-format', { field }))
+    super(t('messages.invalid-format', { field }))
   }
 }
 
 export class ShouldBeTypeOf extends Error {
   constructor(field: string, type: string) {
-    super(i18n.t('should-be-type-of', { field, type }))
+    super(t('should-be-type-of', { field, type }))
   }
 }
 
 export class InvalidJSON extends Error {
   constructor() {
-    super(i18n.t('messages.invalid-json'))
+    super(t('messages.invalid-json'))
   }
 }
 
