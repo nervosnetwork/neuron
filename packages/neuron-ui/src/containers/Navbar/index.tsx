@@ -77,7 +77,7 @@ const Navbar = () => {
 
   useChainTypeByGenesisBlockHash(networkURL, toggleSUDT)
 
-  const selectedKey = menuItems.find(item => item.key === pathname)?.key ?? null
+  const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
   const syncStatus = getSyncStatus({
     syncedBlockNumber,
