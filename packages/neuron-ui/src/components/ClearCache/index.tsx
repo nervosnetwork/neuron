@@ -96,7 +96,6 @@ const ClearCache = ({ dispatch }: { dispatch: StateDispatch }) => {
       <dialog ref={dialogRef} className={styles.dialog}>
         <img src={WarningIcon} alt="warning" className={styles.warningIcon} />
         <div className={styles.title}>{t(`${I18N_PATH}.title`)}</div>
-        <div className={styles.message}>{t(`${I18N_PATH}.detail`)}</div>
         <div className={styles.options}>
           <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
           <label htmlFor={IDs.refreshCacheOption}>{t(`${I18N_PATH}.options.refresh.label`)}</label>

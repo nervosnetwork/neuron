@@ -261,7 +261,6 @@
       },
       "clear-cache": {
         "title": "Clear Cache",
-        "detail": "Are you sure to clear cache?",
         "options": {
           "refresh": {
             "label": "Refresh"

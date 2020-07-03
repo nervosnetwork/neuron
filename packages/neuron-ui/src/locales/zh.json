@@ -261,7 +261,6 @@
       },
       "clear-cache": {
         "title": "清除缓存",
-        "detail": "是否确认清除缓存？",
         "options": {
           "refresh": {
             "label": "刷新缓存"

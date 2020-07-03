@@ -29,7 +29,7 @@
 
 .dialog {
   @include dialog-container;
-  padding: 30px 50px 30px 110px;
+  padding: 30px 50px 30px 85px;
 
   &::backdrop {
     @include overlay;
@@ -38,14 +38,11 @@
     position: absolute;
     top: 30px;
     left: 30px;
-    height: 60px;
+    height: 40px;
   }
   .title {
     @include dialog-title;
     margin-bottom: 5px;
-  }
-  .message {
-    @include semi-bold-text;
   }
 
   .options {
