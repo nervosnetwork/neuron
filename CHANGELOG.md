@@ -17,7 +17,7 @@ This is a beta version to preview the changes in the next release and may not be
 
 ### Syncing
 
-It has adopt a brand new indexing mechanism, which can significantly speed up the cache indexing process. The caches will be rebuilt for the first time, but it should be much faster than the previous versions (up to 3-4x on macOS, Windows and Linux).
+It has adopted a brand new indexing mechanism, which can significantly speed up the cache indexing process. The caches will be rebuilt for the first time, but it should be much faster than the previous versions (up to 3-4x on macOS, Windows and Linux).
 
 ### Bug fixes
 
@@ -1195,4 +1195,3 @@ We also addressed several other bugs to make the Neuron wallet more stable.
 * **package:** Rename package task to release, publish to GitHub ([e3d473e](https://github.com/nervosnetwork/neuron/commit/e3d473e))
 * call methods of app controller with remote module ([cdc93a0](https://github.com/nervosnetwork/neuron/commit/cdc93a0))
 * subscribe network list from neuron-wallet in neuron-ui ([b56ae1c](https://github.com/nervosnetwork/neuron/commit/b56ae1c))
-
