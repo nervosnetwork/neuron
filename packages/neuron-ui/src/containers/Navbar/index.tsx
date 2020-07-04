@@ -17,6 +17,7 @@ import {
   useOnLocaleChange,
   useChainTypeByGenesisBlockHash,
   ChainType,
+  ConnectionStatus,
 } from 'utils'
 
 import styles from './navbar.module.scss'
@@ -70,9 +71,11 @@ const Navbar = () => {
 
   const toggleSUDT = useCallback(
     (chainType: ChainType) => {
-      setShowSUDT(ChainType.MAINNET !== chainType)
+      if (connectionStatus === ConnectionStatus.Online) {
+        setShowSUDT(ChainType.MAINNET !== chainType)
+      }
     },
-    [setShowSUDT]
+    [setShowSUDT, connectionStatus]
   )
 
   useChainTypeByGenesisBlockHash(networkURL, toggleSUDT)
