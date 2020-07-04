@@ -150,14 +150,17 @@ stages:
   - job: release_win
     displayName: Release Windows
     pool:
-      vmImage: 'macos-10.14'
+      vmImage: 'vs2017-win2016'
     steps:
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
       displayName: 'Install Node.js'
+    - pwsh: choco install llvm; refreshenv
+      displayName: 'Install clang (Windows)'
+    - script: yarn global add lerna
+      displayName: 'Install lerna'
     - script: |
-        yarn global add lerna
         yarn bootstrap
       name: Bootstrap
     - task: DownloadSecureFile@1
@@ -165,7 +168,7 @@ stages:
       displayName: 'Download Windows Signing Certificate'
       inputs:
         secureFile: Neuron_win.p12
-    - script: |
+    - pwsh: |
         ./scripts/download-ckb.sh win
         yarn release win
       name: Release
