@@ -27,6 +27,7 @@ import {
   useOnLocaleChange,
   useChainTypeByGenesisBlockHash,
   ChainType,
+  ConnectionStatus,
 } from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
@@ -137,17 +138,17 @@ const MainContent = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const { networkID } = chain
+  const { networkID, connectionStatus } = chain
   const [t, i18n] = useTranslation()
   const isCurrentSUDT = !!useRouteMatch(mainContents.filter(c => c.name.startsWith('SUDT')).map(c => c.path))
 
   const toggleSUDT = useCallback(
     (chainType: ChainType) => {
-      if (ChainType.MAINNET === chainType && isCurrentSUDT) {
+      if (connectionStatus === ConnectionStatus.Online && ChainType.MAINNET === chainType && isCurrentSUDT) {
         history.replace(mainContents[0].path)
       }
     },
-    [isCurrentSUDT, history]
+    [isCurrentSUDT, history, connectionStatus]
   )
 
   const networkURL = networks.find(n => n.id === networkID)?.remote ?? null
