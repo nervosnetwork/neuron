@@ -20,6 +20,7 @@ module.exports = {
   ],
   setupFiles: ['<rootDir>/tests/setup.ts'],
   moduleNameMapper: {
-    "electron": "<rootDir>/tests/mock/electron.ts"
+    "electron": "<rootDir>/tests/mock/electron.ts",
+    "logger": "<rootDir>/tests/mock/logger",
   }
 };

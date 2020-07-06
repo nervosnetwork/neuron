@@ -1,13 +1,3 @@
-jest.mock('../../src/utils/logger', () => {
-  return {
-    error: console.error,
-    transports: {
-      file: {
-        getFile: jest.fn()
-      }
-    }
-  }
-})
 
 jest.mock('../../src/services/networks', () => {
   return {
