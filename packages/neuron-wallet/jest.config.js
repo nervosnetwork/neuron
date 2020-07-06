@@ -18,5 +18,8 @@ module.exports = {
     "json",
     "node"
   ],
-  setupFiles: ['<rootDir>/tests/setup.ts']
+  setupFiles: ['<rootDir>/tests/setup.ts'],
+  moduleNameMapper: {
+    "electron": "<rootDir>/tests/mock/electron.ts"
+  }
 };
