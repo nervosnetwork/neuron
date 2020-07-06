@@ -1,3 +1,31 @@
+jest.mock('electron', () => ({
+  dialog: {
+    showSaveDialog: jest.fn(),
+    showMessageBox: jest.fn(),
+    showErrorBox: jest.fn()
+  },
+
+  app: {
+    getVersion: jest.fn().mockReturnValue('mock_version'),
+    getPath: jest.fn().mockReturnValue('mock_path'),
+    getName: jest.fn().mockReturnValue('mock_name')
+  }
+}))
+
+jest.mock('fs', () => {
+  return {
+    createWriteStream: () => null
+  }
+})
+
+jest.mock('../../src/utils/logger', () => ({
+  error: console.error,
+  transports: {
+    file: {
+      getFile: jest.fn()
+    }
+  }
+}))
 
 jest.mock('../../src/services/networks', () => {
   return {
@@ -10,12 +38,6 @@ jest.mock('../../src/services/networks', () => {
         }
       }
     }
-  }
-})
-
-jest.mock('fs', () => {
-  return {
-    createWriteStream: () => null
   }
 })
 
