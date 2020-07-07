@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import { Address, AddressVersion } from 'database/address/address-dao'
+import { AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import SyncedBlockNumberSubject from 'models/subjects/node'
@@ -29,11 +29,9 @@ const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: 
 }
 
 if (BrowserWindow) {
-  AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
-    // Force rescan when address is imported and there's no previous records (from existing identical wallet)
-    const shouldRescan = addresses.some(address => address.isImporting === true)
+  AddressCreatedSubject.getSubject().subscribe(async () => {
     killBlockSyncTask()
-    await createBlockSyncTask(shouldRescan)
+    await createBlockSyncTask()
   })
 }
 
