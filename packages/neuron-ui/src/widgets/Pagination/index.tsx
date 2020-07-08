@@ -34,6 +34,10 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
     [onChange]
   )
 
+  if (!count) {
+    return null
+  }
+
   const start = (pageNo - 1) * pageSize + 1
   const end = Math.min(count, pageNo * pageSize)
   const range = t(`${I18N_PATH}.range`, { start, end, count })
@@ -88,7 +92,7 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
         <span
           role="button"
           tabIndex={pageNo === pageCount ? -1 : 0}
-          data-page-no={count}
+          data-page-no={pageCount}
           className={styles.toNext}
           data-disabled={pageNo === pageCount}
           title={t(`${I18N_PATH}.last-page`)}

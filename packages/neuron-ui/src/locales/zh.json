@@ -427,7 +427,7 @@
       "last-page": "尾页",
       "page": "页码",
       "selected": "当前页",
-      "range": " 第 {{start}} 至 {{end}} 记录, 共 {{count}} 条记录",
+      "range": " 第 {{start}} 至 {{end}} 条记录, 共 {{count}} 条记录",
       "page-no": "第 {{pageNo}} 页"
     },
     "nervos-dao": {
