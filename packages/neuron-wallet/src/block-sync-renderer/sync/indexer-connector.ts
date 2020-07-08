@@ -1,7 +1,8 @@
 import logger from 'electron-log'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
-import { Indexer, Tip, CollectorQueries, CellCollector } from '@ckb-lumos/indexer'
+import { QueryOptions, HashType } from '@ckb-lumos/base'
+import { Indexer, Tip, CellCollector } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -12,8 +13,8 @@ import IndexerCacheService from './indexer-cache-service'
 import IndexerFolderManager from './indexer-folder-manager'
 
 export interface LumosCellQuery {
-  lock: {codeHash: string, hashType: string, args: string} | null,
-  type: {codeHash: string, hashType: string, args: string} | null,
+  lock: {codeHash: string, hashType: HashType, args: string} | null,
+  type: {codeHash: string, hashType: HashType, args: string} | null,
   data: string | null
 }
 
@@ -84,7 +85,7 @@ export default class IndexerConnector {
       await this.processNextBlockNumber()
 
       while (this.pollingIndexer) {
-        this.indexerTip = this.indexer.tip()
+        this.indexerTip = await this.indexer.tip()
 
         const newInserts = await this.upsertTxHashes()
 
@@ -117,7 +118,7 @@ export default class IndexerConnector {
       throw new Error('at least one parameter is required')
     }
 
-    const queries: CollectorQueries = {}
+    const queries: QueryOptions = {}
     if (lock) {
       queries.lock = {
         code_hash: lock.codeHash,

@@ -22,7 +22,7 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap && lerna link",
+    "bootstrap": "LUMOS_NODE_RUNTIME=electron LUMOS_NODE_RUNTIME_VERSION=7.1.4 lerna bootstrap && lerna link",
     "start:ui": "cd packages/neuron-ui && yarn run start",
     "start:wallet": "cd packages/neuron-wallet && yarn run start:dev",
     "start": "concurrently \"cross-env BROWSER=none yarn run start:ui\" \"wait-on http://localhost:3000 && yarn run start:wallet\"",
