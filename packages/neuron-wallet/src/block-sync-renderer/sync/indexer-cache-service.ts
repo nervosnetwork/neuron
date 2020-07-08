@@ -3,7 +3,7 @@ import { queue } from 'async'
 import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
-import { Indexer } from '@ckb-lumos/indexer'
+import { Indexer, TransactionCollector } from '@ckb-lumos/indexer'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export default class IndexerCacheService {
@@ -93,13 +93,16 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const fetchedTxHashes = this.indexer.getTransactionsByLockScript({
-          code_hash: lockScript.codeHash,
-          hash_type: lockScript.hashType,
-          args: lockScript.args
+        const transactionCollector = new TransactionCollector(this.indexer, {
+          lock: {
+            code_hash: lockScript.codeHash,
+            hash_type: lockScript.hashType,
+            args: lockScript.args
+          }
         })
-
-        if (!fetchedTxHashes || !fetchedTxHashes.length) {
+        //@ts-ignore
+        const fetchedTxHashes = transactionCollector.get_transaction_hashes().toArray()
+        if (!fetchedTxHashes.length) {
           continue
         }
 

@@ -25,8 +25,7 @@
     "test:watch": "jest --watch",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
-    "rebuild:nativemodules": "electron-builder install-app-deps && yarn rebuild:neondeps",
-    "rebuild:neondeps": "electron-build-env neon build -p ../../node_modules/@ckb-lumos/indexer --release"
+    "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -35,7 +34,8 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/indexer": "0.3.0",
+    "@ckb-lumos/base": "0.4.8",
+    "@ckb-lumos/indexer": "0.4.8",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",
     "archiver": "3.1.1",
