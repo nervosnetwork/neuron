@@ -112,6 +112,8 @@ export default class NetworksController {
         }),
         detail: currentID === id ? i18n.t('messageBox.remove-network.alert') : '',
         buttons: [i18n.t('messageBox.button.confirm'), i18n.t('messageBox.button.discard')],
+        defaultId: 0,
+        cancelId: 1,
       }
     )
 
