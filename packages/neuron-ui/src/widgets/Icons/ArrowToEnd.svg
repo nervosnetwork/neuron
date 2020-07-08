@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <path d="M0,35 L60,35 L60,39 L0,39 L0,35 Z M56.9958569,0 L60,3.67890535 L30,28.1764892 L0,3.67890535 L3.00414308,0 L29.9990501,22.0440887 L56.9958569,0 Z" id="arrow-to-end-path"></path>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="1.-Icon/arrow/frame_last_light">
+            <g id="Group-2" transform="translate(0.000000, 10.000000)">
+                <g id="Group">
+                    <mask id="arrow-to-end" fill="white">
+                        <use xlink:href="#arrow-to-end-path"></use>
+                    </mask>
+                    <g mask="url(#arrow-to-end)" fill="#1b73b3">
+                        <g transform="translate(0.000000, -10.000000)" id="Rectangle">
+                            <rect x="0" y="0" width="60" height="60"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -426,7 +426,9 @@
       "first-page": "First page",
       "last-page": "Last page",
       "page": "Page",
-      "selected": "Current page"
+      "selected": "Current page",
+      "range": "{{start}} - {{end}} of {{count}}",
+      "page-no": "Page {{pageNo}}"
     },
     "nervos-dao": {
       "free": "Available",

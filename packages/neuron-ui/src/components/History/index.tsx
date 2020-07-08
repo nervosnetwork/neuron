@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
-import { Pagination } from '@uifabric/experiments'
+import Pagination from 'widgets/Pagination'
 
 import TransactionList from 'components/TransactionList'
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -55,7 +55,7 @@ const History = () => {
 
   const List = useMemo(() => {
     return (
-      <Stack className={styles.history}>
+      <Stack className={styles.container}>
         <div className={styles.tools}>
           <SearchBox
             value={keywords}
@@ -101,28 +101,14 @@ const History = () => {
         </div>
         {totalCount ? null : <div className={styles.noTxs}>{t('history.no-txs')}</div>}
         <div className={styles.pagination}>
-          {totalCount ? (
-            <Pagination
-              selectedPageIndex={pageNo - 1}
-              pageCount={Math.ceil(totalCount / pageSize)}
-              itemsPerPage={pageSize}
-              totalItemCount={totalCount}
-              previousPageAriaLabel={t('pagination.previous-page')}
-              nextPageAriaLabel={t('pagination.next-page')}
-              firstPageAriaLabel={t('pagination.first-page')}
-              lastPageAriaLabel={t('pagination.last-page')}
-              pageAriaLabel={t('pagination.page')}
-              selectedAriaLabel={t('pagination.selected')}
-              firstPageIconProps={{ iconName: 'FirstPage' }}
-              previousPageIconProps={{ iconName: 'PrevPage' }}
-              nextPageIconProps={{ iconName: 'NextPage' }}
-              lastPageIconProps={{ iconName: 'LastPage' }}
-              format="buttons"
-              onPageChange={(idx: number) => {
-                history.push(`${RoutePath.History}?pageNo=${idx + 1}&keywords=${keywords}`)
-              }}
-            />
-          ) : null}
+          <Pagination
+            count={totalCount}
+            pageSize={pageSize}
+            pageNo={pageNo}
+            onChange={(no: number) => {
+              history.push(`${RoutePath.History}?pageNo=${no}&keywords=${keywords}`)
+            }}
+          />
         </div>
       </Stack>
     )
