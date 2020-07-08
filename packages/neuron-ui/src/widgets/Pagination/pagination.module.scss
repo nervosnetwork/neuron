@@ -1,0 +1,68 @@
+$primary-color: #1b73b3;
+$secondary-color: #717171;
+$shadow-color: rgba(0, 0, 0, 0.05);
+$disable-color: $secondary-color;
+
+.container {
+  font-size: 0.875rem;
+  display: flex;
+}
+
+.range {
+  color: $secondary-color;
+  flex: 1;
+}
+
+.navigator {
+  color: $primary-color;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0 10px;
+  & > span {
+    border-radius: 2px;
+    box-sizing: border-box;
+    min-width: 14px;
+    align-self: center;
+    &:hover,
+    &:focus {
+      background-color: $shadow-color;
+    }
+  }
+}
+
+.pageNo {
+  text-decoration: underline;
+  text-align: center;
+  padding: 0 2px;
+  &[data-active='true'] {
+    color: #000;
+    text-decoration: none;
+    font-weight: 900;
+    pointer-events: none;
+  }
+}
+
+.toPrev,
+.toNext {
+  height: 14px;
+  overflow: hidden;
+  svg {
+    pointer-events: none;
+  }
+  &[data-disabled='true'] {
+    pointer-events: none;
+    g {
+      fill: $disable-color;
+    }
+  }
+}
+.toPrev {
+  svg {
+    transform: rotate(90deg);
+  }
+}
+.toNext {
+  svg {
+    transform: rotate(-90deg);
+  }
+}

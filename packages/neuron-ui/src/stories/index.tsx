@@ -32,6 +32,7 @@ import './NervosDAORecord.stories'
 import './CompensationPeriodTooltip.stories'
 import './CompensationProgressBar.stories'
 import './BalanceSyncIcon.stories'
+import './Pagination.stories'
 
 // SUDT
 import './SUDTCreateDialog.stories'
