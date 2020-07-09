@@ -1,3 +1,5 @@
+import '../src/locales/i18n'
+
 export const originalXMLHttpRequest = window.XMLHttpRequest
 
 export const mockedXMLHttpRequest = {

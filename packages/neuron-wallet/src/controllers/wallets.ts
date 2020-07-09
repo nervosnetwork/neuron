@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { t } from 'i18next'
 import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
@@ -20,7 +21,6 @@ import {
   InvalidJSON,
   InvalidAddress,
 } from 'exceptions'
-import i18n from 'locales/i18n'
 import AddressService from 'services/addresses'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 import TransactionSender from 'services/transaction-sender'
@@ -199,7 +199,7 @@ export default class WalletsController {
     return dialog.showOpenDialog(
       BrowserWindow.getFocusedWindow()!,
       {
-        title: i18n.t('messages.import-extended-public-key'),
+        title: t('messages.import-extended-public-key'),
         filters: [{ name: 'JSON File', extensions: ['json'] }]
       }
     ).then((value: OpenDialogReturnValue) => {
@@ -240,7 +240,7 @@ export default class WalletsController {
 
     return dialog.showSaveDialog(
       BrowserWindow.getFocusedWindow()!,
-      { title: i18n.t('messages.save-extended-public-key'), defaultPath: wallet.name + '-xpubkey.json' }
+      { title: t('messages.save-extended-public-key'), defaultPath: wallet.name + '-xpubkey.json' }
     ).then((returnValue: SaveDialogReturnValue) => {
       if (returnValue.filePath) {
         fs.writeFileSync(returnValue.filePath, JSON.stringify({ xpubkey: xpubkey.serialize() }))
@@ -464,7 +464,7 @@ export default class WalletsController {
     const keystore = wallet.loadKeystore()
     return dialog.showSaveDialog(
       BrowserWindow.getFocusedWindow()!,
-      { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
+      { title: t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
     ).then((returnValue: SaveDialogReturnValue) => {
       if (returnValue.canceled) {
         return {

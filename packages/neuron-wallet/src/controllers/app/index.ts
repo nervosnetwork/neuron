@@ -1,8 +1,8 @@
 import path from 'path'
+import { t } from 'i18next'
 import { app as electronApp, remote, BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
-import i18n from 'locales/i18n'
 import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
@@ -134,7 +134,7 @@ export default class AppController {
   }
 
   private clearOnClosed = () => {
-    const windowsToClose = [i18n.t(SETTINGS_WINDOW_TITLE)]
+    const windowsToClose = [t(SETTINGS_WINDOW_TITLE)]
     BrowserWindow.getAllWindows().forEach(bw => {
       if (windowsToClose.includes(bw.getTitle())) {
         bw.close()

@@ -3,8 +3,6 @@ import zh from './zh'
 import en from './en'
 import zhTW from './zh-tw'
 
-export { t } from 'i18next'
-
 i18n.init({
   resources: {
     en,
@@ -24,4 +22,4 @@ export const changeLanguage = (lng = 'en') => {
   i18n.changeLanguage(lng)
 }
 
-export default i18n
+export default { changeLanguage }

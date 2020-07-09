@@ -1,4 +1,5 @@
 import { dialog } from 'electron'
+import { t } from 'i18next'
 import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
@@ -8,7 +9,6 @@ import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
-import i18n from 'locales/i18n'
 import ChainInfo from './chain-info'
 import logger from 'utils/logger'
 
@@ -105,13 +105,13 @@ export default class NetworksController {
     const messageValue = await dialog.showMessageBox(
       {
         type: 'warning',
-        title: i18n.t(`messageBox.remove-network.title`),
-        message: i18n.t(`messageBox.remove-network.message`, {
+        title: t(`messageBox.remove-network.title`),
+        message: t(`messageBox.remove-network.message`, {
           name: network.name,
           address: network.remote,
         }),
-        detail: currentID === id ? i18n.t('messageBox.remove-network.alert') : '',
-        buttons: [i18n.t('messageBox.button.confirm'), i18n.t('messageBox.button.discard')],
+        detail: currentID === id ? t('messageBox.remove-network.alert') : '',
+        buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
         defaultId: 0,
         cancelId: 1,
       }
