@@ -4,42 +4,44 @@ import path from 'path'
 import archiver from 'archiver'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
-import logger from 'electron-log'
-import i18n from 'locales/i18n'
+import logger from 'utils/logger'
+import { t } from 'i18next'
 import { ckbDataPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
 
 export default class ExportDebugController {
-  archive: archiver.Archiver
-  constructor () {
+  #I18N_PATH = 'export-debug-info'
+  #ANONYMOUS_ADDRESS = 'http://****:port'
+  private archive: archiver.Archiver
+
+  constructor() {
     this.archive = archiver('zip', {
       zlib: { level: 9 }
     })
     this.archive.on('error', err => {
-      dialog.showErrorBox(i18n.t('common.error'), err.message)
+      dialog.showErrorBox(t('common.error'), err.message)
     })
   }
 
   public async export() {
     try {
       const { canceled, filePath } = await dialog.showSaveDialog({
-        title: i18n.t('export-debug-info.export-debug-info'),
+        title: t(`${this.#I18N_PATH}.export-debug-info`),
         defaultPath: `neuron_debug_${Date.now()}.zip`
       })
       if (canceled || !filePath) {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await Promise.all([this.addStatusFile(), this.addBundledCKBLog()])
-      this.addLogFiles()
+      await Promise.all([this.addStatusFile(), this.addBundledCKBLog(), this.addLogFiles()])
       await this.archive.finalize()
       dialog.showMessageBox({
         type: 'info',
-        message: i18n.t('export-debug-info.debug-info-exported', { file: filePath })
+        message: t(`${this.#I18N_PATH}.debug-info-exported`, { file: filePath })
       })
     } catch (err) {
-      dialog.showErrorBox(i18n.t('common.error'), err.message)
+      dialog.showErrorBox(t('common.error'), err.message)
     }
   }
 
@@ -73,7 +75,7 @@ export default class ExportDebugController {
         blockNumber: syncedBlockNumber
       },
       ckb: {
-        url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : 'http://****:port',
+        url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : this.#ANONYMOUS_ADDRESS,
         version: ckbVersion,
         blockNumber: tipBlockNumber,
         peers,
@@ -109,7 +111,9 @@ export default class ExportDebugController {
             resolve(buffer.toString('utf8'))
           }
           fs.close(fd, closeErr => {
-            logger.error(closeErr)
+            if (closeErr) {
+              logger.error(closeErr)
+            }
           })
           return
         })
