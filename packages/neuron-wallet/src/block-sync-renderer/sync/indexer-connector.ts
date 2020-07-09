@@ -239,11 +239,7 @@ export default class IndexerConnector {
     return txsWithStatus
   }
 
-  public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
-    for (const [walletId, addressMetas] of this.addressesByWalletId.entries()) {
-      const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
-      await indexerCacheService.updateProcessedTxHashes(blockNumber)
-    }
+  public async notifyCurrentBlockNumberProcessed() {
     this.processNextBlockNumberQueue!.push(null)
   }
 }
