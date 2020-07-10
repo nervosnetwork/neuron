@@ -1,7 +1,6 @@
 import { when } from 'jest-when'
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
-// import IndexerCacheService from '../../src/block-sync-renderer/sync/indexer-cache-service';
 import AddressMeta from '../../src/database/address/meta';
 import { AddressType } from '../../src/models/keys/address';
 import { AddressVersion } from '../../src/database/address/address-dao';
