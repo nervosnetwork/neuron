@@ -89,7 +89,7 @@ export default class IndexerConnector {
 
         const newInserts = await this.upsertTxHashes()
 
-        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock()
+        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
         if (nextUnprocessedBlockTip) {
           this.blockTipSubject.next({
             block_number: nextUnprocessedBlockTip.blockNumber,
@@ -190,7 +190,7 @@ export default class IndexerConnector {
   }
 
   private async upsertTxHashes(): Promise<string[]> {
-    const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
+    const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
     if (nextUnprocessedBlock) {
       return []
     }

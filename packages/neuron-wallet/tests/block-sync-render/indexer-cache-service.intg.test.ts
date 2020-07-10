@@ -440,11 +440,32 @@ describe('indexer cache service', () => {
       await indexerCacheService.upsertTxHashes()
     });
     describe('when has unprocessed blocks', () => {
-      it('returns next unprocessed block number', async () => {
-        const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
-        expect(nextUnprocessedBlock).toEqual({
-          blockNumber: fakeBlock1.number, blockHash: fakeBlock1.hash
-        })
+      let nextUnprocessedBlock: any
+      describe('check with walletId having tx hash caches', () => {
+        beforeEach(async () => {
+          nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock([walletId])
+        });
+        it('returns next unprocessed block number', async () => {
+          expect(nextUnprocessedBlock).toEqual({
+            blockNumber: fakeBlock1.number, blockHash: fakeBlock1.hash
+          })
+        });
+      });
+      describe('check with walletId that does not have hash caches', () => {
+        beforeEach(async () => {
+          nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock(['w1'])
+        });
+        it('returns undefined', async () => {
+          expect(nextUnprocessedBlock).toEqual(undefined)
+        });
+      });
+      describe('check with empty walletIds array', () => {
+        beforeEach(async () => {
+          nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock([])
+        });
+        it('returns undefined', async () => {
+          expect(nextUnprocessedBlock).toEqual(undefined)
+        });
       });
     });
     describe('when has no unprocessed blocks', () => {
@@ -458,7 +479,7 @@ describe('indexer cache service', () => {
           .execute()
       });
       it('returns undefined', async () => {
-        const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
+        const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock([walletId])
         expect(nextUnprocessedBlock).toEqual(undefined)
       });
     });
