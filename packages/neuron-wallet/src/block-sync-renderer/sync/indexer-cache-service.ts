@@ -50,13 +50,13 @@ export default class IndexerCacheService {
       .getMany()
   }
 
-  public static async nextUnprocessedBlock(): Promise<{blockNumber: string, blockHash: string} | undefined> {
+  public static async nextUnprocessedBlock(walletIds: string[]): Promise<{blockNumber: string, blockHash: string} | undefined> {
     const result = await getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
-      .where({
-        isProcessed: false
-      })
+      .where(
+        'walletId IN (:...walletIds) and isProcessed = false', {walletIds}
+      )
       .orderBy('blockNumber', 'ASC')
       .getOne()
 
