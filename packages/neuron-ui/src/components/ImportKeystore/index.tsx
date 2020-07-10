@@ -7,28 +7,12 @@ import { useState as useGlobalState } from 'states'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
+import { PasswordIncorrectException } from 'exceptions'
 import { generateWalletName, RoutePath, ErrorCode, CONSTANTS, useGoBack, isSuccessResponse } from 'utils'
 
 import styles from './importKeystore.module.scss'
 
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
-
-export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
-  history: ReturnType<typeof useHistory>
-) => {
-  return importKeystore(params).then(res => {
-    if (isSuccessResponse(res)) {
-      history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
-    } else if (res.status > 0) {
-      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
-    } else if (res.message) {
-      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
-      if (msg) {
-        showErrorMessage(i18n.t(`messages.error`), msg)
-      }
-    }
-  })
-}
 
 interface KeystoreFields {
   path: string
@@ -80,7 +64,7 @@ const ImportKeystore = () => {
     }
   }, [wallets, fields, setFields, t])
 
-  const onFileClick = useCallback(() => {
+  const handleFileClick = useCallback(() => {
     setOpeningFile(true)
     showOpenDialogModal({
       title: 'import keystore',
@@ -100,37 +84,52 @@ const ImportKeystore = () => {
       })
   }, [fields])
 
-  const onSubmit = useCallback(
+  const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault()
       if (loading || disabled) {
         return
       }
       setLoading(true)
-      setTimeout(() => {
-        importWalletWithKeystore({
-          name: fields.name || '',
-          keystorePath: fields.path,
-          password: fields.password,
-        })(history).finally(() => setLoading(false))
-      }, 200)
+      importKeystore({ name: fields.name!, keystorePath: fields.path, password: fields.password })
+        .then(res => {
+          if (isSuccessResponse(res)) {
+            history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+            return
+          }
+
+          if (res.status === ErrorCode.PasswordIncorrect) {
+            throw new PasswordIncorrectException()
+          }
+
+          if (res.message) {
+            const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+            if (msg) {
+              throw new Error(msg)
+            }
+          }
+        })
+        .catch(err => {
+          if (err.code === ErrorCode.PasswordIncorrect) {
+            setFields(state => ({ ...state, passwordError: t(err.message) }))
+            return
+          }
+          showErrorMessage(i18n.t(`messages.error`), err.message)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     },
-    [fields.name, fields.password, fields.path, history, loading, disabled]
+    [fields.name, fields.password, fields.path, history, loading, disabled, setFields, t]
   )
 
-  const onChange = useCallback(
+  const handleChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const {
         value,
         dataset: { field },
       } = e.target as HTMLInputElement
       if (field !== undefined && value !== undefined) {
-        let maxLength: number | undefined
-        if (field === 'name') {
-          maxLength = MAX_WALLET_NAME_LENGTH
-        } else if (field === 'password') {
-          maxLength = MAX_PASSWORD_LENGTH
-        }
         if (value === '') {
           setFields(state => ({
             ...state,
@@ -149,6 +148,14 @@ const ImportKeystore = () => {
           return
         }
 
+        let maxLength: number | undefined
+
+        if (field === 'name') {
+          maxLength = MAX_WALLET_NAME_LENGTH
+        } else if (field === 'password') {
+          maxLength = MAX_PASSWORD_LENGTH
+        }
+
         if (maxLength && value.length > maxLength) {
           setFields(state => ({
             ...state,
@@ -161,6 +168,7 @@ const ImportKeystore = () => {
           }))
           return
         }
+
         setFields(state => ({
           ...state,
           [field]: value,
@@ -172,7 +180,7 @@ const ImportKeystore = () => {
   )
 
   return (
-    <form className={styles.container} onSubmit={onSubmit}>
+    <form className={styles.container} onSubmit={handleSubmit}>
       {Object.entries(fields)
         .filter(([key]) => !key.endsWith('Error'))
         .map(([key, value]) => {
@@ -181,7 +189,7 @@ const ImportKeystore = () => {
               <TextField
                 key={key}
                 field={key}
-                onClick={key === 'path' ? onFileClick : undefined}
+                onClick={key === 'path' ? handleFileClick : undefined}
                 label={t(`import-keystore.label.${key}`)}
                 placeholder={t(`import-keystore.placeholder.${key}`)}
                 type={key === 'password' ? 'password' : 'text'}
@@ -189,7 +197,7 @@ const ImportKeystore = () => {
                 disabled={key === 'path' && openingFile}
                 value={value}
                 error={fields[`${key}Error` as keyof KeystoreFields]}
-                onChange={onChange}
+                onChange={handleChange}
                 required
               />
             </>
