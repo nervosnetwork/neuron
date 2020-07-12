@@ -1,6 +1,6 @@
 import 'reflect-metadata'
+import { t } from 'i18next'
 
-import i18n from 'locales/i18n'
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import { MissingRequiredArgument } from 'exceptions'
 
@@ -9,10 +9,10 @@ const passwordMetadataKey = Symbol('password')
 
 export const verifyPasswordComplexity = (password: string) => {
   if (password.length < MIN_PASSWORD_LENGTH) {
-    throw Error(i18n.t('messages.wallet-password-less-than-min-length', { minPasswordLength: MIN_PASSWORD_LENGTH }))
+    throw Error(t('messages.wallet-password-less-than-min-length', { minPasswordLength: MIN_PASSWORD_LENGTH }))
   }
   if (password.length > MAX_PASSWORD_LENGTH) {
-    throw Error(i18n.t('messages.wallet-password-more-than-max-length', { maxPasswordLength: MAX_PASSWORD_LENGTH }))
+    throw Error(t('messages.wallet-password-more-than-max-length', { maxPasswordLength: MAX_PASSWORD_LENGTH }))
   }
   let complex = 0
   let reg = /\d/
@@ -32,7 +32,7 @@ export const verifyPasswordComplexity = (password: string) => {
     complex++
   }
   if (complex < 3) {
-    throw Error(i18n.t('messages.wallet-password-letter-complexity'))
+    throw Error(t('messages.wallet-password-letter-complexity'))
   }
 }
 
