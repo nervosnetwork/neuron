@@ -31,8 +31,7 @@ enum ExternalURL {
   Website = 'https://www.nervos.org/',
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
-  Doc = 'https://docs.nervos.org/tooling/neuron.html',
-  Faq = 'https://docs.nervos.org/references/neuron-faq.html'
+  Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet'
 }
 
 const separator: MenuItemConstructorOptions = {
@@ -290,10 +289,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     {
       label: t('application-menu.help.documentation'),
       click: () => { shell.openExternal(ExternalURL.Doc) }
-    },
-    {
-      label: t('application-menu.help.faq'),
-      click: () => { shell.openExternal(ExternalURL.Faq) }
     },
     separator,
     {
