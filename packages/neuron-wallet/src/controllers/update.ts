@@ -1,6 +1,6 @@
 import { dialog } from 'electron'
+import { t } from 'i18next'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
-import i18n from 'locales/i18n'
 import AppUpdaterSubject from 'models/subjects/app-updater'
 
 export default class UpdateController {
@@ -58,8 +58,8 @@ export default class UpdateController {
 
       dialog.showMessageBox({
         type: 'info',
-        message: i18n.t('updater.update-not-available'),
-        buttons: [i18n.t('common.ok')],
+        message: t('updater.update-not-available'),
+        buttons: [t('common.ok')],
       })
     })
 
