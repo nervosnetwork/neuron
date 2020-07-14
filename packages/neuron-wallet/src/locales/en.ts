@@ -47,7 +47,6 @@ export default {
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
         documentation: 'Documentation',
-        faq: 'Neuron FAQ',
         settings: 'Settings',
         'export-debug-info': 'Export Debug Information'
       },

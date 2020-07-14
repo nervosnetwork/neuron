@@ -30,7 +30,7 @@ import styles from './nervosDAO.module.scss'
 const { MIN_DEPOSIT_AMOUNT } = CONSTANTS
 
 const DAO_DOCS_URL =
-  'https://docs.nervos.org/references/neuron-wallet-guide.html#how-to-deposit-your-nervos-ckbyte-tokens-into-nervos-dao'
+  'https://docs.nervos.org/docs/basics/guides/neuron#5-deposit-your-nervos-ckbyte-tokens-into-nervos-dao'
 
 const NervosDAO = () => {
   const [focusedRecord, setFocusedRecord] = useState('')
