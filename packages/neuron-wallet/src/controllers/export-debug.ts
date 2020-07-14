@@ -105,17 +105,13 @@ export default class ExportDebugController {
       fs.open(logPath, 'r', (openErr, fd) => {
         if (openErr) { return reject(openErr) }
         fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
-          if (readErr) {
-            reject(readErr)
-          } else {
-            resolve(buffer.toString('utf8'))
-          }
           fs.close(fd, closeErr => {
-            if (closeErr) {
-              logger.error(closeErr)
+            const err = closeErr || readErr
+            if (err) {
+              return reject(err)
             }
+            return resolve(buffer.toString('utf8'))
           })
-          return
         })
       })
 
