@@ -34,8 +34,8 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.4.8",
-    "@ckb-lumos/indexer": "0.4.8",
+    "@ckb-lumos/base": "0.5.1",
+    "@ckb-lumos/indexer": "0.5.1",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",
     "archiver": "3.1.1",
