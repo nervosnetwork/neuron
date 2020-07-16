@@ -138,7 +138,7 @@ const MainContent = () => {
     if (isCurrentSUDT && isMainnet(networks, networkID)) {
       history.replace(mainContents[0].path)
     }
-  }, [networks, networkID, isCurrentSUDT])
+  }, [networks, networkID, isCurrentSUDT, history])
 
   useSubscription({
     walletID,
