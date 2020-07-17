@@ -80,7 +80,7 @@ describe('indexer cache service', () => {
       stubbedConstructor
         .calledWith(expect.anything(), {lock})
         .mockReturnValue({
-          get_transaction_hashes: jest.fn().mockReturnValue({
+          getTransactionHashes: jest.fn().mockReturnValue({
             toArray: () => hashes
           }),
         })

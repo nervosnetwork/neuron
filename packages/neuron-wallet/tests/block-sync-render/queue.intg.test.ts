@@ -156,7 +156,7 @@ describe('integration tests for sync pipeline', () => {
     )
     stubbedTransactionCollectorConstructor = jest.fn().mockImplementation(
       () => ({
-        get_transaction_hashes: stubbedGetTransactionsByLockScriptFn,
+        getTransactionHashes: stubbedGetTransactionsByLockScriptFn,
       })
     )
     stubbedRPCServiceConstructor = jest.fn().mockImplementation(

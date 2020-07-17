@@ -101,7 +101,7 @@ export default class IndexerCacheService {
           }
         })
         //@ts-ignore
-        const fetchedTxHashes = transactionCollector.get_transaction_hashes().toArray()
+        const fetchedTxHashes = transactionCollector.getTransactionHashes().toArray()
         if (!fetchedTxHashes.length) {
           continue
         }
