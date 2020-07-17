@@ -154,6 +154,11 @@ const NervosDAO = () => {
       }
       return record.status === 'dead'
     })
+
+    if (tabIdx === '1') {
+      filteredRecord.sort((r1, r2) => +r2.unlockInfo!.timestamp! - +r1.unlockInfo!.timestamp!)
+    }
+
     return (
       <>
         <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>
