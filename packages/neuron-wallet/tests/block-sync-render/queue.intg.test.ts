@@ -205,6 +205,11 @@ describe('integration tests for sync pipeline', () => {
           .execute()
       }
 
+      stubbedGetTransactionsByLockScriptFn
+        .mockReturnValue({
+          toArray: () => []
+        })
+
       queue.start()
       await flushPromises()
       await queue.waitForDrained()
