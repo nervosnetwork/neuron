@@ -108,11 +108,6 @@ export class TransactionPersistor {
       }
     }
 
-    // return if success
-    if (txEntity && txEntity.status === TransactionStatus.Success) {
-      return txEntity
-    }
-
     if (txEntity) {
       // lazy load inputs / outputs
       const inputEntities = await connection
