@@ -122,8 +122,9 @@ export class TransactionPersistor {
         .getRepository(OutputEntity)
         .createQueryBuilder('output')
         .where({
-          transaction: txEntity,
+          transaction: txEntity
         })
+        .andWhere('status != :status', {status: OutputStatus.Dead})
         .getMany()
 
       // input -> previousOutput => dead
