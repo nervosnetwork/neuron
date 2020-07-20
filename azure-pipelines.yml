@@ -1,3 +1,6 @@
+variables:
+- group: CSC
+
 trigger:
   batch: true
   branches:
@@ -16,82 +19,8 @@ pr:
       - '*'
 
 stages:
-- stage: unit_tests
-  displayName: Unit Tests
-  jobs:
-  - job: mac
-    displayName: macOS
-    pool:
-      vmImage: 'macos-10.14'
-    strategy:
-      matrix:
-        node_12_x:
-          node_version: 12.x
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: $(node_version)
-      displayName: 'Install Node.js'
-    - script: |
-        yarn global add lerna
-        yarn bootstrap
-        CI=false yarn build
-      name: Bootstrap
-    - script: CI=true yarn test
-      name: Test
-
-  - job: linux
-    displayName: Linux
-    pool:
-      vmImage: 'ubuntu-18.04'
-    strategy:
-      matrix:
-        node_12_x:
-          node_version: 12.x
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: $(node_version)
-      displayName: 'Install Node.js'
-    - script: |
-        yarn global add lerna
-        yarn bootstrap
-        CI=false yarn build
-      name: Bootstrap
-    - script: |
-        export DISPLAY=':99.0'
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        CI=true yarn test
-      name: Test
-
-  - job: win
-    displayName: Windows
-    pool:
-      vmImage: 'vs2017-win2016'
-    strategy:
-      matrix:
-        node_12_x:
-          node_version: 12.x
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: $(node_version)
-      displayName: 'Install Node.js'
-    - script: yarn global add lerna
-      displayName: 'Install lerna'
-    - script: |
-        yarn bootstrap
-        set CI=false
-        yarn build
-      name: Build
-    - script: |
-        set CI=true
-        yarn test
-      name: Test
-
 - stage: release
   displayName: Release Binaries
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: release_mac
     displayName: Release macOS
