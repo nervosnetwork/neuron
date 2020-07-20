@@ -382,6 +382,8 @@ describe('unit tests for IndexerConnector', () => {
             args: '0x'
           },
           type: {
+            //test the workaround for this lumos data issue
+            //@ts-ignore
             hashType: 'lock',
             codeHash: '0xcode',
             args: '0x'

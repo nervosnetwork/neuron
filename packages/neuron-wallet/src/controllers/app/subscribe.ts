@@ -1,4 +1,5 @@
 import { BrowserWindow } from 'electron'
+import { t } from 'i18next'
 import { debounceTime, sampleTime } from 'rxjs/operators'
 
 import CommandSubject from 'models/subjects/command'
@@ -8,7 +9,6 @@ import SyncedBlockNumberSubject, { ConnectionStatusSubject } from 'models/subjec
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import AppUpdaterSubject from 'models/subjects/app-updater'
-import i18n from 'locales/i18n'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 
 interface AppResponder {
@@ -65,7 +65,7 @@ export const subscribe = (dispatcher: AppResponder) => {
     dispatcher.updateMenu()
     BrowserWindow
       .getAllWindows()
-      .find(bw => bw.getTitle() === i18n.t(SETTINGS_WINDOW_TITLE))?.webContents
+      .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))?.webContents
       .send('app-updater-updated', params)
   })
 }

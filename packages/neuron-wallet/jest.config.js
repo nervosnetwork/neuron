@@ -18,5 +18,10 @@ module.exports = {
     "json",
     "node"
   ],
-  setupFiles: ['<rootDir>/tests/setup.ts']
+  setupFiles: ['<rootDir>/tests/setup.ts'],
+  moduleNameMapper: {
+    // FIXME: module mapper causes typeorm errors
+    // "electron": "<rootDir>/tests/mock/electron.ts",
+    // "logger": "<rootDir>/tests/mock/logger",
+  }
 };

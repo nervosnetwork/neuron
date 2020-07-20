@@ -1,6 +1,6 @@
+import { t } from 'i18next'
 import NetworksService from '../../src/services/networks'
 import { Network } from '../../src/models/network'
-import i18n from '../../src/locales/i18n'
 
 const ERROR_MESSAGE = {
   MISSING_ARG: `Missing required argument`,
@@ -127,41 +127,41 @@ describe(`Unit tests of networks service`, () => {
     describe(`validation on parameters`, () => {
       it(`service.create requires name, and remote`, async () => {
         expect(service.create(undefined as any, undefined as any)).rejects.toThrowError(
-          i18n.t(ERROR_MESSAGE.MISSING_ARG),
+          t(ERROR_MESSAGE.MISSING_ARG),
         )
-        expect(service.create('network name', undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
+        expect(service.create('network name', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
       it(`service.update requires id, options`, () => {
         expect(service.update(undefined as any, undefined as any)).rejects.toThrowError(
-          i18n.t(ERROR_MESSAGE.MISSING_ARG),
+          t(ERROR_MESSAGE.MISSING_ARG),
         )
-        expect(service.update('', undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
+        expect(service.update('', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
       it(`service.delete requires id `, () => {
-        expect(service.delete(undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
+        expect(service.delete(undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
       it(`service.activate requires id `, () => {
-        expect(service.activate(undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
+        expect(service.activate(undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
     })
   })
 
   describe(`validation on network existence`, () => {
     it(`create network with existing name of Mainnet`, () => {
-      expect(service.create('Mainnet', 'http://localhost:8114')).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NAME_USED))
+      expect(service.create('Mainnet', 'http://localhost:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
     })
 
     it(`update network which is not existing`, () => {
       const id = `not-existing-id`
-      expect(service.update(id, {})).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
+      expect(service.update(id, {})).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
     })
 
     it(`activate network which is not existing`, () => {
       const id = `not-existing-id`
-      expect(service.activate(id)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
+      expect(service.activate(id)).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
     })
   })
 })

@@ -56,11 +56,6 @@ describe('integration tests for sync pipeline', () => {
 
   const addressMeta = AddressMeta.fromObject(addressInfo)
   const script = addressMeta.generateDefaultLockScript()
-  const formattedScript = {
-    code_hash: script.codeHash,
-    hash_type: script.hashType,
-    args: script.args
-  }
 
   const generateTxWithStatus = (
     id: string,
@@ -122,6 +117,7 @@ describe('integration tests for sync pipeline', () => {
   let queue: any
 
   let stubbedIndexerConstructor: any
+  let stubbedTransactionCollectorConstructor: any
   let stubbedRPCServiceConstructor: any
   const stubbedStartForeverFn = jest.fn()
   const stubbedTipFn = jest.fn()
@@ -154,9 +150,13 @@ describe('integration tests for sync pipeline', () => {
 
     stubbedIndexerConstructor = jest.fn().mockImplementation(
       () => ({
-        getTransactionsByLockScript: stubbedGetTransactionsByLockScriptFn,
         startForever: stubbedStartForeverFn,
         tip: stubbedTipFn,
+      })
+    )
+    stubbedTransactionCollectorConstructor = jest.fn().mockImplementation(
+      () => ({
+        getTransactionHashes: stubbedGetTransactionsByLockScriptFn,
       })
     )
     stubbedRPCServiceConstructor = jest.fn().mockImplementation(
@@ -169,7 +169,8 @@ describe('integration tests for sync pipeline', () => {
 
     jest.doMock('@ckb-lumos/indexer', () => {
       return {
-        Indexer : stubbedIndexerConstructor
+        Indexer : stubbedIndexerConstructor,
+        TransactionCollector : stubbedTransactionCollectorConstructor
       }
     });
 
@@ -203,6 +204,11 @@ describe('integration tests for sync pipeline', () => {
           })
           .execute()
       }
+
+      stubbedGetTransactionsByLockScriptFn
+        .mockReturnValue({
+          toArray: () => []
+        })
 
       queue.start()
       await flushPromises()
@@ -273,8 +279,10 @@ describe('integration tests for sync pipeline', () => {
   });
   describe('when there are new tx hashes found in a poll', () => {
     beforeEach(async () => {
-      when(stubbedGetTransactionsByLockScriptFn)
-        .calledWith(formattedScript).mockReturnValue(fakeTxs.map(tx => tx.transaction.hash))
+      stubbedGetTransactionsByLockScriptFn
+        .mockReturnValue({
+          toArray: () => fakeTxs.map(tx => tx.transaction.hash)
+        })
 
       queue.start()
       await flushPromises()

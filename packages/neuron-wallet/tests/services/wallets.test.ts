@@ -110,14 +110,6 @@ describe('wallet service', () => {
     expect(wallet && wallet.name).toEqual(wallet2.name)
   })
 
-  it('delete wallet', () => {
-    const w1 = walletService.create(wallet1)
-    walletService.create(wallet2)
-    expect(walletService.getAll().length).toBe(2)
-    walletService.delete(w1.id)
-    expect(() => walletService.get(w1.id)).toThrowError()
-  })
-
   it('get and set active wallet', () => {
     const w1 = walletService.create(wallet1)
     const w2 = walletService.create(wallet2)
@@ -142,20 +134,43 @@ describe('wallet service', () => {
     expect(activeWallet && activeWallet.id).toEqual(w2.id)
   })
 
-  it('delete current wallet', () => {
-    const w1 = walletService.create(wallet1)
-    const w2 = walletService.create(wallet2)
-    walletService.delete(w1.id)
-    const activeWallet = walletService.getCurrent()
-    expect(activeWallet && activeWallet.id).toEqual(w2.id)
-    expect(walletService.getAll().length).toEqual(1)
-  })
+  describe('#delete', () => {
+    let w1: any
+    beforeEach(() => {
+      w1 = walletService.create(wallet1)
+    });
+    it('delete wallet', () => {
+      walletService.create(wallet2)
+      expect(walletService.getAll().length).toBe(2)
+      walletService.delete(w1.id)
+      expect(() => walletService.get(w1.id)).toThrowError()
+    })
 
-  it('delete none current wallet', () => {
-    const w1 = walletService.create(wallet1)
-    const w2 = walletService.create(wallet2)
-    walletService.delete(w2.id)
-    const activeWallet = walletService.getCurrent()
-    expect(activeWallet && activeWallet.id).toEqual(w1.id)
-  })
+    describe('with more than one wallets', () => {
+      let w2: any
+      beforeEach(() => {
+        w2 = walletService.create(wallet2)
+      });
+      describe('when deleted current wallet', () => {
+        beforeEach(() => {
+          walletService.delete(w1.id)
+        });
+        it('switches active wallet', () => {
+          const activeWallet = walletService.getCurrent()
+          expect(activeWallet && activeWallet.id).toEqual(w2.id)
+          expect(walletService.getAll().length).toEqual(1)
+        })
+      });
+      describe('when deleted wallets other than current wallet', () => {
+        beforeEach(() => {
+          walletService.delete(w2.id)
+        });
+        it('should not switch active wallet', () => {
+          const activeWallet = walletService.getCurrent()
+          expect(activeWallet && activeWallet.id).toEqual(w1.id)
+        })
+      });
+
+    });
+  });
 })

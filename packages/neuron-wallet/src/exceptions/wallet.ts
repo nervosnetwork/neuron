@@ -1,4 +1,4 @@
-import { t } from 'locales/i18n'
+import { t } from 'i18next'
 
 export class CurrentWalletNotSet extends Error {
   public code = 111

@@ -1,4 +1,4 @@
-import i18n from 'locales/i18n'
+import { t } from 'i18next'
 import shannonToCKB from 'utils/shannonToCKB'
 import sudtValueToAmount from 'utils/sudt-value-to-amount'
 import Transaction from 'models/chain/transaction'
@@ -14,8 +14,8 @@ const toCSVRow = (
   includeSUDT: boolean = false
 ) => {
 
-  const SEND_TYPE = i18n.t('export-transactions.tx-type.send')
-  const RECEIVE_TYPE = i18n.t('export-transactions.tx-type.receive')
+  const SEND_TYPE = t('export-transactions.tx-type.send')
+  const RECEIVE_TYPE = t('export-transactions.tx-type.receive')
 
   const datetime = tx.timestamp ? formatDatetime(new Date(+tx.timestamp)) : ''
   const { blockNumber = '', hash = '', description = '' } = tx

@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.32.0-beta.1",
+  "version": "0.32.0-rc1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -25,8 +25,7 @@
     "test:watch": "jest --watch",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
-    "rebuild:nativemodules": "electron-builder install-app-deps && yarn rebuild:neondeps",
-    "rebuild:neondeps": "electron-build-env neon build -p ../../node_modules/@ckb-lumos/indexer --release"
+    "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -35,7 +34,8 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/indexer": "0.3.0",
+    "@ckb-lumos/base": "0.5.1",
+    "@ckb-lumos/indexer": "0.5.1",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",
     "archiver": "3.1.1",
@@ -71,15 +71,14 @@
     "@types/uuid": "3.4.5",
     "axios": "0.19.0",
     "devtron": "1.4.0",
-    "electron": "7.1.14",
+    "electron": "7.2.4",
     "electron-build-env": "0.2.0",
     "electron-builder": "22.4.0",
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.2.1",
     "jest-when": "2.7.2",
     "lint-staged": "9.2.5",
-    "neon-cli": "0.4.0",
-    "neuron-ui": "0.32.0-beta.1",
+    "neuron-ui": "0.32.0-rc1",
     "rimraf": "3.0.0",
     "ts-transformer-imports": "0.4.3",
     "ttypescript": "1.5.10"

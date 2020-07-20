@@ -6,37 +6,25 @@ import logger from 'utils/logger'
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
   #blockNumberEntity: SyncInfoEntity | undefined = undefined
-  #nextBlock: bigint | undefined = undefined
 
   private static lastSavedBlock: bigint = BigInt(-1)
 
   // Get next block to scan. If syncing hasn't run yet return 0 (genesis block number).
   public async getNextBlock(): Promise<bigint> {
-    if (this.#nextBlock) {
-      return this.#nextBlock
-    }
-
     const blockNumber = BigInt((await this.blockNumber()).value)
     return blockNumber
   }
 
   public async setNextBlock(current: bigint): Promise<void> {
-    this.#nextBlock = current
     SyncedBlockNumberSubject.getSubject().next(current.toString())
 
-    if (current === BigInt(0) || SyncedBlockNumber.lastSavedBlock === BigInt(-1) || current - SyncedBlockNumber.lastSavedBlock >= BigInt(1000)) {
-      // Only persist block number for every 1,000 blocks to reduce DB write.
-      // Practically it's unnecessary to save every block height, as iterating
-      // blocks is fast.
-      //
-      // Note: `#lastSavedBlock` is an instance property. If `SyncedBlockNumber` is used
-      //   in multiple places to write next block number, reading them would get inconsistent results.
-
+    const blockDiffAbs = Math.abs(Number(current) - Number(SyncedBlockNumber.lastSavedBlock))
+    if (current === BigInt(0) || blockDiffAbs >= 10) {
       SyncedBlockNumber.lastSavedBlock = current
 
       let blockNumberEntity = await this.blockNumber()
       blockNumberEntity.value = current.toString()
-      getConnection().manager.save(blockNumberEntity)
+      await getConnection().manager.save(blockNumberEntity)
 
       logger.info("Database:\tsaved synced block #" + current.toString())
     }

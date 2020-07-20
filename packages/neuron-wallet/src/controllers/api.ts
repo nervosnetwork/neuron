@@ -1,8 +1,8 @@
 import { take } from 'rxjs/operators'
 import { ipcMain, IpcMainInvokeEvent, dialog } from 'electron'
+import { t } from 'i18next'
 
 import env from 'env'
-import i18n from 'locales/i18n'
 import { showWindow } from './app/show-window'
 import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
@@ -242,7 +242,7 @@ export default class ApiController {
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }), {
+      showWindow(`#/transaction/${hash}`, t(`messageBox.transaction.title`, { hash }), {
         height: 750
       })
     })
@@ -325,7 +325,7 @@ export default class ApiController {
     // Settings
 
     handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, i18n.t(SETTINGS_WINDOW_TITLE), { width: 900 })
+      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: 900 })
     })
 
     handle('clear-cache', async (_, params: {resetIndexerData: boolean } | null) => {

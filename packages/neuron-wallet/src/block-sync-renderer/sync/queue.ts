@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { queue, AsyncQueue } from 'async'
+import logger from 'utils/logger'
 import { TransactionPersistor } from 'services/tx'
 import WalletService from 'services/wallets'
 import RpcService from 'services/rpc-service'
@@ -15,6 +16,7 @@ import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
+import CommonUtils from 'utils/common'
 
 export default class Queue {
   private lockHashes: string[]
@@ -59,16 +61,23 @@ export default class Queue {
 
     this.checkAndSaveQueue = queue(async (task: any) => {
       const {transactions} = task
-      await this.checkAndSave(transactions)
-
-      const firstTx = transactions.shift()
-      if (firstTx) {
-        await this.indexerConnector!.notifyCurrentBlockNumberProcessed(firstTx.blockNumber!)
+      //need to retry after a certain period of time if throws errors
+      // eslint-disable-next-line no-constant-condition
+      while(true) {
+        try {
+          await this.checkAndSave(transactions)
+          break
+        } catch (error) {
+          logger.error('retry saving transactions in 2 seconds due to error:', error)
+          await CommonUtils.sleep(2000)
+        }
       }
+
+      await this.indexerConnector!.notifyCurrentBlockNumberProcessed()
     })
 
     this.checkAndSaveQueue.error((err: any, task: any) => {
-      console.error(err, task)
+      logger.error(err, JSON.stringify(task, undefined, 2))
     })
 
     this.indexerConnector.transactionsSubject
@@ -187,7 +196,6 @@ export default class Queue {
       }
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
-    cachedPreviousTxs.clear()
   }
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {

@@ -37,9 +37,6 @@ export const MAX_SYMBOL_LENGTH = 8
 export const MIN_DECIMAL = 0
 export const MAX_DECIMAL = 32
 
-export const NERVOS_DAO_RFC_URL =
-  'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
-
 export const DEFAULT_SUDT_FIELDS = {
   accountName: 'Undefined',
   tokenName: 'Unknown',
