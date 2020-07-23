@@ -45,6 +45,7 @@ export default class IndexerConnector {
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
+  private processingBlockNumber: string | undefined
   private indexerTip: Tip | undefined
   public pollingIndexer: boolean = false
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
@@ -87,7 +88,7 @@ export default class IndexerConnector {
       while (this.pollingIndexer) {
         this.indexerTip = await this.indexer.tip()
 
-        const newInserts = await this.upsertTxHashes()
+        await this.upsertTxHashes()
 
         const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
         if (nextUnprocessedBlockTip) {
@@ -95,13 +96,12 @@ export default class IndexerConnector {
             block_number: nextUnprocessedBlockTip.blockNumber,
             block_hash: nextUnprocessedBlockTip.blockHash,
           })
+          if (!this.processingBlockNumber) {
+            await this.processNextBlockNumber()
+          }
         }
         else if (this.indexerTip) {
           this.blockTipSubject.next(this.indexerTip)
-        }
-
-        if (newInserts.length) {
-          await this.processNextBlockNumber()
         }
 
         await CommonUtils.sleep(5000)
@@ -207,13 +207,15 @@ export default class IndexerConnector {
   private async processTxsInNextBlockNumber() {
     const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
     if (txsInNextUnprocessedBlockNumber.length) {
+      this.processingBlockNumber = txsInNextUnprocessedBlockNumber[0].transaction.blockNumber
       this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
     }
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
     const txsWithStatus: TransactionWithStatus[] = []
-    const fetchTxsWithStatusQueue = queue(async (hash: string) => {
+
+    for (const hash of txHashes) {
       const txWithStatus = await this.rpcService.getTransaction(hash)
       if (!txWithStatus) {
         throw new Error(`failed to fetch transaction for hash ${hash}`)
@@ -223,19 +225,18 @@ export default class IndexerConnector {
       txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
       txWithStatus!.transaction.timestamp = blockHeader?.timestamp
       txsWithStatus.push(txWithStatus)
-    }, 1)
-
-    fetchTxsWithStatusQueue.push(txHashes)
-
-    await new Promise((resolve, reject) => {
-      fetchTxsWithStatusQueue.drain(resolve)
-      fetchTxsWithStatusQueue.error(reject)
-    })
+    }
 
     return txsWithStatus
   }
 
-  public async notifyCurrentBlockNumberProcessed() {
-    this.processNextBlockNumberQueue!.push(null)
+  public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
+    if (blockNumber === this.processingBlockNumber) {
+      delete this.processingBlockNumber
+    }
+    else {
+      return
+    }
+    this.processNextBlockNumber()
   }
 }
