@@ -237,7 +237,7 @@ describe('queue', () => {
             }
           });
           it('notify indexer connector of processed block number', () => {
-            expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith()
+            expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)
           });
           it('updates tx hash cache to be processed', () => {
             expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
