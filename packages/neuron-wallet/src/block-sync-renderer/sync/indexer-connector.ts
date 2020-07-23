@@ -230,7 +230,7 @@ export default class IndexerConnector {
     return txsWithStatus
   }
 
-  public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
+  public notifyCurrentBlockNumberProcessed(blockNumber: string) {
     if (blockNumber === this.processingBlockNumber) {
       delete this.processingBlockNumber
     }

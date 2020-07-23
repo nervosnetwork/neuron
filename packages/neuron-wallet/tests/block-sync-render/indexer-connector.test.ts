@@ -310,7 +310,7 @@ describe('unit tests for IndexerConnector', () => {
                     .mockResolvedValueOnce([
                       fakeTxHashCache3,
                     ])
-                  await indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
+                  indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
                   await flushPromises()
                 })
                 it('emits new transactions', async () => {
@@ -322,7 +322,7 @@ describe('unit tests for IndexerConnector', () => {
                   stubbedNextUnprocessedTxsGroupedByBlockNumberFn
                     .mockResolvedValueOnce([])
                     .mockResolvedValueOnce([])
-                  await indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
+                  indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
                   await flushPromises()
                 })
                 it('emits new transactions', async () => {
@@ -339,7 +339,7 @@ describe('unit tests for IndexerConnector', () => {
                   .mockResolvedValueOnce([
                     fakeTxHashCache3,
                   ])
-                await indexerConnector.notifyCurrentBlockNumberProcessed('3')
+                indexerConnector.notifyCurrentBlockNumberProcessed('3')
                 await flushPromises()
               })
               it('should not emit new transactions', async () => {
