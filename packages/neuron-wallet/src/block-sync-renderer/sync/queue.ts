@@ -73,7 +73,7 @@ export default class Queue {
         }
       }
 
-      await this.indexerConnector!.notifyCurrentBlockNumberProcessed()
+      this.indexerConnector!.notifyCurrentBlockNumberProcessed(transactions[0].blockNumber)
     })
 
     this.checkAndSaveQueue.error((err: any, task: any) => {
