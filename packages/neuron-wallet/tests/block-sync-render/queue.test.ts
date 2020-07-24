@@ -28,6 +28,7 @@ const stubbedSaveFetchFn = jest.fn()
 const stubbedUpdateUsedAddressesFn = jest.fn()
 const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
 const stubbedUpdateCacheProcessedFn = jest.fn()
+const stubbedLoggerErrorFn = jest.fn()
 
 const stubbedTxAddressFinder = jest.fn().mockImplementation(
   (...args) => {
@@ -58,6 +59,7 @@ const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
   stubbedUpdateCacheProcessedFn.mockReset()
+  stubbedLoggerErrorFn.mockReset()
 }
 
 const generateFakeTx = (id: string) => {
@@ -148,6 +150,9 @@ describe('queue', () => {
         updateUsedAddresses: stubbedUpdateUsedAddressesFn
       }
     });
+    jest.doMock('utils/logger', () => {
+      return {error: stubbedLoggerErrorFn}
+    });
     jest.doMock('../../src/block-sync-renderer/sync/indexer-connector', () => {
       return stubbedIndexerConnector
     });
@@ -189,14 +194,14 @@ describe('queue', () => {
       });
     })
     describe('subscribes to IndexerConnector#transactionsSubject', () => {
-      describe('processes transactions from an event', () => {
-        const fakeTxWithStatus1 = generateFakeTx('1')
-        const fakeTxWithStatus2 = generateFakeTx('2')
+      const fakeTxWithStatus1 = generateFakeTx('1')
+      const fakeTxWithStatus2 = generateFakeTx('2')
 
-        const fakeTxs = [
-          fakeTxWithStatus2
-        ]
-        beforeEach(async () => {
+      const fakeTxs = [
+        fakeTxWithStatus2
+      ]
+      describe('processes transactions from an event', () => {
+        beforeEach(() => {
           stubbedAddressesFn.mockResolvedValue([
             true,
             addresses.map(addressMeta => addressMeta.address),
@@ -204,39 +209,53 @@ describe('queue', () => {
           ])
           stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
           stubbedTransactionsSubject.next(fakeTxs)
-          await flushPromises()
         });
-        it('check infos by hashes derived from addresses', () => {
-          const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
-          const acpLockHashes = ['0xbda2cfe4214ec63ec301170527222742d9af51b876af12d842a309bc28ee6523']
-          const multiSignBlake160s = ['0x3f9dcc063f5212ec07bbee31e62950b4ea481c53']
-          expect(stubbedTxAddressFinderConstructor).toHaveBeenCalledWith(
-            lockHashes,
-            acpLockHashes,
-            fakeTxs[0].transaction,
-            multiSignBlake160s
-          )
-        })
-        it('saves transactions', () => {
-          for (const {transaction} of fakeTxs) {
-            expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
-          }
-        });
-        it('updates used addresses', () => {
-          for (let i = 0; i < fakeTxs.length; i++) {
-            expect(stubbedUpdateUsedAddressesFn).toHaveBeenCalledWith(
-              addresses.map(addressMeta => addressMeta.address), []
+        describe('when saving transactions is succeeded', () => {
+          beforeEach(flushPromises)
+
+          it('check infos by hashes derived from addresses', () => {
+            const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
+            const acpLockHashes = ['0xbda2cfe4214ec63ec301170527222742d9af51b876af12d842a309bc28ee6523']
+            const multiSignBlake160s = ['0x3f9dcc063f5212ec07bbee31e62950b4ea481c53']
+            expect(stubbedTxAddressFinderConstructor).toHaveBeenCalledWith(
+              lockHashes,
+              acpLockHashes,
+              fakeTxs[0].transaction,
+              multiSignBlake160s
             )
-          }
+          })
+          it('saves transactions', () => {
+            for (const {transaction} of fakeTxs) {
+              expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
+            }
+          });
+          it('updates used addresses', () => {
+            for (let i = 0; i < fakeTxs.length; i++) {
+              expect(stubbedUpdateUsedAddressesFn).toHaveBeenCalledWith(
+                addresses.map(addressMeta => addressMeta.address), []
+              )
+            }
+          });
+          it('notify indexer connector of processed block number', () => {
+            expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)
+          });
+          it('updates tx hash cache to be processed', () => {
+            expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
+          })
         });
-        it('notify indexer connector of processed block number', () => {
-          expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
-            fakeTxWithStatus1.transaction.blockNumber
-          )
+        describe('when failed saving transactions', () => {
+          const err = new Error()
+          beforeEach(async () => {
+            stubbedSaveFetchFn.mockRejectedValueOnce(err)
+            await flushPromises()
+          });
+          it('handles the exception', async () => {
+            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
+              expect.stringMatching(/retry saving transactions in.*seconds/),
+              err
+            )
+          })
         });
-        it('updates tx hash cache to be processed', () => {
-          expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
-        })
       });
     });
   });

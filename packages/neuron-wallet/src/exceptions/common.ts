@@ -1,4 +1,4 @@
-import { t } from 'locales/i18n'
+import { t } from 'i18next'
 
 export class InvalidName extends Error {
   constructor(field: string) {

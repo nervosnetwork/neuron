@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React from 'react'
 import { createPortal } from 'react-dom'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -10,15 +10,7 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
-import {
-  RoutePath,
-  getCurrentUrl,
-  getSyncStatus,
-  useOnLocaleChange,
-  useChainTypeByGenesisBlockHash,
-  ChainType,
-  ConnectionStatus,
-} from 'utils'
+import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange, isMainnet } from 'utils'
 
 import styles from './navbar.module.scss'
 
@@ -62,23 +54,12 @@ const Navbar = () => {
     settings: { wallets = [], networks = [] },
   } = neuronWallet
   const [t, i18n] = useTranslation()
-  const [showSUDT, setShowSUDT] = useState(false)
   useOnLocaleChange(i18n)
 
   const network = networks.find(n => n.id === networkID)
   const networkName = network?.name ?? null
-  const networkURL = network?.remote ?? null
 
-  const toggleSUDT = useCallback(
-    (chainType: ChainType) => {
-      if (connectionStatus === ConnectionStatus.Online) {
-        setShowSUDT(ChainType.MAINNET !== chainType)
-      }
-    },
-    [setShowSUDT, connectionStatus]
-  )
-
-  useChainTypeByGenesisBlockHash(networkURL, toggleSUDT)
+  const showSUDT = !isMainnet(networks, networkID)
 
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 

@@ -77,9 +77,6 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - script: |
-        powershell -Command "choco install llvm; refreshenv"
-      displayName: 'Install clang (Windows)'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |
@@ -156,8 +153,6 @@ stages:
       inputs:
         versionSpec: 12.x
       displayName: 'Install Node.js'
-    - pwsh: choco install llvm; refreshenv
-      displayName: 'Install clang (Windows)'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |

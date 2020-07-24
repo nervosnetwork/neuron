@@ -3,7 +3,8 @@ import { LumosCellQuery } from "../../src/block-sync-renderer/sync/indexer-conne
 const stubbedElectronBrowserOn = jest.fn()
 const stubbedElectronBrowserLoadURL = jest.fn()
 const stubbedElectronBrowserWebContentSend = jest.fn()
-const stubbedSubjectSubscribe = jest.fn()
+const stubbedAddressCreatedSubjectSubscribe = jest.fn()
+const stubbedWalletDeletedSubjectSubscribe = jest.fn()
 
 const stubbedIpcMainOnce = jest.fn()
 
@@ -22,7 +23,8 @@ const resetMocks = () => {
   stubbedElectronBrowserLoadURL.mockReset()
   stubbedElectronBrowserWebContentSend.mockReset()
 
-  stubbedSubjectSubscribe.mockReset()
+  stubbedAddressCreatedSubjectSubscribe.mockReset()
+  stubbedWalletDeletedSubjectSubscribe.mockReset()
 
   stubbedIpcMainOnce.mockReset()
 }
@@ -47,7 +49,14 @@ describe('block sync render', () => {
       jest.doMock('models/subjects/address-created-subject', () => {
         return {
           getSubject: () => ({
-            subscribe: stubbedSubjectSubscribe
+            subscribe: stubbedAddressCreatedSubjectSubscribe
+          })
+        }
+      });
+      jest.doMock('models/subjects/wallet-deleted-subject', () => {
+        return {
+          getSubject: () => ({
+            subscribe: stubbedWalletDeletedSubjectSubscribe
           })
         }
       });
@@ -58,8 +67,9 @@ describe('block sync render', () => {
     afterEach(() => {
       jest.clearAllTimers()
     });
-    it('subscribes to #AddressCreatedSubject', () => {
-      expect(stubbedSubjectSubscribe).toHaveBeenCalled()
+    it('subscribes to #AddressCreatedSubject and #WalletDeletedSubject', () => {
+      expect(stubbedAddressCreatedSubjectSubscribe).toHaveBeenCalled()
+      expect(stubbedWalletDeletedSubjectSubscribe).toHaveBeenCalled()
     })
     describe('after initialized BrowserWindow', () => {
       beforeEach(() => {
@@ -94,8 +104,9 @@ describe('block sync render', () => {
       });
       require('../../src/block-sync-renderer')
     });
-    it('should not subscribe to #AddressCreatedSubject', () => {
-      expect(stubbedSubjectSubscribe).toHaveBeenCalledTimes(0)
+    it('should not subscribe to #AddressCreatedSubject and #WalletDeletedSubject', () => {
+      expect(stubbedAddressCreatedSubjectSubscribe).toHaveBeenCalledTimes(0)
+      expect(stubbedWalletDeletedSubjectSubscribe).toHaveBeenCalledTimes(0)
     });
   });
 });

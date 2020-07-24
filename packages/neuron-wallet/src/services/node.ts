@@ -4,11 +4,11 @@ import path from 'path'
 import https from 'https'
 import http from 'http'
 import { remote, dialog, shell } from 'electron'
+import { t } from 'i18next'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
 import env from 'env'
-import i18n from 'locales/i18n'
 import { ShouldBeTypeOf } from 'exceptions'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
@@ -155,11 +155,11 @@ class NodeService {
     const I18N_PATH = `messageBox.ckb-dependency`
     return dialog.showMessageBox({
       type: 'info',
-      buttons: ['skip', 'install-and-exit'].map(label => i18n.t(`${I18N_PATH}.buttons.${label}`)),
+      buttons: ['skip', 'install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
       defaultId: 1,
-      title: i18n.t(`${I18N_PATH}.title`),
-      message: i18n.t(`${I18N_PATH}.message`),
-      detail: i18n.t(`${I18N_PATH}.detail`),
+      title: t(`${I18N_PATH}.title`),
+      message: t(`${I18N_PATH}.message`),
+      detail: t(`${I18N_PATH}.detail`),
       cancelId: 0,
       noLink: true,
     }).then(({ response }) => {

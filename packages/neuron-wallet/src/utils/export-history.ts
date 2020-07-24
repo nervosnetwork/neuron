@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { promisify } from 'util'
-import i18n from 'locales/i18n'
+import { t } from 'i18next'
 import TransactionsService from 'services/tx/transaction-service'
 import AddressService from 'services/addresses'
 import { ChainType } from 'models/network'
@@ -40,7 +40,7 @@ const exportHistory = async ({
     }
   })
   await wsPromises.write(
-    `${headers.map(label => i18n.t(`export-transactions.column.${label}`))}\n`
+    `${headers.map(label => t(`export-transactions.column.${label}`))}\n`
   )
 
   const addresses = AddressService.allAddressesByWalletId(walletID).map(addr => addr.address)

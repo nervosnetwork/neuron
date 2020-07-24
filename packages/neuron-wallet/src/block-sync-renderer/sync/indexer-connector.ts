@@ -1,7 +1,8 @@
 import logger from 'electron-log'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
-import { Indexer, Tip, CollectorQueries, CellCollector } from '@ckb-lumos/indexer'
+import { QueryOptions, HashType } from '@ckb-lumos/base'
+import { Indexer, Tip, CellCollector } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -12,8 +13,8 @@ import IndexerCacheService from './indexer-cache-service'
 import IndexerFolderManager from './indexer-folder-manager'
 
 export interface LumosCellQuery {
-  lock: {codeHash: string, hashType: string, args: string} | null,
-  type: {codeHash: string, hashType: string, args: string} | null,
+  lock: {codeHash: string, hashType: HashType, args: string} | null,
+  type: {codeHash: string, hashType: HashType, args: string} | null,
   data: string | null
 }
 
@@ -44,6 +45,7 @@ export default class IndexerConnector {
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
+  private processingBlockNumber: string | undefined
   private indexerTip: Tip | undefined
   public pollingIndexer: boolean = false
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
@@ -84,23 +86,22 @@ export default class IndexerConnector {
       await this.processNextBlockNumber()
 
       while (this.pollingIndexer) {
-        this.indexerTip = this.indexer.tip()
+        this.indexerTip = await this.indexer.tip()
 
-        const newInserts = await this.upsertTxHashes()
+        await this.upsertTxHashes()
 
-        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock()
+        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
         if (nextUnprocessedBlockTip) {
           this.blockTipSubject.next({
             block_number: nextUnprocessedBlockTip.blockNumber,
             block_hash: nextUnprocessedBlockTip.blockHash,
           })
+          if (!this.processingBlockNumber) {
+            await this.processNextBlockNumber()
+          }
         }
         else if (this.indexerTip) {
           this.blockTipSubject.next(this.indexerTip)
-        }
-
-        if (newInserts.length) {
-          await this.processNextBlockNumber()
         }
 
         await CommonUtils.sleep(5000)
@@ -117,7 +118,7 @@ export default class IndexerConnector {
       throw new Error('at least one parameter is required')
     }
 
-    const queries: CollectorQueries = {}
+    const queries: QueryOptions = {}
     if (lock) {
       queries.lock = {
         code_hash: lock.codeHash,
@@ -189,10 +190,6 @@ export default class IndexerConnector {
   }
 
   private async upsertTxHashes(): Promise<string[]> {
-    const nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock()
-    if (nextUnprocessedBlock) {
-      return []
-    }
     const arrayOfInsertedTxHashes = await Promise.all(
       [...this.addressesByWalletId.entries()].map(([walletId, addressMetas]) => {
         const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
@@ -210,13 +207,15 @@ export default class IndexerConnector {
   private async processTxsInNextBlockNumber() {
     const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
     if (txsInNextUnprocessedBlockNumber.length) {
+      this.processingBlockNumber = txsInNextUnprocessedBlockNumber[0].transaction.blockNumber
       this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
     }
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
     const txsWithStatus: TransactionWithStatus[] = []
-    const fetchTxsWithStatusQueue = queue(async (hash: string) => {
+
+    for (const hash of txHashes) {
       const txWithStatus = await this.rpcService.getTransaction(hash)
       if (!txWithStatus) {
         throw new Error(`failed to fetch transaction for hash ${hash}`)
@@ -226,23 +225,18 @@ export default class IndexerConnector {
       txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
       txWithStatus!.transaction.timestamp = blockHeader?.timestamp
       txsWithStatus.push(txWithStatus)
-    }, 1)
-
-    fetchTxsWithStatusQueue.push(txHashes)
-
-    await new Promise((resolve, reject) => {
-      fetchTxsWithStatusQueue.drain(resolve)
-      fetchTxsWithStatusQueue.error(reject)
-    })
+    }
 
     return txsWithStatus
   }
 
-  public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
-    for (const [walletId, addressMetas] of this.addressesByWalletId.entries()) {
-      const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
-      await indexerCacheService.updateProcessedTxHashes(blockNumber)
+  public notifyCurrentBlockNumberProcessed(blockNumber: string) {
+    if (blockNumber === this.processingBlockNumber) {
+      delete this.processingBlockNumber
     }
-    this.processNextBlockNumberQueue!.push(null)
+    else {
+      return
+    }
+    this.processNextBlockNumber()
   }
 }

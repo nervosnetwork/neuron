@@ -30,7 +30,7 @@ import styles from './nervosDAO.module.scss'
 const { MIN_DEPOSIT_AMOUNT } = CONSTANTS
 
 const DAO_DOCS_URL =
-  'https://docs.nervos.org/references/neuron-wallet-guide.html#how-to-deposit-your-nervos-ckbyte-tokens-into-nervos-dao'
+  'https://docs.nervos.org/docs/basics/guides/neuron#5-deposit-your-nervos-ckbyte-tokens-into-nervos-dao'
 
 const NervosDAO = () => {
   const [focusedRecord, setFocusedRecord] = useState('')
@@ -154,6 +154,11 @@ const NervosDAO = () => {
       }
       return record.status === 'dead'
     })
+
+    if (tabIdx === '1') {
+      filteredRecord.sort((r1, r2) => +r2.unlockInfo!.timestamp! - +r1.unlockInfo!.timestamp!)
+    }
+
     return (
       <>
         <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>

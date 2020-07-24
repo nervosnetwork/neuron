@@ -226,13 +226,13 @@ describe('unit tests for IndexerConnector', () => {
             stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx3.transaction.hash])
 
             when(stubbedGetTransactionFn)
-              .calledWith(fakeTx1.transaction.hash).mockResolvedValueOnce(fakeTx1)
-              .calledWith(fakeTx2.transaction.hash).mockResolvedValueOnce(fakeTx2)
-              .calledWith(fakeTx3.transaction.hash).mockResolvedValueOnce(fakeTx3)
+              .calledWith(fakeTx1.transaction.hash).mockResolvedValue(fakeTx1)
+              .calledWith(fakeTx2.transaction.hash).mockResolvedValue(fakeTx2)
+              .calledWith(fakeTx3.transaction.hash).mockResolvedValue(fakeTx3)
 
             when(stubbedGetHeaderFn)
-              .calledWith(fakeBlock1.hash).mockResolvedValueOnce(fakeBlock1)
-              .calledWith(fakeBlock2.hash).mockResolvedValueOnce(fakeBlock2)
+              .calledWith(fakeBlock1.hash).mockResolvedValue(fakeBlock1)
+              .calledWith(fakeBlock2.hash).mockResolvedValue(fakeBlock2)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
@@ -283,6 +283,70 @@ describe('unit tests for IndexerConnector', () => {
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
             });
           });
+          describe('#notifyCurrentBlockNumberProcessed', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedTxsGroupedByBlockNumberFn
+                .mockResolvedValueOnce([
+                  fakeTxHashCache1,
+                  fakeTxHashCache2
+                ])
+                .mockResolvedValueOnce([
+                  fakeTxHashCache3,
+                ])
+
+              await connectIndexer(indexerConnector)
+              await flushPromises()
+            })
+            it('emits new transactions', async () => {
+              expect(txObserver).toHaveBeenCalledTimes(1)
+            })
+            describe('when match with the current block number in process', () => {
+              describe('having unprocessed transactions', () => {
+                beforeEach(async () => {
+                  stubbedNextUnprocessedTxsGroupedByBlockNumberFn
+                    .mockResolvedValueOnce([
+                      fakeTxHashCache3
+                    ])
+                    .mockResolvedValueOnce([
+                      fakeTxHashCache3,
+                    ])
+                  indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
+                  await flushPromises()
+                })
+                it('emits new transactions', async () => {
+                  expect(txObserver).toHaveBeenCalledTimes(2)
+                })
+              });
+              describe('having no unprocessed transactions', () => {
+                beforeEach(async () => {
+                  stubbedNextUnprocessedTxsGroupedByBlockNumberFn
+                    .mockResolvedValueOnce([])
+                    .mockResolvedValueOnce([])
+                  indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
+                  await flushPromises()
+                })
+                it('emits new transactions', async () => {
+                  expect(txObserver).toHaveBeenCalledTimes(1)
+                })
+              });
+            });
+            describe('when not match with the current block number in process', () => {
+              beforeEach(async () => {
+                stubbedNextUnprocessedTxsGroupedByBlockNumberFn
+                  .mockResolvedValueOnce([
+                    fakeTxHashCache3
+                  ])
+                  .mockResolvedValueOnce([
+                    fakeTxHashCache3,
+                  ])
+                indexerConnector.notifyCurrentBlockNumberProcessed('3')
+                await flushPromises()
+              })
+              it('should not emit new transactions', async () => {
+                expect(txObserver).toHaveBeenCalledTimes(1)
+              })
+            });
+          })
         });
         describe('when there are no transactions matched', () => {
           let txObserver: any
@@ -382,6 +446,8 @@ describe('unit tests for IndexerConnector', () => {
             args: '0x'
           },
           type: {
+            //test the workaround for this lumos data issue
+            //@ts-ignore
             hashType: 'lock',
             codeHash: '0xcode',
             args: '0x'

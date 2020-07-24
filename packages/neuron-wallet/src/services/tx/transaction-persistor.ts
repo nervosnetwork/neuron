@@ -108,11 +108,6 @@ export class TransactionPersistor {
       }
     }
 
-    // return if success
-    if (txEntity && txEntity.status === TransactionStatus.Success) {
-      return txEntity
-    }
-
     if (txEntity) {
       // lazy load inputs / outputs
       const inputEntities = await connection
@@ -127,8 +122,9 @@ export class TransactionPersistor {
         .getRepository(OutputEntity)
         .createQueryBuilder('output')
         .where({
-          transaction: txEntity,
+          transaction: txEntity
         })
+        .andWhere('status != :status', {status: OutputStatus.Dead})
         .getMany()
 
       // input -> previousOutput => dead
@@ -184,6 +180,7 @@ export class TransactionPersistor {
       } catch (err) {
         logger.error('Database:\tsaveWithFetch update error:', err)
         await queryRunner.rollbackTransaction()
+        throw err
       } finally {
         await queryRunner.release()
       }
@@ -318,6 +315,7 @@ export class TransactionPersistor {
     } catch (err) {
       logger.error('Database:\tcreate transaction error:', err)
       await queryRunner.rollbackTransaction()
+      throw err
     } finally {
       await queryRunner.release()
     }

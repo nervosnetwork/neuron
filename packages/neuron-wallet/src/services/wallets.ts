@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid'
-import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
-import Keystore from 'models/keys/keystore'
-import Store from 'models/store'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
+import Store from 'models/store'
+import Keystore from 'models/keys/keystore'
+import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 
 import FileService from './file'
 import AddressService from './addresses'
@@ -239,6 +240,7 @@ export default class WalletService {
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
     AddressService.deleteByWalletId(id)
+    WalletDeletedSubject.getSubject().next(id)
   }
 
   public setCurrent = (id: string) => {

@@ -1,3 +1,32 @@
+# 0.32.0-rc1 (2020-07-21)
+
+This is an RC version to preview the changes in the next release.
+
+### Bundled CKB node
+
+[CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+
+* Detect vcredist on Windows when user launches Neuron.
+* Enable the button of exporting transaction history.
+* Support two modes for clearing caches: Refresh cache / Fully rebuild index.
+* UI tune for pop-up windows.
+* Share token info across different wallets.
+* Add a link of `Deposit rules` on `Nervos DAO` page.
+* Remove the FAQ from menu and update docs link.
+* Order the `Completed` DAO records by unlock time in desc.
+
+### Syncing
+
+It has adopted a brand new indexing mechanism, which can significantly speed up the cache indexing process. The caches will be rebuilt for the first time, but it should be much faster than the previous versions (up to 3-4x on macOS, Windows and Linux).
+
+### Bug fixes
+
+* Fixed minor bugs on `History` page.
+* Fixed some Traditional Chinese words.
+
+
 # 0.32.0-beta.1 (2020-07-04)
 
 This is a beta version to preview the changes in the next release and may not be stable. It is not suggested to install this version for asset management. Welcome any questions or suggestions.
