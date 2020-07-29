@@ -95,7 +95,7 @@ export default class AppController {
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',
-      icon: path.join(__dirname, '../../neuron-ui/icon.png'),
+      icon: path.join(__dirname, '../../../assets/icons/icon.png'),
       webPreferences: {
         devTools: env.isDevMode,
         nodeIntegration: false,
