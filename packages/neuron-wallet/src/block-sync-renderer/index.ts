@@ -84,7 +84,8 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
     show: false,
     webPreferences: {
       nodeIntegration: false,
-      preload: path.join(__dirname, './preload.js')
+      enableRemoteModule: true,
+      preload: path.join(__dirname, './preload.js'),
     }
   })
 
