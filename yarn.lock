@@ -2672,11 +2672,6 @@
     elliptic "6.5.3"
     jsbi "3.1.3"
 
-"@nervosnetwork/ckb-types@0.32.0":
-  version "0.32.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.32.0.tgz#d289f0f574c51d1c629a7c2dc7b3a2b37186c02c"
-  integrity sha512-d0mJIz9jvL1fGBC1+zx2v3PZsKy1oQS0cL9C9L5JZifkHtlDhe37h50Idp6R2svFXk5zo2mXny7GXe5JBb4zMQ==
-
 "@nervosnetwork/ckb-types@0.34.0":
   version "0.34.0"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.34.0.tgz#4ae3329aa9e5b73dc337a1eac736305f0defd9fe"
