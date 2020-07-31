@@ -2645,37 +2645,42 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nervosnetwork/ckb-sdk-core@0.32.0":
-  version "0.32.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.32.0.tgz#6609b14e7daa5e61bb55ea361581dd634c65b2d8"
-  integrity sha512-h7sAT2XosXoq6SCLdmu5cxYpJU/7+9LyMcxGLDc81ubpbq1uuayaT8XBCBW7129ACoMxeE96R1Ac4kgcnRNYqQ==
+"@nervosnetwork/ckb-sdk-core@0.34.0":
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.34.0.tgz#d68f5ce98cb419457327dd6168a40f3190186cb5"
+  integrity sha512-+ZDAZ1R/ILHyQsZRbG5qHir62gNZdfZCkGoU8vgTrKGl7hPHwP7L0+8bgyO1tVxg5oO/UGTRur+Egs4XeiwFOg==
   dependencies:
-    "@nervosnetwork/ckb-sdk-rpc" "0.32.0"
-    "@nervosnetwork/ckb-sdk-utils" "0.32.0"
-    "@nervosnetwork/ckb-types" "0.32.0"
+    "@nervosnetwork/ckb-sdk-rpc" "0.34.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.34.0"
+    "@nervosnetwork/ckb-types" "0.34.0"
 
-"@nervosnetwork/ckb-sdk-rpc@0.32.0":
-  version "0.32.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.32.0.tgz#b91a0d3821db52ce797bbb0926812f02166cbccc"
-  integrity sha512-//6jKxNyUZ3dSxLVX/HS7NJvK+FI8tWDISCFLpuQ4LpBzpHuurJv3GQ/omLuMyA01d87pgGmDHcUSNrGcXvBgw==
+"@nervosnetwork/ckb-sdk-rpc@0.34.0":
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.34.0.tgz#6b1d795a7575205ad852809aacbe9aa84fc89e12"
+  integrity sha512-/fz7ICAfA2TqOW4WDjHlca47GAcLJztIqbUhIiTIX46z7IefVVVr2uPaJxjo60WQVQFPJ5pN56QFMAgxxEoKbQ==
   dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.32.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.34.0"
     axios "0.19.2"
 
-"@nervosnetwork/ckb-sdk-utils@0.32.0":
-  version "0.32.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.32.0.tgz#a9e1768b6dcf22b7428e8bac7b06e2a64b83a23c"
-  integrity sha512-7rX3mSEbeMUwXT5ssu9L2nCLlJ+LetQx5UinVBhh2ABz+46ugHIIG78b/WaxKCTRnpFAXsch+PXEcc6eFeJJJQ==
+"@nervosnetwork/ckb-sdk-utils@0.34.0":
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.34.0.tgz#12e1b8c053d5bfa0a5ea0b542272faa44e275cbd"
+  integrity sha512-hfoXTxsARuBstgXc1Oxe2VNoDry5qcwqpL4wYhg57ucsDkxrZ8E/cKcNwDd5f3orXHCHG88ReNcqZRCri9EBPA==
   dependencies:
-    "@nervosnetwork/ckb-types" "0.32.0"
+    "@nervosnetwork/ckb-types" "0.34.0"
     blake2b-wasm "2.1.0"
-    elliptic "6.5.2"
-    jsbi "3.1.2"
+    elliptic "6.5.3"
+    jsbi "3.1.3"
 
 "@nervosnetwork/ckb-types@0.32.0":
   version "0.32.0"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.32.0.tgz#d289f0f574c51d1c629a7c2dc7b3a2b37186c02c"
   integrity sha512-d0mJIz9jvL1fGBC1+zx2v3PZsKy1oQS0cL9C9L5JZifkHtlDhe37h50Idp6R2svFXk5zo2mXny7GXe5JBb4zMQ==
+
+"@nervosnetwork/ckb-types@0.34.0":
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.34.0.tgz#4ae3329aa9e5b73dc337a1eac736305f0defd9fe"
+  integrity sha512-gpwICFMltsuNYOVc9S5favA9ViEPfX29VHbnGibs8MelNrZcW/Mq88exWx+FXTnMOVn/bUFaQKOAY6ejWzOFtg==
 
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"
@@ -8484,7 +8489,7 @@ element-resize-detector@^1.2.1:
   dependencies:
     batch-processor "1.0.0"
 
-elliptic@6.5.2, elliptic@6.5.3, elliptic@^6.0.0:
+elliptic@6.5.3, elliptic@^6.0.0:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.3.tgz#cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6"
   integrity sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==
@@ -12354,7 +12359,12 @@ js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
-jsbi@3.1.2, jsbi@^3.1.2:
+jsbi@3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-3.1.3.tgz#f024b340032f7c7caaa6ca4b32b55e8d33f6e897"
+  integrity sha512-nBJqA0C6Qns+ZxurbEoIR56wyjiUszpNy70FHvxO5ervMoCbZVE3z3kxr5nKGhlxr/9MhKTSUBs7cAwwuf3g9w==
+
+jsbi@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-3.1.2.tgz#7502ed36fb2b32bb37efb3d2d0b3806a0d771780"
   integrity sha512-5nDXo1X9QVaXK/Cpb5VECV9ss1QPbjUuk1qSruHB1PK/g39Sd414K4nci99ElFDZv0vzxDEnKn3o49/Tn9Yagw==

@@ -36,8 +36,8 @@
   "dependencies": {
     "@ckb-lumos/base": "0.5.1",
     "@ckb-lumos/indexer": "0.5.1",
-    "@nervosnetwork/ckb-sdk-core": "0.32.0",
-    "@nervosnetwork/ckb-sdk-utils": "0.32.0",
+    "@nervosnetwork/ckb-sdk-core": "0.34.0",
+    "@nervosnetwork/ckb-sdk-utils": "0.34.0",
     "archiver": "4.0.2",
     "async": "3.2.0",
     "bn.js": "4.11.8",
