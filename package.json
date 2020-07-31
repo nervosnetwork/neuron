@@ -55,7 +55,8 @@
     "wait-on": "3.3.0"
   },
   "resolutions": {
-    "@types/node": "12.12.14"
+    "@types/node": "12.12.14",
+    "**/**/elliptic": "6.5.3"
   },
   "dependencies": {}
 }
