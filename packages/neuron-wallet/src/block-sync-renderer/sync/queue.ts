@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import { queue, AsyncQueue } from 'async'
 import logger from 'utils/logger'
 import { TransactionPersistor } from 'services/tx'
@@ -11,6 +10,7 @@ import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
+import SyncApiController from 'controllers/sync-api'
 import { Address as AddressInterface } from 'database/address/address-dao'
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
@@ -200,6 +200,6 @@ export default class Queue {
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
+    SyncApiController.emiter.emit('synced-block-number-updated', this.currentBlockNumber.toString())
   }
 }

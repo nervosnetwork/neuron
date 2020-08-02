@@ -1,5 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron'
-import path from 'path'
+import { BrowserWindow } from 'electron'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
@@ -14,10 +13,10 @@ import CommonUtils from 'utils/common'
 import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import IndexerFolderManager from './sync/indexer-folder-manager'
+import SyncTask from './task'
 
-let backgroundWindow: BrowserWindow | null
+let syncTask: SyncTask | null
 let network: Network | null
-let indexerQueryId: number = 0
 
 const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
   const addrs = AddressService.allAddresses()
@@ -73,23 +72,15 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
     IndexerFolderManager.resetIndexerData()
   }
 
-  if (backgroundWindow) {
+  if (syncTask) {
     return
   }
 
   logger.info('Sync:\tstarting background process')
-  backgroundWindow = new BrowserWindow({
-    width: 1366,
-    height: 768,
-    show: false,
-    webPreferences: {
-      nodeIntegration: false,
-      enableRemoteModule: true,
-      preload: path.join(__dirname, './preload.js'),
-    }
-  })
 
-  backgroundWindow.on('ready-to-show', async () => {
+  syncTask = new SyncTask()
+
+  syncTask.on('mounted', async () => {
     if (!network) {
       network = NetworksService.getInstance().getCurrent()
     }
@@ -106,42 +97,24 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
       // re init txCount in addresses if switch network
       await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
-      if (backgroundWindow) {
-        const addressesMetas = AddressService.allAddresses()
-        backgroundWindow.webContents.send(
-          "block-sync:start",
-          network.remote,
-          network.genesisHash,
-          addressesMetas
-        )
-      }
+      syncTask?.start(
+        network.remote,
+        network.genesisHash,
+        AddressService.allAddresses()
+      )
     }
   })
 
-  backgroundWindow.on('closed', () => {
-    backgroundWindow = null
-  })
-
-  backgroundWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
+  syncTask.mount()
 }
 
 export const killBlockSyncTask = () => {
-  if (backgroundWindow) {
+  if (syncTask) {
     logger.info('Sync:\tkill background process')
-    backgroundWindow.close()
+    syncTask.unmount()
   }
 }
 
 export const queryIndexer = (query: LumosCellQuery): Promise<LumosCell[]> => {
-  indexerQueryId ++
-  return new Promise(resolve => {
-    ipcMain.once(`block-sync:query-indexer:${indexerQueryId}`, (_event, results) => {
-      resolve(results)
-    });
-    backgroundWindow!.webContents.send(
-      "block-sync:query-indexer",
-      query,
-      indexerQueryId
-    )
-  })
+  return syncTask?.queryIndexer(query) as any
 }
