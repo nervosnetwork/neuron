@@ -19,7 +19,7 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
-    "build": "ttsc && ncp ./src/block-sync-renderer/index.html ./dist/block-sync-renderer/index.html",
+    "build": "ttsc",
     "clean": "rimraf dist/*",
     "test": "jest --runInBand --collect-coverage",
     "test:watch": "jest --watch",
