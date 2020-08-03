@@ -1,5 +1,5 @@
 import '../src/locales/i18n'
-
+import { SyncTask } from './test-utils'
 export const originalXMLHttpRequest = window.XMLHttpRequest
 
 export const mockedXMLHttpRequest = {
@@ -33,4 +33,10 @@ jest.mock('levelup', () => {
       })
     }
   })
+})
+
+// like mock electron's `BrowserWindow`
+// we don't need CKB running for testing
+jest.mock('../src/block-sync-renderer/task', () => {
+  return SyncTask
 })

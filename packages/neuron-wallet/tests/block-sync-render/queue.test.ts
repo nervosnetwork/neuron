@@ -22,7 +22,7 @@ const stubbedConnectFn = jest.fn()
 const stubbedGetChainFn = jest.fn()
 const stubbedGenesisBlockHashFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
-const stubbedIpcRenderInvokeFn = jest.fn()
+const stubbedEmiterInvokeFn = jest.fn()
 const stubbedAddressesFn = jest.fn()
 const stubbedSaveFetchFn = jest.fn()
 const stubbedUpdateUsedAddressesFn = jest.fn()
@@ -52,7 +52,7 @@ const resetMocks = () => {
   stubbedGetChainFn.mockReset()
   stubbedGenesisBlockHashFn.mockReset()
   stubbedIndexerConnectorConstructor.mockReset()
-  stubbedIpcRenderInvokeFn.mockReset()
+  stubbedEmiterInvokeFn.mockReset()
   stubbedAddressesFn.mockReset()
   stubbedSaveFetchFn.mockReset()
   stubbedUpdateUsedAddressesFn.mockReset()
@@ -128,13 +128,13 @@ describe('queue', () => {
         }
       }
     )
-    jest.doMock('electron', () => {
+    jest.doMock('controllers/sync-api', () => {
       return {
-        ipcRenderer: {
-          invoke: stubbedIpcRenderInvokeFn
+        emiter: {
+          emit: stubbedEmiterInvokeFn
         }
       }
-    });
+    })
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
     });
@@ -189,7 +189,7 @@ describe('queue', () => {
           stubbedBlockTipSubject.next({block_number: '3', block_hash: '0x'})
         });
         it('notify latest block numbers', () => {
-          expect(stubbedIpcRenderInvokeFn).toHaveBeenCalledWith('synced-block-number-updated', '3')
+          expect(stubbedEmiterInvokeFn).toHaveBeenCalledWith('synced-block-number-updated', '3')
         })
       });
     })

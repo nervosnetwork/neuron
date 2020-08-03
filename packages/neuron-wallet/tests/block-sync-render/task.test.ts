@@ -29,7 +29,7 @@ describe('block sync render', () => {
   let eventEmitter: any
   const query: LumosCellQuery = {lock: null, type: null, data: null}
   const liveCells = [{}]
-
+  let SyncTask: any
   beforeEach(async () => {
     resetMocks()
 
@@ -54,19 +54,19 @@ describe('block sync render', () => {
       return jest.fn()
     });
 
-    require('../../src/block-sync-renderer/task')
+    SyncTask = jest.requireActual('../../src/block-sync-renderer/task').default
   });
   describe('inits sync queue', () => {
+    let syncTask: any
     beforeEach(() => {
-      eventEmitter.emit('block-sync:start')
+      syncTask = new SyncTask()
+      syncTask.start()
     });
     describe('on#block-sync:query-indexer', () => {
-      const queryId = 1
-      beforeEach(() => {
-        eventEmitter.emit('block-sync:query-indexer', undefined, query, queryId)
-      });
-      it('emits block-sync:query-indexer with results', () => {
-        expect(stubbedSend).toHaveBeenCalledWith(`block-sync:query-indexer:${queryId}`, liveCells)
+
+      it('call queryIndexer with results', async () => {
+        const cells = await syncTask.queryIndexer(query)
+        expect(cells).toEqual(liveCells)
       })
     });
   });

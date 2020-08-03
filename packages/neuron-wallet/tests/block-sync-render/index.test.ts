@@ -5,6 +5,7 @@ const stubbedElectronBrowserLoadURL = jest.fn()
 const stubbedElectronBrowserWebContentSend = jest.fn()
 const stubbedAddressCreatedSubjectSubscribe = jest.fn()
 const stubbedWalletDeletedSubjectSubscribe = jest.fn()
+const stubbedQueryIndexer = jest.fn()
 
 const stubbedIpcMainOnce = jest.fn()
 
@@ -18,6 +19,12 @@ const stubbedElectronBrowserConstructor = jest.fn().mockImplementation(
   })
 )
 
+const stubbedSyncTaskCtor = jest.fn().mockImplementation(
+  () => ({
+    queryIndexer: stubbedQueryIndexer
+  })
+)
+
 const resetMocks = () => {
   stubbedElectronBrowserOn.mockReset()
   stubbedElectronBrowserLoadURL.mockReset()
@@ -27,6 +34,7 @@ const resetMocks = () => {
   stubbedWalletDeletedSubjectSubscribe.mockReset()
 
   stubbedIpcMainOnce.mockReset()
+  stubbedQueryIndexer.mockReset()
 }
 
 describe('block sync render', () => {
@@ -61,6 +69,10 @@ describe('block sync render', () => {
         }
       });
 
+      jest.doMock('../../src/block-sync-renderer/task', () => {
+        return stubbedSyncTaskCtor
+      })
+
       queryIndexer = require('../../src/block-sync-renderer').queryIndexer
       createBlockSyncTask = require('../../src/block-sync-renderer').createBlockSyncTask
     });
@@ -81,11 +93,11 @@ describe('block sync render', () => {
         beforeEach(() => {
           queryIndexer(query)
         });
-        it('listens on ipcMain#once', () => {
-          expect(stubbedIpcMainOnce.mock.calls[0][0]).toEqual('block-sync:query-indexer:1')
-          expect(stubbedElectronBrowserWebContentSend).toHaveBeenCalledWith('block-sync:query-indexer', query, 1)
+        it('called with SyncTask instance', () => {
+          expect(stubbedQueryIndexer).toHaveBeenCalledWith(query)
         })
-        describe('in subsequent #queryIndexer calls', () => {
+        // skip query id test since we call `getLiveCellsByScript` directly
+        describe.skip('in subsequent #queryIndexer calls', () => {
           beforeEach(() => {
             queryIndexer(query)
           });
