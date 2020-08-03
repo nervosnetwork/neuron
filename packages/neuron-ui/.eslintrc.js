@@ -26,9 +26,7 @@ module.exports = {
       "exports": "always-multiline",
       "functions": "ignore"
     }],
-    "import/no-extraneous-dependencies": [2, {
-      "devDependencies": true
-    }],
+    "import/no-extraneous-dependencies": "off",
     "no-unused-vars": "off",
     "implicit-arrow-linebreak": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
