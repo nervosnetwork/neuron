@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "typeRoots": [
       "src/types",
       "node_modules/@nervosnetwork/ckb-types",
