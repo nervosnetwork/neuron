@@ -1,4 +1,5 @@
 import { ResponseCode, ErrorCode, isSuccessResponse } from 'utils'
+import { ipcRenderer } from 'electron'
 
 export interface SuccessFromController {
   status: ResponseCode.SUCCESS
@@ -95,14 +96,12 @@ type Action =
   | 'get-token-info-list'
 
 export const remoteApi = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
-  const res: SuccessFromController | FailureFromController = await window.ipcRenderer
-    .invoke(action, params)
-    .catch(() => ({
-      status: ResponseCode.FAILURE,
-      message: {
-        content: 'Invalid response format',
-      },
-    }))
+  const res: SuccessFromController | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({
+    status: ResponseCode.FAILURE,
+    message: {
+      content: 'Invalid response format',
+    },
+  }))
 
   if (process.env.NODE_ENV === 'development' && action === window.localStorage.getItem('log-response')) {
     console.group(action)

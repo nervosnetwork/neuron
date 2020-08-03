@@ -1,3 +1,7 @@
+// Since this file is always running in the Render Process,
+// import modules that are the belonging of the Render Process will always be valid
+import { ipcRenderer, remote, desktopCapturer, shell } from 'electron'
+
 export * from './app'
 export * from './wallets'
 export * from './networks'
@@ -6,78 +10,44 @@ export * from './specialAssets'
 export * from './updater'
 export * from './sudt'
 
-const REMOTE_MODULE_NOT_FOUND =
-  'The remote module is not found, please make sure the UI is running inside the Electron App'
-
-const LIMITED_TO_ELECTRON = 'This function is limited to Electron'
-
 export const getLocale = () => {
-  if (!window.ipcRenderer) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    return window.navigator.language
-  }
-  return window.ipcRenderer.sendSync('get-locale')
+  return ipcRenderer.sendSync('get-locale')
 }
 
 export const getVersion = () => {
-  return window.remote?.app?.getVersion() ?? ''
+  return remote.app.getVersion() ?? ''
 }
 
 export const getPlatform = () => {
-  return window.remote?.process?.platform ?? 'Unknown'
+  return remote?.process?.platform ?? 'Unknown'
 }
 
 export const getWinID = () => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    return -1
-  }
-  return window.remote.getCurrentWindow().id
+  return remote?.getCurrentWindow().id
 }
 
 export const showErrorMessage = (title: string, content: string) => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    window.alert(`${title}: ${content}`)
-  } else {
-    window.remote.require('electron').dialog.showErrorBox(title, content)
-  }
+  remote.require('electron').dialog.showErrorBox(title, content)
 }
 
 export const showOpenDialog = (options: { title: string; message?: string }) => {
-  if (!window.remote) {
-    window.alert(REMOTE_MODULE_NOT_FOUND)
-    return Promise.reject()
-  }
-  return window.remote.require('electron').dialog.showOpenDialog(options)
+  return remote.require('electron').dialog.showOpenDialog(options)
 }
 
 export const showOpenDialogModal = (options: { title: string; message?: string }) => {
-  if (!window.remote) {
-    window.alert(REMOTE_MODULE_NOT_FOUND)
-    return Promise.reject()
-  }
-  return window.remote.require('electron').dialog.showOpenDialog(window.remote.getCurrentWindow(), options)
+  return remote.require('electron').dialog.showOpenDialog(remote.getCurrentWindow(), options)
 }
 
 export const openExternal = (url: string) => {
-  if (!window.remote) {
-    window.open(url)
-  } else {
-    window.remote.require('electron').shell.openExternal(url)
-  }
+  shell.openExternal(url)
 }
 
 export const openContextMenu = (
   template: ({ label: string; click: Function } | { role: string } | { type: string })[]
 ): void => {
-  if (!window.remote) {
-    window.alert(REMOTE_MODULE_NOT_FOUND)
-  } else {
-    const { Menu } = window.remote.require('electron')
-    const menu = Menu.buildFromTemplate(template)
-    menu.popup()
-  }
+  const { Menu } = remote.require('electron')
+  const menu = Menu.buildFromTemplate(template)
+  menu.popup()
 }
 
 const isError = (obj: any): obj is Error => {
@@ -85,12 +55,8 @@ const isError = (obj: any): obj is Error => {
 }
 
 export const captureScreenshot = async () => {
-  if (!window.require) {
-    return Promise.reject(LIMITED_TO_ELECTRON)
-  }
-  const { desktopCapturer } = window.require('electron')
-  const sources = await desktopCapturer.getSources({ types: ['screen'], size: { width: 1920, height: 1440 } })
-  const sizes = window.remote
+  const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1920, height: 1440 } })
+  const sizes = remote
     .require('electron')
     .screen.getAllDisplays()
     .map((display: any) => display.size)

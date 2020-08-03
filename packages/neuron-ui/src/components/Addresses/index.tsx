@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react'
+import { clipboard } from 'electron'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Edit } from 'grommet-icons'
@@ -55,7 +56,7 @@ const Addresses = () => {
           {
             label: t('addresses.copy-address'),
             click: () => {
-              window.clipboard.writeText(item.address)
+              clipboard.writeText(item.address)
             },
           },
           {

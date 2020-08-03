@@ -1,4 +1,4 @@
-import { remote, clipboard, nativeImage, ipcRenderer, IpcRenderer } from 'electron'
+import { remote, nativeImage, ipcRenderer, IpcRenderer } from 'electron'
 
 declare global {
   interface Window {
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'development') {
   })
 }
 
-window.clipboard = clipboard
+// window.clipboard = clipboard
 window.nativeImage = nativeImage
 window.ipcRenderer = ipcRenderer
 window.remote = remote

@@ -1,18 +1,7 @@
 import { CONSTANTS } from 'utils'
+import { ipcRenderer } from 'electron'
 
 const { LOCALES } = CONSTANTS
-
-const FallbackSubject = {
-  subscribe: (args: any) => {
-    console.warn('The remote module is not found, please make sure the UI is running inside the Electron App')
-    console.info(JSON.stringify(args))
-    return {
-      unsubscribe: () => {
-        console.info('unsubscribe')
-      },
-    }
-  },
-}
 
 const SubjectConstructor = <T>(
   channel:
@@ -28,20 +17,18 @@ const SubjectConstructor = <T>(
     | 'navigation'
     | 'set-locale'
 ) => {
-  return window.ipcRenderer
-    ? {
-        subscribe: (handler: (data: T) => void) => {
-          window.ipcRenderer.on(channel, (_e: Event, data: T) => {
-            handler(data)
-          })
-          return {
-            unsubscribe: () => {
-              window.ipcRenderer.removeAllListeners(channel)
-            },
-          }
+  return {
+    subscribe: (handler: (data: T) => void) => {
+      ipcRenderer.on(channel, (_e: Event, data: T) => {
+        handler(data)
+      })
+      return {
+        unsubscribe: () => {
+          ipcRenderer.removeAllListeners(channel)
         },
       }
-    : FallbackSubject
+    },
+  }
 }
 export const DataUpdate = SubjectConstructor<Subject.DataUpdateMetaInfo>('data-updated')
 export const CurrentWallet = SubjectConstructor<any>('current-wallet-updated')
