@@ -390,6 +390,10 @@ export default class ApiController {
     ipcMain.handle(channel, async (event, args) => {
       try {
         const res = await listener(event, args)
+        // All objects, array, class instance need to be serialized before sent to the IPC
+        if (typeof res === 'object') {
+          return JSON.parse(JSON.stringify(res))
+        }
         return res
       } catch (err) {
         logger.warn(`channel handling error: ${err}`)
