@@ -20,22 +20,12 @@ import Output from '../../src/models/chain/output';
 import Transaction from '../../src/models/chain/transaction';
 import Script from '../../src/models/chain/script';
 
-const stubbedGetTransactionFn = jest.fn()
-const stubbedGetHeaderFn = jest.fn()
-const stubbedGenesisBlockHashFn = jest.fn()
-const stubbedGetTransactionsByLockScriptFn = jest.fn()
-
-const resetMocks = () => {
-  stubbedGetTransactionFn.mockReset()
-  stubbedGetHeaderFn.mockReset()
-  stubbedGetTransactionsByLockScriptFn.mockReset()
-}
-
 describe('integration tests for sync pipeline', () => {
   const fakeNodeUrl = 'http://fakenode:8114'
   const fakeGenesisHash = 'fakegenesishash'
+  const pubkeyInBlake160 = '0x36c329ed630d6ce750712a477543672adab57f4c'
   const shortAddressInfo = {
-    lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
+    lock: SystemScriptInfo.generateSecpScript(pubkeyInBlake160),
   }
   const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
   const addressInfo: Address = {
@@ -116,9 +106,23 @@ describe('integration tests for sync pipeline', () => {
 
   let queue: any
 
+  const stubbedGetTransactionFn = jest.fn()
+  const stubbedGetHeaderFn = jest.fn()
+  const stubbedGenesisBlockHashFn = jest.fn()
+  const stubbedGetTransactionsByLockScriptFn = jest.fn()
+  const stubbedUpdateUsedAddressFn = jest.fn()
+
+  const resetMocks = () => {
+    stubbedGetTransactionFn.mockReset()
+    stubbedGetHeaderFn.mockReset()
+    stubbedGetTransactionsByLockScriptFn.mockReset()
+    stubbedUpdateUsedAddressFn.mockReset()
+  }
+
   let stubbedIndexerConstructor: any
   let stubbedTransactionCollectorConstructor: any
   let stubbedRPCServiceConstructor: any
+
   const stubbedStartForeverFn = jest.fn()
   const stubbedTipFn = jest.fn()
 
@@ -136,6 +140,17 @@ describe('integration tests for sync pipeline', () => {
 
     resetMocks()
     jest.useFakeTimers()
+
+    jest.mock('services/networks', () => {
+      return {
+        getInstance: () => ({
+          isMainnet: () => false,
+          getCurrent: () => ({
+            genesisHash: fakeGenesisHash
+          })
+        }),
+      }
+    })
 
     stubbedGenesisBlockHashFn.mockResolvedValue(fakeGenesisHash)
 
@@ -177,6 +192,8 @@ describe('integration tests for sync pipeline', () => {
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
     });
+
+    jest.doMock('services/wallets', () => ({updateUsedAddresses: stubbedUpdateUsedAddressFn}));
 
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
@@ -256,6 +273,12 @@ describe('integration tests for sync pipeline', () => {
         expect(caches.filter(cache => cache.txHash === fakeTx.transaction.hash && cache.isProcessed)).toHaveLength(1)
       }
     });
+    it('updates used addresses', () => {
+      expect(stubbedUpdateUsedAddressFn).toHaveBeenCalledWith(
+        [address],
+        [pubkeyInBlake160]
+      )
+    });
     describe('inserts related outputs', () => {
       let outputs: OutputEntity[] = []
       beforeEach(async () => {
@@ -329,6 +352,12 @@ describe('integration tests for sync pipeline', () => {
       for (const fakeTx of fakeTxs) {
         expect(caches.filter(cache => cache.txHash === fakeTx.transaction.hash && cache.isProcessed)).toHaveLength(1)
       }
+    });
+    it('updates used addresses', () => {
+      expect(stubbedUpdateUsedAddressFn).toHaveBeenCalledWith(
+        [address],
+        [pubkeyInBlake160]
+      )
     });
     describe('handles outputs', () => {
       let outputs: OutputEntity[] = []
