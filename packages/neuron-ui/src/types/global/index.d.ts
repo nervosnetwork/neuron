@@ -8,8 +8,10 @@ declare interface Window {
     process: any
     app: any
   }
+  shell: any
   require: any
   nativeImage: any
+  desktopCapturer: any
   ipcRenderer: {
     invoke(channel: string, ...args: any[]): Promise<any>
     on(channel: string, listener: Function)

@@ -1,5 +1,3 @@
-// Since this file is always running in the Render Process,
-// import modules that are the belonging of the Render Process will always be valid
 import { ipcRenderer, remote, desktopCapturer, shell } from 'electron'
 
 export * from './app'
@@ -61,7 +59,7 @@ export const captureScreenshot = async () => {
     .screen.getAllDisplays()
     .map((display: any) => display.size)
   const streams: (MediaStream | Error)[] = await Promise.all(
-    sources.map(async (source: any, idx: number) => {
+    sources.map(async (source, idx) => {
       const constraints: any = {
         audio: false,
         video: {
