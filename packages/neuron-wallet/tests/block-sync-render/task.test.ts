@@ -6,6 +6,9 @@ const stubbedSend = jest.fn()
 const stubbedGetIndexerConnector = jest.fn()
 const stubbedGetLiveCellsByScript = jest.fn()
 const stubbedStartQueue = jest.fn()
+const stubbedStopQueue = jest.fn()
+const stubbedStopAndWaitQueue = jest.fn()
+const stubbedInitConnection = jest.fn()
 
 const stubbedIndexerConnector = {
   getLiveCellsByScript: stubbedGetLiveCellsByScript
@@ -14,7 +17,9 @@ const stubbedIndexerConnector = {
 const stubbedQueueConstructor = jest.fn().mockImplementation(
   () => ({
     getIndexerConnector: stubbedGetIndexerConnector,
-    start: stubbedStartQueue
+    start: stubbedStartQueue,
+    stop:stubbedStopQueue,
+    stopAndWait: stubbedStopAndWaitQueue,
   })
 )
 
@@ -23,6 +28,9 @@ const resetMocks = () => {
   stubbedGetIndexerConnector.mockReset()
   stubbedGetLiveCellsByScript.mockReset()
   stubbedStartQueue.mockReset()
+  stubbedStopQueue.mockReset()
+  stubbedStopAndWaitQueue.mockReset()
+  stubbedInitConnection.mockReset()
 }
 
 describe('block sync render', () => {
@@ -51,23 +59,56 @@ describe('block sync render', () => {
       return stubbedQueueConstructor
     });
     jest.doMock('../../src/database/chain/ormconfig', () => {
-      return jest.fn()
+      return stubbedInitConnection
     });
-
-    SyncTask = jest.requireActual('../../src/block-sync-renderer/task').default
   });
   describe('inits sync queue', () => {
     let syncTask: any
-    beforeEach(() => {
-      syncTask = new SyncTask()
-      syncTask.start()
-    });
-    describe('on#block-sync:query-indexer', () => {
 
-      it('call queryIndexer with results', async () => {
-        const cells = await syncTask.queryIndexer(query)
-        expect(cells).toEqual(liveCells)
-      })
+    beforeEach(async () => {
+      SyncTask = jest.requireActual('../../src/block-sync-renderer/task').default
+      syncTask = new SyncTask()
     });
+
+    it('call queryIndexer with results', async () => {
+      await syncTask.start()
+      const cells = await syncTask.queryIndexer(query)
+      expect(cells).toEqual(liveCells)
+    })
+    it('start the syncTask should initConnection and start a sync queue', async () => {
+      await syncTask.start()
+      expect(stubbedInitConnection).toHaveBeenCalled()
+      expect(stubbedStartQueue).toHaveBeenCalledTimes(1)
+    })
+
+    it('should emit mounted event', () => {
+      const stubbedMounted = jest.fn()
+      syncTask.on('mounted', stubbedMounted)
+      syncTask.mount()
+      expect(stubbedMounted).toHaveBeenCalled()
+      syncTask.off('mounted', stubbedMounted)
+    })
+
+    it('unmount sync task should stop the sync queue', async () => {
+      await syncTask.start()
+      syncTask.unmount()
+      expect(stubbedStopQueue).toHaveBeenCalled()
+    })
+
+    it('sync task can be start over', async () => {
+      await syncTask.start()
+      syncTask.unmount()
+      expect(stubbedStopQueue).toHaveBeenCalled()
+      await syncTask.start()
+      expect(stubbedInitConnection).toHaveBeenCalled()
+      expect(stubbedStartQueue).toHaveBeenCalledTimes(2)
+    })
+
+    it('sync task start mutiple times should stop and wait for the quene to drained', async () => {
+      await syncTask.start()
+      await syncTask.start()
+      expect(stubbedStopAndWaitQueue).toHaveBeenCalled()
+      expect(stubbedStartQueue).toHaveBeenCalledTimes(2)
+    })
   });
 });
