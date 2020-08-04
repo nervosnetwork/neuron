@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import { clipboard } from 'electron'
 import { useTranslation } from 'react-i18next'
 import { Icon } from 'office-ui-fabric-react'
 import { ReactComponent as Detail } from 'widgets/Icons/Detail.svg'
@@ -86,7 +87,7 @@ const TransactionList = ({
         {
           label: t('history.copy-tx-hash'),
           click: () => {
-            window.clipboard.writeText(hash)
+            clipboard.writeText(hash)
           },
         },
         {

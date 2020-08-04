@@ -1,13 +1,15 @@
-import { remote, clipboard, nativeImage, ipcRenderer, IpcRenderer, shell, desktopCapturer, DesktopCapturer } from 'electron'
+import { remote, clipboard, nativeImage, IpcRenderer, ipcRenderer, shell, desktopCapturer, DesktopCapturer } from 'electron'
 
 declare global {
   interface Window {
-    clipboard: Electron.Clipboard
-    nativeImage: any
-    ipcRenderer: IpcRenderer
-    remote: Electron.Remote
-    shell: Electron.Shell
-    desktopCapturer: DesktopCapturer
+    electron: {
+      clipboard: Electron.Clipboard
+      nativeImage: any
+      ipcRenderer: IpcRenderer
+      remote: Electron.Remote
+      shell: Electron.Shell
+      desktopCapturer: DesktopCapturer
+    }
   }
 }
 
@@ -20,10 +22,11 @@ if (process.env.NODE_ENV === 'development') {
   })
 }
 
-window.clipboard = clipboard
-window.nativeImage = nativeImage
-window.ipcRenderer = ipcRenderer
-window.remote = remote
-window.shell = shell
-window.desktopCapturer = desktopCapturer
-
+window.electron = {
+  clipboard,
+  nativeImage,
+  ipcRenderer,
+  remote,
+  shell,
+  desktopCapturer,
+}
