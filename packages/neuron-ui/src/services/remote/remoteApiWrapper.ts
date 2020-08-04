@@ -1,9 +1,9 @@
 import { ResponseCode, ErrorCode, isSuccessResponse } from 'utils'
 import { ipcRenderer } from 'electron'
 
-export interface SuccessFromController {
+export interface SuccessFromController<R = any> {
   status: ResponseCode.SUCCESS
-  result: any
+  result: R | null
 }
 
 export interface FailureFromController {
@@ -16,7 +16,7 @@ export interface FailureFromController {
       }
 }
 
-export type ControllerResponse = SuccessFromController | FailureFromController
+export type ControllerResponse<R = any> = SuccessFromController<R> | FailureFromController
 
 export const RemoteNotLoadError = {
   status: ResponseCode.FAILURE,
@@ -35,6 +35,12 @@ type Action =
   | 'handle-view-error'
   | 'show-settings'
   | 'set-locale'
+  | 'show-error-message'
+  | 'show-open-dialog'
+  | 'show-open-dialog-modal'
+  | 'open-external'
+  | 'open-context-menu'
+  | 'get-all-displays-size'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -95,8 +101,8 @@ type Action =
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
 
-export const remoteApi = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
-  const res: SuccessFromController | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({
+export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
+  const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({
     status: ResponseCode.FAILURE,
     message: {
       content: 'Invalid response format',

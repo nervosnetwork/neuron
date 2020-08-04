@@ -23,7 +23,7 @@ const showWindow = (url: string, title: string, options?: Electron.BrowserWindow
       webPreferences: {
         devTools: env.isDevMode,
         nodeIntegration: false,
-        enableRemoteModule: true,
+        enableRemoteModule: false,
         preload: path.join(__dirname, './preload.js'),
       },
       ...options,

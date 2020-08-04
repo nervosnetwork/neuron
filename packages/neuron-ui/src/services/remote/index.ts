@@ -1,12 +1,12 @@
+import { ipcRenderer, desktopCapturer, shell, OpenDialogOptions, MenuItemConstructorOptions, MenuItem } from 'electron'
+import { isSuccessResponse } from 'utils/is'
 import {
-  ipcRenderer,
-  remote,
-  desktopCapturer,
-  shell,
-  OpenDialogOptions,
-  MenuItemConstructorOptions,
-  MenuItem,
-} from 'electron'
+  invokeShowErrorMessage,
+  invokeShowOpenDialog,
+  invokeShowOpenDialogModal,
+  invokeOpenContextMenu,
+  invokeGetAllDisplaysSize,
+} from './app'
 
 export * from './app'
 export * from './wallets'
@@ -32,43 +32,43 @@ export const getLocale = () => {
 }
 
 export const getVersion = () => {
-  return remote?.app.getVersion() ?? ''
+  return ipcRenderer.sendSync('get-version') ?? ''
 }
 
 export const getPlatform = () => {
-  return remote?.process.platform ?? 'Unknown'
+  return ipcRenderer.sendSync('get-version') ?? 'Unknown'
 }
 
 export const getWinID = () => {
-  if (remote === undefined) {
+  if (ipcRenderer === undefined) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     return -1
   }
-  return remote?.getCurrentWindow().id
+  return ipcRenderer.sendSync('get-win-id')
 }
 
 export const showErrorMessage = (title: string, content: string) => {
-  if (remote === undefined) {
+  if (ipcRenderer === undefined) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     window.alert(`${title}: ${content}`)
   }
-  remote.require('electron').dialog.showErrorBox(title, content)
+  invokeShowErrorMessage({ title, content })
 }
 
-export const showOpenDialog = (options: { title: string; message?: string }) => {
-  if (remote === undefined) {
+export const showOpenDialog = (options: OpenDialogOptions) => {
+  if (ipcRenderer === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
     return Promise.reject()
   }
-  return remote.require('electron').dialog.showOpenDialog(options)
+  return invokeShowOpenDialog(options)
 }
 
 export const showOpenDialogModal = (options: OpenDialogOptions) => {
-  if (remote === undefined) {
+  if (ipcRenderer === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
     return Promise.reject()
   }
-  return remote.require('electron').dialog.showOpenDialog(remote.getCurrentWindow(), options)
+  return invokeShowOpenDialogModal(options)
 }
 
 export const openExternal = (url: string) => {
@@ -80,12 +80,10 @@ export const openExternal = (url: string) => {
 }
 
 export const openContextMenu = (template: Array<MenuItemConstructorOptions | MenuItem>): void => {
-  if (remote === undefined) {
+  if (ipcRenderer === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
   } else {
-    const { Menu } = remote.require('electron')
-    const menu = Menu.buildFromTemplate(template)
-    menu.popup()
+    invokeOpenContextMenu(template)
   }
 }
 
@@ -94,14 +92,15 @@ const isError = (obj: any): obj is Error => {
 }
 
 export const captureScreenshot = async () => {
-  if (remote === undefined) {
+  if (ipcRenderer === undefined) {
     return Promise.reject(LIMITED_TO_ELECTRON)
   }
   const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1920, height: 1440 } })
-  const sizes = remote
-    .require('electron')
-    .screen.getAllDisplays()
-    .map((display: any) => display.size)
+  const res = await invokeGetAllDisplaysSize()
+  if (!isSuccessResponse(res)) {
+    throw new Error(res.message.toString())
+  }
+  const sizes = res.result!
   const streams: (MediaStream | Error)[] = await Promise.all(
     sources.map(async (source, idx) => {
       const constraints: any = {

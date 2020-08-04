@@ -99,7 +99,7 @@ export default class AppController {
       webPreferences: {
         devTools: env.isDevMode,
         nodeIntegration: false,
-        enableRemoteModule: true,
+        enableRemoteModule: false,
         preload: path.join(__dirname, './preload.js'),
       },
     })
