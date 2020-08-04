@@ -1,4 +1,12 @@
-import { ipcRenderer, remote, desktopCapturer, shell } from 'electron'
+import {
+  ipcRenderer,
+  remote,
+  desktopCapturer,
+  shell,
+  OpenDialogOptions,
+  MenuItemConstructorOptions,
+  MenuItem,
+} from 'electron'
 
 export * from './app'
 export * from './wallets'
@@ -55,7 +63,7 @@ export const showOpenDialog = (options: { title: string; message?: string }) => 
   return remote.require('electron').dialog.showOpenDialog(options)
 }
 
-export const showOpenDialogModal = (options: { title: string; message?: string }) => {
+export const showOpenDialogModal = (options: OpenDialogOptions) => {
   if (remote === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
     return Promise.reject()
@@ -71,9 +79,7 @@ export const openExternal = (url: string) => {
   }
 }
 
-export const openContextMenu = (
-  template: ({ label: string; click: Function } | { role: string } | { type: string })[]
-): void => {
+export const openContextMenu = (template: Array<MenuItemConstructorOptions | MenuItem>): void => {
   if (remote === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
   } else {
