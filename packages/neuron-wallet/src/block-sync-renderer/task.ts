@@ -18,6 +18,7 @@ export default class SyncTask extends EventEmitter {
 
     logger.info("Sync:\tstop block sync queue")
     syncQueue?.stop()
+    syncQueue?.getIndexerConnector()?.disconnect()
     syncQueue = null
   }
 

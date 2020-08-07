@@ -112,6 +112,7 @@ export const killBlockSyncTask = () => {
   if (syncTask) {
     logger.info('Sync:\tkill background process')
     syncTask.unmount()
+    syncTask = null
   }
 }
 

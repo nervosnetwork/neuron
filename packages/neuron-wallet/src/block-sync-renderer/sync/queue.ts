@@ -112,6 +112,7 @@ export default class Queue {
   public stopAndWait = async () => {
     this.stop()
     await this.waitForDrained()
+    await this.indexerConnector?.disconnect()
   }
 
   private checkAndSave = async (transactions: Transaction[]): Promise<void> => {

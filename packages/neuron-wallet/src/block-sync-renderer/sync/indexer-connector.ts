@@ -1,8 +1,9 @@
 import logger from 'electron-log'
+import { spawn, Thread, Worker } from 'threads'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType } from '@ckb-lumos/base'
-import { Indexer, Tip, CellCollector } from '@ckb-lumos/indexer'
+import { Tip } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -11,6 +12,7 @@ import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 import IndexerFolderManager from './indexer-folder-manager'
+import { IndexerWorker } from './indexer-worker'
 
 export interface LumosCellQuery {
   lock: {codeHash: string, hashType: HashType, args: string} | null,
@@ -41,7 +43,10 @@ export interface LumosCell {
 }
 
 export default class IndexerConnector {
-  private indexer: Indexer
+  // @ts-ignore worker is available after connect()
+  private indexerWorker: IndexerWorker
+  private nodeUrl: string
+  private indexerFolderPath: string
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
@@ -56,7 +61,8 @@ export default class IndexerConnector {
     nodeUrl: string,
     indexerFolderPath: string = IndexerFolderManager.IndexerDataFolderPath
   ) {
-    this.indexer = new Indexer(nodeUrl, indexerFolderPath)
+    this.nodeUrl = nodeUrl
+    this.indexerFolderPath = indexerFolderPath
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses
@@ -78,15 +84,28 @@ export default class IndexerConnector {
     })
   }
 
+  private async initWorker (uri: string, dataPath: string) {
+    this.indexerWorker = await spawn<IndexerWorker>(
+      // new Worker(path.join(__dirname, './indexer-worker.js')),
+      new Worker('./indexer-worker'),
+    )
+    await this.indexerWorker.init(uri, dataPath)
+  }
+
+  public async disconnect() {
+    await Thread.terminate(this.indexerWorker as any)
+  }
+
   public async connect() {
     try {
-      this.indexer.startForever()
+      await this.initWorker(this.nodeUrl, this.indexerFolderPath)
+      await this.indexerWorker.startForever()
       this.pollingIndexer = true
 
       await this.processNextBlockNumber()
 
       while (this.pollingIndexer) {
-        this.indexerTip = await this.indexer.tip()
+        this.indexerTip = await this.indexerWorker.tip()
 
         await this.upsertTxHashes()
 
@@ -137,25 +156,14 @@ export default class IndexerConnector {
     //@ts-ignore
     queries.data = data || null
 
-    const collector = new CellCollector(this.indexer, queries)
-
-    const result = []
-    for await (const cell of collector.collect()) {
-      //somehow the lumos indexer returns an invalid hash type "lock" for hash type "data"
-      //for now we have to fix it here
-      const cellOutput: any = cell.cell_output
-      if (cellOutput.type?.hash_type === 'lock') {
-        cellOutput.type.hash_type = 'data'
-      }
-      result.push(cell)
-    }
+    const result = await this.indexerWorker.collectCells(queries)
     return result
   }
 
   private async getTxsInNextUnprocessedBlockNumber() {
     const txHashCachesByNextBlockNumberAndAddress = await Promise.all(
       [...this.addressesByWalletId.entries()].map(async ([walletId, addressMetas]) => {
-        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
+        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexerWorker)
         return indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
       })
     )
@@ -192,7 +200,7 @@ export default class IndexerConnector {
   private async upsertTxHashes(): Promise<string[]> {
     const arrayOfInsertedTxHashes = await Promise.all(
       [...this.addressesByWalletId.entries()].map(([walletId, addressMetas]) => {
-        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
+        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexerWorker)
         return indexerCacheService.upsertTxHashes()
       })
     )
