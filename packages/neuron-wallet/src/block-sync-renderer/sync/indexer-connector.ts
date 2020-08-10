@@ -1,5 +1,5 @@
 import logger from 'electron-log'
-import { spawn, Thread, Worker } from 'threads'
+import { spawn, Thread, Worker } from 'worker-threads.js'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType } from '@ckb-lumos/base'
@@ -86,8 +86,10 @@ export default class IndexerConnector {
 
   private async initWorker (uri: string, dataPath: string) {
     this.indexerWorker = await spawn<IndexerWorker>(
-      // new Worker(path.join(__dirname, './indexer-worker.js')),
-      new Worker('./indexer-worker'),
+      new Worker('./indexer-worker', {
+        // `tiny-worker` meaning that use `child_process.fork` as worker implementation
+        _implementation: 'tiny-worker'
+      }),
     )
     await this.indexerWorker.init(uri, dataPath)
   }

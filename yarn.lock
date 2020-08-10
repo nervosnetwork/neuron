@@ -19263,18 +19263,6 @@ thenify-all@^1.0.0:
   dependencies:
     any-promise "^1.0.0"
 
-threads@^1.6.3:
-  version "1.6.3"
-  resolved "https://registry.yarnpkg.com/threads/-/threads-1.6.3.tgz#89324a93509403c90a169344023151ae1fe4986b"
-  integrity sha512-tKwFIWRgfAT85KGkrpDt2jWPO8IVH0sLNfB/pXad/VW9eUIY2Zlz+QyeizypXhPHv9IHfqRzvk2t3mPw+imhWw==
-  dependencies:
-    callsites "^3.1.0"
-    debug "^4.1.1"
-    is-observable "^1.1.0"
-    observable-fns "^0.5.1"
-  optionalDependencies:
-    tiny-worker ">= 2"
-
 throat@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/throat/-/throat-4.1.0.tgz#89037cbc92c56ab18926e6ba4cbb200e15672a6a"
@@ -19342,7 +19330,7 @@ tiny-warning@^1.0.0, tiny-warning@^1.0.2:
   resolved "https://registry.yarnpkg.com/tiny-warning/-/tiny-warning-1.0.3.tgz#94a30db453df4c643d0fd566060d60a875d84754"
   integrity sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==
 
-"tiny-worker@>= 2", tiny-worker@^2.3.0:
+tiny-worker@2.3.0, "tiny-worker@>= 2":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/tiny-worker/-/tiny-worker-2.3.0.tgz#715ae34304c757a9af573ae9a8e3967177e6011e"
   integrity sha512-pJ70wq5EAqTAEl9IkGzA+fN0836rycEuz2Cn6yeZ6FRzlVS5IDOkFHpIoEsksPRQV34GDqXm65+OlnZqUSyK2g==
@@ -20703,6 +20691,18 @@ worker-rpc@^0.1.0:
   integrity sha512-P1WjMrUB3qgJNI9jfmpZ/htmBEjFh//6l/5y8SD9hg1Ef5zTTVVoRjTrTEzPrNBQvmhMxkoTsjOXN10GWU7aCg==
   dependencies:
     microevent.ts "~0.1.1"
+
+worker-threads.js@1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/worker-threads.js/-/worker-threads.js-1.6.5.tgz#b50ca46b265fc3d6c3d17ace1138b119fe3d1051"
+  integrity sha512-mUd+Icef43uKEDb6GJI7fKwaZvX4Uk5fsg6cOvmd/JY8Q8xmiQqroZEXbURpbfUw23JJGxhw3y1gEh/X9eUyVQ==
+  dependencies:
+    callsites "^3.1.0"
+    debug "^4.1.1"
+    is-observable "^1.1.0"
+    observable-fns "^0.5.1"
+  optionalDependencies:
+    tiny-worker ">= 2"
 
 wrap-ansi@^2.0.0:
   version "2.1.0"
