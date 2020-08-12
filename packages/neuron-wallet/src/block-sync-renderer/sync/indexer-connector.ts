@@ -1,6 +1,7 @@
 import logger from 'electron-log'
-import { spawn, Thread, Worker } from 'worker-threads.js'
 import { Subject } from 'rxjs'
+import { fork } from 'child_process'
+import path from 'path'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType } from '@ckb-lumos/base'
 import { Tip } from '@ckb-lumos/indexer'
@@ -12,7 +13,8 @@ import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 import IndexerFolderManager from './indexer-folder-manager'
-import { IndexerWorker } from './indexer-worker'
+import type { IndexerWorker } from './indexer-worker'
+import { spawn, terminate } from 'utils/worker'
 
 export interface LumosCellQuery {
   lock: {codeHash: string, hashType: HashType, args: string} | null,
@@ -86,16 +88,14 @@ export default class IndexerConnector {
 
   private async initWorker (uri: string, dataPath: string) {
     this.indexerWorker = await spawn<IndexerWorker>(
-      new Worker('./indexer-worker', {
-        // `tiny-worker` meaning that use `child_process.fork` as worker implementation
-        _implementation: 'tiny-worker'
-      }),
+      fork(path.join(__dirname, 'indexer-worker.js'))
     )
+
     await this.indexerWorker.init(uri, dataPath)
   }
 
   public async disconnect() {
-    await Thread.terminate(this.indexerWorker as any)
+    terminate(this.indexerWorker)
   }
 
   public async connect() {

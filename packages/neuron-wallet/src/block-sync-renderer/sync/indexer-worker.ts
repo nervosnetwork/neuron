@@ -1,6 +1,6 @@
 import { Indexer, CellCollector, TransactionCollector } from '@ckb-lumos/indexer'
 import { QueryOptions } from '@ckb-lumos/base'
-import { expose } from 'worker-threads.js/worker'
+import { expose } from 'utils/worker'
 
 let indexer: Indexer | null
 
@@ -48,4 +48,3 @@ const indexerWorker = {
 }
 
 expose(indexerWorker)
-
