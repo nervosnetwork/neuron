@@ -1,7 +1,7 @@
 import type { ChildProcess } from 'child_process'
 
 interface WorkerMessage {
-  type?: 'caller',
+  type?: 'caller' | 'kill',
   result?: {
     channel?: string,
     args?: any[]
@@ -22,7 +22,10 @@ export function expose (obj: Record<string, Function>) {
   })
 
   process.on('message', async (msg: WorkerMessage) => {
-    if (typeof msg !== 'object' || msg?.type !== 'caller') {
+    if (msg?.type === 'kill') {
+      process.exit(0)
+    }
+    if (msg?.type !== 'caller') {
       return
     }
 
@@ -82,6 +85,12 @@ interface WorkerInst {
 
 export async function terminate<T extends WorkerInst> (workerInst: T) {
   const worker = workerInst.$worker
+  worker?.send({ type: 'kill' })
   worker?.disconnect()
   worker?.kill('SIGHUP')
+}
+
+export function subscribe<T extends WorkerInst>(workerInst: T, listener: (...args: any[]) => void) {
+  const worker = workerInst.$worker
+  worker?.on('message', listener)
 }

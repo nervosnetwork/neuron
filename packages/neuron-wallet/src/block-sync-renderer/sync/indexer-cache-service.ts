@@ -3,20 +3,20 @@ import { queue } from 'async'
 import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
+import { Indexer, TransactionCollector } from '@ckb-lumos/indexer'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { IndexerWorker } from './indexer-worker'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
   private rpcService: RpcService
-  private indexerWorker: IndexerWorker
   private walletId: string
+  private indexer: Indexer
 
   constructor(
     walletId: string,
     addressMetas: AddressMeta[],
     rpcService: RpcService,
-    indexerWorker: IndexerWorker
+    indexer: Indexer
   ) {
     for (const addressMeta of addressMetas) {
       if (addressMeta.walletId !== walletId) {
@@ -27,7 +27,7 @@ export default class IndexerCacheService {
     this.walletId = walletId
     this.addressMetas = addressMetas
     this.rpcService = rpcService
-    this.indexerWorker = indexerWorker
+    this.indexer = indexer
   }
 
   private async countTxHashes(): Promise<number> {
@@ -93,7 +93,15 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const fetchedTxHashes = await this.indexerWorker.getTransactionHashes(lockScript)
+        const transactionCollector = new TransactionCollector(this.indexer, {
+          lock: {
+            code_hash: lockScript.codeHash,
+            hash_type: lockScript.hashType,
+            args: lockScript.args
+          }
+        })
+        //@ts-ignore
+        const fetchedTxHashes = transactionCollector.getTransactionHashes().toArray()
         if (!fetchedTxHashes.length) {
           continue
         }

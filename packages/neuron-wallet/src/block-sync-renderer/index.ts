@@ -1,4 +1,6 @@
 import { BrowserWindow } from 'electron'
+import path from 'path'
+import { fork } from 'child_process'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
@@ -13,7 +15,10 @@ import CommonUtils from 'utils/common'
 import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import IndexerFolderManager from './sync/indexer-folder-manager'
-import SyncTask from './task'
+import { spawn, terminate, subscribe } from 'utils/worker'
+import SyncApiController from 'controllers/sync-api'
+import type { SyncTask } from './task'
+import env from 'env'
 
 let syncTask: SyncTask | null
 let network: Network | null
@@ -30,11 +35,11 @@ const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: 
 
 if (BrowserWindow) {
   AddressCreatedSubject.getSubject().subscribe(async () => {
-    killBlockSyncTask()
+    await killBlockSyncTask()
     await createBlockSyncTask()
   })
   WalletDeletedSubject.getSubject().subscribe(async () => {
-    killBlockSyncTask()
+    await killBlockSyncTask()
     await createBlockSyncTask()
   })
 }
@@ -56,7 +61,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
     logger.info('Network:\tswitched to:', network)
   }
 
-  killBlockSyncTask()
+  await killBlockSyncTask()
   if (shouldSync) {
     await createBlockSyncTask()
   } else {
@@ -78,40 +83,49 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
 
   logger.info('Sync:\tstarting background process')
 
-  syncTask = new SyncTask()
-
-  syncTask.on('mounted', async () => {
-    if (!network) {
-      network = NetworksService.getInstance().getCurrent()
-    }
-
-    const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
-    SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
-    logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
-
-    DataUpdateSubject.next({
-      dataType: 'transaction',
-      actionType: 'update',
+  syncTask = await spawn<SyncTask>(
+    fork(path.join(__dirname, 'task.js'), [], {
+      env: {
+        fileBasePath: env.fileBasePath
+      }
     })
+  )
 
-    if (network.genesisHash !== EMPTY_GENESIS_HASH) {
-      // re init txCount in addresses if switch network
-      await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
-      syncTask?.start(
-        network.remote,
-        network.genesisHash,
-        AddressService.allAddresses()
-      )
+  subscribe(syncTask, msg => {
+    if (msg?.channel === 'synced-block-number-updated') {
+      SyncApiController.emiter.emit('synced-block-number-updated', msg?.result)
     }
   })
 
-  syncTask.mount()
+  if (!network) {
+    network = NetworksService.getInstance().getCurrent()
+  }
+
+  const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
+  SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
+  logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
+
+  DataUpdateSubject.next({
+    dataType: 'transaction',
+    actionType: 'update',
+  })
+
+  if (network.genesisHash !== EMPTY_GENESIS_HASH) {
+    // re init txCount in addresses if switch network
+    await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
+    syncTask?.start(
+      network.remote,
+      network.genesisHash,
+      AddressService.allAddresses()
+    )
+  }
 }
 
-export const killBlockSyncTask = () => {
+export const killBlockSyncTask = async () => {
   if (syncTask) {
     logger.info('Sync:\tkill background process')
-    syncTask.unmount()
+    await syncTask.unmount()
+    terminate(syncTask)
     syncTask = null
   }
 }

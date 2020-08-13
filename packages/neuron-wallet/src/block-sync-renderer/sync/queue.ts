@@ -10,7 +10,6 @@ import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
-import SyncApiController from 'controllers/sync-api'
 import { Address as AddressInterface } from 'database/address/address-dao'
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
@@ -58,6 +57,7 @@ export default class Queue {
     this.indexerConnector.blockTipSubject.subscribe(tip => {
       this.updateCurrentBlockNumber(BigInt(tip.block_number))
     });
+
 
     this.checkAndSaveQueue = queue(async (task: any) => {
       const {transactions} = task
@@ -112,7 +112,6 @@ export default class Queue {
   public stopAndWait = async () => {
     this.stop()
     await this.waitForDrained()
-    await this.indexerConnector?.disconnect()
   }
 
   private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
@@ -201,6 +200,9 @@ export default class Queue {
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    SyncApiController.emiter.emit('synced-block-number-updated', this.currentBlockNumber.toString())
+    process.send?.({
+      channel: 'synced-block-number-updated',
+      result: this.currentBlockNumber.toString()
+    })
   }
 }

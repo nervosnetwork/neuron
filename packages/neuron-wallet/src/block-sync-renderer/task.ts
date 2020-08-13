@@ -4,40 +4,40 @@ import Queue from './sync/queue'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import logger from 'utils/logger'
 import { LumosCellQuery } from './sync/indexer-connector'
-import { EventEmitter } from 'events'
+import { expose } from 'utils/worker'
+import env from 'env'
 
 let syncQueue: Queue | null
 
-export default class SyncTask extends EventEmitter {
-  public mount() {
-    this.emit('mounted')
-  }
+export type SyncTask = typeof syncTask
 
-  public unmount() {
+const syncTask = {
+  unmount() {
     unregisterTxStatusListener()
 
     logger.info("Sync:\tstop block sync queue")
     syncQueue?.stop()
-    syncQueue?.getIndexerConnector()?.disconnect()
     syncQueue = null
-  }
-
-  public async start(url: string, genesisHash: string, addressesMetas: AddressInterface[]) {
+  },
+  async start(url: string, genesisHash: string, addressesMetas: AddressInterface[]) {
     if (syncQueue) {
       await syncQueue.stopAndWait()
     }
 
+    // reset `fileBasePath` from master process
+    env.fileBasePath = process.env['fileBasePath'] ?? env.fileBasePath
     await initConnection(genesisHash)
 
     logger.info("Sync:\tstart block sync queue")
     syncQueue = new Queue(url, addressesMetas)
     syncQueue.start()
-  }
-
-  public async queryIndexer (query: LumosCellQuery) {
+  },
+  async queryIndexer (query: LumosCellQuery) {
     const indexerConnector = syncQueue?.getIndexerConnector()
     return await indexerConnector?.getLiveCellsByScript(query)
   }
 }
+
+expose(syncTask)
 
 registerTxStatusListener()

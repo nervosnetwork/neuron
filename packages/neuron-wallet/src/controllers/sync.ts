@@ -26,7 +26,7 @@ export default class SyncController {
   }
 
   private doClearTask = async (clearIndexerFolder: boolean) => {
-    killBlockSyncTask()
+    await killBlockSyncTask()
     AddressDao.resetAddresses()
     await ChainCleaner.clean()
     await createBlockSyncTask(clearIndexerFolder)
