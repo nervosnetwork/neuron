@@ -37,7 +37,6 @@ describe('block sync render', () => {
   let eventEmitter: any
   const query: LumosCellQuery = {lock: null, type: null, data: null}
   const liveCells = [{}]
-  let SyncTask: any
   beforeEach(async () => {
     resetMocks()
 
@@ -66,8 +65,7 @@ describe('block sync render', () => {
     let syncTask: any
 
     beforeEach(async () => {
-      SyncTask = jest.requireActual('../../src/block-sync-renderer/task').default
-      syncTask = new SyncTask()
+      syncTask = jest.requireActual('../../src/block-sync-renderer/task').default
     });
 
     it('call queryIndexer with results', async () => {
@@ -79,14 +77,6 @@ describe('block sync render', () => {
       await syncTask.start()
       expect(stubbedInitConnection).toHaveBeenCalled()
       expect(stubbedStartQueue).toHaveBeenCalledTimes(1)
-    })
-
-    it('should emit mounted event', () => {
-      const stubbedMounted = jest.fn()
-      syncTask.on('mounted', stubbedMounted)
-      syncTask.mount()
-      expect(stubbedMounted).toHaveBeenCalled()
-      syncTask.off('mounted', stubbedMounted)
     })
 
     it('unmount sync task should stop the sync queue', async () => {

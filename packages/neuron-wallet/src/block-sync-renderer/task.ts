@@ -38,6 +38,8 @@ const syncTask = {
   }
 }
 
+export default syncTask
+
 expose(syncTask)
 
 registerTxStatusListener()

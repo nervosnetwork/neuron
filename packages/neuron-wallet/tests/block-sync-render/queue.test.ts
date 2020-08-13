@@ -5,14 +5,14 @@ import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionWithStatus from '../../src/models/chain/transaction-with-status'
-import {Address, AddressVersion} from '../../src/database/address/address-dao'
+import { Address, AddressVersion } from '../../src/database/address/address-dao'
 import Queue from '../../src/block-sync-renderer/sync/queue'
 import Transaction from '../../src/models/chain/transaction'
-import TxStatus, {TxStatusType} from '../../src/models/chain/tx-status'
+import TxStatus, { TxStatusType } from '../../src/models/chain/tx-status'
 import Input from '../../src/models/chain/input'
 import Output from '../../src/models/chain/output'
 import OutPoint from '../../src/models/chain/out-point'
-import Script, {ScriptHashType} from '../../src/models/chain/script'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { flushPromises } from '../test-utils'
 
 const stubbedIndexerConnectorConstructor = jest.fn()
@@ -72,7 +72,7 @@ const generateFakeTx = (id: string) => {
     Output.fromObject({
       capacity: '1',
       lock: Script.fromObject(
-        {hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: '0x'}
+        { hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: '0x' }
       )
     })
   ]
@@ -151,7 +151,7 @@ describe('queue', () => {
       }
     });
     jest.doMock('utils/logger', () => {
-      return {error: stubbedLoggerErrorFn}
+      return { error: stubbedLoggerErrorFn }
     });
     jest.doMock('../../src/block-sync-renderer/sync/indexer-connector', () => {
       return stubbedIndexerConnector
@@ -185,11 +185,11 @@ describe('queue', () => {
     });
     describe('subscribes to IndexerConnector#blockTipSubject', () => {
       describe('when new block tip emits from IndexerConnector', () => {
-        beforeEach(() => {
-          stubbedBlockTipSubject.next({block_number: '3', block_hash: '0x'})
-        });
         it('notify latest block numbers', () => {
-          expect(stubbedEmiterInvokeFn).toHaveBeenCalledWith('synced-block-number-updated', '3')
+          const mock = jest.spyOn(process, 'send')
+          stubbedBlockTipSubject.next({ block_number: '3', block_hash: '0x' })
+          expect(mock).toHaveBeenCalledWith({ channel: 'synced-block-number-updated', result: '3' })
+          mock.mockRestore()
         })
       });
     })
@@ -225,7 +225,7 @@ describe('queue', () => {
             )
           })
           it('saves transactions', () => {
-            for (const {transaction} of fakeTxs) {
+            for (const { transaction } of fakeTxs) {
               expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
             }
           });

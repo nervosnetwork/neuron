@@ -73,6 +73,21 @@ describe('block sync render', () => {
         return stubbedSyncTaskCtor
       })
 
+      jest.doMock('child_process', () => {
+        return {
+          fork: jest.fn()
+        }
+      })
+
+      jest.doMock('utils/worker', () => {
+        return {
+          spawn: () => ({
+            queryIndexer: stubbedQueryIndexer
+          }),
+          subscribe: jest.fn()
+        }
+      })
+
       queryIndexer = require('../../src/block-sync-renderer').queryIndexer
       createBlockSyncTask = require('../../src/block-sync-renderer').createBlockSyncTask
     });
