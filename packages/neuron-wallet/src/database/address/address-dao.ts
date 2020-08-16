@@ -331,6 +331,13 @@ class AddressStore {
   }
 
   static changed() {
-    AddressDbChangedSubject.getSubject().next("Updated")
+    if (process.send) {
+      process.send({
+        channel: 'address-db-changed',
+        result: 'Updated'
+      })
+    } else {
+      AddressDbChangedSubject.getSubject().next("Updated")
+    }
   }
 }

@@ -155,6 +155,13 @@ export default class Transaction extends BaseEntity {
   }
 
   private changed = (event: string) => {
-    TxDbChangedSubject.getSubject().next({ event })
+    if (process.send) {
+      process.send({
+        channel: 'tx-db-changed',
+        result: { event }
+      })
+    } else {
+      TxDbChangedSubject.getSubject().next({ event })
+    }
   }
 }

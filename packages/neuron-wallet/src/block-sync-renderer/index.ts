@@ -19,6 +19,8 @@ import { spawn, terminate, subscribe } from 'utils/worker'
 import SyncApiController from 'controllers/sync-api'
 import type { SyncTask } from './task'
 import env from 'env'
+import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
+import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 
 let syncTask: SyncTask | null
 let network: Network | null
@@ -94,6 +96,14 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   subscribe(syncTask, msg => {
     if (msg?.channel === 'synced-block-number-updated') {
       SyncApiController.emiter.emit('synced-block-number-updated', msg?.result)
+    }
+
+    if (msg?.channel === 'tx-db-changed') {
+      TxDbChangedSubject.getSubject().next(msg?.reslt)
+    }
+
+    if (msg?.channel === 'address-db-changed') {
+      AddressDbChangedSubject.getSubject().next(msg?.result)
     }
   })
 
