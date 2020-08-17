@@ -13,6 +13,11 @@ export type WorkerModule<Keys extends string> = {
     [key in Keys]: WorkerFunction;
 };
 
+/**
+ * expose must be called in a child process, and
+ * make an object containing methods callable from the master process.
+ * @param obj
+ */
 export function expose (obj: Record<string, Function>) {
   const channels = Object.keys(obj)
   // Sending a message in macrotasks ensures that
@@ -21,6 +26,9 @@ export function expose (obj: Record<string, Function>) {
     process.send!({ channels })
   })
 
+  // Since Jest modifies process.on to not respond to child process messages,
+  // the following statement will never be executed in the test environment
+  // istanbul ignore next
   process.on('message', async (msg: WorkerMessage) => {
     if (msg?.type === 'kill') {
       process.exit(0)

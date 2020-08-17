@@ -1,24 +1,20 @@
 const { expose } = require('../../../dist/utils/worker')
 
 expose({
-  f1() {
+  doNothing() {
 
   },
-  f2() {
-    return 'f2'
+  normal() {
+    return 'normal'
   },
-  async f3() {
+  async async() {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve('f3')
+        resolve('async/await')
       }, 2000)
     }, )
   },
-  f4(...args) {
+  args(...args) {
     return args
-  },
-  f5() {
-    process.send({ f5: 'f5' })
-    return 'f5'
   }
 })

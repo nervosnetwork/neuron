@@ -1,47 +1,104 @@
 import path from 'path'
-import { expose, spawn, terminate } from '../../src/utils/worker'
+import { expose, spawn, terminate, subscribe } from '../../src/utils/worker'
 import { fork } from 'child_process'
 
-describe('workers', () => {
-  const noop = (..._: any) => undefined
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+const noop = (..._: any) => undefined
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-  it('expose should send object keys as channels to the master process', async () => {
-    const sendSpy = jest.spyOn(process, 'send')
-    expose({
-      test1: noop,
-      test2: noop
+describe('utils/workers', () => {
+  describe('expose', () => {
+    let processSendSpy: any
+
+    beforeEach(() => {
+      processSendSpy = jest.spyOn(process, 'send')
     })
-    await delay(10)
-    expect(sendSpy).toHaveBeenCalledWith({ channels: ['test1', 'test2'] })
-    sendSpy.mockRestore()
+
+    afterEach(() => {
+      processSendSpy.mockRestore()
+    })
+
+    beforeEach(async () => {
+      expose({
+        test1: noop,
+        test2: noop
+      })
+      // wait for macrotask executed
+      await delay(10)
+    })
+
+    it('expose should send object keys as channels to the master process', async () => {
+      expect(processSendSpy).toHaveBeenCalledWith({ channels: ['test1', 'test2'] })
+    })
   })
 
-  it('spawn should work with expose', async () => {
-    const handlers = await spawn(
-      fork(path.join(__dirname, 'fixtures', 'worker.js'))
-    )
+  describe('spawn', () => {
+    let Worker: any
 
-    const f1 = await handlers.f1()
-    expect(f1).toBe(undefined)
-    const f2 = await handlers.f2()
-    expect(f2).toBe('f2')
-    const f3 = await handlers.f3()
-    expect(f3).toBe('f3')
-    const f4 = await handlers.f4(1, 2, 3)
-    expect(f4).toEqual([1, 2, 3])
+    beforeAll(async () => {
+      Worker = await spawn(
+        fork(path.join(__dirname, 'fixtures', 'worker.js'))
+      )
+    })
 
-    await terminate(handlers)
+    afterAll(async () => {
+      await terminate(Worker)
+    })
+
+    it('spawn handler can execute a function but return nothing', async () => {
+      const res = await Worker.doNothing()
+      expect(res).toBe(undefined)
+    })
+
+    it('spawn handler can execute a async/await function', async () => {
+      const res = await Worker.async()
+      expect(res).toBe('async/await')
+    })
+
+    it('spawn handler can execute a normal function', async () => {
+      const res = await Worker.normal()
+      expect(res).toBe('normal')
+    })
+
+    it('spawn handler can return aruguments', async () => {
+      const res = await Worker.args(1, 2, 3)
+      expect(res).toEqual([1, 2, 3])
+    })
   })
 
-  it('terminate should work', async () => {
-    const handlers = await spawn(
-      fork(path.join(__dirname, 'fixtures', 'worker.js'))
-    )
+  describe('terminate', () => {
+    let handlers: any
 
-    await terminate(handlers)
+    beforeEach(async () => {
+      handlers = await spawn(
+        fork(path.join(__dirname, 'fixtures', 'worker.js'))
+      )
+    })
 
-    expect(handlers?.$worker?.connected).toBe(false)
-    expect(handlers?.$worker?.killed).toBe(true)
+    it('terminate should close ipc connection', async () => {
+      await terminate(handlers)
+      expect(handlers?.$worker?.connected).toBe(false)
+    })
+
+    it('terminate should kill the child process', async () => {
+      await terminate(handlers)
+      expect(handlers?.$worker?.killed).toBe(true)
+    })
+  })
+
+  describe('subscribe', () => {
+    const stubbedaddEventListener = jest.fn()
+
+    afterEach(() => {
+      stubbedaddEventListener.mockRestore()
+    })
+
+    it('subscribe should start a listener in worker instance', () => {
+      subscribe({
+        $worker: {
+          on: stubbedaddEventListener
+        } as any
+      }, noop)
+      expect(stubbedaddEventListener).toHaveBeenCalledWith('message', noop)
+    })
   })
 })

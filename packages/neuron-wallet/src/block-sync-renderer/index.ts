@@ -94,16 +94,18 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   )
 
   subscribe(syncTask, msg => {
-    if (msg?.channel === 'synced-block-number-updated') {
-      SyncApiController.emiter.emit('synced-block-number-updated', msg?.result)
-    }
-
-    if (msg?.channel === 'tx-db-changed') {
-      TxDbChangedSubject.getSubject().next(msg?.reslt)
-    }
-
-    if (msg?.channel === 'address-db-changed') {
-      AddressDbChangedSubject.getSubject().next(msg?.result)
+    switch (msg?.channel) {
+      case 'synced-block-number-updated':
+        SyncApiController.emiter.emit('synced-block-number-updated', msg?.result)
+        break
+      case 'tx-db-changed':
+        TxDbChangedSubject.getSubject().next(msg?.reslt)
+        break
+      case 'address-db-changed':
+        AddressDbChangedSubject.getSubject().next(msg?.result)
+        break
+      default:
+        break
     }
   })
 
