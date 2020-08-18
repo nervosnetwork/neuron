@@ -1,4 +1,4 @@
-const { expose } = require('../../../dist/utils/worker')
+const { expose } = require('./../../../dist/utils/worker')
 
 expose({
   doNothing() {

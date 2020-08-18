@@ -95,7 +95,7 @@ export async function terminate<T extends WorkerInst> (workerInst: T) {
   const worker = workerInst.$worker
   worker?.send({ type: 'kill' })
   worker?.disconnect()
-  worker?.kill('SIGHUP')
+  worker?.kill('SIGINT')
 }
 
 export function subscribe<T extends WorkerInst>(workerInst: T, listener: (...args: any[]) => void) {
