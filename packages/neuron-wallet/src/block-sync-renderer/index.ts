@@ -35,15 +35,14 @@ const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: 
   await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
 }
 
+const restartSyncTask = async () => {
+  await killBlockSyncTask()
+  await createBlockSyncTask()
+}
+
 if (BrowserWindow) {
-  AddressCreatedSubject.getSubject().subscribe(async () => {
-    await killBlockSyncTask()
-    await createBlockSyncTask()
-  })
-  WalletDeletedSubject.getSubject().subscribe(async () => {
-    await killBlockSyncTask()
-    await createBlockSyncTask()
-  })
+  AddressCreatedSubject.getSubject().subscribe(restartSyncTask)
+  WalletDeletedSubject.getSubject().subscribe(restartSyncTask)
 }
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
@@ -103,6 +102,10 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
         break
       case 'address-db-changed':
         AddressDbChangedSubject.getSubject().next(msg?.result)
+        break
+      case 'wallet-deleted':
+      case 'address-created':
+        restartSyncTask()
         break
       default:
         break

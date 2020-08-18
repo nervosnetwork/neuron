@@ -59,7 +59,15 @@ export default class AddressService {
     const addressesToNotify = addresses
       .filter(versionFilter)
       .map(address => { return { ...address, isImporting: importing } })
-    AddressCreatedSubject.getSubject().next(addressesToNotify)
+
+    if (process.send) {
+      process.send({
+        channel: 'address-created',
+        result: addressesToNotify
+      })
+    } else {
+      AddressCreatedSubject.getSubject().next(addressesToNotify)
+    }
   }
 
   public static checkAndGenerateSave(

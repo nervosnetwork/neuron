@@ -240,7 +240,14 @@ export default class WalletService {
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
     AddressService.deleteByWalletId(id)
-    WalletDeletedSubject.getSubject().next(id)
+    if (process.send) {
+      process.send({
+        channel: 'wallet-deleted',
+        result: id
+      })
+    } else {
+      WalletDeletedSubject.getSubject().next(id)
+    }
   }
 
   public setCurrent = (id: string) => {
