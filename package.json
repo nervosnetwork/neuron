@@ -29,8 +29,10 @@
     "clean": "lerna run --stream clean",
     "prebuild": "yarn clean",
     "build": "lerna run --stream build",
+    "build:main": "lerna run build --scope=neuron-wallet",
     "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "test": "lerna run --parallel test",
+    "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run rebuild:nativemodules",
     "db:chain": "node ./node_modules/.bin/typeorm"
