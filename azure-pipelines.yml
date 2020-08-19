@@ -83,10 +83,10 @@ stages:
         yarn bootstrap
         set CI=false
         yarn build
-      name: Build
+      name: Bootstrap
     - script: |
         set CI=true
-        yarn test
+        yarn test:ci
       name: Test
 
 - stage: release
