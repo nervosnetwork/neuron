@@ -1,11 +1,9 @@
 import path from 'path'
-import { expose, spawn, terminate, subscribe, ChildProcess } from '../../src/utils/worker'
+import { expose, spawn, terminate, subscribe } from '../../src/utils/worker'
 import { fork } from 'child_process'
-import { EventEmitter } from 'events'
 
 const noop = (..._: any) => undefined
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-const childProcessEmiter = new EventEmitter()
 
 describe('utils/workers', () => {
   describe('expose', () => {
@@ -14,11 +12,6 @@ describe('utils/workers', () => {
 
     beforeEach(() => {
       ChildProcessSendSpy = jest.spyOn(process, 'send')
-      ChildProcessOnSpy = jest.spyOn(ChildProcess as any, 'on').mockImplementation(() => {
-        return (listener: (message: any) => void) => {
-          childProcessEmiter.on('message', listener)
-        }
-      })
     })
 
     afterEach(() => {
