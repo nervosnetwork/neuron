@@ -6,6 +6,7 @@ import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { TransactionStatus } from 'models/chain/transaction'
 import AddressParser from 'models/address-parser'
 import AssetAccountInfo from 'models/asset-account-info'
+import { ChildProcess } from 'utils/worker'
 
 export enum AddressVersion {
   Testnet = 'testnet',
@@ -331,8 +332,8 @@ class AddressStore {
   }
 
   static changed() {
-    if (process.send) {
-      process.send({
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
         channel: 'address-db-changed',
         result: 'Updated'
       })

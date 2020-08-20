@@ -15,7 +15,7 @@ import CommonUtils from 'utils/common'
 import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import IndexerFolderManager from './sync/indexer-folder-manager'
-import { spawn, terminate, subscribe } from 'utils/worker'
+import { spawn, terminate, subscribe as subscribeToWorkerProcess } from 'utils/worker'
 import SyncApiController from 'controllers/sync-api'
 import type { SyncTask } from './task'
 import env from 'env'
@@ -92,7 +92,7 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
     })
   )
 
-  subscribe(syncTask, msg => {
+  subscribeToWorkerProcess(syncTask, msg => {
     switch (msg?.channel) {
       case 'synced-block-number-updated':
         SyncApiController.emiter.emit('synced-block-number-updated', msg?.result)

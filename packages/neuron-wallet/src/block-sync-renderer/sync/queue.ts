@@ -16,6 +16,7 @@ import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
 import CommonUtils from 'utils/common'
+import { ChildProcess } from 'utils/worker'
 
 export default class Queue {
   private lockHashes: string[]
@@ -200,7 +201,7 @@ export default class Queue {
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    process.send?.({
+    ChildProcess.send({
       channel: 'synced-block-number-updated',
       result: this.currentBlockNumber.toString()
     })

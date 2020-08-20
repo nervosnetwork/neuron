@@ -1,4 +1,4 @@
-import type { ChildProcess } from 'child_process'
+import type { ChildProcess as ChildProcessInst } from 'child_process'
 
 interface WorkerMessage {
   type?: 'caller' | 'kill',
@@ -23,13 +23,13 @@ export function expose (obj: Record<string, Function>) {
   // Sending a message in macrotasks ensures that
   // the message is sent before listening(in microtasks) for it.
   setImmediate(() => {
-    process.send!({ channels })
+    ChildProcess.send({ channels })
   })
 
   // Since Jest modifies process.on to not respond to child process messages,
   // the following statement will never be executed in the test environment
   // istanbul ignore next
-  process.on('message', async (msg: WorkerMessage) => {
+  ChildProcess.onMessage(async (msg: WorkerMessage) => {
     if (msg?.type === 'kill') {
       process.exit(0)
     }
@@ -45,14 +45,14 @@ export function expose (obj: Record<string, Function>) {
     }
 
     const result = await func.apply(null, msg?.result?.args ?? [])
-    process.send!({
+    ChildProcess.send({
       type: `result_${channel}`,
       result
     })
   })
 }
 
-export async function spawn<T>(worker: ChildProcess): Promise<T & WorkerInst> {
+export async function spawn<T>(worker: ChildProcessInst): Promise<T & WorkerInst> {
   const channels: string[] = await new Promise(resovle => {
     worker.once('message', msg => {
       if (msg?.channels) {
@@ -87,7 +87,7 @@ export async function spawn<T>(worker: ChildProcess): Promise<T & WorkerInst> {
 }
 
 interface WorkerInst {
-  $worker?: ChildProcess
+  $worker?: ChildProcessInst
   [key: string]: any
 }
 
@@ -101,4 +101,20 @@ export async function terminate<T extends WorkerInst> (workerInst: T) {
 export function subscribe<T extends WorkerInst>(workerInst: T, listener: (...args: any[]) => void) {
   const worker = workerInst.$worker
   worker?.on('message', listener)
+}
+
+export class ChildProcess {
+  static isChildProcess () {
+    return !!process.send
+  }
+
+  static send(message: any) {
+    if (ChildProcess.isChildProcess()) {
+      process.send!(message)
+    }
+  }
+
+  static onMessage(listener: (message: any, sendHandle: any) => void) {
+    process.on('message', listener)
+  }
 }

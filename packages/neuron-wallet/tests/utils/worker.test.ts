@@ -1,20 +1,29 @@
 import path from 'path'
-import { expose, spawn, terminate, subscribe } from '../../src/utils/worker'
+import { expose, spawn, terminate, subscribe, ChildProcess } from '../../src/utils/worker'
 import { fork } from 'child_process'
+import { EventEmitter } from 'events'
 
 const noop = (..._: any) => undefined
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+const childProcessEmiter = new EventEmitter()
 
 describe('utils/workers', () => {
   describe('expose', () => {
-    let processSendSpy: any
+    let ChildProcessSendSpy: any
+    let ChildProcessOnSpy: any
 
     beforeEach(() => {
-      processSendSpy = jest.spyOn(process, 'send')
+      ChildProcessSendSpy = jest.spyOn(process, 'send')
+      ChildProcessOnSpy = jest.spyOn(ChildProcess as any, 'on').mockImplementation(() => {
+        return (listener: (message: any) => void) => {
+          childProcessEmiter.on('message', listener)
+        }
+      })
     })
 
     afterEach(() => {
-      processSendSpy.mockRestore()
+      ChildProcessSendSpy.mockRestore()
+      ChildProcessOnSpy.mockRestore()
     })
 
     beforeEach(async () => {
@@ -27,7 +36,7 @@ describe('utils/workers', () => {
     })
 
     it('expose should send object keys as channels to the master process', async () => {
-      expect(processSendSpy).toHaveBeenCalledWith({ channels: ['test1', 'test2'] })
+      expect(ChildProcessSendSpy).toHaveBeenCalledWith({ channels: ['test1', 'test2'] })
     })
   })
 

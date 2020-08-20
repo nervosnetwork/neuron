@@ -11,6 +11,7 @@ import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
 import NetworksService from './networks'
 import { AddressVersion } from 'database/address/address-dao'
+import { ChildProcess } from 'utils/worker'
 
 const fileService = FileService.getInstance()
 
@@ -240,8 +241,8 @@ export default class WalletService {
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
     AddressService.deleteByWalletId(id)
-    if (process.send) {
-      process.send({
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
         channel: 'wallet-deleted',
         result: id
       })
