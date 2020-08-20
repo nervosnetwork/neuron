@@ -1,6 +1,4 @@
 import { ReplaySubject } from 'rxjs'
-import ProcessUtils from 'utils/process'
-import { remote } from 'electron'
 
 export interface TransactionChangedMessage {
   event: string
@@ -11,11 +9,7 @@ export class TxDbChangedSubject {
   private static subject = new ReplaySubject<TransactionChangedMessage>(100)
 
   public static getSubject() {
-    if (ProcessUtils.isRenderer()) {
-      return remote.require('./models/subjects/tx-db-changed-subject').default.getSubject()
-    } else {
-      return this.subject
-    }
+    return this.subject
   }
 }
 
