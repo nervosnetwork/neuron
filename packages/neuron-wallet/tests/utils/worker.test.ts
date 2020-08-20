@@ -8,7 +8,6 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 describe('utils/workers', () => {
   describe('expose', () => {
     let ChildProcessSendSpy: any
-    let ChildProcessOnSpy: any
 
     beforeEach(() => {
       ChildProcessSendSpy = jest.spyOn(process, 'send')
@@ -16,7 +15,6 @@ describe('utils/workers', () => {
 
     afterEach(() => {
       ChildProcessSendSpy.mockRestore()
-      ChildProcessOnSpy.mockRestore()
     })
 
     beforeEach(async () => {
