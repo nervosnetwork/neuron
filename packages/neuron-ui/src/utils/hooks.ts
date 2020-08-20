@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { MenuItemConstructorOptions } from 'electron'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
 import { syncRebuildNotification } from 'services/localCache'
@@ -20,6 +19,7 @@ import {
   validateTokenName,
   validateDecimal,
 } from 'utils/validators'
+import { MenuItemConstructorOptions } from 'electron'
 
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
