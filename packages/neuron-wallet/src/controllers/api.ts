@@ -1,5 +1,5 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuItemConstructorOptions, MenuItem, Menu, screen } from 'electron'
+import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuItemConstructorOptions, MenuItem, Menu, screen, BrowserWindow } from 'electron'
 import { t } from 'i18next'
 import env from 'env'
 import { showWindow } from './app/show-window'
@@ -75,24 +75,10 @@ export default class ApiController {
 
     ipcMain.on('get-platform', e => {
       e.returnValue = process.platform
-      // @ts-ignore
-      e.sender.getOwnerBrowserWindow()
     })
 
     ipcMain.on('get-win-id', e => {
-      // Note that we're using a undocumented and untyped method called `getOwnerBrowserWindow` from `e.sender`(instance of `WebContents`).
-      // This is because since `remote` was deprecated, the Electron community had no alternative to `remote.getCurrentWindow()` yet.
-      // However, as we can see by reading the source code of `remote.getCurrentWindow()`:
-      // `remote.getCurrentWindow()` is implemented by calling the `getOwnerBrowserWindow` method of `WebContents`.
-      // see the discussion in electron repo:
-      // https://github.com/electron/electron/issues/21408#issuecomment-656006346
-      // implementation of `remote.getCurrentWindow()':
-      // https://github.com/electron/electron/blob/9-x-y/lib/browser/remote/server.ts#L450-L460
-      // source of `WebContents`:
-      // https://github.com/electron/electron/blob/9-x-y/shell/browser/api/electron_api_web_contents.h#L358-L359
-
-      // @ts-ignore
-      e.returnValue = e.sender.getOwnerBrowserWindow().id
+      e.returnValue = BrowserWindow.fromWebContents(e.sender)?.id
     })
 
     // App
