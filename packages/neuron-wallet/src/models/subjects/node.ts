@@ -12,6 +12,6 @@ export default class SyncedBlockNumberSubject {
   private static subject = new BehaviorSubject<string>('0')
 
   public static getSubject(): BehaviorSubject<string> {
-    return this.subject
+    return SyncedBlockNumberSubject.subject
   }
 }

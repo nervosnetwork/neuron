@@ -9,7 +9,7 @@ export class TxDbChangedSubject {
   private static subject = new ReplaySubject<TransactionChangedMessage>(100)
 
   public static getSubject() {
-    return this.subject
+    return TxDbChangedSubject.subject
   }
 }
 

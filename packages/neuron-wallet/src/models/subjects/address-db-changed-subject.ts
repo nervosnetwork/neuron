@@ -5,7 +5,7 @@ export class AddressDbChangedSubject {
   private static subject = new ReplaySubject<string>(100)
 
   public static getSubject() {
-    return this.subject
+    return AddressDbChangedSubject.subject
   }
 }
 
