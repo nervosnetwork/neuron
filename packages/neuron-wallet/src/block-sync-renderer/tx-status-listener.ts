@@ -3,14 +3,10 @@ import CKB from '@nervosnetwork/ckb-sdk-core'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import RpcService from 'services/rpc-service'
-import NetworksService from 'services/networks'
-import { AddressPrefix } from 'models/keys/address'
 import NodeService from 'services/node'
-import WalletService from 'services/wallets'
 import { TransactionStatus } from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import logger from 'utils/logger'
-import AddressGenerator from 'models/address-generator'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NodeService.getInstance().ckb.rpc.node.url
@@ -58,10 +54,10 @@ const trackingStatus = async () => {
   const successTxs = txs.filter(tx => tx.status === TransactionStatus.Success)
 
   if (failedTxs.length) {
-    const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const usedAddresses = blake160s.map(blake160 => AddressGenerator.toShortByBlake160(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses, blake160s)
+    await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
+    // const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    // const usedAddresses = blake160s.map(blake160 => AddressGenerator.toShortByBlake160(blake160, prefix))
+    // await WalletService.updateUsedAddresses(usedAddresses, blake160s)
   }
 
   if (successTxs.length > 0) {

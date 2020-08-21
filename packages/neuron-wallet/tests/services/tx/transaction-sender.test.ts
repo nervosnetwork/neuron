@@ -131,9 +131,9 @@ describe('TransactionSender Test', () => {
         "hash": "0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1"
       })
 
-      it('success', () => {
+      it('success', async () => {
         // @ts-ignore: Private method
-        const ntx = transactionSender.sign(walletID, tx, '1234')
+        const ntx = await transactionSender.sign(walletID, tx, '1234')
 
         expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
       })
@@ -191,9 +191,9 @@ describe('TransactionSender Test', () => {
         "0x6d000000100000006d0000006d000000590000000000010136c329ed630d6ce750712a477543672adab57f4c1c12c81448189a3455996c31022b8a5407a3d54ff1710eaf4220375f906cb53423040ca9f81e56f41f2df0d6cfd124dbda30b8213a0b15173b745e20449afd5401"
       ]
 
-      it('success', () => {
+      it('success', async () => {
         // @ts-ignore: Private method
-        const ntx = transactionSender.sign(walletID, tx, '1234')
+        const ntx = await transactionSender.sign(walletID, tx, '1234')
 
         expect(ntx.witnesses[0]).toEqual(expectedWitness[0])
       })

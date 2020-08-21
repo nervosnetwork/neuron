@@ -140,7 +140,9 @@ export default class IndexerConnector {
     const collector = new CellCollector(this.indexer, queries)
 
     const result = []
+    console.log(JSON.stringify(queries))
     for await (const cell of collector.collect()) {
+      console.log(cell)
       //somehow the lumos indexer returns an invalid hash type "lock" for hash type "data"
       //for now we have to fix it here
       const cellOutput: any = cell.cell_output

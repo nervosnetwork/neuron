@@ -10,13 +10,13 @@ export default class AddressMeta implements Address {
   path: string
   addressType: AddressType
   addressIndex: number
-  txCount: number
-  liveBalance: string
-  sentBalance: string
-  pendingBalance: string
-  balance: string
   blake160: string
-  version: AddressVersion
+  txCount?: number
+  liveBalance?: string
+  sentBalance?: string
+  pendingBalance?: string
+  balance?: string
+  version?: AddressVersion
   description?: string
   isImporting?: boolean | undefined
   usedByAnyoneCanPay?: boolean | undefined
@@ -27,13 +27,13 @@ export default class AddressMeta implements Address {
     path: string,
     addressType: AddressType,
     addressIndex: number,
-    txCount: number,
-    liveBalance: string,
-    sentBalance: string,
-    pendingBalance: string,
-    balance: string,
     blake160: string,
-    version: AddressVersion,
+    version?: AddressVersion,
+    txCount?: number,
+    liveBalance?: string,
+    sentBalance?: string,
+    pendingBalance?: string,
+    balance?: string,
     description?: string,
     isImporting?: boolean | undefined,
     usedByAnyoneCanPay?: boolean | undefined
@@ -62,13 +62,13 @@ export default class AddressMeta implements Address {
       obj.path,
       obj.addressType,
       obj.addressIndex,
+      obj.blake160,
+      obj.version,
       obj.txCount,
       obj.liveBalance,
       obj.sentBalance,
       obj.pendingBalance,
       obj.balance,
-      obj.blake160,
-      obj.version,
       obj.description,
       obj.isImporting,
       obj.usedByAnyoneCanPay

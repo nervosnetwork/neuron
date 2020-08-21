@@ -38,7 +38,7 @@ export interface UpdateAssetAccountParams {
 export default class AssetAccountController {
   public async getAll(params: { walletID: string }): Promise<Controller.Response<(AssetAccount & { address: string })[]>> {
     const assetAccountInfo = new AssetAccountInfo()
-    const blake160s = AddressService.allBlake160sByWalletId(params.walletID)
+    const blake160s = await AddressService.allBlake160sByWalletId(params.walletID)
     const anyoneCanPayLockHashes: string[] = blake160s.map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
 
     const assetAccounts = await AssetAccountService.getAll(blake160s, anyoneCanPayLockHashes)
@@ -92,7 +92,7 @@ export default class AssetAccountController {
     assetAccount: AssetAccount,
     tx: Transaction
   }>> {
-    const lockHashes: string[] = AddressService.allLockHashesByWalletId(params.walletID)
+    const lockHashes: string[] = await AddressService.allLockHashesByWalletId(params.walletID)
     const result = await AssetAccountService.generateCreateTx(
       params.walletID,
       lockHashes,

@@ -1,10 +1,11 @@
 import { dialog } from 'electron'
 import { t } from 'i18next'
+import env from 'env'
 import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
+import WalletsService from 'services/wallets'
 import NodeService from 'services/node'
-import env from 'env'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'block-sync-renderer'
@@ -181,6 +182,8 @@ export default class NetworksController {
   private async connectToNetwork(reconnected: boolean = false) {
     const network = networksService.getCurrent()
     const genesisHashMatched = await new ChainInfo(network).load()
+    await WalletsService.getInstance().generateAddressesIfNecessary()
+
     await switchToNetwork(network, reconnected, genesisHashMatched)
   }
 }

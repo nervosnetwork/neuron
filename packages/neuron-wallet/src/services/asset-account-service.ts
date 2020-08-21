@@ -7,12 +7,12 @@ import { OutputStatus } from "models/chain/output"
 import AssetAccount from "models/asset-account"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 import AssetAccountEntity from "database/chain/entities/asset-account"
-import { AddressVersion } from "database/address/address-dao"
+// import { AddressVersion } from "database/address/address-dao"
 import { CapacityNotEnoughForChange } from "exceptions"
 import { MIN_CELL_CAPACITY } from 'services/cells'
 import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
-import NetworksService from "./networks"
+// import NetworksService from "./networks"
 import AddressService from "./addresses"
 
 export default class AssetAccountService {
@@ -180,7 +180,7 @@ export default class AssetAccountService {
     }
 
     // 1. find next unused address
-    const addresses = AddressService.allUnusedReceivingAddresses(walletID)
+    const addresses = await AddressService.allUnusedReceivingAddresses(walletID)
     const usedBlake160s = new Set(await this.blake160sOfAssetAccounts())
     const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
 
@@ -188,14 +188,14 @@ export default class AssetAccountService {
     const assetAccount = new AssetAccount(tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
     // 3. generate tx
-    const changeAddrObj = AddressService.nextUnusedChangeAddress(walletID)!
+    const changeAddrObj = await AddressService.nextUnusedChangeAddress(walletID)
     let tx: Transaction | undefined
     try {
       tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
         tokenID,
         lockHashes,
         addrObj.blake160,
-        changeAddrObj.blake160,
+        changeAddrObj!.blake160,
         feeRate,
         fee
       )
@@ -324,8 +324,8 @@ export default class AssetAccountService {
     await connection.manager.save([entity.sudtTokenInfo, entity])
 
     // 4. update address for usedByAnyoneCanPay
-    const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-    AddressService.updateUsedByAnyoneCanPay(walletID, assetAccount.blake160, addressVersion, true)
+    // const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+    // AddressService.updateUsedByAnyoneCanPay(walletID, assetAccount.blake160, addressVersion, true)
 
     return txHash
   }

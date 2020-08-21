@@ -1,6 +1,5 @@
 import AddressService from "./addresses"
 import WalletService, { Wallet } from "./wallets"
-import { AddressVersion } from "database/address/address-dao"
 import Keychain from "models/keys/keychain"
 import Blake2b from "models/blake2b"
 import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
@@ -12,11 +11,9 @@ export default class SignMessage {
   static GENERATE_COUNT = 100
   private static ec = new EC('secp256k1')
 
-  public static sign(walletID: string, address: string, password: string, message: string): string {
-    const addressVersion = address.startsWith('ckb') ? AddressVersion.Mainnet : AddressVersion.Testnet
+  public static async sign(walletID: string, address: string, password: string, message: string): Promise<string> {
     const wallet = WalletService.getInstance().get(walletID)
-    const addresses = AddressService
-      .allAddressesByWalletId(walletID, addressVersion)
+    const addresses = await AddressService.allAddressesByWalletId(walletID)
     let addr = addresses.find(addr => addr.address === address)
     if (!addr) {
       throw new AddressNotFound()

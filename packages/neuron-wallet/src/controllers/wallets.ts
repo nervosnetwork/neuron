@@ -279,7 +279,7 @@ export default class WalletsController {
   }
 
   public async getAllAddresses(id: string) {
-    const addresses = AddressService.allAddressesByWalletId(id).map(
+    const addresses = (await AddressService.allAddressesWithBalancesByWalletId(id)).map(
       ({
         address,
         blake160: identifier,
@@ -292,9 +292,9 @@ export default class WalletsController {
         address,
         identifier,
         type,
-        txCount,
+        txCount: txCount!,
         description,
-        balance,
+        balance: balance!,
         index,
       })
     )
@@ -366,7 +366,7 @@ export default class WalletsController {
 
   public async updateAddressDescription({ walletID, address, description }: { walletID: string, address: string, description: string }) {
     const wallet = WalletsService.getInstance().get(walletID)
-    AddressService.updateDescription(wallet.id, address, description)
+    await AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,

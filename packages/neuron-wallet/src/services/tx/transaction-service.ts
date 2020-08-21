@@ -347,6 +347,64 @@ export class TransactionsService {
     })
 
     return result
+
+  }
+
+  public static async getTxCountsByWalletIdAndStatus(walletId: string, statuses: Set<TransactionStatus>) {
+    const [sql, parameters] = getConnection()
+      .driver
+      .escapeQueryWithParameters(`
+        SELECT
+          lockHash,
+          count(DISTINCT (transactionHash)) AS cnt
+        FROM (
+          SELECT
+            lockHash,
+            lockArgs,
+            transactionHash
+          FROM
+            input
+          UNION
+          SELECT
+            lockHash,
+            lockArgs,
+            transactionHash
+          FROM
+            output) AS cell
+          LEFT JOIN (
+            SELECT
+              tx.hash
+            FROM
+              'transaction' AS tx
+            WHERE
+              tx.status in(:...statuses)
+              AND tx.hash in(
+                SELECT
+                  transactionHash FROM input
+                UNION
+                SELECT
+                  transactionHash FROM output)) AS result ON cell.transactionHash = result.hash
+          WHERE
+            lockArgs in(
+              SELECT
+                hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
+              WHERE
+                walletId = :walletId)
+          GROUP BY
+            lockHash;
+        `,
+        { statuses: [...statuses], walletId },
+        {}
+      )
+
+    const count: { lockHash: string, cnt: number }[] = await getConnection().manager.query(sql, parameters)
+
+    const result = new Map<string, number>()
+    count.forEach(c => {
+      result.set(c.lockHash, c.cnt)
+    })
+
+    return result
   }
 
   public static async checkNonExistTransactionsByHashes(hashes: string[]) {

@@ -48,7 +48,7 @@ export default class AnyoneCanPayService {
 
     const isCKB = !tokenID || tokenID === 'CKBytes'
 
-    const allBlake160s = AddressService.allBlake160sByWalletId(walletID)
+    const allBlake160s = (await AddressService.allBlake160sByWalletId(walletID))
     const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
     const anyoneCanPayLocks: Script[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)]
 
@@ -71,7 +71,7 @@ export default class AnyoneCanPayService {
       outPoint: targetOutputLiveCell.outPoint(),
     })
 
-    const changeBlake160: string = AddressService.nextUnusedChangeAddress(walletID)!.blake160
+    const changeBlake160: string = (await AddressService.nextUnusedChangeAddress(walletID))!.blake160
 
     const tx = isCKB ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
       defaultLockHashes,

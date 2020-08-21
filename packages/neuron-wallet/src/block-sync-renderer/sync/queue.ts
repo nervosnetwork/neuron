@@ -151,7 +151,7 @@ export default class Queue {
     }
 
     for (const [, tx] of transactions.entries()) {
-      const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
+      const [shouldSave, , anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
         this.anyoneCanPayLockHashes,
         tx,
@@ -188,12 +188,17 @@ export default class Queue {
           }
         }
         await TransactionPersistor.saveFetchTx(tx)
-        const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
-        await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
+        // const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
+        // await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
+        const walletIds = new Set(this.addresses.map(addr => addr.walletId))
+        for (const walletId of walletIds) {
+          await WalletService.checkAndGenerateAddresses(walletId)
+        }
         for (const info of anyoneCanPayInfos) {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
       }
+
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
   }

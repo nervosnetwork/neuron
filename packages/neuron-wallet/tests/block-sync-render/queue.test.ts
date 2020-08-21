@@ -25,7 +25,7 @@ const stubbedGetTransactionFn = jest.fn()
 const stubbedIpcRenderInvokeFn = jest.fn()
 const stubbedAddressesFn = jest.fn()
 const stubbedSaveFetchFn = jest.fn()
-const stubbedUpdateUsedAddressesFn = jest.fn()
+const stubbedCheckAndGenerateAddressesFn = jest.fn()
 const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
 const stubbedUpdateCacheProcessedFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
@@ -55,7 +55,7 @@ const resetMocks = () => {
   stubbedIpcRenderInvokeFn.mockReset()
   stubbedAddressesFn.mockReset()
   stubbedSaveFetchFn.mockReset()
-  stubbedUpdateUsedAddressesFn.mockReset()
+  stubbedCheckAndGenerateAddressesFn.mockReset()
   stubbedGetTransactionFn.mockReset()
   stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
   stubbedUpdateCacheProcessedFn.mockReset()
@@ -92,10 +92,11 @@ describe('queue', () => {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
   const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+  const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
     blake160: '0xfakeblake160',
-    walletId: '',
+    walletId: fakeWalletId,
     path: '',
     addressType: AddressType.Receiving,
     addressIndex: 0,
@@ -147,7 +148,7 @@ describe('queue', () => {
     });
     jest.doMock('services/wallets', () => {
       return {
-        updateUsedAddresses: stubbedUpdateUsedAddressesFn
+        checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
       }
     });
     jest.doMock('utils/logger', () => {
@@ -229,12 +230,8 @@ describe('queue', () => {
               expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
             }
           });
-          it('updates used addresses', () => {
-            for (let i = 0; i < fakeTxs.length; i++) {
-              expect(stubbedUpdateUsedAddressesFn).toHaveBeenCalledWith(
-                addresses.map(addressMeta => addressMeta.address), []
-              )
-            }
+          it('checks and generate new addresses', () => {
+            expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
           });
           it('notify indexer connector of processed block number', () => {
             expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)

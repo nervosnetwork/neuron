@@ -43,7 +43,9 @@ const exportHistory = async ({
     `${headers.map(label => t(`export-transactions.column.${label}`))}\n`
   )
 
-  const addresses = AddressService.allAddressesByWalletId(walletID).map(addr => addr.address)
+  const allAddresses = await AddressService.allAddressesByWalletId(walletID)
+
+  const addresses = allAddresses.map(addr => addr.address)
   const PAGE_SIZE = 100
   let count = Infinity
   let txs: Transaction[] = []

@@ -5,6 +5,13 @@ import AddressDao, { Address as AddressInterface, AddressVersion } from 'databas
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
+import { getConnection } from 'typeorm'
+import OutputEntity from 'database/chain/entities/output'
+import { TransactionsService } from 'services/tx'
+import CellsService from './cells'
+import SystemScriptInfo from 'models/system-script-info'
+import Script from 'models/chain/script'
+import { TransactionStatus } from 'models/chain/transaction'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -16,10 +23,9 @@ export interface AddressMetaInfo {
 }
 
 export default class AddressService {
-  // <= 3
   private static minUnusedAddressCount: number = 3
 
-  public static generateAndSave = (
+  public static async generateAndSave(
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
@@ -27,7 +33,7 @@ export default class AddressService {
     changeStartIndex: number,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
-  ) => {
+  ) {
     const addresses = AddressService.generateAddresses(
       walletId,
       extendedKey,
@@ -36,49 +42,41 @@ export default class AddressService {
       receivingAddressCount,
       changeAddressCount
     )
-    const allAddresses: AddressInterface[] = [
-      ...addresses.mainnetReceiving,
-      ...addresses.mainnetChange,
-      ...addresses.testnetReceiving,
-      ...addresses.testnetChange,
-    ]
-    AddressDao.create(allAddresses)
 
-    AddressService.notifyAddressCreated(allAddresses, isImporting)
+
+    const generatedAddresses: AddressInterface[] = [
+      ...addresses.receiving,
+      ...addresses.change,
+    ]
+    await AddressDao.create(generatedAddresses)
+
+    AddressService.notifyAddressCreated(generatedAddresses, isImporting)
   }
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
-    const versionFilter = ((a: AddressInterface) => { return a.version === AddressService.getAddressVersion() })
-
-    // If first receiving address already exists in other wallets, treat as none importing.
-    // This assumes addresses.first is the actual first address.
-    const firstAddress = addresses.filter(versionFilter)[0]
-    const alreadyExist = AddressDao.findByAddresses([firstAddress.address]).length > 1
-    const importing = isImporting && !alreadyExist
-
     const addressesToNotify = addresses
-      .filter(versionFilter)
-      .map(address => { return { ...address, isImporting: importing } })
+      .map(address => ({ ...address, isImporting }))
     AddressCreatedSubject.getSubject().next(addressesToNotify)
   }
 
-  public static checkAndGenerateSave(
+  public static async checkAndGenerateSave(
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ) {
-    const addressVersion = AddressService.getAddressVersion()
-    const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.unusedAddresses(walletId)
+    const unusedReceivingCount = unusedReceivingAddresses.length
+    const unusedChangeCount = unusedChangeAddresses.length
     if (
       unusedReceivingCount > this.minUnusedAddressCount &&
       unusedChangeCount > this.minUnusedAddressCount
     ) {
       return undefined
     }
-    const maxIndexReceivingAddress = AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
-    const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
+    const maxIndexReceivingAddress = await this.maxIndexAddress(walletId, AddressType.Receiving)
+    const maxIndexChangeAddress = await this.maxIndexAddress(walletId, AddressType.Change)
     const nextReceivingIndex = maxIndexReceivingAddress === undefined ? 0 : maxIndexReceivingAddress.addressIndex + 1
     const nextChangeIndex = maxIndexChangeAddress === undefined ? 0 : maxIndexChangeAddress.addressIndex + 1
 
@@ -93,14 +91,6 @@ export default class AddressService {
       receivingCount,
       changeCount
     )
-  }
-
-  public static async updateTxCountAndBalances(addresses: string[]): Promise<AddressInterface[]> {
-    return AddressDao.updateTxCountAndBalances(addresses)
-  }
-
-  public static async updateUsedByAnyoneCanPayByBlake160s(blake160s: string[], addressVersion: AddressVersion): Promise<AddressInterface[]> {
-    return AddressDao.updateUsedByAnyoneCanPayByBlake160s(blake160s, addressVersion)
   }
 
   // Generate both receiving and change addresses.
@@ -119,7 +109,6 @@ export default class AddressService {
       throw new Error('Address number error.')
     }
     const receiving = Array.from({ length: receivingAddressCount }).map((_, idx) => {
-      // extendedKey.address(AddressType.Receiving, idx)
       const addressMetaInfo: AddressMetaInfo = {
         walletId,
         addressType: AddressType.Receiving,
@@ -128,10 +117,7 @@ export default class AddressService {
       }
       return AddressService.toAddress(addressMetaInfo)
     })
-    const testnetReceiving = receiving.map(arr => arr[0])
-    const mainnetReceiving = receiving.map(arr => arr[1])
     const change = Array.from({ length: changeAddressCount }).map((_, idx) => {
-      // extendedKey.address(AddressType.Change, idx)
       const addressMetaInfo: AddressMetaInfo = {
         walletId,
         addressType: AddressType.Change,
@@ -140,128 +126,201 @@ export default class AddressService {
       }
       return AddressService.toAddress(addressMetaInfo)
     })
-    const testnetChange = change.map(arr => arr[0])
-    const mainnetChange = change.map(arr => arr[1])
     return {
-      testnetReceiving,
-      mainnetReceiving,
-      testnetChange,
-      mainnetChange,
+      receiving,
+      change,
     }
   }
 
-  private static toAddress = (addressMetaInfo: AddressMetaInfo): AddressInterface[] => {
+  private static toAddress = (addressMetaInfo: AddressMetaInfo): AddressInterface => {
     const path: string = Address.pathFor(addressMetaInfo.addressType, addressMetaInfo.addressIndex)
-    const testnetAddress: string = addressMetaInfo.accountExtendedPublicKey.address(
+    const address: string = addressMetaInfo.accountExtendedPublicKey.address(
       addressMetaInfo.addressType,
       addressMetaInfo.addressIndex,
-      AddressPrefix.Testnet
+      AddressService.getAddressPrefix()
     ).address
 
-    const mainnetAddress: string = addressMetaInfo.accountExtendedPublicKey.address(
-      addressMetaInfo.addressType,
-      addressMetaInfo.addressIndex,
-      AddressPrefix.Mainnet
-    ).address
+    const blake160: string = AddressParser.toBlake160(address)
 
-    const addressToParse = NetworksService.getInstance().isMainnet() ? mainnetAddress : testnetAddress
-    const blake160: string = AddressParser.toBlake160(addressToParse)
-
-    const testnetAddressInfo: AddressInterface = {
+    const addressInfo: AddressInterface = {
       walletId: addressMetaInfo.walletId,
-      address: testnetAddress,
+      address,
       path,
       addressType: addressMetaInfo.addressType,
       addressIndex: addressMetaInfo.addressIndex,
-      txCount: 0,
-      liveBalance: '0',
-      sentBalance: '0',
-      pendingBalance: '0',
-      balance: '0',
-      blake160,
-      version: AddressVersion.Testnet,
+      blake160
     }
 
-    const mainnetAddressInfo = {
-      ...testnetAddressInfo,
-      address: mainnetAddress,
-      version: AddressVersion.Mainnet,
-    }
-
-    return [testnetAddressInfo, mainnetAddressInfo]
+    return addressInfo
   }
 
-  public static nextUnusedAddress = (walletId: string): AddressInterface | undefined => {
-    const addressEntity = AddressDao.nextUnusedAddress(walletId,  AddressService.getAddressVersion())
-    if (!addressEntity) {
+  private static async maxIndexAddress(walletId: string, addressType: AddressType): Promise<AddressInterface | undefined> {
+    const allAddresses = await this.allAddressesWithBalancesByWalletId(walletId)
+    const maxIndexAddress = allAddresses
+      .filter(addr => addr.addressType === addressType)
+      .sort((a, b) => b.addressIndex - a.addressIndex)[0]
+
+    if (!maxIndexAddress) {
       return undefined
     }
-    return addressEntity
+
+    return maxIndexAddress
   }
 
-  public static allUnusedReceivingAddresses(walletId: string): AddressInterface[] {
-    return AddressDao.allUnusedReceivingAddresses(walletId,  AddressService.getAddressVersion())
-  }
+  private static async unusedAddresses(walletId: string) {
+    const outputStatsByLockArgs: {txCount: number, lockArgs: string}[] = await getConnection()
+      .getRepository(OutputEntity)
+      .manager
+      .query(`
+        select
+            count(*) as txCount,
+            lockArgs
+        from
+            output
+        where
+            output.lockArgs in (
+                select
+                    publicKeyInBlake160
+                from
+                    hd_public_key_info
+                where
+                    walletId = '${ walletId }'
+            )
+        group by output.lockArgs
+      `)
 
-  public static nextUnusedChangeAddress = (walletId: string): AddressInterface | undefined => {
-    const addressEntity = AddressDao.nextUnusedChangeAddress(walletId,  AddressService.getAddressVersion())
-    if (!addressEntity) {
-      return undefined
+    const addresses = await this.allAddressesByWalletId(walletId)
+    for (const address of addresses) {
+      const outputStats = outputStatsByLockArgs.find(
+        stats => address.blake160 === stats.lockArgs
+      )
+      if (!outputStats) {
+        continue
+      }
+      address.txCount = outputStats.txCount
     }
-    return addressEntity
+
+    const unusedReceivingAddresses = addresses
+      .filter(addr => addr.addressType === AddressType.Receiving && !addr.txCount)
+    const unusedChangeAddresses = addresses
+      .filter(addr => addr.addressType === AddressType.Change && !addr.txCount)
+
+    return [unusedReceivingAddresses, unusedChangeAddresses]
   }
 
-  public static allAddresses = (): AddressInterface[] => {
-    return AddressDao.allAddresses( AddressService.getAddressVersion())
+  public static async nextUnusedAddress (walletId: string): Promise<AddressInterface | undefined> {
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.unusedAddresses(walletId)
+    if (unusedReceivingAddresses.length) {
+      return unusedReceivingAddresses[0]
+    }
+    if (unusedChangeAddresses.length) {
+      return unusedChangeAddresses[0]
+    }
+
+    return undefined
   }
 
-  public static allAddressesByWalletId = (
-    walletId: string,
-    addressVersion: AddressVersion = AddressService.getAddressVersion()
-  ): AddressInterface[] => {
-    return AddressDao.allAddressesByWalletId(walletId, addressVersion)
+  public static async nextUnusedChangeAddress (walletId: string): Promise<AddressInterface | undefined> {
+    const [ , unusedChangeAddresses ] = await this.unusedAddresses(walletId)
+    if (unusedChangeAddresses.length) {
+      return unusedChangeAddresses[0]
+    }
+    return undefined
   }
 
-  public static allBlake160sByWalletId(walletId: string): string[] {
-    return AddressService.allAddressesByWalletId(walletId).map(addr => addr.blake160)
+  public static async allUnusedReceivingAddresses(walletId: string): Promise<AddressInterface[]> {
+    const [ unusedReceivingAddresses ] = await this.unusedAddresses(walletId)
+    return unusedReceivingAddresses
   }
 
-  public static allLockHashes(): string[] {
-    const addresses = AddressService.allAddresses().map(address => address.address)
+
+  public static allAddresses = async (): Promise<AddressInterface[]> => {
+    const publicKeyInfos = await AddressDao.allAddresses()
+    return publicKeyInfos.map(publicKeyInfo => ({
+      walletId: publicKeyInfo.walletId,
+      address: publicKeyInfo.address,
+      path: publicKeyInfo.path,
+      addressIndex: publicKeyInfo.addressIndex,
+      addressType: publicKeyInfo.addressType,
+      blake160: publicKeyInfo.publicKeyInBlake160,
+      description: publicKeyInfo.description,
+    }))
+  }
+
+  public static async allAddressesByWalletId (walletId: string): Promise<AddressInterface[]> {
+    const publicKeyInfos = await AddressDao.allAddressesByWalletId(walletId)
+    return publicKeyInfos.map(publicKeyInfo => ({
+        walletId: publicKeyInfo.walletId,
+        address: publicKeyInfo.address,
+        path: publicKeyInfo.path,
+        addressIndex: publicKeyInfo.addressIndex,
+        addressType: publicKeyInfo.addressType,
+        blake160: publicKeyInfo.publicKeyInBlake160,
+        description: publicKeyInfo.description,
+      })
+    )
+  }
+
+  public static async allAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {
+    const publicKeyInfos = await AddressDao.allAddressesByWalletId(walletId)
+    const {liveBalances, sentBalances, pendingBalances} = await CellsService.getBalancesByWalletId(walletId)
+    const txCounts = await TransactionsService.getTxCountsByWalletIdAndStatus(
+      walletId,
+      new Set([TransactionStatus.Pending, TransactionStatus.Success])
+    )
+    return publicKeyInfos.map(publicKeyInfo => {
+      const script = Script.fromObject({
+        codeHash: SystemScriptInfo.SECP_CODE_HASH,
+        hashType: SystemScriptInfo.SECP_HASH_TYPE,
+        args: publicKeyInfo.publicKeyInBlake160
+      });
+      const lockHash = script.computeHash()
+      const liveBalance = liveBalances.get(lockHash) || '0'
+      const sentBalance = sentBalances.get(lockHash) || '0'
+      const pendingBalance = pendingBalances.get(lockHash) || '0'
+      const balance = (BigInt(liveBalance) + BigInt(sentBalance)).toString()
+
+      const txCount = txCounts.get(lockHash) || 0
+
+      return {
+        walletId: publicKeyInfo.walletId,
+        address: publicKeyInfo.address,
+        path: publicKeyInfo.path,
+        addressIndex: publicKeyInfo.addressIndex,
+        addressType: publicKeyInfo.addressType,
+        blake160: publicKeyInfo.publicKeyInBlake160,
+        description: publicKeyInfo.description,
+        liveBalance,
+        sentBalance,
+        pendingBalance,
+        balance,
+        txCount
+      }
+    })
+  }
+
+  public static async allBlake160sByWalletId(walletId: string): Promise<string[]> {
+    return (await AddressService.allAddressesWithBalancesByWalletId(walletId)).map(addr => addr.blake160)
+  }
+
+  public static async allLockHashesByWalletId(walletId: string): Promise<string[]> {
+    const addresses = (await AddressService.allAddressesWithBalancesByWalletId(walletId)).map(addr => addr.address)
     return AddressParser.batchToLockHash(addresses)
   }
 
-  public static allLockHashesByWalletId(walletId: string): string[] {
-    const addresses = AddressService.allAddressesByWalletId(walletId).map(addr => addr.address)
-    return AddressParser.batchToLockHash(addresses)
+  public static async updateDescription (walletId: string, address: string, description: string) {
+    AddressDao.updateDescription(walletId, address, description)
   }
 
-  public static usedAddresses = (walletId: string): AddressInterface[] => {
-    return AddressDao.usedAddressesByWalletId(walletId,  AddressService.getAddressVersion())
-  }
-
-  public static updateDescription = (walletId: string, address: string, description: string): AddressInterface | undefined => {
-    return AddressDao.updateDescription(walletId, address, description)
-  }
-
-  public static updateUsedByAnyoneCanPay(
-    walletId: string,
-    blake160: string,
-    addressVersion: AddressVersion,
-    usedByAnyoneCanPay: boolean,
-  ): AddressInterface | undefined {
-    return AddressDao.updateUsedByAnyoneCanPay(walletId, blake160, addressVersion, usedByAnyoneCanPay)
-  }
-
-  public static deleteByWalletId = (walletId: string): AddressInterface[] => {
+  public static async deleteByWalletId (walletId: string): Promise<void> {
     return AddressDao.deleteByWalletId(walletId)
-  }
-
-  public static findByAddresses = (addresses: string[]): AddressInterface[] => {
-    return AddressDao.findByAddresses(addresses)
   }
 
   private static getAddressVersion = (): AddressVersion => {
     return NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+  }
+
+  private static getAddressPrefix() : AddressPrefix {
+    return this.getAddressVersion() === AddressVersion.Mainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
   }
 }

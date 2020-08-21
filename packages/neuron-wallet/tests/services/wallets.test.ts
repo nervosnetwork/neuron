@@ -1,5 +1,7 @@
 import WalletService, { WalletProperties } from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
+import initConnection from '../../src/database/chain/ormconfig'
+import { getConnection } from 'typeorm'
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -8,7 +10,18 @@ describe('wallet service', () => {
   let wallet2: WalletProperties
   let wallet3: WalletProperties
 
-  beforeEach(() => {
+  beforeAll(async () => {
+    await initConnection('')
+  })
+
+  afterAll(async () => {
+    await getConnection().close()
+  })
+
+  beforeEach(async () => {
+    const connection = getConnection()
+    await connection.synchronize(true)
+
     walletService = new WalletService()
     wallet1 = {
       name: 'wallet-test1',
@@ -139,10 +152,10 @@ describe('wallet service', () => {
     beforeEach(() => {
       w1 = walletService.create(wallet1)
     });
-    it('delete wallet', () => {
+    it('delete wallet', async () => {
       walletService.create(wallet2)
       expect(walletService.getAll().length).toBe(2)
-      walletService.delete(w1.id)
+      await walletService.delete(w1.id)
       expect(() => walletService.get(w1.id)).toThrowError()
     })
 
@@ -152,8 +165,8 @@ describe('wallet service', () => {
         w2 = walletService.create(wallet2)
       });
       describe('when deleted current wallet', () => {
-        beforeEach(() => {
-          walletService.delete(w1.id)
+        beforeEach(async () => {
+          await walletService.delete(w1.id)
         });
         it('switches active wallet', () => {
           const activeWallet = walletService.getCurrent()
@@ -162,8 +175,8 @@ describe('wallet service', () => {
         })
       });
       describe('when deleted wallets other than current wallet', () => {
-        beforeEach(() => {
-          walletService.delete(w2.id)
+        beforeEach(async () => {
+          await walletService.delete(w2.id)
         });
         it('should not switch active wallet', () => {
           const activeWallet = walletService.getCurrent()

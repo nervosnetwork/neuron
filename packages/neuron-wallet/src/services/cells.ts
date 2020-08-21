@@ -78,6 +78,60 @@ export default class CellsService {
     }
   }
 
+  public static async getBalancesByWalletId(walletId: string): Promise<{
+    liveBalances: Map<string, string>
+    sentBalances: Map<string, string>
+    pendingBalances: Map<string, string>
+  }> {
+    const cells: { status: string, lockHash: string, sumOfCapacity: string, txCount: number }[] = await getConnection()
+      .getRepository(OutputEntity)
+      .manager
+      .query(`
+        select
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as sumOfCapacity,
+            lockHash,
+            lockArgs,
+            status
+        from
+            output
+        where
+            output.lockArgs in (
+                select
+                    publicKeyInBlake160
+                from
+                    hd_public_key_info
+                where
+                    walletId = '${ walletId }'
+            ) AND
+            output.hasData = false AND
+            output.typeHash is null
+        group by output.lockHash, output.status
+      `)
+
+    const liveBalances = new Map<string, string>()
+    const sentBalances = new Map<string, string>()
+    const pendingBalances = new Map<string, string>()
+
+    cells.forEach(c => {
+      const lockHash: string = c.lockHash
+
+      const sumOfCapacity: string = c.sumOfCapacity
+      if (c.status === OutputStatus.Live) {
+        liveBalances.set(lockHash, sumOfCapacity)
+      } else if (c.status === OutputStatus.Sent) {
+        sentBalances.set(lockHash, sumOfCapacity)
+      } else if (c.status === OutputStatus.Pending) {
+        pendingBalances.set(lockHash, sumOfCapacity)
+      }
+    })
+
+    return {
+      liveBalances,
+      sentBalances,
+      pendingBalances,
+    }
+  }
+
   public static async usedByAnyoneCanPayBlake160s(anyoneCanPayLockHashes: string[], blake160s: string[]): Promise<string[]> {
     const blake160Set = new Set(blake160s)
     const liveCells = await getConnection()

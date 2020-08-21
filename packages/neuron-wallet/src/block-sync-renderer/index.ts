@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import { AddressVersion } from 'database/address/address-dao'
+// import { AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
@@ -11,7 +11,7 @@ import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
-import AssetAccountInfo from 'models/asset-account-info'
+// import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import IndexerFolderManager from './sync/indexer-folder-manager'
 
@@ -19,15 +19,15 @@ let backgroundWindow: BrowserWindow | null
 let network: Network | null
 let indexerQueryId: number = 0
 
-const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
-  const addrs = AddressService.allAddresses()
-  const addresses = addrs.map(addr => addr.address)
-  const assetAccountInfo = new AssetAccountInfo(genesisBlockHash)
-  const anyoneCanPayLockHashes = addrs.map(a => assetAccountInfo.generateAnyoneCanPayScript(a.blake160).computeHash())
-  await AddressService.updateTxCountAndBalances(addresses)
-  const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-  await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
-}
+// const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
+//   const addrs = AddressService.allAddresses()
+//   const addresses = addrs.map(addr => addr.address)
+//   const assetAccountInfo = new AssetAccountInfo(genesisBlockHash)
+//   const anyoneCanPayLockHashes = addrs.map(a => assetAccountInfo.generateAnyoneCanPayScript(a.blake160).computeHash())
+//   await AddressService.updateTxCountAndBalances(addresses)
+//   const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+//   await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
+// }
 
 if (BrowserWindow) {
   AddressCreatedSubject.getSubject().subscribe(async () => {
@@ -104,9 +104,9 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
 
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
       // re init txCount in addresses if switch network
-      await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
+      // await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
       if (backgroundWindow) {
-        const addressesMetas = AddressService.allAddresses()
+        const addressesMetas = await AddressService.allAddresses()
         backgroundWindow.webContents.send(
           "block-sync:start",
           network.remote,

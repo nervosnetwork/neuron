@@ -1,5 +1,8 @@
 import { AddressType } from '../../../src/models/keys/address'
 import AddressDao, { Address, AddressVersion } from '../../../src/database/address/address-dao'
+import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
+import { getConnection } from 'typeorm'
+import { initConnection } from '../../../src/database/chain/ormconfig'
 
 describe('Address Dao tests', () => {
   const address: Address = {
@@ -19,7 +22,7 @@ describe('Address Dao tests', () => {
 
   const address2: Address = {
     walletId: '1',
-    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu84',
     path: "m/44'/309'/0'/0/1",
     addressType: AddressType.Receiving,
     addressIndex: 1,
@@ -28,13 +31,13 @@ describe('Address Dao tests', () => {
     sentBalance: '0',
     pendingBalance: '0',
     balance: '0',
-    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+    blake160: '0x36c329ed630d6ce750712a477543672adab57f4d',
     version: AddressVersion.Testnet,
   }
 
   const usedAddress: Address = {
     walletId: '2',
-    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu85',
     path: "m/44'/309'/0'/0/0",
     addressType: AddressType.Receiving,
     addressIndex: 0,
@@ -43,118 +46,107 @@ describe('Address Dao tests', () => {
     sentBalance: '0',
     pendingBalance: '0',
     balance: '0',
-    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+    blake160: '0x36c329ed630d6ce750712a477543672adab57f4e',
     version: AddressVersion.Testnet,
   }
 
-  const changeAddress: Address = {
-    walletId: '1',
-    address: 'ckt1q9gry5zgugvnmaga0pq3vqtedv6mz7603ukdsk7sk7v7d3',
-    path: "m/44'/309'/0'/0/0",
-    addressType: AddressType.Change,
-    addressIndex: 0,
-    txCount: 0,
-    liveBalance: '0',
-    sentBalance: '0',
-    pendingBalance: '0',
-    balance: '0',
-    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    version: AddressVersion.Testnet,
-  }
+  // const changeAddress: Address = {
+  //   walletId: '1',
+  //   address: 'ckt1q9gry5zgugvnmaga0pq3vqtedv6mz7603ukdsk7sk7v7d3',
+  //   path: "m/44'/309'/0'/0/0",
+  //   addressType: AddressType.Change,
+  //   addressIndex: 0,
+  //   txCount: 0,
+  //   liveBalance: '0',
+  //   sentBalance: '0',
+  //   pendingBalance: '0',
+  //   balance: '0',
+  //   blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+  //   version: AddressVersion.Testnet,
+  // }
 
-  beforeEach(() => {
-    AddressDao.deleteAll()
+  const addresses = [address, address2, usedAddress]
+
+  beforeAll(async () => {
+    await initConnection('')
   })
 
-  it('create', () => {
-    AddressDao.create([address])
-
-    const all = AddressDao.getAll()
-
-    expect(all.length).toEqual(1)
-    expect(all[0].address).toEqual(address.address)
+  afterAll(async () => {
+    await getConnection().close()
   })
 
-  // it('updateTxCount', async () => {
-  //   const mockGetCount = jest.fn()
-  //   const getCountByAddress = 10
-  //   mockGetCount.mockReturnValue(getCountByAddress)
-  //   TransactionsService.getCountByAddress = mockGetCount.bind(TransactionsService)
+  beforeEach(async () => {
+    const connection = getConnection()
+    await connection.synchronize(true)
 
-  //   const daos = await AddressDao.create([address])
-  //   const dao = daos[0]
-  //   expect(dao.txCount).toEqual(0)
-  //   await AddressDao.updateTxCount(address.address)
-  //   dao.reload()
-  //   expect(dao.txCount).toEqual(getCountByAddress)
-  // })
-
-  it('nextUnusedAddress', () => {
-    AddressDao.create([address, usedAddress])
-
-    const addr = AddressDao.nextUnusedAddress('1', AddressVersion.Testnet)
-    expect(addr!.address).toEqual(address.address)
-
-    const usedAddr = AddressDao.nextUnusedAddress('2', AddressVersion.Testnet)
-    expect(usedAddr).toBe(undefined)
-
-    const mainnetAddr = AddressDao.nextUnusedAddress('1', AddressVersion.Mainnet)
-    expect(mainnetAddr).toBe(undefined)
+    await AddressDao.create(addresses)
   })
 
-  it('nextUnusedChangeAddress', () => {
-    AddressDao.create([address, usedAddress, changeAddress])
+  describe('#create', () => {
+    it('saves the newly added address', async () => {
+      const publicKeyInfos = await getConnection()
+        .getRepository(HdPublicKeyInfo)
+        .find()
 
-    const addr = AddressDao.nextUnusedChangeAddress('1', AddressVersion.Testnet)
-    expect(addr!.address).toEqual(changeAddress.address)
+      expect(publicKeyInfos.length).toEqual(3)
+      for (const publicKeyInfo of publicKeyInfos) {
+        const address = addresses.find(addr => addr.address === publicKeyInfo.address)
+        expect(publicKeyInfo.address).toEqual(address!.address)
+        expect(publicKeyInfo.publicKeyInBlake160).toEqual(address!.blake160)
+      }
+    })
+  });
 
-    const usedAddr = AddressDao.nextUnusedAddress('2', AddressVersion.Testnet)
-    expect(usedAddr).toBe(undefined)
+  describe('#allAddressesByWalletId', () => {
+    let result: HdPublicKeyInfo[]
+    describe('when exists', () => {
+      beforeEach(async () => {
+        const walletId = '1'
+        result = await AddressDao.allAddressesByWalletId(walletId)
+      });
+      it('returns addresses', () => {
+        expect(result.length).toEqual(2)
+        expect(result[0].walletId).toEqual('1')
+        expect(result[1].walletId).toEqual('1')
+      });
+    });
+    describe('when not exists', () => {
+      beforeEach(async () => {
+        const walletId = '3'
+        result = await AddressDao.allAddressesByWalletId(walletId)
+      });
+      it('returns empty array', () => {
+        expect(result).toEqual([])
+      });
+    });
+  });
+  describe('#updateDescriptionByAddress', () => {
+    const description = 'desc'
+    const addressToUpdate = address
+    let publicKeyInfos: HdPublicKeyInfo[]
+    beforeEach(async () => {
+      await AddressDao.updateDescription(addressToUpdate.walletId, addressToUpdate.address, description)
+      publicKeyInfos = await AddressDao.allAddressesByWalletId(addressToUpdate.walletId)
+    });
+    it('saves description for a public key info matching with the address', () => {
+      const updatedPublicKeyInfo = publicKeyInfos.find((publicKeyInfo: any) => publicKeyInfo.address === addressToUpdate.address)
+      expect(updatedPublicKeyInfo!.description).toEqual(description)
 
-    const mainnetAddr = AddressDao.nextUnusedAddress('1', AddressVersion.Mainnet)
-    expect(mainnetAddr).toBe(undefined)
-  })
+      const otherPublicKeyInfo = publicKeyInfos.find((publicKeyInfo: any) => publicKeyInfo.address === address2.address)
+      expect(otherPublicKeyInfo!.description).toEqual(null)
+    })
+  });
+  describe('#deleteByWalletId', () => {
+    const walletId = '1'
+    beforeEach(async () => {
+      const publicKeyInfosByWalletId = await AddressDao.allAddressesByWalletId(walletId)
+      expect(publicKeyInfosByWalletId.length).toEqual(2)
+      await AddressDao.deleteByWalletId(walletId)
+    });
+    it('removes all public key infos of a wallet id', async () => {
+      const publicKeyInfosByWalletId = await AddressDao.allAddressesByWalletId(walletId)
+      expect(publicKeyInfosByWalletId).toEqual([])
+    });
+  });
 
-  it('allAddresses', () => {
-    AddressDao.create([address, usedAddress])
-
-    const all = AddressDao.allAddresses(AddressVersion.Testnet)
-
-    const allMainnet = AddressDao.allAddresses(AddressVersion.Mainnet)
-
-    expect(all.length).toEqual(2)
-    expect(allMainnet.length).toEqual(0)
-  })
-
-  it('allAddressesByWalletId', () => {
-    AddressDao.create([address, usedAddress])
-
-    const all = AddressDao.allAddressesByWalletId('1', AddressVersion.Testnet)
-    expect(all.length).toEqual(1)
-  })
-
-  it('usedAddressByWalletId', () => {
-    AddressDao.create([address, usedAddress])
-
-    const walletOne = AddressDao.usedAddressesByWalletId('1', AddressVersion.Testnet)
-    expect(walletOne.length).toEqual(0)
-
-    const walletTwo = AddressDao.usedAddressesByWalletId('2', AddressVersion.Testnet)
-    expect(walletTwo.length).toEqual(1)
-  })
-
-  it('unusedAddressesCount', () => {
-    AddressDao.create([address, changeAddress])
-
-    const counts = AddressDao.unusedAddressesCount(address.walletId, AddressVersion.Testnet)
-    expect(counts).toEqual([1, 1])
-  })
-
-  it('nextUnusedAddress', () => {
-    AddressDao.create([address, address2])
-
-    const next = AddressDao.nextUnusedAddress('1', AddressVersion.Testnet)
-
-    expect(next!.address).toEqual(address.address)
-  })
 })
