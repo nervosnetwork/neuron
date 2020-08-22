@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import {MigrationInterface, QueryRunner, TableIndex} from "typeorm";
 
 export class HDPublicKeyInfo1598087517643 implements MigrationInterface {
     name = 'HDPublicKeyInfo1598087517643'
@@ -9,6 +9,9 @@ export class HDPublicKeyInfo1598087517643 implements MigrationInterface {
         await queryRunner.query(`CREATE INDEX "IDX_4410222d46f6abb359f3060707" ON "hd_public_key_info" ("address") `, undefined);
         await queryRunner.query(`CREATE INDEX "IDX_6cea1798a91670de43512bc953" ON "hd_public_key_info" ("addressIndex") `, undefined);
         await queryRunner.query(`CREATE INDEX "IDX_86d5826c6a68da483ba2e9754f" ON "hd_public_key_info" ("used") `, undefined);
+
+        await queryRunner.createIndex("output", new TableIndex({ columnNames: ["lockArgs"] }))
+        await queryRunner.createIndex("input", new TableIndex({ columnNames: ["lockArgs"] }))
     }
 
     public async down(): Promise<any> {}
