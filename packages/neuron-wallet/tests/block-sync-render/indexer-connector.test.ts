@@ -507,7 +507,7 @@ describe('unit tests for IndexerConnector', () => {
               code_hash: query.type!.codeHash,
               args: query.type!.args,
             },
-            data: null
+            data: 'any'
           })
         })
         it('returns live cells with property value fix', async () => {
