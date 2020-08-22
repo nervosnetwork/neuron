@@ -149,6 +149,7 @@ export default class IndexerConnector {
       }
       result.push(cell)
     }
+
     return result
   }
 

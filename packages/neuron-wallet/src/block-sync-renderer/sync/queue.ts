@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import { queue, AsyncQueue } from 'async'
 import logger from 'utils/logger'
 import { TransactionPersistor } from 'services/tx'
@@ -17,6 +16,7 @@ import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
 import CommonUtils from 'utils/common'
+import { ChildProcess } from 'utils/worker'
 
 export default class Queue {
   private lockHashes: string[]
@@ -58,6 +58,7 @@ export default class Queue {
     this.indexerConnector.blockTipSubject.subscribe(tip => {
       this.updateCurrentBlockNumber(BigInt(tip.block_number))
     });
+
 
     this.checkAndSaveQueue = queue(async (task: any) => {
       const {transactions} = task
@@ -200,6 +201,9 @@ export default class Queue {
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
+    ChildProcess.send({
+      channel: 'synced-block-number-updated',
+      result: this.currentBlockNumber.toString()
+    })
   }
 }

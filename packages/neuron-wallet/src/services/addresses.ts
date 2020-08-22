@@ -5,6 +5,7 @@ import AddressDao, { Address as AddressInterface, AddressVersion } from 'databas
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
+import { ChildProcess } from 'utils/worker'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -59,7 +60,15 @@ export default class AddressService {
     const addressesToNotify = addresses
       .filter(versionFilter)
       .map(address => { return { ...address, isImporting: importing } })
-    AddressCreatedSubject.getSubject().next(addressesToNotify)
+
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
+        channel: 'address-created',
+        result: addressesToNotify
+      })
+    } else {
+      AddressCreatedSubject.getSubject().next(addressesToNotify)
+    }
   }
 
   public static checkAndGenerateSave(

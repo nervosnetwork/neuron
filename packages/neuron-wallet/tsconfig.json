@@ -12,7 +12,7 @@
       "*": ["./src/*", "node_modules/*"]
     },
     "plugins": [
-      { "transform": "ts-transformer-imports" }
+      { "transform": "@zerollup/ts-transform-paths" }
     ],
     "lib": [
       "es2019",
