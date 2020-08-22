@@ -1,12 +1,13 @@
 // import AddressService from '../../src/services/addresses'
 import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 import initConnection from '../../src/database/chain/ormconfig'
-import { getConnection } from 'typeorm'
+import { getConnection, In } from 'typeorm'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { OutputStatus } from '../../src/models/chain/output'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { AddressType } from '../../src/models/keys/address'
 import { Address } from '../../src/database/address/address-dao'
+import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(
@@ -51,6 +52,16 @@ const linkNewCell = async (
     return generateCell(capacity, lockScript, status)
   })
   await getConnection().manager.save(cells)
+}
+
+const usePublicKeys = async (publicKeysInBlake160: string[]) => {
+  await getConnection()
+    .getRepository(HdPublicKeyInfo)
+    .createQueryBuilder()
+    .update()
+    .set({used: true})
+    .where({publicKeyInBlake160: In(publicKeysInBlake160)})
+    .execute()
 }
 
 describe('integration tests for AddressService', () => {
@@ -174,8 +185,7 @@ describe('integration tests for AddressService', () => {
             beforeEach(async () => {
               const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
               const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
-              await linkNewCell([receivingAddresses[0].blake160])
-              await linkNewCell([changeAddresses[0].blake160])
+              await usePublicKeys([receivingAddresses[0].blake160, changeAddresses[0].blake160])
 
               await AddressService.checkAndGenerateSave(
                 walletId,
@@ -219,7 +229,7 @@ describe('integration tests for AddressService', () => {
           describe('when the unused count is not greater than #minUnusedAddressCount', () => {
             beforeEach(async () => {
               const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
-              await linkNewCell([receivingAddresses[0].blake160])
+              await usePublicKeys([receivingAddresses[0].blake160])
 
               await AddressService.checkAndGenerateSave(
                 walletId,
@@ -245,7 +255,7 @@ describe('integration tests for AddressService', () => {
           describe('when the unused count is not greater than #minUnusedAddressCount', () => {
             beforeEach(async () => {
               const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
-              await linkNewCell([changeAddresses[0].blake160])
+              await usePublicKeys([changeAddresses[0].blake160])
 
               await AddressService.checkAndGenerateSave(
                 walletId,
@@ -311,7 +321,7 @@ describe('integration tests for AddressService', () => {
           )
           generatedAddresses = await AddressService.allAddressesByWalletId(walletId)
           publicKeysToUse = [generatedAddresses[0].blake160]
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns next unused receiving address', async () => {
           const nextUnusedAddress = await AddressService.nextUnusedAddress(walletId)
@@ -335,7 +345,7 @@ describe('integration tests for AddressService', () => {
             .filter((addr: Address) => addr.addressType === AddressType.Receiving)
             .map((addr: Address) => addr.blake160)
 
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns next unused change address', async () => {
           const nextUnusedAddress = await AddressService.nextUnusedAddress(walletId)
@@ -357,7 +367,7 @@ describe('integration tests for AddressService', () => {
           generatedAddresses = await AddressService.allAddressesByWalletId(walletId)
           publicKeysToUse = generatedAddresses.map((addr: Address) => addr.blake160)
 
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns next unused change address', async () => {
           const nextUnusedAddress = await AddressService.nextUnusedAddress(walletId)
@@ -383,7 +393,7 @@ describe('integration tests for AddressService', () => {
           )
           generatedAddresses = await AddressService.allAddressesByWalletId(walletId)
           publicKeysToUse = [generatedAddresses[0].blake160]
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns the unused receiving addresses', async () => {
           const allUnusedReceivingAddresses = await AddressService.allUnusedReceivingAddresses(walletId)
@@ -406,7 +416,7 @@ describe('integration tests for AddressService', () => {
           )
           generatedAddresses = await AddressService.allAddressesByWalletId(walletId)
           publicKeysToUse = generatedAddresses.map((addr: Address) => addr.blake160)
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns empty array', async () => {
           const allUnusedReceivingAddresses = await AddressService.allUnusedReceivingAddresses(walletId)
@@ -434,7 +444,7 @@ describe('integration tests for AddressService', () => {
         beforeEach(async () => {
           generatedAddresses = await AddressService.allAddressesByWalletId(walletId)
           publicKeysToUse = [generatedAddresses[changeAddressCount].blake160]
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns the unused receiving addresses', async () => {
           const nextUnusedChangeAddress = await AddressService.nextUnusedChangeAddress(walletId)
@@ -448,7 +458,7 @@ describe('integration tests for AddressService', () => {
           publicKeysToUse = generatedAddresses
             .filter((addr: Address) => addr.addressType === AddressType.Change)
             .map((addr: Address) => addr.blake160)
-          await linkNewCell(publicKeysToUse)
+          await usePublicKeys(publicKeysToUse)
         });
         it('returns undefined', async () => {
           const nextUnusedChangeAddress = await AddressService.nextUnusedChangeAddress(walletId)

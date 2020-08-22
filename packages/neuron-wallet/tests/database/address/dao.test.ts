@@ -50,21 +50,6 @@ describe('Address Dao tests', () => {
     version: AddressVersion.Testnet,
   }
 
-  // const changeAddress: Address = {
-  //   walletId: '1',
-  //   address: 'ckt1q9gry5zgugvnmaga0pq3vqtedv6mz7603ukdsk7sk7v7d3',
-  //   path: "m/44'/309'/0'/0/0",
-  //   addressType: AddressType.Change,
-  //   addressIndex: 0,
-  //   txCount: 0,
-  //   liveBalance: '0',
-  //   sentBalance: '0',
-  //   pendingBalance: '0',
-  //   balance: '0',
-  //   blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-  //   version: AddressVersion.Testnet,
-  // }
-
   const addresses = [address, address2, usedAddress]
 
   beforeAll(async () => {
@@ -120,7 +105,7 @@ describe('Address Dao tests', () => {
       });
     });
   });
-  describe('#updateDescriptionByAddress', () => {
+  describe('#updateDescription', () => {
     const description = 'desc'
     const addressToUpdate = address
     let publicKeyInfos: HdPublicKeyInfo[]

@@ -34,7 +34,7 @@ import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSud
 import { RemoveAssetAccountWalletID1589273902050 } from './migrations/1589273902050-RemoveAssetAccountWalletID'
 import { RemoveLiveCell1592781363749 } from './migrations/1592781363749-RemoveLiveCell'
 import { AddIndexerTxHashCache1592727615004 } from './migrations/1592727615004-AddIndexerTxHashCache'
-import { HDPublicKeyInfo1597799969212 } from './migrations/1597799969212-HDPublicKeyInfo'
+import { HDPublicKeyInfo1598087517643 } from './migrations/1598087517643-HDPublicKeyInfo'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -85,7 +85,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       RemoveAssetAccountWalletID1589273902050,
       RemoveLiveCell1592781363749,
       AddIndexerTxHashCache1592727615004,
-      HDPublicKeyInfo1597799969212,
+      HDPublicKeyInfo1598087517643,
     ],
     logging,
     maxQueryExecutionTime: 30

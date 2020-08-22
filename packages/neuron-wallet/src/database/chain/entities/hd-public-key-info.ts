@@ -28,12 +28,19 @@ export default class HdPublicKeyInfo {
   addressType!: AddressType
 
   @Column()
+  @Index()
   addressIndex!: number
 
   @Column({
     type: 'varchar',
   })
   publicKeyInBlake160!: string
+
+  @Column({
+    default: false
+  })
+  @Index()
+  used!: boolean
 
   @Column({
     type: 'varchar',

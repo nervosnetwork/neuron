@@ -3,19 +3,26 @@ import fs from 'fs'
 import path from 'path'
 import TransactionService, { SearchType } from '../../../src/services/tx/transaction-service'
 import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
-import { saveTransactions, initConnection, closeConnection, saveAccounts } from '../../setupAndTeardown'
+import { initConnection, saveTransactions, closeConnection, saveAccounts } from '../../setupAndTeardown'
 import accounts from '../../setupAndTeardown/accounts.fixture'
 import transactions from '../../setupAndTeardown/transactions.fixture'
+import { getConnection } from 'typeorm'
 
 describe('Test TransactionService', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     await initConnection()
-    await saveAccounts(accounts)
-    return saveTransactions(transactions)
   })
 
-  afterEach(() => {
+  afterAll(() => {
     return closeConnection()
+  })
+
+  beforeEach(async () => {
+    const connection = getConnection()
+    await connection.synchronize(true)
+
+    await saveAccounts(accounts)
+    return saveTransactions(transactions)
   })
 
   describe('#filterSearchType(searchValue)', () => {

@@ -6,6 +6,7 @@ import transactions from '../../setupAndTeardown/transactions.fixture'
 import i18n from '../../../src/locales/i18n'
 import AddressService from '../../../src/services/addresses'
 import exportHistory from '../../../src/utils/export-history'
+import { getConnection } from 'typeorm'
 
 describe('Test exporting history', () => {
   const WALLET_ID = 'wallet id'
@@ -18,16 +19,24 @@ describe('Test exporting history', () => {
     filePath: FILE_PATH,
   }
 
-  beforeAll(() => {
+  beforeAll(async () => {
     i18n.changeLanguage('en')
+    await initConnection()
+  })
+
+  afterAll(async () => {
+    return closeConnection()
   })
 
   beforeEach(async () => {
+    const connection = getConnection()
+    await connection.synchronize(true)
+
+    await saveTransactions(transactions)
+
     stubProvider.walletID = WALLET_ID
     stubProvider.chainType = MAINNET_CHAIN_TYPE
     stubProvider.filePath = FILE_PATH
-    await initConnection()
-    return saveTransactions(transactions)
   })
 
   afterEach(() => {
@@ -36,7 +45,6 @@ describe('Test exporting history', () => {
     } catch {
       // ignore
     }
-    return closeConnection()
   })
 
   describe('when wallet id is missing', () => {

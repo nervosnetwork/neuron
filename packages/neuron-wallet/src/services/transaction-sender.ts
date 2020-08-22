@@ -515,7 +515,7 @@ export default class TransactionSender {
   public getAddressInfos = (walletID: string): Promise<Address[]> => {
     // only for check wallet exists
     this.walletService.get(walletID)
-    return AddressService.allAddressesWithBalancesByWalletId(walletID)
+    return AddressService.allAddressesByWalletId(walletID)
   }
 
   public getChangeAddress = async (): Promise<string> => {

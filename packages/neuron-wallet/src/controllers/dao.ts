@@ -11,7 +11,7 @@ import AddressParser from 'models/address-parser'
 export default class DaoController {
   public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
     const { walletID } = params
-    const addresses = (await AddressesService.allAddressesWithBalancesByWalletId(walletID)).map(addr => addr.address)
+    const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
     const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
     const cells = await CellsService.getDaoCells(lockHashes)
 
