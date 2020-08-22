@@ -9,13 +9,33 @@ export interface PathAndPrivateKey {
   privateKey: string
 }
 
+const UNCOMPRESSED_KEY_LENGTH = 130
+
 export class ExtendedPublicKey {
   publicKey: string
   chainCode: string
 
   constructor(publicKey: string, chainCode: string) {
-    this.publicKey = publicKey
+    this.publicKey = ExtendedPublicKey.compressPublicKey(publicKey)
     this.chainCode = chainCode
+  }
+
+  static compressPublicKey = (key: string) => {
+    if (key.length !== UNCOMPRESSED_KEY_LENGTH) {
+      return key
+    }
+
+    const publicKey = Buffer.from(key, 'hex')
+    const compressedPublicKey = Buffer
+      .alloc(33)
+      // '03' for odd value, '02' for even value
+      .fill(publicKey[64] & 1 ? '03' : '02', 0, 1, 'hex')
+      .fill(publicKey.subarray(1, 33), 1, 33)
+    return compressedPublicKey.toString('hex')
+  }
+
+  isUncompressedKey = (publicKey: string) => {
+    return publicKey.startsWith('04')
   }
 
   serialize = () => {
