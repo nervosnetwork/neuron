@@ -82,7 +82,8 @@ describe(`SignMessage`, () => {
         keystore,
       })
 
-      await AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, undefined, 0, 0, 2, 1)
+      //@ts-ignore
+      await AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, 0, 0, 2, 1)
     })
 
     afterEach(() => {

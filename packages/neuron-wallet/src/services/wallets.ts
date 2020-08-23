@@ -149,19 +149,19 @@ export default class WalletService {
   public generateAddressesIfNecessary = async () => {
     for (const wallet of this.getAll()) {
       if ((await AddressService.allAddressesByWalletId(wallet.id)).length === 0) {
-        this.generateAddressesById(wallet.id, false)
+        await this.generateAddressesById(wallet.id, false)
       }
     }
   }
 
-  public generateAddressesById = (
+  public generateAddressesById = async (
     id: string,
     isImporting: boolean,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
-    AddressService.checkAndGenerateSave(
+    await AddressService.checkAndGenerateSave(
       id,
       accountExtendedPublicKey,
       isImporting,

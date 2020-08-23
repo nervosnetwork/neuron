@@ -62,28 +62,6 @@ const resetMocks = () => {
   stubbedLoggerErrorFn.mockReset()
 }
 
-const generateFakeTx = (id: string) => {
-  const fakeTx = new Transaction('')
-  fakeTx.hash = 'hash1'
-  fakeTx.inputs = [
-    new Input(new OutPoint('0x' + id.repeat(64), '0'))
-  ]
-  fakeTx.outputs = [
-    Output.fromObject({
-      capacity: '1',
-      lock: Script.fromObject(
-        {hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: '0x'}
-      )
-    })
-  ]
-  fakeTx.blockNumber = '1'
-  const fakeTxWithStatus = {
-    transaction: fakeTx,
-    txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed)
-  }
-  return fakeTxWithStatus
-}
-
 describe('queue', () => {
   let queue: Queue
   const fakeNodeUrl = 'http://fakenode:8114'
@@ -111,6 +89,28 @@ describe('queue', () => {
 
   let stubbedBlockTipSubject: any
   let stubbedTransactionsSubject: any
+
+  const generateFakeTx = (id: string) => {
+    const fakeTx = new Transaction('')
+    fakeTx.hash = 'hash1'
+    fakeTx.inputs = [
+      new Input(new OutPoint('0x' + id.repeat(64), '0'))
+    ]
+    fakeTx.outputs = [
+      Output.fromObject({
+        capacity: '1',
+        lock: Script.fromObject(
+          {hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: addressInfo.blake160}
+        )
+      })
+    ]
+    fakeTx.blockNumber = '1'
+    const fakeTxWithStatus = {
+      transaction: fakeTx,
+      txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed)
+    }
+    return fakeTxWithStatus
+  }
 
   beforeEach(async () => {
     resetMocks()

@@ -1,14 +1,14 @@
 import { getConnection } from 'typeorm'
 import NetworksService from 'services/networks'
 import TransactionEntity from 'database/chain/entities/transaction'
-import OutputEntity from 'database/chain/entities/output'
+// import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus, SudtInfo } from 'models/chain/transaction'
-import InputEntity from 'database/chain/entities/input'
+// import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
 import AssetAccountInfo from 'models/asset-account-info'
-import BufferUtils from 'utils/buffer'
+// import BufferUtils from 'utils/buffer'
 import AssetAccountEntity from 'database/chain/entities/asset-account'
-import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
+// import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
 import exportTransactions from 'utils/export-history'
 
 export interface TransactionsByAddressesParam {
@@ -58,7 +58,7 @@ export class TransactionsService {
 
     const lockScripts = AddressParser.batchParse(params.addresses)
     let lockHashes: string[] = lockScripts.map(s => s.computeHash())
-    const blake160s: string[] = lockScripts.map(s => s.args)
+    // const blake160s: string[] = lockScripts.map(s => s.args)
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHashes: string[] = AddressParser
       .batchParse(params.addresses)
@@ -70,6 +70,7 @@ export class TransactionsService {
 
     let allTxHashes: string[] = []
 
+    console.log('wallet id', params.walletID)
     if (type === SearchType.Address) {
       const lockHashToSearch = AddressParser.parse(searchValue).computeHash()
       if (lockHashes.includes(lockHashToSearch)) {
@@ -78,12 +79,12 @@ export class TransactionsService {
           `tx.hash
           IN
             (
-              SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
+              SELECT output.transactionHash FROM output WHERE output.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId)
               UNION
-              SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
+              SELECT input.transactionHash FROM input WHERE input.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId)
             )
           `,
-          { lockHashes }
+          { walletId: params.walletID }
         )
           .orderBy('tx.timestamp', 'DESC')
           .getRawMany().then(txs => txs.map(tx => tx.txHash))
@@ -139,8 +140,15 @@ export class TransactionsService {
         .createQueryBuilder('tx')
         .select("tx.hash", "txHash")
         .where(
-          `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes))`,
-          { lockHashes: allLockHashes }
+          `tx.hash
+          IN
+            (
+              SELECT output.transactionHash FROM output WHERE output.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId)
+              UNION
+              SELECT input.transactionHash FROM input WHERE input.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId)
+            )
+          `,
+          { walletId: params.walletID }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
@@ -157,125 +165,132 @@ export class TransactionsService {
       .orderBy(`tx.timestamp`, 'DESC')
       .getMany()
 
-    const inputs = await connection
-      .getRepository(InputEntity)
-      .createQueryBuilder('input')
-      .select('input.capacity', 'capacity')
-      .addSelect('input.transactionHash', 'transactionHash')
-      .addSelect('input.outPointTxHash', 'outPointTxHash')
-      .addSelect('input.outPointIndex', 'outPointIndex')
-      .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, {
-        txHashes,
-        lockHashes: allLockHashes,
-      })
-      .getRawMany()
+    // const inputs = await connection
+    //   .getRepository(InputEntity)
+    //   .createQueryBuilder('input')
+    //   .select('input.capacity', 'capacity')
+    //   .addSelect('input.transactionHash', 'transactionHash')
+    //   .addSelect('input.outPointTxHash', 'outPointTxHash')
+    //   .addSelect('input.outPointIndex', 'outPointIndex')
+    //   .where(
+    //     `input.transactionHash
+    //       IN
+    //         (
+    //           SELECT output.transactionHash FROM output WHERE output.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId)
+    //           UNION
+    //           SELECT input.transactionHash FROM input WHERE input.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId)
+    //         )
+    //     `,
+    //     { walletId: params.walletID }
+    //   )
+    //   .getRawMany()
 
-    const outputs = await connection
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .select('output.capacity', 'capacity')
-      .addSelect('output.transactionHash', 'transactionHash')
-      .addSelect('output.daoData', 'daoData')
-      .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, {
-        txHashes,
-        lockHashes: allLockHashes,
-      })
-      .getRawMany()
+    // const outputs = await connection
+    //   .getRepository(OutputEntity)
+    //   .createQueryBuilder('output')
+    //   .select('output.capacity', 'capacity')
+    //   .addSelect('output.transactionHash', 'transactionHash')
+    //   .addSelect('output.daoData', 'daoData')
+    //   .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, {
+    //     txHashes,
+    //     lockHashes: allLockHashes,
+    //   })
+    //   .getRawMany()
 
-    const anyoneCanPayInputs = await connection
-      .getRepository(InputEntity)
-      .createQueryBuilder('input')
-      .where(`input.transactionHash IN (:...txHashes) AND input.typeHash IS NOT NULL AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
-      .getMany()
+    // const anyoneCanPayInputs = await connection
+    //   .getRepository(InputEntity)
+    //   .createQueryBuilder('input')
+    //   .where(`input.transactionHash IN (:...txHashes) AND input.typeHash IS NOT NULL AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+    //   .getMany()
 
-    const anyoneCanPayOutputs = await connection
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .where(`output.transactionHash IN (:...txHashes) AND output.typeHash IS NOT NULL AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
-      .getMany()
+    // const anyoneCanPayOutputs = await connection
+    //   .getRepository(OutputEntity)
+    //   .createQueryBuilder('output')
+    //   .where(`output.transactionHash IN (:...txHashes) AND output.typeHash IS NOT NULL AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+    //   .getMany()
 
-    const inputPreviousTxHashes: string[] = inputs
-      .map(i => i.outPointTxHash)
-      .filter(h => !!h) as string[]
+    // const inputPreviousTxHashes: string[] = inputs
+    //   .map(i => i.outPointTxHash)
+    //   .filter(h => !!h) as string[]
 
-    const daoCellOutPoints: { txHash: string, index: string }[] = (await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .select("output.outPointTxHash", "txHash")
-      .addSelect("output.outPointIndex", "index")
-      .where('output.daoData IS NOT NULL')
-      .getRawMany())
-      .filter(o => inputPreviousTxHashes.includes(o.txHash))
+    // const daoCellOutPoints: { txHash: string, index: string }[] = (await getConnection()
+    //   .getRepository(OutputEntity)
+    //   .createQueryBuilder('output')
+    //   .select("output.outPointTxHash", "txHash")
+    //   .addSelect("output.outPointIndex", "index")
+    //   .where('output.daoData IS NOT NULL')
+    //   .getRawMany())
+    //   .filter(o => inputPreviousTxHashes.includes(o.txHash))
 
     const sums = new Map<string, bigint>()
     const daoFlag = new Map<string, boolean>()
-    outputs.map(o => {
-      const s = sums.get(o.transactionHash) || BigInt(0)
-      sums.set(o.transactionHash, s + BigInt(o.capacity))
+    // outputs.map(o => {
+    //   const s = sums.get(o.transactionHash) || BigInt(0)
+    //   sums.set(o.transactionHash, s + BigInt(o.capacity))
 
-      if (o.daoData) {
-        daoFlag.set(o.transactionHash, true)
-      }
-    })
+    //   if (o.daoData) {
+    //     daoFlag.set(o.transactionHash, true)
+    //   }
+    // })
 
-    inputs.map(i => {
-      const s = sums.get(i.transactionHash) || BigInt(0)
-      sums.set(i.transactionHash, s - BigInt(i.capacity || 0))
+    // inputs.map(i => {
+    //   const s = sums.get(i.transactionHash) || BigInt(0)
+    //   sums.set(i.transactionHash, s - BigInt(i.capacity || 0))
 
-      const result = daoCellOutPoints.some(dc => {
-        return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
-      })
-      if (result) {
-        daoFlag.set(i.transactionHash, true)
-      }
-    })
+    //   const result = daoCellOutPoints.some(dc => {
+    //     return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
+    //   })
+    //   if (result) {
+    //     daoFlag.set(i.transactionHash, true)
+    //   }
+    // })
 
     const txs = await Promise.all(
       transactions.map(async tx => {
         const value = sums.get(tx.hash!) || BigInt(0)
 
-        let typeArgs: string | undefined | null
-        const sudtInput = anyoneCanPayInputs.find(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!))
-        if (sudtInput) {
-          typeArgs = sudtInput.typeArgs
-        } else {
-          const sudtOutput = anyoneCanPayOutputs.find(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!))
-          if (sudtOutput) {
-            typeArgs = sudtOutput.typeArgs
-          }
-        }
+        // let typeArgs: string | undefined | null
+        // const sudtInput = anyoneCanPayInputs.find(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!))
+        // if (sudtInput) {
+        //   typeArgs = sudtInput.typeArgs
+        // } else {
+        //   const sudtOutput = anyoneCanPayOutputs.find(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!))
+        //   if (sudtOutput) {
+        //     typeArgs = sudtOutput.typeArgs
+        //   }
+        // }
 
         let sudtInfo: SudtInfo | undefined
 
-        if (typeArgs) {
-          // const typeArgs = sudtInput.typeArgs
-          const inputAmount = anyoneCanPayInputs
-            .filter(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!) && i.typeArgs === typeArgs)
-            .map(i => BufferUtils.parseAmountFromSUDTData(i.data))
-            .reduce((result, c) => result + c, BigInt(0))
-          const outputAmount = anyoneCanPayOutputs
-            .filter(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!) && o.typeArgs === typeArgs)
-            .map(o => BufferUtils.parseAmountFromSUDTData(o.data))
-            .reduce((result, c) => result + c, BigInt(0))
+        // if (typeArgs) {
+        //   // const typeArgs = sudtInput.typeArgs
+        //   const inputAmount = anyoneCanPayInputs
+        //     .filter(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!) && i.typeArgs === typeArgs)
+        //     .map(i => BufferUtils.parseAmountFromSUDTData(i.data))
+        //     .reduce((result, c) => result + c, BigInt(0))
+        //   const outputAmount = anyoneCanPayOutputs
+        //     .filter(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!) && o.typeArgs === typeArgs)
+        //     .map(o => BufferUtils.parseAmountFromSUDTData(o.data))
+        //     .reduce((result, c) => result + c, BigInt(0))
 
-          const amount = outputAmount - inputAmount
-          const tokenInfo = await getConnection()
-            .getRepository(SudtTokenInfoEntity)
-            .createQueryBuilder('info')
-            .leftJoinAndSelect('info.assetAccounts', 'aa')
-            .where(`info.tokenID = :typeArgs AND aa.blake160 IN (:...blake160s)`, {
-              typeArgs,
-              blake160s,
-            })
-            .getOne()
+        //   const amount = outputAmount - inputAmount
+        //   const tokenInfo = await getConnection()
+        //     .getRepository(SudtTokenInfoEntity)
+        //     .createQueryBuilder('info')
+        //     .leftJoinAndSelect('info.assetAccounts', 'aa')
+        //     .where(`info.tokenID = :typeArgs AND aa.blake160 IN (:...blake160s)`, {
+        //       typeArgs,
+        //       blake160s,
+        //     })
+        //     .getOne()
 
-          if (tokenInfo) {
-            sudtInfo = {
-              sUDT: tokenInfo,
-              amount: amount.toString(),
-            }
-          }
-        }
+        //   if (tokenInfo) {
+        //     sudtInfo = {
+        //       sUDT: tokenInfo,
+        //       amount: amount.toString(),
+        //     }
+        //   }
+        // }
 
         return Transaction.fromObject({
           timestamp: tx.timestamp,

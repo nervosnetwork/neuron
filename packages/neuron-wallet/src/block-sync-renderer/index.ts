@@ -92,10 +92,8 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
     })
 
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
-      // re init txCount in addresses if switch network
-      // await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
+      await WalletService.getInstance().generateAddressesIfNecessary()
       if (backgroundWindow) {
-        await WalletService.getInstance().generateAddressesIfNecessary()
 
         const addressesMetas = await AddressService.allAddresses()
         backgroundWindow.webContents.send(
@@ -128,6 +126,7 @@ export const queryIndexer = (query: LumosCellQuery): Promise<LumosCell[]> => {
     ipcMain.once(`block-sync:query-indexer:${indexerQueryId}`, (_event, results) => {
       resolve(results)
     });
+    console.log('query indexer')
     backgroundWindow!.webContents.send(
       "block-sync:query-indexer",
       query,

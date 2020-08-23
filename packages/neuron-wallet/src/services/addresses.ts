@@ -24,10 +24,9 @@ export interface AddressMetaInfo {
 export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
-  public static async generateAndSave(
+  private static async generateAndSave(
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
-    isImporting: boolean | undefined,
     receivingStartIndex: number,
     changeStartIndex: number,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
@@ -49,7 +48,7 @@ export default class AddressService {
     ]
     await AddressDao.create(generatedAddresses)
 
-    AddressService.notifyAddressCreated(generatedAddresses, isImporting)
+    return generatedAddresses
   }
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
@@ -63,9 +62,10 @@ export default class AddressService {
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change
-  ) {
-    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.unusedAddressesByTypes(walletId)
+    changeAddressCount: number = DefaultAddressNumber.Change,
+    notifyAddressCreated: boolean = true
+  ): Promise<AddressInterface[] | undefined> {
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getUnusedAddresses(walletId)
     const unusedReceivingCount = unusedReceivingAddresses.length
     const unusedChangeCount = unusedChangeAddresses.length
     if (
@@ -81,15 +81,41 @@ export default class AddressService {
 
     const receivingCount: number = unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount
     const changeCount: number = unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount
-    return AddressService.generateAndSave(
+
+    const currentGeneratedAddresses = await this.generateAndSave(
       walletId,
       extendedKey,
-      isImporting,
       nextReceivingIndex,
       nextChangeIndex,
       receivingCount,
       changeCount
     )
+
+    //resursive check and generate addresses
+    const nextGeneratedAddresses = await this.checkAndGenerateSave(
+      walletId,
+      extendedKey,
+      isImporting,
+      receivingAddressCount,
+      changeAddressCount,
+      false
+    )
+
+    const allGeneratedAddresses = currentGeneratedAddresses
+
+    if (nextGeneratedAddresses) {
+      allGeneratedAddresses.push(...nextGeneratedAddresses)
+    }
+
+    allGeneratedAddresses.sort((lhs, rhs) => {
+      return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
+    })
+
+    if (notifyAddressCreated) {
+      this.notifyAddressCreated(allGeneratedAddresses, isImporting)
+    }
+
+    return allGeneratedAddresses
   }
 
   // Generate both receiving and change addresses.
@@ -169,7 +195,7 @@ export default class AddressService {
     return result.addressIndex
   }
 
-  private static async unusedAddressesByTypes(walletId: string) {
+  private static async getUnusedAddresses(walletId: string) {
     const allUnusedAddresses = await this.getAllUnusedAddressesByWalletId(walletId)
 
     const unusedReceivingAddresses = allUnusedAddresses
@@ -181,29 +207,31 @@ export default class AddressService {
   }
 
   public static async getAllUnusedAddressesByWalletId (walletId: string) {
-    const allUnusedPublicKeys = await getConnection()
-      .getRepository(HdPublicKeyInfo)
-      .createQueryBuilder()
-      .where({walletId, used: false})
-      .getMany()
+    const txCountsByLockHashes = await TransactionsService.getTxCountsByWalletId(walletId)
 
-    const allUnusedAddresses = allUnusedPublicKeys.map(publicKeyInfo => (
-      {
-        walletId: publicKeyInfo.walletId,
-        address: publicKeyInfo.address,
-        path: publicKeyInfo.path,
-        addressIndex: publicKeyInfo.addressIndex,
-        addressType: publicKeyInfo.addressType,
-        blake160: publicKeyInfo.publicKeyInBlake160,
-        description: publicKeyInfo.description,
-      })
-    )
+    const addresses = await this.allAddressesByWalletId(walletId)
+    for (const address of addresses) {
+      const script = Script.fromObject({
+        codeHash: SystemScriptInfo.SECP_CODE_HASH,
+        hashType: SystemScriptInfo.SECP_HASH_TYPE,
+        args: address.blake160
+      });
+      const lockHash = script.computeHash()
+      const txCount = txCountsByLockHashes.get(lockHash)
+
+      if (!txCount) {
+        continue
+      }
+      address.txCount = txCount
+    }
+
+    const allUnusedAddresses = addresses.filter(address => !address.txCount)
 
     return allUnusedAddresses
   }
 
   public static async nextUnusedAddress (walletId: string): Promise<AddressInterface | undefined> {
-    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.unusedAddressesByTypes(walletId)
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getUnusedAddresses(walletId)
     if (unusedReceivingAddresses.length) {
       return unusedReceivingAddresses[0]
     }
@@ -215,7 +243,7 @@ export default class AddressService {
   }
 
   public static async nextUnusedChangeAddress (walletId: string): Promise<AddressInterface | undefined> {
-    const [ , unusedChangeAddresses ] = await this.unusedAddressesByTypes(walletId)
+    const [ , unusedChangeAddresses ] = await this.getUnusedAddresses(walletId)
     if (unusedChangeAddresses.length) {
       return unusedChangeAddresses[0]
     }
@@ -223,7 +251,7 @@ export default class AddressService {
   }
 
   public static async allUnusedReceivingAddresses(walletId: string): Promise<AddressInterface[]> {
-    const [ unusedReceivingAddresses ] = await this.unusedAddressesByTypes(walletId)
+    const [ unusedReceivingAddresses ] = await this.getUnusedAddresses(walletId)
     return unusedReceivingAddresses
   }
 
@@ -259,7 +287,7 @@ export default class AddressService {
     const publicKeyInfos = await AddressDao.allAddressesByWalletId(walletId)
     const {liveBalances, sentBalances, pendingBalances} = await CellsService.getBalancesByWalletId(walletId)
     const txCounts = await TransactionsService.getTxCountsByWalletId(walletId)
-    return publicKeyInfos.map(publicKeyInfo => {
+    const allAddressesWithBalances = publicKeyInfos.map(publicKeyInfo => {
       const script = Script.fromObject({
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
@@ -288,6 +316,7 @@ export default class AddressService {
         txCount
       }
     })
+    return allAddressesWithBalances
   }
 
   public static async allBlake160sByWalletId(walletId: string): Promise<string[]> {

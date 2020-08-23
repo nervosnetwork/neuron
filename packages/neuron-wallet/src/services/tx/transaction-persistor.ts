@@ -1,4 +1,4 @@
-import { getConnection, QueryRunner, In } from 'typeorm'
+import { getConnection, QueryRunner } from 'typeorm'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
@@ -9,7 +9,6 @@ import OutPoint from 'models/chain/out-point'
 import Output, { OutputStatus } from 'models/chain/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
 import Input from 'models/chain/input'
-import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 
 export enum TxSaveType {
   Sent = 'sent',
@@ -175,7 +174,6 @@ export class TransactionPersistor {
         for (const slice of ArrayUtils.eachSlice(outputs, sliceSize)) {
           await queryRunner.manager.save(slice)
         }
-        await TransactionPersistor.saveUsedPublicKeys(queryRunner, [], outputs)
         await queryRunner.commitTransaction()
       } catch (err) {
         logger.error('Database:\tsaveWithFetch update error:', err)
@@ -311,7 +309,6 @@ export class TransactionPersistor {
       for (const slice of ArrayUtils.eachSlice(outputs, sliceSize)) {
         await queryRunner.manager.save(slice)
       }
-      await TransactionPersistor.saveUsedPublicKeys(queryRunner, inputs, outputs)
       await queryRunner.commitTransaction();
     } catch (err) {
       logger.error('Database:\tcreate transaction error:', err)
@@ -325,34 +322,6 @@ export class TransactionPersistor {
     return tx
   }
 
-  private static async saveUsedPublicKeys (
-    qr: QueryRunner,
-    inputs: InputEntity[],
-    outputs: OutputEntity[]
-  ) {
-    const publicKeysInBlake160 = new Set()
-    for (const {lockArgs} of inputs) {
-      publicKeysInBlake160.add(lockArgs)
-    }
-    for (const {lockArgs} of outputs) {
-      publicKeysInBlake160.add(lockArgs)
-    }
-    const publicKeyInfos = await getConnection()
-      .getRepository(HdPublicKeyInfo)
-      .createQueryBuilder()
-      .where({
-        publicKeyInBlake160: In([...publicKeysInBlake160]),
-        used: false
-      })
-      .getMany()
-
-    for (const publicKeyInfo of publicKeyInfos) {
-      publicKeyInfo.used = true
-    }
-
-    await qr.manager.save(publicKeyInfos)
-  }
-
   private static waitUntilTransactionFinished = async(queryRunner: QueryRunner, timeout: number = 5000) => {
     const startAt: number = +new Date()
     while (queryRunner.isTransactionActive) {
@@ -361,21 +330,6 @@ export class TransactionPersistor {
         await CommonUtils.sleep(50)
       }
     }
-  }
-
-  public static deleteWhenFork = async (blockNumber: string) => {
-    const txs = await getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('tx')
-      .where(
-        'CAST(tx.blockNumber AS UNSIGNED BIG INT) > CAST(:blockNumber AS UNSIGNED BIG INT) AND tx.status = :status',
-        {
-          blockNumber,
-          status: TransactionStatus.Success,
-        }
-      )
-      .getMany()
-    return getConnection().manager.remove(txs)
   }
 
   // update previousOutput's status to 'dead' if found
@@ -405,11 +359,6 @@ export class TransactionPersistor {
       TxSaveType.Fetch
     )
     return txEntity
-  }
-
-  public static get = async (txHash: string) => {
-    return await getConnection().getRepository(TransactionEntity)
-      .findOne(txHash, { relations: ['inputs'] })
   }
 
   public static saveSentTx = async (

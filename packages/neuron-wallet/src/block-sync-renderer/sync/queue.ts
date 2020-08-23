@@ -188,18 +188,28 @@ export default class Queue {
           }
         }
         await TransactionPersistor.saveFetchTx(tx)
-        // const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
-        // await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
-        const walletIds = new Set(this.addresses.map(addr => addr.walletId))
-        for (const walletId of walletIds) {
-          await WalletService.checkAndGenerateAddresses(walletId)
-        }
         for (const info of anyoneCanPayInfos) {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
       }
 
+      await this.checkAndGenerateAddressesByTx(tx)
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
+    }
+  }
+
+  private async checkAndGenerateAddressesByTx(tx: Transaction) {
+    const walletIds = new Set(
+      this.addresses
+        .filter(
+          addr =>
+            tx.inputs.some(input => input.lock?.args === addr.blake160) ||
+            tx.outputs.some(output => output.lock?.args === addr.blake160)
+        )
+        .map(addr => addr.walletId)
+    )
+    for (const walletId of walletIds) {
+      await WalletService.checkAndGenerateAddresses(walletId)
     }
   }
 

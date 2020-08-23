@@ -28,17 +28,18 @@ export interface Address {
 
 export default class AddressDao {
   public static async create (addresses: Address[]) {
-    for (const address of addresses) {
-      await getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(HdPublicKeyInfo)
-        .values({
-          ...address,
-          publicKeyInBlake160: address.blake160
-        })
-        .execute()
-    }
+    const publicKeyInfos = addresses.map(addr => {
+      const keyInfo = new HdPublicKeyInfo()
+      keyInfo.address = addr.address
+      keyInfo.addressIndex = addr.addressIndex
+      keyInfo.addressType = addr.addressType
+      keyInfo.description = addr.description
+      keyInfo.path = addr.path
+      keyInfo.publicKeyInBlake160 = addr.blake160
+      keyInfo.walletId = addr.walletId
+      return keyInfo
+    })
+    await getConnection().manager.save(publicKeyInfos)
     AddressDbChangedSubject.getSubject().next("Updated")
   }
 
