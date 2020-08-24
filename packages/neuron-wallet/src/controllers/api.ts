@@ -102,8 +102,7 @@ export default class ApiController {
     })
 
     handle('show-open-dialog-modal', async (e, params: OpenDialogSyncOptions) => {
-      // @ts-ignore
-      const win = e.sender.getOwnerBrowserWindow()
+      const win = BrowserWindow.fromWebContents(e.sender)!
       const result = await dialog.showOpenDialog(win, params)
       return {
         status: ResponseCode.Success,
