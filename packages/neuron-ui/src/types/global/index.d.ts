@@ -1,14 +1,6 @@
 declare interface Window {
   electron: {
     clipboard: any
-    remote: {
-      getCurrentWebContents: Function
-      getCurrentWindow: Function
-      getGlobal: (name: string) => any
-      require: (module: string) => any
-      process: any
-      app: any
-    }
     shell: any
     require: any
     nativeImage: any

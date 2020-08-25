@@ -69,7 +69,12 @@ const ImportKeystore = () => {
     showOpenDialogModal({
       title: 'import keystore',
     })
-      .then(({ filePaths }: { filePaths: string[] }) => {
+      .then(res => {
+        if (!isSuccessResponse(res)) {
+          console.error(res.message)
+          return
+        }
+        const { filePaths } = res.result!
         const filePath = filePaths[0]
         if (filePath) {
           setFields({
