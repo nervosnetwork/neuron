@@ -95,9 +95,13 @@ export default class AppController {
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',
-      icon: app.isPackaged
-        ? nativeImage.createFromPath(path.join(__dirname, '../../neuron-ui/icon.png'))
-        : path.join(__dirname, '../../../assets/icons/icon.png'),
+      icon: nativeImage.createFromPath(
+        app.isPackaged
+          ? path.join(__dirname, '../../neuron-ui/icon.png')
+          // use icon from assets in dev mode
+          // since neuron ui only copied to dist during packaging
+          : path.join(__dirname, '../../../assets/icons/icon.png')
+      ),
       webPreferences: {
         devTools: env.isDevMode,
         nodeIntegration: false,
