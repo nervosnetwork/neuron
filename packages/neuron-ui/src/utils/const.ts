@@ -8,7 +8,7 @@ export const SINCE_FIELD_SIZE = 8
 export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
-export const CONFIRMATION_THRESHOLD = 300
+export const CONFIRMATION_THRESHOLD = 24
 export const MAX_TIP_BLOCK_DELAY = 180000
 export const BUFFER_BLOCK_NUMBER = 10
 

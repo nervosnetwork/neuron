@@ -1,21 +1,17 @@
 declare interface Window {
-  clipboard: any
-  remote: {
-    getCurrentWebContents: Function
-    getCurrentWindow: Function
-    getGlobal: (name: string) => any
-    require: (module: string) => any
-    process: any
-    app: any
-  }
-  require: any
-  nativeImage: any
-  ipcRenderer: {
-    invoke(channel: string, ...args: any[]): Promise<any>
-    on(channel: string, listener: Function)
-    removeListener(channel: string, listener: Function)
-    removeAllListeners(channel: string)
-    sendSync(channel: string, ...args: any[]): any
+  electron: {
+    clipboard: any
+    shell: any
+    require: any
+    nativeImage: any
+    desktopCapturer: any
+    ipcRenderer: {
+      invoke(channel: string, ...args: any[]): Promise<any>
+      on(channel: string, listener: Function)
+      removeListener(channel: string, listener: Function)
+      removeAllListeners(channel: string)
+      sendSync(channel: string, ...args: any[]): any
+    }
   }
   neuron: {
     role: 'main' | 'settings'

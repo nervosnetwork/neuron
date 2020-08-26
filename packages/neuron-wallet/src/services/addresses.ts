@@ -11,6 +11,7 @@ import CellsService from './cells'
 import SystemScriptInfo from 'models/system-script-info'
 import Script from 'models/chain/script'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
+import { ChildProcess } from 'utils/worker'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -54,7 +55,15 @@ export default class AddressService {
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
     const addressesToNotify = addresses
       .map(address => ({ ...address, isImporting }))
-    AddressCreatedSubject.getSubject().next(addressesToNotify)
+
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
+        channel: 'address-created',
+        result: addressesToNotify
+      })
+    } else {
+      AddressCreatedSubject.getSubject().next(addressesToNotify)
+    }
   }
 
   public static async checkAndGenerateSave(

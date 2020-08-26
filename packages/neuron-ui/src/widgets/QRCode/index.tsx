@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react'
+import { clipboard, nativeImage } from 'electron'
 import canvg from 'canvg'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
@@ -131,8 +132,8 @@ const QRCode = ({
       return
     }
     const dataURL = canvasRef.current.toDataURL('image/png')
-    const img = window.nativeImage.createFromDataURL(dataURL)
-    window.clipboard.writeImage(img)
+    const img = nativeImage.createFromDataURL(dataURL)
+    clipboard.writeImage(img)
     addPopup('qrcode-copied')(dispatch)
   }, [dispatch])
 

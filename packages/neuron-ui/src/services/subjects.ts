@@ -1,4 +1,5 @@
 import { CONSTANTS } from 'utils'
+import { ipcRenderer } from 'electron'
 
 const { LOCALES } = CONSTANTS
 
@@ -28,15 +29,15 @@ const SubjectConstructor = <T>(
     | 'navigation'
     | 'set-locale'
 ) => {
-  return window.ipcRenderer
+  return ipcRenderer
     ? {
         subscribe: (handler: (data: T) => void) => {
-          window.ipcRenderer.on(channel, (_e: Event, data: T) => {
+          ipcRenderer.on(channel, (_e: Event, data: T) => {
             handler(data)
           })
           return {
             unsubscribe: () => {
-              window.ipcRenderer.removeAllListeners(channel)
+              ipcRenderer.removeAllListeners(channel)
             },
           }
         },

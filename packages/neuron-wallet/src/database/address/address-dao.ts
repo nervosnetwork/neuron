@@ -2,6 +2,7 @@ import { AddressType } from 'models/keys/address'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { getConnection } from 'typeorm'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
+import { ChildProcess } from 'utils/worker'
 
 export enum AddressVersion {
   Testnet = 'testnet',
@@ -84,4 +85,14 @@ export default class AddressDao {
       .execute()
   }
 
+  static changed() {
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
+        channel: 'address-db-changed',
+        result: 'Updated'
+      })
+    } else {
+      AddressDbChangedSubject.getSubject().next("Updated")
+    }
+  }
 }

@@ -1,3 +1,19 @@
+# 0.32.2 (2020-08-22)
+[CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Bug fixes
+
+* Fix a breaking change by lumos indexer which leads to a bug that it can't make transfers from asset accounts.
+
+
+# 0.32.1 (2020-08-10)
+[CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Bug fixes
+
+* Upgrade bundled lumos indexer version to 0.7.4 to support connecting node via https.
+
+
 # 0.32.0 (2020-07-31)
 
 ### Bundled CKB node

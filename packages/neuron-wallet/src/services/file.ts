@@ -14,7 +14,9 @@ export default class FileService {
     return FileService.instance
   }
 
-  public basePath = env.fileBasePath
+  // get fileBasePath value from child_process.fork() env
+  public basePath = process.env['fileBasePath'] ?? env.fileBasePath
+
   public config = {
     encoding: 'utf8',
   }

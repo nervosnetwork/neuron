@@ -9,6 +9,7 @@ import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import FileService from './file'
 import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
+import { ChildProcess } from 'utils/worker'
 
 const fileService = FileService.getInstance()
 
@@ -238,7 +239,15 @@ export default class WalletService {
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
     await AddressService.deleteByWalletId(id)
-    WalletDeletedSubject.getSubject().next(id)
+
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
+        channel: 'wallet-deleted',
+        result: id
+      })
+    } else {
+      WalletDeletedSubject.getSubject().next(id)
+    }
   }
 
   public setCurrent = (id: string) => {

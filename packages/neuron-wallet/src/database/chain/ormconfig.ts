@@ -87,6 +87,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddIndexerTxHashCache1592727615004,
       HDPublicKeyInfo1598087517643,
     ],
+    logger: 'simple-console',
     logging,
     maxQueryExecutionTime: 30
   }

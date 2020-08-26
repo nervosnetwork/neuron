@@ -1,6 +1,6 @@
 import path from 'path'
 import { t } from 'i18next'
-import { app as electronApp, remote, BrowserWindow } from 'electron'
+import { app as electronApp, remote, BrowserWindow, nativeImage } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
 import env from 'env'
@@ -93,10 +93,17 @@ export default class AppController {
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',
-      icon: path.join(__dirname, '../../neuron-ui/icon.png'),
+      icon: nativeImage.createFromPath(
+        app.isPackaged
+          ? path.join(__dirname, '../../neuron-ui/icon.png')
+          // use icon from assets in dev mode
+          // since neuron ui only copied to dist during packaging
+          : path.join(__dirname, '../../../assets/icons/icon.png')
+      ),
       webPreferences: {
         devTools: env.isDevMode,
         nodeIntegration: false,
+        enableRemoteModule: false,
         preload: path.join(__dirname, './preload.js'),
       },
     })
