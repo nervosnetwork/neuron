@@ -123,7 +123,7 @@ export default class Queue {
 
       const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
       cachedPreviousTxs.set(txHash, previousTxWithStatus)
-    }, 100)
+    }, 1)
 
     const drainFetchTxQueue = new Promise((resolve, reject) => {
       fetchTxQueue.error(reject)
