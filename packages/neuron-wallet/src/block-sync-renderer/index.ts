@@ -9,6 +9,7 @@ import SyncedBlockNumberSubject from 'models/subjects/node'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
+import WalletService from 'services/wallets'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
@@ -116,6 +117,8 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   })
 
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
+    await WalletService.getInstance().generateAddressesIfNecessary()
+
     // re init txCount in addresses if switch network
     syncTask?.start(
       network.remote,
