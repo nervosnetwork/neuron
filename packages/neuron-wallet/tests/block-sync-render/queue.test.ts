@@ -62,7 +62,7 @@ const resetMocks = () => {
   stubbedLoggerErrorFn.mockReset()
 }
 
-const generateFakeTx = (id: string) => {
+const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   const fakeTx = new Transaction('')
   fakeTx.hash = 'hash1'
   fakeTx.inputs = [
@@ -72,7 +72,7 @@ const generateFakeTx = (id: string) => {
     Output.fromObject({
       capacity: '1',
       lock: Script.fromObject(
-        { hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: '0x' }
+        { hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash }
       )
     })
   ]
@@ -195,8 +195,8 @@ describe('queue', () => {
       });
     })
     describe('subscribes to IndexerConnector#transactionsSubject', () => {
-      const fakeTxWithStatus1 = generateFakeTx('1')
-      const fakeTxWithStatus2 = generateFakeTx('2')
+      const fakeTxWithStatus1 = generateFakeTx('1', addresses[0].blake160)
+      const fakeTxWithStatus2 = generateFakeTx('2', addresses[0].blake160)
 
       const fakeTxs = [
         fakeTxWithStatus2

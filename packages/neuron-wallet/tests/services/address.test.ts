@@ -72,11 +72,20 @@ const linkNewCell = async (
 
 describe('integration tests for AddressService', () => {
   const stubbedAddressCreatedSubjectNext = jest.fn()
+  const stubbedIsChildProcessFn = jest.fn()
+
   jest.doMock('models/subjects/address-created-subject', () => {
     return {
       getSubject: () => ({
         next: stubbedAddressCreatedSubjectNext
       })
+    }
+  })
+  jest.doMock('utils/worker', () => {
+    return {
+      ChildProcess: {
+        isChildProcess: stubbedIsChildProcessFn
+      }
     }
   })
   const AddressService = require('../../src/services/addresses').default
@@ -114,8 +123,6 @@ describe('integration tests for AddressService', () => {
   });
 
   describe('Key tests with db', () => {
-    const receivingStartIndex = 0
-    const changeStartIndex = 0
     const isImporting = undefined
 
     let generatedAddresses: Address[]
@@ -132,35 +139,6 @@ describe('integration tests for AddressService', () => {
       const connection = getConnection()
       await connection.synchronize(true)
     })
-
-    describe.skip('#generateAndSave', () => {
-      const receivingAddressCount = 2
-      const changeAddressCount = 1
-      beforeEach(async () => {
-        await AddressService.generateAndSave(
-          walletId,
-          extendedKey,
-          isImporting,
-          receivingStartIndex,
-          changeStartIndex,
-          receivingAddressCount,
-          changeAddressCount
-          )
-        generatedAddresses = await AddressService.allAddressesByWalletId(walletId)
-      });
-      it('generate new addresses for a wallet id', async () => {
-        expect(generatedAddresses.length).toEqual(2 + 1)
-      })
-      it('notifies newly generated addresses', () => {
-        expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledWith(
-          generatedAddresses.map((addr: any) => {
-            delete addr.description
-            addr.isImporting = undefined
-            return addr
-          })
-        )
-      })
-    });
 
     describe('#checkAndGenerateSave', () => {
       const receivingAddressCount = 4
