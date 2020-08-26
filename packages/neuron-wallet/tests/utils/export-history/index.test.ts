@@ -3,13 +3,14 @@ import fs from 'fs'
 import path from 'path'
 import { initConnection, closeConnection, saveTransactions } from '../../setupAndTeardown/index'
 import transactions from '../../setupAndTeardown/transactions.fixture'
+import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
 import i18n from '../../../src/locales/i18n'
-import AddressService from '../../../src/services/addresses'
 import exportHistory from '../../../src/utils/export-history'
 import { getConnection } from 'typeorm'
+import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 
 describe('Test exporting history', () => {
-  const WALLET_ID = 'wallet id'
+  const WALLET_ID = 'w1'
   const MAINNET_CHAIN_TYPE = 'ckb'
   const TESTNET_CHAIN_TYPE = 'ckb_testnet'
   const FILE_PATH = path.join(os.tmpdir(), 'transaction.csv')
@@ -33,6 +34,9 @@ describe('Test exporting history', () => {
     await connection.synchronize(true)
 
     await saveTransactions(transactions)
+
+    const keyEntities = keyInfos.map(i => HdPublicKeyInfo.fromObject(i))
+    await getConnection().manager.save(keyEntities)
 
     stubProvider.walletID = WALLET_ID
     stubProvider.chainType = MAINNET_CHAIN_TYPE
@@ -106,6 +110,7 @@ describe('Test exporting history', () => {
     describe('when it\'s Mainnet', () => {
       beforeEach(() => {
         stubProvider.chainType = MAINNET_CHAIN_TYPE
+        stubProvider.walletID = 'non exist id'
       })
 
       it('should export table header without sudt column', async () => {
@@ -120,6 +125,7 @@ describe('Test exporting history', () => {
     describe('when it\'s Testnet', () => {
       beforeEach(() => {
         stubProvider.chainType = TESTNET_CHAIN_TYPE
+        stubProvider.walletID = 'non exist id'
       })
 
       it('should export table header containing sudt column', async () => {
@@ -133,19 +139,6 @@ describe('Test exporting history', () => {
   })
 
   describe('when several transactions exported', () => {
-    const originalAllAddressesByWalletID = AddressService.allAddressesByWalletId
-
-    beforeAll(() => {
-      AddressService.allAddressesByWalletId = jest.fn().mockReturnValue([
-        'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
-        'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
-      ].map(address => ({ address })))
-    })
-
-    afterAll(() => {
-      AddressService.allAddressesByWalletId = originalAllAddressesByWalletID
-    })
-
     it('should export table with records', async () => {
       expect.assertions(2)
       const expectedTotalCount = 3

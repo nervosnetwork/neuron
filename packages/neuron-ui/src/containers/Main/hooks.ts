@@ -96,7 +96,6 @@ export const useOnCurrentWalletChange = ({
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
-    console.info(`switching to ${walletID}`)
     initAppState()(dispatch, history)
   }, [walletID, dispatch, history])
 }

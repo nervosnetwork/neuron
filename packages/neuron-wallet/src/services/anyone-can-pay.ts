@@ -1,5 +1,4 @@
 import AddressService from "./addresses"
-import SystemScriptInfo from "models/system-script-info"
 import AssetAccountInfo from "models/asset-account-info"
 import AddressParser from "models/address-parser"
 import { TransactionGenerator } from "./tx"
@@ -48,8 +47,6 @@ export default class AnyoneCanPayService {
 
     const isCKB = !tokenID || tokenID === 'CKBytes'
 
-    const allBlake160s = (await AddressService.allBlake160sByWalletId(walletID))
-    const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
     const anyoneCanPayLocks: Script[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)]
 
     const liveCellService = LiveCellService.getInstance();
@@ -74,7 +71,7 @@ export default class AnyoneCanPayService {
     const changeBlake160: string = (await AddressService.nextUnusedChangeAddress(walletID))!.blake160
 
     const tx = isCKB ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-      defaultLockHashes,
+      walletID,
       anyoneCanPayLocks,
       targetOutput,
       capacityOrAmount,
@@ -82,7 +79,7 @@ export default class AnyoneCanPayService {
       feeRate,
       fee
     ) : await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-      defaultLockHashes,
+      walletID,
       anyoneCanPayLocks,
       targetOutput,
       capacityOrAmount,

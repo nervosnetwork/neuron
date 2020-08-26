@@ -29,15 +29,10 @@ export interface Address {
 export default class AddressDao {
   public static async create (addresses: Address[]) {
     const publicKeyInfos = addresses.map(addr => {
-      const keyInfo = new HdPublicKeyInfo()
-      keyInfo.address = addr.address
-      keyInfo.addressIndex = addr.addressIndex
-      keyInfo.addressType = addr.addressType
-      keyInfo.description = addr.description
-      keyInfo.path = addr.path
-      keyInfo.publicKeyInBlake160 = addr.blake160
-      keyInfo.walletId = addr.walletId
-      return keyInfo
+      return HdPublicKeyInfo.fromObject({
+        ...addr,
+        publicKeyInBlake160: addr.blake160
+      })
     })
     await getConnection().manager.save(publicKeyInfos)
     AddressDbChangedSubject.getSubject().next("Updated")

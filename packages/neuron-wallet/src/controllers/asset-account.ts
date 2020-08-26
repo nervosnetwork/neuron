@@ -3,7 +3,6 @@ import Transaction from "models/chain/transaction"
 import AssetAccountService from "services/asset-account-service"
 import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
-import AddressService from "services/addresses"
 import NetworksService from "services/networks"
 import AddressGenerator from "models/address-generator"
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils"
@@ -38,15 +37,12 @@ export interface UpdateAssetAccountParams {
 export default class AssetAccountController {
   public async getAll(params: { walletID: string }): Promise<Controller.Response<(AssetAccount & { address: string })[]>> {
     const assetAccountInfo = new AssetAccountInfo()
-    const blake160s = await AddressService.allBlake160sByWalletId(params.walletID)
-    const anyoneCanPayLockHashes: string[] = blake160s.map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
 
-    const assetAccounts = await AssetAccountService.getAll(blake160s, anyoneCanPayLockHashes)
+    const assetAccounts = await AssetAccountService.getAll(params.walletID)
 
     if (!assetAccounts) {
       throw new ServiceHasNoResponse('AssetAccount')
     }
-
 
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
 
@@ -92,10 +88,8 @@ export default class AssetAccountController {
     assetAccount: AssetAccount,
     tx: Transaction
   }>> {
-    const lockHashes: string[] = await AddressService.allLockHashesByWalletId(params.walletID)
     const result = await AssetAccountService.generateCreateTx(
       params.walletID,
-      lockHashes,
       params.tokenID,
       params.symbol,
       params.accountName,

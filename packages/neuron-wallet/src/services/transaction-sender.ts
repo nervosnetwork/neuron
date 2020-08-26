@@ -202,12 +202,6 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = await this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
@@ -216,7 +210,7 @@ export default class TransactionSender {
     const changeAddress: string = await this.getChangeAddress()
 
     const tx: Transaction = await TransactionGenerator.generateTx(
-      lockHashes,
+      walletID,
       targetOutputs,
       changeAddress,
       fee,
@@ -232,11 +226,6 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = await this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -244,7 +233,7 @@ export default class TransactionSender {
     }))
 
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-      lockHashes,
+      walletID,
       targetOutputs,
       fee,
       feeRate
@@ -259,18 +248,12 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = await this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
     const address = await AddressesService.nextUnusedAddress(walletID)
 
     const changeAddress: string = await this.getChangeAddress()
 
     const tx = await TransactionGenerator.generateDepositTx(
-      lockHashes,
+      walletID,
       capacity,
       address!.address,
       changeAddress,
@@ -301,16 +284,12 @@ export default class TransactionSender {
       throw new TransactionIsNotCommittedYet()
     }
 
-    const addressInfos = await this.getAddressInfos(walletID)
-    const addresses: string[] = addressInfos.map(info => info.address)
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
     const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
     const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
-      lockHashes,
+      walletID,
       outPoint,
       prevOutput,
       depositBlockHeader!.number,
@@ -436,16 +415,10 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = await this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
     const address = await AddressesService.nextUnusedAddress(walletID)
 
     const tx = await TransactionGenerator.generateDepositAllTx(
-      lockHashes,
+      walletID,
       address!.address,
       fee,
       feeRate,
