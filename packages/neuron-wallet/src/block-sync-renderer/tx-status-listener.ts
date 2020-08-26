@@ -5,7 +5,6 @@ import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
-import NodeService from 'services/node'
 import WalletService from 'services/wallets'
 import { TransactionStatus } from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -13,7 +12,7 @@ import logger from 'utils/logger'
 import AddressGenerator from 'models/address-generator'
 
 const getTransactionStatus = async (hash: string) => {
-  const url: string = NodeService.getInstance().ckb.rpc.node.url
+  const url: string = NetworksService.getInstance().getCurrent().remote
   const rpcService = new RpcService(url)
   const txWithStatus: TransactionWithStatus | undefined = await rpcService.getTransaction(hash)
   if (!txWithStatus) {
@@ -65,7 +64,7 @@ const trackingStatus = async () => {
   }
 
   if (successTxs.length > 0) {
-    const url: string = NodeService.getInstance().ckb.rpc.node.url
+    const url: string = NetworksService.getInstance().getCurrent().remote
     const ckb = new CKB(url)
     const rpcService = new RpcService(ckb.rpc.node.url)
     for (const successTx of successTxs) {

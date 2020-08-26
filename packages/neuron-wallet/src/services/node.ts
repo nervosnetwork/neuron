@@ -3,7 +3,7 @@ import { promisify } from 'util'
 import path from 'path'
 import https from 'https'
 import http from 'http'
-import { remote, dialog, shell } from 'electron'
+import { dialog, shell } from 'electron'
 import { t } from 'i18next'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
@@ -16,7 +16,6 @@ import NetworksService from 'services/networks'
 import RpcService from 'services/rpc-service'
 import { startCkbNode } from 'services/ckb-runner'
 import HexUtils from 'utils/hex'
-import ProcessUtils from 'utils/process'
 import { BUNDLED_CKB_URL } from 'utils/const'
 import logger from 'utils/logger'
 
@@ -25,11 +24,7 @@ class NodeService {
 
   static getInstance(): NodeService {
     if (!NodeService.instance) {
-      if (ProcessUtils.isRenderer()) {
-        NodeService.instance = remote.require('./services/node').default.getInstance()
-      } else {
-        NodeService.instance = new NodeService()
-      }
+      NodeService.instance = new NodeService()
     }
     return NodeService.instance
   }

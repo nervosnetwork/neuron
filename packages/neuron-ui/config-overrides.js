@@ -1,4 +1,7 @@
-module.exports = function override(config, env) {
-  //do stuff with the webpack config...
-  return config;
+const path = require('path')
+
+module.exports = function override(config) {
+  const webpackCofnig = { ...config }
+  webpackCofnig.resolve.alias.electron = path.join(__dirname, 'src/electron-modules')
+  return webpackCofnig
 }

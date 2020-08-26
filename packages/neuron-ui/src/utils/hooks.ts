@@ -19,6 +19,7 @@ import {
   validateTokenName,
   validateDecimal,
 } from 'utils/validators'
+import { MenuItemConstructorOptions } from 'electron'
 
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
@@ -173,7 +174,7 @@ export const useOnDefaultContextMenu = (t: TFunction) =>
   useCallback(
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       if ((e.target as HTMLElement).tagName === 'INPUT') {
-        const contextMenuTemplate = [
+        const contextMenuTemplate: Array<MenuItemConstructorOptions> = [
           { label: t('contextmenu.cut'), role: 'cut' },
           {
             label: t('contextmenu.copy'),

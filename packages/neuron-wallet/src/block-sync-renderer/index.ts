@@ -84,6 +84,8 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
 
   logger.info('Sync:\tstarting background process')
 
+  // prevents the sync task from being started repeatedly if fork does not finish executing.
+  syncTask = Object.create(null)
   syncTask = await spawn<SyncTask>(
     fork(path.join(__dirname, 'task.js'), [], {
       env: {
