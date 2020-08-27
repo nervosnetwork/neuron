@@ -54,10 +54,6 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
 
-    // update addresses txCount and balance
-    // const blake160s = TransactionsService.blake160sOfTx(tx)
-    // const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    // const usedAddresses = blake160s.map(blake160 => AddressGenerator.toShortByBlake160(blake160, prefix))
     await WalletService.checkAndGenerateAddresses(walletID)
     return txHash
   }
