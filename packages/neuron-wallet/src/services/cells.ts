@@ -242,15 +242,17 @@ export default class CellsService {
 
     const totalCount = matchedOutputs.length
 
-    const cells: Cell[] = matchedOutputs.map(o => {
-      const cell = o.toModel()
-      cell.setCustomizedAssetInfo({
-        lock: CustomizedLock.SingleMultiSign,
-        type: '',
-        data: ''
-      })
-      return cell
-    }).slice(skip, pageNo * pageSize);
+    const cells: Cell[] = matchedOutputs
+      .slice(skip, pageNo * pageSize)
+      .map(o => {
+        const cell = o.toModel()
+        cell.setCustomizedAssetInfo({
+          lock: CustomizedLock.SingleMultiSign,
+          type: '',
+          data: ''
+        })
+        return cell
+      });
 
     return {
       totalCount: totalCount,
