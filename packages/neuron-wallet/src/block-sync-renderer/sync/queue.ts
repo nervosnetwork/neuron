@@ -10,7 +10,7 @@ import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
-import { Address as AddressInterface } from 'database/address/address-dao'
+import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'

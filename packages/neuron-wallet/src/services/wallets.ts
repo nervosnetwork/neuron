@@ -149,7 +149,7 @@ export default class WalletService {
 
   public generateAddressesIfNecessary = async () => {
     for (const wallet of this.getAll()) {
-      if ((await AddressService.allAddressesByWalletId(wallet.id)).length === 0) {
+      if ((await AddressService.getAddressesByWalletId(wallet.id)).length === 0) {
         await this.generateAddressesById(wallet.id, false)
       }
     }

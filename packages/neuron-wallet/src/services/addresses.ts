@@ -1,7 +1,7 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
-import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
+import { Address as AddressInterface, AddressVersion } from "models/address"
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
@@ -12,6 +12,7 @@ import SystemScriptInfo from 'models/system-script-info'
 import Script from 'models/chain/script'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 import { ChildProcess } from 'utils/worker'
+import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -24,6 +25,17 @@ export interface AddressMetaInfo {
 
 export default class AddressService {
   private static minUnusedAddressCount: number = 3
+
+  private static async create (addresses: AddressInterface[]) {
+    const publicKeyInfos = addresses.map(addr => {
+      return HdPublicKeyInfo.fromObject({
+        ...addr,
+        publicKeyInBlake160: addr.blake160
+      })
+    })
+    await getConnection().manager.save(publicKeyInfos)
+    AddressDbChangedSubject.getSubject().next("Updated")
+  }
 
   private static async generateAndSave(
     walletId: string,
@@ -47,7 +59,7 @@ export default class AddressService {
       ...addresses.receiving,
       ...addresses.change,
     ]
-    await AddressDao.create(generatedAddresses)
+    await this.create(generatedAddresses)
 
     return generatedAddresses
   }
@@ -74,7 +86,7 @@ export default class AddressService {
     changeAddressCount: number = DefaultAddressNumber.Change,
     notifyAddressCreated: boolean = true
   ): Promise<AddressInterface[] | undefined> {
-    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getUnusedAddresses(walletId)
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     const unusedReceivingCount = unusedReceivingAddresses.length
     const unusedChangeCount = unusedChangeAddresses.length
     if (
@@ -204,8 +216,8 @@ export default class AddressService {
     return result.addressIndex
   }
 
-  private static async getUnusedAddresses(walletId: string) {
-    const allUnusedAddresses = await this.getAllUnusedAddressesByWalletId(walletId)
+  private static async getGroupedUnusedAddressesByWalletId(walletId: string) {
+    const allUnusedAddresses = await this.getUnusedAddressesByWalletId(walletId)
 
     const unusedReceivingAddresses = allUnusedAddresses
       .filter(addr => addr.addressType === AddressType.Receiving)
@@ -215,10 +227,10 @@ export default class AddressService {
     return [unusedReceivingAddresses, unusedChangeAddresses]
   }
 
-  public static async getAllUnusedAddressesByWalletId (walletId: string) {
+  public static async getUnusedAddressesByWalletId (walletId: string) {
     const txCountsByLockHashes = await TransactionsService.getTxCountsByWalletId(walletId)
 
-    const addresses = await this.allAddressesByWalletId(walletId)
+    const addresses = await this.getAddressesByWalletId(walletId)
     for (const address of addresses) {
       const script = Script.fromObject({
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
@@ -239,8 +251,8 @@ export default class AddressService {
     return allUnusedAddresses
   }
 
-  public static async nextUnusedAddress (walletId: string): Promise<AddressInterface | undefined> {
-    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getUnusedAddresses(walletId)
+  public static async getNextUnusedAddressByWalletId (walletId: string): Promise<AddressInterface | undefined> {
+    const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     if (unusedReceivingAddresses.length) {
       return unusedReceivingAddresses[0]
     }
@@ -251,22 +263,26 @@ export default class AddressService {
     return undefined
   }
 
-  public static async nextUnusedChangeAddress (walletId: string): Promise<AddressInterface | undefined> {
-    const [ , unusedChangeAddresses ] = await this.getUnusedAddresses(walletId)
+  public static async getNextUnusedChangeAddressByWalletId (walletId: string): Promise<AddressInterface | undefined> {
+    const [ , unusedChangeAddresses ] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     if (unusedChangeAddresses.length) {
       return unusedChangeAddresses[0]
     }
     return undefined
   }
 
-  public static async allUnusedReceivingAddresses(walletId: string): Promise<AddressInterface[]> {
-    const [ unusedReceivingAddresses ] = await this.getUnusedAddresses(walletId)
+  public static async getUnusedReceivingAddressesByWalletId(walletId: string): Promise<AddressInterface[]> {
+    const [ unusedReceivingAddresses ] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     return unusedReceivingAddresses
   }
 
 
-  public static allAddresses = async (): Promise<AddressInterface[]> => {
-    const publicKeyInfos = await AddressDao.allAddresses()
+  public static getAddressesByAllWallets = async (): Promise<AddressInterface[]> => {
+    const publicKeyInfos = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .getMany()
+
     return publicKeyInfos.map(publicKeyInfo => ({
       walletId: publicKeyInfo.walletId,
       address: publicKeyInfo.address,
@@ -278,29 +294,35 @@ export default class AddressService {
     }))
   }
 
-  public static async allAddressesByWalletId (walletId: string): Promise<AddressInterface[]> {
-    const publicKeyInfos = await AddressDao.allAddressesByWalletId(walletId)
-    return publicKeyInfos.map(publicKeyInfo => ({
-        walletId: publicKeyInfo.walletId,
-        address: publicKeyInfo.address,
-        path: publicKeyInfo.path,
-        addressIndex: publicKeyInfo.addressIndex,
-        addressType: publicKeyInfo.addressType,
-        blake160: publicKeyInfo.publicKeyInBlake160,
-        description: publicKeyInfo.description,
-      })
-    )
+  public static async getAddressesByWalletId (walletId: string): Promise<AddressInterface[]> {
+    const publicKeyInfos = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .where({walletId})
+      .getMany()
+
+    return publicKeyInfos.sort((lhs, rhs) => {
+      return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
+    }).map(publicKeyInfo => ({
+      walletId: publicKeyInfo.walletId,
+      address: publicKeyInfo.address,
+      path: publicKeyInfo.path,
+      addressIndex: publicKeyInfo.addressIndex,
+      addressType: publicKeyInfo.addressType,
+      blake160: publicKeyInfo.publicKeyInBlake160,
+      description: publicKeyInfo.description,
+    }))
   }
 
-  public static async allAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {
-    const publicKeyInfos = await AddressDao.allAddressesByWalletId(walletId)
+  public static async getAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {
+    const addresses = await this.getAddressesByWalletId(walletId)
     const {liveBalances, sentBalances, pendingBalances} = await CellsService.getBalancesByWalletId(walletId)
     const txCounts = await TransactionsService.getTxCountsByWalletId(walletId)
-    const allAddressesWithBalances = publicKeyInfos.map(publicKeyInfo => {
+    const allAddressesWithBalances = addresses.map(address => {
       const script = Script.fromObject({
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
-        args: publicKeyInfo.publicKeyInBlake160
+        args: address.blake160
       });
       const lockHash = script.computeHash()
       const liveBalance = liveBalances.get(lockHash) || '0'
@@ -311,13 +333,7 @@ export default class AddressService {
       const txCount = txCounts.get(lockHash) || 0
 
       return {
-        walletId: publicKeyInfo.walletId,
-        address: publicKeyInfo.address,
-        path: publicKeyInfo.path,
-        addressIndex: publicKeyInfo.addressIndex,
-        addressType: publicKeyInfo.addressType,
-        blake160: publicKeyInfo.publicKeyInBlake160,
-        description: publicKeyInfo.description,
+        ...address,
         liveBalance,
         sentBalance,
         pendingBalance,
@@ -328,21 +344,27 @@ export default class AddressService {
     return allAddressesWithBalances
   }
 
-  public static async allBlake160sByWalletId(walletId: string): Promise<string[]> {
-    return (await AddressService.allAddressesByWalletId(walletId)).map(addr => addr.blake160)
-  }
-
-  public static async allLockHashesByWalletId(walletId: string): Promise<string[]> {
-    const addresses = (await AddressService.allAddressesByWalletId(walletId)).map(addr => addr.address)
-    return AddressParser.batchToLockHash(addresses)
-  }
-
   public static async updateDescription (walletId: string, address: string, description: string) {
-    AddressDao.updateDescription(walletId, address, description)
+    await getConnection()
+      .createQueryBuilder()
+      .update(HdPublicKeyInfo)
+      .set({
+        description
+      })
+      .where({
+        walletId,
+        address
+      })
+      .execute()
   }
 
   public static async deleteByWalletId (walletId: string): Promise<void> {
-    return AddressDao.deleteByWalletId(walletId)
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(HdPublicKeyInfo)
+      .where({walletId})
+      .execute()
   }
 
   private static getAddressVersion = (): AddressVersion => {

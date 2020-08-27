@@ -192,7 +192,7 @@ export default class AssetAccountService {
     }
 
     // 1. find next unused address
-    const addresses = await AddressService.allUnusedReceivingAddresses(walletID)
+    const addresses = await AddressService.getUnusedReceivingAddressesByWalletId(walletID)
     const usedBlake160s = new Set(await this.blake160sOfAssetAccounts())
     const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
 
@@ -200,7 +200,7 @@ export default class AssetAccountService {
     const assetAccount = new AssetAccount(tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
     // 3. generate tx
-    const changeAddrObj = await AddressService.nextUnusedChangeAddress(walletID)
+    const changeAddrObj = await AddressService.getNextUnusedChangeAddressByWalletId(walletID)
     let tx: Transaction | undefined
     try {
       tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(

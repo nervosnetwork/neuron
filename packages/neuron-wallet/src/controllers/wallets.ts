@@ -279,7 +279,7 @@ export default class WalletsController {
   }
 
   public async getAllAddresses(id: string) {
-    const addresses = (await AddressService.allAddressesWithBalancesByWalletId(id)).map(
+    const addresses = (await AddressService.getAddressesWithBalancesByWalletId(id)).map(
       ({
         address,
         blake160: identifier,

@@ -5,7 +5,7 @@ import NodeService from './node'
 import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
-import { Address } from 'database/address/address-dao'
+import { Address } from "models/address"
 import { PathAndPrivateKey } from 'models/keys/key'
 import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
@@ -248,7 +248,7 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const address = await AddressesService.nextUnusedAddress(walletID)
+    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
 
     const changeAddress: string = await this.getChangeAddress()
 
@@ -286,7 +286,7 @@ export default class TransactionSender {
 
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
-    const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
+    const changeAddress = await AddressesService.getNextUnusedChangeAddressByWalletId(walletID)
     const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
@@ -355,7 +355,7 @@ export default class TransactionSender {
 
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
-    const address = await AddressesService.nextUnusedAddress(walletID)
+    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
     const blake160 = AddressParser.toBlake160(address!.address)
 
     const output: Output = new Output(
@@ -415,7 +415,7 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const address = await AddressesService.nextUnusedAddress(walletID)
+    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
 
     const tx = await TransactionGenerator.generateDepositAllTx(
       walletID,
@@ -447,7 +447,7 @@ export default class TransactionSender {
         throw new TransactionIsNotCommittedYet()
       }
 
-      const receivingAddressInfo = await AddressesService.nextUnusedAddress(walletID)
+      const receivingAddressInfo = await AddressesService.getNextUnusedAddressByWalletId(walletID)
       const receivingAddress = receivingAddressInfo!.address
       const prevOutput = cellWithStatus.cell!.output
       const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
@@ -488,13 +488,13 @@ export default class TransactionSender {
   public getAddressInfos = (walletID: string): Promise<Address[]> => {
     // only for check wallet exists
     this.walletService.get(walletID)
-    return AddressService.allAddressesByWalletId(walletID)
+    return AddressService.getAddressesByWalletId(walletID)
   }
 
   public getChangeAddress = async (): Promise<string> => {
     const walletId = this.walletService.getCurrent()!.id
 
-    const unusedChangeAddress = await AddressService.nextUnusedChangeAddress(walletId)
+    const unusedChangeAddress = await AddressService.getNextUnusedChangeAddressByWalletId(walletId)
 
     return unusedChangeAddress!.address
   }

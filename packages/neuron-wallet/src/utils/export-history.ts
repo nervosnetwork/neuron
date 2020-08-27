@@ -43,7 +43,7 @@ const exportHistory = async ({
     `${headers.map(label => t(`export-transactions.column.${label}`))}\n`
   )
 
-  const allAddresses = await AddressService.allAddressesByWalletId(walletID)
+  const allAddresses = await AddressService.getAddressesByWalletId(walletID)
 
   const addresses = allAddresses.map(addr => addr.address)
   const PAGE_SIZE = 100

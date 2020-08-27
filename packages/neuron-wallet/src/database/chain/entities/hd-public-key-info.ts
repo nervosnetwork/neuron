@@ -63,8 +63,8 @@ export default class HdPublicKeyInfo {
     return publicKeyInfo
   }
 
-  public static fromObject(...args: any[]): HdPublicKeyInfo {
-    const model = HdPublicKeyInfoModel.fromObject.apply(HdPublicKeyInfoModel, args)
+  public static fromObject(...args: Parameters<typeof HdPublicKeyInfoModel.fromObject>): HdPublicKeyInfo {
+    const model = HdPublicKeyInfoModel.fromObject(...args)
     return this.fromModel(model)
   }
 }

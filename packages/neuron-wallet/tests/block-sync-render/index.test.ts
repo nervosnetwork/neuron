@@ -125,7 +125,7 @@ describe('block sync render', () => {
         return {
           updateTxCountAndBalances: jest.fn(),
           updateUsedByAnyoneCanPayByBlake160s: jest.fn(),
-          allAddresses: () => [{}]
+          getAddressesByAllWallets: () => [{}]
         }
       })
 
@@ -189,15 +189,6 @@ describe('block sync render', () => {
         it('called with SyncTask instance', () => {
           expect(stubbedQueryIndexer).toHaveBeenCalledWith(query)
         })
-        // skip query id test since we call `getLiveCellsByScript` directly
-        describe.skip('in subsequent #queryIndexer calls', () => {
-          beforeEach(() => {
-            queryIndexer(query)
-          });
-          it('updates indexer query id', () => {
-            expect(stubbedIpcMainOnce.mock.calls[0][0]).toEqual('block-sync:query-indexer:2')
-          })
-        });
       });
     });
 

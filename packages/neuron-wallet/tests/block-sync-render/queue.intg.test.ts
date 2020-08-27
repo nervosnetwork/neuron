@@ -2,7 +2,7 @@ import { when } from 'jest-when'
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import AddressMeta from '../../src/database/address/meta';
-import { Address, AddressVersion } from '../../src/database/address/address-dao';
+import { Address, AddressVersion } from '../../src/models/address';
 import {default as TransactionEntity} from '../../src/database/chain/entities/transaction';
 import {default as InputEntity} from '../../src/database/chain/entities/input';
 import {default as OutputEntity} from '../../src/database/chain/entities/output';

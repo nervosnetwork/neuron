@@ -5,7 +5,7 @@ import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionWithStatus from '../../src/models/chain/transaction-with-status'
-import { Address, AddressVersion } from '../../src/database/address/address-dao'
+import { Address, AddressVersion } from '../../src/models/address'
 import Queue from '../../src/block-sync-renderer/sync/queue'
 import Transaction from '../../src/models/chain/transaction'
 import TxStatus, { TxStatusType } from '../../src/models/chain/tx-status'

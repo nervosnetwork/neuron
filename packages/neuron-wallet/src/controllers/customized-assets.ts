@@ -11,7 +11,8 @@ export default class CustomizedAssetsController {
   public async getCustomizedAssetCells(
     params: Controller.Params.GetCustomizedAssetCellsParams
   ): Promise<Controller.Response<PaginationResult<Cell>>> {
-    const blake160s = await AddressService.allBlake160sByWalletId(params.walletID)
+    const addresses = await AddressService.getAddressesByWalletId(params.walletID)
+    const blake160s = addresses.map(addr => addr.blake160)
 
     const result = await CellsService.getSingleMultiSignCells(blake160s, params.pageNo, params.pageSize)
 

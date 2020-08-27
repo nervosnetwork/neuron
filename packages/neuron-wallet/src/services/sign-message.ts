@@ -13,7 +13,7 @@ export default class SignMessage {
 
   public static async sign(walletID: string, address: string, password: string, message: string): Promise<string> {
     const wallet = WalletService.getInstance().get(walletID)
-    const addresses = await AddressService.allAddressesByWalletId(walletID)
+    const addresses = await AddressService.getAddressesByWalletId(walletID)
     let addr = addresses.find(addr => addr.address === address)
     if (!addr) {
       throw new AddressNotFound()

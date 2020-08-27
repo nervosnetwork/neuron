@@ -1,4 +1,4 @@
-import { Address, AddressVersion } from "./address-dao";
+import { Address, AddressVersion } from "../../models/address";
 import { AddressType } from "models/keys/address";
 import Script from "models/chain/script";
 import SystemScriptInfo from "models/system-script-info";

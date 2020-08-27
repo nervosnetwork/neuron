@@ -68,7 +68,7 @@ export default class AnyoneCanPayService {
       outPoint: targetOutputLiveCell.outPoint(),
     })
 
-    const changeBlake160: string = (await AddressService.nextUnusedChangeAddress(walletID))!.blake160
+    const changeBlake160: string = (await AddressService.getNextUnusedChangeAddressByWalletId(walletID))!.blake160
 
     const tx = isCKB ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
       walletID,
