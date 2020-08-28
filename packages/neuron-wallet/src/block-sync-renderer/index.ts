@@ -2,7 +2,6 @@ import { BrowserWindow } from 'electron'
 import path from 'path'
 import { fork } from 'child_process'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import { AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
@@ -10,9 +9,9 @@ import SyncedBlockNumberSubject from 'models/subjects/node'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
+import WalletService from 'services/wallets'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
-import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import IndexerFolderManager from './sync/indexer-folder-manager'
 import { spawn, terminate, subscribe as subscribeToWorkerProcess } from 'utils/worker'
@@ -24,16 +23,6 @@ import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 
 let syncTask: SyncTask | null
 let network: Network | null
-
-const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
-  const addrs = AddressService.allAddresses()
-  const addresses = addrs.map(addr => addr.address)
-  const assetAccountInfo = new AssetAccountInfo(genesisBlockHash)
-  const anyoneCanPayLockHashes = addrs.map(a => assetAccountInfo.generateAnyoneCanPayScript(a.blake160).computeHash())
-  await AddressService.updateTxCountAndBalances(addresses)
-  const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-  await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
-}
 
 const restartSyncTask = async () => {
   await killBlockSyncTask()
@@ -128,12 +117,13 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   })
 
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
+    await WalletService.getInstance().generateAddressesIfNecessary()
+
     // re init txCount in addresses if switch network
-    await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
     syncTask?.start(
       network.remote,
       network.genesisHash,
-      AddressService.allAddresses()
+      await AddressService.getAddressesByAllWallets()
     )
   }
 }

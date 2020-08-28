@@ -1,5 +1,5 @@
 import initConnection from 'database/chain/ormconfig'
-import { Address as AddressInterface } from 'database/address/address-dao'
+import { Address as AddressInterface } from "models/address"
 import Queue from './sync/queue'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import logger from 'utils/logger'

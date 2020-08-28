@@ -3,19 +3,28 @@ import fs from 'fs'
 import path from 'path'
 import TransactionService, { SearchType } from '../../../src/services/tx/transaction-service'
 import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
-import { saveTransactions, initConnection, closeConnection, saveAccounts } from '../../setupAndTeardown'
+import { initConnection, saveTransactions, closeConnection, saveAccounts } from '../../setupAndTeardown'
+import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
 import accounts from '../../setupAndTeardown/accounts.fixture'
 import transactions from '../../setupAndTeardown/transactions.fixture'
+import { getConnection } from 'typeorm'
+import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 
 describe('Test TransactionService', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     await initConnection()
-    await saveAccounts(accounts)
-    return saveTransactions(transactions)
   })
 
-  afterEach(() => {
+  afterAll(() => {
     return closeConnection()
+  })
+
+  beforeEach(async () => {
+    const connection = getConnection()
+    await connection.synchronize(true)
+
+    await saveAccounts(accounts)
+    return saveTransactions(transactions)
   })
 
   describe('#filterSearchType(searchValue)', () => {
@@ -257,6 +266,7 @@ describe('Test TransactionService', () => {
   })
 
   describe('#getAllByAddresses({ pageNo, pageSize, addresses, walletID }, searchValue)', () => {
+    const walletId = 'w3'
     // TODO: validate complex sudt transaction, nervos dao transaction
     const ADDRESSES: string[] = [
       'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
@@ -269,15 +279,20 @@ describe('Test TransactionService', () => {
       addresses: string[],
       searchValue: string
     } = {
-      walletID: '',
+      walletID: walletId,
       pageNo: 1,
       pageSize: 15,
       addresses: ADDRESSES,
       searchValue: ''
     }
 
+    beforeEach(async () => {
+      const publicKeyEntities = keyInfos.map(d => HdPublicKeyInfo.fromObject(d))
+      await getConnection().manager.save(publicKeyEntities)
+    });
+
     afterEach(() => {
-      stubProvider.walletID = ''
+      stubProvider.walletID = walletId
       stubProvider.pageNo = 1
       stubProvider.pageSize = 15
       stubProvider.addresses = ADDRESSES

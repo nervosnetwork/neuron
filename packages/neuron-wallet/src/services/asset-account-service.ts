@@ -7,16 +7,14 @@ import { OutputStatus } from "models/chain/output"
 import AssetAccount from "models/asset-account"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 import AssetAccountEntity from "database/chain/entities/asset-account"
-import { AddressVersion } from "database/address/address-dao"
 import { CapacityNotEnoughForChange } from "exceptions"
 import { MIN_CELL_CAPACITY } from 'services/cells'
 import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
-import NetworksService from "./networks"
 import AddressService from "./addresses"
 
 export default class AssetAccountService {
-  public static async getAll(blake160s: string[], anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
+  public static async getAll(walletId: string): Promise<AssetAccount[]> {
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCodeHash = assetAccountInfo.infos.sudt.codeHash
     const sudtHashType = assetAccountInfo.infos.sudt.hashType
@@ -27,7 +25,14 @@ export default class AssetAccountService {
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
       .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
-      .where(`aa.blake160 IN (:...blake160s)`, { blake160s })
+      .where(`
+        aa.blake160 IN (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        )`,
+        { walletId }
+      )
       .getMany()
 
     // calculate balances
@@ -41,12 +46,20 @@ export default class AssetAccountService {
       .addSelect(`output.status`, 'status')
       .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
       .addSelect(`group_concat(output.data)`, 'dataArray')
-      .where(`output.status IN (:...status) AND output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR output.typeCodeHash = :typeCodeHash) AND (output.typeHashType IS NULL OR output.typeHashType = :typeHashType)`, {
-        status: [OutputStatus.Live, OutputStatus.Sent],
-        lockHashes: anyoneCanPayLockHashes,
-        typeCodeHash: sudtCodeHash,
-        typeHashType: sudtHashType,
-      })
+      .where(`
+        output.status IN (:...status) AND
+        output.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId) AND
+        output.lockCodeHash = :lockCodeHash AND
+        (output.typeCodeHash IS NULL OR output.typeCodeHash = :typeCodeHash) AND
+        (output.typeHashType IS NULL OR output.typeHashType = :typeHashType)`,
+        {
+          status: [OutputStatus.Live, OutputStatus.Sent],
+          walletId: walletId,
+          lockCodeHash: assetAccountInfo.anyoneCanPayCodeHash,
+          typeCodeHash: sudtCodeHash,
+          typeHashType: sudtHashType,
+        }
+      )
       .groupBy('output.lockArgs')
       .addGroupBy('output.typeArgs')
       .addGroupBy('output.status')
@@ -163,7 +176,6 @@ export default class AssetAccountService {
 
   public static async generateCreateTx(
     walletID: string,
-    lockHashes: string[],
     tokenID: string,
     symbol: string,
     accountName: string,
@@ -180,7 +192,7 @@ export default class AssetAccountService {
     }
 
     // 1. find next unused address
-    const addresses = AddressService.allUnusedReceivingAddresses(walletID)
+    const addresses = await AddressService.getUnusedReceivingAddressesByWalletId(walletID)
     const usedBlake160s = new Set(await this.blake160sOfAssetAccounts())
     const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
 
@@ -188,14 +200,14 @@ export default class AssetAccountService {
     const assetAccount = new AssetAccount(tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
     // 3. generate tx
-    const changeAddrObj = AddressService.nextUnusedChangeAddress(walletID)!
+    const changeAddrObj = await AddressService.getNextUnusedChangeAddressByWalletId(walletID)
     let tx: Transaction | undefined
     try {
       tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
         tokenID,
-        lockHashes,
+        walletID,
         addrObj.blake160,
-        changeAddrObj.blake160,
+        changeAddrObj!.blake160,
         feeRate,
         fee
       )
@@ -205,7 +217,7 @@ export default class AssetAccountService {
       }
       tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
         tokenID,
-        lockHashes,
+        walletID,
         addrObj.blake160,
         feeRate,
         fee
@@ -322,10 +334,6 @@ export default class AssetAccountService {
     // 3. save asset account
     const entity = AssetAccountEntity.fromModel(assetAccount)
     await connection.manager.save([entity.sudtTokenInfo, entity])
-
-    // 4. update address for usedByAnyoneCanPay
-    const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-    AddressService.updateUsedByAnyoneCanPay(walletID, assetAccount.blake160, addressVersion, true)
 
     return txHash
   }

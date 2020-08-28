@@ -32,7 +32,7 @@ export class TransactionGenerator {
   public static CHANGE_OUTPUT_DATA_SIZE = 8
 
   public static generateTx = async (
-    lockHashes: string[],
+    walletId: string,
     targetOutputs: TargetOutput[],
     changeAddress: string,
     fee: string = '0',
@@ -87,7 +87,7 @@ export class TransactionGenerator {
     hasChangeOutput,
   } = await CellsService.gatherInputs(
     needCapacities.toString(),
-    lockHashes,
+    walletId,
     fee,
     feeRate,
     baseSize,
@@ -120,7 +120,7 @@ export class TransactionGenerator {
 
 // rest of capacity all send to last target output.
   public static generateSendingAllTx = async (
-  lockHashes: string[],
+  walletId: string,
   targetOutputs: TargetOutput[],
   fee: string = '0',
   feeRate: string = '0'
@@ -134,7 +134,7 @@ export class TransactionGenerator {
   const feeRateInt = BigInt(feeRate)
   const mode = new FeeMode(feeRateInt)
 
-  const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+  const allInputs: Input[] = await CellsService.gatherAllInputs(walletId)
 
   if (allInputs.length === 0) {
     throw new CapacityNotEnough()
@@ -209,7 +209,7 @@ export class TransactionGenerator {
   }
 
   public static generateDepositTx = async (
-    lockHashes: string[],
+    walletId: string,
     capacity: string,
     receiveAddress: string,
     changeAddress: string,
@@ -253,7 +253,7 @@ export class TransactionGenerator {
       hasChangeOutput,
     } = await CellsService.gatherInputs(
       capacityInt.toString(),
-      lockHashes,
+      walletId,
       fee,
       feeRate,
       baseSize,
@@ -283,7 +283,7 @@ export class TransactionGenerator {
   }
 
   public static generateDepositAllTx = async (
-    lockHashes: string[],
+    walletId: string,
     receiveAddress: string,
     fee: string = '0',
     feeRate: string = '0'
@@ -296,7 +296,7 @@ export class TransactionGenerator {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+    const allInputs: Input[] = await CellsService.gatherAllInputs(walletId)
     if (allInputs.length === 0) {
       throw new CapacityNotEnough()
     }
@@ -344,7 +344,7 @@ export class TransactionGenerator {
   }
 
   public static startWithdrawFromDao = async (
-    lockHashes: string[],
+    walletId: string,
     outPoint: OutPoint,
     prevOutput: Output,
     depositBlockNumber: string,
@@ -400,7 +400,7 @@ export class TransactionGenerator {
       hasChangeOutput,
     } = await CellsService.gatherInputs(
       '0',
-      lockHashes,
+      walletId,
       fee,
       feeRate,
       baseSize,
@@ -484,7 +484,7 @@ export class TransactionGenerator {
   // sUDT
   public static async generateCreateAnyoneCanPayTx(
     tokenID: string,
-    lockHashes: string[],
+    walletId: string,
     blake160: string,
     changeBlake160: string,
     feeRate: string,
@@ -520,7 +520,7 @@ export class TransactionGenerator {
       hasChangeOutput
     } = await CellsService.gatherInputs(
       needCapacities.toString(),
-      lockHashes,
+      walletId,
       fee,
       feeRate,
       baseSize,
@@ -551,7 +551,7 @@ export class TransactionGenerator {
 
   public static async generateCreateAnyoneCanPayTxUseAllBalance(
     tokenID: string,
-    lockHashes: string[],
+    walletId: string,
     blake160: string,
     feeRate: string,
     fee: string
@@ -566,7 +566,7 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
 
-    const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+    const allInputs: Input[] = await CellsService.gatherAllInputs(walletId)
 
     if (allInputs.length === 0) {
       throw new CapacityNotEnough()
@@ -607,7 +607,7 @@ export class TransactionGenerator {
 
   // anyone-can-pay lock, CKB
   public static async generateAnyoneCanPayToCKBTx(
-    defaultLockHashes: string[],
+    walletId: string,
     anyoneCanPayLocks: Script[],
     targetOutput: Output,
     capacity: 'all' | string,
@@ -650,7 +650,7 @@ export class TransactionGenerator {
       ) :
       CellsService.gatherAnyoneCanPayCKBInputs(
         capacity,
-        defaultLockHashes,
+        walletId,
         anyoneCanPayLocks,
         changeBlake160,
         fee,
@@ -682,7 +682,7 @@ export class TransactionGenerator {
   // anyone-can-pay lock, sUDT
   // amount: 'all' or integer
   public static async generateAnyoneCanPayToSudtTx(
-    defaultLockHashes: string[],
+    walletId: string,
     anyoneCanPayLocks: Script[],
     targetOutput: Output,
     amount: 'all' | string,
@@ -721,7 +721,7 @@ export class TransactionGenerator {
     const baseSize: number = TransactionSize.tx(tx)
     const result = await CellsService.gatherSudtInputs(
       amount,
-      defaultLockHashes,
+      walletId,
       anyoneCanPayLocks,
       targetOutput.type!,
       changeBlake160,

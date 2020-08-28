@@ -2,7 +2,7 @@ import { when } from 'jest-when'
 import path from 'path'
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix, AddressType } from '../../src/models/keys/address'
-import { Address, AddressVersion } from '../../src/database/address/address-dao'
+import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
 import { flushPromises } from '../test-utils'

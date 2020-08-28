@@ -4,7 +4,7 @@ import { ResponseCode } from "utils/const"
 
 export default class SignMessageController {
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
-    const signature: string = SignMessage.sign(
+    const signature: string = await SignMessage.sign(
       params.walletID,
       params.address.trim(),
       params.password,

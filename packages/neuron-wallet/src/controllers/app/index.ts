@@ -28,8 +28,6 @@ export default class AppController {
   public start = async () => {
     registerListeners()
 
-    WalletsService.getInstance().generateAddressesIfNecessary()
-
     this.apiController.mount()
     this.syncApiController.mount()
     this.openWindow()

@@ -96,7 +96,6 @@ export const useOnCurrentWalletChange = ({
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
-    console.info(`switching to ${walletID}`)
     initAppState()(dispatch, history)
   }, [walletID, dispatch, history])
 }
@@ -132,6 +131,7 @@ export const useSubscription = ({
           if (!isAllowedToFetchList) {
             break
           }
+          updateAddressListAndBalance(walletID)(dispatch)
           updateTransactionList({ walletID, keywords, pageNo, pageSize })(dispatch)
           break
         }

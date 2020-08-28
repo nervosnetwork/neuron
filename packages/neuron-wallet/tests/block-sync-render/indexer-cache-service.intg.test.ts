@@ -3,7 +3,7 @@ import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import AddressMeta from '../../src/database/address/meta';
 import { AddressType } from '../../src/models/keys/address';
-import { AddressVersion } from '../../src/database/address/address-dao';
+import { AddressVersion } from '../../src/models/address';
 import IndexerTxHashCache from '../../src/database/chain/entities/indexer-tx-hash-cache';
 import RpcService from '../../src/services/rpc-service';
 

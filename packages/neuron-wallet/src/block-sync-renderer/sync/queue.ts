@@ -10,7 +10,7 @@ import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
-import { Address as AddressInterface } from 'database/address/address-dao'
+import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
@@ -123,7 +123,7 @@ export default class Queue {
 
       const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
       cachedPreviousTxs.set(txHash, previousTxWithStatus)
-    }, 100)
+    }, 1)
 
     const drainFetchTxQueue = new Promise((resolve, reject) => {
       fetchTxQueue.error(reject)
@@ -152,7 +152,7 @@ export default class Queue {
     }
 
     for (const [, tx] of transactions.entries()) {
-      const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
+      const [shouldSave, , anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
         this.anyoneCanPayLockHashes,
         tx,
@@ -189,13 +189,28 @@ export default class Queue {
           }
         }
         await TransactionPersistor.saveFetchTx(tx)
-        const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
-        await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
         for (const info of anyoneCanPayInfos) {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
       }
+
+      await this.checkAndGenerateAddressesByTx(tx)
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
+    }
+  }
+
+  private async checkAndGenerateAddressesByTx(tx: Transaction) {
+    const walletIds = new Set(
+      this.addresses
+        .filter(
+          addr =>
+            tx.inputs.some(input => input.lock?.args === addr.blake160) ||
+            tx.outputs.some(output => output.lock?.args === addr.blake160)
+        )
+        .map(addr => addr.walletId)
+    )
+    for (const walletId of walletIds) {
+      await WalletService.checkAndGenerateAddresses(walletId)
     }
   }
 
