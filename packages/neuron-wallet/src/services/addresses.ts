@@ -285,8 +285,9 @@ export default class AddressService {
       .getMany()
 
     return publicKeyInfos
-      .map(publicKeyInfo => publicKeyInfo.toModel())
-      .map(model => (AddressMeta.fromHdPublicKeyInfoModel(model)))
+      .map(publicKeyInfo => (
+        AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel())
+      ))
   }
 
   public static async getAddressesByWalletId (walletId: string): Promise<AddressInterface[]> {
@@ -299,8 +300,9 @@ export default class AddressService {
     return publicKeyInfos.sort((lhs, rhs) => {
         return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
       })
-      .map(publicKeyInfo => publicKeyInfo.toModel())
-      .map(model => (AddressMeta.fromHdPublicKeyInfoModel(model)))
+      .map(publicKeyInfo => (
+        AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel()))
+      )
   }
 
   public static async getAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {

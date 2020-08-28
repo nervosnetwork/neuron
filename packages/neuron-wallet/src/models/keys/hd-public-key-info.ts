@@ -1,5 +1,4 @@
-import { AddressType } from "./address"
-import { AccountExtendedPublicKey } from "./key"
+import Address, { AddressType } from "./address"
 
 export default class HdPublicKeyInfoModel {
   public walletId: string
@@ -10,7 +9,7 @@ export default class HdPublicKeyInfoModel {
   public description?: string
 
   public get path(): string {
-    return `${AccountExtendedPublicKey.ckbAccountPath}/${this.addressType}/${this.addressIndex}`
+    return Address.pathFor(this.addressType, this.addressIndex)
   }
 
   constructor(

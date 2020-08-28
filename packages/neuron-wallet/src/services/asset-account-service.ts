@@ -335,10 +335,6 @@ export default class AssetAccountService {
     const entity = AssetAccountEntity.fromModel(assetAccount)
     await connection.manager.save([entity.sudtTokenInfo, entity])
 
-    // 4. update address for usedByAnyoneCanPay
-    // const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-    // AddressService.updateUsedByAnyoneCanPay(walletID, assetAccount.blake160, addressVersion, true)
-
     return txHash
   }
 

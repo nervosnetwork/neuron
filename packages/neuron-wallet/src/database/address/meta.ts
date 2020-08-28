@@ -91,8 +91,6 @@ export default class AddressMeta implements Address {
       undefined,
       undefined,
       obj.description,
-      undefined,
-      undefined
     )
   }
 
