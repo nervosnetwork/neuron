@@ -1,17 +1,20 @@
 import { AddressType } from "./address"
+import { AccountExtendedPublicKey } from "./key"
 
 export default class HdPublicKeyInfoModel {
   public walletId: string
-  public path: string
   public address: string
   public addressType: AddressType
   public addressIndex: number
   public publicKeyInBlake160: string
   public description?: string
 
+  public get path(): string {
+    return `${AccountExtendedPublicKey.ckbAccountPath}/${this.addressType}/${this.addressIndex}`
+  }
+
   constructor(
     walletId: string,
-    path: string,
     address: string,
     addressType: AddressType,
     addressIndex: number,
@@ -19,7 +22,6 @@ export default class HdPublicKeyInfoModel {
     description?: string,
   ) {
     this.walletId = walletId
-    this.path = path
     this.address = address
     this.addressType = addressType
     this.addressIndex = addressIndex
@@ -29,7 +31,6 @@ export default class HdPublicKeyInfoModel {
 
   public static fromObject(params: {
     walletId: string,
-    path: string,
     address: string,
     addressType: AddressType,
     addressIndex: number,
@@ -38,7 +39,6 @@ export default class HdPublicKeyInfoModel {
   }): HdPublicKeyInfoModel {
     return new HdPublicKeyInfoModel (
       params.walletId,
-      params.path,
       params.address,
       params.addressType,
       params.addressIndex,

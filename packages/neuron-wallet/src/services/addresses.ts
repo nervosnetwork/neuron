@@ -13,6 +13,7 @@ import Script from 'models/chain/script'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 import { ChildProcess } from 'utils/worker'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
+import AddressMeta from 'database/address/meta'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -283,15 +284,9 @@ export default class AddressService {
       .createQueryBuilder()
       .getMany()
 
-    return publicKeyInfos.map(publicKeyInfo => ({
-      walletId: publicKeyInfo.walletId,
-      address: publicKeyInfo.address,
-      path: publicKeyInfo.path,
-      addressIndex: publicKeyInfo.addressIndex,
-      addressType: publicKeyInfo.addressType,
-      blake160: publicKeyInfo.publicKeyInBlake160,
-      description: publicKeyInfo.description,
-    }))
+    return publicKeyInfos
+      .map(publicKeyInfo => publicKeyInfo.toModel())
+      .map(model => (AddressMeta.fromHdPublicKeyInfoModel(model)))
   }
 
   public static async getAddressesByWalletId (walletId: string): Promise<AddressInterface[]> {
@@ -302,16 +297,10 @@ export default class AddressService {
       .getMany()
 
     return publicKeyInfos.sort((lhs, rhs) => {
-      return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
-    }).map(publicKeyInfo => ({
-      walletId: publicKeyInfo.walletId,
-      address: publicKeyInfo.address,
-      path: publicKeyInfo.path,
-      addressIndex: publicKeyInfo.addressIndex,
-      addressType: publicKeyInfo.addressType,
-      blake160: publicKeyInfo.publicKeyInBlake160,
-      description: publicKeyInfo.description,
-    }))
+        return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
+      })
+      .map(publicKeyInfo => publicKeyInfo.toModel())
+      .map(model => (AddressMeta.fromHdPublicKeyInfoModel(model)))
   }
 
   public static async getAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {

@@ -17,11 +17,6 @@ export default class HdPublicKeyInfo {
   @Column({
     type: 'varchar',
   })
-  path!: string
-
-  @Column({
-    type: 'varchar',
-  })
   @Index()
   address!: string
 
@@ -53,7 +48,6 @@ export default class HdPublicKeyInfo {
     const publicKeyInfo = new HdPublicKeyInfo()
 
     publicKeyInfo.walletId = model.walletId
-    publicKeyInfo.path = model.path
     publicKeyInfo.address = model.address
     publicKeyInfo.addressType = model.addressType
     publicKeyInfo.addressIndex = model.addressIndex
@@ -61,6 +55,10 @@ export default class HdPublicKeyInfo {
     publicKeyInfo.description = model.description
 
     return publicKeyInfo
+  }
+
+  public toModel(): HdPublicKeyInfoModel {
+    return HdPublicKeyInfoModel.fromObject(this)
   }
 
   public static fromObject(...args: Parameters<typeof HdPublicKeyInfoModel.fromObject>): HdPublicKeyInfo {

@@ -3,6 +3,7 @@ import { AddressType } from "models/keys/address";
 import Script from "models/chain/script";
 import SystemScriptInfo from "models/system-script-info";
 import AssetAccountInfo from "models/asset-account-info";
+import HdPublicKeyInfoModel from "models/keys/hd-public-key-info";
 
 export default class AddressMeta implements Address {
   walletId: string
@@ -72,6 +73,26 @@ export default class AddressMeta implements Address {
       obj.description,
       obj.isImporting,
       obj.usedByAnyoneCanPay
+    )
+  }
+
+  public static fromHdPublicKeyInfoModel(obj: HdPublicKeyInfoModel) {
+    return new AddressMeta(
+      obj.walletId,
+      obj.address,
+      obj.path,
+      obj.addressType,
+      obj.addressIndex,
+      obj.publicKeyInBlake160,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      obj.description,
+      undefined,
+      undefined
     )
   }
 
