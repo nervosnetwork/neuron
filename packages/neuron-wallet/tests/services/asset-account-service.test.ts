@@ -85,7 +85,6 @@ describe('AssetAccountService', () => {
 
     const keyInfo = HdPublicKeyInfo.fromObject({
       walletId,
-      path: "m/44'/309'/0'/0/0",
       address: '',
       addressType: AddressType.Receiving,
       addressIndex: 0,
