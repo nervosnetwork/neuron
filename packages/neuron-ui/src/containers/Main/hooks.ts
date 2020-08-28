@@ -164,7 +164,6 @@ export const useSubscription = ({
         payload: currentNetworkList,
       })
       networksCache.save(currentNetworkList)
-      updateAddressListAndBalance(walletID)(dispatch)
     })
     const currentNetworkIDSubscription = CurrentNetworkIDSubject.subscribe((currentNetworkID = '') => {
       dispatch({
