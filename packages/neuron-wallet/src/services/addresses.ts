@@ -79,13 +79,12 @@ export default class AddressService {
     }
   }
 
-  public static async checkAndGenerateSave(
+  private static async recursiveGenerateAndSave(
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change,
-    notifyAddressCreated: boolean = true
   ): Promise<AddressInterface[] | undefined> {
     const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     const unusedReceivingCount = unusedReceivingAddresses.length
@@ -114,13 +113,12 @@ export default class AddressService {
     )
 
     //resursive check and generate addresses
-    const nextGeneratedAddresses = await this.checkAndGenerateSave(
+    const nextGeneratedAddresses = await this.recursiveGenerateAndSave(
       walletId,
       extendedKey,
       isImporting,
       receivingAddressCount,
-      changeAddressCount,
-      false
+      changeAddressCount
     )
 
     const allGeneratedAddresses = currentGeneratedAddresses
@@ -133,11 +131,30 @@ export default class AddressService {
       return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
     })
 
-    if (notifyAddressCreated) {
-      this.notifyAddressCreated(allGeneratedAddresses, isImporting)
+    return allGeneratedAddresses
+  }
+
+  public static async checkAndGenerateSave(
+    walletId: string,
+    extendedKey: AccountExtendedPublicKey,
+    isImporting: boolean | undefined,
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change,
+  ): Promise<AddressInterface[] | undefined> {
+
+    const generatedAddresses = await this.recursiveGenerateAndSave(
+      walletId,
+      extendedKey,
+      isImporting,
+      receivingAddressCount,
+      changeAddressCount
+    )
+
+    if (generatedAddresses) {
+      this.notifyAddressCreated(generatedAddresses, isImporting)
     }
 
-    return allGeneratedAddresses
+    return generatedAddresses
   }
 
   // Generate both receiving and change addresses.
