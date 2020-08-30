@@ -14,6 +14,7 @@ const stubbedUnmountSyncTask = jest.fn()
 const stubbedSyncApiControllerEmitter = jest.fn()
 const stubbedTxDbChangedSubjectNext = jest.fn()
 const stubbedAddressDbChangedSubjectNext = jest.fn()
+const stubbedGetCurrentNetwork = jest.fn()
 
 const childProcessEmiter = new EventEmitter()
 
@@ -46,6 +47,10 @@ const resetMocks = () => {
   stubbedIpcMainOnce.mockReset()
   stubbedQueryIndexer.mockReset()
   stubbedResetIndexerData.mockReset()
+  stubbedGetCurrentNetwork.mockReset()
+
+  stubbedUnmountSyncTask.mockRestore()
+  stubbedSyncTaskStart.mockRestore()
 }
 
 describe('block sync render', () => {
@@ -53,6 +58,11 @@ describe('block sync render', () => {
     let queryIndexer: any
     let createBlockSyncTask: any
     let killBlockSyncTask: any
+
+    const network = {
+      id: 'id',
+      genesisHash: '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
+    }
 
     beforeEach(async () => {
       resetMocks()
@@ -129,6 +139,14 @@ describe('block sync render', () => {
         }
       })
 
+      jest.doMock('services/networks', () => {
+        return {
+          getInstance: () => ({
+            getCurrent: stubbedGetCurrentNetwork
+          }),
+        }
+      })
+
       jest.doMock('utils/common', () => {
         return {
           sleep: jest.fn()
@@ -165,6 +183,8 @@ describe('block sync render', () => {
         }
       })
 
+      stubbedGetCurrentNetwork.mockReturnValue(network)
+
       queryIndexer = require('../../src/block-sync-renderer').queryIndexer
       createBlockSyncTask = require('../../src/block-sync-renderer').createBlockSyncTask
       killBlockSyncTask = require('../../src/block-sync-renderer').killBlockSyncTask
@@ -198,7 +218,6 @@ describe('block sync render', () => {
       });
 
       afterEach(async () => {
-        stubbedResetIndexerData.mockRestore()
         await killBlockSyncTask()
       })
 
@@ -225,43 +244,53 @@ describe('block sync render', () => {
     })
 
     describe('#switchToNetwork', () => {
-      const network = {
-        id: 'id',
-        hash: '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
-      }
       let switchToNetwork: any
-      beforeEach(async () => {
-        switchToNetwork = require('../../src/block-sync-renderer').switchToNetwork
-        await switchToNetwork(network)
-      })
 
-      afterEach(() => {
-        stubbedUnmountSyncTask.mockRestore()
-        stubbedSyncTaskStart.mockRestore()
-      })
+      describe('after created a sync task and switched to a network', () => {
+        beforeEach(async () => {
+          switchToNetwork = require('../../src/block-sync-renderer').switchToNetwork
+          await createBlockSyncTask()
+          await switchToNetwork(network)
+          stubbedSyncTaskStart.mockReset()
+          stubbedUnmountSyncTask.mockReset()
+        })
 
-      it('should restart sync task', () => {
-        expect(stubbedUnmountSyncTask).toHaveBeenCalled()
-        expect(stubbedSyncTaskStart).toHaveBeenCalled()
-      })
+        describe('switches to different network', () => {
+          beforeEach(async () => {
+            await switchToNetwork({id: 'id2', genesisHash: 'hash'})
+          });
+          it('restarts sync task', async () => {
+            expect(stubbedUnmountSyncTask).toHaveBeenCalled()
+            expect(stubbedSyncTaskStart).toHaveBeenCalled()
+          })
+        });
 
-      it('early return if connect the same network', async () => {
-        await switchToNetwork(network)
-        expect(stubbedUnmountSyncTask).not.toHaveBeenCalled()
-        expect(stubbedSyncTaskStart).not.toHaveBeenCalled()
-      })
+        describe('switches to same network', () => {
+          beforeEach(async () => {
+            await switchToNetwork(network)
+          });
+          it('should not trigger operations on sync task', async () => {
+            expect(stubbedUnmountSyncTask).not.toHaveBeenCalled()
+            expect(stubbedSyncTaskStart).not.toHaveBeenCalled()
+          })
+        });
 
-      it(`don't early return if reconnect is set to true`, async () => {
-        await switchToNetwork(network, true)
-        expect(stubbedUnmountSyncTask).toHaveBeenCalled()
-        expect(stubbedSyncTaskStart).toHaveBeenCalled()
-      })
+        describe('forces reconnecting to same network', () => {
+          beforeEach(async () => {
+            await switchToNetwork(network, true)
+          });
+          it(`triggers operations on sync task`, async () => {
+            expect(stubbedUnmountSyncTask).toHaveBeenCalled()
+            expect(stubbedSyncTaskStart).toHaveBeenCalled()
+          })
+        });
 
-      it(`do not create sync task if genesis hash don't match`, async () => {
-        await switchToNetwork(network, true, false)
-        expect(stubbedUnmountSyncTask).toHaveBeenCalled()
-        expect(stubbedSyncTaskStart).not.toHaveBeenCalled()
-      })
+        it(`should not create sync task if genesis hash don't match`, async () => {
+          await switchToNetwork(network, true, false)
+          expect(stubbedUnmountSyncTask).toHaveBeenCalled()
+          expect(stubbedSyncTaskStart).not.toHaveBeenCalled()
+        })
+      });
     })
 
     describe('subscribe message from child process', () => {

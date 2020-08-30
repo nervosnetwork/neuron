@@ -52,6 +52,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   }
 
   await killBlockSyncTask()
+  //TODO evalutate if this is necessary. This might be unnecessary legacy code.
   if (shouldSync) {
     await createBlockSyncTask()
   } else {

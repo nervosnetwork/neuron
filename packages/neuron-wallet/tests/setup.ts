@@ -33,3 +33,5 @@ jest.mock('levelup', () => {
     }
   })
 })
+
+process.on('unhandledRejection', console.error)
