@@ -1,4 +1,3 @@
-import AddressService from "./addresses"
 import AssetAccountInfo from "models/asset-account-info"
 import AddressParser from "models/address-parser"
 import { TransactionGenerator } from "./tx"
@@ -11,6 +10,7 @@ import { TargetOutputNotFoundError } from "exceptions"
 import { AcpSendSameAccountError } from "exceptions"
 import Script from "models/chain/script"
 import LiveCellService from "./live-cell-service"
+import WalletService from "./wallets"
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -73,7 +73,8 @@ export default class AnyoneCanPayService {
       outPoint: targetOutputLiveCell.outPoint(),
     })
 
-    const changeBlake160: string = (await AddressService.getNextUnusedChangeAddressByWalletId(walletID))!.blake160
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeBlake160: string = (await wallet.getNextChangeAddressByWalletId())!.blake160
 
     const tx = isCKB ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
       walletID,

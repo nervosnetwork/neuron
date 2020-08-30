@@ -212,7 +212,13 @@ describe('integration tests for sync pipeline', () => {
       return stubbedRPCServiceConstructor
     });
 
-    jest.doMock('services/wallets', () => ({checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn}));
+    jest.doMock('services/wallets', () => ({
+      getInstance: () => ({
+        get: () => ({
+          checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
+        })
+      }),
+    }));
 
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
@@ -295,7 +301,7 @@ describe('integration tests for sync pipeline', () => {
       }
     });
     it('checks and generates new addresses', () => {
-      expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
+      expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledTimes(fakeTxs.length)
     });
     describe('inserts related outputs', () => {
       let outputs: OutputEntity[] = []
@@ -372,7 +378,7 @@ describe('integration tests for sync pipeline', () => {
       }
     });
     it('checks and generates new addresses', () => {
-      expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
+      expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledTimes(fakeTxs.length)
     });
     describe('handles outputs', () => {
       let outputs: OutputEntity[] = []

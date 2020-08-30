@@ -1,6 +1,6 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
-import Address, { AddressType } from 'models/keys/address'
+import Address, { AddressType, publicKeyToAddress } from 'models/keys/address'
 import { Address as AddressInterface, AddressVersion } from "models/address"
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
@@ -134,7 +134,7 @@ export default class AddressService {
     return allGeneratedAddresses
   }
 
-  public static async checkAndGenerateSave(
+  public static async generateAndSaveForExtendedKey(
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
@@ -155,6 +155,42 @@ export default class AddressService {
     }
 
     return generatedAddresses
+  }
+
+  public static async generateAndSaveForPublicKey(
+    walletId: string,
+    publicKey: string,
+    addressType: AddressType,
+    addressIndex: number
+  ): Promise<AddressInterface | undefined> {
+    const address = publicKeyToAddress(publicKey)
+    const publicKeyHash = AddressParser.toBlake160(address)
+
+    const exist = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .where({
+        walletId,
+        publicKeyInBlake160: publicKeyHash
+      })
+      .getRawOne()
+
+    if (exist) {
+      return
+    }
+
+    const publicKeyInfo = HdPublicKeyInfo.fromObject({
+      walletId,
+      address,
+      addressType,
+      addressIndex,
+      publicKeyInBlake160: publicKeyHash
+    })
+
+    await getConnection().manager.save(publicKeyInfo)
+
+    const addressMeta = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel())
+    this.notifyAddressCreated([addressMeta], undefined)
   }
 
   // Generate both receiving and change addresses.
@@ -288,6 +324,16 @@ export default class AddressService {
     return unusedReceivingAddresses
   }
 
+  public static getFirstAddressByWalletId = async (walletId: string) : Promise<AddressInterface> => {
+    const publicKeyInfo = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .where({walletId, addressType: AddressType.Receiving})
+      .orderBy('addressIndex', 'ASC')
+      .getOne()
+
+      return AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo!.toModel())
+  }
 
   public static getAddressesByAllWallets = async (): Promise<AddressInterface[]> => {
     const publicKeyInfos = await getConnection()

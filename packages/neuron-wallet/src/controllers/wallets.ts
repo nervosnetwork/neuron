@@ -99,7 +99,7 @@ export default class WalletsController {
       keystore,
     })
 
-    walletsService.generateAddressesById(wallet.id, isImporting)
+    wallet.checkAndGenerateAddresses(isImporting)
 
     return {
       status: ResponseCode.Success,
@@ -141,7 +141,7 @@ export default class WalletsController {
       keystore: keystoreObject,
     })
 
-    walletsService.generateAddressesById(wallet.id, true)
+    wallet.checkAndGenerateAddresses(true)
 
     return {
       status: ResponseCode.Success,
@@ -220,7 +220,7 @@ export default class WalletsController {
             keystore: Keystore.createEmpty()
           })
 
-          walletsService.generateAddressesById(wallet.id, true)
+          wallet.checkAndGenerateAddresses(true)
           return {
             status: ResponseCode.Success,
             result: wallet
