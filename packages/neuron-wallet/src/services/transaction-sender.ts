@@ -7,7 +7,6 @@ import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import { Address } from "models/address"
 import { PathAndPrivateKey } from 'models/keys/key'
-import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
@@ -54,7 +53,8 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
 
-    await WalletService.checkAndGenerateAddresses(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    await wallet.checkAndGenerateAddresses()
     return txHash
   }
 
@@ -244,7 +244,9 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+
+    const address = await wallet.getNextAddressByWalletId()
 
     const changeAddress: string = await this.getChangeAddress()
 
@@ -282,7 +284,8 @@ export default class TransactionSender {
 
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
-    const changeAddress = await AddressesService.getNextUnusedChangeAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeAddress = await wallet.getNextChangeAddressByWalletId()
     const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
@@ -351,7 +354,8 @@ export default class TransactionSender {
 
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
-    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    const address = await wallet.getNextAddressByWalletId()
     const blake160 = AddressParser.toBlake160(address!.address)
 
     const output: Output = new Output(
@@ -411,7 +415,8 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    const address = await wallet.getNextAddressByWalletId()
 
     const tx = await TransactionGenerator.generateDepositAllTx(
       walletID,
@@ -443,7 +448,9 @@ export default class TransactionSender {
         throw new TransactionIsNotCommittedYet()
       }
 
-      const receivingAddressInfo = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+      const wallet = WalletService.getInstance().get(walletID)
+      const receivingAddressInfo = await wallet.getNextAddressByWalletId()
+
       const receivingAddress = receivingAddressInfo!.address
       const prevOutput = cellWithStatus.cell!.output
       const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
@@ -488,9 +495,9 @@ export default class TransactionSender {
   }
 
   public getChangeAddress = async (): Promise<string> => {
-    const walletId = this.walletService.getCurrent()!.id
+    const wallet = this.walletService.getCurrent()
 
-    const unusedChangeAddress = await AddressService.getNextUnusedChangeAddressByWalletId(walletId)
+    const unusedChangeAddress = await wallet!.getNextChangeAddressByWalletId()
 
     return unusedChangeAddress!.address
   }

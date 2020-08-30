@@ -209,8 +209,10 @@ export default class Queue {
         )
         .map(addr => addr.walletId)
     )
+    const walletService = WalletService.getInstance()
     for (const walletId of walletIds) {
-      await WalletService.checkAndGenerateAddresses(walletId)
+      const wallet = walletService.get(walletId)
+      await wallet.checkAndGenerateAddresses()
     }
   }
 

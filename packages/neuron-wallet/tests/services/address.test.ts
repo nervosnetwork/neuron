@@ -140,14 +140,14 @@ describe('integration tests for AddressService', () => {
       await connection.synchronize(true)
     })
 
-    describe('#checkAndGenerateSave', () => {
+    describe('#generateAndSaveForExtendedKey', () => {
       const receivingAddressCount = 4
       const changeAddressCount = 4
 
       describe('when the newly created public keys have not been used', () => {
 
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -185,7 +185,7 @@ describe('integration tests for AddressService', () => {
             const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
             await linkNewCell([receivingAddresses[0].blake160, changeAddresses[0].blake160])
 
-            await AddressService.checkAndGenerateSave(
+            await AddressService.generateAndSaveForExtendedKey(
               walletId,
               extendedKey,
               isImporting,
@@ -208,7 +208,7 @@ describe('integration tests for AddressService', () => {
         });
         describe('when none of public keys are used', () => {
           beforeEach(async () => {
-            await AddressService.checkAndGenerateSave(
+            await AddressService.generateAndSaveForExtendedKey(
               walletId,
               extendedKey,
               isImporting,
@@ -227,7 +227,7 @@ describe('integration tests for AddressService', () => {
             const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
             await linkNewCell([receivingAddresses[0].blake160])
 
-            await AddressService.checkAndGenerateSave(
+            await AddressService.generateAndSaveForExtendedKey(
               walletId,
               extendedKey,
               isImporting,
@@ -251,7 +251,7 @@ describe('integration tests for AddressService', () => {
             const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
             await linkNewCell([changeAddresses[0].blake160])
 
-            await AddressService.checkAndGenerateSave(
+            await AddressService.generateAndSaveForExtendedKey(
               walletId,
               extendedKey,
               isImporting,
@@ -278,7 +278,7 @@ describe('integration tests for AddressService', () => {
               .map((k: any) => k.publicKeyHash)
           )
 
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -313,19 +313,62 @@ describe('integration tests for AddressService', () => {
       })
     });
 
+    describe('#generateAndSaveForPublicKey', () => {
+
+      describe('with public key info exist for the public key', () => {
+        const publicKey = 'public key'
+        const addressType = AddressType.Receiving
+        const addressIndex = 0
+        beforeEach(async () => {
+          await AddressService.generateAndSaveForPublicKey(
+            walletId,
+            publicKey,
+            addressType,
+            addressIndex
+          )
+          generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
+        });
+        it('generates one address', () => {
+          expect(generatedAddresses.length).toEqual(1)
+        })
+        it('notifies newly generated addresses', () => {
+          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledTimes(1)
+          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledWith(generatedAddresses)
+        })
+        describe('when trying to generate for the same public key', () => {
+          beforeEach(async () => {
+            stubbedAddressCreatedSubjectNext.mockReset()
+            await AddressService.generateAndSaveForPublicKey(
+              walletId,
+              publicKey,
+              addressType,
+              addressIndex
+            )
+            generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
+          });
+          it('should not generate new address', () => {
+            expect(generatedAddresses.length).toEqual(1)
+          })
+          it('should not notifies for new generated addresses', () => {
+            expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledTimes(0)
+          })
+        })
+      });
+    })
+
     describe('#getAddressesByAllWallets', () => {
       const receivingAddressCount = 4
       const changeAddressCount = 4
       let allAddresses: Address[] = []
       beforeEach(async () => {
-        await AddressService.checkAndGenerateSave(
+        await AddressService.generateAndSaveForExtendedKey(
           '1',
           extendedKey,
           isImporting,
           receivingAddressCount,
           changeAddressCount
         )
-        await AddressService.checkAndGenerateSave(
+        await AddressService.generateAndSaveForExtendedKey(
           '2',
           extendedKey,
           isImporting,
@@ -342,13 +385,37 @@ describe('integration tests for AddressService', () => {
       })
     });
 
+    describe('#getFirstAddressByAllWalletId', () => {
+      const receivingAddressCount = 4
+      const changeAddressCount = 4
+      let address: Address
+      const walletId = '1'
+      beforeEach(async () => {
+        await AddressService.generateAndSaveForExtendedKey(
+          walletId,
+          extendedKey,
+          isImporting,
+          receivingAddressCount,
+          changeAddressCount
+        )
+        address = await AddressService.getFirstAddressByWalletId(walletId)
+      });
+      it('returns the first addresses by by wallet id', () => {
+        expect(address).toEqual(expect.objectContaining({
+          walletId,
+          addressIndex: 0,
+          addressType: 0,
+        }))
+      })
+    });
+
     describe('#nextUnusedAddress', () => {
       const receivingAddressCount = 2
       const changeAddressCount = 2
       let publicKeysToUse = []
       describe('when there are unused receiving addresses', () => {
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -367,7 +434,7 @@ describe('integration tests for AddressService', () => {
       });
       describe('when there are unused change addresses but no receiving addresses', () => {
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -389,7 +456,7 @@ describe('integration tests for AddressService', () => {
       });
       describe('when there is no receiving or change unused address', () => {
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -414,7 +481,7 @@ describe('integration tests for AddressService', () => {
       const changeAddressCount = 4
       describe('when there are unused receiving addresses', () => {
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -435,7 +502,7 @@ describe('integration tests for AddressService', () => {
       });
       describe('when there is no unused receiving address', () => {
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId,
             extendedKey,
             isImporting,
@@ -458,7 +525,7 @@ describe('integration tests for AddressService', () => {
       const receivingAddressCount = 4
       const changeAddressCount = 4
       beforeEach(async () => {
-        await AddressService.checkAndGenerateSave(
+        await AddressService.generateAndSaveForExtendedKey(
           walletId,
           extendedKey,
           isImporting,
@@ -498,7 +565,7 @@ describe('integration tests for AddressService', () => {
       const receivingAddressCount = 1
       const changeAddressCount = 1
       beforeEach(async () => {
-        await AddressService.checkAndGenerateSave(
+        await AddressService.generateAndSaveForExtendedKey(
           walletId,
           extendedKey,
           isImporting,
@@ -539,14 +606,14 @@ describe('integration tests for AddressService', () => {
       const walletId2 = '2'
 
       beforeEach(async () => {
-        await AddressService.checkAndGenerateSave(
+        await AddressService.generateAndSaveForExtendedKey(
           walletId1,
           extendedKey,
           isImporting,
           receivingAddressCount,
           changeAddressCount
         )
-        await AddressService.checkAndGenerateSave(
+        await AddressService.generateAndSaveForExtendedKey(
           walletId2,
           extendedKey,
           isImporting,

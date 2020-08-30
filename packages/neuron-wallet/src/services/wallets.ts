@@ -5,6 +5,7 @@ import Keystore from 'models/keys/keystore'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
+import { Address as AddressInterface } from "models/address"
 
 import FileService from './file'
 import AddressService from './addresses'
@@ -31,26 +32,7 @@ export interface WalletProperties {
   device?: DeviceProperties
 }
 
-export interface Wallet {
-  id: string
-  name: string
-
-  isHardware: () => boolean
-  toJSON: () => {
-    id: string
-    name: string
-    extendedKey?: string,
-    device?: DeviceProperties
-  }
-  fromJSON: (params: WalletProperties) => Wallet
-  loadKeystore: () => Keystore
-  saveKeystore: (keystore: Keystore) => void
-  deleteKeystore: (keystore: Keystore) => void
-  getDeviceInfo: () => DeviceProperties
-  accountExtendedPublicKey: () => AccountExtendedPublicKey
-}
-
-class WalletBase implements Wallet {
+export abstract class Wallet {
   public id: string
   public name: string
   protected extendedKey: string | undefined
@@ -116,9 +98,29 @@ class WalletBase implements Wallet {
       this.name = name
     }
   }
+
+  public checkAndGenerateAddresses = async (
+    _isImporting: boolean = false,
+    _receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    _changeAddressCount: number = DefaultAddressNumber.Change
+  ): Promise<AddressInterface[] | undefined> => {
+    throw new Error('not implemented')
+  }
+
+  public getNextAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+    throw new Error('not implemented')
+  }
+
+  public getNextChangeAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+    throw new Error('not implemented')
+  }
+
+  public getNextReceivingAddressesByWalletId = async (): Promise<AddressInterface[]> => {
+    throw new Error('not implemented')
+  }
 }
 
-export class FileKeystoreWallet extends WalletBase {
+export class FileKeystoreWallet extends Wallet {
   public isHardware = (): boolean => {
     return false
   }
@@ -147,9 +149,35 @@ export class FileKeystoreWallet extends WalletBase {
   keystoreFileName = () => {
     return `${this.id}.json`
   }
+
+  public checkAndGenerateAddresses = async (
+    isImporting: boolean = false,
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
+  ): Promise<AddressInterface[] | undefined> => {
+      return await AddressService.generateAndSaveForExtendedKey(
+        this.id,
+        this.accountExtendedPublicKey(),
+        isImporting,
+        receivingAddressCount,
+        changeAddressCount
+      )
+  }
+
+  public getNextAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+    return AddressService.getNextUnusedAddressByWalletId(this.id)
+  }
+
+  public getNextChangeAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+    return AddressService.getNextUnusedChangeAddressByWalletId(this.id)
+  }
+
+  public getNextReceivingAddressesByWalletId = async (): Promise<AddressInterface[]> => {
+    return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
+  }
 }
 
-export class HardwareWallet extends WalletBase {
+export class HardwareWallet extends Wallet {
   public isHardware = (): boolean => {
     return true
   }
@@ -160,6 +188,37 @@ export class HardwareWallet extends WalletBase {
 
   public getDeviceInfo = (): DeviceProperties => {
     return this.device!
+  }
+
+  public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
+    const {publicKey, addressType, addressIndex} = this.getDeviceInfo()
+    const address = await AddressService.generateAndSaveForPublicKey(
+      this.id,
+      publicKey,
+      addressType,
+      addressIndex
+    )
+
+    if (address) {
+      return [address]
+    }
+  }
+
+  public getNextAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+    return AddressService.getFirstAddressByWalletId(this.id)
+  }
+
+  public getNextChangeAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+    return AddressService.getFirstAddressByWalletId(this.id)
+  }
+
+  public getNextReceivingAddressesByWalletId = async (): Promise<AddressInterface[]> => {
+    const address = await AddressService.getFirstAddressByWalletId(this.id)
+    if (address) {
+      return [address]
+    }
+
+    return []
   }
 }
 
@@ -230,27 +289,12 @@ export default class WalletService {
   }
 
   public generateAddressesIfNecessary = async () => {
-    for (const wallet of this.getAll()) {
+    for (const { id } of this.getAll()) {
+      const wallet = this.get(id)
       if ((await AddressService.getAddressesByWalletId(wallet.id)).length === 0) {
-        await this.generateAddressesById(wallet.id, false)
+        await wallet.checkAndGenerateAddresses()
       }
     }
-  }
-
-  public generateAddressesById = async (
-    id: string,
-    isImporting: boolean,
-    receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change
-  ) => {
-    const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
-    await AddressService.checkAndGenerateSave(
-      id,
-      accountExtendedPublicKey,
-      isImporting,
-      receivingAddressCount,
-      changeAddressCount
-    )
   }
 
   public create = (props: WalletProperties) => {
@@ -377,21 +421,5 @@ export default class WalletService {
       }
     })
     this.listStore.clear()
-  }
-
-  public static async checkAndGenerateAddresses(walletId: string) {
-    const wallet = WalletService.getInstance().get(walletId)
-    //if hardware wallet
-      //check and generate for a public key and relate it to a path
-
-    //if software wallet
-    const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-    await AddressService.checkAndGenerateSave(
-      walletId,
-      accountExtendedPublicKey,
-      undefined,
-      DefaultAddressNumber.Receiving,
-      DefaultAddressNumber.Change
-    )
   }
 }

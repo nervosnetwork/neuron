@@ -1,9 +1,39 @@
-import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
 import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
 import { AddressType } from '../../src/models/keys/address'
+
+const stubbedDeletedByWalletIdFn = jest.fn()
+const stubbedGenerateAndSaveForExtendedKeyFn = jest.fn()
+const stubbedGenerateAndSaveForPublicKeyFn = jest.fn()
+const stubbedGetNextUnusedAddressByWalletIdFn = jest.fn()
+const stubbedGetNextUnusedChangeAddressByWalletIdFn = jest.fn()
+const stubbedGetUnusedReceivingAddressesByWalletIdFn = jest.fn()
+const stubbedGetFirstAddressByWalletIdFn = jest.fn()
+
+jest.doMock('../../src/services/addresses', () => {
+  return {
+    deleteByWalletId: stubbedDeletedByWalletIdFn,
+    generateAndSaveForExtendedKey: stubbedGenerateAndSaveForExtendedKeyFn,
+    generateAndSaveForPublicKey: stubbedGenerateAndSaveForPublicKeyFn,
+    getNextUnusedAddressByWalletId: stubbedGetNextUnusedAddressByWalletIdFn,
+    getNextUnusedChangeAddressByWalletId: stubbedGetNextUnusedChangeAddressByWalletIdFn,
+    getUnusedReceivingAddressesByWalletId: stubbedGetUnusedReceivingAddressesByWalletIdFn,
+    getFirstAddressByWalletId: stubbedGetFirstAddressByWalletIdFn,
+  }
+});
+import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
+
+const resetMocks = () => {
+  stubbedDeletedByWalletIdFn.mockReset()
+  stubbedGenerateAndSaveForExtendedKeyFn.mockReset()
+  stubbedGenerateAndSaveForPublicKeyFn.mockReset()
+  stubbedGetNextUnusedAddressByWalletIdFn.mockReset()
+  stubbedGetNextUnusedChangeAddressByWalletIdFn.mockReset()
+  stubbedGetUnusedReceivingAddressesByWalletIdFn.mockReset()
+  stubbedGetFirstAddressByWalletIdFn.mockReset()
+}
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -15,6 +45,7 @@ describe('wallet service', () => {
   const fakePublicKey = 'keykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykey'
   const fakeChainCode = 'codecodecodecodecodecodecodecodecodecodecodecodecodecodecodecode'
 
+
   beforeAll(async () => {
     await initConnection('')
   })
@@ -24,6 +55,7 @@ describe('wallet service', () => {
   })
 
   beforeEach(async () => {
+    resetMocks()
     const connection = getConnection()
     await connection.synchronize(true)
 
@@ -149,8 +181,54 @@ describe('wallet service', () => {
         )
       })
     });
+
+    describe('#checkAndGenerateAddresses', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.checkAndGenerateAddresses()
+      })
+      it('calls AddressService.generateAndSaveForExtendedKey', async () => {
+        expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
+          createdWallet.id,
+          expect.objectContaining({
+            chainCode: createdWallet.accountExtendedPublicKey().chainCode,
+            publicKey: createdWallet.accountExtendedPublicKey().publicKey,
+          }),
+          false,
+          20,
+          10
+        )
+      })
+    });
+    describe('#getNextUnusedAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextAddressByWalletId()
+      })
+      it('calls AddressService.getNextUnusedAddressByWalletId', () => {
+        expect(stubbedGetNextUnusedAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextUnusedChangeAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextChangeAddressByWalletId()
+      })
+      it('calls AddressService.getNextUnusedChangeAddressByWalletId', () => {
+        expect(stubbedGetNextUnusedChangeAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextUnusedChangeAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextReceivingAddressesByWalletId()
+      })
+      it('calls AddressService.getUnusedReceivingAddressesByWalletId', () => {
+        expect(stubbedGetUnusedReceivingAddressesByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
   });
-  describe('hardware wallet', () => {
+  describe('with a hardware wallet', () => {
     let createdWallet: Wallet
     beforeEach(() => {
       createdWallet = walletService.create(wallet4)
@@ -180,6 +258,48 @@ describe('wallet service', () => {
         expect(() => wallet.accountExtendedPublicKey()).toThrowError(
           new WalletFunctionNotSupported(wallet.accountExtendedPublicKey.name)
         )
+      })
+    });
+
+    describe('#checkAndGenerateAddresses', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.checkAndGenerateAddresses()
+      })
+      it('calls AddressService.generateAndSaveForExtendedKey', async () => {
+        expect(stubbedGenerateAndSaveForPublicKeyFn).toHaveBeenCalledWith(
+          createdWallet.id,
+          createdWallet.getDeviceInfo().publicKey,
+          0,
+          0
+        )
+      })
+    });
+    describe('#getNextUnusedAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextAddressByWalletId()
+      })
+      it('calls AddressService.getNextUnusedAddressByWalletId', () => {
+        expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextUnusedChangeAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextChangeAddressByWalletId()
+      })
+      it('calls AddressService.getNextUnusedChangeAddressByWalletId', () => {
+        expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextUnusedChangeAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextReceivingAddressesByWalletId()
+      })
+      it('calls AddressService.getUnusedReceivingAddressesByWalletId', () => {
+        expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
     });
   });
@@ -236,6 +356,8 @@ describe('wallet service', () => {
       expect(walletService.getAll().length).toBe(2)
       await walletService.delete(w1.id)
       expect(() => walletService.get(w1.id)).toThrowError()
+      expect(stubbedDeletedByWalletIdFn).toHaveBeenCalledWith(w1.id)
+      expect(stubbedDeletedByWalletIdFn).toHaveBeenCalledTimes(1)
     })
 
     describe('with more than one wallets', () => {
