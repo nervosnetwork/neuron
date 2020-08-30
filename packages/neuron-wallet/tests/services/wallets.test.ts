@@ -187,7 +187,7 @@ describe('wallet service', () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.checkAndGenerateAddresses()
       })
-      it('calls AddressService.generateAndSaveForExtendedKey', async () => {
+      it('calls AddressService.accountExtendedPublicKey', async () => {
         expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
           createdWallet.id,
           expect.objectContaining({
@@ -200,7 +200,7 @@ describe('wallet service', () => {
         )
       })
     });
-    describe('#getNextUnusedAddressByWalletId', () => {
+    describe('#getNextAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.getNextAddressByWalletId()
@@ -209,7 +209,7 @@ describe('wallet service', () => {
         expect(stubbedGetNextUnusedAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
     });
-    describe('#getNextUnusedChangeAddressByWalletId', () => {
+    describe('#getNextChangeAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.getNextChangeAddressByWalletId()
@@ -218,7 +218,7 @@ describe('wallet service', () => {
         expect(stubbedGetNextUnusedChangeAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
     });
-    describe('#getNextUnusedChangeAddressByWalletId', () => {
+    describe('#getNextReceivingAddressesByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.getNextReceivingAddressesByWalletId()
@@ -275,30 +275,30 @@ describe('wallet service', () => {
         )
       })
     });
-    describe('#getNextUnusedAddressByWalletId', () => {
+    describe('#getNextAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.getNextAddressByWalletId()
       })
-      it('calls AddressService.getNextUnusedAddressByWalletId', () => {
+      it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
     });
-    describe('#getNextUnusedChangeAddressByWalletId', () => {
+    describe('#getNextChangeAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.getNextChangeAddressByWalletId()
       })
-      it('calls AddressService.getNextUnusedChangeAddressByWalletId', () => {
+      it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
     });
-    describe('#getNextUnusedChangeAddressByWalletId', () => {
+    describe('#getNextReceivingAddressesByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
         await wallet.getNextReceivingAddressesByWalletId()
       })
-      it('calls AddressService.getUnusedReceivingAddressesByWalletId', () => {
+      it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
     });
