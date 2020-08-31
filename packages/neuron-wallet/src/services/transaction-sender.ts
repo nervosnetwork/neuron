@@ -1,6 +1,5 @@
 import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
-import { IsRequired } from 'exceptions'
 import NodeService from './node'
 import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
@@ -27,6 +26,7 @@ import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
+import HardwareWalletService from './hardware-wallet'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -60,14 +60,13 @@ export default class TransactionSender {
 
   private async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
     const wallet = this.walletService.get(walletID)
-
-    if (password === '') {
-      throw new IsRequired('Password')
-    }
-
     const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
+    if (wallet.isHardware()) {
+      const device = HardwareWalletService.getInstance().getCurrent()!
+      return await device.signTransaction(walletID, tx)
+    }
 
     // Only one multi sign input now.
     const isMultiSign = tx.inputs.length === 1 &&
@@ -89,6 +88,7 @@ export default class TransactionSender {
       } else {
         path = addressInfos.find(i => i.blake160 === args)!.path
       }
+
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
       if (!pathAndPrivateKey) {
         throw new Error('no private key found')
@@ -246,7 +246,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const wallet = WalletService.getInstance().get(walletID)
 
-    const address = await wallet.getNextAddressByWalletId()
+    const address = await wallet.getNextAddress()
 
     const changeAddress: string = await this.getChangeAddress()
 
@@ -285,7 +285,7 @@ export default class TransactionSender {
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
     const wallet = WalletService.getInstance().get(walletID)
-    const changeAddress = await wallet.getNextChangeAddressByWalletId()
+    const changeAddress = await wallet.getNextChangeAddress()
     const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
@@ -355,7 +355,7 @@ export default class TransactionSender {
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
     const wallet = WalletService.getInstance().get(walletID)
-    const address = await wallet.getNextAddressByWalletId()
+    const address = await wallet.getNextAddress()
     const blake160 = AddressParser.toBlake160(address!.address)
 
     const output: Output = new Output(
@@ -416,7 +416,7 @@ export default class TransactionSender {
     feeRate: string = '0',
   ): Promise<Transaction> => {
     const wallet = WalletService.getInstance().get(walletID)
-    const address = await wallet.getNextAddressByWalletId()
+    const address = await wallet.getNextAddress()
 
     const tx = await TransactionGenerator.generateDepositAllTx(
       walletID,
@@ -449,7 +449,7 @@ export default class TransactionSender {
       }
 
       const wallet = WalletService.getInstance().get(walletID)
-      const receivingAddressInfo = await wallet.getNextAddressByWalletId()
+      const receivingAddressInfo = await wallet.getNextAddress()
 
       const receivingAddress = receivingAddressInfo!.address
       const prevOutput = cellWithStatus.cell!.output
@@ -497,7 +497,7 @@ export default class TransactionSender {
   public getChangeAddress = async (): Promise<string> => {
     const wallet = this.walletService.getCurrent()
 
-    const unusedChangeAddress = await wallet!.getNextChangeAddressByWalletId()
+    const unusedChangeAddress = await wallet!.getNextChangeAddress()
 
     return unusedChangeAddress!.address
   }

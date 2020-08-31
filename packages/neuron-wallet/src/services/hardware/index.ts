@@ -1,8 +1,12 @@
+import type Transaction from 'models/chain/transaction'
+import { AddressType } from 'models/keys/address';
+
 export interface Hardware {
   deviceInfo: DeviceInfo
   getExtendedPublicKey: () => Promise<ExtendedPublicKey>
   connect: (hardwareInfo?: DeviceInfo) => Promise<void>
   disconect: () => Promise<void>
+  signTransaction: (walletID: string, tx: Transaction) => Promise<Transaction>
 }
 
 export enum Manufacturer {
@@ -15,9 +19,12 @@ export interface DeviceInfo {
   manufacturer: Manufacturer
   product: string
   isBluetooth: boolean
+  // for single address
+  addressType: AddressType
+  addressIndex: number
   // The following information may or may not be available to us
   appVersion?: string
-  firewareVersion?: string
+  firmwareVersion?: string
 }
 
 export interface ExtendedPublicKey {

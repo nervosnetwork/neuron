@@ -74,7 +74,7 @@ export default class AnyoneCanPayService {
     })
 
     const wallet = WalletService.getInstance().get(walletID)
-    const changeBlake160: string = (await wallet.getNextChangeAddressByWalletId())!.blake160
+    const changeBlake160: string = (await wallet.getNextChangeAddress())!.blake160
 
     const tx = isCKB ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
       walletID,

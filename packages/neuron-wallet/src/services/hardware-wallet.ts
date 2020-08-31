@@ -6,7 +6,7 @@ type Descriptor = string
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
   private hardwares: Map<Descriptor, Hardware> = new Map()
-  private descriptor: string = ''
+  private device?: Hardware
 
   public static getInstance = () => {
     if (HardwareWalletService.instance === undefined) {
@@ -16,19 +16,19 @@ export default class HardwareWalletService {
     return HardwareWalletService.instance
   }
 
-  public getCurrentHardware () {
-    return this.getHardware(this.descriptor)
+  public getCurrent () {
+    return this.device
   }
 
   public async initHardware (device: DeviceInfo) {
     switch (device.manufacturer) {
       case Manufacturer.Ledger: {
         const hardware = new Ledger(device)
-        this.hardwares.set(device.descriptor, hardware)
-        break
+        this.device = hardware
+        return hardware
       }
       default:
-        break
+        return null
     }
   }
 

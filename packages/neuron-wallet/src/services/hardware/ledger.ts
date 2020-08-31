@@ -1,5 +1,5 @@
 import { Hardware, DeviceInfo } from './index'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+// import { AccountExtendedPublicKey } from 'models/keys/key'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
@@ -7,30 +7,45 @@ import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
 import Bluetooth from '@ledgerhq/hw-transport-node-ble'
 import LedgerCKB from 'hw-app-ckb'
+import Transaction from 'models/chain/transaction'
+import NodeService from 'services/node'
+import { AccountExtendedPublicKey } from 'models/keys/key'
+import { AddressType } from 'models/keys/address'
 
 export default class Ledger implements Hardware {
   public deviceInfo: DeviceInfo
-  private isBluetooth = false
   private ledgerCKB: LedgerCKB | null = null
+  private transport: Transport | null = null
+  public isConnected = false
 
   constructor (deviceInfo: DeviceInfo) {
     this.deviceInfo = deviceInfo
   }
 
   public async connect (deviceInfo?: DeviceInfo) {
+    if (this.isConnected) {
+      return
+    }
+
     this.deviceInfo = deviceInfo ?? this.deviceInfo
-    const transport: Transport = this.deviceInfo.isBluetooth
+    this.transport = this.deviceInfo.isBluetooth
       ? await Bluetooth.open(this.deviceInfo.descriptor)
       : await HID.open(this.deviceInfo.descriptor)
 
-    this.ledgerCKB = new LedgerCKB(transport)
+    this.ledgerCKB = new LedgerCKB(this.transport)
+    this.isConnected = true
   }
 
-  // for ledger, we can only close bluetooth connection manually
   public async disconect () {
-    if (this.isBluetooth) {
+    if (!this.isConnected) {
+      return
+    }
+
+    this.transport?.close()
+    if (this.deviceInfo.isBluetooth) {
       await Bluetooth.disconnect(this.deviceInfo.descriptor)
     }
+    this.isConnected = false
   }
 
   public async getExtendedPublicKey () {
@@ -39,6 +54,38 @@ export default class Ledger implements Hardware {
       publicKey: public_key,
       chainCode: chain_code
     }
+  }
+
+  public async signTransaction (_: string, tx: Transaction) {
+    const { ckb } = NodeService.getInstance()
+    const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
+    rawTx.witnesses = rawTx.inputs.map(() => '0x')
+    rawTx.witnesses[0] = ckb.utils.serializeWitnessArgs({
+      lock: '',
+      inputType: '',
+      outputType: ''
+    })
+    // const { addressIndex, addressType } = this.deviceInfo
+    const txs = await Promise.all(rawTx.inputs.map(i => ckb.rpc.getTransaction(i.previous_output!.tx_hash)))
+    const txContext = txs.map(i => ckb.rpc.paramsFormatter.toRawTransaction(i.transaction))
+
+    const signature = await this.ledgerCKB!.signTransaction(
+      AccountExtendedPublicKey.ckbAccountPath,
+      rawTx,
+      rawTx.witnesses,
+      txContext,
+      AccountExtendedPublicKey.ckbAccountPath,
+    )
+
+    tx.witnesses[0] = ckb.utils.serializeWitnessArgs({
+      lock: '0x' + signature,
+      inputType: '',
+      outputType: ''
+    })
+
+    tx.hash = tx.computeHash()
+
+    return tx
   }
 
   public static async findDevices () {
@@ -65,6 +112,8 @@ export default class Ledger implements Hardware {
                 vendorId: e.device.vendorId,
                 manufacturer: e.device.manufacturer,
                 product: e.device.product,
+                addressIndex: 0,
+                addressType: AddressType.Receiving
               }
             ]
           }, []),

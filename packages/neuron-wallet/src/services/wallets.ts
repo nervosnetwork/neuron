@@ -11,32 +11,25 @@ import FileService from './file'
 import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
 import { ChildProcess } from 'utils/worker'
-import { AddressType } from 'models/keys/address'
+import { DeviceInfo } from './hardware'
 
 const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
 
-export interface DeviceProperties {
-  name: string
-  publicKey: string
-  addressIndex: number
-  addressType: AddressType
-}
-
 export interface WalletProperties {
   id: string
   name: string
-  extendedKey?: string // Serialized account extended public key
+  extendedKey: string // Serialized account extended public key
+  device?: DeviceInfo
   keystore?: Keystore
-  device?: DeviceProperties
 }
 
 export abstract class Wallet {
   public id: string
   public name: string
-  protected extendedKey: string | undefined
-  protected device: DeviceProperties | undefined
+  protected extendedKey: string = ''
+  protected device?: DeviceInfo
 
   constructor(props: WalletProperties) {
     const { id, name, extendedKey, device } = props
@@ -85,7 +78,7 @@ export abstract class Wallet {
     throw new WalletFunctionNotSupported(this.deleteKeystore.name)
   }
 
-  public getDeviceInfo = (): DeviceProperties => {
+  public getDeviceInfo = (): DeviceInfo => {
     throw new WalletFunctionNotSupported(this.getDeviceInfo.name)
   }
 
@@ -93,31 +86,26 @@ export abstract class Wallet {
     throw new WalletFunctionNotSupported(this.accountExtendedPublicKey.name)
   }
 
-  public update = ({ name }: { name: string }) => {
+  public update = ({ name, device }: Pick<WalletProperties, 'name' | 'device'>) => {
     if (name) {
       this.name = name
     }
+    if (device) {
+      this.device = device
+    }
   }
 
-  public checkAndGenerateAddresses = async (
-    _isImporting: boolean = false,
-    _receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    _changeAddressCount: number = DefaultAddressNumber.Change
-  ): Promise<AddressInterface[] | undefined> => {
-    throw new Error('not implemented')
-  }
+  public abstract checkAndGenerateAddresses (
+    isImporting?: boolean,
+    receivingAddressCount?: number,
+    changeAddressCount?: number
+  ): Promise<AddressInterface[] | undefined>
 
-  public getNextAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
-    throw new Error('not implemented')
-  }
+  public abstract getNextAddress(): Promise<AddressInterface | undefined>
 
-  public getNextChangeAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
-    throw new Error('not implemented')
-  }
+  public abstract getNextChangeAddress (): Promise<AddressInterface | undefined>
 
-  public getNextReceivingAddressesByWalletId = async (): Promise<AddressInterface[]> => {
-    throw new Error('not implemented')
-  }
+  public abstract getNextReceivingAddresses (): Promise<AddressInterface[]>
 }
 
 export class FileKeystoreWallet extends Wallet {
@@ -125,8 +113,17 @@ export class FileKeystoreWallet extends Wallet {
     return false
   }
 
-  public accountExtendedPublicKey = (): AccountExtendedPublicKey => {
-    return AccountExtendedPublicKey.parse(this.extendedKey!) as AccountExtendedPublicKey
+  accountExtendedPublicKey = (): AccountExtendedPublicKey => {
+    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
+  }
+
+  public toJSON = () => {
+    return {
+      id: this.id,
+      name: this.name,
+      extendedKey: this.extendedKey,
+      device: this.device
+    }
   }
 
   public loadKeystore = () => {
@@ -164,15 +161,15 @@ export class FileKeystoreWallet extends Wallet {
       )
   }
 
-  public getNextAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+  public getNextAddress = async (): Promise<AddressInterface | undefined> => {
     return AddressService.getNextUnusedAddressByWalletId(this.id)
   }
 
-  public getNextChangeAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+  public getNextChangeAddress = async (): Promise<AddressInterface | undefined> => {
     return AddressService.getNextUnusedChangeAddressByWalletId(this.id)
   }
 
-  public getNextReceivingAddressesByWalletId = async (): Promise<AddressInterface[]> => {
+  public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
     return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
   }
 }
@@ -186,12 +183,13 @@ export class HardwareWallet extends Wallet {
     return new HardwareWallet(json)
   }
 
-  public getDeviceInfo = (): DeviceProperties => {
+  public getDeviceInfo = (): DeviceInfo => {
     return this.device!
   }
 
   public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
-    const {publicKey, addressType, addressIndex} = this.getDeviceInfo()
+    const { addressType, addressIndex } = this.getDeviceInfo()
+    const { publicKey } = AccountExtendedPublicKey.parse(this.extendedKey)
     const address = await AddressService.generateAndSaveForPublicKey(
       this.id,
       publicKey,
@@ -204,15 +202,15 @@ export class HardwareWallet extends Wallet {
     }
   }
 
-  public getNextAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+  public getNextAddress = async (): Promise<AddressInterface | undefined> => {
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
-  public getNextChangeAddressByWalletId = async (): Promise<AddressInterface | undefined> => {
+  public getNextChangeAddress = async (): Promise<AddressInterface | undefined> => {
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
-  public getNextReceivingAddressesByWalletId = async (): Promise<AddressInterface[]> => {
+  public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
     const address = await AddressService.getFirstAddressByWalletId(this.id)
     if (address) {
       return [address]
@@ -266,9 +264,7 @@ export default class WalletService {
     if (json.device) {
       return HardwareWallet.fromJSON(json)
     }
-    else {
-      return FileKeystoreWallet.fromJSON(json)
-    }
+    return FileKeystoreWallet.fromJSON(json)
   }
 
   public getAll = (): WalletProperties[] => {

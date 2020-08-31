@@ -47,11 +47,11 @@ declare module 'hw-app-ckb' {
      * @return a signature as hex string
      */
     async signTransaction(
-      signPath: string | BIPPath | [number],
+      signPath: string | BIPPath | string[],
       rawTx: string | blockchain.RawTransactionJSON,
-      groupWitnessesHex?: [string],
-      rawContextsTx: [string | blockchain.RawTransactionJSON],
-      changePath: string | BIPPath | [number]
+      groupWitnessesHex?: string[],
+      rawContextsTx: string | blockchain.RawTransactionJSON[],
+      changePath: string | BIPPath | number[]
     ): Promise<string>
 
     /**
