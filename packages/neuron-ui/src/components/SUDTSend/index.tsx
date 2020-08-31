@@ -139,7 +139,8 @@ const SUDTSend = () => {
         setAnyoneCanPayScript({ codeHash: res.result.codeHash, hashType: res.result.hashType })
       }
     })
-  }, [])
+    // eslint-disable-next-line
+  }, [isMainnet])
 
   const breakcrum = [{ label: t('navbar.s-udt'), link: RoutePath.SUDTAccountList }]
   const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
