@@ -10,7 +10,7 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
-import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange, isMainnet } from 'utils'
+import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange } from 'utils'
 
 import styles from './navbar.module.scss'
 
@@ -59,8 +59,6 @@ const Navbar = () => {
   const network = networks.find(n => n.id === networkID)
   const networkName = network?.name ?? null
 
-  const showSUDT = !isMainnet(networks, networkID)
-
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
   const syncStatus = getSyncStatus({
@@ -93,7 +91,7 @@ const Navbar = () => {
     ))
 
   const experimentalMenus = menuItems
-    .filter(item => item.experimental && (showSUDT || item.key !== RoutePath.SUDTAccountList.slice(1)))
+    .filter(item => item.experimental)
     .map(item => (
       <button
         type="button"

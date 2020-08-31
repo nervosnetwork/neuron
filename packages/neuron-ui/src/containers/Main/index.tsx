@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect } from 'react'
-import { useHistory, useRouteMatch } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -20,7 +20,7 @@ import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
 import SUDTReceive from 'components/SUDTReceive'
 
-import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange, isMainnet } from 'utils'
+import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
@@ -132,13 +132,6 @@ const MainContent = () => {
   const dispatch = useDispatch()
   const { networkID } = chain
   const [t, i18n] = useTranslation()
-  const isCurrentSUDT = !!useRouteMatch(mainContents.filter(c => c.name.startsWith('SUDT')).map(c => c.path))
-
-  useEffect(() => {
-    if (isCurrentSUDT && isMainnet(networks, networkID)) {
-      history.replace(mainContents[0].path)
-    }
-  }, [networks, networkID, isCurrentSUDT, history])
 
   useSubscription({
     walletID,
