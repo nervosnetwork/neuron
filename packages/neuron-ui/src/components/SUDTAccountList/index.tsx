@@ -288,11 +288,13 @@ const SUDTAccountList = () => {
       }
     : undefined
 
+  const EXPERIMENTAL_TAG = 'sudt-accounts'
+
   if (!isLoaded) {
     return (
       <div className={styles.loading}>
         <div className={styles.title}>{t('s-udt.account-list.title')}</div>
-        <Experimental tag="customized-assset" />
+        <Experimental tag={EXPERIMENTAL_TAG} />
         <Spinner size={SpinnerSize.large} />
       </div>
     )
@@ -315,7 +317,7 @@ const SUDTAccountList = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>{t('s-udt.account-list.title')}</div>
-      <Experimental tag="sudt-accounts" />
+      <Experimental tag={EXPERIMENTAL_TAG} />
       <div className={styles.header}>
         <SearchBox
           value={keyword}
