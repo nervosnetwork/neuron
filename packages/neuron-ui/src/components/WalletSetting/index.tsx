@@ -4,10 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { WalletWizardPath } from 'components/WalletWizard'
-import Button from 'widgets/Button'
 import { ReactComponent as EditWallet } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as BackupWallet } from 'widgets/Icons/BackupWallet.svg'
 import { ReactComponent as DeleteWallet } from 'widgets/Icons/Delete.svg'
+import { ReactComponent as CreateWallet } from 'widgets/Icons/SoftWalletCreate.svg'
+import { ReactComponent as ImportKeystore } from 'widgets/Icons/SoftWalletImportKeystore.svg'
+import { ReactComponent as ImportSeed } from 'widgets/Icons/SoftWalletImportSeed.svg'
+import { ReactComponent as ImportHardware } from 'widgets/Icons/HardWalletImport.svg'
 
 import { StateDispatch, setCurrentWallet } from 'states'
 import {
@@ -23,21 +26,33 @@ import styles from './walletSetting.module.scss'
 
 const buttons = [
   {
-    label: 'wizard.create-new-wallet',
+    label: 'wizard.new-wallet',
     ariaLabel: 'create a wallet',
     url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+    icon: <CreateWallet />,
   },
   {
-    label: 'wizard.import-mnemonic',
+    label: 'wizard.wallet-seed',
     ariaLabel: 'import wallet seed',
     url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+    icon: <ImportKeystore />,
   },
   {
-    label: 'wizard.import-keystore',
+    label: 'wizard.keystore',
     ariaLabel: 'import from keystore',
     url: RoutePath.ImportKeystore,
+    icon: <ImportSeed />,
+  },
+  {
+    label: 'wizard.hardware-wallet',
+    ariaLabel: 'import from hardware wallet',
+    url: RoutePath.ImportKeystore,
+    icon: <ImportHardware />,
   },
 ]
+
+// eslint-disable-next-line no-console
+console.log(buttons)
 
 const WalletSetting = ({
   wallet: { id: currentID = '' },
@@ -81,6 +96,8 @@ const WalletSetting = ({
 
   useOnWindowResize(toggleBottomBorder)
 
+  const [createWallet, ...importWallet] = buttons
+
   return (
     <div className={styles.container}>
       <ChoiceGroup
@@ -121,8 +138,18 @@ const WalletSetting = ({
         }}
       />
       <div className={styles.actions}>
-        {buttons.map(({ label, ariaLabel, url }) => (
-          <Button key={label} onClick={navTo(url)} label={t(label)} arial-label={ariaLabel} />
+        <div className={styles.label}>{t('wizard.create-new-wallet')}</div>
+        <button className={styles.button} type="button" onClick={navTo(createWallet.url)}>
+          <span>{createWallet.icon}</span>
+          <span>{t(createWallet.label)}</span>
+        </button>
+        <hr className={styles.hr} color="#ccc" />
+        <div className={styles.label}>{t('wizard.import-wallet')}</div>
+        {importWallet.map(({ label, url, icon }) => (
+          <button className={styles.button} type="button" key={label} onClick={navTo(url)}>
+            <span>{icon}</span>
+            <span>{t(label)}</span>
+          </button>
         ))}
       </div>
     </div>
