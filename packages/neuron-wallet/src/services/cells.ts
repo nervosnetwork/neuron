@@ -16,7 +16,7 @@ import BufferUtils from 'utils/buffer'
 import LiveCell from 'models/chain/live-cell'
 import Output from 'models/chain/output'
 import SystemScriptInfo from 'models/system-script-info'
-import Script from 'models/chain/script'
+import Script, { ScriptHashType } from 'models/chain/script'
 import LiveCellService from './live-cell-service'
 
 export const MIN_CELL_CAPACITY = '6100000000'
@@ -295,7 +295,10 @@ export default class CellsService {
       input: Input,
       witness: WitnessArgs,
     },
-    lockCodeHashes: string[] = [SystemScriptInfo.SECP_CODE_HASH]
+    lockClass: {
+      codeHash: string,
+      hashType: ScriptHashType.Type
+    } = {codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type}
   ): Promise<{
     inputs: Input[]
     capacities: string
@@ -326,11 +329,13 @@ export default class CellsService {
           FROM hd_public_key_info
           WHERE walletId = :walletId
         ) AND
-        output.lockCodeHash in (:...lockCodeHashes)
+        output.lockCodeHash = :lockCodeHash AND
+        output.lockHashType = :lockHashType
         `, {
         walletId,
         statuses: [OutputStatus.Live, OutputStatus.Sent],
-        lockCodeHashes,
+        lockCodeHash: lockClass.codeHash,
+        lockHashType: lockClass.hashType,
       })
       .getMany()
 
@@ -442,7 +447,10 @@ export default class CellsService {
 
   public static gatherAllInputs = async (
     walletId: string,
-    lockCodeHashes: string[] = [SystemScriptInfo.SECP_CODE_HASH]
+    lockClass: {
+      codeHash: string,
+      hashType: ScriptHashType.Type
+    } = {codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type}
   ): Promise<Input[]> => {
     const cellEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
@@ -456,11 +464,13 @@ export default class CellsService {
           FROM hd_public_key_info
           WHERE walletId = :walletId
         ) AND
-        output.lockCodeHash in (:...lockCodeHashes)
+        output.lockCodeHash = :lockCodeHash AND
+        output.lockHashType = :lockHashType
         `, {
         walletId,
         statuses: [OutputStatus.Live],
-        lockCodeHashes
+        lockCodeHash: lockClass.codeHash,
+        lockHashType: lockClass.hashType
       })
       .getMany()
 
