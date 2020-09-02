@@ -59,31 +59,33 @@ const Send = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
+
   const isMainnet = isMainnetUtil(networks, networkID)
+
   const {
     outputs,
     fee,
     totalAmount,
     setTotalAmount,
     useOnTransactionChange,
-    onItemChange,
-    onSubmit,
+    onItemChange: handleItemChange,
+    onSubmit: handleSubmit,
     updateTransactionOutput,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
-    onDescriptionChange,
-    onClear,
+    onDescriptionChange: handleDescriptionChange,
+    onClear: handleClear,
     errorMessage,
     setErrorMessage,
     isSendMax,
-    onSendMaxClick,
-    onScan,
+    onSendMaxClick: handleSendMaxClick,
+    onScan: handleScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
-  const onLocktimeClick = useCallback(
+  const handleLocktimeClick = useCallback(
     e => {
       const {
         dataset: { index },
@@ -93,7 +95,7 @@ const Send = () => {
     [setLocktimeIndex]
   )
 
-  const onRemoveLocktime = useCallback(
+  const handleRemoveLocktime = useCallback(
     e => {
       const {
         dataset: { index },
@@ -163,7 +165,7 @@ const Send = () => {
   }, [outputs, isMainnet])
 
   return (
-    <form onSubmit={onSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
+    <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
       <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
       <div className={styles.balance}>
         <span>{`${t('overview.balance')}:`}</span>
@@ -236,7 +238,7 @@ const Send = () => {
                   data-idx={idx}
                   disabled={item.disabled}
                   value={item.address || ''}
-                  onChange={onItemChange}
+                  onChange={handleItemChange}
                   required
                   maxLength={100}
                   error={addrErrorMsg}
@@ -256,7 +258,7 @@ const Send = () => {
                   data-idx={idx}
                   value={localNumberFormatter(item.amount)}
                   placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
-                  onChange={onItemChange}
+                  onChange={handleItemChange}
                   disabled={item.disabled}
                   required
                   suffix="CKB"
@@ -265,7 +267,7 @@ const Send = () => {
                 <button
                   data-idx={idx}
                   style={styles && styles.trigger}
-                  onClick={onScan}
+                  onClick={handleScan}
                   type="button"
                   aria-label="qr-btn"
                   className={styles.scanBtn}
@@ -278,7 +280,7 @@ const Send = () => {
                   <Button
                     className={styles.maxBtn}
                     type="primary"
-                    onClick={onSendMaxClick}
+                    onClick={handleSendMaxClick}
                     disabled={isMaxBtnDisabled}
                     label="Max"
                     data-is-on={isSendMax}
@@ -314,7 +316,7 @@ const Send = () => {
                     <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
                     <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
                     {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
-                    <button type="button" data-index={idx} onClick={onLocktimeClick}>
+                    <button type="button" data-index={idx} onClick={handleLocktimeClick}>
                       {item.date ? (
                         <>
                           <img data-status="inactive" className={styles.icon} src={Edit} alt="edit" />
@@ -325,7 +327,7 @@ const Send = () => {
                       )}
                     </button>
                     {item.date ? (
-                      <button type="button" data-index={idx} onClick={onRemoveLocktime}>
+                      <button type="button" data-index={idx} onClick={handleRemoveLocktime}>
                         <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
                         <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
                       </button>
@@ -352,7 +354,7 @@ const Send = () => {
           field="description"
           label={t('send.description')}
           value={send.description}
-          onChange={onDescriptionChange}
+          onChange={handleDescriptionChange}
           disabled={sending}
         />
         <TransactionFeePanel
@@ -363,7 +365,7 @@ const Send = () => {
       </div>
 
       <div className={styles.actions}>
-        <Button type="reset" onClick={onClear} label={t('send.clear')} />
+        <Button type="reset" onClick={handleClear} label={t('send.clear')} />
         <Button type="submit" disabled={disabled} label={t('send.send')}>
           {sending ? <Spinner /> : (t('send.send') as string)}
         </Button>
