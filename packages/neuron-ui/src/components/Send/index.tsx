@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
 
@@ -27,23 +27,17 @@ import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
 import {
   PlaceHolders,
-  CONSTANTS,
   shannonToCKBFormatter,
   localNumberFormatter,
   getCurrentUrl,
   getSyncStatus,
   validateOutputs,
-  validateAmount,
-  validateAmountRange,
-  validateAddress,
   validateTotalAmount,
   isMainnet as isMainnetUtil,
 } from 'utils'
 
-import { useInitialize } from './hooks'
+import { useInitialize, useOutputErrors } from './hooks'
 import styles from './send.module.scss'
-
-const { SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -134,35 +128,7 @@ const Send = () => {
     url: getCurrentUrl(networkID, networks),
   })
 
-  const outputErrors = useMemo(() => {
-    return outputs.map(({ address, amount, date }) => {
-      let amountError: (Error & { i18n: { [key: string]: string } }) | undefined
-      let addrError: (Error & { i18n: { [key: string]: string } }) | undefined
-
-      if (amount !== undefined) {
-        try {
-          const extraSize = date ? SINCE_FIELD_SIZE : 0
-          validateAmount(amount)
-          validateAmountRange(amount, extraSize)
-        } catch (err) {
-          amountError = err
-        }
-      }
-
-      if (address !== undefined) {
-        try {
-          validateAddress(address, isMainnet)
-        } catch (err) {
-          addrError = err
-        }
-      }
-
-      return {
-        addrError,
-        amountError,
-      }
-    })
-  }, [outputs, isMainnet])
+  const outputErrors = useOutputErrors(outputs, isMainnet)
 
   return (
     <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
