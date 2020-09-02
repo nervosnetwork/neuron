@@ -49,11 +49,6 @@ describe('block sync render', () => {
 
     stubbedGetIndexerConnector.mockReturnValue(stubbedIndexerConnector)
 
-    jest.doMock('electron', () => {
-      return {
-        ipcRenderer: eventEmitter
-      }
-    });
     jest.doMock('../../src/block-sync-renderer/sync/queue', () => {
       return stubbedQueueConstructor
     });
@@ -65,7 +60,7 @@ describe('block sync render', () => {
     let syncTask: any
 
     beforeEach(async () => {
-      syncTask = jest.requireActual('../../src/block-sync-renderer/task').default
+      syncTask = jest.requireActual('../../src/block-sync-renderer/task-wrapper').default
     });
 
     it('call queryIndexer with results', async () => {

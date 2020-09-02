@@ -77,7 +77,7 @@ export const createBlockSyncTask = async (clearIndexerFolder = false) => {
   // prevents the sync task from being started repeatedly if fork does not finish executing.
   syncTask = Object.create(null)
   syncTask = await spawn<SyncTask>(
-    fork(path.join(__dirname, 'task.js'), [], {
+    fork(path.join(__dirname, 'task-wrapper.js'), [], {
       env: {
         fileBasePath: env.fileBasePath
       }
