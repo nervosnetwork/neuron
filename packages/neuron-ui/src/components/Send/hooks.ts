@@ -401,7 +401,7 @@ export const useOutputErrors = (
   return useMemo(
     () =>
       outputs.map(({ address, amount, date }) => {
-        let amountError: (Error & { i18n: { [key: string]: string } }) | undefined
+        let amountError: (Error & { i18n: Record<string, string> }) | undefined
         if (amount !== undefined) {
           try {
             const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
@@ -412,7 +412,7 @@ export const useOutputErrors = (
           }
         }
 
-        let addrError: (Error & { i18n: { [key: string]: string } }) | undefined
+        let addrError: (Error & { i18n: Record<string, string> }) | undefined
         if (address !== undefined) {
           try {
             validateAddress(address, isMainnet)
