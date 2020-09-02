@@ -33,6 +33,7 @@ import './CompensationPeriodTooltip.stories'
 import './CompensationProgressBar.stories'
 import './BalanceSyncIcon.stories'
 import './Pagination.stories'
+import './SendMetaInfo.stories'
 
 // SUDT
 import './SUDTCreateDialog.stories'

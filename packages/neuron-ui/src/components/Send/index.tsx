@@ -6,7 +6,7 @@ import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import Balance from 'components/Balance'
-import TransactionFeePanel from 'components/TransactionFeePanel'
+import SendMetaInfo from 'components/SendMetaInfo'
 
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
@@ -26,7 +26,6 @@ import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
 import {
   PlaceHolders,
-  shannonToCKBFormatter,
   localNumberFormatter,
   getCurrentUrl,
   getSyncStatus,
@@ -66,7 +65,7 @@ const Send = () => {
     updateTransactionOutput,
     addTransactionOutput,
     removeTransactionOutput,
-    updateTransactionPrice,
+    updateTransactionPrice: handlePriceChange,
     onDescriptionChange: handleDescriptionChange,
     onClear: handleClear,
     errorMessage,
@@ -304,26 +303,16 @@ const Send = () => {
       </div>
 
       <div className={styles.info}>
-        {outputs.length > 1 || errorMessageUnderTotal ? (
-          <TextField
-            field="totalAmount"
-            label={t('send.total-amount')}
-            value={`${shannonToCKBFormatter(totalAmount)} CKB`}
-            readOnly
-            error={errorMessageUnderTotal}
-          />
-        ) : null}
-        <TextField
-          field="description"
-          label={t('send.description')}
-          value={send.description}
-          onChange={handleDescriptionChange}
-          disabled={sending}
-        />
-        <TransactionFeePanel
-          fee={shannonToCKBFormatter(fee)}
+        <SendMetaInfo
+          outputs={outputs}
+          errorMessage={errorMessageUnderTotal}
+          totalAmount={totalAmount}
+          sending={sending}
+          description={send.description}
+          fee={fee}
           price={send.price}
-          onPriceChange={updateTransactionPrice}
+          handleDescriptionChange={handleDescriptionChange}
+          handlePriceChange={handlePriceChange}
         />
       </div>
 
