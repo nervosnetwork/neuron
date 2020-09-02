@@ -1,11 +1,19 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
+
 import { ckbCore } from 'services/chain'
+import { useState as useGlobalState, useDispatch, appState } from 'states'
+
 import TransactionFeePanel from 'components/TransactionFeePanel'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
+
 import TextField from 'widgets/TextField'
+import CopyZone from 'widgets/CopyZone'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
+import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
+
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
@@ -16,10 +24,6 @@ import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
 import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-import BalanceSyncIcon from 'components/BalanceSyncingIcon'
-import CopyZone from 'widgets/CopyZone'
-
-import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
@@ -36,7 +40,6 @@ import {
   isMainnet as isMainnetUtil,
 } from 'utils'
 
-import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
