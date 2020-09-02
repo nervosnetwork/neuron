@@ -223,6 +223,9 @@ describe('CellsService', () => {
     const createCells = async () => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('1'), OutputStatus.Live, false, null, {
+          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data)
+        }),
         generateCell(toShannon('200'), OutputStatus.Sent, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, true, null),
         generateCell(toShannon('3000'), OutputStatus.Live, false, typeScript),
@@ -471,7 +474,7 @@ describe('CellsService', () => {
             undefined,
             undefined,
             undefined,
-            [lockCodeHash]
+            {codeHash: lockCodeHash, hashType: ScriptHashType.Type}
           )
         } catch (e) {
           error = e
@@ -486,6 +489,9 @@ describe('CellsService', () => {
     beforeEach(async () => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('1'), OutputStatus.Live, false, null, {
+          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data)
+        }),
         generateCell(toShannon('200'), OutputStatus.Sent, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, true, null),
         generateCell(toShannon('3000'), OutputStatus.Live, false, typeScript),
@@ -509,7 +515,7 @@ describe('CellsService', () => {
       beforeEach(async () => {
         allInputs = await CellsService.gatherAllInputs(
           walletId1,
-          ['non exist lock code hash']
+          {codeHash: 'non exist lock code hash', hashType: ScriptHashType.Type}
         )
       });
       it('returns empty array', async () => {
