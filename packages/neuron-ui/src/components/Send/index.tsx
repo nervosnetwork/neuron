@@ -82,21 +82,23 @@ const Send = () => {
   const handleLocktimeClick = useCallback(
     e => {
       const {
-        dataset: { index },
+        dataset: { index, type },
       } = e.target
-      setLocktimeIndex(index)
+      switch (type) {
+        case 'set': {
+          setLocktimeIndex(index)
+          break
+        }
+        case 'remove': {
+          updateTransactionOutput('date')(index)(undefined)
+          break
+        }
+        default: {
+          // ignore
+        }
+      }
     },
-    [setLocktimeIndex]
-  )
-
-  const handleRemoveLocktime = useCallback(
-    e => {
-      const {
-        dataset: { index },
-      } = e.target
-      updateTransactionOutput('date')(index)(undefined)
-    },
-    [updateTransactionOutput]
+    [setLocktimeIndex, updateTransactionOutput]
   )
 
   useOnTransactionChange(
@@ -282,7 +284,7 @@ const Send = () => {
                     <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
                     <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
                     {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
-                    <button type="button" data-index={idx} onClick={handleLocktimeClick}>
+                    <button type="button" data-index={idx} data-type="set" onClick={handleLocktimeClick}>
                       {item.date ? (
                         <>
                           <img data-status="inactive" className={styles.icon} src={Edit} alt="edit" />
@@ -293,7 +295,7 @@ const Send = () => {
                       )}
                     </button>
                     {item.date ? (
-                      <button type="button" data-index={idx} onClick={handleRemoveLocktime}>
+                      <button type="button" data-index={idx} data-type="remove" onClick={handleLocktimeClick}>
                         <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
                         <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
                       </button>
