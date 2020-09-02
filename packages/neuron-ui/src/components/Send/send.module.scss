@@ -96,18 +96,6 @@ $textfieldWidth: calc(100vw - 370px);
   font-weight: 600;
 }
 
-.balanceValue {
-  font-weight: 500;
-  max-width: 60%;
-  padding: 0 5px 0 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  &:after {
-    content: ' CKB';
-  }
-}
-
 .iconBtns {
   display: flex;
   flex-direction: column;

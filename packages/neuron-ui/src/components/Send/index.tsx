@@ -5,11 +5,10 @@ import { List } from 'office-ui-fabric-react'
 import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
 
+import Balance from 'components/Balance'
 import TransactionFeePanel from 'components/TransactionFeePanel'
-import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 
 import TextField from 'widgets/TextField'
-import CopyZone from 'widgets/CopyZone'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
@@ -136,11 +135,7 @@ const Send = () => {
     <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
       <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
       <div className={styles.balance}>
-        <span>{`${t('overview.balance')}:`}</span>
-        <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
-          <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
-        </CopyZone>
-        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+        <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
       </div>
       <div>
         <List
