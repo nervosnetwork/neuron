@@ -10977,10 +10977,10 @@ husky@3.0.5:
     run-node "^1.0.0"
     slash "^3.0.0"
 
-hw-app-ckb@5.9.2:
-  version "5.9.2"
-  resolved "https://registry.yarnpkg.com/hw-app-ckb/-/hw-app-ckb-5.9.2.tgz#b1f857b7addbc519d74e051bbcb06b2fb3d39c56"
-  integrity sha512-RLIK0W+MOY6lkGDvOjHIEBTP4qbjOscKx2i8cmGmmFjnWd4lAZkc6HFw+BDc5HoUjzKi+Tq79zz/T8da49q+7A==
+hw-app-ckb@5.9.3:
+  version "5.9.3"
+  resolved "https://registry.yarnpkg.com/hw-app-ckb/-/hw-app-ckb-5.9.3.tgz#2de64dcd821f35253d8f85533c33246260e9f8ec"
+  integrity sha512-Cnaf3nxiZcbTC2uoan4czM+KSffJBhs/t9hBWF8Bgwb/ZPKtPQKAefRDQinfPnZZ90rxRxhl/igD8XfHS6goDQ==
   dependencies:
     "@ledgerhq/hw-transport" "^5.9.0"
     bech32 "1.1.4"

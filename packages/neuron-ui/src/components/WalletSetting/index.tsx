@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
@@ -46,13 +46,10 @@ const buttons = [
   {
     label: 'wizard.hardware-wallet',
     ariaLabel: 'import from hardware wallet',
-    url: RoutePath.ImportKeystore,
+    url: RoutePath.ImportHardware,
     icon: <ImportHardware />,
   },
 ]
-
-// eslint-disable-next-line no-console
-console.log(buttons)
 
 const WalletSetting = ({
   wallet: { id: currentID = '' },
@@ -61,6 +58,7 @@ const WalletSetting = ({
 }: State.AppWithNeuronWallet & { dispatch: StateDispatch }) => {
   const [t] = useTranslation()
   const history = useHistory()
+  const location = useLocation()
 
   useEffect(() => {
     backToTop()
@@ -81,9 +79,13 @@ const WalletSetting = ({
 
   const navTo = useCallback(
     (url: string = '/') => () => {
-      history.push(url)
+      if (url === RoutePath.ImportHardware) {
+        history.push(`${location.pathname}/import-hardware`)
+      } else {
+        history.push(url)
+      }
     },
-    [history]
+    [history, location.pathname]
   )
 
   const toggleBottomBorder = useToggleChoiceGroupBorder(`.${styles.wallets}`, styles.hasBottomBorder)

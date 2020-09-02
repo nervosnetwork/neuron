@@ -49,7 +49,7 @@
     "electron-updater": "4.2.0",
     "electron-window-state": "5.0.3",
     "elliptic": "6.5.3",
-    "hw-app-ckb": "5.9.2",
+    "hw-app-ckb": "5.9.3",
     "i18next": "17.0.13",
     "leveldown": "5.4.1",
     "levelup": "4.3.2",
