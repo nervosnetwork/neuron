@@ -407,11 +407,11 @@ export class TransactionsService {
       .driver
       .escapeQueryWithParameters(`
         SELECT
-          lockHash,
+          lockArgs,
           count(DISTINCT (transactionHash)) AS cnt
         FROM (
           SELECT
-            lockHash,
+            lockArgs,
             transactionHash
           FROM
             input
@@ -424,7 +424,7 @@ export class TransactionsService {
             )
           UNION
           SELECT
-            lockHash,
+            lockArgs,
             transactionHash
           FROM
             output
@@ -437,20 +437,19 @@ export class TransactionsService {
             )
         ) AS cell
         GROUP BY
-          lockHash;
+          lockArgs;
         `,
         {
-          // statuses: [...statuses],
           walletId
         },
         {}
       )
 
-    const count: { lockHash: string, cnt: number }[] = await getConnection().manager.query(sql, parameters)
+    const count: { lockArgs: string, cnt: number }[] = await getConnection().manager.query(sql, parameters)
 
     const result = new Map<string, number>()
     count.forEach(c => {
-      result.set(c.lockHash, c.cnt)
+      result.set(c.lockArgs, c.cnt)
     })
 
     return result

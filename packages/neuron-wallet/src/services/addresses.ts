@@ -228,18 +228,12 @@ export default class AddressService {
     return [unusedReceivingAddresses, unusedChangeAddresses]
   }
 
-  public static async getUnusedAddressesByWalletId (walletId: string) {
-    const txCountsByLockHashes = await TransactionsService.getTxCountsByWalletId(walletId)
+  private static async getUnusedAddressesByWalletId (walletId: string) {
+    const txCountsByLockArgs = await TransactionsService.getTxCountsByWalletId(walletId)
 
     const addresses = await this.getAddressesByWalletId(walletId)
     for (const address of addresses) {
-      const script = Script.fromObject({
-        codeHash: SystemScriptInfo.SECP_CODE_HASH,
-        hashType: SystemScriptInfo.SECP_HASH_TYPE,
-        args: address.blake160
-      });
-      const lockHash = script.computeHash()
-      const txCount = txCountsByLockHashes.get(lockHash)
+      const txCount = txCountsByLockArgs.get(address.blake160)
 
       if (!txCount) {
         continue
@@ -308,7 +302,7 @@ export default class AddressService {
   public static async getAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {
     const addresses = await this.getAddressesByWalletId(walletId)
     const {liveBalances, sentBalances, pendingBalances} = await CellsService.getBalancesByWalletId(walletId)
-    const txCounts = await TransactionsService.getTxCountsByWalletId(walletId)
+    const txCountsByLockArgs = await TransactionsService.getTxCountsByWalletId(walletId)
     const allAddressesWithBalances = addresses.map(address => {
       const script = Script.fromObject({
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
@@ -321,7 +315,7 @@ export default class AddressService {
       const pendingBalance = pendingBalances.get(lockHash) || '0'
       const balance = (BigInt(liveBalance) + BigInt(sentBalance)).toString()
 
-      const txCount = txCounts.get(lockHash) || 0
+      const txCount = txCountsByLockArgs.get(address.blake160) || 0
 
       return {
         ...address,
