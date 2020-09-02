@@ -13,6 +13,9 @@ import {
   calculateFee,
   validateOutputs,
   validateAddress,
+  validateAmount,
+  validateAmountRange,
+  CONSTANTS,
 } from 'utils'
 import i18n from 'utils/i18n'
 
@@ -391,6 +394,40 @@ export const useInitialize = (
   }
 }
 
+export const useOutputErrors = (
+  outputs: Partial<Record<'address' | 'amount' | 'date', string>>[],
+  isMainnet: boolean
+) => {
+  return useMemo(
+    () =>
+      outputs.map(({ address, amount, date }) => {
+        let amountError: (Error & { i18n: Record<string, string> }) | undefined
+        if (amount !== undefined) {
+          try {
+            const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
+            validateAmount(amount)
+            validateAmountRange(amount, extraSize)
+          } catch (err) {
+            amountError = err
+          }
+        }
+
+        let addrError: (Error & { i18n: Record<string, string> }) | undefined
+        if (address !== undefined) {
+          try {
+            validateAddress(address, isMainnet)
+          } catch (err) {
+            addrError = err
+          }
+        }
+
+        return { addrError, amountError }
+      }),
+    [outputs, isMainnet]
+  )
+}
+
 export default {
   useInitialize,
+  useOutputErrors,
 }

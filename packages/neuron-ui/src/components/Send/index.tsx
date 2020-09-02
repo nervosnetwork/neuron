@@ -1,11 +1,18 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
+
 import { ckbCore } from 'services/chain'
+import { useState as useGlobalState, useDispatch, appState } from 'states'
+
+import Balance from 'components/Balance'
 import TransactionFeePanel from 'components/TransactionFeePanel'
+
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
+import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
+
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
@@ -16,31 +23,20 @@ import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
 import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-import BalanceSyncIcon from 'components/BalanceSyncingIcon'
-import CopyZone from 'widgets/CopyZone'
-
-import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
-  CONSTANTS,
   shannonToCKBFormatter,
   localNumberFormatter,
   getCurrentUrl,
   getSyncStatus,
   validateOutputs,
-  validateAmount,
-  validateAmountRange,
-  validateAddress,
   validateTotalAmount,
   isMainnet as isMainnetUtil,
 } from 'utils'
 
-import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
-import { useInitialize } from './hooks'
+import { useInitialize, useOutputErrors } from './hooks'
 import styles from './send.module.scss'
-
-const { SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -56,48 +52,52 @@ const Send = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
+
   const isMainnet = isMainnetUtil(networks, networkID)
+
   const {
     outputs,
     fee,
     totalAmount,
     setTotalAmount,
     useOnTransactionChange,
-    onItemChange,
-    onSubmit,
+    onItemChange: handleItemChange,
+    onSubmit: handleSubmit,
     updateTransactionOutput,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
-    onDescriptionChange,
-    onClear,
+    onDescriptionChange: handleDescriptionChange,
+    onClear: handleClear,
     errorMessage,
     setErrorMessage,
     isSendMax,
-    onSendMaxClick,
-    onScan,
+    onSendMaxClick: handleSendMaxClick,
+    onScan: handleScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
-  const onLocktimeClick = useCallback(
+  const handleLocktimeClick = useCallback(
     e => {
       const {
-        dataset: { index },
+        dataset: { index, type },
       } = e.target
-      setLocktimeIndex(index)
+      switch (type) {
+        case 'set': {
+          setLocktimeIndex(index)
+          break
+        }
+        case 'remove': {
+          updateTransactionOutput('date')(index)(undefined)
+          break
+        }
+        default: {
+          // ignore
+        }
+      }
     },
-    [setLocktimeIndex]
-  )
-
-  const onRemoveLocktime = useCallback(
-    e => {
-      const {
-        dataset: { index },
-      } = e.target
-      updateTransactionOutput('date')(index)(undefined)
-    },
-    [updateTransactionOutput]
+    [setLocktimeIndex, updateTransactionOutput]
   )
 
   useOnTransactionChange(
@@ -129,45 +129,13 @@ const Send = () => {
     url: getCurrentUrl(networkID, networks),
   })
 
-  const outputErrors = useMemo(() => {
-    return outputs.map(({ address, amount, date }) => {
-      let amountError: (Error & { i18n: { [key: string]: string } }) | undefined
-      let addrError: (Error & { i18n: { [key: string]: string } }) | undefined
-
-      if (amount !== undefined) {
-        try {
-          const extraSize = date ? SINCE_FIELD_SIZE : 0
-          validateAmount(amount)
-          validateAmountRange(amount, extraSize)
-        } catch (err) {
-          amountError = err
-        }
-      }
-
-      if (address !== undefined) {
-        try {
-          validateAddress(address, isMainnet)
-        } catch (err) {
-          addrError = err
-        }
-      }
-
-      return {
-        addrError,
-        amountError,
-      }
-    })
-  }, [outputs, isMainnet])
+  const outputErrors = useOutputErrors(outputs, isMainnet)
 
   return (
-    <form onSubmit={onSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
+    <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
       <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
       <div className={styles.balance}>
-        <span>{`${t('overview.balance')}:`}</span>
-        <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
-          <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
-        </CopyZone>
-        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+        <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
       </div>
       <div>
         <List
@@ -233,7 +201,7 @@ const Send = () => {
                   data-idx={idx}
                   disabled={item.disabled}
                   value={item.address || ''}
-                  onChange={onItemChange}
+                  onChange={handleItemChange}
                   required
                   maxLength={100}
                   error={addrErrorMsg}
@@ -253,7 +221,7 @@ const Send = () => {
                   data-idx={idx}
                   value={localNumberFormatter(item.amount)}
                   placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
-                  onChange={onItemChange}
+                  onChange={handleItemChange}
                   disabled={item.disabled}
                   required
                   suffix="CKB"
@@ -262,7 +230,7 @@ const Send = () => {
                 <button
                   data-idx={idx}
                   style={styles && styles.trigger}
-                  onClick={onScan}
+                  onClick={handleScan}
                   type="button"
                   aria-label="qr-btn"
                   className={styles.scanBtn}
@@ -275,7 +243,7 @@ const Send = () => {
                   <Button
                     className={styles.maxBtn}
                     type="primary"
-                    onClick={onSendMaxClick}
+                    onClick={handleSendMaxClick}
                     disabled={isMaxBtnDisabled}
                     label="Max"
                     data-is-on={isSendMax}
@@ -311,7 +279,7 @@ const Send = () => {
                     <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
                     <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
                     {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
-                    <button type="button" data-index={idx} onClick={onLocktimeClick}>
+                    <button type="button" data-index={idx} data-type="set" onClick={handleLocktimeClick}>
                       {item.date ? (
                         <>
                           <img data-status="inactive" className={styles.icon} src={Edit} alt="edit" />
@@ -322,7 +290,7 @@ const Send = () => {
                       )}
                     </button>
                     {item.date ? (
-                      <button type="button" data-index={idx} onClick={onRemoveLocktime}>
+                      <button type="button" data-index={idx} data-type="remove" onClick={handleLocktimeClick}>
                         <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
                         <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
                       </button>
@@ -349,7 +317,7 @@ const Send = () => {
           field="description"
           label={t('send.description')}
           value={send.description}
-          onChange={onDescriptionChange}
+          onChange={handleDescriptionChange}
           disabled={sending}
         />
         <TransactionFeePanel
@@ -360,7 +328,7 @@ const Send = () => {
       </div>
 
       <div className={styles.actions}>
-        <Button type="reset" onClick={onClear} label={t('send.clear')} />
+        <Button type="reset" onClick={handleClear} label={t('send.clear')} />
         <Button type="submit" disabled={disabled} label={t('send.send')}>
           {sending ? <Spinner /> : (t('send.send') as string)}
         </Button>
