@@ -2,37 +2,17 @@ import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
 
-import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import Balance from 'components/Balance'
 import SendMetaInfo from 'components/SendMetaInfo'
+import SendFieldset from 'components/SendFieldset'
 
-import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
+import DatetimePicker from 'widgets/DatetimePicker'
 
-import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
-import AddOutput from 'widgets/Icons/AddOutput.png'
-import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
-import Edit from 'widgets/Icons/Edit.png'
-import ActiveEdit from 'widgets/Icons/ActiveEdit.png'
-import Trash from 'widgets/Icons/Trash.png'
-import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
-import Calendar from 'widgets/Icons/Calendar.png'
-import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-
-import {
-  PlaceHolders,
-  localNumberFormatter,
-  getCurrentUrl,
-  getSyncStatus,
-  validateOutputs,
-  validateTotalAmount,
-  isMainnet as isMainnetUtil,
-} from 'utils'
+import { getCurrentUrl, getSyncStatus, validateTotalAmount, isMainnet as isMainnetUtil, validateOutputs } from 'utils'
 
 import { useInitialize, useOutputErrors } from './hooks'
 import styles from './send.module.scss'
@@ -63,8 +43,8 @@ const Send = () => {
     onItemChange: handleItemChange,
     onSubmit: handleSubmit,
     updateTransactionOutput,
-    addTransactionOutput,
-    removeTransactionOutput,
+    addTransactionOutput: handleOutputAdd,
+    removeTransactionOutput: handleOutputRemove,
     updateTransactionPrice: handlePriceChange,
     onDescriptionChange: handleDescriptionChange,
     onClear: handleClear,
@@ -130,6 +110,27 @@ const Send = () => {
 
   const outputErrors = useOutputErrors(outputs, isMainnet)
 
+  const isMaxBtnDisabled = (() => {
+    try {
+      validateOutputs(outputs, isMainnet, true)
+    } catch {
+      return true
+    }
+    return false
+  })()
+
+  const isAddOneBtnDisabled = (() => {
+    try {
+      if (isSendMax) {
+        return true
+      }
+      validateOutputs(outputs, isMainnet, false)
+    } catch {
+      return true
+    }
+    return false
+  })()
+
   return (
     <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
       <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
@@ -139,164 +140,33 @@ const Send = () => {
       <div>
         <List
           items={outputs}
-          onRenderCell={(item, idx) => {
-            const SHORT_ADDR_LENGTH = 46
-            const LOCKTIMEABLE_PREFIX = '0x0100'
-            if (undefined === item || undefined === idx) {
+          onRenderCell={(_, idx) => {
+            if (idx === undefined || outputs[idx] === undefined) {
               return null
             }
-            const outputError = outputErrors[idx]
 
-            const amountErrorMsg = outputError.amountError
-              ? t(outputError.amountError.message, outputError.amountError.i18n)
-              : ''
-
-            const addrErrorMsg = outputError.addrError
-              ? t(outputError.addrError.message, outputError.addrError.i18n)
-              : ''
-
-            const fullAddrInfo =
-              !addrErrorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH
-                ? t('messages.full-addr-info')
-                : ''
-
-            let locktimeAble = false
-            if (!addrErrorMsg && item.address && item.address.length === SHORT_ADDR_LENGTH) {
-              try {
-                const parsed = ckbCore.utils.bytesToHex(ckbCore.utils.parseAddress(item.address))
-                if (parsed.startsWith(LOCKTIMEABLE_PREFIX)) {
-                  locktimeAble = true
-                }
-              } catch {
-                // ignore this
-              }
-            }
-
-            let isMaxBtnDisabled = false
-            let isAddOneBtnDisabled = false
-
-            try {
-              validateOutputs(outputs, isMainnet, true)
-            } catch {
-              isMaxBtnDisabled = true
-            }
-
-            try {
-              if (isSendMax) {
-                isAddOneBtnDisabled = true
-              } else {
-                validateOutputs(outputs, isMainnet, false)
-              }
-            } catch {
-              isAddOneBtnDisabled = true
-            }
+            const isRemoveBtnShow = outputs.length > 1
+            const isAddBtnShow = outputs.length - 1 === idx
+            const isMaxBtnShow = outputs.length - 1 === idx
 
             return (
-              <div className={styles.outputContainer}>
-                <TextField
-                  className={styles.addressField}
-                  label={t('send.address')}
-                  field="address"
-                  data-idx={idx}
-                  disabled={item.disabled}
-                  value={item.address || ''}
-                  onChange={handleItemChange}
-                  required
-                  maxLength={100}
-                  error={addrErrorMsg}
-                  autoFocus
-                />
-                {fullAddrInfo ? (
-                  <div className={styles.fullAddrInfo}>
-                    <Attention />
-                    <span>{fullAddrInfo}</span>
-                  </div>
-                ) : null}
-
-                <TextField
-                  className={styles.amountField}
-                  label={t('send.amount')}
-                  field="amount"
-                  data-idx={idx}
-                  value={localNumberFormatter(item.amount)}
-                  placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
-                  onChange={handleItemChange}
-                  disabled={item.disabled}
-                  required
-                  suffix="CKB"
-                  error={amountErrorMsg}
-                />
-                <button
-                  data-idx={idx}
-                  style={styles && styles.trigger}
-                  onClick={handleScan}
-                  type="button"
-                  aria-label="qr-btn"
-                  className={styles.scanBtn}
-                  data-title={t('send.scan-screen-qr-code')}
-                >
-                  <Scan />
-                </button>
-
-                {idx === outputs.length - 1 ? (
-                  <Button
-                    className={styles.maxBtn}
-                    type="primary"
-                    onClick={handleSendMaxClick}
-                    disabled={isMaxBtnDisabled}
-                    label="Max"
-                    data-is-on={isSendMax}
-                  />
-                ) : null}
-
-                <div className={styles.iconBtns}>
-                  {outputs.length > 1 ? (
-                    <button
-                      type="button"
-                      disabled={isSendMax}
-                      aria-label={t('send.remove-this')}
-                      onClick={() => removeTransactionOutput(idx)}
-                      className={styles.iconBtn}
-                    >
-                      <img src={RemoveOutput} alt="Remove Output" data-type="remove" />
-                    </button>
-                  ) : null}
-                  {idx === outputs.length - 1 ? (
-                    <button
-                      type="button"
-                      disabled={isAddOneBtnDisabled}
-                      onClick={() => addTransactionOutput()}
-                      aria-label={t('send.add-one')}
-                      className={styles.iconBtn}
-                    >
-                      <img src={AddOutput} alt="Add Output" data-type="add" />
-                    </button>
-                  ) : null}
-                </div>
-                {locktimeAble ? (
-                  <div className={styles.locktime} data-status={item.date ? 'set' : 'unset'}>
-                    <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
-                    <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
-                    {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
-                    <button type="button" data-index={idx} data-type="set" onClick={handleLocktimeClick}>
-                      {item.date ? (
-                        <>
-                          <img data-status="inactive" className={styles.icon} src={Edit} alt="edit" />
-                          <img data-status="active" className={styles.icon} src={ActiveEdit} alt="active-edit" />
-                        </>
-                      ) : (
-                        t('send.set-locktime')
-                      )}
-                    </button>
-                    {item.date ? (
-                      <button type="button" data-index={idx} data-type="remove" onClick={handleLocktimeClick}>
-                        <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
-                        <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
-                      </button>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
+              <SendFieldset
+                item={outputs[idx]}
+                idx={idx}
+                errors={outputErrors[idx]}
+                isMaxBtnDisabled={isMaxBtnDisabled}
+                isAddOneBtnDisabled={isAddOneBtnDisabled}
+                isSendMax={isSendMax}
+                isAddBtnShow={isAddBtnShow}
+                isRemoveBtnShow={isRemoveBtnShow}
+                isMaxBtnShow={isMaxBtnShow}
+                onOutputAdd={handleOutputAdd}
+                onOutputRemove={handleOutputRemove}
+                onItemChange={handleItemChange}
+                onScan={handleScan}
+                onSendMaxClick={handleSendMaxClick}
+                onLocktimeClick={handleLocktimeClick}
+              />
             )
           }}
         />
