@@ -138,6 +138,12 @@ export const killBlockSyncTask = async () => {
   }
 }
 
-export const queryIndexer = (query: LumosCellQuery): Promise<LumosCell[]> => {
-  return syncTask?.queryIndexer(query) as any
+export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
+  try {
+    const results = await syncTask?.queryIndexer(query) as LumosCell[]
+    return results || []
+  } catch (error) {
+    logger.error(error)
+    return []
+  }
 }
