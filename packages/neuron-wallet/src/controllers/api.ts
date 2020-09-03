@@ -26,6 +26,8 @@ import AssetAccountController from './asset-account'
 import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
+import { DeviceInfo } from 'services/hardware'
+import HardwareWalletService from 'services/hardware-wallet'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -431,6 +433,31 @@ export default class ApiController {
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.sendTx(params)
+    })
+
+    // Hardware wallet
+    handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
+      const device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+      await device!.connect()
+    })
+
+    handle('detect-device', async () => {
+      return await HardwareWalletService.findDevices()
+    })
+
+    handle('get-ckb-app-version', async () => {
+      const device = HardwareWalletService.getInstance().getCurrent()!
+      return await device.getAppVersion?.()
+    })
+
+    handle('get-firmware-version', async () => {
+      const device = HardwareWalletService.getInstance().getCurrent()!
+      return await device.getFirmwareVersion?.()
+    })
+
+    handle('get-public-key', async () => {
+      const device = HardwareWalletService.getInstance().getCurrent()!
+      return await device.getExtendedPublicKey()
     })
   }
 

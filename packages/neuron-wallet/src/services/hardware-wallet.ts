@@ -1,11 +1,9 @@
-import { Hardware, DeviceInfo, Manufacturer } from './hardware'
+import { Hardware, DeviceInfo, Manufacturer, HardwareResponse } from './hardware'
 import Ledger from './hardware/ledger'
-
-type Descriptor = string
+import { ResponseCode } from 'utils/const'
 
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
-  private hardwares: Map<Descriptor, Hardware> = new Map()
   private device?: Hardware
 
   public static getInstance = () => {
@@ -32,16 +30,27 @@ export default class HardwareWalletService {
     }
   }
 
-  public getHardware (descriptor: string) {
-    return this.hardwares.get(descriptor)
-  }
+  public static async findDevices (device?: DeviceInfo): Promise<HardwareResponse<DeviceInfo[]>> {
+    try {
+      const devices = await Promise.all([
+        Ledger.findDevices(),
+        // add new brand `findDevices()` here
+      ])
+      let result = devices.flat()
 
-  public static async findDevices (): Promise<DeviceInfo[]> {
-    const devices = await Promise.all([
-      Ledger.findDevices(),
-      // add new brand `findDevices()` here
-    ])
+      if (device) {
+        result = result.filter(r => r.manufacturer === device.manufacturer && r.product === device.product)
+      }
 
-    return devices.flat()
+      return {
+        status: ResponseCode.Success,
+        result
+      }
+    } catch (error) {
+      return {
+        status: ResponseCode.Fail,
+        message: error
+      }
+    }
   }
 }

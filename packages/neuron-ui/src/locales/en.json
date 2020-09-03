@@ -28,6 +28,25 @@
         "block-synced": "Block Synced"
       }
     },
+    "import-hardware": {
+      "title": {
+        "select-model": "Please connect your device and select the model",
+        "detect-device": "Detecting device",
+        "name-wallet": "Name the wallet",
+        "choose-address": "Choose an address from the device"
+      },
+      "actions": {
+        "confirm": "Please comfirm on your device...",
+        "success": "Import Success!"
+      },
+      "errors": {
+        "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
+        "device-not-found": "No device detected. Please connect your device.",
+        "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
+      },
+      "app-version": "CKB app v{{version}} running.",
+      "firmware-version": "Firmware v{{version}} detected."
+    },
     "overview": {
       "date": "Date",
       "type": "Type",

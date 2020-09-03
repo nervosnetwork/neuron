@@ -1,4 +1,4 @@
-import { Hardware, DeviceInfo } from './index'
+import { Hardware, DeviceInfo, HardwareResponse } from './index'
 // import { AccountExtendedPublicKey } from 'models/keys/key'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
@@ -11,6 +11,7 @@ import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import { AccountExtendedPublicKey } from 'models/keys/key'
 import { AddressType } from 'models/keys/address'
+import { ResponseCode } from 'utils/const'
 
 export default class Ledger implements Hardware {
   public deviceInfo: DeviceInfo
@@ -86,6 +87,42 @@ export default class Ledger implements Hardware {
     tx.hash = tx.computeHash()
 
     return tx
+  }
+
+  async getAppVersion (): Promise<HardwareResponse<string>> {
+    try {
+      const conf = await this.ledgerCKB?.getAppConfiguration()
+      return {
+        status: ResponseCode.Success,
+        result: conf?.version
+      }
+    } catch (error) {
+      return {
+        status: ResponseCode.Fail,
+        message: error
+      }
+    }
+  }
+
+  async getFirmwareVersion (): Promise<HardwareResponse<string>> {
+    let res: Buffer
+    try {
+      res = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
+    } catch (error) {
+      return {
+        status: ResponseCode.Fail,
+        message: error
+      }
+    }
+    const byteArray = [...res]
+    const data = byteArray.slice(0, byteArray.length - 2)
+    const versionLength = data[4]
+    const version = Buffer.from(data.slice(5, 5 + versionLength)).toString()
+
+    return {
+      status: ResponseCode.Success,
+      result: version
+    }
   }
 
   public static async findDevices () {

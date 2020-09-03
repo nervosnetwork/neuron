@@ -2,11 +2,24 @@
 
 .dialog {
   @include dialog-container;
-  padding: 49px 73px;
+  padding: 30px 50px;
+  min-height: 245px;
 
   &::backdrop {
     @include overlay;
   }
+
+  .footer {
+    @include dialog-footer;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.main {
+  height: 120px;
 }
 
 .title {
@@ -15,9 +28,5 @@
   font-weight: bold;
   letter-spacing: 0.9px;
   margin: 0;
-
-  &:after {
-    display: inline;
-    content: ':';
-  }
+  margin-bottom: 26px;
 }

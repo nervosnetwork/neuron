@@ -1,5 +1,6 @@
 import type Transaction from 'models/chain/transaction'
 import { AddressType } from 'models/keys/address';
+import { ResponseCode } from 'utils/const'
 
 export interface Hardware {
   deviceInfo: DeviceInfo
@@ -7,10 +8,18 @@ export interface Hardware {
   connect: (hardwareInfo?: DeviceInfo) => Promise<void>
   disconect: () => Promise<void>
   signTransaction: (walletID: string, tx: Transaction) => Promise<Transaction>
+  getAppVersion?: () => Promise<HardwareResponse<string>>
+  getFirmwareVersion?: () => Promise<HardwareResponse<string>>
 }
 
 export enum Manufacturer {
   Ledger = 'Ledger'
+}
+
+export interface HardwareResponse<T> {
+  status: ResponseCode,
+  result?: T,
+  message?: Error
 }
 
 export interface DeviceInfo {
