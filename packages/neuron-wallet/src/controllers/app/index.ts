@@ -28,7 +28,7 @@ export default class AppController {
   public start = async () => {
     registerListeners()
 
-    this.apiController.mount()
+    await this.apiController.mount()
     this.syncApiController.mount()
     this.openWindow()
   }
