@@ -141,11 +141,17 @@ const useAddTransactionOutput = (dispatch: StateDispatch) =>
 
 const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
-    (idx: number = -1) => {
-      dispatch({
-        type: AppActions.RemoveSendOutput,
-        payload: idx,
-      })
+    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const {
+        dataset: { idx = '-1' },
+      } = e.currentTarget
+      const index = +idx
+      if (index >= 0) {
+        dispatch({
+          type: AppActions.RemoveSendOutput,
+          payload: index,
+        })
+      }
     },
     [dispatch]
   )
