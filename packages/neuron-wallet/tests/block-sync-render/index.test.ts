@@ -15,6 +15,7 @@ const stubbedSyncApiControllerEmitter = jest.fn()
 const stubbedTxDbChangedSubjectNext = jest.fn()
 const stubbedAddressDbChangedSubjectNext = jest.fn()
 const stubbedGetCurrentNetwork = jest.fn()
+const stubbedGenerateAddressesIfNecessary = jest.fn()
 
 const childProcessEmiter = new EventEmitter()
 
@@ -147,6 +148,14 @@ describe('block sync render', () => {
         }
       })
 
+      jest.doMock('services/wallets', () => {
+        return {
+          getInstance: () => ({
+            generateAddressesIfNecessary: stubbedGenerateAddressesIfNecessary
+          }),
+        }
+      })
+
       jest.doMock('utils/common', () => {
         return {
           sleep: jest.fn()
@@ -203,12 +212,34 @@ describe('block sync render', () => {
       });
       describe('#queryIndexer', () => {
         const query: LumosCellQuery = {lock: null, type: null, data: null}
-        beforeEach(() => {
-          queryIndexer(query)
+        let results: any
+        describe('when returns non empty result from SyncTask.queryIndexer', () => {
+          beforeEach(async () => {
+            stubbedQueryIndexer.mockResolvedValueOnce([{}])
+            results = await queryIndexer(query)
+          });
+          it('returns data array', () => {
+            expect(results).toEqual([{}])
+          })
         });
-        it('called with SyncTask instance', () => {
-          expect(stubbedQueryIndexer).toHaveBeenCalledWith(query)
-        })
+        describe('when returns undefined from SyncTask.queryIndexer', () => {
+          beforeEach(async () => {
+            stubbedQueryIndexer.mockResolvedValueOnce(undefined)
+            results = await queryIndexer(query)
+          });
+          it('returns empty array', () => {
+            expect(results).toEqual([])
+          })
+        });
+        describe('when throws error', () => {
+          beforeEach(async () => {
+            stubbedQueryIndexer.mockRejectedValueOnce({})
+            results = await queryIndexer(query)
+          });
+          it('returns empty array', () => {
+            expect(results).toEqual([])
+          })
+        });
       });
     });
 
@@ -223,6 +254,10 @@ describe('block sync render', () => {
 
       it('reset indexer data', async () => {
         expect(stubbedResetIndexerData).toHaveBeenCalled()
+      })
+
+      it('generates addresses', async () => {
+        expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
       })
 
       it('sync task can be start over by early return', async () => {
