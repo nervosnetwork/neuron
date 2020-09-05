@@ -94,7 +94,7 @@ export default class Ledger implements Hardware {
       const conf = await this.ledgerCKB?.getAppConfiguration()
       return {
         status: ResponseCode.Success,
-        result: conf?.version
+        result: conf!.version
       }
     } catch (error) {
       return {

@@ -22,24 +22,25 @@ enum ErrorType {
   CkbAppNotFound,
 }
 
-const DetectDevice = ({ match, history }: RouteComponentProps<Model>) => {
+const DetectDevice = ({ match, history, location }: RouteComponentProps<{}, {}, Model>) => {
   const [t] = useTranslation()
   const histroy = useHistory()
-  const model = match.params
+  const model = location.state
   const onBack = useCallback(() => {
     histroy.goBack()
   }, [histroy])
 
   const [scaning, setScaning] = useState(true)
-  const [errorType, setErrorType] = useState<ErrorType | null>(null)
+  const [errorType, setErrorType] = useState<ErrorType>(-1)
   const [appVersion, setAppVersion] = useState('')
   const [firmwareVersion, setFirmwareVersion] = useState('')
 
-  const findDevice = async () => {
+  const findDevice = useCallback(async () => {
+    setErrorType(-1)
     setScaning(true)
     const res = await getDevices(model)
-    if (isSuccessResponse(res)) {
-      const [device, ...rest] = res.result!
+    if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
+      const [device, ...rest] = res.result
       if (rest.length > 0) {
         setErrorType(ErrorType.MultiDevice)
         setScaning(false)
@@ -65,7 +66,7 @@ const DetectDevice = ({ match, history }: RouteComponentProps<Model>) => {
       setErrorType(ErrorType.DeviceNotFound)
     }
     setScaning(false)
-  }
+  }, [model])
 
   useEffect(() => {
     findDevice()
@@ -76,24 +77,39 @@ const DetectDevice = ({ match, history }: RouteComponentProps<Model>) => {
   }, [history, match.url])
 
   const errors = {
-    [ErrorType.CkbAppNotFound]: '',
-    [ErrorType.DeviceNotFound]: '',
-    [ErrorType.MultiDevice]: '',
+    [ErrorType.CkbAppNotFound]: t('import-hardware.errors.ckb-app-not-found'),
+    [ErrorType.DeviceNotFound]: t('import-hardware.errors.device-not-found'),
+    [ErrorType.MultiDevice]: t('import-hardware.errors.multi-device'),
   }
+
+  const errorMsg = errors[errorType]
+  const ready = errorMsg === undefined && appVersion !== ''
+  const productName = `${model.manufacturer} ${model.product}`
 
   return (
     <form onSubmit={onNext}>
-      <header className={styles.title}>Detecting device</header>
+      <header className={styles.title}>{t('import-hardware.title.detect-device')}</header>
       <section className={styles.main}>
-        <div className={styles.model}>{model}</div>
-        {errorType !== null && <span>{errors[errorType]}</span>}
-        {scaning && <span>waiting for ckb app...</span>}
-        {appVersion && <span>{t('import-hardware.app-version', { version: appVersion })}</span>}
-        {firmwareVersion && <span>{t('import-hardware.app-version', { version: firmwareVersion })}</span>}
+        <div className={styles.model}>{productName}</div>
+        {errorMsg ? (
+          <>
+            <span>{errors[errorType]}</span>
+            <span>{t('import-hardware.abort')}</span>
+          </>
+        ) : null}
+        {scaning ? <span>waiting for ckb app...</span> : null}
+        {firmwareVersion && !errorMsg && !scaning ? (
+          <span>{t('import-hardware.firmware-version', { version: firmwareVersion })}</span>
+        ) : null}
+        {appVersion ? <span>{t('import-hardware.app-version', { version: appVersion })}</span> : null}
       </section>
       <footer className={styles.footer}>
-        <Button type="cancel" label={t('s-udt.create-dialog.back')} onClick={onBack} />
-        <Button type="submit" label={t('s-udt.create-dialog.confirm')} onClick={onNext} />
+        <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
+        {errorMsg ? (
+          <Button type="ok" label={t('import-hardware.actions.rescan')} onClick={findDevice} />
+        ) : (
+          <Button type="submit" label={t('import-hardware.actions.next')} onClick={onNext} disabled={!ready} />
+        )}
       </footer>
     </form>
   )
@@ -133,15 +149,18 @@ const supportedHardwareModels = [
 
 const SelectModel = ({ match, history }: RouteComponentProps) => {
   const [t] = useTranslation()
-  const [model, setModel] = useState<Model>()
+  const [model, setModel] = useState<Model>(supportedHardwareModels[0] as any)
 
   const onBack = useCallback(() => {
     history.goBack()
   }, [history])
 
   const onNext = useCallback(() => {
-    history.push(match.url + RoutePath.DetectDevice, model)
-  }, [history, match.url])
+    history.push({
+      pathname: match.url + RoutePath.DetectDevice,
+      state: model,
+    })
+  }, [history, match.url, model])
 
   const onDropDownChange = useCallback((_, { data }) => {
     setModel(data)
@@ -149,13 +168,18 @@ const SelectModel = ({ match, history }: RouteComponentProps) => {
 
   return (
     <form onSubmit={onNext}>
-      <header className={styles.title}>Please connect your device and select the model</header>
+      <header className={styles.title}>{t('import-hardware.title.select-model')}</header>
       <section className={styles.main}>
-        <Dropdown onChanged={onDropDownChange} placeholder="Select Model" options={supportedHardwareModels} />
+        <Dropdown onChange={onDropDownChange} placeholder="Select Model" options={supportedHardwareModels} />
       </section>
       <footer className={styles.footer}>
-        <Button type="cancel" label={t('s-udt.create-dialog.back')} onClick={onBack} />
-        <Button type="submit" label={t('s-udt.create-dialog.confirm')} onClick={onNext} disabled={!!model} />
+        <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />
+        <Button
+          type="submit"
+          label={t('import-hardware.actions.next')}
+          onClick={onNext}
+          disabled={model === undefined}
+        />
       </footer>
     </form>
   )

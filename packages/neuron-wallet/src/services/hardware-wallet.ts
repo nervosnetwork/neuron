@@ -21,6 +21,10 @@ export default class HardwareWalletService {
   public async initHardware (device: DeviceInfo) {
     switch (device.manufacturer) {
       case Manufacturer.Ledger: {
+        if (this.device?.deviceInfo.descriptor === device.descriptor) {
+          await this.device.disconect()
+          return this.device!
+        }
         const hardware = new Ledger(device)
         this.device = hardware
         return hardware
@@ -36,7 +40,7 @@ export default class HardwareWalletService {
         Ledger.findDevices(),
         // add new brand `findDevices()` here
       ])
-      let result = devices.flat()
+      let result = devices.flat().filter(Boolean)
 
       if (device) {
         result = result.filter(r => r.manufacturer === device.manufacturer && r.product === device.product)

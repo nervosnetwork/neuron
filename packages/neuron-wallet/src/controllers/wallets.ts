@@ -2,7 +2,7 @@ import fs from 'fs'
 import { t } from 'i18next'
 import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
-import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet, HardwareWallet } from 'services/wallets'
+import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import NetworksService from 'services/networks'
 import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
@@ -28,7 +28,6 @@ import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
-import HardwareWalletService from 'services/hardware-wallet'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -195,32 +194,6 @@ export default class WalletsController {
     }
 
     return this.backupWallet(id)
-  }
-
-  public async importHardwareWallet() {
-    const [ device ] = await HardwareWalletService.findDevices()
-    const hardwareService = HardwareWalletService.getInstance()
-    const hardware = await hardwareService.initHardware(device)
-    if (!hardware) {
-      throw new Error(`Unsupported manufacturer: ${device.manufacturer}`)
-    }
-    await hardware.connect()
-    const { publicKey, chainCode } = await hardware.getExtendedPublicKey()
-    const accountExtendedPublicKey = new AccountExtendedPublicKey(publicKey, chainCode)
-    const walletsService = WalletsService.getInstance()
-    const wallet: HardwareWallet = walletsService.create({
-      device,
-      id: '',
-      name: device.manufacturer + device.product,
-      extendedKey: accountExtendedPublicKey.serialize(),
-    })
-
-    wallet.checkAndGenerateAddresses()
-
-    return {
-      status: ResponseCode.Success,
-      result: wallet
-    }
   }
 
   public async importXPubkey(): Promise<Controller.Response<Wallet>> {

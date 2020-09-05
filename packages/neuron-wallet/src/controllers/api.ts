@@ -57,12 +57,6 @@ export default class ApiController {
       })
     }
 
-    if (command === 'import-hardware-wallet') {
-      this.walletsController.importHardwareWallet().catch(error => {
-        dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
-      })
-    }
-
     if (command === 'delete-wallet' || command === 'backup-wallet') {
       // params: walletID
       this.walletsController.requestPassword(params, command)

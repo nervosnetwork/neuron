@@ -4,6 +4,11 @@
   @include dialog-container;
   padding: 30px 50px;
   min-height: 245px;
+  width: 600px;
+
+  span {
+    display: block;
+  }
 
   &::backdrop {
     @include overlay;

@@ -37,14 +37,21 @@
       },
       "actions": {
         "confirm": "Please comfirm on your device...",
-        "success": "Import Success!"
+        "success": "Import Success!",
+        "next": "Next",
+        "cancel": "Cancel",
+        "back": "Back",
+        "rescan": "Rescan",
+        "close": "close"
       },
       "errors": {
         "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
         "device-not-found": "No device detected. Please connect your device.",
         "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
       },
-      "app-version": "CKB app v{{version}} running.",
+      "waiting": "Waiting for CKB app...",
+      "abort": "Waiting for CKB app... Action aborted.",
+      "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected."
     },
     "overview": {
