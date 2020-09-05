@@ -45,6 +45,8 @@ export default class IndexerConnector {
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
+  private indexerQueryQueue: AsyncQueue<LumosCellQuery> | undefined
+
   private processingBlockNumber: string | undefined
   private indexerTip: Tip | undefined
   public pollingIndexer: boolean = false
@@ -75,6 +77,10 @@ export default class IndexerConnector {
     this.processNextBlockNumberQueue = queue(async () => this.processTxsInNextBlockNumber(), 1)
     this.processNextBlockNumberQueue.error((err: any) => {
       logger.error(err)
+    })
+
+    this.indexerQueryQueue = queue(async (query: any) => {
+      return await this.collectLiveCellsByScript(query)
     })
   }
 
@@ -113,6 +119,17 @@ export default class IndexerConnector {
   }
 
   public async getLiveCellsByScript(query: LumosCellQuery) {
+    return new Promise((resolve, reject) => {
+      this.indexerQueryQueue!.push(query, (err: any, result: unknown) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+
+  private async collectLiveCellsByScript(query: LumosCellQuery) {
     const { lock, type, data } = query
     if (!lock && !type) {
       throw new Error('at least one parameter is required')
