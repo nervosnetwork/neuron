@@ -1,8 +1,8 @@
-import logger from 'electron-log'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType } from '@ckb-lumos/base'
 import { Indexer, Tip, CellCollector } from '@ckb-lumos/indexer'
+import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -76,7 +76,7 @@ export default class IndexerConnector {
 
     this.processNextBlockNumberQueue = queue(async () => this.processTxsInNextBlockNumber(), 1)
     this.processNextBlockNumberQueue.error((err: any) => {
-      logger.error(err)
+      logger.error(`Error in processing next block number queue: ${err}`)
     })
 
     this.indexerQueryQueue = queue(async (query: any) => {
@@ -113,7 +113,7 @@ export default class IndexerConnector {
         await CommonUtils.sleep(5000)
       }
     } catch (error) {
-      logger.error(error)
+      logger.error(`Error connecting to Indexer: ${error.message}`)
       throw error
     }
   }
@@ -236,9 +236,9 @@ export default class IndexerConnector {
         throw new Error(`failed to fetch transaction for hash ${hash}`)
       }
       const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockNumber = blockHeader!.number
       txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
+      txWithStatus!.transaction.timestamp = blockHeader!.timestamp
       txsWithStatus.push(txWithStatus)
     }
 

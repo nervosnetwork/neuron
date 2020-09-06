@@ -78,7 +78,7 @@ describe('unit tests for IndexerConnector', () => {
       })
     )
   });
-  jest.doMock('electron-log', () => {
+  jest.doMock('utils/logger', () => {
     return {error: stubbedLoggerErrorFn}
   });
   jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
@@ -376,7 +376,7 @@ describe('unit tests for IndexerConnector', () => {
             await flushPromises()
           });
           it('throws error', async () => {
-            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(new Error('failed to fetch transaction for hash hash3'))
+            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith('Error in processing next block number queue: Error: failed to fetch transaction for hash hash3')
           });
         });
       });
