@@ -1,4 +1,5 @@
 import type { ChildProcess as ChildProcessInst } from 'child_process'
+import logger from './logger';
 
 interface WorkerMessage {
   type?: 'caller' | 'kill',
@@ -13,6 +14,23 @@ export type WorkerFunction = ((...args: any[]) => any) | (() => any);
 export type WorkerModule<Keys extends string> = {
     [key in Keys]: WorkerFunction;
 };
+
+let requestId = 0
+const requests: any = {}
+
+const executeRequestCallback = async (requestId: string, result: any = undefined) => {
+  const requestCallback = requests[requestId]
+  if (requestCallback) {
+    await requestCallback(result)
+    delete requests[requestId]
+  }
+}
+
+const drain = async () => {
+  for (const id of Object.keys(requests)) {
+    await executeRequestCallback(id)
+  }
+}
 
 /**
  * expose must be called in a child process, and
@@ -55,8 +73,6 @@ export function expose (obj: Record<string, Function>) {
 }
 
 export async function spawn<T>(worker: ChildProcessInst): Promise<T & WorkerInst> {
-  const requests: any = {}
-  let requestId = 0
 
   const channels: string[] = await new Promise(resolve => {
     worker.once('message', msg => {
@@ -67,16 +83,12 @@ export async function spawn<T>(worker: ChildProcessInst): Promise<T & WorkerInst
   })
 
   worker.on('message', msg => {
-    const responseCallback = requests[msg.id]
-    if (responseCallback) {
-      responseCallback(msg.result)
-      delete requests[msg.id]
-    }
+    executeRequestCallback(msg.id, msg.result)
   })
 
   const handlers = channels.reduce((handlers, channel) => {
     handlers[channel] = async (...args: any[]) => {
-      return await new Promise(resolve => {
+      return await new Promise((resolve, reject) => {
         const request = {
           type: 'caller',
           id: requestId++,
@@ -87,7 +99,12 @@ export async function spawn<T>(worker: ChildProcessInst): Promise<T & WorkerInst
         } as WorkerMessage
 
         requests[request.id] = resolve
-        worker.send(request)
+        worker.send(request, err => {
+          if (err) {
+            logger.error(`Error sending message to child process ${err}`)
+            reject(err)
+          }
+        })
       })
     }
     return handlers
@@ -109,6 +126,7 @@ export async function terminate<T extends WorkerInst> (workerInst: T) {
       resolve()
     })
   })
+  await drain()
   worker!.kill()
   return waitForClosing
 }
