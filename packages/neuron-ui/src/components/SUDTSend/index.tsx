@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useReducer, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useReducer, useMemo, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
@@ -98,6 +98,8 @@ const SUDTSend = () => {
     'accountId' | 'accountName' | 'tokenName' | 'balance' | 'tokenId' | 'decimal' | 'symbol'
   > | null>(null)
 
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
   const isMainnet = isMainnetUtil(networks, networkID)
   const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)}` : '0'
 
@@ -181,44 +183,56 @@ const SUDTSend = () => {
   const isSubmittable = isFormReady && experimental?.tx && !remoteError
 
   useEffect(() => {
+    const clearTimer = () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+    clearTimer()
+
     if (!accountInfo) {
-      return
+      return clearTimer
     }
     const amount = sudtAmountToValue(sendState.amount, accountInfo?.decimal)
     if (amount === undefined) {
-      return
+      return clearTimer
     }
     if (sendState.sendAll) {
       if (!sendState.address || errors.address) {
-        return
+        return clearTimer
       }
     } else if (
       [Fields.Address, Fields.Amount].some(key => !sendState[key as Fields.Address | Fields.Amount].trim()) ||
       Object.values(errors).some(v => v)
     ) {
-      return
-    }
-    const params = {
-      assetAccountID: accountInfo?.accountId,
-      walletID: walletId,
-      address: sendState.address,
-      amount,
-      feeRate: sendState.price,
-      description: sendState.description,
+      return clearTimer
     }
     globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: null })
-    const generator = sendState.sendAll ? generateSendAllSUDTTransaction : generateSUDTTransaction
-    generator(params)
-      .then(res => {
-        if (isSuccessResponse(res)) {
-          globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx: res.result } })
-          return
-        }
-        throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
-      })
-      .catch((err: Error) => {
-        setRemoteError(err.message)
-      })
+
+    const TIMER_DELAY = 300
+    timerRef.current = setTimeout(() => {
+      const params = {
+        assetAccountID: accountInfo?.accountId,
+        walletID: walletId,
+        address: sendState.address,
+        amount,
+        feeRate: sendState.price,
+        description: sendState.description,
+      }
+      const generator = sendState.sendAll ? generateSendAllSUDTTransaction : generateSUDTTransaction
+      generator(params)
+        .then(res => {
+          if (isSuccessResponse(res)) {
+            globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx: res.result } })
+            return
+          }
+          throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
+        })
+        .catch((err: Error) => {
+          setRemoteError(err.message)
+        })
+    }, TIMER_DELAY)
+    return clearTimer
     // eslint-disable-next-line
   }, [
     walletId,
@@ -231,6 +245,7 @@ const SUDTSend = () => {
     globalDispatch,
     setRemoteError,
     accountInfo,
+    timerRef,
   ])
 
   useEffect(() => {
