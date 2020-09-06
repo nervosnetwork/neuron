@@ -63,6 +63,26 @@ describe('utils/workers', () => {
       const res = await Worker.args(1, 2, 3)
       expect(res).toEqual([1, 2, 3])
     })
+
+    describe('handles concurrent requests', () => {
+      let results: any[] = []
+      beforeEach(async () => {
+        results = await Promise.all([
+          Worker.async(),
+          Worker.normal(),
+          Worker.doNothing(),
+          Worker.args(4, 5, 6),
+        ])
+      })
+      it('processes responses in correct order', () => {
+        expect(results).toEqual([
+          'async/await',
+          'normal',
+          undefined,
+          [4, 5, 6]
+        ])
+      })
+    });
   })
 
   describe('terminate', () => {
