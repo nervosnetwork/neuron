@@ -103,7 +103,6 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
         resetSyncTask()
         break
       default:
-        logger.debug(`Unhandled message event from child process: ${msg.channel}`)
         break
     }
   })

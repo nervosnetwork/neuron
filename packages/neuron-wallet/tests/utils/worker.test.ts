@@ -1,11 +1,33 @@
 import path from 'path'
-import { expose, spawn, terminate, subscribe } from '../../src/utils/worker'
 import { fork } from 'child_process'
+
+let expose: any, spawn: any, terminate: any, subscribe: any
 
 const noop = (..._: any) => undefined
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+const stubbedLoggerError = jest.fn()
+
+const resetMock = () => {
+  stubbedLoggerError.mockReset()
+}
+
 describe('utils/workers', () => {
+  beforeEach(() => {
+    resetMock()
+
+    jest.doMock('../../src/utils/logger', () => {
+      return {
+        error: stubbedLoggerError
+      }
+    })
+
+    expose = require('../../src/utils/worker').expose
+    spawn = require('../../src/utils/worker').spawn
+    terminate = require('../../src/utils/worker').terminate
+    subscribe = require('../../src/utils/worker').subscribe
+
+  });
   describe('expose', () => {
     let ChildProcessSendSpy: any
 
@@ -33,11 +55,10 @@ describe('utils/workers', () => {
 
   describe('spawn', () => {
     let Worker: any
-
+    let childProcess: any
     beforeAll(async () => {
-      Worker = await spawn(
-        fork(path.join(__dirname, 'fixtures', 'worker.js'))
-      )
+      childProcess = fork(path.join(__dirname, 'fixtures', 'worker.js'))
+      Worker = await spawn(childProcess)
     })
 
     afterAll(async () => {
@@ -83,26 +104,61 @@ describe('utils/workers', () => {
         ])
       })
     });
+    describe('childProcess#send throws error', () => {
+      let error: any
+      beforeEach(async () => {
+        jest.spyOn(childProcess, 'send').mockImplementation((_request, callback: any) => {
+          callback(new Error('err'))
+        })
+        try {
+          await Worker.normal()
+        } catch (err) {
+          error = err
+        }
+      });
+      it('rethrows error', () => {
+        expect(error).toEqual(new Error('err'))
+      })
+      it('logs error', async () => {
+        expect(stubbedLoggerError).toHaveBeenCalledWith('Error sending message to child process Error: err')
+      })
+    });
   })
 
   describe('terminate', () => {
-    let handlers: any
+    let Worker: any
 
     beforeEach(async () => {
-      handlers = await spawn(
+      Worker = await spawn(
         fork(path.join(__dirname, 'fixtures', 'worker.js'))
       )
     })
 
     it('terminate should close ipc connection', async () => {
-      await terminate(handlers)
-      expect(handlers?.$worker?.connected).toBe(false)
+      await terminate(Worker)
+      expect(Worker?.$worker?.connected).toBe(false)
     })
 
     it('terminate should kill the child process', async () => {
-      await terminate(handlers)
-      expect(handlers?.$worker?.killed).toBe(true)
+      await terminate(Worker)
+      expect(Worker?.$worker?.killed).toBe(true)
     })
+
+    describe('with requests in process', () => {
+      let requests: any
+      beforeEach(async () => {
+        requests = Promise.all([
+          Worker.async(),
+          Worker.async(),
+        ])
+        await terminate(Worker)
+      })
+      it('drains and hangs up requests with undefined response', async () => {
+        const results = await requests
+        expect(results).toEqual([undefined, undefined])
+      })
+    });
+
   })
 
   describe('subscribe', () => {

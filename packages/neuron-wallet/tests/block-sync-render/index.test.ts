@@ -414,15 +414,6 @@ describe('block sync render', () => {
             expect(stubbedSyncTaskStart).toHaveBeenCalledTimes(1)
           })
         });
-        describe('unhandled events from child process', () => {
-          beforeEach(async () => {
-            fakeSendMessageToMainProcess('fake', result)
-          });
-          it('logs the event name', ()=> {
-            expect(stubbedLoggerDebug).toHaveBeenCalledWith(expect.stringMatching(/.*event.*fake/i))
-          })
-        });
-
       })
       describe('with parallel calls', () => {
 
