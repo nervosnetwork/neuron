@@ -1,5 +1,5 @@
 import SyncedBlockNumber from 'models/synced-block-number'
-import { createBlockSyncTask, killBlockSyncTask } from 'block-sync-renderer'
+import { resetSyncTask } from 'block-sync-renderer'
 import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'
 
@@ -25,8 +25,8 @@ export default class SyncController {
   }
 
   private doClearTask = async (clearIndexerFolder: boolean) => {
-    await killBlockSyncTask()
+    await resetSyncTask(false)
     await ChainCleaner.clean()
-    await createBlockSyncTask(clearIndexerFolder)
+    await resetSyncTask(true, clearIndexerFolder)
   }
 }
