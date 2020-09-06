@@ -2,6 +2,7 @@ import type { ChildProcess as ChildProcessInst } from 'child_process'
 
 interface WorkerMessage {
   type?: 'caller' | 'kill',
+  id: number,
   result?: {
     channel?: string,
     args?: any[]
@@ -46,6 +47,7 @@ export function expose (obj: Record<string, Function>) {
 
     const result = await func.apply(null, msg?.result?.args ?? [])
     ChildProcess.send({
+      id: msg.id,
       type: `result_${channel}`,
       result
     })
@@ -53,30 +55,39 @@ export function expose (obj: Record<string, Function>) {
 }
 
 export async function spawn<T>(worker: ChildProcessInst): Promise<T & WorkerInst> {
-  const channels: string[] = await new Promise(resovle => {
+  const requests: any = {}
+  let requestId = 0
+
+  const channels: string[] = await new Promise(resolve => {
     worker.once('message', msg => {
-      if (msg?.channels) {
-        resovle(msg?.channels)
+      if (msg.channels) {
+        resolve(msg.channels)
       }
     })
   })
 
+  worker.on('message', msg => {
+    const responseCallback = requests[msg.id]
+    if (responseCallback) {
+      responseCallback(msg.result)
+      delete requests[msg.id]
+    }
+  })
+
   const handlers = channels.reduce((handlers, channel) => {
     handlers[channel] = async (...args: any[]) => {
-      return await new Promise(resovle => {
-        worker.once('message', msg => {
-          if (msg?.type === `result_${channel}`) {
-            resovle(msg?.result)
-          }
-        })
-
-        worker.send({
+      return await new Promise(resolve => {
+        const request = {
           type: 'caller',
+          id: requestId++,
           result: {
             channel,
             args
-          }
-        } as WorkerMessage)
+          },
+        } as WorkerMessage
+
+        requests[request.id] = resolve
+        worker.send(request)
       })
     }
     return handlers
@@ -93,14 +104,18 @@ interface WorkerInst {
 
 export async function terminate<T extends WorkerInst> (workerInst: T) {
   const worker = workerInst.$worker
-  worker?.send({ type: 'kill' })
-  worker?.disconnect()
-  worker?.kill('SIGINT')
+  const waitForClosing = new Promise(resolve => {
+    worker!.once('close', () => {
+      resolve()
+    })
+  })
+  worker!.kill()
+  return waitForClosing
 }
 
 export function subscribe<T extends WorkerInst>(workerInst: T, listener: (...args: any[]) => void) {
   const worker = workerInst.$worker
-  worker?.on('message', listener)
+  worker!.on('message', listener)
 }
 
 export class ChildProcess {
