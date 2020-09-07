@@ -1,7 +1,3 @@
-// Transaction description is stored in LevelDB separated from Sqlite3 data,
-// to keep persisted. Sqlite3 transaction table gets cleaned when user clears
-// cache or sync rebuilds txs.
-
 import { getConnection } from 'typeorm'
 import TxDescription from 'database/chain/entities/tx-description'
 
@@ -23,19 +19,18 @@ export const get = async (walletId: string, txHash: string) => {
   return ''
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const set = async (_walletID: string, _txHash: string, _description: string) => {
-  const entity = await getEntity(_walletID, _txHash)
+export const set = async (walletID: string, txHash: string, description: string) => {
+  const entity = await getEntity(walletID, txHash)
   if (entity) {
-    entity.description = _description
+    entity.description = description
     await getConnection().manager.save(entity)
     return
   }
 
   const txDesc = new TxDescription()
-  txDesc.walletId = _walletID
-  txDesc.txHash = _txHash
-  txDesc.description = _description
+  txDesc.walletId = walletID
+  txDesc.txHash = txHash
+  txDesc.description = description
 
   await getConnection().manager.save(txDesc)
 }
