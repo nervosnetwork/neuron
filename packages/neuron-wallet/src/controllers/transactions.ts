@@ -8,7 +8,7 @@ import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet } from 'exceptions'
 import Transaction from 'models/chain/transaction'
 
-import { set as setDescription, get as getDescription } from 'database/leveldb/transaction-description'
+import { set as setDescription, get as getDescription } from 'services/tx/transaction-description'
 import AddressParser from 'models/address-parser'
 
 export default class TransactionsController {
