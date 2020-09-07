@@ -1,4 +1,4 @@
-import { Hardware, DeviceInfo, HardwareResponse } from './index'
+import { Hardware, DeviceInfo, HardwareResponse, ExtendedPublicKey } from './index'
 // import { AccountExtendedPublicKey } from 'models/keys/key'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
@@ -49,11 +49,21 @@ export default class Ledger implements Hardware {
     this.isConnected = false
   }
 
-  public async getExtendedPublicKey () {
-    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(AccountExtendedPublicKey.ckbAccountPath)
-    return {
-      publicKey: public_key,
-      chainCode: chain_code
+  public async getExtendedPublicKey (): Promise<HardwareResponse<ExtendedPublicKey>> {
+    try {
+      const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(AccountExtendedPublicKey.ckbAccountPath)
+      return {
+        status: ResponseCode.Success,
+        result: {
+          publicKey: public_key,
+          chainCode: chain_code
+        }
+      }
+    } catch (error) {
+      return {
+        status: ResponseCode.Fail,
+        message: error
+      }
     }
   }
 

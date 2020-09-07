@@ -28,6 +28,8 @@ import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
+import HardwareWalletService from 'services/hardware-wallet'
+import { ExtendedPublicKey } from 'services/hardware'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -194,6 +196,28 @@ export default class WalletsController {
     }
 
     return this.backupWallet(id)
+  }
+
+  public async importHardwareWallet (
+    { publicKey, chainCode, walletName }: ExtendedPublicKey & { walletName: string }
+  ): Promise<Controller.Response<Wallet>> {
+    const device = HardwareWalletService.getInstance().getCurrent()!
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(publicKey, chainCode)
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.create({
+      device: device.deviceInfo,
+      id: '',
+      name: walletName,
+      extendedKey: accountExtendedPublicKey.serialize(),
+      keystore: Keystore.createEmpty(),
+    })
+
+    wallet.checkAndGenerateAddresses(true)
+
+    return {
+      status: ResponseCode.Success,
+      result: wallet
+    }
   }
 
   public async importXPubkey(): Promise<Controller.Response<Wallet>> {

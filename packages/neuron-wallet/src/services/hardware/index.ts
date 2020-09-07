@@ -4,7 +4,7 @@ import { ResponseCode } from 'utils/const'
 
 export interface Hardware {
   deviceInfo: DeviceInfo
-  getExtendedPublicKey: () => Promise<ExtendedPublicKey>
+  getExtendedPublicKey: () => Promise<HardwareResponse<ExtendedPublicKey>>
   connect: (hardwareInfo?: DeviceInfo) => Promise<void>
   disconect: () => Promise<void>
   signTransaction: (walletID: string, tx: Transaction) => Promise<Transaction>

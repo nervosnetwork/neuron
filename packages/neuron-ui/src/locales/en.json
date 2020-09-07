@@ -52,7 +52,8 @@
       "waiting": "Waiting for CKB app...",
       "abort": "Waiting for CKB app... Action aborted.",
       "app-version": "CKB App v{{version}} running.",
-      "firmware-version": "Firmware v{{version}} detected."
+      "firmware-version": "Firmware v{{version}} detected.",
+      "wallet-name": "Wallet Name"
     },
     "overview": {
       "date": "Date",

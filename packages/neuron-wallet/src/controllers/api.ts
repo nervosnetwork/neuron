@@ -26,7 +26,7 @@ import AssetAccountController from './asset-account'
 import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
-import { DeviceInfo } from 'services/hardware'
+import { DeviceInfo, ExtendedPublicKey } from 'services/hardware'
 import HardwareWalletService from 'services/hardware-wallet'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
@@ -452,6 +452,10 @@ export default class ApiController {
     handle('get-public-key', async () => {
       const device = HardwareWalletService.getInstance().getCurrent()!
       return await device.getExtendedPublicKey()
+    })
+
+    handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
+      return await this.walletsController.importHardwareWallet(params)
     })
   }
 

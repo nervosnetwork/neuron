@@ -106,6 +106,7 @@ type Action =
   | 'get-firmware-version'
   | 'get-public-key'
   | 'connect-device'
+  | 'create-hardware-wallet'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

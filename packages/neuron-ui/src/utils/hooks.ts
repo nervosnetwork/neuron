@@ -411,3 +411,7 @@ export const useGlobalNotifications = (
     }
   }, [dispatch])
 }
+
+export const useDidMount = (cb: () => void) => {
+  useEffect(cb, [])
+}
