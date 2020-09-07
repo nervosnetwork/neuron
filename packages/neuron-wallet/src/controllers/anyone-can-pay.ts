@@ -4,7 +4,7 @@ import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
 import AnyoneCanPayService from "services/anyone-can-pay"
 import TransactionSender from "services/transaction-sender"
-import { set as setDescription } from 'database/leveldb/transaction-description'
+import { set as setDescription } from 'services/tx/transaction-description'
 
 export interface GenerateAnyoneCanPayTxParams {
   walletID: string

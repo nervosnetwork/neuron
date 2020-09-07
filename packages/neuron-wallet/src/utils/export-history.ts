@@ -6,7 +6,7 @@ import AddressService from 'services/addresses'
 import { ChainType } from 'models/network'
 import Transaction from 'models/chain/transaction'
 import toCSVRow from 'utils/to-csv-row'
-import { get as getDescription } from 'database/leveldb/transaction-description'
+import { get as getDescription } from 'services/tx/transaction-description'
 
 const exportHistory = async ({
   walletID,

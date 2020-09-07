@@ -27,7 +27,7 @@ import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/addre
 import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
-import { set as setDescription } from 'database/leveldb/transaction-description'
+import { set as setDescription } from 'services/tx/transaction-description'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
