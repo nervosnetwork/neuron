@@ -26,7 +26,7 @@ export default class AssetAccountService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
-        status: In([OutputStatus.Live]),
+        status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
         typeHash,
       })
@@ -59,7 +59,7 @@ export default class AssetAccountService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
-        status: In([OutputStatus.Live]),
+        status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
         typeHash,
       })
