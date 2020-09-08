@@ -68,6 +68,8 @@ export default class Ledger implements Hardware {
   }
 
   public async signTransaction (_: string, tx: Transaction) {
+    // eslint-disable-next-line no-debugger
+    debugger
     const { ckb } = NodeService.getInstance()
     const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
     rawTx.witnesses = rawTx.inputs.map(() => '0x')
