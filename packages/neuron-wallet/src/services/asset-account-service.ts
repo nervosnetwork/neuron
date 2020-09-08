@@ -1,4 +1,4 @@
-import { getConnection } from "typeorm"
+import { getConnection, In } from "typeorm"
 import BufferUtils from "utils/buffer"
 import OutputEntity from "database/chain/entities/output"
 import Transaction, { TransactionStatus } from "models/chain/transaction"
@@ -14,11 +14,65 @@ import { TransactionGenerator } from "./tx"
 import AddressService from "./addresses"
 
 export default class AssetAccountService {
-  public static async getAll(walletId: string): Promise<AssetAccount[]> {
+
+  private static async getACPCells (publicKeyHash: string, tokenId: string = 'CKBytes') {
     const assetAccountInfo = new AssetAccountInfo()
-    const sudtCodeHash = assetAccountInfo.infos.sudt.codeHash
-    const sudtHashType = assetAccountInfo.infos.sudt.hashType
-    const generateSumAmountMapKey = (blake160: string, tokenID: string) => blake160 + ":" + tokenID
+    const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
+    let typeHash = null
+    if (tokenId !== 'CKBytes') {
+      typeHash = assetAccountInfo.generateSudtScript(tokenId).computeHash()
+    }
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        status: In([OutputStatus.Live]),
+        lockHash: anyoneCanPayLockHash,
+        typeHash,
+      })
+      .getMany()
+
+    return outputs
+  }
+
+  private static async calculateAvailableCKBBalance (publicKeyHash: string) {
+    const outputs = await this.getACPCells(publicKeyHash)
+
+    const totalBalance = outputs
+      .filter(output => {
+        return output.data === '0x'
+      })
+      .reduce((sum, output) => {
+      return sum + BigInt(output.capacity)
+    }, BigInt(0))
+    const reservedBalance = BigInt(MIN_CELL_CAPACITY)
+    const availableBalance = totalBalance - reservedBalance
+
+    return availableBalance >= 0 ? availableBalance.toString() : BigInt(0)
+  }
+
+  private static async calculateUDTAccountBalance (publicKeyHash: string, tokenId: string) {
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
+    const typeHash = assetAccountInfo.generateSudtScript(tokenId).computeHash()
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        status: In([OutputStatus.Live]),
+        lockHash: anyoneCanPayLockHash,
+        typeHash,
+      })
+      .getMany()
+
+    const totalBalance = outputs.reduce((sum, output) => {
+      return sum + BigInt(BufferUtils.parseAmountFromSUDTData(output.data.trim()))
+    }, BigInt(0))
+
+    return totalBalance
+  }
+
+  public static async getAll(walletId: string): Promise<AssetAccount[]> {
     const determineTokenID = (account: AssetAccountEntity) => account.tokenID.startsWith('0x') ? account.tokenID : 'CKBytes'
 
     const assetAccountEntities = await getConnection()
@@ -35,87 +89,36 @@ export default class AssetAccountService {
       )
       .getMany()
 
-    // calculate balances
-    // anyone-can-pay & sudt
-    // balance = live + sent
-    const outputs = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .select(`output.lockArgs`, 'lockArgs')
-      .addSelect(`output.typeArgs`, 'typeArgs')
-      .addSelect(`output.status`, 'status')
-      .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
-      .addSelect(`group_concat(output.data)`, 'dataArray')
-      .where(`
-        output.status IN (:...status) AND
-        output.lockArgs in (SELECT publicKeyInBlake160 FROM hd_public_key_info WHERE walletId = :walletId) AND
-        output.lockCodeHash = :lockCodeHash AND
-        (output.typeCodeHash IS NULL OR output.typeCodeHash = :typeCodeHash) AND
-        (output.typeHashType IS NULL OR output.typeHashType = :typeHashType)`,
-        {
-          status: [OutputStatus.Live, OutputStatus.Sent],
-          walletId: walletId,
-          lockCodeHash: assetAccountInfo.anyoneCanPayCodeHash,
-          typeCodeHash: sudtCodeHash,
-          typeHashType: sudtHashType,
-        }
-      )
-      .groupBy('output.lockArgs')
-      .addGroupBy('output.typeArgs')
-      .addGroupBy('output.status')
-      .getRawMany()
-
-    // key: blake160:tokenID(typeArgs | CKBytes)
-    // value: total balance
-    const totalBalanceMap = new Map<string, bigint>()
-    const totalCKBAmountMap = new Map<string, bigint>()
-    outputs.forEach(output => {
-      const blake160 = output.lockArgs
-      const tokenID = output.typeArgs || 'CKBytes'
-      const isCKB = !output.typeArgs
-      const key = generateSumAmountMapKey(blake160, tokenID)
-
-      const lastCKBAmount = totalCKBAmountMap.get(key) || BigInt(0)
-      totalCKBAmountMap.set(key, lastCKBAmount + BigInt(output.sumOfCapacity))
-
-      const lastBalance = totalBalanceMap.get(key) || BigInt(0)
-
-      if (isCKB) {
-        totalBalanceMap.set(key, lastBalance + BigInt(output.sumOfCapacity))
-      } else {
-        const sumOfAmount = (output.dataArray as string)
-          .split(',')
-          .map(data => BufferUtils.parseAmountFromSUDTData(data.trim()))
-          .reduce((result, c) => result + c, BigInt(0))
-        totalBalanceMap.set(key, lastBalance + sumOfAmount)
-      }
-    })
-
-    const assetAccounts = assetAccountEntities
-      .filter(aa => {
-        const tokenID = determineTokenID(aa)
-        const key = generateSumAmountMapKey(aa.blake160, tokenID)
-        return totalCKBAmountMap.get(key)
-      })
-      .map(aa => {
+    const assetAccounts = await Promise.all(assetAccountEntities
+      .map(async aa => {
         const model = aa.toModel()
         const tokenID = determineTokenID(aa)
-        const key = generateSumAmountMapKey(aa.blake160, tokenID)
-        const totalBalance = totalBalanceMap.get(key) || BigInt(0)
+
+        const cells = await this.getACPCells(aa.blake160, tokenID)
+        if (!cells.length) {
+          return
+        }
 
         if (tokenID === 'CKBytes') {
-          const reservedBalance = BigInt(MIN_CELL_CAPACITY)
-          const availableBalance = totalBalance - reservedBalance
-          model.balance = availableBalance >= 0 ? availableBalance.toString() : '0'
+          const bigIntAmount = await this.calculateAvailableCKBBalance(aa.blake160)
+          model.balance = bigIntAmount.toString()
         }
         else {
-          model.balance = totalBalance.toString()
+          const bigIntAmount = await this.calculateUDTAccountBalance(aa.blake160, aa.tokenID)
+          model.balance = bigIntAmount.toString()
         }
 
         return model
       })
+    )
 
-    return assetAccounts
+    const validAccounts: AssetAccount[] = []
+    assetAccounts.forEach(aa => {
+      if (aa) {
+        validAccounts.push(aa)
+      }
+    })
+    return validAccounts
   }
 
   public static async getAccount(params: { walletID: string, id: number }): Promise<AssetAccount | undefined> {
@@ -133,42 +136,13 @@ export default class AssetAccountService {
 
     const isCKB = !assetAccount.tokenID.startsWith('0x')
 
-    const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()
-    const typeHash = isCKB ? null : assetAccountInfo.generateSudtScript(assetAccount.tokenID).computeHash()
-
-    // calculate balances
-    // anyone-can-pay & sudt
-    const output = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .select(`output.lockArgs`, 'lockArgs')
-      .addSelect(`output.typeArgs`, 'typeArgs')
-      .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
-      .addSelect(`group_concat(output.data)`, 'dataArray')
-      .where({
-        status: OutputStatus.Live,
-        lockHash: anyoneCanPayLockHash,
-        typeHash,
-      })
-      .groupBy('output.lockArgs')
-      .addGroupBy('output.typeArgs')
-      .getRawOne()
-
-    const totalBalance = isCKB ?
-      BigInt(output.sumOfCapacity) :
-      (output.dataArray as string)
-        .split(',')
-        .map(data => BufferUtils.parseAmountFromSUDTData(data.trim()))
-        .reduce((result, c) => result + c, BigInt(0))
-
     if (isCKB) {
-      const reservedBalance = BigInt(MIN_CELL_CAPACITY)
-      const availableBalance = totalBalance - reservedBalance
-      assetAccount.balance = availableBalance >= 0 ? availableBalance.toString() : '0'
+      const bitIntAmount = await this.calculateAvailableCKBBalance(assetAccount.blake160)
+      assetAccount.balance = bitIntAmount.toString()
     }
     else {
-      assetAccount.balance = totalBalance.toString()
+      const bigIntAmount = await this.calculateUDTAccountBalance(assetAccount.blake160, assetAccount.tokenID)
+      assetAccount.balance = bigIntAmount.toString()
     }
 
     return assetAccount

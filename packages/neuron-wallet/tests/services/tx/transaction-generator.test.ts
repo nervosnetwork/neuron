@@ -908,7 +908,8 @@ describe('TransactionGenerator', () => {
       capacity: string,
       amount: string | undefined = undefined,
       tokenID: string | undefined = undefined,
-      lockScript: Script = bobAnyoneCanPayLockScript
+      lockScript: Script = bobAnyoneCanPayLockScript,
+      customData: string = '0x'
     ) => {
       const liveCell = {
         block_hash: randomHex(),
@@ -936,6 +937,10 @@ describe('TransactionGenerator', () => {
         }
       }
       liveCell.data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'
+
+      if (customData !== '0x') {
+        liveCell.data = customData
+      }
 
       return liveCell
     }
@@ -1149,6 +1154,49 @@ describe('TransactionGenerator', () => {
         })
       });
 
+      describe('with some of ACP cells having data', () => {
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: bobAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+        let tx: Transaction
+
+        const customData = '0x000000'
+        const cellsByAlice = [
+          generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript, customData),
+          generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        const cellsByBob = [
+          generateLiveCell(toShannon('61'), undefined, undefined, bobAnyoneCanPayLockScript),
+        ]
+        beforeEach(async () => {
+          when(stubbedIndexerService.getLiveCellsByScript)
+            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue(cellsByAlice)
+            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue(cellsByBob)
+
+            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+              walletId1,
+              [aliceAnyoneCanPayLockScript],
+              targetOutput,
+              (1 * 10**8).toString(),
+              bob.lockScript.args,
+              feeRate,
+              '0'
+            )
+
+            tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+            tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+        });
+        it('should not use insufficient ACP cell as input', async () => {
+          expect(tx.inputs.length).toEqual(3)
+          expect(tx.outputs.length).toEqual(3)
+
+          expect(tx.outputs.find(o => o.data === customData)).toEqual(undefined)
+        })
+      });
+
       describe('when the total capacity of ACP cells is insufficient for the transfer amount', () => {
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1192,31 +1240,79 @@ describe('TransactionGenerator', () => {
           data: '0x',
         })
         let tx: Transaction
-        beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
-            ])
-          tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-            walletId1,
-            [bobAnyoneCanPayLockScript],
-            targetOutput,
-            'all',
-            bob.lockScript.args,
-            feeRate,
-            '0'
-          )
-        });
+        describe('with all ACP cells without data', () => {
+          beforeEach(async () => {
+            when(stubbedIndexerService.getLiveCellsByScript)
+              .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
+              ])
+              .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+              ])
+            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+              walletId1,
+              [bobAnyoneCanPayLockScript],
+              targetOutput,
+              'all',
+              bob.lockScript.args,
+              feeRate,
+              '0'
+            )
+          });
 
-        it('capacity remains the minimum 61', () => {
-          const changeOutput = tx.outputs.filter(
-            output => output.lock.computeHash() === bobAnyoneCanPayLockScript.computeHash()
-          )[0]
-          expect(changeOutput.capacity).toEqual(toShannon('61'))
-        })
+          it('transfers all capacities and has minimum 61 CKB left', () => {
+            expect(tx.outputs.length).toEqual(2)
+
+            const changeOutput = tx.outputs.find(
+              output => output.lock.computeHash() === bobAnyoneCanPayLockScript.computeHash()
+            )
+            expect(changeOutput!.capacity).toEqual(toShannon('61'))
+
+            const aliceOutput = tx.outputs.find(
+              output => output.lock.computeHash() === aliceAnyoneCanPayLockScript.computeHash()
+            )
+
+            expect(aliceOutput!.capacity).toEqual(
+              (
+                BigInt(targetOutput.capacity) +
+                BigInt(toShannon('70')) +
+                (BigInt(toShannon('70')) - BigInt(changeOutput!.capacity)) -
+                BigInt(tx.fee)).toString()
+            )
+          })
+        });
+        describe('with some of ACP cells having data', () => {
+          beforeEach(async () => {
+            when(stubbedIndexerService.getLiveCellsByScript)
+              .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript, '0x00'),
+              ])
+              .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+              ])
+            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+              walletId1,
+              [bobAnyoneCanPayLockScript],
+              targetOutput,
+              'all',
+              bob.lockScript.args,
+              feeRate,
+              '0'
+            )
+          });
+
+          it('should not use ACP cell input with data', () => {
+            expect(tx.inputs.length).toEqual(2)
+
+            const aliceOutputs = tx.outputs.filter(
+              output => output.lock!.computeHash() === bobAnyoneCanPayLockScript.computeHash()
+            )
+            expect(aliceOutputs.length).toEqual(1)
+            expect(aliceOutputs[0].data).toEqual('0x')
+          })
+        });
       });
     })
 
