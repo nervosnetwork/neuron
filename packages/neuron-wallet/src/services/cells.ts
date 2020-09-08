@@ -506,7 +506,8 @@ export default class CellsService {
 
     // only live cells, skip which has data or type
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const allAnyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const anyoneCanPayLockLiveCells = allAnyoneCanPayLockLiveCells.filter(cell => cell.data === '0x')
 
     const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
     const capacityInt = capacity === 'all' ? (allCapacity - BigInt(anyoneCanPayLockLiveCells.length) * BigInt(61 * 10**8)) : BigInt(capacity)
@@ -623,7 +624,8 @@ export default class CellsService {
 
     // only live cells, skip which has data or type
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const allAnyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const anyoneCanPayLockLiveCells = allAnyoneCanPayLockLiveCells.filter(cell => cell.data === '0x')
 
     if (anyoneCanPayLockLiveCells.length === 0) {
       throw new CapacityNotEnough()
