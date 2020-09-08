@@ -45,18 +45,6 @@ $confirming-color: #b3b3b3;
   font-weight: 600;
 }
 
-.balanceValue {
-  font-weight: 500;
-  max-width: 60%;
-  padding: 0 5px 0 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  &:after {
-    content: ' CKB';
-  }
-}
-
 .recentActivities {
   grid-area: activities;
   padding: 0px 11px 16px;
