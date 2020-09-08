@@ -55,6 +55,16 @@
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name"
     },
+    "hardware-sign": {
+      "cancel": "Cancel",
+      "title": "Sign via hardware walllet",
+      "device": "Device:",
+      "status": {
+        "label": "Status:",
+        "connect": "Connected, waiting for user input...",
+        "disconnect": "Disconnected, please check your connection."
+      }
+    },
     "overview": {
       "date": "Date",
       "type": "Type",

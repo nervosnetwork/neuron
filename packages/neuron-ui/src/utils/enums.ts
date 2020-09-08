@@ -94,6 +94,8 @@ export enum ErrorCode {
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
+  // hardware
+  SignFailed = 400,
 }
 
 export enum SyncStatus {

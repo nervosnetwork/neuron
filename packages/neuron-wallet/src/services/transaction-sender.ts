@@ -64,7 +64,13 @@ export default class TransactionSender {
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
     if (wallet.isHardware()) {
-      const device = HardwareWalletService.getInstance().getCurrent()!
+      let device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const wallet = WalletsService.getInstance().getCurrent()
+        const deviceInfo = wallet!.getDeviceInfo()
+        device = (await HardwareWalletService.getInstance().initHardware(deviceInfo))!
+        await device!.connect()
+      }
       return await device.signTransaction(walletID, tx)
     }
 

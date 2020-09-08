@@ -1,0 +1,56 @@
+@import '../../styles/mixin.scss';
+
+.dialog {
+  @include dialog-container;
+  padding: 30px 50px;
+  min-height: 225px;
+  width: 600px;;
+
+  .container {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+
+    .main {
+      flex: 1;
+      tr {
+        td {
+          font-size: 14px;
+        }
+        .first {
+          padding-right: 30px;
+        }
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+        position: relative;
+        top: 2px;
+      }
+    }
+  }
+
+  &::backdrop {
+    @include overlay;
+  }
+
+  .footer {
+    @include dialog-footer;
+    flex-shrink: 0;
+  }
+}
+
+.warning {
+  color: #d03a3a;
+}
+
+.title {
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+  font-weight: bold;
+  letter-spacing: 0.9px;
+  margin: 0;
+  margin-bottom: 26px;
+}

@@ -92,10 +92,13 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => asy
         type: AppActions.DismissPasswordRequest,
       })
     }
-    return res.status
+    return res
   } catch (err) {
     console.warn(err)
-    return ResponseCode.FAILURE
+    return {
+      status: ResponseCode.FAILURE,
+      message: err,
+    }
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,

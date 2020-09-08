@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
+import HardwareSign from 'components/HardwareSign'
 import { useDialog, ErrorCode, RoutePath, isSuccessResponse } from 'utils'
 
 import {
@@ -69,7 +70,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
@@ -98,7 +99,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, password })(dispatch).then(status => {
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 dispatch({
                   type: AppActions.SetGlobalDialog,
@@ -117,7 +118,7 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendCreateSUDTAccountTransaction(params)(dispatch).then(status => {
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
@@ -133,7 +134,7 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendSUDTTransaction(params)(dispatch).then(status => {
+            await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
@@ -179,6 +180,10 @@ const PasswordRequest = () => {
 
   if (!wallet) {
     return null
+  }
+
+  if (wallet.device) {
+    return <HardwareSign />
   }
 
   return (
