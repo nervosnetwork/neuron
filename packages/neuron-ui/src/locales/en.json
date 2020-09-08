@@ -554,6 +554,14 @@
       "no-special-assets": "No customized assets",
       "experimental": "Experimental"
     },
+    "customized-asset": {
+      "actions": {
+        "unlock": "Unlock",
+        "mint": "Mint",
+        "burn": "Burn"
+      },
+      "view-in-explorer": "Explorer"
+    },
     "s-udt": {
       "account-list": {
         "title": "Asset Accounts",
