@@ -554,11 +554,16 @@
       "no-special-assets": "没有自定义资产",
       "experimental": "实验室"
     },
+    "customized-asset-list": {
+      "no-customized-assets": "没有自定义资产"
+    },
     "customized-asset": {
+      "setupInfo": "设置信息",
       "actions": {
         "unlock": "解锁",
         "mint": "铸币",
-        "burn": "销币"
+        "burn": "销币",
+        "unknown": "未识别资产"
       },
       "view-in-explorer": "浏览器"
     },

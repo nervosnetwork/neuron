@@ -554,11 +554,16 @@
       "no-special-assets": "No customized assets",
       "experimental": "Experimental"
     },
+    "customized-asset-list": {
+      "no-customized-assets": "No customized assets"
+    },
     "customized-asset": {
+      "setupInfo": "Setup Info",
       "actions": {
         "unlock": "Unlock",
         "mint": "Mint",
-        "burn": "Burn"
+        "burn": "Burn",
+        "unknown": "Unknown"
       },
       "view-in-explorer": "Explorer"
     },

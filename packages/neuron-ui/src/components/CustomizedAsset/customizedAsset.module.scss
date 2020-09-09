@@ -1,14 +1,15 @@
 @import '../../styles/mixin.scss';
-$column-gap: 15px;
+$column-gap: 10px;
 
 .container {
   display: grid;
   grid-template:
     'token-name type time amount actions explorer' 50px /
-    minmax(100px, 200px) 50px 100px auto auto 24px;
+    90px 40px 80px 1fr 170px 34px;
   border-bottom: 1px solid #ccc;
   align-items: center;
   gap: $column-gap;
+  font-size: 0.75rem;
 
   .tokenName {
     grid-area: token-name;
@@ -18,10 +19,25 @@ $column-gap: 15px;
     span {
       @include text-overflow-ellipsis;
     }
+    .setup {
+      display: flex;
+      appearance: none;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+      color: #666;
+      text-decoration: underline;
+      letter-spacing: normal;
+    }
   }
 
   .type {
     grid-area: type;
+    svg {
+      width: 19px;
+      height: 19px;
+    }
   }
   .amount {
     @include text-overflow-ellipsis;
@@ -39,6 +55,7 @@ $column-gap: 15px;
     gap: 5px;
     button {
       text-transform: capitalize;
+      padding: 4px 7px;
     }
   }
 
@@ -49,7 +66,7 @@ $column-gap: 15px;
     align-items: center;
     justify-content: center;
     border: none;
-    padding: 3px;
+    padding-left: 20px;
     background: transparent;
     padding-right: $column-gap;
 

@@ -554,11 +554,16 @@
       "no-special-assets": "沒有自定義資產",
       "experimental": "實驗室"
     },
+    "customized-asset-list": {
+      "no-customized-assets": "沒有自定義資產"
+    },
     "customized-asset": {
+      "setupInfo": "設置信息",
       "actions": {
         "unlock": "解鎖",
         "mint": "鑄幣",
-        "burn": "銷幣"
+        "burn": "銷幣",
+        "unknown": "未識別資產"
       },
       "view-in-explorer": "瀏覽器"
     },

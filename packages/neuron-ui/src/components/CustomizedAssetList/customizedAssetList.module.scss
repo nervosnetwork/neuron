@@ -1,0 +1,88 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  min-height: calc(100vh - 2 * var(--main-content-vertical-padding));
+
+  .tools {
+    display: grid;
+    grid-template:
+      'search-input search-button add-button' auto/
+      1fr auto auto;
+
+    .searchBox {
+      grid-area: search-input;
+      border-radius: 0;
+      font-size: 1rem;
+      border: 1px solid rgb(204, 204, 204);
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+      button:hover {
+        background: rgb(220, 220, 220);
+      }
+    }
+
+    .searchBtn {
+      grid-area: search-button;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: unset;
+      height: 1.625rem;
+      padding: 0 15px;
+      background-color: rgb(204, 204, 204);
+      color: rgb(97, 97, 97);
+      border-radius: 2px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border: none;
+    }
+
+    .add {
+      grid-area: add-button;
+      position: relative;
+      border-radius: 2px;
+      box-sizing: border-box;
+      width: 26px;
+      height: 26px;
+      margin: 0 0 0 10px;
+      background-color: var(--nervos-green);
+      &:before,
+      &:after {
+        display: block;
+        content: '';
+        height: 2px;
+        width: 16px;
+        background-color: #fff;
+        position: absolute;
+        top: 50%;
+        left: 5px;
+        transform: translateY(-50%);
+        border-radius: 1px;
+      }
+      &:after {
+        transform: translateY(-50%) rotate(90deg);
+      }
+    }
+  }
+
+  .pagination {
+    margin-top: 12px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    div[class^='visibleItemLabel'] {
+      font-size: 0.75rem;
+    }
+    button {
+      transform: scale(0.75);
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+}
+
+.noItems {
+  @include medium-text;
+  padding: 20px 13px;
+}
