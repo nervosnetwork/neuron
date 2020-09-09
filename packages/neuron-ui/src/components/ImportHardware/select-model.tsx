@@ -2,30 +2,30 @@ import React, { useCallback, useState } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import Dropdown from 'widgets/Dropdown'
+import Select from 'widgets/Select'
 import styles from './findDevice.module.scss'
 import { LocationState, Model, RoutePath } from './common'
 
 const supportedHardwareModels = [
   {
-    text: 'Ledger Nano S',
-    key: '0',
+    label: 'Ledger Nano S',
+    value: 'Ledger Nano S',
     data: {
       manufacturer: 'Ledger',
       product: 'Nano S',
     },
   },
   {
-    text: 'Ledger Nano X',
-    key: '1',
+    label: 'Ledger Nano X',
+    value: 'Ledger Nano X',
     data: {
       manufacturer: 'Ledger',
       product: 'Nano X',
     },
   },
   {
-    text: 'Ledger Blue',
-    key: '2',
+    label: 'Ledger Blue',
+    value: 'Ledger Blue',
     data: {
       manufacturer: 'Ledger',
       product: 'Blue',
@@ -51,7 +51,7 @@ const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationSta
     })
   }, [history, match.url, model])
 
-  const onDropDownChange = useCallback((_, { data }) => {
+  const onDropDownChange = useCallback(({ data }) => {
     setModel(data)
   }, [])
 
@@ -59,7 +59,11 @@ const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationSta
     <form onSubmit={onNext} className={styles.container}>
       <header className={styles.title}>{t('import-hardware.title.select-model')}</header>
       <section className={styles.main}>
-        <Dropdown onChange={onDropDownChange} placeholder="Select Model" options={supportedHardwareModels} />
+        <Select
+          onChange={onDropDownChange}
+          placeholder={t('import-hardware.select-model')}
+          options={supportedHardwareModels}
+        />
       </section>
       <footer className={styles.footer}>
         <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />

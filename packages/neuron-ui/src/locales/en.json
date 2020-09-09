@@ -53,7 +53,8 @@
       "abort": "Waiting for CKB app... Action aborted.",
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
-      "wallet-name": "Wallet Name"
+      "wallet-name": "Wallet Name",
+      "select-model": "Select Model"
     },
     "hardware-sign": {
       "cancel": "Cancel",

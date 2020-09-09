@@ -8,7 +8,7 @@ import WalletEditor from 'components/WalletEditor'
 import WalletWizard from 'components/WalletWizard'
 import ImportKeystore from 'components/ImportKeystore'
 import PasswordRequest from 'components/PasswordRequest'
-import ImportHardware from 'components/ImportWallet'
+import ImportHardware from 'components/ImportHardware'
 
 import { useDispatch, NeuronWalletActions, AppActions } from 'states'
 
