@@ -1,43 +1,50 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow } from 'electron'
 import path from 'path'
+import { fork } from 'child_process'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import { AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
+import env from 'env'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
 import SyncedBlockNumberSubject from 'models/subjects/node'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
+import WalletService from 'services/wallets'
 import logger from 'utils/logger'
-import CommonUtils from 'utils/common'
-import AssetAccountInfo from 'models/asset-account-info'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import IndexerFolderManager from './sync/indexer-folder-manager'
+import { spawn, terminate, subscribe as subscribeToWorkerProcess } from 'utils/worker'
+import SyncApiController from 'controllers/sync-api'
+import type { SyncTask } from './task'
+import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
+import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
+import { queue } from 'async'
 
-let backgroundWindow: BrowserWindow | null
+let syncTask: SyncTask | null
 let network: Network | null
-let indexerQueryId: number = 0
 
-const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
-  const addrs = AddressService.allAddresses()
-  const addresses = addrs.map(addr => addr.address)
-  const assetAccountInfo = new AssetAccountInfo(genesisBlockHash)
-  const anyoneCanPayLockHashes = addrs.map(a => assetAccountInfo.generateAnyoneCanPayScript(a.blake160).computeHash())
-  await AddressService.updateTxCountAndBalances(addresses)
-  const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-  await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
+const resetSyncTaskQueue = queue(async ({startTask, clearIndexerFolder}) => {
+  await killBlockSyncTask()
+  if (startTask) {
+    await createBlockSyncTask(clearIndexerFolder)
+  }
+}, 1)
+
+resetSyncTaskQueue.error(err => {
+  logger.error(err)
+})
+
+export const resetSyncTask = async (startTask: boolean = true, clearIndexerFolder: boolean = false) => {
+  if (resetSyncTaskQueue.length() === 0) {
+    resetSyncTaskQueue.push({startTask, clearIndexerFolder})
+    await resetSyncTaskQueue.drain()
+  }
 }
 
 if (BrowserWindow) {
-  AddressCreatedSubject.getSubject().subscribe(async () => {
-    killBlockSyncTask()
-    await createBlockSyncTask()
-  })
-  WalletDeletedSubject.getSubject().subscribe(async () => {
-    killBlockSyncTask()
-    await createBlockSyncTask()
-  })
+  AddressCreatedSubject.getSubject().subscribe(() => resetSyncTask())
+  WalletDeletedSubject.getSubject().subscribe(() => resetSyncTask())
 }
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
@@ -45,7 +52,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   network = newNetwork
 
   if (previousNetwork && !reconnected) {
-    if (previousNetwork.id === newNetwork.id || previousNetwork.genesisHash === newNetwork.genesisHash) {
+    if (previousNetwork.id === newNetwork.id) {
       // There's no actual change. No need to reconnect.
       return
     }
@@ -57,90 +64,89 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
     logger.info('Network:\tswitched to:', network)
   }
 
-  killBlockSyncTask()
-  if (shouldSync) {
-    await createBlockSyncTask()
-  } else {
-    SyncedBlockNumberSubject.getSubject().next('-1')
-  }
+  await resetSyncTask(shouldSync)
 }
 
-export const createBlockSyncTask = async (clearIndexerFolder = false) => {
-  await CommonUtils.sleep(2000) // Do not start too fast
-
+export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
   if (clearIndexerFolder) {
     await new SyncedBlockNumber().setNextBlock(BigInt(0))
     IndexerFolderManager.resetIndexerData()
   }
 
-  if (backgroundWindow) {
-    return
-  }
-
   logger.info('Sync:\tstarting background process')
-  backgroundWindow = new BrowserWindow({
-    width: 1366,
-    height: 768,
-    show: false,
-    webPreferences: {
-      nodeIntegration: false,
-      preload: path.join(__dirname, './preload.js')
+
+  // prevents the sync task from being started repeatedly if fork does not finish executing.
+  const childProcess = fork(path.join(__dirname, 'task-wrapper.js'), [], {
+    env: {
+      fileBasePath: env.fileBasePath
+    },
+    stdio: ['ipc', process.stdout, 'pipe']
+  })
+  childProcess.stderr!.setEncoding('utf8').on('data', data => {
+    logger.error('Sync:ChildProcess:', data)
+  })
+  syncTask = await spawn<SyncTask>(childProcess)
+
+  subscribeToWorkerProcess(syncTask, msg => {
+    switch (msg.channel) {
+      case 'synced-block-number-updated':
+        SyncApiController.emiter.emit('synced-block-number-updated', msg.result)
+        break
+      case 'tx-db-changed':
+        TxDbChangedSubject.getSubject().next(msg.result)
+        break
+      case 'address-db-changed':
+        AddressDbChangedSubject.getSubject().next(msg.result)
+        break
+      case 'wallet-deleted':
+      case 'address-created':
+        resetSyncTask()
+        break
+      default:
+        break
     }
   })
 
-  backgroundWindow.on('ready-to-show', async () => {
-    if (!network) {
-      network = NetworksService.getInstance().getCurrent()
-    }
+  if (!network) {
+    network = NetworksService.getInstance().getCurrent()
+  }
 
-    const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
-    SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
-    logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
+  const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
+  SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
+  logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
 
-    DataUpdateSubject.next({
-      dataType: 'transaction',
-      actionType: 'update',
-    })
-
-    if (network.genesisHash !== EMPTY_GENESIS_HASH) {
-      // re init txCount in addresses if switch network
-      await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
-      if (backgroundWindow) {
-        const addressesMetas = AddressService.allAddresses()
-        backgroundWindow.webContents.send(
-          "block-sync:start",
-          network.remote,
-          network.genesisHash,
-          addressesMetas
-        )
-      }
-    }
+  DataUpdateSubject.next({
+    dataType: 'transaction',
+    actionType: 'update',
   })
 
-  backgroundWindow.on('closed', () => {
-    backgroundWindow = null
-  })
+  if (network.genesisHash !== EMPTY_GENESIS_HASH) {
+    await WalletService.getInstance().generateAddressesIfNecessary()
 
-  backgroundWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
-}
-
-export const killBlockSyncTask = () => {
-  if (backgroundWindow) {
-    logger.info('Sync:\tkill background process')
-    backgroundWindow.close()
+    // re init txCount in addresses if switch network
+    syncTask!.start(
+      network.remote,
+      network.genesisHash,
+      await AddressService.getAddressesByAllWallets()
+    )
   }
 }
 
-export const queryIndexer = (query: LumosCellQuery): Promise<LumosCell[]> => {
-  indexerQueryId ++
-  return new Promise(resolve => {
-    ipcMain.once(`block-sync:query-indexer:${indexerQueryId}`, (_event, results) => {
-      resolve(results)
-    });
-    backgroundWindow!.webContents.send(
-      "block-sync:query-indexer",
-      query,
-      indexerQueryId
-    )
-  })
+export const killBlockSyncTask = async () => {
+  if (syncTask) {
+    logger.info('Sync:\tkill background process')
+    await syncTask.unmount()
+    await terminate(syncTask)
+    syncTask = null
+  }
+}
+
+export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
+  try {
+    const results = await syncTask?.queryIndexer(query) as LumosCell[]
+    return results || []
+  } catch (error) {
+    logger.error(error)
+    return []
+  }
 }

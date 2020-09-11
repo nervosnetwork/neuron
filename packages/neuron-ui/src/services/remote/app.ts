@@ -1,3 +1,4 @@
+import { OpenDialogOptions, MenuItemConstructorOptions, MenuItem, Size, OpenDialogReturnValue } from 'electron'
 import { LOCALES } from 'utils/const'
 import { remoteApi } from './remoteApiWrapper'
 
@@ -9,3 +10,9 @@ export const showSettings = remoteApi<Controller.ShowSettingsParams>('show-setti
 export const setLocale = remoteApi<typeof LOCALES[number]>('set-locale')
 
 export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
+
+export const invokeShowErrorMessage = remoteApi<{ title: string; content: string }>('show-error-message')
+export const invokeShowOpenDialog = remoteApi<OpenDialogOptions, OpenDialogReturnValue>('show-open-dialog')
+export const invokeShowOpenDialogModal = remoteApi<OpenDialogOptions, OpenDialogReturnValue>('show-open-dialog-modal')
+export const invokeOpenContextMenu = remoteApi<Array<MenuItemConstructorOptions | MenuItem>>('open-context-menu')
+export const invokeGetAllDisplaysSize = remoteApi<void, Size[]>('get-all-displays-size')

@@ -9,8 +9,8 @@ import TransactionWithStatus from 'models/chain/transaction-with-status'
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
   private rpcService: RpcService
-  private indexer: Indexer
   private walletId: string
+  private indexer: Indexer
 
   constructor(
     walletId: string,
@@ -142,12 +142,12 @@ export default class IndexerCacheService {
         return
       }
       const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockNumber = blockHeader!.number
       txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
+      txWithStatus!.transaction.timestamp = blockHeader!.timestamp
 
       txsWithStatus.push(txWithStatus)
-    }, 100)
+    }, 1)
 
     fetchBlockDetailsQueue.push(newTxHashes)
 

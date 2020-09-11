@@ -1,7 +1,6 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent, dialog } from 'electron'
+import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuItemConstructorOptions, MenuItem, Menu, screen, BrowserWindow } from 'electron'
 import { t } from 'i18next'
-
 import env from 'env'
 import { showWindow } from './app/show-window'
 import { NetworkType, Network } from 'models/network'
@@ -42,7 +41,7 @@ export default class ApiController {
   public async mount() {
     this.registerHandlers()
 
-    this.networksController.start()
+    await this.networksController.start()
   }
 
   public runCommand(command: string, params: string) {
@@ -70,11 +69,56 @@ export default class ApiController {
       e.returnValue = SettingsService.getInstance().locale
     })
 
+    ipcMain.on('get-version', e => {
+      e.returnValue = app.getVersion()
+    })
+
+    ipcMain.on('get-platform', e => {
+      e.returnValue = process.platform
+    })
+
+    ipcMain.on('get-win-id', e => {
+      e.returnValue = BrowserWindow.fromWebContents(e.sender)?.id
+    })
+
     // App
     handle('get-system-codehash', async () => {
       return {
         status: ResponseCode.Success,
         result: SystemScriptInfo.SECP_CODE_HASH
+      }
+    })
+
+    handle('show-error-message', async (_, { title = '',  content = '' } ) => {
+      dialog.showErrorBox(title, content)
+    })
+
+    handle('show-open-dialog', async (_, params: OpenDialogSyncOptions) => {
+      const result = await dialog.showOpenDialog(params)
+      return {
+        status: ResponseCode.Success,
+        result
+      }
+    })
+
+    handle('show-open-dialog-modal', async (e, params: OpenDialogSyncOptions) => {
+      const win = BrowserWindow.fromWebContents(e.sender)!
+      const result = await dialog.showOpenDialog(win, params)
+      return {
+        status: ResponseCode.Success,
+        result
+      }
+    })
+
+    handle('open-context-menu', async (_, params: Array<MenuItemConstructorOptions | MenuItem>) => {
+      Menu.buildFromTemplate(params).popup()
+    })
+
+    handle('get-all-displays-size', async () => {
+      const result = screen.getAllDisplays().map(d => d.size)
+      return {
+        status: ResponseCode.Success,
+        result
       }
     })
 
@@ -390,6 +434,10 @@ export default class ApiController {
     ipcMain.handle(channel, async (event, args) => {
       try {
         const res = await listener(event, args)
+        // All objects, array, class instance need to be serialized before sent to the IPC
+        if (typeof res === 'object') {
+          return JSON.parse(JSON.stringify(res))
+        }
         return res
       } catch (err) {
         logger.warn(`channel handling error: ${err}`)

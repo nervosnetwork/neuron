@@ -2,10 +2,11 @@ import SignMessage from '../../src/services/sign-message'
 import WalletService, { Wallet } from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
-import AddressDao from "../../src/database/address/address-dao"
 import AddressService from '../../src/services/addresses'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
 import Keychain from '../../src/models/keys/keychain'
+import initConnection from '../../src/database/chain/ormconfig'
+import { getConnection } from 'typeorm'
 
 describe(`SignMessage`, () => {
   const info = {
@@ -48,7 +49,18 @@ describe(`SignMessage`, () => {
 
     SignMessage.GENERATE_COUNT = 3
 
-    beforeEach(() => {
+    beforeAll(async () => {
+      await initConnection('')
+    })
+
+    afterAll(async () => {
+      await getConnection().close()
+    })
+
+    beforeEach(async () => {
+      const connection = getConnection()
+      await connection.synchronize(true)
+
       const seed = mnemonicToSeedSync(extendedKeyInfo.mnemonic)
       const masterKeychain = Keychain.fromSeed(seed)
       const extendedKey = new ExtendedPrivateKey(
@@ -70,25 +82,23 @@ describe(`SignMessage`, () => {
         keystore,
       })
 
-      AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, undefined, 0, 0, 2, 1)
+      //@ts-ignore
+      await AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, 0, 0, 2, 1)
     })
 
     afterEach(() => {
-      AddressDao.deleteAll()
       walletService.clearAll()
     })
 
     describe('sign', () => {
-      it('not generate', () => {
-        const result = SignMessage.sign(wallet.id, signInfo.address, extendedKeyInfo.password, signInfo.message)
+      it('not generate', async () => {
+        const result = await SignMessage.sign(wallet.id, signInfo.address, extendedKeyInfo.password, signInfo.message)
 
         expect(result).toEqual(signInfo.sigBase64)
       })
 
-      it('with generate', () => {
-        expect(() => {
-          SignMessage.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)
-        }).toThrowError()
+      it('with generate', async () => {
+        await expect(SignMessage.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)).rejects.toThrow()
       })
     })
   })

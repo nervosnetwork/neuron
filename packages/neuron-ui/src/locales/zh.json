@@ -426,7 +426,9 @@
       "first-page": "首页",
       "last-page": "尾页",
       "page": "页码",
-      "selected": "当前页"
+      "selected": "当前页",
+      "range": " 第 {{start}} 至 {{end}} 条记录, 共 {{count}} 条记录",
+      "page-no": "第 {{pageNo}} 页"
     },
     "nervos-dao": {
       "free": "当前可用",
@@ -551,6 +553,14 @@
       "release-success": "资产已解锁，可前往交易历史查看详情。",
       "no-special-assets": "没有自定义资产",
       "experimental": "实验室"
+    },
+    "customized-asset": {
+      "actions": {
+        "unlock": "解锁",
+        "mint": "铸币",
+        "burn": "销币"
+      },
+      "view-in-explorer": "浏览器"
     },
     "s-udt": {
       "account-list": {

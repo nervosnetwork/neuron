@@ -16,7 +16,7 @@ import BufferUtils from 'utils/buffer'
 import LiveCell from 'models/chain/live-cell'
 import Output from 'models/chain/output'
 import SystemScriptInfo from 'models/system-script-info'
-import Script from 'models/chain/script'
+import Script, { ScriptHashType } from 'models/chain/script'
 import LiveCellService from './live-cell-service'
 
 export const MIN_CELL_CAPACITY = '6100000000'
@@ -34,47 +34,57 @@ export default class CellsService {
   private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10**8)
   private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10**8)
 
-  // exclude hasData = true and typeHash != null
-  public static async getBalance(lockHashes: Set<string>): Promise<{
-    liveBalance: Map<string, string>
-    sentBalance: Map<string, string>
-    pendingBalance: Map<string, string>
+  public static async getBalancesByWalletId(walletId: string): Promise<{
+    liveBalances: Map<string, string>
+    sentBalances: Map<string, string>
+    pendingBalances: Map<string, string>
   }> {
-    const cells: { status: string, lockHash: string, sumOfCapacity: string }[] = await getConnection()
+    const cells: { status: string, lockHash: string, sumOfCapacity: string, txCount: number }[] = await getConnection()
       .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .select('output.status', 'status')
-      .addSelect('output.lockHash', 'lockHash')
-      .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
-      .where({
-        lockHash: In([...lockHashes]),
-        hasData: false,
-        typeHash: null,
-      })
-      .groupBy('output.lockHash')
-      .addGroupBy('output.status')
-      .getRawMany()
+      .manager
+      .query(`
+        select
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as sumOfCapacity,
+            lockHash,
+            lockArgs,
+            status
+        from
+            output
+        where
+            output.lockArgs in (
+                select
+                    publicKeyInBlake160
+                from
+                    hd_public_key_info
+                where
+                    walletId = '${ walletId }'
+            ) AND
+            output.hasData = false AND
+            output.typeHash is null
+        group by output.lockHash, output.status
+      `)
 
-    const liveBalance = new Map<string, string>()
-    const sentBalance = new Map<string, string>()
-    const pendingBalance = new Map<string, string>()
+    const liveBalances = new Map<string, string>()
+    const sentBalances = new Map<string, string>()
+    const pendingBalances = new Map<string, string>()
 
     cells.forEach(c => {
       const lockHash: string = c.lockHash
+
       const sumOfCapacity: string = c.sumOfCapacity
       if (c.status === OutputStatus.Live) {
-        liveBalance.set(lockHash, sumOfCapacity)
+        liveBalances.set(lockHash, sumOfCapacity)
       } else if (c.status === OutputStatus.Sent) {
-        sentBalance.set(lockHash, sumOfCapacity)
+        sentBalances.set(lockHash, sumOfCapacity)
       } else if (c.status === OutputStatus.Pending) {
-        pendingBalance.set(lockHash, sumOfCapacity)
+        pendingBalances.set(lockHash, sumOfCapacity)
       }
     })
 
     return {
-      liveBalance,
-      sentBalance,
-      pendingBalance,
+      liveBalances,
+      sentBalances,
+      pendingBalances,
     }
   }
 
@@ -96,13 +106,31 @@ export default class CellsService {
     return uniqueLockArgs
   }
 
-  public static async getDaoCells(lockHashes: string[]): Promise<Cell[]> {
+  public static async getDaoCells(walletId: string): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.daoData IS NOT NULL AND (output.status = :liveStatus OR output.status = :sentStatus OR tx.status = :failedStatus OR ((output.status = :deadStatus OR output.status = :pendingStatus) AND output.depositTxHash is not null)) AND output.lockHash in (:...lockHashes)`, {
-        lockHashes,
+      .where(`
+        output.daoData IS NOT NULL AND
+        (
+          output.status = :liveStatus OR
+          output.status = :sentStatus OR
+          tx.status = :failedStatus OR
+          (
+            (
+              output.status = :deadStatus OR
+              output.status = :pendingStatus
+            ) AND
+            output.depositTxHash is not null
+          )
+        ) AND
+        output.lockArgs in (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        )`, {
+        walletId,
         liveStatus: OutputStatus.Live,
         sentStatus: OutputStatus.Sent,
         failedStatus: TransactionStatus.Failed,
@@ -186,40 +214,48 @@ export default class CellsService {
 
   public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
     const multiSign = new MultiSign()
-    const multiSignHashes: string[] = blake160s.map(blake160 => multiSign.hash(blake160))
+    const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
 
     const skip = (pageNo - 1) * pageSize
 
-    // live cells, empty data, empty type, and of provided blake160s
-    const query = getConnection()
+    const allMutiSignOutputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeHash IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
+      .where(`
+        output.status = :liveStatus AND
+        output.hasData = 0 AND
+        output.typeHash IS NULL AND
+        output.lockCodeHash = :lockCodeHash
+      `, {
         liveStatus: OutputStatus.Live,
-        multiSignHashes,
+        lockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
       })
-
-    const totalCount: number = await query.getCount()
-
-    const outputs: OutputEntity[] = await query
       .orderBy('tx.timestamp', 'ASC')
-      .skip(skip)
-      .take(pageSize)
       .getMany()
 
-    const cells: Cell[] = outputs.map(o => {
-      const cell = o.toModel()
-      cell.setCustomizedAssetInfo({
-        lock: CustomizedLock.SingleMultiSign,
-        type: '',
-        data: ''
-      })
-      return cell
+    const matchedOutputs = allMutiSignOutputs.filter(o => {
+      if (o.multiSignBlake160) {
+        return multiSignHashes.has(o.multiSignBlake160)
+      }
     })
 
+    const totalCount = matchedOutputs.length
+
+    const cells: Cell[] = matchedOutputs
+      .slice(skip, pageNo * pageSize)
+      .map(o => {
+        const cell = o.toModel()
+        cell.setCustomizedAssetInfo({
+          lock: CustomizedLock.SingleMultiSign,
+          type: '',
+          data: ''
+        })
+        return cell
+      });
+
     return {
-      totalCount: totalCount || 0,
+      totalCount: totalCount,
       items: cells,
     }
   }
@@ -249,7 +285,7 @@ export default class CellsService {
   // gather inputs for generateTx
   public static gatherInputs = async (
     capacity: string,
-    lockHashes: string[],
+    walletId: string,
     fee: string = '0',
     feeRate: string = '0',
     baseSize: number = 0,
@@ -258,7 +294,11 @@ export default class CellsService {
     append?: {
       input: Input,
       witness: WitnessArgs,
-    }
+    },
+    lockClass: {
+      codeHash: string,
+      hashType: ScriptHashType.Type
+    } = {codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type}
   ): Promise<{
     inputs: Input[]
     capacities: string
@@ -279,14 +319,26 @@ export default class CellsService {
     // only live cells, skip which has data or type
     const cellEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
-      .find({
-        where: {
-          lockHash: In(lockHashes),
-          status: In([OutputStatus.Live, OutputStatus.Sent]),
-          hasData: false,
-          typeHash: null,
-        },
+      .createQueryBuilder('output')
+      .where(`
+        output.status IN (:...statuses) AND
+        hasData = false AND
+        typeHash is null AND
+        output.lockArgs in (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        ) AND
+        output.lockCodeHash = :lockCodeHash AND
+        output.lockHashType = :lockHashType
+        `, {
+        walletId,
+        statuses: [OutputStatus.Live, OutputStatus.Sent],
+        lockCodeHash: lockClass.codeHash,
+        lockHashType: lockClass.hashType,
       })
+      .getMany()
+
     const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
     const sentBalance: bigint = cellEntities
       .filter(c => c.status === OutputStatus.Sent)
@@ -393,17 +445,34 @@ export default class CellsService {
     }
   }
 
-  public static gatherAllInputs = async (lockHashes: string[]): Promise<Input[]> => {
+  public static gatherAllInputs = async (
+    walletId: string,
+    lockClass: {
+      codeHash: string,
+      hashType: ScriptHashType.Type
+    } = {codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type}
+  ): Promise<Input[]> => {
     const cellEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
-      .find({
-        where: {
-          lockHash: In(lockHashes),
-          status: OutputStatus.Live,
-          hasData: false,
-          typeHash: null,
-        },
+      .createQueryBuilder('output')
+      .where(`
+        output.status IN (:...statuses) AND
+        hasData = false AND
+        typeHash is null AND
+        output.lockArgs in (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        ) AND
+        output.lockCodeHash = :lockCodeHash AND
+        output.lockHashType = :lockHashType
+        `, {
+        walletId,
+        statuses: [OutputStatus.Live],
+        lockCodeHash: lockClass.codeHash,
+        lockHashType: lockClass.hashType
       })
+      .getMany()
 
     const inputs: Input[] = cellEntities.map(cell => {
       return new Input(
@@ -420,7 +489,7 @@ export default class CellsService {
 
   public static async gatherAnyoneCanPayCKBInputs(
     capacity: 'all' | string,
-    defaultLockHashes: string[],
+    walletId: string,
     anyoneCanPayLocks: Script[],
     changeBlake160: string,
     fee: string = '0',
@@ -437,7 +506,8 @@ export default class CellsService {
 
     // only live cells, skip which has data or type
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const allAnyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const anyoneCanPayLockLiveCells = allAnyoneCanPayLockLiveCells.filter(cell => cell.data === '0x')
 
     const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
     const capacityInt = capacity === 'all' ? (allCapacity - BigInt(anyoneCanPayLockLiveCells.length) * BigInt(61 * 10**8)) : BigInt(capacity)
@@ -508,7 +578,7 @@ export default class CellsService {
     if (extraNeedFee > BigInt(0)) {
       const normalCellInputsInfo = await CellsService.gatherInputs(
         (-extraNeedFee).toString(),
-        defaultLockHashes,
+        walletId,
         fee,
         feeRate,
         totalSize,
@@ -554,7 +624,8 @@ export default class CellsService {
 
     // only live cells, skip which has data or type
     const liveCellService = LiveCellService.getInstance()
-    const anyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const allAnyoneCanPayLockLiveCells = await liveCellService.getManyByLockScriptsAndTypeScript(anyoneCanPayLocks, null)
+    const anyoneCanPayLockLiveCells = allAnyoneCanPayLockLiveCells.filter(cell => cell.data === '0x')
 
     if (anyoneCanPayLockLiveCells.length === 0) {
       throw new CapacityNotEnough()
@@ -615,7 +686,7 @@ export default class CellsService {
   // sUDT for amount
   public static async gatherSudtInputs(
     amount: 'all' | string,
-    defaultLockHashes: string[],
+    walletId: string,
     anyoneCanPayLocks: Script[],
     type: Script,
     changeBlake160: string,
@@ -718,7 +789,7 @@ export default class CellsService {
     if (inputCapacities < needFee) {
       const normalCellInputsInfo = await CellsService.gatherInputs(
         (-inputCapacities).toString(),
-        defaultLockHashes,
+        walletId,
         fee,
         feeRate,
         totalSize,

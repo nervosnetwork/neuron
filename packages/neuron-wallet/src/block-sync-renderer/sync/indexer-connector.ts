@@ -1,12 +1,12 @@
-import logger from 'electron-log'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType } from '@ckb-lumos/base'
 import { Indexer, Tip, CellCollector } from '@ckb-lumos/indexer'
+import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { Address } from 'database/address/address-dao'
+import { Address } from "models/address"
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
@@ -45,6 +45,8 @@ export default class IndexerConnector {
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
+  private indexerQueryQueue: AsyncQueue<LumosCellQuery> | undefined
+
   private processingBlockNumber: string | undefined
   private indexerTip: Tip | undefined
   public pollingIndexer: boolean = false
@@ -74,7 +76,11 @@ export default class IndexerConnector {
 
     this.processNextBlockNumberQueue = queue(async () => this.processTxsInNextBlockNumber(), 1)
     this.processNextBlockNumberQueue.error((err: any) => {
-      logger.error(err)
+      logger.error(`Error in processing next block number queue: ${err}`)
+    })
+
+    this.indexerQueryQueue = queue(async (query: any) => {
+      return await this.collectLiveCellsByScript(query)
     })
   }
 
@@ -107,12 +113,23 @@ export default class IndexerConnector {
         await CommonUtils.sleep(5000)
       }
     } catch (error) {
-      logger.error(error)
+      logger.error(`Error connecting to Indexer: ${error.message}`)
       throw error
     }
   }
 
   public async getLiveCellsByScript(query: LumosCellQuery) {
+    return new Promise((resolve, reject) => {
+      this.indexerQueryQueue!.push(query, (err: any, result: unknown) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+
+  private async collectLiveCellsByScript(query: LumosCellQuery) {
     const { lock, type, data } = query
     if (!lock && !type) {
       throw new Error('at least one parameter is required')
@@ -219,9 +236,9 @@ export default class IndexerConnector {
         throw new Error(`failed to fetch transaction for hash ${hash}`)
       }
       const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-      txWithStatus!.transaction.blockNumber = blockHeader?.number
+      txWithStatus!.transaction.blockNumber = blockHeader!.number
       txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-      txWithStatus!.transaction.timestamp = blockHeader?.timestamp
+      txWithStatus!.transaction.timestamp = blockHeader!.timestamp
       txsWithStatus.push(txWithStatus)
     }
 

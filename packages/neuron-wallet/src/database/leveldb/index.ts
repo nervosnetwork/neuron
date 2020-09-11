@@ -13,7 +13,9 @@ const leveldb = (dbname: string): LevelUp => {
 
   const dbpath = path.join(dir, dbname)
   return levelup(leveldown(dbpath), (err: Error | undefined) => {
-    logger.error(`Database:\tfail to open leveldb ${dbname}:`, err?.toString())
+    if (err) {
+      logger.error(`Database:\tfail to open leveldb ${dbname}:`, err.toString())
+    }
 
   })
 }

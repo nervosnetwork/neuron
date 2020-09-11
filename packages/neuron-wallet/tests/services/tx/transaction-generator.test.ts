@@ -19,6 +19,7 @@ import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-util
 import { CapacityNotEnough } from '../../../src/exceptions/wallet'
 import LiveCell from '../../../src/models/chain/live-cell'
 import AddressGenerator from '../../../src/models/address-generator'
+import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -30,21 +31,8 @@ const randomHex = (length: number = 64): string => {
 
 const toShannon = (ckb: string) => `${ckb}00000000`
 
-const bobLockScript: Script = SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
-const bob = {
-  lockScript: bobLockScript,
-  lockHash: bobLockScript.computeHash(),
-  address: AddressGenerator.generate(bobLockScript, AddressPrefix.Testnet),
-  blake160: bobLockScript.args,
-}
-
-const aliceLockScript: Script = SystemScriptInfo.generateSecpScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
-const alice = {
-  lockScript: aliceLockScript,
-  lockHash: aliceLockScript.computeHash(),
-  address: AddressGenerator.generate(aliceLockScript, AddressPrefix.Testnet),
-  blake160: aliceLockScript.args,
-}
+const [alice, bob] = keyInfos
+const walletId1 = alice.walletId
 
 const fullAddressLockScript: Script = new Script(
   '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -74,6 +62,7 @@ jest.doMock('../../../src/services/indexer-service', () => {
   return stubbedIndexerService
 });
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
+import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -121,7 +110,7 @@ describe('TransactionGenerator', () => {
     output.lockCodeHash = who.lockScript.codeHash
     output.lockArgs = who.lockScript.args
     output.lockHashType = who.lockScript.hashType
-    output.lockHash = who.lockHash
+    output.lockHash = who.lockScript.computeHash()
     output.status = status
     output.hasData = hasData
     if (typeScript) {
@@ -136,10 +125,12 @@ describe('TransactionGenerator', () => {
     return output
   }
 
-  beforeEach(async done => {
+  beforeEach(async () => {
     const connection = getConnection()
     await connection.synchronize(true)
-    done()
+
+    const keyEntities = keyInfos.map(d => HdPublicKeyInfo.fromObject(d))
+    await getConnection().manager.save(keyEntities)
   })
 
   describe('generateTx', () => {
@@ -157,7 +148,7 @@ describe('TransactionGenerator', () => {
       it('capacity 500', async () => {
         const feeRate = '1000'
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -187,7 +178,7 @@ describe('TransactionGenerator', () => {
       it('capacity 1000', async () => {
         const feeRate = '1000'
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -215,7 +206,7 @@ describe('TransactionGenerator', () => {
       it('capacity 1000 - fee, no change output', async () => {
         const feeRate = '1000'
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -244,7 +235,7 @@ describe('TransactionGenerator', () => {
       it('capacity 1000 - fee + 1 shannon', async () => {
         const feeRate = '1000'
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -274,7 +265,7 @@ describe('TransactionGenerator', () => {
 
         const feeRate = '1000'
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash, alice.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -299,7 +290,7 @@ describe('TransactionGenerator', () => {
       describe('with full address', () => {
         it(`only full address, 43 capacity`, async () => {
           const tx: Transaction = await TransactionGenerator.generateTx(
-            [bob.lockHash],
+            walletId1,
             [
               {
                 address: fullAddressInfo.address,
@@ -320,7 +311,7 @@ describe('TransactionGenerator', () => {
         it('only full address, 42 capacity', async () => {
           expect(
             TransactionGenerator.generateTx(
-              [bob.lockHash],
+              walletId1,
               [
                 {
                   address: fullAddressInfo.address,
@@ -336,7 +327,7 @@ describe('TransactionGenerator', () => {
 
         it(`full address and bob's output`, async () => {
           const tx: Transaction = await TransactionGenerator.generateTx(
-            [bob.lockHash],
+            walletId1,
             [
               {
                 address: fullAddressInfo.address,
@@ -362,7 +353,7 @@ describe('TransactionGenerator', () => {
       describe('with date', () => {
         it('capacity 500', async () => {
           const tx: Transaction = await TransactionGenerator.generateTx(
-            [bob.lockHash],
+            walletId1,
             [
               {
                 address: bob.address,
@@ -399,7 +390,7 @@ describe('TransactionGenerator', () => {
       const fee = '1000'
       it('capacity 500', async () => {
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -422,7 +413,7 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000', async () => {
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -445,7 +436,7 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000 - fee', async () => {
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -468,7 +459,7 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000 - fee + 1 shannon', async () => {
         const tx: Transaction = await TransactionGenerator.generateTx(
-          [bob.lockHash],
+          walletId1,
           [
             {
               address: bob.address,
@@ -503,7 +494,7 @@ describe('TransactionGenerator', () => {
     })
     const totalCapacities: bigint = BigInt(toShannon('6000'))
 
-    const lockHashes: string[] = [bob.lockHash, alice.lockHash]
+    // const lockHashes: string[] = [bob.lockHash, alice.lockHash]
     const targetOutputs: TargetOutput[] = [
       {
         address: bob.address,
@@ -523,7 +514,7 @@ describe('TransactionGenerator', () => {
       const fee = '800'
       const feeInt = BigInt(fee)
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-        lockHashes,
+        walletId1,
         targetOutputs,
         fee,
       )
@@ -548,7 +539,7 @@ describe('TransactionGenerator', () => {
     it('with feeRate 1000', async () => {
       const feeRate = '1000'
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-        lockHashes,
+        walletId1,
         targetOutputs,
         '0',
         feeRate
@@ -579,7 +570,7 @@ describe('TransactionGenerator', () => {
     it('full address with feeRate 1000, 43 capacity', async () => {
       const feeRate = '1000'
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-        lockHashes,
+        walletId1,
         [
           {
             address: fullAddressInfo.address,
@@ -611,7 +602,7 @@ describe('TransactionGenerator', () => {
 
       expect(
         TransactionGenerator.generateSendingAllTx(
-          lockHashes,
+          walletId1,
           [
             {
               address: fullAddressInfo.address,
@@ -632,7 +623,7 @@ describe('TransactionGenerator', () => {
       const feeRate = '1000'
       it('capacity 500', async () => {
         const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-          lockHashes,
+          walletId1,
           [
             {
               address: bob.address,
@@ -672,7 +663,7 @@ describe('TransactionGenerator', () => {
 
     it('capacity 500', async () => {
       const tx: Transaction = await TransactionGenerator.generateDepositTx(
-        [bob.lockHash],
+        walletId1,
         toShannon('500'),
         bob.address,
         bob.address,
@@ -688,7 +679,7 @@ describe('TransactionGenerator', () => {
     it('capacity 1000', async () => {
       const feeRate = '1000'
       const tx: Transaction = await TransactionGenerator.generateDepositTx(
-        [bob.lockHash],
+        walletId1,
         toShannon('1000'),
         bob.address,
         bob.address,
@@ -703,7 +694,7 @@ describe('TransactionGenerator', () => {
 
     it('capacity 1000 - fee, no change output', async () => {
       const tx: Transaction = await TransactionGenerator.generateDepositTx(
-        [bob.lockHash],
+        walletId1,
         (BigInt(1000 * 10**8 - 453)).toString(),
         bob.address,
         bob.address,
@@ -722,7 +713,7 @@ describe('TransactionGenerator', () => {
       await getConnection().manager.save(aliceCell)
 
       const tx: Transaction = await TransactionGenerator.generateDepositTx(
-        [bob.lockHash, alice.lockHash],
+        walletId1,
         BigInt(3000 * 10**8).toString(),
         alice.address,
         bob.address,
@@ -749,7 +740,7 @@ describe('TransactionGenerator', () => {
 
     it('in fee mode, fee = 0', async () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
-        [bob.lockHash],
+        walletId1,
         bob.address,
         '0'
       )
@@ -762,7 +753,7 @@ describe('TransactionGenerator', () => {
 
     it('in fee mode, fee = 999', async () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
-        [bob.lockHash],
+        walletId1,
         bob.address,
         '999'
       )
@@ -775,7 +766,7 @@ describe('TransactionGenerator', () => {
 
     it('in feeRate mode, feeRate = 0', async () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
-        [bob.lockHash],
+        walletId1,
         bob.address,
         '0',
         '0'
@@ -789,7 +780,7 @@ describe('TransactionGenerator', () => {
 
     it('in feeRate mode, feeRate = 1000', async () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
-        [bob.lockHash],
+        walletId1,
         bob.address,
         '0',
         '1000'
@@ -809,7 +800,7 @@ describe('TransactionGenerator', () => {
       await getConnection().manager.save(aliceCell)
 
       const tx: Transaction = await TransactionGenerator.generateDepositAllTx(
-        [bob.lockHash, alice.lockHash],
+        walletId1,
         bob.address,
         '0',
         '1000'
@@ -846,7 +837,7 @@ describe('TransactionGenerator', () => {
 
     it('deposit first', async () => {
       const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
-        [bob.lockHash, alice.lockHash],
+        walletId1,
         depositOutPoint,
         depositDaoCell,
         '12',
@@ -867,7 +858,7 @@ describe('TransactionGenerator', () => {
   describe('generateWithdrawMultiSignTx', () => {
     const prevOutput = Output.fromObject({
       capacity: toShannon('1000'),
-      lock: SystemScriptInfo.generateMultiSignScript(new MultiSign().args(bob.blake160, 100, '0x7080018000001'))
+      lock: SystemScriptInfo.generateMultiSignScript(new MultiSign().args(bob.lockScript.args, 100, '0x7080018000001'))
     })
     const outPoint = OutPoint.fromObject({
       txHash: '0x' + '0'.repeat(64),
@@ -912,20 +903,13 @@ describe('TransactionGenerator', () => {
     const aliceAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
     const davidAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x' + '0'.repeat(40))
 
-    const davidLockScript: Script = SystemScriptInfo.generateSecpScript('0x' + '0'.repeat(40))
-    const david = {
-      lockScript: davidLockScript,
-      lockHash: davidLockScript.computeHash(),
-      address: AddressGenerator.generate(davidLockScript, AddressPrefix.Testnet),
-      blake160: davidLockScript.args,
-    }
-
     // generate anyone-can-pay live cell
     const generateLiveCell = (
       capacity: string,
       amount: string | undefined = undefined,
       tokenID: string | undefined = undefined,
-      lockScript: Script = bobAnyoneCanPayLockScript
+      lockScript: Script = bobAnyoneCanPayLockScript,
+      customData: string = '0x'
     ) => {
       const liveCell = {
         block_hash: randomHex(),
@@ -953,6 +937,10 @@ describe('TransactionGenerator', () => {
         }
       }
       liveCell.data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'
+
+      if (customData !== '0x') {
+        liveCell.data = customData
+      }
 
       return liveCell
     }
@@ -988,11 +976,11 @@ describe('TransactionGenerator', () => {
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-            [bob.lockHash],
+            walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
             (1 * 10**8).toString(),
-            bob.blake160,
+            bob.lockScript.args,
             feeRate,
             '0'
           )
@@ -1042,11 +1030,11 @@ describe('TransactionGenerator', () => {
           let error
           try {
             await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-              [bob.lockHash, david.lockHash],
+              walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
               (10 * 10**8).toString(),
-              bob.blake160,
+              bob.lockScript.args,
               feeRate,
               '0'
             )
@@ -1078,11 +1066,11 @@ describe('TransactionGenerator', () => {
             ])
 
           tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-            [bob.lockHash],
+            walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
             (1 * 10**8).toString(),
-            bob.blake160,
+            bob.lockScript.args,
             feeRate,
             '0'
           )
@@ -1133,11 +1121,11 @@ describe('TransactionGenerator', () => {
             ])
 
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-              [bob.lockHash],
+              walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
               (1 * 10**8).toString(),
-              bob.blake160,
+              bob.lockScript.args,
               feeRate,
               '0'
             )
@@ -1166,6 +1154,49 @@ describe('TransactionGenerator', () => {
         })
       });
 
+      describe('with some of ACP cells having data', () => {
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: bobAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+        let tx: Transaction
+
+        const customData = '0x000000'
+        const cellsByAlice = [
+          generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript, customData),
+          generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        const cellsByBob = [
+          generateLiveCell(toShannon('61'), undefined, undefined, bobAnyoneCanPayLockScript),
+        ]
+        beforeEach(async () => {
+          when(stubbedIndexerService.getLiveCellsByScript)
+            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue(cellsByAlice)
+            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue(cellsByBob)
+
+            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+              walletId1,
+              [aliceAnyoneCanPayLockScript],
+              targetOutput,
+              (1 * 10**8).toString(),
+              bob.lockScript.args,
+              feeRate,
+              '0'
+            )
+
+            tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+            tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+        });
+        it('should not use insufficient ACP cell as input', async () => {
+          expect(tx.inputs.length).toEqual(3)
+          expect(tx.outputs.length).toEqual(3)
+
+          expect(tx.outputs.find(o => o.data === customData)).toEqual(undefined)
+        })
+      });
+
       describe('when the total capacity of ACP cells is insufficient for the transfer amount', () => {
         const targetOutput: Output = Output.fromObject({
           capacity: toShannon('61'),
@@ -1186,11 +1217,11 @@ describe('TransactionGenerator', () => {
           let error
           try {
             await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-              [bob.lockHash],
+              walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
               (1 * 10**8).toString(),
-              bob.blake160,
+              bob.lockScript.args,
               feeRate,
               '0'
             )
@@ -1209,36 +1240,84 @@ describe('TransactionGenerator', () => {
           data: '0x',
         })
         let tx: Transaction
-        beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
-            ])
-          tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-            [bob.lockHash],
-            [bobAnyoneCanPayLockScript],
-            targetOutput,
-            'all',
-            bob.blake160,
-            feeRate,
-            '0'
-          )
-        });
+        describe('with all ACP cells without data', () => {
+          beforeEach(async () => {
+            when(stubbedIndexerService.getLiveCellsByScript)
+              .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
+              ])
+              .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+              ])
+            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+              walletId1,
+              [bobAnyoneCanPayLockScript],
+              targetOutput,
+              'all',
+              bob.lockScript.args,
+              feeRate,
+              '0'
+            )
+          });
 
-        it('capacity remains the minimum 61', () => {
-          const changeOutput = tx.outputs.filter(
-            output => output.lock.computeHash() === bobAnyoneCanPayLockScript.computeHash()
-          )[0]
-          expect(changeOutput.capacity).toEqual(toShannon('61'))
-        })
+          it('transfers all capacities and has minimum 61 CKB left', () => {
+            expect(tx.outputs.length).toEqual(2)
+
+            const changeOutput = tx.outputs.find(
+              output => output.lock.computeHash() === bobAnyoneCanPayLockScript.computeHash()
+            )
+            expect(changeOutput!.capacity).toEqual(toShannon('61'))
+
+            const aliceOutput = tx.outputs.find(
+              output => output.lock.computeHash() === aliceAnyoneCanPayLockScript.computeHash()
+            )
+
+            expect(aliceOutput!.capacity).toEqual(
+              (
+                BigInt(targetOutput.capacity) +
+                BigInt(toShannon('70')) +
+                (BigInt(toShannon('70')) - BigInt(changeOutput!.capacity)) -
+                BigInt(tx.fee)).toString()
+            )
+          })
+        });
+        describe('with some of ACP cells having data', () => {
+          beforeEach(async () => {
+            when(stubbedIndexerService.getLiveCellsByScript)
+              .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
+                generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript, '0x00'),
+              ])
+              .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
+                generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+              ])
+            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+              walletId1,
+              [bobAnyoneCanPayLockScript],
+              targetOutput,
+              'all',
+              bob.lockScript.args,
+              feeRate,
+              '0'
+            )
+          });
+
+          it('should not use ACP cell input with data', () => {
+            expect(tx.inputs.length).toEqual(2)
+
+            const aliceOutputs = tx.outputs.filter(
+              output => output.lock!.computeHash() === bobAnyoneCanPayLockScript.computeHash()
+            )
+            expect(aliceOutputs.length).toEqual(1)
+            expect(aliceOutputs[0].data).toEqual('0x')
+          })
+        });
       });
     })
 
     describe('generateAnyoneCanPayToSudtTx, with feeRate 1000', () => {
-      const tokenID = bob.lockHash
+      const tokenID = bob.lockScript.computeHash()
       const feeRate = '1000'
       let tx: Transaction
       let expectedTxSize: number
@@ -1265,11 +1344,11 @@ describe('TransactionGenerator', () => {
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-            [bob.lockHash],
+            walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
             '100',
-            bob.blake160,
+            bob.lockScript.args,
             feeRate,
             '0'
           )
@@ -1332,11 +1411,11 @@ describe('TransactionGenerator', () => {
           let error
           try {
             await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-              [bob.lockHash, david.lockHash],
+              walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
               '101',
-              bob.blake160,
+              bob.lockScript.args,
               feeRate,
               '0'
             )
@@ -1369,11 +1448,11 @@ describe('TransactionGenerator', () => {
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-            [bob.lockHash],
+            walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
             '100',
-            bob.blake160,
+            bob.lockScript.args,
             feeRate,
             '0'
           )
@@ -1391,7 +1470,7 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.map(o => o.lockHash)).toEqual([
             bobAnyoneCanPayLockScript.computeHash(),
             aliceAnyoneCanPayLockScript.computeHash(),
-            bob.lockHash,
+            bob.lockScript.computeHash(),
           ])
         })
         it('calculates fees', () => {
@@ -1436,11 +1515,11 @@ describe('TransactionGenerator', () => {
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-            [bob.lockHash],
+            walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
             '100',
-            bob.blake160,
+            bob.lockScript.args,
             feeRate,
             '0'
           )
@@ -1514,11 +1593,11 @@ describe('TransactionGenerator', () => {
           let error
           try {
             await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-              [bob.lockHash],
+              walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
               '100',
-              bob.blake160,
+              bob.lockScript.args,
               feeRate,
               '0'
             )
@@ -1551,11 +1630,11 @@ describe('TransactionGenerator', () => {
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-            [bob.lockHash],
+            walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
             'all',
-            bob.blake160,
+            bob.lockScript.args,
             feeRate,
             '0'
           )
@@ -1598,9 +1677,9 @@ describe('TransactionGenerator', () => {
       it('create ckb', async () => {
         const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
           'CKBytes',
-          [bob.lockHash],
-          alice.blake160,
-          bob.blake160,
+          walletId1,
+          alice.lockScript.args,
+          bob.lockScript.args,
           feeRate,
           '0',
         )
@@ -1637,9 +1716,9 @@ describe('TransactionGenerator', () => {
         const tokenID = '0x' + '0'.repeat(64)
         const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
           tokenID,
-          [bob.lockHash],
-          alice.blake160,
-          bob.blake160,
+          walletId1,
+          alice.lockScript.args,
+          bob.lockScript.args,
           feeRate,
           '0',
         )
@@ -1679,8 +1758,8 @@ describe('TransactionGenerator', () => {
 
       const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
         'CKBytes',
-        [bob.lockHash],
-        alice.blake160,
+        walletId1,
+        alice.lockScript.args,
         feeRate,
         '0',
       )
@@ -1719,8 +1798,8 @@ describe('TransactionGenerator', () => {
       const tokenID = '0x' + '0'.repeat(64)
       const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
         tokenID,
-        [bob.lockHash],
-        alice.blake160,
+        walletId1,
+        alice.lockScript.args,
         feeRate,
         '0',
       )

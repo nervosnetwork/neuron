@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import BalanceSyncIcon from 'components/BalanceSyncingIcon'
-import CopyZone from 'widgets/CopyZone'
+import Balance from 'components/Balance'
 
 import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
@@ -198,11 +197,7 @@ const Overview = () => {
     <div className={styles.overview}>
       <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
       <div className={styles.balance}>
-        <span>{`${t('overview.balance')}:`}</span>
-        <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
-          <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
-        </CopyZone>
-        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+        <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
       </div>
 
       <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>

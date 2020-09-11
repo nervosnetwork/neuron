@@ -2,7 +2,7 @@ import { when } from 'jest-when'
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import AddressMeta from '../../src/database/address/meta';
-import { Address, AddressVersion } from '../../src/database/address/address-dao';
+import { Address, AddressVersion } from '../../src/models/address';
 import {default as TransactionEntity} from '../../src/database/chain/entities/transaction';
 import {default as InputEntity} from '../../src/database/chain/entities/input';
 import {default as OutputEntity} from '../../src/database/chain/entities/output';
@@ -20,28 +20,19 @@ import Output from '../../src/models/chain/output';
 import Transaction from '../../src/models/chain/transaction';
 import Script from '../../src/models/chain/script';
 
-const stubbedGetTransactionFn = jest.fn()
-const stubbedGetHeaderFn = jest.fn()
-const stubbedGenesisBlockHashFn = jest.fn()
-const stubbedGetTransactionsByLockScriptFn = jest.fn()
-
-const resetMocks = () => {
-  stubbedGetTransactionFn.mockReset()
-  stubbedGetHeaderFn.mockReset()
-  stubbedGetTransactionsByLockScriptFn.mockReset()
-}
-
 describe('integration tests for sync pipeline', () => {
   const fakeNodeUrl = 'http://fakenode:8114'
   const fakeGenesisHash = 'fakegenesishash'
+  const pubkeyInBlake160 = '0x36c329ed630d6ce750712a477543672adab57f4c'
   const shortAddressInfo = {
-    lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
+    lock: SystemScriptInfo.generateSecpScript(pubkeyInBlake160),
   }
   const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+  const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
     blake160: shortAddressInfo.lock.args,
-    walletId: '',
+    walletId: fakeWalletId,
     path: '',
     addressType: AddressType.Receiving,
     addressIndex: 0,
@@ -116,9 +107,23 @@ describe('integration tests for sync pipeline', () => {
 
   let queue: any
 
+  const stubbedGetTransactionFn = jest.fn()
+  const stubbedGetHeaderFn = jest.fn()
+  const stubbedGenesisBlockHashFn = jest.fn()
+  const stubbedGetTransactionsByLockScriptFn = jest.fn()
+  const stubbedCheckAndGenerateAddressesFn = jest.fn()
+
+  const resetMocks = () => {
+    stubbedGetTransactionFn.mockReset()
+    stubbedGetHeaderFn.mockReset()
+    stubbedGetTransactionsByLockScriptFn.mockReset()
+    stubbedCheckAndGenerateAddressesFn.mockReset()
+  }
+
   let stubbedIndexerConstructor: any
   let stubbedTransactionCollectorConstructor: any
   let stubbedRPCServiceConstructor: any
+
   const stubbedStartForeverFn = jest.fn()
   const stubbedTipFn = jest.fn()
 
@@ -136,6 +141,17 @@ describe('integration tests for sync pipeline', () => {
 
     resetMocks()
     jest.useFakeTimers()
+
+    jest.mock('services/networks', () => {
+      return {
+        getInstance: () => ({
+          isMainnet: () => false,
+          getCurrent: () => ({
+            genesisHash: fakeGenesisHash
+          })
+        }),
+      }
+    })
 
     stubbedGenesisBlockHashFn.mockResolvedValue(fakeGenesisHash)
 
@@ -177,6 +193,8 @@ describe('integration tests for sync pipeline', () => {
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
     });
+
+    jest.doMock('services/wallets', () => ({checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn}));
 
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
@@ -256,6 +274,9 @@ describe('integration tests for sync pipeline', () => {
         expect(caches.filter(cache => cache.txHash === fakeTx.transaction.hash && cache.isProcessed)).toHaveLength(1)
       }
     });
+    it('checks and generates new addresses', () => {
+      expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
+    });
     describe('inserts related outputs', () => {
       let outputs: OutputEntity[] = []
       beforeEach(async () => {
@@ -329,6 +350,9 @@ describe('integration tests for sync pipeline', () => {
       for (const fakeTx of fakeTxs) {
         expect(caches.filter(cache => cache.txHash === fakeTx.transaction.hash && cache.isProcessed)).toHaveLength(1)
       }
+    });
+    it('checks and generates new addresses', () => {
+      expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
     });
     describe('handles outputs', () => {
       let outputs: OutputEntity[] = []

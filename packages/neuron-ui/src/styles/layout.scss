@@ -1,5 +1,7 @@
 :root {
   --sidebar-width: 200px;
+  --main-content-vertical-padding: 20px;
+  --main-content-horizontal-padding: 30px;
 }
 
 body {
@@ -25,7 +27,8 @@ footer {
 .main-content {
   grid-area: content;
   overflow: auto;
-  padding: 20px 30px;
+  padding: var(--main-content-vertical-padding)
+    var(--main-content-horizontal-padding);
 }
 
 .notification {

@@ -1,3 +1,13 @@
+import { ipcRenderer, desktopCapturer, shell, OpenDialogOptions, MenuItemConstructorOptions, MenuItem } from 'electron'
+import { isSuccessResponse } from 'utils/is'
+import {
+  invokeShowErrorMessage,
+  invokeShowOpenDialog,
+  invokeShowOpenDialogModal,
+  invokeOpenContextMenu,
+  invokeGetAllDisplaysSize,
+} from './app'
+
 export * from './app'
 export * from './wallets'
 export * from './networks'
@@ -12,71 +22,68 @@ const REMOTE_MODULE_NOT_FOUND =
 const LIMITED_TO_ELECTRON = 'This function is limited to Electron'
 
 export const getLocale = () => {
-  if (!window.ipcRenderer) {
+  // While render process modules must be accessible in Electron,
+  // this validation cannot be removed, as other developers may be running this code in their browsers.
+  if (ipcRenderer === undefined) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     return window.navigator.language
   }
-  return window.ipcRenderer.sendSync('get-locale')
+  return ipcRenderer.sendSync('get-locale')
 }
 
 export const getVersion = () => {
-  return window.remote?.app?.getVersion() ?? ''
+  return ipcRenderer.sendSync('get-version') ?? ''
 }
 
 export const getPlatform = () => {
-  return window.remote?.process?.platform ?? 'Unknown'
+  return ipcRenderer.sendSync('get-version') ?? 'Unknown'
 }
 
 export const getWinID = () => {
-  if (!window.remote) {
+  if (ipcRenderer === undefined) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     return -1
   }
-  return window.remote.getCurrentWindow().id
+  return ipcRenderer.sendSync('get-win-id')
 }
 
 export const showErrorMessage = (title: string, content: string) => {
-  if (!window.remote) {
+  if (ipcRenderer === undefined) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     window.alert(`${title}: ${content}`)
-  } else {
-    window.remote.require('electron').dialog.showErrorBox(title, content)
   }
+  invokeShowErrorMessage({ title, content })
 }
 
-export const showOpenDialog = (options: { title: string; message?: string }) => {
-  if (!window.remote) {
+export const showOpenDialog = (options: OpenDialogOptions) => {
+  if (ipcRenderer === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
     return Promise.reject()
   }
-  return window.remote.require('electron').dialog.showOpenDialog(options)
+  return invokeShowOpenDialog(options)
 }
 
-export const showOpenDialogModal = (options: { title: string; message?: string }) => {
-  if (!window.remote) {
+export const showOpenDialogModal = (options: OpenDialogOptions) => {
+  if (ipcRenderer === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
     return Promise.reject()
   }
-  return window.remote.require('electron').dialog.showOpenDialog(window.remote.getCurrentWindow(), options)
+  return invokeShowOpenDialogModal(options)
 }
 
 export const openExternal = (url: string) => {
-  if (!window.remote) {
+  if (shell === undefined) {
     window.open(url)
   } else {
-    window.remote.require('electron').shell.openExternal(url)
+    shell.openExternal(url)
   }
 }
 
-export const openContextMenu = (
-  template: ({ label: string; click: Function } | { role: string } | { type: string })[]
-): void => {
-  if (!window.remote) {
+export const openContextMenu = (template: Array<MenuItemConstructorOptions | MenuItem>): void => {
+  if (ipcRenderer === undefined) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
   } else {
-    const { Menu } = window.remote.require('electron')
-    const menu = Menu.buildFromTemplate(template)
-    menu.popup()
+    invokeOpenContextMenu(template)
   }
 }
 
@@ -85,17 +92,17 @@ const isError = (obj: any): obj is Error => {
 }
 
 export const captureScreenshot = async () => {
-  if (!window.require) {
+  if (ipcRenderer === undefined) {
     return Promise.reject(LIMITED_TO_ELECTRON)
   }
-  const { desktopCapturer } = window.require('electron')
-  const sources = await desktopCapturer.getSources({ types: ['screen'], size: { width: 1920, height: 1440 } })
-  const sizes = window.remote
-    .require('electron')
-    .screen.getAllDisplays()
-    .map((display: any) => display.size)
+  const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1920, height: 1440 } })
+  const res = await invokeGetAllDisplaysSize()
+  if (!isSuccessResponse(res)) {
+    throw new Error(res.message.toString())
+  }
+  const sizes = res.result!
   const streams: (MediaStream | Error)[] = await Promise.all(
-    sources.map(async (source: any, idx: number) => {
+    sources.map(async (source, idx) => {
       const constraints: any = {
         audio: false,
         video: {

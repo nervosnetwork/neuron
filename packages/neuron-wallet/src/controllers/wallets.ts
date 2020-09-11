@@ -20,13 +20,14 @@ import {
   IncorrectPassword,
   InvalidJSON,
   InvalidAddress,
+  UsedName,
 } from 'exceptions'
 import AddressService from 'services/addresses'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
-import { set as setDescription } from 'database/leveldb/transaction-description'
+import { set as setDescription } from 'services/tx/transaction-description'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -224,7 +225,10 @@ export default class WalletsController {
             status: ResponseCode.Success,
             result: wallet
           }
-        } catch {
+        } catch(e) {
+          if (e instanceof UsedName) {
+            throw e
+          }
           throw new InvalidJSON()
         }
       }
@@ -279,7 +283,7 @@ export default class WalletsController {
   }
 
   public async getAllAddresses(id: string) {
-    const addresses = AddressService.allAddressesByWalletId(id).map(
+    const addresses = (await AddressService.getAddressesWithBalancesByWalletId(id)).map(
       ({
         address,
         blake160: identifier,
@@ -292,9 +296,9 @@ export default class WalletsController {
         address,
         identifier,
         type,
-        txCount,
+        txCount: txCount!,
         description,
-        balance,
+        balance: balance!,
         index,
       })
     )
@@ -366,7 +370,7 @@ export default class WalletsController {
 
   public async updateAddressDescription({ walletID, address, description }: { walletID: string, address: string, description: string }) {
     const wallet = WalletsService.getInstance().get(walletID)
-    AddressService.updateDescription(wallet.id, address, description)
+    await AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,

@@ -3,11 +3,9 @@ import WalletsService from 'services/wallets'
 import { IsRequired } from 'exceptions'
 import NodeService from './node'
 import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
-import { TransactionPersistor, TransactionsService, TransactionGenerator, TargetOutput } from './tx'
-import NetworksService from './networks'
-import { AddressPrefix } from 'models/keys/address'
+import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
-import { Address } from 'database/address/address-dao'
+import { Address } from "models/address"
 import { PathAndPrivateKey } from 'models/keys/key'
 import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
@@ -30,7 +28,6 @@ import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
-import AddressGenerator from 'models/address-generator'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -49,7 +46,7 @@ export default class TransactionSender {
   }
 
   public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
-    const tx = this.sign(walletID, transaction, password, skipLastInputs)
+    const tx = await this.sign(walletID, transaction, password, skipLastInputs)
 
     const { ckb } = NodeService.getInstance()
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
@@ -57,15 +54,11 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
 
-    // update addresses txCount and balance
-    const blake160s = TransactionsService.blake160sOfTx(tx)
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const usedAddresses = blake160s.map(blake160 => AddressGenerator.toShortByBlake160(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses, blake160s)
+    await WalletService.checkAndGenerateAddresses(walletID)
     return txHash
   }
 
-  private sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
+  private async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -80,7 +73,7 @@ export default class TransactionSender {
     const isMultiSign = tx.inputs.length === 1 &&
       tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
-    const addressInfos = this.getAddressInfos(walletID)
+    const addressInfos = await this.getAddressInfos(walletID)
     const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
       return {
         multiSignBlake160: new MultiSign().hash(i.blake160),
@@ -205,21 +198,15 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const changeAddress: string = this.getChangeAddress()
+    const changeAddress: string = await this.getChangeAddress()
 
     const tx: Transaction = await TransactionGenerator.generateTx(
-      lockHashes,
+      walletID,
       targetOutputs,
       changeAddress,
       fee,
@@ -235,11 +222,6 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -247,7 +229,7 @@ export default class TransactionSender {
     }))
 
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-      lockHashes,
+      walletID,
       targetOutputs,
       fee,
       feeRate
@@ -262,18 +244,12 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = this.getAddressInfos(walletID)
+    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
 
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
-    const address = AddressesService.nextUnusedAddress(walletID)
-
-    const changeAddress: string = this.getChangeAddress()
+    const changeAddress: string = await this.getChangeAddress()
 
     const tx = await TransactionGenerator.generateDepositTx(
-      lockHashes,
+      walletID,
       capacity,
       address!.address,
       changeAddress,
@@ -304,16 +280,12 @@ export default class TransactionSender {
       throw new TransactionIsNotCommittedYet()
     }
 
-    const addressInfos = this.getAddressInfos(walletID)
-    const addresses: string[] = addressInfos.map(info => info.address)
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
-    const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
+    const changeAddress = await AddressesService.getNextUnusedChangeAddressByWalletId(walletID)
     const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
-      lockHashes,
+      walletID,
       outPoint,
       prevOutput,
       depositBlockHeader!.number,
@@ -379,7 +351,7 @@ export default class TransactionSender {
 
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
-    const address = await AddressesService.nextUnusedAddress(walletID)
+    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
     const blake160 = AddressParser.toBlake160(address!.address)
 
     const output: Output = new Output(
@@ -439,16 +411,10 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const addressInfos = this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
-    const address = AddressesService.nextUnusedAddress(walletID)
+    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
 
     const tx = await TransactionGenerator.generateDepositAllTx(
-      lockHashes,
+      walletID,
       address!.address,
       fee,
       feeRate,
@@ -477,7 +443,7 @@ export default class TransactionSender {
         throw new TransactionIsNotCommittedYet()
       }
 
-      const receivingAddressInfo = await AddressesService.nextUnusedAddress(walletID)
+      const receivingAddressInfo = await AddressesService.getNextUnusedAddressByWalletId(walletID)
       const receivingAddress = receivingAddressInfo!.address
       const prevOutput = cellWithStatus.cell!.output
       const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
@@ -515,15 +481,18 @@ export default class TransactionSender {
   }
 
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
-  public getAddressInfos = (walletID: string): Address[] => {
+  public getAddressInfos = (walletID: string): Promise<Address[]> => {
     // only for check wallet exists
     this.walletService.get(walletID)
-    return AddressService.allAddressesByWalletId(walletID)
+    return AddressService.getAddressesByWalletId(walletID)
   }
 
-  public getChangeAddress = (): string => {
+  public getChangeAddress = async (): Promise<string> => {
     const walletId = this.walletService.getCurrent()!.id
-    return AddressService.nextUnusedChangeAddress(walletId)!.address
+
+    const unusedChangeAddress = await AddressService.getNextUnusedChangeAddressByWalletId(walletId)
+
+    return unusedChangeAddress!.address
   }
 
   // Derive all child private keys for specified BIP44 paths.

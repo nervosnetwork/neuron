@@ -5,6 +5,7 @@ import path from 'path'
 import logger from 'utils/logger'
 import env from 'env'
 
+import HdPublicKeyInfo from './entities/hd-public-key-info'
 import Transaction from './entities/transaction'
 import Input from './entities/input'
 import Output from './entities/output'
@@ -12,6 +13,7 @@ import SyncInfo from './entities/sync-info'
 import AssetAccount from './entities/asset-account'
 import SudtTokenInfo from './entities/sudt-token-info'
 import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
+import TxDescription from './entities/tx-description'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -33,6 +35,8 @@ import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSud
 import { RemoveAssetAccountWalletID1589273902050 } from './migrations/1589273902050-RemoveAssetAccountWalletID'
 import { RemoveLiveCell1592781363749 } from './migrations/1592781363749-RemoveLiveCell'
 import { AddIndexerTxHashCache1592727615004 } from './migrations/1592727615004-AddIndexerTxHashCache'
+import { HDPublicKeyInfo1598087517643 } from './migrations/1598087517643-HDPublicKeyInfo'
+import { TxDescription1599441769473 } from './migrations/1599441769473-TxDescription'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -52,7 +56,17 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ...connectionOptions,
     type: 'sqlite',
     database,
-    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, SudtTokenInfo, IndexerTxHashCache],
+    entities: [
+      HdPublicKeyInfo,
+      Transaction,
+      TxDescription,
+      Input,
+      Output,
+      SyncInfo,
+      AssetAccount,
+      SudtTokenInfo,
+      IndexerTxHashCache
+    ],
     migrations: [
       InitMigration1566959757554,
       AddTypeAndHasData1567144517514,
@@ -74,7 +88,10 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       RemoveAssetAccountWalletID1589273902050,
       RemoveLiveCell1592781363749,
       AddIndexerTxHashCache1592727615004,
+      HDPublicKeyInfo1598087517643,
+      TxDescription1599441769473,
     ],
+    logger: 'simple-console',
     logging,
     maxQueryExecutionTime: 30
   }

@@ -1,4 +1,4 @@
-import { AddressVersion, Address } from '../../../src/database/address/address-dao'
+import { Address, AddressVersion } from '../../../src/models/address'
 import { AddressType } from '../../../src/models/keys/address'
 import AddressMeta from '../../../src/database/address/meta'
 

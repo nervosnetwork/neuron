@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import { queue, AsyncQueue } from 'async'
 import logger from 'utils/logger'
 import { TransactionPersistor } from 'services/tx'
@@ -11,12 +10,13 @@ import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
-import { Address as AddressInterface } from 'database/address/address-dao'
+import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
 import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
 import CommonUtils from 'utils/common'
+import { ChildProcess } from 'utils/worker'
 
 export default class Queue {
   private lockHashes: string[]
@@ -58,6 +58,7 @@ export default class Queue {
     this.indexerConnector.blockTipSubject.subscribe(tip => {
       this.updateCurrentBlockNumber(BigInt(tip.block_number))
     });
+
 
     this.checkAndSaveQueue = queue(async (task: any) => {
       const {transactions} = task
@@ -122,7 +123,7 @@ export default class Queue {
 
       const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
       cachedPreviousTxs.set(txHash, previousTxWithStatus)
-    }, 100)
+    }, 1)
 
     const drainFetchTxQueue = new Promise((resolve, reject) => {
       fetchTxQueue.error(reject)
@@ -151,7 +152,7 @@ export default class Queue {
     }
 
     for (const [, tx] of transactions.entries()) {
-      const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
+      const [shouldSave, , anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
         this.anyoneCanPayLockHashes,
         tx,
@@ -188,18 +189,36 @@ export default class Queue {
           }
         }
         await TransactionPersistor.saveFetchTx(tx)
-        const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
-        await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
         for (const info of anyoneCanPayInfos) {
           await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
         }
       }
+
+      await this.checkAndGenerateAddressesByTx(tx)
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
+    }
+  }
+
+  private async checkAndGenerateAddressesByTx(tx: Transaction) {
+    const walletIds = new Set(
+      this.addresses
+        .filter(
+          addr =>
+            tx.inputs.some(input => input.lock?.args === addr.blake160) ||
+            tx.outputs.some(output => output.lock?.args === addr.blake160)
+        )
+        .map(addr => addr.walletId)
+    )
+    for (const walletId of walletIds) {
+      await WalletService.checkAndGenerateAddresses(walletId)
     }
   }
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
+    ChildProcess.send({
+      channel: 'synced-block-number-updated',
+      result: this.currentBlockNumber.toString()
+    })
   }
 }

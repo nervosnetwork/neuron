@@ -5,14 +5,14 @@ import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionWithStatus from '../../src/models/chain/transaction-with-status'
-import {Address, AddressVersion} from '../../src/database/address/address-dao'
+import { Address, AddressVersion } from '../../src/models/address'
 import Queue from '../../src/block-sync-renderer/sync/queue'
 import Transaction from '../../src/models/chain/transaction'
-import TxStatus, {TxStatusType} from '../../src/models/chain/tx-status'
+import TxStatus, { TxStatusType } from '../../src/models/chain/tx-status'
 import Input from '../../src/models/chain/input'
 import Output from '../../src/models/chain/output'
 import OutPoint from '../../src/models/chain/out-point'
-import Script, {ScriptHashType} from '../../src/models/chain/script'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { flushPromises } from '../test-utils'
 
 const stubbedIndexerConnectorConstructor = jest.fn()
@@ -22,10 +22,10 @@ const stubbedConnectFn = jest.fn()
 const stubbedGetChainFn = jest.fn()
 const stubbedGenesisBlockHashFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
-const stubbedIpcRenderInvokeFn = jest.fn()
+const stubbedEmiterInvokeFn = jest.fn()
 const stubbedAddressesFn = jest.fn()
 const stubbedSaveFetchFn = jest.fn()
-const stubbedUpdateUsedAddressesFn = jest.fn()
+const stubbedCheckAndGenerateAddressesFn = jest.fn()
 const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
 const stubbedUpdateCacheProcessedFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
@@ -52,17 +52,17 @@ const resetMocks = () => {
   stubbedGetChainFn.mockReset()
   stubbedGenesisBlockHashFn.mockReset()
   stubbedIndexerConnectorConstructor.mockReset()
-  stubbedIpcRenderInvokeFn.mockReset()
+  stubbedEmiterInvokeFn.mockReset()
   stubbedAddressesFn.mockReset()
   stubbedSaveFetchFn.mockReset()
-  stubbedUpdateUsedAddressesFn.mockReset()
+  stubbedCheckAndGenerateAddressesFn.mockReset()
   stubbedGetTransactionFn.mockReset()
   stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
   stubbedUpdateCacheProcessedFn.mockReset()
   stubbedLoggerErrorFn.mockReset()
 }
 
-const generateFakeTx = (id: string) => {
+const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   const fakeTx = new Transaction('')
   fakeTx.hash = 'hash1'
   fakeTx.inputs = [
@@ -72,7 +72,7 @@ const generateFakeTx = (id: string) => {
     Output.fromObject({
       capacity: '1',
       lock: Script.fromObject(
-        {hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: '0x'}
+        { hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash }
       )
     })
   ]
@@ -92,10 +92,11 @@ describe('queue', () => {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
   const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+  const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
     blake160: '0xfakeblake160',
-    walletId: '',
+    walletId: fakeWalletId,
     path: '',
     addressType: AddressType.Receiving,
     addressIndex: 0,
@@ -128,13 +129,13 @@ describe('queue', () => {
         }
       }
     )
-    jest.doMock('electron', () => {
+    jest.doMock('controllers/sync-api', () => {
       return {
-        ipcRenderer: {
-          invoke: stubbedIpcRenderInvokeFn
+        emiter: {
+          emit: stubbedEmiterInvokeFn
         }
       }
-    });
+    })
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
     });
@@ -147,11 +148,11 @@ describe('queue', () => {
     });
     jest.doMock('services/wallets', () => {
       return {
-        updateUsedAddresses: stubbedUpdateUsedAddressesFn
+        checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
       }
     });
     jest.doMock('utils/logger', () => {
-      return {error: stubbedLoggerErrorFn}
+      return { error: stubbedLoggerErrorFn }
     });
     jest.doMock('../../src/block-sync-renderer/sync/indexer-connector', () => {
       return stubbedIndexerConnector
@@ -185,17 +186,17 @@ describe('queue', () => {
     });
     describe('subscribes to IndexerConnector#blockTipSubject', () => {
       describe('when new block tip emits from IndexerConnector', () => {
-        beforeEach(() => {
-          stubbedBlockTipSubject.next({block_number: '3', block_hash: '0x'})
-        });
         it('notify latest block numbers', () => {
-          expect(stubbedIpcRenderInvokeFn).toHaveBeenCalledWith('synced-block-number-updated', '3')
+          const mock = jest.spyOn(process, 'send')
+          stubbedBlockTipSubject.next({ block_number: '3', block_hash: '0x' })
+          expect(mock).toHaveBeenCalledWith({ channel: 'synced-block-number-updated', result: '3' })
+          mock.mockRestore()
         })
       });
     })
     describe('subscribes to IndexerConnector#transactionsSubject', () => {
-      const fakeTxWithStatus1 = generateFakeTx('1')
-      const fakeTxWithStatus2 = generateFakeTx('2')
+      const fakeTxWithStatus1 = generateFakeTx('1', addresses[0].blake160)
+      const fakeTxWithStatus2 = generateFakeTx('2', addresses[0].blake160)
 
       const fakeTxs = [
         fakeTxWithStatus2
@@ -225,16 +226,12 @@ describe('queue', () => {
             )
           })
           it('saves transactions', () => {
-            for (const {transaction} of fakeTxs) {
+            for (const { transaction } of fakeTxs) {
               expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
             }
           });
-          it('updates used addresses', () => {
-            for (let i = 0; i < fakeTxs.length; i++) {
-              expect(stubbedUpdateUsedAddressesFn).toHaveBeenCalledWith(
-                addresses.map(addressMeta => addressMeta.address), []
-              )
-            }
+          it('checks and generate new addresses', () => {
+            expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
           });
           it('notify indexer connector of processed block number', () => {
             expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)

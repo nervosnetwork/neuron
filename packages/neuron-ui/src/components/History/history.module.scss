@@ -1,6 +1,7 @@
 @import '../../styles/mixin.scss';
 
-.history {
+.container {
+  min-height: calc(100vh - 2 * var(--main-content-vertical-padding));
   .tools {
     display: grid;
     grid-template:
@@ -54,10 +55,10 @@
     flex: 1;
     flex-direction: column;
     justify-content: flex-end;
-    div[class^=visibleItemLabel] {
+    div[class^='visibleItemLabel'] {
       font-size: 0.75rem;
     }
-    button{
+    button {
       transform: scale(0.75);
       padding-left: 10px;
       padding-right: 10px;

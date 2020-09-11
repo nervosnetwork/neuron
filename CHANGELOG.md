@@ -1,3 +1,28 @@
+# 0.33.0-beta.1 (2020-09-12)
+
+This is a beta version to preview the changes in the next release and may not be stable. It is not suggested to install this version for asset management. Welcome any questions or suggestions.
+
+[CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of 
+CKB node is now bundled and preconfigured in Neuron. 
+
+### Refactor
+
+* Upgrade from Electron 7 to Electron 9.
+* Refactor the wallet address storage to be based on an SQLite table rather than a JSON file.
+* Deprecate LevelDB and use SQLite instead.
+* Refactor send component.
+
+### New features
+
+* Change the confirmation count from 300 to 24.
+* Enable `Asset Accounts` for mainnet.
+
+### Bug fixes
+
+* Fixed `InsufficientCellCapacity` error for CKB ACP transfer when there are cells with data.
+* Fixed `too many SQL variables` error when there are too many addresses in wallets.
+
+
 # 0.32.2 (2020-08-22)
 [CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
 

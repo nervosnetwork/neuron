@@ -426,7 +426,9 @@
       "first-page": "First page",
       "last-page": "Last page",
       "page": "Page",
-      "selected": "Current page"
+      "selected": "Current page",
+      "range": "{{start}} - {{end}} of {{count}}",
+      "page-no": "Page {{pageNo}}"
     },
     "nervos-dao": {
       "free": "Available",
@@ -551,6 +553,14 @@
       "release-success": "Asset was released, view details in History.",
       "no-special-assets": "No customized assets",
       "experimental": "Experimental"
+    },
+    "customized-asset": {
+      "actions": {
+        "unlock": "Unlock",
+        "mint": "Mint",
+        "burn": "Burn"
+      },
+      "view-in-explorer": "Explorer"
     },
     "s-udt": {
       "account-list": {

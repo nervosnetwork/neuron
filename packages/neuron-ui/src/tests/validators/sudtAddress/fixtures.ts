@@ -41,7 +41,7 @@ export default {
     },
     exception: ErrorCode.TestnetAddressRequired,
   },
-  "Should throw an error when it's not a full address": {
+  "Should throw an error when it's not a full version address": {
     params: {
       address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j1',
       isMainnet: false,
@@ -49,10 +49,18 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  "Should throw an error when it's node a 0x04 address": {
+  "Should throw an error when it's not a 0x04(type id ver.) address on testnet": {
     params: {
       address: 'ckt1q2r2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yy3d90uh',
       isMainnet: false,
+      required: false,
+    },
+    exception: ErrorCode.FieldInvalid,
+  },
+  "Should throw an error when it's not a 0x02(data ver.) address on mainnet": {
+    params: {
+      address: 'ckb1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xw3vumhs9nvu786dj9p0q5elx66t24n3kxgj53qks',
+      isMainnet: true,
       required: false,
     },
     exception: ErrorCode.FieldInvalid,

@@ -9,8 +9,7 @@ import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import FileService from './file'
 import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
-import NetworksService from './networks'
-import { AddressVersion } from 'database/address/address-dao'
+import { ChildProcess } from 'utils/worker'
 
 const fileService = FileService.getInstance()
 
@@ -148,22 +147,22 @@ export default class WalletService {
     return FileKeystoreWallet.fromJSON(wallet)
   }
 
-  public generateAddressesIfNecessary = () => {
+  public generateAddressesIfNecessary = async () => {
     for (const wallet of this.getAll()) {
-      if (AddressService.allAddressesByWalletId(wallet.id).length === 0) {
-        this.generateAddressesById(wallet.id, false)
+      if ((await AddressService.getAddressesByWalletId(wallet.id)).length === 0) {
+        await this.generateAddressesById(wallet.id, false)
       }
     }
   }
 
-  public generateAddressesById = (
+  public generateAddressesById = async (
     id: string,
     isImporting: boolean,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
-    AddressService.checkAndGenerateSave(
+    await AddressService.checkAndGenerateSave(
       id,
       accountExtendedPublicKey,
       isImporting,
@@ -239,8 +238,16 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
-    AddressService.deleteByWalletId(id)
-    WalletDeletedSubject.getSubject().next(id)
+    await AddressService.deleteByWalletId(id)
+
+    if (ChildProcess.isChildProcess()) {
+      ChildProcess.send({
+        channel: 'wallet-deleted',
+        result: id
+      })
+    } else {
+      WalletDeletedSubject.getSubject().next(id)
+    }
   }
 
   public setCurrent = (id: string) => {
@@ -283,17 +290,15 @@ export default class WalletService {
     this.listStore.clear()
   }
 
-  // TODO: move this method and generateTx/sendTx out of this file
-  public static async updateUsedAddresses(addresses: string[], anyoneCanPayBlake160s: string[]) {
-    const addrs = await AddressService.updateTxCountAndBalances(addresses)
-    const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-    const anyoneCanPayAddrs = await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayBlake160s, addressVersion)
-    const walletIds: Set<string> = new Set(addrs.concat(anyoneCanPayAddrs).map(addr => addr.walletId))
-    walletIds.forEach(id => {
-      const wallet = WalletService.getInstance().get(id)
-      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-      // set isImporting to undefined means unknown
-      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, DefaultAddressNumber.Receiving, DefaultAddressNumber.Change)
-    })
+  public static async checkAndGenerateAddresses(walletId: string) {
+    const wallet = WalletService.getInstance().get(walletId)
+    const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+    await AddressService.checkAndGenerateSave(
+      walletId,
+      accountExtendedPublicKey,
+      undefined,
+      DefaultAddressNumber.Receiving,
+      DefaultAddressNumber.Change
+    )
   }
 }

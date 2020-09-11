@@ -6,7 +6,7 @@ import AddressService from 'services/addresses'
 import { ChainType } from 'models/network'
 import Transaction from 'models/chain/transaction'
 import toCSVRow from 'utils/to-csv-row'
-import { get as getDescription } from 'database/leveldb/transaction-description'
+import { get as getDescription } from 'services/tx/transaction-description'
 
 const exportHistory = async ({
   walletID,
@@ -43,7 +43,9 @@ const exportHistory = async ({
     `${headers.map(label => t(`export-transactions.column.${label}`))}\n`
   )
 
-  const addresses = AddressService.allAddressesByWalletId(walletID).map(addr => addr.address)
+  const allAddresses = await AddressService.getAddressesByWalletId(walletID)
+
+  const addresses = allAddresses.map(addr => addr.address)
   const PAGE_SIZE = 100
   let count = Infinity
   let txs: Transaction[] = []
