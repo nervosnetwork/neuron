@@ -8,7 +8,7 @@ CKB node is now bundled and preconfigured in Neuron.
 ### Refactor
 
 * Upgrade from Electron 7 to Electron 9.
-* Refactor the address storage to be based on a SQLite table storing the public keys for wallets rather than a JSON file.
+* Refactor the wallet address storage to be based on an SQLite table rather than a JSON file.
 * Deprecate LevelDB and use SQLite instead.
 * Refactor send component.
 
