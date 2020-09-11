@@ -370,7 +370,7 @@ const SUDTSend = () => {
               />
             </div>
             <div className={styles.remoteError}>
-              {isFormReady && remoteError ? (
+              {remoteError ? (
                 <>
                   <Attention />
                   {remoteError}
