@@ -21,7 +21,7 @@ export default class SignMessageController {
   }
 
   public async verify(params: Controller.Params.VerifyParams): Promise<Controller.Response<boolean>> {
-    const result: boolean = SignMessage.verify(
+    const result: boolean = await SignMessage.verify(
       params.address.trim(),
       params.signature,
       params.message

@@ -68,8 +68,6 @@ export default class Ledger implements Hardware {
   }
 
   public async signTransaction (_: string, tx: Transaction) {
-    // eslint-disable-next-line no-debugger
-    debugger
     const { ckb } = NodeService.getInstance()
     const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
     rawTx.witnesses = rawTx.inputs.map(() => '0x')
@@ -99,6 +97,11 @@ export default class Ledger implements Hardware {
     tx.hash = tx.computeHash()
 
     return tx
+  }
+
+  async signMessage (path: string, message: string) {
+    const messageHex = Buffer.from(message, 'utf-8').toString('hex')
+    return await this.ledgerCKB!.signMessage(path, messageHex, true)
   }
 
   async getAppVersion (): Promise<HardwareResponse<string>> {

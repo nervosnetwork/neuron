@@ -5,11 +5,14 @@ import Blake2b from "models/blake2b"
 import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from "exceptions"
+import HardwareWalletService from "./hardware-wallet"
+import { AccountExtendedPublicKey } from "models/keys/key"
 import AddressParser from "models/address-parser"
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
   private static ec = new EC('secp256k1')
+  private static magicString = 'Nervos Message:'
 
   public static async sign(walletID: string, address: string, password: string, message: string): Promise<string> {
     const wallet = WalletService.getInstance().get(walletID)
@@ -19,42 +22,51 @@ export default class SignMessage {
       throw new AddressNotFound()
     }
 
+    if (wallet.isHardware()) {
+      let device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const deviceInfo = wallet.getDeviceInfo()
+        device = (await HardwareWalletService.getInstance().initHardware(deviceInfo))!
+        await device!.connect()
+      }
+      const signed = await device!.signMessage(AccountExtendedPublicKey.ckbAccountPath, message)
+      return '0x' + signed
+    }
+
     // find private key of address
-    const privateKey = this.getPrivateKey(wallet, addr!.path, password)
+    const privateKey = this.getPrivateKey(wallet, addr.path, password)
 
     return this.signByPrivateKey(privateKey, message)
   }
 
   private static signByPrivateKey(privateKey: string, message: string): string {
-    const buffer = Buffer.from(message, 'utf-8')
-    const blake2b = new Blake2b()
-    blake2b.updateBuffer(buffer)
-    const digest = blake2b.digest()
+    const digest = SignMessage.signtureHash(message)
     const ecPair = new ECPair(privateKey)
     const signature = ecPair.signRecoverable(digest)
-    const encoded = Buffer.from(signature.slice(2), 'hex').toString('base64')
-    return encoded
+    return signature
   }
 
-  public static verify(address: string, signature: string, message: string): boolean {
-    const decodedSignature = '0x' + Buffer.from(signature, 'base64').toString('hex')
-
-    const buffer = Buffer.from(message, 'utf-8')
-    const blake2b = new Blake2b()
-    blake2b.updateBuffer(buffer)
-    const digest = blake2b.digest()
+  public static async verify(address: string, signature: string, message: string): Promise<boolean> {
+    const digest = SignMessage.signtureHash(message)
 
     const options = {
-      r: decodedSignature.slice(2, 66),
-      s: decodedSignature.slice(66 ,130),
-      recoveryParam: parseInt(decodedSignature.slice(-1))
+      r: signature.slice(2, 66),
+      s: signature.slice(66 ,130),
+      recoveryParam: parseInt(signature.slice(-1))
     }
+
     const msgBuffer = Buffer.from(digest.slice(2), 'hex')
-    const publicKey = '0x' + this.ec.recoverPubKey(msgBuffer, options, options.recoveryParam).encode('hex', true)
+    const publicKey = '0x' + SignMessage.ec.recoverPubKey(msgBuffer, options, options.recoveryParam).encode('hex', true)
 
     const recoverBlake160 = AddressParser.toBlake160(address)
-
     return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
+  }
+
+  private static signtureHash (message: string) {
+    const buffer = Buffer.from(SignMessage.magicString + message, 'utf-8')
+    const blake2b = new Blake2b()
+    blake2b.updateBuffer(buffer)
+    return blake2b.digest()
   }
 
   private static getPrivateKey(wallet: Wallet, path: string, password: string): string {

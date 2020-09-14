@@ -6,6 +6,7 @@ export interface Hardware {
   deviceInfo: DeviceInfo
   getExtendedPublicKey: () => Promise<HardwareResponse<ExtendedPublicKey>>
   connect: (hardwareInfo?: DeviceInfo) => Promise<void>
+  signMessage: (path: string, messageHex: string) => Promise<string>
   disconect: () => Promise<void>
   signTransaction: (walletID: string, tx: Transaction) => Promise<Transaction>
   getAppVersion?: () => Promise<HardwareResponse<string>>
