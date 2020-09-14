@@ -9,13 +9,15 @@ import {
   sendSUDTTransaction,
   AppActions,
 } from 'states'
+import { useHistory } from 'react-router-dom'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import { connectDevice } from 'services/remote'
-import { isSuccessResponse, useDidMount } from 'utils'
+import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import styles from './hardwareSign.module.scss'
 
 const HardwareSign = () => {
   const [t] = useTranslation()
+  const history = useHistory()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const dispatch = useDispatch()
   const onCancel = useCallback(() => {
@@ -61,6 +63,7 @@ const HardwareSign = () => {
             sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
               if (isSuccessResponse(res)) {
                 setSuccess(true)
+                history.push(RoutePath.History)
               } else {
                 setError(res.message)
               }
