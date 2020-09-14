@@ -3,7 +3,7 @@ import { CapacityTooSmall } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
-import { CapacityNotEnough } from 'exceptions/wallet'
+import { CapacityNotEnough, LiveCapacityNotEnough } from 'exceptions/wallet'
 import Output from 'models/chain/output'
 import Input from 'models/chain/input'
 import OutPoint from 'models/chain/out-point'
@@ -409,6 +409,10 @@ export class TransactionGenerator {
       append
     )
     const finalFeeInt = BigInt(finalFee)
+
+    if (finalFeeInt === BigInt(0)) {
+      throw new LiveCapacityNotEnough()
+    }
 
     tx.inputs = inputs
     tx.fee = finalFee

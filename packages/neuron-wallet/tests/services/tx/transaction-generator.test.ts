@@ -16,7 +16,7 @@ import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
 import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { CapacityNotEnough } from '../../../src/exceptions/wallet'
+import { CapacityNotEnough, LiveCapacityNotEnough } from '../../../src/exceptions/wallet'
 import LiveCell from '../../../src/models/chain/live-cell'
 import AddressGenerator from '../../../src/models/address-generator'
 import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
@@ -816,43 +816,85 @@ describe('TransactionGenerator', () => {
     })
   })
 
-  describe('startWithdrawFromDao', () => {
+  describe.only('#startWithdrawFromDao', () => {
     const daoData = "0x0000000000000000"
     const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, SystemScriptInfo.generateDaoScript(), alice, daoData)
     const depositDaoCell = depositDaoOutput.toModel()
     const depositOutPoint = new OutPoint('0x' + '2'.repeat(64), '0')
-    beforeEach(async done => {
-      const cells: OutputEntity[] = [
-        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
-        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
-        depositDaoOutput,
-      ]
 
-      await getConnection().manager.save(cells)
-      done()
-    })
+    describe('with deposit tx', () => {
+      const feeRate = '1000'
+      const feeRateInt = BigInt(feeRate)
+      beforeEach(async () => {
+        const cells: OutputEntity[] = [
+          depositDaoOutput,
+        ]
 
-    const feeRate = '1000'
-    const feeRateInt = BigInt(feeRate)
+        await getConnection().manager.save(cells)
+      })
 
-    it('deposit first', async () => {
-      const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
-        walletId1,
-        depositOutPoint,
-        depositDaoCell,
-        '12',
-        '0x' + '3'.repeat(64),
-        bob.address,
-        '0',
-        feeRate
-      )
-      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2
-      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
-      expect(expectedFee).toEqual(BigInt(731))
-      expect(tx.fee).toEqual(expectedFee.toString())
-      expect(tx.inputs!.length).toEqual(2)
-      expect(tx.outputs!.length).toEqual(2)
-    })
+      describe('with enough live capacity', () => {
+        beforeEach(async () => {
+          const cells: OutputEntity[] = [
+            generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+          ]
+
+          await getConnection().manager.save(cells)
+        })
+        it('generates withdraw tx', async () => {
+          const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
+            walletId1,
+            depositOutPoint,
+            depositDaoCell,
+            '12',
+            '0x' + '3'.repeat(64),
+            bob.address,
+            '0',
+            feeRate
+          )
+          const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2
+          const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+          expect(expectedFee).toEqual(BigInt(731))
+          expect(tx.fee).toEqual(expectedFee.toString())
+          expect(tx.inputs!.length).toEqual(2)
+          expect(tx.outputs!.length).toEqual(2)
+        })
+      });
+
+      describe('when no enough live capacity to cover fee', () => {
+        beforeEach(async () => {
+          const cells: OutputEntity[] = [
+            generateCell(toShannon('1000'), OutputStatus.Sent, false, null),
+            generateCell(toShannon('1000'), OutputStatus.Dead, false, null),
+            generateCell(toShannon('1000'), OutputStatus.Pending, false, null),
+            generateCell(toShannon('1000'), OutputStatus.Failed, false, null),
+          ]
+
+          await getConnection().manager.save(cells)
+        })
+        it('throws LiveCapacityNotEnough', async () => {
+          let err
+          try {
+            await TransactionGenerator.startWithdrawFromDao(
+              walletId1,
+              depositOutPoint,
+              depositDaoCell,
+              '12',
+              '0x' + '3'.repeat(64),
+              bob.address,
+              '0',
+              feeRate
+            )
+          } catch (error) {
+            err = error
+          }
+
+          expect(err).toEqual(new LiveCapacityNotEnough())
+        });
+      });
+    });
+
+
   })
 
   describe('generateWithdrawMultiSignTx', () => {
