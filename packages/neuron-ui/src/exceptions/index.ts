@@ -5,6 +5,7 @@ export * from './address'
 export * from './amount'
 export * from './url'
 export * from './password'
+export * from './hardware'
 
 const I18N_PATH = `messages.codes.`
 

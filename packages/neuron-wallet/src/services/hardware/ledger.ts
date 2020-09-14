@@ -1,4 +1,4 @@
-import { Hardware, DeviceInfo, HardwareResponse, ExtendedPublicKey } from './index'
+import { Hardware, DeviceInfo, ExtendedPublicKey } from './index'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
@@ -9,7 +9,6 @@ import LedgerCKB from 'hw-app-ckb'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import Address, { AddressType } from 'models/keys/address'
-import { ResponseCode } from 'utils/const'
 
 export default class Ledger implements Hardware {
   public deviceInfo: DeviceInfo
@@ -48,21 +47,11 @@ export default class Ledger implements Hardware {
     this.isConnected = false
   }
 
-  public async getExtendedPublicKey (): Promise<HardwareResponse<ExtendedPublicKey>> {
-    try {
-      const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.firstReceiveAddress)
-      return {
-        status: ResponseCode.Success,
-        result: {
-          publicKey: public_key,
-          chainCode: chain_code
-        }
-      }
-    } catch (error) {
-      return {
-        status: ResponseCode.Fail,
-        message: error
-      }
+  public async getExtendedPublicKey (): Promise<ExtendedPublicKey> {
+    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.firstReceiveAddress)
+    return {
+      publicKey: public_key,
+      chainCode: chain_code
     }
   }
 
@@ -102,40 +91,19 @@ export default class Ledger implements Hardware {
     return await this.ledgerCKB!.signMessage(path, messageHex, true)
   }
 
-  async getAppVersion (): Promise<HardwareResponse<string>> {
-    try {
-      const conf = await this.ledgerCKB?.getAppConfiguration()
-      return {
-        status: ResponseCode.Success,
-        result: conf!.version
-      }
-    } catch (error) {
-      return {
-        status: ResponseCode.Fail,
-        message: error
-      }
-    }
+  async getAppVersion (): Promise<string> {
+    const conf = await this.ledgerCKB?.getAppConfiguration()
+    return conf!.version
   }
 
-  async getFirmwareVersion (): Promise<HardwareResponse<string>> {
-    let res: Buffer
-    try {
-      res = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
-    } catch (error) {
-      return {
-        status: ResponseCode.Fail,
-        message: error
-      }
-    }
+  async getFirmwareVersion (): Promise<string> {
+    let res: Buffer = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
     const byteArray = [...res]
     const data = byteArray.slice(0, byteArray.length - 2)
     const versionLength = data[4]
     const version = Buffer.from(data.slice(5, 5 + versionLength)).toString()
 
-    return {
-      status: ResponseCode.Success,
-      result: version
-    }
+    return version
   }
 
   public static async findDevices () {

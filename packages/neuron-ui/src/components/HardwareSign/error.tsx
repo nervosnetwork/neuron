@@ -1,12 +1,10 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
 import Button from 'widgets/Button'
 import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
-import { LocationState } from './common'
 
-import styles from './findDevice.module.scss'
+import styles from './hardwareSign.module.scss'
 
 function formatError(error: string | FailureFromController['message']) {
   if (typeof error === 'string') {
@@ -16,12 +14,8 @@ function formatError(error: string | FailureFromController['message']) {
   return error.content ?? ''
 }
 
-const ImportError = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const SignError = ({ error, onCancel }: { error: string; onCancel: () => void }) => {
   const [t] = useTranslation()
-  const { error, entryPath } = location.state
-  const onBack = useCallback(() => {
-    history.push(entryPath)
-  }, [history, entryPath])
 
   return (
     <div className={styles.container}>
@@ -32,10 +26,10 @@ const ImportError = ({ history, location }: RouteComponentProps<{}, {}, Location
         <div className={styles.message}>{formatError(error!)}</div>
       </section>
       <footer className={styles.footer}>
-        <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
+        <Button type="cancel" label={t('hardware-sign.actions.close')} onClick={onCancel} />
       </footer>
     </div>
   )
 }
 
-export default ImportError
+export default SignError

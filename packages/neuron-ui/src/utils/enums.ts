@@ -95,7 +95,13 @@ export enum ErrorCode {
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
   // hardware
-  SignFailed = 400,
+  SignTransactionFailed = 400,
+  ConnectFailed = 401,
+  CkbAppNotFound = 402,
+  DeviceNotFound = 403,
+  MultiDevice = 404,
+  UnknownError = 405,
+  SignMessageFailed = 406,
 }
 
 export enum SyncStatus {

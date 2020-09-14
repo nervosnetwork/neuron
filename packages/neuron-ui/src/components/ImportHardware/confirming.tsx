@@ -5,17 +5,9 @@ import Button from 'widgets/Button'
 import { ReactComponent as PendingIcon } from 'widgets/Icons/Pending.svg'
 import { getPublickey } from 'services/remote'
 import { isSuccessResponse, useDidMount } from 'utils'
-import { RoutePath, Model, LocationState } from './common'
+import { RoutePath, LocationState } from './common'
 
 import styles from './findDevice.module.scss'
-
-export interface ConfirmState {
-  model: Model
-  extendedPublicKey: {
-    publicKey: string
-    chaincode: string
-  }
-}
 
 const Confirming = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
   const [t] = useTranslation()
@@ -39,7 +31,7 @@ const Confirming = ({ history, location }: RouteComponentProps<{}, {}, LocationS
           pathname: entryPath + RoutePath.Error,
           state: {
             ...location.state,
-            error: res.message as string,
+            error: res.message,
           },
         })
       }

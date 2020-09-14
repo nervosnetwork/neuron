@@ -6,15 +6,15 @@ import { getDevices, getFirmwareVersion, getCkbAppVersion, connectDevice } from 
 import { isSuccessResponse, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
 import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
+import {
+  CkbAppNotFoundException,
+  ConnectFailedException,
+  DeviceNotFoundException,
+  MultiDeviceException,
+} from 'exceptions'
 import { RoutePath, LocationState } from './common'
 
 import styles from './findDevice.module.scss'
-
-enum ErrorType {
-  MultiDevice,
-  DeviceNotFound,
-  CkbAppNotFound,
-}
 
 const Info = (
   { isError, isScaning, msg }: { isError?: boolean; isScaning?: boolean; msg: string } = {
@@ -54,41 +54,44 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
   }, [histroy])
 
   const [scaning, setScaning] = useState(true)
-  const [errorType, setErrorType] = useState<ErrorType>(-1)
+  const [error, setError] = useState('')
   const [appVersion, setAppVersion] = useState('')
   const [firmwareVersion, setFirmwareVersion] = useState('')
 
   const findDevice = useCallback(async () => {
-    setErrorType(-1)
+    setError('')
     setScaning(true)
-    const res = await getDevices(model)
-    if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
-      const [device, ...rest] = res.result
-      if (rest.length > 0) {
-        setErrorType(ErrorType.MultiDevice)
-        setScaning(false)
-        return
-      }
-      const conectionRes = await connectDevice(device)
-      if (!isSuccessResponse(conectionRes)) {
-        setErrorType(ErrorType.MultiDevice)
-        setScaning(false)
-        return
-      }
-      const firmwareVersionRes = await getFirmwareVersion(device.descriptor)
-      if (isSuccessResponse(firmwareVersionRes)) {
-        setFirmwareVersion(firmwareVersionRes.result!)
-      }
-      const ckbVersionRes = await getCkbAppVersion(device.descriptor)
-      if (isSuccessResponse(ckbVersionRes)) {
-        setAppVersion(ckbVersionRes.result!)
+    try {
+      const res = await getDevices(model)
+      if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
+        const [device, ...rest] = res.result
+        if (rest.length > 0) {
+          setScaning(false)
+          throw new MultiDeviceException()
+        }
+        const conectionRes = await connectDevice(device)
+        if (!isSuccessResponse(conectionRes)) {
+          setScaning(false)
+          throw new ConnectFailedException()
+        }
+        const firmwareVersionRes = await getFirmwareVersion(device.descriptor)
+        if (isSuccessResponse(firmwareVersionRes)) {
+          setFirmwareVersion(firmwareVersionRes.result!)
+        }
+        const ckbVersionRes = await getCkbAppVersion(device.descriptor)
+        if (isSuccessResponse(ckbVersionRes)) {
+          setAppVersion(ckbVersionRes.result!)
+        } else {
+          throw new CkbAppNotFoundException()
+        }
       } else {
-        setErrorType(ErrorType.CkbAppNotFound)
+        throw new DeviceNotFoundException()
       }
-    } else {
-      setErrorType(ErrorType.DeviceNotFound)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setScaning(false)
     }
-    setScaning(false)
   }, [model])
 
   useDidMount(() => {
@@ -102,14 +105,8 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
     })
   }, [history, entryPath, location.state])
 
-  const errors = {
-    [ErrorType.CkbAppNotFound]: t('import-hardware.errors.ckb-app-not-found'),
-    [ErrorType.DeviceNotFound]: t('import-hardware.errors.device-not-found'),
-    [ErrorType.MultiDevice]: t('import-hardware.errors.multi-device'),
-  }
-
-  const errorMsg = errors[errorType]
-  const ready = errorMsg === undefined && appVersion !== ''
+  const errorMsg = t(error)
+  const ready = error === '' && appVersion !== ''
   const productName = `${model.manufacturer} ${model.product}`
 
   return (
@@ -117,7 +114,7 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
       <header className={styles.title}>{t('import-hardware.title.detect-device')}</header>
       <section className={styles.detect}>
         <h3 className={styles.model}>{productName}</h3>
-        {errorMsg ? <Info isError msg={errors[errorType]} /> : null}
+        {errorMsg ? <Info isError msg={errorMsg} /> : null}
         {scaning ? <Info isScaning={scaning} msg={t('import-hardware.waiting')} /> : null}
         {firmwareVersion && !errorMsg && !scaning ? (
           <Info msg={t('import-hardware.firmware-version', { version: firmwareVersion })} />

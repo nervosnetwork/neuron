@@ -80,7 +80,7 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => asy
     const res = await sendTx(params)
     if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
-    } else if (res.status !== ErrorCode.PasswordIncorrect) {
+    } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
       addNotification({
         type: 'alert',
         timestamp: +new Date(),

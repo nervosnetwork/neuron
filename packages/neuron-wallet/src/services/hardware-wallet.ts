@@ -1,6 +1,5 @@
-import { Hardware, DeviceInfo, Manufacturer, HardwareResponse } from './hardware'
+import { Hardware, DeviceInfo, Manufacturer } from './hardware'
 import Ledger from './hardware/ledger'
-import { ResponseCode } from 'utils/const'
 
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
@@ -34,27 +33,17 @@ export default class HardwareWalletService {
     }
   }
 
-  public static async findDevices (device?: DeviceInfo): Promise<HardwareResponse<DeviceInfo[]>> {
-    try {
-      const devices = await Promise.all([
-        Ledger.findDevices(),
-        // add new brand `findDevices()` here
-      ])
-      let result = devices.flat().filter(Boolean)
+  public static async findDevices (device?: DeviceInfo): Promise<DeviceInfo[]> {
+    const devices = await Promise.all([
+      Ledger.findDevices(),
+      // add new brand `findDevices()` here
+    ])
+    const result = devices.flat().filter(Boolean)
 
-      if (device) {
-        result = result.filter(r => r.manufacturer === device.manufacturer && r.product === device.product)
-      }
-
-      return {
-        status: ResponseCode.Success,
-        result
-      }
-    } catch (error) {
-      return {
-        status: ResponseCode.Fail,
-        message: error
-      }
+    if (device) {
+      return result.filter(r => r.manufacturer === device.manufacturer && r.product === device.product)
     }
+
+    return result
   }
 }

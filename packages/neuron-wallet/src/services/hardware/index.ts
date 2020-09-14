@@ -1,26 +1,19 @@
 import type Transaction from 'models/chain/transaction'
 import { AddressType } from 'models/keys/address';
-import { ResponseCode } from 'utils/const'
 
 export interface Hardware {
   deviceInfo: DeviceInfo
-  getExtendedPublicKey: () => Promise<HardwareResponse<ExtendedPublicKey>>
+  getExtendedPublicKey: () => Promise<ExtendedPublicKey>
   connect: (hardwareInfo?: DeviceInfo) => Promise<void>
   signMessage: (path: string, messageHex: string) => Promise<string>
   disconect: () => Promise<void>
   signTransaction: (walletID: string, tx: Transaction) => Promise<Transaction>
-  getAppVersion?: () => Promise<HardwareResponse<string>>
-  getFirmwareVersion?: () => Promise<HardwareResponse<string>>
+  getAppVersion: () => Promise<string>
+  getFirmwareVersion?: () => Promise<string>
 }
 
 export enum Manufacturer {
   Ledger = 'Ledger'
-}
-
-export interface HardwareResponse<T> {
-  status: ResponseCode,
-  result?: T,
-  message?: Error
 }
 
 export interface DeviceInfo {

@@ -64,6 +64,10 @@
         "label": "Status:",
         "connect": "Connected, waiting for user input...",
         "disconnect": "Disconnected, please check your connection."
+      },
+      "actions": {
+        "close": "Close",
+        "success": "Transaction Succesful!"
       }
     },
     "overview": {
@@ -449,7 +453,10 @@
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
         "307": "Please enter a testnet address",
-        "308": "Amount is not enough"
+        "308": "Amount is not enough",
+        "402": "CKB App does not open. Please open the CKB App on your device.",
+        "403": "No device detected. Please connect your device.",
+        "404": "Multiple device detected. Only one device of the same model can be connected."
       }
     },
     "sync": {

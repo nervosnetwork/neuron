@@ -11,23 +11,46 @@
     display: flex;
     flex-direction: column;
 
+    .action {
+      @extend .main;
+      text-align: center;
+      .message {
+        margin-top: 26px;
+        font-weight: bold;
+      }
+
+      +.footer {
+        justify-content: center;
+      }
+
+      svg {
+        width: 56px;
+        height: 56px;
+      }
+
+      .rotating {
+        svg {
+          animation: rotating 3s linear infinite;
+        }
+      }
+    }
+
     .main {
       flex: 1;
       tr {
         td {
           font-size: 14px;
+          svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+            position: relative;
+            top: 2px;
+          }
         }
         .first {
           padding-right: 30px;
         }
-      }
-
-      svg {
-        width: 14px;
-        height: 14px;
-        margin-right: 4px;
-        position: relative;
-        top: 2px;
       }
     }
   }

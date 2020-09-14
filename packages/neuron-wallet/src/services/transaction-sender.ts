@@ -27,6 +27,7 @@ import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
 import HardwareWalletService from './hardware-wallet'
+import { SignTransactionFailed } from 'exceptions'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -71,7 +72,11 @@ export default class TransactionSender {
         device = (await HardwareWalletService.getInstance().initHardware(deviceInfo))!
         await device!.connect()
       }
-      return await device.signTransaction(walletID, tx)
+      try {
+        return await device.signTransaction(walletID, tx)
+      } catch (err) {
+        throw new SignTransactionFailed(err.message)
+      }
     }
 
     // Only one multi sign input now.

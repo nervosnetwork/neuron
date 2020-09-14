@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { FailureFromController } from 'services/remote/remoteApiWrapper'
 
 export enum RoutePath {
   DetectDevice = '/detect-device',
@@ -16,7 +17,7 @@ export interface LocationState {
     publicKey: string
     chainCode: string
   }
-  error?: string | Error
+  error?: FailureFromController['message']
 }
 
 export interface Model {

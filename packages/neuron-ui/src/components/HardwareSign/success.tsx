@@ -1,18 +1,19 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
+import { RoutePath } from 'utils'
 import Button from 'widgets/Button'
 import { ReactComponent as CompleteIcon } from 'widgets/Icons/Complete.svg'
-import { RoutePath, LocationState } from './common'
 
-import styles from './findDevice.module.scss'
+import styles from './hardwareSign.module.scss'
 
-const Success = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const SignSuccess = ({ onCancel }: { onCancel: () => void }) => {
   const [t] = useTranslation()
-  const { entryPath } = location.state
+  const history = useHistory()
   const onClose = useCallback(() => {
-    history.push(entryPath.replace(RoutePath.ImportHardware, ''))
-  }, [history, entryPath])
+    onCancel()
+    history.push(RoutePath.History)
+  }, [history, onCancel])
 
   return (
     <div className={styles.container}>
@@ -29,6 +30,6 @@ const Success = ({ history, location }: RouteComponentProps<{}, {}, LocationStat
   )
 }
 
-Success.displayName = 'Success'
+SignSuccess.displayName = 'SignSuccess'
 
-export default Success
+export default SignSuccess

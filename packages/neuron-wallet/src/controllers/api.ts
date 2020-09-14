@@ -27,7 +27,7 @@ import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, Upd
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware'
-import HardwareWalletService from 'services/hardware-wallet'
+import HardwareController from './hardware'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -39,6 +39,7 @@ export default class ApiController {
   private customizedAssetsController = new CustomizedAssetsController()
   private assetAccountController = new AssetAccountController()
   private anyoneCanPayController = new AnyoneCanPayController()
+  private hardwareController = new HardwareController()
 
   public async mount() {
     this.registerHandlers()
@@ -317,7 +318,7 @@ export default class ApiController {
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
       return this.daoController.withdrawFromDao(params)
-    })
+    });
 
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
@@ -431,27 +432,23 @@ export default class ApiController {
 
     // Hardware wallet
     handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
-      const device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
-      await device!.connect()
+      await this.hardwareController.connectDevice(deviceInfo)
     })
 
     handle('detect-device', async () => {
-      return await HardwareWalletService.findDevices()
+      return this.hardwareController.detectDevice()
     })
 
     handle('get-ckb-app-version', async () => {
-      const device = HardwareWalletService.getInstance().getCurrent()!
-      return await device.getAppVersion?.()
+      return this.hardwareController.getCkbAppVersion()
     })
 
     handle('get-firmware-version', async () => {
-      const device = HardwareWalletService.getInstance().getCurrent()!
-      return await device.getFirmwareVersion?.()
+      return this.hardwareController.getFirmwareVersion()
     })
 
     handle('get-public-key', async () => {
-      const device = HardwareWalletService.getInstance().getCurrent()!
-      return await device.getExtendedPublicKey()
+      return this.hardwareController.getPublicKey()
     })
 
     handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
