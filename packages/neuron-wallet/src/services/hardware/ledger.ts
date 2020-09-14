@@ -1,5 +1,4 @@
 import { Hardware, DeviceInfo, HardwareResponse, ExtendedPublicKey } from './index'
-// import { AccountExtendedPublicKey } from 'models/keys/key'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
@@ -9,15 +8,15 @@ import Bluetooth from '@ledgerhq/hw-transport-node-ble'
 import LedgerCKB from 'hw-app-ckb'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
-import { AccountExtendedPublicKey } from 'models/keys/key'
-import { AddressType } from 'models/keys/address'
+import Address, { AddressType } from 'models/keys/address'
 import { ResponseCode } from 'utils/const'
 
 export default class Ledger implements Hardware {
   public deviceInfo: DeviceInfo
+  public isConnected = false
   private ledgerCKB: LedgerCKB | null = null
   private transport: Transport | null = null
-  public isConnected = false
+  private firstReceiveAddress = Address.pathForReceiving(0)
 
   constructor (deviceInfo: DeviceInfo) {
     this.deviceInfo = deviceInfo
@@ -51,7 +50,7 @@ export default class Ledger implements Hardware {
 
   public async getExtendedPublicKey (): Promise<HardwareResponse<ExtendedPublicKey>> {
     try {
-      const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(AccountExtendedPublicKey.ckbAccountPath)
+      const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.firstReceiveAddress)
       return {
         status: ResponseCode.Success,
         result: {
@@ -79,13 +78,12 @@ export default class Ledger implements Hardware {
     // const { addressIndex, addressType } = this.deviceInfo
     const txs = await Promise.all(rawTx.inputs.map(i => ckb.rpc.getTransaction(i.previous_output!.tx_hash)))
     const txContext = txs.map(i => ckb.rpc.paramsFormatter.toRawTransaction(i.transaction))
-
     const signature = await this.ledgerCKB!.signTransaction(
-      AccountExtendedPublicKey.ckbAccountPath,
+      this.firstReceiveAddress,
       rawTx,
       rawTx.witnesses,
       txContext,
-      AccountExtendedPublicKey.ckbAccountPath,
+      this.firstReceiveAddress,
     )
 
     tx.witnesses[0] = ckb.utils.serializeWitnessArgs({
