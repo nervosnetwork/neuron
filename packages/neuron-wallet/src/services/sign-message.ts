@@ -6,7 +6,6 @@ import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from "exceptions"
 import HardwareWalletService from "./hardware-wallet"
-import { AccountExtendedPublicKey } from "models/keys/key"
 import AddressParser from "models/address-parser"
 
 export default class SignMessage {
@@ -29,7 +28,7 @@ export default class SignMessage {
         device = (await HardwareWalletService.getInstance().initHardware(deviceInfo))!
         await device!.connect()
       }
-      const signed = await device!.signMessage(AccountExtendedPublicKey.ckbAccountPath, message)
+      const signed = await device!.signMessage(addr.path, message)
       return '0x' + signed
     }
 

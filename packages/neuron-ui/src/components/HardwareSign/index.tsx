@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useMemo, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import {
@@ -16,20 +16,29 @@ import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import SignError from './error'
 import styles from './hardwareSign.module.scss'
 
-const HardwareSign = () => {
+export type SignType = 'message' | 'transaction'
+
+export interface HardwareSignProps {
+  signType: SignType
+  wallet: State.WalletIdentity
+  onDissmiss: () => void
+  signMessage?: (password: string) => Promise<any>
+  history?: ReturnType<typeof useHistory>
+}
+
+const HardwareSign = ({ signType, signMessage, history, wallet, onDissmiss }: HardwareSignProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const dispatch = useDispatch()
-  const history = useHistory()
   const onCancel = useCallback(() => {
-    dispatch({
-      type: AppActions.DismissPasswordRequest,
-    })
-    dispatch({
-      type: AppActions.UpdateLoadings,
-      payload: { sending: false },
-    })
-  }, [dispatch])
+    if (signType === 'transaction') {
+      dispatch({
+        type: AppActions.UpdateLoadings,
+        payload: { sending: false },
+      })
+    }
+    onDissmiss()
+  }, [dispatch, signType, onDissmiss])
   const connectStatus = t('hardware-sign.status.connect')
   const disconnectStatus = t('hardware-sign.status.disconnect')
 
@@ -39,17 +48,14 @@ const HardwareSign = () => {
       loadings: { sending: isSending = false },
       passwordRequest: { walletID = '', actionType = null },
     },
-    settings: { wallets = [] },
     experimental,
   } = useGlobalState()
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
-  const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])!
-
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
 
-  const didMount = useCallback(async () => {
+  const signTx = useCallback(async () => {
     dialogRef.current!.showModal()
     try {
       const conectionRes = await connectDevice(wallet.device!)
@@ -66,7 +72,7 @@ const HardwareSign = () => {
           }
           sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history.push(RoutePath.History)
+              history!.push(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -79,7 +85,7 @@ const HardwareSign = () => {
           }
           sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history.push(RoutePath.History)
+              history!.push(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -94,7 +100,7 @@ const HardwareSign = () => {
           }
           sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history.push(RoutePath.History)
+              history!.push(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -108,7 +114,7 @@ const HardwareSign = () => {
           }
           sendSUDTTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history.push(RoutePath.History)
+              history!.push(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -136,8 +142,24 @@ const HardwareSign = () => {
     history,
   ])
 
+  const signMsg = useCallback(async () => {
+    // eslint-disable-next-line no-unused-expressions
+    dialogRef.current?.showModal()
+    const conectionRes = await connectDevice(wallet.device!)
+    if (!isSuccessResponse(conectionRes)) {
+      setStatus(disconnectStatus)
+      return
+    }
+    setStatus(connectStatus)
+    await signMessage?.('')
+  }, [connectStatus, wallet.device, disconnectStatus, signMessage])
+
   useDidMount(() => {
-    didMount()
+    if (signType === 'message') {
+      signMsg()
+    } else {
+      signTx()
+    }
   })
 
   let container = (
