@@ -66,10 +66,7 @@ const SpecialAssetList = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
 
   useEffect(() => {
-    dispatch({
-      type: AppActions.UpdateGeneratedTx,
-      payload: null,
-    })
+    dispatch({ type: AppActions.ClearSendState })
   }, [dispatch])
 
   const fetchList = useCallback(

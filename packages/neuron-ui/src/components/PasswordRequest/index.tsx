@@ -97,7 +97,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+            await sendTransaction({ walletID, tx: generatedTx, password })(dispatch).then(status => {
               if (isSuccessResponse({ status })) {
                 dispatch({
                   type: AppActions.SetGlobalDialog,
