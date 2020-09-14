@@ -816,7 +816,7 @@ describe('TransactionGenerator', () => {
     })
   })
 
-  describe.only('#startWithdrawFromDao', () => {
+  describe('#startWithdrawFromDao', () => {
     const daoData = "0x0000000000000000"
     const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, SystemScriptInfo.generateDaoScript(), alice, daoData)
     const depositDaoCell = depositDaoOutput.toModel()
