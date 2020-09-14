@@ -28,6 +28,43 @@
         "block-synced": "已同步区块"
       }
     },
+    "import-hardware": {
+      "title": {
+        "select-model": "请连接设备并选择型号",
+        "detect-device": "搜索设备",
+        "name-wallet": "命名钱包",
+        "choose-address": "从设备中选择地址"
+      },
+      "actions": {
+        "confirm": "请在你的设备上确认...",
+        "success": "导入成功",
+        "next": "下一步",
+        "cancel": "取消",
+        "back": "上一步",
+        "rescan": "重新搜索",
+        "close": "关闭"
+      },
+      "waiting": "等待 CKB 应用响应...",
+      "abort": "等待 CKB 应用响应... 操作终止。",
+      "app-version": "检测到 CKB 应用版本 v{{version}}。",
+      "firmware-version": "检测到固件版本 v{{version}}。",
+      "wallet-name": "钱包名称",
+      "select-model": "选择型号"
+    },
+    "hardware-sign": {
+      "cancel": "取消",
+      "title": "使用硬件钱包进行签名",
+      "device": "设备：",
+      "status": {
+        "label": "状态",
+        "connect": "已连接，等待确认...",
+        "disconnect": "未连接，请检查设备连接。"
+      },
+      "actions": {
+        "close": "关闭",
+        "success": "交易成功"
+      }
+    },
     "overview": {
       "date": "日期",
       "type": "类型",
@@ -411,7 +448,10 @@
         "305": "$t(messages.fields.address)不能为空。",
         "306": "请输入主网地址",
         "307": "请输入测试网地址",
-        "308": "余额不足"
+        "308": "余额不足",
+        "402": "CKB 应用未打开。请在你的设备打开 CKB 应用。",
+        "403": "未检测到设备，请检查你的设备连接。",
+        "404": "检查到多个设备，同一型号的设备只能同时连接一个。"
       }
     },
     "sync": {

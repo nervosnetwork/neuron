@@ -28,6 +28,29 @@
         "block-synced": "已同步區塊"
       }
     },
+    "import-hardware": {
+      "title": {
+        "select-model": "請連接設備並選擇型號",
+        "detect-device": "搜索設備",
+        "name-wallet": "命名錢包",
+        "choose-address": "從設備中選擇地址"
+      },
+      "actions": {
+        "confirm": "請在設備上確認...",
+        "success": "導入成功",
+        "next": "下一步",
+        "cancel": "取消",
+        "back": "上一班",
+        "rescan": "重新檢索",
+        "close": "關閉"
+      },
+      "waiting": "等待 CKB 應用響應...",
+      "abort": "等待 CKB 應用響應... 操作終止。",
+      "app-version": "檢測到 CKB 應用版本 v{{version}}。",
+      "firmware-version": "檢測到固件版本 v{{version}}。",
+      "wallet-name": "錢包名稱",
+      "select-model": "選擇型號"
+    },
     "overview": {
       "date": "日期",
       "type": "類型",
@@ -411,7 +434,10 @@
         "305": "$t(messages.fields.address)不能為空。",
         "306": "請輸入主網地址",
         "307": "請輸入測試網地址",
-        "308": "餘額不足"
+        "308": "餘額不足",
+        "402": "CKB 應用未打開。請在妳的設備打開 CKB 應用。",
+        "403": "未檢測到設備，請檢查妳的設備連接。",
+        "404": "檢測到多個設備，同一型號的設備只能同時連接一個。"
       }
     },
     "sync": {
