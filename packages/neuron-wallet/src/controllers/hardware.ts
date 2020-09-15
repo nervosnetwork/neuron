@@ -1,11 +1,16 @@
 import { DeviceInfo, ExtendedPublicKey } from "services/hardware";
 import { ResponseCode } from "utils/const"
 import HardwareWalletService from "services/hardware-wallet";
+import { connectDeviceFailed } from "exceptions";
 
 export default class HardwareController {
   public async connectDevice (deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
     const device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
-    await device!.connect()
+    try {
+      await device!.connect()
+    } catch (error) {
+      throw new connectDeviceFailed()
+    }
 
     return {
       status: ResponseCode.Success

@@ -101,7 +101,8 @@ export default {
       'mainnet-address-required': '{{address}} 不是主網地址。',
       'testnet-address-required': '{{address}} 不是測試網地址。',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
-      'acp-same-account': "The payment account and receive account shouldn't be the same."
+      'acp-same-account': "The payment account and receive account shouldn't be the same.",
+      "connect-device-failed": "設備無法連接，請檢查設備連接狀況。",
     },
     messageBox: {
       button: {
