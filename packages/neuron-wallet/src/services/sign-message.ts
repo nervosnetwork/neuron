@@ -25,10 +25,10 @@ export default class SignMessage {
       let device = HardwareWalletService.getInstance().getCurrent()
       if (!device) {
         const deviceInfo = wallet.getDeviceInfo()
-        device = (await HardwareWalletService.getInstance().initHardware(deviceInfo))!
-        await device!.connect()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
       }
-      const signed = await device!.signMessage(addr.path, message)
+      const signed = await device.signMessage(addr.path, message)
       return '0x' + signed
     }
 

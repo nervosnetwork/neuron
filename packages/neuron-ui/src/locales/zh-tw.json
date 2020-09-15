@@ -51,6 +51,20 @@
       "wallet-name": "錢包名稱",
       "select-model": "選擇型號"
     },
+    "hardware-sign": {
+      "cancel": "取消",
+      "title": "使用硬體錢包進行簽名",
+      "device": "設備",
+      "status": {
+        "label": "狀態：",
+        "connect": "已連接，等待確認...",
+        "disconnect": "未連接，請檢查設備連接。"
+      },
+      "actions": {
+        "close": "关闭",
+        "success": "交易成功"
+      }
+    },
     "overview": {
       "date": "日期",
       "type": "類型",

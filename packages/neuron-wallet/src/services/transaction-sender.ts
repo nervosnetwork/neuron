@@ -69,8 +69,8 @@ export default class TransactionSender {
       if (!device) {
         const wallet = WalletsService.getInstance().getCurrent()
         const deviceInfo = wallet!.getDeviceInfo()
-        device = (await HardwareWalletService.getInstance().initHardware(deviceInfo))!
-        await device!.connect()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
       }
       try {
         return await device.signTransaction(walletID, tx)

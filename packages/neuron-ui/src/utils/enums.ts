@@ -102,6 +102,7 @@ export enum ErrorCode {
   MultiDevice = 404,
   UnknownError = 405,
   SignMessageFailed = 406,
+  UnsupportedManufacturer = 407,
 }
 
 export enum SyncStatus {

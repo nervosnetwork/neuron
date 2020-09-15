@@ -1,16 +1,24 @@
 import type Transaction from 'models/chain/transaction'
-import { AddressType } from 'models/keys/address';
+import Address, { AddressType } from 'models/keys/address'
 
-export interface Hardware {
-  deviceInfo: DeviceInfo
-  getExtendedPublicKey: () => Promise<ExtendedPublicKey>
-  connect: (hardwareInfo?: DeviceInfo) => Promise<void>
-  signMessage: (path: string, messageHex: string) => Promise<string>
-  disconect: () => Promise<void>
-  signTransaction: (walletID: string, tx: Transaction) => Promise<Transaction>
-  getAppVersion: () => Promise<string>
-  getFirmwareVersion?: () => Promise<string>
+export abstract class Hardware {
+  public deviceInfo: DeviceInfo
+  protected firstReceiveAddress = Address.pathForReceiving(0)
+
+  constructor(device: DeviceInfo) {
+    this.deviceInfo = device
+  }
+
+  public abstract getExtendedPublicKey(): Promise<ExtendedPublicKey>
+  public abstract connect(hardwareInfo?: DeviceInfo): Promise<void>
+  public abstract signMessage(path: string, message: string): Promise<string>
+  public abstract disconnect(): Promise<void>
+  public abstract signTransaction(walletID: string, tx: Transaction): Promise<Transaction>
+  public abstract getAppVersion(): Promise<string>
+  public abstract getFirmwareVersion?(): Promise<string>
 }
+
+export type HardwareClass = new (device: DeviceInfo) => Hardware
 
 export enum Manufacturer {
   Ledger = 'Ledger'

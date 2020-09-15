@@ -8,17 +8,15 @@ import Bluetooth from '@ledgerhq/hw-transport-node-ble'
 import LedgerCKB from 'hw-app-ckb'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
-import Address, { AddressType } from 'models/keys/address'
+import { AddressType } from 'models/keys/address'
 
-export default class Ledger implements Hardware {
-  public deviceInfo: DeviceInfo
-  public isConnected = false
+export default class Ledger extends Hardware {
+  private isConnected = false
   private ledgerCKB: LedgerCKB | null = null
   private transport: Transport | null = null
-  private firstReceiveAddress = Address.pathForReceiving(0)
 
-  constructor (deviceInfo: DeviceInfo) {
-    this.deviceInfo = deviceInfo
+  public init (device: DeviceInfo) {
+    return new Ledger(device)
   }
 
   public async connect (deviceInfo?: DeviceInfo) {
@@ -35,7 +33,7 @@ export default class Ledger implements Hardware {
     this.isConnected = true
   }
 
-  public async disconect () {
+  public async disconnect () {
     if (!this.isConnected) {
       return
     }
@@ -64,7 +62,6 @@ export default class Ledger implements Hardware {
       inputType: '',
       outputType: ''
     })
-    // const { addressIndex, addressType } = this.deviceInfo
     const txs = await Promise.all(rawTx.inputs.map(i => ckb.rpc.getTransaction(i.previous_output!.tx_hash)))
     const txContext = txs.map(i => ckb.rpc.paramsFormatter.toRawTransaction(i.transaction))
     const signature = await this.ledgerCKB!.signTransaction(

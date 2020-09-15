@@ -56,7 +56,7 @@
       "title": "使用硬件钱包进行签名",
       "device": "设备：",
       "status": {
-        "label": "状态",
+        "label": "状态：",
         "connect": "已连接，等待确认...",
         "disconnect": "未连接，请检查设备连接。"
       },

@@ -1,9 +1,15 @@
-import { Hardware, DeviceInfo, Manufacturer } from './hardware'
+import { UnsupportedManufacturer } from 'exceptions'
+import { Hardware, DeviceInfo, Manufacturer, HardwareClass } from './hardware'
 import Ledger from './hardware/ledger'
 
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
   private device?: Hardware
+  private supportedHardwares: Map<Manufacturer, HardwareClass> = new Map()
+
+  constructor () {
+    this.supportedHardwares.set(Manufacturer.Ledger, Ledger)
+  }
 
   public static getInstance = () => {
     if (HardwareWalletService.instance === undefined) {
@@ -17,20 +23,19 @@ export default class HardwareWalletService {
     return this.device
   }
 
-  public async initHardware (device: DeviceInfo) {
-    switch (device.manufacturer) {
-      case Manufacturer.Ledger: {
-        if (this.device?.deviceInfo.descriptor === device.descriptor) {
-          await this.device.disconect()
-          return this.device!
-        }
-        const hardware = new Ledger(device)
-        this.device = hardware
-        return hardware
-      }
-      default:
-        return null
+  public async initHardware (deviceInfo: DeviceInfo) {
+    const Device = this.supportedHardwares.get(deviceInfo.manufacturer)
+    if (!Device) {
+      throw new UnsupportedManufacturer(deviceInfo.manufacturer)
     }
+
+    if (this.device?.deviceInfo.descriptor === deviceInfo.descriptor) {
+      await this.device.disconnect()
+      return this.device!
+    }
+
+    this.device = new Device(deviceInfo)
+    return this.device
   }
 
   public static async findDevices (device?: DeviceInfo): Promise<DeviceInfo[]> {

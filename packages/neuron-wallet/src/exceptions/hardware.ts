@@ -11,3 +11,11 @@ export class connectDeviceFailed extends Error {
     super(t('messages.connect-device-failed'))
   }
 }
+
+export class UnsupportedManufacturer extends Error {
+  public code = 407
+
+  constructor (manufacturer: string) {
+    super(t('messages.unsupported-manufacturer', { manufacturer }))
+  }
+}
