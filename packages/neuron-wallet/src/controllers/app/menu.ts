@@ -103,6 +103,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
+  const isHardwareWallet = currentWallet?.isHardware() ?? false
 
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
@@ -192,7 +193,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'backup',
         label: t('application-menu.wallet.backup'),
-        enabled: hasCurrentWallet,
+        enabled: hasCurrentWallet && !isHardwareWallet,
         click: () => {
           if (!currentWallet) {
             return
@@ -203,7 +204,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'export-xpubkey',
         label: t('application-menu.wallet.export-xpubkey'),
-        enabled: hasCurrentWallet,
+        enabled: hasCurrentWallet && !isHardwareWallet,
         click: () => {
           if (!currentWallet) {
             return

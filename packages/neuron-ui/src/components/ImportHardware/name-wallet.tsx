@@ -30,7 +30,6 @@ const NameWallet = ({ history, location }: RouteComponentProps<{}, {}, LocationS
           state: location.state,
         })
       } else {
-        // @TODO: error handling
         setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
       }
     })
