@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -101,11 +101,13 @@ export const useSubscription = ({
   isAllowedToFetchList,
   history,
   dispatch,
+  location,
 }: {
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
   history: ReturnType<typeof useHistory>
+  location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
@@ -201,6 +203,12 @@ export const useSubscription = ({
             }
             break
           }
+          case 'import-hardware': {
+            if (payload) {
+              history.push(location.pathname + payload)
+            }
+            break
+          }
           case 'delete-wallet': {
             dispatch({
               type: AppActions.RequestPassword,
@@ -235,7 +243,7 @@ export const useSubscription = ({
       syncStatusSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch])
+  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch, location.pathname])
 }
 
 export default {

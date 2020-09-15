@@ -24,6 +24,7 @@ export default {
         'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
         'import-xpubkey': 'Import Extended Public Key',
+        "import-hardware": "Import Hardware Wallet"
       },
       edit: {
         label: 'Edit',
