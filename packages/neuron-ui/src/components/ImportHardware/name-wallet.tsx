@@ -19,25 +19,25 @@ const NameWallet = ({ history, location }: RouteComponentProps<{}, {}, LocationS
     history.push(entryPath)
   }, [history, entryPath])
 
-  const onNext = useCallback(() => {
-    createHardwareWallet({
-      ...extendedPublicKey!,
-      walletName,
-    }).then(res => {
-      if (isSuccessResponse(res)) {
-        history.push({
-          pathname: entryPath + RoutePath.Success,
-          state: location.state,
-        })
-      } else {
-        setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
-      }
-    })
-    history.push({
-      pathname: entryPath + RoutePath.Success,
-      state: location.state,
-    })
-  }, [history, entryPath, walletName, location.state, extendedPublicKey])
+  const onNext = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      createHardwareWallet({
+        ...extendedPublicKey!,
+        walletName,
+      }).then(res => {
+        if (isSuccessResponse(res)) {
+          history.push({
+            pathname: entryPath + RoutePath.Success,
+            state: location.state,
+          })
+        } else {
+          setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
+        }
+      })
+    },
+    [history, entryPath, walletName, location.state, extendedPublicKey]
+  )
 
   const onInput = useCallback(e => {
     setWalletName(e.target.value)
