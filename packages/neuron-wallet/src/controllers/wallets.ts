@@ -159,9 +159,12 @@ export default class WalletsController {
       throw new WalletNotFound(id)
     }
 
-    const props = {
+    const props: { name: string, keystore?: Keystore } = {
       name: name || wallet.name,
-      keystore: wallet.loadKeystore(),
+    }
+
+    if (!wallet.isHardware()) {
+      props.keystore = wallet.loadKeystore()
     }
 
     if (newPassword) {
