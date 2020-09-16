@@ -179,6 +179,10 @@ export class HardwareWallet extends Wallet {
     return true
   }
 
+  accountExtendedPublicKey = (): AccountExtendedPublicKey => {
+    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
+  }
+
   static fromJSON = (json: WalletProperties) => {
     return new HardwareWallet(json)
   }

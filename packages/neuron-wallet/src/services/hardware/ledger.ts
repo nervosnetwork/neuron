@@ -1,11 +1,11 @@
 import { Hardware, DeviceInfo, ExtendedPublicKey } from './index'
 import HID from '@ledgerhq/hw-transport-node-hid'
+import Bluetooth from '@ledgerhq/hw-transport-node-ble'
+import LedgerCKB from 'hw-app-ckb'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
-import Bluetooth from '@ledgerhq/hw-transport-node-ble'
-import LedgerCKB from 'hw-app-ckb'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import { AddressType } from 'models/keys/address'
@@ -14,10 +14,6 @@ export default class Ledger extends Hardware {
   private isConnected = false
   private ledgerCKB: LedgerCKB | null = null
   private transport: Transport | null = null
-
-  public init (device: DeviceInfo) {
-    return new Ledger(device)
-  }
 
   public async connect (deviceInfo?: DeviceInfo) {
     if (this.isConnected) {

@@ -61,3 +61,14 @@ jest.mock('dotenv', () => ({
 }))
 
 process.on('unhandledRejection', console.error)
+jest.mock('@ledgerhq/hw-transport-node-hid', () => {
+  return () => ({})
+})
+
+jest.mock('@ledgerhq/hw-transport-node-ble', () => {
+  return () => ({})
+})
+
+jest.mock('hw-app-ckb', () => {
+  return () => ({})
+})

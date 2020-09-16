@@ -3,6 +3,7 @@ import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
 import { AddressType } from '../../src/models/keys/address'
+import { Manufacturer } from '../../src/services/hardware'
 
 const stubbedDeletedByWalletIdFn = jest.fn()
 const stubbedGenerateAndSaveForExtendedKeyFn = jest.fn()
@@ -24,6 +25,7 @@ jest.doMock('../../src/services/addresses', () => {
   }
 });
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
+import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 
 const resetMocks = () => {
   stubbedDeletedByWalletIdFn.mockReset()
@@ -132,9 +134,13 @@ describe('wallet service', () => {
     wallet4 = {
       name: 'wallet-test4',
       id: '',
+      extendedKey: 'a'.repeat(66) + 'b'.repeat(64),
       device: {
-        name: 'LEDGER_NANO_S',
-        publicKey: 'public key',
+        manufacturer: Manufacturer.Ledger,
+        product: 'Nano S',
+        isBluetooth: false,
+        descriptor: '',
+        vendorId: '10086',
         addressIndex: 0,
         addressType: AddressType.Receiving,
       }
@@ -203,7 +209,7 @@ describe('wallet service', () => {
     describe('#getNextAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
-        await wallet.getNextAddressByWalletId()
+        await wallet.getNextAddress()
       })
       it('calls AddressService.getNextUnusedAddressByWalletId', () => {
         expect(stubbedGetNextUnusedAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
@@ -212,7 +218,7 @@ describe('wallet service', () => {
     describe('#getNextChangeAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
-        await wallet.getNextChangeAddressByWalletId()
+        await wallet.getNextChangeAddress()
       })
       it('calls AddressService.getNextUnusedChangeAddressByWalletId', () => {
         expect(stubbedGetNextUnusedChangeAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
@@ -221,7 +227,7 @@ describe('wallet service', () => {
     describe('#getNextReceivingAddressesByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
-        await wallet.getNextReceivingAddressesByWalletId()
+        await wallet.getNextReceivingAddresses()
       })
       it('calls AddressService.getUnusedReceivingAddressesByWalletId', () => {
         expect(stubbedGetUnusedReceivingAddressesByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
@@ -252,14 +258,6 @@ describe('wallet service', () => {
         )
       })
     });
-    describe('#accountExtendedPublicKey', () => {
-      it('throws error', () => {
-        const wallet = walletService.get(createdWallet.id)
-        expect(() => wallet.accountExtendedPublicKey()).toThrowError(
-          new WalletFunctionNotSupported(wallet.accountExtendedPublicKey.name)
-        )
-      })
-    });
 
     describe('#checkAndGenerateAddresses', () => {
       beforeEach(async () => {
@@ -267,9 +265,10 @@ describe('wallet service', () => {
         await wallet.checkAndGenerateAddresses()
       })
       it('calls AddressService.generateAndSaveForExtendedKey', async () => {
+        const { publicKey } = AccountExtendedPublicKey.parse(wallet4.extendedKey)
         expect(stubbedGenerateAndSaveForPublicKeyFn).toHaveBeenCalledWith(
           createdWallet.id,
-          createdWallet.getDeviceInfo().publicKey,
+          publicKey,
           0,
           0
         )
@@ -278,7 +277,7 @@ describe('wallet service', () => {
     describe('#getNextAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
-        await wallet.getNextAddressByWalletId()
+        await wallet.getNextAddress()
       })
       it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
@@ -287,7 +286,7 @@ describe('wallet service', () => {
     describe('#getNextChangeAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
-        await wallet.getNextChangeAddressByWalletId()
+        await wallet.getNextChangeAddress()
       })
       it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
@@ -296,7 +295,7 @@ describe('wallet service', () => {
     describe('#getNextReceivingAddressesByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
-        await wallet.getNextReceivingAddressesByWalletId()
+        await wallet.getNextReceivingAddresses()
       })
       it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)

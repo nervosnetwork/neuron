@@ -45,7 +45,7 @@ export default class SignMessage {
     return signature
   }
 
-  public static async verify(address: string, signature: string, message: string): Promise<boolean> {
+  public static verify(address: string, signature: string, message: string): boolean {
     const digest = SignMessage.signtureHash(message)
 
     const options = {

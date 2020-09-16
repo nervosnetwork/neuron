@@ -13,9 +13,8 @@ describe(`SignMessage`, () => {
     privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3',
     message: 'HelloWorld',
     digest: '0xdfb48ccf7126479c052f68cb4202cd094632d30198a322e3c3638679bc73858d',
-    signature: '0x33cb08f423e8e2c05b0810c01e0e0f89c37b2426de76e8a50a54b2df3141b2e915f89bdbd1ff815dc2a4d627bc006bdf6f3a02bd7f351f1a5746207883eb13c000',
     address: 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd',
-    sigBase64: 'M8sI9CPo4sBbCBDAHg4PicN7JCbeduilClSy3zFBsukV+Jvb0f+BXcKk1ie8AGvfbzoCvX81HxpXRiB4g+sTwAA='
+    signture: '0x97ed8c48879eed50743532bf7cc53e641c501509d2be19d06e6496dd944a21b4509136f18c8e139cc4002822b2deb5cbaff8e44b8782769af3113ff7fb8bd92700'
   }
 
   const extendedKeyInfo = {
@@ -28,9 +27,8 @@ describe(`SignMessage`, () => {
     path: "m/44'/309'/0'/0/0",
     privateKey: '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14',
     message: 'HelloWorld',
-    signature: '0xd9139c161fb753c96ced8c24c810c1bb2252da0366496dbca0cba02d3441df7f48ef6ce00416e74e04e329ffdb0281da23fe1d2fbe10f673f1c3cb9184bd5d9f01',
     address: 'ckb1qyqgnjay335t89u0rpwlr8e3vd9msu8fgcuszgdmkp',
-    sigBase64: '2ROcFh+3U8ls7YwkyBDBuyJS2gNmSW28oMugLTRB339I72zgBBbnTgTjKf/bAoHaI/4dL74Q9nPxw8uRhL1dnwE=',
+    signture: '0x0050e46c60cee0b85387a3d16300d74f4761b157857f13ee0ab9cc8df419dd265bbd4babc9ef4c1fb39803d2afd0901104271da026087200a154f037fd88cef201',
   }
 
   const signInfo2 = {
@@ -38,9 +36,8 @@ describe(`SignMessage`, () => {
     path: "m/44'/309'/0'/0/2",
     privateKey: '0x72c0420a2ecfbe8a00a036570c6ce774a40cb344a03ede8eccf0279868485547',
     message: 'HelloWorld',
-    signature: '0x8d83056a47c033d167dbdd78a7f4a74762bc2849af851c08ea893fd1bafd07df0d4042e438cb55251989091ddab413bbe57d8ee6ba5e369ad4b6aba1fa74b2b700',
     address: 'ckb1qyqvxd762w0y6zufm2k3xu9eghmjzradf3psc4h22q',
-    sigBase64: 'jYMFakfAM9Fn2914p/SnR2K8KEmvhRwI6ok/0br9B98NQELkOMtVJRmJCR3atBO75X2O5rpeNprUtquh+nSytwA=',
+    signture: 'jYMFakfAM9Fn2914p/SnR2K8KEmvhRwI6ok/0br9B98NQELkOMtVJRmJCR3atBO75X2O5rpeNprUtquh+nSytwA=',
   }
 
   describe('with extended key', () => {
@@ -94,7 +91,7 @@ describe(`SignMessage`, () => {
       it('not generate', async () => {
         const result = await SignMessage.sign(wallet.id, signInfo.address, extendedKeyInfo.password, signInfo.message)
 
-        expect(result).toEqual(signInfo.sigBase64)
+        expect(result).toEqual(signInfo.signture)
       })
 
       it('with generate', async () => {
@@ -106,16 +103,16 @@ describe(`SignMessage`, () => {
   it("signByPrivateKey", () => {
     // @ts-ignore: Private method
     const sig = SignMessage.signByPrivateKey(info.privateKey, info.message)
-    expect(sig).toEqual(info.sigBase64)
+    expect(sig).toEqual(info.signture)
   })
 
   it('verify', () => {
-    const result = SignMessage.verify(info.address, info.sigBase64, info.message)
+    const result = SignMessage.verify(info.address, info.signture, info.message)
     expect(result).toBeTruthy()
   })
 
   it('verify false', () => {
-    const result = SignMessage.verify(signInfo.address, info.sigBase64, info.message)
+    const result = SignMessage.verify(signInfo.address, info.signture, info.message)
     expect(result).toBeFalsy()
   })
 })
