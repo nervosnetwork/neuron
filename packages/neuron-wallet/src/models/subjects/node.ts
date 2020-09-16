@@ -2,10 +2,14 @@ import { BehaviorSubject } from 'rxjs'
 
 export const ConnectionStatusSubject = new BehaviorSubject<{
   url: string,
-  connected: boolean
+  connected: boolean,
+  isBundledNode: boolean,
+  startedBundledNode: boolean,
 }>({
   url: '',
-  connected: false
+  connected: false,
+  isBundledNode: true,
+  startedBundledNode: false,
 })
 
 export default class SyncedBlockNumberSubject {
