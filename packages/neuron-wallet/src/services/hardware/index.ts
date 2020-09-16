@@ -3,10 +3,12 @@ import Address, { AddressType } from 'models/keys/address'
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
+  public isConnected: boolean
   protected firstReceiveAddress = Address.pathForReceiving(0)
 
   constructor(device: DeviceInfo) {
     this.deviceInfo = device
+    this.isConnected = false
   }
 
   public abstract getExtendedPublicKey(): Promise<ExtendedPublicKey>

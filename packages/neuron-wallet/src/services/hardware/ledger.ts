@@ -11,7 +11,6 @@ import NodeService from 'services/node'
 import { AddressType } from 'models/keys/address'
 
 export default class Ledger extends Hardware {
-  private isConnected = false
   private ledgerCKB: LedgerCKB | null = null
   private transport: Transport | null = null
 
