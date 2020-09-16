@@ -22,9 +22,23 @@ export const LedgerNanoX: DeviceInfo = {
   addressIndex: 0
 }
 
-export class LedgerHID {
-  static async open () {
+class LedgerTransport {
+  send () {
 
+  }
+
+  close () {
+
+  }
+}
+
+export class LedgerHID {
+  static async open (descriptor: string) {
+    if (descriptor !== ledgerNanoS.descriptor && descriptor !== LedgerNanoX.descriptor) {
+      throw new Error("")
+    }
+
+    return new LedgerTransport()
   }
 
   static listen (subscriber: Subscriber<any>) {
@@ -41,8 +55,12 @@ export class LedgerHID {
 }
 
 export class LedgerBLE {
-  static async open () {
+  static async open (descriptor: string) {
+    if (descriptor !== ledgerNanoS.descriptor || descriptor !== LedgerNanoX.descriptor) {
+      throw new Error('')
+    }
 
+    return new LedgerTransport()
   }
 
   static listen (subscriber: Subscriber<any>) {
@@ -55,5 +73,24 @@ export class LedgerBLE {
         vendorId: LedgerNanoX.vendorId,
       }
     })
+  }
+}
+
+export class LedgerCkbApp {
+  public static publicKey = 'publicKey'
+  public static chainCode = 'chain_code'
+  public static version = '0.4.0'
+
+  async getWalletExtendedPublicKey () {
+    return {
+      public_key: LedgerCkbApp.publicKey,
+      chain_code: LedgerCkbApp.chainCode
+    }
+  }
+
+  async getAppConfiguration () {
+    return {
+      version: LedgerCkbApp.version
+    }
   }
 }
