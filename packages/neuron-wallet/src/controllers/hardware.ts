@@ -17,8 +17,8 @@ export default class HardwareController {
     }
   }
 
-  public async detectDevice (): Promise<Controller.Response<DeviceInfo[]>> {
-    const devices = await HardwareWalletService.findDevices()
+  public async detectDevice (model: Pick<DeviceInfo, 'manufacturer' | 'product'>): Promise<Controller.Response<DeviceInfo[]>> {
+    const devices = await HardwareWalletService.findDevices(model)
     return {
       status: ResponseCode.Success,
       result: devices

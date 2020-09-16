@@ -435,8 +435,8 @@ export default class ApiController {
       await this.hardwareController.connectDevice(deviceInfo)
     })
 
-    handle('detect-device', async () => {
-      return this.hardwareController.detectDevice()
+    handle('detect-device', async (_, model: Pick<DeviceInfo, 'manufacturer' | 'product'>) => {
+      return this.hardwareController.detectDevice(model)
     })
 
     handle('get-ckb-app-version', async () => {
