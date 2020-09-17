@@ -49,8 +49,8 @@ export const DEFAULT_SUDT_FIELDS = {
 export const LOCALES = ['zh', 'zh-TW', 'en', 'en-US'] as const
 
 // address property
-export const SHORT_ADDR_00_LENGTH = 46
-export const SHORT_ADDR_00_PREFIX = '0x0100'
+export const SHORT_ADDR_LENGTH = 46
+export const SHORT_ADDR_PREFIX = '0x01'
 export const LONG_DATA_PREFIX = '0x02'
 export const LONG_TYPE_PREFIX = '0x04'
 
