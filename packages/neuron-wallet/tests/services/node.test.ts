@@ -230,7 +230,7 @@ describe('NodeService', () => {
   describe('CurrentNetworkIDSubject#subscribe', () => {
     let eventCallback: any
     const stubbedTipNumberSubjectCallback = jest.fn()
-    beforeEach(() => {
+    beforeEach(async () => {
       stubbedCKB.mockImplementation(() => ({
         setNode: stubbedCKBSetNode,
         rpc: {
@@ -258,6 +258,47 @@ describe('NodeService', () => {
     it('resets tip block number', () => {
       expect(stubbedTipNumberSubjectCallback).toHaveBeenCalledWith('0')
     })
+    describe('targets to bundled node', () => {
+      const bundledNodeUrl = 'http://localhost:8114'
+      beforeEach(async () => {
+        stubbedCKBSetNode.mockImplementation(() => {
+          nodeService.ckb.node.url = bundledNodeUrl
+        })
+        stubbedStartCKBNode.mockResolvedValue(true)
+        stubbedNetworsServiceGet.mockReturnValue({remote: bundledNodeUrl})
+        await nodeService.tryStartNodeOnDefaultURI()
+
+        await eventCallback({currentNetworkID: 'network1'})
+        jest.advanceTimersByTime(10000)
+      });
+      it('sets startedBundledNode to true in ConnectionStatusSubject', () => {
+        expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
+          url: bundledNodeUrl,
+          connected: false,
+          isBundledNode: true,
+          startedBundledNode: true,
+        })
+      })
+      describe('switches to other network', () => {
+        beforeEach(async () => {
+          stubbedConnectionStatusSubjectNext.mockReset()
+          stubbedCKBSetNode.mockImplementation(() => {
+            nodeService.ckb.node.url = fakeHTTPUrl
+          })
+
+          await eventCallback({currentNetworkID: 'network2'})
+          jest.advanceTimersByTime(10000)
+        });
+        it('sets startedBundledNode to true in ConnectionStatusSubject', () => {
+          expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
+            url: fakeHTTPUrl,
+            connected: false,
+            isBundledNode: false,
+            startedBundledNode: false,
+          })
+        })
+      });
+    });
     describe('with http url', () => {
       beforeEach(async () => {
         stubbedNetworsServiceGet.mockReturnValueOnce({remote: fakeHTTPUrl})

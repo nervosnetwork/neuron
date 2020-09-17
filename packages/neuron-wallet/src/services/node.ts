@@ -60,11 +60,12 @@ class NodeService {
     merge(periodSync, realtimeSync)
       .pipe(debounceTime(500))
       .subscribe(connected => {
+        const isBundledNode = this.ckb.node.url === BUNDLED_CKB_URL
         ConnectionStatusSubject.next({
           url: this.ckb.node.url,
           connected,
-          isBundledNode: this.ckb.node.url === BUNDLED_CKB_URL,
-          startedBundledNode: this.startedBundledNode
+          isBundledNode,
+          startedBundledNode: isBundledNode ? this.startedBundledNode : false
         })
       })
   }
