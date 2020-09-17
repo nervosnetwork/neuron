@@ -73,7 +73,7 @@ export default class TransactionSender {
         await device.connect()
       }
       try {
-        return await device.signTransaction(walletID, tx)
+        return await device.signTx(walletID, tx, txHash, skipLastInputs)
       } catch (err) {
         throw new SignTransactionFailed(err.message)
       }

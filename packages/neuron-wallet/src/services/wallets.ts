@@ -21,6 +21,7 @@ export interface WalletProperties {
   id: string
   name: string
   extendedKey: string // Serialized account extended public key
+  isHDWallet?: boolean
   device?: DeviceInfo
   keystore?: Keystore
 }
@@ -30,9 +31,10 @@ export abstract class Wallet {
   public name: string
   protected extendedKey: string = ''
   protected device?: DeviceInfo
+  protected isHDWallet: boolean
 
   constructor(props: WalletProperties) {
-    const { id, name, extendedKey, device } = props
+    const { id, name, extendedKey, device, isHDWallet } = props
 
     if (id === undefined) {
       throw new IsRequired('ID')
@@ -49,6 +51,7 @@ export abstract class Wallet {
     this.name = name
     this.extendedKey = extendedKey
     this.device = device
+    this.isHDWallet = isHDWallet ?? true
   }
 
   public toJSON = () => ({
@@ -111,6 +114,11 @@ export abstract class Wallet {
 export class FileKeystoreWallet extends Wallet {
   public isHardware = (): boolean => {
     return false
+  }
+
+  constructor (props: WalletProperties) {
+    super(props)
+    this.isHDWallet = true
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
@@ -179,6 +187,11 @@ export class HardwareWallet extends Wallet {
     return true
   }
 
+  constructor (props: WalletProperties) {
+    super(props)
+    this.isHDWallet = false
+  }
+
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
     return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
   }
@@ -191,7 +204,21 @@ export class HardwareWallet extends Wallet {
     return this.device!
   }
 
-  public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
+  public checkAndGenerateAddresses = async (
+    isImporting: boolean = false,
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
+  ): Promise<AddressInterface[] | undefined> => {
+    if (this.isHDWallet) {
+      return await AddressService.generateAndSaveForExtendedKey(
+        this.id,
+        this.accountExtendedPublicKey(),
+        isImporting,
+        receivingAddressCount,
+        changeAddressCount
+      )
+    }
+
     const { addressType, addressIndex } = this.getDeviceInfo()
     const { publicKey } = AccountExtendedPublicKey.parse(this.extendedKey)
     const address = await AddressService.generateAndSaveForPublicKey(
@@ -207,14 +234,23 @@ export class HardwareWallet extends Wallet {
   }
 
   public getNextAddress = async (): Promise<AddressInterface | undefined> => {
+    if (this.isHDWallet) {
+      return AddressService.getNextUnusedAddressByWalletId(this.id)
+    }
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
   public getNextChangeAddress = async (): Promise<AddressInterface | undefined> => {
+    if (this.isHDWallet) {
+      return AddressService.getNextUnusedChangeAddressByWalletId(this.id)
+    }
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
   public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
+    if (this.isHDWallet) {
+      return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
+    }
     const address = await AddressService.getFirstAddressByWalletId(this.id)
     if (address) {
       return [address]

@@ -9,6 +9,7 @@ import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import { AddressType } from 'models/keys/address'
+import { AccountExtendedPublicKey } from 'models/keys/key'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
@@ -41,41 +42,27 @@ export default class Ledger extends Hardware {
   }
 
   public async getExtendedPublicKey (): Promise<ExtendedPublicKey> {
-    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.firstReceiveAddress)
+    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(AccountExtendedPublicKey.ckbAccountPath)
     return {
       publicKey: public_key,
       chainCode: chain_code
     }
   }
 
-  public async signTransaction (_: string, tx: Transaction) {
+  public async signTransaction (_: string, tx: Transaction, witnesses: string[], path: string) {
     const { ckb } = NodeService.getInstance()
     const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
-    rawTx.witnesses = rawTx.inputs.map(() => '0x')
-    rawTx.witnesses[0] = ckb.utils.serializeWitnessArgs({
-      lock: '',
-      inputType: '',
-      outputType: ''
-    })
     const txs = await Promise.all(rawTx.inputs.map(i => ckb.rpc.getTransaction(i.previous_output!.tx_hash)))
     const txContext = txs.map(i => ckb.rpc.paramsFormatter.toRawTransaction(i.transaction))
     const signature = await this.ledgerCKB!.signTransaction(
-      this.firstReceiveAddress,
+      path,
       rawTx,
-      rawTx.witnesses,
+      witnesses,
       txContext,
       this.firstReceiveAddress,
     )
 
-    tx.witnesses[0] = ckb.utils.serializeWitnessArgs({
-      lock: '0x' + signature,
-      inputType: '',
-      outputType: ''
-    })
-
-    tx.hash = tx.computeHash()
-
-    return tx
+    return signature
   }
 
   async signMessage (path: string, message: string) {
