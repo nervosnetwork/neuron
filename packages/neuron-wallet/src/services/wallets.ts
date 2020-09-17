@@ -31,7 +31,7 @@ export abstract class Wallet {
   public name: string
   protected extendedKey: string = ''
   protected device?: DeviceInfo
-  protected isHDWallet: boolean
+  protected isHD: boolean
 
   constructor(props: WalletProperties) {
     const { id, name, extendedKey, device, isHDWallet } = props
@@ -51,7 +51,7 @@ export abstract class Wallet {
     this.name = name
     this.extendedKey = extendedKey
     this.device = device
-    this.isHDWallet = isHDWallet ?? true
+    this.isHD = isHDWallet ?? true
   }
 
   public toJSON = () => ({
@@ -109,6 +109,8 @@ export abstract class Wallet {
   public abstract getNextChangeAddress (): Promise<AddressInterface | undefined>
 
   public abstract getNextReceivingAddresses (): Promise<AddressInterface[]>
+
+  public abstract isHDWallet (): boolean
 }
 
 export class FileKeystoreWallet extends Wallet {
@@ -116,9 +118,13 @@ export class FileKeystoreWallet extends Wallet {
     return false
   }
 
+  public isHDWallet () {
+    return true
+  }
+
   constructor (props: WalletProperties) {
     super(props)
-    this.isHDWallet = true
+    this.isHD = true
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
@@ -187,9 +193,13 @@ export class HardwareWallet extends Wallet {
     return true
   }
 
+  public isHDWallet () {
+    return this.isHD
+  }
+
   constructor (props: WalletProperties) {
     super(props)
-    this.isHDWallet = false
+    this.isHD = false
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
@@ -209,7 +219,7 @@ export class HardwareWallet extends Wallet {
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> => {
-    if (this.isHDWallet) {
+    if (this.isHD) {
       return await AddressService.generateAndSaveForExtendedKey(
         this.id,
         this.accountExtendedPublicKey(),
@@ -234,21 +244,21 @@ export class HardwareWallet extends Wallet {
   }
 
   public getNextAddress = async (): Promise<AddressInterface | undefined> => {
-    if (this.isHDWallet) {
+    if (this.isHD) {
       return AddressService.getNextUnusedAddressByWalletId(this.id)
     }
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
   public getNextChangeAddress = async (): Promise<AddressInterface | undefined> => {
-    if (this.isHDWallet) {
+    if (this.isHD) {
       return AddressService.getNextUnusedChangeAddressByWalletId(this.id)
     }
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
   public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
-    if (this.isHDWallet) {
+    if (this.isHD) {
       return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
     }
     const address = await AddressService.getFirstAddressByWalletId(this.id)

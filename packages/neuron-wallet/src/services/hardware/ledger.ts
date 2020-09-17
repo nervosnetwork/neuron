@@ -9,7 +9,6 @@ import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import { AddressType } from 'models/keys/address'
-import { AccountExtendedPublicKey } from 'models/keys/key'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
@@ -42,7 +41,7 @@ export default class Ledger extends Hardware {
   }
 
   public async getExtendedPublicKey (): Promise<ExtendedPublicKey> {
-    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(AccountExtendedPublicKey.ckbAccountPath)
+    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.firstReceiveAddress)
     return {
       publicKey: public_key,
       chainCode: chain_code
