@@ -21,7 +21,7 @@ import {
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ConnectionStatus, ErrorCode, RoutePath } from 'utils'
+import { ErrorCode, RoutePath, getConnectionStatus } from 'utils'
 
 const SYNC_INTERVAL_TIME = 4000
 const CONNECTING_BUFFER = 15_000
@@ -60,12 +60,7 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
           }
         })
         .catch(() => {
-          if (isCurrentUrl(chainURL)) {
-            dispatch({
-              type: NeuronWalletActions.UpdateConnectionStatus,
-              payload: Date.now() > CONNECTING_DEADLINE ? ConnectionStatus.Offline : ConnectionStatus.Connecting,
-            })
-          }
+          // ignore, unconnected events are handled in subscription
         })
     }
     clearInterval(timer!)
@@ -175,13 +170,9 @@ export const useSubscription = ({
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
       if (isCurrentUrl(status.url)) {
-        let payload = status.connected ? ConnectionStatus.Online : ConnectionStatus.Offline
-        if (payload === ConnectionStatus.Offline && Date.now() <= CONNECTING_DEADLINE) {
-          payload = ConnectionStatus.Connecting
-        }
         dispatch({
           type: NeuronWalletActions.UpdateConnectionStatus,
-          payload,
+          payload: getConnectionStatus({ ...status, isTimeout: Date.now() > CONNECTING_DEADLINE }),
         })
       }
     })
