@@ -1,0 +1,57 @@
+{
+  "return online when connected = true": {
+    "params": [
+      {
+        "connected": true,
+        "isTimeout": false,
+        "isBundledNode": false,
+        "startedBundledNode": false
+      }
+    ],
+    "expected": "online"
+  },
+  "return connecting when connected = false and isTimeout = false": {
+    "params": [
+      {
+        "connected": false,
+        "isTimeout": false,
+        "isBundledNode": false,
+        "startedBundledNode": false
+      }
+    ],
+    "expected": "connecting"
+  },
+  "return connecting when connected = false, isTimeout = true, isBundledNode = true and startedBundledNode = true": {
+    "params": [
+      {
+        "connected": false,
+        "isTimeout": true,
+        "isBundledNode": true,
+        "startedBundledNode": true
+      }
+    ],
+    "expected": "connecting"
+  },
+  "return offline when connected = false, isTimeout = true, isBundledNode = false and startedBundledNode = true": {
+    "params": [
+      {
+        "connected": false,
+        "isTimeout": true,
+        "isBundledNode": false,
+        "startedBundledNode": true
+      }
+    ],
+    "expected": "offline"
+  },
+  "return offline when connected = false, isTimeout = true, isBundledNode = true and startedBundledNode = false": {
+    "params": [
+      {
+        "connected": false,
+        "isTimeout": true,
+        "isBundledNode": true,
+        "startedBundledNode": false
+      }
+    ],
+    "expected": "offline"
+  }
+}
