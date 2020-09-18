@@ -115,5 +115,7 @@ export default class Ledger extends Hardware {
           }, []),
         )
       .toPromise()
+      // If the computer does not have Bluetooth support, ledgerjs may throw an error.
+      .catch(() => [] as DeviceInfo[])
   }
 }
