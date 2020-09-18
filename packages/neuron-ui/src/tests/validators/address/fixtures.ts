@@ -36,12 +36,12 @@ export default {
     },
     exception: null,
   },
-  "Should throw an error when it's a multisig short address": {
+  "Should pass when it's a multisig short address": {
     params: {
       address: 'ckb1qyq5lv479ewscx3ms620sv34pgeuz6zagaaqklhtgg',
       isMainnet: true,
     },
-    exception: ErrorCode.FieldInvalid,
+    exception: null,
   },
   "Should pass when it's a full address": {
     params: {
