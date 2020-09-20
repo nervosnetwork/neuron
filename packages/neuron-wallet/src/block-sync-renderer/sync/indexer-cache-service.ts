@@ -3,7 +3,7 @@ import { queue } from 'async'
 import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
-import { Indexer, TransactionCollector } from '@ckb-lumos/indexer'
+import { CellCollector, Indexer, TransactionCollector } from '@ckb-lumos/indexer'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export default class IndexerCacheService {
@@ -83,12 +83,11 @@ export default class IndexerCacheService {
       .execute()
   }
 
-  public async upsertTxHashes(): Promise<string[]> {
+  private async fetchTxMapping(): Promise<Map<string, Array<{address: string, lockHash: string}>>> {
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
         addressMeta.generateDefaultLockScript(),
-        addressMeta.generateSingleMultiSignLockScript(),
         addressMeta.generateACPLockScript()
       ]
 
@@ -113,11 +112,35 @@ export default class IndexerCacheService {
           }])
         }
       }
+
+      const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
+
+      const cellCollector = new CellCollector(this.indexer, {
+        lock: {
+          code_hash: singleMultiSignLockScript.codeHash,
+          hash_type: singleMultiSignLockScript.hashType,
+          args: singleMultiSignLockScript.args.slice(0, 42)
+        },
+        argsLen: 28
+      })
+
+      for await (const cell of cellCollector.collect()) {
+        const txHash = cell.out_point!.tx_hash!
+        mappingsByTxHash.set(txHash, [{
+          address: addressMeta.address,
+          lockHash: singleMultiSignLockScript.computeHash()
+        }])
+      }
     }
+    return mappingsByTxHash
+  }
+
+  public async upsertTxHashes(): Promise<string[]> {
+    const mappingsByTxHash = await this.fetchTxMapping()
 
     const fetchedTxHashes = [...mappingsByTxHash.keys()]
     const fetchedTxHashCount = fetchedTxHashes
-      .reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash).length, 0)
+      .reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash)!.length, 0)
 
     const txCount = await this.countTxHashes()
     if (fetchedTxHashCount === txCount) {
@@ -158,7 +181,7 @@ export default class IndexerCacheService {
 
     for (const txWithStatus of txsWithStatus) {
       const {transaction, txStatus} = txWithStatus
-      const mappings = mappingsByTxHash.get(transaction.hash)
+      const mappings = mappingsByTxHash.get(transaction.hash!)!
 
       for (const {lockHash, address} of mappings) {
         await getConnection()
