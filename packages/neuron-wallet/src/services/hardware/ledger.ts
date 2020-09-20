@@ -1,4 +1,4 @@
-import { Hardware, DeviceInfo, ExtendedPublicKey } from './index'
+import { Hardware, DeviceInfo, ExtendedPublicKey } from './common'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import Bluetooth from '@ledgerhq/hw-transport-node-ble'
 import LedgerCKB from 'hw-app-ckb'

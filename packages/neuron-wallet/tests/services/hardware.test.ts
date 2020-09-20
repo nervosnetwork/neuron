@@ -1,5 +1,5 @@
-import { Manufacturer } from '../../src/services/hardware'
-import HardwareService from '../../src/services/hardware-wallet'
+import { Manufacturer } from '../../src/services/hardware/common'
+import HardwareService from '../../src/services/hardware'
 import HardwareController from '../../src/controllers/hardware'
 import { ResponseCode } from '../../src/utils/const'
 import { ledgerNanoS, LedgerNanoX, LedgerCkbApp } from '../mock/hardware'

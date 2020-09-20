@@ -28,8 +28,8 @@ import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
-import HardwareWalletService from 'services/hardware-wallet'
-import { ExtendedPublicKey } from 'services/hardware'
+import HardwareWalletService from 'services/hardware'
+import { ExtendedPublicKey } from 'services/hardware/common'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {

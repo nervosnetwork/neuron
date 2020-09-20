@@ -1,4 +1,4 @@
-import { DeviceInfo, Manufacturer } from '../../src/services/hardware'
+import { DeviceInfo, Manufacturer } from '../../src/services/hardware/common'
 import { AddressType } from '../../src/models/keys/address'
 import type { Subscriber } from 'rxjs'
 

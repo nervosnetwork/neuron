@@ -26,7 +26,7 @@ import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
-import HardwareWalletService from './hardware-wallet'
+import HardwareWalletService from './hardware'
 import { SignTransactionFailed } from 'exceptions'
 
 interface SignInfo {

@@ -26,7 +26,7 @@ import AssetAccountController from './asset-account'
 import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
-import { DeviceInfo, ExtendedPublicKey } from 'services/hardware'
+import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
@@ -439,15 +439,15 @@ export default class ApiController {
       return this.hardwareController.detectDevice(model)
     })
 
-    handle('get-ckb-app-version', async () => {
+    handle('get-device-ckb-app-version', async () => {
       return this.hardwareController.getCkbAppVersion()
     })
 
-    handle('get-firmware-version', async () => {
+    handle('get-device-firmware-version', async () => {
       return this.hardwareController.getFirmwareVersion()
     })
 
-    handle('get-public-key', async () => {
+    handle('get-device-public-key', async () => {
       return this.hardwareController.getPublicKey()
     })
 

@@ -102,9 +102,9 @@ type Action =
   | 'get-token-info-list'
   // Hardware Wallet
   | 'detect-device'
-  | 'get-ckb-app-version'
-  | 'get-firmware-version'
-  | 'get-public-key'
+  | 'get-device-ckb-app-version'
+  | 'get-device-firmware-version'
+  | 'get-device-public-key'
   | 'connect-device'
   | 'create-hardware-wallet'
 

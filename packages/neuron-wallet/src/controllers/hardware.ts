@@ -1,6 +1,6 @@
-import { DeviceInfo, ExtendedPublicKey } from "services/hardware";
+import { DeviceInfo, ExtendedPublicKey } from "services/hardware/common";
 import { ResponseCode } from "utils/const"
-import HardwareWalletService from "services/hardware-wallet";
+import HardwareWalletService from "services/hardware";
 import { connectDeviceFailed } from "exceptions";
 
 export default class HardwareController {

@@ -5,7 +5,7 @@ import Blake2b from "models/blake2b"
 import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from "exceptions"
-import HardwareWalletService from "./hardware-wallet"
+import HardwareWalletService from "./hardware"
 import AddressParser from "models/address-parser"
 
 export default class SignMessage {

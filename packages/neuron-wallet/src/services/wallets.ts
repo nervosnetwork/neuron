@@ -11,7 +11,7 @@ import FileService from './file'
 import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
 import { ChildProcess } from 'utils/worker'
-import { DeviceInfo } from './hardware'
+import { DeviceInfo } from './hardware/common'
 
 const fileService = FileService.getInstance()
 
