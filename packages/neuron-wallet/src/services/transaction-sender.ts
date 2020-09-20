@@ -145,7 +145,7 @@ export default class TransactionSender {
       if (isMultiSign) {
         const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
         const serializedMultiSign: string = new MultiSign().serialize(blake160)
-        signed = this.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign)
+        signed = await TransactionSender.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign, wallet)
         const wit = signed[0] as WitnessArgs
         wit.lock = serializedMultiSign + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
@@ -172,7 +172,13 @@ export default class TransactionSender {
     return tx
   }
 
-  private signSingleMultiSignScript(privateKey: string, witnesses: (string | WitnessArgs)[], txHash: string, serializedMultiSign: string) {
+public static async signSingleMultiSignScript(
+  privateKeyOrPath: string,
+  witnesses: (string | WitnessArgs)[],
+  txHash: string,
+  serializedMultiSign: string,
+  wallet: Wallet
+) {
     const firstWitness = witnesses[0]
     if (typeof(firstWitness) === 'string') {
       throw new Error('First witness must be WitnessArgs')
@@ -198,8 +204,17 @@ export default class TransactionSender {
     })
 
     const message = blake2b.digest()
-    const keyPair = new ECPair(privateKey)
-    emptyWitness.lock = keyPair.signRecoverable(message)
+
+    if (wallet.isHardware()) {
+      // since the device is reinitted in the sign function,
+      // device must be available here
+      const device = HardwareWalletService.getInstance().getCurrent()!
+      emptyWitness.lock = await device.signMessage(privateKeyOrPath, message)
+    } else {
+      const keyPair = new ECPair(privateKeyOrPath)
+      emptyWitness.lock = keyPair.signRecoverable(message)
+    }
+
     return [emptyWitness, ...restWitnesses]
   }
 

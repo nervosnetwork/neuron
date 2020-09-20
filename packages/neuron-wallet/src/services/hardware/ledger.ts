@@ -9,6 +9,7 @@ import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import { AddressType } from 'models/keys/address'
+import HexUtils from 'utils/hex'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
@@ -64,9 +65,10 @@ export default class Ledger extends Hardware {
     return signature
   }
 
-  async signMessage (path: string, message: string) {
-    const messageHex = Buffer.from(message, 'utf-8').toString('hex')
-    return await this.ledgerCKB!.signMessage(path, messageHex, true)
+  async signMessage (path: string, messageHex: string) {
+    const message = HexUtils.removePrefix(messageHex)
+    const signed = await this.ledgerCKB!.signMessage(path, message, false)
+    return HexUtils.addPrefix(signed)
   }
 
   async getAppVersion (): Promise<string> {
@@ -75,7 +77,7 @@ export default class Ledger extends Hardware {
   }
 
   async getFirmwareVersion (): Promise<string> {
-    let res: Buffer = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
+    const res: Buffer = await this.transport!.send(0xe0, 0x01, 0x00, 0x00)!
     const byteArray = [...res]
     const data = byteArray.slice(0, byteArray.length - 2)
     const versionLength = data[4]

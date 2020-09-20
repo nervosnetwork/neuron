@@ -28,8 +28,8 @@ export default class SignMessage {
         device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
         await device.connect()
       }
-      const signed = await device.signMessage(addr.path, message)
-      return '0x' + signed
+      const messagehex = Buffer.from(message, 'utf-8').toString('hex')
+      return device.signMessage(addr.path, messagehex)
     }
 
     // find private key of address
