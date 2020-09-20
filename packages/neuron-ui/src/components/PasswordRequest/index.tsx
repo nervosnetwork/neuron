@@ -183,7 +183,7 @@ const PasswordRequest = () => {
   }
 
   if (wallet.device) {
-    return <HardwareSign signType="transaction" history={history} wallet={wallet} onDissmiss={onDismiss} />
+    return <HardwareSign signType="transaction" history={history} wallet={wallet} onDismiss={onDismiss} />
   }
 
   return (

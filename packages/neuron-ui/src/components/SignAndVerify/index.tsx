@@ -341,7 +341,7 @@ const SignAndVerify = () => {
           signType="message"
           signMessage={handleSignMessage}
           wallet={currentWallet}
-          onDissmiss={handlePasswordDialogDismiss}
+          onDismiss={handlePasswordDialogDismiss}
         />
       ) : (
         <PasswordDialog dialogRef={dialogRef} onCancel={handlePasswordDialogDismiss} onSubmit={handleSignMessage} />
