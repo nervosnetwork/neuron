@@ -19,16 +19,7 @@ export interface SelectProps {
 }
 
 function parseValue(value: string | SelectOptions, options: SelectOptions[]) {
-  let option: SelectOptions | undefined
-
-  if (typeof value === 'string') {
-    for (let i = 0, num = options.length; i < num; i++) {
-      if (typeof options[i].value !== 'undefined' && options[i].value === value) {
-        option = options[i]
-      }
-    }
-  }
-
+  const option = options.find(o => o.value === value)
   return option || value
 }
 

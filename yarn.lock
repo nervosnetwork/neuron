@@ -4010,7 +4010,7 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.4.tgz#38fd73ddfd9b55abb1e1b2ed578cb55bd7b7d339"
   integrity sha512-8+KAKzEvSUdeo+kmqnKrqgeE+LcA0tjYWFY7RPProVYwnqDjukzO+3b6dLD56rYX5TdWejnEOLJYOIeh4CXKuA==
 
-"@types/ledgerhq__hw-transport-node-hid@^4.22.1":
+"@types/ledgerhq__hw-transport-node-hid@4.22.1":
   version "4.22.1"
   resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport-node-hid/-/ledgerhq__hw-transport-node-hid-4.22.1.tgz#0f075f8965c7234126eb19bc8d569b73cc9a6f8e"
   integrity sha512-EVdR5HWKUsuQOeg8DUqyhAtCooPsYpA3q+xvEdcZsgXxD/R8XNuYxSDCKNVyl0nEfobfJisb7f3Ta+Shf58izw==
@@ -4019,7 +4019,7 @@
     "@types/node" "*"
     "@types/node-hid" "*"
 
-"@types/ledgerhq__hw-transport@*", "@types/ledgerhq__hw-transport@^4.21.2":
+"@types/ledgerhq__hw-transport@*", "@types/ledgerhq__hw-transport@4.21.2":
   version "4.21.2"
   resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport/-/ledgerhq__hw-transport-4.21.2.tgz#92eaea9e4669df2c8ec5292b694097d1629b05c1"
   integrity sha512-NhJwkdxdsqj/ZTq9KuBYtN+rDYOVYrlR3ByYNfK78iUOIlmXcXFBtfkhBUpX8c7dbE5uJZOjDdM3EC7Kf3Fakg==

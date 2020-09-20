@@ -195,7 +195,7 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss: onDis
         <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
         {status === disconnectStatus ? (
           <Button label={t('common.confirm')} type="submit" disabled={isSigning} onClick={sign}>
-            {t('import-hardware.actions.rescan') as string}
+            {t('hardware-sign.actions.rescan') as string}
           </Button>
         ) : null}
       </footer>

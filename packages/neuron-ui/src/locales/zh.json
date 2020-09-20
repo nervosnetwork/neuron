@@ -62,7 +62,8 @@
       },
       "actions": {
         "close": "关闭",
-        "success": "交易成功"
+        "success": "交易成功",
+        "rescan": "再次检测"
       }
     },
     "overview": {

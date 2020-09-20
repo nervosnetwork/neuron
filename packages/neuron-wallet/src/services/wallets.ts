@@ -65,10 +65,6 @@ export abstract class Wallet {
     throw new Error('not implemented')
   }
 
-  public isHardware = (): boolean => {
-    throw new Error('not implemented')
-  }
-
   public loadKeystore = (): Keystore => {
     throw new WalletFunctionNotSupported(this.loadKeystore.name)
   }
@@ -111,6 +107,8 @@ export abstract class Wallet {
   public abstract getNextReceivingAddresses (): Promise<AddressInterface[]>
 
   public abstract isHDWallet (): boolean
+
+  public abstract isHardware(): boolean
 }
 
 export class FileKeystoreWallet extends Wallet {

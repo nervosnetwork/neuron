@@ -92,7 +92,7 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
     } finally {
       setScaning(false)
     }
-  }, [model])
+  }, [model, setError, setScaning])
 
   useDidMount(() => {
     findDevice()

@@ -67,7 +67,8 @@
       },
       "actions": {
         "close": "Close",
-        "success": "Transaction Succesful!"
+        "success": "Transaction Succesful!",
+        "rescan": "Rescan"
       }
     },
     "overview": {

@@ -106,7 +106,7 @@ const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup
 const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   const isMac = process.platform === 'darwin'
   const currentWindow = BrowserWindow.getFocusedWindow()
-  let isMainWindow = mainWindow == currentWindow
+  let isMainWindow = mainWindow === currentWindow
 
   const walletsService = WalletsService.getInstance()
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))

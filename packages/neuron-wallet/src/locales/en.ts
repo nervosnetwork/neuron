@@ -105,7 +105,8 @@ export default {
       'target-output-not-found': "There isn't an account wallet associated with this address.",
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
       "connect-device-failed": "The device cannot be connected, please check your connection.",
-      "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported."
+      "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
+      "wallet-not-supported-function": "This wallet does not support {name} function."
     },
     messageBox: {
       button: {
