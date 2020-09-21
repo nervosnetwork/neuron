@@ -73,8 +73,14 @@ export abstract class Hardware {
         const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
         const serializedMultiSign: string = new MultiSign().serialize(blake160)
         const witnesses = await TransactionSender.signSingleMultiSignScript(path, serializedWitnesses, txHash, serializedMultiSign, wallet)
+        const signture = await this.signTransaction(
+          walletID,
+          tx,
+          witnesses.map(w => typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())),
+          path
+        )
         const wit = witnesses[0] as WitnessArgs
-        wit.lock = serializedMultiSign + wit.lock!.slice(2)
+        wit.lock = serializedMultiSign + signture
         witnesses[0] = serializeWitnessArgs(wit.toSDK())
         witnessesArgs[index].witness = witnesses[0]
         for (let i = 0; i < witnessesArgs.length; ++i) {

@@ -205,12 +205,7 @@ public static async signSingleMultiSignScript(
 
     const message = blake2b.digest()
 
-    if (wallet.isHardware()) {
-      // since the device is reinitted in the sign function,
-      // device must be available here
-      const device = HardwareWalletService.getInstance().getCurrent()!
-      emptyWitness.lock = await device.signMessage(privateKeyOrPath, message)
-    } else {
+    if (!wallet.isHardware()) {
       const keyPair = new ECPair(privateKeyOrPath)
       emptyWitness.lock = keyPair.signRecoverable(message)
     }
