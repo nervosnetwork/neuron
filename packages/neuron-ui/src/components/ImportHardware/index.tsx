@@ -4,7 +4,7 @@ import Comfirming from './confirming'
 import ImportError from './import-error'
 import SelectModel from './select-model'
 import DetectDevice from './detect-device'
-import Success from './import-success'
+import ImportSuccess from './import-success'
 import NameWallet from './name-wallet'
 import { RoutePath } from './common'
 
@@ -24,7 +24,7 @@ const ImportHardware = ({ match }: RouteComponentProps) => {
         <Route component={DetectDevice} exact path={match.url + RoutePath.DetectDevice} />
         <Route component={Comfirming} exact path={match.url + RoutePath.Comfirming} />
         <Route component={ImportError} exact path={match.url + RoutePath.Error} />
-        <Route component={Success} exact path={match.url + RoutePath.Success} />
+        <Route component={ImportSuccess} exact path={match.url + RoutePath.Success} />
         <Route component={NameWallet} exact path={match.url + RoutePath.NameWallet} />
       </Switch>
     </dialog>
