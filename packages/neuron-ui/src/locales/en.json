@@ -65,6 +65,8 @@
         "connect": "Connected, waiting for user input...",
         "disconnect": "Disconnected, please check your connection."
       },
+      "inputs": "Inputs(signing {{index}} of {{length}})",
+      "outputs": "Outputs({{length}})",
       "actions": {
         "close": "Close",
         "success": "Transaction Succesful!",

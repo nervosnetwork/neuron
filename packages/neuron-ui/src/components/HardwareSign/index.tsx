@@ -14,6 +14,7 @@ import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import { connectDevice } from 'services/remote'
 import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import SignError from './error'
+import HDWalletSign from './hd-wallet-sign'
 import styles from './hardwareSign.module.scss'
 
 export type SignType = 'message' | 'transaction'
@@ -26,7 +27,7 @@ export interface HardwareSignProps {
   history?: ReturnType<typeof useHistory>
 }
 
-const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss: onDissmiss }: HardwareSignProps) => {
+const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: HardwareSignProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const dispatch = useDispatch()
@@ -37,8 +38,8 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss: onDis
         payload: { sending: false },
       })
     }
-    onDissmiss()
-  }, [dispatch, signType, onDissmiss])
+    onDismiss()
+  }, [dispatch, signType, onDismiss])
   const connectStatus = t('hardware-sign.status.connect')
   const disconnectStatus = t('hardware-sign.status.disconnect')
 
@@ -171,6 +172,8 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss: onDis
     sign()
   })
 
+  const dialogClass = `${styles.dialog} ${wallet.isHD ? styles.hd : ''}`
+
   let container = (
     <div className={styles.container}>
       <header className={styles.title}>{t('hardware-sign.title')}</header>
@@ -190,6 +193,7 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss: onDis
             </tr>
           </tbody>
         </table>
+        {wallet.isHD ? <HDWalletSign tx={generatedTx} /> : null}
       </section>
       <footer className={styles.footer}>
         <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
@@ -207,7 +211,7 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss: onDis
   }
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
+    <dialog ref={dialogRef} className={dialogClass}>
       {container}
     </dialog>
   )

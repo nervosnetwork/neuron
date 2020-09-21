@@ -28,6 +28,7 @@ const SubjectConstructor = <T>(
     | 'app-updater-updated'
     | 'navigation'
     | 'set-locale'
+    | 'device-sign-index'
 ) => {
   return ipcRenderer
     ? {
@@ -55,6 +56,7 @@ export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-up
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 export const Navigation = SubjectConstructor<Subject.URL>('navigation')
 export const SetLocale = SubjectConstructor<typeof LOCALES[number]>('set-locale')
+export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sign-index')
 
 export default {
   DataUpdate,
@@ -68,4 +70,5 @@ export default {
   Command,
   Navigation,
   SetLocale,
+  DeviceSignIndex,
 }

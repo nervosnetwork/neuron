@@ -6,6 +6,7 @@ import AddressService from 'services/addresses'
 import TransactionSender from 'services/transaction-sender'
 import MultiSign from 'models/multi-sign'
 import WalletService from 'services/wallets'
+import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
@@ -53,6 +54,7 @@ export abstract class Hardware {
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
     for (const [index, lockHash] of [...lockHashes].entries()) {
+      DeviceSignIndexSubject.next(index)
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
       witnessesArgs[0].witnessArgs.setEmptyLock()

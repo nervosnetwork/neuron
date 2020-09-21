@@ -58,7 +58,8 @@ export abstract class Wallet {
     id: this.id,
     name: this.name,
     extendedKey: this.extendedKey,
-    device: this.device
+    device: this.device,
+    isHD: this.isHD,
   })
 
   public fromJSON = () => {
@@ -134,7 +135,8 @@ export class FileKeystoreWallet extends Wallet {
       id: this.id,
       name: this.name,
       extendedKey: this.extendedKey,
-      device: this.device
+      device: this.device,
+      isHD: this.isHD,
     }
   }
 

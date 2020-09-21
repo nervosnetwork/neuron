@@ -4,12 +4,13 @@
   @include dialog-container;
   padding: 30px 50px;
   min-height: 225px;
-  width: 600px;;
+  height: 240px;
+  width: 600px;
 
   .container {
-    height: 180px;
     display: flex;
     flex-direction: column;
+    height: 100%;
 
     .action {
       @extend .main;
@@ -65,6 +66,95 @@
 
     button {
       margin-left: 10px;
+    }
+  }
+}
+
+.table {
+  overflow: auto;
+}
+
+.hd {
+  max-width: 700px;
+  width: 700px;
+  max-height: 400px;
+  height: 400px;
+}
+
+.sign {
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    border-bottom: 1px solid #e3e3e3;
+  }
+
+  tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+
+  td {
+    height: 1.75rem;
+    word-wrap: none;
+    word-break: keep-all;
+    & > div {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+      font-size: 13px;
+    }
+  }
+
+  span,
+  td,
+  th {
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    padding: 0;
+  }
+
+  th,
+  td {
+    &:first-of-type {
+      padding-left: 10px;
+      width: 80px;
+    }
+
+    &:last-of-type {
+      padding-right: 10px;
+      width: 336px;
+      text-align: right;
+    }
+  }
+}
+
+.active {
+  background-color: #eeeeee;
+}
+
+.signed {
+  color: #888888;
+}
+
+.tabs {
+  width: 100%;
+  display: flex;
+  margin-top: 15px;
+  flex-direction: row;
+
+  button {
+    flex: 1;
+    cursor: pointer;
+    font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
+    font-size: 14px;
+    border: none;
+    background: none;
+    height: 30px;
+
+    &.active {
+      font-weight: bold;
+      border-bottom: 4px solid #3cc68a;
     }
   }
 }

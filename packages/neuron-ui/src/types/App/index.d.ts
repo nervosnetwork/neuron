@@ -138,6 +138,7 @@ declare namespace State {
     readonly id: string
     readonly name: string
     readonly device?: DeviceInfo
+    readonly isHD?: boolean
   }
 
   enum Manufacturer {
