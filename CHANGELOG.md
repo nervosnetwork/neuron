@@ -1,3 +1,11 @@
+# 0.32.3 (2020-09-22)
+[CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Bug fixes
+
+* Fix a bug of lumos query for multisign lock.
+
+
 # 0.32.2 (2020-08-22)
 [CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
 
