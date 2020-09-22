@@ -1,6 +1,10 @@
-import { DeviceInfo, Manufacturer } from '../../src/services/hardware/common'
+import { DeviceInfo } from '../../src/services/hardware/common'
 import { AddressType } from '../../src/models/keys/address'
 import type { Subscriber } from 'rxjs'
+
+enum Manufacturer {
+  Ledger = 'Ledger'
+}
 
 export const ledgerNanoS: DeviceInfo = {
   descriptor: '@LedgerNanoS',

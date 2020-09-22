@@ -1,6 +1,7 @@
 import { UnsupportedManufacturer } from 'exceptions'
-import { Hardware, DeviceInfo, Manufacturer, HardwareClass } from './common'
+import { DeviceInfo, Manufacturer } from './common'
 import Ledger from './ledger'
+import { Hardware, HardwareClass } from './hardware'
 
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
