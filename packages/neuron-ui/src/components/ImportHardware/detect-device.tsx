@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { useHistory, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { getDevices, getFirmwareVersion, getCkbAppVersion, connectDevice } from 'services/remote'
+import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
 import { isSuccessResponse, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
 import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
@@ -74,11 +74,11 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
           setScaning(false)
           throw new ConnectFailedException()
         }
-        const firmwareVersionRes = await getFirmwareVersion(device.descriptor)
+        const firmwareVersionRes = await getDeviceFirmwareVersion(device.descriptor)
         if (isSuccessResponse(firmwareVersionRes)) {
           setFirmwareVersion(firmwareVersionRes.result!)
         }
-        const ckbVersionRes = await getCkbAppVersion(device.descriptor)
+        const ckbVersionRes = await getDeviceCkbAppVersion(device.descriptor)
         if (isSuccessResponse(ckbVersionRes)) {
           setAppVersion(ckbVersionRes.result!)
         } else {

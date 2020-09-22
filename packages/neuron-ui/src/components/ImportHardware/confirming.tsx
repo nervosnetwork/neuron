@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router-dom'
 import Button from 'widgets/Button'
 import { ReactComponent as PendingIcon } from 'widgets/Icons/Pending.svg'
-import { getPublickey } from 'services/remote'
+import { getDevicePublickey } from 'services/remote'
 import { isSuccessResponse, useDidMount } from 'utils'
 import { RoutePath, LocationState } from './common'
 
@@ -17,7 +17,7 @@ const Confirming = ({ history, location }: RouteComponentProps<{}, {}, LocationS
   }, [history])
 
   useDidMount(() => {
-    getPublickey().then(res => {
+    getDevicePublickey().then(res => {
       if (isSuccessResponse(res)) {
         history.push({
           pathname: entryPath + RoutePath.NameWallet,

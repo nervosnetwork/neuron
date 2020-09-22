@@ -9,11 +9,12 @@ import {
   sendSUDTTransaction,
   AppActions,
 } from 'states'
+import Spinner from 'widgets/Spinner'
 import { useHistory } from 'react-router-dom'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
-import { connectDevice } from 'services/remote'
+import { connectDevice, getDevices } from 'services/remote'
 import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
-import SignError from './error'
+import SignError from './sign-error'
 import HDWalletSign from './hd-wallet-sign'
 import styles from './hardwareSign.module.scss'
 
@@ -54,117 +55,142 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [isSigning, setSigning] = useState(false)
+  const [isReconnecting, setIsReconnecting] = useState(false)
 
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
 
-  const signTx = useCallback(async () => {
-    try {
-      const conectionRes = await connectDevice(wallet.device!)
+  const signTx = useCallback(
+    async (deviceInfo?: State.DeviceInfo) => {
+      try {
+        const conectionRes = await connectDevice(deviceInfo ?? wallet.device!)
+        if (!isSuccessResponse(conectionRes)) {
+          setStatus(disconnectStatus)
+          return
+        }
+        setStatus(connectStatus)
+
+        switch (actionType) {
+          case 'send': {
+            if (isSending) {
+              break
+            }
+            sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                history!.push(RoutePath.History)
+              } else {
+                setError(res.message)
+              }
+            })
+            break
+          }
+          case 'unlock': {
+            if (isSending) {
+              break
+            }
+            sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                history!.push(RoutePath.History)
+              } else {
+                setError(res.message)
+              }
+            })
+            break
+          }
+          case 'create-sudt-account': {
+            const params: Controller.SendCreateSUDTAccountTransaction.Params = {
+              walletID,
+              assetAccount: experimental?.assetAccount,
+              tx: experimental?.tx,
+            }
+            sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                history!.push(RoutePath.History)
+              } else {
+                setError(res.message)
+              }
+            })
+            break
+          }
+          case 'send-sudt': {
+            const params: Controller.SendSUDTTransaction.Params = {
+              walletID,
+              tx: experimental?.tx,
+            }
+            sendSUDTTransaction(params)(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                history!.push(RoutePath.History)
+              } else {
+                setError(res.message)
+              }
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      } catch (err) {
+        setStatus(disconnectStatus)
+      }
+    },
+    [
+      actionType,
+      connectStatus,
+      disconnectStatus,
+      experimental,
+      generatedTx,
+      isSending,
+      wallet.device,
+      walletID,
+      description,
+      dispatch,
+      history,
+    ]
+  )
+
+  const signMsg = useCallback(
+    async (deviceInfo?: State.DeviceInfo) => {
+      const conectionRes = await connectDevice(deviceInfo ?? wallet.device!)
       if (!isSuccessResponse(conectionRes)) {
         setStatus(disconnectStatus)
         return
       }
       setStatus(connectStatus)
+      await signMessage?.('')
+    },
+    [connectStatus, wallet.device, disconnectStatus, signMessage]
+  )
 
-      switch (actionType) {
-        case 'send': {
-          if (isSending) {
-            break
-          }
-          sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
-            if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
-            } else {
-              setError(res.message)
-            }
-          })
-          break
+  const sign = useCallback(
+    async (deviceInfo?: State.DeviceInfo) => {
+      setSigning(true)
+      try {
+        if (signType === 'message') {
+          await signMsg(deviceInfo)
+        } else {
+          await signTx(deviceInfo)
         }
-        case 'unlock': {
-          if (isSending) {
-            break
-          }
-          sendTransaction({ walletID, tx: generatedTx, description })(dispatch).then(res => {
-            if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
-            } else {
-              setError(res.message)
-            }
-          })
-          break
-        }
-        case 'create-sudt-account': {
-          const params: Controller.SendCreateSUDTAccountTransaction.Params = {
-            walletID,
-            assetAccount: experimental?.assetAccount,
-            tx: experimental?.tx,
-          }
-          sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
-            if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
-            } else {
-              setError(res.message)
-            }
-          })
-          break
-        }
-        case 'send-sudt': {
-          const params: Controller.SendSUDTTransaction.Params = {
-            walletID,
-            tx: experimental?.tx,
-          }
-          sendSUDTTransaction(params)(dispatch).then(res => {
-            if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
-            } else {
-              setError(res.message)
-            }
-          })
-          break
-        }
-        default: {
-          break
-        }
+      } finally {
+        setSigning(false)
+      }
+    },
+    [signType, signTx, setSigning, signMsg]
+  )
+
+  const reconnect = useCallback(async () => {
+    setIsReconnecting(true)
+    try {
+      const res = await getDevices(wallet.device!)
+      if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
+        const [device] = res.result
+        await sign(device)
       }
     } catch (err) {
       setStatus(disconnectStatus)
-    }
-  }, [
-    actionType,
-    connectStatus,
-    disconnectStatus,
-    experimental,
-    generatedTx,
-    isSending,
-    wallet.device,
-    walletID,
-    description,
-    dispatch,
-    history,
-  ])
-
-  const signMsg = useCallback(async () => {
-    const conectionRes = await connectDevice(wallet.device!)
-    if (!isSuccessResponse(conectionRes)) {
-      setStatus(disconnectStatus)
-      return
-    }
-    setStatus(connectStatus)
-    await signMessage?.('')
-  }, [connectStatus, wallet.device, disconnectStatus, signMessage])
-
-  const sign = useCallback(async () => {
-    setSigning(true)
-    try {
-      if (signType === 'message') {
-        await signMsg()
-      } else {
-        await signTx()
-      }
     } finally {
-      setSigning(false)
+      setIsReconnecting(false)
     }
-  }, [signType, signTx, setSigning, signMsg])
+  }, [sign, wallet.device, disconnectStatus])
 
   useDidMount(() => {
     // eslint-disable-next-line no-unused-expressions
@@ -197,9 +223,9 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
       </section>
       <footer className={styles.footer}>
         <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
-        {status === disconnectStatus ? (
-          <Button label={t('common.confirm')} type="submit" disabled={isSigning} onClick={sign}>
-            {t('hardware-sign.actions.rescan') as string}
+        {status === disconnectStatus || isSigning ? (
+          <Button label={t('common.confirm')} type="submit" disabled={isReconnecting} onClick={reconnect}>
+            {isReconnecting ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
           </Button>
         ) : null}
       </footer>

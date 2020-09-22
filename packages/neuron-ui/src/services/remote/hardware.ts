@@ -25,9 +25,9 @@ export type Descriptor = string
 export type Version = string
 
 export const getDevices = remoteApi<Model, DeviceInfo[]>('detect-device')
-export const getCkbAppVersion = remoteApi<Descriptor, Version>('get-device-ckb-app-version')
-export const getFirmwareVersion = remoteApi<Descriptor, Version>('get-device-firmware-version')
-export const getPublickey = remoteApi<void, ExtendedPublicKey>('get-device-public-key')
+export const getDeviceCkbAppVersion = remoteApi<Descriptor, Version>('get-device-ckb-app-version')
+export const getDeviceFirmwareVersion = remoteApi<Descriptor, Version>('get-device-firmware-version')
+export const getDevicePublickey = remoteApi<void, ExtendedPublicKey>('get-device-public-key')
 export const connectDevice = remoteApi<DeviceInfo, void>('connect-device')
 export const createHardwareWallet = remoteApi<ExtendedPublicKey & { walletName: string }, void>(
   'create-hardware-wallet'
