@@ -1,6 +1,7 @@
 import { Address, AddressVersion } from '../../../src/models/address'
 import { AddressType } from '../../../src/models/keys/address'
 import AddressMeta from '../../../src/database/address/meta'
+import MultiSign from "../../../src/models/multi-sign";
 
 describe('Address Dao tests', () => {
   const address: Address = {
@@ -32,7 +33,7 @@ describe('Address Dao tests', () => {
     it('#generateDefaultLockScript', () => {
       const script = addressMeta.generateDefaultLockScript()
       expect(script).toEqual({
-        args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+        args: address.blake160,
         codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
         hashType: 'type'
       })
@@ -41,7 +42,7 @@ describe('Address Dao tests', () => {
     it('#generateSingleMultiSignLockScript', () => {
       const script = addressMeta.generateSingleMultiSignLockScript()
       expect(script).toEqual({
-        args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+        args: new MultiSign().hash(address.blake160),
         codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
         hashType: 'type'
       })
@@ -50,7 +51,7 @@ describe('Address Dao tests', () => {
     it('#generateACPLockScript', () => {
       const script = addressMeta.generateACPLockScript()
       expect(script).toEqual({
-        args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+        args: address.blake160,
         codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
         hashType: 'type'
       })
