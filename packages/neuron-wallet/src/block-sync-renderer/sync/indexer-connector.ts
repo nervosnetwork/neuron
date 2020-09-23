@@ -205,12 +205,12 @@ export default class IndexerConnector {
   }
 
   private async upsertTxHashes(): Promise<string[]> {
-    const arrayOfInsertedTxHashes = await Promise.all(
-      [...this.addressesByWalletId.entries()].map(([walletId, addressMetas]) => {
-        const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
-        return indexerCacheService.upsertTxHashes()
-      })
-    )
+    const arrayOfInsertedTxHashes = []
+    for (const [walletId, addressMetas] of [...this.addressesByWalletId.entries()]) {
+      const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
+      const txHashes = await indexerCacheService.upsertTxHashes()
+      arrayOfInsertedTxHashes.push(txHashes)
+    }
     return arrayOfInsertedTxHashes.flat()
   }
 
