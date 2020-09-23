@@ -87,8 +87,6 @@ describe('TransactionGenerator', () => {
     mockTipHeader.mockReturnValue(blockHeader)
     // @ts-ignore: Private method
     TransactionGenerator.getTipHeader = mockTipHeader.bind(TransactionGenerator)
-
-    stubbedIndexerService.getLiveCellsByScript.mockReset()
   })
 
   afterAll(async () => {
@@ -131,6 +129,7 @@ describe('TransactionGenerator', () => {
 
     const keyEntities = keyInfos.map(d => HdPublicKeyInfo.fromObject(d))
     await getConnection().manager.save(keyEntities)
+
     stubbedIndexerService.getLiveCellsByScript.mockReset()
   })
 
@@ -944,7 +943,6 @@ describe('TransactionGenerator', () => {
     const assetAccountInfo = new AssetAccountInfo()
     const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
     const aliceAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
-    const davidAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x' + '0'.repeat(40))
 
     // generate anyone-can-pay live cell
     const generateLiveCell = (
@@ -987,13 +985,12 @@ describe('TransactionGenerator', () => {
 
       return liveCell
     }
-    beforeEach(async done => {
+    beforeEach(async () => {
       const cells: OutputEntity[] = [
-        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
-        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null, alice),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null, bob),
       ]
       await getConnection().manager.save(cells)
-      done()
     })
 
     describe('generateAnyoneCanPayToCKBTx, with feeRate 1000', () => {
@@ -1113,12 +1110,6 @@ describe('TransactionGenerator', () => {
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
-            .calledWith(davidAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('70'), undefined, undefined, davidAnyoneCanPayLockScript),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
-            ])
         })
         it('throws error CapacityNotEnough', async () => {
           let error
@@ -1154,9 +1145,6 @@ describe('TransactionGenerator', () => {
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
             ])
 
           tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
@@ -1210,9 +1198,6 @@ describe('TransactionGenerator', () => {
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
-            ])
 
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
               walletId1,
@@ -1262,13 +1247,9 @@ describe('TransactionGenerator', () => {
           generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript, customData),
           generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
-        const cellsByBob = [
-          generateLiveCell(toShannon('61'), undefined, undefined, bobAnyoneCanPayLockScript),
-        ]
         beforeEach(async () => {
           when(stubbedIndexerService.getLiveCellsByScript)
             .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue(cellsByAlice)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue(cellsByBob)
 
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
               walletId1,
@@ -1302,9 +1283,6 @@ describe('TransactionGenerator', () => {
           when(stubbedIndexerService.getLiveCellsByScript)
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('61'), undefined, undefined, bobAnyoneCanPayLockScript),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
             ])
         })
         it('throws error CapacityNotEnough', async () => {
@@ -1340,9 +1318,6 @@ describe('TransactionGenerator', () => {
               .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
-              ])
-              .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-                generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
               ])
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
               walletId1,
@@ -1424,9 +1399,6 @@ describe('TransactionGenerator', () => {
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('150'), '1000', tokenID),
             ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              targetLiveCellEntity
-            ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
@@ -1485,12 +1457,6 @@ describe('TransactionGenerator', () => {
           .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
             generateLiveCell(toShannon('150'), '100', tokenID),
           ])
-          .calledWith(davidAnyoneCanPayLockScript).mockResolvedValue([
-            generateLiveCell(toShannon('150'), '100', tokenID),
-          ])
-          .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-            targetLiveCellEntity
-          ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
           targetOutput = Output.fromObject({
@@ -1527,9 +1493,6 @@ describe('TransactionGenerator', () => {
           when(stubbedIndexerService.getLiveCellsByScript)
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('142'), '1000', tokenID),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              targetLiveCellEntity
             ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
@@ -1594,9 +1557,6 @@ describe('TransactionGenerator', () => {
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('143'), '50', tokenID),
               generateLiveCell(toShannon('142'), '1000', tokenID),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              targetLiveCellEntity
             ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
@@ -1670,9 +1630,6 @@ describe('TransactionGenerator', () => {
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('142'), '50', tokenID),
             ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              targetLiveCellEntity
-            ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
 
@@ -1709,9 +1666,6 @@ describe('TransactionGenerator', () => {
           when(stubbedIndexerService.getLiveCellsByScript)
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('1000'), '1000', tokenID),
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              targetLiveCellEntity
             ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
