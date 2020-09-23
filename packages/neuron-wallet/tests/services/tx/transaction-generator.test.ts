@@ -131,6 +131,7 @@ describe('TransactionGenerator', () => {
 
     const keyEntities = keyInfos.map(d => HdPublicKeyInfo.fromObject(d))
     await getConnection().manager.save(keyEntities)
+    stubbedIndexerService.getLiveCellsByScript.mockReset()
   })
 
   describe('generateTx', () => {
@@ -997,7 +998,7 @@ describe('TransactionGenerator', () => {
 
     describe('generateAnyoneCanPayToCKBTx, with feeRate 1000', () => {
       const feeRate = '1000'
-      describe('sending from bob to alice', () => {
+      describe('sending to another ckb acp', () => {
         let tx: Transaction
         let expectedTxSize: number
         let expectedTxFee: string
@@ -1005,9 +1006,6 @@ describe('TransactionGenerator', () => {
           when(stubbedIndexerService.getLiveCellsByScript)
             .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
-            ])
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
-              generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript)
             ])
 
           const targetOutput: Output = Output.fromObject({
@@ -1031,6 +1029,60 @@ describe('TransactionGenerator', () => {
           expectedTxSize = TransactionSize.tx(tx)
           expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
         });
+        it('binds both secp and acp cell dep', () => {
+          expect(tx.cellDeps.length).toEqual(2)
+        })
+        it('calculates fees', async () => {
+          expect(tx.fee).toEqual(expectedTxFee)
+        })
+        it('generates inputs and outputs', () => {
+          expect(tx.inputs.length).toEqual(2)
+          expect(tx.outputs.length).toEqual(2)
+
+          const inputCapacities = tx.inputs
+            .map(input => BigInt(input.capacity))
+            .reduce((result, c) => result + c, BigInt(0))
+          const outputCapacities = tx.outputs
+            .map(output => BigInt(output.capacity))
+            .reduce((result, c) => result + c, BigInt(0))
+
+          expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+        });
+      });
+      describe('sending to sudt acp', () => {
+        let tx: Transaction
+        let expectedTxSize: number
+        let expectedTxFee: string
+        beforeEach(async () => {
+          when(stubbedIndexerService.getLiveCellsByScript)
+            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+              generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
+            ])
+
+          const targetOutput: Output = Output.fromObject({
+            capacity: toShannon('61'),
+            lock: aliceAnyoneCanPayLockScript,
+            type: assetAccountInfo.generateSudtScript('0xuuid'),
+            data: '0x',
+          })
+
+          tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+            walletId1,
+            [bobAnyoneCanPayLockScript],
+            targetOutput,
+            (1 * 10**8).toString(),
+            bob.lockScript.args,
+            feeRate,
+            '0'
+          )
+          tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+          expectedTxSize = TransactionSize.tx(tx)
+          expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+        });
+        it('binds both secp, acp and sudt cell deps', () => {
+          expect(tx.cellDeps.length).toEqual(3)
+        })
         it('calculates fees', async () => {
           expect(tx.fee).toEqual(expectedTxFee)
         })
