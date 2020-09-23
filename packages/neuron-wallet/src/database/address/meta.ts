@@ -4,6 +4,7 @@ import Script from "models/chain/script";
 import SystemScriptInfo from "models/system-script-info";
 import AssetAccountInfo from "models/asset-account-info";
 import HdPublicKeyInfoModel from "models/keys/hd-public-key-info";
+import MultiSign from "models/multi-sign";
 
 export default class AddressMeta implements Address {
   walletId: string
@@ -99,7 +100,7 @@ export default class AddressMeta implements Address {
   }
 
   public generateSingleMultiSignLockScript(): Script {
-    return SystemScriptInfo.generateMultiSignScript(this.blake160)
+    return SystemScriptInfo.generateMultiSignScript(new MultiSign().hash(this.blake160))
   }
 
   public generateACPLockScript(): Script {
