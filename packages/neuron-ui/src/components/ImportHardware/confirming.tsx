@@ -13,8 +13,8 @@ const Confirming = ({ history, location }: RouteComponentProps<{}, {}, LocationS
   const [t] = useTranslation()
   const { entryPath } = location.state
   const onBack = useCallback(() => {
-    history.goBack()
-  }, [history])
+    history.push(entryPath)
+  }, [history, entryPath])
 
   useDidMount(() => {
     getDevicePublickey().then(res => {
