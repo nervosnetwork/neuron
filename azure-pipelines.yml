@@ -5,6 +5,7 @@ trigger:
       - master
       - develop
       - rc/*
+      - hotfix/*
   tags:
     include:
       - refs/tags/v*

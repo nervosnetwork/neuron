@@ -112,6 +112,7 @@ describe('integration tests for sync pipeline', () => {
   const stubbedGenesisBlockHashFn = jest.fn()
   const stubbedGetTransactionsByLockScriptFn = jest.fn()
   const stubbedCheckAndGenerateAddressesFn = jest.fn()
+  const stubbedCellCollectorConstructor = jest.fn()
 
   const resetMocks = () => {
     stubbedGetTransactionFn.mockReset()
@@ -164,6 +165,22 @@ describe('integration tests for sync pipeline', () => {
 
     when(stubbedGetHeaderFn).calledWith(fakeBlock1.hash).mockReturnValue(fakeBlock1)
 
+    when(stubbedCellCollectorConstructor)
+      .calledWith(expect.anything())
+      .mockReturnValue({
+        collect: () => {
+          return {
+            [Symbol.asyncIterator]: () => {
+              return {
+                next: async () => {
+                  return {done: true}
+                }
+              }
+            }
+          }
+        }
+      })
+
     stubbedIndexerConstructor = jest.fn().mockImplementation(
       () => ({
         startForever: stubbedStartForeverFn,
@@ -186,7 +203,8 @@ describe('integration tests for sync pipeline', () => {
     jest.doMock('@ckb-lumos/indexer', () => {
       return {
         Indexer : stubbedIndexerConstructor,
-        TransactionCollector : stubbedTransactionCollectorConstructor
+        TransactionCollector : stubbedTransactionCollectorConstructor,
+        CellCollector : stubbedCellCollectorConstructor
       }
     });
 
