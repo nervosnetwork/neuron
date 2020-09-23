@@ -622,6 +622,9 @@ export class TransactionGenerator {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const sudtDep = assetAccountInfo.sudtCellDep
+
+    const cellDeps = [secpCellDep, anyoneCanPayDep]
     const needCapacities: bigint = capacity === 'all' ? BigInt(targetOutput.capacity) : BigInt(targetOutput.capacity) + BigInt(capacity)
     const output = Output.fromObject({
       ...targetOutput,
@@ -634,10 +637,15 @@ export class TransactionGenerator {
       lock: targetOutput.lock,
       lockHash: targetOutput.lockHash,
     })
+
+    if (output.type) {
+      cellDeps.push(sudtDep)
+    }
+
     const tx =  Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, anyoneCanPayDep],
+      cellDeps,
       inputs: [targetInput],
       outputs: [output],
       outputsData: [output.data],
