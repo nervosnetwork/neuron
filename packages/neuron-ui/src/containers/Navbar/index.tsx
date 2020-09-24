@@ -57,7 +57,6 @@ const Navbar = () => {
   useOnLocaleChange(i18n)
 
   const network = networks.find(n => n.id === networkID)
-  const networkName = network?.name ?? null
 
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
@@ -128,11 +127,9 @@ const Navbar = () => {
       </nav>
       <div className={styles.network}>
         <NetworkStatus
-          syncStatus={syncStatus}
           tipBlockNumber={tipBlockNumber}
           syncedBlockNumber={syncedBlockNumber}
-          networkName={networkName}
-          connectionStatus={connectionStatus}
+          network={network}
           onAction={() => throttledShowSettings({ tab: 'networks' })}
         />
       </div>

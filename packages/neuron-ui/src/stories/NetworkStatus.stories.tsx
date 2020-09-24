@@ -1,56 +1,79 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import { withKnobs, text, number } from '@storybook/addon-knobs'
+import { withKnobs, text, select } from '@storybook/addon-knobs'
 import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
-import { SyncStatus } from 'utils'
 
 const states: { [index: string]: NetworkStatusProps } = {
   Online: {
-    networkName: 'network name',
+    network: {
+      name: 'network name',
+      remote: 'http://localhost:3000',
+      type: 0,
+      id: 'd',
+      chain: 'ckb',
+    },
     tipBlockNumber: '100',
     syncedBlockNumber: '1',
-    connectionStatus: 'online' as any,
-    syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
   Offline: {
-    networkName: 'network',
+    network: {
+      name: 'network',
+      remote: 'http://localhost:3000',
+      type: 0,
+      id: 'd',
+      chain: 'ckb',
+    },
     tipBlockNumber: '100',
     syncedBlockNumber: '1',
-    connectionStatus: 'offline' as any,
-    syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
   '100 synced and 0 tip': {
-    networkName: 'network',
+    network: {
+      name: 'network',
+      remote: 'http://localhost:3000',
+      type: 0,
+      id: 'd',
+      chain: 'ckb',
+    },
     tipBlockNumber: '0',
     syncedBlockNumber: '100',
-    connectionStatus: 'offline' as any,
-    syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
   '100 synced and empty tip': {
-    networkName: 'network',
+    network: {
+      name: 'network',
+      remote: 'http://localhost:3000',
+      type: 0,
+      id: 'd',
+      chain: 'ckb',
+    },
     tipBlockNumber: '',
     syncedBlockNumber: '100',
-    connectionStatus: 'offline' as any,
-    syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
   'not sycned and 100 tip': {
-    networkName: 'network',
+    network: {
+      name: 'network',
+      remote: 'http://localhost:3000',
+      type: 0,
+      id: 'd',
+      chain: 'ckb',
+    },
     tipBlockNumber: '100',
     syncedBlockNumber: '-1',
-    connectionStatus: 'offline' as any,
-    syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
   'not synced and empty tip': {
-    networkName: 'network',
+    network: {
+      name: 'network',
+      remote: 'http://localhost:3000',
+      type: 0,
+      id: 'd',
+      chain: 'ckb',
+    },
     tipBlockNumber: '',
     syncedBlockNumber: '-1',
-    connectionStatus: 'offline' as any,
-    syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
 }
@@ -65,11 +88,15 @@ Object.entries(states).forEach(([title, props]) => {
 
 stories.add('With knobs', () => {
   const props = {
-    networkName: text('Network name', 'network name'),
+    network: {
+      name: text('Network name', 'network name'),
+      remote: text('Remote', 'http://localhost:3000'),
+      type: select('Type', [0, 1], 0) as any,
+      id: text('id', 'd'),
+      chain: select('Chain', ['ckb', 'ckb_testnet', 'ckb_dev'], 'ckb'),
+    },
     tipBlockNumber: text('Tip block number', '100'),
     syncedBlockNumber: text('Synced block number', '1'),
-    connectionStatus: text('online', 'online') as any,
-    syncStatus: number('sync status', 0),
     onAction: () => {},
   }
   return <NetworkStatus {...props} />
