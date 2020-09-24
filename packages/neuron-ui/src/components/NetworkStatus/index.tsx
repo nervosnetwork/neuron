@@ -1,25 +1,17 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConnectionStatus, SyncStatus, localNumberFormatter } from 'utils'
+import NetworkTypeLabel from 'components/NetworkTypeLabel'
+import { localNumberFormatter } from 'utils'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
-  networkName: string | null
+  network: State.Network | undefined
   tipBlockNumber: string
   syncedBlockNumber: string
-  connectionStatus: State.ConnectionStatus
-  syncStatus: SyncStatus
   onAction: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({
-  networkName = null,
-  tipBlockNumber,
-  syncedBlockNumber,
-  connectionStatus = ConnectionStatus.Connecting,
-  onAction,
-  syncStatus = SyncStatus.SyncNotStart,
-}: NetworkStatusProps) => {
+const NetworkStatus = ({ network, tipBlockNumber, syncedBlockNumber, onAction }: NetworkStatusProps) => {
   const [t] = useTranslation()
 
   let synced = syncedBlockNumber
@@ -36,7 +28,7 @@ const NetworkStatus = ({
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {networkName && (tipBlockNumber || +synced >= 0) ? (
+      {network && (tipBlockNumber || +synced >= 0) ? (
         <div className={styles.tooltip}>
           <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
           {tipBlockNumber ? (
@@ -53,14 +45,11 @@ const NetworkStatus = ({
           ) : null}
         </div>
       ) : null}
-      {networkName ? (
-        <span
-          className={styles.name}
-          data-online={connectionStatus === ConnectionStatus.Online}
-          data-sync-status={SyncStatus[syncStatus]}
-        >
-          {networkName}
-        </span>
+      {network ? (
+        <div>
+          <NetworkTypeLabel type={network.chain} />
+          <span className={styles.name}>{network.name}</span>
+        </div>
       ) : (
         <span>{t('settings.setting-tabs.network')}</span>
       )}
