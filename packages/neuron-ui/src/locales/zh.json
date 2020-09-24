@@ -347,7 +347,6 @@
       "view-the-run-node-doc": "打开浏览器查看文档",
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "no-valid-addresses-found": "未找到有效地址",
-      "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
       "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
       "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "rebuild-sync": "为了提供更好的用户体验，Neuron 采取了新的索引方案，该方案需要一次性重构缓存数据库(预期同步时间为 30~60 分钟)。\n抱歉给您带来不便。",
