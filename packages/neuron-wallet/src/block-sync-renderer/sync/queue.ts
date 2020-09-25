@@ -25,7 +25,6 @@ export default class Queue {
   private rpcService: RpcService
   private indexerConnector: IndexerConnector | undefined
   private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
-  private currentBlockNumber = BigInt(0)
 
   private multiSignBlake160s: string[]
   private anyoneCanPayLockHashes: string[]
@@ -56,7 +55,7 @@ export default class Queue {
     )
     this.indexerConnector.connect()
     this.indexerConnector.blockTipSubject.subscribe(tip => {
-      this.updateCurrentBlockNumber(BigInt(tip.block_number))
+      this.updateCurrentBlockNumber(tip)
     });
 
 
@@ -214,11 +213,19 @@ export default class Queue {
     }
   }
 
-  private updateCurrentBlockNumber(blockNumber: BigInt) {
-    this.currentBlockNumber = BigInt(blockNumber)
+  private updateCurrentBlockNumber(tip: any) {
+    const currentBlockNumber = BigInt(tip.block_number)
     ChildProcess.send({
       channel: 'synced-block-number-updated',
-      result: this.currentBlockNumber.toString()
+      result: currentBlockNumber.toString()
+    })
+    ChildProcess.send({
+      channel: 'sync-states-updated',
+      result: {
+        indexerTip: tip.indexer_tip_number,
+        cacheTip: tip.block_number,
+        timestamp: Date.now()
+      }
     })
   }
 }

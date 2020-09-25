@@ -50,7 +50,7 @@ export default class IndexerConnector {
   private processingBlockNumber: string | undefined
   private indexerTip: Tip | undefined
   public pollingIndexer: boolean = false
-  public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
+  public readonly blockTipSubject: Subject<any> = new Subject<any>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
   constructor(
@@ -101,13 +101,18 @@ export default class IndexerConnector {
           this.blockTipSubject.next({
             block_number: nextUnprocessedBlockTip.blockNumber,
             block_hash: nextUnprocessedBlockTip.blockHash,
+            indexer_tip_number: BigInt(this.indexerTip.block_number).toString(),
           })
           if (!this.processingBlockNumber) {
             await this.processNextBlockNumber()
           }
         }
         else if (this.indexerTip) {
-          this.blockTipSubject.next(this.indexerTip)
+          this.blockTipSubject.next({
+            block_number: BigInt(this.indexerTip.block_number).toString(),
+            block_hash: this.indexerTip.block_hash,
+            indexer_tip_number: BigInt(this.indexerTip.block_number).toString()
+          })
         }
 
         await CommonUtils.sleep(5000)

@@ -130,8 +130,8 @@ describe('unit tests for IndexerConnector', () => {
     });
   });
   describe('#connect', () => {
-    const fakeTip1 = {block_number: '1', block_hash: 'hash1'}
-    const fakeTip2 = {block_number: '2', block_hash: 'hash2'}
+    const fakeTip1 = {block_number: '1', block_hash: 'hash1', indexer_tip_number: '1'}
+    const fakeTip2 = {block_number: '2', block_hash: 'hash2', indexer_tip_number: '2'}
     const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
     const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
     const fakeBlock3 = {number: '3', hash: '3', timestamp: '3'}
@@ -426,6 +426,7 @@ describe('unit tests for IndexerConnector', () => {
               expect(tipObserver).toHaveBeenCalledWith({
                 block_number: fakeBlock3.number,
                 block_hash: fakeBlock3.hash,
+                indexer_tip_number: fakeTip2.block_number,
               })
             })
           });
