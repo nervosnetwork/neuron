@@ -2,6 +2,7 @@ import EventEmiter from 'events'
 import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import NodeService from 'services/node'
+import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
 
 interface SyncState {
   nodeUrl: string,
@@ -54,9 +55,20 @@ export default class SyncApiController {
       state => currentTime - state.timestamp <= this.sampleTime
     )
     this.estimates.push(newState)
-    console.log(this.estimates.length)
 
     return newState
+  }
+
+  private async fetchBestKnownBlockNumber (): Promise<number> {
+    const PROPERTIES = {
+      name: 'sync state',
+      method: 'sync_state',
+      paramsFormatters: [],
+    }
+
+    const method = new Method({url: this.nodeUrl!}, PROPERTIES)
+    const {best_known_block_number} = await method.call()
+    return parseInt(best_known_block_number, 16)
   }
 
   private async estimate (states: any): Promise<SyncState> {
@@ -65,11 +77,9 @@ export default class SyncApiController {
     const timestamp = parseInt(states.timestamp)
 
     const ckb = NodeService.getInstance().ckb
-    //@ts-ignore
-    const syncState = await ckb.rpc.syncState()
-    const bestKnownBlockNumber = parseInt(syncState.bestKnownBlockNumber)
-
     this.nodeUrl = ckb.node.url
+
+    const bestKnownBlockNumber = await this.fetchBestKnownBlockNumber()
 
     const estimatesByNode = this.getEstimatesByCurrentNode()
     const lastSyncState = estimatesByNode[estimatesByNode.length - 1]

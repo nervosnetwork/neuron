@@ -4,14 +4,14 @@ import { flushPromises } from '../test-utils'
 const stubbedEmitter = jest.fn()
 const stubbedSyncedBlockNumber = jest.fn()
 const stubbedSyncStateSubjectNext = jest.fn()
-const stubbedSyncState = jest.fn()
+const stubbedSDKMethod = jest.fn()
 const stubbedNodeGetInstance = jest.fn()
 
 const resetMocks = () => {
   stubbedEmitter.mockReset()
   stubbedSyncedBlockNumber.mockReset()
   stubbedSyncStateSubjectNext.mockReset()
-  stubbedSyncState.mockReset()
+  stubbedSDKMethod.mockReset()
   stubbedNodeGetInstance.mockReset()
 }
 
@@ -38,6 +38,13 @@ describe('sync api', () => {
         getInstance: stubbedNodeGetInstance
       }
     })
+    jest.doMock('@nervosnetwork/ckb-sdk-rpc/lib/method', () => {
+      return jest.fn().mockImplementation(() => {
+        return {
+          call: stubbedSDKMethod
+        }
+      })
+    })
 
     stubbedEmitter.mockImplementation(() => {
       return emitter
@@ -59,12 +66,12 @@ describe('sync api', () => {
       jest
         .spyOn(Date, 'now')
         .mockImplementation(() => 66000);
-      stubbedSyncState.mockResolvedValue({bestKnownBlockNumber})
+      stubbedSDKMethod.mockResolvedValue({best_known_block_number: bestKnownBlockNumber.toString(16)})
       stubbedNodeGetInstance.mockImplementation(() => ({
         ckb: {
-          rpc: {
-            syncState: stubbedSyncState
-          },
+          // rpc: {
+          //   syncState: stubbedSyncState
+          // },
           node: {
             url: fakeNodeUrl
           }
@@ -251,9 +258,6 @@ describe('sync api', () => {
             beforeEach(async () => {
               stubbedNodeGetInstance.mockImplementation(() => ({
                 ckb: {
-                  rpc: {
-                    syncState: stubbedSyncState
-                  },
                   node: {
                     url: 'http://diffurl'
                   }
