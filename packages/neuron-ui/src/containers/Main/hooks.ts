@@ -177,10 +177,10 @@ export const useSubscription = ({
       }
     })
 
-    const syncedBlockNumberSubscription = SyncedBlockNumberSubject.subscribe(syncedBlockNumber => {
+    const syncedBlockNumberSubscription = SyncedBlockNumberSubject.subscribe(({ cacheTipNumber }) => {
       dispatch({
         type: NeuronWalletActions.UpdateSyncedBlockNumber,
-        payload: syncedBlockNumber,
+        payload: cacheTipNumber.toString(),
       })
     })
 

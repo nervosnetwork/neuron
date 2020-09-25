@@ -13,7 +13,7 @@ import AssetAccountService from 'services/asset-account-service'
 import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
-import IndexerConnector from './indexer-connector'
+import IndexerConnector, { BlockTips } from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
 import CommonUtils from 'utils/common'
 import { ChildProcess } from 'utils/worker'
@@ -54,8 +54,8 @@ export default class Queue {
       this.url
     )
     this.indexerConnector.connect()
-    this.indexerConnector.blockTipSubject.subscribe(tip => {
-      this.updateCurrentBlockNumber(tip)
+    this.indexerConnector.blockTipsSubject.subscribe(tip => {
+      this.updateBlockNumberTips(tip)
     });
 
 
@@ -213,17 +213,12 @@ export default class Queue {
     }
   }
 
-  private updateCurrentBlockNumber(tip: any) {
-    const currentBlockNumber = BigInt(tip.block_number)
+  private updateBlockNumberTips(tip: BlockTips) {
     ChildProcess.send({
-      channel: 'synced-block-number-updated',
-      result: currentBlockNumber.toString()
-    })
-    ChildProcess.send({
-      channel: 'sync-states-updated',
+      channel: 'sync-estimate-updated',
       result: {
-        indexerTip: tip.indexer_tip_number,
-        cacheTip: tip.block_number,
+        indexerTipNumber: tip.indexerTipNumber,
+        cacheTipNumber: tip.cacheTipNumber,
         timestamp: Date.now()
       }
     })

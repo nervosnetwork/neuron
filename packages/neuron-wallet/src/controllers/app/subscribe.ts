@@ -5,11 +5,12 @@ import { debounceTime, sampleTime } from 'rxjs/operators'
 import CommandSubject from 'models/subjects/command'
 import DataUpdateSubject from 'models/subjects/data-update'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
-import SyncedBlockNumberSubject, { ConnectionStatusSubject } from 'models/subjects/node'
+import { ConnectionStatusSubject } from 'models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import AppUpdaterSubject from 'models/subjects/app-updater'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
+import SyncStateSubject from 'models/subjects/sync-state-subject'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -31,8 +32,8 @@ export const subscribe = (dispatcher: AppResponder) => {
     dispatcher.sendMessage('connection-status-updated', params)
   })
 
-  SyncedBlockNumberSubject.getSubject().pipe(sampleTime(1000)).subscribe(params => {
-    dispatcher.sendMessage('synced-block-number-updated', params)
+  SyncStateSubject.pipe(sampleTime(1000)).subscribe(params => {
+    dispatcher.sendMessage('sync-estimate-updated', params)
   })
 
   CommandSubject.subscribe(params => {

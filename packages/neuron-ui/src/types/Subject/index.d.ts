@@ -28,6 +28,7 @@ declare namespace Subject {
     url: string
   }
   type BlockNumber = string
+  type SyncStatus = { cacheTipNumber: number; bestKnownBlockNumber: number; estimate: number }
   interface AppUpdater {
     checking: boolean
     downloadProgress: number

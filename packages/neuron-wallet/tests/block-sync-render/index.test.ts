@@ -386,20 +386,12 @@ describe('block sync render', () => {
             expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledWith(result)
           })
         });
-        describe('handles synced-block-number-updated event from child process', () => {
+        describe('handles sync-estimate-updated event from child process', () => {
           beforeEach(() => {
-            fakeSendMessageToMainProcess('synced-block-number-updated', result)
+            fakeSendMessageToMainProcess('sync-estimate-updated', result)
           });
           it('SyncApiController emiter message in the main process', ()=> {
-            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('synced-block-number-updated', result)
-          })
-        });
-        describe('handles sync-states-updated event from child process', () => {
-          beforeEach(() => {
-            fakeSendMessageToMainProcess('sync-states-updated', result)
-          });
-          it('SyncApiController emiter message in the main process', ()=> {
-            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('sync-states-updated', result)
+            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('sync-estimate-updated', result)
           })
         });
         describe('handles wallet-deleted event from child process', () => {

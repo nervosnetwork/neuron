@@ -6,6 +6,7 @@ const stubbedSyncedBlockNumber = jest.fn()
 const stubbedSyncStateSubjectNext = jest.fn()
 const stubbedSDKMethod = jest.fn()
 const stubbedNodeGetInstance = jest.fn()
+const stubbedSetNextBlock = jest.fn()
 
 const resetMocks = () => {
   stubbedEmitter.mockReset()
@@ -13,6 +14,7 @@ const resetMocks = () => {
   stubbedSyncStateSubjectNext.mockReset()
   stubbedSDKMethod.mockReset()
   stubbedNodeGetInstance.mockReset()
+  stubbedSetNextBlock.mockReset()
 }
 
 describe('sync api', () => {
@@ -32,6 +34,11 @@ describe('sync api', () => {
     })
     jest.doMock('models/subjects/sync-state-subject', () => {
       return {next: stubbedSyncStateSubjectNext}
+    })
+    jest.doMock('models/synced-block-number', () => {
+      return jest.fn().mockImplementation(() => {
+        return {setNextBlock: stubbedSetNextBlock}
+      })
     })
     jest.doMock('services/node', () => {
       return {
@@ -60,7 +67,7 @@ describe('sync api', () => {
     jest.clearAllTimers()
   });
 
-  describe('on sync-states-updated', () => {
+  describe('on sync-estimate-updated', () => {
     const bestKnownBlockNumber = 10000
     beforeEach(() => {
       jest
@@ -69,9 +76,6 @@ describe('sync api', () => {
       stubbedSDKMethod.mockResolvedValue({best_known_block_number: bestKnownBlockNumber.toString(16)})
       stubbedNodeGetInstance.mockImplementation(() => ({
         ckb: {
-          // rpc: {
-          //   syncState: stubbedSyncState
-          // },
           node: {
             url: fakeNodeUrl
           }
@@ -80,14 +84,14 @@ describe('sync api', () => {
     });
     describe('estimate based on rate of indexing', () => {
       describe('when completed cache', () => {
-        const cacheTip = (bestKnownBlockNumber - 4).toString()
+        const cacheTipNumber = (bestKnownBlockNumber - 4).toString()
         const fakeState1 = {
-          cacheTip,
-          indexerTip: (bestKnownBlockNumber - 50).toString(),
+          cacheTipNumber,
+          indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
           timestamp: '6000',
         }
         beforeEach(async () => {
-          emitter.emit('sync-states-updated', fakeState1)
+          emitter.emit('sync-estimate-updated', fakeState1)
           await flushPromises()
         });
         it('indicates synced', () => {
@@ -95,22 +99,25 @@ describe('sync api', () => {
             nodeUrl: fakeNodeUrl,
             timestamp: parseInt(fakeState1.timestamp),
             bestKnownBlockNumber,
-            cacheTip: parseInt(fakeState1.cacheTip),
-            indexerTip: parseInt(fakeState1.indexerTip),
+            cacheTipNumber: parseInt(fakeState1.cacheTipNumber),
+            indexerTipNumber: parseInt(fakeState1.indexerTipNumber),
             indexRate: undefined,
             cacheRate: undefined,
             estimate: undefined,
             synced: true,
           })
         })
+        it('stores next block number', () => {
+          expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
+        })
         describe('when advanced indexer tip is greater or equals to 50', () => {
           const fakeState2 = {
-            cacheTip,
-            indexerTip: bestKnownBlockNumber.toString(),
+            cacheTipNumber,
+            indexerTipNumber: bestKnownBlockNumber.toString(),
             timestamp: '7000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-states-updated', fakeState2)
+            emitter.emit('sync-estimate-updated', fakeState2)
             await flushPromises()
           });
           it('indicates synced', () => {
@@ -118,8 +125,8 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
               bestKnownBlockNumber,
-              cacheTip: parseInt(fakeState2.cacheTip),
-              indexerTip: parseInt(fakeState2.indexerTip),
+              cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+              indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
               indexRate: undefined,
               cacheRate: undefined,
               estimate: undefined,
@@ -129,16 +136,16 @@ describe('sync api', () => {
         });
       });
       describe('when cache is still ongoing', () => {
-        const cacheTip = (bestKnownBlockNumber - 5).toString()
+        const cacheTipNumber = (bestKnownBlockNumber - 5).toString()
         describe('with only one sample', () => {
           const fakeState1 = {
-            cacheTip,
-            indexerTip: bestKnownBlockNumber.toString(),
+            cacheTipNumber,
+            indexerTipNumber: bestKnownBlockNumber.toString(),
             timestamp: '6000',
           }
           beforeEach(async () => {
             stubbedSyncStateSubjectNext.mockReset()
-            emitter.emit('sync-states-updated', fakeState1)
+            emitter.emit('sync-estimate-updated', fakeState1)
             await flushPromises()
           });
           it('indicates either estimating or synced', () => {
@@ -146,8 +153,8 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState1.timestamp),
               bestKnownBlockNumber,
-              cacheTip: parseInt(fakeState1.cacheTip),
-              indexerTip: parseInt(fakeState1.indexerTip),
+              cacheTipNumber: parseInt(fakeState1.cacheTipNumber),
+              indexerTipNumber: parseInt(fakeState1.indexerTipNumber),
               indexRate: undefined,
               cacheRate: undefined,
               estimate: undefined,
@@ -157,18 +164,18 @@ describe('sync api', () => {
         });
         describe('when advanced indexer tip is greater or equals to 50', () => {
           const fakeState1 = {
-            cacheTip,
-            indexerTip: (bestKnownBlockNumber - 51).toString(),
+            cacheTipNumber,
+            indexerTipNumber: (bestKnownBlockNumber - 51).toString(),
             timestamp: '6000',
           }
           const fakeState2 = {
-            cacheTip,
-            indexerTip: (bestKnownBlockNumber - 1).toString(),
+            cacheTipNumber,
+            indexerTipNumber: (bestKnownBlockNumber - 1).toString(),
             timestamp: '7000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-states-updated', fakeState1)
-            emitter.emit('sync-states-updated', fakeState2)
+            emitter.emit('sync-estimate-updated', fakeState1)
+            emitter.emit('sync-estimate-updated', fakeState2)
             await flushPromises()
           });
           it('indicates synced', () => {
@@ -177,29 +184,29 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
               bestKnownBlockNumber,
-              cacheTip: parseInt(fakeState2.cacheTip),
-              indexerTip: parseInt(fakeState2.indexerTip),
+              cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+              indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
               indexRate,
               cacheRate: undefined,
-              estimate: (bestKnownBlockNumber - parseInt(fakeState2.indexerTip)) / indexRate,
+              estimate: (bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate,
               synced: false,
             })
           })
         });
         describe('when advanced indexer tip is less than 50', () => {
           const fakeState1 = {
-            cacheTip,
-            indexerTip: (bestKnownBlockNumber - 50).toString(),
+            cacheTipNumber,
+            indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
             timestamp: '6000',
           }
           const fakeState2 = {
-            cacheTip,
-            indexerTip: (bestKnownBlockNumber - 1).toString(),
+            cacheTipNumber,
+            indexerTipNumber: (bestKnownBlockNumber - 1).toString(),
             timestamp: '7000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-states-updated', fakeState1)
-            emitter.emit('sync-states-updated', fakeState2)
+            emitter.emit('sync-estimate-updated', fakeState1)
+            emitter.emit('sync-estimate-updated', fakeState2)
             await flushPromises()
           });
           it('indicates synced', () => {
@@ -207,8 +214,8 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
               bestKnownBlockNumber,
-              cacheTip: parseInt(fakeState2.cacheTip),
-              indexerTip: parseInt(fakeState2.indexerTip),
+              cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+              indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
               indexRate: undefined,
               cacheRate: undefined,
               estimate: undefined,
@@ -218,29 +225,29 @@ describe('sync api', () => {
         });
         describe('with samples spaning over 1 min', () => {
           const fakeState1 = {
-            cacheTip,
-            indexerTip: '100',
+            cacheTipNumber,
+            indexerTipNumber: '100',
             timestamp: '1000',
           }
           const fakeState2 = {
-            cacheTip,
-            indexerTip: '200',
+            cacheTipNumber,
+            indexerTipNumber: '200',
             timestamp: '6000',
           }
           const fakeState3 = {
-            cacheTip,
-            indexerTip: '6200',
+            cacheTipNumber,
+            indexerTipNumber: '6200',
             timestamp: '66000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-states-updated', fakeState1)
-            emitter.emit('sync-states-updated', fakeState2)
-            emitter.emit('sync-states-updated', fakeState3)
+            emitter.emit('sync-estimate-updated', fakeState1)
+            emitter.emit('sync-estimate-updated', fakeState2)
+            emitter.emit('sync-estimate-updated', fakeState3)
             await flushPromises()
           });
           it('estimates with samples in the last minute', () => {
             const indexRate = (
-              parseInt(fakeState3.indexerTip) - parseInt(fakeState2.indexerTip)
+              parseInt(fakeState3.indexerTipNumber) - parseInt(fakeState2.indexerTipNumber)
             ) / (parseInt(fakeState3.timestamp) - parseInt(fakeState2.timestamp))
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
               nodeUrl: fakeNodeUrl,
@@ -248,9 +255,9 @@ describe('sync api', () => {
               bestKnownBlockNumber,
               indexRate,
               cacheRate: undefined,
-              cacheTip: parseInt(fakeState3.cacheTip),
-              indexerTip: parseInt(fakeState3.indexerTip),
-              estimate: (bestKnownBlockNumber - parseInt(fakeState3.indexerTip)) / indexRate,
+              cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
+              indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
+              estimate: (bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate,
               synced: false,
             })
           })
@@ -263,7 +270,7 @@ describe('sync api', () => {
                   }
                 }
               }))
-              emitter.emit('sync-states-updated', fakeState3)
+              emitter.emit('sync-estimate-updated', fakeState3)
               await flushPromises()
             });
             it('resets samples', () => {
@@ -273,8 +280,8 @@ describe('sync api', () => {
                 bestKnownBlockNumber,
                 indexRate: undefined,
                 cacheRate: undefined,
-                cacheTip: parseInt(fakeState3.cacheTip),
-                indexerTip: parseInt(fakeState3.indexerTip),
+                cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
+                indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
                 estimate: undefined,
                 synced: false,
               })
