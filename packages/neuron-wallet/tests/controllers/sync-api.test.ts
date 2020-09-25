@@ -144,11 +144,10 @@ describe('sync api', () => {
             timestamp: '6000',
           }
           beforeEach(async () => {
-            stubbedSyncStateSubjectNext.mockReset()
             emitter.emit('sync-estimate-updated', fakeState1)
             await flushPromises()
           });
-          it('indicates either estimating or synced', () => {
+          it('should not calculate estimation', () => {
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState1.timestamp),
@@ -160,6 +159,9 @@ describe('sync api', () => {
               estimate: undefined,
               synced: false,
             })
+          })
+          it('stores next block number', () => {
+            expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
           })
         });
         describe('when advanced indexer tip is greater or equals to 50', () => {
@@ -178,7 +180,7 @@ describe('sync api', () => {
             emitter.emit('sync-estimate-updated', fakeState2)
             await flushPromises()
           });
-          it('indicates synced', () => {
+          it('calculates estimation', () => {
             const indexRate = 50 / (parseInt(fakeState2.timestamp) - parseInt(fakeState1.timestamp))
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
               nodeUrl: fakeNodeUrl,
@@ -191,6 +193,9 @@ describe('sync api', () => {
               estimate: (bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate,
               synced: false,
             })
+          })
+          it('stores next block number', () => {
+            expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
           })
         });
         describe('when advanced indexer tip is less than 50', () => {
@@ -209,7 +214,7 @@ describe('sync api', () => {
             emitter.emit('sync-estimate-updated', fakeState2)
             await flushPromises()
           });
-          it('indicates synced', () => {
+          it('should not calculate estimation', () => {
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
@@ -221,6 +226,9 @@ describe('sync api', () => {
               estimate: undefined,
               synced: false,
             })
+          })
+          it('stores next block number', () => {
+            expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
           })
         });
         describe('with samples spaning over 1 min', () => {
@@ -260,6 +268,9 @@ describe('sync api', () => {
               estimate: (bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate,
               synced: false,
             })
+          })
+          it('stores next block number', () => {
+            expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
           })
           describe('when switching network', () => {
             beforeEach(async () => {
