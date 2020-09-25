@@ -90,17 +90,23 @@ describe('sync api', () => {
           indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
           timestamp: '6000',
         }
+        const fakeState2 = {
+          cacheTipNumber,
+          indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
+          timestamp: '7000',
+        }
         beforeEach(async () => {
           emitter.emit('sync-estimate-updated', fakeState1)
+          emitter.emit('sync-estimate-updated', fakeState2)
           await flushPromises()
         });
         it('indicates synced', () => {
           expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
             nodeUrl: fakeNodeUrl,
-            timestamp: parseInt(fakeState1.timestamp),
+            timestamp: parseInt(fakeState2.timestamp),
             bestKnownBlockNumber,
-            cacheTipNumber: parseInt(fakeState1.cacheTipNumber),
-            indexerTipNumber: parseInt(fakeState1.indexerTipNumber),
+            cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+            indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
             indexRate: undefined,
             cacheRate: undefined,
             estimate: undefined,
@@ -110,30 +116,6 @@ describe('sync api', () => {
         it('stores next block number', () => {
           expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
         })
-        describe('when advanced indexer tip is greater or equals to 50', () => {
-          const fakeState2 = {
-            cacheTipNumber,
-            indexerTipNumber: bestKnownBlockNumber.toString(),
-            timestamp: '7000',
-          }
-          beforeEach(async () => {
-            emitter.emit('sync-estimate-updated', fakeState2)
-            await flushPromises()
-          });
-          it('indicates synced', () => {
-            expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
-              nodeUrl: fakeNodeUrl,
-              timestamp: parseInt(fakeState2.timestamp),
-              bestKnownBlockNumber,
-              cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
-              indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
-              indexRate: undefined,
-              cacheRate: undefined,
-              estimate: undefined,
-              synced: true,
-            })
-          })
-        });
       });
       describe('when cache is still ongoing', () => {
         const cacheTipNumber = (bestKnownBlockNumber - 5).toString()
@@ -299,6 +281,40 @@ describe('sync api', () => {
             })
           });
         });
+      });
+      describe('when searching best known block number is in progress', () => {
+        const cacheTipNumber = bestKnownBlockNumber.toString()
+        const fakeState1 = {
+          cacheTipNumber,
+          indexerTipNumber: (bestKnownBlockNumber - 101).toString(),
+          timestamp: '6000',
+        }
+
+        const nextBestKnownBlockNumber = bestKnownBlockNumber + 5
+        const fakeState2 = {
+          cacheTipNumber: nextBestKnownBlockNumber.toString(),
+          indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
+          timestamp: '7000',
+        }
+        beforeEach(async () => {
+          emitter.emit('sync-estimate-updated', fakeState1)
+          stubbedSDKMethod.mockResolvedValue({best_known_block_number: nextBestKnownBlockNumber.toString(16)})
+          emitter.emit('sync-estimate-updated', fakeState2)
+          await flushPromises()
+        });
+        it('should not calculate estimation', () => {
+          expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
+            nodeUrl: fakeNodeUrl,
+            timestamp: parseInt(fakeState2.timestamp),
+            bestKnownBlockNumber: nextBestKnownBlockNumber,
+            cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+            indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
+            indexRate: undefined,
+            cacheRate: undefined,
+            estimate: undefined,
+            synced: false,
+          })
+        })
       });
     });
   });
