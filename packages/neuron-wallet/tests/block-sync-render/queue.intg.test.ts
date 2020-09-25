@@ -228,6 +228,8 @@ describe('integration tests for sync pipeline', () => {
           toArray: () => []
         })
 
+      stubbedTipFn.mockResolvedValue({block_number: '1'})
+
       queue.start()
       await flushPromises()
       await queue.waitForDrained()

@@ -92,6 +92,9 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
       case 'synced-block-number-updated':
         SyncApiController.emiter.emit('synced-block-number-updated', msg.result)
         break
+      case 'sync-states-updated':
+        SyncApiController.emiter.emit('sync-states-updated', msg.result)
+        break
       case 'tx-db-changed':
         TxDbChangedSubject.getSubject().next(msg.result)
         break
