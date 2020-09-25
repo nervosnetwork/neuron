@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { debounceTime, sampleTime } from 'rxjs/operators'
+import { debounceTime, sampleTime, startWith } from 'rxjs/operators'
 
 import CommandSubject from 'models/subjects/command'
 import DataUpdateSubject from 'models/subjects/data-update'
@@ -11,7 +11,7 @@ import dataUpdateSubject from 'models/subjects/data-update'
 import AppUpdaterSubject from 'models/subjects/app-updater'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
-
+import { combineLatest } from 'rxjs';
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
   runCommand: (command: string, arg: any) => void
@@ -32,8 +32,16 @@ export const subscribe = (dispatcher: AppResponder) => {
     dispatcher.sendMessage('connection-status-updated', params)
   })
 
-  SyncStateSubject.pipe(sampleTime(1000)).subscribe(params => {
-    dispatcher.sendMessage('sync-estimate-updated', params)
+  combineLatest([
+    SyncStateSubject.pipe(sampleTime(1000)),
+    SyncStateSubject.pipe(sampleTime(60000), startWith({estimate: 0}))
+  ]).subscribe(([oneSecSample, oneMinSample]) => {
+    const estimation = {
+      ...oneSecSample,
+      estimate: oneMinSample.estimate === 0 ? oneSecSample.estimate : oneMinSample.estimate
+    }
+
+    dispatcher.sendMessage('sync-estimate-updated', estimation)
   })
 
   CommandSubject.subscribe(params => {

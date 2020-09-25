@@ -132,7 +132,6 @@ export default class SyncApiController {
   private registerHandlers() {
     SyncApiController.emiter.on('sync-estimate-updated', async states => {
       const newSyncEstimate = await this.estimate(states)
-      console.log(newSyncEstimate)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncEstimate.cacheTipNumber))
       SyncStateSubject.next(newSyncEstimate)
     })
