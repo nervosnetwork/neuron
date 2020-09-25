@@ -23,7 +23,7 @@ const SubjectConstructor = <T>(
     | 'current-network-id-updated'
     | 'network-list-updated'
     | 'connection-status-updated'
-    | 'synced-block-number-updated'
+    | 'sync-estimate-updated'
     | 'command'
     | 'app-updater-updated'
     | 'navigation'
@@ -50,7 +50,7 @@ export const WalletList = SubjectConstructor<any[]>('wallet-list-updated')
 export const NetworkList = SubjectConstructor<Subject.NetworkList>('network-list-updated')
 export const CurrentNetworkID = SubjectConstructor<Subject.CurrentNetworkID>('current-network-id-updated')
 export const ConnectionStatus = SubjectConstructor<Subject.ConnectionStatus>('connection-status-updated')
-export const SyncedBlockNumber = SubjectConstructor<Subject.BlockNumber>('synced-block-number-updated')
+export const SyncedBlockNumber = SubjectConstructor<Subject.SyncStatus>('sync-estimate-updated')
 export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-updated')
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 export const Navigation = SubjectConstructor<Subject.URL>('navigation')

@@ -7,8 +7,8 @@ import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
 interface SyncState {
   nodeUrl: string,
   timestamp: number,
-  indexerTip: number,
-  cacheTip: number,
+  indexerTipNumber: number,
+  cacheTipNumber: number,
   bestKnownBlockNumber: number,
   indexRate: number | undefined,
   cacheRate: number | undefined,
@@ -35,45 +35,43 @@ export default class SyncApiController {
     )
   }
 
-  private calculateAvgIndexRate (currentIndexerTip: number, timestamp: number) {
+  private calculateAvgIndexRate (currentindexerTipNumber: number, timestamp: number) {
     const firstState = this.getEstimatesByCurrentNode()[0]
     if (!firstState) {
       return undefined
     }
-    const advancedIndexerTip = currentIndexerTip - firstState.indexerTip
-    if (advancedIndexerTip < this.minimumSteps) {
+    const advancedindexerTipNumber = currentindexerTipNumber - firstState.indexerTipNumber
+    if (advancedindexerTipNumber < this.minimumSteps) {
       return undefined
     }
     const lastedTime = timestamp - firstState.timestamp
-    const indexRate = advancedIndexerTip / lastedTime
+    const indexRate = advancedindexerTipNumber / lastedTime
     return indexRate
   }
 
-  private updateEstimates (newState: SyncState) {
+  private updateEstimates (newSyncEstimate: SyncState) {
     const currentTime = Date.now()
     this.estimates = this.getEstimatesByCurrentNode().filter(
       state => currentTime - state.timestamp <= this.sampleTime
     )
-    this.estimates.push(newState)
+    this.estimates.push(newSyncEstimate)
 
-    return newState
+    return newSyncEstimate
   }
 
   private async fetchBestKnownBlockNumber (): Promise<number> {
-    const PROPERTIES = {
+    const method = new Method({url: this.nodeUrl!}, {
       name: 'sync state',
       method: 'sync_state',
       paramsFormatters: [],
-    }
-
-    const method = new Method({url: this.nodeUrl!}, PROPERTIES)
+    })
     const {best_known_block_number} = await method.call()
     return parseInt(best_known_block_number, 16)
   }
 
   private async estimate (states: any): Promise<SyncState> {
-    const indexerTip = parseInt(states.indexerTip)
-    const cacheTip = parseInt(states.cacheTip)
+    const indexerTipNumber = parseInt(states.indexerTipNumber)
+    const cacheTipNumber = parseInt(states.cacheTipNumber)
     const timestamp = parseInt(states.timestamp)
 
     const ckb = NodeService.getInstance().ckb
@@ -81,60 +79,39 @@ export default class SyncApiController {
 
     const bestKnownBlockNumber = await this.fetchBestKnownBlockNumber()
 
-    const estimatesByNode = this.getEstimatesByCurrentNode()
-    const lastSyncState = estimatesByNode[estimatesByNode.length - 1]
-
-    const remainingBlocksToCache = bestKnownBlockNumber - cacheTip
-    const remainingBlocksToIndex = bestKnownBlockNumber - indexerTip
+    const remainingBlocksToCache = bestKnownBlockNumber - cacheTipNumber
+    const remainingBlocksToIndex = bestKnownBlockNumber - indexerTipNumber
     const synced = remainingBlocksToCache < 5
 
-    let newState: SyncState
-
-    if (!lastSyncState || synced) {
-      newState = {
-        nodeUrl: this.nodeUrl,
-        timestamp,
-        indexerTip,
-        cacheTip,
-        bestKnownBlockNumber,
-        indexRate: undefined,
-        cacheRate: undefined,
-        estimate: undefined,
-        synced,
-      }
+    const newSyncEstimate: SyncState = {
+      nodeUrl: this.nodeUrl,
+      timestamp,
+      indexerTipNumber,
+      cacheTipNumber,
+      bestKnownBlockNumber,
+      indexRate: undefined,
+      cacheRate: undefined,
+      estimate: undefined,
+      synced,
     }
-    else {
-      let estimate = undefined
 
-      const indexRate = this.calculateAvgIndexRate(indexerTip, timestamp)
-
-      if (indexRate) {
-        estimate = remainingBlocksToIndex / indexRate
-      }
-
-      newState = {
-        nodeUrl: this.nodeUrl,
-        timestamp,
-        indexerTip,
-        cacheTip,
-        bestKnownBlockNumber,
+    const indexRate = this.calculateAvgIndexRate(indexerTipNumber, timestamp)
+    if (!synced && indexRate) {
+      const estimate = remainingBlocksToIndex / indexRate
+      Object.assign(newSyncEstimate, {
         indexRate,
-        cacheRate: undefined,
         estimate,
-        synced,
-      }
+      })
     }
 
-    return this.updateEstimates(newState)
+    return this.updateEstimates(newSyncEstimate)
   }
 
   private registerHandlers() {
-    SyncApiController.emiter.on('synced-block-number-updated', async blockNumber => {
-      this.#syncedBlockNumber.setNextBlock(BigInt(blockNumber))
-    })
-    SyncApiController.emiter.on('sync-states-updated', async states => {
-      const newState = await this.estimate(states)
-      SyncStateSubject.next(newState)
+    SyncApiController.emiter.on('sync-estimate-updated', async states => {
+      const newSyncEstimate = await this.estimate(states)
+      this.#syncedBlockNumber.setNextBlock(BigInt(newSyncEstimate.cacheTipNumber))
+      SyncStateSubject.next(newSyncEstimate)
     })
   }
 }
