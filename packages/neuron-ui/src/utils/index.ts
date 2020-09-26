@@ -21,5 +21,6 @@ export * from './is'
 export * from './parsers'
 export * from './validators'
 export * from './sortAccounts'
+export * from './scriptToAddress'
 
 export { CONSTANTS }

@@ -1,14 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { currentWallet as currentWalletCache } from 'services/localCache'
-import {
-  getSystemCodeHash,
-  getTransaction,
-  showErrorMessage,
-  getAllNetworks,
-  getCurrentNetworkID,
-} from 'services/remote'
-import { ckbCore } from 'services/chain'
+import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
 
 import { transactionState } from 'states'
 
@@ -21,6 +14,7 @@ import {
   shannonToCKBFormatter,
   useExitOnWalletChange,
   isSuccessResponse,
+  scriptToAddress,
 } from 'utils'
 import CopyZone from 'widgets/CopyZone'
 
@@ -30,12 +24,10 @@ const { MAINNET_TAG } = CONSTANTS
 
 const Transaction = () => {
   const [t, i18n] = useTranslation()
-  const [systemCodeHash, setSystemCodeHash] = useState<string>('')
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
 
-  const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
   useOnLocaleChange(i18n)
@@ -46,11 +38,6 @@ const Transaction = () => {
   }, [i18n.language, hash])
 
   useEffect(() => {
-    getSystemCodeHash().then(res => {
-      if (isSuccessResponse(res)) {
-        setSystemCodeHash(res.result)
-      }
-    })
     Promise.all([getAllNetworks(), getCurrentNetworkID()])
       .then(([networksRes, idRes]) => {
         if (isSuccessResponse(networksRes) && isSuccessResponse(idRes)) {
@@ -149,23 +136,7 @@ const Transaction = () => {
           address = t('transaction.cell-from-cellbase')
         } else {
           try {
-            if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
-              address = ckbCore.utils.bech32Address(cell.lock.args, {
-                prefix: addressPrefix,
-                type: ckbCore.utils.AddressType.HashIdx,
-                codeHashOrCodeHashIndex: '0x00',
-              })
-            } else {
-              address = ckbCore.utils.fullPayloadToAddress({
-                arg: cell.lock.args,
-                prefix: addressPrefix,
-                type:
-                  cell.lock.hashType === 'data'
-                    ? ckbCore.utils.AddressType.DataCodeHash
-                    : ckbCore.utils.AddressType.TypeCodeHash,
-                codeHash: cell.lock.codeHash,
-              })
-            }
+            address = scriptToAddress(cell.lock, isMainnet)
           } catch (err) {
             console.error(err)
           }
@@ -188,7 +159,7 @@ const Transaction = () => {
           </tr>
         )
       }),
-    [t, addressPrefix, systemCodeHash]
+    [t, isMainnet]
   )
 
   if (error.code) {
