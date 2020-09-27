@@ -24,7 +24,9 @@ declare namespace Subject {
     type: Command.Type
     payload: Command.Payload
   }
-  type ConnectionStatus = { url: string; connected: boolean }
+  interface ConnectionStatus extends Record<'connected' | 'isBundledNode' | 'startedBundledNode', boolean> {
+    url: string
+  }
   type BlockNumber = string
   interface AppUpdater {
     checking: boolean

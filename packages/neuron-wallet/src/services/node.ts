@@ -35,6 +35,7 @@ class NodeService {
   public connectionStatusSubject = new BehaviorSubject<boolean>(false)
 
   private _tipBlockNumber: string = '0'
+  private startedBundledNode: boolean = false
 
   public ckb: CKB = new CKB('')
 
@@ -59,9 +60,12 @@ class NodeService {
     merge(periodSync, realtimeSync)
       .pipe(debounceTime(500))
       .subscribe(connected => {
+        const isBundledNode = this.ckb.node.url === BUNDLED_CKB_URL
         ConnectionStatusSubject.next({
           url: this.ckb.node.url,
           connected,
+          isBundledNode,
+          startedBundledNode: isBundledNode ? this.startedBundledNode : false
         })
       })
   }
@@ -142,7 +146,9 @@ class NodeService {
     } catch (err) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
       const isReadyToStart = await this.detectDependency()
-      return isReadyToStart ? this.startNode() : this.showGuideDialog()
+      this.startedBundledNode = await (isReadyToStart ? this.startNode() : this.showGuideDialog())
+
+      return this.startedBundledNode
     }
   }
 

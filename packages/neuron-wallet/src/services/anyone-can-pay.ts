@@ -60,6 +60,11 @@ export default class AnyoneCanPayService {
     if (!targetOutputLiveCell) {
       throw new TargetOutputNotFoundError()
     }
+
+    if (isCKB && targetOutputLiveCell.type()) {
+      throw new TargetOutputNotFoundError()
+    }
+
     const targetOutput: Output = Output.fromObject({
       capacity: targetOutputLiveCell.capacity,
       lock: targetOutputLiveCell.lock(),

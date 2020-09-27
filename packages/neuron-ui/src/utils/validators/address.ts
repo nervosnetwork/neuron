@@ -5,7 +5,13 @@ import {
   TestnetAddressRequiredException,
   AddressEmptyException,
 } from 'exceptions'
-import { SHORT_ADDR_00_LENGTH, SHORT_ADDR_00_PREFIX, LONG_DATA_PREFIX, LONG_TYPE_PREFIX } from 'utils/const'
+import {
+  LONG_DATA_PREFIX,
+  LONG_TYPE_PREFIX,
+  SHORT_ADDR_LENGTH,
+  SHORT_ADDR_DEFAULT_LOCK_PREFIX,
+  SHORT_ADDR_MULTISIGN_LOCK_PREFIX,
+} from 'utils/const'
 
 export const validateAddress = (address: string, isMainnet: boolean): boolean => {
   const FIELD_NAME = 'address'
@@ -38,7 +44,10 @@ export const validateAddress = (address: string, isMainnet: boolean): boolean =>
     return true
   }
 
-  if (!parsed.startsWith(SHORT_ADDR_00_PREFIX) || address.length !== SHORT_ADDR_00_LENGTH) {
+  if (
+    (!parsed.startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX) && !parsed.startsWith(SHORT_ADDR_MULTISIGN_LOCK_PREFIX)) ||
+    address.length !== SHORT_ADDR_LENGTH
+  ) {
     throw new FieldInvalidException(FIELD_NAME, address)
   }
 

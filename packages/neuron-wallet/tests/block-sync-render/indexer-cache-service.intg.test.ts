@@ -25,79 +25,79 @@ const stubbedIndexerConstructor = jest.fn().mockImplementation(
 )
 
 const stubbedTransactionCollectorConstructor = jest.fn()
+const stubbedCellCollectorConstructor = jest.fn()
 
 const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedGetHeaderFn.mockReset()
   stubbedGetTransactionsByLockScriptFn.mockReset()
+
+  mockGetTransactionHashes()
 }
 
+let IndexerCacheService: any
+let indexerCacheService: any
+let rpcService: RpcService
+
+const walletId = '1'
+const address = {
+  walletId,
+  address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+  path: "m/44'/309'/0'/0/0",
+  addressType: AddressType.Receiving,
+  addressIndex: 0,
+  txCount: 0,
+  liveBalance: '0',
+  sentBalance: '0',
+  pendingBalance: '0',
+  balance: '0',
+  blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+  version: AddressVersion.Testnet,
+}
+const addressMeta = AddressMeta.fromObject(address)
+const addressMetas = [addressMeta]
+const defaultLockScript = addressMeta.generateDefaultLockScript()
+const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
+const acpLockScript = addressMeta.generateACPLockScript()
+const formattedDefaultLockScript = {
+  code_hash: defaultLockScript.codeHash,
+  hash_type: defaultLockScript.hashType,
+  args: defaultLockScript.args
+}
+const formattedSingleMultiSignLockScript = {
+  code_hash: singleMultiSignLockScript.codeHash,
+  hash_type: singleMultiSignLockScript.hashType,
+  args: singleMultiSignLockScript.args + '0'.repeat(14)
+}
+const formattedAcpLockScript = {
+  code_hash: acpLockScript.codeHash,
+  hash_type: acpLockScript.hashType,
+  args: acpLockScript.args
+}
+
+const mockGetTransactionHashes = (mocks: any[] = []) => {
+  const stubbedConstructor = when(stubbedTransactionCollectorConstructor)
+
+  for (const lock of [
+    formattedDefaultLockScript,
+    formattedAcpLockScript
+  ]) {
+    const {hashes} = mocks.find(mock => mock.lock === lock) || {hashes: []}
+    stubbedConstructor
+      .calledWith(expect.anything(), {lock}).mockReturnValue({
+        getTransactionHashes: jest.fn().mockReturnValue({
+          toArray: () => hashes
+        }),
+      })
+  }
+}
+const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
+const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
+const fakeTx1 = {transaction: {hash: 'hash1', blockNumber: fakeBlock1.number}, txStatus: {status: 'committed', blockHash: fakeBlock1.hash}}
+const fakeTx2 = {transaction: {hash: 'hash2', blockNumber: fakeBlock2.number}, txStatus: {status: 'committed', blockHash: fakeBlock2.hash}}
+const fakeTx3 = {transaction: {hash: 'hash3', blockNumber: fakeBlock2.number}, txStatus: {status: 'committed', blockHash: fakeBlock2.hash}}
+
 describe('indexer cache service', () => {
-  let IndexerCacheService: any
-  let indexerCacheService: any
-  let rpcService: RpcService
-
-  const walletId = '1'
-  const address = {
-    walletId,
-    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
-    path: "m/44'/309'/0'/0/0",
-    addressType: AddressType.Receiving,
-    addressIndex: 0,
-    txCount: 0,
-    liveBalance: '0',
-    sentBalance: '0',
-    pendingBalance: '0',
-    balance: '0',
-    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    version: AddressVersion.Testnet,
-  }
-  const addressMeta = AddressMeta.fromObject(address)
-  const addressMetas = [addressMeta]
-  const defaultLockScript = addressMeta.generateDefaultLockScript()
-  const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
-  const acpLockScript = addressMeta.generateACPLockScript()
-  const formattedDefaultLockScript = {
-    code_hash: defaultLockScript.codeHash,
-    hash_type: defaultLockScript.hashType,
-    args: defaultLockScript.args
-  }
-  const formattedSingleMultiSignLockScript = {
-    code_hash: singleMultiSignLockScript.codeHash,
-    hash_type: singleMultiSignLockScript.hashType,
-    args: singleMultiSignLockScript.args
-  }
-  const formattedAcpLockScript = {
-    code_hash: acpLockScript.codeHash,
-    hash_type: acpLockScript.hashType,
-    args: acpLockScript.args
-  }
-
-  const mockGetTransactionHashes = (mocks: any[]) => {
-    const stubbedConstructor = when(stubbedTransactionCollectorConstructor)
-    for (const mock of mocks) {
-      const {lock, hashes} = mock
-      stubbedConstructor
-        .calledWith(expect.anything(), {lock})
-        .mockReturnValue({
-          getTransactionHashes: jest.fn().mockReturnValue({
-            toArray: () => hashes
-          }),
-        })
-    }
-  }
-
-  const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
-  const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
-  const fakeTx1 = {transaction: {hash: 'hash1', blockNumber: fakeBlock1.number}, txStatus: {status: 'committed', blockHash: fakeBlock1.hash}}
-  const fakeTx2 = {transaction: {hash: 'hash2', blockNumber: fakeBlock2.number}, txStatus: {status: 'committed', blockHash: fakeBlock2.hash}}
-  const fakeTx3 = {transaction: {hash: 'hash3', blockNumber: fakeBlock2.number}, txStatus: {status: 'committed', blockHash: fakeBlock2.hash}}
-
-  const txHashes = [
-    fakeTx1.transaction.hash,
-    fakeTx2.transaction.hash,
-    fakeTx3.transaction.hash
-  ]
 
   beforeAll(async () => {
     await initConnection('')
@@ -116,9 +116,26 @@ describe('indexer cache service', () => {
     jest.doMock('@ckb-lumos/indexer', () => {
       return {
         Indexer : stubbedIndexerConstructor,
-        TransactionCollector : stubbedTransactionCollectorConstructor
+        TransactionCollector : stubbedTransactionCollectorConstructor,
+        CellCollector : stubbedCellCollectorConstructor
       }
     });
+
+    when(stubbedCellCollectorConstructor)
+      .calledWith(expect.anything())
+      .mockReturnValue({
+        collect: () => {
+          return {
+            [Symbol.asyncIterator]: () => {
+              return {
+                next: async () => {
+                  return {done: true}
+                }
+              }
+            }
+          }
+        }
+      })
 
     rpcService = new stubbedRPCServiceConstructor()
     IndexerCacheService = require('../../src/block-sync-renderer/sync/indexer-cache-service').default
@@ -136,25 +153,18 @@ describe('indexer cache service', () => {
   });
 
   describe('#upsertTxHashes', () => {
-    describe('when there are tx hashes from indexer', () => {
-      let initTxHashes: any
+    describe('with existing tx hashes from indexer', () => {
+      let newTxHashes: any
+      const initHashes = [
+        fakeTx1.transaction.hash,
+        fakeTx3.transaction.hash,
+      ]
       beforeEach(async () => {
         mockGetTransactionHashes([
           {
             lock: formattedDefaultLockScript,
-            hashes: [
-              fakeTx1.transaction.hash,
-              fakeTx3.transaction.hash,
-            ]
+            hashes: initHashes
           },
-          {
-            lock: formattedSingleMultiSignLockScript,
-            hashes: []
-          },
-          {
-            lock: formattedAcpLockScript,
-            hashes: []
-          }
         ])
         when(stubbedGetTransactionFn)
           .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
@@ -163,40 +173,26 @@ describe('indexer cache service', () => {
           .calledWith(fakeBlock1.hash).mockReturnValueOnce(fakeBlock1)
           .calledWith(fakeBlock2.hash).mockReturnValueOnce(fakeBlock2)
 
-        initTxHashes = await indexerCacheService.upsertTxHashes()
+        newTxHashes = await indexerCacheService.upsertTxHashes()
       });
       it('returns newly cached tx hashes', () => {
-        expect(initTxHashes).toEqual([txHashes[0], txHashes[2]])
+        expect(newTxHashes).toEqual([fakeTx1.transaction.hash, fakeTx3.transaction.hash])
       })
-      describe('when no tx hashes cache exists', () => {
-        it('saves all tx hashes', async () => {
-          const caches = await getConnection()
-            .getRepository(IndexerTxHashCache)
-            .find()
-          expect(caches).toHaveLength(2)
-          expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
-          expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
-        });
+      it('persists tx hashes', async () => {
+        const caches = await getConnection()
+          .getRepository(IndexerTxHashCache)
+          .find()
+        expect(caches).toHaveLength(2)
+        expect(caches.filter(cache => cache.txHash === fakeTx1.transaction.hash)).toHaveLength(1)
+        expect(caches.filter(cache => cache.txHash === fakeTx3.transaction.hash)).toHaveLength(1)
       });
       describe('when new tx hash available', () => {
         beforeEach(async () => {
           mockGetTransactionHashes([
             {
               lock: formattedDefaultLockScript,
-              hashes: [
-                fakeTx1.transaction.hash,
-                fakeTx2.transaction.hash,
-                fakeTx3.transaction.hash,
-              ]
+              hashes: [...initHashes, fakeTx2.transaction.hash]
             },
-            {
-              lock: formattedSingleMultiSignLockScript,
-              hashes: []
-            },
-            {
-              lock: formattedAcpLockScript,
-              hashes: []
-            }
           ])
           when(stubbedGetTransactionFn)
             .calledWith(fakeTx2.transaction.hash)
@@ -212,9 +208,9 @@ describe('indexer cache service', () => {
             .getRepository(IndexerTxHashCache)
             .find()
           expect(caches).toHaveLength(3)
-          expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
-          expect(caches.filter(cache => cache.txHash === txHashes[1])).toHaveLength(1)
-          expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
+          expect(caches.filter(cache => cache.txHash === fakeTx1.transaction.hash)).toHaveLength(1)
+          expect(caches.filter(cache => cache.txHash === fakeTx2.transaction.hash)).toHaveLength(1)
+          expect(caches.filter(cache => cache.txHash === fakeTx3.transaction.hash)).toHaveLength(1)
         });
       });
       describe('when all of tx hashes cache exists', () => {
@@ -223,19 +219,8 @@ describe('indexer cache service', () => {
           mockGetTransactionHashes([
             {
               lock: formattedDefaultLockScript,
-              hashes: [
-                fakeTx1.transaction.hash,
-                fakeTx3.transaction.hash,
-              ]
+              hashes: initHashes
             },
-            {
-              lock: formattedSingleMultiSignLockScript,
-              hashes: []
-            },
-            {
-              lock: formattedAcpLockScript,
-              hashes: []
-            }
           ])
 
           await indexerCacheService.upsertTxHashes()
@@ -251,6 +236,59 @@ describe('indexer cache service', () => {
         });
       });
     });
+    describe('when found cells by single multi sign lock', () => {
+      let newTxHashes: any
+      beforeEach(async () => {
+        when(stubbedGetTransactionFn)
+          .calledWith(fakeTx2.transaction.hash)
+          .mockReturnValueOnce(fakeTx2)
+        when(stubbedGetHeaderFn)
+          .calledWith(fakeBlock2.hash)
+          .mockReturnValueOnce(fakeBlock2)
+
+        stubbedCellCollectorConstructor.mockReset()
+        when(stubbedCellCollectorConstructor)
+          .calledWith(
+            expect.anything(),
+            {
+              lock: {
+                ...formattedSingleMultiSignLockScript,
+                args: formattedSingleMultiSignLockScript.args.slice(0, 42)
+              },
+              argsLen: 28
+            }
+          )
+          .mockReturnValue({
+            collect: () => {
+              return {
+                [Symbol.asyncIterator]: () => {
+                  let count = 0
+                  return {
+                    next: async () => {
+                      if (count++ === 0) {
+                        return {
+                          done: false,
+                          value: {
+                            out_point: {
+                              tx_hash: fakeTx2.transaction.hash
+                            }
+                          }
+                        }
+                      }
+                      return {done: true}
+                    }
+                  }
+                }
+              }
+            }
+          })
+
+        newTxHashes = await indexerCacheService.upsertTxHashes()
+      });
+      it('saves related tx cache', async () => {
+        expect(newTxHashes).toEqual([fakeTx2.transaction.hash])
+      });
+    });
   });
   describe('#updateProcessedTxHashes', () => {
     beforeEach(async () => {
@@ -263,14 +301,6 @@ describe('indexer cache service', () => {
             fakeTx3.transaction.hash,
           ]
         },
-        {
-          lock: formattedSingleMultiSignLockScript,
-          hashes: []
-        },
-        {
-          lock: formattedAcpLockScript,
-          hashes: []
-        }
       ])
       when(stubbedGetTransactionFn)
         .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
@@ -304,14 +334,6 @@ describe('indexer cache service', () => {
               fakeTx3.transaction.hash,
             ]
           },
-          {
-            lock: formattedSingleMultiSignLockScript,
-            hashes: []
-          },
-          {
-            lock: formattedAcpLockScript,
-            hashes: []
-          }
         ])
         when(stubbedGetTransactionFn)
           .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
@@ -381,14 +403,6 @@ describe('indexer cache service', () => {
               fakeTx3.transaction.hash,
             ]
           },
-          {
-            lock: formattedSingleMultiSignLockScript,
-            hashes: []
-          },
-          {
-            lock: formattedAcpLockScript,
-            hashes: []
-          }
         ])
         when(stubbedGetTransactionFn)
           .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
@@ -422,14 +436,6 @@ describe('indexer cache service', () => {
             fakeTx1.transaction.hash,
           ]
         },
-        {
-          lock: formattedSingleMultiSignLockScript,
-          hashes: []
-        },
-        {
-          lock: formattedAcpLockScript,
-          hashes: []
-        }
       ])
       when(stubbedGetTransactionFn)
         .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
@@ -495,14 +501,6 @@ describe('indexer cache service', () => {
               fakeTx3.transaction.hash,
             ]
           },
-          {
-            lock: formattedSingleMultiSignLockScript,
-            hashes: []
-          },
-          {
-            lock: formattedAcpLockScript,
-            hashes: []
-          }
         ])
         when(stubbedGetTransactionFn)
           .calledWith(fakeTx1.transaction.hash).mockReturnValueOnce(fakeTx1)
