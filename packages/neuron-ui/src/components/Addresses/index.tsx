@@ -96,7 +96,6 @@ const Addresses = () => {
             {addresses.map(addr => {
               const isSelected = localDescription.key === addr.address
               const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
-              const balance = `${shannonToCKBFormatter(addr.balance)} CKB`
 
               return (
                 <tr key={addr.address} onContextMenu={onContextMenu(addr)}>
@@ -142,9 +141,9 @@ const Addresses = () => {
                       }
                     />
                   </td>
-                  <td className={styles.balance} title={balance}>
-                    <CopyZone content={balance.slice(0, -4).replace(/,/g, '')}>
-                      <span className="textOverflow">{balance}</span>
+                  <td className={styles.balance}>
+                    <CopyZone content={shannonToCKBFormatter(addr.balance, false, '')}>
+                      <span className="textOverflow">{`${shannonToCKBFormatter(addr.balance)} CKB`}</span>
                     </CopyZone>
                   </td>
                   <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>

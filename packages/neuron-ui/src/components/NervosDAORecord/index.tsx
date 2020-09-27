@@ -240,8 +240,6 @@ export const DAORecord = ({
     )
   }
 
-  const amount = shannonToCKBFormatter(capacity)
-
   return (
     <div className={styles.container} data-is-collapsed={isCollapsed}>
       <div className={styles.badge}>{badge}</div>
@@ -260,7 +258,9 @@ export const DAORecord = ({
         </span>
       </div>
 
-      <CopyZone className={styles.amount} content={amount.replace(/,/g, '')}>{`${amount} CKB`}</CopyZone>
+      <CopyZone className={styles.amount} content={shannonToCKBFormatter(capacity, false, '')}>
+        {`${shannonToCKBFormatter(capacity)} CKB`}
+      </CopyZone>
       {progressOrPeriod}
 
       <div className={styles.apc}>
