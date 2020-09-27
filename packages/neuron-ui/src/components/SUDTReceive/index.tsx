@@ -44,7 +44,7 @@ const SUDTReceive = () => {
       <QRCode value={address} size={220} includeMargin dispatch={dispatch} />
       <div className={styles.address}>
         <CopyZone content={address} name={t('receive.copy-address')} style={{ lineHeight: '1.625rem' }}>
-          <span className={styles.addressValue}>{address}</span>
+          {address.length > 50 ? `${address.substr(0, 45)}...${address.slice(-4)}` : address}
         </CopyZone>
       </div>
       <p className={styles.notation}>
