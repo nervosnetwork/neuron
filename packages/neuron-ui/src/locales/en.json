@@ -295,6 +295,9 @@
       },
       "send-sudt": {
         "title": "Send sUDT"
+      },
+      "send-acp": {
+        "title": "Send CKB"
       }
     },
     "qrcode": {

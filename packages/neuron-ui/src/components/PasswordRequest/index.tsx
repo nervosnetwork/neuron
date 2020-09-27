@@ -51,7 +51,8 @@ const PasswordRequest = () => {
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const isLoading = ['send', 'unlock', 'create-sudt-account', 'send-sudt'].includes(actionType || '') && isSending
+  const isLoading =
+    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp'].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -125,6 +126,7 @@ const PasswordRequest = () => {
             })
             break
           }
+          case 'send-acp':
           case 'send-sudt': {
             const params: Controller.SendSUDTTransaction.Params = {
               walletID,
@@ -183,7 +185,7 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {['unlock', 'create-sudt-account', 'send-sudt'].includes(actionType ?? '') ? null : (
+        {['unlock', 'create-sudt-account', 'send-sudt', 'send-acp'].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
         <TextField
