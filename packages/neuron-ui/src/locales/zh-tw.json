@@ -295,6 +295,9 @@
       },
       "send-sudt": {
         "title": "發起 sUDT 交易"
+      },
+      "send-acp": {
+        "title": "發起 CKB 交易"
       }
     },
     "qrcode": {
