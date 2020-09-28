@@ -149,7 +149,7 @@ describe('sync api', () => {
         describe('when advanced indexer tip is greater or equals to 50', () => {
           const fakeState1 = {
             cacheTipNumber,
-            indexerTipNumber: (bestKnownBlockNumber - 51).toString(),
+            indexerTipNumber: (bestKnownBlockNumber - 52).toString(),
             timestamp: '6000',
           }
           const fakeState2 = {
@@ -163,7 +163,7 @@ describe('sync api', () => {
             await flushPromises()
           });
           it('calculates estimation', () => {
-            const indexRate = 50 / (parseInt(fakeState2.timestamp) - parseInt(fakeState1.timestamp))
+            const indexRate = 51 / (parseInt(fakeState2.timestamp) - parseInt(fakeState1.timestamp))
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
@@ -172,7 +172,7 @@ describe('sync api', () => {
               indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
               indexRate,
               cacheRate: undefined,
-              estimate: (bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate,
+              estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate),
               synced: false,
             })
           })
@@ -226,7 +226,7 @@ describe('sync api', () => {
           }
           const fakeState3 = {
             cacheTipNumber,
-            indexerTipNumber: '6200',
+            indexerTipNumber: '6201',
             timestamp: '66000',
           }
           beforeEach(async () => {
@@ -247,7 +247,7 @@ describe('sync api', () => {
               cacheRate: undefined,
               cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
               indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
-              estimate: (bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate,
+              estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate),
               synced: false,
             })
           })
