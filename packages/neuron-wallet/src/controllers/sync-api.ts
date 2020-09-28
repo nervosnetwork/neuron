@@ -117,7 +117,7 @@ export default class SyncApiController {
 
       const indexRate = this.calculateAvgIndexRate(indexerTipNumber, timestamp)
       if (!newSyncEstimate.synced && indexRate) {
-        const estimate = remainingBlocksToIndex / indexRate
+        const estimate = Math.round(remainingBlocksToIndex / indexRate)
         Object.assign(newSyncEstimate, {
           indexRate,
           estimate,
