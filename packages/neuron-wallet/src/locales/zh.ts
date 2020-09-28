@@ -188,6 +188,10 @@ export default {
         "send": "转账",
         "receive": "收款"
       }
+    },
+    'offline-signature': {
+      'export-transaction': '导出交易为 JSON 文件',
+      'transaction-exported': '交易已被导出至 {{filePath}}.'
     }
   },
 }

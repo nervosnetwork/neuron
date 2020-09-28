@@ -191,6 +191,10 @@ export default {
         "send": "Send",
         "receive": "Receive"
       }
+    },
+    'offline-signature': {
+      'export-transaction': 'Export Transaction as JSON',
+      'transaction-exported': 'The transaction have beed exported to {{filePath}}.'
     }
   },
 }

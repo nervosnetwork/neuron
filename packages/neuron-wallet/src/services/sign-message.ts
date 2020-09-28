@@ -39,14 +39,14 @@ export default class SignMessage {
   }
 
   private static signByPrivateKey(privateKey: string, message: string): string {
-    const digest = SignMessage.signtureHash(message)
+    const digest = SignMessage.signatureHash(message)
     const ecPair = new ECPair(privateKey)
     const signature = ecPair.signRecoverable(digest)
     return signature
   }
 
   public static verify(address: string, signature: string, message: string): boolean {
-    const digest = SignMessage.signtureHash(message)
+    const digest = SignMessage.signatureHash(message)
 
     const options = {
       r: signature.slice(2, 66),
@@ -61,7 +61,7 @@ export default class SignMessage {
     return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
   }
 
-  private static signtureHash (message: string) {
+  private static signatureHash (message: string) {
     const buffer = Buffer.from(SignMessage.magicString + message, 'utf-8')
     const blake2b = new Blake2b()
     blake2b.updateBuffer(buffer)
