@@ -53,15 +53,15 @@ const SpecialAsset = ({
     openExternal(`${explorerUrl}/transaction/${txHash}#${index}`)
   }, [isMainnet, txHash, index])
 
-  const balance = shannonToCKBFormatter(capacity)
-
   return (
     <div className={styles.container}>
       <div className={styles.datetime}>
         <span>{date}</span>
         <span>{time}</span>
       </div>
-      <CopyZone className={styles.capacity} content={balance.replace(/,/g, '')}>{`${balance} CKB`}</CopyZone>
+      <CopyZone className={styles.capacity} content={shannonToCKBFormatter(capacity, false, '')}>
+        {`${shannonToCKBFormatter(capacity)} CKB`}
+      </CopyZone>
       <div className={styles.indicators}>
         <div data-on={hasTypeScript} data-tooltip="Type">
           T

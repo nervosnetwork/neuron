@@ -84,8 +84,6 @@ const Transaction = () => {
   useExitOnWalletChange()
 
   const basicInfoItems = useMemo(() => {
-    const balance = shannonToCKBFormatter(transaction.value)
-
     return [
       {
         label: t('transaction.transaction-hash'),
@@ -109,8 +107,8 @@ const Transaction = () => {
       {
         label: t('transaction.income'),
         value: (
-          <CopyZone content={balance.replace(/,/g, '')} name={t('history.copy-balance')}>
-            {`${balance} CKB`}
+          <CopyZone content={shannonToCKBFormatter(transaction.value, false, '')} name={t('history.copy-balance')}>
+            {`${shannonToCKBFormatter(transaction.value)} CKB`}
           </CopyZone>
         ),
       },

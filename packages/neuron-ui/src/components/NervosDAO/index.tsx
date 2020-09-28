@@ -277,19 +277,16 @@ const NervosDAO = () => {
 
   const onlineAndSynced = ConnectionStatus.Online === connectionStatus && SyncStatus.SyncCompleted === syncStatus
 
-  const freeBalance = shannonToCKBFormatter(`${free}`)
-  const lockedBalance = shannonToCKBFormatter(`${locked}`)
-
   const info = [
     {
       key: 'free',
       value: (
         <CopyZone
-          content={freeBalance.replace(/,/g, '')}
+          content={shannonToCKBFormatter(`${free}`, false, '')}
           name={t('nervos-dao.copy-balance')}
           className={styles.balance}
         >
-          {`${freeBalance} CKB`}
+          {`${shannonToCKBFormatter(`${free}`)} CKB`}
         </CopyZone>
       ),
     },
@@ -297,11 +294,11 @@ const NervosDAO = () => {
       key: 'locked',
       value: onlineAndSynced ? (
         <CopyZone
-          content={lockedBalance.replace(/,/g, '')}
+          content={shannonToCKBFormatter(`${locked}`, false, '')}
           name={t('nervos-dao.copy-balance')}
           className={styles.balance}
         >
-          {`${lockedBalance} CKB`}
+          {`${shannonToCKBFormatter(`${locked}`)} CKB`}
         </CopyZone>
       ) : (
         `-- CKB`

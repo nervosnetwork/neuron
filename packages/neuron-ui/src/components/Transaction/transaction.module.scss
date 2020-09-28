@@ -98,6 +98,11 @@
       margin-bottom: 0;
     }
   }
+
+  div[class^='copyZone'] {
+    min-width: 120px;
+    text-align: right;
+  }
 }
 
 .inputsTitle {
