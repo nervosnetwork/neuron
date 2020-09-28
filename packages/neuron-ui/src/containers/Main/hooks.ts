@@ -229,6 +229,17 @@ export const useSubscription = ({
             })
             break
           }
+          case 'load-transaction-json': {
+            if (payload) {
+              const { url, json } = JSON.parse(payload)
+              dispatch({
+                type: AppActions.UpdateLoadedTransaction,
+                payload: json,
+              })
+              history.push(location.pathname + url)
+            }
+            break
+          }
           default: {
             break
           }

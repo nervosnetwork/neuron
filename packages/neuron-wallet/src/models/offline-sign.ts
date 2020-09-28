@@ -28,24 +28,18 @@ interface Signatures {
 
 export interface OfflineSignProps {
   transaction: Transaction
-  // for frond-end
   status: SignStatus
   type: SignType
-  // for sudt
   assetAccount?: AssetAccount
-  // for multisig
   multisig_configs?: MultisigConfigs
   signatures?: Signatures
 }
 
 export interface OfflineSignJSON {
   transaction: Transaction
-  // for frond-end
   status: SignStatus
   type: SignType
-  // for sudt
   asset_account?: AssetAccount
-  // for multisig
   multisig_configs?: MultisigConfigs
   signatures?: Signatures
 }

@@ -240,8 +240,6 @@ public static async signSingleMultiSignScript(
       feeRate
     )
 
-    console.log(tx)
-
     return tx
   }
 

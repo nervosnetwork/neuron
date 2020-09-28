@@ -17,6 +17,7 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
+import { exportTransactionAsJSON, SignStatus, SignType } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from './passwordRequest.module.scss'
 
@@ -30,6 +31,7 @@ const PasswordRequest = () => {
     settings: { wallets = [] },
     experimental,
   } = useGlobalState()
+
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
@@ -48,6 +50,29 @@ const PasswordRequest = () => {
       type: AppActions.DismissPasswordRequest,
     })
   }, [dispatch])
+
+  const signType = useMemo(() => {
+    switch (actionType) {
+      case 'create-sudt-account':
+        return SignType.CreateSUDTAccount
+      case 'send-sudt':
+        return SignType.SendSUDT
+      case 'unlock':
+        return SignType.UnlockDAO
+      default:
+        return SignType.Regular
+    }
+  }, [actionType])
+
+  const exportTransaction = useCallback(async () => {
+    onDismiss()
+    await exportTransactionAsJSON({
+      transaction: generatedTx,
+      status: SignStatus.Unsigned,
+      type: signType,
+    })
+  }, [signType, generatedTx, onDismiss])
+
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
@@ -207,6 +232,7 @@ const PasswordRequest = () => {
         />
         <div className={styles.footer}>
           <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
+          <Button label="Export" type="cancel" onClick={exportTransaction} />
           <Button label={t('common.confirm')} type="submit" disabled={disabled}>
             {isLoading ? <Spinner /> : (t('common.confirm') as string)}
           </Button>

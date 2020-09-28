@@ -30,6 +30,7 @@ export enum RoutePath {
   SUDTSend = '/s-udt/send',
   SUDTReceive = '/s-udt/receive',
   ImportHardware = '/*/import-hardware',
+  OfflineSign = '/*/offline-sign',
 }
 
 export enum CapacityUnit {

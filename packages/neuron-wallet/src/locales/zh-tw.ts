@@ -36,6 +36,7 @@ export default {
       tools: {
         label: "工具",
         "sign-and-verify": "簽名/驗簽信息",
+        "offline-sign": "離線簽名",
       },
       window: {
         label: '視窗',
@@ -190,7 +191,8 @@ export default {
     },
     'offline-signature': {
       'export-transaction': '導出交易為 JSON 檔案',
-      'transaction-exported': '交易已被導出至 {{filePath}}.'
+      'transaction-exported': '交易已被導出至 {{filePath}}.',
+      'load-transaction': '加載交易檔案',
     }
   },
 }

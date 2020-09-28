@@ -20,6 +20,7 @@ import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
 import SUDTReceive from 'components/SUDTReceive'
 import ImportHardware from 'components/ImportHardware'
+import OfflineSign from 'components/OfflineSign'
 
 import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
 
@@ -125,6 +126,12 @@ export const mainContents: CustomRouter.Route[] = [
     path: RoutePath.ImportHardware,
     exact: false,
     component: ImportHardware,
+  },
+  {
+    name: `OfflineSign`,
+    path: RoutePath.OfflineSign,
+    exact: false,
+    component: OfflineSign,
   },
 ]
 

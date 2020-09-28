@@ -28,7 +28,7 @@ export default class OfflineSignController {
         asset_account,
       })
 
-      fs.writeFileSync(filePath, signer.toJSON())
+      fs.writeFileSync(filePath, JSON.stringify(signer.toJSON()))
 
       dialog.showMessageBox({
         type: 'info',

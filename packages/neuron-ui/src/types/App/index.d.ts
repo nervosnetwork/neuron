@@ -121,6 +121,7 @@ declare namespace State {
     readonly showTopAlert: boolean
     readonly showAllNotifications: boolean
     readonly isAllowedToFetchList: boolean
+    readonly loadedTransaction: any
   }
 
   interface NetworkProperty {

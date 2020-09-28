@@ -28,6 +28,7 @@ import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
+import OfflineSignController from './offline-sign'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -40,6 +41,7 @@ export default class ApiController {
   private assetAccountController = new AssetAccountController()
   private anyoneCanPayController = new AnyoneCanPayController()
   private hardwareController = new HardwareController()
+  private offlineSignController = new OfflineSignController()
 
   public async mount() {
     this.registerHandlers()
@@ -453,6 +455,23 @@ export default class ApiController {
 
     handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
       return await this.walletsController.importHardwareWallet(params)
+    })
+
+    // Offline sign
+    handle('export-transaction-as-json', async (_, params) => {
+      return this.offlineSignController.exportTransactionAsJSON(params)
+    })
+
+    handle('sign-transaction-only', async (_, params) => {
+      return this.offlineSignController.signTransaction(params)
+    })
+
+    handle('broadcast-transaction-only', async (_, params) => {
+      return this.offlineSignController.broadcastTransaction(params)
+    })
+
+    handle('sign-and-export-transaction', async (_, params) => {
+      return this.offlineSignController.signAndExportTransaction(params)
     })
   }
 
