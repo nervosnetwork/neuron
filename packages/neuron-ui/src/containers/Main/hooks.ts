@@ -231,10 +231,13 @@ export const useSubscription = ({
           }
           case 'load-transaction-json': {
             if (payload) {
-              const { url, json } = JSON.parse(payload)
+              const { url, json, filePath } = JSON.parse(payload)
               dispatch({
                 type: AppActions.UpdateLoadedTransaction,
-                payload: json,
+                payload: {
+                  json,
+                  filePath,
+                },
               })
               history.push(location.pathname + url)
             }

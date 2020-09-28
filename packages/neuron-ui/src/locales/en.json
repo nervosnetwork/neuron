@@ -73,6 +73,25 @@
         "rescan": "Rescan"
       }
     },
+    "offline-sign": {
+      "title": "Offline Sign",
+      "json-file": "JSON file:",
+      "status": {
+        "label": "Status:",
+        "unsigned": "Unsigned",
+        "partially-signed": "Partially Signed",
+        "signed": "Signed"
+      },
+      "wallet": "Wallet:",
+      "content": "Content:",
+      "sign-and-export": "Sign and export transaction",
+      "sign-and-broadcast": "Sign and broadcast",
+      "actions": {
+        "broadcast": "Broadcast",
+        "sign": "Sign and export",
+        "cancel": "Cancel"
+      }
+    },
     "overview": {
       "date": "Date",
       "type": "Type",

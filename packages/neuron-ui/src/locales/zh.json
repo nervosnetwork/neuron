@@ -66,6 +66,25 @@
         "rescan": "再次检测"
       }
     },
+    "offline-sign": {
+      "title": "离线签名",
+      "json-file": "JSON 文件：",
+      "status": {
+        "label": "状态：",
+        "unsigned": "未签名",
+        "partially-signed": "部分签名",
+        "signed": "已签名"
+      },
+      "wallet": "钱包：",
+      "content": "内容：",
+      "sign-and-export": "签名并导出交易",
+      "sign-and-broadcast": "签名并广播交易",
+      "actions": {
+        "broadcast": "广播交易",
+        "sign": "签名并导出",
+        "cancel": "取消"
+      }
+    },
     "overview": {
       "date": "日期",
       "type": "类型",

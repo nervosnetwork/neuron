@@ -12,6 +12,23 @@
 
     .main {
       flex: 1;
+      margin: 25px 0;
+      tr {
+        td {
+          font-size: 14px;
+          svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+            position: relative;
+            top: 2px;
+          }
+        }
+        .first {
+          padding-right: 30px;
+          color: #434343;
+        }
+      }
     }
   }
 
@@ -29,13 +46,18 @@
   }
 }
 
+.content {
+  color: #434343;
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+
 .title {
   font-size: 1.125rem;
   line-height: 1.375rem;
   font-weight: bold;
   letter-spacing: 0.9px;
   margin: 0;
-  margin-bottom: 26px;
 }
 
 .textarea {

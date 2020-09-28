@@ -28,7 +28,9 @@ export default class OfflineSignController {
         asset_account,
       })
 
-      fs.writeFileSync(filePath, JSON.stringify(signer.toJSON()))
+      const json = signer.toJSON()
+
+      fs.writeFileSync(filePath, JSON.stringify(json))
 
       dialog.showMessageBox({
         type: 'info',
@@ -36,7 +38,8 @@ export default class OfflineSignController {
       })
 
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
+        result: json
       }
     } catch (err) {
       dialog.showErrorBox(t('common.error'), err.message)
@@ -66,7 +69,7 @@ export default class OfflineSignController {
 
     const signer = OfflineSign.fromJSON({
       ...params,
-      transaction: res.result.transaction
+      ...res.result
     })
 
     return await this.exportTransactionAsJSON(signer.toJSON())

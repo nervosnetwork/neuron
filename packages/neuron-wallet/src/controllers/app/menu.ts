@@ -89,10 +89,10 @@ const importHardware = (url: string) => {
   }
 }
 
-const loadTransaction = (url: string, json: OfflineSignJSON) => {
+const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    const payload = JSON.stringify({url, json})
+    const payload = JSON.stringify({url, json, filePath})
     CommandSubject.next({ winID: window.id, type: 'load-transaction-json', payload, dispatchToUI: true })
   }
 }
@@ -299,11 +299,12 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.tools.offline-sign'),
         enabled: hasCurrentWallet,
         click: async () => {
-          const json = await OfflineSignService.loadTransactionJSON()
-          if (!json) {
+          const result = await OfflineSignService.loadTransactionJSON()
+          if (!result) {
             return
           }
-          loadTransaction(URL.OfflineSign, json)
+          const { json, filePath } = result
+          loadTransaction(URL.OfflineSign, json, filePath)
         }
       },
     ]

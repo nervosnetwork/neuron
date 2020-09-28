@@ -35,7 +35,11 @@ export interface OfflineSignJSON {
   signatures?: Signatures
 }
 
+export type SignProps = OfflineSignJSON & { walletID: string; password: string }
+
+export type BroadcastProps = OfflineSignJSON & { walletID: string }
+
 export const exportTransactionAsJSON = remoteApi<OfflineSignJSON, void>('export-transaction-as-json')
 export const signTransactionOnly = remoteApi<OfflineSignJSON, void>('sign-transaction-only')
-export const broadcastTransactionOnly = remoteApi<OfflineSignJSON, void>('broadcast-transaction-only')
-export const signAndExportTransaction = remoteApi<OfflineSignJSON, void>('sign-and-export-transaction')
+export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-transaction-only')
+export const signAndExportTransaction = remoteApi<SignProps, OfflineSignJSON>('sign-and-export-transaction')
