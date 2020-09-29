@@ -19,6 +19,7 @@ import WalletService, { WalletProperties } from '../../src/services/wallets'
 const resetMocks = () => {
   stubbedGetAddressesByWalletId.mockReset()
   stubbedCheckAndGenerateSave.mockReset()
+  stubbedDeleteByWalletId.mockReset()
 }
 
 describe('wallet service', () => {
