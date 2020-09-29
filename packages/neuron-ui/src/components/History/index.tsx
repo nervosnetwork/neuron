@@ -24,7 +24,7 @@ const History = () => {
     wallet: { id, name: walletName },
     chain: {
       networkID,
-      tipBlockNumber: syncedBlockNumber,
+      syncStatus: { cacheTipBlockNumber },
       transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
     },
     settings: { networks },
@@ -50,8 +50,8 @@ const History = () => {
   }, [id, setIsExporting])
 
   const tipBlockNumber = useMemo(() => {
-    return Math.max(+syncedBlockNumber, +chainBlockNumber).toString()
-  }, [syncedBlockNumber, chainBlockNumber])
+    return Math.max(cacheTipBlockNumber, +chainBlockNumber).toString()
+  }, [cacheTipBlockNumber, chainBlockNumber])
 
   const List = useMemo(() => {
     return (

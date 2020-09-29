@@ -7,15 +7,15 @@ import styles from './networkStatus.module.scss'
 export interface NetworkStatusProps {
   network: State.Network | undefined
   tipBlockNumber: string
-  syncedBlockNumber: string
+  cacheTipBlockNumber: number
   onAction: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({ network, tipBlockNumber, syncedBlockNumber, onAction }: NetworkStatusProps) => {
+const NetworkStatus = ({ network, tipBlockNumber, cacheTipBlockNumber, onAction }: NetworkStatusProps) => {
   const [t] = useTranslation()
 
-  let synced = syncedBlockNumber
-  if (tipBlockNumber && BigInt(tipBlockNumber) < BigInt(syncedBlockNumber)) {
+  let synced = `${cacheTipBlockNumber}`
+  if (tipBlockNumber && BigInt(tipBlockNumber) < BigInt(cacheTipBlockNumber)) {
     synced = tipBlockNumber
   }
 

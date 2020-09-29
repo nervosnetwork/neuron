@@ -46,7 +46,11 @@ const NervosDAO = () => {
     },
     wallet,
     nervosDAO: { records },
-    chain: { connectionStatus, tipBlockNumber: syncedBlockNumber, networkID },
+    chain: {
+      connectionStatus,
+      syncStatus: { cacheTipBlockNumber },
+      networkID,
+    },
     settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -130,7 +134,7 @@ const NervosDAO = () => {
   const syncStatus = getSyncStatus({
     tipBlockNumber,
     tipBlockTimestamp,
-    syncedBlockNumber,
+    cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })

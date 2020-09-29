@@ -50,7 +50,11 @@ const Navbar = () => {
   const {
     wallet: { name },
     app: { tipBlockNumber = '0', tipBlockTimestamp },
-    chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    chain: {
+      connectionStatus,
+      networkID,
+      syncStatus: { cacheTipBlockNumber },
+    },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
   const [t, i18n] = useTranslation()
@@ -61,7 +65,7 @@ const Navbar = () => {
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
   const syncStatus = getSyncStatus({
-    syncedBlockNumber,
+    cacheTipBlockNumber,
     tipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
@@ -128,7 +132,7 @@ const Navbar = () => {
       <div className={styles.network}>
         <NetworkStatus
           tipBlockNumber={tipBlockNumber}
-          syncedBlockNumber={syncedBlockNumber}
+          cacheTipBlockNumber={cacheTipBlockNumber}
           network={network}
           onAction={() => throttledShowSettings({ tab: 'networks' })}
         />

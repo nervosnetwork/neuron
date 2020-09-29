@@ -7,13 +7,13 @@ let timestamp10MinAgo: number | undefined
 let prevUrl: string | undefined
 
 export const getSyncStatus = ({
-  syncedBlockNumber,
+  cacheTipBlockNumber,
   tipBlockNumber,
   tipBlockTimestamp,
   currentTimestamp,
   url,
 }: {
-  syncedBlockNumber: string
+  cacheTipBlockNumber: number
   tipBlockNumber: string
   tipBlockTimestamp: number
   currentTimestamp: number
@@ -26,7 +26,7 @@ export const getSyncStatus = ({
   }
 
   const now = Math.floor(currentTimestamp / 1000) * 1000
-  if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0' || tipBlockNumber === '') {
+  if (cacheTipBlockNumber < 0 || tipBlockNumber === '0' || tipBlockNumber === '') {
     return SyncStatus.SyncNotStart
   }
 
@@ -37,7 +37,7 @@ export const getSyncStatus = ({
     timestamp10MinAgo = currentTimestamp
     blockNumber10MinAgo = tipBlockNumber
   }
-  if (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber)) {
+  if (BigInt(cacheTipBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber)) {
     return SyncStatus.Syncing
   }
   if (tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= now) {

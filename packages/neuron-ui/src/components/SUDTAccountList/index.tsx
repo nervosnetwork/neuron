@@ -41,7 +41,10 @@ const SUDTAccountList = () => {
   const {
     wallet: { id: walletId, balance },
     app: { tipBlockNumber = '0', tipBlockTimestamp },
-    chain: { networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    chain: {
+      networkID,
+      syncStatus: { cacheTipBlockNumber },
+    },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -300,7 +303,7 @@ const SUDTAccountList = () => {
     )
   }
   const syncStatus = getSyncStatus({
-    syncedBlockNumber,
+    cacheTipBlockNumber,
     tipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),

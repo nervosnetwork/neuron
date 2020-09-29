@@ -26,7 +26,11 @@ const Send = () => {
       tipBlockTimestamp,
     },
     wallet: { id: walletID = '', balance = '' },
-    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
+    chain: {
+      networkID,
+      connectionStatus,
+      syncStatus: { cacheTipBlockNumber },
+    },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -102,7 +106,7 @@ const Send = () => {
 
   const syncStatus = getSyncStatus({
     tipBlockNumber,
-    syncedBlockNumber,
+    cacheTipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
