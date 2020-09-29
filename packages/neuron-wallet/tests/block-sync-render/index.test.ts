@@ -54,6 +54,7 @@ const resetMocks = () => {
   stubbedQueryIndexer.mockReset()
   stubbedResetIndexerData.mockReset()
   stubbedGetCurrentNetwork.mockReset()
+  stubbedGenerateAddressesIfNecessary.mockReset()
 
   stubbedUnmountSyncTask.mockReset()
   stubbedSyncTaskStart.mockReset()
@@ -245,10 +246,6 @@ describe('block sync render', () => {
         expect(stubbedResetIndexerData).not.toHaveBeenCalled()
       })
 
-      it('generates addresses', async () => {
-        expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
-      })
-
       it('sync task can be start over by early return', async () => {
         expect(async () => {
           await createBlockSyncTask(true)
@@ -325,6 +322,9 @@ describe('block sync render', () => {
               expect(stubbedUnmountSyncTask).toHaveBeenCalled()
               expect(stubbedSyncTaskStart).toHaveBeenCalled()
             })
+            it('checks and generates addresses if necessary', () => {
+              expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
+            })
           });
 
           describe('switches to same network', () => {
@@ -335,6 +335,9 @@ describe('block sync render', () => {
               expect(stubbedUnmountSyncTask).not.toHaveBeenCalled()
               expect(stubbedSyncTaskStart).not.toHaveBeenCalled()
             })
+            it('should not generate addresses', () => {
+              expect(stubbedGenerateAddressesIfNecessary).not.toHaveBeenCalled()
+            })
           });
 
           describe('forces reconnecting to same network', () => {
@@ -344,6 +347,9 @@ describe('block sync render', () => {
             it(`triggers operations on sync task`, async () => {
               expect(stubbedUnmountSyncTask).toHaveBeenCalled()
               expect(stubbedSyncTaskStart).toHaveBeenCalled()
+            })
+            it('checks and generates addresses if necessary', () => {
+              expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
             })
           });
 

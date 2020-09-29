@@ -64,6 +64,8 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
     logger.info('Network:\tswitched to:', network)
   }
 
+  await WalletService.getInstance().generateAddressesIfNecessary()
+
   await resetSyncTask(shouldSync)
 }
 
@@ -121,9 +123,6 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
   })
 
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
-    await WalletService.getInstance().generateAddressesIfNecessary()
-
-    // re init txCount in addresses if switch network
     syncTask!.start(
       network.remote,
       network.genesisHash,
