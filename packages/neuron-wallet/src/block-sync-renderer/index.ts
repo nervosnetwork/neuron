@@ -25,6 +25,7 @@ let syncTask: SyncTask | null
 let network: Network | null
 
 const resetSyncTaskQueue = queue(async ({startTask, clearIndexerFolder}) => {
+  await WalletService.getInstance().generateAddressesIfNecessary()
   await killBlockSyncTask()
   if (startTask) {
     await createBlockSyncTask(clearIndexerFolder)
@@ -63,8 +64,6 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   } else {
     logger.info('Network:\tswitched to:', network)
   }
-
-  await WalletService.getInstance().generateAddressesIfNecessary()
 
   await resetSyncTask(shouldSync)
 }

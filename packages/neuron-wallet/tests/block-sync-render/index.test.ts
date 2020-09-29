@@ -246,6 +246,10 @@ describe('block sync render', () => {
         expect(stubbedResetIndexerData).not.toHaveBeenCalled()
       })
 
+      it('generates addresses', async () => {
+        expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
+      })
+
       it('sync task can be start over by early return', async () => {
         expect(async () => {
           await createBlockSyncTask(true)
@@ -312,6 +316,7 @@ describe('block sync render', () => {
             await switchToNetwork(network)
             stubbedSyncTaskStart.mockReset()
             stubbedUnmountSyncTask.mockReset()
+            stubbedGenerateAddressesIfNecessary.mockReset()
           })
 
           describe('switches to different network', () => {
