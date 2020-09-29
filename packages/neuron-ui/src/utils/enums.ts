@@ -130,8 +130,14 @@ export enum MultiSigLockInfo {
   CodeHashIndex = '0x01',
 }
 
-export enum AnyoneCanPayLockInfo {
+export enum AnyoneCanPayLockInfoOnAggron {
   CodeHash = '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
   HashType = 'type',
+  CodeHashIndex = '0x02',
+}
+
+export enum AnyoneCanPayLockInfoOnLina {
+  CodeHash = '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
+  HashType = 'data',
   CodeHashIndex = '0x02',
 }
