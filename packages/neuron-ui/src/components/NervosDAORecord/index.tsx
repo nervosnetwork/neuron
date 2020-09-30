@@ -39,7 +39,7 @@ export interface DAORecordProps extends State.NervosDAORecord {
   onClick: React.EventHandler<React.MouseEvent> // on action button click
   onToggle: () => void
   isCollapsed?: boolean
-  tipBlockTimestamp: number // tip block timestamp, used to calculate apc
+  tipBlockTimestamp: number // tip block timestamp, used to calculate apc, dovetails with current epoch
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc
 }
 

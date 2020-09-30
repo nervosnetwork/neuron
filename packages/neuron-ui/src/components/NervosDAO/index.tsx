@@ -19,7 +19,7 @@ import { openExternal } from 'services/remote'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
-import DAORecord from 'components/NervosDAORecord'
+import DAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
@@ -39,7 +39,6 @@ const NervosDAO = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
-      tipBlockNumber,
       tipBlockHash,
       tipBlockTimestamp,
       epoch,
@@ -98,7 +97,7 @@ const NervosDAO = () => {
 
   hooks.useUpdateMaxDeposit({ wallet, setMaxDepositAmount, setMaxDepositTx, setMaxDepositErrorMessage })
   hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
-  hooks.useUpdateGlobalAPC({ tipBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
+  hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
   const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
     activeRecord,
     setActiveRecord,
@@ -180,27 +179,21 @@ const NervosDAO = () => {
               ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
               : `${record.outPoint.txHash}-${record.outPoint.index}`
 
-            const props = {
+            const props: DAORecordProps = {
               ...record,
               tipBlockTimestamp,
               withdrawCapacity: withdrawList.get(key) || null,
-              key,
               onClick: onActionClick,
-              tipBlockNumber,
               depositEpoch: depositEpochList.get(key) || '',
               currentEpoch: epoch,
               genesisBlockTimestamp,
               connectionStatus,
+              isCollapsed: focusedRecord !== key,
+              onToggle: () => {
+                setFocusedRecord(focusedRecord === key ? '' : key)
+              },
             }
-            return (
-              <DAORecord
-                {...props}
-                isCollapsed={focusedRecord !== key}
-                onToggle={() => {
-                  setFocusedRecord(focusedRecord === key ? '' : key)
-                }}
-              />
-            )
+            return <DAORecord key={key} {...props} />
           })
         ) : (
           <div className={styles.noRecords}>
@@ -214,7 +207,6 @@ const NervosDAO = () => {
     withdrawList,
     t,
     onActionClick,
-    tipBlockNumber,
     epoch,
     connectionStatus,
     genesisBlockTimestamp,
