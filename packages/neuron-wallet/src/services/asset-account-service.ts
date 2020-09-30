@@ -170,7 +170,7 @@ export default class AssetAccountService {
 
     const addresses = await wallet.getNextReceivingAddresses()
     const usedBlake160s = new Set(await this.blake160sOfAssetAccounts())
-    const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
+    const addrObj = !wallet.isHDWallet() ? addresses[0] : addresses.find(a => !usedBlake160s.has(a.blake160))!
 
     // 2. generate AssetAccount object
     const assetAccount = new AssetAccount(tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
