@@ -20,7 +20,7 @@ $hover-bg-color: #3cc68a4d;
 
   &:hover {
     .tooltip {
-      display: grid;
+      display: flex;
       opacity: 1;
       bottom: calc(100% + 18px);
     }
@@ -39,9 +39,7 @@ $hover-bg-color: #3cc68a4d;
   position: absolute;
   bottom: calc(100% + 10px);
   left: 12px;
-  display: grid;
-  grid-template: 'title title' auto 'label value' auto/ auto 1fr;
-  column-gap: 5px;
+  flex-direction: column;
   background-color: #fff;
   color: #000;
   min-width: 176px;
@@ -61,10 +59,14 @@ $hover-bg-color: #3cc68a4d;
     word-wrap: none;
     word-break: keep-all;
     font-weight: 900;
+    display: flex;
+    justify-content: space-between;
   }
 
   .blockNumber {
     justify-self: flex-end;
+    text-align: right;
+    padding-left: 30px;
   }
 
   &::after {

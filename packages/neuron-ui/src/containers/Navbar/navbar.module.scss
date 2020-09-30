@@ -9,7 +9,7 @@ $left-padding: 15px;
     'name' 75px
     'navs' 1fr
     'network' 4rem
-    'sync' 3rem /
+    'sync' 2.6rem /
     var(--sidebar-width);
   height: 100vh;
   background: black;
@@ -76,13 +76,12 @@ $left-padding: 15px;
 .sync {
   position: relative;
   display: flex;
-  flex-direction: column;
   grid-area: sync;
   font-size: 0.8rem;
-
-  & > span {
-    padding-left: $left-padding;
-    color: var(--nervos-green);
+  padding-left: $left-padding;
+  color: var(--nervos-green);
+  span {
+    padding-left: 3px;
   }
 }
 

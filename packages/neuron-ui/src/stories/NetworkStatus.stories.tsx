@@ -12,8 +12,8 @@ const states: { [index: string]: NetworkStatusProps } = {
       id: 'd',
       chain: 'ckb',
     },
-    bestKnownBlockNumber: 100,
-    cacheTipBlockNumber: 1,
+    syncPercents: 1,
+    syncBlockNumbers: '1/200',
     onAction: () => {},
   },
   Offline: {
@@ -24,8 +24,8 @@ const states: { [index: string]: NetworkStatusProps } = {
       id: 'd',
       chain: 'ckb',
     },
-    bestKnownBlockNumber: 100,
-    cacheTipBlockNumber: 1,
+    syncPercents: 1,
+    syncBlockNumbers: '1/100',
     onAction: () => {},
   },
   '100 synced and 0 tip': {
@@ -36,8 +36,8 @@ const states: { [index: string]: NetworkStatusProps } = {
       id: 'd',
       chain: 'ckb',
     },
-    bestKnownBlockNumber: 0,
-    cacheTipBlockNumber: 100,
+    syncPercents: 100,
+    syncBlockNumbers: '100/0',
     onAction: () => {},
   },
   '100 synced and empty tip': {
@@ -48,8 +48,8 @@ const states: { [index: string]: NetworkStatusProps } = {
       id: 'd',
       chain: 'ckb',
     },
-    bestKnownBlockNumber: -1,
-    cacheTipBlockNumber: 100,
+    syncPercents: 100,
+    syncBlockNumbers: '-/100',
     onAction: () => {},
   },
   'not sycned and 100 tip': {
@@ -60,8 +60,8 @@ const states: { [index: string]: NetworkStatusProps } = {
       id: 'd',
       chain: 'ckb',
     },
-    bestKnownBlockNumber: 100,
-    cacheTipBlockNumber: -1,
+    syncPercents: 0,
+    syncBlockNumbers: '-/100',
     onAction: () => {},
   },
   'not synced and empty tip': {
@@ -72,13 +72,13 @@ const states: { [index: string]: NetworkStatusProps } = {
       id: 'd',
       chain: 'ckb',
     },
-    bestKnownBlockNumber: -1,
-    cacheTipBlockNumber: -1,
+    syncPercents: 0,
+    syncBlockNumbers: '-/-',
     onAction: () => {},
   },
 }
 
-const stories = storiesOf('Connection Status', module).addDecorator(withKnobs)
+const stories = storiesOf('Network Status', module).addDecorator(withKnobs)
 
 Object.entries(states).forEach(([title, props]) => {
   stories.add(title, () => {
@@ -95,8 +95,8 @@ stories.add('With knobs', () => {
       id: text('id', 'd'),
       chain: select('Chain', ['ckb', 'ckb_testnet', 'ckb_dev'], 'ckb'),
     },
-    bestKnownBlockNumber: number('Tip block number', 100),
-    cacheTipBlockNumber: number('Synced block number', 1),
+    syncPercents: number('Sync Percents', 1),
+    syncBlockNumbers: text('Sync Block Number', '1/100'),
     onAction: () => {},
   }
   return <NetworkStatus {...props} />

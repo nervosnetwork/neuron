@@ -1,20 +1,17 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import NetworkTypeLabel from 'components/NetworkTypeLabel'
-import { localNumberFormatter } from 'utils'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
   network: State.Network | undefined
-  bestKnownBlockNumber: number
-  cacheTipBlockNumber: number
+  syncPercents: number
+  syncBlockNumbers: string
   onAction: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({ network, bestKnownBlockNumber, cacheTipBlockNumber, onAction }: NetworkStatusProps) => {
+const NetworkStatus = ({ network, syncPercents, syncBlockNumbers, onAction }: NetworkStatusProps) => {
   const [t] = useTranslation()
-
-  const synced = Math.min(bestKnownBlockNumber, cacheTipBlockNumber)
 
   return (
     <div
@@ -25,21 +22,13 @@ const NetworkStatus = ({ network, bestKnownBlockNumber, cacheTipBlockNumber, onA
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {network && (bestKnownBlockNumber >= 0 || synced >= 0) ? (
+      {network ? (
         <div className={styles.tooltip}>
-          <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
-          {bestKnownBlockNumber >= 0 ? (
-            <>
-              <span>{t('network-status.tooltip.tip-block')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(bestKnownBlockNumber)}</span>
-            </>
-          ) : null}
-          {synced >= 0 ? (
-            <>
-              <span>{t('network-status.tooltip.synced')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(synced)}</span>
-            </>
-          ) : null}
+          <div className={styles.tooltipTitle}>
+            <span>{t('network-status.tooltip.block-synced')}</span>
+            <span>{`${syncPercents}%`}</span>
+          </div>
+          <span className={styles.blockNumber}>{syncBlockNumbers}</span>
         </div>
       ) : null}
       {network ? (

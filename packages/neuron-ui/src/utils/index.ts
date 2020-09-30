@@ -22,5 +22,6 @@ export * from './parsers'
 export * from './validators'
 export * from './sortAccounts'
 export * from './scriptToAddress'
+export * from './getSyncLeftTime'
 
 export { CONSTANTS }

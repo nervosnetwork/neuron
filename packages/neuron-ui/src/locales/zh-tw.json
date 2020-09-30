@@ -25,9 +25,7 @@
     },
     "network-status": {
       "tooltip": {
-        "block-number": "區塊高度",
-        "tip-block": "已知最新區塊",
-        "synced": "已同步"
+        "block-synced": "已同步區塊"
       }
     },
     "overview": {
@@ -414,7 +412,7 @@
     },
     "sync": {
       "synced": "同步完成",
-      "syncing": "區塊同步中",
+      "syncing": "區塊同步中, 還需約 {{ leftTime }}",
       "block-number": "區塊高度",
       "syncing-balance": "區塊同步中, 正在獲取最新余額",
       "slow": "同步緩慢，請檢查網絡",
