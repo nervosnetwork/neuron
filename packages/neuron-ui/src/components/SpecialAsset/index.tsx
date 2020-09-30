@@ -25,7 +25,7 @@ export interface SpecialAssetProps {
   }
   onAction: any
   connectionStatus: State.ConnectionStatus
-  tipBlockTimestamp: number
+  bestKnownBlockTimestamp: number
 }
 
 const SpecialAsset = ({
@@ -39,13 +39,13 @@ const SpecialAsset = ({
   epochsInfo,
   onAction,
   connectionStatus,
-  tipBlockTimestamp,
+  bestKnownBlockTimestamp,
 }: SpecialAssetProps) => {
   const [t] = useTranslation()
   const [date, time] = uniformTimeFormatter(datetime).split(' ')
   let targetTime: undefined | number
   if (epochsInfo?.target !== undefined && epochsInfo?.current !== undefined) {
-    targetTime = tipBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MS_PER_EPOCHS
+    targetTime = bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MS_PER_EPOCHS
   }
 
   const onViewDetail = useCallback(() => {
