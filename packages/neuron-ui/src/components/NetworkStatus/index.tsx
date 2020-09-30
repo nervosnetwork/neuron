@@ -6,18 +6,15 @@ import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
   network: State.Network | undefined
-  tipBlockNumber: string
+  bestKnownBlockNumber: number
   cacheTipBlockNumber: number
   onAction: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({ network, tipBlockNumber, cacheTipBlockNumber, onAction }: NetworkStatusProps) => {
+const NetworkStatus = ({ network, bestKnownBlockNumber, cacheTipBlockNumber, onAction }: NetworkStatusProps) => {
   const [t] = useTranslation()
 
-  let synced = `${cacheTipBlockNumber}`
-  if (tipBlockNumber && BigInt(tipBlockNumber) < BigInt(cacheTipBlockNumber)) {
-    synced = tipBlockNumber
-  }
+  const synced = Math.min(bestKnownBlockNumber, cacheTipBlockNumber)
 
   return (
     <div
@@ -28,16 +25,16 @@ const NetworkStatus = ({ network, tipBlockNumber, cacheTipBlockNumber, onAction 
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {network && (tipBlockNumber || +synced >= 0) ? (
+      {network && (bestKnownBlockNumber >= 0 || synced >= 0) ? (
         <div className={styles.tooltip}>
           <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
-          {tipBlockNumber ? (
+          {bestKnownBlockNumber >= 0 ? (
             <>
               <span>{t('network-status.tooltip.tip-block')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(tipBlockNumber)}</span>
+              <span className={styles.blockNumber}>{localNumberFormatter(bestKnownBlockNumber)}</span>
             </>
           ) : null}
-          {+synced >= 0 ? (
+          {synced >= 0 ? (
             <>
               <span>{t('network-status.tooltip.synced')}</span>
               <span className={styles.blockNumber}>{localNumberFormatter(synced)}</span>

@@ -49,7 +49,6 @@ const Navbar = () => {
   const neuronWallet = useGlobalState()
   const {
     wallet: { name },
-    app: { tipBlockNumber = '0' },
     chain: {
       connectionStatus,
       networkID,
@@ -131,7 +130,7 @@ const Navbar = () => {
       </nav>
       <div className={styles.network}>
         <NetworkStatus
-          tipBlockNumber={tipBlockNumber}
+          bestKnownBlockNumber={bestKnownBlockNumber}
           cacheTipBlockNumber={cacheTipBlockNumber}
           network={network}
           onAction={() => throttledShowSettings({ tab: 'networks' })}
