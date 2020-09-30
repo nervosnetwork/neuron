@@ -54,7 +54,7 @@ const Overview = () => {
     app: { tipBlockNumber, tipBlockTimestamp },
     wallet: { id, balance = '' },
     chain: {
-      syncStatus: { cacheTipBlockNumber },
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber },
       transactions: { items = [] },
       connectionStatus,
       networkID,
@@ -113,7 +113,7 @@ const Overview = () => {
         const confirmationCount =
           item.blockNumber === null || item.status === 'failed'
             ? 0
-            : 1 + Math.max(cacheTipBlockNumber, +tipBlockNumber) - +item.blockNumber
+            : 1 + Math.max(cacheTipBlockNumber, bestKnownBlockNumber) - +item.blockNumber
 
         if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
           status = 'confirming' as any
@@ -191,7 +191,7 @@ const Overview = () => {
         </table>
       </div>
     )
-  }, [recentItems, cacheTipBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
+  }, [recentItems, cacheTipBlockNumber, bestKnownBlockNumber, t, onRecentActivityDoubleClick])
 
   return (
     <div className={styles.overview}>
