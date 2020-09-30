@@ -177,15 +177,18 @@ export const useSubscription = ({
       }
     })
 
-    const syncedStatusSubscription = SyncedStatusSubject.subscribe(({ cacheTipNumber = 0, estimate }) => {
-      dispatch({
-        type: NeuronWalletActions.UpdateSyncStatus,
-        payload: {
-          cacheTipBlockNumber: cacheTipNumber,
-          estimate,
-        },
-      })
-    })
+    const syncedStatusSubscription = SyncedStatusSubject.subscribe(
+      ({ cacheTipNumber = 0, bestKnownBlockNumber = 0, estimate }) => {
+        dispatch({
+          type: NeuronWalletActions.UpdateSyncStatus,
+          payload: {
+            cacheTipBlockNumber: cacheTipNumber,
+            bestKnownBlockNumber,
+            estimate,
+          },
+        })
+      }
+    )
 
     const commandSubscription = CommandSubject.subscribe(({ winID, type, payload }: Subject.CommandMetaInfo) => {
       if (winID && getWinID() === winID) {

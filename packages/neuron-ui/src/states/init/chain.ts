@@ -26,6 +26,7 @@ export const chainState: Readonly<State.Chain> = {
   connectionStatus: ConnectionStatus.Connecting,
   syncStatus: {
     cacheTipBlockNumber: 0,
+    bestKnownBlockNumber: 0,
     estimate: undefined,
   },
   transactions: {
