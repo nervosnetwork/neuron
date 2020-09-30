@@ -51,10 +51,9 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
 
 const Overview = () => {
   const {
-    app: { tipBlockNumber, tipBlockTimestamp },
     wallet: { id, balance = '' },
     chain: {
-      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber },
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
       transactions: { items = [] },
       connectionStatus,
       networkID,
@@ -66,9 +65,9 @@ const Overview = () => {
   const history = useHistory()
 
   const syncStatus = getSyncStatus({
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
     cacheTipBlockNumber,
-    tipBlockNumber,
-    tipBlockTimestamp,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })

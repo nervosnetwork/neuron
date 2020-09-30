@@ -48,7 +48,7 @@ const NervosDAO = () => {
     nervosDAO: { records },
     chain: {
       connectionStatus,
-      syncStatus: { cacheTipBlockNumber },
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
       networkID,
     },
     settings: { networks },
@@ -132,8 +132,8 @@ const NervosDAO = () => {
   })
 
   const syncStatus = getSyncStatus({
-    tipBlockNumber,
-    tipBlockTimestamp,
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
     cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),

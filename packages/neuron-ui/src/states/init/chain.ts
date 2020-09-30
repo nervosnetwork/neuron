@@ -27,6 +27,7 @@ export const chainState: Readonly<State.Chain> = {
   syncStatus: {
     cacheTipBlockNumber: 0,
     bestKnownBlockNumber: 0,
+    bestKnownBlockTimestamp: 0,
     estimate: undefined,
   },
   transactions: {

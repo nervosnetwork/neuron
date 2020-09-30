@@ -49,11 +49,11 @@ const Navbar = () => {
   const neuronWallet = useGlobalState()
   const {
     wallet: { name },
-    app: { tipBlockNumber = '0', tipBlockTimestamp },
+    app: { tipBlockNumber = '0' },
     chain: {
       connectionStatus,
       networkID,
-      syncStatus: { cacheTipBlockNumber },
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
     },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
@@ -65,9 +65,9 @@ const Navbar = () => {
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
   const syncStatus = getSyncStatus({
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
     cacheTipBlockNumber,
-    tipBlockNumber,
-    tipBlockTimestamp,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })

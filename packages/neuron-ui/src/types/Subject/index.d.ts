@@ -28,7 +28,8 @@ declare namespace Subject {
     url: string
   }
   type BlockNumber = string
-  type SyncStatus = Partial<Record<'cacheTipNumber' | 'bestKnownBlockNumber' | 'estimate', number>>
+  type SyncStatus = Record<'cacheTipNumber' | 'bestKnownBlockNumber' | 'bestKnownBlockTimestamp' | 'estimate', number>
+
   interface AppUpdater {
     checking: boolean
     downloadProgress: number

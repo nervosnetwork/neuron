@@ -157,6 +157,8 @@ declare namespace State {
 
   type SyncStatus = Readonly<{
     cacheTipBlockNumber: number
+    bestKnownBlockNumber: number
+    bestKnownBlockTimestamp: number
     estimate: number | undefined
   }>
 

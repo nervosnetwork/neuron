@@ -2,45 +2,45 @@ import { SyncStatus } from 'utils/enums'
 import { BUFFER_BLOCK_NUMBER, MAX_TIP_BLOCK_DELAY } from 'utils/const'
 
 const TEN_MINS = 10 * 60 * 1000
-let blockNumber10MinAgo: string = ''
+let blockNumber10MinAgo: number = -1
 let timestamp10MinAgo: number | undefined
 let prevUrl: string | undefined
 
 export const getSyncStatus = ({
+  bestKnownBlockNumber,
+  bestKnownBlockTimestamp,
   cacheTipBlockNumber,
-  tipBlockNumber,
-  tipBlockTimestamp,
   currentTimestamp,
   url,
 }: {
+  bestKnownBlockNumber: number
+  bestKnownBlockTimestamp: number
   cacheTipBlockNumber: number
-  tipBlockNumber: string
-  tipBlockTimestamp: number
   currentTimestamp: number
   url: string | undefined
 }) => {
-  if ((!timestamp10MinAgo && tipBlockNumber !== '') || (prevUrl && url !== prevUrl && tipBlockNumber !== '')) {
+  if ((!timestamp10MinAgo && bestKnownBlockNumber >= 0) || (prevUrl && url !== prevUrl && bestKnownBlockNumber >= 0)) {
     timestamp10MinAgo = currentTimestamp
-    blockNumber10MinAgo = tipBlockNumber
+    blockNumber10MinAgo = bestKnownBlockNumber
     prevUrl = url
   }
 
   const now = Math.floor(currentTimestamp / 1000) * 1000
-  if (cacheTipBlockNumber < 0 || tipBlockNumber === '0' || tipBlockNumber === '') {
+  if (cacheTipBlockNumber < 0 || bestKnownBlockNumber <= 0) {
     return SyncStatus.SyncNotStart
   }
 
   if (timestamp10MinAgo && timestamp10MinAgo + TEN_MINS < currentTimestamp) {
-    if (BigInt(blockNumber10MinAgo) >= BigInt(tipBlockNumber)) {
+    if (blockNumber10MinAgo >= bestKnownBlockNumber) {
       return SyncStatus.SyncPending
     }
     timestamp10MinAgo = currentTimestamp
-    blockNumber10MinAgo = tipBlockNumber
+    blockNumber10MinAgo = bestKnownBlockNumber
   }
-  if (BigInt(cacheTipBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber)) {
+  if (cacheTipBlockNumber + BUFFER_BLOCK_NUMBER < bestKnownBlockNumber) {
     return SyncStatus.Syncing
   }
-  if (tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= now) {
+  if (bestKnownBlockTimestamp + MAX_TIP_BLOCK_DELAY >= now) {
     return SyncStatus.SyncCompleted
   }
   return SyncStatus.Syncing

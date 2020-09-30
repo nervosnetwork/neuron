@@ -40,10 +40,9 @@ const SUDTAccountList = () => {
   const history = useHistory()
   const {
     wallet: { id: walletId, balance },
-    app: { tipBlockNumber = '0', tipBlockTimestamp },
     chain: {
       networkID,
-      syncStatus: { cacheTipBlockNumber },
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
     },
     settings: { networks = [] },
   } = useGlobalState()
@@ -303,9 +302,9 @@ const SUDTAccountList = () => {
     )
   }
   const syncStatus = getSyncStatus({
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
     cacheTipBlockNumber,
-    tipBlockNumber,
-    tipBlockTimestamp,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })

@@ -178,12 +178,13 @@ export const useSubscription = ({
     })
 
     const syncedStatusSubscription = SyncedStatusSubject.subscribe(
-      ({ cacheTipNumber = 0, bestKnownBlockNumber = 0, estimate }) => {
+      ({ cacheTipNumber, bestKnownBlockNumber, bestKnownBlockTimestamp, estimate }) => {
         dispatch({
           type: NeuronWalletActions.UpdateSyncStatus,
           payload: {
             cacheTipBlockNumber: cacheTipNumber,
             bestKnownBlockNumber,
+            bestKnownBlockTimestamp,
             estimate,
           },
         })
