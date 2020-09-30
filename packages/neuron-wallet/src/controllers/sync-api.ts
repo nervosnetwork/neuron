@@ -10,6 +10,7 @@ interface SyncState {
   indexerTipNumber: number,
   cacheTipNumber: number,
   bestKnownBlockNumber: number,
+  bestKnownBlockTimestamp: number,
   indexRate: number | undefined,
   cacheRate: number | undefined,
   estimate: number | undefined,
@@ -76,14 +77,17 @@ export default class SyncApiController {
     return newSyncEstimate
   }
 
-  private async fetchBestKnownBlockNumber (): Promise<number> {
+  private async fetchBestKnownBlockInfo (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> {
     const method = new Method({url: this.nodeUrl!}, {
       name: 'sync state',
       method: 'sync_state',
       paramsFormatters: [],
     })
-    const {best_known_block_number} = await method.call()
-    return parseInt(best_known_block_number, 16)
+    const { best_known_block_number, best_known_block_timestamp } = await method.call()
+    return {
+      bestKnownBlockNumber: parseInt(best_known_block_number, 16),
+      bestKnownBlockTimestamp: +best_known_block_timestamp,
+    }
   }
 
   private async estimate (states: any): Promise<SyncState> {
@@ -94,7 +98,7 @@ export default class SyncApiController {
     const ckb = NodeService.getInstance().ckb
     this.nodeUrl = ckb.node.url
 
-    const bestKnownBlockNumber = await this.fetchBestKnownBlockNumber()
+    const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.fetchBestKnownBlockInfo()
     const foundBestKnownBlockNumber = this.foundBestKnownBlockNumber(bestKnownBlockNumber)
 
     const remainingBlocksToCache = bestKnownBlockNumber - cacheTipNumber
@@ -106,6 +110,7 @@ export default class SyncApiController {
       indexerTipNumber,
       cacheTipNumber,
       bestKnownBlockNumber,
+      bestKnownBlockTimestamp,
       indexRate: undefined,
       cacheRate: undefined,
       estimate: undefined,
