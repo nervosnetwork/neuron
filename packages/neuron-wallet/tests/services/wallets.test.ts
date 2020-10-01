@@ -392,6 +392,5 @@ describe('wallet service', () => {
         })
       });
     });
-
   });
 })
