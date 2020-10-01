@@ -111,6 +111,7 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
             })
             break
           }
+          case 'send-acp':
           case 'send-sudt': {
             const params: Controller.SendSUDTTransaction.Params = {
               walletID,
