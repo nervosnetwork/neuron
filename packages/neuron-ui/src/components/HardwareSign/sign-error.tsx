@@ -28,4 +28,6 @@ const SignError = ({ error, onCancel }: { error: string; onCancel: () => void })
   )
 }
 
+SignError.displayName = 'SignError'
+
 export default SignError

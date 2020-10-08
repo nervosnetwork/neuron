@@ -6,7 +6,7 @@ import { getSystemCodeHash, getAllNetworks, getCurrentNetworkID } from 'services
 import CopyZone from 'widgets/CopyZone'
 import { DeviceSignIndex as DeviceSignIndexSubject } from 'services/subjects'
 
-import styles from './hardwareSign.module.scss'
+import styles from '../HardwareSign/hardwareSign.module.scss'
 
 const { MAINNET_TAG } = CONSTANTS
 

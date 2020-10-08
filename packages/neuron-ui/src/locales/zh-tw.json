@@ -99,6 +99,7 @@
       "import-mnemonic": "導入助記詞",
       "import-keystore": "導入 Keystore 檔案",
       "import-wallet": "導入錢包",
+      "import-hardware-wallet": "導入硬體錢包",
       "new-wallet": "新錢包",
       "wallet-seed": "Keystore 檔案",
       "keystore": "助記詞",

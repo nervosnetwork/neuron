@@ -15,7 +15,7 @@ import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import { connectDevice, getDevices } from 'services/remote'
 import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import SignError from './sign-error'
-import HDWalletSign from './hd-wallet-sign'
+import HDWalletSign from '../HDWalletSign'
 import styles from './hardwareSign.module.scss'
 
 export type SignType = 'message' | 'transaction'

@@ -99,6 +99,7 @@
       "import-mnemonic": "导入助记词",
       "import-keystore": "导入 Keystore 文件",
       "import-wallet": "导入钱包",
+      "import-hardware-wallet": "导入硬件钱包",
       "new-wallet": "新钱包",
       "wallet-seed": "Keystore 文件",
       "keystore": "助记词",
