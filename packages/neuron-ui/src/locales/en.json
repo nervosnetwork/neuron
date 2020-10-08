@@ -106,6 +106,7 @@
       "import-mnemonic": "Import Wallet Seed",
       "import-keystore": "Import from Keystore",
       "import-wallet": "Import a Wallet",
+      "import-hardware-wallet": "Import Hardware Wallet",
       "new-wallet": "New Wallet",
       "wallet-seed": "Wallet Seed",
       "keystore": "Keystore",

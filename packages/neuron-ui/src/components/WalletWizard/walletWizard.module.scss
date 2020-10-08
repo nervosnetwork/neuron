@@ -10,13 +10,27 @@ $line-gap: 15px;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: stretch;
 }
 
 .welcome {
   @include center;
-  align-items: center;
+  align-items: inherit;
+  flex-direction: row;
+  height: calc(100vh - 110px);
+  padding: 55px 140px;
+
+  .banner {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  hr {
+    color: #aeaeae;
+  }
 
   .slogan {
     font-size: 1.5rem;
@@ -25,21 +39,45 @@ $line-gap: 15px;
   }
 
   .actions {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 
     button {
-      margin: 0 40px;
+      margin: 10px 40px;
+    }
+
+    span {
+      margin: 10px 0;
     }
   }
 
   button {
-    width: 225px;
-    height: 60px;
+    width: 270px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 4px;
+
+      path {
+        fill: #fff;
+      }
+    }
+
+    &[data-type="default"] {
+      svg {
+        path {
+          fill: #000;
+        }
+      }
+    }
   }
 }
 
