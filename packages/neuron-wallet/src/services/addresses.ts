@@ -163,7 +163,8 @@ export default class AddressService {
     addressType: AddressType,
     addressIndex: number
   ): Promise<AddressInterface | undefined> {
-    const address = publicKeyToAddress(publicKey)
+    const isMainnet = NetworksService.getInstance().isMainnet()
+    const address = publicKeyToAddress(publicKey, isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet)
     const publicKeyHash = AddressParser.toBlake160(address)
 
     const exist = await getConnection()
