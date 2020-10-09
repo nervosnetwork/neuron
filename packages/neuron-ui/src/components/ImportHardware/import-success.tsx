@@ -7,7 +7,7 @@ import { RoutePath, LocationState } from './common'
 
 import styles from './findDevice.module.scss'
 
-const Success = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const ImportSuccess = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
   const [t] = useTranslation()
   const { entryPath } = location.state
   const onClose = useCallback(() => {
@@ -29,6 +29,6 @@ const Success = ({ history, location }: RouteComponentProps<{}, {}, LocationStat
   )
 }
 
-Success.displayName = 'Success'
+ImportSuccess.displayName = 'ImportSuccess'
 
-export default Success
+export default ImportSuccess

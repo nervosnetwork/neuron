@@ -31,5 +31,6 @@ const ImportHardware = ({ match }: RouteComponentProps) => {
   )
 }
 
-ImportHardware.displayName = 'FindDevice'
+ImportHardware.displayName = 'ImportHardware'
+
 export default ImportHardware

@@ -35,4 +35,6 @@ const ImportError = ({ history, location }: RouteComponentProps<{}, {}, Location
   )
 }
 
+ImportError.displayName = 'ImportError'
+
 export default ImportError
