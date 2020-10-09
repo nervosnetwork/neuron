@@ -25,9 +25,7 @@
     },
     "network-status": {
       "tooltip": {
-        "block-number": "Block Number",
-        "tip-block": "Tip Block",
-        "synced": "Synced"
+        "block-synced": "Block Synced"
       }
     },
     "overview": {
@@ -414,7 +412,7 @@
     },
     "sync": {
       "synced": "Synced",
-      "syncing": "Synchronizing",
+      "syncing": "Syncing, ~{{ leftTime }} left",
       "block-number": "block number",
       "syncing-balance": "Balance is updating",
       "slow": "Sync is slow",

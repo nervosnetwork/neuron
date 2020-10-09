@@ -69,11 +69,15 @@ describe('sync api', () => {
 
   describe('on sync-estimate-updated', () => {
     const bestKnownBlockNumber = 10000
+    const bestKnownBlockTimestamp = 1557311767
     beforeEach(() => {
       jest
         .spyOn(Date, 'now')
         .mockImplementation(() => 66000);
-      stubbedSDKMethod.mockResolvedValue({best_known_block_number: bestKnownBlockNumber.toString(16)})
+      stubbedSDKMethod.mockResolvedValue({
+        best_known_block_number: bestKnownBlockNumber.toString(16),
+        best_known_block_timestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
+      })
       stubbedNodeGetInstance.mockImplementation(() => ({
         ckb: {
           node: {
@@ -105,6 +109,7 @@ describe('sync api', () => {
             nodeUrl: fakeNodeUrl,
             timestamp: parseInt(fakeState2.timestamp),
             bestKnownBlockNumber,
+            bestKnownBlockTimestamp,
             cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
             indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
             indexRate: undefined,
@@ -134,6 +139,7 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState1.timestamp),
               bestKnownBlockNumber,
+              bestKnownBlockTimestamp,
               cacheTipNumber: parseInt(fakeState1.cacheTipNumber),
               indexerTipNumber: parseInt(fakeState1.indexerTipNumber),
               indexRate: undefined,
@@ -168,6 +174,7 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
               bestKnownBlockNumber,
+              bestKnownBlockTimestamp,
               cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
               indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
               indexRate,
@@ -201,6 +208,7 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState2.timestamp),
               bestKnownBlockNumber,
+              bestKnownBlockTimestamp,
               cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
               indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
               indexRate: undefined,
@@ -243,6 +251,7 @@ describe('sync api', () => {
               nodeUrl: fakeNodeUrl,
               timestamp: parseInt(fakeState3.timestamp),
               bestKnownBlockNumber,
+              bestKnownBlockTimestamp,
               indexRate,
               cacheRate: undefined,
               cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
@@ -271,6 +280,7 @@ describe('sync api', () => {
                 nodeUrl: 'http://diffurl',
                 timestamp: parseInt(fakeState3.timestamp),
                 bestKnownBlockNumber,
+                bestKnownBlockTimestamp,
                 indexRate: undefined,
                 cacheRate: undefined,
                 cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
@@ -298,7 +308,10 @@ describe('sync api', () => {
         }
         beforeEach(async () => {
           emitter.emit('sync-estimate-updated', fakeState1)
-          stubbedSDKMethod.mockResolvedValue({best_known_block_number: nextBestKnownBlockNumber.toString(16)})
+          stubbedSDKMethod.mockResolvedValue({
+            best_known_block_number: nextBestKnownBlockNumber.toString(16),
+            best_known_block_timestamp: bestKnownBlockTimestamp,
+          })
           emitter.emit('sync-estimate-updated', fakeState2)
           await flushPromises()
         });
@@ -307,6 +320,7 @@ describe('sync api', () => {
             nodeUrl: fakeNodeUrl,
             timestamp: parseInt(fakeState2.timestamp),
             bestKnownBlockNumber: nextBestKnownBlockNumber,
+            bestKnownBlockTimestamp,
             cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
             indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
             indexRate: undefined,

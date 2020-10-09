@@ -8,9 +8,19 @@ import { showSettings } from 'services/remote'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
+import RingProgresBar from 'widgets/RingProgressBar'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
-import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange } from 'utils'
+import {
+  RoutePath,
+  getCurrentUrl,
+  getSyncStatus,
+  getSyncLeftTime,
+  localNumberFormatter,
+  useOnLocaleChange,
+  SyncStatus as SyncStatusEnum,
+  ConnectionStatus,
+} from 'utils'
 
 import styles from './navbar.module.scss'
 
@@ -49,8 +59,11 @@ const Navbar = () => {
   const neuronWallet = useGlobalState()
   const {
     wallet: { name },
-    app: { tipBlockNumber = '0', tipBlockTimestamp },
-    chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    chain: {
+      connectionStatus,
+      networkID,
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp, estimate },
+    },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
   const [t, i18n] = useTranslation()
@@ -61,9 +74,9 @@ const Navbar = () => {
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
   const syncStatus = getSyncStatus({
-    syncedBlockNumber,
-    tipBlockNumber,
-    tipBlockTimestamp,
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
+    cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })
@@ -106,6 +119,20 @@ const Navbar = () => {
       </button>
     ))
 
+  const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
+  const syncPercents =
+    bestBlockNumber > 0 && cacheTipBlockNumber > 0 ? +((cacheTipBlockNumber * 100) / bestBlockNumber).toFixed(2) : 0
+  let ringBarColor = '#3cc68a'
+  if (ConnectionStatus.Offline === connectionStatus || SyncStatusEnum.SyncNotStart === syncStatus) {
+    ringBarColor = '#ff0000'
+  } else if (SyncStatusEnum.SyncPending === syncStatus) {
+    ringBarColor = '#f7ae4d'
+  }
+
+  const syncBlockNumbers = `${cacheTipBlockNumber >= 0 ? localNumberFormatter(cacheTipBlockNumber) : '-'}/${
+    bestBlockNumber >= 0 ? localNumberFormatter(bestBlockNumber) : '-'
+  }`
+
   return (
     <aside className={styles.sidebar}>
       <button
@@ -127,14 +154,21 @@ const Navbar = () => {
       </nav>
       <div className={styles.network}>
         <NetworkStatus
-          tipBlockNumber={tipBlockNumber}
-          syncedBlockNumber={syncedBlockNumber}
+          syncPercents={syncPercents}
+          syncBlockNumbers={syncBlockNumbers}
           network={network}
           onAction={() => throttledShowSettings({ tab: 'networks' })}
         />
       </div>
       <div className={styles.sync}>
-        <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} />
+        <RingProgresBar
+          percents={syncPercents}
+          color={ringBarColor}
+          backgroundColor="#666"
+          size="16px"
+          strokeWidth="4px"
+        />
+        <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} leftTime={getSyncLeftTime(estimate)} />
       </div>
     </aside>
   )

@@ -1,23 +1,17 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import NetworkTypeLabel from 'components/NetworkTypeLabel'
-import { localNumberFormatter } from 'utils'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
   network: State.Network | undefined
-  tipBlockNumber: string
-  syncedBlockNumber: string
+  syncPercents: number
+  syncBlockNumbers: string
   onAction: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({ network, tipBlockNumber, syncedBlockNumber, onAction }: NetworkStatusProps) => {
+const NetworkStatus = ({ network, syncPercents, syncBlockNumbers, onAction }: NetworkStatusProps) => {
   const [t] = useTranslation()
-
-  let synced = syncedBlockNumber
-  if (tipBlockNumber && BigInt(tipBlockNumber) < BigInt(syncedBlockNumber)) {
-    synced = tipBlockNumber
-  }
 
   return (
     <div
@@ -28,21 +22,13 @@ const NetworkStatus = ({ network, tipBlockNumber, syncedBlockNumber, onAction }:
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {network && (tipBlockNumber || +synced >= 0) ? (
+      {network ? (
         <div className={styles.tooltip}>
-          <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
-          {tipBlockNumber ? (
-            <>
-              <span>{t('network-status.tooltip.tip-block')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(tipBlockNumber)}</span>
-            </>
-          ) : null}
-          {+synced >= 0 ? (
-            <>
-              <span>{t('network-status.tooltip.synced')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(synced)}</span>
-            </>
-          ) : null}
+          <div className={styles.tooltipTitle}>
+            <span>{t('network-status.tooltip.block-synced')}</span>
+            <span>{`${syncPercents}%`}</span>
+          </div>
+          <span className={styles.blockNumber}>{syncBlockNumbers}</span>
         </div>
       ) : null}
       {network ? (
