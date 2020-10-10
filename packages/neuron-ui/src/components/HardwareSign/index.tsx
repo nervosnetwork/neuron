@@ -167,6 +167,7 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
       setSigning(true)
       try {
         if (signType === 'message') {
+          setSigning(false)
           await signMsg(deviceInfo)
         } else {
           await signTx(deviceInfo)
@@ -200,7 +201,6 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
   })
 
   const dialogClass = `${styles.dialog} ${wallet.isHD ? styles.hd : ''}`
-
   let container = (
     <div className={styles.container}>
       <header className={styles.title}>{t('hardware-sign.title')}</header>
