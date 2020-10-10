@@ -17,7 +17,7 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { exportTransactionAsJSON, SignStatus, SignType } from 'services/remote'
+import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from './passwordRequest.module.scss'
 
@@ -54,13 +54,13 @@ const PasswordRequest = () => {
   const signType = useMemo(() => {
     switch (actionType) {
       case 'create-sudt-account':
-        return SignType.CreateSUDTAccount
+        return OfflineSignType.CreateSUDTAccount
       case 'send-sudt':
-        return SignType.SendSUDT
+        return OfflineSignType.SendSUDT
       case 'unlock':
-        return SignType.UnlockDAO
+        return OfflineSignType.UnlockDAO
       default:
-        return SignType.Regular
+        return OfflineSignType.Regular
     }
   }, [actionType])
 
@@ -68,7 +68,7 @@ const PasswordRequest = () => {
     onDismiss()
     await exportTransactionAsJSON({
       transaction: generatedTx,
-      status: SignStatus.Unsigned,
+      status: OfflineSignStatus.Unsigned,
       type: signType,
     })
   }, [signType, generatedTx, onDismiss])
@@ -231,11 +231,15 @@ const PasswordRequest = () => {
           error={error}
         />
         <div className={styles.footer}>
-          <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-          <Button label="Export" type="cancel" onClick={exportTransaction} />
-          <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-            {isLoading ? <Spinner /> : (t('common.confirm') as string)}
-          </Button>
+          <div className={styles.left}>
+            <Button label={t('offline-sign.export')} type="cancel" onClick={exportTransaction} />
+          </div>
+          <div className={styles.right}>
+            <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
+            <Button label={t('common.confirm')} type="submit" disabled={disabled}>
+              {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+            </Button>
+          </div>
         </div>
       </form>
     </dialog>

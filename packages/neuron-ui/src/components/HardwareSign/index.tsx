@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import {
@@ -12,8 +12,9 @@ import {
 import Spinner from 'widgets/Spinner'
 import { useHistory } from 'react-router-dom'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
-import { connectDevice, getDevices } from 'services/remote'
+import { connectDevice, getDevices, exportTransactionAsJSON, OfflineSignStatus, OfflineSignType } from 'services/remote'
 import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
+
 import SignError from './sign-error'
 import HDWalletSign from '../HDWalletSign'
 import styles from './hardwareSign.module.scss'
@@ -194,6 +195,28 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
     }
   }, [sign, wallet.device, disconnectStatus])
 
+  const offlineSignType = useMemo(() => {
+    switch (actionType) {
+      case 'create-sudt-account':
+        return OfflineSignType.CreateSUDTAccount
+      case 'send-sudt':
+        return OfflineSignType.SendSUDT
+      case 'unlock':
+        return OfflineSignType.UnlockDAO
+      default:
+        return OfflineSignType.Regular
+    }
+  }, [actionType])
+
+  const exportTransaction = useCallback(async () => {
+    onCancel()
+    await exportTransactionAsJSON({
+      transaction: generatedTx,
+      status: OfflineSignStatus.Unsigned,
+      type: offlineSignType,
+    })
+  }, [offlineSignType, generatedTx, onCancel])
+
   useDidMount(() => {
     // eslint-disable-next-line no-unused-expressions
     dialogRef.current?.showModal()
@@ -223,12 +246,17 @@ const HardwareSign = ({ signType, signMessage, history, wallet, onDismiss }: Har
         {wallet.isHD ? <HDWalletSign tx={generatedTx} /> : null}
       </section>
       <footer className={styles.footer}>
-        <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
-        {status === disconnectStatus || isSigning ? (
-          <Button label={t('common.confirm')} type="submit" disabled={isReconnecting} onClick={reconnect}>
-            {isReconnecting ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
-          </Button>
-        ) : null}
+        <div className={styles.left}>
+          <Button label={t('offline-sign.export')} type="cancel" onClick={exportTransaction} />
+        </div>
+        <div className={styles.right}>
+          <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
+          {status === disconnectStatus || isSigning ? (
+            <Button label={t('common.confirm')} type="submit" disabled={isReconnecting} onClick={reconnect}>
+              {isReconnecting ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
+            </Button>
+          ) : null}
+        </div>
       </footer>
     </div>
   )

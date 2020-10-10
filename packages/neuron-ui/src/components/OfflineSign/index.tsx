@@ -5,7 +5,7 @@ import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { useState as useGlobalState } from 'states'
-import { broadcastTransaction, getCurrentWallet, SignStatus } from 'services/remote'
+import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import SignDialog from './sign-dialog'
 
@@ -28,13 +28,13 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
     return JSON.stringify(json, null, 2)
   }, [json])
 
-  const signStatus: SignStatus = json.status
+  const signStatus: OfflineSignStatus = json.status
 
   const status = useMemo(() => {
     switch (signStatus) {
-      case SignStatus.Unsigned:
+      case OfflineSignStatus.Unsigned:
         return t('offline-sign.status.unsigned')
-      case SignStatus.PartiallySigned:
+      case OfflineSignStatus.PartiallySigned:
         return t('offline-sign.status.partially-signed')
       default:
         return t('offline-sign.status.signed')
@@ -123,7 +123,7 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
         </section>
         <footer className={styles.footer}>
           <Button type="cancel" label={t('offline-sign.actions.cancel')} onClick={onBack} />
-          {signStatus === SignStatus.Signed ? (
+          {signStatus === OfflineSignStatus.Signed ? (
             <Button type="submit" label={t('offline-sign.actions.broadcast')} onClick={onBroadcast}>
               {isBroadCasting ? <Spinner /> : (t('offline-sign.actions.broadcast') as string)}
             </Button>

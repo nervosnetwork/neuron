@@ -84,6 +84,7 @@
       },
       "wallet": "Wallet:",
       "content": "Content:",
+      "export": "Export Tx",
       "sign-and-export": "Sign and export transaction",
       "sign-and-broadcast": "Sign and broadcast",
       "actions": {

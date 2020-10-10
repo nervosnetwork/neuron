@@ -1,13 +1,13 @@
 /* eslint-disable camelcase */
 import { remoteApi } from './remoteApiWrapper'
 
-export enum SignStatus {
+export enum OfflineSignStatus {
   Signed = 'Signed',
   Unsigned = 'Unsigned',
   PartiallySigned = 'PartiallySigned',
 }
 
-export enum SignType {
+export enum OfflineSignType {
   Regular = 'Regular',
   UnlockDAO = 'UnlockDAO',
   CreateSUDTAccount = 'CreateSUDTAccount',
@@ -28,8 +28,8 @@ interface Signatures {
 
 export interface OfflineSignJSON {
   transaction: any
-  status: SignStatus
-  type: SignType
+  status: OfflineSignStatus
+  type: OfflineSignType
   asset_account?: Pick<Controller.SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
   multisig_configs?: MultisigConfigs
   signatures?: Signatures

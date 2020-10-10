@@ -15,7 +15,7 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { OfflineSignJSON, signAndExportTransaction, SignType } from 'services/remote'
+import { OfflineSignJSON, signAndExportTransaction, OfflineSignType } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from '../PasswordRequest/passwordRequest.module.scss'
 
@@ -95,7 +95,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
       }
       try {
         switch (signType) {
-          case SignType.Regular: {
+          case OfflineSignType.Regular: {
             if (isSigning) {
               break
             }
@@ -108,7 +108,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
             })
             break
           }
-          case SignType.UnlockDAO: {
+          case OfflineSignType.UnlockDAO: {
             if (isSigning) {
               break
             }
@@ -124,7 +124,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
             })
             break
           }
-          case SignType.CreateSUDTAccount: {
+          case OfflineSignType.CreateSUDTAccount: {
             const params: Controller.SendCreateSUDTAccountTransaction.Params = {
               walletID,
               assetAccount: experimental?.assetAccount,
@@ -140,7 +140,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
             })
             break
           }
-          case SignType.SendSUDT: {
+          case OfflineSignType.SendSUDT: {
             const params: Controller.SendSUDTTransaction.Params = {
               walletID,
               tx: experimental?.tx,

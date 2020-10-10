@@ -77,6 +77,7 @@
       },
       "wallet": "钱包：",
       "content": "内容：",
+      "export": "导出交易",
       "sign-and-export": "签名并导出交易",
       "sign-and-broadcast": "签名并广播交易",
       "actions": {
