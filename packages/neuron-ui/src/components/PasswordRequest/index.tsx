@@ -71,8 +71,9 @@ const PasswordRequest = () => {
       transaction: generatedTx,
       status: OfflineSignStatus.Unsigned,
       type: signType,
+      description,
     })
-  }, [signType, generatedTx, onDismiss])
+  }, [signType, generatedTx, onDismiss, description])
 
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 

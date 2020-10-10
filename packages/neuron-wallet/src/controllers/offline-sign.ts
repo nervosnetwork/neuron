@@ -11,7 +11,7 @@ import WalletsController from './wallets'
 import NodeService from 'services/node'
 
 export default class OfflineSignController {
-  public async exportTransactionAsJSON ({ transaction, type, status, asset_account }: OfflineSignJSON) {
+  public async exportTransactionAsJSON ({ transaction, type, status, asset_account, description }: OfflineSignJSON) {
     try {
       const { canceled, filePath } = await dialog.showSaveDialog({
         title: t('offline-signature.export-transaction-as-json'),
@@ -35,7 +35,8 @@ export default class OfflineSignController {
         type,
         status,
         asset_account,
-        context
+        context,
+        description
       })
 
       const json = signer.toJSON()
@@ -94,7 +95,8 @@ export default class OfflineSignController {
     transaction,
     type,
     asset_account: assetAccount,
-    walletID
+    walletID,
+    description
   }: OfflineSignJSON & { walletID: string }) {
     const tx = Transaction.fromObject(transaction)
     switch (type) {
@@ -103,7 +105,7 @@ export default class OfflineSignController {
           walletID,
           assetAccount: assetAccount!,
           tx,
-          password: ''
+          password: '',
         }, true)
       }
       case SignType.SendSUDT: {
@@ -117,7 +119,8 @@ export default class OfflineSignController {
         return new WalletsController().sendTx({
           walletID,
           tx,
-          password: ''
+          password: '',
+          description
         }, true)
       }
     }

@@ -31,6 +31,7 @@ export interface OfflineSignProps {
   status: SignStatus
   type: SignType
   context: RPC.RawTransaction[]
+  description?: string
   assetAccount?: AssetAccount
   multisig_configs?: MultisigConfigs
   signatures?: Signatures
@@ -41,6 +42,7 @@ export interface OfflineSignJSON {
   status: SignStatus
   type: SignType
   context: RPC.RawTransaction[]
+  description?: string
   asset_account?: AssetAccount
   multisig_configs?: MultisigConfigs
   signatures?: Signatures
@@ -52,16 +54,25 @@ export default class OfflineSign implements OfflineSignProps {
   public status: SignStatus
   public type: SignType
   public context: RPC.RawTransaction[]
+  public description: string
 
-  constructor (transaction: Transaction, signType: SignType, status: SignStatus, context: RPC.RawTransaction[],assetAcount?: AssetAccount) {
+  constructor(
+    transaction: Transaction,
+    signType: SignType,
+    status: SignStatus,
+    context: RPC.RawTransaction[],
+    assetAcount?: AssetAccount,
+    description: string = ''
+  ) {
     this.transaction = transaction
     this.assetAccount = assetAcount
     this.type = signType
     this.status = status
     this.context = context
+    this.description = description
   }
 
-  public toJSON (): OfflineSignJSON {
+  public toJSON(): OfflineSignJSON {
     const json: OfflineSignJSON = {
       transaction: this.transaction,
       type: this.type,
@@ -73,14 +84,25 @@ export default class OfflineSign implements OfflineSignProps {
       json.asset_account = this.assetAccount
     }
 
+    if (this.description) {
+      json.description = this.description
+    }
+
     return json
   }
 
-  public static fromJSON ({ transaction, type: signType, asset_account: assetAcount, status, context }: OfflineSignJSON) {
-    return new OfflineSign(transaction, signType, status, context, assetAcount)
+  public static fromJSON({
+    transaction,
+    type: signType,
+    asset_account: assetAcount,
+    status,
+    context,
+    description
+  }: OfflineSignJSON) {
+    return new OfflineSign(transaction, signType, status, context, assetAcount, description)
   }
 
-  public setStatus (status: SignStatus) {
+  public setStatus(status: SignStatus) {
     this.status = status
   }
 }

@@ -30,6 +30,7 @@ export interface OfflineSignJSON {
   transaction: any
   status: OfflineSignStatus
   type: OfflineSignType
+  description?: string
   asset_account?: Pick<Controller.SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
   multisig_configs?: MultisigConfigs
   signatures?: Signatures

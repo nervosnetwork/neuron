@@ -259,15 +259,15 @@ const HardwareSign = ({
       setIsReconnecting(false)
     }
   }, [deviceInfo, disconnectStatus, connectStatus])
-
   const exportTransaction = useCallback(async () => {
     onCancel()
     await exportTransactionAsJSON({
       transaction: generatedTx,
       status: OfflineSignStatus.Unsigned,
       type: offlineSignType!,
+      description,
     })
-  }, [offlineSignType, generatedTx, onCancel])
+  }, [offlineSignType, generatedTx, onCancel, description])
 
   useDidMount(() => {
     // eslint-disable-next-line no-unused-expressions
