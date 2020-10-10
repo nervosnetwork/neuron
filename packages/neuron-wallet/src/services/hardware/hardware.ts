@@ -101,7 +101,7 @@ export abstract class Hardware {
         const witnessEntry = witnessSigningEntries.find(w => w.lockHash === lockHash)!
         witnessEntry.witness = serializeWitnessArgs({
           lock: '0x' + signture,
-          inputType: '',
+          inputType: witnessEntry.witnessArgs.inputType ?? '',
           outputType: ''
         })
       }
