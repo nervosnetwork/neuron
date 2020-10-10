@@ -35,7 +35,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
   } = useGlobalState()
 
   const walletID = wallet.id
-  const { transaction, type: signType } = offlineSignJSON
+  const { transaction, type: signType, asset_account: assetAccount } = offlineSignJSON
 
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -127,8 +127,8 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
           case OfflineSignType.CreateSUDTAccount: {
             const params: Controller.SendCreateSUDTAccountTransaction.Params = {
               walletID,
-              assetAccount: experimental?.assetAccount,
-              tx: experimental?.tx,
+              assetAccount: assetAccount ?? experimental?.assetAccount,
+              tx: transaction,
               password,
             }
             await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
@@ -143,7 +143,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
           case OfflineSignType.SendSUDT: {
             const params: Controller.SendSUDTTransaction.Params = {
               walletID,
-              tx: experimental?.tx,
+              tx: transaction,
               password,
             }
             await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
@@ -180,6 +180,7 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
       t,
       isBroadcast,
       signAndExport,
+      assetAccount,
     ]
   )
 
@@ -197,7 +198,15 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
   }, [isBroadcast, t])
 
   if (wallet.device) {
-    return <HardwareSign signType="transaction" history={history} wallet={wallet} onDismiss={onDismiss} />
+    return (
+      <HardwareSign
+        signType="transaction"
+        history={history}
+        wallet={wallet}
+        onDismiss={onDismiss}
+        offlineSignJSON={offlineSignJSON}
+      />
+    )
   }
 
   return (

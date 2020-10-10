@@ -65,7 +65,7 @@ export default class TransactionSender {
     return txHash
   }
 
-  public async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
+  public async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0, context?: RPC.RawTransaction[]) {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
@@ -79,7 +79,7 @@ export default class TransactionSender {
         await device.connect()
       }
       try {
-        return await device.signTx(walletID, tx, txHash, skipLastInputs)
+        return await device.signTx(walletID, tx, txHash, skipLastInputs, context)
       } catch (err) {
         throw new SignTransactionFailed(err.message)
       }

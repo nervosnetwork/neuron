@@ -19,7 +19,7 @@
   "scripts": {
     "start": "electron .",
     "build": "ttsc",
-    "start:dev": "yarn run build && electron .",
+    "start:dev": "yarn run build && electron --inspect=5858 .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
     "clean": "rimraf dist/*",
     "test": "jest --runInBand --collect-coverage",

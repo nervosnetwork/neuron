@@ -30,6 +30,7 @@ export interface OfflineSignProps {
   transaction: Transaction
   status: SignStatus
   type: SignType
+  context: RPC.RawTransaction[]
   assetAccount?: AssetAccount
   multisig_configs?: MultisigConfigs
   signatures?: Signatures
@@ -39,6 +40,7 @@ export interface OfflineSignJSON {
   transaction: Transaction
   status: SignStatus
   type: SignType
+  context: RPC.RawTransaction[]
   asset_account?: AssetAccount
   multisig_configs?: MultisigConfigs
   signatures?: Signatures
@@ -49,19 +51,22 @@ export default class OfflineSign implements OfflineSignProps {
   public assetAccount?: AssetAccount
   public status: SignStatus
   public type: SignType
+  public context: RPC.RawTransaction[]
 
-  constructor (transaction: Transaction, signType: SignType, status: SignStatus, assetAcount?: AssetAccount) {
+  constructor (transaction: Transaction, signType: SignType, status: SignStatus, context: RPC.RawTransaction[],assetAcount?: AssetAccount) {
     this.transaction = transaction
     this.assetAccount = assetAcount
     this.type = signType
     this.status = status
+    this.context = context
   }
 
   public toJSON (): OfflineSignJSON {
     const json: OfflineSignJSON = {
       transaction: this.transaction,
       type: this.type,
-      status: this.status
+      status: this.status,
+      context: this.context
     }
 
     if (this.assetAccount) {
@@ -71,8 +76,8 @@ export default class OfflineSign implements OfflineSignProps {
     return json
   }
 
-  public static fromJSON ({ transaction, type: signType, asset_account: assetAcount, status }: OfflineSignJSON) {
-    return new OfflineSign(transaction, signType, status, assetAcount)
+  public static fromJSON ({ transaction, type: signType, asset_account: assetAcount, status, context }: OfflineSignJSON) {
+    return new OfflineSign(transaction, signType, status, context, assetAcount)
   }
 
   public setStatus (status: SignStatus) {

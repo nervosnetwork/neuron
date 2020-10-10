@@ -55,6 +55,7 @@ const PasswordRequest = () => {
     switch (actionType) {
       case 'create-sudt-account':
         return OfflineSignType.CreateSUDTAccount
+      case 'send-acp':
       case 'send-sudt':
         return OfflineSignType.SendSUDT
       case 'unlock':
@@ -208,7 +209,15 @@ const PasswordRequest = () => {
   }
 
   if (wallet.device) {
-    return <HardwareSign signType="transaction" history={history} wallet={wallet} onDismiss={onDismiss} />
+    return (
+      <HardwareSign
+        signType="transaction"
+        history={history}
+        wallet={wallet}
+        onDismiss={onDismiss}
+        offlineSignType={signType}
+      />
+    )
   }
 
   return (

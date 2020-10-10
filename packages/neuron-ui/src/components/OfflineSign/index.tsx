@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router-dom'
 import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { useState as useGlobalState } from 'states'
+import { addNotification, useDispatch, useState as useGlobalState } from 'states'
 import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import SignDialog from './sign-dialog'
@@ -21,6 +21,7 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
   const [isSigning, setIsSigning] = useState(false)
   const [isBroadCasting, setIsBroadcasting] = useState(false)
   const [t] = useTranslation()
+  const dispatch = useDispatch()
 
   const { filePath, json } = loadedTransaction
 
@@ -64,12 +65,21 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
         })
         if (isSuccessResponse(res)) {
           history.push(RoutePath.History)
+        } else {
+          addNotification({
+            type: 'alert',
+            timestamp: +new Date(),
+            code: res.status,
+            content: typeof res.message === 'string' ? res.message : res.message.content,
+            meta: typeof res.message === 'string' ? undefined : res.message.meta,
+          })(dispatch)
+          onBack()
         }
       } finally {
         setIsBroadcasting(false)
       }
     },
-    [wallet, json, history]
+    [wallet, json, history, dispatch, onBack]
   )
 
   useDidMount(() => {

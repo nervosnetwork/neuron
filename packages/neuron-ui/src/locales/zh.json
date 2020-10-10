@@ -57,7 +57,8 @@
       "device": "设备：",
       "status": {
         "label": "状态：",
-        "connect": "已连接，等待确认...",
+        "connect": "已连接",
+        "user-input": "已连接，等待确认...",
         "disconnect": "未连接，请检查设备连接。"
       },
       "actions": {

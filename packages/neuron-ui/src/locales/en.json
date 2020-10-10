@@ -62,7 +62,8 @@
       "device": "Device:",
       "status": {
         "label": "Status:",
-        "connect": "Connected, waiting for user input...",
+        "connect": "Connected, ready for signing.",
+        "user-input": "Connected, waiting for user input...",
         "disconnect": "Disconnected, please check your connection."
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
