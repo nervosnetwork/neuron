@@ -117,7 +117,7 @@ const HardwareSign = ({
   const signAndExportFromGenerateTx = useCallback(async () => {
     setStatus(userInputStatus)
     const json: OfflineSignJSON = {
-      transaction: generatedTx,
+      transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Signed,
       type: offlineSignType!,
       description,
@@ -292,13 +292,14 @@ const HardwareSign = ({
 
   const exportTransaction = useCallback(async () => {
     await exportTransactionAsJSON({
-      transaction: generatedTx,
+      transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Unsigned,
       type: offlineSignType!,
       description,
+      asset_account: experimental?.assetAccount,
     })
     onCancel()
-  }, [offlineSignType, generatedTx, onCancel, description])
+  }, [offlineSignType, generatedTx, onCancel, description, experimental])
 
   useDidMount(() => {
     // eslint-disable-next-line no-unused-expressions

@@ -69,12 +69,13 @@ const PasswordRequest = () => {
   const exportTransaction = useCallback(async () => {
     onDismiss()
     await exportTransactionAsJSON({
-      transaction: generatedTx,
+      transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Unsigned,
       type: signType,
       description,
+      asset_account: experimental?.assetAccount,
     })
-  }, [signType, generatedTx, onDismiss, description])
+  }, [signType, generatedTx, onDismiss, description, experimental])
 
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 
@@ -214,7 +215,7 @@ const PasswordRequest = () => {
       },
     })
     const json = {
-      transaction: generatedTx,
+      transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Signed,
       type: signType,
       description,
