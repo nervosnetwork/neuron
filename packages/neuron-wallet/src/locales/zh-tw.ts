@@ -104,6 +104,8 @@ export default {
       'target-output-not-found': "There isn't an account wallet associated with this address.",
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
       "connect-device-failed": "設備無法連接，請檢查設備連接狀況。",
+      "save-offline-json-failed": "無法保存 JSON 文件。",
+      "offline-sign-failed": "簽名失敗，請檢查是否使用了正確的錢包進行簽名。",
     },
     messageBox: {
       button: {

@@ -60,7 +60,6 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
   const disabled = !password || isSigning
 
   const signAndExport = useCallback(async () => {
-    // @TODO: error handling
     const res = await signAndExportTransaction({
       ...offlineSignJSON,
       walletID,

@@ -10,7 +10,6 @@ import styles from './hardwareSign.module.scss'
 const SignError = ({ error, onCancel }: { error: string; onCancel: () => void }) => {
   const [t] = useTranslation()
   const errorMsg = errorFormatter(error, t)
-
   return (
     <div className={styles.container}>
       <section className={styles.action}>

@@ -108,7 +108,9 @@ export default {
       "connect-device-failed": "The device cannot be connected, please check your connection.",
       "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
       "wallet-not-supported-function": "This wallet does not support {name} function.",
-      "invalid-transaction-file": "Invalid transaction file."
+      "invalid-transaction-file": "Invalid transaction file.",
+      "save-offline-json-failed": "Unable to save JSON file.",
+      "offline-sign-failed": "Signing failed, please check if you are signing with the correct wallet.",
     },
     messageBox: {
       button: {

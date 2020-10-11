@@ -167,6 +167,7 @@ const HardwareSign = ({
       const assetAccount = offlineSignJSON?.asset_account ?? experimental?.assetAccount
       if (offlineSignJSON !== undefined) {
         await signAndExportFromJSON()
+        return
       }
       switch (type) {
         case 'send': {
