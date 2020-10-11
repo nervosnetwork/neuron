@@ -93,7 +93,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `NervosDAO`,
     path: RoutePath.NervosDAO,
-    exact: true,
+    exact: false,
     component: NervosDAO,
   },
   {
@@ -105,7 +105,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `SUDTAccountList`,
     path: RoutePath.SUDTAccountList,
-    exact: true,
+    exact: false,
     component: SUDTAccountList,
   },
   {
