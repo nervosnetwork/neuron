@@ -22,7 +22,7 @@ import {
   signAndExportTransaction,
 } from 'services/remote'
 import { errorFormatter, isSuccessResponse, RoutePath, useDidMount } from 'utils'
-
+import DropdownButton from 'widgets/DropdownButton'
 import SignError from './sign-error'
 import HDWalletSign from '../HDWalletSign'
 import styles from './hardwareSign.module.scss'
@@ -74,9 +74,11 @@ const HardwareSign = ({
   } = useGlobalState()
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
-  const [isSigning, setSigning] = useState(false)
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
+  const isSigning = useMemo(() => {
+    return status === userInputStatus
+  }, [status, userInputStatus])
 
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
 
@@ -93,7 +95,7 @@ const HardwareSign = ({
     }
   }, [offlineSignJSON])
 
-  const signAndExport = useCallback(async () => {
+  const signAndExportFromJSON = useCallback(async () => {
     const res = await signAndExportTransaction({
       ...offlineSignJSON!,
       walletID: wallet.id,
@@ -112,6 +114,45 @@ const HardwareSign = ({
     onCancel()
   }, [offlineSignJSON, dispatch, onCancel, t, wallet.id])
 
+  const signAndExportFromGenerateTx = useCallback(async () => {
+    setStatus(userInputStatus)
+    const json: OfflineSignJSON = {
+      transaction: generatedTx,
+      status: OfflineSignStatus.Signed,
+      type: offlineSignType!,
+      description,
+      asset_account: experimental?.assetAccount,
+    }
+    const res = await signAndExportTransaction({
+      ...json,
+      walletID: wallet.id,
+      password: '',
+    })
+    if (!isSuccessResponse(res)) {
+      setStatus(connectStatus)
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    dispatch({
+      type: AppActions.UpdateLoadedTransaction,
+      payload: {
+        json: res.result!,
+      },
+    })
+    onCancel()
+  }, [
+    dispatch,
+    onCancel,
+    t,
+    wallet.id,
+    generatedTx,
+    userInputStatus,
+    description,
+    experimental,
+    offlineSignType,
+    connectStatus,
+  ])
+
   const signTx = useCallback(async () => {
     try {
       const conectionRes = await connectDevice(deviceInfo)
@@ -125,14 +166,7 @@ const HardwareSign = ({
       // eslint-disable-next-line camelcase
       const assetAccount = offlineSignJSON?.asset_account ?? experimental?.assetAccount
       if (offlineSignJSON !== undefined) {
-        try {
-          await signAndExport()
-        } catch (err) {
-          //
-        } finally {
-          // eslint-disable-next-line no-unsafe-finally
-          return
-        }
+        await signAndExportFromJSON()
       }
       switch (type) {
         case 'send': {
@@ -212,7 +246,7 @@ const HardwareSign = ({
     description,
     dispatch,
     history,
-    signAndExport,
+    signAndExportFromJSON,
   ])
 
   const signMsg = useCallback(async () => {
@@ -230,18 +264,13 @@ const HardwareSign = ({
       if (e) {
         e.preventDefault()
       }
-      setSigning(true)
-      try {
-        if (signType === 'message') {
-          await signMsg()
-        } else {
-          await signTx()
-        }
-      } finally {
-        setSigning(false)
+      if (signType === 'message') {
+        await signMsg()
+      } else {
+        await signTx()
       }
     },
-    [signType, signTx, setSigning, signMsg]
+    [signType, signTx, signMsg]
   )
 
   const reconnect = useCallback(async () => {
@@ -259,14 +288,15 @@ const HardwareSign = ({
       setIsReconnecting(false)
     }
   }, [deviceInfo, disconnectStatus, connectStatus])
+
   const exportTransaction = useCallback(async () => {
-    onCancel()
     await exportTransactionAsJSON({
       transaction: generatedTx,
       status: OfflineSignStatus.Unsigned,
       type: offlineSignType!,
       description,
     })
+    onCancel()
   }, [offlineSignType, generatedTx, onCancel, description])
 
   useDidMount(() => {
@@ -286,6 +316,14 @@ const HardwareSign = ({
   })
 
   const dialogClass = `${styles.dialog} ${wallet.isHD ? styles.hd : ''}`
+
+  const dropdownList = [
+    {
+      text: t('offline-sign.sign-and-export'),
+      onClick: signAndExportFromGenerateTx,
+    },
+  ]
+
   let container = (
     <div className={styles.container}>
       <header className={styles.title}>{t('hardware-sign.title')}</header>
@@ -310,12 +348,17 @@ const HardwareSign = ({
       <footer className={styles.footer}>
         {offlineSignJSON === undefined && signType === 'transaction' ? (
           <div className={styles.left}>
-            <Button label={t('offline-sign.export')} type="cancel" onClick={exportTransaction} />
+            <DropdownButton
+              mainBtnLabel={t('offline-sign.export')}
+              mainBtnOnClick={exportTransaction}
+              mainBtnDisabled={isSigning}
+              list={dropdownList}
+            />
           </div>
         ) : null}
         <div className={styles.right}>
           <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
-          {status === disconnectStatus || isSigning ? (
+          {status === disconnectStatus ? (
             <Button
               label={t('hardware-sign.actions.rescan')}
               type="submit"
@@ -325,12 +368,7 @@ const HardwareSign = ({
               {isReconnecting || isSigning ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
             </Button>
           ) : (
-            <Button
-              label={t('sign-and-verify.sign')}
-              type="submit"
-              disabled={isSigning || status !== connectStatus}
-              onClick={sign}
-            >
+            <Button label={t('sign-and-verify.sign')} type="submit" disabled={isSigning} onClick={sign}>
               {isSigning ? <Spinner /> : (t('sign-and-verify.sign') as string)}
             </Button>
           )}

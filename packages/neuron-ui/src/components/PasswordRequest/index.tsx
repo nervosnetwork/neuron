@@ -5,7 +5,7 @@ import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
 import HardwareSign from 'components/HardwareSign'
-import { useDialog, ErrorCode, RoutePath, isSuccessResponse } from 'utils'
+import { useDialog, ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
   useState as useGlobalState,
@@ -17,8 +17,9 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType } from 'services/remote'
+import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType, signAndExportTransaction } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
+import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = () => {
@@ -205,6 +206,53 @@ const PasswordRequest = () => {
     [setPassword, setError]
   )
 
+  const signAndExportFromGenerateTx = useCallback(async () => {
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: {
+        sending: true,
+      },
+    })
+    const json = {
+      transaction: generatedTx,
+      status: OfflineSignStatus.Signed,
+      type: signType,
+      description,
+      asset_account: experimental?.assetAccount,
+    }
+    const res = await signAndExportTransaction({
+      ...json,
+      walletID,
+      password,
+    })
+    if (!isSuccessResponse(res)) {
+      dispatch({
+        type: AppActions.UpdateLoadings,
+        payload: { sending: false },
+      })
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    dispatch({
+      type: AppActions.UpdateLoadedTransaction,
+      payload: {
+        json: res.result!,
+      },
+    })
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: { sending: false },
+    })
+    onDismiss()
+  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID])
+
+  const dropdownList = [
+    {
+      text: t('offline-sign.sign-and-export'),
+      onClick: signAndExportFromGenerateTx,
+    },
+  ]
+
   if (!wallet) {
     return null
   }
@@ -242,7 +290,12 @@ const PasswordRequest = () => {
         />
         <div className={styles.footer}>
           <div className={styles.left}>
-            <Button label={t('offline-sign.export')} type="cancel" onClick={exportTransaction} />
+            <DropdownButton
+              mainBtnLabel={t('offline-sign.export')}
+              mainBtnOnClick={exportTransaction}
+              mainBtnDisabled={isLoading}
+              list={dropdownList}
+            />
           </div>
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
