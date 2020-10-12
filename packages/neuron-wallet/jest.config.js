@@ -1,6 +1,6 @@
 module.exports = {
   displayName: "Unit Tests",
-  testRegex: "(/tests/services/offline-sign.(test|spec))\\.(ts?|js?)$",
+  testRegex: "(/tests/.*.(test|spec))\\.(ts?|js?)$",
   transform: {
     "^.+\\.ts?$": "ts-jest"
   },

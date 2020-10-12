@@ -62,7 +62,8 @@ export default class OfflineSignController {
       const tx = await new TransactionSender().sign(
         walletID,
         Transaction.fromObject(transaction),
-        password, type === SignType.SendSUDT ? 1 : 0,
+        password,
+        type === SignType.SendSUDT ? 1 : 0,
         context
       )
 
