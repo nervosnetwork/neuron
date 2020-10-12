@@ -330,6 +330,8 @@ export default class AddressService {
   }
 
   public static async updateDescription (walletId: string, address: string, description: string) {
+    const addresses = await this.getAddressesByWalletId(walletId);
+    const addressMeta = addresses.find(meta => meta.address === address)
     await getConnection()
       .createQueryBuilder()
       .update(HdPublicKeyInfo)
@@ -338,7 +340,8 @@ export default class AddressService {
       })
       .where({
         walletId,
-        address
+        addressType: addressMeta!.addressType,
+        addressIndex: addressMeta!.addressIndex
       })
       .execute()
   }
