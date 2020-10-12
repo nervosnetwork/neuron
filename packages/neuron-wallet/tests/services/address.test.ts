@@ -561,11 +561,12 @@ describe('integration tests for AddressService', () => {
       it('saves description for a public key info matching with the address', async () => {
         const generatedAddresses1 = await AddressService.getAddressesByWalletId(walletId1)
 
-        const wallet1Addr = generatedAddresses1.find(
-          (addr: any) => addr.walletId === walletId1 && addr.address === addressToUpdate.address
+        const wallet1Addr = generatedAddresses1.filter(
+          (addr: any) => addr.walletId === walletId1 && addr.description === description
         )
-        expect(wallet1Addr!.description).toEqual(description)
 
+        expect(wallet1Addr.length).toEqual(1)
+        expect(wallet1Addr[0].address).toEqual(addressToUpdate.address)
       })
       it('should not description to the public key under other wallets even if the address is the same', async () => {
         const generatedAddresses2 = await AddressService.getAddressesByWalletId(walletId2)
