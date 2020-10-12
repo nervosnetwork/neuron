@@ -9,12 +9,12 @@
 
 * Upgrade from Electron 7 to Electron 9.
 * Refactor the wallet address storage to be based on an SQLite table rather than a JSON file.
-* Deprecate LevelDB and use SQLite instead.
+* Deprecate LevelDB and instead SQLite for persisting transaction descriptions.
 * Refactor send component.
+* Reduce the confirmation block height from 300 to 24.
 
 ### New features
 
-* Reduce the confirmation block height from 300 to 24.
 * Enable `Asset Accounts` for mainnet.
 * Support transfer to multisig address.
 
