@@ -14,12 +14,6 @@ export default class HdPublicKeyInfo {
   @Index()
   walletId!: string
 
-  @Column({
-    type: 'varchar',
-  })
-  @Index()
-  address!: string
-
   @Column()
   addressType!: AddressType
 
@@ -48,7 +42,6 @@ export default class HdPublicKeyInfo {
     const publicKeyInfo = new HdPublicKeyInfo()
 
     publicKeyInfo.walletId = model.walletId
-    publicKeyInfo.address = model.address
     publicKeyInfo.addressType = model.addressType
     publicKeyInfo.addressIndex = model.addressIndex
     publicKeyInfo.publicKeyInBlake160 = model.publicKeyInBlake160
