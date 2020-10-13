@@ -11,6 +11,7 @@ import CellsService from './cells'
 import SystemScriptInfo from 'models/system-script-info'
 import Script from 'models/chain/script'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
+import AddressDescription from 'database/chain/entities/address-description'
 import { ChildProcess } from 'utils/worker'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import AddressMeta from 'database/address/meta'
@@ -291,12 +292,21 @@ export default class AddressService {
       .where({walletId})
       .getMany()
 
+    const addressDescriptions = await getConnection()
+      .getRepository(AddressDescription)
+      .createQueryBuilder()
+      .where({walletId})
+      .getMany()
+
     return publicKeyInfos.sort((lhs, rhs) => {
         return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
       })
-      .map(publicKeyInfo => (
-        AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel()))
-      )
+      .map(publicKeyInfo => {
+        const keyInfoModel = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel());
+        const found = addressDescriptions.find(addrDesc => addrDesc.address === keyInfoModel.address)
+        keyInfoModel.description = found?.description
+        return keyInfoModel
+      })
   }
 
   public static async getAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {
@@ -330,19 +340,25 @@ export default class AddressService {
   }
 
   public static async updateDescription (walletId: string, address: string, description: string) {
-    const addresses = await this.getAddressesByWalletId(walletId);
-    const addressMeta = addresses.find(meta => meta.address === address)
-    await getConnection()
+    const addressDescription = await getConnection()
+      .getRepository(AddressDescription)
       .createQueryBuilder()
-      .update(HdPublicKeyInfo)
-      .set({
-        description
-      })
-      .where({
-        walletId,
-        addressType: addressMeta!.addressType,
-        addressIndex: addressMeta!.addressIndex
-      })
+      .where({walletId, address})
+      .getOne()
+
+    if (addressDescription) {
+      addressDescription.description = description
+      await getConnection()
+        .manager.save(addressDescription)
+
+      return
+    }
+
+    await getConnection()
+      .getRepository(AddressDescription)
+      .createQueryBuilder()
+      .insert()
+      .values({walletId, address, description})
       .execute()
   }
 
