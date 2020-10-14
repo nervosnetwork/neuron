@@ -149,8 +149,9 @@ export default class WalletService {
 
   public generateAddressesIfNecessary = async () => {
     for (const wallet of this.getAll()) {
-      if ((await AddressService.getAddressesByWalletId(wallet.id)).length === 0) {
-        await this.generateAddressesById(wallet.id, false)
+      const addresses = await AddressService.getAddressesByWalletId(wallet.id)
+      if (addresses.length === 0) {
+        await this.generateAddressesById(wallet.id, false, undefined, undefined, false)
       }
     }
   }
@@ -159,7 +160,8 @@ export default class WalletService {
     id: string,
     isImporting: boolean,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change
+    changeAddressCount: number = DefaultAddressNumber.Change,
+    notifyAddressCreated: boolean = true
   ) => {
     const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
     await AddressService.checkAndGenerateSave(
@@ -167,7 +169,8 @@ export default class WalletService {
       accountExtendedPublicKey,
       isImporting,
       receivingAddressCount,
-      changeAddressCount
+      changeAddressCount,
+      notifyAddressCreated
     )
   }
 

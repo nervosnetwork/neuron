@@ -78,7 +78,6 @@ describe('CellsService', () => {
       HdPublicKeyInfo.fromObject({
         walletId: d.walletId,
         publicKeyInBlake160: d.lockScript.args,
-        address: d.address,
         addressType: 0,
         addressIndex: 0,
       })
