@@ -538,43 +538,66 @@ describe('integration tests for AddressService', () => {
       const walletId1 = '1'
       const walletId2 = '2'
 
-      beforeEach(async () => {
-        await AddressService.checkAndGenerateSave(
-          walletId1,
-          extendedKey,
-          isImporting,
-          receivingAddressCount,
-          changeAddressCount
-        )
-        await AddressService.checkAndGenerateSave(
-          walletId2,
-          extendedKey,
-          isImporting,
-          receivingAddressCount,
-          changeAddressCount
-        )
+      describe('when saved description', () => {
+        beforeEach(async () => {
+          await AddressService.checkAndGenerateSave(
+            walletId1,
+            extendedKey,
+            isImporting,
+            receivingAddressCount,
+            changeAddressCount
+          )
+          await AddressService.checkAndGenerateSave(
+            walletId2,
+            extendedKey,
+            isImporting,
+            receivingAddressCount,
+            changeAddressCount
+          )
 
-        const generatedAddresses1 = await AddressService.getAddressesByWalletId(walletId1)
-        addressToUpdate = generatedAddresses1[0]
-        await AddressService.updateDescription(walletId1, addressToUpdate.address, description)
-      })
-      it('saves description for a public key info matching with the address', async () => {
-        const generatedAddresses1 = await AddressService.getAddressesByWalletId(walletId1)
+          const generatedAddresses1 = await AddressService.getAddressesByWalletId(walletId1)
+          addressToUpdate = generatedAddresses1[0]
+          await AddressService.updateDescription(walletId1, addressToUpdate.address, description)
+        })
+        it('returns description for an address', async () => {
+          const generatedAddresses1 = await AddressService.getAddressesByWalletId(walletId1)
 
-        const wallet1Addr = generatedAddresses1.find(
-          (addr: any) => addr.walletId === walletId1 && addr.address === addressToUpdate.address
-        )
-        expect(wallet1Addr!.description).toEqual(description)
+          const wallet1Addr = generatedAddresses1.filter(
+            (addr: any) => addr.walletId === walletId1 && addr.description === description
+          )
 
-      })
-      it('should not description to the public key under other wallets even if the address is the same', async () => {
-        const generatedAddresses2 = await AddressService.getAddressesByWalletId(walletId2)
+          expect(wallet1Addr.length).toEqual(1)
+          expect(wallet1Addr[0].address).toEqual(addressToUpdate.address)
+        })
+        it('should not return description for an address under other wallets even if the address is the same', async () => {
+          const generatedAddresses2 = await AddressService.getAddressesByWalletId(walletId2)
 
-        const wallet1Addr = generatedAddresses2.find(
-          (addr: any) => addr.walletId === walletId2 && addr.address === addressToUpdate.address
-        )
-        expect(wallet1Addr!.description).toEqual(null)
-      })
+          const wallet1Addr = generatedAddresses2.find(
+            (addr: any) => addr.walletId === walletId2 && addr.address === addressToUpdate.address
+          )
+          expect(wallet1Addr!.description).toEqual(undefined)
+        })
+        describe('when updated an existing description', () => {
+          const newDescription = 'new desc'
+          beforeEach(async () => {
+            await AddressService.updateDescription(walletId1, addressToUpdate.address, newDescription)
+          })
+          it('overrides description for an address', async () => {
+            const generatedAddresses1 = await AddressService.getAddressesByWalletId(walletId1)
+
+            const originals = generatedAddresses1.filter(
+              (addr: any) => addr.walletId === walletId1 && addr.description === description
+            )
+            expect(originals.length).toEqual(0)
+
+            const overrides = generatedAddresses1.filter(
+              (addr: any) => addr.walletId === walletId1 && addr.description === newDescription
+            )
+            expect(overrides.length).toEqual(1)
+            expect(overrides[0].address).toEqual(addressToUpdate.address)
+          })
+        });
+      });
     });
   })
 });

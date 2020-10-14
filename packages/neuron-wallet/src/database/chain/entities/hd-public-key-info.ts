@@ -26,12 +26,6 @@ export default class HdPublicKeyInfo {
   })
   publicKeyInBlake160!: string
 
-  @Column({
-    type: 'varchar',
-    default: null
-  })
-  description?: string
-
   @CreateDateColumn({
     type: "varchar",
     default: () => "CURRENT_TIMESTAMP"
@@ -45,7 +39,6 @@ export default class HdPublicKeyInfo {
     publicKeyInfo.addressType = model.addressType
     publicKeyInfo.addressIndex = model.addressIndex
     publicKeyInfo.publicKeyInBlake160 = model.publicKeyInBlake160
-    publicKeyInfo.description = model.description
 
     return publicKeyInfo
   }
