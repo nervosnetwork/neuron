@@ -11,6 +11,7 @@ import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
 import { AddressType } from 'models/keys/address'
 import HexUtils from 'utils/hex'
+import logger from 'utils/logger'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
@@ -20,6 +21,8 @@ export default class Ledger extends Hardware {
     if (this.isConnected) {
       return
     }
+
+    logger.info("Connect device:\t", deviceInfo)
 
     this.deviceInfo = deviceInfo ?? this.deviceInfo
     this.transport = this.deviceInfo.isBluetooth
@@ -90,7 +93,7 @@ export default class Ledger extends Hardware {
   public static async findDevices () {
     const devices = await Promise.all([
       Ledger.searchDevices(HID.listen, false),
-      Ledger.searchDevices(Bluetooth.listen, true)
+      // Ledger.searchDevices(Bluetooth.listen, true)
     ])
 
     return devices.flat()

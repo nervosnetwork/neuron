@@ -23,14 +23,6 @@ const supportedHardwareModels = [
       product: 'Nano X',
     },
   },
-  {
-    label: 'Ledger Blue',
-    value: 'Ledger Blue',
-    data: {
-      manufacturer: 'Ledger',
-      product: 'Blue',
-    },
-  },
 ]
 
 const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationState>) => {

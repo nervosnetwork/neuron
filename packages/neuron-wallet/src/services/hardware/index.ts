@@ -2,6 +2,7 @@ import { UnsupportedManufacturer } from 'exceptions'
 import { DeviceInfo, Manufacturer } from './common'
 import Ledger from './ledger'
 import { Hardware, HardwareClass } from './hardware'
+import logger from 'utils/logger'
 
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
@@ -44,6 +45,9 @@ export default class HardwareWalletService {
       Ledger.findDevices(),
       // add new brand `findDevices()` here
     ])
+
+    logger.info("Find devices:\t", devices)
+
     const result = devices.flat().filter(Boolean)
 
     if (device) {

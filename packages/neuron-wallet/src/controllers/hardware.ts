@@ -9,7 +9,7 @@ export default class HardwareController {
     try {
       await device!.connect()
     } catch (error) {
-      throw new connectDeviceFailed()
+      throw new connectDeviceFailed(error.message)
     }
 
     return {

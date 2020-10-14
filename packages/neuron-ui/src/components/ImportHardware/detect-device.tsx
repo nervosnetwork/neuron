@@ -3,7 +3,7 @@ import { useHistory, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
-import { isSuccessResponse, useDidMount } from 'utils'
+import { isSuccessResponse, useDidMount, errorFormatter } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
 import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
 import {
@@ -72,7 +72,7 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
         const conectionRes = await connectDevice(device)
         if (!isSuccessResponse(conectionRes)) {
           setScaning(false)
-          throw new ConnectFailedException()
+          throw new ConnectFailedException(errorFormatter(conectionRes.message, t))
         }
         const firmwareVersionRes = await getDeviceFirmwareVersion(device.descriptor)
         if (isSuccessResponse(firmwareVersionRes)) {
@@ -92,7 +92,7 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
     } finally {
       setScaning(false)
     }
-  }, [model, setError, setScaning])
+  }, [model, setError, setScaning, t])
 
   useDidMount(() => {
     findDevice()
@@ -105,7 +105,7 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
     })
   }, [history, entryPath, location.state])
 
-  const errorMsg = t(error)
+  const errorMsg = error.startsWith('messages.codes.') ? t(error) : error
   const ready = error === '' && appVersion !== ''
   const productName = `${model.manufacturer} ${model.product}`
 

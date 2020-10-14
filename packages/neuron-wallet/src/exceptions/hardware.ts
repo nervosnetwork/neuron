@@ -6,10 +6,6 @@ export class SignTransactionFailed extends Error {
 
 export class connectDeviceFailed extends Error {
   public code = 401
-
-  constructor () {
-    super(t('messages.connect-device-failed'))
-  }
 }
 
 export class UnsupportedManufacturer extends Error {
