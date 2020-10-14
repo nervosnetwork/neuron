@@ -1,4 +1,4 @@
-# 0.33.0 (2020-10-12)
+# 0.33.0 (2020-10-14)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
 
