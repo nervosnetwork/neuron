@@ -3,20 +3,20 @@
     "estimate": null,
     "expected": "-"
   },
-  "should return 0:1 when estimate is 60_000": {
+  "should return 00:01 when estimate is 60_000": {
     "estimate": 60000,
-    "expected": "0:1"
+    "expected": "00:01"
   },
-  "should return 1:0 when estimate is 60 * 60_000": {
+  "should return 01:00 when estimate is 60 * 60_000": {
     "estimate": 3600000,
-    "expected": "1:0"
+    "expected": "01:00"
   },
-  "should return 0:0 when estimate is less than 30_000": {
+  "should return 00:00 when estimate is less than 30_000": {
     "estimate": 29999,
-    "expected": "0:0"
+    "expected": "00:00"
   },
-  "should return 0:1 when estimate is less than 60_000 but greater than 30_000": {
+  "should return 00:01 when estimate is less than 60_000 but greater than 30_000": {
     "estimate": 30001,
-    "expected": "0:1"
+    "expected": "00:01"
   }
 }
