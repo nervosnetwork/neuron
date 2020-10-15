@@ -1,13 +1,11 @@
 import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
-import { IsRequired } from 'exceptions'
 import NodeService from './node'
 import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import { Address } from "models/address"
 import { PathAndPrivateKey } from 'models/keys/key'
-import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
@@ -28,6 +26,8 @@ import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
+import HardwareWalletService from './hardware'
+import { SignTransactionFailed } from 'exceptions'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -54,20 +54,30 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
 
-    await WalletService.checkAndGenerateAddresses(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    await wallet.checkAndGenerateAddresses()
     return txHash
   }
 
   private async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
     const wallet = this.walletService.get(walletID)
-
-    if (password === '') {
-      throw new IsRequired('Password')
-    }
-
     const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
+    if (wallet.isHardware()) {
+      let device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const wallet = WalletsService.getInstance().getCurrent()
+        const deviceInfo = wallet!.getDeviceInfo()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
+      }
+      try {
+        return await device.signTx(walletID, tx, txHash, skipLastInputs)
+      } catch (err) {
+        throw new SignTransactionFailed(err.message)
+      }
+    }
 
     // Only one multi sign input now.
     const isMultiSign = tx.inputs.length === 1 &&
@@ -89,6 +99,7 @@ export default class TransactionSender {
       } else {
         path = addressInfos.find(i => i.blake160 === args)!.path
       }
+
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
       if (!pathAndPrivateKey) {
         throw new Error('no private key found')
@@ -134,7 +145,7 @@ export default class TransactionSender {
       if (isMultiSign) {
         const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
         const serializedMultiSign: string = new MultiSign().serialize(blake160)
-        signed = this.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign)
+        signed = await TransactionSender.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign, wallet)
         const wit = signed[0] as WitnessArgs
         wit.lock = serializedMultiSign + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
@@ -161,7 +172,13 @@ export default class TransactionSender {
     return tx
   }
 
-  private signSingleMultiSignScript(privateKey: string, witnesses: (string | WitnessArgs)[], txHash: string, serializedMultiSign: string) {
+public static async signSingleMultiSignScript(
+  privateKeyOrPath: string,
+  witnesses: (string | WitnessArgs)[],
+  txHash: string,
+  serializedMultiSign: string,
+  wallet: Wallet
+) {
     const firstWitness = witnesses[0]
     if (typeof(firstWitness) === 'string') {
       throw new Error('First witness must be WitnessArgs')
@@ -187,8 +204,12 @@ export default class TransactionSender {
     })
 
     const message = blake2b.digest()
-    const keyPair = new ECPair(privateKey)
-    emptyWitness.lock = keyPair.signRecoverable(message)
+
+    if (!wallet.isHardware()) {
+      const keyPair = new ECPair(privateKeyOrPath)
+      emptyWitness.lock = keyPair.signRecoverable(message)
+    }
+
     return [emptyWitness, ...restWitnesses]
   }
 
@@ -244,7 +265,9 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+
+    const address = await wallet.getNextAddress()
 
     const changeAddress: string = await this.getChangeAddress()
 
@@ -282,7 +305,8 @@ export default class TransactionSender {
 
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
-    const changeAddress = await AddressesService.getNextUnusedChangeAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeAddress = await wallet.getNextChangeAddress()
     const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
@@ -351,7 +375,8 @@ export default class TransactionSender {
 
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
-    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    const address = await wallet.getNextAddress()
     const blake160 = AddressParser.toBlake160(address!.address)
 
     const output: Output = new Output(
@@ -411,7 +436,8 @@ export default class TransactionSender {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
-    const address = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+    const address = await wallet.getNextAddress()
 
     const tx = await TransactionGenerator.generateDepositAllTx(
       walletID,
@@ -443,7 +469,9 @@ export default class TransactionSender {
         throw new TransactionIsNotCommittedYet()
       }
 
-      const receivingAddressInfo = await AddressesService.getNextUnusedAddressByWalletId(walletID)
+      const wallet = WalletService.getInstance().get(walletID)
+      const receivingAddressInfo = await wallet.getNextAddress()
+
       const receivingAddress = receivingAddressInfo!.address
       const prevOutput = cellWithStatus.cell!.output
       const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
@@ -488,9 +516,9 @@ export default class TransactionSender {
   }
 
   public getChangeAddress = async (): Promise<string> => {
-    const walletId = this.walletService.getCurrent()!.id
+    const wallet = this.walletService.getCurrent()
 
-    const unusedChangeAddress = await AddressService.getNextUnusedChangeAddressByWalletId(walletId)
+    const unusedChangeAddress = await wallet!.getNextChangeAddress()
 
     return unusedChangeAddress!.address
   }

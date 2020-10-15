@@ -28,6 +28,8 @@ import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
+import HardwareWalletService from 'services/hardware'
+import { ExtendedPublicKey } from 'services/hardware/common'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -99,7 +101,7 @@ export default class WalletsController {
       keystore,
     })
 
-    walletsService.generateAddressesById(wallet.id, isImporting)
+    wallet.checkAndGenerateAddresses(isImporting)
 
     return {
       status: ResponseCode.Success,
@@ -141,7 +143,7 @@ export default class WalletsController {
       keystore: keystoreObject,
     })
 
-    walletsService.generateAddressesById(wallet.id, true)
+    wallet.checkAndGenerateAddresses(true)
 
     return {
       status: ResponseCode.Success,
@@ -157,9 +159,12 @@ export default class WalletsController {
       throw new WalletNotFound(id)
     }
 
-    const props = {
+    const props: { name: string, keystore?: Keystore } = {
       name: name || wallet.name,
-      keystore: wallet.loadKeystore(),
+    }
+
+    if (!wallet.isHardware()) {
+      props.keystore = wallet.loadKeystore()
     }
 
     if (newPassword) {
@@ -196,6 +201,28 @@ export default class WalletsController {
     return this.backupWallet(id)
   }
 
+  public async importHardwareWallet (
+    { publicKey, chainCode, walletName }: ExtendedPublicKey & { walletName: string }
+  ): Promise<Controller.Response<Wallet>> {
+    const device = HardwareWalletService.getInstance().getCurrent()!
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(publicKey, chainCode)
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.create({
+      device: device.deviceInfo,
+      id: '',
+      name: walletName,
+      extendedKey: accountExtendedPublicKey.serialize(),
+      keystore: Keystore.createEmpty(),
+    })
+
+    wallet.checkAndGenerateAddresses(true)
+
+    return {
+      status: ResponseCode.Success,
+      result: wallet
+    }
+  }
+
   public async importXPubkey(): Promise<Controller.Response<Wallet>> {
     return dialog.showOpenDialog(
       BrowserWindow.getFocusedWindow()!,
@@ -220,7 +247,7 @@ export default class WalletsController {
             keystore: Keystore.createEmpty()
           })
 
-          walletsService.generateAddressesById(wallet.id, true)
+          wallet.checkAndGenerateAddresses(true)
           return {
             status: ResponseCode.Success,
             result: wallet
@@ -384,7 +411,15 @@ export default class WalletsController {
 
   // It would bypass verifying password window/event if wallet is watch only.
   public async requestPassword(walletID: string, action: 'delete-wallet' | 'backup-wallet'){
-    const keystore = WalletsService.getInstance().get(walletID).loadKeystore()
+    const wallet = WalletsService.getInstance().get(walletID)
+    if (wallet.isHardware()) {
+      if (action === 'delete-wallet') {
+        return this.deleteWallet(walletID)
+      }
+      return this.backupWallet(walletID)
+    }
+
+    const keystore = wallet.loadKeystore()
     if (keystore.isEmpty()) {
       // Watch only wallet imported with xpubkey
       if (action === 'delete-wallet') {

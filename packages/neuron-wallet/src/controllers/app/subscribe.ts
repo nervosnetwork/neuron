@@ -12,6 +12,8 @@ import AppUpdaterSubject from 'models/subjects/app-updater'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import { combineLatest } from 'rxjs';
+import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
+
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
   runCommand: (command: string, arg: any) => void
@@ -68,6 +70,10 @@ export const subscribe = (dispatcher: AppResponder) => {
       dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
     dispatcher.updateWindowTitle()
+  })
+
+  DeviceSignIndexSubject.subscribe(index => {
+    dispatcher.sendMessage('device-sign-index', index)
   })
 
   AppUpdaterSubject.subscribe(params => {

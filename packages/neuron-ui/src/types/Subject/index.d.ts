@@ -7,7 +7,7 @@ interface NeuronWalletSubject<T = any> {
 }
 
 declare namespace Command {
-  type Type = 'navigate-to-url' | 'delete-wallet' | 'backup-wallet'
+  type Type = 'navigate-to-url' | 'delete-wallet' | 'backup-wallet' | 'import-hardware'
   type Payload = string | null
 }
 
@@ -37,4 +37,5 @@ declare namespace Subject {
     releaseNotes: string
   }
   type URL = string
+  type SignIndex = number
 }

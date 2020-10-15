@@ -11,7 +11,7 @@ import { CapacityNotEnoughForChange } from "exceptions"
 import { MIN_CELL_CAPACITY } from 'services/cells'
 import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
-import AddressService from "./addresses"
+import WalletService from "./wallets"
 
 export default class AssetAccountService {
 
@@ -166,15 +166,17 @@ export default class AssetAccountService {
     }
 
     // 1. find next unused address
-    const addresses = await AddressService.getUnusedReceivingAddressesByWalletId(walletID)
+    const wallet = WalletService.getInstance().get(walletID)
+
+    const addresses = await wallet.getNextReceivingAddresses()
     const usedBlake160s = new Set(await this.blake160sOfAssetAccounts())
-    const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
+    const addrObj = !wallet.isHDWallet() ? addresses[0] : addresses.find(a => !usedBlake160s.has(a.blake160))!
 
     // 2. generate AssetAccount object
     const assetAccount = new AssetAccount(tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
     // 3. generate tx
-    const changeAddrObj = await AddressService.getNextUnusedChangeAddressByWalletId(walletID)
+    const changeAddrObj = await wallet.getNextChangeAddress()
     let tx: Transaction | undefined
     try {
       tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(

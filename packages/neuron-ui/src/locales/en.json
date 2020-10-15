@@ -28,6 +28,51 @@
         "block-synced": "Block Synced"
       }
     },
+    "import-hardware": {
+      "title": {
+        "select-model": "Please connect your device and select the model",
+        "detect-device": "Detecting device",
+        "name-wallet": "Name the wallet",
+        "choose-address": "Choose an address from the device"
+      },
+      "actions": {
+        "confirm": "Please comfirm on your device...",
+        "success": "Import Success!",
+        "next": "Next",
+        "cancel": "Cancel",
+        "back": "Back",
+        "rescan": "Rescan",
+        "close": "close"
+      },
+      "errors": {
+        "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
+        "device-not-found": "No device detected. Please connect your device.",
+        "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
+      },
+      "waiting": "Waiting for CKB app...",
+      "abort": "Waiting for CKB app... Action aborted.",
+      "app-version": "CKB App v{{version}} running.",
+      "firmware-version": "Firmware v{{version}} detected.",
+      "wallet-name": "Wallet Name",
+      "select-model": "Select Model"
+    },
+    "hardware-sign": {
+      "cancel": "Cancel",
+      "title": "Sign via hardware walllet",
+      "device": "Device:",
+      "status": {
+        "label": "Status:",
+        "connect": "Connected, waiting for user input...",
+        "disconnect": "Disconnected, please check your connection."
+      },
+      "inputs": "Inputs(signing {{index}} of {{length}})",
+      "outputs": "Outputs({{length}})",
+      "actions": {
+        "close": "Close",
+        "success": "Transaction Succesful!",
+        "rescan": "Rescan"
+      }
+    },
     "overview": {
       "date": "Date",
       "type": "Type",
@@ -61,6 +106,11 @@
       "import-mnemonic": "Import Wallet Seed",
       "import-keystore": "Import from Keystore",
       "import-wallet": "Import a Wallet",
+      "import-hardware-wallet": "Import Hardware Wallet",
+      "new-wallet": "New Wallet",
+      "wallet-seed": "Wallet Seed",
+      "keystore": "Keystore",
+      "hardware-wallet": "Hardware Wallet",
       "next": "Next",
       "back": "Back",
       "name": "Name",
@@ -407,7 +457,10 @@
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
         "307": "Please enter a testnet address",
-        "308": "Amount is not enough"
+        "308": "Amount is not enough",
+        "402": "CKB App does not open. Please open the CKB App on your device.",
+        "403": "No device detected. Please connect your device.",
+        "404": "Multiple device detected. Only one device of the same model can be connected."
       }
     },
     "sync": {

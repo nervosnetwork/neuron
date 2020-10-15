@@ -137,6 +137,26 @@ declare namespace State {
   interface WalletIdentity {
     readonly id: string
     readonly name: string
+    readonly device?: DeviceInfo
+    readonly isHD?: boolean
+  }
+
+  enum Manufacturer {
+    Ledger = 'Ledger',
+  }
+
+  interface DeviceInfo {
+    descriptor: string
+    vendorId: string
+    manufacturer: Manufacturer
+    product: string
+  }
+
+  interface DeviceInfo {
+    descriptor: string
+    vendorId: string
+    manufacturer: string
+    product: string
   }
 
   interface Address {

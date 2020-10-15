@@ -146,11 +146,13 @@ describe('queue', () => {
         }
       }
     });
-    jest.doMock('services/wallets', () => {
-      return {
-        checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
-      }
-    });
+    jest.doMock('services/wallets', () => ({
+      getInstance: () => ({
+        get: () => ({
+          checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
+        })
+      }),
+    }));
     jest.doMock('utils/logger', () => {
       return { error: stubbedLoggerErrorFn }
     });
@@ -234,7 +236,7 @@ describe('queue', () => {
             }
           });
           it('checks and generate new addresses', () => {
-            expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
+            expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledTimes(fakeTxs.length)
           });
           it('notify indexer connector of processed block number', () => {
             expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)

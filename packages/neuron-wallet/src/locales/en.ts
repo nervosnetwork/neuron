@@ -24,6 +24,7 @@ export default {
         'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
         'import-xpubkey': 'Import Extended Public Key',
+        "import-hardware": "Import Hardware Wallet"
       },
       edit: {
         label: 'Edit',
@@ -102,7 +103,10 @@ export default {
       'testnet-address-required': '{{address}} is not a testnet address.',
       'address-not-found': 'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
-      'acp-same-account': "The payment account and receive account shouldn't be the same."
+      'acp-same-account': "The payment account and receive account shouldn't be the same.",
+      "connect-device-failed": "The device cannot be connected, please check your connection.",
+      "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
+      "wallet-not-supported-function": "This wallet does not support {name} function."
     },
     messageBox: {
       button: {

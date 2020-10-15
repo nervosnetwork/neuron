@@ -65,6 +65,12 @@ export class InvalidKeystore extends Error {
   }
 }
 
+export class WalletFunctionNotSupported extends Error {
+  constructor(name: string) {
+    super(t('messages.wallet-not-supported-function', { name }))
+  }
+}
+
 export default {
   WalletNotFound,
   CurrentWalletNotSet,

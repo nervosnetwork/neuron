@@ -18,11 +18,14 @@ const Receive = () => {
     params: { address },
   } = useRouteMatch()
   const history = useHistory()
+  const isSingleAddress = addresses.length === 1
 
-  const accountAddress = useMemo(
-    () => (address || addresses.find(addr => addr.type === 0 && addr.txCount === 0)?.address) ?? '',
-    [address, addresses]
-  )
+  const accountAddress = useMemo(() => {
+    if (isSingleAddress) {
+      return addresses[0].address
+    }
+    return (address || addresses.find(addr => addr.type === 0 && addr.txCount === 0)?.address) ?? ''
+  }, [address, addresses, isSingleAddress])
 
   const onAddressBookClick = useCallback(() => {
     history.push(RoutePath.Addresses)
@@ -46,13 +49,15 @@ const Receive = () => {
           {accountAddress}
         </CopyZone>
       </div>
-      <p className={styles.notation}>{t('receive.prompt')}</p>
-      <Button
-        type="primary"
-        className={styles.addressBook}
-        label={t('receive.address-book')}
-        onClick={onAddressBookClick}
-      />
+      {isSingleAddress ? null : <p className={styles.notation}>{t('receive.prompt')}</p>}
+      {isSingleAddress ? null : (
+        <Button
+          type="primary"
+          className={styles.addressBook}
+          label={t('receive.address-book')}
+          onClick={onAddressBookClick}
+        />
+      )}
     </div>
   )
 }

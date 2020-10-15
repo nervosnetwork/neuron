@@ -8,6 +8,10 @@ import Spinner from 'widgets/Spinner'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import { createWallet, importMnemonic, generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
+import { ReactComponent as ImportHardwareIcon } from 'widgets/Icons/HardWalletImport.svg'
+import { ReactComponent as CreateWalletIcon } from 'widgets/Icons/SoftWalletCreate.svg'
+import { ReactComponent as ImportKeystoreIcon } from 'widgets/Icons/SoftWalletImportKeystore.svg'
+import { ReactComponent as ImportSeedIcon } from 'widgets/Icons/SoftWalletImportSeed.svg'
 
 import {
   generateWalletName,
@@ -18,7 +22,6 @@ import {
   isSuccessResponse,
   validatePasswordComplexity,
 } from 'utils'
-import { buttonGrommetIconStyles } from 'utils/icons'
 import i18n from 'utils/i18n'
 import styles from './walletWizard.module.scss'
 
@@ -99,6 +102,7 @@ const submissionInputs = [
 const Welcome = ({ rootPath = '/wizard', wallets = [] }: WizardElementProps) => {
   const [t] = useTranslation()
   const history = useHistory()
+  const match = useRouteMatch()
   useEffect(() => {
     if (wallets.length) {
       history.push(RoutePath.Overview)
@@ -112,37 +116,49 @@ const Welcome = ({ rootPath = '/wizard', wallets = [] }: WizardElementProps) => 
     [history]
   )
 
+  const importHardware = useCallback(() => {
+    history.push(`${match.url}/import-hardware`)
+  }, [match.url, history])
+
   return (
     <div className={styles.welcome}>
-      <img src={`${process.env.PUBLIC_URL}/icon.png`} width="120px" className={styles.logo} alt="logo" />
-      <span className={styles.slogan}>{t('wizard.welcome-to-nervos-neuron')}</span>
+      <div className={styles.banner}>
+        <img src={`${process.env.PUBLIC_URL}/icon.png`} width="120px" className={styles.logo} alt="logo" />
+        <span className={styles.slogan}>{t('wizard.welcome-to-nervos-neuron')}</span>
+      </div>
+      <hr />
       <div className={styles.actions}>
-        <Button
-          type="primary"
-          label={t('wizard.import-mnemonic')}
-          onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`)}
-        >
-          <>
-            <Icon iconName="Import" styles={buttonGrommetIconStyles} />
-            {t('wizard.import-mnemonic')}
-          </>
-        </Button>
-        <span>{t('common.or')}</span>
-        <Button type="primary" label={t('wizard.import-keystore')} onClick={next(RoutePath.ImportKeystore)}>
-          <>
-            <Icon iconName="Keystore" styles={buttonGrommetIconStyles} />
-            {t('wizard.import-keystore')}
-          </>
-        </Button>
-        <span>{t('common.or')}</span>
         <Button
           type="default"
           label={t('wizard.create-new-wallet')}
           onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`)}
         >
           <>
-            <Icon iconName="Create" styles={buttonGrommetIconStyles} />
+            <CreateWalletIcon />
             {t('wizard.create-new-wallet')}
+          </>
+        </Button>
+        <span>{t('common.or')}</span>
+        <Button
+          type="primary"
+          label={t('wizard.import-mnemonic')}
+          onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`)}
+        >
+          <>
+            <ImportSeedIcon />
+            {t('wizard.import-mnemonic')}
+          </>
+        </Button>
+        <Button type="primary" label={t('wizard.import-keystore')} onClick={next(RoutePath.ImportKeystore)}>
+          <>
+            <ImportKeystoreIcon />
+            {t('wizard.import-keystore')}
+          </>
+        </Button>
+        <Button type="primary" label={t('wizard.import-hardware-wallet')} onClick={importHardware}>
+          <>
+            <ImportHardwareIcon css="color: white" />
+            {t('wizard.import-hardware-wallet')}
           </>
         </Button>
       </div>

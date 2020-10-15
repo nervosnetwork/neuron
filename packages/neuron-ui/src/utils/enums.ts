@@ -29,6 +29,7 @@ export enum RoutePath {
   SUDTAccountList = '/s-udt/accounts',
   SUDTSend = '/s-udt/send',
   SUDTReceive = '/s-udt/receive',
+  ImportHardware = '/*/import-hardware',
 }
 
 export enum CapacityUnit {
@@ -93,6 +94,15 @@ export enum ErrorCode {
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
+  // hardware
+  SignTransactionFailed = 400,
+  ConnectFailed = 401,
+  CkbAppNotFound = 402,
+  DeviceNotFound = 403,
+  MultiDevice = 404,
+  UnknownError = 405,
+  SignMessageFailed = 406,
+  UnsupportedManufacturer = 407,
 }
 
 export enum SyncStatus {

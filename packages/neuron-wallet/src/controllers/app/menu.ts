@@ -25,6 +25,7 @@ enum URL {
   CreateWallet = '/wizard/mnemonic/create',
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
+  ImportHardware = '/import-hardware'
 }
 
 enum ExternalURL {
@@ -78,6 +79,13 @@ const navigateTo = (url: string) => {
   }
 }
 
+const importHardware = (url: string) => {
+  const window = BrowserWindow.getFocusedWindow()
+  if (window) {
+    CommandSubject.next({ winID: window.id, type: 'import-hardware', payload: url, dispatchToUI: true })
+  }
+}
+
 const showSettings$ = new Subject()
 
 showSettings$.pipe(throttleTime(1000)).subscribe(() => {
@@ -97,12 +105,15 @@ const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup
 
 const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   const isMac = process.platform === 'darwin'
-  let isMainWindow = mainWindow == BrowserWindow.getFocusedWindow()
+  const currentWindow = BrowserWindow.getFocusedWindow()
+  let isMainWindow = mainWindow === currentWindow
 
   const walletsService = WalletsService.getInstance()
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
+  const isHardwareWallet = currentWallet?.isHardware() ?? false
+
 
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
@@ -185,6 +196,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
                 CommandSubject.next({ winID: window.id, type: 'import-xpubkey', payload: null, dispatchToUI: false })
               }
             }
+          },
+          {
+            id: 'import-with-hardware',
+            label: t('application-menu.wallet.import-hardware'),
+            click: () => {
+              importHardware(URL.ImportHardware)
+            }
           }
         ],
       },
@@ -192,7 +210,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'backup',
         label: t('application-menu.wallet.backup'),
-        enabled: hasCurrentWallet,
+        enabled: hasCurrentWallet && !isHardwareWallet,
         click: () => {
           if (!currentWallet) {
             return
@@ -203,7 +221,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'export-xpubkey',
         label: t('application-menu.wallet.export-xpubkey'),
-        enabled: hasCurrentWallet,
+        enabled: hasCurrentWallet && !isHardwareWallet,
         click: () => {
           if (!currentWallet) {
             return
