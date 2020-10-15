@@ -3,7 +3,7 @@ import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
 import { AddressType } from '../../src/models/keys/address'
-import { Manufacturer } from '../../src/services/hardware'
+import { Manufacturer } from '../../src/services/hardware/common'
 
 const stubbedDeletedByWalletIdFn = jest.fn()
 const stubbedGenerateAndSaveForExtendedKeyFn = jest.fn()
