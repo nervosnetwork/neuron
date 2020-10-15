@@ -14,6 +14,7 @@ import AssetAccount from './entities/asset-account'
 import SudtTokenInfo from './entities/sudt-token-info'
 import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import TxDescription from './entities/tx-description'
+import AddressDescription from './entities/address-description'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -37,6 +38,8 @@ import { RemoveLiveCell1592781363749 } from './migrations/1592781363749-RemoveLi
 import { AddIndexerTxHashCache1592727615004 } from './migrations/1592727615004-AddIndexerTxHashCache'
 import { HDPublicKeyInfo1598087517643 } from './migrations/1598087517643-HDPublicKeyInfo'
 import { TxDescription1599441769473 } from './migrations/1599441769473-TxDescription'
+import { RemoveKeyInfoAddress1601447406035 } from './migrations/1601447406035-RemoveKeyInfoAddress'
+import { AddAddressDescription1602543179168 } from './migrations/1602543179168-AddAddressDescription'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -65,7 +68,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       SyncInfo,
       AssetAccount,
       SudtTokenInfo,
-      IndexerTxHashCache
+      IndexerTxHashCache,
+      AddressDescription,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -90,6 +94,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddIndexerTxHashCache1592727615004,
       HDPublicKeyInfo1598087517643,
       TxDescription1599441769473,
+      RemoveKeyInfoAddress1601447406035,
+      AddAddressDescription1602543179168,
     ],
     logger: 'simple-console',
     logging,

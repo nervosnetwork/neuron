@@ -24,6 +24,7 @@ let syncTask: SyncTask | null
 let network: Network | null
 
 const resetSyncTaskQueue = queue(async ({startTask, clearIndexerFolder}) => {
+  await WalletService.getInstance().generateAddressesIfNecessary()
   await killBlockSyncTask()
   if (startTask) {
     await createBlockSyncTask(clearIndexerFolder)
@@ -116,9 +117,6 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
   })
 
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
-    await WalletService.getInstance().generateAddressesIfNecessary()
-
-    // re init txCount in addresses if switch network
     syncTask!.start(
       network.remote,
       network.genesisHash,

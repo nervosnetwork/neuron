@@ -1,7 +1,26 @@
-import WalletService, { WalletProperties } from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
 import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
+import { when } from 'jest-when'
+
+const stubbedGetAddressesByWalletId = jest.fn()
+const stubbedCheckAndGenerateSave = jest.fn()
+const stubbedDeleteByWalletId = jest.fn()
+
+jest.doMock('../../src/services/addresses', () => {
+  return {
+    getAddressesByWalletId: stubbedGetAddressesByWalletId,
+    checkAndGenerateSave: stubbedCheckAndGenerateSave,
+    deleteByWalletId: stubbedDeleteByWalletId
+  }
+});
+import WalletService, { WalletProperties } from '../../src/services/wallets'
+
+const resetMocks = () => {
+  stubbedGetAddressesByWalletId.mockReset()
+  stubbedCheckAndGenerateSave.mockReset()
+  stubbedDeleteByWalletId.mockReset()
+}
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -21,6 +40,8 @@ describe('wallet service', () => {
   beforeEach(async () => {
     const connection = getConnection()
     await connection.synchronize(true)
+
+    resetMocks()
 
     walletService = new WalletService()
     wallet1 = {
@@ -157,6 +178,7 @@ describe('wallet service', () => {
       expect(walletService.getAll().length).toBe(2)
       await walletService.delete(w1.id)
       expect(() => walletService.get(w1.id)).toThrowError()
+      expect(stubbedDeleteByWalletId).toHaveBeenCalledWith(w1.id)
     })
 
     describe('with more than one wallets', () => {
@@ -184,6 +206,45 @@ describe('wallet service', () => {
         })
       });
 
+    });
+  });
+
+  describe('#generateAddressesIfNecessary', () => {
+    let createdWallet1: any
+    let createdWallet2: any
+    let createdWallet3: any
+    beforeEach(async () => {
+      createdWallet1 = walletService.create(wallet1)
+      createdWallet2 = walletService.create(wallet2)
+      createdWallet3 = walletService.create(wallet3)
+
+      when(stubbedGetAddressesByWalletId)
+        .calledWith(createdWallet1.id).mockResolvedValue({length: 1})
+        .calledWith(createdWallet2.id).mockResolvedValue({length: 0})
+        .calledWith(createdWallet3.id).mockResolvedValue({length: 0})
+
+      await walletService.generateAddressesIfNecessary()
+    });
+    it('should not generate addresses for wallets already having addresses', () => {
+      expect(stubbedCheckAndGenerateSave).not.toHaveBeenCalledWith(createdWallet1.id)
+    })
+    it('generates addresses for wallets not having addresses', () => {
+      expect(stubbedCheckAndGenerateSave).toHaveBeenCalledWith(
+        createdWallet2.id,
+        expect.objectContaining({publicKey: ''}),
+        false,
+        20,
+        10,
+        false
+      )
+      expect(stubbedCheckAndGenerateSave).toHaveBeenCalledWith(
+        createdWallet3.id,
+        expect.objectContaining({publicKey: ''}),
+        false,
+        20,
+        10,
+        false
+      )
     });
   });
 })
