@@ -97,7 +97,7 @@ export default class Ledger extends Hardware {
   public static async findDevices () {
     const devices = await Promise.all([
       Ledger.searchDevices(HID.listen, false),
-      // Ledger.searchDevices(Bluetooth.listen, true)
+      Ledger.searchDevices(Bluetooth.listen, true)
     ])
 
     return devices.flat()
