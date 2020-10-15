@@ -13,15 +13,21 @@ const stubbedGetNextUnusedChangeAddressByWalletIdFn = jest.fn()
 const stubbedGetUnusedReceivingAddressesByWalletIdFn = jest.fn()
 const stubbedGetFirstAddressByWalletIdFn = jest.fn()
 
+const stubbedGetAddressesByWalletId = jest.fn()
+const stubbedCheckAndGenerateSave = jest.fn()
+const stubbedDeleteByWalletId = jest.fn()
+
 jest.doMock('../../src/services/addresses', () => {
   return {
-    deleteByWalletId: stubbedDeletedByWalletIdFn,
+    deleteByWalletId: stubbedDeleteByWalletId,
     generateAndSaveForExtendedKey: stubbedGenerateAndSaveForExtendedKeyFn,
     generateAndSaveForPublicKey: stubbedGenerateAndSaveForPublicKeyFn,
     getNextUnusedAddressByWalletId: stubbedGetNextUnusedAddressByWalletIdFn,
     getNextUnusedChangeAddressByWalletId: stubbedGetNextUnusedChangeAddressByWalletIdFn,
     getUnusedReceivingAddressesByWalletId: stubbedGetUnusedReceivingAddressesByWalletIdFn,
     getFirstAddressByWalletId: stubbedGetFirstAddressByWalletIdFn,
+    getAddressesByWalletId: stubbedGetAddressesByWalletId,
+    checkAndGenerateSave: stubbedCheckAndGenerateSave,
   }
 });
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
@@ -357,8 +363,8 @@ describe('wallet service', () => {
       expect(walletService.getAll().length).toBe(2)
       await walletService.delete(w1.id)
       expect(() => walletService.get(w1.id)).toThrowError()
-      expect(stubbedDeletedByWalletIdFn).toHaveBeenCalledWith(w1.id)
-      expect(stubbedDeletedByWalletIdFn).toHaveBeenCalledTimes(1)
+      expect(stubbedDeleteByWalletId).toHaveBeenCalledWith(w1.id)
+      expect(stubbedDeleteByWalletId).toHaveBeenCalledTimes(1)
     })
 
     describe('with more than one wallets', () => {
@@ -386,45 +392,6 @@ describe('wallet service', () => {
         })
       });
 
-    });
-  });
-
-  describe('#generateAddressesIfNecessary', () => {
-    let createdWallet1: any
-    let createdWallet2: any
-    let createdWallet3: any
-    beforeEach(async () => {
-      createdWallet1 = walletService.create(wallet1)
-      createdWallet2 = walletService.create(wallet2)
-      createdWallet3 = walletService.create(wallet3)
-
-      when(stubbedGetAddressesByWalletId)
-        .calledWith(createdWallet1.id).mockResolvedValue({length: 1})
-        .calledWith(createdWallet2.id).mockResolvedValue({length: 0})
-        .calledWith(createdWallet3.id).mockResolvedValue({length: 0})
-
-      await walletService.generateAddressesIfNecessary()
-    });
-    it('should not generate addresses for wallets already having addresses', () => {
-      expect(stubbedCheckAndGenerateSave).not.toHaveBeenCalledWith(createdWallet1.id)
-    })
-    it('generates addresses for wallets not having addresses', () => {
-      expect(stubbedCheckAndGenerateSave).toHaveBeenCalledWith(
-        createdWallet2.id,
-        expect.objectContaining({publicKey: ''}),
-        false,
-        20,
-        10,
-        false
-      )
-      expect(stubbedCheckAndGenerateSave).toHaveBeenCalledWith(
-        createdWallet3.id,
-        expect.objectContaining({publicKey: ''}),
-        false,
-        20,
-        10,
-        false
-      )
     });
   });
 })

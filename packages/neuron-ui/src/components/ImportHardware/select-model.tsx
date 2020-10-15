@@ -27,7 +27,7 @@ const supportedHardwareModels = [
 
 const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationState>) => {
   const [t] = useTranslation()
-  const [model, setModel] = useState<Model>(supportedHardwareModels[0] as any)
+  const [model, setModel] = useState<Model>()
 
   const onBack = useCallback(() => {
     history.push(match.url.replace(RoutePath.ImportHardware, ''))
@@ -37,7 +37,7 @@ const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationSta
     history.push({
       pathname: match.url + RoutePath.DetectDevice,
       state: {
-        model,
+        model: model!,
         entryPath: match.url,
       },
     })

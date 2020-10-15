@@ -343,24 +343,6 @@ export default class WalletService {
     }
   }
 
-  public generateAddressesById = async (
-    id: string,
-    isImporting: boolean,
-    receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change,
-    notifyAddressCreated: boolean = true
-  ) => {
-    const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
-    await AddressService.checkAndGenerateSave(
-      id,
-      accountExtendedPublicKey,
-      isImporting,
-      receivingAddressCount,
-      changeAddressCount,
-      notifyAddressCreated
-    )
-  }
-
   public create = (props: WalletProperties) => {
     if (!props) {
       throw new IsRequired('wallet property')

@@ -183,7 +183,6 @@ export default class AddressService {
 
     const publicKeyInfo = HdPublicKeyInfo.fromObject({
       walletId,
-      address,
       addressType,
       addressIndex,
       publicKeyInBlake160: publicKeyHash

@@ -607,14 +607,14 @@ describe('integration tests for AddressService', () => {
 
       describe('when saved description', () => {
         beforeEach(async () => {
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId1,
             extendedKey,
             isImporting,
             receivingAddressCount,
             changeAddressCount
           )
-          await AddressService.checkAndGenerateSave(
+          await AddressService.generateAndSaveForExtendedKey(
             walletId2,
             extendedKey,
             isImporting,

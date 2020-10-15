@@ -22,7 +22,7 @@ export default class Ledger extends Hardware {
       return
     }
 
-    logger.info("Connect device:\t", deviceInfo)
+    logger.info("Connect device:\t", deviceInfo ?? this.deviceInfo)
 
     this.deviceInfo = deviceInfo ?? this.deviceInfo
     this.transport = this.deviceInfo.isBluetooth
@@ -93,7 +93,7 @@ export default class Ledger extends Hardware {
   public static async findDevices () {
     const devices = await Promise.all([
       Ledger.searchDevices(HID.listen, false),
-      // Ledger.searchDevices(Bluetooth.listen, true)
+      Ledger.searchDevices(Bluetooth.listen, true)
     ])
 
     return devices.flat()
