@@ -162,7 +162,7 @@ const HardwareSign = ({
       }
       setStatus(userInputStatus)
       const type = actionType || offlineSignActionType
-      const tx = offlineSignJSON?.transaction ?? generatedTx
+      const tx = offlineSignJSON?.transaction || generatedTx
       // eslint-disable-next-line camelcase
       const assetAccount = offlineSignJSON?.asset_account ?? experimental?.assetAccount
       if (offlineSignJSON !== undefined) {
@@ -200,7 +200,7 @@ const HardwareSign = ({
           const params: Controller.SendCreateSUDTAccountTransaction.Params = {
             walletID: wallet.id,
             assetAccount,
-            tx: tx ?? experimental?.tx,
+            tx: tx || experimental?.tx,
           }
           sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
@@ -215,7 +215,7 @@ const HardwareSign = ({
         case 'send-sudt': {
           const params: Controller.SendSUDTTransaction.Params = {
             walletID: wallet.id,
-            tx: tx ?? experimental?.tx,
+            tx: tx || experimental?.tx,
           }
           sendSUDTTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
