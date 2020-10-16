@@ -7,7 +7,7 @@ import Spinner from 'widgets/Spinner'
 import { addNotification, useDispatch, useState as useGlobalState } from 'states'
 import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
-import SignDialog from './sign-dialog'
+import OfflineSignDialog from '../OfflineSignDialog'
 
 import styles from './offlineSign.module.scss'
 
@@ -101,7 +101,9 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
   }, [])
 
   if (isSigning && wallet) {
-    return <SignDialog isBroadcast={false} wallet={wallet} offlineSignJSON={json} onDismiss={signDialogOnDismiss} />
+    return (
+      <OfflineSignDialog isBroadcast={false} wallet={wallet} offlineSignJSON={json} onDismiss={signDialogOnDismiss} />
+    )
   }
 
   return (

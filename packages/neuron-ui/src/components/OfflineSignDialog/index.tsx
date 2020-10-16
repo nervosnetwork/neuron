@@ -26,7 +26,7 @@ interface SignDialogProps {
   onDismiss: () => void
 }
 
-const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDialogProps) => {
+const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDialogProps) => {
   const {
     app: {
       send: { description },
@@ -235,5 +235,6 @@ const SignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDia
   )
 }
 
-SignDialog.displayName = 'SignDialog'
-export default SignDialog
+OfflineSignDialog.displayName = 'SoftWalletOfflineSign'
+
+export default OfflineSignDialog
