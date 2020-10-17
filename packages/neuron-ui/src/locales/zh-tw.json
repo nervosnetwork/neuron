@@ -57,13 +57,34 @@
       "device": "設備",
       "status": {
         "label": "狀態：",
-        "connect": "已連接，等待確認...",
+        "connect": "已連接",
+        "user-input": "已連接，等待確認...",
         "disconnect": "未連接，請檢查設備連接。"
       },
       "actions": {
         "close": "关闭",
         "success": "交易成功",
         "rescan": "再次檢測"
+      }
+    },
+    "offline-sign": {
+      "title": "離線簽名",
+      "json-file": "JSON 檔案：",
+      "status": {
+        "label": "狀態：",
+        "unsigned": "未簽名",
+        "partially-signed": "部分簽名",
+        "signed": "已簽名"
+      },
+      "wallet": "錢包：",
+      "content": "內容：",
+      "export": "導出交易",
+      "sign-and-export": "簽名並導出交易",
+      "sign-and-broadcast": "簽名並廣播交易",
+      "actions": {
+        "broadcast": "廣播交易",
+        "sign": "簽名並導出",
+        "cancel": "取消"
       }
     },
     "overview": {

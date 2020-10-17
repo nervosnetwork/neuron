@@ -391,7 +391,6 @@ describe('wallet service', () => {
           expect(activeWallet && activeWallet.id).toEqual(w1.id)
         })
       });
-
     });
   });
 })

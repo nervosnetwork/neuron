@@ -36,6 +36,7 @@ export default {
       tools: {
         label: "Tools",
         "sign-and-verify": "Sign/Verify Message",
+        'offline-sign': 'Offline sign',
       },
       window: {
         label: 'Window',
@@ -106,7 +107,10 @@ export default {
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
       "connect-device-failed": "The device cannot be connected, please check your connection.",
       "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
-      "wallet-not-supported-function": "This wallet does not support {name} function."
+      "wallet-not-supported-function": "This wallet does not support {name} function.",
+      "invalid-transaction-file": "Invalid transaction file.",
+      "save-offline-json-failed": "Unable to save JSON file.",
+      "offline-sign-failed": "Signing failed, please check if you are signing with the correct wallet.",
     },
     messageBox: {
       button: {
@@ -191,6 +195,11 @@ export default {
         "send": "Send",
         "receive": "Receive"
       }
+    },
+    'offline-signature': {
+      'export-transaction': 'Export Transaction as JSON',
+      'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
+      'load-transaction': 'Load Transaction file',
     }
   },
 }

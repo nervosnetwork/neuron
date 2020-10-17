@@ -36,6 +36,7 @@ export default {
       tools: {
         label: "工具",
         "sign-and-verify": "签名/验签信息",
+        'offline-sign': '离线签名',
       },
       window: {
         label: '窗口',
@@ -104,6 +105,8 @@ export default {
       'target-output-not-found': "无法找到与指定地址关联的账户钱包。",
       'acp-same-account': "请设置与转出账户不同的收款账户。",
       "connect-device-failed": "设备无法连接，请检查设备连接状况。",
+      "save-offline-json-failed": "无法保存 JSON 文件。",
+      "offline-sign-failed": "签名失败，请检查是否使用了正确的钱包进行签名。",
     },
     messageBox: {
       button: {
@@ -188,6 +191,11 @@ export default {
         "send": "转账",
         "receive": "收款"
       }
+    },
+    'offline-signature': {
+      'export-transaction': '导出交易为 JSON 文件',
+      'transaction-exported': '交易已被导出至 {{filePath}}.',
+      'load-transaction': '加载交易文件',
     }
   },
 }

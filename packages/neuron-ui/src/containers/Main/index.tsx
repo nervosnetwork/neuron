@@ -20,6 +20,7 @@ import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
 import SUDTReceive from 'components/SUDTReceive'
 import ImportHardware from 'components/ImportHardware'
+import OfflineSign from 'components/OfflineSign'
 
 import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
 
@@ -92,7 +93,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `NervosDAO`,
     path: RoutePath.NervosDAO,
-    exact: true,
+    exact: false,
     component: NervosDAO,
   },
   {
@@ -104,7 +105,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `SUDTAccountList`,
     path: RoutePath.SUDTAccountList,
-    exact: true,
+    exact: false,
     component: SUDTAccountList,
   },
   {
@@ -125,6 +126,12 @@ export const mainContents: CustomRouter.Route[] = [
     path: RoutePath.ImportHardware,
     exact: false,
     component: ImportHardware,
+  },
+  {
+    name: `OfflineSign`,
+    path: RoutePath.OfflineSign,
+    exact: false,
+    component: OfflineSign,
   },
 ]
 

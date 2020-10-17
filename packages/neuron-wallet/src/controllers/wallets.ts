@@ -335,7 +335,7 @@ export default class WalletsController {
     }
   }
 
-  public async sendTx(params: { walletID: string, tx: Transaction, password: string, description?: string }) {
+  public async sendTx(params: { walletID: string, tx: Transaction, password: string, description?: string }, skipSign = false) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -343,7 +343,9 @@ export default class WalletsController {
     const hash = await new TransactionSender().sendTx(
       params.walletID,
       Transaction.fromObject(params.tx),
-      params.password
+      params.password,
+      0,
+      skipSign
     )
     const description = params.description ?? ''
     if (description !== '') {

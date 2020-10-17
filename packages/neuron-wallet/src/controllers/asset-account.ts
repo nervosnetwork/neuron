@@ -109,10 +109,10 @@ export default class AssetAccountController {
     }
   }
 
-  public async sendCreateTx(params: SendCreateAssetAccountTxParams): Promise<Controller.Response<string>> {
+  public async sendCreateTx(params: SendCreateAssetAccountTxParams, skipSign = false): Promise<Controller.Response<string>> {
     const tx = Transaction.fromObject(params.tx)
     const assetAccount = AssetAccount.fromObject(params.assetAccount)
-    const txHash = await AssetAccountService.sendTx(params.walletID, assetAccount, tx, params.password)
+    const txHash = await AssetAccountService.sendTx(params.walletID, assetAccount, tx, params.password, skipSign)
 
     if (!txHash) {
       throw new ServiceHasNoResponse('AssetAccount')

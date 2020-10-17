@@ -62,7 +62,8 @@
       "device": "Device:",
       "status": {
         "label": "Status:",
-        "connect": "Connected, waiting for user input...",
+        "connect": "Connected, ready for signing.",
+        "user-input": "Connected, waiting for user input...",
         "disconnect": "Disconnected, please check your connection."
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
@@ -71,6 +72,26 @@
         "close": "Close",
         "success": "Transaction Succesful!",
         "rescan": "Rescan"
+      }
+    },
+    "offline-sign": {
+      "title": "Offline Sign",
+      "json-file": "JSON file:",
+      "status": {
+        "label": "Status:",
+        "unsigned": "Unsigned",
+        "partially-signed": "Partially Signed",
+        "signed": "Signed"
+      },
+      "wallet": "Wallet:",
+      "content": "Content:",
+      "export": "Export Tx",
+      "sign-and-export": "Sign and export",
+      "sign-and-broadcast": "Sign and broadcast",
+      "actions": {
+        "broadcast": "Broadcast",
+        "sign": "Sign and export",
+        "cancel": "Cancel"
       }
     },
     "overview": {

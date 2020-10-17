@@ -290,7 +290,7 @@ export default class AssetAccountService {
     return assetAccounts.map(aa => aa.blake160)
   }
 
-  public static async sendTx(walletID: string, assetAccount: AssetAccount, tx: Transaction, password: string): Promise<string> {
+  public static async sendTx(walletID: string, assetAccount: AssetAccount, tx: Transaction, password: string, skipSign = false): Promise<string> {
     // 1. check AssetAccount exists
     const connection = getConnection()
     const exists = await connection
@@ -305,7 +305,7 @@ export default class AssetAccountService {
     }
 
     // 2. send tx
-    const txHash = await new TransactionSender().sendTx(walletID, tx, password)
+    const txHash = await new TransactionSender().sendTx(walletID, tx, password, 0, skipSign)
 
     // 3. save asset account
     const entity = AssetAccountEntity.fromModel(assetAccount)

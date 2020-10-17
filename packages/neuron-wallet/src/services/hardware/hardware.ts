@@ -20,7 +20,7 @@ export abstract class Hardware {
   }
 
   // @TODO: After multi-signature feature is complete, refactor this function into `TransactionSender#sign`.
-  public async signTx (walletID: string, tx: Transaction, txHash: string, skipLastInputs: number = 0) {
+  public async signTx (walletID: string, tx: Transaction, txHash: string, skipLastInputs: number = 0, context?: RPC.RawTransaction[]) {
     const wallet = WalletService.getInstance().get(walletID)
     const addressInfos = await AddressService.getAddressesByWalletId(walletID)
     const witnessSigningEntries = tx.inputs.slice(0, tx.inputs.length - skipLastInputs).map((input, index) => {
@@ -76,14 +76,14 @@ export abstract class Hardware {
         const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
         const serializedMultiSign: string = new MultiSign().serialize(blake160)
         const witnesses = await TransactionSender.signSingleMultiSignScript(path, serializedWitnesses, txHash, serializedMultiSign, wallet)
-        const signture = await this.signTransaction(
+        const signature = await this.signTransaction(
           walletID,
           tx,
           witnesses.map(w => typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())),
           path
         )
         const wit = witnesses[0] as WitnessArgs
-        wit.lock = serializedMultiSign + signture
+        wit.lock = serializedMultiSign + signature
         witnesses[0] = serializeWitnessArgs(wit.toSDK())
         witnessesArgs[index].witness = witnesses[0]
         for (let i = 0; i < witnessesArgs.length; ++i) {
@@ -97,7 +97,7 @@ export abstract class Hardware {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-        const signture = await this.signTransaction(walletID, tx, serializedWitnesses, path)
+        const signture = await this.signTransaction(walletID, tx, serializedWitnesses, path, context)
         const witnessEntry = witnessSigningEntries.find(w => w.lockHash === lockHash)!
         witnessEntry.witness = serializeWitnessArgs({
           lock: '0x' + signture,
@@ -117,9 +117,15 @@ export abstract class Hardware {
   public abstract connect(hardwareInfo?: DeviceInfo): Promise<void>
   public abstract signMessage(path: string, messageHex: string): Promise<string>
   public abstract disconnect(): Promise<void>
-  public abstract signTransaction(walletID: string, tx: Transaction, witnesses: string[], path: string): Promise<string>
   public abstract getAppVersion(): Promise<string>
   public abstract getFirmwareVersion?(): Promise<string>
+  public abstract signTransaction(
+    walletID: string,
+    tx: Transaction,
+    witnesses: string[],
+    path: string,
+    context?: RPC.RawTransaction[]
+  ): Promise<string>
 }
 
 export type HardwareClass = new (device: DeviceInfo) => Hardware

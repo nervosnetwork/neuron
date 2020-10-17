@@ -16,16 +16,19 @@ import UpdateController from 'controllers/update'
 import ExportDebugController from 'controllers/export-debug'
 import { showWindow } from 'controllers/app/show-window'
 import WalletsService from 'services/wallets'
+import OfflineSignService from 'services/offline-sign'
 import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
+import { OfflineSignJSON } from 'models/offline-sign'
 
 enum URL {
   Settings = '/settings/general',
   CreateWallet = '/wizard/mnemonic/create',
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
-  ImportHardware = '/import-hardware'
+  ImportHardware = '/import-hardware',
+  OfflineSign = '/offline-sign'
 }
 
 enum ExternalURL {
@@ -83,6 +86,14 @@ const importHardware = (url: string) => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
     CommandSubject.next({ winID: window.id, type: 'import-hardware', payload: url, dispatchToUI: true })
+  }
+}
+
+const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) => {
+  const window = BrowserWindow.getFocusedWindow()
+  if (window) {
+    const payload = JSON.stringify({url, json, filePath})
+    CommandSubject.next({ winID: window.id, type: 'load-transaction-json', payload, dispatchToUI: true })
   }
 }
 
@@ -283,7 +294,19 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             width: 900,
           })
         }
-      }
+      },
+      {
+        label: t('application-menu.tools.offline-sign'),
+        enabled: hasCurrentWallet,
+        click: async () => {
+          const result = await OfflineSignService.loadTransactionJSON()
+          if (!result) {
+            return
+          }
+          const { json, filePath } = result
+          loadTransaction(URL.OfflineSign, json, filePath)
+        }
+      },
     ]
   }
 

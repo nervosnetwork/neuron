@@ -45,9 +45,15 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
-    const tx = await this.sign(walletID, transaction, password, skipLastInputs)
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0, skipSign = false) {
+    const tx = skipSign
+      ? Transaction.fromObject(transaction)
+      : await this.sign(walletID, transaction, password, skipLastInputs)
 
+    return this.broadcastTx(walletID, tx)
+  }
+
+  public async broadcastTx (walletID: string = '', tx: Transaction) {
     const { ckb } = NodeService.getInstance()
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
@@ -59,7 +65,7 @@ export default class TransactionSender {
     return txHash
   }
 
-  private async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
+  public async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0, context?: RPC.RawTransaction[]) {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
@@ -73,7 +79,7 @@ export default class TransactionSender {
         await device.connect()
       }
       try {
-        return await device.signTx(walletID, tx, txHash, skipLastInputs)
+        return await device.signTx(walletID, tx, txHash, skipLastInputs, context)
       } catch (err) {
         throw new SignTransactionFailed(err.message)
       }
