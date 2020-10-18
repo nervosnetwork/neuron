@@ -7,7 +7,7 @@ export const getSyncLeftTime = (estimate: number | undefined) => {
     const time = estimate / MILLISECS_PER_HOUR
     const hrs = Math.floor(time)
     const mins = Math.round((time - hrs) * MINS_PER_HOUR)
-    leftTime = `${hrs}:${mins}`
+    leftTime = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
   }
   return leftTime
 }
