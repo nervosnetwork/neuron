@@ -1,18 +1,18 @@
 import type Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import Address from 'models/keys/address'
 import AddressService from 'services/addresses'
 import TransactionSender from 'services/transaction-sender'
 import MultiSign from 'models/multi-sign'
 import WalletService from 'services/wallets'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 import type { DeviceInfo, ExtendedPublicKey } from './common'
+import { AccountExtendedPublicKey } from 'models/keys/key'
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
   public isConnected: boolean
-  protected firstReceiveAddress = Address.pathForReceiving(0)
+  protected defaultAddress = AccountExtendedPublicKey.ckbAccountPath
 
   constructor(device: DeviceInfo) {
     this.deviceInfo = device

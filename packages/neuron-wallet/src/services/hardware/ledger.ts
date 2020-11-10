@@ -9,7 +9,7 @@ import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from 'models/chain/transaction'
 import NodeService from 'services/node'
-import { AddressType } from 'models/keys/address'
+import Address, { AddressType } from 'models/keys/address'
 import HexUtils from 'utils/hex'
 import logger from 'utils/logger'
 
@@ -46,7 +46,7 @@ export default class Ledger extends Hardware {
   }
 
   public async getExtendedPublicKey (): Promise<ExtendedPublicKey> {
-    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.firstReceiveAddress)
+    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.defaultAddress)
     return {
       publicKey: public_key,
       chainCode: chain_code
@@ -63,11 +63,11 @@ export default class Ledger extends Hardware {
     }
 
     const signature = await this.ledgerCKB!.signTransaction(
-      path,
+      path === Address.pathForReceiving(0) ? this.defaultAddress : path,
       rawTx,
       witnesses,
       context,
-      this.firstReceiveAddress,
+      this.defaultAddress,
     )
 
     return signature
