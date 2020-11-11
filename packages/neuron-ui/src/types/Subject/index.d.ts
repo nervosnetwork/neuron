@@ -7,7 +7,13 @@ interface NeuronWalletSubject<T = any> {
 }
 
 declare namespace Command {
-  type Type = 'navigate-to-url' | 'delete-wallet' | 'backup-wallet' | 'import-hardware' | 'load-transaction-json'
+  type Type =
+    | 'navigate-to-url'
+    | 'delete-wallet'
+    | 'backup-wallet'
+    | 'import-hardware'
+    | 'load-transaction-json'
+    | 'migrate-acp'
   type Payload = string | null
 }
 

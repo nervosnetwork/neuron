@@ -100,6 +100,7 @@ type Action =
   | 'generate-send-all-to-anyone-can-pay-tx'
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
+  | 'migrate-acp'
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'

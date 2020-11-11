@@ -229,6 +229,16 @@ export const useSubscription = ({
             })
             break
           }
+          case 'migrate-acp': {
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: payload || '',
+                actionType: 'migrate-acp',
+              },
+            })
+            break
+          }
           case 'load-transaction-json': {
             if (payload) {
               const { url, json, filePath } = JSON.parse(payload)
