@@ -107,9 +107,7 @@ const HardwareSign = ({
     }
     dispatch({
       type: AppActions.UpdateLoadedTransaction,
-      payload: {
-        json: res.result!,
-      },
+      payload: res.result!,
     })
     onCancel()
   }, [offlineSignJSON, dispatch, onCancel, t, wallet.id])
@@ -135,9 +133,7 @@ const HardwareSign = ({
     }
     dispatch({
       type: AppActions.UpdateLoadedTransaction,
-      payload: {
-        json: res.result!,
-      },
+      payload: res.result!,
     })
     onCancel()
   }, [

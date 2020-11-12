@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import { ResponseCode } from 'utils/const'
@@ -14,7 +15,7 @@ import { OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
 export default class OfflineSignController {
   public async exportTransactionAsJSON ({ transaction, type, status, asset_account, description, context }: OfflineSignJSON) {
     const { canceled, filePath } = await dialog.showSaveDialog({
-      title: t('offline-signature.export-transaction-as-json'),
+      title: t('offline-signature.export-transaction'),
       defaultPath: `transaction_${Date.now()}.json`
     })
 
@@ -51,7 +52,10 @@ export default class OfflineSignController {
 
     return {
       status: ResponseCode.Success,
-      result: json
+      result: {
+        filePath: path.basename(filePath),
+        json
+      }
     }
   }
 

@@ -247,9 +247,7 @@ const PasswordRequest = () => {
     }
     dispatch({
       type: AppActions.UpdateLoadedTransaction,
-      payload: {
-        json: res.result!,
-      },
+      payload: res.result!,
     })
     dispatch({
       type: AppActions.UpdateLoadings,
