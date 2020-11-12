@@ -228,6 +228,8 @@ describe('OfflineSignController', () => {
     })
 
     describe('it works', () => {
+      const filePath = 'filePath.json'
+
       beforeEach(() => {
         resetMocks()
       })
@@ -235,7 +237,7 @@ describe('OfflineSignController', () => {
       it('should work with signed JSON', async () => {
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: false,
-          filePath: 'filePath.json'
+          filePath,
         })
         const res = await offlineSignController.exportTransactionAsJSON({
           transaction: mockTransaction,
@@ -244,7 +246,7 @@ describe('OfflineSignController', () => {
           type: SignType.Regular,
         } as any)
 
-        expect(res.result).toEqual({
+        expect(res.result.json).toEqual({
           transaction: mockTransaction,
           status: 'Signed',
           context: [],
@@ -255,7 +257,7 @@ describe('OfflineSignController', () => {
       it('should work with unsigned JSON', async () => {
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: false,
-          filePath: 'filePath.json'
+          filePath,
         })
         const res = await offlineSignController.exportTransactionAsJSON({
           transaction: mockTransaction,
@@ -263,7 +265,7 @@ describe('OfflineSignController', () => {
           type: SignType.Regular,
         } as any)
 
-        expect(res.result).toEqual({
+        expect(res.result.json).toEqual({
           transaction: mockTransaction,
           status: SignStatus.Unsigned,
           type: SignType.Regular,
