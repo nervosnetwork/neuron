@@ -128,9 +128,11 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
                   <span>{wallet?.name ?? ''}</span>
                 </td>
               </tr>
+              <tr>
+                <td className={styles.first}>{t('offline-sign.content')}</td>
+              </tr>
             </tbody>
           </table>
-          <div className={styles.content}>{t('offline-sign.content')}</div>
           <textarea disabled value={jsonContent} className={styles.textarea} />
         </section>
         <footer className={styles.footer}>
