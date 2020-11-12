@@ -46,7 +46,7 @@ export default class Ledger extends Hardware {
   }
 
   public async getExtendedPublicKey (): Promise<ExtendedPublicKey> {
-    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.defaultAddress)
+    const { public_key, chain_code } = await this.ledgerCKB!.getWalletExtendedPublicKey(this.defaultPath)
     return {
       publicKey: public_key,
       chainCode: chain_code
@@ -63,11 +63,11 @@ export default class Ledger extends Hardware {
     }
 
     const signature = await this.ledgerCKB!.signTransaction(
-      path === Address.pathForReceiving(0) ? this.defaultAddress : path,
+      path === Address.pathForReceiving(0) ? this.defaultPath : path,
       rawTx,
       witnesses,
       context,
-      this.defaultAddress,
+      this.defaultPath,
     )
 
     return signature
@@ -75,7 +75,7 @@ export default class Ledger extends Hardware {
 
   async signMessage (path: string, messageHex: string) {
     const message = HexUtils.removePrefix(messageHex)
-    const signed = await this.ledgerCKB!.signMessage(path === Address.pathForReceiving(0) ? this.defaultAddress : path, message, false)
+    const signed = await this.ledgerCKB!.signMessage(path === Address.pathForReceiving(0) ? this.defaultPath : path, message, false)
     return HexUtils.addPrefix(signed)
   }
 
