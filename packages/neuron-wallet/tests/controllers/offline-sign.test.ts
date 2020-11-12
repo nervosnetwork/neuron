@@ -380,15 +380,15 @@ describe('OfflineSignController', () => {
       })
 
       it('should signed', async () => {
-        const { result } = await offlineSignController.signAndExportTransaction({
+        const { result: { json } } = await offlineSignController.signAndExportTransaction({
           transaction: mockTransaction,
           status: SignStatus.Unsigned,
           type: SignType.SendSUDT,
         } as any)
 
-        expect(result.transaction).toEqual(mockTransaction)
-        expect(result.status).toEqual(SignStatus.Signed)
-        expect(result.type).toEqual(SignType.SendSUDT)
+        expect(json.transaction).toEqual(mockTransaction)
+        expect(json.status).toEqual(SignStatus.Signed)
+        expect(json.type).toEqual(SignType.SendSUDT)
       })
     })
   })

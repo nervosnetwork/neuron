@@ -71,9 +71,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
     }
     dispatch({
       type: AppActions.UpdateLoadedTransaction,
-      payload: {
-        json: res.result!,
-      },
+      payload: res.result!,
     })
     onDismiss()
   }, [offlineSignJSON, dispatch, onDismiss, t, password, walletID])
