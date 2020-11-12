@@ -75,7 +75,7 @@ export default class Ledger extends Hardware {
 
   async signMessage (path: string, messageHex: string) {
     const message = HexUtils.removePrefix(messageHex)
-    const signed = await this.ledgerCKB!.signMessage(path, message, false)
+    const signed = await this.ledgerCKB!.signMessage(path === Address.pathForReceiving(0) ? this.defaultAddress : path, message, false)
     return HexUtils.addPrefix(signed)
   }
 
