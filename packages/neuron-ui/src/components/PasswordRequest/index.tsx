@@ -13,6 +13,7 @@ import {
   sendTransaction,
   deleteWallet,
   backupWallet,
+  migrateAcp,
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
@@ -88,6 +89,16 @@ const PasswordRequest = () => {
           case 'backup': {
             await backupWallet({ id: walletID, password })(dispatch).then(status => {
               if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          case 'migrate-acp': {
+            await migrateAcp({ id: walletID, password })(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
             })
@@ -183,7 +194,7 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {['unlock', 'create-sudt-account', 'send-sudt'].includes(actionType ?? '') ? null : (
+        {['unlock', 'create-sudt-account', 'send-sudt', 'migrate-acp'].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
         <TextField

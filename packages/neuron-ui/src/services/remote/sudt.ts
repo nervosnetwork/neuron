@@ -27,3 +27,5 @@ export const generateSendAllSUDTTransaction = remoteApi<Controller.GenerateSendA
 )
 
 export const sendSUDTTransaction = remoteApi<Controller.SendSUDTTransaction.Params>('send-to-anyone-can-pay')
+
+export const migrateAcp = remoteApi<Controller.MigrateAcp.Params>('migrate-acp')
