@@ -81,6 +81,7 @@ $left-padding: 15px;
   padding-left: $left-padding;
   color: var(--nervos-green);
   span {
+    flex: 1;
     padding-left: 3px;
   }
 }
