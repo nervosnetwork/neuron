@@ -12,7 +12,7 @@ import { AccountExtendedPublicKey } from 'models/keys/key'
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
   public isConnected: boolean
-  protected defaultAddress = AccountExtendedPublicKey.ckbAccountPath
+  protected defaultPath = AccountExtendedPublicKey.ckbAccountPath
 
   constructor(device: DeviceInfo) {
     this.deviceInfo = device
