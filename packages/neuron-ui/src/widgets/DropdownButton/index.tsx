@@ -7,7 +7,7 @@ interface DropdownButtonProps {
   mainBtnOnClick: () => void
   mainBtnLabel: string
   mainBtnDisabled: boolean
-  list: { text: string; onClick: () => void }[]
+  list: { text: string; onClick: () => void; disabled?: boolean; disabledMsg?: string }[]
 }
 
 const DropdownButton = ({ mainBtnLabel, mainBtnOnClick, mainBtnDisabled, list }: DropdownButtonProps) => {
@@ -20,9 +20,15 @@ const DropdownButton = ({ mainBtnLabel, mainBtnOnClick, mainBtnDisabled, list }:
         </button>
         {!mainBtnDisabled ? (
           <div className={styles.content}>
-            {list.map(({ text, onClick }) => {
+            {list.map(({ text, onClick, disabled, disabledMsg }) => {
               return (
-                <button type="button" onClick={onClick} key={text}>
+                <button
+                  title={disabled ? disabledMsg : text}
+                  type="button"
+                  onClick={onClick}
+                  key={text}
+                  disabled={disabled}
+                >
                   {text}
                 </button>
               )

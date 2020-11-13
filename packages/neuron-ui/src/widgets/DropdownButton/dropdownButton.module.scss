@@ -26,6 +26,10 @@
         background-color: #d1d1d1;
         font-weight: bold;
       }
+
+      &:disabled {
+        cursor: not-allowed !important;
+      }
     }
   }
 
