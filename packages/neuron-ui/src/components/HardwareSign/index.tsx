@@ -324,7 +324,7 @@ const HardwareSign = ({
         disabledMsg: disconnectStatus,
       },
     ]
-  }, [signAndExportFromGenerateTx, status])
+  }, [signAndExportFromGenerateTx, status, disconnectStatus, t])
 
   let container = (
     <div className={styles.container}>
