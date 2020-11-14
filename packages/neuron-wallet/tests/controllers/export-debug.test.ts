@@ -12,6 +12,25 @@ jest.mock('electron', () => ({
   }
 }))
 
+jest.mock('../../src/services/addresses', () => {
+  return {
+    getAddressesByAllWallets: () => ([
+      {
+        walletId: '0',
+        addressType: '0',
+        addressIndex: '0',
+        blake160: 'hash1',
+      },
+      {
+        walletId: '1',
+        addressType: '1',
+        addressIndex: '1',
+        blake160: 'hash2',
+      },
+    ])
+  }
+})
+
 jest.mock('fs', () => {
   return {
     createWriteStream: () => null
@@ -56,6 +75,7 @@ describe('Test ExportDebugController', () => {
   let addBundledCKBLogMock: any
   let addLogFilesMock: any
   let addStatusFileMock: any
+  let archiveAppendMock: any
 
   beforeAll(() => {
     showSaveDialogMock = jest.spyOn(dialog, 'showSaveDialog')
@@ -64,7 +84,7 @@ describe('Test ExportDebugController', () => {
     addBundledCKBLogMock = jest.spyOn(exportDebugController, 'addBundledCKBLog')
     addLogFilesMock = jest.spyOn(exportDebugController, 'addLogFiles')
     addStatusFileMock = jest.spyOn(exportDebugController, 'addStatusFile')
-    jest.spyOn(exportDebugController.archive, 'append')
+    archiveAppendMock = jest.spyOn(exportDebugController.archive, 'append')
     jest.spyOn(exportDebugController.archive, 'file')
     jest.spyOn(exportDebugController.archive, 'pipe').mockImplementation(() => { })
     jest.spyOn(logger, 'error')
@@ -85,7 +105,7 @@ describe('Test ExportDebugController', () => {
     })
 
     it('should call required methods', () => {
-      expect.assertions(7)
+      expect.assertions(8)
       expect(showSaveDialogMock).toHaveBeenCalled()
 
       expect(addBundledCKBLogMock).toHaveBeenCalled()
@@ -95,6 +115,16 @@ describe('Test ExportDebugController', () => {
       expect(showMessageBoxMock).toHaveBeenCalled()
       expect(showErrorBoxMock).not.toHaveBeenCalled()
       expect(logger.error).not.toHaveBeenCalled()
+
+      const csv = [
+        'walletId,addressType,addressIndex,publicKeyInBlake160\n',
+        '0,0,0,hash1\n',
+        '1,1,1,hash2\n',
+      ].join('')
+      expect(archiveAppendMock).toHaveBeenCalledWith(
+        csv,
+        expect.objectContaining({name: 'hd_public_key_info.csv'})
+      )
     })
   })
 
@@ -105,13 +135,14 @@ describe('Test ExportDebugController', () => {
     })
 
     it('should not call required methods', () => {
-      expect.assertions(7)
+      expect.assertions(8)
 
       expect(showSaveDialogMock).toHaveBeenCalled()
 
       expect(addBundledCKBLogMock).not.toHaveBeenCalled()
       expect(addLogFilesMock).not.toHaveBeenCalled()
       expect(addStatusFileMock).not.toHaveBeenCalled()
+      expect(archiveAppendMock).not.toHaveBeenCalled()
 
       expect(showMessageBoxMock).not.toHaveBeenCalled()
       expect(showErrorBoxMock).not.toHaveBeenCalled()
