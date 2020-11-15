@@ -171,7 +171,6 @@ export default class AssetAccountController {
     const currentWallet = walletsService.getCurrent()
     const walletId = currentWallet!.id;
 
-
     if (this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
       return
     }

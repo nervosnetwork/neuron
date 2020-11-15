@@ -419,6 +419,10 @@ export default class ApiController {
       return this.assetAccountController.getAccount(params)
     })
 
+    handle('check-migrate-acp', async () => {
+      return this.assetAccountController.showACPMigrationDialog()
+    })
+
     handle('migrate-acp', async (_, params: MigrateACPParams) => {
       return this.assetAccountController.migrateAcp(params)
     })
