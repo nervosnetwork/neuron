@@ -138,6 +138,15 @@ export default {
           'install-and-exit': '安裝並退出'
         }
       },
+      'acp-migration': {
+        title: '升級資產賬戶',
+        message: '升級資產賬戶',
+        detail: '資產賬戶合約已經升級並修復了可能被利用的潛在漏洞。請您立即升級自己的資產賬戶，以獲得安全性提升。',
+        buttons: {
+          migrate: '安全升級',
+          skip: '已知風險，稍後升級'
+        }
+      }
     },
     prompt: {
       password: {

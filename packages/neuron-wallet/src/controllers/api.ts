@@ -23,7 +23,7 @@ import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
 import AssetAccountController from './asset-account'
-import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams } from './asset-account'
+import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams, MigrateACPParams } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 
@@ -58,6 +58,10 @@ export default class ApiController {
     if (command === 'delete-wallet' || command === 'backup-wallet') {
       // params: walletID
       this.walletsController.requestPassword(params, command)
+    }
+
+    if (command === 'migrate-acp') {
+      this.assetAccountController.showACPMigrationDialog()
     }
   }
 
@@ -413,6 +417,10 @@ export default class ApiController {
 
     handle("get-asset-account", async (_, params: { walletID: string, id: number }) => {
       return this.assetAccountController.getAccount(params)
+    })
+
+    handle('migrate-acp', async (_, params: MigrateACPParams) => {
+      return this.assetAccountController.migrateAcp(params)
     })
 
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {

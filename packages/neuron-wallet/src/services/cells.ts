@@ -844,4 +844,26 @@ export default class CellsService {
 
     return uniqueBlake160s
   }
+
+  public static async gatherLegacyACPInputs (walletId: string) {
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        status: In([OutputStatus.Live]),
+        lockCodeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH,
+        lockHashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE,
+      })
+      .andWhere(`
+        lockArgs IN (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        )`,
+        { walletId }
+      )
+      .getMany()
+
+    return outputs
+  }
 }

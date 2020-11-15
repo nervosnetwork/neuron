@@ -1,4 +1,4 @@
-import CellsService from 'services/cells'
+import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import { CapacityTooSmall } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
@@ -20,6 +20,7 @@ import ArrayUtils from 'utils/array'
 import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
 import assert from 'assert'
+import CellDep, { DepType } from 'models/chain/cell-dep'
 
 export interface TargetOutput {
   address: string
@@ -764,6 +765,88 @@ export class TransactionGenerator {
     TransactionGenerator.checkTxSudtAmount(tx, 'generateAnyoneCanPayToSudtTx sUDT amount not match!', assetAccountInfo)
 
     return tx
+  }
+
+  public static async generateMigrateLegacyACPTx (walletId: string): Promise<Transaction | null> {
+    const assetAccountInfo = new AssetAccountInfo()
+    const legacyACPCells = await CellsService.gatherLegacyACPInputs(walletId)
+    if (!legacyACPCells.length) {
+      return null
+    }
+    const legacyACPInputs = legacyACPCells.map(cell => {
+      return new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lockScript(),
+        cell.lockHash
+      );
+    });
+    const ACPCells = legacyACPCells.map(cell => {
+      const newACPLockScript = assetAccountInfo.generateAnyoneCanPayScript(cell.lockArgs)
+
+      cell.lockCodeHash = newACPLockScript.codeHash
+      cell.lockHashType = newACPLockScript.hashType
+      cell.lockArgs = newACPLockScript.args
+      cell.lockHash = newACPLockScript.computeHash()
+
+      return cell
+    })
+    const ACPOutputs = ACPCells.map(cell => cell.toModel())
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+
+    const legacyACPCellDep = new CellDep(
+      new OutPoint(process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!,
+      process.env.LEGACY_TESTNET_ACP_DEP_INDEX!),
+      process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType,
+    )
+
+    const tx = Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep, legacyACPCellDep],
+      inputs: legacyACPInputs,
+      outputs: ACPOutputs,
+      outputsData: ACPCells.map(o => o.data || '0x'),
+      witnesses: [],
+    })
+
+    const baseSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
+
+    const inputGatherResult = await CellsService.gatherInputs(
+      '0',
+      walletId,
+      '0',
+      '1000',
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+    )
+    tx.inputs.push(...inputGatherResult.inputs)
+
+    const originalChangeCapacity = inputGatherResult.inputs
+      .reduce((sum: bigint, input: Input) => {
+        return sum + BigInt(input.capacity)
+      }, BigInt(0))
+
+    const actualChangeCapacity = originalChangeCapacity - BigInt(inputGatherResult.finalFee)
+    tx.fee = inputGatherResult.finalFee
+
+    if (actualChangeCapacity < BigInt(MIN_CELL_CAPACITY)) {
+      throw new CapacityNotEnough()
+    }
+
+    const changeOutput = new Output(
+      actualChangeCapacity.toString(),
+      SystemScriptInfo.generateSecpScript(inputGatherResult.inputs[0].lock!.args!)
+    )
+    tx.outputs.push(changeOutput)
+    tx.outputsData.push('0x')
+
+    return tx;
   }
 
   private static checkTxCapacity(tx: Transaction, msg: string) {
