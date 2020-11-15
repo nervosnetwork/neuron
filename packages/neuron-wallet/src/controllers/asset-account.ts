@@ -7,6 +7,13 @@ import NetworksService from "services/networks"
 import AddressGenerator from "models/address-generator"
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils"
 import AssetAccountInfo from "models/asset-account-info"
+import TransactionSender from "services/transaction-sender"
+import { BrowserWindow, dialog } from "electron"
+import { t } from "i18next"
+import WalletsService from "services/wallets"
+import CommandSubject from 'models/subjects/command'
+import SyncApiController, { SyncStatus } from "./sync-api"
+import { TransactionGenerator } from "services/tx"
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -34,7 +41,14 @@ export interface UpdateAssetAccountParams {
   decimal?: string
 }
 
+export interface MigrateACPParams {
+  id: string
+  password: string
+}
+
 export default class AssetAccountController {
+  private displayedACPMigrationDialogByWalletIds: Set<string> = new Set()
+
   public async getAll(params: { walletID: string }): Promise<Controller.Response<(AssetAccount & { address: string })[]>> {
     const assetAccountInfo = new AssetAccountInfo()
 
@@ -139,5 +153,70 @@ export default class AssetAccountController {
       status: ResponseCode.Success,
       result,
     }
+  }
+
+  public async migrateAcp(params: MigrateACPParams): Promise<Controller.Response<string>> {
+    const tx = await TransactionGenerator.generateMigrateLegacyACPTx(params.id)
+
+    const txHash = await new TransactionSender().sendTx(params.id, tx!, params.password)
+
+    return {
+      status: ResponseCode.Success,
+      result: txHash,
+    }
+  }
+
+  public async showACPMigrationDialog() {
+    const walletsService = WalletsService.getInstance()
+    const currentWallet = walletsService.getCurrent()
+    const walletId = currentWallet!.id;
+
+
+    if (this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
+      return
+    }
+
+    const syncStatus = await new SyncApiController().getSyncStatus()
+    if (syncStatus !== SyncStatus.SyncCompleted || BrowserWindow.getAllWindows().length !== 1) {
+      return
+    }
+
+    const window = BrowserWindow.getFocusedWindow()!
+    if (!window) {
+      return
+    }
+
+    const tx = await TransactionGenerator.generateMigrateLegacyACPTx(walletId)
+    if (!tx) {
+      return
+    }
+
+    this.displayedACPMigrationDialogByWalletIds.add(walletId)
+
+    const I18N_PATH = `messageBox.acp-migration`
+    return dialog.showMessageBox({
+      type: 'info',
+      buttons: ['skip', 'migrate'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
+      defaultId: 1,
+      title: t(`${I18N_PATH}.title`),
+      message: t(`${I18N_PATH}.message`),
+      detail: t(`${I18N_PATH}.detail`),
+      cancelId: 0,
+      noLink: true,
+    }).then(({ response }) => {
+      switch (response) {
+        case 1: {
+          CommandSubject.next({
+            winID: window.id,
+            type: 'migrate-acp',
+            payload: walletId,
+            dispatchToUI: true
+          })
+          return false
+        }
+        case 0:
+        default:
+      }
+    })
   }
 }

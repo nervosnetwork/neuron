@@ -139,6 +139,15 @@ export default {
           'install-and-exit': '安装并退出'
         }
       },
+      'acp-migration': {
+        title: '升级资产账户',
+        message: '升级资产账户',
+        detail: '资产账户合约已经升级并修复了可能被利用的潜在漏洞。请您立即升级自己的资产账户，以获得安全性提升。',
+        buttons: {
+          migrate: '安全升级',
+          skip: '已知风险，稍后升级'
+        }
+      }
     },
     prompt: {
       password: {

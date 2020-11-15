@@ -33,6 +33,8 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   SyncedBlockNumberSubject.getSubject().pipe(sampleTime(1000)).subscribe(params => {
     dispatcher.sendMessage('synced-block-number-updated', params)
+
+    dispatcher.runCommand('migrate-acp', params)
   })
 
   CommandSubject.subscribe(params => {
