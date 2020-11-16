@@ -160,6 +160,18 @@ export default class AssetAccountController {
 
     const txHash = await new TransactionSender().sendTx(params.id, tx!, params.password)
 
+    const I18N_PATH = `messageBox.acp-migration-completed`
+
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: ['ok'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
+      defaultId: 1,
+      title: t(`${I18N_PATH}.title`),
+      message: t(`${I18N_PATH}.message`),
+      cancelId: 0,
+      noLink: true,
+    })
+
     return {
       status: ResponseCode.Success,
       result: txHash,
