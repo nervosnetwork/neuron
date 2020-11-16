@@ -295,6 +295,9 @@
       },
       "send-sudt": {
         "title": "Send sUDT"
+      },
+      "migrate-acp": {
+        "title": "Upgrade Asset Accounts"
       }
     },
     "qrcode": {
