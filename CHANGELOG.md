@@ -1,3 +1,13 @@
+# 0.33.1 (2020-11-16)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Include the `hd_public_key_info` table info in debug log.
+* Requires the **x64** version of vcredist component on Windows.
+
+
 # 0.33.0 (2020-10-14)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
