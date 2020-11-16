@@ -16,11 +16,7 @@ export const ConnectionStatusSubject = new BehaviorSubject<ConnectionStatus>({
 })
 
 export const getLatestConnectionStatus = async () => {
-  return new Promise(resolve => {
-    ConnectionStatusSubject.pipe(take(1)).subscribe(
-      status => { resolve(status) }
-    )
-  })
+  return ConnectionStatusSubject.pipe(take(1)).toPromise()
 }
 
 export default class SyncedBlockNumberSubject {

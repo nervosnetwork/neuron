@@ -850,7 +850,7 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
-        status: In([OutputStatus.Live]),
+        status: OutputStatus.Live,
         lockCodeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH,
         lockHashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE,
       })
