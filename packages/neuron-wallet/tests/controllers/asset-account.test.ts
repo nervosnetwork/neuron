@@ -20,6 +20,7 @@ const resetMocks = () => {
 
 describe('AssetAccountController', () => {
   let assetAccountController: any;
+  let AssetAccountController: any;
   const walletId = 'w1'
 
   jest.doMock('electron', () => {
@@ -64,7 +65,7 @@ describe('AssetAccountController', () => {
 
   beforeEach(() => {
     resetMocks()
-    const AssetAccountController = require('../../src/controllers/asset-account').default
+    AssetAccountController = require('../../src/controllers/asset-account').default
     assetAccountController = new AssetAccountController()
   });
   describe('#showACPMigrationDialog', () => {
@@ -87,6 +88,28 @@ describe('AssetAccountController', () => {
           dispatchToUI: true, payload: "w1", type: "migrate-acp", winID: "1"
         })
       })
+      describe('attempts to open dialog again', () => {
+        beforeEach(async () => {
+          stubbedCommandSubjectNext.mockReset()
+          mockStates(SyncStatus.SyncCompleted, 1, true, true)
+          await assetAccountController.showACPMigrationDialog()
+        });
+        it('should not broadcast migrate-acp command', () => {
+          expect(stubbedCommandSubjectNext).not.toHaveBeenCalled()
+        })
+      });
+      describe('force to open dialog again', () => {
+        beforeEach(async () => {
+          stubbedCommandSubjectNext.mockReset()
+          mockStates(SyncStatus.SyncCompleted, 1, true, true)
+          await assetAccountController.showACPMigrationDialog(true)
+        });
+        it('broadcast migrate-acp command', () => {
+          expect(stubbedCommandSubjectNext).toHaveBeenCalledWith({
+            dispatchToUI: true, payload: "w1", type: "migrate-acp", winID: "1"
+          })
+        })
+      });
     });
     describe('when one of the conditions not met', () => {
       [
@@ -100,6 +123,7 @@ describe('AssetAccountController', () => {
       ].forEach(([syncStatus, winCount, hasFocusedWindow, hasTx]) => {
         describe(`when SyncStatus: ${syncStatus}, winCount: ${winCount}, hasFocusedWindow: ${hasFocusedWindow}, hasTx: ${hasTx}`, () => {
           beforeEach(async () => {
+            assetAccountController = new AssetAccountController()
             mockStates(syncStatus, winCount, hasFocusedWindow, hasTx)
             await assetAccountController.showACPMigrationDialog()
           });
