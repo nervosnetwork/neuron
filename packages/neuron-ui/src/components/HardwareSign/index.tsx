@@ -315,12 +315,16 @@ const HardwareSign = ({
 
   const dialogClass = `${styles.dialog} ${wallet.isHD ? styles.hd : ''}`
 
-  const dropdownList = [
-    {
-      text: t('offline-sign.sign-and-export'),
-      onClick: signAndExportFromGenerateTx,
-    },
-  ]
+  const dropdownList = useMemo(() => {
+    return [
+      {
+        text: t('offline-sign.sign-and-export'),
+        onClick: signAndExportFromGenerateTx,
+        disabled: status === disconnectStatus,
+        disabledMsg: disconnectStatus,
+      },
+    ]
+  }, [signAndExportFromGenerateTx, status, disconnectStatus, t])
 
   let container = (
     <div className={styles.container}>
