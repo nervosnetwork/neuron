@@ -61,7 +61,7 @@ export default class ApiController {
     }
 
     if (command === 'migrate-acp') {
-      this.assetAccountController.showACPMigrationDialog()
+      this.assetAccountController.showACPMigrationDialog(false)
     }
   }
 
@@ -420,7 +420,8 @@ export default class ApiController {
     })
 
     handle('check-migrate-acp', async () => {
-      return this.assetAccountController.showACPMigrationDialog()
+      const allowMultipleOpen = true
+      return this.assetAccountController.showACPMigrationDialog(allowMultipleOpen)
     })
 
     handle('migrate-acp', async (_, params: MigrateACPParams) => {

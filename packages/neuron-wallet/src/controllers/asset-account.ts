@@ -166,12 +166,12 @@ export default class AssetAccountController {
     }
   }
 
-  public async showACPMigrationDialog() {
+  public async showACPMigrationDialog(allowMultipleOpen: boolean | undefined) {
     const walletsService = WalletsService.getInstance()
     const currentWallet = walletsService.getCurrent()
     const walletId = currentWallet!.id;
 
-    if (this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
+    if (!allowMultipleOpen && this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
       return
     }
 
