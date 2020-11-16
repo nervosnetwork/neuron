@@ -180,7 +180,7 @@ export default class AssetAccountController {
       return
     }
 
-    const window = BrowserWindow.getFocusedWindow()!
+    const window = BrowserWindow.getFocusedWindow()
     if (!window) {
       return
     }

@@ -143,7 +143,7 @@ export default {
       'acp-migration': {
         title: 'Upgrade Asset Account',
         message: 'Upgrade Asset Account',
-        detail: 'Assets account script has been upgraded, and a potential vulnerability in it has been fixed. Please upgrade your account to get the security reinforcements.',
+        detail: 'Asset account script has been upgraded, and a potential vulnerability in it has been fixed. Please upgrade your account to get the security reinforcements.',
         buttons: {
           migrate: 'Secure upgrade now',
           skip: 'I know the risk, will upgrade later'
