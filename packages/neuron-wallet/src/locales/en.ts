@@ -148,6 +148,13 @@ export default {
           migrate: 'Secure upgrade now',
           skip: 'I know the risk, will upgrade later'
         }
+      },
+      'acp-migration-completed': {
+        title: 'Congratulations! You have completed the secure upgrade.',
+        message: 'Congratulations! You have completed the secure upgrade.',
+        buttons: {
+          ok: 'OK'
+        }
       }
     },
     prompt: {

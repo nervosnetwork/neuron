@@ -147,6 +147,13 @@ export default {
           migrate: '安全升级',
           skip: '已知风险，稍后升级'
         }
+      },
+      'acp-migration-completed': {
+        title: '恭喜！您已经完成安全升级。',
+        message: '恭喜！您已经完成安全升级。',
+        buttons: {
+          ok: 'OK'
+        }
       }
     },
     prompt: {
