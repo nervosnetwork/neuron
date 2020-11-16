@@ -4,7 +4,7 @@
 
 ### Hotfix
 
-* Include the `hd_public_key_info` table info in debug log.
+* Includes the `hd_public_key_info` table info in debug log.
 * Requires the **x64** version of vcredist component on Windows.
 
 
