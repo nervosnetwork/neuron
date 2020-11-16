@@ -295,6 +295,9 @@
       },
       "send-sudt": {
         "title": "发起 sUDT 交易"
+      },
+      "migrate-acp": {
+        "title": "升级资产账户"
       }
     },
     "qrcode": {
