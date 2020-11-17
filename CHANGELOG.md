@@ -1,3 +1,41 @@
+# 0.33.1 (2020-11-16)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Includes the `hd_public_key_info` table info in debug log.
+* Requires the **x64** version of vcredist component on Windows.
+
+
+# 0.33.0 (2020-10-14)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**Note:** There will be a data migration for the new bundled node [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1), which may take several minutes to boot up for the first time after upgraded from the earlier versions. 
+**Attention:** The migration is not reversible. Please backup the data directory if you want to use old versions later.
+
+### Refactor
+
+* Upgrade from Electron 7 to Electron 9.
+* Refactor the wallet address storage to be based on an SQLite table rather than a JSON file.
+* Deprecate LevelDB and instead SQLite for persisting transaction descriptions.
+* Refactor send component.
+* Reduce the confirmation block height from 300 to 24.
+
+### New features
+
+* Enable `Asset Accounts` for mainnet.
+* Support transfer to multisig address.
+
+### Bug fixes
+
+* Fixed `InsufficientCellCapacity` error for CKB ACP transfer when there are cells with data.
+* Fixed `too many SQL variables` error when there are too many addresses in wallets.
+* Fixed the autofill description on unlocking assets.
+* Refine error message when the fee for dao withdrawal transaction is insufficient.
+
+
 # 0.33.0-rc1 (2020-09-27)
 
 This is a release candidate to preview the changes in the next official release and may not be stable. Welcome any questions or suggestions.

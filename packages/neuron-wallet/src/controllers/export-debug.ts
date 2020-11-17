@@ -9,6 +9,7 @@ import { t } from 'i18next'
 import { ckbDataPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
+import AddressService from 'services/addresses'
 
 export default class ExportDebugController {
   #I18N_PATH = 'export-debug-info'
@@ -34,7 +35,7 @@ export default class ExportDebugController {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await Promise.all([this.addStatusFile(), this.addBundledCKBLog(), this.addLogFiles()])
+      await Promise.all([this.addStatusFile(), this.addBundledCKBLog(), this.addLogFiles(), this.addHdPublicKeyInfoCsv()])
       await this.archive.finalize()
       dialog.showMessageBox({
         type: 'info',
@@ -120,6 +121,17 @@ export default class ExportDebugController {
     }).catch(err => {
       this.archive.append(err.message, { name })
     })
+  }
+
+  private async addHdPublicKeyInfoCsv() {
+    const addressMetas = await AddressService.getAddressesByAllWallets()
+    let csv = 'walletId,addressType,addressIndex,publicKeyInBlake160\n'
+    for (const addressMeta of addressMetas) {
+      const row = `${addressMeta.walletId},${addressMeta.addressType},${addressMeta.addressIndex},${addressMeta.blake160}\n`
+      csv += row
+    }
+    const csvFileName = 'hd_public_key_info.csv'
+    this.archive.append(csv, { name: csvFileName })
   }
 
   private addLogFiles = (files = ['main.log', 'renderer.log']) => {
