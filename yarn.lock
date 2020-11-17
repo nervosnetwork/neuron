@@ -10977,10 +10977,10 @@ husky@3.0.5:
     run-node "^1.0.0"
     slash "^3.0.0"
 
-hw-app-ckb@5.9.3:
-  version "5.9.3"
-  resolved "https://registry.yarnpkg.com/hw-app-ckb/-/hw-app-ckb-5.9.3.tgz#2de64dcd821f35253d8f85533c33246260e9f8ec"
-  integrity sha512-Cnaf3nxiZcbTC2uoan4czM+KSffJBhs/t9hBWF8Bgwb/ZPKtPQKAefRDQinfPnZZ90rxRxhl/igD8XfHS6goDQ==
+hw-app-ckb@0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/hw-app-ckb/-/hw-app-ckb-0.1.1.tgz#3c17ac57c29b7ac18e521ba2db131887832d2480"
+  integrity sha512-WGJVv3eibkiuax1gFuU+zytTKz7f0GUCDKQIHSvP9smVZe0zufmhWab8x/cKdRyrOMNhyINRpotqsW3/XiD4Lg==
   dependencies:
     "@ledgerhq/hw-transport" "^5.9.0"
     bech32 "1.1.4"
@@ -16417,13 +16417,6 @@ prismjs@^1.8.4:
   version "1.22.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.22.0.tgz#73c3400afc58a823dd7eed023f8e1ce9fd8977fa"
   integrity sha512-lLJ/Wt9yy0AiSYBf212kK3mM5L8ycwlyTlSxHBAneXLR0nzFMlZ5y7riFPF3E33zXOF2IH95xdY5jIyZbM9z/w==
-  optionalDependencies:
-    clipboard "^2.0.0"
-
-prismjs@~1.17.0:
-  version "1.17.1"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.17.1.tgz#e669fcbd4cdd873c35102881c33b14d0d68519be"
-  integrity sha512-PrEDJAFdUGbOP6xK/UsfkC5ghJsPJviKgnQOoxaDbBjwc8op68Quupwt1DeAFoG8GImPhiKXAvvsH7wDSLsu1Q==
   optionalDependencies:
     clipboard "^2.0.0"
 
