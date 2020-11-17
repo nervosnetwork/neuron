@@ -799,8 +799,10 @@ export class TransactionGenerator {
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
 
     const legacyACPCellDep = new CellDep(
-      new OutPoint(process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!,
-      process.env.LEGACY_TESTNET_ACP_DEP_INDEX!),
+      new OutPoint(
+        process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!,
+        process.env.LEGACY_TESTNET_ACP_DEP_INDEX!
+      ),
       process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType,
     )
 
