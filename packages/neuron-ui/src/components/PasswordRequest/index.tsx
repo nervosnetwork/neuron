@@ -62,8 +62,10 @@ const PasswordRequest = () => {
         return OfflineSignType.SendSUDT
       case 'unlock':
         return OfflineSignType.UnlockDAO
-      default:
+      case 'send':
         return OfflineSignType.Regular
+      default:
+        return OfflineSignType.Invalid
     }
   }, [actionType])
 
@@ -299,14 +301,16 @@ const PasswordRequest = () => {
           error={error}
         />
         <div className={styles.footer}>
-          <div className={styles.left}>
-            <DropdownButton
-              mainBtnLabel={t('offline-sign.export')}
-              mainBtnOnClick={exportTransaction}
-              mainBtnDisabled={isLoading}
-              list={dropdownList}
-            />
-          </div>
+          {signType !== OfflineSignType.Invalid ? (
+            <div className={styles.left}>
+              <DropdownButton
+                mainBtnLabel={t('offline-sign.export')}
+                mainBtnOnClick={exportTransaction}
+                mainBtnDisabled={isLoading}
+                list={dropdownList}
+              />
+            </div>
+          ) : null}
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
             <Button label={t('common.confirm')} type="submit" disabled={disabled}>
