@@ -13,8 +13,10 @@ export class ConnectFailedException extends Error {
 export class CkbAppNotFoundException extends Error {
   public code = ErrorCode.CkbAppNotFound
 
+  static message = `${I18N_PATH}${ErrorCode.CkbAppNotFound}`
+
   constructor() {
-    super(`${I18N_PATH}${ErrorCode.CkbAppNotFound}`)
+    super(CkbAppNotFoundException.message)
   }
 }
 

@@ -29,6 +29,7 @@ declare namespace Controller {
     password?: string
     newPassword?: string
     name?: string
+    device?: any
   }
 
   interface RequestPasswordParams {

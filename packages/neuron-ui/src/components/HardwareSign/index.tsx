@@ -20,9 +20,13 @@ import {
   OfflineSignType,
   OfflineSignJSON,
   signAndExportTransaction,
+  getDeviceCkbAppVersion,
+  DeviceInfo,
+  updateWallet,
 } from 'services/remote'
-import { errorFormatter, isSuccessResponse, RoutePath, useDidMount } from 'utils'
+import { ErrorCode, errorFormatter, isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import DropdownButton from 'widgets/DropdownButton'
+import { CkbAppNotFoundException } from 'exceptions'
 import SignError from './sign-error'
 import HDWalletSign from '../HDWalletSign'
 import styles from './hardwareSign.module.scss'
@@ -60,9 +64,14 @@ const HardwareSign = ({
     }
     onDismiss()
   }, [dispatch, signType, onDismiss])
+  const [status, setStatus] = useState('')
   const connectStatus = t('hardware-sign.status.connect')
-  const disconnectStatus = t('hardware-sign.status.disconnect')
   const userInputStatus = t('hardware-sign.status.user-input')
+  const disconnectStatus = t('hardware-sign.status.disconnect')
+  const ckbAppNotFoundStatus = t(CkbAppNotFoundException.message)
+  const isNotAvailableToSign = useMemo(() => {
+    return status === disconnectStatus || status === ckbAppNotFoundStatus
+  }, [status, disconnectStatus, ckbAppNotFoundStatus])
 
   const {
     app: {
@@ -72,7 +81,6 @@ const HardwareSign = ({
     },
     experimental,
   } = useGlobalState()
-  const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
@@ -149,13 +157,34 @@ const HardwareSign = ({
     connectStatus,
   ])
 
+  const ensureDeviceAvailable = useCallback(
+    async (device: DeviceInfo) => {
+      try {
+        const conectionRes = await connectDevice(device)
+        if (!isSuccessResponse(conectionRes)) {
+          setStatus(disconnectStatus)
+          return
+        }
+
+        const ckbVersionRes = await getDeviceCkbAppVersion(device.descriptor)
+        if (!isSuccessResponse(ckbVersionRes)) {
+          throw new CkbAppNotFoundException()
+        }
+        setStatus(connectStatus)
+      } catch (err) {
+        if (err.code === ErrorCode.CkbAppNotFound) {
+          setStatus(ckbAppNotFoundStatus)
+        } else {
+          setStatus(disconnectStatus)
+        }
+      }
+    },
+    [connectStatus, disconnectStatus, ckbAppNotFoundStatus]
+  )
+
   const signTx = useCallback(async () => {
     try {
-      const conectionRes = await connectDevice(deviceInfo)
-      if (!isSuccessResponse(conectionRes)) {
-        setStatus(disconnectStatus)
-        return
-      }
+      await ensureDeviceAvailable(deviceInfo)
       setStatus(userInputStatus)
       const type = actionType || offlineSignActionType
       const tx = offlineSignJSON?.transaction || generatedTx
@@ -244,17 +273,13 @@ const HardwareSign = ({
     dispatch,
     history,
     signAndExportFromJSON,
+    ensureDeviceAvailable,
   ])
 
   const signMsg = useCallback(async () => {
-    const conectionRes = await connectDevice(deviceInfo)
-    if (!isSuccessResponse(conectionRes)) {
-      setStatus(disconnectStatus)
-      return
-    }
-    setStatus(userInputStatus)
+    await ensureDeviceAvailable(deviceInfo)
     await signMessage?.('')
-  }, [userInputStatus, deviceInfo, disconnectStatus, signMessage])
+  }, [ensureDeviceAvailable, signMessage, deviceInfo])
 
   const sign = useCallback(
     async (e?: React.FormEvent) => {
@@ -277,14 +302,20 @@ const HardwareSign = ({
       if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
         const [device] = res.result
         setDeviceInfo(device)
-        setStatus(connectStatus)
+        if (device.descriptor !== deviceInfo.descriptor) {
+          updateWallet({
+            id: wallet.id,
+            device,
+          })
+        }
+        await ensureDeviceAvailable(device)
       }
     } catch (err) {
       setStatus(disconnectStatus)
     } finally {
       setIsReconnecting(false)
     }
-  }, [deviceInfo, disconnectStatus, connectStatus])
+  }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
 
   const exportTransaction = useCallback(async () => {
     await exportTransactionAsJSON({
@@ -300,17 +331,7 @@ const HardwareSign = ({
   useDidMount(() => {
     // eslint-disable-next-line no-unused-expressions
     dialogRef.current?.showModal()
-    connectDevice(deviceInfo)
-      .then(res => {
-        if (isSuccessResponse(res)) {
-          setStatus(connectStatus)
-        } else {
-          setStatus(disconnectStatus)
-        }
-      })
-      .catch(() => {
-        setStatus(disconnectStatus)
-      })
+    ensureDeviceAvailable(deviceInfo)
   })
 
   const dialogClass = `${styles.dialog} ${wallet.isHD ? styles.hd : ''}`
@@ -320,11 +341,11 @@ const HardwareSign = ({
       {
         text: t('offline-sign.sign-and-export'),
         onClick: signAndExportFromGenerateTx,
-        disabled: status === disconnectStatus,
-        disabledMsg: disconnectStatus,
+        disabled: isNotAvailableToSign,
+        disabledMsg: isNotAvailableToSign ? status : undefined,
       },
     ]
-  }, [signAndExportFromGenerateTx, status, disconnectStatus, t])
+  }, [signAndExportFromGenerateTx, status, isNotAvailableToSign, t])
 
   let container = (
     <div className={styles.container}>
@@ -341,7 +362,7 @@ const HardwareSign = ({
             </tr>
             <tr>
               <td className={styles.first}>{t('hardware-sign.status.label')}</td>
-              <td className={status === disconnectStatus ? styles.warning : ''}>{status}</td>
+              <td className={isNotAvailableToSign ? styles.warning : ''}>{status}</td>
             </tr>
           </tbody>
         </table>
@@ -360,7 +381,7 @@ const HardwareSign = ({
         ) : null}
         <div className={styles.right}>
           <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
-          {status === disconnectStatus ? (
+          {isNotAvailableToSign ? (
             <Button
               label={t('hardware-sign.actions.rescan')}
               type="submit"
