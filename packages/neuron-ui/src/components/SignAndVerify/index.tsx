@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
@@ -10,6 +10,7 @@ import {
   useExitOnWalletChange,
   useOnLocaleChange,
 } from 'utils'
+import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
@@ -19,6 +20,7 @@ import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
 import VerificationWarningIcon from 'widgets/Icons/Warning.png'
 
+import HardwareSign from 'components/HardwareSign'
 import styles from './signAndVerify.module.scss'
 
 interface PasswordDialogProps {
@@ -152,13 +154,16 @@ const Notifications = ({ notification, onDismiss }: NotificationsProps) =>
 const SignAndVerify = () => {
   const [t, i18n] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
-  const [requestPassword, setRequestPassword] = useState<boolean>(false)
-  const [wallet, setWallet] = useState<Pick<State.Wallet, 'id' | 'addresses'> | undefined>(undefined)
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const [wallet, setWallet] = useState<Pick<State.Wallet, 'id' | 'addresses' | 'device'> | undefined>(undefined)
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
+  const {
+    settings: { wallets = [] },
+  } = useGlobalState()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-
+  const currentWallet = useMemo(() => wallets.find(w => w.id === wallet?.id), [wallet, wallets])
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
   useEffect(() => {
@@ -184,19 +189,19 @@ const SignAndVerify = () => {
   }, [t])
 
   const handlePasswordDialogOpen = useCallback(() => {
-    setRequestPassword(true)
-  }, [setRequestPassword])
+    setIsDialogOpen(true)
+  }, [setIsDialogOpen])
 
   const handlePasswordDialogDismiss = useCallback(() => {
-    setRequestPassword(false)
-  }, [setRequestPassword])
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
 
   const handleNotificationDismiss = useCallback(() => {
     setNotification(null)
   }, [setNotification])
 
   useDialog({
-    show: requestPassword,
+    show: isDialogOpen,
     dialogRef,
     onClose: handlePasswordDialogDismiss,
   })
@@ -331,8 +336,16 @@ const SignAndVerify = () => {
       </div>
 
       <Notifications notification={notification} onDismiss={handleNotificationDismiss} />
-
-      <PasswordDialog dialogRef={dialogRef} onCancel={handlePasswordDialogDismiss} onSubmit={handleSignMessage} />
+      {isDialogOpen && currentWallet?.device ? (
+        <HardwareSign
+          signType="message"
+          signMessage={handleSignMessage}
+          wallet={currentWallet}
+          onDismiss={handlePasswordDialogDismiss}
+        />
+      ) : (
+        <PasswordDialog dialogRef={dialogRef} onCancel={handlePasswordDialogDismiss} onSubmit={handleSignMessage} />
+      )}
     </div>
   )
 }

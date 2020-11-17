@@ -81,7 +81,16 @@ declare namespace State {
   }
 
   interface PasswordRequest {
-    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | 'create-sudt-account' | 'send-sudt' | null
+    readonly actionType:
+      | 'send'
+      | 'backup'
+      | 'delete'
+      | 'unlock'
+      | 'create-sudt-account'
+      | 'send-sudt'
+      | 'send-acp'
+      | 'migrate-acp'
+      | null
     readonly walletID: string
   }
 
@@ -113,6 +122,7 @@ declare namespace State {
     readonly showTopAlert: boolean
     readonly showAllNotifications: boolean
     readonly isAllowedToFetchList: boolean
+    readonly loadedTransaction: any
   }
 
   interface NetworkProperty {
@@ -129,6 +139,26 @@ declare namespace State {
   interface WalletIdentity {
     readonly id: string
     readonly name: string
+    readonly device?: DeviceInfo
+    readonly isHD?: boolean
+  }
+
+  enum Manufacturer {
+    Ledger = 'Ledger',
+  }
+
+  interface DeviceInfo {
+    descriptor: string
+    vendorId: string
+    manufacturer: Manufacturer
+    product: string
+  }
+
+  interface DeviceInfo {
+    descriptor: string
+    vendorId: string
+    manufacturer: string
+    product: string
   }
 
   interface Address {
@@ -147,10 +177,17 @@ declare namespace State {
   }
   type ConnectionStatus = 'online' | 'offline' | 'connecting'
 
+  type SyncStatus = Readonly<{
+    cacheTipBlockNumber: number
+    bestKnownBlockNumber: number
+    bestKnownBlockTimestamp: number
+    estimate: number | undefined
+  }>
+
   interface Chain {
     readonly networkID: string
     readonly connectionStatus: ConnectionStatus
-    readonly tipBlockNumber: string
+    readonly syncStatus: SyncStatus
     readonly transactions: Readonly<{
       pageNo: number
       pageSize: number

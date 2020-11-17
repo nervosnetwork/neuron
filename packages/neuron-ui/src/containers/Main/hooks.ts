@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -15,7 +15,7 @@ import {
   NetworkList as NetworkListSubject,
   CurrentNetworkID as CurrentNetworkIDSubject,
   ConnectionStatus as ConnectionStatusSubject,
-  SyncedBlockNumber as SyncedBlockNumberSubject,
+  SyncStatus as SyncStatusSubject,
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
@@ -101,11 +101,13 @@ export const useSubscription = ({
   isAllowedToFetchList,
   history,
   dispatch,
+  location,
 }: {
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
   history: ReturnType<typeof useHistory>
+  location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
@@ -177,12 +179,19 @@ export const useSubscription = ({
       }
     })
 
-    const syncedBlockNumberSubscription = SyncedBlockNumberSubject.subscribe(syncedBlockNumber => {
-      dispatch({
-        type: NeuronWalletActions.UpdateSyncedBlockNumber,
-        payload: syncedBlockNumber,
-      })
-    })
+    const syncStatusSubscription = SyncStatusSubject.subscribe(
+      ({ cacheTipNumber, bestKnownBlockNumber, bestKnownBlockTimestamp, estimate }) => {
+        dispatch({
+          type: NeuronWalletActions.UpdateSyncStatus,
+          payload: {
+            cacheTipBlockNumber: cacheTipNumber,
+            bestKnownBlockNumber,
+            bestKnownBlockTimestamp,
+            estimate,
+          },
+        })
+      }
+    )
 
     const commandSubscription = CommandSubject.subscribe(({ winID, type, payload }: Subject.CommandMetaInfo) => {
       if (winID && getWinID() === winID) {
@@ -191,6 +200,12 @@ export const useSubscription = ({
           case 'navigate-to-url': {
             if (payload) {
               history.push(payload)
+            }
+            break
+          }
+          case 'import-hardware': {
+            if (payload) {
+              history.push(location.pathname + payload)
             }
             break
           }
@@ -214,6 +229,30 @@ export const useSubscription = ({
             })
             break
           }
+          case 'migrate-acp': {
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: payload || '',
+                actionType: 'migrate-acp',
+              },
+            })
+            break
+          }
+          case 'load-transaction-json': {
+            if (payload) {
+              const { url, json, filePath } = JSON.parse(payload)
+              dispatch({
+                type: AppActions.UpdateLoadedTransaction,
+                payload: {
+                  json,
+                  filePath,
+                },
+              })
+              history.push(location.pathname + url)
+            }
+            break
+          }
           default: {
             break
           }
@@ -225,10 +264,10 @@ export const useSubscription = ({
       networkListSubscription.unsubscribe()
       currentNetworkIDSubscription.unsubscribe()
       connectionStatusSubscription.unsubscribe()
-      syncedBlockNumberSubscription.unsubscribe()
+      syncStatusSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch])
+  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch, location.pathname])
 }
 
 export default {

@@ -109,21 +109,21 @@ describe('queue', () => {
   }
   const addresses = [addressInfo]
 
-  let stubbedBlockTipSubject: any
+  let stubbedBlockTipsSubject: any
   let stubbedTransactionsSubject: any
 
   beforeEach(async () => {
     resetMocks()
     jest.useFakeTimers()
 
-    stubbedBlockTipSubject = new Subject<Tip>()
+    stubbedBlockTipsSubject = new Subject<Tip>()
     stubbedTransactionsSubject = new Subject<Array<TransactionWithStatus>>()
     const stubbedIndexerConnector = jest.fn().mockImplementation(
       (...args) => {
         stubbedIndexerConnectorConstructor(...args)
         return {
           connect: stubbedConnectFn,
-          blockTipSubject: stubbedBlockTipSubject,
+          blockTipsSubject: stubbedBlockTipsSubject,
           transactionsSubject: stubbedTransactionsSubject,
           notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn,
         }
@@ -146,11 +146,13 @@ describe('queue', () => {
         }
       }
     });
-    jest.doMock('services/wallets', () => {
-      return {
-        checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
-      }
-    });
+    jest.doMock('services/wallets', () => ({
+      getInstance: () => ({
+        get: () => ({
+          checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
+        })
+      }),
+    }));
     jest.doMock('utils/logger', () => {
       return { error: stubbedLoggerErrorFn }
     });
@@ -184,12 +186,15 @@ describe('queue', () => {
     it('connects indexer', () => {
       expect(stubbedConnectFn).toHaveBeenCalled()
     });
-    describe('subscribes to IndexerConnector#blockTipSubject', () => {
+    describe('subscribes to IndexerConnector#blockTipsSubject', () => {
       describe('when new block tip emits from IndexerConnector', () => {
         it('notify latest block numbers', () => {
           const mock = jest.spyOn(process, 'send')
-          stubbedBlockTipSubject.next({ block_number: '3', block_hash: '0x' })
-          expect(mock).toHaveBeenCalledWith({ channel: 'synced-block-number-updated', result: '3' })
+          stubbedBlockTipsSubject.next({ cacheTipNumber: 3, indexerTipNumber: 3 })
+          expect(mock).toHaveBeenCalledWith({
+            channel: 'sync-estimate-updated',
+            result: {cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything()}
+          })
           mock.mockRestore()
         })
       });
@@ -231,7 +236,7 @@ describe('queue', () => {
             }
           });
           it('checks and generate new addresses', () => {
-            expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledWith(fakeWalletId)
+            expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledTimes(fakeTxs.length)
           });
           it('notify indexer connector of processed block number', () => {
             expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)

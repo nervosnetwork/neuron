@@ -25,7 +25,7 @@ export interface SpecialAssetProps {
   }
   onAction: any
   connectionStatus: State.ConnectionStatus
-  tipBlockTimestamp: number
+  bestKnownBlockTimestamp: number
 }
 
 const SpecialAsset = ({
@@ -39,13 +39,13 @@ const SpecialAsset = ({
   epochsInfo,
   onAction,
   connectionStatus,
-  tipBlockTimestamp,
+  bestKnownBlockTimestamp,
 }: SpecialAssetProps) => {
   const [t] = useTranslation()
   const [date, time] = uniformTimeFormatter(datetime).split(' ')
   let targetTime: undefined | number
   if (epochsInfo?.target !== undefined && epochsInfo?.current !== undefined) {
-    targetTime = tipBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MS_PER_EPOCHS
+    targetTime = bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MS_PER_EPOCHS
   }
 
   const onViewDetail = useCallback(() => {
@@ -53,15 +53,15 @@ const SpecialAsset = ({
     openExternal(`${explorerUrl}/transaction/${txHash}#${index}`)
   }, [isMainnet, txHash, index])
 
-  const balance = shannonToCKBFormatter(capacity)
-
   return (
     <div className={styles.container}>
       <div className={styles.datetime}>
         <span>{date}</span>
         <span>{time}</span>
       </div>
-      <CopyZone className={styles.capacity} content={balance.replace(/,/g, '')}>{`${balance} CKB`}</CopyZone>
+      <CopyZone className={styles.capacity} content={shannonToCKBFormatter(capacity, false, '')}>
+        {`${shannonToCKBFormatter(capacity)} CKB`}
+      </CopyZone>
       <div className={styles.indicators}>
         <div data-on={hasTypeScript} data-tooltip="Type">
           T

@@ -60,13 +60,14 @@ export default class AnyoneCanPayController {
     })
   }
 
-  public async sendTx(params: SendAnyoneCanPayTxParams): Promise<Controller.Response<string>> {
+  public async sendTx(params: SendAnyoneCanPayTxParams, skipSign = false): Promise<Controller.Response<string>> {
     const txModel = Transaction.fromObject(params.tx)
     const txHash = await new TransactionSender().sendTx(
       params.walletID,
       txModel,
       params.password,
       1,
+      skipSign
     )
 
     if (!txHash) {

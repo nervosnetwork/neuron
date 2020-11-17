@@ -1,3 +1,5 @@
+import { TFunction } from 'i18next'
+import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { CapacityUnit } from './enums'
 
 const base = 10e9
@@ -271,4 +273,14 @@ export const sudtValueToAmount = (value: string | null = '0', decimal: string = 
 export const sUDTAmountFormatter = (amount: string) => {
   const fmtted = amount.substr(0, (amount.split('.')[0]?.length ?? 0) + 9)
   return `${fmtted}${fmtted.length < amount.length ? '...' : ''}`
+}
+
+export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {
+  // empty string should return unknown error too
+  const unknownError = t('messages.unknown-error')
+  if (typeof error === 'string') {
+    return error || unknownError
+  }
+
+  return error.content || unknownError
 }

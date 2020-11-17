@@ -22,11 +22,13 @@ const Send = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
-      tipBlockNumber,
-      tipBlockTimestamp,
     },
     wallet: { id: walletID = '', balance = '' },
-    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
+    chain: {
+      networkID,
+      connectionStatus,
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+    },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -101,9 +103,9 @@ const Send = () => {
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
 
   const syncStatus = getSyncStatus({
-    tipBlockNumber,
-    syncedBlockNumber,
-    tipBlockTimestamp,
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
+    cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })

@@ -2,6 +2,17 @@ import Keystore from '../../src/models/keys/keystore'
 import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { when } from 'jest-when'
+import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
+import { AddressType } from '../../src/models/keys/address'
+import { Manufacturer } from '../../src/services/hardware/common'
+
+const stubbedDeletedByWalletIdFn = jest.fn()
+const stubbedGenerateAndSaveForExtendedKeyFn = jest.fn()
+const stubbedGenerateAndSaveForPublicKeyFn = jest.fn()
+const stubbedGetNextUnusedAddressByWalletIdFn = jest.fn()
+const stubbedGetNextUnusedChangeAddressByWalletIdFn = jest.fn()
+const stubbedGetUnusedReceivingAddressesByWalletIdFn = jest.fn()
+const stubbedGetFirstAddressByWalletIdFn = jest.fn()
 
 const stubbedGetAddressesByWalletId = jest.fn()
 const stubbedCheckAndGenerateSave = jest.fn()
@@ -9,17 +20,28 @@ const stubbedDeleteByWalletId = jest.fn()
 
 jest.doMock('../../src/services/addresses', () => {
   return {
+    deleteByWalletId: stubbedDeleteByWalletId,
+    generateAndSaveForExtendedKey: stubbedGenerateAndSaveForExtendedKeyFn,
+    generateAndSaveForPublicKey: stubbedGenerateAndSaveForPublicKeyFn,
+    getNextUnusedAddressByWalletId: stubbedGetNextUnusedAddressByWalletIdFn,
+    getNextUnusedChangeAddressByWalletId: stubbedGetNextUnusedChangeAddressByWalletIdFn,
+    getUnusedReceivingAddressesByWalletId: stubbedGetUnusedReceivingAddressesByWalletIdFn,
+    getFirstAddressByWalletId: stubbedGetFirstAddressByWalletIdFn,
     getAddressesByWalletId: stubbedGetAddressesByWalletId,
     checkAndGenerateSave: stubbedCheckAndGenerateSave,
-    deleteByWalletId: stubbedDeleteByWalletId
   }
 });
-import WalletService, { WalletProperties } from '../../src/services/wallets'
+import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
+import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 
 const resetMocks = () => {
-  stubbedGetAddressesByWalletId.mockReset()
-  stubbedCheckAndGenerateSave.mockReset()
-  stubbedDeleteByWalletId.mockReset()
+  stubbedDeletedByWalletIdFn.mockReset()
+  stubbedGenerateAndSaveForExtendedKeyFn.mockReset()
+  stubbedGenerateAndSaveForPublicKeyFn.mockReset()
+  stubbedGetNextUnusedAddressByWalletIdFn.mockReset()
+  stubbedGetNextUnusedChangeAddressByWalletIdFn.mockReset()
+  stubbedGetUnusedReceivingAddressesByWalletIdFn.mockReset()
+  stubbedGetFirstAddressByWalletIdFn.mockReset()
 }
 
 describe('wallet service', () => {
@@ -28,6 +50,10 @@ describe('wallet service', () => {
   let wallet1: WalletProperties
   let wallet2: WalletProperties
   let wallet3: WalletProperties
+  let wallet4: WalletProperties
+  const fakePublicKey = 'keykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykey'
+  const fakeChainCode = 'codecodecodecodecodecodecodecodecodecodecodecodecodecodecodecode'
+
 
   beforeAll(async () => {
     await initConnection('')
@@ -38,6 +64,7 @@ describe('wallet service', () => {
   })
 
   beforeEach(async () => {
+    resetMocks()
     const connection = getConnection()
     await connection.synchronize(true)
 
@@ -47,7 +74,7 @@ describe('wallet service', () => {
     wallet1 = {
       name: 'wallet-test1',
       id: '',
-      extendedKey: '',
+      extendedKey: `${fakePublicKey}${fakeChainCode}`,
       keystore: new Keystore(
         {
           cipher: 'wallet1',
@@ -70,7 +97,7 @@ describe('wallet service', () => {
     wallet2 = {
       name: 'wallet-test2',
       id: '',
-      extendedKey: '',
+      extendedKey: 'a',
       keystore: new Keystore(
         {
           cipher: 'wallet2',
@@ -93,7 +120,7 @@ describe('wallet service', () => {
     wallet3 = {
       name: 'wallet-test3',
       id: '',
-      extendedKey: '',
+      extendedKey: 'a',
       keystore: new Keystore(
         {
           cipher: 'wallet3',
@@ -112,61 +139,220 @@ describe('wallet service', () => {
         '3'
       ),
     }
+
+    wallet4 = {
+      name: 'wallet-test4',
+      id: '',
+      extendedKey: 'a'.repeat(66) + 'b'.repeat(64),
+      device: {
+        manufacturer: Manufacturer.Ledger,
+        product: 'Nano S',
+        isBluetooth: false,
+        descriptor: '',
+        vendorId: '10086',
+        addressIndex: 0,
+        addressType: AddressType.Receiving,
+      }
+    }
   })
 
   afterEach(() => {
     walletService.clearAll()
   })
 
-  it('save wallet', () => {
-    const { id } = walletService.create(wallet1)
-    const wallet = walletService.get(id)
-    expect(wallet && wallet.name).toEqual(wallet1.name)
-  })
-
   it('wallet not exist', () => {
     const id = '1111111111'
     expect(() => walletService.get(id)).toThrowError()
   })
+  describe('with a software wallet', () => {
+    let createdWallet: Wallet
+    beforeEach(() => {
+      createdWallet = walletService.create(wallet1)
+    });
+    it('saves name', () => {
+      const wallet = walletService.get(createdWallet.id)
+      expect(wallet.name).toEqual(wallet1.name)
+    })
+    describe('#loadKeystore', () => {
+      it('returns keystore', () => {
+        const wallet = walletService.get(createdWallet.id)
+        const keystore = wallet.loadKeystore()
+        expect(keystore.crypto).toEqual(wallet1.keystore!.crypto)
+      })
+    });
+    describe('#accountExtendedPublicKey', () => {
+      it('returns xpubkey', () => {
+        const wallet = walletService.get(createdWallet.id)
+        const extendedPublicKey = wallet.accountExtendedPublicKey()
+        expect(extendedPublicKey.publicKey).toEqual(fakePublicKey)
+        expect(extendedPublicKey.chainCode).toEqual(fakeChainCode)
+      })
+    });
+    describe('#getDeviceInfo', () => {
+      it('throws error', () => {
+        const wallet = walletService.get(createdWallet.id)
+        expect(() => wallet.getDeviceInfo()).toThrowError(
+          new WalletFunctionNotSupported(wallet.getDeviceInfo.name)
+        )
+      })
+    });
 
-  it('get all wallets', () => {
-    walletService.create(wallet1)
-    walletService.create(wallet2)
-    walletService.create(wallet3)
-    expect(walletService.getAll().length).toBe(3)
-  })
+    describe('#checkAndGenerateAddresses', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.checkAndGenerateAddresses()
+      })
+      it('calls AddressService.accountExtendedPublicKey', async () => {
+        expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
+          createdWallet.id,
+          expect.objectContaining({
+            chainCode: createdWallet.accountExtendedPublicKey().chainCode,
+            publicKey: createdWallet.accountExtendedPublicKey().publicKey,
+          }),
+          false,
+          20,
+          10
+        )
+      })
+    });
+    describe('#getNextAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextAddress()
+      })
+      it('calls AddressService.getNextUnusedAddressByWalletId', () => {
+        expect(stubbedGetNextUnusedAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextChangeAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextChangeAddress()
+      })
+      it('calls AddressService.getNextUnusedChangeAddressByWalletId', () => {
+        expect(stubbedGetNextUnusedChangeAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextReceivingAddressesByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextReceivingAddresses()
+      })
+      it('calls AddressService.getUnusedReceivingAddressesByWalletId', () => {
+        expect(stubbedGetUnusedReceivingAddressesByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+  });
+  describe('with a hardware wallet', () => {
+    let createdWallet: Wallet
+    beforeEach(() => {
+      createdWallet = walletService.create(wallet4)
+    });
+    it('saves name', () => {
+      const wallet = walletService.get(createdWallet.id)
+      expect(wallet.name).toEqual(wallet4.name)
+    })
+    describe('#getDeviceInfo', () => {
+      it('return device info', () => {
+        const wallet = walletService.get(createdWallet.id)
+        const device = wallet.getDeviceInfo()
+        expect(device).toEqual(wallet4.device)
+      })
+    });
+    describe('#loadKeystore', () => {
+      it('throws error', () => {
+        const wallet = walletService.get(createdWallet.id)
+        expect(() => wallet.loadKeystore()).toThrowError(
+          new WalletFunctionNotSupported(wallet.loadKeystore.name)
+        )
+      })
+    });
 
-  it('rename wallet', () => {
-    const w1 = walletService.create(wallet1)
-    wallet1.name = wallet2.name
-    walletService.update(w1.id, wallet1)
-    const wallet = walletService.get(w1.id)
-    expect(wallet && wallet.name).toEqual(wallet2.name)
-  })
+    describe('#checkAndGenerateAddresses', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.checkAndGenerateAddresses()
+      })
+      it('calls AddressService.generateAndSaveForExtendedKey', async () => {
+        const { publicKey } = AccountExtendedPublicKey.parse(wallet4.extendedKey)
+        expect(stubbedGenerateAndSaveForPublicKeyFn).toHaveBeenCalledWith(
+          createdWallet.id,
+          publicKey,
+          0,
+          0
+        )
+      })
+    });
+    describe('#getNextAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextAddress()
+      })
+      it('calls AddressService.getGetFirstAddressByWalletId', () => {
+        expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextChangeAddressByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextChangeAddress()
+      })
+      it('calls AddressService.getGetFirstAddressByWalletId', () => {
+        expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+    describe('#getNextReceivingAddressesByWalletId', () => {
+      beforeEach(async () => {
+        const wallet = await WalletService.getInstance().get(createdWallet.id)
+        await wallet.getNextReceivingAddresses()
+      })
+      it('calls AddressService.getGetFirstAddressByWalletId', () => {
+        expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
+      })
+    });
+  });
 
-  it('get and set active wallet', () => {
-    const w1 = walletService.create(wallet1)
-    const w2 = walletService.create(wallet2)
+  describe('#update', () => {
+    let createdWallet: Wallet
+    beforeEach(() => {
+      createdWallet = walletService.create(wallet1)
+    });
+    it('renames wallet', () => {
+      wallet1.name = 'renamed'
+      walletService.update(createdWallet.id, wallet1)
+      const updatedWallet = walletService.get(createdWallet.id)
+      expect(updatedWallet.name).toEqual('renamed')
+    })
+  });
 
-    expect(() => walletService.setCurrent(w1.id)).not.toThrowError()
+  describe('#getCurrent', () => {
+    let createdWallet1: Wallet
+    let createdWallet2: Wallet
+    beforeEach(() => {
+      createdWallet1 = walletService.create(wallet2)
+      createdWallet2 = walletService.create(wallet3)
+    });
+    it('get all wallets', () => {
+      expect(walletService.getAll().length).toBe(2)
+    })
 
-    let currentWallet = walletService.getCurrent()
-    expect(currentWallet && currentWallet.id).toEqual(w1.id)
+    it('get and set active wallet', () => {
+      expect(() => walletService.setCurrent(createdWallet1.id)).not.toThrowError()
 
-    expect(() => walletService.setCurrent(w2.id)).not.toThrowError()
+      let currentWallet = walletService.getCurrent()
+      expect(currentWallet && currentWallet.id).toEqual(createdWallet1.id)
 
-    currentWallet = walletService.getCurrent()
-    expect(currentWallet && currentWallet.id).toEqual(w2.id)
+      expect(() => walletService.setCurrent(createdWallet2.id)).not.toThrowError()
 
-    expect(() => walletService.setCurrent(w1.id)).not.toThrowError()
-  })
+      currentWallet = walletService.getCurrent()
+      expect(currentWallet && currentWallet.id).toEqual(createdWallet2.id)
+    })
 
-  it('the last created wallet is active wallet', () => {
-    walletService.create(wallet1)
-    const w2 = walletService.create(wallet2)
-    const activeWallet = walletService.getCurrent()
-    expect(activeWallet && activeWallet.id).toEqual(w2.id)
-  })
+    it('the last created wallet is active wallet', () => {
+      const activeWallet = walletService.getCurrent()
+      expect(activeWallet && activeWallet.id).toEqual(createdWallet2.id)
+    })
+  });
 
   describe('#delete', () => {
     let w1: any
@@ -179,6 +365,7 @@ describe('wallet service', () => {
       await walletService.delete(w1.id)
       expect(() => walletService.get(w1.id)).toThrowError()
       expect(stubbedDeleteByWalletId).toHaveBeenCalledWith(w1.id)
+      expect(stubbedDeleteByWalletId).toHaveBeenCalledTimes(1)
     })
 
     describe('with more than one wallets', () => {
@@ -205,7 +392,6 @@ describe('wallet service', () => {
           expect(activeWallet && activeWallet.id).toEqual(w1.id)
         })
       });
-
     });
   });
 

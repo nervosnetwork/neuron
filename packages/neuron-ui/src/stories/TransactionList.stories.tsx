@@ -9,7 +9,7 @@ Object.entries(transactions).forEach(([title, list]) => {
     <TransactionList
       isMainnet
       isLoading={false}
-      tipBlockNumber="123"
+      bestKnownBlockNumber={123}
       walletID="1"
       walletName="wallet name"
       items={list}
@@ -22,7 +22,7 @@ stories.add('Wtih empty pending list', () => (
   <TransactionList
     isMainnet
     isLoading={false}
-    tipBlockNumber="123"
+    bestKnownBlockNumber={123}
     walletID="1"
     walletName="wallet name"
     items={transactions['Content List'].filter(item => item.status !== 'pending')}
@@ -35,7 +35,7 @@ stories.add('Shimmered List', () => {
     <TransactionList
       isMainnet
       isLoading={false}
-      tipBlockNumber="123"
+      bestKnownBlockNumber={123}
       walletID="1"
       walletName="wallet name"
       items={[]}

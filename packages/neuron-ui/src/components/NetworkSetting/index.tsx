@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TFunction } from 'i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import NetworkTypeLabel from 'components/NetworkTypeLabel'
 import Button from 'widgets/Button'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
@@ -12,20 +12,6 @@ import { setCurrentNetowrk } from 'services/remote'
 
 import { backToTop, RoutePath, useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
 import styles from './networkSetting.module.scss'
-
-const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: TFunction }) => {
-  switch (type) {
-    case 'ckb': {
-      return <span className="label primary">{t('settings.network.mainnet')}</span>
-    }
-    case 'ckb_testnet': {
-      return <span className="label secondary">{t('settings.network.testnet')}</span>
-    }
-    default: {
-      return <span className="label third">{t('settings.network.devnet')}</span>
-    }
-  }
-}
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
@@ -83,7 +69,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                   <span className={styles.networkLabel}>
                     {text}
                     <span className={styles.url}>{`(${network.remote}`}</span>
-                    <Label type={network.chain} t={t} />
+                    <NetworkTypeLabel type={network.chain} />
                   </span>
 
                   <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>

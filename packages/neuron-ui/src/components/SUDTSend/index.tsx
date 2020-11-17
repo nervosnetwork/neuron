@@ -294,12 +294,12 @@ const SUDTSend = () => {
           type: AppActions.RequestPassword,
           payload: {
             walletID: walletId as string,
-            actionType: 'send-sudt',
+            actionType: accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? 'send-acp' : 'send-sudt',
           },
         })
       }
     },
-    [isSubmittable, globalDispatch, walletId]
+    [isSubmittable, globalDispatch, walletId, accountInfo]
   )
 
   if (!isLoaded) {

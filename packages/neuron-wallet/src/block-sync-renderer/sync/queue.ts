@@ -13,7 +13,7 @@ import AssetAccountService from 'services/asset-account-service'
 import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
-import IndexerConnector from './indexer-connector'
+import IndexerConnector, { BlockTips } from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
 import CommonUtils from 'utils/common'
 import { ChildProcess } from 'utils/worker'
@@ -25,7 +25,6 @@ export default class Queue {
   private rpcService: RpcService
   private indexerConnector: IndexerConnector | undefined
   private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
-  private currentBlockNumber = BigInt(0)
 
   private multiSignBlake160s: string[]
   private anyoneCanPayLockHashes: string[]
@@ -55,8 +54,8 @@ export default class Queue {
       this.url
     )
     this.indexerConnector.connect()
-    this.indexerConnector.blockTipSubject.subscribe(tip => {
-      this.updateCurrentBlockNumber(BigInt(tip.block_number))
+    this.indexerConnector.blockTipsSubject.subscribe(tip => {
+      this.updateBlockNumberTips(tip)
     });
 
 
@@ -209,16 +208,21 @@ export default class Queue {
         )
         .map(addr => addr.walletId)
     )
+    const walletService = WalletService.getInstance()
     for (const walletId of walletIds) {
-      await WalletService.checkAndGenerateAddresses(walletId)
+      const wallet = walletService.get(walletId)
+      await wallet.checkAndGenerateAddresses()
     }
   }
 
-  private updateCurrentBlockNumber(blockNumber: BigInt) {
-    this.currentBlockNumber = BigInt(blockNumber)
+  private updateBlockNumberTips(tip: BlockTips) {
     ChildProcess.send({
-      channel: 'synced-block-number-updated',
-      result: this.currentBlockNumber.toString()
+      channel: 'sync-estimate-updated',
+      result: {
+        indexerTipNumber: tip.indexerTipNumber,
+        cacheTipNumber: tip.cacheTipNumber,
+        timestamp: Date.now()
+      }
     })
   }
 }

@@ -29,6 +29,8 @@ export enum RoutePath {
   SUDTAccountList = '/s-udt/accounts',
   SUDTSend = '/s-udt/send',
   SUDTReceive = '/s-udt/receive',
+  ImportHardware = '/*/import-hardware',
+  OfflineSign = '/*/offline-sign',
 }
 
 export enum CapacityUnit {
@@ -93,6 +95,15 @@ export enum ErrorCode {
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
+  // hardware
+  SignTransactionFailed = 400,
+  ConnectFailed = 401,
+  CkbAppNotFound = 402,
+  DeviceNotFound = 403,
+  MultiDevice = 404,
+  UnknownError = 405,
+  SignMessageFailed = 406,
+  UnsupportedManufacturer = 407,
 }
 
 export enum SyncStatus {
@@ -130,8 +141,14 @@ export enum MultiSigLockInfo {
   CodeHashIndex = '0x01',
 }
 
-export enum AnyoneCanPayLockInfo {
+export enum AnyoneCanPayLockInfoOnAggron {
   CodeHash = '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
   HashType = 'type',
+  CodeHashIndex = '0x02',
+}
+
+export enum AnyoneCanPayLockInfoOnLina {
+  CodeHash = '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
+  HashType = 'data',
   CodeHashIndex = '0x02',
 }

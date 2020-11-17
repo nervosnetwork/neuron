@@ -1,7 +1,8 @@
-import { ErrorCode, isSuccessResponse, ResponseCode } from 'utils'
+import { ErrorCode, isSuccessResponse, ResponseCode, failureResToNotification } from 'utils'
 import {
   sendCreateSUDTAccountTransaction as sendCreateAccountTx,
   sendSUDTTransaction as sendSUDTTx,
+  migrateAcp as migrateAcpIpc,
 } from 'services/remote'
 import { AppActions, StateDispatch } from '../reducer'
 import { addNotification } from './app'
@@ -17,7 +18,7 @@ export const sendCreateSUDTAccountTransaction = (params: Controller.SendCreateSU
     const res = await sendCreateAccountTx(params)
     if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
-    } else if (res.status !== ErrorCode.PasswordIncorrect) {
+    } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
       addNotification({
         type: 'alert',
         timestamp: +new Date(),
@@ -27,10 +28,13 @@ export const sendCreateSUDTAccountTransaction = (params: Controller.SendCreateSU
       })(dispatch)
       dispatch({ type: AppActions.DismissPasswordRequest })
     }
-    return res.status
+    return res
   } catch (err) {
     console.warn(err)
-    return ResponseCode.FAILURE
+    return {
+      status: ResponseCode.FAILURE,
+      message: err,
+    }
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,
@@ -50,7 +54,7 @@ export const sendSUDTTransaction = (params: Controller.SendSUDTTransaction.Param
     const res = await sendSUDTTx(params)
     if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
-    } else if (res.status !== ErrorCode.PasswordIncorrect) {
+    } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
       addNotification({
         type: 'alert',
         timestamp: +new Date(),
@@ -60,10 +64,40 @@ export const sendSUDTTransaction = (params: Controller.SendSUDTTransaction.Param
       })(dispatch)
       dispatch({ type: AppActions.DismissPasswordRequest })
     }
+    return res
+  } catch (err) {
+    console.warn(err)
+    return {
+      status: ResponseCode.FAILURE,
+      message: err,
+    }
+  } finally {
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: { sending: false },
+    })
+  }
+}
+
+export const migrateAcp = (params: Controller.MigrateAcp.Params) => async (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.UpdateLoadings,
+    payload: { sending: true },
+  })
+  try {
+    const res = await migrateAcpIpc(params)
+    if (res.status !== ErrorCode.PasswordIncorrect) {
+      dispatch({
+        type: AppActions.DismissPasswordRequest,
+      })
+      if (!isSuccessResponse(res)) {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
+    }
     return res.status
   } catch (err) {
     console.warn(err)
-    return ResponseCode.FAILURE
+    return 0
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,

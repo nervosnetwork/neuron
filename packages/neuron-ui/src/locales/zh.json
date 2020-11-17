@@ -25,9 +25,66 @@
     },
     "network-status": {
       "tooltip": {
-        "block-number": "区块高度",
-        "tip-block": "已知最新区块",
-        "synced": "已同步"
+        "block-synced": "已同步区块"
+      }
+    },
+    "import-hardware": {
+      "title": {
+        "select-model": "请连接设备并选择型号",
+        "detect-device": "搜索设备",
+        "name-wallet": "命名钱包",
+        "choose-address": "从设备中选择地址"
+      },
+      "actions": {
+        "confirm": "请在你的设备上确认...",
+        "success": "导入成功",
+        "next": "下一步",
+        "cancel": "取消",
+        "back": "上一步",
+        "rescan": "重新搜索",
+        "close": "关闭"
+      },
+      "waiting": "等待 CKB 应用响应...",
+      "abort": "等待 CKB 应用响应... 操作终止。",
+      "app-version": "检测到 CKB 应用版本 v{{version}}。",
+      "firmware-version": "检测到固件版本 v{{version}}。",
+      "wallet-name": "钱包名称",
+      "select-model": "选择型号"
+    },
+    "hardware-sign": {
+      "cancel": "取消",
+      "title": "使用硬件钱包进行签名",
+      "device": "设备：",
+      "status": {
+        "label": "状态：",
+        "connect": "已连接",
+        "user-input": "已连接，等待确认...",
+        "disconnect": "未连接，请检查设备连接。"
+      },
+      "actions": {
+        "close": "关闭",
+        "success": "交易成功",
+        "rescan": "再次检测"
+      }
+    },
+    "offline-sign": {
+      "title": "离线签名",
+      "json-file": "JSON 文件：",
+      "status": {
+        "label": "状态：",
+        "unsigned": "未签名",
+        "partially-signed": "部分签名",
+        "signed": "已签名"
+      },
+      "wallet": "钱包：",
+      "content": "内容：",
+      "export": "导出交易",
+      "sign-and-export": "签名并导出交易",
+      "sign-and-broadcast": "签名并广播交易",
+      "actions": {
+        "broadcast": "广播交易",
+        "sign": "签名并导出",
+        "cancel": "取消"
       }
     },
     "overview": {
@@ -63,6 +120,11 @@
       "import-mnemonic": "导入助记词",
       "import-keystore": "导入 Keystore 文件",
       "import-wallet": "导入钱包",
+      "import-hardware-wallet": "导入硬件钱包",
+      "new-wallet": "新钱包",
+      "wallet-seed": "Keystore 文件",
+      "keystore": "助记词",
+      "hardware-wallet": "硬件钱包",
       "next": "下一步",
       "back": "上一步",
       "name": "钱包名称",
@@ -295,6 +357,9 @@
       },
       "send-sudt": {
         "title": "发起 sUDT 交易"
+      },
+      "send-acp": {
+        "title": "发起 CKB 交易"
       }
     },
     "qrcode": {
@@ -347,7 +412,6 @@
       "view-the-run-node-doc": "打开浏览器查看文档",
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "no-valid-addresses-found": "未找到有效地址",
-      "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
       "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
       "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "rebuild-sync": "为了提供更好的用户体验，Neuron 采取了新的索引方案，该方案需要一次性重构缓存数据库(预期同步时间为 30~60 分钟)。\n抱歉给您带来不便。",
@@ -407,12 +471,15 @@
         "305": "$t(messages.fields.address)不能为空。",
         "306": "请输入主网地址",
         "307": "请输入测试网地址",
-        "308": "余额不足"
+        "308": "余额不足",
+        "402": "CKB 应用未打开。请在你的设备打开 CKB 应用。",
+        "403": "未检测到设备，请检查你的设备连接。",
+        "404": "检查到多个设备，同一型号的设备只能同时连接一个。"
       }
     },
     "sync": {
       "synced": "同步完成",
-      "syncing": "区块同步中",
+      "syncing": "区块同步中, 还需约 {{ leftTime }}",
       "block-number": "区块高度",
       "syncing-balance": "区块同步中, 正在获取最新余额",
       "slow": "同步缓慢，请检查网络",

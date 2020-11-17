@@ -18,7 +18,7 @@ describe('TransactionSender Test', () => {
       const wallet1 = {
         name: 'wallet-test1',
         id: '11',
-        extendedKey: '',
+        extendedKey: 'a',
         keystore: new Keystore(
           {
             cipher: 'wallet1',

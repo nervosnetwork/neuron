@@ -100,6 +100,19 @@ type Action =
   | 'generate-send-all-to-anyone-can-pay-tx'
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
+  | 'migrate-acp'
+  // Hardware Wallet
+  | 'detect-device'
+  | 'get-device-ckb-app-version'
+  | 'get-device-firmware-version'
+  | 'get-device-public-key'
+  | 'connect-device'
+  | 'create-hardware-wallet'
+  // offline-signature
+  | 'export-transaction-as-json'
+  | 'sign-transaction-only'
+  | 'broadcast-transaction-only'
+  | 'sign-and-export-transaction'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

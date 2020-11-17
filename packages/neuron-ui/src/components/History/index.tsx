@@ -18,13 +18,12 @@ import styles from './history.module.scss'
 const History = () => {
   const {
     app: {
-      tipBlockNumber: chainBlockNumber,
       loadings: { transactionList: isLoading },
     },
     wallet: { id, name: walletName },
     chain: {
       networkID,
-      tipBlockNumber: syncedBlockNumber,
+      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber },
       transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
     },
     settings: { networks },
@@ -49,10 +48,7 @@ const History = () => {
     })
   }, [id, setIsExporting])
 
-  const tipBlockNumber = useMemo(() => {
-    return Math.max(+syncedBlockNumber, +chainBlockNumber).toString()
-  }, [syncedBlockNumber, chainBlockNumber])
-
+  const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
   const List = useMemo(() => {
     return (
       <Stack className={styles.container}>
@@ -93,7 +89,7 @@ const History = () => {
               walletID={id}
               walletName={walletName}
               items={items as State.Transaction[]}
-              tipBlockNumber={tipBlockNumber}
+              bestKnownBlockNumber={bestBlockNumber}
               isMainnet={isMainnet}
               dispatch={dispatch}
             />
@@ -120,7 +116,7 @@ const History = () => {
     id,
     walletName,
     items,
-    tipBlockNumber,
+    bestBlockNumber,
     dispatch,
     pageNo,
     totalCount,

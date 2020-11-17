@@ -1,31 +1,17 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConnectionStatus, SyncStatus, localNumberFormatter } from 'utils'
+import NetworkTypeLabel from 'components/NetworkTypeLabel'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
-  networkName: string | null
-  tipBlockNumber: string
-  syncedBlockNumber: string
-  connectionStatus: State.ConnectionStatus
-  syncStatus: SyncStatus
+  network: State.Network | undefined
+  syncPercents: number
+  syncBlockNumbers: string
   onAction: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({
-  networkName = null,
-  tipBlockNumber,
-  syncedBlockNumber,
-  connectionStatus = ConnectionStatus.Connecting,
-  onAction,
-  syncStatus = SyncStatus.SyncNotStart,
-}: NetworkStatusProps) => {
+const NetworkStatus = ({ network, syncPercents, syncBlockNumbers, onAction }: NetworkStatusProps) => {
   const [t] = useTranslation()
-
-  let synced = syncedBlockNumber
-  if (tipBlockNumber && BigInt(tipBlockNumber) < BigInt(syncedBlockNumber)) {
-    synced = tipBlockNumber
-  }
 
   return (
     <div
@@ -36,31 +22,20 @@ const NetworkStatus = ({
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {networkName && (tipBlockNumber || +synced >= 0) ? (
+      {network ? (
         <div className={styles.tooltip}>
-          <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
-          {tipBlockNumber ? (
-            <>
-              <span>{t('network-status.tooltip.tip-block')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(tipBlockNumber)}</span>
-            </>
-          ) : null}
-          {+synced >= 0 ? (
-            <>
-              <span>{t('network-status.tooltip.synced')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(synced)}</span>
-            </>
-          ) : null}
+          <div className={styles.tooltipTitle}>
+            <span>{t('network-status.tooltip.block-synced')}</span>
+            <span>{`${syncPercents}%`}</span>
+          </div>
+          <span className={styles.blockNumber}>{syncBlockNumbers}</span>
         </div>
       ) : null}
-      {networkName ? (
-        <span
-          className={styles.name}
-          data-online={connectionStatus === ConnectionStatus.Online}
-          data-sync-status={SyncStatus[syncStatus]}
-        >
-          {networkName}
-        </span>
+      {network ? (
+        <div>
+          <NetworkTypeLabel type={network.chain} />
+          <span className={styles.name}>{network.name}</span>
+        </div>
       ) : (
         <span>{t('settings.setting-tabs.network')}</span>
       )}

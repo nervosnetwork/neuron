@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType } from '@ckb-lumos/base'
-import { Indexer, Tip, CellCollector } from '@ckb-lumos/indexer'
+import { Indexer, CellCollector, Tip } from '@ckb-lumos/indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -40,6 +40,11 @@ export interface LumosCell {
   data?: string
 }
 
+export interface BlockTips {
+  cacheTipNumber: number
+  indexerTipNumber: number | undefined
+}
+
 export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
@@ -48,9 +53,8 @@ export default class IndexerConnector {
   private indexerQueryQueue: AsyncQueue<LumosCellQuery> | undefined
 
   private processingBlockNumber: string | undefined
-  private indexerTip: Tip | undefined
   public pollingIndexer: boolean = false
-  public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
+  public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
   constructor(
@@ -84,6 +88,33 @@ export default class IndexerConnector {
     })
   }
 
+  private async synchronize(indexerTipBlock: Tip) {
+    if (!indexerTipBlock) {
+      return
+    }
+
+    await this.upsertTxHashes()
+
+    const indexerTipNumber = parseInt(indexerTipBlock.block_number, 16)
+
+    const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
+    if (nextUnprocessedBlockTip) {
+      this.blockTipsSubject.next({
+        cacheTipNumber: parseInt(nextUnprocessedBlockTip.blockNumber),
+        indexerTipNumber,
+      })
+      if (!this.processingBlockNumber) {
+        await this.processNextBlockNumber()
+      }
+    }
+    else {
+      this.blockTipsSubject.next({
+        cacheTipNumber: indexerTipNumber,
+        indexerTipNumber,
+      })
+    }
+  }
+
   public async connect() {
     try {
       this.indexer.startForever()
@@ -92,24 +123,8 @@ export default class IndexerConnector {
       await this.processNextBlockNumber()
 
       while (this.pollingIndexer) {
-        this.indexerTip = await this.indexer.tip()
-
-        await this.upsertTxHashes()
-
-        const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
-        if (nextUnprocessedBlockTip) {
-          this.blockTipSubject.next({
-            block_number: nextUnprocessedBlockTip.blockNumber,
-            block_hash: nextUnprocessedBlockTip.blockHash,
-          })
-          if (!this.processingBlockNumber) {
-            await this.processNextBlockNumber()
-          }
-        }
-        else if (this.indexerTip) {
-          this.blockTipSubject.next(this.indexerTip)
-        }
-
+        const indexerTipBlock = await this.indexer.tip()
+        await this.synchronize(indexerTipBlock)
         await CommonUtils.sleep(5000)
       }
     } catch (error) {

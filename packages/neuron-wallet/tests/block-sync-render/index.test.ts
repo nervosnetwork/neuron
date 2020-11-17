@@ -22,8 +22,6 @@ const stubbedLoggerInfo = jest.fn()
 const stubbedLoggerDebug = jest.fn()
 const stubbedLoggerError = jest.fn()
 
-const childProcessEmiter = new EventEmitter()
-
 const stubbedIpcMainOnce = jest.fn()
 
 const stubbedElectronBrowserConstructor = jest.fn().mockImplementation(
@@ -50,6 +48,9 @@ const resetMocks = () => {
   stubbedAddressCreatedSubjectSubscribe.mockReset()
   stubbedWalletDeletedSubjectSubscribe.mockReset()
 
+  stubbedTxDbChangedSubjectNext.mockReset()
+  stubbedSyncApiControllerEmitter.mockReset()
+
   stubbedIpcMainOnce.mockReset()
   stubbedQueryIndexer.mockReset()
   stubbedResetIndexerData.mockReset()
@@ -70,6 +71,7 @@ describe('block sync render', () => {
     let queryIndexer: any
     let createBlockSyncTask: any
     let resetSyncTask: any
+    let childProcessEmiter: any
 
     const network = {
       id: 'id',
@@ -79,6 +81,7 @@ describe('block sync render', () => {
     beforeEach(async () => {
       resetMocks()
       jest.useFakeTimers()
+      childProcessEmiter = new EventEmitter()
 
       jest.doMock('electron', () => {
         return {
@@ -373,7 +376,10 @@ describe('block sync render', () => {
             result
           })
         }
-        const result = { event: '' }
+        let result: any
+        beforeEach(() => {
+          result = { event: '' }
+        });
 
         describe('handles tx-db-changed event from child process', () => {
           beforeEach(() => {
@@ -388,17 +394,15 @@ describe('block sync render', () => {
             fakeSendMessageToMainProcess('address-db-changed', result)
           });
           it('AddressDbChangedSubject change in the main process', () => {
-            fakeSendMessageToMainProcess('address-db-changed', result)
             expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledWith(result)
           })
         });
-        describe('handles synced-block-number-updated event from child process', () => {
+        describe('handles sync-estimate-updated event from child process', () => {
           beforeEach(() => {
-            fakeSendMessageToMainProcess('synced-block-number-updated', result)
+            fakeSendMessageToMainProcess('sync-estimate-updated', result)
           });
           it('SyncApiController emiter message in the main process', ()=> {
-            fakeSendMessageToMainProcess('synced-block-number-updated', result)
-            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('synced-block-number-updated', result)
+            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('sync-estimate-updated', result)
           })
         });
         describe('handles wallet-deleted event from child process', () => {
