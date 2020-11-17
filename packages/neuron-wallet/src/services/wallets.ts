@@ -29,8 +29,8 @@ export interface WalletProperties {
 export abstract class Wallet {
   public id: string
   public name: string
+  public device?: DeviceInfo
   protected extendedKey: string = ''
-  protected device?: DeviceInfo
   protected isHD: boolean
 
   constructor(props: WalletProperties) {

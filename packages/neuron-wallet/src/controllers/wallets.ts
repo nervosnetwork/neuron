@@ -29,17 +29,17 @@ import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
 import HardwareWalletService from 'services/hardware'
-import { ExtendedPublicKey } from 'services/hardware/common'
+import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 
 export default class WalletsController {
-  public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
+  public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
     const wallets = WalletsService.getInstance().getAll()
     if (!wallets) {
       throw new ServiceHasNoResponse('Wallet')
     }
     return {
       status: ResponseCode.Success,
-      result: wallets.map(({ name, id }) => ({ name, id })),
+      result: wallets.map(({ name, id, device, }) => ({ name, id, device, })),
     }
   }
 
@@ -151,20 +151,35 @@ export default class WalletsController {
     }
   }
 
-  public async update({ id, name, password, newPassword }: { id: string, password: string, name: string, newPassword?: string }):
-    Promise<Controller.Response<Wallet>> {
+  public async update({
+    id,
+    name,
+    password,
+    newPassword,
+    device,
+  }: {
+    id: string;
+    password: string;
+    name: string;
+    newPassword?: string;
+    device?: DeviceInfo;
+  }): Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
     if (!wallet) {
       throw new WalletNotFound(id)
     }
 
-    const props: { name: string, keystore?: Keystore } = {
+    const props: { name: string, keystore?: Keystore, device?: DeviceInfo } = {
       name: name || wallet.name,
     }
 
     if (!wallet.isHardware()) {
       props.keystore = wallet.loadKeystore()
+    }
+
+    if (device && wallet.isHardware()) {
+      props.device = device
     }
 
     if (newPassword) {
