@@ -178,28 +178,36 @@ export default class AssetAccountController {
     }
   }
 
-  public async showACPMigrationDialog(allowMultipleOpen: boolean | undefined) {
+  public async showACPMigrationDialog(allowMultipleOpen: boolean | undefined): Promise<Controller.Response<boolean | undefined>> {
     const walletsService = WalletsService.getInstance()
     const currentWallet = walletsService.getCurrent()
     const walletId = currentWallet!.id;
 
     if (!allowMultipleOpen && this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
-      return
+      return {
+        status: ResponseCode.Success
+      }
     }
 
     const syncStatus = await new SyncApiController().getSyncStatus()
     if (syncStatus !== SyncStatus.SyncCompleted || BrowserWindow.getAllWindows().length !== 1) {
-      return
+      return {
+        status: ResponseCode.Success
+      }
     }
 
     const window = BrowserWindow.getFocusedWindow()
     if (!window) {
-      return
+      return {
+        status: ResponseCode.Success
+      }
     }
 
     const tx = await TransactionGenerator.generateMigrateLegacyACPTx(walletId)
     if (!tx) {
-      return
+      return {
+        status: ResponseCode.Success
+      }
     }
 
     this.displayedACPMigrationDialogByWalletIds.add(walletId)
@@ -223,11 +231,15 @@ export default class AssetAccountController {
             payload: walletId,
             dispatchToUI: true
           })
-          return false
+          return true
         }
         case 0:
         default:
+          return false
       }
-    })
+    }).then(result => ({
+      status: ResponseCode.Success,
+      result,
+    }))
   }
 }
