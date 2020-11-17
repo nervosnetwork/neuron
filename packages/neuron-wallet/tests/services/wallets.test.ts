@@ -15,7 +15,6 @@ const stubbedGetUnusedReceivingAddressesByWalletIdFn = jest.fn()
 const stubbedGetFirstAddressByWalletIdFn = jest.fn()
 
 const stubbedGetAddressesByWalletId = jest.fn()
-const stubbedCheckAndGenerateSave = jest.fn()
 const stubbedDeleteByWalletId = jest.fn()
 
 jest.doMock('../../src/services/addresses', () => {
@@ -28,7 +27,6 @@ jest.doMock('../../src/services/addresses', () => {
     getUnusedReceivingAddressesByWalletId: stubbedGetUnusedReceivingAddressesByWalletIdFn,
     getFirstAddressByWalletId: stubbedGetFirstAddressByWalletIdFn,
     getAddressesByWalletId: stubbedGetAddressesByWalletId,
-    checkAndGenerateSave: stubbedCheckAndGenerateSave,
   }
 });
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
@@ -412,24 +410,22 @@ describe('wallet service', () => {
       await walletService.generateAddressesIfNecessary()
     });
     it('should not generate addresses for wallets already having addresses', () => {
-      expect(stubbedCheckAndGenerateSave).not.toHaveBeenCalledWith(createdWallet1.id)
+      expect(stubbedGenerateAndSaveForExtendedKeyFn).not.toHaveBeenCalledWith(createdWallet1.id)
     })
     it('generates addresses for wallets not having addresses', () => {
-      expect(stubbedCheckAndGenerateSave).toHaveBeenCalledWith(
+      expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
         createdWallet2.id,
-        expect.objectContaining({publicKey: ''}),
+        expect.objectContaining({publicKey: 'a'}),
         false,
         20,
         10,
-        false
       )
-      expect(stubbedCheckAndGenerateSave).toHaveBeenCalledWith(
+      expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
         createdWallet3.id,
-        expect.objectContaining({publicKey: ''}),
+        expect.objectContaining({publicKey: 'a'}),
         false,
         20,
         10,
-        false
       )
     });
   });
