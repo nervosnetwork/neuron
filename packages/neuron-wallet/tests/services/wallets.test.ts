@@ -1,6 +1,7 @@
 import Keystore from '../../src/models/keys/keystore'
 import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
+import { when } from 'jest-when'
 import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
 import { AddressType } from '../../src/models/keys/address'
 import { Manufacturer } from '../../src/services/hardware/common'
@@ -14,7 +15,6 @@ const stubbedGetUnusedReceivingAddressesByWalletIdFn = jest.fn()
 const stubbedGetFirstAddressByWalletIdFn = jest.fn()
 
 const stubbedGetAddressesByWalletId = jest.fn()
-const stubbedCheckAndGenerateSave = jest.fn()
 const stubbedDeleteByWalletId = jest.fn()
 
 jest.doMock('../../src/services/addresses', () => {
@@ -27,7 +27,6 @@ jest.doMock('../../src/services/addresses', () => {
     getUnusedReceivingAddressesByWalletId: stubbedGetUnusedReceivingAddressesByWalletIdFn,
     getFirstAddressByWalletId: stubbedGetFirstAddressByWalletIdFn,
     getAddressesByWalletId: stubbedGetAddressesByWalletId,
-    checkAndGenerateSave: stubbedCheckAndGenerateSave,
   }
 });
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
@@ -391,6 +390,43 @@ describe('wallet service', () => {
           expect(activeWallet && activeWallet.id).toEqual(w1.id)
         })
       });
+    });
+  });
+
+  describe('#generateAddressesIfNecessary', () => {
+    let createdWallet1: any
+    let createdWallet2: any
+    let createdWallet3: any
+    beforeEach(async () => {
+      createdWallet1 = walletService.create(wallet1)
+      createdWallet2 = walletService.create(wallet2)
+      createdWallet3 = walletService.create(wallet3)
+
+      when(stubbedGetAddressesByWalletId)
+        .calledWith(createdWallet1.id).mockResolvedValue({length: 1})
+        .calledWith(createdWallet2.id).mockResolvedValue({length: 0})
+        .calledWith(createdWallet3.id).mockResolvedValue({length: 0})
+
+      await walletService.generateAddressesIfNecessary()
+    });
+    it('should not generate addresses for wallets already having addresses', () => {
+      expect(stubbedGenerateAndSaveForExtendedKeyFn).not.toHaveBeenCalledWith(createdWallet1.id)
+    })
+    it('generates addresses for wallets not having addresses', () => {
+      expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
+        createdWallet2.id,
+        expect.objectContaining({publicKey: 'a'}),
+        false,
+        20,
+        10,
+      )
+      expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
+        createdWallet3.id,
+        expect.objectContaining({publicKey: 'a'}),
+        false,
+        20,
+        10,
+      )
     });
   });
 })

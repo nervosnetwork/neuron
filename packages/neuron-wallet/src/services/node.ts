@@ -186,7 +186,7 @@ class NodeService {
       return true
     }
     const execPromise = promisify(exec)
-    const arches = process.arch === 'x64' ? ['x86', 'x64'] : ['x64']
+    const arches = ['x64']
     const queries = arches.map(arch =>
       `REG QUERY ` +
       [`HKEY_LOCAL_MACHINE`, `SOFTWARE`, `Microsoft`, `VisualStudio`, `14.0`, `VC`, `Runtimes`, arch].join(path.sep))
