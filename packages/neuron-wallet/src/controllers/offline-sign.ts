@@ -59,6 +59,16 @@ export default class OfflineSignController {
     }
   }
 
+  public async toRawTransaction (params: Transaction) {
+    const { ckb } = NodeService.getInstance()
+    const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(Transaction.fromObject(params).toSDKRawTransaction())
+
+    return {
+      status: ResponseCode.Success,
+      result: rawTx,
+    }
+  }
+
   public async signTransaction (params: OfflineSignJSON & { walletID: string, password: string }) {
     const { transaction, type, walletID, password, context } = params
 

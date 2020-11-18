@@ -81,6 +81,11 @@ export default class TransactionSender {
       try {
         return await device.signTx(walletID, tx, txHash, skipLastInputs, context)
       } catch (err) {
+        // if signing a tx from another wallet, throw an error without error code,
+        // instead, throw SignTransactionFailed error with message from ledger app
+        if (err instanceof TypeError) {
+          throw err
+        }
         throw new SignTransactionFailed(err.message)
       }
     }

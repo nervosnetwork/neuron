@@ -473,6 +473,10 @@ export default class ApiController {
     handle('sign-and-export-transaction', async (_, params) => {
       return this.offlineSignController.signAndExportTransaction(params)
     })
+
+    handle('to-raw-transaction', async (_, params) => {
+      return this.offlineSignController.toRawTransaction(params)
+    })
   }
 
   // Register handler, warp and serialize API response

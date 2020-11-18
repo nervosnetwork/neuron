@@ -5,7 +5,7 @@ import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { addNotification, useDispatch, useState as useGlobalState } from 'states'
-import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
+import { broadcastTransaction, getCurrentWallet, OfflineSignStatus, toRawTransaction } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import OfflineSignDialog from '../OfflineSignDialog'
 
@@ -20,13 +20,22 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
   const [wallet, setWallet] = useState<State.Wallet | null>(null)
   const [isSigning, setIsSigning] = useState(false)
   const [isBroadCasting, setIsBroadcasting] = useState(false)
+  const [jsonContent, setJsonContent] = useState('')
   const [t] = useTranslation()
   const dispatch = useDispatch()
 
   const { filePath, json } = loadedTransaction
 
-  const jsonContent = useMemo(() => {
-    return JSON.stringify(json, null, 2)
+  useEffect(() => {
+    toRawTransaction(json.transaction).then(res => {
+      if (isSuccessResponse(res)) {
+        const content = {
+          ...json,
+          transaction: res.result,
+        }
+        setJsonContent(JSON.stringify(content, null, 2))
+      }
+    })
   }, [json])
 
   const signStatus: OfflineSignStatus = json.status
