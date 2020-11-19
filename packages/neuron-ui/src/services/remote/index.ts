@@ -38,7 +38,7 @@ export const getVersion = () => {
 }
 
 export const getPlatform = () => {
-  return ipcRenderer.sendSync('get-version') ?? 'Unknown'
+  return ipcRenderer.sendSync('get-platform') ?? 'Unknown'
 }
 
 export const getWinID = () => {

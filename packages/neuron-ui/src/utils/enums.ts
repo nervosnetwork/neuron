@@ -104,6 +104,8 @@ export enum ErrorCode {
   UnknownError = 405,
   SignMessageFailed = 406,
   UnsupportedManufacturer = 407,
+  // offline
+  DeviceInSleep = 501,
 }
 
 export enum SyncStatus {
