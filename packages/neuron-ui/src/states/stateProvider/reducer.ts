@@ -18,7 +18,7 @@ export enum NeuronWalletActions {
   UpdateCurrentNetworkID = 'updateCurrentNetworkID',
   // Connection
   UpdateConnectionStatus = 'updateConnectionStatus',
-  UpdateSyncStatus = 'updateSyncStatus',
+  UpdateSyncEstimate = 'updateEstimateStatus',
   // dao
   UpdateNervosDaoData = 'updateNervosDaoData',
   // updater
@@ -97,7 +97,7 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateNetworkList; payload: State.Network[] }
   | { type: NeuronWalletActions.UpdateCurrentNetworkID; payload: string }
   | { type: NeuronWalletActions.UpdateConnectionStatus; payload: State.ConnectionStatus }
-  | { type: NeuronWalletActions.UpdateSyncStatus; payload: State.SyncStatus }
+  | { type: NeuronWalletActions.UpdateSyncEstimate; payload: State.SyncEstimate }
   | { type: NeuronWalletActions.UpdateNervosDaoData; payload: State.NervosDAO }
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
 
@@ -180,8 +180,8 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.chain.connectionStatus = action.payload
       break
     }
-    case NeuronWalletActions.UpdateSyncStatus: {
-      state.chain.syncStatus = action.payload
+    case NeuronWalletActions.UpdateSyncEstimate: {
+      state.chain.syncEstimate = action.payload
       break
     }
     case NeuronWalletActions.UpdateAppUpdaterStatus: {

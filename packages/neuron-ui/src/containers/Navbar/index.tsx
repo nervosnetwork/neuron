@@ -13,8 +13,6 @@ import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
 import {
   RoutePath,
-  getCurrentUrl,
-  getSyncStatus,
   getSyncLeftTime,
   localNumberFormatter,
   useOnLocaleChange,
@@ -62,7 +60,7 @@ const Navbar = () => {
     chain: {
       connectionStatus,
       networkID,
-      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp, estimate },
+      syncEstimate: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status },
     },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
@@ -73,13 +71,7 @@ const Navbar = () => {
 
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
-  const syncStatus = getSyncStatus({
-    bestKnownBlockNumber,
-    bestKnownBlockTimestamp,
-    cacheTipBlockNumber,
-    currentTimestamp: Date.now(),
-    url: getCurrentUrl(networkID, networks),
-  })
+  const syncStatus = status
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null

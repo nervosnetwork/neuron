@@ -1,8 +1,21 @@
 import EventEmiter from 'events'
+import RpcService from 'services/rpc-service'
 import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import NodeService from 'services/node'
 import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
+import { CurrentNetworkIDSubject } from 'models/subjects/networks'
+import { debounceTime } from 'rxjs/operators'
+
+const MAX_TIP_BLOCK_DELAY = 180000
+const TEN_MINS = 600000
+
+export enum SyncStatus {
+  SyncNotStart,
+  SyncPending,
+  Syncing,
+  SyncCompleted,
+}
 
 interface SyncState {
   nodeUrl: string,
@@ -15,26 +28,37 @@ interface SyncState {
   cacheRate: number | undefined,
   estimate: number | undefined,
   synced: boolean,
+  status: SyncStatus
 }
 
 export default class SyncApiController {
   #syncedBlockNumber = new SyncedBlockNumber()
   static emiter = new EventEmiter()
+  private static instance: SyncApiController
 
   private estimates: Array<SyncState> = []
   private sampleTime: number = 60000
   private indexerTipDiff = 50
   private cacheDiff = 5
-  private bestKnownBlockNumberDiff = 5
-  private nodeUrl: string | undefined
+  private bestKnownBlockNumberDiff = 50
+
+  public static async getInstance() {
+    if (this.instance) {
+      return this.instance
+    }
+    this.instance = new SyncApiController()
+    return this.instance
+  }
 
   public async mount() {
     this.registerHandlers()
   }
 
   private getEstimatesByCurrentNode () {
+    const nodeUrl = this.getCurrentNodeUrl()
     return this.estimates.filter(
-      state => state.nodeUrl === this.nodeUrl
+      state => state.nodeUrl === nodeUrl &&
+      Date.now() - state.timestamp <= this.sampleTime
     )
   }
 
@@ -78,25 +102,40 @@ export default class SyncApiController {
   }
 
   private async fetchBestKnownBlockInfo (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> {
-    const method = new Method({url: this.nodeUrl!}, {
-      name: 'sync state',
-      method: 'sync_state',
-      paramsFormatters: [],
-    })
-    const { best_known_block_number, best_known_block_timestamp } = await method.call()
-    return {
-      bestKnownBlockNumber: parseInt(best_known_block_number, 16),
-      bestKnownBlockTimestamp: +best_known_block_timestamp,
+    const nodeUrl = this.getCurrentNodeUrl()
+    try {
+      const method = new Method({url: nodeUrl}, {
+        name: 'sync state',
+        method: 'sync_state',
+        paramsFormatters: [],
+      })
+      const { best_known_block_number, best_known_block_timestamp } = await method.call()
+      return {
+        bestKnownBlockNumber: parseInt(best_known_block_number, 16),
+        bestKnownBlockTimestamp: +best_known_block_timestamp,
+      }
+    } catch (error) {
+      const tipHeader = await new RpcService(nodeUrl).getTipHeader()
+
+      return {
+        bestKnownBlockNumber: Number(tipHeader.number),
+        bestKnownBlockTimestamp: Number(tipHeader.timestamp),
+      }
     }
+  }
+
+  private getCurrentNodeUrl () {
+    const ckb = NodeService.getInstance().ckb
+    return ckb.node.url
   }
 
   private async estimate (states: any): Promise<SyncState> {
     const indexerTipNumber = parseInt(states.indexerTipNumber)
     const cacheTipNumber = parseInt(states.cacheTipNumber)
-    const timestamp = parseInt(states.timestamp)
 
-    const ckb = NodeService.getInstance().ckb
-    this.nodeUrl = ckb.node.url
+    const currentTimestamp = Date.now()
+    const nodeUrl = this.getCurrentNodeUrl()
+    const tipHeader = await new RpcService(nodeUrl).getTipHeader()
 
     const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.fetchBestKnownBlockInfo()
     const foundBestKnownBlockNumber = this.foundBestKnownBlockNumber(bestKnownBlockNumber)
@@ -105,8 +144,8 @@ export default class SyncApiController {
     const remainingBlocksToIndex = bestKnownBlockNumber - indexerTipNumber
 
     const newSyncEstimate: SyncState = {
-      nodeUrl: this.nodeUrl,
-      timestamp,
+      nodeUrl,
+      timestamp: currentTimestamp,
       indexerTipNumber,
       cacheTipNumber,
       bestKnownBlockNumber,
@@ -115,13 +154,25 @@ export default class SyncApiController {
       cacheRate: undefined,
       estimate: undefined,
       synced: false,
+      status: SyncStatus.Syncing
     }
 
     if (foundBestKnownBlockNumber) {
-      newSyncEstimate.synced = remainingBlocksToCache < this.cacheDiff
+      const allCached = remainingBlocksToCache < this.cacheDiff
+      newSyncEstimate.synced = allCached
 
-      const indexRate = this.calculateAvgIndexRate(indexerTipNumber, timestamp)
-      if (!newSyncEstimate.synced && indexRate) {
+      const tipBlockTimestamp = Number(tipHeader.timestamp)
+      if (allCached) {
+        if (tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= newSyncEstimate.timestamp) {
+          newSyncEstimate.status = SyncStatus.SyncCompleted
+        }
+        if (tipBlockTimestamp + TEN_MINS < newSyncEstimate.timestamp) {
+          newSyncEstimate.status = SyncStatus.SyncPending
+        }
+      }
+
+      const indexRate = this.calculateAvgIndexRate(indexerTipNumber, currentTimestamp)
+      if (!allCached && indexRate) {
         const estimate = Math.round(remainingBlocksToIndex / indexRate)
         Object.assign(newSyncEstimate, {
           indexRate,
@@ -130,14 +181,41 @@ export default class SyncApiController {
       }
     }
 
-
     return this.updateEstimates(newSyncEstimate)
   }
 
+  public async getSyncStatus () {
+    if (!this.estimates.length) {
+      return SyncStatus.SyncNotStart
+    }
+    const lastEstimate = this.estimates[this.estimates.length - 1]
+    return lastEstimate.status
+  }
+
   private registerHandlers() {
-    SyncApiController.emiter.on('sync-estimate-updated', async states => {
+    SyncApiController.emiter.on('cache-tip-block-updated', async states => {
       const newSyncEstimate = await this.estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncEstimate.cacheTipNumber))
+      SyncStateSubject.next(newSyncEstimate)
+    })
+
+    CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {
+      const nodeUrl = this.getCurrentNodeUrl()
+      const newSyncEstimate: SyncState = {
+        nodeUrl,
+        timestamp: 0,
+        indexerTipNumber: 0,
+        cacheTipNumber: 0,
+        bestKnownBlockNumber: 0,
+        bestKnownBlockTimestamp: 0,
+        indexRate: undefined,
+        cacheRate: undefined,
+        estimate: undefined,
+        synced: false,
+        status: SyncStatus.SyncNotStart
+      }
+      this.estimates = [newSyncEstimate]
+
       SyncStateSubject.next(newSyncEstimate)
     })
   }

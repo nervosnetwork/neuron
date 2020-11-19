@@ -8,6 +8,14 @@ const stubbedSDKMethod = jest.fn()
 const stubbedNodeGetInstance = jest.fn()
 const stubbedSetNextBlock = jest.fn()
 
+const stubbedSyncControllerConstructor = jest.fn()
+const stubbedRpcServiceConstructor = jest.fn()
+const stubbedCurrentBlockNumber = jest.fn()
+const stubbedGetLatestConnectionStatus = jest.fn()
+const stubbedGetTipHeader = jest.fn()
+const stubbedCurrentNetworkIDSubject = jest.fn()
+const stubbedDateNow = jest.fn()
+
 const resetMocks = () => {
   stubbedEmitter.mockReset()
   stubbedSyncedBlockNumber.mockReset()
@@ -15,12 +23,39 @@ const resetMocks = () => {
   stubbedSDKMethod.mockReset()
   stubbedNodeGetInstance.mockReset()
   stubbedSetNextBlock.mockReset()
+  stubbedCurrentBlockNumber.mockReset()
+  stubbedGetLatestConnectionStatus.mockReset()
+  stubbedGetTipHeader.mockReset()
+  stubbedCurrentNetworkIDSubject.mockReset()
+  stubbedDateNow.mockReset()
 }
 
-describe('sync api', () => {
+let networkChangedCallback: any
+jest.doMock('models/subjects/networks', () => {
+  return {
+    CurrentNetworkIDSubject: {
+      pipe: () => ({
+        subscribe: (callback: any) => {
+          networkChangedCallback = callback
+        }
+      })
+    }
+  }
+})
+
+
+
+describe('SyncApiController', () => {
   const emitter = new Emitter()
   const fakeNodeUrl = 'http://fakenodeurl'
   let controller: any
+  Date.now = stubbedDateNow
+
+  const sendFakeCacheBlockTipEvent = async (event: any) => {
+    stubbedDateNow.mockReturnValue(Number(event.timestamp))
+    emitter.emit('cache-tip-block-updated', event)
+    await flushPromises()
+  }
 
   beforeEach(() => {
     resetMocks()
@@ -45,6 +80,13 @@ describe('sync api', () => {
         getInstance: stubbedNodeGetInstance
       }
     })
+    jest.doMock('services/networks', () => {
+      return {
+        getInstance: () => ({
+          getCurrent: () => ({remote: ''})
+        })
+      }
+    })
     jest.doMock('@nervosnetwork/ckb-sdk-rpc/lib/method', () => {
       return jest.fn().mockImplementation(() => {
         return {
@@ -52,6 +94,31 @@ describe('sync api', () => {
         }
       })
     })
+
+    jest.doMock('../../src/models/subjects/node', () => {
+      return {
+        getLatestConnectionStatus: stubbedGetLatestConnectionStatus
+      }
+    });
+    jest.doMock('../../src/services/rpc-service', () => {
+      return {
+        __esModule: true,
+        default: stubbedRpcServiceConstructor.mockImplementation(
+          () => ({
+            getTipHeader: stubbedGetTipHeader,
+          })
+        ),
+      }
+    });
+
+    jest.doMock('../../src/controllers/sync', () => ({
+      __esModule: true,
+      default: stubbedSyncControllerConstructor.mockImplementation(
+        () => ({
+          currentBlockNumber: stubbedCurrentBlockNumber,
+        })
+      ),
+    }));
 
     stubbedEmitter.mockImplementation(() => {
       return emitter
@@ -67,13 +134,11 @@ describe('sync api', () => {
     jest.clearAllTimers()
   });
 
-  describe('on sync-estimate-updated', () => {
+  describe('updates sync status', () => {
     const bestKnownBlockNumber = 10000
-    const bestKnownBlockTimestamp = 1557311767
+    const bestKnownBlockTimestamp = 246000
     beforeEach(() => {
-      jest
-        .spyOn(Date, 'now')
-        .mockImplementation(() => 66000);
+      stubbedDateNow.mockReturnValue(246000)
       stubbedSDKMethod.mockResolvedValue({
         best_known_block_number: bestKnownBlockNumber.toString(16),
         best_known_block_timestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
@@ -85,26 +150,26 @@ describe('sync api', () => {
           }
         }
       }))
+      stubbedGetTipHeader.mockResolvedValue({timestamp: '180000'})
     });
-    describe('estimate based on rate of indexing', () => {
+    describe('on cache-tip-block-updated', () => {
       describe('when completed cache', () => {
         const cacheTipNumber = (bestKnownBlockNumber - 4).toString()
         const fakeState1 = {
           cacheTipNumber,
-          indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
-          timestamp: '6000',
+          indexerTipNumber: bestKnownBlockNumber.toString(),
+          timestamp: '186000',
         }
         const fakeState2 = {
           cacheTipNumber,
-          indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
-          timestamp: '7000',
+          indexerTipNumber: bestKnownBlockNumber.toString(),
+          timestamp: '187000',
         }
         beforeEach(async () => {
-          emitter.emit('sync-estimate-updated', fakeState1)
-          emitter.emit('sync-estimate-updated', fakeState2)
-          await flushPromises()
+          await sendFakeCacheBlockTipEvent(fakeState1)
+          await sendFakeCacheBlockTipEvent(fakeState2)
         });
-        it('indicates synced', () => {
+        it('broadcast event of synced', () => {
           expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
             nodeUrl: fakeNodeUrl,
             timestamp: parseInt(fakeState2.timestamp),
@@ -116,10 +181,89 @@ describe('sync api', () => {
             cacheRate: undefined,
             estimate: undefined,
             synced: true,
+            status: 3
           })
+        })
+        it('#getSyncStatus returns synced', async () => {
+          const syncStatus = await controller.getSyncStatus()
+          expect(syncStatus).toEqual(3)
         })
         it('stores next block number', () => {
           expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
+        })
+      });
+      describe('when tip header is out of sync for a while', () => {
+        const cacheTipNumber = (bestKnownBlockNumber - 4).toString()
+        const fakeState1 = {
+          cacheTipNumber,
+          indexerTipNumber: bestKnownBlockNumber.toString(),
+          timestamp: '186000',
+        }
+        const fakeState2 = {
+          cacheTipNumber,
+          indexerTipNumber: bestKnownBlockNumber.toString(),
+          timestamp: '187000',
+        }
+        beforeEach(async () => {
+          await sendFakeCacheBlockTipEvent(fakeState1)
+          stubbedGetTipHeader.mockResolvedValue({timestamp: '1'})
+          await sendFakeCacheBlockTipEvent(fakeState2)
+        });
+        it('broadcast event of syncing', () => {
+          expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
+            nodeUrl: fakeNodeUrl,
+            timestamp: parseInt(fakeState2.timestamp),
+            bestKnownBlockNumber,
+            bestKnownBlockTimestamp,
+            cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+            indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
+            indexRate: undefined,
+            cacheRate: undefined,
+            estimate: undefined,
+            synced: true,
+            status: 2
+          })
+        })
+        it('#getSyncStatus returns syncing', async () => {
+          const syncStatus = await controller.getSyncStatus()
+          expect(syncStatus).toEqual(2)
+        })
+      });
+      describe('when tip header timestamp is ten minutes earlier than current timestamp', () => {
+        const cacheTipNumber = (bestKnownBlockNumber - 4).toString()
+        const fakeState1 = {
+          cacheTipNumber,
+          indexerTipNumber: bestKnownBlockNumber.toString(),
+          timestamp: '606000',
+        }
+        const fakeState2 = {
+          cacheTipNumber,
+          indexerTipNumber: bestKnownBlockNumber.toString(),
+          timestamp: '607000',
+        }
+        beforeEach(async () => {
+          await sendFakeCacheBlockTipEvent(fakeState1)
+          stubbedGetTipHeader.mockResolvedValue({timestamp: '1'})
+          await sendFakeCacheBlockTipEvent(fakeState2)
+        });
+        it('broadcast event of sync pending', () => {
+          expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
+            nodeUrl: fakeNodeUrl,
+            timestamp: parseInt(fakeState2.timestamp),
+            bestKnownBlockNumber,
+            bestKnownBlockTimestamp,
+            cacheTipNumber: parseInt(fakeState2.cacheTipNumber),
+            indexerTipNumber: parseInt(fakeState2.indexerTipNumber),
+            indexRate: undefined,
+            cacheRate: undefined,
+            estimate: undefined,
+            synced: true,
+            status: 1
+          })
+        })
+        it('#getSyncStatus returns sync pending', async () => {
+          const syncStatus = await controller.getSyncStatus()
+          expect(syncStatus).toEqual(1)
         })
       });
       describe('when cache is still ongoing', () => {
@@ -128,11 +272,10 @@ describe('sync api', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: bestKnownBlockNumber.toString(),
-            timestamp: '6000',
+            timestamp: '186000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-estimate-updated', fakeState1)
-            await flushPromises()
+            await sendFakeCacheBlockTipEvent(fakeState1)
           });
           it('should not calculate estimation', () => {
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
@@ -146,27 +289,31 @@ describe('sync api', () => {
               cacheRate: undefined,
               estimate: undefined,
               synced: false,
+              status: 2
             })
           })
           it('stores next block number', () => {
             expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
+          })
+          it('#getSyncStatus returns syncing', async () => {
+            const syncStatus = await controller.getSyncStatus()
+            expect(syncStatus).toEqual(2)
           })
         });
         describe('when advanced indexer tip is greater or equals to 50', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 52).toString(),
-            timestamp: '6000',
+            timestamp: '186000',
           }
           const fakeState2 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 1).toString(),
-            timestamp: '7000',
+            timestamp: '187000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-estimate-updated', fakeState1)
-            emitter.emit('sync-estimate-updated', fakeState2)
-            await flushPromises()
+            await sendFakeCacheBlockTipEvent(fakeState1)
+            await sendFakeCacheBlockTipEvent(fakeState2)
           });
           it('calculates estimation', () => {
             const indexRate = 51 / (parseInt(fakeState2.timestamp) - parseInt(fakeState1.timestamp))
@@ -181,27 +328,31 @@ describe('sync api', () => {
               cacheRate: undefined,
               estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate),
               synced: false,
+              status: 2
             })
           })
           it('stores next block number', () => {
             expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
+          })
+          it('#getSyncStatus returns syncing', async () => {
+            const syncStatus = await controller.getSyncStatus()
+            expect(syncStatus).toEqual(2)
           })
         });
         describe('when advanced indexer tip is less than 50', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
-            timestamp: '6000',
+            timestamp: '186000',
           }
           const fakeState2 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 1).toString(),
-            timestamp: '7000',
+            timestamp: '187000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-estimate-updated', fakeState1)
-            emitter.emit('sync-estimate-updated', fakeState2)
-            await flushPromises()
+            await sendFakeCacheBlockTipEvent(fakeState1)
+            await sendFakeCacheBlockTipEvent(fakeState2)
           });
           it('should not calculate estimation', () => {
             expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
@@ -215,33 +366,38 @@ describe('sync api', () => {
               cacheRate: undefined,
               estimate: undefined,
               synced: false,
+              status: 2
             })
           })
           it('stores next block number', () => {
             expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
+          })
+          it('#getSyncStatus returns syncing', async () => {
+            const syncStatus = await controller.getSyncStatus()
+            expect(syncStatus).toEqual(2)
           })
         });
         describe('with samples spaning over 1 min', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: '100',
-            timestamp: '1000',
+            timestamp: '181000',
           }
           const fakeState2 = {
             cacheTipNumber,
             indexerTipNumber: '200',
-            timestamp: '6000',
+            timestamp: '186000',
           }
           const fakeState3 = {
             cacheTipNumber,
             indexerTipNumber: '6201',
-            timestamp: '66000',
+            timestamp: '246000',
           }
           beforeEach(async () => {
-            emitter.emit('sync-estimate-updated', fakeState1)
-            emitter.emit('sync-estimate-updated', fakeState2)
-            emitter.emit('sync-estimate-updated', fakeState3)
-            await flushPromises()
+            stubbedSyncStateSubjectNext.mockReset()
+            await sendFakeCacheBlockTipEvent(fakeState1)
+            await sendFakeCacheBlockTipEvent(fakeState2)
+            await sendFakeCacheBlockTipEvent(fakeState3)
           });
           it('estimates with samples in the last minute', () => {
             const indexRate = (
@@ -258,12 +414,17 @@ describe('sync api', () => {
               indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
               estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate),
               synced: false,
+              status: 2
             })
           })
           it('stores next block number', () => {
             expect(stubbedSetNextBlock).toHaveBeenCalledWith(BigInt(cacheTipNumber))
           })
-          describe('when switching network', () => {
+          it('#getSyncStatus returns syncing', async () => {
+            const syncStatus = await controller.getSyncStatus()
+            expect(syncStatus).toEqual(2)
+          })
+          describe('when node url changed', () => {
             beforeEach(async () => {
               stubbedNodeGetInstance.mockImplementation(() => ({
                 ckb: {
@@ -272,8 +433,7 @@ describe('sync api', () => {
                   }
                 }
               }))
-              emitter.emit('sync-estimate-updated', fakeState3)
-              await flushPromises()
+              await sendFakeCacheBlockTipEvent(fakeState3)
             });
             it('resets samples', () => {
               expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
@@ -287,7 +447,12 @@ describe('sync api', () => {
                 indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
                 estimate: undefined,
                 synced: false,
+                status: 2
               })
+            })
+            it('#getSyncStatus returns syncing', async () => {
+              const syncStatus = await controller.getSyncStatus()
+              expect(syncStatus).toEqual(2)
             })
           });
         });
@@ -297,23 +462,22 @@ describe('sync api', () => {
         const fakeState1 = {
           cacheTipNumber,
           indexerTipNumber: (bestKnownBlockNumber - 101).toString(),
-          timestamp: '6000',
+          timestamp: '186000',
         }
 
-        const nextBestKnownBlockNumber = bestKnownBlockNumber + 5
+        const nextBestKnownBlockNumber = bestKnownBlockNumber + 50
         const fakeState2 = {
           cacheTipNumber: nextBestKnownBlockNumber.toString(),
           indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
-          timestamp: '7000',
+          timestamp: '187000',
         }
         beforeEach(async () => {
-          emitter.emit('sync-estimate-updated', fakeState1)
+          await sendFakeCacheBlockTipEvent(fakeState1)
           stubbedSDKMethod.mockResolvedValue({
             best_known_block_number: nextBestKnownBlockNumber.toString(16),
             best_known_block_timestamp: bestKnownBlockTimestamp,
           })
-          emitter.emit('sync-estimate-updated', fakeState2)
-          await flushPromises()
+          await sendFakeCacheBlockTipEvent(fakeState2)
         });
         it('should not calculate estimation', () => {
           expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
@@ -327,9 +491,38 @@ describe('sync api', () => {
             cacheRate: undefined,
             estimate: undefined,
             synced: false,
+            status: 2
           })
+        })
+        it('#getSyncStatus returns syncing', async () => {
+          const syncStatus = await controller.getSyncStatus()
+          expect(syncStatus).toEqual(2)
         })
       });
     });
+    describe('when got CurrentNetworkIDSubject event', () => {
+      beforeEach(async () => {
+        networkChangedCallback()
+      });
+      it('broadcast event of sync not started', () => {
+        expect(stubbedSyncStateSubjectNext).toHaveBeenCalledWith({
+          nodeUrl: fakeNodeUrl,
+          timestamp: 0,
+          bestKnownBlockNumber: 0,
+          bestKnownBlockTimestamp: 0,
+          cacheTipNumber: 0,
+          indexerTipNumber: 0,
+          indexRate: undefined,
+          cacheRate: undefined,
+          estimate: undefined,
+          synced: false,
+          status: 0
+        })
+      })
+      it('#getSyncStatus returns not started', async () => {
+        const syncStatus = await controller.getSyncStatus()
+        expect(syncStatus).toEqual(0)
+      })
+    });
   });
-});
+})

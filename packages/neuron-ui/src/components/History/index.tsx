@@ -23,7 +23,7 @@ const History = () => {
     wallet: { id, name: walletName },
     chain: {
       networkID,
-      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber },
+      syncEstimate: { cacheTipBlockNumber, bestKnownBlockNumber },
       transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
     },
     settings: { networks },

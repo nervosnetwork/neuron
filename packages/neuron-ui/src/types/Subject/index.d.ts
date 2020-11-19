@@ -34,7 +34,13 @@ declare namespace Subject {
     url: string
   }
   type BlockNumber = string
-  type SyncStatus = Record<'cacheTipNumber' | 'bestKnownBlockNumber' | 'bestKnownBlockTimestamp' | 'estimate', number>
+  interface SyncEstimate {
+    cacheTipNumber: number
+    bestKnownBlockNumber: number
+    bestKnownBlockTimestamp: number
+    estimate: number
+    status: number
+  }
 
   interface AppUpdater {
     checking: boolean

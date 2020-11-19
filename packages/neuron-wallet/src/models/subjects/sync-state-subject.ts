@@ -8,6 +8,7 @@ const SyncStateSubject = new BehaviorSubject<{
   cacheRate: number | undefined,
   estimate: number | undefined,
   synced: boolean,
+  status: number
 }>({
   timestamp: 0,
   indexerTipNumber: 0,
@@ -16,6 +17,7 @@ const SyncStateSubject = new BehaviorSubject<{
   cacheRate: undefined,
   estimate: undefined,
   synced: false,
+  status: 0,
 })
 
 export default SyncStateSubject

@@ -397,12 +397,12 @@ describe('block sync render', () => {
             expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledWith(result)
           })
         });
-        describe('handles sync-estimate-updated event from child process', () => {
+        describe('handles cache-tip-block-updated event from child process', () => {
           beforeEach(() => {
-            fakeSendMessageToMainProcess('sync-estimate-updated', result)
+            fakeSendMessageToMainProcess('cache-tip-block-updated', result)
           });
           it('SyncApiController emiter message in the main process', ()=> {
-            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('sync-estimate-updated', result)
+            expect(stubbedSyncApiControllerEmitter).toHaveBeenCalledWith('cache-tip-block-updated', result)
           })
         });
         describe('handles wallet-deleted event from child process', () => {

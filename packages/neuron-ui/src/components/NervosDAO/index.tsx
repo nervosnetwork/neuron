@@ -47,7 +47,7 @@ const NervosDAO = () => {
     nervosDAO: { records },
     chain: {
       connectionStatus,
-      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+      syncEstimate: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
       networkID,
     },
     settings: { networks },
