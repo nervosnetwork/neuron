@@ -47,3 +47,4 @@ export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-t
 export const signAndExportTransaction = remoteApi<SignProps, { filePath: string; json: OfflineSignJSON }>(
   'sign-and-export-transaction'
 )
+export const toRawTransaction = remoteApi('to-raw-transaction')

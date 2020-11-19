@@ -113,6 +113,7 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'sign-and-export-transaction'
+  | 'to-raw-transaction'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({
