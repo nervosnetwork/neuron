@@ -29,7 +29,7 @@ export default class AppController {
     registerListeners()
 
     await this.apiController.mount()
-    this.syncApiController = await SyncApiController.getInstance()
+    this.syncApiController = SyncApiController.getInstance()
     this.syncApiController.mount()
     this.openWindow()
   }

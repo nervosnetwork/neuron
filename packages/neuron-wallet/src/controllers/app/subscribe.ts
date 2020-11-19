@@ -12,6 +12,7 @@ import AppUpdaterSubject from 'models/subjects/app-updater'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
+import SyncApiController from 'controllers/sync-api'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -34,6 +35,10 @@ export const subscribe = (dispatcher: AppResponder) => {
   })
 
   SyncStateSubject.pipe(debounceTime(50)).subscribe(estimation => {
+    const cachedEstimation = SyncApiController.getInstance().getCachedEstimation()
+    if (cachedEstimation) {
+      estimation.estimate = cachedEstimation.estimate
+    }
     dispatcher.sendMessage('sync-estimate-updated', estimation)
   })
 

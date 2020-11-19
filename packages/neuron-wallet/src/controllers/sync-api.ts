@@ -27,7 +27,6 @@ interface SyncState {
   indexRate: number | undefined,
   cacheRate: number | undefined,
   estimate: number | undefined,
-  synced: boolean,
   status: SyncStatus
 }
 
@@ -41,8 +40,9 @@ export default class SyncApiController {
   private indexerTipDiff = 50
   private cacheDiff = 5
   private bestKnownBlockNumberDiff = 50
+  private cachedEstimation: SyncState|undefined = undefined
 
-  public static async getInstance() {
+  public static getInstance() {
     if (this.instance) {
       return this.instance
     }
@@ -153,13 +153,11 @@ export default class SyncApiController {
       indexRate: undefined,
       cacheRate: undefined,
       estimate: undefined,
-      synced: false,
       status: SyncStatus.Syncing
     }
 
     if (foundBestKnownBlockNumber) {
       const allCached = remainingBlocksToCache < this.cacheDiff
-      newSyncEstimate.synced = allCached
 
       const tipBlockTimestamp = Number(tipHeader.timestamp)
       if (allCached) {
@@ -192,6 +190,31 @@ export default class SyncApiController {
     return lastEstimate.status
   }
 
+  public getCachedEstimation () {
+    const lastEstimation = this.estimates[this.estimates.length - 1]
+    if (!this.cachedEstimation) {
+      this.cachedEstimation = lastEstimation
+      return this.cachedEstimation
+    }
+
+    if (this.estimates.length > 1 &&
+      this.estimates[this.estimates.length - 2].cacheTipNumber === lastEstimation.cacheTipNumber
+    ) {
+      this.cachedEstimation = lastEstimation
+      return this.cachedEstimation
+    }
+
+    const nodeUrl = this.getCurrentNodeUrl()
+
+    if (this.cachedEstimation.nodeUrl !== nodeUrl ||
+      this.cachedEstimation.timestamp + this.sampleTime <= Date.now()
+    ) {
+      this.cachedEstimation = lastEstimation
+    }
+
+    return this.cachedEstimation
+  }
+
   private registerHandlers() {
     SyncApiController.emiter.on('cache-tip-block-updated', async states => {
       const newSyncEstimate = await this.estimate(states)
@@ -211,7 +234,6 @@ export default class SyncApiController {
         indexRate: undefined,
         cacheRate: undefined,
         estimate: undefined,
-        synced: false,
         status: SyncStatus.SyncNotStart
       }
       this.estimates = [newSyncEstimate]
