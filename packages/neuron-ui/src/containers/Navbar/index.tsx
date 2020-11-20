@@ -60,7 +60,7 @@ const Navbar = () => {
     chain: {
       connectionStatus,
       networkID,
-      syncEstimate: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status },
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status },
     },
     settings: { wallets = [], networks = [] },
   } = neuronWallet

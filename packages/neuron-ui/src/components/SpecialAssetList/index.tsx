@@ -64,7 +64,7 @@ const SpecialAssetList = () => {
     chain: {
       networkID,
       connectionStatus,
-      syncEstimate: { bestKnownBlockTimestamp },
+      syncState: { bestKnownBlockTimestamp },
     },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)

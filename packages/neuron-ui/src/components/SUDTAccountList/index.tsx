@@ -42,7 +42,7 @@ const SUDTAccountList = () => {
     wallet: { id: walletId, balance },
     chain: {
       networkID,
-      syncEstimate: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
     },
     settings: { networks = [] },
   } = useGlobalState()

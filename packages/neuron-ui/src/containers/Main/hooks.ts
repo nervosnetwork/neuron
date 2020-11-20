@@ -15,7 +15,7 @@ import {
   NetworkList as NetworkListSubject,
   CurrentNetworkID as CurrentNetworkIDSubject,
   ConnectionStatus as ConnectionStatusSubject,
-  SyncEstimate as SyncEstimateSubject,
+  SyncState as SyncStateSubject,
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
@@ -179,10 +179,10 @@ export const useSubscription = ({
       }
     })
 
-    const syncEstimateSubscription = SyncEstimateSubject.subscribe(
+    const syncStateSubscription = SyncStateSubject.subscribe(
       ({ cacheTipNumber, bestKnownBlockNumber, bestKnownBlockTimestamp, estimate, status }) => {
         dispatch({
-          type: NeuronWalletActions.UpdateSyncEstimate,
+          type: NeuronWalletActions.UpdateSyncState,
           payload: {
             cacheTipBlockNumber: cacheTipNumber,
             bestKnownBlockNumber,
@@ -265,7 +265,7 @@ export const useSubscription = ({
       networkListSubscription.unsubscribe()
       currentNetworkIDSubscription.unsubscribe()
       connectionStatusSubscription.unsubscribe()
-      syncEstimateSubscription.unsubscribe()
+      syncStateSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
   }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch, location.pathname])

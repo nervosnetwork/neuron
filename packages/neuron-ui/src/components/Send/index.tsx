@@ -27,7 +27,7 @@ const Send = () => {
     chain: {
       networkID,
       connectionStatus,
-      syncEstimate: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
     },
     settings: { networks = [] },
   } = useGlobalState()

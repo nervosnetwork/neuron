@@ -51,7 +51,7 @@ export const WalletList = SubjectConstructor<any[]>('wallet-list-updated')
 export const NetworkList = SubjectConstructor<Subject.NetworkList>('network-list-updated')
 export const CurrentNetworkID = SubjectConstructor<Subject.CurrentNetworkID>('current-network-id-updated')
 export const ConnectionStatus = SubjectConstructor<Subject.ConnectionStatus>('connection-status-updated')
-export const SyncEstimate = SubjectConstructor<Subject.SyncEstimate>('sync-estimate-updated')
+export const SyncState = SubjectConstructor<Subject.SyncState>('sync-estimate-updated')
 export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-updated')
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 export const Navigation = SubjectConstructor<Subject.URL>('navigation')
@@ -65,7 +65,7 @@ export default {
   NetworkList,
   CurrentNetworkID,
   ConnectionStatus,
-  SyncEstimate,
+  SyncState,
   AppUpdater,
   Command,
   Navigation,

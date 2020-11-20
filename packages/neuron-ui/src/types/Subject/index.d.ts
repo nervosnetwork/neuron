@@ -34,7 +34,7 @@ declare namespace Subject {
     url: string
   }
   type BlockNumber = string
-  interface SyncEstimate {
+  interface SyncState {
     cacheTipNumber: number
     bestKnownBlockNumber: number
     bestKnownBlockTimestamp: number

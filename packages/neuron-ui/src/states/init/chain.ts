@@ -24,7 +24,7 @@ export const transactionState: Readonly<State.DetailedTransaction> = {
 export const chainState: Readonly<State.Chain> = {
   networkID: currentNetworkID.load(),
   connectionStatus: ConnectionStatus.Connecting,
-  syncEstimate: {
+  syncState: {
     cacheTipBlockNumber: 0,
     bestKnownBlockNumber: 0,
     bestKnownBlockTimestamp: 0,
