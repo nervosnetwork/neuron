@@ -81,6 +81,9 @@ export default class TransactionSender {
       try {
         return await device.signTx(walletID, tx, txHash, skipLastInputs, context)
       } catch (err) {
+        if (err instanceof TypeError) {
+          throw err
+        }
         throw new SignTransactionFailed(err.message)
       }
     }

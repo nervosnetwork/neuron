@@ -9,6 +9,7 @@ import {
   sendSUDTTransaction,
   AppActions,
 } from 'states'
+import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import Spinner from 'widgets/Spinner'
 import { useHistory } from 'react-router-dom'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
@@ -23,10 +24,11 @@ import {
   getDeviceCkbAppVersion,
   DeviceInfo,
   updateWallet,
+  getPlatform,
 } from 'services/remote'
 import { ErrorCode, errorFormatter, isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import DropdownButton from 'widgets/DropdownButton'
-import { CkbAppNotFoundException } from 'exceptions'
+import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
 import SignError from './sign-error'
 import HDWalletSign from '../HDWalletSign'
 import styles from './hardwareSign.module.scss'
@@ -64,6 +66,9 @@ const HardwareSign = ({
     }
     onDismiss()
   }, [dispatch, signType, onDismiss])
+  const isWin32 = useMemo(() => {
+    return getPlatform() === 'win32'
+  }, [])
   const [status, setStatus] = useState('')
   const connectStatus = t('hardware-sign.status.connect')
   const userInputStatus = t('hardware-sign.status.user-input')
@@ -84,9 +89,9 @@ const HardwareSign = ({
   const [error, setError] = useState('')
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
-  const isSigning = useMemo(() => {
-    return status === userInputStatus
-  }, [status, userInputStatus])
+  const isLoading = useMemo(() => {
+    return status === userInputStatus || isReconnecting
+  }, [status, userInputStatus, isReconnecting])
 
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
 
@@ -161,14 +166,42 @@ const HardwareSign = ({
     async (device: DeviceInfo) => {
       try {
         const conectionRes = await connectDevice(device)
+        let { descriptor } = device
         if (!isSuccessResponse(conectionRes)) {
-          setStatus(disconnectStatus)
-          return
+          // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
+          // so if we can't connect to the device, we need to re-search device automatically.
+          // for unix, the descriptor never changes unless user plugs the device into another USB port,
+          // in that case, mannauly re-search device one time will do.
+          if (isWin32) {
+            setIsReconnecting(true)
+            const devicesRes = await getDevices(device)
+            setIsReconnecting(false)
+            if (isSuccessResponse(devicesRes) && Array.isArray(devicesRes.result) && devicesRes.result.length > 0) {
+              const [updatedDeviceInfo] = devicesRes.result
+              descriptor = updatedDeviceInfo.descriptor
+              setDeviceInfo(updatedDeviceInfo)
+            } else {
+              throw new DeviceNotFoundException()
+            }
+          } else {
+            throw new DeviceNotFoundException()
+          }
         }
 
-        const ckbVersionRes = await getDeviceCkbAppVersion(device.descriptor)
+        // getDeviceCkbAppVersion will halt forever while in win32 sleep mode.
+        const ckbVersionRes = await Promise.race([
+          getDeviceCkbAppVersion(descriptor),
+          new Promise<ControllerResponse>((_, reject) => setTimeout(() => reject(), 1000)),
+        ]).catch(() => {
+          return { status: ErrorCode.DeviceInSleep }
+        })
+
         if (!isSuccessResponse(ckbVersionRes)) {
-          throw new CkbAppNotFoundException()
+          if (ckbVersionRes.status !== ErrorCode.DeviceInSleep) {
+            throw new CkbAppNotFoundException()
+          } else {
+            throw new DeviceNotFoundException()
+          }
         }
         setStatus(connectStatus)
       } catch (err) {
@@ -179,7 +212,7 @@ const HardwareSign = ({
         }
       }
     },
-    [connectStatus, disconnectStatus, ckbAppNotFoundStatus]
+    [connectStatus, disconnectStatus, ckbAppNotFoundStatus, isWin32]
   )
 
   const signTx = useCallback(async () => {
@@ -278,8 +311,9 @@ const HardwareSign = ({
 
   const signMsg = useCallback(async () => {
     await ensureDeviceAvailable(deviceInfo)
+    setStatus(userInputStatus)
     await signMessage?.('')
-  }, [ensureDeviceAvailable, signMessage, deviceInfo])
+  }, [ensureDeviceAvailable, signMessage, deviceInfo, userInputStatus])
 
   const sign = useCallback(
     async (e?: React.FormEvent) => {
@@ -303,7 +337,7 @@ const HardwareSign = ({
         const [device] = res.result
         setDeviceInfo(device)
         if (device.descriptor !== deviceInfo.descriptor) {
-          updateWallet({
+          await updateWallet({
             id: wallet.id,
             device,
           })
@@ -374,7 +408,7 @@ const HardwareSign = ({
             <DropdownButton
               mainBtnLabel={t('offline-sign.export')}
               mainBtnOnClick={exportTransaction}
-              mainBtnDisabled={isSigning}
+              mainBtnDisabled={isLoading}
               list={dropdownList}
             />
           </div>
@@ -382,17 +416,12 @@ const HardwareSign = ({
         <div className={styles.right}>
           <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
           {isNotAvailableToSign ? (
-            <Button
-              label={t('hardware-sign.actions.rescan')}
-              type="submit"
-              disabled={isReconnecting || isSigning}
-              onClick={reconnect}
-            >
-              {isReconnecting || isSigning ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
+            <Button label={t('hardware-sign.actions.rescan')} type="submit" disabled={isLoading} onClick={reconnect}>
+              {isLoading ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
             </Button>
           ) : (
-            <Button label={t('sign-and-verify.sign')} type="submit" disabled={isSigning} onClick={sign}>
-              {isSigning ? <Spinner /> : (t('sign-and-verify.sign') as string)}
+            <Button label={t('sign-and-verify.sign')} type="submit" disabled={isLoading} onClick={sign}>
+              {isLoading ? <Spinner /> : (t('sign-and-verify.sign') as string)}
             </Button>
           )}
         </div>
