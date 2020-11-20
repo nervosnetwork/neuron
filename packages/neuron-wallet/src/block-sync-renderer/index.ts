@@ -89,8 +89,8 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
 
   subscribeToWorkerProcess(syncTask, msg => {
     switch (msg.channel) {
-      case 'sync-estimate-updated':
-        SyncApiController.emiter.emit('sync-estimate-updated', msg.result)
+      case 'cache-tip-block-updated':
+        SyncApiController.emiter.emit('cache-tip-block-updated', msg.result)
         break
       case 'tx-db-changed':
         TxDbChangedSubject.getSubject().next(msg.result)

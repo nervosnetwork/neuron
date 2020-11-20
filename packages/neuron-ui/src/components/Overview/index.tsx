@@ -53,7 +53,7 @@ const Overview = () => {
   const {
     wallet: { id, balance = '' },
     chain: {
-      syncStatus: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
       transactions: { items = [] },
       connectionStatus,
       networkID,

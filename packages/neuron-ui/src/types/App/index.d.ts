@@ -177,17 +177,18 @@ declare namespace State {
   }
   type ConnectionStatus = 'online' | 'offline' | 'connecting'
 
-  type SyncStatus = Readonly<{
+  type SyncState = Readonly<{
     cacheTipBlockNumber: number
     bestKnownBlockNumber: number
     bestKnownBlockTimestamp: number
     estimate: number | undefined
+    status: number
   }>
 
   interface Chain {
     readonly networkID: string
     readonly connectionStatus: ConnectionStatus
-    readonly syncStatus: SyncStatus
+    readonly syncState: SyncState
     readonly transactions: Readonly<{
       pageNo: number
       pageSize: number

@@ -217,7 +217,7 @@ export default class Queue {
 
   private updateBlockNumberTips(tip: BlockTips) {
     ChildProcess.send({
-      channel: 'sync-estimate-updated',
+      channel: 'cache-tip-block-updated',
       result: {
         indexerTipNumber: tip.indexerTipNumber,
         cacheTipNumber: tip.cacheTipNumber,

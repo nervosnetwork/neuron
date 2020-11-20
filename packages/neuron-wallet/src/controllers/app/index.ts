@@ -18,8 +18,8 @@ const app = electronApp || (remote && remote.app)
 
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
+  private syncApiController: SyncApiController | undefined
   private apiController = new ApiController()
-  private syncApiController = new SyncApiController()
 
   constructor() {
     subscribe(this)
@@ -29,6 +29,7 @@ export default class AppController {
     registerListeners()
 
     await this.apiController.mount()
+    this.syncApiController = SyncApiController.getInstance()
     this.syncApiController.mount()
     this.openWindow()
   }

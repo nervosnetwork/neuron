@@ -192,7 +192,7 @@ describe('queue', () => {
           const mock = jest.spyOn(process, 'send')
           stubbedBlockTipsSubject.next({ cacheTipNumber: 3, indexerTipNumber: 3 })
           expect(mock).toHaveBeenCalledWith({
-            channel: 'sync-estimate-updated',
+            channel: 'cache-tip-block-updated',
             result: {cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything()}
           })
           mock.mockRestore()
