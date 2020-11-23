@@ -410,12 +410,13 @@ export default class WalletService {
       }
     }
 
+    await AddressService.deleteByWalletId(id)
+
     this.listStore.writeSync(this.walletsKey, newWallets)
 
     if (!wallet.isHardware()) {
       wallet.deleteKeystore()
     }
-    await AddressService.deleteByWalletId(id)
 
     if (ChildProcess.isChildProcess()) {
       ChildProcess.send({
