@@ -22,3 +22,10 @@ export class AddressEmptyException extends Error {
     super(`${I18N_PATH}${ErrorCode.AddressIsEmpty}`)
   }
 }
+
+export class AddressDeprecatedException extends Error {
+  public code = ErrorCode.AddressIsDeprecated
+  constructor() {
+    super(`${I18N_PATH}${ErrorCode.AddressIsDeprecated}`)
+  }
+}

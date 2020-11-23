@@ -1,6 +1,7 @@
 import { ckbCore } from 'services/chain'
-import { FieldRequiredException, FieldInvalidException } from 'exceptions'
-import { LONG_TYPE_PREFIX, LONG_DATA_PREFIX } from 'utils/const'
+import { FieldRequiredException, FieldInvalidException, AddressDeprecatedException } from 'exceptions'
+import { LONG_TYPE_PREFIX } from 'utils/const'
+import { DeprecatedScript } from 'utils/enums'
 import { validateAddress } from './address'
 
 export const validateSUDTAddress = ({
@@ -19,13 +20,11 @@ export const validateSUDTAddress = ({
     validateAddress(address, isMainnet)
     const parsed = ckbCore.utils.parseAddress(address, 'hex')
 
-    /**
-     * Only anyone can pay address(type id ver/data ver) is under validation
-     * - data version for mainnet
-     * - type version for testnet
-     */
-    const addrType = isMainnet ? LONG_DATA_PREFIX : LONG_TYPE_PREFIX
-    if (!parsed.startsWith(addrType)) {
+    if ([DeprecatedScript.AcpOnAggron, DeprecatedScript.AcpOnLina].some(script => parsed.startsWith(script))) {
+      throw new AddressDeprecatedException()
+    }
+
+    if (!parsed.startsWith(LONG_TYPE_PREFIX)) {
       throw new FieldInvalidException(FIELD_NAME)
     }
 
