@@ -152,46 +152,44 @@ export default class Queue {
     }
 
     for (const [, tx] of transactions.entries()) {
-      const [shouldSave, , anyoneCanPayInfos] = await new TxAddressFinder(
+      const [, , anyoneCanPayInfos] = await new TxAddressFinder(
         this.lockHashes,
         this.anyoneCanPayLockHashes,
         tx,
         this.multiSignBlake160s
       ).addresses()
-      if (shouldSave) {
-        for (const [inputIndex, input] of tx.inputs.entries()) {
-          const previousTxHash = input.previousOutput!.txHash
-          const previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
-          if (!previousTxWithStatus) {
-            continue
-          }
+      for (const [inputIndex, input] of tx.inputs.entries()) {
+        const previousTxHash = input.previousOutput!.txHash
+        const previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
+        if (!previousTxWithStatus) {
+          continue
+        }
 
-          const previousTx = previousTxWithStatus!.transaction
-          const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-          const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
-          input.setLock(previousOutput.lock)
-          previousOutput.type && input.setType(previousOutput.type)
-          input.setData(previousOutputData)
-          input.setCapacity(previousOutput.capacity)
-          input.setInputIndex(inputIndex.toString())
+        const previousTx = previousTxWithStatus!.transaction
+        const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+        const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
+        input.setLock(previousOutput.lock)
+        previousOutput.type && input.setType(previousOutput.type)
+        input.setData(previousOutputData)
+        input.setCapacity(previousOutput.capacity)
+        input.setInputIndex(inputIndex.toString())
 
-          if (
-            previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
-            previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
-          ) {
-            const output = tx.outputs![inputIndex]
-            if (output) {
-              output.setDepositOutPoint(new OutPoint(
-                input.previousOutput!.txHash,
-                input.previousOutput!.index,
-              ))
-            }
+        if (
+          previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
+          previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+        ) {
+          const output = tx.outputs![inputIndex]
+          if (output) {
+            output.setDepositOutPoint(new OutPoint(
+              input.previousOutput!.txHash,
+              input.previousOutput!.index,
+            ))
           }
         }
-        await TransactionPersistor.saveFetchTx(tx)
-        for (const info of anyoneCanPayInfos) {
-          await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
-        }
+      }
+      await TransactionPersistor.saveFetchTx(tx)
+      for (const info of anyoneCanPayInfos) {
+        await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
       }
 
       await this.checkAndGenerateAddressesByTx(tx)

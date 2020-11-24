@@ -14,6 +14,7 @@ export default class AssetAccountInfo {
   private sudtInfo: ScriptCellInfo
   private anyoneCanPayInfo: ScriptCellInfo
   private pwAnyoneCanPayInfo: ScriptCellInfo
+  private legacyAnyoneCanPayInfo: ScriptCellInfo
 
   private static MAINNET_GENESIS_BLOCK_HASH: string = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
 
@@ -45,6 +46,12 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
+      this.legacyAnyoneCanPayInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.LEGACY_MAINNET_ACP_DEP_TXHASH!, process.env.LEGACY_MAINNET_ACP_DEP_INDEX!),
+          process.env.LEGACY_MAINNET_ACP_DEP_TYPE! as DepType),
+        codeHash: process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH!,
+        hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+      }
     } else {
       this.sudtInfo = {
         cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
@@ -63,6 +70,12 @@ export default class AssetAccountInfo {
           process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType),
         codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+      }
+      this.legacyAnyoneCanPayInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!, process.env.LEGACY_TESTNET_ACP_DEP_INDEX!),
+          process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType),
+        codeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH!,
+        hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
     }
   }
@@ -89,6 +102,11 @@ export default class AssetAccountInfo {
 
   public generateAnyoneCanPayScript(args: string): Script {
     const info = this.anyoneCanPayInfo
+    return new Script(info.codeHash, args, info.hashType)
+  }
+
+  public generateLegacyAnyoneCanPayScript(args: string): Script {
+    const info = this.legacyAnyoneCanPayInfo
     return new Script(info.codeHash, args, info.hashType)
   }
 
