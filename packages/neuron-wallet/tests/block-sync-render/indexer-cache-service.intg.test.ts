@@ -59,6 +59,7 @@ const addressMetas = [addressMeta]
 const defaultLockScript = addressMeta.generateDefaultLockScript()
 const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
 const acpLockScript = addressMeta.generateACPLockScript()
+const legacyAcpLockScript = addressMeta.generateLegacyACPLockScript()
 const formattedDefaultLockScript = {
   code_hash: defaultLockScript.codeHash,
   hash_type: defaultLockScript.hashType,
@@ -74,13 +75,19 @@ const formattedAcpLockScript = {
   hash_type: acpLockScript.hashType,
   args: acpLockScript.args
 }
+const formattedLegacyAcpLockScript = {
+  code_hash: legacyAcpLockScript.codeHash,
+  hash_type: legacyAcpLockScript.hashType,
+  args: legacyAcpLockScript.args
+}
 
 const mockGetTransactionHashes = (mocks: any[] = []) => {
   const stubbedConstructor = when(stubbedTransactionCollectorConstructor)
 
   for (const lock of [
     formattedDefaultLockScript,
-    formattedAcpLockScript
+    formattedAcpLockScript,
+    formattedLegacyAcpLockScript,
   ]) {
     const {hashes} = mocks.find(mock => mock.lock === lock) || {hashes: []}
     stubbedConstructor
