@@ -945,8 +945,8 @@ describe('TransactionGenerator', () => {
 
   describe('AnyoneCanPay', () => {
     const assetAccountInfo = new AssetAccountInfo()
-    const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
     const aliceAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
+    const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
 
     // generate anyone-can-pay live cell
     const generateLiveCell = (
@@ -1082,6 +1082,64 @@ describe('TransactionGenerator', () => {
           expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
         });
         it('binds both secp, acp and sudt cell deps', () => {
+          expect(tx.cellDeps.length).toEqual(3)
+        })
+        it('calculates fees', async () => {
+          expect(tx.fee).toEqual(expectedTxFee)
+        })
+        it('generates inputs and outputs', () => {
+          expect(tx.inputs.length).toEqual(2)
+          expect(tx.outputs.length).toEqual(2)
+
+          const inputCapacities = tx.inputs
+            .map(input => BigInt(input.capacity))
+            .reduce((result, c) => result + c, BigInt(0))
+          const outputCapacities = tx.outputs
+            .map(output => BigInt(output.capacity))
+            .reduce((result, c) => result + c, BigInt(0))
+
+          expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+        });
+      });
+
+      describe('sending to pw ckb acp', () => {
+        let tx: Transaction
+        let expectedTxSize: number
+        let expectedTxFee: string
+        beforeEach(async () => {
+          when(stubbedIndexerService.getLiveCellsByScript)
+            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+              generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
+            ])
+
+          const pwAnyoneCanPayLockScript = new Script(
+            process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
+            '0x36c329ed630d6ce750712a477543672adab57f4c',
+            process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE as ScriptHashType,
+          )
+
+          const targetOutput: Output = Output.fromObject({
+            capacity: toShannon('61'),
+            lock: pwAnyoneCanPayLockScript,
+            type: null,
+            data: '0x',
+          })
+
+          tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+            walletId1,
+            [bobAnyoneCanPayLockScript],
+            targetOutput,
+            (1 * 10**8).toString(),
+            bob.lockScript.args,
+            feeRate,
+            '0'
+          )
+          tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+          expectedTxSize = TransactionSize.tx(tx)
+          expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+        });
+        it('binds both secp, pw and acp cell dep', () => {
           expect(tx.cellDeps.length).toEqual(3)
         })
         it('calculates fees', async () => {
@@ -1427,6 +1485,9 @@ describe('TransactionGenerator', () => {
           expectedTxSize = TransactionSize.tx(tx)
           expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
         })
+        it('binds secp, sudt, acp cell dep', () => {
+          expect(tx.cellDeps.length).toEqual(3)
+        })
         it('the size of inputs and outputs should remain 2', () => {
           expect(tx.inputs.length).toEqual(2)
           expect(tx.outputs.length).toEqual(2)
@@ -1449,6 +1510,48 @@ describe('TransactionGenerator', () => {
         });
         it('updates output data', () => {
           expect(tx.outputsData).toEqual([BufferUtils.writeBigUInt128LE(BigInt(900)), BufferUtils.writeBigUInt128LE(BigInt(200))])
+        })
+      });
+
+      describe('when sending to pw acp', () => {
+        const pwAnyoneCanPayLockScript = new Script(
+          process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
+          '0x36c329ed630d6ce750712a477543672adab57f4c',
+          process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE as ScriptHashType,
+        )
+        beforeEach(async () => {
+          const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, pwAnyoneCanPayLockScript)
+
+          when(stubbedIndexerService.getLiveCellsByScript)
+            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+              generateLiveCell(toShannon('150'), '1000', tokenID),
+            ])
+
+          const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
+
+          const targetOutput: Output = Output.fromObject({
+            capacity: targetLiveCell.capacity,
+            lock: targetLiveCell.lock(),
+            type: targetLiveCell.type(),
+            data: targetLiveCell.data,
+          })
+
+          tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+            walletId1,
+            [bobAnyoneCanPayLockScript],
+            targetOutput,
+            '100',
+            bob.lockScript.args,
+            feeRate,
+            '0'
+          )
+          tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+          expectedTxSize = TransactionSize.tx(tx)
+          expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+        })
+        it('binds secp, sudt, pw and acp cell dep', () => {
+          expect(tx.cellDeps.length).toEqual(4)
         })
       });
 

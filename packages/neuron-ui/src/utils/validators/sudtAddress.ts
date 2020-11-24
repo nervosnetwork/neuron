@@ -30,9 +30,12 @@ export const validateSUDTAddress = ({
 
     const CODE_HASH_LENGTH = 64
     const codeHashOfAddr = parsed.substr(4, CODE_HASH_LENGTH)
-    if (codeHash && codeHashOfAddr !== codeHash.slice(2)) {
-      throw new FieldInvalidException(FIELD_NAME)
-    }
+    // eslint-disable-next-line no-console
+    console.log('code hash', codeHash, codeHashOfAddr)
+
+    // if (codeHash && codeHashOfAddr !== codeHash.slice(2)) {
+    //   throw new FieldInvalidException(FIELD_NAME)
+    // }
     const ARGS_LENGTH = 40
     const minimums = parsed.slice(4 + CODE_HASH_LENGTH + ARGS_LENGTH)
     if (minimums && ((minimums.length !== 2 && minimums.length !== 4) || Number.isNaN(+`0x${minimums}`))) {
