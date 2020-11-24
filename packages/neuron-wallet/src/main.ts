@@ -23,6 +23,12 @@ if (singleInstanceLock) {
   app.on('second-instance', () => {
     appController.restoreWindow()
   })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
 } else {
   app.quit()
 }
