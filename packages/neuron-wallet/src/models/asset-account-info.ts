@@ -26,7 +26,6 @@ export default class AssetAccountInfo {
   }
 
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
-    // dev chain: using testnet config
     if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
       this.sudtInfo = {
         cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!),
