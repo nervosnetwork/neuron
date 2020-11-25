@@ -81,15 +81,6 @@ export default {
     },
     exception: null,
   },
-  'Should throw an error when the address is an acp address but code hash is not matched': {
-    params: {
-      address: 'ckt1qs6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4v7tvzu37rv87kyv59ltdece09usz9t9yym9pmex',
-      codeHash: '0x123',
-      isMainnet: false,
-      required: false,
-    },
-    exception: ErrorCode.FieldInvalid,
-  },
   'Should pass when the address is an acp address and the code hash is matched': {
     params: {
       address: 'ckt1qs6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4v7tvzu37rv87kyv59ltdece09usz9t9yym9pmex',
