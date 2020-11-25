@@ -39,17 +39,17 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
-      this.pwAnyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_PW_ACP_DEP_TXHASH!, process.env.MAINNET_PW_ACP_DEP_INDEX!),
-          process.env.MAINNET_PW_ACP_DEP_TYPE! as DepType),
-        codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
-      }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(new OutPoint(process.env.LEGACY_MAINNET_ACP_DEP_TXHASH!, process.env.LEGACY_MAINNET_ACP_DEP_INDEX!),
           process.env.LEGACY_MAINNET_ACP_DEP_TYPE! as DepType),
         codeHash: process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+      }
+      this.pwAnyoneCanPayInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_PW_ACP_DEP_TXHASH!, process.env.MAINNET_PW_ACP_DEP_INDEX!),
+          process.env.MAINNET_PW_ACP_DEP_TYPE! as DepType),
+        codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
+        hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
     } else {
       this.sudtInfo = {
@@ -64,17 +64,17 @@ export default class AssetAccountInfo {
         codeHash: process.env.TESTNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
-      this.pwAnyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_PW_ACP_DEP_TXHASH!, process.env.TESTNET_PW_ACP_DEP_INDEX!),
-          process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType),
-        codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
-      }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(new OutPoint(process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!, process.env.LEGACY_TESTNET_ACP_DEP_INDEX!),
           process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType),
         codeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+      }
+      this.pwAnyoneCanPayInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_PW_ACP_DEP_TXHASH!, process.env.TESTNET_PW_ACP_DEP_INDEX!),
+          process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType),
+        codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
+        hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
     }
   }
