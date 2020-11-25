@@ -20,7 +20,6 @@ import ArrayUtils from 'utils/array'
 import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
 import assert from 'assert'
-import CellDep, { DepType } from 'models/chain/cell-dep'
 
 export interface TargetOutput {
   address: string
@@ -797,14 +796,7 @@ export class TransactionGenerator {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
-
-    const legacyACPCellDep = new CellDep(
-      new OutPoint(
-        process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!,
-        process.env.LEGACY_TESTNET_ACP_DEP_INDEX!
-      ),
-      process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType,
-    )
+    const legacyACPCellDep = assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep
 
     const tx = Transaction.fromObject({
       version: '0',
