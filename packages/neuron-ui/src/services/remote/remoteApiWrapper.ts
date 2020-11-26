@@ -100,6 +100,8 @@ type Action =
   | 'generate-send-all-to-anyone-can-pay-tx'
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
+  | 'migrate-acp'
+  | 'check-migrate-acp'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({
@@ -126,13 +128,13 @@ export const remoteApi = <P = any, R = any>(action: Action) => async (params: P)
   if (isSuccessResponse(res)) {
     return {
       status: ResponseCode.SUCCESS,
-      result: res.result || null,
+      result: res.result ?? null,
     }
   }
 
   return {
-    status: res.status || ResponseCode.FAILURE,
-    message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
+    status: res.status ?? ResponseCode.FAILURE,
+    message: typeof res.message === 'string' ? { content: res.message } : res.message ?? '',
   }
 }
 

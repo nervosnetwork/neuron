@@ -295,6 +295,9 @@
       },
       "send-sudt": {
         "title": "Send sUDT"
+      },
+      "migrate-acp": {
+        "title": "Upgrade Asset Accounts"
       }
     },
     "qrcode": {
@@ -407,7 +410,8 @@
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
         "307": "Please enter a testnet address",
-        "308": "Amount is not enough"
+        "308": "Amount is not enough",
+        "309": "The receiver needs to upgrade her account address to accept more transfer."
       }
     },
     "sync": {

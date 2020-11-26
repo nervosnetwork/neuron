@@ -81,7 +81,15 @@ declare namespace State {
   }
 
   interface PasswordRequest {
-    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | 'create-sudt-account' | 'send-sudt' | null
+    readonly actionType:
+      | 'send'
+      | 'backup'
+      | 'delete'
+      | 'unlock'
+      | 'create-sudt-account'
+      | 'send-sudt'
+      | 'migrate-acp'
+      | null
     readonly walletID: string
   }
 

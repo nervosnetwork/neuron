@@ -21,6 +21,28 @@
     ],
     "expected": "ckb1qyq5lv479ewscx3ms620sv34pgeuz6zagaaqklhtgg"
   },
+  "anyone can pay address on lina": {
+    "params": [
+      {
+        "codeHash": "0xd369597ff47f29fbc0d47d2e3775370d1250b85140c670e4718af712983a2354",
+        "hashType": "type",
+        "args": "0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a"
+      },
+      true
+    ],
+    "expected": "ckb1qypylv479ewscx3ms620sv34pgeuz6zagaaqvrugu7"
+  },
+  "anyone can pay address on aggron": {
+    "params": [
+      {
+        "codeHash": "0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356",
+        "hashType": "type",
+        "args": "0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a"
+      },
+      false
+    ],
+    "expected": "ckt1qypylv479ewscx3ms620sv34pgeuz6zagaaq3xzhsz"
+  },
   "full version address of hashType = 'data'": {
     "params": [
       {
@@ -42,5 +64,16 @@
       false
     ],
     "expected": "ckt1qsvf96jqmq4483ncl7yrzfzshwchu9jd0glq4yy5r2jcsw04d7xlydkr98kkxrtvuag8z2j8w4pkw2k6k4l5c02auef"
+  },
+  "full version address when args length is not matched": {
+    "params": [
+      {
+        "args": "0x7346c078cd8684ba9fc7bcaba49442a13b46617c4504009400f00020",
+        "codeHash": "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8",
+        "hashType": "type"
+      },
+      false
+    ],
+    "expected": "ckt1q3w9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32su6xcpuvmp5yh20u009t5j2y9gfmgeshc3gyqz2qpuqqyqjlmnq6"
   }
 }

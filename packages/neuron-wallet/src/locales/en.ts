@@ -140,6 +140,22 @@ export default {
           'install-and-exit': 'Install and Exit'
         }
       },
+      'acp-migration': {
+        title: 'Upgrade Asset Account',
+        message: 'Upgrade Asset Account',
+        detail: 'Recently our security team identified a potential vulnerability in the experimental Asset Account script. We have deployed a new Asset Account script with a fix on mainnet and all future Asset Account will use the new version. We suggest you to upgrade them to use the new script.',
+        buttons: {
+          migrate: 'Secure upgrade now',
+          skip: 'I know the risk, will upgrade later'
+        }
+      },
+      'acp-migration-completed': {
+        title: 'Congratulations! You have completed the secure upgrade.',
+        message: 'Congratulations! You have completed the secure upgrade.',
+        buttons: {
+          ok: 'OK'
+        }
+      }
     },
     prompt: {
       password: {

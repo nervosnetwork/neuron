@@ -139,6 +139,22 @@ export default {
           'install-and-exit': '安装并退出'
         }
       },
+      'acp-migration': {
+        title: '升级资产账户',
+        message: '升级资产账户',
+        detail: '我们的安全团队在近期在实验性的资产账户脚本中定位了一个潜在的安全性问题。我们已经部署了新的资产账户脚本来替换旧脚本，未来的资产账户也会采纳新的脚本。建议您立即升级以使用新的账户脚本。',
+        buttons: {
+          migrate: '安全升级',
+          skip: '已知风险，稍后升级'
+        }
+      },
+      'acp-migration-completed': {
+        title: '恭喜！您已经完成安全升级。',
+        message: '恭喜！您已经完成安全升级。',
+        buttons: {
+          ok: 'OK'
+        }
+      }
     },
     prompt: {
       password: {

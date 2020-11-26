@@ -138,6 +138,22 @@ export default {
           'install-and-exit': '安裝並退出'
         }
       },
+      'acp-migration': {
+        title: '升級資產賬戶',
+        message: '升級資產賬戶',
+        detail: '我們的安全團隊在近期在實驗性的資產賬戶腳本中定位了壹個潛在的安全性問題。我們已經部署了新的資產賬戶腳本來替換舊腳本，未來的資產賬戶也會采納新的腳本。建議您立即升級以使用新的賬戶腳本。',
+        buttons: {
+          migrate: '安全升級',
+          skip: '已知風險，稍後升級'
+        }
+      },
+      'acp-migration-completed': {
+        title: '恭喜！您已經完成安全升級。',
+        message: '恭喜！您已經完成安全升級。',
+        buttons: {
+          ok: 'OK'
+        }
+      }
     },
     prompt: {
       password: {

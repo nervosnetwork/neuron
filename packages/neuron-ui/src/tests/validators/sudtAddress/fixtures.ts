@@ -49,7 +49,7 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  "Should throw an error when it's not a 0x04(type id ver.) address on testnet": {
+  "Should throw an error when it's code hash index is not 0x04": {
     params: {
       address: 'ckt1q2r2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yy3d90uh',
       isMainnet: false,
@@ -57,17 +57,9 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  "Should throw an error when it's not a 0x02(data ver.) address on mainnet": {
-    params: {
-      address: 'ckb1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xw3vumhs9nvu786dj9p0q5elx66t24n3kxgj53qks',
-      isMainnet: true,
-      required: false,
-    },
-    exception: ErrorCode.FieldInvalid,
-  },
   'Should throw an error when minimum is malformed': {
     params: {
-      address: 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yyyg3zy4fq3q6',
+      address: 'ckt1qy6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4v7tvzu37rv87kyv59ltdece09usz9t9yyyg3zy428nc2',
       isMainnet: false,
       required: false,
     },
@@ -75,15 +67,15 @@ export default {
   },
   'Should throw an error when the address is required but missing': {
     params: {
-      address: 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yywhe92q',
+      address: '',
       isMainnet: false,
-      required: false,
+      required: true,
     },
-    exception: null,
+    exception: ErrorCode.FieldRequired,
   },
   'Should pass when the address is an acp address without code hash validation': {
     params: {
-      address: 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yywhe92q',
+      address: 'ckt1qs6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4v7tvzu37rv87kyv59ltdece09usz9t9yym9pmex',
       isMainnet: false,
       required: false,
     },
@@ -91,7 +83,7 @@ export default {
   },
   'Should throw an error when the address is an acp address but code hash is not matched': {
     params: {
-      address: 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yywhe92q',
+      address: 'ckt1qs6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4v7tvzu37rv87kyv59ltdece09usz9t9yym9pmex',
       codeHash: '0x123',
       isMainnet: false,
       required: false,
@@ -100,11 +92,27 @@ export default {
   },
   'Should pass when the address is an acp address and the code hash is matched': {
     params: {
-      address: 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yywhe92q',
-      codeHash: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+      address: 'ckt1qs6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4v7tvzu37rv87kyv59ltdece09usz9t9yym9pmex',
+      codeHash: '0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356',
       isMainnet: false,
       required: false,
     },
     exception: null,
+  },
+  'Should throw an error when address is a deprecated acp address on lina': {
+    params: {
+      address: 'ckt1qg8mxsu48mncexvxkzgaa7mz2g25uza4zpz062relhjmyuc52ps3z7tvzu37rv87kyv59ltdece09usz9t9yyx9r0yj',
+      isMainnet: false,
+      required: false,
+    },
+    exception: ErrorCode.AddressIsDeprecated,
+  },
+  'Should throw an error when address is a deprecated acp address on aggron': {
+    params: {
+      address: 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yywhe92q',
+      isMainnet: false,
+      required: false,
+    },
+    exception: ErrorCode.AddressIsDeprecated,
   },
 }

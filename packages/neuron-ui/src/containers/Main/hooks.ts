@@ -214,6 +214,16 @@ export const useSubscription = ({
             })
             break
           }
+          case 'migrate-acp': {
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: payload || '',
+                actionType: 'migrate-acp',
+              },
+            })
+            break
+          }
           default: {
             break
           }

@@ -276,6 +276,18 @@ declare namespace Controller {
     type Response = Hash
   }
 
+  namespace CheckMigrateAcp {
+    type Params = void
+    type Response = boolean | undefined
+  }
+
+  namespace MigrateAcp {
+    interface Params {
+      id: string
+      password: string
+    }
+  }
+
   namespace ExportTransactions {
     interface Params {
       walletID: string
