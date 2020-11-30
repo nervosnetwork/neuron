@@ -35,13 +35,13 @@
   "anyone can pay address on aggron": {
     "params": [
       {
-        "codeHash": "0xd369597ff47f29fbc0d47d2e3775370d1250b85140c670e4718af712983a2354",
+        "codeHash": "0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356",
         "hashType": "type",
         "args": "0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a"
       },
-      true
+      false
     ],
-    "expected": "ckb1qypylv479ewscx3ms620sv34pgeuz6zagaaqvrugu7"
+    "expected": "ckt1qypylv479ewscx3ms620sv34pgeuz6zagaaq3xzhsz"
   },
   "full version address of hashType = 'data'": {
     "params": [

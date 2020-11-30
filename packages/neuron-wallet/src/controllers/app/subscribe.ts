@@ -40,6 +40,9 @@ export const subscribe = (dispatcher: AppResponder) => {
       estimation.estimate = cachedEstimation.estimate
     }
     dispatcher.sendMessage('sync-estimate-updated', estimation)
+    // dispatcher.sendMessage('synced-block-number-updated', params)
+
+    dispatcher.runCommand('migrate-acp', '')
   })
 
   CommandSubject.subscribe(params => {

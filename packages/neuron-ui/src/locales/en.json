@@ -367,6 +367,9 @@
       },
       "send-acp": {
         "title": "Send CKB"
+      },
+      "migrate-acp": {
+        "title": "Upgrade Asset Accounts"
       }
     },
     "qrcode": {
@@ -479,6 +482,7 @@
         "306": "Please enter a mainnet address",
         "307": "Please enter a testnet address",
         "308": "Amount is not enough",
+        "309": "The receiver needs to upgrade her account address to accept more transfer.",
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No device detected. Please connect your device.",
         "404": "Multiple device detected. Only one device of the same model can be connected."

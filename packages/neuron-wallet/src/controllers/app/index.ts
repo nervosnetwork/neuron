@@ -121,9 +121,6 @@ export default class AppController {
     })
 
     this.mainWindow.on('closed', () => {
-      if (process.platform !== 'darwin') {
-        app.quit()
-      }
       this.clearOnClosed()
     })
 
