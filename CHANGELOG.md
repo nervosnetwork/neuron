@@ -1,3 +1,16 @@
+# 0.33.2 (2020-11-26)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Upgrade Asset Account script config.
+
+### Bug fix
+
+* Prevent Neuron from quitting when the main window is closed on MacOS.
+
+
 # 0.33.1 (2020-11-16)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 

@@ -18,6 +18,7 @@ import Output from 'models/chain/output'
 import SystemScriptInfo from 'models/system-script-info'
 import Script, { ScriptHashType } from 'models/chain/script'
 import LiveCellService from './live-cell-service'
+import AssetAccountInfo from 'models/asset-account-info'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -843,5 +844,29 @@ export default class CellsService {
     const uniqueBlake160s = [...new Set(blake160s)]
 
     return uniqueBlake160s
+  }
+
+  public static async gatherLegacyACPInputs (walletId: string) {
+    const assetAccountInfo = new AssetAccountInfo()
+    const legacyACPScriptInfo = assetAccountInfo.getLegacyAnyoneCanPayInfo()
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        status: OutputStatus.Live,
+        lockCodeHash: legacyACPScriptInfo.codeHash,
+        lockHashType: legacyACPScriptInfo.hashType,
+      })
+      .andWhere(`
+        lockArgs IN (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        )`,
+        { walletId }
+      )
+      .getMany()
+
+    return outputs
   }
 }

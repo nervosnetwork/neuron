@@ -99,7 +99,8 @@ describe('TransactionGenerator', () => {
     hasData: boolean,
     typeScript: Script | null,
     who: any = bob,
-    daoData?: string | undefined
+    daoData?: string | undefined,
+    outputData?: string | undefined
   ) => {
     const output = new OutputEntity()
     output.outPointTxHash = randomHex()
@@ -118,6 +119,9 @@ describe('TransactionGenerator', () => {
     }
     if (daoData) {
       output.daoData = daoData
+    }
+    if (outputData) {
+      output.data = outputData
     }
 
     return output
@@ -1871,4 +1875,97 @@ describe('TransactionGenerator', () => {
       expect(output.data).toEqual('0x' + '0'.repeat(32))
     })
   })
+
+  describe('#generateMigrateLegacyACPTx', () => {
+    const defaultLock = new Script(SystemScriptInfo.SECP_CODE_HASH, alice.publicKeyInBlake160, SystemScriptInfo.SECP_HASH_TYPE)
+    const legacyACPCodeHash: string = process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH as string
+    const legacyACPHashType: string = process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE as string
+    const legacyACPLock = new Script(legacyACPCodeHash, alice.publicKeyInBlake160, legacyACPHashType as ScriptHashType)
+    const assetAccountInfo = new AssetAccountInfo()
+    const tokenID = '0x' + '0'.repeat(64)
+
+    const sudtScript = assetAccountInfo.generateSudtScript(tokenID)
+    const acpLock = assetAccountInfo.generateAnyoneCanPayScript(alice.publicKeyInBlake160)
+
+    describe('with legacy acp cells', () => {
+      beforeEach(async () => {
+        const cells = [
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: legacyACPLock}),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: legacyACPLock}),
+
+          generateCell(toShannon('61'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: legacyACPLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: legacyACPLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+        ]
+        await getConnection().manager.save(cells)
+      });
+      it('generates acp migration transaction', async () => {
+        const tx = (await TransactionGenerator.generateMigrateLegacyACPTx(alice.walletId))!
+        const totalLegacyACPCellsCount = tx.inputs.filter(input => input.lockHash === legacyACPLock.computeHash()).length
+        const totalMigratedACPCellsCount = tx.outputs.filter(output => output.lockHash === acpLock.computeHash()).length
+        const totalMigratedSUDTCellCount = tx.outputs.filter(output => output.typeHash === sudtScript.computeHash()).length
+        const normalInputCellCapacity = tx.inputs.filter(input => input.lockHash === defaultLock.computeHash()).reduce((sum, input) => {
+          return sum += BigInt(input.capacity)
+        }, BigInt(0))
+        const normalOutputCellCapacity = tx.outputs.filter(output => output.lockHash === defaultLock.computeHash()).reduce((sum, output) => {
+          return sum += BigInt(output.capacity)
+        }, BigInt(0))
+        const acpCellCapacity = tx.outputs.filter(output => output.lockHash === acpLock.computeHash()).reduce((sum, output) => {
+          return sum += BigInt(output.capacity)
+        }, BigInt(0))
+        const acpCellSudtAmount = tx.outputsData.reduce((sum, lehex) => {
+          return sum += BufferUtils.parseAmountFromSUDTData(lehex)
+        }, BigInt(0))
+
+        expect(totalLegacyACPCellsCount).toEqual(4)
+        expect(totalMigratedACPCellsCount).toEqual(4)
+        expect(normalInputCellCapacity.toString()).toEqual(toShannon('161'))
+        expect(normalOutputCellCapacity.toString()).toEqual((normalInputCellCapacity - BigInt(tx.fee)).toString())
+        expect(acpCellCapacity.toString()).toEqual(toShannon('2400'))
+        expect(totalMigratedSUDTCellCount).toEqual(2)
+        expect(acpCellSudtAmount).toEqual(BigInt(200))
+      })
+    });
+    describe('with no legacy acp cells', () => {
+      beforeEach(async () => {
+        const cells = [
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: acpLock}),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: acpLock}),
+
+          generateCell(toShannon('61'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: acpLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: acpLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+        ]
+        await getConnection().manager.save(cells)
+      });
+      it('returns null', async () => {
+        const tx = await TransactionGenerator.generateMigrateLegacyACPTx(alice.walletId)
+        expect(tx).toEqual(null)
+      })
+    });
+    describe('with insufficient normal cells for fees', () => {
+      beforeEach(async () => {
+        const cells = [
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: legacyACPLock}),
+          generateCell(toShannon('61'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+        ]
+        await getConnection().manager.save(cells)
+      });
+      it('throws CapacityNotEnough', async () => {
+        let error = null
+        try {
+          await TransactionGenerator.generateMigrateLegacyACPTx(alice.walletId)
+        } catch (err) {
+          error = err
+        }
+        expect(error).not.toEqual(null)
+      });
+    });
+  });
 })

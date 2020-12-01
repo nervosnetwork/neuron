@@ -21,7 +21,12 @@ import {
   isSuccessResponse,
 } from 'utils'
 
-import { getSUDTAccountList, generateCreateSUDTAccountTransaction, updateSUDTAccount } from 'services/remote'
+import {
+  getSUDTAccountList,
+  generateCreateSUDTAccountTransaction,
+  updateSUDTAccount,
+  checkMigrateAcp,
+} from 'services/remote'
 
 import styles from './sUDTAccountList.module.scss'
 
@@ -57,6 +62,25 @@ const SUDTAccountList = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const existingAccountNames = accounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
+
+  useEffect(() => {
+    checkMigrateAcp().then(res => {
+      if (isSuccessResponse(res)) {
+        if (res.result === false) {
+          history.push(RoutePath.Overview)
+        }
+      } else {
+        dispatch({
+          type: AppActions.AddNotification,
+          payload: {
+            type: 'alert',
+            timestamp: +new Date(),
+            content: typeof res.message === 'string' ? res.message : res.message.content,
+          },
+        })
+      }
+    })
+  }, [dispatch, history])
 
   useEffect(() => {
     const ckbBalance = BigInt(balance)
