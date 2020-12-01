@@ -103,4 +103,8 @@ export default class AssetAccountInfo {
   public isAnyoneCanPayScript(script: Script): boolean {
     return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
   }
+
+  public isDefaultAnyoneCanPayScript(script: Script): boolean {
+    return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
+  }
 }
