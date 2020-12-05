@@ -100,6 +100,7 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
         break
       case 'wallet-deleted':
       case 'address-created':
+      case 'indexer-error':
         resetSyncTask()
         break
       default:
