@@ -49,11 +49,20 @@ export default class Queue {
   }
 
   public async start() {
-    this.indexerConnector = new IndexerConnector(
-      this.addresses,
-      this.url
-    )
-    this.indexerConnector.connect()
+    try {
+      this.indexerConnector = new IndexerConnector(
+        this.addresses,
+        this.url
+      )
+      await this.indexerConnector.connect()
+    } catch (error) {
+      logger.error('Restarting child process due to error', error.message)
+      ChildProcess.send({
+        channel: 'indexer-error'
+      })
+      return
+    }
+
     this.indexerConnector.blockTipsSubject.subscribe(tip => {
       this.updateBlockNumberTips(tip)
     });
