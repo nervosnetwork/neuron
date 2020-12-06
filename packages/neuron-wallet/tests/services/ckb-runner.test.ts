@@ -1,4 +1,5 @@
 import { EventEmitter } from "typeorm/platform/PlatformTools"
+import path from 'path'
 
 const stubbedChildProcess = jest.fn()
 const stubbedSpawn = jest.fn()
@@ -81,13 +82,13 @@ describe('ckb runner', () => {
         it('should not init ckb config', () => {
           expect(stubbedSpawn).not.toHaveBeenCalledWith(
             expect.stringContaining('/ckb'),
-            ['init', '--chain', 'mainnet', '-C', expect.stringContaining('/chains/mainnet')]
+            ['init', '--chain', 'mainnet', '-C', expect.stringContaining(path.join('chains','mainnet'))]
           )
         })
         it('runs ckb binary', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
-            expect.stringContaining(`${platformPath}/ckb`),
-            ['run', '-C', expect.stringContaining('/chains/mainnet')],
+            expect.stringContaining(path.join(platformPath,'ckb')),
+            ['run', '-C', expect.stringContaining(path.join('chains','mainnet'))],
             {'stdio': ['ignore', 'ignore', 'pipe']}
           )
         })
@@ -106,14 +107,14 @@ describe('ckb runner', () => {
           });
           it('inits ckb config', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
-              expect.stringContaining(`${platformPath}/ckb`),
-              ['init', '--chain', 'mainnet', '-C', expect.stringContaining('/chains/mainnet')]
+              expect.stringContaining(path.join(platformPath,'ckb')),
+              ['init', '--chain', 'mainnet', '-C', expect.stringContaining(path.join('chains','mainnet'))]
             )
           })
           it('runs ckb binary', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
-              expect.stringContaining(`${platformPath}/ckb`),
-              ['run', '-C', expect.stringContaining('/chains/mainnet')],
+              expect.stringContaining(path.join(platformPath,'ckb')),
+              ['run', '-C', expect.stringContaining(path.join('chains','mainnet'))],
               {'stdio': ['ignore', 'ignore', 'pipe']}
             )
           })
