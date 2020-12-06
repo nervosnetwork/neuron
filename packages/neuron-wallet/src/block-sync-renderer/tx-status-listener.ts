@@ -75,7 +75,7 @@ const trackingStatus = async () => {
 }
 
 export const register = () => {
-  interval(5000).pipe().subscribe(async () => {
+  interval(5000).subscribe(async () => {
     try {
       getConnection()
       await trackingStatus()

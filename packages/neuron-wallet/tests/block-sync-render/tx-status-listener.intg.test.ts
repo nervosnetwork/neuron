@@ -62,11 +62,9 @@ describe('', () => {
 
     beforeEach(() => {
       stubbedRxJsIntervalFn.mockReturnValue({
-        pipe: () => ({
-          subscribe: (_callback: any) => {
-            trackingStatus = _callback
-          }
-        })
+        subscribe: (_callback: any) => {
+          trackingStatus = _callback
+        }
       })
     });
 
