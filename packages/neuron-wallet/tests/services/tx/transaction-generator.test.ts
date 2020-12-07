@@ -52,14 +52,9 @@ const tipTimestamp = '1580599200000'
 const tipEpoch = '0x7080018000001'
 const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0x' + '0'.repeat(64), '0', tipEpoch)
 
-const stubbedIndexerService = {
-  getInstance: jest.fn(),
-  getLiveCellsByScript: jest.fn()
-}
-
-stubbedIndexerService.getInstance.mockReturnValue(stubbedIndexerService)
-jest.doMock('../../../src/services/indexer-service', () => {
-  return stubbedIndexerService
+const stubbedQueryIndexer = jest.fn()
+jest.doMock('../../../src/block-sync-renderer/index', () => {
+  return {queryIndexer: stubbedQueryIndexer}
 });
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
@@ -133,8 +128,6 @@ describe('TransactionGenerator', () => {
 
     const keyEntities = keyInfos.map(d => HdPublicKeyInfo.fromObject(d))
     await getConnection().manager.save(keyEntities)
-
-    stubbedIndexerService.getLiveCellsByScript.mockReset()
   })
 
   describe('generateTx', () => {
@@ -1004,8 +997,8 @@ describe('TransactionGenerator', () => {
         let expectedTxSize: number
         let expectedTxFee: string
         beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
             ])
 
@@ -1055,8 +1048,8 @@ describe('TransactionGenerator', () => {
         let expectedTxSize: number
         let expectedTxFee: string
         beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
             ])
 
@@ -1168,8 +1161,8 @@ describe('TransactionGenerator', () => {
           data: '0x',
         })
         beforeEach(() => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
         })
@@ -1203,8 +1196,8 @@ describe('TransactionGenerator', () => {
         let expectedTxFee: string
         let tx: Transaction
         beforeEach(async  () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
@@ -1256,8 +1249,8 @@ describe('TransactionGenerator', () => {
         let expectedTxFee: string
 
         beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
 
@@ -1310,8 +1303,8 @@ describe('TransactionGenerator', () => {
           generateLiveCell(toShannon('62'), undefined, undefined, aliceAnyoneCanPayLockScript),
         ]
         beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue(cellsByAlice)
+          when(stubbedQueryIndexer)
+            .calledWith({lock: aliceAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue(cellsByAlice)
 
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
               walletId1,
@@ -1342,8 +1335,8 @@ describe('TransactionGenerator', () => {
           data: '0x',
         })
         beforeEach(() => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('61'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
         })
@@ -1376,8 +1369,8 @@ describe('TransactionGenerator', () => {
         let tx: Transaction
         describe('with all ACP cells without data', () => {
           beforeEach(async () => {
-            when(stubbedIndexerService.getLiveCellsByScript)
-              .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+            when(stubbedQueryIndexer)
+              .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
               ])
@@ -1415,12 +1408,12 @@ describe('TransactionGenerator', () => {
         });
         describe('with some of ACP cells having data', () => {
           beforeEach(async () => {
-            when(stubbedIndexerService.getLiveCellsByScript)
-              .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+            when(stubbedQueryIndexer)
+              .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript, '0x00'),
               ])
-              .calledWith(aliceAnyoneCanPayLockScript).mockResolvedValue([
+              .calledWith({lock: aliceAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
                 generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
               ])
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
@@ -1457,8 +1450,12 @@ describe('TransactionGenerator', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            }).mockResolvedValue([
               generateLiveCell(toShannon('150'), '1000', tokenID),
             ])
 
@@ -1560,8 +1557,12 @@ describe('TransactionGenerator', () => {
         beforeEach(() => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-          .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            }).mockResolvedValue([
             generateLiveCell(toShannon('150'), '100', tokenID),
           ])
 
@@ -1597,8 +1598,12 @@ describe('TransactionGenerator', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            }).mockResolvedValue([
               generateLiveCell(toShannon('142'), '1000', tokenID),
             ])
 
@@ -1660,8 +1665,12 @@ describe('TransactionGenerator', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            }).mockResolvedValue([
               generateLiveCell(toShannon('143'), '50', tokenID),
               generateLiveCell(toShannon('142'), '1000', tokenID),
             ])
@@ -1733,8 +1742,12 @@ describe('TransactionGenerator', () => {
         beforeEach(() => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            }).mockResolvedValue([
               generateLiveCell(toShannon('142'), '50', tokenID),
             ])
 
@@ -1770,8 +1783,12 @@ describe('TransactionGenerator', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            }).mockResolvedValue([
               generateLiveCell(toShannon('1000'), '1000', tokenID),
             ])
 
