@@ -1100,8 +1100,8 @@ describe('TransactionGenerator', () => {
         let expectedTxSize: number
         let expectedTxFee: string
         beforeEach(async () => {
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
             ])
 
@@ -1519,8 +1519,8 @@ describe('TransactionGenerator', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, pwAnyoneCanPayLockScript)
 
-          when(stubbedIndexerService.getLiveCellsByScript)
-            .calledWith(bobAnyoneCanPayLockScript).mockResolvedValue([
+          when(stubbedQueryIndexer)
+            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
               generateLiveCell(toShannon('150'), '1000', tokenID),
             ])
 
