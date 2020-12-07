@@ -2,6 +2,7 @@ import { AddressPrefix } from './keys/address'
 import { bech32Address, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import Script, { ScriptHashType } from './chain/script'
 import SystemScriptInfo from './system-script-info'
+import AssetAccountInfo from "./asset-account-info"
 
 export default class AddressGenerator {
   public static toShort(lock: Script, prefix: AddressPrefix = AddressPrefix.Mainnet): string {
@@ -32,6 +33,12 @@ export default class AddressGenerator {
         prefix,
         type: AddressType.HashIdx,
         codeHashOrCodeHashIndex: '0x01'
+      })
+    } else if (new AssetAccountInfo().isDefaultAnyoneCanPayScript(lock)) {
+      return bech32Address(lock.args, {
+        prefix,
+        type: AddressType.HashIdx,
+        codeHashOrCodeHashIndex: '0x02'
       })
     } else {
       const type = lock.hashType === ScriptHashType.Type ? AddressType.TypeCodeHash : AddressType.DataCodeHash

@@ -140,4 +140,8 @@ export default class AssetAccountInfo {
     }
     return [...cellDeps.values()]
   }
+
+  public isDefaultAnyoneCanPayScript(script: Script): boolean {
+    return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
+  }
 }

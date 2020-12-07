@@ -35,7 +35,7 @@ const [alice, bob] = keyInfos
 const walletId1 = alice.walletId
 
 const fullAddressLockScript: Script = new Script(
-  '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '0x0000000000000000000000000000000000000000000000000000000000000011',
   '0x1234',
   ScriptHashType.Type
 )
