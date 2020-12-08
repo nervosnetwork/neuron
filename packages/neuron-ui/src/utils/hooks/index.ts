@@ -21,6 +21,8 @@ import {
 } from 'utils/validators'
 import { MenuItemConstructorOptions } from 'electron'
 
+export * from './isInsufficient'
+
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
     history.goBack()

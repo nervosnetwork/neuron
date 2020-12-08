@@ -13,12 +13,12 @@ import {
   isMainnet as isMainnetUtil,
   RoutePath,
   SyncStatus,
-  ErrorCode,
   CONSTANTS,
   getSyncStatus,
   getCurrentUrl,
   sortAccounts,
   isSuccessResponse,
+  useIsInsufficientToCreateSUDTAccount,
 } from 'utils'
 
 import {
@@ -30,13 +30,7 @@ import {
 
 import styles from './sUDTAccountList.module.scss'
 
-const {
-  MEDIUM_FEE_RATE,
-  DEFAULT_SUDT_FIELDS,
-  MIN_CKB_REQUIRED_BY_NORMAL_SUDT,
-  MIN_CKB_REQUIRED_BY_CKB_SUDT,
-  SHANNON_CKB_RATIO,
-} = CONSTANTS
+const { MEDIUM_FEE_RATE, DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
@@ -81,52 +75,7 @@ const SUDTAccountList = () => {
       }
     })
   }, [dispatch, history])
-
-  useEffect(() => {
-    const ckbBalance = BigInt(balance)
-    const isInsufficient = (res: { status: number }) =>
-      [ErrorCode.CapacityNotEnough, ErrorCode.CapacityNotEnoughForChange].includes(res.status)
-    const createSUDTAccount = () => {
-      if (ckbBalance <= BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
-        return true
-      }
-      const params: Controller.GenerateCreateSUDTAccountTransaction.Params = {
-        walletID: walletId,
-        tokenID: `0x${'0'.repeat(64)}`,
-        tokenName: DEFAULT_SUDT_FIELDS.tokenName,
-        accountName: DEFAULT_SUDT_FIELDS.accountName,
-        symbol: DEFAULT_SUDT_FIELDS.symbol,
-        decimal: '0',
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      }
-      return generateCreateSUDTAccountTransaction(params)
-        .then(isInsufficient)
-        .catch(() => false)
-    }
-    const createCKBAccount = () => {
-      if (ckbBalance <= BigInt(MIN_CKB_REQUIRED_BY_CKB_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
-        return true
-      }
-      const params: Controller.GenerateCreateSUDTAccountTransaction.Params = {
-        walletID: walletId,
-        tokenID: DEFAULT_SUDT_FIELDS.CKBTokenId,
-        tokenName: DEFAULT_SUDT_FIELDS.CKBTokenName,
-        accountName: DEFAULT_SUDT_FIELDS.accountName,
-        symbol: DEFAULT_SUDT_FIELDS.CKBSymbol,
-        decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      }
-      return generateCreateSUDTAccountTransaction(params)
-        .then(isInsufficient)
-        .catch(() => false)
-    }
-    Promise.all([createSUDTAccount(), createCKBAccount()]).then(([insufficientForSUDT, insufficientForCKB]) => {
-      setInsufficient({
-        [AccountType.CKB]: insufficientForCKB,
-        [AccountType.SUDT]: insufficientForSUDT,
-      })
-    })
-  }, [balance, walletId])
+  useIsInsufficientToCreateSUDTAccount({ walletId, balance: BigInt(balance), setInsufficient })
 
   const fetchAndUpdateList = useCallback(() => {
     getSUDTAccountList({ walletID: walletId })
