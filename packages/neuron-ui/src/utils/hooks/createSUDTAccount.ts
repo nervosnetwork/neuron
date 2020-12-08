@@ -1,7 +1,9 @@
-import { useEffect } from 'react'
-import { AccountType } from 'components/SUDTCreateDialog'
-import { generateCreateSUDTAccountTransaction } from '../../services/remote'
+import { useEffect, useCallback } from 'react'
+import { AccountType, TokenInfo } from 'components/SUDTCreateDialog'
+import { AppActions, StateAction } from 'states'
+import { generateCreateSUDTAccountTransaction } from 'services/remote'
 import { ErrorCode } from '../enums'
+import { isSuccessResponse } from '../is'
 import {
   MIN_CKB_REQUIRED_BY_CKB_SUDT,
   MIN_CKB_REQUIRED_BY_NORMAL_SUDT,
@@ -68,4 +70,47 @@ export const useIsInsufficientToCreateSUDTAccount = ({
       })
   }, [walletId, balance, setInsufficient])
 
-export default { useIsInsufficientToCreateSUDTAccount }
+export const useOnGenerateNewAccountTransaction = ({
+  walletId,
+  dispatch,
+  onGenerated,
+}: {
+  walletId: string
+  dispatch: React.Dispatch<StateAction>
+  onGenerated: () => void
+}) =>
+  useCallback(
+    ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo) => {
+      return generateCreateSUDTAccountTransaction({
+        walletID: walletId,
+        tokenID: tokenId,
+        tokenName,
+        accountName,
+        symbol,
+        decimal,
+        feeRate: `${MEDIUM_FEE_RATE}`,
+      })
+        .then(res => {
+          if (isSuccessResponse(res)) {
+            return res.result
+          }
+          throw new Error(res.message.toString())
+        })
+        .then((res: Controller.GenerateCreateSUDTAccountTransaction.Response) => {
+          dispatch({ type: AppActions.UpdateExperimentalParams, payload: res })
+          dispatch({
+            type: AppActions.RequestPassword,
+            payload: { walletID: walletId as string, actionType: 'create-sudt-account' },
+          })
+          onGenerated()
+          return true
+        })
+        .catch(err => {
+          console.error(err)
+          return false
+        })
+    },
+    [onGenerated, walletId, dispatch]
+  )
+
+export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction }

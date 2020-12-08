@@ -19,18 +19,14 @@ import {
   sortAccounts,
   isSuccessResponse,
   useIsInsufficientToCreateSUDTAccount,
+  useOnGenerateNewAccountTransaction,
 } from 'utils'
 
-import {
-  getSUDTAccountList,
-  generateCreateSUDTAccountTransaction,
-  updateSUDTAccount,
-  checkMigrateAcp,
-} from 'services/remote'
+import { getSUDTAccountList, updateSUDTAccount, checkMigrateAcp } from 'services/remote'
 
 import styles from './sUDTAccountList.module.scss'
 
-const { MEDIUM_FEE_RATE, DEFAULT_SUDT_FIELDS } = CONSTANTS
+const { DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
@@ -177,39 +173,15 @@ const SUDTAccountList = () => {
     [setKeyword]
   )
 
-  const onCreateAccount = useCallback(
-    ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo) => {
-      return generateCreateSUDTAccountTransaction({
-        walletID: walletId,
-        tokenID: tokenId,
-        tokenName,
-        accountName,
-        symbol,
-        decimal,
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      })
-        .then(res => {
-          if (isSuccessResponse(res)) {
-            return res.result
-          }
-          throw new Error(res.message.toString())
-        })
-        .then((res: Controller.GenerateCreateSUDTAccountTransaction.Response) => {
-          dispatch({ type: AppActions.UpdateExperimentalParams, payload: res })
-          dispatch({
-            type: AppActions.RequestPassword,
-            payload: { walletID: walletId as string, actionType: 'create-sudt-account' },
-          })
-          setDialog(null)
-          return true
-        })
-        .catch(err => {
-          console.error(err)
-          return false
-        })
-    },
-    [setDialog, walletId, dispatch]
-  )
+  const onTransactionGenerated = useCallback(() => {
+    setDialog(null)
+  }, [setDialog])
+
+  const handleCreateAccount = useOnGenerateNewAccountTransaction({
+    walletId,
+    dispatch,
+    onGenerated: onTransactionGenerated,
+  })
 
   const onOpenCreateDialog = useCallback(() => {
     setDialog({ id: '', action: 'create' })
@@ -319,7 +291,7 @@ const SUDTAccountList = () => {
       {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}
       {dialog?.action === 'create' ? (
         <SUDTCreateDialog
-          onSubmit={onCreateAccount}
+          onSubmit={handleCreateAccount}
           onCancel={() => {
             setDialog(null)
           }}
