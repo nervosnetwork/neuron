@@ -95,6 +95,7 @@ export enum ErrorCode {
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
+  AddressIsDeprecated = 309,
   // hardware
   SignTransactionFailed = 400,
   ConnectFailed = 401,
@@ -135,22 +136,31 @@ export enum DefaultLockInfo {
   CodeHash = '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
   HashType = 'type',
   CodeHashIndex = '0x00',
+  ArgsLen = '20',
 }
 
 export enum MultiSigLockInfo {
   CodeHash = '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
   HashType = 'type',
   CodeHashIndex = '0x01',
+  ArgsLen = '20',
 }
 
 export enum AnyoneCanPayLockInfoOnAggron {
-  CodeHash = '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+  CodeHash = '0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356',
   HashType = 'type',
   CodeHashIndex = '0x02',
+  ArgsLen = '20,21,22',
 }
 
 export enum AnyoneCanPayLockInfoOnLina {
-  CodeHash = '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
-  HashType = 'data',
+  CodeHash = '0xd369597ff47f29fbc0d47d2e3775370d1250b85140c670e4718af712983a2354',
+  HashType = 'type',
   CodeHashIndex = '0x02',
+  ArgsLen = '20,21,22',
+}
+
+export enum DeprecatedScript {
+  AcpOnLina = '0x020fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
+  AcpOnAggron = '0x0486a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
 }

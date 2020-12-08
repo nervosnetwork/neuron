@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { Calendar } from '@bit/primefaces.primereact.calendar'
+import { Calendar } from 'primereact/calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
 import styles from './datetimePicker.module.scss'

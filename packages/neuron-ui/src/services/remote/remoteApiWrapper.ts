@@ -101,6 +101,7 @@ type Action =
   | 'send-to-anyone-can-pay'
   | 'get-token-info-list'
   | 'migrate-acp'
+  | 'check-migrate-acp'
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'
@@ -139,13 +140,13 @@ export const remoteApi = <P = any, R = any>(action: Action) => async (params: P)
   if (isSuccessResponse(res)) {
     return {
       status: ResponseCode.SUCCESS,
-      result: res.result || null,
+      result: res.result ?? null,
     }
   }
 
   return {
-    status: res.status || ResponseCode.FAILURE,
-    message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
+    status: res.status ?? ResponseCode.FAILURE,
+    message: typeof res.message === 'string' ? { content: res.message } : res.message ?? '',
   }
 }
 

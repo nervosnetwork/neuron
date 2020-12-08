@@ -88,7 +88,8 @@ export default class IndexerCacheService {
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
         addressMeta.generateDefaultLockScript(),
-        addressMeta.generateACPLockScript()
+        addressMeta.generateACPLockScript(),
+        addressMeta.generateLegacyACPLockScript()
       ]
 
       for (const lockScript of lockScripts) {

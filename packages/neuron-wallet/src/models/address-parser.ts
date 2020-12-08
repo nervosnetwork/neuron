@@ -1,6 +1,7 @@
 import Script, { ScriptHashType } from "./chain/script"
 import { parseAddress } from "@nervosnetwork/ckb-sdk-utils"
 import SystemScriptInfo from "./system-script-info"
+import AssetAccountInfo from "./asset-account-info"
 
 export default class AddressParser {
   public static parse(address: string): Script {
@@ -15,6 +16,8 @@ export default class AddressParser {
         return SystemScriptInfo.generateSecpScript(args)
       } else if (codeHashIndex === '0x01') {
         return SystemScriptInfo.generateMultiSignScript(args)
+      } else if (codeHashIndex === '0x02') {
+        return new AssetAccountInfo().generateAnyoneCanPayScript(args)
       } else {
         throw new Error('Address format error!')
       }

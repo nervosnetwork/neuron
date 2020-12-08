@@ -1,14 +1,15 @@
 import EventEmiter from 'events'
-import RpcService from 'services/rpc-service'
+import { debounceTime } from 'rxjs/operators'
 import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import NodeService from 'services/node'
 import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
-import { debounceTime } from 'rxjs/operators'
 
-const MAX_TIP_BLOCK_DELAY = 180000
+import RpcService from 'services/rpc-service'
+
 const TEN_MINS = 600000
+const MAX_TIP_BLOCK_DELAY = 180000
 
 export enum SyncStatus {
   SyncNotStart,
@@ -241,4 +242,5 @@ export default class SyncApiController {
       SyncStateSubject.next(newSyncState)
     })
   }
+
 }
