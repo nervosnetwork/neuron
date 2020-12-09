@@ -2,6 +2,7 @@ import env from 'env'
 import path from 'path'
 import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
+import process from 'process'
 import logger from 'utils/logger'
 
 const platform = (): string => {

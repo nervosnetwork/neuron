@@ -2,6 +2,7 @@ import Script, { ScriptHashType } from "../../src/models/chain/script"
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
+import AssetAccountInfo from "../../src/models/asset-account-info"
 
 describe('AddressGenerator', () => {
   const shortAddressInfo = {
@@ -16,10 +17,17 @@ describe('AddressGenerator', () => {
     lock: SystemScriptInfo.generateMultiSignScript('0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a')
   }
 
+  const assetAccountInfo = new AssetAccountInfo()
+  const shortACPAddressInfo = {
+    mainnetAddress: 'ckb1qypylv479ewscx3ms620sv34pgeuz6zagaaqvrugu7',
+    testnetAddress: 'ckt1qypylv479ewscx3ms620sv34pgeuz6zagaaq3xzhsz',
+    lock: assetAccountInfo.generateAnyoneCanPayScript('0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a')
+  }
+
   const fullAddressInfo = {
-    mainnetAddress: 'ckb1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpvumhs9nvu786dj9p0q5elx66t24n3kxgmz0sxt',
-    testnetAddress: 'ckt1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpvumhs9nvu786dj9p0q5elx66t24n3kxgkpkap5',
-    lock: new Script('0x0000000000000000000000000000000000000000000000000000000000000000', '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64', ScriptHashType.Type)
+    mainnetAddress: 'ckb1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqprvumhs9nvu786dj9p0q5elx66t24n3kxgr8j38l',
+    testnetAddress: 'ckt1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqprvumhs9nvu786dj9p0q5elx66t24n3kxgwytuqq',
+    lock: new Script('0x0000000000000000000000000000000000000000000000000000000000000011', '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64', ScriptHashType.Type)
   }
 
   const fullAddressWithData = {
@@ -61,16 +69,28 @@ describe('AddressGenerator', () => {
       expect(result).toEqual(fullAddressInfo.testnetAddress)
     })
 
-    it('short payload, mainnet', () => {
+    it('short default lock payload, mainnet', () => {
       const result = AddressGenerator.generate(shortAddressInfo.lock, AddressPrefix.Mainnet)
 
       expect(result).toEqual(shortAddressInfo.mainnetAddress)
     })
 
-    it('short payload, testnet', () => {
+    it('short default lock payload, testnet', () => {
       const result = AddressGenerator.generate(shortAddressInfo.lock, AddressPrefix.Testnet)
 
       expect(result).toEqual(shortAddressInfo.testnetAddress)
+    })
+
+    it('short acp lock payload, mainnet', () => {
+      const result = AddressGenerator.generate(shortACPAddressInfo.lock, AddressPrefix.Mainnet)
+
+      expect(result).toEqual(shortACPAddressInfo.mainnetAddress)
+    })
+
+    it('short acp lock payload, testnet', () => {
+      const result = AddressGenerator.generate(shortACPAddressInfo.lock, AddressPrefix.Testnet)
+
+      expect(result).toEqual(shortACPAddressInfo.testnetAddress)
     })
 
     it('short multi payload, mainnet', () => {

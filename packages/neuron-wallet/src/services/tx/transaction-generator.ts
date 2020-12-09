@@ -652,6 +652,9 @@ export class TransactionGenerator {
       witnesses: []
     })
 
+    const deps = assetAccountInfo.determineAdditionalACPCellDepsByTx(tx)
+    tx.cellDeps.push(...deps)
+
     const baseSize: number = TransactionSize.tx(tx)
     const result = await (capacity === 'all' ?
       CellsService.gatherAnyoneCanPaySendAllCKBInputs(
@@ -729,6 +732,9 @@ export class TransactionGenerator {
       outputsData: [output.data],
       witnesses: []
     })
+
+    const deps = assetAccountInfo.determineAdditionalACPCellDepsByTx(tx)
+    tx.cellDeps.push(...deps)
 
     const baseSize: number = TransactionSize.tx(tx)
     const result = await CellsService.gatherSudtInputs(

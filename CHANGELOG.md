@@ -11,6 +11,23 @@
 * Prevent Neuron from quitting when the main window is closed on MacOS.
 
 
+# 0.34.0-rc1 (2020-11-21)
+
+This is a release candidate to preview the changes in the next official release and may not be stable. Welcome any questions or suggestions.
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of 
+CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+
+* Support hardware wallet of Ledger.
+* Support generating and signing offline transaction.
+* Support broadcasting the signed offline transaction.
+* Display network type in the navbar.
+* Display progress and left time for sync.
+* Minor UX changes to `Asset Accounts`.
+
+
 # 0.33.1 (2020-11-16)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
