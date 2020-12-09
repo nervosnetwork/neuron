@@ -181,7 +181,12 @@ export default class AssetAccountController {
   public async showACPMigrationDialog(allowMultipleOpen: boolean | undefined): Promise<Controller.Response<boolean | undefined>> {
     const walletsService = WalletsService.getInstance()
     const currentWallet = walletsService.getCurrent()
-    const walletId = currentWallet!.id;
+    if (!currentWallet) {
+      return {
+        status: ResponseCode.Success
+      }
+    }
+    const walletId = currentWallet.id;
 
     if (!allowMultipleOpen && this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
       return {
