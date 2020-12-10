@@ -11,6 +11,7 @@ import {
   SHORT_ADDR_LENGTH,
   SHORT_ADDR_DEFAULT_LOCK_PREFIX,
   SHORT_ADDR_MULTISIGN_LOCK_PREFIX,
+  SHORT_ADDR_SUDT_LOCK_PREFIX,
 } from 'utils/const'
 
 export const validateAddress = (address: string, isMainnet: boolean): boolean => {
@@ -45,7 +46,9 @@ export const validateAddress = (address: string, isMainnet: boolean): boolean =>
   }
 
   if (
-    (!parsed.startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX) && !parsed.startsWith(SHORT_ADDR_MULTISIGN_LOCK_PREFIX)) ||
+    (!parsed.startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX) &&
+      !parsed.startsWith(SHORT_ADDR_MULTISIGN_LOCK_PREFIX) &&
+      !parsed.startsWith(SHORT_ADDR_SUDT_LOCK_PREFIX)) ||
     address.length !== SHORT_ADDR_LENGTH
   ) {
     throw new FieldInvalidException(FIELD_NAME, address)
