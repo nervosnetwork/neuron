@@ -1,6 +1,5 @@
 import fs from 'fs'
 import { t } from 'i18next'
-import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import NetworksService from 'services/networks'
@@ -30,6 +29,7 @@ import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
 import HardwareWalletService from 'services/hardware'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
+import AddressParser from 'models/address-parser'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
@@ -489,13 +489,9 @@ export default class WalletsController {
   }
 
   private verifyAddress = (address: string): boolean => {
-    if (typeof address !== 'string') {
-      return false
-    }
     try {
-      const result = parseAddress(address, 'hex')
-      const isShortAddress = (result.startsWith('0x0100') || result.startsWith('0x0101')) && address.length === 46
-      return isShortAddress || result.startsWith('0x02') || result.startsWith('0x04')
+      AddressParser.parse(address)
+      return true
     } catch (err) {
       logger.warn(`verify address error: ${err}`)
       return false
