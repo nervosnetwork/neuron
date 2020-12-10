@@ -6,7 +6,7 @@ const fixtureTable: Fixture.Validator<typeof validateSUDTAddress>[] = Object.ent
 ).map(([title, { params, exception }]) => [title, [params], exception])
 
 describe(`Test sudt address validator`, () => {
-  test.each(fixtureTable)(`%s`, (_title, [params], exception) => {
+  test.each(fixtureTable.slice(11, 12))(`%s`, (_title, [params], exception) => {
     expect.assertions(1)
     if (exception) {
       try {
