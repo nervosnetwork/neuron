@@ -3,15 +3,17 @@ import BufferUtils from "utils/buffer"
 import OutputEntity from "database/chain/entities/output"
 import Transaction, { TransactionStatus } from "models/chain/transaction"
 import AssetAccountInfo from "models/asset-account-info"
-import { OutputStatus } from "models/chain/output"
+import Output, { OutputStatus } from "models/chain/output"
 import AssetAccount from "models/asset-account"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 import AssetAccountEntity from "database/chain/entities/asset-account"
 import { CapacityNotEnoughForChange } from "exceptions"
-import { MIN_CELL_CAPACITY } from 'services/cells'
+import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
 import WalletService from "./wallets"
+import AddressParser from "models/address-parser"
+import OutPoint from "models/chain/out-point"
 
 export default class AssetAccountService {
 
@@ -345,5 +347,86 @@ export default class AssetAccountService {
   public static getTokenInfoList() {
     const repo = getConnection().getRepository(SudtTokenInfoEntity)
     return repo.find().then(list => list.map(item => item.toModel()))
+  }
+
+
+  // TODO cover tests
+  public static async generateCreateChequeTx(walletID: string, accountId: number, receiverAddress: string, amount: string) {
+    const assetAccount = await this.getAccount({walletID, id: accountId})
+    if (!assetAccount) {
+      throw new Error('Asset Account not found')
+    }
+    const assetAccountInfo = new AssetAccountInfo()
+    const senderAcpScript = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)
+
+    const receiverLockScript = AddressParser.parse(receiverAddress)
+
+    const chequeCell = Output.fromObject({
+      // TODO should be 161 ckb
+      capacity: BigInt(174 * 10 ** 8).toString(),
+      lock: assetAccountInfo.generateChequeScript(receiverLockScript.args + senderAcpScript.computeHash().slice(2, 42)),
+      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
+    })
+
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeAddrObj = await wallet.getNextChangeAddress()
+    const tx = await TransactionGenerator.generateCreateChequeTx(
+      walletID,
+      amount,
+      chequeCell,
+      senderAcpScript,
+      changeAddrObj!.address,
+    )
+
+    return tx
+  }
+
+  // TODO cover test
+  public static async generateClaimChequeTx(
+    walletID: string,
+    chequeCellOutPoint: OutPoint,
+  ): Promise<{
+    tx: Transaction,
+    assetAccount?: AssetAccount
+  }> {
+    const assetAccountInfo = new AssetAccountInfo()
+
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeAddrObj = await wallet.getNextChangeAddress()
+
+    const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
+    if (!chequeLiveCell) {
+      throw new Error()
+    }
+    const receiverLockArgs = chequeLiveCell.lock.args.slice(0, 42)
+    const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverLockArgs)
+
+    const tx = await TransactionGenerator.generateClaimChequeTx(
+      walletID,
+      chequeLiveCell,
+      changeAddrObj!.address
+    )
+
+    const hasAssetAccount = !!tx.inputs.find(
+      input => input.lock!.computeHash() === receiverAcpScript.computeHash()
+    )
+
+    if (hasAssetAccount) {
+      return {tx}
+    }
+
+    const tokenId = chequeLiveCell.type!.args
+    const assetAccount = new AssetAccount(
+      tokenId,
+      '',
+      '',
+      '',
+      '',
+      '0',
+      receiverAcpScript.args
+    )
+
+    return {tx, assetAccount}
+
   }
 }

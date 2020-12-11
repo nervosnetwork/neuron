@@ -114,23 +114,34 @@ export default class IndexerCacheService {
         }
       }
 
-      const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
-
-      const cellCollector = new CellCollector(this.indexer, {
-        lock: {
-          code_hash: singleMultiSignLockScript.codeHash,
-          hash_type: singleMultiSignLockScript.hashType,
-          args: singleMultiSignLockScript.args.slice(0, 42)
+      const lockScriptsForCellCollection = [
+        {
+          lockScript: addressMeta.generateSingleMultiSignLockScript(),
+          argsLen: 28
         },
-        argsLen: 28
-      })
+        {
+          lockScript: addressMeta.generateChequeLockScriptWithReceiverLockArgs(),
+          argsLen: 52
+        },
+      ]
 
-      for await (const cell of cellCollector.collect()) {
-        const txHash = cell.out_point!.tx_hash!
-        mappingsByTxHash.set(txHash, [{
-          address: addressMeta.address,
-          lockHash: singleMultiSignLockScript.computeHash()
-        }])
+      for (const {lockScript, argsLen} of lockScriptsForCellCollection) {
+        const cellCollector = new CellCollector(this.indexer, {
+          lock: {
+            code_hash: lockScript.codeHash,
+            hash_type: lockScript.hashType,
+            args: lockScript.args.slice(0, 42)
+          },
+          argsLen,
+        })
+
+        for await (const cell of cellCollector.collect()) {
+          const txHash = cell.out_point!.tx_hash!
+          mappingsByTxHash.set(txHash, [{
+            address: addressMeta.address,
+            lockHash: lockScript.computeHash()
+          }])
+        }
       }
     }
     return mappingsByTxHash

@@ -112,4 +112,9 @@ export default class AddressMeta implements Address {
     const assetAccountInfo = new AssetAccountInfo()
     return assetAccountInfo.generateLegacyAnyoneCanPayScript(this.blake160)
   }
+
+  public generateChequeLockScriptWithReceiverLockArgs(): Script {
+    const assetAccountInfo = new AssetAccountInfo()
+    return assetAccountInfo.generateChequeScript(this.blake160)
+  }
 }

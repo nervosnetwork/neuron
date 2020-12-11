@@ -2,11 +2,13 @@ import { when } from 'jest-when'
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
 import OutputEntity from '../../../src/database/chain/entities/output'
+import InputEntity from '../../../src/database/chain/entities/input'
+import TransactionEntity from '../../../src/database/chain/entities/transaction'
 import { TargetOutput } from '../../../src/services/tx/transaction-generator'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
-import Transaction from '../../../src/models/chain/transaction'
+import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
 import BlockHeader from '../../../src/models/chain/block-header'
@@ -1917,6 +1919,156 @@ describe('TransactionGenerator', () => {
         expect(SystemScriptInfo.isSecpScript(changeOutput.lock)).toBe(true)
       })
     })
+
+    describe.only('#generateCreateChequeTx', () => {
+      let tx: Transaction
+      describe('with existing acp cell', () => {
+        let senderAcpLiveCell: LiveCell
+        let receiverAcpLiveCell: LiveCell
+        let chequeCell: Output
+        const chequeAmount = '110'
+        beforeEach(async () => {
+          const tokenID = '0x' + '0'.repeat(64)
+
+          const senderAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+          const receiverAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, bobAnyoneCanPayLockScript)
+          senderAcpLiveCell = LiveCell.fromLumos(senderAcpCellEntity)
+          receiverAcpLiveCell = LiveCell.fromLumos(receiverAcpCellEntity)
+
+          when(stubbedQueryIndexer)
+            .calledWith({lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null})
+            .mockResolvedValue([
+              generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript),
+              generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+            ])
+
+          chequeCell = Output.fromObject({
+            capacity: toShannon('174'),
+            lock: new Script(
+              '0x' + '3'.repeat(64),
+              receiverAcpLiveCell.lock().args + senderAcpLiveCell.lock().computeHash().slice(2, 42),
+              ScriptHashType.Type
+            ),
+            type: senderAcpLiveCell.type(),
+          })
+
+          tx = await TransactionGenerator.generateCreateChequeTx(
+            walletId1,
+            chequeAmount,
+            chequeCell,
+            senderAcpLiveCell.lock(),
+            alice.address
+          )
+        });
+        it('creates cheque output', () => {
+          expect(BufferUtils.readBigUInt128LE(tx.outputsData[0]).toString()).toEqual(chequeAmount)
+          expect(tx.outputs[0].lockHash).toEqual(chequeCell.lockHash)
+        })
+      })
+    });
+
+    describe.only('#generateClaimChequeTx', () => {
+      let tx: Transaction
+      describe('with existing acp cell', () => {
+        let senderAcpLiveCell: LiveCell
+        let receiverAcpLiveCell: LiveCell
+        let chequeCell: Output
+        beforeEach(async () => {
+          const tokenID = '0x' + '0'.repeat(64)
+
+          const senderAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+          const receiverAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, bobAnyoneCanPayLockScript)
+          senderAcpLiveCell = LiveCell.fromLumos(senderAcpCellEntity)
+          receiverAcpLiveCell = LiveCell.fromLumos(receiverAcpCellEntity)
+
+          const transaction = new TransactionEntity()
+          transaction.hash = '0x'
+          transaction.version = '0'
+          transaction.witnesses = []
+          transaction.status = TransactionStatus.Success
+
+          const senderAcpInput = new InputEntity()
+
+          senderAcpInput.lockArgs = senderAcpLiveCell.lock().args
+          senderAcpInput.lockCodeHash = senderAcpLiveCell.lock().codeHash
+          senderAcpInput.lockHashType = senderAcpLiveCell.lock().hashType
+          senderAcpInput.lockHash = senderAcpLiveCell.lock().computeHash()
+          senderAcpInput.typeArgs = senderAcpLiveCell.type()!.args
+          senderAcpInput.typeCodeHash = senderAcpLiveCell.type()!.codeHash
+          senderAcpInput.typeHashType = senderAcpLiveCell.type()!.hashType
+          senderAcpInput.typeHash = senderAcpLiveCell.type()!.computeHash()
+          senderAcpInput.transactionHash = transaction.hash
+          // senderAcpInput.outPointTxHash = '0x'
+          // senderAcpInput.outPointIndex = '0x0'
+          senderAcpInput.since = '0x0'
+
+          transaction.inputs = [senderAcpInput]
+          const receiverAcpCell = generateCell(
+            toShannon('1000'),
+            OutputStatus.Live,
+            true,
+            receiverAcpLiveCell.type()!,
+            {lockScript: receiverAcpLiveCell.lock()},
+            undefined,
+            receiverAcpCellEntity.data
+          )
+          await getConnection().manager.save([transaction, senderAcpInput, receiverAcpCell])
+
+          const chequeAmount = '10'
+
+          chequeCell = Output.fromObject({
+            capacity: toShannon('161'),
+            lock: new Script(
+              '0x' + '3'.repeat(64),
+              receiverAcpLiveCell.lock().args + senderAcpLiveCell.lock().computeHash().slice(2, 42),
+              ScriptHashType.Type
+            ),
+            type: senderAcpLiveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(chequeAmount))
+          })
+
+          tx = await TransactionGenerator.generateClaimChequeTx(
+            walletId1,
+            chequeCell,
+            alice.address
+          )
+        });
+        it('uses the existing acp cell to hold the claimed sudt amount', () => {
+          const chequeCellAmount = BufferUtils.readBigUInt128LE(chequeCell.data)
+
+          const acpInput = tx.inputs.find(input => (
+            input.lock!.computeHash() === receiverAcpLiveCell.lockHash &&
+            input.type!.computeHash() === receiverAcpLiveCell.typeHash
+          ))
+          const acpInputAmount = BufferUtils.readBigUInt128LE(acpInput!.data!)
+
+          const acpOutput = tx.outputs.find(input => (
+            input.lock!.computeHash() === receiverAcpLiveCell.lockHash &&
+            input.type!.computeHash() === receiverAcpLiveCell.typeHash
+          ))
+
+          const acpOutputAmount = BufferUtils.readBigUInt128LE(acpOutput!.data!)
+
+          const claimedAmount = acpOutputAmount - acpInputAmount
+          expect(claimedAmount).toEqual(chequeCellAmount)
+        })
+        it('returns ckb to sender', () => {
+          const acpOutput = tx.outputs.find(input => (
+            input.lock!.computeHash() === senderAcpLiveCell.lockHash
+          ))
+          expect(acpOutput!.capacity).toEqual(chequeCell.capacity)
+        })
+      })
+
+      describe('without existing acp cell', () => {
+        it('creates an new acp cell to hold the claimed sudt amount', () => {
+
+        })
+        it('returns ckb to sender', () => {
+
+        })
+      });
+    });
   })
 
   describe('generateCreateAnyoneCanPayTxUseAllBalance', () => {

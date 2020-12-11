@@ -12,6 +12,7 @@ import Script from "models/chain/script"
 import LiveCellService from "./live-cell-service"
 import WalletService from "./wallets"
 
+// TODO merge into asset account service
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
     walletID: string,
@@ -39,6 +40,7 @@ export default class AnyoneCanPayService {
       throw new AcpSendSameAccountError()
     }
 
+    // TODO check if it is for normal address
     const assetAccountInfo = new AssetAccountInfo()
     // verify targetAnyoneCanPay codeHash & hashType
     if (!assetAccountInfo.isAnyoneCanPayScript(targetAnyoneCanPayLockScript)) {

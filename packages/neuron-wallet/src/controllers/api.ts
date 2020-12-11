@@ -23,7 +23,14 @@ import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
 import AssetAccountController from './asset-account'
-import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams, MigrateACPParams } from './asset-account'
+import {
+  GenerateCreateAssetAccountTxParams,
+  SendCreateAssetAccountTxParams,
+  UpdateAssetAccountParams,
+  MigrateACPParams,
+  CreateChequeTxParams,
+  ClaimChequeTxParams,
+} from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
@@ -431,6 +438,14 @@ export default class ApiController {
 
     handle('migrate-acp', async (_, params: MigrateACPParams) => {
       return this.assetAccountController.migrateAcp(params)
+    })
+
+    handle('generate-create-cheque-tx', async (_, params: CreateChequeTxParams) => {
+      return this.assetAccountController.generateCreateChequeTx(params)
+    })
+
+    handle('generate-claim-cheque-tx', async (_, params: ClaimChequeTxParams) => {
+      return this.assetAccountController.generateClaimChequeTx(params)
     })
 
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {

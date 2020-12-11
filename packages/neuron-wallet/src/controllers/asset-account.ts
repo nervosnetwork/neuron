@@ -14,6 +14,7 @@ import WalletsService from "services/wallets"
 import CommandSubject from 'models/subjects/command'
 import SyncApiController, { SyncStatus } from "./sync-api"
 import { TransactionGenerator } from "services/tx"
+import OutPoint from "models/chain/out-point"
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -44,6 +45,18 @@ export interface UpdateAssetAccountParams {
 export interface MigrateACPParams {
   id: string
   password: string
+}
+
+export interface CreateChequeTxParams {
+  walletID: string
+  accountID: number
+  receiverAddress: string
+  amount: string
+}
+
+export interface ClaimChequeTxParams {
+  walletID: string
+  chequeCellOutPoint: OutPoint
 }
 
 export default class AssetAccountController {
@@ -247,5 +260,33 @@ export default class AssetAccountController {
       status: ResponseCode.Success,
       result,
     }))
+  }
+
+  public async generateCreateChequeTx(params: CreateChequeTxParams):
+  Promise<Controller.Response<{tx: Transaction}>> {
+    const {walletID, accountID, receiverAddress, amount} = params
+    const tx = await AssetAccountService.generateCreateChequeTx(
+      walletID,
+      accountID,
+      receiverAddress,
+      amount
+    )
+    return {
+      status: ResponseCode.Success,
+      result: {tx},
+    }
+  }
+
+  public async generateClaimChequeTx(params: ClaimChequeTxParams):
+  Promise<Controller.Response<{tx: Transaction, assetAccount?: AssetAccount}>> {
+    const {walletID, chequeCellOutPoint} = params
+    const {tx, assetAccount} = await AssetAccountService.generateClaimChequeTx(
+      walletID,
+      chequeCellOutPoint,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: {tx, assetAccount},
+    }
   }
 }

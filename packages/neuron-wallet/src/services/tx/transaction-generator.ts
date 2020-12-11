@@ -849,6 +849,218 @@ export class TransactionGenerator {
     return tx;
   }
 
+  public static async generateCreateChequeTx(
+    walletId: string,
+    amount: string,
+    targetOutput: Output,
+    senderAcpLock: Script,
+    changeAddress: string,
+  ) {
+
+    const assetAccountInfo = new AssetAccountInfo()
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      inputs: [],
+      outputs: [targetOutput],
+      outputsData: [],
+      witnesses: []
+    })
+
+    const changeBlake160: string = AddressParser.toBlake160(changeAddress)
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const gatheredSudtInputResult = await CellsService.gatherSudtInputs(
+      amount,
+      walletId,
+      [senderAcpLock],
+      targetOutput.type!,
+      changeBlake160,
+      undefined,
+      undefined,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+
+    tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(gatheredSudtInputResult.amount))
+
+    tx.inputs = gatheredSudtInputResult.anyoneCanPayInputs.concat(gatheredSudtInputResult.changeInputs).concat(tx.inputs)
+    tx.outputs.push(...gatheredSudtInputResult.anyoneCanPayOutputs)
+    tx.outputsData = tx.outputs.map(output => output.data || '0x')
+
+    const newBaseSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
+    const gatheredCKBInputResult = await CellsService.gatherInputs(
+      targetOutput.capacity,
+      walletId,
+      undefined,
+      '1000',
+      newBaseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+
+    const finalFeeInt = BigInt(gatheredCKBInputResult.finalFee)
+    tx.inputs.push(...gatheredCKBInputResult.inputs)
+    tx.fee = finalFeeInt.toString()
+
+    if (gatheredCKBInputResult.hasChangeOutput) {
+      const changeBlake160: string = AddressParser.toBlake160(changeAddress)
+
+      const changeCapacity = BigInt(gatheredCKBInputResult.capacities) - finalFeeInt - BigInt(targetOutput.capacity)
+
+      const output = new Output(
+        changeCapacity.toString(),
+        SystemScriptInfo.generateSecpScript(changeBlake160)
+      )
+
+      tx.addOutput(output)
+    }
+
+    TransactionGenerator.checkTxCapacity(tx, 'generateCreateChequeTx capacity not match!')
+    TransactionGenerator.checkTxSudtAmount(tx, 'generateCreateChequeTx sUDT amount not match!', assetAccountInfo)
+
+    return tx
+  }
+
+  public static async generateClaimChequeTx(walletId: string, chequeCell: Output, changeAddress: string) {
+    const receiverLockArgs = chequeCell.lock.args.slice(0, 42)
+    const senderLockHash = '0x' + chequeCell.lock.args.slice(42)
+
+    const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
+    const chequeSenderInput = senderInputsByLockHash.find(input => input.typeHash === chequeCell.type?.computeHash())
+    if (!chequeSenderInput) {
+      throw new Error('sender acp cell could not be found')
+    }
+
+    const acpCellCapacity = BigInt(142 * 10 ** 8)
+    const assetAccountInfo = new AssetAccountInfo()
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const chequeDep = assetAccountInfo.getChequeInfo().cellDep
+
+    const chequeInput = Input.fromObject({
+      previousOutput: chequeCell.outPoint!,
+      since: '0',
+      capacity: chequeCell.capacity,
+      lock: chequeCell.lock,
+      type: chequeCell.type,
+      lockHash: chequeCell.lockHash,
+      data: chequeCell.data
+    })
+
+    const senderOutput = Output.fromObject({
+      capacity: chequeCell.capacity,
+      lock: chequeSenderInput.lockScript()!,
+      type: chequeSenderInput.typeScript(),
+      data: chequeSenderInput.data
+    })
+
+    const tx = Transaction.fromObject({
+      version: '0',
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep, chequeDep],
+      headerDeps: [],
+      inputs: [chequeInput],
+      outputs: [senderOutput],
+      outputsData: [senderOutput.data],
+      witnesses: [],
+    })
+
+    const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverLockArgs)
+    const receiverAcpCells = await CellsService.getACPCells(receiverAcpScript, chequeCell.type!)
+
+    let requiredCapacity = BigInt(0)
+    if (receiverAcpCells.length) {
+      const originalReceiverAcpOutput = receiverAcpCells[0]
+
+      const receiverAcpInputAmount = BufferUtils.readBigUInt128LE(originalReceiverAcpOutput.data)
+      const chequeCellAmount = BufferUtils.readBigUInt128LE(chequeCell.data)
+      const receiverAcpOutputAmount = receiverAcpInputAmount + chequeCellAmount
+
+      const newReceiverAcpOutput = Output.fromObject({
+        capacity: originalReceiverAcpOutput.capacity,
+        lock: originalReceiverAcpOutput.lockScript(),
+        type: originalReceiverAcpOutput.typeScript(),
+        data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount),
+      })
+
+      const receiverAcpInput = Input.fromObject({
+        previousOutput: originalReceiverAcpOutput.outPoint(),
+        since: '0',
+        capacity: originalReceiverAcpOutput.capacity,
+        lock: originalReceiverAcpOutput.lockScript(),
+        type: originalReceiverAcpOutput.typeScript(),
+        data: originalReceiverAcpOutput.data,
+      })
+      tx.inputs.push(receiverAcpInput)
+      tx.outputs.push(newReceiverAcpOutput)
+    }
+    else {
+      requiredCapacity = acpCellCapacity
+
+      const receiverAcpOutput = Output.fromObject({
+        capacity: acpCellCapacity.toString(),
+        lock: receiverAcpScript,
+        type: chequeCell.type,
+        data: chequeCell.data,
+      })
+
+      tx.outputs.push(receiverAcpOutput)
+    }
+
+    tx.outputsData = tx.outputs.map(output => output.data || '0x')
+
+    const baseSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput,
+    } = await CellsService.gatherInputs(
+      acpCellCapacity.toString(),
+      walletId,
+      undefined,
+      '1000',
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs.push(...inputs)
+    tx.fee = finalFee
+
+    if (hasChangeOutput) {
+      const changeBlake160: string = AddressParser.toBlake160(changeAddress)
+
+      const changeCapacity = BigInt(capacities) - finalFeeInt - requiredCapacity
+
+      const output = new Output(
+        changeCapacity.toString(),
+        SystemScriptInfo.generateSecpScript(changeBlake160)
+      )
+
+      tx.addOutput(output)
+    }
+
+    TransactionGenerator.checkTxCapacity(tx, 'generateClaimChequeTx capacity not match!')
+    TransactionGenerator.checkTxSudtAmount(tx, 'generateClaimChequeTx sUDT amount not match!', assetAccountInfo)
+
+    return tx
+  }
+
+  // public static async generateWithdrawChequeTx(walletId: string) {
+
+  // }
+
   private static checkTxCapacity(tx: Transaction, msg: string) {
     const inputCapacity = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
     const outputCapacity = tx.outputs.map(o => BigInt(o.capacity!)).reduce((result, c) => result + c, BigInt(0))
