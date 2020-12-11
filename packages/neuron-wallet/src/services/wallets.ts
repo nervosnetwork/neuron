@@ -12,6 +12,8 @@ import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
 import { ChildProcess } from 'utils/worker'
 import { DeviceInfo } from './hardware/common'
+import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
+import { getConnection, In, Not } from 'typeorm'
 
 const fileService = FileService.getInstance()
 
@@ -328,6 +330,13 @@ export default class WalletService {
     return FileKeystoreWallet.fromJSON(json)
   }
 
+  private async cleanupAddresses() {
+    const allWallets = this.getAll()
+    await getConnection().getRepository(HdPublicKeyInfo).delete({
+      walletId: Not(In(allWallets.map(w => w.id)))
+    })
+  }
+
   public getAll = (): WalletProperties[] => {
     return this.listStore.readSync(this.walletsKey) || []
   }
@@ -345,13 +354,15 @@ export default class WalletService {
     return this.fromJSON(wallet)
   }
 
-  public generateAddressesIfNecessary = async () => {
+  public maintainAddressesIfNecessary = async () => {
     for (const { id } of this.getAll()) {
       const wallet = this.get(id)
       if ((await AddressService.getAddressesByWalletId(wallet.id)).length === 0) {
         await wallet.checkAndGenerateAddresses()
       }
     }
+
+    await this.cleanupAddresses()
   }
 
   public create = (props: WalletProperties) => {
