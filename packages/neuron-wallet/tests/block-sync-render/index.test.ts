@@ -16,7 +16,7 @@ const stubbedSyncApiControllerEmitter = jest.fn()
 const stubbedTxDbChangedSubjectNext = jest.fn()
 const stubbedAddressDbChangedSubjectNext = jest.fn()
 const stubbedGetCurrentNetwork = jest.fn()
-const stubbedGenerateAddressesIfNecessary = jest.fn()
+const stubbedmaintainAddressesIfNecessary = jest.fn()
 const stubbedFork = jest.fn()
 const stubbedLoggerInfo = jest.fn()
 const stubbedLoggerDebug = jest.fn()
@@ -55,7 +55,7 @@ const resetMocks = () => {
   stubbedQueryIndexer.mockReset()
   stubbedResetIndexerData.mockReset()
   stubbedGetCurrentNetwork.mockReset()
-  stubbedGenerateAddressesIfNecessary.mockReset()
+  stubbedmaintainAddressesIfNecessary.mockReset()
 
   stubbedUnmountSyncTask.mockReset()
   stubbedSyncTaskStart.mockReset()
@@ -173,7 +173,7 @@ describe('block sync render', () => {
       jest.doMock('services/wallets', () => {
         return {
           getInstance: () => ({
-            generateAddressesIfNecessary: stubbedGenerateAddressesIfNecessary
+            maintainAddressesIfNecessary: stubbedmaintainAddressesIfNecessary
           }),
         }
       })
@@ -250,7 +250,7 @@ describe('block sync render', () => {
       })
 
       it('generates addresses', async () => {
-        expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
+        expect(stubbedmaintainAddressesIfNecessary).toHaveBeenCalled()
       })
 
       it('sync task can be start over by early return', async () => {
@@ -319,7 +319,7 @@ describe('block sync render', () => {
             await switchToNetwork(network)
             stubbedSyncTaskStart.mockReset()
             stubbedUnmountSyncTask.mockReset()
-            stubbedGenerateAddressesIfNecessary.mockReset()
+            stubbedmaintainAddressesIfNecessary.mockReset()
           })
 
           describe('switches to different network', () => {
@@ -331,7 +331,7 @@ describe('block sync render', () => {
               expect(stubbedSyncTaskStart).toHaveBeenCalled()
             })
             it('checks and generates addresses if necessary', () => {
-              expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
+              expect(stubbedmaintainAddressesIfNecessary).toHaveBeenCalled()
             })
           });
 
@@ -344,7 +344,7 @@ describe('block sync render', () => {
               expect(stubbedSyncTaskStart).not.toHaveBeenCalled()
             })
             it('should not generate addresses', () => {
-              expect(stubbedGenerateAddressesIfNecessary).not.toHaveBeenCalled()
+              expect(stubbedmaintainAddressesIfNecessary).not.toHaveBeenCalled()
             })
           });
 
@@ -357,7 +357,7 @@ describe('block sync render', () => {
               expect(stubbedSyncTaskStart).toHaveBeenCalled()
             })
             it('checks and generates addresses if necessary', () => {
-              expect(stubbedGenerateAddressesIfNecessary).toHaveBeenCalled()
+              expect(stubbedmaintainAddressesIfNecessary).toHaveBeenCalled()
             })
           });
 

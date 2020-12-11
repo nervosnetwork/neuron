@@ -24,7 +24,7 @@ let syncTask: SyncTask | null
 let network: Network | null
 
 const resetSyncTaskQueue = queue(async ({startTask, clearIndexerFolder}) => {
-  await WalletService.getInstance().generateAddressesIfNecessary()
+  await WalletService.getInstance().maintainAddressesIfNecessary()
   await killBlockSyncTask()
   if (startTask) {
     await createBlockSyncTask(clearIndexerFolder)
