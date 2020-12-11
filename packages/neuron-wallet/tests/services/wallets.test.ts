@@ -31,6 +31,7 @@ jest.doMock('../../src/services/addresses', () => {
 });
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
 import { AccountExtendedPublicKey } from '../../src/models/keys/key'
+import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 
 const resetMocks = () => {
   stubbedDeletedByWalletIdFn.mockReset()
@@ -393,7 +394,7 @@ describe('wallet service', () => {
     });
   });
 
-  describe('#generateAddressesIfNecessary', () => {
+  describe('#maintainAddressesIfNecessary', () => {
     let createdWallet1: any
     let createdWallet2: any
     let createdWallet3: any
@@ -407,7 +408,7 @@ describe('wallet service', () => {
         .calledWith(createdWallet2.id).mockResolvedValue({length: 0})
         .calledWith(createdWallet3.id).mockResolvedValue({length: 0})
 
-      await walletService.generateAddressesIfNecessary()
+      await walletService.maintainAddressesIfNecessary()
     });
     it('should not generate addresses for wallets already having addresses', () => {
       expect(stubbedGenerateAndSaveForExtendedKeyFn).not.toHaveBeenCalledWith(createdWallet1.id)
@@ -427,6 +428,38 @@ describe('wallet service', () => {
         20,
         10,
       )
+    });
+    describe('when having invalid wallet ids in key info', () => {
+      const deletedWalletId = 'wallet4'
+      const generateKeyInfo = (walletId: string, pk: string) => {
+        const keyInfo = new HdPublicKeyInfo()
+        keyInfo.walletId = walletId
+        keyInfo.publicKeyInBlake160 = pk
+        keyInfo.addressType = 0
+        keyInfo.addressIndex = 0
+        return keyInfo
+      }
+      beforeEach(async () => {
+        const keyInfos = [
+          generateKeyInfo(deletedWalletId, 'pk1'),
+          generateKeyInfo(deletedWalletId, 'pk2'),
+          generateKeyInfo(createdWallet1.id, 'pk3'),
+        ]
+        await getConnection().manager.save(keyInfos)
+
+        const savedKeyInfos = await getConnection().getRepository(HdPublicKeyInfo).find()
+        expect(savedKeyInfos.length).toEqual(3)
+        const keyInfosByDeletedWallet = savedKeyInfos.filter(key => key.walletId === deletedWalletId)
+        expect(keyInfosByDeletedWallet.length).toEqual(2)
+
+        await walletService.maintainAddressesIfNecessary()
+      });
+      it('deletes related key infos in hd_public_key_info table', async () => {
+        const savedKeyInfos = await getConnection().getRepository(HdPublicKeyInfo).find()
+        expect(savedKeyInfos.length).toEqual(1)
+        const keyInfosByDeletedWallet = savedKeyInfos.filter(key => key.walletId === deletedWalletId)
+        expect(keyInfosByDeletedWallet.length).toEqual(0)
+      })
     });
   });
 })
