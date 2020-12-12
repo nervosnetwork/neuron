@@ -82,12 +82,12 @@ const navigateTo = (url: string) => {
   }
 }
 
-const importHardware = (url: string) => {
-  const window = BrowserWindow.getFocusedWindow()
-  if (window) {
-    CommandSubject.next({ winID: window.id, type: 'import-hardware', payload: url, dispatchToUI: true })
-  }
-}
+// const importHardware = (url: string) => {
+//   const window = BrowserWindow.getFocusedWindow()
+//   if (window) {
+//     CommandSubject.next({ winID: window.id, type: 'import-hardware', payload: url, dispatchToUI: true })
+//   }
+// }
 
 const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) => {
   const window = BrowserWindow.getFocusedWindow()
@@ -208,13 +208,14 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               }
             }
           },
-          {
-            id: 'import-with-hardware',
-            label: t('application-menu.wallet.import-hardware'),
-            click: () => {
-              importHardware(URL.ImportHardware)
-            }
-          }
+          // COMMENT OUT UNTIL ledger app is approved
+          // {
+          //   id: 'import-with-hardware',
+          //   label: t('application-menu.wallet.import-hardware'),
+          //   click: () => {
+          //     importHardware(URL.ImportHardware)
+          //   }
+          // }
         ],
       },
       separator,
