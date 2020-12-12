@@ -6,7 +6,7 @@
 
 * Support acp short address generation and parsing.
 * Support transfer to PW lock full address.
-* Support hardware wallet of Ledger.
+* Support hardware wallet of Ledger (not available in production for now).
 * Support generating and signing offline transaction.
 * Support broadcasting the signed offline transaction.
 * Display network type in the navbar.
