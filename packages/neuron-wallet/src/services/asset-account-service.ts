@@ -3,7 +3,7 @@ import BufferUtils from "utils/buffer"
 import OutputEntity from "database/chain/entities/output"
 import Transaction, { TransactionStatus } from "models/chain/transaction"
 import AssetAccountInfo from "models/asset-account-info"
-import Output, { OutputStatus } from "models/chain/output"
+import { OutputStatus } from "models/chain/output"
 import AssetAccount from "models/asset-account"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 import AssetAccountEntity from "database/chain/entities/asset-account"
@@ -12,7 +12,6 @@ import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
 import WalletService from "./wallets"
-import AddressParser from "models/address-parser"
 import OutPoint from "models/chain/out-point"
 
 export default class AssetAccountService {
@@ -351,31 +350,30 @@ export default class AssetAccountService {
 
 
   // TODO cover tests
-  public static async generateCreateChequeTx(walletID: string, accountId: number, receiverAddress: string, amount: string) {
+  public static async generateCreateChequeTx(
+    walletID: string,
+    accountId: number,
+    receiverAddress: string,
+    amount: string,
+    fee: string,
+    feeRate: string,
+  ) {
+    console.log(accountId)
     const assetAccount = await this.getAccount({walletID, id: accountId})
     if (!assetAccount) {
       throw new Error('Asset Account not found')
     }
-    const assetAccountInfo = new AssetAccountInfo()
-    const senderAcpScript = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)
-
-    const receiverLockScript = AddressParser.parse(receiverAddress)
-
-    const chequeCell = Output.fromObject({
-      // TODO should be 161 ckb
-      capacity: BigInt(174 * 10 ** 8).toString(),
-      lock: assetAccountInfo.generateChequeScript(receiverLockScript.args + senderAcpScript.computeHash().slice(2, 42)),
-      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
-    })
 
     const wallet = WalletService.getInstance().get(walletID)
     const changeAddrObj = await wallet.getNextChangeAddress()
     const tx = await TransactionGenerator.generateCreateChequeTx(
       walletID,
       amount,
-      chequeCell,
-      senderAcpScript,
+      assetAccount,
+      receiverAddress,
       changeAddrObj!.address,
+      fee,
+      feeRate,
     )
 
     return tx

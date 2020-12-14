@@ -47,14 +47,17 @@ export interface MigrateACPParams {
   password: string
 }
 
-export interface CreateChequeTxParams {
+export interface GenerateCreateChequeTxParams {
   walletID: string
-  accountID: number
-  receiverAddress: string
+  assetAccountID: number
+  address: string
   amount: string
+  fee: string
+  feeRate: string
+  description?: string
 }
 
-export interface ClaimChequeTxParams {
+export interface GenerateClaimChequeTxParams {
   walletID: string
   chequeCellOutPoint: OutPoint
 }
@@ -262,14 +265,15 @@ export default class AssetAccountController {
     }))
   }
 
-  public async generateCreateChequeTx(params: CreateChequeTxParams):
+  public async generateCreateChequeTx(params: GenerateCreateChequeTxParams):
   Promise<Controller.Response<{tx: Transaction}>> {
-    const {walletID, accountID, receiverAddress, amount} = params
     const tx = await AssetAccountService.generateCreateChequeTx(
-      walletID,
-      accountID,
-      receiverAddress,
-      amount
+      params.walletID,
+      params.assetAccountID,
+      params.address,
+      params.amount,
+      params.fee,
+      params.feeRate,
     )
     return {
       status: ResponseCode.Success,
@@ -277,7 +281,7 @@ export default class AssetAccountController {
     }
   }
 
-  public async generateClaimChequeTx(params: ClaimChequeTxParams):
+  public async generateClaimChequeTx(params: GenerateClaimChequeTxParams):
   Promise<Controller.Response<{tx: Transaction, assetAccount?: AssetAccount}>> {
     const {walletID, chequeCellOutPoint} = params
     const {tx, assetAccount} = await AssetAccountService.generateClaimChequeTx(

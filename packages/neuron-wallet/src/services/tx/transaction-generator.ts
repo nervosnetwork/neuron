@@ -20,6 +20,7 @@ import ArrayUtils from 'utils/array'
 import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
 import assert from 'assert'
+import AssetAccount from 'models/asset-account'
 
 export interface TargetOutput {
   address: string
@@ -852,9 +853,11 @@ export class TransactionGenerator {
   public static async generateCreateChequeTx(
     walletId: string,
     amount: string,
-    targetOutput: Output,
-    senderAcpLock: Script,
+    assetAccount: AssetAccount,
+    receiverAddress: string,
     changeAddress: string,
+    fee: string = '0',
+    feeRate: string = '0',
   ) {
 
     const assetAccountInfo = new AssetAccountInfo()
@@ -863,12 +866,23 @@ export class TransactionGenerator {
     const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
 
+    const senderAcpScript = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)
+    const receiverLockScript = AddressParser.parse(receiverAddress)
+
+    //TODO shift this construction to the end so as to avoid the need of overwriting
+    const chequeCell = Output.fromObject({
+      capacity: BigInt(162 * 10 ** 8).toString(),
+      lock: assetAccountInfo.generateChequeScript('0x' + '0'.repeat(80)),
+      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
+      data: BufferUtils.writeBigUInt128LE(BigInt(amount))
+    })
+
     const tx =  Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
       inputs: [],
-      outputs: [targetOutput],
+      outputs: [chequeCell],
       outputsData: [],
       witnesses: []
     })
@@ -879,8 +893,8 @@ export class TransactionGenerator {
     const gatheredSudtInputResult = await CellsService.gatherSudtInputs(
       amount,
       walletId,
-      [senderAcpLock],
-      targetOutput.type!,
+      [senderAcpScript],
+      chequeCell.type!,
       changeBlake160,
       undefined,
       undefined,
@@ -889,31 +903,42 @@ export class TransactionGenerator {
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
     )
 
-    tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(gatheredSudtInputResult.amount))
-
     tx.inputs = gatheredSudtInputResult.anyoneCanPayInputs.concat(gatheredSudtInputResult.changeInputs).concat(tx.inputs)
     tx.outputs.push(...gatheredSudtInputResult.anyoneCanPayOutputs)
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
 
     const newBaseSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
     const gatheredCKBInputResult = await CellsService.gatherInputs(
-      targetOutput.capacity,
+      chequeCell.capacity,
       walletId,
-      undefined,
-      '1000',
+      fee,
+      feeRate,
       newBaseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
     )
 
-    const finalFeeInt = BigInt(gatheredCKBInputResult.finalFee)
     tx.inputs.push(...gatheredCKBInputResult.inputs)
+
+    const senderDefaultCell = tx.inputs.find(input => input.lock!.codeHash === SystemScriptInfo.SECP_CODE_HASH)
+    if (!senderDefaultCell) {
+      throw new Error('Default cells not found')
+    }
+
+    tx.outputs[0].setLock(
+      assetAccountInfo.generateChequeScript(
+        receiverLockScript.args + senderDefaultCell.lock!.computeHash().slice(2, 42)
+      )
+    )
+
+
+    const finalFeeInt = BigInt(gatheredCKBInputResult.finalFee)
     tx.fee = finalFeeInt.toString()
 
     if (gatheredCKBInputResult.hasChangeOutput) {
       const changeBlake160: string = AddressParser.toBlake160(changeAddress)
 
-      const changeCapacity = BigInt(gatheredCKBInputResult.capacities) - finalFeeInt - BigInt(targetOutput.capacity)
+      const changeCapacity = BigInt(gatheredCKBInputResult.capacities) - finalFeeInt - BigInt(chequeCell.capacity)
 
       const output = new Output(
         changeCapacity.toString(),
@@ -934,10 +959,10 @@ export class TransactionGenerator {
     const senderLockHash = '0x' + chequeCell.lock.args.slice(42)
 
     const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
-    const chequeSenderInput = senderInputsByLockHash.find(input => input.typeHash === chequeCell.type?.computeHash())
-    if (!chequeSenderInput) {
-      throw new Error('sender acp cell could not be found')
+    if (!senderInputsByLockHash.length) {
+      throw new Error('sender input cell could not be found')
     }
+    const chequeSenderLock = senderInputsByLockHash[0].lockScript()
 
     const acpCellCapacity = BigInt(142 * 10 ** 8)
     const assetAccountInfo = new AssetAccountInfo()
@@ -959,9 +984,7 @@ export class TransactionGenerator {
 
     const senderOutput = Output.fromObject({
       capacity: chequeCell.capacity,
-      lock: chequeSenderInput.lockScript()!,
-      type: chequeSenderInput.typeScript(),
-      data: chequeSenderInput.data
+      lock: chequeSenderLock!,
     })
 
     const tx = Transaction.fromObject({

@@ -28,8 +28,8 @@ import {
   SendCreateAssetAccountTxParams,
   UpdateAssetAccountParams,
   MigrateACPParams,
-  CreateChequeTxParams,
-  ClaimChequeTxParams,
+  GenerateCreateChequeTxParams,
+  GenerateClaimChequeTxParams,
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
@@ -440,11 +440,11 @@ export default class ApiController {
       return this.assetAccountController.migrateAcp(params)
     })
 
-    handle('generate-create-cheque-tx', async (_, params: CreateChequeTxParams) => {
+    handle('generate-create-cheque-tx', async (_, params: GenerateCreateChequeTxParams) => {
       return this.assetAccountController.generateCreateChequeTx(params)
     })
 
-    handle('generate-claim-cheque-tx', async (_, params: ClaimChequeTxParams) => {
+    handle('generate-claim-cheque-tx', async (_, params: GenerateClaimChequeTxParams) => {
       return this.assetAccountController.generateClaimChequeTx(params)
     })
 
