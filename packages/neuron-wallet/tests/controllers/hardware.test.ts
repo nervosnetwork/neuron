@@ -42,7 +42,7 @@ describe('hardware controller', () => {
      expect(result!.chainCode).toBe(LedgerCkbApp.chainCode)
    })
 
-   it('#detectDevice', async () => {
+   it.skip('#detectDevice', async () => {
     const { result } = await hardwareControler.detectDevice({
       manufacturer: Manufacturer.Ledger,
       product: 'Nano X'

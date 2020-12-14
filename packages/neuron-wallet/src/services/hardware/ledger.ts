@@ -1,7 +1,7 @@
 import { DeviceInfo, ExtendedPublicKey } from './common'
 import { Hardware } from './hardware'
 import HID from '@ledgerhq/hw-transport-node-hid'
-import Bluetooth from '@ledgerhq/hw-transport-node-ble'
+// import Bluetooth from '@ledgerhq/hw-transport-node-ble'
 import LedgerCKB from 'hw-app-ckb'
 import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
@@ -25,9 +25,10 @@ export default class Ledger extends Hardware {
     logger.info("Connect device:\t", deviceInfo ?? this.deviceInfo)
 
     this.deviceInfo = deviceInfo ?? this.deviceInfo
-    this.transport = this.deviceInfo.isBluetooth
-      ? await Bluetooth.open(this.deviceInfo.descriptor)
-      : await HID.open(this.deviceInfo.descriptor)
+    // this.transport = this.deviceInfo.isBluetooth
+    //   ? await Bluetooth.open(this.deviceInfo.descriptor)
+    //   : await HID.open(this.deviceInfo.descriptor)
+    this.transport = await HID.open(this.deviceInfo.descriptor)
 
     this.ledgerCKB = new LedgerCKB(this.transport)
     this.isConnected = true
@@ -39,9 +40,9 @@ export default class Ledger extends Hardware {
     }
 
     this.transport?.close()
-    if (this.deviceInfo.isBluetooth) {
-      await Bluetooth.disconnect(this.deviceInfo.descriptor)
-    }
+    // if (this.deviceInfo.isBluetooth) {
+    //   await Bluetooth.disconnect(this.deviceInfo.descriptor)
+    // }
     this.isConnected = false
   }
 
@@ -97,7 +98,7 @@ export default class Ledger extends Hardware {
   public static async findDevices () {
     const devices = await Promise.all([
       Ledger.searchDevices(HID.listen, false),
-      Ledger.searchDevices(Bluetooth.listen, true)
+      // Ledger.searchDevices(Bluetooth.listen, true)
     ])
 
     return devices.flat()
