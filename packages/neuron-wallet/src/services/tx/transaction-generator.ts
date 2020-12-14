@@ -869,8 +869,7 @@ export class TransactionGenerator {
     const senderAcpScript = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)
     const receiverLockScript = AddressParser.parse(receiverAddress)
 
-    //TODO shift this construction to the end so as to avoid the need of overwriting
-    const chequeCell = Output.fromObject({
+    const chequeCellTmp = Output.fromObject({
       capacity: BigInt(162 * 10 ** 8).toString(),
       lock: assetAccountInfo.generateChequeScript('0x' + '0'.repeat(80)),
       type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
@@ -882,7 +881,7 @@ export class TransactionGenerator {
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
       inputs: [],
-      outputs: [chequeCell],
+      outputs: [],
       outputsData: [],
       witnesses: []
     })
@@ -894,7 +893,7 @@ export class TransactionGenerator {
       amount,
       walletId,
       [senderAcpScript],
-      chequeCell.type!,
+      chequeCellTmp.type!,
       changeBlake160,
       undefined,
       undefined,
@@ -907,9 +906,13 @@ export class TransactionGenerator {
     tx.outputs.push(...gatheredSudtInputResult.anyoneCanPayOutputs)
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
 
-    const newBaseSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
+    const newBaseSize: number = TransactionSize.tx(tx) +
+      TransactionSize.secpLockWitness() * tx.inputs.length +
+      TransactionSize.output(chequeCellTmp) +
+      TransactionSize.outputData(chequeCellTmp.data)
+
     const gatheredCKBInputResult = await CellsService.gatherInputs(
-      chequeCell.capacity,
+      chequeCellTmp.capacity,
       walletId,
       fee,
       feeRate,
@@ -925,12 +928,14 @@ export class TransactionGenerator {
       throw new Error('Default cells not found')
     }
 
-    tx.outputs[0].setLock(
-      assetAccountInfo.generateChequeScript(
+    const chequeCell = Output.fromObject({
+      ...chequeCellTmp,
+      lock: assetAccountInfo.generateChequeScript(
         receiverLockScript.args + senderDefaultCell.lock!.computeHash().slice(2, 42)
       )
-    )
-
+    })
+    tx.outputs.unshift(chequeCell)
+    tx.outputsData.unshift(chequeCell.data)
 
     const finalFeeInt = BigInt(gatheredCKBInputResult.finalFee)
     tx.fee = finalFeeInt.toString()
