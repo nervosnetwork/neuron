@@ -515,7 +515,7 @@ export default class ApiController {
         }
         return res
       } catch (err) {
-        logger.warn(`channel handling error: ${err}`)
+        logger.warn(`channel handling error: ${err}`, err.stack)
 
         if (err.code === 'ECONNREFUSED') {
           err.code = ApiController.NODE_DISCONNECTED_CODE
