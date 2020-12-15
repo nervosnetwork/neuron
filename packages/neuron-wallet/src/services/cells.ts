@@ -1,7 +1,8 @@
 import { getConnection, In } from 'typeorm'
-import OutputEntity from 'database/chain/entities/output'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import FeeMode from 'models/fee-mode'
+import OutputEntity from 'database/chain/entities/output'
+import InputEntity from 'database/chain/entities/input'
 import TransactionEntity from 'database/chain/entities/transaction'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
@@ -11,7 +12,6 @@ import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import WitnessArgs from 'models/chain/witness-args'
 import MultiSign from 'models/multi-sign'
-import InputEntity from 'database/chain/entities/input'
 import BufferUtils from 'utils/buffer'
 import LiveCell from 'models/chain/live-cell'
 import Output from 'models/chain/output'
@@ -257,7 +257,6 @@ export default class CellsService {
         return multiSignHashes.has(o.multiSignBlake160)
       }
       if (o.lockCodeHash === chequeLockCodeHash) {
-        console.log(o)
         const receiverLockArgs = o.lockArgs.slice(0, 42)
         const senderLockHash = o.lockArgs.slice(42)
         return blake160Hashes.has(receiverLockArgs) || acpLockHashes.has(senderLockHash)
@@ -921,5 +920,18 @@ export default class CellsService {
       .getMany()
 
     return inputs
+  }
+
+  public static async getOutputsByTransactionHash(hash: string) {
+    const outputEntities: OutputEntity[] = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        status: OutputStatus.Live,
+        transactionHash: hash
+      })
+      .getMany()
+
+    return outputEntities
   }
 }

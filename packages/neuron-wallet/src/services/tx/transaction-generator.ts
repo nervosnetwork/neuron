@@ -1085,9 +1085,97 @@ export class TransactionGenerator {
     return tx
   }
 
-  // public static async generateWithdrawChequeTx(walletId: string) {
+  public static async generateWithdrawChequeTx(
+    chequeCell: Output,
+    fee: string = '0',
+    feeRate: string = '0',
+  ): Promise<Transaction> {
+    const senderLockHash = '0x' + chequeCell.lock.args.slice(42)
 
-  // }
+    const assetAccountInfo = new AssetAccountInfo()
+    const outputEntities = await CellsService.getOutputsByTransactionHash(chequeCell.outPoint!.txHash)
+    const chequeSenderAcpCell = outputEntities.find(
+      output => assetAccountInfo.isDefaultAnyoneCanPayScript(output.lockScript())
+    )
+    if (!chequeSenderAcpCell) {
+      throw new Error('ACP cell not found')
+    }
+
+    const relativeEpoch = '0xa000000000000006'
+    const chequeInput = Input.fromObject({
+      previousOutput: chequeCell.outPoint!,
+      since: relativeEpoch,
+      capacity: chequeCell.capacity,
+      lock: chequeCell.lock,
+      type: chequeCell.type,
+      lockHash: chequeCell.lockHash,
+      data: chequeCell.data
+    })
+
+    const chequeSenderAcpInput = Input.fromObject({
+      previousOutput: chequeSenderAcpCell.outPoint(),
+      since: '0',
+      capacity: chequeSenderAcpCell.capacity,
+      lock: chequeSenderAcpCell.lockScript(),
+      type: chequeSenderAcpCell.typeScript(),
+      data: chequeSenderAcpCell.data,
+    })
+
+    const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
+    if (!senderInputsByLockHash.length) {
+      throw new Error('sender input cell could not be found')
+    }
+    const chequeSenderLock = senderInputsByLockHash[0].lockScript()
+    const senderDefaultLockOutput = Output.fromObject({
+      capacity: chequeCell.capacity,
+      lock: chequeSenderLock!,
+    })
+
+    const senderAcpInputAmount = BufferUtils.readBigUInt128LE(chequeSenderAcpInput.data!)
+    const chequeCellAmount = BufferUtils.readBigUInt128LE(chequeCell.data)
+    const senderAcpOutputAmount = senderAcpInputAmount + chequeCellAmount
+
+    const senderAcpOutput = Output.fromObject({
+      capacity: chequeSenderAcpInput.capacity!,
+      lock: chequeSenderAcpInput.lock!,
+      type: chequeSenderAcpInput.type!,
+      data: BufferUtils.writeBigUInt128LE(senderAcpOutputAmount),
+    })
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const chequeDep = assetAccountInfo.getChequeInfo().cellDep
+
+    const tx = Transaction.fromObject({
+      version: '0',
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep, chequeDep],
+      headerDeps: [],
+      inputs: [chequeSenderAcpInput, chequeInput],
+      outputs: [senderAcpOutput],
+      outputsData: [],
+      witnesses: [],
+    })
+
+    tx.outputsData = tx.outputs.map(output => output.data || '0x')
+
+    if (BigInt(fee) !== BigInt(0)) {
+      tx.fee = fee
+    }
+    else {
+      const txSize = TransactionSize.tx(tx) + TransactionSize.output(senderDefaultLockOutput) + TransactionSize.secpLockWitness() * tx.inputs.length
+      tx.fee = TransactionFee.fee(txSize, BigInt(feeRate)).toString()
+    }
+
+    const capacityAfterFee = BigInt(senderDefaultLockOutput.capacity) - BigInt(tx.fee)
+    senderDefaultLockOutput.capacity = capacityAfterFee.toString()
+    tx.outputs.push(senderDefaultLockOutput)
+
+    TransactionGenerator.checkTxCapacity(tx, 'generateWithdrawChequeTx capacity not match!')
+    TransactionGenerator.checkTxSudtAmount(tx, 'generateWithdrawChequeTx sUDT amount not match!', assetAccountInfo)
+
+    return tx
+  }
 
   private static checkTxCapacity(tx: Transaction, msg: string) {
     const inputCapacity = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
