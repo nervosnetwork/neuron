@@ -16,10 +16,11 @@ import {
   generateSendAllSUDTTransaction,
   getAnyoneCanPayScript,
 } from 'services/remote'
+import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
-  validateSUDTAddress,
-  validateSUDTAmount,
+  validateAssetAccountAddress as validateAddress,
+  validateAssetAccountAmount as validateAmount,
   isMainnet as isMainnetUtil,
   shannonToCKBFormatter,
   sudtValueToAmount,
@@ -32,7 +33,7 @@ import {
 import { AmountNotEnoughException } from 'exceptions'
 import styles from './sUDTSend.module.scss'
 
-const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
+const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, SHORT_ADDR_DEFAULT_LOCK_PREFIX } = CONSTANTS
 
 enum Fields {
   Address = 'address',
@@ -153,7 +154,7 @@ const SUDTSend = () => {
   const errors: { [Fields.Address]: string; [Fields.Amount]: string } = useMemo(() => {
     const errMap = { address: '', amount: '' }
     try {
-      validateSUDTAddress({
+      validateAddress({
         address: sendState.address,
         codeHash: anyoneCanPayScript?.codeHash ?? '',
         isMainnet,
@@ -163,7 +164,7 @@ const SUDTSend = () => {
       errMap.address = t(err.message, err.i18n)
     }
     try {
-      validateSUDTAmount({ amount: sendState.amount, decimal: accountInfo?.decimal ?? '32', required: false })
+      validateAmount({ amount: sendState.amount, decimal: accountInfo?.decimal ?? '32', required: false })
       const value = sudtAmountToValue(sendState.amount, accountInfo?.decimal ?? '32')
       const total = accountInfo?.balance ?? '0'
       if (total && value && BigInt(total) < BigInt(value)) {
@@ -179,6 +180,14 @@ const SUDTSend = () => {
     !isSending &&
     Object.values(errors).every(v => !v) &&
     [Fields.Address, Fields.Amount].every(key => sendState[key as Fields.Address | Fields.Amount].trim())
+
+  const isSecp256k1ShortAddress = useMemo(() => {
+    try {
+      return ckbCore.utils.parseAddress(sendState.address, 'hex').startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX)
+    } catch {
+      return false
+    }
+  }, [sendState.address])
 
   const isSubmittable = isFormReady && experimental?.tx && !remoteError
 
@@ -345,6 +354,11 @@ const SUDTSend = () => {
                   disabled={sendState.sendAll}
                   error={errors[field.key]}
                   className={styles[field.key]}
+                  hint={
+                    field.key === Fields.Address && isSecp256k1ShortAddress
+                      ? t('s-udt.send.cheque-address-hint')
+                      : undefined
+                  }
                 />
               )
             })}

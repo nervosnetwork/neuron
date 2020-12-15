@@ -665,7 +665,8 @@
         "amount": "金额",
         "description": "备注",
         "submit": "提交",
-        "click-to-edit": "点击编辑"
+        "click-to-edit": "点击编辑",
+        "cheque-address-hint": "向该地址转账需要临时锁定 162 CKB，对方领取后自动解锁。"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 转账"

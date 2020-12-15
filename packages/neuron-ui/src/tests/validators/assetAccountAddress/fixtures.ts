@@ -49,9 +49,17 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  "Should throw an error when it's a short version address but its code hash index is not 0x02": {
+  "Should pass when it's a short version address of secp256k1 lock": {
     params: {
       address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+      isMainnet: false,
+      required: false,
+    },
+    exception: null,
+  },
+  "Should throw an error when it's a short version address but its code hash index is not 0x00 or 0x02": {
+    params: {
+      address: 'ckt1qqprdsefa43s6m882pcj53m4gdnj4k440axqy6n3uj',
       isMainnet: false,
       required: false,
     },

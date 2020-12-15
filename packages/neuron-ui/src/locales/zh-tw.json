@@ -665,7 +665,8 @@
         "amount": "金額",
         "description": "備註",
         "submit": "提交",
-        "click-to-edit": "點擊編輯"
+        "click-to-edit": "點擊編輯",
+        "cheque-address-hint": "向該地址轉賬需要臨時鎖定 162 CKB，對方領取後自動解鎖。"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 轉賬"
