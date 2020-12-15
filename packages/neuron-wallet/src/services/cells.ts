@@ -28,7 +28,8 @@ export interface PaginationResult<T = any> {
 }
 
 export enum CustomizedLock {
-  SingleMultiSign = "SingleMultiSign"
+  SingleMultiSign = "SingleMultiSign",
+  Cheque = "Cheque",
 }
 
 export default class CellsService {
@@ -214,14 +215,12 @@ export default class CellsService {
   }
 
   public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
-    const assetAccountInfo = new AssetAccountInfo()
     const blake160Hashes = new Set(blake160s)
     const multiSign = new MultiSign()
     const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
-    const acpLockHashes = new Set(
-      blake160s.map(blake160 => assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash())
-    )
+    const assetAccountInfo = new AssetAccountInfo()
     const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash
+    const secp256k1LockHashes = [...blake160Hashes].map(blake160 => SystemScriptInfo.generateSecpScript(blake160).computeHash())
 
     const skip = (pageNo - 1) * pageSize
 
@@ -259,7 +258,7 @@ export default class CellsService {
       if (o.lockCodeHash === chequeLockCodeHash) {
         const receiverLockArgs = o.lockArgs.slice(0, 42)
         const senderLockHash = o.lockArgs.slice(42)
-        return blake160Hashes.has(receiverLockArgs) || acpLockHashes.has(senderLockHash)
+        return blake160Hashes.has(receiverLockArgs) || secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
     })
 
@@ -269,11 +268,30 @@ export default class CellsService {
       .slice(skip, pageNo * pageSize)
       .map(o => {
         const cell = o.toModel()
-        cell.setCustomizedAssetInfo({
-          lock: CustomizedLock.SingleMultiSign,
-          type: '',
-          data: ''
-        })
+        if (o.lockCodeHash === chequeLockCodeHash) {
+          const receiverLockArgs = o.lockArgs.slice(0, 42)
+          if (blake160Hashes.has(receiverLockArgs)) {
+            cell.setCustomizedAssetInfo({
+              lock: CustomizedLock.Cheque,
+              type: '',
+              data: 'claimable'
+            })
+          }
+          else {
+            cell.setCustomizedAssetInfo({
+              lock: CustomizedLock.Cheque,
+              type: '',
+              data: 'withdraw-able'
+            })
+          }
+        }
+        else {
+          cell.setCustomizedAssetInfo({
+            lock: CustomizedLock.SingleMultiSign,
+            type: '',
+            data: ''
+          })
+        }
         return cell
       });
 
