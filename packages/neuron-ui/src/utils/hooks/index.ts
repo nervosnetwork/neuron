@@ -14,7 +14,7 @@ import {
 import { epochParser, RoutePath, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
 import {
   validateTokenId,
-  validateSUDTAccountName,
+  validateAssetAccountName,
   validateSymbol,
   validateTokenName,
   validateDecimal,
@@ -243,7 +243,7 @@ export const useSUDTAccountInfoErrors = ({
     const dataToValidate = {
       accountName: {
         params: { name: accountName, exists: existingAccountNames },
-        validator: validateSUDTAccountName,
+        validator: validateAssetAccountName,
       },
       symbol: { params: { symbol, isCKB }, validator: validateSymbol },
       tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
