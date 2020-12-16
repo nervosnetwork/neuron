@@ -612,7 +612,7 @@
     "special-assets": {
       "title": "自定義資產",
       "date": "日期",
-      "capacity": "金額",
+      "asset": "資產",
       "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "未識別資產",
