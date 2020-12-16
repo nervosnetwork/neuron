@@ -2167,12 +2167,16 @@ describe('TransactionGenerator', () => {
         const senderDefaultLockOutput = tx.outputs.find(
           output => output.lockHash === senderDefaultLockInputEntity.lockHash
         )!
-        const capacityAfterFees = BigInt(chequeOutputEntity.capacity) - BigInt(tx.fee)
+        const capacityAfterFees = BigInt(chequeOutputEntity.capacity) + BigInt(toShannon('1000')) - BigInt(tx.fee)
         expect(senderDefaultLockOutput.capacity).toEqual(capacityAfterFees.toString())
       })
-      it('use 6 relative epoch in since', () => {
+      it('use 6 relative epoch in cheque input since', () => {
         const chequeInput = tx.inputs.find(input => input.lockHash === chequeOutputEntity.lockHash)!
         expect(chequeInput.toSDK().since).toEqual('0xa000000000000006')
+      })
+      it('first input should be with the sender default lock', () => {
+        const senderDefaultLockInput = tx.inputs[0]
+        expect(senderDefaultLockInput.lockHash!).toEqual(senderDefaultLockInputEntity.lockHash)
       })
     })
   })

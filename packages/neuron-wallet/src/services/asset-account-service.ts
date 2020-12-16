@@ -426,6 +426,23 @@ export default class AssetAccountService {
     )
 
     return {tx, assetAccount}
+  }
 
+  public static async generateWithdrawChequeTx(
+    chequeCellOutPoint: OutPoint,
+  ): Promise<Transaction> {
+
+    const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
+    if (!chequeLiveCell) {
+      throw new Error()
+    }
+
+    const tx = await TransactionGenerator.generateWithdrawChequeTx(
+      chequeLiveCell,
+      undefined,
+      '1000'
+    )
+
+    return tx
   }
 }

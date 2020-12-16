@@ -22,7 +22,7 @@ import SignMessageController from 'controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
-import AssetAccountController from './asset-account'
+import AssetAccountController, { GenerateWithdrawChequeTxParams, SendWithdrawChequeTxParams } from './asset-account'
 import {
   GenerateCreateAssetAccountTxParams,
   SendCreateAssetAccountTxParams,
@@ -446,6 +446,14 @@ export default class ApiController {
 
     handle('generate-claim-cheque-tx', async (_, params: GenerateClaimChequeTxParams) => {
       return this.assetAccountController.generateClaimChequeTx(params)
+    })
+
+    handle('generate-withdraw-cheque-tx', async (_, params: GenerateWithdrawChequeTxParams) => {
+      return this.assetAccountController.generateWithdrawChequeTx(params)
+    })
+
+    handle('send-withdraw-cheque-tx', async (_, params: SendWithdrawChequeTxParams) => {
+      return this.assetAccountController.sendWithdrawChequeTx(params)
     })
 
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {

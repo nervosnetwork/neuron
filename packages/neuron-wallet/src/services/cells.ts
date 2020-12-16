@@ -940,13 +940,31 @@ export default class CellsService {
     return inputs
   }
 
+  public static async searchLiveCellsByLockHash(lockHash: string) {
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`
+        output.status = :status AND
+        output.lockHash like :lockHash AND
+        hasData = false AND
+        typeHash is null
+      `, {
+        status: OutputStatus.Live,
+        lockHash: `%${lockHash}%`
+      })
+      .getMany()
+
+    return outputs
+  }
+
   public static async getOutputsByTransactionHash(hash: string) {
     const outputEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
         status: OutputStatus.Live,
-        transactionHash: hash
+        outPointTxHash: hash
       })
       .getMany()
 
