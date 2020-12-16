@@ -8,8 +8,6 @@ const props: {
   'Type and Data': {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: true,
-    hasData: true,
     status: 'locked-asset',
     isMainnet: true,
     outPoint: {
@@ -22,8 +20,6 @@ const props: {
   Type: {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: true,
-    hasData: false,
     status: 'locked-asset',
     isMainnet: true,
     outPoint: {
@@ -36,8 +32,6 @@ const props: {
   Data: {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: false,
-    hasData: true,
     status: 'locked-asset',
     isMainnet: true,
     outPoint: {
@@ -50,8 +44,6 @@ const props: {
   'User defined asset': {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: true,
-    hasData: false,
     status: 'user-defined-asset',
     isMainnet: true,
     outPoint: {
@@ -64,8 +56,6 @@ const props: {
   Locked: {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: true,
-    hasData: false,
     status: 'locked-asset',
     isMainnet: true,
     outPoint: {
@@ -78,8 +68,6 @@ const props: {
   Claim: {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: true,
-    hasData: false,
     status: 'claim-asset',
     isMainnet: true,
     outPoint: {
@@ -92,8 +80,6 @@ const props: {
   Offline: {
     datetime: new Date().getTime(),
     capacity: '123456789012345678',
-    hasTypeScript: true,
-    hasData: false,
     status: 'claim-asset',
     isMainnet: true,
     outPoint: {

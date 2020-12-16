@@ -190,8 +190,6 @@ const SpecialAssetList = () => {
           key={`${cell.outPoint.txHash}-${cell.outPoint.index}`}
           datetime={+cell.timestamp}
           capacity={cell.capacity}
-          hasTypeScript={!!cell.type}
-          hasData={cell.data !== '0x'}
           outPoint={cell.outPoint}
           isMainnet={isMainnet}
           status={status}
