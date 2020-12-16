@@ -32,4 +32,9 @@ export const checkMigrateAcp = remoteApi<Controller.CheckMigrateAcp.Params, Cont
   'check-migrate-acp'
 )
 
+export const generateChequeTransaction = remoteApi<
+  Controller.CreateChequeTransaction.Params,
+  Controller.CreateChequeTransaction.Response
+>('generate-create-cheque-tx')
+
 export const migrateAcp = remoteApi<Controller.MigrateAcp.Params>('migrate-acp')

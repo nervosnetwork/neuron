@@ -15,6 +15,7 @@ import {
   generateSUDTTransaction,
   generateSendAllSUDTTransaction,
   getAnyoneCanPayScript,
+  generateChequeTransaction,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
@@ -27,6 +28,7 @@ import {
   sudtAmountToValue,
   localNumberFormatter,
   RoutePath,
+  AccountType,
   CONSTANTS,
   isSuccessResponse,
 } from 'utils'
@@ -102,6 +104,7 @@ const SUDTSend = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const accountType = accountInfo?.tokenId === 'CKBytes' ? AccountType.CKB : AccountType.SUDT
   const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)}` : '0'
 
   useEffect(() => {
@@ -159,6 +162,7 @@ const SUDTSend = () => {
         codeHash: anyoneCanPayScript?.codeHash ?? '',
         isMainnet,
         required: false,
+        type: accountType,
       })
     } catch (err) {
       errMap.address = t(err.message, err.i18n)
@@ -174,7 +178,7 @@ const SUDTSend = () => {
       errMap.amount = t(err.message, err.i18n)
     }
     return errMap
-  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t])
+  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, accountType])
 
   const isFormReady =
     !isSending &&
@@ -228,7 +232,13 @@ const SUDTSend = () => {
         feeRate: sendState.price,
         description: sendState.description,
       }
-      const generator = sendState.sendAll ? generateSendAllSUDTTransaction : generateSUDTTransaction
+      let generator = generateSUDTTransaction
+      if (isSecp256k1ShortAddress) {
+        // TODO: send all to cheque
+        generator = sendState.sendAll ? generateChequeTransaction : generateChequeTransaction
+      } else if (sendState.sendAll) {
+        generator = generateSendAllSUDTTransaction
+      }
       generator(params)
         .then(res => {
           if (isSuccessResponse(res)) {
@@ -255,6 +265,7 @@ const SUDTSend = () => {
     setRemoteError,
     accountInfo,
     timerRef,
+    isSecp256k1ShortAddress,
   ])
 
   useEffect(() => {
@@ -355,7 +366,7 @@ const SUDTSend = () => {
                   error={errors[field.key]}
                   className={styles[field.key]}
                   hint={
-                    field.key === Fields.Address && isSecp256k1ShortAddress
+                    field.key === Fields.Address && isSecp256k1ShortAddress && accountType === AccountType.SUDT
                       ? t('s-udt.send.cheque-address-hint')
                       : undefined
                   }

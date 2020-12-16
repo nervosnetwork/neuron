@@ -102,6 +102,7 @@ type Action =
   | 'get-token-info-list'
   | 'migrate-acp'
   | 'check-migrate-acp'
+  | 'generate-create-cheque-tx'
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'

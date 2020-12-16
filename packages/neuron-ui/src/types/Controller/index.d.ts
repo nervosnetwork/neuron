@@ -311,4 +311,17 @@ declare namespace Controller {
     }
     type Response = boolean
   }
+
+  namespace CreateChequeTransaction {
+    type SerializedTx = string
+    interface Params {
+      walletID: string
+      assetAccountID: string
+      address: string
+      amount: string
+      feeRate: string
+    }
+
+    type Response = SerializedTx
+  }
 }
