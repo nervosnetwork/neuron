@@ -11,8 +11,6 @@ const MS_PER_EPOCHS = 4 * 60 * 60 * 1000
 export interface SpecialAssetProps {
   datetime: number
   capacity: string
-  hasTypeScript: boolean
-  hasData: boolean
   status: 'user-defined-asset' | 'locked-asset' | 'claim-asset'
   isMainnet: boolean
   outPoint: {
@@ -31,8 +29,6 @@ export interface SpecialAssetProps {
 const SpecialAsset = ({
   datetime,
   capacity,
-  hasTypeScript,
-  hasData,
   status,
   isMainnet,
   outPoint: { txHash, index },
@@ -62,14 +58,6 @@ const SpecialAsset = ({
       <CopyZone className={styles.capacity} content={shannonToCKBFormatter(capacity, false, '')}>
         {`${shannonToCKBFormatter(capacity)} CKB`}
       </CopyZone>
-      <div className={styles.indicators}>
-        <div data-on={hasTypeScript} data-tooltip="Type">
-          T
-        </div>
-        <div data-on={hasData} data-tooltip="Data">
-          D
-        </div>
-      </div>
       <div className={styles.actions}>
         <Button
           data-tx-hash={txHash}
