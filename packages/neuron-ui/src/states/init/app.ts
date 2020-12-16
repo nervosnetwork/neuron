@@ -46,6 +46,7 @@ export const appState: Readonly<State.App> = {
   showTopAlert: false,
   showAllNotifications: false,
   isAllowedToFetchList: true,
+  loadedTransaction: null,
 }
 
 export default appState

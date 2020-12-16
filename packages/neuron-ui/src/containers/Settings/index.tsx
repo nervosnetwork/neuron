@@ -8,6 +8,7 @@ import WalletEditor from 'components/WalletEditor'
 import WalletWizard from 'components/WalletWizard'
 import ImportKeystore from 'components/ImportKeystore'
 import PasswordRequest from 'components/PasswordRequest'
+import ImportHardware from 'components/ImportHardware'
 
 import { useDispatch, NeuronWalletActions, AppActions } from 'states'
 
@@ -27,6 +28,7 @@ export const settingContents: CustomRouter.Route[] = [
   { name: `WalletWizard`, path: RoutePath.WalletWizard, exact: false, component: WalletWizard },
   { name: `ImportKeystore`, path: RoutePath.ImportKeystore, exact: false, component: ImportKeystore },
   { name: `PasswordRequest`, path: '/', exact: false, component: PasswordRequest },
+  { name: `ImportHardware`, path: RoutePath.ImportHardware, exact: false, component: ImportHardware },
 ]
 
 const Settings = () => {

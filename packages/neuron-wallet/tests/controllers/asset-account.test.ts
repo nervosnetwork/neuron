@@ -1,7 +1,6 @@
 
 import {SyncStatus} from '../../src/controllers/sync-api'
 
-const stubbedSyncApiControllerConstructor = jest.fn()
 const stubbedGetSyncStatus = jest.fn()
 const stubbedGetAllWindows = jest.fn()
 const stubbedGetFocusedWindow = jest.fn()
@@ -45,11 +44,11 @@ describe('AssetAccountController', () => {
 
   jest.doMock('../../src/controllers/sync-api', () => ({
     __esModule: true,
-    default: stubbedSyncApiControllerConstructor.mockImplementation(
-      () => ({
-        getSyncStatus: stubbedGetSyncStatus,
-      })
-    ),
+    default: {
+      getInstance: () => ({
+        getSyncStatus: stubbedGetSyncStatus
+      }),
+    },
     SyncStatus: SyncStatus
   }));
 

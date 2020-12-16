@@ -29,6 +29,7 @@ declare namespace Controller {
     password?: string
     newPassword?: string
     name?: string
+    device?: any
   }
 
   interface RequestPasswordParams {
@@ -51,7 +52,7 @@ declare namespace Controller {
   interface SendTransactionParams {
     walletID: string
     tx: string
-    password: string
+    password?: string
     description?: string
   }
 
@@ -226,7 +227,7 @@ declare namespace Controller {
       walletID: string
       assetAccount: Pick<SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
       tx: any
-      password: string
+      password?: string
     }
   }
 
@@ -271,7 +272,7 @@ declare namespace Controller {
     interface Params {
       walletID: string
       tx: any
-      password: string
+      password?: string
     }
     type Response = Hash
   }

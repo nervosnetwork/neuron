@@ -24,6 +24,7 @@ export default {
         'import-mnemonic': '導入助記詞',
         'import-keystore': '導入 Keystore 檔案',
         'import-xpubkey': '導入 Extended Public Key',
+        "import-hardware": "導入硬體錢包"
       },
       edit: {
         label: '編輯',
@@ -35,6 +36,7 @@ export default {
       tools: {
         label: "工具",
         "sign-and-verify": "簽名/驗簽信息",
+        "offline-sign": "離線簽名",
       },
       window: {
         label: '視窗',
@@ -100,7 +102,10 @@ export default {
       'mainnet-address-required': '{{address}} 不是主網地址。',
       'testnet-address-required': '{{address}} 不是測試網地址。',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
-      'acp-same-account': "The payment account and receive account shouldn't be the same."
+      'acp-same-account': "The payment account and receive account shouldn't be the same.",
+      "connect-device-failed": "設備無法連接，請檢查設備連接狀況。",
+      "save-offline-json-failed": "無法保存 JSON 文件。",
+      "offline-sign-failed": "簽名失敗，請檢查是否使用了正確的錢包進行簽名。",
     },
     messageBox: {
       button: {
@@ -201,6 +206,11 @@ export default {
         "send": "轉賬",
         "receive": "收款"
       }
+    },
+    'offline-signature': {
+      'export-transaction': '導出交易為 JSON 檔案',
+      'transaction-exported': '交易已被導出至 {{filePath}}.',
+      'load-transaction': '加載交易檔案',
     }
   },
 }

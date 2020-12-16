@@ -39,7 +39,7 @@ export interface DAORecordProps extends State.NervosDAORecord {
   onClick: React.EventHandler<React.MouseEvent> // on action button click
   onToggle: () => void
   isCollapsed?: boolean
-  tipBlockTimestamp: number // tip block timestamp, used to calculate apc
+  tipBlockTimestamp: number // tip block timestamp, used to calculate apc, dovetails with current epoch
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc
 }
 
@@ -240,8 +240,6 @@ export const DAORecord = ({
     )
   }
 
-  const amount = shannonToCKBFormatter(capacity)
-
   return (
     <div className={styles.container} data-is-collapsed={isCollapsed}>
       <div className={styles.badge}>{badge}</div>
@@ -260,7 +258,9 @@ export const DAORecord = ({
         </span>
       </div>
 
-      <CopyZone className={styles.amount} content={amount.replace(/,/g, '')}>{`${amount} CKB`}</CopyZone>
+      <CopyZone className={styles.amount} content={shannonToCKBFormatter(capacity, false, '')}>
+        {`${shannonToCKBFormatter(capacity)} CKB`}
+      </CopyZone>
       {progressOrPeriod}
 
       <div className={styles.apc}>

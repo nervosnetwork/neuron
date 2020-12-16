@@ -1,15 +1,18 @@
 import { BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { debounceTime, sampleTime } from 'rxjs/operators'
+import { debounceTime } from 'rxjs/operators'
 
 import CommandSubject from 'models/subjects/command'
 import DataUpdateSubject from 'models/subjects/data-update'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
-import SyncedBlockNumberSubject, { ConnectionStatusSubject } from 'models/subjects/node'
+import { ConnectionStatusSubject } from 'models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import AppUpdaterSubject from 'models/subjects/app-updater'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
+import SyncStateSubject from 'models/subjects/sync-state-subject'
+import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
+import SyncApiController from 'controllers/sync-api'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -31,10 +34,15 @@ export const subscribe = (dispatcher: AppResponder) => {
     dispatcher.sendMessage('connection-status-updated', params)
   })
 
-  SyncedBlockNumberSubject.getSubject().pipe(sampleTime(1000)).subscribe(params => {
-    dispatcher.sendMessage('synced-block-number-updated', params)
+  SyncStateSubject.pipe(debounceTime(50)).subscribe(estimation => {
+    const cachedEstimation = SyncApiController.getInstance().getCachedEstimation()
+    if (cachedEstimation) {
+      estimation.estimate = cachedEstimation.estimate
+    }
+    dispatcher.sendMessage('sync-estimate-updated', estimation)
+    // dispatcher.sendMessage('synced-block-number-updated', params)
 
-    dispatcher.runCommand('migrate-acp', params)
+    dispatcher.runCommand('migrate-acp', '')
   })
 
   CommandSubject.subscribe(params => {
@@ -61,6 +69,10 @@ export const subscribe = (dispatcher: AppResponder) => {
       dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
     dispatcher.updateWindowTitle()
+  })
+
+  DeviceSignIndexSubject.subscribe(index => {
+    dispatcher.sendMessage('device-sign-index', index)
   })
 
   AppUpdaterSubject.subscribe(params => {

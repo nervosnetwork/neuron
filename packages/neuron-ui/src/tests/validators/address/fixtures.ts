@@ -43,6 +43,13 @@ export default {
     },
     exception: null,
   },
+  "Should pass when it's an acp short address": {
+    params: {
+      address: 'ckt1qypgzvf2uphwkpgykum7d0862wtmuddf9r0qnzefn9',
+      isMainnet: false,
+    },
+    exception: null,
+  },
   "Should pass when it's a full address": {
     params: {
       address: 'ckb1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xw3vumhs9nvu786dj9p0q5elx66t24n3kxgj53qks',

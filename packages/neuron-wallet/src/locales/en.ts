@@ -24,6 +24,7 @@ export default {
         'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
         'import-xpubkey': 'Import Extended Public Key',
+        "import-hardware": "Import Hardware Wallet"
       },
       edit: {
         label: 'Edit',
@@ -35,6 +36,7 @@ export default {
       tools: {
         label: "Tools",
         "sign-and-verify": "Sign/Verify Message",
+        'offline-sign': 'Offline sign',
       },
       window: {
         label: 'Window',
@@ -102,7 +104,13 @@ export default {
       'testnet-address-required': '{{address}} is not a testnet address.',
       'address-not-found': 'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
-      'acp-same-account': "The payment account and receive account shouldn't be the same."
+      'acp-same-account': "The payment account and receive account shouldn't be the same.",
+      "connect-device-failed": "The device cannot be connected, please check your connection.",
+      "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
+      "wallet-not-supported-function": "This wallet does not support {name} function.",
+      "invalid-transaction-file": "Invalid transaction file.",
+      "save-offline-json-failed": "Unable to save JSON file.",
+      "offline-sign-failed": "Signing failed, please check if you are signing with the correct wallet.",
     },
     messageBox: {
       button: {
@@ -203,6 +211,11 @@ export default {
         "send": "Send",
         "receive": "Receive"
       }
+    },
+    'offline-signature': {
+      'export-transaction': 'Export Transaction as JSON',
+      'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
+      'load-transaction': 'Load Transaction file',
     }
   },
 }

@@ -123,10 +123,10 @@ export default class AssetAccountController {
     }
   }
 
-  public async sendCreateTx(params: SendCreateAssetAccountTxParams): Promise<Controller.Response<string>> {
+  public async sendCreateTx(params: SendCreateAssetAccountTxParams, skipSign = false): Promise<Controller.Response<string>> {
     const tx = Transaction.fromObject(params.tx)
     const assetAccount = AssetAccount.fromObject(params.assetAccount)
-    const txHash = await AssetAccountService.sendTx(params.walletID, assetAccount, tx, params.password)
+    const txHash = await AssetAccountService.sendTx(params.walletID, assetAccount, tx, params.password, skipSign)
 
     if (!txHash) {
       throw new ServiceHasNoResponse('AssetAccount')
@@ -181,7 +181,12 @@ export default class AssetAccountController {
   public async showACPMigrationDialog(allowMultipleOpen: boolean | undefined): Promise<Controller.Response<boolean | undefined>> {
     const walletsService = WalletsService.getInstance()
     const currentWallet = walletsService.getCurrent()
-    const walletId = currentWallet!.id;
+    if (!currentWallet) {
+      return {
+        status: ResponseCode.Success
+      }
+    }
+    const walletId = currentWallet.id;
 
     if (!allowMultipleOpen && this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
       return {
@@ -189,7 +194,8 @@ export default class AssetAccountController {
       }
     }
 
-    const syncStatus = await new SyncApiController().getSyncStatus()
+    const syncStatus = await SyncApiController.getInstance().getSyncStatus()
+
     if (syncStatus !== SyncStatus.SyncCompleted || BrowserWindow.getAllWindows().length !== 1) {
       return {
         status: ResponseCode.Success

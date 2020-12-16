@@ -25,9 +25,73 @@
     },
     "network-status": {
       "tooltip": {
-        "block-number": "Block Number",
-        "tip-block": "Tip Block",
-        "synced": "Synced"
+        "block-synced": "Block Synced"
+      }
+    },
+    "import-hardware": {
+      "title": {
+        "select-model": "Please connect your device and select the model",
+        "detect-device": "Detecting device",
+        "name-wallet": "Name the wallet",
+        "choose-address": "Choose an address from the device"
+      },
+      "actions": {
+        "confirm": "Please comfirm on your device...",
+        "success": "Import Success!",
+        "next": "Next",
+        "cancel": "Cancel",
+        "back": "Back",
+        "rescan": "Rescan",
+        "close": "close"
+      },
+      "errors": {
+        "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
+        "device-not-found": "No device detected. Please connect your device.",
+        "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
+      },
+      "waiting": "Waiting for CKB app...",
+      "abort": "Waiting for CKB app... Action aborted.",
+      "app-version": "CKB App v{{version}} running.",
+      "firmware-version": "Firmware v{{version}} detected.",
+      "wallet-name": "Wallet Name",
+      "select-model": "Select Model"
+    },
+    "hardware-sign": {
+      "cancel": "Cancel",
+      "title": "Sign via hardware walllet",
+      "device": "Device:",
+      "status": {
+        "label": "Status:",
+        "connect": "Connected, ready for signing.",
+        "user-input": "Connected, waiting for user input...",
+        "disconnect": "Disconnected, please check your connection."
+      },
+      "inputs": "Inputs(signing {{index}} of {{length}})",
+      "outputs": "Outputs({{length}})",
+      "actions": {
+        "close": "Close",
+        "success": "Transaction Succesful!",
+        "rescan": "Rescan"
+      }
+    },
+    "offline-sign": {
+      "title": "Offline Sign",
+      "json-file": "JSON file:",
+      "status": {
+        "label": "Status:",
+        "unsigned": "Unsigned",
+        "partially-signed": "Partially Signed",
+        "signed": "Signed"
+      },
+      "wallet": "Wallet:",
+      "content": "Content:",
+      "export": "Export Tx",
+      "sign-and-export": "Sign and export",
+      "sign-and-broadcast": "Sign and broadcast",
+      "actions": {
+        "broadcast": "Broadcast",
+        "sign": "Sign and export",
+        "cancel": "Cancel"
       }
     },
     "overview": {
@@ -63,6 +127,11 @@
       "import-mnemonic": "Import Wallet Seed",
       "import-keystore": "Import from Keystore",
       "import-wallet": "Import a Wallet",
+      "import-hardware-wallet": "Import Hardware Wallet",
+      "new-wallet": "New Wallet",
+      "wallet-seed": "Wallet Seed",
+      "keystore": "Keystore",
+      "hardware-wallet": "Hardware Wallet",
       "next": "Next",
       "back": "Back",
       "name": "Name",
@@ -296,6 +365,9 @@
       "send-sudt": {
         "title": "Send sUDT"
       },
+      "send-acp": {
+        "title": "Send CKB"
+      },
       "migrate-acp": {
         "title": "Upgrade Asset Accounts"
       }
@@ -350,7 +422,6 @@
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "no-valid-addresses-found": "No valid addresses found",
-      "full-addr-info": "Additional software or dApp interface might be required to operate the assets on this address. Please double check its validity.",
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
@@ -411,12 +482,15 @@
         "306": "Please enter a mainnet address",
         "307": "Please enter a testnet address",
         "308": "Amount is not enough",
-        "309": "The receiver needs to upgrade her account address to accept more transfer."
+        "309": "The receiver needs to upgrade her account address to accept more transfer.",
+        "402": "CKB App does not open. Please open the CKB App on your device.",
+        "403": "No device detected. Please connect your device.",
+        "404": "Multiple device detected. Only one device of the same model can be connected."
       }
     },
     "sync": {
       "synced": "Synced",
-      "syncing": "Synchronizing",
+      "syncing": "Syncing, ~{{ leftTime }} left",
       "block-number": "block number",
       "syncing-balance": "Balance is updating",
       "slow": "Sync is slow",

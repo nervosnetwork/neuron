@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
-import { useDialog, ErrorCode, RoutePath, isSuccessResponse } from 'utils'
+import HardwareSign from 'components/HardwareSign'
+import { useDialog, ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
   useState as useGlobalState,
@@ -17,7 +18,9 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
+import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType, signAndExportTransaction } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
+import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = () => {
@@ -30,6 +33,7 @@ const PasswordRequest = () => {
     settings: { wallets = [] },
     experimental,
   } = useGlobalState()
+
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
@@ -48,11 +52,40 @@ const PasswordRequest = () => {
       type: AppActions.DismissPasswordRequest,
     })
   }, [dispatch])
+
+  const signType = useMemo(() => {
+    switch (actionType) {
+      case 'create-sudt-account':
+        return OfflineSignType.CreateSUDTAccount
+      case 'send-acp':
+      case 'send-sudt':
+        return OfflineSignType.SendSUDT
+      case 'unlock':
+        return OfflineSignType.UnlockDAO
+      case 'send':
+        return OfflineSignType.Regular
+      default:
+        return OfflineSignType.Invalid
+    }
+  }, [actionType])
+
+  const exportTransaction = useCallback(async () => {
+    onDismiss()
+    await exportTransactionAsJSON({
+      transaction: generatedTx || experimental?.tx,
+      status: OfflineSignStatus.Unsigned,
+      type: signType,
+      description,
+      asset_account: experimental?.assetAccount,
+    })
+  }, [signType, generatedTx, onDismiss, description, experimental])
+
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const isLoading = ['send', 'unlock', 'create-sudt-account', 'send-sudt'].includes(actionType || '') && isSending
+  const isLoading =
+    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp'].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -69,7 +102,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
@@ -108,7 +141,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, password })(dispatch).then(status => {
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 dispatch({
                   type: AppActions.SetGlobalDialog,
@@ -127,7 +160,7 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendCreateSUDTAccountTransaction(params)(dispatch).then(status => {
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
@@ -136,13 +169,14 @@ const PasswordRequest = () => {
             })
             break
           }
+          case 'send-acp':
           case 'send-sudt': {
             const params: Controller.SendSUDTTransaction.Params = {
               walletID,
               tx: experimental?.tx,
               password,
             }
-            await sendSUDTTransaction(params)(dispatch).then(status => {
+            await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
@@ -186,15 +220,72 @@ const PasswordRequest = () => {
     [setPassword, setError]
   )
 
+  const signAndExportFromGenerateTx = useCallback(async () => {
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: {
+        sending: true,
+      },
+    })
+    const json = {
+      transaction: generatedTx || experimental?.tx,
+      status: OfflineSignStatus.Signed,
+      type: signType,
+      description,
+      asset_account: experimental?.assetAccount,
+    }
+    const res = await signAndExportTransaction({
+      ...json,
+      walletID,
+      password,
+    })
+    if (!isSuccessResponse(res)) {
+      dispatch({
+        type: AppActions.UpdateLoadings,
+        payload: { sending: false },
+      })
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    dispatch({
+      type: AppActions.UpdateLoadedTransaction,
+      payload: res.result!,
+    })
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: { sending: false },
+    })
+    onDismiss()
+  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID])
+
+  const dropdownList = [
+    {
+      text: t('offline-sign.sign-and-export'),
+      onClick: signAndExportFromGenerateTx,
+    },
+  ]
+
   if (!wallet) {
     return null
+  }
+
+  if (wallet.device) {
+    return (
+      <HardwareSign
+        signType="transaction"
+        history={history}
+        wallet={wallet}
+        onDismiss={onDismiss}
+        offlineSignType={signType}
+      />
+    )
   }
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {['unlock', 'create-sudt-account', 'send-sudt', 'migrate-acp'].includes(actionType ?? '') ? null : (
+        {['unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'migrate-acp'].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
         <TextField
@@ -210,10 +301,22 @@ const PasswordRequest = () => {
           error={error}
         />
         <div className={styles.footer}>
-          <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-          <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-            {isLoading ? <Spinner /> : (t('common.confirm') as string)}
-          </Button>
+          {signType !== OfflineSignType.Invalid ? (
+            <div className={styles.left}>
+              <DropdownButton
+                mainBtnLabel={t('offline-sign.export')}
+                mainBtnOnClick={exportTransaction}
+                mainBtnDisabled={isLoading}
+                list={dropdownList}
+              />
+            </div>
+          ) : null}
+          <div className={styles.right}>
+            <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
+            <Button label={t('common.confirm')} type="submit" disabled={disabled}>
+              {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+            </Button>
+          </div>
         </div>
       </form>
     </dialog>
