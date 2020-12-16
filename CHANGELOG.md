@@ -1,4 +1,4 @@
-# 0.34.0 (2020-12-12)
+# 0.34.0 (2020-12-16)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
 
@@ -6,11 +6,10 @@
 
 * Support acp short address generation and parsing.
 * Support transfer to PW lock full address.
-* Support hardware wallet of Ledger (not available in production for now).
 * Support generating and signing offline transaction.
 * Support broadcasting the signed offline transaction.
 * Display network type in the navbar.
-* Display progress and left time for sync.
+* Display progress and estimation for synchronization.
 * Minor UX changes to `Asset Accounts`.
 
 ### Bug fix
