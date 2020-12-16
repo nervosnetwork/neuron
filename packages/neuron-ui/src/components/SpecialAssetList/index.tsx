@@ -170,7 +170,7 @@ const SpecialAssetList = () => {
       let status: SpecialAssetProps['status'] = 'user-defined-asset'
       let epochInfo: { target: number; current: number } | undefined
       if (cell.customizedAssetInfo.lock === PresetScript.Locktime) {
-        const targetEpochInfo = epochParser(ckbCore.utils.toHexInLittleEndian(`0x${cell.lock.args.slice(-16)}`))
+        const targetEpochInfo = epochParser(ckbCore.utils.toUint64Le(`0x${cell.lock.args.slice(-16)}`))
         const currentEpochInfo = epochParser(epoch)
         const targetEpochFraction =
           Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
