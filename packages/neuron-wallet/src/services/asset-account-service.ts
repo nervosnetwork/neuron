@@ -358,7 +358,6 @@ export default class AssetAccountService {
     fee: string,
     feeRate: string,
   ) {
-    console.log(accountId)
     const assetAccount = await this.getAccount({walletID, id: accountId})
     if (!assetAccount) {
       throw new Error('Asset Account not found')
@@ -402,7 +401,9 @@ export default class AssetAccountService {
     const tx = await TransactionGenerator.generateClaimChequeTx(
       walletID,
       chequeLiveCell,
-      changeAddrObj!.address
+      changeAddrObj!.address,
+      undefined,
+      '1000'
     )
 
     const hasAssetAccount = !!tx.inputs.find(

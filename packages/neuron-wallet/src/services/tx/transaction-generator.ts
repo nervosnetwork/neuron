@@ -959,7 +959,13 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateClaimChequeTx(walletId: string, chequeCell: Output, changeAddress: string) {
+  public static async generateClaimChequeTx(
+    walletId: string,
+    chequeCell: Output,
+    changeAddress: string,
+    fee: string = '0',
+    feeRate: string = '0',
+  ) {
     const receiverLockArgs = chequeCell.lock.args.slice(0, 42)
     const senderLockHash = '0x' + chequeCell.lock.args.slice(42)
 
@@ -1055,8 +1061,8 @@ export class TransactionGenerator {
     } = await CellsService.gatherInputs(
       acpCellCapacity.toString(),
       walletId,
-      undefined,
-      '1000',
+      fee,
+      feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,

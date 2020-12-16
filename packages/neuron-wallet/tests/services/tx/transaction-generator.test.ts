@@ -2044,7 +2044,9 @@ describe('TransactionGenerator', () => {
           tx = await TransactionGenerator.generateClaimChequeTx(
             walletId1,
             expectedChequeOutput,
-            alice.address
+            alice.address,
+            undefined,
+            '1000'
           )
         });
         it('uses the existing acp cell to hold the claimed sudt amount', () => {
