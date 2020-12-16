@@ -104,7 +104,7 @@ const SUDTSend = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const isMainnet = isMainnetUtil(networks, networkID)
-  const accountType = accountInfo?.tokenId === 'CKBytes' ? AccountType.CKB : AccountType.SUDT
+  const accountType = accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? AccountType.CKB : AccountType.SUDT
   const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)}` : '0'
 
   useEffect(() => {
@@ -310,16 +310,22 @@ const SUDTSend = () => {
       e.preventDefault()
       e.stopPropagation()
       if (isSubmittable) {
+        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' = 'send-sudt'
+        if (accountType === AccountType.CKB) {
+          actionType = 'send-acp'
+        } else if (isSecp256k1ShortAddress) {
+          actionType = 'send-cheque'
+        }
         globalDispatch({
           type: AppActions.RequestPassword,
           payload: {
             walletID: walletId as string,
-            actionType: accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? 'send-acp' : 'send-sudt',
+            actionType,
           },
         })
       }
     },
-    [isSubmittable, globalDispatch, walletId, accountInfo]
+    [isSubmittable, globalDispatch, walletId, accountType, isSecp256k1ShortAddress]
   )
 
   if (!isLoaded) {

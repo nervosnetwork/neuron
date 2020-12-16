@@ -85,7 +85,8 @@ const PasswordRequest = () => {
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
   const isLoading =
-    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp'].includes(actionType || '') && isSending
+    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'send-cheque'].includes(actionType || '') &&
+    isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -183,6 +184,21 @@ const PasswordRequest = () => {
                 throw new PasswordIncorrectException()
               }
             })
+            break
+          }
+          case 'send-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: experimental?.tx, description, password })(dispatch).then(
+              ({ status }) => {
+                if (isSuccessResponse({ status })) {
+                  history.push(RoutePath.History)
+                } else if (status === ErrorCode.PasswordIncorrect) {
+                  throw new PasswordIncorrectException()
+                }
+              }
+            )
             break
           }
           default: {
@@ -285,7 +301,9 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {['unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'migrate-acp'].includes(actionType ?? '') ? null : (
+        {['unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'send-cheque', 'migrate-acp'].includes(
+          actionType ?? ''
+        ) ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
         <TextField
