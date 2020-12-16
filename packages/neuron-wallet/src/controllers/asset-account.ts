@@ -278,7 +278,7 @@ export default class AssetAccountController {
   }
 
   public async generateCreateChequeTx(params: GenerateCreateChequeTxParams):
-  Promise<Controller.Response<{tx: Transaction}>> {
+  Promise<Controller.Response<Transaction>> {
     const tx = await AssetAccountService.generateCreateChequeTx(
       params.walletID,
       params.assetAccountID,
@@ -289,7 +289,7 @@ export default class AssetAccountController {
     )
     return {
       status: ResponseCode.Success,
-      result: {tx},
+      result: tx,
     }
   }
 
