@@ -129,6 +129,9 @@ stages:
     pool:
       vmImage: 'ubuntu-18.04'
     steps:
+    - script: |
+        apt-get install -y libudev-dev
+      name: libudev-dev
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
