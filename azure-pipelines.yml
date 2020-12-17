@@ -84,7 +84,7 @@ stages:
 
 - stage: release
   displayName: Release Binaries
-  condition: startsWith(variables['build.sourceBranch'], 'refs/heads/rc')
+  condition: startsWith(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: release_mac
     displayName: Release macOS
@@ -142,13 +142,6 @@ stages:
     pool:
       vmImage: 'vs2017-win2016'
     steps:
-    - script: |
-        yarn add @abandonware/bluetooth-hci-socket@0.5.3-5 --ignore-workspace-root-check
-      name: InstallBluetoothDep
-    - task: NodeTool@0
-      inputs:
-        versionSpec: 12.x
-      displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |
