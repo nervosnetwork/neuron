@@ -69,7 +69,7 @@ const SpecialAsset = ({
   const [t] = useTranslation()
   const [date, time] = uniformTimeFormatter(datetime).split(' ')
   let targetTime: undefined | number
-  let status: 'user-defined-asset' | 'locked-asset' | 'claim-asset' = 'user-defined-asset'
+  let status: 'user-defined-asset' | 'locked-asset' | 'claim-asset' | 'withdraw-asset' = 'user-defined-asset'
   let epochsInfo: Record<'target' | 'current', number> | undefined
   let amount = `${shannonToCKBFormatter(capacity)} CKB`
   let amountToCopy = shannonToCKBFormatter(capacity, false, '')
@@ -93,7 +93,7 @@ const SpecialAsset = ({
       break
     }
     case PresetScript.Cheque: {
-      status = 'claim-asset'
+      status = (assetInfo as ChequeAssetInfo).data === 'claimable' ? 'claim-asset' : 'withdraw-asset'
 
       try {
         const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
@@ -139,12 +139,16 @@ const SpecialAsset = ({
             ['user-defined-asset', 'locked-asset'].includes(status) || connectionStatus === ConnectionStatus.Offline
           }
           className={['user-defined-asset', 'locked-asset'].includes(status) ? styles.hasTooltip : ''}
-          data-tooltip={t(`special-assets.${status}-tooltip`, {
-            epochs: epochsInfo?.target.toFixed(2),
-            year: targetTime ? new Date(targetTime).getFullYear() : '',
-            month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
-            day: targetTime ? new Date(targetTime).getDate() : '',
-          })}
+          data-tooltip={
+            assetInfo.lock === PresetScript.Cheque
+              ? null
+              : t(`special-assets.${status}-tooltip`, {
+                  epochs: epochsInfo?.target.toFixed(2),
+                  year: targetTime ? new Date(targetTime).getFullYear() : '',
+                  month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                  day: targetTime ? new Date(targetTime).getDate() : '',
+                })
+          }
         />
         <Button
           type="default"
