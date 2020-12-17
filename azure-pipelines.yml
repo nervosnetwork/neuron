@@ -75,7 +75,7 @@ stages:
           node_version: 12.x
     steps:
     - script: |
-        yarn add @abandonware/bluetooth-hci-socket@0.5.3-5
+        yarn add @abandonware/bluetooth-hci-socket@0.5.3-5 -W
       name: InstallBluetoothDep
     - task: NodeTool@0
       inputs:
@@ -154,7 +154,7 @@ stages:
       vmImage: 'vs2017-win2016'
     steps:
     - script: |
-        yarn add @abandonware/bluetooth-hci-socket@0.5.3-5
+        yarn add @abandonware/bluetooth-hci-socket@0.5.3-5 -W
       name: InstallBluetoothDep
     - task: NodeTool@0
       inputs:
