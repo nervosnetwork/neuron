@@ -95,7 +95,7 @@ stages:
 
 - stage: release
   displayName: Release Binaries
-  condition: startsWith(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: startsWith(variables['build.sourceBranch'], 'refs/heads/rc')
   jobs:
   - job: release_mac
     displayName: Release macOS
