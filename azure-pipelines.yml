@@ -103,10 +103,6 @@ stages:
     pool:
       vmImage: 'macos-10.14'
     steps:
-    - script: |
-        npm i --global --production windows-build-tools
-        npm i --verbose @abandonware/bluetooth-hci-socket
-      name: installBluetoothHciScoket
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
@@ -158,6 +154,10 @@ stages:
     pool:
       vmImage: 'vs2017-win2016'
     steps:
+    - script: |
+        npm i --global --production windows-build-tools
+        npm i --verbose @abandonware/bluetooth-hci-socket
+      name: installBluetoothHciScoket
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
