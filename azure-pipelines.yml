@@ -76,7 +76,7 @@ stages:
     steps:
     - script: |
         npm i --verbose @abandonware/bluetooth-hci-socket
-      name: installBluetoothHciScoket
+      name: preinstall bluetooth-hci-socket
     - task: NodeTool@0
       inputs:
         versionSpec: $(node_version)
@@ -154,9 +154,8 @@ stages:
       vmImage: 'vs2017-win2016'
     steps:
     - script: |
-        yarn global add --production windows-build-tools
-        yarn global add --verbose @abandonware/bluetooth-hci-socket
-      name: installBluetoothHciScoket
+        npm i --verbose @abandonware/bluetooth-hci-socket
+      name: preinstall bluetooth-hci-socket
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
