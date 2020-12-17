@@ -69,7 +69,15 @@ stages:
     displayName: Windows
     pool:
       vmImage: 'vs2017-win2016'
+    strategy:
+      matrix:
+        node_11_x:
+          node_version: 11.x
     steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: $(node_version)
+      displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |
@@ -142,6 +150,10 @@ stages:
     pool:
       vmImage: 'vs2017-win2016'
     steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: 11.x
+      displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |
