@@ -76,7 +76,7 @@ stages:
     steps:
     - script: |
         npm i --verbose @abandonware/bluetooth-hci-socket
-      name: preinstall bluetooth_hci_socket
+      name: InstallBluetoothDep
     - task: NodeTool@0
       inputs:
         versionSpec: $(node_version)
@@ -155,7 +155,7 @@ stages:
     steps:
     - script: |
         npm i --verbose @abandonware/bluetooth-hci-socket
-      name: preinstall bluetooth_hci_socket
+      name: InstallBluetoothDep
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
