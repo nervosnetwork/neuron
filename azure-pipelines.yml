@@ -51,7 +51,7 @@ stages:
           node_version: 12.x
     steps:
     - script: |
-        apt-get install -y libudev-dev
+        sudo apt-get install -y libudev-dev
       name: libudev
     - task: NodeTool@0
       inputs:
@@ -133,7 +133,7 @@ stages:
       vmImage: 'ubuntu-18.04'
     steps:
     - script: |
-        apt-get install -y libudev-dev
+        sudo apt-get install -y libudev-dev
       name: libudev
     - task: NodeTool@0
       inputs:
