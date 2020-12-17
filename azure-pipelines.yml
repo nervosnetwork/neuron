@@ -50,9 +50,6 @@ stages:
         node_12_x:
           node_version: 12.x
     steps:
-    - script: |
-        sudo apt-get install -y libudev-dev
-      name: libudev
     - task: NodeTool@0
       inputs:
         versionSpec: $(node_version)
@@ -77,6 +74,10 @@ stages:
         node_12_x:
           node_version: 12.x
     steps:
+    - script: |
+        npm i --global --production windows-build-tools
+        npm i --verbose @abandonware/bluetooth-hci-socket
+      name: installBluetoothHciScoket
     - task: NodeTool@0
       inputs:
         versionSpec: $(node_version)
@@ -102,6 +103,10 @@ stages:
     pool:
       vmImage: 'macos-10.14'
     steps:
+    - script: |
+        npm i --global --production windows-build-tools
+        npm i --verbose @abandonware/bluetooth-hci-socket
+      name: installBluetoothHciScoket
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
@@ -132,9 +137,6 @@ stages:
     pool:
       vmImage: 'ubuntu-18.04'
     steps:
-    - script: |
-        sudo apt-get install -y libudev-dev
-      name: libudev
     - task: NodeTool@0
       inputs:
         versionSpec: 12.x
