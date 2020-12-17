@@ -71,8 +71,8 @@ stages:
       vmImage: 'vs2017-win2016'
     strategy:
       matrix:
-        node_11_x:
-          node_version: 11.x
+        node_13_x:
+          node_version: 13.x
     steps:
     - task: NodeTool@0
       inputs:
@@ -152,7 +152,7 @@ stages:
     steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: 11.x
+        versionSpec: 13.x
       displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
