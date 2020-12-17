@@ -2,18 +2,16 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
-import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
+import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
 import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
-import { ckbCore } from 'services/chain'
 import {
   CONSTANTS,
   RoutePath,
-  PresetScript,
   isMainnet as isMainnetUtil,
   isSuccessResponse,
   queryParsers,
-  epochParser,
+  useFetchTokenInfoList,
 } from 'utils'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import styles from './specialAssetList.module.scss'
@@ -24,11 +22,7 @@ export interface SpecialAssetCell {
   blockHash: string
   blockNumber: string
   capacity: string
-  customizedAssetInfo: {
-    data: string
-    lock: PresetScript.Locktime | string
-    type: string
-  }
+  customizedAssetInfo: AssetInfo
   daoData: string | null
   data: string
   lock: {
@@ -56,6 +50,7 @@ const SpecialAssetList = () => {
   const [pageNo, setPageNo] = useState<number>(1)
   const { search } = useLocation()
   const dispatch = useDispatch()
+  const tokenInfoList = useFetchTokenInfoList()
 
   const {
     app: { epoch, globalDialog },
@@ -166,41 +161,23 @@ const SpecialAssetList = () => {
   )
 
   const list = useMemo(() => {
-    return cells.map(cell => {
-      let status: SpecialAssetProps['status'] = 'user-defined-asset'
-      let epochInfo: { target: number; current: number } | undefined
-      if (cell.customizedAssetInfo.lock === PresetScript.Locktime) {
-        const targetEpochInfo = epochParser(ckbCore.utils.toUint64Le(`0x${cell.lock.args.slice(-16)}`))
-        const currentEpochInfo = epochParser(epoch)
-        const targetEpochFraction =
-          Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
-        epochInfo = {
-          target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
-          current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
-        }
-        if (epochInfo.target - epochInfo.current > 0) {
-          status = 'locked-asset'
-        } else {
-          status = 'claim-asset'
-        }
-      }
-
+    return cells.map(({ outPoint, timestamp, customizedAssetInfo, data, lock, type, capacity }) => {
       return (
         <SpecialAsset
-          key={`${cell.outPoint.txHash}-${cell.outPoint.index}`}
-          datetime={+cell.timestamp}
-          capacity={cell.capacity}
-          outPoint={cell.outPoint}
+          key={`${outPoint.txHash}-${outPoint.index}`}
+          datetime={+timestamp}
           isMainnet={isMainnet}
-          status={status}
-          epochsInfo={epochInfo}
+          cell={{ outPoint, capacity, data, lock, type }}
+          assetInfo={customizedAssetInfo}
+          epoch={epoch}
           onAction={onUnlock}
           connectionStatus={connectionStatus}
           bestKnownBlockTimestamp={bestKnownBlockTimestamp}
+          tokenInfoList={tokenInfoList}
         />
       )
     })
-  }, [cells, epoch, isMainnet, onUnlock, connectionStatus, bestKnownBlockTimestamp])
+  }, [cells, epoch, isMainnet, onUnlock, connectionStatus, bestKnownBlockTimestamp, tokenInfoList])
 
   return (
     <div className={styles.container}>
