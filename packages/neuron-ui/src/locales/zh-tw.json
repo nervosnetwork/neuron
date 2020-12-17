@@ -620,6 +620,7 @@
       "locked-asset": "已鎖定",
       "locked-asset-tooltip": "鎖定參數為 {{epochs}} epochs, 預計解鎖時間為 {{year}}年{{month}}月{{day}}日(鎖定時間根據區塊鏈實際運行情況會有一定的誤差)。",
       "claim-asset": "領取",
+      "withdraw-asset": "撤回",
       "view-details": "查看詳情",
       "release-success": "資產已解鎖，可前往交易歷史查看詳情。",
       "no-special-assets": "沒有自定義資產",

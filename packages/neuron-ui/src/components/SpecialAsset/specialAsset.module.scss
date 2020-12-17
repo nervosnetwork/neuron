@@ -90,6 +90,17 @@
       background-color: #3cc68a80 !important;
       color: #ffffff80 !important;
     }
+
+    &.hasTooltip:disabled[data-tooltip] {
+      @include tooltip;
+      position: relative;
+
+      &:before {
+        width: 200px;
+        text-align: left;
+        box-sizing: border-box;
+      }
+    }
   }
 }
 
