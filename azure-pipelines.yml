@@ -4,6 +4,7 @@ trigger:
     include:
       - master
       - develop
+      - rc/*
       - hotfix/*
   tags:
     include:
@@ -95,7 +96,7 @@ stages:
 
 - stage: release
   displayName: Release Binaries
-  condition: startsWith(variables['build.sourceBranch'], 'refs/heads/rc')
+  condition: startsWith(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: release_mac
     displayName: Release macOS
