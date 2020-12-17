@@ -4,7 +4,6 @@ trigger:
     include:
       - master
       - develop
-      - rc/*
       - hotfix/*
   tags:
     include:
@@ -75,8 +74,8 @@ stages:
           node_version: 12.x
     steps:
     - script: |
-        npm i -g node-gyp
-        npm i --verbose @abandonware/bluetooth-hci-socket
+        yarn global add node-gyp
+        yarn add @abandonware/bluetooth-hci-socket
       name: InstallBluetoothDep
     - task: NodeTool@0
       inputs:
@@ -155,8 +154,8 @@ stages:
       vmImage: 'vs2017-win2016'
     steps:
     - script: |
-        npm i -g node-gyp
-        npm i --verbose @abandonware/bluetooth-hci-socket
+        yarn global add node-gyp
+        yarn add @abandonware/bluetooth-hci-socket
       name: InstallBluetoothDep
     - task: NodeTool@0
       inputs:
