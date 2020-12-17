@@ -74,13 +74,6 @@ stages:
         node_12_x:
           node_version: 12.x
     steps:
-    - script: |
-        yarn add @abandonware/bluetooth-hci-socket@0.5.3-5 --ignore-workspace-root-check
-      name: InstallBluetoothDep
-    - task: NodeTool@0
-      inputs:
-        versionSpec: $(node_version)
-      displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
     - script: |
