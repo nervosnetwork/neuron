@@ -75,7 +75,7 @@ stages:
           node_version: 12.x
     steps:
     - script: |
-        yarn add --verbose @abandonware/bluetooth-hci-socket
+        npm i --verbose @abandonware/bluetooth-hci-socket
       name: installBluetoothHciScoket
     - task: NodeTool@0
       inputs:
