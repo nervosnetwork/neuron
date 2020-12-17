@@ -4,7 +4,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
 import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
-import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
+import { unlockSpecialAsset, getSpecialAssets, generateWithdrawChequeTransaction } from 'services/remote'
 import {
   CONSTANTS,
   RoutePath,
@@ -12,8 +12,10 @@ import {
   isSuccessResponse,
   queryParsers,
   useFetchTokenInfoList,
+  PresetScript,
 } from 'utils'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import styles from './specialAssetList.module.scss'
 
 const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
@@ -119,42 +121,48 @@ const SpecialAssetList = () => {
       if (!cell) {
         dispatch({
           type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            timestamp: +new Date(),
-            content: 'Cannot find the cell',
-          },
+          payload: { type: 'alert', timestamp: +new Date(), content: 'Cannot find the cell' },
         })
-      } else {
-        unlockSpecialAsset({
-          walletID: id,
-          outPoint: cell.outPoint,
-          feeRate: `${MEDIUM_FEE_RATE}`,
-          customizedAssetInfo: cell.customizedAssetInfo,
-        }).then(res => {
-          if (isSuccessResponse(res)) {
-            dispatch({
-              type: AppActions.UpdateGeneratedTx,
-              payload: res.result,
-            })
-            dispatch({
-              type: AppActions.RequestPassword,
-              payload: {
-                walletID: id,
-                actionType: 'unlock',
-              },
-            })
+        return
+      }
+      const handleRes = (actionType: 'unlock' | 'withdraw-cheque') => (res: ControllerResponse<any>) => {
+        if (isSuccessResponse(res)) {
+          dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+          dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
+        } else {
+          dispatch({
+            type: AppActions.AddNotification,
+            payload: {
+              type: 'alert',
+              timestamp: +new Date(),
+              content: typeof res.message === 'string' ? res.message : res.message.content!,
+            },
+          })
+        }
+      }
+      switch (cell.customizedAssetInfo.lock) {
+        case PresetScript.Locktime: {
+          unlockSpecialAsset({
+            walletID: id,
+            outPoint: cell.outPoint,
+            feeRate: `${MEDIUM_FEE_RATE}`,
+            customizedAssetInfo: cell.customizedAssetInfo,
+          }).then(handleRes('unlock'))
+          return
+        }
+        case PresetScript.Cheque: {
+          if (cell.customizedAssetInfo.data === 'claimable') {
+            // TODO: claim
           } else {
-            dispatch({
-              type: AppActions.AddNotification,
-              payload: {
-                type: 'alert',
-                timestamp: +new Date(),
-                content: typeof res.message === 'string' ? res.message : res.message.content!,
-              },
-            })
+            generateWithdrawChequeTransaction({ walletID: id, chequeCellOutPoint: cell.outPoint }).then(
+              handleRes('withdraw-cheque')
+            )
           }
-        })
+          break
+        }
+        default: {
+          // ignore
+        }
       }
     },
     [cells, id, dispatch]

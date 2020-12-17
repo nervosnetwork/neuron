@@ -5,6 +5,7 @@ import {
   setCurrentWallet as setRemoteCurrentWallet,
   getDaoData,
   sendTx,
+  sendWithdrawChequeTransaction as sendWithdrawChequeTransactionToChain,
   getAddressesByWalletID,
   updateAddressDescription as updateRemoteAddressDescription,
   deleteWallet as deleteRemoteWallet,
@@ -69,7 +70,9 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   })
 }
 
-export const sendTransaction = (params: Controller.SendTransactionParams) => async (dispatch: StateDispatch) => {
+const sendTransactionBase = <T extends typeof sendTx | typeof sendWithdrawChequeTransactionToChain>(sendMethod: T) => (
+  params: Parameters<T>[0]
+) => async (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.UpdateLoadings,
     payload: {
@@ -77,7 +80,7 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => asy
     },
   })
   try {
-    const res = await sendTx(params)
+    const res = await sendMethod(params as any)
     if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
     } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
@@ -106,6 +109,9 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => asy
     })
   }
 }
+
+export const sendTransaction = sendTransactionBase(sendTx)
+export const sendWithdrawChequeTransaction = sendTransactionBase(sendWithdrawChequeTransactionToChain)
 
 export const updateAddressListAndBalance = (params: Controller.GetAddressesByWalletIDParams) => (
   dispatch: StateDispatch

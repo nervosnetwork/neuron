@@ -12,6 +12,7 @@ import {
   useDispatch,
   AppActions,
   sendTransaction,
+  sendWithdrawChequeTransaction,
   deleteWallet,
   backupWallet,
   migrateAcp,
@@ -85,8 +86,9 @@ const PasswordRequest = () => {
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
   const isLoading =
-    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'send-cheque'].includes(actionType || '') &&
-    isSending
+    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'send-cheque', 'withdraw-cheque'].includes(
+      actionType || ''
+    ) && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -201,6 +203,24 @@ const PasswordRequest = () => {
             )
             break
           }
+          case 'withdraw-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendWithdrawChequeTransaction({ walletID, tx: generatedTx, password })(dispatch).then(
+              ({ status }) => {
+                if (isSuccessResponse({ status })) {
+                  dispatch({
+                    type: AppActions.SetGlobalDialog,
+                    payload: 'unlock-success',
+                  })
+                } else if (status === ErrorCode.PasswordIncorrect) {
+                  throw new PasswordIncorrectException()
+                }
+              }
+            )
+            break
+          }
           default: {
             break
           }
@@ -301,9 +321,15 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {['unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'send-cheque', 'migrate-acp'].includes(
-          actionType ?? ''
-        ) ? null : (
+        {[
+          'unlock',
+          'create-sudt-account',
+          'send-sudt',
+          'send-acp',
+          'send-cheque',
+          'withdraw-cheque',
+          'migrate-acp',
+        ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
         <TextField
