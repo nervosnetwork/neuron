@@ -313,7 +313,7 @@ declare namespace Controller {
   }
 
   namespace CreateChequeTransaction {
-    type SerializedTx = string
+    type Tx = any
     interface Params {
       walletID: string
       assetAccountID: string
@@ -322,6 +322,29 @@ declare namespace Controller {
       feeRate: string
     }
 
-    type Response = SerializedTx
+    type Response = Tx
+  }
+
+  namespace GenerateWithdrawChequeTransaction {
+    type Tx = any
+    interface Params {
+      walletID: string
+      chequeCellOutPoint: OutPoint
+    }
+
+    interface Response {
+      tx: Tx
+    }
+  }
+
+  namespace SendWithdrawChequeTransaction {
+    type Tx = any
+    interface Params {
+      walletID: string
+      tx: Tx
+      password: string
+    }
+
+    type Response = string
   }
 }
