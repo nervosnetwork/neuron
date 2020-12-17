@@ -22,6 +22,7 @@ import {
 import { MenuItemConstructorOptions } from 'electron'
 
 export * from './createSUDTAccount'
+export * from './tokenInfoList'
 
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {

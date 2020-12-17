@@ -1,3 +1,4 @@
+import { toUint64Le } from 'services/chain'
 import { PAGE_SIZE } from './const'
 
 export const listParams = (search: string) => {
@@ -35,4 +36,8 @@ export const epochParser = (epoch: string) => {
     ...res,
     value: res.length > 0 ? Number(res.number) + Number(res.index) / Number(res.length) : Number(res.number),
   }
+}
+
+export const toUint128Le = (hexString: string) => {
+  return `${toUint64Le(`0x${hexString.substr(34, 16)}`)}${toUint64Le(hexString.substr(0, 18)).slice(2)}`
 }
