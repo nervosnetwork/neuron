@@ -45,7 +45,7 @@ export default class HardwareController {
     }
   }
 
-  public async getPublicKey (): Promise<Controller.Response<ExtendedPublicKey>> {
+  public async getExtendedPublicKey (): Promise<Controller.Response<ExtendedPublicKey>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const pubkey = await device.getExtendedPublicKey()
 
