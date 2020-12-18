@@ -163,6 +163,8 @@ const SpecialAssetList = () => {
               if (isSuccessResponse(res)) {
                 if (!res.result!.assetAccount) {
                   handleRes('claim-cheque')(res)
+                } else {
+                  // create account and send tx
                 }
               } else {
                 dispatch({
@@ -175,7 +177,6 @@ const SpecialAssetList = () => {
                 })
               }
             })
-            // TODO: claim
           } else {
             generateWithdrawChequeTransaction({ walletID: id, chequeCellOutPoint: cell.outPoint }).then(
               handleRes('withdraw-cheque')
