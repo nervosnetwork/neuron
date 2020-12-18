@@ -106,6 +106,7 @@ type Action =
   | 'generate-create-cheque-tx'
   | 'generate-withdraw-cheque-tx'
   | 'send-withdraw-cheque-tx'
+  | 'generate-claim-cheque-tx'
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'

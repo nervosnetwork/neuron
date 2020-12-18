@@ -4,7 +4,12 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
 import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
-import { unlockSpecialAsset, getSpecialAssets, generateWithdrawChequeTransaction } from 'services/remote'
+import {
+  unlockSpecialAsset,
+  getSpecialAssets,
+  generateWithdrawChequeTransaction,
+  generateClaimChequeTransaction,
+} from 'services/remote'
 import {
   CONSTANTS,
   RoutePath,
@@ -125,7 +130,9 @@ const SpecialAssetList = () => {
         })
         return
       }
-      const handleRes = (actionType: 'unlock' | 'withdraw-cheque') => (res: ControllerResponse<any>) => {
+      const handleRes = (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (
+        res: ControllerResponse<any>
+      ) => {
         if (isSuccessResponse(res)) {
           dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
           dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
@@ -152,6 +159,22 @@ const SpecialAssetList = () => {
         }
         case PresetScript.Cheque: {
           if (cell.customizedAssetInfo.data === 'claimable') {
+            generateClaimChequeTransaction({ walletID: id, chequeCellOutPoint: cell.outPoint }).then(res => {
+              if (isSuccessResponse(res)) {
+                if (!res.result!.assetAccount) {
+                  handleRes('claim-cheque')(res)
+                }
+              } else {
+                dispatch({
+                  type: AppActions.AddNotification,
+                  payload: {
+                    type: 'alert',
+                    timestamp: +new Date(),
+                    content: typeof res.message === 'string' ? res.message : res.message.content!,
+                  },
+                })
+              }
+            })
             // TODO: claim
           } else {
             generateWithdrawChequeTransaction({ walletID: id, chequeCellOutPoint: cell.outPoint }).then(

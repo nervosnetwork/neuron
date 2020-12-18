@@ -91,6 +91,7 @@ declare namespace State {
       | 'send-acp'
       | 'send-cheque'
       | 'withdraw-cheque'
+      | 'claim-cheque'
       | 'migrate-acp'
       | null
     readonly walletID: string
