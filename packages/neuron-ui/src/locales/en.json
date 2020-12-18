@@ -58,12 +58,12 @@
     },
     "hardware-sign": {
       "cancel": "Cancel",
-      "title": "Sign via hardware walllet",
+      "title": "Sign via hardware wallet",
       "device": "Device:",
       "status": {
         "label": "Status:",
         "connect": "Connected, ready for signing.",
-        "user-input": "Connected, waiting for user input...",
+        "user-input": "Connected, waiting for confirmation on device...",
         "disconnect": "Disconnected, please check your connection."
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
@@ -72,6 +72,25 @@
         "close": "Close",
         "success": "Transaction Succesful!",
         "rescan": "Rescan"
+      }
+    },
+    "hardware-verify-address": {
+      "title": "Verify address via hardware wallet",
+      "device": "Device:",
+      "address": "Address:",
+      "verified": "Verified",
+      "invalid": "Invalid",
+      "status": {
+        "label": "Status:",
+        "connect": "Connected, ready for verifying.",
+        "user-input": "Connected, waiting for confirmation on device...",
+        "disconnect": "Disconnected, please check your connection."
+      },
+      "actions": {
+        "close": "Close",
+        "rescan": "Rescan",
+        "copy-address": "Copy Address",
+        "verify": "Verify"
       }
     },
     "offline-sign": {
@@ -200,7 +219,8 @@
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
       "address-qrcode": "Address QR Code",
-      "address": "{{network}} Address"
+      "address": "{{network}} Address",
+      "verify-address": "Verify Address"
     },
     "history": {
       "meta": "Meta",

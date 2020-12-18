@@ -67,6 +67,25 @@
         "rescan": "再次检测"
       }
     },
+    "hardware-verify-address": {
+      "title": "使用硬件钱包进行地址验证",
+      "device": "设备：",
+      "address": "地址：",
+      "verified": "验证通过",
+      "invalid": "地址不正确",
+      "status": {
+        "label": "状态：",
+        "connect": "已连接",
+        "user-input": "已连接，等待确认...",
+        "disconnect": "未连接，请检查设备连接。"
+      },
+      "actions": {
+        "close": "关闭",
+        "rescan": "再次检测",
+        "copy-address": "复制地址",
+        "verify": "验证"
+      }
+    },
     "offline-sign": {
       "title": "离线签名",
       "json-file": "JSON 文件：",

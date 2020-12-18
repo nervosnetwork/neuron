@@ -12,6 +12,7 @@ import NodeService from 'services/node'
 import Address, { AddressType } from 'models/keys/address'
 import HexUtils from 'utils/hex'
 import logger from 'utils/logger'
+import NetworksService from 'services/networks'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
@@ -92,6 +93,13 @@ export default class Ledger extends Hardware {
     const version = Buffer.from(data.slice(5, 5 + versionLength)).toString()
 
     return version
+  }
+
+  async getPublicKey (path: string) {
+    const networkService = NetworksService.getInstance()
+    const isTestnet = !networkService.isMainnet()
+    const result = await this.ledgerCKB!.getWalletPublicKey(path === Address.pathForReceiving(0) ? this.defaultPath : path, isTestnet)
+    return result
   }
 
   public static async findDevices () {

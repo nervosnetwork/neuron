@@ -462,8 +462,12 @@ export default class ApiController {
       return this.hardwareController.getFirmwareVersion()
     })
 
-    handle('get-device-public-key', async () => {
+    handle('get-device-extended-public-key', async () => {
       return this.hardwareController.getExtendedPublicKey()
+    })
+
+    handle('get-device-public-key', async () => {
+      return this.hardwareController.getPublicKey()
     })
 
     handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
