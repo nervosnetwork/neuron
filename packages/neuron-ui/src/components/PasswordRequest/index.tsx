@@ -86,9 +86,16 @@ const PasswordRequest = () => {
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
   const isLoading =
-    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'send-cheque', 'withdraw-cheque'].includes(
-      actionType || ''
-    ) && isSending
+    [
+      'send',
+      'unlock',
+      'create-sudt-account',
+      'send-sudt',
+      'send-acp',
+      'send-cheque',
+      'withdraw-cheque',
+      'claim-cheque',
+    ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -221,6 +228,10 @@ const PasswordRequest = () => {
             )
             break
           }
+          case 'claim-cheque': {
+            // TODO:
+            break
+          }
           default: {
             break
           }
@@ -328,6 +339,7 @@ const PasswordRequest = () => {
           'send-acp',
           'send-cheque',
           'withdraw-cheque',
+          'claim-cheque',
           'migrate-acp',
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>

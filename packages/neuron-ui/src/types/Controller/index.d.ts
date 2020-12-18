@@ -347,4 +347,21 @@ declare namespace Controller {
 
     type Response = string
   }
+
+  namespace GenerateClaimChequeTransaction {
+    type AssetAccount = Record<
+      'accountName' | 'balance' | 'blake160' | 'decimal' | 'symbol' | 'tokenID' | 'tokenName',
+      string
+    >
+
+    interface Params {
+      walletID: string
+      chequeCellOutPoint: CKBComponents.OutPoint
+    }
+
+    interface Response {
+      tx: any
+      assetAccount?: AssetAccount
+    }
+  }
 }
