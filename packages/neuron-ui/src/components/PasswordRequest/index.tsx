@@ -108,6 +108,7 @@ const PasswordRequest = () => {
       }
       try {
         switch (actionType) {
+          case 'claim-cheque':
           case 'send': {
             if (isSending) {
               break
@@ -226,10 +227,6 @@ const PasswordRequest = () => {
                 }
               }
             )
-            break
-          }
-          case 'claim-cheque': {
-            // TODO:
             break
           }
           default: {
