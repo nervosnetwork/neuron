@@ -39,6 +39,13 @@ describe('hardware controller', () => {
    it('#getPublicKey', async () => {
      const { result } = await hardwareControler.getPublicKey()
      expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
+     expect(result!.lockArg).toBe(LedgerCkbApp.lockArg)
+     expect(result!.address).toBe(LedgerCkbApp.address)
+   })
+
+   it('#getExtendedPublicKey', async () => {
+     const { result } = await hardwareControler.getExtendedPublicKey()
+     expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
      expect(result!.chainCode).toBe(LedgerCkbApp.chainCode)
    })
 

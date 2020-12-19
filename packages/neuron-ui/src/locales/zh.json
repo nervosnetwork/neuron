@@ -67,6 +67,25 @@
         "rescan": "再次检测"
       }
     },
+    "hardware-verify-address": {
+      "title": "使用硬件钱包进行地址验证",
+      "device": "设备：",
+      "address": "地址：",
+      "verified": "验证通过",
+      "invalid": "地址不正确",
+      "status": {
+        "label": "状态：",
+        "connect": "已连接",
+        "user-input": "已连接，等待确认...",
+        "disconnect": "未连接，请检查设备连接。"
+      },
+      "actions": {
+        "close": "关闭",
+        "rescan": "再次检测",
+        "copy-address": "复制地址",
+        "verify": "验证"
+      }
+    },
     "offline-sign": {
       "title": "离线签名",
       "json-file": "JSON 文件：",
@@ -193,7 +212,8 @@
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址簿页面。",
       "address-qrcode": "地址二维码",
-      "address": "{{network}} 地址"
+      "address": "{{network}} 地址",
+      "verify-address": "验证地址"
     },
     "history": {
       "meta": "元信息",

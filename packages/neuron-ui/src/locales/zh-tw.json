@@ -62,9 +62,28 @@
         "disconnect": "未連接，請檢查設備連接。"
       },
       "actions": {
-        "close": "关闭",
+        "close": "關閉",
         "success": "交易成功",
         "rescan": "再次檢測"
+      }
+    },
+    "hardware-verify-address": {
+      "title": "使用硬件錢包進行地址驗證",
+      "device": "設備：",
+      "address": "地址：",
+      "verified": "驗證通過",
+      "invalid": "地址不正確",
+      "status": {
+        "label": "狀態：",
+        "connect": "已連接",
+        "user-input": "已連接，等待確認...",
+        "disconnect": "未連接，請檢查設備連接。"
+      },
+      "actions": {
+        "close": "關閉",
+        "rescan": "再次檢測",
+        "copy-address": "复制地址",
+        "verify": "驗證"
       }
     },
     "offline-sign": {
@@ -193,7 +212,8 @@
       "address-not-found": "未找到地址",
       "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址簿頁面。",
       "address-qrcode": "地址二維碼",
-      "address": "{{network}} 地址"
+      "address": "{{network}} 地址",
+      "verify-address": "驗證地址"
     },
     "history": {
       "meta": "元信息",

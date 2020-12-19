@@ -84,6 +84,16 @@ export class LedgerCkbApp {
   public static publicKey = 'publicKey'
   public static chainCode = 'chain_code'
   public static version = '0.4.0'
+  public static lockArg = 'args'
+  public static address = 'address'
+
+  async getWalletPublicKey () {
+    return {
+      publicKey: LedgerCkbApp.publicKey,
+      lockArg: LedgerCkbApp.lockArg,
+      address: LedgerCkbApp.address
+    }
+  }
 
   async getWalletExtendedPublicKey () {
     return {
