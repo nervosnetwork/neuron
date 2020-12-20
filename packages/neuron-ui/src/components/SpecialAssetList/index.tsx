@@ -7,6 +7,7 @@ import Experimental from 'widgets/ExperimentalRibbon'
 import {
   unlockSpecialAsset,
   getSpecialAssets,
+  getSUDTAccountList,
   generateWithdrawChequeTransaction,
   generateClaimChequeTransaction,
 } from 'services/remote'
@@ -21,6 +22,8 @@ import {
 } from 'utils'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
+import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
+import { TokenInfo } from 'components/SUDTCreateDialog'
 import styles from './specialAssetList.module.scss'
 
 const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
@@ -58,6 +61,11 @@ const SpecialAssetList = () => {
   const { search } = useLocation()
   const dispatch = useDispatch()
   const tokenInfoList = useFetchTokenInfoList()
+  const [accountToClaim, setAccountToClaim] = useState<{
+    account: Controller.GenerateClaimChequeTransaction.AssetAccount
+    tx: any
+  } | null>(null)
+  const [accountNames, setAccountNames] = useState<string[]>([])
 
   const {
     app: { epoch, globalDialog },
@@ -70,6 +78,53 @@ const SpecialAssetList = () => {
     },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
+  const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
+  const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
+    ? {
+        ...accountToClaim.account,
+        accountId: '',
+        tokenId: accountToClaim.account.tokenID,
+        accountName: '',
+        tokenName: (accountToClaim.account.tokenName || foundTokenInfo?.tokenName) ?? '',
+        symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
+        decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
+        isCKB: false,
+        onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
+          const params: any = {}
+          Object.keys(info).forEach(key => {
+            if (
+              info[key as keyof typeof info] !==
+              accountToClaim?.account[key as keyof Controller.GenerateClaimChequeTransaction.AssetAccount]
+            ) {
+              params[key] = info[key as keyof typeof info]
+            }
+          })
+          dispatch({
+            type: AppActions.UpdateExperimentalParams,
+            payload: { tx: accountToClaim.tx, assetAccount: params },
+          })
+          dispatch({
+            type: AppActions.RequestPassword,
+            payload: { walletID: id, actionType: 'create-account-to-claim-cheque' },
+          })
+          setAccountToClaim(null)
+          return Promise.resolve(true)
+        },
+        onCancel: () => {
+          setAccountToClaim(null)
+        },
+        existingAccountNames: accountNames.filter(name => name !== accountToClaim.account.accountName),
+      }
+    : undefined
+
+  useEffect(() => {
+    getSUDTAccountList({ walletID: id }).then(res => {
+      if (isSuccessResponse(res)) {
+        const names = res.result.filter((a: { id: string }) => a.id).map((a: { accountName: string }) => a.accountName)
+        setAccountNames(names)
+      }
+    })
+  }, [id, setAccountNames])
 
   useEffect(() => {
     dispatch({ type: AppActions.ClearSendState })
@@ -117,7 +172,7 @@ const SpecialAssetList = () => {
     }
   }, [globalDialog, fetchList, id, pageNo])
 
-  const onUnlock = useCallback(
+  const handleAction = useCallback(
     e => {
       const {
         dataset: { txHash, idx },
@@ -134,7 +189,11 @@ const SpecialAssetList = () => {
         res: ControllerResponse<any>
       ) => {
         if (isSuccessResponse(res)) {
-          dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+          if (actionType === 'unlock') {
+            dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+          } else {
+            dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
+          }
           dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
         } else {
           dispatch({
@@ -164,7 +223,10 @@ const SpecialAssetList = () => {
                 if (!res.result!.assetAccount) {
                   handleRes('claim-cheque')(res)
                 } else {
-                  // create account and send tx
+                  setAccountToClaim({
+                    account: res!.result!.assetAccount,
+                    tx: res!.result!.tx,
+                  })
                 }
               } else {
                 dispatch({
@@ -189,7 +251,7 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch]
+    [cells, id, dispatch, setAccountToClaim]
   )
 
   const list = useMemo(() => {
@@ -202,14 +264,14 @@ const SpecialAssetList = () => {
           cell={{ outPoint, capacity, data, lock, type }}
           assetInfo={customizedAssetInfo}
           epoch={epoch}
-          onAction={onUnlock}
+          onAction={handleAction}
           connectionStatus={connectionStatus}
           bestKnownBlockTimestamp={bestKnownBlockTimestamp}
           tokenInfoList={tokenInfoList}
         />
       )
     })
-  }, [cells, epoch, isMainnet, onUnlock, connectionStatus, bestKnownBlockTimestamp, tokenInfoList])
+  }, [cells, epoch, isMainnet, handleAction, connectionStatus, bestKnownBlockTimestamp, tokenInfoList])
 
   return (
     <div className={styles.container}>
@@ -250,6 +312,7 @@ const SpecialAssetList = () => {
           />
         ) : null}
       </div>
+      {updateAccountDialogProps ? <SUDTUpdateDialog {...updateAccountDialogProps} /> : null}
     </div>
   )
 }

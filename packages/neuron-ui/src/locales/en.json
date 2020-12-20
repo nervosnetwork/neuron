@@ -370,6 +370,18 @@
       },
       "migrate-acp": {
         "title": "Upgrade Asset Accounts"
+      },
+      "send-cheque": {
+        "title": "Send Cheque Asset"
+      },
+      "withdraw-cheque": {
+        "title": "Withdraw Cheque Asset"
+      },
+      "claim-cheque": {
+        "title": "Claim Cheque Asset"
+      },
+      "create-account-to-claim-cheque": {
+        "title": "Claim Cheque Asset with New Account"
       }
     },
     "qrcode": {

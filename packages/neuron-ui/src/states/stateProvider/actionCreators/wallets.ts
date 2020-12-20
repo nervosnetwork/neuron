@@ -5,7 +5,6 @@ import {
   setCurrentWallet as setRemoteCurrentWallet,
   getDaoData,
   sendTx,
-  sendWithdrawChequeTransaction as sendWithdrawChequeTransactionToChain,
   getAddressesByWalletID,
   updateAddressDescription as updateRemoteAddressDescription,
   deleteWallet as deleteRemoteWallet,
@@ -14,7 +13,7 @@ import {
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
 
 import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData } from 'states'
-import { ErrorCode, ResponseCode, addressesToBalance, failureResToNotification, isSuccessResponse } from 'utils'
+import { ErrorCode, addressesToBalance, failureResToNotification, isSuccessResponse, sendTxBaseAction } from 'utils'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 
@@ -70,48 +69,8 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   })
 }
 
-const sendTransactionBase = <T extends typeof sendTx | typeof sendWithdrawChequeTransactionToChain>(sendMethod: T) => (
-  params: Parameters<T>[0]
-) => async (dispatch: StateDispatch) => {
-  dispatch({
-    type: AppActions.UpdateLoadings,
-    payload: {
-      sending: true,
-    },
-  })
-  try {
-    const res = await sendMethod(params as any)
-    if (isSuccessResponse(res)) {
-      dispatch({ type: AppActions.DismissPasswordRequest })
-    } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.status,
-        content: typeof res.message === 'string' ? res.message : res.message.content,
-        meta: typeof res.message === 'string' ? undefined : res.message.meta,
-      })(dispatch)
-      dispatch({
-        type: AppActions.DismissPasswordRequest,
-      })
-    }
-    return res
-  } catch (err) {
-    console.warn(err)
-    return {
-      status: ResponseCode.FAILURE,
-      message: err,
-    }
-  } finally {
-    dispatch({
-      type: AppActions.UpdateLoadings,
-      payload: { sending: false },
-    })
-  }
-}
-
-export const sendTransaction = sendTransactionBase(sendTx)
-export const sendWithdrawChequeTransaction = sendTransactionBase(sendWithdrawChequeTransactionToChain)
+export const sendTransaction = (params: Controller.SendTransactionParams) => async (dispatch: StateDispatch) =>
+  sendTxBaseAction(sendTx, params, dispatch, addNotification)
 
 export const updateAddressListAndBalance = (params: Controller.GetAddressesByWalletIDParams) => (
   dispatch: StateDispatch
