@@ -95,6 +95,7 @@ const PasswordRequest = () => {
       'send-cheque',
       'withdraw-cheque',
       'claim-cheque',
+      'create-account-to-claim-cheque',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
@@ -108,7 +109,6 @@ const PasswordRequest = () => {
       }
       try {
         switch (actionType) {
-          case 'claim-cheque':
           case 'send': {
             if (isSending) {
               break
@@ -211,11 +211,46 @@ const PasswordRequest = () => {
             )
             break
           }
+          case 'claim-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(({ status }) => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          case 'create-account-to-claim-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendCreateSUDTAccountTransaction({
+              walletID,
+              password,
+              tx: experimental?.tx,
+              assetAccount: {
+                ...experimental?.assetAccount,
+                tokenID: experimental?.assetAccount.tokenId,
+                balance: '0',
+              },
+            })(dispatch).then(({ status }) => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
           case 'withdraw-cheque': {
             if (isSending) {
               break
             }
-            await sendWithdrawChequeTransaction({ walletID, tx: generatedTx, password })(dispatch).then(
+            await sendWithdrawChequeTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(
               ({ status }) => {
                 if (isSuccessResponse({ status })) {
                   dispatch({
@@ -337,6 +372,7 @@ const PasswordRequest = () => {
           'send-cheque',
           'withdraw-cheque',
           'claim-cheque',
+          'create-account-to-claim-cheque',
           'migrate-acp',
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>

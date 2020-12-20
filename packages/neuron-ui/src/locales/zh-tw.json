@@ -363,6 +363,18 @@
       },
       "migrate-acp": {
         "title": "升級資產賬戶"
+      },
+      "send-cheque": {
+        "title": ""
+      },
+      "withdraw-cheque": {
+        "title": ""
+      },
+      "claim-cheque": {
+        "title": ""
+      },
+      "create-account-to-claim-cheque": {
+        "title": ""
       }
     },
     "qrcode": {
