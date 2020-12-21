@@ -3,6 +3,9 @@ import Script, { ScriptHashType } from "./chain/script"
 import OutPoint from "./chain/out-point"
 import NetworksService from "services/networks"
 import Transaction from "./chain/transaction"
+import HexUtils from "utils/hex"
+import SystemScriptInfo from "./system-script-info"
+import { Address } from "./address"
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -126,7 +129,10 @@ export default class AssetAccountInfo {
     return new Script(info.codeHash, args, info.hashType)
   }
 
-  public generateChequeScript(args: string): Script {
+  public generateChequeScript(receiverLockHash: string, senderLockHash: string): Script {
+    const receiverLockHash20 = HexUtils.removePrefix(receiverLockHash).slice(0, 40)
+    const senderLockHash20 = HexUtils.removePrefix(senderLockHash).slice(0, 40)
+    const args = `0x${receiverLockHash20}${senderLockHash20}`
     const info = this.chequeInfo
     return new Script(info.codeHash, args, info.hashType)
   }
@@ -165,5 +171,13 @@ export default class AssetAccountInfo {
 
   public isDefaultAnyoneCanPayScript(script: Script): boolean {
     return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
+  }
+
+  public static findSignPath(addressInfos: Address[], chequeLockArgs: string) {
+    return addressInfos.find(info => {
+      const defaultLockScript = SystemScriptInfo.generateSecpScript(info.blake160)
+      const lockHash20 = HexUtils.removePrefix(defaultLockScript.computeHash()).slice(0, 40)
+      return chequeLockArgs.includes(lockHash20)
+    })
   }
 }

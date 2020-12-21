@@ -14,7 +14,7 @@ export default class CustomizedAssetsController {
     const addresses = await AddressService.getAddressesByWalletId(params.walletID)
     const blake160s = addresses.map(addr => addr.blake160)
 
-    const result = await CellsService.getSingleMultiSignCells(blake160s, params.pageNo, params.pageSize)
+    const result = await CellsService.getCustomizedAssetCells(blake160s, params.pageNo, params.pageSize)
 
     if (!result) {
       throw new ServiceHasNoResponse('GetCustomizedAssetCells')

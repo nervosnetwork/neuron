@@ -28,6 +28,7 @@ import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
 import HardwareWalletService from './hardware'
 import { SignTransactionFailed } from 'exceptions'
+import AssetAccountInfo from 'models/asset-account-info'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -55,7 +56,6 @@ export default class TransactionSender {
 
   public async broadcastTx (walletID: string = '', tx: Transaction) {
     const { ckb } = NodeService.getInstance()
-    console.log(JSON.stringify(tx.toSDKRawTransaction(), undefined, 2))
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
@@ -107,9 +107,12 @@ export default class TransactionSender {
       if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
         path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
       }
+      else if (args.length === 42) {
+        path = addressInfos.find(i => i.blake160 === args)!.path
+      }
       else {
-        const publicKeyHash = args.slice(0, 42)
-        path = addressInfos.find(i => i.blake160 === publicKeyHash)!.path
+        const addressInfo = AssetAccountInfo.findSignPath(addressInfos, args)
+        path = addressInfo?.path
       }
 
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
@@ -135,7 +138,6 @@ export default class TransactionSender {
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
     for (const lockHash of lockHashes) {
-      //TODO adapt to sign for cheque inputs
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
       witnessesArgs[0].witnessArgs.setEmptyLock()

@@ -13,6 +13,7 @@ import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
 import WalletService from "./wallets"
 import OutPoint from "models/chain/out-point"
+import SystemScriptInfo from "models/system-script-info"
 
 export default class AssetAccountService {
 
@@ -349,7 +350,6 @@ export default class AssetAccountService {
   }
 
 
-  // TODO cover tests
   public static async generateCreateChequeTx(
     walletID: string,
     accountId: number,
@@ -378,7 +378,6 @@ export default class AssetAccountService {
     return tx
   }
 
-  // TODO cover test
   public static async generateClaimChequeTx(
     walletID: string,
     chequeCellOutPoint: OutPoint,
@@ -393,10 +392,20 @@ export default class AssetAccountService {
 
     const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
     if (!chequeLiveCell) {
-      throw new Error()
+      throw new Error('cheque live cell not found')
     }
-    const receiverLockArgs = chequeLiveCell.lock.args.slice(0, 42)
-    const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverLockArgs)
+    const receiverLockHash20 = chequeLiveCell.lock.args.slice(0, 42)
+    const addressInfos = await wallet.getAllAddresses()
+
+    const receiverDefaultLock = addressInfos.map(
+      info => SystemScriptInfo.generateSecpScript(info.blake160)
+    ).find(defaultLock => defaultLock.computeHash().slice(0, 42) === receiverLockHash20)
+
+    if (!receiverDefaultLock) {
+      throw new Error('receiver default lock not found by receiver lock hash')
+    }
+
+    const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverDefaultLock.args)
 
     const tx = await TransactionGenerator.generateClaimChequeTx(
       walletID,
@@ -434,7 +443,7 @@ export default class AssetAccountService {
 
     const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
     if (!chequeLiveCell) {
-      throw new Error()
+      throw new Error('cheque live cell not found')
     }
 
     const tx = await TransactionGenerator.generateWithdrawChequeTx(

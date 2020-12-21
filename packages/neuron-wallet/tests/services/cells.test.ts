@@ -2,7 +2,7 @@ import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
-import CellsService from '../../src/services/cells'
+import CellsService, { CustomizedLock } from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
@@ -19,6 +19,7 @@ import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-inf
 import AddressGenerator from '../../src/models/address-generator'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import MultiSign from '../../src/models/multi-sign'
+import AssetAccountInfo from '../../src/models/asset-account-info'
 
 
 const randomHex = (length: number = 64): string => {
@@ -796,16 +797,27 @@ describe('CellsService', () => {
     })
   });
 
-  describe('#getSingleMultiSignCells', () => {
+  describe('#getCustomizedAssetCells', () => {
+    const assetAccountInfo = new AssetAccountInfo()
     const publicKeyHash = bob.lockScript.args
+    const bobDefaultLock = SystemScriptInfo.generateSecpScript(publicKeyHash)
     const multiSignHash = new MultiSign().hash(publicKeyHash)
     const multiSignLockScript = SystemScriptInfo.generateMultiSignScript(multiSignHash)
     const pageSize = 2
 
-    describe('with indexed multi sign outputs', () => {
+    describe('with indexed customized asset outputs', () => {
       const user = {
         lockScript: multiSignLockScript
       }
+
+      const receiverChequeLock = assetAccountInfo.generateChequeScript(
+        bobDefaultLock.computeHash(),
+        '0'.repeat(40)
+      )
+      const senderChequeLock = assetAccountInfo.generateChequeScript(
+        '0'.repeat(40),
+        bobDefaultLock.computeHash()
+      )
 
       beforeEach(async () => {
         const cells: OutputEntity[] = [
@@ -818,54 +830,64 @@ describe('CellsService', () => {
           generateCell('400', OutputStatus.Dead, false, null, user),
           generateCell('1000', OutputStatus.Live, true, null, user),
           generateCell('10000', OutputStatus.Live, false, typeScript, user),
+          generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: receiverChequeLock}),
+          generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: senderChequeLock}),
         ]
         await getConnection().manager.save(cells)
       });
-      describe('when there are records with multiSignBlake160 matched', () => {
+      describe('when there are records matched', () => {
         describe('one page contains all results', () => {
           let result: any
           beforeEach(async () => {
-            result = await CellsService.getSingleMultiSignCells([publicKeyHash], 1, 10)
+            result = await CellsService.getCustomizedAssetCells([publicKeyHash], 1, 10)
           })
           it('returns all items', () => {
-            expect(result.totalCount).toEqual(3)
-            expect(result.items.length).toEqual(3)
+            expect(result.totalCount).toEqual(5)
+            expect(result.items.length).toEqual(5)
             const totalCapacity = result.items.reduce((total: number, cell: any) => total + parseInt(cell.capacity), 0)
-            expect(totalCapacity).toEqual(100 * 3)
+            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2)
           })
-          it('attaches setCustomizedAssetInfo to cells ', async () => {
-            for (const item of result.items) {
+          it('attaches setCustomizedAssetInfo to single multisign cells', async () => {
+            const singleMultiSignCells = result.items.filter((item: any) => item.customizedAssetInfo.lock === CustomizedLock.SingleMultiSign)
+            expect(singleMultiSignCells.length).toBe(3)
+            for (const item of singleMultiSignCells) {
               expect(item.customizedAssetInfo).toEqual({"data": "", "lock": "SingleMultiSign", "type": ""})
             }
+          });
+          it('attaches setCustomizedAssetInfo to cheque cells', () => {
+            const chequeCells = result.items.filter((item: any) => item.customizedAssetInfo.lock === CustomizedLock.Cheque)
+            expect(chequeCells.length).toEqual(2)
+            expect(chequeCells[0].customizedAssetInfo.data).toBe('claimable')
+            expect(chequeCells[1].customizedAssetInfo.data).toBe('withdraw-able')
           });
         });
         describe('within pagination scope', () => {
           it('returns first page result', async () => {
             const page = 1
-            const result = await CellsService.getSingleMultiSignCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(3)
+            const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
+            expect(result.totalCount).toEqual(5)
             expect(result.items.length).toEqual(pageSize)
           });
           it('returns the remaining cells for the last page', async () => {
             const page = 2
-            const result = await CellsService.getSingleMultiSignCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(3)
-            expect(result.items.length).toEqual(1)
+            const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
+            expect(result.totalCount).toEqual(5)
+            expect(result.items.length).toEqual(2)
           });
         });
         describe('outside pagination scope', () => {
           it('returns empty result', async () => {
-            const page = 3
-            const result = await CellsService.getSingleMultiSignCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(3)
+            const page = 4
+            const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
+            expect(result.totalCount).toEqual(5)
             expect(result.items.length).toEqual(0)
           });
         });
       })
-      describe('when there is no record with multiSignBlake160 matched', () => {
+      describe('when there is no record with customized assets matched', () => {
         it('returns empty result', async () => {
           const page = 1
-          const result = await CellsService.getSingleMultiSignCells(['non exist hash'], page, pageSize)
+          const result = await CellsService.getCustomizedAssetCells(['0x' + '0'.repeat(40)], page, pageSize)
           expect(result.totalCount).toEqual(0)
           expect(result.items.length).toEqual(0)
         });
@@ -874,7 +896,7 @@ describe('CellsService', () => {
     describe('with no indexed multi sign outputs', () => {
       it('returns empty result', async () => {
         const page = 1
-        const result = await CellsService.getSingleMultiSignCells([publicKeyHash], page, pageSize)
+        const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
         expect(result.totalCount).toEqual(0)
         expect(result.items.length).toEqual(0)
       });

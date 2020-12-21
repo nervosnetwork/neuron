@@ -21,6 +21,7 @@ import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
 import assert from 'assert'
 import AssetAccount from 'models/asset-account'
+import AddressService from 'services/addresses'
 
 export interface TargetOutput {
   address: string
@@ -871,7 +872,7 @@ export class TransactionGenerator {
 
     const chequeCellTmp = Output.fromObject({
       capacity: BigInt(162 * 10 ** 8).toString(),
-      lock: assetAccountInfo.generateChequeScript('0x' + '0'.repeat(80)),
+      lock: assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40)),
       type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
       data: BufferUtils.writeBigUInt128LE(BigInt(amount))
     })
@@ -931,7 +932,8 @@ export class TransactionGenerator {
     const chequeCell = Output.fromObject({
       ...chequeCellTmp,
       lock: assetAccountInfo.generateChequeScript(
-        receiverLockScript.args + senderDefaultCell.lock!.computeHash().slice(2, 42)
+        receiverLockScript.computeHash(),
+        senderDefaultCell.lock!.computeHash()
       )
     })
     tx.outputs.unshift(chequeCell)
@@ -966,8 +968,20 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0',
   ) {
-    const receiverLockArgs = chequeCell.lock.args.slice(0, 42)
-    const senderLockHash = '0x' + chequeCell.lock.args.slice(42)
+    const receiverLockHash20 = chequeCell.lock.args.slice(0, 42)
+    const allAddressInfos = await AddressService.getAddressesByWalletId(walletId)
+    const receiverAddressInfo = allAddressInfos.find(
+      info => {
+        const lockHash = SystemScriptInfo.generateSecpScript(info.blake160).computeHash()
+        return lockHash.startsWith(receiverLockHash20)
+      }
+    )
+    if (!receiverAddressInfo) {
+      throw new Error('Receiver lock hash not found in wallet')
+    }
+
+    const receiverLockArgs = receiverAddressInfo?.blake160
+    const senderLockHash = chequeCell.lock.args.slice(42)
 
     const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
     if (!senderInputsByLockHash.length) {
@@ -1106,7 +1120,7 @@ export class TransactionGenerator {
         output.typeHash === chequeCell.typeHash!
     )
     if (!chequeSenderAcpCell) {
-      throw new Error('ACP cell not found')
+      throw new Error('sender ACP cell not found')
     }
 
     const relativeEpoch = '0xa000000000000006'
@@ -1129,21 +1143,15 @@ export class TransactionGenerator {
       data: chequeSenderAcpCell.data,
     })
 
-    const senderOutputsByLockHash = await CellsService.searchLiveCellsByLockHash(senderLockHash)
-    if (!senderOutputsByLockHash.length) {
-      throw new Error('sender live cell could not be found')
+    const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
+    const senderDefaultLockInput = senderInputsByLockHash[0]
+    if (!senderDefaultLockInput) {
+      throw new Error('sender default lock inputs could not be found')
     }
-    const previousSenderDefaultLockOutput = senderOutputsByLockHash[0]
 
-    const senderDefaultLockInput = Input.fromObject({
-      previousOutput: previousSenderDefaultLockOutput.outPoint(),
-      since: '0',
-      capacity: previousSenderDefaultLockOutput.capacity,
-      lock: previousSenderDefaultLockOutput.lockScript(),
-    })
     const senderDefaultLockOutput = Output.fromObject({
-      capacity: (BigInt(senderDefaultLockInput.capacity) + BigInt(chequeCell.capacity)).toString(),
-      lock: senderDefaultLockInput.lock!,
+      capacity: chequeCell.capacity,
+      lock: senderDefaultLockInput.lockScript()!,
     })
 
     const senderAcpInputAmount = BufferUtils.readBigUInt128LE(chequeSenderAcpInput.data!)
@@ -1166,7 +1174,7 @@ export class TransactionGenerator {
       version: '0',
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep, chequeDep],
       headerDeps: [],
-      inputs: [senderDefaultLockInput, chequeSenderAcpInput, chequeInput],
+      inputs: [chequeSenderAcpInput, chequeInput],
       outputs: [senderAcpOutput],
       outputsData: [],
       witnesses: [],

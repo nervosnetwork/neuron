@@ -214,7 +214,7 @@ export default class CellsService {
     return cells
   }
 
-  public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
+  public static async getCustomizedAssetCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
     const blake160Hashes = new Set(blake160s)
     const multiSign = new MultiSign()
     const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
@@ -256,9 +256,10 @@ export default class CellsService {
         return multiSignHashes.has(o.multiSignBlake160)
       }
       if (o.lockCodeHash === chequeLockCodeHash) {
-        const receiverLockArgs = o.lockArgs.slice(0, 42)
+        const receiverLockHash = o.lockArgs.slice(0, 42)
         const senderLockHash = o.lockArgs.slice(42)
-        return blake160Hashes.has(receiverLockArgs) || secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
+        return secp256k1LockHashes.find(hash => hash.includes(receiverLockHash)) ||
+          secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
     })
 
@@ -269,8 +270,8 @@ export default class CellsService {
       .map(o => {
         const cell = o.toModel()
         if (o.lockCodeHash === chequeLockCodeHash) {
-          const receiverLockArgs = o.lockArgs.slice(0, 42)
-          if (blake160Hashes.has(receiverLockArgs)) {
+          const receiverLockHash = o.lockArgs.slice(0, 42)
+          if (secp256k1LockHashes.find(hash => hash.includes(receiverLockHash))) {
             cell.setCustomizedAssetInfo({
               lock: CustomizedLock.Cheque,
               type: '',

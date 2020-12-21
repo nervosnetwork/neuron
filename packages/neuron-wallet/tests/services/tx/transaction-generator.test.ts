@@ -1933,7 +1933,7 @@ describe('TransactionGenerator', () => {
           const senderAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
           senderAcpLiveCell = LiveCell.fromLumos(senderAcpCellEntity)
           senderDefaultLock = alice.lockScript
-          const receiverDefaultLock = bobAnyoneCanPayLockScript
+          const receiverDefaultLock = bob.lockScript
 
           when(stubbedQueryIndexer)
             .calledWith({lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null})
@@ -1944,7 +1944,7 @@ describe('TransactionGenerator', () => {
 
           expectedChequeOutput = Output.fromObject({
             capacity: toShannon('161'),
-            lock: assetAccountInfo.generateChequeScript(receiverDefaultLock.args + senderDefaultLock.computeHash().slice(2, 42)),
+            lock: assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), senderDefaultLock.computeHash()),
             type: senderAcpLiveCell.type(),
             data: BufferUtils.writeBigUInt128LE(BigInt(110))
           })
@@ -2034,9 +2034,15 @@ describe('TransactionGenerator', () => {
 
           const chequeAmount = '10'
 
+          const receiverLockHash = SystemScriptInfo
+            .generateSecpScript(receiverAcpLiveCell.lockArgs)
+            .computeHash()
+
+          const senderDefaultLockHash = senderDefaultLock.computeHash()
+
           expectedChequeOutput = Output.fromObject({
             capacity: toShannon('161'),
-            lock: assetAccountInfo.generateChequeScript(receiverAcpLiveCell.lock().args + senderDefaultLock.computeHash().slice(2, 42)),
+            lock: assetAccountInfo.generateChequeScript(receiverLockHash, senderDefaultLockHash),
             type: senderAcpLiveCell.type(),
             data: BufferUtils.writeBigUInt128LE(BigInt(chequeAmount))
           })
@@ -2132,7 +2138,8 @@ describe('TransactionGenerator', () => {
 
         const chequeAmount = '10'
 
-        const chequeLock = assetAccountInfo.generateChequeScript('0x' + '0'.repeat(40) + senderDefaultLock.computeHash().slice(2, 42))
+        const chequeLock = assetAccountInfo
+          .generateChequeScript('0x' + '0'.repeat(40), senderDefaultLock.computeHash())
         chequeOutputEntity = new OutputEntity()
         chequeOutputEntity.capacity = toShannon('162')
         chequeOutputEntity.lockArgs = chequeLock.args
@@ -2167,16 +2174,12 @@ describe('TransactionGenerator', () => {
         const senderDefaultLockOutput = tx.outputs.find(
           output => output.lockHash === senderDefaultLockInputEntity.lockHash
         )!
-        const capacityAfterFees = BigInt(chequeOutputEntity.capacity) + BigInt(toShannon('1000')) - BigInt(tx.fee)
+        const capacityAfterFees = BigInt(chequeOutputEntity.capacity) - BigInt(tx.fee)
         expect(senderDefaultLockOutput.capacity).toEqual(capacityAfterFees.toString())
       })
       it('use 6 relative epoch in cheque input since', () => {
         const chequeInput = tx.inputs.find(input => input.lockHash === chequeOutputEntity.lockHash)!
         expect(chequeInput.toSDK().since).toEqual('0xa000000000000006')
-      })
-      it('first input should be with the sender default lock', () => {
-        const senderDefaultLockInput = tx.inputs[0]
-        expect(senderDefaultLockInput.lockHash!).toEqual(senderDefaultLockInputEntity.lockHash)
       })
     })
   })

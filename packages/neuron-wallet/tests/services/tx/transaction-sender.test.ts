@@ -103,6 +103,7 @@ import WitnessArgs from '../../../src/models/chain/witness-args'
 import CellWithStatus from '../../../src/models/chain/cell-with-status'
 import SystemScriptInfo from '../../../src/models/system-script-info'
 import NodeService from '../../../src/services/node'
+import AssetAccountInfo from '../../../src/models/asset-account-info'
 
 const TransactionSender = require('../../../src/services/transaction-sender').default
 
@@ -225,7 +226,7 @@ describe('TransactionSender Test', () => {
 
   describe('sign', () => {
     const pathAndPrivateKey = {
-      path: '',
+      path: `m/44'/309'/0'/0/0`,
       privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
     }
 
@@ -236,7 +237,7 @@ describe('TransactionSender Test', () => {
     const addr = {
       walletId: fakeWallet.id,
       address: '',
-      path: '',
+      path: `m/44'/309'/0'/0/0`,
       addressType: AddressType.Receiving,
       addressIndex: 1,
       txCount: 0,
@@ -376,6 +377,106 @@ describe('TransactionSender Test', () => {
 
           expect(ntx.witnesses[0]).toEqual(expectedWitness[0])
         })
+      })
+
+      describe('sign for cheque claim tx', () => {
+        const assetAccountInfo = new AssetAccountInfo()
+        const receiverDefaultLock = SystemScriptInfo.generateSecpScript(addr.blake160)
+        const tx = Transaction .fromObject({
+          "version": "0x0",
+          "cellDeps": [],
+          "headerDeps": [],
+          "inputs": [
+            Input.fromObject({
+              "previousOutput": OutPoint.fromObject({
+                "txHash": "0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3",
+                "index": "0x0"
+              }),
+              "since": "0x0",
+            })
+          ],
+          "outputs": [],
+          "outputsData": [],
+          "witnesses": [
+            "0x5500000010000000550000005500000041000000b6d1e054606d7229b594820357397ececac31685646d3dbf07d6afe421c96ff72d32ed139f20c7b97b47ec8361c00c1924976ed90031380c488c1bae8ce3bd9d00"
+          ],
+        })
+        describe('when matched receiver lock hash', () => {
+          beforeEach(() => {
+            const chequeLock = assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), '0'.repeat(40))
+            tx.inputs[0].lock = chequeLock
+          });
+          it('success', async () => {
+            // @ts-ignore: Private method
+            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234')
+
+            expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
+          })
+        });
+        describe('when not matched receiver lock hash', () => {
+          beforeEach(() => {
+            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40))
+            tx.inputs[0].lock = chequeLock
+          });
+          it('throws', async () => {
+            try {
+              // @ts-ignore: Private method
+              await transactionSender.sign(fakeWallet.id, tx, '1234')
+            } catch (error) {
+              expect(error.message).toBe('no private key found')
+            }
+          })
+        });
+      })
+
+      describe('sign for cheque withdraw tx', () => {
+        const assetAccountInfo = new AssetAccountInfo()
+        const senderDefaultLock = SystemScriptInfo.generateSecpScript(addr.blake160)
+        const tx = Transaction .fromObject({
+          "version": "0x0",
+          "cellDeps": [],
+          "headerDeps": [],
+          "inputs": [
+            Input.fromObject({
+              "previousOutput": OutPoint.fromObject({
+                "txHash": "0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3",
+                "index": "0x0"
+              }),
+              "since": "0x0",
+            })
+          ],
+          "outputs": [],
+          "outputsData": [],
+          "witnesses": [
+            "0x5500000010000000550000005500000041000000b6d1e054606d7229b594820357397ececac31685646d3dbf07d6afe421c96ff72d32ed139f20c7b97b47ec8361c00c1924976ed90031380c488c1bae8ce3bd9d00"
+          ],
+        })
+        describe('when matched sender lock hash', () => {
+          beforeEach(() => {
+            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), senderDefaultLock.computeHash())
+            tx.inputs[0].lock = chequeLock
+          });
+          it('success', async () => {
+            // @ts-ignore: Private method
+            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234')
+
+            expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
+          })
+        });
+        describe('when not matched sender lock hash', () => {
+          beforeEach(() => {
+            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40))
+            tx.inputs[0].lock = chequeLock
+          });
+          it('throws', async () => {
+            try {
+              // @ts-ignore: Private method
+              await transactionSender.sign(fakeWallet.id, tx, '1234')
+            } catch (error) {
+              expect(error.message).toBe('no private key found')
+            }
+          })
+        });
       })
     });
 
