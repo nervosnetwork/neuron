@@ -1,101 +1,206 @@
-// import React from 'react'
-// import { storiesOf } from '@storybook/react'
-// import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
+import React from 'react'
+import { storiesOf } from '@storybook/react'
+import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
 
-// const props: {
-//   [name: string]: Omit<SpecialAssetProps, 'onAction'>
-// } = {
-//   'Type and Data': {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'locked-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'online',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-//   Type: {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'locked-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'online',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-//   Data: {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'locked-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'online',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-//   'User defined asset': {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'user-defined-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'online',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-//   Locked: {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'locked-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'online',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-//   Claim: {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'claim-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'online',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-//   Offline: {
-//     datetime: new Date().getTime(),
-//     capacity: '123456789012345678',
-//     status: 'claim-asset',
-//     isMainnet: true,
-//     outPoint: {
-//       txHash: '',
-//       index: '',
-//     },
-//     connectionStatus: 'offline',
-//     bestKnownBlockTimestamp: Date.now(),
-//   },
-// }
+const props: {
+  [name: string]: Omit<SpecialAssetProps, 'onAction'>
+} = {
+  'Type and Data': {
+    cell: {
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
+      capacity: '123456789012345678',
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'online',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+  Type: {
+    cell: {
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
+      capacity: '123456789012345678',
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'online',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+  Data: {
+    cell: {
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
 
-// const stories = storiesOf('Special Asset', module)
+      capacity: '123456789012345678',
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'online',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+  'User defined asset': {
+    cell: {
+      capacity: '123456789012345678',
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'online',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+  Locked: {
+    cell: {
+      capacity: '123456789012345678',
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'online',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+  Claim: {
+    cell: {
+      capacity: '123456789012345678',
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'online',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+  Offline: {
+    cell: {
+      capacity: '123456789012345678',
+      outPoint: {
+        txHash: '',
+        index: '',
+      },
+      lock: {
+        args: '0xd2393e52df67cc0c231ef8cb04418bfeabb7b5e8b402009b00f00020',
+        codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+        hashType: 'type',
+      },
+      type: undefined,
+      data: '0x',
+    },
+    epoch: '0x3dd011d0004fb',
+    datetime: new Date().getTime(),
+    isMainnet: true,
+    connectionStatus: 'offline',
+    bestKnownBlockTimestamp: Date.now(),
+    tokenInfoList: [],
+    assetInfo: {
+      data: '',
+      lock: 'SingleMultiSign',
+      type: '',
+    },
+  },
+}
 
-// Object.keys(props).forEach(name => {
-//   stories.add(name, () => {
-//     return <SpecialAsset {...props[name]} onAction={console.info} />
-//   })
-// })
-export default undefined
+const stories = storiesOf('Special Asset', module)
+
+Object.keys(props).forEach(name => {
+  stories.add(name, () => {
+    return <SpecialAsset {...props[name]} onAction={console.info} />
+  })
+})
