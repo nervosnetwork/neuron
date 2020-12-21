@@ -1,5 +1,4 @@
 import { sendWithdrawChequeTransaction as sendTx } from 'services/remote'
-
 import { StateDispatch } from 'states'
 import { sendTxBaseAction } from 'utils'
 import { addNotification } from './app'
