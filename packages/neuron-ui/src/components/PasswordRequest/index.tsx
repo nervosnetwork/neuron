@@ -107,19 +107,20 @@ const PasswordRequest = () => {
       if (disabled) {
         return
       }
+      const handleSendTxRes = ({ status }: { status: number }) => {
+        if (isSuccessResponse({ status })) {
+          history.push(RoutePath.History)
+        } else if (status === ErrorCode.PasswordIncorrect) {
+          throw new PasswordIncorrectException()
+        }
+      }
       try {
         switch (actionType) {
           case 'send': {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
             break
           }
           case 'delete': {
@@ -171,13 +172,7 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
           case 'send-acp':
@@ -187,13 +182,7 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
           case 'send-cheque': {
@@ -201,13 +190,7 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: experimental?.tx, description, password })(dispatch).then(
-              ({ status }) => {
-                if (isSuccessResponse({ status })) {
-                  history.push(RoutePath.History)
-                } else if (status === ErrorCode.PasswordIncorrect) {
-                  throw new PasswordIncorrectException()
-                }
-              }
+              handleSendTxRes
             )
             break
           }
@@ -215,13 +198,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(handleSendTxRes)
             break
           }
           case 'create-account-to-claim-cheque': {
@@ -237,13 +214,7 @@ const PasswordRequest = () => {
                 tokenID: experimental?.assetAccount.tokenId,
                 balance: '0',
               },
-            })(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            })(dispatch).then(handleSendTxRes)
             break
           }
           case 'withdraw-cheque': {
@@ -251,16 +222,7 @@ const PasswordRequest = () => {
               break
             }
             await sendWithdrawChequeTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(
-              ({ status }) => {
-                if (isSuccessResponse({ status })) {
-                  dispatch({
-                    type: AppActions.SetGlobalDialog,
-                    payload: 'unlock-success',
-                  })
-                } else if (status === ErrorCode.PasswordIncorrect) {
-                  throw new PasswordIncorrectException()
-                }
-              }
+              handleSendTxRes
             )
             break
           }
