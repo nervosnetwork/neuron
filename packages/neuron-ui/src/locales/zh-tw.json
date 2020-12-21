@@ -365,16 +365,16 @@
         "title": "升級資產賬戶"
       },
       "send-cheque": {
-        "title": ""
+        "title": "發起 Cheque 交易"
       },
       "withdraw-cheque": {
-        "title": ""
+        "title": "撤回 Cheque 資產"
       },
       "claim-cheque": {
-        "title": ""
+        "title": "領取 Cheque 資產"
       },
       "create-account-to-claim-cheque": {
-        "title": ""
+        "title": "創建賬戶並領取 Cheque 資產"
       }
     },
     "qrcode": {

@@ -365,16 +365,16 @@
         "title": "升级资产账户"
       },
       "send-cheque": {
-        "title": ""
+        "title": "发起 Cheque 交易"
       },
       "withdraw-cheque": {
-        "title": ""
+        "title": "撤回 Cheque 资产"
       },
       "claim-cheque": {
-        "title": ""
+        "title": "领取 Cheque 资产"
       },
       "create-account-to-claim-cheque": {
-        "title": ""
+        "title": "创建账户并领取 Cheque 资产"
       }
     },
     "qrcode": {
