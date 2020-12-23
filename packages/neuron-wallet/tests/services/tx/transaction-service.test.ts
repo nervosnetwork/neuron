@@ -361,16 +361,29 @@ describe('Test TransactionService', () => {
 
     describe('When search with an address', () => {
       describe('When address hits', () => {
-        beforeEach(() => {
-          const ADDRESS = 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
-          stubProvider.searchValue = ADDRESS
-        })
+        describe('search with wallet adddress', () => {
+          beforeEach(() => {
+            const ADDRESS = ADDRESSES[1]
+            stubProvider.searchValue = ADDRESS
+          })
 
-        it('Should return an array of several transactions', async () => {
-          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
-          expect(actual.totalCount).toBe(2)
-        })
-      })
+          it('Should return an array of several transactions', async () => {
+            const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+            expect(actual.totalCount).toBe(2)
+          })
+        });
+        describe('search with counterparty wallet adddress', () => {
+          beforeEach(() => {
+            const ADDRESS = 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83'
+            stubProvider.searchValue = ADDRESS
+          })
+
+          it('Should return an array of several transactions', async () => {
+            const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
+            expect(actual.totalCount).toBe(2)
+          })
+        });
+      });
 
       describe('When address misses', () => {
         beforeEach(() => {
