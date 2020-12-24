@@ -121,7 +121,7 @@ export default class IndexerCacheService {
         },
         {
           lockScript: addressMeta.generateChequeLockScriptWithReceiverLockHash(),
-          argsLen: 52
+          argsLen: 40
         },
       ]
 

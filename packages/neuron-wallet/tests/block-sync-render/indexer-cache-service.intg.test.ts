@@ -303,7 +303,7 @@ describe('indexer cache service', () => {
                 ...formattedChequeLockScript,
                 args: formattedChequeLockScript.args.slice(0, 42)
               },
-              argsLen: 52
+              argsLen: 40
             }
           )
           .mockReturnValue(fakeCollectorObj)
