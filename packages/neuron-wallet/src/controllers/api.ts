@@ -3,6 +3,7 @@ import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuIt
 import { t } from 'i18next'
 import env from 'env'
 import { showWindow } from './app/show-window'
+import CommonUtils from 'utils/common'
 import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
@@ -22,7 +23,7 @@ import SignMessageController from 'controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
-import AssetAccountController, { GenerateWithdrawChequeTxParams, SendWithdrawChequeTxParams } from './asset-account'
+import AssetAccountController, { GenerateWithdrawChequeTxParams } from './asset-account'
 import {
   GenerateCreateAssetAccountTxParams,
   SendCreateAssetAccountTxParams,
@@ -452,10 +453,6 @@ export default class ApiController {
       return this.assetAccountController.generateWithdrawChequeTx(params)
     })
 
-    handle('send-withdraw-cheque-tx', async (_, params: SendWithdrawChequeTxParams) => {
-      return this.assetAccountController.sendWithdrawChequeTx(params)
-    })
-
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.generateTx(params)
     })
@@ -530,7 +527,7 @@ export default class ApiController {
         }
         const res = {
           status: err.code || ResponseCode.Fail,
-          message: typeof err.message === 'string' ? { content: err.message } : err.message,
+          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
         }
         return res
       }

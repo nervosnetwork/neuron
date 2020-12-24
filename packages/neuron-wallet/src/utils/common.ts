@@ -27,4 +27,16 @@ export default class CommonUtils {
       })
     ])
   }
+
+  public static tryParseError(message: any) {
+    try {
+      const json = JSON.parse(message)
+      if (json.message) {
+        return json.message
+      }
+      return message
+    } catch (error) {
+      return message
+    }
+  }
 }
