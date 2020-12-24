@@ -12,7 +12,6 @@ import {
   useDispatch,
   AppActions,
   sendTransaction,
-  sendWithdrawChequeTransaction,
   deleteWallet,
   backupWallet,
   migrateAcp,
@@ -221,9 +220,7 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendWithdrawChequeTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(
-              handleSendTxRes
-            )
+            await sendTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(handleSendTxRes)
             break
           }
           default: {

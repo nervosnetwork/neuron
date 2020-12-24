@@ -90,7 +90,7 @@ const SpecialAssetList = () => {
         decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
         isCKB: false,
         onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
-          const params: any = {}
+          const params: any = accountToClaim?.account || {}
           Object.keys(info).forEach(key => {
             if (
               info[key as keyof typeof info] !==

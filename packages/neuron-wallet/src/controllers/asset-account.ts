@@ -15,7 +15,6 @@ import CommandSubject from 'models/subjects/command'
 import SyncApiController, { SyncStatus } from "./sync-api"
 import { TransactionGenerator } from "services/tx"
 import OutPoint from "models/chain/out-point"
-import { set as setDescription } from 'services/tx/transaction-description'
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -66,12 +65,6 @@ export interface GenerateClaimChequeTxParams {
 export interface GenerateWithdrawChequeTxParams {
   walletID: string
   chequeCellOutPoint: OutPoint
-}
-
-export interface SendWithdrawChequeTxParams {
-  walletID: string
-  tx: Transaction
-  password: string
 }
 
 export default class AssetAccountController {
@@ -313,31 +306,6 @@ export default class AssetAccountController {
     return {
       status: ResponseCode.Success,
       result: {tx},
-    }
-  }
-
-  public async sendWithdrawChequeTx(params: SendWithdrawChequeTxParams): Promise<Controller.Response<string>> {
-    const txModel = Transaction.fromObject(params.tx)
-    const txHash = await new TransactionSender().sendTx(
-      params.walletID,
-      txModel,
-      params.password,
-      1,
-      false
-    )
-
-    if (!txHash) {
-      throw new ServiceHasNoResponse('AnyoneCanPay')
-    }
-
-    const description = txModel.description
-    if (description !== '') {
-      await setDescription(params.walletID, txHash, description)
-    }
-
-    return {
-      status: ResponseCode.Success,
-      result: txHash,
     }
   }
 }

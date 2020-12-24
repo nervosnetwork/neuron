@@ -10,11 +10,6 @@ export const generateWithdrawChequeTransaction = remoteApi<
   Controller.GenerateWithdrawChequeTransaction.Response
 >('generate-withdraw-cheque-tx')
 
-export const sendWithdrawChequeTransaction = remoteApi<
-  Controller.SendWithdrawChequeTransaction.Params,
-  Controller.SendWithdrawChequeTransaction.Response
->('send-withdraw-cheque-tx')
-
 export const generateClaimChequeTransaction = remoteApi<
   Controller.GenerateClaimChequeTransaction.Params,
   Controller.GenerateClaimChequeTransaction.Response
