@@ -874,7 +874,6 @@ export class TransactionGenerator {
       capacity: BigInt(162 * 10 ** 8).toString(),
       lock: assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40)),
       type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
-      data: BufferUtils.writeBigUInt128LE(BigInt(amount))
     })
 
     const tx =  Transaction.fromObject({
@@ -910,7 +909,7 @@ export class TransactionGenerator {
     const newBaseSize: number = TransactionSize.tx(tx) +
       TransactionSize.secpLockWitness() * tx.inputs.length +
       TransactionSize.output(chequeCellTmp) +
-      TransactionSize.outputData(chequeCellTmp.data)
+      TransactionSize.outputData(BufferUtils.writeBigUInt128LE(BigInt(0)))
 
     const gatheredCKBInputResult = await CellsService.gatherInputs(
       chequeCellTmp.capacity,
@@ -931,6 +930,7 @@ export class TransactionGenerator {
 
     const chequeCell = Output.fromObject({
       ...chequeCellTmp,
+      data: BufferUtils.writeBigUInt128LE(BigInt(gatheredSudtInputResult.amount)),
       lock: assetAccountInfo.generateChequeScript(
         receiverLockScript.computeHash(),
         senderDefaultCell.lock!.computeHash()
@@ -954,6 +954,9 @@ export class TransactionGenerator {
 
       tx.addOutput(output)
     }
+
+    tx.sudtInfo = amount === 'all' ? { amount: gatheredSudtInputResult.amount }: { amount }
+    tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
 
     TransactionGenerator.checkTxCapacity(tx, 'generateCreateChequeTx capacity not match!')
     TransactionGenerator.checkTxSudtAmount(tx, 'generateCreateChequeTx sUDT amount not match!', assetAccountInfo)

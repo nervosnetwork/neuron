@@ -1967,33 +1967,35 @@ describe('TransactionGenerator', () => {
       const tokenID = '0x' + '0'.repeat(64)
       const typeScript = assetAccountInfo.generateSudtScript(tokenID)
       const chequeAmount = '10'
+      let assetAccount: AssetAccount
       let tx: Transaction
       describe('#generateCreateChequeTx', () => {
-        describe('with existing acp cell', () => {
-          let senderAcpLiveCell: LiveCell
-          let senderDefaultLock: Script
-          let expectedChequeOutput: Output
+        let senderAcpLiveCell: LiveCell
+        let senderDefaultLock: Script
+        let expectedChequeOutput: Output
+        beforeEach(async () => {
+          const senderAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+          senderAcpLiveCell = LiveCell.fromLumos(senderAcpCellEntity)
+          senderDefaultLock = alice.lockScript
+          const receiverDefaultLock = bob.lockScript
+
+          when(stubbedQueryIndexer)
+            .calledWith({lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null})
+            .mockResolvedValue([
+              generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript),
+              generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+            ])
+
+          expectedChequeOutput = Output.fromObject({
+            capacity: toShannon('161'),
+            lock: assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), senderDefaultLock.computeHash()),
+            type: senderAcpLiveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(110))
+          })
+          assetAccount = new AssetAccount(tokenID, '', '', '', '', '', alice.lockScript.args)
+        });
+        describe('with numeric send amount', () => {
           beforeEach(async () => {
-            const senderAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-            senderAcpLiveCell = LiveCell.fromLumos(senderAcpCellEntity)
-            senderDefaultLock = alice.lockScript
-            const receiverDefaultLock = bob.lockScript
-
-            when(stubbedQueryIndexer)
-              .calledWith({lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null})
-              .mockResolvedValue([
-                generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript),
-                generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
-              ])
-
-            expectedChequeOutput = Output.fromObject({
-              capacity: toShannon('161'),
-              lock: assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), senderDefaultLock.computeHash()),
-              type: senderAcpLiveCell.type(),
-              data: BufferUtils.writeBigUInt128LE(BigInt(110))
-            })
-            const assetAccount = new AssetAccount(tokenID, '', '', '', '', '', alice.lockScript.args)
-
             tx = await TransactionGenerator.generateCreateChequeTx(
               walletId1,
               BufferUtils.readBigUInt128LE(expectedChequeOutput.data).toString(),
@@ -2005,7 +2007,6 @@ describe('TransactionGenerator', () => {
             )
           });
           it('creates cheque output', () => {
-            expect(tx.outputsData[0]).toEqual(expectedChequeOutput.data)
             const chequeOutput = tx.outputs[0]
             expect(chequeOutput.lock.computeHash()).toEqual(expectedChequeOutput.lockHash)
             expect(chequeOutput.lock.args.length).toEqual(82)
@@ -2019,7 +2020,30 @@ describe('TransactionGenerator', () => {
             )
             expect(defaultLockInput).not.toEqual(undefined)
           })
-        })
+          it('specifies send amount', () => {
+            expect(tx.outputsData[0]).toEqual(expectedChequeOutput.data)
+            expect(tx.sudtInfo!.amount).toBe('110')
+            expect(tx.anyoneCanPaySendAmount).toBe('110')
+          })
+        });
+        describe('with send all amount', () => {
+          beforeEach(async () => {
+            tx = await TransactionGenerator.generateCreateChequeTx(
+              walletId1,
+              'all',
+              assetAccount,
+              bob.address,
+              alice.address,
+              '0',
+              '1000'
+            )
+          });
+          it('specifies send amount', () => {
+            expect(tx.outputsData[0]).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+            expect(tx.sudtInfo!.amount).toBe('200')
+            expect(tx.anyoneCanPaySendAmount).toBe('200')
+          })
+        });
       });
 
       describe('#generateClaimChequeTx', () => {

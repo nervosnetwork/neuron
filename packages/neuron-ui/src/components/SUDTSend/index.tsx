@@ -234,8 +234,10 @@ const SUDTSend = () => {
       }
       let generator = generateSUDTTransaction
       if (isSecp256k1ShortAddress) {
-        // TODO: send all to cheque
-        generator = sendState.sendAll ? generateChequeTransaction : generateChequeTransaction
+        generator = generateChequeTransaction
+        if (sendState.sendAll) {
+          params.amount = 'all'
+        }
       } else if (sendState.sendAll) {
         generator = generateSendAllSUDTTransaction
       }
