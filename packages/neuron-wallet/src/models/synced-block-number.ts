@@ -1,6 +1,5 @@
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
-import SyncedBlockNumberSubject from 'models/subjects/node'
 import logger from 'utils/logger'
 
 // Keep track of synced block number.
@@ -16,8 +15,6 @@ export default class SyncedBlockNumber {
   }
 
   public async setNextBlock(current: bigint): Promise<void> {
-    SyncedBlockNumberSubject.getSubject().next(current.toString())
-
     const blockDiffAbs = Math.abs(Number(current) - Number(SyncedBlockNumber.lastSavedBlock))
     if (current === BigInt(0) || blockDiffAbs >= 10) {
       SyncedBlockNumber.lastSavedBlock = current

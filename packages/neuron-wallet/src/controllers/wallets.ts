@@ -1,6 +1,5 @@
 import fs from 'fs'
 import { t } from 'i18next'
-import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import NetworksService from 'services/networks'
@@ -28,16 +27,19 @@ import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
 import { set as setDescription } from 'services/tx/transaction-description'
+import HardwareWalletService from 'services/hardware'
+import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
+import AddressParser from 'models/address-parser'
 
 export default class WalletsController {
-  public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
+  public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
     const wallets = WalletsService.getInstance().getAll()
     if (!wallets) {
       throw new ServiceHasNoResponse('Wallet')
     }
     return {
       status: ResponseCode.Success,
-      result: wallets.map(({ name, id }) => ({ name, id })),
+      result: wallets.map(({ name, id, device, }) => ({ name, id, device, })),
     }
   }
 
@@ -99,7 +101,7 @@ export default class WalletsController {
       keystore,
     })
 
-    walletsService.generateAddressesById(wallet.id, isImporting)
+    wallet.checkAndGenerateAddresses(isImporting)
 
     return {
       status: ResponseCode.Success,
@@ -141,7 +143,7 @@ export default class WalletsController {
       keystore: keystoreObject,
     })
 
-    walletsService.generateAddressesById(wallet.id, true)
+    wallet.checkAndGenerateAddresses(true)
 
     return {
       status: ResponseCode.Success,
@@ -149,17 +151,35 @@ export default class WalletsController {
     }
   }
 
-  public async update({ id, name, password, newPassword }: { id: string, password: string, name: string, newPassword?: string }):
-    Promise<Controller.Response<Wallet>> {
+  public async update({
+    id,
+    name,
+    password,
+    newPassword,
+    device,
+  }: {
+    id: string;
+    password: string;
+    name: string;
+    newPassword?: string;
+    device?: DeviceInfo;
+  }): Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
     if (!wallet) {
       throw new WalletNotFound(id)
     }
 
-    const props = {
+    const props: { name: string, keystore?: Keystore, device?: DeviceInfo } = {
       name: name || wallet.name,
-      keystore: wallet.loadKeystore(),
+    }
+
+    if (!wallet.isHardware()) {
+      props.keystore = wallet.loadKeystore()
+    }
+
+    if (device && wallet.isHardware()) {
+      props.device = device
     }
 
     if (newPassword) {
@@ -196,6 +216,28 @@ export default class WalletsController {
     return this.backupWallet(id)
   }
 
+  public async importHardwareWallet (
+    { publicKey, chainCode, walletName }: ExtendedPublicKey & { walletName: string }
+  ): Promise<Controller.Response<Wallet>> {
+    const device = HardwareWalletService.getInstance().getCurrent()!
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(publicKey, chainCode)
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.create({
+      device: device.deviceInfo,
+      id: '',
+      name: walletName,
+      extendedKey: accountExtendedPublicKey.serialize(),
+      keystore: Keystore.createEmpty(),
+    })
+
+    wallet.checkAndGenerateAddresses(true)
+
+    return {
+      status: ResponseCode.Success,
+      result: wallet
+    }
+  }
+
   public async importXPubkey(): Promise<Controller.Response<Wallet>> {
     return dialog.showOpenDialog(
       BrowserWindow.getFocusedWindow()!,
@@ -220,7 +262,7 @@ export default class WalletsController {
             keystore: Keystore.createEmpty()
           })
 
-          walletsService.generateAddressesById(wallet.id, true)
+          wallet.checkAndGenerateAddresses(true)
           return {
             status: ResponseCode.Success,
             result: wallet
@@ -308,7 +350,7 @@ export default class WalletsController {
     }
   }
 
-  public async sendTx(params: { walletID: string, tx: Transaction, password: string, description?: string }) {
+  public async sendTx(params: { walletID: string, tx: Transaction, password: string, description?: string }, skipSign = false) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -316,7 +358,9 @@ export default class WalletsController {
     const hash = await new TransactionSender().sendTx(
       params.walletID,
       Transaction.fromObject(params.tx),
-      params.password
+      params.password,
+      0,
+      skipSign
     )
     const description = params.description ?? ''
     if (description !== '') {
@@ -384,7 +428,15 @@ export default class WalletsController {
 
   // It would bypass verifying password window/event if wallet is watch only.
   public async requestPassword(walletID: string, action: 'delete-wallet' | 'backup-wallet'){
-    const keystore = WalletsService.getInstance().get(walletID).loadKeystore()
+    const wallet = WalletsService.getInstance().get(walletID)
+    if (wallet.isHardware()) {
+      if (action === 'delete-wallet') {
+        return this.deleteWallet(walletID)
+      }
+      return this.backupWallet(walletID)
+    }
+
+    const keystore = wallet.loadKeystore()
     if (keystore.isEmpty()) {
       // Watch only wallet imported with xpubkey
       if (action === 'delete-wallet') {
@@ -437,13 +489,9 @@ export default class WalletsController {
   }
 
   private verifyAddress = (address: string): boolean => {
-    if (typeof address !== 'string') {
-      return false
-    }
     try {
-      const result = parseAddress(address, 'hex')
-      const isShortAddress = (result.startsWith('0x0100') || result.startsWith('0x0101')) && address.length === 46
-      return isShortAddress || result.startsWith('0x02') || result.startsWith('0x04')
+      AddressParser.parse(address)
+      return true
     } catch (err) {
       logger.warn(`verify address error: ${err}`)
       return false

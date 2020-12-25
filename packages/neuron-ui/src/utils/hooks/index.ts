@@ -21,6 +21,8 @@ import {
 } from 'utils/validators'
 import { MenuItemConstructorOptions } from 'electron'
 
+export * from './createSUDTAccount'
+
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
     history.goBack()
@@ -410,4 +412,8 @@ export const useGlobalNotifications = (
       })
     }
   }, [dispatch])
+}
+
+export const useDidMount = (cb: () => void) => {
+  useEffect(cb, [])
 }

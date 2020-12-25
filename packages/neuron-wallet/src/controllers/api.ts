@@ -26,6 +26,9 @@ import AssetAccountController from './asset-account'
 import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams, MigrateACPParams } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
+import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
+import HardwareController from './hardware'
+import OfflineSignController from './offline-sign'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -37,6 +40,8 @@ export default class ApiController {
   private customizedAssetsController = new CustomizedAssetsController()
   private assetAccountController = new AssetAccountController()
   private anyoneCanPayController = new AnyoneCanPayController()
+  private hardwareController = new HardwareController()
+  private offlineSignController = new OfflineSignController()
 
   public async mount() {
     this.registerHandlers()
@@ -319,7 +324,7 @@ export default class ApiController {
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
       return this.daoController.withdrawFromDao(params)
-    })
+    });
 
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
@@ -438,6 +443,48 @@ export default class ApiController {
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.sendTx(params)
+    })
+
+    // Hardware wallet
+    handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
+      await this.hardwareController.connectDevice(deviceInfo)
+    })
+
+    handle('detect-device', async (_, model: Pick<DeviceInfo, 'manufacturer' | 'product'>) => {
+      return this.hardwareController.detectDevice(model)
+    })
+
+    handle('get-device-ckb-app-version', async () => {
+      return this.hardwareController.getCkbAppVersion()
+    })
+
+    handle('get-device-firmware-version', async () => {
+      return this.hardwareController.getFirmwareVersion()
+    })
+
+    handle('get-device-public-key', async () => {
+      return this.hardwareController.getPublicKey()
+    })
+
+    handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
+      return await this.walletsController.importHardwareWallet(params)
+    })
+
+    // Offline sign
+    handle('export-transaction-as-json', async (_, params) => {
+      return this.offlineSignController.exportTransactionAsJSON(params)
+    })
+
+    handle('sign-transaction-only', async (_, params) => {
+      return this.offlineSignController.signTransaction(params)
+    })
+
+    handle('broadcast-transaction-only', async (_, params) => {
+      return this.offlineSignController.broadcastTransaction(params)
+    })
+
+    handle('sign-and-export-transaction', async (_, params) => {
+      return this.offlineSignController.signAndExportTransaction(params)
     })
   }
 

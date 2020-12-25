@@ -5,9 +5,11 @@ import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils'
 const SyncStatus = ({
   syncStatus,
   connectionStatus,
+  leftTime,
 }: React.PropsWithoutRef<{
   syncStatus: SyncStatusEnum
   connectionStatus: State.ConnectionStatus
+  leftTime: string
 }>) => {
   const [t] = useTranslation()
 
@@ -31,7 +33,7 @@ const SyncStatus = ({
     return <span>{t('sync.synced')}</span>
   }
 
-  return <span>{t('sync.syncing')}</span>
+  return <span>{t('sync.syncing', { leftTime })}</span>
 }
 
 SyncStatus.displayName = 'SyncStatus'

@@ -213,17 +213,17 @@ export const useOnDepositValueChange = ({ updateDepositValue }: { updateDepositV
   )
 
 export const useUpdateGlobalAPC = ({
-  tipBlockTimestamp,
+  bestKnownBlockTimestamp,
   genesisBlockTimestamp,
   setGlobalAPC,
 }: {
-  tipBlockTimestamp: number
+  bestKnownBlockTimestamp: number
   genesisBlockTimestamp: number | undefined
   setGlobalAPC: React.Dispatch<React.SetStateAction<number>>
 }) =>
   useEffect(() => {
-    if (tipBlockTimestamp) {
-      const startYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+    if (bestKnownBlockTimestamp) {
+      const startYearNumber = (bestKnownBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
       try {
         const apc = calculateAPC({
           startYearNumber,
@@ -234,7 +234,7 @@ export const useUpdateGlobalAPC = ({
         console.error(err)
       }
     }
-  }, [tipBlockTimestamp, genesisBlockTimestamp, setGlobalAPC])
+  }, [bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC])
 
 export const useOnDepositDialogDismiss = ({
   setShowDepositDialog,

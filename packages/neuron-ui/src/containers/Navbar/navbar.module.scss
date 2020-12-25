@@ -8,8 +8,8 @@ $left-padding: 15px;
   grid-template:
     'name' 75px
     'navs' 1fr
-    'network' 3rem
-    'sync' 3rem /
+    'network' 4rem
+    'sync' 2.6rem /
     var(--sidebar-width);
   height: 100vh;
   background: black;
@@ -67,7 +67,7 @@ $left-padding: 15px;
 
   & > div {
     align-items: flex-end;
-    padding-left: $left-padding * 2;
+    padding-left: $left-padding;
     padding-right: $left-padding;
     padding-bottom: 5px;
   }
@@ -76,13 +76,13 @@ $left-padding: 15px;
 .sync {
   position: relative;
   display: flex;
-  flex-direction: column;
   grid-area: sync;
   font-size: 0.8rem;
-
-  & > span {
-    padding-left: $left-padding * 2;
-    color: var(--nervos-green);
+  padding-left: $left-padding;
+  color: var(--nervos-green);
+  span {
+    flex: 1;
+    padding-left: 3px;
   }
 }
 

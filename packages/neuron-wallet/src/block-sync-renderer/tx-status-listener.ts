@@ -7,6 +7,7 @@ import NetworksService from 'services/networks'
 import { TransactionStatus } from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import logger from 'utils/logger'
+import { interval } from 'rxjs'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NetworksService.getInstance().getCurrent().remote
@@ -74,10 +75,7 @@ const trackingStatus = async () => {
 }
 
 export const register = () => {
-  // every 5 seconds
-  setInterval(async () => {
-    // Disable debug output as it's too annoying.
-    // logger.debug("periodically status tracking ...")
+  interval(5000).subscribe(async () => {
     try {
       getConnection()
       await trackingStatus()
@@ -87,7 +85,7 @@ export const register = () => {
         throw err
       }
     }
-  }, 5000)
+  })
 }
 
 export const unregister = () => {

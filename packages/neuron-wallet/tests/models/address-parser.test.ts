@@ -23,6 +23,13 @@ describe('AddressParser', () => {
     codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8'
   }
 
+  const shortACPAddressInfo = {
+    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    args: '0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a',
+    hashType: ScriptHashType.Type,
+    address: 'ckb1qypylv479ewscx3ms620sv34pgeuz6zagaaqvrugu7',
+  }
+
   describe('parse', () => {
     it('full address', () => {
       const script = AddressParser.parse(fullAddressInfo.address)
@@ -31,7 +38,7 @@ describe('AddressParser', () => {
       expect(script.hashType).toEqual(fullAddressInfo.hashType)
     })
 
-    it('short address', () => {
+    it('default lock short address', () => {
       const script = AddressParser.parse(shortAddressInfo.address)
       expect(script.codeHash).toEqual(shortAddressInfo.codeHash)
       expect(script.args).toEqual(shortAddressInfo.args)
@@ -44,17 +51,31 @@ describe('AddressParser', () => {
       expect(script.args).toEqual(multiSignAddressInfo.args)
       expect(script.hashType).toEqual(multiSignAddressInfo.hashType)
     })
+
+    it ('acp short address', () => {
+      const script = AddressParser.parse(shortACPAddressInfo.address)
+      expect(script.codeHash).toEqual(shortACPAddressInfo.codeHash)
+      expect(script.args).toEqual(shortACPAddressInfo.args)
+      expect(script.hashType).toEqual(shortACPAddressInfo.hashType)
+    })
   })
 
   it('batchParse', () => {
-    const result = AddressParser.batchParse([shortAddressInfo.address, fullAddressInfo.address])
-    expect(result.length).toEqual(2)
+    const result = AddressParser.batchParse([
+      shortAddressInfo.address,
+      fullAddressInfo.address,
+      shortACPAddressInfo.address
+    ])
+    expect(result.length).toEqual(3)
     expect(result[0].codeHash).toEqual(shortAddressInfo.codeHash)
     expect(result[0].args).toEqual(shortAddressInfo.args)
     expect(result[0].hashType).toEqual(shortAddressInfo.hashType)
     expect(result[1].codeHash).toEqual(fullAddressInfo.codeHash)
     expect(result[1].args).toEqual(fullAddressInfo.args)
     expect(result[1].hashType).toEqual(fullAddressInfo.hashType)
+    expect(result[2].codeHash).toEqual(shortACPAddressInfo.codeHash)
+    expect(result[2].args).toEqual(shortACPAddressInfo.args)
+    expect(result[2].hashType).toEqual(shortACPAddressInfo.hashType)
   })
 
 })

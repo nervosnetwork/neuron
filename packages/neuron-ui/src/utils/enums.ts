@@ -29,6 +29,8 @@ export enum RoutePath {
   SUDTAccountList = '/s-udt/accounts',
   SUDTSend = '/s-udt/send',
   SUDTReceive = '/s-udt/receive',
+  ImportHardware = '/*/import-hardware',
+  OfflineSign = '/*/offline-sign',
 }
 
 export enum CapacityUnit {
@@ -94,6 +96,17 @@ export enum ErrorCode {
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
   AddressIsDeprecated = 309,
+  // hardware
+  SignTransactionFailed = 400,
+  ConnectFailed = 401,
+  CkbAppNotFound = 402,
+  DeviceNotFound = 403,
+  MultiDevice = 404,
+  UnknownError = 405,
+  SignMessageFailed = 406,
+  UnsupportedManufacturer = 407,
+  // offline
+  DeviceInSleep = 501,
 }
 
 export enum SyncStatus {

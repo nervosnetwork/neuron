@@ -1,12 +1,11 @@
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException, FieldInvalidException, AddressDeprecatedException } from 'exceptions'
-import { LONG_TYPE_PREFIX } from 'utils/const'
+import { LONG_TYPE_PREFIX, SHORT_ADDR_SUDT_LOCK_PREFIX } from 'utils/const'
 import { DeprecatedScript } from 'utils/enums'
 import { validateAddress } from './address'
 
 export const validateSUDTAddress = ({
   address,
-  codeHash = '',
   isMainnet,
   required = false,
 }: {
@@ -24,17 +23,21 @@ export const validateSUDTAddress = ({
       throw new AddressDeprecatedException()
     }
 
-    if (!parsed.startsWith(LONG_TYPE_PREFIX)) {
+    const ARGS_LENGTH = 40
+    let minimums = ''
+
+    if (parsed.startsWith(LONG_TYPE_PREFIX)) {
+      const CODE_HASH_LENGTH = 64
+      if (parsed.length < LONG_TYPE_PREFIX.length + CODE_HASH_LENGTH + ARGS_LENGTH) {
+        throw new FieldInvalidException(FIELD_NAME)
+      }
+      minimums = parsed.slice(LONG_TYPE_PREFIX.length + CODE_HASH_LENGTH + ARGS_LENGTH)
+    } else if (parsed.startsWith(SHORT_ADDR_SUDT_LOCK_PREFIX)) {
+      minimums = parsed.slice(SHORT_ADDR_SUDT_LOCK_PREFIX.length + ARGS_LENGTH)
+    } else {
       throw new FieldInvalidException(FIELD_NAME)
     }
 
-    const CODE_HASH_LENGTH = 64
-    const codeHashOfAddr = parsed.substr(4, CODE_HASH_LENGTH)
-    if (codeHash && codeHashOfAddr !== codeHash.slice(2)) {
-      throw new FieldInvalidException(FIELD_NAME)
-    }
-    const ARGS_LENGTH = 40
-    const minimums = parsed.slice(4 + CODE_HASH_LENGTH + ARGS_LENGTH)
     if (minimums && ((minimums.length !== 2 && minimums.length !== 4) || Number.isNaN(+`0x${minimums}`))) {
       throw new FieldInvalidException(FIELD_NAME)
     }

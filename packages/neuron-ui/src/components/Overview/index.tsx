@@ -51,10 +51,9 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
 
 const Overview = () => {
   const {
-    app: { tipBlockNumber, tipBlockTimestamp },
     wallet: { id, balance = '' },
     chain: {
-      tipBlockNumber: syncedBlockNumber,
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
       transactions: { items = [] },
       connectionStatus,
       networkID,
@@ -66,9 +65,9 @@ const Overview = () => {
   const history = useHistory()
 
   const syncStatus = getSyncStatus({
-    syncedBlockNumber,
-    tipBlockNumber,
-    tipBlockTimestamp,
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
+    cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })
@@ -113,7 +112,7 @@ const Overview = () => {
         const confirmationCount =
           item.blockNumber === null || item.status === 'failed'
             ? 0
-            : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+            : 1 + Math.max(cacheTipBlockNumber, bestKnownBlockNumber) - +item.blockNumber
 
         if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
           status = 'confirming' as any
@@ -191,7 +190,7 @@ const Overview = () => {
         </table>
       </div>
     )
-  }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
+  }, [recentItems, cacheTipBlockNumber, bestKnownBlockNumber, t, onRecentActivityDoubleClick])
 
   return (
     <div className={styles.overview}>
