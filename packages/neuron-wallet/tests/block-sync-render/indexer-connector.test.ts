@@ -130,8 +130,8 @@ describe('unit tests for IndexerConnector', () => {
     });
   });
   describe('#connect', () => {
-    const fakeTip1 = {block_number: '1', block_hash: 'hash1'}
-    const fakeTip2 = {block_number: '2', block_hash: 'hash2'}
+    const fakeTip1 = {block_number: '1', block_hash: 'hash1', indexer_tip_number: '1'}
+    const fakeTip2 = {block_number: '2', block_hash: 'hash2', indexer_tip_number: '2'}
     const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
     const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
     const fakeBlock3 = {number: '3', hash: '3', timestamp: '3'}
@@ -212,6 +212,8 @@ describe('unit tests for IndexerConnector', () => {
       describe('#transactionsSubject', () => {
         let transactionsSubject: any
         beforeEach(() => {
+          stubbedTipFn.mockReturnValueOnce(fakeTip1)
+
           indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
           transactionsSubject = indexerConnector.transactionsSubject
         });
@@ -219,6 +221,7 @@ describe('unit tests for IndexerConnector', () => {
         describe('when there are transactions', () => {
           let txObserver: any
           beforeEach(() => {
+
             stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
             stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx3.transaction.hash])
 
@@ -380,11 +383,11 @@ describe('unit tests for IndexerConnector', () => {
           });
         });
       });
-      describe('#blockTipSubject', () => {
+      describe('#blockTipsSubject', () => {
         let tipObserver: any
         beforeEach(async () => {
           tipObserver = jest.fn()
-          indexerConnector.blockTipSubject.subscribe(tip => {
+          indexerConnector.blockTipsSubject.subscribe(tip => {
             tipObserver(tip)
           })
           stubbedTipFn.mockReturnValueOnce(fakeTip1)
@@ -398,7 +401,10 @@ describe('unit tests for IndexerConnector', () => {
         });
         it('observes an indexer tip', () => {
           expect(tipObserver).toHaveBeenCalledTimes(1)
-          expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
+          expect(tipObserver).toHaveBeenCalledWith({
+            cacheTipNumber: parseInt(fakeTip1.block_number),
+            indexerTipNumber: parseInt(fakeTip1.block_number),
+          })
         });
         describe('fast forward the interval time', () => {
           describe('when there is no unprocessed blocks', () => {
@@ -409,7 +415,10 @@ describe('unit tests for IndexerConnector', () => {
             });
             it('observes another indexer tip', async () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
-              expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
+              expect(tipObserver).toHaveBeenCalledWith({
+                cacheTipNumber: parseInt(fakeTip2.block_number),
+                indexerTipNumber: parseInt(fakeTip2.block_number),
+              })
             })
           });
           describe('when there are unprocessed blocks', () => {
@@ -424,8 +433,8 @@ describe('unit tests for IndexerConnector', () => {
             it('observes next unprocessed block tip', async () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
-                block_number: fakeBlock3.number,
-                block_hash: fakeBlock3.hash,
+                cacheTipNumber: parseInt(fakeBlock3.number),
+                indexerTipNumber: parseInt(fakeTip2.block_number),
               })
             })
           });

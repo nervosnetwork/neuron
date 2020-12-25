@@ -1,26 +1,33 @@
-import IndexerService from "./indexer-service";
 import Script from "models/chain/script";
 import LiveCell from "models/chain/live-cell";
+import { queryIndexer } from 'block-sync-renderer/index'
+import { LumosCellQuery, LumosCell } from "block-sync-renderer/sync/indexer-connector";
 
 export default class LiveCellService {
   private static instance: LiveCellService;
 
   public static getInstance = () => {
     if (!LiveCellService.instance) {
-      LiveCellService.instance = new LiveCellService(IndexerService.getInstance())
+      LiveCellService.instance = new LiveCellService()
     }
 
     return LiveCellService.instance
   }
 
-  private indexer: IndexerService
+  constructor() {}
 
-  constructor(indexer: IndexerService) {
-    this.indexer = indexer
+  private async getLiveCellsByScript(lock: Script | null, type: Script | null, data: string | null): Promise<LumosCell[]> {
+    if (!lock && !type) {
+      throw new Error('at least one parameter is required')
+    }
+
+    const query: LumosCellQuery = {lock, type, data}
+    const liveCells: LumosCell[] = await queryIndexer(query)
+    return liveCells
   }
 
   public async getOneByLockScriptAndTypeScript(lock: Script | null, type: Script | null) {
-    const result = await this.indexer.getLiveCellsByScript(lock, type, null)
+    const result = await this.getLiveCellsByScript(lock, type, null)
     if (result.length === 0) {
       return null
     }
@@ -41,13 +48,12 @@ export default class LiveCellService {
   }
 
   public async getManyByLockScriptAndTypeScript(lock: Script | null, type: Script | null) {
-    const result = await this.indexer.getLiveCellsByScript(lock, type, null)
+    const result = await this.getLiveCellsByScript(lock, type, null)
 
     const cells = []
 
     const typeHash = type ? type.computeHash() : ""
     for (let i = 0; i < result.length; i++) {
-      // @ts-ignore
       const item = LiveCell.fromLumos(result[i]);
       if (type) {
         if (typeHash === item.typeHash) {

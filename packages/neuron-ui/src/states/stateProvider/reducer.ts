@@ -1,4 +1,5 @@
 import produce, { Draft } from 'immer'
+import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'
 import { ConnectionStatus, ErrorCode } from 'utils'
 
@@ -17,7 +18,7 @@ export enum NeuronWalletActions {
   UpdateCurrentNetworkID = 'updateCurrentNetworkID',
   // Connection
   UpdateConnectionStatus = 'updateConnectionStatus',
-  UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
+  UpdateSyncState = 'updateSyncState',
   // dao
   UpdateNervosDaoData = 'updateNervosDaoData',
   // updater
@@ -53,6 +54,8 @@ export enum AppActions {
   Ignore = 'ignore',
   // Experimentals
   UpdateExperimentalParams = 'updateExperimentalParams',
+  // offline sign
+  UpdateLoadedTransaction = 'updateLoadedTransaction',
 }
 
 export type StateAction =
@@ -83,6 +86,7 @@ export type StateAction =
   | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: { tx: any; assetAccount?: any } | null }
+  | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
   | { type: NeuronWalletActions.InitAppState; payload: any }
   | { type: NeuronWalletActions.UpdateCurrentWallet; payload: Partial<State.Wallet> }
   | { type: NeuronWalletActions.UpdateWalletList; payload: State.WalletIdentity[] }
@@ -93,7 +97,7 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateNetworkList; payload: State.Network[] }
   | { type: NeuronWalletActions.UpdateCurrentNetworkID; payload: string }
   | { type: NeuronWalletActions.UpdateConnectionStatus; payload: State.ConnectionStatus }
-  | { type: NeuronWalletActions.UpdateSyncedBlockNumber; payload: string }
+  | { type: NeuronWalletActions.UpdateSyncState; payload: State.SyncState }
   | { type: NeuronWalletActions.UpdateNervosDaoData; payload: State.NervosDAO }
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
 
@@ -176,8 +180,8 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.chain.connectionStatus = action.payload
       break
     }
-    case NeuronWalletActions.UpdateSyncedBlockNumber: {
-      state.chain.tipBlockNumber = action.payload
+    case NeuronWalletActions.UpdateSyncState: {
+      state.chain.syncState = action.payload
       break
     }
     case NeuronWalletActions.UpdateAppUpdaterStatus: {
@@ -333,6 +337,13 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.UpdateExperimentalParams: {
       state.experimental = action.payload
+      break
+    }
+    case AppActions.UpdateLoadedTransaction: {
+      state.app.loadedTransaction = {
+        ...state.app.loadedTransaction,
+        ...action.payload,
+      }
       break
     }
     default: {

@@ -1,23 +1,62 @@
 .container {
-  display: grid;
-  grid-template: 'wallets' auto 'actions' auto;
-  grid-row-gap: 15px;
+  display: flex;
+  margin-top: 10px;
 }
 
 .wallets {
-  grid-area: wallets;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 150px);
+  width: 1200px;
   overflow: auto;
   padding: 0 0 5px 8px;
 }
 
 .actions {
-  grid-area: actions;
-  justify-self: flex-end;
-
+  margin-top: 10px;
+  padding: 0 10px;
+  border-left: 1px solid #ccc;
   button {
     min-width: 9.375rem;
-    margin-right: 15px;
+  }
+}
+
+.hr {
+  height: 1px;
+  margin: 0 0 18px 0;
+  border: none;
+}
+
+.label {
+  color: #888;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.button {
+  background: none;
+  font-size: 14px;
+  margin: 18px 0;
+  width: 200px;
+  display: block;
+  color: #434343;
+  border: none;
+  text-align: left;
+  border-radius: 2px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  span {
+    font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
+    svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: bottom;
+      fill: #434343;
+    }
+  }
+  &:hover {
+    border-radius: 2px;
+    background-color: #eaeaea;
   }
 }
 

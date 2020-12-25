@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -19,6 +19,8 @@ import SpecialAssetList from 'components/SpecialAssetList'
 import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
 import SUDTReceive from 'components/SUDTReceive'
+import ImportHardware from 'components/ImportHardware'
+import OfflineSign from 'components/OfflineSign'
 
 import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
 
@@ -34,7 +36,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `General`,
     path: RoutePath.Overview,
-    exact: true,
+    exact: false,
     component: Overview,
   },
   {
@@ -91,7 +93,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `NervosDAO`,
     path: RoutePath.NervosDAO,
-    exact: true,
+    exact: false,
     component: NervosDAO,
   },
   {
@@ -103,7 +105,7 @@ export const mainContents: CustomRouter.Route[] = [
   {
     name: `SUDTAccountList`,
     path: RoutePath.SUDTAccountList,
-    exact: true,
+    exact: false,
     component: SUDTAccountList,
   },
   {
@@ -119,10 +121,23 @@ export const mainContents: CustomRouter.Route[] = [
     exact: false,
     component: SUDTReceive,
   },
+  {
+    name: `ImportHardware`,
+    path: RoutePath.ImportHardware,
+    exact: false,
+    component: ImportHardware,
+  },
+  {
+    name: `OfflineSign`,
+    path: RoutePath.OfflineSign,
+    exact: false,
+    component: OfflineSign,
+  },
 ]
 
 const MainContent = () => {
   const history = useHistory()
+  const location = useLocation()
   const {
     app: { isAllowedToFetchList = true },
     wallet: { id: walletID = '' },
@@ -139,6 +154,7 @@ const MainContent = () => {
     isAllowedToFetchList,
     history,
     dispatch,
+    location,
   })
 
   const chainURL = useMemo(() => {

@@ -13,30 +13,20 @@ import {
   isMainnet as isMainnetUtil,
   RoutePath,
   SyncStatus,
-  ErrorCode,
   CONSTANTS,
   getSyncStatus,
   getCurrentUrl,
   sortAccounts,
   isSuccessResponse,
+  useIsInsufficientToCreateSUDTAccount,
+  useOnGenerateNewAccountTransaction,
 } from 'utils'
 
-import {
-  getSUDTAccountList,
-  generateCreateSUDTAccountTransaction,
-  updateSUDTAccount,
-  checkMigrateAcp,
-} from 'services/remote'
+import { getSUDTAccountList, updateSUDTAccount, checkMigrateAcp } from 'services/remote'
 
 import styles from './sUDTAccountList.module.scss'
 
-const {
-  MEDIUM_FEE_RATE,
-  DEFAULT_SUDT_FIELDS,
-  MIN_CKB_REQUIRED_BY_NORMAL_SUDT,
-  MIN_CKB_REQUIRED_BY_CKB_SUDT,
-  SHANNON_CKB_RATIO,
-} = CONSTANTS
+const { DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
@@ -45,8 +35,10 @@ const SUDTAccountList = () => {
   const history = useHistory()
   const {
     wallet: { id: walletId, balance },
-    app: { tipBlockNumber = '0', tipBlockTimestamp },
-    chain: { networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    chain: {
+      networkID,
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+    },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -79,52 +71,7 @@ const SUDTAccountList = () => {
       }
     })
   }, [dispatch, history])
-
-  useEffect(() => {
-    const ckbBalance = BigInt(balance)
-    const isInsufficient = (res: { status: number }) =>
-      [ErrorCode.CapacityNotEnough, ErrorCode.CapacityNotEnoughForChange].includes(res.status)
-    const createSUDTAccount = () => {
-      if (ckbBalance <= BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
-        return true
-      }
-      const params: Controller.GenerateCreateSUDTAccountTransaction.Params = {
-        walletID: walletId,
-        tokenID: `0x${'0'.repeat(64)}`,
-        tokenName: DEFAULT_SUDT_FIELDS.tokenName,
-        accountName: DEFAULT_SUDT_FIELDS.accountName,
-        symbol: DEFAULT_SUDT_FIELDS.symbol,
-        decimal: '0',
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      }
-      return generateCreateSUDTAccountTransaction(params)
-        .then(isInsufficient)
-        .catch(() => false)
-    }
-    const createCKBAccount = () => {
-      if (ckbBalance <= BigInt(MIN_CKB_REQUIRED_BY_CKB_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
-        return true
-      }
-      const params: Controller.GenerateCreateSUDTAccountTransaction.Params = {
-        walletID: walletId,
-        tokenID: DEFAULT_SUDT_FIELDS.CKBTokenId,
-        tokenName: DEFAULT_SUDT_FIELDS.CKBTokenName,
-        accountName: DEFAULT_SUDT_FIELDS.accountName,
-        symbol: DEFAULT_SUDT_FIELDS.CKBSymbol,
-        decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      }
-      return generateCreateSUDTAccountTransaction(params)
-        .then(isInsufficient)
-        .catch(() => false)
-    }
-    Promise.all([createSUDTAccount(), createCKBAccount()]).then(([insufficientForSUDT, insufficientForCKB]) => {
-      setInsufficient({
-        [AccountType.CKB]: insufficientForCKB,
-        [AccountType.SUDT]: insufficientForSUDT,
-      })
-    })
-  }, [balance, walletId])
+  useIsInsufficientToCreateSUDTAccount({ walletId, balance: BigInt(balance), setInsufficient })
 
   const fetchAndUpdateList = useCallback(() => {
     getSUDTAccountList({ walletID: walletId })
@@ -226,39 +173,15 @@ const SUDTAccountList = () => {
     [setKeyword]
   )
 
-  const onCreateAccount = useCallback(
-    ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo) => {
-      return generateCreateSUDTAccountTransaction({
-        walletID: walletId,
-        tokenID: tokenId,
-        tokenName,
-        accountName,
-        symbol,
-        decimal,
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      })
-        .then(res => {
-          if (isSuccessResponse(res)) {
-            return res.result
-          }
-          throw new Error(res.message.toString())
-        })
-        .then((res: Controller.GenerateCreateSUDTAccountTransaction.Response) => {
-          dispatch({ type: AppActions.UpdateExperimentalParams, payload: res })
-          dispatch({
-            type: AppActions.RequestPassword,
-            payload: { walletID: walletId as string, actionType: 'create-sudt-account' },
-          })
-          setDialog(null)
-          return true
-        })
-        .catch(err => {
-          console.error(err)
-          return false
-        })
-    },
-    [setDialog, walletId, dispatch]
-  )
+  const onTransactionGenerated = useCallback(() => {
+    setDialog(null)
+  }, [setDialog])
+
+  const handleCreateAccount = useOnGenerateNewAccountTransaction({
+    walletId,
+    dispatch,
+    onGenerated: onTransactionGenerated,
+  })
 
   const onOpenCreateDialog = useCallback(() => {
     setDialog({ id: '', action: 'create' })
@@ -324,9 +247,9 @@ const SUDTAccountList = () => {
     )
   }
   const syncStatus = getSyncStatus({
-    syncedBlockNumber,
-    tipBlockNumber,
-    tipBlockTimestamp,
+    bestKnownBlockNumber,
+    bestKnownBlockTimestamp,
+    cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })
@@ -368,7 +291,7 @@ const SUDTAccountList = () => {
       {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}
       {dialog?.action === 'create' ? (
         <SUDTCreateDialog
-          onSubmit={onCreateAccount}
+          onSubmit={handleCreateAccount}
           onCancel={() => {
             setDialog(null)
           }}

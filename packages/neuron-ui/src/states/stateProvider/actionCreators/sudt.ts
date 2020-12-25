@@ -18,7 +18,7 @@ export const sendCreateSUDTAccountTransaction = (params: Controller.SendCreateSU
     const res = await sendCreateAccountTx(params)
     if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
-    } else if (res.status !== ErrorCode.PasswordIncorrect) {
+    } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
       addNotification({
         type: 'alert',
         timestamp: +new Date(),
@@ -28,10 +28,13 @@ export const sendCreateSUDTAccountTransaction = (params: Controller.SendCreateSU
       })(dispatch)
       dispatch({ type: AppActions.DismissPasswordRequest })
     }
-    return res.status
+    return res
   } catch (err) {
     console.warn(err)
-    return ResponseCode.FAILURE
+    return {
+      status: ResponseCode.FAILURE,
+      message: err,
+    }
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,
@@ -51,7 +54,7 @@ export const sendSUDTTransaction = (params: Controller.SendSUDTTransaction.Param
     const res = await sendSUDTTx(params)
     if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
-    } else if (res.status !== ErrorCode.PasswordIncorrect) {
+    } else if (res.status !== ErrorCode.PasswordIncorrect && res.status !== ErrorCode.SignTransactionFailed) {
       addNotification({
         type: 'alert',
         timestamp: +new Date(),
@@ -61,10 +64,13 @@ export const sendSUDTTransaction = (params: Controller.SendSUDTTransaction.Param
       })(dispatch)
       dispatch({ type: AppActions.DismissPasswordRequest })
     }
-    return res.status
+    return res
   } catch (err) {
     console.warn(err)
-    return ResponseCode.FAILURE
+    return {
+      status: ResponseCode.FAILURE,
+      message: err,
+    }
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,

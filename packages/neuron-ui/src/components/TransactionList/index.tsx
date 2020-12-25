@@ -33,14 +33,14 @@ interface TransactionListProps {
   walletName: string
   walletID: string
   items: State.Transaction[]
-  tipBlockNumber: string
+  bestKnownBlockNumber: number
   isMainnet: boolean
   dispatch: StateDispatch
 }
 
 const TransactionList = ({
   items: txs,
-  tipBlockNumber,
+  bestKnownBlockNumber,
   walletID,
   walletName,
   isMainnet,
@@ -132,7 +132,7 @@ const TransactionList = ({
       {txs.map(tx => {
         const isSelected = localDescription.key === tx.hash
 
-        const confirmations = 1 + +tipBlockNumber - +tx.blockNumber
+        const confirmations = 1 + bestKnownBlockNumber - +tx.blockNumber
         let status = tx.status as string
         if (status === 'success' && confirmations < CONFIRMATION_THRESHOLD) {
           status = 'confirming'

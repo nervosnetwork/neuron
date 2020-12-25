@@ -58,10 +58,14 @@ const SpecialAssetList = () => {
   const dispatch = useDispatch()
 
   const {
-    app: { epoch, globalDialog, tipBlockTimestamp },
+    app: { epoch, globalDialog },
     wallet: { id },
     settings: { networks },
-    chain: { networkID, connectionStatus },
+    chain: {
+      networkID,
+      connectionStatus,
+      syncState: { bestKnownBlockTimestamp },
+    },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
 
@@ -194,11 +198,11 @@ const SpecialAssetList = () => {
           epochsInfo={epochInfo}
           onAction={onUnlock}
           connectionStatus={connectionStatus}
-          tipBlockTimestamp={tipBlockTimestamp}
+          bestKnownBlockTimestamp={bestKnownBlockTimestamp}
         />
       )
     })
-  }, [cells, epoch, isMainnet, onUnlock, connectionStatus, tipBlockTimestamp])
+  }, [cells, epoch, isMainnet, onUnlock, connectionStatus, bestKnownBlockTimestamp])
 
   return (
     <div className={styles.container}>

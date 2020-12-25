@@ -48,3 +48,6 @@ import './SUDTReceive.stories'
 
 import './ExperimentalRibbon.stories'
 import './CopyZone.stories'
+
+// Widgets
+import './RingProgressBar.stories'

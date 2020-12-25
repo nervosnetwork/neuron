@@ -46,9 +46,6 @@ describe('SyncedBlockNumber model', () => {
       syncedBlockNumber = new SyncedBlockNumber()
       await syncedBlockNumber.setNextBlock(BigInt(0))
     })
-    it('emits next block number', () => {
-      expect(stubbedSyncedBlockNumberSubjectNext).toHaveBeenCalledWith('0')
-    });
     it('updates logs', () => {
       expect(stubbedLoggerInfo).toHaveBeenCalled()
     })
@@ -69,9 +66,6 @@ describe('SyncedBlockNumber model', () => {
         beforeEach(async () => {
           await syncedBlockNumber.setNextBlock(BigInt(9))
         });
-        it('emits next block number', () => {
-          expect(stubbedSyncedBlockNumberSubjectNext).toHaveBeenCalledWith('9')
-        });
         it('should not update logs', () => {
           expect(stubbedLoggerInfo).not.toHaveBeenCalled()
         })
@@ -88,9 +82,6 @@ describe('SyncedBlockNumber model', () => {
       describe('when setting to a block number having absolute difference with the previous one by greater or equals to 10', () => {
         beforeEach(async () => {
           await syncedBlockNumber.setNextBlock(BigInt(10))
-        });
-        it('emits next block number', () => {
-          expect(stubbedSyncedBlockNumberSubjectNext).toHaveBeenCalledWith('10')
         });
         it('updates logs', () => {
           expect(stubbedLoggerInfo).toHaveBeenCalled()

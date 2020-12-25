@@ -15,7 +15,6 @@ import Trash from 'widgets/Icons/Trash.png'
 import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
 import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
 import { formatDate } from 'widgets/DatetimePicker'
 import { localNumberFormatter, PlaceHolders } from 'utils'
@@ -66,9 +65,6 @@ const SendFieldset = ({
     err ? t(err.message, err.i18n) : ''
   )
 
-  const fullAddrInfo =
-    !addrErrorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH ? t('messages.full-addr-info') : ''
-
   let locktimeAble = false
   if (!addrErrorMsg && item.address?.length === SHORT_ADDR_LENGTH) {
     try {
@@ -96,13 +92,6 @@ const SendFieldset = ({
         error={addrErrorMsg}
         autoFocus
       />
-
-      {fullAddrInfo ? (
-        <div className={styles.fullAddrInfo}>
-          <Attention />
-          <span>{fullAddrInfo}</span>
-        </div>
-      ) : null}
 
       <TextField
         className={styles.amountField}

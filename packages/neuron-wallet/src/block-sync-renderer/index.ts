@@ -6,7 +6,6 @@ import DataUpdateSubject from 'models/subjects/data-update'
 import env from 'env'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
-import SyncedBlockNumberSubject from 'models/subjects/node'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
@@ -25,7 +24,7 @@ let syncTask: SyncTask | null
 let network: Network | null
 
 const resetSyncTaskQueue = queue(async ({startTask, clearIndexerFolder}) => {
-  await WalletService.getInstance().generateAddressesIfNecessary()
+  await WalletService.getInstance().maintainAddressesIfNecessary()
   await killBlockSyncTask()
   if (startTask) {
     await createBlockSyncTask(clearIndexerFolder)
@@ -90,8 +89,8 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
 
   subscribeToWorkerProcess(syncTask, msg => {
     switch (msg.channel) {
-      case 'synced-block-number-updated':
-        SyncApiController.emiter.emit('synced-block-number-updated', msg.result)
+      case 'cache-tip-block-updated':
+        SyncApiController.emiter.emit('cache-tip-block-updated', msg.result)
         break
       case 'tx-db-changed':
         TxDbChangedSubject.getSubject().next(msg.result)
@@ -101,6 +100,7 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
         break
       case 'wallet-deleted':
       case 'address-created':
+      case 'indexer-error':
         resetSyncTask()
         break
       default:
@@ -111,10 +111,6 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
   if (!network) {
     network = NetworksService.getInstance().getCurrent()
   }
-
-  const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
-  SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
-  logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
 
   DataUpdateSubject.next({
     dataType: 'transaction',
