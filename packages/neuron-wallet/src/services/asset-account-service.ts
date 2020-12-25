@@ -415,8 +415,14 @@ export default class AssetAccountService {
       '1000'
     )
 
-    const hasAssetAccount = !!tx.inputs.find(
-      input => input.lock!.computeHash() === receiverAcpScript.computeHash()
+    const assetAccountEntities = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .getMany()
+
+    const hasAssetAccount = assetAccountEntities.find(
+      assetAccount => assetAccount.tokenID !== 'CKBytes' &&
+      assetAccount.blake160 === receiverDefaultLock.args
     )
 
     if (hasAssetAccount) {

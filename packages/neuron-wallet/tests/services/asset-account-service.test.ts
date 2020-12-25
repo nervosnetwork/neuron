@@ -994,6 +994,7 @@ describe('AssetAccountService', () => {
       '0',
       '0x0000000000000000000000000000000000000000'
     )
+    const tx = {}
     beforeEach(async () => {
       const receiverDefaultLockScript = SystemScriptInfo.generateSecpScript(blake160)
       const senderDefaultLockScript = SystemScriptInfo.generateSecpScript('0x' + '1'.repeat(40))
@@ -1006,17 +1007,16 @@ describe('AssetAccountService', () => {
 
       stubbedGetAllAddresses.mockResolvedValue([{blake160}])
       stubbedWalletServiceGet.mockReturnValue(fakeWallet)
+      when(stubbedGenerateClaimChequeTx)
+        .calledWith(walletId, expect.anything(), address, undefined, '1000')
+        .mockResolvedValue(tx)
       fakeChequeCellOutPoint = OutPoint.fromObject({
         txHash: output.transaction.hash,
         index: '0x0'
       })
     });
     describe('without existing acp', () => {
-      const tx = {inputs: []}
       beforeEach(async () => {
-        when(stubbedGenerateClaimChequeTx)
-          .calledWith(walletId, expect.anything(), address, undefined, '1000')
-          .mockResolvedValue(tx)
         result = await AssetAccountService.generateClaimChequeTx(walletId, fakeChequeCellOutPoint)
       })
       it('only returns transaction and asset account object', () => {
@@ -1024,13 +1024,20 @@ describe('AssetAccountService', () => {
       })
     });
     describe('with existing acp', () => {
-      const tx = {inputs: [
-        {lock: assetAccountInfo.generateAnyoneCanPayScript(blake160)}
-      ]}
       beforeEach(async () => {
-        when(stubbedGenerateClaimChequeTx)
-          .calledWith(walletId, expect.anything(), address, undefined, '1000')
-          .mockResolvedValue(tx)
+        const assetAccount = AssetAccount.fromObject({
+          tokenID: tokenID,
+          symbol: 'udt',
+          tokenName: 'udt',
+          decimal: '0',
+          balance: '0',
+          accountName: 'udt',
+          blake160,
+        })
+
+        const e = AssetAccountEntity.fromModel(assetAccount)
+        await getConnection().manager.save([e.sudtTokenInfo, e])
+
         result = await AssetAccountService.generateClaimChequeTx(walletId, fakeChequeCellOutPoint)
       })
       it('returns both transaction and asset account objects', () => {
