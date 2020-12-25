@@ -9,6 +9,14 @@ This is a release candidate to preview the changes in the next official release 
 * Enable hardware wallet of Ledger.
 * Support address verification on hardware wallet device.
 
+# 0.34.1 (2020-12-19)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Fix libudev-dev dependency for Ubuntu build.
+
 
 # 0.34.0 (2020-12-16)
 
