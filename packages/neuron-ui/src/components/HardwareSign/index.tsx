@@ -228,11 +228,16 @@ const HardwareSign = ({
         return
       }
       switch (type) {
-        case 'send': {
+        case 'send':
+        case 'claim-cheque': {
           if (isSending) {
             break
           }
-          sendTransaction({ walletID: wallet.id, tx, description })(dispatch).then(res => {
+          sendTransaction({
+            walletID: wallet.id,
+            tx: tx || experimental?.tx,
+            description,
+          })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
               history!.push(RoutePath.History)
             } else {
@@ -254,7 +259,8 @@ const HardwareSign = ({
           })
           break
         }
-        case 'create-sudt-account': {
+        case 'create-sudt-account':
+        case 'create-account-to-claim-cheque': {
           const params: Controller.SendCreateSUDTAccountTransaction.Params = {
             walletID: wallet.id,
             assetAccount,
