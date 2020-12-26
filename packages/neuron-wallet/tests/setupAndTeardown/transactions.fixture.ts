@@ -193,7 +193,52 @@ const ACPTx0 = {
   hash: '0x025ef744cbc86e92c5c766233cac9a203a3c470dfa23cd5005c3a086e0b0b3f4',
   witnesses: []
 }
+
+const basicTx2 = {
+  version: '0x0',
+  cellDeps: [
+    {
+      outPoint: {
+        txHash: '0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d',
+        index: '0x0'
+      },
+      depType: 'depGroup'
+    }
+  ],
+  headerDeps: [],
+  inputs: [
+    {
+      // address: ckb1qyqt8xaupvm8837nv3gtc9x0ekkj64vud3jqfwyw5v
+      previousOutput: {
+        txHash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1',
+        index: '0x1'
+      },
+      since: '0x0',
+      lock: {
+        codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+        hashType: 'type',
+        args: '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64'
+      }
+    }
+  ],
+  outputs: [
+    {
+      // address: ckb1qyqt8xaupvm8837nv3gtc9x0ekkj64vud3jqfwyw5v
+      capacity: '0x174876e800',
+      lock: {
+        codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+        hashType: 'type',
+        args: '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64'
+      },
+      type: null,
+      outPoint: { txHash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a8657900', index: '0' }
+    }
+  ],
+  outputsData: ['0x'],
+  witnesses: [],
+  hash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a8657901'
+}
 // TODO: complex sUDT transaction
 // TODO: dao transaction
 
-export default [basicTx0, basicTx1, ACPTx0].map(tx => fromTxObject(tx))
+export default [basicTx0, basicTx1, ACPTx0, basicTx2].map(tx => fromTxObject(tx))
