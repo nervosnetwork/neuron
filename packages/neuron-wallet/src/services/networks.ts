@@ -14,7 +14,7 @@ const presetNetworks: { selected: string, networks: Network[] } = {
   networks: [
     {
       id: 'mainnet',
-      name: 'Mainnet',
+      name: 'Default',
       remote: 'http://localhost:8114',
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
