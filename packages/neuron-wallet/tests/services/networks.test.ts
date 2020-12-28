@@ -150,8 +150,8 @@ describe(`Unit tests of networks service`, () => {
   })
 
   describe(`validation on network existence`, () => {
-    it(`create network with existing name of Mainnet`, () => {
-      expect(service.create('Mainnet', 'http://localhost:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
+    it(`create network with existing name of Default`, () => {
+      expect(service.create('Default', 'http://localhost:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
     })
 
     it(`update network which is not existing`, () => {
