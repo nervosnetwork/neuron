@@ -347,7 +347,7 @@ describe('Test TransactionService', () => {
 
       describe('When hash misses', () => {
         beforeEach(() => {
-          const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a865790f'
+          const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a8657901'
           stubProvider.searchValue = HASH
         })
 
