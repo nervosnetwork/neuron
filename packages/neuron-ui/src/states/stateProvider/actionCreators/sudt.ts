@@ -86,18 +86,28 @@ export const migrateAcp = (params: Controller.MigrateAcp.Params) => async (dispa
   })
   try {
     const res = await migrateAcpIpc(params)
-    if (res.status !== ErrorCode.PasswordIncorrect) {
+
+    if (isSuccessResponse(res)) {
       dispatch({
         type: AppActions.DismissPasswordRequest,
       })
-      if (!isSuccessResponse(res)) {
-        addNotification(failureResToNotification(res))(dispatch)
+    }
+
+    if (params.password) {
+      if (res.status !== ErrorCode.PasswordIncorrect) {
+        dispatch({
+          type: AppActions.DismissPasswordRequest,
+        })
+        if (!isSuccessResponse(res)) {
+          addNotification(failureResToNotification(res))(dispatch)
+        }
       }
     }
-    return res.status
+
+    return res
   } catch (err) {
     console.warn(err)
-    return 0
+    return { status: ResponseCode.FAILURE, message: err }
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,
