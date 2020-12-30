@@ -2,15 +2,29 @@ import CKB from '@nervosnetwork/ckb-sdk-core'
 import https from 'https'
 import http from 'http'
 
-const httpsAgent = new https.Agent({ keepAlive: true })
-const httpAgent = new http.Agent({ keepAlive: true })
+let httpsAgent: https.Agent
+let httpAgent: http.Agent
+
+const getHttpsAgent = () => {
+  if (!httpsAgent) {
+    httpsAgent = new https.Agent({ keepAlive: true })
+  }
+  return httpsAgent
+}
+
+const getHttpAgent = () => {
+  if (!httpAgent) {
+    httpAgent = new http.Agent({ keepAlive: true })
+  }
+  return httpAgent
+}
 
 export const generateCKB = (url: string): CKB => {
   const ckb = new CKB(url)
   if (url.startsWith('https')) {
-    ckb.rpc.setNode({ url, httpsAgent })
+    ckb.rpc.setNode({ url, httpsAgent: getHttpsAgent() })
   } else {
-    ckb.rpc.setNode({ url, httpAgent })
+    ckb.rpc.setNode({ url, httpAgent: getHttpAgent() })
   }
   return ckb
 }
