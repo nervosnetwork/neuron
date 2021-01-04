@@ -1,3 +1,15 @@
+# 0.34.2 (2020-12-31)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Update the CKB logo.
+* Rename the default network name to `Default`.
+* Fix version updater error when clicking the install button too soon.
+* Fix bug of `too many open files` error.
+
+
 # 0.34.1 (2020-12-19)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
