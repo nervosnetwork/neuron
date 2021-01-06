@@ -95,6 +95,11 @@ const SpecialAsset = ({
     case PresetScript.Cheque: {
       status = (assetInfo as ChequeAssetInfo).data === 'claimable' ? 'claim-asset' : 'withdraw-asset'
 
+      if (status === 'withdraw-asset') {
+        const DAY = 86_400_000
+        targetTime = datetime + DAY
+      }
+
       try {
         const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
         if (!tokenInfo) {
@@ -119,6 +124,8 @@ const SpecialAsset = ({
     openExternal(`${explorerUrl}/transaction/${txHash}#${index}`)
   }, [isMainnet, txHash, index])
 
+  const isLockedCheque = status === 'withdraw-asset' && Date.now() < targetTime!
+
   return (
     <div className={styles.container}>
       <div className={styles.datetime}>
@@ -136,17 +143,21 @@ const SpecialAsset = ({
           label={t(`special-assets.${status}`)}
           onClick={onAction}
           disabled={
-            ['user-defined-asset', 'locked-asset'].includes(status) || connectionStatus === ConnectionStatus.Offline
+            ['user-defined-asset', 'locked-asset'].includes(status) ||
+            connectionStatus === ConnectionStatus.Offline ||
+            isLockedCheque
           }
-          className={['user-defined-asset', 'locked-asset'].includes(status) ? styles.hasTooltip : ''}
+          className={['user-defined-asset', 'locked-asset'].includes(status) || isLockedCheque ? styles.hasTooltip : ''}
           data-tooltip={
-            assetInfo.lock === PresetScript.Cheque
+            assetInfo.lock === PresetScript.Cheque && !isLockedCheque
               ? null
               : t(`special-assets.${status}-tooltip`, {
                   epochs: epochsInfo?.target.toFixed(2),
                   year: targetTime ? new Date(targetTime).getFullYear() : '',
                   month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
                   day: targetTime ? new Date(targetTime).getDate() : '',
+                  hour: targetTime ? new Date(targetTime).getHours() : '',
+                  minute: targetTime ? new Date(targetTime).getMinutes() : '',
                 })
           }
         />
