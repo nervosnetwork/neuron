@@ -932,6 +932,7 @@ describe('AssetAccountService', () => {
     const amount = '1'
     const fee = '1'
     const feeRate = '1'
+    const description = 'desc'
 
     const fakeWallet = {
       getNextChangeAddress: () => changeAddressObj,
@@ -961,7 +962,8 @@ describe('AssetAccountService', () => {
         receiverAddress,
         amount,
         fee,
-        feeRate
+        feeRate,
+        description
       )
     });
     it('generates create cheque tx', () => {
@@ -972,7 +974,8 @@ describe('AssetAccountService', () => {
         receiverAddress,
         changeAddressObj.address,
         fee,
-        feeRate
+        feeRate,
+        description
       )
     });
   });
