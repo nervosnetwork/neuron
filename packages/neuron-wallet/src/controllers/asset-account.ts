@@ -279,6 +279,7 @@ export default class AssetAccountController {
       params.amount,
       params.fee,
       params.feeRate,
+      params.description,
     )
     return {
       status: ResponseCode.Success,

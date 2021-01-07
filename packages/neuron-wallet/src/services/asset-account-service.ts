@@ -357,6 +357,7 @@ export default class AssetAccountService {
     amount: string,
     fee: string,
     feeRate: string,
+    description?: string
   ) {
     const assetAccount = await this.getAccount({walletID, id: accountId})
     if (!assetAccount) {
@@ -373,6 +374,7 @@ export default class AssetAccountService {
       changeAddrObj!.address,
       fee,
       feeRate,
+      description,
     )
 
     return tx

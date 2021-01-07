@@ -859,6 +859,7 @@ export class TransactionGenerator {
     changeAddress: string,
     fee: string = '0',
     feeRate: string = '0',
+    description: string = '',
   ) {
 
     const assetAccountInfo = new AssetAccountInfo()
@@ -883,7 +884,8 @@ export class TransactionGenerator {
       inputs: [],
       outputs: [],
       outputsData: [],
-      witnesses: []
+      witnesses: [],
+      description,
     })
 
     const changeBlake160: string = AddressParser.toBlake160(changeAddress)
