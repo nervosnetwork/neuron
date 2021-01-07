@@ -188,9 +188,12 @@ const PasswordRequest = () => {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: experimental?.tx, description, password })(dispatch).then(
-              handleSendTxRes
-            )
+            await sendTransaction({
+              walletID,
+              tx: experimental?.tx,
+              description: experimental?.tx?.description,
+              password,
+            })(dispatch).then(handleSendTxRes)
             break
           }
           case 'claim-cheque': {
