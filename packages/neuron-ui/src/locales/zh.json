@@ -624,7 +624,7 @@
     "special-assets": {
       "title": "自定义资产",
       "date": "日期",
-      "asset": "资产",
+      "assets": "资产",
       "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "未识别资产",
