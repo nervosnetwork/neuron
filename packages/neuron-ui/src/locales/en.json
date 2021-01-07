@@ -631,7 +631,7 @@
     "special-assets": {
       "title": "Customized Assets",
       "date": "Date",
-      "asset": "Asset",
+      "assets": "Assets",
       "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "Uncataloged Asset",

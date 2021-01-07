@@ -281,7 +281,7 @@ const SpecialAssetList = () => {
         <div className={styles.listContainer}>
           <div className={styles.listHeader}>
             <span>{t('special-assets.date')}</span>
-            <span>{t('special-assets.asset')}</span>
+            <span>{t('special-assets.assets')}</span>
           </div>
           {list}
         </div>
