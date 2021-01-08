@@ -347,6 +347,11 @@ const SUDTSend = () => {
                   suffix={field.key === Fields.Amount && accountInfo?.symbol}
                   disabled={sendState.sendAll}
                   error={errors[field.key]}
+                  hint={
+                    field.key === Fields.Amount && accountType === AccountType.CKB && sendState.sendAll
+                      ? t('s-udt.send.alert-of-closing-account')
+                      : undefined
+                  }
                   className={styles[field.key]}
                 />
               )

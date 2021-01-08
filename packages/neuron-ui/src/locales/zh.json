@@ -665,7 +665,8 @@
         "amount": "金额",
         "description": "备注",
         "submit": "提交",
-        "click-to-edit": "点击编辑"
+        "click-to-edit": "点击编辑",
+        "alert-of-closing-account": "转移该金额会导致该账户销户"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 转账"

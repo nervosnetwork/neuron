@@ -672,7 +672,8 @@
         "amount": "Amount",
         "description": "Description",
         "submit": "Submit",
-        "click-to-edit": "Click to edit"
+        "click-to-edit": "Click to edit",
+        "alert-of-closing-account": "Transferring with this amount will close your asset account"
       },
       "receive": {
         "notation": "Accept {{symbol}} only"

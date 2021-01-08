@@ -665,7 +665,8 @@
         "amount": "金額",
         "description": "備註",
         "submit": "提交",
-        "click-to-edit": "點擊編輯"
+        "click-to-edit": "點擊編輯",
+        "alert-of-closing-account": "轉移該金額會導致該賬戶銷戶"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 轉賬"
