@@ -4,7 +4,7 @@ import { LONG_TYPE_PREFIX, SHORT_ADDR_SUDT_LOCK_PREFIX } from 'utils/const'
 import { DeprecatedScript } from 'utils/enums'
 import { validateAddress } from './address'
 
-export const validateSUDTAddress = ({
+export const validateAssetAccountAddress = ({
   address,
   isMainnet,
   required = false,
@@ -47,4 +47,4 @@ export const validateSUDTAddress = ({
   return true
 }
 
-export default validateSUDTAddress
+export default validateAssetAccountAddress
