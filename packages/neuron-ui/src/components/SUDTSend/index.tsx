@@ -26,6 +26,7 @@ import {
   sudtAmountToValue,
   localNumberFormatter,
   RoutePath,
+  AccountType,
   CONSTANTS,
   isSuccessResponse,
 } from 'utils'
@@ -101,6 +102,7 @@ const SUDTSend = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const accountType = accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? AccountType.CKB : AccountType.SUDT
   const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)}` : '0'
 
   useEffect(() => {
@@ -158,6 +160,7 @@ const SUDTSend = () => {
         codeHash: anyoneCanPayScript?.codeHash ?? '',
         isMainnet,
         required: false,
+        type: accountType,
       })
     } catch (err) {
       errMap.address = t(err.message, err.i18n)
@@ -173,7 +176,7 @@ const SUDTSend = () => {
       errMap.amount = t(err.message, err.i18n)
     }
     return errMap
-  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t])
+  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, accountType])
 
   const isFormReady =
     !isSending &&
