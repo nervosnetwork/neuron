@@ -67,27 +67,20 @@ export class TransactionsService {
 
     if (type === SearchType.Address) {
       const lockHashToSearch = AddressParser.parse(searchValue).computeHash()
-      if (lockHashes.includes(lockHashToSearch)) {
-        lockHashes = [lockHashToSearch]
-        allTxHashes = await repository.createQueryBuilder('tx').select('tx.hash', 'txHash').where(
-          `tx.hash
-          IN
-            (
-              SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
-              UNION
-              SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
-            )
-          `,
-          { lockHashes }
-        )
-        .orderBy('tx.timestamp', 'DESC')
-        .getRawMany().then(txs => txs.map(tx => tx.txHash))
-      } else {
-        return {
-          totalCount: 0,
-          items: []
-        }
-      }
+      lockHashes = [lockHashToSearch]
+      allTxHashes = await repository.createQueryBuilder('tx').select('tx.hash', 'txHash').where(
+        `tx.hash
+        IN
+          (
+            SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
+            UNION
+            SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
+          )
+        `,
+        { lockHashes }
+      )
+      .orderBy('tx.timestamp', 'DESC')
+      .getRawMany().then(txs => txs.map(tx => tx.txHash))
     } else if (type === SearchType.TxHash) {
       allTxHashes = [searchValue]
     } else if (type === SearchType.Date) {

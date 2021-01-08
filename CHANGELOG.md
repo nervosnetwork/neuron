@@ -1,3 +1,43 @@
+# 0.34.2 (2020-12-31)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Update the CKB logo.
+* Rename the default network name to `Default`.
+* Fix version updater error when clicking the install button too soon.
+* Fix bug of `too many open files` error.
+
+
+# 0.34.1 (2020-12-19)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Fix libudev-dev dependency for Ubuntu build.
+
+
+# 0.34.0 (2020-12-16)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+
+* Support acp short address generation and parsing.
+* Support transfer to PW lock full address.
+* Support generating and signing offline transaction.
+* Support broadcasting the signed offline transaction.
+* Display network type in the navbar.
+* Display progress and estimation for synchronization.
+* Minor UX changes to `Asset Accounts`.
+
+### Bug fix
+
+* Ensure addresses have been cleaned up for the deleted wallets.
+
+
 # 0.33.2 (2020-11-26)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
