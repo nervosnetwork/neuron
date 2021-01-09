@@ -1119,12 +1119,18 @@ export class TransactionGenerator {
 
     const assetAccountInfo = new AssetAccountInfo()
     const outputEntities = await CellsService.getOutputsByTransactionHash(chequeCell.outPoint!.txHash)
-    const chequeSenderAcpCell = outputEntities.find(
+    const chequeSenderAcpOutput = outputEntities.find(
       output =>
         assetAccountInfo.isDefaultAnyoneCanPayScript(output.lockScript()) &&
         output.typeHash === chequeCell.typeHash!
     )
-    if (!chequeSenderAcpCell) {
+
+    const chequeSenderLiveAcpOutputs = await CellsService.getLiveCellsByLockHash(chequeSenderAcpOutput!.lockHash)
+    const chequeSenderLiveAcpCell = chequeSenderLiveAcpOutputs.find(
+      output => output.typeHash === chequeSenderAcpOutput!.typeHash
+    )
+
+    if (!chequeSenderLiveAcpCell) {
       throw new Error('sender ACP cell not found')
     }
 
@@ -1140,12 +1146,12 @@ export class TransactionGenerator {
     })
 
     const chequeSenderAcpInput = Input.fromObject({
-      previousOutput: chequeSenderAcpCell.outPoint(),
+      previousOutput: chequeSenderLiveAcpCell.outPoint(),
       since: '0',
-      capacity: chequeSenderAcpCell.capacity,
-      lock: chequeSenderAcpCell.lockScript(),
-      type: chequeSenderAcpCell.typeScript(),
-      data: chequeSenderAcpCell.data,
+      capacity: chequeSenderLiveAcpCell.capacity,
+      lock: chequeSenderLiveAcpCell.lockScript(),
+      type: chequeSenderLiveAcpCell.typeScript(),
+      data: chequeSenderLiveAcpCell.data,
     })
 
     const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
