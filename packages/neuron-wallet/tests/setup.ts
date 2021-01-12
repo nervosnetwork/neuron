@@ -1,5 +1,5 @@
 import '../src/locales/i18n'
-import { LedgerBLE, LedgerHID, LedgerCkbApp } from './mock/hardware'
+import { LedgerHID, LedgerCkbApp } from './mock/hardware'
 export const originalXMLHttpRequest = window.XMLHttpRequest
 
 export const mockedXMLHttpRequest = {
@@ -90,10 +90,6 @@ jest.mock('dotenv', () => ({
 process.on('unhandledRejection', console.error)
 jest.mock('@ledgerhq/hw-transport-node-hid', () => {
   return LedgerHID
-})
-
-jest.mock('@ledgerhq/hw-transport-node-ble', () => {
-  return LedgerBLE
 })
 
 jest.mock('hw-app-ckb', () => {

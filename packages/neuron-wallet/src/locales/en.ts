@@ -105,6 +105,7 @@ export default {
       'address-not-found': 'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
+      "device-sign-canceled": "You have canceled the signing request. Otherwise, please make sure the Nervos app on your device has the configuration “allow contract data” enabled",
       "connect-device-failed": "The device cannot be connected, please check your connection.",
       "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
       "wallet-not-supported-function": "This wallet does not support {name} function.",

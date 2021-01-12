@@ -1,7 +1,8 @@
-import { DeviceInfo, ExtendedPublicKey } from "services/hardware/common";
+import { DeviceInfo, ExtendedPublicKey, PublicKey } from "services/hardware/common";
 import { ResponseCode } from "utils/const"
 import HardwareWalletService from "services/hardware";
 import { connectDeviceFailed } from "exceptions";
+import { AccountExtendedPublicKey } from "models/keys/key";
 
 export default class HardwareController {
   public async connectDevice (deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
@@ -45,9 +46,20 @@ export default class HardwareController {
     }
   }
 
-  public async getPublicKey (): Promise<Controller.Response<ExtendedPublicKey>> {
+  public async getExtendedPublicKey (): Promise<Controller.Response<ExtendedPublicKey>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const pubkey = await device.getExtendedPublicKey()
+
+    return {
+      status: ResponseCode.Success,
+      result: pubkey,
+    }
+  }
+
+  public async getPublicKey (): Promise<Controller.Response<PublicKey>> {
+    const device = HardwareWalletService.getInstance().getCurrent()!
+    const defaultPath = AccountExtendedPublicKey.ckbAccountPath
+    const pubkey = await device.getPublicKey(defaultPath)
 
     return {
       status: ResponseCode.Success,

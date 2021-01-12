@@ -6,7 +6,7 @@ import TransactionSender from 'services/transaction-sender'
 import MultiSign from 'models/multi-sign'
 import WalletService from 'services/wallets'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
-import type { DeviceInfo, ExtendedPublicKey } from './common'
+import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
 import { AccountExtendedPublicKey } from 'models/keys/key'
 
 export abstract class Hardware {
@@ -113,6 +113,7 @@ export abstract class Hardware {
     return tx
   }
 
+  public abstract getPublicKey(path: string): Promise<PublicKey>
   public abstract getExtendedPublicKey(): Promise<ExtendedPublicKey>
   public abstract connect(hardwareInfo?: DeviceInfo): Promise<void>
   public abstract signMessage(path: string, messageHex: string): Promise<string>

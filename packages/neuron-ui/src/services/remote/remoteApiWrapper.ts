@@ -107,6 +107,7 @@ type Action =
   | 'get-device-ckb-app-version'
   | 'get-device-firmware-version'
   | 'get-device-public-key'
+  | 'get-device-extended-public-key'
   | 'connect-device'
   | 'create-hardware-wallet'
   // offline-signature
