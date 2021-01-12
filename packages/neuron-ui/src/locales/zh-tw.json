@@ -49,8 +49,7 @@
       "app-version": "檢測到 CKB 應用版本 v{{version}}。",
       "firmware-version": "檢測到固件版本 v{{version}}。",
       "wallet-name": "錢包名稱",
-      "select-model": "選擇型號",
-      "review-warning": "由於當前 Nervos app 處於 Ledger 官方的審核中，此功能還屬於試驗性階段."
+      "select-model": "選擇型號"
     },
     "hardware-sign": {
       "cancel": "取消",
@@ -437,6 +436,7 @@
       "remain-ckb-for-withdraw": "建議保留部分 CKB 作為提現手續費",
       "no-valid-addresses-found": "未找到有效地址",
       "decimal-range": "小數位應為 {{range}}(包括) 之間的整數",
+      "experimental-message-hardware": "本功能為實驗性功能，請註意風險，謹慎使用。",
       "experimental-message": "本頁面為實驗性功能，可能隨時變更。請謹慎使用。",
       "rebuild-sync": "為了提供更好的用戶體驗，Neuron 採取了新的索引方案，該方案需要一次性重構緩存數據庫(預期同步時間為 30~60 分鐘)。\n抱歉給您帶來不便。",
       "fields": {
