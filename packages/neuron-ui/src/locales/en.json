@@ -54,8 +54,7 @@
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name",
-      "select-model": "Select Model",
-      "review-warning": "This is an experimental feature, as the Nervos app is currently in review mode by the Ledger official."
+      "select-model": "Select Model"
     },
     "hardware-sign": {
       "cancel": "Cancel",
@@ -444,6 +443,7 @@
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "no-valid-addresses-found": "No valid addresses found",
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
       "fields": {

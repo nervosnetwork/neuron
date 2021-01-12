@@ -57,7 +57,7 @@ const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationSta
           placeholder={t('import-hardware.select-model')}
           options={supportedHardwareModels}
         />
-        <Text variant="tiny">{t('import-hardware.review-warning')}</Text>
+        <Text variant="tiny">{t('messages.experimental-message-hardware')}</Text>
       </section>
       <footer className={styles.footer}>
         <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />
