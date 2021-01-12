@@ -49,7 +49,8 @@
       "app-version": "檢測到 CKB 應用版本 v{{version}}。",
       "firmware-version": "檢測到固件版本 v{{version}}。",
       "wallet-name": "錢包名稱",
-      "select-model": "選擇型號"
+      "select-model": "選擇型號",
+      "review-warning": "由於當前 Nervos app 處於 Ledger 官方的審核中，此功能還屬於試驗性階段."
     },
     "hardware-sign": {
       "cancel": "取消",

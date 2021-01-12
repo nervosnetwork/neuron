@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import Select from 'widgets/Select'
+import { Text } from 'office-ui-fabric-react'
 import styles from './findDevice.module.scss'
 import { LocationState, Model, RoutePath } from './common'
 
@@ -56,6 +57,7 @@ const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationSta
           placeholder={t('import-hardware.select-model')}
           options={supportedHardwareModels}
         />
+        <Text variant="tiny">{t('import-hardware.review-warning')}</Text>
       </section>
       <footer className={styles.footer}>
         <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />
