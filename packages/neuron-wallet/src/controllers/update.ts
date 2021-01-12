@@ -64,7 +64,10 @@ export default class UpdateController {
     })
 
     autoUpdater.on('download-progress', progress => {
-      this.notify(progress.percent / 100)
+      const progressPercent = progress.percent / 100
+      if (progressPercent !== 1) {
+        this.notify(progressPercent)
+      }
     })
 
     autoUpdater.on('update-downloaded', () => {

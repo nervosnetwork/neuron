@@ -285,7 +285,7 @@ declare namespace Controller {
   namespace MigrateAcp {
     interface Params {
       id: string
-      password: string
+      password?: string
     }
   }
 

@@ -54,7 +54,8 @@
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name",
-      "select-model": "Select Model"
+      "select-model": "Select Model",
+      "review-warning": "This is an experimental feature, as the Nervos app is currently in review mode by the Ledger official."
     },
     "hardware-sign": {
       "cancel": "Cancel",

@@ -8,6 +8,7 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
   AppActions,
+  migrateAcp,
 } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import Spinner from 'widgets/Spinner'
@@ -280,6 +281,16 @@ const HardwareSign = ({
               history!.push(RoutePath.History)
             } else {
               setError(res.message)
+            }
+          })
+          break
+        }
+        case 'migrate-acp': {
+          await migrateAcp({ id: wallet.id })(dispatch).then(res => {
+            if (isSuccessResponse(res)) {
+              history!.push(RoutePath.History)
+            } else {
+              setError(res.message.content)
             }
           })
           break

@@ -1,3 +1,27 @@
+# 0.35.0 (2021-01-12)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+
+* Enable hardware wallet of Ledger. Please note that this is an **experimental** feature, as the Nervos app is currently in review mode by the Ledger official.
+* Support address verification on hardware wallet device.
+
+### Bug fixes
+
+* Fix problems in searching transactions by address or tx hash.
+
+# 0.34.2 (2020-12-31)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Update the CKB logo.
+* Rename the default network name to `Default`.
+* Fix version updater error when clicking the install button too soon.
+* Fix bug of `too many open files` error.
+
 # 0.35.0-rc1 (2020-12-19)
 
 This is a release candidate to preview the changes in the next official release and may not be stable. Welcome any questions or suggestions.
@@ -8,6 +32,14 @@ This is a release candidate to preview the changes in the next official release 
 
 * Enable hardware wallet of Ledger.
 * Support address verification on hardware wallet device.
+
+# 0.34.1 (2020-12-19)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hotfix
+
+* Fix libudev-dev dependency for Ubuntu build.
 
 
 # 0.34.0 (2020-12-16)
