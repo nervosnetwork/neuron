@@ -103,6 +103,7 @@ export default {
       'testnet-address-required': '{{address}} 不是測試網地址。',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
+      "device-sign-canceled": "您取消了簽名。否則，請確保設備上 Nervos app 設置開啟了 “allow contract data”。",
       "connect-device-failed": "設備無法連接，請檢查設備連接狀況。",
       "save-offline-json-failed": "無法保存 JSON 文件。",
       "offline-sign-failed": "簽名失敗，請檢查是否使用了正確的錢包進行簽名。",
