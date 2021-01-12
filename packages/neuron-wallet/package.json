@@ -37,7 +37,6 @@
   "dependencies": {
     "@ckb-lumos/base": "0.7.4",
     "@ckb-lumos/indexer": "0.7.4",
-    "@ledgerhq/hw-transport-node-ble": "5.22.0",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",
@@ -57,7 +56,7 @@
     "reflect-metadata": "0.1.13",
     "rxjs": "6.5.3",
     "sha3": "2.0.7",
-    "sqlite3": "5.0.0",
+    "sqlite3": "4.1.1",
     "subleveldown": "^4.1.4",
     "typeorm": "0.2.20",
     "uuid": "3.3.3"
