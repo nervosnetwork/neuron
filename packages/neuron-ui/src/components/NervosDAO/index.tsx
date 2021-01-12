@@ -218,6 +218,11 @@ const NervosDAO = () => {
     setTabIdx,
   ])
 
+  const onDepositDialogOpen = useCallback(() => {
+    clearGeneratedTx()
+    updateDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
+  }, [clearGeneratedTx, updateDepositValue])
+
   const MemoizedDepositDialog = useMemo(() => {
     return (
       <DepositDialog
@@ -225,6 +230,7 @@ const NervosDAO = () => {
         value={depositValue}
         fee={fee}
         onChange={onDepositValueChange}
+        onOpen={onDepositDialogOpen}
         onDismiss={onDepositDialogDismiss}
         onSubmit={onDepositDialogSubmit}
         onSlide={onSlide}
@@ -239,6 +245,7 @@ const NervosDAO = () => {
     showDepositDialog,
     depositValue,
     fee,
+    onDepositDialogOpen,
     onDepositDialogDismiss,
     onDepositDialogSubmit,
     onSlide,
