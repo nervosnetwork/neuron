@@ -4,7 +4,7 @@
 
 ### New features
 
-* Enable hardware wallet of Ledger.
+* Enable hardware wallet of Ledger. Please note that this is an **experimental** feature, as the Nervos app is currently in review mode by the Ledger official.
 * Support address verification on hardware wallet device.
 
 ### Bug fixes
