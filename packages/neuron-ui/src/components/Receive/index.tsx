@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useRouteMatch, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
@@ -6,18 +6,19 @@ import QRCode from 'widgets/QRCode'
 import CopyZone from 'widgets/CopyZone'
 import { RoutePath } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
+import VerifyHardwareAddress from 'components/VerifyHardwareAddress'
 import styles from './receive.module.scss'
 
 const Receive = () => {
-  const {
-    wallet: { addresses = [] },
-  } = useGlobalState()
+  const { wallet } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const {
     params: { address },
   } = useRouteMatch()
   const history = useHistory()
+  const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
+  const { addresses } = wallet
   const isSingleAddress = addresses.length === 1
 
   const accountAddress = useMemo(() => {
@@ -30,6 +31,10 @@ const Receive = () => {
   const onAddressBookClick = useCallback(() => {
     history.push(RoutePath.Addresses)
   }, [history])
+
+  const onVerifyAddressClick = useCallback(() => {
+    setDisplayVerifyDialog(true)
+  }, [])
 
   if (!accountAddress) {
     return <div>{t('receive.address-not-found')}</div>
@@ -56,6 +61,23 @@ const Receive = () => {
           className={styles.addressBook}
           label={t('receive.address-book')}
           onClick={onAddressBookClick}
+        />
+      )}
+      {isSingleAddress && (
+        <Button
+          type="primary"
+          className={styles.addressBook}
+          label={t('receive.verify-address')}
+          onClick={onVerifyAddressClick}
+        />
+      )}
+      {displayVerifyDialog && (
+        <VerifyHardwareAddress
+          address={accountAddress}
+          wallet={wallet}
+          onDismiss={() => {
+            setDisplayVerifyDialog(false)
+          }}
         />
       )}
     </div>

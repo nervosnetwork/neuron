@@ -67,6 +67,25 @@
         "rescan": "再次检测"
       }
     },
+    "hardware-verify-address": {
+      "title": "使用硬件钱包进行地址验证",
+      "device": "设备：",
+      "address": "地址：",
+      "verified": "验证通过",
+      "invalid": "地址不正确",
+      "status": {
+        "label": "状态：",
+        "connect": "已连接",
+        "user-input": "已连接，等待确认...",
+        "disconnect": "未连接，请检查设备连接。"
+      },
+      "actions": {
+        "close": "关闭",
+        "rescan": "再次检测",
+        "copy-address": "复制地址",
+        "verify": "验证"
+      }
+    },
     "offline-sign": {
       "title": "离线签名",
       "json-file": "JSON 文件：",
@@ -193,7 +212,8 @@
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址簿页面。",
       "address-qrcode": "地址二维码",
-      "address": "{{network}} 地址"
+      "address": "{{network}} 地址",
+      "verify-address": "验证地址"
     },
     "history": {
       "meta": "元信息",
@@ -416,6 +436,7 @@
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "no-valid-addresses-found": "未找到有效地址",
       "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
+      "experimental-message-hardware": "本功能为实验性功能，请注意风险，谨慎使用。",
       "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "rebuild-sync": "为了提供更好的用户体验，Neuron 采取了新的索引方案，该方案需要一次性重构缓存数据库(预期同步时间为 30~60 分钟)。\n抱歉给您带来不便。",
       "fields": {

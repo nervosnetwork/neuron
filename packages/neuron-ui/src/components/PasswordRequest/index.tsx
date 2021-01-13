@@ -128,7 +128,7 @@ const PasswordRequest = () => {
             break
           }
           case 'migrate-acp': {
-            await migrateAcp({ id: walletID, password })(dispatch).then(status => {
+            await migrateAcp({ id: walletID, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {

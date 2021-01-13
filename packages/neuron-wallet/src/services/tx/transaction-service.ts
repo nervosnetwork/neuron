@@ -72,17 +72,40 @@ export class TransactionsService {
         `tx.hash
         IN
           (
-            SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
-            UNION
-            SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
+            SELECT transactionHash from (
+              SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
+              UNION
+              SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
+            )
+            INTERSECT
+            SELECT transactionHash from (
+              SELECT output.transactionHash FROM output WHERE output.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)
+              UNION
+              SELECT input.transactionHash FROM input WHERE input.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)
+            )
           )
         `,
-        { lockHashes }
+        { lockHashes, walletId: params.walletID }
       )
       .orderBy('tx.timestamp', 'DESC')
       .getRawMany().then(txs => txs.map(tx => tx.txHash))
     } else if (type === SearchType.TxHash) {
-      allTxHashes = [searchValue]
+      allTxHashes = await repository.createQueryBuilder('tx').select('tx.hash', 'txHash').where(
+        `tx.hash
+        IN
+          (
+            SELECT transactionHash from (
+              SELECT output.transactionHash FROM output WHERE output.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)
+              UNION
+              SELECT input.transactionHash FROM input WHERE input.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)
+            )
+            WHERE transactionHash = :txHash
+          )
+        `,
+        { walletId: params.walletID, txHash: searchValue }
+      )
+      .orderBy('tx.timestamp', 'DESC')
+      .getRawMany().then(txs => txs.map(tx => tx.txHash))
     } else if (type === SearchType.Date) {
       const beginTimestamp = +new Date(new Date(searchValue).toDateString())
       const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
