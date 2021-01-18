@@ -2,7 +2,7 @@ import { Manufacturer } from '../../src/services/hardware/common'
 import HardwareService from '../../src/services/hardware'
 import HardwareController from '../../src/controllers/hardware'
 import { ResponseCode } from '../../src/utils/const'
-import { ledgerNanoS, LedgerNanoX, LedgerCkbApp } from '../mock/hardware'
+import { ledgerNanoS, LedgerCkbApp } from '../mock/hardware'
 import { connectDeviceFailed } from '../../src/exceptions'
 
 describe('hardware controller', () => {
@@ -39,14 +39,21 @@ describe('hardware controller', () => {
    it('#getPublicKey', async () => {
      const { result } = await hardwareControler.getPublicKey()
      expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
+     expect(result!.lockArg).toBe(LedgerCkbApp.lockArg)
+     expect(result!.address).toBe(LedgerCkbApp.address)
+   })
+
+   it('#getExtendedPublicKey', async () => {
+     const { result } = await hardwareControler.getExtendedPublicKey()
+     expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
      expect(result!.chainCode).toBe(LedgerCkbApp.chainCode)
    })
 
    it('#detectDevice', async () => {
     const { result } = await hardwareControler.detectDevice({
       manufacturer: Manufacturer.Ledger,
-      product: 'Nano X'
+      product: 'Nano S'
     })
-    expect(result).toEqual([LedgerNanoX])
+    expect(result).toEqual([ledgerNanoS])
    })
 })

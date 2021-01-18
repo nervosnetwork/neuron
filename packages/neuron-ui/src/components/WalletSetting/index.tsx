@@ -43,16 +43,13 @@ const buttons = [
     url: RoutePath.ImportKeystore,
     icon: <ImportSeed />,
   },
-]
-
-if (process.env.NODE_ENV === 'development') {
-  buttons.push({
+  {
     label: 'wizard.hardware-wallet',
     ariaLabel: 'import from hardware wallet',
     url: RoutePath.ImportHardware,
     icon: <ImportHardware />,
-  })
-}
+  },
+]
 
 const WalletSetting = ({
   wallet: { id: currentID = '' },

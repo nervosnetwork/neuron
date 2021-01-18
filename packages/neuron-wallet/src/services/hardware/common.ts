@@ -22,3 +22,9 @@ export interface ExtendedPublicKey {
   publicKey: string
   chainCode: string
 }
+
+export interface PublicKey {
+  publicKey: string
+  lockArg: string
+  address: string
+}

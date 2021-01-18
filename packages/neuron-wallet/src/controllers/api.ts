@@ -462,6 +462,10 @@ export default class ApiController {
       return this.hardwareController.getFirmwareVersion()
     })
 
+    handle('get-device-extended-public-key', async () => {
+      return this.hardwareController.getExtendedPublicKey()
+    })
+
     handle('get-device-public-key', async () => {
       return this.hardwareController.getPublicKey()
     })

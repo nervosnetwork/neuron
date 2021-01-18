@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { Switch, Route, RouteComponentProps } from 'react-router-dom'
+import Experimental from 'widgets/ExperimentalRibbon'
 import Comfirming from './confirming'
 import ImportError from './import-error'
 import SelectModel from './select-model'
@@ -12,6 +13,7 @@ import styles from './findDevice.module.scss'
 
 const ImportHardware = ({ match }: RouteComponentProps) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const EXPERIMENTAL_TAG = 'import-hardware'
 
   useEffect(() => {
     dialogRef.current!.showModal()
@@ -19,6 +21,7 @@ const ImportHardware = ({ match }: RouteComponentProps) => {
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
+      <Experimental tag={EXPERIMENTAL_TAG} showRibbon={false} message="messages.experimental-message-hardware" />
       <Switch>
         <Route component={SelectModel} exact path={match.url} />
         <Route component={DetectDevice} exact path={match.url + RoutePath.DetectDevice} />
