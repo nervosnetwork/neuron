@@ -178,16 +178,16 @@ declare namespace Controller {
     }
   }
   interface SUDTAccount {
-    public id?: number
-    public walletID: string
-    public tokenID: string
-    public symbol: string
-    public accountName: string
-    public tokenName: string
-    public decimal: string
-    public balance: string
-    public blake160: string
-    public address: string
+    id?: number
+    walletID: string
+    tokenID: string
+    symbol: string
+    accountName: string
+    tokenName: string
+    decimal: string
+    balance: string
+    blake160: string
+    address: string
   }
 
   namespace GetSUDTAccount {
@@ -310,6 +310,18 @@ declare namespace Controller {
       resetIndexerData: boolean
     }
     type Response = boolean
+  }
+
+  namespace GetSUDTTokenInfo {
+    interface Params {
+      tokenId: string
+    }
+    interface Response {
+      tokenId: string
+      symbol: string
+      tokenName: string
+      decimal: string
+    }
   }
 
   namespace CreateChequeTransaction {

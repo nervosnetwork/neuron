@@ -1,10 +1,11 @@
 import React, { useState, useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { useSUDTAccountInfoErrors, useFetchTokenInfoList } from 'utils'
-import { DEFAULT_SUDT_FIELDS } from 'utils/const'
+import { useSUDTAccountInfoErrors, isSuccessResponse, useFetchTokenInfoList } from 'utils'
+import { DEFAULT_SUDT_FIELDS, TOKEN_ID_LENGTH } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
 export enum AccountType {
@@ -140,10 +141,24 @@ const SUDTCreateDialog = ({
         value: payload,
         dataset: { field: type },
       } = e.target
-      const tokenInfo = tokenInfoList.find(ti => payload === ti.tokenID)
-      if (type === 'tokenId' && tokenInfo) {
-        const { tokenID, ...rest } = tokenInfo
-        dispatch({ type: 'import', payload: { ...rest, tokenId: tokenID } })
+      if (
+        type === 'tokenId' &&
+        payload.startsWith('0x') &&
+        payload.length === TOKEN_ID_LENGTH &&
+        !Number.isNaN(+payload)
+      ) {
+        const tokenInfo = tokenInfoList.find(ti => payload === ti.tokenID)
+        if (tokenInfo) {
+          const { tokenID, ...rest } = tokenInfo
+          dispatch({ type: 'import', payload: { ...rest, tokenId: tokenID } })
+        } else {
+          getSUDTTokenInfo({ tokenId: payload }).then(res => {
+            if (isSuccessResponse(res) && res.result) {
+              dispatch({ type: 'import', payload: { ...res.result } })
+            }
+          })
+          dispatch({ type, payload })
+        }
       } else {
         dispatch({ type, payload })
       }
