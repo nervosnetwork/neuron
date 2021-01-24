@@ -314,10 +314,10 @@ declare namespace Controller {
 
   namespace GetSUDTTokenInfo {
     interface Params {
-      tokenId: string
+      tokenID: string
     }
     interface Response {
-      tokenId: string
+      tokenID: string
       symbol: string
       tokenName: string
       decimal: string

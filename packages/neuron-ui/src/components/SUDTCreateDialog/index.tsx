@@ -4,8 +4,8 @@ import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { useSUDTAccountInfoErrors, isSuccessResponse, useFetchTokenInfoList } from 'utils'
-import { DEFAULT_SUDT_FIELDS, TOKEN_ID_LENGTH } from 'utils/const'
+import { validateTokenId, isSuccessResponse, useSUDTAccountInfoErrors, useFetchTokenInfoList } from 'utils'
+import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
 export enum AccountType {
@@ -141,20 +141,24 @@ const SUDTCreateDialog = ({
         value: payload,
         dataset: { field: type },
       } = e.target
-      if (
-        type === 'tokenId' &&
-        payload.startsWith('0x') &&
-        payload.length === TOKEN_ID_LENGTH &&
-        !Number.isNaN(+payload)
-      ) {
+
+      const isTokenIdValidated = () => {
+        try {
+          return validateTokenId({ isCKB: false, required: true, tokenId: payload })
+        } catch (_) {
+          return false
+        }
+      }
+
+      if (type === 'tokenId' && isTokenIdValidated()) {
         const tokenInfo = tokenInfoList.find(ti => payload === ti.tokenID)
         if (tokenInfo) {
           const { tokenID, ...rest } = tokenInfo
           dispatch({ type: 'import', payload: { ...rest, tokenId: tokenID } })
         } else {
-          getSUDTTokenInfo({ tokenId: payload }).then(res => {
+          getSUDTTokenInfo({ tokenID: payload }).then(res => {
             if (isSuccessResponse(res) && res.result) {
-              dispatch({ type: 'import', payload: { ...res.result } })
+              dispatch({ type: 'import', payload: { ...res.result, tokenId: res.result.tokenID } })
             }
           })
           dispatch({ type, payload })

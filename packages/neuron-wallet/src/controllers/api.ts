@@ -467,7 +467,7 @@ export default class ApiController {
       return this.anyoneCanPayController.sendTx(params)
     })
 
-    handle('get-sudt-token-info', async (_, params: { tokenId: string })=>{
+    handle('get-sudt-token-info', async (_, params: { tokenID: string })=>{
       return this.sudtController.getSUDTTokenInfo(params)
     })
 
