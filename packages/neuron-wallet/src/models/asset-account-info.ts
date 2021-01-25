@@ -14,6 +14,7 @@ export interface ScriptCellInfo {
 }
 
 export default class AssetAccountInfo {
+  private sudt: ScriptCellInfo
   private sudtInfo: ScriptCellInfo
   private anyoneCanPayInfo: ScriptCellInfo
   private pwAnyoneCanPayInfo: ScriptCellInfo
@@ -24,18 +25,25 @@ export default class AssetAccountInfo {
 
   public get infos(): {[name: string]: ScriptCellInfo} {
     return {
-      sudt: this.sudtInfo,
+      sudt: this.sudt,
+      sudtInfo: this.sudtInfo,
       anyoneCanPay: this.anyoneCanPayInfo
     }
   }
 
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
     if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
-      this.sudtInfo = {
+      this.sudt = {
         cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!),
           process.env.MAINNET_SUDT_DEP_TYPE! as DepType),
         codeHash: process.env.MAINNET_SUDT_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
+      }
+      this.sudtInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_INFO_DEP_TXHASH!, process.env.MAINNET_SUDT_INFO_DEP_INDEX!),
+          process.env.MAINNET_SUDT_INFO_DEP_TYPE! as DepType),
+        codeHash: process.env.MAINNET_SUDT_INFO_SCRIPT_CODEHASH!,
+        hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.anyoneCanPayInfo = {
         cellDep: new CellDep(new OutPoint(process.env.MAINNET_ACP_DEP_TXHASH!, process.env.MAINNET_ACP_DEP_INDEX!),
@@ -62,11 +70,17 @@ export default class AssetAccountInfo {
         hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
       }
     } else {
-      this.sudtInfo = {
+      this.sudt = {
         cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
           process.env.TESTNET_SUDT_DEP_TYPE! as DepType),
         codeHash: process.env.TESTNET_SUDT_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
+      }
+      this.sudtInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_INFO_DEP_TXHASH!, process.env.TESTNET_SUDT_INFO_DEP_INDEX!),
+          process.env.TESTNET_SUDT_INFO_DEP_TYPE! as DepType),
+        codeHash: process.env.TESTNET_SUDT_INFO_SCRIPT_CODEHASH!,
+        hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.anyoneCanPayInfo = {
         cellDep: new CellDep(new OutPoint(process.env.TESTNET_ACP_DEP_TXHASH!, process.env.TESTNET_ACP_DEP_INDEX!),
@@ -96,7 +110,11 @@ export default class AssetAccountInfo {
   }
 
   public get sudtCellDep(): CellDep {
-    return this.sudtInfo.cellDep
+    return this.sudt.cellDep
+  }
+
+  public get sudtInfoCodeHash():string{
+    return this.sudtInfo.codeHash
   }
 
   public get anyoneCanPayCellDep(): CellDep {
@@ -116,7 +134,7 @@ export default class AssetAccountInfo {
   }
 
   public generateSudtScript(args: string): Script {
-    return new Script(this.sudtInfo.codeHash, args, this.sudtInfo.hashType)
+    return new Script(this.sudt.codeHash, args, this.sudt.hashType)
   }
 
   public generateAnyoneCanPayScript(args: string): Script {
@@ -138,7 +156,7 @@ export default class AssetAccountInfo {
   }
 
   public isSudtScript(script: Script): boolean {
-    return script.codeHash === this.sudtInfo.codeHash && script.hashType === this.sudtInfo.hashType
+    return script.codeHash === this.sudt.codeHash && script.hashType === this.sudt.hashType
   }
 
   public isAnyoneCanPayScript(script: Script): boolean {

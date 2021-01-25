@@ -1,4 +1,4 @@
-import parseSUDTTokenInfo from "../../../dist/utils/parse_sudt_token_info";
+import parseSUDTTokenInfo from "../../../src/utils/parse_sudt_token_info";
 
 describe('parseSUDTTokenInfo', () => {
   it('parse sudt token info should success', function () {

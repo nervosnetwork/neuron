@@ -151,18 +151,13 @@ const SUDTCreateDialog = ({
       }
 
       if (type === 'tokenId' && isTokenIdValidated()) {
-        const tokenInfo = tokenInfoList.find(ti => payload === ti.tokenID)
-        if (tokenInfo) {
-          const { tokenID, ...rest } = tokenInfo
-          dispatch({ type: 'import', payload: { ...rest, tokenId: tokenID } })
-        } else {
-          getSUDTTokenInfo({ tokenID: payload }).then(res => {
-            if (isSuccessResponse(res) && res.result) {
-              dispatch({ type: 'import', payload: { ...res.result, tokenId: res.result.tokenID } })
-            }
-          })
-          dispatch({ type, payload })
-        }
+        getSUDTTokenInfo({ tokenID: payload }).then(res => {
+          if (isSuccessResponse(res) && res.result) {
+            dispatch({ type: 'import', payload: { ...res.result, tokenId: res.result.tokenID } })
+          } else {
+            dispatch({ type, payload })
+          }
+        })
       } else {
         dispatch({ type, payload })
       }
