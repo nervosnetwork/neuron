@@ -21,7 +21,7 @@ export default class SUDTController {
       args: params.tokenID,
       hashType: ScriptHashType.Type})
     const liveCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(null, typeScript)
-    if (liveCell == undefined) {
+    if (!liveCell) {
       return {
         status: ResponseCode.Fail,
       }
