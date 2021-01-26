@@ -1,4 +1,4 @@
-import { ErrorCode, isSuccessResponse, failureResToNotification, sendTxBaseAction } from 'utils'
+import { ErrorCode, isSuccessResponse, failureResToNotification, sendTxBaseAction, ResponseCode } from 'utils'
 import {
   sendCreateSUDTAccountTransaction as sendCreateAccountTx,
   sendSUDTTransaction as sendSUDTTx,
