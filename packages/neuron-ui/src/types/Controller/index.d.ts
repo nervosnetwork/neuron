@@ -311,4 +311,57 @@ declare namespace Controller {
     }
     type Response = boolean
   }
+
+  namespace CreateChequeTransaction {
+    type Tx = any
+    interface Params {
+      walletID: string
+      assetAccountID: string
+      address: string
+      amount: string
+      feeRate: string
+    }
+
+    type Response = Tx
+  }
+
+  namespace GenerateWithdrawChequeTransaction {
+    type Tx = any
+    interface Params {
+      walletID: string
+      chequeCellOutPoint: OutPoint
+    }
+
+    interface Response {
+      tx: Tx
+    }
+  }
+
+  namespace SendWithdrawChequeTransaction {
+    type Tx = any
+    interface Params {
+      walletID: string
+      tx: Tx
+      password: string
+    }
+
+    type Response = string
+  }
+
+  namespace GenerateClaimChequeTransaction {
+    type AssetAccount = Record<
+      'accountName' | 'balance' | 'blake160' | 'decimal' | 'symbol' | 'tokenID' | 'tokenName',
+      string
+    >
+
+    interface Params {
+      walletID: string
+      chequeCellOutPoint: CKBComponents.OutPoint
+    }
+
+    interface Response {
+      tx: any
+      assetAccount?: AssetAccount
+    }
+  }
 }

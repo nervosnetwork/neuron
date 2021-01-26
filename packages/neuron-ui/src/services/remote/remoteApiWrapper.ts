@@ -102,6 +102,11 @@ type Action =
   | 'get-token-info-list'
   | 'migrate-acp'
   | 'check-migrate-acp'
+  // Cheque
+  | 'generate-create-cheque-tx'
+  | 'generate-withdraw-cheque-tx'
+  | 'send-withdraw-cheque-tx'
+  | 'generate-claim-cheque-tx'
   // Hardware Wallet
   | 'detect-device'
   | 'get-device-ckb-app-version'
@@ -123,13 +128,6 @@ export const remoteApi = <P = any, R = any>(action: Action) => async (params: P)
       content: 'Invalid response format',
     },
   }))
-
-  if (process.env.NODE_ENV === 'development' && action === window.localStorage.getItem('log-response')) {
-    console.group(action)
-    console.info(`params: ${JSON.stringify(params, null, 2)}`)
-    console.info(`res: ${JSON.stringify(res, null, 2)}`)
-    console.groupEnd()
-  }
 
   if (!res) {
     return {

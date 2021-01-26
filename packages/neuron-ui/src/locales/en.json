@@ -390,6 +390,18 @@
       },
       "migrate-acp": {
         "title": "Upgrade Asset Accounts"
+      },
+      "send-cheque": {
+        "title": "Send Cheque Asset"
+      },
+      "withdraw-cheque": {
+        "title": "Withdraw Cheque Asset"
+      },
+      "claim-cheque": {
+        "title": "Claim Cheque Asset"
+      },
+      "create-account-to-claim-cheque": {
+        "title": "Claim Cheque Asset with New Account"
       }
     },
     "qrcode": {
@@ -640,14 +652,16 @@
     "special-assets": {
       "title": "Customized Assets",
       "date": "Date",
-      "capacity": "Capacity",
+      "assets": "Assets",
       "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "Uncataloged Asset",
       "user-defined-asset-tooltip": "This is an uncataloged asset，Neuron cannot process it now，please use a third-party software to check.",
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
+      "withdraw-asset-tooltip": "Estimate release time is {{year}}-{{month}}-{{day}} {{hour}}:{{minute}}(according to the actual running block height).",
       "claim-asset": "Claim",
+      "withdraw-asset": "Withdraw",
       "view-details": "View Details",
       "release-success": "Asset was released, view details in History.",
       "no-special-assets": "No customized assets",
@@ -693,7 +707,8 @@
         "amount": "Amount",
         "description": "Description",
         "submit": "Submit",
-        "click-to-edit": "Click to edit"
+        "click-to-edit": "Click to edit",
+        "cheque-address-hint": "162 CKBytes capacity is going to be temporarily locked to initialize the token transfer, and it will be automatically unlocked after the token being claimed by the receiver."
       },
       "receive": {
         "notation": "Accept {{symbol}} only"

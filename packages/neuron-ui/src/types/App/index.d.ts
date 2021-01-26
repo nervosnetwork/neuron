@@ -89,6 +89,10 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-sudt'
       | 'send-acp'
+      | 'send-cheque'
+      | 'withdraw-cheque'
+      | 'claim-cheque'
+      | 'create-account-to-claim-cheque'
       | 'migrate-acp'
       | null
     readonly walletID: string

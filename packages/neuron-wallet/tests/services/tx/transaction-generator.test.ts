@@ -2,11 +2,13 @@ import { when } from 'jest-when'
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
 import OutputEntity from '../../../src/database/chain/entities/output'
+import InputEntity from '../../../src/database/chain/entities/input'
+import TransactionEntity from '../../../src/database/chain/entities/transaction'
 import { TargetOutput } from '../../../src/services/tx/transaction-generator'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
-import Transaction from '../../../src/models/chain/transaction'
+import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
 import BlockHeader from '../../../src/models/chain/block-header'
@@ -58,6 +60,7 @@ jest.doMock('../../../src/block-sync-renderer/index', () => {
 });
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
+import AssetAccount from '../../../src/models/asset-account'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -118,6 +121,48 @@ describe('TransactionGenerator', () => {
     if (outputData) {
       output.data = outputData
     }
+
+    return output
+  }
+
+  const createInput = (lock: Script, type: Script | undefined, txHash: string) => {
+    const input = new InputEntity()
+
+    input.lockArgs = lock.args
+    input.lockCodeHash = lock.codeHash
+    input.lockHashType = lock.hashType
+    input.lockHash = lock.computeHash()
+    if (type) {
+      input.typeArgs = type!.args
+      input.typeCodeHash = type!.codeHash
+      input.typeHashType = type!.hashType
+      input.typeHash = type!.computeHash()
+    }
+
+    input.since = '0x0'
+    input.transactionHash = txHash
+
+    return input
+  }
+
+  const createOutput = (lock: Script, type: Script, capacity: string, data: string, outpoint: OutPoint) => {
+    const output = new OutputEntity()
+    output.capacity = capacity
+    output.lockArgs = lock.args
+    output.lockCodeHash = lock.codeHash
+    output.lockHashType = lock.hashType
+    output.lockHash = lock.computeHash()
+    if (type) {
+      output.typeArgs = type!.args
+      output.typeCodeHash = type!.codeHash
+      output.typeHashType = type!.hashType
+      output.typeHash = type!.computeHash()
+    }
+    output.hasData = true
+    output.data = data
+    output.outPointTxHash = outpoint.txHash
+    output.outPointIndex = outpoint.index
+    output.status = 'live'
 
     return output
   }
@@ -1917,6 +1962,303 @@ describe('TransactionGenerator', () => {
         expect(SystemScriptInfo.isSecpScript(changeOutput.lock)).toBe(true)
       })
     })
+
+    describe('generators for cheque', () => {
+      const tokenID = '0x' + '0'.repeat(64)
+      const typeScript = assetAccountInfo.generateSudtScript(tokenID)
+      const chequeAmount = '10'
+      let assetAccount: AssetAccount
+      let tx: Transaction
+      describe('#generateCreateChequeTx', () => {
+        let senderAcpLiveCell: LiveCell
+        let senderDefaultLock: Script
+        let expectedChequeOutput: Output
+        beforeEach(async () => {
+          const senderAcpCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+          senderAcpLiveCell = LiveCell.fromLumos(senderAcpCellEntity)
+          senderDefaultLock = alice.lockScript
+          const receiverDefaultLock = bob.lockScript
+
+          when(stubbedQueryIndexer)
+            .calledWith({lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null})
+            .mockResolvedValue([
+              generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript),
+              generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+            ])
+
+          expectedChequeOutput = Output.fromObject({
+            capacity: toShannon('161'),
+            lock: assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), senderDefaultLock.computeHash()),
+            type: senderAcpLiveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(110))
+          })
+          assetAccount = new AssetAccount(tokenID, '', '', '', '', '', alice.lockScript.args)
+        });
+        describe('with numeric send amount', () => {
+          beforeEach(async () => {
+            tx = await TransactionGenerator.generateCreateChequeTx(
+              walletId1,
+              BufferUtils.readBigUInt128LE(expectedChequeOutput.data).toString(),
+              assetAccount,
+              bob.address,
+              alice.address,
+              '0',
+              '1000'
+            )
+          });
+          it('creates cheque output', () => {
+            const chequeOutput = tx.outputs[0]
+            expect(chequeOutput.lock.computeHash()).toEqual(expectedChequeOutput.lockHash)
+            expect(chequeOutput.lock.args.length).toEqual(82)
+          })
+          it('sender lock hash equals to one of default lock inputs', () => {
+            const defaultLockInput = tx.inputs.find(
+              input => {
+                const isDefaultLock = input.lock!.codeHash === SystemScriptInfo.SECP_CODE_HASH
+                return isDefaultLock && input.lock!.computeHash().slice(0, 42) === '0x' + expectedChequeOutput.lock.args.slice(42)
+              }
+            )
+            expect(defaultLockInput).not.toEqual(undefined)
+          })
+          it('specifies send amount', () => {
+            expect(tx.outputsData[0]).toEqual(expectedChequeOutput.data)
+            expect(tx.sudtInfo!.amount).toBe('110')
+            expect(tx.anyoneCanPaySendAmount).toBe('110')
+          })
+        });
+        describe('with send all amount', () => {
+          beforeEach(async () => {
+            tx = await TransactionGenerator.generateCreateChequeTx(
+              walletId1,
+              'all',
+              assetAccount,
+              bob.address,
+              alice.address,
+              '0',
+              '1000'
+            )
+          });
+          it('specifies send amount', () => {
+            expect(tx.outputsData[0]).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+            expect(tx.sudtInfo!.amount).toBe('200')
+            expect(tx.anyoneCanPaySendAmount).toBe('200')
+          })
+        });
+      });
+
+      describe('#generateClaimChequeTx', () => {
+        let expectedChequeOutput: Output
+        let receiverAcpCell: OutputEntity
+        const senderDefaultLock: Script = alice.lockScript
+        const receiverDefaultLock = bob.lockScript
+
+        beforeEach(async () => {
+          const receiverDefaultLockHash = receiverDefaultLock.computeHash()
+          const senderDefaultLockHash = senderDefaultLock.computeHash()
+
+          const transaction = new TransactionEntity()
+          transaction.hash = '0x'
+          transaction.version = '0'
+          transaction.witnesses = []
+          transaction.status = TransactionStatus.Success
+
+          const senderDefaultLockInput = createInput(senderDefaultLock, undefined, transaction.hash)
+          await getConnection().manager.save([transaction, senderDefaultLockInput])
+
+          expectedChequeOutput = Output.fromObject({
+            capacity: toShannon('161'),
+            lock: assetAccountInfo.generateChequeScript(receiverDefaultLockHash, senderDefaultLockHash),
+            type: typeScript,
+            data: BufferUtils.writeBigUInt128LE(BigInt(chequeAmount))
+          })
+        })
+        describe('with existing acp cell', () => {
+          beforeEach(async () => {
+            const receiverAcpLock = bobAnyoneCanPayLockScript
+            receiverAcpCell = generateCell(
+              toShannon('1000'),
+              OutputStatus.Live,
+              true,
+              typeScript,
+              {lockScript: receiverAcpLock},
+              undefined,
+              BufferUtils.writeBigUInt128LE(BigInt(100))
+            )
+            await getConnection().manager.save([receiverAcpCell])
+            tx = await TransactionGenerator.generateClaimChequeTx(
+              walletId1,
+              expectedChequeOutput,
+              alice.address,
+              undefined,
+              '1000'
+            )
+          });
+          it('uses the existing acp cell to hold the claimed sudt amount', () => {
+            const acpInput = tx.inputs.find(input => (
+              input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
+              input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+            ))
+            const acpInputAmount = BufferUtils.readBigUInt128LE(acpInput!.data!)
+
+            const acpOutput = tx.outputs.find(input => (
+              input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
+              input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+            ))
+
+            const chequeCellAmount = BufferUtils.readBigUInt128LE(expectedChequeOutput.data)
+            const acpOutputAmount = BufferUtils.readBigUInt128LE(acpOutput!.data!)
+
+            const claimedAmount = acpOutputAmount - acpInputAmount
+            expect(claimedAmount).toEqual(chequeCellAmount)
+          })
+          it('returns ckb to sender', () => {
+            const senderDefaultOutput = tx.outputs.find(input => (
+              input.lock!.computeHash() === senderDefaultLock.computeHash()
+            ))
+            expect(senderDefaultOutput!.capacity).toEqual(expectedChequeOutput.capacity)
+          })
+        })
+
+        describe('without existing acp cell', () => {
+          beforeEach(async () => {
+            tx = await TransactionGenerator.generateClaimChequeTx(
+              walletId1,
+              expectedChequeOutput,
+              alice.address,
+              undefined,
+              '1000'
+            )
+          })
+          it('creates an new acp cell to hold the claimed sudt amount', () => {
+
+            const acpInput = tx.inputs.find(input => (
+              input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
+              input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+            ))
+            expect(acpInput).toBe(undefined)
+
+            const acpOutput = tx.outputs.find(input => (
+              input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
+              input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+            ))
+
+            const chequeCellAmount = BufferUtils.readBigUInt128LE(expectedChequeOutput.data)
+            const claimedAmount = BufferUtils.readBigUInt128LE(acpOutput!.data!)
+
+            expect(claimedAmount).toEqual(chequeCellAmount)
+          })
+          it('returns ckb to sender', () => {
+            const senderDefaultOutput = tx.outputs.find(input => (
+              input.lock!.computeHash() === senderDefaultLock.computeHash()
+            ))
+            expect(senderDefaultOutput!.capacity).toEqual(expectedChequeOutput.capacity)
+          })
+        });
+      });
+      describe('#generateWithdrawChequeTx', () => {
+        let senderDefaultLock: Script = alice.lockScript
+        let senderAcpOutputEntity: OutputEntity
+        let senderDefaultLockInputEntity: InputEntity
+        let chequeOutputEntity: OutputEntity
+
+        const transaction = new TransactionEntity()
+        transaction.hash = '0x' + '0'.repeat(64)
+        transaction.version = '0'
+        transaction.witnesses = []
+        transaction.status = TransactionStatus.Success
+
+        senderDefaultLockInputEntity = createInput(senderDefaultLock, undefined, transaction.hash)
+
+        const chequeLock = assetAccountInfo
+          .generateChequeScript('0x' + '0'.repeat(40), senderDefaultLock.computeHash())
+        chequeOutputEntity = createOutput(
+          chequeLock,
+          typeScript,
+          toShannon('162'),
+          BufferUtils.writeBigUInt128LE(BigInt(chequeAmount)),
+          OutPoint.fromObject({txHash: transaction.hash, index: '0x1'})
+        )
+
+        describe('when the sender acp output from cheque tx is still live', () => {
+          beforeEach(async () => {
+            senderAcpOutputEntity = createOutput(
+              aliceAnyoneCanPayLockScript,
+              typeScript,
+              toShannon('142'),
+              BufferUtils.writeBigUInt128LE(BigInt('1')),
+              OutPoint.fromObject({txHash: transaction.hash, index: '0x0'})
+            )
+            await getConnection().manager.save([
+              transaction,
+              senderAcpOutputEntity,
+              senderDefaultLockInputEntity,
+              chequeOutputEntity
+            ])
+
+            const chequeOutput = chequeOutputEntity.toModel()
+            tx = await TransactionGenerator.generateWithdrawChequeTx(chequeOutput, undefined, '1000')
+          });
+          it('returns cheque sudt to sender acp', () => {
+            const updatedSenderAcpOutput = tx.outputs.find(output => output.lockHash === senderAcpOutputEntity.lockHash)!
+            expect(BufferUtils.parseAmountFromSUDTData(updatedSenderAcpOutput.data))
+              .toEqual(
+                BufferUtils.parseAmountFromSUDTData(chequeOutputEntity.data) +
+                BufferUtils.parseAmountFromSUDTData(senderAcpOutputEntity.data)
+              )
+          })
+          it('returns cheque ckb subtracted fees to sender lock', () => {
+            const senderDefaultLockOutput = tx.outputs.find(
+              output => output.lockHash === senderDefaultLockInputEntity.lockHash
+            )!
+            const capacityAfterFees = BigInt(chequeOutputEntity.capacity) - BigInt(tx.fee)
+            expect(senderDefaultLockOutput.capacity).toEqual(capacityAfterFees.toString())
+          })
+          it('use 6 relative epoch in cheque input since', () => {
+            const chequeInput = tx.inputs.find(input => input.lockHash === chequeOutputEntity.lockHash)!
+            expect(chequeInput.toSDK().since).toEqual('0xa000000000000006')
+          })
+        });
+        describe('when the sender acp output from cheque tx is consumed', () => {
+          const senderLiveAcpOutputEntity = createOutput(
+            aliceAnyoneCanPayLockScript,
+            typeScript,
+            toShannon('142'),
+            BufferUtils.writeBigUInt128LE(BigInt('2')),
+            OutPoint.fromObject({txHash: '0x' + '1'.repeat(64), index: '0x0'})
+          )
+          beforeEach(async () => {
+            senderAcpOutputEntity = createOutput(
+              aliceAnyoneCanPayLockScript,
+              typeScript,
+              toShannon('142'),
+              BufferUtils.writeBigUInt128LE(BigInt('1')),
+              OutPoint.fromObject({txHash: transaction.hash, index: '0x0'})
+            )
+            senderAcpOutputEntity.status = OutputStatus.Dead
+
+            await getConnection().manager.save([
+              transaction,
+              senderAcpOutputEntity,
+              senderLiveAcpOutputEntity,
+              senderDefaultLockInputEntity,
+              chequeOutputEntity
+            ])
+
+            const chequeOutput = chequeOutputEntity.toModel()
+            tx = await TransactionGenerator.generateWithdrawChequeTx(chequeOutput, undefined, '1000')
+          });
+          it('returns cheque sudt to latest live sender acp', () => {
+            const updatedSenderAcpOutput = tx.outputs.find(output => output.lockHash === senderLiveAcpOutputEntity.lockHash)!
+            expect(BufferUtils.parseAmountFromSUDTData(updatedSenderAcpOutput.data))
+              .toEqual(
+                BufferUtils.parseAmountFromSUDTData(chequeOutputEntity.data) +
+                BufferUtils.parseAmountFromSUDTData(senderLiveAcpOutputEntity.data)
+              )
+          })
+        });
+      })
+    });
+
   })
 
   describe('generateCreateAnyoneCanPayTxUseAllBalance', () => {

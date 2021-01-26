@@ -15,6 +15,7 @@ export * from './transactions'
 export * from './specialAssets'
 export * from './updater'
 export * from './sudt'
+export * from './cheque'
 export * from './hardware'
 export * from './offline'
 

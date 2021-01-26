@@ -1,7 +1,8 @@
 import { getConnection, In } from 'typeorm'
-import OutputEntity from 'database/chain/entities/output'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import FeeMode from 'models/fee-mode'
+import OutputEntity from 'database/chain/entities/output'
+import InputEntity from 'database/chain/entities/input'
 import TransactionEntity from 'database/chain/entities/transaction'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
@@ -11,7 +12,6 @@ import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import WitnessArgs from 'models/chain/witness-args'
 import MultiSign from 'models/multi-sign'
-import InputEntity from 'database/chain/entities/input'
 import BufferUtils from 'utils/buffer'
 import LiveCell from 'models/chain/live-cell'
 import Output from 'models/chain/output'
@@ -28,7 +28,8 @@ export interface PaginationResult<T = any> {
 }
 
 export enum CustomizedLock {
-  SingleMultiSign = "SingleMultiSign"
+  SingleMultiSign = "SingleMultiSign",
+  Cheque = "Cheque",
 }
 
 export default class CellsService {
@@ -213,9 +214,13 @@ export default class CellsService {
     return cells
   }
 
-  public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
+  public static async getCustomizedAssetCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
+    const blake160Hashes = new Set(blake160s)
     const multiSign = new MultiSign()
     const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
+    const assetAccountInfo = new AssetAccountInfo()
+    const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash
+    const secp256k1LockHashes = [...blake160Hashes].map(blake160 => SystemScriptInfo.generateSecpScript(blake160).computeHash())
 
     const skip = (pageNo - 1) * pageSize
 
@@ -225,12 +230,23 @@ export default class CellsService {
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(`
         output.status = :liveStatus AND
-        output.hasData = 0 AND
-        output.typeHash IS NULL AND
-        output.lockCodeHash = :lockCodeHash
+        (
+          (
+            output.hasData = 0 AND
+            output.typeHash IS NULL AND
+            output.lockCodeHash = :multiSignlockCodeHash
+          )
+          OR
+          (
+            output.hasData = 1 AND
+            output.typeHash IS NOT NULL AND
+            output.lockCodeHash = :chequeLockCodeHash
+          )
+        )
       `, {
         liveStatus: OutputStatus.Live,
-        lockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        multiSignlockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+        chequeLockCodeHash
       })
       .orderBy('tx.timestamp', 'ASC')
       .getMany()
@@ -238,6 +254,12 @@ export default class CellsService {
     const matchedOutputs = allMutiSignOutputs.filter(o => {
       if (o.multiSignBlake160) {
         return multiSignHashes.has(o.multiSignBlake160)
+      }
+      if (o.lockCodeHash === chequeLockCodeHash) {
+        const receiverLockHash = o.lockArgs.slice(0, 42)
+        const senderLockHash = o.lockArgs.slice(42)
+        return secp256k1LockHashes.find(hash => hash.includes(receiverLockHash)) ||
+          secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
     })
 
@@ -247,11 +269,30 @@ export default class CellsService {
       .slice(skip, pageNo * pageSize)
       .map(o => {
         const cell = o.toModel()
-        cell.setCustomizedAssetInfo({
-          lock: CustomizedLock.SingleMultiSign,
-          type: '',
-          data: ''
-        })
+        if (o.lockCodeHash === chequeLockCodeHash) {
+          const receiverLockHash = o.lockArgs.slice(0, 42)
+          if (secp256k1LockHashes.find(hash => hash.includes(receiverLockHash))) {
+            cell.setCustomizedAssetInfo({
+              lock: CustomizedLock.Cheque,
+              type: '',
+              data: 'claimable'
+            })
+          }
+          else {
+            cell.setCustomizedAssetInfo({
+              lock: CustomizedLock.Cheque,
+              type: '',
+              data: 'withdraw-able'
+            })
+          }
+        }
+        else {
+          cell.setCustomizedAssetInfo({
+            lock: CustomizedLock.SingleMultiSign,
+            type: '',
+            data: ''
+          })
+        }
         return cell
       });
 
@@ -868,5 +909,63 @@ export default class CellsService {
       .getMany()
 
     return outputs
+  }
+
+  public static async getACPCells(lock: Script, type: Script) {
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        status: OutputStatus.Live,
+        lockCodeHash: lock.codeHash,
+        lockHashType: lock.hashType,
+        lockArgs: lock.args,
+        typeCodeHash: type.codeHash,
+        typeHashType: type.hashType,
+        typeArgs: type.args,
+      })
+      .getMany()
+
+    return outputs
+  }
+
+  public static async searchInputsByLockHash(lockHash: string) {
+    const inputs = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where('input.lockHash like :lockHash', {
+        lockHash: `%${lockHash}%`
+      })
+      .getMany()
+
+    return inputs
+  }
+
+  public static async getLiveCellsByLockHash(lockHash: string) {
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`
+        output.status = :status AND
+        output.lockHash = :lockHash
+      `, {
+        status: OutputStatus.Live,
+        lockHash: lockHash
+      })
+      .getMany()
+
+    return outputs
+  }
+
+  public static async getOutputsByTransactionHash(hash: string) {
+    const outputEntities: OutputEntity[] = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        outPointTxHash: hash
+      })
+      .getMany()
+
+    return outputEntities
   }
 }

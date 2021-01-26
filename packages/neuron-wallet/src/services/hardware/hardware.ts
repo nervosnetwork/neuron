@@ -8,6 +8,7 @@ import WalletService from 'services/wallets'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
 import { AccountExtendedPublicKey } from 'models/keys/key'
+import AssetAccountInfo from 'models/asset-account-info'
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
@@ -49,7 +50,13 @@ export abstract class Hardware {
       if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
         return multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
       }
-      return addressInfos.find(i => i.blake160 === args)!.path
+      else if (args.length === 42) {
+        return addressInfos.find(i => i.blake160 === args)!.path
+      }
+      else {
+        const addressInfo = AssetAccountInfo.findSignPath(addressInfos, args)
+        return addressInfo!.path
+      }
     }
 
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))

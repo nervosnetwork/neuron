@@ -3,6 +3,9 @@ import Script, { ScriptHashType } from "./chain/script"
 import OutPoint from "./chain/out-point"
 import NetworksService from "services/networks"
 import Transaction from "./chain/transaction"
+import HexUtils from "utils/hex"
+import SystemScriptInfo from "./system-script-info"
+import { Address } from "./address"
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -15,6 +18,7 @@ export default class AssetAccountInfo {
   private anyoneCanPayInfo: ScriptCellInfo
   private pwAnyoneCanPayInfo: ScriptCellInfo
   private legacyAnyoneCanPayInfo: ScriptCellInfo
+  private chequeInfo: ScriptCellInfo
 
   private static MAINNET_GENESIS_BLOCK_HASH: string = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
 
@@ -51,6 +55,12 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
+      this.chequeInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_CHEQUE_TX_HASH!, process.env.MAINNET_CHEQUE_DEP_INDEX!),
+          process.env.MAINNET_CHEQUE_DEP_TYPE! as DepType),
+        codeHash: process.env.MAINNET_CHEQUE_SCRIPT_CODEHASH!,
+        hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
+      }
     } else {
       this.sudtInfo = {
         cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
@@ -76,6 +86,12 @@ export default class AssetAccountInfo {
         codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
+      this.chequeInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_CHEQUE_DEP_TXHASH!, process.env.TESTNET_CHEQUE_DEP_INDEX!),
+          process.env.TESTNET_CHEQUE_DEP_TYPE! as DepType),
+        codeHash: process.env.TESTNET_CHEQUE_SCRIPT_CODEHASH!,
+        hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
+      }
     }
   }
 
@@ -95,6 +111,10 @@ export default class AssetAccountInfo {
     return this.legacyAnyoneCanPayInfo
   }
 
+  public getChequeInfo(): ScriptCellInfo {
+    return this.chequeInfo
+  }
+
   public generateSudtScript(args: string): Script {
     return new Script(this.sudtInfo.codeHash, args, this.sudtInfo.hashType)
   }
@@ -106,6 +126,14 @@ export default class AssetAccountInfo {
 
   public generateLegacyAnyoneCanPayScript(args: string): Script {
     const info = this.legacyAnyoneCanPayInfo
+    return new Script(info.codeHash, args, info.hashType)
+  }
+
+  public generateChequeScript(receiverLockHash: string, senderLockHash: string): Script {
+    const receiverLockHash20 = HexUtils.removePrefix(receiverLockHash).slice(0, 40)
+    const senderLockHash20 = HexUtils.removePrefix(senderLockHash).slice(0, 40)
+    const args = `0x${receiverLockHash20}${senderLockHash20}`
+    const info = this.chequeInfo
     return new Script(info.codeHash, args, info.hashType)
   }
 
@@ -143,5 +171,13 @@ export default class AssetAccountInfo {
 
   public isDefaultAnyoneCanPayScript(script: Script): boolean {
     return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
+  }
+
+  public static findSignPath(addressInfos: Address[], chequeLockArgs: string) {
+    return addressInfos.find(info => {
+      const defaultLockScript = SystemScriptInfo.generateSecpScript(info.blake160)
+      const lockHash20 = HexUtils.removePrefix(defaultLockScript.computeHash()).slice(0, 40)
+      return chequeLockArgs.includes(lockHash20)
+    })
   }
 }
