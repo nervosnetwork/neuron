@@ -46,7 +46,11 @@ export default class NetworksService extends Store {
   }
 
   public getAll = () => {
-    return this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
+    const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
+    const defaultNetwork = networks[0]
+    const isOldDefaultName = ['Default', 'Mainnet'].includes(networks[0].name)
+    defaultNetwork.name = isOldDefaultName ? 'default node' : defaultNetwork.name
+    return networks
   }
 
   public getCurrent(): Network {
