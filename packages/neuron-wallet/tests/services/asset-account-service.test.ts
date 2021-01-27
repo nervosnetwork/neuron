@@ -910,6 +910,12 @@ describe('AssetAccountService', () => {
           symbol: 'udt',
           tokenName: 'udt',
           decimal: '0',
+        },
+        {
+          tokenID: 'invalid token info',
+          symbol: '',
+          tokenName: '',
+          decimal: '',
         }
       ]
       const repo = getConnection().getRepository(SudtTokenInfoEntity)
@@ -923,6 +929,13 @@ describe('AssetAccountService', () => {
       expect(list.find((item: any) => item.tokenID === tokenID)).toBeTruthy()
     })
 
+    it('Filter invalid token info out', async () => {
+      const repo = getConnection().getRepository(SudtTokenInfoEntity)
+      const count = await repo.count()
+      expect(count).toBe(3)
+      const list = await AssetAccountService.getTokenInfoList()
+      expect(list).toHaveLength(2)
+    })
   })
 
   describe('#generateCreateChequeTx', () => {

@@ -1,4 +1,4 @@
-import { getConnection, In } from "typeorm"
+import { getConnection, In, Not } from "typeorm"
 import BufferUtils from "utils/buffer"
 import OutputEntity from "database/chain/entities/output"
 import Transaction, { TransactionStatus } from "models/chain/transaction"
@@ -346,7 +346,14 @@ export default class AssetAccountService {
 
   public static getTokenInfoList() {
     const repo = getConnection().getRepository(SudtTokenInfoEntity)
-    return repo.find().then(list => list.map(item => item.toModel()))
+    return repo.find({
+      where: {
+        tokenID: Not(''),
+        tokenName: Not(''),
+        symbol: Not(''),
+        decimal: Not('')
+      }
+    }).then(list => list.map(item => item.toModel()))
   }
 
 
