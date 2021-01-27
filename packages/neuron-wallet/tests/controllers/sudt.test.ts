@@ -1,4 +1,3 @@
-import SUDTController from "../../src/controllers/sudt";
 import LiveCell from "../../src/models/chain/live-cell";
 import Script, { ScriptHashType } from "../../src/models/chain/script";
 import {ResponseCode} from "../../src/utils/const";
@@ -12,7 +11,7 @@ describe('SUDTController', () => {
     stubbedGetTokenInfoList.mockReset()
   }
 
-  beforeEach(async ()=>{
+  beforeEach(async () => {
     resetMocks()
     jest.doMock('../../src/services/live-cell-service', () => {
       return {
@@ -21,11 +20,11 @@ describe('SUDTController', () => {
         }),
       }
     })
-  })
-  jest.doMock('../../src/services/asset-account-service', () => {
-    return {
-      getTokenInfoList: stubbedGetTokenInfoList,
-    }
+    jest.doMock('../../src/services/asset-account-service', () => {
+      return {
+        getTokenInfoList: stubbedGetTokenInfoList,
+      }
+    })
   })
 
   describe('get sudtInfo from token list', () => {
@@ -41,6 +40,7 @@ describe('SUDTController', () => {
     })
 
     it('getSUDTTokenInfo from token list success', async () => {
+      const SUDTController = require("../../src/controllers/sudt").default
       const sudtController = new SUDTController()
       const tokenInfo =  await sudtController.getSUDTTokenInfo({tokenID:testTokenID})
       expect(tokenInfo).toEqual({
@@ -68,6 +68,7 @@ describe('SUDTController', () => {
     })
 
     it('getSUDTTokenInfo from live cell data parse', async () => {
+      const SUDTController = require("../../src/controllers/sudt").default
       const sudtController = new SUDTController()
       const tokenInfo =  await sudtController.getSUDTTokenInfo({tokenID:testTokenID})
       expect(tokenInfo).toEqual({
@@ -83,6 +84,7 @@ describe('SUDTController', () => {
       stubbedGetTokenInfoList.mockReturnValue([])
     })
     it('getSUDTTokenInfo from live cell data parse', async () => {
+      const SUDTController = require("../../src/controllers/sudt").default
       const sudtController = new SUDTController()
       const tokenInfo =  await sudtController.getSUDTTokenInfo({tokenID:testTokenID})
       expect(tokenInfo).toEqual({
