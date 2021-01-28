@@ -54,7 +54,7 @@ export abstract class Hardware {
         return addressInfos.find(i => i.blake160 === args)!.path
       }
       else {
-        const addressInfo = AssetAccountInfo.findSignPath(addressInfos, args)
+        const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
         return addressInfo!.path
       }
     }

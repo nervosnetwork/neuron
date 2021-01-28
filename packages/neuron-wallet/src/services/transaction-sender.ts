@@ -111,7 +111,7 @@ export default class TransactionSender {
         path = addressInfos.find(i => i.blake160 === args)!.path
       }
       else {
-        const addressInfo = AssetAccountInfo.findSignPath(addressInfos, args)
+        const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
         path = addressInfo?.path
       }
 
