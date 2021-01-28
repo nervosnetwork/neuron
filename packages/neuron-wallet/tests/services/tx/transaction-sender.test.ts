@@ -104,6 +104,7 @@ import CellWithStatus from '../../../src/models/chain/cell-with-status'
 import SystemScriptInfo from '../../../src/models/system-script-info'
 import NodeService from '../../../src/services/node'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
+import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer } from '../../../src/exceptions/wallet'
 
 const TransactionSender = require('../../../src/services/transaction-sender').default
 
@@ -502,29 +503,42 @@ describe('TransactionSender Test', () => {
     describe('#generateTx', () => {
       const fee = '1'
       const feeRate = '10'
-      beforeEach(async () => {
+      const targetOutputs = [
+        {address: '1', capacity: 1},
+        {address: '1', capacity: 1},
+      ]
+      beforeEach(() => {
         stubbedGetCurrentWallet.mockReturnValue(fakeWallet)
         stubbedGetNextChangeAddress.mockReturnValue({
           address: fakeAddress1
         })
-        const targetOutputs = [
-          {address: '1', capacity: 1},
-          {address: '1', capacity: 1},
-        ]
-        await transactionSender.generateTx(fakeWallet.id, targetOutputs, fee, feeRate)
       });
-      it('generates transaction', () => {
-        expect(stubbedGenerateTx).toHaveBeenCalledWith(
-          fakeWallet.id,
-          [
-            {address: '1', capacity: '1'},
-            {address: '1', capacity: '1'},
-          ],
-          fakeAddress1,
-          fee,
-          feeRate
-        )
-      })
+      describe('success', () => {
+        beforeEach(async () => {
+          await transactionSender.generateTx(fakeWallet.id, targetOutputs, fee, feeRate)
+        });
+        it('generates transaction', () => {
+          expect(stubbedGenerateTx).toHaveBeenCalledWith(
+            fakeWallet.id,
+            [
+              {address: '1', capacity: '1'},
+              {address: '1', capacity: '1'},
+            ],
+            fakeAddress1,
+            fee,
+            feeRate
+          )
+        })
+      });
+      describe('fail', () => {
+        beforeEach(async () => {
+          stubbedGenerateTx.mockRejectedValue(new CapacityNotEnoughForChange())
+        });
+        it('generates transaction', async () => {
+          expect(transactionSender.generateTx(fakeWallet.id, targetOutputs, fee, feeRate))
+            .rejects.toThrowError(CapacityNotEnoughForChangeByTransfer)
+        })
+      });
     });
 
     describe('#generateSendingAllTx', () => {

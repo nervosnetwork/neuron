@@ -489,6 +489,7 @@
         "112": "未找到錢包 {{id}}。",
         "113": "Keystore 格式錯誤，請檢查檔案完整性。",
         "114": "最小轉帳金額為 {{bytes}} CKBytes。",
+        "115": "您需要有足夠的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太長，其長度應不超過 {{length}}。",

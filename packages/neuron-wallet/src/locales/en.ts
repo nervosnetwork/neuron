@@ -93,6 +93,7 @@ export default {
       'unsupported-cipher': 'Unsupported cipher.',
       'capacity-not-enough': 'Insufficient balance.',
       'capacity-not-enough-for-change': "You need more capacities for change (at least 61 CKBytes).",
+      'capacity-not-enough-for-change-by-transfer': "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
       'live-capacity-not-enough': 'Insufficient available balance, please try again when last transaction has been confirmed.',
       'capacity-too-small': 'The minimal transfer balance is {{bytes}} CKBytes.',
       'should-be-type-of': '{{field}} should be type of {{type}}.',

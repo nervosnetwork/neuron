@@ -92,6 +92,7 @@ export default {
       'unsupported-cipher': '不支持的 Cipher。',
       'capacity-not-enough': '余额不足。',
       'capacity-not-enough-for-change': "您需要有足够的余额来支付找零（至少 61 CKBytes）。",
+      'capacity-not-enough-for-change-by-transfer': "您需要有足够的余额来支付找零（至少 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
       'live-capacity-not-enough': '可用余额不足，请等待上一笔交易上链。',
       'capacity-too-small': '最小转账金额为 {{bytes}} CKBytes。',
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型。',
