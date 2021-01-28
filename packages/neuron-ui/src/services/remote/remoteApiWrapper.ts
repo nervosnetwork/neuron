@@ -102,6 +102,7 @@ type Action =
   | 'get-token-info-list'
   | 'migrate-acp'
   | 'check-migrate-acp'
+  | 'get-sudt-token-info'
   // Cheque
   | 'generate-create-cheque-tx'
   | 'generate-withdraw-cheque-tx'

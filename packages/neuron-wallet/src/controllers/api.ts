@@ -37,6 +37,7 @@ import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyo
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
+import SUDTController from "controllers/sudt";
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -50,6 +51,7 @@ export default class ApiController {
   private anyoneCanPayController = new AnyoneCanPayController()
   private hardwareController = new HardwareController()
   private offlineSignController = new OfflineSignController()
+  private sudtController = new SUDTController()
 
   public async mount() {
     this.registerHandlers()
@@ -463,6 +465,10 @@ export default class ApiController {
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.sendTx(params)
+    })
+
+    handle('get-sudt-token-info', async (_, params: { tokenID: string })=>{
+      return this.sudtController.getSUDTTokenInfo(params)
     })
 
     // Hardware wallet
