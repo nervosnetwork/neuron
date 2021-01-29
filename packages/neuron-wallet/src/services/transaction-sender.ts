@@ -27,7 +27,7 @@ import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
 import HardwareWalletService from './hardware'
-import { SignTransactionFailed } from 'exceptions'
+import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, SignTransactionFailed } from 'exceptions'
 import AssetAccountInfo from 'models/asset-account-info'
 
 interface SignInfo {
@@ -241,15 +241,22 @@ public static async signSingleMultiSignScript(
 
     const changeAddress: string = await this.getChangeAddress()
 
-    const tx: Transaction = await TransactionGenerator.generateTx(
-      walletID,
-      targetOutputs,
-      changeAddress,
-      fee,
-      feeRate
-    )
+    try {
+      const tx: Transaction = await TransactionGenerator.generateTx(
+        walletID,
+        targetOutputs,
+        changeAddress,
+        fee,
+        feeRate
+      )
 
-    return tx
+      return tx
+    } catch (error) {
+      if (error instanceof CapacityNotEnoughForChange) {
+        throw new CapacityNotEnoughForChangeByTransfer()
+      }
+      throw error
+    }
   }
 
   public generateSendingAllTx = async (
