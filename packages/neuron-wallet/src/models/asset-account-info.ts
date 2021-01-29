@@ -191,11 +191,21 @@ export default class AssetAccountInfo {
     return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
   }
 
-  public static findSignPath(addressInfos: Address[], chequeLockArgs: string) {
-    return addressInfos.find(info => {
-      const defaultLockScript = SystemScriptInfo.generateSecpScript(info.blake160)
-      const lockHash20 = HexUtils.removePrefix(defaultLockScript.computeHash()).slice(0, 40)
-      return chequeLockArgs.includes(lockHash20)
-    })
+  public static findSignPathForCheque(addressInfos: Address[], chequeLockArgs: string) {
+    const receiverLockHash = HexUtils.removePrefix(chequeLockArgs).slice(0, 40)
+    const senderLockHash = HexUtils.removePrefix(chequeLockArgs).slice(40)
+
+    for (const lockHash20 of [receiverLockHash, senderLockHash]) {
+      const foundAddressInfo = addressInfos.find(info => {
+        const defaultLockScript = SystemScriptInfo.generateSecpScript(info.blake160)
+        const addressLockHash20 = HexUtils.removePrefix(defaultLockScript.computeHash()).slice(0, 40)
+        return lockHash20 === addressLockHash20
+      })
+      if (foundAddressInfo) {
+        return foundAddressInfo
+      }
+    }
+
+    return null
   }
 }
