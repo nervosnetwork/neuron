@@ -272,6 +272,11 @@ export default class AssetAccountController {
 
   public async generateCreateChequeTx(params: GenerateCreateChequeTxParams):
   Promise<Controller.Response<Transaction>> {
+
+    if (NetworksService.getInstance().isMainnet()) {
+      throw new Error('Cheque transfer is not supported on mainnet yet')
+    }
+
     const tx = await AssetAccountService.generateCreateChequeTx(
       params.walletID,
       params.assetAccountID,
