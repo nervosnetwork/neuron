@@ -1,3 +1,21 @@
+# 0.36.0-alpha.1 (2021-02-01)
+
+This is an alpha version to preview the changes in the next release and may not be stable. It is not suggested to install this version for asset management. Welcome any questions or suggestions.
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+
+* Support cheque transfers from sUDT asset accounts.
+* Support automatically filling in the token metadata for a new sUDT account by referencing the corresponding on-chain info cell.
+
+### Bug fixes
+
+* Fix a bug of init data in the DAO deposit dialog.
+* Fix the surfix of exported bundled ckb log file.
+* Rename default `Network` names of `Default` / `Mainnet` to `default node`.
+
+
 # 0.35.0 (2021-01-12)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
