@@ -10,6 +10,7 @@ export const {
   calculateDaoMaximumWithdraw,
 } = ckbCore.rpc
 
+export const { toUint64Le } = ckbCore.utils
 export default {
   ckbCore,
   getBlock,
@@ -18,4 +19,5 @@ export default {
   getTipHeader,
   getHeaderByNumber,
   calculateDaoMaximumWithdraw,
+  toUint64Le,
 }

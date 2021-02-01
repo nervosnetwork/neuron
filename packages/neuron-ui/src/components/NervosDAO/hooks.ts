@@ -468,7 +468,7 @@ export const useUpdateDepositEpochList = ({
     if (connectionStatus === 'online') {
       Promise.all(
         records.map(({ daoData, depositOutPoint, blockNumber }) => {
-          const depositBlockNumber = depositOutPoint ? ckbCore.utils.toHexInLittleEndian(daoData) : blockNumber
+          const depositBlockNumber = depositOutPoint ? ckbCore.utils.toUint64Le(daoData) : blockNumber
           if (!depositBlockNumber) {
             return null
           }

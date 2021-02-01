@@ -230,7 +230,12 @@ export const sudtAmountToValue = (amount: string = '0', decimal: string = '0') =
   }
 }
 
-export const sudtValueToAmount = (value: string | null = '0', decimal: string = '0', showPositiveSign = false) => {
+export const sudtValueToAmount = (
+  value: string | null = '0',
+  decimal: string = '0',
+  showPositiveSign = false,
+  separator = ','
+) => {
   if (value === null) {
     return showPositiveSign ? '+0' : '0'
   }
@@ -262,7 +267,7 @@ export const sudtValueToAmount = (value: string | null = '0', decimal: string = 
         .join('')
         .match(/\d{1,3}/g) || ['0']
     )
-      .join(',')
+      .join(separator)
       .split('')
       .reverse()
       .join('')}${decimalFraction}`

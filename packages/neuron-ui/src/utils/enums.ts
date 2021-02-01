@@ -118,6 +118,7 @@ export enum SyncStatus {
 
 export enum PresetScript {
   Locktime = 'SingleMultiSign',
+  Cheque = 'Cheque',
 }
 
 export enum CompensationPeriod {
@@ -163,4 +164,9 @@ export enum AnyoneCanPayLockInfoOnLina {
 export enum DeprecatedScript {
   AcpOnLina = '0x020fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
   AcpOnAggron = '0x0486a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+}
+
+export enum AccountType {
+  CKB,
+  SUDT,
 }

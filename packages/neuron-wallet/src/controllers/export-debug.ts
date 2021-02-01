@@ -93,7 +93,7 @@ export default class ExportDebugController {
   }
 
   private addBundledCKBLog = () => {
-    const name = 'bundled-ckb-log.json'
+    const name = 'bundled-ckb.log'
     const SIZE_TO_READ = 32_000
 
     return new Promise((resolve, reject) => {

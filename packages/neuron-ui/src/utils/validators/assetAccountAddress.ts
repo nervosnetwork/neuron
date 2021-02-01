@@ -1,23 +1,38 @@
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException, FieldInvalidException, AddressDeprecatedException } from 'exceptions'
-import { LONG_TYPE_PREFIX, SHORT_ADDR_SUDT_LOCK_PREFIX } from 'utils/const'
-import { DeprecatedScript } from 'utils/enums'
+import {
+  SHORT_ADDR_DEFAULT_LOCK_PREFIX,
+  SHORT_ADDR_LENGTH,
+  LONG_TYPE_PREFIX,
+  SHORT_ADDR_SUDT_LOCK_PREFIX,
+} from 'utils/const'
+import { DeprecatedScript, AccountType } from 'utils/enums'
 import { validateAddress } from './address'
 
-export const validateSUDTAddress = ({
+export const validateAssetAccountAddress = ({
   address,
   isMainnet,
   required = false,
+  type = AccountType.SUDT,
 }: {
   address: string
   codeHash?: string
   isMainnet: boolean
   required?: boolean
+  type?: AccountType
 }) => {
   const FIELD_NAME = 'address'
   if (address) {
     validateAddress(address, isMainnet)
     const parsed = ckbCore.utils.parseAddress(address, 'hex')
+
+    if (
+      type === AccountType.SUDT &&
+      parsed.startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX) &&
+      address.length === SHORT_ADDR_LENGTH
+    ) {
+      return true
+    }
 
     if ([DeprecatedScript.AcpOnAggron, DeprecatedScript.AcpOnLina].some(script => parsed.startsWith(script))) {
       throw new AddressDeprecatedException()
@@ -47,4 +62,4 @@ export const validateSUDTAddress = ({
   return true
 }
 
-export default validateSUDTAddress
+export default validateAssetAccountAddress

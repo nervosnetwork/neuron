@@ -150,6 +150,10 @@ describe(`Unit tests of networks service`, () => {
   })
 
   describe(`validation on network existence`, () => {
+    beforeEach(async () => {
+      await service.create('Default', 'http://localhost:8114')
+    });
+
     it(`create network with existing name of Default`, () => {
       expect(service.create('Default', 'http://localhost:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
     })

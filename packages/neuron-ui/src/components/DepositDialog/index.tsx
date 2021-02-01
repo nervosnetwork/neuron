@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useRef } from 'react'
+import React, { useEffect, useMemo, useCallback, useRef } from 'react'
 import { Slider, SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation, Trans } from 'react-i18next'
 import TextField from 'widgets/TextField'
@@ -18,8 +18,9 @@ interface DepositDialogProps {
   show: boolean
   value: any
   fee: string
+  onOpen: () => void
   onDismiss: () => void
-  onChange: any
+  onChange: (e: React.SyntheticEvent<HTMLInputElement, Event>) => void
   onSubmit: () => void
   onSlide: (value: number) => void
   maxDepositAmount: bigint
@@ -36,6 +37,7 @@ const DepositDialog = ({
   onChange,
   onSlide,
   onSubmit,
+  onOpen,
   onDismiss,
   isDepositing,
   errorMessage,
@@ -44,6 +46,12 @@ const DepositDialog = ({
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show, dialogRef, onClose: onDismiss })
+
+  useEffect(() => {
+    if (show) {
+      onOpen()
+    }
+  }, [onOpen, show])
 
   const rfcLink = useMemo(
     () => (

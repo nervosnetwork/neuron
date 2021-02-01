@@ -1,7 +1,7 @@
 import { AmountZeroException, FieldRequiredException, FieldInvalidException } from 'exceptions'
 import { sudtAmountToValue } from 'utils/formatters'
 
-export const validateSUDTAmount = ({
+export const validateAssetAccountAmount = ({
   amount,
   decimal,
   required = false,
@@ -31,4 +31,4 @@ export const validateSUDTAmount = ({
   return true
 }
 
-export default validateSUDTAmount
+export default validateAssetAccountAmount

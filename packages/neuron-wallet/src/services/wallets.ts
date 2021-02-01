@@ -109,6 +109,8 @@ export abstract class Wallet {
 
   public abstract getNextReceivingAddresses (): Promise<AddressInterface[]>
 
+  public abstract getAllAddresses (): Promise<AddressInterface[]>
+
   public abstract isHDWallet (): boolean
 
   public abstract isHardware(): boolean
@@ -188,6 +190,11 @@ export class FileKeystoreWallet extends Wallet {
   public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
     return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
   }
+
+  public getAllAddresses = async (): Promise<AddressInterface[]> => {
+    return AddressService.getAddressesByWalletId(this.id)
+  }
+
 }
 
 export class HardwareWallet extends Wallet {
@@ -269,6 +276,10 @@ export class HardwareWallet extends Wallet {
     }
 
     return []
+  }
+
+  public getAllAddresses = async (): Promise<AddressInterface[]> => {
+    return AddressService.getAddressesByWalletId(this.id)
   }
 }
 

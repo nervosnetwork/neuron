@@ -1,4 +1,4 @@
-import { getConnection, In } from "typeorm"
+import { getConnection, In, Not } from "typeorm"
 import BufferUtils from "utils/buffer"
 import OutputEntity from "database/chain/entities/output"
 import Transaction, { TransactionStatus } from "models/chain/transaction"
@@ -8,10 +8,12 @@ import AssetAccount from "models/asset-account"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 import AssetAccountEntity from "database/chain/entities/asset-account"
 import { CapacityNotEnoughForChange } from "exceptions"
-import { MIN_CELL_CAPACITY } from 'services/cells'
+import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import TransactionSender from "./transaction-sender"
 import { TransactionGenerator } from "./tx"
 import WalletService from "./wallets"
+import OutPoint from "models/chain/out-point"
+import SystemScriptInfo from "models/system-script-info"
 
 export default class AssetAccountService {
 
@@ -344,6 +346,127 @@ export default class AssetAccountService {
 
   public static getTokenInfoList() {
     const repo = getConnection().getRepository(SudtTokenInfoEntity)
-    return repo.find().then(list => list.map(item => item.toModel()))
+    return repo.find({
+      where: {
+        tokenID: Not(''),
+        tokenName: Not(''),
+        symbol: Not(''),
+        decimal: Not('')
+      }
+    }).then(list => list.map(item => item.toModel()))
+  }
+
+
+  public static async generateCreateChequeTx(
+    walletID: string,
+    accountId: number,
+    receiverAddress: string,
+    amount: string,
+    fee: string,
+    feeRate: string,
+    description?: string
+  ) {
+    const assetAccount = await this.getAccount({walletID, id: accountId})
+    if (!assetAccount) {
+      throw new Error('Asset Account not found')
+    }
+
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeAddrObj = await wallet.getNextChangeAddress()
+    const tx = await TransactionGenerator.generateCreateChequeTx(
+      walletID,
+      amount,
+      assetAccount,
+      receiverAddress,
+      changeAddrObj!.address,
+      fee,
+      feeRate,
+      description,
+    )
+
+    return tx
+  }
+
+  public static async generateClaimChequeTx(
+    walletID: string,
+    chequeCellOutPoint: OutPoint,
+  ): Promise<{
+    tx: Transaction,
+    assetAccount?: AssetAccount
+  }> {
+    const assetAccountInfo = new AssetAccountInfo()
+
+    const wallet = WalletService.getInstance().get(walletID)
+    const changeAddrObj = await wallet.getNextChangeAddress()
+
+    const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
+    if (!chequeLiveCell) {
+      throw new Error('cheque live cell not found')
+    }
+    const receiverLockHash20 = chequeLiveCell.lock.args.slice(0, 42)
+    const addressInfos = await wallet.getAllAddresses()
+
+    const receiverDefaultLock = addressInfos.map(
+      info => SystemScriptInfo.generateSecpScript(info.blake160)
+    ).find(defaultLock => defaultLock.computeHash().slice(0, 42) === receiverLockHash20)
+
+    if (!receiverDefaultLock) {
+      throw new Error('receiver default lock not found by receiver lock hash')
+    }
+
+    const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverDefaultLock.args)
+
+    const tx = await TransactionGenerator.generateClaimChequeTx(
+      walletID,
+      chequeLiveCell,
+      changeAddrObj!.address,
+      undefined,
+      '1000'
+    )
+
+    const assetAccountEntities = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .getMany()
+
+    const hasAssetAccount = assetAccountEntities.find(
+      assetAccount => assetAccount.tokenID !== 'CKBytes' &&
+      assetAccount.blake160 === receiverDefaultLock.args
+    )
+
+    if (hasAssetAccount) {
+      return {tx}
+    }
+
+    const tokenId = chequeLiveCell.type!.args
+    const assetAccount = new AssetAccount(
+      tokenId,
+      '',
+      '',
+      '',
+      '',
+      '0',
+      receiverAcpScript.args
+    )
+
+    return {tx, assetAccount}
+  }
+
+  public static async generateWithdrawChequeTx(
+    chequeCellOutPoint: OutPoint,
+  ): Promise<Transaction> {
+
+    const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
+    if (!chequeLiveCell) {
+      throw new Error('cheque live cell not found')
+    }
+
+    const tx = await TransactionGenerator.generateWithdrawChequeTx(
+      chequeLiveCell,
+      undefined,
+      '1000'
+    )
+
+    return tx
   }
 }

@@ -58,6 +58,13 @@ export class CapacityNotEnoughForChange extends Error {
   }
 }
 
+export class CapacityNotEnoughForChangeByTransfer extends Error {
+  public code = 115
+  constructor() {
+    super(t('messages.capacity-not-enough-for-change-by-transfer'))
+  }
+}
+
 export class InvalidKeystore extends Error {
   public code = 113
   constructor() {

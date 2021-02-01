@@ -14,7 +14,7 @@ export enum TransactionStatus {
   Failed = 'failed',
 }
 
-interface SudtTokenInfo {
+export interface SudtTokenInfo {
   symbol: string
   tokenID: string
   tokenName: string
