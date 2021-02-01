@@ -6,6 +6,7 @@ trigger:
       - develop
       - rc/*
       - hotfix/*
+      - alpha/*
   tags:
     include:
       - refs/tags/v*
@@ -92,7 +93,7 @@ stages:
 
 - stage: release
   displayName: Release Binaries
-  condition: or(startsWith(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/heads/rc'))
+  condition: or(startsWith(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/heads/rc'), startsWith(variables['build.sourceBranch'], 'refs/heads/alpha'))
   jobs:
   - job: release_mac
     displayName: Release macOS
