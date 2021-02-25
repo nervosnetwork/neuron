@@ -1,3 +1,12 @@
+# 0.35.1 (2021-02-25)
+
+[CKB v0.35.2](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.2) was released on Feb. 23rd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hot fixes
+
+* Upgrade the bundled CKB node to v0.35.2.
+* Add hint for `Token ID` field when creating a new sUDT account.
+
 # 0.35.0 (2021-01-12)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
