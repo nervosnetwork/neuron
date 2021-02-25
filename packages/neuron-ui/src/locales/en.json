@@ -685,7 +685,10 @@
         "next": "Next",
         "back": "Back",
         "occupy-142-ckb": "Occupies at least 142 CKBytes",
-        "occupy-61-ckb": "Occupies at least 61 CKBytes"
+        "occupy-61-ckb": "Occupies at least 61 CKBytes",
+        "placeholder": {
+          "token-id": "Token ID is the Args of the sUDT Type Script, which is the same as the lock hash of the token issuer."
+        }
       },
       "send": {
         "title": "Send",
