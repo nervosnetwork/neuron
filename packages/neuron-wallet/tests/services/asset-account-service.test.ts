@@ -725,7 +725,7 @@ describe('AssetAccountService', () => {
 
     it('assetAccount exists', async () => {
       const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
-      await getConnection().manager.save([assetAccountEntity.sudtTokenInfo, assetAccount])
+      await getConnection().manager.save([assetAccountEntity.sudtTokenInfo, assetAccountEntity])
       const aae = await getConnection()
         .getRepository(AssetAccountEntity)
         .createQueryBuilder('aa')
