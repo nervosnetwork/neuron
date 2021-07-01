@@ -20,6 +20,9 @@ export default class AssetAccountInfo {
   private pwAnyoneCanPayInfo: ScriptCellInfo
   private legacyAnyoneCanPayInfo: ScriptCellInfo
   private chequeInfo: ScriptCellInfo
+  private nftIssuerInfo: ScriptCellInfo
+  private nftClassInfo: ScriptCellInfo
+  private nftInfo: ScriptCellInfo
 
   private static MAINNET_GENESIS_BLOCK_HASH: string = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
 
@@ -69,6 +72,24 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_CHEQUE_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
       }
+      this.nftIssuerInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_NFT_ISSUER_DEP_TXHASH!, process.env.MAINNET_NFT_ISSUER_DEP_INDEX!),
+        (process.env.MAINNET_NFT_ISSUER_DEP_TYPE as DepType)),
+        codeHash: process.env.MAINNET_NFT_ISSUER_SCRIPT_CODEHASH!,
+        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
+      }
+      this.nftClassInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_NFT_CLASS_DEP_TXHASH!, process.env.MAINNET_NFT_CLASS_DEP_INDEX!),
+        (process.env.MAINNET_NFT_CLASS_DEP_TYPE as DepType)),
+        codeHash: process.env.MAINNET_NFT_CLASS_SCRIPT_CODEHASH!,
+        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
+      }
+      this.nftInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_NFT_DEP_TXHASH!, process.env.MAINNET_NFT_DEP_INDEX!),
+        (process.env.MAINNET_NFT_DEP_TYPE as DepType)),
+        codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
+        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
+      }
     } else {
       this.sudt = {
         cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
@@ -106,6 +127,24 @@ export default class AssetAccountInfo {
         codeHash: process.env.TESTNET_CHEQUE_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
       }
+      this.nftIssuerInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_NFT_ISSUER_DEP_TXHASH!, process.env.TESTNET_NFT_ISSUER_DEP_INDEX!),
+        (process.env.TESTNET_NFT_ISSUER_DEP_TYPE as DepType)),
+        codeHash: process.env.TESTNET_NFT_ISSUER_SCRIPT_CODEHASH!,
+        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
+      }
+      this.nftClassInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_NFT_CLASS_DEP_TXHASH!, process.env.TESTNET_NFT_CLASS_DEP_INDEX!),
+        (process.env.TESTNET_NFT_CLASS_DEP_TYPE as DepType)),
+        codeHash: process.env.TESTNET_NFT_CLASS_SCRIPT_CODEHASH!,
+        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
+      }
+      this.nftInfo = {
+        cellDep: new CellDep(new OutPoint(process.env.TESTNET_NFT_DEP_TXHASH!, process.env.TESTNET_NFT_DEP_INDEX!),
+        (process.env.TESTNET_NFT_DEP_TYPE as DepType)),
+        codeHash: process.env.TESTNET_NFT_SCRIPT_CODEHASH!,
+        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
+      }
     }
   }
 
@@ -131,6 +170,18 @@ export default class AssetAccountInfo {
 
   public getChequeInfo(): ScriptCellInfo {
     return this.chequeInfo
+  }
+
+  public getNftIssuerInfo(): ScriptCellInfo {
+    return this.nftIssuerInfo
+  }
+
+  public getNftClassInfo(): ScriptCellInfo {
+    return this.nftClassInfo
+  }
+
+  public getNftInfo(): ScriptCellInfo {
+    return this.nftInfo
   }
 
   public generateSudtScript(args: string): Script {

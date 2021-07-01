@@ -666,7 +666,9 @@
       "view-details": "View Details",
       "release-success": "Asset was released, view details in History.",
       "no-special-assets": "No customized assets",
-      "experimental": "Experimental"
+      "experimental": "Experimental",
+      "unknown-asset": "Unknown Asset",
+      "transfer-nft": "Transfer"
     },
     "customized-asset": {
       "actions": {

@@ -34,7 +34,7 @@ export default class SignMessage {
 
     // find private key of address
     const privateKey = this.getPrivateKey(wallet, addr.path, password)
-
+    console.log(addr.address, privateKey, 'privateKey')
     return this.signByPrivateKey(privateKey, message)
   }
 
