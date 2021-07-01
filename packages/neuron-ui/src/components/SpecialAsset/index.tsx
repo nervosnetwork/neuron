@@ -13,6 +13,7 @@ import {
   epochParser,
   toUint128Le,
   sudtValueToAmount,
+  nftFormatter,
 } from 'utils'
 import styles from './specialAsset.module.scss'
 
@@ -30,9 +31,21 @@ interface ChequeAssetInfo {
   type: ''
 }
 
+enum NFTType {
+  NFT = 'NFT',
+  NFTClass = 'NFTClass',
+  NFTIssuer = 'NFTIssuer',
+}
+
+interface NFTAssetInfo {
+  data: '' | 'transferable'
+  lock: ''
+  type: NFTType
+}
+
 type UnknownAssetInfo = Record<'data' | 'lock' | 'type', string>
 
-export type AssetInfo = LocktimeAssetInfo | ChequeAssetInfo | UnknownAssetInfo
+export type AssetInfo = LocktimeAssetInfo | ChequeAssetInfo | UnknownAssetInfo | NFTAssetInfo
 
 export interface SpecialAssetProps {
   cell: CKBComponents.CellOutput & {
@@ -69,7 +82,8 @@ const SpecialAsset = ({
   const [t] = useTranslation()
   const [date, time] = uniformTimeFormatter(datetime).split(' ')
   let targetTime: undefined | number
-  let status: 'user-defined-asset' | 'locked-asset' | 'claim-asset' | 'withdraw-asset' = 'user-defined-asset'
+  let status: 'user-defined-asset' | 'locked-asset' | 'claim-asset' | 'withdraw-asset' | 'transfer-nft' =
+    'user-defined-asset'
   let epochsInfo: Record<'target' | 'current', number> | undefined
   let amount = `${shannonToCKBFormatter(capacity)} CKB`
   let amountToCopy = shannonToCKBFormatter(capacity, false, '')
@@ -125,6 +139,15 @@ const SpecialAsset = ({
   }, [isMainnet, txHash, index])
 
   const isLockedCheque = status === 'withdraw-asset' && Date.now() < targetTime!
+  const isNFTTransferable = assetInfo.type === NFTType.NFT && assetInfo.data === 'transferable'
+  const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
+
+  if (assetInfo.type === NFTType.NFT) {
+    amount = nftFormatter(type?.args)
+    status = 'transfer-nft'
+  } else if (isNFTClassOrIssuer) {
+    amount = t('special-assets.unknown-asset')
+  }
 
   return (
     <div className={styles.container}>
@@ -136,31 +159,35 @@ const SpecialAsset = ({
         {amount}
       </CopyZone>
       <div className={styles.actions}>
-        <Button
-          data-tx-hash={txHash}
-          data-idx={index}
-          type="primary"
-          label={t(`special-assets.${status}`)}
-          onClick={onAction}
-          disabled={
-            ['user-defined-asset', 'locked-asset'].includes(status) ||
-            connectionStatus === ConnectionStatus.Offline ||
-            isLockedCheque
-          }
-          className={['user-defined-asset', 'locked-asset'].includes(status) || isLockedCheque ? styles.hasTooltip : ''}
-          data-tooltip={
-            assetInfo.lock === PresetScript.Cheque && !isLockedCheque
-              ? null
-              : t(`special-assets.${status}-tooltip`, {
-                  epochs: epochsInfo?.target.toFixed(2),
-                  year: targetTime ? new Date(targetTime).getFullYear() : '',
-                  month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
-                  day: targetTime ? new Date(targetTime).getDate() : '',
-                  hour: targetTime ? new Date(targetTime).getHours() : '',
-                  minute: targetTime ? new Date(targetTime).getMinutes() : '',
-                })
-          }
-        />
+        {isNFTClassOrIssuer || !isNFTTransferable ? null : (
+          <Button
+            data-tx-hash={txHash}
+            data-idx={index}
+            type="primary"
+            label={t(`special-assets.${status}`)}
+            onClick={onAction}
+            disabled={
+              ['user-defined-asset', 'locked-asset'].includes(status) ||
+              connectionStatus === ConnectionStatus.Offline ||
+              isLockedCheque
+            }
+            className={
+              ['user-defined-asset', 'locked-asset'].includes(status) || isLockedCheque ? styles.hasTooltip : ''
+            }
+            data-tooltip={
+              assetInfo.lock === PresetScript.Cheque && !isLockedCheque
+                ? null
+                : t(`special-assets.${status}-tooltip`, {
+                    epochs: epochsInfo?.target.toFixed(2),
+                    year: targetTime ? new Date(targetTime).getFullYear() : '',
+                    month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                    day: targetTime ? new Date(targetTime).getDate() : '',
+                    hour: targetTime ? new Date(targetTime).getHours() : '',
+                    minute: targetTime ? new Date(targetTime).getMinutes() : '',
+                  })
+            }
+          />
+        )}
         <Button
           type="default"
           label={t('special-assets.view-details')}

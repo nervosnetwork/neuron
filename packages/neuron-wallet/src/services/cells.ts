@@ -19,6 +19,7 @@ import SystemScriptInfo from 'models/system-script-info'
 import Script, { ScriptHashType } from 'models/chain/script'
 import LiveCellService from './live-cell-service'
 import AssetAccountInfo from 'models/asset-account-info'
+import NFT from 'models/nft'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -30,6 +31,12 @@ export interface PaginationResult<T = any> {
 export enum CustomizedLock {
   SingleMultiSign = "SingleMultiSign",
   Cheque = "Cheque",
+}
+
+export enum CustomizedType {
+  NFT = "NFT",
+  NFTClass = "NFTClass",
+  NFTIssuer = 'NFTIssuer',
 }
 
 export default class CellsService {
@@ -219,7 +226,10 @@ export default class CellsService {
     const multiSign = new MultiSign()
     const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
     const assetAccountInfo = new AssetAccountInfo()
-    const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash
+    const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash;
+    const nftIssuerCodehash = assetAccountInfo.getNftIssuerInfo().codeHash;
+    const nftClassCodehash = assetAccountInfo.getNftClassInfo().codeHash;
+    const nftCodehash = assetAccountInfo.getNftInfo().codeHash;
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 => SystemScriptInfo.generateSecpScript(blake160).computeHash())
 
     const skip = (pageNo - 1) * pageSize
@@ -242,11 +252,29 @@ export default class CellsService {
             output.typeHash IS NOT NULL AND
             output.lockCodeHash = :chequeLockCodeHash
           )
+          OR
+          (
+            output.hasData = 1 AND
+            output.typeCodeHash = :nftIssuerCodehash
+          )
+          OR
+          (
+            output.hasData = 1 AND
+            output.typeCodeHash = :nftClassCodehash
+          )
+          OR
+          (
+            output.hasData = 1 AND
+            output.typeCodeHash = :nftCodehash
+          )
         )
       `, {
         liveStatus: OutputStatus.Live,
         multiSignlockCodeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-        chequeLockCodeHash
+        chequeLockCodeHash,
+        nftIssuerCodehash,
+        nftClassCodehash,
+        nftCodehash,
       })
       .orderBy('tx.timestamp', 'ASC')
       .getMany()
@@ -261,6 +289,7 @@ export default class CellsService {
         return secp256k1LockHashes.find(hash => hash.includes(receiverLockHash)) ||
           secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
+      return o.typeCodeHash === nftIssuerCodehash || o.typeCodeHash === nftClassCodehash || o.typeCodeHash === nftCodehash
     })
 
     const totalCount = matchedOutputs.length
@@ -269,7 +298,26 @@ export default class CellsService {
       .slice(skip, pageNo * pageSize)
       .map(o => {
         const cell = o.toModel()
-        if (o.lockCodeHash === chequeLockCodeHash) {
+        if (o.typeCodeHash === nftIssuerCodehash) {
+          cell.setCustomizedAssetInfo({
+            lock: '',
+            type: CustomizedType.NFTIssuer,
+            data: '',
+          })
+        } else if (o.typeCodeHash === nftClassCodehash) {
+          cell.setCustomizedAssetInfo({
+            lock: '',
+            type: CustomizedType.NFTClass,
+            data: '',
+          })
+        } else if (o.typeCodeHash === nftCodehash) {
+          const isTransferable = NFT.fromString(o.data).isTransferable()
+          cell.setCustomizedAssetInfo({
+            lock: '',
+            type: CustomizedType.NFT,
+            data: isTransferable ? 'transferable' : '',
+          })
+        } else if (o.lockCodeHash === chequeLockCodeHash) {
           const receiverLockHash = o.lockArgs.slice(0, 42)
           if (secp256k1LockHashes.find(hash => hash.includes(receiverLockHash))) {
             cell.setCustomizedAssetInfo({

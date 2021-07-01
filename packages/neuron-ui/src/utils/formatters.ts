@@ -280,6 +280,17 @@ export const sUDTAmountFormatter = (amount: string) => {
   return `${fmtted}${fmtted.length < amount.length ? '...' : ''}`
 }
 
+export const nftFormatter = (hex?: string) => {
+  if (hex == null || hex.length !== 58) {
+    return 'mNFT'
+  }
+  const data = hex.slice(2, 58)
+  const issuerId = data.slice(36, 40)
+  const classId = BigInt(`0x${data.slice(40, 48)}`).toString()
+  const tokenId = BigInt(`0x${data.slice(48, 56)}`).toString()
+  return `#${issuerId}-${classId}-${tokenId} mNFT`
+}
+
 export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {
   // empty string should return unknown error too
   const unknownError = t('messages.unknown-error')

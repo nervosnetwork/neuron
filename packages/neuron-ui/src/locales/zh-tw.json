@@ -659,7 +659,9 @@
       "view-details": "查看詳情",
       "release-success": "資產已解鎖，可前往交易歷史查看詳情。",
       "no-special-assets": "沒有自定義資產",
-      "experimental": "實驗室"
+      "experimental": "實驗室",
+      "unknown-asset": "未知資產",
+      "transfer-nft": "轉讓"
     },
     "customized-asset": {
       "actions": {

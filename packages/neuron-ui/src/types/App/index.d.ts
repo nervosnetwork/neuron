@@ -19,6 +19,10 @@ declare namespace State {
       }
       amount: string
     }>
+    readonly nftInfo?: {
+      type: 'send' | 'receive'
+      data: string
+    }
   }
 
   interface DetailedInput {
