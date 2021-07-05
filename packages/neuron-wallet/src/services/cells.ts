@@ -289,7 +289,10 @@ export default class CellsService {
         return secp256k1LockHashes.find(hash => hash.includes(receiverLockHash)) ||
           secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
-      return o.typeCodeHash === nftIssuerCodehash || o.typeCodeHash === nftClassCodehash || o.typeCodeHash === nftCodehash
+
+      if (o.typeCodeHash === nftIssuerCodehash || o.typeCodeHash === nftClassCodehash || o.typeCodeHash === nftCodehash) {
+        return blake160Hashes.has(o.lockArgs)
+      }
     })
 
     const totalCount = matchedOutputs.length
