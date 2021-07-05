@@ -216,7 +216,6 @@ const SpecialAssetList = () => {
           })
         }
       }
-      // eslint-disable-next-line no-console
       switch (cell.customizedAssetInfo.lock) {
         case PresetScript.Locktime: {
           unlockSpecialAsset({
