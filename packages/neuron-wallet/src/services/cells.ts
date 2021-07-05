@@ -226,10 +226,10 @@ export default class CellsService {
     const multiSign = new MultiSign()
     const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
     const assetAccountInfo = new AssetAccountInfo()
-    const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash;
-    const nftIssuerCodehash = assetAccountInfo.getNftIssuerInfo().codeHash;
-    const nftClassCodehash = assetAccountInfo.getNftClassInfo().codeHash;
-    const nftCodehash = assetAccountInfo.getNftInfo().codeHash;
+    const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash
+    const nftIssuerCodehash = assetAccountInfo.getNftIssuerInfo().codeHash
+    const nftClassCodehash = assetAccountInfo.getNftClassInfo().codeHash
+    const nftCodehash = assetAccountInfo.getNftInfo().codeHash
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 => SystemScriptInfo.generateSecpScript(blake160).computeHash())
 
     const skip = (pageNo - 1) * pageSize

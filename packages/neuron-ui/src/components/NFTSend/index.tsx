@@ -104,9 +104,6 @@ const NFTSend = () => {
 
   const outPoint = location.state?.outPoint
 
-  // eslint-disable-next-line no-console
-  console.log(location.state)
-
   useEffect(() => {
     const clearTimer = () => {
       if (timerRef.current) {
