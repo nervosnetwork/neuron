@@ -345,6 +345,10 @@ export default class ApiController {
       return this.customizedAssetsController.generateWithdrawCustomizedCellTx(params)
     })
 
+    handle('generate-transfer-nft-tx', async (_, params: Controller.Params.GenerateTransferNftTxParams) => {
+      return this.customizedAssetsController.generateTransferNftTx(params)
+    })
+
     // Networks
 
     handle('get-all-networks', async () => {

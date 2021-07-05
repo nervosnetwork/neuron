@@ -363,6 +363,9 @@
       "send": {
         "title": "發起交易"
       },
+      "send-nft": {
+        "title": "轉讓 NFT"
+      },
       "delete": {
         "title": "删除錢包 {{name}}"
       },

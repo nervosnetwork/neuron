@@ -150,7 +150,7 @@ const TransactionList = ({
           name = walletName
           const { type, data } = tx.nftInfo
           typeLabel = `${t(`history.${type}`)} m-NFT`
-          amount = `${type === 'receive' ? '+' : '-'} ${nftFormatter(data)}`
+          amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
         } else if (tx.sudtInfo?.sUDT) {
           name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
           const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'

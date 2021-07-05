@@ -33,6 +33,93 @@ export class TransactionGenerator {
   public static CHANGE_OUTPUT_SIZE = 101
   public static CHANGE_OUTPUT_DATA_SIZE = 8
 
+  public static generateNftTx = async (
+    walletId: string,
+    outPoint: OutPoint,
+    receiveAddress: string,
+    changeAddress: string,
+    fee: string = '0',
+    feeRate: string = '0'
+  ) => {
+    const assetAccount = new AssetAccountInfo()
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const nftCellDep = assetAccount.getNftInfo().cellDep
+    const op = new OutPoint(outPoint.txHash, outPoint.index)
+    const nftCell = await CellsService.getLiveCell(op)
+    const blake160: string = AddressParser.toBlake160(receiveAddress)
+
+    if (nftCell === undefined) {
+      throw new Error('NFT cell not found')
+    }
+
+    const nftInput = Input.fromObject({
+      previousOutput: op,
+      capacity: nftCell.capacity,
+      lock: new Script(nftCell.lock.codeHash, nftCell.lock.args, nftCell.lock.hashType),
+      type: new Script(nftCell.type?.codeHash!, nftCell.type?.args!, nftCell.type?.hashType!),
+      data: nftCell.data,
+      since: '0',
+    })
+
+    const append = {
+      input: nftInput,
+      witness: WitnessArgs.emptyLock()
+    }
+
+    nftCell.setLock(SystemScriptInfo.generateSecpScript(blake160))
+    const outputs: Output[] = [nftCell]
+    const tx = Transaction.fromObject({
+      version: '0',
+      cellDeps: [secpCellDep, nftCellDep],
+      headerDeps: [],
+      inputs: [],
+      outputs,
+      outputsData: outputs.map(output => output.data || '0x'),
+      witnesses: [],
+    })
+
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput,
+    } = await CellsService.gatherInputs(
+      '0',
+      walletId,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      append
+    )
+    const finalFeeInt = BigInt(finalFee)
+
+    if (finalFeeInt === BigInt(0)) {
+      throw new LiveCapacityNotEnough()
+    }
+
+    tx.inputs = inputs
+    tx.fee = finalFee
+
+    // change
+    if (hasChangeOutput) {
+      const changeBlake160: string = AddressParser.toBlake160(changeAddress)
+      const changeCapacity = BigInt(capacities) - finalFeeInt
+
+      const changeOutput = new Output(
+        changeCapacity.toString(),
+        SystemScriptInfo.generateSecpScript(changeBlake160)
+      )
+
+      tx.addOutput(changeOutput)
+    }
+
+    return tx
+  }
+
   public static generateTx = async (
     walletId: string,
     targetOutputs: TargetOutput[],

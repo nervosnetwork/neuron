@@ -19,6 +19,7 @@ import {
   queryParsers,
   useFetchTokenInfoList,
   PresetScript,
+  nftFormatter,
 } from 'utils'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
@@ -185,6 +186,15 @@ const SpecialAssetList = () => {
         })
         return
       }
+      if (cell.customizedAssetInfo.type === 'NFT') {
+        history.push({
+          pathname: `${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`,
+          state: {
+            outPoint: cell.outPoint,
+          },
+        })
+        return
+      }
       const handleRes = (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (
         res: ControllerResponse<any>
       ) => {
@@ -206,6 +216,7 @@ const SpecialAssetList = () => {
           })
         }
       }
+      // eslint-disable-next-line no-console
       switch (cell.customizedAssetInfo.lock) {
         case PresetScript.Locktime: {
           unlockSpecialAsset({
@@ -251,7 +262,7 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim]
+    [cells, id, dispatch, setAccountToClaim, history]
   )
 
   const list = useMemo(() => {

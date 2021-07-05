@@ -62,6 +62,7 @@ const PasswordRequest = () => {
         return OfflineSignType.SendSUDT
       case 'unlock':
         return OfflineSignType.UnlockDAO
+      case 'send-nft':
       case 'send':
         return OfflineSignType.Regular
       default:
@@ -184,6 +185,7 @@ const PasswordRequest = () => {
             await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
+          case 'send-nft':
           case 'send-cheque': {
             if (isSending) {
               break

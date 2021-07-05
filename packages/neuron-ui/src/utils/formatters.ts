@@ -280,7 +280,7 @@ export const sUDTAmountFormatter = (amount: string) => {
   return `${fmtted}${fmtted.length < amount.length ? '...' : ''}`
 }
 
-export const nftFormatter = (hex?: string) => {
+export const nftFormatter = (hex?: string, idOnly = false) => {
   if (hex == null || hex.length !== 58) {
     return 'mNFT'
   }
@@ -288,7 +288,11 @@ export const nftFormatter = (hex?: string) => {
   const issuerId = data.slice(36, 40)
   const classId = BigInt(`0x${data.slice(40, 48)}`).toString()
   const tokenId = BigInt(`0x${data.slice(48, 56)}`).toString()
-  return `#${issuerId}-${classId}-${tokenId} mNFT`
+  const id = `${issuerId}-${classId}-${tokenId}`
+  if (idOnly) {
+    return id
+  }
+  return `#${id} mNFT`
 }
 
 export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {

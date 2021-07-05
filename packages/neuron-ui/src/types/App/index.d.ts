@@ -98,6 +98,7 @@ declare namespace State {
       | 'claim-cheque'
       | 'create-account-to-claim-cheque'
       | 'migrate-acp'
+      | 'send-nft'
       | null
     readonly walletID: string
   }
