@@ -337,6 +337,19 @@ declare namespace Controller {
     type Response = Tx
   }
 
+  namespace CreateNFTSendTransaction {
+    type Tx = any
+    interface Params {
+      walletID: string
+      outPoint: any
+      receiveAddress: string
+      description?: string
+      feeRate: string
+    }
+
+    type Response = Tx
+  }
+
   namespace GenerateWithdrawChequeTransaction {
     type Tx = any
     interface Params {

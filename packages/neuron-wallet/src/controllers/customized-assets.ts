@@ -26,6 +26,19 @@ export default class CustomizedAssetsController {
     }
   }
 
+  public async generateTransferNftTx(params: Controller.Params.GenerateTransferNftTxParams): Promise<Controller.Response<Transaction>> {
+    const tx = await new TransactionSender().generateNftTx(params.walletID, params.outPoint, params.receiveAddress, undefined, params.feeRate)
+
+    if (!tx) {
+      throw new ServiceHasNoResponse('GenerateTransferNftTx')
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public async generateWithdrawCustomizedCellTx(
     params: Controller.Params.GenerateWithdrawCustomizedCellTxParams
   ): Promise<Controller.Response<Transaction>> {

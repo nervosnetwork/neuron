@@ -370,6 +370,9 @@
       "send": {
         "title": "Submit the transaction"
       },
+      "send-nft": {
+        "title": "Send NFT"
+      },
       "delete": {
         "title": "Delete the {{name}} wallet"
       },

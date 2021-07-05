@@ -230,6 +230,7 @@ const HardwareSign = ({
       }
       switch (type) {
         case 'send':
+        case 'send-nft':
         case 'claim-cheque': {
           if (isSending) {
             break

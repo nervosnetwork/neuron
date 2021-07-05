@@ -279,8 +279,8 @@ export class TransactionsService {
       )
       .getMany()
 
-    const nftOnputs = await connection
-      .getRepository(InputEntity)
+    const nftOutputs = await connection
+      .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where(`
         output.transactionHash IN (:...txHashes) AND
@@ -379,7 +379,7 @@ export class TransactionsService {
         }
 
         const sendNFTCell = nftInputs.find(i => i.typeCodeHash === nftCodehash && i.transactionHash === tx.hash)
-        const receiveNFTCell = nftOnputs.find(o => o.typeCodeHash === nftCodehash && o.transactionHash === tx.hash)
+        const receiveNFTCell = nftOutputs.find(o => o.typeCodeHash === nftCodehash && o.outPointTxHash === tx.hash)
 
         let nftInfo: NFTInfo | undefined
         if (sendNFTCell) {

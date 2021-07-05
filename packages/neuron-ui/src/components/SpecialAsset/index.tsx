@@ -159,7 +159,7 @@ const SpecialAsset = ({
         {amount}
       </CopyZone>
       <div className={styles.actions}>
-        {isNFTClassOrIssuer || !isNFTTransferable ? null : (
+        {isNFTClassOrIssuer || (assetInfo.type === NFTType.NFT && !isNFTTransferable) ? null : (
           <Button
             data-tx-hash={txHash}
             data-idx={index}
