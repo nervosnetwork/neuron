@@ -27,10 +27,14 @@ export default class CustomizedAssetsController {
   }
 
   public async generateTransferNftTx(params: Controller.Params.GenerateTransferNftTxParams): Promise<Controller.Response<Transaction>> {
-    const tx = await new TransactionSender().generateNftTx(params.walletID, params.outPoint, params.receiveAddress, undefined, params.feeRate)
+    const tx = await new TransactionSender().generateTransferNftTx(params.walletID, params.outPoint, params.receiveAddress, undefined, params.feeRate)
 
     if (!tx) {
       throw new ServiceHasNoResponse('GenerateTransferNftTx')
+    }
+
+    if (params.description) {
+      tx.description = params.description
     }
 
     return {

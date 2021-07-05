@@ -281,16 +281,16 @@ public static async signSingleMultiSignScript(
     return tx
   }
 
-  public generateNftTx = async (
+  public generateTransferNftTx = async (
     walletId: string,
     outPoint: OutPoint,
     receiveAddress: string,
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
   ): Promise<Transaction>  => {
     const changeAddress: string = await this.getChangeAddress()
 
-    const tx = await TransactionGenerator.generateNftTx(
+    const tx = await TransactionGenerator.generateTransferNftTx(
       walletId,
       outPoint,
       receiveAddress,

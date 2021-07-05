@@ -32,8 +32,9 @@ export interface TargetOutput {
 export class TransactionGenerator {
   public static CHANGE_OUTPUT_SIZE = 101
   public static CHANGE_OUTPUT_DATA_SIZE = 8
+  public static MIN_NFT_CELL_SIZE = BigInt(133 * 10 ** 8)
 
-  public static generateNftTx = async (
+  public static generateTransferNftTx = async (
     walletId: string,
     outPoint: OutPoint,
     receiveAddress: string,
@@ -72,12 +73,22 @@ export class TransactionGenerator {
       version: '0',
       cellDeps: [secpCellDep, nftCellDep],
       headerDeps: [],
-      inputs: [],
+      inputs: [nftInput],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
     })
 
+    const txSize = TransactionSize.tx(tx)
+    tx.fee = TransactionFee.fee(txSize, BigInt(feeRate)).toString()
+    const outputCapacity = BigInt(nftCell.capacity) - BigInt(tx.fee)
+    // if there is enough capacity left to cover tx fee
+    if (outputCapacity >= TransactionGenerator.MIN_NFT_CELL_SIZE) {
+      tx.outputs[0].capacity = outputCapacity.toString()
+      return tx
+    }
+
+    tx.inputs = []
     const baseSize: number = TransactionSize.tx(tx)
 
     const {
