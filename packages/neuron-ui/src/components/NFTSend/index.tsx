@@ -2,7 +2,7 @@ import React, { useState, useCallback, useReducer, useMemo, useRef, useEffect } 
 import { useTranslation } from 'react-i18next'
 import { useLocation, useParams } from 'react-router-dom'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
-import { validateAssetAccountAddress, isMainnet as isMainnetUtil, isSuccessResponse } from 'utils'
+import { isMainnet as isMainnetUtil, isSuccessResponse, validateAddress } from 'utils'
 import TextField from 'widgets/TextField'
 import { generateNFTSendTransaction } from 'services/remote'
 import Button from 'widgets/Button'
@@ -67,11 +67,7 @@ const NFTSend = () => {
 
   const addressError = useMemo(() => {
     try {
-      // validate like sudt
-      validateAssetAccountAddress({
-        address: sendState.address,
-        isMainnet,
-      })
+      validateAddress(sendState.address, isMainnet)
     } catch (err) {
       return t(err.message, err.i18n)
     }
