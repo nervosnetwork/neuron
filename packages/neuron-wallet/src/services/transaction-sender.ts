@@ -289,10 +289,19 @@ public static async signSingleMultiSignScript(
     feeRate: string = '0',
   ): Promise<Transaction>  => {
     const changeAddress: string = await this.getChangeAddress()
+    const url: string = NodeService.getInstance().ckb.node.url
+    const rpcService = new RpcService(url)
+    // for some reason with data won't work
+    const cellWithStatus = await rpcService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index), true)
+    const prevOutput = cellWithStatus.cell!.output
+    if (!cellWithStatus.isLive()) {
+      throw new CellIsNotYetLive()
+    }
 
     const tx = await TransactionGenerator.generateTransferNftTx(
       walletId,
       outPoint,
+      prevOutput,
       receiveAddress,
       changeAddress,
       fee,

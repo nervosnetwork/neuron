@@ -155,7 +155,10 @@ const SpecialAsset = ({
         <span>{date}</span>
         <span>{time}</span>
       </div>
-      <CopyZone className={styles.capacity} content={amountToCopy}>
+      <CopyZone
+        className={styles.capacity}
+        content={isNFTClassOrIssuer || assetInfo.type === NFTType.NFT ? amount : amountToCopy}
+      >
         {amount}
       </CopyZone>
       <div className={styles.actions}>

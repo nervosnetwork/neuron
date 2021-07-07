@@ -37,6 +37,7 @@ export class TransactionGenerator {
   public static generateTransferNftTx = async (
     walletId: string,
     outPoint: OutPoint,
+    prevOutput: Output,
     receiveAddress: string,
     changeAddress: string,
     fee: string = '0',
@@ -48,15 +49,22 @@ export class TransactionGenerator {
     const op = new OutPoint(outPoint.txHash, outPoint.index)
     const nftCell = await CellsService.getLiveCell(op)
     const receiverLockScript = AddressParser.parse(receiveAddress)
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
 
     if (nftCell === undefined) {
       throw new Error('NFT cell not found')
+    }
+    const cellDeps = [secpCellDep, nftCellDep]
+    const outputLock = new Script(prevOutput.lock.codeHash, prevOutput.lock.args, prevOutput.lock.hashType)
+    if (assetAccountInfo.isDefaultAnyoneCanPayScript(outputLock)) {
+      cellDeps.push(anyoneCanPayDep)
     }
 
     const nftInput = Input.fromObject({
       previousOutput: op,
       capacity: nftCell.capacity,
-      lock: new Script(nftCell.lock.codeHash, nftCell.lock.args, nftCell.lock.hashType),
+      lock: outputLock,
       type: new Script(nftCell.type?.codeHash!, nftCell.type?.args!, nftCell.type?.hashType!),
       data: nftCell.data,
       since: '0',
@@ -71,7 +79,7 @@ export class TransactionGenerator {
     const outputs: Output[] = [nftCell]
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep, nftCellDep],
+      cellDeps: [secpCellDep, nftCellDep, anyoneCanPayDep],
       headerDeps: [],
       inputs: [nftInput],
       outputs,
