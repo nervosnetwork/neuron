@@ -671,7 +671,7 @@
       "no-special-assets": "No customized assets",
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
-      "transfer-nft": "Transfer"
+      "transfer-nft": "Send"
     },
     "customized-asset": {
       "actions": {

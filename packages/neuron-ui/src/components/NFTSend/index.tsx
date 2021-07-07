@@ -2,9 +2,8 @@ import React, { useState, useCallback, useReducer, useMemo, useRef, useEffect } 
 import { useTranslation } from 'react-i18next'
 import { useLocation, useParams } from 'react-router-dom'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
-import { RoutePath, validateAssetAccountAddress, isMainnet as isMainnetUtil, isSuccessResponse } from 'utils'
+import { validateAssetAccountAddress, isMainnet as isMainnetUtil, isSuccessResponse } from 'utils'
 import TextField from 'widgets/TextField'
-import Breadcrum from 'widgets/Breadcrum'
 import { generateNFTSendTransaction } from 'services/remote'
 import Button from 'widgets/Button'
 import { MEDIUM_FEE_RATE } from 'utils/const'
@@ -50,7 +49,6 @@ const NFTSend = () => {
   const globalDispatch = useDispatch()
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const breakcrum = [{ label: t('navbar.s-udt'), link: RoutePath.SpecialAssets }]
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [remoteError, setRemoteError] = useState('')
 
@@ -145,9 +143,6 @@ const NFTSend = () => {
 
   return (
     <div>
-      <div className={styles.breadcrum}>
-        <Breadcrum pages={breakcrum} />
-      </div>
       <div className={styles.title}>{`#${nftId} mNFT`}</div>
       <form onSubmit={onSubmit}>
         <div className={styles.card}>
