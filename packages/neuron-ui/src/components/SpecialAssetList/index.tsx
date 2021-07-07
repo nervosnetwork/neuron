@@ -141,7 +141,7 @@ const SpecialAssetList = () => {
         .then(res => {
           if (isSuccessResponse(res)) {
             const { items, totalCount: count } = res.result as { items: SpecialAssetCell[]; totalCount: string }
-            setCells(items.sort((i1, i2) => +i2.timestamp - +i1.timestamp))
+            setCells(items)
             setTotalCount(+count)
           } else {
             dispatch({
@@ -263,6 +263,9 @@ const SpecialAssetList = () => {
     },
     [cells, id, dispatch, setAccountToClaim, history]
   )
+
+  // eslint-disable-next-line no-console
+  console.log(cells)
 
   const list = useMemo(() => {
     return cells.map(({ outPoint, timestamp, customizedAssetInfo, data, lock, type, capacity }) => {
