@@ -47,7 +47,7 @@ export class TransactionGenerator {
     const nftCellDep = assetAccount.getNftInfo().cellDep
     const op = new OutPoint(outPoint.txHash, outPoint.index)
     const nftCell = await CellsService.getLiveCell(op)
-    const blake160: string = AddressParser.toBlake160(receiveAddress)
+    const receiverLockScript = AddressParser.parse(receiveAddress)
 
     if (nftCell === undefined) {
       throw new Error('NFT cell not found')
@@ -67,7 +67,7 @@ export class TransactionGenerator {
       witness: WitnessArgs.emptyLock()
     }
 
-    nftCell.setLock(SystemScriptInfo.generateSecpScript(blake160))
+    nftCell.setLock(receiverLockScript)
     const outputs: Output[] = [nftCell]
     const tx = Transaction.fromObject({
       version: '0',
