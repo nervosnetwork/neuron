@@ -66,6 +66,9 @@ const NFTSend = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const addressError = useMemo(() => {
+    if (!sendState.address) {
+      return undefined
+    }
     try {
       validateAddress(sendState.address, isMainnet)
     } catch (err) {
