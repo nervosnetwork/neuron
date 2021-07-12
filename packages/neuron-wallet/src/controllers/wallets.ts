@@ -362,7 +362,7 @@ export default class WalletsController {
       0,
       skipSign
     )
-    const description = params.description ?? ''
+    const description = params.description || params.tx.description || ''
     if (description !== '') {
       await setDescription(params.walletID, hash, description)
     }
