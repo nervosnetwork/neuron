@@ -1,0 +1,89 @@
+@import '../../styles/mixin.scss';
+
+.title {
+  @include page-title;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 6px;
+  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.12);
+}
+
+.send {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 30px 20px;
+
+  .address {
+    grid-area: address;
+  }
+
+  .description {
+    grid-area: description;
+  }
+
+  .descriptionField {
+    & > div {
+      border-color: transparent transparent #aaa !important;
+    }
+  }
+  .remoteError {
+    display: flex;
+    align-items: center;
+    height: 15px;
+    padding-bottom: 15px;
+    grid-area: remote-error;
+    font-size: 0.75rem;
+    color: #d50000;
+    svg {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal {
+  @include overlay;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &[hidden] {
+    display: none;
+  }
+  h2 {
+    @include dialog-title;
+  }
+  .passwordDialog {
+    @include dialog-container;
+    background: #fff;
+    padding: 49px 73px;
+  }
+  .dialogFooter {
+    @include dialog-footer;
+    button {
+      margin-left: 5px;
+    }
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}

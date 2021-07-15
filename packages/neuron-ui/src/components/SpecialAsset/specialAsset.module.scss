@@ -44,8 +44,8 @@
 .container {
   display: grid;
   grid-template:
-    'datetime capacity indicators actions' 1fr /
-    120px minmax(100px, 1fr) 50px 300px;
+    'datetime capacity actions' 1fr /
+    120px minmax(100px, 1fr) 300px;
   grid-column-gap: 15px;
   box-sizing: border-box;
   border-bottom: 1px solid #b3b3b3;
@@ -75,34 +75,9 @@
   @include text-overflow-ellipsis;
 }
 
-.indicators {
-  grid-area: indicators;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #fff;
-  font-size: 0.9375rem;
-
-  &>div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    width: 1.25rem;
-    height: 1.25rem;
-    background-color: #949494;
-
-    &[data-on="true"] {
-      @include tooltip;
-      position: relative;
-      background-color: var(--nervos-green);
-    }
-  }
-}
-
 .actions {
   grid-area: actions;
-
+  text-align: right;
   button {
     height: 1.5rem;
     width: 150px;
@@ -112,8 +87,8 @@
 
     &:disabled {
       opacity: 1 !important;
-      background-color: #3cc68a80!important;
-      color: #ffffff80!important;
+      background-color: #3cc68a80 !important;
+      color: #ffffff80 !important;
     }
 
     &.hasTooltip:disabled[data-tooltip] {

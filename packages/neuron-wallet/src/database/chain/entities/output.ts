@@ -148,6 +148,7 @@ export default class Output extends BaseEntity {
       status: this.status as OutputStatus,
       type: this.typeScript(),
       typeHash: this.typeHash ? this.typeHash : undefined,
+      data: this.data,
       daoData: this.daoData,
       timestamp,
       blockNumber: this.transaction?.blockNumber,

@@ -363,6 +363,9 @@
       "send": {
         "title": "發起交易"
       },
+      "send-nft": {
+        "title": "轉讓 NFT"
+      },
       "delete": {
         "title": "删除錢包 {{name}}"
       },
@@ -383,6 +386,18 @@
       },
       "migrate-acp": {
         "title": "升級資產賬戶"
+      },
+      "send-cheque": {
+        "title": "發起 Cheque 交易"
+      },
+      "withdraw-cheque": {
+        "title": "撤回 Cheque 資產"
+      },
+      "claim-cheque": {
+        "title": "領取 Cheque 資產"
+      },
+      "create-account-to-claim-cheque": {
+        "title": "創建賬戶並領取 Cheque 資產"
       }
     },
     "qrcode": {
@@ -467,7 +482,7 @@
         "102": "$t(messages.fields.{{fieldName}})無效。",
         "103": "$t(messages.fields.keystore-password)不正確。",
         "104": "未連接到節點，請重啓 Neuron。",
-        "105": "您需要有足夠的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
+        "105": "您需要有足夠的餘額來支付找零(至少61 CKBytes)。",
         "106": "您需要有足夠的餘額來支付找零(至少61 CKBytes)，或者拖動滑塊到最右端發送全部餘額。",
         "107": "金額 {{amount}} CKB 太小，含鎖定時間轉帳需要輸入一個不小於 69 CKB 的值。",
         "108": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。",
@@ -477,6 +492,7 @@
         "112": "未找到錢包 {{id}}。",
         "113": "Keystore 格式錯誤，請檢查檔案完整性。",
         "114": "最小轉帳金額為 {{bytes}} CKBytes。",
+        "115": "您需要有足夠的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太長，其長度應不超過 {{length}}。",
@@ -633,18 +649,22 @@
     "special-assets": {
       "title": "自定義資產",
       "date": "日期",
-      "capacity": "金額",
+      "assets": "資產",
       "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "未識別資產",
       "user-defined-asset-tooltip": "該資產為未識別資產，Neuron 暫時無法處理，請使用第三方應用操作該資產。",
       "locked-asset": "已鎖定",
       "locked-asset-tooltip": "鎖定參數為 {{epochs}} epochs, 預計解鎖時間為 {{year}}年{{month}}月{{day}}日(鎖定時間根據區塊鏈實際運行情況會有一定的誤差)。",
+      "withdraw-asset-tooltip": "預計解鎖時間為 {{year}}年{{month}}月{{day}}日 {{hour}}時{{minute}}分(根據區塊鏈實際運行情況會有一定的誤差)。",
       "claim-asset": "領取",
+      "withdraw-asset": "撤回",
       "view-details": "查看詳情",
       "release-success": "資產已解鎖，可前往交易歷史查看詳情。",
       "no-special-assets": "沒有自定義資產",
-      "experimental": "實驗室"
+      "experimental": "實驗室",
+      "unknown-asset": "未知資產",
+      "transfer-nft": "轉讓"
     },
     "customized-asset": {
       "actions": {
@@ -689,7 +709,8 @@
         "amount": "金額",
         "description": "備註",
         "submit": "提交",
-        "click-to-edit": "點擊編輯"
+        "click-to-edit": "點擊編輯",
+        "cheque-address-hint": "向該地址轉賬需要臨時鎖定 162 CKB，對方領取後自動解鎖。"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 轉賬"

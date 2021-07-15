@@ -14,6 +14,7 @@ import WalletsService from "services/wallets"
 import CommandSubject from 'models/subjects/command'
 import SyncApiController, { SyncStatus } from "./sync-api"
 import { TransactionGenerator } from "services/tx"
+import OutPoint from "models/chain/out-point"
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -44,6 +45,26 @@ export interface UpdateAssetAccountParams {
 export interface MigrateACPParams {
   id: string
   password: string
+}
+
+export interface GenerateCreateChequeTxParams {
+  walletID: string
+  assetAccountID: number
+  address: string
+  amount: string
+  fee: string
+  feeRate: string
+  description?: string
+}
+
+export interface GenerateClaimChequeTxParams {
+  walletID: string
+  chequeCellOutPoint: OutPoint
+}
+
+export interface GenerateWithdrawChequeTxParams {
+  walletID: string
+  chequeCellOutPoint: OutPoint
 }
 
 export default class AssetAccountController {
@@ -247,5 +268,45 @@ export default class AssetAccountController {
       status: ResponseCode.Success,
       result,
     }))
+  }
+
+  public async generateCreateChequeTx(params: GenerateCreateChequeTxParams):
+  Promise<Controller.Response<Transaction>> {
+    const tx = await AssetAccountService.generateCreateChequeTx(
+      params.walletID,
+      params.assetAccountID,
+      params.address,
+      params.amount,
+      params.fee,
+      params.feeRate,
+      params.description,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
+  public async generateClaimChequeTx(params: GenerateClaimChequeTxParams):
+  Promise<Controller.Response<{tx: Transaction, assetAccount?: AssetAccount}>> {
+    const {walletID, chequeCellOutPoint} = params
+    const {tx, assetAccount} = await AssetAccountService.generateClaimChequeTx(
+      walletID,
+      chequeCellOutPoint,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: {tx, assetAccount},
+    }
+  }
+
+  public async generateWithdrawChequeTx(params: GenerateWithdrawChequeTxParams):
+  Promise<Controller.Response<{tx: Transaction}>> {
+    const {chequeCellOutPoint} = params
+    const tx = await AssetAccountService.generateWithdrawChequeTx(chequeCellOutPoint)
+    return {
+      status: ResponseCode.Success,
+      result: {tx},
+    }
   }
 }

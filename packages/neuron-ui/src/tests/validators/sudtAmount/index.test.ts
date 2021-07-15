@@ -1,8 +1,8 @@
-import { validateSUDTAmount } from 'utils/validators'
+import { validateAssetAccountAmount } from 'utils/validators'
 
 import fixtures from './fixtures'
 
-const fixtureTable: Fixture.Validator<typeof validateSUDTAmount>[] = Object.entries(
+const fixtureTable: Fixture.Validator<typeof validateAssetAccountAmount>[] = Object.entries(
   fixtures
 ).map(([title, { params, exception }]) => [title, [params], exception])
 
@@ -11,12 +11,12 @@ describe(`Test sudt amount validator`, () => {
     expect.assertions(1)
     if (exception) {
       try {
-        validateSUDTAmount(params)
+        validateAssetAccountAmount(params)
       } catch (err) {
         expect(err.code).toBe(exception)
       }
     } else {
-      expect(validateSUDTAmount(params)).toBeTruthy()
+      expect(validateAssetAccountAmount(params)).toBeTruthy()
     }
   })
 })

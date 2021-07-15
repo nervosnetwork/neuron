@@ -3,6 +3,7 @@ import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuIt
 import { t } from 'i18next'
 import env from 'env'
 import { showWindow } from './app/show-window'
+import CommonUtils from 'utils/common'
 import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
@@ -22,13 +23,21 @@ import SignMessageController from 'controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
-import AssetAccountController from './asset-account'
-import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams, MigrateACPParams } from './asset-account'
+import AssetAccountController, { GenerateWithdrawChequeTxParams } from './asset-account'
+import {
+  GenerateCreateAssetAccountTxParams,
+  SendCreateAssetAccountTxParams,
+  UpdateAssetAccountParams,
+  MigrateACPParams,
+  GenerateCreateChequeTxParams,
+  GenerateClaimChequeTxParams,
+} from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
+import SUDTController from "controllers/sudt";
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -42,6 +51,7 @@ export default class ApiController {
   private anyoneCanPayController = new AnyoneCanPayController()
   private hardwareController = new HardwareController()
   private offlineSignController = new OfflineSignController()
+  private sudtController = new SUDTController()
 
   public async mount() {
     this.registerHandlers()
@@ -335,6 +345,10 @@ export default class ApiController {
       return this.customizedAssetsController.generateWithdrawCustomizedCellTx(params)
     })
 
+    handle('generate-transfer-nft-tx', async (_, params: Controller.Params.GenerateTransferNftTxParams) => {
+      return this.customizedAssetsController.generateTransferNftTx(params)
+    })
+
     // Networks
 
     handle('get-all-networks', async () => {
@@ -433,6 +447,18 @@ export default class ApiController {
       return this.assetAccountController.migrateAcp(params)
     })
 
+    handle('generate-create-cheque-tx', async (_, params: GenerateCreateChequeTxParams) => {
+      return this.assetAccountController.generateCreateChequeTx(params)
+    })
+
+    handle('generate-claim-cheque-tx', async (_, params: GenerateClaimChequeTxParams) => {
+      return this.assetAccountController.generateClaimChequeTx(params)
+    })
+
+    handle('generate-withdraw-cheque-tx', async (_, params: GenerateWithdrawChequeTxParams) => {
+      return this.assetAccountController.generateWithdrawChequeTx(params)
+    })
+
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.generateTx(params)
     })
@@ -443,6 +469,10 @@ export default class ApiController {
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.sendTx(params)
+    })
+
+    handle('get-sudt-token-info', async (_, params: { tokenID: string })=>{
+      return this.sudtController.getSUDTTokenInfo(params)
     })
 
     // Hardware wallet
@@ -504,14 +534,14 @@ export default class ApiController {
         }
         return res
       } catch (err) {
-        logger.warn(`channel handling error: ${err}`)
+        logger.warn(`channel handling error: ${err}`, err.stack)
 
         if (err.code === 'ECONNREFUSED') {
           err.code = ApiController.NODE_DISCONNECTED_CODE
         }
         const res = {
           status: err.code || ResponseCode.Fail,
-          message: typeof err.message === 'string' ? { content: err.message } : err.message,
+          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
         }
         return res
       }

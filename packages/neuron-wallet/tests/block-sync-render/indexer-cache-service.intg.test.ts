@@ -58,6 +58,7 @@ const addressMeta = AddressMeta.fromObject(address)
 const addressMetas = [addressMeta]
 const defaultLockScript = addressMeta.generateDefaultLockScript()
 const singleMultiSignLockScript = addressMeta.generateSingleMultiSignLockScript()
+const chequeLockScript = addressMeta.generateChequeLockScriptWithReceiverLockHash()
 const acpLockScript = addressMeta.generateACPLockScript()
 const legacyAcpLockScript = addressMeta.generateLegacyACPLockScript()
 const formattedDefaultLockScript = {
@@ -69,6 +70,11 @@ const formattedSingleMultiSignLockScript = {
   code_hash: singleMultiSignLockScript.codeHash,
   hash_type: singleMultiSignLockScript.hashType,
   args: singleMultiSignLockScript.args + '0'.repeat(14)
+}
+const formattedChequeLockScript = {
+  code_hash: chequeLockScript.codeHash,
+  hash_type: chequeLockScript.hashType,
+  args: chequeLockScript.args
 }
 const formattedAcpLockScript = {
   code_hash: acpLockScript.codeHash,
@@ -243,8 +249,32 @@ describe('indexer cache service', () => {
         });
       });
     });
-    describe('when found cells by single multi sign lock', () => {
+    describe('when found cells using cell collector', () => {
       let newTxHashes: any
+      const fakeCollectorObj = {
+        collect: () => {
+          return {
+            [Symbol.asyncIterator]: () => {
+              let count = 0
+              return {
+                next: async () => {
+                  if (count++ === 0) {
+                    return {
+                      done: false,
+                      value: {
+                        out_point: {
+                          tx_hash: fakeTx2.transaction.hash
+                        }
+                      }
+                    }
+                  }
+                  return {done: true}
+                }
+              }
+            }
+          }
+        }
+      }
       beforeEach(async () => {
         when(stubbedGetTransactionFn)
           .calledWith(fakeTx2.transaction.hash)
@@ -265,30 +295,18 @@ describe('indexer cache service', () => {
               argsLen: 28
             }
           )
-          .mockReturnValue({
-            collect: () => {
-              return {
-                [Symbol.asyncIterator]: () => {
-                  let count = 0
-                  return {
-                    next: async () => {
-                      if (count++ === 0) {
-                        return {
-                          done: false,
-                          value: {
-                            out_point: {
-                              tx_hash: fakeTx2.transaction.hash
-                            }
-                          }
-                        }
-                      }
-                      return {done: true}
-                    }
-                  }
-                }
-              }
+          .mockReturnValue(fakeCollectorObj)
+          .calledWith(
+            expect.anything(),
+            {
+              lock: {
+                ...formattedChequeLockScript,
+                args: formattedChequeLockScript.args.slice(0, 42)
+              },
+              argsLen: 40
             }
-          })
+          )
+          .mockReturnValue(fakeCollectorObj)
 
         newTxHashes = await indexerCacheService.upsertTxHashes()
       });

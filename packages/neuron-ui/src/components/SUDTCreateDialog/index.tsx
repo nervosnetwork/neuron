@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useReducer, useCallback } from 'react'
+import React, { useState, useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
-import { getTokenInfoList } from 'services/remote'
+import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { useSUDTAccountInfoErrors, isSuccessResponse } from 'utils'
+import { validateTokenId, isSuccessResponse, useSUDTAccountInfoErrors, useFetchTokenInfoList } from 'utils'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
@@ -120,7 +120,7 @@ const SUDTCreateDialog = ({
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
   const [accountType, setAccountType] = useState([AccountType.SUDT, AccountType.CKB].find(at => !insufficient[at]))
   const [step, setStep] = useState(DialogSection.Account)
-  const [tokenInfoList, setTokenInfoList] = useState<Controller.GetTokenInfoList.TokenInfo[]>([])
+  const tokenInfoList = useFetchTokenInfoList()
 
   const tokenInfoFields: (keyof TokenInfo)[] = ['tokenId', 'tokenName', 'symbol', 'decimal']
 
@@ -135,28 +135,29 @@ const SUDTCreateDialog = ({
   const isTokenReady =
     isAccountNameReady && Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
-  useEffect(() => {
-    getTokenInfoList()
-      .then(res => {
-        if (isSuccessResponse(res)) {
-          setTokenInfoList(res.result)
-        }
-      })
-      .catch(() => {
-        console.warn('Fail to fetch the token info list')
-      })
-  }, [setTokenInfoList])
-
   const onInput = useCallback(
     e => {
       const {
         value: payload,
         dataset: { field: type },
       } = e.target
-      const tokenInfo = tokenInfoList.find(ti => payload === ti.tokenID)
-      if (type === 'tokenId' && tokenInfo) {
-        const { tokenID, ...rest } = tokenInfo
-        dispatch({ type: 'import', payload: { ...rest, tokenId: tokenID } })
+
+      const isTokenIdValidated = () => {
+        try {
+          return validateTokenId({ isCKB: false, required: true, tokenId: payload })
+        } catch (_) {
+          return false
+        }
+      }
+
+      if (type === 'tokenId' && isTokenIdValidated()) {
+        getSUDTTokenInfo({ tokenID: payload }).then(res => {
+          if (isSuccessResponse(res) && res.result) {
+            dispatch({ type: 'import', payload: { ...res.result, tokenId: res.result.tokenID } })
+          } else {
+            dispatch({ type, payload })
+          }
+        })
       } else {
         dispatch({ type, payload })
       }

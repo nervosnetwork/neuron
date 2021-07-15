@@ -14,7 +14,7 @@ export default class CustomizedAssetsController {
     const addresses = await AddressService.getAddressesByWalletId(params.walletID)
     const blake160s = addresses.map(addr => addr.blake160)
 
-    const result = await CellsService.getSingleMultiSignCells(blake160s, params.pageNo, params.pageSize)
+    const result = await CellsService.getCustomizedAssetCells(blake160s, params.pageNo, params.pageSize)
 
     if (!result) {
       throw new ServiceHasNoResponse('GetCustomizedAssetCells')
@@ -23,6 +23,23 @@ export default class CustomizedAssetsController {
     return {
       status: ResponseCode.Success,
       result,
+    }
+  }
+
+  public async generateTransferNftTx(params: Controller.Params.GenerateTransferNftTxParams): Promise<Controller.Response<Transaction>> {
+    const tx = await new TransactionSender().generateTransferNftTx(params.walletID, params.outPoint, params.receiveAddress, undefined, params.feeRate)
+
+    if (!tx) {
+      throw new ServiceHasNoResponse('GenerateTransferNftTx')
+    }
+
+    if (params.description) {
+      tx.description = params.description
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: tx,
     }
   }
 

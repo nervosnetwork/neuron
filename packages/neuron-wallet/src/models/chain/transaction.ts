@@ -14,7 +14,7 @@ export enum TransactionStatus {
   Failed = 'failed',
 }
 
-interface SudtTokenInfo {
+export interface SudtTokenInfo {
   symbol: string
   tokenID: string
   tokenName: string
@@ -24,6 +24,16 @@ interface SudtTokenInfo {
 export interface SudtInfo {
   sUDT?: SudtTokenInfo
   amount: string
+}
+
+export enum NFTType {
+  Send = 'send',
+  Receive = 'receive'
+}
+
+export interface NFTInfo {
+  type: NFTType
+  data: string
 }
 
 export default class Transaction {
@@ -58,6 +68,8 @@ export default class Transaction {
 
   public anyoneCanPaySendAmount?: string
 
+  public nftInfo?: NFTInfo
+
   constructor(
     version: string,
     cellDeps: CellDep[] = [],
@@ -79,7 +91,8 @@ export default class Transaction {
     nervosDao: boolean = false, // Default to false
     createdAt?: string,
     updatedAt?: string,
-    sudtInfo?: SudtInfo
+    sudtInfo?: SudtInfo,
+    nftType?: NFTInfo
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -103,7 +116,7 @@ export default class Transaction {
     this.outputsData = outputsData || this.outputs.map(o => o.data || '0x')
 
     this.sudtInfo = sudtInfo
-
+    this.nftInfo = nftType
     TypeCheckerUtils.hashChecker(...this.headerDeps, this.blockHash)
     TypeCheckerUtils.numberChecker(
       this.version,
@@ -139,6 +152,7 @@ export default class Transaction {
     createdAt,
     updatedAt,
     sudtInfo,
+    nftInfo
   }: {
     version: string,
     cellDeps?: CellDep[],
@@ -160,7 +174,8 @@ export default class Transaction {
     nervosDao?: boolean, // Default to false
     createdAt?: string,
     updatedAt?: string,
-    sudtInfo?: SudtInfo
+    sudtInfo?: SudtInfo,
+    nftInfo?: NFTInfo
   }): Transaction {
     return new Transaction(
       version,
@@ -189,6 +204,7 @@ export default class Transaction {
       createdAt,
       updatedAt,
       sudtInfo,
+      nftInfo
     )
   }
 

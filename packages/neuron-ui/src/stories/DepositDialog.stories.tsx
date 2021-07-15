@@ -1,15 +1,17 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { action } from '@storybook/addon-actions'
 import DepositDialog from 'components/DepositDialog'
 
 const props = {
   show: true,
   value: '123',
   fee: '123',
-  onDismiss: () => {},
-  onChange: () => {},
-  onSubmit: () => {},
-  onSlide: () => {},
+  onOpen: action('on open'),
+  onDismiss: action('on dismiss'),
+  onChange: action('on change'),
+  onSubmit: action('on submit'),
+  onSlide: action('on slide'),
   maxDepositAmount: BigInt('30000000000'),
   isDepositing: false,
   errorMessage: 'Amount is not enough',

@@ -21,6 +21,7 @@ import SUDTSend from 'components/SUDTSend'
 import SUDTReceive from 'components/SUDTReceive'
 import ImportHardware from 'components/ImportHardware'
 import OfflineSign from 'components/OfflineSign'
+import NFTSend from 'components/NFTSend'
 
 import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
 
@@ -132,6 +133,13 @@ export const mainContents: CustomRouter.Route[] = [
     path: RoutePath.OfflineSign,
     exact: false,
     component: OfflineSign,
+  },
+  {
+    name: `NFTTransfer`,
+    path: RoutePath.NFTSend,
+    params: '/:nftId?',
+    exact: true,
+    component: NFTSend,
   },
 ]
 

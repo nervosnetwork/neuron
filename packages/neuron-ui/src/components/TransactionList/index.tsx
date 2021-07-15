@@ -20,6 +20,7 @@ import {
   sUDTAmountFormatter,
   getExplorerUrl,
   useLocalDescription,
+  nftFormatter,
 } from 'utils'
 import { StateDispatch } from 'states'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
@@ -145,7 +146,12 @@ const TransactionList = ({
         let amount = '--'
         let typeLabel = '--'
 
-        if (tx.sudtInfo?.sUDT) {
+        if (tx.nftInfo) {
+          name = walletName
+          const { type, data } = tx.nftInfo
+          typeLabel = `${t(`history.${type}`)} m-NFT`
+          amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
+        } else if (tx.sudtInfo?.sUDT) {
           name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
           const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
           typeLabel = `UDT ${t(`history.${type}`)}`

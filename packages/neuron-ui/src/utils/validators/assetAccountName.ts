@@ -1,7 +1,7 @@
 import { MAX_SUDT_ACCOUNT_NAME_LENGTH, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { FieldRequiredException, ValueReservedException, FieldTooLongException, FieldUsedException } from 'exceptions'
 
-export const validateSUDTAccountName = ({
+export const validateAssetAccountName = ({
   name = '',
   exists = [],
   required = false,
@@ -29,4 +29,4 @@ export const validateSUDTAccountName = ({
   return true
 }
 
-export default validateSUDTAccountName
+export default validateAssetAccountName

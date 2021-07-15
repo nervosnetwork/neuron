@@ -17,6 +17,7 @@ import {
   RoutePath,
   getCurrentUrl,
   getSyncStatus,
+  nftFormatter,
 } from 'utils'
 
 import styles from './overview.module.scss'
@@ -128,7 +129,11 @@ const Overview = () => {
           }
         }
 
-        if (item.sudtInfo?.sUDT) {
+        if (item.nftInfo) {
+          const { type, data } = item.nftInfo
+          typeLabel = `${t(`overview.${genTypeLabel(type, status)}`)}`
+          amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
+        } else if (item.sudtInfo?.sUDT) {
           const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
           typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
 

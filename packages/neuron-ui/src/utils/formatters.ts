@@ -230,7 +230,12 @@ export const sudtAmountToValue = (amount: string = '0', decimal: string = '0') =
   }
 }
 
-export const sudtValueToAmount = (value: string | null = '0', decimal: string = '0', showPositiveSign = false) => {
+export const sudtValueToAmount = (
+  value: string | null = '0',
+  decimal: string = '0',
+  showPositiveSign = false,
+  separator = ','
+) => {
   if (value === null) {
     return showPositiveSign ? '+0' : '0'
   }
@@ -262,7 +267,7 @@ export const sudtValueToAmount = (value: string | null = '0', decimal: string = 
         .join('')
         .match(/\d{1,3}/g) || ['0']
     )
-      .join(',')
+      .join(separator)
       .split('')
       .reverse()
       .join('')}${decimalFraction}`
@@ -273,6 +278,21 @@ export const sudtValueToAmount = (value: string | null = '0', decimal: string = 
 export const sUDTAmountFormatter = (amount: string) => {
   const fmtted = amount.substr(0, (amount.split('.')[0]?.length ?? 0) + 9)
   return `${fmtted}${fmtted.length < amount.length ? '...' : ''}`
+}
+
+export const nftFormatter = (hex?: string, idOnly = false) => {
+  if (hex == null || hex.length !== 58) {
+    return 'mNFT'
+  }
+  const data = hex.slice(2, 58)
+  const issuerId = data.slice(36, 40)
+  const classId = BigInt(`0x${data.slice(40, 48)}`).toString()
+  const tokenId = BigInt(`0x${data.slice(48, 56)}`).toString()
+  const id = `${issuerId}-${classId}-${tokenId}`
+  if (idOnly) {
+    return id
+  }
+  return `#${id} mNFT`
 }
 
 export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {

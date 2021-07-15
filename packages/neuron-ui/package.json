@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.35.1",
+  "version": "0.36.0-rc1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -50,7 +50,7 @@
     "canvg": "2.0.0",
     "grommet-icons": "4.4.0",
     "i18next": "17.0.13",
-    "immer": "5.1.0",
+    "immer": "8.0.1",
     "jsqr": "1.2.0",
     "office-ui-fabric-react": "7.31.1",
     "qr.js": "0.0.0",
@@ -79,7 +79,7 @@
     "@types/storybook__addon-storyshots": "5.1.2",
     "@types/styled-components": "4.4.0",
     "babel-jest": "25.1.0",
-    "electron": "9.3.2",
+    "electron": "9.4.0",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.2",
     "eslint-config-airbnb": "18.0.1",

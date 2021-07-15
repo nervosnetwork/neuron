@@ -17,6 +17,13 @@ declare module Controller {
       keywords: string
       walletID: string
     }
+    interface GenerateTransferNftTxParams {
+      walletID: string
+      outPoint: OutPoint
+      receiveAddress: string
+      feeRate: string
+      description?: string
+    }
     interface TransactionsByAddresses {
       pageNo: number
       pageSize: number

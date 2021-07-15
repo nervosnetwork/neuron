@@ -3,7 +3,6 @@ import { initConnection } from "../../src/database/chain/ormconfig"
 import AssetAccount from "../../src/models/asset-account"
 import AssetAccountEntity from "../../src/database/chain/entities/asset-account"
 import SudtTokenInfo from "../../src/database/chain/entities/sudt-token-info"
-import AssetAccountService from "../../src/services/asset-account-service"
 import OutputEntity from "../../src/database/chain/entities/output"
 import AssetAccountInfo from "../../src/models/asset-account-info"
 import BufferUtils from "../../src/utils/buffer"
@@ -15,6 +14,24 @@ import { createAccounts } from '../setupAndTeardown'
 import accounts from '../setupAndTeardown/accounts.fixture'
 import HdPublicKeyInfo from "../../src/database/chain/entities/hd-public-key-info"
 import { AddressType } from "../../src/models/keys/address"
+import OutPoint from "../../src/models/chain/out-point"
+import { when } from "jest-when"
+import SystemScriptInfo from "../../src/models/system-script-info"
+import Script from "../../src/models/chain/script"
+
+const stubbedWalletServiceGet = jest.fn()
+const stubbedGenerateClaimChequeTx = jest.fn()
+const stubbedGenerateWithdrawChequeTx = jest.fn()
+const stubbedGetAllAddresses = jest.fn()
+const stubbedGenerateCreateChequeTx = jest.fn()
+
+const resetMocks = () => {
+  stubbedWalletServiceGet.mockReset()
+  stubbedGenerateCreateChequeTx.mockReset()
+  stubbedGenerateClaimChequeTx.mockReset()
+  stubbedGenerateWithdrawChequeTx.mockReset()
+  stubbedGetAllAddresses.mockReset()
+}
 
 const [assetAccount, ckbAssetAccount] = accounts
 
@@ -37,16 +54,19 @@ const generateOutput = (
   tokenAmount = '100',
   customData: string | undefined = undefined,
   status: OutputStatus = OutputStatus.Live,
+  lock?: Script,
 ) => {
   const outputEntity = new OutputEntity()
   outputEntity.outPointTxHash = randomHex()
   outputEntity.outPointIndex = '0'
   outputEntity.capacity = capacity
-  const lock = assetAccountInfo.generateAnyoneCanPayScript(blake160)
-  outputEntity.lockCodeHash = lock.codeHash
-  outputEntity.lockArgs = lock.args
-  outputEntity.lockHashType = lock.hashType
-  outputEntity.lockHash = lock.computeHash()
+
+  const lockToUse = lock || assetAccountInfo.generateAnyoneCanPayScript(blake160)
+  outputEntity.lockCodeHash = lockToUse.codeHash
+  outputEntity.lockArgs = lockToUse.args
+  outputEntity.lockHashType = lockToUse.hashType
+  outputEntity.lockHash = lockToUse.computeHash()
+
   outputEntity.status = status
   outputEntity.data = customData || '0x'
   outputEntity.hasData = customData ? true : false
@@ -74,6 +94,27 @@ const tokenID = '0x' + '0'.repeat(64)
 const walletId = 'w1'
 
 describe('AssetAccountService', () => {
+  jest.mock('services/wallets', () => {
+    return {
+      getInstance: () => ({
+        get: stubbedWalletServiceGet
+      })
+    }
+  })
+
+  jest.mock('services/tx', () => {
+    return {
+      _esModule: true,
+      TransactionGenerator: {
+        generateClaimChequeTx: stubbedGenerateClaimChequeTx,
+        generateCreateChequeTx: stubbedGenerateCreateChequeTx,
+        generateWithdrawChequeTx: stubbedGenerateWithdrawChequeTx
+      }
+    }
+  })
+
+  const AssetAccountService = require("../../src/services/asset-account-service").default
+
   beforeAll(async () => {
     await initConnection('0x1234')
   })
@@ -85,6 +126,7 @@ describe('AssetAccountService', () => {
   beforeEach(async () => {
     const connection = getConnection()
     await connection.synchronize(true)
+    resetMocks()
 
     const keyInfo = HdPublicKeyInfo.fromObject({
       walletId,
@@ -232,8 +274,8 @@ describe('AssetAccountService', () => {
           const result = await AssetAccountService.getAll(walletId)
 
           expect(result.length).toEqual(2)
-          expect(result.find(a => a.tokenID === tokenID)?.balance).toEqual('200')
-          expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(2000 - 61).toString())
+          expect(result.find((a: any) => a.tokenID === tokenID)?.balance).toEqual('200')
+          expect(result.find((a: any) => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(2000 - 61).toString())
         })
       });
       describe('with cells being sent', () => {
@@ -270,8 +312,8 @@ describe('AssetAccountService', () => {
           const result = await AssetAccountService.getAll(walletId)
 
           expect(result.length).toEqual(2)
-          expect(result.find(a => a.tokenID === tokenID)?.balance).toEqual('200')
-          expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(2000 - 61).toString())
+          expect(result.find((a: any) => a.tokenID === tokenID)?.balance).toEqual('200')
+          expect(result.find((a: any) => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(2000 - 61).toString())
         })
       });
     });
@@ -297,7 +339,7 @@ describe('AssetAccountService', () => {
         const result = await AssetAccountService.getAll(walletId)
 
         expect(result.length).toEqual(1)
-        expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual('0')
+        expect(result.find((a: any) => a.tokenID === 'CKBytes')?.balance).toEqual('0')
       })
     });
     describe('with no CKB cells under a ACP lock', () => {
@@ -374,7 +416,7 @@ describe('AssetAccountService', () => {
         const result = await AssetAccountService.getAll(walletId)
 
         expect(result.length).toEqual(1)
-        expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(100))
+        expect(result.find((a: any) => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(100))
       });
     });
 
@@ -683,7 +725,7 @@ describe('AssetAccountService', () => {
 
     it('assetAccount exists', async () => {
       const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
-      await getConnection().manager.save([assetAccountEntity.sudtTokenInfo, assetAccount])
+      await getConnection().manager.save([assetAccountEntity.sudtTokenInfo, assetAccountEntity])
       const aae = await getConnection()
         .getRepository(AssetAccountEntity)
         .createQueryBuilder('aa')
@@ -868,6 +910,12 @@ describe('AssetAccountService', () => {
           symbol: 'udt',
           tokenName: 'udt',
           decimal: '0',
+        },
+        {
+          tokenID: 'invalid token info',
+          symbol: '',
+          tokenName: '',
+          decimal: '',
         }
       ]
       const repo = getConnection().getRepository(SudtTokenInfoEntity)
@@ -877,9 +925,165 @@ describe('AssetAccountService', () => {
     it('Get token info list', async () => {
       const list = await AssetAccountService.getTokenInfoList()
       expect(list.length).toEqual(2)
-      expect(list.find(item => item.tokenID === 'CKBytes')).toBeTruthy()
-      expect(list.find(item => item.tokenID === tokenID)).toBeTruthy()
+      expect(list.find((item: any) => item.tokenID === 'CKBytes')).toBeTruthy()
+      expect(list.find((item: any) => item.tokenID === tokenID)).toBeTruthy()
     })
 
+    it('Filter invalid token info out', async () => {
+      const repo = getConnection().getRepository(SudtTokenInfoEntity)
+      const count = await repo.count()
+      expect(count).toBe(3)
+      const list = await AssetAccountService.getTokenInfoList()
+      expect(list).toHaveLength(2)
+    })
   })
+
+  describe('#generateCreateChequeTx', () => {
+    let fakeAssetAccount: AssetAccountEntity
+    const receiverAddress = 'receiver address'
+    const changeAddressObj = {address: 'chanage address'}
+    const amount = '1'
+    const fee = '1'
+    const feeRate = '1'
+    const description = 'desc'
+
+    const fakeWallet = {
+      getNextChangeAddress: () => changeAddressObj,
+    }
+
+    beforeEach(async () => {
+      const assetAccount = AssetAccount.fromObject({
+        tokenID: tokenID,
+        symbol: 'udt',
+        tokenName: 'udt',
+        decimal: '0',
+        balance: '0',
+        accountName: 'udt',
+        blake160,
+      })
+
+      const e = AssetAccountEntity.fromModel(assetAccount)
+      await getConnection().manager.save([e.sudtTokenInfo])
+      const [aa] = await getConnection().manager.save([e])
+      fakeAssetAccount = aa
+
+      stubbedWalletServiceGet.mockReturnValue(fakeWallet)
+
+      await AssetAccountService.generateCreateChequeTx(
+        walletId,
+        fakeAssetAccount.id,
+        receiverAddress,
+        amount,
+        fee,
+        feeRate,
+        description
+      )
+    });
+    it('generates create cheque tx', () => {
+      expect(stubbedGenerateCreateChequeTx).toHaveBeenCalledWith(
+        walletId,
+        amount,
+        expect.objectContaining({blake160, tokenID}),
+        receiverAddress,
+        changeAddressObj.address,
+        fee,
+        feeRate,
+        description
+      )
+    });
+  });
+
+  describe('#generateClaimChequeTx', () => {
+    let result: any
+    let fakeChequeCellOutPoint: OutPoint
+    const address = 'address'
+    const fakeWallet = {
+      getNextChangeAddress: () => ({address}),
+      getAllAddresses: stubbedGetAllAddresses
+    }
+    const expectedAssetAccount = new AssetAccount(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+      '',
+      '',
+      '',
+      '',
+      '0',
+      '0x0000000000000000000000000000000000000000'
+    )
+    const tx = {}
+    beforeEach(async () => {
+      const receiverDefaultLockScript = SystemScriptInfo.generateSecpScript(blake160)
+      const senderDefaultLockScript = SystemScriptInfo.generateSecpScript('0x' + '1'.repeat(40))
+      const chequeLock = assetAccountInfo.generateChequeScript(
+        receiverDefaultLockScript.computeHash(),
+        senderDefaultLockScript.computeHash()
+      )
+      const output = generateOutput(tokenID, TransactionStatus.Success, '2', undefined, undefined, undefined, undefined, chequeLock)
+      await getConnection().manager.save([output.transaction, output])
+
+      stubbedGetAllAddresses.mockResolvedValue([{blake160}])
+      stubbedWalletServiceGet.mockReturnValue(fakeWallet)
+      when(stubbedGenerateClaimChequeTx)
+        .calledWith(walletId, expect.anything(), address, undefined, '1000')
+        .mockResolvedValue(tx)
+      fakeChequeCellOutPoint = OutPoint.fromObject({
+        txHash: output.transaction.hash,
+        index: '0x0'
+      })
+    });
+    describe('without existing acp', () => {
+      beforeEach(async () => {
+        result = await AssetAccountService.generateClaimChequeTx(walletId, fakeChequeCellOutPoint)
+      })
+      it('only returns transaction and asset account object', () => {
+        expect(result).toEqual({tx, assetAccount: expectedAssetAccount})
+      })
+    });
+    describe('with existing acp', () => {
+      beforeEach(async () => {
+        const assetAccount = AssetAccount.fromObject({
+          tokenID: tokenID,
+          symbol: 'udt',
+          tokenName: 'udt',
+          decimal: '0',
+          balance: '0',
+          accountName: 'udt',
+          blake160,
+        })
+
+        const e = AssetAccountEntity.fromModel(assetAccount)
+        await getConnection().manager.save([e.sudtTokenInfo, e])
+
+        result = await AssetAccountService.generateClaimChequeTx(walletId, fakeChequeCellOutPoint)
+      })
+      it('returns both transaction and asset account objects', () => {
+        expect(result).toEqual({tx})
+      })
+    });
+  });
+
+  describe('#generateWithdrawChequeTx', () => {
+    let fakeChequeCellOutPoint: OutPoint
+    beforeEach(async () => {
+      const output = generateOutput(tokenID, TransactionStatus.Success, '2')
+      await getConnection().manager.save([output.transaction, output])
+      fakeChequeCellOutPoint = OutPoint.fromObject({
+        txHash: output.transaction.hash,
+        index: '0x0'
+      })
+      await AssetAccountService.generateWithdrawChequeTx(fakeChequeCellOutPoint)
+    });
+    it('generates cheque withdrawal tx', () => {
+      expect(stubbedGenerateWithdrawChequeTx).toHaveBeenCalledWith(
+        expect.objectContaining({
+          outPoint: {
+            index: '0',
+            txHash: fakeChequeCellOutPoint.txHash
+          }
+        }),
+        undefined,
+        '1000'
+      )
+    })
+  });
 })

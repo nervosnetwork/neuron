@@ -19,6 +19,10 @@ declare namespace State {
       }
       amount: string
     }>
+    readonly nftInfo?: {
+      type: 'send' | 'receive'
+      data: string
+    }
   }
 
   interface DetailedInput {
@@ -89,7 +93,12 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-sudt'
       | 'send-acp'
+      | 'send-cheque'
+      | 'withdraw-cheque'
+      | 'claim-cheque'
+      | 'create-account-to-claim-cheque'
       | 'migrate-acp'
+      | 'send-nft'
       | null
     readonly walletID: string
   }

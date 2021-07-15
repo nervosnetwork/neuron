@@ -2,7 +2,7 @@ import { getConnection } from 'typeorm'
 import NetworksService from 'services/networks'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
-import Transaction, { TransactionStatus, SudtInfo } from 'models/chain/transaction'
+import Transaction, { TransactionStatus, SudtInfo, NFTType, NFTInfo } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -62,6 +62,7 @@ export class TransactionsService {
 
     const connection = getConnection()
     const repository = connection.getRepository(TransactionEntity)
+    const nftCodehash = assetAccountInfo.getNftInfo().codeHash;
 
     let allTxHashes: string[] = []
 
@@ -262,6 +263,38 @@ export class TransactionsService {
       )
       .getMany()
 
+    const nftInputs = await connection
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where(`
+        input.transactionHash IN (:...txHashes) AND
+        input.typeHash IS NOT NULL AND
+        input.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId) AND
+        input.typeCodeHash = :nftCodehash`,
+        {
+          txHashes,
+          walletId: params.walletID,
+          nftCodehash,
+        }
+      )
+      .getMany()
+
+    const nftOutputs = await connection
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`
+        output.transactionHash IN (:...txHashes) AND
+        output.typeHash IS NOT NULL AND
+        output.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId) AND
+        output.typeCodeHash = :nftCodehash`,
+        {
+          txHashes,
+          walletId: params.walletID,
+          nftCodehash,
+        }
+      )
+      .getMany()
+
     const inputPreviousTxHashes: string[] = inputs
       .map(i => i.outPointTxHash)
       .filter(h => !!h) as string[]
@@ -345,6 +378,16 @@ export class TransactionsService {
           }
         }
 
+        const sendNFTCell = nftInputs.find(i => i.typeCodeHash === nftCodehash && i.transactionHash === tx.hash)
+        const receiveNFTCell = nftOutputs.find(o => o.typeCodeHash === nftCodehash && o.outPointTxHash === tx.hash)
+
+        let nftInfo: NFTInfo | undefined
+        if (sendNFTCell) {
+          nftInfo = { type: NFTType.Send, data: sendNFTCell.typeArgs! }
+        } else if (receiveNFTCell) {
+          nftInfo = { type: NFTType.Receive, data: receiveNFTCell.typeArgs! }
+        }
+
         return Transaction.fromObject({
           timestamp: tx.timestamp,
           value: value.toString(),
@@ -358,6 +401,7 @@ export class TransactionsService {
           updatedAt: tx.updatedAt,
           blockNumber: tx.blockNumber,
           sudtInfo: sudtInfo,
+          nftInfo: nftInfo,
         })
       })
     )

@@ -62,6 +62,7 @@ const PasswordRequest = () => {
         return OfflineSignType.SendSUDT
       case 'unlock':
         return OfflineSignType.UnlockDAO
+      case 'send-nft':
       case 'send':
         return OfflineSignType.Regular
       default:
@@ -85,7 +86,17 @@ const PasswordRequest = () => {
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
   const isLoading =
-    ['send', 'unlock', 'create-sudt-account', 'send-sudt', 'send-acp'].includes(actionType || '') && isSending
+    [
+      'send',
+      'unlock',
+      'create-sudt-account',
+      'send-sudt',
+      'send-acp',
+      'send-cheque',
+      'withdraw-cheque',
+      'claim-cheque',
+      'create-account-to-claim-cheque',
+    ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -96,19 +107,20 @@ const PasswordRequest = () => {
       if (disabled) {
         return
       }
+      const handleSendTxRes = ({ status }: { status: number }) => {
+        if (isSuccessResponse({ status })) {
+          history.push(RoutePath.History)
+        } else if (status === ErrorCode.PasswordIncorrect) {
+          throw new PasswordIncorrectException()
+        }
+      }
       try {
         switch (actionType) {
           case 'send': {
             if (isSending) {
               break
             }
-            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
             break
           }
           case 'delete': {
@@ -160,13 +172,7 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
           case 'send-acp':
@@ -176,13 +182,50 @@ const PasswordRequest = () => {
               tx: experimental?.tx,
               password,
             }
-            await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
-                throw new PasswordIncorrectException()
-              }
-            })
+            await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
+            break
+          }
+          case 'send-nft':
+          case 'send-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({
+              walletID,
+              tx: experimental?.tx,
+              description: experimental?.tx?.description,
+              password,
+            })(dispatch).then(handleSendTxRes)
+            break
+          }
+          case 'claim-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(handleSendTxRes)
+            break
+          }
+          case 'create-account-to-claim-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendCreateSUDTAccountTransaction({
+              walletID,
+              password,
+              tx: experimental?.tx,
+              assetAccount: {
+                ...experimental?.assetAccount,
+                tokenID: experimental?.assetAccount.tokenId,
+                balance: '0',
+              },
+            })(dispatch).then(handleSendTxRes)
+            break
+          }
+          case 'withdraw-cheque': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: experimental?.tx, password })(dispatch).then(handleSendTxRes)
             break
           }
           default: {
@@ -285,7 +328,17 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {['unlock', 'create-sudt-account', 'send-sudt', 'send-acp', 'migrate-acp'].includes(actionType ?? '') ? null : (
+        {[
+          'unlock',
+          'create-sudt-account',
+          'send-sudt',
+          'send-acp',
+          'send-cheque',
+          'withdraw-cheque',
+          'claim-cheque',
+          'create-account-to-claim-cheque',
+          'migrate-acp',
+        ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
         <TextField
