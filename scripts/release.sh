@@ -3,16 +3,16 @@
 function release() {
     case $1 in
         mac)
-        electron-builder --mac -p always
+        electron-builder --mac --publish=always
         ;;
         win)
-        electron-builder --win --x64 -p always
+        set DEBUG=electron-builder electron-builder --win --x64 --publish=always
         ;;
         linux)
-        electron-builder --linux -p always
+        electron-builder --linux --publish=always
         ;;
         *)
-        electron-builder -mwl -p always
+        electron-builder -mwl --publish=always
         ;;
         esac
 }
