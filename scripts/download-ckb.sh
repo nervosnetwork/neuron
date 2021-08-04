@@ -2,6 +2,36 @@
 
 CKB_VERSION=$(cat .ckb-version)
 ROOT_DIR=$(pwd) # Be sure to run this from root directory!
+MERCURY_VERSION="v0.1.0-rc.3"
+
+function download_mercury_macos() {
+  MERCURY_FILENAME="mercury-x86_64-apple-darwin.tar.gz"
+  cd $ROOT_DIR/packages/neuron-wallet/bin/mac
+
+  curl -O -L "https://github.com/nervosnetwork/mercury/releases/download/${MERCURY_VERSION}/${MERCURY_FILENAME}"
+  tar xvzf ${MERCURY_FILENAME} mercury
+  chmod +x ./mercury
+  rm $MERCURY_FILENAME
+}
+
+function download_mercury_linux() {
+  MERCURY_FILENAME="mercury-x86_64-unknown-linux-gnu.tar.gz"
+  cd $ROOT_DIR/packages/neuron-wallet/bin/linux
+
+  curl -O -L "https://github.com/nervosnetwork/mercury/releases/download/${MERCURY_VERSION}/${MERCURY_FILENAME}"
+  tar xvzf ${MERCURY_FILENAME} mercury
+  chmod +x ./mercury
+  rm $MERCURY_FILENAME
+}
+
+function download_mercury_windows() {
+  MERCURY_FILENAME="mercury-x86_64-pc-windows-msvc.zip"
+  cd $ROOT_DIR/packages/neuron-wallet/bin/win
+
+  curl -O -L "https://github.com/nervosnetwork/mercury/releases/download/${MERCURY_VERSION}/${MERCURY_FILENAME}"
+  unzip -o ${MERCURY_FILENAME} mercury.exe
+  rm $MERCURY_FILENAME
+}
 
 function download_macos() {
   # macOS
@@ -13,6 +43,7 @@ function download_macos() {
   cp ${CKB_FILENAME}/ckb ./
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.zip
+  download_mercury_macos
 }
 
 function download_linux() {
@@ -25,6 +56,7 @@ function download_linux() {
   cp ${CKB_FILENAME}/ckb ./
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.tar.gz
+  download_mercury_linux
 }
 
 function download_windows() {
@@ -37,6 +69,7 @@ function download_windows() {
   cp ${CKB_FILENAME}/ckb.exe ./
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.zip
+  download_mercury_windows
 }
 
 case $1 in

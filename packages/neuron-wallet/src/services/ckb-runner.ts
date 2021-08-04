@@ -40,7 +40,7 @@ export const ckbDataPath = (): string => {
 
 const initCkb = async () => {
   logger.info('CKB:\tInitializing node...')
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     if (fs.existsSync(path.join(ckbDataPath(), 'ckb.toml'))) {
       logger.log('CKB:\tinit: config file detected, skip ckb init.')
       return resolve()

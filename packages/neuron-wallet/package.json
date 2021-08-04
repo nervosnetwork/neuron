@@ -35,8 +35,8 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.7.4",
-    "@ckb-lumos/indexer": "0.7.4",
+    "@ckb-lumos/base": "0.16.0",
+    "@ckb-lumos/rpc": "0.16.0",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",

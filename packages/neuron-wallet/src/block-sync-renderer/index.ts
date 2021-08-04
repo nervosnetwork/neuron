@@ -82,6 +82,7 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
     },
     stdio: ['ipc', process.stdout, 'pipe']
   })
+
   childProcess.stderr!.setEncoding('utf8').on('data', data => {
     logger.error('Sync:ChildProcess:', data)
   })

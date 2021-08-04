@@ -3,20 +3,20 @@ import { queue } from 'async'
 import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
-import { CellCollector, Indexer, TransactionCollector } from '@ckb-lumos/indexer'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
+import CkbIndexer from 'block-sync-renderer/Indexer/ckb-indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
   private rpcService: RpcService
   private walletId: string
-  private indexer: Indexer
+  private indexer: CkbIndexer
 
   constructor(
     walletId: string,
     addressMetas: AddressMeta[],
     rpcService: RpcService,
-    indexer: Indexer
+    indexer: CkbIndexer
   ) {
     for (const addressMeta of addressMetas) {
       if (addressMeta.walletId !== walletId) {
@@ -93,15 +93,19 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const transactionCollector = new TransactionCollector(this.indexer, {
+        const transactionCollector = this.indexer.txCollector({
           lock: {
             code_hash: lockScript.codeHash,
             hash_type: lockScript.hashType,
             args: lockScript.args
           }
         })
+        const fetchedTxHashes: string[] = []
+        for await (const txHash of transactionCollector.collect()) {
+          fetchedTxHashes.push(txHash)
+        }
+
         //@ts-ignore
-        const fetchedTxHashes = transactionCollector.getTransactionHashes().toArray()
         if (!fetchedTxHashes.length) {
           continue
         }
@@ -126,7 +130,7 @@ export default class IndexerCacheService {
       ]
 
       for (const {lockScript, argsLen} of lockScriptsForCellCollection) {
-        const cellCollector = new CellCollector(this.indexer, {
+        const cellCollector = this.indexer.collector({
           lock: {
             code_hash: lockScript.codeHash,
             hash_type: lockScript.hashType,
