@@ -17,6 +17,6 @@ jobs:
           source_branch: 'master'
           destination_branch: 'develop'
           pr_title: 'Merge released ${{ github.ref }} into develop'
-          pr_reviewer: 'keith-cy,katat,yuche,kellyshang'
+          pr_reviewer: 'keith-cy,yuche,kellyshang'
           pr_label: 'auto-pr'
           github_token: ${{ secrets.GITHUB_TOKEN }}
