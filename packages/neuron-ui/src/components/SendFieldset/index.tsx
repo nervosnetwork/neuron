@@ -31,6 +31,7 @@ interface SendSubformProps {
   isAddOneBtnDisabled: boolean
   isAddBtnShow: boolean
   isRemoveBtnShow: boolean
+  isTimeLockable?: boolean
   onOutputAdd: () => void
   onOutputRemove: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onLocktimeClick: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
@@ -55,6 +56,7 @@ const SendFieldset = ({
   onScan,
   onSendMaxClick,
   onItemChange,
+  isTimeLockable = true,
 }: SendSubformProps) => {
   const [t] = useTranslation()
 
@@ -66,7 +68,7 @@ const SendFieldset = ({
   )
 
   let locktimeAble = false
-  if (!addrErrorMsg && item.address?.length === SHORT_ADDR_LENGTH) {
+  if (isTimeLockable && !addrErrorMsg && item.address?.length === SHORT_ADDR_LENGTH) {
     try {
       const parsed = ckbCore.utils.bytesToHex(ckbCore.utils.parseAddress(item.address))
       if (parsed.startsWith(LOCKTIMEABLE_PREFIX)) {

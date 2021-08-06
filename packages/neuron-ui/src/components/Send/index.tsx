@@ -23,7 +23,7 @@ const Send = () => {
       send = appState.send,
       loadings: { sending = false },
     },
-    wallet: { id: walletID = '', balance = '' },
+    wallet: { id: walletID = '', balance = '', device },
     chain: {
       networkID,
       connectionStatus,
@@ -168,6 +168,7 @@ const Send = () => {
                 onScan={handleScan}
                 onSendMaxClick={handleSendMaxClick}
                 onLocktimeClick={handleLocktimeClick}
+                isTimeLockable={!device}
               />
             )
           }}
