@@ -13,6 +13,7 @@ import ApiController from 'controllers/api'
 import NodeController from 'controllers/node'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
+import MercuryService from 'services/mercury'
 
 const app = electronApp || (remote && remote.app)
 
@@ -37,6 +38,7 @@ export default class AppController {
   public end = () => {
     if (!env.isTestMode) {
       new NodeController().stopNode()
+      MercuryService.getInstance().stop()
     }
   }
 

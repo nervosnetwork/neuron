@@ -24,6 +24,15 @@ function download_mercury_linux() {
   rm $MERCURY_FILENAME
 }
 
+function download_mercury_config() {
+  MERCURY_MAINNET_CONFIG="mainnet_config.toml"
+  MERCURY_TESTNET_CONFIG="testnet_config.toml"
+  cd $ROOT_DIR/packages/neuron-wallet/bin/$1
+
+  curl -O -L "https://github.com/nervosnetwork/mercury/releases/download/${MERCURY_VERSION}/${MERCURY_MAINNET_CONFIG}"
+  curl -O -L "https://github.com/nervosnetwork/mercury/releases/download/${MERCURY_VERSION}/${MERCURY_TESTNET_CONFIG}"
+}
+
 function download_mercury_windows() {
   MERCURY_FILENAME="mercury-x86_64-pc-windows-msvc.zip"
   cd $ROOT_DIR/packages/neuron-wallet/bin/win
@@ -44,6 +53,7 @@ function download_macos() {
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.zip
   download_mercury_macos
+  download_mercury_config "mac"
 }
 
 function download_linux() {
@@ -57,6 +67,7 @@ function download_linux() {
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.tar.gz
   download_mercury_linux
+  download_mercury_config "linux"
 }
 
 function download_windows() {
@@ -70,6 +81,7 @@ function download_windows() {
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.zip
   download_mercury_windows
+  download_mercury_config "win"
 }
 
 case $1 in

@@ -10,7 +10,7 @@ import { Address } from "models/address"
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
-import IndexerFolderManager from './indexer-folder-manager'
+import MercuryService from 'services/mercury'
 
 export interface LumosCellQuery {
   lock: {codeHash: string, hashType: HashType, args: string} | null,
@@ -60,10 +60,8 @@ export default class IndexerConnector {
   constructor(
     addresses: Address[],
     nodeUrl: string,
-    indexerFolderPath: string = IndexerFolderManager.IndexerDataFolderPath
   ) {
-    console.log(indexerFolderPath)
-    this.indexer = new CkbIndexer(nodeUrl, 'http://localhost:8116')
+    this.indexer = new CkbIndexer(nodeUrl, MercuryService.LISTEN_URI)
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses
