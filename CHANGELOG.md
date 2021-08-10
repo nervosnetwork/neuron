@@ -1,3 +1,11 @@
+# 0.35.1 (2021-08-25)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hot fix
+
+* Disable timelock for hardware wallet transfer.
+
 # 0.35.0 (2021-01-12)
 
 [CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
