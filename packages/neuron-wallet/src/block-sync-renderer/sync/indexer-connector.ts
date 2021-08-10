@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { QueryOptions, HashType, Tip } from '@ckb-lumos/base'
-import CkbIndexer from '../Indexer/ckb-indexer'
+import { Indexer, CellCollector } from 'block-sync-renderer/mercury/indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -46,7 +46,7 @@ export interface BlockTips {
 }
 
 export default class IndexerConnector {
-  private indexer: CkbIndexer
+  private indexer: Indexer
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
@@ -61,7 +61,7 @@ export default class IndexerConnector {
     addresses: Address[],
     nodeUrl: string,
   ) {
-    this.indexer = new CkbIndexer(nodeUrl, MercuryService.LISTEN_URI)
+    this.indexer = new Indexer(nodeUrl, MercuryService.LISTEN_URI)
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses
@@ -170,7 +170,7 @@ export default class IndexerConnector {
     }
     queries.data = data || 'any'
 
-    const collector = this.indexer.collector(queries)
+    const collector = new CellCollector(this.indexer, queries)
 
     const result = []
     for await (const cell of collector.collect()) {

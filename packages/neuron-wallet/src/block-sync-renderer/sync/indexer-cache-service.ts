@@ -4,19 +4,19 @@ import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import CkbIndexer from 'block-sync-renderer/Indexer/ckb-indexer'
+import { Indexer, TransactionCollector, CellCollector } from 'block-sync-renderer/mercury/indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
   private rpcService: RpcService
   private walletId: string
-  private indexer: CkbIndexer
+  private indexer: Indexer
 
   constructor(
     walletId: string,
     addressMetas: AddressMeta[],
     rpcService: RpcService,
-    indexer: CkbIndexer
+    indexer: Indexer
   ) {
     for (const addressMeta of addressMetas) {
       if (addressMeta.walletId !== walletId) {
@@ -93,17 +93,15 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const transactionCollector = this.indexer.txCollector({
+        const transactionCollector = new TransactionCollector(this.indexer, {
           lock: {
             code_hash: lockScript.codeHash,
             hash_type: lockScript.hashType,
             args: lockScript.args
           }
         })
-        const fetchedTxHashes: string[] = []
-        for await (const txHash of transactionCollector.collect()) {
-          fetchedTxHashes.push(txHash)
-        }
+
+        const fetchedTxHashes = await transactionCollector.getTransactionHashes()
 
         //@ts-ignore
         if (!fetchedTxHashes.length) {
@@ -130,7 +128,7 @@ export default class IndexerCacheService {
       ]
 
       for (const {lockScript, argsLen} of lockScriptsForCellCollection) {
-        const cellCollector = this.indexer.collector({
+        const cellCollector = new CellCollector(this.indexer, {
           lock: {
             code_hash: lockScript.codeHash,
             hash_type: lockScript.hashType,
@@ -190,7 +188,7 @@ export default class IndexerCacheService {
 
     fetchBlockDetailsQueue.push(newTxHashes)
 
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       fetchBlockDetailsQueue.error(reject)
       fetchBlockDetailsQueue.drain(resolve)
     })

@@ -55,7 +55,7 @@ describe('unit tests for IndexerConnector', () => {
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
-  jest.doMock('@ckb-lumos/indexer', () => {
+  jest.doMock('block-sync-renderer/mercury/indexer', () => {
     return {
       Indexer : stubbedIndexerConstructor.mockImplementation(
         () => ({

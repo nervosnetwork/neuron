@@ -200,7 +200,7 @@ describe('integration tests for sync pipeline', () => {
       })
     )
 
-    jest.doMock('@ckb-lumos/indexer', () => {
+    jest.doMock('block-sync-renderer/mercury/indexer', () => {
       return {
         Indexer : stubbedIndexerConstructor,
         TransactionCollector : stubbedTransactionCollectorConstructor,

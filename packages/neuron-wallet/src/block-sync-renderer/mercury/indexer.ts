@@ -1,11 +1,11 @@
 /* eslint-disable no-constant-condition */
 import {
   Cell,
-  CellCollector,
+  CellCollector as LumosCellCollector,
   CellCollectorResults,
   Hexadecimal,
   HexString,
-  Indexer,
+  Indexer as LumosIndexer,
   QueryOptions,
   Script,
   Tip,
@@ -72,7 +72,7 @@ const DefaultTerminator: Terminator = (_index, _cell) => {
   return { stop: false, push: true };
 };
 
-export default class CkbIndexer implements Indexer {
+export class Indexer implements LumosIndexer {
   uri: string;
 
   constructor(public ckbRpcUrl: string, public ckbIndexerUrl: string) {
@@ -103,7 +103,7 @@ export default class CkbIndexer implements Indexer {
     }
   }
 
-  collector(queries: QueryOptions): CellCollector {
+  collector(queries: QueryOptions): LumosCellCollector {
     const { lock, type } = queries;
     let searchKey: SearchKey;
     if (lock !== undefined) {
@@ -292,5 +292,36 @@ export default class CkbIndexer implements Indexer {
 
   subscribeMedianTime(): NodeJS.EventEmitter {
     throw new Error('unimplemented');
+  }
+}
+
+export class CellCollector {
+  indexer: Indexer
+  queries: QueryOptions
+  constructor(indexer: Indexer, queries: QueryOptions) {
+    this.indexer = indexer
+    this.queries = queries
+  }
+
+  collect() {
+    return this.indexer.collector(this.queries).collect()
+  }
+}
+
+export class TransactionCollector {
+  indexer: Indexer
+  queries: QueryOptions
+  constructor(indexer: Indexer, queries: QueryOptions) {
+    this.indexer = indexer
+    this.queries = queries
+  }
+
+  async getTransactionHashes() {
+    const transactionCollector = this.indexer.txCollector(this.queries)
+    const fetchedTxHashes: string[] = []
+    for await (const txHash of transactionCollector.collect()) {
+      fetchedTxHashes.push(txHash)
+    }
+    return fetchedTxHashes
   }
 }

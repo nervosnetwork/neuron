@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs'
-import { Tip } from '@ckb-lumos/indexer'
+import { Tip } from '@ckb-lumos/base'
 import { AddressType } from '../../src/models/keys/address'
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
