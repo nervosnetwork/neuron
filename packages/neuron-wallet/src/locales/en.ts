@@ -165,6 +165,9 @@ export default {
         buttons: {
           ok: 'OK'
         }
+      },
+      'hard-fork-migrate': {
+        message: 'migrate to new database',
       }
     },
     prompt: {

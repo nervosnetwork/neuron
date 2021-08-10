@@ -89,9 +89,14 @@ export const startCkbNode = async () => {
 }
 
 export const stopCkbNode = () => {
-  if (ckb) {
-    logger.info('CKB:\tkilling node')
-    ckb.kill()
-    ckb = null
-  }
+  return new Promise<void>(resolve => {
+    if (ckb) {
+      logger.info('CKB:\tkilling node')
+      ckb.once('close', () => resolve())
+      ckb.kill()
+      ckb = null
+    } else {
+      resolve()
+    }
+  })
 }

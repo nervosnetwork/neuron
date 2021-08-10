@@ -11,6 +11,7 @@ import { register as registerListeners } from 'listeners/main'
 import WalletsService from 'services/wallets'
 import ApiController from 'controllers/api'
 import NodeController from 'controllers/node'
+import MerucuryController from 'controllers/mercury'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import MercuryService from 'services/mercury'
@@ -21,18 +22,19 @@ export default class AppController {
   public mainWindow: BrowserWindow | null = null
   private syncApiController: SyncApiController | undefined
   private apiController = new ApiController()
+  private mercuryController = new MerucuryController()
 
   constructor() {
-    subscribe(this)
+    subscribe(this);
   }
 
   public start = async () => {
     registerListeners()
-
     await this.apiController.mount()
     this.syncApiController = SyncApiController.getInstance()
     this.syncApiController.mount()
-    this.openWindow()
+    await this.openWindow()
+    await this.mercuryController.migrate()
   }
 
   public end = () => {
@@ -67,7 +69,7 @@ export default class AppController {
       return
     }
 
-    this.createWindow()
+    return this.createWindow()
   }
 
   public restoreWindow = () => {
@@ -136,6 +138,10 @@ export default class AppController {
 
     this.mainWindow.loadURL(env.mainURL)
     this.updateMenu()
+
+    return new Promise<void>(resolve => {
+      this.mainWindow?.on('show', () => resolve())
+    })
   }
 
   private clearOnClosed = () => {
