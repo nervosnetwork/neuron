@@ -110,7 +110,7 @@ export default class Queue {
   }
 
   public waitForDrained = async () => {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       if (!this.checkAndSaveQueue?.idle()) {
         return resolve()
       }

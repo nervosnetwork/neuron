@@ -98,9 +98,7 @@ const mockGetTransactionHashes = (mocks: any[] = []) => {
     const {hashes} = mocks.find(mock => mock.lock === lock) || {hashes: []}
     stubbedConstructor
       .calledWith(expect.anything(), {lock}).mockReturnValue({
-        getTransactionHashes: jest.fn().mockReturnValue({
-          toArray: () => hashes
-        }),
+        getTransactionHashes: jest.fn().mockReturnValue(hashes),
       })
   }
 }

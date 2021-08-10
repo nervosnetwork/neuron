@@ -34,7 +34,9 @@ export default class AppController {
     this.syncApiController = SyncApiController.getInstance()
     this.syncApiController.mount()
     await this.openWindow()
-    await this.mercuryController.migrate()
+    if (!env.isTestMode) {
+      await this.mercuryController.migrate()
+    }
   }
 
   public end = () => {
