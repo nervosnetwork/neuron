@@ -27,7 +27,8 @@ const { app } = env
 export default class MercuryService {
   private mercury: ChildProcess | null = null
   private static instance: MercuryService
-  public static LISTEN_URI = 'http://localhost:8116'
+  public static PORT = '8118'
+  public static LISTEN_URI = `http://localhost:${MercuryService.PORT}`
 
   public static getInstance = () => {
     if (!MercuryService.instance) {
@@ -84,6 +85,7 @@ export default class MercuryService {
     config.ckb_uri = network.remote
     config.network_type = network.chain
     config.log_path = path.resolve(dataPath, 'mercury.log')
+    config.listen_uri = `0.0.0.0:${MercuryService.PORT}`
     fs.writeFileSync(configPath, TOML.stringify(config))
     return configPath
   }

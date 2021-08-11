@@ -163,7 +163,7 @@ export default {
         }
       },
       'hard-fork-migrate': {
-        message: 'migrate to new database',
+        message: '为适配最新版本的 CKB 节点，Neuron 将会重新同步链上数据，整个同步可能时间较长',
       }
     },
     prompt: {

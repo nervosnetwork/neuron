@@ -80,6 +80,7 @@ export class Indexer implements LumosIndexer {
   }
 
   getCkbRpc(): RPC {
+    // lumos rpc returns lumos-style data structures
     return new RPC(this.ckbRpcUrl);
   }
 

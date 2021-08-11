@@ -167,7 +167,7 @@ export default {
         }
       },
       'hard-fork-migrate': {
-        message: 'migrate to new database',
+        message: 'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.',
       }
     },
     prompt: {
