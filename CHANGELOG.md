@@ -1,4 +1,4 @@
-# 0.36.0-rc1 (2021-07-16)
+# 0.36.0-rc1 (2021-08-10)
 
 This is a release candidate to preview the changes in the next official release and may not be stable. Welcome any questions or suggestions.
 
@@ -11,6 +11,14 @@ This is a release candidate to preview the changes in the next official release 
 
 * Upgrade the bundled CKB node to v0.35.2.
 * Add hint for `Token ID` field when creating a new sUDT account.
+
+# 0.35.1 (2021-08-10)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hot fix
+
+* Disable timelock for hardware wallet transfer.
 
 # 0.35.0 (2021-01-12)
 
