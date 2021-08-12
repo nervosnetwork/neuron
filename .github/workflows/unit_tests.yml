@@ -35,7 +35,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+          key: 2021-8-11-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
       - name: Install Lerna
         run: yarn global add lerna
