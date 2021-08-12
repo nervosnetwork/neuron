@@ -14,7 +14,9 @@ export default class MerucuryController {
   async migrate() {
     const ckbPath = ckbDataPath()
     const lumosIndexerDBFolder = './indexer_data'
-    const lumosDataPath = path.resolve(app.getPath('userData'), lumosIndexerDBFolder)
+    const lumosDataPath = app.isPackaged ?
+      path.resolve(app.getPath('userData'), lumosIndexerDBFolder) :
+      path.resolve(app.getPath('userData'), './dev', lumosIndexerDBFolder)
     // User has old synchronized data
     if (fs.existsSync(ckbPath) && fs.existsSync(lumosDataPath)) {
       const node = new NodeController()
