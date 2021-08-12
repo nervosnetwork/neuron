@@ -58,20 +58,25 @@ export default class MercuryService {
   }
 
   getDataPath = (network: Network): string => {
-    return path.resolve(app.getPath('userData'), './mercury', `./${network.chain}`, `./${network.id}`)
+    return app.isPackaged ?
+      path.resolve(app.getPath('userData'), './mercury', './data', `./${network.genesisHash}`) :
+      path.resolve(app.getPath('userData'), './dev', './mercury', './data', `./${network.genesisHash}`)
   }
 
   getConfigPath = (network: Network): string => {
-    const dataPath = this.getDataPath(network)
-    return path.resolve(dataPath, './config.toml')
+    return app.isPackaged ?
+      path.resolve(app.getPath('userData'), './mercury', './config', `./${network.id}`) :
+      path.resolve(app.getPath('userData'), './dev', './mercury', './config', `./${network.id}`)
   }
 
   createConfig = (network: Network) => {
     const dataPath = this.getDataPath(network)
-    const configPath = path.resolve(dataPath, './config.toml')
-    if (fs.existsSync(configPath)) {
-      return configPath
+    const configPath = this.getConfigPath(network)
+    const configFile = path.resolve(configPath, 'config.toml')
+    if (fs.existsSync(configFile)) {
+      return configFile
     }
+    MercuryService.createFolder(configPath)
     const defaultTomlPath = MercuryService.getDefaultConfig(network.chain === 'ckb')
     const storePath = path.resolve(dataPath, './db')
     // mercury throws if folder is not exist
@@ -86,8 +91,8 @@ export default class MercuryService {
     config.network_type = network.chain
     config.log_path = path.resolve(dataPath, 'mercury.log')
     config.listen_uri = `0.0.0.0:${MercuryService.PORT}`
-    fs.writeFileSync(configPath, TOML.stringify(config))
-    return configPath
+    fs.writeFileSync(configFile, TOML.stringify(config))
+    return configFile
   }
 
   async stop() {
