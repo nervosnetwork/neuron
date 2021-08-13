@@ -3,15 +3,20 @@ name: Package Neuron
 on:
   push:
     branches:
+      - master
+      - "rc/**"
       - "hotfix/**"
 
   pull_request:
     branches:
       - master
       - "rc/**"
+    types:
+      - closed
 
 jobs:
   default:
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     strategy:
       matrix:
         node:
