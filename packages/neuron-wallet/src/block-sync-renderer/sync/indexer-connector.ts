@@ -10,7 +10,8 @@ import { Address } from "models/address"
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
-import MercuryService from 'services/mercury'
+// import MercuryService from 'services/mercury'
+import IndexerService from 'services/indexer'
 
 export interface LumosCellQuery {
   lock: {codeHash: string, hashType: HashType, args: string} | null,
@@ -61,7 +62,7 @@ export default class IndexerConnector {
     addresses: Address[],
     nodeUrl: string,
   ) {
-    this.indexer = new Indexer(nodeUrl, MercuryService.LISTEN_URI)
+    this.indexer = new Indexer(nodeUrl, IndexerService.LISTEN_URI)
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses

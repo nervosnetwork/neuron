@@ -14,7 +14,8 @@ import NodeController from 'controllers/node'
 import MerucuryController from 'controllers/mercury'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
-import MercuryService from 'services/mercury'
+// import MercuryService from 'services/mercury'
+import IndexerService from 'services/indexer'
 
 const app = electronApp || (remote && remote.app)
 
@@ -42,7 +43,7 @@ export default class AppController {
   public end = () => {
     if (!env.isTestMode) {
       new NodeController().stopNode()
-      MercuryService.getInstance().stop()
+      IndexerService.getInstance().stop()
     }
   }
 

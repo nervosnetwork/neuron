@@ -19,7 +19,8 @@ import type { SyncTask } from './task'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { queue } from 'async'
-import MercuryService from 'services/mercury'
+// import MercuryService from 'services/mercury'
+import IndexerService from 'services/indexer'
 
 let syncTask: SyncTask | null
 let network: Network | null
@@ -69,7 +70,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
 }
 
 export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
-  const mercury = MercuryService.getInstance()
+  const mercury = IndexerService.getInstance()
   if (clearIndexerFolder) {
     await new SyncedBlockNumber().setNextBlock(BigInt(0))
     IndexerFolderManager.resetIndexerData()
@@ -138,7 +139,7 @@ export const killBlockSyncTask = async () => {
     logger.info('Sync:\tkill background process')
     await syncTask.unmount()
     await terminate(syncTask)
-    const mercury = MercuryService.getInstance()
+    const mercury = IndexerService.getInstance()
     await mercury.stop()
     syncTask = null
   }
