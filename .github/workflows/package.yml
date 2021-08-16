@@ -3,12 +3,9 @@ name: Package Neuron
 on:
   push:
     branches:
-      - "hotfix/**"
-
-  pull_request:
-    branches:
       - master
       - "rc/**"
+      - "hotfix/**"
 
 jobs:
   default:
