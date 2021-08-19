@@ -9,6 +9,7 @@ on:
 
 jobs:
   default:
+    if: false
     strategy:
       matrix:
         node:
