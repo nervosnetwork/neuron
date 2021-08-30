@@ -8,7 +8,7 @@ on:
 jobs:
   merge-to-dev:
     name: Merge into develop
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - name: Request
