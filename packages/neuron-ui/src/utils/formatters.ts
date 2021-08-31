@@ -295,6 +295,30 @@ export const nftFormatter = (hex?: string, idOnly = false) => {
   return `#${id} mNFT`
 }
 
+export const nftClassFormatter = (hex?: string) => {
+  if (hex == null) {
+    return 'nNFT-Class'
+  }
+  const data = hex.slice(2)
+  const version = parseInt(data.slice(0, 1), 16)
+  const total = parseInt(data.slice(1, 10), 16)
+  const issued = parseInt(data.slice(10, 18), 16)
+  const configure = parseInt(data.slice(18, 20), 16)
+  const nameSize = parseInt(data.slice(20, 24), 16)
+  const nameEnd = 24 + (nameSize * 2)
+  const name = decodeURIComponent(data.slice(24, nameEnd).replace(/[0-9a-f]{2}/g, '%$&'))
+  const descriptionSizeEnd = nameEnd + 4
+  const descriptionSize = parseInt(data.slice(nameEnd, descriptionSizeEnd), 16)
+  const descriptionEnd = descriptionSizeEnd + (descriptionSize * 2)
+  const description = decodeURIComponent(data.slice(descriptionSizeEnd, descriptionEnd).replace(/[0-9a-f]{2}/g, '%$&'))
+  const rendererSizeEnd = descriptionEnd + 4
+  const rendererSize = parseInt(data.slice(descriptionEnd, rendererSizeEnd), 16)
+  const rendererEnd = rendererSizeEnd + (rendererSize * 2)
+  const renderer = decodeURIComponent(data.slice(rendererSizeEnd, rendererEnd).replace(/[0-9a-f]{2}/g, '%$&'))
+
+  return { name: name, description: description, renderer: renderer, version: version, configure: configure, issued: issued, total: total }
+}
+
 export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {
   // empty string should return unknown error too
   const unknownError = t('messages.unknown-error')
