@@ -1,6 +1,7 @@
 import env from 'env'
 import path from 'path'
 import fs from 'fs'
+import net from 'net'
 import { ChildProcess, spawn } from 'child_process'
 import process from 'process'
 import logger from 'utils/logger'
@@ -76,11 +77,12 @@ export default class IndexerService {
   start = async () => {
     const network = NetworksService.getInstance().getCurrent()
     await this.stop()
-    logger.info('Indexer:\tstart...')
     const dataPath = this.getDataPath(network)
     MercuryService.createFolder(dataPath)
+    await IndexerService.ensurePortUsable()
 
     this.indexer = spawn(IndexerService.getBinary(), ['-c', network.remote, '-s', dataPath, '-l', `127.0.0.1:${IndexerService.PORT}`])
+    logger.info(`Indexer:\tstart: PORT: ${IndexerService.PORT}...`)
     this.indexer.stderr && this.indexer.stderr.on('data', data => {
       logger.error('Indexer:\trun fail:', data.toString())
       this.indexer = null
@@ -91,7 +93,7 @@ export default class IndexerService {
       this.indexer = null
     })
 
-    this.indexer.on('close', () => {
+    this.indexer.on('close', async () => {
       logger.info('Indexer:\tprocess closed')
       this.indexer = null
     })
@@ -108,5 +110,44 @@ export default class IndexerService {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
+  }
+
+  static isPortReachable = async (port: number) => {
+    const timeout = 1e3
+    const host = '127.0.0.1'
+    const promise = new Promise<void>((resolve, reject) => {
+      const socket = new net.Socket()
+
+      const onError = () => {
+        socket.destroy()
+        reject()
+      }
+
+      socket.setTimeout(timeout)
+      socket.once('error', onError)
+      socket.once('timeout', onError)
+
+      socket.connect(port, host, () => {
+        socket.end()
+        resolve()
+      })
+    })
+
+    try {
+      await promise
+      return true
+    } catch (_) {
+      return false
+    }
+  }
+
+  static ensurePortUsable = async () => {
+    const port = Number(IndexerService.PORT)
+    const isPortReachable = await IndexerService.isPortReachable(port)
+    if (!isPortReachable) {
+      return
+    }
+    IndexerService.PORT = (port + 1).toString()
+    await IndexerService.ensurePortUsable()
   }
 }
