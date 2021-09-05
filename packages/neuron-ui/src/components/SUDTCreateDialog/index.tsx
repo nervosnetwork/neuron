@@ -162,6 +162,7 @@ const SUDTCreateDialog = ({
         dispatch({ type, payload })
       }
     },
+    /* eslint-disable */
     [dispatch, tokenInfoList]
   )
 

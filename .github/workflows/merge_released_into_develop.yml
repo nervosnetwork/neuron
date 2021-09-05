@@ -8,7 +8,7 @@ on:
 jobs:
   merge-to-dev:
     name: Merge into develop
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - name: Request
@@ -17,6 +17,6 @@ jobs:
           source_branch: 'master'
           destination_branch: 'develop'
           pr_title: 'Merge released ${{ github.ref }} into develop'
-          pr_reviewer: 'keith-cy,katat,yuche,kellyshang'
+          pr_reviewer: 'keith-cy,yuche,kellyshang'
           pr_label: 'auto-pr'
           github_token: ${{ secrets.GITHUB_TOKEN }}

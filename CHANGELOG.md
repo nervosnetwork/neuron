@@ -1,11 +1,41 @@
-# 0.35.1 (2021-02-25)
+# 0.36.0-rc2 (2021-08-23)
+
+This is a release candidate to preview the changes in the next official release and may not be stable. Welcome any questions or suggestions.
 
 [CKB v0.35.2](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.2) was released on Feb. 23rd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
 
-### Hot fixes
+### New feature
+* Support sending and receiving NFT in the `Customized Assets`.
+
+### Bug fixes
 
 * Upgrade the bundled CKB node to v0.35.2.
 * Add hint for `Token ID` field when creating a new sUDT account.
+
+
+# 0.36.0-rc1 (2021-08-13)
+
+⚠️ **Yanked because of CI exception** ⚠️
+
+This is a release candidate to preview the changes in the next official release and may not be stable. Welcome any questions or suggestions.
+
+[CKB v0.35.2](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.2) was released on Feb. 23rd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New feature
+* Support sending and receiving NFT in the `Customized Assets`.
+
+### Bug fixes
+
+* Upgrade the bundled CKB node to v0.35.2.
+* Add hint for `Token ID` field when creating a new sUDT account.
+
+# 0.35.1 (2021-08-10)
+
+[CKB v0.35.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.1) was released on Sept. 14th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Hot fix
+
+* Disable timelock for hardware wallet transfer.
 
 # 0.35.0 (2021-01-12)
 
