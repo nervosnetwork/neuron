@@ -29,7 +29,9 @@ export default class IndexerService {
   private indexer: ChildProcess | null = null
   private static instance: IndexerService
   public static PORT = '8118'
-  public static LISTEN_URI = `http://localhost:${IndexerService.PORT}`
+  public static get LISTEN_URI() {
+    return `http://localhost:${IndexerService.PORT}`
+  }
 
   public static getInstance = () => {
     if (!IndexerService.instance) {

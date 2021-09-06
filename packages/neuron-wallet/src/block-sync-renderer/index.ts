@@ -129,7 +129,8 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
     syncTask!.start(
       network.remote,
       network.genesisHash,
-      await AddressService.getAddressesByAllWallets()
+      await AddressService.getAddressesByAllWallets(),
+      IndexerService.LISTEN_URI
     )
   }
 }

@@ -21,6 +21,7 @@ import { ChildProcess } from 'utils/worker'
 export default class Queue {
   private lockHashes: string[]
   private url: string
+  private indexerUrl: string
   private addresses: AddressInterface[]
   private rpcService: RpcService
   private indexerConnector: IndexerConnector | undefined
@@ -30,8 +31,9 @@ export default class Queue {
   private anyoneCanPayLockHashes: string[]
   private assetAccountInfo: AssetAccountInfo
 
-  constructor(url: string, addresses: AddressInterface[]) {
+  constructor(url: string, addresses: AddressInterface[], indexerUrl: string) {
     this.url = url
+    this.indexerUrl = indexerUrl
     this.addresses = addresses
     this.rpcService = new RpcService(url)
     this.assetAccountInfo = new AssetAccountInfo()
@@ -52,7 +54,8 @@ export default class Queue {
     try {
       this.indexerConnector = new IndexerConnector(
         this.addresses,
-        this.url
+        this.url,
+        this.indexerUrl,
       )
       await this.indexerConnector.connect()
     } catch (error) {
