@@ -37,6 +37,11 @@ jobs:
             */*/node_modules
           key: 2021-8-11-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
+      - name: Install libudev
+        if: matrix.os == 'ubuntu-18.04'
+        run: |
+          sudo apt-get install -y libudev-dev
+
       - name: Install Lerna
         run: yarn global add lerna
 

@@ -47,6 +47,11 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
+      - name: Install libudev
+        if: matrix.os == 'ubuntu-18.04'
+        run: |
+          sudo apt-get install -y libudev-dev
+
       - name: Install Lerna
         run: yarn global add lerna
 
