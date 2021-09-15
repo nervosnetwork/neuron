@@ -224,6 +224,16 @@ describe('block sync render', () => {
         }
       })
 
+      jest.doMock('services/indexer', () => {
+        return {
+          getInstance : () => ({
+            clearData: jest.fn(),
+            start: jest.fn(),
+            stop: jest.fn(),
+          })
+        }
+      })
+
       stubbedGetCurrentNetwork.mockReturnValue(network)
 
       queryIndexer = require('../../src/block-sync-renderer').queryIndexer

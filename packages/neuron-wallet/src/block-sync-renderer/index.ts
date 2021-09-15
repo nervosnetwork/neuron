@@ -19,7 +19,6 @@ import type { SyncTask } from './task'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { queue } from 'async'
-// import MercuryService from 'services/mercury'
 import IndexerService from 'services/indexer'
 
 let syncTask: SyncTask | null

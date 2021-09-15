@@ -182,10 +182,9 @@ describe('queue', () => {
         await queue.start()
       });
       it('inits IndexerConnector', () => {
-        expect(stubbedIndexerConnectorConstructor).toHaveBeenCalledWith(
-          addresses,
-          fakeNodeUrl
-        )
+        const [call] = stubbedIndexerConnectorConstructor.mock.calls
+        expect(call[0]).toEqual(addresses)
+        expect(call[1]).toEqual(fakeNodeUrl)
       });
       it('connects indexer', () => {
         expect(stubbedConnectFn).toHaveBeenCalled()

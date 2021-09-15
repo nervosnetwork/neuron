@@ -8,7 +8,6 @@ import logger from 'utils/logger'
 import { Network } from 'models/network'
 import { deleteFolderRecursive } from 'block-sync-renderer/sync/indexer-folder-manager'
 import NetworksService from './networks'
-import MercuryService from './mercury'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -80,7 +79,7 @@ export default class IndexerService {
     const network = NetworksService.getInstance().getCurrent()
     await this.stop()
     const dataPath = this.getDataPath(network)
-    MercuryService.createFolder(dataPath)
+    IndexerService.createFolder(dataPath)
     await IndexerService.ensurePortUsable()
 
     this.indexer = spawn(IndexerService.getBinary(), ['-c', network.remote, '-s', dataPath, '-l', `127.0.0.1:${IndexerService.PORT}`])
