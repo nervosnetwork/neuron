@@ -108,6 +108,8 @@ export enum ErrorCode {
   UnsupportedManufacturer = 407,
   // offline
   DeviceInSleep = 501,
+  // active warning
+  WaitForFullySynced = 600,
 }
 
 export enum SyncStatus {
