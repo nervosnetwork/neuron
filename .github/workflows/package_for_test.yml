@@ -1,14 +1,10 @@
-name: Package Neuron for Release Draft
+name: Package Neuron for Test
 
 on:
-  push:
-    branches:
-      - master
-      - "rc/**"
-      - "hotfix/**"
+  - push
 
 jobs:
-  default:
+  packaging:
     strategy:
       matrix:
         node:
@@ -64,7 +60,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           ./scripts/download-ckb.sh mac
-          yarn release mac
+          yarn package:test mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
@@ -76,17 +72,17 @@ jobs:
           bash ./scripts/download-ckb.sh win
           yarn build
           bash ./scripts/copy-ui-files.sh
-          bash ./scripts/release.sh win
+          bash ./scripts/package_for_test.sh win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
 
       - name: Package for Linux
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-18.04'
         run: |
           ./scripts/download-ckb.sh
-          yarn release linux
+          yarn package:test linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -112,8 +108,18 @@ jobs:
           path: release/Neuron-*-setup.exe
 
       - name: Upload Neuron Linux
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-18.04'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
+
+  comment:
+    needs: [packaging]
+    name: Append links to the commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peter-evans/commit-comment@v1
+        with:
+          body: |
+            Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
