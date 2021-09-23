@@ -522,7 +522,8 @@
         "309": "The receiver needs to upgrade her account address to accept more transfer.",
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No device detected. Please connect your device.",
-        "404": "Multiple device detected. Only one device of the same model can be connected."
+        "404": "Multiple device detected. Only one device of the same model can be connected.",
+        "600": "Please make sure the sync has finalized before you do any operation."
       }
     },
     "sync": {

@@ -1,6 +1,14 @@
-import { CapacityUnit, CONSTANTS } from 'utils'
+import { CapacityUnit, CONSTANTS, ErrorCode } from 'utils'
 
 const { INIT_SEND_PRICE } = CONSTANTS
+
+const initNotifications: Array<State.Message> = [
+  {
+    type: 'warning',
+    timestamp: Date.now(),
+    code: ErrorCode.WaitForFullySynced,
+  },
+]
 
 export const appState: Readonly<State.App> = {
   tipBlockNumber: '',
@@ -36,14 +44,14 @@ export const appState: Readonly<State.App> = {
   },
   popups: [],
   globalDialog: null,
-  notifications: [],
+  notifications: initNotifications,
   alertDialog: null,
   loadings: {
     sending: false,
     addressList: false,
     transactionList: false,
   },
-  showTopAlert: false,
+  showTopAlert: !!initNotifications.length,
   showAllNotifications: false,
   isAllowedToFetchList: true,
   loadedTransaction: null,
