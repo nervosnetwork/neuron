@@ -1,3 +1,14 @@
+# 0.100.0 (2021-09-24)
+
+[CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**Please note that in order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.**
+
+### New feature
+* Upgrade ckb version to v0.100.0 and replace lumos with ckb indexer.
+* Add more notifications about synchronization.
+
+
 # 0.36.0 (2021-08-30)
 
 [CKB v0.35.2](https://github.com/nervosnetwork/ckb/releases/tag/v0.35.2) was released on Feb. 23rd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
