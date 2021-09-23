@@ -35,8 +35,9 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.7.4",
-    "@ckb-lumos/indexer": "0.7.4",
+    "@ckb-lumos/base": "0.16.0",
+    "@ckb-lumos/rpc": "0.16.0",
+    "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
     "@nervosnetwork/ckb-sdk-core": "0.32.0",
     "@nervosnetwork/ckb-sdk-utils": "0.32.0",
@@ -67,6 +68,7 @@
     "@types/async": "3.2.3",
     "@types/electron-devtools-installer": "2.2.0",
     "@types/elliptic": "6.4.9",
+    "@types/iarna__toml": "2.0.2",
     "@types/jest-when": "2.7.1",
     "@types/ledgerhq__hw-transport": "4.21.2",
     "@types/ledgerhq__hw-transport-node-hid": "4.22.1",

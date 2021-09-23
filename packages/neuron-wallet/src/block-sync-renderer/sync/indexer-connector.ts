@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
-import { QueryOptions, HashType } from '@ckb-lumos/base'
-import { Indexer, CellCollector, Tip } from '@ckb-lumos/indexer'
+import { QueryOptions, HashType, Tip } from '@ckb-lumos/base'
+import { Indexer, CellCollector } from 'block-sync-renderer/mercury/indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -10,7 +10,6 @@ import { Address } from "models/address"
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
-import IndexerFolderManager from './indexer-folder-manager'
 
 export interface LumosCellQuery {
   lock: {codeHash: string, hashType: HashType, args: string} | null,
@@ -60,9 +59,9 @@ export default class IndexerConnector {
   constructor(
     addresses: Address[],
     nodeUrl: string,
-    indexerFolderPath: string = IndexerFolderManager.IndexerDataFolderPath
+    indexerUrl: string
   ) {
-    this.indexer = new Indexer(nodeUrl, indexerFolderPath)
+    this.indexer = new Indexer(nodeUrl, indexerUrl)
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses

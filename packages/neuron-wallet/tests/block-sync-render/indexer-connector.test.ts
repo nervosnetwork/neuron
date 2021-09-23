@@ -1,11 +1,11 @@
 import { when } from 'jest-when'
-import path from 'path'
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix, AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
 import { flushPromises } from '../test-utils'
+import MercuryService from '../../src/services/mercury'
 
 const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
@@ -29,7 +29,6 @@ const connectIndexer = async (indexerConnector: IndexerConnector) => {
 
 describe('unit tests for IndexerConnector', () => {
   const nodeUrl = 'http://nodeurl:8114'
-  const indexerFolderPath = path.join('indexer', 'data', 'path')
   let stubbedIndexerConnector: any
 
   let stubbedIndexerConstructor: any
@@ -55,7 +54,7 @@ describe('unit tests for IndexerConnector', () => {
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
-  jest.doMock('@ckb-lumos/indexer', () => {
+  jest.doMock('block-sync-renderer/mercury/indexer', () => {
     return {
       Indexer : stubbedIndexerConstructor.mockImplementation(
         () => ({
@@ -103,28 +102,20 @@ describe('unit tests for IndexerConnector', () => {
   describe('#constructor', () => {
     describe('when init with indexer folder path', () => {
       beforeEach(() => {
-        new stubbedIndexerConnector([], nodeUrl, indexerFolderPath)
+        new stubbedIndexerConnector([], nodeUrl, MercuryService.LISTEN_URI)
       });
       it('inits lumos indexer with a node url and indexer folder path', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, path.join(indexerFolderPath))
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, MercuryService.LISTEN_URI)
       });
     });
     describe('when init without indexer folder path', () => {
       beforeEach(() => {
         new stubbedIndexerConnector([], nodeUrl)
       });
-      it('inits lumos indexer with a node url and a default indexer folder path', () => {
-        let expectPathRegex
-        if (process.platform === 'win32') {
-          expectPathRegex = expect.stringMatching(/test\\indexer_data/)
-        }
-        else {
-          expectPathRegex = expect.stringMatching(/test\/indexer_data/)
-        }
-
+      it('inits merucry indexer with a node url and a default port', () => {
         expect(stubbedIndexerConstructor).toHaveBeenCalledWith(
           nodeUrl,
-          expectPathRegex
+          MercuryService.LISTEN_URI
         )
       })
     });
@@ -588,13 +579,13 @@ describe('unit tests for IndexerConnector', () => {
           )
 
           const promises = Promise.all([
-            new Promise(resolve => {
+            new Promise<void>(resolve => {
               indexerConnector.getLiveCellsByScript(query1).then(cells => {
                 results.push(cells)
                 resolve()
               })
             }),
-            new Promise(resolve => {
+            new Promise<void>(resolve => {
               indexerConnector.getLiveCellsByScript(query2).then(cells => {
                 results.push(cells)
                 resolve()

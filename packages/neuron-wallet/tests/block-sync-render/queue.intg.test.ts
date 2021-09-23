@@ -200,7 +200,7 @@ describe('integration tests for sync pipeline', () => {
       })
     )
 
-    jest.doMock('@ckb-lumos/indexer', () => {
+    jest.doMock('block-sync-renderer/mercury/indexer', () => {
       return {
         Indexer : stubbedIndexerConstructor,
         TransactionCollector : stubbedTransactionCollectorConstructor,
@@ -248,12 +248,9 @@ describe('integration tests for sync pipeline', () => {
       }
 
       stubbedGetTransactionsByLockScriptFn
-        .mockReturnValue({
-          toArray: () => []
-        })
+        .mockReturnValue([])
 
       stubbedTipFn.mockResolvedValue({block_number: '1'})
-
       queue.start()
       await flushPromises()
       await queue.waitForDrained()
@@ -262,6 +259,8 @@ describe('integration tests for sync pipeline', () => {
       const txs = await getConnection()
         .getRepository(TransactionEntity)
         .find()
+
+      console.log(txs)
       expect(txs).toHaveLength(fakeTxs.length)
       for (const fakeTx of fakeTxs) {
         expect(txs.filter(tx => tx.hash === fakeTx.transaction.hash)).toHaveLength(1)
@@ -327,9 +326,7 @@ describe('integration tests for sync pipeline', () => {
   describe('when there are new tx hashes found in a poll', () => {
     beforeEach(async () => {
       stubbedGetTransactionsByLockScriptFn
-        .mockReturnValue({
-          toArray: () => fakeTxs.map(tx => tx.transaction.hash)
-        })
+        .mockReturnValue(fakeTxs.map(tx => tx.transaction.hash))
 
       queue.start()
       await flushPromises()
