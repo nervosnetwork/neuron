@@ -3,7 +3,7 @@
 CKB_VERSION=$(cat .ckb-version)
 ROOT_DIR=$(pwd) # Be sure to run this from root directory!
 MERCURY_VERSION="v0.1.0-rc.3"
-CKB_INDEXER_VERSION="0.3.0-rc1"
+CKB_INDEXER_VERSION="0.3.0"
 
 function download_ckb_indexer_macos() {
   FILENAME="ckb-indexer-${CKB_INDEXER_VERSION}-macos"
