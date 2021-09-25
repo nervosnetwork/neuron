@@ -40,7 +40,7 @@ export const ckbDataPath = (): string => {
 
 const initCkb = async () => {
   logger.info('CKB:\tInitializing node...')
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     if (fs.existsSync(path.join(ckbDataPath(), 'ckb.toml'))) {
       logger.log('CKB:\tinit: config file detected, skip ckb init.')
       return resolve()
@@ -89,9 +89,14 @@ export const startCkbNode = async () => {
 }
 
 export const stopCkbNode = () => {
-  if (ckb) {
-    logger.info('CKB:\tkilling node')
-    ckb.kill()
-    ckb = null
-  }
+  return new Promise<void>(resolve => {
+    if (ckb) {
+      logger.info('CKB:\tkilling node')
+      ckb.once('close', () => resolve())
+      ckb.kill()
+      ckb = null
+    } else {
+      resolve()
+    }
+  })
 }

@@ -19,7 +19,7 @@ const syncTask = {
     syncQueue?.stop()
     syncQueue = null
   },
-  async start(url: string, genesisHash: string, addressesMetas: AddressInterface[]) {
+  async start(url: string, genesisHash: string, addressesMetas: AddressInterface[], indexerUrl: string) {
     if (syncQueue) {
       await syncQueue.stopAndWait()
     }
@@ -29,7 +29,7 @@ const syncTask = {
     await initConnection(genesisHash)
 
     logger.info("Sync:\tstart block sync queue")
-    syncQueue = new Queue(url, addressesMetas)
+    syncQueue = new Queue(url, addressesMetas, indexerUrl)
     syncQueue.start()
   },
   async queryIndexer (query: LumosCellQuery) {

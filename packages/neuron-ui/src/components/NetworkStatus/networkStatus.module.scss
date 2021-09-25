@@ -18,11 +18,11 @@ $hover-bg-color: #3cc68a4d;
     margin-top: 3px;
   }
 
-  &:hover {
+  /* keep the tooltip popped to make it more obvious */
+  & {
     .tooltip {
       display: flex;
       opacity: 1;
-      bottom: calc(100% + 18px);
     }
   }
   span[class^='label'] {
@@ -43,7 +43,7 @@ $hover-bg-color: #3cc68a4d;
   background-color: #fff;
   color: #000;
   min-width: 176px;
-  padding: 8px 10px;
+  padding: 5px 10px;
   border-radius: 1px;
   box-sizing: border-box;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.22);
@@ -51,7 +51,7 @@ $hover-bg-color: #3cc68a4d;
   opacity: 0;
   pointer-events: none;
   font-size: 0.75rem;
-  line-height: 1.5em;
+  line-height: 1.25em;
   white-space: nowrap;
 
   .tooltipTitle {

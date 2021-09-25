@@ -3,8 +3,8 @@ import { queue } from 'async'
 import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
-import { CellCollector, Indexer, TransactionCollector } from '@ckb-lumos/indexer'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
+import { Indexer, TransactionCollector, CellCollector } from 'block-sync-renderer/mercury/indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
@@ -100,8 +100,10 @@ export default class IndexerCacheService {
             args: lockScript.args
           }
         })
+
+        const fetchedTxHashes = await transactionCollector.getTransactionHashes()
+
         //@ts-ignore
-        const fetchedTxHashes = transactionCollector.getTransactionHashes().toArray()
         if (!fetchedTxHashes.length) {
           continue
         }
@@ -186,7 +188,7 @@ export default class IndexerCacheService {
 
     fetchBlockDetailsQueue.push(newTxHashes)
 
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       fetchBlockDetailsQueue.error(reject)
       fetchBlockDetailsQueue.drain(resolve)
     })

@@ -109,6 +109,9 @@ export const NoticeContent = () => {
             root: {
               flexDirection: 'row',
             },
+            text: {
+              alignItems: 'center',
+            },
             actions: {
               margin: 0,
               marginRight: '12px',

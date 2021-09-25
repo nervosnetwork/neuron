@@ -19,6 +19,7 @@ import type { SyncTask } from './task'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { queue } from 'async'
+import IndexerService from 'services/indexer'
 
 let syncTask: SyncTask | null
 let network: Network | null
@@ -68,10 +69,14 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
 }
 
 export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
+  const mercury = IndexerService.getInstance()
   if (clearIndexerFolder) {
     await new SyncedBlockNumber().setNextBlock(BigInt(0))
     IndexerFolderManager.resetIndexerData()
+    await mercury.clearData()
   }
+
+  await mercury.start()
 
   logger.info('Sync:\tstarting background process')
 
@@ -82,6 +87,7 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
     },
     stdio: ['ipc', process.stdout, 'pipe']
   })
+
   childProcess.stderr!.setEncoding('utf8').on('data', data => {
     logger.error('Sync:ChildProcess:', data)
   })
@@ -108,6 +114,7 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
     }
   })
 
+
   if (!network) {
     network = NetworksService.getInstance().getCurrent()
   }
@@ -121,7 +128,8 @@ export const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
     syncTask!.start(
       network.remote,
       network.genesisHash,
-      await AddressService.getAddressesByAllWallets()
+      await AddressService.getAddressesByAllWallets(),
+      IndexerService.LISTEN_URI
     )
   }
 }
@@ -131,6 +139,8 @@ export const killBlockSyncTask = async () => {
     logger.info('Sync:\tkill background process')
     await syncTask.unmount()
     await terminate(syncTask)
+    const mercury = IndexerService.getInstance()
+    await mercury.stop()
     syncTask = null
   }
 }

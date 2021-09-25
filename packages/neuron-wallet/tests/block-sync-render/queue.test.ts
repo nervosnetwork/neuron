@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs'
-import { Tip } from '@ckb-lumos/indexer'
+import { Tip } from '@ckb-lumos/base'
 import { AddressType } from '../../src/models/keys/address'
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
@@ -182,10 +182,9 @@ describe('queue', () => {
         await queue.start()
       });
       it('inits IndexerConnector', () => {
-        expect(stubbedIndexerConnectorConstructor).toHaveBeenCalledWith(
-          addresses,
-          fakeNodeUrl
-        )
+        const [call] = stubbedIndexerConnectorConstructor.mock.calls
+        expect(call[0]).toEqual(addresses)
+        expect(call[1]).toEqual(fakeNodeUrl)
       });
       it('connects indexer', () => {
         expect(stubbedConnectFn).toHaveBeenCalled()

@@ -16,7 +16,7 @@ jobs:
           - 12
         os:
           - macos-latest
-          - ubuntu-18.04
+          - ubuntu-20.04
           - windows-2019
 
     runs-on: ${{ matrix.os }}
@@ -46,6 +46,11 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+
+      - name: Install libudev
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          sudo apt-get install -y libudev-dev
 
       - name: Install Lerna
         run: yarn global add lerna
@@ -86,7 +91,7 @@ jobs:
           # CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
 
       - name: Package for Linux
-        if: matrix.os == 'ubuntu-18.04'
+        if: matrix.os == 'ubuntu-20.04'
         run: |
           ./scripts/download-ckb.sh
           yarn release linux
@@ -115,7 +120,7 @@ jobs:
           path: release/Neuron-*-setup.exe
 
       - name: Upload Neuron Linux
-        if: matrix.os == 'ubuntu-18.04'
+        if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Linux
