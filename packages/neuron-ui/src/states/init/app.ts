@@ -2,7 +2,7 @@ import { CapacityUnit, CONSTANTS } from 'utils'
 
 const { INIT_SEND_PRICE } = CONSTANTS
 
-export const appState: Readonly<State.App> = {
+export const appState: State.App = {
   tipBlockNumber: '',
   tipBlockHash: '',
   tipBlockTimestamp: 0,
