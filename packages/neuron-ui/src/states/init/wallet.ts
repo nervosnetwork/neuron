@@ -1,6 +1,6 @@
 import { addresses, currentWallet } from 'services/localCache'
 
-export const emptyWallet: Readonly<State.Wallet> = {
+export const emptyWallet: State.Wallet = {
   name: '',
   id: '',
   balance: '0',
@@ -9,7 +9,7 @@ export const emptyWallet: Readonly<State.Wallet> = {
 
 const wallet = currentWallet.load()
 
-export const walletState: Readonly<State.Wallet> = {
+export const walletState: State.Wallet = {
   name: wallet.name || '',
   id: wallet.id || '',
   balance: '0',
