@@ -222,6 +222,15 @@ body {
   }
 }
 
+// hack fabric icon style
+.ms-MessageBar-icon {
+  i {
+    height: 20px;
+    display: flex;
+    align-items: center;
+  }
+}
+
 @keyframes rotate360 {
   from {
     transform: rotate(0);

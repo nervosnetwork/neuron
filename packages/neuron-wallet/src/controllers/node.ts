@@ -11,8 +11,8 @@ export default class NodeController {
     }
   }
 
-  public stopNode() {
-    stopCkbNode()
+  public async stopNode() {
+    await stopCkbNode()
 
     return {
       status: ResponseCode.Success,

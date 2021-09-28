@@ -21,7 +21,7 @@ export default class IndexerFolderManager {
   }
 }
 
-const deleteFolderRecursive = (pathToRemove: string) => {
+export const deleteFolderRecursive = (pathToRemove: string) => {
   if (fs.existsSync(pathToRemove)) {
     fs.readdirSync(pathToRemove).forEach(file => {
       const curPath = path.join(pathToRemove, file)
