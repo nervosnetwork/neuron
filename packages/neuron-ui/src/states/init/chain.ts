@@ -1,7 +1,7 @@
 import { currentNetworkID } from 'services/localCache'
 import { ConnectionStatus } from 'utils'
 
-export const transactionState: Readonly<State.DetailedTransaction> = {
+export const transactionState: State.DetailedTransaction = {
   value: '',
   hash: '',
   type: 'receive',

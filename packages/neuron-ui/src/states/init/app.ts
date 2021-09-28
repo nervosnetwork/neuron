@@ -10,7 +10,7 @@ const initNotifications: Array<State.Message> = [
   },
 ]
 
-export const appState: Readonly<State.App> = {
+export const appState: State.App = {
   tipBlockNumber: '',
   tipBlockHash: '',
   tipBlockTimestamp: 0,

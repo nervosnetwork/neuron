@@ -1,6 +1,6 @@
 import { wallets, networks } from 'services/localCache'
 
-export const settingsState: Readonly<State.Settings> = {
+export const settingsState: State.Settings = {
   general: {},
   networks: networks.load(),
   wallets: wallets.load(),
