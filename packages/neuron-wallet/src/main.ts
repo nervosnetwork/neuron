@@ -15,7 +15,7 @@ if (singleInstanceLock) {
   })
 
   app.on('before-quit', async () => {
-    appController.end()
+    await appController.end()
   })
 
   app.on('activate', appController.openWindow)

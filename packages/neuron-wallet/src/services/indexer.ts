@@ -27,6 +27,7 @@ const { app } = env
 export default class IndexerService {
   private indexer: ChildProcess | null = null
   private static instance: IndexerService
+  private static indexerDataFolder = './ckb_indexer_data'
   public static PORT = '8118'
   public static get LISTEN_URI() {
     return `http://localhost:${IndexerService.PORT}`
@@ -54,8 +55,8 @@ export default class IndexerService {
 
   getDataPath = (network: Network): string => {
     return app.isPackaged ?
-      path.resolve(app.getPath('userData'), './ckb-indexer', './data', `./${network.genesisHash}`) :
-      path.resolve(app.getPath('userData'), './dev', './ckb-indexer', './data', `./${network.genesisHash}`)
+      path.resolve(app.getPath('userData'), IndexerService.indexerDataFolder, './data', `./${network.genesisHash}`) :
+      path.resolve(app.getPath('userData'), './dev', IndexerService.indexerDataFolder, './data', `./${network.genesisHash}`)
   }
 
   async stop() {

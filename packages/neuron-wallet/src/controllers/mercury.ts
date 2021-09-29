@@ -5,8 +5,6 @@ import env from 'env'
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import { deleteFolderRecursive } from 'block-sync-renderer/sync/indexer-folder-manager'
-import NodeController from './node'
-import SyncController from './sync'
 
 const { app } = env
 
@@ -17,16 +15,19 @@ export default class MerucuryController {
     const lumosDataPath = app.isPackaged ?
       path.resolve(app.getPath('userData'), lumosIndexerDBFolder) :
       path.resolve(app.getPath('userData'), './dev', lumosIndexerDBFolder)
+    const ckbIndexerDBFolder = './ckb-indexer'
+    const ckbIndexerDataPath = app.isPackaged ?
+      path.resolve(app.getPath('userData'), ckbIndexerDBFolder) :
+      path.resolve(app.getPath('userData'), './dev', ckbIndexerDBFolder)
     // User has old synchronized data
     if (fs.existsSync(ckbPath) && fs.existsSync(lumosDataPath)) {
-      const node = new NodeController()
-      await node.stopNode()
-      await this.openMigrateDialog('hard-fork')
       deleteFolderRecursive(lumosDataPath)
       deleteFolderRecursive(ckbPath)
-      await node.startNode()
-      const syncController = new SyncController()
-      await syncController.clearCache(true)
+      await this.openMigrateDialog('hard-fork')
+    }
+    if (fs.existsSync(ckbIndexerDataPath)) {
+      deleteFolderRecursive(ckbIndexerDataPath)
+      await this.openMigrateDialog('hard-fork')
     }
     // TODO: mercury migration when mercury 1.0 is ready
   }
