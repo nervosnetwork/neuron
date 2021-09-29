@@ -1,4 +1,4 @@
-const appUpdaterState: Readonly<State.AppUpdater> = {
+const appUpdaterState: State.AppUpdater = {
   checking: false,
   downloadProgress: -1,
   version: '',

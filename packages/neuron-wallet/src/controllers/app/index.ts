@@ -30,19 +30,19 @@ export default class AppController {
 
   public start = async () => {
     registerListeners()
+    if (!env.isTestMode) {
+      await this.mercuryController.migrate()
+    }
     await this.apiController.mount()
     this.syncApiController = SyncApiController.getInstance()
     this.syncApiController.mount()
     await this.openWindow()
-    if (!env.isTestMode) {
-      await this.mercuryController.migrate()
-    }
   }
 
-  public end = () => {
+  public end = async () => {
     if (!env.isTestMode) {
-      new NodeController().stopNode()
-      IndexerService.getInstance().stop()
+      await new NodeController().stopNode()
+      await IndexerService.getInstance().stop()
     }
   }
 

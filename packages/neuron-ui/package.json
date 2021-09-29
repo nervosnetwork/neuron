@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.100.0",
+  "version": "0.100.1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -50,7 +50,7 @@
     "canvg": "2.0.0",
     "grommet-icons": "4.4.0",
     "i18next": "17.0.13",
-    "immer": "8.0.1",
+    "immer": "9.0.6",
     "jsqr": "1.2.0",
     "office-ui-fabric-react": "7.31.1",
     "qr.js": "0.0.0",

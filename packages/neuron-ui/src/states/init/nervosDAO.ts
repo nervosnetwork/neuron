@@ -1,4 +1,4 @@
-export const emptyNervosDaoData: Readonly<State.NervosDAO> = {
+export const emptyNervosDaoData: State.NervosDAO = {
   records: [],
 }
 

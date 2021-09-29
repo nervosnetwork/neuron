@@ -1,87 +1,76 @@
 declare namespace State {
   interface Transaction {
-    readonly type: 'send' | 'receive'
-    readonly createdAt: string
-    readonly updatedAt: string
-    readonly timestamp: string
-    readonly value: string
-    readonly hash: string
-    readonly description: string
-    readonly blockNumber: string
-    readonly status: 'pending' | 'success' | 'failed'
-    readonly nervosDao: boolean
-    readonly sudtInfo?: Readonly<{
-      sUDT: {
-        tokenID: string
-        tokenName: string
-        symbol: string
-        decimal: string
-      }
+    type: 'send' | 'receive'
+    createdAt: string
+    updatedAt: string
+    timestamp: string
+    value: string
+    hash: string
+    description: string
+    blockNumber: string
+    status: 'pending' | 'success' | 'failed'
+    nervosDao: boolean
+    sudtInfo?: {
+      sUDT: Record<'tokenID' | 'tokenName' | 'symbol' | 'decimal', string>
       amount: string
-    }>
-    readonly nftInfo?: {
+    }
+    nftInfo?: {
       type: 'send' | 'receive'
       data: string
     }
   }
 
   interface DetailedInput {
-    readonly capacity: string | null
-    readonly lockHash: string | null
-    readonly previousOutput: {
-      readonly blockHash: string | null
-      readonly cell: Readonly<{
-        txHash: string
-        index: string
-      } | null>
+    capacity: string | null
+    lockHash: string | null
+    previousOutput: {
+      blockHash: string | null
+      cell: Record<'txHash' | 'index', string> | null
     }
-    readonly lock: Readonly<CKBComponents.Script | null>
+    lock: CKBComponents.Script | null
   }
 
   interface DetailedOutput {
-    readonly capacity: string
-    readonly lock: Readonly<CKBComponents.Script>
-    readonly lockHash: string
-    readonly outPoint: Readonly<{
-      index: string
-      txHash: string
-    }>
+    capacity: string
+    lock: CKBComponents.Script
+    lockHash: string
+    outPoint: CKBComponents.OutPoint
   }
   interface DetailedTransaction extends Transaction {
-    readonly blockHash: string
-    readonly blockNumber: string
-    readonly deps: any[]
-    readonly inputs: Readonly<DetailedInput[]>
-    readonly inputsCount: string
-    readonly outputs: Readonly<DetailedOutput[]>
-    readonly outputsCount: string
-    readonly witnesses: string[]
+    blockHash: string
+    blockNumber: string
+    deps: any[]
+    inputs: DetailedInput[]
+    inputsCount: string
+    outputs: DetailedOutput[]
+    outputsCount: string
+    witnesses: string[]
   }
   interface Output {
-    readonly address: string | undefined
-    readonly amount: string | undefined
-    readonly unit: any
-    readonly date?: string
+    address: string | undefined
+    amount: string | undefined
+    unit: any
+    date?: string
   }
   type MessageType = 'success' | 'warning' | 'alert'
-  interface Message<Code = number, Meta = Readonly<{ [key: string]: string | undefined }>> {
-    readonly type: MessageType
-    readonly timestamp: number
-    readonly code?: Code
-    readonly content?: string
-    readonly meta?: Meta
+  interface Message<Code = number, Meta = Partial<Record<string, string>>> {
+    type: MessageType
+    timestamp: number
+    code?: Code
+    content?: string
+    meta?: Meta
   }
   interface Send {
-    readonly txID: string
-    readonly outputs: Readonly<Output[]>
-    readonly price: string
-    readonly description: string
-    readonly generatedTx: any
+    txID: string
+    outputs: Output[]
+    price: string
+    description: string
+    generatedTx: any
   }
 
   interface Popup {
-    readonly timestamp: number
-    readonly text: string
+    timestamp: number
+    text: string
   }
 
   interface PasswordRequest {
@@ -100,56 +89,50 @@ declare namespace State {
       | 'migrate-acp'
       | 'send-nft'
       | null
-    readonly walletID: string
+    walletID: string
   }
 
-  type AlertDialog = Readonly<{ title: string; message: string }> | null
+  type AlertDialog = Record<'title' | 'message', string> | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
 
   interface App {
-    readonly tipBlockNumber: string
-    readonly tipBlockHash: string
-    readonly tipBlockTimestamp: number
-    readonly chain: string
-    readonly difficulty: bigint
-    readonly epoch: string
-    readonly send: Readonly<Send>
-    readonly passwordRequest: PasswordRequest
+    tipBlockNumber: string
+    tipBlockHash: string
+    tipBlockTimestamp: number
+    chain: string
+    difficulty: bigint
+    epoch: string
+    send: Send
+    passwordRequest: PasswordRequest
     // TODO: is the field used in the app?
-    readonly messages: {
-      readonly [index: string]: Message | null
-    }
-    readonly popups: Readonly<Popup[]>
-    readonly notifications: Readonly<Message[]>
-    readonly globalDialog: GlobalDialogType
-    readonly alertDialog: AlertDialog
-    readonly loadings: Readonly<{
-      sending: boolean
-      addressList: boolean
-      transactionList: boolean
-    }>
-    readonly showTopAlert: boolean
-    readonly showAllNotifications: boolean
-    readonly isAllowedToFetchList: boolean
-    readonly loadedTransaction: any
+    messages: Record<string, Message | null>
+    popups: Popup[]
+    notifications: Message[]
+    globalDialog: GlobalDialogType
+    alertDialog: AlertDialog
+    loadings: Record<'sending' | 'addressList' | 'transactionList', boolean>
+    showTopAlert: boolean
+    showAllNotifications: boolean
+    isAllowedToFetchList: boolean
+    loadedTransaction: any
   }
 
   interface NetworkProperty {
-    readonly name: string
-    readonly remote: string
-    readonly chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
-    readonly type: 0 | 1
+    name: string
+    remote: string
+    chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
+    type: 0 | 1
   }
 
   interface Network extends NetworkProperty {
-    readonly id: NetworkID
+    id: NetworkID
   }
 
   interface WalletIdentity {
-    readonly id: string
-    readonly name: string
-    readonly device?: DeviceInfo
-    readonly isHD?: boolean
+    id: string
+    name: string
+    device?: DeviceInfo
+    isHD?: boolean
   }
 
   enum Manufacturer {
@@ -171,18 +154,18 @@ declare namespace State {
   }
 
   interface Address {
-    readonly address: string
-    readonly identifier: string
-    readonly description: string
-    readonly type: 0 | 1 // 0 for receiving, 1 for change
-    readonly txCount: number
-    readonly balance: string
-    readonly index: number
+    address: string
+    identifier: string
+    description: string
+    type: 0 | 1 // 0 for receiving, 1 for change
+    txCount: number
+    balance: string
+    index: number
   }
 
   interface Wallet extends WalletIdentity {
-    readonly balance: string
-    readonly addresses: Readonly<Address[]>
+    balance: string
+    addresses: Address[]
   }
   type ConnectionStatus = 'online' | 'offline' | 'connecting'
 
@@ -195,86 +178,65 @@ declare namespace State {
   }>
 
   interface Chain {
-    readonly networkID: string
-    readonly connectionStatus: ConnectionStatus
-    readonly syncState: SyncState
-    readonly transactions: Readonly<{
+    networkID: string
+    connectionStatus: ConnectionStatus
+    syncState: SyncState
+    transactions: {
       pageNo: number
       pageSize: number
       totalCount: number
-      items: Readonly<Transaction[]>
+      items: Transaction[]
       keywords: string
-    }>
+    }
   }
   interface Settings {
-    readonly general: {}
-    readonly networks: Readonly<Network[]>
-    readonly wallets: Readonly<WalletIdentity[]>
+    general: {}
+    networks: Network[]
+    wallets: WalletIdentity[]
   }
 
+  type DaoActionInfo = Record<'txHash' | 'timestamp', string>
+
   interface NervosDAORecord {
-    readonly blockNumber: string // '0', the block of current status. Namely it's the deposit block number if the depositOutPoint is undefined, or the withdrawn block number if the depositOutPoint
-    readonly blockHash: string
-    readonly capacity: string
-    readonly lock: Readonly<{
-      codeHash: string
-      hashType: 'type' | 'data'
-      args: string
-    }>
-    readonly type: Readonly<{
-      codeHash: string
-      hashType: 'type' | 'data'
-      args: string
-    }>
-    readonly lockHash: string
-    readonly typeHash: string | null
-    readonly outPoint: Readonly<{
-      txHash: string
-      index: string // '0'
-    }>
-    readonly status: 'live' | 'dead' | 'sent' | 'pending' | 'failed' // 1. status === deat => record is completed; 2. status === sent => depositing or withdrawing; 3. status === live => record is deposited or locked; 4. status === pending => unlocking
-    readonly daoData: string // locktime epoch in le
-    readonly data: string
-    readonly timestamp: string
-    readonly depositOutPoint?: Readonly<{
-      txHash: string
-      index: string
-    }>
-    readonly depositTimestamp?: string
-    readonly multiSignBlake160: string | null
-    readonly depositInfo?: {
-      txHash: string
-      timestamp: string
-    }
-    readonly withdrawInfo?: {
-      txHash: string
-      timestamp: string
-    }
-    readonly unlockInfo?: {
-      txHash: string
-      timestamp: string
-    }
+    blockNumber: string // '0', the block of current status. Namely it's the deposit block number if the depositOutPoint is undefined, or the withdrawn block number if the depositOutPoint
+    blockHash: string
+    capacity: string
+    lock: CKBComponents.Script
+    type: CKBComponents.Script
+    lockHash: string
+    typeHash: string | null
+    outPoint: CKBComponents.OutPoint
+    status: 'live' | 'dead' | 'sent' | 'pending' | 'failed' // 1. status === deat => record is completed; 2. status === sent => depositing or withdrawing; 3. status === live => record is deposited or locked; 4. status === pending => unlocking
+    daoData: string // locktime epoch in le
+    data: string
+    timestamp: string
+    depositOutPoint?: CKBComponents.OutPoint
+    depositTimestamp?: string
+    multiSignBlake160: string | null
+    depositInfo?: DaoActionInfo
+    withdrawInfo?: DaoActionInfo
+    unlockInfo?: DaoActionInfo
   }
 
   interface NervosDAO {
-    readonly records: Readonly<NervosDAORecord[]>
+    records: NervosDAORecord[]
   }
 
   interface AppUpdater {
-    readonly checking: boolean
-    readonly downloadProgress: number
-    readonly version: string
-    readonly releaseNotes: string
+    checking: boolean
+    downloadProgress: number
+    version: string
+    releaseNotes: string
   }
 
   interface AppWithNeuronWallet {
-    readonly app: App
-    readonly chain: Chain
-    readonly settings: Settings
-    readonly wallet: Wallet
-    readonly nervosDAO: NervosDAO
-    readonly updater: AppUpdater
-    readonly experimental: { tx: any; assetAccount?: any } | null
+    app: App
+    chain: Chain
+    settings: Settings
+    wallet: Wallet
+    nervosDAO: NervosDAO
+    updater: AppUpdater
+    experimental: { tx: any; assetAccount?: any } | null
   }
 }
 
