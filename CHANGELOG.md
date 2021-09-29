@@ -1,4 +1,15 @@
-# 0.100.0 (2021-09-24)
+# 0.100.1 (2021-09-29)
+
+[CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**Please note that in order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.**
+
+### Hotfix
+* Rename ckb-indexer data folder from `ckb-indexer` to `ckb_indexer_data`.
+* [GHSA-33f9-j839-rf8h](https://github.com/advisories/GHSA-33f9-j839-rf8h): Upgrade immer to 9.0.6.
+
+
+# 0.100.0 (2021-09-25)
 
 [CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
 
