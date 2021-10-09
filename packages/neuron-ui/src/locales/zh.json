@@ -398,6 +398,9 @@
       },
       "create-account-to-claim-cheque": {
         "title": "创建账户并领取 Cheque 资产"
+      },
+      "destroy-ckb-account": {
+        "title": "销毁 CKB 资产账户"
       }
     },
     "qrcode": {
@@ -711,7 +714,8 @@
         "description": "备注",
         "submit": "提交",
         "click-to-edit": "点击编辑",
-        "cheque-address-hint": "向该地址转账需要临时锁定 162 CKB，对方领取后自动解锁。"
+        "cheque-address-hint": "向该地址转账需要临时锁定 162 CKB，对方领取后自动解锁。",
+        "destroy": "销毁"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 转账"

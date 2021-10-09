@@ -231,6 +231,7 @@ const HardwareSign = ({
       switch (type) {
         case 'send':
         case 'send-nft':
+        case 'destroy-ckb-account':
         case 'claim-cheque': {
           if (isSending) {
             break

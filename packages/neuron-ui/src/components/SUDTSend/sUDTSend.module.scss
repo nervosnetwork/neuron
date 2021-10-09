@@ -136,6 +136,11 @@
   justify-content: flex-end;
 }
 
+.ckb-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
 .modal {
   @include overlay;
   position: absolute;

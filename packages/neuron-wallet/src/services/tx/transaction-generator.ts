@@ -717,6 +717,51 @@ export class TransactionGenerator {
     return tx
   }
 
+  public static async generateDestoryCKBAssetAccountTx(walletId: string, asssetAccountInputs: Input[], changeBlake160: string) {
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+
+    const cellDeps = [secpCellDep, anyoneCanPayDep]
+
+    const {
+      inputs: changeInputs,
+    } = await CellsService.gatherInputs('0', walletId)
+
+    if (changeInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const [changeInput] = changeInputs
+    const allInputs = [...asssetAccountInputs, changeInput]
+    const allCapacities = allInputs.reduce((a, b) => {
+      return a + BigInt(b.capacity as string)
+    }, BigInt(0))
+
+
+    const output = Output.fromObject({
+      capacity: '0',
+      lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+    })
+
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps,
+      inputs: allInputs,
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+
+    const txSize = TransactionSize.tx(tx)
+    tx.fee = TransactionFee.fee(txSize, BigInt(1e4)).toString()
+    const outputCapacity = allCapacities - BigInt(tx.fee)
+    tx.outputs[0].capacity = outputCapacity.toString()
+
+    return tx
+  }
+
   // anyone-can-pay lock, CKB
   public static async generateAnyoneCanPayToCKBTx(
     walletId: string,

@@ -97,6 +97,23 @@ export default class AssetAccountController {
     }
   }
 
+  public async destoryCKBAssetAccount(
+    params: { walletID: string, id: number }
+  ): Promise<Controller.Response<Transaction>> {
+    const account = await AssetAccountService.getAccount(params)
+
+    if (!account) {
+      throw new ServiceHasNoResponse('AssetAccount')
+    }
+
+    const { tx } = await AssetAccountService.destoryCKBAssetAccount(params.walletID, account)
+
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public async getAccount(params: { walletID: string, id: number }): Promise<Controller.Response<AssetAccount & { address: string }>> {
     const account = await AssetAccountService.getAccount(params)
 
