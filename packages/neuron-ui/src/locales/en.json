@@ -405,6 +405,9 @@
       },
       "create-account-to-claim-cheque": {
         "title": "Claim Cheque Asset with New Account"
+      },
+      "destroy-ckb-account": {
+        "title": "Destroy CKB Asset Account"
       }
     },
     "qrcode": {
@@ -718,7 +721,8 @@
         "description": "Description",
         "submit": "Submit",
         "click-to-edit": "Click to edit",
-        "cheque-address-hint": "162 CKBytes capacity is going to be temporarily locked to initialize the token transfer, and it will be automatically unlocked after the token being claimed by the receiver."
+        "cheque-address-hint": "162 CKBytes capacity is going to be temporarily locked to initialize the token transfer, and it will be automatically unlocked after the token being claimed by the receiver.",
+        "destroy": "Destroy"
       },
       "receive": {
         "notation": "Accept {{symbol}} only"

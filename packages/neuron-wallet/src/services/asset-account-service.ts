@@ -14,6 +14,7 @@ import { TransactionGenerator } from "./tx"
 import WalletService from "./wallets"
 import OutPoint from "models/chain/out-point"
 import SystemScriptInfo from "models/system-script-info"
+import Input from "models/chain/input"
 
 export default class AssetAccountService {
 
@@ -72,6 +73,30 @@ export default class AssetAccountService {
     }, BigInt(0))
 
     return totalBalance
+  }
+
+  public static async destoryCKBAssetAccount(walletID: string, assetAccount: AssetAccount) {
+    const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, 'CKBytes')
+    const inputs = cells.map(cell => {
+      return Input.fromObject({
+        previousOutput: cell.outPoint(),
+        capacity: cell.capacity,
+        lock: cell.lockScript(),
+        lockHash: cell.lockHash,
+        since: '0',
+      })
+    })
+    // 1. find next unused address
+    const wallet = WalletService.getInstance().get(walletID)
+
+    const address = await wallet.getNextChangeAddress()
+
+    const tx = await TransactionGenerator.generateDestoryCKBAssetAccountTx(walletID, inputs, address!.blake160)
+
+    return {
+      assetAccount,
+      tx,
+    }
   }
 
   public static async getAll(walletId: string): Promise<AssetAccount[]> {
