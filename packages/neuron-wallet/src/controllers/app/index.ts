@@ -41,8 +41,10 @@ export default class AppController {
 
   public end = async () => {
     if (!env.isTestMode) {
-      await new NodeController().stopNode()
-      await IndexerService.getInstance().stop()
+      await Promise.all([
+        new NodeController().stopNode(),
+        IndexerService.getInstance().stop(),
+      ])
     }
   }
 
