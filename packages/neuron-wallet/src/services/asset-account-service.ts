@@ -327,15 +327,39 @@ export default class AssetAccountService {
         [assetAccount.tokenID, assetAccount.blake160]
       )
 
+    const wallet = WalletService.getInstance().get(walletID)
+    const entity = AssetAccountEntity.fromModel(assetAccount)
     if (exists[0].exist === 1) {
-      throw new Error(`Asset account already exists!`)
+      // For hardware wallet in ckb asset account:
+      // 1. If a ckb account has been created, another one cannot be created;
+      // 2. If a ckb account has been destroyed, ckb account can be created.
+      if (wallet.isHardware() && assetAccount.tokenID === 'CKBytes') {
+        const address = await wallet.getNextAddress()
+        if (address) {
+          const acpCells = await AssetAccountService.getACPCells(address.blake160, 'CKBytes')
+          if (acpCells.length) {
+            throw new Error(`Asset account already exists!`)
+          } else {
+            await getConnection()
+              .createQueryBuilder()
+              .delete()
+              .from(AssetAccountEntity)
+              .where("tokenID = :tokenID AND blake160 = :blake160", {
+                tokenID: 'CKBytes',
+                blake160: assetAccount.blake160,
+              })
+              .execute()
+          }
+        }
+      } else {
+        throw new Error(`Asset account already exists!`)
+      }
     }
 
     // 2. send tx
     const txHash = await new TransactionSender().sendTx(walletID, tx, password, 0, skipSign)
 
     // 3. save asset account
-    const entity = AssetAccountEntity.fromModel(assetAccount)
     await connection.manager.save([entity.sudtTokenInfo, entity])
 
     return txHash
