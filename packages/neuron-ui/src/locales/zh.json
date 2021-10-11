@@ -715,7 +715,8 @@
         "submit": "提交",
         "click-to-edit": "点击编辑",
         "cheque-address-hint": "向该地址转账需要临时锁定 162 CKB，对方领取后自动解锁。",
-        "destroy": "销毁"
+        "destroy": "销毁",
+        "destroy-desc": "将会返还所有该 CKB 资产账户的 CKB 到你的找零地址中"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 转账"

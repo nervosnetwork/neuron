@@ -722,7 +722,8 @@
         "submit": "Submit",
         "click-to-edit": "Click to edit",
         "cheque-address-hint": "162 CKBytes capacity is going to be temporarily locked to initialize the token transfer, and it will be automatically unlocked after the token being claimed by the receiver.",
-        "destroy": "Destroy"
+        "destroy": "Destroy",
+        "destroy-desc": "Will returns all CKB of this CKB Asset account to your change address."
       },
       "receive": {
         "notation": "Accept {{symbol}} only"

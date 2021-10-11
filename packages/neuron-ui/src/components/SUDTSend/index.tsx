@@ -446,7 +446,12 @@ const SUDTSend = () => {
         </div>
         <div className={accountType === AccountType.CKB ? styles['ckb-footer'] : styles.footer}>
           {accountType === AccountType.CKB ? (
-            <Button type="cancel" label={t('s-udt.send.destroy')} onClick={onDestroy} disabled={isDestroying} />
+            <div className={styles.tooltip}>
+              <Button type="cancel" label="" onClick={onDestroy} disabled={isDestroying}>
+                {t('s-udt.send.destroy') as string}
+              </Button>
+              <span className={styles.tooltiptext}>{t('s-udt.send.destroy-desc')}</span>
+            </div>
           ) : null}
           <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />
         </div>
