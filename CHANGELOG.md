@@ -1,3 +1,18 @@
+# 0.100.2 (2021-10-15)
+
+[CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**This version is compatible with v0.100.0 and above.**
+
+### New feature
+* Add feature of destroy CKB Asset Account.
+
+### Bug fixes
+* Kill ckb/indexer before Neuron quit.
+* Fix a cosmetic bug of address truncation in addresses book under higher resolution.
+* Remove useless token id prompt when asset account type is `CKB Account`.
+
+
 # 0.100.1 (2021-09-29)
 
 [CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
