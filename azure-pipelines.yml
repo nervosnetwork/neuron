@@ -169,7 +169,7 @@ stages:
             name: winSiginingCertificate
             displayName: "Download Windows Signing Certificate"
             inputs:
-              secureFile: Neuron_win.p12
+              secureFile: neuron_win_2021.pfx
           - pwsh: |
               bash ./scripts/download-ckb.sh win
               yarn build
