@@ -16,6 +16,7 @@ import {
   generateSendAllSUDTTransaction,
   getAnyoneCanPayScript,
   generateChequeTransaction,
+  destoryCKBAssetAccount,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
@@ -330,6 +331,37 @@ const SUDTSend = () => {
     [isSubmittable, globalDispatch, walletId, accountType, isSecp256k1ShortAddress]
   )
 
+  const [isDestroying, setIsDestroying] = useState(false)
+  const onDestroy = useCallback(() => {
+    setIsDestroying(true)
+    destoryCKBAssetAccount({ walletID: walletId, id: accountId })
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          const tx = res.result
+          globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx } })
+          globalDispatch({
+            type: AppActions.RequestPassword,
+            payload: {
+              walletID: walletId,
+              actionType: 'destroy-ckb-account',
+            },
+          })
+        } else {
+          globalDispatch({
+            type: AppActions.AddNotification,
+            payload: {
+              type: 'alert',
+              timestamp: +new Date(),
+              content: typeof res.message === 'string' ? res.message : res.message.content!,
+            },
+          })
+        }
+      })
+      .finally(() => {
+        setIsDestroying(false)
+      })
+  }, [globalDispatch, walletId, accountId])
+
   if (!isLoaded) {
     return (
       <div className={styles.loading}>
@@ -412,7 +444,15 @@ const SUDTSend = () => {
             </div>
           </div>
         </div>
-        <div className={styles.footer}>
+        <div className={accountType === AccountType.CKB ? styles['ckb-footer'] : styles.footer}>
+          {accountType === AccountType.CKB ? (
+            <div className={styles.tooltip}>
+              <Button type="cancel" label="" onClick={onDestroy} disabled={isDestroying}>
+                {t('s-udt.send.destroy') as string}
+              </Button>
+              <span className={styles.tooltiptext}>{t('s-udt.send.destroy-desc')}</span>
+            </div>
+          ) : null}
           <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />
         </div>
       </form>

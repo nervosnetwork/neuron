@@ -103,6 +103,7 @@ type Action =
   | 'migrate-acp'
   | 'check-migrate-acp'
   | 'get-sudt-token-info'
+  | 'generate-destroy-ckb-account-tx'
   // Cheque
   | 'generate-create-cheque-tx'
   | 'generate-withdraw-cheque-tx'

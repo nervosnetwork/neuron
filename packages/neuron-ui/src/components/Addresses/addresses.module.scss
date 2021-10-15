@@ -116,14 +116,12 @@ $change-color: #6666cc;
         display: none;
       }
 
-      @media screen and (max-width: 1365px) {
+      @media screen and (max-width: 1680px) {
+        width: 20vw;
+
         .ellipsis {
           display: inline;
         }
-      }
-
-      @media screen and (max-width: 1680px) {
-        width: 20vw;
 
         &::after {
           position: absolute;

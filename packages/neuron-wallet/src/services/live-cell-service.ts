@@ -40,7 +40,10 @@ export default class LiveCellService {
           return item
         }
       } else {
-        return item
+        // if type is falsy, should return cell that type is empty
+        if (!item.type()) {
+          return item
+        }
       }
     }
 

@@ -398,6 +398,9 @@
       },
       "create-account-to-claim-cheque": {
         "title": "創建賬戶並領取 Cheque 資產"
+      },
+      "destroy-ckb-account": {
+        "title": "銷毀 CKB 資產賬戶"
       }
     },
     "qrcode": {
@@ -711,7 +714,9 @@
         "description": "備註",
         "submit": "提交",
         "click-to-edit": "點擊編輯",
-        "cheque-address-hint": "向該地址轉賬需要臨時鎖定 162 CKB，對方領取後自動解鎖。"
+        "cheque-address-hint": "向該地址轉賬需要臨時鎖定 162 CKB，對方領取後自動解鎖。",
+        "destroy": "銷毀",
+        "destroy-desc": "將會返還所有該 CKB 資產賬戶的 CKB 到你的找零地址中"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 轉賬"

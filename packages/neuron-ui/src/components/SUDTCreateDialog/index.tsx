@@ -289,7 +289,7 @@ const SUDTCreateDialog = ({
                   error={tokenErrors[field.key]}
                   className={accountType === AccountType.CKB ? styles.ckbField : undefined}
                   hint={
-                    !tokenErrors[field.key] && field.key === 'tokenId'
+                    !tokenErrors[field.key] && field.key === 'tokenId' && accountType === AccountType.SUDT
                       ? t(`s-udt.create-dialog.placeholder.${field.label}`)
                       : undefined
                   }

@@ -475,6 +475,10 @@ export default class ApiController {
       return this.sudtController.getSUDTTokenInfo(params)
     })
 
+    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number })=>{
+      return this.assetAccountController.destoryCKBAssetAccount(params)
+    })
+
     // Hardware wallet
     handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
       await this.hardwareController.connectDevice(deviceInfo)
