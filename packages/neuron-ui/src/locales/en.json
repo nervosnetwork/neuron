@@ -492,8 +492,8 @@
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
         "103": "$t(messages.fields.keystore-password) is incorrect.",
         "104": "Fail to connect to the node, please restart Neuron.",
-        "105": "You need more capacities for change (at least 61 CKBytes).",
-        "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
+        "105": "You need more capacities for change (more than 61 CKBytes).",
+        "106": "You need more capacities for change (more than 61 CKBytes), or slide to the end to send all your balance.",
         "107": "The amount {{amount}} CKB is too small, transfer with locktime requires an amount no less than 69 CKB.",
         "108": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
         "109": "Insufficient balance.",
@@ -502,7 +502,7 @@
         "112": "Wallet {{id}} not found.",
         "113": "Keystore is invalid, please check your file integrity.",
         "114": "The minimal transfer balance is {{bytes}} CKBytes.",
-        "115": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
+        "115": "You need more capacities for change (more than 61 CKBytes), or click 'Max' button to send all your balance.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",
@@ -526,7 +526,7 @@
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No device detected. Please connect your device.",
         "404": "Multiple device detected. Only one device of the same model can be connected.",
-        "600": "Please make sure the sync has finalized before you do any operation."
+        "600": "Please make sure the sync has finalized before you do any transaction related operation."
       }
     },
     "sync": {
