@@ -1,8 +1,21 @@
+# 0.101.0 (2021-10-27)
+
+[CKB v0.101.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.0) was released on Oct. 20th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**The CKB v0.101.0 activates ckb2021 since epoch 3113 in the testnet. After that nodes running this version are imcompatible with old versions. However, this version is still compatible with CKB v0.25.0 and above in the mainnet.**
+
+### New feature
+* Upgrade the bundled CKB version and CKB-Indexer version.
+
+### Bug fix
+* Update the hint of synchronization and warning of `capacity not enough for change`.
+
+
 # 0.100.2 (2021-10-15)
 
-[CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
-
 **This version is compatible with v0.100.0 and above.**
+
+[CKB v0.100.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.100.0) was released on Sep. 22nd, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
 
 ### New feature
 * Add feature of destroy CKB Asset Account.
