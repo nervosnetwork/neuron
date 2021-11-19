@@ -20,7 +20,7 @@ export const scriptToAddress = (lock: CKBComponents.Script, isMainnet: boolean) 
   }
 
   return ckbCore.utils.fullPayloadToAddress({
-    arg: lock.args,
+    args: lock.args,
     prefix: addressPrefix,
     type: lock.hashType === 'data' ? ckbCore.utils.AddressType.DataCodeHash : ckbCore.utils.AddressType.TypeCodeHash,
     codeHash: lock.codeHash,
