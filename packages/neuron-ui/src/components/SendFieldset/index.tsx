@@ -90,7 +90,6 @@ const SendFieldset = ({
         value={item.address || ''}
         onChange={onItemChange}
         required
-        maxLength={100}
         error={addrErrorMsg}
         autoFocus
       />

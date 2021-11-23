@@ -1,21 +1,77 @@
 /* eslint-disable no-constant-condition */
+import type { ScriptHashType } from 'models/chain/script'
 import {
-  Cell,
-  CellCollector as LumosCellCollector,
-  CellCollectorResults,
   Hexadecimal,
   HexString,
-  Indexer as LumosIndexer,
-  QueryOptions,
-  Script,
+  Hash,
   Tip,
   OutPoint,
   HexNumber,
-} from '@ckb-lumos/base';
-import { RPC } from '@ckb-lumos/rpc';
-import axios from 'axios';
+} from '@ckb-lumos/base'
+import { RPC } from '@ckb-lumos/rpc'
+import axios from 'axios'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
+
+export interface Script {
+  code_hash: Hash
+  hash_type: ScriptHashType
+  args: HexString
+}
+
+interface ScriptWrapper {
+  script: Script
+  ioType?: "input" | "output" | "both"
+  argsLen?: number | "any"
+}
+
+export interface QueryOptions {
+  lock?: Script | ScriptWrapper
+  type?: Script | ScriptWrapper | "empty"
+  // data = any means any data content is ok
+  data?: string | "any"
+  argsLen?: number | "any"
+  /** `fromBlock` itself is included in range query. */
+  fromBlock?: Hexadecimal
+  /** `toBlock` itself is included in range query. */
+  toBlock?: Hexadecimal
+  skip?: number
+  order?: "asc" | "desc"
+}
+
+interface Cell {
+  cell_output: {
+    capacity: HexNumber
+    lock: Script
+    type?: Script
+  }
+  data: HexString
+  out_point?: OutPoint
+  block_hash?: Hash
+  block_number?: HexNumber
+}
+
+interface CellCollectorResults {
+  [Symbol.asyncIterator](): AsyncIterator<Cell>
+}
+
+interface LumosCellCollector {
+  collect(): CellCollectorResults
+}
+interface LumosIndexer {
+  uri: string
+
+  running(): boolean
+  startForever(): void
+  start(): void
+  stop(): void
+  tip(): Promise<Tip>
+
+  collector(queries: QueryOptions): LumosCellCollector
+  subscribe(queries: QueryOptions): NodeJS.EventEmitter
+  subscribeMedianTime(): NodeJS.EventEmitter
+  waitForSync(blockDifference?: number): Promise<void>
+}
 
 export enum ScriptType {
   type = 'type',
