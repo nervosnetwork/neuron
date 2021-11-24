@@ -30,6 +30,13 @@ describe('AddressParser', () => {
     address: 'ckb1qypylv479ewscx3ms620sv34pgeuz6zagaaqvrugu7',
   }
 
+  const newFullVersionAddressInfo = {
+    codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+    args: '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64',
+    hashType: ScriptHashType.Type,
+    address: 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4'
+  }
+
   describe('parse', () => {
     it('full address', () => {
       const script = AddressParser.parse(fullAddressInfo.address)
@@ -57,6 +64,13 @@ describe('AddressParser', () => {
       expect(script.codeHash).toEqual(shortACPAddressInfo.codeHash)
       expect(script.args).toEqual(shortACPAddressInfo.args)
       expect(script.hashType).toEqual(shortACPAddressInfo.hashType)
+    })
+
+    it('new full version address', () => {
+      const script = AddressParser.parse(newFullVersionAddressInfo.address)
+      expect(script.codeHash).toEqual(newFullVersionAddressInfo.codeHash)
+      expect(script.args).toEqual(newFullVersionAddressInfo.args)
+      expect(script.hashType).toEqual(newFullVersionAddressInfo.hashType)
     })
   })
 

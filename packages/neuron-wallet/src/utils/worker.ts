@@ -123,7 +123,7 @@ export async function terminate<T extends WorkerInst> (workerInst: T) {
   const worker = workerInst.$worker
   const waitForClosing = new Promise(resolve => {
     worker!.once('close', () => {
-      resolve()
+      resolve(0)
     })
   })
   await drain()

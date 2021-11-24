@@ -6,6 +6,7 @@ import {
   AddressEmptyException,
 } from 'exceptions'
 import {
+  NEW_LONG_ADDR_PREFIX,
   LONG_DATA_PREFIX,
   LONG_TYPE_PREFIX,
   SHORT_ADDR_LENGTH,
@@ -41,7 +42,11 @@ export const validateAddress = (address: string, isMainnet: boolean): boolean =>
     throw new FieldInvalidException(FIELD_NAME, address)
   }
 
-  if (parsed.startsWith(LONG_DATA_PREFIX) || parsed.startsWith(LONG_TYPE_PREFIX)) {
+  if (
+    parsed.startsWith(LONG_DATA_PREFIX) ||
+    parsed.startsWith(LONG_TYPE_PREFIX) ||
+    parsed.startsWith(NEW_LONG_ADDR_PREFIX)
+  ) {
     return true
   }
 

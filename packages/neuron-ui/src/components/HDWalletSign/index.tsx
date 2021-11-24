@@ -63,7 +63,7 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
               })
             } else {
               address = ckbCore.utils.fullPayloadToAddress({
-                arg: cell.lock.args,
+                args: cell.lock.args,
                 prefix: addressPrefix,
                 type:
                   cell.lock.hashType === 'data'

@@ -57,6 +57,13 @@ export default {
     },
     exception: null,
   },
+  "Should pass when it's a new full address": {
+    params: {
+      address: 'ckt1qzn9dutjk669cfznq7httfar0gtk7qp0du3wjfvzck9l0w3k9eqhvq4nnw7qkdnnclfkg59uzn8umtfd2kwxceq225jvu',
+      isMainnet: false,
+    },
+    exception: null,
+  },
   "Should throw an error when it's an invalid short address": {
     params: {
       address: 'ckb1qy1t8xaupvm8837nv3gtc9x0ekkj64vud3jqfwyw5v',

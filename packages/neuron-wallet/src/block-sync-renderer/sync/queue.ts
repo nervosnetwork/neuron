@@ -138,7 +138,7 @@ export default class Queue {
 
     const drainFetchTxQueue = new Promise((resolve, reject) => {
       fetchTxQueue.error(reject)
-      fetchTxQueue.drain(resolve)
+      fetchTxQueue.drain(() => resolve(0))
     })
 
     const txHashSet = new Set()
