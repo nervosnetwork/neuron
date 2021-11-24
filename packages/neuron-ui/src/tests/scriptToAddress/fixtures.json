@@ -52,7 +52,7 @@
       },
       false
     ],
-    "expected": "ckt1q2n9dutjk669cfznq7httfar0gtk7qp0du3wjfvzck9l0w3k9eqhvdkr98kkxrtvuag8z2j8w4pkw2k6k4l5czshhac"
+    "expected": "ckt1qzn9dutjk669cfznq7httfar0gtk7qp0du3wjfvzck9l0w3k9eqhvqpkcv576ccddnn4quf2ga65xee2m26h7nqr2r97x"
   },
   "full version address of hashType = 'type'": {
     "params": [
@@ -63,17 +63,6 @@
       },
       false
     ],
-    "expected": "ckt1qsvf96jqmq4483ncl7yrzfzshwchu9jd0glq4yy5r2jcsw04d7xlydkr98kkxrtvuag8z2j8w4pkw2k6k4l5c02auef"
-  },
-  "full version address when args length is not matched": {
-    "params": [
-      {
-        "args": "0x7346c078cd8684ba9fc7bcaba49442a13b46617c4504009400f00020",
-        "codeHash": "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8",
-        "hashType": "type"
-      },
-      false
-    ],
-    "expected": "ckt1q3w9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32su6xcpuvmp5yh20u009t5j2y9gfmgeshc3gyqz2qpuqqyqjlmnq6"
+    "expected": "ckt1qqvf96jqmq4483ncl7yrzfzshwchu9jd0glq4yy5r2jcsw04d7xlyqfkcv576ccddnn4quf2ga65xee2m26h7nq8t420m"
   }
 }

@@ -5,6 +5,7 @@ import TypeChecker from "utils/type-checker"
 export enum ScriptHashType {
   Data = 'data',
   Type = 'type',
+  Data1 = 'data1' 
 }
 
 export default class Script {
