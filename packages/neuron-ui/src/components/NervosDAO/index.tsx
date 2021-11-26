@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 
 import appState from 'states/init/app'
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -53,7 +54,7 @@ const NervosDAO = () => {
     settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const [t] = useTranslation()
+  const [t, { language }] = useTranslation()
   useEffect(() => {
     backToTop()
   }, [])
@@ -309,6 +310,7 @@ const NervosDAO = () => {
     },
     {
       key: 'apc',
+      tooltip: ['en', 'en-US'].includes(language) ? `apc-tooltip` : undefined,
       value: `~${globalAPC}%`,
     },
   ]
@@ -316,11 +318,19 @@ const NervosDAO = () => {
   return (
     <div className={styles.nervosDAOContainer}>
       <h1 className={styles.title}>Nervos DAO</h1>
-      {info.map(({ key, value }) => {
+      {info.map(({ key, value, tooltip }) => {
         const label = t(`nervos-dao.${key}`)
         return (
           <div key={key} title={label} aria-label={label} className={styles[key]}>
-            <span>{label}</span>
+            <span>
+              {label}
+              {tooltip ? (
+                <span className={styles.tooltip} data-tooltip={t(`nervos-dao.${tooltip}`)}>
+                  <TooltipIcon />
+                </span>
+              ) : null}
+            </span>
+
             <div
               style={{
                 color: onlineAndSynced ? '#000' : '#888',

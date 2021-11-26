@@ -46,6 +46,8 @@ $infoHeight: 1.75rem;
   font-size: 0.875rem;
 
   & > span {
+    display: flex;
+    align-items: center;
     font-weight: 600;
     padding-right: 15px;
     white-space: nowrap;
@@ -63,6 +65,29 @@ $infoHeight: 1.75rem;
   .balance {
     @include text-overflow-ellipsis;
     padding: 0;
+  }
+
+  .tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding-left: 5px;
+
+    &::after {
+      display: none;
+      position: absolute;
+      left: -20px;
+      bottom: 120%;
+      content: attr(data-tooltip);
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: #cccccc99;
+      font-weight: 300;
+    }
+
+    &:hover::after {
+      display: block;
+    }
   }
 }
 
