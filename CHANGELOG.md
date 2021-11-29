@@ -1,8 +1,18 @@
+# 0.101.1 (2021-11-29)
+
+[CKB v0.101.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.0) was released on Oct. 20th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**The CKB v0.101.0 activates ckb2021 since epoch 3113 in the testnet. After that nodes running this version are incompatible with old versions. However, this version is still compatible with CKB v0.25.0 and above in the mainnet.**
+
+### New feature
+* Remove 100-char limitation from sending addresses.
+
+
 # 0.101.0 (2021-10-27)
 
 [CKB v0.101.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.0) was released on Oct. 20th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
 
-**The CKB v0.101.0 activates ckb2021 since epoch 3113 in the testnet. After that nodes running this version are imcompatible with old versions. However, this version is still compatible with CKB v0.25.0 and above in the mainnet.**
+**The CKB v0.101.0 activates ckb2021 since epoch 3113 in the testnet. After that nodes running this version are incompatible with old versions. However, this version is still compatible with CKB v0.25.0 and above in the mainnet.**
 
 ### New feature
 * Upgrade the bundled CKB version and CKB-Indexer version.
