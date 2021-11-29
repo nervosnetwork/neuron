@@ -551,6 +551,7 @@
       "deposit-records": "存入",
       "completed-records": "已解鎖",
       "apc": "當前年化鎖定補貼率",
+      "apc-tooltip": "當前年化鎖定補貼率",
       "fee": "手續費",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "從 Nervos DAO 取出",
