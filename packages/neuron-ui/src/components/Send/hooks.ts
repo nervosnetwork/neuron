@@ -93,7 +93,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
           }
           return res.result
         }
-        if (res.status === 0) {
+        if (res.status === 0 || res.status === 114) {
           throw new Error(res.message.content)
         }
         throw new Error(t(`messages.codes.${res.status}`))
