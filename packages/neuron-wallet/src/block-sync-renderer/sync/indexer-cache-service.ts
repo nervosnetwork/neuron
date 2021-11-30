@@ -4,19 +4,20 @@ import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { Indexer, TransactionCollector, CellCollector } from 'block-sync-renderer/mercury/indexer'
+import { TransactionCollector, CellCollector } from 'ckb-lumos-indexer'
+import { CkbIndexer } from 'ckb-lumos-indexer/lib/indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
   private rpcService: RpcService
   private walletId: string
-  private indexer: Indexer
+  private indexer: CkbIndexer
 
   constructor(
     walletId: string,
     addressMetas: AddressMeta[],
     rpcService: RpcService,
-    indexer: Indexer
+    indexer: CkbIndexer
   ) {
     for (const addressMeta of addressMetas) {
       if (addressMeta.walletId !== walletId) {
@@ -99,10 +100,11 @@ export default class IndexerCacheService {
             hash_type: lockScript.hashType,
             args: lockScript.args
           }
+        }, this.indexer.ckbRpcUrl, {
+          includeStatus: false
         })
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
-
         //@ts-ignore
         if (!fetchedTxHashes.length) {
           continue

@@ -1,8 +1,9 @@
 import type { ScriptHashType } from 'models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
-import { Tip } from '@ckb-lumos/base'
-import { Indexer, CellCollector, QueryOptions } from 'block-sync-renderer/mercury/indexer'
+import { Tip, QueryOptions } from '@ckb-lumos/base'
+import { Indexer, CellCollector } from 'ckb-lumos-indexer'
+import { CkbIndexer } from 'ckb-lumos-indexer/lib/indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -46,7 +47,7 @@ export interface BlockTips {
 }
 
 export default class IndexerConnector {
-  private indexer: Indexer
+  private indexer: CkbIndexer
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
   private processNextBlockNumberQueue: AsyncQueue<null> | undefined
@@ -62,7 +63,7 @@ export default class IndexerConnector {
     nodeUrl: string,
     indexerUrl: string
   ) {
-    this.indexer = new Indexer(nodeUrl, indexerUrl)
+    this.indexer = new Indexer(indexerUrl, nodeUrl)
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses

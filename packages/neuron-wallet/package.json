@@ -19,6 +19,7 @@
   "scripts": {
     "start": "electron .",
     "build": "ttsc",
+    "watch": "ttsc -w",
     "start:dev": "yarn run build && electron .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
     "clean": "rimraf dist/*",
@@ -35,8 +36,8 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.16.0",
-    "@ckb-lumos/rpc": "0.16.0",
+    "@ckb-lumos/base": "0.18.0-rc2",
+    "@ckb-lumos/rpc": "0.18.0-rc2",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
     "@nervosnetwork/ckb-sdk-core": "0.101.0",
@@ -46,6 +47,7 @@
     "axios": "0.21.4",
     "bn.js": "4.11.8",
     "chalk": "3.0.0",
+    "ckb-lumos-indexer": "0.18.0",
     "dotenv": "8.2.0",
     "electron-log": "4.0.0",
     "electron-updater": "4.2.0",
