@@ -142,7 +142,6 @@ export default {
         message: '缺少必要的依赖',
         detail: 'Neuron 内置的 CKB 节点需要安装 x64 版本的 Microsoft Visual C++ Redistributable 才能正常运行。您需要安装该组件来启用内置节点。如果您使用外部节点，也可以跳过该步骤。',
         buttons: {
-          'skip': '跳过',
           'install-and-exit': '安装并退出'
         }
       },

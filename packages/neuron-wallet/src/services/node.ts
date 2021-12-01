@@ -156,28 +156,18 @@ class NodeService {
     const I18N_PATH = `messageBox.ckb-dependency`
     return dialog.showMessageBox({
       type: 'info',
-      buttons: ['skip', 'install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
-      defaultId: 1,
+      buttons: ['install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
+      defaultId: 0,
       title: t(`${I18N_PATH}.title`),
       message: t(`${I18N_PATH}.message`),
       detail: t(`${I18N_PATH}.detail`),
       cancelId: 0,
       noLink: true,
-    }).then(({ response }) => {
-      switch (response) {
-        case 1: {
-          // open browser and shutdown
-          const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
-          shell.openExternal(VC_REDIST_URL)
-          env.app.quit()
-          return false
-        }
-        case 0:
-        default: {
-          // dismiss dialog and continue
-          return this.startNode()
-        }
-      }
+    }).then(() => {
+      const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
+      shell.openExternal(VC_REDIST_URL)
+      env.app.quit()
+      return false
     })
   }
 
