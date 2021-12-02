@@ -4,8 +4,7 @@ import AddressMeta from "database/address/meta"
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { TransactionCollector, CellCollector } from 'ckb-lumos-indexer'
-import { CkbIndexer } from 'ckb-lumos-indexer/lib/indexer'
+import { TransactionCollector, CellCollector, CkbIndexer } from '@nervina-labs/ckb-indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]

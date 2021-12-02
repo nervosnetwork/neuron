@@ -55,9 +55,9 @@ describe('unit tests for IndexerConnector', () => {
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
-  jest.doMock('block-sync-renderer/mercury/indexer', () => {
+  jest.doMock('@nervina-labs/ckb-indexer', () => {
     return {
-      Indexer : stubbedIndexerConstructor.mockImplementation(
+      CkbIndexer : stubbedIndexerConstructor.mockImplementation(
         () => ({
           startForever: stubbedStartForeverFn,
           tip: stubbedTipFn,

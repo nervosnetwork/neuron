@@ -1,0 +1,45 @@
+{
+  "name": "@nervina-labs/ckb-indexer",
+  "version": "0.1.0",
+  "description": "CKB indexer binding for Node.js",
+  "author": {
+    "name": "Nervos Core Dev",
+    "email": "dev@nervos.org",
+    "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "homepage": "https://github.com/nervosnetwork/neuron#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "dependencies": {
+    "@ckb-lumos/base": "0.18.0-rc2",
+    "@ckb-lumos/rpc": "0.18.0-rc2",
+    "ckb-js-toolkit": "0.100.0-rc1",
+    "cross-fetch": "3.1.4"
+  },
+  "devDependencies": {
+    "@types/sinon": "10.0.6",
+    "ava": "3.15.0",
+    "events": "3.3.0",
+    "sinon": "12.0.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib",
+    "prepublishOnly": "yarn run clean && yarn run build",
+    "release": "npm publish"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nervosnetwork/neuron.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nervosnetwork/neuron/issues"
+  }
+}

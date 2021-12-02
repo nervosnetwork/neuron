@@ -1373,7 +1373,7 @@
     immutable "^4.0.0-rc.12"
     js-xxhash "^1.0.4"
 
-"@ckb-lumos/rpc@0.18.0-rc2", "@ckb-lumos/rpc@^0.18.0-rc2":
+"@ckb-lumos/rpc@0.18.0-rc2":
   version "0.18.0-rc2"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.18.0-rc2.tgz#f7360d7e89d76c97188711eba5faedc4e23b2d40"
   integrity sha512-ZuJW5NA4GOO6repwZGD8OqTT6sRmKvLPrut0s2xK7uIiGh5bdL9NThk7Nlnbyvtp8LVxIe4LHFgxFzWbZ+NXMA==
@@ -4128,7 +4128,7 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.2.1.tgz#a236185670a7860f1597cf73bea2e16d001461ba"
   integrity sha512-+beqKQOh9PYxuHvijhVl+tIHvT6tuwOrE9m14zd+MT2A38KoKZhh7pYJ0SNleLtwDsiIxHDsIk9bv01oOxvSvA==
 
-"@types/sinon@^10.0.6":
+"@types/sinon@10.0.6":
   version "10.0.6"
   resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-10.0.6.tgz#bc3faff5154e6ecb69b797d311b7cf0c1b523a1d"
   integrity sha512-6EF+wzMWvBNeGrfP3Nx60hhx+FfwSg1JJBLAAP/IdIUq0EYkqCYf70VT3PhuhPX9eLD+Dp+lNdpb/ZeHG8Yezg==
@@ -5320,7 +5320,7 @@ autoprefixer@^9.6.1, autoprefixer@^9.7.2:
     postcss "^7.0.26"
     postcss-value-parser "^4.0.2"
 
-ava@^3.15.0:
+ava@3.15.0:
   version "3.15.0"
   resolved "https://registry.yarnpkg.com/ava/-/ava-3.15.0.tgz#a239658ab1de8a29a243cc902e6b42e4574de2f0"
   integrity sha512-HGAnk1SHPk4Sx6plFAUkzV/XC1j9+iQhOzt4vBly18/yo0AV8Oytx7mtJd/CR8igCJ5p160N/Oo/cNJi2uSeWA==
@@ -6821,27 +6821,13 @@ cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-ckb-js-toolkit@^0.100.0-rc1:
+ckb-js-toolkit@0.100.0-rc1, ckb-js-toolkit@^0.100.0-rc1:
   version "0.100.0-rc1"
   resolved "https://registry.yarnpkg.com/ckb-js-toolkit/-/ckb-js-toolkit-0.100.0-rc1.tgz#4c2b71db5092b69ae44ad52880c00b4c0e6cc494"
   integrity sha512-8TnOS8qGskcmINfeSN+DEdPmGouTe1XRBYtT3uxYq0e+R3yeUS/46uZmhG3LL5IpudZpYwopaAY+/UYV5q0iig==
   dependencies:
     cross-fetch "^3.0.6"
     jsbi "^3.1.2"
-
-ckb-lumos-indexer@0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/ckb-lumos-indexer/-/ckb-lumos-indexer-0.18.0.tgz#667409393a84a9868bdcd02f82bb1aef175f42d0"
-  integrity sha512-MueLJt2GLKHY6LHwa1elatejwt1Z2w8SLmPWNCz4L5YuBYiBe8w2iYBnq2Bqsgmod8AIoAwGbYfVd1ws+/nuKg==
-  dependencies:
-    "@ckb-lumos/base" "^0.18.0-rc2"
-    "@ckb-lumos/rpc" "^0.18.0-rc2"
-    "@types/sinon" "^10.0.6"
-    ava "^3.15.0"
-    ckb-js-toolkit "^0.100.0-rc1"
-    cross-fetch "^3.1.4"
-    events "^3.3.0"
-    sinon "^12.0.1"
 
 class-utils@^0.3.5:
   version "0.3.6"
@@ -7624,7 +7610,7 @@ cross-env@5.2.1:
   dependencies:
     cross-spawn "^6.0.5"
 
-cross-fetch@^3.0.6, cross-fetch@^3.1.4:
+cross-fetch@3.1.4, cross-fetch@^3.0.6:
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.4.tgz#9723f3a3a247bf8b89039f3a380a9244e8fa2f39"
   integrity sha512-1eAtFWdIubi6T4XPy6ei9iUFoKpUkIF971QLN8lIvvvwueI65+Nw5haMNKUwfJxabqlIIDODJKGrQ66gxC0PbQ==
@@ -9400,6 +9386,11 @@ eventemitter3@^4.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
+events@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
+  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
+
 events@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.1.0.tgz#84279af1b34cb75aa88bf5ff291f6d0bd9b31a59"
@@ -9409,11 +9400,6 @@ events@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.2.0.tgz#93b87c18f8efcd4202a461aec4dfc0556b639379"
   integrity sha512-/46HWwbfCX2xTawVfkKLGxMifJYQBWMwY1mjywRtb4c9x8l5NP3KoJtnIOiL1hfdRkIuYhETxQlo62IF8tcnlg==
-
-events@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
-  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
 eventsource@^1.0.7:
   version "1.0.7"
@@ -18768,7 +18754,7 @@ simplebar@^4.2.3:
     lodash.throttle "^4.1.1"
     resize-observer-polyfill "^1.5.1"
 
-sinon@^12.0.1:
+sinon@12.0.1:
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/sinon/-/sinon-12.0.1.tgz#331eef87298752e1b88a662b699f98e403c859e9"
   integrity sha512-iGu29Xhym33ydkAT+aNQFBINakjq69kKO6ByPvTsm3yyIACfyQttRTP03aBP/I8GfhFmLzrnKwNNkr0ORb1udg==

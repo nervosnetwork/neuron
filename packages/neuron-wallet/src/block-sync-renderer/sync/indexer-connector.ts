@@ -2,8 +2,7 @@ import type { ScriptHashType } from 'models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { Tip, QueryOptions } from '@ckb-lumos/base'
-import { Indexer, CellCollector } from 'ckb-lumos-indexer'
-import { CkbIndexer } from 'ckb-lumos-indexer/lib/indexer'
+import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -63,7 +62,7 @@ export default class IndexerConnector {
     nodeUrl: string,
     indexerUrl: string
   ) {
-    this.indexer = new Indexer(indexerUrl, nodeUrl)
+    this.indexer = new CkbIndexer(nodeUrl, indexerUrl)
     this.rpcService = new RpcService(nodeUrl)
 
     this.addressesByWalletId = addresses
