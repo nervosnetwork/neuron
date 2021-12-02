@@ -40,7 +40,7 @@
     "@ckb-lumos/rpc": "0.18.0-rc2",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
-    "@nervina-labs/ckb-indexer": "0.1.0",
+    "@nervina-labs/ckb-indexer": "0.1.1",
     "@nervosnetwork/ckb-sdk-core": "0.101.0",
     "@nervosnetwork/ckb-sdk-utils": "0.101.0",
     "archiver": "4.0.2",

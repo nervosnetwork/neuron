@@ -1,6 +1,6 @@
 {
   "name": "@nervina-labs/ckb-indexer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CKB indexer binding for Node.js",
   "author": {
     "name": "Nervos Core Dev",
