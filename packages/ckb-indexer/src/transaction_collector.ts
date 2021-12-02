@@ -56,7 +56,7 @@ export class CKBIndexerTransactionCollector extends BaseIndexerModule.Transactio
    *order?: query by ckb-indexer;
    */
   private async getTransactions(
-    lastCursor?: string
+    lastCursor?: string,
   ): Promise<GetTransactionDetailResult> {
     const searchKeyFilter: SearchKeyFilter = {
       sizeLimit: this.queries.bufferSize,
@@ -146,6 +146,51 @@ export class CKBIndexerTransactionCollector extends BaseIndexerModule.Transactio
       objects: objects,
       lastCursor: lastCursor,
     };
+  }
+
+  private async getTxHashesWithCursor(lastCursor?: string) {
+    const searchKeyFilter: SearchKeyFilter = {
+      sizeLimit: this.queries.bufferSize,
+      order: this.queries.order as Order,
+    };
+    if (lastCursor) {
+      searchKeyFilter.lastCursor = lastCursor;
+    }
+    let transactionHashList: GetTransactionsResults = {
+      objects: [],
+      lastCursor: "",
+    };
+    /*
+     * if both lock and type exist,we need search them in independent and then get intersection
+     * cause ckb-indexer use searchKey script on each cell but native indexer use lock and type on transaction,
+     * and one transaction may have many cells both in input and output, more detail in test 'Test query transaction by both input lock and output type script'
+     */
+
+    //if both lock and type, search search them in independent and then get intersection, GetTransactionsResults.lastCursor change to `${lockLastCursor}-${typeLastCursor}`
+    if (
+      instanceOfScriptWrapper(this.queries.lock) &&
+      instanceOfScriptWrapper(this.queries.type)
+    ) {
+      transactionHashList = await this.getTransactionByLockAndTypeIndependent(
+        searchKeyFilter
+      );
+      lastCursor = transactionHashList.lastCursor;
+    } else {
+      //query by ScriptWrapper.script,block_range,order
+      transactionHashList = await this.indexer.getTransactions(
+        generateSearchKey(this.queries),
+        searchKeyFilter
+      );
+      lastCursor = transactionHashList.lastCursor;
+    }
+
+    // filter by ScriptWrapper.io_type
+    transactionHashList.objects = this.filterByTypeIoTypeAndLockIoType(
+      transactionHashList.objects,
+      this.queries
+    );
+
+    return transactionHashList;
   }
 
   private async getTransactionByLockAndTypeIndependent(
@@ -351,8 +396,8 @@ export class CKBIndexerTransactionCollector extends BaseIndexerModule.Transactio
   }
   async getTransactionHashes(): Promise<string[]> {
     let lastCursor: undefined | string = undefined;
-    const getTxWithCursor = async (): Promise<TransactionWithStatus[]> => {
-      const result: GetTransactionDetailResult = await this.getTransactions(
+    const getTxWithCursor = async (): Promise<GetTransactionsResult[]> => {
+      const result = await this.getTxHashesWithCursor(
         lastCursor
       );
       lastCursor = result.lastCursor;
@@ -361,19 +406,19 @@ export class CKBIndexerTransactionCollector extends BaseIndexerModule.Transactio
 
     let transactionHashes: string[] = [];
     //skip query result in first query
-    let txs: TransactionWithStatus[] = await getTxWithCursor();
+    let txs = await getTxWithCursor();
     if (txs.length === 0) {
       return [];
     }
-    let buffer: Promise<TransactionWithStatus[]> = getTxWithCursor();
+    let buffer = getTxWithCursor();
     let index: number = 0;
     while (true) {
       if (this.queries.skip && index < this.queries.skip) {
         index++;
         continue;
       }
-      if (txs[index].transaction.hash) {
-        transactionHashes.push(txs[index].transaction.hash as string);
+      if (txs[index]?.tx_hash) {
+        transactionHashes.push(txs[index].tx_hash as string);
       }
       index++;
       //reset index and exchange `txs` and `buffer` after count last tx
