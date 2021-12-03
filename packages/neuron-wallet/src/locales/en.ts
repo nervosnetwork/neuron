@@ -144,7 +144,7 @@ export default {
       'ckb-dependency': {
         title: 'Bundled CKB Node',
         message: 'Dependency Required',
-        detail: `The embedded CKB node in Neuron requires x64 version of Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node. If you'd like to use a remote CKB node, you can skip this step.`,
+        detail: `The embedded CKB node in Neuron requires x64 version of Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node.`,
         buttons: {
           'install-and-exit': 'Install and Exit'
         }
