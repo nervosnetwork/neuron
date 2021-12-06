@@ -37,6 +37,7 @@ export default {
         label: "工具",
         "sign-and-verify": "簽名/驗簽信息",
         "offline-sign": "離線簽名",
+		"clear-sync-data": "清除所有同步數據",
       },
       window: {
         label: '視窗',
@@ -116,6 +117,10 @@ export default {
       },
       'send-capacity': {
         title: '發送交易',
+      },
+      'clear-sync-data': {
+        title: '清除同步數據',
+        message: '清除所有同步數據會重置所有本地節點數據並重新同步，整個過程可能會消耗較長時間。'
       },
       'remove-network': {
         title: '删除網路',

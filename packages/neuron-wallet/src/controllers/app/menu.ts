@@ -21,6 +21,9 @@ import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
+import NodeController from 'controllers/node'
+import SyncController from 'controllers/sync'
+import NetworksService from 'services/networks'
 
 enum URL {
   Settings = '/settings/general',
@@ -120,6 +123,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   let isMainWindow = mainWindow === currentWindow
 
   const walletsService = WalletsService.getInstance()
+  const isMainnet = new NetworksService().getCurrent().chain === 'ckb'
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
@@ -293,6 +297,24 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           showWindow(`#/sign-verify/${currentWallet!.id}`, t(`messageBox.sign-and-verify.title`), {
             width: 900,
           })
+        }
+      },
+      {
+        label: t('application-menu.tools.clear-sync-data'),
+        enabled: hasCurrentWallet && isMainnet,
+        click: async () => {
+          const msgVal = await dialog.showMessageBox({
+            type: 'warning',
+            title: t('messageBox.clear-sync-data.title'),
+            message: t('messageBox.clear-sync-data.message'),
+            buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
+            defaultId: 0,
+            cancelId: 1,
+          })
+          if (msgVal.response === 0) {
+            await new NodeController().clearCache()
+            await new SyncController().clearCache(true)
+          }
         }
       },
       {

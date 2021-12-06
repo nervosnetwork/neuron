@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf lib",
+    "clean": "rimraf lib",
     "prepublishOnly": "yarn run clean && yarn run build",
     "release": "npm publish"
   },

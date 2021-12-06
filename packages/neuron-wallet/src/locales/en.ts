@@ -37,6 +37,7 @@ export default {
         label: "Tools",
         "sign-and-verify": "Sign/Verify Message",
         'offline-sign': 'Offline sign',
+        "clear-sync-data": "Clear all synchronized data",
       },
       window: {
         label: 'Window',
@@ -118,6 +119,10 @@ export default {
       button: {
         confirm: 'OK',
         discard: 'Cancel',
+      },
+      'clear-sync-data': {
+        title: 'Clear all synchronized data',
+        message: 'Clear all synchronized data will delete all local synchronized data and resynchronize the data on the chain, the whole synchronization may take a long time.'
       },
       'send-capacity': {
         title: 'Send Transaction',
