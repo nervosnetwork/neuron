@@ -11,6 +11,7 @@ import { switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import ChainInfo from './chain-info'
 import logger from 'utils/logger'
+import IndexerService from 'services/indexer'
 
 const networksService = NetworksService.getInstance()
 
@@ -28,6 +29,7 @@ export default class NetworksController {
           await this.connectToNetwork(true)
         } else {
           logger.debug('Network:\tconnection dropped')
+          await IndexerService.getInstance().stop()
         }
       })
 

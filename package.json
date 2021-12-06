@@ -34,7 +34,7 @@
     "test": "lerna run --parallel test",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
-    "postinstall": "lerna run rebuild:nativemodules",
+    "postinstall": "lerna run build --scope=@nervina-labs/ckb-indexer && lerna run rebuild:nativemodules",
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "husky": {

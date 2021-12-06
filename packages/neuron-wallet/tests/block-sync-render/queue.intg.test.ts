@@ -200,9 +200,9 @@ describe('integration tests for sync pipeline', () => {
       })
     )
 
-    jest.doMock('block-sync-renderer/mercury/indexer', () => {
+    jest.doMock('@nervina-labs/ckb-indexer', () => {
       return {
-        Indexer : stubbedIndexerConstructor,
+        CkbIndexer : stubbedIndexerConstructor,
         TransactionCollector : stubbedTransactionCollectorConstructor,
         CellCollector : stubbedCellCollectorConstructor
       }

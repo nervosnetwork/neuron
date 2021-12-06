@@ -19,6 +19,7 @@
   "scripts": {
     "start": "electron .",
     "build": "ttsc",
+    "watch": "ttsc -w",
     "start:dev": "yarn run build && electron .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
     "clean": "rimraf dist/*",
@@ -35,10 +36,11 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.16.0",
-    "@ckb-lumos/rpc": "0.16.0",
+    "@ckb-lumos/base": "0.18.0-rc2",
+    "@ckb-lumos/rpc": "0.18.0-rc2",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
+    "@nervina-labs/ckb-indexer": "0.1.1",
     "@nervosnetwork/ckb-sdk-core": "0.101.0",
     "@nervosnetwork/ckb-sdk-utils": "0.101.0",
     "archiver": "4.0.2",
