@@ -1,3 +1,24 @@
+# 0.101.2 (2021-12-10)
+
+[CKB v0.101.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.1) was released on Oct. 28th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+**The CKB v0.101.0 activates ckb2021 since epoch 3113 in the testnet. After that nodes running this version are incompatible with old versions. However, this version is still compatible with CKB v0.25.0 and above in the mainnet.**
+
+### New features
+* Upgrade the bundled ckb node to v0.101.1.
+* Update nft contract info.
+* Update cheque cell contract info.
+* Add feature of clear all synchronized data.
+* Add tooltip for APC abbreviation.
+* Set exit-and-install redist to mandatory.
+
+### Bug fixes
+* Capture capacity too small error.
+* Fix the problem that sometimes cells cannot be synced in time.
+* Fix the problem that Neuron cannot be synced after the ckb node is disconnected and reconnected.
+* Reduce CKB RPC request.
+
+
 # 0.101.1 (2021-11-29)
 
 [CKB v0.101.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.0) was released on Oct. 20th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
