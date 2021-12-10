@@ -1,7 +1,7 @@
 import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
 import NodeService from './node'
-import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import { Address } from "models/address"
@@ -208,13 +208,13 @@ public static async signSingleMultiSignScript(
     const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(toHexInLittleEndian(`0x${serialziedEmptyWitnessSize.toString(16)}`, 8))
+    blake2b.update(toUint64Le(`0x${serialziedEmptyWitnessSize.toString(16)}`))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
       const byteLength = HexUtils.byteLength(wit)
-      blake2b.update(toHexInLittleEndian(`0x${byteLength.toString(16)}`, 8))
+      blake2b.update(toUint64Le(`0x${byteLength.toString(16)}`))
       blake2b.update(wit)
     })
 

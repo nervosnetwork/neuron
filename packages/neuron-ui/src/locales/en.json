@@ -558,6 +558,7 @@
       "deposit-records": "Deposits",
       "completed-records": "Completed",
       "apc": "Current APC",
+      "apc-tooltip": "Current Annual Percentage Compensation",
       "fee": "Transaction fee",
       "deposit-to-nervos-dao": "Deposit to Nervos DAO",
       "withdraw-from-nervos-dao": "Withdraw from Nervos DAO",

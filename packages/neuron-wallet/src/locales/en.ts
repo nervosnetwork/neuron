@@ -37,6 +37,7 @@ export default {
         label: "Tools",
         "sign-and-verify": "Sign/Verify Message",
         'offline-sign': 'Offline sign',
+        "clear-sync-data": "Clear all synchronized data",
       },
       window: {
         label: 'Window',
@@ -119,6 +120,10 @@ export default {
         confirm: 'OK',
         discard: 'Cancel',
       },
+      'clear-sync-data': {
+        title: 'Clear all synchronized data',
+        message: 'Clear all synchronized data will delete all local synchronized data and resynchronize the data on the chain, the whole synchronization may take a long time.'
+      },
       'send-capacity': {
         title: 'Send Transaction',
       },
@@ -144,9 +149,8 @@ export default {
       'ckb-dependency': {
         title: 'Bundled CKB Node',
         message: 'Dependency Required',
-        detail: `The embedded CKB node in Neuron requires x64 version of Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node. If you'd like to use a remote CKB node, you can skip this step.`,
+        detail: `The embedded CKB node in Neuron requires x64 version of Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node.`,
         buttons: {
-          'skip': 'Skip',
           'install-and-exit': 'Install and Exit'
         }
       },

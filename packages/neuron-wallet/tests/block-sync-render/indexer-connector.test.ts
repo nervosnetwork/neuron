@@ -6,6 +6,7 @@ import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
 import { flushPromises } from '../test-utils'
 import MercuryService from '../../src/services/mercury'
+import { ScriptHashType } from '../../src/models/chain/script'
 
 const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
@@ -54,9 +55,9 @@ describe('unit tests for IndexerConnector', () => {
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
-  jest.doMock('block-sync-renderer/mercury/indexer', () => {
+  jest.doMock('@nervina-labs/ckb-indexer', () => {
     return {
-      Indexer : stubbedIndexerConstructor.mockImplementation(
+      CkbIndexer : stubbedIndexerConstructor.mockImplementation(
         () => ({
           startForever: stubbedStartForeverFn,
           tip: stubbedTipFn,
@@ -469,7 +470,7 @@ describe('unit tests for IndexerConnector', () => {
       describe('when success', () => {
         const query: LumosCellQuery = {
           lock: {
-            hashType: 'data',
+            hashType: ScriptHashType.Data,
             codeHash: '0xcode',
             args: '0x'
           },
@@ -516,12 +517,12 @@ describe('unit tests for IndexerConnector', () => {
       describe('when handling concurrent requests', () => {
         const query1: LumosCellQuery = {
           lock: {
-            hashType: 'data',
+            hashType: ScriptHashType.Data,
             codeHash: '0xcode',
             args: '0x1'
           },
           type: {
-            hashType: 'data',
+            hashType: ScriptHashType.Data,
             codeHash: '0xcode',
             args: '0x1'
           },
@@ -529,12 +530,12 @@ describe('unit tests for IndexerConnector', () => {
         }
         const query2: LumosCellQuery = {
           lock: {
-            hashType: 'type',
+            hashType: ScriptHashType.Type,
             codeHash: '0xcode',
             args: '0x2'
           },
           type: {
-            hashType: 'type',
+            hashType: ScriptHashType.Type,
             codeHash: '0xcode',
             args: '0x2'
           },

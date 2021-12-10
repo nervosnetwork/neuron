@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.101.1",
+  "version": "0.101.2",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -19,6 +19,7 @@
   "scripts": {
     "start": "electron .",
     "build": "ttsc",
+    "watch": "ttsc -w",
     "start:dev": "yarn run build && electron .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
     "clean": "rimraf dist/*",
@@ -35,12 +36,13 @@
     ]
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.16.0",
-    "@ckb-lumos/rpc": "0.16.0",
+    "@ckb-lumos/base": "0.18.0-rc2",
+    "@ckb-lumos/rpc": "0.18.0-rc2",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "5.22.0",
-    "@nervosnetwork/ckb-sdk-core": "0.32.0",
-    "@nervosnetwork/ckb-sdk-utils": "0.32.0",
+    "@nervina-labs/ckb-indexer": "0.1.1",
+    "@nervosnetwork/ckb-sdk-core": "0.101.0",
+    "@nervosnetwork/ckb-sdk-utils": "0.101.0",
     "archiver": "4.0.2",
     "async": "3.2.0",
     "axios": "0.21.4",
@@ -64,7 +66,7 @@
     "uuid": "3.3.3"
   },
   "devDependencies": {
-    "@nervosnetwork/ckb-types": "0.32.0",
+    "@nervosnetwork/ckb-types": "0.101.0",
     "@types/archiver": "3.1.0",
     "@types/async": "3.2.3",
     "@types/electron-devtools-installer": "2.2.0",
@@ -86,8 +88,9 @@
     "electron-notarize": "0.2.1",
     "jest-when": "2.7.2",
     "lint-staged": "9.2.5",
-    "neuron-ui": "0.101.1",
+    "neuron-ui": "0.101.2",
     "rimraf": "3.0.0",
-    "ttypescript": "1.5.10"
+    "ttypescript": "1.5.10",
+    "typescript": "4.2.3"
   }
 }

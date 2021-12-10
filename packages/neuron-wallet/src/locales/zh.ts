@@ -37,6 +37,7 @@ export default {
         label: "工具",
         "sign-and-verify": "签名/验签信息",
         'offline-sign': '离线签名',
+        "clear-sync-data": "清除所有同步数据",
       },
       window: {
         label: '窗口',
@@ -118,6 +119,10 @@ export default {
       'send-capacity': {
         title: '发送交易',
       },
+      'clear-sync-data': {
+        title: '清除同步数据',
+        message: '清除所有同步数据会重置所有本地节点数据并重新同步，整个过程可能会消耗较长时间。'
+      },
       'remove-network': {
         title: '删除网络',
         message: '将删除网络 {{name}}(地址: {{address}})的设置.',
@@ -140,9 +145,8 @@ export default {
       'ckb-dependency': {
         title: '内置 CKB 节点',
         message: '缺少必要的依赖',
-        detail: 'Neuron 内置的 CKB 节点需要安装 x64 版本的 Microsoft Visual C++ Redistributable 才能正常运行。您需要安装该组件来启用内置节点。如果您使用外部节点，也可以跳过该步骤。',
+        detail: 'Neuron 内置的 CKB 节点需要安装 x64 版本的 Microsoft Visual C++ Redistributable 才能正常运行。您需要安装该组件来启用内置节点。',
         buttons: {
-          'skip': '跳过',
           'install-and-exit': '安装并退出'
         }
       },
