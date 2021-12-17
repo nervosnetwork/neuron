@@ -12,7 +12,7 @@ import OfflineSignDialog from '../OfflineSignDialog'
 import styles from './offlineSign.module.scss'
 
 const OfflineSign = ({ history }: RouteComponentProps) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const dialogRef = useRef<any | null>(null) // HTMLDialogElement is deprecated
   const {
     app: { loadedTransaction = {} },
   } = useGlobalState()

@@ -16,7 +16,7 @@ const NetworkEditor = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const history = useHistory()
   const cachedNetworks = useRef(networks)
   const cachedNetwork = useMemo(() => cachedNetworks.current.find(network => network.id === id), [cachedNetworks, id])

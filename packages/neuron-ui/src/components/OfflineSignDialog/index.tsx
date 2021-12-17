@@ -40,7 +40,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const dialogRef = useRef<any | null>(null) // HTMLDialogElement is deprecated
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -157,7 +157,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
           }
         }
       } catch (err) {
-        if (err.code === ErrorCode.PasswordIncorrect) {
+        if (err instanceof PasswordIncorrectException) {
           setError(t(err.message))
         }
       }

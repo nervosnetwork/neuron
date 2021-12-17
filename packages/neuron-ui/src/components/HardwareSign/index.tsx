@@ -56,7 +56,7 @@ const HardwareSign = ({
   offlineSignType,
 }: HardwareSignProps) => {
   const [t] = useTranslation()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const dialogRef = useRef<any | null>(null) // HTMLDialogElement is deprecated in most browsers
   const dispatch = useDispatch()
   const onCancel = useCallback(() => {
     if (signType === 'transaction') {
@@ -206,7 +206,7 @@ const HardwareSign = ({
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)
@@ -298,7 +298,7 @@ const HardwareSign = ({
             if (isSuccessResponse(res)) {
               history!.push(RoutePath.History)
             } else {
-              setError(res.message.content)
+              setError((res as any).message.content)
             }
           })
           break

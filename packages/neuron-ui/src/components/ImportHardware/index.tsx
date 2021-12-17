@@ -12,7 +12,7 @@ import { RoutePath } from './common'
 import styles from './findDevice.module.scss'
 
 const ImportHardware = ({ match }: RouteComponentProps) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const dialogRef = useRef<any | null>(null) // HTMLDialogElement is deprecated
   const EXPERIMENTAL_TAG = 'import-hardware'
 
   useEffect(() => {

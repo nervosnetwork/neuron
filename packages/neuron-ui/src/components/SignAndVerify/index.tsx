@@ -24,7 +24,7 @@ import HardwareSign from 'components/HardwareSign'
 import styles from './signAndVerify.module.scss'
 
 interface PasswordDialogProps {
-  dialogRef: React.MutableRefObject<HTMLDialogElement | null>
+  dialogRef: React.MutableRefObject<any | null> // HTMLDialogElement is deprecated
   onCancel: React.MouseEventHandler
   onSubmit: (pwd: string) => Promise<ControllerResponse>
 }

@@ -150,7 +150,7 @@ export const useDialog = ({
   onClose,
 }: {
   show: any
-  dialogRef: React.MutableRefObject<HTMLDialogElement | null>
+  dialogRef: React.MutableRefObject<any | null> // HTMLDialogElement is deprecated in most browsers
   onClose: () => void
 }) => {
   useEffect(() => {

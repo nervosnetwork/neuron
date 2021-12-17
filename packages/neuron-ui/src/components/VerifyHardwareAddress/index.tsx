@@ -28,7 +28,7 @@ export interface VerifyHardwareAddressProps {
 
 const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAddressProps) => {
   const [t] = useTranslation()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const dialogRef = useRef<any | null>(null) // HTMLDialogElement is deprecated
   // const dispatch = useDispatch()
   const onCancel = useCallback(() => {
     onDismiss()
@@ -99,7 +99,7 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)
