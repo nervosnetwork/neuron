@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 if (window.electron === undefined) {
-  // for developers who develope rendered process in a browser.
+  // for developers who develop rendered process in a browser.
   window.electron = Object.create(null)
 }
 export const { ipcRenderer } = window.electron
