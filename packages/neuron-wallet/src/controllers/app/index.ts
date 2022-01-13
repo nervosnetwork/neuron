@@ -1,6 +1,6 @@
 import path from 'path'
 import { t } from 'i18next'
-import { app as electronApp, remote, BrowserWindow, nativeImage } from 'electron'
+import { app as electronApp, BrowserWindow, nativeImage } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
 import env from 'env'
@@ -16,7 +16,7 @@ import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import IndexerService from 'services/indexer'
 
-const app = electronApp || (remote && remote.app)
+const app = electronApp
 
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
@@ -111,8 +111,7 @@ export default class AppController {
       ),
       webPreferences: {
         devTools: env.isDevMode,
-        nodeIntegration: false,
-        enableRemoteModule: false,
+        contextIsolation: false,
         preload: path.join(__dirname, './preload.js'),
       },
     })
