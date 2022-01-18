@@ -314,7 +314,7 @@ describe('Test TransactionService', () => {
         expect(actual.items.map(tx => tx.type)).toEqual(['receive', 'receive', 'receive'])
         expect(actual.items.map(tx => tx.value)).toEqual(['14200000000', '100000000000', '100000000000'])
         expect(actual.items.map(tx => tx.description)).toEqual(expectedTxs.map(tx => tx.description))
-        expect(actual.items.map(tx => !!tx.sudtInfo)).toEqual([true, false, false])
+        expect(actual.items.map(tx => !!tx.sudtInfo)).toEqual([false, false, false])
       })
     })
 

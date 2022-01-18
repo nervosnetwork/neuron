@@ -145,7 +145,7 @@ const SpecialAsset = ({
   if (assetInfo.type === NFTType.NFT) {
     amount = nftFormatter(type?.args)
     status = 'transfer-nft'
-  } else if (isNFTClassOrIssuer) {
+  } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
     amount = t('special-assets.unknown-asset')
   }
 

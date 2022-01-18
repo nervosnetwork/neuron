@@ -184,6 +184,14 @@ export default class AssetAccountInfo {
     return this.nftInfo
   }
 
+  public getAcpCodeHash(): string {
+    return this.anyoneCanPayInfo.codeHash
+  }
+
+  public getSudtCodeHash(): string {
+    return this.sudt.codeHash
+  }
+
   public generateSudtScript(args: string): Script {
     return new Script(this.sudt.codeHash, args, this.sudt.hashType)
   }
