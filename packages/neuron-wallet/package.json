@@ -63,7 +63,7 @@
     "sqlite3": "5.0.2",
     "subleveldown": "^4.1.4",
     "typeorm": "0.2.25",
-    "uuid": "3.3.3"
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "0.101.0",
@@ -78,7 +78,7 @@
     "@types/leveldown": "4.0.2",
     "@types/levelup": "4.3.0",
     "@types/sqlite3": "3.1.5",
-    "@types/uuid": "3.4.5",
+    "@types/uuid": "8.3.4",
     "@zerollup/ts-transform-paths": "1.7.18",
     "devtron": "1.4.0",
     "electron": "16.0.6",
