@@ -43,7 +43,7 @@
     }
   },
   "devDependencies": {
-    "@types/jest": "27.4.0",
+    "@types/jest": "24.0.18",
     "@typescript-eslint/eslint-plugin": "2.19.0",
     "@typescript-eslint/parser": "2.19.0",
     "concurrently": "7.0.0",
@@ -52,7 +52,7 @@
     "husky": "3.0.5",
     "lerna": "4.0.0",
     "ncp": "2.0.0",
-    "ts-jest": "27.1.2",
+    "ts-jest": "24.0.2",
     "typescript": "3.8.2",
     "wait-on": "6.0.0"
   },
