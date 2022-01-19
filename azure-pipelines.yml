@@ -23,7 +23,7 @@ stages:
       - job: mac
         displayName: macOS
         pool:
-          vmImage: "macos-10.14"
+          vmImage: "macos-11"
         strategy:
           matrix:
             node_12_x:
@@ -55,6 +55,7 @@ stages:
               versionSpec: $(node_version)
             displayName: "Install Node.js"
           - script: |
+              sudo apt-get update
               sudo apt-get install -y libudev-dev
             displayName: Install libudev
           - script: |
@@ -100,7 +101,7 @@ stages:
       - job: release_mac
         displayName: Release macOS
         pool:
-          vmImage: "macos-10.14"
+          vmImage: "macos-11"
         steps:
           - task: NodeTool@0
             inputs:
@@ -137,6 +138,7 @@ stages:
               versionSpec: 12.x
             displayName: "Install Node.js"
           - script: |
+              sudo apt-get update
               sudo apt-get install -y libudev-dev
             displayName: Install libudev
           - script: |
