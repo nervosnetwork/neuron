@@ -298,7 +298,7 @@ export default class CellsService {
           secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
 
-      if (o.typeCodeHash != null && o.hasData && o.typeCodeHash === sudtCodehash && o.lockCodeHash === acpCodehash) {
+      if (o.hasData && o.typeCodeHash === sudtCodehash && o.lockCodeHash === acpCodehash) {
         return false
       }
 

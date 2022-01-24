@@ -669,6 +669,7 @@
       "no-special-assets": "沒有自定義資產",
       "experimental": "實驗室",
       "unknown-asset": "未知資產",
+      "unrecognized-asset": "無法識別",
       "transfer-nft": "轉讓"
     },
     "customized-asset": {
