@@ -273,7 +273,8 @@ export default class CellsService {
           OR
           (
             output.hasData = 1 AND
-            output.typeHash IS NOT NULL
+            output.typeHash IS NOT NULL AND
+            output.daoData IS NULL
           )
         )
       `, {

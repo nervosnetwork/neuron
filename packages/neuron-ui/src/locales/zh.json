@@ -669,7 +669,6 @@
       "no-special-assets": "没有自定义资产",
       "experimental": "实验室",
       "unknown-asset": "未知资产",
-      "unrecognized-asset": "无法识别",
       "transfer-nft": "转让"
     },
     "customized-asset": {

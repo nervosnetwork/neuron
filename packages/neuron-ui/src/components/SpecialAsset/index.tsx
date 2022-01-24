@@ -145,10 +145,8 @@ const SpecialAsset = ({
   if (assetInfo.type === NFTType.NFT) {
     amount = nftFormatter(type?.args)
     status = 'transfer-nft'
-  } else if (isNFTClassOrIssuer) {
+  } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
     amount = t('special-assets.unknown-asset')
-  } else if (assetInfo.type === 'Unknown') {
-    amount = t('special-assets.unrecognized-asset', { amount })
   }
 
   return (
@@ -157,10 +155,7 @@ const SpecialAsset = ({
         <span>{date}</span>
         <span>{time}</span>
       </div>
-      <CopyZone
-        className={styles.capacity}
-        content={isNFTClassOrIssuer || assetInfo.type === NFTType.NFT ? amount : amountToCopy}
-      >
+      <CopyZone className={styles.capacity} content={assetInfo.type === NFTType.NFT ? amount : amountToCopy}>
         {amount}
       </CopyZone>
       <div className={styles.actions}>
