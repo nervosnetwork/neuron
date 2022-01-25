@@ -37,6 +37,7 @@ export enum CustomizedType {
   NFT = "NFT",
   NFTClass = "NFTClass",
   NFTIssuer = 'NFTIssuer',
+  Unknown = 'Unknown',
 }
 
 export default class CellsService {
@@ -230,6 +231,8 @@ export default class CellsService {
     const nftIssuerCodehash = assetAccountInfo.getNftIssuerInfo().codeHash
     const nftClassCodehash = assetAccountInfo.getNftClassInfo().codeHash
     const nftCodehash = assetAccountInfo.getNftInfo().codeHash
+    const acpCodehash = assetAccountInfo.getAcpCodeHash()
+    const sudtCodehash = assetAccountInfo.getSudtCodeHash()
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 => SystemScriptInfo.generateSecpScript(blake160).computeHash())
 
     const skip = (pageNo - 1) * pageSize
@@ -267,6 +270,12 @@ export default class CellsService {
             output.hasData = 1 AND
             output.typeCodeHash = :nftCodehash
           )
+          OR
+          (
+            output.hasData = 1 AND
+            output.typeHash IS NOT NULL AND
+            output.daoData IS NULL
+          )
         )
       `, {
         liveStatus: OutputStatus.Live,
@@ -277,7 +286,7 @@ export default class CellsService {
         nftCodehash,
       })
       .orderBy('tx.timestamp', 'ASC')
-      .getMany()
+      .getMany();
 
     const matchedOutputs = allMutiSignOutputs.filter(o => {
       if (o.multiSignBlake160) {
@@ -290,7 +299,16 @@ export default class CellsService {
           secp256k1LockHashes.find(hash => hash.includes(senderLockHash))
       }
 
-      if (o.typeCodeHash === nftIssuerCodehash || o.typeCodeHash === nftClassCodehash || o.typeCodeHash === nftCodehash) {
+      if (o.hasData && o.typeCodeHash === sudtCodehash && o.lockCodeHash === acpCodehash) {
+        return false
+      }
+
+      if (
+        o.typeCodeHash === nftIssuerCodehash ||
+        o.typeCodeHash === nftClassCodehash ||
+        o.typeCodeHash === nftCodehash ||
+        (o.typeCodeHash != null && o.hasData)
+      ) {
         return blake160Hashes.has(o.lockArgs)
       }
     })
@@ -336,11 +354,16 @@ export default class CellsService {
               data: 'withdraw-able'
             })
           }
-        }
-        else {
+        } else if (o.lockCodeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
           cell.setCustomizedAssetInfo({
             lock: CustomizedLock.SingleMultiSign,
             type: '',
+            data: ''
+          })
+        } else {
+          cell.setCustomizedAssetInfo({
+            lock: '',
+            type: CustomizedType.Unknown,
             data: ''
           })
         }
