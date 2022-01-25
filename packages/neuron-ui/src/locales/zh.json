@@ -367,10 +367,10 @@
         "title": "转让 NFT"
       },
       "delete": {
-        "title": "删除钱包 {{name}}"
+        "title": "删除钱包"
       },
       "backup": {
-        "title": "备份钱包 {{name}}"
+        "title": "备份钱包"
       },
       "unlock": {
         "title": "请输入钱包密码提取资产"

@@ -374,10 +374,10 @@
         "title": "Send NFT"
       },
       "delete": {
-        "title": "Delete the {{name}} wallet"
+        "title": "Delete the wallet"
       },
       "backup": {
-        "title": "Backup the {{name}} wallet"
+        "title": "Backup the wallet"
       },
       "unlock": {
         "title": "Please input wallet password to claim the asset"
