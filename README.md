@@ -12,7 +12,7 @@ Nervos CKB Full-Node Desktop Wallet
 
 ### Prerequisites
 
-You will need `node >= 12` and `yarn >= 1.14` to build and run Neuron.
+You will need `node >= 16` and `yarn >= 1.14` to build and run Neuron.
 
 #### Lerna
 
@@ -28,6 +28,7 @@ After lerna has been installed, run this to install and link dependencies:
 
 ```shell
 $ yarn bootstrap
+$ cd packages/neuron-wallet && yarn rebuild:nativemodules
 ```
 
 ### Start Neuron

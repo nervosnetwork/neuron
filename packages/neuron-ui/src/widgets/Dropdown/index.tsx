@@ -25,11 +25,11 @@ const CustomDropdown = (props: IDropdownProps) => (
       dropdownItem: {
         fontSize: '0.75rem!important',
         boxShadow: 'border-box',
-        minHeight: 'auto',
+        minHeight: '1.5rem',
       },
       dropdownItemSelected: {
         fontSize: '0.75rem!important',
-        minHeight: 'auto',
+        minHeight: '1.5rem',
         backgroundColor: '#e3e3e3',
       },
       root: {
