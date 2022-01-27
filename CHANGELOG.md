@@ -1,3 +1,14 @@
+# 0.101.3 (2022-01-28)
+
+[CKB v0.101.3](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.3) was released on Dec. 14th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+* Update dependencies [#2243](https://github.com/nervosnetwork/neuron/pull/2243).
+* Display all unknown custom asset [#2247](https://github.com/nervosnetwork/neuron/pull/2247).
+* Upgrade the bundled ckb node to v0.101.3.
+* Upgrade the bundled ckb-indexer to v0.3.2.
+
+
 # 0.101.2 (2021-12-10)
 
 [CKB v0.101.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.1) was released on Oct. 28th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
@@ -5,6 +16,7 @@
 **The CKB v0.101.0 activates ckb2021 since epoch 3113 in the testnet. After that nodes running this version are incompatible with old versions. However, this version is still compatible with CKB v0.25.0 and above in the mainnet.**
 
 ### New features
+* Upgrade SDK to v0.101.0 to adopt new full format of address.
 * Upgrade the bundled ckb node to v0.101.1.
 * Update nft contract info.
 * Update cheque cell contract info.
