@@ -28,7 +28,7 @@ After lerna has been installed, run this to install and link dependencies:
 
 ```shell
 $ yarn bootstrap
-$ cd packages/neuron-wallet && yarn rebuild:nativemodules
+$ lerna run rebuild:nativemodules
 ```
 
 ### Start Neuron
