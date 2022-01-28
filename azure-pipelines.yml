@@ -109,6 +109,7 @@ stages:
             displayName: "Install Node.js"
           - script: |
               yarn global add lerna
+              yarn global add electron-builder
               yarn bootstrap
               lerna run rebuild:nativemodules
             name: Bootstrap
@@ -144,6 +145,7 @@ stages:
             displayName: Install libudev
           - script: |
               yarn global add lerna
+              yarn global add electron-builder
               yarn bootstrap
               lerna run rebuild:nativemodules
             name: Bootstrap
@@ -167,6 +169,7 @@ stages:
           - script: yarn global add lerna
             displayName: "Install lerna"
           - script: |
+              yarn global add electron-builder
               yarn bootstrap
               lerna run rebuild:nativemodules
             name: Bootstrap
