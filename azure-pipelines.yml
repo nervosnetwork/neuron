@@ -110,6 +110,7 @@ stages:
           - script: |
               yarn global add lerna
               yarn bootstrap
+              lerna run rebuild:nativemodules
             name: Bootstrap
           - task: DownloadSecureFile@1
             name: macSiginingCertificate
@@ -144,6 +145,7 @@ stages:
           - script: |
               yarn global add lerna
               yarn bootstrap
+              lerna run rebuild:nativemodules
             name: Bootstrap
           - script: |
               ./scripts/download-ckb.sh
@@ -166,6 +168,7 @@ stages:
             displayName: "Install lerna"
           - script: |
               yarn bootstrap
+              lerna run rebuild:nativemodules
             name: Bootstrap
           - task: DownloadSecureFile@1
             name: winSiginingCertificate
