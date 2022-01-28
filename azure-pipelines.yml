@@ -118,6 +118,7 @@ stages:
               secureFile: Neuron_mac.p12
           - script: |
               ./scripts/download-ckb.sh mac
+              yarn pre-release
               yarn release mac
             name: Release
             displayName: "Sign and Release"
@@ -147,6 +148,7 @@ stages:
             name: Bootstrap
           - script: |
               ./scripts/download-ckb.sh
+              yarn pre-release
               yarn release linux
             name: Release
             displayName: "Sign and Release"
