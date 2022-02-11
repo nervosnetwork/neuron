@@ -100,3 +100,12 @@ export const stopCkbNode = () => {
     }
   })
 }
+
+/**
+ * remove ckb data
+ */
+export const clearCkbNodeCache = async () => {
+  await stopCkbNode()
+  fs.rmSync(ckbDataPath(), { recursive: true, force: true })
+  await startCkbNode()
+}

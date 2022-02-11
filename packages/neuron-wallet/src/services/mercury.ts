@@ -6,7 +6,6 @@ import process from 'process'
 import logger from 'utils/logger'
 import { Network } from 'models/network'
 import TOML from '@iarna/toml'
-import { deleteFolderRecursive } from 'block-sync-renderer/sync/indexer-folder-manager'
 import NetworksService from './networks'
 
 const platform = (): string => {
@@ -136,10 +135,15 @@ export default class MercuryService {
   }
 
   clearData = async () => {
-    const network = NetworksService.getInstance().getCurrent()
-    await this.stop()
-    const dataPath = this.getDataPath(network)
-    deleteFolderRecursive(dataPath)
+    const lumosIndexerDBFolder = 'indexer_data'
+    const genesisBlockHash = NetworksService.getInstance().getCurrent().genesisHash
+    const indexedDataFolderPath = path.resolve(
+      env.fileBasePath,
+      lumosIndexerDBFolder,
+      genesisBlockHash
+    )
+
+    fs.rmSync(indexedDataFolderPath, { recursive: true, force: true })
   }
 
   static createFolder(dir: string) {

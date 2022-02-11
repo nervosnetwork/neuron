@@ -18,7 +18,6 @@ import CellDep, { DepType } from 'models/chain/cell-dep'
 import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import Output from 'models/chain/output'
-import { ChildProcess } from 'utils/worker'
 
 @Entity()
 export default class Transaction extends BaseEntity {
@@ -156,11 +155,8 @@ export default class Transaction extends BaseEntity {
   }
 
   private changed = (event: string) => {
-    if (ChildProcess.isChildProcess()) {
-      ChildProcess.send({
-        channel: 'tx-db-changed',
-        result: { event }
-      })
+    if (process.send) {
+      process.send({ channel: 'tx-db-changed', message: { event } })
     } else {
       TxDbChangedSubject.getSubject().next({ event })
     }

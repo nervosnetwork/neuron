@@ -16,68 +16,59 @@ import MultiSign from 'models/multi-sign'
 import IndexerConnector, { BlockTips } from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
 import CommonUtils from 'utils/common'
-import { ChildProcess } from 'utils/worker'
+import { ShouldInChildProcess } from 'exceptions'
 
 export default class Queue {
-  private lockHashes: string[]
-  private url: string
-  private indexerUrl: string
-  private addresses: AddressInterface[]
-  private rpcService: RpcService
-  private indexerConnector: IndexerConnector | undefined
-  private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
+  #lockHashes: string[]
+  #url: string // ckb node
+  #indexerUrl: string
+  #addresses: AddressInterface[]
+  #rpcService: RpcService
+  #indexerConnector: IndexerConnector | undefined
+  #checkAndSaveQueue: AsyncQueue<{ transactions: Transaction[] }> | undefined
 
-  private multiSignBlake160s: string[]
-  private anyoneCanPayLockHashes: string[]
-  private assetAccountInfo: AssetAccountInfo
+  #multiSignBlake160s: string[]
+  #anyoneCanPayLockHashes: string[]
+  #assetAccountInfo: AssetAccountInfo
 
   constructor(url: string, addresses: AddressInterface[], indexerUrl: string) {
-    this.url = url
-    this.indexerUrl = indexerUrl
-    this.addresses = addresses
-    this.rpcService = new RpcService(url)
-    this.assetAccountInfo = new AssetAccountInfo()
-
-    this.lockHashes = AddressParser.batchToLockHash(
-      this.addresses.map(meta => meta.address)
-    )
+    this.#url = url
+    this.#indexerUrl = indexerUrl
+    this.#addresses = addresses
+    this.#rpcService = new RpcService(url)
+    this.#assetAccountInfo = new AssetAccountInfo()
+    this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
 
     const multiSign = new MultiSign()
-    const blake160s = this.addresses.map(meta => meta.blake160)
-    this.multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
-    this.anyoneCanPayLockHashes = blake160s.map(
-      b => this.assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
-    )
+    const blake160s = this.#addresses.map(meta => meta.blake160)
+    this.#multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
+    this.#anyoneCanPayLockHashes = blake160s.map(b => this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
   }
 
-  public async start() {
+  start = async () => {
+    logger.info("Queue:\tstart block sync queue")
     try {
-      this.indexerConnector = new IndexerConnector(
-        this.addresses,
-        this.url,
-        this.indexerUrl,
-      )
-      await this.indexerConnector.connect()
+      this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl)
+
+      await this.#indexerConnector.connect()
     } catch (error) {
       logger.error('Restarting child process due to error', error.message)
-      ChildProcess.send({
-        channel: 'indexer-error'
-      })
+      if (process.send) {
+        process.send({ channel: 'indexer-error' })
+      } else {
+        throw new ShouldInChildProcess()
+      }
       return
     }
+    this.#indexerConnector.blockTipsSubject.subscribe(tip => this.#updateBlockNumberTips(tip))
 
-    this.indexerConnector.blockTipsSubject.subscribe(tip => {
-      this.updateBlockNumberTips(tip)
-    });
-
-
-    this.checkAndSaveQueue = queue(async (task: any) => {
-      const {transactions} = task
+    this.#checkAndSaveQueue = queue(async (task: any) => {
+      const { transactions } = task
       //need to retry after a certain period of time if throws errors
       // eslint-disable-next-line no-constant-condition
-      while(true) {
+      while (true) {
         try {
-          await this.checkAndSave(transactions)
+          await this.#checkAndSave(transactions)
           break
         } catch (error) {
           logger.error('retry saving transactions in 2 seconds due to error:', error)
@@ -85,54 +76,47 @@ export default class Queue {
         }
       }
 
-      this.indexerConnector!.notifyCurrentBlockNumberProcessed(transactions[0].blockNumber)
+      this.#indexerConnector!.notifyCurrentBlockNumberProcessed(transactions[0].blockNumber)
     })
 
-    this.checkAndSaveQueue.error((err: any, task: any) => {
+    this.#checkAndSaveQueue.error((err: any, task: any) => {
       logger.error(err, JSON.stringify(task, undefined, 2))
     })
 
-    this.indexerConnector.transactionsSubject
+    this.#indexerConnector.transactionsSubject
       .subscribe(transactions => {
-        const task = {
-          transactions: transactions.map(
-            transactionWithStatus => transactionWithStatus.transaction
-          )
-        }
-        this.checkAndSaveQueue!.push(task)
+        const task = { transactions: transactions.map(t => t.transaction) }
+        this.#checkAndSaveQueue!.push(task)
       })
-
   }
 
-  public getIndexerConnector(): IndexerConnector {
-    return this.indexerConnector!
-  }
+  getIndexerConnector = (): IndexerConnector => this.#indexerConnector!
 
-  public stop = () => {
-    this.indexerConnector!.pollingIndexer = false
-  }
+  stop = () => this.#indexerConnector!.pollingIndexer = false
 
-  public waitForDrained = async () => {
-    return new Promise<void>(resolve => {
-      if (!this.checkAndSaveQueue?.idle()) {
-        return resolve()
-      }
-      this.checkAndSaveQueue?.drain(resolve)
-    })
-  }
-
-  public stopAndWait = async () => {
+  stopAndWait = async () => {
     this.stop()
-    await this.waitForDrained()
+    // FIXME: figure out why async/await not work here
+    // drain maybe not called if queue is empty from the beginning
+    if (this.#checkAndSaveQueue) {
+      this.#checkAndSaveQueue.idle() ? true : await this.#checkAndSaveQueue.drain()
+    }
+    // await this.#checkAndSaveQueue?.drain()
+    // return new Promise<void>(resolve => {
+    //   if (this.#checkAndSaveQueue?.idle()) {
+    //     return resolve()
+    //   }
+    //   this.#checkAndSaveQueue?.drain(resolve)
+    // })
   }
 
-  private checkAndSave = async (transactions: Transaction[]): Promise<void> => {
+  #checkAndSave = async (transactions: Transaction[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
 
     const fetchTxQueue = queue(async (task: any) => {
-      const {txHash} = task
+      const { txHash } = task
 
-      const previousTxWithStatus = await this.rpcService.getTransaction(txHash)
+      const previousTxWithStatus = await this.#rpcService.getTransaction(txHash)
       cachedPreviousTxs.set(txHash, previousTxWithStatus)
     }, 1)
 
@@ -153,7 +137,7 @@ export default class Queue {
           continue;
         }
 
-        fetchTxQueue.push({txHash: previousTxHash})
+        fetchTxQueue.push({ txHash: previousTxHash })
         txHashSet.add(previousTxHash)
       }
     }
@@ -164,10 +148,10 @@ export default class Queue {
 
     for (const [, tx] of transactions.entries()) {
       const [, , anyoneCanPayInfos] = await new TxAddressFinder(
-        this.lockHashes,
-        this.anyoneCanPayLockHashes,
+        this.#lockHashes,
+        this.#anyoneCanPayLockHashes,
         tx,
-        this.multiSignBlake160s
+        this.#multiSignBlake160s
       ).addresses()
       for (const [inputIndex, input] of tx.inputs.entries()) {
         const previousTxHash = input.previousOutput!.txHash
@@ -203,14 +187,14 @@ export default class Queue {
         await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
       }
 
-      await this.checkAndGenerateAddressesByTx(tx)
+      await this.#checkAndGenerateAddressesByTx(tx)
       await IndexerCacheService.updateCacheProcessed(tx.hash!)
     }
   }
 
-  private async checkAndGenerateAddressesByTx(tx: Transaction) {
+  #checkAndGenerateAddressesByTx = async (tx: Transaction) => {
     const walletIds = new Set(
-      this.addresses
+      this.#addresses
         .filter(
           addr =>
             tx.inputs.some(input => input.lock?.args === addr.blake160) ||
@@ -225,14 +209,18 @@ export default class Queue {
     }
   }
 
-  private updateBlockNumberTips(tip: BlockTips) {
-    ChildProcess.send({
-      channel: 'cache-tip-block-updated',
-      result: {
-        indexerTipNumber: tip.indexerTipNumber,
-        cacheTipNumber: tip.cacheTipNumber,
-        timestamp: Date.now()
-      }
-    })
+  #updateBlockNumberTips = (tip: BlockTips) => {
+    if (process.send) {
+      process.send({
+        channel: 'cache-tip-block-updated',
+        message: {
+          indexerTipNumber: tip.indexerTipNumber,
+          cacheTipNumber: tip.cacheTipNumber,
+          timestamp: Date.now()
+        }
+      })
+    } else {
+      throw new ShouldInChildProcess()
+    }
   }
 }

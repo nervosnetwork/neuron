@@ -12,7 +12,6 @@ import SystemScriptInfo from 'models/system-script-info'
 import Script from 'models/chain/script'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 import AddressDescription from 'database/chain/entities/address-description'
-import { ChildProcess } from 'utils/worker'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import AddressMeta from 'database/address/meta'
 
@@ -28,7 +27,7 @@ export interface AddressMetaInfo {
 export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
-  private static async create (addresses: AddressInterface[]) {
+  private static async create(addresses: AddressInterface[]) {
     const publicKeyInfos = addresses.map(addr => {
       return HdPublicKeyInfo.fromObject({
         ...addr,
@@ -70,11 +69,8 @@ export default class AddressService {
     const addressesToNotify = addresses
       .map(address => ({ ...address, isImporting }))
 
-    if (ChildProcess.isChildProcess()) {
-      ChildProcess.send({
-        channel: 'address-created',
-        result: addressesToNotify
-      })
+    if (process.send) {
+      process.send({ channel: 'address-created', message: addressesToNotify })
     } else {
       AddressCreatedSubject.getSubject().next(addressesToNotify)
     }
@@ -260,7 +256,7 @@ export default class AddressService {
       .getRepository(HdPublicKeyInfo)
       .createQueryBuilder()
       .select('addressIndex')
-      .where({walletId, addressType})
+      .where({ walletId, addressType })
       .orderBy('addressIndex', 'DESC')
       .getRawOne()
 
@@ -282,7 +278,7 @@ export default class AddressService {
     return [unusedReceivingAddresses, unusedChangeAddresses]
   }
 
-  private static async getUnusedAddressesByWalletId (walletId: string) {
+  private static async getUnusedAddressesByWalletId(walletId: string) {
     const txCountsByLockArgs = await TransactionsService.getTxCountsByWalletId(walletId)
 
     const addresses = await this.getAddressesByWalletId(walletId)
@@ -300,7 +296,7 @@ export default class AddressService {
     return allUnusedAddresses
   }
 
-  public static async getNextUnusedAddressByWalletId (walletId: string): Promise<AddressInterface | undefined> {
+  public static async getNextUnusedAddressByWalletId(walletId: string): Promise<AddressInterface | undefined> {
     const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     if (unusedReceivingAddresses.length) {
       return unusedReceivingAddresses[0]
@@ -312,8 +308,8 @@ export default class AddressService {
     return undefined
   }
 
-  public static async getNextUnusedChangeAddressByWalletId (walletId: string): Promise<AddressInterface | undefined> {
-    const [ , unusedChangeAddresses ] = await this.getGroupedUnusedAddressesByWalletId(walletId)
+  public static async getNextUnusedChangeAddressByWalletId(walletId: string): Promise<AddressInterface | undefined> {
+    const [, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     if (unusedChangeAddresses.length) {
       return unusedChangeAddresses[0]
     }
@@ -321,19 +317,19 @@ export default class AddressService {
   }
 
   public static async getUnusedReceivingAddressesByWalletId(walletId: string): Promise<AddressInterface[]> {
-    const [ unusedReceivingAddresses ] = await this.getGroupedUnusedAddressesByWalletId(walletId)
+    const [unusedReceivingAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     return unusedReceivingAddresses
   }
 
-  public static getFirstAddressByWalletId = async (walletId: string) : Promise<AddressInterface> => {
+  public static getFirstAddressByWalletId = async (walletId: string): Promise<AddressInterface> => {
     const publicKeyInfo = await getConnection()
       .getRepository(HdPublicKeyInfo)
       .createQueryBuilder()
-      .where({walletId, addressType: AddressType.Receiving})
+      .where({ walletId, addressType: AddressType.Receiving })
       .orderBy('addressIndex', 'ASC')
       .getOne()
 
-      return AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo!.toModel())
+    return AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo!.toModel())
   }
 
   public static getAddressesByAllWallets = async (): Promise<AddressInterface[]> => {
@@ -348,22 +344,22 @@ export default class AddressService {
       ))
   }
 
-  public static async getAddressesByWalletId (walletId: string): Promise<AddressInterface[]> {
+  public static async getAddressesByWalletId(walletId: string): Promise<AddressInterface[]> {
     const publicKeyInfos = await getConnection()
       .getRepository(HdPublicKeyInfo)
       .createQueryBuilder()
-      .where({walletId})
+      .where({ walletId })
       .getMany()
 
     const addressDescriptions = await getConnection()
       .getRepository(AddressDescription)
       .createQueryBuilder()
-      .where({walletId})
+      .where({ walletId })
       .getMany()
 
     return publicKeyInfos.sort((lhs, rhs) => {
-        return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
-      })
+      return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
+    })
       .map(publicKeyInfo => {
         const keyInfoModel = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel());
         const found = addressDescriptions.find(addrDesc => addrDesc.address === keyInfoModel.address)
@@ -372,9 +368,9 @@ export default class AddressService {
       })
   }
 
-  public static async getAddressesWithBalancesByWalletId (walletId: string): Promise<AddressInterface[]> {
+  public static async getAddressesWithBalancesByWalletId(walletId: string): Promise<AddressInterface[]> {
     const addresses = await this.getAddressesByWalletId(walletId)
-    const {liveBalances, sentBalances, pendingBalances} = await CellsService.getBalancesByWalletId(walletId)
+    const { liveBalances, sentBalances, pendingBalances } = await CellsService.getBalancesByWalletId(walletId)
     const txCountsByLockArgs = await TransactionsService.getTxCountsByWalletId(walletId)
     const allAddressesWithBalances = addresses.map(address => {
       const script = Script.fromObject({
@@ -402,11 +398,11 @@ export default class AddressService {
     return allAddressesWithBalances
   }
 
-  public static async updateDescription (walletId: string, address: string, description: string) {
+  public static async updateDescription(walletId: string, address: string, description: string) {
     const addressDescription = await getConnection()
       .getRepository(AddressDescription)
       .createQueryBuilder()
-      .where({walletId, address})
+      .where({ walletId, address })
       .getOne()
 
     if (addressDescription) {
@@ -421,16 +417,16 @@ export default class AddressService {
       .getRepository(AddressDescription)
       .createQueryBuilder()
       .insert()
-      .values({walletId, address, description})
+      .values({ walletId, address, description })
       .execute()
   }
 
-  public static async deleteByWalletId (walletId: string): Promise<void> {
+  public static async deleteByWalletId(walletId: string): Promise<void> {
     await getConnection()
       .createQueryBuilder()
       .delete()
       .from(HdPublicKeyInfo)
-      .where({walletId})
+      .where({ walletId })
       .execute()
   }
 
@@ -438,7 +434,7 @@ export default class AddressService {
     return NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
   }
 
-  private static getAddressPrefix() : AddressPrefix {
+  private static getAddressPrefix(): AddressPrefix {
     return this.getAddressVersion() === AddressVersion.Mainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
   }
 }
