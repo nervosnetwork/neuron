@@ -36,9 +36,8 @@ const getTransactionStatus = async (hash: string) => {
 
 const trackingStatus = async () => {
   const pendingTransactions = await FailedTransaction.pendings()
-  if (!pendingTransactions.length) {
-    return
-  }
+  if (!pendingTransactions.length) {return}
+
   const pendingHashes = pendingTransactions.map(tx => tx.hash)
   const txs = await Promise.all(
     pendingHashes.map(async hash => {
@@ -88,8 +87,3 @@ export const register = () => {
   })
 }
 
-export const unregister = () => {
-  // Nothing to do. This interval subscription will be killed with the renderer process.
-}
-
-export default register

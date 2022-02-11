@@ -1,7 +1,7 @@
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import env from 'env'
-import { distinctUntilChanged } from 'rxjs/operators'
+import { distinctUntilChanged, debounceTime } from 'rxjs/operators'
 import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
 import NodeService from 'services/node'
@@ -20,7 +20,7 @@ export default class NetworksController {
     NodeService
       .getInstance()
       .connectionStatusSubject
-      .pipe(distinctUntilChanged())
+      .pipe(distinctUntilChanged(), debounceTime(3000))
       .subscribe(async (connected: boolean) => {
         if (connected) {
           logger.debug('Network:\treconnected')
@@ -64,6 +64,7 @@ export default class NetworksController {
     if (!name || !remote) {
       throw new IsRequired('Name and address')
     }
+
     if (name === 'error') {
       throw new InvalidName('Network')
     }

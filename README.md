@@ -31,6 +31,12 @@ $ yarn bootstrap
 $ lerna run rebuild:nativemodules
 ```
 
+#### Add CKB Indexer
+
+CKB Indexer is a service to create cell and transaction indexes.
+
+Download [CKB Indexer](https://github.com/nervosnetwork/ckb-indexer/releases) and move the binary into `packages/neuron-wallet/bin/{win/linux/mac}/`.
+
 ### Start Neuron
 
 As of `v0.26.0`, Neuron bundles a CKB binary and starts it for Mainnet automatically. If you prefer to run a local CKB node yourself instead, please follow the [Nervos CKB doc](https://docs.nervos.org/docs/basics/guides/mainnet) to get it up and running before launching Neuron.

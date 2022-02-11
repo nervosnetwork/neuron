@@ -1,12 +1,11 @@
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
+import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
+import NodeService from 'services/node'
+import RpcService from 'services/rpc-service'
 import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
-import NodeService from 'services/node'
-import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
-
-import RpcService from 'services/rpc-service'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
@@ -36,12 +35,12 @@ export default class SyncApiController {
   static emiter = new EventEmiter()
   private static instance: SyncApiController
 
-  private estimates: Array<SyncState> = []
-  private sampleTime: number = 60000
-  private indexerTipDiff = 50
-  private cacheDiff = 5
-  private bestKnownBlockNumberDiff = 50
-  private cachedEstimation: SyncState|undefined = undefined
+  #estimates: Array<SyncState> = []
+  #sampleTime: number = 60000
+  #indexerTipDiff = 50
+  #cacheDiff = 5
+  #bestKnownBlockNumberDiff = 50
+  #cachedEstimation?: SyncState = undefined
 
   public static getInstance() {
     if (this.instance) {
@@ -51,25 +50,25 @@ export default class SyncApiController {
     return this.instance
   }
 
-  public async mount() {
-    this.registerHandlers()
+  public mount() {
+    this.#registerHandlers()
   }
 
-  private getEstimatesByCurrentNode () {
-    const nodeUrl = this.getCurrentNodeUrl()
-    return this.estimates.filter(
+  #getEstimatesByCurrentNode = () => {
+    const nodeUrl = this.#getCurrentNodeUrl()
+    return this.#estimates.filter(
       state => state.nodeUrl === nodeUrl &&
-      Date.now() - state.timestamp <= this.sampleTime
+        Date.now() - state.timestamp <= this.#sampleTime
     )
   }
 
-  private calculateAvgIndexRate (currentindexerTipNumber: number, timestamp: number) {
-    const firstState = this.getEstimatesByCurrentNode()[0]
+  #calculateAvgIndexRate = (currentindexerTipNumber: number, timestamp: number) => {
+    const firstState = this.#getEstimatesByCurrentNode()[0]
     if (!firstState) {
       return undefined
     }
     const advancedindexerTipNumber = currentindexerTipNumber - firstState.indexerTipNumber
-    if (advancedindexerTipNumber < this.indexerTipDiff) {
+    if (advancedindexerTipNumber < this.#indexerTipDiff) {
       return undefined
     }
     const lastedTime = timestamp - firstState.timestamp
@@ -77,35 +76,35 @@ export default class SyncApiController {
     return indexRate
   }
 
-  private foundBestKnownBlockNumber (bestKnownBlockNumber: number): boolean {
-    const estimates = this.getEstimatesByCurrentNode()
+  #foundBestKnownBlockNumber = (bestKnownBlockNumber: number): boolean => {
+    const estimates = this.#getEstimatesByCurrentNode()
     const lastEstimate = estimates[0]
 
     if (!lastEstimate) {
       return false
     }
 
-    if (bestKnownBlockNumber - lastEstimate.bestKnownBlockNumber >= this.bestKnownBlockNumberDiff) {
+    if (bestKnownBlockNumber - lastEstimate.bestKnownBlockNumber >= this.#bestKnownBlockNumberDiff) {
       return false
     }
 
     return true
   }
 
-  private updateEstimates (newSyncState: SyncState) {
+  #updateEstimates = (newSyncState: SyncState) => {
     const currentTime = Date.now()
-    this.estimates = this.getEstimatesByCurrentNode().filter(
-      state => currentTime - state.timestamp <= this.sampleTime
+    this.#estimates = this.#getEstimatesByCurrentNode().filter(
+      state => currentTime - state.timestamp <= this.#sampleTime
     )
-    this.estimates.push(newSyncState)
+    this.#estimates.push(newSyncState)
 
     return newSyncState
   }
 
-  private async fetchBestKnownBlockInfo (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> {
-    const nodeUrl = this.getCurrentNodeUrl()
+  #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> => {
+    const nodeUrl = this.#getCurrentNodeUrl()
     try {
-      const method = new Method({url: nodeUrl}, {
+      const method = new Method({ url: nodeUrl }, {
         name: 'sync state',
         method: 'sync_state',
         paramsFormatters: [],
@@ -125,21 +124,21 @@ export default class SyncApiController {
     }
   }
 
-  private getCurrentNodeUrl () {
+  #getCurrentNodeUrl = () => {
     const ckb = NodeService.getInstance().ckb
     return ckb.node.url
   }
 
-  private async estimate (states: any): Promise<SyncState> {
+  #estimate = async (states: any): Promise<SyncState> => {
     const indexerTipNumber = parseInt(states.indexerTipNumber)
     const cacheTipNumber = parseInt(states.cacheTipNumber)
 
     const currentTimestamp = Date.now()
-    const nodeUrl = this.getCurrentNodeUrl()
+    const nodeUrl = this.#getCurrentNodeUrl()
     const tipHeader = await new RpcService(nodeUrl).getTipHeader()
 
-    const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.fetchBestKnownBlockInfo()
-    const foundBestKnownBlockNumber = this.foundBestKnownBlockNumber(bestKnownBlockNumber)
+    const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.#fetchBestKnownBlockInfo()
+    const foundBestKnownBlockNumber = this.#foundBestKnownBlockNumber(bestKnownBlockNumber)
 
     const remainingBlocksToCache = bestKnownBlockNumber - cacheTipNumber
     const remainingBlocksToIndex = bestKnownBlockNumber - indexerTipNumber
@@ -158,7 +157,7 @@ export default class SyncApiController {
     }
 
     if (foundBestKnownBlockNumber) {
-      const allCached = remainingBlocksToCache < this.cacheDiff
+      const allCached = remainingBlocksToCache < this.#cacheDiff
 
       const tipBlockTimestamp = Number(tipHeader.timestamp)
       if (allCached) {
@@ -170,7 +169,7 @@ export default class SyncApiController {
         }
       }
 
-      const indexRate = this.calculateAvgIndexRate(indexerTipNumber, currentTimestamp)
+      const indexRate = this.#calculateAvgIndexRate(indexerTipNumber, currentTimestamp)
       if (!allCached && indexRate) {
         const estimate = Math.round(remainingBlocksToIndex / indexRate)
         Object.assign(newSyncState, {
@@ -180,51 +179,54 @@ export default class SyncApiController {
       }
     }
 
-    return this.updateEstimates(newSyncState)
+    return this.#updateEstimates(newSyncState)
   }
 
-  public async getSyncStatus () {
-    if (!this.estimates.length) {
+  public async getSyncStatus() {
+    if (!this.#estimates.length) {
       return SyncStatus.SyncNotStart
     }
-    const lastEstimate = this.estimates[this.estimates.length - 1]
+    const lastEstimate = this.#estimates[this.#estimates.length - 1]
     return lastEstimate.status
   }
 
-  public getCachedEstimation () {
-    const lastEstimation = this.estimates[this.estimates.length - 1]
-    if (!this.cachedEstimation) {
-      this.cachedEstimation = lastEstimation
-      return this.cachedEstimation
+  public getCachedEstimation() {
+    const lastEstimation = this.#estimates[this.#estimates.length - 1]
+    if (!this.#cachedEstimation) {
+      this.#cachedEstimation = lastEstimation
+      return this.#cachedEstimation
     }
 
-    if (this.estimates.length > 1 &&
-      this.estimates[this.estimates.length - 2].cacheTipNumber === lastEstimation.cacheTipNumber
+    if (this.#estimates.length > 1 &&
+      this.#estimates[this.#estimates.length - 2].cacheTipNumber === lastEstimation.cacheTipNumber
     ) {
-      this.cachedEstimation = lastEstimation
-      return this.cachedEstimation
+      this.#cachedEstimation = lastEstimation
+      return this.#cachedEstimation
     }
 
-    const nodeUrl = this.getCurrentNodeUrl()
+    const nodeUrl = this.#getCurrentNodeUrl()
 
-    if (this.cachedEstimation.nodeUrl !== nodeUrl ||
-      this.cachedEstimation.timestamp + this.sampleTime <= Date.now()
+    if (this.#cachedEstimation.nodeUrl !== nodeUrl ||
+      this.#cachedEstimation.timestamp + this.#sampleTime <= Date.now()
     ) {
-      this.cachedEstimation = lastEstimation
+      this.#cachedEstimation = lastEstimation
     }
 
-    return this.cachedEstimation
+    return this.#cachedEstimation
   }
 
-  private registerHandlers() {
+  #registerHandlers = () => {
+
+    // FIX: remove listener when sync task stopped
+    // Export handler to devtools
     SyncApiController.emiter.on('cache-tip-block-updated', async states => {
-      const newSyncState = await this.estimate(states)
+      const newSyncState = await this.#estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncState.cacheTipNumber))
       SyncStateSubject.next(newSyncState)
     })
 
     CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {
-      const nodeUrl = this.getCurrentNodeUrl()
+      const nodeUrl = this.#getCurrentNodeUrl()
       const newSyncState: SyncState = {
         nodeUrl,
         timestamp: 0,
@@ -237,7 +239,7 @@ export default class SyncApiController {
         estimate: undefined,
         status: SyncStatus.SyncNotStart
       }
-      this.estimates = [newSyncState]
+      this.#estimates = [newSyncState]
 
       SyncStateSubject.next(newSyncState)
     })
