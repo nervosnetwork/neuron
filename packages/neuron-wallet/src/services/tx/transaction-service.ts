@@ -462,7 +462,7 @@ export class TransactionsService {
 
   }
 
-  public static async getTxCountsByWalletId(walletId: string) {
+  public static async getTxCountsByWalletId(walletId: string, lockCodeHash?: string) {
     const [sql, parameters] = getConnection()
       .driver
       .escapeQueryWithParameters(`
@@ -480,7 +480,7 @@ export class TransactionsService {
               SELECT
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
-                walletId = :walletId
+                walletId = :walletId ${lockCodeHash ? 'AND lockCodeHash = :lockCodeHash' : ''}
             )
           UNION
           SELECT
@@ -493,14 +493,15 @@ export class TransactionsService {
               SELECT
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
-                walletId = :walletId
+                walletId = :walletId ${lockCodeHash ? 'AND lockCodeHash = :lockCodeHash' : ''}
             )
         ) AS cell
         GROUP BY
           lockArgs;
         `,
         {
-          walletId
+          walletId,
+          lockCodeHash,
         },
         {}
       )
