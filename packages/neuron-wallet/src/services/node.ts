@@ -183,8 +183,11 @@ class NodeService {
     const vcredists = await Promise.all(
       queries.map(
         query => execPromise(query)
-          .then(({ stdout }) => {
-            logger.info(`${query} result: ${stdout}`)
+          .then(({ stdout, stderr }) => {
+            if (stderr) {
+              logger.error(`${query} stderr: ${stderr}`)
+              return false;
+            }
             return !!stdout;
           })
           .catch(err => {
