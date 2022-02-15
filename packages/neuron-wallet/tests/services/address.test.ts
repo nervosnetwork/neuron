@@ -17,7 +17,7 @@ const extendedKey = new AccountExtendedPublicKey(
   '37e85a19f54f0a242a35599abac64a71aacc21e3a5860dd024377ffc7e6827d8'
 )
 
-const preloadedPublicKeys:any = []
+const preloadedPublicKeys: any = []
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -71,28 +71,13 @@ const linkNewCell = async (
 }
 
 describe('integration tests for AddressService', () => {
-  const stubbedAddressCreatedSubjectNext = jest.fn()
-  const stubbedIsChildProcessFn = jest.fn()
-
-  jest.doMock('models/subjects/address-created-subject', () => {
-    return {
-      getSubject: () => ({
-        next: stubbedAddressCreatedSubjectNext
-      })
-    }
-  })
-  jest.doMock('utils/worker', () => {
-    return {
-      ChildProcess: {
-        isChildProcess: stubbedIsChildProcessFn
-      }
-    }
-  })
   const AddressService = require('../../src/services/addresses').default
+  const notifyAddressCreatedStub = jest.spyOn(AddressService, 'notifyAddressCreated');
+  notifyAddressCreatedStub.mockImplementation(() => { });
 
   beforeAll(() => {
-    for (let addressType = 0; addressType <= 1; addressType ++) {
-      for (let addressIndex = 0; addressIndex <= 7; addressIndex ++) {
+    for (let addressType = 0; addressType <= 1; addressType++) {
+      for (let addressIndex = 0; addressIndex <= 7; addressIndex++) {
         const address = extendedKey.address(
           addressType,
           addressIndex,
@@ -118,8 +103,9 @@ describe('integration tests for AddressService', () => {
         .mockReturnValue(addressToMock.address)
     }
   })
+
   beforeEach(() => {
-    stubbedAddressCreatedSubjectNext.mockReset()
+    notifyAddressCreatedStub.mockReset()
   });
 
   describe('Key tests with db', () => {
@@ -156,6 +142,7 @@ describe('integration tests for AddressService', () => {
           )
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
         });
+
         it('generates both receiving and change addresses', () => {
           expect(generatedAddresses.length).toEqual(receivingAddressCount + changeAddressCount)
 
@@ -169,14 +156,8 @@ describe('integration tests for AddressService', () => {
           }
         })
         it('notifies newly generated addresses', () => {
-          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledTimes(1)
-          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledWith(
-            generatedAddresses.map((addr: any) => {
-              delete addr.description
-              addr.isImporting = undefined
-              return addr
-            })
-          )
+          expect(notifyAddressCreatedStub).toHaveBeenCalledTimes(1)
+          expect(notifyAddressCreatedStub).toHaveBeenCalledWith(generatedAddresses, undefined)
         })
 
         describe('when receiving and change addresses are used', () => {
@@ -300,15 +281,8 @@ describe('integration tests for AddressService', () => {
           }
         })
         it('notifies newly generated addresses', () => {
-          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledTimes(1)
-          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledWith(
-            generatedAddresses
-              .map((addr: any) => {
-                delete addr.description
-                addr.isImporting = undefined
-                return addr
-              })
-          )
+          expect(notifyAddressCreatedStub).toHaveBeenCalledTimes(1)
+          expect(notifyAddressCreatedStub).toHaveBeenCalledWith(generatedAddresses, undefined)
         })
       })
     });
@@ -332,12 +306,12 @@ describe('integration tests for AddressService', () => {
           expect(generatedAddresses.length).toEqual(1)
         })
         it('notifies newly generated addresses', () => {
-          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledTimes(1)
-          expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledWith(generatedAddresses)
+          expect(notifyAddressCreatedStub).toHaveBeenCalledTimes(1)
+          expect(notifyAddressCreatedStub).toHaveBeenCalledWith(generatedAddresses, undefined)
         })
         describe('when trying to generate for the same public key', () => {
           beforeEach(async () => {
-            stubbedAddressCreatedSubjectNext.mockReset()
+            notifyAddressCreatedStub.mockReset()
             await AddressService.generateAndSaveForPublicKey(
               walletId,
               publicKey,
@@ -349,8 +323,9 @@ describe('integration tests for AddressService', () => {
           it('should not generate new address', () => {
             expect(generatedAddresses.length).toEqual(1)
           })
+
           it('should not notifies for new generated addresses', () => {
-            expect(stubbedAddressCreatedSubjectNext).toHaveBeenCalledTimes(0)
+            expect(notifyAddressCreatedStub).toHaveBeenCalledTimes(0)
           })
         })
       });
@@ -582,17 +557,17 @@ describe('integration tests for AddressService', () => {
         await linkNewCell([publicKeysToUse[0]], '5', OutputStatus.Dead)
       });
       it('calculates balances', async () => {
-          const allAddresses = await AddressService.getAddressesWithBalancesByWalletId(walletId)
-          expect(allAddresses[0].blake160).toEqual(publicKeysToUse[0])
-          expect(allAddresses[0].liveBalance).toEqual('1')
-          expect(allAddresses[0].sentBalance).toEqual('2')
-          expect(allAddresses[0].pendingBalance).toEqual('3')
-          expect(allAddresses[0].balance).toEqual((parseInt(allAddresses[0].liveBalance) + parseInt(allAddresses[0].sentBalance)).toString())
+        const allAddresses = await AddressService.getAddressesWithBalancesByWalletId(walletId)
+        expect(allAddresses[0].blake160).toEqual(publicKeysToUse[0])
+        expect(allAddresses[0].liveBalance).toEqual('1')
+        expect(allAddresses[0].sentBalance).toEqual('2')
+        expect(allAddresses[0].pendingBalance).toEqual('3')
+        expect(allAddresses[0].balance).toEqual((parseInt(allAddresses[0].liveBalance) + parseInt(allAddresses[0].sentBalance)).toString())
 
-          expect(allAddresses[1].liveBalance).toEqual('0')
-          expect(allAddresses[1].sentBalance).toEqual('0')
-          expect(allAddresses[1].pendingBalance).toEqual('0')
-          expect(allAddresses[1].balance).toEqual('0')
+        expect(allAddresses[1].liveBalance).toEqual('0')
+        expect(allAddresses[1].sentBalance).toEqual('0')
+        expect(allAddresses[1].pendingBalance).toEqual('0')
+        expect(allAddresses[1].balance).toEqual('0')
       })
     });
 
