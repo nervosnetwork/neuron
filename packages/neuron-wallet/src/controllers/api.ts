@@ -108,7 +108,7 @@ export default class ApiController {
       }
     })
 
-    handle('show-error-message', async (_, { title = '',  content = '' } ) => {
+    handle('show-error-message', async (_, { title = '', content = '' }) => {
       dialog.showErrorBox(title, content)
     })
 
@@ -181,11 +181,11 @@ export default class ApiController {
 
       const transactions = currentWallet
         ? await this.transactionsController.getAll({
-            pageNo: 1,
-            pageSize: 15,
-            keywords: '',
-            walletID: currentWallet.id,
-          }).then(res => res.result)
+          pageNo: 1,
+          pageSize: 15,
+          keywords: '',
+          walletID: currentWallet.id,
+        }).then(res => res.result)
         : []
 
       const initState = {
@@ -395,7 +395,7 @@ export default class ApiController {
       showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: 900 })
     })
 
-    handle('clear-cache', async (_, params: {resetIndexerData: boolean } | null) => {
+    handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
       return new SyncController().clearCache(params?.resetIndexerData)
     })
 
@@ -471,11 +471,11 @@ export default class ApiController {
       return this.anyoneCanPayController.sendTx(params)
     })
 
-    handle('get-sudt-token-info', async (_, params: { tokenID: string })=>{
+    handle('get-sudt-token-info', async (_, params: { tokenID: string }) => {
       return this.sudtController.getSUDTTokenInfo(params)
     })
 
-    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number })=>{
+    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number }) => {
       return this.assetAccountController.destoryCKBAssetAccount(params)
     })
 
@@ -543,6 +543,11 @@ export default class ApiController {
         if (err.code === 'ECONNREFUSED') {
           err.code = ApiController.NODE_DISCONNECTED_CODE
         }
+
+        if (!Number.isNaN(err.message?.code)) {
+          err.code = err.message.code
+        }
+
         const res = {
           status: err.code || ResponseCode.Fail,
           message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
