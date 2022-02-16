@@ -69,7 +69,6 @@ export default class ExportDebugController {
         .getPeers()
         .catch(() => []),
       redistCheck()
-        .catch(() => false),
     ])
     const { platform, arch } = process
     const release = os.release()
