@@ -143,8 +143,8 @@ class NodeService {
       return false
     } catch (err) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
-      const isReadyToStart = await redistCheck()
-      this.startedBundledNode = await (isReadyToStart ? this.startNode() : this.showGuideDialog())
+      const redistReady = await redistCheck()
+      this.startedBundledNode = await (redistReady ? this.startNode() : this.showGuideDialog())
 
       return this.startedBundledNode
     }
