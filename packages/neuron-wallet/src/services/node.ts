@@ -1,6 +1,3 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import path from 'path'
 import https from 'https'
 import http from 'http'
 import { dialog, shell } from 'electron'
@@ -18,6 +15,7 @@ import { startCkbNode } from 'services/ckb-runner'
 import HexUtils from 'utils/hex'
 import { BUNDLED_CKB_URL } from 'utils/const'
 import logger from 'utils/logger'
+import redistCheck from 'utils/redist-check'
 
 class NodeService {
   private static instance: NodeService
@@ -145,8 +143,8 @@ class NodeService {
       return false
     } catch (err) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
-      const isReadyToStart = await this.detectDependency()
-      this.startedBundledNode = await (isReadyToStart ? this.startNode() : this.showGuideDialog())
+      const redistReady = await redistCheck()
+      this.startedBundledNode = await (redistReady ? this.startNode() : this.showGuideDialog())
 
       return this.startedBundledNode
     }
@@ -169,25 +167,6 @@ class NodeService {
       env.app.quit()
       return false
     })
-  }
-
-  private detectDependency = async () => {
-    if (process.platform !== 'win32') {
-      return true
-    }
-    const execPromise = promisify(exec)
-    const arches = ['x64']
-    const queries = arches.map(arch =>
-      `REG QUERY ` +
-      [`HKEY_LOCAL_MACHINE`, `SOFTWARE`, `Microsoft`, `VisualStudio`, `14.0`, `VC`, `Runtimes`, arch].join(path.sep))
-    const vcredists = await Promise.all(
-      queries.map(
-        query => execPromise(query)
-          .then(({ stdout }) => !!stdout)
-          .catch(() => false)
-      )
-    )
-    return vcredists.includes(true)
   }
 
   private startNode = () => {
