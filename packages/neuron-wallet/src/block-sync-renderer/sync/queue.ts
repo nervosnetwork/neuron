@@ -1,20 +1,20 @@
 import { queue, AsyncQueue } from 'async'
-import logger from 'utils/logger'
 import { TransactionPersistor } from 'services/tx'
 import WalletService from 'services/wallets'
 import RpcService from 'services/rpc-service'
+import AssetAccountService from 'services/asset-account-service'
 import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
-import AssetAccountService from 'services/asset-account-service'
 import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import MultiSign from 'models/multi-sign'
+import TxAddressFinder from './tx-address-finder'
 import IndexerConnector, { BlockTips } from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
+import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import { ShouldInChildProcess } from 'exceptions'
 
@@ -46,7 +46,7 @@ export default class Queue {
   }
 
   start = async () => {
-    logger.info("Queue:\tstart block sync queue")
+    logger.info("Queue:\tstart")
     try {
       this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl)
 
@@ -96,18 +96,9 @@ export default class Queue {
 
   stopAndWait = async () => {
     this.stop()
-    // FIXME: figure out why async/await not work here
-    // drain maybe not called if queue is empty from the beginning
     if (this.#checkAndSaveQueue) {
       this.#checkAndSaveQueue.idle() ? true : await this.#checkAndSaveQueue.drain()
     }
-    // await this.#checkAndSaveQueue?.drain()
-    // return new Promise<void>(resolve => {
-    //   if (this.#checkAndSaveQueue?.idle()) {
-    //     return resolve()
-    //   }
-    //   this.#checkAndSaveQueue?.drain(resolve)
-    // })
   }
 
   #checkAndSave = async (transactions: Transaction[]): Promise<void> => {

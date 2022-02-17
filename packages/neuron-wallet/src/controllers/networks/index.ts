@@ -1,7 +1,7 @@
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import env from 'env'
-import { distinctUntilChanged, debounceTime } from 'rxjs/operators'
+import { skip, distinctUntilChanged, debounceTime } from 'rxjs/operators'
 import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
 import NodeService from 'services/node'
@@ -20,10 +20,10 @@ export default class NetworksController {
     NodeService
       .getInstance()
       .connectionStatusSubject
-      .pipe(distinctUntilChanged(), debounceTime(3000))
+      // TODO: find out the redundant message and remove skip
+      .pipe(distinctUntilChanged(), debounceTime(3000), skip(1))
       .subscribe(async (connected: boolean) => {
         if (connected) {
-          logger.debug('Network:\treconnected')
           await networksService.update(networksService.getCurrentID(), {})
           this.notifyListChange()
           await this.connectToNetwork(true)

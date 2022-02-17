@@ -1,4 +1,3 @@
-import { BrowserWindow } from 'electron'
 import path from 'path'
 import { fork, ChildProcess } from 'child_process'
 import SyncApiController from 'controllers/sync-api'
@@ -10,7 +9,6 @@ import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
-import SyncedBlockNumber from 'models/synced-block-number'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import { WorkerMessage, StartParams, QueryIndexerParams } from './task'
@@ -23,15 +21,10 @@ let child: ChildProcess | null = null
 let requestId = 0
 let requests = new Map<number, Record<'resolve' | 'reject', Function>>()
 
-if (BrowserWindow) {
-  AddressCreatedSubject.getSubject().subscribe(() => resetSyncTask())
-  WalletDeletedSubject.getSubject().subscribe(() => resetSyncTask())
-}
-
 export const killBlockSyncTask = async () => {
   const _child = child
   child = null
-  if (!_child) {return}
+  if (!_child) { return }
 
   logger.info('Sync:\tdrain requests')
   await Promise.all(
@@ -43,43 +36,35 @@ export const killBlockSyncTask = async () => {
     ))
     .finally(() => requests = new Map())
 
-  logger.info('Sync:\tkill block sync task')
+  await waitForChildClose(_child)
+  await IndexerService.getInstance().stop()
+}
+
+const waitForChildClose = (c: ChildProcess) => new Promise((resolve, reject) => {
+  c.once('close', resolve)
   const msg: Required<WorkerMessage> = {
     type: 'call',
     id: requestId++,
     channel: 'unmount',
     message: null
   }
-  await new Promise((resolve, reject) => {
-    requests.set(msg.id, { resolve, reject })
-    _child.send(msg, err => {
-      if (err) {
-        reject(err)
-      }
-    })
+  c.send(msg, err => {
+    if (err) { reject(err) }
   })
+}).catch(() => 0)
 
-  await new Promise(resolve => {
-    _child.once('close', () => resolve(0))
-    _child.kill()
-  })
-
-  const mercury = IndexerService.getInstance()
-  await mercury.stop()
-}
-
-export const resetSyncTask = async (startTask = true, clearIndexerFolder = false) => {
+export const resetSyncTask = async (startTask = true) => {
   await killBlockSyncTask()
-  await WalletService.getInstance().maintainAddressesIfNecessary()
 
   if (startTask) {
+    await WalletService.getInstance().maintainAddressesIfNecessary()
     await CommonUtils.sleep(3000)
-    await createBlockSyncTask(clearIndexerFolder)
+    await createBlockSyncTask()
   }
 }
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
-  if (network && !reconnected && network.id === newNetwork.id) {return}
+  if (!reconnected && network?.id === newNetwork.id) { return }
 
   network = newNetwork
 
@@ -92,19 +77,20 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   await resetSyncTask(shouldSync)
 }
 
-const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
-  await killBlockSyncTask()
+export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
+  const _child = child
+  if (!_child) { return [] }
+  const msg: Required<WorkerMessage<QueryIndexerParams>> = { type: 'call', id: requestId++, channel: 'queryIndexer', message: query }
+  return registerRequest(_child, msg).catch(err => {
+    logger.error(`Sync:\tfailed to register query indexer task`, err)
+    return []
+  }) as Promise<LumosCell[]>
+}
 
-  const mercury = IndexerService.getInstance()
+export const createBlockSyncTask = async () => {
+  await IndexerService.getInstance().start()
 
-  if (clearIndexerFolder) {
-    mercury.clearData()
-    await new SyncedBlockNumber().setNextBlock(BigInt(0))
-  }
-
-  await mercury.start()
-
-  logger.info('Sync:\tstarting background process')
+  logger.info('Sync:\tstart')
 
   // prevents the sync task from being started repeatedly if fork does not finish executing.
   child = fork(path.join(__dirname, 'task-wrapper.js'), [], {
@@ -114,17 +100,17 @@ const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {
     if (id !== undefined) {
-      if (!requests.has(id)) {return}
+      if (!requests.has(id)) { return }
       const { resolve } = requests.get(id)!
       requests.delete(id)
       if (typeof resolve === 'function') {
         try {
           resolve(message)
         } catch (err) {
-          logger.error(`Sync Block Task:\t${err}`)
+          logger.error(`Sync:\t${err}`)
         }
       } else {
-        logger.error(`Sync Block Task:\tresolve expected, got ${resolve}`)
+        logger.error(`Sync:\tresolve expected, got ${resolve}`)
       }
 
     } else {
@@ -170,29 +156,22 @@ const createBlockSyncTask = async (clearIndexerFolder: boolean) => {
     const addressMetas = await AddressService.getAddressesByAllWallets()
     const message: StartParams = { genesisHash: network.genesisHash, url: network.remote, addressMetas, indexerUrl: IndexerService.LISTEN_URI }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
-    await new Promise((resolve, reject) => {
-      requests.set(msg.id, { resolve, reject })
-      _child.send(msg, err => {
-        if (err) { reject(err) }
-      })
+    return registerRequest(_child, msg).catch(err => {
+      logger.error(`Sync:\ffailed to register sync task`, err)
     })
   }
 }
 
-export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
-  const _child = child
-  if (!_child) { return [] }
-  const id = requestId++
-  const msg: Required<WorkerMessage<QueryIndexerParams>> = { type: 'call', id, channel: 'queryIndexer', message: query }
-
-  return new Promise((resolve, reject) => {
+export const registerRequest = (c: ChildProcess, msg: Required<WorkerMessage>) =>
+  new Promise((resolve, reject) => {
     requests.set(msg.id, { resolve, reject })
-    _child.send(msg, err => {
+    c.send(msg, err => {
       if (err) {
-        logger.error(`Query Indexer:\t`, err)
+        logger.error(`Sync:\tfailed to send message to child process: ${msg}`)
         reject(err)
       }
     })
   })
-}
 
+AddressCreatedSubject.getSubject().subscribe(() => resetSyncTask())
+WalletDeletedSubject.getSubject().subscribe(() => resetSyncTask())

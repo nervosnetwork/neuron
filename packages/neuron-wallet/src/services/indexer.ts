@@ -7,6 +7,7 @@ import process from 'process'
 import { dialog } from 'electron'
 import logger from 'utils/logger'
 import { Network } from 'models/network'
+import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from './networks'
 import CommonUtils from 'utils/common'
 import { resetSyncTask } from 'block-sync-renderer'
@@ -36,7 +37,7 @@ export default class IndexerService {
     return `http://localhost:${IndexerService.PORT}`
   }
 
-  public static getInstance = () => {
+  static getInstance = () => {
     if (!IndexerService.instance) {
       IndexerService.instance = new IndexerService()
     }
@@ -56,74 +57,26 @@ export default class IndexerService {
     return platform() === 'win' ? binary + '.exe' : binary
   }
 
-  #getDataPath = (network: Network): string => {
-    return path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data', `${network.genesisHash}`)
-  }
-
-  async stop() {
-    return new Promise<void>(_resolve => {
-      const resolve = () => {
-        this.indexer?.removeAllListeners()
-        _resolve()
-      }
-      if (this.indexer) {
-        logger.info('Indexer:\tkilling')
-        this.indexer.once('close', () => resolve())
-        this.indexer.kill()
-        this.indexer = null
-      } else {
-        resolve()
-      }
-    })
-  }
-
-  start = async () => {
-    const network = NetworksService.getInstance().getCurrent()
-    await this.stop()
-    const dataPath = this.#getDataPath(network)
-    IndexerService.createFolder(dataPath)
-    await IndexerService.ensurePortUsable()
-
-    const bin = IndexerService.getBinary()
-    const params = ['-c', network.remote, '-s', dataPath, '-l', `127.0.0.1:${IndexerService.PORT}`]
-
-    try {
-      this.indexer = spawn(bin, params)
-      logger.info(`Indexer:\tstart: PORT: ${IndexerService.PORT}...`)
-
-      this.indexer.stderr && this.indexer.stderr.on('data', data => {
-        logger.error('Indexer:\trun fail:', data.toString())
-        this.indexer = null
-      })
-
-      this.indexer.on('error', error => {
-        logger.error('Indexer:\trun fail:', error)
-        this.indexer = null
-        logger.info('Indexer:\trestarting')
-        this.start()
-      })
-
-      this.indexer.on('close', async () => {
-        logger.info('Indexer:\tprocess closed')
-        this.indexer = null
-      })
-
-    } catch (err) {
-      logger.error(err)
-      dialog.showErrorBox("CKB Indexer", err.message)
+  static ensurePortUsable = async () => {
+    const port = Number(IndexerService.PORT)
+    const isPortReachable = await IndexerService.isPortReachable(port)
+    if (!isPortReachable) {
+      return
     }
-    // REFACTOR: use message
-    await CommonUtils.sleep(1000)
+    IndexerService.PORT = (port + 1).toString()
+    await IndexerService.ensurePortUsable()
   }
 
-  clearData = () => {
-    const network = NetworksService.getInstance().getCurrent()
-    const dataPath = this.#getDataPath(network)
-    logger.debug(`Removing data ${dataPath}`)
-    fs.rmSync(dataPath, { recursive: true, force: true })
+  static clearCache = async (clearIndexerFolder = false) => {
+    await resetSyncTask(false)
+    await cleanChain()
 
-    // remove legacy data
-    fs.rmSync(path.resolve(env.fileBasePath, 'indexer_data', network.genesisHash), { recursive: true, force: true })
+    if (clearIndexerFolder) {
+      IndexerService.getInstance().clearData()
+      await new SyncedBlockNumber().setNextBlock(BigInt(0))
+    }
+
+    await resetSyncTask(true)
   }
 
   static createFolder(dir: string) {
@@ -161,19 +114,77 @@ export default class IndexerService {
     }
   }
 
-  static ensurePortUsable = async () => {
-    const port = Number(IndexerService.PORT)
-    const isPortReachable = await IndexerService.isPortReachable(port)
-    if (!isPortReachable) {
-      return
-    }
-    IndexerService.PORT = (port + 1).toString()
-    await IndexerService.ensurePortUsable()
+  stop = async () => {
+    const _indexer = this.indexer
+
+    if (!_indexer) { return }
+    logger.debug(`Indexer:\tstopping`)
+    // _indexer.removeAllListeners()
+    await new Promise((resolve, reject) => {
+      _indexer.once('close', code => {
+        return code ? reject(code) : resolve(code)
+      })
+      _indexer.kill()
+    }).catch(() => null)
   }
 
-  static clearCache = async (clearIndexerFolder = false) => {
-    await resetSyncTask(false)
-    await cleanChain()
-    await resetSyncTask(true, clearIndexerFolder)
+  start = async () => {
+    if (this.indexer) {
+      return
+    }
+    const network = NetworksService.getInstance().getCurrent()
+    const dataPath = this.#getDataPath(network)
+    IndexerService.createFolder(dataPath)
+    await IndexerService.ensurePortUsable()
+
+    try {
+      const bin = IndexerService.getBinary()
+      const params = ['-c', network.remote, '-s', dataPath, '-l', `127.0.0.1:${IndexerService.PORT}`]
+      const indexer = spawn(bin, params)
+      this.indexer = indexer
+      logger.info(`Indexer:\tstart: PORT: ${IndexerService.PORT}...`)
+
+      indexer.stderr && indexer.stderr.on('data', async data => {
+        logger.debug(`Indexer stderr:\t`, data.toString())
+      })
+
+      indexer.on('error', (error: any) => {
+        logger.error('Indexer error:\t:', error.toString())
+        CommonUtils.sleep(3000)
+        this.start()
+      })
+
+      indexer.on('exit', () => {
+        logger.debug(`Indexer:\tstopped`)
+        this.indexer = null
+      })
+
+
+    } catch (err) {
+      logger.error(err)
+      dialog.showErrorBox("CKB Indexer", err.message)
+    }
+
+
+    // REFACTOR: use message to return the promise
+    while (!(await IndexerService.isPortReachable(+IndexerService.PORT))) {
+      await CommonUtils.sleep(1000)
+    }
+  }
+
+  clearData = () => {
+    const network = NetworksService.getInstance().getCurrent()
+    const dataPath = this.#getDataPath(network)
+    logger.debug(`Removing data ${dataPath}`)
+    fs.rmSync(dataPath, { recursive: true, force: true })
+
+    // remove legacy data
+    fs.rmSync(path.resolve(env.fileBasePath, 'indexer_data', network.genesisHash), { recursive: true, force: true })
+  }
+
+
+
+  #getDataPath = (network: Network): string => {
+    return path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data', `${network.genesisHash}`)
   }
 }

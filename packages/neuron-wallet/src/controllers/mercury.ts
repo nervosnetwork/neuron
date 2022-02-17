@@ -25,6 +25,7 @@ export const migrate = async () => {
     await openMigrateDialog('hard-fork')
   }
   // TODO: mercury migration when mercury 1.0 is ready
+  // TODO: could this be removed?
 }
 
 const openMigrateDialog = (type: 'hard-fork' | 'mercury') => {
