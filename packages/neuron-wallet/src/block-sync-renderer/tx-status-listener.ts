@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import CKB from '@nervosnetwork/ckb-sdk-core'
-import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
+import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
 import { TransactionStatus } from 'models/chain/transaction'
@@ -36,7 +36,7 @@ const getTransactionStatus = async (hash: string) => {
 
 const trackingStatus = async () => {
   const pendingTransactions = await FailedTransaction.pendings()
-  if (!pendingTransactions.length) {return}
+  if (!pendingTransactions.length) { return }
 
   const pendingHashes = pendingTransactions.map(tx => tx.hash)
   const txs = await Promise.all(
@@ -50,6 +50,7 @@ const trackingStatus = async () => {
       }
     })
   )
+
   const failedTxs = txs.filter(tx => tx.status === TransactionStatus.Failed)
   const successTxs = txs.filter(tx => tx.status === TransactionStatus.Success)
 
