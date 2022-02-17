@@ -462,7 +462,7 @@ export class TransactionsService {
 
   }
 
-  public static async getTxCountsByWalletId(walletId: string, lockCodeHash?: string) {
+  public static async getTxCountsByWalletId(walletId: string, lock?: Omit<CKBComponents.Script, 'args'>) {
     const [sql, parameters] = getConnection()
       .driver
       .escapeQueryWithParameters(`
@@ -480,7 +480,7 @@ export class TransactionsService {
               SELECT
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
-                walletId = :walletId ${lockCodeHash ? 'AND lockCodeHash = :lockCodeHash' : ''}
+                walletId = :walletId ${lock ? 'AND lockCodeHash = :lockCodeHash AND lockHashType = :lockHashType' : ''}
             )
           UNION
           SELECT
@@ -493,7 +493,7 @@ export class TransactionsService {
               SELECT
                 hd_public_key_info.publicKeyInBlake160 FROM hd_public_key_info
               WHERE
-                walletId = :walletId ${lockCodeHash ? 'AND lockCodeHash = :lockCodeHash' : ''}
+                walletId = :walletId ${lock ? 'AND lockCodeHash = :lockCodeHash AND lockHashType = :lockHashType' : ''}
             )
         ) AS cell
         GROUP BY
@@ -501,7 +501,8 @@ export class TransactionsService {
         `,
         {
           walletId,
-          lockCodeHash,
+          lockCodeHash: lock?.codeHash,
+          lockHashType: lock?.hashType,
         },
         {}
       )
