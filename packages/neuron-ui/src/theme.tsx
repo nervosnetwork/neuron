@@ -1,5 +1,16 @@
 import React from 'react'
 import { loadTheme, getTheme } from 'office-ui-fabric-react'
+import { ReactComponent as Explorer } from 'widgets/Icons/Explorer.svg'
+import { ReactComponent as Search } from 'widgets/Icons/Search.svg'
+import { ReactComponent as FirstPage } from 'widgets/Icons/FirstPage.svg'
+import { ReactComponent as PreviousPage } from 'widgets/Icons/PreviousPage.svg'
+import { ReactComponent as LastPage } from 'widgets/Icons/LastPage.svg'
+import { ReactComponent as NextPage } from 'widgets/Icons/NextPage.svg'
+import { ReactComponent as Matched } from 'widgets/Icons/Matched.svg'
+import { ReactComponent as Unmatched } from 'widgets/Icons/Unmatched.svg'
+import { ReactComponent as Close } from 'widgets/Icons/Close.svg'
+import { ReactComponent as More } from 'widgets/Icons/More.svg'
+import { ReactComponent as ArrowDown } from 'widgets/Icons/ArrowToNext.svg'
 
 import {
   Alert as AlertIcon,
@@ -8,24 +19,15 @@ import {
   Close as DismissIcon,
   Close as FailIcon,
   Copy as CopyIcon,
-  Domain as ExplorerIcon,
-  Down as ArrowDownIcon,
   FormClose as ClearIcon,
   FormAdd as CreateIcon,
   FormPreviousLink as LeaveIcon,
   FormUp as ExpandIcon,
   FormUpload as ImportIcon,
   License as KeystoreIcon,
-  LinkBottom as LinkBottomIcon,
-  LinkDown as LinkDownIcon,
-  LinkTop as LinkTopIcon,
-  LinkUp as LinkUpIcon,
-  More as MoreIcon,
   Nodes as ConnectedIcon,
   Scan as ScanIcon,
-  Search as SearchIcon,
   SettingsOption as SettingsIcon,
-  StatusGood as MatchedIcon,
   Update as UpdateIcon,
   Update as PendingIcon,
 } from 'grommet-icons'
@@ -59,31 +61,31 @@ registerIcons({
     completed: <SuccessIcon size="16px" />,
     cancel: <DismissIcon size="16px" />,
     MiniCopy: <CopyIcon size="small" color={semanticColors.primaryButtonBackground} />,
-    Search: <SearchIcon size="14px" color="#000" />,
-    FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    NextPage: <LinkDownIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    ArrowDown: <ArrowDownIcon size="16px" />,
+    Search: <Search />,
+    FirstPage: <FirstPage />,
+    LastPage: <LastPage />,
+    PrevPage: <PreviousPage />,
+    NextPage: <NextPage />,
+    ArrowDown: <ArrowDown />,
     ChevronRightMed: <ExpandIcon size="16px" style={{ transform: 'rotate(90deg) translate(2px, 0px)' }} />,
     Scan: <ScanIcon />,
     Import: <ImportIcon color="white" />,
     Create: <CreateIcon />,
     Clear: <ClearIcon size="16px" />,
-    Dismiss: <DismissIcon size="16px" />,
+    Dismiss: <Close />,
     Leave: <LeaveIcon />,
     Connected: <ConnectedIcon size="small" color="green" />,
     Disconnected: <AlertIcon size="small" color="red" />,
     Updating: <UpdateIcon size="16px" style={{ animation: 'rotate360 3s linear infinite' }} />,
-    More: <MoreIcon size="16px" />,
-    Matched: <MatchedIcon size="16px" color="green" />,
-    Unmatched: <InfoIcon size="16px" color="#d50000" />,
+    More: <More />,
+    Matched: <Matched />,
+    Unmatched: <Unmatched />,
     TransactionSuccess: <SuccessIcon size="14px" color="green" />,
     TransactionFailure: <FailIcon size="14px" color="#d50000" />,
     TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
     Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
     Settings: <SettingsIcon size="20px" />,
-    Explorer: <ExplorerIcon size="16px" color="#FFF" />,
+    Explorer: <Explorer />,
   },
 })
 

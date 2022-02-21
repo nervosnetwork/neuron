@@ -1,10 +1,11 @@
 import React from 'react'
 import { Dropdown, IDropdownProps, Icon } from 'office-ui-fabric-react'
+import styles from './dropdown.module.scss'
 
 const CustomDropdown = (props: IDropdownProps) => (
   <Dropdown
     onRenderCaretDown={() => {
-      return <Icon iconName="ArrowDown" />
+      return <Icon iconName="ArrowDown" className={styles.arrowDown} />
     }}
     styles={{
       label: {
