@@ -485,15 +485,19 @@ public static async signSingleMultiSignScript(
 
   public generateDepositAllTx = async (
     walletID: string = '',
+    isBalanceReserved = true,
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
     const wallet = WalletService.getInstance().get(walletID)
-    const address = await wallet.getNextAddress()
+    const receiveAddress = await wallet.getNextAddress()
+    const changeAddress = await wallet.getNextChangeAddress()
 
     const tx = await TransactionGenerator.generateDepositAllTx(
       walletID,
-      address!.address,
+      receiveAddress!.address,
+      changeAddress!.address,
+      isBalanceReserved,
       fee,
       feeRate,
     )

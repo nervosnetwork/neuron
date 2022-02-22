@@ -324,7 +324,7 @@ export default class ApiController {
       return this.daoController.generateDepositTx(params)
     })
 
-    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
+    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, isBalanceReserved: boolean, fee: string, feeRate: string }) => {
       return this.daoController.generateDepositAllTx(params)
     })
 

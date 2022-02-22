@@ -39,7 +39,7 @@ export default class DaoController {
     }
   }
 
-  public async generateDepositAllTx(params: { walletID: string, fee: string, feeRate: string }):
+  public async generateDepositAllTx(params: { walletID: string, isBalanceReserved: boolean, fee: string, feeRate: string }):
     Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -47,6 +47,7 @@ export default class DaoController {
 
     const tx = await new TransactionSender().generateDepositAllTx(
       params.walletID,
+      params.isBalanceReserved,
       params.fee,
       params.feeRate,
     )

@@ -564,6 +564,7 @@
       "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
+      "balance-not-reserved": "（不建议）不预留未来操作手续费",
       "deposit-record": {
         "deposited-at": "存入于",
         "completed-at": "已取出",
@@ -614,25 +615,101 @@
       "quit-and-install": "安装并重启应用"
     },
     "datetime": {
-      "mon": { "full": "周一", "short": "周一", "tag": "周一" },
-      "tue": { "full": "周二", "short": "周二", "tag": "周二" },
-      "wed": { "full": "周三", "short": "周三", "tag": "周三" },
-      "thur": { "full": "周四", "short": "周四", "tag": "周四" },
-      "fri": { "full": "周五", "short": "周五", "tag": "周五" },
-      "sat": { "full": "周六", "short": "周六", "tag": "周六" },
-      "sun": { "full": "周日", "short": "周日", "tag": "周日" },
-      "jan": { "full": "一月", "short": "一月", "tag": "一月" },
-      "feb": { "full": "二月", "short": "二月", "tag": "二月" },
-      "mar": { "full": "三月", "short": "三月", "tag": "三月" },
-      "apr": { "full": "四月", "short": "四月", "tag": "四月" },
-      "may": { "full": "五月", "short": "五月", "tag": "五月" },
-      "june": { "full": "六月", "short": "六月", "tag": "六月" },
-      "july": { "full": "七月", "short": "七月", "tag": "七月" },
-      "aug": { "full": "八月", "short": "八月", "tag": "八月" },
-      "sept": { "full": "九月", "short": "九月", "tag": "九月" },
-      "oct": { "full": "十月", "short": "十月", "tag": "十月" },
-      "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
-      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" },
+      "mon": {
+        "full": "周一",
+        "short": "周一",
+        "tag": "周一"
+      },
+      "tue": {
+        "full": "周二",
+        "short": "周二",
+        "tag": "周二"
+      },
+      "wed": {
+        "full": "周三",
+        "short": "周三",
+        "tag": "周三"
+      },
+      "thur": {
+        "full": "周四",
+        "short": "周四",
+        "tag": "周四"
+      },
+      "fri": {
+        "full": "周五",
+        "short": "周五",
+        "tag": "周五"
+      },
+      "sat": {
+        "full": "周六",
+        "short": "周六",
+        "tag": "周六"
+      },
+      "sun": {
+        "full": "周日",
+        "short": "周日",
+        "tag": "周日"
+      },
+      "jan": {
+        "full": "一月",
+        "short": "一月",
+        "tag": "一月"
+      },
+      "feb": {
+        "full": "二月",
+        "short": "二月",
+        "tag": "二月"
+      },
+      "mar": {
+        "full": "三月",
+        "short": "三月",
+        "tag": "三月"
+      },
+      "apr": {
+        "full": "四月",
+        "short": "四月",
+        "tag": "四月"
+      },
+      "may": {
+        "full": "五月",
+        "short": "五月",
+        "tag": "五月"
+      },
+      "june": {
+        "full": "六月",
+        "short": "六月",
+        "tag": "六月"
+      },
+      "july": {
+        "full": "七月",
+        "short": "七月",
+        "tag": "七月"
+      },
+      "aug": {
+        "full": "八月",
+        "short": "八月",
+        "tag": "八月"
+      },
+      "sept": {
+        "full": "九月",
+        "short": "九月",
+        "tag": "九月"
+      },
+      "oct": {
+        "full": "十月",
+        "short": "十月",
+        "tag": "十月"
+      },
+      "nov": {
+        "full": "十一月",
+        "short": "十一月",
+        "tag": "十一月"
+      },
+      "dec": {
+        "full": "十二月",
+        "short": "十二月",
+        "tag": "十二月"
+      },
       "timezone": "时区",
       "start-tomorrow": "所选时间不能早于明天。"
     },
