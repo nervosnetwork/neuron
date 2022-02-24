@@ -297,6 +297,7 @@ const SUDTAccountList = () => {
           }}
           existingAccountNames={existingAccountNames}
           insufficient={insufficient}
+          isMainnet={isMainnet}
         />
       ) : null}
     </div>

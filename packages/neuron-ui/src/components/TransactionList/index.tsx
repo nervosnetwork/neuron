@@ -111,8 +111,7 @@ const TransactionList = ({
       if (btn?.dataset?.hash && btn?.dataset?.action) {
         switch (btn.dataset.action) {
           case 'explorer': {
-            const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
-            openExternal(`${explorerUrl}/transaction/${btn.dataset.hash}`)
+            openExternal(`${getExplorerUrl(isMainnet)}/transaction/${btn.dataset.hash}`)
             break
           }
           case 'detail': {
