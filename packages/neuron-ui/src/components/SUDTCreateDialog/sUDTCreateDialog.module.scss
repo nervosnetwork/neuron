@@ -100,5 +100,9 @@
   border: none;
   border-radius: 2px;
   padding: 4px;
-  background: rgba(60, 198, 138, 0.8);
+  background-color: var(--nervos-green);
+
+  &:hover {
+    background-color: #21b574;
+  }
 }

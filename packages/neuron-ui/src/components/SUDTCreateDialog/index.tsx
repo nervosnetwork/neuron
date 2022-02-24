@@ -312,7 +312,7 @@ const SUDTCreateDialog = ({
                 />
               ))}
             {
-              !tokenErrors.tokenId && info.tokenId && (
+              accountType === AccountType.SUDT && !tokenErrors.tokenId && info.tokenId && (
                 <button
                   type="button"
                   className={styles.explorerNavButton}
