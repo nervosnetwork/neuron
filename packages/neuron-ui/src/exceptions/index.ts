@@ -79,11 +79,12 @@ export class FieldUsedException extends Error {
   public code = ErrorCode.FieldUsed
   public i18n: {
     fieldName: string
+    fieldValue: string
   }
 
-  constructor(fieldName: string) {
+  constructor(fieldName: string, fieldValue: string) {
     super(`${I18N_PATH}${ErrorCode.FieldUsed}`)
-    this.i18n = { fieldName }
+    this.i18n = { fieldName, fieldValue }
   }
 }
 
