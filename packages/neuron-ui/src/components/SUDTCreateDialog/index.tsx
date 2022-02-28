@@ -1,7 +1,7 @@
 import React, { useState, useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
-import { getSUDTTokenInfo, openExternal, getSUDTTypeScriptHash } from 'services/remote'
+import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import {
@@ -9,7 +9,7 @@ import {
   isSuccessResponse,
   useSUDTAccountInfoErrors,
   useFetchTokenInfoList,
-  getExplorerUrl,
+  useOpenSUDTTokenUrl,
 } from 'utils'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
@@ -224,15 +224,7 @@ const SUDTCreateDialog = ({
       }
     }
   }
-  const openTokenUrl = useCallback(() => {
-    if (info.tokenId) {
-      getSUDTTypeScriptHash({ tokenID: info.tokenId }).then(res => {
-        if (isSuccessResponse(res) && res.result) {
-          openExternal(`${getExplorerUrl(isMainnet)}/sudt/${res.result}`);
-        }
-      })
-    }
-  }, [isMainnet, info.tokenId])
+  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet);
   return (
     <div className={styles.container}>
       {step === 0 ? (
@@ -317,7 +309,7 @@ const SUDTCreateDialog = ({
                   type="button"
                   className={styles.explorerNavButton}
                   title={t('history.view-in-explorer-button-title')}
-                  onClick={openTokenUrl}
+                  onClick={openSUDTTokenUrl}
                 >
                   {t('history.view-in-explorer-button-title')}
                 </button>
