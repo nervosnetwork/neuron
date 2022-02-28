@@ -1,12 +1,23 @@
-# 0.101.3 (2022-01-28)
+# 0.101.3 (2022-03-01)
 
-[CKB v0.101.3](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.3) was released on Dec. 14th, 2021. This version of CKB node is now bundled and preconfigured in Neuron. 
+[CKB v0.101.4](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.4) was released on Jan. 20th, 2022. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### Refactor
+* #2243: Update dependencies (@Lester-xie)
+* #2272: Refactor block sync renderer (@Keith-CY)
 
 ### New features
-* Update dependencies [#2243](https://github.com/nervosnetwork/neuron/pull/2243).
-* Display all unknown custom asset [#2247](https://github.com/nervosnetwork/neuron/pull/2247).
-* Upgrade the bundled ckb node to v0.101.3.
-* Upgrade the bundled ckb-indexer to v0.3.2.
+* #2247: Display all unknown custom assets (@yuche)
+* #2268: Add redist log in the debug info zip file (@yanguoyu)
+* #2287: Upgrade the bundled ckb node to v0.101.4 (@kellyshang)
+* #2250: Upgrade the bundled ckb-indexer to v0.3.2 (@kellyshang)
+
+### Bug fixes
+* #2267: Fix the tx count inaccurate issue (@Keith-CY)
+* #2269: Unwrap RPC errors (@Keith-CY)
+* #2271: Fix some file is empty when export to debug info (@yanguoyu)
+* #2272: Fix indexer closed unexpectedly (@Keith-CY)
+* #2274: Fix copying sUDT amount problem (@Keith-CY)
 
 
 # 0.101.2 (2021-12-10)
