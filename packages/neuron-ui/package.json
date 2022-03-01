@@ -48,7 +48,6 @@
     "@uifabric/experiments": "7.42.4",
     "@uifabric/styling": "7.20.0",
     "canvg": "2.0.0",
-    "grommet-icons": "4.7.0",
     "i18next": "21.6.6",
     "immer": "9.0.12",
     "jsqr": "1.4.0",
@@ -58,8 +57,7 @@
     "react-dom": "16.12.0",
     "react-i18next": "11.15.3",
     "react-router-dom": "5.1.2",
-    "sass": "1.47.0",
-    "styled-components": "5.3.3"
+    "sass": "1.47.0"
   },
   "devDependencies": {
     "@storybook/addon-actions": "5.3.18",

@@ -154,7 +154,7 @@ $change-color: #6666cc;
       appearance: none;
       border: none;
       background-color: transparent;
-      width: 1rem;
+      width: 2rem;
       height: 1rem;
       display: flex;
       justify-content: center;
@@ -162,6 +162,10 @@ $change-color: #6666cc;
 
       svg {
         pointer-events: none;
+
+        g {
+          fill: #000;
+        }
       }
     }
   }
