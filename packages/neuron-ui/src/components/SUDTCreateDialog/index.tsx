@@ -4,7 +4,13 @@ import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { validateTokenId, isSuccessResponse, useSUDTAccountInfoErrors, useFetchTokenInfoList } from 'utils'
+import {
+  validateTokenId,
+  isSuccessResponse,
+  useSUDTAccountInfoErrors,
+  useFetchTokenInfoList,
+  useOpenSUDTTokenUrl,
+} from 'utils'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
@@ -25,6 +31,7 @@ export interface TokenInfo extends BasicInfo {
 }
 
 export interface SUDTCreateDialogProps extends TokenInfo {
+  isMainnet: boolean
   onSubmit: (info: TokenInfo) => Promise<boolean>
   onCancel: () => void
   existingAccountNames?: string[]
@@ -114,6 +121,7 @@ const SUDTCreateDialog = ({
   onCancel,
   existingAccountNames = [],
   insufficient = { [AccountType.CKB]: false, [AccountType.SUDT]: false },
+  isMainnet,
 }: Partial<Omit<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>> &
   Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel' | 'insufficient'>) => {
   const [t] = useTranslation()
@@ -216,7 +224,7 @@ const SUDTCreateDialog = ({
       }
     }
   }
-
+  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet);
   return (
     <div className={styles.container}>
       {step === 0 ? (
@@ -295,6 +303,18 @@ const SUDTCreateDialog = ({
                   }
                 />
               ))}
+            {
+              accountType === AccountType.SUDT && !tokenErrors.tokenId && info.tokenId && (
+                <button
+                  type="button"
+                  className={styles.explorerNavButton}
+                  title={t('history.view-in-explorer-button-title')}
+                  onClick={openSUDTTokenUrl}
+                >
+                  {t('history.view-in-explorer-button-title')}
+                </button>
+              )
+            }
             <div className={styles.footer}>
               <Button type="cancel" label={t('s-udt.create-dialog.back')} onClick={onBack} />
               <Button
