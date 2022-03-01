@@ -22,8 +22,7 @@ const showWindow = (url: string, title: string, options?: Electron.BrowserWindow
       autoHideMenuBar: true,
       webPreferences: {
         devTools: env.isDevMode,
-        nodeIntegration: false,
-        enableRemoteModule: false,
+        contextIsolation: false,
         preload: path.join(__dirname, './preload.js'),
       },
       ...options,

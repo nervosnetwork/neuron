@@ -367,10 +367,10 @@
         "title": "轉讓 NFT"
       },
       "delete": {
-        "title": "删除錢包 {{name}}"
+        "title": "删除錢包"
       },
       "backup": {
-        "title": "備份錢包 {{name}}"
+        "title": "備份錢包"
       },
       "unlock": {
         "title": "請輸入錢包密碼提取資產"

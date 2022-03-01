@@ -21,9 +21,9 @@ import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
-import NodeController from 'controllers/node'
-import SyncController from 'controllers/sync'
 import NetworksService from 'services/networks'
+import { clearCkbNodeCache } from 'services/ckb-runner'
+import IndexerService from 'services/indexer'
 
 enum URL {
   Settings = '/settings/general',
@@ -95,7 +95,7 @@ const importHardware = (url: string) => {
 const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    const payload = JSON.stringify({url, json, filePath})
+    const payload = JSON.stringify({ url, json, filePath })
     CommandSubject.next({ winID: window.id, type: 'load-transaction-json', payload, dispatchToUI: true })
   }
 }
@@ -303,7 +303,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.tools.clear-sync-data'),
         enabled: hasCurrentWallet && isMainnet,
         click: async () => {
-          const msgVal = await dialog.showMessageBox({
+          const res = await dialog.showMessageBox({
             type: 'warning',
             title: t('messageBox.clear-sync-data.title'),
             message: t('messageBox.clear-sync-data.message'),
@@ -311,9 +311,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             defaultId: 0,
             cancelId: 1,
           })
-          if (msgVal.response === 0) {
-            await new NodeController().clearCache()
-            await new SyncController().clearCache(true)
+          if (res.response === 0) {
+            await clearCkbNodeCache()
+            await IndexerService.clearCache(true)
           }
         }
       },

@@ -2,7 +2,7 @@ import { DeviceInfo, ExtendedPublicKey } from './common'
 import { Hardware } from './hardware'
 import HID from '@ledgerhq/hw-transport-node-hid'
 import LedgerCKB from 'hw-app-ckb'
-import type { DescriptorEvent, Descriptor } from '@ledgerhq/hw-transport'
+import type { DescriptorEvent, Subscription, Observer } from '@ledgerhq/hw-transport'
 import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
@@ -105,13 +105,13 @@ export default class Ledger extends Hardware {
     return devices.flat()
   }
 
-  private static async searchDevices (listener: any, isBluetooth: boolean) {
+  private static async searchDevices (listener: (observer: Observer<DescriptorEvent<any>>) => Subscription, isBluetooth: boolean) {
     return new Observable(listener)
       .pipe(
         // searching for 2 seconds
         takeUntil(timer(2000)),
-        filter<DescriptorEvent<Descriptor>>(e => e.type === 'add'),
-        scan<DescriptorEvent<Descriptor>, DeviceInfo[]>((acc, e) => {
+        filter<DescriptorEvent<any>>(e => e.type === 'add'),
+        scan<DescriptorEvent<any>, DeviceInfo[]>((acc, e) => {
             return [
               ...acc,
               {

@@ -20,7 +20,7 @@ export const validateAssetAccountName = ({
   }
 
   if (exists.includes(name)) {
-    throw new FieldUsedException(fieldName)
+    throw new FieldUsedException(fieldName, name)
   }
 
   if (name.length > MAX_SUDT_ACCOUNT_NAME_LENGTH) {

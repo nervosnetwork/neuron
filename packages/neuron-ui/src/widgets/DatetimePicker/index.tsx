@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Calendar } from 'primereact/calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
+import { addLocale } from 'primereact/api'
 import styles from './datetimePicker.module.scss'
 
 const SECONDS_PER_DAY = 24 * 3600 * 1000
@@ -64,6 +65,8 @@ const DatetimePicker = ({
       'dec',
     ].map(monname => t(`datetime.${monname}.short`)),
   }
+
+  addLocale('es', locale)
 
   let selected: Date | undefined = display ? new Date(display) : undefined
   if (selected?.toString() === 'Invalid Date') {
@@ -157,7 +160,7 @@ const DatetimePicker = ({
           minDate={new Date()}
           onChange={onCalendarChange}
           inline
-          locale={locale}
+          locale="es"
           className={styles.calendar}
         />
         {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}

@@ -21,6 +21,9 @@ interface AppResponder {
   updateWindowTitle: () => void
 }
 
+/**
+ * subscribe to events and dispatch them to the renderer process
+ */
 export const subscribe = (dispatcher: AppResponder) => {
   NetworkListSubject.pipe(debounceTime(50)).subscribe(({ currentNetworkList = [] }) => {
     dispatcher.sendMessage('network-list-updated', currentNetworkList)

@@ -819,6 +819,9 @@ describe('CellsService', () => {
         bobDefaultLock.computeHash()
       )
 
+      const acpLock = assetAccountInfo.generateAnyoneCanPayScript('0x')
+      const sudtType = new Script(assetAccountInfo.getSudtCodeHash(), '0x', ScriptHashType.Type)
+
       beforeEach(async () => {
         const cells: OutputEntity[] = [
           generateCell('100', OutputStatus.Live, false, null, user),
@@ -830,8 +833,13 @@ describe('CellsService', () => {
           generateCell('400', OutputStatus.Dead, false, null, user),
           generateCell('1000', OutputStatus.Live, true, null, user),
           generateCell('10000', OutputStatus.Live, false, typeScript, user),
+          generateCell('54321', OutputStatus.Live, true, sudtType, { lockScript: acpLock }),
+          // cheque cell
           generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: receiverChequeLock}),
           generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: senderChequeLock}),
+          // unknown asset
+          generateCell('666', OutputStatus.Live, true, typeScript, {lockScript: bobDefaultLock}),
+          generateCell('666', OutputStatus.Live, true, sudtType, {lockScript: bobDefaultLock}),
         ]
         await getConnection().manager.save(cells)
       });
@@ -842,10 +850,10 @@ describe('CellsService', () => {
             result = await CellsService.getCustomizedAssetCells([publicKeyHash], 1, 10)
           })
           it('returns all items', () => {
-            expect(result.totalCount).toEqual(5)
-            expect(result.items.length).toEqual(5)
+            expect(result.totalCount).toEqual(7)
+            expect(result.items.length).toEqual(7)
             const totalCapacity = result.items.reduce((total: number, cell: any) => total + parseInt(cell.capacity), 0)
-            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2)
+            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 * 2)
           })
           it('attaches setCustomizedAssetInfo to single multisign cells', async () => {
             const singleMultiSignCells = result.items.filter((item: any) => item.customizedAssetInfo.lock === CustomizedLock.SingleMultiSign)
@@ -860,26 +868,33 @@ describe('CellsService', () => {
             expect(chequeCells[0].customizedAssetInfo.data).toBe('claimable')
             expect(chequeCells[1].customizedAssetInfo.data).toBe('withdraw-able')
           });
+
+          it('attaches setCustomizedAssetInfo to unknown cells', () => {
+            const chequeCells = result.items.filter((item: any) => item.capacity === '666')
+            expect(chequeCells.length).toEqual(2)
+            expect(chequeCells[0].customizedAssetInfo.type).toBe('Unknown')
+            expect(chequeCells[1].customizedAssetInfo.type).toBe('Unknown')
+          });
         });
         describe('within pagination scope', () => {
           it('returns first page result', async () => {
             const page = 1
             const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(5)
+            expect(result.totalCount).toEqual(7)
             expect(result.items.length).toEqual(pageSize)
           });
           it('returns the remaining cells for the last page', async () => {
             const page = 2
             const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(5)
+            expect(result.totalCount).toEqual(7)
             expect(result.items.length).toEqual(2)
           });
         });
         describe('outside pagination scope', () => {
           it('returns empty result', async () => {
-            const page = 4
+            const page = 8
             const result = await CellsService.getCustomizedAssetCells([publicKeyHash], page, pageSize)
-            expect(result.totalCount).toEqual(5)
+            expect(result.totalCount).toEqual(7)
             expect(result.items.length).toEqual(0)
           });
         });

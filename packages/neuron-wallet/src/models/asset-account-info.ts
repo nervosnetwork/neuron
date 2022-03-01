@@ -67,7 +67,7 @@ export default class AssetAccountInfo {
         hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.chequeInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_CHEQUE_TX_HASH!, process.env.MAINNET_CHEQUE_DEP_INDEX!),
+        cellDep: new CellDep(new OutPoint(process.env.MAINNET_CHEQUE_DEP_TXHASH!, process.env.MAINNET_CHEQUE_DEP_INDEX!),
           process.env.MAINNET_CHEQUE_DEP_TYPE! as DepType),
         codeHash: process.env.MAINNET_CHEQUE_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
@@ -182,6 +182,14 @@ export default class AssetAccountInfo {
 
   public getNftInfo(): ScriptCellInfo {
     return this.nftInfo
+  }
+
+  public getAcpCodeHash(): string {
+    return this.anyoneCanPayInfo.codeHash
+  }
+
+  public getSudtCodeHash(): string {
+    return this.sudt.codeHash
   }
 
   public generateSudtScript(args: string): Script {

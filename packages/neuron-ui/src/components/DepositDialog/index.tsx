@@ -110,7 +110,7 @@ const DepositDialog = ({
           </div>
           <div className={styles.fee}>
             <span>{t('nervos-dao.fee')}</span>
-            <span>{`${shannonToCKBFormatter(fee)} CKB`}</span>
+            <span>{`${shannonToCKBFormatter(fee)}`}</span>
           </div>
           <div className={styles.footer}>
             <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />

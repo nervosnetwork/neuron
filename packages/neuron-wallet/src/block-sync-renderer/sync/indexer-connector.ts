@@ -127,7 +127,6 @@ export default class IndexerConnector {
 
   public async connect() {
     try {
-      this.indexer.startForever()
       this.pollingIndexer = true
 
       this.initSync()
