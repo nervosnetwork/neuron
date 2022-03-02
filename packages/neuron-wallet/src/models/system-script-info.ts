@@ -1,19 +1,23 @@
-import OutPoint from "./chain/out-point"
-import CellDep, { DepType } from "./chain/cell-dep"
-import NetworksService from "services/networks"
-import RpcService from "services/rpc-service"
-import Script, { ScriptHashType } from "./chain/script"
+import OutPoint from './chain/out-point'
+import CellDep, { DepType } from './chain/cell-dep'
+import NetworksService from 'services/networks'
+import RpcService from 'services/rpc-service'
+import Script, { ScriptHashType } from './chain/script'
 
 export default class SystemScriptInfo {
-  static SECP_CODE_HASH = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
-  static DAO_CODE_HASH = "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e"
-  static MULTI_SIGN_CODE_HASH = "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8"
+  static SECP_CODE_HASH = '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8'
+  static DAO_CODE_HASH = '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e'
+  static MULTI_SIGN_CODE_HASH = '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8'
 
   static SECP_HASH_TYPE = ScriptHashType.Type
   static DAO_HASH_TYPE = ScriptHashType.Type
   static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
 
-  static DAO_SCRIPT_HASH = new Script(SystemScriptInfo.DAO_CODE_HASH, '0x', SystemScriptInfo.DAO_HASH_TYPE).computeHash()
+  static DAO_SCRIPT_HASH = new Script(
+    SystemScriptInfo.DAO_CODE_HASH,
+    '0x',
+    SystemScriptInfo.DAO_HASH_TYPE
+  ).computeHash()
 
   private static instance: SystemScriptInfo
   static getInstance(): SystemScriptInfo {
@@ -32,7 +36,9 @@ export default class SystemScriptInfo {
   private multiSignOutPointInfo = new Map<string, OutPoint>()
 
   // need network url and genesisBlockHash
-  public async getSecpCellDep(network: {remote: string, genesisHash: string} = NetworksService.getInstance().getCurrent()): Promise<CellDep> {
+  public async getSecpCellDep(
+    network: { remote: string; genesisHash: string } = NetworksService.getInstance().getCurrent()
+  ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     let outPoint = this.secpOutPointInfo.get(genesisBlockHash)
     if (!outPoint) {
@@ -42,7 +48,9 @@ export default class SystemScriptInfo {
     return new CellDep(outPoint, DepType.DepGroup)
   }
 
-  public async getDaoCellDep(network: {remote: string, genesisHash: string} = NetworksService.getInstance().getCurrent()): Promise<CellDep> {
+  public async getDaoCellDep(
+    network: { remote: string; genesisHash: string } = NetworksService.getInstance().getCurrent()
+  ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     let outPoint = this.daoOutPointInfo.get(genesisBlockHash)
     if (!outPoint) {
@@ -52,7 +60,9 @@ export default class SystemScriptInfo {
     return new CellDep(outPoint, DepType.Code)
   }
 
-  public async getMultiSignCellDep(network: {remote: string, genesisHash: string} = NetworksService.getInstance().getCurrent()): Promise<CellDep> {
+  public async getMultiSignCellDep(
+    network: { remote: string; genesisHash: string } = NetworksService.getInstance().getCurrent()
+  ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     let outPoint = this.multiSignOutPointInfo.get(genesisBlockHash)
     if (!outPoint) {
@@ -79,7 +89,10 @@ export default class SystemScriptInfo {
   }
 
   public static isMultiSignScript(script: Script): boolean {
-    return script.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH && script.hashType === SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+    return (
+      script.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH &&
+      script.hashType === SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+    )
   }
 
   public static isDaoScript(script: Script): boolean {

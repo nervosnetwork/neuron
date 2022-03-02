@@ -11,5 +11,5 @@ export class FileNotFound extends Error {
 
 export default {
   ModuleNotFound,
-  FileNotFound,
+  FileNotFound
 }

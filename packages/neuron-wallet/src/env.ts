@@ -11,7 +11,7 @@ const app = electronApp ?? {
   name: 'Fake App',
   getLocale(): string {
     return 'en'
-  },
+  }
 }
 
 const isTestMode = process.env.NODE_ENV === 'test'

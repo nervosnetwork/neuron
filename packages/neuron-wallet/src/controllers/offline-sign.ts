@@ -13,7 +13,14 @@ import NodeService from 'services/node'
 import { OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
 
 export default class OfflineSignController {
-  public async exportTransactionAsJSON ({ transaction, type, status, asset_account, description, context }: OfflineSignJSON) {
+  public async exportTransactionAsJSON({
+    transaction,
+    type,
+    status,
+    asset_account,
+    description,
+    context
+  }: OfflineSignJSON) {
     const { canceled, filePath } = await dialog.showSaveDialog({
       title: t('offline-signature.export-transaction'),
       defaultPath: `transaction_${Date.now()}.json`
@@ -59,7 +66,7 @@ export default class OfflineSignController {
     }
   }
 
-  public async signTransaction (params: OfflineSignJSON & { walletID: string, password: string }) {
+  public async signTransaction(params: OfflineSignJSON & { walletID: string; password: string }) {
     const { transaction, type, walletID, password, context } = params
 
     try {
@@ -90,7 +97,7 @@ export default class OfflineSignController {
     }
   }
 
-  public async signAndExportTransaction (params: OfflineSignJSON & { walletID: string, password: string }) {
+  public async signAndExportTransaction(params: OfflineSignJSON & { walletID: string; password: string }) {
     const res = await this.signTransaction(params)
 
     const signer = OfflineSign.fromJSON({
@@ -101,7 +108,7 @@ export default class OfflineSignController {
     return await this.exportTransactionAsJSON(signer.toJSON())
   }
 
-  public async broadcastTransaction ({
+  public async broadcastTransaction({
     transaction,
     type,
     asset_account: assetAccount,
@@ -111,27 +118,36 @@ export default class OfflineSignController {
     const tx = Transaction.fromObject(transaction)
     switch (type) {
       case SignType.CreateSUDTAccount: {
-        return new AssetAccountController().sendCreateTx({
-          walletID,
-          assetAccount: assetAccount!,
-          tx,
-          password: '',
-        }, true)
+        return new AssetAccountController().sendCreateTx(
+          {
+            walletID,
+            assetAccount: assetAccount!,
+            tx,
+            password: ''
+          },
+          true
+        )
       }
       case SignType.SendSUDT: {
-        return new AnyoneCanPayController().sendTx({
-          walletID,
-          tx,
-          password: ''
-        }, true)
+        return new AnyoneCanPayController().sendTx(
+          {
+            walletID,
+            tx,
+            password: ''
+          },
+          true
+        )
       }
       default: {
-        return new WalletsController().sendTx({
-          walletID,
-          tx,
-          password: '',
-          description
-        }, true)
+        return new WalletsController().sendTx(
+          {
+            walletID,
+            tx,
+            password: '',
+            description
+          },
+          true
+        )
       }
     }
   }

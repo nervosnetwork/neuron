@@ -10,8 +10,10 @@ import { ckbDataPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
 import AddressService from 'services/addresses'
+import redistCheck from 'utils/redist-check'
 
 export default class ExportDebugController {
+  // eslint-disable-next-line prettier/prettier
   #I18N_PATH = 'export-debug-info'
   #ANONYMOUS_ADDRESS = 'http://****:port'
   private archive: archiver.Archiver
@@ -51,7 +53,7 @@ export default class ExportDebugController {
     const url = NetworksService.getInstance().getCurrent().remote
     const ckb = new CKB(url)
 
-    const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers] = await Promise.all([
+    const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers, vcredist] = await Promise.all([
       new SyncedBlockNumber()
         .getNextBlock()
         .then(n => n.toString())
@@ -66,7 +68,8 @@ export default class ExportDebugController {
         .catch(() => ''),
       ckb.rpc
         .getPeers()
-        .catch(() => [])
+        .catch(() => []),
+      redistCheck()
     ])
     const { platform, arch } = process
     const release = os.release()
@@ -85,6 +88,7 @@ export default class ExportDebugController {
         platform,
         arch,
         release,
+        vcredist
       }
     }
     this.archive.append(JSON.stringify(status), {

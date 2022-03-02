@@ -1,12 +1,12 @@
 import { BehaviorSubject } from 'rxjs'
 
 const SyncStateSubject = new BehaviorSubject<{
-  timestamp: number,
-  indexerTipNumber: number,
-  cacheTipNumber: number,
-  indexRate: number | undefined,
-  cacheRate: number | undefined,
-  estimate: number | undefined,
+  timestamp: number
+  indexerTipNumber: number
+  cacheTipNumber: number
+  indexRate: number | undefined
+  cacheRate: number | undefined
+  estimate: number | undefined
   status: number
 }>({
   timestamp: 0,
@@ -15,7 +15,7 @@ const SyncStateSubject = new BehaviorSubject<{
   indexRate: undefined,
   cacheRate: undefined,
   estimate: undefined,
-  status: 0,
+  status: 0
 })
 
 export default SyncStateSubject

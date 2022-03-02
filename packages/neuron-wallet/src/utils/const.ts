@@ -6,9 +6,9 @@ export const DEFAULT_UDT_SYMBOL = 'Unknown'
 
 export enum ResponseCode {
   Fail,
-  Success,
+  Success
 }
 
 export default {
-  ResponseCode,
+  ResponseCode
 }

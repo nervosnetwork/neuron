@@ -4,22 +4,20 @@ import logger from 'utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
-  #blockNumberEntity: SyncInfoEntity | undefined = undefined
-
-  private static lastSavedBlock: bigint = BigInt(-1)
+  // eslint-disable-next-line prettier/prettier
+  #blockNumberEntity?: SyncInfoEntity
+  #lastSavedBlock: bigint = BigInt(-1)
 
   // Get next block to scan. If syncing hasn't run yet return 0 (genesis block number).
-  public async getNextBlock(): Promise<bigint> {
-    const blockNumber = BigInt((await this.blockNumber()).value)
-    return blockNumber
-  }
+  public getNextBlock = () => this.#blockNumber().then(({ value }) => BigInt(value))
 
-  public async setNextBlock(current: bigint): Promise<void> {
-    const blockDiffAbs = Math.abs(Number(current) - Number(SyncedBlockNumber.lastSavedBlock))
+  public setNextBlock = async (current: bigint): Promise<void> => {
+    const blockDiffAbs = Math.abs(Number(current) - Number(this.#lastSavedBlock))
+
     if (current === BigInt(0) || blockDiffAbs >= 10) {
-      SyncedBlockNumber.lastSavedBlock = current
+      this.#lastSavedBlock = current
 
-      let blockNumberEntity = await this.blockNumber()
+      let blockNumberEntity = await this.#blockNumber()
       blockNumberEntity.value = current.toString()
       await getConnection().manager.save(blockNumberEntity)
 
@@ -27,19 +25,16 @@ export default class SyncedBlockNumber {
     }
   }
 
-  private async blockNumber(): Promise<SyncInfoEntity> {
+  #blockNumber = async (): Promise<SyncInfoEntity> => {
     if (!this.#blockNumberEntity) {
-      this.#blockNumberEntity = await getConnection()
-        .getRepository(SyncInfoEntity)
-        .findOne({
-          name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
-        })
-    }
+      let blockNumber = await getConnection().getRepository(SyncInfoEntity).findOne({ name: SyncInfoEntity.CURRENT_BLOCK_NUMBER })
 
-    if (!this.#blockNumberEntity) {
-      this.#blockNumberEntity = new SyncInfoEntity()
-      this.#blockNumberEntity.name = SyncInfoEntity.CURRENT_BLOCK_NUMBER
-      this.#blockNumberEntity.value = '0'
+      if (!blockNumber) {
+        blockNumber = new SyncInfoEntity()
+        blockNumber.name = SyncInfoEntity.CURRENT_BLOCK_NUMBER
+        blockNumber.value = '0'
+      }
+      this.#blockNumberEntity = blockNumber
     }
 
     return this.#blockNumberEntity

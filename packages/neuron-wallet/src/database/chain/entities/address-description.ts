@@ -6,19 +6,19 @@ export default class AddressDescription {
   id!: number
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   @Index()
   walletId!: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   @Index()
   address!: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   description!: string
 }

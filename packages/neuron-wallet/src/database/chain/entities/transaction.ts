@@ -8,7 +8,7 @@ import {
   BeforeUpdate,
   AfterInsert,
   AfterUpdate,
-  AfterRemove,
+  AfterRemove
 } from 'typeorm'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
@@ -18,84 +18,89 @@ import CellDep, { DepType } from 'models/chain/cell-dep'
 import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import Output from 'models/chain/output'
-import { ChildProcess } from 'utils/worker'
 
 @Entity()
 export default class Transaction extends BaseEntity {
   @PrimaryColumn({
-    type: 'varchar',
+    type: 'varchar'
   })
   hash!: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   version!: string
 
   @Column({
-    type: 'simple-json',
+    type: 'simple-json'
   })
   cellDeps: CellDep[] = []
 
   @Column({
-    type: 'simple-json',
+    type: 'simple-json'
   })
   headerDeps: string[] = []
 
   @Column({
-    type: 'simple-json',
+    type: 'simple-json'
   })
   witnesses!: string[]
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   timestamp: string | undefined = undefined
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   blockNumber: string | undefined = undefined
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   blockHash: string | undefined = undefined
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   description?: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   status!: TransactionStatus
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   createdAt!: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   updatedAt!: string
 
   // only used for check fork in indexer mode
   @Column({
-    type: 'boolean',
+    type: 'boolean'
   })
   confirmed: boolean = false
 
-  @OneToMany(_type => InputEntity, input => input.transaction)
+  @OneToMany(
+    _type => InputEntity,
+    input => input.transaction
+  )
   inputs!: InputEntity[]
 
-  @OneToMany(_type => OutputEntity, output => output.transaction)
+  @OneToMany(
+    _type => OutputEntity,
+    output => output.transaction
+  )
   outputs!: OutputEntity[]
 
   public toModel(): TransactionModel {
@@ -104,12 +109,13 @@ export default class Transaction extends BaseEntity {
     return TransactionModel.fromObject({
       hash: this.hash,
       version: this.version,
-      cellDeps: this.cellDeps?.map((cd: any) => {
-        if (cd instanceof CellDep) {
-          return cd
-        }
-        return new CellDep(new OutPoint(cd.outPoint.txHash, cd.outPoint.index), cd.depType as DepType)
-      }) || [],
+      cellDeps:
+        this.cellDeps?.map((cd: any) => {
+          if (cd instanceof CellDep) {
+            return cd
+          }
+          return new CellDep(new OutPoint(cd.outPoint.txHash, cd.outPoint.index), cd.depType as DepType)
+        }) || [],
       headerDeps: this.headerDeps,
       inputs,
       outputs,
@@ -156,11 +162,8 @@ export default class Transaction extends BaseEntity {
   }
 
   private changed = (event: string) => {
-    if (ChildProcess.isChildProcess()) {
-      ChildProcess.send({
-        channel: 'tx-db-changed',
-        result: { event }
-      })
+    if (process.send) {
+      process.send({ channel: 'tx-db-changed', message: { event } })
     } else {
       TxDbChangedSubject.getSubject().next({ event })
     }

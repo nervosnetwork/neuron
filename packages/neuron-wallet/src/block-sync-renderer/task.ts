@@ -1,45 +1,88 @@
+// eslint-disable-next-line prettier/prettier
+import type { LumosCellQuery } from './sync/indexer-connector'
 import initConnection from 'database/chain/ormconfig'
-import { Address as AddressInterface } from "models/address"
-import Queue from './sync/queue'
-import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
+import { register as registerTxStatusListener, } from './tx-status-listener'
+import SyncQueue from './sync/queue'
 import logger from 'utils/logger'
-import { LumosCellQuery } from './sync/indexer-connector'
-import { expose } from 'utils/worker'
+import { ShouldInChildProcess } from 'exceptions'
 import env from 'env'
 
-let syncQueue: Queue | null
+let syncQueue: SyncQueue | null
 
-export type SyncTask = typeof syncTask
-
-const syncTask = {
-  unmount() {
-    unregisterTxStatusListener()
-
-    logger.info("Sync:\tstop block sync queue")
-    syncQueue?.stop()
-    syncQueue = null
-  },
-  async start(url: string, genesisHash: string, addressesMetas: AddressInterface[], indexerUrl: string) {
-    if (syncQueue) {
-      await syncQueue.stopAndWait()
-    }
-
-    // reset `fileBasePath` from master process
-    env.fileBasePath = process.env['fileBasePath'] ?? env.fileBasePath
-    await initConnection(genesisHash)
-
-    logger.info("Sync:\tstart block sync queue")
-    syncQueue = new Queue(url, addressesMetas, indexerUrl)
-    syncQueue.start()
-  },
-  async queryIndexer (query: LumosCellQuery) {
-    const indexerConnector = syncQueue?.getIndexerConnector()
-    return await indexerConnector?.getLiveCellsByScript(query)
-  }
+export interface WorkerMessage<T = any> {
+  type: 'call' | 'response' | 'kill',
+  id?: number,
+  channel: 'start' | 'queryIndexer' | 'unmount' | 'cache-tip-block-updated' | 'tx-db-changed' | 'wallet-deleted' | 'address-created' | 'indexer-error'
+  message: T
 }
 
-export default syncTask
+type SyncQueueParams = ConstructorParameters<typeof SyncQueue>
 
-expose(syncTask)
+export interface StartParams {
+  genesisHash: string
+  url: SyncQueueParams[0]
+  addressMetas: SyncQueueParams[1]
+  indexerUrl: SyncQueueParams[2]
+}
+
+export type QueryIndexerParams = LumosCellQuery
+
+export const listener = async ({ type, id, channel, message }: WorkerMessage) => {
+
+  if (type === 'kill') {
+    process.exit(0)
+  }
+
+  if (!process.send) {
+    throw new ShouldInChildProcess()
+  }
+
+  if (type !== 'call') { return }
+
+  let res = null
+
+  switch (channel) {
+    case 'start': {
+      if (syncQueue) { return }
+
+      env.fileBasePath = process.env['fileBasePath'] ?? env.fileBasePath
+
+      try {
+        await initConnection(message.genesisHash)
+
+        syncQueue = new SyncQueue(message.url, message.addressMetas, message.indexerUrl)
+        syncQueue.start()
+
+      } catch (err) {
+        logger.error(`Block Sync Task:\t`, err,)
+      }
+
+      break
+    }
+
+    case 'unmount': {
+      if (!syncQueue) { return }
+      logger.debug("Sync:\tstopping")
+      await syncQueue.stopAndWait()
+      syncQueue = null
+      logger.debug("Sync:\tstopped")
+      process.exit(0)
+      break
+    }
+
+    case 'queryIndexer': {
+      res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
+      break
+    }
+    default: {
+      // ignore
+    }
+
+  }
+  process.send({ id, type: `response`, channel, message: res })
+}
+
+process.on('message', listener)
 
 registerTxStatusListener()
+

@@ -4,12 +4,11 @@ import { AddressType } from 'models/keys/address'
 
 @Entity()
 export default class HdPublicKeyInfo {
-
   @PrimaryGeneratedColumn()
   id!: number
 
   @Column({
-    type: "varchar",
+    type: 'varchar'
   })
   @Index()
   walletId!: string
@@ -22,15 +21,15 @@ export default class HdPublicKeyInfo {
   addressIndex!: number
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   publicKeyInBlake160!: string
 
   @CreateDateColumn({
-    type: "varchar",
-    default: () => "CURRENT_TIMESTAMP"
+    type: 'varchar',
+    default: () => 'CURRENT_TIMESTAMP'
   })
-  createdAt!: Date;
+  createdAt!: Date
 
   public static fromModel(model: HdPublicKeyInfoModel): HdPublicKeyInfo {
     const publicKeyInfo = new HdPublicKeyInfo()

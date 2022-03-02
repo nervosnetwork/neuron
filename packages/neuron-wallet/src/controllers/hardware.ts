@@ -1,11 +1,11 @@
-import { DeviceInfo, ExtendedPublicKey, PublicKey } from "services/hardware/common";
-import { ResponseCode } from "utils/const"
-import HardwareWalletService from "services/hardware";
-import { connectDeviceFailed } from "exceptions";
-import { AccountExtendedPublicKey } from "models/keys/key";
+import { DeviceInfo, ExtendedPublicKey, PublicKey } from 'services/hardware/common'
+import { ResponseCode } from 'utils/const'
+import HardwareWalletService from 'services/hardware'
+import { connectDeviceFailed } from 'exceptions'
+import { AccountExtendedPublicKey } from 'models/keys/key'
 
 export default class HardwareController {
-  public async connectDevice (deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
+  public async connectDevice(deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
     const device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
     try {
       await device!.connect()
@@ -18,7 +18,9 @@ export default class HardwareController {
     }
   }
 
-  public async detectDevice (model: Pick<DeviceInfo, 'manufacturer' | 'product'>): Promise<Controller.Response<DeviceInfo[]>> {
+  public async detectDevice(
+    model: Pick<DeviceInfo, 'manufacturer' | 'product'>
+  ): Promise<Controller.Response<DeviceInfo[]>> {
     const devices = await HardwareWalletService.findDevices(model)
     return {
       status: ResponseCode.Success,
@@ -26,7 +28,7 @@ export default class HardwareController {
     }
   }
 
-  public async getCkbAppVersion (): Promise<Controller.Response<string>> {
+  public async getCkbAppVersion(): Promise<Controller.Response<string>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const version = await device.getAppVersion()
 
@@ -36,7 +38,7 @@ export default class HardwareController {
     }
   }
 
-  public async getFirmwareVersion (): Promise<Controller.Response<string>> {
+  public async getFirmwareVersion(): Promise<Controller.Response<string>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const version = await device.getFirmwareVersion?.()
 
@@ -46,24 +48,24 @@ export default class HardwareController {
     }
   }
 
-  public async getExtendedPublicKey (): Promise<Controller.Response<ExtendedPublicKey>> {
+  public async getExtendedPublicKey(): Promise<Controller.Response<ExtendedPublicKey>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const pubkey = await device.getExtendedPublicKey()
 
     return {
       status: ResponseCode.Success,
-      result: pubkey,
+      result: pubkey
     }
   }
 
-  public async getPublicKey (): Promise<Controller.Response<PublicKey>> {
+  public async getPublicKey(): Promise<Controller.Response<PublicKey>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const defaultPath = AccountExtendedPublicKey.ckbAccountPath
     const pubkey = await device.getPublicKey(defaultPath)
 
     return {
       status: ResponseCode.Success,
-      result: pubkey,
+      result: pubkey
     }
   }
 }

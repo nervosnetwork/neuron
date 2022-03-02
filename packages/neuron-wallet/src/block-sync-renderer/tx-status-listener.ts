@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import CKB from '@nervosnetwork/ckb-sdk-core'
-import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
+import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
 import { TransactionStatus } from 'models/chain/transaction'
@@ -17,20 +17,20 @@ const getTransactionStatus = async (hash: string) => {
     return {
       tx: txWithStatus,
       status: TransactionStatus.Failed,
-      blockHash: null,
+      blockHash: null
     }
   }
   if (txWithStatus.txStatus.isCommitted()) {
     return {
       tx: txWithStatus.transaction,
       status: TransactionStatus.Success,
-      blockHash: txWithStatus.txStatus.blockHash,
+      blockHash: txWithStatus.txStatus.blockHash
     }
   }
   return {
     tx: txWithStatus.transaction,
     status: TransactionStatus.Pending,
-    blockHash: null,
+    blockHash: null
   }
 }
 
@@ -39,6 +39,7 @@ const trackingStatus = async () => {
   if (!pendingTransactions.length) {
     return
   }
+
   const pendingHashes = pendingTransactions.map(tx => tx.hash)
   const txs = await Promise.all(
     pendingHashes.map(async hash => {
@@ -47,10 +48,11 @@ const trackingStatus = async () => {
         hash,
         tx: txWithStatus.tx,
         status: txWithStatus.status,
-        blockHash: txWithStatus.blockHash,
+        blockHash: txWithStatus.blockHash
       }
     })
   )
+
   const failedTxs = txs.filter(tx => tx.status === TransactionStatus.Failed)
   const successTxs = txs.filter(tx => tx.status === TransactionStatus.Success)
 
@@ -87,9 +89,3 @@ export const register = () => {
     }
   })
 }
-
-export const unregister = () => {
-  // Nothing to do. This interval subscription will be killed with the renderer process.
-}
-
-export default register

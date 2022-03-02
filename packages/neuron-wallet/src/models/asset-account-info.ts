@@ -1,11 +1,11 @@
-import CellDep, { DepType } from "./chain/cell-dep"
-import Script, { ScriptHashType } from "./chain/script"
-import OutPoint from "./chain/out-point"
-import NetworksService from "services/networks"
-import Transaction from "./chain/transaction"
-import HexUtils from "utils/hex"
-import SystemScriptInfo from "./system-script-info"
-import { Address } from "./address"
+import CellDep, { DepType } from './chain/cell-dep'
+import Script, { ScriptHashType } from './chain/script'
+import OutPoint from './chain/out-point'
+import NetworksService from 'services/networks'
+import Transaction from './chain/transaction'
+import HexUtils from 'utils/hex'
+import SystemScriptInfo from './system-script-info'
+import { Address } from './address'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -24,9 +24,10 @@ export default class AssetAccountInfo {
   private nftClassInfo: ScriptCellInfo
   private nftInfo: ScriptCellInfo
 
-  private static MAINNET_GENESIS_BLOCK_HASH: string = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
+  private static MAINNET_GENESIS_BLOCK_HASH: string =
+    '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
 
-  public get infos(): {[name: string]: ScriptCellInfo} {
+  public get infos(): { [name: string]: ScriptCellInfo } {
     return {
       sudt: this.sudt,
       sudtInfo: this.sudtInfo,
@@ -37,113 +38,149 @@ export default class AssetAccountInfo {
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
     if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
       this.sudt = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!),
-          process.env.MAINNET_SUDT_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_SUDT_DEP_TXHASH!, process.env.MAINNET_SUDT_DEP_INDEX!),
+          process.env.MAINNET_SUDT_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.MAINNET_SUDT_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.sudtInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_SUDT_INFO_DEP_TXHASH!, process.env.MAINNET_SUDT_INFO_DEP_INDEX!),
-          process.env.MAINNET_SUDT_INFO_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_SUDT_INFO_DEP_TXHASH!, process.env.MAINNET_SUDT_INFO_DEP_INDEX!),
+          process.env.MAINNET_SUDT_INFO_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.MAINNET_SUDT_INFO_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.anyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_ACP_DEP_TXHASH!, process.env.MAINNET_ACP_DEP_INDEX!),
-          process.env.MAINNET_ACP_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_ACP_DEP_TXHASH!, process.env.MAINNET_ACP_DEP_INDEX!),
+          process.env.MAINNET_ACP_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.MAINNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.legacyAnyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.LEGACY_MAINNET_ACP_DEP_TXHASH!, process.env.LEGACY_MAINNET_ACP_DEP_INDEX!),
-          process.env.LEGACY_MAINNET_ACP_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.LEGACY_MAINNET_ACP_DEP_TXHASH!, process.env.LEGACY_MAINNET_ACP_DEP_INDEX!),
+          process.env.LEGACY_MAINNET_ACP_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.pwAnyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_PW_ACP_DEP_TXHASH!, process.env.MAINNET_PW_ACP_DEP_INDEX!),
-          process.env.MAINNET_PW_ACP_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_PW_ACP_DEP_TXHASH!, process.env.MAINNET_PW_ACP_DEP_INDEX!),
+          process.env.MAINNET_PW_ACP_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.chequeInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_CHEQUE_TX_HASH!, process.env.MAINNET_CHEQUE_DEP_INDEX!),
-          process.env.MAINNET_CHEQUE_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_CHEQUE_DEP_TXHASH!, process.env.MAINNET_CHEQUE_DEP_INDEX!),
+          process.env.MAINNET_CHEQUE_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.MAINNET_CHEQUE_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.nftIssuerInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_NFT_ISSUER_DEP_TXHASH!, process.env.MAINNET_NFT_ISSUER_DEP_INDEX!),
-        (process.env.MAINNET_NFT_ISSUER_DEP_TYPE as DepType)),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_NFT_ISSUER_DEP_TXHASH!, process.env.MAINNET_NFT_ISSUER_DEP_INDEX!),
+          process.env.MAINNET_NFT_ISSUER_DEP_TYPE as DepType
+        ),
         codeHash: process.env.MAINNET_NFT_ISSUER_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType
       }
       this.nftClassInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_NFT_CLASS_DEP_TXHASH!, process.env.MAINNET_NFT_CLASS_DEP_INDEX!),
-        (process.env.MAINNET_NFT_CLASS_DEP_TYPE as DepType)),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_NFT_CLASS_DEP_TXHASH!, process.env.MAINNET_NFT_CLASS_DEP_INDEX!),
+          process.env.MAINNET_NFT_CLASS_DEP_TYPE as DepType
+        ),
         codeHash: process.env.MAINNET_NFT_CLASS_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType
       }
       this.nftInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.MAINNET_NFT_DEP_TXHASH!, process.env.MAINNET_NFT_DEP_INDEX!),
-        (process.env.MAINNET_NFT_DEP_TYPE as DepType)),
+        cellDep: new CellDep(
+          new OutPoint(process.env.MAINNET_NFT_DEP_TXHASH!, process.env.MAINNET_NFT_DEP_INDEX!),
+          process.env.MAINNET_NFT_DEP_TYPE as DepType
+        ),
         codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType
       }
     } else {
       this.sudt = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
-          process.env.TESTNET_SUDT_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_SUDT_DEP_TXHASH!, process.env.TESTNET_SUDT_DEP_INDEX!),
+          process.env.TESTNET_SUDT_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.TESTNET_SUDT_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.sudtInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_SUDT_INFO_DEP_TXHASH!, process.env.TESTNET_SUDT_INFO_DEP_INDEX!),
-          process.env.TESTNET_SUDT_INFO_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_SUDT_INFO_DEP_TXHASH!, process.env.TESTNET_SUDT_INFO_DEP_INDEX!),
+          process.env.TESTNET_SUDT_INFO_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.TESTNET_SUDT_INFO_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.anyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_ACP_DEP_TXHASH!, process.env.TESTNET_ACP_DEP_INDEX!),
-          process.env.TESTNET_ACP_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_ACP_DEP_TXHASH!, process.env.TESTNET_ACP_DEP_INDEX!),
+          process.env.TESTNET_ACP_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.TESTNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.legacyAnyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!, process.env.LEGACY_TESTNET_ACP_DEP_INDEX!),
-          process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.LEGACY_TESTNET_ACP_DEP_TXHASH!, process.env.LEGACY_TESTNET_ACP_DEP_INDEX!),
+          process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.pwAnyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_PW_ACP_DEP_TXHASH!, process.env.TESTNET_PW_ACP_DEP_INDEX!),
-          process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_PW_ACP_DEP_TXHASH!, process.env.TESTNET_PW_ACP_DEP_INDEX!),
+          process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.chequeInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_CHEQUE_DEP_TXHASH!, process.env.TESTNET_CHEQUE_DEP_INDEX!),
-          process.env.TESTNET_CHEQUE_DEP_TYPE! as DepType),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_CHEQUE_DEP_TXHASH!, process.env.TESTNET_CHEQUE_DEP_INDEX!),
+          process.env.TESTNET_CHEQUE_DEP_TYPE! as DepType
+        ),
         codeHash: process.env.TESTNET_CHEQUE_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
       }
       this.nftIssuerInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_NFT_ISSUER_DEP_TXHASH!, process.env.TESTNET_NFT_ISSUER_DEP_INDEX!),
-        (process.env.TESTNET_NFT_ISSUER_DEP_TYPE as DepType)),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_NFT_ISSUER_DEP_TXHASH!, process.env.TESTNET_NFT_ISSUER_DEP_INDEX!),
+          process.env.TESTNET_NFT_ISSUER_DEP_TYPE as DepType
+        ),
         codeHash: process.env.TESTNET_NFT_ISSUER_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType
       }
       this.nftClassInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_NFT_CLASS_DEP_TXHASH!, process.env.TESTNET_NFT_CLASS_DEP_INDEX!),
-        (process.env.TESTNET_NFT_CLASS_DEP_TYPE as DepType)),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_NFT_CLASS_DEP_TXHASH!, process.env.TESTNET_NFT_CLASS_DEP_INDEX!),
+          process.env.TESTNET_NFT_CLASS_DEP_TYPE as DepType
+        ),
         codeHash: process.env.TESTNET_NFT_CLASS_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType
       }
       this.nftInfo = {
-        cellDep: new CellDep(new OutPoint(process.env.TESTNET_NFT_DEP_TXHASH!, process.env.TESTNET_NFT_DEP_INDEX!),
-        (process.env.TESTNET_NFT_DEP_TYPE as DepType)),
+        cellDep: new CellDep(
+          new OutPoint(process.env.TESTNET_NFT_DEP_TXHASH!, process.env.TESTNET_NFT_DEP_INDEX!),
+          process.env.TESTNET_NFT_DEP_TYPE as DepType
+        ),
         codeHash: process.env.TESTNET_NFT_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType
       }
     }
   }
@@ -152,7 +189,7 @@ export default class AssetAccountInfo {
     return this.sudt.cellDep
   }
 
-  public get sudtInfoCodeHash():string{
+  public get sudtInfoCodeHash(): string {
     return this.sudtInfo.codeHash
   }
 
@@ -227,9 +264,7 @@ export default class AssetAccountInfo {
   }
 
   public determineAdditionalACPCellDepsByTx(tx: Transaction): CellDep[] {
-    const acpInfos = [
-      this.pwAnyoneCanPayInfo,
-    ]
+    const acpInfos = [this.pwAnyoneCanPayInfo]
     const cellDeps = new Set<CellDep>()
     for (const acpInfo of acpInfos) {
       for (const input of tx.inputs) {

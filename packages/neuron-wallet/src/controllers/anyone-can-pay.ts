@@ -1,9 +1,9 @@
 import AssetAccountInfo from 'models/asset-account-info'
-import Transaction from "models/chain/transaction"
-import { ServiceHasNoResponse } from "exceptions"
-import { ResponseCode } from "utils/const"
-import AnyoneCanPayService from "services/anyone-can-pay"
-import TransactionSender from "services/transaction-sender"
+import Transaction from 'models/chain/transaction'
+import { ServiceHasNoResponse } from 'exceptions'
+import { ResponseCode } from 'utils/const'
+import AnyoneCanPayService from 'services/anyone-can-pay'
+import TransactionSender from 'services/transaction-sender'
 import { set as setDescription } from 'services/tx/transaction-description'
 
 export interface GenerateAnyoneCanPayTxParams {
@@ -49,7 +49,7 @@ export default class AnyoneCanPayController {
 
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 
@@ -62,13 +62,7 @@ export default class AnyoneCanPayController {
 
   public async sendTx(params: SendAnyoneCanPayTxParams, skipSign = false): Promise<Controller.Response<string>> {
     const txModel = Transaction.fromObject(params.tx)
-    const txHash = await new TransactionSender().sendTx(
-      params.walletID,
-      txModel,
-      params.password,
-      1,
-      skipSign
-    )
+    const txHash = await new TransactionSender().sendTx(params.walletID, txModel, params.password, 1, skipSign)
 
     if (!txHash) {
       throw new ServiceHasNoResponse('AnyoneCanPay')
@@ -81,7 +75,7 @@ export default class AnyoneCanPayController {
 
     return {
       status: ResponseCode.Success,
-      result: txHash,
+      result: txHash
     }
   }
 

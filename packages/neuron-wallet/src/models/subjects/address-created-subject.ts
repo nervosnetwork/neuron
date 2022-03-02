@@ -1,5 +1,5 @@
 import { ReplaySubject } from 'rxjs'
-import { Address } from "models/address"
+import { Address } from 'models/address'
 
 export default class AddressCreatedSubject {
   private static subject = new ReplaySubject<Address[]>(100)

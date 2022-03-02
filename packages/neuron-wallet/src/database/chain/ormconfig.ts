@@ -53,7 +53,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
   const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] = ['warn', 'error']
-    // (env.isDevMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
+  // (env.isDevMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
 
   return {
     ...connectionOptions,
@@ -69,7 +69,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AssetAccount,
       SudtTokenInfo,
       IndexerTxHashCache,
-      AddressDescription,
+      AddressDescription
     ],
     migrations: [
       InitMigration1566959757554,
@@ -95,7 +95,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       HDPublicKeyInfo1598087517643,
       TxDescription1599441769473,
       RemoveKeyInfoAddress1601447406035,
-      AddAddressDescription1602543179168,
+      AddAddressDescription1602543179168
     ],
     logger: 'simple-console',
     logging,

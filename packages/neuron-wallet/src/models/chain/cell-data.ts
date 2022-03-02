@@ -11,10 +11,7 @@ export default class CellData {
     TypeChecker.hashChecker(this.hash)
   }
 
-  public static fromSDK(cellData: { content: string, hash: string }): CellData {
-    return new CellData(
-      cellData.content,
-      cellData.hash
-    )
+  public static fromSDK(cellData: { content: string; hash: string }): CellData {
+    return new CellData(cellData.content, cellData.hash)
   }
 }

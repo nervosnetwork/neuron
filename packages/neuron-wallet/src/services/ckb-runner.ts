@@ -22,20 +22,16 @@ const { app } = env
 let ckb: ChildProcess | null = null
 
 const ckbPath = (): string => {
-  return app.isPackaged ?
-    path.join(path.dirname(app.getAppPath()), '..', './bin') :
-    path.join(__dirname, '../../bin',)
+  return app.isPackaged ? path.join(path.dirname(app.getAppPath()), '..', './bin') : path.join(__dirname, '../../bin')
 }
 
 const ckbBinary = (): string => {
-  const binary = app.isPackaged ?
-    path.resolve(ckbPath(), './ckb') :
-    path.resolve(ckbPath(), `./${platform()}`, './ckb')
+  const binary = app.isPackaged ? path.resolve(ckbPath(), './ckb') : path.resolve(ckbPath(), `./${platform()}`, './ckb')
   return platform() === 'win' ? binary + '.exe' : binary
 }
 
 export const ckbDataPath = (): string => {
-  return path.resolve(app.getPath('userData',), 'chains/mainnet')
+  return path.resolve(app.getPath('userData'), 'chains/mainnet')
 }
 
 const initCkb = async () => {
@@ -72,10 +68,11 @@ export const startCkbNode = async () => {
 
   logger.info('CKB:\tstarting node...')
   ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
-  ckb.stderr && ckb.stderr.on('data', data => {
-    logger.error('CKB:\trun fail:', data.toString())
-    ckb = null
-  })
+  ckb.stderr &&
+    ckb.stderr.on('data', data => {
+      logger.error('CKB:\trun fail:', data.toString())
+      ckb = null
+    })
 
   ckb.on('error', error => {
     logger.error('CKB:\trun fail:', error)
@@ -99,4 +96,13 @@ export const stopCkbNode = () => {
       resolve()
     }
   })
+}
+
+/**
+ * remove ckb data
+ */
+export const clearCkbNodeCache = async () => {
+  await stopCkbNode()
+  fs.rmSync(ckbDataPath(), { recursive: true, force: true })
+  await startCkbNode()
 }

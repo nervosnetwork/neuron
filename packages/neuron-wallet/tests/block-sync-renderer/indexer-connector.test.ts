@@ -5,10 +5,8 @@ import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
 import { flushPromises } from '../test-utils'
-import MercuryService from '../../src/services/mercury'
 import { ScriptHashType } from '../../src/models/chain/script'
 
-const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
@@ -39,7 +37,6 @@ describe('unit tests for IndexerConnector', () => {
 
   const resetMocks = () => {
     stubbedTipFn.mockReset()
-    stubbedStartForeverFn.mockReset()
     stubbedGetTransactionFn.mockReset()
     stubbedGetHeaderFn.mockReset()
     stubbedUpsertTxHashesFn.mockReset()
@@ -57,9 +54,8 @@ describe('unit tests for IndexerConnector', () => {
 
   jest.doMock('@nervina-labs/ckb-indexer', () => {
     return {
-      CkbIndexer : stubbedIndexerConstructor.mockImplementation(
+      CkbIndexer: stubbedIndexerConstructor.mockImplementation(
         () => ({
-          startForever: stubbedStartForeverFn,
           tip: stubbedTipFn,
         })
       ),
@@ -79,7 +75,7 @@ describe('unit tests for IndexerConnector', () => {
     )
   });
   jest.doMock('utils/logger', () => {
-    return {error: stubbedLoggerErrorFn}
+    return { error: stubbedLoggerErrorFn }
   });
   jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
     return stubbedIndexerCacheService.mockImplementation(
@@ -101,12 +97,14 @@ describe('unit tests for IndexerConnector', () => {
   });
 
   describe('#constructor', () => {
+    const STUB_URI = 'stub_uri'
+
     describe('when init with indexer folder path', () => {
       beforeEach(() => {
-        new stubbedIndexerConnector([], nodeUrl, MercuryService.LISTEN_URI)
+        new stubbedIndexerConnector([], nodeUrl, STUB_URI)
       });
       it('inits lumos indexer with a node url and indexer folder path', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, MercuryService.LISTEN_URI)
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
       });
     });
     describe('when init without indexer folder path', () => {
@@ -116,28 +114,28 @@ describe('unit tests for IndexerConnector', () => {
       it('inits merucry indexer with a node url and a default port', () => {
         expect(stubbedIndexerConstructor).toHaveBeenCalledWith(
           nodeUrl,
-          MercuryService.LISTEN_URI
+          STUB_URI
         )
       })
     });
   });
   describe('#connect', () => {
-    const fakeTip1 = {block_number: '1', block_hash: 'hash1', indexer_tip_number: '1'}
-    const fakeTip2 = {block_number: '2', block_hash: 'hash2', indexer_tip_number: '2'}
-    const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
-    const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
-    const fakeBlock3 = {number: '3', hash: '3', timestamp: '3'}
+    const fakeTip1 = { block_number: '1', block_hash: 'hash1', indexer_tip_number: '1' }
+    const fakeTip2 = { block_number: '2', block_hash: 'hash2', indexer_tip_number: '2' }
+    const fakeBlock1 = { number: '1', hash: '1', timestamp: '1' }
+    const fakeBlock2 = { number: '2', hash: '2', timestamp: '2' }
+    const fakeBlock3 = { number: '3', hash: '3', timestamp: '3' }
     const fakeTx1 = {
-      transaction: {hash: 'hash1', blockNumber: fakeBlock1.number, blockTimestamp: new Date(1)},
-      txStatus: {status: 'committed', blockHash: fakeBlock1.hash}
+      transaction: { hash: 'hash1', blockNumber: fakeBlock1.number, blockTimestamp: new Date(1) },
+      txStatus: { status: 'committed', blockHash: fakeBlock1.hash }
     }
     const fakeTx2 = {
-      transaction: {hash: 'hash2', blockNumber: fakeBlock2.number, blockTimestamp: new Date(2)},
-      txStatus: {status: 'committed', blockHash: fakeBlock2.hash}
+      transaction: { hash: 'hash2', blockNumber: fakeBlock2.number, blockTimestamp: new Date(2) },
+      txStatus: { status: 'committed', blockHash: fakeBlock2.hash }
     }
     const fakeTx3 = {
-      transaction: {hash: 'hash3', blockNumber: fakeBlock2.number, blockTimestamp: new Date(3)},
-      txStatus: {status: 'committed', blockHash: fakeBlock2.hash}
+      transaction: { hash: 'hash3', blockNumber: fakeBlock2.number, blockTimestamp: new Date(3) },
+      txStatus: { status: 'committed', blockHash: fakeBlock2.hash }
     }
 
     const fakeTxHashCache1 = {
@@ -189,16 +187,6 @@ describe('unit tests for IndexerConnector', () => {
 
     beforeEach(() => {
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
-    });
-    describe('starts lumos indexer', () => {
-      beforeEach(async () => {
-        stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
-        await connectIndexer(indexerConnector)
-        expect(stubbedLoggerErrorFn).toHaveBeenCalledTimes(0)
-      });
-      it('starts indexer', async () => {
-        expect(stubbedStartForeverFn).toHaveBeenCalled()
-      });
     });
     describe('polls for new data', () => {
       describe('#transactionsSubject', () => {
@@ -607,7 +595,7 @@ describe('unit tests for IndexerConnector', () => {
           it('throws error', async () => {
             let err
             try {
-              await indexerConnector.getLiveCellsByScript({lock: null, type: null, data: null})
+              await indexerConnector.getLiveCellsByScript({ lock: null, type: null, data: null })
             } catch (error) {
               err = error
             }

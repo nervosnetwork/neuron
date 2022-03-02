@@ -49,7 +49,6 @@ class NFT {
     return true
   }
 
-
   static fromString(hex: string) {
     const data = this.remove0x(hex)
     const configure = parseInt(data.slice(18, 20), 16)
