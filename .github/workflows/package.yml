@@ -1,4 +1,4 @@
-name: Package Neuron
+name: Package Neuron for Release Draft
 
 on:
   push:
@@ -9,7 +9,6 @@ on:
 
 jobs:
   default:
-    if: false
     strategy:
       matrix:
         node:
@@ -62,13 +61,6 @@ jobs:
         env:
           CI: false
 
-      - name: Import Code-Signing Certificates
-        if: matrix.os == 'macos-latest'
-        uses: Apple-Actions/import-codesign-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
-          p12-password: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
-
       - name: Package for MacOS
         if: matrix.os == 'macos-latest'
         run: |
@@ -76,6 +68,8 @@ jobs:
           yarn release mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
 
@@ -88,8 +82,8 @@ jobs:
           bash ./scripts/release.sh win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
-          # CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
 
       - name: Package for Linux
         if: matrix.os == 'ubuntu-20.04'

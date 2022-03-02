@@ -15,7 +15,7 @@ export default class AssetAccount {
 
   @Column({
     type: 'varchar',
-    default: '',
+    default: ''
   })
   accountName!: string
 
@@ -29,10 +29,12 @@ export default class AssetAccount {
   })
   blake160!: string
 
-  @ManyToOne(_type => SudtTokenInfo, sudtTokenInfo => sudtTokenInfo.assetAccounts, { onDelete: 'CASCADE' })
-  @JoinColumn([
-    { name: 'tokenID', referencedColumnName: 'tokenID' },
-  ])
+  @ManyToOne(
+    _type => SudtTokenInfo,
+    sudtTokenInfo => sudtTokenInfo.assetAccounts,
+    { onDelete: 'CASCADE' }
+  )
+  @JoinColumn([{ name: 'tokenID', referencedColumnName: 'tokenID' }])
   sudtTokenInfo!: SudtTokenInfo
 
   public static fromModel(info: AssetAccountModel): AssetAccount {

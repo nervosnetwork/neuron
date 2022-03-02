@@ -45,6 +45,11 @@ export class InvalidJSON extends Error {
     super(t('messages.invalid-json'))
   }
 }
+export class ShouldInChildProcess extends Error {
+  constructor() {
+    super(`This function should be run in a child process`)
+  }
+}
 
 export default {
   InvalidName,
@@ -54,4 +59,5 @@ export default {
   ServiceHasNoResponse,
   ShouldBeTypeOf,
   InvalidJSON,
+  ShouldInChildProcess
 }

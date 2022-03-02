@@ -20,5 +20,5 @@ export class CapacityTooSmall extends Error {
 
 export default {
   TransactionNotFound,
-  CapacityTooSmall,
+  CapacityTooSmall
 }

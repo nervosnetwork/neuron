@@ -1,4 +1,4 @@
-import TypeChecker from "utils/type-checker"
+import TypeChecker from 'utils/type-checker'
 
 export default class BlockHeader {
   public version: string
@@ -21,7 +21,6 @@ export default class BlockHeader {
     TypeChecker.numberChecker(this.version, this.timestamp, this.number, this.epoch)
   }
 
-
   public static fromSDK(header: CKBComponents.BlockHeader): BlockHeader {
     return new BlockHeader(
       header.version,
@@ -29,7 +28,7 @@ export default class BlockHeader {
       header.hash,
       header.parentHash,
       header.number,
-      header.epoch,
+      header.epoch
     )
   }
 }

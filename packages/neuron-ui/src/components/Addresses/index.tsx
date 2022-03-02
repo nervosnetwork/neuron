@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from 'react'
 import { clipboard } from 'electron'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Edit } from 'grommet-icons'
+import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import CopyZone from 'widgets/CopyZone'
@@ -135,7 +135,7 @@ const Addresses = () => {
                             onClick={onDescriptionSelected}
                             className={styles.editBtn}
                           >
-                            <Edit size="0.875rem" />
+                            <Edit />
                           </button>
                         )
                       }

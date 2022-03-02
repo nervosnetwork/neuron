@@ -11,9 +11,13 @@ export default class WitnessArgs {
     this.outputType = outputType
   }
 
-  public static fromObject({ lock, inputType, outputType }: {
-    lock?: string,
-    inputType?: string,
+  public static fromObject({
+    lock,
+    inputType,
+    outputType
+  }: {
+    lock?: string
+    inputType?: string
     outputType?: string
   }): WitnessArgs {
     return new WitnessArgs(lock, inputType, outputType)
@@ -58,20 +62,14 @@ export default class WitnessArgs {
   }
 
   public static emptyLock(): WitnessArgs {
-    return new WitnessArgs(
-      WitnessArgs.EMPTY_LOCK,
-      undefined,
-      undefined,
-    )
+    return new WitnessArgs(WitnessArgs.EMPTY_LOCK, undefined, undefined)
   }
 
   public toSDK(): CKBComponents.WitnessArgs {
     return {
       lock: this.lock,
       inputType: this.inputType,
-      outputType: this.outputType,
+      outputType: this.outputType
     }
   }
 }
-
-

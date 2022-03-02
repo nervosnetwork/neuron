@@ -1,7 +1,7 @@
-import Script, { ScriptHashType } from "./chain/script"
-import { parseAddress } from "@nervosnetwork/ckb-sdk-utils"
-import SystemScriptInfo from "./system-script-info"
-import AssetAccountInfo from "./asset-account-info"
+import Script, { ScriptHashType } from './chain/script'
+import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
+import SystemScriptInfo from './system-script-info'
+import AssetAccountInfo from './asset-account-info'
 
 export default class AddressParser {
   public static parse(address: string): Script {
@@ -15,7 +15,7 @@ export default class AddressParser {
         const args = '0x' + result.slice(70)
         return new Script(codeHash, args, hashType)
       }
-      case '0x01':{
+      case '0x01': {
         // short address
         const codeHashIndex = '0x' + result.slice(4, 6)
         const args = '0x' + result.slice(6)
@@ -40,7 +40,6 @@ export default class AddressParser {
         throw new Error('Address format error!')
       }
     }
-
   }
 
   public static batchParse(addresses: string[]): Script[] {

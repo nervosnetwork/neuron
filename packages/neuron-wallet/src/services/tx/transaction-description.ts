@@ -5,7 +5,7 @@ const getEntity = async (walletId: string, txHash: string) => {
   return await getConnection()
     .getRepository(TxDescription)
     .createQueryBuilder()
-    .where({walletId, txHash})
+    .where({ walletId, txHash })
     .getOne()
 }
 

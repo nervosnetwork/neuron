@@ -11,10 +11,14 @@ import { get as getDescription } from 'services/tx/transaction-description'
 const exportHistory = async ({
   walletID,
   filePath,
-  chainType = 'ckb',
-}: { walletID: string, filePath: string, chainType: ChainType | string }) => {
+  chainType = 'ckb'
+}: {
+  walletID: string
+  filePath: string
+  chainType: ChainType | string
+}) => {
   if (!walletID) {
-    throw new Error("Wallet ID is required")
+    throw new Error('Wallet ID is required')
   }
 
   if (!filePath) {
@@ -39,9 +43,7 @@ const exportHistory = async ({
       return Reflect.get(target, key, receiver)
     }
   })
-  await wsPromises.write(
-    `${headers.map(label => t(`export-transactions.column.${label}`))}\n`
-  )
+  await wsPromises.write(`${headers.map(label => t(`export-transactions.column.${label}`))}\n`)
 
   const allAddresses = await AddressService.getAddressesByWalletId(walletID)
 
@@ -52,7 +54,12 @@ const exportHistory = async ({
   let pageNo = 1
 
   while (pageNo <= Math.ceil(count / PAGE_SIZE)) {
-    const { totalCount, items } = await TransactionsService.getAllByAddresses({ pageNo, pageSize: PAGE_SIZE, addresses, walletID })
+    const { totalCount, items } = await TransactionsService.getAllByAddresses({
+      pageNo,
+      pageSize: PAGE_SIZE,
+      addresses,
+      walletID
+    })
     count = totalCount
     txs.push(...items.filter(item => item.status === 'success'))
     pageNo++

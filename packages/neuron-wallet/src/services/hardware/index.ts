@@ -9,7 +9,7 @@ export default class HardwareWalletService {
   private device?: Hardware
   private supportedHardwares: Map<Manufacturer, HardwareClass> = new Map()
 
-  constructor () {
+  constructor() {
     this.supportedHardwares.set(Manufacturer.Ledger, Ledger)
   }
 
@@ -21,11 +21,11 @@ export default class HardwareWalletService {
     return HardwareWalletService.instance
   }
 
-  public getCurrent () {
+  public getCurrent() {
     return this.device
   }
 
-  public async initHardware (deviceInfo: DeviceInfo) {
+  public async initHardware(deviceInfo: DeviceInfo) {
     const Device = this.supportedHardwares.get(deviceInfo.manufacturer)
     if (!Device) {
       throw new UnsupportedManufacturer(deviceInfo.manufacturer)
@@ -40,13 +40,13 @@ export default class HardwareWalletService {
     return this.device
   }
 
-  public static async findDevices (device?: Pick<DeviceInfo, 'manufacturer' | 'product'>): Promise<DeviceInfo[]> {
+  public static async findDevices(device?: Pick<DeviceInfo, 'manufacturer' | 'product'>): Promise<DeviceInfo[]> {
     const devices = await Promise.all([
-      Ledger.findDevices(),
+      Ledger.findDevices()
       // add new brand `findDevices()` here
     ])
 
-    logger.info("Find devices:\t", devices)
+    logger.info('Find devices:\t', devices)
 
     const result = devices.flat().filter(Boolean)
 

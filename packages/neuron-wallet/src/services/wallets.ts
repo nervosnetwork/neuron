@@ -5,12 +5,10 @@ import Keystore from 'models/keys/keystore'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
-import { Address as AddressInterface } from "models/address"
+import { Address as AddressInterface } from 'models/address'
 
 import FileService from './file'
 import AddressService from './addresses'
-import ProcessUtils from 'utils/process'
-import { ChildProcess } from 'utils/worker'
 import { DeviceInfo } from './hardware/common'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 import { getConnection, In, Not } from 'typeorm'
@@ -61,7 +59,7 @@ export abstract class Wallet {
     name: this.name,
     extendedKey: this.extendedKey,
     device: this.device,
-    isHD: this.isHD,
+    isHD: this.isHD
   })
 
   public fromJSON = () => {
@@ -97,7 +95,7 @@ export abstract class Wallet {
     }
   }
 
-  public abstract checkAndGenerateAddresses (
+  public abstract checkAndGenerateAddresses(
     isImporting?: boolean,
     receivingAddressCount?: number,
     changeAddressCount?: number
@@ -105,13 +103,13 @@ export abstract class Wallet {
 
   public abstract getNextAddress(): Promise<AddressInterface | undefined>
 
-  public abstract getNextChangeAddress (): Promise<AddressInterface | undefined>
+  public abstract getNextChangeAddress(): Promise<AddressInterface | undefined>
 
-  public abstract getNextReceivingAddresses (): Promise<AddressInterface[]>
+  public abstract getNextReceivingAddresses(): Promise<AddressInterface[]>
 
-  public abstract getAllAddresses (): Promise<AddressInterface[]>
+  public abstract getAllAddresses(): Promise<AddressInterface[]>
 
-  public abstract isHDWallet (): boolean
+  public abstract isHDWallet(): boolean
 
   public abstract isHardware(): boolean
 }
@@ -121,11 +119,11 @@ export class FileKeystoreWallet extends Wallet {
     return false
   }
 
-  public isHDWallet () {
+  public isHDWallet() {
     return true
   }
 
-  constructor (props: WalletProperties) {
+  constructor(props: WalletProperties) {
     super(props)
     this.isHD = true
   }
@@ -140,7 +138,7 @@ export class FileKeystoreWallet extends Wallet {
       name: this.name,
       extendedKey: this.extendedKey,
       device: this.device,
-      isHD: this.isHD,
+      isHD: this.isHD
     }
   }
 
@@ -170,13 +168,13 @@ export class FileKeystoreWallet extends Wallet {
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> => {
-      return await AddressService.generateAndSaveForExtendedKey(
-        this.id,
-        this.accountExtendedPublicKey(),
-        isImporting,
-        receivingAddressCount,
-        changeAddressCount
-      )
+    return await AddressService.generateAndSaveForExtendedKey(
+      this.id,
+      this.accountExtendedPublicKey(),
+      isImporting,
+      receivingAddressCount,
+      changeAddressCount
+    )
   }
 
   public getNextAddress = async (): Promise<AddressInterface | undefined> => {
@@ -194,7 +192,6 @@ export class FileKeystoreWallet extends Wallet {
   public getAllAddresses = async (): Promise<AddressInterface[]> => {
     return AddressService.getAddressesByWalletId(this.id)
   }
-
 }
 
 export class HardwareWallet extends Wallet {
@@ -202,11 +199,11 @@ export class HardwareWallet extends Wallet {
     return true
   }
 
-  public isHDWallet () {
+  public isHDWallet() {
     return this.isHD
   }
 
-  constructor (props: WalletProperties) {
+  constructor(props: WalletProperties) {
     super(props)
     this.isHD = false
   }
@@ -240,12 +237,7 @@ export class HardwareWallet extends Wallet {
 
     const { addressType, addressIndex } = this.getDeviceInfo()
     const { publicKey } = AccountExtendedPublicKey.parse(this.extendedKey)
-    const address = await AddressService.generateAndSaveForPublicKey(
-      this.id,
-      publicKey,
-      addressType,
-      addressIndex
-    )
+    const address = await AddressService.generateAndSaveForPublicKey(this.id, publicKey, addressType, addressIndex)
 
     if (address) {
       return [address]
@@ -302,7 +294,7 @@ export default class WalletService {
     this.listStore.on(
       this.walletsKey,
       (previousWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
-        if (ProcessUtils.isMain()) {
+        if (process.type === 'browser') {
           const currentWallet = this.getCurrent()
           WalletListSubject.next({ currentWallet, previousWalletList, currentWalletList })
         }
@@ -312,12 +304,12 @@ export default class WalletService {
       if (undefined === currentID) {
         return
       }
-      if (ProcessUtils.isMain()) {
+      if (process.type === 'browser') {
         const currentWallet = this.getCurrent() || null
         const walletList = this.getAll()
         CurrentWalletSubject.next({
           currentWallet,
-          walletList,
+          walletList
         })
       }
     })
@@ -332,9 +324,11 @@ export default class WalletService {
 
   private async cleanupAddresses() {
     const allWallets = this.getAll()
-    await getConnection().getRepository(HdPublicKeyInfo).delete({
-      walletId: Not(In(allWallets.map(w => w.id)))
-    })
+    await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .delete({
+        walletId: Not(In(allWallets.map(w => w.id)))
+      })
   }
 
   public getAll = (): WalletProperties[] => {
@@ -440,11 +434,8 @@ export default class WalletService {
       wallet.deleteKeystore()
     }
 
-    if (ChildProcess.isChildProcess()) {
-      ChildProcess.send({
-        channel: 'wallet-deleted',
-        result: id
-      })
+    if (process.send) {
+      process.send({ channel: 'wallet-deleted', message: id })
     } else {
       WalletDeletedSubject.getSubject().next(id)
     }

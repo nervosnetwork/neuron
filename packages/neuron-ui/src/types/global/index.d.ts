@@ -25,7 +25,7 @@ declare module '*.json' {
 
 declare module '*.svg' {
   const value: string
-  export const ReactComponent = value
+  export const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>
   export default value
 }
 

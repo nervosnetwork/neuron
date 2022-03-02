@@ -1,0 +1,34 @@
+
+$error-color: #d50000;
+$success-color: #008000;
+$activity-color: #1b73b3;
+
+.error {
+  path {
+    fill: $error-color;
+    stroke: $error-color;
+  }
+  polygon {
+    fill: $error-color;
+  }
+}
+
+.success {
+  path {
+    fill: $success-color;
+    stroke: $success-color;
+  }
+  polygon {
+    fill: $success-color;
+  }
+}
+
+.activity {
+  path {
+    fill: $activity-color;
+    stroke: $activity-color;
+  }
+  polygon {
+    fill: $activity-color;
+  }
+}

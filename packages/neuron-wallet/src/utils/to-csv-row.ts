@@ -13,7 +13,6 @@ const toCSVRow = (
   tx: Pick<Transaction, 'blockNumber' | 'hash' | 'description' | 'timestamp' | 'sudtInfo' | 'nervosDao' | 'value'>,
   includeSUDT: boolean = false
 ) => {
-
   const SEND_TYPE = t('export-transactions.tx-type.send')
   const RECEIVE_TYPE = t('export-transactions.tx-type.receive')
 

@@ -1,0 +1,127 @@
+name: Package Neuron for Test
+
+on: [push]
+
+jobs:
+  packaging:
+    strategy:
+      matrix:
+        node:
+          - 16
+        os:
+          - macos-latest
+          - ubuntu-20.04
+          - windows-2019
+
+    runs-on: ${{ matrix.os }}
+
+    name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "yarn"
+
+      - name: Restore
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: 2021-8-11-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+
+      - name: Add msbuild to PATH
+        if: matrix.os == 'windows-2019'
+        uses: microsoft/setup-msbuild@v1.0.2
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+
+      - name: Install libudev
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev
+
+      - name: Install Lerna
+        run: yarn global add lerna
+
+      - name: Boostrap
+        run: |
+          yarn bootstrap
+        env:
+          CI: false
+
+      - name: Package for MacOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          ./scripts/download-ckb.sh mac
+          yarn package:test mac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+
+      - name: Package for Windows
+        if: matrix.os == 'windows-2019'
+        run: |
+          bash ./scripts/download-ckb.sh win
+          yarn build
+          bash ./scripts/copy-ui-files.sh
+          bash ./scripts/package-for-test.sh win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
+
+      - name: Package for Linux
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          ./scripts/download-ckb.sh
+          yarn package:test linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Neuron App Zip
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neuron-Mac
+          path: release/Neuron-*-mac.zip
+
+      - name: Upload Neuron Dmg
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neuron-Dmg
+          path: release/Neuron-*.dmg
+
+      - name: Upload Neuron Win
+        if: matrix.os == 'windows-2019'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neuron-Win
+          path: release/Neuron-*-setup.exe
+
+      - name: Upload Neuron Linux
+        if: matrix.os == 'ubuntu-20.04'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neuron-Linux
+          path: release/Neuron-*.AppImage
+
+  comment:
+    needs: [packaging]
+    name: Append links to the Pull Request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peter-evans/commit-comment@v1
+        with:
+          body: |
+            Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})

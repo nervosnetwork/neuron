@@ -1,4 +1,4 @@
-import TypeChecker from "utils/type-checker"
+import TypeChecker from 'utils/type-checker'
 
 export default class TransactionPoint {
   public blockNumber: string
@@ -15,10 +15,6 @@ export default class TransactionPoint {
   }
 
   public static fromSDK(txPoint: CKBComponents.TransactionPoint): TransactionPoint {
-    return new TransactionPoint(
-      txPoint.blockNumber,
-      txPoint.txHash,
-      txPoint.index
-    )
+    return new TransactionPoint(txPoint.blockNumber, txPoint.txHash, txPoint.index)
   }
 }

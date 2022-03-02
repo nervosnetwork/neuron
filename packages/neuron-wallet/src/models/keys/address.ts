@@ -6,7 +6,7 @@ export { AddressPrefix }
 
 export enum AddressType {
   Receiving = 0, // External chain
-  Change = 1, // Internal chain
+  Change = 1 // Internal chain
 }
 
 export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Testnet) => {
@@ -14,7 +14,7 @@ export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Tes
   return pubkeyToAddress(pubkey, {
     prefix,
     type: Type.HashIdx,
-    codeHashOrCodeHashIndex: '0x00',
+    codeHashOrCodeHashIndex: '0x00'
   })
 }
 

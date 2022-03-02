@@ -1,5 +1,5 @@
-import AssetAccount from "./asset-account";
-import Transaction from "./chain/transaction";
+import AssetAccount from './asset-account'
+import Transaction from './chain/transaction'
 
 export enum SignStatus {
   Signed = 'Signed',
@@ -16,8 +16,8 @@ export enum SignType {
 
 interface MultisigConfigs {
   [hash: string]: {
-    sighash_addresses: string[],
-    require_first_n: number,
+    sighash_addresses: string[]
+    require_first_n: number
     threshold: number
   }
 }

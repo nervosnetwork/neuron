@@ -31,7 +31,7 @@ export default class SettingsService extends Store {
     }
   }
 
-  constructor () {
+  constructor() {
     super('', 'settings.json', JSON.stringify({ locale: env.app.getLocale() }))
   }
 

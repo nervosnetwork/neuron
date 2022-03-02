@@ -1,6 +1,6 @@
-import SignMessage from "services/sign-message"
-import { ServiceHasNoResponse } from "exceptions"
-import { ResponseCode } from "utils/const"
+import SignMessage from 'services/sign-message'
+import { ServiceHasNoResponse } from 'exceptions'
+import { ResponseCode } from 'utils/const'
 
 export default class SignMessageController {
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
@@ -21,18 +21,14 @@ export default class SignMessageController {
   }
 
   public async verify(params: Controller.Params.VerifyParams): Promise<Controller.Response<boolean>> {
-    const result: boolean = SignMessage.verify(
-      params.address.trim(),
-      params.signature,
-      params.message
-    )
+    const result: boolean = SignMessage.verify(params.address.trim(), params.signature, params.message)
     if (!result) {
       throw new ServiceHasNoResponse('Verify')
     }
 
     return {
       status: ResponseCode.Success,
-      result,
+      result
     }
   }
 }

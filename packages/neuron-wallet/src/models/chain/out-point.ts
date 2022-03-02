@@ -14,7 +14,7 @@ export default class OutPoint {
     TypeChecker.numberChecker(this.index)
   }
 
-  public static fromObject({ txHash, index}: { txHash: string, index: string }): OutPoint {
+  public static fromObject({ txHash, index }: { txHash: string; index: string }): OutPoint {
     return new OutPoint(txHash, index)
   }
 
@@ -26,9 +26,6 @@ export default class OutPoint {
   }
 
   public static fromSDK(outPoint: CKBComponents.OutPoint): OutPoint {
-    return new OutPoint(
-      outPoint.txHash,
-      outPoint.index,
-    )
+    return new OutPoint(outPoint.txHash, outPoint.index)
   }
 }

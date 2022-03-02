@@ -1,10 +1,10 @@
-import Script from "models/chain/script";
-import LiveCell from "models/chain/live-cell";
+import Script from 'models/chain/script'
+import LiveCell from 'models/chain/live-cell'
 import { queryIndexer } from 'block-sync-renderer/index'
-import { LumosCellQuery, LumosCell } from "block-sync-renderer/sync/indexer-connector";
+import { LumosCellQuery, LumosCell } from 'block-sync-renderer/sync/indexer-connector'
 
 export default class LiveCellService {
-  private static instance: LiveCellService;
+  private static instance: LiveCellService
 
   public static getInstance = () => {
     if (!LiveCellService.instance) {
@@ -16,12 +16,16 @@ export default class LiveCellService {
 
   constructor() {}
 
-  private async getLiveCellsByScript(lock: Script | null, type: Script | null, data: string | null): Promise<LumosCell[]> {
+  private async getLiveCellsByScript(
+    lock: Script | null,
+    type: Script | null,
+    data: string | null
+  ): Promise<LumosCell[]> {
     if (!lock && !type) {
       throw new Error('at least one parameter is required')
     }
 
-    const query: LumosCellQuery = {lock, type, data}
+    const query: LumosCellQuery = { lock, type, data }
     const liveCells: LumosCell[] = await queryIndexer(query)
     return liveCells
   }
@@ -32,9 +36,9 @@ export default class LiveCellService {
       return null
     }
 
-    const typeHash = type ? type.computeHash() : ""
+    const typeHash = type ? type.computeHash() : ''
     for (let i = 0; i < result.length; i++) {
-      const item = LiveCell.fromLumos(result[i]);
+      const item = LiveCell.fromLumos(result[i])
       if (type) {
         if (typeHash === item.typeHash) {
           return item
@@ -55,9 +59,9 @@ export default class LiveCellService {
 
     const cells = []
 
-    const typeHash = type ? type.computeHash() : ""
+    const typeHash = type ? type.computeHash() : ''
     for (let i = 0; i < result.length; i++) {
-      const item = LiveCell.fromLumos(result[i]);
+      const item = LiveCell.fromLumos(result[i])
       if (type) {
         if (typeHash === item.typeHash) {
           cells.push(item)

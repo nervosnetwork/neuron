@@ -26,8 +26,7 @@ export class ExtendedPublicKey {
     }
 
     const publicKey = Buffer.from(key, 'hex')
-    const compressedPublicKey = Buffer
-      .alloc(33)
+    const compressedPublicKey = Buffer.alloc(33)
       // '03' for odd value, '02' for even value
       .fill(publicKey[64] & 1 ? '03' : '02', 0, 1, 'hex')
       .fill(publicKey.subarray(1, 33), 1, 33)
@@ -103,7 +102,7 @@ export class ExtendedPrivateKey {
 
 export enum DefaultAddressNumber {
   Receiving = 20,
-  Change = 10,
+  Change = 10
 }
 
 export interface Addresses {

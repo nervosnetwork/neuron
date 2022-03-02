@@ -7,7 +7,7 @@ export const validateNetworkName = (name: string, usedNames: string[]) => {
     throw new FieldRequiredException(FIELD_NAME)
   }
   if (usedNames.includes(name)) {
-    throw new FieldUsedException(FIELD_NAME)
+    throw new FieldUsedException(FIELD_NAME, name)
   }
   if (name.length > MAX_NETWORK_NAME_LENGTH) {
     throw new FieldTooLongException(FIELD_NAME, MAX_NETWORK_NAME_LENGTH)

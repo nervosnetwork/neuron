@@ -157,7 +157,7 @@ describe('queue', () => {
       }),
     }));
     jest.doMock('utils/logger', () => {
-      return { error: stubbedLoggerErrorFn }
+      return { error: stubbedLoggerErrorFn, info: jest.fn() }
     });
     jest.doMock('../../src/block-sync-renderer/sync/indexer-connector', () => {
       return stubbedIndexerConnector
@@ -195,7 +195,7 @@ describe('queue', () => {
             stubbedBlockTipsSubject.next({ cacheTipNumber: 3, indexerTipNumber: 3 })
             expect(stubbedProcessSend).toHaveBeenCalledWith({
               channel: 'cache-tip-block-updated',
-              result: {cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything()}
+              message: { cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything() }
             })
           })
         });

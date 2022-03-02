@@ -1,6 +1,3 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import path from 'path'
 import https from 'https'
 import http from 'http'
 import { dialog, shell } from 'electron'
@@ -18,6 +15,7 @@ import { startCkbNode } from 'services/ckb-runner'
 import HexUtils from 'utils/hex'
 import { BUNDLED_CKB_URL } from 'utils/const'
 import logger from 'utils/logger'
+import redistCheck from 'utils/redist-check'
 
 class NodeService {
   private static instance: NodeService
@@ -39,7 +37,7 @@ class NodeService {
 
   public ckb: CKB = new CKB('')
 
-  constructor () {
+  constructor() {
     this.start()
     this.syncConnectionStatus()
     CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
@@ -145,8 +143,8 @@ class NodeService {
       return false
     } catch (err) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
-      const isReadyToStart = await this.detectDependency()
-      this.startedBundledNode = await (isReadyToStart ? this.startNode() : this.showGuideDialog())
+      const redistReady = await redistCheck()
+      this.startedBundledNode = await (redistReady ? this.startNode() : this.showGuideDialog())
 
       return this.startedBundledNode
     }
@@ -154,48 +152,33 @@ class NodeService {
 
   private showGuideDialog = () => {
     const I18N_PATH = `messageBox.ckb-dependency`
-    return dialog.showMessageBox({
-      type: 'info',
-      buttons: ['install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
-      defaultId: 0,
-      title: t(`${I18N_PATH}.title`),
-      message: t(`${I18N_PATH}.message`),
-      detail: t(`${I18N_PATH}.detail`),
-      cancelId: 0,
-      noLink: true,
-    }).then(() => {
-      const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
-      shell.openExternal(VC_REDIST_URL)
-      env.app.quit()
-      return false
-    })
-  }
-
-  private detectDependency = async () => {
-    if (process.platform !== 'win32') {
-      return true
-    }
-    const execPromise = promisify(exec)
-    const arches = ['x64']
-    const queries = arches.map(arch =>
-      `REG QUERY ` +
-      [`HKEY_LOCAL_MACHINE`, `SOFTWARE`, `Microsoft`, `VisualStudio`, `14.0`, `VC`, `Runtimes`, arch].join(path.sep))
-    const vcredists = await Promise.all(
-      queries.map(
-        query => execPromise(query)
-          .then(({ stdout }) => !!stdout)
-          .catch(() => false)
-      )
-    )
-    return vcredists.includes(true)
+    return dialog
+      .showMessageBox({
+        type: 'info',
+        buttons: ['install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
+        defaultId: 0,
+        title: t(`${I18N_PATH}.title`),
+        message: t(`${I18N_PATH}.message`),
+        detail: t(`${I18N_PATH}.detail`),
+        cancelId: 0,
+        noLink: true
+      })
+      .then(() => {
+        const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
+        shell.openExternal(VC_REDIST_URL)
+        env.app.quit()
+        return false
+      })
   }
 
   private startNode = () => {
-    return startCkbNode().then(() => true).catch(err => {
-      logger.info('CKB:\tfail to start bundled CKB with error:')
-      logger.error(err)
-      return false
-    })
+    return startCkbNode()
+      .then(() => true)
+      .catch(err => {
+        logger.info('CKB:\tfail to start bundled CKB with error:')
+        logger.error(err)
+        return false
+      })
   }
 }
 

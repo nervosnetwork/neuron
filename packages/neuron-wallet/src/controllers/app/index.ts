@@ -9,52 +9,60 @@ import logger from 'utils/logger'
 import { subscribe } from './subscribe'
 import { register as registerListeners } from 'listeners/main'
 import WalletsService from 'services/wallets'
-import ApiController from 'controllers/api'
-import NodeController from 'controllers/node'
-import MerucuryController from 'controllers/mercury'
+import ApiController, { Command } from 'controllers/api'
+import { migrate as mecuryMigrate } from 'controllers/mercury'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import IndexerService from 'services/indexer'
+import { stopCkbNode } from 'services/ckb-runner'
 
 const app = electronApp
 
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
-  private syncApiController: SyncApiController | undefined
   private apiController = new ApiController()
-  private mercuryController = new MerucuryController()
 
   constructor() {
-    subscribe(this);
+    subscribe(this)
   }
 
   public start = async () => {
     registerListeners()
+
     if (!env.isTestMode) {
-      await this.mercuryController.migrate()
+      await mecuryMigrate()
     }
+
+    /**
+     * mount event handlers to renderer ipc messages and user actions
+     */
     await this.apiController.mount()
-    this.syncApiController = SyncApiController.getInstance()
-    this.syncApiController.mount()
+    SyncApiController.getInstance().mount()
+
     await this.openWindow()
   }
 
+  /**
+   * called before the app quits
+   */
   public end = async () => {
-    if (!env.isTestMode) {
-      await Promise.all([
-        new NodeController().stopNode(),
-        IndexerService.getInstance().stop(),
-      ])
+    if (env.isTestMode) {
+      return
     }
+    await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
   }
 
+  /**
+   * send message to renderer process
+   */
   public sendMessage = (channel: string, obj: any) => {
-    if (this.mainWindow) {
-      this.mainWindow.webContents.send(channel, obj)
-    }
+    this.mainWindow?.webContents.send(channel, obj)
   }
 
-  public runCommand = (command: string, obj: any) => {
+  /**
+   * run command with user action
+   */
+  public runCommand = (command: Command, obj: any) => {
     this.apiController.runCommand(command, obj)
   }
 
@@ -80,18 +88,11 @@ export default class AppController {
     if (!this.mainWindow) {
       return
     }
-
-    if (this.mainWindow.isMinimized()) {
-      this.mainWindow.restore()
-    }
-    this.mainWindow.focus()
+    this.mainWindow.isMinimized() ? this.mainWindow.restore() : this.mainWindow.focus()
   }
 
-  createWindow = () => {
-    const windowState = windowStateKeeper({
-      defaultWidth: 1366,
-      defaultHeight: 900,
-    })
+  public createWindow = () => {
+    const windowState = windowStateKeeper({ defaultWidth: 1366, defaultHeight: 900 })
 
     this.mainWindow = new BrowserWindow({
       x: windowState.x,
@@ -103,28 +104,25 @@ export default class AppController {
       show: false,
       backgroundColor: '#e9ecef',
       icon: nativeImage.createFromPath(
-        app.isPackaged
-          ? path.join(__dirname, '../../neuron-ui/icon.png')
-          // use icon from assets in dev mode
-          // since neuron ui only copied to dist during packaging
-          : path.join(__dirname, '../../../assets/icons/icon.png')
+        path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')
       ),
       webPreferences: {
         devTools: env.isDevMode,
         contextIsolation: false,
-        preload: path.join(__dirname, './preload.js'),
-      },
+        preload: path.join(__dirname, './preload.js')
+      }
     })
 
     windowState.manage(this.mainWindow)
 
     this.mainWindow.on('ready-to-show', () => {
-      if (this.mainWindow) {
-        this.mainWindow.show()
-        this.mainWindow.focus()
-        this.updateWindowTitle()
-        logger.info('Main window:\tThe main window is ready to show')
+      if (!this.mainWindow) {
+        logger.error('Main window:\tfailed to open window due to mainWindow is undefined')
+        return
       }
+      this.mainWindow.show()
+      this.mainWindow.focus()
+      this.updateWindowTitle()
     })
 
     this.mainWindow.on('closed', () => {

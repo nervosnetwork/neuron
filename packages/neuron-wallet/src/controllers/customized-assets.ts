@@ -1,11 +1,11 @@
-import AddressService from "services/addresses"
-import CellsService, { PaginationResult, CustomizedLock } from "services/cells"
+import AddressService from 'services/addresses'
+import CellsService, { PaginationResult, CustomizedLock } from 'services/cells'
 import Cell from 'models/chain/output'
-import { ServiceHasNoResponse } from "exceptions"
-import { ResponseCode } from "utils/const"
-import Transaction from "models/chain/transaction"
-import TransactionSender from "services/transaction-sender"
-import OutPoint from "models/chain/out-point"
+import { ServiceHasNoResponse } from 'exceptions'
+import { ResponseCode } from 'utils/const'
+import Transaction from 'models/chain/transaction'
+import TransactionSender from 'services/transaction-sender'
+import OutPoint from 'models/chain/out-point'
 
 export default class CustomizedAssetsController {
   public async getCustomizedAssetCells(
@@ -22,12 +22,20 @@ export default class CustomizedAssetsController {
 
     return {
       status: ResponseCode.Success,
-      result,
+      result
     }
   }
 
-  public async generateTransferNftTx(params: Controller.Params.GenerateTransferNftTxParams): Promise<Controller.Response<Transaction>> {
-    const tx = await new TransactionSender().generateTransferNftTx(params.walletID, params.outPoint, params.receiveAddress, undefined, params.feeRate)
+  public async generateTransferNftTx(
+    params: Controller.Params.GenerateTransferNftTxParams
+  ): Promise<Controller.Response<Transaction>> {
+    const tx = await new TransactionSender().generateTransferNftTx(
+      params.walletID,
+      params.outPoint,
+      params.receiveAddress,
+      undefined,
+      params.feeRate
+    )
 
     if (!tx) {
       throw new ServiceHasNoResponse('GenerateTransferNftTx')
@@ -39,7 +47,7 @@ export default class CustomizedAssetsController {
 
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 
@@ -73,7 +81,7 @@ export default class CustomizedAssetsController {
 
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 }

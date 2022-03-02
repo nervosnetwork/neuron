@@ -59,7 +59,7 @@ export default class UpdateController {
       dialog.showMessageBox({
         type: 'info',
         message: t('updater.update-not-available'),
-        buttons: [t('common.ok')],
+        buttons: [t('common.ok')]
       })
     })
 

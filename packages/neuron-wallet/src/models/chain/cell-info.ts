@@ -11,9 +11,6 @@ export default class CellInfo {
   }
 
   public static fromSDK(cellInfo: CKBComponents.LiveCell): CellInfo {
-    return new CellInfo(
-      Output.fromSDK(cellInfo.output),
-      cellInfo.data ? CellData.fromSDK(cellInfo.data) : undefined,
-    )
+    return new CellInfo(Output.fromSDK(cellInfo.output), cellInfo.data ? CellData.fromSDK(cellInfo.data) : undefined)
   }
 }
