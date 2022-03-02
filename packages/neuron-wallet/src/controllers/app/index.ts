@@ -23,7 +23,7 @@ export default class AppController {
   private apiController = new ApiController()
 
   constructor() {
-    subscribe(this);
+    subscribe(this)
   }
 
   public start = async () => {
@@ -46,11 +46,10 @@ export default class AppController {
    * called before the app quits
    */
   public end = async () => {
-    if (env.isTestMode) {return}
-    await Promise.all([
-      stopCkbNode(),
-      IndexerService.getInstance().stop()
-    ])
+    if (env.isTestMode) {
+      return
+    }
+    await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
   }
 
   /**
@@ -78,13 +77,17 @@ export default class AppController {
   }
 
   public openWindow = () => {
-    if (this.mainWindow) {return}
+    if (this.mainWindow) {
+      return
+    }
 
     return this.createWindow()
   }
 
   public restoreWindow = () => {
-    if (!this.mainWindow) {return}
+    if (!this.mainWindow) {
+      return
+    }
     this.mainWindow.isMinimized() ? this.mainWindow.restore() : this.mainWindow.focus()
   }
 
@@ -100,8 +103,14 @@ export default class AppController {
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',
-      icon: nativeImage.createFromPath(path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')),
-      webPreferences: { devTools: env.isDevMode, contextIsolation: false, preload: path.join(__dirname, './preload.js') },
+      icon: nativeImage.createFromPath(
+        path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')
+      ),
+      webPreferences: {
+        devTools: env.isDevMode,
+        contextIsolation: false,
+        preload: path.join(__dirname, './preload.js')
+      }
     })
 
     windowState.manage(this.mainWindow)

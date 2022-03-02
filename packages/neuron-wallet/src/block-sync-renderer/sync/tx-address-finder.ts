@@ -50,33 +50,35 @@ export default class TxAddressFinder {
     let shouldSync = false
     // const anyoneCanPayBlake160s: string[] = []
     const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
-    const outputs: Output[] = this.tx.outputs!.map((output, index) => {
-      if (SystemScriptInfo.isMultiSignScript(output.lock)) {
-        const multiSignBlake160 = output.lock.args.slice(0, 42)
-        if (this.multiSignBlake160s.has(multiSignBlake160)) {
-          shouldSync = true
-          output.setMultiSignBlake160(multiSignBlake160)
-        }
-      }
-      if (this.anyoneCanPayLockHashes.has(output.lockHash!)) {
-        shouldSync = true
-        // anyoneCanPayBlake160s.push(output.lock.args)
-        anyoneCanPayInfos.push({
-          blake160: output.lock.args,
-          tokenID: output.type?.args || "CKBytes"
-        })
-      }
-      if (this.lockHashes.has(output.lockHash!)) {
-        if (output.type) {
-          if (output.typeHash === SystemScriptInfo.DAO_SCRIPT_HASH) {
-            this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
+    const outputs: Output[] = this.tx
+      .outputs!.map((output, index) => {
+        if (SystemScriptInfo.isMultiSignScript(output.lock)) {
+          const multiSignBlake160 = output.lock.args.slice(0, 42)
+          if (this.multiSignBlake160s.has(multiSignBlake160)) {
+            shouldSync = true
+            output.setMultiSignBlake160(multiSignBlake160)
           }
         }
-        shouldSync = true
-        return output
-      }
-      return false
-    }).filter(output => !!output) as Output[]
+        if (this.anyoneCanPayLockHashes.has(output.lockHash!)) {
+          shouldSync = true
+          // anyoneCanPayBlake160s.push(output.lock.args)
+          anyoneCanPayInfos.push({
+            blake160: output.lock.args,
+            tokenID: output.type?.args || 'CKBytes'
+          })
+        }
+        if (this.lockHashes.has(output.lockHash!)) {
+          if (output.type) {
+            if (output.typeHash === SystemScriptInfo.DAO_SCRIPT_HASH) {
+              this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
+            }
+          }
+          shouldSync = true
+          return output
+        }
+        return false
+      })
+      .filter(output => !!output) as Output[]
 
     return [shouldSync, outputs, anyoneCanPayInfos]
   }
@@ -95,7 +97,7 @@ export default class TxAddressFinder {
         .getRepository(OutputEntity)
         .findOne({
           outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index,
+          outPointIndex: outPoint.index
         })
       if (output && this.anyoneCanPayLockHashes.has(output.lockHash)) {
         shouldSync = true
@@ -107,9 +109,7 @@ export default class TxAddressFinder {
       }
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
-        addresses.push(
-          AddressGenerator.generate(output.lockScript(), prefix)
-        )
+        addresses.push(AddressGenerator.generate(output.lockScript(), prefix))
       }
       if (output && SystemScriptInfo.isMultiSignScript(output.lockScript())) {
         const multiSignBlake160 = output.lockScript().args.slice(0, 42)

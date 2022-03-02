@@ -4,7 +4,7 @@ import NodeService from './node'
 import { serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
-import { Address } from "models/address"
+import { Address } from 'models/address'
 import { PathAndPrivateKey } from 'models/keys/key'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 import FeeMode from 'models/fee-mode'
@@ -46,7 +46,13 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0, skipSign = false) {
+  public async sendTx(
+    walletID: string = '',
+    transaction: Transaction,
+    password: string = '',
+    skipLastInputs: number = 0,
+    skipSign = false
+  ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
       : await this.sign(walletID, transaction, password, skipLastInputs)
@@ -54,7 +60,7 @@ export default class TransactionSender {
     return this.broadcastTx(walletID, tx)
   }
 
-  public async broadcastTx (walletID: string = '', tx: Transaction) {
+  public async broadcastTx(walletID: string = '', tx: Transaction) {
     const { ckb } = NodeService.getInstance()
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
@@ -66,7 +72,13 @@ export default class TransactionSender {
     return txHash
   }
 
-  public async sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0, context?: RPC.RawTransaction[]) {
+  public async sign(
+    walletID: string = '',
+    transaction: Transaction,
+    password: string = '',
+    skipLastInputs: number = 0,
+    context?: RPC.RawTransaction[]
+  ) {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
@@ -90,27 +102,27 @@ export default class TransactionSender {
     }
 
     // Only one multi sign input now.
-    const isMultiSign = tx.inputs.length === 1 &&
-      tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
+    const isMultiSign =
+      tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
     const addressInfos = await this.getAddressInfos(walletID)
-    const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
-      return {
-        multiSignBlake160: new MultiSign().hash(i.blake160),
-        path: i.path
-      }
-    }) : []
+    const multiSignBlake160s = isMultiSign
+      ? addressInfos.map(i => {
+          return {
+            multiSignBlake160: new MultiSign().hash(i.blake160),
+            path: i.path
+          }
+        })
+      : []
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
     const findPrivateKey = (args: string) => {
       let path: string | undefined
       if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
         path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
-      }
-      else if (args.length === 42) {
+      } else if (args.length === 42) {
         path = addressInfos.find(i => i.blake160 === args)!.path
-      }
-      else {
+      } else {
         const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
         path = addressInfo?.path
       }
@@ -122,18 +134,20 @@ export default class TransactionSender {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessSigningEntries: SignInfo[] = tx.inputs.slice(0, tx.inputs.length - skipLastInputs).map((input: Input, index: number) => {
-      const lockArgs: string = input.lock!.args!
-      const wit: WitnessArgs | string = tx.witnesses[index]
-      const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
-      return {
-        // TODO: fill in required DAO's type witness here
-        witnessArgs,
-        lockHash: input.lockHash!,
-        witness: '',
-        lockArgs,
-      }
-    })
+    const witnessSigningEntries: SignInfo[] = tx.inputs
+      .slice(0, tx.inputs.length - skipLastInputs)
+      .map((input: Input, index: number) => {
+        const lockArgs: string = input.lock!.args!
+        const wit: WitnessArgs | string = tx.witnesses[index]
+        const witnessArgs: WitnessArgs = wit instanceof WitnessArgs ? wit : WitnessArgs.generateEmpty()
+        return {
+          // TODO: fill in required DAO's type witness here
+          witnessArgs,
+          lockHash: input.lockHash!,
+          witness: '',
+          lockArgs
+        }
+      })
 
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
@@ -144,23 +158,30 @@ export default class TransactionSender {
 
       const privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
 
-      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs
-        .map((value: SignInfo, index: number) => {
-          const args = value.witnessArgs
-          if (index === 0) {
-            return args
-          }
-          if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
-            return '0x'
-          }
-          return serializeWitnessArgs(args.toSDK())
-        })
+      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs.map((value: SignInfo, index: number) => {
+        const args = value.witnessArgs
+        if (index === 0) {
+          return args
+        }
+        if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
+          return '0x'
+        }
+        return serializeWitnessArgs(args.toSDK())
+      })
       let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
       if (isMultiSign) {
-        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
+        const blake160 = addressInfos.find(
+          i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160)
+        )!.blake160
         const serializedMultiSign: string = new MultiSign().serialize(blake160)
-        signed = await TransactionSender.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign, wallet)
+        signed = await TransactionSender.signSingleMultiSignScript(
+          privateKey,
+          serializedWitnesses,
+          txHash,
+          serializedMultiSign,
+          wallet
+        )
         const wit = signed[0] as WitnessArgs
         wit.lock = serializedMultiSign + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
@@ -187,15 +208,15 @@ export default class TransactionSender {
     return tx
   }
 
-public static async signSingleMultiSignScript(
-  privateKeyOrPath: string,
-  witnesses: (string | WitnessArgs)[],
-  txHash: string,
-  serializedMultiSign: string,
-  wallet: Wallet
-) {
+  public static async signSingleMultiSignScript(
+    privateKeyOrPath: string,
+    witnesses: (string | WitnessArgs)[],
+    txHash: string,
+    serializedMultiSign: string,
+    wallet: Wallet
+  ) {
     const firstWitness = witnesses[0]
-    if (typeof(firstWitness) === 'string') {
+    if (typeof firstWitness === 'string') {
       throw new Error('First witness must be WitnessArgs')
     }
     const restWitnesses = witnesses.slice(1)
@@ -232,11 +253,11 @@ public static async signSingleMultiSignScript(
     walletID: string = '',
     items: TargetOutput[] = [],
     fee: string = '0',
-    feeRate: string = '0',
+    feeRate: string = '0'
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString(),
+      capacity: BigInt(item.capacity).toString()
     }))
 
     const changeAddress: string = await this.getChangeAddress()
@@ -263,20 +284,14 @@ public static async signSingleMultiSignScript(
     walletID: string = '',
     items: TargetOutput[] = [],
     fee: string = '0',
-    feeRate: string = '0',
+    feeRate: string = '0'
   ): Promise<Transaction> => {
-
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString(),
+      capacity: BigInt(item.capacity).toString()
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-      walletID,
-      targetOutputs,
-      fee,
-      feeRate
-    )
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
 
     return tx
   }
@@ -286,8 +301,8 @@ public static async signSingleMultiSignScript(
     outPoint: OutPoint,
     receiveAddress: string,
     fee: string = '0',
-    feeRate: string = '0',
-  ): Promise<Transaction>  => {
+    feeRate: string = '0'
+  ): Promise<Transaction> => {
     const changeAddress: string = await this.getChangeAddress()
     const url: string = NodeService.getInstance().ckb.node.url
     const rpcService = new RpcService(url)
@@ -315,7 +330,7 @@ public static async signSingleMultiSignScript(
     walletID: string = '',
     capacity: string,
     fee: string = '0',
-    feeRate: string = '0',
+    feeRate: string = '0'
   ): Promise<Transaction> => {
     const wallet = WalletService.getInstance().get(walletID)
 
@@ -329,7 +344,7 @@ public static async signSingleMultiSignScript(
       address!.address,
       changeAddress,
       fee,
-      feeRate,
+      feeRate
     )
 
     return tx
@@ -368,7 +383,7 @@ public static async signSingleMultiSignScript(
       depositBlockHeader!.hash,
       changeAddress!.address,
       fee,
-      feeRate,
+      feeRate
     )
 
     return tx
@@ -418,7 +433,8 @@ public static async signSingleMultiSignScript(
     if (withdrawFraction > depositFraction) {
       depositedEpoches += BigInt(1)
     }
-    const lockEpoches = (depositedEpoches + (DAO_LOCK_PERIOD_EPOCHS - BigInt(1))) / DAO_LOCK_PERIOD_EPOCHS * DAO_LOCK_PERIOD_EPOCHS
+    const lockEpoches =
+      ((depositedEpoches + (DAO_LOCK_PERIOD_EPOCHS - BigInt(1))) / DAO_LOCK_PERIOD_EPOCHS) * DAO_LOCK_PERIOD_EPOCHS
     const minimalSinceEpochNumber = depositEpoch.number + lockEpoches
     const minimalSinceEpochIndex = depositEpoch.index
     const minimalSinceEpochLength = depositEpoch.length
@@ -448,25 +464,16 @@ public static async signSingleMultiSignScript(
       previousOutput.lock
     )
 
-    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(
-      WitnessArgs.EMPTY_LOCK,
-      '0x0000000000000000'
-    )
+    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(WitnessArgs.EMPTY_LOCK, '0x0000000000000000')
     const tx: Transaction = Transaction.fromObject({
       version: '0',
-      cellDeps: [
-        secpCellDep,
-        daoCellDep
-      ],
-      headerDeps: [
-        depositBlockHeader.hash,
-        withdrawBlockHeader.hash
-      ],
+      cellDeps: [secpCellDep, daoCellDep],
+      headerDeps: [depositBlockHeader.hash, withdrawBlockHeader.hash],
       inputs: [input],
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [withdrawWitnessArgs],
-      interest: (BigInt(outputCapacity) - depositCapacity).toString(),
+      interest: (BigInt(outputCapacity) - depositCapacity).toString()
     })
     if (mode.isFeeRateMode()) {
       const txSize: number = TransactionSize.tx(tx)
@@ -486,17 +493,12 @@ public static async signSingleMultiSignScript(
   public generateDepositAllTx = async (
     walletID: string = '',
     fee: string = '0',
-    feeRate: string = '0',
+    feeRate: string = '0'
   ): Promise<Transaction> => {
     const wallet = WalletService.getInstance().get(walletID)
     const address = await wallet.getNextAddress()
 
-    const tx = await TransactionGenerator.generateDepositAllTx(
-      walletID,
-      address!.address,
-      fee,
-      feeRate,
-    )
+    const tx = await TransactionGenerator.generateDepositAllTx(walletID, address!.address, fee, feeRate)
 
     return tx
   }
@@ -507,52 +509,51 @@ public static async signSingleMultiSignScript(
     fee: string = '0',
     feeRate: string = '0'
   ) {
-      // only for check wallet exists
-      this.walletService.get(walletID)
+    // only for check wallet exists
+    this.walletService.get(walletID)
 
-      const url: string = NodeService.getInstance().ckb.node.url
-      const rpcService = new RpcService(url)
-      const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
-      if (!cellWithStatus.isLive()) {
-        throw new CellIsNotYetLive()
-      }
-      const prevTx = await rpcService.getTransaction(outPoint.txHash)
-      if (!prevTx || !prevTx.txStatus.isCommitted()) {
-        throw new TransactionIsNotCommittedYet()
-      }
+    const url: string = NodeService.getInstance().ckb.node.url
+    const rpcService = new RpcService(url)
+    const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
+    if (!cellWithStatus.isLive()) {
+      throw new CellIsNotYetLive()
+    }
+    const prevTx = await rpcService.getTransaction(outPoint.txHash)
+    if (!prevTx || !prevTx.txStatus.isCommitted()) {
+      throw new TransactionIsNotCommittedYet()
+    }
 
-      const wallet = WalletService.getInstance().get(walletID)
-      const receivingAddressInfo = await wallet.getNextAddress()
+    const wallet = WalletService.getInstance().get(walletID)
+    const receivingAddressInfo = await wallet.getNextAddress()
 
-      const receivingAddress = receivingAddressInfo!.address
-      const prevOutput = cellWithStatus.cell!.output
-      const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
-        outPoint,
-        prevOutput,
-        receivingAddress,
-        fee,
-        feeRate,
-      )
+    const receivingAddress = receivingAddressInfo!.address
+    const prevOutput = cellWithStatus.cell!.output
+    const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
+      outPoint,
+      prevOutput,
+      receivingAddress,
+      fee,
+      feeRate
+    )
 
-      return tx
+    return tx
   }
 
-  public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
-
+  public calculateDaoMaximumWithdraw = async (
+    depositOutPoint: OutPoint,
+    withdrawBlockHash: string
+  ): Promise<bigint> => {
     const { ckb } = NodeService.getInstance()
-    const result = await ckb.rpc.calculateDaoMaximumWithdraw(
-      depositOutPoint.toSDK(),
-      withdrawBlockHash,
-    )
+    const result = await ckb.rpc.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
 
     return BigInt(result)
   }
 
   private parseEpoch = (epoch: bigint) => {
     return {
-      length: (epoch >> BigInt(40)) & BigInt(0xFFFF),
-      index: (epoch >> BigInt(24)) & BigInt(0xFFFF),
-      number: epoch & BigInt(0xFFFFFF)
+      length: (epoch >> BigInt(40)) & BigInt(0xffff),
+      index: (epoch >> BigInt(24)) & BigInt(0xffff),
+      number: epoch & BigInt(0xffffff)
     }
   }
 
@@ -586,7 +587,7 @@ public static async signSingleMultiSignScript(
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     return uniquePaths.map(path => ({
       path,
-      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
+      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`
     }))
   }
 }

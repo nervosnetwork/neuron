@@ -1,4 +1,3 @@
-
 const DECIMAL = 8
 
 const shannonToCKB = (shannon: bigint) => {

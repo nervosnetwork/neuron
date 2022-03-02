@@ -29,13 +29,13 @@ export default class AssetAccount {
   }
 
   public static fromObject(params: {
-    tokenID: string,
-    symbol: string,
-    accountName: string,
-    tokenName: string,
-    decimal: string,
-    balance: string,
-    blake160: string,
+    tokenID: string
+    symbol: string
+    accountName: string
+    tokenName: string
+    decimal: string
+    balance: string
+    blake160: string
     id?: number
   }): AssetAccount {
     return new AssetAccount(

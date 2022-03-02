@@ -11,11 +11,14 @@ import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 export const clean = async () => {
   await Promise.all(
     [InputEntity, OutputEntity, TransactionEntity, IndexerTxHashCache].map(entity => {
-      return getConnection().getRepository(entity).clear()
+      return getConnection()
+        .getRepository(entity)
+        .clear()
     })
   )
 
-  await getConnection().createQueryBuilder()
+  await getConnection()
+    .createQueryBuilder()
     .delete()
     .from(SyncInfoEntity)
     .execute()

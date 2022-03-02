@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { queue } from 'async'
-import AddressMeta from "database/address/meta"
+import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
@@ -12,12 +12,7 @@ export default class IndexerCacheService {
   private walletId: string
   private indexer: CkbIndexer
 
-  constructor(
-    walletId: string,
-    addressMetas: AddressMeta[],
-    rpcService: RpcService,
-    indexer: CkbIndexer
-  ) {
+  constructor(walletId: string, addressMetas: AddressMeta[], rpcService: RpcService, indexer: CkbIndexer) {
     for (const addressMeta of addressMetas) {
       if (addressMeta.walletId !== walletId) {
         throw new Error(`address ${addressMeta.address} does not belong to wallet id ${walletId}`)
@@ -50,13 +45,13 @@ export default class IndexerCacheService {
       .getMany()
   }
 
-  public static async nextUnprocessedBlock(walletIds: string[]): Promise<{blockNumber: string, blockHash: string} | undefined> {
+  public static async nextUnprocessedBlock(
+    walletIds: string[]
+  ): Promise<{ blockNumber: string; blockHash: string } | undefined> {
     const result = await getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
-      .where(
-        'walletId IN (:...walletIds) and isProcessed = false', {walletIds}
-      )
+      .where('walletId IN (:...walletIds) and isProcessed = false', { walletIds })
       .orderBy('blockNumber', 'ASC')
       .getOne()
 
@@ -83,7 +78,7 @@ export default class IndexerCacheService {
       .execute()
   }
 
-  private async fetchTxMapping(): Promise<Map<string, Array<{address: string, lockHash: string}>>> {
+  private async fetchTxMapping(): Promise<Map<string, Array<{ address: string; lockHash: string }>>> {
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
@@ -93,15 +88,20 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const transactionCollector = new TransactionCollector(this.indexer, {
-          lock: {
-            code_hash: lockScript.codeHash,
-            hash_type: lockScript.hashType,
-            args: lockScript.args
+        const transactionCollector = new TransactionCollector(
+          this.indexer,
+          {
+            lock: {
+              code_hash: lockScript.codeHash,
+              hash_type: lockScript.hashType,
+              args: lockScript.args
+            }
+          },
+          this.indexer.ckbRpcUrl,
+          {
+            includeStatus: false
           }
-        }, this.indexer.ckbRpcUrl, {
-          includeStatus: false
-        })
+        )
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
         //@ts-ignore
@@ -110,10 +110,12 @@ export default class IndexerCacheService {
         }
 
         for (const txHash of fetchedTxHashes) {
-          mappingsByTxHash.set(txHash, [{
-            address: addressMeta.address,
-            lockHash: lockScript.computeHash()
-          }])
+          mappingsByTxHash.set(txHash, [
+            {
+              address: addressMeta.address,
+              lockHash: lockScript.computeHash()
+            }
+          ])
         }
       }
 
@@ -125,25 +127,27 @@ export default class IndexerCacheService {
         {
           lockScript: addressMeta.generateChequeLockScriptWithReceiverLockHash(),
           argsLen: 40
-        },
+        }
       ]
 
-      for (const {lockScript, argsLen} of lockScriptsForCellCollection) {
+      for (const { lockScript, argsLen } of lockScriptsForCellCollection) {
         const cellCollector = new CellCollector(this.indexer, {
           lock: {
             code_hash: lockScript.codeHash,
             hash_type: lockScript.hashType,
             args: lockScript.args.slice(0, 42)
           },
-          argsLen,
+          argsLen
         })
 
         for await (const cell of cellCollector.collect()) {
           const txHash = cell.out_point!.tx_hash!
-          mappingsByTxHash.set(txHash, [{
-            address: addressMeta.address,
-            lockHash: lockScript.computeHash()
-          }])
+          mappingsByTxHash.set(txHash, [
+            {
+              address: addressMeta.address,
+              lockHash: lockScript.computeHash()
+            }
+          ])
         }
       }
     }
@@ -154,8 +158,7 @@ export default class IndexerCacheService {
     const mappingsByTxHash = await this.fetchTxMapping()
 
     const fetchedTxHashes = [...mappingsByTxHash.keys()]
-    const fetchedTxHashCount = fetchedTxHashes
-      .reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash)!.length, 0)
+    const fetchedTxHashCount = fetchedTxHashes.reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash)!.length, 0)
 
     const txCount = await this.countTxHashes()
     if (fetchedTxHashCount === txCount) {
@@ -195,10 +198,10 @@ export default class IndexerCacheService {
     })
 
     for (const txWithStatus of txsWithStatus) {
-      const {transaction, txStatus} = txWithStatus
+      const { transaction, txStatus } = txWithStatus
       const mappings = mappingsByTxHash.get(transaction.hash!)!
 
-      for (const {lockHash, address} of mappings) {
+      for (const { lockHash, address } of mappings) {
         await getConnection()
           .createQueryBuilder()
           .insert()
@@ -229,7 +232,7 @@ export default class IndexerCacheService {
       })
       .where({
         blockNumber: blockNumber,
-        walletId: this.walletId,
+        walletId: this.walletId
       })
       .execute()
   }
@@ -260,5 +263,4 @@ export default class IndexerCacheService {
       })
       .getMany()
   }
-
 }

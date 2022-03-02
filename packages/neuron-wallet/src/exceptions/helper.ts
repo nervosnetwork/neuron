@@ -7,5 +7,5 @@ export class FailToCreateMnemonic extends Error {
 }
 
 export default {
-  FailToCreateMnemonic,
+  FailToCreateMnemonic
 }

@@ -1,12 +1,12 @@
-import AddressService from "./addresses"
-import WalletService, { Wallet } from "./wallets"
-import Keychain from "models/keys/keychain"
-import Blake2b from "models/blake2b"
-import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
+import AddressService from './addresses'
+import WalletService, { Wallet } from './wallets'
+import Keychain from 'models/keys/keychain'
+import Blake2b from 'models/blake2b'
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import { ec as EC } from 'elliptic'
-import { AddressNotFound } from "exceptions"
-import HardwareWalletService from "./hardware"
-import AddressParser from "models/address-parser"
+import { AddressNotFound } from 'exceptions'
+import HardwareWalletService from './hardware'
+import AddressParser from 'models/address-parser'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -50,7 +50,7 @@ export default class SignMessage {
 
     const options = {
       r: signature.slice(2, 66),
-      s: signature.slice(66 ,130),
+      s: signature.slice(66, 130),
       recoveryParam: parseInt(signature.slice(-1))
     }
 
@@ -61,7 +61,7 @@ export default class SignMessage {
     return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
   }
 
-  private static signatureHash (message: string) {
+  private static signatureHash(message: string) {
     const buffer = Buffer.from(SignMessage.magicString + message, 'utf-8')
     const blake2b = new Blake2b()
     blake2b.updateBuffer(buffer)

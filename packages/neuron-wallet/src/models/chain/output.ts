@@ -10,7 +10,7 @@ export enum OutputStatus {
   Live = 'live',
   Pending = 'pending',
   Dead = 'dead',
-  Failed = 'failed',
+  Failed = 'failed'
 }
 
 // empty string '' means not customized lock / type / data
@@ -90,41 +90,39 @@ export default class Output {
     TypeChecker.numberChecker(this.capacity, this.timestamp, this.blockNumber, this.depositTimestamp)
   }
 
-  public static fromObject(
-    {
-      capacity,
-      data,
-      lock,
-      type,
-      lockHash,
-      typeHash,
-      outPoint,
-      status,
-      daoData,
-      timestamp,
-      blockNumber,
-      blockHash,
-      depositOutPoint,
-      depositTimestamp,
-      multiSignBlake160,
-    }: {
-      capacity: string
-      data?: string
-      lock: Script
-      type?: Script | null
-      outPoint?: OutPoint
-      status?: OutputStatus
-      lockHash?: string
-      typeHash?: string
-      daoData?: string | null
-      timestamp?: string | null
-      blockNumber?: string | null
-      blockHash?: string | null
-      depositOutPoint?: OutPoint
-      depositTimestamp?: string
-      multiSignBlake160?: string | null
-    }
-  ): Output {
+  public static fromObject({
+    capacity,
+    data,
+    lock,
+    type,
+    lockHash,
+    typeHash,
+    outPoint,
+    status,
+    daoData,
+    timestamp,
+    blockNumber,
+    blockHash,
+    depositOutPoint,
+    depositTimestamp,
+    multiSignBlake160
+  }: {
+    capacity: string
+    data?: string
+    lock: Script
+    type?: Script | null
+    outPoint?: OutPoint
+    status?: OutputStatus
+    lockHash?: string
+    typeHash?: string
+    daoData?: string | null
+    timestamp?: string | null
+    blockNumber?: string | null
+    blockHash?: string | null
+    depositOutPoint?: OutPoint
+    depositTimestamp?: string
+    multiSignBlake160?: string | null
+  }): Output {
     return new Output(
       capacity,
       Script.fromObject(lock),
@@ -186,7 +184,7 @@ export default class Output {
     this.depositInfo = value
   }
 
-  public setWithdrawInfo(value: DaoCellInfo)  {
+  public setWithdrawInfo(value: DaoCellInfo) {
     this.withdrawInfo = value
   }
 
@@ -214,7 +212,7 @@ export default class Output {
     return new Output(
       output.capacity,
       Script.fromSDK(output.lock),
-      output.type ? Script.fromSDK(output.type) : output.type,
+      output.type ? Script.fromSDK(output.type) : output.type
     )
   }
 }

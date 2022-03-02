@@ -1,3 +1,4 @@
+// eslint-disable-next-line prettier/prettier
 import type { LumosCellQuery } from './sync/indexer-connector'
 import initConnection from 'database/chain/ormconfig'
 import { register as registerTxStatusListener, } from './tx-status-listener'
@@ -66,7 +67,9 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
       syncQueue = null
       logger.debug("Sync:\tstopped")
       process.exit(0)
+      break
     }
+
     case 'queryIndexer': {
       res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
       break

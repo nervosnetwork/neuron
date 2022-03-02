@@ -1,3 +1,4 @@
+// eslint-disable-next-line prettier/prettier
 import type { ScriptHashType } from 'models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'

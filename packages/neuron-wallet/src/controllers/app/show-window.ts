@@ -23,9 +23,9 @@ const showWindow = (url: string, title: string, options?: Electron.BrowserWindow
       webPreferences: {
         devTools: env.isDevMode,
         contextIsolation: false,
-        preload: path.join(__dirname, './preload.js'),
+        preload: path.join(__dirname, './preload.js')
       },
-      ...options,
+      ...options
     })
     const fmtUrl = url.startsWith('http') || url.startsWith('file:') ? url : env.mainURL + url
     win.loadURL(fmtUrl)

@@ -16,8 +16,8 @@ if (process.env.NODE_ENV === 'development') {
   Object.defineProperty(window, '__devtron', {
     value: {
       require,
-      process,
-    },
+      process
+    }
   })
 }
 
@@ -26,5 +26,5 @@ window.electron = {
   nativeImage,
   ipcRenderer,
   shell,
-  desktopCapturer,
+  desktopCapturer
 }

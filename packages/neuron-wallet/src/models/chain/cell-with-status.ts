@@ -15,7 +15,10 @@ export default class CellWithStatus {
     return this.status === 'live'
   }
 
-  public static fromSDK(cellWithStatus: { cell: CKBComponents.LiveCell, status: CKBComponents.CellStatus }): CellWithStatus {
+  public static fromSDK(cellWithStatus: {
+    cell: CKBComponents.LiveCell
+    status: CKBComponents.CellStatus
+  }): CellWithStatus {
     return new CellWithStatus(
       cellWithStatus.status,
       cellWithStatus.cell ? CellInfo.fromSDK(cellWithStatus.cell) : undefined

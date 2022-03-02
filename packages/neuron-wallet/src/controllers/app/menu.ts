@@ -1,13 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import {
-  app,
-  shell,
-  BrowserWindow,
-  dialog,
-  MenuItemConstructorOptions,
-  Menu,
-} from 'electron'
+import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
 import { t } from 'i18next'
 import { Subject } from 'rxjs'
 import { throttleTime } from 'rxjs/operators'
@@ -42,7 +35,7 @@ enum ExternalURL {
 }
 
 const separator: MenuItemConstructorOptions = {
-  type: 'separator',
+  type: 'separator'
 }
 
 const showAbout = () => {
@@ -68,7 +61,7 @@ const showAbout = () => {
       message: app.name,
       detail: applicationVersion,
       buttons: ['OK'],
-      cancelId: 0,
+      cancelId: 0
     }
     dialog.showMessageBox(options)
     return
@@ -129,7 +122,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   const hasCurrentWallet = currentWallet !== undefined
   const isHardwareWallet = currentWallet?.isHardware() ?? false
 
-
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
     label: app.name,
@@ -137,9 +129,11 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'about',
         label: t('application-menu.neuron.about', {
-          app: app.name,
+          app: app.name
         }),
-        click: () => { showAbout() },
+        click: () => {
+          showAbout()
+        }
       },
       {
         label: t('application-menu.neuron.check-updates'),
@@ -160,11 +154,11 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       separator,
       {
         label: t('application-menu.neuron.quit', {
-          app: app.name,
+          app: app.name
         }),
-        role: 'quit',
-      },
-    ],
+        role: 'quit'
+      }
+    ]
   }
 
   const selectWalletMenu: MenuItemConstructorOptions[] = wallets.map(wallet => {
@@ -173,7 +167,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: wallet.name,
       type: 'radio',
       checked: currentWallet && wallet.id === currentWallet.id,
-      click: () => { WalletsService.getInstance().setCurrent(wallet.id) }
+      click: () => {
+        WalletsService.getInstance().setCurrent(wallet.id)
+      }
     }
   })
 
@@ -186,7 +182,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'create',
         label: t('application-menu.wallet.create-new'),
-        click: () => { navigateTo(URL.CreateWallet) }
+        click: () => {
+          navigateTo(URL.CreateWallet)
+        }
       },
       {
         id: 'import',
@@ -195,12 +193,16 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           {
             id: 'import-with-mnemonic',
             label: t('application-menu.wallet.import-mnemonic'),
-            click: () => { navigateTo(URL.ImportMnemonic) }
+            click: () => {
+              navigateTo(URL.ImportMnemonic)
+            }
           },
           {
             id: 'import-with-keystore',
             label: t('application-menu.wallet.import-keystore'),
-            click: () => { navigateTo(URL.ImportKeystore) }
+            click: () => {
+              navigateTo(URL.ImportKeystore)
+            }
           },
           {
             id: 'import-with-xpubkey',
@@ -219,7 +221,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               importHardware(URL.ImportHardware)
             }
           }
-        ],
+        ]
       },
       separator,
       {
@@ -231,7 +233,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             return
           }
           requestPassword(currentWallet.id, 'backup-wallet')
-        },
+        }
       },
       {
         id: 'export-xpubkey',
@@ -243,7 +245,12 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           }
           const window = BrowserWindow.getFocusedWindow()
           if (window) {
-            CommandSubject.next({ winID: window.id, type: 'export-xpubkey', payload: currentWallet.id, dispatchToUI: false })
+            CommandSubject.next({
+              winID: window.id,
+              type: 'export-xpubkey',
+              payload: currentWallet.id,
+              dispatchToUI: false
+            })
           }
         }
       },
@@ -256,9 +263,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             return
           }
           requestPassword(currentWallet.id, 'delete-wallet')
-        },
-      },
-    ],
+        }
+      }
+    ]
   }
 
   const editMenuItem: MenuItemConstructorOptions = {
@@ -267,22 +274,22 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     submenu: [
       {
         label: t('application-menu.edit.cut'),
-        role: 'cut',
+        role: 'cut'
       },
       {
         label: t('application-menu.edit.copy'),
-        role: 'copy',
+        role: 'copy'
       },
       {
         label: t('application-menu.edit.paste'),
-        role: 'paste',
+        role: 'paste'
       },
       separator,
       {
         label: t('application-menu.edit.selectall'),
-        role: 'selectAll',
-      },
-    ],
+        role: 'selectAll'
+      }
+    ]
   }
 
   const toolsMenuItem: MenuItemConstructorOptions = {
@@ -295,7 +302,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         click: () => {
           const currentWallet = walletsService.getCurrent()
           showWindow(`#/sign-verify/${currentWallet!.id}`, t(`messageBox.sign-and-verify.title`), {
-            width: 900,
+            width: 900
           })
         }
       },
@@ -309,7 +316,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             message: t('messageBox.clear-sync-data.message'),
             buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
             defaultId: 0,
-            cancelId: 1,
+            cancelId: 1
           })
           if (res.response === 0) {
             await clearCkbNodeCache()
@@ -328,7 +335,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           const { json, filePath } = result
           loadTransaction(URL.OfflineSign, json, filePath)
         }
-      },
+      }
     ]
   }
 
@@ -339,36 +346,46 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     submenu: [
       {
         label: t('application-menu.window.minimize'),
-        role: 'minimize',
+        role: 'minimize'
       },
       {
         label: t('application-menu.window.close'),
-        role: 'close',
-      },
-    ],
+        role: 'close'
+      }
+    ]
   }
 
   const helpSubmenu: MenuItemConstructorOptions[] = [
     {
       label: t('application-menu.help.documentation'),
-      click: () => { shell.openExternal(ExternalURL.Doc) }
+      click: () => {
+        shell.openExternal(ExternalURL.Doc)
+      }
     },
     separator,
     {
       label: t('application-menu.help.nervos-website'),
-      click: () => { shell.openExternal(ExternalURL.Website) }
+      click: () => {
+        shell.openExternal(ExternalURL.Website)
+      }
     },
     {
       label: t('application-menu.help.source-code'),
-      click: () => { shell.openExternal(ExternalURL.Repository) }
+      click: () => {
+        shell.openExternal(ExternalURL.Repository)
+      }
     },
     {
       label: t('application-menu.help.report-issue'),
-      click: () => { shell.openExternal(ExternalURL.Issues) }
+      click: () => {
+        shell.openExternal(ExternalURL.Issues)
+      }
     },
     {
-      label: t("application-menu.help.export-debug-info"),
-      click: () => { new ExportDebugController().export() }
+      label: t('application-menu.help.export-debug-info'),
+      click: () => {
+        new ExportDebugController().export()
+      }
     }
   ]
   if (!isMac) {
@@ -376,7 +393,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     helpSubmenu.push({
       id: 'preference',
       label: t(SETTINGS_WINDOW_TITLE),
-      click: showSettings,
+      click: showSettings
     })
     helpSubmenu.push({
       label: t('application-menu.neuron.check-updates'),
@@ -391,7 +408,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.neuron.about', {
         app: app.name
       }),
-      click: () => { showAbout() }
+      click: () => {
+        showAbout()
+      }
     })
   }
 
@@ -399,7 +418,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     id: 'help',
     label: t('application-menu.help.label'),
     role: 'help',
-    submenu: helpSubmenu,
+    submenu: helpSubmenu
   }
 
   const developMenuItem: MenuItemConstructorOptions = {
@@ -408,17 +427,17 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     submenu: [
       {
         label: t('application-menu.develop.reload'),
-        role: 'reload',
+        role: 'reload'
       },
       {
         label: t('application-menu.develop.force-reload'),
-        role: 'forceReload',
+        role: 'forceReload'
       },
       {
         label: t('application-menu.develop.toggle-dev-tools'),
-        role: 'toggleDevTools',
-      },
-    ],
+        role: 'toggleDevTools'
+      }
+    ]
   }
 
   const applicationMenuTemplate = env.isDevMode

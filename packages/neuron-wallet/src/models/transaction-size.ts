@@ -8,7 +8,7 @@ import MultiSign from './multi-sign'
 import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from 'utils/buffer'
 
-export default class  TransactionSize {
+export default class TransactionSize {
   public static SERIALIZED_OFFSET_BYTESIZE = 4
 
   public static base(): number {
@@ -37,7 +37,7 @@ export default class  TransactionSize {
     const hash20 = '0x' + '0'.repeat(40)
     const sudtOutput = Output.fromObject({
       capacity: '61',
-      lock: new Script(hash32, hash20, ScriptHashType.Type),
+      lock: new Script(hash32, hash20, ScriptHashType.Type)
     })
     return TransactionSize.output(sudtOutput)
   }
@@ -49,7 +49,7 @@ export default class  TransactionSize {
     const sudtOutput = Output.fromObject({
       capacity: '142',
       lock: new Script(hash32, hash20, ScriptHashType.Type),
-      type: new Script(hash32, hash32, ScriptHashType.Type),
+      type: new Script(hash32, hash32, ScriptHashType.Type)
     })
     return TransactionSize.output(sudtOutput)
   }
@@ -66,9 +66,7 @@ export default class  TransactionSize {
   }
 
   public static witness(witness: WitnessArgs | string): number {
-    const wit: string = typeof(witness) === 'string'
-      ? witness
-      : serializeWitnessArgs(witness.toSDK())
+    const wit: string = typeof witness === 'string' ? witness : serializeWitnessArgs(witness.toSDK())
     const bytes = serializeFixVec(wit)
     return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
@@ -96,7 +94,7 @@ export default class  TransactionSize {
       this.input() * tx.inputs.length,
       ...tx.outputs.map(o => this.output(o)),
       ...tx.outputsData.map(data => this.outputData(data)),
-      ...tx.witnesses.map(wit => this.witness(wit)),
+      ...tx.witnesses.map(wit => this.witness(wit))
     ].reduce((result, c) => result + c, 0)
   }
 }

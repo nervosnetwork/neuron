@@ -61,13 +61,13 @@ export default class Keystore {
       salt: salt.toString('hex'),
       n: 2 ** 18,
       r: 8,
-      p: 1,
+      p: 1
     }
     return new Keystore(
       {
         ciphertext: '',
         cipherparams: {
-          iv: iv.toString('hex'),
+          iv: iv.toString('hex')
         },
         cipher: CIPHER,
         kdf: 'scrypt',
@@ -90,7 +90,7 @@ export default class Keystore {
       salt: salt.toString('hex'),
       n: 2 ** 18,
       r: 8,
-      p: 1,
+      p: 1
     }
     const derivedKey = crypto.scryptSync(password, salt, kdfparams.dklen, Keystore.scryptOptions(kdfparams))
 
@@ -100,19 +100,19 @@ export default class Keystore {
     }
     const ciphertext = Buffer.concat([
       cipher.update(Buffer.from(extendedPrivateKey.serialize(), 'hex')),
-      cipher.final(),
+      cipher.final()
     ])
 
     return new Keystore(
       {
         ciphertext: ciphertext.toString('hex'),
         cipherparams: {
-          iv: iv.toString('hex'),
+          iv: iv.toString('hex')
         },
         cipher: CIPHER,
         kdf: 'scrypt',
         kdfparams,
-        mac: Keystore.mac(derivedKey, ciphertext),
+        mac: Keystore.mac(derivedKey, ciphertext)
       },
       uuid()
     )
@@ -120,7 +120,7 @@ export default class Keystore {
 
   // Imported from xpub with empty private key.
   isEmpty(): boolean {
-    return this.crypto.ciphertext === "" && this.crypto.mac === ""
+    return this.crypto.ciphertext === '' && this.crypto.mac === ''
   }
 
   // Decrypt and return serialized extended private key.
@@ -167,7 +167,7 @@ export default class Keystore {
       N: kdfparams.n,
       r: kdfparams.r,
       p: kdfparams.p,
-      maxmem: 128 * (kdfparams.n + kdfparams.p + 2) * kdfparams.r,
+      maxmem: 128 * (kdfparams.n + kdfparams.p + 2) * kdfparams.r
     }
   }
 }

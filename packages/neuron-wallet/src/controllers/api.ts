@@ -43,6 +43,7 @@ import IndexerService from 'services/indexer'
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
 export default class ApiController {
+  // eslint-disable-next-line prettier/prettier
   #walletsController = new WalletsController()
   #transactionsController = new TransactionsController()
   #daoController = new DaoController()

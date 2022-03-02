@@ -1,7 +1,7 @@
-import AddressGenerator from "models/address-generator"
-import SystemScriptInfo from "models/system-script-info"
-import NetworksService from "services/networks"
-import Address, { AddressPrefix, AddressType } from "./address"
+import AddressGenerator from 'models/address-generator'
+import SystemScriptInfo from 'models/system-script-info'
+import NetworksService from 'services/networks'
+import Address, { AddressPrefix, AddressType } from './address'
 
 export default class HdPublicKeyInfoModel {
   public walletId: string
@@ -12,10 +12,7 @@ export default class HdPublicKeyInfoModel {
 
   public get address() {
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    return AddressGenerator.toShort(
-      SystemScriptInfo.generateSecpScript(this.publicKeyInBlake160),
-      prefix
-    )
+    return AddressGenerator.toShort(SystemScriptInfo.generateSecpScript(this.publicKeyInBlake160), prefix)
   }
 
   public get path(): string {
@@ -27,7 +24,7 @@ export default class HdPublicKeyInfoModel {
     addressType: AddressType,
     addressIndex: number,
     publicKeyInBlake160: string,
-    description?: string,
+    description?: string
   ) {
     this.walletId = walletId
     this.addressType = addressType
@@ -37,18 +34,18 @@ export default class HdPublicKeyInfoModel {
   }
 
   public static fromObject(params: {
-    walletId: string,
-    addressType: AddressType,
-    addressIndex: number,
-    publicKeyInBlake160: string,
-    description?: string,
+    walletId: string
+    addressType: AddressType
+    addressIndex: number
+    publicKeyInBlake160: string
+    description?: string
   }): HdPublicKeyInfoModel {
-    return new HdPublicKeyInfoModel (
+    return new HdPublicKeyInfoModel(
       params.walletId,
       params.addressType,
       params.addressIndex,
       params.publicKeyInBlake160,
-      params.description,
+      params.description
     )
   }
 }

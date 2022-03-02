@@ -3,12 +3,12 @@
 declare module '@ledgerhq/hw-transport-node-ble'
 declare module 'hw-app-ckb' {
   export interface WalletPublicKey {
-    publicKey: string,
-    lockArg: string,
+    publicKey: string
+    lockArg: string
     address: string
   }
   export interface ExtendPublicKey {
-    public_key: string,
+    public_key: string
     chain_code: string
   }
   export default class LedgerCKB {
@@ -75,9 +75,7 @@ declare module 'hw-app-ckb' {
     /**
      * Sign an already constructed AnnotatedTransaction.
      */
-    async signAnnotatedTransaction(
-      tx: AnnotatedTransaction | AnnotatedTransactionJSON
-    ): Promise<string>
+    async signAnnotatedTransaction(tx: AnnotatedTransaction | AnnotatedTransactionJSON): Promise<string>
 
     /**
      * Get the version of the Nervos app installed on the hardware device
@@ -92,8 +90,8 @@ declare module 'hw-app-ckb' {
      * }
      */
     async getAppConfiguration(): Promise<{
-      version: string,
-      hash: string,
+      version: string
+      hash: string
     }>
 
     /**
@@ -107,10 +105,6 @@ declare module 'hw-app-ckb' {
      */
     async getWalletId(): Promise<string>
 
-    async signMessage(
-      path: string,
-      rawMsgHex: string,
-      displayHex: bool
-    ): Promise<string>
+    async signMessage(path: string, rawMsgHex: string, displayHex: bool): Promise<string>
   }
 }

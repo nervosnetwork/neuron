@@ -80,9 +80,8 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   AppUpdaterSubject.subscribe(params => {
     dispatcher.updateMenu()
-    BrowserWindow
-      .getAllWindows()
-      .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))?.webContents
-      .send('app-updater-updated', params)
+    BrowserWindow.getAllWindows()
+      .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))
+      ?.webContents.send('app-updater-updated', params)
   })
 }

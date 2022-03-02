@@ -11,7 +11,7 @@ import OutPoint from './out-point'
 export enum TransactionStatus {
   Pending = 'pending',
   Success = 'success',
-  Failed = 'failed',
+  Failed = 'failed'
 }
 
 export interface SudtTokenInfo {
@@ -154,27 +154,27 @@ export default class Transaction {
     sudtInfo,
     nftInfo
   }: {
-    version: string,
-    cellDeps?: CellDep[],
-    headerDeps?: string[],
-    inputs?: Input[],
-    outputs?: Output[],
-    outputsData?: string[],
-    witnesses?: (WitnessArgs | string)[],
-    hash?: string,
-    timestamp?: string,
-    blockNumber?: string,
-    blockHash?: string,
-    value?: string,
-    fee?: string,
-    interest?: string,
-    type?: string,
-    status?: TransactionStatus,
-    description?: string, // Default to ''
-    nervosDao?: boolean, // Default to false
-    createdAt?: string,
-    updatedAt?: string,
-    sudtInfo?: SudtInfo,
+    version: string
+    cellDeps?: CellDep[]
+    headerDeps?: string[]
+    inputs?: Input[]
+    outputs?: Output[]
+    outputsData?: string[]
+    witnesses?: (WitnessArgs | string)[]
+    hash?: string
+    timestamp?: string
+    blockNumber?: string
+    blockHash?: string
+    value?: string
+    fee?: string
+    interest?: string
+    type?: string
+    status?: TransactionStatus
+    description?: string // Default to ''
+    nervosDao?: boolean // Default to false
+    createdAt?: string
+    updatedAt?: string
+    sudtInfo?: SudtInfo
     nftInfo?: NFTInfo
   }): Transaction {
     return new Transaction(
@@ -252,7 +252,7 @@ export default class Transaction {
       cellDeps: this.cellDeps.map(cd => cd.toSDK()),
       headerDeps: this.headerDeps,
       outputsData: this.outputsData,
-      witnesses: this.witnessesAsString(),
+      witnesses: this.witnessesAsString()
     }
   }
 
@@ -261,11 +261,14 @@ export default class Transaction {
     const hash = this.hash || this.computeHash()
     return {
       ...this.toSDKRawTransaction(),
-      hash,
+      hash
     }
   }
 
-  public static fromSDK(tx: CKBComponents.RawTransaction | CKBComponents.Transaction, blockHeader?: BlockHeader): Transaction {
+  public static fromSDK(
+    tx: CKBComponents.RawTransaction | CKBComponents.Transaction,
+    blockHeader?: BlockHeader
+  ): Transaction {
     const txHash: string | undefined = (tx as CKBComponents.Transaction).hash
     const outputs = tx.outputs.map((o, i) => {
       const output = Output.fromSDK(o)

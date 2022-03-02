@@ -1,4 +1,4 @@
-import Blake2b from "./blake2b"
+import Blake2b from './blake2b'
 
 export default class MultiSign {
   // 1 epoch = 4h = 240min
@@ -18,10 +18,17 @@ export default class MultiSign {
       throw new Error("minutes to calculate since can't be less than 0")
     }
     const currentEpochInfo = this.parseEpoch(BigInt(headerEpoch))
-    const totalMinutes = minutes +
-      parseInt((parseInt(currentEpochInfo.index.toString()) / parseInt(currentEpochInfo.length.toString()) * this.EPOCH_MINUTES).toString())
+    const totalMinutes =
+      minutes +
+      parseInt(
+        (
+          (parseInt(currentEpochInfo.index.toString()) / parseInt(currentEpochInfo.length.toString())) *
+          this.EPOCH_MINUTES
+        ).toString()
+      )
     const leftMinutes = totalMinutes % this.EPOCH_MINUTES
-    const epochs: bigint = BigInt(parseInt((totalMinutes / this.EPOCH_MINUTES).toString(), 10)) + currentEpochInfo.number
+    const epochs: bigint =
+      BigInt(parseInt((totalMinutes / this.EPOCH_MINUTES).toString(), 10)) + currentEpochInfo.number
     const result = this.epochSince(BigInt(this.EPOCH_MINUTES), BigInt(leftMinutes), epochs)
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(result)
@@ -45,9 +52,9 @@ export default class MultiSign {
 
   private parseEpoch(epoch: bigint) {
     return {
-      length: (epoch >> BigInt(40)) & BigInt(0xFFFF),
-      index: (epoch >> BigInt(24)) & BigInt(0xFFFF),
-      number: epoch & BigInt(0xFFFFFF)
+      length: (epoch >> BigInt(40)) & BigInt(0xffff),
+      index: (epoch >> BigInt(24)) & BigInt(0xffff),
+      number: epoch & BigInt(0xffffff)
     }
   }
 }

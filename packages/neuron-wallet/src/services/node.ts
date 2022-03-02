@@ -37,7 +37,7 @@ class NodeService {
 
   public ckb: CKB = new CKB('')
 
-  constructor () {
+  constructor() {
     this.start()
     this.syncConnectionStatus()
     CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
@@ -152,29 +152,33 @@ class NodeService {
 
   private showGuideDialog = () => {
     const I18N_PATH = `messageBox.ckb-dependency`
-    return dialog.showMessageBox({
-      type: 'info',
-      buttons: ['install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
-      defaultId: 0,
-      title: t(`${I18N_PATH}.title`),
-      message: t(`${I18N_PATH}.message`),
-      detail: t(`${I18N_PATH}.detail`),
-      cancelId: 0,
-      noLink: true,
-    }).then(() => {
-      const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
-      shell.openExternal(VC_REDIST_URL)
-      env.app.quit()
-      return false
-    })
+    return dialog
+      .showMessageBox({
+        type: 'info',
+        buttons: ['install-and-exit'].map(label => t(`${I18N_PATH}.buttons.${label}`)),
+        defaultId: 0,
+        title: t(`${I18N_PATH}.title`),
+        message: t(`${I18N_PATH}.message`),
+        detail: t(`${I18N_PATH}.detail`),
+        cancelId: 0,
+        noLink: true
+      })
+      .then(() => {
+        const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
+        shell.openExternal(VC_REDIST_URL)
+        env.app.quit()
+        return false
+      })
   }
 
   private startNode = () => {
-    return startCkbNode().then(() => true).catch(err => {
-      logger.info('CKB:\tfail to start bundled CKB with error:')
-      logger.error(err)
-      return false
-    })
+    return startCkbNode()
+      .then(() => true)
+      .catch(err => {
+        logger.info('CKB:\tfail to start bundled CKB with error:')
+        logger.error(err)
+        return false
+      })
   }
 }
 

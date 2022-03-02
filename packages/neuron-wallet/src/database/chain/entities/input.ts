@@ -13,67 +13,67 @@ export default class Input extends BaseEntity {
   // cellbase input has empty cell { txHash, index }
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   outPointTxHash: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   outPointIndex: string | null = null
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   since!: string
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   lockHash: string | null = null
 
   // cellbase input has no previous output lock script
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   lockCodeHash: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   lockArgs: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   lockHashType: ScriptHashType | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   typeCodeHash: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   typeArgs: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   typeHashType: ScriptHashType | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   typeHash: string | null = null
 
@@ -89,24 +89,28 @@ export default class Input extends BaseEntity {
   })
   transactionHash!: string
 
-  @ManyToOne(_type => Transaction, transaction => transaction.inputs, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    _type => Transaction,
+    transaction => transaction.inputs,
+    { onDelete: 'CASCADE' }
+  )
   transaction!: Transaction
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   capacity: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   inputIndex: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true,
+    nullable: true
   })
   multiSignBlake160: string | null = null
 
@@ -114,10 +118,7 @@ export default class Input extends BaseEntity {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
     }
-    return new OutPoint(
-      this.outPointTxHash,
-      this.outPointIndex,
-    )
+    return new OutPoint(this.outPointTxHash, this.outPointIndex)
   }
 
   public lockScript(): Script | undefined {
@@ -144,7 +145,7 @@ export default class Input extends BaseEntity {
       this.inputIndex,
       this.multiSignBlake160,
       this.typeScript(),
-      this.typeHash,
+      this.typeHash
     )
   }
 }

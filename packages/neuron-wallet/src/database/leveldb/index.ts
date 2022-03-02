@@ -16,10 +16,9 @@ const leveldb = (dbname: string): LevelUp => {
     if (err) {
       logger.error(`Database:\tfail to open leveldb ${dbname}:`, err.toString())
     }
-
   })
 }
 
-export const maindb = leveldb("datastore")
+export const maindb = leveldb('datastore')
 
 export default leveldb
