@@ -1,11 +1,14 @@
 module.exports = {
-  "extends": "eslint:recommended",
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
+    "prettier/prettier": [2, {
+      "printWidth": 120
+    }],
     "no-console": 0,
     "no-cond-assign": 0,
     "no-extra-semi": "warn",
