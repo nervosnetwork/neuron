@@ -1,24 +1,33 @@
-const { notarize } = require('electron-notarize');
+const { notarize } = require('electron-notarize')
 
 exports.default = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
   if (electronPlatformName !== 'darwin') {
-    return;
+    return
   }
 
   const appleId = process.env.APPLE_ID;
   const appleIdPassword = process.env.APPLE_ID_PASSWORD;
 
   if (!appleId || !appleIdPassword) {
-    return;
+    console.warn(`${appleId ? "Apple id password" : "Apple id"} is not found`)
+    process.exit(1)
   }
 
-  const appName = context.packager.appInfo.productFilename;
+  const appName = context.packager.appInfo.productFilename
 
-  return await notarize({
-    appBundleId: 'com.nervos.neuron',
-    appPath: `${appOutDir}/${appName}.app`,
-    appleId: appleId,
-    appleIdPassword: appleIdPassword,
-  });
-};
+  console.info("Notarization started")
+
+  try {
+    await notarize({
+      appBundleId: 'com.nervos.neuron',
+      appPath: `${appOutDir}/${appName}.app`,
+      appleId: appleId,
+      appleIdPassword: appleIdPassword,
+    })
+    console.info("Notarization finished")
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
+}

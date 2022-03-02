@@ -149,7 +149,9 @@ export const useUpdateDepositValue = ({
         try {
           validateAmount(amount)
         } catch (err) {
-          setErrorMessage(t(`messages.codes.${err.code}`, { fieldName: 'deposit', length: MAX_DECIMAL_DIGITS }))
+          setErrorMessage(
+            t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: amount, length: MAX_DECIMAL_DIGITS })
+          )
           return
         }
 

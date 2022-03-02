@@ -16,7 +16,6 @@ import TransactionsController from 'controllers/transactions'
 import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
-import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
@@ -38,50 +37,61 @@ import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
 import SUDTController from "controllers/sudt";
+import SyncedBlockNumber from 'models/synced-block-number'
+import IndexerService from 'services/indexer'
 
-// Handle channel messages from neuron react UI renderer process and user actions.
+export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
+// Handle channel messages from renderer process and user actions.
 export default class ApiController {
-  private walletsController = new WalletsController()
-  private transactionsController = new TransactionsController()
-  private daoController = new DaoController()
-  private networksController = new NetworksController()
-  private signAndVerifyController = new SignMessageController()
-  private customizedAssetsController = new CustomizedAssetsController()
-  private assetAccountController = new AssetAccountController()
-  private anyoneCanPayController = new AnyoneCanPayController()
-  private hardwareController = new HardwareController()
-  private offlineSignController = new OfflineSignController()
-  private sudtController = new SUDTController()
+  #walletsController = new WalletsController()
+  #transactionsController = new TransactionsController()
+  #daoController = new DaoController()
+  #networksController = new NetworksController()
+  #signAndVerifyController = new SignMessageController()
+  #customizedAssetsController = new CustomizedAssetsController()
+  #assetAccountController = new AssetAccountController()
+  #anyoneCanPayController = new AnyoneCanPayController()
+  #hardwareController = new HardwareController()
+  #offlineSignController = new OfflineSignController()
+  #sudtController = new SUDTController()
 
   public async mount() {
-    this.registerHandlers()
+    this.#registerHandlers()
 
-    await this.networksController.start()
+    await this.#networksController.start()
   }
 
-  public runCommand(command: string, params: string) {
-    if (command === 'export-xpubkey') {
-      this.walletsController.exportXPubkey(params)
-    }
+  public runCommand(command: Command, params: string) {
+    switch (command) {
+      case 'export-xpubkey': {
+        // export xpubkey with wallet id
+        this.#walletsController.exportXPubkey(params)
+        break
+      }
+      case 'import-xpubkey': {
+        this.#walletsController.importXPubkey()
+          .catch(error => { dialog.showMessageBox({ type: 'error', buttons: [], message: error.message }) })
+        break
+      }
+      case 'delete-wallet':
+      case 'backup-wallet': {
+        // delete/backup wallet with wallet id
+        this.#walletsController.requestPassword(params, command)
+        break
 
-    if (command === 'import-xpubkey') {
-      this.walletsController.importXPubkey().catch(error => {
-        dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
-      })
-    }
-
-    if (command === 'delete-wallet' || command === 'backup-wallet') {
-      // params: walletID
-      this.walletsController.requestPassword(params, command)
-    }
-
-    if (command === 'migrate-acp') {
-      this.assetAccountController.showACPMigrationDialog(false)
+      }
+      case 'migrate-acp': {
+        this.#assetAccountController.showACPMigrationDialog(false)
+        break
+      }
+      default: {
+        logger.error(`API Controller:\treceive invalid command "${command}" with params "${params}"`)
+      }
     }
   }
 
-  private registerHandlers() {
-    const handle = this.handleChannel
+  #registerHandlers = () => {
+    const handle = this.#handleChannel
 
     // sync messages
     ipcMain.on('get-locale', e => {
@@ -108,7 +118,7 @@ export default class ApiController {
       }
     })
 
-    handle('show-error-message', async (_, { title = '',  content = '' } ) => {
+    handle('show-error-message', async (_, { title = '', content = '' }) => {
       dialog.showErrorBox(title, content)
     })
 
@@ -156,16 +166,9 @@ export default class ApiController {
       ] = await Promise.all([
         networksService.getCurrentID(),
         networksService.getAll(),
-
-        new SyncController().currentBlockNumber()
-          .then(res => {
-            if (res.status) {
-              return res.result.currentBlockNumber
-            }
-            return '0'
-          })
-          .catch(() => '0'),
-
+        new SyncedBlockNumber().getNextBlock().then(
+          blockNumber => blockNumber.toString()
+        ).catch(() => '0'),
         new Promise(resolve => {
           ConnectionStatusSubject.pipe(take(1)).subscribe(
             status => { resolve(status) },
@@ -176,16 +179,16 @@ export default class ApiController {
       ])
 
       const addresses: Controller.Address[] = await (currentWallet
-        ? this.walletsController.getAllAddresses(currentWallet.id).then(res => res.result)
+        ? this.#walletsController.getAllAddresses(currentWallet.id).then(res => res.result)
         : [])
 
       const transactions = currentWallet
-        ? await this.transactionsController.getAll({
-            pageNo: 1,
-            pageSize: 15,
-            keywords: '',
-            walletID: currentWallet.id,
-          }).then(res => res.result)
+        ? await this.#transactionsController.getAll({
+          pageNo: 1,
+          pageSize: 15,
+          keywords: '',
+          walletID: currentWallet.id,
+        }).then(res => res.result)
         : []
 
       const initState = {
@@ -219,89 +222,89 @@ export default class ApiController {
     // Wallets
 
     handle('get-all-wallets', async () => {
-      return this.walletsController.getAll()
+      return this.#walletsController.getAll()
     })
 
     handle('get-current-wallet', async () => {
-      return this.walletsController.getCurrent()
+      return this.#walletsController.getCurrent()
     })
 
     handle('set-current-wallet', async (_, id: string) => {
-      return this.walletsController.activate(id)
+      return this.#walletsController.activate(id)
     })
 
     handle('import-mnemonic', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return this.walletsController.importMnemonic(params)
+      return this.#walletsController.importMnemonic(params)
     })
 
     handle('import-keystore', async (_, params: { name: string; password: string; keystorePath: string }) => {
-      return this.walletsController.importKeystore(params)
+      return this.#walletsController.importKeystore(params)
     })
 
     handle('create-wallet', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return this.walletsController.create(params)
+      return this.#walletsController.create(params)
     })
 
     handle('update-wallet', async (_, params: { id: string; password: string; name: string; newPassword?: string }) => {
-      return this.walletsController.update(params)
+      return this.#walletsController.update(params)
     })
 
     handle('delete-wallet', async (_, { id = '', password = '' }) => {
-      return this.walletsController.delete({ id, password })
+      return this.#walletsController.delete({ id, password })
     })
 
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
-      return this.walletsController.backup({ id, password })
+      return this.#walletsController.backup({ id, password })
     })
 
     handle('export-xpubkey', async (_, id: string) => {
-      return this.walletsController.exportXPubkey(id)
+      return this.#walletsController.exportXPubkey(id)
     })
 
     handle('get-all-addresses', async (_, id: string) => {
-      return this.walletsController.getAllAddresses(id)
+      return this.#walletsController.getAllAddresses(id)
     })
 
     handle('update-address-description', async (_, params: { walletID: string, address: string, description: string }) => {
-      return this.walletsController.updateAddressDescription(params)
+      return this.#walletsController.updateAddressDescription(params)
     })
 
     handle('request-password', async (_, { walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) => {
-      this.walletsController.requestPassword(walletID, action)
+      this.#walletsController.requestPassword(walletID, action)
     })
 
     handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string }) => {
-      return this.walletsController.sendTx(params)
+      return this.#walletsController.sendTx(params)
     })
 
     handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return this.walletsController.generateTx(params)
+      return this.#walletsController.generateTx(params)
     })
 
     handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return this.walletsController.generateSendingAllTx(params)
+      return this.#walletsController.generateSendingAllTx(params)
     })
 
     handle('generate-mnemonic', async () => {
-      return this.walletsController.generateMnemonic()
+      return this.#walletsController.generateMnemonic()
     })
 
     handle('validate-mnemonic', async (_, mnemonic: string) => {
-      return this.walletsController.validateMnemonic(mnemonic)
+      return this.#walletsController.validateMnemonic(mnemonic)
     })
 
     // Transactions
 
     handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
-      return this.transactionsController.getAll(params)
+      return this.#transactionsController.getAll(params)
     })
 
     handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
-      return this.transactionsController.get(walletID, hash)
+      return this.#transactionsController.get(walletID, hash)
     })
 
     handle('update-transaction-description', async (_, params: { walletID: string; hash: string; description: string }) => {
-      return this.transactionsController.updateDescription(params)
+      return this.#transactionsController.updateDescription(params)
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
@@ -311,68 +314,68 @@ export default class ApiController {
     })
 
     handle('export-transactions', async (_, params: { walletID: string }) => {
-      return this.transactionsController.exportTransactions(params)
+      return this.#transactionsController.exportTransactions(params)
     })
 
     // Dao
 
     handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {
-      return this.daoController.getDaoCells(params)
+      return this.#daoController.getDaoCells(params)
     })
 
     handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
-      return this.daoController.generateDepositTx(params)
+      return this.#daoController.generateDepositTx(params)
     })
 
     handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
-      return this.daoController.generateDepositAllTx(params)
+      return this.#daoController.generateDepositAllTx(params)
     })
 
     handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
-      return this.daoController.startWithdrawFromDao(params)
+      return this.#daoController.startWithdrawFromDao(params)
     })
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
-      return this.daoController.withdrawFromDao(params)
+      return this.#daoController.withdrawFromDao(params)
     });
 
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
-      return this.customizedAssetsController.getCustomizedAssetCells(params)
+      return this.#customizedAssetsController.getCustomizedAssetCells(params)
     })
 
     handle('generate-withdraw-customized-cell-tx', async (_, params: Controller.Params.GenerateWithdrawCustomizedCellTxParams) => {
-      return this.customizedAssetsController.generateWithdrawCustomizedCellTx(params)
+      return this.#customizedAssetsController.generateWithdrawCustomizedCellTx(params)
     })
 
     handle('generate-transfer-nft-tx', async (_, params: Controller.Params.GenerateTransferNftTxParams) => {
-      return this.customizedAssetsController.generateTransferNftTx(params)
+      return this.#customizedAssetsController.generateTransferNftTx(params)
     })
 
     // Networks
 
     handle('get-all-networks', async () => {
-      return this.networksController.getAll()
+      return this.#networksController.getAll()
     })
 
     handle('create-network', async (_, { name, remote, type = NetworkType.Normal }: Network) => {
-      return this.networksController.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
+      return this.#networksController.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
     })
 
     handle('update-network', async (_, { networkID, options }: { networkID: string, options: Partial<Network> }) => {
-      return this.networksController.update(networkID, options)
+      return this.#networksController.update(networkID, options)
     })
 
     handle('get-current-network-id', async () => {
-      return this.networksController.currentID()
+      return this.#networksController.currentID()
     })
 
     handle('set-current-network-id', async (_, id: string) => {
-      return this.networksController.activate(id)
+      return this.#networksController.activate(id)
     })
 
     handle('delete-network', async (_, id: string) => {
-      return this.networksController.delete(id)
+      return this.#networksController.delete(id)
     })
 
     // Updater
@@ -395,159 +398,160 @@ export default class ApiController {
       showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: 900 })
     })
 
-    handle('clear-cache', async (_, params: {resetIndexerData: boolean } | null) => {
-      return new SyncController().clearCache(params?.resetIndexerData)
+    handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
+      await IndexerService.clearCache(params?.resetIndexerData)
+      return { status: ResponseCode.Success, result: true }
     })
-
     // Sign and Verify
     handle('sign-message', async (_, params: Controller.Params.SignParams) => {
-      return this.signAndVerifyController.sign(params)
+      return this.#signAndVerifyController.sign(params)
     })
 
     handle('verify-signature', async (_, params: Controller.Params.VerifyParams) => {
-      return this.signAndVerifyController.verify(params)
+      return this.#signAndVerifyController.verify(params)
     })
 
     // sUDT
 
     handle('get-anyone-can-pay-script', () => {
-      return this.anyoneCanPayController.getScript()
+      return this.#anyoneCanPayController.getScript()
     })
 
     handle('get-token-info-list', () => {
-      return this.assetAccountController.getTokenInfoList()
+      return this.#assetAccountController.getTokenInfoList()
     })
 
     handle('generate-create-asset-account-tx', async (_, params: GenerateCreateAssetAccountTxParams) => {
-      return this.assetAccountController.generateCreateTx(params)
+      return this.#assetAccountController.generateCreateTx(params)
     })
 
     handle('send-create-asset-account-tx', async (_, params: SendCreateAssetAccountTxParams) => {
-      return this.assetAccountController.sendCreateTx(params)
+      return this.#assetAccountController.sendCreateTx(params)
     })
 
     handle('update-asset-account', async (_, params: UpdateAssetAccountParams) => {
-      return this.assetAccountController.update(params)
+      return this.#assetAccountController.update(params)
     })
 
     handle('asset-accounts', async (_, params: { walletID: string }) => {
-      return this.assetAccountController.getAll(params)
+      return this.#assetAccountController.getAll(params)
     })
 
     handle("get-asset-account", async (_, params: { walletID: string, id: number }) => {
-      return this.assetAccountController.getAccount(params)
+      return this.#assetAccountController.getAccount(params)
     })
 
     handle('check-migrate-acp', async () => {
       const allowMultipleOpen = true
-      return this.assetAccountController.showACPMigrationDialog(allowMultipleOpen)
+      return this.#assetAccountController.showACPMigrationDialog(allowMultipleOpen)
     })
 
     handle('migrate-acp', async (_, params: MigrateACPParams) => {
-      return this.assetAccountController.migrateAcp(params)
+      return this.#assetAccountController.migrateAcp(params)
     })
 
     handle('generate-create-cheque-tx', async (_, params: GenerateCreateChequeTxParams) => {
-      return this.assetAccountController.generateCreateChequeTx(params)
+      return this.#assetAccountController.generateCreateChequeTx(params)
     })
 
     handle('generate-claim-cheque-tx', async (_, params: GenerateClaimChequeTxParams) => {
-      return this.assetAccountController.generateClaimChequeTx(params)
+      return this.#assetAccountController.generateClaimChequeTx(params)
     })
 
     handle('generate-withdraw-cheque-tx', async (_, params: GenerateWithdrawChequeTxParams) => {
-      return this.assetAccountController.generateWithdrawChequeTx(params)
+      return this.#assetAccountController.generateWithdrawChequeTx(params)
     })
 
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {
-      return this.anyoneCanPayController.generateTx(params)
+      return this.#anyoneCanPayController.generateTx(params)
     })
 
     handle('generate-send-all-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayAllTxParams) => {
-      return this.anyoneCanPayController.generateSendAllTx(params)
+      return this.#anyoneCanPayController.generateSendAllTx(params)
     })
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
-      return this.anyoneCanPayController.sendTx(params)
+      return this.#anyoneCanPayController.sendTx(params)
     })
 
-    handle('get-sudt-token-info', async (_, params: { tokenID: string })=>{
-      return this.sudtController.getSUDTTokenInfo(params)
+    handle('get-sudt-token-info', async (_, params: { tokenID: string }) => {
+      return this.#sudtController.getSUDTTokenInfo(params)
     })
 
-    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number })=>{
-      return this.assetAccountController.destoryCKBAssetAccount(params)
+    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number }) => {
+      return this.#assetAccountController.destoryCKBAssetAccount(params)
     })
 
     // Hardware wallet
     handle('connect-device', async (_, deviceInfo: DeviceInfo) => {
-      await this.hardwareController.connectDevice(deviceInfo)
+      await this.#hardwareController.connectDevice(deviceInfo)
     })
 
     handle('detect-device', async (_, model: Pick<DeviceInfo, 'manufacturer' | 'product'>) => {
-      return this.hardwareController.detectDevice(model)
+      return this.#hardwareController.detectDevice(model)
     })
 
     handle('get-device-ckb-app-version', async () => {
-      return this.hardwareController.getCkbAppVersion()
+      return this.#hardwareController.getCkbAppVersion()
     })
 
     handle('get-device-firmware-version', async () => {
-      return this.hardwareController.getFirmwareVersion()
+      return this.#hardwareController.getFirmwareVersion()
     })
 
     handle('get-device-extended-public-key', async () => {
-      return this.hardwareController.getExtendedPublicKey()
+      return this.#hardwareController.getExtendedPublicKey()
     })
 
     handle('get-device-public-key', async () => {
-      return this.hardwareController.getPublicKey()
+      return this.#hardwareController.getPublicKey()
     })
 
     handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
-      return await this.walletsController.importHardwareWallet(params)
+      return await this.#walletsController.importHardwareWallet(params)
     })
 
     // Offline sign
     handle('export-transaction-as-json', async (_, params) => {
-      return this.offlineSignController.exportTransactionAsJSON(params)
+      return this.#offlineSignController.exportTransactionAsJSON(params)
     })
 
     handle('sign-transaction-only', async (_, params) => {
-      return this.offlineSignController.signTransaction(params)
+      return this.#offlineSignController.signTransaction(params)
     })
 
     handle('broadcast-transaction-only', async (_, params) => {
-      return this.offlineSignController.broadcastTransaction(params)
+      return this.#offlineSignController.broadcastTransaction(params)
     })
 
     handle('sign-and-export-transaction', async (_, params) => {
-      return this.offlineSignController.signAndExportTransaction(params)
+      return this.#offlineSignController.signAndExportTransaction(params)
     })
   }
 
   // Register handler, warp and serialize API response
-  static NODE_DISCONNECTED_CODE = 104
-  private handleChannel(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)) {
+  #handleChannel = (channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)) => {
     ipcMain.handle(channel, async (event, args) => {
       try {
         const res = await listener(event, args)
         // All objects, array, class instance need to be serialized before sent to the IPC
-        if (typeof res === 'object') {
-          return JSON.parse(JSON.stringify(res))
-        }
-        return res
+        return typeof res === 'object' ? JSON.parse(JSON.stringify(res)) : res
       } catch (err) {
-        logger.warn(`channel handling error: ${err}`, err.stack)
+        logger.warn(`API Controller:\tchannel handling error: ${err}`, err.stack)
 
         if (err.code === 'ECONNREFUSED') {
-          err.code = ApiController.NODE_DISCONNECTED_CODE
+          const NODE_DISCONNECTED_CODE = 104
+          err.code = NODE_DISCONNECTED_CODE
         }
-        const res = {
+
+        if (!Number.isNaN(err.message?.code)) {
+          err.code = err.message.code
+        }
+
+        return {
           status: err.code || ResponseCode.Fail,
           message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
         }
-        return res
       }
     })
   }

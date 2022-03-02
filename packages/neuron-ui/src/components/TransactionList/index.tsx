@@ -145,6 +145,7 @@ const TransactionList = ({
         let value = '--'
         let amount = '--'
         let typeLabel = '--'
+        let sudtAmount = ''
 
         if (tx.nftInfo) {
           name = walletName
@@ -158,9 +159,8 @@ const TransactionList = ({
           value = tx.sudtInfo.amount
 
           if (tx.sudtInfo.sUDT.decimal) {
-            amount = `${sUDTAmountFormatter(sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal, true))} ${
-              tx.sudtInfo.sUDT.symbol
-            }`
+            sudtAmount = sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal, true)
+            amount = `${sUDTAmountFormatter(sudtAmount)} ${tx.sudtInfo.sUDT.symbol}`
           }
         } else {
           name = walletName
@@ -203,7 +203,7 @@ const TransactionList = ({
                 )}
               </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <CopyZone className={styles.amount} content={amount.replace(/[^\d\\.+-]/g, '')}>
+              <CopyZone className={styles.amount} content={(sudtAmount || amount).replace(/[^\d\\.+-]/g, '')}>
                 {amount}
               </CopyZone>
               <span className={styles.type} title={typeLabel}>

@@ -17,7 +17,7 @@ export default class FileService {
   // get fileBasePath value from child_process.fork() env
   public basePath = process.env['fileBasePath'] ?? env.fileBasePath
 
-  public config = {
+  public config: fs.WriteFileOptions = {
     encoding: 'utf8',
   }
 
@@ -48,11 +48,11 @@ export default class FileService {
     return fs.existsSync(path.join(this.basePath, moduleName, filename))
   }
 
-  public readFileSync = (moduleName: string, filename: string) => {
+  public readFileSync = (moduleName: string, filename: string): string => {
     if (!this.hasFile(moduleName, filename)) {
       throw new FileNotFound(filename)
     }
-    return fs.readFileSync(path.join(this.basePath, moduleName, filename), this.config)
+    return fs.readFileSync(path.join(this.basePath, moduleName, filename), this.config) as string
   }
 
   public writeFileSync = (moduleName: string, filename: string, data: string) => {

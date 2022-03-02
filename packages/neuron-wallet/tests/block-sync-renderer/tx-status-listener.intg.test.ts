@@ -4,13 +4,20 @@ import mockedTransactions from '../setupAndTeardown/transactions.fixture'
 import { TransactionStatus } from '../../src/models/chain/transaction'
 import TransactionPersistor from '../../src/services/tx/transaction-persistor'
 import { OutputStatus } from '../../src/models/chain/output'
-import TxStatus, {TxStatusType} from '../../src/models/chain/tx-status'
+import TxStatus, { TxStatusType } from '../../src/models/chain/tx-status'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 
 const stubbedRPCServiceConstructor = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
 const stubbedRxJsIntervalFn = jest.fn()
+
+jest.doMock('models/subjects/address-created-subject', () => ({
+  getSubject: jest.fn().mockImplementation(() => ({ subscribe: jest.fn }))
+}))
+jest.doMock('models/subjects/wallet-deleted-subject', () => ({
+  getSubject: jest.fn().mockImplementation(() => ({ subscribe: jest.fn() }))
+}))
 
 const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
@@ -37,7 +44,7 @@ jest.doMock('rxjs', () => {
   }
 });
 
-const {register} = require('../../src/block-sync-renderer/tx-status-listener')
+const { register } = require('../../src/block-sync-renderer/tx-status-listener')
 
 describe('', () => {
   beforeAll(async () => {
