@@ -544,7 +544,7 @@ export default class TransactionSender {
     withdrawBlockHash: string
   ): Promise<bigint> => {
     const { ckb } = NodeService.getInstance()
-    const result = await ckb.rpc.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
+    const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
 
     return BigInt(result)
   }

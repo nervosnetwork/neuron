@@ -2696,40 +2696,40 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nervosnetwork/ckb-sdk-core@0.101.0":
-  version "0.101.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.101.0.tgz#2168869938e46f19a7f5b82ecdf0cb1c8ddc66a6"
-  integrity sha512-6vaYReSljgWiWhkzEMxKyV+utJnECzrWZW2817N1rQzWLYGeF/1yBKPNM4s34rglo14/Ktz8JcTAiebQCwM42g==
+"@nervosnetwork/ckb-sdk-core@0.102.2":
+  version "0.102.2"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.102.2.tgz#6ab1303f1687dd12c0273f91fd6744ed51b0347b"
+  integrity sha512-jvu1Hk5HYfAXbd78AvhUUtJmAVH/oa0RqceIqGQO5mu1hLiMDgjpOfV3p8FDaeqmh3MSPbPM2M2DtO3rGmZftg==
   dependencies:
-    "@nervosnetwork/ckb-sdk-rpc" "0.101.0"
-    "@nervosnetwork/ckb-sdk-utils" "0.101.0"
-    "@nervosnetwork/ckb-types" "0.101.0"
+    "@nervosnetwork/ckb-sdk-rpc" "0.102.2"
+    "@nervosnetwork/ckb-sdk-utils" "0.102.2"
+    "@nervosnetwork/ckb-types" "0.102.2"
     tslib "2.3.1"
 
-"@nervosnetwork/ckb-sdk-rpc@0.101.0":
-  version "0.101.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.101.0.tgz#aa8d6b25b66306e6d1dc21cf7a9c01ddc1f8aa2a"
-  integrity sha512-7cO0BpKGL1ujO5yj6GZ3hDXpnDpOlgIDdTUc5Cs776+6nH+Amb3xfRvk6Jn3PlCzpHBQ4KD80BezCdaxeBLJdg==
+"@nervosnetwork/ckb-sdk-rpc@0.102.2":
+  version "0.102.2"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.102.2.tgz#0de07cb2683fb6ae9db7478e9bfe6b1971ed2658"
+  integrity sha512-IhLsqsHb1RMsNJh9GBoSQgsIEIGYu2ch6SwsrxNN1+Qr33PlImr2WDfM42qIvZazZJUH9ssldAZmABy2xrgf5g==
   dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.101.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.102.2"
     axios "0.21.4"
     tslib "2.3.1"
 
-"@nervosnetwork/ckb-sdk-utils@0.101.0":
-  version "0.101.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.101.0.tgz#f51b6dc6df9299544217984c2c3e29e09d050c60"
-  integrity sha512-1Cm66rQ8XawavZ69TjMiPRECzX77ndRf8DPUskn0QXyy9YU9bDGNSWVgIBnt0T5Nxl4Y+itAWFukltoEWpzU3A==
+"@nervosnetwork/ckb-sdk-utils@0.102.2":
+  version "0.102.2"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.102.2.tgz#726285d1345b25fa15762aa483ca0b3349944cf1"
+  integrity sha512-s+KKS6J9V4SWAApSkBCWiGWSo1aybm0v2LSCP2lAF/IhzhCb/BWR2ZMOMoBBFaA9GCEsoZYXpQBG1o1XgGPo/w==
   dependencies:
-    "@nervosnetwork/ckb-types" "0.101.0"
+    "@nervosnetwork/ckb-types" "0.102.2"
     bech32 "2.0.0"
     elliptic "6.5.4"
     jsbi "3.1.3"
     tslib "2.3.1"
 
-"@nervosnetwork/ckb-types@0.101.0":
-  version "0.101.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.101.0.tgz#84c5f590bd8e2e06fdf56bab0c09995da0ada4ca"
-  integrity sha512-J82ANP44TvdYY1fCEom9RodMIFJYCb2oteSCU1TD9bY3tZZFrhRi+Muz0qh6f9wrR5F3NzdXQD8wJoPZ3Exr9Q==
+"@nervosnetwork/ckb-types@0.102.2":
+  version "0.102.2"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.102.2.tgz#6f781419b0e837356ab63fec116031c4dcf40998"
+  integrity sha512-bnocHxyKs2cHQPJGlICJO4S5tAnPoQCGTlo0TefI6x1am7FXJoxNyS2djmmOTFnDFdMy4BhH3WsIaAmhT1TT9w==
 
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"

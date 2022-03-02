@@ -44,7 +44,7 @@
   ],
   "dependencies": {
     "primereact": "7.1.0",
-    "@nervosnetwork/ckb-sdk-core": "0.101.0",
+    "@nervosnetwork/ckb-sdk-core": "0.102.2",
     "@uifabric/experiments": "7.42.4",
     "@uifabric/styling": "7.20.0",
     "canvg": "2.0.0",
