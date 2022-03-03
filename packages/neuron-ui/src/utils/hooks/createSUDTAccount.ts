@@ -1,7 +1,8 @@
 import { useEffect, useCallback } from 'react'
 import { AccountType, TokenInfo } from 'components/SUDTCreateDialog'
 import { AppActions, StateAction } from 'states'
-import { generateCreateSUDTAccountTransaction } from 'services/remote'
+import { generateCreateSUDTAccountTransaction, openExternal, getSUDTTypeScriptHash } from 'services/remote'
+import { getExplorerUrl } from 'utils'
 import { ErrorCode } from '../enums'
 import { isSuccessResponse } from '../is'
 import {
@@ -113,4 +114,15 @@ export const useOnGenerateNewAccountTransaction = ({
     [onGenerated, walletId, dispatch]
   )
 
-export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction }
+export const useOpenSUDTTokenUrl = (tokenID: string, isMainnet?: boolean) =>
+  useCallback(() => {
+    if (tokenID) {
+      getSUDTTypeScriptHash({ tokenID }).then(res => {
+        if (isSuccessResponse(res) && res.result) {
+          openExternal(`${getExplorerUrl(isMainnet)}/sudt/${res.result}`)
+        }
+      })
+    }
+  }, [isMainnet, tokenID])
+
+export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction, useOpenSUDTTokenUrl }
