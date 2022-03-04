@@ -203,6 +203,7 @@ const SUDTAccountList = () => {
   const updateDialogProps: SUDTUpdateDialogProps | undefined = accountToUpdate
     ? {
         ...accountToUpdate,
+        isMainnet,
         accountName: accountToUpdate.accountName || DEFAULT_SUDT_FIELDS.accountName,
         tokenName: accountToUpdate.tokenName || DEFAULT_SUDT_FIELDS.tokenName,
         symbol: accountToUpdate.symbol || DEFAULT_SUDT_FIELDS.symbol,
@@ -297,6 +298,7 @@ const SUDTAccountList = () => {
           }}
           existingAccountNames={existingAccountNames}
           insufficient={insufficient}
+          isMainnet={isMainnet}
         />
       ) : null}
     </div>

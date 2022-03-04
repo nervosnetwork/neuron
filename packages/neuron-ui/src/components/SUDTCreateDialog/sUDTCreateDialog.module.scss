@@ -92,3 +92,17 @@
     }
   }
 }
+
+.explorerNavButton {
+  height: 24px;
+  font-size: 12px;
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  padding: 4px;
+  background-color: var(--nervos-green);
+
+  &:hover {
+    background-color: #21b574;
+  }
+}

@@ -2,7 +2,7 @@ import React, { useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { useSUDTAccountInfoErrors } from 'utils/hooks'
+import { useSUDTAccountInfoErrors, useOpenSUDTTokenUrl } from 'utils/hooks'
 import styles from './sUDTUpdateDialog.module.scss'
 
 export interface BasicInfo {
@@ -19,6 +19,7 @@ export interface TokenInfo extends BasicInfo {
 }
 
 export interface SUDTUpdateDialogProps extends TokenInfo {
+  isMainnet: boolean
   onSubmit: (info: Omit<TokenInfo, 'isCKB'>) => Promise<boolean>
   onCancel: () => void
   existingAccountNames: string[]
@@ -67,6 +68,7 @@ const reducer: React.Reducer<
 }
 
 const SUDTUpdateDialog = ({
+  isMainnet,
   accountName = '',
   accountId = '',
   tokenName = '',
@@ -104,6 +106,7 @@ const SUDTUpdateDialog = ({
       onSubmit({ ...info, accountName: info.accountName.trim(), tokenName: info.tokenName.trim(), accountId })
     }
   }
+  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet)
 
   return (
     <div className={styles.container}>
@@ -128,6 +131,16 @@ const SUDTUpdateDialog = ({
               />
             )
           })}
+          {!isCKB && !tokenErrors.tokenId && info.tokenId && (
+            <button
+              type="button"
+              className={styles.explorerNavButton}
+              title={t('history.view-in-explorer-button-title')}
+              onClick={openSUDTTokenUrl}
+            >
+              {t('history.view-in-explorer-button-title')}
+            </button>
+          )}
           <div className={styles.footer}>
             <Button type="cancel" label={t('s-udt.update-dialog.cancel')} onClick={onCancel} />
             <Button
