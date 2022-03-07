@@ -69,6 +69,7 @@ declare namespace Controller {
 
   interface GenerateDepositAllTransactionParams {
     walletID: string
+    isBalanceReserved: boolean
     feeRate: string
   }
 
