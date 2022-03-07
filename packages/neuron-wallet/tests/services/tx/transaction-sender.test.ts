@@ -220,9 +220,9 @@ describe('TransactionSender Test', () => {
 
     //@ts-ignore
     NodeService.getInstance().ckb.rpc = {
-      calculateDaoMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
       sendTransaction: stubbedSendTransaction
     }
+    NodeService.getInstance().ckb.calculateDaoMaximumWithdraw = stubbedCalculateDaoMaximumWithdraw
   })
 
   describe('sign', () => {
