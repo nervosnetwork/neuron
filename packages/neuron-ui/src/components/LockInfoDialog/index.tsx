@@ -1,16 +1,18 @@
 import { useTranslation } from 'react-i18next'
 import React, { useRef } from 'react'
 import Button from 'widgets/Button'
-import { useDialog } from '../../utils'
+import CopyZone from 'widgets/CopyZone'
+import { useDialog } from 'utils'
 import styles from './lockInfoDialog.module.scss'
 
 interface LockInfoDialog {
   show: boolean
   lockInfo: CKBComponents.Script | null
+  newAddress: string
   onDismiss: () => void
 }
 
-const LockInfoDialog = ({ show, lockInfo, onDismiss }: LockInfoDialog) => {
+const LockInfoDialog = ({ show, lockInfo, newAddress, onDismiss }: LockInfoDialog) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show, dialogRef, onClose: onDismiss })
@@ -47,6 +49,14 @@ const LockInfoDialog = ({ show, lockInfo, onDismiss }: LockInfoDialog) => {
               </li>
             </ul>
           )}
+        </div>
+        <h2 title={t('transaction.lock-script`')} className={styles.title}>
+          {t('transaction.new-address')}
+        </h2>
+        <div className={styles.newAddress}>
+          <CopyZone content={newAddress} name={t('history.copy-address')}>
+            {newAddress}
+          </CopyZone>
         </div>
         <div className={styles.footer}>
           <Button type="cancel" onClick={onDismiss} label={t('common.close')} />

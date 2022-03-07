@@ -270,7 +270,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "cell-from-cellbase": "来自 Cellbase",
-      "lock-script": "锁脚本"
+      "lock-script": "锁脚本",
+      "new-address": "新地址"
     },
     "addresses": {
       "title": "地址簿",

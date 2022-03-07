@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, scriptToAddress as lockScriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { transactionState } from 'states'
 import LockInfoDialog from 'components/LockInfoDialog'
 import Tag from 'components/Tag'
@@ -37,6 +37,7 @@ const Transaction = () => {
   const [error, setError] = useState({ code: '', message: '' })
   const [showLockInfoDialog, setShowLockInfoDialog] = useState(false)
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
+  const [newAddress, setNewAddress] = useState<string>('')
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -136,13 +137,15 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
-  const onTagClicked = (lock: CKBComponents.Script) => {
+  const onTagClicked = (lockScript: CKBComponents.Script, address: string) => {
     setShowLockInfoDialog(true)
-    setLockInfo(lock)
+    setLockInfo(lockScript)
+    setNewAddress(address)
   }
 
   const renderTag = (address: string) => {
-    const lock = addressToScript(address)
+    const lockScript = addressToScript(address)
+    const newAdd = lockScriptToAddress(lockScript, isMainnet)
     const foundLock = [
       MultiSigLockInfo,
       DefaultLockInfo,
@@ -152,9 +155,9 @@ const Transaction = () => {
       ChequeLockInfoOnLina,
     ].find(
       info =>
-        lock.codeHash === info.CodeHash &&
-        lock.hashType === info.HashType &&
-        info.ArgsLen.split(',').includes(`${(lock.args.length - 2) / 2}`)
+        lockScript.codeHash === info.CodeHash &&
+        lockScript.hashType === info.HashType &&
+        info.ArgsLen.split(',').includes(`${(lockScript.args.length - 2) / 2}`)
     )
 
     if (!foundLock) {
@@ -162,14 +165,19 @@ const Transaction = () => {
     }
     return (
       <div className={styles.tagWrap}>
-        <Tag text={foundLock?.TagName} onClick={() => onTagClicked(lock)} />
+        <Tag text={foundLock?.TagName} onClick={() => onTagClicked(lockScript, newAdd)} />
       </div>
     )
   }
 
   const MemoizedDepositDialog = useMemo(() => {
     return (
-      <LockInfoDialog show={showLockInfoDialog} lockInfo={lockInfo} onDismiss={() => setShowLockInfoDialog(false)} />
+      <LockInfoDialog
+        show={showLockInfoDialog}
+        lockInfo={lockInfo}
+        newAddress={newAddress}
+        onDismiss={() => setShowLockInfoDialog(false)}
+      />
     )
   }, [showLockInfoDialog])
 

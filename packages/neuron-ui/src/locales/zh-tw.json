@@ -270,7 +270,8 @@
       "inputs": "輸入",
       "outputs": "輸出",
       "cell-from-cellbase": "來自 Cellbase",
-      "lock-script": "鎖腳本"
+      "lock-script": "鎖腳本",
+      "new-address": "新地址"
     },
     "addresses": {
       "title": "地址簿",
