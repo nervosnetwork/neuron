@@ -276,7 +276,8 @@
       "amount": "Amount",
       "inputs": "Inputs",
       "outputs": "Outputs",
-      "cell-from-cellbase": "From cellbase"
+      "cell-from-cellbase": "From cellbase",
+      "lock-script": "Lock Script"
     },
     "addresses": {
       "title": "Address Book",

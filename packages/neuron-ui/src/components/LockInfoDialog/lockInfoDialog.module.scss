@@ -1,0 +1,52 @@
+@import '../../styles/mixin.scss';
+
+.dialog {
+  @include dialog-container;
+  padding: 0;
+
+  &::backdrop {
+    @include overlay;
+  }
+}
+
+.container {
+  padding: 30px 50px;
+}
+
+.title {
+  font-weight: 900;
+  font-size: 1.125rem;
+}
+
+.infoWrap {
+  padding: 20px;
+  border-radius: 6px;
+  background-color: rgb(249, 249, 249);
+
+  li:not(:first-child) {
+    margin-top: 10px;
+  }
+
+  li {
+    display: flex;
+
+    > div:first-child {
+      width: 96px;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+
+    > div:last-child {
+      flex: 1;
+      word-break: break-all;
+    }
+  }
+}
+
+.footer {
+  @include dialog-footer;
+
+  button:last-of-type {
+    margin-left: 9px;
+  }
+}

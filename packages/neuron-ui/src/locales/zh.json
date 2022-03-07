@@ -269,7 +269,8 @@
       "amount": "数量",
       "inputs": "输入",
       "outputs": "输出",
-      "cell-from-cellbase": "来自 Cellbase"
+      "cell-from-cellbase": "来自 Cellbase",
+      "lock-script": "锁脚本"
     },
     "addresses": {
       "title": "地址簿",

@@ -2,8 +2,10 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
-
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { transactionState } from 'states'
+import LockInfoDialog from 'components/LockInfoDialog'
+import Tag from 'components/Tag'
 
 import {
   useOnLocaleChange,
@@ -15,6 +17,12 @@ import {
   useExitOnWalletChange,
   isSuccessResponse,
   scriptToAddress,
+  MultiSigLockInfo,
+  DefaultLockInfo,
+  AnyoneCanPayLockInfoOnAggron,
+  AnyoneCanPayLockInfoOnLina,
+  ChequeLockInfoOnAggron,
+  ChequeLockInfoOnLina,
 } from 'utils'
 import CopyZone from 'widgets/CopyZone'
 
@@ -27,6 +35,8 @@ const Transaction = () => {
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
+  const [showLockInfoDialog, setShowLockInfoDialog] = useState(false)
+  const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -126,6 +136,43 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
+  const onTagClicked = (lock: CKBComponents.Script) => {
+    setShowLockInfoDialog(true)
+    setLockInfo(lock)
+  }
+
+  const renderTag = (address: string) => {
+    const lock = addressToScript(address)
+    const foundLock = [
+      MultiSigLockInfo,
+      DefaultLockInfo,
+      AnyoneCanPayLockInfoOnAggron,
+      AnyoneCanPayLockInfoOnLina,
+      ChequeLockInfoOnAggron,
+      ChequeLockInfoOnLina,
+    ].find(
+      info =>
+        lock.codeHash === info.CodeHash &&
+        lock.hashType === info.HashType &&
+        info.ArgsLen.split(',').includes(`${(lock.args.length - 2) / 2}`)
+    )
+
+    if (!foundLock) {
+      return null
+    }
+    return (
+      <div className={styles.tagWrap}>
+        <Tag text={foundLock?.TagName} onClick={() => onTagClicked(lock)} />
+      </div>
+    )
+  }
+
+  const MemoizedDepositDialog = useMemo(() => {
+    return (
+      <LockInfoDialog show={showLockInfoDialog} lockInfo={lockInfo} onDismiss={() => setShowLockInfoDialog(false)} />
+    )
+  }, [showLockInfoDialog])
+
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>) =>
       cells.map((cell, index) => {
@@ -148,6 +195,7 @@ const Transaction = () => {
               <CopyZone content={address} name={t('history.copy-address')}>
                 {address}
               </CopyZone>
+              {renderTag(address)}
             </td>
             <td>
               <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
@@ -211,6 +259,7 @@ const Transaction = () => {
         </thead>
         <tbody>{renderList(transaction.outputs)}</tbody>
       </table>
+      {MemoizedDepositDialog}
     </div>
   )
 }

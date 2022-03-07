@@ -34,6 +34,7 @@
     height: 1.75rem;
     word-wrap: none;
     word-break: keep-all;
+
     & > div {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -63,8 +64,17 @@
   }
 
   .addressCell {
-    max-width: calc(90vw - 416px);
-    padding-right: 15px;
+    max-width: calc(90vw - 380px);
+    display: flex;
+    > div {
+      width: inherit;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .tagWrap {
+    width: 280px !important;
   }
 }
 
