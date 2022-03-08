@@ -6,16 +6,15 @@ import { useDialog } from 'utils'
 import styles from './lockInfoDialog.module.scss'
 
 interface LockInfoDialog {
-  show: boolean
   lockInfo: CKBComponents.Script | null
-  newAddress: string
+  fullVersionAddress: string
   onDismiss: () => void
 }
 
-const LockInfoDialog = ({ show, lockInfo, newAddress, onDismiss }: LockInfoDialog) => {
+const LockInfoDialog = ({ lockInfo, fullVersionAddress, onDismiss }: LockInfoDialog) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show, dialogRef, onClose: onDismiss })
+  useDialog({ show: !!lockInfo, dialogRef, onClose: onDismiss })
 
   const onDialogClicked = (e: any) => {
     if (e.target.tagName === 'DIALOG') {
@@ -23,11 +22,8 @@ const LockInfoDialog = ({ show, lockInfo, newAddress, onDismiss }: LockInfoDialo
     }
   }
 
-  if (!show) {
-    return null
-  }
   return (
-    <dialog ref={dialogRef} className={styles.dialog} onClick={e => onDialogClicked(e)}>
+    <dialog ref={dialogRef} className={styles.dialog} role="presentation" onClick={e => onDialogClicked(e)}>
       <div className={styles.container}>
         <h2 title={t('transaction.lock-script`')} className={styles.title}>
           {t('transaction.lock-script')}
@@ -51,11 +47,11 @@ const LockInfoDialog = ({ show, lockInfo, newAddress, onDismiss }: LockInfoDialo
           )}
         </div>
         <h2 title={t('transaction.lock-script`')} className={styles.title}>
-          {t('transaction.new-address')}
+          {t('transaction.full-version-address')}
         </h2>
         <div className={styles.newAddress}>
-          <CopyZone content={newAddress} name={t('history.copy-address')}>
-            {newAddress}
+          <CopyZone content={fullVersionAddress} name={t('history.copy-address')}>
+            {fullVersionAddress}
           </CopyZone>
         </div>
         <div className={styles.footer}>

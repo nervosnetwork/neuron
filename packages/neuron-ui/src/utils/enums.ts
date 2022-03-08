@@ -141,7 +141,7 @@ export enum DefaultLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x00',
   ArgsLen = '20',
-  TagName = 'secp256k1_blake160',
+  TagName = 'secp256k1/blake160',
 }
 
 export enum MultiSigLockInfo {
@@ -149,7 +149,7 @@ export enum MultiSigLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x01',
   ArgsLen = '20',
-  TagName = 'secp256k1_blake160/multi_sign',
+  TagName = 'secp256k1/multisig',
 }
 
 export enum AnyoneCanPayLockInfoOnAggron {
@@ -157,7 +157,7 @@ export enum AnyoneCanPayLockInfoOnAggron {
   HashType = 'type',
   CodeHashIndex = '0x02',
   ArgsLen = '20,21,22',
-  TagName = 'secp256k1_blake160/anyone_can_pay',
+  TagName = 'secp256k1/anyone_can_pay',
 }
 
 export enum AnyoneCanPayLockInfoOnLina {
@@ -165,7 +165,7 @@ export enum AnyoneCanPayLockInfoOnLina {
   HashType = 'type',
   CodeHashIndex = '0x02',
   ArgsLen = '20,21,22',
-  TagName = 'secp256k1_blake160/anyone_can_pay',
+  TagName = 'secp256k1/anyone_can_pay',
 }
 
 export enum ChequeLockInfoOnAggron {

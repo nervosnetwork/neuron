@@ -278,7 +278,7 @@
       "outputs": "Outputs",
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
-      "new-address": "New Address"
+      "full-version-address": "Full Version Address"
     },
     "addresses": {
       "title": "Address Book",

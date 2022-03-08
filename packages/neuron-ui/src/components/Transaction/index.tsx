@@ -35,9 +35,7 @@ const Transaction = () => {
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
-  const [showLockInfoDialog, setShowLockInfoDialog] = useState(false)
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
-  const [newAddress, setNewAddress] = useState<string>('')
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -137,24 +135,15 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
-  const onTagClicked = (lockScript: CKBComponents.Script, address: string) => {
-    setShowLockInfoDialog(true)
-    setLockInfo(lockScript)
-    setNewAddress(address)
-  }
-
   const renderTag = (address: string) => {
     const lockScript = addressToScript(address)
-    const newAdd = lockScriptToAddress(lockScript, isMainnet)
-    const foundLock = [
-      MultiSigLockInfo,
-      DefaultLockInfo,
-      AnyoneCanPayLockInfoOnAggron,
-      AnyoneCanPayLockInfoOnLina,
-      ChequeLockInfoOnAggron,
-      ChequeLockInfoOnLina,
-    ].find(
-      info =>
+    const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
+    const lockArray = isMainnet
+      ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
+      : [...commonLockArray, AnyoneCanPayLockInfoOnAggron, ChequeLockInfoOnAggron]
+    // @ts-ignore
+    const foundLock = lockArray.find(
+      (info: { CodeHash: string; HashType: string; ArgsLen: string }) =>
         lockScript.codeHash === info.CodeHash &&
         lockScript.hashType === info.HashType &&
         info.ArgsLen.split(',').includes(`${(lockScript.args.length - 2) / 2}`)
@@ -165,21 +154,20 @@ const Transaction = () => {
     }
     return (
       <div className={styles.tagWrap}>
-        <Tag text={foundLock?.TagName} onClick={() => onTagClicked(lockScript, newAdd)} />
+        <Tag text={foundLock.TagName} onClick={() => setLockInfo(lockScript)} />
       </div>
     )
   }
 
   const MemoizedDepositDialog = useMemo(() => {
+    if (!lockInfo) {
+      return null
+    }
+    const fullVersionAddress = lockScriptToAddress(lockInfo, isMainnet)
     return (
-      <LockInfoDialog
-        show={showLockInfoDialog}
-        lockInfo={lockInfo}
-        newAddress={newAddress}
-        onDismiss={() => setShowLockInfoDialog(false)}
-      />
+      <LockInfoDialog lockInfo={lockInfo} fullVersionAddress={fullVersionAddress} onDismiss={() => setLockInfo(null)} />
     )
-  }, [showLockInfoDialog])
+  }, [lockInfo])
 
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>) =>

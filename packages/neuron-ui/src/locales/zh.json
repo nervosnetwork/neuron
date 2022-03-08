@@ -271,7 +271,7 @@
       "outputs": "输出",
       "cell-from-cellbase": "来自 Cellbase",
       "lock-script": "锁脚本",
-      "new-address": "新地址"
+      "full-version-address": "完整版地址"
     },
     "addresses": {
       "title": "地址簿",
