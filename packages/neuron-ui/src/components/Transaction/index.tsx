@@ -138,10 +138,9 @@ const Transaction = () => {
   const renderTag = (address: string) => {
     const lockScript = addressToScript(address)
     const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
-    const lockArray = isMainnet
+    const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
       ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
       : [...commonLockArray, AnyoneCanPayLockInfoOnAggron, ChequeLockInfoOnAggron]
-    // @ts-ignore
     const foundLock = lockArray.find(
       (info: { CodeHash: string; HashType: string; ArgsLen: string }) =>
         lockScript.codeHash === info.CodeHash &&
