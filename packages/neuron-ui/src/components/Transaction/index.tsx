@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
-import { scriptToAddress as lockScriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { transactionState } from 'states'
 import LockInfoDialog from 'components/LockInfoDialog'
 import Tag from 'components/Tag'
@@ -36,7 +35,6 @@ const Transaction = () => {
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
-  const [currentAddress, setCurrentAddress] = useState<string>('')
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -136,12 +134,7 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
-  const onTagClicked = (lockScript: CKBComponents.Script, address: string) => {
-    setLockInfo(lockScript)
-    setCurrentAddress(address)
-  }
-
-  const renderTag = (address: string, lockScript: CKBComponents.Script) => {
+  const renderTag = (lockScript: CKBComponents.Script) => {
     const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
     const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
       ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
@@ -158,7 +151,7 @@ const Transaction = () => {
     }
     return (
       <div className={styles.tagWrap}>
-        <Tag text={foundLock.TagName} onClick={() => onTagClicked(lockScript, address)} />
+        <Tag text={foundLock.TagName} onClick={() => setLockInfo(lockScript)} />
       </div>
     )
   }
@@ -167,11 +160,7 @@ const Transaction = () => {
     if (!lockInfo) {
       return null
     }
-    let fullVersionAddress = lockScriptToAddress(lockInfo, isMainnet)
-    fullVersionAddress = fullVersionAddress === currentAddress ? '' : fullVersionAddress
-    return (
-      <LockInfoDialog lockInfo={lockInfo} fullVersionAddress={fullVersionAddress} onDismiss={() => setLockInfo(null)} />
-    )
+    return <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />
   }, [lockInfo])
 
   const renderList = useCallback(
@@ -196,7 +185,7 @@ const Transaction = () => {
               <CopyZone content={address} name={t('history.copy-address')}>
                 {address}
               </CopyZone>
-              {cell.lock && renderTag(address, cell.lock)}
+              {cell.lock && renderTag(cell.lock)}
             </td>
             <td>
               <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>

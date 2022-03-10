@@ -1,26 +1,50 @@
 import { useTranslation } from 'react-i18next'
-import React, { useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import { useDialog } from 'utils'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import styles from './lockInfoDialog.module.scss'
+import getLockSupportShortAddress from '../../utils/getLockSupportShortAddress'
 
 interface LockInfoDialog {
   lockInfo: CKBComponents.Script | null
-  fullVersionAddress: string
+  isMainnet: boolean
   onDismiss: () => void
 }
 
-const LockInfoDialog = ({ lockInfo, fullVersionAddress, onDismiss }: LockInfoDialog) => {
+const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show: !!lockInfo, dialogRef, onClose: onDismiss })
 
-  const onDialogClicked = (e: any) => {
-    if (e.target.tagName === 'DIALOG') {
-      onDismiss()
+  const onDialogClicked = useCallback(
+    (e: any) => {
+      if (e.target.tagName === 'DIALOG') {
+        onDismiss()
+      }
+    },
+    [onDismiss]
+  )
+
+  const renderFullVersionAddress = useCallback(() => {
+    if (!lockInfo || !getLockSupportShortAddress(lockInfo)) {
+      return null
     }
-  }
+    const fullVersionAddress = scriptToAddress(lockInfo, isMainnet)
+    return (
+      <>
+        <h2 title={t('transaction.full-version-address')} className={styles.title}>
+          {t('transaction.full-version-address')}
+        </h2>
+        <div className={styles.fullVersionAddress}>
+          <CopyZone content={fullVersionAddress} name={t('history.copy-address')}>
+            {fullVersionAddress}
+          </CopyZone>
+        </div>
+      </>
+    )
+  }, [lockInfo, isMainnet])
 
   return (
     <dialog ref={dialogRef} className={styles.dialog} role="presentation" onClick={e => onDialogClicked(e)}>
@@ -46,18 +70,7 @@ const LockInfoDialog = ({ lockInfo, fullVersionAddress, onDismiss }: LockInfoDia
             </ul>
           )}
         </div>
-        {fullVersionAddress && (
-          <>
-            <h2 title={t('transaction.full-version-address')} className={styles.title}>
-              {t('transaction.full-version-address')}
-            </h2>
-            <div className={styles.fullVersionAddress}>
-              <CopyZone content={fullVersionAddress} name={t('history.copy-address')}>
-                {fullVersionAddress}
-              </CopyZone>
-            </div>
-          </>
-        )}
+        {renderFullVersionAddress()}
         <div className={styles.footer}>
           <Button type="cancel" onClick={onDismiss} label={t('common.close')} />
         </div>
