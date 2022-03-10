@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
-import { addressToScript, scriptToAddress as lockScriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress as lockScriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { transactionState } from 'states'
 import LockInfoDialog from 'components/LockInfoDialog'
 import Tag from 'components/Tag'
@@ -36,6 +36,7 @@ const Transaction = () => {
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
+  const [currentAddress, setCurrentAddress] = useState<string>('')
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -135,8 +136,12 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
-  const renderTag = (address: string) => {
-    const lockScript = addressToScript(address)
+  const onTagClicked = (lockScript: CKBComponents.Script, address: string) => {
+    setLockInfo(lockScript)
+    setCurrentAddress(address)
+  }
+
+  const renderTag = (address: string, lockScript: CKBComponents.Script) => {
     const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
     const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
       ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
@@ -153,7 +158,7 @@ const Transaction = () => {
     }
     return (
       <div className={styles.tagWrap}>
-        <Tag text={foundLock.TagName} onClick={() => setLockInfo(lockScript)} />
+        <Tag text={foundLock.TagName} onClick={() => onTagClicked(lockScript, address)} />
       </div>
     )
   }
@@ -162,7 +167,8 @@ const Transaction = () => {
     if (!lockInfo) {
       return null
     }
-    const fullVersionAddress = lockScriptToAddress(lockInfo, isMainnet)
+    let fullVersionAddress = lockScriptToAddress(lockInfo, isMainnet)
+    fullVersionAddress = fullVersionAddress === currentAddress ? '' : fullVersionAddress
     return (
       <LockInfoDialog lockInfo={lockInfo} fullVersionAddress={fullVersionAddress} onDismiss={() => setLockInfo(null)} />
     )
@@ -190,7 +196,7 @@ const Transaction = () => {
               <CopyZone content={address} name={t('history.copy-address')}>
                 {address}
               </CopyZone>
-              {renderTag(address)}
+              {cell.lock && renderTag(address, cell.lock)}
             </td>
             <td>
               <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>

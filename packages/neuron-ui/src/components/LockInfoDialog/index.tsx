@@ -25,7 +25,7 @@ const LockInfoDialog = ({ lockInfo, fullVersionAddress, onDismiss }: LockInfoDia
   return (
     <dialog ref={dialogRef} className={styles.dialog} role="presentation" onClick={e => onDialogClicked(e)}>
       <div className={styles.container}>
-        <h2 title={t('transaction.lock-script`')} className={styles.title}>
+        <h2 title={t('transaction.lock-script')} className={styles.title}>
           {t('transaction.lock-script')}
         </h2>
         <div className={styles.addressDetailWrap}>
@@ -46,14 +46,18 @@ const LockInfoDialog = ({ lockInfo, fullVersionAddress, onDismiss }: LockInfoDia
             </ul>
           )}
         </div>
-        <h2 title={t('transaction.lock-script`')} className={styles.title}>
-          {t('transaction.full-version-address')}
-        </h2>
-        <div className={styles.newAddress}>
-          <CopyZone content={fullVersionAddress} name={t('history.copy-address')}>
-            {fullVersionAddress}
-          </CopyZone>
-        </div>
+        {fullVersionAddress && (
+          <>
+            <h2 title={t('transaction.full-version-address')} className={styles.title}>
+              {t('transaction.full-version-address')}
+            </h2>
+            <div className={styles.fullVersionAddress}>
+              <CopyZone content={fullVersionAddress} name={t('history.copy-address')}>
+                {fullVersionAddress}
+              </CopyZone>
+            </div>
+          </>
+        )}
         <div className={styles.footer}>
           <Button type="cancel" onClick={onDismiss} label={t('common.close')} />
         </div>
