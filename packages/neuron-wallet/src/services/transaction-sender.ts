@@ -174,7 +174,7 @@ export default class TransactionSender {
         const blake160 = addressInfos.find(
           i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160)
         )!.blake160
-        const serializedMultiSign: string = new MultiSign().serialize(blake160)
+        const serializedMultiSign: string = new MultiSign().serialize([blake160])
         signed = await TransactionSender.signSingleMultiSignScript(
           privateKey,
           serializedWitnesses,

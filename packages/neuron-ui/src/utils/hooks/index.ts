@@ -418,3 +418,16 @@ export const useGlobalNotifications = (
 export const useDidMount = (cb: () => void) => {
   useEffect(cb, [])
 }
+
+export const useForceUpdate = <T extends Function>(cb: T) => {
+  const [, update] = useState<{}>(Object.create(null))
+
+  const memoizedDispatch = useCallback(
+    (...args) => {
+      cb(...args)
+      update(Object.create(null))
+    },
+    [update, cb]
+  )
+  return memoizedDispatch
+}

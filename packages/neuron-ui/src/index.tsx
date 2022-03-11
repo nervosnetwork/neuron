@@ -13,6 +13,7 @@ import Main from 'containers/Main'
 import Settings from 'containers/Settings'
 import Transaction from 'components/Transaction'
 import SignAndVerify from 'components/SignAndVerify'
+import MultiSignAddress from 'components/MultiSignAddress'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { withProvider } from 'states'
 
@@ -20,6 +21,8 @@ if (window.location.hash.startsWith('#/transaction/')) {
   ReactDOM.render(<Transaction />, document.getElementById('root'))
 } else if (window.location.hash.startsWith('#/sign-verify/')) {
   ReactDOM.render(<SignAndVerify />, document.getElementById('root'))
+} else if (window.location.hash.startsWith('#/add-multisigsign-address/')) {
+  ReactDOM.render(<MultiSignAddress />, document.getElementById('root'))
 } else {
   const isSettings = window.location.hash.startsWith('#/settings/')
 

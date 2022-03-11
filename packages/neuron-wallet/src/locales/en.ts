@@ -36,6 +36,7 @@ export default {
       tools: {
         label: 'Tools',
         'sign-and-verify': 'Sign/Verify Message',
+        'create-multisig-address': 'Create multisig address',
         'offline-sign': 'Offline sign',
         'clear-sync-data': 'Clear all synchronized data'
       },
@@ -118,7 +119,11 @@ export default {
       'wallet-not-supported-function': 'This wallet does not support {name} function.',
       'invalid-transaction-file': 'Invalid transaction file.',
       'save-offline-json-failed': 'Unable to save JSON file.',
-      'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.'
+      'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
+      'multi-sign-script-prefix-error': 'The multisign config is error',
+      'multi-sign-config-not-exist': 'The multisign config is not exist',
+      'multi-sign-config-exist': 'The multisign config has exist',
+      'import-multi-sign-config-params-error': 'The multisign config lose requried paramter'
     },
     messageBox: {
       button: {
@@ -151,6 +156,9 @@ export default {
       },
       'sign-and-verify': {
         title: 'Sign/verify message'
+      },
+      'create-multisig-address': {
+        title: 'Create multisig address'
       },
       'ckb-dependency': {
         title: 'Bundled CKB Node',
@@ -233,6 +241,11 @@ export default {
       'export-transaction': 'Export Transaction as JSON',
       'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
       'load-transaction': 'Load Transaction file'
+    },
+    'multi-sign-config': {
+      'import-config': 'Import multisign config',
+      'export-config': 'Export multisign config',
+      'config-exported': 'Multisign configs has been exported at {{filePath}}.'
     }
   }
 }

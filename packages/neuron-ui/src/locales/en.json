@@ -739,6 +739,63 @@
         "confirm": "Confirm",
         "cancel": "Cancel"
       }
+    },
+    "multi-sign-address": {
+      "search": {
+        "placeholder": "search by multisign address,alias"
+      },
+      "add": {
+        "label": "Add"
+      },
+      "import": {
+        "label": "Import"
+      },
+      "export": {
+        "label": "Export"
+      },
+      "ok": "OK",
+      "table": {
+        "address": "address",
+        "alias": "alias",
+        "type": "type",
+        "balance": "balance",
+        "copy-address": "Copy Address",
+        "actions": {
+          "info": "Info",
+          "send": "Send",
+          "approve": "Sign",
+          "delete": "Delete"
+        }
+      },
+      "import-dialog": {
+        "actions": {
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        }
+      },
+      "create-dialog": {
+        "title": "Create multisign address",
+        "index": "index",
+        "required": "required",
+        "signer-address": "signer address",
+        "copy-address": "Copy Address",
+        "m-n": {
+          "title": "Please choose the multisig address configuration in the m of n type where any m private keys out of a possible n are required to move the asset.",
+          "error": "for m-of-n multisig address, m shouldn't be greater than n"
+        },
+        "multi-address-info": {
+          "title": "Please input the signers for the {{m}} of {{n}} multisig address",
+          "view-title": "The {{m}} of {{n}} multisig address is",
+          "ckb-address-placeholder": "ckb address"
+        },
+        "multi-list": "Signer list",
+        "actions": {
+          "cancel": "Cancel",
+          "back": "Back",
+          "next": "Next",
+          "confirm": "Confirm"
+        }
+      }
     }
   }
 }

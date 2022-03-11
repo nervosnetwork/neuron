@@ -19,6 +19,7 @@ export * from './cheque'
 export * from './hardware'
 export * from './offline'
 export * from './nft'
+export * from './multiSign'
 
 const REMOTE_MODULE_NOT_FOUND =
   'The remote module is not found, please make sure the UI is running inside the Electron App'

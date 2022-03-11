@@ -16,6 +16,7 @@ import TransactionsController from 'controllers/transactions'
 import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
+import MultiSignController from 'controllers/multi-sign'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
@@ -55,6 +56,7 @@ export default class ApiController {
   #hardwareController = new HardwareController()
   #offlineSignController = new OfflineSignController()
   #sudtController = new SUDTController()
+  #multiSignController = new MultiSignController()
 
   public async mount() {
     this.#registerHandlers()
@@ -527,6 +529,31 @@ export default class ApiController {
 
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction(params)
+    })
+
+    // multi sign
+    handle('create-multi-sign-address',async (_, params) => {
+      return this.#multiSignController.createMultiSignAddress(params)
+    })
+
+    handle('save-multi-sign-config',async (_, params) => {
+      return this.#multiSignController.saveConfig(params)
+    })
+
+    handle('update-multi-sign-config',async (_, params) => {
+      return this.#multiSignController.updateConfig(params)
+    })
+
+    handle('get-multi-sign-config',async (_, params) => {
+      return this.#multiSignController.getConfig(params)
+    })
+
+    handle('import-multi-sign-config',async (_, params) => {
+      return this.#multiSignController.importConfig(params)
+    })
+
+    handle('export-multi-sign-config',async (_, params) => {
+      return this.#multiSignController.exportConfig(params)
     })
   }
 

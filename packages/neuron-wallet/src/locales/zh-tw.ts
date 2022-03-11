@@ -36,6 +36,7 @@ export default {
       tools: {
         label: '工具',
         'sign-and-verify': '簽名/驗簽信息',
+        'create-multisig-address': '創建多重簽名地址',
         'offline-sign': '離線簽名',
         'clear-sync-data': '清除所有同步數據'
       },
@@ -109,7 +110,11 @@ export default {
       'device-sign-canceled': '您取消了簽名。否則，請確保設備上 Nervos app 設置開啟了 “allow contract data”。',
       'connect-device-failed': '設備無法連接，請檢查設備連接狀況。',
       'save-offline-json-failed': '無法保存 JSON 文件。',
-      'offline-sign-failed': '簽名失敗，請檢查是否使用了正確的錢包進行簽名。'
+      'offline-sign-failed': '簽名失敗，請檢查是否使用了正確的錢包進行簽名。',
+      'multi-sign-script-prefix-error': '多簽配置錯誤',
+      'multi-sign-config-not-exist': '多簽配置不存在',
+      'multi-sign-config-exist': '多簽地址已經存在',
+      'import-multi-sign-config-params-error': '導入的多簽配置文件缺少參數'
     },
     messageBox: {
       button: {
@@ -141,6 +146,9 @@ export default {
       },
       'sign-and-verify': {
         title: '簽名/驗簽信息'
+      },
+      'create-multisig-address': {
+        title: '創建多重簽名地址'
       },
       'ckb-dependency': {
         title: '內置 CKB 節點',
@@ -223,6 +231,11 @@ export default {
       'export-transaction': '導出交易為 JSON 檔案',
       'transaction-exported': '交易已被導出至 {{filePath}}.',
       'load-transaction': '加載交易檔案'
+    },
+    'multi-sign-config': {
+      'import-config': '導入多簽配置',
+      'export-config': '導出多簽配置',
+      'config-exported': '多簽配置已被導出至 {{filePath}}.'
     }
   }
 }

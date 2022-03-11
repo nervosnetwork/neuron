@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Dropdown, IDropdownProps, Icon } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
 import styles from './dropdown.module.scss'
 
 const CustomDropdown = (props: IDropdownProps) => (
@@ -42,4 +43,37 @@ const CustomDropdown = (props: IDropdownProps) => (
   />
 )
 
+interface DropdownItem {
+  key: string
+  label: string
+}
+export const CustomizableDropdown = ({
+  onClickItem: onClickItemCallback,
+  className,
+  children,
+  options,
+}: {
+  options: DropdownItem[]
+  onClickItem?: (item: DropdownItem) => void
+} & React.HTMLProps<HTMLDivElement>) => {
+  const onClickItem = useCallback(
+    (option: DropdownItem) => (e: React.MouseEvent) => {
+      e.nativeEvent.stopImmediatePropagation()
+      if (onClickItemCallback) {
+        onClickItemCallback(option)
+      }
+    },
+    [onClickItemCallback]
+  )
+  return (
+    <div className={`${styles.customizableRoot} ${className || ''}`}>
+      {children}
+      <div className={styles.dropdownItems}>
+        {options.map(option => (
+          <Button key={option.key} onClick={onClickItem(option)} label={option.label} type="cancel" />
+        ))}
+      </div>
+    </div>
+  )
+}
 export default CustomDropdown
