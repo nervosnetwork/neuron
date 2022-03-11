@@ -156,12 +156,12 @@ const Transaction = () => {
     )
   }
 
-  const MemoizedDepositDialog = useMemo(() => {
+  const renderLockInfoDialog = useCallback(() => {
     if (!lockInfo) {
       return null
     }
     return <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />
-  }, [lockInfo])
+  }, [lockInfo, isMainnet])
 
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>) =>
@@ -249,7 +249,7 @@ const Transaction = () => {
         </thead>
         <tbody>{renderList(transaction.outputs)}</tbody>
       </table>
-      {MemoizedDepositDialog}
+      {renderLockInfoDialog()}
     </div>
   )
 }
