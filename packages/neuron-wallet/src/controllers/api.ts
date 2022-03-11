@@ -549,7 +549,7 @@ export default class ApiController {
           err.code = NODE_DISCONNECTED_CODE
         }
 
-        if (!Number.isNaN(err.message?.code)) {
+        if (err.message?.code !== undefined && !Number.isNaN(err.message.code)) {
           err.code = err.message.code
         }
 
