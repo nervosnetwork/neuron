@@ -8,6 +8,7 @@ import {
   importMultiSignConfig,
   updateMultiSignConfig,
   exportMultiSignConfig,
+  deleteMultiSignConfig,
 } from 'services/remote'
 
 export const useSearch = () => {
@@ -86,7 +87,7 @@ export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string
     })
   }, [changeConfig, walletId])
   const updateConfig = useCallback(
-    (id: string) => (alias: string | undefined) => {
+    (id: number) => (alias: string | undefined) => {
       updateMultiSignConfig({ id, alias: alias || '' }).then(res => {
         if (isSuccessResponse(res)) {
           changeConfig(config.map(v => (v.id === res.result?.id ? res.result : v)))
@@ -105,6 +106,12 @@ export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string
     },
     [config]
   )
+  const deleteConfigById = useCallback(
+    (id: number) => {
+      changeConfig(config.filter(v => v.id !== id))
+    },
+    [config, changeConfig]
+  )
   return {
     saveConfig,
     config: useMemo(
@@ -117,6 +124,7 @@ export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string
       [config, searchKeywords]
     ),
     updateConfig,
+    deleteConfigById,
     filterConfig,
   }
 }
@@ -163,11 +171,11 @@ export const useImportConfig = ({
 }
 
 export const useExportConfig = (config: MultiSignConfig[]) => {
-  const [selectIds, changeSelectIds] = useState<string[]>([])
+  const [selectIds, changeSelectIds] = useState<number[]>([])
   const onChangeCheckedAll = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.checked) {
-        changeSelectIds(config.map(v => v.id.toString()))
+        changeSelectIds(config.map(v => v.id))
       } else {
         changeSelectIds([])
       }
@@ -179,16 +187,16 @@ export const useExportConfig = (config: MultiSignConfig[]) => {
       const { configId } = e.target.dataset
       if (configId) {
         if (e.target.checked) {
-          changeSelectIds([...selectIds, configId])
+          changeSelectIds([...selectIds, Number(configId)])
         } else {
-          changeSelectIds(selectIds.filter(v => v !== configId))
+          changeSelectIds(selectIds.filter(v => v.toString() !== configId))
         }
       }
     },
     [selectIds, changeSelectIds]
   )
   const exportConfig = useCallback(() => {
-    exportMultiSignConfig(selectIds.length ? config.filter(v => selectIds.includes(v.id.toString())) : config)
+    exportMultiSignConfig(selectIds.length ? config.filter(v => selectIds.includes(v.id)) : config)
   }, [config, selectIds])
   return {
     onChangeCheckedAll,
@@ -196,5 +204,38 @@ export const useExportConfig = (config: MultiSignConfig[]) => {
     selectIds,
     isAllSelected: !!config.length && selectIds.length === config.length,
     exportConfig,
+  }
+}
+
+export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
+  const deleteConfig = useCallback(
+    (option: MultiSignConfig) => {
+      deleteMultiSignConfig({ id: option.id }).then(res => {
+        if (isSuccessResponse(res)) {
+          deleteConfigById(option.id)
+        }
+      })
+    },
+    [deleteConfigById]
+  )
+  const { openDialog: openInfoDialog, closeDialog, dialogRef } = useDialogWrapper()
+  const [multiSignConfig, changeMultiSignConfig] = useState<MultiSignConfig | undefined>()
+  const viewMultisignConfig = useCallback(
+    (option: MultiSignConfig) => {
+      openInfoDialog()
+      changeMultiSignConfig(option)
+    },
+    [openInfoDialog, changeMultiSignConfig]
+  )
+  return {
+    deleteAction: {
+      action: deleteConfig,
+    },
+    infoAction: {
+      action: viewMultisignConfig,
+      closeDialog,
+      dialogRef,
+      multiSignConfig,
+    },
   }
 }

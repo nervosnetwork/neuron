@@ -9,7 +9,7 @@ interface MultiSignParams {
 }
 
 export interface MultiSignConfig {
-  id: string
+  id: number
   walletId: string
   r: number
   m: number
@@ -28,6 +28,7 @@ export const importMultiSignConfig = remoteApi<{ isMainnet: boolean }, ImportMul
   'import-multi-sign-config'
 )
 export const exportMultiSignConfig = remoteApi<MultiSignConfig[]>('export-multi-sign-config')
-export const updateMultiSignConfig = remoteApi<{ id: string } & Omit<Partial<MultiSignConfig>, 'id'>, MultiSignConfig>(
+export const updateMultiSignConfig = remoteApi<{ id: number } & Omit<Partial<MultiSignConfig>, 'id'>, MultiSignConfig>(
   'update-multi-sign-config'
 )
+export const deleteMultiSignConfig = remoteApi<{ id: number }>('delete-multi-sign-config')

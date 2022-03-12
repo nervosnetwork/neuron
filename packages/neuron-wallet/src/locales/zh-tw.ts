@@ -235,7 +235,12 @@ export default {
     'multi-sign-config': {
       'import-config': '導入多簽配置',
       'export-config': '導出多簽配置',
-      'config-exported': '多簽配置已被導出至 {{filePath}}.'
+      'config-exported': '多簽配置已被導出至 {{filePath}}.',
+      'confirm-delete': '確認刪除該多簽地址嗎？',
+      'delete-actions': {
+        ok: '確認',
+        cancel: '取消'
+      }
     }
   }
 }

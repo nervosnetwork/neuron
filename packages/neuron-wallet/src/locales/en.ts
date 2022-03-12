@@ -245,7 +245,12 @@ export default {
     'multi-sign-config': {
       'import-config': 'Import multisign config',
       'export-config': 'Export multisign config',
-      'config-exported': 'Multisign configs has been exported at {{filePath}}.'
+      'config-exported': 'Multisign configs has been exported at {{filePath}}.',
+      'confirm-delete': 'Confirm delete the multisign config?',
+      'delete-actions': {
+        ok: 'Confirm',
+        cancel: 'Cancel'
+      }
     }
   }
 }

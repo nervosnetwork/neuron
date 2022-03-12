@@ -131,6 +131,7 @@ type Action =
   | 'import-multi-sign-config'
   | 'export-multi-sign-config'
   | 'update-multi-sign-config'
+  | 'delete-multi-sign-config'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

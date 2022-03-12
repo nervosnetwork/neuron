@@ -544,6 +544,10 @@ export default class ApiController {
       return this.#multiSignController.updateConfig(params)
     })
 
+    handle('delete-multi-sign-config',async (_, params) => {
+      return this.#multiSignController.deleteConfig(params)
+    })
+
     handle('get-multi-sign-config',async (_, params) => {
       return this.#multiSignController.getConfig(params)
     })

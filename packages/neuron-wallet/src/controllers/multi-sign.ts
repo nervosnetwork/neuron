@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { dialog } from 'electron'
+import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { ResponseCode } from 'utils/const'
@@ -89,17 +89,38 @@ export default class MultiSignController {
     }
   }
 
+  async deleteConfig(params: { id: number }) {
+    const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+      message: t('multi-sign-config.confirm-delete'),
+      type: 'question',
+      buttons: [
+        t('multi-sign-config.delete-actions.ok'),
+        t('multi-sign-config.delete-actions.cancel')
+      ]
+    })
+    if (response === 0) {
+      await this.#multiSignService.deleteConfig(params.id)
+      return {
+        status: ResponseCode.Success,
+      }
+    }
+    return {
+      status: ResponseCode.Fail,
+    }
+  }
+
   async getConfig(params: {
     walletId: string
   }) {
+    const result = await this.#multiSignService.getMultiSignConfig(params.walletId)
     return {
       status: ResponseCode.Success,
-      result: await this.#multiSignService.getMultiSignConfig(params.walletId)
+      result
     }
   }
 
   async importConfig({ isMainnet }: { isMainnet: boolean }) {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
+    const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multi-sign-config.import-config'),
       filters: [{
         name: 'json',
@@ -141,7 +162,7 @@ export default class MultiSignController {
     alias?: string
     fullPayload: string
   }[]) {
-    const { canceled, filePath } = await dialog.showSaveDialog({
+    const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multi-sign-config.export-config'),
       defaultPath: `multi-sign-config_${Date.now()}.json`
     })

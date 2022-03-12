@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SearchBox } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
@@ -12,7 +12,7 @@ import MultiSignAddressInfo from 'components/MultiSignAddressInfo'
 import { EditTextField } from 'widgets/TextField'
 import { MultiSignConfig } from 'services/remote'
 
-import { useSearch, useDialogWrapper, useConfigManage, useImportConfig, useExportConfig } from './hooks'
+import { useSearch, useDialogWrapper, useConfigManage, useImportConfig, useExportConfig, useActions } from './hooks'
 import styles from './multi-sign-address.module.scss'
 
 const searchBoxStyles = {
@@ -26,7 +26,7 @@ const searchBoxStyles = {
   },
 }
 
-const tableActions = ['info']
+const tableActions = ['info', 'delete']
 
 const MultiSignAddress = () => {
   const [t, i18n] = useTranslation()
@@ -38,17 +38,17 @@ const MultiSignAddress = () => {
   } = useGlobalState()
   const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { config, saveConfig, updateConfig } = useConfigManage({ walletId, searchKeywords })
-  const { openDialog: openInfoDialog, closeDialog: closeInfoDialog, dialogRef: infoDialog } = useDialogWrapper()
-  const [multiSignConfig, changeMultiSignConfig] = useState<MultiSignConfig | undefined>()
+  const { config, saveConfig, updateConfig, deleteConfigById } = useConfigManage({ walletId, searchKeywords })
+  const { deleteAction, infoAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
-    (viewConfig: MultiSignConfig) => (option: { key: string }) => {
+    (multiSignConfig: MultiSignConfig) => (option: { key: string }) => {
       if (option.key === 'info') {
-        openInfoDialog()
-        changeMultiSignConfig(viewConfig)
+        infoAction.action(multiSignConfig)
+      } else if (option.key === 'delete') {
+        deleteAction.action(multiSignConfig)
       }
     },
-    [openInfoDialog]
+    [deleteAction, infoAction]
   )
   const listActionOptions = useMemo(
     () => tableActions.map(key => ({ key, label: t(`multi-sign-address.table.actions.${key}`) })),
@@ -102,7 +102,7 @@ const MultiSignAddress = () => {
                     data-config-id={v.id}
                     type="checkbox"
                     onChange={onChangeChecked}
-                    checked={selectIds.includes(v.id.toString())}
+                    checked={selectIds.includes(v.id)}
                   />
                 </td>
                 <td>
@@ -165,18 +165,18 @@ const MultiSignAddress = () => {
           </div>
         )}
       </dialog>
-      <dialog ref={infoDialog} className={styles.dialog}>
-        {multiSignConfig && (
+      <dialog ref={infoAction.dialogRef} className={styles.dialog}>
+        {infoAction.multiSignConfig && (
           <MultiSignAddressInfo
-            m={multiSignConfig.m.toString()}
-            n={multiSignConfig.n.toString()}
-            r={multiSignConfig.r}
-            blake160s={multiSignConfig.blake160s || []}
-            multiSignAddress={multiSignConfig.fullPayload}
+            m={infoAction.multiSignConfig.m.toString()}
+            n={infoAction.multiSignConfig.n.toString()}
+            r={infoAction.multiSignConfig.r}
+            blake160s={infoAction.multiSignConfig.blake160s || []}
+            multiSignAddress={infoAction.multiSignConfig.fullPayload}
           />
         )}
         <div className={styles.ok}>
-          <Button label={t('multi-sign-address.ok')} type="ok" onClick={closeInfoDialog} />
+          <Button label={t('multi-sign-address.ok')} type="ok" onClick={infoAction.closeDialog} />
         </div>
       </dialog>
     </div>

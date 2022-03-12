@@ -65,4 +65,13 @@ export default class MultiSignService {
       .getMany()
     return result
   }
+
+  async deleteConfig(id: number) {
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(MultiSignConfig)
+      .where('id = :id', { id })
+      .execute()
+  }
 }
