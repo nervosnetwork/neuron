@@ -31,7 +31,7 @@ export const MultiSignAddressTable = ({
         </thead>
         <tbody>
           {blake160s.map((v, idx) => (
-            <tr key={v}>
+            <tr key={v || idx}>
               <td className={styles.index}>{`#${idx + 1}`}</td>
               <td className={styles.required}>
                 <input

@@ -194,7 +194,7 @@ export const useExportConfig = (config: MultiSignConfig[]) => {
     onChangeCheckedAll,
     onChangeChecked,
     selectIds,
-    isAllSelected: selectIds.length === config.length,
+    isAllSelected: !!config.length && selectIds.length === config.length,
     exportConfig,
   }
 }

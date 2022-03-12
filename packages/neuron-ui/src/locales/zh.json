@@ -747,6 +747,7 @@
         "label": "导出"
       },
       "ok": "好的",
+      "no-data": "没有多签地址",
       "table": {
         "address": "地址",
         "alias": "别名",

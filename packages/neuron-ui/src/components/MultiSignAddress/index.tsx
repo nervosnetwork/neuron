@@ -82,56 +82,60 @@ const MultiSignAddress = () => {
           <Button label={t('multi-sign-address.export.label')} type="primary" onClick={exportConfig} />
         </div>
       </div>
-      <table className={styles.multiSignConfig}>
-        <thead>
-          <tr>
-            <th>
-              <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
-            </th>
-            {['address', 'alias', 'type'].map(field => (
-              <th key={field}>{t(`multi-sign-address.table.${field}`)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {config.map(v => (
-            <tr key={v.id}>
-              <td>
-                <input
-                  data-config-id={v.id}
-                  type="checkbox"
-                  onChange={onChangeChecked}
-                  checked={selectIds.includes(v.id.toString())}
-                />
-              </td>
-              <td>
-                <CopyZone
-                  content={v.fullPayload}
-                  className={styles.fullPayload}
-                  name={t('multi-sign-address.table.copy-address')}
-                >
-                  <span className={styles.overflow}>{v.fullPayload.slice(0, -6)}</span>
-                  <span>...</span>
-                  <span>{v.fullPayload.slice(-6)}</span>
-                </CopyZone>
-              </td>
-              <td>
-                <EditTextField field="alias" value={v.alias || ''} onChange={updateConfig(v.id)} />
-              </td>
-              <td>
-                {v.m}
-                &nbsp;of&nbsp;
-                {v.n}
-              </td>
-              <td>
-                <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>
-                  <More className={styles.more} />
-                </CustomizableDropdown>
-              </td>
+      {config.length ? (
+        <table className={styles.multiSignConfig}>
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
+              </th>
+              {['address', 'alias', 'type'].map(field => (
+                <th key={field}>{t(`multi-sign-address.table.${field}`)}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {config.map(v => (
+              <tr key={v.id}>
+                <td>
+                  <input
+                    data-config-id={v.id}
+                    type="checkbox"
+                    onChange={onChangeChecked}
+                    checked={selectIds.includes(v.id.toString())}
+                  />
+                </td>
+                <td>
+                  <CopyZone
+                    content={v.fullPayload}
+                    className={styles.fullPayload}
+                    name={t('multi-sign-address.table.copy-address')}
+                  >
+                    <span className={styles.overflow}>{v.fullPayload.slice(0, -6)}</span>
+                    <span>...</span>
+                    <span>{v.fullPayload.slice(-6)}</span>
+                  </CopyZone>
+                </td>
+                <td>
+                  <EditTextField field="alias" value={v.alias || ''} onChange={updateConfig(v.id)} />
+                </td>
+                <td>
+                  {v.m}
+                  &nbsp;of&nbsp;
+                  {v.n}
+                </td>
+                <td>
+                  <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>
+                    <More className={styles.more} />
+                  </CustomizableDropdown>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className={styles.noData}>{t('multi-sign-address.no-data')}</div>
+      )}
       <dialog ref={dialogRef} className={styles.dialog}>
         {isDialogOpen && <MultiSignAddressCreateDialog closeDialog={closeDialog} confirm={saveConfig} />}
       </dialog>

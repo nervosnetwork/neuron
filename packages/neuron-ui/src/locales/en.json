@@ -754,6 +754,7 @@
         "label": "Export"
       },
       "ok": "OK",
+      "no-data": "No multisign address",
       "table": {
         "address": "address",
         "alias": "alias",
