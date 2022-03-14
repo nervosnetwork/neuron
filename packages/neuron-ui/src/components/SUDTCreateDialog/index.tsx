@@ -138,7 +138,7 @@ const SUDTCreateDialog = ({
     existingAccountNames,
     t,
   })
-  const isAccountNameReady = info.accountName.trim() && !tokenErrors.accountName
+  const isAccountNameReady = info.accountName.trim() && !tokenErrors.accountName && accountType
 
   const isTokenReady =
     isAccountNameReady && Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
