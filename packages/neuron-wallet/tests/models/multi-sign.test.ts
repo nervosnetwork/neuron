@@ -26,7 +26,7 @@ describe('MultiSign Test', () => {
   })
 
   it('serialize', () => {
-    const s = new MultiSign().serialize(bob.blake160)
+    const s = new MultiSign().serialize([bob.blake160])
     expect(s).toEqual(serialized)
   })
 
