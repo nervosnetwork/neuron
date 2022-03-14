@@ -7,13 +7,13 @@ import styles from './multi-sign-address-info.module.scss'
 
 export const MultiSignAddressTable = ({
   r,
-  blake160s,
+  addresses,
   changeR,
   changeAddress,
   disabled,
 }: {
   r: number
-  blake160s: string[]
+  addresses: string[]
   changeR?: (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => void
   changeAddress?: (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean
@@ -30,7 +30,7 @@ export const MultiSignAddressTable = ({
           </tr>
         </thead>
         <tbody>
-          {blake160s.map((v, idx) => (
+          {addresses.map((v, idx) => (
             <tr key={v || idx}>
               <td className={styles.index}>{`#${idx + 1}`}</td>
               <td className={styles.required}>
@@ -75,13 +75,13 @@ const MultiSignAddressInfo = ({
   m,
   n,
   r,
-  blake160s,
+  addresses,
   multiSignAddress,
 }: {
   m: string
   n: string
   r: number
-  blake160s: string[]
+  addresses: string[]
   multiSignAddress: string
 }) => {
   const [t] = useTranslation()
@@ -98,7 +98,7 @@ const MultiSignAddressInfo = ({
         <span>{multiSignAddress.slice(-6)}</span>
       </CopyZone>
       <p>{t('multi-sign-address.create-dialog.multi-list', { m, n })}</p>
-      <MultiSignAddressTable r={r} blake160s={blake160s} disabled />
+      <MultiSignAddressTable r={r} addresses={addresses} disabled />
     </>
   )
 }

@@ -20,7 +20,7 @@ export default class MultiSignConfig {
   r!: number
 
   @Column('simple-array')
-  blake160s!: string[]
+  addresses!: string[]
 
   @Column()
   alias!: string
@@ -35,7 +35,7 @@ export default class MultiSignConfig {
     multiSignConfig.m = model.m
     multiSignConfig.n = model.n
     multiSignConfig.r = model.r
-    multiSignConfig.blake160s = model.blake160s
+    multiSignConfig.addresses = model.addresses
     if (model.alias) {
       multiSignConfig.alias = model.alias
     }

@@ -40,7 +40,7 @@ export const useMAndN = () => {
 }
 
 export const useMultiAddress = ({ n }: { n: number }) => {
-  const [blake160s, changeAddresses] = useState(new Array(n).fill(''))
+  const [addresses, changeAddresses] = useState(new Array(n).fill(''))
   const [r, setR] = useState(0)
   const changeR = useCallback(
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,20 +50,20 @@ export const useMultiAddress = ({ n }: { n: number }) => {
   )
   const changeAddress = useCallback(
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      changeAddresses(blake160s.map((item, idx) => (index === idx ? e.target.value : item)))
+      changeAddresses(addresses.map((item, idx) => (index === idx ? e.target.value : item)))
     },
-    [changeAddresses, blake160s]
+    [changeAddresses, addresses]
   )
   const isError = useMemo(() => {
-    return blake160s.some(v => !v)
-  }, [blake160s])
+    return addresses.some(v => !v)
+  }, [addresses])
   useEffect(() => {
     changeAddresses(new Array(n).fill(''))
     setR(0)
   }, [n])
   return {
     r,
-    blake160s,
+    addresses,
     changeR,
     changeAddress,
     isError,
@@ -75,14 +75,14 @@ export const useViewMultiSignAddress = ({
   m,
   n,
   r,
-  blake160s,
+  addresses,
   isMainnet,
 }: {
   step: Step
   m: number
   n: number
   r: number
-  blake160s: string[]
+  addresses: string[]
   isMainnet: boolean
 }) => {
   const [multiSignAddress, changeMultiSignAddress] = useState('')
@@ -92,7 +92,7 @@ export const useViewMultiSignAddress = ({
         r,
         m,
         n,
-        blake160s,
+        addresses,
         isMainnet,
       }).then(res => {
         if (isSuccessResponse(res) && res.result) {
@@ -100,6 +100,6 @@ export const useViewMultiSignAddress = ({
         }
       })
     }
-  }, [step, changeMultiSignAddress, m, n, r, blake160s, isMainnet])
+  }, [step, changeMultiSignAddress, m, n, r, addresses, isMainnet])
   return multiSignAddress
 }

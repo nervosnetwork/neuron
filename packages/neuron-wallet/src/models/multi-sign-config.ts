@@ -4,7 +4,7 @@ export default class MultiSignConfigModel {
   public m: number
   public n: number
   public r: number
-  public blake160s: string[]
+  public addresses: string[]
   public alias?: string
   public fullPayload: string
 
@@ -13,7 +13,7 @@ export default class MultiSignConfigModel {
     m: number,
     n: number,
     r: number,
-    blake160s: string[],
+    addresses: string[],
     fullPayload: string,
     alias?: string,
     id?: number
@@ -22,7 +22,7 @@ export default class MultiSignConfigModel {
     this.m = m
     this.n = n
     this.r = r
-    this.blake160s = blake160s
+    this.addresses = addresses
     this.fullPayload = fullPayload
     this.alias = alias
     this.id = id
@@ -33,7 +33,7 @@ export default class MultiSignConfigModel {
     m: number
     n: number
     r: number
-    blake160s: string[]
+    addresses: string[]
     alias: string
     fullPayload: string
     id?: number
@@ -43,7 +43,7 @@ export default class MultiSignConfigModel {
       params.m,
       params.n,
       params.r,
-      params.blake160s,
+      params.addresses,
       params.fullPayload,
       params.alias,
       params.id
@@ -55,7 +55,7 @@ export default class MultiSignConfigModel {
       m: this.m,
       n: this.n,
       r: this.r,
-      blake160s: this.blake160s,
+      addresses: this.addresses,
       fullPayload: this.fullPayload,
       alias: this.alias
     }

@@ -147,7 +147,7 @@ const MultiSignAddress = () => {
               m={importConfig.m.toString()}
               n={importConfig.n.toString()}
               r={importConfig.r}
-              blake160s={importConfig.blake160s || []}
+              addresses={importConfig.addresses || []}
               multiSignAddress={importConfig.fullPayload}
             />
             <div className={styles.importActions}>
@@ -171,7 +171,7 @@ const MultiSignAddress = () => {
             m={infoAction.multiSignConfig.m.toString()}
             n={infoAction.multiSignConfig.n.toString()}
             r={infoAction.multiSignConfig.r}
-            blake160s={infoAction.multiSignConfig.blake160s || []}
+            addresses={infoAction.multiSignConfig.addresses || []}
             multiSignAddress={infoAction.multiSignConfig.fullPayload}
           />
         )}

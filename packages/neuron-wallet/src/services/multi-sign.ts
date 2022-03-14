@@ -24,7 +24,7 @@ export default class MultiSignService {
     r?: number
     m?: number
     n?: number
-    blake160s?: string[]
+    addresses?: string[]
     alias?: string
     fullPayload?: string
   }) {
@@ -47,7 +47,7 @@ export default class MultiSignService {
         r: params.r ?? result.r,
         m: params.m ?? result.m,
         n: params.n ?? result.n,
-        blake160s: params.blake160s ?? result.blake160s,
+        addresses: params.addresses ?? result.addresses,
         fullPayload: params.fullPayload ?? result.fullPayload
       })
       .where('id = :id', { id: params.id })

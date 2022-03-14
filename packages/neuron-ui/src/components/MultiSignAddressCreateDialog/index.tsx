@@ -57,7 +57,7 @@ const MultiSignAddressCreateDialog = ({
   const back = useCallback(() => {
     changeStep(step - 1)
   }, [changeStep, step])
-  const { r, blake160s, changeR, changeAddress, isError: addressErr } = useMultiAddress({ n: Number(n) })
+  const { r, addresses, changeR, changeAddress, isError: addressErr } = useMultiAddress({ n: Number(n) })
   const {
     chain: { networkID },
     settings: { networks = [] },
@@ -67,7 +67,7 @@ const MultiSignAddressCreateDialog = ({
     m: Number(m),
     n: Number(n),
     r,
-    blake160s,
+    addresses,
     step,
     isMainnet,
   })
@@ -77,12 +77,12 @@ const MultiSignAddressCreateDialog = ({
       m: Number(m),
       n: Number(n),
       r,
-      blake160s,
+      addresses,
       fullPayload: multiSignAddress,
     }).then(() => {
       closeDialog()
     })
-  }, [m, n, r, blake160s, multiSignAddress, saveConfig, closeDialog])
+  }, [m, n, r, addresses, multiSignAddress, saveConfig, closeDialog])
 
   return (
     <>
@@ -91,11 +91,11 @@ const MultiSignAddressCreateDialog = ({
       {step === Step.setMultiAddress && (
         <>
           <p>{t('multi-sign-address.create-dialog.multi-address-info.title', { m, n })}</p>
-          <MultiSignAddressTable r={r} blake160s={blake160s} changeR={changeR} changeAddress={changeAddress} />
+          <MultiSignAddressTable r={r} addresses={addresses} changeR={changeR} changeAddress={changeAddress} />
         </>
       )}
       {step === Step.viewMultiAddress && (
-        <MultiSignAddressInfo m={m} n={n} r={r} blake160s={blake160s} multiSignAddress={multiSignAddress} />
+        <MultiSignAddressInfo m={m} n={n} r={r} addresses={addresses} multiSignAddress={multiSignAddress} />
       )}
       <div className={styles.actions}>
         <Button

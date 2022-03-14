@@ -4,7 +4,7 @@ interface MultiSignParams {
   r: number
   m: number
   n: number
-  blake160s: string[]
+  addresses: string[]
   isMainnet: boolean
 }
 
@@ -14,7 +14,7 @@ export interface MultiSignConfig {
   r: number
   m: number
   n: number
-  blake160s: string[]
+  addresses: string[]
   alias?: string
   fullPayload: string
 }

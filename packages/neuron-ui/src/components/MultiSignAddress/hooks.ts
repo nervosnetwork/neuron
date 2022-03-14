@@ -57,12 +57,12 @@ export const useDialogWrapper = ({
 export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string; searchKeywords: string }) => {
   const [config, changeConfig] = useState<MultiSignConfig[]>([])
   const saveConfig = useCallback(
-    ({ m, n, r, blake160s, fullPayload }) => {
+    ({ m, n, r, addresses, fullPayload }) => {
       return saveMultiSignConfig({
         m,
         n,
         r,
-        blake160s,
+        addresses,
         fullPayload,
         walletId,
       }).then(res => {

@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { ResponseCode } from 'utils/const'
 import MultiSign from 'models/multi-sign'
 import SystemScriptInfo from 'models/system-script-info'
@@ -23,7 +23,7 @@ export default class MultiSignController {
     r: number
     m: number
     n: number
-    blake160s: string[]
+    addresses: string[]
     isMainnet: boolean
   }) {
     const multiSign = new MultiSign();
@@ -33,11 +33,12 @@ export default class MultiSignController {
       M: `0x${params.m.toString(16).padStart(2, '0')}`,
       N: `0x${params.n.toString(16).padStart(2, '0')}`,
     };
+    const blake160s = params.addresses.map(address => addressToScript(address).args)
     return {
       status: ResponseCode.Success,
       result: scriptToAddress(
         {
-          args: multiSign.hash(params.blake160s, multiSignPrefix),
+          args: multiSign.hash(blake160s, multiSignPrefix),
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
         },
@@ -51,7 +52,7 @@ export default class MultiSignController {
     r: number
     m: number
     n: number
-    blake160s: string[]
+    addresses: string[]
     alias: string
     fullPayload: string
   }) {
@@ -60,7 +61,7 @@ export default class MultiSignController {
       params.m,
       params.n,
       params.r,
-      params.blake160s,
+      params.addresses,
       params.fullPayload,
       params.alias
     ))
@@ -78,7 +79,7 @@ export default class MultiSignController {
     r?: number
     m?: number
     n?: number
-    blake160s?: string[]
+    addresses?: string[]
     alias?: string
     fullPayload?: string
   }) {
@@ -138,7 +139,7 @@ export default class MultiSignController {
       config.r === undefined
       || config.m === undefined
       || config.n === undefined
-      || config.blake160s === undefined
+      || config.addresses === undefined
     ) {
       throw new ImportMultiSignConfigParamsError()
     }
@@ -158,7 +159,7 @@ export default class MultiSignController {
     r: number
     m: number
     n: number
-    blake160s: string[]
+    addresses: string[]
     alias?: string
     fullPayload: string
   }[]) {
