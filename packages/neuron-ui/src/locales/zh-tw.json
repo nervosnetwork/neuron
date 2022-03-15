@@ -765,7 +765,8 @@
         "actions": {
           "cancel": "取消",
           "confirm": "確認"
-        }
+        },
+        "notice": "導入配置一次只能導入一個，如果是文件內容是數組默認取第一個導入"
       },
       "create-dialog": {
         "title": "創建多重簽名地址",

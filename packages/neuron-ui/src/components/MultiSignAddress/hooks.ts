@@ -149,21 +149,27 @@ export const useImportConfig = ({
       }
     })
   }, [openDialog, changeImportConfig, isMainnet])
+  const closeDialogAndReset = useCallback(() => {
+    closeDialog()
+    changeImportConfig(undefined)
+    setImportErr(undefined)
+  }, [closeDialog, changeImportConfig, setImportErr])
   const confirm = useCallback(() => {
     if (importConfig) {
       saveConfig(importConfig)
         .then(() => {
-          closeDialog()
+          closeDialogAndReset()
+          changeImportConfig(undefined)
         })
         .catch(err => {
           setImportErr(err.message.toString())
         })
     }
-  }, [closeDialog, saveConfig, importConfig])
+  }, [closeDialogAndReset, saveConfig, importConfig])
   return {
     onImportConfig,
     importConfig,
-    closeDialog,
+    closeDialog: closeDialogAndReset,
     dialogRef,
     confirm,
     importErr,

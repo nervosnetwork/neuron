@@ -134,7 +134,10 @@ export default class MultiSignController {
       return
     }
     const json = fs.readFileSync(filePaths[0], 'utf-8')
-    const config = JSON.parse(json)
+    let config = JSON.parse(json)
+    if (config?.length) {
+      config = config[0]
+    }
     if (
       config.r === undefined
       || config.m === undefined

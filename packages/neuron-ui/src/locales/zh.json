@@ -765,7 +765,8 @@
         "actions": {
           "cancel": "取消",
           "confirm": "确认"
-        }
+        },
+        "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
       },
       "create-dialog": {
         "title": "创建多重签名地址",

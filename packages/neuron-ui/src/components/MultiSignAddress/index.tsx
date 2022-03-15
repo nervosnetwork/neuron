@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SearchBox } from 'office-ui-fabric-react'
+import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import { useOnLocaleChange, isMainnet as isMainnetUtil } from 'utils'
 import { useState as useGlobalState } from 'states'
@@ -25,6 +25,7 @@ const searchBoxStyles = {
     borderBottomLeftRadius: 2,
   },
 }
+const messageBarStyle = { text: { alignItems: 'center' } }
 
 const tableActions = ['info', 'delete']
 
@@ -142,7 +143,11 @@ const MultiSignAddress = () => {
       <dialog ref={importDialog} className={styles.dialog}>
         {importConfig && (
           <div>
-            {importErr && <div className={styles.error}>{importErr}</div>}
+            {importErr && (
+              <MessageBar messageBarType={MessageBarType.error} styles={messageBarStyle}>
+                {importErr}
+              </MessageBar>
+            )}
             <MultiSignAddressInfo
               m={importConfig.m.toString()}
               n={importConfig.n.toString()}
@@ -150,6 +155,10 @@ const MultiSignAddress = () => {
               addresses={importConfig.addresses || []}
               multiSignAddress={importConfig.fullPayload}
             />
+            <br />
+            <MessageBar messageBarType={MessageBarType.warning} styles={messageBarStyle}>
+              {t('multi-sign-address.import-dialog.notice')}
+            </MessageBar>
             <div className={styles.importActions}>
               <Button
                 label={t('multi-sign-address.import-dialog.actions.cancel')}
