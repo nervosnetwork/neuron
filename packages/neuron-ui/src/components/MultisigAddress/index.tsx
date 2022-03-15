@@ -175,13 +175,13 @@ const MultisigAddress = () => {
         )}
       </dialog>
       <dialog ref={infoAction.dialogRef} className={styles.dialog}>
-        {infoAction.MultisigConfig && (
+        {infoAction.multisigConfig && (
           <MultisigAddressInfo
-            m={infoAction.MultisigConfig.m.toString()}
-            n={infoAction.MultisigConfig.n.toString()}
-            r={infoAction.MultisigConfig.r}
-            addresses={infoAction.MultisigConfig.addresses || []}
-            multisigAddress={infoAction.MultisigConfig.fullPayload}
+            m={infoAction.multisigConfig.m.toString()}
+            n={infoAction.multisigConfig.n.toString()}
+            r={infoAction.multisigConfig.r}
+            addresses={infoAction.multisigConfig.addresses || []}
+            multisigAddress={infoAction.multisigConfig.fullPayload}
           />
         )}
         <div className={styles.ok}>
