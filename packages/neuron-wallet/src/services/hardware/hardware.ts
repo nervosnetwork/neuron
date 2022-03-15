@@ -22,10 +22,10 @@ export abstract class Hardware {
   }
 
   // @TODO: After multi-signature feature is complete, refactor this function into `TransactionSender#sign`.
-  public async signTx (walletID: string, tx: Transaction, txHash: string, skipLastInputs: number = 0, context?: RPC.RawTransaction[]) {
+  public async signTx (walletID: string, tx: Transaction, txHash: string, skipLastInputs: boolean = true, context?: RPC.RawTransaction[]) {
     const wallet = WalletService.getInstance().get(walletID)
     const addressInfos = await AddressService.getAddressesByWalletId(walletID)
-    const witnessSigningEntries = tx.inputs.slice(0, tx.inputs.length - skipLastInputs).map((input, index) => {
+    const witnessSigningEntries = tx.inputs.slice(0, skipLastInputs ? -1 : tx.inputs.length).map((input, index) => {
       const lockArgs: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
       const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()

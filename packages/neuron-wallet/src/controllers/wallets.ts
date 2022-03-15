@@ -400,7 +400,7 @@ export default class WalletsController {
       params.walletID,
       Transaction.fromObject(params.tx),
       params.password,
-      0,
+      false,
       skipSign
     )
     const description = params.description || params.tx.description || ''

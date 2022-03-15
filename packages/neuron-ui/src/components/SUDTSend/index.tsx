@@ -163,7 +163,6 @@ const SUDTSend = () => {
         codeHash: anyoneCanPayScript?.codeHash ?? '',
         isMainnet,
         required: false,
-        type: accountType,
       })
     } catch (err) {
       errMap.address = t(err.message, err.i18n)
@@ -234,7 +233,7 @@ const SUDTSend = () => {
         description: sendState.description,
       }
       let generator = generateSUDTTransaction
-      if (isSecp256k1ShortAddress) {
+      if (isSecp256k1ShortAddress && accountType === AccountType.SUDT) {
         generator = generateChequeTransaction
         if (sendState.sendAll) {
           params.amount = 'all'
@@ -313,8 +312,10 @@ const SUDTSend = () => {
       e.preventDefault()
       e.stopPropagation()
       if (isSubmittable) {
-        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' = 'send-sudt'
-        if (accountType === AccountType.CKB) {
+        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' | 'send-acp-to-default' = 'send-sudt'
+        if (accountType === AccountType.CKB && isSecp256k1ShortAddress) {
+          actionType = 'send-acp-to-default'
+        } else if (accountType === AccountType.CKB) {
           actionType = 'send-acp'
         } else if (isSecp256k1ShortAddress) {
           actionType = 'send-cheque'

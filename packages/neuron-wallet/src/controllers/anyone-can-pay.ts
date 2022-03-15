@@ -29,6 +29,7 @@ export interface SendAnyoneCanPayTxParams {
   walletID: string
   tx: Transaction
   password: string
+  skipLastInputs?: boolean
 }
 
 export default class AnyoneCanPayController {
@@ -62,7 +63,13 @@ export default class AnyoneCanPayController {
 
   public async sendTx(params: SendAnyoneCanPayTxParams, skipSign = false): Promise<Controller.Response<string>> {
     const txModel = Transaction.fromObject(params.tx)
-    const txHash = await new TransactionSender().sendTx(params.walletID, txModel, params.password, 1, skipSign)
+    const txHash = await new TransactionSender().sendTx(
+      params.walletID,
+      txModel,
+      params.password,
+      params?.skipLastInputs ?? true,
+      skipSign
+    )
 
     if (!txHash) {
       throw new ServiceHasNoResponse('AnyoneCanPay')
