@@ -19,7 +19,7 @@ export default class MultiSignService {
   }
 
   async updateMultiSignConfig(params: {
-    id: string
+    id: number
     walletId?: string
     r?: number
     m?: number

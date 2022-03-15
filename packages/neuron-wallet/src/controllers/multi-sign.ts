@@ -74,7 +74,7 @@ export default class MultiSignController {
 
 
   async updateConfig(params: {
-    id: string
+    id: number
     walletId?: string
     r?: number
     m?: number

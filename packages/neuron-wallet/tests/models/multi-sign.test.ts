@@ -30,6 +30,17 @@ describe('MultiSign Test', () => {
     expect(s).toEqual(serialized)
   })
 
+  it('serialize with r/m/n', () => {
+    const s = new MultiSign().serialize([bob.blake160], { S: '0x00', R: '0x01', M: '0x02', N: '0x03'})
+    expect(s).toEqual('0x0001020336c329ed630d6ce750712a477543672adab57f4c')
+  })
+
+  it('serialize with r/m/n exception', () => {
+    expect(() => {
+      new MultiSign().serialize([bob.blake160], { S: '0x00', R: '0x01', M: '0x02', N: '0xf000'})
+    }).toThrow()
+  })
+
   it('hash', () => {
     const hash = new MultiSign().hash(bob.blake160)
     expect(hash).toEqual(bob.hash)
