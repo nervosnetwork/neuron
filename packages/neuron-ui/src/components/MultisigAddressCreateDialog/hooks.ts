@@ -85,7 +85,7 @@ export const useViewMultisigAddress = ({
   addresses: string[]
   isMainnet: boolean
 }) => {
-  const [MultisigAddress, changeMultisigAddress] = useState('')
+  const [multisigAddress, changeMultisigAddress] = useState('')
   useEffect(() => {
     if (step === Step.viewMultiAddress) {
       createMultisigAddress({
@@ -101,5 +101,5 @@ export const useViewMultisigAddress = ({
       })
     }
   }, [step, changeMultisigAddress, m, n, r, addresses, isMainnet])
-  return MultisigAddress
+  return multisigAddress
 }
