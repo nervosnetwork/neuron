@@ -35,6 +35,7 @@ import {
 } from 'utils'
 import { AmountNotEnoughException } from 'exceptions'
 import styles from './sUDTSend.module.scss'
+import validateAmountRange from '../../utils/validators/amountRange'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, SHORT_ADDR_DEFAULT_LOCK_PREFIX } = CONSTANTS
 
@@ -155,6 +156,14 @@ const SUDTSend = () => {
     { key: Fields.Amount, label: t('s-udt.send.amount') },
   ]
 
+  const isSecp256k1ShortAddress = useMemo(() => {
+    try {
+      return ckbCore.utils.parseAddress(sendState.address, 'hex').startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX)
+    } catch {
+      return false
+    }
+  }, [sendState.address])
+
   const errors: { [Fields.Address]: string; [Fields.Amount]: string } = useMemo(() => {
     const errMap = { address: '', amount: '' }
     try {
@@ -174,6 +183,9 @@ const SUDTSend = () => {
       if (total && value && BigInt(total) < BigInt(value)) {
         throw new AmountNotEnoughException()
       }
+      if (sendState.amount && isSecp256k1ShortAddress) {
+        validateAmountRange(sendState.amount)
+      }
     } catch (err) {
       errMap.amount = t(err.message, err.i18n)
     }
@@ -184,14 +196,6 @@ const SUDTSend = () => {
     !isSending &&
     Object.values(errors).every(v => !v) &&
     [Fields.Address, Fields.Amount].every(key => sendState[key as Fields.Address | Fields.Amount].trim())
-
-  const isSecp256k1ShortAddress = useMemo(() => {
-    try {
-      return ckbCore.utils.parseAddress(sendState.address, 'hex').startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX)
-    } catch {
-      return false
-    }
-  }, [sendState.address])
 
   const isSubmittable = isFormReady && experimental?.tx && !remoteError
 

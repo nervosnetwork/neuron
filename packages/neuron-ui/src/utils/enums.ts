@@ -95,7 +95,6 @@ export enum ErrorCode {
   AddressIsEmpty = 305,
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
-  BalanceNotEnough = 308,
   AddressIsDeprecated = 309,
   // hardware
   SignTransactionFailed = 400,
