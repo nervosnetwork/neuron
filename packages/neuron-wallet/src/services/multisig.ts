@@ -1,24 +1,24 @@
 import { getConnection } from 'typeorm'
-import MultiSignConfig from 'database/chain/entities/multi-sign-config'
-import { MultiSignConfigNotExistError, MultiSignConfigExistError } from 'exceptions/multi-sign'
+import MultisigConfig from 'database/chain/entities/multisig-config'
+import { MultisigConfigNotExistError, MultisigConfigExistError } from 'exceptions/multisig'
 
-export default class MultiSignService {
-  async saveMultiSignConfig(multiSignConfig: MultiSignConfig) {
+export default class MultisigService {
+  async saveMultisigConfig(multisigConfig: MultisigConfig) {
     const result = await getConnection()
-      .getRepository(MultiSignConfig)
+      .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        walletId: multiSignConfig.walletId,
-        fullPayload: multiSignConfig.fullPayload
+        walletId: multisigConfig.walletId,
+        fullPayload: multisigConfig.fullPayload
       })
       .getCount()
     if (result > 0) {
-      throw new MultiSignConfigExistError()
+      throw new MultisigConfigExistError()
     }
-    return await getConnection().manager.save(multiSignConfig)
+    return await getConnection().manager.save(multisigConfig)
   }
 
-  async updateMultiSignConfig(params: {
+  async updateMultisigConfig(params: {
     id: number
     walletId?: string
     r?: number
@@ -29,18 +29,18 @@ export default class MultiSignService {
     fullPayload?: string
   }) {
     const result = await getConnection()
-      .getRepository(MultiSignConfig)
+      .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
         id: params.id
       })
       .getOne()
     if (!result) {
-      throw new MultiSignConfigNotExistError()
+      throw new MultisigConfigNotExistError()
     }
     await getConnection()
       .createQueryBuilder()
-      .update(MultiSignConfig)
+      .update(MultisigConfig)
       .set({
         alias: params.alias ?? result.alias,
         walletId: params.walletId ?? result.walletId,
@@ -55,9 +55,9 @@ export default class MultiSignService {
     return { ...result, ...params }
   }
 
-  async getMultiSignConfig(walletId: string) {
+  async getMultisigConfig(walletId: string) {
     const result = await getConnection()
-      .getRepository(MultiSignConfig)
+      .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
         walletId
@@ -70,7 +70,7 @@ export default class MultiSignService {
     await getConnection()
       .createQueryBuilder()
       .delete()
-      .from(MultiSignConfig)
+      .from(MultisigConfig)
       .where('id = :id', { id })
       .execute()
   }

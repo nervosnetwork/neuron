@@ -4,16 +4,16 @@ import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import { useOnLocaleChange, isMainnet as isMainnetUtil } from 'utils'
 import { useState as useGlobalState } from 'states'
-import MultiSignAddressCreateDialog from 'components/MultiSignAddressCreateDialog'
+import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import CopyZone from 'widgets/CopyZone'
 import { More } from 'widgets/Icons/icon'
 import { CustomizableDropdown } from 'widgets/Dropdown'
-import MultiSignAddressInfo from 'components/MultiSignAddressInfo'
+import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import { EditTextField } from 'widgets/TextField'
-import { MultiSignConfig } from 'services/remote'
+import { MultisigConfig } from 'services/remote'
 
 import { useSearch, useDialogWrapper, useConfigManage, useImportConfig, useExportConfig, useActions } from './hooks'
-import styles from './multi-sign-address.module.scss'
+import styles from './multisig-address.module.scss'
 
 const searchBoxStyles = {
   root: {
@@ -29,7 +29,7 @@ const messageBarStyle = { text: { alignItems: 'center' } }
 
 const tableActions = ['info', 'delete']
 
-const MultiSignAddress = () => {
+const MultisigAddress = () => {
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
   const {
@@ -42,17 +42,17 @@ const MultiSignAddress = () => {
   const { config, saveConfig, updateConfig, deleteConfigById } = useConfigManage({ walletId, searchKeywords })
   const { deleteAction, infoAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
-    (multiSignConfig: MultiSignConfig) => (option: { key: string }) => {
+    (multisigConfig: MultisigConfig) => (option: { key: string }) => {
       if (option.key === 'info') {
-        infoAction.action(multiSignConfig)
+        infoAction.action(multisigConfig)
       } else if (option.key === 'delete') {
-        deleteAction.action(multiSignConfig)
+        deleteAction.action(multisigConfig)
       }
     },
     [deleteAction, infoAction]
   )
   const listActionOptions = useMemo(
-    () => tableActions.map(key => ({ key, label: t(`multi-sign-address.table.actions.${key}`) })),
+    () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
     [t]
   )
   const isMainnet = isMainnetUtil(networks, networkID)
@@ -72,26 +72,26 @@ const MultiSignAddress = () => {
           value={keywords}
           className={styles.searchBox}
           styles={searchBoxStyles}
-          placeholder={t('multi-sign-address.search.placeholder')}
+          placeholder={t('multisig-address.search.placeholder')}
           onChange={onKeywordsChange}
           onSearch={onSearch}
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
         <div className={styles.actions}>
-          <Button label={t('multi-sign-address.add.label')} type="primary" onClick={openDialog} />
-          <Button label={t('multi-sign-address.import.label')} type="primary" onClick={onImportConfig} />
-          <Button label={t('multi-sign-address.export.label')} type="primary" onClick={exportConfig} />
+          <Button label={t('multisig-address.add.label')} type="primary" onClick={openDialog} />
+          <Button label={t('multisig-address.import.label')} type="primary" onClick={onImportConfig} />
+          <Button label={t('multisig-address.export.label')} type="primary" onClick={exportConfig} />
         </div>
       </div>
       {config.length ? (
-        <table className={styles.multiSignConfig}>
+        <table className={styles.multisigConfig}>
           <thead>
             <tr>
               <th>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
               {['address', 'alias', 'type'].map(field => (
-                <th key={field}>{t(`multi-sign-address.table.${field}`)}</th>
+                <th key={field}>{t(`multisig-address.table.${field}`)}</th>
               ))}
             </tr>
           </thead>
@@ -110,7 +110,7 @@ const MultiSignAddress = () => {
                   <CopyZone
                     content={v.fullPayload}
                     className={styles.fullPayload}
-                    name={t('multi-sign-address.table.copy-address')}
+                    name={t('multisig-address.table.copy-address')}
                   >
                     <span className={styles.overflow}>{v.fullPayload.slice(0, -6)}</span>
                     <span>...</span>
@@ -135,10 +135,10 @@ const MultiSignAddress = () => {
           </tbody>
         </table>
       ) : (
-        <div className={styles.noData}>{t('multi-sign-address.no-data')}</div>
+        <div className={styles.noData}>{t('multisig-address.no-data')}</div>
       )}
       <dialog ref={dialogRef} className={styles.dialog}>
-        {isDialogOpen && <MultiSignAddressCreateDialog closeDialog={closeDialog} confirm={saveConfig} />}
+        {isDialogOpen && <MultisigAddressCreateDialog closeDialog={closeDialog} confirm={saveConfig} />}
       </dialog>
       <dialog ref={importDialog} className={styles.dialog}>
         {importConfig && (
@@ -148,25 +148,25 @@ const MultiSignAddress = () => {
                 {importErr}
               </MessageBar>
             )}
-            <MultiSignAddressInfo
+            <MultisigAddressInfo
               m={importConfig.m.toString()}
               n={importConfig.n.toString()}
               r={importConfig.r}
               addresses={importConfig.addresses || []}
-              multiSignAddress={importConfig.fullPayload}
+              multisigAddress={importConfig.fullPayload}
             />
             <br />
             <MessageBar messageBarType={MessageBarType.warning} styles={messageBarStyle}>
-              {t('multi-sign-address.import-dialog.notice')}
+              {t('multisig-address.import-dialog.notice')}
             </MessageBar>
             <div className={styles.importActions}>
               <Button
-                label={t('multi-sign-address.import-dialog.actions.cancel')}
+                label={t('multisig-address.import-dialog.actions.cancel')}
                 type="cancel"
                 onClick={closeImportDialog}
               />
               <Button
-                label={t('multi-sign-address.import-dialog.actions.confirm')}
+                label={t('multisig-address.import-dialog.actions.confirm')}
                 type="primary"
                 onClick={confirmImport}
               />
@@ -175,23 +175,23 @@ const MultiSignAddress = () => {
         )}
       </dialog>
       <dialog ref={infoAction.dialogRef} className={styles.dialog}>
-        {infoAction.multiSignConfig && (
-          <MultiSignAddressInfo
-            m={infoAction.multiSignConfig.m.toString()}
-            n={infoAction.multiSignConfig.n.toString()}
-            r={infoAction.multiSignConfig.r}
-            addresses={infoAction.multiSignConfig.addresses || []}
-            multiSignAddress={infoAction.multiSignConfig.fullPayload}
+        {infoAction.MultisigConfig && (
+          <MultisigAddressInfo
+            m={infoAction.MultisigConfig.m.toString()}
+            n={infoAction.MultisigConfig.n.toString()}
+            r={infoAction.MultisigConfig.r}
+            addresses={infoAction.MultisigConfig.addresses || []}
+            multisigAddress={infoAction.MultisigConfig.fullPayload}
           />
         )}
         <div className={styles.ok}>
-          <Button label={t('multi-sign-address.ok')} type="ok" onClick={infoAction.closeDialog} />
+          <Button label={t('multisig-address.ok')} type="ok" onClick={infoAction.closeDialog} />
         </div>
       </dialog>
     </div>
   )
 }
 
-MultiSignAddress.displayName = 'MultiSignAddress'
+MultisigAddress.displayName = 'MultisigAddress'
 
-export default MultiSignAddress
+export default MultisigAddress

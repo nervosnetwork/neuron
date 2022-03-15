@@ -6,20 +6,20 @@ import { scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { ResponseCode } from 'utils/const'
 import MultiSign from 'models/multi-sign'
 import SystemScriptInfo from 'models/system-script-info'
-import MultiSignConfig from 'database/chain/entities/multi-sign-config'
-import MultiSignConfigModel from 'models/multi-sign-config'
-import MultiSignService from 'services/multi-sign'
-import { ImportMultiSignConfigParamsError } from 'exceptions/multi-sign'
+import MultisigConfig from 'database/chain/entities/multisig-config'
+import MultisigConfigModel from 'models/multisig-config'
+import MultisigService from 'services/multisig'
+import { ImportMultisigConfigParamsError } from 'exceptions/multisig'
 
-export default class MultiSignController {
+export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
-  #multiSignService: MultiSignService;
+  #multisigService: MultisigService;
 
   constructor() {
-    this.#multiSignService = new MultiSignService();
+    this.#multisigService = new MultisigService();
   }
 
-  createMultiSignAddress(params: {
+  createMultisigAddress(params: {
     r: number
     m: number
     n: number
@@ -56,7 +56,7 @@ export default class MultiSignController {
     alias: string
     fullPayload: string
   }) {
-    const multiSignConfig = MultiSignConfig.fromModel(new MultiSignConfigModel(
+    const multiSignConfig = MultisigConfig.fromModel(new MultisigConfigModel(
       params.walletId,
       params.m,
       params.n,
@@ -65,7 +65,7 @@ export default class MultiSignController {
       params.fullPayload,
       params.alias
     ))
-    const result = await this.#multiSignService.saveMultiSignConfig(multiSignConfig)
+    const result = await this.#multisigService.saveMultisigConfig(multiSignConfig)
     return {
       status: ResponseCode.Success,
       result
@@ -83,7 +83,7 @@ export default class MultiSignController {
     alias?: string
     fullPayload?: string
   }) {
-    const result = await this.#multiSignService.updateMultiSignConfig(params)
+    const result = await this.#multisigService.updateMultisigConfig(params)
     return {
       status: ResponseCode.Success,
       result
@@ -92,15 +92,15 @@ export default class MultiSignController {
 
   async deleteConfig(params: { id: number }) {
     const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
-      message: t('multi-sign-config.confirm-delete'),
+      message: t('multisig-config.confirm-delete'),
       type: 'question',
       buttons: [
-        t('multi-sign-config.delete-actions.ok'),
-        t('multi-sign-config.delete-actions.cancel')
+        t('multisig-config.delete-actions.ok'),
+        t('multisig-config.delete-actions.cancel')
       ]
     })
     if (response === 0) {
-      await this.#multiSignService.deleteConfig(params.id)
+      await this.#multisigService.deleteConfig(params.id)
       return {
         status: ResponseCode.Success,
       }
@@ -113,7 +113,7 @@ export default class MultiSignController {
   async getConfig(params: {
     walletId: string
   }) {
-    const result = await this.#multiSignService.getMultiSignConfig(params.walletId)
+    const result = await this.#multisigService.getMultisigConfig(params.walletId)
     return {
       status: ResponseCode.Success,
       result
@@ -122,7 +122,7 @@ export default class MultiSignController {
 
   async importConfig({ isMainnet }: { isMainnet: boolean }) {
     const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
-      title: t('multi-sign-config.import-config'),
+      title: t('multisig-config.import-config'),
       filters: [{
         name: 'json',
         extensions: ['json']
@@ -144,9 +144,9 @@ export default class MultiSignController {
       || config.n === undefined
       || config.addresses === undefined
     ) {
-      throw new ImportMultiSignConfigParamsError()
+      throw new ImportMultisigConfigParamsError()
     }
-    const fullPayload = this.createMultiSignAddress({ ...config, isMainnet })
+    const fullPayload = this.createMultisigAddress({ ...config, isMainnet })
     return {
       status: ResponseCode.Success,
       result: {
@@ -167,8 +167,8 @@ export default class MultiSignController {
     fullPayload: string
   }[]) {
     const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, {
-      title: t('multi-sign-config.export-config'),
-      defaultPath: `multi-sign-config_${Date.now()}.json`
+      title: t('multisig-config.export-config'),
+      defaultPath: `multisig-config_${Date.now()}.json`
     })
     if (canceled || !filePath) {
       return
@@ -178,7 +178,7 @@ export default class MultiSignController {
 
     dialog.showMessageBox({
       type: 'info',
-      message: t('multi-sign-config.config-exported', { filePath })
+      message: t('multisig-config.config-exported', { filePath })
     })
 
     return {

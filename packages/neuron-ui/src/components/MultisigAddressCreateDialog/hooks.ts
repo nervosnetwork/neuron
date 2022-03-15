@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
-import { createMultiSignAddress } from 'services/remote'
+import { createMultisigAddress } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 
 export enum Step {
@@ -70,7 +70,7 @@ export const useMultiAddress = ({ n }: { n: number }) => {
   }
 }
 
-export const useViewMultiSignAddress = ({
+export const useViewMultisigAddress = ({
   step,
   m,
   n,
@@ -85,10 +85,10 @@ export const useViewMultiSignAddress = ({
   addresses: string[]
   isMainnet: boolean
 }) => {
-  const [multiSignAddress, changeMultiSignAddress] = useState('')
+  const [MultisigAddress, changeMultisigAddress] = useState('')
   useEffect(() => {
     if (step === Step.viewMultiAddress) {
-      createMultiSignAddress({
+      createMultisigAddress({
         r,
         m,
         n,
@@ -96,10 +96,10 @@ export const useViewMultiSignAddress = ({
         isMainnet,
       }).then(res => {
         if (isSuccessResponse(res) && res.result) {
-          changeMultiSignAddress(res.result)
+          changeMultisigAddress(res.result)
         }
       })
     }
-  }, [step, changeMultiSignAddress, m, n, r, addresses, isMainnet])
-  return multiSignAddress
+  }, [step, changeMultisigAddress, m, n, r, addresses, isMainnet])
+  return MultisigAddress
 }

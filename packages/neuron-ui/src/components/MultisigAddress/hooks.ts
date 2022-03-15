@@ -1,14 +1,14 @@
 import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { useDialog, isSuccessResponse } from 'utils'
 import {
-  MultiSignConfig,
-  ImportMultiSignConfig,
-  saveMultiSignConfig,
-  getMultiSignConfig,
-  importMultiSignConfig,
-  updateMultiSignConfig,
-  exportMultiSignConfig,
-  deleteMultiSignConfig,
+  MultisigConfig,
+  ImportMultisigConfig,
+  saveMultisigConfig,
+  getMultisigConfig,
+  importMultisigConfig,
+  updateMultisigConfig,
+  exportMultisigConfig,
+  deleteMultisigConfig,
 } from 'services/remote'
 
 export const useSearch = () => {
@@ -55,10 +55,10 @@ export const useDialogWrapper = ({
 }
 
 export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string; searchKeywords: string }) => {
-  const [config, changeConfig] = useState<MultiSignConfig[]>([])
+  const [config, changeConfig] = useState<MultisigConfig[]>([])
   const saveConfig = useCallback(
     ({ m, n, r, addresses, fullPayload }) => {
-      return saveMultiSignConfig({
+      return saveMultisigConfig({
         m,
         n,
         r,
@@ -78,7 +78,7 @@ export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string
     [walletId, config]
   )
   useEffect(() => {
-    getMultiSignConfig({
+    getMultisigConfig({
       walletId,
     }).then(res => {
       if (isSuccessResponse(res)) {
@@ -88,7 +88,7 @@ export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string
   }, [changeConfig, walletId])
   const updateConfig = useCallback(
     (id: number) => (alias: string | undefined) => {
-      updateMultiSignConfig({ id, alias: alias || '' }).then(res => {
+      updateMultisigConfig({ id, alias: alias || '' }).then(res => {
         if (isSuccessResponse(res)) {
           changeConfig(config.map(v => (v.id === res.result?.id ? res.result : v)))
         }
@@ -134,13 +134,13 @@ export const useImportConfig = ({
   isMainnet,
 }: {
   isMainnet: boolean
-  saveConfig: (config: Omit<MultiSignConfig, 'walletId' | 'id'>) => Promise<void>
+  saveConfig: (config: Omit<MultisigConfig, 'walletId' | 'id'>) => Promise<void>
 }) => {
   const [importErr, setImportErr] = useState<string>()
-  const [importConfig, changeImportConfig] = useState<ImportMultiSignConfig | undefined>()
+  const [importConfig, changeImportConfig] = useState<ImportMultisigConfig | undefined>()
   const { openDialog, closeDialog, dialogRef } = useDialogWrapper()
   const onImportConfig = useCallback(() => {
-    importMultiSignConfig({ isMainnet }).then(res => {
+    importMultisigConfig({ isMainnet }).then(res => {
       if (isSuccessResponse(res) && res.result) {
         changeImportConfig(res.result)
         openDialog()
@@ -176,7 +176,7 @@ export const useImportConfig = ({
   }
 }
 
-export const useExportConfig = (config: MultiSignConfig[]) => {
+export const useExportConfig = (config: MultisigConfig[]) => {
   const [selectIds, changeSelectIds] = useState<number[]>([])
   const onChangeCheckedAll = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -202,7 +202,7 @@ export const useExportConfig = (config: MultiSignConfig[]) => {
     [selectIds, changeSelectIds]
   )
   const exportConfig = useCallback(() => {
-    exportMultiSignConfig(selectIds.length ? config.filter(v => selectIds.includes(v.id)) : config)
+    exportMultisigConfig(selectIds.length ? config.filter(v => selectIds.includes(v.id)) : config)
   }, [config, selectIds])
   return {
     onChangeCheckedAll,
@@ -215,8 +215,8 @@ export const useExportConfig = (config: MultiSignConfig[]) => {
 
 export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
   const deleteConfig = useCallback(
-    (option: MultiSignConfig) => {
-      deleteMultiSignConfig({ id: option.id }).then(res => {
+    (option: MultisigConfig) => {
+      deleteMultisigConfig({ id: option.id }).then(res => {
         if (isSuccessResponse(res)) {
           deleteConfigById(option.id)
         }
@@ -225,23 +225,23 @@ export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number
     [deleteConfigById]
   )
   const { openDialog: openInfoDialog, closeDialog, dialogRef } = useDialogWrapper()
-  const [multiSignConfig, changeMultiSignConfig] = useState<MultiSignConfig | undefined>()
-  const viewMultisignConfig = useCallback(
-    (option: MultiSignConfig) => {
+  const [multisigConfig, changeMultisigConfig] = useState<MultisigConfig | undefined>()
+  const viewMultisigConfig = useCallback(
+    (option: MultisigConfig) => {
       openInfoDialog()
-      changeMultiSignConfig(option)
+      changeMultisigConfig(option)
     },
-    [openInfoDialog, changeMultiSignConfig]
+    [openInfoDialog, changeMultisigConfig]
   )
   return {
     deleteAction: {
       action: deleteConfig,
     },
     infoAction: {
-      action: viewMultisignConfig,
+      action: viewMultisigConfig,
       closeDialog,
       dialogRef,
-      multiSignConfig,
+      multisigConfig,
     },
   }
 }

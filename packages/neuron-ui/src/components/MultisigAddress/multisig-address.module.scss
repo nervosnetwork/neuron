@@ -21,7 +21,7 @@
   padding: 30px 50px;
 }
 
-.multiSignConfig {
+.multisigConfig {
   width: 100%;
   border-collapse: collapse;
   margin-top: 16px;
@@ -88,15 +88,6 @@
   & > button {
     margin-left: 12px;
   }
-}
-
-.error {
-  color: red;
-}
-
-.notice {
-  background: rgb(255, 244, 206);
-  color: rgb(50, 49, 48);
 }
 
 .noData {

@@ -1,6 +1,6 @@
 import { ResponseCode } from '../../src/utils/const'
-import MultiSignService from '../../src/services/multi-sign'
-import MultiSignController from '../../src/controllers/multi-sign'
+import MultisigService from '../../src/services/multisig'
+import MultisigController from '../../src/controllers/multisig'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -15,8 +15,8 @@ jest.mock('electron', () => ({
   }
 }))
 
-jest.mock('../../src/services/multi-sign')
-const MultiSignServiceMock = MultiSignService as jest.MockedClass<typeof MultiSignService>
+jest.mock('../../src/services/multisig')
+const MultiSigServiceMock = MultisigService as jest.MockedClass<typeof MultisigService>
 
 let fileContent: {
   r?: number
@@ -46,7 +46,7 @@ jest.mock('../../src/utils/logger', () => ({
   }
 }))
 
-const multisignConfig = {
+const multisigConfig = {
   testnet: {
     params: {
       r: 1,
@@ -77,21 +77,21 @@ const multisignConfig = {
   }
 }
 
-describe('test for multisign controller', () => {
-  const multiSignController = new MultiSignController()
+describe('test for multisig controller', () => {
+  const multisigController = new MultisigController()
   afterEach(() => {
     response = 0
     dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
   })
 
-  describe('test createMultiSignAddress', () => {
+  describe('test createMultisigAddress', () => {
     it('test net', () => {
-      const multisignAddress = multiSignController.createMultiSignAddress(multisignConfig.testnet.params)
-      expect(multisignAddress.result).toEqual(multisignConfig.testnet.result)
+      const multisigAddress = multisigController.createMultisigAddress(multisigConfig.testnet.params)
+      expect(multisigAddress.result).toEqual(multisigConfig.testnet.result)
     })
     it('main net', () => {
-      const multisignAddress = multiSignController.createMultiSignAddress(multisignConfig.mainnet.params)
-      expect(multisignAddress.result).toEqual(multisignConfig.mainnet.result)
+      const multisigAddress = multisigController.createMultisigAddress(multisigConfig.mainnet.params)
+      expect(multisigAddress.result).toEqual(multisigConfig.mainnet.result)
     })
   })
 
@@ -105,8 +105,8 @@ describe('test for multisign controller', () => {
       alias: 'string',
       fullPayload: 'string'
     }
-    await multiSignController.saveConfig(params)
-    expect(MultiSignServiceMock.prototype.saveMultiSignConfig).toHaveBeenCalledWith(params)
+    await multisigController.saveConfig(params)
+    expect(MultiSigServiceMock.prototype.saveMultisigConfig).toHaveBeenCalledWith(params)
   })
 
   it('test update config', async () => {
@@ -114,58 +114,58 @@ describe('test for multisign controller', () => {
       id: 1,
       alias: '2'
     }
-    await multiSignController.updateConfig(params)
-    expect(MultiSignServiceMock.prototype.updateMultiSignConfig).toHaveBeenCalledWith(params)
+    await multisigController.updateConfig(params)
+    expect(MultiSigServiceMock.prototype.updateMultisigConfig).toHaveBeenCalledWith(params)
   })
 
   describe('test delete config', () => {
     it('cancel delete config', async () => {
       response = 1
-      const result = await multiSignController.deleteConfig({ id: 10 })
-      expect(MultiSignServiceMock.prototype.deleteConfig).not.toHaveBeenCalled()
+      const result = await multisigController.deleteConfig({ id: 10 })
+      expect(MultiSigServiceMock.prototype.deleteConfig).not.toHaveBeenCalled()
       expect(result.status).toBe(ResponseCode.Fail)
     })
     it('confirm delete config', async () => {
-      const result = await multiSignController.deleteConfig({ id: 10 })
-      expect(MultiSignServiceMock.prototype.deleteConfig).toHaveBeenCalled()
+      const result = await multisigController.deleteConfig({ id: 10 })
+      expect(MultiSigServiceMock.prototype.deleteConfig).toHaveBeenCalled()
       expect(result.status).toBe(ResponseCode.Success)
     })
   })
 
   it('get config', async () => {
     const params = { walletId: 'abcd' }
-    await multiSignController.getConfig(params)
-    expect(MultiSignServiceMock.prototype.getMultiSignConfig).toHaveBeenCalledWith(params.walletId)
+    await multisigController.getConfig(params)
+    expect(MultiSigServiceMock.prototype.getMultisigConfig).toHaveBeenCalledWith(params.walletId)
   })
 
   describe('import config', () => {
     it('cancel import', async () => {
       dialogRes = { canceled: true, filePaths: [], filePath: './' }
-      const res = await multiSignController.importConfig({ isMainnet: false })
+      const res = await multisigController.importConfig({ isMainnet: false })
       expect(res).toBeUndefined()
     })
     it('import data is error', async () => {
       fileContent = {
-        ...multisignConfig.testnet.params,
+        ...multisigConfig.testnet.params,
         r: undefined
       }
-      expect(multiSignController.importConfig({ isMainnet: false })).rejects.toThrow()
+      expect(multisigController.importConfig({ isMainnet: false })).rejects.toThrow()
     })
     it('import success', async () => {
-      fileContent = multisignConfig.testnet.params
-      const res = await multiSignController.importConfig({ isMainnet: false })
-      expect(res?.result?.fullPayload).toBe(multisignConfig.testnet.result)
+      fileContent = multisigConfig.testnet.params
+      const res = await multisigController.importConfig({ isMainnet: false })
+      expect(res?.result?.fullPayload).toBe(multisigConfig.testnet.result)
     })
   })
 
   describe('export config', () => {
     it('cancel export', async () => {
       dialogRes = { canceled: true, filePaths: [], filePath: './' }
-      const res = await multiSignController.exportConfig([])
+      const res = await multisigController.exportConfig([])
       expect(res).toBeUndefined()
     })
     it('export success', async () => {
-      const res = await multiSignController.exportConfig([])
+      const res = await multisigController.exportConfig([])
       expect(res?.status).toBe(ResponseCode.Success)
     })
   })

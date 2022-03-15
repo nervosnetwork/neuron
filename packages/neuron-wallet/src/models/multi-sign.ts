@@ -1,14 +1,14 @@
-import { MultiSignPrefixError } from 'exceptions'
+import { MultisigPrefixError } from 'exceptions'
 import Blake2b from './blake2b'
 
-export interface MultiSignPrefix {
+export interface MultisigPrefix {
   S: string
   R: string
   M: string
   N: string
 }
 
-const defaultMultiSignPrefix = {
+const defaultMultisigPrefix = {
   S: '0x00',
   R: '0x00',
   M: '0x01',
@@ -19,16 +19,16 @@ export default class MultiSign {
   // 1 epoch = 4h = 240min
   EPOCH_MINUTES = 240
 
-  serialize(blake160s: string[], { S, R, M, N }: MultiSignPrefix = defaultMultiSignPrefix) {
-    this.validMultiSignPrefix(S)
-    this.validMultiSignPrefix(R)
-    this.validMultiSignPrefix(M)
-    this.validMultiSignPrefix(N)
+  serialize(blake160s: string[], { S, R, M, N }: MultisigPrefix = defaultMultisigPrefix) {
+    this.validMultisigPrefix(S)
+    this.validMultisigPrefix(R)
+    this.validMultisigPrefix(M)
+    this.validMultisigPrefix(N)
     return `${S}${R.slice(2)}${M.slice(2)}${N.slice(2)}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
   }
 
-  hash(blake160: string | string[], multiSignPrefix: MultiSignPrefix = defaultMultiSignPrefix): string {
-    return Blake2b.digest(this.serialize(typeof blake160 === 'string' ? [blake160] : blake160, multiSignPrefix)).slice(
+  hash(blake160: string | string[], multisigPrefix: MultisigPrefix = defaultMultisigPrefix): string {
+    return Blake2b.digest(this.serialize(typeof blake160 === 'string' ? [blake160] : blake160, multisigPrefix)).slice(
       0,
       42
     )
@@ -79,9 +79,9 @@ export default class MultiSign {
     }
   }
 
-  private validMultiSignPrefix(v: string) {
+  private validMultisigPrefix(v: string) {
     if (!v.startsWith('0x') || v.length !== 4) {
-      throw new MultiSignPrefixError()
+      throw new MultisigPrefixError()
     }
   }
 }

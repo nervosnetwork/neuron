@@ -1,4 +1,4 @@
-export default class MultiSignConfigModel {
+export default class MultisigConfigModel {
   public id?: number
   public walletId: string
   public m: number
@@ -37,8 +37,8 @@ export default class MultiSignConfigModel {
     alias: string
     fullPayload: string
     id?: number
-  }): MultiSignConfigModel {
-    return new MultiSignConfigModel(
+  }): MultisigConfigModel {
+    return new MultisigConfigModel(
       params.walletId,
       params.m,
       params.n,

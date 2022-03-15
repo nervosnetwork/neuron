@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import CopyZone from 'widgets/CopyZone'
 
-import styles from './multi-sign-address-info.module.scss'
+import styles from './multisig-address-info.module.scss'
 
-export const MultiSignAddressTable = ({
+export const MultisigAddressTable = ({
   r,
   addresses,
   changeR,
@@ -25,7 +25,7 @@ export const MultiSignAddressTable = ({
         <thead>
           <tr>
             {['index', 'required', 'signer-address'].map(field => (
-              <th key={field}>{t(`multi-sign-address.create-dialog.${field}`)}</th>
+              <th key={field}>{t(`multisig-address.create-dialog.${field}`)}</th>
             ))}
           </tr>
         </thead>
@@ -46,7 +46,7 @@ export const MultiSignAddressTable = ({
                   <CopyZone
                     content={v}
                     className={styles.copyzone}
-                    name={t('multi-sign-address.create-dialog.copy-address')}
+                    name={t('multisig-address.create-dialog.copy-address')}
                   >
                     <span className={styles.overflow}>{v.slice(0, -6)}</span>
                     <span>...</span>
@@ -59,7 +59,7 @@ export const MultiSignAddressTable = ({
                     className={styles.addressField}
                     onChange={changeAddress ? changeAddress(idx) : undefined}
                     disabled={disabled}
-                    placeholder={t('multi-sign-address.create-dialog.multi-address-info.ckb-address-placeholder')}
+                    placeholder={t('multisig-address.create-dialog.multi-address-info.ckb-address-placeholder')}
                   />
                 )}
               </td>
@@ -76,29 +76,29 @@ const MultiSignAddressInfo = ({
   n,
   r,
   addresses,
-  multiSignAddress,
+  multisigAddress,
 }: {
   m: string
   n: string
   r: number
   addresses: string[]
-  multiSignAddress: string
+  multisigAddress: string
 }) => {
   const [t] = useTranslation()
   return (
     <>
-      <p>{t('multi-sign-address.create-dialog.multi-address-info.view-title', { m, n })}</p>
+      <p>{t('multisig-address.create-dialog.multi-address-info.view-title', { m, n })}</p>
       <CopyZone
-        content={multiSignAddress}
+        content={multisigAddress}
         className={styles.copyzone}
-        name={t('multi-sign-address.create-dialog.copy-address')}
+        name={t('multisig-address.create-dialog.copy-address')}
       >
-        <span className={styles.overflow}>{multiSignAddress.slice(0, -6)}</span>
+        <span className={styles.overflow}>{multisigAddress.slice(0, -6)}</span>
         <span>...</span>
-        <span>{multiSignAddress.slice(-6)}</span>
+        <span>{multisigAddress.slice(-6)}</span>
       </CopyZone>
-      <p>{t('multi-sign-address.create-dialog.multi-list', { m, n })}</p>
-      <MultiSignAddressTable r={r} addresses={addresses} disabled />
+      <p>{t('multisig-address.create-dialog.multi-list', { m, n })}</p>
+      <MultisigAddressTable r={r} addresses={addresses} disabled />
     </>
   )
 }

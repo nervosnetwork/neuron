@@ -120,10 +120,10 @@ export default {
       'invalid-transaction-file': 'Invalid transaction file.',
       'save-offline-json-failed': 'Unable to save JSON file.',
       'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
-      'multi-sign-script-prefix-error': 'The multisign config is error',
-      'multi-sign-config-not-exist': 'The multisign config is not exist',
-      'multi-sign-config-exist': 'The multisign config has exist',
-      'import-multi-sign-config-params-error': 'The multisign config lose requried paramter'
+      'multisig-script-prefix-error': 'The multisig config is error',
+      'multisig-config-not-exist': 'The multisig config is not exist',
+      'multisig-config-exist': 'The multisig config has exist',
+      'import-multisig-config-params-error': 'The multisig config lose requried paramter'
     },
     messageBox: {
       button: {
@@ -242,11 +242,11 @@ export default {
       'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
       'load-transaction': 'Load Transaction file'
     },
-    'multi-sign-config': {
-      'import-config': 'Import multisign config',
-      'export-config': 'Export multisign config',
-      'config-exported': 'Multisign configs has been exported at {{filePath}}.',
-      'confirm-delete': 'Confirm delete the multisign config?',
+    'multisig-config': {
+      'import-config': 'Import multisig config',
+      'export-config': 'Export multisig config',
+      'config-exported': 'Multisig configs has been exported at {{filePath}}.',
+      'confirm-delete': 'Confirm delete the multisig config?',
       'delete-actions': {
         ok: 'Confirm',
         cancel: 'Cancel'

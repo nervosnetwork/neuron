@@ -16,7 +16,7 @@ import TransactionsController from 'controllers/transactions'
 import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
-import MultiSignController from 'controllers/multi-sign'
+import MultisigController from 'controllers/multisig'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
@@ -56,7 +56,7 @@ export default class ApiController {
   #hardwareController = new HardwareController()
   #offlineSignController = new OfflineSignController()
   #sudtController = new SUDTController()
-  #multiSignController = new MultiSignController()
+  #multisigController = new MultisigController()
 
   public async mount() {
     this.#registerHandlers()
@@ -532,32 +532,32 @@ export default class ApiController {
     })
 
     // multi sign
-    handle('create-multi-sign-address',async (_, params) => {
-      return this.#multiSignController.createMultiSignAddress(params)
+    handle('create-multisig-address',async (_, params) => {
+      return this.#multisigController.createMultisigAddress(params)
     })
 
-    handle('save-multi-sign-config',async (_, params) => {
-      return this.#multiSignController.saveConfig(params)
+    handle('save-multisig-config',async (_, params) => {
+      return this.#multisigController.saveConfig(params)
     })
 
-    handle('update-multi-sign-config',async (_, params) => {
-      return this.#multiSignController.updateConfig(params)
+    handle('update-multisig-config',async (_, params) => {
+      return this.#multisigController.updateConfig(params)
     })
 
-    handle('delete-multi-sign-config',async (_, params) => {
-      return this.#multiSignController.deleteConfig(params)
+    handle('delete-multisig-config',async (_, params) => {
+      return this.#multisigController.deleteConfig(params)
     })
 
-    handle('get-multi-sign-config',async (_, params) => {
-      return this.#multiSignController.getConfig(params)
+    handle('get-multisig-config',async (_, params) => {
+      return this.#multisigController.getConfig(params)
     })
 
-    handle('import-multi-sign-config',async (_, params) => {
-      return this.#multiSignController.importConfig(params)
+    handle('import-multisig-config',async (_, params) => {
+      return this.#multisigController.importConfig(params)
     })
 
-    handle('export-multi-sign-config',async (_, params) => {
-      return this.#multiSignController.exportConfig(params)
+    handle('export-multisig-config',async (_, params) => {
+      return this.#multisigController.exportConfig(params)
     })
   }
 

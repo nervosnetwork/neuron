@@ -111,10 +111,10 @@ export default {
       'connect-device-failed': '設備無法連接，請檢查設備連接狀況。',
       'save-offline-json-failed': '無法保存 JSON 文件。',
       'offline-sign-failed': '簽名失敗，請檢查是否使用了正確的錢包進行簽名。',
-      'multi-sign-script-prefix-error': '多簽配置錯誤',
-      'multi-sign-config-not-exist': '多簽配置不存在',
-      'multi-sign-config-exist': '多簽地址已經存在',
-      'import-multi-sign-config-params-error': '導入的多簽配置文件缺少參數'
+      'multisig-script-prefix-error': '多簽配置錯誤',
+      'multisig-config-not-exist': '多簽配置不存在',
+      'multisig-config-exist': '多簽地址已經存在',
+      'import-multisig-config-params-error': '導入的多簽配置文件缺少參數'
     },
     messageBox: {
       button: {
@@ -232,7 +232,7 @@ export default {
       'transaction-exported': '交易已被導出至 {{filePath}}.',
       'load-transaction': '加載交易檔案'
     },
-    'multi-sign-config': {
+    'multisig-config': {
       'import-config': '導入多簽配置',
       'export-config': '導出多簽配置',
       'config-exported': '多簽配置已被導出至 {{filePath}}.',

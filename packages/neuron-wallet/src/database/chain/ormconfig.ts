@@ -15,7 +15,7 @@ import SudtTokenInfo from './entities/sudt-token-info'
 import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import TxDescription from './entities/tx-description'
 import AddressDescription from './entities/address-description'
-import MultiSignConfig from './entities/multi-sign-config'
+import MultisigConfig from './entities/multisig-config'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -41,7 +41,7 @@ import { HDPublicKeyInfo1598087517643 } from './migrations/1598087517643-HDPubli
 import { TxDescription1599441769473 } from './migrations/1599441769473-TxDescription'
 import { RemoveKeyInfoAddress1601447406035 } from './migrations/1601447406035-RemoveKeyInfoAddress'
 import { AddAddressDescription1602543179168 } from './migrations/1602543179168-AddAddressDescription'
-import { AddMultiSignConfig1646817547204 } from './migrations/1646817547204-AddMultiSignConfig'
+import { AddMultisigConfig1646817547204 } from './migrations/1646817547204-AddMultisigConfig'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -72,7 +72,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       SudtTokenInfo,
       IndexerTxHashCache,
       AddressDescription,
-      MultiSignConfig
+      MultisigConfig
     ],
     migrations: [
       InitMigration1566959757554,
@@ -99,7 +99,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       TxDescription1599441769473,
       RemoveKeyInfoAddress1601447406035,
       AddAddressDescription1602543179168,
-      AddMultiSignConfig1646817547204
+      AddMultisigConfig1646817547204
     ],
     logger: 'simple-console',
     logging,

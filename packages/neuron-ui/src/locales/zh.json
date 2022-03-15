@@ -733,7 +733,7 @@
         "cancel": "取消"
       }
     },
-    "multi-sign-address": {
+    "multisig-address": {
       "search": {
         "placeholder": "使用地址或者别名搜索"
       },
@@ -775,12 +775,12 @@
         "signer-address": "签名者地址",
         "copy-address": "复制地址",
         "m-n": {
-          "title": "请选择 m of n 类型的多重签名地址配置，从n个密钥中通过m个确认来转移资产。",
+          "title": "请选择 m-of-n 类型的多重签名地址配置，从n个密钥中通过m个确认来转移资产。",
           "error": "对于 m-of-n 多重签名地址，m 不应大于 n"
         },
         "multi-address-info": {
-          "title": "对于 {{m}} of {{n}}, 请输入 {{n}} 个签名者地址",
-          "view-title": " {{m}} of {{n}} 的多签地址是",
+          "title": "对于 {{m}}-of-{{n}}, 请输入 {{n}} 个签名者地址",
+          "view-title": " {{m}}-of-{{n}} 的多签地址是",
           "ckb-address-placeholder": "ckb address"
         },
         "multi-list": "多签地址列表",

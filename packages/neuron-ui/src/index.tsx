@@ -13,7 +13,7 @@ import Main from 'containers/Main'
 import Settings from 'containers/Settings'
 import Transaction from 'components/Transaction'
 import SignAndVerify from 'components/SignAndVerify'
-import MultiSignAddress from 'components/MultiSignAddress'
+import MultiSignAddress from 'components/MultisigAddress'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { withProvider } from 'states'
 
