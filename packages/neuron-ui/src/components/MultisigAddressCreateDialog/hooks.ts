@@ -43,15 +43,22 @@ export const useMultiAddress = ({ n }: { n: number }) => {
   const [addresses, setAddresses] = useState(new Array(n).fill(''))
   const [r, setR] = useState(0)
   const changeR = useCallback(
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setR(e.target.checked ? index + 1 : index)
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        checked,
+        dataset: { idx = -1 },
+      } = e.target
+      setR(checked ? +idx + 1 : +idx)
     },
     [setR]
   )
   const changeAddress = useCallback(
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = e.target
-      setAddresses(v => v.map((item, idx) => (index === idx ? value : item)))
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        value,
+        dataset: { idx = -1 },
+      } = e.target
+      setAddresses(v => v.map((item, index) => (+idx === index ? value : item)))
     },
     [setAddresses]
   )

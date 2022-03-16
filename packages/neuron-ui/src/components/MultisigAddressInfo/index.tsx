@@ -14,8 +14,8 @@ export const MultisigAddressTable = ({
 }: {
   r: number
   addresses: string[]
-  changeR?: (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => void
-  changeAddress?: (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => void
+  changeR?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  changeAddress?: (e: React.ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean
 }) => {
   const [t] = useTranslation()
@@ -31,12 +31,13 @@ export const MultisigAddressTable = ({
         </thead>
         <tbody>
           {addresses.map((v, idx) => (
-            <tr key={v || idx}>
+            <tr key={idx.toString()}>
               <td className={styles.index}>{`#${idx + 1}`}</td>
               <td className={styles.required}>
                 <input
                   type="checkbox"
-                  onChange={changeR ? changeR(idx) : undefined}
+                  data-idx={idx}
+                  onChange={changeR}
                   checked={idx < r}
                   disabled={idx > r || disabled}
                 />
@@ -54,10 +55,11 @@ export const MultisigAddressTable = ({
                   </CopyZone>
                 ) : (
                   <TextField
-                    field="address"
+                    field={`${idx}_address`}
+                    data-idx={idx}
                     value={v}
                     className={styles.addressField}
-                    onChange={changeAddress ? changeAddress(idx) : undefined}
+                    onChange={changeAddress}
                     disabled={disabled}
                     placeholder={t('multisig-address.create-dialog.multi-address-info.ckb-address-placeholder')}
                   />
