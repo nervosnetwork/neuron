@@ -11,12 +11,14 @@ export const MultisigAddressTable = ({
   changeR,
   changeAddress,
   disabled,
+  addressErrors,
 }: {
   r: number
   addresses: string[]
   changeR?: (e: React.ChangeEvent<HTMLInputElement>) => void
   changeAddress?: (e: React.ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean
+  addressErrors?: Record<number, (Error & { i18n: Record<string, string> }) | undefined>
 }) => {
   const [t] = useTranslation()
   return (
@@ -62,6 +64,7 @@ export const MultisigAddressTable = ({
                     onChange={changeAddress}
                     disabled={disabled}
                     placeholder={t('multisig-address.create-dialog.multi-address-info.ckb-address-placeholder')}
+                    error={addressErrors?.[idx] ? t(addressErrors[idx]!.message, addressErrors[idx]!.i18n) : undefined}
                   />
                 )}
               </td>

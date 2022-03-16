@@ -57,12 +57,15 @@ const MultisigAddressCreateDialog = ({
   const back = useCallback(() => {
     changeStep(step - 1)
   }, [changeStep, step])
-  const { r, addresses, changeR, changeAddress, isError: addressErr } = useMultiAddress({ n: Number(n) })
   const {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
+  const { r, addresses, changeR, changeAddress, isError: addressErr, addressErrors } = useMultiAddress({
+    n: Number(n),
+    isMainnet,
+  })
   const multisigAddress = useViewMultisigAddress({
     m: Number(m),
     n: Number(n),
@@ -91,7 +94,13 @@ const MultisigAddressCreateDialog = ({
       {step === Step.setMultiAddress && (
         <>
           <p>{t('multisig-address.create-dialog.multi-address-info.title', { m, n })}</p>
-          <MultisigAddressTable r={r} addresses={addresses} changeR={changeR} changeAddress={changeAddress} />
+          <MultisigAddressTable
+            r={r}
+            addresses={addresses}
+            changeR={changeR}
+            changeAddress={changeAddress}
+            addressErrors={addressErrors}
+          />
         </>
       )}
       {step === Step.viewMultiAddress && (

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { createMultisigAddress } from 'services/remote'
-import { isSuccessResponse } from 'utils'
+import { isSuccessResponse, validateAddress } from 'utils'
 
 export enum Step {
   setMN = 0,
@@ -39,8 +39,11 @@ export const useMAndN = () => {
   }
 }
 
-export const useMultiAddress = ({ n }: { n: number }) => {
+export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolean }) => {
   const [addresses, setAddresses] = useState(new Array(n).fill(''))
+  const [addressErrors, setAddressErrors] = useState<
+    Record<number, (Error & { i18n: Record<string, string> }) | undefined>
+  >({})
   const [r, setR] = useState(0)
   const changeR = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,13 +61,25 @@ export const useMultiAddress = ({ n }: { n: number }) => {
         value,
         dataset: { idx = -1 },
       } = e.target
+      try {
+        validateAddress(value, isMainnet)
+        setAddressErrors(v => ({
+          ...v,
+          [idx]: undefined,
+        }))
+      } catch (error) {
+        setAddressErrors(v => ({
+          ...v,
+          [idx]: error,
+        }))
+      }
       setAddresses(v => v.map((item, index) => (+idx === index ? value : item)))
     },
-    [setAddresses]
+    [setAddresses, isMainnet, setAddressErrors]
   )
   const isError = useMemo(() => {
-    return addresses.some(v => !v)
-  }, [addresses])
+    return addresses.some((v, idx) => !v || addressErrors[idx])
+  }, [addresses, addressErrors])
   useEffect(() => {
     setAddresses(new Array(n).fill(''))
     setR(0)
@@ -75,6 +90,7 @@ export const useMultiAddress = ({ n }: { n: number }) => {
     changeR,
     changeAddress,
     isError,
+    addressErrors,
   }
 }
 
