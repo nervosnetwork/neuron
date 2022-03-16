@@ -39,7 +39,7 @@ const MultisigAddress = () => {
   } = useGlobalState()
   const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { config, saveConfig, updateConfig, deleteConfigById } = useConfigManage({ walletId, searchKeywords })
+  const { configs, saveConfig, updateConfig, deleteConfigById } = useConfigManage({ walletId, searchKeywords })
   const { deleteAction, infoAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
@@ -64,7 +64,7 @@ const MultisigAddress = () => {
     closeDialog: closeImportDialog,
     confirm: confirmImport,
   } = useImportConfig({ isMainnet, saveConfig })
-  const { selectIds, isAllSelected, onChangeChecked, onChangeCheckedAll, exportConfig } = useExportConfig(config)
+  const { selectIds, isAllSelected, onChangeChecked, onChangeCheckedAll, exportConfig } = useExportConfig(configs)
   return (
     <div>
       <div className={styles.head}>
@@ -83,7 +83,7 @@ const MultisigAddress = () => {
           <Button label={t('multisig-address.export.label')} type="primary" onClick={exportConfig} />
         </div>
       </div>
-      {config.length ? (
+      {configs.length ? (
         <table className={styles.multisigConfig}>
           <thead>
             <tr>
@@ -96,7 +96,7 @@ const MultisigAddress = () => {
             </tr>
           </thead>
           <tbody>
-            {config.map(v => (
+            {configs.map(v => (
               <tr key={v.id}>
                 <td>
                   <input

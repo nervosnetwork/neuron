@@ -92,20 +92,20 @@ export const EditTextField = ({
 } & React.ComponentPropsWithRef<typeof TextField>) => {
   const rootRef = useRef<any>()
   const [editedValue, changeEditValue] = useState<string | undefined>('')
-  const [isActived, changeActivied] = useState(false)
+  const [isActive, changeActive] = useState(false)
   const focusEdit = useCallback(() => {
     if (rootRef.current && rootRef.current.querySelector('input')) {
       changeEditValue(value)
       rootRef.current.querySelector('input').focus()
     }
-    changeActivied(true)
-  }, [changeActivied, value])
+    changeActive(true)
+  }, [changeActive, value])
   const onBlur = useCallback(() => {
-    changeActivied(false)
+    changeActive(false)
     if (onChange && editedValue !== value) {
       onChange(editedValue)
     }
-  }, [onChange, changeActivied, editedValue, value])
+  }, [onChange, changeActive, editedValue, value])
   const onChangeFocus = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       changeEditValue(e.target.value)
@@ -117,14 +117,14 @@ export const EditTextField = ({
     <TextField
       {...rest}
       ref={rootRef}
-      value={isActived ? editedValue : value}
+      value={isActive ? editedValue : value}
       onBlur={onBlur}
-      onChange={isActived ? onChangeFocus : undefined}
-      readOnly={!isActived}
+      onChange={isActive ? onChangeFocus : undefined}
+      readOnly={!isActive}
       onDoubleClick={focusEdit}
       className={styles.editTextField}
       suffix={
-        isActived ? (
+        isActive ? (
           undefined
         ) : (
           <button type="button" onClick={focusEdit} className={styles.editBtn}>

@@ -141,7 +141,7 @@ describe('test for multisig controller', () => {
   describe('import config', () => {
     it('cancel import', async () => {
       dialogRes = { canceled: true, filePaths: [], filePath: './' }
-      const res = await multisigController.importConfig({ isMainnet: false })
+      const res = await multisigController.importConfig(false)
       expect(res).toBeUndefined()
     })
     it('import data is error', async () => {
@@ -149,11 +149,11 @@ describe('test for multisig controller', () => {
         ...multisigConfig.testnet.params,
         r: undefined
       }
-      expect(multisigController.importConfig({ isMainnet: false })).rejects.toThrow()
+      expect(multisigController.importConfig(false)).rejects.toThrow()
     })
     it('import success', async () => {
       fileContent = multisigConfig.testnet.params
-      const res = await multisigController.importConfig({ isMainnet: false })
+      const res = await multisigController.importConfig(false)
       expect(res?.result?.fullPayload).toBe(multisigConfig.testnet.result)
     })
   })

@@ -20,10 +20,10 @@ export default class MultiSign {
   EPOCH_MINUTES = 240
 
   serialize(blake160s: string[], { S, R, M, N }: MultisigPrefix = defaultMultisigPrefix) {
-    this.validMultisigPrefix(S)
-    this.validMultisigPrefix(R)
-    this.validMultisigPrefix(M)
-    this.validMultisigPrefix(N)
+    this.validateMultisigPrefix(S)
+    this.validateMultisigPrefix(R)
+    this.validateMultisigPrefix(M)
+    this.validateMultisigPrefix(N)
     return `${S}${R.slice(2)}${M.slice(2)}${N.slice(2)}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
   }
 
@@ -79,7 +79,7 @@ export default class MultiSign {
     }
   }
 
-  private validMultisigPrefix(v: string) {
+  private validateMultisigPrefix(v: string) {
     if (!v.startsWith('0x') || v.length !== 4) {
       throw new MultisigPrefixError()
     }

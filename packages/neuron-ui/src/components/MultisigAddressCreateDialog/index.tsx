@@ -50,7 +50,7 @@ const MultisigAddressCreateDialog = ({
 }) => {
   const [step, changeStep] = useState(Step.setMN)
   const [t] = useTranslation()
-  const { m, n, changeMBySelect, changeNBySelect, isError: mnErr } = useMAndN()
+  const { m, n, setMBySelect, setNBySelect, isError: mnErr } = useMAndN()
   const next = useCallback(() => {
     changeStep(step + 1)
   }, [changeStep, step])
@@ -87,7 +87,7 @@ const MultisigAddressCreateDialog = ({
   return (
     <>
       <p>{t('multisig-address.create-dialog.title')}</p>
-      {step === Step.setMN && <SetMN m={m} n={n} changeM={changeMBySelect} changeN={changeNBySelect} />}
+      {step === Step.setMN && <SetMN m={m} n={n} changeM={setMBySelect} changeN={setNBySelect} />}
       {step === Step.setMultiAddress && (
         <>
           <p>{t('multisig-address.create-dialog.multi-address-info.title', { m, n })}</p>

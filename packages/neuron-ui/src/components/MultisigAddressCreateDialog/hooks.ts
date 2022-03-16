@@ -9,23 +9,23 @@ export enum Step {
 }
 
 export const useMAndN = () => {
-  const [m, changeM] = useState('')
-  const [n, changeN] = useState('')
-  const changeMBySelect = useCallback(
+  const [m, setM] = useState('')
+  const [n, setN] = useState('')
+  const setMBySelect = useCallback(
     (value: string) => {
       if (!Number.isNaN(Number(value))) {
-        changeM(value)
+        setM(value)
       }
     },
-    [changeM]
+    [setM]
   )
-  const changeNBySelect = useCallback(
+  const setNBySelect = useCallback(
     (value: string) => {
       if (!Number.isNaN(Number(value))) {
-        changeN(value)
+        setN(value)
       }
     },
-    [changeN]
+    [setN]
   )
   const isError = useMemo(() => {
     return !m || !n || Number(m) > Number(n)
@@ -33,14 +33,14 @@ export const useMAndN = () => {
   return {
     m,
     n,
-    changeMBySelect,
-    changeNBySelect,
+    setMBySelect,
+    setNBySelect,
     isError,
   }
 }
 
 export const useMultiAddress = ({ n }: { n: number }) => {
-  const [addresses, changeAddresses] = useState(new Array(n).fill(''))
+  const [addresses, setAddresses] = useState(new Array(n).fill(''))
   const [r, setR] = useState(0)
   const changeR = useCallback(
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,15 +50,16 @@ export const useMultiAddress = ({ n }: { n: number }) => {
   )
   const changeAddress = useCallback(
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      changeAddresses(addresses.map((item, idx) => (index === idx ? e.target.value : item)))
+      const { value } = e.target
+      setAddresses(v => v.map((item, idx) => (index === idx ? value : item)))
     },
-    [changeAddresses, addresses]
+    [setAddresses]
   )
   const isError = useMemo(() => {
     return addresses.some(v => !v)
   }, [addresses])
   useEffect(() => {
-    changeAddresses(new Array(n).fill(''))
+    setAddresses(new Array(n).fill(''))
     setR(0)
   }, [n])
   return {

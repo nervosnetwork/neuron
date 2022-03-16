@@ -120,7 +120,7 @@ export default class MultisigController {
     }
   }
 
-  async importConfig({ isMainnet }: { isMainnet: boolean }) {
+  async importConfig(isMainnet: boolean) {
     const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.import-config'),
       filters: [{

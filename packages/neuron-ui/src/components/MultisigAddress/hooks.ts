@@ -55,7 +55,7 @@ export const useDialogWrapper = ({
 }
 
 export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string; searchKeywords: string }) => {
-  const [config, changeConfig] = useState<MultisigConfig[]>([])
+  const [configs, setConfigs] = useState<MultisigConfig[]>([])
   const saveConfig = useCallback(
     ({ m, n, r, addresses, fullPayload }) => {
       return saveMultisigConfig({
@@ -68,60 +68,57 @@ export const useConfigManage = ({ walletId, searchKeywords }: { walletId: string
       }).then(res => {
         if (isSuccessResponse(res)) {
           if (res.result) {
-            changeConfig([res.result, ...config])
+            setConfigs(v => [res.result!, ...v])
           }
         } else {
           throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
         }
       })
     },
-    [walletId, config]
+    [walletId, setConfigs]
   )
   useEffect(() => {
     getMultisigConfig({
       walletId,
     }).then(res => {
       if (isSuccessResponse(res)) {
-        changeConfig(res.result)
+        setConfigs(res.result)
       }
     })
-  }, [changeConfig, walletId])
+  }, [setConfigs, walletId])
   const updateConfig = useCallback(
     (id: number) => (alias: string | undefined) => {
       updateMultisigConfig({ id, alias: alias || '' }).then(res => {
         if (isSuccessResponse(res)) {
-          changeConfig(config.map(v => (v.id === res.result?.id ? res.result : v)))
+          setConfigs(v => v.map(config => (config.id === res.result?.id ? res.result : config)))
         }
       })
     },
-    [config, changeConfig]
+    [setConfigs]
   )
-  const filterConfig = useCallback(
-    (key: string) => {
-      changeConfig(
-        config.filter(v => {
-          return v.alias?.includes(key) || v.fullPayload === key
-        })
-      )
-    },
-    [config]
-  )
+  const filterConfig = useCallback((key: string) => {
+    setConfigs(v =>
+      v.filter(config => {
+        return config.alias?.includes(key) || config.fullPayload === key
+      })
+    )
+  }, [])
   const deleteConfigById = useCallback(
     (id: number) => {
-      changeConfig(config.filter(v => v.id !== id))
+      setConfigs(v => v.filter(config => config.id !== id))
     },
-    [config, changeConfig]
+    [setConfigs]
   )
   return {
     saveConfig,
-    config: useMemo(
+    configs: useMemo(
       () =>
         searchKeywords
-          ? config.filter(v => {
+          ? configs.filter(v => {
               return v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords
             })
-          : config,
-      [config, searchKeywords]
+          : configs,
+      [configs, searchKeywords]
     ),
     updateConfig,
     deleteConfigById,
@@ -136,11 +133,11 @@ export const useImportConfig = ({
   isMainnet: boolean
   saveConfig: (config: Omit<MultisigConfig, 'walletId' | 'id'>) => Promise<void>
 }) => {
-  const [importErr, setImportErr] = useState<string>()
+  const [importErr, setImportErr] = useState<string | undefined>()
   const [importConfig, changeImportConfig] = useState<ImportMultisigConfig | undefined>()
   const { openDialog, closeDialog, dialogRef } = useDialogWrapper()
   const onImportConfig = useCallback(() => {
-    importMultisigConfig({ isMainnet }).then(res => {
+    importMultisigConfig(isMainnet).then(res => {
       if (isSuccessResponse(res) && res.result) {
         changeImportConfig(res.result)
         openDialog()
@@ -176,39 +173,39 @@ export const useImportConfig = ({
   }
 }
 
-export const useExportConfig = (config: MultisigConfig[]) => {
-  const [selectIds, changeSelectIds] = useState<number[]>([])
+export const useExportConfig = (configs: MultisigConfig[]) => {
+  const [selectIds, setSelectIds] = useState<number[]>([])
   const onChangeCheckedAll = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.checked) {
-        changeSelectIds(config.map(v => v.id))
+        setSelectIds(configs.map(v => v.id))
       } else {
-        changeSelectIds([])
+        setSelectIds([])
       }
     },
-    [changeSelectIds, config]
+    [setSelectIds, configs]
   )
   const onChangeChecked = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { configId } = e.target.dataset
       if (configId) {
         if (e.target.checked) {
-          changeSelectIds([...selectIds, Number(configId)])
+          setSelectIds([...selectIds, Number(configId)])
         } else {
-          changeSelectIds(selectIds.filter(v => v.toString() !== configId))
+          setSelectIds(selectIds.filter(v => v.toString() !== configId))
         }
       }
     },
-    [selectIds, changeSelectIds]
+    [selectIds, setSelectIds]
   )
   const exportConfig = useCallback(() => {
-    exportMultisigConfig(selectIds.length ? config.filter(v => selectIds.includes(v.id)) : config)
-  }, [config, selectIds])
+    exportMultisigConfig(selectIds.length ? configs.filter(v => selectIds.includes(v.id)) : configs)
+  }, [configs, selectIds])
   return {
     onChangeCheckedAll,
     onChangeChecked,
     selectIds,
-    isAllSelected: !!config.length && selectIds.length === config.length,
+    isAllSelected: !!configs.length && selectIds.length === configs.length,
     exportConfig,
   }
 }
@@ -225,13 +222,13 @@ export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number
     [deleteConfigById]
   )
   const { openDialog: openInfoDialog, closeDialog, dialogRef } = useDialogWrapper()
-  const [multisigConfig, changeMultisigConfig] = useState<MultisigConfig | undefined>()
+  const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
   const viewMultisigConfig = useCallback(
     (option: MultisigConfig) => {
       openInfoDialog()
-      changeMultisigConfig(option)
+      setMultisigConfig(option)
     },
-    [openInfoDialog, changeMultisigConfig]
+    [openInfoDialog, setMultisigConfig]
   )
   return {
     deleteAction: {
