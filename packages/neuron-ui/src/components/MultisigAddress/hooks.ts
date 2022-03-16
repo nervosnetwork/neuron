@@ -134,29 +134,29 @@ export const useImportConfig = ({
   saveConfig: (config: Omit<MultisigConfig, 'walletId' | 'id'>) => Promise<void>
 }) => {
   const [importErr, setImportErr] = useState<string | undefined>()
-  const [importConfig, changeImportConfig] = useState<ImportMultisigConfig | undefined>()
+  const [importConfig, setImportConfig] = useState<ImportMultisigConfig | undefined>()
   const { openDialog, closeDialog, dialogRef } = useDialogWrapper()
   const onImportConfig = useCallback(() => {
     importMultisigConfig(isMainnet).then(res => {
       if (isSuccessResponse(res) && res.result) {
-        changeImportConfig(res.result)
+        setImportConfig(res.result)
         openDialog()
       } else {
-        changeImportConfig(undefined)
+        setImportConfig(undefined)
       }
     })
-  }, [openDialog, changeImportConfig, isMainnet])
+  }, [openDialog, setImportConfig, isMainnet])
   const closeDialogAndReset = useCallback(() => {
     closeDialog()
-    changeImportConfig(undefined)
+    setImportConfig(undefined)
     setImportErr(undefined)
-  }, [closeDialog, changeImportConfig, setImportErr])
+  }, [closeDialog, setImportConfig, setImportErr])
   const confirm = useCallback(() => {
     if (importConfig) {
       saveConfig(importConfig)
         .then(() => {
           closeDialogAndReset()
-          changeImportConfig(undefined)
+          setImportConfig(undefined)
         })
         .catch(err => {
           setImportErr(err.message.toString())
