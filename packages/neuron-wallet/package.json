@@ -41,8 +41,8 @@
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.20.0",
     "@nervina-labs/ckb-indexer": "0.1.1",
-    "@nervosnetwork/ckb-sdk-core": "0.101.0",
-    "@nervosnetwork/ckb-sdk-utils": "0.101.0",
+    "@nervosnetwork/ckb-sdk-core": "0.102.2",
+    "@nervosnetwork/ckb-sdk-utils": "0.102.2",
     "archiver": "5.3.0",
     "async": "3.2.0",
     "axios": "0.21.4",
@@ -66,7 +66,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@nervosnetwork/ckb-types": "0.101.0",
+    "@nervosnetwork/ckb-types": "0.102.2",
     "@types/archiver": "3.1.0",
     "@types/async": "3.2.3",
     "@types/electron-devtools-installer": "2.2.0",

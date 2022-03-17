@@ -83,6 +83,7 @@ const SpecialAssetList = () => {
   const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
     ? {
         ...accountToClaim.account,
+        isMainnet,
         accountId: '',
         tokenId: accountToClaim.account.tokenID,
         accountName: '',

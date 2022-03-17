@@ -235,7 +235,7 @@ export class TransactionGenerator {
     }
 
     const totalCapacity: bigint = allInputs
-      .map(input => BigInt(input.capacity))
+      .map(input => BigInt(input.capacity || 0))
       .reduce((result, c) => result + c, BigInt(0))
 
     const outputs: Output[] = targetOutputs.map((o, index) => {
@@ -374,12 +374,13 @@ export class TransactionGenerator {
   public static generateDepositAllTx = async (
     walletId: string,
     receiveAddress: string,
+    changeAddress: string,
+    isBalanceReserved = true,
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
-    const blake160: string = AddressParser.toBlake160(receiveAddress)
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -389,18 +390,26 @@ export class TransactionGenerator {
     if (allInputs.length === 0) {
       throw new CapacityNotEnough()
     }
-    const totalCapacity: bigint = allInputs
-      .map(input => BigInt(input.capacity))
-      .reduce((result, c) => result + c, BigInt(0))
 
+    const reservedBalance = isBalanceReserved ? BigInt(62_00_000_000) : BigInt(0)
+
+    const totalCapacity: bigint =
+      allInputs.map(input => BigInt(input.capacity || 0)).reduce((result, c) => result + c, BigInt(0)) - reservedBalance
+
+    const receiveBlake160: string = AddressParser.toBlake160(receiveAddress)
     const output = new Output(
       totalCapacity.toString(),
-      SystemScriptInfo.generateSecpScript(blake160),
+      SystemScriptInfo.generateSecpScript(receiveBlake160),
       SystemScriptInfo.generateDaoScript('0x')
     )
+
     output.setDaoData('0x0000000000000000')
 
     const outputs: Output[] = [output]
+    if (isBalanceReserved) {
+      const changeBlake160 = AddressParser.toBlake160(changeAddress)
+      outputs.push(new Output(reservedBalance.toString(), SystemScriptInfo.generateSecpScript(changeBlake160)))
+    }
 
     const tx = Transaction.fromObject({
       version: '0',
@@ -633,7 +642,7 @@ export class TransactionGenerator {
       throw new CapacityNotEnough()
     }
 
-    const totalCapacity = allInputs.map(i => BigInt(i.capacity)).reduce((result, c) => result + c, BigInt(0))
+    const totalCapacity = allInputs.map(i => BigInt(i.capacity || 0)).reduce((result, c) => result + c, BigInt(0))
 
     const output = Output.fromObject({
       capacity: totalCapacity.toString(),
@@ -923,7 +932,7 @@ export class TransactionGenerator {
     tx.inputs.push(...inputGatherResult.inputs)
 
     const originalChangeCapacity = inputGatherResult.inputs.reduce((sum: bigint, input: Input) => {
-      return sum + BigInt(input.capacity)
+      return sum + BigInt(input.capacity || 0)
     }, BigInt(0))
 
     const actualChangeCapacity = originalChangeCapacity - BigInt(inputGatherResult.finalFee)

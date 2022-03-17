@@ -9,7 +9,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SettingsService, { Locale } from 'services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE } from 'utils/const'
+import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -330,7 +330,7 @@ export default class ApiController {
       return this.#daoController.generateDepositTx(params)
     })
 
-    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
+    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, isBalanceReserved: boolean, fee: string, feeRate: string }) => {
       return this.#daoController.generateDepositAllTx(params)
     })
 
@@ -398,7 +398,7 @@ export default class ApiController {
     // Settings
 
     handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: 900 })
+      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
     })
 
     handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
@@ -479,6 +479,10 @@ export default class ApiController {
 
     handle('get-sudt-token-info', async (_, params: { tokenID: string }) => {
       return this.#sudtController.getSUDTTokenInfo(params)
+    })
+
+    handle('get-sudt-type-script-hash', async (_, params: { tokenID: string }) => {
+      return this.#sudtController.getSUDTTypeScriptHash(params)
     })
 
     handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number }) => {
@@ -576,7 +580,7 @@ export default class ApiController {
           err.code = NODE_DISCONNECTED_CODE
         }
 
-        if (!Number.isNaN(err.message?.code)) {
+        if (err.message?.code !== undefined && !Number.isNaN(err.message.code)) {
           err.code = err.message.code
         }
 

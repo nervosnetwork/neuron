@@ -27,6 +27,8 @@ interface DepositDialogProps {
   isDepositing: boolean
   errorMessage: string
   isTxGenerated: boolean
+  isBalanceReserved: boolean
+  onIsBalanceReservedChange: (e: React.SyntheticEvent<HTMLInputElement>) => void
 }
 
 const DepositDialog = ({
@@ -42,6 +44,8 @@ const DepositDialog = ({
   isDepositing,
   errorMessage,
   isTxGenerated,
+  isBalanceReserved,
+  onIsBalanceReservedChange,
 }: DepositDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
@@ -104,6 +108,15 @@ const DepositDialog = ({
             error={errorMessage}
           />
           <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
+          <div className={styles.isBalanceReserved}>
+            <input
+              type="checkbox"
+              id="is-balance-reserved"
+              checked={!isBalanceReserved}
+              onChange={onIsBalanceReservedChange}
+            />
+            <label htmlFor="is-balance-reserved">{t(`nervos-dao.balance-not-reserved`)}</label>
+          </div>
           <div className={styles.notice}>
             <Attention />
             <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />

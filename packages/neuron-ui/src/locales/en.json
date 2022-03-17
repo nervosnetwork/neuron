@@ -571,6 +571,7 @@
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
+      "balance-not-reserved": "(Not recommended) Don't reserve any CKBytes for future DAO operations",
       "deposit-record": {
         "deposited-at": "Deposited",
         "completed-at": "Completed",
@@ -621,25 +622,101 @@
       "quit-and-install": "Install and relaunch"
     },
     "datetime": {
-      "mon": { "full": "Monday", "short": "Mon.", "tag": "M" },
-      "tue": { "full": "Tuesday", "short": "Tue.", "tag": "Tu" },
-      "wed": { "full": "Wednesday", "short": "Wed.", "tag": "W" },
-      "thur": { "full": "Thursday", "short": "Thur.", "tag": "T" },
-      "fri": { "full": "Friday", "short": "Fri.", "tag": "F" },
-      "sat": { "full": "Saturday", "short": "Sat.", "tag": "Sa" },
-      "sun": { "full": "Sunday", "short": "Sun.", "tag": "Su" },
-      "jan": { "full": "January", "short": "Jan.", "tag": "J" },
-      "feb": { "full": "Febrary", "short": "Feb.", "tag": "F" },
-      "mar": { "full": "March", "short": "Mar.", "tag": "M" },
-      "apr": { "full": "April", "short": "Apr.", "tag": "A" },
-      "may": { "full": "May", "short": "May.", "tag": "M" },
-      "june": { "full": "June", "short": "June.", "tag": "J" },
-      "july": { "full": "July", "short": "July.", "tag": "J" },
-      "aug": { "full": "August", "short": "Aug.", "tag": "Aug" },
-      "sept": { "full": "September", "short": "Sept.", "tag": "S" },
-      "oct": { "full": "October", "short": "Oct.", "tag": "O" },
-      "nov": { "full": "November", "short": "Nov.", "tag": "N" },
-      "dec": { "full": "December", "short": "Dec.", "tag": "D" },
+      "mon": {
+        "full": "Monday",
+        "short": "Mon.",
+        "tag": "M"
+      },
+      "tue": {
+        "full": "Tuesday",
+        "short": "Tue.",
+        "tag": "Tu"
+      },
+      "wed": {
+        "full": "Wednesday",
+        "short": "Wed.",
+        "tag": "W"
+      },
+      "thur": {
+        "full": "Thursday",
+        "short": "Thur.",
+        "tag": "T"
+      },
+      "fri": {
+        "full": "Friday",
+        "short": "Fri.",
+        "tag": "F"
+      },
+      "sat": {
+        "full": "Saturday",
+        "short": "Sat.",
+        "tag": "Sa"
+      },
+      "sun": {
+        "full": "Sunday",
+        "short": "Sun.",
+        "tag": "Su"
+      },
+      "jan": {
+        "full": "January",
+        "short": "Jan.",
+        "tag": "J"
+      },
+      "feb": {
+        "full": "Febrary",
+        "short": "Feb.",
+        "tag": "F"
+      },
+      "mar": {
+        "full": "March",
+        "short": "Mar.",
+        "tag": "M"
+      },
+      "apr": {
+        "full": "April",
+        "short": "Apr.",
+        "tag": "A"
+      },
+      "may": {
+        "full": "May",
+        "short": "May.",
+        "tag": "M"
+      },
+      "june": {
+        "full": "June",
+        "short": "June.",
+        "tag": "J"
+      },
+      "july": {
+        "full": "July",
+        "short": "July.",
+        "tag": "J"
+      },
+      "aug": {
+        "full": "August",
+        "short": "Aug.",
+        "tag": "Aug"
+      },
+      "sept": {
+        "full": "September",
+        "short": "Sept.",
+        "tag": "S"
+      },
+      "oct": {
+        "full": "October",
+        "short": "Oct.",
+        "tag": "O"
+      },
+      "nov": {
+        "full": "November",
+        "short": "Nov.",
+        "tag": "N"
+      },
+      "dec": {
+        "full": "December",
+        "short": "Dec.",
+        "tag": "D"
+      },
       "timezone": "Time Zone",
       "start-tomorrow": "Selected time should start from tomorrow."
     },

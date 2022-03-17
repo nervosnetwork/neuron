@@ -220,9 +220,9 @@ describe('TransactionSender Test', () => {
 
     //@ts-ignore
     NodeService.getInstance().ckb.rpc = {
-      calculateDaoMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
       sendTransaction: stubbedSendTransaction
     }
+    NodeService.getInstance().ckb.calculateDaoMaximumWithdraw = stubbedCalculateDaoMaximumWithdraw
   })
 
   describe('sign', () => {
@@ -598,12 +598,17 @@ describe('TransactionSender Test', () => {
         stubbedGetNextAddress.mockReturnValue({
           address: fakeAddress1
         })
-        await transactionSender.generateDepositAllTx(fakeWallet.id, fee, feeRate)
+        stubbedGetNextChangeAddress.mockReturnValue({
+          address: fakeAddress2
+        })
+        await transactionSender.generateDepositAllTx(fakeWallet.id, false, fee, feeRate)
       });
       it('generates transaction', () => {
         expect(stubbedGenerateDepositAllTx).toHaveBeenCalledWith(
           fakeWallet.id,
           fakeAddress1,
+          fakeAddress2,
+          false,
           fee,
           feeRate
         )

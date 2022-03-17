@@ -784,6 +784,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0'
       )
 
@@ -797,6 +799,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '999'
       )
 
@@ -810,6 +814,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0',
         '0'
       )
@@ -824,6 +830,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0',
         '1000'
       )
@@ -844,6 +852,8 @@ describe('TransactionGenerator', () => {
       const tx: Transaction = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0',
         '1000'
       )
@@ -855,6 +865,21 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs!.length).toEqual(1)
       expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
       expect(tx.fee!).toEqual(expectedFee.toString())
+    })
+
+    it('with reserved balance', async () => {
+      const tx = await TransactionGenerator.generateDepositAllTx(
+        walletId1,
+        bob.address,
+        bob.address,
+        true,
+        '999'
+      )
+
+      const expectCapacity = BigInt('300000000000') - BigInt('999') - BigInt('6200000000')
+
+      expect(tx.outputs!.length).toEqual(2)
+      expect(tx.outputs![0].capacity).toEqual(expectCapacity.toString())
     })
   })
 

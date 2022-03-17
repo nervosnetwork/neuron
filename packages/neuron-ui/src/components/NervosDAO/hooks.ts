@@ -41,21 +41,23 @@ export const useUpdateMaxDeposit = ({
   setMaxDepositAmount,
   setMaxDepositTx,
   setMaxDepositErrorMessage,
+  isBalanceReserved,
 }: {
   wallet: State.Wallet
   setMaxDepositAmount: React.Dispatch<React.SetStateAction<bigint>>
   setMaxDepositTx: React.Dispatch<React.SetStateAction<any>>
   setMaxDepositErrorMessage: React.Dispatch<React.SetStateAction<string>>
+  isBalanceReserved: boolean
 }) => {
   useEffect(() => {
     generateDaoDepositAllTx({
       walletID: wallet.id,
       feeRate: `${MEDIUM_FEE_RATE}`,
+      isBalanceReserved,
     })
-      .then(res => {
+      .then((res: any) => {
         if (isSuccessResponse(res)) {
-          const fee = BigInt(res.result.fee)
-          const maxValue = fee < BigInt(wallet.balance) ? BigInt(wallet.balance) - fee : BigInt(0)
+          const maxValue = BigInt(res.result.outputs[0]?.capacity ?? 0)
           setMaxDepositAmount(maxValue)
           setMaxDepositTx(res.result)
           setMaxDepositErrorMessage('')
@@ -63,12 +65,12 @@ export const useUpdateMaxDeposit = ({
           throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
         }
       })
-      .catch(err => {
+      .catch((err: any) => {
         setMaxDepositAmount(BigInt(0))
         setMaxDepositTx(undefined)
         setMaxDepositErrorMessage(err.message)
       })
-  }, [wallet.id, wallet.balance, setMaxDepositAmount, setMaxDepositErrorMessage, setMaxDepositTx])
+  }, [wallet.id, wallet.balance, setMaxDepositAmount, setMaxDepositErrorMessage, setMaxDepositTx, isBalanceReserved])
 }
 
 export const useInitData = ({
@@ -123,6 +125,7 @@ export const useUpdateDepositValue = ({
   dispatch,
   walletID,
   maxDepositErrorMessage,
+  isBalanceReserved,
   t,
 }: {
   setDepositValue: React.Dispatch<React.SetStateAction<string>>
@@ -133,6 +136,7 @@ export const useUpdateDepositValue = ({
   dispatch: React.Dispatch<StateAction>
   walletID: string
   maxDepositErrorMessage: string
+  isBalanceReserved: boolean
   t: TFunction
 }) =>
   useCallback(
@@ -185,7 +189,9 @@ export const useUpdateDepositValue = ({
             type: AppActions.UpdateGeneratedTx,
             payload: maxDepositTx,
           })
-          setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
+          if (!isBalanceReserved) {
+            setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
+          }
         } else {
           setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
         }
@@ -202,6 +208,7 @@ export const useUpdateDepositValue = ({
       t,
       setDepositValue,
       setErrorMessage,
+      isBalanceReserved,
     ]
   )
 

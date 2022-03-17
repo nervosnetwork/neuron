@@ -492,13 +492,22 @@ export default class TransactionSender {
 
   public generateDepositAllTx = async (
     walletID: string = '',
+    isBalanceReserved = true,
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const wallet = WalletService.getInstance().get(walletID)
-    const address = await wallet.getNextAddress()
+    const receiveAddress = await wallet.getNextAddress()
+    const changeAddress = await wallet.getNextChangeAddress()
 
-    const tx = await TransactionGenerator.generateDepositAllTx(walletID, address!.address, fee, feeRate)
+    const tx = await TransactionGenerator.generateDepositAllTx(
+      walletID,
+      receiveAddress!.address,
+      changeAddress!.address,
+      isBalanceReserved,
+      fee,
+      feeRate
+    )
 
     return tx
   }
@@ -544,7 +553,7 @@ export default class TransactionSender {
     withdrawBlockHash: string
   ): Promise<bigint> => {
     const { ckb } = NodeService.getInstance()
-    const result = await ckb.rpc.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
+    const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
 
     return BigInt(result)
   }
