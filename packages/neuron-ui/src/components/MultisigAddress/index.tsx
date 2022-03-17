@@ -188,6 +188,14 @@ const MultisigAddress = () => {
           <Button label={t('multisig-address.ok')} type="ok" onClick={infoAction.closeDialog} />
         </div>
       </dialog>
+      <dialog ref={deleteAction.dialogRef} className={styles.dialog}>
+        <MessageBar messageBarType={MessageBarType.error} styles={messageBarStyle}>
+          {t('multisig-address.delete-failed', { reason: deleteAction.deleteErrorMessage })}
+        </MessageBar>
+        <div className={styles.ok}>
+          <Button label={t('multisig-address.ok')} type="cancel" onClick={deleteAction.closeDialog} />
+        </div>
+      </dialog>
     </div>
   )
 }

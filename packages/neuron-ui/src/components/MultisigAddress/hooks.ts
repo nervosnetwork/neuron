@@ -211,15 +211,24 @@ export const useExportConfig = (configs: MultisigConfig[]) => {
 }
 
 export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
+  const {
+    openDialog: openDeleteErrorDialog,
+    closeDialog: closeDeleteErrorDialog,
+    dialogRef: deleteErrorDialogRef,
+  } = useDialogWrapper()
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | undefined>()
   const deleteConfig = useCallback(
     (option: MultisigConfig) => {
       deleteMultisigConfig({ id: option.id }).then(res => {
         if (isSuccessResponse(res)) {
           deleteConfigById(option.id)
+        } else {
+          openDeleteErrorDialog()
+          setDeleteErrorMessage(typeof res.message === 'string' ? res.message : res.message.content)
         }
       })
     },
-    [deleteConfigById]
+    [deleteConfigById, setDeleteErrorMessage, openDeleteErrorDialog]
   )
   const { openDialog: openInfoDialog, closeDialog, dialogRef } = useDialogWrapper()
   const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
@@ -233,6 +242,9 @@ export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number
   return {
     deleteAction: {
       action: deleteConfig,
+      closeDialog: closeDeleteErrorDialog,
+      dialogRef: deleteErrorDialogRef,
+      deleteErrorMessage,
     },
     infoAction: {
       action: viewMultisigConfig,

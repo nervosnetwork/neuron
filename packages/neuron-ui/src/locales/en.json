@@ -775,6 +775,7 @@
         },
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
+      "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
       "create-dialog": {
         "title": "Create multisig address",
         "index": "index",
