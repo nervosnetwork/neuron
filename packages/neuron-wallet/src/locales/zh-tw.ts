@@ -114,7 +114,7 @@ export default {
       'multisig-script-prefix-error': '多簽配置錯誤',
       'multisig-config-not-exist': '多簽配置不存在',
       'multisig-config-exist': '多簽地址已經存在',
-      'import-multisig-config-params-error': '導入的多簽配置文件缺少參數'
+      'multisig-config-address-error': '多簽配置的地址設置不正確'
     },
     messageBox: {
       button: {
@@ -236,6 +236,8 @@ export default {
       'import-config': '導入多簽配置',
       'export-config': '導出多簽配置',
       'config-exported': '多簽配置已被導出至 {{filePath}}.',
+      'import-duplicate': '請檢查是否存在重複配置',
+      'import-result': '導入成功 {{success}} 個，失敗 {{fail}} 個。{{failCheck}}',
       'confirm-delete': '確認刪除該多簽地址嗎？',
       'delete-actions': {
         ok: '確認',

@@ -12,7 +12,7 @@ import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
 
-import { useSearch, useDialogWrapper, useConfigManage, useImportConfig, useExportConfig, useActions } from './hooks'
+import { useSearch, useDialogWrapper, useConfigManage, useExportConfig, useActions } from './hooks'
 import styles from './multisig-address.module.scss'
 
 const searchBoxStyles = {
@@ -37,9 +37,14 @@ const MultisigAddress = () => {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
+  const isMainnet = isMainnetUtil(networks, networkID)
   const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { configs, saveConfig, updateConfig, deleteConfigById } = useConfigManage({ walletId, searchKeywords })
+  const { configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
+    walletId,
+    searchKeywords,
+    isMainnet,
+  })
   const { deleteAction, infoAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
@@ -55,15 +60,6 @@ const MultisigAddress = () => {
     () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
     [t]
   )
-  const isMainnet = isMainnetUtil(networks, networkID)
-  const {
-    importErr,
-    importConfig,
-    onImportConfig,
-    dialogRef: importDialog,
-    closeDialog: closeImportDialog,
-    confirm: confirmImport,
-  } = useImportConfig({ isMainnet, saveConfig })
   const { selectIds, isAllSelected, onChangeChecked, onChangeCheckedAll, exportConfig } = useExportConfig(configs)
   return (
     <div>
@@ -139,40 +135,6 @@ const MultisigAddress = () => {
       )}
       <dialog ref={dialogRef} className={styles.dialog}>
         {isDialogOpen && <MultisigAddressCreateDialog closeDialog={closeDialog} confirm={saveConfig} />}
-      </dialog>
-      <dialog ref={importDialog} className={styles.dialog}>
-        {importConfig && (
-          <div>
-            {importErr && (
-              <MessageBar messageBarType={MessageBarType.error} styles={messageBarStyle}>
-                {importErr}
-              </MessageBar>
-            )}
-            <MultisigAddressInfo
-              m={importConfig.m.toString()}
-              n={importConfig.n.toString()}
-              r={importConfig.r}
-              addresses={importConfig.addresses || []}
-              multisigAddress={importConfig.fullPayload}
-            />
-            <br />
-            <MessageBar messageBarType={MessageBarType.warning} styles={messageBarStyle}>
-              {t('multisig-address.import-dialog.notice')}
-            </MessageBar>
-            <div className={styles.importActions}>
-              <Button
-                label={t('multisig-address.import-dialog.actions.cancel')}
-                type="cancel"
-                onClick={closeImportDialog}
-              />
-              <Button
-                label={t('multisig-address.import-dialog.actions.confirm')}
-                type="primary"
-                onClick={confirmImport}
-              />
-            </div>
-          </div>
-        )}
       </dialog>
       <dialog ref={infoAction.dialogRef} className={styles.dialog}>
         {infoAction.multisigConfig && (

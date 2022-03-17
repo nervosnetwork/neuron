@@ -18,8 +18,8 @@ export class MultisigConfigExistError extends Error {
   }
 }
 
-export class ImportMultisigConfigParamsError extends Error {
+export class MultisigConfigAddressError extends Error {
   constructor() {
-    super(t('messages.import-multisig-config-params-error'))
+    super(t('messages.multisig-config-address-error'))
   }
 }

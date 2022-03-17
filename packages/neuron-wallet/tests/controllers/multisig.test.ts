@@ -9,6 +9,7 @@ jest.mock('electron', () => ({
     showMessageBox: jest.fn().mockImplementation(() => ({ response })),
     showOpenDialog: jest.fn().mockImplementation(() => dialogRes),
     showSaveDialog: jest.fn().mockImplementation(() => dialogRes),
+    showErrorBox: jest.fn()
   },
   BrowserWindow: {
     getFocusedWindow: jest.fn()
@@ -23,12 +24,17 @@ let fileContent: {
   m?: number
   n?: number
   addresses?: string[]
-} = {
+} | {
+  r?: number
+  m?: number
+  n?: number
+  addresses?: string[]
+}[] = [{
   r: 1,
   m: 2,
   n: 3,
   addresses: ['ckt1qyqvmm64mjmcwftjx6a73kxr8z23ks5sef5sv2702w', 'ckt1qyqrgqluh0v7yrarreezawvcrv3q8t28tyzqveg4zl']
-}
+}]
 
 jest.mock('fs', () => {
   return {
@@ -141,20 +147,40 @@ describe('test for multisig controller', () => {
   describe('import config', () => {
     it('cancel import', async () => {
       dialogRes = { canceled: true, filePaths: [], filePath: './' }
-      const res = await multisigController.importConfig(false)
+      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
       expect(res).toBeUndefined()
     })
     it('import data is error', async () => {
-      fileContent = {
+      fileContent = [{
         ...multisigConfig.testnet.params,
         r: undefined
-      }
-      expect(multisigController.importConfig(false)).rejects.toThrow()
+      }]
+      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
+      expect(res).toBeUndefined()
+    })
+    it('import object success', async () => {
+      fileContent = multisigConfig.testnet.params
+      MultiSigServiceMock.prototype.saveMultisigConfig.mockResolvedValueOnce({
+        ...multisigConfig.testnet.params,
+        id: 1,
+        walletId: '1234',
+        alias: '',
+        fullPayload: multisigConfig.testnet.result
+      })
+      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
+      expect(res?.result[0].fullPayload).toBe(multisigConfig.testnet.result)
     })
     it('import success', async () => {
       fileContent = multisigConfig.testnet.params
-      const res = await multisigController.importConfig(false)
-      expect(res?.result?.fullPayload).toBe(multisigConfig.testnet.result)
+      MultiSigServiceMock.prototype.saveMultisigConfig.mockResolvedValueOnce({
+        ...multisigConfig.testnet.params,
+        id: 1,
+        walletId: '1234',
+        alias: '',
+        fullPayload: multisigConfig.testnet.result
+      })
+      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
+      expect(res?.result[0].fullPayload).toBe(multisigConfig.testnet.result)
     })
   })
 

@@ -115,7 +115,7 @@ export default {
       'multisig-script-prefix-error': '多签配置错误',
       'multisig-config-not-exist': '多签配置不存在',
       'multisig-config-exist': '多签地址已经存在',
-      'import-multisig-config-params-error': '导入的多签配置文件缺少必要参数'
+      'multisig-config-address-error': '多签配置的地址设置不正确'
     },
     messageBox: {
       button: {
@@ -237,6 +237,8 @@ export default {
       'import-config': '导入多签配置',
       'export-config': '导出多签配置',
       'config-exported': '多签配置已被导出至 {{filePath}}.',
+      'import-duplicate': '请检查是否存在重复配置',
+      'import-result': '导入成功 {{success}} 个，失败 {{fail}} 个。{{failCheck}}',
       'confirm-delete': '确认删除该多签地址吗？',
       'delete-actions': {
         ok: '确认',

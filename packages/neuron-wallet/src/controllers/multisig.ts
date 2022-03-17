@@ -9,7 +9,7 @@ import SystemScriptInfo from 'models/system-script-info'
 import MultisigConfig from 'database/chain/entities/multisig-config'
 import MultisigConfigModel from 'models/multisig-config'
 import MultisigService from 'services/multisig'
-import { ImportMultisigConfigParamsError } from 'exceptions/multisig'
+import { MultisigConfigAddressError } from 'exceptions/multisig'
 
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
@@ -34,6 +34,9 @@ export default class MultisigController {
       N: `0x${params.n.toString(16).padStart(2, '0')}`,
     };
     const blake160s = params.addresses.map(address => addressToScript(address).args)
+    if (blake160s.some(blake160 => blake160.length !== 42)) {
+      throw new MultisigConfigAddressError()
+    }
     return {
       status: ResponseCode.Success,
       result: scriptToAddress(
@@ -120,7 +123,7 @@ export default class MultisigController {
     }
   }
 
-  async importConfig(isMainnet: boolean) {
+  async importConfig({ isMainnet, walletId }: { isMainnet: boolean, walletId: string }) {
     const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.import-config'),
       filters: [{
@@ -133,26 +136,50 @@ export default class MultisigController {
     if (canceled || !filePaths || !filePaths[0]) {
       return
     }
-    const json = fs.readFileSync(filePaths[0], 'utf-8')
-    let config = JSON.parse(json)
-    if (config?.length) {
-      config = config[0]
-    }
-    if (
-      config.r === undefined
-      || config.m === undefined
-      || config.n === undefined
-      || config.addresses === undefined
-    ) {
-      throw new ImportMultisigConfigParamsError()
-    }
-    const fullPayload = this.createMultisigAddress({ ...config, isMainnet })
-    return {
-      status: ResponseCode.Success,
-      result: {
-        ...config,
-        fullPayload: fullPayload.result
+    try {
+      const json = fs.readFileSync(filePaths[0], 'utf-8')
+      let configs: Array<{r: number, m: number, n: number, addresses: string[], alias: string}> = JSON.parse(json)
+      if (!Array.isArray(configs)) {
+        configs = [configs]
       }
+      if (
+        configs.some(config => config.r === undefined
+          || config.m === undefined
+          || config.n === undefined
+          || config.addresses === undefined)
+      ) {
+        dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+        return
+      }
+      const saveConfigs = configs.map(config => ({
+        ...config,
+        walletId,
+        fullPayload: this.createMultisigAddress({ ...config, isMainnet }).result
+      }))
+      const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
+      const saveSuccessConfigs: MultisigConfig[] = []
+      for (let idx = 0; idx < savedResult.length; idx++) {
+        const item = savedResult[idx]
+        if (item.status === 'fulfilled') {
+          saveSuccessConfigs.push(item.value.result)
+        }
+      }
+      dialog.showMessageBox({
+        type: 'info',
+        message: t(
+          'multisig-config.import-result',
+          {
+            success: saveSuccessConfigs.length,
+            fail: savedResult.length - saveSuccessConfigs.length,
+            failCheck: savedResult.length > saveSuccessConfigs.length ? t('multisig-config.import-duplicate') : undefined,
+          })
+      })
+      return {
+        status: ResponseCode.Success,
+        result: saveSuccessConfigs
+      }
+    } catch {
+      dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
     }
   }
 
