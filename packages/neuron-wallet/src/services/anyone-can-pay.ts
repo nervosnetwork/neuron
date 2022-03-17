@@ -11,6 +11,7 @@ import { AcpSendSameAccountError } from 'exceptions'
 import Script from 'models/chain/script'
 import LiveCellService from './live-cell-service'
 import WalletService from './wallets'
+import SystemScriptInfo from 'models/system-script-info'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -59,7 +60,7 @@ export default class AnyoneCanPayService {
       throw new TargetOutputNotFoundError()
     }
 
-    if (assetAccountInfo.isDefaultLockScript(targetLockScript)) {
+    if (SystemScriptInfo.isSecpScript(targetLockScript)) {
       targetOutput = Output.fromObject({
         capacity: '0',
         lock: targetLockScript,

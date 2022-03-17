@@ -23,7 +23,6 @@ export default class AssetAccountInfo {
   private nftIssuerInfo: ScriptCellInfo
   private nftClassInfo: ScriptCellInfo
   private nftInfo: ScriptCellInfo
-  private defaultLockScriptInfo: ScriptCellInfo
 
   private static MAINNET_GENESIS_BLOCK_HASH: string =
     '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
@@ -184,14 +183,6 @@ export default class AssetAccountInfo {
         hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType
       }
     }
-    this.defaultLockScriptInfo = {
-      cellDep: new CellDep(
-        new OutPoint(process.env.DEFAULT_LOCK_DEP_TXHASH!, process.env.DEFAULT_LOCK_DEP_INDEX!),
-        process.env.DEFAULT_LOCK_DEP_TYPE! as DepType
-      ),
-      codeHash: process.env.DEFAULT_LOCK_SCRIPT_CODEHASH!,
-      hashType: process.env.DEFAULT_LOCK_SCRIPT_HASHTYPE! as ScriptHashType
-    }
   }
 
   public get sudtCellDep(): CellDep {
@@ -270,12 +261,6 @@ export default class AssetAccountInfo {
       return script.codeHash === acpScript.codeHash && script.hashType === acpScript.hashType
     })
     return !!exist
-  }
-
-  public isDefaultLockScript(script: Script): boolean {
-    return (
-      script.codeHash === this.defaultLockScriptInfo.codeHash && script.hashType === this.defaultLockScriptInfo.hashType
-    )
   }
 
   public determineAdditionalACPCellDepsByTx(tx: Transaction): CellDep[] {

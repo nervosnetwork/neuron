@@ -734,7 +734,7 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     const sudtDep = assetAccountInfo.sudtCellDep
-    const isDefaultLockScript = assetAccountInfo.isDefaultLockScript(targetOutput.lock)
+    const isDefaultLockScript = SystemScriptInfo.isSecpScript(targetOutput.lock)
 
     const cellDeps = [secpCellDep, anyoneCanPayDep]
     const needCapacities: bigint =

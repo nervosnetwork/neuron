@@ -34,8 +34,8 @@ import {
   isSuccessResponse,
 } from 'utils'
 import { AmountNotEnoughException } from 'exceptions'
+import validateAmountRange from 'utils/validators/amountRange'
 import styles from './sUDTSend.module.scss'
-import validateAmountRange from '../../utils/validators/amountRange'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, SHORT_ADDR_DEFAULT_LOCK_PREFIX } = CONSTANTS
 
