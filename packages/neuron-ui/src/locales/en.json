@@ -209,7 +209,8 @@
       "scan-screen-qr-code": "Scan the QR Code on the screen",
       "set-locktime": "Set Locktime",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
-      "release-on": "Release on"
+      "release-on": "Release on",
+      "locktime-warning": "Please ensure that the other party's wallet can support the expiration unlock function. Under normal circumstances, the exchange does not support the expiration unlock function, please use it with caution!"
     },
     "receive": {
       "title": "Receive",

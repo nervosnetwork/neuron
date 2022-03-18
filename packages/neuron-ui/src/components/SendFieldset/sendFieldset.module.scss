@@ -84,8 +84,14 @@ $textfieldWidth: calc(100vw - 370px);
   grid-area: locktime;
   color: #000;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   font-size: 14px;
+
+  .locktimeWarn {
+    width: 100%;
+    margin-top: 4px;
+  }
 
   .icon {
     height: 15px;

@@ -5,6 +5,7 @@ import { ckbCore } from 'services/chain'
 
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react'
 
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
@@ -178,6 +179,15 @@ const SendFieldset = ({
               <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
             </button>
           ) : null}
+          {item.date && (
+            <MessageBar
+              messageBarType={MessageBarType.warning}
+              styles={{ text: { alignItems: 'center' } }}
+              className={styles.locktimeWarn}
+            >
+              {t('send.locktime-warning')}
+            </MessageBar>
+          )}
         </div>
       ) : null}
     </div>
