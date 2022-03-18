@@ -190,7 +190,7 @@ const SUDTSend = () => {
       errMap.amount = t(err.message, err.i18n)
     }
     return errMap
-  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, accountType])
+  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, isSecp256k1ShortAddress])
 
   const isFormReady =
     !isSending &&
