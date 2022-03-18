@@ -61,6 +61,7 @@ type Action =
   | 'validate-mnemonic'
   | 'sign-message'
   | 'verify-signature'
+  | 'is-wallet-xpub'
   // Transactions
   | 'get-transaction-list'
   | 'get-transaction'

@@ -230,6 +230,10 @@ export default class ApiController {
       return this.#walletsController.getCurrent()
     })
 
+    handle('is-wallet-xpub', async (_, id: string) => {
+      return this.#walletsController.isWalletXpub(id)
+    })
+
     handle('set-current-wallet', async (_, id: string) => {
       return this.#walletsController.activate(id)
     })

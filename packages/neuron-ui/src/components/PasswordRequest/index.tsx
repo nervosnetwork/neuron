@@ -5,6 +5,7 @@ import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
 import HardwareSign from 'components/HardwareSign'
+import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import { useDialog, ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
@@ -18,7 +19,13 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType, signAndExportTransaction } from 'services/remote'
+import {
+  exportTransactionAsJSON,
+  OfflineSignStatus,
+  OfflineSignType,
+  signAndExportTransaction,
+  isWalletXpub,
+} from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
@@ -41,6 +48,14 @@ const PasswordRequest = () => {
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isXpub, setIsXpub] = useState(false)
+  useEffect(() => {
+    isWalletXpub(walletID).then(res => {
+      if (isSuccessResponse(res) && res.result !== null) {
+        setIsXpub(res.result)
+      }
+    })
+  })
 
   useEffect(() => {
     setPassword('')
@@ -342,18 +357,26 @@ const PasswordRequest = () => {
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
-        <TextField
-          label={t('password-request.password')}
-          value={password}
-          field="password"
-          type="password"
-          title={t('password-request.password')}
-          onChange={onChange}
-          autoFocus
-          required
-          className={styles.passwordInput}
-          error={error}
-        />
+        {isXpub && (
+          <div className={styles.xpubNotice}>
+            <Attention />
+            {t('password-request.xpub-notice')}
+          </div>
+        )}
+        {isXpub || (
+          <TextField
+            label={t('password-request.password')}
+            value={password}
+            field="password"
+            type="password"
+            title={t('password-request.password')}
+            onChange={onChange}
+            autoFocus
+            required
+            className={styles.passwordInput}
+            error={error}
+          />
+        )}
         <div className={styles.footer}>
           {signType !== OfflineSignType.Invalid ? (
             <div className={styles.left}>
@@ -361,15 +384,17 @@ const PasswordRequest = () => {
                 mainBtnLabel={t('offline-sign.export')}
                 mainBtnOnClick={exportTransaction}
                 mainBtnDisabled={isLoading}
-                list={dropdownList}
+                list={isXpub ? [] : dropdownList}
               />
             </div>
           ) : null}
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-            <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-              {isLoading ? <Spinner /> : (t('common.confirm') as string)}
-            </Button>
+            {isXpub || (
+              <Button label={t('common.confirm')} type="submit" disabled={disabled}>
+                {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+              </Button>
+            )}
           </div>
         </div>
       </form>

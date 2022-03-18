@@ -349,6 +349,14 @@ export default class WalletsController {
     }
   }
 
+  public isWalletXpub(id: string) {
+    const wallet = WalletsService.getInstance().get(id)
+    return {
+      status: ResponseCode.Success,
+      result: wallet.isHDWallet() && wallet.loadKeystore().isEmpty()
+    }
+  }
+
   public async activate(id: string) {
     const walletsService = WalletsService.getInstance()
     walletsService.setCurrent(id)
