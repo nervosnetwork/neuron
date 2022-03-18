@@ -5,9 +5,9 @@ import RpcService from 'services/rpc-service'
 import Script, { ScriptHashType } from './chain/script'
 
 export default class SystemScriptInfo {
-  static SECP_CODE_HASH = process.env.DEFAULT_LOCK_SCRIPT_CODEHASH!
-  static DAO_CODE_HASH = process.env.DEFAULT_DAO_CODE_HASH!
-  static MULTI_SIGN_CODE_HASH = process.env.DEFAULT_MULTI_SIGN_CODE_HASH!
+  static SECP_CODE_HASH = '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8'
+  static DAO_CODE_HASH = '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e'
+  static MULTI_SIGN_CODE_HASH = '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8'
 
   static SECP_HASH_TYPE = ScriptHashType.Type
   static DAO_HASH_TYPE = ScriptHashType.Type
