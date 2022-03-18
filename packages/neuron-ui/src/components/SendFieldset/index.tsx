@@ -5,7 +5,6 @@ import { ckbCore } from 'services/chain'
 
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react'
 
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
@@ -16,6 +15,7 @@ import Trash from 'widgets/Icons/Trash.png'
 import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
 import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
+import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 
 import { formatDate } from 'widgets/DatetimePicker'
 import { localNumberFormatter, PlaceHolders } from 'utils'
@@ -180,13 +180,10 @@ const SendFieldset = ({
             </button>
           ) : null}
           {item.date && (
-            <MessageBar
-              messageBarType={MessageBarType.warning}
-              styles={{ text: { alignItems: 'center' } }}
-              className={styles.locktimeWarn}
-            >
+            <div className={styles.locktimeWarn}>
+              <Attention />
               {t('send.locktime-warning')}
-            </MessageBar>
+            </div>
           )}
         </div>
       ) : null}
