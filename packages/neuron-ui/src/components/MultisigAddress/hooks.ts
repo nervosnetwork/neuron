@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { useDialog, isSuccessResponse } from 'utils'
+import { DataUpdate as DataUpdateSubject } from 'services/subjects'
 import {
   MultisigConfig,
   saveMultisigConfig,
@@ -8,6 +9,7 @@ import {
   updateMultisigConfig,
   exportMultisigConfig,
   deleteMultisigConfig,
+  getMultisigBalances,
 } from 'services/remote'
 
 export const useSearch = () => {
@@ -224,4 +226,36 @@ export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number
       multisigConfig,
     },
   }
+}
+
+export const useSubscription = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {
+  const [multisigBanlances, setMultisigBanlances] = useState<Record<string, string>>({})
+  const getAndSaveMultisigBalances = useCallback(() => {
+    getMultisigBalances(isMainnet).then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setMultisigBanlances(res.result)
+      }
+    })
+  }, [setMultisigBanlances, isMainnet])
+  useEffect(() => {
+    const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
+      if (walletIDOfMessage && walletIDOfMessage !== walletId) {
+        return
+      }
+      switch (dataType) {
+        case 'transaction': {
+          getAndSaveMultisigBalances()
+          break
+        }
+        default: {
+          break
+        }
+      }
+    })
+    getAndSaveMultisigBalances()
+    return () => {
+      dataUpdateSubscription.unsubscribe()
+    }
+  }, [walletId, getAndSaveMultisigBalances])
+  return multisigBanlances
 }

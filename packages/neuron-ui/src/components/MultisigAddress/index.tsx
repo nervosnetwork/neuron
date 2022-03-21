@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
-import { useOnLocaleChange, isMainnet as isMainnetUtil } from 'utils'
+import { useOnLocaleChange, isMainnet as isMainnetUtil, shannonToCKBFormatter } from 'utils'
 import { useState as useGlobalState } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import CopyZone from 'widgets/CopyZone'
@@ -11,8 +11,7 @@ import { CustomizableDropdown } from 'widgets/Dropdown'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
-
-import { useSearch, useDialogWrapper, useConfigManage, useExportConfig, useActions } from './hooks'
+import { useSearch, useDialogWrapper, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 import styles from './multisig-address.module.scss'
 
 const searchBoxStyles = {
@@ -38,6 +37,7 @@ const MultisigAddress = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
+  const multisigBanlances = useSubscription({ walletId, isMainnet })
   const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
   const { configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
@@ -86,7 +86,7 @@ const MultisigAddress = () => {
               <th>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
-              {['address', 'alias', 'type'].map(field => (
+              {['address', 'alias', 'type', 'balance'].map(field => (
                 <th key={field}>{t(`multisig-address.table.${field}`)}</th>
               ))}
             </tr>
@@ -120,6 +120,10 @@ const MultisigAddress = () => {
                   {v.m}
                   &nbsp;of&nbsp;
                   {v.n}
+                </td>
+                <td>
+                  {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
+                  CKB
                 </td>
                 <td>
                   <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>

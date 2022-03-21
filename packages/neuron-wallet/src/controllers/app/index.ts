@@ -21,9 +21,19 @@ const app = electronApp
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
   private apiController = new ApiController()
+  private windowRegisterChannels = new Map<number, string[]>()
+  private static instance: AppController
 
-  constructor() {
+  private constructor() {
     subscribe(this)
+  }
+
+  static getInstance() {
+    if (AppController.instance) {
+      return AppController.instance
+    }
+    AppController.instance = new AppController()
+    return AppController.instance
   }
 
   public start = async () => {
@@ -52,11 +62,21 @@ export default class AppController {
     await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
   }
 
+  public registerChannels(winId: number, channels: string[]) {
+    this.windowRegisterChannels.set(winId, channels)
+  }
+
   /**
    * send message to renderer process
    */
   public sendMessage = (channel: string, obj: any) => {
     this.mainWindow?.webContents.send(channel, obj)
+    BrowserWindow.getAllWindows().forEach(window => {
+      const channels = this.windowRegisterChannels.get(window.id)
+      if (channels && channels.includes(channel)) {
+        window.webContents.send(channel, obj)
+      }
+    })
   }
 
   /**

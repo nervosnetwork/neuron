@@ -1,4 +1,5 @@
 import { getConnection } from 'typeorm'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
@@ -916,5 +917,18 @@ describe('CellsService', () => {
         expect(result.items.length).toEqual(0)
       });
     });
+  })
+
+  it('getMultisigBalance', async () => {
+    const capacity = '1000'
+    const lockScript = Script.fromObject({
+      codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+      hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+      args: '0x5e1a15cb9301116ef4ec2f14866701d2492d8683'
+    })
+    const address = scriptToAddress(lockScript.toSDK(), false)
+    await createCell(capacity, OutputStatus.Sent, false, null, { lockScript })
+    const multisigBalances = await CellsService.getMultisigBalance(false)
+    expect(multisigBalances[address]).toBe(capacity)
   })
 })

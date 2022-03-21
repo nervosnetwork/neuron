@@ -1,4 +1,5 @@
 import { getConnection, In } from 'typeorm'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import OutputEntity from 'database/chain/entities/output'
@@ -1053,5 +1054,40 @@ export default class CellsService {
       .getMany()
 
     return outputEntities
+  }
+
+  public static async getMultisigBalance(isMainnet: boolean) {
+    const cells: {
+      lockArgs: string
+      balance: string
+    }[] = await getConnection().getRepository(OutputEntity).manager.query(`
+        select
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
+            lockArgs
+        from
+            output
+        where
+            output.lockCodeHash = '${SystemScriptInfo.MULTI_SIGN_CODE_HASH}' AND
+            output.status in ('${OutputStatus.Live}', '${OutputStatus.Sent}') AND
+            output.lockHashType = '${SystemScriptInfo.MULTI_SIGN_HASH_TYPE}'
+        group by output.lockArgs
+      `)
+
+    const balances: Record<string, string> = {}
+
+    cells.forEach(c => {
+      balances[
+        scriptToAddress(
+          {
+            args: c.lockArgs,
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+          },
+          isMainnet
+        )
+      ] = c.balance
+    })
+
+    return balances
   }
 }

@@ -563,6 +563,10 @@ export default class ApiController {
     handle('export-multisig-config',async (_, params) => {
       return this.#multisigController.exportConfig(params)
     })
+
+    handle('get-multisig-balances',async (_, params) => {
+      return this.#multisigController.getMultisigBalances(params)
+    })
   }
 
   // Register handler, warp and serialize API response

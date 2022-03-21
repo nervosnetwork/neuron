@@ -4,7 +4,7 @@ import AppController from 'controllers/app'
 import SettingsService from 'services/settings'
 import { changeLanguage } from 'locales/i18n'
 
-const appController = new AppController()
+const appController = AppController.getInstance()
 
 const singleInstanceLock = app.requestSingleInstanceLock()
 if (singleInstanceLock) {
