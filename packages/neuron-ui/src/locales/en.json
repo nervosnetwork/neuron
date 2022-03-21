@@ -409,7 +409,7 @@
       "destroy-ckb-account": {
         "title": "Destroy CKB Asset Account"
       },
-      "xpub-notice": "For Extended Public Key wallets, only export transactions are supported"
+      "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
     "qrcode": {
       "copy": "Copy image",

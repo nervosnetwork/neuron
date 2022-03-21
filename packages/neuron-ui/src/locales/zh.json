@@ -402,7 +402,7 @@
       "destroy-ckb-account": {
         "title": "销毁 CKB 资产账户"
       },
-      "xpub-notice": "对于 Extended Public Key 钱包，只支持导出交易"
+      "xpub-notice": "对于观察钱包，只支持导出交易"
     },
     "qrcode": {
       "copy": "复制图片",
