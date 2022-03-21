@@ -775,7 +775,7 @@
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
         "account-name": "Account Name",
-        "sudt-account": "sUDT Account",
+      "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
         "ckb-account": "CKB Account",
         "set-token-info": "Set Token Info",
         "token-id": "Token ID",
