@@ -1,16 +1,37 @@
+import { MultisigPrefixError } from 'exceptions'
 import Blake2b from './blake2b'
+
+export interface MultisigPrefix {
+  S: string
+  R: string
+  M: string
+  N: string
+}
+
+const defaultMultisigPrefix = {
+  S: '0x00',
+  R: '0x00',
+  M: '0x01',
+  N: '0x01'
+}
 
 export default class MultiSign {
   // 1 epoch = 4h = 240min
   EPOCH_MINUTES = 240
 
-  serialize(blake160: string) {
-    // S = '0x00', R = '0x00', M = '0x01', N = '0x01'
-    return '0x00000101' + blake160.slice(2)
+  serialize(blake160s: string[], { S, R, M, N }: MultisigPrefix = defaultMultisigPrefix) {
+    this.validateMultisigPrefix(S)
+    this.validateMultisigPrefix(R)
+    this.validateMultisigPrefix(M)
+    this.validateMultisigPrefix(N)
+    return `${S}${R.slice(2)}${M.slice(2)}${N.slice(2)}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
   }
 
-  hash(blake160: string): string {
-    return Blake2b.digest(this.serialize(blake160)).slice(0, 42)
+  hash(blake160: string | string[], multisigPrefix: MultisigPrefix = defaultMultisigPrefix): string {
+    return Blake2b.digest(this.serialize(typeof blake160 === 'string' ? [blake160] : blake160, multisigPrefix)).slice(
+      0,
+      42
+    )
   }
 
   since(minutes: number, headerEpoch: string): string {
@@ -55,6 +76,12 @@ export default class MultiSign {
       length: (epoch >> BigInt(40)) & BigInt(0xffff),
       index: (epoch >> BigInt(24)) & BigInt(0xffff),
       number: epoch & BigInt(0xffffff)
+    }
+  }
+
+  private validateMultisigPrefix(v: string) {
+    if (!v.startsWith('0x') || v.length !== 4) {
+      throw new MultisigPrefixError()
     }
   }
 }

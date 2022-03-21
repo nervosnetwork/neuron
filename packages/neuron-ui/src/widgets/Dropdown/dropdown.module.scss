@@ -3,3 +3,24 @@
     fill: #666;
   }
 }
+
+.customizableRoot {
+  position: relative;
+
+  .dropdownItems {
+    display: none;
+    position: absolute;
+    z-index: 100;
+    margin: 0;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
+    right: 0;
+  }
+
+  &:hover {
+    .dropdownItems {
+      display: block;
+    }
+  }
+}

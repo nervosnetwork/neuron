@@ -36,6 +36,7 @@ export default {
       tools: {
         label: 'Tools',
         'sign-and-verify': 'Sign/Verify Message',
+        'create-multisig-address': 'Create multisig address',
         'offline-sign': 'Offline sign',
         'clear-sync-data': 'Clear all synchronized data'
       },
@@ -118,7 +119,11 @@ export default {
       'wallet-not-supported-function': 'This wallet does not support {name} function.',
       'invalid-transaction-file': 'Invalid transaction file.',
       'save-offline-json-failed': 'Unable to save JSON file.',
-      'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.'
+      'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
+      'multisig-script-prefix-error': 'The multisig config is error',
+      'multisig-config-not-exist': 'The multisig config is not exist',
+      'multisig-config-exist': 'The multisig config has exist',
+      'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect'
     },
     messageBox: {
       button: {
@@ -151,6 +156,9 @@ export default {
       },
       'sign-and-verify': {
         title: 'Sign/verify message'
+      },
+      'create-multisig-address': {
+        title: 'Create multisig address'
       },
       'ckb-dependency': {
         title: 'Bundled CKB Node',
@@ -233,6 +241,18 @@ export default {
       'export-transaction': 'Export Transaction as JSON',
       'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
       'load-transaction': 'Load Transaction file'
+    },
+    'multisig-config': {
+      'import-config': 'Import multisig config',
+      'export-config': 'Export multisig config',
+      'config-exported': 'Multisig configs has been exported at {{filePath}}.',
+      'import-duplicate': 'Please check for duplicate configurations',
+      'import-result': 'Imports succeeded {{success}}, failed {{fail}}.{{failCheck}}',
+      'confirm-delete': 'Confirm delete the multisig config?',
+      'delete-actions': {
+        ok: 'Confirm',
+        cancel: 'Cancel'
+      }
     }
   }
 }

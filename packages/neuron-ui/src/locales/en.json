@@ -775,7 +775,7 @@
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
         "account-name": "Account Name",
-        "sudt-account": "sUDT Account",
+      "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
         "ckb-account": "CKB Account",
         "set-token-info": "Set Token Info",
         "token-id": "Token ID",
@@ -815,6 +815,66 @@
         "decimal": "Decimal",
         "confirm": "Confirm",
         "cancel": "Cancel"
+      }
+    },
+    "multisig-address": {
+      "search": {
+        "placeholder": "search by multisig address,alias"
+      },
+      "add": {
+        "label": "Add"
+      },
+      "import": {
+        "label": "Import"
+      },
+      "export": {
+        "label": "Export"
+      },
+      "ok": "OK",
+      "no-data": "No multisig address",
+      "table": {
+        "address": "address",
+        "alias": "alias",
+        "type": "type",
+        "balance": "balance",
+        "copy-address": "Copy Address",
+        "actions": {
+          "info": "Info",
+          "send": "Send",
+          "approve": "Sign",
+          "delete": "Delete"
+        }
+      },
+      "import-dialog": {
+        "actions": {
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        },
+        "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
+      },
+      "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
+      "create-dialog": {
+        "title": "Create multisig address",
+        "index": "index",
+        "required": "required",
+        "signer-address": "signer address",
+        "copy-address": "Copy Address",
+        "m-n": {
+          "title": "Please choose the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
+          "error": "for m-of-n multisig address, m shouldn't be greater than n"
+        },
+        "multi-address-info": {
+          "title": "Please input the signers for the {{m}}-of-{{n}} multisig address",
+          "view-title": "The {{m}}-of-{{n}} multisig address is",
+          "ckb-address-placeholder": "ckb address"
+        },
+        "multi-list": "Signer list",
+        "actions": {
+          "cancel": "Cancel",
+          "back": "Back",
+          "next": "Next",
+          "confirm": "Confirm"
+        }
       }
     }
   }
