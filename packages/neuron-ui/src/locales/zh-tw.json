@@ -202,7 +202,8 @@
       "scan-screen-qr-code": "掃描螢幕上的二維碼",
       "set-locktime": "設置鎖定時間",
       "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
-      "release-on": "鎖定至"
+      "release-on": "鎖定至",
+      "locktime-warning": "請確保對方錢包能夠支持到期解鎖功能。一般情況下，交易所不支持到期解鎖功能，請謹慎使用！"
     },
     "receive": {
       "title": "收款",

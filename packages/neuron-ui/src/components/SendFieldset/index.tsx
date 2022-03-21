@@ -15,6 +15,7 @@ import Trash from 'widgets/Icons/Trash.png'
 import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
 import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
+import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 
 import { formatDate } from 'widgets/DatetimePicker'
 import { localNumberFormatter, PlaceHolders } from 'utils'
@@ -178,6 +179,12 @@ const SendFieldset = ({
               <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
             </button>
           ) : null}
+          {item.date && (
+            <div className={styles.locktimeWarn}>
+              <Attention />
+              {t('send.locktime-warning')}
+            </div>
+          )}
         </div>
       ) : null}
     </div>
