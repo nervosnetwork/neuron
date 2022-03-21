@@ -18,7 +18,7 @@ export const MultisigAddressTable = ({
   changeR?: (e: React.ChangeEvent<HTMLInputElement>) => void
   changeAddress?: (e: React.ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean
-  addressErrors?: Record<number, (Error & { i18n: Record<string, string> }) | undefined>
+  addressErrors?: ((Error & { i18n: Record<string, string> }) | undefined)[]
 }) => {
   const [t] = useTranslation()
   return (

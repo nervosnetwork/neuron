@@ -41,9 +41,9 @@ export const useMAndN = () => {
 
 export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolean }) => {
   const [addresses, setAddresses] = useState(new Array(n).fill(''))
-  const [addressErrors, setAddressErrors] = useState<
-    Record<number, (Error & { i18n: Record<string, string> }) | undefined>
-  >({})
+  const [addressErrors, setAddressErrors] = useState<((Error & { i18n: Record<string, string> }) | undefined)[]>(
+    new Array(n).fill(undefined)
+  )
   const [r, setR] = useState(0)
   const changeR = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,15 +63,9 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
       } = e.target
       try {
         validateAddress(value, isMainnet)
-        setAddressErrors(v => ({
-          ...v,
-          [idx]: undefined,
-        }))
+        setAddressErrors(v => v.map((item, index) => (index === +idx ? undefined : item)))
       } catch (error) {
-        setAddressErrors(v => ({
-          ...v,
-          [idx]: error,
-        }))
+        setAddressErrors(v => v.map((item, index) => (index === +idx ? error : item)))
       }
       setAddresses(v => v.map((item, index) => (+idx === index ? value : item)))
     },
@@ -82,8 +76,9 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
   }, [addresses, addressErrors])
   useEffect(() => {
     setAddresses(new Array(n).fill(''))
+    setAddressErrors(new Array(n).fill(undefined))
     setR(0)
-  }, [n])
+  }, [n, setAddressErrors])
   return {
     r,
     addresses,
