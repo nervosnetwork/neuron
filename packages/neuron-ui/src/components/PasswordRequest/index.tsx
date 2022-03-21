@@ -19,13 +19,7 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import {
-  exportTransactionAsJSON,
-  OfflineSignStatus,
-  OfflineSignType,
-  signAndExportTransaction,
-  isWalletXpub,
-} from 'services/remote'
+import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType, signAndExportTransaction } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
@@ -39,6 +33,7 @@ const PasswordRequest = () => {
     },
     settings: { wallets = [] },
     experimental,
+    wallet: currentWallet,
   } = useGlobalState()
 
   const dispatch = useDispatch()
@@ -48,14 +43,6 @@ const PasswordRequest = () => {
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [isXpub, setIsXpub] = useState(false)
-  useEffect(() => {
-    isWalletXpub(walletID).then(res => {
-      if (isSuccessResponse(res) && res.result !== null) {
-        setIsXpub(res.result)
-      }
-    })
-  })
 
   useEffect(() => {
     setPassword('')
@@ -357,13 +344,13 @@ const PasswordRequest = () => {
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
-        {isXpub && (
+        {currentWallet.isWatchOnly && (
           <div className={styles.xpubNotice}>
             <Attention />
             {t('password-request.xpub-notice')}
           </div>
         )}
-        {isXpub || (
+        {currentWallet.isWatchOnly || (
           <TextField
             label={t('password-request.password')}
             value={password}
@@ -384,13 +371,13 @@ const PasswordRequest = () => {
                 mainBtnLabel={t('offline-sign.export')}
                 mainBtnOnClick={exportTransaction}
                 mainBtnDisabled={isLoading}
-                list={isXpub ? [] : dropdownList}
+                list={currentWallet.isWatchOnly ? [] : dropdownList}
               />
             </div>
           ) : null}
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-            {isXpub || (
+            {currentWallet.isWatchOnly || (
               <Button label={t('common.confirm')} type="submit" disabled={disabled}>
                 {isLoading ? <Spinner /> : (t('common.confirm') as string)}
               </Button>

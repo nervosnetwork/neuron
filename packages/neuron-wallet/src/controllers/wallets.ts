@@ -341,19 +341,16 @@ export default class WalletsController {
       })
   }
 
-  public async getCurrent() {
+  public getCurrent() {
     const currentWallet = WalletsService.getInstance().getCurrent() || null
     return {
       status: ResponseCode.Success,
       result: currentWallet
-    }
-  }
-
-  public isWalletXpub(id: string) {
-    const wallet = WalletsService.getInstance().get(id)
-    return {
-      status: ResponseCode.Success,
-      result: wallet.isHDWallet() && wallet.loadKeystore().isEmpty()
+        ? {
+            ...currentWallet.toJSON(),
+            isWatchOnly: currentWallet.isHDWallet() && currentWallet.loadKeystore().isEmpty()
+          }
+        : null
     }
   }
 

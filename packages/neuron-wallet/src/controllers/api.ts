@@ -156,7 +156,7 @@ export default class ApiController {
       const walletsService = WalletsService.getInstance()
       const networksService = NetworksService.getInstance()
 
-      const currentWallet = walletsService.getCurrent()
+      const currentWallet = this.#walletsController.getCurrent().result
       const wallets = walletsService.getAll()
 
       const [
@@ -228,10 +228,6 @@ export default class ApiController {
 
     handle('get-current-wallet', async () => {
       return this.#walletsController.getCurrent()
-    })
-
-    handle('is-wallet-xpub', async (_, id: string) => {
-      return this.#walletsController.isWalletXpub(id)
     })
 
     handle('set-current-wallet', async (_, id: string) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID, isWalletXpub } from 'services/remote'
+import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID, getCurrentWallet } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import {
   ErrorCode,
@@ -155,8 +155,9 @@ const SignAndVerify = () => {
   const [t, i18n] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [wallet, setWallet] = useState<Pick<State.Wallet, 'id' | 'addresses' | 'device'> | undefined>(undefined)
-  const [isXpub, setIsXpub] = useState(false)
+  const [wallet, setWallet] = useState<Pick<State.Wallet, 'id' | 'addresses' | 'device' | 'isWatchOnly'> | undefined>(
+    undefined
+  )
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
@@ -182,14 +183,14 @@ const SignAndVerify = () => {
 
     getAddressesByWalletID(id).then(res => {
       if (isSuccessResponse(res)) {
-        setWallet({ id, addresses: res.result })
+        setWallet(v => ({ ...v, id, addresses: res.result }))
       } else {
         showErrorMessage(t('messages.error'), typeof res.message === 'string' ? res.message : res.message.content!)
       }
     })
-    isWalletXpub(id).then(res => {
+    getCurrentWallet().then(res => {
       if (isSuccessResponse(res) && res.result !== null) {
-        setIsXpub(res.result)
+        setWallet(v => ({ ...v, ...res.result }))
       }
     })
   }, [t])
@@ -327,7 +328,7 @@ const SignAndVerify = () => {
 
       <div className={styles.actions}>
         <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={handleClose} />
-        {isXpub || (
+        {wallet?.isWatchOnly || (
           <Button
             type="primary"
             label={t('sign-and-verify.sign')}
