@@ -392,6 +392,9 @@
       "send-acp": {
         "title": "Send CKB"
       },
+      "send-acp-to-default": {
+        "title": "Send CKB"
+      },
       "migrate-acp": {
         "title": "Upgrade Asset Accounts"
       },

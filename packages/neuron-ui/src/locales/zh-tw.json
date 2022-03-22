@@ -385,6 +385,9 @@
       "send-acp": {
         "title": "發起 CKB 交易"
       },
+      "send-acp-to-default": {
+        "title": "發起 CKB 交易"
+      },
       "migrate-acp": {
         "title": "升級資產賬戶"
       },

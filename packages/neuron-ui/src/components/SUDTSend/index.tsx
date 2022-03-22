@@ -32,6 +32,7 @@ import {
   AccountType,
   CONSTANTS,
   isSuccessResponse,
+  validateAmountRange,
 } from 'utils'
 import { AmountNotEnoughException } from 'exceptions'
 import styles from './sUDTSend.module.scss'
@@ -155,6 +156,14 @@ const SUDTSend = () => {
     { key: Fields.Amount, label: t('s-udt.send.amount') },
   ]
 
+  const isSecp256k1ShortAddress = useMemo(() => {
+    try {
+      return ckbCore.utils.parseAddress(sendState.address, 'hex').startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX)
+    } catch {
+      return false
+    }
+  }, [sendState.address])
+
   const errors: { [Fields.Address]: string; [Fields.Amount]: string } = useMemo(() => {
     const errMap = { address: '', amount: '' }
     try {
@@ -163,7 +172,6 @@ const SUDTSend = () => {
         codeHash: anyoneCanPayScript?.codeHash ?? '',
         isMainnet,
         required: false,
-        type: accountType,
       })
     } catch (err) {
       errMap.address = t(err.message, err.i18n)
@@ -175,24 +183,19 @@ const SUDTSend = () => {
       if (total && value && BigInt(total) < BigInt(value)) {
         throw new AmountNotEnoughException()
       }
+      if (sendState.amount && isSecp256k1ShortAddress) {
+        validateAmountRange(sendState.amount)
+      }
     } catch (err) {
       errMap.amount = t(err.message, err.i18n)
     }
     return errMap
-  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, accountType])
+  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, isSecp256k1ShortAddress])
 
   const isFormReady =
     !isSending &&
     Object.values(errors).every(v => !v) &&
     [Fields.Address, Fields.Amount].every(key => sendState[key as Fields.Address | Fields.Amount].trim())
-
-  const isSecp256k1ShortAddress = useMemo(() => {
-    try {
-      return ckbCore.utils.parseAddress(sendState.address, 'hex').startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX)
-    } catch {
-      return false
-    }
-  }, [sendState.address])
 
   const isSubmittable = isFormReady && experimental?.tx && !remoteError
 
@@ -234,7 +237,7 @@ const SUDTSend = () => {
         description: sendState.description,
       }
       let generator = generateSUDTTransaction
-      if (isSecp256k1ShortAddress) {
+      if (isSecp256k1ShortAddress && accountType === AccountType.SUDT) {
         generator = generateChequeTransaction
         if (sendState.sendAll) {
           params.amount = 'all'
@@ -313,8 +316,10 @@ const SUDTSend = () => {
       e.preventDefault()
       e.stopPropagation()
       if (isSubmittable) {
-        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' = 'send-sudt'
-        if (accountType === AccountType.CKB) {
+        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' | 'send-acp-to-default' = 'send-sudt'
+        if (accountType === AccountType.CKB && isSecp256k1ShortAddress) {
+          actionType = 'send-acp-to-default'
+        } else if (accountType === AccountType.CKB) {
           actionType = 'send-acp'
         } else if (isSecp256k1ShortAddress) {
           actionType = 'send-cheque'

@@ -56,10 +56,3 @@ export class AmountNegativeException extends RangeError {
     this.i18n.fieldValue = value
   }
 }
-
-export class BalanceNotEnoughException extends Error {
-  public code = ErrorCode.BalanceNotEnough
-  constructor() {
-    super(`${I18N_PATH}${ErrorCode.BalanceNotEnough}`)
-  }
-}

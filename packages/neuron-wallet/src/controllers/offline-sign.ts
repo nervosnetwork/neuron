@@ -74,7 +74,7 @@ export default class OfflineSignController {
         walletID,
         Transaction.fromObject(transaction),
         password,
-        type === SignType.SendSUDT ? 1 : 0,
+        type === SignType.SendSUDT,
         context
       )
 
