@@ -355,7 +355,7 @@ describe('OfflineSignController', () => {
           type: SignType.SendSUDT,
         } as any)
 
-        const skipFirstInput = 1
+        const skipFirstInput = true
 
         expect(stubbedTransactionSenderSign).toHaveBeenCalledWith(
           undefined,

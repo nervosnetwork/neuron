@@ -12,7 +12,7 @@ import WalletsService from 'services/wallets'
 import OfflineSignService from 'services/offline-sign'
 import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
-import { SETTINGS_WINDOW_TITLE } from 'utils/const'
+import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
 import NetworksService from 'services/networks'
 import { clearCkbNodeCache } from 'services/ckb-runner'
@@ -96,7 +96,7 @@ const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) =
 const showSettings$ = new Subject()
 
 showSettings$.pipe(throttleTime(1000)).subscribe(() => {
-  showWindow(`#${URL.Settings}`, t(SETTINGS_WINDOW_TITLE))
+  showWindow(`#${URL.Settings}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
 })
 
 const showSettings = () => {
@@ -303,6 +303,17 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           const currentWallet = walletsService.getCurrent()
           showWindow(`#/sign-verify/${currentWallet!.id}`, t(`messageBox.sign-and-verify.title`), {
             width: 900
+          })
+        }
+      },
+      {
+        label: t('application-menu.tools.create-multisig-address'),
+        enabled: hasCurrentWallet,
+        click: () => {
+          const currentWallet = walletsService.getCurrent()
+          showWindow(`#/add-multisig-address/${currentWallet!.id}`, t(`messageBox.create-multisig-address.title`), {
+            width: 900,
+            resizable: true
           })
         }
       },

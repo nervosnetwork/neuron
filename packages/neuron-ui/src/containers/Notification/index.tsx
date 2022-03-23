@@ -54,6 +54,7 @@ const TopAlertActions = ({
         onClick={() => {
           toggleAllNotificationVisibility()(dispatch)
         }}
+        className={styles.moreBtn}
       >
         more
       </IconButton>

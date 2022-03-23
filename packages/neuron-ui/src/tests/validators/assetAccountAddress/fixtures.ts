@@ -1,4 +1,4 @@
-import { ErrorCode, AccountType } from 'utils/enums'
+import { AccountType, ErrorCode } from 'utils/enums'
 
 export default {
   'Should throw an error when address is not a string': {
@@ -57,14 +57,14 @@ export default {
     },
     exception: null,
   },
-  "Should throw an error when account type is ckb and it's a short version address of secp256k1 lock": {
+  "Should pass when account type is ckb and it's a short version address of secp256k1 lock": {
     params: {
       address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
       isMainnet: false,
       required: false,
       type: AccountType.CKB,
     },
-    exception: ErrorCode.FieldInvalid,
+    exception: null,
   },
   "Should throw an error when it's a short version address but its code hash index is not 0x00 or 0x02": {
     params: {

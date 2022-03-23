@@ -202,7 +202,8 @@
       "scan-screen-qr-code": "扫描屏幕上的二维码",
       "set-locktime": "设置锁定时间",
       "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
-      "release-on": "锁定至"
+      "release-on": "锁定至",
+      "locktime-warning": "请确保对方钱包能够支持到期解锁功能。一般情况下，交易所不支持到期解锁功能，请谨慎使用！"
     },
     "receive": {
       "title": "收款",
@@ -382,6 +383,9 @@
         "title": "发起 sUDT 交易"
       },
       "send-acp": {
+        "title": "发起 CKB 交易"
+      },
+      "send-acp-to-default": {
         "title": "发起 CKB 交易"
       },
       "migrate-acp": {
@@ -808,6 +812,66 @@
         "decimal": "小数位",
         "confirm": "确认",
         "cancel": "取消"
+      }
+    },
+    "multisig-address": {
+      "search": {
+        "placeholder": "使用地址或者别名搜索"
+      },
+      "add": {
+        "label": "添加"
+      },
+      "import": {
+        "label": "导入"
+      },
+      "export": {
+        "label": "导出"
+      },
+      "ok": "好的",
+      "no-data": "没有多签地址",
+      "table": {
+        "address": "地址",
+        "alias": "别名",
+        "type": "类型",
+        "balance": "余额",
+        "copy-address": "复制地址",
+        "actions": {
+          "info": "详情",
+          "send": "转账",
+          "approve": "签名",
+          "delete": "删除"
+        }
+      },
+      "import-dialog": {
+        "actions": {
+          "cancel": "取消",
+          "confirm": "确认"
+        },
+        "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
+      },
+      "delete-failed": "删除多签配置失败，失败原因：{{reason}}",
+      "create-dialog": {
+        "title": "创建多重签名地址",
+        "index": "序号",
+        "required": "必选",
+        "signer-address": "签名者地址",
+        "copy-address": "复制地址",
+        "m-n": {
+          "title": "请选择 m-of-n 类型的多重签名地址配置，从 n 个密钥中通过 m 个确认来转移资产。",
+          "error": "对于 m-of-n 多重签名地址，m 不应大于 n"
+        },
+        "multi-address-info": {
+          "title": "对于 {{m}}-of-{{n}}, 请输入 {{n}} 个签名者地址",
+          "view-title": " {{m}}-of-{{n}} 的多签地址是",
+          "ckb-address-placeholder": "ckb address"
+        },
+        "multi-list": "多签地址列表",
+        "actions": {
+          "cancel": "取消",
+          "back": "上一步",
+          "next": "下一步",
+          "confirm": "确认"
+        }
       }
     }
   }

@@ -2,7 +2,6 @@
 
 Nervos CKB Full-Node Desktop Wallet
 
-[![Azure Pipelines Build Status](https://dev.azure.com/nervosnetwork/neuron/_apis/build/status/nervosnetwork.neuron?branchName=develop)](https://dev.azure.com/nervosnetwork/neuron/_build/latest?definitionId=8&branchName=develop)
 [![Unit Tests](https://github.com/nervosnetwork/neuron/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/nervosnetwork/neuron/actions/workflows/unit_tests.yml)
 [![Telegram Group](https://cdn.rawgit.com/Patrolavia/telegram-badge/8fe3382b/chat.svg)](https://t.me/nervos_ckb_dev)
 

@@ -15,7 +15,7 @@ const fixtures = {
       fee: '0',
       balance: '10000000000000000000000',
     },
-    exception: ErrorCode.BalanceNotEnough,
+    exception: ErrorCode.AmountNotEnough,
   },
   'Should throw an error when total amount + fee is greater than balance': {
     params: {
@@ -23,7 +23,7 @@ const fixtures = {
       fee: '1',
       balance: '10000000000000000000000',
     },
-    exception: ErrorCode.BalanceNotEnough,
+    exception: ErrorCode.AmountNotEnough,
   },
   'Should throw an error when balance is negative': {
     params: {
@@ -31,7 +31,7 @@ const fixtures = {
       fee: '10000000000',
       balance: '-10000000000010000000000',
     },
-    exception: ErrorCode.BalanceNotEnough,
+    exception: ErrorCode.AmountNotEnough,
   },
 }
 

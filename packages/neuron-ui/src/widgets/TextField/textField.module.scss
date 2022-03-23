@@ -103,3 +103,41 @@ $secondary-font-size: 0.63rem;
     margin-top: 0.125rem;
   }
 }
+
+.editTextField {
+  display: flex;
+  align-items: center;
+
+  .editBtn {
+    appearance: none;
+    border: none;
+    background-color: transparent;
+    width: 2rem;
+    height: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      pointer-events: none;
+
+      g {
+        fill: #000;
+      }
+    }
+  }
+
+  input {
+    font-size: 0.875rem;
+  }
+
+  & > div {
+    border: none !important;
+  }
+
+  @media screen and (max-width: 1500px) {
+    input {
+      width: 100px;
+    }
+  }
+}
