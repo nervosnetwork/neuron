@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID, getCurrentWallet } from 'services/remote'
+import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import {
   ErrorCode,
@@ -155,17 +155,11 @@ const SignAndVerify = () => {
   const [t, i18n] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [wallet, setWallet] = useState<Pick<State.Wallet, 'id' | 'addresses' | 'device' | 'isWatchOnly'> | undefined>(
-    undefined
-  )
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
-  const {
-    settings: { wallets = [] },
-  } = useGlobalState()
+  const { wallet } = useGlobalState()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  const currentWallet = useMemo(() => wallets.find(w => w.id === wallet?.id), [wallet, wallets])
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
   useEffect(() => {
@@ -178,21 +172,7 @@ const SignAndVerify = () => {
     if (!id) {
       showErrorMessage(t('messages.error'), t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' }))
       window.close()
-      return
     }
-
-    getAddressesByWalletID(id).then(res => {
-      if (isSuccessResponse(res)) {
-        setWallet(v => ({ ...v, id, addresses: res.result }))
-      } else {
-        showErrorMessage(t('messages.error'), typeof res.message === 'string' ? res.message : res.message.content!)
-      }
-    })
-    getCurrentWallet().then(res => {
-      if (isSuccessResponse(res) && res.result !== null) {
-        setWallet(v => ({ ...v, ...res.result }))
-      }
-    })
   }, [t])
 
   const handlePasswordDialogOpen = useCallback(() => {
@@ -345,11 +325,11 @@ const SignAndVerify = () => {
       </div>
 
       <Notifications notification={notification} onDismiss={handleNotificationDismiss} />
-      {isDialogOpen && currentWallet?.device ? (
+      {isDialogOpen && wallet?.device ? (
         <HardwareSign
           signType="message"
           signMessage={handleSignMessage}
-          wallet={currentWallet}
+          wallet={wallet}
           onDismiss={handlePasswordDialogDismiss}
         />
       ) : (
