@@ -219,7 +219,7 @@ export default class MultisigController {
   }
 
   async getMultisigBalances(isMainnet: boolean) {
-    const balances = await CellsService.getMultisigBalance(isMainnet)
+    const balances = await CellsService.getMultisigBalances(isMainnet)
     return {
       status: ResponseCode.Success,
       result: balances

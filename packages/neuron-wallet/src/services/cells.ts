@@ -1056,7 +1056,7 @@ export default class CellsService {
     return outputEntities
   }
 
-  public static async getMultisigBalance(isMainnet: boolean) {
+  public static async getMultisigBalances(isMainnet: boolean) {
     const cells: {
       lockArgs: string
       balance: string

@@ -928,7 +928,7 @@ describe('CellsService', () => {
     })
     const address = scriptToAddress(lockScript.toSDK(), false)
     await createCell(capacity, OutputStatus.Sent, false, null, { lockScript })
-    const multisigBalances = await CellsService.getMultisigBalance(false)
+    const multisigBalances = await CellsService.getMultisigBalances(false)
     expect(multisigBalances[address]).toBe(capacity)
   })
 })

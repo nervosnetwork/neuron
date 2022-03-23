@@ -1,6 +1,7 @@
 import { ResponseCode } from '../../src/utils/const'
 import MultisigService from '../../src/services/multisig'
 import MultisigController from '../../src/controllers/multisig'
+import CellsService from '../../src/services/cells'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -202,6 +203,7 @@ describe('test for multisig controller', () => {
 
   it('getMultisigBalances', async () => {
     const res = await multisigController.getMultisigBalances(false)
+    expect(CellsService.getMultisigBalances).toHaveBeenCalled()
     expect(res.status).toBe(ResponseCode.Success)
   })
   
