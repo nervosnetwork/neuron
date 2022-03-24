@@ -54,7 +54,7 @@ jest.mock('../../src/utils/logger', () => ({
 }))
 
 jest.mock('../../src/services/cells', () => ({
-  getMultisigBalance: jest.fn()
+  getMultisigBalances: jest.fn(),
 }))
 
 const multisigConfig = {
@@ -202,7 +202,7 @@ describe('test for multisig controller', () => {
   })
 
   it('getMultisigBalances', async () => {
-    const res = await multisigController.getMultisigBalances(false)
+    const res = await multisigController.getMultisigBalances({ isMainnet: false, multisigAddresses: [] })
     expect(CellsService.getMultisigBalances).toHaveBeenCalled()
     expect(res.status).toBe(ResponseCode.Success)
   })

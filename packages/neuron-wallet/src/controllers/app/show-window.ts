@@ -34,7 +34,7 @@ const showWindow = (
       ...options
     })
     if (channels) {
-      AppController.getInstance().registerChannels(win.id, channels)
+      AppController.getInstance().registerChannels(win, channels)
     }
     const fmtUrl = url.startsWith('http') || url.startsWith('file:') ? url : env.mainURL + url
     win.loadURL(fmtUrl)

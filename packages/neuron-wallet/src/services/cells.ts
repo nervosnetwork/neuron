@@ -1,5 +1,5 @@
 import { getConnection, In } from 'typeorm'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import OutputEntity from 'database/chain/entities/output'
@@ -1056,7 +1056,11 @@ export default class CellsService {
     return outputEntities
   }
 
-  public static async getMultisigBalances(isMainnet: boolean) {
+  public static async getMultisigBalances(isMainnet: boolean, multisigAddresses: string[]) {
+    if (!multisigAddresses.length) {
+      return {}
+    }
+    const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
     const cells: {
       lockArgs: string
       balance: string
@@ -1067,9 +1071,8 @@ export default class CellsService {
         from
             output
         where
-            output.lockCodeHash = '${SystemScriptInfo.MULTI_SIGN_CODE_HASH}' AND
-            output.status in ('${OutputStatus.Live}', '${OutputStatus.Sent}') AND
-            output.lockHashType = '${SystemScriptInfo.MULTI_SIGN_HASH_TYPE}'
+            output.lockHash in (${lockHashes.map(v => `'${v}'`).join(',')}) AND
+            output.status in ('${OutputStatus.Live}', '${OutputStatus.Sent}')
         group by output.lockArgs
       `)
 

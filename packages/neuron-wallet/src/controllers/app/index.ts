@@ -21,7 +21,7 @@ const app = electronApp
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
   private apiController = new ApiController()
-  private windowRegisterChannels = new Map<number, string[]>()
+  private windowRegisterChannels = new WeakMap<BrowserWindow, string[]>()
   private static instance: AppController
 
   private constructor() {
@@ -62,8 +62,8 @@ export default class AppController {
     await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
   }
 
-  public registerChannels(winId: number, channels: string[]) {
-    this.windowRegisterChannels.set(winId, channels)
+  public registerChannels(win: BrowserWindow, channels: string[]) {
+    this.windowRegisterChannels.set(win, channels)
   }
 
   /**
@@ -72,7 +72,7 @@ export default class AppController {
   public sendMessage = (channel: string, obj: any) => {
     this.mainWindow?.webContents.send(channel, obj)
     BrowserWindow.getAllWindows().forEach(window => {
-      const channels = this.windowRegisterChannels.get(window.id)
+      const channels = this.windowRegisterChannels.get(window)
       if (channels && channels.includes(channel)) {
         window.webContents.send(channel, obj)
       }

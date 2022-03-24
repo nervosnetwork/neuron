@@ -37,14 +37,14 @@ const MultisigAddress = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
-  const multisigBanlances = useSubscription({ walletId, isMainnet })
   const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
+  const { allConfigs, configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
     walletId,
     searchKeywords,
     isMainnet,
   })
+  const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
   const { deleteAction, infoAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {

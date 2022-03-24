@@ -919,16 +919,22 @@ describe('CellsService', () => {
     });
   })
 
-  it('getMultisigBalance', async () => {
-    const capacity = '1000'
-    const lockScript = Script.fromObject({
-      codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-      hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-      args: '0x5e1a15cb9301116ef4ec2f14866701d2492d8683'
+  describe('getMultisigBalance', () => {
+    it('multiaddress not empty', async () => {
+      const capacity = '1000'
+      const lockScript = Script.fromObject({
+        codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+        hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+        args: '0x5e1a15cb9301116ef4ec2f14866701d2492d8683'
+      })
+      const address = scriptToAddress(lockScript.toSDK(), false)
+      await createCell(capacity, OutputStatus.Sent, false, null, { lockScript })
+      const multisigBalances = await CellsService.getMultisigBalances(false, [address])
+      expect(multisigBalances[address]).toBe(capacity)
     })
-    const address = scriptToAddress(lockScript.toSDK(), false)
-    await createCell(capacity, OutputStatus.Sent, false, null, { lockScript })
-    const multisigBalances = await CellsService.getMultisigBalances(false)
-    expect(multisigBalances[address]).toBe(capacity)
+    it('multiaddress is empty', async () => {
+      const multisigBalances = await CellsService.getMultisigBalances(false, [])
+      expect(multisigBalances).toMatchObject({})
+    })
   })
 })
