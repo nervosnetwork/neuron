@@ -22,7 +22,12 @@ if (window.location.hash.startsWith('#/transaction/')) {
 } else if (window.location.hash.startsWith('#/sign-verify/')) {
   ReactDOM.render(<SignAndVerify />, document.getElementById('root'))
 } else if (window.location.hash.startsWith('#/add-multisig-address/')) {
-  ReactDOM.render(<MultiSignAddress />, document.getElementById('root'))
+  ReactDOM.render(
+    <Router>
+      <MultiSignAddress />
+    </Router>,
+    document.getElementById('root')
+  )
 } else {
   const isSettings = window.location.hash.startsWith('#/settings/')
 

@@ -1,7 +1,7 @@
 import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
 import NodeService from './node'
-import { serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import { Address } from 'models/address'
@@ -29,6 +29,7 @@ import AddressParser from 'models/address-parser'
 import HardwareWalletService from './hardware'
 import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, SignTransactionFailed } from 'exceptions'
 import AssetAccountInfo from 'models/asset-account-info'
+import MultisigConfigModel from 'models/multisig-config'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -60,8 +61,23 @@ export default class TransactionSender {
     return this.broadcastTx(walletID, tx)
   }
 
+  public async sendMultisigTx(
+    walletID: string = '',
+    transaction: Transaction,
+    password: string = '',
+    multisigConfigs: MultisigConfigModel[],
+    skipSign = false
+  ) {
+    const tx = skipSign
+      ? Transaction.fromObject(transaction)
+      : await this.signMultisig(walletID, transaction, password, multisigConfigs, [])
+
+    return this.broadcastTx(walletID, tx)
+  }
+
   public async broadcastTx(walletID: string = '', tx: Transaction) {
     const { ckb } = NodeService.getInstance()
+    console.log(JSON.stringify(tx.toSDKRawTransaction()))
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
@@ -208,12 +224,138 @@ export default class TransactionSender {
     return tx
   }
 
+  public async signMultisig(
+    walletID: string = '',
+    transaction: Transaction,
+    password: string = '',
+    multisigConfigs: MultisigConfigModel[],
+    signedBlake160s: string[],
+    context?: RPC.RawTransaction[]
+  ) {
+    const wallet = this.walletService.get(walletID)
+    const tx = Transaction.fromObject(transaction)
+    const txHash: string = tx.computeHash()
+    if (wallet.isHardware()) {
+      let device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const wallet = WalletsService.getInstance().getCurrent()
+        const deviceInfo = wallet!.getDeviceInfo()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
+      }
+      try {
+        return await device.signTx(walletID, tx, txHash, 0, context)
+      } catch (err) {
+        if (err instanceof TypeError) {
+          throw err
+        }
+        throw new SignTransactionFailed(err.message)
+      }
+    }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+    const paths = addressInfos.map(info => info.path)
+    const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
+    const findPrivateKey = (argses: string[]) => {
+      let path: string | undefined
+      argses.some(args => {
+        if (signedBlake160s.includes(args)) {
+          return false
+        }
+        if (args.length === 42) {
+          path = addressInfos.find(i => i.blake160 === args)!.path
+        } else {
+          const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
+          path = addressInfo?.path
+        }
+        return !!path
+      })
+      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
+      if (!pathAndPrivateKey) {
+        throw new Error('no private key found')
+      }
+      return pathAndPrivateKey.privateKey
+    }
+
+    const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
+      const lockArgs: string = input.lock!.args!
+      const wit: WitnessArgs | string = tx.witnesses[index]
+      const witnessArgs: WitnessArgs = wit instanceof WitnessArgs ? wit : WitnessArgs.generateEmpty()
+      if (typeof wit === 'string' && wit.length) {
+        witnessArgs.lock = wit
+      }
+      return {
+        witnessArgs,
+        lockHash: input.lockHash!,
+        witness: '',
+        lockArgs
+      }
+    })
+
+    const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
+    const multisigConfigMap: Record<string, MultisigConfigModel> = multisigConfigs.reduce(
+      (pre, cur) => ({
+        ...pre,
+        [cur.getLockHash()]: cur
+      }),
+      {}
+    )
+    for (const lockHash of lockHashes) {
+      const multisigConfig = multisigConfigMap[lockHash]
+      const multisigArgses = multisigConfig.addresses.map(v => addressToScript(v).args)
+      const privateKey = findPrivateKey(multisigArgses)
+
+      const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
+      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs.map((value: SignInfo, index: number) => {
+        const args = value.witnessArgs
+        if (index === 0) {
+          return args
+        }
+        if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
+          return '0x'
+        }
+        return serializeWitnessArgs(args.toSDK())
+      })
+      let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
+      const serializedMultiSign: string = new MultiSign().serialize(multisigArgses, {
+        M: HexUtils.toHex(multisigConfig.m, 2),
+        N: HexUtils.toHex(multisigConfig.n, 2),
+        R: HexUtils.toHex(multisigConfig.r, 2),
+        S: MultiSign.defaultS
+      })
+      signed = await TransactionSender.signSingleMultiSignScript(
+        privateKey,
+        serializedWitnesses,
+        txHash,
+        serializedMultiSign,
+        wallet,
+        multisigConfig.m
+      )
+      const wit = signed[0] as WitnessArgs
+      if (!witnessesArgs[0].witnessArgs.lock) {
+        wit.lock = serializedMultiSign + wit.lock!.slice(2)
+      } else {
+        wit.lock += wit.lock!.slice(2)
+      }
+      signed[0] = serializeWitnessArgs(wit.toSDK())
+
+      for (let i = 0; i < witnessesArgs.length; ++i) {
+        witnessesArgs[i].witness = signed[i] as string
+      }
+    }
+    tx.witnesses = witnessSigningEntries.map(w => w.witness)
+    tx.hash = txHash
+
+    return tx
+  }
+
   public static async signSingleMultiSignScript(
     privateKeyOrPath: string,
     witnesses: (string | WitnessArgs)[],
     txHash: string,
     serializedMultiSign: string,
-    wallet: Wallet
+    wallet: Wallet,
+    m: number = 1
   ) {
     const firstWitness = witnesses[0]
     if (typeof firstWitness === 'string') {
@@ -223,7 +365,7 @@ export default class TransactionSender {
 
     const emptyWitness = WitnessArgs.fromObject({
       ...firstWitness,
-      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130)
+      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m)
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
     const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
@@ -294,6 +436,39 @@ export default class TransactionSender {
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
 
     return tx
+  }
+
+  public async generateMultisigTx(
+    items: TargetOutput[] = [],
+    multisigConfig: MultisigConfigModel
+  ): Promise<Transaction> {
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: BigInt(item.capacity).toString()
+    }))
+
+    try {
+      const lockScript = addressToScript(multisigConfig.fullPayload)
+      const tx: Transaction = await TransactionGenerator.generateTx(
+        '',
+        targetOutputs,
+        multisigConfig.fullPayload,
+        '0',
+        '1000',
+        {
+          lockArgs: lockScript.args,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+        },
+        multisigConfig
+      )
+      return tx
+    } catch (error) {
+      if (error instanceof CapacityNotEnoughForChange) {
+        throw new CapacityNotEnoughForChangeByTransfer()
+      }
+      throw error
+    }
   }
 
   public generateTransferNftTx = async (

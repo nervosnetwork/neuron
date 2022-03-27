@@ -1,3 +1,5 @@
+import { MultisigConfig } from 'services/remote'
+
 declare namespace State {
   interface Transaction {
     type: 'send' | 'receive'
@@ -90,8 +92,10 @@ declare namespace State {
       | 'destroy-ckb-account'
       | 'migrate-acp'
       | 'send-nft'
+      | 'send-from-multisig'
       | null
     walletID: string
+    multisigConfig?: MultisigConfig
   }
 
   type AlertDialog = Record<'title' | 'message', string> | null

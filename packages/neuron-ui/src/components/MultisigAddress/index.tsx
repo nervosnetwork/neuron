@@ -2,18 +2,20 @@ import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
-import { useOnLocaleChange, isMainnet as isMainnetUtil } from 'utils'
-import { useState as useGlobalState } from 'states'
+import { useOnLocaleChange, isMainnet as isMainnetUtil, shannonToCKBFormatter } from 'utils'
+import { useState as useGlobalState, withProvider } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import CopyZone from 'widgets/CopyZone'
 import { More } from 'widgets/Icons/icon'
 import { CustomizableDropdown } from 'widgets/Dropdown'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
+import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
 import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
+import PasswordRequest from 'components/PasswordRequest'
+import { useSearch, useDialogWrapper, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
-import { useSearch, useDialogWrapper, useConfigManage, useExportConfig, useActions } from './hooks'
-import styles from './multisig-address.module.scss'
+import styles from './multisigAddress.module.scss'
 
 const searchBoxStyles = {
   root: {
@@ -27,7 +29,7 @@ const searchBoxStyles = {
 }
 const messageBarStyle = { text: { alignItems: 'center' } }
 
-const tableActions = ['info', 'delete']
+const tableActions = ['info', 'delete', 'send']
 
 const MultisigAddress = () => {
   const [t, i18n] = useTranslation()
@@ -40,27 +42,36 @@ const MultisigAddress = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
   const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
+  const { allConfigs, configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
     walletId,
     searchKeywords,
     isMainnet,
   })
-  const { deleteAction, infoAction } = useActions({ deleteConfigById })
+  const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
+  const { deleteAction, infoAction, sendAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
       if (option.key === 'info') {
         infoAction.action(multisigConfig)
       } else if (option.key === 'delete') {
         deleteAction.action(multisigConfig)
+      } else if (option.key === 'send') {
+        sendAction.action(multisigConfig)
       }
     },
-    [deleteAction, infoAction]
+    [deleteAction, infoAction, sendAction]
   )
   const listActionOptions = useMemo(
     () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
     [t]
   )
   const { selectIds, isAllSelected, onChangeChecked, onChangeCheckedAll, exportConfig } = useExportConfig(configs)
+  const sendTotalBalance = useMemo(() => {
+    if (sendAction.sendFromMultisig?.fullPayload) {
+      return multisigBanlances[sendAction.sendFromMultisig.fullPayload]
+    }
+    return ''
+  }, [multisigBanlances, sendAction.sendFromMultisig])
   return (
     <div>
       <div className={styles.head}>
@@ -86,7 +97,7 @@ const MultisigAddress = () => {
               <th>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
-              {['address', 'alias', 'type'].map(field => (
+              {['address', 'alias', 'type', 'balance'].map(field => (
                 <th key={field}>{t(`multisig-address.table.${field}`)}</th>
               ))}
             </tr>
@@ -120,6 +131,10 @@ const MultisigAddress = () => {
                   {v.m}
                   &nbsp;of&nbsp;
                   {v.n}
+                </td>
+                <td className={styles.balance}>
+                  {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
+                  CKB
                 </td>
                 <td>
                   <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>
@@ -158,10 +173,20 @@ const MultisigAddress = () => {
           <Button label={t('multisig-address.ok')} type="cancel" onClick={deleteAction.closeDialog} />
         </div>
       </dialog>
+      <dialog ref={sendAction.dialogRef} className={styles.dialog}>
+        {sendAction.isDialogOpen && sendAction.sendFromMultisig && (
+          <SendFromMultisigDialog
+            closeDialog={sendAction.closeDialog}
+            multisigConfig={sendAction.sendFromMultisig}
+            balance={sendTotalBalance}
+          />
+        )}
+      </dialog>
+      <PasswordRequest />
     </div>
   )
 }
 
 MultisigAddress.displayName = 'MultisigAddress'
 
-export default MultisigAddress
+export default withProvider(MultisigAddress)

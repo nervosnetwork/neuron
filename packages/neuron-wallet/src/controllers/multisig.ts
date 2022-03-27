@@ -10,6 +10,8 @@ import MultisigConfig from 'database/chain/entities/multisig-config'
 import MultisigConfigModel from 'models/multisig-config'
 import MultisigService from 'services/multisig'
 import { MultisigConfigAddressError } from 'exceptions/multisig'
+import CellsService from 'services/cells'
+import HexUtils from 'utils/hex'
 
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
@@ -28,10 +30,10 @@ export default class MultisigController {
   }) {
     const multiSign = new MultiSign();
     const multiSignPrefix = {
-      S: '0x00',
-      R: `0x${params.r.toString(16).padStart(2, '0')}`,
-      M: `0x${params.m.toString(16).padStart(2, '0')}`,
-      N: `0x${params.n.toString(16).padStart(2, '0')}`,
+      S: MultiSign.defaultS,
+      R: HexUtils.toHex(params.r, 2),
+      M: HexUtils.toHex(params.m, 2),
+      N: HexUtils.toHex(params.n, 2)
     };
     const blake160s = params.addresses.map(address => addressToScript(address).args)
     if (blake160s.some(blake160 => blake160.length !== 42)) {
@@ -214,6 +216,15 @@ export default class MultisigController {
         filePath: path.basename(filePath),
         configs
       }
+    }
+  }
+
+  async getMultisigBalances({ isMainnet, multisigAddresses}: { isMainnet: boolean , multisigAddresses: string[] }) {
+    console.log(CellsService)
+    const balances = await CellsService.getMultisigBalances(isMainnet, multisigAddresses)
+    return {
+      status: ResponseCode.Success,
+      result: balances
     }
   }
 }

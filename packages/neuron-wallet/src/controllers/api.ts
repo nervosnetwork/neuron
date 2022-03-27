@@ -40,6 +40,7 @@ import OfflineSignController from './offline-sign'
 import SUDTController from "controllers/sudt";
 import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
+import MultisigConfigModel from 'models/multisig-config'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -276,8 +277,19 @@ export default class ApiController {
       this.#walletsController.requestPassword(walletID, action)
     })
 
-    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string }) => {
-      return this.#walletsController.sendTx(params)
+    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string, multisigConfig?: {
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias: string
+      fullPayload: string
+    }}) => {
+      return this.#walletsController.sendTx({
+        ...params,
+        multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined
+      })
     })
 
     handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
@@ -286,6 +298,21 @@ export default class ApiController {
 
     handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
       return this.#walletsController.generateSendingAllTx(params)
+    })
+
+    handle('generate-multisig-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: {
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias: string
+      fullPayload: string
+    }}) => {
+      return this.#walletsController.generateMultisigTx({
+        items: params.items,
+        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+      })
     })
 
     handle('generate-mnemonic', async () => {
@@ -532,7 +559,10 @@ export default class ApiController {
     })
 
     handle('sign-and-export-transaction', async (_, params) => {
-      return this.#offlineSignController.signAndExportTransaction(params)
+      return this.#offlineSignController.signAndExportTransaction({
+        ...params,
+        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined
+      })
     })
 
     // multi sign
@@ -562,6 +592,10 @@ export default class ApiController {
 
     handle('export-multisig-config',async (_, params) => {
       return this.#multisigController.exportConfig(params)
+    })
+
+    handle('get-multisig-balances',async (_, params) => {
+      return this.#multisigController.getMultisigBalances(params)
     })
   }
 

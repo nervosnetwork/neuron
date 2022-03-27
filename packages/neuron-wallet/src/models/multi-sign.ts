@@ -19,6 +19,8 @@ export default class MultiSign {
   // 1 epoch = 4h = 240min
   EPOCH_MINUTES = 240
 
+  static defaultS: string = '0x00'
+
   serialize(blake160s: string[], { S, R, M, N }: MultisigPrefix = defaultMultisigPrefix) {
     this.validateMultisigPrefix(S)
     this.validateMultisigPrefix(R)

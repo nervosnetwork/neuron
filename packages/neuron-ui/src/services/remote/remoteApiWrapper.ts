@@ -133,6 +133,8 @@ type Action =
   | 'export-multisig-config'
   | 'update-multisig-config'
   | 'delete-multisig-config'
+  | 'get-multisig-balances'
+  | 'generate-multisig-tx'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

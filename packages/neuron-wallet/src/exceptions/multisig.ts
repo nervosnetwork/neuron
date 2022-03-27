@@ -23,3 +23,9 @@ export class MultisigConfigAddressError extends Error {
     super(t('messages.multisig-config-address-error'))
   }
 }
+
+export class MultisigConfigNeedError extends Error {
+  constructor() {
+    super(t('messages.multisig-config-need-error'))
+  }
+}

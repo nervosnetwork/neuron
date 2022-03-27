@@ -65,6 +65,10 @@ export default class WitnessArgs {
     return new WitnessArgs(WitnessArgs.EMPTY_LOCK, undefined, undefined)
   }
 
+  public static multisigEmptyLock(): WitnessArgs {
+    return new WitnessArgs(WitnessArgs.EMPTY_LOCK, undefined, undefined)
+  }
+
   public toSDK(): CKBComponents.WitnessArgs {
     return {
       lock: this.lock,

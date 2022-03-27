@@ -1,6 +1,7 @@
 import { ResponseCode } from '../../src/utils/const'
 import MultisigService from '../../src/services/multisig'
 import MultisigController from '../../src/controllers/multisig'
+import CellsService from '../../src/services/cells'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -50,6 +51,10 @@ jest.mock('../../src/utils/logger', () => ({
       getFile: jest.fn()
     }
   }
+}))
+
+jest.mock('../../src/services/cells', () => ({
+  getMultisigBalances: jest.fn(),
 }))
 
 const multisigConfig = {
@@ -195,4 +200,11 @@ describe('test for multisig controller', () => {
       expect(res?.status).toBe(ResponseCode.Success)
     })
   })
+
+  it('getMultisigBalances', async () => {
+    const res = await multisigController.getMultisigBalances({ isMainnet: false, multisigAddresses: [] })
+    expect(CellsService.getMultisigBalances).toHaveBeenCalled()
+    expect(res.status).toBe(ResponseCode.Success)
+  })
+  
 })

@@ -1,5 +1,11 @@
 import { getConnection, In } from 'typeorm'
-import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
+import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import {
+  CapacityNotEnough,
+  CapacityNotEnoughForChange,
+  LiveCapacityNotEnough,
+  MultisigConfigNeedError
+} from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import OutputEntity from 'database/chain/entities/output'
 import InputEntity from 'database/chain/entities/input'
@@ -20,6 +26,7 @@ import Script, { ScriptHashType } from 'models/chain/script'
 import LiveCellService from './live-cell-service'
 import AssetAccountInfo from 'models/asset-account-info'
 import NFT from 'models/nft'
+import MultisigConfigModel from 'models/multisig-config'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -417,7 +424,7 @@ export default class CellsService {
   // gather inputs for generateTx
   public static gatherInputs = async (
     capacity: string,
-    walletId: string,
+    walletId?: string,
     fee: string = '0',
     feeRate: string = '0',
     baseSize: number = 0,
@@ -428,15 +435,20 @@ export default class CellsService {
       witness: WitnessArgs
     },
     lockClass: {
+      lockArgs?: string | string[]
       codeHash: string
-      hashType: ScriptHashType.Type
-    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type }
+      hashType: ScriptHashType
+    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
+    multisigConfigs: MultisigConfigModel[] = []
   ): Promise<{
     inputs: Input[]
     capacities: string
     finalFee: string
     hasChangeOutput: boolean
   }> => {
+    if (!walletId && !lockClass.lockArgs) {
+      throw new Error('no input from')
+    }
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -457,11 +469,18 @@ export default class CellsService {
         output.status IN (:...statuses) AND
         hasData = false AND
         typeHash is null AND
-        output.lockArgs in (
-          SELECT publicKeyInBlake160
-          FROM hd_public_key_info
-          WHERE walletId = :walletId
-        ) AND
+        ${
+          walletId
+            ? `
+          output.lockArgs in (
+            SELECT publicKeyInBlake160
+            FROM hd_public_key_info
+            WHERE walletId = :walletId
+          )`
+            : typeof lockClass.lockArgs === 'string'
+            ? 'output.lockArgs = :lockArgs'
+            : 'output.lockArgs in (:lockArgs)'
+        } AND
         output.lockCodeHash = :lockCodeHash AND
         output.lockHashType = :lockHashType
         `,
@@ -469,7 +488,8 @@ export default class CellsService {
           walletId,
           statuses: [OutputStatus.Live, OutputStatus.Sent],
           lockCodeHash: lockClass.codeHash,
-          lockHashType: lockClass.hashType
+          lockHashType: lockClass.hashType,
+          lockArgs: lockClass.lockArgs
         }
       )
       .getMany()
@@ -507,12 +527,27 @@ export default class CellsService {
       totalSize += TransactionSize.witness(append.witness)
     }
     let hasChangeOutput: boolean = false
+    const multisigConfigMap: Record<string, MultisigConfigModel> = multisigConfigs.reduce(
+      (pre, cur) => ({
+        ...pre,
+        [cur.getLockHash()]: cur
+      }),
+      {}
+    )
     liveCells.every(cell => {
       const input: Input = new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
-        totalSize += TransactionSize.secpLockWitness()
+        if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+          const multisigConfig = multisigConfigMap[cell.lockHash]
+          if (!multisigConfig) {
+            throw new MultisigConfigNeedError()
+          }
+          totalSize += TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n)
+        } else {
+          totalSize += TransactionSize.secpLockWitness()
+        }
       }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)
@@ -1053,5 +1088,43 @@ export default class CellsService {
       .getMany()
 
     return outputEntities
+  }
+
+  public static async getMultisigBalances(isMainnet: boolean, multisigAddresses: string[]) {
+    if (!multisigAddresses.length) {
+      return {}
+    }
+    const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
+    const cells: {
+      lockArgs: string
+      balance: string
+    }[] = await getConnection().getRepository(OutputEntity).manager.query(`
+        select
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
+            lockArgs
+        from
+            output
+        where
+            output.lockHash in (${lockHashes.map(v => `'${v}'`).join(',')}) AND
+            output.status in ('${OutputStatus.Live}', '${OutputStatus.Sent}')
+        group by output.lockArgs
+      `)
+
+    const balances: Record<string, string> = {}
+
+    cells.forEach(c => {
+      balances[
+        scriptToAddress(
+          {
+            args: c.lockArgs,
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+          },
+          isMainnet
+        )
+      ] = c.balance
+    })
+
+    return balances
   }
 }

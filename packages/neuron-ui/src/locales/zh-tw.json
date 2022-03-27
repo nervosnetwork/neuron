@@ -850,6 +850,14 @@
         "notice": "導入配置一次只能導入一個，如果是文件內容是數組默認取第一個導入"
       },
       "delete-failed": "刪除多簽配置失敗，失敗原因：{{reason}}",
+      "send-ckb": {
+        "title": "從 {{m}}-of-{{n}} 多簽地址 <0></0> 轉賬",
+        "balance": "余額",
+        "address": "地址",
+        "amount": "金額",
+        "send": "發送",
+        "cancel": "取消"
+      },
       "create-dialog": {
         "title": "創建多重簽名地址",
         "index": "序號",

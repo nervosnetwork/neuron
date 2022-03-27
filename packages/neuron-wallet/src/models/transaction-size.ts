@@ -86,6 +86,19 @@ export default class TransactionSize {
     return TransactionSize.witness(wit)
   }
 
+  public static multiSignWitness(r: number, m: number, n: number): number {
+    const blake160 = '0x' + '0'.repeat(40)
+    const lock =
+      new MultiSign().serialize(new Array(n).fill(blake160), {
+        R: HexUtils.toHex(r, 2),
+        M: HexUtils.toHex(m, 2),
+        N: HexUtils.toHex(n, 2),
+        S: MultiSign.defaultS
+      }) + '0'.repeat(130 * m)
+    const wit = new WitnessArgs(lock)
+    return TransactionSize.witness(wit)
+  }
+
   public static tx(tx: Transaction): number {
     return [
       this.base(),

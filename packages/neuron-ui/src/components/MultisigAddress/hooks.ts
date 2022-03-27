@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { useDialog, isSuccessResponse } from 'utils'
+import { DataUpdate as DataUpdateSubject } from 'services/subjects'
 import {
   MultisigConfig,
   saveMultisigConfig,
@@ -8,6 +9,7 @@ import {
   updateMultisigConfig,
   exportMultisigConfig,
   deleteMultisigConfig,
+  getMultisigBalances,
 } from 'services/remote'
 
 export const useSearch = () => {
@@ -128,6 +130,7 @@ export const useConfigManage = ({
   }, [walletId, isMainnet])
   return {
     saveConfig,
+    allConfigs: configs,
     configs: useMemo(
       () =>
         searchKeywords
@@ -181,26 +184,26 @@ export const useExportConfig = (configs: MultisigConfig[]) => {
   }
 }
 
-export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
-  const {
-    openDialog: openDeleteErrorDialog,
-    closeDialog: closeDeleteErrorDialog,
-    dialogRef: deleteErrorDialogRef,
-  } = useDialogWrapper()
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | undefined>()
-  const deleteConfig = useCallback(
+const useSendAction = () => {
+  const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
+  const [sendFromMultisig, setSendFromMultisig] = useState<MultisigConfig | undefined>()
+  const onOpenSendDialog = useCallback(
     (option: MultisigConfig) => {
-      deleteMultisigConfig({ id: option.id }).then(res => {
-        if (isSuccessResponse(res)) {
-          deleteConfigById(option.id)
-        } else {
-          openDeleteErrorDialog()
-          setDeleteErrorMessage(typeof res.message === 'string' ? res.message : res.message.content)
-        }
-      })
+      openDialog()
+      setSendFromMultisig(option)
     },
-    [deleteConfigById, setDeleteErrorMessage, openDeleteErrorDialog]
+    [openDialog, setSendFromMultisig]
   )
+  return {
+    action: onOpenSendDialog,
+    closeDialog,
+    dialogRef,
+    sendFromMultisig,
+    isDialogOpen,
+  }
+}
+
+const useInfoAction = () => {
   const { openDialog: openInfoDialog, closeDialog, dialogRef } = useDialogWrapper()
   const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
   const viewMultisigConfig = useCallback(
@@ -211,17 +214,80 @@ export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number
     [openInfoDialog, setMultisigConfig]
   )
   return {
-    deleteAction: {
-      action: deleteConfig,
-      closeDialog: closeDeleteErrorDialog,
-      dialogRef: deleteErrorDialogRef,
-      deleteErrorMessage,
-    },
-    infoAction: {
-      action: viewMultisigConfig,
-      closeDialog,
-      dialogRef,
-      multisigConfig,
-    },
+    action: viewMultisigConfig,
+    closeDialog,
+    dialogRef,
+    multisigConfig,
   }
+}
+
+const useDeleteAction = (deleteConfigById: (id: number) => void) => {
+  const { openDialog, closeDialog, dialogRef } = useDialogWrapper()
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | undefined>()
+  const deleteConfig = useCallback(
+    (option: MultisigConfig) => {
+      deleteMultisigConfig({ id: option.id }).then(res => {
+        if (isSuccessResponse(res)) {
+          deleteConfigById(option.id)
+        } else {
+          openDialog()
+          setDeleteErrorMessage(typeof res.message === 'string' ? res.message : res.message.content)
+        }
+      })
+    },
+    [deleteConfigById, setDeleteErrorMessage, openDialog]
+  )
+  return {
+    action: deleteConfig,
+    closeDialog,
+    dialogRef,
+    deleteErrorMessage,
+  }
+}
+export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
+  return {
+    deleteAction: useDeleteAction(deleteConfigById),
+    infoAction: useInfoAction(),
+    sendAction: useSendAction(),
+  }
+}
+
+export const useSubscription = ({
+  walletId,
+  isMainnet,
+  configs,
+}: {
+  walletId: string
+  isMainnet: boolean
+  configs: MultisigConfig[]
+}) => {
+  const [multisigBanlances, setMultisigBanlances] = useState<Record<string, string>>({})
+  const getAndSaveMultisigBalances = useCallback(() => {
+    getMultisigBalances({ isMainnet, multisigAddresses: configs.map(v => v.fullPayload) }).then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setMultisigBanlances(res.result)
+      }
+    })
+  }, [setMultisigBanlances, isMainnet, configs])
+  useEffect(() => {
+    const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
+      if (walletIDOfMessage && walletIDOfMessage !== walletId) {
+        return
+      }
+      switch (dataType) {
+        case 'transaction': {
+          getAndSaveMultisigBalances()
+          break
+        }
+        default: {
+          break
+        }
+      }
+    })
+    getAndSaveMultisigBalances()
+    return () => {
+      dataUpdateSubscription.unsubscribe()
+    }
+  }, [walletId, getAndSaveMultisigBalances])
+  return multisigBanlances
 }
