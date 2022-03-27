@@ -244,7 +244,7 @@ export default class TransactionSender {
         await device.connect()
       }
       try {
-        return await device.signTx(walletID, tx, txHash, 0, context)
+        return await device.signTx(walletID, tx, txHash, false, context)
       } catch (err) {
         if (err instanceof TypeError) {
           throw err
