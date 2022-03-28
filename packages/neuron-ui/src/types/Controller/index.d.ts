@@ -1,5 +1,3 @@
-import { MultisigConfig } from 'services/remote'
-
 declare namespace Controller {
   interface OpenInWindowParams {
     url: string
@@ -56,7 +54,16 @@ declare namespace Controller {
     tx: string
     password?: string
     description?: string
-    multisigConfig?: MultisigConfig
+    multisigConfig?: {
+      id: number
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias?: string
+      fullPayload: string
+    }
   }
 
   interface GenerateTransactionParams {
