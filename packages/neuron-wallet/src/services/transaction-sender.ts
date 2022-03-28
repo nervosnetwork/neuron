@@ -30,6 +30,7 @@ import HardwareWalletService from './hardware'
 import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, SignTransactionFailed } from 'exceptions'
 import AssetAccountInfo from 'models/asset-account-info'
 import MultisigConfigModel from 'models/multisig-config'
+import { Hardware } from './hardware/hardware'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -235,24 +236,6 @@ export default class TransactionSender {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
     const txHash: string = tx.computeHash()
-    if (wallet.isHardware()) {
-      let device = HardwareWalletService.getInstance().getCurrent()
-      if (!device) {
-        const wallet = WalletsService.getInstance().getCurrent()
-        const deviceInfo = wallet!.getDeviceInfo()
-        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
-        await device.connect()
-      }
-      try {
-        return await device.signTx(walletID, tx, txHash, false, context)
-      } catch (err) {
-        if (err instanceof TypeError) {
-          throw err
-        }
-        throw new SignTransactionFailed(err.message)
-      }
-    }
-
     const addressInfos = await this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
@@ -300,6 +283,16 @@ export default class TransactionSender {
       }),
       {}
     )
+    let device: Hardware
+    if (wallet.isHardware()) {
+      let device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const wallet = WalletsService.getInstance().getCurrent()
+        const deviceInfo = wallet!.getDeviceInfo()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
+      }
+    }
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
       const multisigArgses = multisigConfig.addresses.map(v => addressToScript(v).args)
@@ -316,14 +309,14 @@ export default class TransactionSender {
         }
         return serializeWitnessArgs(args.toSDK())
       })
-      let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
+      let witnesses: (string | WitnessArgs)[] = []
       const serializedMultiSign: string = new MultiSign().serialize(multisigArgses, {
         M: HexUtils.toHex(multisigConfig.m, 2),
         N: HexUtils.toHex(multisigConfig.n, 2),
         R: HexUtils.toHex(multisigConfig.r, 2),
         S: MultiSign.defaultS
       })
-      signed = await TransactionSender.signSingleMultiSignScript(
+      witnesses = await TransactionSender.signSingleMultiSignScript(
         privateKey,
         serializedWitnesses,
         txHash,
@@ -331,16 +324,26 @@ export default class TransactionSender {
         wallet,
         multisigConfig.m
       )
-      const wit = signed[0] as WitnessArgs
-      if (!witnessesArgs[0].witnessArgs.lock) {
-        wit.lock = serializedMultiSign + wit.lock!.slice(2)
-      } else {
-        wit.lock += wit.lock!.slice(2)
+      const wit = witnesses[0] as WitnessArgs
+      wit.lock = wit.lock!.slice(2)
+      if (wallet.isHardware()) {
+        wit.lock = await device!.signTransaction(
+          walletID,
+          tx,
+          witnesses.map(w => (typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK()))),
+          privateKey,
+          context
+        )
       }
-      signed[0] = serializeWitnessArgs(wit.toSDK())
+      if (!witnessesArgs[0].witnessArgs.lock) {
+        wit.lock = serializedMultiSign + wit.lock
+      } else {
+        wit.lock = witnessesArgs[0].witnessArgs.lock + wit.lock
+      }
+      witnesses[0] = serializeWitnessArgs(wit.toSDK())
 
       for (let i = 0; i < witnessesArgs.length; ++i) {
-        witnessesArgs[i].witness = signed[i] as string
+        witnessesArgs[i].witness = witnesses[i] as string
       }
     }
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
