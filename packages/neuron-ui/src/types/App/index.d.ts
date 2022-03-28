@@ -1,5 +1,3 @@
-import { MultisigConfig } from 'services/remote'
-
 declare namespace State {
   interface Transaction {
     type: 'send' | 'receive'
@@ -95,7 +93,16 @@ declare namespace State {
       | 'send-from-multisig'
       | null
     walletID: string
-    multisigConfig?: MultisigConfig
+    multisigConfig?: {
+      id: number
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias?: string
+      fullPayload: string
+    }
   }
 
   type AlertDialog = Record<'title' | 'message', string> | null
