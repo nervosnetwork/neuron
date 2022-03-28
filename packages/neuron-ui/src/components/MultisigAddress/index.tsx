@@ -121,7 +121,7 @@ const MultisigAddress = () => {
                   &nbsp;of&nbsp;
                   {v.n}
                 </td>
-                <td className={styles.balance}>
+                <td>
                   {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
                   CKB
                 </td>
