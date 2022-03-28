@@ -123,7 +123,8 @@ export default {
       'multisig-script-prefix-error': 'The multisig config is error',
       'multisig-config-not-exist': 'The multisig config is not exist',
       'multisig-config-exist': 'The multisig config has exist',
-      'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect'
+      'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
+      'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration'
     },
     messageBox: {
       button: {
