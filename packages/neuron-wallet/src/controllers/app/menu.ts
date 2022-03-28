@@ -311,10 +311,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: hasCurrentWallet,
         click: () => {
           const currentWallet = walletsService.getCurrent()
-          showWindow(`#/add-multisig-address/${currentWallet!.id}`, t(`messageBox.create-multisig-address.title`), {
-            width: 900,
-            resizable: true
-          })
+          showWindow(
+            `#/add-multisig-address/${currentWallet!.id}`,
+            t(`messageBox.create-multisig-address.title`),
+            {
+              width: 900,
+              resizable: true
+            },
+            ['data-updated']
+          )
         }
       },
       {

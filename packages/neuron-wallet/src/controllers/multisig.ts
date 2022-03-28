@@ -10,6 +10,7 @@ import MultisigConfig from 'database/chain/entities/multisig-config'
 import MultisigConfigModel from 'models/multisig-config'
 import MultisigService from 'services/multisig'
 import { MultisigConfigAddressError } from 'exceptions/multisig'
+import CellsService from 'services/cells'
 
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
@@ -214,6 +215,14 @@ export default class MultisigController {
         filePath: path.basename(filePath),
         configs
       }
+    }
+  }
+
+  async getMultisigBalances({ isMainnet, multisigAddresses}: { isMainnet: boolean , multisigAddresses: string[] }) {
+    const balances = await CellsService.getMultisigBalances(isMainnet, multisigAddresses)
+    return {
+      status: ResponseCode.Success,
+      result: balances
     }
   }
 }

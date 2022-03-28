@@ -1,4 +1,5 @@
 import { getConnection, In } from 'typeorm'
+import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import OutputEntity from 'database/chain/entities/output'
@@ -1053,5 +1054,52 @@ export default class CellsService {
       .getMany()
 
     return outputEntities
+  }
+
+  public static async getMultisigBalances(isMainnet: boolean, multisigAddresses: string[]) {
+    if (!multisigAddresses.length) {
+      return {}
+    }
+    const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
+    const connection = await getConnection()
+    const [sql, parameters] = connection.driver.escapeQueryWithParameters(
+      `
+        select
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
+            lockArgs
+        from
+            output
+        where
+            output.lockHash in (:...lockHashes) AND
+            output.status in (:...statuses)
+        group by output.lockArgs
+      `,
+      {
+        lockHashes,
+        statuses: [OutputStatus.Live, OutputStatus.Sent]
+      },
+      {}
+    )
+    const cells: {
+      lockArgs: string
+      balance: string
+    }[] = await connection.getRepository(OutputEntity).manager.query(sql, parameters)
+
+    const balances: Record<string, string> = {}
+
+    cells.forEach(c => {
+      balances[
+        scriptToAddress(
+          {
+            args: c.lockArgs,
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+          },
+          isMainnet
+        )
+      ] = c.balance
+    })
+
+    return balances
   }
 }
