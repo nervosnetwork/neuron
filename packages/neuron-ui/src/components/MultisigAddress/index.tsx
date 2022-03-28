@@ -137,6 +137,10 @@ const MultisigAddress = () => {
                   CKB
                 </td>
                 <td>
+                  {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
+                  CKB
+                </td>
+                <td>
                   <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>
                     <More className={styles.more} />
                   </CustomizableDropdown>

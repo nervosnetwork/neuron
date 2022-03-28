@@ -1095,20 +1095,29 @@ export default class CellsService {
       return {}
     }
     const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
-    const cells: {
-      lockArgs: string
-      balance: string
-    }[] = await getConnection().getRepository(OutputEntity).manager.query(`
+    const connection = await getConnection()
+    const [sql, parameters] = connection.driver.escapeQueryWithParameters(
+      `
         select
             CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
             lockArgs
         from
             output
         where
-            output.lockHash in (${lockHashes.map(v => `'${v}'`).join(',')}) AND
-            output.status in ('${OutputStatus.Live}', '${OutputStatus.Sent}')
+            output.lockHash in (:...lockHashes) AND
+            output.status in (:...statuses)
         group by output.lockArgs
-      `)
+      `,
+      {
+        lockHashes,
+        statuses: [OutputStatus.Live, OutputStatus.Sent]
+      },
+      {}
+    )
+    const cells: {
+      lockArgs: string
+      balance: string
+    }[] = await connection.getRepository(OutputEntity).manager.query(sql, parameters)
 
     const balances: Record<string, string> = {}
 
