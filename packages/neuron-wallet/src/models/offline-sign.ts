@@ -22,7 +22,7 @@ interface MultisigConfigs {
   }
 }
 
-interface Signatures {
+export interface Signatures {
   [hash: string]: string[]
 }
 
@@ -34,7 +34,6 @@ export interface OfflineSignProps {
   description?: string
   assetAccount?: AssetAccount
   multisig_configs?: MultisigConfigs
-  signatures?: Signatures
 }
 
 export interface OfflineSignJSON {
@@ -45,7 +44,6 @@ export interface OfflineSignJSON {
   description?: string
   asset_account?: AssetAccount
   multisig_configs?: MultisigConfigs
-  signatures?: Signatures
 }
 
 export default class OfflineSign implements OfflineSignProps {

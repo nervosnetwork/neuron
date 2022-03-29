@@ -36,7 +36,7 @@ export default class MultisigConfigModel {
     n: number
     r: number
     addresses: string[]
-    alias: string
+    alias?: string
     fullPayload: string
     id?: number
   }): MultisigConfigModel {

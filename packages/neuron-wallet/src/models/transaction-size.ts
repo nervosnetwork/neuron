@@ -87,7 +87,7 @@ export default class TransactionSize {
   }
 
   public static multiSignWitness(r: number, m: number, n: number): number {
-    const blake160 = '0x' + '0'.repeat(40)
+    const blake160 = '0x' + '0'.repeat(40 * n)
     const lock =
       new MultiSign().serialize(new Array(n).fill(blake160), {
         R: HexUtils.toHex(r, 2),

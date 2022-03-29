@@ -1,0 +1,17 @@
+.fullPayload {
+  min-width: 100px;
+  display: flex;
+  height: 1.625rem;
+  flex: 1;
+
+  .overflow {
+    word-break: break-all;
+    text-align: right;
+    line-height: 1.625rem;
+    overflow: hidden;
+  }
+
+  & > span {
+    line-height: 1.625rem;
+  }
+}

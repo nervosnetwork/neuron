@@ -1,0 +1,18 @@
+.title {
+  display: flex;
+  line-height: 1.625rem;
+  flex-wrap: wrap;
+}
+
+.textarea {
+  margin-top: 8px;
+  width: 100%;
+  height: 140px;
+  resize: none;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}

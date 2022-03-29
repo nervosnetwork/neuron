@@ -405,6 +405,12 @@
       },
       "destroy-ckb-account": {
         "title": "銷毀 CKB 資產賬戶"
+      },
+      "send-from-multisig": {
+        "title": "發起交易"
+      },
+      "send-from-multisig-need-one": {
+        "title": "發起交易"
       }
     },
     "qrcode": {
@@ -838,7 +844,7 @@
         "actions": {
           "info": "詳情",
           "send": "轉賬",
-          "approve": "簽名",
+          "approve": "確認",
           "delete": "删除"
         }
       },
@@ -880,6 +886,19 @@
           "next": "下一步",
           "confirm": "確認"
         }
+      },
+      "approve-dialog": {
+        "title": "從{{m}}-of-{{n}}多簽地址<0></0>確認交易",
+        "transaction": "交易",
+        "cancel": "取消",
+        "signAndExport": "簽名並導出",
+        "signAndBroadcast": "簽名並廣播",
+        "broadcast": "廣播交易",
+        "content": "內容：",
+        "status": "狀態",
+        "signerApprove": "還需要{{m}}個簽名者的確認",
+        "requiredSigner": "還需要{{r}}個必要簽名者的確認",
+        "signed": "已簽名"
       }
     }
   }

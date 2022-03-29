@@ -165,7 +165,7 @@ export const useOnSumbit = ({
           type: AppActions.RequestPassword,
           payload: {
             walletID: walletId as string,
-            actionType: 'send-from-multisig',
+            actionType: multisigConfig.m === 1 ? 'send-from-multisig-need-one' : 'send-from-multisig',
             multisigConfig,
           },
         })

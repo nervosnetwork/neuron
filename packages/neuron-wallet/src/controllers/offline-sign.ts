@@ -10,8 +10,9 @@ import AssetAccountController from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
 import NodeService from 'services/node'
-import { OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
+import { MultisigNotSignedNeedError, OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
 import MultisigConfigModel from 'models/multisig-config'
+import { getMultisigStatus } from 'utils/multisig'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -72,7 +73,6 @@ export default class OfflineSignController {
       walletID: string
       password: string
       multisigConfig?: MultisigConfigModel
-      signedBlake160s?: string[]
     }
   ) {
     const { transaction, type, walletID, password, context } = params
@@ -85,7 +85,6 @@ export default class OfflineSignController {
           Transaction.fromObject(transaction),
           password,
           [params.multisigConfig],
-          params.signedBlake160s || [],
           context
         )
       } else {
@@ -103,7 +102,11 @@ export default class OfflineSignController {
         transaction: tx
       })
 
-      signer.setStatus(SignStatus.Signed)
+      let signStatus = SignStatus.Signed
+      if (params.multisigConfig) {
+        signStatus = getMultisigStatus(params.multisigConfig, params.transaction.signatures)
+      }
+      signer.setStatus(signStatus)
 
       return {
         status: ResponseCode.Success,
@@ -128,6 +131,20 @@ export default class OfflineSignController {
     })
 
     return await this.exportTransactionAsJSON(signer.toJSON())
+  }
+
+  public async signAndBroadcastTransaction(
+    params: OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigConfigModel }
+  ) {
+    const res = await this.signTransaction(params)
+    if (res.result.status !== SignStatus.Signed) {
+      throw new MultisigNotSignedNeedError()
+    }
+
+    return await this.broadcastTransaction({
+      ...res.result,
+      walletID: params.walletID
+    })
   }
 
   public async broadcastTransaction({

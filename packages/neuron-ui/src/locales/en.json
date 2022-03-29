@@ -412,6 +412,12 @@
       },
       "destroy-ckb-account": {
         "title": "Destroy CKB Asset Account"
+      },
+      "send-from-multisig": {
+        "title": "Submit the transaction"
+      },
+      "send-from-multisig-need-one": {
+        "title": "Submit the transaction"
       }
     },
     "qrcode": {
@@ -845,7 +851,7 @@
         "actions": {
           "info": "Info",
           "send": "Send",
-          "approve": "Sign",
+          "approve": "Approve",
           "delete": "Delete"
         }
       },
@@ -887,6 +893,19 @@
           "next": "Next",
           "confirm": "Confirm"
         }
+      },
+      "approve-dialog": {
+        "title": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
+        "transaction": "Transaction",
+        "cancel": "Cancel",
+        "signAndExport": "Sign & Export",
+        "signAndBroadcast": "Sign & Broadcast",
+        "broadcast": "Broadcast",
+        "content": "Content:",
+        "status": "Status",
+        "signerApprove": "Lack of {{m}} signer approval(s)",
+        "requiredSigner": "Lack of {{r}} required signer approval(s)",
+        "signed": "Signed"
       }
     }
   }

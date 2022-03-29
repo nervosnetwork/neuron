@@ -124,7 +124,9 @@ export default {
       'multisig-config-not-exist': 'The multisig config is not exist',
       'multisig-config-exist': 'The multisig config has exist',
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
-      'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration'
+      'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
+      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be confirmed',
+      'multisig-not-signed': 'Partial signatures are missing for multisig transactions'
     },
     messageBox: {
       button: {
@@ -250,6 +252,7 @@ export default {
       'import-duplicate': 'Please check for duplicate configurations',
       'import-result': 'Imports succeeded {{success}}, failed {{fail}}.{{failCheck}}',
       'confirm-delete': 'Confirm delete the multisig config?',
+      'approve-tx': 'Confirm multisig transaction',
       'delete-actions': {
         ok: 'Confirm',
         cancel: 'Cancel'

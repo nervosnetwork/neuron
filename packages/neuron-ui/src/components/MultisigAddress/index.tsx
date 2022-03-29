@@ -13,6 +13,7 @@ import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
 import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
 import PasswordRequest from 'components/PasswordRequest'
+import ApproveMultisigTx from 'components/ApproveMultisigTx'
 import { useSearch, useDialogWrapper, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
@@ -29,7 +30,7 @@ const searchBoxStyles = {
 }
 const messageBarStyle = { text: { alignItems: 'center' } }
 
-const tableActions = ['info', 'delete', 'send']
+const tableActions = ['info', 'delete', 'send', 'approve']
 
 const MultisigAddress = () => {
   const [t, i18n] = useTranslation()
@@ -48,7 +49,7 @@ const MultisigAddress = () => {
     isMainnet,
   })
   const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
-  const { deleteAction, infoAction, sendAction } = useActions({ deleteConfigById })
+  const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
       if (option.key === 'info') {
@@ -57,9 +58,11 @@ const MultisigAddress = () => {
         deleteAction.action(multisigConfig)
       } else if (option.key === 'send') {
         sendAction.action(multisigConfig)
+      } else if (option.key === 'approve') {
+        approveAction.action(multisigConfig)
       }
     },
-    [deleteAction, infoAction, sendAction]
+    [deleteAction, infoAction, sendAction, approveAction]
   )
   const listActionOptions = useMemo(
     () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
@@ -183,6 +186,15 @@ const MultisigAddress = () => {
             closeDialog={sendAction.closeDialog}
             multisigConfig={sendAction.sendFromMultisig}
             balance={sendTotalBalance}
+          />
+        )}
+      </dialog>
+      <dialog ref={approveAction.dialogRef} className={styles.dialog}>
+        {approveAction.isDialogOpen && approveAction.multisigConfig && approveAction.offlineSignJson && (
+          <ApproveMultisigTx
+            closeDialog={approveAction.closeDialog}
+            multisigConfig={approveAction.multisigConfig}
+            offlineSignJson={approveAction.offlineSignJson}
           />
         )}
       </dialog>

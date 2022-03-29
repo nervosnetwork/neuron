@@ -7,20 +7,10 @@ import TextField from 'widgets/TextField'
 import SendFieldset from 'components/SendFieldset'
 import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount } from 'utils'
 import { useState as useGlobalState } from 'states'
+import MultisigAddress from 'widgets/MultisigAddress'
 
 import { useSendInfo, useOnSumbit } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
-
-const SendCkbTitle = React.memo(({ fullPayload }: { fullPayload: string }) => {
-  const [t] = useTranslation()
-  return (
-    <CopyZone content={fullPayload} className={styles.fullPayload} name={t('multisig-address.table.copy-address')}>
-      <span className={styles.overflow}>{fullPayload.slice(0, -6)}</span>
-      <span>...</span>
-      <span>{fullPayload.slice(-6)}</span>
-    </CopyZone>
-  )
-})
 
 const SendFromMultisigDialog = ({
   multisigConfig,
@@ -75,7 +65,7 @@ const SendFromMultisigDialog = ({
         <Trans
           i18nKey="multisig-address.send-ckb.title"
           values={multisigConfig}
-          components={[<SendCkbTitle fullPayload={multisigConfig.fullPayload} />]}
+          components={[<MultisigAddress fullPayload={multisigConfig.fullPayload} />]}
         />
       </div>
       <div className={styles.sendContainer}>

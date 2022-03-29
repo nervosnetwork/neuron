@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress, addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { ResponseCode } from 'utils/const'
 import MultiSign from 'models/multi-sign'
 import SystemScriptInfo from 'models/system-script-info'
@@ -11,6 +11,7 @@ import MultisigConfigModel from 'models/multisig-config'
 import MultisigService from 'services/multisig'
 import { MultisigConfigAddressError } from 'exceptions/multisig'
 import CellsService from 'services/cells'
+import OfflineSignService from 'services/offline-sign'
 import HexUtils from 'utils/hex'
 
 export default class MultisigController {
@@ -224,6 +225,27 @@ export default class MultisigController {
     return {
       status: ResponseCode.Success,
       result: balances
+    }
+  }
+
+  async loadMultisigTxJson(fullPayload: string) {
+    const result = await OfflineSignService.loadTransactionJSON()
+    if (!result) {
+      return {
+        status: ResponseCode.Fail,
+      }
+    }
+    const tx = result.json
+    const lockHash = scriptToHash(addressToScript(fullPayload))
+    if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
+      dialog.showErrorBox(t('common.error'), t('messages.multisig-lock-hash-mismatch'))
+      return {
+        status: ResponseCode.Fail
+      }
+    }
+    return {
+      status: ResponseCode.Success,
+      result: result?.json
     }
   }
 }

@@ -1,4 +1,5 @@
 import { remoteApi } from './remoteApiWrapper'
+import { OfflineSignJSON } from './offline'
 
 interface MultisigParams {
   r: number
@@ -38,3 +39,4 @@ export const generateMultisigTx = remoteApi<{
   items: { address: string; capacity: string }[]
   multisigConfig: MultisigConfig
 }>('generate-multisig-tx')
+export const loadMultisigTxJson = remoteApi<string, OfflineSignJSON>('load-multisig-tx-json')
