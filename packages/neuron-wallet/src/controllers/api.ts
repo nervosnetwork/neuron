@@ -315,6 +315,13 @@ export default class ApiController {
       })
     })
 
+    handle('generate-multisig-send-all-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel }) => {
+      return this.#walletsController.generateMultisigSendAllTx({
+        items: params.items,
+        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+      })
+    })
+
     handle('generate-mnemonic', async () => {
       return this.#walletsController.generateMnemonic()
     })

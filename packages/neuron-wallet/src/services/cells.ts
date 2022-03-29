@@ -610,7 +610,8 @@ export default class CellsService {
     walletId: string,
     lockClass: {
       codeHash: string
-      hashType: ScriptHashType.Type
+      hashType: ScriptHashType
+      args?: string
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type }
   ): Promise<Input[]> => {
     const cellEntities: OutputEntity[] = await getConnection()
@@ -621,16 +622,21 @@ export default class CellsService {
         output.status IN (:...statuses) AND
         hasData = false AND
         typeHash is null AND
-        output.lockArgs in (
-          SELECT publicKeyInBlake160
-          FROM hd_public_key_info
-          WHERE walletId = :walletId
-        ) AND
+        ${
+          lockClass.args
+            ? 'output.lockArgs = :lockArgs'
+            : `output.lockArgs in (
+            SELECT publicKeyInBlake160
+            FROM hd_public_key_info
+            WHERE walletId = :walletId
+          )`
+        } AND
         output.lockCodeHash = :lockCodeHash AND
         output.lockHashType = :lockHashType
         `,
         {
           walletId,
+          lockArgs: lockClass.args,
           statuses: [OutputStatus.Live],
           lockCodeHash: lockClass.codeHash,
           lockHashType: lockClass.hashType

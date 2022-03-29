@@ -50,6 +50,9 @@ const SendFromMultisigDialog = ({
     onSendInfoChange,
     totalAmount,
     errorMessage,
+    onSendMaxClick,
+    isSendMax,
+    isMaxBtnDisabled,
   } = useSendInfo({ isMainnet, balance, multisigConfig, t })
   const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
   const totalAmountErrorMessage = useMemo(() => {
@@ -92,16 +95,17 @@ const SendFromMultisigDialog = ({
               idx={idx}
               item={item}
               errors={outputErrors[idx]}
-              isSendMax={false}
-              isAddBtnShow={idx === sendInfoList.length - 1}
+              isSendMax={isSendMax}
+              isAddBtnShow={idx === sendInfoList.length - 1 && !item.disabled}
               isAddOneBtnDisabled={isAddOneBtnDisabled}
-              isMaxBtnDisabled
+              isMaxBtnDisabled={isMaxBtnDisabled}
               isTimeLockable={false}
-              isMaxBtnShow={false}
+              isMaxBtnShow={idx === sendInfoList.length - 1}
               isRemoveBtnShow={sendInfoList.length > 1}
               onOutputAdd={addSendInfo}
               onOutputRemove={deleteSendInfo}
               onItemChange={onSendInfoChange}
+              onSendMaxClick={onSendMaxClick}
             />
           ))}
         </div>

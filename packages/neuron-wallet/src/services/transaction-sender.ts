@@ -441,6 +441,26 @@ export default class TransactionSender {
     return tx
   }
 
+  public generateMultisigSendAllTx = async (
+    items: TargetOutput[] = [],
+    multisigConfig: MultisigConfigModel
+  ): Promise<Transaction> => {
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: BigInt(item.capacity).toString()
+    }))
+
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+      '',
+      targetOutputs,
+      '0',
+      '1000',
+      multisigConfig
+    )
+
+    return tx
+  }
+
   public async generateMultisigTx(
     items: TargetOutput[] = [],
     multisigConfig: MultisigConfigModel

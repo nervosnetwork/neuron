@@ -1,26 +1,43 @@
 import { useCallback, useState, useMemo, useEffect } from 'react'
-import { useOutputErrors, outputsToTotalAmount, CapacityUnit, validateOutputs, CKBToShannonFormatter } from 'utils'
+import {
+  useOutputErrors,
+  outputsToTotalAmount,
+  CapacityUnit,
+  validateOutputs,
+  CKBToShannonFormatter,
+  shannonToCKBFormatter,
+} from 'utils'
 import { useDispatch } from 'states'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { generateMultisigTx, MultisigConfig } from 'services/remote'
+import { generateMultisigTx, MultisigConfig, generateMultisigSendAllTx } from 'services/remote'
 import { TFunction } from 'i18next'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
+Object.defineProperty(generateMultisigTx, 'type', {
+  value: 'common',
+})
+Object.defineProperty(generateMultisigSendAllTx, 'type', {
+  value: 'all',
+})
 
-const generateMultisigTxWith = ({
+const generateMultisigTxWith = (generator: typeof generateMultisigTx | typeof generateMultisigSendAllTx) => ({
   sendInfoList,
   multisigConfig,
   dispatch,
   setErrorMessage,
   t,
+  isMainnet,
 }: {
   sendInfoList: { address: string | undefined; amount: string | undefined; unit: CapacityUnit }[]
   multisigConfig: MultisigConfig
   dispatch: StateDispatch
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   t: TFunction
+  isMainnet: boolean
 }) => {
   try {
+    const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
+    validateOutputs(sendInfoList, isMainnet, type === 'all')
     const realParams = {
       items: sendInfoList.map(item => ({
         address: item.address || '',
@@ -28,7 +45,7 @@ const generateMultisigTxWith = ({
       })),
       multisigConfig,
     }
-    generateMultisigTx(realParams)
+    return generator(realParams)
       .then((res: any) => {
         if (res.status === 1) {
           dispatch({
@@ -56,6 +73,7 @@ const generateMultisigTxWith = ({
     type: AppActions.UpdateGeneratedTx,
     payload: '',
   })
+  return Promise.resolve(undefined)
 }
 export const useSendInfo = ({
   isMainnet,
@@ -122,15 +140,64 @@ export const useSendInfo = ({
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
-      generateMultisigTxWith({
+      generateMultisigTxWith(generateMultisigTx)({
         sendInfoList: validSendInfoList,
         setErrorMessage,
         multisigConfig,
         dispatch,
         t,
+        isMainnet,
       })
     }, 300)
-  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t])
+  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet])
+  const [isSendMax, setIsSendMax] = useState(false)
+  const onSendMaxClick = useCallback(
+    e => {
+      const {
+        dataset: { isOn = 'false' },
+      } = e.currentTarget
+      setIsSendMax(isOn === 'false')
+      if (isOn === 'false') {
+        generateMultisigTxWith(generateMultisigSendAllTx)({
+          sendInfoList,
+          setErrorMessage,
+          multisigConfig,
+          dispatch,
+          t,
+          isMainnet,
+        }).then(res => {
+          if (res.outputs && res.outputs.length) {
+            setSendInfoList(v => [
+              ...v.slice(0, v.length - 1),
+              {
+                ...v[v.length - 1],
+                amount: shannonToCKBFormatter(res.outputs[res.outputs.length - 1].capacity, false, ''),
+                disabled: true,
+              },
+            ])
+          }
+        })
+      } else {
+        setSendInfoList(v => [
+          ...v.slice(0, v.length - 1),
+          {
+            ...v[v.length - 1],
+            amount: '0',
+            disabled: false,
+          },
+        ])
+      }
+    },
+    [setIsSendMax, sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet]
+  )
+  const isMaxBtnDisabled = useMemo(() => {
+    try {
+      validateOutputs(sendInfoList, isMainnet, true)
+    } catch {
+      return true
+    }
+    return false
+  }, [sendInfoList, isMainnet])
   return {
     sendInfoList,
     addSendInfo,
@@ -140,6 +207,9 @@ export const useSendInfo = ({
     outputErrors,
     totalAmount,
     errorMessage,
+    onSendMaxClick,
+    isSendMax,
+    isMaxBtnDisabled,
   }
 }
 
