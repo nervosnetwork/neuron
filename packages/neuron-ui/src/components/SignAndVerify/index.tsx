@@ -19,6 +19,7 @@ import DownArrow from 'widgets/Icons/DownArrow.png'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
 import VerificationWarningIcon from 'widgets/Icons/Warning.png'
+import { InfoCircleOutlined } from 'widgets/Icons/icon'
 
 import HardwareSign from 'components/HardwareSign'
 import styles from './signAndVerify.module.scss'
@@ -294,6 +295,12 @@ const SignAndVerify = () => {
 
       <h2 className={styles.label}>{t('sign-and-verify.message')}</h2>
       <textarea data-field="message" value={message} onChange={handleInputChange} />
+      <div className={styles.tips}>
+        {t('sign-and-verify.sign-with-magic-byte')}
+        <span className={styles.infoIconContainer} data-tip={t('sign-and-verify.verify-tip')}>
+          <InfoCircleOutlined />
+        </span>
+      </div>
 
       <div className={styles.address}>
         <h2 className={styles.label}>{t('sign-and-verify.address')}</h2>

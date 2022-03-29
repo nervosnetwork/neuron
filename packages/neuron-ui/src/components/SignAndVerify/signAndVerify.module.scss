@@ -224,3 +224,24 @@ $inputHeight: 26px;
     height: 30px;
   }
 }
+
+.tips {
+  display: flex;
+  align-items: center;
+
+  .infoIconContainer {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    &:hover {
+      &:after {
+        content: attr(data-tip);
+        position: absolute;
+        width: 350px;
+        font-size: 12px;
+        left: 16px;
+        top: -10px;
+      }
+    }
+  }
+}
