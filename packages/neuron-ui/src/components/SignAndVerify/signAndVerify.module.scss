@@ -251,10 +251,10 @@ $inputHeight: 26px;
     }
 
     &::before {
-      z-index: 1;
+      z-index: 2;
       display: none;
       content: '';
-      top: 2px;
+      top: 4px;
       left: 50%;
       transform: translateX(-50%);
       position: absolute;
