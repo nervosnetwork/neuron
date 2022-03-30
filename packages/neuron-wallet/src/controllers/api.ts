@@ -277,7 +277,7 @@ export default class ApiController {
       this.#walletsController.requestPassword(walletID, action)
     })
 
-    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string, multisigConfig?: MultisigConfigModel}) => {
+    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string, multisigConfig?: MultisigConfigModel }) => {
       return this.#walletsController.sendTx({
         ...params,
         multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined
