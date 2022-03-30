@@ -732,7 +732,8 @@
       "verification-failure": "验证失败",
       "address-not-found": "当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。",
       "sign-with-magic-byte": "信息会和 magic bytes 'Nervos Message:' 一起签名",
-      "verify-tip": "可以通过 v0.101.4 及以后的 Neuron 进行验证"
+      "verify-tip": "可以通过 v0.33.1 及以后的 Neuron 进行验证",
+      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本签名"
     },
     "special-assets": {
       "title": "自定义资产",

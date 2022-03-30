@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
+import { TFunction, useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import {
@@ -127,14 +127,15 @@ const AddressNotFound = ({ onDismiss }: { onDismiss: () => void }) => {
   )
 }
 
-type Notification = 'verify-success' | 'verify-failure' | 'address-not-found' | null
+type Notification = 'verify-success' | 'verify-old-sign-success' | 'verify-failure' | 'address-not-found' | null
 
 interface NotificationsProps {
   notification: Notification
   onDismiss: () => void
+  t: TFunction
 }
 
-const Notifications = ({ notification, onDismiss }: NotificationsProps) =>
+const Notifications = ({ notification, onDismiss, t }: NotificationsProps) =>
   notification !== null ? (
     <div className={styles.dialogContainer} role="presentation" onClick={onDismiss}>
       <div
@@ -147,6 +148,12 @@ const Notifications = ({ notification, onDismiss }: NotificationsProps) =>
       >
         {notification === 'verify-failure' ? <VerifyFailure /> : null}
         {notification === 'verify-success' ? <VerifySuccess /> : null}
+        {notification === 'verify-old-sign-success' ? (
+          <>
+            <VerifySuccess />
+            {t('sign-and-verify.verify-old-sign-success')}
+          </>
+        ) : null}
         {notification === 'address-not-found' ? <AddressNotFound onDismiss={onDismiss} /> : null}
       </div>
     </div>
@@ -248,9 +255,13 @@ const SignAndVerify = () => {
 
   const handleVerifyMessage = useCallback(() => {
     verifyMessage({ message, signature, address })
-      .then((res: ControllerResponse) => {
-        if (res.status === 1) {
-          setNotification('verify-success')
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          if (res.result === 'old-sign') {
+            setNotification('verify-old-sign-success')
+          } else {
+            setNotification('verify-success')
+          }
         } else {
           setNotification('verify-failure')
         }
@@ -342,7 +353,7 @@ const SignAndVerify = () => {
         />
       </div>
 
-      <Notifications notification={notification} onDismiss={handleNotificationDismiss} />
+      <Notifications notification={notification} onDismiss={handleNotificationDismiss} t={t} />
       {isDialogOpen && currentWallet?.device ? (
         <HardwareSign
           signType="message"
