@@ -1,12 +1,37 @@
 import SignMessage from '../../src/services/sign-message'
-import WalletService, { Wallet } from '../../src/services/wallets'
-import Keystore from '../../src/models/keys/keystore'
-import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
-import AddressService from '../../src/services/addresses'
-import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
-import Keychain from '../../src/models/keys/keychain'
-import initConnection from '../../src/database/chain/ormconfig'
-import { getConnection } from 'typeorm'
+import { AddressNotFound } from '../../src/exceptions'
+
+const getAddressesByWalletIdMock = jest.fn()
+jest.mock('../../src/services/addresses', () => ({
+  getAddressesByWalletId: () => getAddressesByWalletIdMock()
+}))
+
+const walletMock = jest.fn().mockReturnValue({
+  isHardware: () => false
+})
+
+jest.mock('../../src/services/wallets', () => ({
+  getInstance: () => ({
+    get() { return walletMock() }
+  })
+}))
+
+const hardWalletMock = jest.fn()
+
+jest.mock('../../src/services/hardware', () => ({
+  getInstance: () => ({
+    getCurrent() { return hardWalletMock() }
+  })
+}))
+
+// @ts-ignore: Private method
+const getPrivateKeyMock = jest.fn().mockImplementation(SignMessage.getPrivateKey)
+
+jest
+  // @ts-ignore: Private method
+  .spyOn(SignMessage, 'getPrivateKey')
+  // @ts-ignore
+  .mockImplementation((...args) => getPrivateKeyMock(...args));
 
 describe(`SignMessage`, () => {
   const info = {
@@ -41,61 +66,29 @@ describe(`SignMessage`, () => {
   }
 
   describe('with extended key', () => {
-    let wallet: Wallet
-    const walletService = new WalletService()
 
     SignMessage.GENERATE_COUNT = 3
 
-    beforeAll(async () => {
-      await initConnection('')
-    })
-
-    afterAll(async () => {
-      await getConnection().close()
-    })
-
-    beforeEach(async () => {
-      const connection = getConnection()
-      await connection.synchronize(true)
-
-      const seed = mnemonicToSeedSync(extendedKeyInfo.mnemonic)
-      const masterKeychain = Keychain.fromSeed(seed)
-      const extendedKey = new ExtendedPrivateKey(
-        masterKeychain.privateKey.toString('hex'),
-        masterKeychain.chainCode.toString('hex')
-      )
-      const keystore = Keystore.create(extendedKey, extendedKeyInfo.password)
-
-      const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
-      const accountExtendedPublicKey = new AccountExtendedPublicKey(
-        accountKeychain.publicKey.toString('hex'),
-        accountKeychain.chainCode.toString('hex')
-      )
-
-      wallet = walletService.create({
-        id: '',
-        name: 'Test Wallet',
-        extendedKey: accountExtendedPublicKey.serialize(),
-        keystore,
-      })
-
-      //@ts-ignore
-      await AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, 0, 0, 2, 1)
-    })
-
-    afterEach(() => {
-      walletService.clearAll()
-    })
-
     describe('sign', () => {
-      it('not generate', async () => {
-        const result = await SignMessage.sign(wallet.id, signInfo.address, extendedKeyInfo.password, signInfo.message)
-
-        expect(result).toEqual(signInfo.signture)
+      it('not match wallet address', async () => {
+        getAddressesByWalletIdMock.mockReturnValueOnce([])
+        await expect(SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)).rejects.toThrow(new AddressNotFound())
       })
 
       it('with generate', async () => {
-        await expect(SignMessage.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)).rejects.toThrow()
+        getAddressesByWalletIdMock.mockReturnValueOnce([{ address: signInfo.address }])
+        getPrivateKeyMock.mockReturnValueOnce(signInfo.privateKey)
+        const res = await SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)
+        expect(res).toEqual(signInfo.signture)
+      })
+
+      it('sign hard wallet', async () => {
+        getAddressesByWalletIdMock.mockReturnValueOnce([{ address: signInfo.address }])
+        walletMock.mockReturnValueOnce({ isHardware: () => true })
+        const signMessage = jest.fn()
+        hardWalletMock.mockReturnValueOnce({ signMessage })
+        await SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)
+        expect(signMessage).toHaveBeenCalled()
       })
     })
   })
@@ -107,12 +100,17 @@ describe(`SignMessage`, () => {
   })
 
   it('verify', () => {
-    const result = SignMessage.verify(info.address, info.signture, info.message)
-    expect(result).toBeTruthy()
+    const result = SignMessage.verifyOldAndNew(info.address, info.signture, info.message)
+    expect(result).toEqual('new-sign')
   })
 
   it('verify false', () => {
-    const result = SignMessage.verify(signInfo.address, info.signture, info.message)
-    expect(result).toBeFalsy()
+    const result = SignMessage.verifyOldAndNew(signInfo.address, info.signture, info.message)
+    expect(result).toBeUndefined()
+  })
+
+  it('verify old sign success', () => {
+    const result = SignMessage.verifyOldAndNew(signInfo2.address, signInfo2.signture, signInfo2.message)
+    expect(result).toEqual('old-sign')
   })
 })
