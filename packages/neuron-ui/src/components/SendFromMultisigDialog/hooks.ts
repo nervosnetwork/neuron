@@ -83,27 +83,33 @@ export const useSendInfo = ({
     },
     [setSendInfoList]
   )
-  const onSendInfoChange = useCallback(e => {
-    const {
-      dataset: { idx = '-1', field },
-      value,
-    } = e.currentTarget as { dataset: { idx: string; field: 'address' | 'amount' }; value: string }
-    setSendInfoList(v => {
-      const copy = [...v]
-      if (field === 'amount') {
-        const amount = value.replace(/,/g, '') || '0'
-        if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+  const onSendInfoChange = useCallback(
+    e => {
+      const {
+        dataset: { idx = '-1', field },
+        value,
+      } = e.currentTarget as { dataset: { idx: string; field: 'address' | 'amount' }; value: string }
+      setSendInfoList(v => {
+        const copy = [...v]
+        if (field === 'amount') {
+          const amount = value.replace(/,/g, '') || '0'
+          if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+            return copy
+          }
+          copy[+idx][field] = amount
           return copy
         }
-        copy[+idx][field] = amount
+        copy[+idx][field] = value
         return copy
-      }
-      copy[+idx][field] = value
-      return copy
-    })
-  }, [])
+      })
+    },
+    [setSendInfoList]
+  )
   const outputErrors = useOutputErrors(sendInfoList, isMainnet)
-  const totalAmount = useMemo(() => outputsToTotalAmount(sendInfoList.filter(v => !!v.amount)), [sendInfoList])
+  const totalAmount = useMemo(
+    () => outputsToTotalAmount(sendInfoList.filter((v, idx) => !!v.amount && !outputErrors[idx].amountError)),
+    [sendInfoList, outputErrors]
+  )
   const isAddOneBtnDisabled = useMemo(() => {
     return (
       outputErrors.some(v => v.addrError || v.amountError) ||
@@ -114,6 +120,9 @@ export const useSendInfo = ({
   const dispatch = useDispatch()
   const [errorMessage, setErrorMessage] = useState('')
   useEffect(() => {
+    if (outputErrors.some(v => v.addrError || v.amountError)) {
+      return
+    }
     clearTimeout(generateTxTimer)
     setErrorMessage('')
     const validSendInfoList = sendInfoList.filter(v => v.address && v.amount)
@@ -130,7 +139,7 @@ export const useSendInfo = ({
         t,
       })
     }, 300)
-  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t])
+  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, outputErrors])
   return {
     sendInfoList,
     addSendInfo,

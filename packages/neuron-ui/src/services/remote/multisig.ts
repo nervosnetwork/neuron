@@ -29,7 +29,7 @@ export const exportMultisigConfig = remoteApi<MultisigConfig[]>('export-multisig
 export const updateMultisigConfig = remoteApi<{ id: number } & Omit<Partial<MultisigConfig>, 'id'>, MultisigConfig>(
   'update-multisig-config'
 )
-export const deleteMultisigConfig = remoteApi<{ id: number }>('delete-multisig-config')
+export const deleteMultisigConfig = remoteApi<number, boolean>('delete-multisig-config')
 export const getMultisigBalances = remoteApi<
   { isMainnet: boolean; multisigAddresses: string[] },
   Record<string, string>

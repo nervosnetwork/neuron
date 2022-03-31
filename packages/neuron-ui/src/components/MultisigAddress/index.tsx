@@ -40,11 +40,9 @@ const MultisigAddress = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
-  const { keywords, onKeywordsChange, onSearch, searchKeywords } = useSearch()
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { allConfigs, configs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
+  const { allConfigs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
     walletId,
-    searchKeywords,
     isMainnet,
   })
   const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
@@ -65,7 +63,24 @@ const MultisigAddress = () => {
     () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
     [t]
   )
-  const { selectIds, isAllSelected, onChangeChecked, onChangeCheckedAll, exportConfig } = useExportConfig(configs)
+  const {
+    selectIds,
+    isAllSelected,
+    onChangeChecked,
+    onChangeCheckedAll,
+    exportConfig,
+    clearSelected,
+  } = useExportConfig(allConfigs)
+  const { keywords, onKeywordsChange, onSearch, searchKeywords, onClear } = useSearch(clearSelected)
+  const configs = useMemo(
+    () =>
+      searchKeywords
+        ? allConfigs.filter(v => {
+            return v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords
+          })
+        : allConfigs,
+    [allConfigs, searchKeywords]
+  )
   const sendTotalBalance = useMemo(() => {
     if (sendAction.sendFromMultisig?.fullPayload) {
       return multisigBanlances[sendAction.sendFromMultisig.fullPayload]
@@ -76,12 +91,14 @@ const MultisigAddress = () => {
     <div>
       <div className={styles.head}>
         <SearchBox
+          data-
           value={keywords}
           className={styles.searchBox}
           styles={searchBoxStyles}
           placeholder={t('multisig-address.search.placeholder')}
           onChange={onKeywordsChange}
           onSearch={onSearch}
+          onClear={onClear}
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
         <div className={styles.actions}>
@@ -94,7 +111,7 @@ const MultisigAddress = () => {
         <table className={styles.multisigConfig}>
           <thead>
             <tr>
-              <th>
+              <th className={styles.checkBoxTh}>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
               {['address', 'alias', 'type', 'balance'].map(field => (
