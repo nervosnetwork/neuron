@@ -858,7 +858,7 @@
       },
       "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
       "send-ckb": {
-        "title": "Send ckb from {{m}}-of-{{n}} multisig address: <0></0>",
+        "title": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
         "balance": "Balance",
         "address": "Address",
         "amount": "Amount",

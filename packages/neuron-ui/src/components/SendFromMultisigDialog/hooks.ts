@@ -20,38 +20,34 @@ const generateMultisigTxWith = ({
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   t: TFunction
 }) => {
-  try {
-    const realParams = {
-      items: sendInfoList.map(item => ({
-        address: item.address || '',
-        capacity: CKBToShannonFormatter(item.amount, item.unit),
-      })),
-      multisigConfig,
-    }
-    generateMultisigTx(realParams)
-      .then((res: any) => {
-        if (res.status === 1) {
-          dispatch({
-            type: AppActions.UpdateGeneratedTx,
-            payload: res.result,
-          })
-          return res.result
-        }
-        if (res.status === 0 || res.status === 114) {
-          throw new Error(res.message.content)
-        }
-        throw new Error(t(`messages.codes.${res.status}`))
-      })
-      .catch((err: Error) => {
+  const realParams = {
+    items: sendInfoList.map(item => ({
+      address: item.address || '',
+      capacity: CKBToShannonFormatter(item.amount, item.unit),
+    })),
+    multisigConfig,
+  }
+  generateMultisigTx(realParams)
+    .then((res: any) => {
+      if (res.status === 1) {
         dispatch({
           type: AppActions.UpdateGeneratedTx,
-          payload: '',
+          payload: res.result,
         })
-        setErrorMessage(err.message)
+        return res.result
+      }
+      if (res.status === 0 || res.status === 114) {
+        throw new Error(res.message.content)
+      }
+      throw new Error(t(`messages.codes.${res.status}`))
+    })
+    .catch((err: Error) => {
+      dispatch({
+        type: AppActions.UpdateGeneratedTx,
+        payload: '',
       })
-  } catch {
-    // ignore
-  }
+      setErrorMessage(err.message)
+    })
   dispatch({
     type: AppActions.UpdateGeneratedTx,
     payload: '',

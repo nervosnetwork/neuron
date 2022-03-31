@@ -49,12 +49,18 @@ const MultisigAddress = () => {
   const { deleteAction, infoAction, sendAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
-      if (option.key === 'info') {
-        infoAction.action(multisigConfig)
-      } else if (option.key === 'delete') {
-        deleteAction.action(multisigConfig)
-      } else if (option.key === 'send') {
-        sendAction.action(multisigConfig)
+      switch (option.key) {
+        case 'info':
+          infoAction.action(multisigConfig)
+          break
+        case 'delete':
+          deleteAction.action(multisigConfig)
+          break
+        case 'send':
+          sendAction.action(multisigConfig)
+          break
+        default:
+          break
       }
     },
     [deleteAction, infoAction, sendAction]
@@ -149,7 +155,7 @@ const MultisigAddress = () => {
                   &nbsp;of&nbsp;
                   {v.n}
                 </td>
-                <td className={styles.balance}>
+                <td>
                   {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
                   CKB
                 </td>

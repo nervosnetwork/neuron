@@ -16,6 +16,16 @@
     border-radius: 2px;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
     right: 0;
+
+    & > button {
+      border-radius: 0;
+      background-color: #fff;
+
+      &:hover {
+        background-color: #ddd;
+        font-weight: 500;
+      }
+    }
   }
 
   &:hover {

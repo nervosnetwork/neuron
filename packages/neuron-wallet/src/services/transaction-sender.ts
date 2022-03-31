@@ -78,7 +78,6 @@ export default class TransactionSender {
 
   public async broadcastTx(walletID: string = '', tx: Transaction) {
     const { ckb } = NodeService.getInstance()
-    console.log(JSON.stringify(tx.toSDKRawTransaction()))
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
@@ -239,9 +238,9 @@ export default class TransactionSender {
     const addressInfos = await this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
-    const findPrivateKey = (argses: string[]) => {
+    const findPrivateKey = (argsList: string[]) => {
       let path: string | undefined
-      argses.some(args => {
+      argsList.some(args => {
         if (signedBlake160s.includes(args)) {
           return false
         }
@@ -459,7 +458,7 @@ export default class TransactionSender {
         '0',
         '1000',
         {
-          lockArgs: lockScript.args,
+          lockArgs: [lockScript.args],
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
         },
