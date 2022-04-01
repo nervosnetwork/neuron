@@ -875,7 +875,8 @@
           "back": "上一步",
           "next": "下一步",
           "confirm": "確認"
-        }
+        },
+        "duplicate-address-forbid": "地址不能重復"
       }
     }
   }

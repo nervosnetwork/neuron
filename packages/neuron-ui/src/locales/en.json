@@ -882,7 +882,8 @@
           "back": "Back",
           "next": "Next",
           "confirm": "Confirm"
-        }
+        },
+        "duplicate-address-forbid": "Address can't be duplicate"
       }
     }
   }
