@@ -23,7 +23,7 @@ import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
-const PasswordRequest = () => {
+const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) => {
   const {
     app: {
       send: { description, generatedTx },
@@ -123,7 +123,9 @@ const PasswordRequest = () => {
       }
       const handleSendMultiTxRes = ({ status }: { status: number }) => {
         if (isSuccessResponse({ status })) {
-          window.location.reload()
+          if (onSumbitSuccess) {
+            onSumbitSuccess()
+          }
         } else if (status === ErrorCode.PasswordIncorrect) {
           throw new PasswordIncorrectException()
         }
@@ -282,6 +284,7 @@ const PasswordRequest = () => {
       setError,
       t,
       multisigConfig,
+      onSumbitSuccess,
     ]
   )
 
@@ -331,8 +334,8 @@ const PasswordRequest = () => {
       payload: { sending: false },
     })
     onDismiss()
-    if (actionType === 'send-from-multisig') {
-      window.location.reload()
+    if (actionType === 'send-from-multisig' && onSumbitSuccess) {
+      onSumbitSuccess()
     }
   }, [
     description,
@@ -346,6 +349,7 @@ const PasswordRequest = () => {
     walletID,
     actionType,
     multisigConfig,
+    onSumbitSuccess,
   ])
 
   const dropdownList = [

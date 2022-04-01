@@ -93,6 +93,9 @@ const MultisigAddress = () => {
     }
     return ''
   }, [multisigBanlances, sendAction.sendFromMultisig])
+  const onSumbitSuccess = useCallback(() => {
+    sendAction.closeDialog()
+  }, [sendAction])
   return (
     <div>
       <div className={styles.head}>
@@ -160,10 +163,6 @@ const MultisigAddress = () => {
                   CKB
                 </td>
                 <td>
-                  {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
-                  CKB
-                </td>
-                <td>
                   <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>
                     <More className={styles.more} />
                   </CustomizableDropdown>
@@ -209,7 +208,7 @@ const MultisigAddress = () => {
           />
         )}
       </dialog>
-      <PasswordRequest />
+      <PasswordRequest onSumbitSuccess={onSumbitSuccess} />
     </div>
   )
 }
