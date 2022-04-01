@@ -1,5 +1,5 @@
 import { TFunction } from 'i18next'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import { ckbCore } from 'services/chain'
 import {
   broadcastTransaction,
@@ -129,4 +129,20 @@ export const useSignAndBroadcast = ({
     })
   }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, onlyNeedOne])
   return signAndExport
+}
+
+export const useTabView = () => {
+  const [tabIdx, setTabIdx] = useState('0')
+  const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
+    const {
+      dataset: { idx },
+    } = e.target as HTMLDivElement
+    if (idx) {
+      setTabIdx(idx)
+    }
+  }
+  return {
+    tabIdx,
+    onTabClick,
+  }
 }

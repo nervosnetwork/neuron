@@ -1,10 +1,15 @@
 import { ckbCore } from 'services/chain'
 import { MultiSigLockInfo, DefaultLockInfo, AnyoneCanPayLockInfoOnAggron, AnyoneCanPayLockInfoOnLina } from './enums'
 
-export const scriptToAddress = (lock: CKBComponents.Script, isMainnet: boolean) => {
+export const scriptToAddress = (lock: CKBComponents.Script, isMainnet: boolean, useMultisigLong?: boolean) => {
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
 
-  const foundLock = [MultiSigLockInfo, DefaultLockInfo, AnyoneCanPayLockInfoOnAggron, AnyoneCanPayLockInfoOnLina].find(
+  const foundLock = [
+    ...(useMultisigLong ? [] : [MultiSigLockInfo]),
+    DefaultLockInfo,
+    AnyoneCanPayLockInfoOnAggron,
+    AnyoneCanPayLockInfoOnLina,
+  ].find(
     info =>
       lock.codeHash === info.CodeHash &&
       lock.hashType === info.HashType &&

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import CopyZone from 'widgets/CopyZone'
 import styles from './multisigAddress.module.scss'
 
-const MultisigAddress = ({ fullPayload, className }: { fullPayload: string; className?: string }) => {
+const Address = ({ fullPayload, className }: { fullPayload: string; className?: string }) => {
   const [t] = useTranslation()
   return (
     <CopyZone
@@ -18,6 +18,6 @@ const MultisigAddress = ({ fullPayload, className }: { fullPayload: string; clas
   )
 }
 
-MultisigAddress.displayName = 'MultisigAddress'
+Address.displayName = 'MultisigAddress'
 
-export default React.memo(MultisigAddress)
+export default React.memo(Address)

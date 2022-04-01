@@ -898,7 +898,9 @@
         "status": "状态",
         "signerApprove": "还需要{{m}}个签名者的确认",
         "requiredSigner": "还需要{{r}}个必要签名者的确认",
-        "signed": "已签名"
+        "signed": "已签名",
+        "view-concise-data": "查看概要",
+        "view-raw-data": "查看原始数据"
       }
     }
   }

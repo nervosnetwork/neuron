@@ -2,19 +2,48 @@ import React, { useMemo } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { MultisigConfig, OfflineSignJSON } from 'services/remote'
 import Button from 'widgets/Button'
-import MultisigAddress from 'widgets/MultisigAddress'
+import Address from 'widgets/Address'
 import { useState as useGlobalState } from 'states'
+import { scriptToAddress, shannonToCKBFormatter, getScriptFormat } from 'utils'
 import styles from './approveMultisigTx.module.scss'
-import { useBroadcast, useSignAndBroadcast, useSignAndExport, useSignedStatus } from './hooks'
+import { useBroadcast, useSignAndBroadcast, useSignAndExport, useSignedStatus, useTabView } from './hooks'
 
+const Cell = React.memo(
+  ({
+    cell,
+    isMainnet,
+  }: {
+    cell: {
+      lock: CKBComponents.Script
+      type?: CKBComponents.Script
+      data?: string
+      capacity: string
+    }
+    isMainnet: boolean
+  }) => {
+    return (
+      <div className={styles.cellItem}>
+        <div>
+          <Address fullPayload={scriptToAddress(cell.lock, isMainnet, true)} />
+          <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
+          <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
+          <span className={`${styles.activity} ${styles.tag}`}>{getScriptFormat(cell.lock)}</span>
+        </div>
+        <span className={styles.capacity}>{`${shannonToCKBFormatter(cell.capacity)} CKB`}</span>
+      </div>
+    )
+  }
+)
 const ApproveMultisigTx = ({
   multisigConfig,
   closeDialog,
   offlineSignJson,
+  isMainnet,
 }: {
   multisigConfig: MultisigConfig
   closeDialog: () => void
   offlineSignJson: OfflineSignJSON
+  isMainnet: boolean
 }) => {
   const [t] = useTranslation()
   const { wallet } = useGlobalState()
@@ -38,19 +67,42 @@ const ApproveMultisigTx = ({
     offlineSignJson,
     onlyNeedOne: needSignCount === 1,
   })
+  const { tabIdx, onTabClick } = useTabView()
   return (
     <>
       <div className={styles.title}>
         <Trans
           i18nKey="multisig-address.approve-dialog.title"
           values={multisigConfig}
-          components={[<MultisigAddress fullPayload={multisigConfig.fullPayload} />]}
+          components={[<Address fullPayload={multisigConfig.fullPayload} />]}
         />
       </div>
       <h4>{t('multisig-address.approve-dialog.transaction')}</h4>
       <section>
         <div>{t('multisig-address.approve-dialog.content')}</div>
-        <textarea disabled value={jsonContent} className={styles.textarea} />
+        <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>
+          <button type="button" role="tab" data-idx="0">
+            {t('multisig-address.approve-dialog.view-raw-data')}
+          </button>
+          <button type="button" role="tab" data-idx="1">
+            {t('multisig-address.approve-dialog.view-concise-data')}
+          </button>
+          <div className={styles.underline} />
+        </div>
+        {tabIdx === '0' ? (
+          <textarea disabled value={jsonContent} className={styles.textarea} />
+        ) : (
+          <>
+            <h5>Inputs</h5>
+            {offlineSignJson.transaction?.inputs?.map(v => (
+              <Cell cell={v} isMainnet={isMainnet} key={v.lockHash} />
+            ))}
+            <h5>Outputs</h5>
+            {offlineSignJson.transaction?.outputs?.map(v => (
+              <Cell cell={v} isMainnet={isMainnet} key={v.lockHash} />
+            ))}
+          </>
+        )}
         <div>{t('multisig-address.approve-dialog.status')}</div>
         {!needSignCount && !requiredSignCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
         {!!needSignCount && <div>{`-${t('multisig-address.approve-dialog.signerApprove', { m: needSignCount })}`}</div>}

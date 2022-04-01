@@ -213,12 +213,13 @@ const MultisigAddress = () => {
           />
         )}
       </dialog>
-      <dialog ref={approveAction.dialogRef} className={styles.dialog}>
+      <dialog ref={approveAction.dialogRef} className={styles.approveDialog}>
         {approveAction.isDialogOpen && approveAction.multisigConfig && approveAction.offlineSignJson && (
           <ApproveMultisigTx
             closeDialog={approveAction.closeDialog}
             multisigConfig={approveAction.multisigConfig}
             offlineSignJson={approveAction.offlineSignJson}
+            isMainnet={isMainnet}
           />
         )}
       </dialog>
