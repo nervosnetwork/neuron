@@ -24,7 +24,7 @@ const SendCkbTitle = React.memo(({ fullPayload }: { fullPayload: string }) => {
 
 const SendFromMultisigDialog = ({
   multisigConfig,
-  balance,
+  balance = '0',
   closeDialog,
 }: {
   multisigConfig: MultisigConfig

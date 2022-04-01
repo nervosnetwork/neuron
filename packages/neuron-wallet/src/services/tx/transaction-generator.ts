@@ -141,7 +141,7 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0',
     lockClass: {
-      lockArgs?: string
+      lockArgs?: string[]
       codeHash: string
       hashType: ScriptHashType
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },

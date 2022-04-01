@@ -67,7 +67,7 @@ const generateMultisigTxWith = (generator: typeof generateMultisigTx | typeof ge
         setErrorMessage(err.message)
       })
   } catch {
-    // ignore
+    // ignore catch
   }
   dispatch({
     type: AppActions.UpdateGeneratedTx,
@@ -101,37 +101,48 @@ export const useSendInfo = ({
     },
     [setSendInfoList]
   )
-  const onSendInfoChange = useCallback(e => {
-    const {
-      dataset: { idx = '-1', field },
-      value,
-    } = e.currentTarget as { dataset: { idx: string; field: 'address' | 'amount' }; value: string }
-    setSendInfoList(v => {
-      const copy = [...v]
-      if (field === 'amount') {
-        const amount = value.replace(/,/g, '') || '0'
-        if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+  const onSendInfoChange = useCallback(
+    e => {
+      const {
+        dataset: { idx = '-1', field },
+        value,
+      } = e.currentTarget as { dataset: { idx: string; field: 'address' | 'amount' }; value: string }
+      setSendInfoList(v => {
+        const copy = [...v]
+        if (field === 'amount') {
+          const amount = value.replace(/,/g, '') || '0'
+          if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+            return copy
+          }
+          copy[+idx][field] = amount
           return copy
         }
-        copy[+idx][field] = amount
+        copy[+idx][field] = value
         return copy
-      }
-      copy[+idx][field] = value
-      return copy
-    })
-  }, [])
+      })
+    },
+    [setSendInfoList]
+  )
   const outputErrors = useOutputErrors(sendInfoList, isMainnet)
-  const totalAmount = useMemo(() => outputsToTotalAmount(sendInfoList.filter(v => !!v.amount)), [sendInfoList])
+  const totalAmount = useMemo(
+    () => outputsToTotalAmount(sendInfoList.filter((v, idx) => !!v.amount && !outputErrors[idx].amountError)),
+    [sendInfoList, outputErrors]
+  )
   const isAddOneBtnDisabled = useMemo(() => {
     return (
       outputErrors.some(v => v.addrError || v.amountError) ||
       sendInfoList.some(v => !v.address || !v.amount) ||
+      !balance ||
+      !totalAmount ||
       BigInt(totalAmount) >= BigInt(balance)
     )
   }, [outputErrors, sendInfoList, balance, totalAmount])
   const dispatch = useDispatch()
   const [errorMessage, setErrorMessage] = useState('')
   useEffect(() => {
+    if (outputErrors.some(v => v.addrError || v.amountError)) {
+      return
+    }
     clearTimeout(generateTxTimer)
     setErrorMessage('')
     const validSendInfoList = sendInfoList.filter(v => v.address && v.amount)
@@ -149,7 +160,7 @@ export const useSendInfo = ({
         isMainnet,
       })
     }, 300)
-  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet])
+  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet, outputErrors])
   const [isSendMax, setIsSendMax] = useState(false)
   const onSendMaxClick = useCallback(
     e => {
