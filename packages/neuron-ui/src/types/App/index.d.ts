@@ -82,6 +82,7 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-sudt'
       | 'send-acp'
+      | 'send-acp-to-default'
       | 'send-cheque'
       | 'withdraw-cheque'
       | 'claim-cheque'

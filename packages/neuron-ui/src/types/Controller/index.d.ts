@@ -274,6 +274,7 @@ declare namespace Controller {
       walletID: string
       tx: any
       password?: string
+      skipLastInputs?: boolean
     }
     type Response = Hash
   }

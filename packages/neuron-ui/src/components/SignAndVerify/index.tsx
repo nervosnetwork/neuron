@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { TFunction, useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import {
@@ -19,6 +19,7 @@ import DownArrow from 'widgets/Icons/DownArrow.png'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
 import VerificationWarningIcon from 'widgets/Icons/Warning.png'
+import { InfoCircleOutlined } from 'widgets/Icons/icon'
 
 import HardwareSign from 'components/HardwareSign'
 import styles from './signAndVerify.module.scss'
@@ -126,14 +127,15 @@ const AddressNotFound = ({ onDismiss }: { onDismiss: () => void }) => {
   )
 }
 
-type Notification = 'verify-success' | 'verify-failure' | 'address-not-found' | null
+type Notification = 'verify-success' | 'verify-old-sign-success' | 'verify-failure' | 'address-not-found' | null
 
 interface NotificationsProps {
   notification: Notification
   onDismiss: () => void
+  t: TFunction
 }
 
-const Notifications = ({ notification, onDismiss }: NotificationsProps) =>
+const Notifications = ({ notification, onDismiss, t }: NotificationsProps) =>
   notification !== null ? (
     <div className={styles.dialogContainer} role="presentation" onClick={onDismiss}>
       <div
@@ -146,6 +148,12 @@ const Notifications = ({ notification, onDismiss }: NotificationsProps) =>
       >
         {notification === 'verify-failure' ? <VerifyFailure /> : null}
         {notification === 'verify-success' ? <VerifySuccess /> : null}
+        {notification === 'verify-old-sign-success' ? (
+          <>
+            <VerifySuccess />
+            {t('sign-and-verify.verify-old-sign-success')}
+          </>
+        ) : null}
         {notification === 'address-not-found' ? <AddressNotFound onDismiss={onDismiss} /> : null}
       </div>
     </div>
@@ -234,9 +242,13 @@ const SignAndVerify = () => {
 
   const handleVerifyMessage = useCallback(() => {
     verifyMessage({ message, signature, address })
-      .then((res: ControllerResponse) => {
-        if (res.status === 1) {
-          setNotification('verify-success')
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          if (res.result === 'old-sign') {
+            setNotification('verify-old-sign-success')
+          } else {
+            setNotification('verify-success')
+          }
         } else {
           setNotification('verify-failure')
         }
@@ -281,6 +293,12 @@ const SignAndVerify = () => {
 
       <h2 className={styles.label}>{t('sign-and-verify.message')}</h2>
       <textarea data-field="message" value={message} onChange={handleInputChange} />
+      <div className={styles.tips}>
+        {t('sign-and-verify.sign-with-magic-byte')}
+        <span className={styles.infoIconContainer} data-tip={t('sign-and-verify.verify-tip')}>
+          <InfoCircleOutlined />
+        </span>
+      </div>
 
       <div className={styles.address}>
         <h2 className={styles.label}>{t('sign-and-verify.address')}</h2>
@@ -324,7 +342,7 @@ const SignAndVerify = () => {
         />
       </div>
 
-      <Notifications notification={notification} onDismiss={handleNotificationDismiss} />
+      <Notifications notification={notification} onDismiss={handleNotificationDismiss} t={t} />
       {isDialogOpen && wallet?.device ? (
         <HardwareSign
           signType="message"

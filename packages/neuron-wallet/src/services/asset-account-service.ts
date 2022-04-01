@@ -365,7 +365,7 @@ export default class AssetAccountService {
     }
 
     // 2. send tx
-    const txHash = await new TransactionSender().sendTx(walletID, tx, password, 0, skipSign)
+    const txHash = await new TransactionSender().sendTx(walletID, tx, password, false, skipSign)
 
     // 3. save asset account
     await connection.manager.save([entity.sudtTokenInfo, entity])

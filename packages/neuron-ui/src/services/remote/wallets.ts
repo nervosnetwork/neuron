@@ -31,4 +31,4 @@ export const generateDaoClaimTx = remoteApi<Controller.ClaimParams>('withdraw-fr
 
 // Sign and Verify
 export const signMessage = remoteApi<Controller.SignMessageParams>('sign-message')
-export const verifyMessage = remoteApi<Controller.VerifyMessageParams>('verify-signature')
+export const verifyMessage = remoteApi<Controller.VerifyMessageParams, 'old-sign' | 'new-sign'>('verify-signature')

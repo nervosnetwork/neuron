@@ -314,7 +314,7 @@ describe('TransactionSender Test', () => {
 
         it('success', async () => {
           // @ts-ignore: Private method
-          const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234')
+          const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
           expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
         })
@@ -374,7 +374,7 @@ describe('TransactionSender Test', () => {
 
         it('success', async () => {
           // @ts-ignore: Private method
-          const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234')
+          const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
           expect(ntx.witnesses[0]).toEqual(expectedWitness[0])
         })
@@ -409,7 +409,7 @@ describe('TransactionSender Test', () => {
           });
           it('success', async () => {
             // @ts-ignore: Private method
-            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234')
+            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
             expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
           })
@@ -459,7 +459,7 @@ describe('TransactionSender Test', () => {
           });
           it('success', async () => {
             // @ts-ignore: Private method
-            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234')
+            const ntx = await transactionSender.sign(fakeWallet.id, tx, '1234', false)
 
             expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
           })

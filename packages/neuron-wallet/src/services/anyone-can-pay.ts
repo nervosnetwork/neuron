@@ -11,6 +11,7 @@ import { AcpSendSameAccountError } from 'exceptions'
 import Script from 'models/chain/script'
 import LiveCellService from './live-cell-service'
 import WalletService from './wallets'
+import SystemScriptInfo from 'models/system-script-info'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -34,16 +35,12 @@ export default class AnyoneCanPayService {
     }
     const tokenID = assetAccount.tokenID
 
-    const targetAnyoneCanPayLockScript = AddressParser.parse(targetAddress)
-    if (assetAccount.blake160 === targetAnyoneCanPayLockScript.args) {
+    const targetLockScript = AddressParser.parse(targetAddress)
+    if (assetAccount.blake160 === targetLockScript.args) {
       throw new AcpSendSameAccountError()
     }
 
     const assetAccountInfo = new AssetAccountInfo()
-    // verify targetAnyoneCanPay codeHash & hashType
-    if (!assetAccountInfo.isAnyoneCanPayScript(targetAnyoneCanPayLockScript)) {
-      throw new Error(`Invalid anyone-can-pay lock script address`)
-    }
 
     const isCKB = !tokenID || tokenID === 'CKBytes'
 
@@ -53,49 +50,43 @@ export default class AnyoneCanPayService {
 
     // find target output
     const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
-      targetAnyoneCanPayLockScript,
+      targetLockScript,
       isCKB ? null : assetAccountInfo.generateSudtScript(tokenID)
     )
 
-    if (!targetOutputLiveCell) {
+    let targetOutput: Output
+
+    if (isCKB && targetOutputLiveCell?.type()) {
       throw new TargetOutputNotFoundError()
     }
 
-    if (isCKB && targetOutputLiveCell.type()) {
-      throw new TargetOutputNotFoundError()
+    if (SystemScriptInfo.isSecpScript(targetLockScript)) {
+      targetOutput = Output.fromObject({
+        capacity: '0',
+        lock: targetLockScript,
+        type: null
+      })
+    } else {
+      if (!targetOutputLiveCell) {
+        throw new TargetOutputNotFoundError()
+      }
+      targetOutput = Output.fromObject({
+        capacity: targetOutputLiveCell.capacity,
+        lock: targetOutputLiveCell.lock(),
+        type: targetOutputLiveCell.type(),
+        data: targetOutputLiveCell.data,
+        outPoint: targetOutputLiveCell.outPoint()
+      })
     }
-
-    const targetOutput: Output = Output.fromObject({
-      capacity: targetOutputLiveCell.capacity,
-      lock: targetOutputLiveCell.lock(),
-      type: targetOutputLiveCell.type(),
-      data: targetOutputLiveCell.data,
-      outPoint: targetOutputLiveCell.outPoint()
-    })
 
     const wallet = WalletService.getInstance().get(walletID)
     const changeBlake160: string = (await wallet.getNextChangeAddress())!.blake160
 
-    const tx = isCKB
-      ? await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-          walletID,
-          anyoneCanPayLocks,
-          targetOutput,
-          capacityOrAmount,
-          changeBlake160,
-          feeRate,
-          fee
-        )
-      : await TransactionGenerator.generateAnyoneCanPayToSudtTx(
-          walletID,
-          anyoneCanPayLocks,
-          targetOutput,
-          capacityOrAmount,
-          changeBlake160,
-          feeRate,
-          fee
-        )
+    const method = isCKB
+      ? TransactionGenerator.generateAnyoneCanPayToCKBTx
+      : TransactionGenerator.generateAnyoneCanPayToSudtTx
 
+    const tx = await method(walletID, anyoneCanPayLocks, targetOutput, capacityOrAmount, changeBlake160, feeRate, fee)
     tx.description = description || ''
 
     return tx

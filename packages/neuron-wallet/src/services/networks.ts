@@ -107,6 +107,7 @@ export default class NetworksService extends Store {
     )
 
     this.updateAll(list)
+    return network
   }
 
   @Validate

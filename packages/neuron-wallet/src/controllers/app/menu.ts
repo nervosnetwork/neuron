@@ -308,6 +308,22 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         }
       },
       {
+        label: t('application-menu.tools.create-multisig-address'),
+        enabled: hasCurrentWallet,
+        click: () => {
+          const currentWallet = walletsService.getCurrent()
+          showWindow(
+            `#/add-multisig-address/${currentWallet!.id}`,
+            t(`messageBox.create-multisig-address.title`),
+            {
+              width: 900,
+              resizable: true
+            },
+            ['data-updated']
+          )
+        }
+      },
+      {
         label: t('application-menu.tools.clear-sync-data'),
         enabled: hasCurrentWallet && isMainnet,
         click: async () => {

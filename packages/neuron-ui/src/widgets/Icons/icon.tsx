@@ -26,8 +26,12 @@ import { ReactComponent as PendingIconSvg } from './PendingIcon.svg'
 import styles from './icon.module.scss'
 
 function WrapSvg(SvgComponent: React.FC<React.SVGProps<SVGSVGElement>>) {
-  return ({ type, ...props }: { type?: 'success' | 'activity' | 'error' } & React.SVGProps<SVGSVGElement> = {}) => {
-    return <SvgComponent className={type ? styles[type] : ''} {...props} />
+  return ({
+    type,
+    className,
+    ...props
+  }: { type?: 'success' | 'activity' | 'error' } & React.SVGProps<SVGSVGElement> = {}) => {
+    return <SvgComponent className={`${type ? styles[type] : ''} ${className || ''}`} {...props} />
   }
 }
 

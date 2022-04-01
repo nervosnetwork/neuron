@@ -66,7 +66,7 @@ export const resetSyncTask = async (startTask = true) => {
 }
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
-  if (!reconnected && network?.id === newNetwork.id) {
+  if (!reconnected && network?.id === newNetwork.id && network?.genesisHash === newNetwork.genesisHash) {
     return
   }
 
