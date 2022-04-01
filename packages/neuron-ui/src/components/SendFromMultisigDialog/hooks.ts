@@ -110,6 +110,8 @@ export const useSendInfo = ({
     return (
       outputErrors.some(v => v.addrError || v.amountError) ||
       sendInfoList.some(v => !v.address || !v.amount) ||
+      !balance ||
+      !totalAmount ||
       BigInt(totalAmount) >= BigInt(balance)
     )
   }, [outputErrors, sendInfoList, balance, totalAmount])

@@ -821,6 +821,7 @@
       }
     },
     "multisig-address": {
+      "window-title": "创建多重签名地址",
       "search": {
         "placeholder": "使用地址或者别名搜索"
       },

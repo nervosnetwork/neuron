@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
@@ -40,6 +40,10 @@ const MultisigAddress = () => {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
+  useEffect(() => {
+    window.document.title = i18n.t('multisig-address.window-title')
+    // eslint-disable-next-line
+  }, [i18n.language])
   const isMainnet = isMainnetUtil(networks, networkID)
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
   const { allConfigs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
@@ -73,6 +77,11 @@ const MultisigAddress = () => {
     () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
     [t]
   )
+  const listNoBalanceActionOptions = useMemo(
+    () =>
+      tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`), disabled: key === 'send' })),
+    [t]
+  )
   const {
     selectIds,
     isAllSelected,
@@ -97,6 +106,13 @@ const MultisigAddress = () => {
     }
     return ''
   }, [multisigBanlances, sendAction.sendFromMultisig])
+  const onSumbitSuccess = useCallback(() => {
+    if (sendAction.isDialogOpen) {
+      sendAction.closeDialog()
+    } else if (approveAction.isDialogOpen) {
+      approveAction.closeDialog()
+    }
+  }, [sendAction, approveAction])
   return (
     <div>
       <div className={styles.head}>
@@ -164,11 +180,14 @@ const MultisigAddress = () => {
                   CKB
                 </td>
                 <td>
-                  {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
-                  CKB
-                </td>
-                <td>
-                  <CustomizableDropdown options={listActionOptions} onClickItem={onClickItem(v)}>
+                  <CustomizableDropdown
+                    options={
+                      !multisigBanlances[v.fullPayload] || multisigBanlances[v.fullPayload] === '0'
+                        ? listNoBalanceActionOptions
+                        : listActionOptions
+                    }
+                    onClickItem={onClickItem(v)}
+                  >
                     <More className={styles.more} />
                   </CustomizableDropdown>
                 </td>
@@ -223,7 +242,7 @@ const MultisigAddress = () => {
           />
         )}
       </dialog>
-      <PasswordRequest />
+      <PasswordRequest onSumbitSuccess={onSumbitSuccess} />
     </div>
   )
 }

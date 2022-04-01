@@ -14,7 +14,7 @@ import styles from './sendFromMultisigDialog.module.scss'
 
 const SendFromMultisigDialog = ({
   multisigConfig,
-  balance,
+  balance = '0',
   closeDialog,
 }: {
   multisigConfig: MultisigConfig

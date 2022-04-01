@@ -828,6 +828,7 @@
       }
     },
     "multisig-address": {
+      "window-title": "Create multisig address",
       "search": {
         "placeholder": "search by multisig address,alias"
       },
