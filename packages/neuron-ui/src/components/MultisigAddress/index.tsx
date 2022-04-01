@@ -168,7 +168,6 @@ const MultisigAddress = () => {
                   {v.n}
                 </td>
                 <td>
-                  {multisigBanlances[v.fullPayload]}
                   {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
                   CKB
                 </td>
