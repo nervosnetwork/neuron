@@ -69,7 +69,7 @@ const MultisigAddressCreateDialog = ({
     changeAddress,
     isError: addressErr,
     addressErrors,
-    duplicateAddress,
+    isAddressesDuplicated,
   } = useMultiAddress({
     n: Number(n),
     isMainnet,
@@ -109,7 +109,7 @@ const MultisigAddressCreateDialog = ({
             changeAddress={changeAddress}
             addressErrors={addressErrors}
           />
-          {duplicateAddress && (
+          {isAddressesDuplicated && (
             <div className={styles.errorMessage}>{t('multisig-address.create-dialog.duplicate-address-forbid')}</div>
           )}
         </>

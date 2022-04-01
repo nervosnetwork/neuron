@@ -883,7 +883,7 @@
           "next": "Next",
           "confirm": "Confirm"
         },
-        "duplicate-address-forbid": "Address can't be duplicate"
+        "duplicate-address-forbid": "Address can't be duplicated"
       }
     }
   }
