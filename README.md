@@ -3,7 +3,7 @@
 Nervos CKB Full-Node Desktop Wallet
 
 [![Unit Tests](https://github.com/nervosnetwork/neuron/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/nervosnetwork/neuron/actions/workflows/unit_tests.yml)
-[![Telegram Group](https://cdn.rawgit.com/Patrolavia/telegram-badge/8fe3382b/chat.svg)](https://t.me/nervos_ckb_dev)
+[![Discord](https://img.shields.io/discord/956765352514183188?label=Discord&logo=discord&style=default&color=grey&labelColor=5865F2&logoColor=white)](https://discord.gg/N9nZ3JE2Gg)
 
 ---
 
