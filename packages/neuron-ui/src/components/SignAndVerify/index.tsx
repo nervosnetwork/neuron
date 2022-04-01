@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { TFunction, useTranslation } from 'react-i18next'
-import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID } from 'services/remote'
+import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import {
   ErrorCode,
@@ -163,15 +163,11 @@ const SignAndVerify = () => {
   const [t, i18n] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [wallet, setWallet] = useState<Pick<State.Wallet, 'id' | 'addresses' | 'device'> | undefined>(undefined)
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
-  const {
-    settings: { wallets = [] },
-  } = useGlobalState()
+  const { wallet } = useGlobalState()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  const currentWallet = useMemo(() => wallets.find(w => w.id === wallet?.id), [wallet, wallets])
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
   useEffect(() => {
@@ -184,16 +180,7 @@ const SignAndVerify = () => {
     if (!id) {
       showErrorMessage(t('messages.error'), t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' }))
       window.close()
-      return
     }
-
-    getAddressesByWalletID(id).then(res => {
-      if (isSuccessResponse(res)) {
-        setWallet({ id, addresses: res.result })
-      } else {
-        showErrorMessage(t('messages.error'), typeof res.message === 'string' ? res.message : res.message.content!)
-      }
-    })
   }, [t])
 
   const handlePasswordDialogOpen = useCallback(() => {
@@ -339,12 +326,14 @@ const SignAndVerify = () => {
 
       <div className={styles.actions}>
         <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={handleClose} />
-        <Button
-          type="primary"
-          label={t('sign-and-verify.sign')}
-          disabled={!message || !address}
-          onClick={handlePasswordDialogOpen}
-        />
+        {wallet?.isWatchOnly || (
+          <Button
+            type="primary"
+            label={t('sign-and-verify.sign')}
+            disabled={!message || !address}
+            onClick={handlePasswordDialogOpen}
+          />
+        )}
         <Button
           type="primary"
           label={t('sign-and-verify.verify')}
@@ -354,11 +343,11 @@ const SignAndVerify = () => {
       </div>
 
       <Notifications notification={notification} onDismiss={handleNotificationDismiss} t={t} />
-      {isDialogOpen && currentWallet?.device ? (
+      {isDialogOpen && wallet?.device ? (
         <HardwareSign
           signType="message"
           signMessage={handleSignMessage}
-          wallet={currentWallet}
+          wallet={wallet}
           onDismiss={handlePasswordDialogDismiss}
         />
       ) : (

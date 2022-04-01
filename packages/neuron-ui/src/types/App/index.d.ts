@@ -135,6 +135,7 @@ declare namespace State {
     name: string
     device?: DeviceInfo
     isHD?: boolean
+    isWatchOnly?: boolean
   }
 
   enum Manufacturer {
