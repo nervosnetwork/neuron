@@ -4,7 +4,8 @@ import {
   CapacityNotEnough,
   CapacityNotEnoughForChange,
   LiveCapacityNotEnough,
-  MultisigConfigNeedError
+  MultisigConfigNeedError,
+  TransactionInputParamterMiss
 } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import OutputEntity from 'database/chain/entities/output'
@@ -435,7 +436,7 @@ export default class CellsService {
       witness: WitnessArgs
     },
     lockClass: {
-      lockArgs?: string | string[]
+      lockArgs?: string[]
       codeHash: string
       hashType: ScriptHashType
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
@@ -447,7 +448,7 @@ export default class CellsService {
     hasChangeOutput: boolean
   }> => {
     if (!walletId && !lockClass.lockArgs) {
-      throw new Error('no input from')
+      throw new TransactionInputParamterMiss()
     }
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)
@@ -477,8 +478,6 @@ export default class CellsService {
             FROM hd_public_key_info
             WHERE walletId = :walletId
           )`
-            : typeof lockClass.lockArgs === 'string'
-            ? 'output.lockArgs = :lockArgs'
             : 'output.lockArgs in (:lockArgs)'
         } AND
         output.lockCodeHash = :lockCodeHash AND

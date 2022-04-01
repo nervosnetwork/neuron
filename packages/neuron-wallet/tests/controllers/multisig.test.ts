@@ -132,14 +132,14 @@ describe('test for multisig controller', () => {
   describe('test delete config', () => {
     it('cancel delete config', async () => {
       response = 1
-      const result = await multisigController.deleteConfig({ id: 10 })
+      const result = await multisigController.deleteConfig(10)
       expect(MultiSigServiceMock.prototype.deleteConfig).not.toHaveBeenCalled()
-      expect(result.status).toBe(ResponseCode.Fail)
+      expect(result.result).toBeFalsy()
     })
     it('confirm delete config', async () => {
-      const result = await multisigController.deleteConfig({ id: 10 })
+      const result = await multisigController.deleteConfig(10)
       expect(MultiSigServiceMock.prototype.deleteConfig).toHaveBeenCalled()
-      expect(result.status).toBe(ResponseCode.Success)
+      expect(result.result).toBeTruthy()
     })
   })
 

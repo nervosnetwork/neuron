@@ -126,7 +126,8 @@ export default {
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be confirmed',
-      'multisig-not-signed': 'Partial signatures are missing for multisig transactions'
+      'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
+      'transaction-no-input-paramter': 'The query input cell is missing a required parameter'
     },
     messageBox: {
       button: {

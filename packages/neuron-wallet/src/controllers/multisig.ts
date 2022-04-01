@@ -96,7 +96,7 @@ export default class MultisigController {
     }
   }
 
-  async deleteConfig(params: { id: number }) {
+  async deleteConfig(id: number) {
     const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
       message: t('multisig-config.confirm-delete'),
       type: 'question',
@@ -106,13 +106,15 @@ export default class MultisigController {
       ]
     })
     if (response === 0) {
-      await this.#multisigService.deleteConfig(params.id)
+      await this.#multisigService.deleteConfig(id)
       return {
         status: ResponseCode.Success,
+        result: true
       }
     }
     return {
-      status: ResponseCode.Fail,
+      status: ResponseCode.Success,
+      result: false
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { useDialog, isSuccessResponse } from 'utils'
 import { DataUpdate as DataUpdateSubject } from 'services/subjects'
 import {
@@ -14,7 +14,7 @@ import {
   OfflineSignJSON,
 } from 'services/remote'
 
-export const useSearch = () => {
+export const useSearch = (clearSelected: () => void) => {
   const [keywords, setKeywords] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
 
@@ -24,11 +24,18 @@ export const useSearch = () => {
     }
   }
 
-  const onSearch = useCallback(() => {
-    setSearchKeywords(keywords)
-  }, [keywords, setSearchKeywords])
+  const onSearch = useCallback(
+    value => {
+      setSearchKeywords(value)
+      clearSelected()
+    },
+    [setSearchKeywords, clearSelected]
+  )
 
-  return { keywords, onKeywordsChange, setKeywords, onSearch, searchKeywords }
+  const onClear = useCallback(() => {
+    onSearch('')
+  }, [onSearch])
+  return { keywords, onKeywordsChange, setKeywords, onSearch, searchKeywords, onClear }
 }
 
 export const useDialogWrapper = ({
@@ -57,15 +64,7 @@ export const useDialogWrapper = ({
   }
 }
 
-export const useConfigManage = ({
-  walletId,
-  searchKeywords,
-  isMainnet,
-}: {
-  walletId: string
-  searchKeywords: string
-  isMainnet: boolean
-}) => {
+export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {
   const [configs, setConfigs] = useState<MultisigConfig[]>([])
   const saveConfig = useCallback(
     ({ m, n, r, addresses, fullPayload }) => {
@@ -133,15 +132,6 @@ export const useConfigManage = ({
   return {
     saveConfig,
     allConfigs: configs,
-    configs: useMemo(
-      () =>
-        searchKeywords
-          ? configs.filter(v => {
-              return v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords
-            })
-          : configs,
-      [configs, searchKeywords]
-    ),
     updateConfig,
     deleteConfigById,
     filterConfig,
@@ -177,12 +167,14 @@ export const useExportConfig = (configs: MultisigConfig[]) => {
   const exportConfig = useCallback(() => {
     exportMultisigConfig(selectIds.length ? configs.filter(v => selectIds.includes(v.id)) : configs)
   }, [configs, selectIds])
+  const clearSelected = useCallback(() => setSelectIds([]), [setSelectIds])
   return {
     onChangeCheckedAll,
     onChangeChecked,
     selectIds,
     isAllSelected: !!configs.length && selectIds.length === configs.length,
     exportConfig,
+    clearSelected,
   }
 }
 
@@ -228,9 +220,11 @@ const useDeleteAction = (deleteConfigById: (id: number) => void) => {
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | undefined>()
   const deleteConfig = useCallback(
     (option: MultisigConfig) => {
-      deleteMultisigConfig({ id: option.id }).then(res => {
+      deleteMultisigConfig(option.id).then(res => {
         if (isSuccessResponse(res)) {
-          deleteConfigById(option.id)
+          if (res.result) {
+            deleteConfigById(option.id)
+          }
         } else {
           openDialog()
           setDeleteErrorMessage(typeof res.message === 'string' ? res.message : res.message.content)
