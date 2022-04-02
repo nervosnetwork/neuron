@@ -129,13 +129,15 @@ export const useSendInfo = ({
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
-      generateMultisigTxWith({
-        sendInfoList: validSendInfoList,
-        setErrorMessage,
-        multisigConfig,
-        dispatch,
-        t,
-      })
+      if (validSendInfoList.length) {
+        generateMultisigTxWith({
+          sendInfoList: validSendInfoList,
+          setErrorMessage,
+          multisigConfig,
+          dispatch,
+          t,
+        })
+      }
     }, 300)
   }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, outputErrors])
   return {

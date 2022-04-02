@@ -129,7 +129,7 @@ const MultisigAddress = () => {
         <table className={styles.multisigConfig}>
           <thead>
             <tr>
-              <th className={styles.checkBoxTh}>
+              <th>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
               {['address', 'alias', 'type', 'balance'].map(field => (
@@ -169,7 +169,7 @@ const MultisigAddress = () => {
                 </td>
                 <td>
                   {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
-                  CKB
+                  &nbsp;CKB
                 </td>
                 <td>
                   <CustomizableDropdown
