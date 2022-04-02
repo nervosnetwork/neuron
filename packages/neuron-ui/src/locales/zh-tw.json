@@ -406,6 +406,9 @@
       "destroy-ckb-account": {
         "title": "銷毀 CKB 資產賬戶"
       },
+      "send-from-multisig": {
+        "title": "發起交易"
+      },
       "xpub-notice": "對於觀察錢包，只支持導出交易"
     },
     "qrcode": {

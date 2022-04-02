@@ -413,6 +413,9 @@
       "destroy-ckb-account": {
         "title": "Destroy CKB Asset Account"
       },
+      "send-from-multisig": {
+        "title": "Submit the transaction"
+      },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
     "qrcode": {
