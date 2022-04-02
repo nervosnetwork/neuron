@@ -141,6 +141,7 @@ export enum DefaultLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x00',
   ArgsLen = '20',
+  TagName = 'secp256k1/blake160',
 }
 
 export enum MultiSigLockInfo {
@@ -148,6 +149,7 @@ export enum MultiSigLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x01',
   ArgsLen = '20',
+  TagName = 'secp256k1/multisig',
 }
 
 export enum AnyoneCanPayLockInfoOnAggron {
@@ -155,6 +157,7 @@ export enum AnyoneCanPayLockInfoOnAggron {
   HashType = 'type',
   CodeHashIndex = '0x02',
   ArgsLen = '20,21,22',
+  TagName = 'secp256k1/anyone_can_pay',
 }
 
 export enum AnyoneCanPayLockInfoOnLina {
@@ -162,6 +165,23 @@ export enum AnyoneCanPayLockInfoOnLina {
   HashType = 'type',
   CodeHashIndex = '0x02',
   ArgsLen = '20,21,22',
+  TagName = 'secp256k1/anyone_can_pay',
+}
+
+export enum ChequeLockInfoOnAggron {
+  CodeHash = '0x60d5f39efce409c587cb9ea359cefdead650ca128f0bd9cb3855348f98c70d5b',
+  HashType = 'type',
+  CodeHashIndex = '0x00',
+  ArgsLen = '40',
+  TagName = 'cheque',
+}
+
+export enum ChequeLockInfoOnLina {
+  CodeHash = '0xe4d4ecc6e5f9a059bf2f7a82cca292083aebc0c421566a52484fe2ec51a9fb0c',
+  HashType = 'type',
+  CodeHashIndex = '0x00',
+  ArgsLen = '40',
+  TagName = 'cheque',
 }
 
 export enum DeprecatedScript {

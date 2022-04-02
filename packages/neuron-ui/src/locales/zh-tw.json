@@ -270,7 +270,9 @@
       "amount": "數量",
       "inputs": "輸入",
       "outputs": "輸出",
-      "cell-from-cellbase": "來自 Cellbase"
+      "cell-from-cellbase": "來自 Cellbase",
+      "lock-script": "鎖腳本",
+      "full-version-address": "完整版地址"
     },
     "addresses": {
       "title": "地址簿",
