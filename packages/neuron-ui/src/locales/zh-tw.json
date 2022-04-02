@@ -405,7 +405,8 @@
       },
       "destroy-ckb-account": {
         "title": "銷毀 CKB 資產賬戶"
-      }
+      },
+      "xpub-notice": "對於觀察錢包，只支持導出交易"
     },
     "qrcode": {
       "copy": "複製圖片",
@@ -730,7 +731,10 @@
       "confirm": "確認",
       "verification-success": "驗證成功",
       "verification-failure": "驗證失敗",
-      "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。"
+      "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。",
+      "sign-with-magic-byte": "信息會和 magic bytes 'Nervos Message:' 一起簽名",
+      "verify-tip": "可以通過 v0.33.1 及以後的 Neuron 進行驗證",
+      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本簽名"
     },
     "special-assets": {
       "title": "自定義資產",
