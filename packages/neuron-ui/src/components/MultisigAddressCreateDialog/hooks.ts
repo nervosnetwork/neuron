@@ -71,9 +71,13 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
     },
     [setAddresses, isMainnet, setAddressErrors]
   )
+  const isAddressesDuplicated = useMemo(() => {
+    const notEmptyAddresses = addresses.filter(v => !!v)
+    return new Set(notEmptyAddresses).size !== notEmptyAddresses.length
+  }, [addresses])
   const isError = useMemo(() => {
-    return addresses.some((v, idx) => !v || addressErrors[idx])
-  }, [addresses, addressErrors])
+    return isAddressesDuplicated || addresses.some((v, idx) => !v || addressErrors[idx])
+  }, [addresses, addressErrors, isAddressesDuplicated])
   useEffect(() => {
     setAddresses(new Array(n).fill(''))
     setAddressErrors(new Array(n).fill(undefined))
@@ -86,6 +90,7 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
     changeAddress,
     isError,
     addressErrors,
+    isAddressesDuplicated,
   }
 }
 
