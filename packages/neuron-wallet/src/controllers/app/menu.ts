@@ -121,6 +121,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
   const isHardwareWallet = currentWallet?.isHardware() ?? false
+  const isXpubWallet = !isHardwareWallet && currentWallet?.loadKeystore().isEmpty()
 
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
@@ -227,7 +228,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'backup',
         label: t('application-menu.wallet.backup'),
-        enabled: hasCurrentWallet && !isHardwareWallet,
+        enabled: !isXpubWallet && hasCurrentWallet && !isHardwareWallet,
         click: () => {
           if (!currentWallet) {
             return
@@ -342,7 +343,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       },
       {
         label: t('application-menu.tools.offline-sign'),
-        enabled: hasCurrentWallet,
+        enabled: hasCurrentWallet && !isXpubWallet,
         click: async () => {
           const result = await OfflineSignService.loadTransactionJSON()
           if (!result) {

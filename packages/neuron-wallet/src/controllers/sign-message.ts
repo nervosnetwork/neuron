@@ -20,8 +20,8 @@ export default class SignMessageController {
     }
   }
 
-  public async verify(params: Controller.Params.VerifyParams): Promise<Controller.Response<boolean>> {
-    const result: boolean = SignMessage.verify(params.address.trim(), params.signature, params.message)
+  public async verify(params: Controller.Params.VerifyParams): Promise<Controller.Response<'old-sign' | 'new-sign'>> {
+    const result = SignMessage.verifyOldAndNew(params.address.trim(), params.signature, params.message)
     if (!result) {
       throw new ServiceHasNoResponse('Verify')
     }
