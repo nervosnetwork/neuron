@@ -44,7 +44,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
         </div>
       </>
     )
-  }, [lockInfo, isMainnet])
+  }, [lockInfo, isMainnet, t])
 
   return (
     <dialog ref={dialogRef} className={styles.dialog} role="presentation" onClick={e => onDialogClicked(e)}>

@@ -195,7 +195,7 @@ const Transaction = () => {
           </tr>
         )
       }),
-    [t, isMainnet]
+    [t, isMainnet, renderTag]
   )
 
   if (error.code) {
