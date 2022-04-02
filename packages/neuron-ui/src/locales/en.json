@@ -418,7 +418,8 @@
       },
       "send-from-multisig-need-one": {
         "title": "Submit the transaction"
-      }
+      },
+      "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
     "qrcode": {
       "copy": "Copy image",
@@ -743,7 +744,10 @@
       "confirm": "Confirm",
       "verification-success": "Verification Succeeded",
       "verification-failure": "Verification Failed",
-      "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete."
+      "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
+      "sign-with-magic-byte": "Message will be signed with magic bytes 'Nervos Message:'",
+      "verify-tip": "Could be verified by Neuron from v0.33.1",
+      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1"
     },
     "special-assets": {
       "title": "Customized Assets",

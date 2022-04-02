@@ -159,7 +159,7 @@ export default class ApiController {
       const walletsService = WalletsService.getInstance()
       const networksService = NetworksService.getInstance()
 
-      const currentWallet = walletsService.getCurrent()
+      const currentWallet = this.#walletsController.getCurrent().result
       const wallets = walletsService.getAll()
 
       const [

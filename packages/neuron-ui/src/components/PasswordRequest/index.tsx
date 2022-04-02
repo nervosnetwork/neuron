@@ -5,6 +5,7 @@ import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
 import HardwareSign from 'components/HardwareSign'
+import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import { useDialog, ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
@@ -32,6 +33,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
     },
     settings: { wallets = [] },
     experimental,
+    wallet: currentWallet,
   } = useGlobalState()
 
   const dispatch = useDispatch()
@@ -391,18 +393,26 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
-        <TextField
-          label={t('password-request.password')}
-          value={password}
-          field="password"
-          type="password"
-          title={t('password-request.password')}
-          onChange={onChange}
-          autoFocus
-          required
-          className={styles.passwordInput}
-          error={error}
-        />
+        {currentWallet.isWatchOnly && (
+          <div className={styles.xpubNotice}>
+            <Attention />
+            {t('password-request.xpub-notice')}
+          </div>
+        )}
+        {currentWallet.isWatchOnly || (
+          <TextField
+            label={t('password-request.password')}
+            value={password}
+            field="password"
+            type="password"
+            title={t('password-request.password')}
+            onChange={onChange}
+            autoFocus
+            required
+            className={styles.passwordInput}
+            error={error}
+          />
+        )}
         <div className={styles.footer}>
           {signType !== OfflineSignType.Invalid ? (
             <div className={styles.left}>
@@ -410,13 +420,13 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
                 mainBtnLabel={t('offline-sign.export')}
                 mainBtnOnClick={exportTransaction}
                 mainBtnDisabled={isLoading}
-                list={dropdownList}
+                list={currentWallet.isWatchOnly ? [] : dropdownList}
               />
             </div>
           ) : null}
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-            {signType === OfflineSignType.SendFromMultisigOnlySig || (
+            {signType === OfflineSignType.SendFromMultisigOnlySig || currentWallet.isWatchOnly || (
               <Button label={t('common.confirm')} type="submit" disabled={disabled}>
                 {isLoading ? <Spinner /> : (t('common.confirm') as string)}
               </Button>
