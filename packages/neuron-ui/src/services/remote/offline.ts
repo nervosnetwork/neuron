@@ -12,6 +12,7 @@ export enum OfflineSignType {
   UnlockDAO = 'UnlockDAO',
   CreateSUDTAccount = 'CreateSUDTAccount',
   SendSUDT = 'SendSUDT',
+  SendFromMultisigOnlySig = 'SendFromMultisigOnlySig',
   Invalid = 'Invalid',
 }
 
@@ -37,7 +38,20 @@ export interface OfflineSignJSON {
   signatures?: Signatures
 }
 
-export type SignProps = OfflineSignJSON & { walletID: string; password: string }
+export type SignProps = OfflineSignJSON & {
+  walletID: string
+  password: string
+  multisigConfig?: {
+    id: number
+    walletId: string
+    r: number
+    m: number
+    n: number
+    addresses: string[]
+    alias?: string
+    fullPayload: string
+  }
+}
 
 export type BroadcastProps = OfflineSignJSON & { walletID: string }
 

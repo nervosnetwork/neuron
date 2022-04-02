@@ -7,7 +7,7 @@ import { CapacityNotEnough, LiveCapacityNotEnough } from 'exceptions/wallet'
 import Output from 'models/chain/output'
 import Input from 'models/chain/input'
 import OutPoint from 'models/chain/out-point'
-import Script from 'models/chain/script'
+import Script, { ScriptHashType } from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
 import AddressParser from 'models/address-parser'
@@ -15,6 +15,7 @@ import MultiSign from 'models/multi-sign'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
+import CellDep from 'models/chain/cell-dep'
 import SystemScriptInfo from 'models/system-script-info'
 import ArrayUtils from 'utils/array'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -22,6 +23,8 @@ import BufferUtils from 'utils/buffer'
 import assert from 'assert'
 import AssetAccount from 'models/asset-account'
 import AddressService from 'services/addresses'
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import MultisigConfigModel from 'models/multisig-config'
 
 export interface TargetOutput {
   address: string
@@ -136,9 +139,20 @@ export class TransactionGenerator {
     targetOutputs: TargetOutput[],
     changeAddress: string,
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    lockClass: {
+      lockArgs?: string[]
+      codeHash: string
+      hashType: ScriptHashType
+    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
+    multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    let cellDep: CellDep
+    if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    } else {
+      cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    }
     const tipHeader = await TransactionGenerator.getTipHeader()
     const tipHeaderEpoch = tipHeader.epoch
     const tipHeaderTimestamp = tipHeader.timestamp
@@ -173,7 +187,7 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep],
+      cellDeps: [cellDep],
       headerDeps: [],
       inputs: [],
       outputs,
@@ -189,7 +203,10 @@ export class TransactionGenerator {
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      undefined,
+      lockClass,
+      multisigConfig ? [multisigConfig] : []
     )
     const finalFeeInt = BigInt(finalFee)
     tx.inputs = inputs
@@ -197,11 +214,9 @@ export class TransactionGenerator {
 
     // change
     if (hasChangeOutput) {
-      const changeBlake160: string = AddressParser.toBlake160(changeAddress)
-
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
-      const output = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
+      const output = new Output(changeCapacity.toString(), Script.fromSDK(addressToScript(changeAddress)))
 
       tx.addOutput(output)
     }

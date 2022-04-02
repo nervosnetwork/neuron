@@ -46,6 +46,7 @@ const CustomDropdown = (props: IDropdownProps) => (
 interface DropdownItem {
   key: string
   label: string
+  disabled?: boolean
 }
 export const CustomizableDropdown = ({
   onClickItem: onClickItemCallback,
@@ -70,7 +71,13 @@ export const CustomizableDropdown = ({
       {children}
       <div className={styles.dropdownItems}>
         {options.map(option => (
-          <Button key={option.key} onClick={onClickItem(option)} label={option.label} type="cancel" />
+          <Button
+            disabled={option.disabled}
+            key={option.key}
+            onClick={onClickItem(option)}
+            label={option.label}
+            type="cancel"
+          />
         ))}
       </div>
     </div>

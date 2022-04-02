@@ -114,7 +114,9 @@ export default {
       'multisig-script-prefix-error': '多簽配置錯誤',
       'multisig-config-not-exist': '多簽配置不存在',
       'multisig-config-exist': '多簽地址已經存在',
-      'multisig-config-address-error': '多簽配置的地址設置不正確'
+      'multisig-config-address-error': '多簽配置的地址設置不正確',
+      'multisig-config-need-error': '多簽交易生成需要多簽配置',
+      'transaction-no-input-paramter': '查詢 Input Cell 缺少必要的參數'
     },
     messageBox: {
       button: {

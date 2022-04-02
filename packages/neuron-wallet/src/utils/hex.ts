@@ -3,11 +3,11 @@ export default class HexUtils {
     return BigInt(hex).toString()
   }
 
-  public static toHex(num: string): string {
-    if (num.startsWith('0x')) {
+  public static toHex(num: string | number, padStartCount: number = 0): string {
+    if (typeof num === 'string' && num.startsWith('0x')) {
       return num
     }
-    return `0x${BigInt(num).toString(16)}`
+    return `0x${(typeof num === 'string' ? BigInt(num) : num).toString(16).padStart(padStartCount, '0')}`
   }
 
   public static removePrefix(hex: string): string {

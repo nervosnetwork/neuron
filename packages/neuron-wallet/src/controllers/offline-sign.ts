@@ -11,6 +11,7 @@ import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
 import NodeService from 'services/node'
 import { OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
+import MultisigConfigModel from 'models/multisig-config'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -66,17 +67,36 @@ export default class OfflineSignController {
     }
   }
 
-  public async signTransaction(params: OfflineSignJSON & { walletID: string; password: string }) {
+  public async signTransaction(
+    params: OfflineSignJSON & {
+      walletID: string
+      password: string
+      multisigConfig?: MultisigConfigModel
+      signedBlake160s?: string[]
+    }
+  ) {
     const { transaction, type, walletID, password, context } = params
 
     try {
-      const tx = await new TransactionSender().sign(
-        walletID,
-        Transaction.fromObject(transaction),
-        password,
-        type === SignType.SendSUDT,
-        context
-      )
+      let tx: Transaction
+      if (params.multisigConfig) {
+        tx = await new TransactionSender().signMultisig(
+          walletID,
+          Transaction.fromObject(transaction),
+          password,
+          [params.multisigConfig],
+          params.signedBlake160s || [],
+          context
+        )
+      } else {
+        tx = await new TransactionSender().sign(
+          walletID,
+          Transaction.fromObject(transaction),
+          password,
+          type === SignType.SendSUDT,
+          context
+        )
+      }
 
       const signer = OfflineSign.fromJSON({
         ...params,
@@ -97,7 +117,9 @@ export default class OfflineSignController {
     }
   }
 
-  public async signAndExportTransaction(params: OfflineSignJSON & { walletID: string; password: string }) {
+  public async signAndExportTransaction(
+    params: OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigConfigModel }
+  ) {
     const res = await this.signTransaction(params)
 
     const signer = OfflineSign.fromJSON({

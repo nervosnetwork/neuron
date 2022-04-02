@@ -408,6 +408,9 @@
       "destroy-ckb-account": {
         "title": "销毁 CKB 资产账户"
       },
+      "send-from-multisig": {
+        "title": "发起交易"
+      },
       "xpub-notice": "对于观察钱包，只支持导出交易"
     },
     "qrcode": {
@@ -821,6 +824,7 @@
       }
     },
     "multisig-address": {
+      "window-title": "创建多重签名地址",
       "search": {
         "placeholder": "使用地址或者别名搜索"
       },
@@ -856,6 +860,14 @@
         "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
       },
       "delete-failed": "删除多签配置失败，失败原因：{{reason}}",
+      "send-ckb": {
+        "title": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",
+        "balance": "余额",
+        "address": "地址",
+        "amount": "金额",
+        "send": "发送",
+        "cancel": "取消"
+      },
       "create-dialog": {
         "title": "创建多重签名地址",
         "index": "序号",

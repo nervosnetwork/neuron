@@ -12,9 +12,16 @@ import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePicker from 'widgets/DatetimePicker'
 
-import { getCurrentUrl, getSyncStatus, validateTotalAmount, isMainnet as isMainnetUtil, validateOutputs } from 'utils'
+import {
+  getCurrentUrl,
+  getSyncStatus,
+  validateTotalAmount,
+  isMainnet as isMainnetUtil,
+  validateOutputs,
+  useOutputErrors,
+} from 'utils'
 
-import { useInitialize, useOutputErrors } from './hooks'
+import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
 const Send = () => {

@@ -90,8 +90,19 @@ declare namespace State {
       | 'destroy-ckb-account'
       | 'migrate-acp'
       | 'send-nft'
+      | 'send-from-multisig'
       | null
     walletID: string
+    multisigConfig?: {
+      id: number
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias?: string
+      fullPayload: string
+    }
   }
 
   type AlertDialog = Record<'title' | 'message', string> | null

@@ -1,3 +1,5 @@
+import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+
 export default class MultisigConfigModel {
   public id?: number
   public walletId: string
@@ -34,7 +36,7 @@ export default class MultisigConfigModel {
     n: number
     r: number
     addresses: string[]
-    alias: string
+    alias?: string
     fullPayload: string
     id?: number
   }): MultisigConfigModel {
@@ -59,5 +61,9 @@ export default class MultisigConfigModel {
       fullPayload: this.fullPayload,
       alias: this.alias
     }
+  }
+
+  public getLockHash() {
+    return scriptToHash(addressToScript(this.fullPayload))
   }
 }

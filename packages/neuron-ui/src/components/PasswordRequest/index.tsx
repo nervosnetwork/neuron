@@ -24,12 +24,12 @@ import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
-const PasswordRequest = () => {
+const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) => {
   const {
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest: { walletID = '', actionType = null },
+      passwordRequest: { walletID = '', actionType = null, multisigConfig },
     },
     settings: { wallets = [] },
     experimental,
@@ -68,10 +68,15 @@ const PasswordRequest = () => {
       case 'send-nft':
       case 'send':
         return OfflineSignType.Regular
+      case 'send-from-multisig':
+        if (multisigConfig?.m === 1) {
+          return OfflineSignType.Regular
+        }
+        return OfflineSignType.SendFromMultisigOnlySig
       default:
         return OfflineSignType.Invalid
     }
-  }, [actionType])
+  }, [actionType, multisigConfig])
 
   const exportTransaction = useCallback(async () => {
     onDismiss()
@@ -118,6 +123,15 @@ const PasswordRequest = () => {
           throw new PasswordIncorrectException()
         }
       }
+      const handleSendMultiTxRes = ({ status }: { status: number }) => {
+        if (isSuccessResponse({ status })) {
+          if (onSumbitSuccess) {
+            onSumbitSuccess()
+          }
+        } else if (status === ErrorCode.PasswordIncorrect) {
+          throw new PasswordIncorrectException()
+        }
+      }
       try {
         switch (actionType) {
           case 'send': {
@@ -125,6 +139,15 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
+            break
+          }
+          case 'send-from-multisig': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
+              handleSendMultiTxRes
+            )
             break
           }
           case 'delete': {
@@ -262,6 +285,8 @@ const PasswordRequest = () => {
       experimental,
       setError,
       t,
+      multisigConfig,
+      onSumbitSuccess,
     ]
   )
 
@@ -292,6 +317,7 @@ const PasswordRequest = () => {
       ...json,
       walletID,
       password,
+      multisigConfig,
     })
     if (!isSuccessResponse(res)) {
       dispatch({
@@ -310,7 +336,23 @@ const PasswordRequest = () => {
       payload: { sending: false },
     })
     onDismiss()
-  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID])
+    if (actionType === 'send-from-multisig' && onSumbitSuccess) {
+      onSumbitSuccess()
+    }
+  }, [
+    description,
+    dispatch,
+    experimental,
+    generatedTx,
+    onDismiss,
+    password,
+    signType,
+    t,
+    walletID,
+    actionType,
+    multisigConfig,
+    onSumbitSuccess,
+  ])
 
   const dropdownList = [
     {
@@ -386,7 +428,7 @@ const PasswordRequest = () => {
           ) : null}
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-            {currentWallet.isWatchOnly || (
+            {signType === OfflineSignType.SendFromMultisigOnlySig || currentWallet.isWatchOnly || (
               <Button label={t('common.confirm')} type="submit" disabled={disabled}>
                 {isLoading ? <Spinner /> : (t('common.confirm') as string)}
               </Button>

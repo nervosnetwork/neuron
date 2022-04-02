@@ -54,6 +54,16 @@ declare namespace Controller {
     tx: string
     password?: string
     description?: string
+    multisigConfig?: {
+      id: number
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias?: string
+      fullPayload: string
+    }
   }
 
   interface GenerateTransactionParams {

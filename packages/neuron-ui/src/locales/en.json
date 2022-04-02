@@ -415,6 +415,9 @@
       "destroy-ckb-account": {
         "title": "Destroy CKB Asset Account"
       },
+      "send-from-multisig": {
+        "title": "Submit the transaction"
+      },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
     "qrcode": {
@@ -828,6 +831,7 @@
       }
     },
     "multisig-address": {
+      "window-title": "Create multisig address",
       "search": {
         "placeholder": "search by multisig address,alias"
       },
@@ -863,6 +867,14 @@
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
       "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
+      "send-ckb": {
+        "title": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
+        "balance": "Balance",
+        "address": "Address",
+        "amount": "Amount",
+        "send": "Send",
+        "cancel": "Cancel"
+      },
       "create-dialog": {
         "title": "Create multisig address",
         "index": "index",

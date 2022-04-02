@@ -16,6 +16,24 @@
   }
 }
 
+@mixin copyzone-fullpayload {
+  min-width: 100px;
+  max-width: calc(100% - 20px);
+  display: flex;
+  height: 1.625rem;
+
+  .overflow {
+    word-break: break-all;
+    text-align: right;
+    line-height: 1.625rem;
+    overflow: hidden;
+  }
+
+  & > span {
+    line-height: 1.625rem;
+  }
+}
+
 .dialog {
   @include dialog-container;
   padding: 30px 50px;
@@ -30,6 +48,7 @@
     th {
       padding: 8px;
       min-width: 40px;
+      text-align: left;
     }
   }
 
@@ -42,25 +61,12 @@
       padding: 8px;
       min-width: 40px;
       text-align: left;
+      font-size: 14px;
     }
   }
 
   .fullPayload {
-    min-width: 100px;
-    max-width: calc(100% - 20px);
-    display: flex;
-    height: 1.625rem;
-  
-    .overflow {
-      word-break: break-all;
-      text-align: right;
-      line-height: 1.625rem;
-      overflow: hidden;
-    }
-
-    & > span {
-      line-height: 1.625rem;
-    }
+    @include copyzone-fullpayload;
   }
   
   .more {
