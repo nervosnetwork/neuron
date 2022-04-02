@@ -4,7 +4,7 @@ import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
 import { transactionState } from 'states'
 import LockInfoDialog from 'components/LockInfoDialog'
-import Tag from 'components/Tag'
+import ScriptTag from 'components/ScriptTag'
 
 import {
   useOnLocaleChange,
@@ -16,12 +16,6 @@ import {
   useExitOnWalletChange,
   isSuccessResponse,
   scriptToAddress,
-  MultiSigLockInfo,
-  DefaultLockInfo,
-  AnyoneCanPayLockInfoOnAggron,
-  AnyoneCanPayLockInfoOnLina,
-  ChequeLockInfoOnAggron,
-  ChequeLockInfoOnLina,
 } from 'utils'
 import CopyZone from 'widgets/CopyZone'
 
@@ -156,33 +150,6 @@ const Transaction = () => {
         }
         const capacity = shannonToCKBFormatter(cell.capacity || '0')
 
-        // REFACTOR: should be refacter into a component
-        const renderTag = (lockScript: CKBComponents.Script | null) => {
-          if (!lockScript) {
-            return null
-          }
-
-          const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
-          const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
-            ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
-            : [...commonLockArray, AnyoneCanPayLockInfoOnAggron, ChequeLockInfoOnAggron]
-          const foundLock = lockArray.find(
-            (info: { CodeHash: string; HashType: string; ArgsLen: string }) =>
-              lockScript.codeHash === info.CodeHash &&
-              lockScript.hashType === info.HashType &&
-              info.ArgsLen.split(',').includes(`${(lockScript.args.length - 2) / 2}`)
-          )
-
-          if (!foundLock) {
-            return null
-          }
-          return (
-            <div className={styles.tagWrap}>
-              <Tag text={foundLock.TagName} onClick={() => setLockInfo(lockScript)} />
-            </div>
-          )
-        }
-
         return (
           <tr key={cell.lockHash || ''} data-address={address}>
             <td title={`${index}`}>{index}</td>
@@ -190,7 +157,7 @@ const Transaction = () => {
               <CopyZone content={address} name={t('history.copy-address')}>
                 {address}
               </CopyZone>
-              {renderTag(cell.lock)}
+              <ScriptTag isMainnet={isMainnet} script={cell.lock} onClick={() => setLockInfo(cell.lock)} />
             </td>
             <td>
               <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>

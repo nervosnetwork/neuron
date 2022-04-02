@@ -51,3 +51,4 @@ import './CopyZone.stories'
 
 // Widgets
 import './RingProgressBar.stories'
+import './ScriptTag.stories'
