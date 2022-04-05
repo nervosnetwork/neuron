@@ -181,6 +181,7 @@ const SUDTAccountList = () => {
     walletId,
     dispatch,
     onGenerated: onTransactionGenerated,
+    t,
   })
 
   const onOpenCreateDialog = useCallback(() => {

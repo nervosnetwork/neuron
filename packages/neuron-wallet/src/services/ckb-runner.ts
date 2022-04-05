@@ -67,7 +67,11 @@ export const startCkbNode = async () => {
   await initCkb()
 
   logger.info('CKB:\tstarting node...')
-  ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
+  const options = ['run', '-C', ckbDataPath()]
+  if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
+    options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
+  }
+  ckb = spawn(ckbBinary(), options, { stdio: ['ignore', 'ignore', 'pipe'] })
   ckb.stderr &&
     ckb.stderr.on('data', data => {
       logger.error('CKB:\trun fail:', data.toString())

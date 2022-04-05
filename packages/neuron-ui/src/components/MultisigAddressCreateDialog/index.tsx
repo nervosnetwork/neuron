@@ -62,7 +62,15 @@ const MultisigAddressCreateDialog = ({
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
-  const { r, addresses, changeR, changeAddress, isError: addressErr, addressErrors } = useMultiAddress({
+  const {
+    r,
+    addresses,
+    changeR,
+    changeAddress,
+    isError: addressErr,
+    addressErrors,
+    isAddressesDuplicated,
+  } = useMultiAddress({
     n: Number(n),
     isMainnet,
   })
@@ -101,6 +109,9 @@ const MultisigAddressCreateDialog = ({
             changeAddress={changeAddress}
             addressErrors={addressErrors}
           />
+          {isAddressesDuplicated && (
+            <div className={styles.errorMessage}>{t('multisig-address.create-dialog.duplicate-address-forbid')}</div>
+          )}
         </>
       )}
       {step === Step.viewMultiAddress && (

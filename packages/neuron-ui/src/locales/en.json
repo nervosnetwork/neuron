@@ -277,7 +277,9 @@
       "amount": "Amount",
       "inputs": "Inputs",
       "outputs": "Outputs",
-      "cell-from-cellbase": "From cellbase"
+      "cell-from-cellbase": "From cellbase",
+      "lock-script": "Lock Script",
+      "full-version-address": "Full Version Address"
     },
     "addresses": {
       "title": "Address Book",
@@ -911,7 +913,8 @@
         "signerApprove": "Lack of {{m}} signer approval(s)",
         "requiredSigner": "Lack of {{r}} required signer approval(s)",
         "signed": "Signed"
-      }
+      },
+      "duplicate-address-forbid": "Address can't be duplicated"
     }
   }
 }

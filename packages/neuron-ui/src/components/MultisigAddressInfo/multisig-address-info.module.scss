@@ -11,18 +11,16 @@
     td {
       padding: 8px;
       min-width: 40px;
+      text-align: left;
     }
   }
-  .index {
-    text-align: center;
-  }
 
-  .required {
-    text-align: center;
-  }
-
-  .addressField {
-    display: block;
+  .address {
+    width: 400px;
+    
+    .addressField {
+      display: block;
+    }
   }
 }
 

@@ -74,7 +74,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       default:
         return OfflineSignType.Invalid
     }
-  }, [actionType])
+  }, [actionType, multisigConfig])
 
   const exportTransaction = useCallback(async () => {
     onDismiss()

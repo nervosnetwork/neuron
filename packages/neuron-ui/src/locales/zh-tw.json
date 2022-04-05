@@ -270,7 +270,9 @@
       "amount": "數量",
       "inputs": "輸入",
       "outputs": "輸出",
-      "cell-from-cellbase": "來自 Cellbase"
+      "cell-from-cellbase": "來自 Cellbase",
+      "lock-script": "鎖腳本",
+      "full-version-address": "完整版地址"
     },
     "addresses": {
       "title": "地址簿",
@@ -904,7 +906,8 @@
         "signerApprove": "還需要{{m}}個簽名者的確認",
         "requiredSigner": "還需要{{r}}個必要簽名者的確認",
         "signed": "已簽名"
-      }
+      },
+      "duplicate-address-forbid": "地址不能重復"
     }
   }
 }

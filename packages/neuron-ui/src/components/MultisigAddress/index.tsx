@@ -177,7 +177,7 @@ const MultisigAddress = () => {
                 </td>
                 <td>
                   {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
-                  CKB
+                  &nbsp;CKB
                 </td>
                 <td>
                   <CustomizableDropdown

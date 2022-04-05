@@ -1,20 +1,10 @@
 import { ckbCore } from 'services/chain'
-import { MultiSigLockInfo, DefaultLockInfo, AnyoneCanPayLockInfoOnAggron, AnyoneCanPayLockInfoOnLina } from './enums'
+import getLockSupportShortAddress from './getLockSupportShortAddress'
 
-export const scriptToAddress = (lock: CKBComponents.Script, isMainnet: boolean, useMultisigLong?: boolean) => {
+export const scriptToAddress = (lock: CKBComponents.Script, isMainnet: boolean) => {
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
 
-  const foundLock = [
-    ...(useMultisigLong ? [] : [MultiSigLockInfo]),
-    DefaultLockInfo,
-    AnyoneCanPayLockInfoOnAggron,
-    AnyoneCanPayLockInfoOnLina,
-  ].find(
-    info =>
-      lock.codeHash === info.CodeHash &&
-      lock.hashType === info.HashType &&
-      info.ArgsLen.split(',').includes(`${(lock.args.length - 2) / 2}`)
-  )
+  const foundLock = getLockSupportShortAddress(lock)
 
   if (foundLock) {
     return ckbCore.utils.bech32Address(lock.args, {
