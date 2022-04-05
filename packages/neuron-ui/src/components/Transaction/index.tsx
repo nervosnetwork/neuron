@@ -2,8 +2,9 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
-
 import { transactionState } from 'states'
+import LockInfoDialog from 'components/LockInfoDialog'
+import Tag from 'components/Tag'
 
 import {
   useOnLocaleChange,
@@ -15,6 +16,12 @@ import {
   useExitOnWalletChange,
   isSuccessResponse,
   scriptToAddress,
+  MultiSigLockInfo,
+  DefaultLockInfo,
+  AnyoneCanPayLockInfoOnAggron,
+  AnyoneCanPayLockInfoOnLina,
+  ChequeLockInfoOnAggron,
+  ChequeLockInfoOnLina,
 } from 'utils'
 import CopyZone from 'widgets/CopyZone'
 
@@ -27,6 +34,7 @@ const Transaction = () => {
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
+  const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -126,6 +134,35 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
+  const renderTag = (lockScript: CKBComponents.Script) => {
+    const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
+    const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
+      ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]
+      : [...commonLockArray, AnyoneCanPayLockInfoOnAggron, ChequeLockInfoOnAggron]
+    const foundLock = lockArray.find(
+      (info: { CodeHash: string; HashType: string; ArgsLen: string }) =>
+        lockScript.codeHash === info.CodeHash &&
+        lockScript.hashType === info.HashType &&
+        info.ArgsLen.split(',').includes(`${(lockScript.args.length - 2) / 2}`)
+    )
+
+    if (!foundLock) {
+      return null
+    }
+    return (
+      <div className={styles.tagWrap}>
+        <Tag text={foundLock.TagName} onClick={() => setLockInfo(lockScript)} />
+      </div>
+    )
+  }
+
+  const renderLockInfoDialog = useCallback(() => {
+    if (!lockInfo) {
+      return null
+    }
+    return <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />
+  }, [lockInfo, isMainnet])
+
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>) =>
       cells.map((cell, index) => {
@@ -148,6 +185,7 @@ const Transaction = () => {
               <CopyZone content={address} name={t('history.copy-address')}>
                 {address}
               </CopyZone>
+              {cell.lock && renderTag(cell.lock)}
             </td>
             <td>
               <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
@@ -211,6 +249,7 @@ const Transaction = () => {
         </thead>
         <tbody>{renderList(transaction.outputs)}</tbody>
       </table>
+      {renderLockInfoDialog()}
     </div>
   )
 }

@@ -270,7 +270,9 @@
       "amount": "数量",
       "inputs": "输入",
       "outputs": "输出",
-      "cell-from-cellbase": "来自 Cellbase"
+      "cell-from-cellbase": "来自 Cellbase",
+      "lock-script": "锁脚本",
+      "full-version-address": "完整版地址"
     },
     "addresses": {
       "title": "地址簿",
@@ -887,7 +889,8 @@
           "back": "上一步",
           "next": "下一步",
           "confirm": "确认"
-        }
+        },
+        "duplicate-address-forbid": "地址不能重复"
       }
     }
   }

@@ -34,8 +34,8 @@ export const MultisigAddressTable = ({
         <tbody>
           {addresses.map((v, idx) => (
             <tr key={idx.toString()}>
-              <td className={styles.index}>{`#${idx + 1}`}</td>
-              <td className={styles.required}>
+              <td>{`#${idx + 1}`}</td>
+              <td>
                 <input
                   type="checkbox"
                   data-idx={idx}
@@ -44,7 +44,7 @@ export const MultisigAddressTable = ({
                   disabled={idx > r || disabled}
                 />
               </td>
-              <td>
+              <td className={styles.address}>
                 {disabled ? (
                   <CopyZone
                     content={v}

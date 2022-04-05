@@ -140,25 +140,26 @@ export const useSendInfo = ({
   const dispatch = useDispatch()
   const [errorMessage, setErrorMessage] = useState('')
   useEffect(() => {
-    if (outputErrors.some(v => v.addrError || v.amountError)) {
-      return
-    }
     clearTimeout(generateTxTimer)
     setErrorMessage('')
-    const validSendInfoList = sendInfoList.filter(v => v.address && v.amount)
+    const validSendInfoList = sendInfoList.filter(
+      (v, i) => v.address && v.amount && !outputErrors[i].addrError && !outputErrors[i].amountError
+    )
     generateTxTimer = setTimeout(() => {
       dispatch({
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
-      generateMultisigTxWith(generateMultisigTx)({
-        sendInfoList: validSendInfoList,
-        setErrorMessage,
-        multisigConfig,
-        dispatch,
-        t,
-        isMainnet,
-      })
+      if (validSendInfoList.length) {
+        generateMultisigTxWith(generateMultisigTx)({
+          sendInfoList: validSendInfoList,
+          setErrorMessage,
+          multisigConfig,
+          dispatch,
+          t,
+          isMainnet,
+        })
+      }
     }, 300)
   }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet, outputErrors])
   const [isSendMax, setIsSendMax] = useState(false)

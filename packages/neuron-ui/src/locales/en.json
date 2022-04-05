@@ -277,7 +277,9 @@
       "amount": "Amount",
       "inputs": "Inputs",
       "outputs": "Outputs",
-      "cell-from-cellbase": "From cellbase"
+      "cell-from-cellbase": "From cellbase",
+      "lock-script": "Lock Script",
+      "full-version-address": "Full Version Address"
     },
     "addresses": {
       "title": "Address Book",
@@ -894,7 +896,8 @@
           "back": "Back",
           "next": "Next",
           "confirm": "Confirm"
-        }
+        },
+        "duplicate-address-forbid": "Address can't be duplicated"
       }
     }
   }
