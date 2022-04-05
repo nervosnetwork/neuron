@@ -4,7 +4,8 @@ import { MultisigConfig, OfflineSignJSON } from 'services/remote'
 import Button from 'widgets/Button'
 import Address from 'widgets/Address'
 import { useState as useGlobalState } from 'states'
-import { scriptToAddress, shannonToCKBFormatter, getScriptFormat } from 'utils'
+import { ckbCore } from 'services/chain'
+import { shannonToCKBFormatter, getScriptFormat } from 'utils'
 import styles from './approveMultisigTx.module.scss'
 import { useBroadcast, useSignAndBroadcast, useSignAndExport, useSignedStatus, useTabView } from './hooks'
 
@@ -24,7 +25,7 @@ const Cell = React.memo(
     return (
       <div className={styles.cellItem}>
         <div>
-          <Address fullPayload={scriptToAddress(cell.lock, isMainnet, true)} />
+          <Address fullPayload={ckbCore.utils.scriptToAddress(cell.lock, isMainnet)} />
           <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
           <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
           <span className={`${styles.activity} ${styles.tag}`}>{getScriptFormat(cell.lock)}</span>
