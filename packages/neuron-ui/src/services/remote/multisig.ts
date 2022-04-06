@@ -38,3 +38,7 @@ export const generateMultisigTx = remoteApi<{
   items: { address: string; capacity: string }[]
   multisigConfig: MultisigConfig
 }>('generate-multisig-tx')
+export const generateMultisigSendAllTx = remoteApi<{
+  items: { address: string; capacity: string }[]
+  multisigConfig: MultisigConfig
+}>('generate-multisig-send-all-tx')

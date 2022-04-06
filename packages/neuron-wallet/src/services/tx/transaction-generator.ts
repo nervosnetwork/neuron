@@ -232,9 +232,15 @@ export class TransactionGenerator {
     walletId: string,
     targetOutputs: TargetOutput[],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    let cellDep: CellDep
+    if (multisigConfig) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    } else {
+      cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    }
     const tipHeader = await TransactionGenerator.getTipHeader()
     const tipHeaderEpoch = tipHeader.epoch
     const tipHeaderTimestamp = tipHeader.timestamp
@@ -243,7 +249,10 @@ export class TransactionGenerator {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const allInputs: Input[] = await CellsService.gatherAllInputs(walletId)
+    const allInputs: Input[] = await CellsService.gatherAllInputs(
+      walletId,
+      multisigConfig?.fullPayload ? Script.fromSDK(addressToScript(multisigConfig?.fullPayload)) : undefined
+    )
 
     if (allInputs.length === 0) {
       throw new CapacityNotEnough()
@@ -280,7 +289,7 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep],
+      cellDeps: [cellDep],
       headerDeps: [],
       inputs: allInputs,
       outputs,
@@ -294,7 +303,9 @@ export class TransactionGenerator {
       const keyCount: number = lockHashes.size
       const txSize: number =
         TransactionSize.tx(tx) +
-        TransactionSize.secpLockWitness() * keyCount +
+        (multisigConfig
+          ? TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n)
+          : TransactionSize.secpLockWitness() * keyCount) +
         TransactionSize.emptyWitness() * (allInputs.length - keyCount)
       finalFee = TransactionFee.fee(txSize, feeRateInt)
     }

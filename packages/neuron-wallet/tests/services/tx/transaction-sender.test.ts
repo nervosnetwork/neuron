@@ -90,6 +90,20 @@ jest.doMock('services/tx/transaction-persistor', () => {
   }
 });
 
+jest.mock('../../../src/models/system-script-info', () => {
+  const originalModule = jest.requireActual('../../../src/models/system-script-info');
+  return {
+    ...originalModule.default,
+    isSecpScript: originalModule.default.isSecpScript,
+    generateDaoScript: originalModule.default.generateDaoScript,
+    generateSecpScript: originalModule.default.generateSecpScript,
+    getInstance: () => ({
+      getSecpCellDep: jest.fn().mockReturnValue(new CellDep(new OutPoint('0x3e6790b2f47c7de911c2def3c0a3b5bf613e457e38f185e2e566f9010e495874', '0'), DepType.DepGroup)),
+      getDaoCellDep: jest.fn().mockReturnValue(new CellDep(new OutPoint('0x3e6790b2f47c7de911c2def3c0a3b5bf613e457e38f185e2e566f9010e495874', '0'), DepType.DepGroup)),
+    })
+  }
+})
+
 import Transaction from '../../../src/models/chain/transaction'
 import TxStatus from '../../../src/models/chain/tx-status'
 import CellDep, { DepType } from '../../../src/models/chain/cell-dep'
@@ -105,8 +119,8 @@ import SystemScriptInfo from '../../../src/models/system-script-info'
 import NodeService from '../../../src/services/node'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer } from '../../../src/exceptions/wallet'
-
-const TransactionSender = require('../../../src/services/transaction-sender').default
+import TransactionSender from '../../../src/services/transaction-sender'
+import MultisigConfigModel from '../../../src/models/multisig-config'
 
 const fakeScript = new Script(
   '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
@@ -504,8 +518,8 @@ describe('TransactionSender Test', () => {
       const fee = '1'
       const feeRate = '10'
       const targetOutputs = [
-        {address: '1', capacity: 1},
-        {address: '1', capacity: 1},
+        {address: '1', capacity: '1'},
+        {address: '1', capacity: '1'},
       ]
       beforeEach(() => {
         stubbedGetCurrentWallet.mockReturnValue(fakeWallet)
@@ -546,8 +560,8 @@ describe('TransactionSender Test', () => {
       const feeRate = '10'
       beforeEach(async () => {
         const targetOutputs = [
-          {address: '1', capacity: 1},
-          {address: '1', capacity: 1},
+          {address: '1', capacity: '1'},
+          {address: '1', capacity: '1'},
         ]
         await transactionSender.generateSendingAllTx(fakeWallet.id, targetOutputs, fee, feeRate)
       });
@@ -560,6 +574,31 @@ describe('TransactionSender Test', () => {
           ],
           fee,
           feeRate
+        )
+      })
+    });
+
+    describe('#generateSendingAllTx', () => {
+      it('generates transaction', async () => {
+        const targetOutputs = [
+          {address: '1', capacity: '1'},
+          {address: '1', capacity: '1'},
+        ]
+        const multisigConfig = MultisigConfigModel.fromObject({
+          walletId: 'walletId',
+          m: 1,
+          n: 1,
+          r: 1,
+          fullPayload: 'fullPayload',
+          addresses: ['addresses']
+        })
+        await transactionSender.generateMultisigSendAllTx(targetOutputs, multisigConfig)
+        expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith(
+          '',
+          targetOutputs,
+          '0',
+          '1000',
+          multisigConfig
         )
       })
     });
