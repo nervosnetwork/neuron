@@ -36,7 +36,7 @@ export default {
       tools: {
         label: 'Tools',
         'sign-and-verify': 'Sign/Verify Message',
-        'create-multisig-address': 'Create multisig address',
+        'multisig-address': 'Multisig Addresses',
         'offline-sign': 'Offline sign',
         'clear-sync-data': 'Clear all synchronized data'
       },
@@ -159,8 +159,8 @@ export default {
       'sign-and-verify': {
         title: 'Sign/verify message'
       },
-      'create-multisig-address': {
-        title: 'Create multisig address'
+      'multisig-address': {
+        title: 'Multisig Addresses'
       },
       'ckb-dependency': {
         title: 'Bundled CKB Node',

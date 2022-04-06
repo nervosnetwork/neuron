@@ -36,7 +36,7 @@ export default {
       tools: {
         label: '工具',
         'sign-and-verify': '签名/验签信息',
-        'create-multisig-address': '创建多重签名地址',
+        'multisig-address': '多签地址',
         'offline-sign': '离线签名',
         'clear-sync-data': '清除所有同步数据'
       },
@@ -150,8 +150,8 @@ export default {
       'sign-and-verify': {
         title: '签名/验签信息'
       },
-      'create-multisig-address': {
-        title: '创建多重签名地址'
+      'multisig-address': {
+        title: '多签地址'
       },
       'ckb-dependency': {
         title: '内置 CKB 节点',

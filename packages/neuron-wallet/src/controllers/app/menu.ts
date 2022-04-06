@@ -308,13 +308,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         }
       },
       {
-        label: t('application-menu.tools.create-multisig-address'),
+        label: t('application-menu.tools.multisig-address'),
         enabled: hasCurrentWallet,
         click: () => {
           const currentWallet = walletsService.getCurrent()
           showWindow(
             `#/add-multisig-address/${currentWallet!.id}`,
-            t(`messageBox.create-multisig-address.title`),
+            t(`messageBox.multisig-address.title`),
             {
               width: 900,
               resizable: true
