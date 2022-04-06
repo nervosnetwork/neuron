@@ -29,3 +29,9 @@ export class MultisigConfigNeedError extends Error {
     super(t('messages.multisig-config-need-error'))
   }
 }
+
+export class MultisigNotSignedNeedError extends Error {
+  constructor() {
+    super(t('messages.multisig-not-signed'))
+  }
+}

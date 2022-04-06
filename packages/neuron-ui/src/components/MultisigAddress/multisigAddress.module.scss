@@ -39,6 +39,12 @@
   padding: 30px 50px;
 }
 
+.approveDialog {
+  @include dialog-container;
+  padding: 30px 50px;
+  max-width: 800px;
+}
+
 .multisigConfig {
   width: 100%;
   border-collapse: collapse;
@@ -48,6 +54,10 @@
     th {
       padding: 8px;
       min-width: 40px;
+      text-align: left;
+    }
+
+    .checkBoxTh {
       text-align: left;
     }
   }

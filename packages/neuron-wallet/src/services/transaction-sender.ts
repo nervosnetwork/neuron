@@ -32,6 +32,8 @@ import AssetAccountInfo from 'models/asset-account-info'
 import MultisigConfigModel from 'models/multisig-config'
 import { Hardware } from './hardware/hardware'
 import MultisigService from './multisig'
+import { getMultisigStatus } from 'utils/multisig'
+import { SignStatus } from 'models/offline-sign'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -72,7 +74,7 @@ export default class TransactionSender {
   ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
-      : await this.signMultisig(walletID, transaction, password, multisigConfigs, [])
+      : await this.signMultisig(walletID, transaction, password, multisigConfigs)
 
     return this.broadcastTx(walletID, tx)
   }
@@ -231,7 +233,6 @@ export default class TransactionSender {
     transaction: Transaction,
     password: string = '',
     multisigConfigs: MultisigConfigModel[],
-    signedBlake160s: string[],
     context?: RPC.RawTransaction[]
   ) {
     const wallet = this.walletService.get(walletID)
@@ -240,17 +241,21 @@ export default class TransactionSender {
     const addressInfos = await this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
-    const findPrivateKey = (argsList: string[]) => {
+    const findPrivateKeyAndBlake160 = (argsList: string[], signedBlake160s?: string[]) => {
       let path: string | undefined
+      let matchArgs: string | undefined
       argsList.some(args => {
-        if (signedBlake160s.includes(args)) {
+        if (signedBlake160s?.includes(args)) {
           return false
         }
         if (args.length === 42) {
-          path = addressInfos.find(i => i.blake160 === args)!.path
+          const matchAddress = addressInfos.find(i => i.blake160 === args)
+          path = matchAddress?.path
+          matchArgs = matchAddress?.blake160
         } else {
           const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
           path = addressInfo?.path
+          matchArgs = addressInfo?.blake160
         }
         return !!path
       })
@@ -258,7 +263,7 @@ export default class TransactionSender {
       if (!pathAndPrivateKey) {
         throw new Error('no private key found')
       }
-      return pathAndPrivateKey.privateKey
+      return [pathAndPrivateKey.privateKey, matchArgs]
     }
 
     const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
@@ -297,7 +302,7 @@ export default class TransactionSender {
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
       const multisigArgses = multisigConfig.addresses.map(v => addressToScript(v).args)
-      const privateKey = findPrivateKey(multisigArgses)
+      const [privateKey, blake160] = findPrivateKeyAndBlake160(multisigArgses, tx.signatures?.[lockHash])
 
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs.map((value: SignInfo, index: number) => {
@@ -318,7 +323,7 @@ export default class TransactionSender {
         S: MultiSign.defaultS
       })
       witnesses = await TransactionSender.signSingleMultiSignScript(
-        privateKey,
+        privateKey!,
         serializedWitnesses,
         txHash,
         serializedMultiSign,
@@ -332,7 +337,7 @@ export default class TransactionSender {
           walletID,
           tx,
           witnesses.map(w => (typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK()))),
-          privateKey,
+          privateKey!,
           context
         )
       }
@@ -341,11 +346,17 @@ export default class TransactionSender {
       } else {
         wit.lock = witnessesArgs[0].witnessArgs.lock + wit.lock
       }
-      witnesses[0] = serializeWitnessArgs(wit.toSDK())
+      const signStatus = getMultisigStatus(multisigConfig, transaction.signatures)
+      if (signStatus === SignStatus.Signed) {
+        witnesses[0] = serializeWitnessArgs(wit.toSDK())
+      } else {
+        witnesses[0] = wit
+      }
 
       for (let i = 0; i < witnessesArgs.length; ++i) {
         witnessesArgs[i].witness = witnesses[i] as string
       }
+      tx.setSignatures(lockHash, blake160!)
     }
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
     tx.hash = txHash

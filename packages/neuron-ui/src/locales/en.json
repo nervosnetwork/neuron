@@ -418,6 +418,9 @@
       "send-from-multisig": {
         "title": "Submit the transaction"
       },
+      "send-from-multisig-need-one": {
+        "title": "Submit the transaction"
+      },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
     "qrcode": {
@@ -877,7 +880,7 @@
         "actions": {
           "info": "Info",
           "send": "Send",
-          "approve": "Sign",
+          "approve": "Approve",
           "delete": "Delete"
         }
       },
@@ -918,9 +921,22 @@
           "back": "Back",
           "next": "Next",
           "confirm": "Confirm"
-        },
-        "duplicate-address-forbid": "Address can't be duplicated"
-      }
+        }
+      },
+      "approve-dialog": {
+        "title": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
+        "transaction": "Transaction",
+        "cancel": "Cancel",
+        "signAndExport": "Sign & Export",
+        "signAndBroadcast": "Sign & Broadcast",
+        "broadcast": "Broadcast",
+        "content": "Content:",
+        "status": "Status",
+        "signerApprove": "Lack of {{m}} signer approval(s)",
+        "requiredSigner": "Lack of {{r}} required signer approval(s)",
+        "signed": "Signed"
+      },
+      "duplicate-address-forbid": "Address can't be duplicated"
     }
   }
 }

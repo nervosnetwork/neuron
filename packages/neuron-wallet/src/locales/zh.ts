@@ -118,7 +118,9 @@ export default {
       'multisig-config-address-error': '多签配置的地址设置不正确',
       'multisig-config-need-error': '多签交易生成需要多签配置',
       'transaction-no-input-paramter': '查询 Input Cell 缺少必要的参数',
-      'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script'
+      'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script',
+      'multisig-lock-hash-mismatch': '当前多签地址与需要确认交易不匹配',
+      'multisig-not-signed': '多签交易缺少部分签名'
     },
     messageBox: {
       button: {
@@ -243,6 +245,7 @@ export default {
       'import-duplicate': '请检查是否存在重复配置',
       'import-result': '导入成功 {{success}} 个，失败 {{fail}} 个。{{failCheck}}',
       'confirm-delete': '确认删除该多签地址吗？',
+      'approve-tx': '确认多签交易',
       'delete-actions': {
         ok: '确认',
         cancel: '取消'

@@ -560,6 +560,13 @@ export default class ApiController {
       })
     })
 
+    handle('sign-and-broadcast-transaction', async (_, params) => {
+      return this.#offlineSignController.signAndBroadcastTransaction({
+        ...params,
+        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined
+      })
+    })
+
     // multi sign
     handle('create-multisig-address',async (_, params) => {
       return this.#multisigController.createMultisigAddress(params)
@@ -591,6 +598,10 @@ export default class ApiController {
 
     handle('get-multisig-balances',async (_, params) => {
       return this.#multisigController.getMultisigBalances(params)
+    })
+
+    handle('load-multisig-tx-json',async (_, fullPayload) => {
+      return this.#multisigController.loadMultisigTxJson(fullPayload)
     })
   }
 

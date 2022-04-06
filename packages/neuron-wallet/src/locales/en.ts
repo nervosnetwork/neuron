@@ -126,7 +126,9 @@ export default {
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
       'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
-      'migrate-sudt-no-type': 'The migrating cell does not have type script'
+      'migrate-sudt-no-type': 'The migrating cell does not have type script',
+      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be confirmed',
+      'multisig-not-signed': 'Partial signatures are missing for multisig transactions'
     },
     messageBox: {
       button: {
@@ -252,6 +254,7 @@ export default {
       'import-duplicate': 'Please check for duplicate configurations',
       'import-result': 'Imports succeeded {{success}}, failed {{fail}}.{{failCheck}}',
       'confirm-delete': 'Confirm delete the multisig config?',
+      'approve-tx': 'Confirm multisig transaction',
       'delete-actions': {
         ok: 'Confirm',
         cancel: 'Cancel'

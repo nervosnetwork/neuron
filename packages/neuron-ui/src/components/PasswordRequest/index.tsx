@@ -66,17 +66,15 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       case 'unlock':
         return OfflineSignType.UnlockDAO
       case 'send-nft':
+      case 'send-from-multisig-need-one':
       case 'send':
         return OfflineSignType.Regular
       case 'send-from-multisig':
-        if (multisigConfig?.m === 1) {
-          return OfflineSignType.Regular
-        }
         return OfflineSignType.SendFromMultisigOnlySig
       default:
         return OfflineSignType.Invalid
     }
-  }, [actionType, multisigConfig])
+  }, [actionType])
 
   const exportTransaction = useCallback(async () => {
     onDismiss()
@@ -141,7 +139,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
             break
           }
-          case 'send-from-multisig': {
+          case 'send-from-multisig-need-one': {
             if (isSending) {
               break
             }

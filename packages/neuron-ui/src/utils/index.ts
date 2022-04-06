@@ -25,5 +25,6 @@ export * from './scriptToAddress'
 export * from './getSyncLeftTime'
 export * from './baseActions'
 export * from './getSUDTAmount'
+export * from './getScriptFormat'
 
 export { CONSTANTS }
