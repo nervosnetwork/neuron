@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   MultiSigLockInfo,
+  LocktimeLockInfo,
   DefaultLockInfo,
   AnyoneCanPayLockInfoOnAggron,
   AnyoneCanPayLockInfoOnLina,
@@ -22,7 +23,7 @@ const ScriptTag = ({
     return null
   }
 
-  const commonLockArray = [MultiSigLockInfo, DefaultLockInfo]
+  const commonLockArray = [MultiSigLockInfo, LocktimeLockInfo, DefaultLockInfo]
 
   const lockArray: Array<Record<'CodeHash' | 'HashType' | 'ArgsLen' | 'TagName', string>> = isMainnet
     ? [...commonLockArray, AnyoneCanPayLockInfoOnLina, ChequeLockInfoOnLina]

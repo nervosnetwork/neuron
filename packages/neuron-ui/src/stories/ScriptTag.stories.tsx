@@ -22,6 +22,11 @@ const scripts: Record<string, CKBComponents.Script> = {
     hashType: 'type',
     args: '0x3c12e68513a8731692607387fcfcfce4275b6ffa',
   },
+  locktime: {
+    codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+    hashType: 'type',
+    args: '0x822f72beaac01b956d4ce5ac00a5806a8be356100310008700f00020',
+  },
 }
 
 Object.entries(scripts).forEach(([title, script]) => {
