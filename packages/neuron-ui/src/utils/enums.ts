@@ -152,6 +152,14 @@ export enum MultiSigLockInfo {
   TagName = 'secp256k1/multisig',
 }
 
+export enum LocktimeLockInfo {
+  CodeHash = '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+  HashType = 'type',
+  CodeHashIndex = '0x01',
+  ArgsLen = '28',
+  TagName = 'secp256k1/multisig/locktime',
+}
+
 export enum AnyoneCanPayLockInfoOnAggron {
   CodeHash = '0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356',
   HashType = 'type',
