@@ -831,7 +831,7 @@
       }
     },
     "multisig-address": {
-      "window-title": "Create multisig address",
+      "window-title": "Multisig Addresses",
       "search": {
         "placeholder": "search by multisig address,alias"
       },
