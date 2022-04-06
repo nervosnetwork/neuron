@@ -178,7 +178,7 @@ export const useSendInfo = ({
           t,
           isMainnet,
         }).then(res => {
-          if (res.outputs && res.outputs.length) {
+          if (res && res.outputs && res.outputs.length) {
             setSendInfoList(v => [
               ...v.slice(0, v.length - 1),
               {

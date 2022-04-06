@@ -523,6 +523,23 @@ describe('CellsService', () => {
         expect(allInputs.length).toEqual(0)
       })
     });
+    describe('gather with lock args', () => {
+      it('gather with exist args', async () => {
+        const inputs = await CellsService.gatherAllInputs(
+          walletId1,
+          { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type, args: bob.lockScript.args }
+        )
+        expect(inputs).toHaveLength(1)
+        expect(inputs[0].capacity).toEqual(toShannon('1000'))
+      })
+      it('gather with non-exist args', async () => {
+        const inputs = await CellsService.gatherAllInputs(
+          walletId1,
+          { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type, args: 'non-exist-args' }
+        )
+        expect(inputs).toHaveLength(0)
+      })
+    });
   })
 
   describe('#getDaoCells', () => {

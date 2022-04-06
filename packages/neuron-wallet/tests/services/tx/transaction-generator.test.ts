@@ -61,6 +61,7 @@ jest.doMock('../../../src/block-sync-renderer/index', () => {
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 import AssetAccount from '../../../src/models/asset-account'
+import MultisigConfigModel from '../../../src/models/multisig-config'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -530,6 +531,13 @@ describe('TransactionGenerator', () => {
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, false, null),
         generateCell(toShannon('3000'), OutputStatus.Live, false, null, alice),
+        generateCell(toShannon('3000'), OutputStatus.Live, false, null, {
+          lockScript: Script.fromObject({
+            codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+            hashType: ScriptHashType.Type,
+            args: '0x87b9ae2c1c7108178e709bf4a89b736bc0f0ae60'
+          })
+        })
       ]
       await getConnection().manager.save(cells)
       done()
@@ -687,6 +695,44 @@ describe('TransactionGenerator', () => {
         expect(parsedEpoch.length).toEqual(BigInt(240))
         expect(parsedEpoch.index).toEqual(BigInt(43))
       })
+    })
+
+    it('generator with multisigConfig', async () => {
+      const feeRate = '1000'
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+        walletId1,
+        targetOutputs,
+        '0',
+        feeRate,
+        MultisigConfigModel.fromObject({
+          walletId: walletId1,
+          r: 1,
+          m: 2,
+          n: 3,
+          addresses: ['ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y', 'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y', 'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda'],
+          fullPayload: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sqv8hxhzc8r3pqtcuuym7j5fkumtcrc2ucqe3z37y'
+        })
+      )
+
+      const inputCapacities = tx.inputs!
+        .map(input => BigInt(input.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs!
+        .map(output => BigInt(output.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.multiSignWitness(1, 2, 3)
+
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+      expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+      expect(tx.fee).toEqual(expectedFee.toString())
+      targetOutputs.map((o, index) => {
+        if (index !== targetOutputs.length - 1) {
+          expect(o.capacity).toEqual(tx.outputs![index].capacity)
+        }
+      })
+      const totalCapacities: bigint = BigInt(toShannon('3000'))
+      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
     })
   })
 
