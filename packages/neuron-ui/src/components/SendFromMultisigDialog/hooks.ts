@@ -1,57 +1,79 @@
 import { useCallback, useState, useMemo, useEffect } from 'react'
-import { useOutputErrors, outputsToTotalAmount, CapacityUnit, validateOutputs, CKBToShannonFormatter } from 'utils'
+import {
+  useOutputErrors,
+  outputsToTotalAmount,
+  CapacityUnit,
+  validateOutputs,
+  CKBToShannonFormatter,
+  shannonToCKBFormatter,
+} from 'utils'
 import { useDispatch } from 'states'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { generateMultisigTx, MultisigConfig } from 'services/remote'
+import { generateMultisigTx, MultisigConfig, generateMultisigSendAllTx } from 'services/remote'
 import { TFunction } from 'i18next'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
+Object.defineProperty(generateMultisigTx, 'type', {
+  value: 'common',
+})
+Object.defineProperty(generateMultisigSendAllTx, 'type', {
+  value: 'all',
+})
 
-const generateMultisigTxWith = ({
+const generateMultisigTxWith = (generator: typeof generateMultisigTx | typeof generateMultisigSendAllTx) => ({
   sendInfoList,
   multisigConfig,
   dispatch,
   setErrorMessage,
   t,
+  isMainnet,
 }: {
   sendInfoList: { address: string | undefined; amount: string | undefined; unit: CapacityUnit }[]
   multisigConfig: MultisigConfig
   dispatch: StateDispatch
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   t: TFunction
+  isMainnet: boolean
 }) => {
-  const realParams = {
-    items: sendInfoList.map(item => ({
-      address: item.address || '',
-      capacity: CKBToShannonFormatter(item.amount, item.unit),
-    })),
-    multisigConfig,
-  }
-  generateMultisigTx(realParams)
-    .then((res: any) => {
-      if (res.status === 1) {
+  try {
+    const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
+    validateOutputs(sendInfoList, isMainnet, type === 'all')
+    const realParams = {
+      items: sendInfoList.map(item => ({
+        address: item.address || '',
+        capacity: CKBToShannonFormatter(item.amount, item.unit),
+      })),
+      multisigConfig,
+    }
+    return generator(realParams)
+      .then((res: any) => {
+        if (res.status === 1) {
+          dispatch({
+            type: AppActions.UpdateGeneratedTx,
+            payload: res.result,
+          })
+          return res.result
+        }
+        if (res.status === 0 || res.status === 114) {
+          throw new Error(res.message.content)
+        }
+        throw new Error(t(`messages.codes.${res.status}`))
+      })
+      .catch((err: Error) => {
         dispatch({
           type: AppActions.UpdateGeneratedTx,
-          payload: res.result,
+          payload: '',
         })
-        return res.result
-      }
-      if (res.status === 0 || res.status === 114) {
-        throw new Error(res.message.content)
-      }
-      throw new Error(t(`messages.codes.${res.status}`))
-    })
-    .catch((err: Error) => {
-      dispatch({
-        type: AppActions.UpdateGeneratedTx,
-        payload: '',
+        setErrorMessage(err.message)
       })
-      setErrorMessage(err.message)
-    })
+  } catch {
+    // ignore catch
+  }
   dispatch({
     type: AppActions.UpdateGeneratedTx,
     payload: '',
   })
+  return Promise.resolve(undefined)
 }
 export const useSendInfo = ({
   isMainnet,
@@ -118,28 +140,76 @@ export const useSendInfo = ({
   const dispatch = useDispatch()
   const [errorMessage, setErrorMessage] = useState('')
   useEffect(() => {
-    if (outputErrors.some(v => v.addrError || v.amountError)) {
-      return
-    }
     clearTimeout(generateTxTimer)
     setErrorMessage('')
-    const validSendInfoList = sendInfoList.filter(v => v.address && v.amount)
+    const validSendInfoList = sendInfoList.filter(
+      (v, i) => v.address && v.amount && !outputErrors[i].addrError && !outputErrors[i].amountError
+    )
     generateTxTimer = setTimeout(() => {
       dispatch({
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
       if (validSendInfoList.length) {
-        generateMultisigTxWith({
+        generateMultisigTxWith(generateMultisigTx)({
           sendInfoList: validSendInfoList,
           setErrorMessage,
           multisigConfig,
           dispatch,
           t,
+          isMainnet,
         })
       }
     }, 300)
-  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, outputErrors])
+  }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet, outputErrors])
+  const [isSendMax, setIsSendMax] = useState(false)
+  const onSendMaxClick = useCallback(
+    e => {
+      const {
+        dataset: { isOn = 'false' },
+      } = e.currentTarget
+      setIsSendMax(isOn === 'false')
+      if (isOn === 'false') {
+        generateMultisigTxWith(generateMultisigSendAllTx)({
+          sendInfoList,
+          setErrorMessage,
+          multisigConfig,
+          dispatch,
+          t,
+          isMainnet,
+        }).then(res => {
+          if (res.outputs && res.outputs.length) {
+            setSendInfoList(v => [
+              ...v.slice(0, v.length - 1),
+              {
+                ...v[v.length - 1],
+                amount: shannonToCKBFormatter(res.outputs[res.outputs.length - 1].capacity, false, ''),
+                disabled: true,
+              },
+            ])
+          }
+        })
+      } else {
+        setSendInfoList(v => [
+          ...v.slice(0, v.length - 1),
+          {
+            ...v[v.length - 1],
+            amount: '0',
+            disabled: false,
+          },
+        ])
+      }
+    },
+    [setIsSendMax, sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet]
+  )
+  const isMaxBtnDisabled = useMemo(() => {
+    try {
+      validateOutputs(sendInfoList, isMainnet, true)
+    } catch {
+      return true
+    }
+    return false
+  }, [sendInfoList, isMainnet])
   return {
     sendInfoList,
     addSendInfo,
@@ -149,6 +219,9 @@ export const useSendInfo = ({
     outputErrors,
     totalAmount,
     errorMessage,
+    onSendMaxClick,
+    isSendMax,
+    isMaxBtnDisabled,
   }
 }
 
