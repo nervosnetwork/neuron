@@ -91,7 +91,7 @@ export const useSignedStatus = ({
         r = multisigConfig.r - i
       }
     }
-    for (let i = 0; i < (signatures?.[multisigLockHash].length || 0); i++) {
+    for (let i = 0; i < (signatures?.[multisigLockHash]?.length || 0); i++) {
       const blake160 = signatures![multisigLockHash][i]
       if (multisigBlake160s.includes(blake160)) {
         signed += 1

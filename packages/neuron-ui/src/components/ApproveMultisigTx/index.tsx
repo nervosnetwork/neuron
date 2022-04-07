@@ -5,7 +5,8 @@ import Button from 'widgets/Button'
 import Address from 'widgets/Address'
 import { useState as useGlobalState } from 'states'
 import { ckbCore } from 'services/chain'
-import { shannonToCKBFormatter, getScriptFormat } from 'utils'
+import { shannonToCKBFormatter } from 'utils'
+import ScriptTag from 'components/ScriptTag'
 import styles from './approveMultisigTx.module.scss'
 import { useBroadcast, useSignAndBroadcast, useSignAndExport, useSignedStatus, useTabView } from './hooks'
 
@@ -28,7 +29,7 @@ const Cell = React.memo(
           <Address fullPayload={ckbCore.utils.scriptToAddress(cell.lock, isMainnet)} />
           <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
           <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
-          <span className={`${styles.activity} ${styles.tag}`}>{getScriptFormat(cell.lock)}</span>
+          <ScriptTag script={cell.lock} isMainnet={isMainnet} />
         </div>
         <span className={styles.capacity}>{`${shannonToCKBFormatter(cell.capacity)} CKB`}</span>
       </div>
@@ -104,7 +105,7 @@ const ApproveMultisigTx = ({
             ))}
           </>
         )}
-        <div>{t('multisig-address.approve-dialog.status')}</div>
+        <div className={styles.statusTitle}>{t('multisig-address.approve-dialog.status')}</div>
         {!needSignCount && !requiredSignCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
         {!!needSignCount && <div>{`-${t('multisig-address.approve-dialog.signerApprove', { m: needSignCount })}`}</div>}
         {!!requiredSignCount && (

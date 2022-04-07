@@ -85,7 +85,10 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       description,
       asset_account: experimental?.assetAccount,
     })
-  }, [signType, generatedTx, onDismiss, description, experimental])
+    if (onSumbitSuccess) {
+      onSumbitSuccess()
+    }
+  }, [signType, generatedTx, onDismiss, description, experimental, onSumbitSuccess])
 
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 
@@ -334,7 +337,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       payload: { sending: false },
     })
     onDismiss()
-    if (actionType === 'send-from-multisig' && onSumbitSuccess) {
+    if (onSumbitSuccess) {
       onSumbitSuccess()
     }
   }, [
@@ -347,7 +350,6 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
     signType,
     t,
     walletID,
-    actionType,
     multisigConfig,
     onSumbitSuccess,
   ])
