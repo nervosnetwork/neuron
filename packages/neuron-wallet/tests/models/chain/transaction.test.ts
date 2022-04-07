@@ -60,4 +60,75 @@ describe('Transaction', () => {
     const s = Transaction.fromSDK(json)
     expect(s.toSDK()).toEqual(json)
   })
+
+  describe('setSignatures', () => {
+    const sdkTx: CKBComponents.Transaction = {
+      "hash": '',
+      "version": "0x0",
+      "cellDeps": [
+        {
+          "outPoint": {
+            "txHash": "0xc12386705b5cbb312b693874f3edf45c43a274482e27b8df0fd80c8d3f5feb8b",
+            "index": "0x0"
+          },
+          "depType": "depGroup"
+        },
+        {
+          "outPoint": {
+            "txHash": "0x0fb4945d52baf91e0dee2a686cdd9d84cad95b566a1d7409b970ee0a0f364f60",
+            "index": "0x2"
+          },
+          "depType": "code"
+        }
+      ],
+      "headerDeps": [],
+      "inputs": [
+        {
+          "previousOutput": {
+            "txHash": "0x31f695263423a4b05045dd25ce6692bb55d7bba2965d8be16b036e138e72cc65",
+            "index": "0x1"
+          },
+          "since": "0x0"
+        }
+      ],
+      "outputs": [
+        {
+          "capacity": "0x174876e800",
+          "lock": {
+            "codeHash": "0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88",
+            "args": "0x59a27ef3ba84f061517d13f42cf44ed020610061",
+            "hashType": "type"
+          },
+          "type": {
+            "codeHash": "0xece45e0979030e2f8909f76258631c42333b1e906fd9701ec3600a464a90b8f6",
+            "args": "0x",
+            "hashType": "data"
+          }
+        },
+        {
+          "capacity": "0x59e1416a5000",
+          "lock": {
+            "codeHash": "0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88",
+            "args": "0x59a27ef3ba84f061517d13f42cf44ed020610061",
+            "hashType": "type"
+          },
+          "type": null
+        }
+      ],
+      "outputsData": ["0x1234", "0x"],
+      "witnesses": [
+        "0x82df73581bcd08cb9aa270128d15e79996229ce8ea9e4f985b49fbf36762c5c37936caf3ea3784ee326f60b8992924fcf496f9503c907982525a3436f01ab32900"
+      ]
+    }
+    const tx = Transaction.fromSDK(sdkTx)
+
+    it('lockHash not exist', () => {
+      tx.setSignatures('lockhash', 'blake1')
+      expect(tx.signatures['lockhash']).toHaveLength(1)
+    })
+    it('lockHash exist', () => {
+      tx.setSignatures('lockhash', 'blake2')
+      expect(tx.signatures['lockhash']).toHaveLength(2)
+    })
+  })
 })

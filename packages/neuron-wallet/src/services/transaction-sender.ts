@@ -27,7 +27,12 @@ import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressParser from 'models/address-parser'
 import HardwareWalletService from './hardware'
-import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, SignTransactionFailed } from 'exceptions'
+import {
+  CapacityNotEnoughForChange,
+  CapacityNotEnoughForChangeByTransfer,
+  MultisigConfigNeedError,
+  SignTransactionFailed
+} from 'exceptions'
 import AssetAccountInfo from 'models/asset-account-info'
 import MultisigConfigModel from 'models/multisig-config'
 import { Hardware } from './hardware/hardware'
@@ -301,6 +306,9 @@ export default class TransactionSender {
     }
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
+      if (!multisigConfig) {
+        throw new MultisigConfigNeedError()
+      }
       const multisigArgses = multisigConfig.addresses.map(v => addressToScript(v).args)
       const [privateKey, blake160] = findPrivateKeyAndBlake160(multisigArgses, tx.signatures?.[lockHash])
 
@@ -346,7 +354,8 @@ export default class TransactionSender {
       } else {
         wit.lock = witnessesArgs[0].witnessArgs.lock + wit.lock
       }
-      const signStatus = getMultisigStatus(multisigConfig, transaction.signatures)
+      tx.setSignatures(lockHash, blake160!)
+      const signStatus = getMultisigStatus(multisigConfig, tx.signatures)
       if (signStatus === SignStatus.Signed) {
         witnesses[0] = serializeWitnessArgs(wit.toSDK())
       } else {
@@ -356,7 +365,6 @@ export default class TransactionSender {
       for (let i = 0; i < witnessesArgs.length; ++i) {
         witnessesArgs[i].witness = witnesses[i] as string
       }
-      tx.setSignatures(lockHash, blake160!)
     }
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
     tx.hash = txHash
