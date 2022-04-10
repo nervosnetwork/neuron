@@ -105,6 +105,17 @@ declare namespace State {
     }
   }
 
+  interface SUDTAccount {
+    accountId: string
+    accountName?: string
+    tokenName?: string
+    symbol?: string
+    balance: string
+    tokenId: string
+    address: string
+    decimal: string
+  }
+
   type AlertDialog = Record<'title' | 'message', string> | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
 
@@ -250,6 +261,7 @@ declare namespace State {
     wallet: Wallet
     nervosDAO: NervosDAO
     updater: AppUpdater
+    sUDTAccounts: SUDTAccount[]
     experimental: { tx: any; assetAccount?: any } | null
   }
 }

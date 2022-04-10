@@ -7,7 +7,6 @@ import Experimental from 'widgets/ExperimentalRibbon'
 import {
   unlockSpecialAsset,
   getSpecialAssets,
-  getSUDTAccountList,
   generateWithdrawChequeTransaction,
   generateClaimChequeTransaction,
 } from 'services/remote'
@@ -25,6 +24,16 @@ import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
 import { TokenInfo } from 'components/SUDTCreateDialog'
+import SUDTMigrateDialog from 'components/SUDTMigrateDialog'
+import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDialog'
+import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
+import {
+  useMigrate,
+  useClickMigrate,
+  useMigrateToNewAccount,
+  useMigrateToExistAccount,
+  useGetAssetAccounts,
+} from './hooks'
 import styles from './specialAssetList.module.scss'
 
 const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
@@ -66,7 +75,29 @@ const SpecialAssetList = () => {
     account: Controller.GenerateClaimChequeTransaction.AssetAccount
     tx: any
   } | null>(null)
-  const [accountNames, setAccountNames] = useState<string[]>([])
+  const [migrateCell, setMigrateCell] = useState<SpecialAssetCell | undefined>()
+  const [migrateTokenInfo, setMigrateTokenInfo] = useState<Controller.GetTokenInfoList.TokenInfo | undefined>()
+  const { dialogRef, openDialog, closeDialog } = useMigrate()
+  const {
+    dialogRef: newAccountDialog,
+    openDialog: openNewAccount,
+    closeDialog: closeNewAccount,
+  } = useMigrateToNewAccount()
+  const {
+    dialogRef: existAccountDialog,
+    openDialog: openExistAccount,
+    closeDialog: closeExistAccount,
+  } = useMigrateToExistAccount()
+  const onClickMigrate = useClickMigrate({
+    closeMigrateDialog: closeDialog,
+    openMigrateToNewAccountDialog: openNewAccount,
+    openMigrateToExistAccountDialog: openExistAccount,
+  })
+  const onCloseDialog = useCallback(() => {
+    closeExistAccount()
+    closeNewAccount()
+    setMigrateCell(undefined)
+  }, [closeNewAccount, closeExistAccount, setMigrateCell])
 
   const {
     app: { epoch, globalDialog },
@@ -77,9 +108,11 @@ const SpecialAssetList = () => {
       connectionStatus,
       syncState: { bestKnownBlockTimestamp },
     },
+    sUDTAccounts,
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
+  const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
   const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
     ? {
         ...accountToClaim.account,
@@ -119,14 +152,7 @@ const SpecialAssetList = () => {
       }
     : undefined
 
-  useEffect(() => {
-    getSUDTAccountList({ walletID: id }).then(res => {
-      if (isSuccessResponse(res)) {
-        const names = res.result.filter((a: { id: string }) => a.id).map((a: { accountName: string }) => a.accountName)
-        setAccountNames(names)
-      }
-    })
-  }, [id, setAccountNames])
+  useGetAssetAccounts(id)
 
   useEffect(() => {
     dispatch({ type: AppActions.ClearSendState })
@@ -257,16 +283,20 @@ const SpecialAssetList = () => {
           }
           break
         }
+        case PresetScript.SUDT: {
+          openDialog()
+          setMigrateCell(cell)
+          const findTokenInfo = tokenInfoList.find(info => info.tokenID === cell.type?.args)
+          setMigrateTokenInfo(findTokenInfo)
+          break
+        }
         default: {
           // ignore
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, history]
+    [cells, id, dispatch, setAccountToClaim, history, openDialog, tokenInfoList]
   )
-
-  // eslint-disable-next-line no-console
-  console.log(cells)
 
   const list = useMemo(() => {
     return cells.map(({ outPoint, timestamp, customizedAssetInfo, data, lock, type, capacity }) => {
@@ -327,6 +357,34 @@ const SpecialAssetList = () => {
         ) : null}
       </div>
       {updateAccountDialogProps ? <SUDTUpdateDialog {...updateAccountDialogProps} /> : null}
+      {migrateCell && (
+        <dialog className={styles.migrateSelectDialog} ref={dialogRef}>
+          <SUDTMigrateDialog cell={migrateCell} openDialog={onClickMigrate} />
+        </dialog>
+      )}
+      {migrateCell && (
+        <dialog className={styles.dialog} ref={newAccountDialog}>
+          <SUDTMigrateToNewAccountDialog
+            cell={migrateCell}
+            closeDialog={onCloseDialog}
+            sUDTAccounts={sUDTAccounts}
+            walletID={id}
+            tokenInfo={migrateTokenInfo}
+          />
+        </dialog>
+      )}
+      {migrateCell && (
+        <dialog className={styles.dialog} ref={existAccountDialog}>
+          <SUDTMigrateToExistAccountDialog
+            cell={migrateCell}
+            closeDialog={onCloseDialog}
+            tokenInfo={migrateTokenInfo}
+            sUDTAccounts={sUDTAccounts}
+            isMainnet={isMainnet}
+            walletID={id}
+          />
+        </dialog>
+      )}
     </div>
   )
 }

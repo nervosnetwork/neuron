@@ -42,3 +42,5 @@ export const getSUDTTypeScriptHash = remoteApi<
   Controller.GetSUDTTokenInfo.Params,
   Controller.GetSUDTTokenInfo.Response
 >('get-sudt-type-script-hash')
+
+export const generateSudtMigrateAcpTx = remoteApi('generate-sudt-migrate-acp-tx')

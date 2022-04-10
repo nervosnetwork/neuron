@@ -92,4 +92,12 @@ export default class AnyoneCanPayController {
       result: new AssetAccountInfo().infos.anyoneCanPay
     }
   }
+
+  public async generateSudtMigrateAcpTx(params: { outPoint: CKBComponents.OutPoint; acpAddress?: string }) {
+    const tx = await AnyoneCanPayService.generateSudtMigrateAcpTx(params.outPoint, params.acpAddress)
+    return {
+      status: ResponseCode.Success,
+      result: tx
+    }
+  }
 }

@@ -766,7 +766,26 @@
       "no-special-assets": "No customized assets",
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
-      "transfer-nft": "Send"
+      "transfer-nft": "Send",
+      "user-defined-token": "Migrate"
+    },
+    "migrate-sudt": {
+      "title": "Migrate to a sUDT Asset Account",
+      "turn-into-new-account": {
+        "title": "Turn into a new sUDT Asset Account",
+        "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      },
+      "transfer-to-exist-account": {
+        "title": "Transfer to a sUDT Asset Account",
+        "sub-title": "Transfer all sUDT balance to an existing sUDT Account, please make sure the target account is alive"
+      },
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "balance": "Balance",
+      "amount": "Amount",
+      "address": "Address"
     },
     "customized-asset": {
       "actions": {

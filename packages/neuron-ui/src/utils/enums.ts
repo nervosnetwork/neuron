@@ -122,6 +122,7 @@ export enum SyncStatus {
 export enum PresetScript {
   Locktime = 'SingleMultiSign',
   Cheque = 'Cheque',
+  SUDT = 'SUDT',
 }
 
 export enum CompensationPeriod {

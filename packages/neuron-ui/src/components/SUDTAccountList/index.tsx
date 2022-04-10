@@ -8,7 +8,7 @@ import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDi
 import Experimental from 'widgets/ExperimentalRibbon'
 import Spinner from 'widgets/Spinner'
 
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import {
   isMainnet as isMainnetUtil,
   RoutePath,
@@ -16,7 +16,6 @@ import {
   CONSTANTS,
   getSyncStatus,
   getCurrentUrl,
-  sortAccounts,
   isSuccessResponse,
   useIsInsufficientToCreateSUDTAccount,
   useOnGenerateNewAccountTransaction,
@@ -40,10 +39,10 @@ const SUDTAccountList = () => {
       syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
     },
     settings: { networks = [] },
+    sUDTAccounts,
   } = useGlobalState()
   const dispatch = useDispatch()
 
-  const [accounts, setAccounts] = useState<SUDTAccount[]>([])
   const [keyword, setKeyword] = useState('')
   const [dialog, setDialog] = useState<{ id: string; action: 'create' | 'update' } | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -51,7 +50,7 @@ const SUDTAccountList = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const existingAccountNames = accounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
+  const existingAccountNames = sUDTAccounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
 
   useEffect(() => {
     checkMigrateAcp().then(res => {
@@ -82,27 +81,16 @@ const SUDTAccountList = () => {
         throw new Error(res.message.toString())
       })
       .then((list: Controller.GetSUDTAccountList.Response) => {
-        setAccounts(
-          list
-            .filter(account => account.id !== undefined)
-            .sort(sortAccounts)
-            .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal }) => ({
-              accountId: id!.toString(),
-              accountName,
-              tokenName,
-              symbol,
-              balance: accountBalance,
-              address,
-              decimal,
-              tokenId: tokenID,
-            }))
-        )
+        dispatch({
+          type: NeuronWalletActions.GetSUDTAccountList,
+          payload: list,
+        })
       })
       .catch((err: Error) => console.error(err))
       .finally(() => {
         setIsLoaded(true)
       })
-  }, [walletId, setAccounts, setIsLoaded])
+  }, [walletId, setIsLoaded, dispatch])
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined
@@ -121,7 +109,7 @@ const SUDTAccountList = () => {
         payload: null,
       })
     }
-  }, [walletId, setAccounts, dispatch, isMainnet, fetchAndUpdateList])
+  }, [walletId, dispatch, isMainnet, fetchAndUpdateList])
 
   const onClick = (e: any) => {
     const {
@@ -141,7 +129,7 @@ const SUDTAccountList = () => {
         break
       }
       case 'receive': {
-        const account = accounts.find(a => a.accountId === id)
+        const account = sUDTAccounts.find(a => a.accountId === id)
         if (!account) {
           break
         }
@@ -189,17 +177,17 @@ const SUDTAccountList = () => {
   }, [setDialog])
 
   const filteredAccounts = keyword
-    ? accounts.filter(
+    ? sUDTAccounts.filter(
         account =>
           account.accountName?.toLowerCase().includes(keyword.toLowerCase()) ||
           account.tokenName?.toLowerCase().includes(keyword.toLowerCase()) ||
           account.symbol?.toLowerCase().includes(keyword.toLowerCase()) ||
           account.tokenId.toLowerCase() === keyword.toLowerCase()
       )
-    : accounts
+    : sUDTAccounts
 
   const accountToUpdate =
-    dialog && dialog.action === 'update' && accounts.find(account => account.accountId === dialog.id)
+    dialog && dialog.action === 'update' && sUDTAccounts.find(account => account.accountId === dialog.id)
 
   const updateDialogProps: SUDTUpdateDialogProps | undefined = accountToUpdate
     ? {

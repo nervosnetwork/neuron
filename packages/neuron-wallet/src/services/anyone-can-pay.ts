@@ -9,9 +9,11 @@ import AssetAccountEntity from 'database/chain/entities/asset-account'
 import { TargetOutputNotFoundError } from 'exceptions'
 import { AcpSendSameAccountError } from 'exceptions'
 import Script from 'models/chain/script'
+import OutPoint from 'models/chain/out-point'
 import LiveCellService from './live-cell-service'
 import WalletService from './wallets'
 import SystemScriptInfo from 'models/system-script-info'
+import CellsService from './cells'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -90,5 +92,14 @@ export default class AnyoneCanPayService {
     tx.description = description || ''
 
     return tx
+  }
+
+  public static async generateSudtMigrateAcpTx(outPoint: CKBComponents.OutPoint, acpAddress?: string) {
+    const sudtLiveCell = await CellsService.getLiveCell(OutPoint.fromSDK(outPoint))
+    if (!sudtLiveCell) {
+      throw new Error('sudt live cell not found')
+    }
+
+    return await TransactionGenerator.generateSudtMigrateAcpTx(sudtLiveCell, acpAddress)
   }
 }

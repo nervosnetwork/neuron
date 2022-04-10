@@ -1,5 +1,5 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react'
-import { useDialog, isSuccessResponse } from 'utils'
+import React, { useCallback, useState, useEffect } from 'react'
+import { useDialogWrapper, isSuccessResponse } from 'utils'
 import { MultisigOutputUpdate } from 'services/subjects'
 import {
   MultisigConfig,
@@ -34,32 +34,6 @@ export const useSearch = (clearSelected: () => void) => {
     onSearch('')
   }, [onSearch])
   return { keywords, onKeywordsChange, setKeywords, onSearch, searchKeywords, onClear }
-}
-
-export const useDialogWrapper = ({
-  onClose,
-}: {
-  onClose?: () => void
-} = {}) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const openDialog = useCallback(() => {
-    setIsDialogOpen(true)
-  }, [setIsDialogOpen])
-  const closeDialog = useCallback(() => {
-    setIsDialogOpen(false)
-  }, [setIsDialogOpen])
-  useDialog({
-    show: isDialogOpen,
-    dialogRef,
-    onClose: onClose || closeDialog,
-  })
-  return {
-    isDialogOpen,
-    openDialog,
-    closeDialog,
-    dialogRef,
-  }
 }
 
 export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {

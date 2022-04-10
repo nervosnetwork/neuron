@@ -508,7 +508,7 @@
         "115": "您需要有足够的余额来支付找零（大于 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
-        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}。",
+        "203": "$t(messages.fields.{{fieldName}})太长, 其长度应不超过 {{length}}。",
         "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短, 其长度应不小于 {{length}}。",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效。",
         "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其小数位应不超过 {{length}} 位。",
@@ -752,6 +752,7 @@
       "locked-asset": "已锁定",
       "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日(锁定时间根据区块链实际运行情况会有一定的误差)。",
       "withdraw-asset-tooltip": "预计解锁时间为 {{year}}年{{month}}月{{day}}日 {{hour}}时{{minute}}分(根据区块链实际运行情况会有一定的误差)。",
+      "user-defined-token-tooltip": "将sUDT资产转移到sUDT账户",
       "claim-asset": "领取",
       "withdraw-asset": "撤回",
       "view-details": "查看详情",
@@ -759,7 +760,26 @@
       "no-special-assets": "没有自定义资产",
       "experimental": "实验室",
       "unknown-asset": "未知资产",
-      "transfer-nft": "转让"
+      "transfer-nft": "转让",
+      "user-defined-token": "迁移"
+    },
+    "migrate-sudt": {
+      "title": "迁移至 sUDT 资产账户",
+      "turn-into-new-account": {
+        "title": "转换成新的 sUDT 资产账户",
+        "sub-title": "将 sUDT 资产转换成 sUDT 资产账户, 至少占用 142 CKBytes",
+        "cancel": "取消",
+        "confirm": "确认"
+      },
+      "transfer-to-exist-account": {
+        "title": "转入 sUDT 账户",
+        "sub-title": "将全部 sUDT 余额转入已存在的 sUDT 资产账户, 请确保目标账户存在"
+      },
+      "cancel": "取消",
+      "confirm": "确认",
+      "balance": "余额",
+      "amount": "数量",
+      "address": "地址"
     },
     "customized-asset": {
       "actions": {

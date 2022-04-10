@@ -17,8 +17,8 @@ import SystemScriptInfo from '../../../src/models/system-script-info'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
-import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { CapacityNotEnough, LiveCapacityNotEnough } from '../../../src/exceptions/wallet'
+import { serializeWitnessArgs, AddressPrefix, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough, MigrateSudtCellNoTypeError, TargetOutputNotFoundError } from '../../../src/exceptions'
 import LiveCell from '../../../src/models/chain/live-cell'
 import AddressGenerator from '../../../src/models/address-generator'
 import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
@@ -58,6 +58,16 @@ const stubbedQueryIndexer = jest.fn()
 jest.doMock('../../../src/block-sync-renderer/index', () => {
   return {queryIndexer: stubbedQueryIndexer}
 });
+const getCurrentMock = jest.fn()
+jest.doMock('../../../src/services/wallets', () => ({
+  getInstance() {
+    return {
+      getCurrent: getCurrentMock
+    }
+  }
+}))
+
+
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 import AssetAccount from '../../../src/models/asset-account'
@@ -2521,4 +2531,123 @@ describe('TransactionGenerator', () => {
       });
     });
   });
+
+  describe('generateSudtMigrateAcpTx', () => {
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellObject = {
+      capacity: toShannon('142'),
+      lock: alice.lockScript,
+      type: assetAccountInfo.generateSudtScript('0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03'),
+      data: BufferUtils.writeBigUInt128LE(BigInt(100))
+    }
+    it('no wallet', async () => {
+      getCurrentMock.mockReturnValueOnce(undefined)
+      expect(TransactionGenerator.generateSudtMigrateAcpTx(Output.fromObject(sudtCellObject))).rejects.toThrow(new CurrentWalletNotSet())
+    })
+
+    describe('with acp address', () => {
+      let receiverAcpCell: OutputEntity
+      let secpCell: OutputEntity
+      const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+      beforeEach(async () => {
+        receiverAcpCell = generateCell(
+          toShannon('1000'),
+          OutputStatus.Live,
+          true,
+          sudtCellObject.type!,
+          {lockScript: bobAnyoneCanPayLockScript},
+          undefined,
+          BufferUtils.writeBigUInt128LE(BigInt(100))
+        )
+        secpCell = generateCell(
+          toShannon('100'),
+          OutputStatus.Live,
+          false,
+          null,
+          { lockScript: alice.lockScript },
+        )
+        await getConnection().manager.save([receiverAcpCell, secpCell])
+      })
+      it('sudt cell no type',async () => {
+        getCurrentMock.mockReturnValueOnce({})
+        const sudtCell = Output.fromObject(sudtCellObject)
+        sudtCell.type = null
+        expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, 'acpAddress')).rejects.toThrow(new MigrateSudtCellNoTypeError())
+      })
+      it('acp address is invalid', async () => {
+        getCurrentMock.mockReturnValueOnce({})
+        const sudtCell = Output.fromObject(sudtCellObject)
+        expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, 'ckt1qyq0tejcz8rl6yyjw3m3vnu7r955d9ecj9gq46suu6')).rejects.toThrow(new TargetOutputNotFoundError())
+      })
+      it('sudt capacitity is enough', async () => {
+        const sudtCell = Output.fromObject(sudtCellObject)
+        sudtCell.setCapacity(toShannon('144'))
+        getCurrentMock.mockReturnValueOnce({})
+        const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
+        const res = await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash) as Transaction
+        expect(res.outputs).toHaveLength(2)
+        expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+      })
+      it('sudt capacitity is not enough', async () => {
+        const sudtCell = Output.fromObject(sudtCellObject)
+        getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
+        const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
+        const res = await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash) as Transaction
+        expect(res.outputs).toHaveLength(3)
+        expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+        expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee)).toString())
+      })
+    })
+
+    describe('create new acp address', () => {
+      let receiverAcpCell: OutputEntity
+      const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+      beforeEach(async () => {
+        receiverAcpCell = generateCell(
+          toShannon('1000'),
+          OutputStatus.Live,
+          true,
+          sudtCellObject.type!,
+          {lockScript: bobAnyoneCanPayLockScript},
+          undefined,
+          BufferUtils.writeBigUInt128LE(BigInt(100))
+        )
+        await getConnection().manager.save([receiverAcpCell])
+      })
+      it('new account create', async () => {
+        const sudtCell = Output.fromObject(sudtCellObject)
+        sudtCell.setCapacity(toShannon('144'))
+        getCurrentMock.mockReturnValueOnce({
+          id: alice.walletId,
+          getNextChangeAddress: () => ({ address: alice.address }),
+          isHDWallet: () => true,
+          getNextReceivingAddresses: () => [{ blake160: alice.publicKeyInBlake160 }]
+        })
+        const res = await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell) as Transaction
+        expect(res.outputs).toHaveLength(1)
+        expect(res.outputs[0].data).toEqual(sudtCell.data)
+        expect(res.outputs[0].capacity).toEqual((BigInt(sudtCell.capacity) - BigInt(res.fee)).toString())
+      })
+
+      it('account capacity is not enough', async () => {
+        const sudtCell = Output.fromObject(sudtCellObject)
+        getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
+        expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell)).rejects.toThrow()
+      })
+
+      it('account capacity not enough for change', async () => {
+        const secpCell = generateCell(
+          toShannon('61'),
+          OutputStatus.Live,
+          false,
+          null,
+          { lockScript: alice.lockScript },
+        )
+        await getConnection().manager.save([receiverAcpCell, secpCell])
+        const sudtCell = Output.fromObject(sudtCellObject)
+        getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
+        expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell)).rejects.toThrow()
+      })
+    })
+  })
 })

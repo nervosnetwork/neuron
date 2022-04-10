@@ -1,9 +1,9 @@
-import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
-import { CapacityTooSmall } from 'exceptions'
+import CellsService from 'services/cells'
+import { CapacityTooSmall, MigrateSudtCellNoTypeError, TargetOutputNotFoundError } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
-import { CapacityNotEnough, LiveCapacityNotEnough } from 'exceptions/wallet'
+import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough } from 'exceptions/wallet'
 import Output from 'models/chain/output'
 import Input from 'models/chain/input'
 import OutPoint from 'models/chain/out-point'
@@ -25,6 +25,9 @@ import AssetAccount from 'models/asset-account'
 import AddressService from 'services/addresses'
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import MultisigConfigModel from 'models/multisig-config'
+import WalletService from 'services/wallets'
+import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from 'utils/const'
+import AssetAccountService from 'services/asset-account-service'
 
 export interface TargetOutput {
   address: string
@@ -1329,6 +1332,131 @@ export class TransactionGenerator {
     TransactionGenerator.checkTxCapacity(tx, 'generateWithdrawChequeTx capacity not match!')
     TransactionGenerator.checkTxSudtAmount(tx, 'generateWithdrawChequeTx sUDT amount not match!', assetAccountInfo)
 
+    return tx
+  }
+
+  public static async generateSudtMigrateAcpTx(
+    sudtCell: Output,
+    acpAddress?: string,
+    fee: string = '0',
+    feeRate: string = '1000'
+  ) {
+    const currentWallet = WalletService.getInstance().getCurrent()
+    if (!currentWallet) {
+      throw new CurrentWalletNotSet()
+    }
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtMigrateAcpInput = [
+      Input.fromObject({
+        previousOutput: sudtCell.outPoint!,
+        capacity: sudtCell.capacity,
+        lock: sudtCell.lock,
+        type: sudtCell.type,
+        lockHash: sudtCell.lockHash,
+        data: sudtCell.data,
+        since: '0'
+      })
+    ]
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    let outputs: Output[] = []
+    if (acpAddress) {
+      if (!sudtCell.type) {
+        throw new MigrateSudtCellNoTypeError()
+      }
+      const receiverAcpCells = await CellsService.getACPCells(
+        Script.fromSDK(addressToScript(acpAddress)),
+        sudtCell.type
+      )
+      if (!receiverAcpCells.length) {
+        throw new TargetOutputNotFoundError()
+      }
+      const receiverAcpCell = receiverAcpCells[0]
+      const receiverAcpInputAmount = BufferUtils.readBigUInt128LE(receiverAcpCell.data)
+      const sudtCellAmount = BufferUtils.readBigUInt128LE(sudtCell.data)
+      const receiverAcpOutputAmount = receiverAcpInputAmount + sudtCellAmount
+      sudtCell.setData('0x')
+      sudtCell.setType(null)
+      outputs = [
+        sudtCell,
+        Output.fromObject({
+          capacity: receiverAcpCell.capacity,
+          lock: receiverAcpCell.lockScript(),
+          type: receiverAcpCell.typeScript(),
+          data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount)
+        })
+      ]
+      const receiverAcpCellModel = receiverAcpCell.toModel()
+      sudtMigrateAcpInput.push(
+        Input.fromObject({
+          previousOutput: receiverAcpCellModel.outPoint!,
+          capacity: receiverAcpCellModel.capacity,
+          lock: receiverAcpCellModel.lock,
+          type: receiverAcpCellModel.type,
+          lockHash: receiverAcpCellModel.lockHash,
+          data: receiverAcpCellModel.data,
+          since: '0'
+        })
+      )
+    } else {
+      const addresses = await currentWallet.getNextReceivingAddresses()
+      const usedBlake160s = new Set(await AssetAccountService.blake160sOfAssetAccounts())
+      const addrObj = !currentWallet.isHDWallet() ? addresses[0] : addresses.find(a => !usedBlake160s.has(a.blake160))!
+      sudtCell.setLock(assetAccountInfo.generateAnyoneCanPayScript(addrObj.blake160))
+      outputs = [sudtCell]
+    }
+
+    const tx = Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      inputs: sudtMigrateAcpInput,
+      outputs: outputs,
+      outputsData: outputs.map(v => v.data || '0x'),
+      witnesses: []
+    })
+
+    const txSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
+    tx.fee = TransactionFee.fee(txSize, BigInt(feeRate)).toString()
+    const outputCapacity = BigInt(sudtCell.capacity) - BigInt(tx.fee)
+    if (outputCapacity >= BigInt(MIN_SUDT_CAPACITY)) {
+      tx.outputs[0].capacity = outputCapacity.toString()
+      return tx
+    }
+    tx.inputs = []
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
+      '0',
+      currentWallet.id,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      sudtMigrateAcpInput.map(v => ({
+        input: v,
+        witness: WitnessArgs.emptyLock()
+      }))
+    )
+    const finalFeeInt = BigInt(finalFee)
+
+    if (finalFeeInt === BigInt(0)) {
+      throw new LiveCapacityNotEnough()
+    }
+
+    tx.inputs = inputs
+    tx.fee = finalFee
+
+    if (hasChangeOutput) {
+      const unusedChangeAddress = await currentWallet.getNextChangeAddress()
+      const changeBlake160: string = AddressParser.toBlake160(unusedChangeAddress!.address)
+      const changeCapacity = BigInt(capacities) - finalFeeInt
+      const changeOutput = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
+      tx.addOutput(changeOutput)
+    }
     return tx
   }
 

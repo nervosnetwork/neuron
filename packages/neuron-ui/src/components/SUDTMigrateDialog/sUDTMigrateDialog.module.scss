@@ -1,0 +1,33 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  padding: 12px 48px;
+}
+
+.actionContainer {
+  border: 1px solid #000;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  cursor: pointer !important;
+
+  * {
+    cursor: pointer !important;
+  }
+
+  .subTitle {
+    font-size: 12px;
+  }
+
+  &.disabled {
+    cursor: not-allowed !important;
+    background-color: #eee;
+    * {
+      cursor: not-allowed !important;
+    }
+  }
+}
+
+.dialog {
+  @include dialog-container;
+}

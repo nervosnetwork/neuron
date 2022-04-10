@@ -8,7 +8,7 @@
   font-family: inherit;
   grid-area: input;
   color: #434343;
-  border: solid 1px#000000;
+  border: solid 1px #000000;
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
@@ -26,7 +26,7 @@
   & > input {
     border: none;
     width: 100%;
-    padding: 4.5px 10px;
+    padding: 4px 24px 4px 12px;
   }
 }
 
@@ -34,17 +34,13 @@
   border-color: #999 transparent transparent;
   border-style: solid;
   border-width: 5px 5px 0;
-  content: ' ';
-  display: block;
-  height: 0;
-  margin-top: -ceil(2.5);
   position: absolute;
-  right: 10px;
-  top: 14px;
-  width: 0
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-.is-open .arrow {
+.isOpen .arrow {
   border-color: transparent transparent #999;
   border-width: 0 5px 5px;
 }
