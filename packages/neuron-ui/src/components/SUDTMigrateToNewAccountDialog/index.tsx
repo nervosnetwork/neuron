@@ -35,7 +35,7 @@ const SUDTMigrateToNewAccountDialog = ({
   const { tokenInfo, tokenInfoErrors, onChangeTokenInfo } = useTokenInfo({
     tokenInfo: findTokenInfo,
     t,
-    type: cell.type,
+    tokenId: cell.type?.args,
     sUDTAccounts,
   })
   const confirmDisabled = useMemo(() => fields.some(v => tokenInfoErrors[v.key] || !tokenInfo[v.key]), [
@@ -94,7 +94,7 @@ const SUDTMigrateToNewAccountDialog = ({
             value={tokenInfo[field.key]}
             required
             error={tokenInfoErrors[field.key]}
-            disabled={!!findTokenInfo && field.key !== 'accountName'}
+            disabled={(!!findTokenInfo && field.key !== 'accountName') || field.key === 'tokenId'}
             autoFocus
           />
         ))}

@@ -11,15 +11,16 @@ export const useTokenInfo = ({
   tokenInfo: findTokenInfo,
   t,
   sUDTAccounts,
+  tokenId,
 }: {
-  type: CKBComponents.Script | null
+  tokenId?: string
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
   t: TFunction
   sUDTAccounts: State.SUDTAccount[]
 }) => {
   const [tokenInfo, setTokenInfo] = useState<TokenInfoType>({
     accountName: '',
-    tokenId: '',
+    tokenId: tokenId || '',
     symbol: '',
     tokenName: '',
     decimal: '',
