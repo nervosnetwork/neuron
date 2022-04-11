@@ -127,8 +127,8 @@ export default {
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
       'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
       'migrate-sudt-no-type': 'The migrating cell does not have type script',
-      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be confirmed',
-      'multisig-not-signed': 'Partial signatures are missing for multisig transactions'
+      'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
+      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved'
     },
     messageBox: {
       button: {

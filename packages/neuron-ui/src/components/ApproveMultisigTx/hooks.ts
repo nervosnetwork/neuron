@@ -84,7 +84,7 @@ export const useSignedStatus = ({
   const multisigBlake160s = useMemo(() => multisigConfig.addresses.map(v => addressToScript(v).args), [
     multisigConfig.addresses,
   ])
-  const [requiredSignCount, needSignCount] = useMemo(() => {
+  const [lackOfRCount, lackOfMCount] = useMemo(() => {
     let [r, signed] = [0, 0]
     for (let i = 0; i < multisigConfig.r; i++) {
       if (!signatures?.[multisigLockHash]?.includes(multisigBlake160s[i])) {
@@ -99,7 +99,7 @@ export const useSignedStatus = ({
     }
     return [r, multisigConfig.m >= signed ? multisigConfig.m - signed : 0]
   }, [signatures, multisigLockHash, multisigConfig, multisigBlake160s])
-  return [requiredSignCount, needSignCount]
+  return [lackOfRCount, lackOfMCount]
 }
 
 export const useSignAndBroadcast = ({

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { MultisigConfig, OfflineSignJSON } from 'services/remote'
 import Button from 'widgets/Button'
-import Address from 'widgets/Address'
+import CopyZoneAddress from 'widgets/CopyZoneAddress'
 import { useState as useGlobalState } from 'states'
 import { ckbCore } from 'services/chain'
 import { shannonToCKBFormatter } from 'utils'
@@ -26,7 +26,7 @@ const Cell = React.memo(
     return (
       <div className={styles.cellItem}>
         <div>
-          <Address fullPayload={ckbCore.utils.scriptToAddress(cell.lock, isMainnet)} />
+          <CopyZoneAddress fullPayload={ckbCore.utils.scriptToAddress(cell.lock, isMainnet)} />
           <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
           <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
           <ScriptTag script={cell.lock} isMainnet={isMainnet} />
@@ -52,7 +52,7 @@ const ApproveMultisigTx = ({
   const jsonContent = useMemo(() => {
     return JSON.stringify(offlineSignJson, null, 2)
   }, [offlineSignJson])
-  const [requiredSignCount, needSignCount] = useSignedStatus({
+  const [lackOfRCount, lackOfMCount] = useSignedStatus({
     multisigConfig,
     signatures: offlineSignJson.transaction.signatures,
   })
@@ -60,14 +60,14 @@ const ApproveMultisigTx = ({
     multisigConfig,
     walletID: wallet.id,
     offlineSignJson,
-    onlyNeedOne: needSignCount === 1,
+    onlyNeedOne: lackOfMCount === 1,
   })
   const onBroadcast = useBroadcast({ offlineSignJson, walletID: wallet.id, closeDialog, t })
   const onSignAndBroadcast = useSignAndBroadcast({
     multisigConfig,
     walletID: wallet.id,
     offlineSignJson,
-    onlyNeedOne: needSignCount === 1,
+    onlyNeedOne: lackOfMCount === 1,
     closeDialog,
   })
   const { tabIdx, onTabClick } = useTabView()
@@ -77,7 +77,7 @@ const ApproveMultisigTx = ({
         <Trans
           i18nKey="multisig-address.approve-dialog.title"
           values={multisigConfig}
-          components={[<Address fullPayload={multisigConfig.fullPayload} />]}
+          components={[<CopyZoneAddress fullPayload={multisigConfig.fullPayload} />]}
         />
       </div>
       <h4>{t('multisig-address.approve-dialog.transaction')}</h4>
@@ -107,25 +107,23 @@ const ApproveMultisigTx = ({
           </>
         )}
         <div className={styles.statusTitle}>{t('multisig-address.approve-dialog.status')}</div>
-        {!needSignCount && !requiredSignCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
-        {!!needSignCount && <div>{`-${t('multisig-address.approve-dialog.signerApprove', { m: needSignCount })}`}</div>}
-        {!!requiredSignCount && (
-          <div>{`-${t('multisig-address.approve-dialog.requiredSigner', { r: requiredSignCount })}`}</div>
-        )}
+        {!lackOfMCount && !lackOfRCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
+        {!!lackOfMCount && <div>{`-${t('multisig-address.approve-dialog.signerApprove', { m: lackOfMCount })}`}</div>}
+        {!!lackOfRCount && <div>{`-${t('multisig-address.approve-dialog.requiredSigner', { r: lackOfRCount })}`}</div>}
       </section>
       <div className={styles.action}>
         <Button label={t('multisig-address.approve-dialog.cancel')} type="cancel" onClick={closeDialog} />
-        {!needSignCount && !requiredSignCount && (
+        {!lackOfMCount && !lackOfRCount && (
           <Button label={t('multisig-address.approve-dialog.broadcast')} type="primary" onClick={onBroadcast} />
         )}
-        {needSignCount === 1 && (
+        {lackOfMCount === 1 && (
           <Button
             label={t('multisig-address.approve-dialog.signAndBroadcast')}
             type="primary"
             onClick={onSignAndBroadcast}
           />
         )}
-        {needSignCount > 1 && (
+        {lackOfMCount > 1 && (
           <Button label={t('multisig-address.approve-dialog.signAndExport')} type="primary" onClick={onSignAndExport} />
         )}
       </div>

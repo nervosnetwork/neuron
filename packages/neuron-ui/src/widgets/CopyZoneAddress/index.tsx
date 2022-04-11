@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import CopyZone from 'widgets/CopyZone'
-import styles from './multisigAddress.module.scss'
+import styles from './copyZoneAddress.module.scss'
 
 const Address = ({ fullPayload, className }: { fullPayload: string; className?: string }) => {
   const [t] = useTranslation()

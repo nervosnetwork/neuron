@@ -7,7 +7,7 @@ import TextField from 'widgets/TextField'
 import SendFieldset from 'components/SendFieldset'
 import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount } from 'utils'
 import { useState as useGlobalState } from 'states'
-import Address from 'widgets/Address'
+import CopyZoneAddress from 'widgets/CopyZoneAddress'
 
 import { useSendInfo, useOnSumbit } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
@@ -68,7 +68,7 @@ const SendFromMultisigDialog = ({
         <Trans
           i18nKey="multisig-address.send-ckb.title"
           values={multisigConfig}
-          components={[<Address fullPayload={multisigConfig.fullPayload} />]}
+          components={[<CopyZoneAddress fullPayload={multisigConfig.fullPayload} />]}
         />
       </div>
       <div className={styles.sendContainer}>
