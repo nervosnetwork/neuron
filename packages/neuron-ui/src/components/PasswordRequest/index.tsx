@@ -24,7 +24,7 @@ import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
-const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) => {
+const PasswordRequest = () => {
   const {
     app: {
       send: { description, generatedTx },
@@ -85,10 +85,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       description,
       asset_account: experimental?.assetAccount,
     })
-    if (onSumbitSuccess) {
-      onSumbitSuccess()
-    }
-  }, [signType, generatedTx, onDismiss, description, experimental, onSumbitSuccess])
+  }, [signType, generatedTx, onDismiss, description, experimental])
 
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 
@@ -124,15 +121,6 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
           throw new PasswordIncorrectException()
         }
       }
-      const handleSendMultiTxRes = ({ status }: { status: number }) => {
-        if (isSuccessResponse({ status })) {
-          if (onSumbitSuccess) {
-            onSumbitSuccess()
-          }
-        } else if (status === ErrorCode.PasswordIncorrect) {
-          throw new PasswordIncorrectException()
-        }
-      }
       try {
         switch (actionType) {
           case 'send': {
@@ -147,7 +135,11 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
-              handleSendMultiTxRes
+              status => {
+                if (status === ErrorCode.PasswordIncorrect) {
+                  throw new PasswordIncorrectException()
+                }
+              }
             )
             break
           }
@@ -287,7 +279,6 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       setError,
       t,
       multisigConfig,
-      onSumbitSuccess,
     ]
   )
 
@@ -337,22 +328,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       payload: { sending: false },
     })
     onDismiss()
-    if (onSumbitSuccess) {
-      onSumbitSuccess()
-    }
-  }, [
-    description,
-    dispatch,
-    experimental,
-    generatedTx,
-    onDismiss,
-    password,
-    signType,
-    t,
-    walletID,
-    multisigConfig,
-    onSumbitSuccess,
-  ])
+  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
   const dropdownList = [
     {

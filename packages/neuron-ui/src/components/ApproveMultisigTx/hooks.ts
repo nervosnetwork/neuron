@@ -107,11 +107,13 @@ export const useSignAndBroadcast = ({
   multisigConfig,
   walletID,
   onlyNeedOne,
+  closeDialog,
 }: {
   offlineSignJson: OfflineSignJSON
   multisigConfig: MultisigConfig
   walletID: string
   onlyNeedOne: boolean
+  closeDialog: () => void
 }) => {
   const dispatch = useDispatch()
   const signAndExport = useCallback(() => {
@@ -127,7 +129,8 @@ export const useSignAndBroadcast = ({
         multisigConfig,
       },
     })
-  }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, onlyNeedOne])
+    closeDialog()
+  }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, onlyNeedOne, closeDialog])
   return signAndExport
 }
 

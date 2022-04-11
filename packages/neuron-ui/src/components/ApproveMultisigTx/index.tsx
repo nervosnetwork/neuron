@@ -68,6 +68,7 @@ const ApproveMultisigTx = ({
     walletID: wallet.id,
     offlineSignJson,
     onlyNeedOne: needSignCount === 1,
+    closeDialog,
   })
   const { tabIdx, onTabClick } = useTabView()
   return (
