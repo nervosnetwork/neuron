@@ -229,10 +229,12 @@ export const useOnSumbit = ({
   outputs,
   isMainnet,
   multisigConfig,
+  closeDialog,
 }: {
   outputs: { address: string | undefined; amount: string | undefined; unit: CapacityUnit }[]
   isMainnet: boolean
   multisigConfig: MultisigConfig
+  closeDialog: () => void
 }) => {
   const dispatch = useDispatch()
   return useCallback(
@@ -251,10 +253,11 @@ export const useOnSumbit = ({
             multisigConfig,
           },
         })
+        closeDialog()
       } catch {
         // ignore
       }
     },
-    [dispatch, outputs, isMainnet, multisigConfig]
+    [dispatch, outputs, isMainnet, multisigConfig, closeDialog]
   )
 }

@@ -107,13 +107,6 @@ const MultisigAddress = () => {
     }
     return ''
   }, [multisigBanlances, sendAction.sendFromMultisig])
-  const onSumbitSuccess = useCallback(() => {
-    if (sendAction.isDialogOpen) {
-      sendAction.closeDialog()
-    } else if (approveAction.isDialogOpen) {
-      approveAction.closeDialog()
-    }
-  }, [sendAction, approveAction])
   return (
     <div>
       <div className={styles.head}>
@@ -243,7 +236,7 @@ const MultisigAddress = () => {
           />
         )}
       </dialog>
-      <PasswordRequest onSumbitSuccess={onSumbitSuccess} />
+      <PasswordRequest />
     </div>
   )
 }

@@ -61,7 +61,7 @@ const SendFromMultisigDialog = ({
       !!totalAmountErrorMessage,
     [outputErrors, sendInfoList, totalAmountErrorMessage]
   )
-  const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig })
+  const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
   return (
     <>
       <div className={styles.sendCKBTitle}>
