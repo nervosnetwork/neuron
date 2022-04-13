@@ -58,6 +58,11 @@ jest.mock('../../src/services/cells', () => ({
   getMultisigBalances: jest.fn(),
 }))
 
+const loadTransactionJSONMock = jest.fn()
+jest.mock('../../src/services/offline-sign', () => ({
+  loadTransactionJSON: () => loadTransactionJSONMock()
+}))
+
 const multisigConfig = {
   testnet: {
     params: {
@@ -209,4 +214,41 @@ describe('test for multisig controller', () => {
     expect(res.status).toBe(ResponseCode.Success)
   })
   
+  describe('loadMultisigTxJson', () => {
+    const fullPayload = 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2yu88cl4mwf0jc05q38gu237qd753c4jcan9jch'
+    const lockHash = '0xd121829f9c355496ab54c8b570dd7b0d0f4958dcba6967c241a0ca49a55a8e38'
+    it('load failed', async () => {
+      loadTransactionJSONMock.mockResolvedValueOnce(undefined)
+      const res = await multisigController.loadMultisigTxJson('fullpayload')
+      expect(res.status).toBe(ResponseCode.Fail)
+    })
+
+    it('fullpayload not matched', async () => {
+      loadTransactionJSONMock.mockResolvedValueOnce({
+        json: {
+            transaction: {
+            inputs: [
+              { lockHash }
+            ]
+          }
+        }
+      })
+      const res = await multisigController.loadMultisigTxJson('ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sqdr04fsz70xn6kl7c54cj0ap93qlvf0cacdhulch')
+      expect(res.status).toBe(ResponseCode.Fail)
+    })
+
+    it('fullpayload matched', async () => {
+      loadTransactionJSONMock.mockResolvedValueOnce({
+        json: {
+          transaction: {
+            inputs: [
+              { lockHash }
+            ]
+          }
+        }
+      })
+      const res = await multisigController.loadMultisigTxJson(fullPayload)
+      expect(res.status).toBe(ResponseCode.Success)
+    })
+  })
 })

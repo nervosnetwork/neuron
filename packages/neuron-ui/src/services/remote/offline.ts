@@ -32,7 +32,8 @@ export interface Signatures {
 export interface OfflineSignJSON {
   transaction: {
     signatures?: Signatures
-  } & Omit<any, 'signatures'>
+    [key: string]: any
+  }
   status: OfflineSignStatus
   type: OfflineSignType
   description?: string
