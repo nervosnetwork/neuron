@@ -93,26 +93,28 @@ const generateOutput = (
 const tokenID = '0x' + '0'.repeat(64)
 const walletId = 'w1'
 
+jest.mock('services/wallets', () => {
+  return {
+    getInstance: () => ({
+      get: stubbedWalletServiceGet
+    })
+  }
+})
+jest.mock('services/tx', () => {
+  return {
+    _esModule: true,
+    TransactionGenerator: {
+      // @ts-ignore
+      generateClaimChequeTx: (...args) => stubbedGenerateClaimChequeTx(...args),
+      // @ts-ignore
+      generateCreateChequeTx: (...args) => stubbedGenerateCreateChequeTx(...args),
+      // @ts-ignore
+      generateWithdrawChequeTx: (...args) => stubbedGenerateWithdrawChequeTx(...args)
+    }
+  }
+})
+
 describe('AssetAccountService', () => {
-  jest.mock('services/wallets', () => {
-    return {
-      getInstance: () => ({
-        get: stubbedWalletServiceGet
-      })
-    }
-  })
-
-  jest.mock('services/tx', () => {
-    return {
-      _esModule: true,
-      TransactionGenerator: {
-        generateClaimChequeTx: stubbedGenerateClaimChequeTx,
-        generateCreateChequeTx: stubbedGenerateCreateChequeTx,
-        generateWithdrawChequeTx: stubbedGenerateWithdrawChequeTx
-      }
-    }
-  })
-
   const AssetAccountService = require("../../src/services/asset-account-service").default
 
   beforeAll(async () => {
