@@ -80,16 +80,16 @@ describe('anyone-can-pay-service', () => {
 
   describe('generateAnyoneCanPayTx', () => {
     it('exception no asset account', async () => {
-      expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', 1000)).rejects.toThrow(new Error('Asset Account not found!'))
+      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', 1000)).rejects.toThrow(new Error('Asset Account not found!'))
     })
     it('exception AcpSendSameAccountError', async () => {
       addressParseMock.mockReturnValueOnce({ args: assetAccount.blake160 })
-      expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', assetAccountEntity.id)).rejects.toThrow(new AcpSendSameAccountError())
+      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', assetAccountEntity.id)).rejects.toThrow(new AcpSendSameAccountError())
     })
     it('exception with TargetOutputNotFoundError', async () => {
       addressParseMock.mockReturnValueOnce({})
       getOneByLockScriptAndTypeScriptMock.mockResolvedValueOnce({ type: () => true })
-      expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)).rejects.toThrow(new TargetOutputNotFoundError())
+      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)).rejects.toThrow(new TargetOutputNotFoundError())
     })
     it('isSecpScript with ckb', async () => {
       const targetLockScript = { args: 'args', codeHash: 'codeHash', hashType: 'hashType' }
@@ -152,7 +152,7 @@ describe('anyone-can-pay-service', () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValueOnce(null)
       const output = {}
       fromObjectMock.mockReturnValueOnce(output)
-      expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)).rejects.toThrow(new TargetOutputNotFoundError())
+      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)).rejects.toThrow(new TargetOutputNotFoundError())
     })
     it('not SecpScript with sudt', async () => {
       const targetLockScript = { args: 'args', codeHash: 'codeHash', hashType: 'hashType' }
@@ -193,7 +193,7 @@ describe('anyone-can-pay-service', () => {
   describe('generateSudtMigrateAcpTx', () => {
     it('exception', async () => {
       getLiveCellMock.mockResolvedValueOnce(undefined)
-      expect(AnyoneCanPayServece.generateSudtMigrateAcpTx({ txHash: '', index: '0' })).rejects.toThrow(new Error('sudt live cell not found'))
+      await expect(AnyoneCanPayServece.generateSudtMigrateAcpTx({ txHash: '', index: '0' })).rejects.toThrow(new Error('sudt live cell not found'))
     })
     it('normal', async () => {
       const cell = {}
