@@ -60,6 +60,8 @@ describe('SyncApiController', () => {
     resetMocks()
     jest.useFakeTimers()
 
+    jest.doMock('services/indexer', () => ({ LISTEN_URI: 'stub_listen_uri' }))
+
     jest.doMock('events', () => {
       return stubbedEmitter
     })
