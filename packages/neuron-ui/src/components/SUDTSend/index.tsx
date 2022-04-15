@@ -183,14 +183,23 @@ const SUDTSend = () => {
       if (total && value && BigInt(total) < BigInt(value)) {
         throw new AmountNotEnoughException()
       }
-      if (sendState.amount && isSecp256k1ShortAddress) {
+      if (sendState.amount && isSecp256k1ShortAddress && accountType === AccountType.CKB) {
         validateAmountRange(sendState.amount)
       }
     } catch (err) {
       errMap.amount = t(err.message, err.i18n)
     }
     return errMap
-  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, isSecp256k1ShortAddress])
+  }, [
+    sendState.address,
+    sendState.amount,
+    isMainnet,
+    anyoneCanPayScript,
+    accountInfo,
+    t,
+    isSecp256k1ShortAddress,
+    accountType,
+  ])
 
   const isFormReady =
     !isSending &&
