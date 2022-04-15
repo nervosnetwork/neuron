@@ -14,6 +14,8 @@ import Output from '../../src/models/chain/output'
 import OutPoint from '../../src/models/chain/out-point'
 import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { flushPromises } from '../test-utils'
+import AssetAccountInfo from '../../src/models/asset-account-info'
+import MultiSign from '../../src/models/multi-sign'
 
 const stubbedIndexerConnectorConstructor = jest.fn()
 const stubbedTxAddressFinderConstructor = jest.fn()
@@ -222,13 +224,11 @@ describe('queue', () => {
 
             it('check infos by hashes derived from addresses', () => {
               const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
-              const acpLockHashes = ['0xbda2cfe4214ec63ec301170527222742d9af51b876af12d842a309bc28ee6523']
-              const multiSignBlake160s = ['0x3f9dcc063f5212ec07bbee31e62950b4ea481c53']
               expect(stubbedTxAddressFinderConstructor).toHaveBeenCalledWith(
                 lockHashes,
-                acpLockHashes,
+                [new AssetAccountInfo().generateAnyoneCanPayScript(addressInfo.blake160).computeHash()],
                 fakeTxs[0].transaction,
-                multiSignBlake160s
+                [new MultiSign().hash(addressInfo.blake160)]
               )
             })
             it('saves transactions', () => {
