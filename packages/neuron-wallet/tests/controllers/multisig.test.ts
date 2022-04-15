@@ -40,7 +40,8 @@ let fileContent: {
 jest.mock('fs', () => {
   return {
     readFileSync: () => JSON.stringify(fileContent),
-    writeFileSync: () => jest.fn()
+    writeFileSync: () => jest.fn(),
+    existsSync: () => jest.fn()
   }
 })
 
@@ -114,7 +115,8 @@ describe('test for multisig controller', () => {
       n: 1,
       addresses: [],
       alias: 'string',
-      fullPayload: 'string'
+      fullPayload: 'string',
+      changed: expect.any(Function)
     }
     await multisigController.saveConfig(params)
     expect(MultiSigServiceMock.prototype.saveMultisigConfig).toHaveBeenCalledWith(params)
@@ -170,8 +172,8 @@ describe('test for multisig controller', () => {
         id: 1,
         walletId: '1234',
         alias: '',
-        fullPayload: multisigConfig.testnet.result
-      })
+        fullPayload: multisigConfig.testnet.result,
+      } as any)
       const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
       expect(res?.result[0].fullPayload).toBe(multisigConfig.testnet.result)
     })
@@ -182,8 +184,8 @@ describe('test for multisig controller', () => {
         id: 1,
         walletId: '1234',
         alias: '',
-        fullPayload: multisigConfig.testnet.result
-      })
+        fullPayload: multisigConfig.testnet.result,
+      } as any)
       const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
       expect(res?.result[0].fullPayload).toBe(multisigConfig.testnet.result)
     })

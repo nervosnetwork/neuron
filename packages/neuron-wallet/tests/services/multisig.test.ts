@@ -3,6 +3,21 @@ import { initConnection } from '../../src/database/chain/ormconfig'
 import MultisigConfig from '../../src/database/chain/entities/multisig-config'
 import MultisigConfigModel from '../../src/models/multisig-config'
 import MultisigService from '../../src/services/multisig'
+import MultisigOutput from '../../src/database/chain/entities/multisig-output'
+import { OutputStatus } from '../../src/models/chain/output'
+
+const rpcBatchRequestMock = jest.fn()
+jest.mock('../../src/utils/rpc-request', () => ({
+  rpcBatchRequest: () => rpcBatchRequestMock()
+}))
+const multisigOutputChangedSubjectNextMock = jest.fn()
+jest.mock('../../src/models/subjects/multisig-output-db-changed-subject', () => ({
+  getSubject() {
+    return {
+      next: multisigOutputChangedSubjectNextMock
+    }
+  }
+}))
 
 describe('multisig service', () => {
   const multisigService = new MultisigService()
@@ -12,9 +27,22 @@ describe('multisig service', () => {
     2,
     3,
     ['addresses'],
-    'fullpayload'
+    'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2y0lufgxn0q93dyx2wndvjhvjnfglxkaqlz8tny',
+    'alias'
   );
   const defaultMultisigConfig = MultisigConfig.fromModel(multisigConfigModel)
+  defaultMultisigConfig.lastestBlockNumber = '0x0'
+  const lock = {
+    args: '0x447ff8941a6f0162d2194e9b592bb2534a3e6b74',
+    code_hash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+    hash_type: 'type'
+  }
+  const defaultTxOutpoint = { tx_hash: 'tx_hash', index: '0x0' }
+  const defaultOutput = {
+    out_point: defaultTxOutpoint,
+    output: { lock, capacity: '6100000000' }
+  }
+  const multisigOutput = MultisigOutput.fromIndexer(defaultOutput)
 
   beforeAll(async () => {
     await initConnection('0x1234')
@@ -27,20 +55,23 @@ describe('multisig service', () => {
   beforeEach(async () => {
     const res = await multisigService.saveMultisigConfig(defaultMultisigConfig)
     multisigConfigModel.id = res?.id
+    await getConnection().manager.save(multisigOutput)
+    rpcBatchRequestMock.mockResolvedValue([])
   })
-
   afterEach(async () => {
-    await multisigService.deleteConfig(multisigConfigModel.id!)
+    const connection = getConnection()
+    await connection.synchronize(true)
+    rpcBatchRequestMock.mockReset()
+    multisigOutputChangedSubjectNextMock.mockReset()
   })
 
   describe('save multisig config', () => {
     it('has exist', async () => {
-      expect(multisigService.saveMultisigConfig(defaultMultisigConfig)).rejects.toThrow()
+      await expect(multisigService.saveMultisigConfig(defaultMultisigConfig)).rejects.toThrow()
     })
     it('save success', async () => {
-      const originalWalletId = multisigConfigModel.walletId
-      multisigConfigModel.walletId = 'walletId1'
-      const res = await multisigService.saveMultisigConfig(MultisigConfig.fromModel(multisigConfigModel))
+      defaultMultisigConfig.walletId = 'walletId1'
+      const res = await multisigService.saveMultisigConfig(defaultMultisigConfig)
       const count = await getConnection()
         .getRepository(MultisigConfig)
         .createQueryBuilder()
@@ -49,8 +80,7 @@ describe('multisig service', () => {
         })
         .getCount()
       expect(count).toBe(1)
-      multisigConfigModel.walletId = originalWalletId
-      await multisigService.deleteConfig(res.id)
+      defaultMultisigConfig.walletId = 'walletId'
     })
   })
 
@@ -99,6 +129,174 @@ describe('multisig service', () => {
         })
         .getCount()
       expect(count).toBe(0)
+    })
+  })
+
+  describe('getLiveCells', () => {
+    it('params is empty', async () => {
+      const res = await MultisigService.getLiveCells([])
+      expect(res).toHaveLength(0)
+    })
+
+    it('no live cell', async () => {
+      const res = await MultisigService.getLiveCells([defaultMultisigConfig])
+      expect(res).toHaveLength(0)
+    })
+
+    it('a live cell', async () => {
+      rpcBatchRequestMock.mockResolvedValueOnce([
+        {
+          result: { objects: [defaultOutput] }
+        }
+      ])
+      const res = await MultisigService.getLiveCells([defaultMultisigConfig])
+      expect(res).toHaveLength(1)
+      expect(res[0]).toEqual(MultisigOutput.fromIndexer(defaultOutput))
+    })
+  })
+
+  describe('saveLiveMultisigOutput', () => {
+    it('no live cell save', async () => {
+      await MultisigService.saveLiveMultisigOutput()
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledTimes(0)
+    })
+    it('with live cell save', async () => {
+      rpcBatchRequestMock.mockResolvedValueOnce([
+        {
+          result: { objects: [defaultOutput] }
+        }
+      ])
+      await MultisigService.saveLiveMultisigOutput()
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledWith('create')
+    })
+  })
+  describe('getMultisigTransactionHashList', () => {
+    it('params is empty', async () => {
+      const res = await MultisigService.getMultisigTransactionHashList([])
+      expect(res).toEqual(new Set())
+    })
+
+    it('no Transaction', async () => {
+      const res = await MultisigService.getMultisigTransactionHashList([defaultMultisigConfig])
+      expect(res).toEqual(new Set())
+    })
+
+    it('a Transaction', async () => {
+      rpcBatchRequestMock.mockResolvedValueOnce([
+        {
+          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] }
+        }
+      ])
+      const res = await MultisigService.getMultisigTransactionHashList([defaultMultisigConfig])
+      expect(res).toEqual(new Set([defaultTxOutpoint.tx_hash]))
+    })
+  })
+
+  describe('deleteDeadMultisigOutput', () => {
+    it('no transaction', async () => {
+      // @ts-ignore Private method
+      await MultisigService.deleteDeadMultisigOutput([])
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledTimes(0)
+    })
+    it('no delete transaction', async () => {
+      rpcBatchRequestMock.mockResolvedValueOnce([
+        {
+          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] }
+        }
+      ])
+      // @ts-ignore Private method
+      await MultisigService.deleteDeadMultisigOutput([defaultMultisigConfig])
+      const multisigOutputs = await getConnection()
+        .getRepository(MultisigOutput)
+        .createQueryBuilder()
+        .getMany()
+      expect(multisigOutputs).toHaveLength(1)
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledTimes(0)
+    })
+    it('delete a transaction', async () => {
+      rpcBatchRequestMock.mockResolvedValueOnce([
+        {
+          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] }
+        }
+      ]).mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          result: { transaction: { inputs: [{ previous_output: defaultTxOutpoint }] }}
+        }
+      ])
+      // @ts-ignore Private method
+      await MultisigService.deleteDeadMultisigOutput([defaultMultisigConfig])
+      const multisigOutputs = await getConnection()
+        .getRepository(MultisigOutput)
+        .createQueryBuilder()
+        .getMany()
+      expect(multisigOutputs).toHaveLength(0)
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledWith('delete')
+    })
+  })
+
+  describe('deleteRemovedMultisigOutput', () => {
+    it('delete cell thats config not in db', async () => {
+      const output =  MultisigOutput.fromIndexer(defaultOutput)
+      output.lockHash = '0x8a281512ae899c8cb2bfd177c7747e1ff20b5980'
+      output.outPointTxHash = '0x9821d3184b5743726e4686541a74213eaa63e2d8f4fb9ee9ff50878aa9177c87'
+      await getConnection().manager.save(output)
+      await MultisigService.deleteRemovedMultisigOutput()
+      const multisigOutputs = await getConnection()
+        .getRepository(MultisigOutput)
+        .createQueryBuilder()
+        .getMany()
+      expect(multisigOutputs).toEqual([multisigOutput])
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledWith('delete')
+    })
+  })
+
+  describe('syncMultisigOutput', () => {
+    it('success', async () => {
+      await MultisigService.syncMultisigOutput('0xdddddd')
+      const multisigConfig = await getConnection()
+        .getRepository(MultisigConfig)
+        .createQueryBuilder()
+        .getOne()
+      expect(multisigConfig!.lastestBlockNumber).toEqual('0xdddddd')
+    })
+  })
+
+  describe('saveSentMultisigOutput', () => {
+    it('success', async() => {
+      const tx = {
+        hash: '0x2fefadab413ae1f919f4e21d53c719b583e124ca817f2497ce7a7688dedfbebb',
+        inputs: [{
+          previousOutput: { txHash: defaultTxOutpoint.tx_hash, index: '0x0' }
+        }],
+        outputs: [
+          {
+            capacity: '770000000',
+            lock: {
+              codeHash: lock.code_hash,
+              hashType: lock.hash_type,
+              args: lock.args
+            },
+            lockHash: 'lockHash'
+          }
+        ]
+      }
+      await MultisigService.saveSentMultisigOutput(tx as any)
+      const sendMultisigConfig = await getConnection()
+        .getRepository(MultisigOutput)
+        .createQueryBuilder()
+        .where({ status: OutputStatus.Sent })
+        .getMany()
+      expect(sendMultisigConfig).toHaveLength(1)
+      expect(sendMultisigConfig[0].capacity).toBe('770000000')
+      const pendingMultisigConfig = await getConnection()
+        .getRepository(MultisigOutput)
+        .createQueryBuilder()
+        .where({ status: OutputStatus.Pending })
+        .getMany()
+      expect(pendingMultisigConfig).toHaveLength(1)
+      expect(pendingMultisigConfig[0].capacity).toBe(defaultOutput.output.capacity)
+      expect(multisigOutputChangedSubjectNextMock).toHaveBeenCalledWith('update')
     })
   })
 })

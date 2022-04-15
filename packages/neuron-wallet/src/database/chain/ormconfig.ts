@@ -16,6 +16,7 @@ import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import TxDescription from './entities/tx-description'
 import AddressDescription from './entities/address-description'
 import MultisigConfig from './entities/multisig-config'
+import MultisigOuput from './entities/multisig-output'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -42,6 +43,7 @@ import { TxDescription1599441769473 } from './migrations/1599441769473-TxDescrip
 import { RemoveKeyInfoAddress1601447406035 } from './migrations/1601447406035-RemoveKeyInfoAddress'
 import { AddAddressDescription1602543179168 } from './migrations/1602543179168-AddAddressDescription'
 import { AddMultisigConfig1646817547204 } from './migrations/1646817547204-AddMultisigConfig'
+import { AddMultisigOutput1649729996969 } from './migrations/1649729996969-AddMultisigOutput'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -72,7 +74,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       SudtTokenInfo,
       IndexerTxHashCache,
       AddressDescription,
-      MultisigConfig
+      MultisigConfig,
+      MultisigOuput
     ],
     migrations: [
       InitMigration1566959757554,
@@ -99,7 +102,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       TxDescription1599441769473,
       RemoveKeyInfoAddress1601447406035,
       AddAddressDescription1602543179168,
-      AddMultisigConfig1646817547204
+      AddMultisigConfig1646817547204,
+      AddMultisigOutput1649729996969
     ],
     logger: 'simple-console',
     logging,

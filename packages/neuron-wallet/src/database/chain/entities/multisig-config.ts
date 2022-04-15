@@ -1,5 +1,6 @@
 import MultisigConfigModel from 'models/multisig-config'
-import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm'
+import MultisigConfigDbChangedSubject from 'models/subjects/multisig-config-db-changed-subject'
+import { Entity, Column, PrimaryGeneratedColumn, Index, AfterInsert, AfterRemove } from 'typeorm'
 
 @Entity()
 export default class MultisigConfig {
@@ -28,6 +29,9 @@ export default class MultisigConfig {
   @Column()
   fullPayload!: string
 
+  @Column()
+  lastestBlockNumber!: string
+
   public static fromModel(model: MultisigConfigModel): MultisigConfig {
     const multisigConfig = new MultisigConfig()
 
@@ -42,5 +46,19 @@ export default class MultisigConfig {
     multisigConfig.fullPayload = model.fullPayload
 
     return multisigConfig
+  }
+
+  @AfterInsert()
+  emitInsert() {
+    this.changed('AfterInsert')
+  }
+
+  @AfterRemove()
+  emitRemove() {
+    this.changed('AfterRemove')
+  }
+
+  private changed = (event: string) => {
+    MultisigConfigDbChangedSubject.getSubject().next(event)
   }
 }

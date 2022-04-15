@@ -29,6 +29,7 @@ const SubjectConstructor = <T>(
     | 'navigation'
     | 'set-locale'
     | 'device-sign-index'
+    | 'multisig-output-update'
 ) => {
   return ipcRenderer
     ? {
@@ -57,6 +58,7 @@ export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 export const Navigation = SubjectConstructor<Subject.URL>('navigation')
 export const SetLocale = SubjectConstructor<typeof LOCALES[number]>('set-locale')
 export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sign-index')
+export const MultisigOutputUpdate = SubjectConstructor<string>('multisig-output-update')
 
 export default {
   DataUpdate,
@@ -71,4 +73,5 @@ export default {
   Navigation,
   SetLocale,
   DeviceSignIndex,
+  MultisigOutputUpdate,
 }

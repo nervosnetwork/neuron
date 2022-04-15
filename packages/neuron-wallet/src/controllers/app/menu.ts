@@ -313,13 +313,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         click: () => {
           const currentWallet = walletsService.getCurrent()
           showWindow(
-            `#/add-multisig-address/${currentWallet!.id}`,
+            `#/multisig-address/${currentWallet!.id}`,
             t(`messageBox.multisig-address.title`),
             {
               width: 900,
               resizable: true
             },
-            ['data-updated']
+            ['multisig-output-update']
           )
         }
       },

@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { useDialog, isSuccessResponse } from 'utils'
-import { DataUpdate as DataUpdateSubject } from 'services/subjects'
+import { MultisigOutputUpdate } from 'services/subjects'
 import {
   MultisigConfig,
   saveMultisigConfig,
@@ -264,19 +264,8 @@ export const useSubscription = ({
     })
   }, [setMultisigBanlances, isMainnet, configs])
   useEffect(() => {
-    const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
-      if (walletIDOfMessage && walletIDOfMessage !== walletId) {
-        return
-      }
-      switch (dataType) {
-        case 'transaction': {
-          getAndSaveMultisigBalances()
-          break
-        }
-        default: {
-          break
-        }
-      }
+    const dataUpdateSubscription = MultisigOutputUpdate.subscribe(() => {
+      getAndSaveMultisigBalances()
     })
     getAndSaveMultisigBalances()
     return () => {
