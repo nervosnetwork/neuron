@@ -5,7 +5,6 @@ export const getSUDTAmount = ({
   data,
 }: {
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
-  type?: CKBComponents.Script | null
   data: string
 }) => {
   let amount = BigInt(toUint128Le(data)).toString()

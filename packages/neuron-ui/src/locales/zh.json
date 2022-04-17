@@ -752,7 +752,7 @@
       "locked-asset": "已锁定",
       "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日(锁定时间根据区块链实际运行情况会有一定的误差)。",
       "withdraw-asset-tooltip": "预计解锁时间为 {{year}}年{{month}}月{{day}}日 {{hour}}时{{minute}}分(根据区块链实际运行情况会有一定的误差)。",
-      "user-defined-token-tooltip": "将sUDT资产转移到sUDT账户",
+      "user-defined-token-tooltip": "将 sUDT 资产转移到 sUDT 账户",
       "claim-asset": "领取",
       "withdraw-asset": "撤回",
       "view-details": "查看详情",

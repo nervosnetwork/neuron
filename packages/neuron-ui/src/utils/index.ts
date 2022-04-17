@@ -24,6 +24,6 @@ export * from './sortAccounts'
 export * from './scriptToAddress'
 export * from './getSyncLeftTime'
 export * from './baseActions'
-export * from './getSUDTAmmount'
+export * from './getSUDTAmount'
 
 export { CONSTANTS }

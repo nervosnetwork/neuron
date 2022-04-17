@@ -752,7 +752,7 @@
       "locked-asset": "已鎖定",
       "locked-asset-tooltip": "鎖定參數為 {{epochs}} epochs, 預計解鎖時間為 {{year}}年{{month}}月{{day}}日(鎖定時間根據區塊鏈實際運行情況會有一定的誤差)。",
       "withdraw-asset-tooltip": "預計解鎖時間為 {{year}}年{{month}}月{{day}}日 {{hour}}時{{minute}}分(根據區塊鏈實際運行情況會有一定的誤差)。",
-      "user-defined-token-tooltip": "將sUDT資產轉移到sUDT賬戶",
+      "user-defined-token-tooltip": "將 sUDT 資產轉移到 sUDT 賬戶",
       "claim-asset": "領取",
       "withdraw-asset": "撤回",
       "view-details": "查看詳情",

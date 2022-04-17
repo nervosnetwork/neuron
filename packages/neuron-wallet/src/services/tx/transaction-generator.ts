@@ -1345,15 +1345,32 @@ export class TransactionGenerator {
     if (!currentWallet) {
       throw new CurrentWalletNotSet()
     }
+    const inputSudtCell = new Output(
+      sudtCell.capacity,
+      sudtCell.lock,
+      sudtCell.type,
+      sudtCell.data,
+      sudtCell.lockHash,
+      sudtCell.typeHash,
+      sudtCell.outPoint,
+      sudtCell.status,
+      sudtCell.daoData,
+      sudtCell.timestamp,
+      sudtCell.blockNumber,
+      sudtCell.blockHash,
+      sudtCell.depositOutPoint,
+      sudtCell.depositTimestamp,
+      sudtCell.multiSignBlake160
+    )
     const assetAccountInfo = new AssetAccountInfo()
-    const sudtMigrateAcpInput = [
+    const sudtMigrateAcpInputs = [
       Input.fromObject({
-        previousOutput: sudtCell.outPoint!,
-        capacity: sudtCell.capacity,
-        lock: sudtCell.lock,
-        type: sudtCell.type,
-        lockHash: sudtCell.lockHash,
-        data: sudtCell.data,
+        previousOutput: inputSudtCell.outPoint!,
+        capacity: inputSudtCell.capacity,
+        lock: inputSudtCell.lock,
+        type: inputSudtCell.type,
+        lockHash: inputSudtCell.lockHash,
+        data: inputSudtCell.data,
         since: '0'
       })
     ]
@@ -1363,24 +1380,24 @@ export class TransactionGenerator {
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     let outputs: Output[] = []
     if (acpAddress) {
-      if (!sudtCell.type) {
+      if (!inputSudtCell.type) {
         throw new MigrateSudtCellNoTypeError()
       }
       const receiverAcpCells = await CellsService.getACPCells(
         Script.fromSDK(addressToScript(acpAddress)),
-        sudtCell.type
+        inputSudtCell.type
       )
       if (!receiverAcpCells.length) {
         throw new TargetOutputNotFoundError()
       }
       const receiverAcpCell = receiverAcpCells[0]
       const receiverAcpInputAmount = BufferUtils.readBigUInt128LE(receiverAcpCell.data)
-      const sudtCellAmount = BufferUtils.readBigUInt128LE(sudtCell.data)
+      const sudtCellAmount = BufferUtils.readBigUInt128LE(inputSudtCell.data)
       const receiverAcpOutputAmount = receiverAcpInputAmount + sudtCellAmount
-      sudtCell.setData('0x')
-      sudtCell.setType(null)
+      inputSudtCell.setData('0x')
+      inputSudtCell.setType(null)
       outputs = [
-        sudtCell,
+        inputSudtCell,
         Output.fromObject({
           capacity: receiverAcpCell.capacity,
           lock: receiverAcpCell.lockScript(),
@@ -1389,7 +1406,7 @@ export class TransactionGenerator {
         })
       ]
       const receiverAcpCellModel = receiverAcpCell.toModel()
-      sudtMigrateAcpInput.push(
+      sudtMigrateAcpInputs.push(
         Input.fromObject({
           previousOutput: receiverAcpCellModel.outPoint!,
           capacity: receiverAcpCellModel.capacity,
@@ -1404,15 +1421,15 @@ export class TransactionGenerator {
       const addresses = await currentWallet.getNextReceivingAddresses()
       const usedBlake160s = new Set(await AssetAccountService.blake160sOfAssetAccounts())
       const addrObj = !currentWallet.isHDWallet() ? addresses[0] : addresses.find(a => !usedBlake160s.has(a.blake160))!
-      sudtCell.setLock(assetAccountInfo.generateAnyoneCanPayScript(addrObj.blake160))
-      outputs = [sudtCell]
+      inputSudtCell.setLock(assetAccountInfo.generateAnyoneCanPayScript(addrObj.blake160))
+      outputs = [inputSudtCell]
     }
 
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
-      inputs: sudtMigrateAcpInput,
+      inputs: sudtMigrateAcpInputs,
       outputs: outputs,
       outputsData: outputs.map(v => v.data || '0x'),
       witnesses: []
@@ -1420,7 +1437,7 @@ export class TransactionGenerator {
 
     const txSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
     tx.fee = TransactionFee.fee(txSize, BigInt(feeRate)).toString()
-    const outputCapacity = BigInt(sudtCell.capacity) - BigInt(tx.fee)
+    const outputCapacity = BigInt(inputSudtCell.capacity) - BigInt(tx.fee)
     if (outputCapacity >= BigInt(MIN_SUDT_CAPACITY)) {
       tx.outputs[0].capacity = outputCapacity.toString()
       return tx
@@ -1436,7 +1453,7 @@ export class TransactionGenerator {
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
-      sudtMigrateAcpInput.map(v => ({
+      sudtMigrateAcpInputs.map(v => ({
         input: v,
         witness: WitnessArgs.emptyLock()
       }))
