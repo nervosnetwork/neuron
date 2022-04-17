@@ -5,7 +5,7 @@ export const { getHeader, getBlock, getBlockchainInfo, getTipHeader, getHeaderBy
 
 export const { calculateDaoMaximumWithdraw } = ckbCore
 
-export const { toUint64Le } = ckbCore.utils
+export const { toUint64Le, parseEpoch } = ckbCore.utils
 export default {
   ckbCore,
   getBlock,

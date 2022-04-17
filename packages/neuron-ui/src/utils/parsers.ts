@@ -1,4 +1,4 @@
-import { toUint64Le } from 'services/chain'
+import { toUint64Le, parseEpoch } from 'services/chain'
 import { PAGE_SIZE } from './const'
 
 export const listParams = (search: string) => {
@@ -13,25 +13,18 @@ export const listParams = (search: string) => {
   return params
 }
 
-export const prompt = (search: string) => {
-  const query = new URLSearchParams(search)
-  const params: { [index: string]: string | null } = {}
-  const keys = [...query.keys()]
-  keys.forEach((key: string) => {
-    params[key] = query.get(key)
-  })
-  return params
-}
-export const queryParsers = { listParams, prompt }
+export const queryParsers = { listParams }
 
 export const epochParser = (epoch: string) => {
-  const e = BigInt(epoch)
+  const e = epoch.startsWith('0x') ? epoch : `0x${BigInt(epoch).toString(16)}`
+  const parsed = parseEpoch(e)
 
   const res = {
-    length: (e >> BigInt(40)) & BigInt(0xffff),
-    index: (e >> BigInt(24)) & BigInt(0xffff),
-    number: e & BigInt(0xffffff),
+    length: BigInt(parsed.length),
+    index: BigInt(parsed.index),
+    number: BigInt(parsed.number),
   }
+
   return {
     ...res,
     value: res.length > 0 ? Number(res.number) + Number(res.index) / Number(res.length) : Number(res.number),
@@ -39,5 +32,17 @@ export const epochParser = (epoch: string) => {
 }
 
 export const toUint128Le = (hexString: string) => {
-  return `${toUint64Le(`0x${hexString.substr(34, 16)}`)}${toUint64Le(hexString.substr(0, 18)).slice(2)}`
+  if (!hexString.startsWith('0x')) {
+    throw new Error('Invalid hex string')
+  }
+
+  let s = hexString
+
+  if (s.length < 34) {
+    s = s.padEnd(34, '0')
+  } else if (s.length > 34) {
+    s = s.slice(0, 34)
+  }
+
+  return `${toUint64Le(`0x${s.substr(18, 16)}`)}${toUint64Le(s.substr(0, 18)).slice(2)}`
 }
