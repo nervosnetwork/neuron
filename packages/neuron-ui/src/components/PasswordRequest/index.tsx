@@ -103,6 +103,7 @@ const PasswordRequest = () => {
       'withdraw-cheque',
       'claim-cheque',
       'create-account-to-claim-cheque',
+      'send-from-multisig-need-one',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
@@ -135,7 +136,7 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
-              status => {
+              ({ status }) => {
                 if (status === ErrorCode.PasswordIncorrect) {
                   throw new PasswordIncorrectException()
                 }
