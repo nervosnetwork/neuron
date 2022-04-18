@@ -12,6 +12,7 @@ import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 import SyncApiController from 'controllers/sync-api'
+import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -83,4 +84,8 @@ export const subscribe = (dispatcher: AppResponder) => {
       .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))
       ?.webContents.send('app-updater-updated', params)
   })
+
+  MultisigOutputChangedSubject.getSubject().subscribe(params => [
+    dispatcher.sendMessage('multisig-output-update', params)
+  ])
 }

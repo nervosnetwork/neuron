@@ -1,4 +1,5 @@
 import AddressParser from "../../src/models/address-parser"
+import AssetAccountInfo from "../../src/models/asset-account-info"
 import { ScriptHashType } from "../../src/models/chain/script"
 
 describe('AddressParser', () => {
@@ -24,7 +25,6 @@ describe('AddressParser', () => {
   }
 
   const shortACPAddressInfo = {
-    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
     args: '0x4fb2be2e5d0c1a3b8694f832350a33c1685d477a',
     hashType: ScriptHashType.Type,
     address: 'ckb1qypylv479ewscx3ms620sv34pgeuz6zagaaqvrugu7',
@@ -36,6 +36,7 @@ describe('AddressParser', () => {
     hashType: ScriptHashType.Type,
     address: 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4'
   }
+  const assetAccount = new AssetAccountInfo()
 
   describe('parse', () => {
     it('full address', () => {
@@ -61,7 +62,7 @@ describe('AddressParser', () => {
 
     it ('acp short address', () => {
       const script = AddressParser.parse(shortACPAddressInfo.address)
-      expect(script.codeHash).toEqual(shortACPAddressInfo.codeHash)
+      expect(script.codeHash).toEqual(assetAccount.anyoneCanPayCodeHash)
       expect(script.args).toEqual(shortACPAddressInfo.args)
       expect(script.hashType).toEqual(shortACPAddressInfo.hashType)
     })
@@ -87,7 +88,7 @@ describe('AddressParser', () => {
     expect(result[1].codeHash).toEqual(fullAddressInfo.codeHash)
     expect(result[1].args).toEqual(fullAddressInfo.args)
     expect(result[1].hashType).toEqual(fullAddressInfo.hashType)
-    expect(result[2].codeHash).toEqual(shortACPAddressInfo.codeHash)
+    expect(result[2].codeHash).toEqual(assetAccount.anyoneCanPayCodeHash)
     expect(result[2].args).toEqual(shortACPAddressInfo.args)
     expect(result[2].hashType).toEqual(shortACPAddressInfo.hashType)
   })

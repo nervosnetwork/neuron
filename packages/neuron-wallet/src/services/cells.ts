@@ -28,6 +28,7 @@ import LiveCellService from './live-cell-service'
 import AssetAccountInfo from 'models/asset-account-info'
 import NFT from 'models/nft'
 import MultisigConfigModel from 'models/multisig-config'
+import MultisigOutput from 'database/chain/entities/multisig-output'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -422,6 +423,64 @@ export default class CellsService {
     return cellEntity
   }
 
+  private static getLiveOrSentCellByWalletId = async (
+    walletId: string,
+    lockClass: {
+      codeHash: string
+      hashType: ScriptHashType
+    }
+  ) => {
+    return await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(
+        `
+        output.status IN (:...statuses) AND
+        hasData = false AND
+        typeHash is null AND
+        output.lockArgs in (
+          SELECT publicKeyInBlake160
+          FROM hd_public_key_info
+          WHERE walletId = :walletId
+        ) AND
+        output.lockCodeHash = :lockCodeHash AND
+        output.lockHashType = :lockHashType
+        `,
+        {
+          walletId,
+          lockCodeHash: lockClass.codeHash,
+          lockHashType: lockClass.hashType,
+          statuses: [OutputStatus.Live, OutputStatus.Sent]
+        }
+      )
+      .getMany()
+  }
+
+  private static getLiveOrSentCellByLockArgsMultisigOutput = async (lockClass: {
+    lockArgs?: string[]
+    codeHash: string
+    hashType: ScriptHashType
+  }) => {
+    return await getConnection()
+      .getRepository(MultisigOutput)
+      .createQueryBuilder('multisig_output')
+      .where(
+        `
+        multisig_output.status IN (:...statuses) AND
+        multisig_output.lockArgs in (:lockArgs) AND
+        multisig_output.lockCodeHash = :lockCodeHash AND
+        multisig_output.lockHashType = :lockHashType
+        `,
+        {
+          lockArgs: lockClass.lockArgs,
+          lockCodeHash: lockClass.codeHash,
+          lockHashType: lockClass.hashType,
+          statuses: [OutputStatus.Live, OutputStatus.Sent]
+        }
+      )
+      .getMany()
+  }
+
   // gather inputs for generateTx
   public static gatherInputs = async (
     capacity: string,
@@ -462,36 +521,9 @@ export default class CellsService {
     const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
 
     // only live cells, skip which has data or type
-    const cellEntities: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .where(
-        `
-        output.status IN (:...statuses) AND
-        hasData = false AND
-        typeHash is null AND
-        ${
-          walletId
-            ? `
-          output.lockArgs in (
-            SELECT publicKeyInBlake160
-            FROM hd_public_key_info
-            WHERE walletId = :walletId
-          )`
-            : 'output.lockArgs in (:lockArgs)'
-        } AND
-        output.lockCodeHash = :lockCodeHash AND
-        output.lockHashType = :lockHashType
-        `,
-        {
-          walletId,
-          statuses: [OutputStatus.Live, OutputStatus.Sent],
-          lockCodeHash: lockClass.codeHash,
-          lockHashType: lockClass.hashType,
-          lockArgs: lockClass.lockArgs
-        }
-      )
-      .getMany()
+    const cellEntities: (OutputEntity | MultisigOutput)[] = await (walletId
+      ? CellsService.getLiveOrSentCellByWalletId(walletId, lockClass)
+      : CellsService.getLiveOrSentCellByLockArgsMultisigOutput(lockClass))
 
     const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
     const sentBalance: bigint = cellEntities
@@ -613,39 +645,19 @@ export default class CellsService {
       args?: string
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type }
   ): Promise<Input[]> => {
-    const cellEntities: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .where(
-        `
-        output.status IN (:...statuses) AND
-        hasData = false AND
-        typeHash is null AND
-        ${
-          lockClass.args
-            ? 'output.lockArgs = :lockArgs'
-            : `output.lockArgs in (
-            SELECT publicKeyInBlake160
-            FROM hd_public_key_info
-            WHERE walletId = :walletId
-          )`
-        } AND
-        output.lockCodeHash = :lockCodeHash AND
-        output.lockHashType = :lockHashType
-        `,
-        {
-          walletId,
-          lockArgs: lockClass.args,
-          statuses: [OutputStatus.Live],
-          lockCodeHash: lockClass.codeHash,
-          lockHashType: lockClass.hashType
-        }
-      )
-      .getMany()
+    const cellEntities: (OutputEntity | MultisigOutput)[] = await (!lockClass.args
+      ? CellsService.getLiveOrSentCellByWalletId(walletId, lockClass)
+      : CellsService.getLiveOrSentCellByLockArgsMultisigOutput({
+          codeHash: lockClass.codeHash,
+          hashType: lockClass.hashType,
+          lockArgs: [lockClass.args]
+        }))
 
-    const inputs: Input[] = cellEntities.map(cell => {
-      return new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
-    })
+    const inputs: Input[] = cellEntities
+      .filter(v => v.status === OutputStatus.Live)
+      .map(cell => {
+        return new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
+      })
 
     return inputs
   }
@@ -1104,14 +1116,14 @@ export default class CellsService {
     const [sql, parameters] = connection.driver.escapeQueryWithParameters(
       `
         select
-            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
+            CAST(SUM(CAST(multisig_output.capacity AS UNSIGNED BIG INT)) AS VARCHAR) as balance,
             lockArgs
         from
-            output
+            multisig_output
         where
-            output.lockHash in (:...lockHashes) AND
-            output.status in (:...statuses)
-        group by output.lockArgs
+            multisig_output.lockHash in (:...lockHashes) AND
+            status in (:...statuses)
+        group by multisig_output.lockArgs
       `,
       {
         lockHashes,
@@ -1122,7 +1134,7 @@ export default class CellsService {
     const cells: {
       lockArgs: string
       balance: string
-    }[] = await connection.getRepository(OutputEntity).manager.query(sql, parameters)
+    }[] = await connection.getRepository(MultisigOutput).manager.query(sql, parameters)
 
     const balances: Record<string, string> = {}
 

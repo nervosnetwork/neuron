@@ -90,6 +90,12 @@ jest.doMock('services/tx/transaction-persistor', () => {
   }
 });
 
+jest.doMock('services/multisig', () => {
+  return {
+    saveSentMultisigOutput: jest.fn()
+  }
+});
+
 jest.mock('../../../src/models/system-script-info', () => {
   const originalModule = jest.requireActual('../../../src/models/system-script-info');
   return {

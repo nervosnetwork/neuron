@@ -21,7 +21,7 @@ if (window.location.hash.startsWith('#/transaction/')) {
   ReactDOM.render(<Transaction />, document.getElementById('root'))
 } else if (window.location.hash.startsWith('#/sign-verify/')) {
   ReactDOM.render(<SignAndVerify />, document.getElementById('root'))
-} else if (window.location.hash.startsWith('#/add-multisig-address/')) {
+} else if (window.location.hash.startsWith('#/multisig-address/')) {
   ReactDOM.render(
     <Router>
       <MultiSignAddress />

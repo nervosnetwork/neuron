@@ -62,6 +62,7 @@ import TransactionGenerator from '../../../src/services/tx/transaction-generator
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
+import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -166,6 +167,25 @@ describe('TransactionGenerator', () => {
     output.status = 'live'
 
     return output
+  }
+  
+  const createMultisigCell = async (
+    capacity: string,
+    status: OutputStatus,
+    who: any
+  ) => {
+    const multisigCell = new MultisigOutput()
+    multisigCell.capacity = capacity
+    multisigCell.status = status
+    multisigCell.outPointTxHash = randomHex()
+    multisigCell.outPointIndex = '0'
+    multisigCell.outPointTxHashAddIndex = multisigCell.outPointTxHash + multisigCell.outPointIndex
+    multisigCell.lockCodeHash = who.lockScript.codeHash
+    multisigCell.lockArgs = who.lockScript.args
+    multisigCell.lockHashType = who.lockScript.hashType
+    multisigCell.lockHash = who.lockScript.computeHash()
+    await getConnection().manager.save(multisigCell)
+    return multisigCell
   }
 
   beforeEach(async () => {
@@ -531,13 +551,6 @@ describe('TransactionGenerator', () => {
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, false, null),
         generateCell(toShannon('3000'), OutputStatus.Live, false, null, alice),
-        generateCell(toShannon('3000'), OutputStatus.Live, false, null, {
-          lockScript: Script.fromObject({
-            codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
-            hashType: ScriptHashType.Type,
-            args: '0x87b9ae2c1c7108178e709bf4a89b736bc0f0ae60'
-          })
-        })
       ]
       await getConnection().manager.save(cells)
       done()
@@ -698,6 +711,13 @@ describe('TransactionGenerator', () => {
     })
 
     it('generator with multisigConfig', async () => {
+      await createMultisigCell(toShannon('3000'), OutputStatus.Live, {
+        lockScript: Script.fromObject({
+          codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+          hashType: ScriptHashType.Type,
+          args: '0x87b9ae2c1c7108178e709bf4a89b736bc0f0ae60'
+        })
+      })
       const feeRate = '1000'
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
         walletId1,

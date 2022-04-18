@@ -2,6 +2,7 @@ import { Address, AddressVersion } from '../../../src/models/address'
 import { AddressType } from '../../../src/models/keys/address'
 import AddressMeta from '../../../src/database/address/meta'
 import MultiSign from "../../../src/models/multi-sign";
+import AssetAccountInfo from '../../../src/models/asset-account-info'
 
 describe('Address Dao tests', () => {
   const address: Address = {
@@ -50,9 +51,10 @@ describe('Address Dao tests', () => {
 
     it('#generateACPLockScript', () => {
       const script = addressMeta.generateACPLockScript()
+      const assetAccountInfo = new AssetAccountInfo()
       expect(script).toEqual({
         args: address.blake160,
-        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        codeHash: assetAccountInfo.anyoneCanPayCodeHash,
         hashType: 'type'
       })
     })

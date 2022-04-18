@@ -31,6 +31,7 @@ import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, SignT
 import AssetAccountInfo from 'models/asset-account-info'
 import MultisigConfigModel from 'models/multisig-config'
 import { Hardware } from './hardware/hardware'
+import MultisigService from './multisig'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -82,6 +83,7 @@ export default class TransactionSender {
     const txHash = tx.hash!
 
     await TransactionPersistor.saveSentTx(tx, txHash)
+    await MultisigService.saveSentMultisigOutput(tx)
 
     const wallet = WalletService.getInstance().get(walletID)
     await wallet.checkAndGenerateAddresses()

@@ -6,6 +6,7 @@ import RpcService from 'services/rpc-service'
 import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
+import MultisigService from 'services/multisig'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
@@ -224,6 +225,7 @@ export default class SyncApiController {
       const newSyncState = await this.#estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncState.cacheTipNumber))
       SyncStateSubject.next(newSyncState)
+      await MultisigService.syncMultisigOutput(`0x${(BigInt(newSyncState.cacheTipNumber)).toString(16)}`)
     })
 
     CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {

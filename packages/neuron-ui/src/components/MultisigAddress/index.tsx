@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
-import { useOnLocaleChange, isMainnet as isMainnetUtil, shannonToCKBFormatter } from 'utils'
+import { useOnLocaleChange, isMainnet as isMainnetUtil, shannonToCKBFormatter, useExitOnWalletChange } from 'utils'
 import { useState as useGlobalState, withProvider } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import CopyZone from 'widgets/CopyZone'
@@ -34,6 +34,7 @@ const tableActions = ['info', 'delete', 'send']
 const MultisigAddress = () => {
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
+  useExitOnWalletChange()
   const {
     wallet: { id: walletId },
     chain: { networkID },
