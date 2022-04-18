@@ -7,23 +7,24 @@ export const rpcBatchRequest = async (
     params?: any
   }[]
 ): Promise<any[]> => {
-  const res = await axios({
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json'
-    },
-    data: options.map(v => ({
-      id: 0,
+  const res = await axios.post<{ id: number; error?: any; result: any }[]>(
+    ckbIndexerUrl,
+    options.map((v, idx) => ({
+      id: idx,
       jsonrpc: '2.0',
       method: v.method,
       params: v.params
     })),
-    url: ckbIndexerUrl
-  })
+    {
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
+  )
   if (res.status !== 200) {
     throw new Error(`indexer request failed with HTTP code ${res.status}`)
   }
-  return res.data
+  return res.data.sort((a, b) => a.id - b.id)
 }
 
 export default {
