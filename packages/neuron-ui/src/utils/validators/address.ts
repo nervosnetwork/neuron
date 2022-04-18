@@ -83,7 +83,7 @@ const addressTagMap = {
 export function validateSpecificAddress(address: string, isMainnet: boolean, tagName: keyof typeof addressTagMap) {
   validateAddress(address, isMainnet)
   const script = ckbCore.utils.addressToScript(address)
-  const lockInfo = addressTagMap[tagName][isMainnet ? 1 : 0] // first is lock on Lina
+  const lockInfo = addressTagMap[tagName][isMainnet ? 0 : 1] // first is lock on Lina
   if (script.codeHash !== lockInfo.CodeHash || script.hashType !== lockInfo.HashType) {
     throw new AddressNotMatchException(tagName)
   }

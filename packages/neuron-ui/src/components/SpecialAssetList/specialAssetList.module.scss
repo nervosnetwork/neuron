@@ -49,4 +49,5 @@
 .dialog {
   @include dialog-container;
   padding: 24px 48px;
+  width: 520px;
 }
