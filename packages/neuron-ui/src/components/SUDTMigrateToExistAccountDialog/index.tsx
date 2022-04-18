@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { SpecialAssetCell } from 'components/SpecialAssetList'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
-import { getSUDTAmount, isSuccessResponse, validateAddress } from 'utils'
+import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
 import InputSelect from 'widgets/InputSelect'
 import { generateSudtMigrateAcpTx, invokeShowErrorMessage } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
@@ -30,7 +30,7 @@ const SUDTMigrateToExistAccountDialog = ({
   const onAddressChange = useCallback(
     value => {
       try {
-        validateAddress(value, isMainnet)
+        validateSpecificAddress(value, isMainnet, AnyoneCanPayLockInfoOnAggron.TagName)
         setAddressError('')
       } catch (error) {
         setAddressError(t(error.message, error.i18n))
