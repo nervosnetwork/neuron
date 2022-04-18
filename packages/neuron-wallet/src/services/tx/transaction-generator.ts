@@ -1419,8 +1419,10 @@ export class TransactionGenerator {
       )
     } else {
       const addresses = await currentWallet.getNextReceivingAddresses()
-      const usedBlake160s = new Set(await AssetAccountService.blake160sOfAssetAccounts())
-      const addrObj = !currentWallet.isHDWallet() ? addresses[0] : addresses.find(a => !usedBlake160s.has(a.blake160))!
+      const usedBlake160s = new Set(
+        currentWallet.isHDWallet() ? await AssetAccountService.blake160sOfAssetAccounts() : []
+      )
+      const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
       inputSudtCell.setLock(assetAccountInfo.generateAnyoneCanPayScript(addrObj.blake160))
       outputs = [inputSudtCell]
     }
