@@ -1379,6 +1379,7 @@ export class TransactionGenerator {
     const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     let outputs: Output[] = []
+    let acpInputCell: Input | null = null
     if (acpAddress) {
       if (!inputSudtCell.type) {
         throw new MigrateSudtCellNoTypeError()
@@ -1406,17 +1407,16 @@ export class TransactionGenerator {
         })
       ]
       const receiverAcpCellModel = receiverAcpCell.toModel()
-      sudtMigrateAcpInputs.push(
-        Input.fromObject({
-          previousOutput: receiverAcpCellModel.outPoint!,
-          capacity: receiverAcpCellModel.capacity,
-          lock: receiverAcpCellModel.lock,
-          type: receiverAcpCellModel.type,
-          lockHash: receiverAcpCellModel.lockHash,
-          data: receiverAcpCellModel.data,
-          since: '0'
-        })
-      )
+      acpInputCell = Input.fromObject({
+        previousOutput: receiverAcpCellModel.outPoint!,
+        capacity: receiverAcpCellModel.capacity,
+        lock: receiverAcpCellModel.lock,
+        type: receiverAcpCellModel.type,
+        lockHash: receiverAcpCellModel.lockHash,
+        data: receiverAcpCellModel.data,
+        since: '0'
+      })
+      sudtMigrateAcpInputs.push(acpInputCell)
     } else {
       const addresses = await currentWallet.getNextReceivingAddresses()
       const usedBlake160s = new Set(
@@ -1466,7 +1466,13 @@ export class TransactionGenerator {
       throw new LiveCapacityNotEnough()
     }
 
-    tx.inputs = inputs
+    if (acpInputCell) {
+      // if migrate to exist address, the exist address cell should at last
+      const inputsExcludeAcp = inputs.filter(v => v.lockHash !== acpInputCell!.lockHash)
+      tx.inputs = [...inputsExcludeAcp, acpInputCell]
+    } else {
+      tx.inputs = inputs
+    }
     tx.fee = finalFee
 
     if (hasChangeOutput) {

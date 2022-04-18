@@ -2588,7 +2588,7 @@ describe('TransactionGenerator', () => {
         expect(res.outputs).toHaveLength(2)
         expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
       })
-      it('sudt capacitity is not enough', async () => {
+      it('sudt capacitity is not enough and last address should be acp input cell', async () => {
         const sudtCell = Output.fromObject(sudtCellObject)
         getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
         const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
@@ -2596,6 +2596,8 @@ describe('TransactionGenerator', () => {
         expect(res.outputs).toHaveLength(3)
         expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
         expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee)).toString())
+        expect(res.inputs).toHaveLength(3)
+        expect(res.inputs[2].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
       })
     })
 

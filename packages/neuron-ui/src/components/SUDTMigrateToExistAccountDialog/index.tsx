@@ -53,14 +53,16 @@ const SUDTMigrateToExistAccountDialog = ({
         if (res.result) {
           closeDialog()
           dispatch({
-            type: AppActions.UpdateGeneratedTx,
-            payload: res.result,
+            type: AppActions.UpdateExperimentalParams,
+            payload: {
+              tx: res.result,
+            },
           })
           dispatch({
             type: AppActions.RequestPassword,
             payload: {
               walletID,
-              actionType: 'send',
+              actionType: 'send-sudt',
             },
           })
         }
