@@ -16,7 +16,7 @@ import {
   RoutePath,
   isMainnet as isMainnetUtil,
   isSuccessResponse,
-  queryParsers,
+  listParams,
   useFetchTokenInfoList,
   PresetScript,
   nftFormatter,
@@ -163,7 +163,7 @@ const SpecialAssetList = () => {
   )
 
   useEffect(() => {
-    const { pageNo: no } = queryParsers.listParams(search)
+    const { pageNo: no } = listParams(search)
     setPageNo(no)
     fetchList(id, no)
   }, [search, id, dispatch, fetchList])

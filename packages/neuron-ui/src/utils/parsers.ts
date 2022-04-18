@@ -13,8 +13,6 @@ export const listParams = (search: string) => {
   return params
 }
 
-export const queryParsers = { listParams }
-
 export const epochParser = (epoch: string) => {
   const e = epoch.startsWith('0x') ? epoch : `0x${BigInt(epoch).toString(16)}`
   const parsed = parseEpoch(e)
