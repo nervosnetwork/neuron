@@ -104,6 +104,7 @@ const PasswordRequest = () => {
       'claim-cheque',
       'create-account-to-claim-cheque',
       'send-from-multisig-need-one',
+      'send-from-multisig',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
@@ -369,6 +370,8 @@ const PasswordRequest = () => {
           'claim-cheque',
           'create-account-to-claim-cheque',
           'migrate-acp',
+          'send-from-multisig-need-one',
+          'send-from-multisig',
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}

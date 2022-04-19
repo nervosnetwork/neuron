@@ -934,7 +934,9 @@
         "status": "Status",
         "signerApprove": "Lack of {{m}} signer approval(s)",
         "requiredSigner": "Lack of {{r}} required signer approval(s)",
-        "signed": "Signed"
+        "signed": "Signed",
+        "view-concise-data": "View concise data",
+        "view-raw-data": "View raw data"
       },
       "duplicate-address-forbid": "Address can't be duplicated"
     }

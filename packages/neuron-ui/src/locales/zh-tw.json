@@ -926,7 +926,9 @@
         "status": "狀態",
         "signerApprove": "還需要{{m}}個簽名者的確認",
         "requiredSigner": "還需要{{r}}個必要簽名者的確認",
-        "signed": "已簽名"
+        "signed": "已簽名",
+        "view-concise-data": "查看概要",
+        "view-raw-data": "查看原始數據"
       },
       "duplicate-address-forbid": "地址不能重復"
     }
