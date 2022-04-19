@@ -1467,11 +1467,13 @@ export class TransactionGenerator {
 
     if (acpInputCell) {
       // if migrate to exist address, the exist address cell should at last
-      const inputsExcludeAcp = inputs.filter(v => v.lockHash !== acpInputCell!.lockHash)
-      tx.inputs = [...inputsExcludeAcp, acpInputCell]
+      tx.inputs = inputs.sort((a, b) =>
+        a.lockHash === acpInputCell!.lockHash ? 1 : b.lockHash === acpInputCell?.lockHash ? -1 : 0
+      )
     } else {
       tx.inputs = inputs
     }
+    tx.inputs = inputs
     tx.fee = finalFee
 
     if (hasChangeOutput) {

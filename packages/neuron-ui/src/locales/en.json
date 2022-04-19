@@ -760,6 +760,7 @@
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
       "withdraw-asset-tooltip": "Estimate release time is {{year}}-{{month}}-{{day}} {{hour}}:{{minute}}(according to the actual running block height).",
+      "user-defined-token-tooltip": "Migrate sUDT asset to a sUDT Asset Account",
       "claim-asset": "Claim",
       "withdraw-asset": "Withdraw",
       "view-details": "View Details",
