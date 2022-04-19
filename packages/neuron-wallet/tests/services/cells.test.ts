@@ -3,7 +3,7 @@ import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
-import CellsService, { CustomizedLock } from '../../src/services/cells'
+import CellsService, { CustomizedLock, CustomizedType } from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
@@ -977,7 +977,8 @@ describe('CellsService', () => {
           generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: senderChequeLock}),
           // unknown asset
           generateCell('666', OutputStatus.Live, true, typeScript, {lockScript: bobDefaultLock}),
-          generateCell('666', OutputStatus.Live, true, sudtType, {lockScript: bobDefaultLock}),
+          // sudt asset
+          generateCell('777', OutputStatus.Live, true, sudtType, {lockScript: bobDefaultLock}),
         ]
         await getConnection().manager.save(cells)
       });
@@ -991,7 +992,7 @@ describe('CellsService', () => {
             expect(result.totalCount).toEqual(7)
             expect(result.items.length).toEqual(7)
             const totalCapacity = result.items.reduce((total: number, cell: any) => total + parseInt(cell.capacity), 0)
-            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 * 2)
+            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 + 777)
           })
           it('attaches setCustomizedAssetInfo to single multisign cells', async () => {
             const singleMultiSignCells = result.items.filter((item: any) => item.customizedAssetInfo.lock === CustomizedLock.SingleMultiSign)
@@ -1008,10 +1009,18 @@ describe('CellsService', () => {
           });
 
           it('attaches setCustomizedAssetInfo to unknown cells', () => {
-            const chequeCells = result.items.filter((item: any) => item.capacity === '666')
-            expect(chequeCells.length).toEqual(2)
-            expect(chequeCells[0].customizedAssetInfo.type).toBe('Unknown')
-            expect(chequeCells[1].customizedAssetInfo.type).toBe('Unknown')
+            const cells = result.items.filter((item: any) => item.capacity === '666')
+            expect(cells.length).toEqual(1)
+            expect(cells[0].customizedAssetInfo.type).toBe('Unknown')
+          });
+          it('attaches setCustomizedAssetInfo to sudt cells', () => {
+            const cells = result.items.filter((item: any) => item.capacity === '777')
+            expect(cells.length).toEqual(1)
+            expect(cells[0].customizedAssetInfo).toEqual({
+              lock: CustomizedLock.SUDT,
+              type: CustomizedType.SUDT,
+              data: ''
+            })
           });
         });
         describe('within pagination scope', () => {

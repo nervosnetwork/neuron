@@ -8,13 +8,14 @@ import AssetAccount from 'models/asset-account'
 import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
 import AssetAccountEntity from 'database/chain/entities/asset-account'
 import { CapacityNotEnoughForChange } from 'exceptions'
-import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
+import CellsService from 'services/cells'
 import TransactionSender from './transaction-sender'
 import { TransactionGenerator } from './tx'
 import WalletService from './wallets'
 import OutPoint from 'models/chain/out-point'
 import SystemScriptInfo from 'models/system-script-info'
 import Input from 'models/chain/input'
+import { MIN_CELL_CAPACITY } from 'utils/const'
 
 export default class AssetAccountService {
   private static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes') {
@@ -311,7 +312,7 @@ export default class AssetAccountService {
     }
   }
 
-  private static async blake160sOfAssetAccounts(): Promise<string[]> {
+  public static async blake160sOfAssetAccounts(): Promise<string[]> {
     const assetAccounts = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')

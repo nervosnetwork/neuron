@@ -533,6 +533,7 @@
         "307": "Please enter a testnet address",
         "308": "Amount is not enough",
         "309": "The receiver needs to upgrade her account address to accept more transfer.",
+        "310": "Please enter a {{tagName}} address",
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No device detected. Please connect your device.",
         "404": "Multiple device detected. Only one device of the same model can be connected.",
@@ -759,6 +760,7 @@
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
       "withdraw-asset-tooltip": "Estimate release time is {{year}}-{{month}}-{{day}} {{hour}}:{{minute}}(according to the actual running block height).",
+      "user-defined-token-tooltip": "Migrate sUDT asset to a sUDT Asset Account",
       "claim-asset": "Claim",
       "withdraw-asset": "Withdraw",
       "view-details": "View Details",
@@ -766,7 +768,26 @@
       "no-special-assets": "No customized assets",
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
-      "transfer-nft": "Send"
+      "transfer-nft": "Send",
+      "user-defined-token": "Migrate"
+    },
+    "migrate-sudt": {
+      "title": "Migrate to a sUDT Asset Account",
+      "turn-into-new-account": {
+        "title": "Turn into a new sUDT Asset Account",
+        "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      },
+      "transfer-to-exist-account": {
+        "title": "Transfer to a sUDT Asset Account",
+        "sub-title": "Transfer all sUDT balance to an existing sUDT Account, please make sure the target account is alive"
+      },
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "balance": "Balance",
+      "amount": "Amount",
+      "address": "Address"
     },
     "customized-asset": {
       "actions": {

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
@@ -174,6 +174,32 @@ export const useDialog = ({
       }
     }
   }, [show, dialogRef, onClose])
+}
+
+export const useDialogWrapper = ({
+  onClose,
+}: {
+  onClose?: () => void
+} = {}) => {
+  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const openDialog = useCallback(() => {
+    setIsDialogOpen(true)
+  }, [setIsDialogOpen])
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
+  useDialog({
+    show: isDialogOpen,
+    dialogRef,
+    onClose: onClose || closeDialog,
+  })
+  return {
+    isDialogOpen,
+    openDialog,
+    closeDialog,
+    dialogRef,
+  }
 }
 
 export const useOnDefaultContextMenu = (t: TFunction) =>

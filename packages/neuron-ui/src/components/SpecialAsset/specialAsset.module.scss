@@ -91,7 +91,7 @@
       color: #ffffff80 !important;
     }
 
-    &.hasTooltip:disabled[data-tooltip] {
+    &.hasTooltip[data-tooltip] {
       @include tooltip;
       position: relative;
 

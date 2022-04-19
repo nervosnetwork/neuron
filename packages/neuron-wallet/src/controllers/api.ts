@@ -495,6 +495,10 @@ export default class ApiController {
       return this.#anyoneCanPayController.sendTx(params)
     })
 
+    handle('generate-sudt-migrate-acp-tx', async (_, params) => {
+      return this.#anyoneCanPayController.generateSudtMigrateAcpTx(params)
+    })
+
     handle('get-sudt-token-info', async (_, params: { tokenID: string }) => {
       return this.#sudtController.getSUDTTokenInfo(params)
     })

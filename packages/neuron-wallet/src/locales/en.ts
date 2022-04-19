@@ -125,7 +125,8 @@ export default {
       'multisig-config-exist': 'The multisig config has exist',
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
-      'transaction-no-input-paramter': 'The query input cell is missing a required parameter'
+      'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
+      'migrate-sudt-no-type': 'The migrating cell does not have type script'
     },
     messageBox: {
       button: {

@@ -14,6 +14,7 @@ import {
   toUint128Le,
   sudtValueToAmount,
   nftFormatter,
+  getSUDTAmount,
 } from 'utils'
 import styles from './specialAsset.module.scss'
 
@@ -82,11 +83,16 @@ const SpecialAsset = ({
   const [t] = useTranslation()
   const [date, time] = uniformTimeFormatter(datetime).split(' ')
   let targetTime: undefined | number
-  let status: 'user-defined-asset' | 'locked-asset' | 'claim-asset' | 'withdraw-asset' | 'transfer-nft' =
-    'user-defined-asset'
+  let status:
+    | 'user-defined-asset'
+    | 'locked-asset'
+    | 'claim-asset'
+    | 'withdraw-asset'
+    | 'transfer-nft'
+    | 'user-defined-token' = 'user-defined-asset'
   let epochsInfo: Record<'target' | 'current', number> | undefined
-  let amount = `${shannonToCKBFormatter(capacity)} CKB`
-  let amountToCopy = shannonToCKBFormatter(capacity, false, '')
+  let amount: string = `${shannonToCKBFormatter(capacity)} CKB`
+  let amountToCopy: string = shannonToCKBFormatter(capacity, false, '')
 
   switch (assetInfo.lock) {
     case PresetScript.Locktime: {
@@ -126,6 +132,14 @@ const SpecialAsset = ({
         amount = 'sUDT Token'
         amountToCopy = 'sUDT Token'
       }
+      break
+    }
+    case PresetScript.SUDT: {
+      status = 'user-defined-token'
+      const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
+      const amountInfo = getSUDTAmount({ tokenInfo, type, data })
+      amount = amountInfo.amount
+      amountToCopy = amountInfo.amountToCopy
       break
     }
     default: {
@@ -172,7 +186,9 @@ const SpecialAsset = ({
               isLockedCheque
             }
             className={
-              ['user-defined-asset', 'locked-asset'].includes(status) || isLockedCheque ? styles.hasTooltip : ''
+              ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) || isLockedCheque
+                ? styles.hasTooltip
+                : ''
             }
             data-tooltip={
               assetInfo.lock === PresetScript.Cheque && !isLockedCheque

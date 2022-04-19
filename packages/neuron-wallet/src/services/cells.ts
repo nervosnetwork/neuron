@@ -29,8 +29,7 @@ import AssetAccountInfo from 'models/asset-account-info'
 import NFT from 'models/nft'
 import MultisigConfigModel from 'models/multisig-config'
 import MultisigOutput from 'database/chain/entities/multisig-output'
-
-export const MIN_CELL_CAPACITY = '6100000000'
+import { MIN_CELL_CAPACITY } from 'utils/const'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -39,13 +38,15 @@ export interface PaginationResult<T = any> {
 
 export enum CustomizedLock {
   SingleMultiSign = 'SingleMultiSign',
-  Cheque = 'Cheque'
+  Cheque = 'Cheque',
+  SUDT = 'SUDT'
 }
 
 export enum CustomizedType {
   NFT = 'NFT',
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
+  SUDT = 'SUDT',
   Unknown = 'Unknown'
 }
 
@@ -385,6 +386,12 @@ export default class CellsService {
           type: '',
           data: ''
         })
+      } else if (o.typeCodeHash === sudtCodehash) {
+        cell.setCustomizedAssetInfo({
+          lock: CustomizedLock.SUDT,
+          type: CustomizedType.SUDT,
+          data: ''
+        })
       } else {
         cell.setCustomizedAssetInfo({
           lock: '',
@@ -490,10 +497,15 @@ export default class CellsService {
     baseSize: number = 0,
     changeOutputSize: number = 0,
     changeOutputDataSize: number = 0,
-    append?: {
-      input: Input
-      witness: WitnessArgs
-    },
+    append?:
+      | {
+          input: Input
+          witness: WitnessArgs
+        }
+      | {
+          input: Input
+          witness: WitnessArgs
+        }[],
     lockClass: {
       lockArgs?: string[]
       codeHash: string
@@ -553,9 +565,20 @@ export default class CellsService {
     let inputCapacities: bigint = BigInt(0)
     let totalSize: number = baseSize
     if (append) {
-      inputs.push(append.input)
-      totalSize += TransactionSize.input()
-      totalSize += TransactionSize.witness(append.witness)
+      let appends: {
+        input: Input
+        witness: WitnessArgs
+      }[]
+      if (Array.isArray(append)) {
+        appends = append
+      } else {
+        appends = [append]
+      }
+      appends.forEach(v => {
+        inputs.push(v.input)
+        totalSize += TransactionSize.input()
+        totalSize += TransactionSize.witness(v.witness)
+      })
     }
     let hasChangeOutput: boolean = false
     const multisigConfigMap: Record<string, MultisigConfigModel> = multisigConfigs.reduce(
@@ -937,7 +960,7 @@ export default class CellsService {
     const anyoneCanPayOutputs = inputOriginCells.map(cell => {
       const cellCapacity: bigint = inputs
         .filter(i => i.lockHash === cell.lockHash)
-        .map(i => BigInt(i.capacity))
+        .map(i => BigInt(i.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       let capacity: bigint = BigInt(0)
       if (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= currentFee) {

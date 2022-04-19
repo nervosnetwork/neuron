@@ -97,6 +97,7 @@ export enum ErrorCode {
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
   AddressIsDeprecated = 309,
+  AddressTypeNotMatch = 310,
   // hardware
   SignTransactionFailed = 400,
   ConnectFailed = 401,
@@ -122,6 +123,7 @@ export enum SyncStatus {
 export enum PresetScript {
   Locktime = 'SingleMultiSign',
   Cheque = 'Cheque',
+  SUDT = 'SUDT',
 }
 
 export enum CompensationPeriod {

@@ -168,6 +168,16 @@ export default class Output {
     this.lockHash = value.computeHash()
   }
 
+  public setType(value: Script | null) {
+    if (value) {
+      this.type = value
+      this.lockHash = value.computeHash()
+    } else {
+      this.type = value
+      this.typeHash = undefined
+    }
+  }
+
   public setMultiSignBlake160(value: string) {
     this.multiSignBlake160 = value
   }

@@ -29,3 +29,17 @@ export class AddressDeprecatedException extends Error {
     super(`${I18N_PATH}${ErrorCode.AddressIsDeprecated}`)
   }
 }
+
+export class AddressNotMatchException extends Error {
+  public code = ErrorCode.AddressTypeNotMatch
+  public i18n: {
+    tagName: string
+  }
+
+  constructor(tagName: string) {
+    super(`${I18N_PATH}${ErrorCode.AddressTypeNotMatch}`)
+    this.i18n = {
+      tagName,
+    }
+  }
+}

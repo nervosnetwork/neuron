@@ -122,9 +122,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className }: 
         data-open={openRef.current}
       >
         <input className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
-        <div className={styles.arrowWrapper}>
-          <span className={styles.arrow} />
-        </div>
+        <div className={styles.arrow} />
       </div>
       {openRef.current ? (
         <div className={styles.menu} aria-expanded="true">

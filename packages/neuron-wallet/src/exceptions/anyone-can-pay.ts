@@ -12,6 +12,12 @@ export class AcpSendSameAccountError extends Error {
   }
 }
 
+export class MigrateSudtCellNoTypeError extends Error {
+  constructor() {
+    super(t('messages.migrate-sudt-no-type'))
+  }
+}
+
 export default {
   TargetOutputNotFoundError,
   AcpSendSameAccountError
