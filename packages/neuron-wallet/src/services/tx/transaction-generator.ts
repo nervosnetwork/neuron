@@ -28,6 +28,7 @@ import MultisigConfigModel from 'models/multisig-config'
 import WalletService from 'services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from 'utils/const'
 import AssetAccountService from 'services/asset-account-service'
+import LiveCellService from 'services/live-cell-service'
 
 export interface TargetOutput {
   address: string
@@ -1384,14 +1385,13 @@ export class TransactionGenerator {
       if (!inputSudtCell.type) {
         throw new MigrateSudtCellNoTypeError()
       }
-      const receiverAcpCells = await CellsService.getACPCells(
+      const receiverAcpCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(
         Script.fromSDK(addressToScript(acpAddress)),
         inputSudtCell.type
       )
-      if (!receiverAcpCells.length) {
+      if (!receiverAcpCell) {
         throw new TargetOutputNotFoundError()
       }
-      const receiverAcpCell = receiverAcpCells[0]
       const receiverAcpInputAmount = BufferUtils.readBigUInt128LE(receiverAcpCell.data)
       const sudtCellAmount = BufferUtils.readBigUInt128LE(inputSudtCell.data)
       const receiverAcpOutputAmount = receiverAcpInputAmount + sudtCellAmount
@@ -1401,19 +1401,18 @@ export class TransactionGenerator {
         inputSudtCell,
         Output.fromObject({
           capacity: receiverAcpCell.capacity,
-          lock: receiverAcpCell.lockScript(),
-          type: receiverAcpCell.typeScript(),
+          lock: receiverAcpCell.lock(),
+          type: receiverAcpCell.type(),
           data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount)
         })
       ]
-      const receiverAcpCellModel = receiverAcpCell.toModel()
       acpInputCell = Input.fromObject({
-        previousOutput: receiverAcpCellModel.outPoint!,
-        capacity: receiverAcpCellModel.capacity,
-        lock: receiverAcpCellModel.lock,
-        type: receiverAcpCellModel.type,
-        lockHash: receiverAcpCellModel.lockHash,
-        data: receiverAcpCellModel.data,
+        previousOutput: receiverAcpCell.outPoint(),
+        capacity: receiverAcpCell.capacity,
+        lock: receiverAcpCell.lock(),
+        type: receiverAcpCell.type(),
+        lockHash: receiverAcpCell.lockHash,
+        data: receiverAcpCell.data,
         since: '0'
       })
       sudtMigrateAcpInputs.push(acpInputCell)
