@@ -18,7 +18,7 @@ import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
 import { serializeWitnessArgs, AddressPrefix, scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
-import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough, MigrateSudtCellNoTypeError, TargetOutputNotFoundError } from '../../../src/exceptions'
+import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough, MigrateSudtCellNoTypeError, SudtAcpHaveDataError, TargetOutputNotFoundError } from '../../../src/exceptions'
 import LiveCell from '../../../src/models/chain/live-cell'
 import AddressGenerator from '../../../src/models/address-generator'
 import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
@@ -2702,23 +2702,42 @@ describe('TransactionGenerator', () => {
         expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
       })
     })
-    it('sUDT account', async () => {
-      const typeScript = new Script(
-        '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
-        '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
-        ScriptHashType.Type
-      )
-      const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
-      const asssetAccountInput = input.toModel()
-      asssetAccountInput.capacity = toShannon('142')
-      const res = await TransactionGenerator.generateDestoryAssetAccountTx(
-        alice.walletId,
-        [asssetAccountInput],
-        bob.publicKeyInBlake160,
-        false
-      )
-      const expectCapacity = BigInt(toShannon('142')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
-      expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+    describe('sUDT account', () => {
+      it('sUDT amount is not zero throw exception', async () => {
+        const typeScript = new Script(
+          '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+          '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+          ScriptHashType.Type
+        )
+        const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('142')
+        asssetAccountInput.data = BufferUtils.writeBigUInt128LE(BigInt('10'))
+        await expect(TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          false
+        )).rejects.toThrow(new SudtAcpHaveDataError())
+      })
+      it('destory success', async () => {
+        const typeScript = new Script(
+          '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+          '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+          ScriptHashType.Type
+        )
+        const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('142')
+        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          false
+        )
+        const expectCapacity = BigInt(toShannon('142')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+        expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+      })
     })
   })
 })

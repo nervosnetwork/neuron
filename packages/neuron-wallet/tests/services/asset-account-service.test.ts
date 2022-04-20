@@ -1122,6 +1122,7 @@ describe('AssetAccountService', () => {
             type: outputs[0].typeScript(),
             lockHash: outputs[0].lockHash,
             typeHash: outputs[0].typeHash,
+            data: outputs[0].data,
             since: '0'
           })
         ],
@@ -1156,6 +1157,7 @@ describe('AssetAccountService', () => {
             type: outputs[0].typeScript(),
             lockHash: outputs[0].lockHash,
             typeHash: outputs[0].typeHash,
+            data: outputs[0].data,
             since: '0'
           })
         ],
