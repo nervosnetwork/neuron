@@ -2656,5 +2656,69 @@ describe('TransactionGenerator', () => {
         expect(error).not.toEqual(null)
       });
     });
-  });
+  })
+
+  describe('generateDestoryAssetAccountTx', () => {
+    describe('CKB account', () => {
+      it('capacity not enough for fee', async () => {
+        const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('61')
+        await expect(TransactionGenerator.generateDestoryAssetAccountTx(
+          'walletId',
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          true
+        )).rejects.toThrow(new CapacityNotEnough())
+      })
+      it('account capacity not enough for fee need other address', async () => {
+        const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('61')
+        const cell: OutputEntity = generateCell(toShannon('62'), OutputStatus.Live, false, null, alice)
+        await getConnection().manager.save(cell)
+        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          true
+        )
+        const expectCapacity = BigInt(toShannon('123')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+        expect(res.inputs).toHaveLength(2)
+        expect(res.inputs[1].capacity).toBe(toShannon('62'))
+        expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+      })
+      it('account capacity enough for fee', async () => {
+        const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('62')
+        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          true
+        )
+        const expectCapacity = BigInt(toShannon('62')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+        expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+      })
+    })
+    it('sUDT account', async () => {
+      const typeScript = new Script(
+        '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+        '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+        ScriptHashType.Type
+      )
+      const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
+      const asssetAccountInput = input.toModel()
+      asssetAccountInput.capacity = toShannon('142')
+      const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+        alice.walletId,
+        [asssetAccountInput],
+        bob.publicKeyInBlake160,
+        false
+      )
+      const expectCapacity = BigInt(toShannon('142')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+      expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+    })
+  })
 })

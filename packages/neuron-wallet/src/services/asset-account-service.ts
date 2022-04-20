@@ -75,14 +75,16 @@ export default class AssetAccountService {
     return totalBalance
   }
 
-  public static async destoryCKBAssetAccount(walletID: string, assetAccount: AssetAccount) {
-    const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, 'CKBytes')
+  public static async destoryAssetAccount(walletID: string, assetAccount: AssetAccount) {
+    const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, assetAccount.tokenID)
     const inputs = cells.map(cell => {
       return Input.fromObject({
         previousOutput: cell.outPoint(),
         capacity: cell.capacity,
         lock: cell.lockScript(),
+        type: cell.typeScript(),
         lockHash: cell.lockHash,
+        typeHash: cell.typeHash,
         since: '0'
       })
     })
@@ -91,7 +93,12 @@ export default class AssetAccountService {
 
     const address = await wallet.getNextChangeAddress()
 
-    const tx = await TransactionGenerator.generateDestoryCKBAssetAccountTx(walletID, inputs, address!.blake160)
+    const tx = await TransactionGenerator.generateDestoryAssetAccountTx(
+      walletID,
+      inputs,
+      address!.blake160,
+      assetAccount.tokenID === 'CKBytes'
+    )
 
     return {
       assetAccount,

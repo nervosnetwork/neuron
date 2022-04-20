@@ -704,28 +704,19 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateDestoryCKBAssetAccountTx(
+  public static async generateDestoryAssetAccountTx(
     walletId: string,
     asssetAccountInputs: Input[],
-    changeBlake160: string
+    changeBlake160: string,
+    isCKBAccount: boolean
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
 
-    const cellDeps = [secpCellDep, anyoneCanPayDep]
-
-    const { inputs: changeInputs } = await CellsService.gatherInputs('0', walletId)
-
-    if (changeInputs.length === 0) {
-      throw new CapacityNotEnough()
+    const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
+    if (!isCKBAccount) {
+      cellDeps.push(assetAccountInfo.sudtCellDep)
     }
-
-    const [changeInput] = changeInputs
-    const allInputs = [...asssetAccountInputs, changeInput]
-    const allCapacities = allInputs.reduce((a, b) => {
-      return a + BigInt(b.capacity as string)
-    }, BigInt(0))
 
     const output = Output.fromObject({
       capacity: '0',
@@ -736,17 +727,34 @@ export class TransactionGenerator {
       version: '0',
       headerDeps: [],
       cellDeps,
-      inputs: allInputs,
+      inputs: asssetAccountInputs,
       outputs: [output],
       outputsData: [output.data],
       witnesses: []
     })
 
-    const txSize = TransactionSize.tx(tx)
-    tx.fee = TransactionFee.fee(txSize, BigInt(1e4)).toString()
+    let allCapacities = asssetAccountInputs.reduce((a, b) => {
+      return a + BigInt(b.capacity as string)
+    }, BigInt(0))
+    tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
     const outputCapacity = allCapacities - BigInt(tx.fee)
     tx.outputs[0].capacity = outputCapacity.toString()
 
+    if (outputCapacity >= BigInt(MIN_CELL_CAPACITY)) {
+      tx.outputs[0].capacity = outputCapacity.toString()
+      return tx
+    }
+    const { inputs: changeInputs } = await CellsService.gatherInputs('0', walletId)
+    if (changeInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    tx.inputs.push(changeInputs[0])
+    allCapacities = tx.inputs.reduce((a, b) => {
+      return a + BigInt(b.capacity as string)
+    }, BigInt(0))
+    tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
+    tx.outputs[0].capacity = (allCapacities - BigInt(tx.fee)).toString()
     return tx
   }
 
@@ -1473,7 +1481,6 @@ export class TransactionGenerator {
     } else {
       tx.inputs = inputs
     }
-    tx.inputs = inputs
     tx.fee = finalFee
 
     if (hasChangeOutput) {

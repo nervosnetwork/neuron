@@ -1,5 +1,6 @@
 
 import {SyncStatus} from '../../src/controllers/sync-api'
+import { ServiceHasNoResponse } from '../../src/exceptions'
 
 const stubbedGetSyncStatus = jest.fn()
 const stubbedGetAllWindows = jest.fn()
@@ -7,6 +8,8 @@ const stubbedGetFocusedWindow = jest.fn()
 const stubbedShowMessageBox = jest.fn()
 const stubbedGenerateMigrateLegacyACPTx = jest.fn()
 const stubbedCommandSubjectNext = jest.fn()
+const stubbedAssetAccountServiceGetAccount = jest.fn()
+const stubbedAssetAccountServiceDestoryAssetAccount = jest.fn()
 
 const resetMocks = () => {
   stubbedGetSyncStatus.mockReset()
@@ -15,6 +18,8 @@ const resetMocks = () => {
   stubbedGetFocusedWindow.mockReset()
   stubbedGenerateMigrateLegacyACPTx.mockReset()
   stubbedCommandSubjectNext.mockReset()
+  stubbedAssetAccountServiceGetAccount.mockReset()
+  stubbedAssetAccountServiceDestoryAssetAccount.mockReset()
 }
 
 describe('AssetAccountController', () => {
@@ -61,6 +66,11 @@ describe('AssetAccountController', () => {
   jest.doMock('../../src/models/subjects/command', () => ({
     next: stubbedCommandSubjectNext
   }));
+
+  jest.doMock('../../src/services/asset-account-service.ts', () => ({
+    getAccount: stubbedAssetAccountServiceGetAccount,
+    destoryAssetAccount: stubbedAssetAccountServiceDestoryAssetAccount
+  }))
 
   beforeEach(() => {
     resetMocks()
@@ -133,4 +143,20 @@ describe('AssetAccountController', () => {
       })
     });
   });
+  describe('destoryAssetAccount', () => {
+    const params = {
+      walletID: 'walletID',
+      id: 1
+    }
+    it('no AssetAccount', async () => {
+      stubbedAssetAccountServiceGetAccount.mockResolvedValueOnce(undefined)
+      await expect(assetAccountController.destoryAssetAccount(params)).rejects.toThrow(new ServiceHasNoResponse('AssetAccount'))
+    })
+    it('excute success', async () => {
+      stubbedAssetAccountServiceGetAccount.mockResolvedValueOnce({})
+      stubbedAssetAccountServiceDestoryAssetAccount.mockResolvedValueOnce({})
+      await assetAccountController.destoryAssetAccount(params)
+      expect(stubbedAssetAccountServiceDestoryAssetAccount).toHaveBeenCalledWith(params.walletID, {})
+    })
+  })
 });
