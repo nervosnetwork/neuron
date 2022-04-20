@@ -126,7 +126,8 @@ export default {
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
       'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
-      'migrate-sudt-no-type': 'The migrating cell does not have type script'
+      'migrate-sudt-no-type': 'The migrating cell does not have type script',
+      'sudt-acp-have-data': 'The destroying sUDT acp account have amount'
     },
     messageBox: {
       button: {

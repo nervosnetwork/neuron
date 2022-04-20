@@ -85,6 +85,7 @@ export default class AssetAccountService {
         type: cell.typeScript(),
         lockHash: cell.lockHash,
         typeHash: cell.typeHash,
+        data: cell.data,
         since: '0'
       })
     })

@@ -393,8 +393,6 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
           'claim-cheque',
           'create-account-to-claim-cheque',
           'migrate-acp',
-          'send-from-multisig-need-one',
-          'send-from-multisig',
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}

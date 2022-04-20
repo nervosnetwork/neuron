@@ -507,7 +507,7 @@ export default class ApiController {
       return this.#sudtController.getSUDTTypeScriptHash(params)
     })
 
-    handle('generate-destroy-account-tx', async (_, params: { walletID: string, id: number }) => {
+    handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string, id: number }) => {
       return this.#assetAccountController.destoryAssetAccount(params)
     })
 

@@ -117,7 +117,8 @@ export default {
       'multisig-config-address-error': '多簽配置的地址設置不正確',
       'multisig-config-need-error': '多簽交易生成需要多簽配置',
       'transaction-no-input-paramter': '查詢 Input Cell 缺少必要的參數',
-      'migrate-sudt-no-type': '遷移的 sUDT Cell 沒有 type script'
+      'migrate-sudt-no-type': '遷移的 sUDT Cell 沒有 type script',
+      'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0'
     },
     messageBox: {
       button: {

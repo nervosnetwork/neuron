@@ -377,11 +377,7 @@ const SUDTSend = () => {
   }, [globalDispatch, walletId, accountId])
 
   const showDestory = useMemo(
-    () =>
-      accountType === AccountType.CKB ||
-      !accountInfo ||
-      !accountInfo.balance ||
-      BigInt(accountInfo.balance) === BigInt(0),
+    () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
     [accountType, accountInfo]
   )
 

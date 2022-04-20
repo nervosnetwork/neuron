@@ -1,5 +1,10 @@
 import CellsService from 'services/cells'
-import { CapacityTooSmall, MigrateSudtCellNoTypeError, TargetOutputNotFoundError } from 'exceptions'
+import {
+  CapacityTooSmall,
+  MigrateSudtCellNoTypeError,
+  SudtAcpHaveDataError,
+  TargetOutputNotFoundError
+} from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
@@ -714,6 +719,9 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
 
     const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
+    if (asssetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
+      throw new SudtAcpHaveDataError()
+    }
     if (!isCKBAccount) {
       cellDeps.push(assetAccountInfo.sudtCellDep)
     }
@@ -738,7 +746,6 @@ export class TransactionGenerator {
     }, BigInt(0))
     tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
     const outputCapacity = allCapacities - BigInt(tx.fee)
-    tx.outputs[0].capacity = outputCapacity.toString()
 
     if (outputCapacity >= BigInt(MIN_CELL_CAPACITY)) {
       tx.outputs[0].capacity = outputCapacity.toString()

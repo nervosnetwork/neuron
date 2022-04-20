@@ -103,7 +103,7 @@ type Action =
   | 'migrate-acp'
   | 'check-migrate-acp'
   | 'get-sudt-token-info'
-  | 'generate-destroy-account-tx'
+  | 'generate-destroy-asset-account-tx'
   | 'get-sudt-type-script-hash'
   | 'generate-sudt-migrate-acp-tx'
   // Cheque
