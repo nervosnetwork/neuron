@@ -105,6 +105,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       'withdraw-cheque',
       'claim-cheque',
       'create-account-to-claim-cheque',
+      'destroy-asset-account',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
@@ -218,7 +219,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
             await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
-          case 'destroy-ckb-account':
+          case 'destroy-asset-account':
           case 'send-nft':
           case 'send-cheque': {
             if (isSending) {

@@ -96,7 +96,7 @@ export default class AssetAccountController {
     }
   }
 
-  public async destoryCKBAssetAccount(params: {
+  public async destoryAssetAccount(params: {
     walletID: string
     id: number
   }): Promise<Controller.Response<Transaction>> {
@@ -106,7 +106,7 @@ export default class AssetAccountController {
       throw new ServiceHasNoResponse('AssetAccount')
     }
 
-    const { tx } = await AssetAccountService.destoryCKBAssetAccount(params.walletID, account)
+    const { tx } = await AssetAccountService.destoryAssetAccount(params.walletID, account)
 
     return {
       status: ResponseCode.Success,

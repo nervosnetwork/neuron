@@ -118,7 +118,8 @@ export default {
       'multisig-config-address-error': '多签配置的地址设置不正确',
       'multisig-config-need-error': '多签交易生成需要多签配置',
       'transaction-no-input-paramter': '查询 Input Cell 缺少必要的参数',
-      'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script'
+      'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script',
+      'sudt-acp-have-data': '待销毁的 sUDT 账户资产不为 0'
     },
     messageBox: {
       button: {
