@@ -6,10 +6,18 @@ import {
   validateOutputs,
   CKBToShannonFormatter,
   shannonToCKBFormatter,
+  isSuccessResponse,
 } from 'utils'
 import { useDispatch } from 'states'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { generateMultisigTx, MultisigConfig, generateMultisigSendAllTx } from 'services/remote'
+import {
+  generateMultisigTx,
+  MultisigConfig,
+  generateMultisigSendAllTx,
+  exportTransactionAsJSON,
+  OfflineSignStatus,
+  OfflineSignType,
+} from 'services/remote'
 import { TFunction } from 'i18next'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
@@ -223,6 +231,30 @@ export const useSendInfo = ({
     isSendMax,
     isMaxBtnDisabled,
   }
+}
+
+export const useCanSign = ({
+  addresses,
+  multisigConfig,
+}: {
+  addresses: State.Address[]
+  multisigConfig: MultisigConfig
+}) => {
+  const addressList = useMemo(() => addresses.map(v => v.address), [addresses])
+  return useMemo(() => multisigConfig.addresses.some(v => addressList.includes(v)), [multisigConfig, addressList])
+}
+
+export const useExport = ({ generatedTx, closeDialog }: { generatedTx: any; closeDialog: () => void }) => {
+  return useCallback(async () => {
+    const res = await exportTransactionAsJSON({
+      transaction: generatedTx,
+      status: OfflineSignStatus.Unsigned,
+      type: OfflineSignType.SendFromMultisigOnlySig,
+    })
+    if (isSuccessResponse(res)) {
+      closeDialog()
+    }
+  }, [closeDialog, generatedTx])
 }
 
 export const useOnSumbit = ({

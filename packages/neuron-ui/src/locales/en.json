@@ -899,7 +899,8 @@
         "address": "Address",
         "amount": "Amount",
         "send": "Send",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "export": "Export Tx"
       },
       "create-dialog": {
         "title": "Create multisig address",
@@ -929,12 +930,13 @@
         "transaction": "Transaction",
         "cancel": "Cancel",
         "signAndExport": "Sign & Export",
+        "export": "Export Tx",
         "signAndBroadcast": "Sign & Broadcast",
         "broadcast": "Broadcast",
         "content": "Content:",
         "status": "Status",
-        "signerApprove": "Lack of {{m}} signer approval(s)",
-        "requiredSigner": "Lack of {{r}} required signer approval(s)",
+        "signerApprove": "Lack of {{m}} signer approval(s), including {{r}} from specified signer(s)",
+        "noRSignerApprove": "Lack of {{m}} signer approval(s)",
         "signed": "Signed",
         "view-concise-data": "View concise data",
         "view-raw-data": "View raw data"

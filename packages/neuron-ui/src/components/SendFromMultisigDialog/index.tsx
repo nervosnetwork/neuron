@@ -9,7 +9,7 @@ import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, valida
 import { useState as useGlobalState } from 'states'
 import CopyZoneAddress from 'widgets/CopyZoneAddress'
 
-import { useSendInfo, useOnSumbit } from './hooks'
+import { useSendInfo, useOnSumbit, useExport, useCanSign } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
 
 const SendFromMultisigDialog = ({
@@ -62,6 +62,8 @@ const SendFromMultisigDialog = ({
     [outputErrors, sendInfoList, totalAmountErrorMessage]
   )
   const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
+  const onExport = useExport({ generatedTx, closeDialog })
+  const canSign = useCanSign({ addresses: wallet.addresses, multisigConfig })
   return (
     <>
       <div className={styles.sendCKBTitle}>
@@ -110,13 +112,22 @@ const SendFromMultisigDialog = ({
       </div>
       <div className={styles.sendActions}>
         <Button label={t('multisig-address.send-ckb.cancel')} type="cancel" onClick={closeDialog} />
-        <Button
-          disabled={isSendDisabled}
-          label={t('multisig-address.send-ckb.send')}
-          type="primary"
-          onClick={onSumbit}
-          data-wallet-id={wallet.id}
-        />
+        {canSign ? (
+          <Button
+            disabled={isSendDisabled}
+            label={t('multisig-address.send-ckb.send')}
+            type="primary"
+            onClick={onSumbit}
+            data-wallet-id={wallet.id}
+          />
+        ) : (
+          <Button
+            disabled={isSendDisabled}
+            label={t('multisig-address.send-ckb.export')}
+            type="primary"
+            onClick={onExport}
+          />
+        )}
       </div>
     </>
   )

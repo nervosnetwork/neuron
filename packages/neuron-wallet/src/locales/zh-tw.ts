@@ -120,7 +120,8 @@ export default {
       'migrate-sudt-no-type': '遷移的 sUDT Cell 沒有 type script',
       'multisig-lock-hash-mismatch': '當前多簽地址與需要確認交易不匹配',
       'multisig-not-signed': '多簽交易缺少部分簽名',
-      'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0'
+      'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0',
+      'no-match-address-for-sign': '没有找到匹配的地址'
     },
     messageBox: {
       button: {

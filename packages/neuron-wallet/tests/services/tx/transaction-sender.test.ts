@@ -111,7 +111,6 @@ jest.mock('../../../src/models/system-script-info', () => {
   }
 })
 
-import { t } from 'i18next'
 import Transaction from '../../../src/models/chain/transaction'
 import TxStatus from '../../../src/models/chain/tx-status'
 import CellDep, { DepType } from '../../../src/models/chain/cell-dep'
@@ -126,7 +125,7 @@ import CellWithStatus from '../../../src/models/chain/cell-with-status'
 import SystemScriptInfo from '../../../src/models/system-script-info'
 import NodeService from '../../../src/services/node'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
-import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer } from '../../../src/exceptions/wallet'
+import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, MultisigConfigNeedError, NoMatchAddressForSign } from '../../../src/exceptions'
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multi-sign'
@@ -940,7 +939,45 @@ describe('TransactionSender Test', () => {
       })
 
       it('throw exception no matched multisig config', async () => {
-        expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [])).rejects.toThrowError(t('messages.multisig-config-need-error'))
+        mockGAI.mockReturnValueOnce([{ path: '' }])
+        transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
+        await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [])).rejects.toThrowError(new MultisigConfigNeedError())
+      })
+
+      it('throw exception no matched multisig config addresses', async () => {
+        const addresses = ['ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4', 'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6']
+        const multiArgs = new Multisig().hash(addresses, {
+          S: '0x00',
+          R: '0x01',
+          M: '0x01',
+          N: '0x02'
+        })
+        const noMatchAddress = 'ckt1qyqf5v66n4vrxu75kks2ku06g7trnkdwt52s8000ee'
+        const multisigConfig = MultisigConfigModel.fromObject({
+          walletId: fakeWallet.id,
+          r: 1,
+          m: 1,
+          n: 2,
+          addresses,
+          fullPayload: scriptToAddress({
+            args: multiArgs,
+            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+          })
+        })
+        const addr = {
+          walletId: fakeWallet.id,
+          address: noMatchAddress,
+          blake160: addressToScript(noMatchAddress).args,
+          version: 'testnet'
+        }
+    
+        const mockGAI = jest.fn()
+        mockGAI.mockReturnValueOnce([addr])
+        transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
+  
+        tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
+        await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])).rejects.toThrow(new NoMatchAddressForSign())
       })
     })
   })

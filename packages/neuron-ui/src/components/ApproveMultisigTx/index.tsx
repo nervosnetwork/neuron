@@ -8,7 +8,7 @@ import { ckbCore } from 'services/chain'
 import { shannonToCKBFormatter } from 'utils'
 import ScriptTag from 'components/ScriptTag'
 import styles from './approveMultisigTx.module.scss'
-import { useBroadcast, useSignAndBroadcast, useSignAndExport, useSignedStatus, useTabView } from './hooks'
+import { useBroadcast, useExport, useSignAndBroadcast, useSignAndExport, useSignedStatus, useTabView } from './hooks'
 
 const Cell = React.memo(
   ({
@@ -52,25 +52,48 @@ const ApproveMultisigTx = ({
   const jsonContent = useMemo(() => {
     return JSON.stringify(offlineSignJson, null, 2)
   }, [offlineSignJson])
-  const [lackOfRCount, lackOfMCount] = useSignedStatus({
+  const { lackOfRCount, lackOfMCount, canBroadcastAfterSign, canSign } = useSignedStatus({
     multisigConfig,
     signatures: offlineSignJson.transaction.signatures,
+    addresses: wallet.addresses,
   })
   const onSignAndExport = useSignAndExport({
     multisigConfig,
     walletID: wallet.id,
     offlineSignJson,
-    onlyNeedOne: lackOfMCount === 1,
+    closeDialog,
   })
   const onBroadcast = useBroadcast({ offlineSignJson, walletID: wallet.id, closeDialog, t })
   const onSignAndBroadcast = useSignAndBroadcast({
     multisigConfig,
     walletID: wallet.id,
     offlineSignJson,
-    onlyNeedOne: lackOfMCount === 1,
+    canBroadcastAfterSign,
     closeDialog,
   })
+  const onExport = useExport({ offlineSignJson, closeDialog })
   const { tabIdx, onTabClick } = useTabView()
+  const [label, action] = useMemo(() => {
+    if (!lackOfMCount && !lackOfRCount) {
+      return ['broadcast', onBroadcast]
+    }
+    if (!canSign) {
+      return ['export', onExport]
+    }
+    if (canBroadcastAfterSign) {
+      return ['signAndBroadcast', onSignAndBroadcast]
+    }
+    return ['signAndExport', onSignAndExport]
+  }, [
+    lackOfMCount,
+    lackOfRCount,
+    canSign,
+    canBroadcastAfterSign,
+    onBroadcast,
+    onExport,
+    onSignAndBroadcast,
+    onSignAndExport,
+  ])
   return (
     <>
       <div className={styles.title}>
@@ -107,25 +130,18 @@ const ApproveMultisigTx = ({
           </>
         )}
         <div className={styles.statusTitle}>{t('multisig-address.approve-dialog.status')}</div>
-        {!lackOfMCount && !lackOfRCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
-        {!!lackOfMCount && <div>{`-${t('multisig-address.approve-dialog.signerApprove', { m: lackOfMCount })}`}</div>}
-        {!!lackOfRCount && <div>{`-${t('multisig-address.approve-dialog.requiredSigner', { r: lackOfRCount })}`}</div>}
+        {lackOfMCount && lackOfRCount ? (
+          <div>{t('multisig-address.approve-dialog.signerApprove', { m: lackOfMCount, r: lackOfRCount })}</div>
+        ) : (
+          <>
+            {!!lackOfRCount && <div>{t('multisig-address.approve-dialog.noRSignerApprove', { m: lackOfMCount })}</div>}
+            {!lackOfRCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
+          </>
+        )}
       </section>
       <div className={styles.action}>
         <Button label={t('multisig-address.approve-dialog.cancel')} type="cancel" onClick={closeDialog} />
-        {!lackOfMCount && !lackOfRCount && (
-          <Button label={t('multisig-address.approve-dialog.broadcast')} type="primary" onClick={onBroadcast} />
-        )}
-        {lackOfMCount === 1 && (
-          <Button
-            label={t('multisig-address.approve-dialog.signAndBroadcast')}
-            type="primary"
-            onClick={onSignAndBroadcast}
-          />
-        )}
-        {lackOfMCount > 1 && (
-          <Button label={t('multisig-address.approve-dialog.signAndExport')} type="primary" onClick={onSignAndExport} />
-        )}
+        <Button label={t(`multisig-address.approve-dialog.${label}`)} type="primary" onClick={action} />
       </div>
     </>
   )

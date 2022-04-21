@@ -3,6 +3,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { ckbCore } from 'services/chain'
 import {
   broadcastTransaction,
+  exportTransactionAsJSON,
   invokeShowErrorMessage,
   MultisigConfig,
   OfflineSignJSON,
@@ -46,73 +47,11 @@ export const useSignAndExport = ({
   offlineSignJson,
   walletID,
   multisigConfig,
-  onlyNeedOne,
-}: {
-  offlineSignJson: OfflineSignJSON
-  walletID: string
-  multisigConfig: MultisigConfig
-  onlyNeedOne: boolean
-}) => {
-  const dispatch = useDispatch()
-  const signAndExport = useCallback(() => {
-    dispatch({
-      type: AppActions.UpdateGeneratedTx,
-      payload: offlineSignJson.transaction,
-    })
-    dispatch({
-      type: AppActions.RequestPassword,
-      payload: {
-        walletID,
-        actionType: onlyNeedOne ? 'send-from-multisig-need-one' : 'send-from-multisig',
-        multisigConfig,
-      },
-    })
-  }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, onlyNeedOne])
-  return signAndExport
-}
-
-export const useSignedStatus = ({
-  multisigConfig,
-  signatures,
-}: {
-  multisigConfig: MultisigConfig
-  signatures?: Signatures
-}) => {
-  const multisigLockHash = useMemo(() => scriptToHash(addressToScript(multisigConfig.fullPayload)), [
-    multisigConfig.fullPayload,
-  ])
-  const multisigBlake160s = useMemo(() => multisigConfig.addresses.map(v => addressToScript(v).args), [
-    multisigConfig.addresses,
-  ])
-  const [lackOfRCount, lackOfMCount] = useMemo(() => {
-    let [r, signed] = [0, 0]
-    for (let i = 0; i < multisigConfig.r; i++) {
-      if (!signatures?.[multisigLockHash]?.includes(multisigBlake160s[i])) {
-        r = multisigConfig.r - i
-      }
-    }
-    for (let i = 0; i < (signatures?.[multisigLockHash]?.length || 0); i++) {
-      const blake160 = signatures![multisigLockHash][i]
-      if (multisigBlake160s.includes(blake160)) {
-        signed += 1
-      }
-    }
-    return [r, multisigConfig.m >= signed ? multisigConfig.m - signed : 0]
-  }, [signatures, multisigLockHash, multisigConfig, multisigBlake160s])
-  return [lackOfRCount, lackOfMCount]
-}
-
-export const useSignAndBroadcast = ({
-  offlineSignJson,
-  multisigConfig,
-  walletID,
-  onlyNeedOne,
   closeDialog,
 }: {
   offlineSignJson: OfflineSignJSON
-  multisigConfig: MultisigConfig
   walletID: string
-  onlyNeedOne: boolean
+  multisigConfig: MultisigConfig
   closeDialog: () => void
 }) => {
   const dispatch = useDispatch()
@@ -125,13 +64,116 @@ export const useSignAndBroadcast = ({
       type: AppActions.RequestPassword,
       payload: {
         walletID,
-        actionType: onlyNeedOne ? 'send-from-multisig-need-one' : 'send-from-multisig',
+        actionType: 'send-from-multisig',
         multisigConfig,
       },
     })
     closeDialog()
-  }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, onlyNeedOne, closeDialog])
+  }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, closeDialog])
   return signAndExport
+}
+
+export const useSignedStatus = ({
+  multisigConfig,
+  signatures,
+  addresses,
+}: {
+  multisigConfig: MultisigConfig
+  signatures?: Signatures
+  addresses: State.Address[]
+}) => {
+  const multisigLockHash = useMemo(() => scriptToHash(addressToScript(multisigConfig.fullPayload)), [
+    multisigConfig.fullPayload,
+  ])
+  const multisigBlake160s = useMemo(() => multisigConfig.addresses.map(v => addressToScript(v).args), [
+    multisigConfig.addresses,
+  ])
+  const addressBlake160s = useMemo(() => addresses.map(v => addressToScript(v.address).args), [addresses])
+  return useMemo(() => {
+    const notSpecifiedCount = multisigConfig.m - multisigConfig.r
+    const specifiedUnsignedAddresses: string[] = []
+    const unspecifiedSignedAddresses: string[] = []
+    const unspecifiedUnsignedAddresses: string[] = []
+    for (let i = 0; i < multisigBlake160s.length; i++) {
+      const hasSigned = signatures?.[multisigLockHash]?.includes(multisigBlake160s[i])
+      if (i < multisigConfig.r) {
+        if (!hasSigned) {
+          specifiedUnsignedAddresses.push(multisigBlake160s[i])
+        }
+      } else {
+        ;(hasSigned ? unspecifiedSignedAddresses : unspecifiedUnsignedAddresses).push(multisigBlake160s[i])
+      }
+    }
+    const lackOfUnspecifiedCount =
+      unspecifiedSignedAddresses.length < notSpecifiedCount ? notSpecifiedCount - unspecifiedSignedAddresses.length : 0
+    let canBroadcastAfterSign = false
+    let canSign = specifiedUnsignedAddresses.some(v => addressBlake160s.includes(v))
+    if (lackOfUnspecifiedCount + specifiedUnsignedAddresses.length === 1) {
+      if (specifiedUnsignedAddresses.length === 1) {
+        canBroadcastAfterSign = addressBlake160s.includes(specifiedUnsignedAddresses[0])
+      } else {
+        canBroadcastAfterSign = unspecifiedUnsignedAddresses.some(v => addressBlake160s.includes(v))
+      }
+      canSign = canBroadcastAfterSign
+    } else {
+      canSign =
+        specifiedUnsignedAddresses.some(v => addressBlake160s.includes(v)) ||
+        (!!lackOfUnspecifiedCount && unspecifiedUnsignedAddresses.some(v => addressBlake160s.includes(v)))
+    }
+    return {
+      lackOfRCount: specifiedUnsignedAddresses.length,
+      lackOfMCount: lackOfUnspecifiedCount + specifiedUnsignedAddresses.length,
+      canBroadcastAfterSign,
+      canSign,
+    }
+  }, [signatures, multisigLockHash, multisigConfig, multisigBlake160s, addressBlake160s])
+}
+
+export const useSignAndBroadcast = ({
+  offlineSignJson,
+  multisigConfig,
+  walletID,
+  canBroadcastAfterSign,
+  closeDialog,
+}: {
+  offlineSignJson: OfflineSignJSON
+  multisigConfig: MultisigConfig
+  walletID: string
+  canBroadcastAfterSign: boolean
+  closeDialog: () => void
+}) => {
+  const dispatch = useDispatch()
+  const signAndExport = useCallback(() => {
+    dispatch({
+      type: AppActions.UpdateGeneratedTx,
+      payload: offlineSignJson.transaction,
+    })
+    dispatch({
+      type: AppActions.RequestPassword,
+      payload: {
+        walletID,
+        actionType: canBroadcastAfterSign ? 'send-from-multisig-need-one' : 'send-from-multisig',
+        multisigConfig,
+      },
+    })
+    closeDialog()
+  }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, canBroadcastAfterSign, closeDialog])
+  return signAndExport
+}
+
+export const useExport = ({
+  offlineSignJson,
+  closeDialog,
+}: {
+  offlineSignJson: OfflineSignJSON
+  closeDialog: () => void
+}) => {
+  return useCallback(async () => {
+    const res = await exportTransactionAsJSON(offlineSignJson)
+    if (isSuccessResponse(res)) {
+      closeDialog()
+    }
+  }, [closeDialog, offlineSignJson])
 }
 
 export const useTabView = () => {

@@ -31,6 +31,7 @@ import {
   CapacityNotEnoughForChange,
   CapacityNotEnoughForChangeByTransfer,
   MultisigConfigNeedError,
+  NoMatchAddressForSign,
   SignTransactionFailed
 } from 'exceptions'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -264,6 +265,9 @@ export default class TransactionSender {
         }
         return !!path
       })
+      if (!path) {
+        throw new NoMatchAddressForSign()
+      }
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
       if (!pathAndPrivateKey) {
         throw new Error('no private key found')
