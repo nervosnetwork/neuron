@@ -16,7 +16,7 @@ import {
   generateSendAllSUDTTransaction,
   getAnyoneCanPayScript,
   generateChequeTransaction,
-  destoryCKBAssetAccount,
+  destoryAssetAccount,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
@@ -348,7 +348,7 @@ const SUDTSend = () => {
   const [isDestroying, setIsDestroying] = useState(false)
   const onDestroy = useCallback(() => {
     setIsDestroying(true)
-    destoryCKBAssetAccount({ walletID: walletId, id: accountId })
+    destoryAssetAccount({ walletID: walletId, id: accountId })
       .then(res => {
         if (isSuccessResponse(res)) {
           const tx = res.result
@@ -357,7 +357,7 @@ const SUDTSend = () => {
             type: AppActions.RequestPassword,
             payload: {
               walletID: walletId,
-              actionType: 'destroy-ckb-account',
+              actionType: 'destroy-asset-account',
             },
           })
         } else {
@@ -375,6 +375,11 @@ const SUDTSend = () => {
         setIsDestroying(false)
       })
   }, [globalDispatch, walletId, accountId])
+
+  const showDestory = useMemo(
+    () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
+    [accountType, accountInfo]
+  )
 
   if (!isLoaded) {
     return (
@@ -458,13 +463,15 @@ const SUDTSend = () => {
             </div>
           </div>
         </div>
-        <div className={accountType === AccountType.CKB ? styles['ckb-footer'] : styles.footer}>
-          {accountType === AccountType.CKB ? (
+        <div className={showDestory ? styles['ckb-footer'] : styles.footer}>
+          {showDestory ? (
             <div className={styles.tooltip}>
               <Button type="cancel" label="" onClick={onDestroy} disabled={isDestroying}>
                 {t('s-udt.send.destroy') as string}
               </Button>
-              <span className={styles.tooltiptext}>{t('s-udt.send.destroy-desc')}</span>
+              <span className={styles.tooltiptext}>
+                {t(accountType === AccountType.CKB ? 's-udt.send.destroy-ckb-desc' : 's-udt.send.destroy-sudt-desc')}
+              </span>
             </div>
           ) : null}
           <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />

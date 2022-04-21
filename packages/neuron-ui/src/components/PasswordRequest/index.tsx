@@ -105,6 +105,7 @@ const PasswordRequest = () => {
       'create-account-to-claim-cheque',
       'send-from-multisig-need-one',
       'send-from-multisig',
+      'destroy-asset-account',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
@@ -213,7 +214,7 @@ const PasswordRequest = () => {
             await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
-          case 'destroy-ckb-account':
+          case 'destroy-asset-account':
           case 'send-nft':
           case 'send-cheque': {
             if (isSending) {

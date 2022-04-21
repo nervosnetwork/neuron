@@ -87,7 +87,7 @@ declare namespace State {
       | 'withdraw-cheque'
       | 'claim-cheque'
       | 'create-account-to-claim-cheque'
-      | 'destroy-ckb-account'
+      | 'destroy-asset-account'
       | 'migrate-acp'
       | 'send-nft'
       | 'send-from-multisig'

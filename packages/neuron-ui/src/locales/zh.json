@@ -405,8 +405,8 @@
       "create-account-to-claim-cheque": {
         "title": "创建账户并领取 Cheque 资产"
       },
-      "destroy-ckb-account": {
-        "title": "销毁 CKB 资产账户"
+      "destroy-asset-account": {
+        "title": "销毁资产账户"
       },
       "send-from-multisig": {
         "title": "发起交易"
@@ -831,7 +831,8 @@
         "click-to-edit": "点击编辑",
         "cheque-address-hint": "向该地址转账需要临时锁定 162 CKB，对方领取后自动解锁。",
         "destroy": "销毁",
-        "destroy-desc": "将会返还所有该 CKB 资产账户的 CKB 到你的找零地址中"
+        "destroy-ckb-desc": "将会返还所有该 CKB 资产账户的 CKB 到你的找零地址中",
+        "destroy-sudt-desc": "将会返还该资产账户所占用的 CKB 到你的找零地址中"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 转账"

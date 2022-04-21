@@ -128,7 +128,8 @@ export default {
       'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
       'migrate-sudt-no-type': 'The migrating cell does not have type script',
       'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
-      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved'
+      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
+      'sudt-acp-have-data': 'The destroying sUDT acp account have amount'
     },
     messageBox: {
       button: {

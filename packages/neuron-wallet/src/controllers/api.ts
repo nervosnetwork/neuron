@@ -507,8 +507,8 @@ export default class ApiController {
       return this.#sudtController.getSUDTTypeScriptHash(params)
     })
 
-    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number }) => {
-      return this.#assetAccountController.destoryCKBAssetAccount(params)
+    handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string, id: number }) => {
+      return this.#assetAccountController.destoryAssetAccount(params)
     })
 
     // Hardware wallet

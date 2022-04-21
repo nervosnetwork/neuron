@@ -119,7 +119,8 @@ export default {
       'transaction-no-input-paramter': '查詢 Input Cell 缺少必要的參數',
       'migrate-sudt-no-type': '遷移的 sUDT Cell 沒有 type script',
       'multisig-lock-hash-mismatch': '當前多簽地址與需要確認交易不匹配',
-      'multisig-not-signed': '多簽交易缺少部分簽名'
+      'multisig-not-signed': '多簽交易缺少部分簽名',
+      'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0'
     },
     messageBox: {
       button: {

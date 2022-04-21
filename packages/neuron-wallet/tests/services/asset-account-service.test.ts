@@ -18,12 +18,14 @@ import OutPoint from "../../src/models/chain/out-point"
 import { when } from "jest-when"
 import SystemScriptInfo from "../../src/models/system-script-info"
 import Script from "../../src/models/chain/script"
+import Input from "../../src/models/chain/input"
 
 const stubbedWalletServiceGet = jest.fn()
 const stubbedGenerateClaimChequeTx = jest.fn()
 const stubbedGenerateWithdrawChequeTx = jest.fn()
 const stubbedGetAllAddresses = jest.fn()
 const stubbedGenerateCreateChequeTx = jest.fn()
+const stubbedGenerateDestoryAssetAccountTx = jest.fn()
 
 const resetMocks = () => {
   stubbedWalletServiceGet.mockReset()
@@ -31,6 +33,7 @@ const resetMocks = () => {
   stubbedGenerateClaimChequeTx.mockReset()
   stubbedGenerateWithdrawChequeTx.mockReset()
   stubbedGetAllAddresses.mockReset()
+  stubbedGenerateDestoryAssetAccountTx.mockReset()
 }
 
 const [assetAccount, ckbAssetAccount] = accounts
@@ -109,7 +112,9 @@ jest.mock('services/tx', () => {
       // @ts-ignore
       generateCreateChequeTx: (...args) => stubbedGenerateCreateChequeTx(...args),
       // @ts-ignore
-      generateWithdrawChequeTx: (...args) => stubbedGenerateWithdrawChequeTx(...args)
+      generateWithdrawChequeTx: (...args) => stubbedGenerateWithdrawChequeTx(...args),
+      // @ts-ignore
+      generateDestoryAssetAccountTx: (...args) => stubbedGenerateDestoryAssetAccountTx(...args)
     }
   }
 })
@@ -1088,4 +1093,77 @@ describe('AssetAccountService', () => {
       )
     })
   });
+
+  describe('destoryAssetAccount', () => {
+    it('destory ckb account', async () => {
+      const assetAccount = AssetAccount.fromObject({
+        tokenID: 'CKBytes',
+        symbol: 'ckb',
+        tokenName: 'ckb',
+        decimal: '0',
+        balance: '0',
+        accountName: 'ckb',
+        blake160,
+      })
+      const outputs = [
+        generateOutput('CKBytes', undefined, undefined, toShannon(1000)),
+      ]
+      await createAccounts([assetAccount], outputs)
+      const walletId = 'walletId'
+      stubbedWalletServiceGet.mockReturnValue({ getNextChangeAddress: () => ({ blake160: 'blake160' } )})
+      await AssetAccountService.destoryAssetAccount(walletId, assetAccount)
+      expect(stubbedGenerateDestoryAssetAccountTx).toHaveBeenCalledWith(
+        walletId,
+        [
+          Input.fromObject({
+            previousOutput: outputs[0].outPoint(),
+            capacity: outputs[0].capacity,
+            lock: outputs[0].lockScript(),
+            type: outputs[0].typeScript(),
+            lockHash: outputs[0].lockHash,
+            typeHash: outputs[0].typeHash,
+            data: outputs[0].data,
+            since: '0'
+          })
+        ],
+        'blake160',
+        true
+      )
+    })
+    it('destory sudt account', async () => {
+      const assetAccount = AssetAccount.fromObject({
+        tokenID: '0x1e6159a251360113fc0fb0e6edb4613fc4a149222a3bebd9710543b8be9663f9',
+        symbol: 'sudt',
+        tokenName: 'sudt',
+        decimal: '0',
+        balance: '0',
+        accountName: 'sudt',
+        blake160,
+      })
+      const outputs = [
+        generateOutput(assetAccount.tokenID, undefined, undefined, toShannon(1000)),
+      ]
+      await createAccounts([assetAccount], outputs)
+      const walletId = 'walletId'
+      stubbedWalletServiceGet.mockReturnValue({ getNextChangeAddress: () => ({ blake160: 'blake160' } )})
+      await AssetAccountService.destoryAssetAccount(walletId, assetAccount)
+      expect(stubbedGenerateDestoryAssetAccountTx).toHaveBeenCalledWith(
+        walletId,
+        [
+          Input.fromObject({
+            previousOutput: outputs[0].outPoint(),
+            capacity: outputs[0].capacity,
+            lock: outputs[0].lockScript(),
+            type: outputs[0].typeScript(),
+            lockHash: outputs[0].lockHash,
+            typeHash: outputs[0].typeHash,
+            data: outputs[0].data,
+            since: '0'
+          })
+        ],
+        'blake160',
+        false
+      )
+    })
+  })
 })

@@ -18,6 +18,12 @@ export class MigrateSudtCellNoTypeError extends Error {
   }
 }
 
+export class SudtAcpHaveDataError extends Error {
+  constructor() {
+    super(t('messages.sudt-acp-have-data'))
+  }
+}
+
 export default {
   TargetOutputNotFoundError,
   AcpSendSameAccountError
