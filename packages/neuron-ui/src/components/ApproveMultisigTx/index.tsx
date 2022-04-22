@@ -7,8 +7,9 @@ import { useState as useGlobalState } from 'states'
 import { ckbCore } from 'services/chain'
 import { shannonToCKBFormatter } from 'utils'
 import ScriptTag from 'components/ScriptTag'
+import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import styles from './approveMultisigTx.module.scss'
-import { useBroadcast, useExport, useSignAndBroadcast, useSignAndExport, useSignedStatus, useTabView } from './hooks'
+import { useBroadcast, useExport, useSignAndBroadcast, useSignAndExport, useTabView } from './hooks'
 
 const Cell = React.memo(
   ({
@@ -52,11 +53,15 @@ const ApproveMultisigTx = ({
   const jsonContent = useMemo(() => {
     return JSON.stringify(offlineSignJson, null, 2)
   }, [offlineSignJson])
-  const { lackOfRCount, lackOfMCount, canBroadcastAfterSign, canSign } = useSignedStatus({
-    multisigConfig,
-    signatures: offlineSignJson.transaction.signatures,
-    addresses: wallet.addresses,
-  })
+  const { lackOfRCount, lackOfMCount, canBroadcastAfterSign, canSign } = useMemo(
+    () =>
+      getMultisigSignStatus({
+        multisigConfig,
+        signatures: offlineSignJson.transaction.signatures,
+        addresses: wallet.addresses,
+      }),
+    [multisigConfig, offlineSignJson.transaction.signatures, wallet.addresses]
+  )
   const onSignAndExport = useSignAndExport({
     multisigConfig,
     walletID: wallet.id,

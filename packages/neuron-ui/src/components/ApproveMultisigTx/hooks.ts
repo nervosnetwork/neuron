@@ -1,19 +1,15 @@
 import { TFunction } from 'i18next'
-import { useMemo, useCallback, useState } from 'react'
-import { ckbCore } from 'services/chain'
+import { useCallback, useState } from 'react'
 import {
   broadcastTransaction,
   exportTransactionAsJSON,
   invokeShowErrorMessage,
   MultisigConfig,
   OfflineSignJSON,
-  Signatures,
 } from 'services/remote'
 import { useDispatch } from 'states'
 import { AppActions } from 'states/stateProvider/reducer'
 import { isSuccessResponse } from 'utils'
-
-const { scriptToHash, addressToScript } = ckbCore.utils
 
 export const useBroadcast = ({
   offlineSignJson,
@@ -71,62 +67,6 @@ export const useSignAndExport = ({
     closeDialog()
   }, [dispatch, walletID, multisigConfig, offlineSignJson.transaction, closeDialog])
   return signAndExport
-}
-
-export const useSignedStatus = ({
-  multisigConfig,
-  signatures,
-  addresses,
-}: {
-  multisigConfig: MultisigConfig
-  signatures?: Signatures
-  addresses: State.Address[]
-}) => {
-  const multisigLockHash = useMemo(() => scriptToHash(addressToScript(multisigConfig.fullPayload)), [
-    multisigConfig.fullPayload,
-  ])
-  const multisigBlake160s = useMemo(() => multisigConfig.addresses.map(v => addressToScript(v).args), [
-    multisigConfig.addresses,
-  ])
-  const addressBlake160s = useMemo(() => addresses.map(v => addressToScript(v.address).args), [addresses])
-  return useMemo(() => {
-    const notSpecifiedCount = multisigConfig.m - multisigConfig.r
-    const specifiedUnsignedAddresses: string[] = []
-    const unspecifiedSignedAddresses: string[] = []
-    const unspecifiedUnsignedAddresses: string[] = []
-    for (let i = 0; i < multisigBlake160s.length; i++) {
-      const hasSigned = signatures?.[multisigLockHash]?.includes(multisigBlake160s[i])
-      if (i < multisigConfig.r) {
-        if (!hasSigned) {
-          specifiedUnsignedAddresses.push(multisigBlake160s[i])
-        }
-      } else {
-        ;(hasSigned ? unspecifiedSignedAddresses : unspecifiedUnsignedAddresses).push(multisigBlake160s[i])
-      }
-    }
-    const lackOfUnspecifiedCount =
-      unspecifiedSignedAddresses.length < notSpecifiedCount ? notSpecifiedCount - unspecifiedSignedAddresses.length : 0
-    let canBroadcastAfterSign = false
-    let canSign = specifiedUnsignedAddresses.some(v => addressBlake160s.includes(v))
-    if (lackOfUnspecifiedCount + specifiedUnsignedAddresses.length === 1) {
-      if (specifiedUnsignedAddresses.length === 1) {
-        canBroadcastAfterSign = addressBlake160s.includes(specifiedUnsignedAddresses[0])
-      } else {
-        canBroadcastAfterSign = unspecifiedUnsignedAddresses.some(v => addressBlake160s.includes(v))
-      }
-      canSign = canBroadcastAfterSign
-    } else {
-      canSign =
-        specifiedUnsignedAddresses.some(v => addressBlake160s.includes(v)) ||
-        (!!lackOfUnspecifiedCount && unspecifiedUnsignedAddresses.some(v => addressBlake160s.includes(v)))
-    }
-    return {
-      lackOfRCount: specifiedUnsignedAddresses.length,
-      lackOfMCount: lackOfUnspecifiedCount + specifiedUnsignedAddresses.length,
-      canBroadcastAfterSign,
-      canSign,
-    }
-  }, [signatures, multisigLockHash, multisigConfig, multisigBlake160s, addressBlake160s])
 }
 
 export const useSignAndBroadcast = ({
