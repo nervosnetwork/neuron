@@ -411,6 +411,9 @@
       "send-from-multisig": {
         "title": "發起交易"
       },
+      "send-from-multisig-need-one": {
+        "title": "發起交易"
+      },
       "xpub-notice": "對於觀察錢包，只支持導出交易"
     },
     "qrcode": {
@@ -870,7 +873,7 @@
         "actions": {
           "info": "詳情",
           "send": "轉賬",
-          "approve": "簽名",
+          "approve": "確認",
           "delete": "删除"
         }
       },
@@ -888,7 +891,8 @@
         "address": "地址",
         "amount": "金額",
         "send": "發送",
-        "cancel": "取消"
+        "cancel": "取消",
+        "export": "導出交易"
       },
       "create-dialog": {
         "title": "創建多重簽名地址",
@@ -911,9 +915,25 @@
           "back": "上一步",
           "next": "下一步",
           "confirm": "確認"
-        },
-        "duplicate-address-forbid": "地址不能重復"
-      }
+        }
+      },
+      "approve-dialog": {
+        "title": "從{{m}}-of-{{n}}多簽地址<0></0>確認交易",
+        "transaction": "交易",
+        "cancel": "取消",
+        "signAndExport": "簽名並導出",
+        "export": "導出交易",
+        "signAndBroadcast": "簽名並廣播",
+        "broadcast": "廣播交易",
+        "content": "內容：",
+        "status": "狀態",
+        "signerApprove": "缺少 {{m}} 個簽名者同意, 其中包括 {{r}} 個指定簽名者",
+        "noRSignerApprove": "缺少 {{m}} 個簽名者同意",
+        "signed": "已簽名",
+        "view-concise-data": "查看概要",
+        "view-raw-data": "查看原始數據"
+      },
+      "duplicate-address-forbid": "地址不能重復"
     }
   }
 }

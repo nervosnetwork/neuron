@@ -13,6 +13,7 @@ import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
 import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
 import PasswordRequest from 'components/PasswordRequest'
+import ApproveMultisigTx from 'components/ApproveMultisigTx'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
@@ -29,7 +30,7 @@ const searchBoxStyles = {
 }
 const messageBarStyle = { text: { alignItems: 'center' } }
 
-const tableActions = ['info', 'delete', 'send']
+const tableActions = ['info', 'delete', 'send', 'approve']
 
 const MultisigAddress = () => {
   const [t, i18n] = useTranslation()
@@ -51,7 +52,7 @@ const MultisigAddress = () => {
     isMainnet,
   })
   const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
-  const { deleteAction, infoAction, sendAction } = useActions({ deleteConfigById })
+  const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
       switch (option.key) {
@@ -64,11 +65,14 @@ const MultisigAddress = () => {
         case 'send':
           sendAction.action(multisigConfig)
           break
+        case 'approve':
+          approveAction.action(multisigConfig)
+          break
         default:
           break
       }
     },
-    [deleteAction, infoAction, sendAction]
+    [deleteAction, infoAction, sendAction, approveAction]
   )
   const listActionOptions = useMemo(
     () => tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`) })),
@@ -103,9 +107,6 @@ const MultisigAddress = () => {
     }
     return ''
   }, [multisigBanlances, sendAction.sendFromMultisig])
-  const onSumbitSuccess = useCallback(() => {
-    sendAction.closeDialog()
-  }, [sendAction])
   return (
     <div>
       <div className={styles.head}>
@@ -130,7 +131,7 @@ const MultisigAddress = () => {
         <table className={styles.multisigConfig}>
           <thead>
             <tr>
-              <th>
+              <th className={styles.checkBoxTh}>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
               {['address', 'alias', 'type', 'balance'].map(field => (
@@ -225,7 +226,17 @@ const MultisigAddress = () => {
           />
         )}
       </dialog>
-      <PasswordRequest onSumbitSuccess={onSumbitSuccess} />
+      <dialog ref={approveAction.dialogRef} className={styles.approveDialog}>
+        {approveAction.isDialogOpen && approveAction.multisigConfig && approveAction.offlineSignJson && (
+          <ApproveMultisigTx
+            closeDialog={approveAction.closeDialog}
+            multisigConfig={approveAction.multisigConfig}
+            offlineSignJson={approveAction.offlineSignJson}
+            isMainnet={isMainnet}
+          />
+        )}
+      </dialog>
+      <PasswordRequest />
     </div>
   )
 }

@@ -1,0 +1,102 @@
+@import '../../styles/mixin.scss';
+
+.title {
+  display: flex;
+  line-height: 1.625rem;
+  flex-wrap: wrap;
+}
+
+.textarea {
+  margin-top: 8px;
+  width: 100%;
+  height: 140px;
+  resize: none;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.recordTab {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  margin: 0 0 10px 0;
+  padding: 0;
+  line-height: 1.6875rem;
+  font-size: 1.375rem;
+  color: #000;
+  border-bottom: 1px solid #ccc;
+
+  button {
+    @include bold-text;
+    appearance: none;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 1.875rem;
+    font-size: 1rem;
+    background-color: transparent;
+    padding: 0 0 6px 0;
+    margin: 0;
+    border: none;
+
+    &:hover {
+      color: var(--nervos-green);
+      opacity: 0.8;
+    }
+  }
+
+  .underline {
+    display: block;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 4px;
+    width: 50%;
+    background: var(--nervos-green);
+    box-sizing: border-box;
+    padding: 0;
+    transition: transform 0.1s ease-in-out;
+  }
+
+  &[data-idx='1'] {
+    .underline {
+      transform: translateX(100%);
+    }
+  }
+}
+
+.cellItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & > div {
+    display: flex;
+    align-items: center;
+  }
+
+  .tag {
+    background-color: #ddd;
+    color: #fff;
+    padding: 2px;
+    margin: 4px;
+  
+    &+.activity {
+      background: var(--nervos-green);
+    }
+  }
+
+  .capacity {
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+}
+
+.statusTitle {
+  margin-top: 8px;
+}

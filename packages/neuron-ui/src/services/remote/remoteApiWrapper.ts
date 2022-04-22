@@ -124,6 +124,7 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'sign-and-export-transaction'
+  | 'sign-and-broadcast-transaction'
   // nft
   | 'generate-transfer-nft-tx'
   // multisig
@@ -137,6 +138,7 @@ type Action =
   | 'get-multisig-balances'
   | 'generate-multisig-tx'
   | 'generate-multisig-send-all-tx'
+  | 'load-multisig-tx-json'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

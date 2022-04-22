@@ -91,6 +91,7 @@ declare namespace State {
       | 'migrate-acp'
       | 'send-nft'
       | 'send-from-multisig'
+      | 'send-from-multisig-need-one'
       | null
     walletID: string
     multisigConfig?: {

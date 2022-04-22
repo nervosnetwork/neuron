@@ -10,6 +10,8 @@ import {
   exportMultisigConfig,
   deleteMultisigConfig,
   getMultisigBalances,
+  loadMultisigTxJson,
+  OfflineSignJSON,
 } from 'services/remote'
 
 export const useSearch = (clearSelected: () => void) => {
@@ -212,11 +214,42 @@ const useDeleteAction = (deleteConfigById: (id: number) => void) => {
     deleteErrorMessage,
   }
 }
+
+const useApproveAction = () => {
+  const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
+  const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
+  const [offlineSignJson, setOfflineSignJson] = useState<OfflineSignJSON | undefined>()
+  const action = useCallback(
+    (option: MultisigConfig) => {
+      setMultisigConfig(undefined)
+      if (option.fullPayload) {
+        loadMultisigTxJson(option.fullPayload).then(res => {
+          if (isSuccessResponse(res) && res.result) {
+            openDialog()
+            setMultisigConfig(option)
+            setOfflineSignJson(res.result)
+          }
+        })
+      }
+    },
+    [openDialog]
+  )
+  return {
+    action,
+    closeDialog,
+    dialogRef,
+    multisigConfig,
+    isDialogOpen,
+    offlineSignJson,
+  }
+}
+
 export const useActions = ({ deleteConfigById }: { deleteConfigById: (id: number) => void }) => {
   return {
     deleteAction: useDeleteAction(deleteConfigById),
     infoAction: useInfoAction(),
     sendAction: useSendAction(),
+    approveAction: useApproveAction(),
   }
 }
 

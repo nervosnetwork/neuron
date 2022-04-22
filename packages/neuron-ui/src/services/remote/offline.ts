@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { remoteApi } from './remoteApiWrapper'
+import { MultisigConfig } from './multisig'
 
 export enum OfflineSignStatus {
   Signed = 'Signed',
@@ -24,34 +25,23 @@ interface MultisigConfigs {
   }
 }
 
-interface Signatures {
+export interface Signatures {
   [hash: string]: string[]
 }
 
 export interface OfflineSignJSON {
-  transaction: any
+  transaction: {
+    signatures?: Signatures
+    [key: string]: any
+  }
   status: OfflineSignStatus
   type: OfflineSignType
   description?: string
   asset_account?: Pick<Controller.SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
   multisig_configs?: MultisigConfigs
-  signatures?: Signatures
 }
 
-export type SignProps = OfflineSignJSON & {
-  walletID: string
-  password: string
-  multisigConfig?: {
-    id: number
-    walletId: string
-    r: number
-    m: number
-    n: number
-    addresses: string[]
-    alias?: string
-    fullPayload: string
-  }
-}
+export type SignProps = OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigConfig }
 
 export type BroadcastProps = OfflineSignJSON & { walletID: string }
 
@@ -61,3 +51,4 @@ export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-t
 export const signAndExportTransaction = remoteApi<SignProps, { filePath: string; json: OfflineSignJSON }>(
   'sign-and-export-transaction'
 )
+export const signAndBroadcastTransaction = remoteApi<SignProps>('sign-and-broadcast-transaction')

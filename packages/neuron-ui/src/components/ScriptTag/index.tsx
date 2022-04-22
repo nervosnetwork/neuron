@@ -17,7 +17,7 @@ const ScriptTag = ({
 }: {
   script: CKBComponents.Script | null
   isMainnet: boolean
-  onClick: () => void
+  onClick?: () => void
 }) => {
   if (!script) {
     return null

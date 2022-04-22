@@ -7,6 +7,7 @@ import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-s
 import BlockHeader from './block-header'
 import TypeCheckerUtils from 'utils/type-checker'
 import OutPoint from './out-point'
+import { Signatures } from 'models/offline-sign'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -70,6 +71,8 @@ export default class Transaction {
 
   public nftInfo?: NFTInfo
 
+  public signatures: Signatures = {}
+
   constructor(
     version: string,
     cellDeps: CellDep[] = [],
@@ -92,7 +95,8 @@ export default class Transaction {
     createdAt?: string,
     updatedAt?: string,
     sudtInfo?: SudtInfo,
-    nftType?: NFTInfo
+    nftType?: NFTInfo,
+    signatures: Signatures = {}
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -117,6 +121,7 @@ export default class Transaction {
 
     this.sudtInfo = sudtInfo
     this.nftInfo = nftType
+    this.signatures = signatures
     TypeCheckerUtils.hashChecker(...this.headerDeps, this.blockHash)
     TypeCheckerUtils.numberChecker(
       this.version,
@@ -152,7 +157,8 @@ export default class Transaction {
     createdAt,
     updatedAt,
     sudtInfo,
-    nftInfo
+    nftInfo,
+    signatures = {}
   }: {
     version: string
     cellDeps?: CellDep[]
@@ -176,6 +182,7 @@ export default class Transaction {
     updatedAt?: string
     sudtInfo?: SudtInfo
     nftInfo?: NFTInfo
+    signatures?: Signatures
   }): Transaction {
     return new Transaction(
       version,
@@ -204,7 +211,8 @@ export default class Transaction {
       createdAt,
       updatedAt,
       sudtInfo,
-      nftInfo
+      nftInfo,
+      signatures
     )
   }
 
@@ -218,6 +226,14 @@ export default class Transaction {
 
   public setInterest(value: string | undefined) {
     this.interest = value ? BigInt(value).toString() : value
+  }
+
+  public setSignatures(lockHash: string, blake160: string) {
+    if (this.signatures[lockHash]) {
+      this.signatures[lockHash].push(blake160)
+    } else {
+      this.signatures[lockHash] = [blake160]
+    }
   }
 
   public witnessesAsString(): string[] {

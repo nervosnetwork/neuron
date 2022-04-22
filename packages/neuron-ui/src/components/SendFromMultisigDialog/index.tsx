@@ -7,20 +7,10 @@ import TextField from 'widgets/TextField'
 import SendFieldset from 'components/SendFieldset'
 import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount } from 'utils'
 import { useState as useGlobalState } from 'states'
+import CopyZoneAddress from 'widgets/CopyZoneAddress'
 
-import { useSendInfo, useOnSumbit } from './hooks'
+import { useSendInfo, useOnSumbit, useExport, useCanSign } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
-
-const SendCkbTitle = React.memo(({ fullPayload }: { fullPayload: string }) => {
-  const [t] = useTranslation()
-  return (
-    <CopyZone content={fullPayload} className={styles.fullPayload} name={t('multisig-address.table.copy-address')}>
-      <span className={styles.overflow}>{fullPayload.slice(0, -6)}</span>
-      <span>...</span>
-      <span>{fullPayload.slice(-6)}</span>
-    </CopyZone>
-  )
-})
 
 const SendFromMultisigDialog = ({
   multisigConfig,
@@ -71,14 +61,16 @@ const SendFromMultisigDialog = ({
       !!totalAmountErrorMessage,
     [outputErrors, sendInfoList, totalAmountErrorMessage]
   )
-  const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig })
+  const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
+  const onExport = useExport({ generatedTx, closeDialog })
+  const canSign = useCanSign({ addresses: wallet.addresses, multisigConfig })
   return (
     <>
       <div className={styles.sendCKBTitle}>
         <Trans
           i18nKey="multisig-address.send-ckb.title"
           values={multisigConfig}
-          components={[<SendCkbTitle fullPayload={multisigConfig.fullPayload} />]}
+          components={[<CopyZoneAddress fullPayload={multisigConfig.fullPayload} />]}
         />
       </div>
       <div className={styles.sendContainer}>
@@ -120,13 +112,22 @@ const SendFromMultisigDialog = ({
       </div>
       <div className={styles.sendActions}>
         <Button label={t('multisig-address.send-ckb.cancel')} type="cancel" onClick={closeDialog} />
-        <Button
-          disabled={isSendDisabled}
-          label={t('multisig-address.send-ckb.send')}
-          type="primary"
-          onClick={onSumbit}
-          data-wallet-id={wallet.id}
-        />
+        {canSign ? (
+          <Button
+            disabled={isSendDisabled}
+            label={t('multisig-address.send-ckb.send')}
+            type="primary"
+            onClick={onSumbit}
+            data-wallet-id={wallet.id}
+          />
+        ) : (
+          <Button
+            disabled={isSendDisabled}
+            label={t('multisig-address.send-ckb.export')}
+            type="primary"
+            onClick={onExport}
+          />
+        )}
       </div>
     </>
   )

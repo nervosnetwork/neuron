@@ -24,7 +24,7 @@ import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
-const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) => {
+const PasswordRequest = () => {
   const {
     app: {
       send: { description, generatedTx },
@@ -66,17 +66,15 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       case 'unlock':
         return OfflineSignType.UnlockDAO
       case 'send-nft':
+      case 'send-from-multisig-need-one':
       case 'send':
         return OfflineSignType.Regular
       case 'send-from-multisig':
-        if (multisigConfig?.m === 1) {
-          return OfflineSignType.Regular
-        }
         return OfflineSignType.SendFromMultisigOnlySig
       default:
         return OfflineSignType.Invalid
     }
-  }, [actionType, multisigConfig])
+  }, [actionType])
 
   const exportTransaction = useCallback(async () => {
     onDismiss()
@@ -105,6 +103,8 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       'withdraw-cheque',
       'claim-cheque',
       'create-account-to-claim-cheque',
+      'send-from-multisig-need-one',
+      'send-from-multisig',
       'destroy-asset-account',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
@@ -124,15 +124,6 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
           throw new PasswordIncorrectException()
         }
       }
-      const handleSendMultiTxRes = ({ status }: { status: number }) => {
-        if (isSuccessResponse({ status })) {
-          if (onSumbitSuccess) {
-            onSumbitSuccess()
-          }
-        } else if (status === ErrorCode.PasswordIncorrect) {
-          throw new PasswordIncorrectException()
-        }
-      }
       try {
         switch (actionType) {
           case 'send': {
@@ -142,12 +133,16 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
             break
           }
-          case 'send-from-multisig': {
+          case 'send-from-multisig-need-one': {
             if (isSending) {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
-              handleSendMultiTxRes
+              ({ status }) => {
+                if (status === ErrorCode.PasswordIncorrect) {
+                  throw new PasswordIncorrectException()
+                }
+              }
             )
             break
           }
@@ -287,7 +282,6 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       setError,
       t,
       multisigConfig,
-      onSumbitSuccess,
     ]
   )
 
@@ -337,23 +331,7 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
       payload: { sending: false },
     })
     onDismiss()
-    if (actionType === 'send-from-multisig' && onSumbitSuccess) {
-      onSumbitSuccess()
-    }
-  }, [
-    description,
-    dispatch,
-    experimental,
-    generatedTx,
-    onDismiss,
-    password,
-    signType,
-    t,
-    walletID,
-    actionType,
-    multisigConfig,
-    onSumbitSuccess,
-  ])
+  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
   const dropdownList = [
     {
@@ -393,6 +371,8 @@ const PasswordRequest = ({ onSumbitSuccess }: { onSumbitSuccess?: () => void }) 
           'claim-cheque',
           'create-account-to-claim-cheque',
           'migrate-acp',
+          'send-from-multisig-need-one',
+          'send-from-multisig',
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}

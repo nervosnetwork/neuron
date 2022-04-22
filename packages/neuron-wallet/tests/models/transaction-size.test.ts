@@ -131,4 +131,12 @@ describe('TransactionSize', () => {
     const length = TransactionSize.tx(tx)
     expect(length).toEqual(536)
   })
+
+  it('multiSignWitness', () => {
+    const witness = TransactionSize.witness
+    TransactionSize.witness = jest.fn()
+    TransactionSize.multiSignWitness(1, 1, 2)
+    expect(TransactionSize.witness).toHaveBeenCalledWith(new WitnessArgs('0x00010102' + '0'.repeat(80) + '0'.repeat(130)))
+    TransactionSize.witness = witness
+  })
 })

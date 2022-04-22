@@ -32,4 +32,17 @@ export class AddressNotFound extends Error {
   }
 }
 
-export default { InvalidAddress, MainnetAddressRequired, TestnetAddressRequired, AddressNotFound }
+export class NoMatchAddressForSign extends Error {
+  code = 109
+  constructor() {
+    super(t('messages.no-match-address-for-sign'))
+  }
+}
+
+export default {
+  InvalidAddress,
+  MainnetAddressRequired,
+  TestnetAddressRequired,
+  AddressNotFound,
+  NoMatchAddressForSign
+}

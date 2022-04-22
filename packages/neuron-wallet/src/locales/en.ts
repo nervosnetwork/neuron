@@ -127,7 +127,10 @@ export default {
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
       'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
       'migrate-sudt-no-type': 'The migrating cell does not have type script',
-      'sudt-acp-have-data': 'The destroying sUDT acp account have amount'
+      'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
+      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
+      'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
+      'no-match-address-for-sign': 'Not found matched address'
     },
     messageBox: {
       button: {
@@ -253,6 +256,7 @@ export default {
       'import-duplicate': 'Please check for duplicate configurations',
       'import-result': 'Imports succeeded {{success}}, failed {{fail}}.{{failCheck}}',
       'confirm-delete': 'Confirm delete the multisig config?',
+      'approve-tx': 'Confirm multisig transaction',
       'delete-actions': {
         ok: 'Confirm',
         cancel: 'Cancel'
