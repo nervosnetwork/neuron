@@ -121,7 +121,11 @@ export default class MultisigService {
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
           addressCursorMap.set(currentMultisigConfigs[idx].fullPayload, v?.result?.last_cursor)
-          liveCells.push(...v.result.objects.map((output: any) => MultisigOutput.fromIndexer(output)))
+          liveCells.push(
+            ...v.result.objects
+              .filter((object: any) => !object?.output?.type)
+              .map((object: any) => MultisigOutput.fromIndexer(object))
+          )
           nextMultisigConfigs.push(currentMultisigConfigs[idx])
         }
       })
