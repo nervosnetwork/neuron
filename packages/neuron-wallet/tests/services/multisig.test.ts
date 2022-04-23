@@ -153,6 +153,25 @@ describe('multisig service', () => {
       expect(res).toHaveLength(1)
       expect(res[0]).toEqual(MultisigOutput.fromIndexer(defaultOutput))
     })
+
+    it('filter cell with type', async () => {
+      rpcBatchRequestMock.mockResolvedValueOnce([
+        {
+          result: {
+            objects: [
+              defaultOutput,
+              {
+                out_point: { tx_hash: 'tx_hash_1', index: '0x0' },
+                output: { lock, type: { args: '', code_hash: '', hash_type: ''}, capacity: '6100000000' }
+              }
+            ]
+          }
+        }
+      ])
+      const res = await MultisigService.getLiveCells([defaultMultisigConfig])
+      expect(res).toHaveLength(1)
+      expect(res[0]).toEqual(MultisigOutput.fromIndexer(defaultOutput))
+    })
   })
 
   describe('saveLiveMultisigOutput', () => {
