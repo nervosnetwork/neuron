@@ -137,7 +137,9 @@
         "pending": "Pending",
         "confirming": "Confirming"
       },
-      "copy-balance": "Copy Balance"
+      "copy-balance": "Copy Balance",
+      "create": "Create {{name}} Asset Account",
+      "destroy": "Destroy {{name}} Asset Account"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -263,7 +265,9 @@
       "view-detail-button-title": "View Detail",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
-      "copy-address": "Copy Address"
+      "copy-address": "Copy Address",
+      "create": "Create {{name}} Asset Account",
+      "destroy": "Destroy {{name}} Asset Account"
     },
     "transaction": {
       "window-title": "Transaction: {{hash}}",

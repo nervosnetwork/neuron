@@ -2,7 +2,7 @@ import { getConnection } from 'typeorm'
 import NetworksService from 'services/networks'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
-import Transaction, { TransactionStatus, SudtInfo, NFTType, NFTInfo } from 'models/chain/transaction'
+import Transaction, { TransactionStatus, SudtInfo, NFTType, NFTInfo, AssetAccountType } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -358,18 +358,37 @@ export class TransactionsService {
         const value = sums.get(tx.hash!) || BigInt(0)
 
         let typeArgs: string | undefined | null
+        let txType: string = ''
+        let assetAccountType: AssetAccountType | string = ''
+
         const sudtInput = anyoneCanPayInputs.find(
           i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!)
         )
+        const sudtOutput = anyoneCanPayOutputs.find(
+          o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!)
+        )
         if (sudtInput) {
           typeArgs = sudtInput.typeArgs
+          if (!sudtOutput) {
+            txType = 'destroy'
+            assetAccountType = AssetAccountType.SUDT
+          }
         } else {
-          const sudtOutput = anyoneCanPayOutputs.find(
-            o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!)
-          )
           if (sudtOutput) {
             typeArgs = sudtOutput.typeArgs
+            txType = 'create'
+            assetAccountType = AssetAccountType.SUDT
           }
+        }
+
+        const ckbInput = anyoneCanPayInputs.find(i => i.transactionHash === tx.hash && !i.typeScript())
+        const ckbOutput = anyoneCanPayOutputs.find(o => o.outPointTxHash === tx.hash && !o.typeScript())
+        if (ckbInput && !ckbOutput) {
+          txType = 'destroy'
+          assetAccountType = AssetAccountType.CKB
+        } else if (!ckbInput && ckbOutput) {
+          txType = 'create'
+          assetAccountType = AssetAccountType.CKB
         }
 
         let sudtInfo: SudtInfo | undefined
@@ -427,12 +446,17 @@ export class TransactionsService {
           nftInfo = { type: NFTType.Receive, data: receiveNFTCell.typeArgs! }
         }
 
+        if (!txType) {
+          txType = value > BigInt(0) ? 'receive' : 'send'
+        }
+
         return Transaction.fromObject({
           timestamp: tx.timestamp,
           value: value.toString(),
           hash: tx.hash,
           version: tx.version,
-          type: value > BigInt(0) ? 'receive' : 'send',
+          type: txType,
+          assetAccountType: assetAccountType,
           nervosDao: daoFlag.get(tx.hash!),
           status: tx.status,
           description: tx.description,
