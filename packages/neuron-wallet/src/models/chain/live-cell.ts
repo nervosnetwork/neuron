@@ -2,6 +2,12 @@ import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
 import { LumosCell } from 'block-sync-renderer/sync/indexer-connector'
 
+const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
+  type: ScriptHashType.Type,
+  data1: ScriptHashType.Data1,
+  data: ScriptHashType.Data
+}
+
 export default class LiveCell {
   public txHash: string
   public outputIndex: string
@@ -53,7 +59,7 @@ export default class LiveCell {
       ? new Script(
           cell.cell_output.type.code_hash,
           cell.cell_output.type.args,
-          cell.cell_output.type.hash_type === 'data' ? ScriptHashType.Data : ScriptHashType.Type
+          LUMOS_HASH_TYPE_MAP[cell.cell_output.type.hash_type] ?? ScriptHashType.Data
         )
       : null
 
@@ -64,7 +70,7 @@ export default class LiveCell {
       new Script(
         cell.cell_output.lock.code_hash,
         cell.cell_output.lock.args,
-        cell.cell_output.lock.hash_type === 'data' ? ScriptHashType.Data : ScriptHashType.Type
+        LUMOS_HASH_TYPE_MAP[cell.cell_output.lock.hash_type] ?? ScriptHashType.Data
       ),
       type,
       cell.data ? cell.data : '0x'
