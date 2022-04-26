@@ -364,7 +364,7 @@ export class TransactionsService {
         const value = sums.get(tx.hash!) || BigInt(0)
 
         let typeArgs: string | undefined | null
-        let txType: string = ''
+        let txType: string = value > BigInt(0) ? 'receive' : 'send'
         let assetAccountType: AssetAccountType | undefined
 
         const sudtInput = anyoneCanPayInputs.find(
@@ -450,10 +450,6 @@ export class TransactionsService {
           nftInfo = { type: NFTType.Send, data: sendNFTCell.typeArgs! }
         } else if (receiveNFTCell) {
           nftInfo = { type: NFTType.Receive, data: receiveNFTCell.typeArgs! }
-        }
-
-        if (txType === '') {
-          txType = value > BigInt(0) ? 'receive' : 'send'
         }
 
         return Transaction.fromObject({
