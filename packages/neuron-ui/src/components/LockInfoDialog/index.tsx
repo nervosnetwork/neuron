@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useState, useRef } from 'react'
+import { bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
+import { ReactComponent as Copy } from 'widgets/Icons/TinyCopy.svg'
+import { ReactComponent as Check } from 'widgets/Icons/Check.svg'
 import { useDialog } from 'utils'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import styles from './lockInfoDialog.module.scss'
 import getLockSupportShortAddress from '../../utils/getLockSupportShortAddress'
 
@@ -13,10 +15,44 @@ interface LockInfoDialog {
   onDismiss: () => void
 }
 
+const ShortAddr = ({ lockScript, isMainnet }: { lockScript: CKBComponents.Script | null; isMainnet: boolean }) => {
+  const [t] = useTranslation()
+
+  if (!lockScript) {
+    return null
+  }
+
+  const lock = getLockSupportShortAddress(lockScript)
+  if (!lock) {
+    return null
+  }
+
+  const shortAddr = bech32Address(lockScript.args, {
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+    codeHashOrCodeHashIndex: lock.CodeHashIndex,
+  })
+
+  return (
+    <>
+      <h2 title={t('transaction.deprecated-address-format')} className={styles.title}>
+        {t('transaction.deprecated-address-format')}
+      </h2>
+      <div style={{ marginBottom: 10 }}>
+        <CopyZone content={shortAddr} name={t('history.copy-address')}>
+          <span>{shortAddr}</span>
+        </CopyZone>
+      </div>
+    </>
+  )
+}
+
 const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
   const [t] = useTranslation()
+  const [copied, setCopied] = useState(false)
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show: !!lockInfo, dialogRef, onClose: onDismiss })
+
+  const timer = useRef<ReturnType<typeof setTimeout>>()
 
   const onDialogClicked = useCallback(
     (e: any) => {
@@ -26,25 +62,25 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
     },
     [onDismiss]
   )
+  if (!lockInfo) {
+    return null
+  }
 
-  const renderFullVersionAddress = useCallback(() => {
-    if (!lockInfo || !getLockSupportShortAddress(lockInfo)) {
-      return null
-    }
-    const fullVersionAddress = scriptToAddress(lockInfo, isMainnet)
-    return (
-      <>
-        <h2 title={t('transaction.full-version-address')} className={styles.title}>
-          {t('transaction.full-version-address')}
-        </h2>
-        <div className={styles.fullVersionAddress}>
-          <CopyZone content={fullVersionAddress} name={t('history.copy-address')}>
-            {fullVersionAddress}
-          </CopyZone>
-        </div>
-      </>
-    )
-  }, [lockInfo, isMainnet, t])
+  const rawLock = `{
+  "code_hash": "${lockInfo.codeHash}",
+  "hash_type": "${lockInfo.hashType}",
+  "args": "${lockInfo.args}"
+}`
+
+  const handleCopy = () => {
+    setCopied(true)
+    window.navigator.clipboard.writeText(rawLock)
+
+    clearTimeout(timer.current!)
+    timer.current = setTimeout(() => {
+      setCopied(false)
+    }, 1000)
+  }
 
   return (
     <dialog ref={dialogRef} className={styles.dialog} role="presentation" onClick={e => onDialogClicked(e)}>
@@ -52,25 +88,18 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
         <h2 title={t('transaction.lock-script')} className={styles.title}>
           {t('transaction.lock-script')}
         </h2>
-        <div className={styles.addressDetailWrap}>
-          {lockInfo && (
-            <ul className={styles.infoWrap}>
-              <li>
-                <div>code_hash:</div>
-                <div>{lockInfo.codeHash}</div>
-              </li>
-              <li>
-                <div>hash_type:</div>
-                <div>{lockInfo.hashType}</div>
-              </li>
-              <li>
-                <div>args:</div>
-                <div>{lockInfo.args}</div>
-              </li>
-            </ul>
-          )}
+        <div className={styles.lock}>
+          <div
+            className={styles.copyBtn}
+            onClick={handleCopy}
+            onKeyPress={e => (e.key === 'enter' ? handleCopy : undefined)}
+            role="none"
+          >
+            {copied ? <Check /> : <Copy />}
+          </div>
+          <pre>{rawLock}</pre>
         </div>
-        {renderFullVersionAddress()}
+        <ShortAddr isMainnet={isMainnet} lockScript={lockInfo} />
         <div className={styles.footer}>
           <Button type="cancel" onClick={onDismiss} label={t('common.close')} />
         </div>

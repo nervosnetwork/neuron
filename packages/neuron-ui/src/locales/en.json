@@ -279,7 +279,7 @@
       "outputs": "Outputs",
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
-      "full-version-address": "Full Version Address"
+      "deprecated-address-format": "Address in deprecated format"
     },
     "addresses": {
       "title": "Address Book",
@@ -477,6 +477,7 @@
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
+      "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",

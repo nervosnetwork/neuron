@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
 import { transactionState } from 'states'
@@ -15,7 +16,6 @@ import {
   shannonToCKBFormatter,
   useExitOnWalletChange,
   isSuccessResponse,
-  scriptToAddress,
 } from 'utils'
 import CopyZone from 'widgets/CopyZone'
 
@@ -155,7 +155,7 @@ const Transaction = () => {
             <td title={`${index}`}>{index}</td>
             <td title={address} className={styles.addressCell}>
               <CopyZone content={address} name={t('history.copy-address')}>
-                {address}
+                {`${address.slice(0, 20)}...${address.slice(-20)}`}
               </CopyZone>
               <ScriptTag isMainnet={isMainnet} script={cell.lock} onClick={() => setLockInfo(cell.lock)} />
             </td>

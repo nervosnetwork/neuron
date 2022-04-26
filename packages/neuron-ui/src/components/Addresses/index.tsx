@@ -105,9 +105,9 @@ const Addresses = () => {
                   <td className={styles.address}>
                     <div data-address={addr.address}>
                       <CopyZone content={addr.address} name={t('addresses.copy-address')}>
-                        <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
+                        <span className={styles.addressOverflow}>{addr.address.slice(0, -20)}</span>
                         <span className={styles.ellipsis}>...</span>
-                        <span>{addr.address.slice(-6)}</span>
+                        <span>{addr.address.slice(-20)}</span>
                       </CopyZone>
                     </div>
                   </td>

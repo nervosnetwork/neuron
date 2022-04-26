@@ -1,7 +1,6 @@
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType, publicKeyToAddress } from 'models/keys/address'
-import { Address as AddressInterface, AddressVersion } from 'models/address'
+import { Address as AddressInterface } from 'models/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
@@ -152,7 +151,7 @@ export default class AddressService {
     addressIndex: number
   ): Promise<AddressInterface | undefined> {
     const isMainnet = NetworksService.getInstance().isMainnet()
-    const address = publicKeyToAddress(publicKey, isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet)
+    const address = publicKeyToAddress(publicKey, isMainnet)
     const publicKeyHash = AddressParser.toBlake160(address)
 
     const exist = await getConnection()
@@ -225,7 +224,7 @@ export default class AddressService {
     const address: string = addressMetaInfo.accountExtendedPublicKey.address(
       addressMetaInfo.addressType,
       addressMetaInfo.addressIndex,
-      AddressService.getAddressPrefix()
+      NetworksService.getInstance().isMainnet()
     ).address
 
     const blake160: string = AddressParser.toBlake160(address)
@@ -417,13 +416,5 @@ export default class AddressService {
       .from(HdPublicKeyInfo)
       .where({ walletId })
       .execute()
-  }
-
-  private static getAddressVersion = (): AddressVersion => {
-    return NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-  }
-
-  private static getAddressPrefix(): AddressPrefix {
-    return this.getAddressVersion() === AddressVersion.Mainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
   }
 }

@@ -1,5 +1,4 @@
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import AddressGenerator from '../../../src/models/address-generator'
+import { scriptToAddress, systemScripts } from '@nervosnetwork/ckb-sdk-utils'
 import { AddressType } from '../../../src/models/keys/address'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
 
@@ -36,7 +35,7 @@ describe('HdPublicKeyInfoModel', () => {
         })
       });
       it('generates mainnet address by property', () => {
-        const address = AddressGenerator.toShortByBlake160(keyInfo.publicKeyInBlake160, AddressPrefix.Mainnet)
+        const address = scriptToAddress({ ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 }, true)
         expect(keyInfoModel.address).toEqual(address)
       })
     });
@@ -48,7 +47,7 @@ describe('HdPublicKeyInfoModel', () => {
         })
       });
       it('generates testnet address by property', () => {
-        const address = AddressGenerator.toShortByBlake160(keyInfo.publicKeyInBlake160, AddressPrefix.Testnet)
+        const address = scriptToAddress({ ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 }, false)
         expect(keyInfoModel.address).toEqual(address)
       })
     });

@@ -2,7 +2,13 @@ import React, { useCallback, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SearchBox, MessageBar, MessageBarType } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
-import { useOnLocaleChange, isMainnet as isMainnetUtil, shannonToCKBFormatter, useExitOnWalletChange, useDialogWrapper } from 'utils'
+import {
+  useOnLocaleChange,
+  isMainnet as isMainnetUtil,
+  shannonToCKBFormatter,
+  useExitOnWalletChange,
+  useDialogWrapper,
+} from 'utils'
 import { useState as useGlobalState, withProvider } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import CopyZone from 'widgets/CopyZone'
@@ -156,7 +162,7 @@ const MultisigAddress = () => {
                     className={styles.fullPayload}
                     name={t('multisig-address.table.copy-address')}
                   >
-                    <span className={styles.overflow}>{v.fullPayload.slice(0, -6)}</span>
+                    <span className={styles.overflow}>{v.fullPayload.slice(0, -7)}</span>
                     <span>...</span>
                     <span>{v.fullPayload.slice(-6)}</span>
                   </CopyZone>

@@ -1,8 +1,7 @@
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { AddressType } from '../../src/models/keys/address'
-import AddressGenerator from "../../src/models/address-generator"
-import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionWithStatus from '../../src/models/chain/transaction-with-status'
 import { Address, AddressVersion } from '../../src/models/address'
@@ -96,7 +95,7 @@ describe('queue', () => {
   const shortAddressInfo = {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
-  const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+  const address = scriptToAddress(shortAddressInfo.lock, false)
   const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,

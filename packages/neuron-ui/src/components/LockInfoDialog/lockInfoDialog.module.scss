@@ -43,10 +43,37 @@
   }
 }
 
-.fullVersionAddress {
-  word-break: break-all;
-  margin-bottom: 10px;
+.lock {
+  position: relative;
+
+  pre{
+    overflow: auto;
+    background: #eee;
+    padding: 30px 10px 10px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .copyBtn{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    cursor: pointer!important;
+
+    svg{
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    &:hover{
+      filter: brightness(0.5);
+    }
+  }
 }
+
 
 .footer {
   @include dialog-footer;
