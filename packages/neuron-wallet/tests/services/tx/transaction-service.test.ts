@@ -4,7 +4,7 @@ import path from 'path'
 import TransactionService, { SearchType } from '../../../src/services/tx/transaction-service'
 import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import { initConnection, saveTransactions, closeConnection, saveAccounts } from '../../setupAndTeardown'
-import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
+import { keyInfos } from '../../setupAndTeardown/public-key-info.fixture'
 import accounts from '../../setupAndTeardown/accounts.fixture'
 import transactions from '../../setupAndTeardown/transactions.fixture'
 import { getConnection } from 'typeorm'
@@ -51,7 +51,10 @@ describe('Test TransactionService', () => {
     describe('When the search value is an address', () => {
       const MAINNET_ADDRESS = 'ckb1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
       const TESTNET_ADDRESS = 'ckt1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
-      const fixtures = [['Mainnet', MAINNET_ADDRESS], ['Testnet', TESTNET_ADDRESS]]
+      const fixtures = [
+        ['Mainnet', MAINNET_ADDRESS],
+        ['Testnet', TESTNET_ADDRESS]
+      ]
 
       test.each(fixtures)('Should return SearchType.Address When search value is a %s address', (_type, addr) => {
         stubProvider.searchValue = addr
@@ -143,7 +146,10 @@ describe('Test TransactionService', () => {
       })
 
       it('Should return a map of <lockHash, count>', async () => {
-        const actual = await TransactionService.getCountByLockHashesAndStatus(stubProvider.lockHashList, stubProvider.status)
+        const actual = await TransactionService.getCountByLockHashesAndStatus(
+          stubProvider.lockHashList,
+          stubProvider.status
+        )
         expect(actual).toEqual(new Map([[LOCK_HASH, 2]]))
       })
     })
@@ -157,7 +163,10 @@ describe('Test TransactionService', () => {
       })
 
       it('Should return an empty map', async () => {
-        const actual = await TransactionService.getCountByLockHashesAndStatus(stubProvider.lockHashList, stubProvider.status)
+        const actual = await TransactionService.getCountByLockHashesAndStatus(
+          stubProvider.lockHashList,
+          stubProvider.status
+        )
         expect(actual).toEqual(new Map())
       })
     })
@@ -175,7 +184,6 @@ describe('Test TransactionService', () => {
     })
 
     describe('When the transaction exists', () => {
-
       beforeEach(() => {
         const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
         const DESCRIPTION = 'new description'
@@ -192,7 +200,7 @@ describe('Test TransactionService', () => {
       })
     })
 
-    describe('When the transaction doesn\'t exist', () => {
+    describe("When the transaction doesn't exist", () => {
       beforeEach(() => {
         const HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
         const DESCRIPTION = 'new description'
@@ -228,7 +236,7 @@ describe('Test TransactionService', () => {
       })
     })
 
-    describe('When the transaction doesn\'t exist', () => {
+    describe("When the transaction doesn't exist", () => {
       beforeEach(() => {
         const HASH = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
         stubProvider.hash = HASH
@@ -259,7 +267,10 @@ describe('Test TransactionService', () => {
       })
 
       it('Should return the total count', async () => {
-        const actual = await TransactionService.exportTransactions({ walletID: stubProvider.walletID, filePath: stubProvider.filePath })
+        const actual = await TransactionService.exportTransactions({
+          walletID: stubProvider.walletID,
+          filePath: stubProvider.filePath
+        })
         expect(actual).toBe(0)
       })
     })
@@ -273,10 +284,10 @@ describe('Test TransactionService', () => {
       'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
     ]
     const stubProvider: {
-      walletID: string,
-      pageNo: number,
-      pageSize: number,
-      addresses: string[],
+      walletID: string
+      pageNo: number
+      pageSize: number
+      addresses: string[]
       searchValue: string
     } = {
       walletID: walletId,
@@ -289,7 +300,7 @@ describe('Test TransactionService', () => {
     beforeEach(async () => {
       const publicKeyEntities = keyInfos.map(d => HdPublicKeyInfo.fromObject(d))
       await getConnection().manager.save(publicKeyEntities)
-    });
+    })
 
     afterEach(() => {
       stubProvider.walletID = walletId
@@ -307,14 +318,15 @@ describe('Test TransactionService', () => {
 
       it('Should return transactions', async () => {
         const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
-        const expectedTxs = [...transactions.slice(0, 3)].reverse()
+        const expectedTxs = [...transactions.slice(0, 4)].reverse()
 
         expect(actual.totalCount).toBe(expectedTxs.length)
         expect(actual.items.map(tx => tx.hash)).toEqual(expectedTxs.map(tx => tx.hash))
-        expect(actual.items.map(tx => tx.type)).toEqual(['receive', 'receive', 'receive'])
-        expect(actual.items.map(tx => tx.value)).toEqual(['14200000000', '100000000000', '100000000000'])
+        expect(actual.items.map(tx => tx.type)).toEqual(['create', 'receive', 'receive', 'receive'])
+        expect(actual.items.map(tx => tx.assetAccountType)).toEqual(['CKB', undefined, undefined, undefined])
+        expect(actual.items.map(tx => tx.value)).toEqual(['14200000000', '14200000000', '100000000000', '100000000000'])
         expect(actual.items.map(tx => tx.description)).toEqual(expectedTxs.map(tx => tx.description))
-        expect(actual.items.map(tx => !!tx.sudtInfo)).toEqual([false, false, false])
+        expect(actual.items.map(tx => !!tx.sudtInfo)).toEqual([false, false, false, false])
       })
     })
 
@@ -330,18 +342,22 @@ describe('Test TransactionService', () => {
           const expectedTxs = [transactions[0]]
 
           expect(actual.totalCount).toBe(expectedTxs.length)
-          expect(actual.items).toEqual(expectedTxs.map(tx => expect.objectContaining({
-            version: tx.version,
-            description: tx.description,
-            hash: tx.hash,
-            blockHash: undefined,
-            blockNumber: null,
-            value: '100000000000',
-            type: 'receive',
-            status: 'success',
-            sudtInfo: undefined,
-            nervosDao: false
-          })))
+          expect(actual.items).toEqual(
+            expectedTxs.map(tx =>
+              expect.objectContaining({
+                version: tx.version,
+                description: tx.description,
+                hash: tx.hash,
+                blockHash: undefined,
+                blockNumber: null,
+                value: '100000000000',
+                type: 'receive',
+                status: 'success',
+                sudtInfo: undefined,
+                nervosDao: false
+              })
+            )
+          )
         })
       })
 
@@ -369,9 +385,9 @@ describe('Test TransactionService', () => {
 
           it('Should return an array of several transactions', async () => {
             const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
-            expect(actual.totalCount).toBe(2)
+            expect(actual.totalCount).toBe(3)
           })
-        });
+        })
         describe('search with counterparty wallet adddress', () => {
           beforeEach(() => {
             const ADDRESS = 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83'
@@ -382,8 +398,8 @@ describe('Test TransactionService', () => {
             const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
             expect(actual.totalCount).toBe(2)
           })
-        });
-      });
+        })
+      })
 
       describe('When address misses', () => {
         beforeEach(() => {
@@ -412,7 +428,7 @@ describe('Test TransactionService', () => {
 
         it('Should return an array of several transactions', async () => {
           const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
-          expect(actual.totalCount).toBe(3)
+          expect(actual.totalCount).toBe(4)
         })
       })
 
@@ -423,7 +439,7 @@ describe('Test TransactionService', () => {
         })
 
         it('Should return an empty array', async () => {
-          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue,)
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
           expect(actual.totalCount).toBe(0)
           expect(actual.items).toEqual([])
         })
@@ -439,7 +455,7 @@ describe('Test TransactionService', () => {
         })
 
         it('Should return an array of several transactions', async () => {
-          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue,)
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
           expect(actual.totalCount).toBe(1)
         })
       })
@@ -463,7 +479,7 @@ describe('Test TransactionService', () => {
         })
 
         it('Should return an empty array', async () => {
-          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue,)
+          const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
           expect(actual.totalCount).toBe(0)
         })
       })
