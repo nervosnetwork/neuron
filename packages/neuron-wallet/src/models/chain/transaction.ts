@@ -77,7 +77,7 @@ export default class Transaction {
   public nftInfo?: NFTInfo
 
   public signatures: Signatures = {}
-  public assetAccountType?: AssetAccountType | string = '' // Default to ''
+  public assetAccountType?: AssetAccountType
 
   constructor(
     version: string,
@@ -103,7 +103,7 @@ export default class Transaction {
     sudtInfo?: SudtInfo,
     nftType?: NFTInfo,
     signatures: Signatures = {},
-    assetAccountType?: AssetAccountType | string
+    assetAccountType?: AssetAccountType
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -192,7 +192,7 @@ export default class Transaction {
     sudtInfo?: SudtInfo
     nftInfo?: NFTInfo
     signatures?: Signatures
-    assetAccountType?: AssetAccountType | string // Default to ''
+    assetAccountType?: AssetAccountType
   }): Transaction {
     return new Transaction(
       version,

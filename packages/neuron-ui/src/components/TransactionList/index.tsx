@@ -171,7 +171,9 @@ const TransactionList = ({
           amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
           if (tx.type === 'create' || tx.type === 'destroy') {
             if (tx.assetAccountType === 'CKB') {
-              typeLabel = `${t(`history.${tx.type}`, { name })}`
+              typeLabel = `${t(`history.${tx.type}`, { name: 'CKB' })}`
+            } else {
+              typeLabel = `${t(`overview.${tx.type}`, { name: 'Unknown' })}`
             }
           } else {
             typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)

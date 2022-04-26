@@ -153,6 +153,8 @@ const Overview = () => {
           if (item.type === 'create' || item.type === 'destroy') {
             if (item.assetAccountType === 'CKB') {
               typeLabel = `${t(`overview.${item.type}`, { name: 'CKB' })}`
+            } else {
+              typeLabel = `${t(`overview.${item.type}`, { name: 'Unknown' })}`
             }
           } else {
             typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
