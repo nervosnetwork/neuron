@@ -37,6 +37,11 @@ export interface NFTInfo {
   data: string
 }
 
+export enum AssetAccountType {
+  CKB = 'CKB',
+  SUDT = 'sUDT'
+}
+
 export default class Transaction {
   public version: string
   public cellDeps: CellDep[] = []
@@ -72,6 +77,7 @@ export default class Transaction {
   public nftInfo?: NFTInfo
 
   public signatures: Signatures = {}
+  public assetAccountType?: AssetAccountType
 
   constructor(
     version: string,
@@ -96,7 +102,8 @@ export default class Transaction {
     updatedAt?: string,
     sudtInfo?: SudtInfo,
     nftType?: NFTInfo,
-    signatures: Signatures = {}
+    signatures: Signatures = {},
+    assetAccountType?: AssetAccountType
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -109,6 +116,7 @@ export default class Transaction {
     this.status = status
     this.description = description
     this.nervosDao = nervosDao
+    this.assetAccountType = assetAccountType
     this.version = BigInt(version).toString()
     this.value = value ? BigInt(value).toString() : value
     this.fee = fee ? BigInt(fee).toString() : fee
@@ -158,7 +166,8 @@ export default class Transaction {
     updatedAt,
     sudtInfo,
     nftInfo,
-    signatures = {}
+    signatures = {},
+    assetAccountType
   }: {
     version: string
     cellDeps?: CellDep[]
@@ -183,6 +192,7 @@ export default class Transaction {
     sudtInfo?: SudtInfo
     nftInfo?: NFTInfo
     signatures?: Signatures
+    assetAccountType?: AssetAccountType
   }): Transaction {
     return new Transaction(
       version,
@@ -212,7 +222,8 @@ export default class Transaction {
       updatedAt,
       sudtInfo,
       nftInfo,
-      signatures
+      signatures,
+      assetAccountType
     )
   }
 

@@ -2,7 +2,7 @@ import { getConnection } from 'typeorm'
 import NetworksService from 'services/networks'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
-import Transaction, { TransactionStatus, SudtInfo, NFTType, NFTInfo } from 'models/chain/transaction'
+import Transaction, { TransactionStatus, SudtInfo, NFTType, NFTInfo, AssetAccountType } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -250,13 +250,12 @@ export class TransactionsService {
       )
       .getRawMany()
 
-    const anyoneCanPayInputs = await connection
+    const assetAccountInputs = await connection
       .getRepository(InputEntity)
       .createQueryBuilder('input')
       .where(
         `
         input.transactionHash IN (:...txHashes) AND
-        input.typeHash IS NOT NULL AND
         input.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId) AND
         input.lockCodeHash = :lockCodeHash`,
         {
@@ -267,13 +266,12 @@ export class TransactionsService {
       )
       .getMany()
 
-    const anyoneCanPayOutputs = await connection
+    const assetAccountOutputs = await connection
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where(
         `
         output.transactionHash IN (:...txHashes) AND
-        output.typeHash IS NOT NULL AND
         output.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId) AND
         output.lockCodeHash = :lockCodeHash`,
         {
@@ -318,6 +316,14 @@ export class TransactionsService {
       )
       .getMany()
 
+    const anyoneCanPayInputs = assetAccountInputs.filter(i => i.typeScript())
+
+    const anyoneCanPayOutputs = assetAccountOutputs.filter(i => i.typeScript())
+
+    const ckbAssetInputs = assetAccountInputs.filter(i => !i.typeScript())
+
+    const ckbAssetOutputs = assetAccountOutputs.filter(i => !i.typeScript())
+
     const inputPreviousTxHashes: string[] = inputs.map(i => i.outPointTxHash).filter(h => !!h) as string[]
 
     const daoCellOutPoints: { txHash: string; index: string }[] = (
@@ -358,18 +364,37 @@ export class TransactionsService {
         const value = sums.get(tx.hash!) || BigInt(0)
 
         let typeArgs: string | undefined | null
+        let txType: string = value > BigInt(0) ? 'receive' : 'send'
+        let assetAccountType: AssetAccountType | undefined
+
         const sudtInput = anyoneCanPayInputs.find(
           i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!)
         )
+        const sudtOutput = anyoneCanPayOutputs.find(
+          o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!)
+        )
         if (sudtInput) {
           typeArgs = sudtInput.typeArgs
+          if (!sudtOutput) {
+            txType = 'destroy'
+            assetAccountType = AssetAccountType.SUDT
+          }
         } else {
-          const sudtOutput = anyoneCanPayOutputs.find(
-            o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!)
-          )
           if (sudtOutput) {
             typeArgs = sudtOutput.typeArgs
+            txType = 'create'
+            assetAccountType = AssetAccountType.SUDT
           }
+        }
+
+        const ckbAssetInput = ckbAssetInputs.find(i => i.transactionHash === tx.hash)
+        const ckbAssetOutput = ckbAssetOutputs.find(o => o.outPointTxHash === tx.hash)
+        if (ckbAssetInput && !ckbAssetOutput) {
+          txType = 'destroy'
+          assetAccountType = AssetAccountType.CKB
+        } else if (!ckbAssetInput && ckbAssetOutput) {
+          txType = 'create'
+          assetAccountType = AssetAccountType.CKB
         }
 
         let sudtInfo: SudtInfo | undefined
@@ -432,7 +457,8 @@ export class TransactionsService {
           value: value.toString(),
           hash: tx.hash,
           version: tx.version,
-          type: value > BigInt(0) ? 'receive' : 'send',
+          type: txType,
+          assetAccountType: assetAccountType,
           nervosDao: daoFlag.get(tx.hash!),
           status: tx.status,
           description: tx.description,

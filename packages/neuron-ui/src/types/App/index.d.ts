@@ -1,6 +1,6 @@
 declare namespace State {
   interface Transaction {
-    type: 'send' | 'receive'
+    type: 'send' | 'receive' | 'create' | 'destroy'
     createdAt: string
     updatedAt: string
     timestamp: string
@@ -18,6 +18,7 @@ declare namespace State {
       type: 'send' | 'receive'
       data: string
     }
+    assetAccountType?: 'CKB' | 'sUDT' | string
   }
 
   interface DetailedInput {

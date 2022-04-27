@@ -153,9 +153,13 @@ const TransactionList = ({
           amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
         } else if (tx.sudtInfo?.sUDT) {
           name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
-          const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
-          typeLabel = `UDT ${t(`history.${type}`)}`
-          value = tx.sudtInfo.amount
+          if (tx.type === 'create' || tx.type === 'destroy') {
+            typeLabel = `${t(`history.${tx.type}`, { name })}`
+          } else {
+            value = tx.sudtInfo.amount
+            const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
+            typeLabel = `UDT ${t(`history.${type}`)}`
+          }
 
           if (tx.sudtInfo.sUDT.decimal) {
             sudtAmount = sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal, true)
@@ -165,7 +169,15 @@ const TransactionList = ({
           name = walletName
           value = `${tx.value} shannons`
           amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
-          typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+          if (tx.type === 'create' || tx.type === 'destroy') {
+            if (tx.assetAccountType === 'CKB') {
+              typeLabel = `${t(`history.${tx.type}`, { name: 'CKB' })}`
+            } else {
+              typeLabel = `${t(`overview.${tx.type}`, { name: 'Unknown' })}`
+            }
+          } else {
+            typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+          }
         }
 
         let indicator = <Pending />
