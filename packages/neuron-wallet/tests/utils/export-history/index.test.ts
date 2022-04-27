@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { initConnection, closeConnection, saveTransactions } from '../../setupAndTeardown/index'
 import transactions from '../../setupAndTeardown/transactions.fixture'
-import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
+import { keyInfos } from '../../setupAndTeardown/public-key-info.fixture'
 import i18n from '../../../src/locales/i18n'
 import exportHistory from '../../../src/utils/export-history'
 import { getConnection } from 'typeorm'
@@ -17,7 +17,7 @@ describe('Test exporting history', () => {
   const stubProvider = {
     walletID: WALLET_ID,
     chainType: MAINNET_CHAIN_TYPE,
-    filePath: FILE_PATH,
+    filePath: FILE_PATH
   }
 
   beforeAll(async () => {
@@ -56,7 +56,7 @@ describe('Test exporting history', () => {
       stubProvider.walletID = ''
     })
 
-    it("Should throw an error", async () => {
+    it('Should throw an error', async () => {
       expect.assertions(1)
       try {
         await exportHistory(stubProvider)
@@ -82,7 +82,6 @@ describe('Test exporting history', () => {
   })
 
   describe('when file exists', () => {
-
     let existsSyncSpy: any
     let unlinkSyncSpy: any
     beforeEach(() => {
@@ -107,7 +106,7 @@ describe('Test exporting history', () => {
   })
 
   describe('when no transactions exported', () => {
-    describe('when it\'s Mainnet', () => {
+    describe("when it's Mainnet", () => {
       beforeEach(() => {
         stubProvider.chainType = MAINNET_CHAIN_TYPE
         stubProvider.walletID = 'non exist id'
@@ -122,7 +121,7 @@ describe('Test exporting history', () => {
       })
     })
 
-    describe('when it\'s Testnet', () => {
+    describe("when it's Testnet", () => {
       beforeEach(() => {
         stubProvider.chainType = TESTNET_CHAIN_TYPE
         stubProvider.walletID = 'non exist id'
@@ -141,7 +140,7 @@ describe('Test exporting history', () => {
   describe('when several transactions exported', () => {
     it('should export table with records', async () => {
       expect.assertions(2)
-      const expectedTotalCount = 3
+      const expectedTotalCount = 4
       const totalCount = await exportHistory(stubProvider)
       const actual = fs.readFileSync(stubProvider.filePath, 'utf8')
       expect(totalCount).toBe(expectedTotalCount)
