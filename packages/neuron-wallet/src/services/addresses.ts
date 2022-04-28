@@ -4,7 +4,7 @@ import { Address as AddressInterface } from 'models/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
-import { getConnection } from 'typeorm'
+import { getConnection, In } from 'typeorm'
 import { TransactionsService } from 'services/tx'
 import CellsService from './cells'
 import SystemScriptInfo from 'models/system-script-info'
@@ -27,14 +27,33 @@ export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
   private static async create(addresses: AddressInterface[]) {
-    const publicKeyInfos = addresses.map(addr => {
-      return HdPublicKeyInfo.fromObject({
-        ...addr,
-        publicKeyInBlake160: addr.blake160
+    const walletIds = addresses.map(v => v.walletId)
+    const walletIdMaxAddressIndex = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .select('walletId')
+      .addSelect('group_concat(publicKeyInBlake160)', 'publicKeyInBlake160Array')
+      .where({ walletId: In(walletIds) })
+      .getRawMany()
+    const walletIdMaxAddressIndexMap: Record<string, string> = walletIdMaxAddressIndex.reduce(
+      (pre, cur) => ({
+        ...pre,
+        [cur.walletId]: cur.publicKeyInBlake160Array
+      }),
+      {}
+    )
+    const publicKeyInfos = addresses
+      .filter(v => !walletIdMaxAddressIndexMap?.[v.walletId]?.includes(v.blake160))
+      .map(addr => {
+        return HdPublicKeyInfo.fromObject({
+          ...addr,
+          publicKeyInBlake160: addr.blake160
+        })
       })
-    })
-    await getConnection().manager.save(publicKeyInfos)
-    AddressDbChangedSubject.getSubject().next('Updated')
+    if (publicKeyInfos.length) {
+      await getConnection().manager.save(publicKeyInfos)
+      AddressDbChangedSubject.getSubject().next('Updated')
+    }
   }
 
   private static async generateAndSave(

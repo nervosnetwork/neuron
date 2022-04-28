@@ -45,6 +45,7 @@ import { AddAddressDescription1602543179168 } from './migrations/1602543179168-A
 import { AddMultisigConfig1646817547204 } from './migrations/1646817547204-AddMultisigConfig'
 import { AddMultisigOutput1649729996969 } from './migrations/1649729996969-AddMultisigOutput'
 import { UpdateAddressDescription1650984779265 } from './migrations/1650984779265-UpdateAddressDescription'
+import { RemoveDuplicateBlake160s1651133703535 } from './migrations/1651133703535-RemoveDuplicateBlake160s'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -105,7 +106,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddAddressDescription1602543179168,
       AddMultisigConfig1646817547204,
       AddMultisigOutput1649729996969,
-      UpdateAddressDescription1650984779265
+      UpdateAddressDescription1650984779265,
+      RemoveDuplicateBlake160s1651133703535
     ],
     logger: 'simple-console',
     logging,
