@@ -1,11 +1,10 @@
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import AssetAccount from 'models/asset-account'
 import Transaction from 'models/chain/transaction'
 import AssetAccountService from 'services/asset-account-service'
 import { ServiceHasNoResponse } from 'exceptions'
 import { ResponseCode } from 'utils/const'
 import NetworksService from 'services/networks'
-import AddressGenerator from 'models/address-generator'
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import AssetAccountInfo from 'models/asset-account-info'
 import TransactionSender from 'services/transaction-sender'
 import { BrowserWindow, dialog } from 'electron'
@@ -81,12 +80,12 @@ export default class AssetAccountController {
       throw new ServiceHasNoResponse('AssetAccount')
     }
 
-    const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const isMainnet = NetworksService.getInstance().isMainnet()
 
     const result = assetAccounts.map(aa => {
       return {
         ...aa,
-        address: AddressGenerator.generate(assetAccountInfo.generateAnyoneCanPayScript(aa.blake160), addressPrefix)
+        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(aa.blake160), isMainnet)
       }
     })
 
@@ -125,13 +124,13 @@ export default class AssetAccountController {
     }
 
     const assetAccountInfo = new AssetAccountInfo()
-    const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const isMainnet = NetworksService.getInstance().isMainnet()
 
     return {
       status: ResponseCode.Success,
       result: {
         ...account,
-        address: AddressGenerator.generate(assetAccountInfo.generateAnyoneCanPayScript(account.blake160), addressPrefix)
+        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(account.blake160), isMainnet)
       }
     }
   }

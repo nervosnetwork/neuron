@@ -74,9 +74,17 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  "Should throw an error when it's a full version address but its code hash index is not 0x04": {
+  "Should throw an error when address's code hash is deprecated": {
     params: {
       address: 'ckt1q2r2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yy3d90uh',
+      isMainnet: false,
+      required: false,
+    },
+    exception: ErrorCode.AddressIsDeprecated,
+  },
+  "Should throw an error when it's a full version address but its code hash index is not 0x04": {
+    params: {
+      address: 'ckt1qkr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yy8tyx5j',
       isMainnet: false,
       required: false,
     },

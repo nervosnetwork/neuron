@@ -1,4 +1,4 @@
-import Address, { AddressType, publicKeyToAddress, AddressPrefix } from '../../../src/models/keys/address'
+import Address, { AddressType, publicKeyToAddress } from '../../../src/models/keys/address'
 
 describe('address', () => {
   it('path from index', () => {
@@ -17,19 +17,19 @@ describe('address', () => {
     const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
     const path = `m/44'/309'/0'/0/0`
     const address = Address.fromPublicKey(publicKey, `m/44'/309'/0'/0/0`)
-    expect(address.address).toEqual('ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83')
+    expect(address.address).toEqual('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqfkcv576ccddnn4quf2ga65xee2m26h7nq4sds0r')
     expect(address.path).toEqual(path)
   })
 
   it('Generate testnet address from public key', () => {
     const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
     const address = publicKeyToAddress(publicKey)
-    expect(address).toEqual('ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83')
+    expect(address).toEqual('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqfkcv576ccddnn4quf2ga65xee2m26h7nq4sds0r')
   })
 
   it('Generate mainnet address from public key', () => {
     const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
-    const address = publicKeyToAddress(publicKey, AddressPrefix.Mainnet)
-    expect(address).toEqual('ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd')
+    const address = publicKeyToAddress(publicKey, true)
+    expect(address).toEqual('ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqfkcv576ccddnn4quf2ga65xee2m26h7nqmzxl9m')
   })
 })

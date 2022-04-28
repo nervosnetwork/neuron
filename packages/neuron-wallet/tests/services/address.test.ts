@@ -81,7 +81,7 @@ describe('integration tests for AddressService', () => {
         const address = extendedKey.address(
           addressType,
           addressIndex,
-          AddressService.getAddressPrefix()
+          true,
         )
         preloadedPublicKeys.push({
           address,
@@ -98,7 +98,7 @@ describe('integration tests for AddressService', () => {
         .calledWith(
           addressToMock.addressType,
           addressToMock.addressIndex,
-          AddressService.getAddressPrefix()
+          true,
         )
         .mockReturnValue(addressToMock.address)
     }

@@ -1,6 +1,6 @@
-import { AddressType, AddressPrefix } from "../../src/models/keys/address"
+import { scriptToAddress } from "@nervosnetwork/ckb-sdk-utils"
+import { AddressType } from "../../src/models/keys/address"
 import SystemScriptInfo from "../../src/models/system-script-info"
-import AddressGenerator from "../../src/models/address-generator"
 
 const walletId1 = 'w1'
 const walletId2 = 'w2'
@@ -11,7 +11,7 @@ const aliceLockScript = SystemScriptInfo.generateSecpScript(alicePublicKeyHash)
 const alice = {
   lockScript: aliceLockScript,
   lockHash: aliceLockScript.computeHash(),
-  address:  AddressGenerator.generate(aliceLockScript, AddressPrefix.Testnet),
+  address: scriptToAddress(aliceLockScript, false),
   blake160: aliceLockScript.args,
   walletId: walletId1
 }
@@ -21,7 +21,7 @@ const bobLockScript = SystemScriptInfo.generateSecpScript(bobPublicKeyHash)
 const bob = {
   lockScript: bobLockScript,
   lockHash: bobLockScript.computeHash(),
-  address: AddressGenerator.generate(bobLockScript, AddressPrefix.Testnet),
+  address: scriptToAddress(bobLockScript, false),
   blake160: bobPublicKeyHash,
   walletId: walletId1
 }
@@ -31,7 +31,7 @@ const charlieLockScript = SystemScriptInfo.generateSecpScript(charliePublicKeyHa
 const charlie = {
   lockScript: charlieLockScript,
   lockHash: charlieLockScript.computeHash(),
-  address: AddressGenerator.generate(charlieLockScript, AddressPrefix.Testnet),
+  address: scriptToAddress(charlieLockScript, false),
   blake160: charliePublicKeyHash,
   walletId: walletId2
 }

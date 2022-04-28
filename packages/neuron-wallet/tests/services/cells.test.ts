@@ -17,8 +17,6 @@ import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionPersistor from '../../src/services/tx/transaction-persistor'
 import OutPoint from '../../src/models/chain/out-point'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import AddressGenerator from '../../src/models/address-generator'
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import MultiSign from '../../src/models/multi-sign'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import MultisigOutput from '../../src/database/chain/entities/multisig-output'
@@ -41,7 +39,7 @@ describe('CellsService', () => {
   const alice = {
     lockScript: aliceLockScript,
     lockHash: aliceLockScript.computeHash(),
-    address:  AddressGenerator.generate(aliceLockScript, AddressPrefix.Testnet),
+    address: scriptToAddress(aliceLockScript, false),
     blake160: alicePublicKeyHash,
     walletId: walletId1
   }
@@ -51,7 +49,7 @@ describe('CellsService', () => {
   const bob = {
     lockScript: bobLockScript,
     lockHash: bobLockScript.computeHash(),
-    address: AddressGenerator.generate(bobLockScript, AddressPrefix.Testnet),
+    address: scriptToAddress(bobLockScript, false),
     blake160: bobPublicKeyHash,
     walletId: walletId1
   }
@@ -71,7 +69,7 @@ describe('CellsService', () => {
   const charlie = {
     lockScript: charlieLockScript,
     lockHash: charlieLockScript.computeHash(),
-    address: AddressGenerator.generate(charlieLockScript, AddressPrefix.Testnet),
+    address: scriptToAddress(charlieLockScript, false),
     blake160: charliePublicKeyHash,
     walletId: walletId2
   }
@@ -449,7 +447,7 @@ describe('CellsService', () => {
           '0',
           feeRate
         )
-        const expectedSize = 2 * TransactionSize.input() + TransactionSize.secpLockWitness()+ TransactionSize.emptyWitness()
+        const expectedSize = 2 * TransactionSize.input() + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
         expect(result.capacities).toEqual(toShannon('3000'))
         expect(BigInt(result.finalFee)).toEqual(TransactionFee.fee(expectedSize, BigInt(feeRate)))
       })
@@ -459,7 +457,7 @@ describe('CellsService', () => {
         const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         const expectedFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - expectedFee
+        const capacity = BigInt(1000 * 10 ** 8) - expectedFee
         const result = await CellsService.gatherInputs(
           capacity.toString(),
           walletId1,
@@ -475,7 +473,7 @@ describe('CellsService', () => {
         const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         const inputFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - inputFee + BigInt(1)
+        const capacity = BigInt(1000 * 10 ** 8) - inputFee + BigInt(1)
         const result = await CellsService.gatherInputs(
           capacity.toString(),
           walletId1,
@@ -506,7 +504,7 @@ describe('CellsService', () => {
             undefined,
             undefined,
             undefined,
-            {codeHash: lockCodeHash, hashType: ScriptHashType.Type}
+            { codeHash: lockCodeHash, hashType: ScriptHashType.Type }
           )
         } catch (e) {
           error = e
@@ -633,7 +631,7 @@ describe('CellsService', () => {
       beforeEach(async () => {
         allInputs = await CellsService.gatherAllInputs(
           walletId1,
-          {codeHash: 'non exist lock code hash', hashType: ScriptHashType.Type}
+          { codeHash: 'non exist lock code hash', hashType: ScriptHashType.Type }
         )
       });
       it('returns empty array', async () => {
@@ -902,9 +900,9 @@ describe('CellsService', () => {
     const lockScript2 = new Script(codeHash, fakeArgs2, ScriptHashType.Type)
     const lockScript3 = new Script(codeHash, fakeArgs3, ScriptHashType.Type)
 
-    const owner1 = {lockScript: lockScript1, lockHash: lockScript1.computeHash()}
-    const owner2 = {lockScript: lockScript2, lockHash: lockScript2.computeHash()}
-    const owner3 = {lockScript: lockScript3, lockHash: lockScript3.computeHash()}
+    const owner1 = { lockScript: lockScript1, lockHash: lockScript1.computeHash() }
+    const owner2 = { lockScript: lockScript2, lockHash: lockScript2.computeHash() }
+    const owner3 = { lockScript: lockScript3, lockHash: lockScript3.computeHash() }
 
     beforeEach(async () => {
       await createCell('1000', OutputStatus.Live, false, null, owner1)
@@ -973,12 +971,12 @@ describe('CellsService', () => {
           generateCell('10000', OutputStatus.Live, false, typeScript, user),
           generateCell('54321', OutputStatus.Live, true, sudtType, { lockScript: acpLock }),
           // cheque cell
-          generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: receiverChequeLock}),
-          generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: senderChequeLock}),
+          generateCell('10000', OutputStatus.Live, true, typeScript, { lockScript: receiverChequeLock }),
+          generateCell('10000', OutputStatus.Live, true, typeScript, { lockScript: senderChequeLock }),
           // unknown asset
-          generateCell('666', OutputStatus.Live, true, typeScript, {lockScript: bobDefaultLock}),
+          generateCell('666', OutputStatus.Live, true, typeScript, { lockScript: bobDefaultLock }),
           // sudt asset
-          generateCell('777', OutputStatus.Live, true, sudtType, {lockScript: bobDefaultLock}),
+          generateCell('777', OutputStatus.Live, true, sudtType, { lockScript: bobDefaultLock }),
         ]
         await getConnection().manager.save(cells)
       });
@@ -998,7 +996,7 @@ describe('CellsService', () => {
             const singleMultiSignCells = result.items.filter((item: any) => item.customizedAssetInfo.lock === CustomizedLock.SingleMultiSign)
             expect(singleMultiSignCells.length).toBe(3)
             for (const item of singleMultiSignCells) {
-              expect(item.customizedAssetInfo).toEqual({"data": "", "lock": "SingleMultiSign", "type": ""})
+              expect(item.customizedAssetInfo).toEqual({ "data": "", "lock": "SingleMultiSign", "type": "" })
             }
           });
           it('attaches setCustomizedAssetInfo to cheque cells', () => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { TFunction, useTranslation } from 'react-i18next'
+import { TFunction } from 'i18next'
+import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import {
@@ -310,7 +311,7 @@ const SignAndVerify = () => {
           <div role="presentation" className={styles.addrList} onClick={handleAddrSelected}>
             {wallet.addresses.map(addr => (
               <div key={addr.address} className={styles.addrOpt} data-addr={addr.address}>
-                <span>{addr.address}</span>
+                <span>{`${addr.address.slice(0, 30)}...${addr.address.slice(-30)}`}</span>
                 <Balance balance={shannonToCKBFormatter(addr.balance)} />
                 <span className={styles.addrType} data-type={addr.type}>
                   {addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')}

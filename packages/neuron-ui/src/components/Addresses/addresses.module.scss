@@ -100,7 +100,7 @@ $change-color: #6666cc;
 
     div {
       min-width: 100px;
-      max-width: 500px;
+      max-width: 818px;
       display: flex;
       position: relative;
 
@@ -116,8 +116,8 @@ $change-color: #6666cc;
         display: none;
       }
 
-      @media screen and (max-width: 1680px) {
-        width: 20vw;
+      @media screen and (max-width: 1800px) {
+        width: 46vw;
 
         .ellipsis {
           display: inline;
@@ -137,6 +137,10 @@ $change-color: #6666cc;
           transform: translateX(-50%);
           display: none;
         }
+      }
+
+      @media screen and (max-width: 1600px) {
+        width: 30vw;
       }
 
       @media screen and (max-width: 1000px) {
@@ -181,11 +185,12 @@ $change-color: #6666cc;
       border: none;
     }
 
-    @media screen and (max-width: 1500px) {
+    @media screen and (max-width: 2400px) {
       input {
         width: 100px;
       }
     }
+
   }
 
   .balance {

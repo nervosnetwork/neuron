@@ -1,12 +1,11 @@
 import { getConnection } from 'typeorm'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import OutputEntity from 'database/chain/entities/output'
 import NetworksService from 'services/networks'
-import { AddressPrefix } from 'models/keys/address'
 import Output from 'models/chain/output'
 import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import SystemScriptInfo from 'models/system-script-info'
-import AddressGenerator from 'models/address-generator'
 
 export interface AnyoneCanPayInfo {
   tokenID: string
@@ -33,10 +32,8 @@ export default class TxAddressFinder {
     const inputAddressesResult = await this.selectInputAddresses()
 
     const outputsResult: [boolean, Output[], AnyoneCanPayInfo[]] = this.selectOutputs()
-    const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const outputAddresses: string[] = outputsResult[1].map(output => {
-      return AddressGenerator.toShort(output.lock, addressPrefix)
-    })
+    const isMainnet = NetworksService.getInstance().isMainnet()
+    const outputAddresses: string[] = outputsResult[1].map(output => scriptToAddress(output.lock, isMainnet))
 
     return [
       inputAddressesResult[0] || outputsResult[0],
@@ -88,7 +85,7 @@ export default class TxAddressFinder {
     // const anyoneCanPayBlake160s: string[] = []
     const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const isMainnet = NetworksService.getInstance().isMainnet()
 
     let shouldSync = false
     for (const input of inputs) {
@@ -109,7 +106,7 @@ export default class TxAddressFinder {
       }
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
-        addresses.push(AddressGenerator.generate(output.lockScript(), prefix))
+        addresses.push(scriptToAddress(output.lockScript(), isMainnet))
       }
       if (output && SystemScriptInfo.isMultiSignScript(output.lockScript())) {
         const multiSignBlake160 = output.lockScript().args.slice(0, 42)

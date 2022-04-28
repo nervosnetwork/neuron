@@ -112,14 +112,15 @@ export default class AppController {
   }
 
   public createWindow = () => {
+    const MIN_WIDTH = 1200
     const windowState = windowStateKeeper({ defaultWidth: 1366, defaultHeight: 900 })
 
     this.mainWindow = new BrowserWindow({
       x: windowState.x,
       y: windowState.y,
-      width: windowState.width,
+      width: Math.max(windowState.width, MIN_WIDTH),
       height: windowState.height,
-      minWidth: 900,
+      minWidth: MIN_WIDTH,
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',

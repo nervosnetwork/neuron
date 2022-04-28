@@ -1,7 +1,7 @@
-import AddressGenerator from 'models/address-generator'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import SystemScriptInfo from 'models/system-script-info'
 import NetworksService from 'services/networks'
-import Address, { AddressPrefix, AddressType } from './address'
+import Address, { AddressType } from './address'
 
 export default class HdPublicKeyInfoModel {
   public walletId: string
@@ -11,8 +11,14 @@ export default class HdPublicKeyInfoModel {
   public description?: string
 
   public get address() {
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    return AddressGenerator.toShort(SystemScriptInfo.generateSecpScript(this.publicKeyInBlake160), prefix)
+    return scriptToAddress(
+      {
+        codeHash: SystemScriptInfo.SECP_CODE_HASH,
+        hashType: SystemScriptInfo.SECP_HASH_TYPE,
+        args: this.publicKeyInBlake160
+      },
+      NetworksService.getInstance().isMainnet()
+    )
   }
 
   public get path(): string {

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { createMultisigAddress } from 'services/remote'
-import { isSuccessResponse, validateAddress } from 'utils'
+import { isSuccessResponse, validateAddress, isSecp256k1Address } from 'utils'
+import { useTranslation } from 'react-i18next'
 
 export enum Step {
   setMN = 0,
@@ -40,6 +41,7 @@ export const useMAndN = () => {
 }
 
 export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolean }) => {
+  const [t] = useTranslation()
   const [addresses, setAddresses] = useState(new Array(n).fill(''))
   const [addressErrors, setAddressErrors] = useState<((Error & { i18n: Record<string, string> }) | undefined)[]>(
     new Array(n).fill(undefined)
@@ -63,13 +65,16 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
       } = e.target
       try {
         validateAddress(value, isMainnet)
+        if (!isSecp256k1Address(value)) {
+          throw new Error(t(`messages.secp256k1/blake160-address-required`))
+        }
         setAddressErrors(v => v.map((item, index) => (index === +idx ? undefined : item)))
       } catch (error) {
         setAddressErrors(v => v.map((item, index) => (index === +idx ? error : item)))
       }
       setAddresses(v => v.map((item, index) => (+idx === index ? value : item)))
     },
-    [setAddresses, isMainnet, setAddressErrors]
+    [setAddresses, isMainnet, setAddressErrors, t]
   )
   const isAddressesDuplicated = useMemo(() => {
     const notEmptyAddresses = addresses.filter(v => !!v)

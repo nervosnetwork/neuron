@@ -89,4 +89,5 @@ export function validateSpecificAddress(address: string, isMainnet: boolean, tag
   }
   return true
 }
+
 export default validateAddress

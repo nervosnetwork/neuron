@@ -1,6 +1,6 @@
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { when } from 'jest-when'
-import AddressGenerator from "../../src/models/address-generator"
-import { AddressPrefix, AddressType } from '../../src/models/keys/address'
+import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
@@ -152,7 +152,7 @@ describe('unit tests for IndexerConnector', () => {
     const shortAddressInfo = {
       lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
     }
-    const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+    const address = scriptToAddress(shortAddressInfo.lock, false)
     const walletId1 = 'walletid1'
     const walletId2 = 'walletid2'
     const addressObj1: Address = {

@@ -1,4 +1,4 @@
-import { AddressPrefix, AddressType as Type, pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { AddressPrefix, blake160, scriptToAddress, systemScripts, bytesToHex } from '@nervosnetwork/ckb-sdk-utils'
 
 import { AccountExtendedPublicKey } from './key'
 
@@ -9,13 +9,9 @@ export enum AddressType {
   Change = 1 // Internal chain
 }
 
-export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Testnet) => {
+export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
   const pubkey = publicKey.startsWith('0x') ? publicKey : `0x${publicKey}`
-  return pubkeyToAddress(pubkey, {
-    prefix,
-    type: Type.HashIdx,
-    codeHashOrCodeHashIndex: '0x00'
-  })
+  return scriptToAddress({ ...systemScripts.SECP256K1_BLAKE160, args: bytesToHex(blake160(pubkey)) }, isMainnet)
 }
 
 export default class Address {
@@ -28,8 +24,8 @@ export default class Address {
     this.path = path
   }
 
-  public static fromPublicKey = (publicKey: string, path: string, prefix: AddressPrefix = AddressPrefix.Testnet) => {
-    const address = publicKeyToAddress(publicKey, prefix)
+  public static fromPublicKey = (publicKey: string, path: string, isMainnet = false) => {
+    const address = publicKeyToAddress(publicKey, isMainnet)
     const instance = new Address(address, path)
     instance.publicKey = publicKey
     return instance

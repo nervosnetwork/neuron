@@ -6,6 +6,7 @@ import Input from '../../src/models/chain/input'
 import Script from '../../src/models/chain/script'
 import Output from '../../src/models/chain/output'
 import { DEPLOY_KEY } from './keys'
+import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
 
 const fromTxObject = (tx: any) =>
   Transaction.fromObject({
@@ -176,8 +177,8 @@ const ACPTx0 = {
       // address: ckt1qyq9t2w0l0u7rnylrxmj2uq6a28sstnctcwfu4vnst4n3u0p2luawfsmjrmsz
       lock: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-        hashType: 'type'
+        codeHash: systemScripts.ANYONE_CAN_PAY_MAINNET.codeHash,
+        hashType: systemScripts.ANYONE_CAN_PAY_MAINNET.hashType,
       },
       type: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
