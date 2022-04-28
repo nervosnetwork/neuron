@@ -33,6 +33,10 @@ const SyncStatus = ({
     return <span>{t('sync.synced')}</span>
   }
 
+  if (SyncStatusEnum.SyncLookingValidTarget === syncStatus) {
+    return <span>{t('sync.looking-valid-target')}</span>
+  }
+
   return <span>{t('sync.syncing', { leftTime })}</span>
 }
 

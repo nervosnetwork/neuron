@@ -1,3 +1,4 @@
+import env from 'env'
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
 import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
@@ -16,6 +17,7 @@ export enum SyncStatus {
   SyncPending,
   Syncing,
   SyncCompleted,
+  SyncLookingValidTarget
 }
 
 interface SyncState {
@@ -43,6 +45,7 @@ export default class SyncApiController {
   #cacheDiff = 5
   #bestKnownBlockNumberDiff = 50
   #cachedEstimation?: SyncState = undefined
+  #lastCacheTipNumber?: number
 
   public static getInstance() {
     if (this.instance) {
@@ -224,6 +227,14 @@ export default class SyncApiController {
     SyncApiController.emiter.on('cache-tip-block-updated', async states => {
       const newSyncState = await this.#estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncState.cacheTipNumber))
+      if (
+        env.app.isPackaged &&
+        process.env.CKB_NODE_ASSUME_VALID_TARGET &&
+        (newSyncState.cacheTipNumber === 0 || newSyncState.cacheTipNumber === this.#lastCacheTipNumber)
+      ) {
+        newSyncState.status = SyncStatus.SyncLookingValidTarget
+      }
+      this.#lastCacheTipNumber = newSyncState.cacheTipNumber
       SyncStateSubject.next(newSyncState)
       await MultisigService.syncMultisigOutput(`0x${(BigInt(newSyncState.cacheTipNumber)).toString(16)}`)
     })

@@ -549,7 +549,8 @@
       "slow": "同步缓慢，请检查网络",
       "sync-failed": "连接失败, 请检查网络",
       "sync-not-start": "同步尚未开始, 请尝试重启",
-      "connecting": "正在连接节点"
+      "connecting": "正在连接节点",
+      "looking-valid-target": "寻找预设可信区块"
     },
     "pagination": {
       "previous-page": "上一页",
