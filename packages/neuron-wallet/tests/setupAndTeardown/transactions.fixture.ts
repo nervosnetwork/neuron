@@ -224,8 +224,8 @@ const ACPTx1 = {
       // address: ckt1qyq9t2w0l0u7rnylrxmj2uq6a28sstnctcwfu4vnst4n3u0p2luawfsmjrmsz
       lock: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-        hashType: 'type'
+        codeHash: systemScripts.ANYONE_CAN_PAY_MAINNET.codeHash,
+        hashType: systemScripts.ANYONE_CAN_PAY_MAINNET.hashType,
       },
       capacity: '0x34e62ce00',
       outPoint: { txHash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a8657900', index: '0' }
