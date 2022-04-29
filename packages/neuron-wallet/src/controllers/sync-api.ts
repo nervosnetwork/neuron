@@ -16,8 +16,7 @@ export enum SyncStatus {
   SyncNotStart,
   SyncPending,
   Syncing,
-  SyncCompleted,
-  SyncLookingValidTarget
+  SyncCompleted
 }
 
 interface SyncState {
@@ -31,6 +30,8 @@ interface SyncState {
   cacheRate: number | undefined,
   estimate: number | undefined,
   status: SyncStatus
+  isLookingValidTarget?: boolean,
+  validTarget?: string
 }
 
 export default class SyncApiController {
@@ -46,6 +47,7 @@ export default class SyncApiController {
   #bestKnownBlockNumberDiff = 50
   #cachedEstimation?: SyncState = undefined
   #lastCacheTipNumber?: number
+  #isLookingValidTarget?: boolean
 
   public static getInstance() {
     if (this.instance) {
@@ -154,8 +156,20 @@ export default class SyncApiController {
       indexRate: undefined,
       cacheRate: undefined,
       estimate: undefined,
-      status: SyncStatus.Syncing
+      status: SyncStatus.Syncing,
+      isLookingValidTarget: (this.#isLookingValidTarget ?? true) && !!(
+        process.env.CKB_NODE_ASSUME_VALID_TARGET &&
+          env.app.isPackaged &&
+          (
+            cacheTipNumber === 0 ||
+            !this.#lastCacheTipNumber ||
+            cacheTipNumber === this.#lastCacheTipNumber
+          ) && Date.now() - bestKnownBlockTimestamp > MAX_TIP_AGE
+      ),
+      validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
     }
+    this.#lastCacheTipNumber = newSyncState.cacheTipNumber
+    this.#isLookingValidTarget = newSyncState.isLookingValidTarget
 
     if (foundBestKnownBlockNumber) {
       const allCached = remainingBlocksToCache < this.#cacheDiff
@@ -223,18 +237,6 @@ export default class SyncApiController {
     SyncApiController.emiter.on('cache-tip-block-updated', async states => {
       const newSyncState = await this.#estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncState.cacheTipNumber))
-      if (
-        env.app.isPackaged &&
-        process.env.CKB_NODE_ASSUME_VALID_TARGET &&
-        (
-          newSyncState.cacheTipNumber === 0 ||
-          newSyncState.cacheTipNumber === this.#lastCacheTipNumber
-        ) &&
-        Date.now() - newSyncState.bestKnownBlockTimestamp > MAX_TIP_AGE
-      ) {
-        newSyncState.status = SyncStatus.SyncLookingValidTarget
-      }
-      this.#lastCacheTipNumber = newSyncState.cacheTipNumber
       SyncStateSubject.next(newSyncState)
       await MultisigService.syncMultisigOutput(`0x${(BigInt(newSyncState.cacheTipNumber)).toString(16)}`)
     })
@@ -251,7 +253,8 @@ export default class SyncApiController {
         indexRate: undefined,
         cacheRate: undefined,
         estimate: undefined,
-        status: SyncStatus.SyncNotStart
+        status: SyncStatus.SyncNotStart,
+        validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
       }
       this.#estimates = [newSyncState]
 

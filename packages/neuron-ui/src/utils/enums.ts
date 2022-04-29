@@ -118,7 +118,6 @@ export enum SyncStatus {
   SyncPending,
   Syncing,
   SyncCompleted,
-  SyncLookingValidTarget,
 }
 
 export enum PresetScript {
