@@ -1,7 +1,6 @@
 import env from 'env'
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
-import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
 import NodeService from 'services/node'
 import RpcService from 'services/rpc-service'
 import SyncedBlockNumber from 'models/synced-block-number'
@@ -11,6 +10,7 @@ import MultisigService from 'services/multisig'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
+const MAX_TIP_AGE = 24 * 60 * 60 * 1000
 
 export enum SyncStatus {
   SyncNotStart,
@@ -108,19 +108,15 @@ export default class SyncApiController {
 
   #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> => {
     const nodeUrl = this.#getCurrentNodeUrl()
+    const rpcService = new RpcService(nodeUrl)
     try {
-      const method = new Method({ url: nodeUrl }, {
-        name: 'sync state',
-        method: 'sync_state',
-        paramsFormatters: [],
-      })
-      const { best_known_block_number, best_known_block_timestamp } = await method.call()
+      const syncState = await rpcService.getSyncState()
       return {
-        bestKnownBlockNumber: parseInt(best_known_block_number, 16),
-        bestKnownBlockTimestamp: +best_known_block_timestamp,
+        bestKnownBlockNumber: parseInt(syncState.bestKnownBlockNumber, 16),
+        bestKnownBlockTimestamp: +syncState.bestKnownBlockTimestamp,
       }
     } catch (error) {
-      const tipHeader = await new RpcService(nodeUrl).getTipHeader()
+      const tipHeader = await rpcService.getTipHeader()
 
       return {
         bestKnownBlockNumber: Number(tipHeader.number),
@@ -230,7 +226,11 @@ export default class SyncApiController {
       if (
         env.app.isPackaged &&
         process.env.CKB_NODE_ASSUME_VALID_TARGET &&
-        (newSyncState.cacheTipNumber === 0 || newSyncState.cacheTipNumber === this.#lastCacheTipNumber)
+        (
+          newSyncState.cacheTipNumber === 0 ||
+          newSyncState.cacheTipNumber === this.#lastCacheTipNumber
+        ) &&
+        Date.now() - newSyncState.bestKnownBlockTimestamp > MAX_TIP_AGE
       ) {
         newSyncState.status = SyncStatus.SyncLookingValidTarget
       }

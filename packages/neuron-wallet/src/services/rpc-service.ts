@@ -120,6 +120,13 @@ export default class RpcService {
     return chain
   }
 
+  public async getSyncState(): Promise<CKBComponents.SyncState> {
+    const syncState = await this.retry(async () => {
+      return await this.ckb.rpc.syncState()
+    })
+    return syncState
+  }
+
   private async retry<T>(func: () => T): Promise<T> {
     return CommonUtils.retry(this.retryTime, this.retryInterval, func)
   }
