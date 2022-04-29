@@ -4,7 +4,7 @@ import { flushPromises } from '../test-utils'
 const stubbedEmitter = jest.fn()
 const stubbedSyncedBlockNumber = jest.fn()
 const stubbedSyncStateSubjectNext = jest.fn()
-const stubbedSDKMethod = jest.fn()
+const stubbedGetSyncState = jest.fn()
 const stubbedNodeGetInstance = jest.fn()
 const stubbedSetNextBlock = jest.fn()
 
@@ -19,7 +19,7 @@ const resetMocks = () => {
   stubbedEmitter.mockReset()
   stubbedSyncedBlockNumber.mockReset()
   stubbedSyncStateSubjectNext.mockReset()
-  stubbedSDKMethod.mockReset()
+  stubbedGetSyncState.mockReset()
   stubbedNodeGetInstance.mockReset()
   stubbedSetNextBlock.mockReset()
   stubbedCurrentBlockNumber.mockReset()
@@ -88,14 +88,7 @@ describe('SyncApiController', () => {
         })
       }
     })
-    jest.doMock('@nervosnetwork/ckb-sdk-rpc/lib/method', () => {
-      return jest.fn().mockImplementation(() => {
-        return {
-          call: stubbedSDKMethod
-        }
-      })
-    })
-
+    
     jest.doMock('../../src/models/subjects/node', () => {
       return {
         getLatestConnectionStatus: stubbedGetLatestConnectionStatus
@@ -107,6 +100,7 @@ describe('SyncApiController', () => {
         default: stubbedRpcServiceConstructor.mockImplementation(
           () => ({
             getTipHeader: stubbedGetTipHeader,
+            getSyncState: stubbedGetSyncState
           })
         ),
       }
@@ -131,9 +125,9 @@ describe('SyncApiController', () => {
     const bestKnownBlockTimestamp = 246000
     beforeEach(() => {
       stubbedDateNow.mockReturnValue(246000)
-      stubbedSDKMethod.mockResolvedValue({
-        best_known_block_number: bestKnownBlockNumber.toString(16),
-        best_known_block_timestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
+      stubbedGetSyncState.mockResolvedValue({
+        bestKnownBlockNumber: bestKnownBlockNumber.toString(16),
+        bestKnownBlockTimestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
       })
       stubbedNodeGetInstance.mockReturnValue({
         ckb: {
@@ -520,9 +514,9 @@ describe('SyncApiController', () => {
         }
         beforeEach(async () => {
           await sendFakeCacheBlockTipEvent(fakeState1)
-          stubbedSDKMethod.mockResolvedValue({
-            best_known_block_number: nextBestKnownBlockNumber.toString(16),
-            best_known_block_timestamp: bestKnownBlockTimestamp,
+          stubbedGetSyncState.mockResolvedValue({
+            bestKnownBlockNumber: nextBestKnownBlockNumber.toString(16),
+            bestKnownBlockTimestamp: bestKnownBlockTimestamp,
           })
           await sendFakeCacheBlockTipEvent(fakeState2)
         });
