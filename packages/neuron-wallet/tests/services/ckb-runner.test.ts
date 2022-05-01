@@ -34,12 +34,15 @@ jest.doMock('fs', () => {
     }
   }
 })
+
+const app = {
+  getAppPath: () => '/',
+  getPath: () => '/',
+  isPackaged: false
+}
 jest.doMock('env', () => {
   return {
-    app: {
-      getAppPath: () => '/',
-      getPath: () => '/'
-    },
+    app
   }
 })
 jest.doMock('utils/logger', () => {
@@ -52,7 +55,7 @@ jest.doMock('utils/logger', () => {
 jest.doMock('process', () => {
   return stubbedProcess
 })
-const { startCkbNode, stopCkbNode } = require('../../src/services/ckb-runner')
+const { startCkbNode, stopCkbNode, getLookingValidTargetStatus } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
@@ -133,6 +136,37 @@ describe('ckb runner', () => {
             expect(hasError).toEqual(true)
           })
         });
+      });
+
+      describe('with assume valid target', () => {
+        beforeEach(async () => {
+          app.isPackaged = true
+          stubbedProcess.env = { CKB_NODE_ASSUME_VALID_TARGET: '0x' + '0'.repeat(64) }
+          stubbedExistsSync.mockReturnValue(true)
+          await startCkbNode()
+        })
+        afterEach(() => {
+          app.isPackaged = false
+          stubbedProcess.env = {}
+        })
+        it('is Looking valid target', () => {
+          stubbedCkb.stdout.emit('data', `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`)
+          expect(getLookingValidTargetStatus()).toBeTruthy()
+          stubbedCkb.emit('close')
+        })
+        it('is Looking valid target', async () => {
+          jest.setTimeout(15000)
+          stubbedCkb.stdout.emit('data', `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`)
+          await new Promise((resolve) => setTimeout(() => { resolve(undefined) }, 11000))
+          stubbedCkb.stdout.emit('data', `had find valid target`)
+          expect(getLookingValidTargetStatus()).toBeFalsy()
+          stubbedCkb.emit('close')
+        })
+        it('ckb has closed', async () => {
+          stubbedCkb.stdout.emit('data', `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`)
+          stubbedCkb.emit('close')
+          expect(getLookingValidTargetStatus()).toBeFalsy()
+        })
       });
     })
   })
