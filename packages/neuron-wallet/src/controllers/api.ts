@@ -292,7 +292,7 @@ export default class ApiController {
       return this.#walletsController.generateSendingAllTx(params)
     })
 
-    handle('generate-multisig-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel}) => {
+    handle('generate-multisig-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel }) => {
       return this.#walletsController.generateMultisigTx({
         items: params.items,
         multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
@@ -568,39 +568,39 @@ export default class ApiController {
     })
 
     // multi sign
-    handle('create-multisig-address',async (_, params) => {
+    handle('create-multisig-address', async (_, params) => {
       return this.#multisigController.createMultisigAddress(params)
     })
 
-    handle('save-multisig-config',async (_, params) => {
+    handle('save-multisig-config', async (_, params) => {
       return this.#multisigController.saveConfig(params)
     })
 
-    handle('update-multisig-config',async (_, params) => {
+    handle('update-multisig-config', async (_, params) => {
       return this.#multisigController.updateConfig(params)
     })
 
-    handle('delete-multisig-config',async (_, params) => {
+    handle('delete-multisig-config', async (_, params) => {
       return this.#multisigController.deleteConfig(params)
     })
 
-    handle('get-multisig-config',async (_, params) => {
+    handle('get-multisig-config', async (_, params) => {
       return this.#multisigController.getConfig(params)
     })
 
-    handle('import-multisig-config',async (_, params) => {
+    handle('import-multisig-config', async (_, params) => {
       return this.#multisigController.importConfig(params)
     })
 
-    handle('export-multisig-config',async (_, params) => {
+    handle('export-multisig-config', async (_, params) => {
       return this.#multisigController.exportConfig(params)
     })
 
-    handle('get-multisig-balances',async (_, params) => {
+    handle('get-multisig-balances', async (_, params) => {
       return this.#multisigController.getMultisigBalances(params)
     })
 
-    handle('load-multisig-tx-json',async (_, fullPayload) => {
+    handle('load-multisig-tx-json', async (_, fullPayload) => {
       return this.#multisigController.loadMultisigTxJson(fullPayload)
     })
   }
@@ -620,8 +620,19 @@ export default class ApiController {
           err.code = NODE_DISCONNECTED_CODE
         }
 
-        if (err.message?.code !== undefined && !Number.isNaN(err.message.code)) {
-          err.code = err.message.code
+        try {
+          /**
+           * error.message from ckb node is a stringified error object with code and message
+           */
+          const e = JSON.parse(err.message)
+          if (!Number.isNaN(+e.code)) {
+            return {
+              status: ResponseCode.Fail,
+              message: e.message || err.message,
+            }
+          }
+        } catch {
+          // ignore
         }
 
         return {
