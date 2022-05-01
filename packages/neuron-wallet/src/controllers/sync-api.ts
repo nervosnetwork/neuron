@@ -1,4 +1,3 @@
-import env from 'env'
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
 import NodeService from 'services/node'
@@ -7,10 +6,10 @@ import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
 import MultisigService from 'services/multisig'
+import { getLookingValidTargetStatus } from 'services/ckb-runner'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
-const MAX_TIP_AGE = 24 * 60 * 60 * 1000
 
 export enum SyncStatus {
   SyncNotStart,
@@ -46,8 +45,6 @@ export default class SyncApiController {
   #cacheDiff = 5
   #bestKnownBlockNumberDiff = 50
   #cachedEstimation?: SyncState = undefined
-  #lastCacheTipNumber?: number
-  #isLookingValidTarget?: boolean
 
   public static getInstance() {
     if (this.instance) {
@@ -157,19 +154,9 @@ export default class SyncApiController {
       cacheRate: undefined,
       estimate: undefined,
       status: SyncStatus.Syncing,
-      isLookingValidTarget: (this.#isLookingValidTarget ?? true) && !!(
-        process.env.CKB_NODE_ASSUME_VALID_TARGET &&
-          env.app.isPackaged &&
-          (
-            cacheTipNumber === 0 ||
-            !this.#lastCacheTipNumber ||
-            cacheTipNumber === this.#lastCacheTipNumber
-          ) && Date.now() - bestKnownBlockTimestamp > MAX_TIP_AGE
-      ),
+      isLookingValidTarget: getLookingValidTargetStatus(),
       validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
     }
-    this.#lastCacheTipNumber = newSyncState.cacheTipNumber
-    this.#isLookingValidTarget = newSyncState.isLookingValidTarget
 
     if (foundBestKnownBlockNumber) {
       const allCached = remainingBlocksToCache < this.#cacheDiff

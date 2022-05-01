@@ -63,6 +63,10 @@ const initCkb = async () => {
   })
 }
 
+let isLookingValidTarget: boolean = false
+let lastLogTime: number
+export const getLookingValidTargetStatus = () => isLookingValidTarget
+
 export const startCkbNode = async () => {
   await initCkb()
 
@@ -71,20 +75,40 @@ export const startCkbNode = async () => {
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
   }
-  ckb = spawn(ckbBinary(), options, { stdio: ['ignore', 'ignore', 'pipe'] })
+  ckb = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
+
   ckb.stderr &&
     ckb.stderr.on('data', data => {
       logger.error('CKB:\trun fail:', data.toString())
       ckb = null
     })
+  ckb.stdout &&
+    ckb.stdout.on('data', data => {
+      if (!app.isPackaged || !process.env.CKB_NODE_ASSUME_VALID_TARGET) {
+        return
+      }
+      const dataString: string = data.toString()
+      if (
+        dataString.includes(
+          `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
+        )
+      ) {
+        isLookingValidTarget = true
+        lastLogTime = Date.now()
+      } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
+        isLookingValidTarget = false
+      }
+    })
 
   ckb.on('error', error => {
     logger.error('CKB:\trun fail:', error)
+    isLookingValidTarget = false
     ckb = null
   })
 
   ckb.on('close', () => {
     logger.info('CKB:\tprocess closed')
+    isLookingValidTarget = false
     ckb = null
   })
 }
