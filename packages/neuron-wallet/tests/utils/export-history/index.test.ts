@@ -117,7 +117,7 @@ describe('Test exporting history', () => {
         const totalCount = await exportHistory(stubProvider)
         const actual = fs.readFileSync(stubProvider.filePath, 'utf8')
         expect(totalCount).toBe(0)
-        expect(actual).toBe('Time,Block Number,Transaction Hash,Transaction Type,CKB Amount,Description\n')
+        expect(actual).toBe('Time,Block Number,Transaction Hash,Transaction Type,CKB Amount,UDT Amount,Description\n')
       })
     })
 

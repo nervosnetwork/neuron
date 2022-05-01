@@ -3,76 +3,63 @@
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": false,
         "value": "0",
         "description": "description"
-      },
-      "includeSUDT": false
+      }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Send,+0.00000000,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,+0.00000000,,\"description\"\n"
   },
   "Receive CKB": {
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "receive",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": false,
         "value": "900000000",
         "description": "description"
-      },
-      "includeSUDT": false
+      }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Receive,+9.00000000,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Receive,+9.00000000,,\"description\"\n"
   },
   "SEND CKB": {
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": false,
         "value": "-900000000",
         "description": "description"
-      },
-      "includeSUDT": false
+      }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,,\"description\"\n"
   },
   "Nervos DAO": {
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": true,
         "value": "-900000000",
         "description": "description"
-      },
-      "includeSUDT": false
+      }
     },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-9.00000000,\"description\"\n"
-  },
-  "Show sUDT without sUDT tx": {
-    "data": {
-      "tx": {
-        "hash": "hash",
-        "timestamp": "1591954855123",
-        "blockNumber": "0",
-        "nervosDao": false,
-        "value": "-900000000",
-        "description": "description"
-      },
-      "includeSUDT": true
-    },
-    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,,\"description\"\n"
+    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-9.00000000,,\"description\"\n"
   },
   "Receive unknown UDT": {
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": true,
@@ -82,8 +69,7 @@
           "sUDT": {},
           "amount": "100000"
         }
-      },
-      "includeSUDT": true
+      }
     },
     "expected": "2020-06-12 09:40:55.123,0,hash,UDT Receive,,--,\"description\"\n"
   },
@@ -91,6 +77,7 @@
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": true,
@@ -100,8 +87,7 @@
           "sUDT": {},
           "amount": "-100000"
         }
-      },
-      "includeSUDT": true
+      }
     },
     "expected": "2020-06-12 09:40:55.123,0,hash,UDT Send,,--,\"description\"\n"
   },
@@ -109,6 +95,7 @@
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": true,
@@ -121,8 +108,7 @@
           },
           "amount": "100000"
         }
-      },
-      "includeSUDT": true
+      }
     },
     "expected": "2020-06-12 09:40:55.123,0,hash,UDT Receive,,+0.00001 UDT,\"description\"\n"
   },
@@ -130,6 +116,7 @@
     "data": {
       "tx": {
         "hash": "hash",
+        "type": "send",
         "timestamp": "1591954855123",
         "blockNumber": "0",
         "nervosDao": true,
@@ -142,9 +129,146 @@
           },
           "amount": "-100000"
         }
-      },
-      "includeSUDT": true
+      }
     },
     "expected": "2020-06-12 09:40:55.123,0,hash,UDT Send,,-0.00001 UDT,\"description\"\n"
+  },
+  "Create unknown Asset Account": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "create",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "",
+            "decimal": "",
+            "tokenName": ""
+          },
+          "amount": "0"
+        }
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Create Unknown Asset Account,,+0 Unknown,\"description\"\n"
+  },
+  "Destroy unknown Asset Account": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "destroy",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "",
+            "decimal": "",
+            "tokenName": ""
+          },
+          "amount": "0"
+        }
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Destroy Unknown Asset Account,,+0 Unknown,\"description\"\n"
+  },
+  "Create known Asset Account": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "create",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "UDT",
+            "decimal": "10",
+            "tokenName": "UDT"
+          },
+          "amount": "0"
+        }
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Create UDT Asset Account,,+0 UDT,\"description\"\n"
+  },
+  "Create known Asset Account with Income": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "create",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "UDT",
+            "decimal": "10",
+            "tokenName": "UDT"
+          },
+          "amount": "1000"
+        }
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Create UDT Asset Account,,+0.0000001 UDT,\"description\"\n"
+  },
+  "Destroy known Asset Account": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "destroy",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description",
+        "sudtInfo": {
+          "sUDT": {
+            "symbol": "UDT",
+            "decimal": "10",
+            "tokenName": "UDT"
+          },
+          "amount": "0"
+        }
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Destroy UDT Asset Account,,+0 UDT,\"description\"\n"
+  },
+  "Create CKB Asset Account": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "create",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description"
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Create CKB Asset Account,-9.00000000,,\"description\"\n"
+  },
+  "Destroy CKB Asset Account": {
+    "data": {
+      "tx": {
+        "hash": "hash",
+        "type": "destroy",
+        "timestamp": "1591954855123",
+        "blockNumber": "0",
+        "nervosDao": false,
+        "value": "-900000000",
+        "description": "description"
+      }
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Destroy CKB Asset Account,-9.00000000,,\"description\"\n"
   }
 }

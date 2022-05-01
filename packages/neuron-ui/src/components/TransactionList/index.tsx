@@ -141,33 +141,35 @@ const TransactionList = ({
         const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
 
         let name = '--'
-        let value = '--'
         let amount = '--'
         let typeLabel = '--'
         let sudtAmount = ''
 
         if (tx.nftInfo) {
+          // NFT
           name = walletName
           const { type, data } = tx.nftInfo
           typeLabel = `${t(`history.${type}`)} m-NFT`
           amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
         } else if (tx.sudtInfo?.sUDT) {
+          // Asset Account
           name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
-          if (tx.type === 'create' || tx.type === 'destroy') {
+          if (['create', 'destroy'].includes(tx.type)) {
+            // create/destroy an account
             typeLabel = `${t(`history.${tx.type}`, { name })}`
           } else {
-            value = tx.sudtInfo.amount
+            // send/receive to/from an account
             const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
             typeLabel = `UDT ${t(`history.${type}`)}`
           }
 
           if (tx.sudtInfo.sUDT.decimal) {
-            sudtAmount = sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal, true)
+            sudtAmount = sudtValueToAmount(tx.sudtInfo.amount, tx.sudtInfo.sUDT.decimal, true)
             amount = `${sUDTAmountFormatter(sudtAmount)} ${tx.sudtInfo.sUDT.symbol}`
           }
         } else {
+          // normal tx
           name = walletName
-          value = `${tx.value} shannons`
           amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
           if (tx.type === 'create' || tx.type === 'destroy') {
             if (tx.assetAccountType === 'CKB') {

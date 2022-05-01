@@ -231,7 +231,9 @@ export default {
       },
       'tx-type': {
         send: '轉賬',
-        receive: '收款'
+        receive: '收款',
+        'create-asset-account': '創建 {{name}} 資產賬戶',
+        'destroy-asset-account': '銷毀 {{name}} 資產賬戶'
       }
     },
     'offline-signature': {

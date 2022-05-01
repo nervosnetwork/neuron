@@ -133,13 +133,17 @@ const Overview = () => {
         }
 
         if (item.nftInfo) {
+          // NFT
           const { type, data } = item.nftInfo
           typeLabel = `${t(`overview.${genTypeLabel(type, status)}`)}`
           amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
         } else if (item.sudtInfo?.sUDT) {
-          if (item.type === 'create' || item.type === 'destroy') {
+          // Asset Account
+          if (['create', 'destroy'].includes(item.type)) {
+            // create/destroy an account
             typeLabel = `${t(`overview.${item.type}`, { name: item.sudtInfo.sUDT.tokenName || 'UDT' })}`
           } else {
+            // send/receive to/from an account
             const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
             typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
           }
@@ -149,6 +153,7 @@ const Overview = () => {
             }`
           }
         } else {
+          // normal tx
           amount = `${shannonToCKBFormatter(item.value)} CKB`
           if (item.type === 'create' || item.type === 'destroy') {
             if (item.assetAccountType === 'CKB') {

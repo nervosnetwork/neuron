@@ -1,4 +1,5 @@
 import toCSVRow from '../../../src/utils/to-csv-row'
+import { SudtInfo } from '../../../src/models/chain/transaction'
 import fixtures from './fixtures.json'
 
 describe(`Test generating csv row`, () => {
@@ -9,20 +10,21 @@ describe(`Test generating csv row`, () => {
         data: {
           tx: {
             hash: string
+            type: string
             timestamp: string
             blockNumber: string
             nervosDao: boolean
             value: string
             description: string
+            sudtInfo?: SudtInfo
           }
-          includeSUDT: boolean
         }
         expected: string
       }
     ]
   > = Object.entries(fixtures)
   test.each(fixtureTable)(`%s`, (_name, fixture) => {
-    const actual = toCSVRow(fixture.data.tx, fixture.data.includeSUDT)
+    const actual = toCSVRow(fixture.data.tx)
     expect(actual).toEqual(fixture.expected)
   })
 })
