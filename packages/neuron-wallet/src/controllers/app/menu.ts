@@ -317,6 +317,8 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             t(`messageBox.multisig-address.title`),
             {
               width: 900,
+              maxWidth: 900,
+              minWidth: 900,
               resizable: true
             },
             ['multisig-output-update']
