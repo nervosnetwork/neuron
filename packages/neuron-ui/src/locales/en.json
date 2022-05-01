@@ -105,8 +105,8 @@
       "wallet": "Wallet:",
       "content": "Content:",
       "export": "Export Tx",
-      "sign-and-export": "Sign and export",
-      "sign-and-broadcast": "Sign and broadcast",
+      "sign-and-export": "Sign & export",
+      "sign-and-broadcast": "Sign & broadcast",
       "actions": {
         "broadcast": "Broadcast",
         "sign": "Sign and export",

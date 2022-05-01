@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import React, { useCallback, useState, useRef } from 'react'
 import { bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import { ReactComponent as Copy } from 'widgets/Icons/TinyCopy.svg'
 import { ReactComponent as Check } from 'widgets/Icons/Check.svg'
@@ -100,9 +99,6 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
           <pre>{rawLock}</pre>
         </div>
         <ShortAddr isMainnet={isMainnet} lockScript={lockInfo} />
-        <div className={styles.footer}>
-          <Button type="cancel" onClick={onDismiss} label={t('common.close')} />
-        </div>
       </div>
     </dialog>
   )
