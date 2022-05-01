@@ -4,7 +4,7 @@ import { Address as AddressInterface } from 'models/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
-import { getConnection, In } from 'typeorm'
+import { getConnection } from 'typeorm'
 import { TransactionsService } from 'services/tx'
 import CellsService from './cells'
 import SystemScriptInfo from 'models/system-script-info'
@@ -27,23 +27,18 @@ export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
   private static async create(addresses: AddressInterface[]) {
-    const walletIds = addresses.map(v => v.walletId)
-    const walletIdMaxAddressIndex = await getConnection()
+    const walletIds = new Set(addresses.map(v => v.walletId))
+    if (walletIds.size !== 1) {
+      throw new Error('Addresses can only be created for one wallet at a time')
+    }
+    const walletAddresses = await getConnection()
       .getRepository(HdPublicKeyInfo)
       .createQueryBuilder()
-      .select('walletId')
-      .addSelect('group_concat(publicKeyInBlake160)', 'publicKeyInBlake160Array')
-      .where({ walletId: In(walletIds) })
-      .getRawMany()
-    const walletIdMaxAddressIndexMap: Record<string, string> = walletIdMaxAddressIndex.reduce(
-      (pre, cur) => ({
-        ...pre,
-        [cur.walletId]: cur.publicKeyInBlake160Array
-      }),
-      {}
-    )
+      .where({ walletId: [...walletIds.values()][0] })
+      .getMany()
+    const publicKeyInBlake160Array: string[] = walletAddresses.map(v => v.publicKeyInBlake160)
     const publicKeyInfos = addresses
-      .filter(v => !walletIdMaxAddressIndexMap?.[v.walletId]?.includes(v.blake160))
+      .filter(v => !publicKeyInBlake160Array?.includes(v.blake160))
       .map(addr => {
         return HdPublicKeyInfo.fromObject({
           ...addr,

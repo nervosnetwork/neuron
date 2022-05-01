@@ -683,6 +683,12 @@ describe('integration tests for AddressService', () => {
         await AddressService.create(receiving)
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(0)
       })
+      it('create with more than one wallet', async () => {
+        await expect(AddressService.create([
+          { walletId: '1' },
+          { walletId: '2' }
+        ])).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
+      })
       it('create with some exist', async () => {
         const { receiving, change } = await AddressService.generateAddresses(
           walletId,
