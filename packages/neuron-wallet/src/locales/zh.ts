@@ -232,7 +232,9 @@ export default {
       },
       'tx-type': {
         send: '转账',
-        receive: '收款'
+        receive: '收款',
+        'create-asset-account': '创建 {{name}} 资产账户',
+        'destroy-asset-account': '销毁 {{name}} 资产账户'
       }
     },
     'offline-signature': {

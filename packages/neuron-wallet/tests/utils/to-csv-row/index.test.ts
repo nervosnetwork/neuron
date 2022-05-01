@@ -9,20 +9,21 @@ describe(`Test generating csv row`, () => {
         data: {
           tx: {
             hash: string
+            type: string
             timestamp: string
             blockNumber: string
             nervosDao: boolean
             value: string
             description: string
+            sudtInfo?: any
           }
-          includeSUDT: boolean
         }
         expected: string
       }
     ]
   > = Object.entries(fixtures)
   test.each(fixtureTable)(`%s`, (_name, fixture) => {
-    const actual = toCSVRow(fixture.data.tx, fixture.data.includeSUDT)
+    const actual = toCSVRow(fixture.data.tx)
     expect(actual).toEqual(fixture.expected)
   })
 })

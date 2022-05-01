@@ -241,7 +241,9 @@ export default {
       },
       'tx-type': {
         send: 'Send',
-        receive: 'Receive'
+        receive: 'Receive',
+        'create-asset-account': 'Create {{name}} Asset Account',
+        'destroy-asset-account': 'Destroy {{name}} Asset Account'
       }
     },
     'offline-signature': {

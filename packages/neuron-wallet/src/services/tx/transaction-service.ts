@@ -1,5 +1,4 @@
 import { getConnection } from 'typeorm'
-import NetworksService from 'services/networks'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus, SudtInfo, NFTType, NFTInfo, AssetAccountType } from 'models/chain/transaction'
@@ -621,8 +620,7 @@ export class TransactionsService {
   }
 
   public static async exportTransactions({ walletID, filePath }: { walletID: string; filePath: string }) {
-    const chainType = NetworksService.getInstance().getCurrent().chain
-    const total = await exportTransactions({ walletID, filePath, chainType })
+    const total = await exportTransactions({ walletID, filePath })
     return total
   }
 }
