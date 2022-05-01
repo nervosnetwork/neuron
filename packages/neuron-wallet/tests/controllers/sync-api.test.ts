@@ -41,8 +41,9 @@ jest.doMock('models/subjects/networks', () => {
     }
   }
 })
-
-
+jest.doMock('services/ckb-runner', () => ({
+  getLookingValidTargetStatus: jest.fn()
+}))
 
 describe('SyncApiController', () => {
   const emitter = new Emitter()

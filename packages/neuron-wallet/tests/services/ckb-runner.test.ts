@@ -52,7 +52,7 @@ jest.doMock('utils/logger', () => {
 jest.doMock('process', () => {
   return stubbedProcess
 })
-const {startCkbNode, stopCkbNode} = require('../../src/services/ckb-runner')
+const { startCkbNode, stopCkbNode } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
@@ -89,7 +89,7 @@ describe('ckb runner', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join(platformPath,'ckb')),
             ['run', '-C', expect.stringContaining(path.join('chains','mainnet'))],
-            {'stdio': ['ignore', 'ignore', 'pipe']}
+            {'stdio': ['ignore', 'pipe', 'pipe']}
           )
         })
       });
@@ -115,7 +115,7 @@ describe('ckb runner', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
               expect.stringContaining(path.join(platformPath,'ckb')),
               ['run', '-C', expect.stringContaining(path.join('chains','mainnet'))],
-              {'stdio': ['ignore', 'ignore', 'pipe']}
+              {'stdio': ['ignore', 'pipe', 'pipe']}
             )
           })
         });
