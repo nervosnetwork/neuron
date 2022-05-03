@@ -211,6 +211,7 @@ export default {
       yes: 'Yes',
       no: 'No',
       ok: 'OK',
+      cancel: 'Cancel',
       error: 'Error'
     },
     'export-debug-info': {
@@ -261,6 +262,11 @@ export default {
         ok: 'Confirm',
         cancel: 'Cancel'
       }
+    },
+    'open-in-explorer': {
+      title: 'View in CKB Explorer',
+      transaction: 'transaction',
+      message: 'View {{type}} {{key}} in CKB Explorer'
     }
   }
 }

@@ -1,5 +1,17 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuItemConstructorOptions, MenuItem, Menu, screen, BrowserWindow } from 'electron'
+import {
+  shell,
+  ipcMain,
+  IpcMainInvokeEvent,
+  dialog,
+  app,
+  OpenDialogSyncOptions,
+  MenuItemConstructorOptions,
+  MenuItem,
+  Menu,
+  screen,
+  BrowserWindow
+} from 'electron'
 import { t } from 'i18next'
 import env from 'env'
 import { showWindow } from './app/show-window'
@@ -37,7 +49,7 @@ import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyo
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
-import SUDTController from "controllers/sudt";
+import SUDTController from "controllers/sudt"
 import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
@@ -211,6 +223,24 @@ export default class ApiController {
 
     handle('open-in-window', async (_, { url, title }: { url: string, title: string }) => {
       showWindow(url, title)
+    })
+
+    handle('request-open-in-explorer', (_, { key, type }: { key: string, type: 'transaction' }) => {
+      if (type !== 'transaction' || !key) {
+        return
+      }
+      dialog.showMessageBox({
+        type: 'question',
+        title: t(`open-in-explorer.title`),
+        message: t(`open-in-explorer.message`, { type: t(`open-in-explorer.${type}`), key }),
+        defaultId: 0,
+        buttons: [t('common.ok'), t('common.cancel'),]
+      }).then(({ response }) => {
+        if (response === 0) {
+          const base = NetworksService.getInstance().explorerUrl()
+          shell.openExternal(`${base}/${type}/${key}`)
+        }
+      })
     })
 
     handle('handle-view-error', async (_, error: string) => {

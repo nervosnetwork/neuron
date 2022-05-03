@@ -32,6 +32,7 @@ type Action =
   | 'get-system-codehash'
   | 'load-init-data'
   | 'open-in-window'
+  | 'request-open-in-explorer'
   | 'handle-view-error'
   | 'show-settings'
   | 'set-locale'

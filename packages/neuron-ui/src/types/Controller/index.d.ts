@@ -1,4 +1,9 @@
 declare namespace Controller {
+  interface RequestOpenInExplorerParams {
+    key: string
+    type: 'transaction'
+  }
+
   interface OpenInWindowParams {
     url: string
     title: string
