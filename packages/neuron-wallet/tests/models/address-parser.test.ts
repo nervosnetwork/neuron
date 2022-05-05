@@ -36,7 +36,8 @@ describe('AddressParser', () => {
     hashType: ScriptHashType.Type,
     address: 'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4'
   }
-  const assetAccount = new AssetAccountInfo()
+  // @ts-ignore private property
+  const assetAccount = new AssetAccountInfo(AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH)
 
   describe('parse', () => {
     it('full address', () => {

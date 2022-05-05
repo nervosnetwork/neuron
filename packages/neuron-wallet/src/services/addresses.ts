@@ -27,14 +27,28 @@ export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
   private static async create(addresses: AddressInterface[]) {
-    const publicKeyInfos = addresses.map(addr => {
-      return HdPublicKeyInfo.fromObject({
-        ...addr,
-        publicKeyInBlake160: addr.blake160
+    const walletIds = new Set(addresses.map(v => v.walletId))
+    if (walletIds.size !== 1) {
+      throw new Error('Addresses can only be created for one wallet at a time')
+    }
+    const walletAddresses = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .where({ walletId: [...walletIds.values()][0] })
+      .getMany()
+    const publicKeyInBlake160Array: string[] = walletAddresses.map(v => v.publicKeyInBlake160)
+    const publicKeyInfos = addresses
+      .filter(v => !publicKeyInBlake160Array?.includes(v.blake160))
+      .map(addr => {
+        return HdPublicKeyInfo.fromObject({
+          ...addr,
+          publicKeyInBlake160: addr.blake160
+        })
       })
-    })
-    await getConnection().manager.save(publicKeyInfos)
-    AddressDbChangedSubject.getSubject().next('Updated')
+    if (publicKeyInfos.length) {
+      await getConnection().manager.save(publicKeyInfos)
+      AddressDbChangedSubject.getSubject().next('Updated')
+    }
   }
 
   private static async generateAndSave(
