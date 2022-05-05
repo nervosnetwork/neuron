@@ -19,7 +19,13 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType, signAndExportTransaction } from 'services/remote'
+import {
+  exportTransactionAsJSON,
+  OfflineSignStatus,
+  OfflineSignType,
+  signAndExportTransaction,
+  requestOpenInExplorer,
+} from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
@@ -138,8 +144,10 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
-              ({ status }) => {
-                if (status === ErrorCode.PasswordIncorrect) {
+              (res: { result: string; status: number }) => {
+                if (isSuccessResponse(res)) {
+                  requestOpenInExplorer({ type: 'transaction', key: res.result })
+                } else if (res.status === ErrorCode.PasswordIncorrect) {
                   throw new PasswordIncorrectException()
                 }
               }

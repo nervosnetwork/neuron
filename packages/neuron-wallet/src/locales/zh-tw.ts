@@ -201,6 +201,7 @@ export default {
       yes: '是',
       no: '否',
       ok: '確定',
+      cancel: '取消',
       error: '錯誤'
     },
     'export-debug-info': {
@@ -253,6 +254,11 @@ export default {
         ok: '確認',
         cancel: '取消'
       }
+    },
+    'open-in-explorer': {
+      title: '在 CKB 瀏覽器中查看',
+      transaction: '交易',
+      message: '在 CKB 瀏覽器中查看 {{type}} {{key}}'
     }
   }
 }
