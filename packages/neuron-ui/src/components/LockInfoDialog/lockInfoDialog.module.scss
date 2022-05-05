@@ -46,21 +46,22 @@
 .lock {
   position: relative;
 
-  pre{
+  pre {
     overflow: auto;
     background: #eee;
-    padding: 30px 10px 10px 10px;
+    padding: 10px;
     border-radius: 6px;
     font-size: 12px;
   }
 
-  .copyBtn{
+  .copyBtn {
     position: absolute;
     top: 5px;
     right: 5px;
     width: 15px;
     height: 15px;
     cursor: pointer!important;
+    opacity: 0;
 
     svg{
       width: 100%;
@@ -68,17 +69,12 @@
       pointer-events: none;
     }
 
-    &:hover{
+    &:hover {
       filter: brightness(0.5);
     }
   }
-}
-
-
-.footer {
-  @include dialog-footer;
-
-  button:last-of-type {
-    margin-left: 9px;
+ &:hover .copyBtn {
+    opacity: 100%;
   }
 }
+
