@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import NetworkTypeLabel from 'components/NetworkTypeLabel'
+import { NewTab } from 'widgets/Icons/icon'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
@@ -8,9 +9,18 @@ export interface NetworkStatusProps {
   syncPercents: number
   syncBlockNumbers: string
   onAction: (e: React.SyntheticEvent) => void
+  isLookingValidTarget: boolean
+  onOpenValidTarget: (e: React.SyntheticEvent) => void
 }
 
-const NetworkStatus = ({ network, syncPercents, syncBlockNumbers, onAction }: NetworkStatusProps) => {
+const NetworkStatus = ({
+  network,
+  syncPercents,
+  syncBlockNumbers,
+  onAction,
+  isLookingValidTarget,
+  onOpenValidTarget,
+}: NetworkStatusProps) => {
   const [t] = useTranslation()
 
   return (
@@ -29,6 +39,18 @@ const NetworkStatus = ({ network, syncPercents, syncBlockNumbers, onAction }: Ne
             <span>{`${syncPercents}%`}</span>
           </div>
           <span className={styles.blockNumber}>{syncBlockNumbers}</span>
+          {isLookingValidTarget && (
+            <div
+              role="link"
+              className={styles.lookingValidTarget}
+              onClick={onOpenValidTarget}
+              onKeyPress={onOpenValidTarget}
+              tabIndex={-1}
+            >
+              <span>{t('network-status.tooltip.looking-valid-target')}</span>
+              <NewTab className={styles.openTarget} />
+            </div>
+          )}
         </div>
       ) : null}
       {network ? (

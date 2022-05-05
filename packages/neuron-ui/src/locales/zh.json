@@ -25,7 +25,8 @@
     },
     "network-status": {
       "tooltip": {
-        "block-synced": "已同步区块"
+        "block-synced": "已同步区块",
+        "looking-valid-target": "寻找预设可信区块"
       }
     },
     "import-hardware": {

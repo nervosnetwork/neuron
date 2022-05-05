@@ -202,6 +202,8 @@ declare namespace State {
     bestKnownBlockTimestamp: number
     estimate: number | undefined
     status: number
+    isLookingValidTarget: boolean
+    validTarget?: string
   }>
 
   interface Chain {

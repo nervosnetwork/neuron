@@ -40,6 +40,8 @@ declare namespace Subject {
     bestKnownBlockTimestamp: number
     estimate: number
     status: number
+    isLookingValidTarget: boolean
+    validTarget?: string
   }
 
   interface AppUpdater {

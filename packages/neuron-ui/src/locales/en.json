@@ -25,7 +25,8 @@
     },
     "network-status": {
       "tooltip": {
-        "block-synced": "Block Synced"
+        "block-synced": "Block Synced",
+        "looking-valid-target": "Looking for assumed valid target"
       }
     },
     "import-hardware": {

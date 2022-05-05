@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 
-import { showSettings } from 'services/remote'
+import { openExternal, showSettings } from 'services/remote'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
@@ -18,6 +18,8 @@ import {
   useOnLocaleChange,
   SyncStatus as SyncStatusEnum,
   ConnectionStatus,
+  getExplorerUrl,
+  isMainnet,
 } from 'utils'
 
 import styles from './navbar.module.scss'
@@ -60,7 +62,7 @@ const Navbar = () => {
     chain: {
       connectionStatus,
       networkID,
-      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status },
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status, isLookingValidTarget, validTarget },
     },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
@@ -72,6 +74,15 @@ const Navbar = () => {
   const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
 
   const syncStatus = status
+
+  const onOpenValidTarget = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.stopPropagation()
+      const explorerUrl = getExplorerUrl(isMainnet(networks, networkID))
+      openExternal(`${explorerUrl}/block/${validTarget}`)
+    },
+    [networks, networkID, validTarget]
+  )
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
@@ -146,6 +157,8 @@ const Navbar = () => {
       </nav>
       <div className={styles.network}>
         <NetworkStatus
+          isLookingValidTarget={isLookingValidTarget}
+          onOpenValidTarget={onOpenValidTarget}
           syncPercents={syncPercents}
           syncBlockNumbers={syncBlockNumbers}
           network={network}
