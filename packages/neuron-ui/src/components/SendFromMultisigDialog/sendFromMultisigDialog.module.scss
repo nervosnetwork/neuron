@@ -20,12 +20,15 @@
 }
 
 .sendFieldContainer {
+  margin-bottom: 16px;
   & > div {
     grid-template:
       'address scanner add-or-remove' auto
       'amount max add-or-remove' auto
       'locktime locktime locktime' auto /
       calc(100% - 130px) 50px 30px;
+      padding-top: 10px;
+      padding-bottom: 10px;
   }
 }
 
