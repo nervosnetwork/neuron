@@ -82,23 +82,22 @@ export const startCkbNode = async () => {
       logger.error('CKB:\trun fail:', data.toString())
       ckb = null
     })
-  ckb.stdout &&
-    ckb.stdout.on('data', data => {
-      if (!app.isPackaged || !process.env.CKB_NODE_ASSUME_VALID_TARGET) {
-        return
-      }
-      const dataString: string = data.toString()
-      if (
-        dataString.includes(
-          `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
-        )
-      ) {
-        isLookingValidTarget = true
-        lastLogTime = Date.now()
-      } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
-        isLookingValidTarget = false
-      }
-    })
+  if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
+    ckb.stdout &&
+      ckb.stdout.on('data', data => {
+        const dataString: string = data.toString()
+        if (
+          dataString.includes(
+            `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
+          )
+        ) {
+          isLookingValidTarget = true
+          lastLogTime = Date.now()
+        } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
+          isLookingValidTarget = false
+        }
+      })
+  }
 
   ckb.on('error', error => {
     logger.error('CKB:\trun fail:', error)
