@@ -1,5 +1,4 @@
 import WalletService, { Wallet } from 'services/wallets'
-import WalletsService from 'services/wallets'
 import NodeService from './node'
 import { addressToScript, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
@@ -54,7 +53,7 @@ export default class TransactionSender {
   private walletService: WalletService
 
   constructor() {
-    this.walletService = WalletsService.getInstance()
+    this.walletService = WalletService.getInstance()
   }
 
   public async sendTx(
@@ -112,7 +111,7 @@ export default class TransactionSender {
     if (wallet.isHardware()) {
       let device = HardwareWalletService.getInstance().getCurrent()
       if (!device) {
-        const wallet = WalletsService.getInstance().getCurrent()
+        const wallet = WalletService.getInstance().getCurrent()
         const deviceInfo = wallet!.getDeviceInfo()
         device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
         await device.connect()
@@ -246,7 +245,19 @@ export default class TransactionSender {
     const txHash: string = tx.computeHash()
     const addressInfos = await this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
-    const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
+    let device: Hardware | undefined
+    let pathAndPrivateKeys: PathAndPrivateKey[] | undefined
+    if (wallet.isHardware()) {
+      device = HardwareWalletService.getInstance().getCurrent()
+      if (!device) {
+        const wallet = WalletService.getInstance().getCurrent()
+        const deviceInfo = wallet!.getDeviceInfo()
+        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
+        await device.connect()
+      }
+    } else {
+      pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
+    }
     const findPrivateKeyAndBlake160 = (argsList: string[], signedBlake160s?: string[]) => {
       let path: string | undefined
       let matchArgs: string | undefined
@@ -267,6 +278,9 @@ export default class TransactionSender {
       })
       if (!path) {
         throw new NoMatchAddressForSign()
+      }
+      if (!pathAndPrivateKeys) {
+        return [path, matchArgs]
       }
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
       if (!pathAndPrivateKey) {
@@ -298,16 +312,6 @@ export default class TransactionSender {
       }),
       {}
     )
-    let device: Hardware
-    if (wallet.isHardware()) {
-      let device = HardwareWalletService.getInstance().getCurrent()
-      if (!device) {
-        const wallet = WalletsService.getInstance().getCurrent()
-        const deviceInfo = wallet!.getDeviceInfo()
-        device = await HardwareWalletService.getInstance().initHardware(deviceInfo)
-        await device.connect()
-      }
-    }
     for (const lockHash of lockHashes) {
       const multisigConfig = multisigConfigMap[lockHash]
       if (!multisigConfig) {
@@ -343,7 +347,6 @@ export default class TransactionSender {
         multisigConfig.m
       )
       const wit = witnesses[0] as WitnessArgs
-      wit.lock = wit.lock!.slice(2)
       if (wallet.isHardware()) {
         wit.lock = await device!.signTransaction(
           walletID,
@@ -352,6 +355,8 @@ export default class TransactionSender {
           privateKey!,
           context
         )
+      } else {
+        wit.lock = wit.lock!.slice(2)
       }
       if (!witnessesArgs[0].witnessArgs.lock) {
         wit.lock = serializedMultiSign + wit.lock

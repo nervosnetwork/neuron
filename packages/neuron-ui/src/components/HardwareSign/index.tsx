@@ -83,7 +83,7 @@ const HardwareSign = ({
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest: { actionType = null },
+      passwordRequest: { actionType = null, multisigConfig },
     },
     experimental,
   } = useGlobalState()
@@ -104,6 +104,8 @@ const HardwareSign = ({
         return 'send-sudt'
       case OfflineSignType.UnlockDAO:
         return 'unlock'
+      case OfflineSignType.SendFromMultisigOnlySig:
+        return 'send-from-multisig'
       default:
         return 'send'
     }
@@ -139,6 +141,7 @@ const HardwareSign = ({
       ...json,
       walletID: wallet.id,
       password: '',
+      multisigConfig,
     })
     if (!isSuccessResponse(res)) {
       setStatus(connectStatus)
@@ -161,6 +164,7 @@ const HardwareSign = ({
     experimental,
     offlineSignType,
     connectStatus,
+    multisigConfig,
   ])
 
   const ensureDeviceAvailable = useCallback(
@@ -232,6 +236,7 @@ const HardwareSign = ({
         case 'send':
         case 'send-nft':
         case 'destroy-asset-account':
+        case 'send-cheque':
         case 'claim-cheque': {
           if (isSending) {
             break
@@ -279,10 +284,16 @@ const HardwareSign = ({
           break
         }
         case 'send-acp':
+        case 'send-acp-to-default':
         case 'send-sudt': {
+          let skipLastInputs = true
+          if (actionType === 'send-acp-to-default') {
+            skipLastInputs = false
+          }
           const params: Controller.SendSUDTTransaction.Params = {
             walletID: wallet.id,
             tx: tx || experimental?.tx,
+            skipLastInputs,
           }
           sendSUDTTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
@@ -301,6 +312,19 @@ const HardwareSign = ({
               setError(res.message.content)
             }
           })
+          break
+        }
+        case 'send-from-multisig-need-one': {
+          if (isSending) {
+            break
+          }
+          await sendTransaction({ walletID: wallet.id, tx: generatedTx, description, multisigConfig })(dispatch).then(
+            res => {
+              if (!isSuccessResponse(res)) {
+                setError(res.message.content)
+              }
+            }
+          )
           break
         }
         default: {
@@ -326,6 +350,7 @@ const HardwareSign = ({
     history,
     signAndExportFromJSON,
     ensureDeviceAvailable,
+    multisigConfig,
   ])
 
   const signMsg = useCallback(async () => {
@@ -434,14 +459,24 @@ const HardwareSign = ({
         ) : null}
         <div className={styles.right}>
           <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
-          {isNotAvailableToSign ? (
-            <Button label={t('hardware-sign.actions.rescan')} type="submit" disabled={isLoading} onClick={reconnect}>
-              {isLoading ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
-            </Button>
-          ) : (
-            <Button label={t('sign-and-verify.sign')} type="submit" disabled={isLoading} onClick={sign}>
-              {isLoading ? <Spinner /> : (t('sign-and-verify.sign') as string)}
-            </Button>
+          {(actionType || offlineSignActionType) === 'send-from-multisig' ? null : (
+            <>
+              {isNotAvailableToSign && (
+                <Button
+                  label={t('hardware-sign.actions.rescan')}
+                  type="submit"
+                  disabled={isLoading}
+                  onClick={reconnect}
+                >
+                  {isLoading ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
+                </Button>
+              )}
+              {!isNotAvailableToSign && (
+                <Button label={t('sign-and-verify.sign')} type="submit" disabled={isLoading} onClick={sign}>
+                  {isLoading ? <Spinner /> : (t('sign-and-verify.sign') as string)}
+                </Button>
+              )}
+            </>
           )}
         </div>
       </footer>

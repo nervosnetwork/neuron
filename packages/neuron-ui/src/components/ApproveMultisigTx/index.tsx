@@ -139,8 +139,8 @@ const ApproveMultisigTx = ({
           <div>{t('multisig-address.approve-dialog.signerApprove', { m: lackOfMCount, r: lackOfRCount })}</div>
         ) : (
           <>
-            {!!lackOfRCount && <div>{t('multisig-address.approve-dialog.noRSignerApprove', { m: lackOfMCount })}</div>}
-            {!lackOfRCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
+            {!!lackOfMCount && <div>{t('multisig-address.approve-dialog.noRSignerApprove', { m: lackOfMCount })}</div>}
+            {!lackOfMCount && <div>{t('multisig-address.approve-dialog.signed')}</div>}
           </>
         )}
       </section>

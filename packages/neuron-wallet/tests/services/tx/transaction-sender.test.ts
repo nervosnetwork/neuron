@@ -19,6 +19,7 @@ const stubbedSaveWithSentTx = jest.fn()
 const stubbedCheckAndGenerateAddresses = jest.fn()
 const stubbedGenerateDepositAllTx = jest.fn()
 const stubbedGenerateWithdrawMultiSignTx = jest.fn()
+const stubbedHardWalletGetCurrent = jest.fn()
 
 const resetMocks = () => {
   stubbedGetLiveCell.mockReset()
@@ -110,6 +111,14 @@ jest.mock('../../../src/models/system-script-info', () => {
     })
   }
 })
+jest.doMock('services/hardware', () => ({
+  getInstance: () => ({
+    getCurrent: stubbedHardWalletGetCurrent,
+    initHardware: () => ({
+      connect: jest.fn()
+    })
+  })
+}))
 
 import Transaction from '../../../src/models/chain/transaction'
 import TxStatus from '../../../src/models/chain/tx-status'
@@ -129,7 +138,7 @@ import { CapacityNotEnoughForChange, CapacityNotEnoughForChangeByTransfer, Multi
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multi-sign'
-import { addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, scriptToAddress, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 import MultiSign from '../../../src/models/multi-sign'
 
 const fakeScript = new Script(
@@ -783,7 +792,7 @@ describe('TransactionSender Test', () => {
     });
 
     describe('#signMultisig', () => {
-      let tx = Transaction .fromObject({
+      const transcationObject = {
         "version": "0x0",
         "cellDeps": [
           CellDep.fromObject({
@@ -835,39 +844,38 @@ describe('TransactionSender Test', () => {
         ],
         "witnesses": [],
         "hash": "0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1"
-      })
+      }
+
+      const createMultisigConfig = (r: number, m: number, addresses: string[]): [string, MultisigConfigModel] => {
+        const multiArgs = new Multisig().hash(addresses, {
+          S: '0x00',
+          R: `0x${r.toString(16).padStart(2, '0')}`,
+          M: `0x${r.toString(16).padStart(2, '0')}`,
+          N: `0x${addresses.length.toString(16).padStart(2, '0')}`,
+        })
+        return [
+          multiArgs,
+          MultisigConfigModel.fromObject({
+            walletId: fakeWallet.id,
+            r,
+            m,
+            n: addresses.length,
+            addresses,
+            fullPayload: scriptToAddress({
+              args: multiArgs,
+              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+            })
+          })
+        ]
+      }
 
       it('m is 1', async () => {
         const addresses = ['ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4', 'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6']
-        const multiArgs = new Multisig().hash(addresses, {
-          S: '0x00',
-          R: '0x01',
-          M: '0x01',
-          N: '0x02'
-        })
-        const multisigConfig = MultisigConfigModel.fromObject({
-          walletId: fakeWallet.id,
-          r: 1,
-          m: 1,
-          n: 2,
-          addresses,
-          fullPayload: scriptToAddress({
-            args: multiArgs,
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          })
-        })
+        const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
         const addr = {
           walletId: fakeWallet.id,
-          address: '',
           path: `m/44'/309'/0'/0/0`,
-          addressType: AddressType.Receiving,
-          addressIndex: 1,
-          txCount: 0,
-          liveBalance: '0',
-          sentBalance: '0',
-          pendingBalance: '0',
-          balance: '0',
           blake160: addressToScript(addresses[0]).args,
           version: 'testnet'
         }
@@ -875,7 +883,7 @@ describe('TransactionSender Test', () => {
         const mockGAI = jest.fn()
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
-  
+        const tx = Transaction.fromObject(transcationObject)
         tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
         const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
         expect(res.witnesses[0]).toBe('0x810000001000000081000000810000006d00000000010102729a884056fed321daaca410d94a5d6425a6ca1f0fbd88910d2348d69da5a980f2376a7a1a04feb5e3b593ad962c15abe214722ef6f84c186d757c6807a70e705adde5dea39b6856643cbf36312df13cc6a46e2a015e8508cecf2e31d5e2a65264516eb9b89ebbb701')
@@ -889,36 +897,17 @@ describe('TransactionSender Test', () => {
           M: '0x02',
           N: '0x03'
         }
-        const multiArgs = new Multisig().hash(addresses, multisigPrefix)
-        const multisigConfig = MultisigConfigModel.fromObject({
-          walletId: fakeWallet.id,
-          r: 1,
-          m: 2,
-          n: 3,
-          addresses,
-          fullPayload: scriptToAddress({
-            args: multiArgs,
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          })
-        })
+        const [multiArgs, multisigConfig] = createMultisigConfig(1, 2, addresses)
         const addr = {
           walletId: fakeWallet.id,
-          address: '',
           path: `m/44'/309'/0'/0/0`,
-          addressType: AddressType.Receiving,
-          addressIndex: 1,
-          txCount: 0,
-          liveBalance: '0',
-          sentBalance: '0',
-          pendingBalance: '0',
-          balance: '0',
           blake160: '',
           version: 'testnet'
         }
     
         const mockGAI = jest.fn()
         mockGAI.mockReturnValue([addr, addr, addr].map((v, idx) => ({ ...v, blake160: addressToScript(addresses[idx]).args})))
+        let tx = Transaction.fromObject(transcationObject)
         it('first sign', async () => {
           const getAddressInfos = transactionSender.getAddressInfos
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
@@ -941,30 +930,14 @@ describe('TransactionSender Test', () => {
       it('throw exception no matched multisig config', async () => {
         mockGAI.mockReturnValueOnce([{ path: '' }])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
+        const tx = Transaction.fromObject(transcationObject)
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [])).rejects.toThrowError(new MultisigConfigNeedError())
       })
 
       it('throw exception no matched multisig config addresses', async () => {
         const addresses = ['ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4', 'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6']
-        const multiArgs = new Multisig().hash(addresses, {
-          S: '0x00',
-          R: '0x01',
-          M: '0x01',
-          N: '0x02'
-        })
         const noMatchAddress = 'ckt1qyqf5v66n4vrxu75kks2ku06g7trnkdwt52s8000ee'
-        const multisigConfig = MultisigConfigModel.fromObject({
-          walletId: fakeWallet.id,
-          r: 1,
-          m: 1,
-          n: 2,
-          addresses,
-          fullPayload: scriptToAddress({
-            args: multiArgs,
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          })
-        })
+        const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
         const addr = {
           walletId: fakeWallet.id,
           address: noMatchAddress,
@@ -976,8 +949,51 @@ describe('TransactionSender Test', () => {
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
   
+        const tx = Transaction.fromObject(transcationObject)
         tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])).rejects.toThrow(new NoMatchAddressForSign())
+      })
+
+      describe('sign with hard wallet', () => {
+        beforeEach(() => {
+          stubbedGetWallet.mockReturnValue({
+            ...fakeWallet,
+            isHardware() { return true }
+          })
+        })
+
+        it('m is 1', async () => {
+          const witnessLock = '0'.repeat(130)
+          stubbedHardWalletGetCurrent.mockReturnValueOnce({
+            signTransaction: jest.fn().mockResolvedValueOnce(witnessLock)
+          })
+          const addresses = ['ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4', 'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6']
+          const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
+          const addr = {
+            walletId: fakeWallet.id,
+            path: `m/44'/309'/0'/0/0`,
+            blake160: addressToScript(addresses[0]).args,
+            version: 'testnet'
+          }
+      
+          const mockGAI = jest.fn()
+          mockGAI.mockReturnValueOnce([addr])
+          transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
+          const tx = Transaction.fromObject(transcationObject)
+          tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
+          const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
+          const expectedValue = serializeWitnessArgs({
+            inputType: undefined,
+            outputType: undefined,
+            lock: new MultiSign().serialize(addresses.map(v => addressToScript(v).args), {
+              S: '0x00',
+              R: `0x01`,
+              M: `0x01`,
+              N: `0x02`,
+            }) + witnessLock
+          })
+          expect(res.witnesses[0]).toBe(expectedValue)
+        })
       })
     })
   })

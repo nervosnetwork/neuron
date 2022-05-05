@@ -63,6 +63,7 @@
   .footer {
     @include dialog-footer;
     flex-shrink: 0;
+    margin-bottom: 12px;
 
     button {
       margin-left: 10px;
