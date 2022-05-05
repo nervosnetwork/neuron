@@ -1,8 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ckbCore } from 'services/chain'
-
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 
@@ -18,7 +16,7 @@ import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 
 import { formatDate } from 'widgets/DatetimePicker'
-import { localNumberFormatter, PlaceHolders } from 'utils'
+import { localNumberFormatter, PlaceHolders, isSecp256k1Address } from 'utils'
 
 import styles from './sendFieldset.module.scss'
 
@@ -61,18 +59,14 @@ const SendFieldset = ({
 }: SendSubformProps) => {
   const [t] = useTranslation()
 
-  const SHORT_ADDR_LENGTH = 46
-  const LOCKTIMEABLE_PREFIX = '0x0100'
-
   const [amountErrorMsg, addrErrorMsg] = [errors.amountError, errors.addrError].map(err =>
     err ? t(err.message, err.i18n) : ''
   )
 
   let locktimeAble = false
-  if (isTimeLockable && !addrErrorMsg && item.address?.length === SHORT_ADDR_LENGTH) {
+  if (isTimeLockable && !addrErrorMsg && item.address) {
     try {
-      const parsed = ckbCore.utils.bytesToHex(ckbCore.utils.parseAddress(item.address))
-      if (parsed.startsWith(LOCKTIMEABLE_PREFIX)) {
+      if (isSecp256k1Address(item.address)) {
         locktimeAble = true
       }
     } catch {
