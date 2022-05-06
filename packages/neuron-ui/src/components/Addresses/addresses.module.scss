@@ -191,6 +191,12 @@ $change-color: #6666cc;
       }
     }
 
+    @media screen and (max-width: 1300px) {
+      input {
+        width: 90px;
+      }
+    }
+
   }
 
   .balance {
