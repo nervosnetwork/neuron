@@ -2,17 +2,13 @@ import fs from 'fs'
 import path from 'path'
 import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { scriptToAddress, addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { ResponseCode } from 'utils/const'
-import MultiSign from 'models/multi-sign'
-import SystemScriptInfo from 'models/system-script-info'
 import MultisigConfig from 'database/chain/entities/multisig-config'
 import MultisigConfigModel from 'models/multisig-config'
 import MultisigService from 'services/multisig'
-import { MultisigConfigAddressError } from 'exceptions/multisig'
 import CellsService from 'services/cells'
 import OfflineSignService from 'services/offline-sign'
-import HexUtils from 'utils/hex'
 
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
@@ -22,53 +18,20 @@ export default class MultisigController {
     this.#multisigService = new MultisigService();
   }
 
-  createMultisigAddress(params: {
-    r: number
-    m: number
-    n: number
-    addresses: string[]
-    isMainnet: boolean
-  }) {
-    const multiSign = new MultiSign();
-    const multiSignPrefix = {
-      S: MultiSign.defaultS,
-      R: HexUtils.toHex(params.r, 2),
-      M: HexUtils.toHex(params.m, 2),
-      N: HexUtils.toHex(params.n, 2)
-    };
-    const blake160s = params.addresses.map(address => addressToScript(address).args)
-    if (blake160s.some(blake160 => blake160.length !== 42)) {
-      throw new MultisigConfigAddressError()
-    }
-    return {
-      status: ResponseCode.Success,
-      result: scriptToAddress(
-        {
-          args: multiSign.hash(blake160s, multiSignPrefix),
-          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
-        },
-        params.isMainnet
-      )
-    }
-  }
-
   async saveConfig(params: {
     walletId: string
     r: number
     m: number
     n: number
-    addresses: string[]
+    blake160s: string[]
     alias: string
-    fullPayload: string
   }) {
     const multiSignConfig = MultisigConfig.fromModel(new MultisigConfigModel(
       params.walletId,
+      params.r,
       params.m,
       params.n,
-      params.r,
-      params.addresses,
-      params.fullPayload,
+      params.blake160s,
       params.alias
     ))
     const result = await this.#multisigService.saveMultisigConfig(multiSignConfig)
@@ -87,7 +50,6 @@ export default class MultisigController {
     n?: number
     addresses?: string[]
     alias?: string
-    fullPayload?: string
   }) {
     const result = await this.#multisigService.updateMultisigConfig(params)
     return {
@@ -118,17 +80,15 @@ export default class MultisigController {
     }
   }
 
-  async getConfig(params: {
-    walletId: string
-  }) {
-    const result = await this.#multisigService.getMultisigConfig(params.walletId)
+  async getConfig(walletId: string) {
+    const result = await this.#multisigService.getMultisigConfig(walletId)
     return {
       status: ResponseCode.Success,
       result
     }
   }
 
-  async importConfig({ isMainnet, walletId }: { isMainnet: boolean, walletId: string }) {
+  async importConfig(walletId: string) {
     const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.import-config'),
       filters: [{
@@ -143,7 +103,7 @@ export default class MultisigController {
     }
     try {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
-      let configs: Array<{r: number, m: number, n: number, addresses: string[], alias: string}> = JSON.parse(json)
+      let configs: Array<{r: number, m: number, n: number, blake160s: string[], alias: string}> = JSON.parse(json)
       if (!Array.isArray(configs)) {
         configs = [configs]
       }
@@ -151,7 +111,7 @@ export default class MultisigController {
         configs.some(config => config.r === undefined
           || config.m === undefined
           || config.n === undefined
-          || config.addresses === undefined)
+          || config.blake160s === undefined)
       ) {
         dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
         return
@@ -159,7 +119,6 @@ export default class MultisigController {
       const saveConfigs = configs.map(config => ({
         ...config,
         walletId,
-        fullPayload: this.createMultisigAddress({ ...config, isMainnet }).result
       }))
       const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
       const saveSuccessConfigs: MultisigConfig[] = []
@@ -194,9 +153,8 @@ export default class MultisigController {
     r: number
     m: number
     n: number
-    addresses: string[]
+    blake160s: string[]
     alias?: string
-    fullPayload: string
   }[]) {
     const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.export-config'),

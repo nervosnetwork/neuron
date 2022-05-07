@@ -4,7 +4,7 @@ import WitnessArgs from 'models/chain/witness-args'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 import AddressService from 'services/addresses'
 import TransactionSender from 'services/transaction-sender'
-import MultiSign from 'models/multi-sign'
+import Multisig from 'models/multisig'
 import WalletService from 'services/wallets'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
@@ -42,7 +42,7 @@ export abstract class Hardware {
 
     const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
       return {
-        multiSignBlake160: new MultiSign().hash(i.blake160),
+        multiSignBlake160: Multisig.hash([i.blake160]),
         path: i.path
       }
     }) : []
@@ -81,8 +81,8 @@ export abstract class Hardware {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
-        const serializedMultiSign: string = new MultiSign().serialize([blake160])
+        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160]))!.blake160
+        const serializedMultiSign: string = Multisig.serialize([blake160])
         const witnesses = await TransactionSender.signSingleMultiSignScript(path, serializedWitnesses, txHash, serializedMultiSign, wallet)
         const signature = await this.signTransaction(
           walletID,

@@ -598,9 +598,6 @@ export default class ApiController {
     })
 
     // multi sign
-    handle('create-multisig-address', async (_, params) => {
-      return this.#multisigController.createMultisigAddress(params)
-    })
 
     handle('save-multisig-config', async (_, params) => {
       return this.#multisigController.saveConfig(params)
@@ -614,12 +611,12 @@ export default class ApiController {
       return this.#multisigController.deleteConfig(params)
     })
 
-    handle('get-multisig-config', async (_, params) => {
-      return this.#multisigController.getConfig(params)
+    handle('get-multisig-config', async (_, walletId: string) => {
+      return this.#multisigController.getConfig(walletId)
     })
 
-    handle('import-multisig-config', async (_, params) => {
-      return this.#multisigController.importConfig(params)
+    handle('import-multisig-config', async (_, walletId: string) => {
+      return this.#multisigController.importConfig(walletId)
     })
 
     handle('export-multisig-config', async (_, params) => {

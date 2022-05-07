@@ -24,5 +24,6 @@ export * from './sortAccounts'
 export * from './getSyncLeftTime'
 export * from './baseActions'
 export * from './getSUDTAmount'
+export * from './multisig'
 
 export { CONSTANTS }

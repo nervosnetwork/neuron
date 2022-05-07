@@ -18,7 +18,7 @@ import { TransactionStatus } from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import WitnessArgs from 'models/chain/witness-args'
-import MultiSign from 'models/multi-sign'
+import Multisig from 'models/multisig'
 import BufferUtils from 'utils/buffer'
 import LiveCell from 'models/chain/live-cell'
 import Output from 'models/chain/output'
@@ -246,8 +246,7 @@ export default class CellsService {
     pageSize: number
   ): Promise<PaginationResult<Cell>> {
     const blake160Hashes = new Set(blake160s)
-    const multiSign = new MultiSign()
-    const multiSignHashes = new Set(blake160s.map(blake160 => multiSign.hash(blake160)))
+    const multiSignHashes = new Set(blake160s.map(blake160 => Multisig.hash([blake160])))
     const assetAccountInfo = new AssetAccountInfo()
     const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash
     const nftIssuerCodehash = assetAccountInfo.getNftIssuerInfo().codeHash

@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
-import { createMultisigAddress } from 'services/remote'
-import { isSuccessResponse, validateAddress, isSecp256k1Address } from 'utils'
+import { validateAddress, isSecp256k1Address, getMultisigAddress } from 'utils'
 import { useTranslation } from 'react-i18next'
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 
 export enum Step {
   setMN = 0,
@@ -28,15 +28,26 @@ export const useMAndN = () => {
     },
     [setN]
   )
-  const isError = useMemo(() => {
-    return !m || !n || Number(m) > Number(n)
+  const errorI18nKey: string | undefined = useMemo(() => {
+    if (!m || !n) {
+      return 'm-n-required'
+    }
+    const numM = Number(m)
+    const numN = Number(n)
+    if (numM > numN) {
+      return 'm-less-equal-n'
+    }
+    if (numM < 1 || numM > 255 || numN < 1 || numN > 255) {
+      return 'm-n-between-0-255'
+    }
+    return undefined
   }, [m, n])
   return {
     m,
     n,
     setMBySelect,
     setNBySelect,
-    isError,
+    errorI18nKey,
   }
 }
 
@@ -117,17 +128,18 @@ export const useViewMultisigAddress = ({
   const [multisigAddress, changeMultisigAddress] = useState('')
   useEffect(() => {
     if (step === Step.viewMultiAddress) {
-      createMultisigAddress({
-        r,
-        m,
-        n,
-        addresses,
-        isMainnet,
-      }).then(res => {
-        if (isSuccessResponse(res) && res.result) {
-          changeMultisigAddress(res.result)
-        }
-      })
+      try {
+        const address = getMultisigAddress(
+          addresses.map(v => addressToScript(v).args),
+          r,
+          m,
+          n,
+          isMainnet
+        )
+        changeMultisigAddress(address)
+      } catch (error) {
+        // ignore error. The ui ensures the correctness of the parameters
+      }
     }
   }, [step, changeMultisigAddress, m, n, r, addresses, isMainnet])
   return multisigAddress

@@ -1,31 +1,21 @@
-import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import Multisig from './multisig'
 
 export default class MultisigConfigModel {
   public id?: number
   public walletId: string
+  public r: number
   public m: number
   public n: number
-  public r: number
-  public addresses: string[]
+  public blake160s: string[]
   public alias?: string
-  public fullPayload: string
 
-  constructor(
-    walletId: string,
-    m: number,
-    n: number,
-    r: number,
-    addresses: string[],
-    fullPayload: string,
-    alias?: string,
-    id?: number
-  ) {
+  constructor(walletId: string, r: number, m: number, n: number, blake160s: string[], alias?: string, id?: number) {
     this.walletId = walletId
+    this.r = r
     this.m = m
     this.n = n
-    this.r = r
-    this.addresses = addresses
-    this.fullPayload = fullPayload
+    this.blake160s = blake160s
     this.alias = alias
     this.id = id
   }
@@ -35,18 +25,16 @@ export default class MultisigConfigModel {
     m: number
     n: number
     r: number
-    addresses: string[]
+    blake160s: string[]
     alias?: string
-    fullPayload: string
     id?: number
   }): MultisigConfigModel {
     return new MultisigConfigModel(
       params.walletId,
+      params.r,
       params.m,
       params.n,
-      params.r,
-      params.addresses,
-      params.fullPayload,
+      params.blake160s,
       params.alias,
       params.id
     )
@@ -57,13 +45,12 @@ export default class MultisigConfigModel {
       m: this.m,
       n: this.n,
       r: this.r,
-      addresses: this.addresses,
-      fullPayload: this.fullPayload,
+      blake160s: this.blake160s,
       alias: this.alias
     }
   }
 
   public getLockHash() {
-    return scriptToHash(addressToScript(this.fullPayload))
+    return scriptToHash(Multisig.getMultisigScript(this.blake160s, this.r, this.m, this.n))
   }
 }

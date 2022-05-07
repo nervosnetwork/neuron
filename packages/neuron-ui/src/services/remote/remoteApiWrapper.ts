@@ -129,7 +129,6 @@ type Action =
   // nft
   | 'generate-transfer-nft-tx'
   // multisig
-  | 'create-multisig-address'
   | 'save-multisig-config'
   | 'get-multisig-config'
   | 'import-multisig-config'

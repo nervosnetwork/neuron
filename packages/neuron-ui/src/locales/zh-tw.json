@@ -908,7 +908,9 @@
         "copy-address": "復製地址",
         "m-n": {
           "title": "請選擇 m-of-n 類型的多重簽名地址配置，從 n 個密鑰中通過 m 個確認來轉移資產。",
-          "error": "對於 m-of-n 多重簽名地址，m 不應大於 n"
+          "m-less-equal-n": "對於 m-of-n 多重簽名地址，m 不應大於 n",
+          "m-n-required": "請輸入/選擇 m/n",
+          "m-n-between-0-256": "m/n 應該在 0-256 之間"
         },
         "multi-address-info": {
           "title": "對於 {{m}}-of-{{n}}, 請輸入 {{n}} 個簽名者地址",
