@@ -97,6 +97,7 @@ export enum ErrorCode {
   TestnetAddressRequired = 307,
   BalanceNotEnough = 308,
   AddressIsDeprecated = 309,
+  AddressTypeNotMatch = 310,
   // hardware
   SignTransactionFailed = 400,
   ConnectFailed = 401,
@@ -122,6 +123,7 @@ export enum SyncStatus {
 export enum PresetScript {
   Locktime = 'SingleMultiSign',
   Cheque = 'Cheque',
+  SUDT = 'SUDT',
 }
 
 export enum CompensationPeriod {
@@ -141,6 +143,7 @@ export enum DefaultLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x00',
   ArgsLen = '20',
+  TagName = 'secp256k1/blake160',
 }
 
 export enum MultiSigLockInfo {
@@ -148,6 +151,15 @@ export enum MultiSigLockInfo {
   HashType = 'type',
   CodeHashIndex = '0x01',
   ArgsLen = '20',
+  TagName = 'secp256k1/multisig',
+}
+
+export enum LocktimeLockInfo {
+  CodeHash = '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+  HashType = 'type',
+  CodeHashIndex = '0x01',
+  ArgsLen = '28',
+  TagName = 'secp256k1/multisig/locktime',
 }
 
 export enum AnyoneCanPayLockInfoOnAggron {
@@ -155,6 +167,7 @@ export enum AnyoneCanPayLockInfoOnAggron {
   HashType = 'type',
   CodeHashIndex = '0x02',
   ArgsLen = '20,21,22',
+  TagName = 'secp256k1/anyone_can_pay',
 }
 
 export enum AnyoneCanPayLockInfoOnLina {
@@ -162,11 +175,23 @@ export enum AnyoneCanPayLockInfoOnLina {
   HashType = 'type',
   CodeHashIndex = '0x02',
   ArgsLen = '20,21,22',
+  TagName = 'secp256k1/anyone_can_pay',
 }
 
-export enum DeprecatedScript {
-  AcpOnLina = '0x020fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
-  AcpOnAggron = '0x0486a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+export enum ChequeLockInfoOnAggron {
+  CodeHash = '0x60d5f39efce409c587cb9ea359cefdead650ca128f0bd9cb3855348f98c70d5b',
+  HashType = 'type',
+  CodeHashIndex = '0x00',
+  ArgsLen = '40',
+  TagName = 'cheque',
+}
+
+export enum ChequeLockInfoOnLina {
+  CodeHash = '0xe4d4ecc6e5f9a059bf2f7a82cca292083aebc0c421566a52484fe2ec51a9fb0c',
+  HashType = 'type',
+  CodeHashIndex = '0x00',
+  ArgsLen = '40',
+  TagName = 'cheque',
 }
 
 export enum AccountType {

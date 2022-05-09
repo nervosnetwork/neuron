@@ -4,7 +4,7 @@ export default class FeeMode {
   constructor(feeRate: bigint) {
     if (feeRate > 0) {
       this.mode = 'feeRate'
-    } else{
+    } else {
       this.mode = 'fee'
     }
   }

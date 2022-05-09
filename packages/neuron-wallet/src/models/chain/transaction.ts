@@ -7,11 +7,12 @@ import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-s
 import BlockHeader from './block-header'
 import TypeCheckerUtils from 'utils/type-checker'
 import OutPoint from './out-point'
+import { Signatures } from 'models/offline-sign'
 
 export enum TransactionStatus {
   Pending = 'pending',
   Success = 'success',
-  Failed = 'failed',
+  Failed = 'failed'
 }
 
 export interface SudtTokenInfo {
@@ -34,6 +35,11 @@ export enum NFTType {
 export interface NFTInfo {
   type: NFTType
   data: string
+}
+
+export enum AssetAccountType {
+  CKB = 'CKB',
+  SUDT = 'sUDT'
 }
 
 export default class Transaction {
@@ -70,6 +76,9 @@ export default class Transaction {
 
   public nftInfo?: NFTInfo
 
+  public signatures: Signatures = {}
+  public assetAccountType?: AssetAccountType
+
   constructor(
     version: string,
     cellDeps: CellDep[] = [],
@@ -92,7 +101,9 @@ export default class Transaction {
     createdAt?: string,
     updatedAt?: string,
     sudtInfo?: SudtInfo,
-    nftType?: NFTInfo
+    nftType?: NFTInfo,
+    signatures: Signatures = {},
+    assetAccountType?: AssetAccountType
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -105,6 +116,7 @@ export default class Transaction {
     this.status = status
     this.description = description
     this.nervosDao = nervosDao
+    this.assetAccountType = assetAccountType
     this.version = BigInt(version).toString()
     this.value = value ? BigInt(value).toString() : value
     this.fee = fee ? BigInt(fee).toString() : fee
@@ -117,6 +129,7 @@ export default class Transaction {
 
     this.sudtInfo = sudtInfo
     this.nftInfo = nftType
+    this.signatures = signatures
     TypeCheckerUtils.hashChecker(...this.headerDeps, this.blockHash)
     TypeCheckerUtils.numberChecker(
       this.version,
@@ -152,30 +165,34 @@ export default class Transaction {
     createdAt,
     updatedAt,
     sudtInfo,
-    nftInfo
+    nftInfo,
+    signatures = {},
+    assetAccountType
   }: {
-    version: string,
-    cellDeps?: CellDep[],
-    headerDeps?: string[],
-    inputs?: Input[],
-    outputs?: Output[],
-    outputsData?: string[],
-    witnesses?: (WitnessArgs | string)[],
-    hash?: string,
-    timestamp?: string,
-    blockNumber?: string,
-    blockHash?: string,
-    value?: string,
-    fee?: string,
-    interest?: string,
-    type?: string,
-    status?: TransactionStatus,
-    description?: string, // Default to ''
-    nervosDao?: boolean, // Default to false
-    createdAt?: string,
-    updatedAt?: string,
-    sudtInfo?: SudtInfo,
+    version: string
+    cellDeps?: CellDep[]
+    headerDeps?: string[]
+    inputs?: Input[]
+    outputs?: Output[]
+    outputsData?: string[]
+    witnesses?: (WitnessArgs | string)[]
+    hash?: string
+    timestamp?: string
+    blockNumber?: string
+    blockHash?: string
+    value?: string
+    fee?: string
+    interest?: string
+    type?: string
+    status?: TransactionStatus
+    description?: string // Default to ''
+    nervosDao?: boolean // Default to false
+    createdAt?: string
+    updatedAt?: string
+    sudtInfo?: SudtInfo
     nftInfo?: NFTInfo
+    signatures?: Signatures
+    assetAccountType?: AssetAccountType
   }): Transaction {
     return new Transaction(
       version,
@@ -204,7 +221,9 @@ export default class Transaction {
       createdAt,
       updatedAt,
       sudtInfo,
-      nftInfo
+      nftInfo,
+      signatures,
+      assetAccountType
     )
   }
 
@@ -218,6 +237,14 @@ export default class Transaction {
 
   public setInterest(value: string | undefined) {
     this.interest = value ? BigInt(value).toString() : value
+  }
+
+  public setSignatures(lockHash: string, blake160: string) {
+    if (this.signatures[lockHash]) {
+      this.signatures[lockHash].push(blake160)
+    } else {
+      this.signatures[lockHash] = [blake160]
+    }
   }
 
   public witnessesAsString(): string[] {
@@ -252,7 +279,7 @@ export default class Transaction {
       cellDeps: this.cellDeps.map(cd => cd.toSDK()),
       headerDeps: this.headerDeps,
       outputsData: this.outputsData,
-      witnesses: this.witnessesAsString(),
+      witnesses: this.witnessesAsString()
     }
   }
 
@@ -261,11 +288,14 @@ export default class Transaction {
     const hash = this.hash || this.computeHash()
     return {
       ...this.toSDKRawTransaction(),
-      hash,
+      hash
     }
   }
 
-  public static fromSDK(tx: CKBComponents.RawTransaction | CKBComponents.Transaction, blockHeader?: BlockHeader): Transaction {
+  public static fromSDK(
+    tx: CKBComponents.RawTransaction | CKBComponents.Transaction,
+    blockHeader?: BlockHeader
+  ): Transaction {
     const txHash: string | undefined = (tx as CKBComponents.Transaction).hash
     const outputs = tx.outputs.map((o, i) => {
       const output = Output.fromSDK(o)

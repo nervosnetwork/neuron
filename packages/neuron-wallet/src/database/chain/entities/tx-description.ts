@@ -6,18 +6,18 @@ export default class TxDescription {
   id!: number
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   walletId!: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   @Index()
   txHash!: string
 
   @Column({
-    type: 'varchar',
+    type: 'varchar'
   })
   description!: string
 }

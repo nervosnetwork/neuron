@@ -24,7 +24,10 @@ import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
 
-const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming' | 'success' | 'failed') => {
+const genTypeLabel = (
+  type: 'send' | 'receive' | 'create' | 'destroy',
+  status: 'pending' | 'confirming' | 'success' | 'failed'
+) => {
   switch (type) {
     case 'send': {
       if (status === 'failed') {
@@ -130,21 +133,37 @@ const Overview = () => {
         }
 
         if (item.nftInfo) {
+          // NFT
           const { type, data } = item.nftInfo
           typeLabel = `${t(`overview.${genTypeLabel(type, status)}`)}`
           amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
         } else if (item.sudtInfo?.sUDT) {
-          const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
-          typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
-
+          // Asset Account
+          if (['create', 'destroy'].includes(item.type)) {
+            // create/destroy an account
+            typeLabel = `${t(`overview.${item.type}`, { name: item.sudtInfo.sUDT.tokenName || 'UDT' })}`
+          } else {
+            // send/receive to/from an account
+            const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
+            typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
+          }
           if (item.sudtInfo.sUDT.decimal) {
             amount = `${sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))} ${
               item.sudtInfo.sUDT.symbol
             }`
           }
         } else {
+          // normal tx
           amount = `${shannonToCKBFormatter(item.value)} CKB`
-          typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
+          if (item.type === 'create' || item.type === 'destroy') {
+            if (item.assetAccountType === 'CKB') {
+              typeLabel = `${t(`overview.${item.type}`, { name: 'CKB' })}`
+            } else {
+              typeLabel = `${t(`overview.${item.type}`, { name: 'Unknown' })}`
+            }
+          } else {
+            typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
+          }
         }
       }
 

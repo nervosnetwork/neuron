@@ -1,5 +1,6 @@
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { ControllerResponse, SuccessFromController } from 'services/remote/remoteApiWrapper'
-import { ResponseCode } from 'utils/enums'
+import { ResponseCode, DefaultLockInfo } from 'utils/enums'
 import { MAINNET_TAG } from './const'
 
 export const isMainnet = (networks: Readonly<State.Network[]>, networkID: string) => {
@@ -18,4 +19,17 @@ export const isReadyByVersion = (targetVersion: number, lastVersion: number | nu
     return true
   }
   return false
+}
+
+export const isSecp256k1Address = (address: string) => {
+  try {
+    const script = addressToScript(address)
+    return (
+      script.codeHash === DefaultLockInfo.CodeHash &&
+      script.hashType === DefaultLockInfo.HashType &&
+      script.args.length === +DefaultLockInfo.ArgsLen * 2 + 2
+    )
+  } catch {
+    return false
+  }
 }

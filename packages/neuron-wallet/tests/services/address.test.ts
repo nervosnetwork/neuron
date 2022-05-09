@@ -10,6 +10,7 @@ import Transaction from '../../src/database/chain/entities/transaction'
 import { TransactionStatus } from '../../src/models/chain/transaction'
 import AddressParser from '../../src/models/address-parser'
 import { when } from 'jest-when'
+import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(
@@ -70,6 +71,23 @@ const linkNewCell = async (
   await getConnection().manager.save(txs)
 }
 
+jest.mock('services/networks', () => ({
+  getInstance() {
+    return {
+      isMainnet: () => true
+    }
+  }
+}))
+
+const stubbedAddressDbChangedSubjectNext = jest.fn()
+jest.mock('models/subjects/address-db-changed-subject', () => ({
+  getSubject() {
+    return {
+      next: stubbedAddressDbChangedSubjectNext
+    }
+  }
+}))
+
 describe('integration tests for AddressService', () => {
   const AddressService = require('../../src/services/addresses').default
   const notifyAddressCreatedStub = jest.spyOn(AddressService, 'notifyAddressCreated');
@@ -81,7 +99,7 @@ describe('integration tests for AddressService', () => {
         const address = extendedKey.address(
           addressType,
           addressIndex,
-          AddressService.getAddressPrefix()
+          true,
         )
         preloadedPublicKeys.push({
           address,
@@ -98,7 +116,7 @@ describe('integration tests for AddressService', () => {
         .calledWith(
           addressToMock.addressType,
           addressToMock.addressIndex,
-          AddressService.getAddressPrefix()
+          true,
         )
         .mockReturnValue(addressToMock.address)
     }
@@ -124,6 +142,10 @@ describe('integration tests for AddressService', () => {
     beforeEach(async () => {
       const connection = getConnection()
       await connection.synchronize(true)
+    })
+
+    afterEach(async () => {
+      stubbedAddressDbChangedSubjectNext.mockReset()
     })
 
     describe('#generateAndSaveForExtendedKey', () => {
@@ -641,5 +663,50 @@ describe('integration tests for AddressService', () => {
         });
       });
     });
+
+    describe('create', () => {
+      it('create with exist', async () => {
+        const { receiving } = await AddressService.generateAddresses(
+          walletId,
+          extendedKey,
+          0,
+          0,
+          5,
+          5
+        )
+        await getConnection().manager.save(receiving.map((addr: any) => {
+          return HdPublicKeyInfo.fromObject({
+            ...addr,
+            publicKeyInBlake160: addr.blake160
+          })
+        }))
+        await AddressService.create(receiving)
+        expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(0)
+      })
+      it('create with more than one wallet', async () => {
+        await expect(AddressService.create([
+          { walletId: '1' },
+          { walletId: '2' }
+        ])).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
+      })
+      it('create with some exist', async () => {
+        const { receiving, change } = await AddressService.generateAddresses(
+          walletId,
+          extendedKey,
+          0,
+          0,
+          5,
+          5
+        )
+        await getConnection().manager.save(receiving.map((addr: any) => {
+          return HdPublicKeyInfo.fromObject({
+            ...addr,
+            publicKeyInBlake160: addr.blake160
+          })
+        }))
+        await AddressService.create([...receiving, ...change])
+        expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(1)
+      })
+    })
   })
 });

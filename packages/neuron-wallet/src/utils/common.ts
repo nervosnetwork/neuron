@@ -12,7 +12,7 @@ export default class CommonUtils {
       try {
         return callback()
       } catch (err) {
-        logger.warn(`function call error: ${err}, retry ${retryTime+1} ...`)
+        logger.warn(`function call error: ${err}, retry ${retryTime + 1} ...`)
         await CommonUtils.sleep(interval)
       }
     }

@@ -1,9 +1,9 @@
 import AssetAccountInfo from 'models/asset-account-info'
-import Transaction from "models/chain/transaction"
-import { ServiceHasNoResponse } from "exceptions"
-import { ResponseCode } from "utils/const"
-import AnyoneCanPayService from "services/anyone-can-pay"
-import TransactionSender from "services/transaction-sender"
+import Transaction from 'models/chain/transaction'
+import { ServiceHasNoResponse } from 'exceptions'
+import { ResponseCode } from 'utils/const'
+import AnyoneCanPayService from 'services/anyone-can-pay'
+import TransactionSender from 'services/transaction-sender'
 import { set as setDescription } from 'services/tx/transaction-description'
 
 export interface GenerateAnyoneCanPayTxParams {
@@ -29,6 +29,7 @@ export interface SendAnyoneCanPayTxParams {
   walletID: string
   tx: Transaction
   password: string
+  skipLastInputs?: boolean
 }
 
 export default class AnyoneCanPayController {
@@ -49,7 +50,7 @@ export default class AnyoneCanPayController {
 
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 
@@ -66,7 +67,7 @@ export default class AnyoneCanPayController {
       params.walletID,
       txModel,
       params.password,
-      1,
+      params?.skipLastInputs ?? true,
       skipSign
     )
 
@@ -81,7 +82,7 @@ export default class AnyoneCanPayController {
 
     return {
       status: ResponseCode.Success,
-      result: txHash,
+      result: txHash
     }
   }
 
@@ -89,6 +90,14 @@ export default class AnyoneCanPayController {
     return {
       status: ResponseCode.Success,
       result: new AssetAccountInfo().infos.anyoneCanPay
+    }
+  }
+
+  public async generateSudtMigrateAcpTx(params: { outPoint: CKBComponents.OutPoint; acpAddress?: string }) {
+    const tx = await AnyoneCanPayService.generateSudtMigrateAcpTx(params.outPoint, params.acpAddress)
+    return {
+      status: ResponseCode.Success,
+      result: tx
     }
   }
 }

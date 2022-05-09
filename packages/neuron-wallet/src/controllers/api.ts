@@ -1,5 +1,17 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent, dialog, app, OpenDialogSyncOptions, MenuItemConstructorOptions, MenuItem, Menu, screen, BrowserWindow } from 'electron'
+import {
+  shell,
+  ipcMain,
+  IpcMainInvokeEvent,
+  dialog,
+  app,
+  OpenDialogSyncOptions,
+  MenuItemConstructorOptions,
+  MenuItem,
+  Menu,
+  screen,
+  BrowserWindow
+} from 'electron'
 import { t } from 'i18next'
 import env from 'env'
 import { showWindow } from './app/show-window'
@@ -9,13 +21,14 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SettingsService, { Locale } from 'services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE } from 'utils/const'
+import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
 import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
+import MultisigController from 'controllers/multisig'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
@@ -36,13 +49,15 @@ import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyo
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
-import SUDTController from "controllers/sudt";
+import SUDTController from "controllers/sudt"
 import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
+import MultisigConfigModel from 'models/multisig-config'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
 export default class ApiController {
+  // eslint-disable-next-line prettier/prettier
   #walletsController = new WalletsController()
   #transactionsController = new TransactionsController()
   #daoController = new DaoController()
@@ -54,6 +69,7 @@ export default class ApiController {
   #hardwareController = new HardwareController()
   #offlineSignController = new OfflineSignController()
   #sudtController = new SUDTController()
+  #multisigController = new MultisigController()
 
   public async mount() {
     this.#registerHandlers()
@@ -155,7 +171,7 @@ export default class ApiController {
       const walletsService = WalletsService.getInstance()
       const networksService = NetworksService.getInstance()
 
-      const currentWallet = walletsService.getCurrent()
+      const currentWallet = this.#walletsController.getCurrent().result
       const wallets = walletsService.getAll()
 
       const [
@@ -207,6 +223,24 @@ export default class ApiController {
 
     handle('open-in-window', async (_, { url, title }: { url: string, title: string }) => {
       showWindow(url, title)
+    })
+
+    handle('request-open-in-explorer', (_, { key, type }: { key: string, type: 'transaction' }) => {
+      if (type !== 'transaction' || !key) {
+        return
+      }
+      dialog.showMessageBox({
+        type: 'question',
+        title: t(`open-in-explorer.title`),
+        message: t(`open-in-explorer.message`, { type: t(`open-in-explorer.${type}`), key }),
+        defaultId: 0,
+        buttons: [t('common.ok'), t('common.cancel'),]
+      }).then(({ response }) => {
+        if (response === 0) {
+          const base = NetworksService.getInstance().explorerUrl()
+          shell.openExternal(`${base}/${type}/${key}`)
+        }
+      })
     })
 
     handle('handle-view-error', async (_, error: string) => {
@@ -273,8 +307,11 @@ export default class ApiController {
       this.#walletsController.requestPassword(walletID, action)
     })
 
-    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string }) => {
-      return this.#walletsController.sendTx(params)
+    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string, multisigConfig?: MultisigConfigModel }) => {
+      return this.#walletsController.sendTx({
+        ...params,
+        multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined
+      })
     })
 
     handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
@@ -283,6 +320,20 @@ export default class ApiController {
 
     handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
       return this.#walletsController.generateSendingAllTx(params)
+    })
+
+    handle('generate-multisig-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel }) => {
+      return this.#walletsController.generateMultisigTx({
+        items: params.items,
+        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+      })
+    })
+
+    handle('generate-multisig-send-all-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel }) => {
+      return this.#walletsController.generateMultisigSendAllTx({
+        items: params.items,
+        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+      })
     })
 
     handle('generate-mnemonic', async () => {
@@ -327,7 +378,7 @@ export default class ApiController {
       return this.#daoController.generateDepositTx(params)
     })
 
-    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
+    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, isBalanceReserved: boolean, fee: string, feeRate: string }) => {
       return this.#daoController.generateDepositAllTx(params)
     })
 
@@ -395,7 +446,7 @@ export default class ApiController {
     // Settings
 
     handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: 900 })
+      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
     })
 
     handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
@@ -474,12 +525,20 @@ export default class ApiController {
       return this.#anyoneCanPayController.sendTx(params)
     })
 
+    handle('generate-sudt-migrate-acp-tx', async (_, params) => {
+      return this.#anyoneCanPayController.generateSudtMigrateAcpTx(params)
+    })
+
     handle('get-sudt-token-info', async (_, params: { tokenID: string }) => {
       return this.#sudtController.getSUDTTokenInfo(params)
     })
 
-    handle('generate-destroy-ckb-account-tx', async (_, params: { walletID: string, id: number }) => {
-      return this.#assetAccountController.destoryCKBAssetAccount(params)
+    handle('get-sudt-type-script-hash', async (_, params: { tokenID: string }) => {
+      return this.#sudtController.getSUDTTypeScriptHash(params)
+    })
+
+    handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string, id: number }) => {
+      return this.#assetAccountController.destoryAssetAccount(params)
     })
 
     // Hardware wallet
@@ -525,7 +584,54 @@ export default class ApiController {
     })
 
     handle('sign-and-export-transaction', async (_, params) => {
-      return this.#offlineSignController.signAndExportTransaction(params)
+      return this.#offlineSignController.signAndExportTransaction({
+        ...params,
+        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined
+      })
+    })
+
+    handle('sign-and-broadcast-transaction', async (_, params) => {
+      return this.#offlineSignController.signAndBroadcastTransaction({
+        ...params,
+        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined
+      })
+    })
+
+    // multi sign
+    handle('create-multisig-address', async (_, params) => {
+      return this.#multisigController.createMultisigAddress(params)
+    })
+
+    handle('save-multisig-config', async (_, params) => {
+      return this.#multisigController.saveConfig(params)
+    })
+
+    handle('update-multisig-config', async (_, params) => {
+      return this.#multisigController.updateConfig(params)
+    })
+
+    handle('delete-multisig-config', async (_, params) => {
+      return this.#multisigController.deleteConfig(params)
+    })
+
+    handle('get-multisig-config', async (_, params) => {
+      return this.#multisigController.getConfig(params)
+    })
+
+    handle('import-multisig-config', async (_, params) => {
+      return this.#multisigController.importConfig(params)
+    })
+
+    handle('export-multisig-config', async (_, params) => {
+      return this.#multisigController.exportConfig(params)
+    })
+
+    handle('get-multisig-balances', async (_, params) => {
+      return this.#multisigController.getMultisigBalances(params)
+    })
+
+    handle('load-multisig-tx-json', async (_, fullPayload) => {
+      return this.#multisigController.loadMultisigTxJson(fullPayload)
     })
   }
 
@@ -544,8 +650,19 @@ export default class ApiController {
           err.code = NODE_DISCONNECTED_CODE
         }
 
-        if (!Number.isNaN(err.message?.code)) {
-          err.code = err.message.code
+        try {
+          /**
+           * error.message from ckb node is a stringified error object with code and message
+           */
+          const e = JSON.parse(err.message)
+          if (!Number.isNaN(+e.code)) {
+            return {
+              status: ResponseCode.Fail,
+              message: e.message || err.message,
+            }
+          }
+        } catch {
+          // ignore
         }
 
         return {

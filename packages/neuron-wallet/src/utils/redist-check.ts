@@ -9,22 +9,24 @@ const redistCheck = async () => {
   }
   const execPromise = promisify(exec)
   const arches = ['x64']
-  const queries = arches.map(arch =>
-    `REG QUERY ` +
-    [`HKEY_LOCAL_MACHINE`, `SOFTWARE`, `Microsoft`, `VisualStudio`, `14.0`, `VC`, `Runtimes`, arch].join(path.sep))
+  const queries = arches.map(
+    arch =>
+      `REG QUERY ` +
+      [`HKEY_LOCAL_MACHINE`, `SOFTWARE`, `Microsoft`, `VisualStudio`, `14.0`, `VC`, `Runtimes`, arch].join(path.sep)
+  )
   const vcredists = await Promise.all(
-    queries.map(
-      query => execPromise(query)
+    queries.map(query =>
+      execPromise(query)
         .then(({ stdout, stderr }) => {
           if (stderr) {
             logger.error(`${query} stderr: ${stderr}`)
-            return false;
+            return false
           }
-          return !!stdout;
+          return !!stdout
         })
         .catch(err => {
           logger.error(err)
-          return false;
+          return false
         })
     )
   )

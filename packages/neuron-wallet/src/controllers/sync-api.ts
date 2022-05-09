@@ -1,11 +1,12 @@
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
-import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
 import NodeService from 'services/node'
 import RpcService from 'services/rpc-service'
 import SyncedBlockNumber from 'models/synced-block-number'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
+import MultisigService from 'services/multisig'
+import { getLookingValidTargetStatus } from 'services/ckb-runner'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
@@ -14,7 +15,7 @@ export enum SyncStatus {
   SyncNotStart,
   SyncPending,
   Syncing,
-  SyncCompleted,
+  SyncCompleted
 }
 
 interface SyncState {
@@ -28,9 +29,12 @@ interface SyncState {
   cacheRate: number | undefined,
   estimate: number | undefined,
   status: SyncStatus
+  isLookingValidTarget?: boolean,
+  validTarget?: string
 }
 
 export default class SyncApiController {
+  // eslint-disable-next-line prettier/prettier
   #syncedBlockNumber = new SyncedBlockNumber()
   static emiter = new EventEmiter()
   private static instance: SyncApiController
@@ -103,19 +107,15 @@ export default class SyncApiController {
 
   #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> => {
     const nodeUrl = this.#getCurrentNodeUrl()
+    const rpcService = new RpcService(nodeUrl)
     try {
-      const method = new Method({ url: nodeUrl }, {
-        name: 'sync state',
-        method: 'sync_state',
-        paramsFormatters: [],
-      })
-      const { best_known_block_number, best_known_block_timestamp } = await method.call()
+      const syncState = await rpcService.getSyncState()
       return {
-        bestKnownBlockNumber: parseInt(best_known_block_number, 16),
-        bestKnownBlockTimestamp: +best_known_block_timestamp,
+        bestKnownBlockNumber: parseInt(syncState.bestKnownBlockNumber, 16),
+        bestKnownBlockTimestamp: +syncState.bestKnownBlockTimestamp,
       }
     } catch (error) {
-      const tipHeader = await new RpcService(nodeUrl).getTipHeader()
+      const tipHeader = await rpcService.getTipHeader()
 
       return {
         bestKnownBlockNumber: Number(tipHeader.number),
@@ -153,7 +153,9 @@ export default class SyncApiController {
       indexRate: undefined,
       cacheRate: undefined,
       estimate: undefined,
-      status: SyncStatus.Syncing
+      status: SyncStatus.Syncing,
+      isLookingValidTarget: getLookingValidTargetStatus(),
+      validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
     }
 
     if (foundBestKnownBlockNumber) {
@@ -223,6 +225,7 @@ export default class SyncApiController {
       const newSyncState = await this.#estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncState.cacheTipNumber))
       SyncStateSubject.next(newSyncState)
+      await MultisigService.syncMultisigOutput(`0x${(BigInt(newSyncState.cacheTipNumber)).toString(16)}`)
     })
 
     CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {
@@ -237,7 +240,8 @@ export default class SyncApiController {
         indexRate: undefined,
         cacheRate: undefined,
         estimate: undefined,
-        status: SyncStatus.SyncNotStart
+        status: SyncStatus.SyncNotStart,
+        validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
       }
       this.#estimates = [newSyncState]
 

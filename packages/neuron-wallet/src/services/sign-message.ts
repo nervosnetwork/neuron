@@ -1,12 +1,12 @@
-import AddressService from "./addresses"
-import WalletService, { Wallet } from "./wallets"
-import Keychain from "models/keys/keychain"
-import Blake2b from "models/blake2b"
-import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
+import AddressService from './addresses'
+import WalletService, { Wallet } from './wallets'
+import Keychain from 'models/keys/keychain'
+import Blake2b from 'models/blake2b'
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import { ec as EC } from 'elliptic'
-import { AddressNotFound } from "exceptions"
-import HardwareWalletService from "./hardware"
-import AddressParser from "models/address-parser"
+import { AddressNotFound } from 'exceptions'
+import HardwareWalletService from './hardware'
+import AddressParser from 'models/address-parser'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -45,23 +45,45 @@ export default class SignMessage {
     return signature
   }
 
-  public static verify(address: string, signature: string, message: string): boolean {
-    const digest = SignMessage.signatureHash(message)
+  public static verifyOldAndNew(
+    address: string,
+    signature: string,
+    message: string
+  ): 'old-sign' | 'new-sign' | undefined {
+    let digest = SignMessage.signatureHash(message)
 
-    const options = {
-      r: signature.slice(2, 66),
-      s: signature.slice(66 ,130),
-      recoveryParam: parseInt(signature.slice(-1))
+    if (SignMessage.verify(address, signature, digest)) {
+      return 'new-sign'
     }
-
-    const msgBuffer = Buffer.from(digest.slice(2), 'hex')
-    const publicKey = '0x' + SignMessage.ec.recoverPubKey(msgBuffer, options, options.recoveryParam).encode('hex', true)
-
-    const recoverBlake160 = AddressParser.toBlake160(address)
-    return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
+    const oldSignature = '0x' + Buffer.from(signature, 'base64').toString('hex')
+    const buffer = Buffer.from(message, 'utf-8')
+    const blake2b = new Blake2b()
+    blake2b.updateBuffer(buffer)
+    digest = blake2b.digest()
+    if (SignMessage.verify(address, oldSignature, digest)) {
+      return 'old-sign'
+    }
   }
 
-  private static signatureHash (message: string) {
+  private static verify(address: string, signature: string, digest: string): boolean {
+    try {
+      const options = {
+        r: signature.slice(2, 66),
+        s: signature.slice(66, 130),
+        recoveryParam: parseInt(signature.slice(-1))
+      }
+      const msgBuffer = Buffer.from(digest.slice(2), 'hex')
+      const publicKey =
+        '0x' + SignMessage.ec.recoverPubKey(msgBuffer, options, options.recoveryParam).encode('hex', true)
+
+      const recoverBlake160 = AddressParser.toBlake160(address)
+      return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
+    } catch (error) {
+      return false
+    }
+  }
+
+  private static signatureHash(message: string) {
     const buffer = Buffer.from(SignMessage.magicString + message, 'utf-8')
     const blake2b = new Blake2b()
     blake2b.updateBuffer(buffer)

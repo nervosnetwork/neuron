@@ -1,5 +1,5 @@
-import AssetAccount from "./asset-account";
-import Transaction from "./chain/transaction";
+import AssetAccount from './asset-account'
+import Transaction from './chain/transaction'
 
 export enum SignStatus {
   Signed = 'Signed',
@@ -16,13 +16,13 @@ export enum SignType {
 
 interface MultisigConfigs {
   [hash: string]: {
-    sighash_addresses: string[],
-    require_first_n: number,
+    sighash_addresses: string[]
+    require_first_n: number
     threshold: number
   }
 }
 
-interface Signatures {
+export interface Signatures {
   [hash: string]: string[]
 }
 
@@ -34,7 +34,6 @@ export interface OfflineSignProps {
   description?: string
   assetAccount?: AssetAccount
   multisig_configs?: MultisigConfigs
-  signatures?: Signatures
 }
 
 export interface OfflineSignJSON {
@@ -45,7 +44,6 @@ export interface OfflineSignJSON {
   description?: string
   asset_account?: AssetAccount
   multisig_configs?: MultisigConfigs
-  signatures?: Signatures
 }
 
 export default class OfflineSign implements OfflineSignProps {

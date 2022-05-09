@@ -30,6 +30,7 @@ export const chainState: Readonly<State.Chain> = {
     bestKnownBlockTimestamp: 0,
     estimate: undefined,
     status: 0,
+    isLookingValidTarget: false,
   },
   transactions: {
     pageNo: 1,

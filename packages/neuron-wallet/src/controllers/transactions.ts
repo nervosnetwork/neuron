@@ -12,28 +12,32 @@ import { set as setDescription, get as getDescription } from 'services/tx/transa
 import AddressParser from 'models/address-parser'
 
 export default class TransactionsController {
-  public async getAll(params: Controller.Params.TransactionsByKeywords):
-    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
+  public async getAll(
+    params: Controller.Params.TransactionsByKeywords
+  ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = (await AddressesService.getAddressesByWalletId(walletID)).map(addr => addr.address)
 
-    const transactions = await TransactionsService
-      .getAllByAddresses({ walletID, pageNo, pageSize, addresses }, keywords.trim())
-      .catch(() => ({
-        totalCount: 0,
-        items: [] as Transaction[]
-      }))
-    transactions.items = await Promise.all(transactions.items.map(async tx => {
-      const description = await getDescription(walletID, tx.hash!)
-      if (description !== '') {
-        tx.description = description
-      } else if (tx.description !== '') {
-        // Legacy data has description but leveldb doesn't have it.
-        await setDescription(walletID, tx.hash!, tx.description)
-      }
-      return tx
+    const transactions = await TransactionsService.getAllByAddresses(
+      { walletID, pageNo, pageSize, addresses },
+      keywords.trim()
+    ).catch(() => ({
+      totalCount: 0,
+      items: [] as Transaction[]
     }))
+    transactions.items = await Promise.all(
+      transactions.items.map(async tx => {
+        const description = await getDescription(walletID, tx.hash!)
+        if (description !== '') {
+          tx.description = description
+        } else if (tx.description !== '') {
+          // Legacy data has description but leveldb doesn't have it.
+          await setDescription(walletID, tx.hash!, tx.description)
+        }
+        return tx
+      })
+    )
 
     return {
       status: ResponseCode.Success,
@@ -42,8 +46,10 @@ export default class TransactionsController {
   }
 
   private cellCountThreshold = 10
-  public async get(walletID: string, hash: string):
-    Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
+  public async get(
+    walletID: string,
+    hash: string
+  ): Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
     const transaction = await TransactionsService.get(hash)
     if (!transaction) {
       throw new TransactionNotFound(hash)
@@ -87,11 +93,22 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: { ...transaction, outputsCount, inputsCount } as Transaction & { outputsCount: string; inputsCount: string }
+      result: { ...transaction, outputsCount, inputsCount } as Transaction & {
+        outputsCount: string
+        inputsCount: string
+      }
     }
   }
 
-  public async updateDescription({ walletID, hash, description }: { walletID: string; hash: string; description: string }) {
+  public async updateDescription({
+    walletID,
+    hash,
+    description
+  }: {
+    walletID: string
+    hash: string
+    description: string
+  }) {
     await setDescription(walletID, hash, description)
 
     return {

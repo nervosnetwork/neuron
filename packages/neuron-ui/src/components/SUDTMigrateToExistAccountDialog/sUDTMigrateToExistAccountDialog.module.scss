@@ -1,0 +1,37 @@
+@import '../../styles/mixin.scss';
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+
+  & > button {
+    margin-left: 4px;
+  }
+}
+
+.addressContainer {
+  width: 424px;
+  margin-bottom: 8px;
+
+  & > div:first-child {
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    color: #000000;
+    margin-bottom: 2px;
+    display: block;
+  }
+
+  .addressInputSelect {
+    & > div:first-child {
+      height: 26px;
+    }
+  }
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  width: 100%;
+  word-break: break-all;
+}

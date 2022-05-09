@@ -1,7 +1,6 @@
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType, publicKeyToAddress } from 'models/keys/address'
-import { Address as AddressInterface, AddressVersion } from "models/address"
+import { Address as AddressInterface } from 'models/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
 import AddressParser from 'models/address-parser'
@@ -28,14 +27,28 @@ export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
   private static async create(addresses: AddressInterface[]) {
-    const publicKeyInfos = addresses.map(addr => {
-      return HdPublicKeyInfo.fromObject({
-        ...addr,
-        publicKeyInBlake160: addr.blake160
+    const walletIds = new Set(addresses.map(v => v.walletId))
+    if (walletIds.size !== 1) {
+      throw new Error('Addresses can only be created for one wallet at a time')
+    }
+    const walletAddresses = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .where({ walletId: [...walletIds.values()][0] })
+      .getMany()
+    const publicKeyInBlake160Array: string[] = walletAddresses.map(v => v.publicKeyInBlake160)
+    const publicKeyInfos = addresses
+      .filter(v => !publicKeyInBlake160Array?.includes(v.blake160))
+      .map(addr => {
+        return HdPublicKeyInfo.fromObject({
+          ...addr,
+          publicKeyInBlake160: addr.blake160
+        })
       })
-    })
-    await getConnection().manager.save(publicKeyInfos)
-    AddressDbChangedSubject.getSubject().next("Updated")
+    if (publicKeyInfos.length) {
+      await getConnection().manager.save(publicKeyInfos)
+      AddressDbChangedSubject.getSubject().next('Updated')
+    }
   }
 
   private static async generateAndSave(
@@ -55,19 +68,14 @@ export default class AddressService {
       changeAddressCount
     )
 
-
-    const generatedAddresses: AddressInterface[] = [
-      ...addresses.receiving,
-      ...addresses.change,
-    ]
+    const generatedAddresses: AddressInterface[] = [...addresses.receiving, ...addresses.change]
     await this.create(generatedAddresses)
 
     return generatedAddresses
   }
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
-    const addressesToNotify = addresses
-      .map(address => ({ ...address, isImporting }))
+    const addressesToNotify = addresses.map(address => ({ ...address, isImporting }))
 
     if (process.send) {
       process.send({ channel: 'address-created', message: addressesToNotify })
@@ -81,15 +89,12 @@ export default class AddressService {
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> {
     const [unusedReceivingAddresses, unusedChangeAddresses] = await this.getGroupedUnusedAddressesByWalletId(walletId)
     const unusedReceivingCount = unusedReceivingAddresses.length
     const unusedChangeCount = unusedChangeAddresses.length
-    if (
-      unusedReceivingCount > this.minUnusedAddressCount &&
-      unusedChangeCount > this.minUnusedAddressCount
-    ) {
+    if (unusedReceivingCount > this.minUnusedAddressCount && unusedChangeCount > this.minUnusedAddressCount) {
       return undefined
     }
     const maxReceivingAddressIndex = await this.maxAddressIndex(walletId, AddressType.Receiving)
@@ -136,9 +141,8 @@ export default class AddressService {
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> {
-
     const generatedAddresses = await this.recursiveGenerateAndSave(
       walletId,
       extendedKey,
@@ -161,7 +165,7 @@ export default class AddressService {
     addressIndex: number
   ): Promise<AddressInterface | undefined> {
     const isMainnet = NetworksService.getInstance().isMainnet()
-    const address = publicKeyToAddress(publicKey, isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet)
+    const address = publicKeyToAddress(publicKey, isMainnet)
     const publicKeyHash = AddressParser.toBlake160(address)
 
     const exist = await getConnection()
@@ -210,7 +214,7 @@ export default class AddressService {
         walletId,
         addressType: AddressType.Receiving,
         addressIndex: idx + receivingStartIndex,
-        accountExtendedPublicKey: extendedKey,
+        accountExtendedPublicKey: extendedKey
       }
       return AddressService.toAddress(addressMetaInfo)
     })
@@ -219,13 +223,13 @@ export default class AddressService {
         walletId,
         addressType: AddressType.Change,
         addressIndex: idx + changeStartIndex,
-        accountExtendedPublicKey: extendedKey,
+        accountExtendedPublicKey: extendedKey
       }
       return AddressService.toAddress(addressMetaInfo)
     })
     return {
       receiving,
-      change,
+      change
     }
   }
 
@@ -234,7 +238,7 @@ export default class AddressService {
     const address: string = addressMetaInfo.accountExtendedPublicKey.address(
       addressMetaInfo.addressType,
       addressMetaInfo.addressIndex,
-      AddressService.getAddressPrefix()
+      NetworksService.getInstance().isMainnet()
     ).address
 
     const blake160: string = AddressParser.toBlake160(address)
@@ -270,10 +274,8 @@ export default class AddressService {
   private static async getGroupedUnusedAddressesByWalletId(walletId: string) {
     const allUnusedAddresses = await this.getUnusedAddressesByWalletId(walletId)
 
-    const unusedReceivingAddresses = allUnusedAddresses
-      .filter(addr => addr.addressType === AddressType.Receiving)
-    const unusedChangeAddresses = allUnusedAddresses
-      .filter(addr => addr.addressType === AddressType.Change)
+    const unusedReceivingAddresses = allUnusedAddresses.filter(addr => addr.addressType === AddressType.Receiving)
+    const unusedChangeAddresses = allUnusedAddresses.filter(addr => addr.addressType === AddressType.Change)
 
     return [unusedReceivingAddresses, unusedChangeAddresses]
   }
@@ -338,10 +340,7 @@ export default class AddressService {
       .createQueryBuilder()
       .getMany()
 
-    return publicKeyInfos
-      .map(publicKeyInfo => (
-        AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel())
-      ))
+    return publicKeyInfos.map(publicKeyInfo => AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel()))
   }
 
   public static async getAddressesByWalletId(walletId: string): Promise<AddressInterface[]> {
@@ -357,11 +356,12 @@ export default class AddressService {
       .where({ walletId })
       .getMany()
 
-    return publicKeyInfos.sort((lhs, rhs) => {
-      return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
-    })
+    return publicKeyInfos
+      .sort((lhs, rhs) => {
+        return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
+      })
       .map(publicKeyInfo => {
-        const keyInfoModel = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel());
+        const keyInfoModel = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel())
         const found = addressDescriptions.find(addrDesc => addrDesc.address === keyInfoModel.address)
         keyInfoModel.description = found?.description
         return keyInfoModel
@@ -371,16 +371,16 @@ export default class AddressService {
   public static async getAddressesWithBalancesByWalletId(walletId: string): Promise<AddressInterface[]> {
     const addresses = await this.getAddressesByWalletId(walletId)
     const { liveBalances, sentBalances, pendingBalances } = await CellsService.getBalancesByWalletId(walletId)
-    const txCountsByLock = await TransactionsService.getTxCountsByWalletId(
-      walletId,
-      { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: SystemScriptInfo.SECP_HASH_TYPE }
-    )
+    const txCountsByLock = await TransactionsService.getTxCountsByWalletId(walletId, {
+      codeHash: SystemScriptInfo.SECP_CODE_HASH,
+      hashType: SystemScriptInfo.SECP_HASH_TYPE
+    })
     const allAddressesWithBalances = addresses.map(address => {
       const script = Script.fromObject({
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
         args: address.blake160
-      });
+      })
       const lockHash = script.computeHash()
       const liveBalance = liveBalances.get(lockHash) || '0'
       const sentBalance = sentBalances.get(lockHash) || '0'
@@ -410,8 +410,7 @@ export default class AddressService {
 
     if (addressDescription) {
       addressDescription.description = description
-      await getConnection()
-        .manager.save(addressDescription)
+      await getConnection().manager.save(addressDescription)
 
       return
     }
@@ -431,13 +430,5 @@ export default class AddressService {
       .from(HdPublicKeyInfo)
       .where({ walletId })
       .execute()
-  }
-
-  private static getAddressVersion = (): AddressVersion => {
-    return NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
-  }
-
-  private static getAddressPrefix(): AddressPrefix {
-    return this.getAddressVersion() === AddressVersion.Mainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
   }
 }

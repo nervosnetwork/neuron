@@ -1,6 +1,6 @@
 declare namespace State {
   interface Transaction {
-    type: 'send' | 'receive'
+    type: 'send' | 'receive' | 'create' | 'destroy'
     createdAt: string
     updatedAt: string
     timestamp: string
@@ -18,6 +18,7 @@ declare namespace State {
       type: 'send' | 'receive'
       data: string
     }
+    assetAccountType?: 'CKB' | 'sUDT' | string
   }
 
   interface DetailedInput {
@@ -82,15 +83,39 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-sudt'
       | 'send-acp'
+      | 'send-acp-to-default'
       | 'send-cheque'
       | 'withdraw-cheque'
       | 'claim-cheque'
       | 'create-account-to-claim-cheque'
-      | 'destroy-ckb-account'
+      | 'destroy-asset-account'
       | 'migrate-acp'
       | 'send-nft'
+      | 'send-from-multisig'
+      | 'send-from-multisig-need-one'
       | null
     walletID: string
+    multisigConfig?: {
+      id: number
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias?: string
+      fullPayload: string
+    }
+  }
+
+  interface SUDTAccount {
+    accountId: string
+    accountName?: string
+    tokenName?: string
+    symbol?: string
+    balance: string
+    tokenId: string
+    address: string
+    decimal: string
   }
 
   type AlertDialog = Record<'title' | 'message', string> | null
@@ -134,6 +159,7 @@ declare namespace State {
     name: string
     device?: DeviceInfo
     isHD?: boolean
+    isWatchOnly?: boolean
   }
 
   enum Manufacturer {
@@ -176,6 +202,8 @@ declare namespace State {
     bestKnownBlockTimestamp: number
     estimate: number | undefined
     status: number
+    isLookingValidTarget: boolean
+    validTarget?: string
   }>
 
   interface Chain {
@@ -237,6 +265,7 @@ declare namespace State {
     wallet: Wallet
     nervosDAO: NervosDAO
     updater: AppUpdater
+    sUDTAccounts: SUDTAccount[]
     experimental: { tx: any; assetAccount?: any } | null
   }
 }

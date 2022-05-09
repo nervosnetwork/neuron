@@ -3,18 +3,13 @@ import { promisify } from 'util'
 import { t } from 'i18next'
 import TransactionsService from 'services/tx/transaction-service'
 import AddressService from 'services/addresses'
-import { ChainType } from 'models/network'
 import Transaction from 'models/chain/transaction'
 import toCSVRow from 'utils/to-csv-row'
 import { get as getDescription } from 'services/tx/transaction-description'
 
-const exportHistory = async ({
-  walletID,
-  filePath,
-  chainType = 'ckb',
-}: { walletID: string, filePath: string, chainType: ChainType | string }) => {
+const exportHistory = async ({ walletID, filePath }: { walletID: string; filePath: string }) => {
   if (!walletID) {
-    throw new Error("Wallet ID is required")
+    throw new Error('Wallet ID is required')
   }
 
   if (!filePath) {
@@ -25,10 +20,7 @@ const exportHistory = async ({
     fs.unlinkSync(filePath)
   }
 
-  const includeSUDT = chainType === 'ckb_testnet'
-  const headers = includeSUDT
-    ? ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'udt-amount', 'description']
-    : ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'description']
+  const headers = ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'udt-amount', 'description']
 
   const ws = fs.createWriteStream(filePath)
   const wsPromises: any = new Proxy(ws, {
@@ -39,9 +31,7 @@ const exportHistory = async ({
       return Reflect.get(target, key, receiver)
     }
   })
-  await wsPromises.write(
-    `${headers.map(label => t(`export-transactions.column.${label}`))}\n`
-  )
+  await wsPromises.write(`${headers.map(label => t(`export-transactions.column.${label}`))}\n`)
 
   const allAddresses = await AddressService.getAddressesByWalletId(walletID)
 
@@ -52,7 +42,12 @@ const exportHistory = async ({
   let pageNo = 1
 
   while (pageNo <= Math.ceil(count / PAGE_SIZE)) {
-    const { totalCount, items } = await TransactionsService.getAllByAddresses({ pageNo, pageSize: PAGE_SIZE, addresses, walletID })
+    const { totalCount, items } = await TransactionsService.getAllByAddresses({
+      pageNo,
+      pageSize: PAGE_SIZE,
+      addresses,
+      walletID
+    })
     count = totalCount
     txs.push(...items.filter(item => item.status === 'success'))
     pageNo++
@@ -60,7 +55,7 @@ const exportHistory = async ({
 
   for (const tx of txs.reverse()) {
     const description = await getDescription(walletID, tx.hash!)
-    const data = toCSVRow({ ...tx, description }, includeSUDT)
+    const data = toCSVRow({ ...tx, description })
     await wsPromises.write(data)
   }
 

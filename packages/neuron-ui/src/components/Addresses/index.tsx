@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from 'react'
 import { clipboard } from 'electron'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Edit } from 'grommet-icons'
+import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import CopyZone from 'widgets/CopyZone'
@@ -105,9 +105,9 @@ const Addresses = () => {
                   <td className={styles.address}>
                     <div data-address={addr.address}>
                       <CopyZone content={addr.address} name={t('addresses.copy-address')}>
-                        <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
+                        <span className={styles.addressOverflow}>{addr.address.slice(0, -20)}</span>
                         <span className={styles.ellipsis}>...</span>
-                        <span>{addr.address.slice(-6)}</span>
+                        <span>{addr.address.slice(-20)}</span>
                       </CopyZone>
                     </div>
                   </td>
@@ -135,7 +135,7 @@ const Addresses = () => {
                             onClick={onDescriptionSelected}
                             className={styles.editBtn}
                           >
-                            <Edit size="0.875rem" />
+                            <Edit />
                           </button>
                         )
                       }

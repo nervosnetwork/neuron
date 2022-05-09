@@ -1,10 +1,10 @@
-import { Address, AddressVersion } from "../../models/address";
-import { AddressType } from "models/keys/address";
-import Script from "models/chain/script";
-import SystemScriptInfo from "models/system-script-info";
-import AssetAccountInfo from "models/asset-account-info";
-import HdPublicKeyInfoModel from "models/keys/hd-public-key-info";
-import MultiSign from "models/multi-sign";
+import { Address, AddressVersion } from '../../models/address'
+import { AddressType } from 'models/keys/address'
+import Script from 'models/chain/script'
+import SystemScriptInfo from 'models/system-script-info'
+import AssetAccountInfo from 'models/asset-account-info'
+import HdPublicKeyInfoModel from 'models/keys/hd-public-key-info'
+import MultiSign from 'models/multi-sign'
 
 export default class AddressMeta implements Address {
   walletId: string
@@ -23,7 +23,7 @@ export default class AddressMeta implements Address {
   isImporting?: boolean | undefined
   usedByAnyoneCanPay?: boolean | undefined
 
-  constructor (
+  constructor(
     walletId: string,
     address: string,
     path: string,
@@ -39,7 +39,7 @@ export default class AddressMeta implements Address {
     description?: string,
     isImporting?: boolean | undefined,
     usedByAnyoneCanPay?: boolean | undefined
-    ) {
+  ) {
     this.walletId = walletId
     this.address = address
     this.path = path
@@ -91,7 +91,7 @@ export default class AddressMeta implements Address {
       undefined,
       undefined,
       undefined,
-      obj.description,
+      obj.description
     )
   }
 

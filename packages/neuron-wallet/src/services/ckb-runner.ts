@@ -22,20 +22,16 @@ const { app } = env
 let ckb: ChildProcess | null = null
 
 const ckbPath = (): string => {
-  return app.isPackaged ?
-    path.join(path.dirname(app.getAppPath()), '..', './bin') :
-    path.join(__dirname, '../../bin',)
+  return app.isPackaged ? path.join(path.dirname(app.getAppPath()), '..', './bin') : path.join(__dirname, '../../bin')
 }
 
 const ckbBinary = (): string => {
-  const binary = app.isPackaged ?
-    path.resolve(ckbPath(), './ckb') :
-    path.resolve(ckbPath(), `./${platform()}`, './ckb')
+  const binary = app.isPackaged ? path.resolve(ckbPath(), './ckb') : path.resolve(ckbPath(), `./${platform()}`, './ckb')
   return platform() === 'win' ? binary + '.exe' : binary
 }
 
 export const ckbDataPath = (): string => {
-  return path.resolve(app.getPath('userData',), 'chains/mainnet')
+  return path.resolve(app.getPath('userData'), 'chains/mainnet')
 }
 
 const initCkb = async () => {
@@ -67,23 +63,51 @@ const initCkb = async () => {
   })
 }
 
+let isLookingValidTarget: boolean = false
+let lastLogTime: number
+export const getLookingValidTargetStatus = () => isLookingValidTarget
+
 export const startCkbNode = async () => {
   await initCkb()
 
   logger.info('CKB:\tstarting node...')
-  ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
-  ckb.stderr && ckb.stderr.on('data', data => {
-    logger.error('CKB:\trun fail:', data.toString())
-    ckb = null
-  })
+  const options = ['run', '-C', ckbDataPath()]
+  if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
+    options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
+  }
+  ckb = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
+
+  ckb.stderr &&
+    ckb.stderr.on('data', data => {
+      logger.error('CKB:\trun fail:', data.toString())
+      ckb = null
+    })
+  if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
+    ckb.stdout &&
+      ckb.stdout.on('data', data => {
+        const dataString: string = data.toString()
+        if (
+          dataString.includes(
+            `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
+          )
+        ) {
+          isLookingValidTarget = true
+          lastLogTime = Date.now()
+        } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
+          isLookingValidTarget = false
+        }
+      })
+  }
 
   ckb.on('error', error => {
     logger.error('CKB:\trun fail:', error)
+    isLookingValidTarget = false
     ckb = null
   })
 
   ckb.on('close', () => {
     logger.info('CKB:\tprocess closed')
+    isLookingValidTarget = false
     ckb = null
   })
 }

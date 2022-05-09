@@ -133,6 +133,7 @@ export default class IndexerService {
       return
     }
     const network = NetworksService.getInstance().getCurrent()
+    // eslint-disable-next-line prettier/prettier
     const dataPath = this.#getDataPath(network)
     IndexerService.createFolder(dataPath)
     await IndexerService.ensurePortUsable()

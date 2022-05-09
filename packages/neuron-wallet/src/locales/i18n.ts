@@ -7,14 +7,14 @@ i18n.init({
   resources: {
     en,
     zh,
-    "zh-TW": zhTW
+    'zh-TW': zhTW
   },
   fallbackLng: {
     'zh-CN': ['zh'],
     default: ['en']
   },
   interpolation: {
-    escapeValue: false,
+    escapeValue: false
   }
 })
 

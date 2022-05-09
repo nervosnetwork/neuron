@@ -9,6 +9,7 @@ stories.add('sUDT Token', () => {
   return (
     <SUDTUpdateDialog
       isCKB={false}
+      isMainnet
       accountName="account name"
       tokenName="token name"
       symbol="symbol"
@@ -31,6 +32,7 @@ stories.add('CKB', () => {
   return (
     <SUDTUpdateDialog
       isCKB
+      isMainnet={false}
       accountName="account name"
       tokenName="token name"
       symbol="symbol"

@@ -1,6 +1,7 @@
 @import '../../styles/mixin.scss';
 
 .container {
+  position: relative;
   .title {
     @include page-title;
     margin-bottom: 20px;
@@ -38,4 +39,15 @@
 .noItems {
   @include medium-text;
   padding: 20px 13px;
+}
+
+.migrateSelectDialog {
+  @include dialog-container;
+  padding: 0;
+}
+
+.dialog {
+  @include dialog-container;
+  padding: 24px 48px;
+  width: 520px;
 }

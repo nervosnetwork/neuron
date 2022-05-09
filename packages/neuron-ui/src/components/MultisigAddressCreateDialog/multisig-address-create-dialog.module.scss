@@ -1,0 +1,33 @@
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+
+  & > button {
+    margin-left: 12px;
+  }
+}
+
+.setMNRoot {
+  height: 340px;
+}
+
+.countSelect {
+  display: flex;
+  align-items: center;
+  padding: 40px 0;
+  justify-content: center;
+
+  & > div {
+    width: 160px;
+  }
+}
+
+.error {
+  color: #d50000;
+}
+
+.errorMessage {
+  color: #d50000;
+  margin-top: 8px;
+}

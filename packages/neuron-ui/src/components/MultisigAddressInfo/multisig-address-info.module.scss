@@ -1,0 +1,41 @@
+
+.multiAddressTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  tr {
+    border-bottom: 1px solid #b3b3b3;
+  }
+
+  tbody {
+    td {
+      padding: 8px;
+      min-width: 40px;
+      text-align: left;
+    }
+  }
+
+  .address {
+    width: 400px;
+    
+    .addressField {
+      display: block;
+    }
+  }
+}
+
+.copyzone {
+  min-width: 100px;
+  max-width: 500px;
+  display: flex;
+  height: 1.625rem;
+
+  & > span {
+    line-height: 1.625rem;
+  }
+  .overflow {
+    word-break: break-all;
+    overflow: hidden;
+    text-align: right;
+  }
+}

@@ -20,6 +20,7 @@ export const initStates = {
   nervosDAO,
   updater,
   experimental: null,
+  sUDTAccounts: [],
 }
 
 export default initStates

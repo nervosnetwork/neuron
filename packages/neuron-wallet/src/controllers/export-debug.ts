@@ -13,6 +13,7 @@ import AddressService from 'services/addresses'
 import redistCheck from 'utils/redist-check'
 
 export default class ExportDebugController {
+  // eslint-disable-next-line prettier/prettier
   #I18N_PATH = 'export-debug-info'
   #ANONYMOUS_ADDRESS = 'http://****:port'
   private archive: archiver.Archiver

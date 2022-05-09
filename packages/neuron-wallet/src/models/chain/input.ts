@@ -27,7 +27,7 @@ export default class Input {
     multiSignBlake160?: string | null,
     type?: Script | null,
     typeHash?: string | null,
-    data?: string | null,
+    data?: string | null
   ) {
     this.previousOutput = previousOutput
     this.since = since ? BigInt(since).toString() : since
@@ -47,17 +47,28 @@ export default class Input {
     TypeChecker.numberChecker(this.since, this.capacity, this.inputIndex)
   }
 
-  public static fromObject({ previousOutput, since, capacity, lock, lockHash, inputIndex, multiSignBlake160, type, typeHash, data }: {
-    previousOutput: OutPoint | null,
-    since?: string,
-    capacity?: string | null,
-    lock?: Script | null,
-    lockHash?: string | null,
-    inputIndex?: string | null,
-    multiSignBlake160?: string | null,
-    type?: Script | null,
-    typeHash?: string | null,
-    data?: string | null,
+  public static fromObject({
+    previousOutput,
+    since,
+    capacity,
+    lock,
+    lockHash,
+    inputIndex,
+    multiSignBlake160,
+    type,
+    typeHash,
+    data
+  }: {
+    previousOutput: OutPoint | null
+    since?: string
+    capacity?: string | null
+    lock?: Script | null
+    lockHash?: string | null
+    inputIndex?: string | null
+    multiSignBlake160?: string | null
+    type?: Script | null
+    typeHash?: string | null
+    data?: string | null
   }): Input {
     return new Input(
       previousOutput ? OutPoint.fromObject(previousOutput) : previousOutput,
@@ -107,9 +118,6 @@ export default class Input {
   }
 
   public static fromSDK(input: CKBComponents.CellInput): Input {
-    return new Input(
-      input.previousOutput ? OutPoint.fromSDK(input.previousOutput) : null,
-      input.since,
-    )
+    return new Input(input.previousOutput ? OutPoint.fromSDK(input.previousOutput) : null, input.since)
   }
 }

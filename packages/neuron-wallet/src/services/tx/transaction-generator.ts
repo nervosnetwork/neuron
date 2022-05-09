@@ -1,13 +1,18 @@
-import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
-import { CapacityTooSmall } from 'exceptions'
+import CellsService from 'services/cells'
+import {
+  CapacityTooSmall,
+  MigrateSudtCellNoTypeError,
+  SudtAcpHaveDataError,
+  TargetOutputNotFoundError
+} from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
-import { CapacityNotEnough, LiveCapacityNotEnough } from 'exceptions/wallet'
+import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough } from 'exceptions/wallet'
 import Output from 'models/chain/output'
 import Input from 'models/chain/input'
 import OutPoint from 'models/chain/out-point'
-import Script from 'models/chain/script'
+import Script, { ScriptHashType } from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
 import AddressParser from 'models/address-parser'
@@ -15,6 +20,7 @@ import MultiSign from 'models/multi-sign'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
+import CellDep from 'models/chain/cell-dep'
 import SystemScriptInfo from 'models/system-script-info'
 import ArrayUtils from 'utils/array'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -22,6 +28,12 @@ import BufferUtils from 'utils/buffer'
 import assert from 'assert'
 import AssetAccount from 'models/asset-account'
 import AddressService from 'services/addresses'
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import MultisigConfigModel from 'models/multisig-config'
+import WalletService from 'services/wallets'
+import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from 'utils/const'
+import AssetAccountService from 'services/asset-account-service'
+import LiveCellService from 'services/live-cell-service'
 
 export interface TargetOutput {
   address: string
@@ -67,7 +79,7 @@ export class TransactionGenerator {
       lock: outputLock,
       type: new Script(nftCell.type?.codeHash!, nftCell.type?.args!, nftCell.type?.hashType!),
       data: nftCell.data,
-      since: '0',
+      since: '0'
     })
 
     const append = {
@@ -84,7 +96,7 @@ export class TransactionGenerator {
       inputs: [nftInput],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
+      witnesses: []
     })
 
     const txSize = TransactionSize.tx(tx)
@@ -99,12 +111,7 @@ export class TransactionGenerator {
     tx.inputs = []
     const baseSize: number = TransactionSize.tx(tx)
 
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput,
-    } = await CellsService.gatherInputs(
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
       '0',
       walletId,
       fee,
@@ -128,10 +135,7 @@ export class TransactionGenerator {
       const changeBlake160: string = AddressParser.toBlake160(changeAddress)
       const changeCapacity = BigInt(capacities) - finalFeeInt
 
-      const changeOutput = new Output(
-        changeCapacity.toString(),
-        SystemScriptInfo.generateSecpScript(changeBlake160)
-      )
+      const changeOutput = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
 
       tx.addOutput(changeOutput)
     }
@@ -144,9 +148,20 @@ export class TransactionGenerator {
     targetOutputs: TargetOutput[],
     changeAddress: string,
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    lockClass: {
+      lockArgs?: string[]
+      codeHash: string
+      hashType: ScriptHashType
+    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
+    multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    let cellDep: CellDep
+    if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    } else {
+      cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    }
     const tipHeader = await TransactionGenerator.getTipHeader()
     const tipHeaderEpoch = tipHeader.epoch
     const tipHeaderTimestamp = tipHeader.timestamp
@@ -164,13 +179,15 @@ export class TransactionGenerator {
       if (date) {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
-        const script = SystemScriptInfo.generateMultiSignScript(new MultiSign().args(blake160, +minutes, tipHeaderEpoch))
+        const script = SystemScriptInfo.generateMultiSignScript(
+          new MultiSign().args(blake160, +minutes, tipHeaderEpoch)
+        )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
 
       const outputSize = output.calculateBytesize()
-      if (BigInt(capacity) < BigInt(outputSize) * BigInt(10**8)) {
+      if (BigInt(capacity) < BigInt(outputSize) * BigInt(10 ** 8)) {
         throw new CapacityTooSmall(outputSize.toString())
       }
 
@@ -179,96 +196,100 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep],
+      cellDeps: [cellDep],
       headerDeps: [],
       inputs: [],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
+      witnesses: []
     })
 
-  const baseSize: number = TransactionSize.tx(tx)
-  const {
-    inputs,
-    capacities,
-    finalFee,
-    hasChangeOutput,
-  } = await CellsService.gatherInputs(
-    needCapacities.toString(),
-    walletId,
-    fee,
-    feeRate,
-    baseSize,
-    TransactionGenerator.CHANGE_OUTPUT_SIZE,
-    TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
-  )
-  const finalFeeInt = BigInt(finalFee)
-  tx.inputs = inputs
-  tx.fee = finalFee
+    const baseSize: number = TransactionSize.tx(tx)
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
+      needCapacities.toString(),
+      walletId,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      undefined,
+      lockClass,
+      multisigConfig ? [multisigConfig] : []
+    )
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs = inputs
+    tx.fee = finalFee
 
-  // change
-  if (hasChangeOutput) {
-    const changeBlake160: string = AddressParser.toBlake160(changeAddress)
+    // change
+    if (hasChangeOutput) {
+      const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
-    const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
+      const output = new Output(changeCapacity.toString(), Script.fromSDK(addressToScript(changeAddress)))
 
-    const output = new Output(
-      changeCapacity.toString(),
-      SystemScriptInfo.generateSecpScript(changeBlake160)
+      tx.addOutput(output)
+    }
+
+    tx.outputs = ArrayUtils.shuffle(tx.outputs)
+    tx.outputsData = tx.outputs.map(output => output.data || '0x')
+
+    return tx
+  }
+
+  // rest of capacity all send to last target output.
+  public static generateSendingAllTx = async (
+    walletId: string,
+    targetOutputs: TargetOutput[],
+    fee: string = '0',
+    feeRate: string = '0',
+    multisigConfig?: MultisigConfigModel
+  ): Promise<Transaction> => {
+    let cellDep: CellDep
+    if (multisigConfig) {
+      cellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
+    } else {
+      cellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    }
+    const tipHeader = await TransactionGenerator.getTipHeader()
+    const tipHeaderEpoch = tipHeader.epoch
+    const tipHeaderTimestamp = tipHeader.timestamp
+
+    const feeInt = BigInt(fee)
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    const allInputs: Input[] = await CellsService.gatherAllInputs(
+      walletId,
+      multisigConfig?.fullPayload ? Script.fromSDK(addressToScript(multisigConfig?.fullPayload)) : undefined
     )
 
-    tx.addOutput(output)
-  }
+    if (allInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
 
-  tx.outputs = ArrayUtils.shuffle(tx.outputs)
-  tx.outputsData = tx.outputs.map(output => output.data || '0x')
+    const totalCapacity: bigint = allInputs
+      .map(input => BigInt(input.capacity || 0))
+      .reduce((result, c) => result + c, BigInt(0))
 
-  return tx
-}
+    const outputs: Output[] = targetOutputs.map((o, index) => {
+      const { capacity, address, date } = o
 
-// rest of capacity all send to last target output.
-  public static generateSendingAllTx = async (
-  walletId: string,
-  targetOutputs: TargetOutput[],
-  fee: string = '0',
-  feeRate: string = '0'
-): Promise<Transaction> => {
-  const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
-  const tipHeader = await TransactionGenerator.getTipHeader()
-  const tipHeaderEpoch = tipHeader.epoch
-  const tipHeaderTimestamp = tipHeader.timestamp
+      const lockScript: Script = AddressParser.parse(address)
 
-  const feeInt = BigInt(fee)
-  const feeRateInt = BigInt(feeRate)
-  const mode = new FeeMode(feeRateInt)
-
-  const allInputs: Input[] = await CellsService.gatherAllInputs(walletId)
-
-  if (allInputs.length === 0) {
-    throw new CapacityNotEnough()
-  }
-
-  const totalCapacity: bigint = allInputs
-    .map(input => BigInt(input.capacity))
-    .reduce((result, c) => result + c, BigInt(0))
-
-  const outputs: Output[] = targetOutputs.map((o, index) => {
-    const { capacity, address, date } = o
-
-    const lockScript: Script = AddressParser.parse(address)
-
-    const output = new Output(capacity, lockScript)
-    if (date) {
-      const blake160 = lockScript.args
+      const output = new Output(capacity, lockScript)
+      if (date) {
+        const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
-        const script: Script = SystemScriptInfo.generateMultiSignScript(new MultiSign().args(blake160, minutes, tipHeaderEpoch))
+        const script: Script = SystemScriptInfo.generateMultiSignScript(
+          new MultiSign().args(blake160, minutes, tipHeaderEpoch)
+        )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
 
       // skip last output
       const outputSize = output.calculateBytesize()
-      if (BigInt(capacity) < (BigInt(outputSize) * BigInt(10**8)) && index !== targetOutputs.length - 1) {
+      if (BigInt(capacity) < BigInt(outputSize) * BigInt(10 ** 8) && index !== targetOutputs.length - 1) {
         throw new CapacityTooSmall(outputSize.toString())
       }
 
@@ -277,11 +298,11 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep],
+      cellDeps: [cellDep],
       headerDeps: [],
       inputs: allInputs,
       outputs,
-      witnesses: [],
+      witnesses: []
     })
 
     // change
@@ -289,8 +310,11 @@ export class TransactionGenerator {
     if (mode.isFeeRateMode()) {
       const lockHashes = new Set(allInputs.map(i => i.lockHash!))
       const keyCount: number = lockHashes.size
-      const txSize: number = TransactionSize.tx(tx) +
-        TransactionSize.secpLockWitness() * keyCount +
+      const txSize: number =
+        TransactionSize.tx(tx) +
+        (multisigConfig
+          ? TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n)
+          : TransactionSize.secpLockWitness() * keyCount) +
         TransactionSize.emptyWitness() * (allInputs.length - keyCount)
       finalFee = TransactionFee.fee(txSize, feeRateInt)
     }
@@ -303,7 +327,10 @@ export class TransactionGenerator {
     tx.fee = finalFee.toString()
 
     // check
-    if (tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0)) + finalFee !== totalCapacity) {
+    if (
+      tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0)) + finalFee !==
+      totalCapacity
+    ) {
       throw new Error('generateSendingAllTx Error')
     }
 
@@ -341,10 +368,7 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [
-        secpCellDep,
-        daoCellDep
-      ],
+      cellDeps: [secpCellDep, daoCellDep],
       headerDeps: [],
       inputs: [],
       outputs,
@@ -354,19 +378,14 @@ export class TransactionGenerator {
 
     const baseSize: number = TransactionSize.tx(tx)
 
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput,
-    } = await CellsService.gatherInputs(
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
       capacityInt.toString(),
       walletId,
       fee,
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
     )
     const finalFeeInt = BigInt(finalFee)
     tx.inputs = inputs
@@ -377,10 +396,7 @@ export class TransactionGenerator {
 
       const changeCapacity = BigInt(capacities) - capacityInt - finalFeeInt
 
-      const changeOutput = new Output(
-        changeCapacity.toString(),
-        SystemScriptInfo.generateSecpScript(changeBlake160)
-      )
+      const changeOutput = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
 
       tx.addOutput(changeOutput)
     }
@@ -393,12 +409,13 @@ export class TransactionGenerator {
   public static generateDepositAllTx = async (
     walletId: string,
     receiveAddress: string,
+    changeAddress: string,
+    isBalanceReserved = true,
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
-    const blake160: string = AddressParser.toBlake160(receiveAddress)
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -408,30 +425,35 @@ export class TransactionGenerator {
     if (allInputs.length === 0) {
       throw new CapacityNotEnough()
     }
-    const totalCapacity: bigint = allInputs
-      .map(input => BigInt(input.capacity))
-      .reduce((result, c) => result + c, BigInt(0))
 
+    const reservedBalance = isBalanceReserved ? BigInt(62_00_000_000) : BigInt(0)
+
+    const totalCapacity: bigint =
+      allInputs.map(input => BigInt(input.capacity || 0)).reduce((result, c) => result + c, BigInt(0)) - reservedBalance
+
+    const receiveBlake160: string = AddressParser.toBlake160(receiveAddress)
     const output = new Output(
       totalCapacity.toString(),
-      SystemScriptInfo.generateSecpScript(blake160),
+      SystemScriptInfo.generateSecpScript(receiveBlake160),
       SystemScriptInfo.generateDaoScript('0x')
     )
+
     output.setDaoData('0x0000000000000000')
 
     const outputs: Output[] = [output]
+    if (isBalanceReserved) {
+      const changeBlake160 = AddressParser.toBlake160(changeAddress)
+      outputs.push(new Output(reservedBalance.toString(), SystemScriptInfo.generateSecpScript(changeBlake160)))
+    }
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [
-        secpCellDep,
-        daoCellDep
-      ],
+      cellDeps: [secpCellDep, daoCellDep],
       headerDeps: [],
       inputs: allInputs,
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
+      witnesses: []
     })
 
     // change
@@ -439,7 +461,8 @@ export class TransactionGenerator {
     if (mode.isFeeRateMode()) {
       const lockHashes = new Set(allInputs.map(i => i.lockHash!))
       const keyCount: number = lockHashes.size
-      const txSize: number = TransactionSize.tx(tx) +
+      const txSize: number =
+        TransactionSize.tx(tx) +
         TransactionSize.secpLockWitness() * keyCount +
         TransactionSize.emptyWitness() * (allInputs.length - keyCount)
       finalFee = TransactionFee.fee(txSize, feeRateInt)
@@ -474,39 +497,24 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [
-        secpCellDep,
-        daoCellDep
-      ],
-      headerDeps: [
-        depositBlockHash,
-      ],
+      cellDeps: [secpCellDep, daoCellDep],
+      headerDeps: [depositBlockHash],
       inputs: [],
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
-      witnesses: [],
+      witnesses: []
     })
 
     const baseSize: number = TransactionSize.tx(tx)
 
-    const input = new Input(
-      outPoint,
-      '0',
-      output.capacity,
-      output.lock,
-    )
+    const input = new Input(outPoint, '0', output.capacity, output.lock)
 
     const append = {
       input,
       witness: WitnessArgs.emptyLock()
     }
 
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput,
-    } = await CellsService.gatherInputs(
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
       '0',
       walletId,
       fee,
@@ -530,10 +538,7 @@ export class TransactionGenerator {
       const changeBlake160: string = AddressParser.toBlake160(changeAddress)
       const changeCapacity = BigInt(capacities) - finalFeeInt
 
-      const changeOutput = new Output(
-        changeCapacity.toString(),
-        SystemScriptInfo.generateSecpScript(changeBlake160)
-      )
+      const changeOutput = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
 
       tx.addOutput(changeOutput)
     }
@@ -546,7 +551,7 @@ export class TransactionGenerator {
     prevOutput: Output,
     receivingAddress: string,
     fee: string,
-    feeRate: string,
+    feeRate: string
   ): Promise<Transaction> {
     const multiSignCellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
 
@@ -563,21 +568,14 @@ export class TransactionGenerator {
 
     const since = new MultiSign().parseSince(prevOutput.lock.args)
 
-    const input = new Input(
-      outPoint,
-      since.toString(),
-      prevOutput.capacity,
-      prevOutput.lock,
-    )
+    const input = new Input(outPoint, since.toString(), prevOutput.capacity, prevOutput.lock)
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [
-        multiSignCellDep
-      ],
+      cellDeps: [multiSignCellDep],
       headerDeps: [],
       inputs: [input],
       outputs: [output],
-      witnesses: [],
+      witnesses: []
     })
 
     if (mode.isFeeRateMode()) {
@@ -608,14 +606,14 @@ export class TransactionGenerator {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
-    const needCapacities = isCKB ? BigInt(61 * 10**8) : BigInt(142 * 10**8)
+    const needCapacities = isCKB ? BigInt(61 * 10 ** 8) : BigInt(142 * 10 ** 8)
     const output = Output.fromObject({
       capacity: needCapacities.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
       type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
-      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0))
     })
-    const tx =  Transaction.fromObject({
+    const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep],
@@ -625,19 +623,14 @@ export class TransactionGenerator {
       witnesses: []
     })
     const baseSize: number = TransactionSize.tx(tx)
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput
-    } = await CellsService.gatherInputs(
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
       needCapacities.toString(),
       walletId,
       fee,
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
     )
     const finalFeeInt = BigInt(finalFee)
     tx.inputs = inputs
@@ -684,18 +677,16 @@ export class TransactionGenerator {
       throw new CapacityNotEnough()
     }
 
-    const totalCapacity = allInputs
-      .map(i => BigInt(i.capacity))
-      .reduce((result, c) => result + c, BigInt(0))
+    const totalCapacity = allInputs.map(i => BigInt(i.capacity || 0)).reduce((result, c) => result + c, BigInt(0))
 
     const output = Output.fromObject({
       capacity: totalCapacity.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
       type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
-      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0))
     })
 
-    const tx =  Transaction.fromObject({
+    const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep],
@@ -705,7 +696,8 @@ export class TransactionGenerator {
       witnesses: []
     })
     const keyCount = new Set(allInputs.map(i => i.lockHash!)).size
-    const txSize: number = TransactionSize.tx(tx) +
+    const txSize: number =
+      TransactionSize.tx(tx) +
       TransactionSize.secpLockWitness() * keyCount +
       TransactionSize.emptyWitness() * (allInputs.length - keyCount)
     tx.fee = mode.isFeeMode() ? fee : TransactionFee.fee(txSize, feeRateInt).toString()
@@ -717,48 +709,59 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateDestoryCKBAssetAccountTx(walletId: string, asssetAccountInputs: Input[], changeBlake160: string) {
+  public static async generateDestoryAssetAccountTx(
+    walletId: string,
+    asssetAccountInputs: Input[],
+    changeBlake160: string,
+    isCKBAccount: boolean
+  ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
 
-    const cellDeps = [secpCellDep, anyoneCanPayDep]
-
-    const {
-      inputs: changeInputs,
-    } = await CellsService.gatherInputs('0', walletId)
-
-    if (changeInputs.length === 0) {
-      throw new CapacityNotEnough()
+    const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
+    if (asssetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
+      throw new SudtAcpHaveDataError()
     }
-
-    const [changeInput] = changeInputs
-    const allInputs = [...asssetAccountInputs, changeInput]
-    const allCapacities = allInputs.reduce((a, b) => {
-      return a + BigInt(b.capacity as string)
-    }, BigInt(0))
-
+    if (!isCKBAccount) {
+      cellDeps.push(assetAccountInfo.sudtCellDep)
+    }
 
     const output = Output.fromObject({
       capacity: '0',
       lock: SystemScriptInfo.generateSecpScript(changeBlake160)
     })
 
-    const tx =  Transaction.fromObject({
+    const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps,
-      inputs: allInputs,
+      inputs: asssetAccountInputs,
       outputs: [output],
       outputsData: [output.data],
       witnesses: []
     })
 
-    const txSize = TransactionSize.tx(tx)
-    tx.fee = TransactionFee.fee(txSize, BigInt(1e4)).toString()
+    let allCapacities = asssetAccountInputs.reduce((a, b) => {
+      return a + BigInt(b.capacity as string)
+    }, BigInt(0))
+    tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
     const outputCapacity = allCapacities - BigInt(tx.fee)
-    tx.outputs[0].capacity = outputCapacity.toString()
 
+    if (outputCapacity >= BigInt(MIN_CELL_CAPACITY)) {
+      tx.outputs[0].capacity = outputCapacity.toString()
+      return tx
+    }
+    const { inputs: changeInputs } = await CellsService.gatherInputs('0', walletId)
+    if (changeInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    tx.inputs.push(changeInputs[0])
+    allCapacities = tx.inputs.reduce((a, b) => {
+      return a + BigInt(b.capacity as string)
+    }, BigInt(0))
+    tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
+    tx.outputs[0].capacity = (allCapacities - BigInt(tx.fee)).toString()
     return tx
   }
 
@@ -770,32 +773,34 @@ export class TransactionGenerator {
     capacity: 'all' | string,
     changeBlake160: string,
     feeRate: string = '0',
-    fee: string = '0',
+    fee: string = '0'
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     const sudtDep = assetAccountInfo.sudtCellDep
+    const isDefaultLockScript = SystemScriptInfo.isSecpScript(targetOutput.lock)
 
     const cellDeps = [secpCellDep, anyoneCanPayDep]
-    const needCapacities: bigint = capacity === 'all' ? BigInt(targetOutput.capacity) : BigInt(targetOutput.capacity) + BigInt(capacity)
+    const needCapacities: bigint =
+      capacity === 'all' ? BigInt(targetOutput.capacity) : BigInt(targetOutput.capacity) + BigInt(capacity)
     const output = Output.fromObject({
       ...targetOutput,
-      capacity: needCapacities.toString(),
+      capacity: needCapacities.toString()
     })
     const targetInput = Input.fromObject({
       previousOutput: targetOutput.outPoint!,
       since: '0',
       capacity: targetOutput.capacity,
       lock: targetOutput.lock,
-      lockHash: targetOutput.lockHash,
+      lockHash: targetOutput.lockHash
     })
 
     if (output.type) {
       cellDeps.push(sudtDep)
     }
 
-    const tx =  Transaction.fromObject({
+    const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps,
@@ -809,30 +814,27 @@ export class TransactionGenerator {
     tx.cellDeps.push(...deps)
 
     const baseSize: number = TransactionSize.tx(tx)
-    const result = await (capacity === 'all' ?
-      CellsService.gatherAnyoneCanPaySendAllCKBInputs(
-        anyoneCanPayLocks,
-        fee,
-        feeRate,
-        baseSize,
-      ) :
-      CellsService.gatherAnyoneCanPayCKBInputs(
-        capacity,
-        walletId,
-        anyoneCanPayLocks,
-        changeBlake160,
-        fee,
-        feeRate,
-        baseSize,
-        TransactionGenerator.CHANGE_OUTPUT_SIZE,
-        TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
-      ))
+    const result = await (capacity === 'all'
+      ? CellsService.gatherAnyoneCanPaySendAllCKBInputs(anyoneCanPayLocks, fee, feeRate, baseSize)
+      : CellsService.gatherAnyoneCanPayCKBInputs(
+          capacity,
+          walletId,
+          anyoneCanPayLocks,
+          changeBlake160,
+          fee,
+          feeRate,
+          baseSize,
+          TransactionGenerator.CHANGE_OUTPUT_SIZE,
+          TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
+        ))
 
     if (capacity === 'all') {
       tx.outputs[0].capacity = (BigInt(result.sendCapacity) + BigInt(targetOutput.capacity)).toString()
     }
 
-    tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
+    tx.inputs = isDefaultLockScript
+      ? result.anyoneCanPayInputs
+      : result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
     tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
     if (result.changeOutput) {
       tx.outputs.push(result.changeOutput)
@@ -856,16 +858,17 @@ export class TransactionGenerator {
     amount: 'all' | string,
     changeBlake160: string,
     feeRate: string = '0',
-    fee: string = '0',
+    fee: string = '0'
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
-    const targetAmount: bigint = amount === 'all' ? BigInt(0) : BufferUtils.parseAmountFromSUDTData(targetOutput.data) + BigInt(amount)
+    const targetAmount: bigint =
+      amount === 'all' ? BigInt(0) : BufferUtils.parseAmountFromSUDTData(targetOutput.data) + BigInt(amount)
     const output = Output.fromObject({
       ...targetOutput,
-      data: BufferUtils.writeBigUInt128LE(targetAmount),
+      data: BufferUtils.writeBigUInt128LE(targetAmount)
     })
     const targetInput = Input.fromObject({
       previousOutput: targetOutput.outPoint!,
@@ -874,9 +877,9 @@ export class TransactionGenerator {
       lock: targetOutput.lock,
       lockHash: targetOutput.lockHash,
       type: targetOutput.type,
-      data: targetOutput.data,
+      data: targetOutput.data
     })
-    const tx =  Transaction.fromObject({
+    const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
@@ -900,11 +903,13 @@ export class TransactionGenerator {
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
     )
 
     if (amount === 'all') {
-      tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(result.amount) + BufferUtils.parseAmountFromSUDTData(targetOutput.data))
+      tx.outputs[0].data = BufferUtils.writeBigUInt128LE(
+        BigInt(result.amount) + BufferUtils.parseAmountFromSUDTData(targetOutput.data)
+      )
     }
 
     tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
@@ -915,7 +920,7 @@ export class TransactionGenerator {
     tx.outputsData = tx.outputs.map(o => o.data)
     tx.fee = result.finalFee
 
-    tx.sudtInfo = amount === 'all' ? { amount: result.amount }: { amount }
+    tx.sudtInfo = amount === 'all' ? { amount: result.amount } : { amount }
     tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
 
     // amount assertion
@@ -925,21 +930,15 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateMigrateLegacyACPTx (walletId: string): Promise<Transaction | null> {
+  public static async generateMigrateLegacyACPTx(walletId: string): Promise<Transaction | null> {
     const assetAccountInfo = new AssetAccountInfo()
     const legacyACPCells = await CellsService.gatherLegacyACPInputs(walletId)
     if (!legacyACPCells.length) {
       return null
     }
     const legacyACPInputs = legacyACPCells.map(cell => {
-      return new Input(
-        cell.outPoint(),
-        '0',
-        cell.capacity,
-        cell.lockScript(),
-        cell.lockHash
-      );
-    });
+      return new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
+    })
     const ACPCells = legacyACPCells.map(cell => {
       const newACPLockScript = assetAccountInfo.generateAnyoneCanPayScript(cell.lockArgs)
 
@@ -964,7 +963,7 @@ export class TransactionGenerator {
       inputs: legacyACPInputs,
       outputs: ACPOutputs,
       outputsData: ACPCells.map(o => o.data || '0x'),
-      witnesses: [],
+      witnesses: []
     })
 
     const baseSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
@@ -976,14 +975,13 @@ export class TransactionGenerator {
       '1000',
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE
     )
     tx.inputs.push(...inputGatherResult.inputs)
 
-    const originalChangeCapacity = inputGatherResult.inputs
-      .reduce((sum: bigint, input: Input) => {
-        return sum + BigInt(input.capacity)
-      }, BigInt(0))
+    const originalChangeCapacity = inputGatherResult.inputs.reduce((sum: bigint, input: Input) => {
+      return sum + BigInt(input.capacity || 0)
+    }, BigInt(0))
 
     const actualChangeCapacity = originalChangeCapacity - BigInt(inputGatherResult.finalFee)
     tx.fee = inputGatherResult.finalFee
@@ -999,7 +997,7 @@ export class TransactionGenerator {
     tx.outputs.push(changeOutput)
     tx.outputsData.push('0x')
 
-    return tx;
+    return tx
   }
 
   public static async generateCreateChequeTx(
@@ -1010,9 +1008,8 @@ export class TransactionGenerator {
     changeAddress: string,
     fee: string = '0',
     feeRate: string = '0',
-    description: string = '',
+    description: string = ''
   ) {
-
     const assetAccountInfo = new AssetAccountInfo()
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
@@ -1025,10 +1022,10 @@ export class TransactionGenerator {
     const chequeCellTmp = Output.fromObject({
       capacity: BigInt(162 * 10 ** 8).toString(),
       lock: assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40)),
-      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
+      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID)
     })
 
-    const tx =  Transaction.fromObject({
+    const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
@@ -1036,7 +1033,7 @@ export class TransactionGenerator {
       outputs: [],
       outputsData: [],
       witnesses: [],
-      description,
+      description
     })
 
     const changeBlake160: string = AddressParser.toBlake160(changeAddress)
@@ -1052,14 +1049,17 @@ export class TransactionGenerator {
       undefined,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
     )
 
-    tx.inputs = gatheredSudtInputResult.anyoneCanPayInputs.concat(gatheredSudtInputResult.changeInputs).concat(tx.inputs)
+    tx.inputs = gatheredSudtInputResult.anyoneCanPayInputs
+      .concat(gatheredSudtInputResult.changeInputs)
+      .concat(tx.inputs)
     tx.outputs.push(...gatheredSudtInputResult.anyoneCanPayOutputs)
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
 
-    const newBaseSize: number = TransactionSize.tx(tx) +
+    const newBaseSize: number =
+      TransactionSize.tx(tx) +
       TransactionSize.secpLockWitness() * tx.inputs.length +
       TransactionSize.output(chequeCellTmp) +
       TransactionSize.outputData(BufferUtils.writeBigUInt128LE(BigInt(0)))
@@ -1071,7 +1071,7 @@ export class TransactionGenerator {
       feeRate,
       newBaseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
     )
 
     tx.inputs.push(...gatheredCKBInputResult.inputs)
@@ -1100,15 +1100,12 @@ export class TransactionGenerator {
 
       const changeCapacity = BigInt(gatheredCKBInputResult.capacities) - finalFeeInt - BigInt(chequeCell.capacity)
 
-      const output = new Output(
-        changeCapacity.toString(),
-        SystemScriptInfo.generateSecpScript(changeBlake160)
-      )
+      const output = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
 
       tx.addOutput(output)
     }
 
-    tx.sudtInfo = amount === 'all' ? { amount: gatheredSudtInputResult.amount }: { amount }
+    tx.sudtInfo = amount === 'all' ? { amount: gatheredSudtInputResult.amount } : { amount }
     tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
 
     TransactionGenerator.checkTxCapacity(tx, 'generateCreateChequeTx capacity not match!')
@@ -1122,16 +1119,14 @@ export class TransactionGenerator {
     chequeCell: Output,
     changeAddress: string,
     fee: string = '0',
-    feeRate: string = '0',
+    feeRate: string = '0'
   ) {
     const receiverLockHash20 = chequeCell.lock.args.slice(0, 42)
     const allAddressInfos = await AddressService.getAddressesByWalletId(walletId)
-    const receiverAddressInfo = allAddressInfos.find(
-      info => {
-        const lockHash = SystemScriptInfo.generateSecpScript(info.blake160).computeHash()
-        return lockHash.startsWith(receiverLockHash20)
-      }
-    )
+    const receiverAddressInfo = allAddressInfos.find(info => {
+      const lockHash = SystemScriptInfo.generateSecpScript(info.blake160).computeHash()
+      return lockHash.startsWith(receiverLockHash20)
+    })
     if (!receiverAddressInfo) {
       throw new Error('Receiver lock hash not found in wallet')
     }
@@ -1165,7 +1160,7 @@ export class TransactionGenerator {
 
     const senderOutput = Output.fromObject({
       capacity: chequeCell.capacity,
-      lock: chequeSenderLock!,
+      lock: chequeSenderLock!
     })
 
     const tx = Transaction.fromObject({
@@ -1175,7 +1170,7 @@ export class TransactionGenerator {
       inputs: [chequeInput],
       outputs: [senderOutput],
       outputsData: [senderOutput.data],
-      witnesses: [],
+      witnesses: []
     })
 
     const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverLockArgs)
@@ -1193,7 +1188,7 @@ export class TransactionGenerator {
         capacity: originalReceiverAcpOutput.capacity,
         lock: originalReceiverAcpOutput.lockScript(),
         type: originalReceiverAcpOutput.typeScript(),
-        data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount),
+        data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount)
       })
 
       const receiverAcpInput = Input.fromObject({
@@ -1202,19 +1197,18 @@ export class TransactionGenerator {
         capacity: originalReceiverAcpOutput.capacity,
         lock: originalReceiverAcpOutput.lockScript(),
         type: originalReceiverAcpOutput.typeScript(),
-        data: originalReceiverAcpOutput.data,
+        data: originalReceiverAcpOutput.data
       })
       tx.inputs.push(receiverAcpInput)
       tx.outputs.push(newReceiverAcpOutput)
-    }
-    else {
+    } else {
       requiredCapacity = acpCellCapacity
 
       const receiverAcpOutput = Output.fromObject({
         capacity: acpCellCapacity.toString(),
         lock: receiverAcpScript,
         type: chequeCell.type,
-        data: chequeCell.data,
+        data: chequeCell.data
       })
 
       tx.outputs.push(receiverAcpOutput)
@@ -1223,19 +1217,14 @@ export class TransactionGenerator {
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
 
     const baseSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput,
-    } = await CellsService.gatherInputs(
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
       acpCellCapacity.toString(),
       walletId,
       fee,
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
     )
 
     const finalFeeInt = BigInt(finalFee)
@@ -1247,10 +1236,7 @@ export class TransactionGenerator {
 
       const changeCapacity = BigInt(capacities) - finalFeeInt - requiredCapacity
 
-      const output = new Output(
-        changeCapacity.toString(),
-        SystemScriptInfo.generateSecpScript(changeBlake160)
-      )
+      const output = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
 
       tx.addOutput(output)
     }
@@ -1264,7 +1250,7 @@ export class TransactionGenerator {
   public static async generateWithdrawChequeTx(
     chequeCell: Output,
     fee: string = '0',
-    feeRate: string = '0',
+    feeRate: string = '0'
   ): Promise<Transaction> {
     const senderLockHash = '0x' + chequeCell.lock.args.slice(42)
 
@@ -1272,8 +1258,7 @@ export class TransactionGenerator {
     const outputEntities = await CellsService.getOutputsByTransactionHash(chequeCell.outPoint!.txHash)
     const chequeSenderAcpOutput = outputEntities.find(
       output =>
-        assetAccountInfo.isDefaultAnyoneCanPayScript(output.lockScript()) &&
-        output.typeHash === chequeCell.typeHash!
+        assetAccountInfo.isDefaultAnyoneCanPayScript(output.lockScript()) && output.typeHash === chequeCell.typeHash!
     )
 
     const chequeSenderLiveAcpOutputs = await CellsService.getLiveCellsByLockHash(chequeSenderAcpOutput!.lockHash)
@@ -1302,7 +1287,7 @@ export class TransactionGenerator {
       capacity: chequeSenderLiveAcpCell.capacity,
       lock: chequeSenderLiveAcpCell.lockScript(),
       type: chequeSenderLiveAcpCell.typeScript(),
-      data: chequeSenderLiveAcpCell.data,
+      data: chequeSenderLiveAcpCell.data
     })
 
     const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
@@ -1313,7 +1298,7 @@ export class TransactionGenerator {
 
     const senderDefaultLockOutput = Output.fromObject({
       capacity: chequeCell.capacity,
-      lock: senderDefaultLockInput.lockScript()!,
+      lock: senderDefaultLockInput.lockScript()!
     })
 
     const senderAcpInputAmount = BufferUtils.readBigUInt128LE(chequeSenderAcpInput.data!)
@@ -1324,7 +1309,7 @@ export class TransactionGenerator {
       capacity: chequeSenderAcpInput.capacity!,
       lock: chequeSenderAcpInput.lock!,
       type: chequeSenderAcpInput.type!,
-      data: BufferUtils.writeBigUInt128LE(senderAcpOutputAmount),
+      data: BufferUtils.writeBigUInt128LE(senderAcpOutputAmount)
     })
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
@@ -1339,16 +1324,16 @@ export class TransactionGenerator {
       inputs: [chequeSenderAcpInput, chequeInput],
       outputs: [senderAcpOutput],
       outputsData: [],
-      witnesses: [],
+      witnesses: []
     })
 
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
 
     if (BigInt(fee) !== BigInt(0)) {
       tx.fee = fee
-    }
-    else {
-      const txSize = TransactionSize.tx(tx) +
+    } else {
+      const txSize =
+        TransactionSize.tx(tx) +
         TransactionSize.output(senderDefaultLockOutput) +
         TransactionSize.outputData('0x') +
         TransactionSize.secpLockWitness() * tx.inputs.length
@@ -1366,10 +1351,163 @@ export class TransactionGenerator {
     return tx
   }
 
+  public static async generateSudtMigrateAcpTx(
+    sudtCell: Output,
+    acpAddress?: string,
+    fee: string = '0',
+    feeRate: string = '1000'
+  ) {
+    const currentWallet = WalletService.getInstance().getCurrent()
+    if (!currentWallet) {
+      throw new CurrentWalletNotSet()
+    }
+    const inputSudtCell = new Output(
+      sudtCell.capacity,
+      sudtCell.lock,
+      sudtCell.type,
+      sudtCell.data,
+      sudtCell.lockHash,
+      sudtCell.typeHash,
+      sudtCell.outPoint,
+      sudtCell.status,
+      sudtCell.daoData,
+      sudtCell.timestamp,
+      sudtCell.blockNumber,
+      sudtCell.blockHash,
+      sudtCell.depositOutPoint,
+      sudtCell.depositTimestamp,
+      sudtCell.multiSignBlake160
+    )
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtMigrateAcpInputs = [
+      Input.fromObject({
+        previousOutput: inputSudtCell.outPoint!,
+        capacity: inputSudtCell.capacity,
+        lock: inputSudtCell.lock,
+        type: inputSudtCell.type,
+        lockHash: inputSudtCell.lockHash,
+        data: inputSudtCell.data,
+        since: '0'
+      })
+    ]
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    let outputs: Output[] = []
+    let acpInputCell: Input | null = null
+    if (acpAddress) {
+      if (!inputSudtCell.type) {
+        throw new MigrateSudtCellNoTypeError()
+      }
+      const receiverAcpCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(
+        Script.fromSDK(addressToScript(acpAddress)),
+        inputSudtCell.type
+      )
+      if (!receiverAcpCell) {
+        throw new TargetOutputNotFoundError()
+      }
+      const receiverAcpInputAmount = BufferUtils.readBigUInt128LE(receiverAcpCell.data)
+      const sudtCellAmount = BufferUtils.readBigUInt128LE(inputSudtCell.data)
+      const receiverAcpOutputAmount = receiverAcpInputAmount + sudtCellAmount
+      inputSudtCell.setData('0x')
+      inputSudtCell.setType(null)
+      outputs = [
+        inputSudtCell,
+        Output.fromObject({
+          capacity: receiverAcpCell.capacity,
+          lock: receiverAcpCell.lock(),
+          type: receiverAcpCell.type(),
+          data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount)
+        })
+      ]
+      acpInputCell = Input.fromObject({
+        previousOutput: receiverAcpCell.outPoint(),
+        capacity: receiverAcpCell.capacity,
+        lock: receiverAcpCell.lock(),
+        type: receiverAcpCell.type(),
+        lockHash: receiverAcpCell.lockHash,
+        data: receiverAcpCell.data,
+        since: '0'
+      })
+      sudtMigrateAcpInputs.push(acpInputCell)
+    } else {
+      const addresses = await currentWallet.getNextReceivingAddresses()
+      const usedBlake160s = new Set(
+        currentWallet.isHDWallet() ? await AssetAccountService.blake160sOfAssetAccounts() : []
+      )
+      const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
+      inputSudtCell.setLock(assetAccountInfo.generateAnyoneCanPayScript(addrObj.blake160))
+      outputs = [inputSudtCell]
+    }
+
+    const tx = Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      inputs: sudtMigrateAcpInputs,
+      outputs: outputs,
+      outputsData: outputs.map(v => v.data || '0x'),
+      witnesses: []
+    })
+
+    const txSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
+    tx.fee = TransactionFee.fee(txSize, BigInt(feeRate)).toString()
+    const outputCapacity = BigInt(inputSudtCell.capacity) - BigInt(tx.fee)
+    if (outputCapacity >= BigInt(MIN_SUDT_CAPACITY)) {
+      tx.outputs[0].capacity = outputCapacity.toString()
+      return tx
+    }
+    tx.inputs = []
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
+      '0',
+      currentWallet.id,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      sudtMigrateAcpInputs.map(v => ({
+        input: v,
+        witness: WitnessArgs.emptyLock()
+      }))
+    )
+    const finalFeeInt = BigInt(finalFee)
+
+    if (finalFeeInt === BigInt(0)) {
+      throw new LiveCapacityNotEnough()
+    }
+
+    if (acpInputCell) {
+      // if migrate to exist address, the exist address cell should at last
+      tx.inputs = inputs.sort((a, b) =>
+        a.lockHash === acpInputCell!.lockHash ? 1 : b.lockHash === acpInputCell?.lockHash ? -1 : 0
+      )
+    } else {
+      tx.inputs = inputs
+    }
+    tx.fee = finalFee
+
+    if (hasChangeOutput) {
+      const unusedChangeAddress = await currentWallet.getNextChangeAddress()
+      const changeBlake160: string = AddressParser.toBlake160(unusedChangeAddress!.address)
+      const changeCapacity = BigInt(capacities) - finalFeeInt
+      const changeOutput = new Output(changeCapacity.toString(), SystemScriptInfo.generateSecpScript(changeBlake160))
+      tx.addOutput(changeOutput)
+    }
+    return tx
+  }
+
   private static checkTxCapacity(tx: Transaction, msg: string) {
     const inputCapacity = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
     const outputCapacity = tx.outputs.map(o => BigInt(o.capacity!)).reduce((result, c) => result + c, BigInt(0))
-    assert.equal(inputCapacity.toString(), (outputCapacity + BigInt(tx.fee!)).toString(), `${msg}: ${JSON.stringify(tx)}`)
+    assert.equal(
+      inputCapacity.toString(),
+      (outputCapacity + BigInt(tx.fee!)).toString(),
+      `${msg}: ${JSON.stringify(tx)}`
+    )
   }
 
   private static checkTxSudtAmount(tx: Transaction, msg: string, assetAccountInfo: AssetAccountInfo) {

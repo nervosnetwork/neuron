@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 
-import Address, { AddressType, AddressPrefix } from './address'
+import Address, { AddressType } from './address'
 import Keychain, { privateToPublic } from './keychain'
 import { entropyToMnemonic } from './mnemonic'
 
@@ -26,8 +26,7 @@ export class ExtendedPublicKey {
     }
 
     const publicKey = Buffer.from(key, 'hex')
-    const compressedPublicKey = Buffer
-      .alloc(33)
+    const compressedPublicKey = Buffer.alloc(33)
       // '03' for odd value, '02' for even value
       .fill(publicKey[64] & 1 ? '03' : '02', 0, 1, 'hex')
       .fill(publicKey.subarray(1, 33), 1, 33)
@@ -57,12 +56,8 @@ export class AccountExtendedPublicKey extends ExtendedPublicKey {
     return new AccountExtendedPublicKey(serialized.slice(0, 66), serialized.slice(66))
   }
 
-  address = (
-    type: AddressType = AddressType.Receiving,
-    index: number,
-    prefix: AddressPrefix = AddressPrefix.Testnet
-  ): Address => {
-    return Address.fromPublicKey(this.addressPublicKey(type, index), Address.pathFor(type, index), prefix)
+  address = (type: AddressType = AddressType.Receiving, index: number, isMainnet = false): Address => {
+    return Address.fromPublicKey(this.addressPublicKey(type, index), Address.pathFor(type, index), isMainnet)
   }
 
   private addressPublicKey = (type = AddressType.Receiving, index: number) => {
@@ -103,7 +98,7 @@ export class ExtendedPrivateKey {
 
 export enum DefaultAddressNumber {
   Receiving = 20,
-  Change = 10,
+  Change = 10
 }
 
 export interface Addresses {

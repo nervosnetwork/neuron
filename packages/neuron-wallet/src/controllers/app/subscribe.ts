@@ -7,12 +7,12 @@ import DataUpdateSubject from 'models/subjects/data-update'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
-import dataUpdateSubject from 'models/subjects/data-update'
 import AppUpdaterSubject from 'models/subjects/app-updater'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import SyncStateSubject from 'models/subjects/sync-state-subject'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 import SyncApiController from 'controllers/sync-api'
+import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -61,7 +61,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   })
 
   WalletListSubject.pipe(debounceTime(50)).subscribe(() => {
-    dataUpdateSubject.next({ dataType: 'wallets', actionType: 'update' })
+    DataUpdateSubject.next({ dataType: 'wallets', actionType: 'update' })
     dispatcher.updateMenu()
     dispatcher.updateWindowTitle()
   })
@@ -69,7 +69,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   CurrentWalletSubject.pipe(debounceTime(50)).subscribe(async params => {
     dispatcher.updateMenu()
     if (params.currentWallet) {
-      dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
+      DataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
     dispatcher.updateWindowTitle()
   })
@@ -80,9 +80,12 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   AppUpdaterSubject.subscribe(params => {
     dispatcher.updateMenu()
-    BrowserWindow
-      .getAllWindows()
-      .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))?.webContents
-      .send('app-updater-updated', params)
+    BrowserWindow.getAllWindows()
+      .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))
+      ?.webContents.send('app-updater-updated', params)
   })
+
+  MultisigOutputChangedSubject.getSubject().subscribe(params => [
+    dispatcher.sendMessage('multisig-output-update', params)
+  ])
 }

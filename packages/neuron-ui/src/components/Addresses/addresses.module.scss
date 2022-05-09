@@ -100,7 +100,7 @@ $change-color: #6666cc;
 
     div {
       min-width: 100px;
-      max-width: 500px;
+      max-width: 818px;
       display: flex;
       position: relative;
 
@@ -116,8 +116,8 @@ $change-color: #6666cc;
         display: none;
       }
 
-      @media screen and (max-width: 1680px) {
-        width: 20vw;
+      @media screen and (max-width: 1800px) {
+        width: 46vw;
 
         .ellipsis {
           display: inline;
@@ -139,6 +139,10 @@ $change-color: #6666cc;
         }
       }
 
+      @media screen and (max-width: 1600px) {
+        width: 30vw;
+      }
+
       @media screen and (max-width: 1000px) {
         width: 15vw;
       }
@@ -154,7 +158,7 @@ $change-color: #6666cc;
       appearance: none;
       border: none;
       background-color: transparent;
-      width: 1rem;
+      width: 2rem;
       height: 1rem;
       display: flex;
       justify-content: center;
@@ -162,6 +166,10 @@ $change-color: #6666cc;
 
       svg {
         pointer-events: none;
+
+        g {
+          fill: #000;
+        }
       }
     }
   }
@@ -177,11 +185,18 @@ $change-color: #6666cc;
       border: none;
     }
 
-    @media screen and (max-width: 1500px) {
+    @media screen and (max-width: 2400px) {
       input {
         width: 100px;
       }
     }
+
+    @media screen and (max-width: 1300px) {
+      input {
+        width: 90px;
+      }
+    }
+
   }
 
   .balance {

@@ -3,14 +3,14 @@ export default {
     keywords: {
       wallet: 'Wallet',
       password: 'Password',
-      'wallet-name': 'Wallet Name',
+      'wallet-name': 'Wallet Name'
     },
     'application-menu': {
       neuron: {
         about: 'About {{app}}',
         preferences: 'Preferences...',
         'check-updates': 'Check for Updates...',
-        quit: 'Quit {{app}}',
+        quit: 'Quit {{app}}'
       },
       wallet: {
         label: 'Wallet',
@@ -24,25 +24,26 @@ export default {
         'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
         'import-xpubkey': 'Import Extended Public Key',
-        "import-hardware": "Import Hardware Wallet"
+        'import-hardware': 'Import Hardware Wallet'
       },
       edit: {
         label: 'Edit',
         cut: 'Cut',
         copy: 'Copy',
         paste: 'Paste',
-        selectall: 'Select All',
+        selectall: 'Select All'
       },
       tools: {
-        label: "Tools",
-        "sign-and-verify": "Sign/Verify Message",
+        label: 'Tools',
+        'sign-and-verify': 'Sign/Verify Message',
+        'multisig-address': 'Multisig Addresses',
         'offline-sign': 'Offline sign',
-        "clear-sync-data": "Clear all synchronized data",
+        'clear-sync-data': 'Clear all synchronized data'
       },
       window: {
         label: 'Window',
         minimize: 'Minimize',
-        close: 'Close Window',
+        close: 'Close Window'
       },
       help: {
         label: 'Help',
@@ -57,12 +58,12 @@ export default {
         develop: 'Develop',
         'force-reload': 'Force Reload',
         reload: 'Reload',
-        'toggle-dev-tools': 'Toggle Developer Tools',
-      },
+        'toggle-dev-tools': 'Toggle Developer Tools'
+      }
     },
     services: {
       transactions: 'Transactions',
-      wallets: 'Wallets',
+      wallets: 'Wallets'
     },
     messages: {
       'failed-to-load-networks': 'Failed to load networks.',
@@ -93,58 +94,78 @@ export default {
       'invalid-mnemonic': 'Wallet seed is invalid, please check it again.',
       'unsupported-cipher': 'Unsupported cipher.',
       'capacity-not-enough': 'Insufficient balance.',
-      'capacity-not-enough-for-change': "You need more capacities for change (more than 61 CKBytes).",
-      'capacity-not-enough-for-change-by-transfer': "You need more capacities for change (more than 61 CKBytes), or click 'Max' button to send all your balance.",
-      'live-capacity-not-enough': 'Insufficient available balance, please try again when last transaction has been confirmed.',
+      'capacity-not-enough-for-change': 'You need more capacities for change (more than 61 CKBytes).',
+      'capacity-not-enough-for-change-by-transfer':
+        "You need more capacities for change (more than 61 CKBytes), or click 'Max' button to send all your balance.",
+      'live-capacity-not-enough':
+        'Insufficient available balance, please try again when last transaction has been confirmed.',
       'capacity-too-small': 'The minimal transfer balance is {{bytes}} CKBytes.',
       'should-be-type-of': '{{field}} should be type of {{type}}.',
       'invalid-keystore': 'Keystore is invalid, please check your file integrity.',
       'invalid-json': 'Invalid JSON file, please check your file integrity.',
       'cell-is-not-yet-live': 'Please wait until last transaction is confirmed by chain.',
-      'transaction-is-not-committed-yet': 'Cannot find required cells on chain, please make sure the related transactions has been confirmed.',
+      'transaction-is-not-committed-yet':
+        'Cannot find required cells on chain, please make sure the related transactions has been confirmed.',
       'mainnet-address-required': '{{address}} is not a mainnet address.',
       'testnet-address-required': '{{address}} is not a testnet address.',
-      'address-not-found': 'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.',
+      'address-not-found':
+        'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.',
       'target-output-not-found': "There isn't an account wallet associated with this address.",
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
-      "device-sign-canceled": "You have canceled the signing request. Otherwise, please make sure the Nervos app on your device has the configuration “allow contract data” enabled",
-      "connect-device-failed": "The device cannot be connected, please check your connection.",
-      "unsupported-manufacturer": "Devices from {{manufacturer}} are not yet supported.",
-      "wallet-not-supported-function": "This wallet does not support {name} function.",
-      "invalid-transaction-file": "Invalid transaction file.",
-      "save-offline-json-failed": "Unable to save JSON file.",
-      "offline-sign-failed": "Signing failed, please check if you are signing with the correct wallet.",
+      'device-sign-canceled':
+        'You have canceled the signing request. Otherwise, please make sure the Nervos app on your device has the configuration “allow contract data” enabled',
+      'connect-device-failed': 'The device cannot be connected, please check your connection.',
+      'unsupported-manufacturer': 'Devices from {{manufacturer}} are not yet supported.',
+      'wallet-not-supported-function': 'This wallet does not support {name} function.',
+      'invalid-transaction-file': 'Invalid transaction file.',
+      'save-offline-json-failed': 'Unable to save JSON file.',
+      'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
+      'multisig-script-prefix-error': 'The multisig config is error',
+      'multisig-config-not-exist': 'The multisig config is not exist',
+      'multisig-config-exist': 'The multisig config has exist',
+      'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
+      'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
+      'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
+      'migrate-sudt-no-type': 'The migrating cell does not have type script',
+      'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
+      'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
+      'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
+      'no-match-address-for-sign': 'Not found matched address'
     },
     messageBox: {
       button: {
         confirm: 'OK',
-        discard: 'Cancel',
+        discard: 'Cancel'
       },
       'clear-sync-data': {
         title: 'Clear all synchronized data',
-        message: 'Clear all synchronized data will delete all local synchronized data and resynchronize the data on the chain, the whole synchronization may take a long time.'
+        message:
+          'Clear all synchronized data will delete all local synchronized data and resynchronize the data on the chain, the whole synchronization may take a long time.'
       },
       'send-capacity': {
-        title: 'Send Transaction',
+        title: 'Send Transaction'
       },
       'remove-network': {
         title: 'Remove Network',
         message: 'Network {{name}} (address: {{address}}) will be removed.',
-        alert: 'This is the current network, by removing it, the connection will be switched to the default network',
+        alert: 'This is the current network, by removing it, the connection will be switched to the default network'
       },
       'remove-wallet': {
         title: 'Delete the wallet',
-        password: 'Password',
+        password: 'Password'
       },
       'backup-keystore': {
         title: 'Backup the Keystore',
-        password: 'Password',
+        password: 'Password'
       },
       transaction: {
-        title: 'Transaction: {{hash}}',
+        title: 'Transaction: {{hash}}'
       },
       'sign-and-verify': {
         title: 'Sign/verify message'
+      },
+      'multisig-address': {
+        title: 'Multisig Addresses'
       },
       'ckb-dependency': {
         title: 'Bundled CKB Node',
@@ -157,7 +178,8 @@ export default {
       'acp-migration': {
         title: 'Upgrade Asset Account',
         message: 'Upgrade Asset Account',
-        detail: 'Recently our security team identified a potential vulnerability in the experimental Asset Account script. We have deployed a new Asset Account script with a fix on mainnet and all future Asset Account will use the new version. We suggest you to upgrade them to use the new script.',
+        detail:
+          'Recently our security team identified a potential vulnerability in the experimental Asset Account script. We have deployed a new Asset Account script with a fix on mainnet and all future Asset Account will use the new version. We suggest you to upgrade them to use the new script.',
         buttons: {
           migrate: 'Secure upgrade now',
           skip: 'I know the risk, will upgrade later'
@@ -171,32 +193,34 @@ export default {
         }
       },
       'hard-fork-migrate': {
-        message: 'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.',
+        message:
+          'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.'
       }
     },
     prompt: {
       password: {
         label: 'Input your password',
         submit: 'Submit',
-        cancel: 'Cancel',
-      },
+        cancel: 'Cancel'
+      }
     },
     updater: {
-      'update-not-available': 'There are currently no updates available.',
+      'update-not-available': 'There are currently no updates available.'
     },
     common: {
       yes: 'Yes',
       no: 'No',
       ok: 'OK',
-      error: 'Error',
+      cancel: 'Cancel',
+      error: 'Error'
     },
     'export-debug-info': {
       'export-debug-info': 'Export Debug Information',
       'debug-info-exported': 'Debug information has been exported to {{ file }}'
     },
     about: {
-      "app-version": "{{name}} Version: {{version}}",
-      "ckb-client-version": "CKB Client Version: {{version}}"
+      'app-version': '{{name}} Version: {{version}}',
+      'ckb-client-version': 'CKB Client Version: {{version}}'
     },
     settings: {
       title: {
@@ -208,23 +232,43 @@ export default {
       'export-transactions': 'Export Transaction History',
       'transactions-exported': '{{total}} transaction records have been exported to {{file}}',
       column: {
-        "time": "Time",
-        "block-number": "Block Number",
-        "tx-hash": "Transaction Hash",
-        "tx-type": "Transaction Type",
-        "amount": "CKB Amount",
-        "udt-amount": "UDT Amount",
-        "description": "Description"
+        time: 'Time',
+        'block-number': 'Block Number',
+        'tx-hash': 'Transaction Hash',
+        'tx-type': 'Transaction Type',
+        amount: 'CKB Amount',
+        'udt-amount': 'UDT Amount',
+        description: 'Description'
       },
-      "tx-type": {
-        "send": "Send",
-        "receive": "Receive"
+      'tx-type': {
+        send: 'Send',
+        receive: 'Receive',
+        'create-asset-account': 'Create {{name}} Asset Account',
+        'destroy-asset-account': 'Destroy {{name}} Asset Account'
       }
     },
     'offline-signature': {
       'export-transaction': 'Export Transaction as JSON',
       'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
-      'load-transaction': 'Load Transaction file',
+      'load-transaction': 'Load Transaction file'
+    },
+    'multisig-config': {
+      'import-config': 'Import multisig config',
+      'export-config': 'Export multisig config',
+      'config-exported': 'Multisig configs has been exported at {{filePath}}.',
+      'import-duplicate': 'Please check for duplicate configurations',
+      'import-result': 'Imports succeeded {{success}}, failed {{fail}}.{{failCheck}}',
+      'confirm-delete': 'Confirm delete the multisig config?',
+      'approve-tx': 'Confirm multisig transaction',
+      'delete-actions': {
+        ok: 'Confirm',
+        cancel: 'Cancel'
+      }
+    },
+    'open-in-explorer': {
+      title: 'View in CKB Explorer',
+      transaction: 'transaction',
+      message: 'View {{type}} {{key}} in CKB Explorer'
     }
-  },
+  }
 }

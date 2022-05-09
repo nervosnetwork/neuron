@@ -18,12 +18,16 @@ import OutPoint from "../../src/models/chain/out-point"
 import { when } from "jest-when"
 import SystemScriptInfo from "../../src/models/system-script-info"
 import Script from "../../src/models/chain/script"
+import Input from "../../src/models/chain/input"
+import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 
 const stubbedWalletServiceGet = jest.fn()
 const stubbedGenerateClaimChequeTx = jest.fn()
 const stubbedGenerateWithdrawChequeTx = jest.fn()
 const stubbedGetAllAddresses = jest.fn()
 const stubbedGenerateCreateChequeTx = jest.fn()
+const stubbedGenerateDestoryAssetAccountTx = jest.fn()
+const stubbedTransactionSendersendTx = jest.fn()
 
 const resetMocks = () => {
   stubbedWalletServiceGet.mockReset()
@@ -31,9 +35,12 @@ const resetMocks = () => {
   stubbedGenerateClaimChequeTx.mockReset()
   stubbedGenerateWithdrawChequeTx.mockReset()
   stubbedGetAllAddresses.mockReset()
+  stubbedGenerateDestoryAssetAccountTx.mockReset()
+  stubbedTransactionSendersendTx.mockReset()
 }
 
 const [assetAccount, ckbAssetAccount] = accounts
+const [alice, bob] = keyInfos
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -93,26 +100,37 @@ const generateOutput = (
 const tokenID = '0x' + '0'.repeat(64)
 const walletId = 'w1'
 
+jest.mock('services/wallets', () => {
+  return {
+    getInstance: () => ({
+      get: stubbedWalletServiceGet
+    })
+  }
+})
+jest.mock('services/tx', () => {
+  return {
+    _esModule: true,
+    TransactionGenerator: {
+      // @ts-ignore
+      generateClaimChequeTx: (...args) => stubbedGenerateClaimChequeTx(...args),
+      // @ts-ignore
+      generateCreateChequeTx: (...args) => stubbedGenerateCreateChequeTx(...args),
+      // @ts-ignore
+      generateWithdrawChequeTx: (...args) => stubbedGenerateWithdrawChequeTx(...args),
+      // @ts-ignore
+      generateDestoryAssetAccountTx: (...args) => stubbedGenerateDestoryAssetAccountTx(...args)
+    }
+  }
+})
+jest.mock('services/transaction-sender', () => {
+  return function() {
+    return {
+      sendTx: stubbedTransactionSendersendTx
+    }
+  }
+})
+
 describe('AssetAccountService', () => {
-  jest.mock('services/wallets', () => {
-    return {
-      getInstance: () => ({
-        get: stubbedWalletServiceGet
-      })
-    }
-  })
-
-  jest.mock('services/tx', () => {
-    return {
-      _esModule: true,
-      TransactionGenerator: {
-        generateClaimChequeTx: stubbedGenerateClaimChequeTx,
-        generateCreateChequeTx: stubbedGenerateCreateChequeTx,
-        generateWithdrawChequeTx: stubbedGenerateWithdrawChequeTx
-      }
-    }
-  })
-
   const AssetAccountService = require("../../src/services/asset-account-service").default
 
   beforeAll(async () => {
@@ -1086,4 +1104,192 @@ describe('AssetAccountService', () => {
       )
     })
   });
+
+  describe('destoryAssetAccount', () => {
+    it('destory ckb account', async () => {
+      const assetAccount = AssetAccount.fromObject({
+        tokenID: 'CKBytes',
+        symbol: 'ckb',
+        tokenName: 'ckb',
+        decimal: '0',
+        balance: '0',
+        accountName: 'ckb',
+        blake160,
+      })
+      const outputs = [
+        generateOutput('CKBytes', undefined, undefined, toShannon(1000)),
+      ]
+      await createAccounts([assetAccount], outputs)
+      const walletId = 'walletId'
+      stubbedWalletServiceGet.mockReturnValue({ getNextChangeAddress: () => ({ blake160: 'blake160' } )})
+      await AssetAccountService.destoryAssetAccount(walletId, assetAccount)
+      expect(stubbedGenerateDestoryAssetAccountTx).toHaveBeenCalledWith(
+        walletId,
+        [
+          Input.fromObject({
+            previousOutput: outputs[0].outPoint(),
+            capacity: outputs[0].capacity,
+            lock: outputs[0].lockScript(),
+            type: outputs[0].typeScript(),
+            lockHash: outputs[0].lockHash,
+            typeHash: outputs[0].typeHash,
+            data: outputs[0].data,
+            since: '0'
+          })
+        ],
+        'blake160',
+        true
+      )
+    })
+    it('destory sudt account', async () => {
+      const assetAccount = AssetAccount.fromObject({
+        tokenID: '0x1e6159a251360113fc0fb0e6edb4613fc4a149222a3bebd9710543b8be9663f9',
+        symbol: 'sudt',
+        tokenName: 'sudt',
+        decimal: '0',
+        balance: '0',
+        accountName: 'sudt',
+        blake160,
+      })
+      const outputs = [
+        generateOutput(assetAccount.tokenID, undefined, undefined, toShannon(1000)),
+      ]
+      await createAccounts([assetAccount], outputs)
+      const walletId = 'walletId'
+      stubbedWalletServiceGet.mockReturnValue({ getNextChangeAddress: () => ({ blake160: 'blake160' } )})
+      await AssetAccountService.destoryAssetAccount(walletId, assetAccount)
+      expect(stubbedGenerateDestoryAssetAccountTx).toHaveBeenCalledWith(
+        walletId,
+        [
+          Input.fromObject({
+            previousOutput: outputs[0].outPoint(),
+            capacity: outputs[0].capacity,
+            lock: outputs[0].lockScript(),
+            type: outputs[0].typeScript(),
+            lockHash: outputs[0].lockHash,
+            typeHash: outputs[0].typeHash,
+            data: outputs[0].data,
+            since: '0'
+          })
+        ],
+        'blake160',
+        false
+      )
+    })
+  })
+
+  describe('sendTx', () => {
+    beforeEach(async() => {
+      const outputs = [
+        generateOutput(undefined, undefined, undefined, toShannon(1000)),
+        generateOutput(
+          assetAccount.tokenID, undefined, undefined, toShannon(1000),
+          toShannon(100), undefined, OutputStatus.Live,
+          assetAccountInfo.generateAnyoneCanPayScript(alice.publicKeyInBlake160)
+        ),
+      ]
+      await createAccounts(accounts, outputs)
+    })
+    describe('hd wallet', () => {
+      it('exception with Asset account already exists!', async () => {
+        stubbedWalletServiceGet.mockReturnValueOnce({
+          isHardware: () => false,
+        })
+        await expect(AssetAccountService.sendTx(
+          'walletID',
+          assetAccount
+        )).rejects.toThrow(new Error('Asset account already exists!'))
+      })
+    })
+    describe('hard wallet', () => {
+      it('no next address', async () => {
+        stubbedWalletServiceGet.mockReturnValueOnce({
+          isHardware: () => true,
+          getNextAddress: () => undefined
+        })
+        await AssetAccountService.sendTx(
+          'walletID',
+          AssetAccount.fromObject({
+            tokenID,
+            symbol: 'sUDT',
+            tokenName: 'sUDT',
+            decimal: '0',
+            balance: '0',
+            accountName: 'sUDT',
+            blake160: alice.publicKeyInBlake160,
+          }),
+          {},
+          'password'
+        )
+        expect(stubbedTransactionSendersendTx).toHaveBeenCalledWith('walletID', {}, 'password', false, false)
+        const count = await getConnection()
+          .getRepository(AssetAccountEntity)
+          .createQueryBuilder()
+          .where({
+            tokenID,
+            blake160: alice.publicKeyInBlake160
+          })
+          .getCount()
+        expect(count).toBe(1)
+      })
+      it('exception with Asset account already exists!', async () => {
+        stubbedWalletServiceGet.mockReturnValueOnce({
+          isHardware: () => true,
+          getNextAddress: () => ({ blake160: alice.publicKeyInBlake160, tokenID: assetAccount.tokenID })
+        })
+        await expect(AssetAccountService.sendTx(
+          'walletID',
+          assetAccount
+        )).rejects.toThrow(new Error('Asset account already exists!'))
+      })
+      it('no acp cell and delete outdate account', async () => {
+        stubbedWalletServiceGet.mockReturnValueOnce({
+          isHardware: () => true,
+          getNextAddress: () => ({ blake160: bob.publicKeyInBlake160, tokenID: assetAccount.tokenID })
+        })
+        await AssetAccountService.sendTx(
+          'walletID',
+          assetAccount,
+          {},
+          'password'
+        )
+        expect(stubbedTransactionSendersendTx).toHaveBeenCalledWith('walletID', {}, 'password', false, false)
+        const count = await getConnection()
+          .getRepository(AssetAccountEntity)
+          .createQueryBuilder()
+          .where({
+            tokenID: assetAccount.tokenID,
+            blake160: assetAccount.blake160
+          })
+          .getCount()
+        expect(count).toBe(1)
+      })
+    })
+    it('save a asset account', async () => {
+      await AssetAccountService.sendTx(
+        'walletID',
+        AssetAccount.fromObject({
+          tokenID,
+          symbol: 'sUDT',
+          tokenName: 'sUDT',
+          decimal: '0',
+          balance: '0',
+          accountName: 'sUDT',
+          blake160: alice.publicKeyInBlake160,
+        }),
+        {},
+        'password'
+      )
+      expect(stubbedTransactionSendersendTx).toHaveBeenCalledWith('walletID', {}, 'password', false, false)
+      const count = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder()
+        .where({
+          tokenID,
+          blake160: alice.publicKeyInBlake160
+        })
+        .getCount()
+      expect(count).toBe(1)
+    })
+  })
 })

@@ -21,9 +21,19 @@ const app = electronApp
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
   private apiController = new ApiController()
+  private windowRegisterChannels = new WeakMap<BrowserWindow, string[]>()
+  private static instance: AppController
 
-  constructor() {
-    subscribe(this);
+  private constructor() {
+    subscribe(this)
+  }
+
+  static getInstance() {
+    if (AppController.instance) {
+      return AppController.instance
+    }
+    AppController.instance = new AppController()
+    return AppController.instance
   }
 
   public start = async () => {
@@ -46,11 +56,14 @@ export default class AppController {
    * called before the app quits
    */
   public end = async () => {
-    if (env.isTestMode) {return}
-    await Promise.all([
-      stopCkbNode(),
-      IndexerService.getInstance().stop()
-    ])
+    if (env.isTestMode) {
+      return
+    }
+    await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
+  }
+
+  public registerChannels(win: BrowserWindow, channels: string[]) {
+    this.windowRegisterChannels.set(win, channels)
   }
 
   /**
@@ -58,6 +71,12 @@ export default class AppController {
    */
   public sendMessage = (channel: string, obj: any) => {
     this.mainWindow?.webContents.send(channel, obj)
+    BrowserWindow.getAllWindows().forEach(window => {
+      const channels = this.windowRegisterChannels.get(window)
+      if (channels && channels.includes(channel)) {
+        window.webContents.send(channel, obj)
+      }
+    })
   }
 
   /**
@@ -78,30 +97,41 @@ export default class AppController {
   }
 
   public openWindow = () => {
-    if (this.mainWindow) {return}
+    if (this.mainWindow) {
+      return
+    }
 
     return this.createWindow()
   }
 
   public restoreWindow = () => {
-    if (!this.mainWindow) {return}
+    if (!this.mainWindow) {
+      return
+    }
     this.mainWindow.isMinimized() ? this.mainWindow.restore() : this.mainWindow.focus()
   }
 
   public createWindow = () => {
+    const MIN_WIDTH = 1200
     const windowState = windowStateKeeper({ defaultWidth: 1366, defaultHeight: 900 })
 
     this.mainWindow = new BrowserWindow({
       x: windowState.x,
       y: windowState.y,
-      width: windowState.width,
+      width: Math.max(windowState.width, MIN_WIDTH),
       height: windowState.height,
-      minWidth: 900,
+      minWidth: MIN_WIDTH,
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',
-      icon: nativeImage.createFromPath(path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')),
-      webPreferences: { devTools: env.isDevMode, contextIsolation: false, preload: path.join(__dirname, './preload.js') },
+      icon: nativeImage.createFromPath(
+        path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')
+      ),
+      webPreferences: {
+        devTools: env.isDevMode,
+        contextIsolation: false,
+        preload: path.join(__dirname, './preload.js')
+      }
     })
 
     windowState.manage(this.mainWindow)

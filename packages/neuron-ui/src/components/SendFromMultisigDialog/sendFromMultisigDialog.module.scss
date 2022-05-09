@@ -1,0 +1,55 @@
+
+.sendCKBTitle {
+  display: flex;
+  line-height: 1.625rem;
+  flex-wrap: wrap;
+}
+
+.sendContainer {
+  margin: 16px 0;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+.balance {
+  grid-area: balance;
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sendFieldContainer {
+  margin-bottom: 16px;
+  & > div {
+    grid-template:
+      'address scanner add-or-remove' auto
+      'amount max add-or-remove' auto
+      'locktime locktime locktime' auto /
+      calc(100% - 130px) 50px 30px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+  }
+}
+
+.sendActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+
+  & > button {
+    margin-left: 12px;
+  }
+}
+
+.balanceValue {
+  font-weight: 500;
+  max-width: 60%;
+  padding: 0 5px 0 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &:after {
+    content: ' CKB';
+  }
+}

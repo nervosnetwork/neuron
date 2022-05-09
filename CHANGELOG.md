@@ -1,3 +1,49 @@
+# 0.103.0 (2022-05-10)
+
+### Hardfork
+
+Neuron adopts new RFCs introduced by [HARDFORK 2021](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0037-ckb2021/0037-ckb2021.md), prominents are as follows,
+
+1. adopt the new address format and deprecate the short version of addresses #2346
+
+
+### CKB
+[CKB v0.103.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.103.0) was released on Apr. 11th, 2022. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+
+### New features
+* #2280: add a balance-not-reserved checkbox in Nervos DAO deposit dialog(@Keith-CY)
+* #2291: add a sudt detail link in creating asset account dialog (@yanguoyu)
+* #2296, #2320: add address lock script detail in transaction detail window (@Lester-xie, @Keith-CY)
+* #2300, #2352: add options of ckb node to boost synchronization (@Keith-CY)
+* #2302, #2333: allow ACP account to transfer to secp256k1 addresses (@Lester-xie)
+* #2303, #2310, #2313, #2323, #2324, #2332, #2340, #2357, #2363: add multisig address management (@yanguoyu, @Keith-CY)
+* #2307: disable some functions when current wallet is an xpub wallet (@yanguoyu)
+* #2309: check checksums after publishment (@Keith-CY)
+* #2315: add new sign tips and add old sign notice in sign/verify window (@yanguoyu)
+* #2330: allow sudt/secp256k1 assets to be migrated to an asset account (@yanguoyu)
+* #2331: upgrade bundled ckb version to v0.103.0 (@Keith-CY)
+* #2337: allow asset account to be destroied when balance is 0 (@yanguoyu)
+* #2341: support syncing cells those have script of hash type 'data1' (@Keith-CY)
+* #2342, #2361: mark create and destroy asset account in transaction history (@qiweiii)
+* #2346: use new foramt of addresses by default (@Keith-CY)
+* #2359: allow secp256k1 address to be timelocked (@Keith-CY)
+
+
+### Bug fixes
+* #2304: fix error message of creating sudt/acp account (@Keith-CY)
+* #2335: fix parsers (@Keith-CY)
+* #2351: avoid saving duplicate blake160 for one wallet (@yanguoyu)
+* #2362: ignore rejected transaction by (@Keith-CY)
+
+
+### Refactor
+* #2277: remove grommet icons (@yanguoyu)
+* #2289: format code (@Lester-xie)
+* #2290: replace calculate_dao_maximum_withdraw with calculateDaoMaximumWithdraw method in sdk (@yanguoyu)
+
+
+
 # 0.101.3 (2022-03-01)
 
 [CKB v0.101.4](https://github.com/nervosnetwork/ckb/releases/tag/v0.101.4) was released on Jan. 20th, 2022. This version of CKB node is now bundled and preconfigured in Neuron. 

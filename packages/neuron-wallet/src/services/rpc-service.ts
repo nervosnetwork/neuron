@@ -8,6 +8,7 @@ import BlockHeader from 'models/chain/block-header'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import OutPoint from 'models/chain/out-point'
 import CellWithStatus from 'models/chain/cell-with-status'
+import logger from 'utils/logger'
 
 export default class RpcService {
   private retryTime: number
@@ -61,10 +62,20 @@ export default class RpcService {
     })
   }
 
+  /**
+   * TODO: rejected tx should be handled
+   * {
+   *   transaction: null,
+   *   txStatus: { blockHash: null, status: 'rejected' }
+   * }
+   */
   public async getTransaction(hash: string): Promise<TransactionWithStatus | undefined> {
     const result = await this.ckb.rpc.getTransaction(hash)
-    if (result) {
+    if (result?.transaction) {
       return TransactionWithStatus.fromSDK(result)
+    }
+    if ((result.txStatus as any) === 'rejected') {
+      logger.warn(`Transaction[${hash}] was rejected`)
     }
     return undefined
   }
@@ -118,6 +129,13 @@ export default class RpcService {
       return i.chain
     })
     return chain
+  }
+
+  public async getSyncState(): Promise<CKBComponents.SyncState> {
+    const syncState = await this.retry(async () => {
+      return await this.ckb.rpc.syncState()
+    })
+    return syncState
   }
 
   private async retry<T>(func: () => T): Promise<T> {

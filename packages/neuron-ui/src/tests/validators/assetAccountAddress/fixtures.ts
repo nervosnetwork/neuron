@@ -1,4 +1,4 @@
-import { ErrorCode, AccountType } from 'utils/enums'
+import { AccountType, ErrorCode } from 'utils/enums'
 
 export default {
   'Should throw an error when address is not a string': {
@@ -57,14 +57,14 @@ export default {
     },
     exception: null,
   },
-  "Should throw an error when account type is ckb and it's a short version address of secp256k1 lock": {
+  "Should pass when account type is ckb and it's a short version address of secp256k1 lock": {
     params: {
       address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
       isMainnet: false,
       required: false,
       type: AccountType.CKB,
     },
-    exception: ErrorCode.FieldInvalid,
+    exception: null,
   },
   "Should throw an error when it's a short version address but its code hash index is not 0x00 or 0x02": {
     params: {
@@ -74,9 +74,17 @@ export default {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  "Should throw an error when it's a full version address but its code hash index is not 0x04": {
+  "Should throw an error when address's code hash is deprecated": {
     params: {
       address: 'ckt1q2r2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yy3d90uh',
+      isMainnet: false,
+      required: false,
+    },
+    exception: ErrorCode.AddressIsDeprecated,
+  },
+  "Should throw an error when it's a full version address but its code hash index is not 0x04": {
+    params: {
+      address: 'ckt1qkr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykyk7tvzu37rv87kyv59ltdece09usz9t9yy8tyx5j',
       isMainnet: false,
       required: false,
     },

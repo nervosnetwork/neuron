@@ -5,6 +5,7 @@ import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
 import HardwareSign from 'components/HardwareSign'
+import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import { useDialog, ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
@@ -18,7 +19,13 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { exportTransactionAsJSON, OfflineSignStatus, OfflineSignType, signAndExportTransaction } from 'services/remote'
+import {
+  exportTransactionAsJSON,
+  OfflineSignStatus,
+  OfflineSignType,
+  signAndExportTransaction,
+  requestOpenInExplorer,
+} from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
@@ -28,10 +35,11 @@ const PasswordRequest = () => {
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest: { walletID = '', actionType = null },
+      passwordRequest: { walletID = '', actionType = null, multisigConfig },
     },
     settings: { wallets = [] },
     experimental,
+    wallet: currentWallet,
   } = useGlobalState()
 
   const dispatch = useDispatch()
@@ -58,13 +66,17 @@ const PasswordRequest = () => {
       case 'create-sudt-account':
         return OfflineSignType.CreateSUDTAccount
       case 'send-acp':
+      case 'send-acp-to-default':
       case 'send-sudt':
         return OfflineSignType.SendSUDT
       case 'unlock':
         return OfflineSignType.UnlockDAO
       case 'send-nft':
+      case 'send-from-multisig-need-one':
       case 'send':
         return OfflineSignType.Regular
+      case 'send-from-multisig':
+        return OfflineSignType.SendFromMultisigOnlySig
       default:
         return OfflineSignType.Invalid
     }
@@ -92,10 +104,14 @@ const PasswordRequest = () => {
       'create-sudt-account',
       'send-sudt',
       'send-acp',
+      'send-acp-to-default',
       'send-cheque',
       'withdraw-cheque',
       'claim-cheque',
       'create-account-to-claim-cheque',
+      'send-from-multisig-need-one',
+      'send-from-multisig',
+      'destroy-asset-account',
     ].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
@@ -121,6 +137,21 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(handleSendTxRes)
+            break
+          }
+          case 'send-from-multisig-need-one': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
+              (res: { result: string; status: number }) => {
+                if (isSuccessResponse(res)) {
+                  requestOpenInExplorer({ type: 'transaction', key: res.result })
+                } else if (res.status === ErrorCode.PasswordIncorrect) {
+                  throw new PasswordIncorrectException()
+                }
+              }
+            )
             break
           }
           case 'delete': {
@@ -176,16 +207,22 @@ const PasswordRequest = () => {
             break
           }
           case 'send-acp':
+          case 'send-acp-to-default':
           case 'send-sudt': {
+            let skipLastInputs = true
+            if (actionType === 'send-acp-to-default') {
+              skipLastInputs = false
+            }
             const params: Controller.SendSUDTTransaction.Params = {
               walletID,
               tx: experimental?.tx,
               password,
+              skipLastInputs,
             }
             await sendSUDTTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
-          case 'destroy-ckb-account':
+          case 'destroy-asset-account':
           case 'send-nft':
           case 'send-cheque': {
             if (isSending) {
@@ -252,6 +289,7 @@ const PasswordRequest = () => {
       experimental,
       setError,
       t,
+      multisigConfig,
     ]
   )
 
@@ -282,6 +320,7 @@ const PasswordRequest = () => {
       ...json,
       walletID,
       password,
+      multisigConfig,
     })
     if (!isSuccessResponse(res)) {
       dispatch({
@@ -300,7 +339,7 @@ const PasswordRequest = () => {
       payload: { sending: false },
     })
     onDismiss()
-  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID])
+  }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
   const dropdownList = [
     {
@@ -334,26 +373,37 @@ const PasswordRequest = () => {
           'create-sudt-account',
           'send-sudt',
           'send-acp',
+          'send-acp-to-default',
           'send-cheque',
           'withdraw-cheque',
           'claim-cheque',
           'create-account-to-claim-cheque',
           'migrate-acp',
+          'send-from-multisig-need-one',
+          'send-from-multisig',
         ].includes(actionType ?? '') ? null : (
           <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
         )}
-        <TextField
-          label={t('password-request.password')}
-          value={password}
-          field="password"
-          type="password"
-          title={t('password-request.password')}
-          onChange={onChange}
-          autoFocus
-          required
-          className={styles.passwordInput}
-          error={error}
-        />
+        {currentWallet.isWatchOnly && (
+          <div className={styles.xpubNotice}>
+            <Attention />
+            {t('password-request.xpub-notice')}
+          </div>
+        )}
+        {currentWallet.isWatchOnly || (
+          <TextField
+            label={t('password-request.password')}
+            value={password}
+            field="password"
+            type="password"
+            title={t('password-request.password')}
+            onChange={onChange}
+            autoFocus
+            required
+            className={styles.passwordInput}
+            error={error}
+          />
+        )}
         <div className={styles.footer}>
           {signType !== OfflineSignType.Invalid ? (
             <div className={styles.left}>
@@ -361,15 +411,17 @@ const PasswordRequest = () => {
                 mainBtnLabel={t('offline-sign.export')}
                 mainBtnOnClick={exportTransaction}
                 mainBtnDisabled={isLoading}
-                list={dropdownList}
+                list={currentWallet.isWatchOnly ? [] : dropdownList}
               />
             </div>
           ) : null}
           <div className={styles.right}>
             <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-            <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-              {isLoading ? <Spinner /> : (t('common.confirm') as string)}
-            </Button>
+            {signType === OfflineSignType.SendFromMultisigOnlySig || currentWallet.isWatchOnly || (
+              <Button label={t('common.confirm')} type="submit" disabled={disabled}>
+                {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+              </Button>
+            )}
           </div>
         </div>
       </form>

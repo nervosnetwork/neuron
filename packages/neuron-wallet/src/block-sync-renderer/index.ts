@@ -24,34 +24,36 @@ let requests = new Map<number, Record<'resolve' | 'reject', Function>>()
 export const killBlockSyncTask = async () => {
   const _child = child
   child = null
-  if (!_child) { return }
+  if (!_child) {
+    return
+  }
 
   logger.info('Sync:\tdrain requests')
   await Promise.all(
-    [...requests.values()].map(
-      ({ reject }) =>
-        typeof reject === 'function'
-          ? reject()
-          : logger.error(`Worker:\treject is not a function, get ${reject}`)
-    ))
-    .finally(() => requests = new Map())
+    [...requests.values()].map(({ reject }) =>
+      typeof reject === 'function' ? reject() : logger.error(`Worker:\treject is not a function, get ${reject}`)
+    )
+  ).finally(() => (requests = new Map()))
 
   await waitForChildClose(_child)
   await IndexerService.getInstance().stop()
 }
 
-const waitForChildClose = (c: ChildProcess) => new Promise((resolve, reject) => {
-  c.once('close', resolve)
-  const msg: Required<WorkerMessage> = {
-    type: 'call',
-    id: requestId++,
-    channel: 'unmount',
-    message: null
-  }
-  c.send(msg, err => {
-    if (err) { reject(err) }
-  })
-}).catch(() => 0)
+const waitForChildClose = (c: ChildProcess) =>
+  new Promise((resolve, reject) => {
+    c.once('close', resolve)
+    const msg: Required<WorkerMessage> = {
+      type: 'call',
+      id: requestId++,
+      channel: 'unmount',
+      message: null
+    }
+    c.send(msg, err => {
+      if (err) {
+        reject(err)
+      }
+    })
+  }).catch(() => 0)
 
 export const resetSyncTask = async (startTask = true) => {
   await killBlockSyncTask()
@@ -64,7 +66,9 @@ export const resetSyncTask = async (startTask = true) => {
 }
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
-  if (!reconnected && network?.id === newNetwork.id) { return }
+  if (!reconnected && network?.id === newNetwork.id && network?.genesisHash === newNetwork.genesisHash) {
+    return
+  }
 
   network = newNetwork
 
@@ -79,8 +83,15 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
 
 export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
   const _child = child
-  if (!_child) { return [] }
-  const msg: Required<WorkerMessage<QueryIndexerParams>> = { type: 'call', id: requestId++, channel: 'queryIndexer', message: query }
+  if (!_child) {
+    return []
+  }
+  const msg: Required<WorkerMessage<QueryIndexerParams>> = {
+    type: 'call',
+    id: requestId++,
+    channel: 'queryIndexer',
+    message: query
+  }
   return registerRequest(_child, msg).catch(err => {
     logger.error(`Sync:\tfailed to register query indexer task`, err)
     return []
@@ -100,7 +111,9 @@ export const createBlockSyncTask = async () => {
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {
     if (id !== undefined) {
-      if (!requests.has(id)) { return }
+      if (!requests.has(id)) {
+        return
+      }
       const { resolve } = requests.get(id)!
       requests.delete(id)
       if (typeof resolve === 'function') {
@@ -112,7 +125,6 @@ export const createBlockSyncTask = async () => {
       } else {
         logger.error(`Sync:\tresolve expected, got ${resolve}`)
       }
-
     } else {
       switch (channel) {
         case 'cache-tip-block-updated':
@@ -132,7 +144,6 @@ export const createBlockSyncTask = async () => {
         default:
           break
       }
-
     }
   })
 
@@ -140,21 +151,25 @@ export const createBlockSyncTask = async () => {
     logger.error('Sync:ChildProcess:', data)
   })
 
-
   if (!network) {
     network = NetworksService.getInstance().getCurrent()
   }
 
   DataUpdateSubject.next({
     dataType: 'transaction',
-    actionType: 'update',
+    actionType: 'update'
   })
 
   const _child = child
 
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
     const addressMetas = await AddressService.getAddressesByAllWallets()
-    const message: StartParams = { genesisHash: network.genesisHash, url: network.remote, addressMetas, indexerUrl: IndexerService.LISTEN_URI }
+    const message: StartParams = {
+      genesisHash: network.genesisHash,
+      url: network.remote,
+      addressMetas,
+      indexerUrl: IndexerService.LISTEN_URI
+    }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {
       logger.error(`Sync:\ffailed to register sync task`, err)

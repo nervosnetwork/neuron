@@ -59,3 +59,8 @@ export const LONG_TYPE_PREFIX = '0x04'
 
 // times
 export const SYNC_REBUILD_SINCE_VERSION = '0.32'
+
+export const DEPRECATED_CODE_HASH: Record<string, string> = {
+  AcpOnLina: '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
+  AcpOnAggron: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+}

@@ -25,7 +25,8 @@
     },
     "network-status": {
       "tooltip": {
-        "block-synced": "Block Synced"
+        "block-synced": "Block Synced",
+        "looking-valid-target": "Looking for assumed valid target"
       }
     },
     "import-hardware": {
@@ -105,8 +106,8 @@
       "wallet": "Wallet:",
       "content": "Content:",
       "export": "Export Tx",
-      "sign-and-export": "Sign and export",
-      "sign-and-broadcast": "Sign and broadcast",
+      "sign-and-export": "Sign & export",
+      "sign-and-broadcast": "Sign & broadcast",
       "actions": {
         "broadcast": "Broadcast",
         "sign": "Sign and export",
@@ -137,7 +138,9 @@
         "pending": "Pending",
         "confirming": "Confirming"
       },
-      "copy-balance": "Copy Balance"
+      "copy-balance": "Copy Balance",
+      "create": "Create {{name}} Asset Account",
+      "destroy": "Destroy {{name}} Asset Account"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -209,7 +212,8 @@
       "scan-screen-qr-code": "Scan the QR Code on the screen",
       "set-locktime": "Set Locktime",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
-      "release-on": "Release on"
+      "release-on": "Release on",
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. In general, exchanges do not support expiration unlocking, please use with caution!"
     },
     "receive": {
       "title": "Receive",
@@ -262,7 +266,9 @@
       "view-detail-button-title": "View Detail",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
-      "copy-address": "Copy Address"
+      "copy-address": "Copy Address",
+      "create": "Create {{name}} Asset Account",
+      "destroy": "Destroy {{name}} Asset Account"
     },
     "transaction": {
       "window-title": "Transaction: {{hash}}",
@@ -276,7 +282,9 @@
       "amount": "Amount",
       "inputs": "Inputs",
       "outputs": "Outputs",
-      "cell-from-cellbase": "From cellbase"
+      "cell-from-cellbase": "From cellbase",
+      "lock-script": "Lock Script",
+      "deprecated-address-format": "Address in deprecated format"
     },
     "addresses": {
       "title": "Address Book",
@@ -391,6 +399,9 @@
       "send-acp": {
         "title": "Send CKB"
       },
+      "send-acp-to-default": {
+        "title": "Send CKB"
+      },
       "migrate-acp": {
         "title": "Upgrade Asset Accounts"
       },
@@ -406,9 +417,16 @@
       "create-account-to-claim-cheque": {
         "title": "Claim Cheque Asset with New Account"
       },
-      "destroy-ckb-account": {
-        "title": "Destroy CKB Asset Account"
-      }
+      "destroy-asset-account": {
+        "title": "Destroy Asset Account"
+      },
+      "send-from-multisig": {
+        "title": "Submit the transaction"
+      },
+      "send-from-multisig-need-one": {
+        "title": "Submit the transaction"
+      },
+      "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
     "qrcode": {
       "copy": "Copy image",
@@ -464,6 +482,7 @@
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
+      "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -523,6 +542,7 @@
         "307": "Please enter a testnet address",
         "308": "Amount is not enough",
         "309": "The receiver needs to upgrade her account address to accept more transfer.",
+        "310": "Please enter a {{tagName}} address",
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No device detected. Please connect your device.",
         "404": "Multiple device detected. Only one device of the same model can be connected.",
@@ -571,6 +591,7 @@
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
+      "balance-not-reserved": "(Not recommended) Don't reserve any CKBytes for future DAO operations",
       "deposit-record": {
         "deposited-at": "Deposited",
         "completed-at": "Completed",
@@ -621,25 +642,101 @@
       "quit-and-install": "Install and relaunch"
     },
     "datetime": {
-      "mon": { "full": "Monday", "short": "Mon.", "tag": "M" },
-      "tue": { "full": "Tuesday", "short": "Tue.", "tag": "Tu" },
-      "wed": { "full": "Wednesday", "short": "Wed.", "tag": "W" },
-      "thur": { "full": "Thursday", "short": "Thur.", "tag": "T" },
-      "fri": { "full": "Friday", "short": "Fri.", "tag": "F" },
-      "sat": { "full": "Saturday", "short": "Sat.", "tag": "Sa" },
-      "sun": { "full": "Sunday", "short": "Sun.", "tag": "Su" },
-      "jan": { "full": "January", "short": "Jan.", "tag": "J" },
-      "feb": { "full": "Febrary", "short": "Feb.", "tag": "F" },
-      "mar": { "full": "March", "short": "Mar.", "tag": "M" },
-      "apr": { "full": "April", "short": "Apr.", "tag": "A" },
-      "may": { "full": "May", "short": "May.", "tag": "M" },
-      "june": { "full": "June", "short": "June.", "tag": "J" },
-      "july": { "full": "July", "short": "July.", "tag": "J" },
-      "aug": { "full": "August", "short": "Aug.", "tag": "Aug" },
-      "sept": { "full": "September", "short": "Sept.", "tag": "S" },
-      "oct": { "full": "October", "short": "Oct.", "tag": "O" },
-      "nov": { "full": "November", "short": "Nov.", "tag": "N" },
-      "dec": { "full": "December", "short": "Dec.", "tag": "D" },
+      "mon": {
+        "full": "Monday",
+        "short": "Mon.",
+        "tag": "M"
+      },
+      "tue": {
+        "full": "Tuesday",
+        "short": "Tue.",
+        "tag": "Tu"
+      },
+      "wed": {
+        "full": "Wednesday",
+        "short": "Wed.",
+        "tag": "W"
+      },
+      "thur": {
+        "full": "Thursday",
+        "short": "Thur.",
+        "tag": "T"
+      },
+      "fri": {
+        "full": "Friday",
+        "short": "Fri.",
+        "tag": "F"
+      },
+      "sat": {
+        "full": "Saturday",
+        "short": "Sat.",
+        "tag": "Sa"
+      },
+      "sun": {
+        "full": "Sunday",
+        "short": "Sun.",
+        "tag": "Su"
+      },
+      "jan": {
+        "full": "January",
+        "short": "Jan.",
+        "tag": "J"
+      },
+      "feb": {
+        "full": "Febrary",
+        "short": "Feb.",
+        "tag": "F"
+      },
+      "mar": {
+        "full": "March",
+        "short": "Mar.",
+        "tag": "M"
+      },
+      "apr": {
+        "full": "April",
+        "short": "Apr.",
+        "tag": "A"
+      },
+      "may": {
+        "full": "May",
+        "short": "May.",
+        "tag": "M"
+      },
+      "june": {
+        "full": "June",
+        "short": "June.",
+        "tag": "J"
+      },
+      "july": {
+        "full": "July",
+        "short": "July.",
+        "tag": "J"
+      },
+      "aug": {
+        "full": "August",
+        "short": "Aug.",
+        "tag": "Aug"
+      },
+      "sept": {
+        "full": "September",
+        "short": "Sept.",
+        "tag": "S"
+      },
+      "oct": {
+        "full": "October",
+        "short": "Oct.",
+        "tag": "O"
+      },
+      "nov": {
+        "full": "November",
+        "short": "Nov.",
+        "tag": "N"
+      },
+      "dec": {
+        "full": "December",
+        "short": "Dec.",
+        "tag": "D"
+      },
       "timezone": "Time Zone",
       "start-tomorrow": "Selected time should start from tomorrow."
     },
@@ -656,7 +753,10 @@
       "confirm": "Confirm",
       "verification-success": "Verification Succeeded",
       "verification-failure": "Verification Failed",
-      "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete."
+      "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
+      "sign-with-magic-byte": "Message will be signed with magic bytes 'Nervos Message:'",
+      "verify-tip": "Could be verified by Neuron from v0.33.1",
+      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1"
     },
     "special-assets": {
       "title": "Customized Assets",
@@ -669,6 +769,7 @@
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
       "withdraw-asset-tooltip": "Estimate release time is {{year}}-{{month}}-{{day}} {{hour}}:{{minute}}(according to the actual running block height).",
+      "user-defined-token-tooltip": "Migrate sUDT asset to a sUDT Asset Account",
       "claim-asset": "Claim",
       "withdraw-asset": "Withdraw",
       "view-details": "View Details",
@@ -676,7 +777,26 @@
       "no-special-assets": "No customized assets",
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
-      "transfer-nft": "Send"
+      "transfer-nft": "Send",
+      "user-defined-token": "Migrate"
+    },
+    "migrate-sudt": {
+      "title": "Migrate to a sUDT Asset Account",
+      "turn-into-new-account": {
+        "title": "Turn into a new sUDT Asset Account",
+        "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      },
+      "transfer-to-exist-account": {
+        "title": "Transfer to a sUDT Asset Account",
+        "sub-title": "Transfer all sUDT balance to an existing sUDT Account, please make sure the target account is alive"
+      },
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "balance": "Balance",
+      "amount": "Amount",
+      "address": "Address"
     },
     "customized-asset": {
       "actions": {
@@ -699,6 +819,7 @@
         "create-asset-account": "Create Asset Account",
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
+        "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
         "ckb-account": "CKB Account",
         "set-token-info": "Set Token Info",
         "token-id": "Token ID",
@@ -724,7 +845,8 @@
         "click-to-edit": "Click to edit",
         "cheque-address-hint": "162 CKBytes capacity is going to be temporarily locked to initialize the token transfer, and it will be automatically unlocked after the token being claimed by the receiver.",
         "destroy": "Destroy",
-        "destroy-desc": "Will returns all CKB of this CKB Asset account to your change address."
+        "destroy-ckb-desc": "Will return all CKB of this CKB Asset account to your change address.",
+        "destroy-sudt-desc": "Will return the asset account occupied CKB to your change address."
       },
       "receive": {
         "notation": "Accept {{symbol}} only"
@@ -738,6 +860,93 @@
         "decimal": "Decimal",
         "confirm": "Confirm",
         "cancel": "Cancel"
+      }
+    },
+    "multisig-address": {
+      "window-title": "Multisig Addresses",
+      "search": {
+        "placeholder": "search by multisig address,alias"
+      },
+      "add": {
+        "label": "Add"
+      },
+      "import": {
+        "label": "Import"
+      },
+      "export": {
+        "label": "Export"
+      },
+      "ok": "OK",
+      "no-data": "No multisig address",
+      "table": {
+        "address": "address",
+        "alias": "alias",
+        "type": "type",
+        "balance": "balance",
+        "copy-address": "Copy Address",
+        "actions": {
+          "info": "Info",
+          "send": "Send",
+          "approve": "Approve",
+          "delete": "Delete"
+        }
+      },
+      "import-dialog": {
+        "actions": {
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        },
+        "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
+      },
+      "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
+      "send-ckb": {
+        "title": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
+        "balance": "Balance",
+        "address": "Address",
+        "amount": "Amount",
+        "send": "Send",
+        "cancel": "Cancel",
+        "export": "Export Tx"
+      },
+      "create-dialog": {
+        "title": "Create multisig address",
+        "index": "index",
+        "required": "required",
+        "signer-address": "signer address",
+        "copy-address": "Copy Address",
+        "m-n": {
+          "title": "Please choose the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
+          "error": "for m-of-n multisig address, m shouldn't be greater than n"
+        },
+        "multi-address-info": {
+          "title": "Please input the signers for the {{m}}-of-{{n}} multisig address",
+          "view-title": "The {{m}}-of-{{n}} multisig address is",
+          "ckb-address-placeholder": "ckb address"
+        },
+        "multi-list": "Signer list",
+        "actions": {
+          "cancel": "Cancel",
+          "back": "Back",
+          "next": "Next",
+          "confirm": "Confirm"
+        },
+        "duplicate-address-forbid": "Address can't be duplicated"
+      },
+      "approve-dialog": {
+        "title": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
+        "transaction": "Transaction",
+        "cancel": "Cancel",
+        "signAndExport": "Sign & Export",
+        "export": "Export Tx",
+        "signAndBroadcast": "Sign & Broadcast",
+        "broadcast": "Broadcast",
+        "content": "Content:",
+        "status": "Status",
+        "signerApprove": "Lack of {{m}} signer approval(s), including {{r}} from specified signer(s)",
+        "noRSignerApprove": "Lack of {{m}} signer approval(s)",
+        "signed": "Signed",
+        "view-concise-data": "View concise data",
+        "view-raw-data": "View raw data"
       }
     }
   }

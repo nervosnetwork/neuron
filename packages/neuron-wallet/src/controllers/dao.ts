@@ -17,12 +17,16 @@ export default class DaoController {
 
     return {
       status: ResponseCode.Success,
-      result: cells,
+      result: cells
     }
   }
 
-  public async generateDepositTx(params: { walletID: string, capacity: string, fee: string, feeRate: string }):
-    Promise<Controller.Response<Transaction>> {
+  public async generateDepositTx(params: {
+    walletID: string
+    capacity: string
+    fee: string
+    feeRate: string
+  }): Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -31,33 +35,42 @@ export default class DaoController {
       params.walletID,
       params.capacity,
       params.fee,
-      params.feeRate,
+      params.feeRate
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 
-  public async generateDepositAllTx(params: { walletID: string, fee: string, feeRate: string }):
-    Promise<Controller.Response<Transaction>> {
+  public async generateDepositAllTx(params: {
+    walletID: string
+    isBalanceReserved: boolean
+    fee: string
+    feeRate: string
+  }): Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
     const tx = await new TransactionSender().generateDepositAllTx(
       params.walletID,
+      params.isBalanceReserved,
       params.fee,
-      params.feeRate,
+      params.feeRate
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 
-  public async startWithdrawFromDao(params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }):
-    Promise<Controller.Response<Transaction>> {
+  public async startWithdrawFromDao(params: {
+    walletID: string
+    outPoint: OutPoint
+    fee: string
+    feeRate: string
+  }): Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -66,19 +79,20 @@ export default class DaoController {
       params.walletID,
       new OutPoint(params.outPoint.txHash, params.outPoint.index),
       params.fee,
-      params.feeRate,
+      params.feeRate
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 
   public async withdrawFromDao(params: {
-    walletID: string,
-    depositOutPoint: OutPoint,
-    withdrawingOutPoint: OutPoint,
-    fee: string, feeRate: string
+    walletID: string
+    depositOutPoint: OutPoint
+    withdrawingOutPoint: OutPoint
+    fee: string
+    feeRate: string
   }): Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -89,11 +103,11 @@ export default class DaoController {
       new OutPoint(params.depositOutPoint.txHash, params.depositOutPoint.index),
       new OutPoint(params.withdrawingOutPoint.txHash, params.withdrawingOutPoint.index),
       params.fee,
-      params.feeRate,
+      params.feeRate
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx
     }
   }
 }

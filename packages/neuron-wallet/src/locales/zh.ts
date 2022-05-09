@@ -3,14 +3,14 @@ export default {
     keywords: {
       wallet: '钱包',
       password: '密码',
-      'wallet-name': '钱包名称',
+      'wallet-name': '钱包名称'
     },
     'application-menu': {
       neuron: {
         about: '关于{{app}}',
         preferences: '偏好设置...',
         'check-updates': '检查更新...',
-        quit: '退出{{app}}',
+        quit: '退出{{app}}'
       },
       wallet: {
         label: '钱包',
@@ -24,25 +24,26 @@ export default {
         'import-mnemonic': '导入助记词',
         'import-keystore': '导入 Keystore 文件',
         'import-xpubkey': '导入 Extended Public Key',
-        'import-hardware': '导入硬件钱包',
+        'import-hardware': '导入硬件钱包'
       },
       edit: {
         label: '编辑',
         cut: '剪切',
         copy: '复制',
         paste: '粘贴',
-        selectall: '全部选中',
+        selectall: '全部选中'
       },
       tools: {
-        label: "工具",
-        "sign-and-verify": "签名/验签信息",
+        label: '工具',
+        'sign-and-verify': '签名/验签信息',
+        'multisig-address': '多签地址',
         'offline-sign': '离线签名',
-        "clear-sync-data": "清除所有同步数据",
+        'clear-sync-data': '清除所有同步数据'
       },
       window: {
         label: '窗口',
         minimize: '最小化',
-        close: '关闭窗口',
+        close: '关闭窗口'
       },
       help: {
         label: '帮助',
@@ -51,18 +52,18 @@ export default {
         'report-issue': '报告问题',
         documentation: '使用文档',
         settings: '设置',
-        'export-debug-info': '导出调试信息',
+        'export-debug-info': '导出调试信息'
       },
       develop: {
         develop: '开发',
         'force-reload': '强制刷新',
         reload: '刷新',
-        'toggle-dev-tools': '开发者工具',
-      },
+        'toggle-dev-tools': '开发者工具'
+      }
     },
     services: {
       transactions: '交易',
-      wallets: '钱包',
+      wallets: '钱包'
     },
     messages: {
       'failed-to-load-networks': '加载节点失败。',
@@ -92,8 +93,9 @@ export default {
       'invalid-mnemonic': '助记词不合法，请检查。',
       'unsupported-cipher': '不支持的 Cipher。',
       'capacity-not-enough': '余额不足。',
-      'capacity-not-enough-for-change': "您需要有足够的余额来支付找零（大于 61 CKBytes）。",
-      'capacity-not-enough-for-change-by-transfer': "您需要有足够的余额来支付找零（大于 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
+      'capacity-not-enough-for-change': '您需要有足够的余额来支付找零（大于 61 CKBytes）。',
+      'capacity-not-enough-for-change-by-transfer':
+        "您需要有足够的余额来支付找零（大于 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
       'live-capacity-not-enough': '可用余额不足，请等待上一笔交易上链。',
       'capacity-too-small': '最小转账金额为 {{bytes}} CKBytes。',
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型。',
@@ -104,20 +106,31 @@ export default {
       'mainnet-address-required': '{{address}} 不是主网地址。',
       'testnet-address-required': '{{address}} 不是测试网地址。',
       'address-not-found': '当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。',
-      'target-output-not-found': "无法找到与指定地址关联的账户钱包。",
-      'acp-same-account': "请设置与转出账户不同的收款账户。",
-      "device-sign-canceled": "您取消了签名。否则，请确保设备上 Nervos app 设置开启了 “allow contract data”。",
-      "connect-device-failed": "设备无法连接，请检查设备连接状况。",
-      "save-offline-json-failed": "无法保存 JSON 文件。",
-      "offline-sign-failed": "签名失败，请检查是否使用了正确的钱包进行签名。",
+      'target-output-not-found': '无法找到与指定地址关联的账户钱包。',
+      'acp-same-account': '请设置与转出账户不同的收款账户。',
+      'device-sign-canceled': '您取消了签名。否则，请确保设备上 Nervos app 设置开启了 “allow contract data”。',
+      'connect-device-failed': '设备无法连接，请检查设备连接状况。',
+      'save-offline-json-failed': '无法保存 JSON 文件。',
+      'offline-sign-failed': '签名失败，请检查是否使用了正确的钱包进行签名。',
+      'multisig-script-prefix-error': '多签配置错误',
+      'multisig-config-not-exist': '多签配置不存在',
+      'multisig-config-exist': '多签地址已经存在',
+      'multisig-config-address-error': '多签配置的地址设置不正确',
+      'multisig-config-need-error': '多签交易生成需要多签配置',
+      'transaction-no-input-paramter': '查询 Input Cell 缺少必要的参数',
+      'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script',
+      'multisig-lock-hash-mismatch': '当前多签地址与需要确认交易不匹配',
+      'multisig-not-signed': '多签交易缺少部分签名',
+      'sudt-acp-have-data': '待销毁的 sUDT 账户资产不为 0',
+      'no-match-address-for-sign': '没有找到匹配的地址'
     },
     messageBox: {
       button: {
         confirm: '确定',
-        discard: '放弃',
+        discard: '放弃'
       },
       'send-capacity': {
-        title: '发送交易',
+        title: '发送交易'
       },
       'clear-sync-data': {
         title: '清除同步数据',
@@ -126,26 +139,30 @@ export default {
       'remove-network': {
         title: '删除网络',
         message: '将删除网络 {{name}}(地址: {{address}})的设置.',
-        alert: '这是当前连接网络, 删除后会连接到默认网络',
+        alert: '这是当前连接网络, 删除后会连接到默认网络'
       },
       'remove-wallet': {
         title: '删除钱包',
-        password: '密码',
+        password: '密码'
       },
       'backup-keystore': {
         title: '备份 Keystore 文件',
-        password: '密码',
+        password: '密码'
       },
       transaction: {
-        title: '交易: {{hash}}',
+        title: '交易: {{hash}}'
       },
       'sign-and-verify': {
         title: '签名/验签信息'
       },
+      'multisig-address': {
+        title: '多签地址'
+      },
       'ckb-dependency': {
         title: '内置 CKB 节点',
         message: '缺少必要的依赖',
-        detail: 'Neuron 内置的 CKB 节点需要安装 x64 版本的 Microsoft Visual C++ Redistributable 才能正常运行。您需要安装该组件来启用内置节点。',
+        detail:
+          'Neuron 内置的 CKB 节点需要安装 x64 版本的 Microsoft Visual C++ Redistributable 才能正常运行。您需要安装该组件来启用内置节点。',
         buttons: {
           'install-and-exit': '安装并退出'
         }
@@ -153,7 +170,8 @@ export default {
       'acp-migration': {
         title: '升级资产账户',
         message: '升级资产账户',
-        detail: '我们的安全团队在近期在实验性的资产账户脚本中定位了一个潜在的安全性问题。我们已经部署了新的资产账户脚本来替换旧脚本，未来的资产账户也会采纳新的脚本。建议您立即升级以使用新的账户脚本。',
+        detail:
+          '我们的安全团队在近期在实验性的资产账户脚本中定位了一个潜在的安全性问题。我们已经部署了新的资产账户脚本来替换旧脚本，未来的资产账户也会采纳新的脚本。建议您立即升级以使用新的账户脚本。',
         buttons: {
           migrate: '安全升级',
           skip: '已知风险，稍后升级'
@@ -167,23 +185,24 @@ export default {
         }
       },
       'hard-fork-migrate': {
-        message: '为适配最新版本的 CKB 节点，Neuron 将会重新同步链上数据，整个同步可能时间较长',
+        message: '为适配最新版本的 CKB 节点，Neuron 将会重新同步链上数据，整个同步可能时间较长'
       }
     },
     prompt: {
       password: {
         label: '请输入密码',
         submit: '提交',
-        cancel: '取消',
-      },
+        cancel: '取消'
+      }
     },
     updater: {
-      'update-not-available': '没有可供升级的新版本。',
+      'update-not-available': '没有可供升级的新版本。'
     },
     common: {
       yes: '是',
       no: '否',
       ok: '确定',
+      cancel: '取消',
       error: '错误'
     },
     'export-debug-info': {
@@ -191,8 +210,8 @@ export default {
       'debug-info-exported': '调试信息已被导出至 {{ file }}'
     },
     about: {
-      "app-version": "{{name}} 版本: {{version}}",
-      "ckb-client-version": "CKB 节点版本: {{version}}"
+      'app-version': '{{name}} 版本: {{version}}',
+      'ckb-client-version': 'CKB 节点版本: {{version}}'
     },
     settings: {
       title: {
@@ -204,23 +223,43 @@ export default {
       'export-transactions': '导出交易历史',
       'transactions-exported': '{{total}} 条交易记录已被导出至 {{file}}',
       column: {
-        "time": "时间",
-        "block-number": "区块高度",
-        "tx-hash": "交易哈希",
-        "tx-type": "交易类型",
-        "amount": "CKB 金额",
-        "udt-amount": "UDT 金额",
-        "description": "备注"
+        time: '时间',
+        'block-number': '区块高度',
+        'tx-hash': '交易哈希',
+        'tx-type': '交易类型',
+        amount: 'CKB 金额',
+        'udt-amount': 'UDT 金额',
+        description: '备注'
       },
-      "tx-type": {
-        "send": "转账",
-        "receive": "收款"
+      'tx-type': {
+        send: '转账',
+        receive: '收款',
+        'create-asset-account': '创建 {{name}} 资产账户',
+        'destroy-asset-account': '销毁 {{name}} 资产账户'
       }
     },
     'offline-signature': {
       'export-transaction': '导出交易为 JSON 文件',
       'transaction-exported': '交易已被导出至 {{filePath}}.',
-      'load-transaction': '加载交易文件',
+      'load-transaction': '加载交易文件'
+    },
+    'multisig-config': {
+      'import-config': '导入多签配置',
+      'export-config': '导出多签配置',
+      'config-exported': '多签配置已被导出至 {{filePath}}.',
+      'import-duplicate': '请检查是否存在重复配置',
+      'import-result': '导入成功 {{success}} 个，失败 {{fail}} 个。{{failCheck}}',
+      'confirm-delete': '确认删除该多签地址吗？',
+      'approve-tx': '确认多签交易',
+      'delete-actions': {
+        ok: '确认',
+        cancel: '取消'
+      }
+    },
+    'open-in-explorer': {
+      title: '在 CKB 浏览器中查看',
+      transaction: '交易',
+      message: '在 CKB 浏览器中查看 {{type}} {{key}}'
     }
-  },
+  }
 }

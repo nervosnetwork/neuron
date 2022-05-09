@@ -10,10 +10,19 @@ import AssetAccountController from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
 import NodeService from 'services/node'
-import { OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
+import { MultisigNotSignedNeedError, OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
+import MultisigConfigModel from 'models/multisig-config'
+import { getMultisigStatus } from 'utils/multisig'
 
 export default class OfflineSignController {
-  public async exportTransactionAsJSON ({ transaction, type, status, asset_account, description, context }: OfflineSignJSON) {
+  public async exportTransactionAsJSON({
+    transaction,
+    type,
+    status,
+    asset_account,
+    description,
+    context
+  }: OfflineSignJSON) {
     const { canceled, filePath } = await dialog.showSaveDialog({
       title: t('offline-signature.export-transaction'),
       defaultPath: `transaction_${Date.now()}.json`
@@ -59,24 +68,45 @@ export default class OfflineSignController {
     }
   }
 
-  public async signTransaction (params: OfflineSignJSON & { walletID: string, password: string }) {
+  public async signTransaction(
+    params: OfflineSignJSON & {
+      walletID: string
+      password: string
+      multisigConfig?: MultisigConfigModel
+    }
+  ) {
     const { transaction, type, walletID, password, context } = params
 
     try {
-      const tx = await new TransactionSender().sign(
-        walletID,
-        Transaction.fromObject(transaction),
-        password,
-        type === SignType.SendSUDT ? 1 : 0,
-        context
-      )
+      let tx: Transaction
+      if (params.multisigConfig) {
+        tx = await new TransactionSender().signMultisig(
+          walletID,
+          Transaction.fromObject(transaction),
+          password,
+          [params.multisigConfig],
+          context
+        )
+      } else {
+        tx = await new TransactionSender().sign(
+          walletID,
+          Transaction.fromObject(transaction),
+          password,
+          type === SignType.SendSUDT,
+          context
+        )
+      }
 
       const signer = OfflineSign.fromJSON({
         ...params,
         transaction: tx
       })
 
-      signer.setStatus(SignStatus.Signed)
+      let signStatus = SignStatus.Signed
+      if (params.multisigConfig) {
+        signStatus = getMultisigStatus(params.multisigConfig, params.transaction.signatures)
+      }
+      signer.setStatus(signStatus)
 
       return {
         status: ResponseCode.Success,
@@ -90,7 +120,9 @@ export default class OfflineSignController {
     }
   }
 
-  public async signAndExportTransaction (params: OfflineSignJSON & { walletID: string, password: string }) {
+  public async signAndExportTransaction(
+    params: OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigConfigModel }
+  ) {
     const res = await this.signTransaction(params)
 
     const signer = OfflineSign.fromJSON({
@@ -101,7 +133,21 @@ export default class OfflineSignController {
     return await this.exportTransactionAsJSON(signer.toJSON())
   }
 
-  public async broadcastTransaction ({
+  public async signAndBroadcastTransaction(
+    params: OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigConfigModel }
+  ) {
+    const res = await this.signTransaction(params)
+    if (res.result.status !== SignStatus.Signed) {
+      throw new MultisigNotSignedNeedError()
+    }
+
+    return await this.broadcastTransaction({
+      ...res.result,
+      walletID: params.walletID
+    })
+  }
+
+  public async broadcastTransaction({
     transaction,
     type,
     asset_account: assetAccount,
@@ -111,27 +157,36 @@ export default class OfflineSignController {
     const tx = Transaction.fromObject(transaction)
     switch (type) {
       case SignType.CreateSUDTAccount: {
-        return new AssetAccountController().sendCreateTx({
-          walletID,
-          assetAccount: assetAccount!,
-          tx,
-          password: '',
-        }, true)
+        return new AssetAccountController().sendCreateTx(
+          {
+            walletID,
+            assetAccount: assetAccount!,
+            tx,
+            password: ''
+          },
+          true
+        )
       }
       case SignType.SendSUDT: {
-        return new AnyoneCanPayController().sendTx({
-          walletID,
-          tx,
-          password: ''
-        }, true)
+        return new AnyoneCanPayController().sendTx(
+          {
+            walletID,
+            tx,
+            password: ''
+          },
+          true
+        )
       }
       default: {
-        return new WalletsController().sendTx({
-          walletID,
-          tx,
-          password: '',
-          description
-        }, true)
+        return new WalletsController().sendTx(
+          {
+            walletID,
+            tx,
+            password: '',
+            description
+          },
+          true
+        )
       }
     }
   }

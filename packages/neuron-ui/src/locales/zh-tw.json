@@ -25,7 +25,8 @@
     },
     "network-status": {
       "tooltip": {
-        "block-synced": "已同步區塊"
+        "block-synced": "已同步區塊",
+        "looking-valid-target": "尋找預設可信區塊"
       }
     },
     "import-hardware": {
@@ -130,7 +131,9 @@
         "pending": "已提交",
         "confirming": "確認中"
       },
-      "copy-balance": "複製餘額"
+      "copy-balance": "複製餘額",
+      "create": "創建 {{name}} 資產賬戶",
+      "destroy": "銷毀 {{name}} 資產賬戶"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -202,7 +205,8 @@
       "scan-screen-qr-code": "掃描螢幕上的二維碼",
       "set-locktime": "設置鎖定時間",
       "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
-      "release-on": "鎖定至"
+      "release-on": "鎖定至",
+      "locktime-warning": "請確保對方錢包能夠支持到期解鎖功能。一般情況下，交易所不支持到期解鎖功能，請謹慎使用！"
     },
     "receive": {
       "title": "收款",
@@ -255,7 +259,9 @@
       "view-detail-button-title": "查看詳情",
       "copy-tx-hash": "複製交易哈希",
       "copy-balance": "複製餘額",
-      "copy-address": "複製地址"
+      "copy-address": "複製地址",
+      "create": "創建 {{name}} 資產賬戶",
+      "destroy": "銷毀 {{name}} 資產賬戶"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
@@ -269,7 +275,9 @@
       "amount": "數量",
       "inputs": "輸入",
       "outputs": "輸出",
-      "cell-from-cellbase": "來自 Cellbase"
+      "cell-from-cellbase": "來自 Cellbase",
+      "lock-script": "鎖腳本",
+      "deprecated-address-format": "廢棄格式地址"
     },
     "addresses": {
       "title": "地址簿",
@@ -384,6 +392,9 @@
       "send-acp": {
         "title": "發起 CKB 交易"
       },
+      "send-acp-to-default": {
+        "title": "發起 CKB 交易"
+      },
       "migrate-acp": {
         "title": "升級資產賬戶"
       },
@@ -399,9 +410,16 @@
       "create-account-to-claim-cheque": {
         "title": "創建賬戶並領取 Cheque 資產"
       },
-      "destroy-ckb-account": {
-        "title": "銷毀 CKB 資產賬戶"
-      }
+      "destroy-asset-account": {
+        "title": "銷毀資產賬戶"
+      },
+      "send-from-multisig": {
+        "title": "發起交易"
+      },
+      "send-from-multisig-need-one": {
+        "title": "發起交易"
+      },
+      "xpub-notice": "對於觀察錢包，只支持導出交易"
     },
     "qrcode": {
       "copy": "複製圖片",
@@ -457,6 +475,7 @@
       "experimental-message-hardware": "本功能為實驗性功能，請註意風險，謹慎使用。",
       "experimental-message": "本頁面為實驗性功能，可能隨時變更。請謹慎使用。",
       "rebuild-sync": "為了提供更好的用戶體驗，Neuron 採取了新的索引方案，該方案需要一次性重構緩存數據庫(預期同步時間為 30~60 分鐘)。\n抱歉給您帶來不便。",
+      "secp256k1/blake160-address-required": "請輸入 secp256k1/blake160 地址",
       "fields": {
         "wallet": "錢包",
         "name": "名稱",
@@ -498,7 +517,7 @@
         "115": "您需要有足夠的餘額來支付找零(大于 61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
-        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太長，其長度應不超過 {{length}}。",
+        "203": "$t(messages.fields.{{fieldName}})太長，其長度應不超過 {{length}}。",
         "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短，其長度應不小於 {{length}}。",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效。",
         "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其小數位應不超過 {{length}}比特。",
@@ -516,6 +535,7 @@
         "307": "請輸入測試網地址",
         "308": "餘額不足",
         "309": "收款人需要升級資產賬戶才能繼續接收轉賬。",
+        "310": "請輸入 {{tagName}} 地址",
         "402": "CKB 應用未打開。請在妳的設備打開 CKB 應用。",
         "403": "未檢測到設備，請檢查妳的設備連接。",
         "404": "檢測到多個設備，同一型號的設備只能同時連接一個。",
@@ -564,6 +584,7 @@
       "minimal-fee-required": "存入數量應不少於 {{minimal}} CKBytes",
       "compensation-accumulated": "已累計 {{blockNumber}} 個塊的鎖定補貼",
       "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
+      "balance-not-reserved": "（不建議）不預留未來操作手續費",
       "deposit-record": {
         "deposited-at": "存入於",
         "completed-at": "已取出",
@@ -614,25 +635,101 @@
       "quit-and-install": "安裝並重啓應用"
     },
     "datetime": {
-      "mon": { "full": "周一", "short": "周一", "tag": "周一" },
-      "tue": { "full": "周二", "short": "周二", "tag": "周二" },
-      "wed": { "full": "周三", "short": "周三", "tag": "周三" },
-      "thur": { "full": "周四", "short": "周四", "tag": "周四" },
-      "fri": { "full": "周五", "short": "周五", "tag": "周五" },
-      "sat": { "full": "周六", "short": "周六", "tag": "周六" },
-      "sun": { "full": "周日", "short": "周日", "tag": "周日" },
-      "jan": { "full": "一月", "short": "一月", "tag": "一月" },
-      "feb": { "full": "二月", "short": "二月", "tag": "二月" },
-      "mar": { "full": "三月", "short": "三月", "tag": "三月" },
-      "apr": { "full": "四月", "short": "四月", "tag": "四月" },
-      "may": { "full": "五月", "short": "五月", "tag": "五月" },
-      "june": { "full": "六月", "short": "六月", "tag": "六月" },
-      "july": { "full": "七月", "short": "七月", "tag": "七月" },
-      "aug": { "full": "八月", "short": "八月", "tag": "八月" },
-      "sept": { "full": "九月", "short": "九月", "tag": "九月" },
-      "oct": { "full": "十月", "short": "十月", "tag": "十月" },
-      "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
-      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" },
+      "mon": {
+        "full": "周一",
+        "short": "周一",
+        "tag": "周一"
+      },
+      "tue": {
+        "full": "周二",
+        "short": "周二",
+        "tag": "周二"
+      },
+      "wed": {
+        "full": "周三",
+        "short": "周三",
+        "tag": "周三"
+      },
+      "thur": {
+        "full": "周四",
+        "short": "周四",
+        "tag": "周四"
+      },
+      "fri": {
+        "full": "周五",
+        "short": "周五",
+        "tag": "周五"
+      },
+      "sat": {
+        "full": "周六",
+        "short": "周六",
+        "tag": "周六"
+      },
+      "sun": {
+        "full": "周日",
+        "short": "周日",
+        "tag": "周日"
+      },
+      "jan": {
+        "full": "一月",
+        "short": "一月",
+        "tag": "一月"
+      },
+      "feb": {
+        "full": "二月",
+        "short": "二月",
+        "tag": "二月"
+      },
+      "mar": {
+        "full": "三月",
+        "short": "三月",
+        "tag": "三月"
+      },
+      "apr": {
+        "full": "四月",
+        "short": "四月",
+        "tag": "四月"
+      },
+      "may": {
+        "full": "五月",
+        "short": "五月",
+        "tag": "五月"
+      },
+      "june": {
+        "full": "六月",
+        "short": "六月",
+        "tag": "六月"
+      },
+      "july": {
+        "full": "七月",
+        "short": "七月",
+        "tag": "七月"
+      },
+      "aug": {
+        "full": "八月",
+        "short": "八月",
+        "tag": "八月"
+      },
+      "sept": {
+        "full": "九月",
+        "short": "九月",
+        "tag": "九月"
+      },
+      "oct": {
+        "full": "十月",
+        "short": "十月",
+        "tag": "十月"
+      },
+      "nov": {
+        "full": "十一月",
+        "short": "十一月",
+        "tag": "十一月"
+      },
+      "dec": {
+        "full": "十二月",
+        "short": "十二月",
+        "tag": "十二月"
+      },
       "timezone": "時區",
       "start-tomorrow": "所選時間不能早於明天。"
     },
@@ -649,7 +746,10 @@
       "confirm": "確認",
       "verification-success": "驗證成功",
       "verification-failure": "驗證失敗",
-      "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。"
+      "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。",
+      "sign-with-magic-byte": "信息會和 magic bytes 'Nervos Message:' 一起簽名",
+      "verify-tip": "可以通過 v0.33.1 及以後的 Neuron 進行驗證",
+      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本簽名"
     },
     "special-assets": {
       "title": "自定義資產",
@@ -662,6 +762,7 @@
       "locked-asset": "已鎖定",
       "locked-asset-tooltip": "鎖定參數為 {{epochs}} epochs, 預計解鎖時間為 {{year}}年{{month}}月{{day}}日(鎖定時間根據區塊鏈實際運行情況會有一定的誤差)。",
       "withdraw-asset-tooltip": "預計解鎖時間為 {{year}}年{{month}}月{{day}}日 {{hour}}時{{minute}}分(根據區塊鏈實際運行情況會有一定的誤差)。",
+      "user-defined-token-tooltip": "將 sUDT 資產轉移到 sUDT 賬戶",
       "claim-asset": "領取",
       "withdraw-asset": "撤回",
       "view-details": "查看詳情",
@@ -669,7 +770,26 @@
       "no-special-assets": "沒有自定義資產",
       "experimental": "實驗室",
       "unknown-asset": "未知資產",
-      "transfer-nft": "轉讓"
+      "transfer-nft": "轉讓",
+      "user-defined-token": "遷移"
+    },
+    "migrate-sudt": {
+      "title": "遷移至 sUDT 資產賬戶",
+      "turn-into-new-account": {
+        "title": "轉換成新的 sUDT 資產賬戶",
+        "sub-title": "將 sUDT 資產轉換成 sUDT 資產賬戶, 至少占用 142 CKBytes",
+        "cancel": "取消",
+        "confirm": "確認"
+      },
+      "transfer-to-exist-account": {
+        "title": "轉入 sUDT 賬戶",
+        "sub-title": "將全部 sUDT 余額轉入已存在的 sUDT 資產賬戶, 請確保目標賬戶存在"
+      },
+      "cancel": "取消",
+      "confirm": "確認",
+      "balance": "余額",
+      "amount": "數量",
+      "address": "地址"
     },
     "customized-asset": {
       "actions": {
@@ -717,7 +837,8 @@
         "click-to-edit": "點擊編輯",
         "cheque-address-hint": "向該地址轉賬需要臨時鎖定 162 CKB，對方領取後自動解鎖。",
         "destroy": "銷毀",
-        "destroy-desc": "將會返還所有該 CKB 資產賬戶的 CKB 到你的找零地址中"
+        "destroy-ckb-desc": "將會返還所有該 CKB 資產賬戶的 CKB 到你的找零地址中",
+        "destroy-sudt-desc": "將會返還該資產賬戶所占用的 CKB 到你的找零地址中"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 轉賬"
@@ -731,6 +852,93 @@
         "decimal": "小數位",
         "confirm": "確認",
         "cancel": "取消"
+      }
+    },
+    "multisig-address": {
+      "window-title": "多簽地址",
+      "search": {
+        "placeholder": "使用地址或者别名搜索"
+      },
+      "add": {
+        "label": "添加"
+      },
+      "import": {
+        "label": "導入"
+      },
+      "export": {
+        "label": "導出"
+      },
+      "ok": "好的",
+      "no-data": "沒有多簽地址",
+      "table": {
+        "address": "地址",
+        "alias": "别名",
+        "type": "類型",
+        "balance": "余额",
+        "copy-address": "復製地址",
+        "actions": {
+          "info": "詳情",
+          "send": "轉賬",
+          "approve": "確認",
+          "delete": "删除"
+        }
+      },
+      "import-dialog": {
+        "actions": {
+          "cancel": "取消",
+          "confirm": "確認"
+        },
+        "notice": "導入配置一次只能導入一個，如果是文件內容是數組默認取第一個導入"
+      },
+      "delete-failed": "刪除多簽配置失敗，失敗原因：{{reason}}",
+      "send-ckb": {
+        "title": "從 {{m}}-of-{{n}} 多簽地址 <0></0> 轉賬",
+        "balance": "余額",
+        "address": "地址",
+        "amount": "金額",
+        "send": "發送",
+        "cancel": "取消",
+        "export": "導出交易"
+      },
+      "create-dialog": {
+        "title": "創建多重簽名地址",
+        "index": "序號",
+        "required": "必選",
+        "signer-address": "簽名者地址",
+        "copy-address": "復製地址",
+        "m-n": {
+          "title": "請選擇 m-of-n 類型的多重簽名地址配置，從 n 個密鑰中通過 m 個確認來轉移資產。",
+          "error": "對於 m-of-n 多重簽名地址，m 不應大於 n"
+        },
+        "multi-address-info": {
+          "title": "對於 {{m}}-of-{{n}}, 請輸入 {{n}} 個簽名者地址",
+          "view-title": " {{m}}-of-{{n}} 的多簽地址是",
+          "ckb-address-placeholder": "ckb address"
+        },
+        "multi-list": "多簽地址列表",
+        "actions": {
+          "cancel": "取消",
+          "back": "上一步",
+          "next": "下一步",
+          "confirm": "確認"
+        },
+        "duplicate-address-forbid": "地址不能重復"
+      },
+      "approve-dialog": {
+        "title": "從{{m}}-of-{{n}}多簽地址<0></0>確認交易",
+        "transaction": "交易",
+        "cancel": "取消",
+        "signAndExport": "簽名並導出",
+        "export": "導出交易",
+        "signAndBroadcast": "簽名並廣播",
+        "broadcast": "廣播交易",
+        "content": "內容：",
+        "status": "狀態",
+        "signerApprove": "缺少 {{m}} 個簽名者同意, 其中包括 {{r}} 個指定簽名者",
+        "noRSignerApprove": "缺少 {{m}} 個簽名者同意",
+        "signed": "已簽名",
+        "view-concise-data": "查看概要",
+        "view-raw-data": "查看原始數據"
       }
     }
   }

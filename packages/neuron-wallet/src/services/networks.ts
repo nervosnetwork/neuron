@@ -9,7 +9,7 @@ import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
 import CommonUtils from 'utils/common'
 
-const presetNetworks: { selected: string, networks: Network[] } = {
+const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',
   networks: [
     {
@@ -18,14 +18,14 @@ const presetNetworks: { selected: string, networks: Network[] } = {
       remote: 'http://localhost:8114',
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
-      chain: 'ckb',
+      chain: 'ckb'
     }
   ]
 }
 
 enum NetworksKey {
   List = 'networks',
-  Current = 'selected',
+  Current = 'selected'
 }
 
 export default class NetworksService extends Store {
@@ -84,8 +84,9 @@ export default class NetworksService extends Store {
       genesisHash: EMPTY_GENESIS_HASH,
       chain: 'ckb_dev'
     }
-    const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties)
-      .catch(() => properties )
+    const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties).catch(
+      () => properties
+    )
 
     this.updateAll([...list, network])
     return network
@@ -102,11 +103,11 @@ export default class NetworksService extends Store {
     Object.assign(network, options)
     Object.assign(
       network,
-      await CommonUtils.timeout(2000, this.refreshChainInfo(network), network)
-        .catch(() => network)
+      await CommonUtils.timeout(2000, this.refreshChainInfo(network), network).catch(() => network)
     )
 
     this.updateAll(list)
+    return network
   }
 
   @Validate
@@ -152,18 +153,16 @@ export default class NetworksService extends Store {
 
   public explorerUrl = (): string => {
     if (this.isMainnet()) {
-      return "https://explorer.nervos.org"
+      return 'https://explorer.nervos.org'
     }
-    return "https://explorer.nervos.org/aggron"
+    return 'https://explorer.nervos.org/aggron'
   }
 
   // Refresh a network's genesis and chain info
   private async refreshChainInfo(network: Network): Promise<Network> {
     const ckb = new CKB(network.remote)
 
-    const genesisHash = await ckb.rpc
-      .getBlockHash('0x0')
-      .catch(() => EMPTY_GENESIS_HASH)
+    const genesisHash = await ckb.rpc.getBlockHash('0x0').catch(() => EMPTY_GENESIS_HASH)
     const chain = await ckb.rpc
       .getBlockchainInfo()
       .then(info => info.chain)

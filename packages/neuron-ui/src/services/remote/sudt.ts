@@ -37,3 +37,10 @@ export const migrateAcp = remoteApi<Controller.MigrateAcp.Params>('migrate-acp')
 export const getSUDTTokenInfo = remoteApi<Controller.GetSUDTTokenInfo.Params, Controller.GetSUDTTokenInfo.Response>(
   'get-sudt-token-info'
 )
+
+export const getSUDTTypeScriptHash = remoteApi<
+  Controller.GetSUDTTokenInfo.Params,
+  Controller.GetSUDTTokenInfo.Response
+>('get-sudt-type-script-hash')
+
+export const generateSudtMigrateAcpTx = remoteApi('generate-sudt-migrate-acp-tx')

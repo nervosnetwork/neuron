@@ -1,7 +1,15 @@
+// TODO: update eslint to use 'import type' syntax
+import { TFunction } from 'i18next'
 import { useEffect, useCallback } from 'react'
 import { AccountType, TokenInfo } from 'components/SUDTCreateDialog'
 import { AppActions, StateAction } from 'states'
-import { generateCreateSUDTAccountTransaction } from 'services/remote'
+import {
+  generateCreateSUDTAccountTransaction,
+  openExternal,
+  getSUDTTypeScriptHash,
+  invokeShowErrorMessage,
+} from 'services/remote'
+import { getExplorerUrl } from 'utils'
 import { ErrorCode } from '../enums'
 import { isSuccessResponse } from '../is'
 import {
@@ -74,10 +82,12 @@ export const useOnGenerateNewAccountTransaction = ({
   walletId,
   dispatch,
   onGenerated,
+  t,
 }: {
   walletId: string
   dispatch: React.Dispatch<StateAction>
   onGenerated: () => void
+  t: TFunction
 }) =>
   useCallback(
     ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo) => {
@@ -94,7 +104,7 @@ export const useOnGenerateNewAccountTransaction = ({
           if (isSuccessResponse(res)) {
             return res.result
           }
-          throw new Error(res.message.toString())
+          throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
         })
         .then((res: Controller.GenerateCreateSUDTAccountTransaction.Response) => {
           dispatch({ type: AppActions.UpdateExperimentalParams, payload: res })
@@ -106,11 +116,22 @@ export const useOnGenerateNewAccountTransaction = ({
           return true
         })
         .catch(err => {
-          console.error(err)
+          invokeShowErrorMessage({ title: t('messages.error'), content: err.message })
           return false
         })
     },
-    [onGenerated, walletId, dispatch]
+    [onGenerated, walletId, dispatch, t]
   )
 
-export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction }
+export const useOpenSUDTTokenUrl = (tokenID: string, isMainnet?: boolean) =>
+  useCallback(() => {
+    if (tokenID) {
+      getSUDTTypeScriptHash({ tokenID }).then(res => {
+        if (isSuccessResponse(res) && res.result) {
+          openExternal(`${getExplorerUrl(isMainnet)}/sudt/${res.result}`)
+        }
+      })
+    }
+  }, [isMainnet, tokenID])
+
+export default { useIsInsufficientToCreateSUDTAccount, useOnGenerateNewAccountTransaction, useOpenSUDTTokenUrl }

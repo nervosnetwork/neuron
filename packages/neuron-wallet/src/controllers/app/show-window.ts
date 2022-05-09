@@ -1,8 +1,14 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
 import env from 'env'
+import AppController from '.'
 
-const showWindow = (url: string, title: string, options?: Electron.BrowserWindowConstructorOptions): BrowserWindow => {
+const showWindow = (
+  url: string,
+  title: string,
+  options?: Electron.BrowserWindowConstructorOptions,
+  channels?: string[]
+): BrowserWindow => {
   const opened = BrowserWindow.getAllWindows().find(bw => bw.getTitle() === title)
   if (opened) {
     opened.webContents.send('navigation', url.replace(/^#/, ''))
@@ -23,10 +29,13 @@ const showWindow = (url: string, title: string, options?: Electron.BrowserWindow
       webPreferences: {
         devTools: env.isDevMode,
         contextIsolation: false,
-        preload: path.join(__dirname, './preload.js'),
+        preload: path.join(__dirname, './preload.js')
       },
-      ...options,
+      ...options
     })
+    if (channels) {
+      AppController.getInstance().registerChannels(win, channels)
+    }
     const fmtUrl = url.startsWith('http') || url.startsWith('file:') ? url : env.mainURL + url
     win.loadURL(fmtUrl)
     win.on('ready-to-show', () => {

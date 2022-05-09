@@ -1,4 +1,9 @@
 declare namespace Controller {
+  interface RequestOpenInExplorerParams {
+    key: string
+    type: 'transaction'
+  }
+
   interface OpenInWindowParams {
     url: string
     title: string
@@ -54,6 +59,16 @@ declare namespace Controller {
     tx: string
     password?: string
     description?: string
+    multisigConfig?: {
+      id: number
+      walletId: string
+      r: number
+      m: number
+      n: number
+      addresses: string[]
+      alias?: string
+      fullPayload: string
+    }
   }
 
   interface GenerateTransactionParams {
@@ -69,6 +84,7 @@ declare namespace Controller {
 
   interface GenerateDepositAllTransactionParams {
     walletID: string
+    isBalanceReserved: boolean
     feeRate: string
   }
 
@@ -273,6 +289,7 @@ declare namespace Controller {
       walletID: string
       tx: any
       password?: string
+      skipLastInputs?: boolean
     }
     type Response = Hash
   }

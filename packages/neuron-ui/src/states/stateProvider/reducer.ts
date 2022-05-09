@@ -1,7 +1,7 @@
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'
-import { ConnectionStatus, ErrorCode } from 'utils'
+import { ConnectionStatus, ErrorCode, sortAccounts } from 'utils'
 
 export enum NeuronWalletActions {
   InitAppState = 'initAppState',
@@ -23,6 +23,8 @@ export enum NeuronWalletActions {
   UpdateNervosDaoData = 'updateNervosDaoData',
   // updater
   UpdateAppUpdaterStatus = 'updateAppUpdaterStatus',
+  // sUDT
+  GetSUDTAccountList = 'getSUDTAccountList',
 }
 export enum AppActions {
   AddSendOutput = 'addSendOutput',
@@ -100,6 +102,7 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateSyncState; payload: State.SyncState }
   | { type: NeuronWalletActions.UpdateNervosDaoData; payload: State.NervosDAO }
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
+  | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -190,6 +193,22 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case NeuronWalletActions.UpdateNervosDaoData: {
       state.nervosDAO = action.payload as Draft<typeof initStates.nervosDAO>
+      break
+    }
+    case NeuronWalletActions.GetSUDTAccountList: {
+      state.sUDTAccounts = action.payload
+        .filter(account => account.id !== undefined)
+        .sort(sortAccounts)
+        .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal }) => ({
+          accountId: id!.toString(),
+          accountName,
+          tokenName,
+          symbol,
+          balance: accountBalance,
+          address,
+          decimal,
+          tokenId: tokenID,
+        }))
       break
     }
     // Actions of App

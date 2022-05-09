@@ -1,8 +1,7 @@
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { AddressType } from '../../src/models/keys/address'
-import AddressGenerator from "../../src/models/address-generator"
-import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionWithStatus from '../../src/models/chain/transaction-with-status'
 import { Address, AddressVersion } from '../../src/models/address'
@@ -14,6 +13,8 @@ import Output from '../../src/models/chain/output'
 import OutPoint from '../../src/models/chain/out-point'
 import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { flushPromises } from '../test-utils'
+import AssetAccountInfo from '../../src/models/asset-account-info'
+import MultiSign from '../../src/models/multi-sign'
 
 const stubbedIndexerConnectorConstructor = jest.fn()
 const stubbedTxAddressFinderConstructor = jest.fn()
@@ -94,7 +95,7 @@ describe('queue', () => {
   const shortAddressInfo = {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
-  const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+  const address = scriptToAddress(shortAddressInfo.lock, false)
   const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
@@ -222,13 +223,11 @@ describe('queue', () => {
 
             it('check infos by hashes derived from addresses', () => {
               const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
-              const acpLockHashes = ['0xbda2cfe4214ec63ec301170527222742d9af51b876af12d842a309bc28ee6523']
-              const multiSignBlake160s = ['0x3f9dcc063f5212ec07bbee31e62950b4ea481c53']
               expect(stubbedTxAddressFinderConstructor).toHaveBeenCalledWith(
                 lockHashes,
-                acpLockHashes,
+                [new AssetAccountInfo().generateAnyoneCanPayScript(addressInfo.blake160).computeHash()],
                 fakeTxs[0].transaction,
-                multiSignBlake160s
+                [new MultiSign().hash(addressInfo.blake160)]
               )
             })
             it('saves transactions', () => {

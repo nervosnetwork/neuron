@@ -1,6 +1,6 @@
 import type OfflineSignController from '../../src/controllers/offline-sign'
 import { SignStatus, SignType } from '../../src/models/offline-sign'
-import { connectDeviceFailed, OfflineSignFailed } from '../../src/exceptions'
+import { connectDeviceFailed, MultisigNotSignedNeedError, OfflineSignFailed } from '../../src/exceptions'
 
 const stubbedElectronShowSaveDialog = jest.fn()
 const stubbedElectronShowErrorBox = jest.fn()
@@ -10,6 +10,8 @@ const stubbedTransactionSenderSign = jest.fn()
 const stubbedAssetAccountControllerSend = jest.fn()
 const stubbedAnyoneCanPayControllerSend = jest.fn()
 const stubbedWalletsControllerSend = jest.fn()
+const getMultisigStatusMock = jest.fn()
+const signMultisigMock = jest.fn()
 
 function resetMocks() {
   stubbedElectronShowErrorBox.mockReset()
@@ -20,6 +22,8 @@ function resetMocks() {
   stubbedAssetAccountControllerSend.mockReset()
   stubbedAnyoneCanPayControllerSend.mockReset()
   stubbedWalletsControllerSend.mockReset()
+  getMultisigStatusMock.mockReset()
+  signMultisigMock.mockReset()
 }
 
 
@@ -167,7 +171,8 @@ describe('OfflineSignController', () => {
     jest.doMock('services/transaction-sender', () => {
       return jest.fn().mockImplementation(
         () => ({
-          sign: stubbedTransactionSenderSign
+          sign: stubbedTransactionSenderSign,
+          signMultisig: signMultisigMock
         })
       )
     })
@@ -195,6 +200,10 @@ describe('OfflineSignController', () => {
         })
       )
     })
+
+    jest.doMock('../../src/utils/multisig', () => ({
+      getMultisigStatus: getMultisigStatusMock
+    }))
 
     const OfflineSignController = require('../../src/controllers/offline-sign').default
     offlineSignController = new OfflineSignController()
@@ -355,7 +364,7 @@ describe('OfflineSignController', () => {
           type: SignType.SendSUDT,
         } as any)
 
-        const skipFirstInput = 1
+        const skipFirstInput = true
 
         expect(stubbedTransactionSenderSign).toHaveBeenCalledWith(
           undefined,
@@ -364,6 +373,24 @@ describe('OfflineSignController', () => {
           skipFirstInput,
           undefined
         )
+      })
+
+      it('sign multisig PartiallySigned', async () => {
+        getMultisigStatusMock.mockReturnValueOnce(SignStatus.PartiallySigned)
+        const res = await offlineSignController.signTransaction({
+          transaction: mockTransaction,
+          status: SignStatus.Unsigned,
+          type: SignType.SendSUDT,
+          multisigConfig: {}
+        } as any)
+        expect(signMultisigMock).toHaveBeenCalledWith(
+          undefined,
+          mockTxInstance,
+          undefined,
+          [{}],
+          undefined
+        )
+        expect(res.result.status).toBe(SignStatus.PartiallySigned)
       })
     })
   })
@@ -444,6 +471,22 @@ describe('OfflineSignController', () => {
 
         expect(stubbedWalletsControllerSend).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('signAndBroadcastTransaction', () => {
+    beforeEach(() => {
+      resetMocks()
+      signMultisigMock.mockReturnValue(mockTransaction)
+    })
+    it('throw exception', async () => {
+      getMultisigStatusMock.mockReturnValueOnce(SignStatus.PartiallySigned)
+      await expect(offlineSignController.signAndBroadcastTransaction({ transaction: mockTransaction, multisigConfig: {}} as any)).rejects.toThrow(new MultisigNotSignedNeedError())
+    })
+    it('success', async () => {
+      getMultisigStatusMock.mockReturnValueOnce(SignStatus.Signed)
+      await offlineSignController.signAndBroadcastTransaction({ transaction: mockTransaction, multisigConfig: {}, type: SignType.CreateSUDTAccount } as any)
+      expect(stubbedAssetAccountControllerSend).toHaveBeenCalled()
     })
   })
 })

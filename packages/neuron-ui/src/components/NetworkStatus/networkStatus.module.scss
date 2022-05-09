@@ -78,6 +78,17 @@ $hover-bg-color: #3cc68a4d;
     border: 10px solid transparent;
     border-top-color: #fff;
   }
+
+  .lookingValidTarget {
+    display: flex;
+    align-items: center;
+    pointer-events: initial;
+
+    .openTarget {
+      width: 14px;
+      height: 14px;
+    }
+  }
 }
 
 @keyframes rotate {

@@ -1,4 +1,4 @@
-import AssetAccount from "../../src/models/asset-account"
+import AssetAccount from '../../src/models/asset-account'
 import { DEPLOY_KEY } from './keys'
 
 const ASSET_ACCOUNT = {
@@ -8,7 +8,7 @@ const ASSET_ACCOUNT = {
   decimal: '0',
   balance: '0',
   accountName: 'SUDT Account',
-  blake160: DEPLOY_KEY.blake160,
+  blake160: DEPLOY_KEY.blake160
 }
 
 const CKB_ASSET_ACCOUNT = {
@@ -18,7 +18,7 @@ const CKB_ASSET_ACCOUNT = {
   decimal: '8',
   balance: '0',
   accountName: 'CKB Account',
-  blake160: DEPLOY_KEY.blake160,
+  blake160: DEPLOY_KEY.blake160
 }
 
 export default [ASSET_ACCOUNT, CKB_ASSET_ACCOUNT].map(acc => AssetAccount.fromObject(acc))

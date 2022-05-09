@@ -14,11 +14,9 @@ import {
   getSUDTAccount,
   generateSUDTTransaction,
   generateSendAllSUDTTransaction,
-  getAnyoneCanPayScript,
   generateChequeTransaction,
-  destoryCKBAssetAccount,
+  destoryAssetAccount,
 } from 'services/remote'
-import { ckbCore } from 'services/chain'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
   validateAssetAccountAddress as validateAddress,
@@ -30,13 +28,15 @@ import {
   localNumberFormatter,
   RoutePath,
   AccountType,
-  CONSTANTS,
   isSuccessResponse,
+  validateAmountRange,
+  isSecp256k1Address,
+  CONSTANTS,
 } from 'utils'
 import { AmountNotEnoughException } from 'exceptions'
 import styles from './sUDTSend.module.scss'
 
-const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, SHORT_ADDR_DEFAULT_LOCK_PREFIX } = CONSTANTS
+const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 enum Fields {
   Address = 'address',
@@ -93,9 +93,8 @@ const SUDTSend = () => {
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [isLoaded, setIsLoaded] = useState(false)
   const [remoteError, setRemoteError] = useState('')
-  const [anyoneCanPayScript, setAnyoneCanPayScript] = useState<Omit<Controller.GetScript.Response, 'cellDep'> | null>(
-    null
-  )
+
+  const isSecp256k1Addr = isSecp256k1Address(sendState.address)
 
   const [accountInfo, setAccountInfo] = useState<Pick<
     Required<SUDTAccount>,
@@ -140,14 +139,6 @@ const SUDTSend = () => {
         })
     }
   }, [walletId, accountId, setIsLoaded])
-  useEffect(() => {
-    getAnyoneCanPayScript().then(res => {
-      if (isSuccessResponse(res)) {
-        setAnyoneCanPayScript({ codeHash: res.result.codeHash, hashType: res.result.hashType })
-      }
-    })
-    // eslint-disable-next-line
-  }, [isMainnet])
 
   const breakcrum = [{ label: t('navbar.s-udt'), link: RoutePath.SUDTAccountList }]
   const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
@@ -158,13 +149,7 @@ const SUDTSend = () => {
   const errors: { [Fields.Address]: string; [Fields.Amount]: string } = useMemo(() => {
     const errMap = { address: '', amount: '' }
     try {
-      validateAddress({
-        address: sendState.address,
-        codeHash: anyoneCanPayScript?.codeHash ?? '',
-        isMainnet,
-        required: false,
-        type: accountType,
-      })
+      validateAddress({ address: sendState.address, isMainnet, required: false })
     } catch (err) {
       errMap.address = t(err.message, err.i18n)
     }
@@ -175,24 +160,19 @@ const SUDTSend = () => {
       if (total && value && BigInt(total) < BigInt(value)) {
         throw new AmountNotEnoughException()
       }
+      if (sendState.amount && isSecp256k1Addr && accountType === AccountType.CKB) {
+        validateAmountRange(sendState.amount)
+      }
     } catch (err) {
       errMap.amount = t(err.message, err.i18n)
     }
     return errMap
-  }, [sendState.address, sendState.amount, isMainnet, anyoneCanPayScript, accountInfo, t, accountType])
+  }, [sendState.address, sendState.amount, isMainnet, accountInfo, t, accountType, isSecp256k1Addr])
 
   const isFormReady =
     !isSending &&
     Object.values(errors).every(v => !v) &&
     [Fields.Address, Fields.Amount].every(key => sendState[key as Fields.Address | Fields.Amount].trim())
-
-  const isSecp256k1ShortAddress = useMemo(() => {
-    try {
-      return ckbCore.utils.parseAddress(sendState.address, 'hex').startsWith(SHORT_ADDR_DEFAULT_LOCK_PREFIX)
-    } catch {
-      return false
-    }
-  }, [sendState.address])
 
   const isSubmittable = isFormReady && experimental?.tx && !remoteError
 
@@ -234,7 +214,7 @@ const SUDTSend = () => {
         description: sendState.description,
       }
       let generator = generateSUDTTransaction
-      if (isSecp256k1ShortAddress) {
+      if (isSecp256k1Addr && accountType === AccountType.SUDT) {
         generator = generateChequeTransaction
         if (sendState.sendAll) {
           params.amount = 'all'
@@ -268,7 +248,6 @@ const SUDTSend = () => {
     setRemoteError,
     accountInfo,
     timerRef,
-    isSecp256k1ShortAddress,
   ])
 
   useEffect(() => {
@@ -313,10 +292,12 @@ const SUDTSend = () => {
       e.preventDefault()
       e.stopPropagation()
       if (isSubmittable) {
-        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' = 'send-sudt'
-        if (accountType === AccountType.CKB) {
+        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' | 'send-acp-to-default' = 'send-sudt'
+        if (accountType === AccountType.CKB && isSecp256k1Addr) {
+          actionType = 'send-acp-to-default'
+        } else if (accountType === AccountType.CKB) {
           actionType = 'send-acp'
-        } else if (isSecp256k1ShortAddress) {
+        } else if (isSecp256k1Addr) {
           actionType = 'send-cheque'
         }
         globalDispatch({
@@ -328,13 +309,13 @@ const SUDTSend = () => {
         })
       }
     },
-    [isSubmittable, globalDispatch, walletId, accountType, isSecp256k1ShortAddress]
+    [isSubmittable, globalDispatch, walletId, accountType, isSecp256k1Addr]
   )
 
   const [isDestroying, setIsDestroying] = useState(false)
   const onDestroy = useCallback(() => {
     setIsDestroying(true)
-    destoryCKBAssetAccount({ walletID: walletId, id: accountId })
+    destoryAssetAccount({ walletID: walletId, id: accountId })
       .then(res => {
         if (isSuccessResponse(res)) {
           const tx = res.result
@@ -343,7 +324,7 @@ const SUDTSend = () => {
             type: AppActions.RequestPassword,
             payload: {
               walletID: walletId,
-              actionType: 'destroy-ckb-account',
+              actionType: 'destroy-asset-account',
             },
           })
         } else {
@@ -361,6 +342,11 @@ const SUDTSend = () => {
         setIsDestroying(false)
       })
   }, [globalDispatch, walletId, accountId])
+
+  const showDestory = useMemo(
+    () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
+    [accountType, accountInfo]
+  )
 
   if (!isLoaded) {
     return (
@@ -406,7 +392,7 @@ const SUDTSend = () => {
                   error={errors[field.key]}
                   className={styles[field.key]}
                   hint={
-                    field.key === Fields.Address && isSecp256k1ShortAddress && accountType === AccountType.SUDT
+                    field.key === Fields.Address && isSecp256k1Addr && accountType === AccountType.SUDT
                       ? t('s-udt.send.cheque-address-hint')
                       : undefined
                   }
@@ -444,13 +430,15 @@ const SUDTSend = () => {
             </div>
           </div>
         </div>
-        <div className={accountType === AccountType.CKB ? styles['ckb-footer'] : styles.footer}>
-          {accountType === AccountType.CKB ? (
+        <div className={showDestory ? styles['ckb-footer'] : styles.footer}>
+          {showDestory ? (
             <div className={styles.tooltip}>
               <Button type="cancel" label="" onClick={onDestroy} disabled={isDestroying}>
                 {t('s-udt.send.destroy') as string}
               </Button>
-              <span className={styles.tooltiptext}>{t('s-udt.send.destroy-desc')}</span>
+              <span className={styles.tooltiptext}>
+                {t(accountType === AccountType.CKB ? 's-udt.send.destroy-ckb-desc' : 's-udt.send.destroy-sudt-desc')}
+              </span>
             </div>
           ) : null}
           <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />

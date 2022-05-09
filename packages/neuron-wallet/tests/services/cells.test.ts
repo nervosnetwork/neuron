@@ -1,8 +1,9 @@
 import { getConnection } from 'typeorm'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
-import CellsService, { CustomizedLock } from '../../src/services/cells'
+import CellsService, { CustomizedLock, CustomizedType } from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
@@ -16,10 +17,10 @@ import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionPersistor from '../../src/services/tx/transaction-persistor'
 import OutPoint from '../../src/models/chain/out-point'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import AddressGenerator from '../../src/models/address-generator'
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import MultiSign from '../../src/models/multi-sign'
 import AssetAccountInfo from '../../src/models/asset-account-info'
+import MultisigOutput from '../../src/database/chain/entities/multisig-output'
+import { MultisigConfigNeedError, TransactionInputParamterMiss } from '../../src/exceptions'
 
 
 const randomHex = (length: number = 64): string => {
@@ -38,7 +39,7 @@ describe('CellsService', () => {
   const alice = {
     lockScript: aliceLockScript,
     lockHash: aliceLockScript.computeHash(),
-    address:  AddressGenerator.generate(aliceLockScript, AddressPrefix.Testnet),
+    address: scriptToAddress(aliceLockScript, false),
     blake160: alicePublicKeyHash,
     walletId: walletId1
   }
@@ -48,8 +49,18 @@ describe('CellsService', () => {
   const bob = {
     lockScript: bobLockScript,
     lockHash: bobLockScript.computeHash(),
-    address: AddressGenerator.generate(bobLockScript, AddressPrefix.Testnet),
+    address: scriptToAddress(bobLockScript, false),
     blake160: bobPublicKeyHash,
+    walletId: walletId1
+  }
+
+  const multisigPublicKeyHash = '0x447ff8941a6f0162d2194e9b592bb2534a3e6b74'
+  const multisigLockScript = SystemScriptInfo.generateMultiSignScript(multisigPublicKeyHash)
+  const multisigInfo = {
+    lockScript: multisigLockScript,
+    lockHash: multisigLockScript.computeHash(),
+    address: scriptToAddress(multisigLockScript, false),
+    blake160: multisigPublicKeyHash,
     walletId: walletId1
   }
 
@@ -58,7 +69,7 @@ describe('CellsService', () => {
   const charlie = {
     lockScript: charlieLockScript,
     lockHash: charlieLockScript.computeHash(),
-    address: AddressGenerator.generate(charlieLockScript, AddressPrefix.Testnet),
+    address: scriptToAddress(charlieLockScript, false),
     blake160: charliePublicKeyHash,
     walletId: walletId2
   }
@@ -134,6 +145,25 @@ describe('CellsService', () => {
     const cell = generateCell(capacity, status, hasData, typeScript, who)
     await getConnection().manager.save(cell)
     return cell
+  }
+
+  const createMultisigCell = async (
+    capacity: string,
+    status: OutputStatus,
+    who: any
+  ) => {
+    const multisigCell = new MultisigOutput()
+    multisigCell.capacity = capacity
+    multisigCell.status = status
+    multisigCell.outPointTxHash = randomHex()
+    multisigCell.outPointIndex = '0'
+    multisigCell.outPointTxHashAddIndex = multisigCell.outPointTxHash + multisigCell.outPointIndex
+    multisigCell.lockCodeHash = who.lockScript.codeHash
+    multisigCell.lockArgs = who.lockScript.args
+    multisigCell.lockHashType = who.lockScript.hashType
+    multisigCell.lockHash = who.lockHash
+    await getConnection().manager.save(multisigCell)
+    return multisigCell
   }
 
   const typeScript = new Script(randomHex(), '0x', ScriptHashType.Data)
@@ -417,7 +447,7 @@ describe('CellsService', () => {
           '0',
           feeRate
         )
-        const expectedSize = 2 * TransactionSize.input() + TransactionSize.secpLockWitness()+ TransactionSize.emptyWitness()
+        const expectedSize = 2 * TransactionSize.input() + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
         expect(result.capacities).toEqual(toShannon('3000'))
         expect(BigInt(result.finalFee)).toEqual(TransactionFee.fee(expectedSize, BigInt(feeRate)))
       })
@@ -427,7 +457,7 @@ describe('CellsService', () => {
         const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         const expectedFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - expectedFee
+        const capacity = BigInt(1000 * 10 ** 8) - expectedFee
         const result = await CellsService.gatherInputs(
           capacity.toString(),
           walletId1,
@@ -443,7 +473,7 @@ describe('CellsService', () => {
         const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         const inputFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - inputFee + BigInt(1)
+        const capacity = BigInt(1000 * 10 ** 8) - inputFee + BigInt(1)
         const result = await CellsService.gatherInputs(
           capacity.toString(),
           walletId1,
@@ -474,7 +504,7 @@ describe('CellsService', () => {
             undefined,
             undefined,
             undefined,
-            {codeHash: lockCodeHash, hashType: ScriptHashType.Type}
+            { codeHash: lockCodeHash, hashType: ScriptHashType.Type }
           )
         } catch (e) {
           error = e
@@ -483,6 +513,92 @@ describe('CellsService', () => {
         expect(error).toBeInstanceOf(CapacityNotEnough)
       })
     });
+
+    describe('gather in multisig output', () => {
+      beforeEach(async () => {
+        await createMultisigCell(toShannon('1000'), OutputStatus.Live, multisigInfo)
+      })
+
+      it('no walletId and no lockargs', async () => {
+        await expect(CellsService.gatherInputs('', '')).rejects.toThrow(new TransactionInputParamterMiss())
+      })
+
+      it('no live cell throw CapacityNotEnough', async () => {
+        await expect(CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
+          lockArgs: ['bob.blake160'],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        })).rejects.toThrow(new CapacityNotEnough())
+      })
+
+      it('MultisigConfigNeedError', async () => {
+        await expect(CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
+          lockArgs: [multisigInfo.lockScript.args],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        })).rejects.toThrow(new MultisigConfigNeedError())
+      })
+
+      it('live cell not enough throw CapacityNotEnough', async () => {
+        await expect(CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
+          lockArgs: [multisigInfo.lockScript.args],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        }, [
+          { r: 1, m: 1, n: 1, getLockHash() { return multisigInfo.lockHash } } as any
+        ])).rejects.toThrow(new CapacityNotEnough())
+      })
+      it('some live cell status is sent throw CapacityNotEnough', async () => {
+        await createMultisigCell(toShannon('1000'), OutputStatus.Sent, multisigInfo)
+        await expect(CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
+          lockArgs: [multisigInfo.lockScript.args],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        }, [
+          { r: 1, m: 1, n: 1, getLockHash() { return multisigInfo.lockHash } } as any
+        ])).rejects.toThrow(new LiveCapacityNotEnough())
+      })
+      it('left capcity not enough for a cell throw CapacityNotEnoughForChange', async () => {
+        await createMultisigCell(toShannon('1000'), OutputStatus.Sent, multisigInfo)
+        await expect(CellsService.gatherInputs(toShannon('990'), '', '0', '1000', 0, 0, 0, undefined, {
+          lockArgs: [multisigInfo.lockScript.args],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        }, [
+          { r: 1, m: 1, n: 1, getLockHash() { return multisigInfo.lockHash } } as any
+        ])).rejects.toThrow(new LiveCapacityNotEnough())
+      })
+      it('left capcity not enough for a cell throw CapacityNotEnoughForChange', async () => {
+        await expect(CellsService.gatherInputs(toShannon('990'), '', '0', '1000', 0, 0, 0, undefined, {
+          lockArgs: [multisigInfo.lockScript.args],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        }, [
+          { r: 1, m: 1, n: 1, getLockHash() { return multisigInfo.lockHash } } as any
+        ])).rejects.toThrow(new CapacityNotEnoughForChange())
+      })
+      it('success gather input', async () => {
+        const feeRate = '1000'
+        const multisigConfig = { r: 1, m: 1, n: 1 }
+        const res = await CellsService.gatherInputs(toShannon('900'), '', '0', feeRate, 0, 0, 0, undefined, {
+          lockArgs: [multisigInfo.lockScript.args],
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+          codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+        }, [
+          { ...multisigConfig, getLockHash() { return multisigInfo.lockHash } } as any
+        ])
+        const input = await getConnection()
+          .getRepository(MultisigOutput)
+          .createQueryBuilder('multisig_output')
+          .getOne()
+        expect(res).toEqual({
+          inputs: [new Input(input!.outPoint(), '0', input!.capacity, input!.lockScript(), input!.lockHash)],
+          capacities: toShannon('1000'),
+          finalFee: (TransactionFee.fee(TransactionSize.input() + TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n), BigInt('1000'))).toString(),
+          hasChangeOutput: true
+        })
+      })
+    })
   })
 
   describe('#gatherAllInputs', () => {
@@ -515,11 +631,31 @@ describe('CellsService', () => {
       beforeEach(async () => {
         allInputs = await CellsService.gatherAllInputs(
           walletId1,
-          {codeHash: 'non exist lock code hash', hashType: ScriptHashType.Type}
+          { codeHash: 'non exist lock code hash', hashType: ScriptHashType.Type }
         )
       });
       it('returns empty array', async () => {
         expect(allInputs.length).toEqual(0)
+      })
+    });
+    describe('gather with lock args', () => {
+      beforeEach(async () => {
+        await createMultisigCell(toShannon('1000'), OutputStatus.Live, multisigInfo)
+      })
+      it('gather with exist args', async () => {
+        const inputs = await CellsService.gatherAllInputs(
+          walletId1,
+          { codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH, hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE, args: multisigInfo.lockScript.args }
+        )
+        expect(inputs).toHaveLength(1)
+        expect(inputs[0].capacity).toEqual(toShannon('1000'))
+      })
+      it('gather with non-exist args', async () => {
+        const inputs = await CellsService.gatherAllInputs(
+          walletId1,
+          { codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH, hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE, args: 'non-exist-args' }
+        )
+        expect(inputs).toHaveLength(0)
       })
     });
   })
@@ -764,9 +900,9 @@ describe('CellsService', () => {
     const lockScript2 = new Script(codeHash, fakeArgs2, ScriptHashType.Type)
     const lockScript3 = new Script(codeHash, fakeArgs3, ScriptHashType.Type)
 
-    const owner1 = {lockScript: lockScript1, lockHash: lockScript1.computeHash()}
-    const owner2 = {lockScript: lockScript2, lockHash: lockScript2.computeHash()}
-    const owner3 = {lockScript: lockScript3, lockHash: lockScript3.computeHash()}
+    const owner1 = { lockScript: lockScript1, lockHash: lockScript1.computeHash() }
+    const owner2 = { lockScript: lockScript2, lockHash: lockScript2.computeHash() }
+    const owner3 = { lockScript: lockScript3, lockHash: lockScript3.computeHash() }
 
     beforeEach(async () => {
       await createCell('1000', OutputStatus.Live, false, null, owner1)
@@ -835,11 +971,12 @@ describe('CellsService', () => {
           generateCell('10000', OutputStatus.Live, false, typeScript, user),
           generateCell('54321', OutputStatus.Live, true, sudtType, { lockScript: acpLock }),
           // cheque cell
-          generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: receiverChequeLock}),
-          generateCell('10000', OutputStatus.Live, true, typeScript, {lockScript: senderChequeLock}),
+          generateCell('10000', OutputStatus.Live, true, typeScript, { lockScript: receiverChequeLock }),
+          generateCell('10000', OutputStatus.Live, true, typeScript, { lockScript: senderChequeLock }),
           // unknown asset
-          generateCell('666', OutputStatus.Live, true, typeScript, {lockScript: bobDefaultLock}),
-          generateCell('666', OutputStatus.Live, true, sudtType, {lockScript: bobDefaultLock}),
+          generateCell('666', OutputStatus.Live, true, typeScript, { lockScript: bobDefaultLock }),
+          // sudt asset
+          generateCell('777', OutputStatus.Live, true, sudtType, { lockScript: bobDefaultLock }),
         ]
         await getConnection().manager.save(cells)
       });
@@ -853,13 +990,13 @@ describe('CellsService', () => {
             expect(result.totalCount).toEqual(7)
             expect(result.items.length).toEqual(7)
             const totalCapacity = result.items.reduce((total: number, cell: any) => total + parseInt(cell.capacity), 0)
-            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 * 2)
+            expect(totalCapacity).toEqual(100 * 3 + 10000 * 2 + 666 + 777)
           })
           it('attaches setCustomizedAssetInfo to single multisign cells', async () => {
             const singleMultiSignCells = result.items.filter((item: any) => item.customizedAssetInfo.lock === CustomizedLock.SingleMultiSign)
             expect(singleMultiSignCells.length).toBe(3)
             for (const item of singleMultiSignCells) {
-              expect(item.customizedAssetInfo).toEqual({"data": "", "lock": "SingleMultiSign", "type": ""})
+              expect(item.customizedAssetInfo).toEqual({ "data": "", "lock": "SingleMultiSign", "type": "" })
             }
           });
           it('attaches setCustomizedAssetInfo to cheque cells', () => {
@@ -870,10 +1007,18 @@ describe('CellsService', () => {
           });
 
           it('attaches setCustomizedAssetInfo to unknown cells', () => {
-            const chequeCells = result.items.filter((item: any) => item.capacity === '666')
-            expect(chequeCells.length).toEqual(2)
-            expect(chequeCells[0].customizedAssetInfo.type).toBe('Unknown')
-            expect(chequeCells[1].customizedAssetInfo.type).toBe('Unknown')
+            const cells = result.items.filter((item: any) => item.capacity === '666')
+            expect(cells.length).toEqual(1)
+            expect(cells[0].customizedAssetInfo.type).toBe('Unknown')
+          });
+          it('attaches setCustomizedAssetInfo to sudt cells', () => {
+            const cells = result.items.filter((item: any) => item.capacity === '777')
+            expect(cells.length).toEqual(1)
+            expect(cells[0].customizedAssetInfo).toEqual({
+              lock: CustomizedLock.SUDT,
+              type: CustomizedType.SUDT,
+              data: ''
+            })
           });
         });
         describe('within pagination scope', () => {
@@ -916,5 +1061,19 @@ describe('CellsService', () => {
         expect(result.items.length).toEqual(0)
       });
     });
+  })
+
+  describe('getMultisigBalance', () => {
+    beforeEach(async () => {
+      await createMultisigCell(toShannon('1000'), OutputStatus.Live, multisigInfo)
+    })
+    it('multiaddress not empty', async () => {
+      const multisigBalances = await CellsService.getMultisigBalances(false, [multisigInfo.address])
+      expect(multisigBalances[multisigInfo.address]).toBe(toShannon('1000'))
+    })
+    it('multiaddress is empty', async () => {
+      const multisigBalances = await CellsService.getMultisigBalances(false, [])
+      expect(multisigBalances).toMatchObject({})
+    })
   })
 })

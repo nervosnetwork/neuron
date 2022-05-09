@@ -1,9 +1,9 @@
-import TypeCheckerUtils from "utils/type-checker"
+import TypeCheckerUtils from 'utils/type-checker'
 
 export enum TxStatusType {
   Pending = 'pending',
   Proposed = 'proposed',
-  Committed = 'committed',
+  Committed = 'committed'
 }
 
 export default class TxStatus {
@@ -31,14 +31,11 @@ export default class TxStatus {
   public toSDK() {
     return {
       blockHash: this.blockHash,
-      status: this.status,
+      status: this.status
     }
   }
 
   public static fromSDK(txStatus: any): TxStatus {
-    return new TxStatus(
-      txStatus.blockHash,
-      txStatus.status as TxStatusType
-    )
+    return new TxStatus(txStatus.blockHash, txStatus.status as TxStatusType)
   }
 }

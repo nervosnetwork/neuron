@@ -14,6 +14,7 @@ import {
   shannonToCKBFormatter,
   getCurrentUrl,
   getSyncStatus,
+  CKBToShannonFormatter,
 } from 'utils'
 
 import { openExternal } from 'services/remote'
@@ -55,9 +56,6 @@ const NervosDAO = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, { language }] = useTranslation()
-  useEffect(() => {
-    backToTop()
-  }, [])
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
@@ -69,6 +67,7 @@ const NervosDAO = () => {
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
   const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
   const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
+  const [isBalanceReserved, setIsBalanceReserved] = useState(true)
   const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
   const updateDepositValue = hooks.useUpdateDepositValue({
     setDepositValue,
@@ -79,8 +78,10 @@ const NervosDAO = () => {
     dispatch,
     walletID: wallet.id,
     maxDepositErrorMessage,
+    isBalanceReserved,
     t,
   })
+
   const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
   const onDepositDialogDismiss = hooks.useOnDepositDialogDismiss({
     setShowDepositDialog,
@@ -96,7 +97,13 @@ const NervosDAO = () => {
   })
   const onWithdrawDialogDismiss = hooks.useOnWithdrawDialogDismiss(setActiveRecord)
 
-  hooks.useUpdateMaxDeposit({ wallet, setMaxDepositAmount, setMaxDepositTx, setMaxDepositErrorMessage })
+  hooks.useUpdateMaxDeposit({
+    wallet,
+    setMaxDepositAmount,
+    setMaxDepositTx,
+    setMaxDepositErrorMessage,
+    isBalanceReserved,
+  })
   hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
   const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
@@ -121,6 +128,11 @@ const NervosDAO = () => {
 
   const onSlide = hooks.useOnSlide({ updateDepositValue, maxDepositAmount })
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
+
+  const onIsBalanceReservedChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    setErrorMessage('')
+    setIsBalanceReserved(!e.currentTarget.checked)
+  }
 
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
@@ -221,8 +233,17 @@ const NervosDAO = () => {
 
   const onDepositDialogOpen = useCallback(() => {
     clearGeneratedTx()
-    updateDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
-  }, [clearGeneratedTx, updateDepositValue])
+  }, [clearGeneratedTx])
+
+  useEffect(() => {
+    backToTop()
+  }, [])
+
+  useEffect(() => {
+    if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
+      setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+    }
+  }, [maxDepositAmount, depositValue, setDepositValue])
 
   const MemoizedDepositDialog = useMemo(() => {
     return (
@@ -239,6 +260,8 @@ const NervosDAO = () => {
         isDepositing={sending}
         errorMessage={errorMessage}
         isTxGenerated={!!send.generatedTx}
+        isBalanceReserved={isBalanceReserved}
+        onIsBalanceReservedChange={onIsBalanceReservedChange}
       />
     )
     // eslint-disable-next-line
@@ -254,6 +277,8 @@ const NervosDAO = () => {
     sending,
     errorMessage,
     send.generatedTx,
+    isBalanceReserved,
+    onIsBalanceReservedChange,
   ])
 
   const MemoizedWithdrawDialog = useMemo(() => {

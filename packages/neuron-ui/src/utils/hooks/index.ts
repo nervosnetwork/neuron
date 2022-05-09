@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
@@ -18,6 +18,9 @@ import {
   validateSymbol,
   validateTokenName,
   validateDecimal,
+  validateAmount,
+  validateAddress,
+  validateAmountRange,
 } from 'utils/validators'
 import { MenuItemConstructorOptions } from 'electron'
 
@@ -171,6 +174,32 @@ export const useDialog = ({
       }
     }
   }, [show, dialogRef, onClose])
+}
+
+export const useDialogWrapper = ({
+  onClose,
+}: {
+  onClose?: () => void
+} = {}) => {
+  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const openDialog = useCallback(() => {
+    setIsDialogOpen(true)
+  }, [setIsDialogOpen])
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
+  useDialog({
+    show: isDialogOpen,
+    dialogRef,
+    onClose: onClose || closeDialog,
+  })
+  return {
+    isDialogOpen,
+    openDialog,
+    closeDialog,
+    dialogRef,
+  }
 }
 
 export const useOnDefaultContextMenu = (t: TFunction) =>
@@ -417,4 +446,50 @@ export const useGlobalNotifications = (
 
 export const useDidMount = (cb: () => void) => {
   useEffect(cb, [])
+}
+
+export const useForceUpdate = <T extends Function>(cb: T) => {
+  const [, update] = useState<{}>(Object.create(null))
+
+  const memoizedDispatch = useCallback(
+    (...args) => {
+      cb(...args)
+      update(Object.create(null))
+    },
+    [update, cb]
+  )
+  return memoizedDispatch
+}
+
+export const useOutputErrors = (
+  outputs: Partial<Record<'address' | 'amount' | 'date', string>>[],
+  isMainnet: boolean
+) => {
+  return useMemo(
+    () =>
+      outputs.map(({ address, amount, date }) => {
+        let amountError: (Error & { i18n: Record<string, string> }) | undefined
+        if (amount !== undefined) {
+          try {
+            const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
+            validateAmount(amount)
+            validateAmountRange(amount, extraSize)
+          } catch (err) {
+            amountError = err
+          }
+        }
+
+        let addrError: (Error & { i18n: Record<string, string> }) | undefined
+        if (address !== undefined) {
+          try {
+            validateAddress(address, isMainnet)
+          } catch (err) {
+            addrError = err
+          }
+        }
+
+        return { addrError, amountError }
+      }),
+    [outputs, isMainnet]
+  )
 }

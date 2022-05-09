@@ -32,6 +32,7 @@ type Action =
   | 'get-system-codehash'
   | 'load-init-data'
   | 'open-in-window'
+  | 'request-open-in-explorer'
   | 'handle-view-error'
   | 'show-settings'
   | 'set-locale'
@@ -103,7 +104,9 @@ type Action =
   | 'migrate-acp'
   | 'check-migrate-acp'
   | 'get-sudt-token-info'
-  | 'generate-destroy-ckb-account-tx'
+  | 'generate-destroy-asset-account-tx'
+  | 'get-sudt-type-script-hash'
+  | 'generate-sudt-migrate-acp-tx'
   // Cheque
   | 'generate-create-cheque-tx'
   | 'generate-withdraw-cheque-tx'
@@ -122,8 +125,21 @@ type Action =
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
   | 'sign-and-export-transaction'
+  | 'sign-and-broadcast-transaction'
   // nft
   | 'generate-transfer-nft-tx'
+  // multisig
+  | 'create-multisig-address'
+  | 'save-multisig-config'
+  | 'get-multisig-config'
+  | 'import-multisig-config'
+  | 'export-multisig-config'
+  | 'update-multisig-config'
+  | 'delete-multisig-config'
+  | 'get-multisig-balances'
+  | 'generate-multisig-tx'
+  | 'generate-multisig-send-all-tx'
+  | 'load-multisig-tx-json'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

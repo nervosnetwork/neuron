@@ -65,6 +65,6 @@ export const Validate = (target: any, propertyKey: string, descriptor: PropertyD
         verifyPasswordComplexity(args[passwordIndex])
       }
       return originalMethod.apply(this, args)
-    },
+    }
   }
 }

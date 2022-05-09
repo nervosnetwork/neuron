@@ -12,7 +12,7 @@ import Input from 'models/chain/input'
 
 export enum TxSaveType {
   Sent = 'sent',
-  Fetch = 'fetch',
+  Fetch = 'fetch'
 }
 
 export class TransactionPersistor {
@@ -50,8 +50,12 @@ export class TransactionPersistor {
 
     // update multiSignBlake160 / input.type / input.data / output.data
     if (txEntity) {
-      const outputsToUpdate: Output[] = transaction.outputs.filter((o, i) => !!o.multiSignBlake160 || transaction.outputsData[i].length > 2)
-      const inputsToUpdate: Input[] = transaction.inputs.filter(i => !!i.multiSignBlake160 || (i.data && i.data.length > 2) || i.type)
+      const outputsToUpdate: Output[] = transaction.outputs.filter(
+        (o, i) => !!o.multiSignBlake160 || transaction.outputsData[i].length > 2
+      )
+      const inputsToUpdate: Input[] = transaction.inputs.filter(
+        i => !!i.multiSignBlake160 || (i.data && i.data.length > 2) || i.type
+      )
 
       if (outputsToUpdate.length || inputsToUpdate.length) {
         // update multiSignBlake160Info
@@ -64,7 +68,7 @@ export class TransactionPersistor {
               .update(OutputEntity)
               .set({
                 multiSignBlake160: o.multiSignBlake160,
-                data,
+                data
               })
               .where({
                 outPointTxHash: o.outPoint!.txHash,
@@ -77,7 +81,7 @@ export class TransactionPersistor {
               .update(InputEntity)
               .set({
                 multiSignBlake160: o.multiSignBlake160,
-                data,
+                data
               })
               .where({
                 outPointTxHash: o.outPoint!.txHash,
@@ -96,7 +100,7 @@ export class TransactionPersistor {
                 typeCodeHash: i.type?.codeHash,
                 typeArgs: i.type?.args,
                 typeHashType: i.type?.hashType,
-                typeHash: i.typeHash,
+                typeHash: i.typeHash
               })
               .where({
                 outPointTxHash: i.previousOutput!.txHash,
@@ -112,7 +116,7 @@ export class TransactionPersistor {
         .getRepository(InputEntity)
         .createQueryBuilder('input')
         .where({
-          transaction: txEntity,
+          transaction: txEntity
         })
         .getMany()
 
@@ -122,7 +126,7 @@ export class TransactionPersistor {
         .where({
           transaction: txEntity
         })
-        .andWhere('status != :status', {status: OutputStatus.Dead})
+        .andWhere('status != :status', { status: OutputStatus.Dead })
         .getMany()
 
       // input -> previousOutput => dead
@@ -142,7 +146,7 @@ export class TransactionPersistor {
           if (outPoint) {
             const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
               outPointTxHash: outPoint.txHash,
-              outPointIndex: outPoint.index,
+              outPointIndex: outPoint.index
             })
             if (outputEntity && outputEntity.status !== OutputStatus.Dead) {
               outputEntity.status = OutputStatus.Dead
@@ -247,7 +251,7 @@ export class TransactionPersistor {
       if (outPoint) {
         const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
           outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index,
+          outPointIndex: outPoint.index
         })
 
         if (previousOutput && previousOutput.status !== inputStatus) {
@@ -309,7 +313,7 @@ export class TransactionPersistor {
       for (const slice of ArrayUtils.eachSlice(outputs, sliceSize)) {
         await queryRunner.manager.save(slice)
       }
-      await queryRunner.commitTransaction();
+      await queryRunner.commitTransaction()
     } catch (err) {
       logger.error('Database:\tcreate transaction error:', err)
       await queryRunner.rollbackTransaction()
@@ -322,7 +326,7 @@ export class TransactionPersistor {
     return tx
   }
 
-  private static waitUntilTransactionFinished = async(queryRunner: QueryRunner, timeout: number = 5000) => {
+  private static waitUntilTransactionFinished = async (queryRunner: QueryRunner, timeout: number = 5000) => {
     const startAt: number = +new Date()
     while (queryRunner.isTransactionActive) {
       const now: number = +new Date()
@@ -361,13 +365,10 @@ export class TransactionPersistor {
     return txEntity
   }
 
-  public static saveSentTx = async (
-    transaction: Transaction,
-    txHash: string
-  ): Promise<TransactionEntity> => {
+  public static saveSentTx = async (transaction: Transaction, txHash: string): Promise<TransactionEntity> => {
     const tx = Transaction.fromObject({
       ...transaction,
-      hash: txHash,
+      hash: txHash
     })
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity

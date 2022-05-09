@@ -1,24 +1,24 @@
-import { getConnection, In, Not } from "typeorm"
-import BufferUtils from "utils/buffer"
-import OutputEntity from "database/chain/entities/output"
-import Transaction, { TransactionStatus } from "models/chain/transaction"
-import AssetAccountInfo from "models/asset-account-info"
-import { OutputStatus } from "models/chain/output"
-import AssetAccount from "models/asset-account"
-import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
-import AssetAccountEntity from "database/chain/entities/asset-account"
-import { CapacityNotEnoughForChange } from "exceptions"
-import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
-import TransactionSender from "./transaction-sender"
-import { TransactionGenerator } from "./tx"
-import WalletService from "./wallets"
-import OutPoint from "models/chain/out-point"
-import SystemScriptInfo from "models/system-script-info"
-import Input from "models/chain/input"
+import { getConnection, In, Not } from 'typeorm'
+import BufferUtils from 'utils/buffer'
+import OutputEntity from 'database/chain/entities/output'
+import Transaction, { TransactionStatus } from 'models/chain/transaction'
+import AssetAccountInfo from 'models/asset-account-info'
+import { OutputStatus } from 'models/chain/output'
+import AssetAccount from 'models/asset-account'
+import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
+import AssetAccountEntity from 'database/chain/entities/asset-account'
+import { CapacityNotEnoughForChange } from 'exceptions'
+import CellsService from 'services/cells'
+import TransactionSender from './transaction-sender'
+import { TransactionGenerator } from './tx'
+import WalletService from './wallets'
+import OutPoint from 'models/chain/out-point'
+import SystemScriptInfo from 'models/system-script-info'
+import Input from 'models/chain/input'
+import { MIN_CELL_CAPACITY } from 'utils/const'
 
 export default class AssetAccountService {
-
-  private static async getACPCells (publicKeyHash: string, tokenId: string = 'CKBytes') {
+  private static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes') {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
     let typeHash = null
@@ -31,14 +31,14 @@ export default class AssetAccountService {
       .where({
         status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
-        typeHash,
+        typeHash
       })
       .getMany()
 
     return outputs
   }
 
-  private static async calculateAvailableCKBBalance (publicKeyHash: string) {
+  private static async calculateAvailableCKBBalance(publicKeyHash: string) {
     const outputs = await this.getACPCells(publicKeyHash)
 
     const totalBalance = outputs
@@ -46,15 +46,15 @@ export default class AssetAccountService {
         return output.data === '0x'
       })
       .reduce((sum, output) => {
-      return sum + BigInt(output.capacity)
-    }, BigInt(0))
+        return sum + BigInt(output.capacity)
+      }, BigInt(0))
     const reservedBalance = BigInt(MIN_CELL_CAPACITY)
     const availableBalance = totalBalance - reservedBalance
 
     return availableBalance >= 0 ? availableBalance.toString() : BigInt(0)
   }
 
-  private static async calculateUDTAccountBalance (publicKeyHash: string, tokenId: string) {
+  private static async calculateUDTAccountBalance(publicKeyHash: string, tokenId: string) {
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
     const typeHash = assetAccountInfo.generateSudtScript(tokenId).computeHash()
@@ -64,7 +64,7 @@ export default class AssetAccountService {
       .where({
         status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
-        typeHash,
+        typeHash
       })
       .getMany()
 
@@ -75,15 +75,18 @@ export default class AssetAccountService {
     return totalBalance
   }
 
-  public static async destoryCKBAssetAccount(walletID: string, assetAccount: AssetAccount) {
-    const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, 'CKBytes')
+  public static async destoryAssetAccount(walletID: string, assetAccount: AssetAccount) {
+    const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, assetAccount.tokenID)
     const inputs = cells.map(cell => {
       return Input.fromObject({
         previousOutput: cell.outPoint(),
         capacity: cell.capacity,
         lock: cell.lockScript(),
+        type: cell.typeScript(),
         lockHash: cell.lockHash,
-        since: '0',
+        typeHash: cell.typeHash,
+        data: cell.data,
+        since: '0'
       })
     })
     // 1. find next unused address
@@ -91,22 +94,29 @@ export default class AssetAccountService {
 
     const address = await wallet.getNextChangeAddress()
 
-    const tx = await TransactionGenerator.generateDestoryCKBAssetAccountTx(walletID, inputs, address!.blake160)
+    const tx = await TransactionGenerator.generateDestoryAssetAccountTx(
+      walletID,
+      inputs,
+      address!.blake160,
+      assetAccount.tokenID === 'CKBytes'
+    )
 
     return {
       assetAccount,
-      tx,
+      tx
     }
   }
 
   public static async getAll(walletId: string): Promise<AssetAccount[]> {
-    const determineTokenID = (account: AssetAccountEntity) => account.tokenID.startsWith('0x') ? account.tokenID : 'CKBytes'
+    const determineTokenID = (account: AssetAccountEntity) =>
+      account.tokenID.startsWith('0x') ? account.tokenID : 'CKBytes'
 
     const assetAccountEntities = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
       .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
-      .where(`
+      .where(
+        `
         aa.blake160 IN (
           SELECT publicKeyInBlake160
           FROM hd_public_key_info
@@ -116,8 +126,8 @@ export default class AssetAccountService {
       )
       .getMany()
 
-    const assetAccounts = await Promise.all(assetAccountEntities
-      .map(async aa => {
+    const assetAccounts = await Promise.all(
+      assetAccountEntities.map(async aa => {
         const model = aa.toModel()
         const tokenID = determineTokenID(aa)
 
@@ -129,8 +139,7 @@ export default class AssetAccountService {
         if (tokenID === 'CKBytes') {
           const bigIntAmount = await this.calculateAvailableCKBBalance(aa.blake160)
           model.balance = bigIntAmount.toString()
-        }
-        else {
+        } else {
           const bigIntAmount = await this.calculateUDTAccountBalance(aa.blake160, aa.tokenID)
           model.balance = bigIntAmount.toString()
         }
@@ -148,7 +157,7 @@ export default class AssetAccountService {
     return validAccounts
   }
 
-  public static async getAccount(params: { walletID: string, id: number }): Promise<AssetAccount | undefined> {
+  public static async getAccount(params: { walletID: string; id: number }): Promise<AssetAccount | undefined> {
     const assetAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
@@ -166,8 +175,7 @@ export default class AssetAccountService {
     if (isCKB) {
       const bitIntAmount = await this.calculateAvailableCKBBalance(assetAccount.blake160)
       assetAccount.balance = bitIntAmount.toString()
-    }
-    else {
+    } else {
       const bigIntAmount = await this.calculateUDTAccountBalance(assetAccount.blake160, assetAccount.tokenID)
       assetAccount.balance = bigIntAmount.toString()
     }
@@ -183,9 +191,9 @@ export default class AssetAccountService {
     tokenName: string,
     decimal: string,
     feeRate: string,
-    fee: string,
+    fee: string
   ): Promise<{
-    assetAccount: AssetAccount,
+    assetAccount: AssetAccount
     tx: Transaction
   }> {
     if (tokenID !== 'CKBytes' && !tokenID.startsWith('0x')) {
@@ -229,7 +237,7 @@ export default class AssetAccountService {
 
     return {
       assetAccount,
-      tx,
+      tx
     }
   }
 
@@ -271,43 +279,48 @@ export default class AssetAccountService {
       .addSelect('output.typeArgs', 'typeArgs')
       .addSelect('group_concat(tx.status)', 'txStatusArray')
       .addSelect('group_concat(tx.blockNumber)', 'blockNumberArray')
-      .where(`output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR (output.typeCodeHash = :sudtCodeHash AND output.typeHashType = :sudtHashType))`, {
-        lockHashes: anyoneCanPayLockHashes,
-        sudtCodeHash: assetAccountInfo.infos.sudt.codeHash,
-        sudtHashType: assetAccountInfo.infos.sudt.hashType,
-      })
+      .where(
+        `output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR (output.typeCodeHash = :sudtCodeHash AND output.typeHashType = :sudtHashType))`,
+        {
+          lockHashes: anyoneCanPayLockHashes,
+          sudtCodeHash: assetAccountInfo.infos.sudt.codeHash,
+          sudtHashType: assetAccountInfo.infos.sudt.hashType
+        }
+      )
       .groupBy('output.lockHash')
       .addGroupBy('output.typeArgs')
       .getRawMany()
 
-    const result = outputs
-      .filter(o => {
-        const status = (o.txStatusArray as string).split(',').map(a => a.trim())
-        const blockNumbers: bigint[] = (o.blockNumberArray as string).split(',').map(a => BigInt(a.trim())).sort()
-        if (
-          blockNumbers[blockNumbers.length - 1] >= startBlockNumberInt &&
-          !(blockNumbers[0] < startBlockNumberInt) &&
-          !status.includes(TransactionStatus.Pending)
-        ) {
-          return o
-        }
-        return undefined
-      })
+    const result = outputs.filter(o => {
+      const status = (o.txStatusArray as string).split(',').map(a => a.trim())
+      const blockNumbers: bigint[] = (o.blockNumberArray as string)
+        .split(',')
+        .map(a => BigInt(a.trim()))
+        .sort()
+      if (
+        blockNumbers[blockNumbers.length - 1] >= startBlockNumberInt &&
+        !(blockNumbers[0] < startBlockNumberInt) &&
+        !status.includes(TransactionStatus.Pending)
+      ) {
+        return o
+      }
+      return undefined
+    })
 
     for (const output of result) {
       await getConnection()
         .createQueryBuilder()
         .delete()
         .from(AssetAccountEntity)
-        .where("tokenID = :tokenID AND blake160 = :blake160", {
+        .where('tokenID = :tokenID AND blake160 = :blake160', {
           tokenID: output.typeArgs || 'CKBytes',
-          blake160: output.lockArgs,
+          blake160: output.lockArgs
         })
         .execute()
     }
   }
 
-  private static async blake160sOfAssetAccounts(): Promise<string[]> {
+  public static async blake160sOfAssetAccounts(): Promise<string[]> {
     const assetAccounts = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
@@ -317,26 +330,29 @@ export default class AssetAccountService {
     return assetAccounts.map(aa => aa.blake160)
   }
 
-  public static async sendTx(walletID: string, assetAccount: AssetAccount, tx: Transaction, password: string, skipSign = false): Promise<string> {
+  public static async sendTx(
+    walletID: string,
+    assetAccount: AssetAccount,
+    tx: Transaction,
+    password: string,
+    skipSign = false
+  ): Promise<string> {
     // 1. check AssetAccount exists
     const connection = getConnection()
-    const exists = await connection
-      .manager
-      .query(
-        `SELECT EXISTS (SELECT 1 FROM asset_account where tokenID = ? AND blake160 = ?) as exist`,
-        [assetAccount.tokenID, assetAccount.blake160]
-      )
+    const exists = await connection.manager.query(
+      `SELECT EXISTS (SELECT 1 FROM asset_account where tokenID = ? AND blake160 = ?) as exist`,
+      [assetAccount.tokenID, assetAccount.blake160]
+    )
 
-    const wallet = WalletService.getInstance().get(walletID)
-    const entity = AssetAccountEntity.fromModel(assetAccount)
     if (exists[0].exist === 1) {
       // For hardware wallet in ckb asset account:
       // 1. If a ckb account has been created, another one cannot be created;
       // 2. If a ckb account has been destroyed, ckb account can be created.
-      if (wallet.isHardware() && assetAccount.tokenID === 'CKBytes') {
+      const wallet = WalletService.getInstance().get(walletID)
+      if (wallet.isHardware()) {
         const address = await wallet.getNextAddress()
         if (address) {
-          const acpCells = await AssetAccountService.getACPCells(address.blake160, 'CKBytes')
+          const acpCells = await AssetAccountService.getACPCells(address.blake160, assetAccount.tokenID)
           if (acpCells.length) {
             throw new Error(`Asset account already exists!`)
           } else {
@@ -344,9 +360,9 @@ export default class AssetAccountService {
               .createQueryBuilder()
               .delete()
               .from(AssetAccountEntity)
-              .where("tokenID = :tokenID AND blake160 = :blake160", {
-                tokenID: 'CKBytes',
-                blake160: assetAccount.blake160,
+              .where('tokenID = :tokenID AND blake160 = :blake160', {
+                tokenID: assetAccount.tokenID,
+                blake160: assetAccount.blake160
               })
               .execute()
           }
@@ -357,15 +373,19 @@ export default class AssetAccountService {
     }
 
     // 2. send tx
-    const txHash = await new TransactionSender().sendTx(walletID, tx, password, 0, skipSign)
+    const txHash = await new TransactionSender().sendTx(walletID, tx, password, false, skipSign)
 
     // 3. save asset account
+    const entity = AssetAccountEntity.fromModel(assetAccount)
     await connection.manager.save([entity.sudtTokenInfo, entity])
 
     return txHash
   }
 
-  public static async update(id: number, params: { accountName?: string, tokenName?: string, symbol?: string, decimal?: string }) {
+  public static async update(
+    id: number,
+    params: { accountName?: string; tokenName?: string; symbol?: string; decimal?: string }
+  ) {
     const assetAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
@@ -395,16 +415,17 @@ export default class AssetAccountService {
 
   public static getTokenInfoList() {
     const repo = getConnection().getRepository(SudtTokenInfoEntity)
-    return repo.find({
-      where: {
-        tokenID: Not(''),
-        tokenName: Not(''),
-        symbol: Not(''),
-        decimal: Not('')
-      }
-    }).then(list => list.map(item => item.toModel()))
+    return repo
+      .find({
+        where: {
+          tokenID: Not(''),
+          tokenName: Not(''),
+          symbol: Not(''),
+          decimal: Not('')
+        }
+      })
+      .then(list => list.map(item => item.toModel()))
   }
-
 
   public static async generateCreateChequeTx(
     walletID: string,
@@ -415,7 +436,7 @@ export default class AssetAccountService {
     feeRate: string,
     description?: string
   ) {
-    const assetAccount = await this.getAccount({walletID, id: accountId})
+    const assetAccount = await this.getAccount({ walletID, id: accountId })
     if (!assetAccount) {
       throw new Error('Asset Account not found')
     }
@@ -430,7 +451,7 @@ export default class AssetAccountService {
       changeAddrObj!.address,
       fee,
       feeRate,
-      description,
+      description
     )
 
     return tx
@@ -438,9 +459,9 @@ export default class AssetAccountService {
 
   public static async generateClaimChequeTx(
     walletID: string,
-    chequeCellOutPoint: OutPoint,
+    chequeCellOutPoint: OutPoint
   ): Promise<{
-    tx: Transaction,
+    tx: Transaction
     assetAccount?: AssetAccount
   }> {
     const assetAccountInfo = new AssetAccountInfo()
@@ -455,9 +476,9 @@ export default class AssetAccountService {
     const receiverLockHash20 = chequeLiveCell.lock.args.slice(0, 42)
     const addressInfos = await wallet.getAllAddresses()
 
-    const receiverDefaultLock = addressInfos.map(
-      info => SystemScriptInfo.generateSecpScript(info.blake160)
-    ).find(defaultLock => defaultLock.computeHash().slice(0, 42) === receiverLockHash20)
+    const receiverDefaultLock = addressInfos
+      .map(info => SystemScriptInfo.generateSecpScript(info.blake160))
+      .find(defaultLock => defaultLock.computeHash().slice(0, 42) === receiverLockHash20)
 
     if (!receiverDefaultLock) {
       throw new Error('receiver default lock not found by receiver lock hash')
@@ -479,42 +500,26 @@ export default class AssetAccountService {
       .getMany()
 
     const hasAssetAccount = assetAccountEntities.find(
-      assetAccount => assetAccount.tokenID !== 'CKBytes' &&
-      assetAccount.blake160 === receiverDefaultLock.args
+      assetAccount => assetAccount.tokenID !== 'CKBytes' && assetAccount.blake160 === receiverDefaultLock.args
     )
 
     if (hasAssetAccount) {
-      return {tx}
+      return { tx }
     }
 
     const tokenId = chequeLiveCell.type!.args
-    const assetAccount = new AssetAccount(
-      tokenId,
-      '',
-      '',
-      '',
-      '',
-      '0',
-      receiverAcpScript.args
-    )
+    const assetAccount = new AssetAccount(tokenId, '', '', '', '', '0', receiverAcpScript.args)
 
-    return {tx, assetAccount}
+    return { tx, assetAccount }
   }
 
-  public static async generateWithdrawChequeTx(
-    chequeCellOutPoint: OutPoint,
-  ): Promise<Transaction> {
-
+  public static async generateWithdrawChequeTx(chequeCellOutPoint: OutPoint): Promise<Transaction> {
     const chequeLiveCell = await CellsService.getLiveCell(chequeCellOutPoint)
     if (!chequeLiveCell) {
       throw new Error('cheque live cell not found')
     }
 
-    const tx = await TransactionGenerator.generateWithdrawChequeTx(
-      chequeLiveCell,
-      undefined,
-      '1000'
-    )
+    const tx = await TransactionGenerator.generateWithdrawChequeTx(chequeLiveCell, undefined, '1000')
 
     return tx
   }

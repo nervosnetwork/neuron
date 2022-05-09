@@ -17,11 +17,10 @@ import SystemScriptInfo from '../../../src/models/system-script-info'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
-import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { CapacityNotEnough, LiveCapacityNotEnough } from '../../../src/exceptions/wallet'
+import { serializeWitnessArgs, scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough, MigrateSudtCellNoTypeError, SudtAcpHaveDataError, TargetOutputNotFoundError } from '../../../src/exceptions'
 import LiveCell from '../../../src/models/chain/live-cell'
-import AddressGenerator from '../../../src/models/address-generator'
-import {keyInfos} from '../../setupAndTeardown/public-key-info.fixture'
+import { keyInfos } from '../../setupAndTeardown/public-key-info.fixture'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -44,7 +43,7 @@ const fullAddressLockScript: Script = new Script(
 const fullAddressInfo = {
   lockScript: fullAddressLockScript,
   lockHash: fullAddressLockScript.computeHash(),
-  address: AddressGenerator.generate(fullAddressLockScript, AddressPrefix.Testnet),
+  address: scriptToAddress(fullAddressLockScript, false),
 }
 
 // diff = 1000min
@@ -56,11 +55,23 @@ const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0
 
 const stubbedQueryIndexer = jest.fn()
 jest.doMock('../../../src/block-sync-renderer/index', () => {
-  return {queryIndexer: stubbedQueryIndexer}
+  return { queryIndexer: stubbedQueryIndexer }
 });
+const getCurrentMock = jest.fn()
+jest.doMock('../../../src/services/wallets', () => ({
+  getInstance() {
+    return {
+      getCurrent: getCurrentMock
+    }
+  }
+}))
+
+
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 import AssetAccount from '../../../src/models/asset-account'
+import MultisigConfigModel from '../../../src/models/multisig-config'
+import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -167,6 +178,25 @@ describe('TransactionGenerator', () => {
     return output
   }
 
+  const createMultisigCell = async (
+    capacity: string,
+    status: OutputStatus,
+    who: any
+  ) => {
+    const multisigCell = new MultisigOutput()
+    multisigCell.capacity = capacity
+    multisigCell.status = status
+    multisigCell.outPointTxHash = randomHex()
+    multisigCell.outPointIndex = '0'
+    multisigCell.outPointTxHashAddIndex = multisigCell.outPointTxHash + multisigCell.outPointIndex
+    multisigCell.lockCodeHash = who.lockScript.codeHash
+    multisigCell.lockArgs = who.lockScript.args
+    multisigCell.lockHashType = who.lockScript.hashType
+    multisigCell.lockHash = who.lockScript.computeHash()
+    await getConnection().manager.save(multisigCell)
+    return multisigCell
+  }
+
   beforeEach(async () => {
     const connection = getConnection()
     await connection.synchronize(true)
@@ -252,7 +282,7 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: BigInt(1000 * 10**8 - 355).toString(),
+              capacity: BigInt(1000 * 10 ** 8 - 355).toString(),
             }
           ],
           bob.address,
@@ -281,7 +311,7 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - BigInt(464) + BigInt(1)).toString(),
+              capacity: (BigInt(1000 * 10 ** 8) - BigInt(464) + BigInt(1)).toString(),
             }
           ],
           bob.address,
@@ -311,11 +341,11 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: BigInt(1000 * 10**8).toString(),
+              capacity: BigInt(1000 * 10 ** 8).toString(),
             },
             {
               address: alice.address,
-              capacity: BigInt(2500 * 10**8).toString(),
+              capacity: BigInt(2500 * 10 ** 8).toString(),
             }
           ],
           bob.address,
@@ -336,7 +366,7 @@ describe('TransactionGenerator', () => {
             [
               {
                 address: fullAddressInfo.address,
-                capacity: BigInt(43 * 10**8).toString()
+                capacity: BigInt(43 * 10 ** 8).toString()
               }
             ],
             bob.address,
@@ -357,7 +387,7 @@ describe('TransactionGenerator', () => {
               [
                 {
                   address: fullAddressInfo.address,
-                  capacity: BigInt(42 * 10**8).toString()
+                  capacity: BigInt(42 * 10 ** 8).toString()
                 }
               ],
               bob.address,
@@ -373,11 +403,11 @@ describe('TransactionGenerator', () => {
             [
               {
                 address: fullAddressInfo.address,
-                capacity: BigInt(1000 * 10**8).toString()
+                capacity: BigInt(1000 * 10 ** 8).toString()
               },
               {
                 address: bob.address,
-                capacity: BigInt(1000 * 10**8).toString(),
+                capacity: BigInt(1000 * 10 ** 8).toString(),
               },
             ],
             bob.address,
@@ -482,7 +512,7 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - BigInt(fee)).toString(),
+              capacity: (BigInt(1000 * 10 ** 8) - BigInt(fee)).toString(),
             }
           ],
           bob.address,
@@ -505,7 +535,7 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - BigInt(fee) + BigInt(1)).toString(),
+              capacity: (BigInt(1000 * 10 ** 8) - BigInt(fee) + BigInt(1)).toString(),
             }
           ],
           bob.address,
@@ -688,6 +718,51 @@ describe('TransactionGenerator', () => {
         expect(parsedEpoch.index).toEqual(BigInt(43))
       })
     })
+
+    it('generator with multisigConfig', async () => {
+      await createMultisigCell(toShannon('3000'), OutputStatus.Live, {
+        lockScript: Script.fromObject({
+          codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
+          hashType: ScriptHashType.Type,
+          args: '0x87b9ae2c1c7108178e709bf4a89b736bc0f0ae60'
+        })
+      })
+      const feeRate = '1000'
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+        walletId1,
+        targetOutputs,
+        '0',
+        feeRate,
+        MultisigConfigModel.fromObject({
+          walletId: walletId1,
+          r: 1,
+          m: 2,
+          n: 3,
+          addresses: ['ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y', 'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y', 'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda'],
+          fullPayload: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sqv8hxhzc8r3pqtcuuym7j5fkumtcrc2ucqe3z37y'
+        })
+      )
+
+      const inputCapacities = tx.inputs!
+        .map(input => BigInt(input.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs!
+        .map(output => BigInt(output.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.multiSignWitness(1, 2, 3)
+
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+      expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+      expect(tx.fee).toEqual(expectedFee.toString())
+      targetOutputs.map((o, index) => {
+        if (index !== targetOutputs.length - 1) {
+          expect(o.capacity).toEqual(tx.outputs![index].capacity)
+        }
+      })
+      const totalCapacities: bigint = BigInt(toShannon('3000'))
+      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+    })
   })
 
   describe('generateDepositTx', () => {
@@ -737,7 +812,7 @@ describe('TransactionGenerator', () => {
     it('capacity 1000 - fee, no change output', async () => {
       const tx: Transaction = await TransactionGenerator.generateDepositTx(
         walletId1,
-        (BigInt(1000 * 10**8 - 453)).toString(),
+        (BigInt(1000 * 10 ** 8 - 453)).toString(),
         bob.address,
         bob.address,
         '0',
@@ -756,7 +831,7 @@ describe('TransactionGenerator', () => {
 
       const tx: Transaction = await TransactionGenerator.generateDepositTx(
         walletId1,
-        BigInt(3000 * 10**8).toString(),
+        BigInt(3000 * 10 ** 8).toString(),
         alice.address,
         bob.address,
         '0',
@@ -784,6 +859,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0'
       )
 
@@ -797,6 +874,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '999'
       )
 
@@ -810,6 +889,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0',
         '0'
       )
@@ -824,6 +905,8 @@ describe('TransactionGenerator', () => {
       const tx = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0',
         '1000'
       )
@@ -844,6 +927,8 @@ describe('TransactionGenerator', () => {
       const tx: Transaction = await TransactionGenerator.generateDepositAllTx(
         walletId1,
         bob.address,
+        bob.address,
+        false,
         '0',
         '1000'
       )
@@ -855,6 +940,21 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs!.length).toEqual(1)
       expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
       expect(tx.fee!).toEqual(expectedFee.toString())
+    })
+
+    it('with reserved balance', async () => {
+      const tx = await TransactionGenerator.generateDepositAllTx(
+        walletId1,
+        bob.address,
+        bob.address,
+        true,
+        '999'
+      )
+
+      const expectCapacity = BigInt('300000000000') - BigInt('999') - BigInt('6200000000')
+
+      expect(tx.outputs!.length).toEqual(2)
+      expect(tx.outputs![0].capacity).toEqual(expectCapacity.toString())
     })
   })
 
@@ -1043,7 +1143,7 @@ describe('TransactionGenerator', () => {
         let expectedTxFee: string
         beforeEach(async () => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
             ])
 
@@ -1058,7 +1158,7 @@ describe('TransactionGenerator', () => {
             walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
-            (1 * 10**8).toString(),
+            (1 * 10 ** 8).toString(),
             bob.lockScript.args,
             feeRate,
             '0'
@@ -1094,7 +1194,7 @@ describe('TransactionGenerator', () => {
         let expectedTxFee: string
         beforeEach(async () => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
             ])
 
@@ -1109,7 +1209,7 @@ describe('TransactionGenerator', () => {
             walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
-            (1 * 10**8).toString(),
+            (1 * 10 ** 8).toString(),
             bob.lockScript.args,
             feeRate,
             '0'
@@ -1146,7 +1246,7 @@ describe('TransactionGenerator', () => {
         let expectedTxFee: string
         beforeEach(async () => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)
             ])
 
@@ -1167,7 +1267,7 @@ describe('TransactionGenerator', () => {
             walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
-            (1 * 10**8).toString(),
+            (1 * 10 ** 8).toString(),
             bob.lockScript.args,
             feeRate,
             '0'
@@ -1207,7 +1307,7 @@ describe('TransactionGenerator', () => {
         })
         beforeEach(() => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
         })
@@ -1218,7 +1318,7 @@ describe('TransactionGenerator', () => {
               walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
-              (10 * 10**8).toString(),
+              (10 * 10 ** 8).toString(),
               bob.lockScript.args,
               feeRate,
               '0'
@@ -1240,9 +1340,9 @@ describe('TransactionGenerator', () => {
         let expectedTxSize: number
         let expectedTxFee: string
         let tx: Transaction
-        beforeEach(async  () => {
+        beforeEach(async () => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
@@ -1251,7 +1351,7 @@ describe('TransactionGenerator', () => {
             walletId1,
             [bobAnyoneCanPayLockScript],
             targetOutput,
-            (1 * 10**8).toString(),
+            (1 * 10 ** 8).toString(),
             bob.lockScript.args,
             feeRate,
             '0'
@@ -1295,25 +1395,25 @@ describe('TransactionGenerator', () => {
 
         beforeEach(async () => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('62'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
 
-            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-              walletId1,
-              [bobAnyoneCanPayLockScript],
-              targetOutput,
-              (1 * 10**8).toString(),
-              bob.lockScript.args,
-              feeRate,
-              '0'
-            )
+          tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+            walletId1,
+            [bobAnyoneCanPayLockScript],
+            targetOutput,
+            (1 * 10 ** 8).toString(),
+            bob.lockScript.args,
+            feeRate,
+            '0'
+          )
 
-            tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
-            tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+          tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+          tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
 
-            expectedTxSize = TransactionSize.tx(tx)
-            expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+          expectedTxSize = TransactionSize.tx(tx)
+          expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
         });
         it('calculates fees', () => {
           expect(tx.fee).toEqual(expectedTxFee)
@@ -1349,20 +1449,20 @@ describe('TransactionGenerator', () => {
         ]
         beforeEach(async () => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: aliceAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue(cellsByAlice)
+            .calledWith({ lock: aliceAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue(cellsByAlice)
 
-            tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
-              walletId1,
-              [aliceAnyoneCanPayLockScript],
-              targetOutput,
-              (1 * 10**8).toString(),
-              bob.lockScript.args,
-              feeRate,
-              '0'
-            )
+          tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+            walletId1,
+            [aliceAnyoneCanPayLockScript],
+            targetOutput,
+            (1 * 10 ** 8).toString(),
+            bob.lockScript.args,
+            feeRate,
+            '0'
+          )
 
-            tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
-            tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+          tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+          tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
         });
         it('should not use insufficient ACP cell as input', async () => {
           expect(tx.inputs.length).toEqual(3)
@@ -1381,7 +1481,7 @@ describe('TransactionGenerator', () => {
         })
         beforeEach(() => {
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('61'), undefined, undefined, bobAnyoneCanPayLockScript),
             ])
         })
@@ -1392,7 +1492,7 @@ describe('TransactionGenerator', () => {
               walletId1,
               [bobAnyoneCanPayLockScript],
               targetOutput,
-              (1 * 10**8).toString(),
+              (1 * 10 ** 8).toString(),
               bob.lockScript.args,
               feeRate,
               '0'
@@ -1415,7 +1515,7 @@ describe('TransactionGenerator', () => {
         describe('with all ACP cells without data', () => {
           beforeEach(async () => {
             when(stubbedQueryIndexer)
-              .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+              .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
               ])
@@ -1454,11 +1554,11 @@ describe('TransactionGenerator', () => {
         describe('with some of ACP cells having data', () => {
           beforeEach(async () => {
             when(stubbedQueryIndexer)
-              .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+              .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript),
                 generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript, '0x00'),
               ])
-              .calledWith({lock: aliceAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+              .calledWith({ lock: aliceAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
                 generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
               ])
             tx = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
@@ -1565,7 +1665,7 @@ describe('TransactionGenerator', () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, pwAnyoneCanPayLockScript)
 
           when(stubbedQueryIndexer)
-            .calledWith({lock: bobAnyoneCanPayLockScript, type: null, data: null}).mockResolvedValue([
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null }).mockResolvedValue([
               generateLiveCell(toShannon('150'), '1000', tokenID),
             ])
 
@@ -1608,8 +1708,8 @@ describe('TransactionGenerator', () => {
               type: assetAccountInfo.generateSudtScript(tokenID),
               data: null
             }).mockResolvedValue([
-            generateLiveCell(toShannon('150'), '100', tokenID),
-          ])
+              generateLiveCell(toShannon('150'), '100', tokenID),
+            ])
 
           const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
           targetOutput = Output.fromObject({
@@ -1920,7 +2020,7 @@ describe('TransactionGenerator', () => {
         expect(tx.outputs.length).toEqual(2)
 
         const output = tx.outputs[0]
-        expect(output.capacity).toEqual(BigInt(61 * 10**8).toString())
+        expect(output.capacity).toEqual(BigInt(61 * 10 ** 8).toString())
         expect(!!output.type).toBe(false)
         expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
         expect(output.data).toEqual('0x')
@@ -1953,7 +2053,7 @@ describe('TransactionGenerator', () => {
         expect(tx.outputs.length).toEqual(2)
 
         const output = tx.outputs[0]
-        expect(output.capacity).toEqual(BigInt(142 * 10**8).toString())
+        expect(output.capacity).toEqual(BigInt(142 * 10 ** 8).toString())
         expect(assetAccountInfo.isSudtScript(output.type!)).toBe(true)
         expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
         expect(output.data).toEqual('0x' + '0'.repeat(32))
@@ -1980,7 +2080,7 @@ describe('TransactionGenerator', () => {
           const receiverDefaultLock = bob.lockScript
 
           when(stubbedQueryIndexer)
-            .calledWith({lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null})
+            .calledWith({ lock: aliceAnyoneCanPayLockScript, type: assetAccountInfo.generateSudtScript(tokenID), data: null })
             .mockResolvedValue([
               generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript),
               generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
@@ -2080,7 +2180,7 @@ describe('TransactionGenerator', () => {
               OutputStatus.Live,
               true,
               typeScript,
-              {lockScript: receiverAcpLock},
+              { lockScript: receiverAcpLock },
               undefined,
               BufferUtils.writeBigUInt128LE(BigInt(100))
             )
@@ -2176,7 +2276,7 @@ describe('TransactionGenerator', () => {
           typeScript,
           toShannon('162'),
           BufferUtils.writeBigUInt128LE(BigInt(chequeAmount)),
-          OutPoint.fromObject({txHash: transaction.hash, index: '0x1'})
+          OutPoint.fromObject({ txHash: transaction.hash, index: '0x1' })
         )
 
         describe('when the sender acp output from cheque tx is still live', () => {
@@ -2186,7 +2286,7 @@ describe('TransactionGenerator', () => {
               typeScript,
               toShannon('142'),
               BufferUtils.writeBigUInt128LE(BigInt('1')),
-              OutPoint.fromObject({txHash: transaction.hash, index: '0x0'})
+              OutPoint.fromObject({ txHash: transaction.hash, index: '0x0' })
             )
             await getConnection().manager.save([
               transaction,
@@ -2224,7 +2324,7 @@ describe('TransactionGenerator', () => {
             typeScript,
             toShannon('142'),
             BufferUtils.writeBigUInt128LE(BigInt('2')),
-            OutPoint.fromObject({txHash: '0x' + '1'.repeat(64), index: '0x0'})
+            OutPoint.fromObject({ txHash: '0x' + '1'.repeat(64), index: '0x0' })
           )
           beforeEach(async () => {
             senderAcpOutputEntity = createOutput(
@@ -2232,7 +2332,7 @@ describe('TransactionGenerator', () => {
               typeScript,
               toShannon('142'),
               BufferUtils.writeBigUInt128LE(BigInt('1')),
-              OutPoint.fromObject({txHash: transaction.hash, index: '0x0'})
+              OutPoint.fromObject({ txHash: transaction.hash, index: '0x0' })
             )
             senderAcpOutputEntity.status = OutputStatus.Dead
 
@@ -2259,6 +2359,132 @@ describe('TransactionGenerator', () => {
       })
     });
 
+    describe('generateSudtMigrateAcpTx', () => {
+      const assetAccountInfo = new AssetAccountInfo()
+      const sudtCellObject = {
+        capacity: toShannon('142'),
+        lock: alice.lockScript,
+        type: assetAccountInfo.generateSudtScript('0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03'),
+        data: BufferUtils.writeBigUInt128LE(BigInt(100))
+      }
+      it('no wallet', async () => {
+        getCurrentMock.mockReturnValueOnce(undefined)
+        expect(TransactionGenerator.generateSudtMigrateAcpTx(Output.fromObject(sudtCellObject))).rejects.toThrow(new CurrentWalletNotSet())
+      })
+
+      describe('with acp address', () => {
+        let receiverAcpCell: OutputEntity
+        let secpCell: OutputEntity
+        const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+        beforeEach(async () => {
+          receiverAcpCell = generateCell(
+            toShannon('1000'),
+            OutputStatus.Live,
+            true,
+            sudtCellObject.type!,
+            { lockScript: bobAnyoneCanPayLockScript },
+            undefined,
+            BufferUtils.writeBigUInt128LE(BigInt(100))
+          )
+          secpCell = generateCell(
+            toShannon('100'),
+            OutputStatus.Live,
+            false,
+            null,
+            { lockScript: alice.lockScript },
+          )
+          await getConnection().manager.save([receiverAcpCell, secpCell])
+          when(stubbedQueryIndexer)
+            .calledWith({ lock: bobAnyoneCanPayLockScript, type: Output.fromObject(sudtCellObject).type, data: null }).mockResolvedValue([
+              generateLiveCell(toShannon('70'), '100', receiverAcpCell.typeArgs!, bobAnyoneCanPayLockScript)
+            ])
+        })
+        it('sudt cell no type', async () => {
+          getCurrentMock.mockReturnValueOnce({})
+          const sudtCell = Output.fromObject(sudtCellObject)
+          sudtCell.type = null
+          expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, 'acpAddress')).rejects.toThrow(new MigrateSudtCellNoTypeError())
+        })
+        it('acp address is invalid', async () => {
+          getCurrentMock.mockReturnValueOnce({})
+          const sudtCell = Output.fromObject(sudtCellObject)
+          when(stubbedQueryIndexer)
+            .calledWith({ lock: addressToScript('ckt1qyq0tejcz8rl6yyjw3m3vnu7r955d9ecj9gq46suu6'), type: sudtCell.type, data: null }).mockResolvedValue([])
+          expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, 'ckt1qyq0tejcz8rl6yyjw3m3vnu7r955d9ecj9gq46suu6')).rejects.toThrow(new TargetOutputNotFoundError())
+        })
+        it('sudt capacitity is enough', async () => {
+          const sudtCell = Output.fromObject(sudtCellObject)
+          sudtCell.setCapacity(toShannon('144'))
+          getCurrentMock.mockReturnValueOnce({})
+          const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
+          const res = await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash) as Transaction
+          expect(res.outputs).toHaveLength(2)
+          expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+        })
+        it('sudt capacitity is not enough and last address should be acp input cell', async () => {
+          const sudtCell = Output.fromObject(sudtCellObject)
+          getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
+          const bobLockHash = scriptToAddress(bobAnyoneCanPayLockScript)
+          const res = await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash) as Transaction
+          expect(res.outputs).toHaveLength(3)
+          expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
+          expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee)).toString())
+          expect(res.inputs).toHaveLength(3)
+          expect(res.inputs[2].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
+        })
+      })
+
+      describe('create new acp address', () => {
+        let receiverAcpCell: OutputEntity
+        const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+        beforeEach(async () => {
+          receiverAcpCell = generateCell(
+            toShannon('1000'),
+            OutputStatus.Live,
+            true,
+            sudtCellObject.type!,
+            { lockScript: bobAnyoneCanPayLockScript },
+            undefined,
+            BufferUtils.writeBigUInt128LE(BigInt(100))
+          )
+          await getConnection().manager.save([receiverAcpCell])
+        })
+        it('new account create', async () => {
+          const sudtCell = Output.fromObject(sudtCellObject)
+          sudtCell.setCapacity(toShannon('144'))
+          getCurrentMock.mockReturnValueOnce({
+            id: alice.walletId,
+            getNextChangeAddress: () => ({ address: alice.address }),
+            isHDWallet: () => true,
+            getNextReceivingAddresses: () => [{ blake160: alice.publicKeyInBlake160 }]
+          })
+          const res = await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell) as Transaction
+          expect(res.outputs).toHaveLength(1)
+          expect(res.outputs[0].data).toEqual(sudtCell.data)
+          expect(res.outputs[0].capacity).toEqual((BigInt(sudtCell.capacity) - BigInt(res.fee)).toString())
+        })
+
+        it('account capacity is not enough', async () => {
+          const sudtCell = Output.fromObject(sudtCellObject)
+          getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
+          expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell)).rejects.toThrow()
+        })
+
+        it('account capacity not enough for change', async () => {
+          const secpCell = generateCell(
+            toShannon('61'),
+            OutputStatus.Live,
+            false,
+            null,
+            { lockScript: alice.lockScript },
+          )
+          await getConnection().manager.save([receiverAcpCell, secpCell])
+          const sudtCell = Output.fromObject(sudtCellObject)
+          getCurrentMock.mockReturnValueOnce({ id: alice.walletId, getNextChangeAddress: () => ({ address: alice.address }) })
+          expect(TransactionGenerator.generateSudtMigrateAcpTx(sudtCell)).rejects.toThrow()
+        })
+      })
+    })
   })
 
   describe('generateCreateAnyoneCanPayTxUseAllBalance', () => {
@@ -2297,7 +2523,7 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs.length).toEqual(1)
 
       const output = tx.outputs[0]
-      expect(output.capacity).toEqual((BigInt(100 * 10**8) - BigInt(tx.fee)).toString())
+      expect(output.capacity).toEqual((BigInt(100 * 10 ** 8) - BigInt(tx.fee)).toString())
       expect(!!output.type).toBe(false)
       expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
       expect(output.data).toEqual('0x')
@@ -2331,7 +2557,7 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs.length).toEqual(1)
 
       const output = tx.outputs[0]
-      expect(output.capacity).toEqual((BigInt(143 * 10**8) - BigInt(tx.fee)).toString())
+      expect(output.capacity).toEqual((BigInt(143 * 10 ** 8) - BigInt(tx.fee)).toString())
       expect(assetAccountInfo.isSudtScript(output.type!)).toBe(true)
       expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
       expect(output.data).toEqual('0x' + '0'.repeat(32))
@@ -2352,15 +2578,15 @@ describe('TransactionGenerator', () => {
     describe('with legacy acp cells', () => {
       beforeEach(async () => {
         const cells = [
-          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: legacyACPLock}),
-          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: legacyACPLock}),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, { lockScript: legacyACPLock }),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, { lockScript: legacyACPLock }),
 
-          generateCell(toShannon('61'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
-          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
-          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('61'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
 
-          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: legacyACPLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
-          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: legacyACPLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, { lockScript: legacyACPLock }, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, { lockScript: legacyACPLock }, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
         ]
         await getConnection().manager.save(cells)
       });
@@ -2394,15 +2620,15 @@ describe('TransactionGenerator', () => {
     describe('with no legacy acp cells', () => {
       beforeEach(async () => {
         const cells = [
-          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: acpLock}),
-          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: acpLock}),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, { lockScript: acpLock }),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, { lockScript: acpLock }),
 
-          generateCell(toShannon('61'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
-          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
-          generateCell(toShannon('100'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('61'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
+          generateCell(toShannon('100'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
 
-          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: acpLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
-          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, {lockScript: acpLock}, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, { lockScript: acpLock }, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
+          generateCell(toShannon('200'), OutputStatus.Live, false, sudtScript, { lockScript: acpLock }, undefined, BufferUtils.writeBigUInt128LE(BigInt(100))),
         ]
         await getConnection().manager.save(cells)
       });
@@ -2414,8 +2640,8 @@ describe('TransactionGenerator', () => {
     describe('with insufficient normal cells for fees', () => {
       beforeEach(async () => {
         const cells = [
-          generateCell(toShannon('1000'), OutputStatus.Live, false, null, {lockScript: legacyACPLock}),
-          generateCell(toShannon('61'), OutputStatus.Live, false, null, {lockScript: defaultLock}),
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, { lockScript: legacyACPLock }),
+          generateCell(toShannon('61'), OutputStatus.Live, false, null, { lockScript: defaultLock }),
         ]
         await getConnection().manager.save(cells)
       });
@@ -2429,5 +2655,88 @@ describe('TransactionGenerator', () => {
         expect(error).not.toEqual(null)
       });
     });
-  });
+  })
+
+  describe('generateDestoryAssetAccountTx', () => {
+    describe('CKB account', () => {
+      it('capacity not enough for fee', async () => {
+        const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('61')
+        await expect(TransactionGenerator.generateDestoryAssetAccountTx(
+          'walletId',
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          true
+        )).rejects.toThrow(new CapacityNotEnough())
+      })
+      it('account capacity not enough for fee need other address', async () => {
+        const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('61')
+        const cell: OutputEntity = generateCell(toShannon('62'), OutputStatus.Live, false, null, alice)
+        await getConnection().manager.save(cell)
+        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          true
+        )
+        const expectCapacity = BigInt(toShannon('123')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+        expect(res.inputs).toHaveLength(2)
+        expect(res.inputs[1].capacity).toBe(toShannon('62'))
+        expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+      })
+      it('account capacity enough for fee', async () => {
+        const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('62')
+        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          true
+        )
+        const expectCapacity = BigInt(toShannon('62')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+        expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+      })
+    })
+    describe('sUDT account', () => {
+      it('sUDT amount is not zero throw exception', async () => {
+        const typeScript = new Script(
+          '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+          '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+          ScriptHashType.Type
+        )
+        const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('142')
+        asssetAccountInput.data = BufferUtils.writeBigUInt128LE(BigInt('10'))
+        await expect(TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          false
+        )).rejects.toThrow(new SudtAcpHaveDataError())
+      })
+      it('destory success', async () => {
+        const typeScript = new Script(
+          '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+          '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+          ScriptHashType.Type
+        )
+        const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
+        const asssetAccountInput = input.toModel()
+        asssetAccountInput.capacity = toShannon('142')
+        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+          alice.walletId,
+          [asssetAccountInput],
+          bob.publicKeyInBlake160,
+          false
+        )
+        const expectCapacity = BigInt(toShannon('142')) - TransactionFee.fee(TransactionSize.tx(res), BigInt(1e4))
+        expect(res.outputs[0].capacity).toBe(expectCapacity.toString())
+      })
+    })
+  })
 })

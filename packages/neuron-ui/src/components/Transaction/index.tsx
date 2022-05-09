@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID } from 'services/remote'
-
 import { transactionState } from 'states'
+import LockInfoDialog from 'components/LockInfoDialog'
+import ScriptTag from 'components/ScriptTag'
 
 import {
   useOnLocaleChange,
@@ -14,7 +16,6 @@ import {
   shannonToCKBFormatter,
   useExitOnWalletChange,
   isSuccessResponse,
-  scriptToAddress,
 } from 'utils'
 import CopyZone from 'widgets/CopyZone'
 
@@ -27,6 +28,7 @@ const Transaction = () => {
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
+  const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
 
   const hash = useMemo(() => window.location.href.split('/').pop(), [])
 
@@ -126,6 +128,13 @@ const Transaction = () => {
     )})`
   }, [transaction.outputs.length, transaction.outputsCount, t])
 
+  const renderLockInfoDialog = useCallback(() => {
+    if (!lockInfo) {
+      return null
+    }
+    return <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />
+  }, [lockInfo, isMainnet])
+
   const renderList = useCallback(
     (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>) =>
       cells.map((cell, index) => {
@@ -146,8 +155,9 @@ const Transaction = () => {
             <td title={`${index}`}>{index}</td>
             <td title={address} className={styles.addressCell}>
               <CopyZone content={address} name={t('history.copy-address')}>
-                {address}
+                {`${address.slice(0, 20)}...${address.slice(-20)}`}
               </CopyZone>
+              <ScriptTag isMainnet={isMainnet} script={cell.lock} onClick={() => setLockInfo(cell.lock)} />
             </td>
             <td>
               <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
@@ -211,6 +221,7 @@ const Transaction = () => {
         </thead>
         <tbody>{renderList(transaction.outputs)}</tbody>
       </table>
+      {renderLockInfoDialog()}
     </div>
   )
 }

@@ -149,5 +149,5 @@ export default {
   mnemonicToEntropy,
   mnemonicToSeed,
   mnemonicToSeedSync,
-  validateMnemonic,
+  validateMnemonic
 }

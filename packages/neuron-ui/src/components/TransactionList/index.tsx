@@ -111,8 +111,7 @@ const TransactionList = ({
       if (btn?.dataset?.hash && btn?.dataset?.action) {
         switch (btn.dataset.action) {
           case 'explorer': {
-            const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
-            openExternal(`${explorerUrl}/transaction/${btn.dataset.hash}`)
+            openExternal(`${getExplorerUrl(isMainnet)}/transaction/${btn.dataset.hash}`)
             break
           }
           case 'detail': {
@@ -142,31 +141,45 @@ const TransactionList = ({
         const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
 
         let name = '--'
-        let value = '--'
         let amount = '--'
         let typeLabel = '--'
         let sudtAmount = ''
 
         if (tx.nftInfo) {
+          // NFT
           name = walletName
           const { type, data } = tx.nftInfo
           typeLabel = `${t(`history.${type}`)} m-NFT`
           amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
         } else if (tx.sudtInfo?.sUDT) {
+          // Asset Account
           name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
-          const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
-          typeLabel = `UDT ${t(`history.${type}`)}`
-          value = tx.sudtInfo.amount
+          if (['create', 'destroy'].includes(tx.type)) {
+            // create/destroy an account
+            typeLabel = `${t(`history.${tx.type}`, { name })}`
+          } else {
+            // send/receive to/from an account
+            const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
+            typeLabel = `UDT ${t(`history.${type}`)}`
+          }
 
           if (tx.sudtInfo.sUDT.decimal) {
-            sudtAmount = sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal, true)
+            sudtAmount = sudtValueToAmount(tx.sudtInfo.amount, tx.sudtInfo.sUDT.decimal, true)
             amount = `${sUDTAmountFormatter(sudtAmount)} ${tx.sudtInfo.sUDT.symbol}`
           }
         } else {
+          // normal tx
           name = walletName
-          value = `${tx.value} shannons`
           amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
-          typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+          if (tx.type === 'create' || tx.type === 'destroy') {
+            if (tx.assetAccountType === 'CKB') {
+              typeLabel = `${t(`history.${tx.type}`, { name: 'CKB' })}`
+            } else {
+              typeLabel = `${t(`overview.${tx.type}`, { name: 'Unknown' })}`
+            }
+          } else {
+            typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+          }
         }
 
         let indicator = <Pending />

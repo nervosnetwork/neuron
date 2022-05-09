@@ -1,0 +1,111 @@
+@import '../../styles/mixin.scss';
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .searchBox {
+      width: 60%;
+  }
+
+  .actions {
+      & > button {
+          margin-left: 4px;
+      }
+  }
+}
+
+@mixin copyzone-fullpayload {
+  min-width: 100px;
+  max-width: calc(100% - 20px);
+  display: flex;
+  height: 1.625rem;
+
+  .overflow {
+    word-break: break-all;
+    text-align: right;
+    line-height: 1.625rem;
+    overflow: hidden;
+  }
+
+  & > span {
+    line-height: 1.625rem;
+  }
+}
+
+.dialog {
+  @include dialog-container;
+  padding: 30px 50px;
+}
+
+.approveDialog {
+  @include dialog-container;
+  padding: 30px 50px;
+  max-width: 800px;
+}
+
+.multisigConfig {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+
+  thead {
+    th {
+      padding: 8px;
+      min-width: 40px;
+      text-align: left;
+    }
+
+    .checkBoxTh {
+      text-align: left;
+    }
+  }
+
+  tr {
+    border-bottom: 1px solid #b3b3b3;
+  }
+
+  tbody {
+    td {
+      padding: 8px;
+      min-width: 40px;
+      text-align: left;
+      font-size: 14px;
+    }
+  }
+
+  .fullPayload {
+    @include copyzone-fullpayload;
+  }
+  
+  .more {
+    transform: rotate(90deg);
+
+    &:hover {
+      path {
+        fill: var(--nervos-green);
+        stroke: var(--nervos-green);
+      }
+    }
+  }
+}
+
+.ok {
+  margin: 12px 0;
+  text-align: center;
+}
+
+.importActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+
+  & > button {
+    margin-left: 12px;
+  }
+}
+
+.noData {
+  margin-top: 16px;
+}
