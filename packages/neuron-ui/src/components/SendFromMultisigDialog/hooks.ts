@@ -95,10 +95,10 @@ export const useSendInfo = ({
   t: TFunction
 }) => {
   const [sendInfoList, setSendInfoList] = useState<
-    { address: string | undefined; amount: string | undefined; unit: CapacityUnit }[]
-  >([{ address: undefined, amount: undefined, unit: CapacityUnit.CKB }])
+    { address: string | undefined; amount: string | undefined; unit: CapacityUnit; disabled: boolean }[]
+  >([{ address: undefined, amount: undefined, unit: CapacityUnit.CKB, disabled: false }])
   const addSendInfo = useCallback(() => {
-    setSendInfoList(v => [...v, { address: undefined, amount: undefined, unit: CapacityUnit.CKB }])
+    setSendInfoList(v => [...v, { address: undefined, amount: undefined, unit: CapacityUnit.CKB, disabled: false }])
   }, [setSendInfoList])
   const deleteSendInfo = useCallback(
     e => {

@@ -56,7 +56,7 @@ declare namespace Controller {
 
   interface SendTransactionParams {
     walletID: string
-    tx: string
+    tx: any
     password?: string
     description?: string
     multisigConfig?: {

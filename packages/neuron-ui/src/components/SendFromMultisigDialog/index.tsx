@@ -9,6 +9,7 @@ import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, valida
 import { useState as useGlobalState } from 'states'
 import CopyZoneAddress from 'widgets/CopyZoneAddress'
 
+import { AmountNotEnoughException } from 'exceptions'
 import { useSendInfo, useOnSumbit, useExport, useCanSign } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
 
@@ -50,7 +51,9 @@ const SendFromMultisigDialog = ({
     try {
       validateTotalAmount(totalAmount, fee, balance)
     } catch (err) {
-      errorMessageUnderTotal = t(err.message)
+      if (err instanceof AmountNotEnoughException) {
+        errorMessageUnderTotal = t(err.message)
+      }
     }
     return errorMessageUnderTotal
   }, [errorMessage, totalAmount, balance, t, fee])
