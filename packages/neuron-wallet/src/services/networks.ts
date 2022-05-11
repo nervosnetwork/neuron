@@ -155,7 +155,7 @@ export default class NetworksService extends Store {
     if (this.isMainnet()) {
       return 'https://explorer.nervos.org'
     }
-    return 'https://explorer.nervos.org/aggron'
+    return 'https://pudge.explorer.nervos.org'
   }
 
   // Refresh a network's genesis and chain info
