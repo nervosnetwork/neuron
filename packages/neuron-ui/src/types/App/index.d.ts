@@ -154,14 +154,6 @@ declare namespace State {
     id: NetworkID
   }
 
-  interface WalletIdentity {
-    id: string
-    name: string
-    device?: DeviceInfo
-    isHD?: boolean
-    isWatchOnly?: boolean
-  }
-
   enum Manufacturer {
     Ledger = 'Ledger',
   }
@@ -171,6 +163,14 @@ declare namespace State {
     vendorId: string
     manufacturer: Manufacturer
     product: string
+  }
+
+  interface WalletIdentity {
+    id: string
+    name: string
+    device?: DeviceInfo
+    isHD?: boolean
+    isWatchOnly?: boolean
   }
 
   interface DeviceInfo {

@@ -130,12 +130,20 @@ module.exports = {
     ],
     'default-param-last': 'off',
     'no-unsafe-optional-chaining': 'warn',
+    'react/no-unstable-nested-components': ['warn', { allowAsProps: true }],
+    'react/jsx-no-useless-fragment': 'off',
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
       rules: {
         'no-undef': 'off',
+      },
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'react/jsx-no-constructed-context-values': 0,
       },
     },
   ],

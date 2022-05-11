@@ -8,7 +8,7 @@ import { useDialog } from 'utils'
 import styles from './lockInfoDialog.module.scss'
 import getLockSupportShortAddress from '../../utils/getLockSupportShortAddress'
 
-interface LockInfoDialog {
+interface LockInfoDialogProps {
   lockInfo: CKBComponents.Script | null
   isMainnet: boolean
   onDismiss: () => void
@@ -45,7 +45,7 @@ const ShortAddr = ({ lockScript, isMainnet }: { lockScript: CKBComponents.Script
   )
 }
 
-const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialog) => {
+const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps) => {
   const [t] = useTranslation()
   const [copied, setCopied] = useState(false)
   const dialogRef = useRef<HTMLDialogElement | null>(null)

@@ -10,6 +10,11 @@ export enum RoutePath {
   ImportHardware = '/import-hardware',
 }
 
+export interface Model {
+  manufacturer: string
+  product: string
+}
+
 export interface LocationState {
   entryPath: string
   model: Model
@@ -18,9 +23,4 @@ export interface LocationState {
     chainCode: string
   }
   error?: FailureFromController['message']
-}
-
-export interface Model {
-  manufacturer: string
-  product: string
 }

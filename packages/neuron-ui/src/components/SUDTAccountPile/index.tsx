@@ -14,6 +14,7 @@ export interface SUDTAccountPileProps {
   symbol?: string
   balance: string
   tokenId: string
+  // eslint-disable-next-line react/no-unused-prop-types
   address: string
   decimal: string
   onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>

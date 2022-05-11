@@ -22,57 +22,56 @@ export const MultisigAddressTable = ({
 }) => {
   const [t] = useTranslation()
   return (
-    <>
-      <table className={styles.multiAddressTable}>
-        <thead>
-          <tr>
-            {['index', 'required', 'signer-address'].map(field => (
-              <th key={field}>{t(`multisig-address.create-dialog.${field}`)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {addresses.map((v, idx) => (
-            <tr key={idx.toString()}>
-              <td>{`#${idx + 1}`}</td>
-              <td>
-                <input
-                  type="checkbox"
-                  data-idx={idx}
-                  onChange={changeR}
-                  checked={idx < r}
-                  disabled={idx > r || disabled}
-                />
-              </td>
-              <td className={styles.address}>
-                {disabled ? (
-                  <CopyZone
-                    content={v}
-                    className={styles.copyzone}
-                    name={t('multisig-address.create-dialog.copy-address')}
-                  >
-                    <span className={styles.overflow}>{v.slice(0, -6)}</span>
-                    <span>...</span>
-                    <span>{v.slice(-6)}</span>
-                  </CopyZone>
-                ) : (
-                  <TextField
-                    field={`${idx}_address`}
-                    data-idx={idx}
-                    value={v}
-                    className={styles.addressField}
-                    onChange={changeAddress}
-                    disabled={disabled}
-                    placeholder={t('multisig-address.create-dialog.multi-address-info.ckb-address-placeholder')}
-                    error={addressErrors?.[idx] ? t(addressErrors[idx]!.message, addressErrors[idx]!.i18n) : undefined}
-                  />
-                )}
-              </td>
-            </tr>
+    <table className={styles.multiAddressTable}>
+      <thead>
+        <tr>
+          {['index', 'required', 'signer-address'].map(field => (
+            <th key={field}>{t(`multisig-address.create-dialog.${field}`)}</th>
           ))}
-        </tbody>
-      </table>
-    </>
+        </tr>
+      </thead>
+      <tbody>
+        {addresses.map((v, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <tr key={idx.toString()}>
+            <td>{`#${idx + 1}`}</td>
+            <td>
+              <input
+                type="checkbox"
+                data-idx={idx}
+                onChange={changeR}
+                checked={idx < r}
+                disabled={idx > r || disabled}
+              />
+            </td>
+            <td className={styles.address}>
+              {disabled ? (
+                <CopyZone
+                  content={v}
+                  className={styles.copyzone}
+                  name={t('multisig-address.create-dialog.copy-address')}
+                >
+                  <span className={styles.overflow}>{v.slice(0, -6)}</span>
+                  <span>...</span>
+                  <span>{v.slice(-6)}</span>
+                </CopyZone>
+              ) : (
+                <TextField
+                  field={`${idx}_address`}
+                  data-idx={idx}
+                  value={v}
+                  className={styles.addressField}
+                  onChange={changeAddress}
+                  disabled={disabled}
+                  placeholder={t('multisig-address.create-dialog.multi-address-info.ckb-address-placeholder')}
+                  error={addressErrors?.[idx] ? t(addressErrors[idx]!.message, addressErrors[idx]!.i18n) : undefined}
+                />
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
 
