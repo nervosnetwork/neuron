@@ -16,9 +16,8 @@ import {
 } from 'services/remote'
 import { addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 
-export const useSearch = (clearSelected: () => void) => {
+export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
-  const [searchKeywords, setSearchKeywords] = useState('')
 
   const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     if (undefined !== newValue) {
@@ -28,16 +27,16 @@ export const useSearch = (clearSelected: () => void) => {
 
   const onSearch = useCallback(
     value => {
-      setSearchKeywords(value)
+      onFilterConfig(value)
       clearSelected()
     },
-    [setSearchKeywords, clearSelected]
+    [onFilterConfig, clearSelected]
   )
 
   const onClear = useCallback(() => {
     onSearch('')
   }, [onSearch])
-  return { keywords, onKeywordsChange, setKeywords, onSearch, searchKeywords, onClear }
+  return { keywords, onKeywordsChange, setKeywords, onSearch, onClear }
 }
 
 export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {
@@ -77,7 +76,30 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
     },
     [setEntities]
   )
-  const configs = useMemo<MultisigConfig[]>(
+  const deleteConfigById = useCallback(
+    (id: number) => {
+      setEntities(v => v.filter(config => config.id !== id))
+    },
+    [setEntities]
+  )
+  const onImportConfig = useCallback(() => {
+    importMultisigConfig(walletId).then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        const { result } = res
+        if (result) {
+          setEntities(v => [...result, ...v])
+        }
+      }
+    })
+  }, [walletId])
+  const [searchKeywords, setSearchKeywords] = useState('')
+  const onFilterConfig = useCallback(
+    (v: string) => {
+      setSearchKeywords(v)
+    },
+    [setSearchKeywords]
+  )
+  const allConfigs = useMemo<MultisigConfig[]>(
     () =>
       entities.map(entity => ({
         ...entity,
@@ -95,28 +117,21 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
       })),
     [entities, isMainnet]
   )
-  const deleteConfigById = useCallback(
-    (id: number) => {
-      setEntities(v => v.filter(config => config.id !== id))
-    },
-    [setEntities]
+  const configs = useMemo<MultisigConfig[]>(
+    () =>
+      searchKeywords
+        ? allConfigs.filter(v => v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords)
+        : allConfigs,
+    [allConfigs, searchKeywords]
   )
-  const onImportConfig = useCallback(() => {
-    importMultisigConfig(walletId).then(res => {
-      if (isSuccessResponse(res) && res.result) {
-        const { result } = res
-        if (result) {
-          setEntities(v => [...result, ...v])
-        }
-      }
-    })
-  }, [walletId])
   return {
     saveConfig,
-    allConfigs: configs,
+    allConfigs,
     updateConfig,
     deleteConfigById,
     onImportConfig,
+    configs,
+    onFilterConfig,
   }
 }
 
