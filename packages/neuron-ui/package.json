@@ -15,7 +15,7 @@
   "main": "./build",
   "license": "MIT",
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
     "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "build": "react-app-rewired build",

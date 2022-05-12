@@ -128,9 +128,9 @@ module.exports = {
         },
       },
     ],
-    'default-param-last': 'off',
-    'no-unsafe-optional-chaining': 'warn',
+    'no-unsafe-optional-chaining': ['warn', { disallowArithmeticOperators: false }],
     'react/no-unstable-nested-components': ['warn', { allowAsProps: true }],
+    'default-param-last': 'off',
     'react/jsx-no-useless-fragment': 'off',
   },
   overrides: [
