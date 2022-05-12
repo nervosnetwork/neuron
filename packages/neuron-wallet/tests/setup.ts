@@ -1,30 +1,33 @@
 import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
 import '../src/locales/i18n'
 import { LedgerHID, LedgerCkbApp } from './mock/hardware'
-export const originalXMLHttpRequest = window.XMLHttpRequest
 
-export const mockedXMLHttpRequest = {
-  open: jest.fn(),
-  send: jest.fn(),
-  readyState: null,
-  responseText: null,
-}
+// export const mockedXMLHttpRequest = {
+//   open: jest.fn(),
+//   send: jest.fn(),
+//   readyState: null,
+//   responseText: null
+// }
 
-Object.defineProperty(mockedXMLHttpRequest, 'readyState', {
-  get: jest.fn(() => 4),
-  set: jest.fn()
-});
-Object.defineProperty(mockedXMLHttpRequest, 'responseText', {
-  get: jest.fn(() => JSON.stringify([])),
-  set: jest.fn()
-});
+// Object.defineProperty(mockedXMLHttpRequest, 'readyState', {
+//   get: jest.fn(() => 4),
+//   set: jest.fn()
+// })
+// Object.defineProperty(mockedXMLHttpRequest, 'responseText', {
+//   get: jest.fn(() => JSON.stringify([])),
+//   set: jest.fn()
+// })
 
-Object.defineProperty(window, "XMLHttpRequest", jest.fn(() => ({
-  open: mockedXMLHttpRequest.open,
-  send: mockedXMLHttpRequest.send,
-  readyState: mockedXMLHttpRequest.readyState,
-  responseText: mockedXMLHttpRequest.responseText
-})));
+// Object.defineProperty(
+//   window,
+//   'XMLHttpRequest',
+//   jest.fn(() => ({
+//     open: mockedXMLHttpRequest.open,
+//     send: mockedXMLHttpRequest.send,
+//     readyState: mockedXMLHttpRequest.readyState,
+//     responseText: mockedXMLHttpRequest.responseText
+//   }))
+// )
 
 jest.mock('levelup', () => {
   return () => ({
@@ -53,7 +56,8 @@ jest.mock('dotenv', () => ({
     process.env.LEGACY_MAINNET_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.LEGACY_MAINNET_ACP_DEP_INDEX = '0'
     process.env.LEGACY_MAINNET_ACP_DEP_TYPE = 'code'
-    process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH =
+      '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE = 'type'
 
     process.env.MAINNET_PW_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000002'
@@ -85,7 +89,8 @@ jest.mock('dotenv', () => ({
     process.env.LEGACY_TESTNET_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.LEGACY_TESTNET_ACP_DEP_INDEX = '0'
     process.env.LEGACY_TESTNET_ACP_DEP_TYPE = 'code'
-    process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH =
+      '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE = 'type'
 
     process.env.TESTNET_PW_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000002'

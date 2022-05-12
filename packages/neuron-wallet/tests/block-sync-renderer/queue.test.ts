@@ -31,22 +31,18 @@ const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
 const stubbedUpdateCacheProcessedFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
 
-const stubbedTxAddressFinder = jest.fn().mockImplementation(
-  (...args) => {
-    stubbedTxAddressFinderConstructor(...args)
-    return {
-      addresses: stubbedAddressesFn
-    }
+const stubbedTxAddressFinder = jest.fn().mockImplementation((...args) => {
+  stubbedTxAddressFinderConstructor(...args)
+  return {
+    addresses: stubbedAddressesFn
   }
-)
+})
 
-const stubbedRPCServiceConstructor = jest.fn().mockImplementation(
-  () => ({
-    getChain: stubbedGetChainFn,
-    getTransaction: stubbedGetTransactionFn,
-    genesisBlockHash: stubbedGenesisBlockHashFn
-  })
-)
+const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
+  getChain: stubbedGetChainFn,
+  getTransaction: stubbedGetTransactionFn,
+  genesisBlockHash: stubbedGenesisBlockHashFn
+}))
 
 const stubbedProcessSend = jest.spyOn(process, 'send')
 
@@ -69,15 +65,11 @@ const resetMocks = () => {
 const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   const fakeTx = new Transaction('')
   fakeTx.hash = 'hash1'
-  fakeTx.inputs = [
-    new Input(new OutPoint('0x' + id.repeat(64), '0'))
-  ]
+  fakeTx.inputs = [new Input(new OutPoint('0x' + id.repeat(64), '0'))]
   fakeTx.outputs = [
     Output.fromObject({
       capacity: '1',
-      lock: Script.fromObject(
-        { hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash }
-      )
+      lock: Script.fromObject({ hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash })
     })
   ]
   fakeTx.blockNumber = '1'
@@ -93,7 +85,7 @@ describe('queue', () => {
   const fakeNodeUrl = 'http://fakenode:8114'
   const fakeChain = 'ckb_test'
   const shortAddressInfo = {
-    lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
+    lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
   }
   const address = scriptToAddress(shortAddressInfo.lock, false)
   const fakeWalletId = 'w1'
@@ -118,21 +110,19 @@ describe('queue', () => {
 
   beforeEach(async () => {
     resetMocks()
-    jest.useFakeTimers()
+    jest.useFakeTimers('legacy')
 
     stubbedBlockTipsSubject = new Subject<Tip>()
     stubbedTransactionsSubject = new Subject<Array<TransactionWithStatus>>()
-    const stubbedIndexerConnector = jest.fn().mockImplementation(
-      (...args) => {
-        stubbedIndexerConnectorConstructor(...args)
-        return {
-          connect: stubbedConnectFn,
-          blockTipsSubject: stubbedBlockTipsSubject,
-          transactionsSubject: stubbedTransactionsSubject,
-          notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn,
-        }
+    const stubbedIndexerConnector = jest.fn().mockImplementation((...args) => {
+      stubbedIndexerConnectorConstructor(...args)
+      return {
+        connect: stubbedConnectFn,
+        blockTipsSubject: stubbedBlockTipsSubject,
+        transactionsSubject: stubbedTransactionsSubject,
+        notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn
       }
-    )
+    })
     jest.doMock('controllers/sync-api', () => {
       return {
         emiter: {
@@ -142,54 +132,54 @@ describe('queue', () => {
     })
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
-    });
+    })
     jest.doMock('services/tx', () => {
       return {
         TransactionPersistor: {
           saveFetchTx: stubbedSaveFetchFn
         }
       }
-    });
+    })
     jest.doMock('services/wallets', () => ({
       getInstance: () => ({
         get: () => ({
           checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
         })
-      }),
-    }));
+      })
+    }))
     jest.doMock('utils/logger', () => {
       return { error: stubbedLoggerErrorFn, info: jest.fn() }
-    });
+    })
     jest.doMock('../../src/block-sync-renderer/sync/indexer-connector', () => {
       return stubbedIndexerConnector
-    });
+    })
     jest.doMock('../../src/block-sync-renderer/sync/tx-address-finder', () => {
       return stubbedTxAddressFinder
-    });
+    })
     jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
       return { updateCacheProcessed: stubbedUpdateCacheProcessedFn }
-    });
+    })
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
-  });
+  })
   afterEach(() => {
     jest.clearAllTimers()
-  });
+  })
   describe('#start', () => {
     describe('when success', () => {
       beforeEach(async () => {
         stubbedGenesisBlockHashFn.mockResolvedValue('fakegenesisblockhash')
         stubbedGetChainFn.mockResolvedValue(fakeChain)
         await queue.start()
-      });
+      })
       it('inits IndexerConnector', () => {
         const [call] = stubbedIndexerConnectorConstructor.mock.calls
         expect(call[0]).toEqual(addresses)
         expect(call[1]).toEqual(fakeNodeUrl)
-      });
+      })
       it('connects indexer', () => {
         expect(stubbedConnectFn).toHaveBeenCalled()
-      });
+      })
       describe('subscribes to IndexerConnector#blockTipsSubject', () => {
         describe('when new block tip emits from IndexerConnector', () => {
           it('notify latest block numbers', () => {
@@ -199,25 +189,19 @@ describe('queue', () => {
               message: { cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything() }
             })
           })
-        });
+        })
       })
       describe('subscribes to IndexerConnector#transactionsSubject', () => {
         const fakeTxWithStatus1 = generateFakeTx('1', addresses[0].blake160)
         const fakeTxWithStatus2 = generateFakeTx('2', addresses[0].blake160)
 
-        const fakeTxs = [
-          fakeTxWithStatus2
-        ]
+        const fakeTxs = [fakeTxWithStatus2]
         describe('processes transactions from an event', () => {
           beforeEach(() => {
-            stubbedAddressesFn.mockResolvedValue([
-              true,
-              addresses.map(addressMeta => addressMeta.address),
-              []
-            ])
+            stubbedAddressesFn.mockResolvedValue([true, addresses.map(addressMeta => addressMeta.address), []])
             stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
             stubbedTransactionsSubject.next(fakeTxs)
-          });
+          })
           describe('when saving transactions is succeeded', () => {
             beforeEach(flushPromises)
 
@@ -234,45 +218,47 @@ describe('queue', () => {
               for (const { transaction } of fakeTxs) {
                 expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
               }
-            });
+            })
             it('checks and generate new addresses', () => {
               expect(stubbedCheckAndGenerateAddressesFn).toHaveBeenCalledTimes(fakeTxs.length)
-            });
+            })
             it('notify indexer connector of processed block number', () => {
-              expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.blockNumber)
-            });
+              expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
+                fakeTxs[0].transaction.blockNumber
+              )
+            })
             it('updates tx hash cache to be processed', () => {
               expect(stubbedUpdateCacheProcessedFn).toHaveBeenCalledWith(fakeTxs[0].transaction.hash)
             })
-          });
+          })
           describe('when failed saving transactions', () => {
             const err = new Error()
             beforeEach(async () => {
               stubbedSaveFetchFn.mockRejectedValueOnce(err)
               await flushPromises()
-            });
+            })
             it('handles the exception', async () => {
               expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
                 expect.stringMatching(/retry saving transactions in.*seconds/),
                 err
               )
             })
-          });
-        });
-      });
-    });
+          })
+        })
+      })
+    })
     describe('when fails', () => {
       describe('fails in connecting indexer', () => {
         beforeEach(async () => {
           stubbedConnectFn.mockRejectedValue(new Error())
           await queue.start()
-        });
+        })
         it('emit event indexer-error', () => {
           expect(stubbedProcessSend).toHaveBeenCalledWith({
-            channel: 'indexer-error',
+            channel: 'indexer-error'
           })
-        });
-      });
-    });
-  });
-});
+        })
+      })
+    })
+  })
+})

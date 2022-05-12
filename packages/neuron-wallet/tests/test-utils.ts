@@ -1,4 +1,4 @@
 export const flushPromises = () => {
-  jest.runAllImmediates()
-  return new Promise(setImmediate)
-};
+  jest.runAllTicks()
+  return new Promise(process.nextTick)
+}
