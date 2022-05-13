@@ -235,6 +235,7 @@ describe('queue', () => {
             const err = new Error()
             beforeEach(async () => {
               stubbedSaveFetchFn.mockRejectedValueOnce(err)
+              stubbedTransactionsSubject.next(fakeTxs)
               await flushPromises()
             })
             it('handles the exception', async () => {
