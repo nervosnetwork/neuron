@@ -85,7 +85,6 @@ const History = () => {
         <div>
           {totalCount ? (
             <TransactionList
-              isLoading={isLoading}
               walletID={id}
               walletName={walletName}
               items={items as State.Transaction[]}

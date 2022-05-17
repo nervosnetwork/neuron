@@ -466,7 +466,7 @@ describe('Test TransactionService', () => {
           stubProvider.searchValue = ACCOUNT_NAME
         })
 
-        it.only('Should return an array of several transactions', async () => {
+        it('Should return an array of several transactions', async () => {
           const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
           expect(actual.totalCount).toBe(1)
         })

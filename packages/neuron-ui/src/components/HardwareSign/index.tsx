@@ -212,7 +212,7 @@ const HardwareSign = ({
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err instanceof CkbAppNotFoundException && err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)

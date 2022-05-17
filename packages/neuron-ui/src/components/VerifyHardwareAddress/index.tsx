@@ -101,7 +101,7 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err instanceof CkbAppNotFoundException && err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)
