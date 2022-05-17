@@ -5,13 +5,17 @@ import TextField from 'widgets/TextField'
 import { useTranslation } from 'react-i18next'
 import { Price, localNumberFormatter } from 'utils'
 
-interface TransactionFee {
+interface TransactionFeeProps {
   fee: string
   price: string
   onPriceChange: any
 }
 
-const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, onPriceChange }: TransactionFee) => {
+const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
+  price,
+  fee,
+  onPriceChange,
+}: TransactionFeeProps) => {
   const [t] = useTranslation()
   const [showDetail, setShowDetail] = useState(false)
 

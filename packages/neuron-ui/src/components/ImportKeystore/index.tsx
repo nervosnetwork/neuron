@@ -190,22 +190,20 @@ const ImportKeystore = () => {
         .filter(([key]) => !key.endsWith('Error'))
         .map(([key, value]) => {
           return (
-            <>
-              <TextField
-                key={key}
-                field={key}
-                onClick={key === 'path' ? handleFileClick : undefined}
-                label={t(`import-keystore.label.${key}`)}
-                placeholder={t(`import-keystore.placeholder.${key}`)}
-                type={key === 'password' ? 'password' : 'text'}
-                readOnly={key === 'path'}
-                disabled={key === 'path' && openingFile}
-                value={value}
-                error={fields[`${key}Error` as keyof KeystoreFields]}
-                onChange={handleChange}
-                required
-              />
-            </>
+            <TextField
+              key={key}
+              field={key}
+              onClick={key === 'path' ? handleFileClick : undefined}
+              label={t(`import-keystore.label.${key}`)}
+              placeholder={t(`import-keystore.placeholder.${key}`)}
+              type={key === 'password' ? 'password' : 'text'}
+              readOnly={key === 'path'}
+              disabled={key === 'path' && openingFile}
+              value={value}
+              error={fields[`${key}Error` as keyof KeystoreFields]}
+              onChange={handleChange}
+              required
+            />
           )
         })}
       <div className={styles.actions}>

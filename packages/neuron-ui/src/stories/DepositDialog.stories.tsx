@@ -16,6 +16,8 @@ const props = {
   isDepositing: false,
   errorMessage: 'Amount is not enough',
   isTxGenerated: true,
+  isBalanceReserved: true,
+  onIsBalanceReservedChange: action('on is balance reserved change'),
 }
 
 const stories = storiesOf('Deposit Dialog', module)

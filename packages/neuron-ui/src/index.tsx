@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import ReactDOM from 'react-dom'
 import { HashRouter as Router } from 'react-router-dom'
 
@@ -8,14 +8,16 @@ import 'utils/i18n'
 import { useRoutes } from 'utils'
 
 import Navbar from 'containers/Navbar'
-import Notification from 'containers/Notification'
 import Main from 'containers/Main'
-import Settings from 'containers/Settings'
 import Transaction from 'components/Transaction'
 import SignAndVerify from 'components/SignAndVerify'
 import MultiSignAddress from 'components/MultisigAddress'
 import ErrorBoundary from 'components/ErrorBoundary'
+import Spinner from 'widgets/Spinner'
 import { withProvider } from 'states'
+
+const Notification = lazy(() => import('containers/Notification'))
+const Settings = lazy(() => import('containers/Settings'))
 
 if (window.location.hash.startsWith('#/transaction/')) {
   ReactDOM.render(<Transaction />, document.getElementById('root'))
@@ -50,7 +52,9 @@ if (window.location.hash.startsWith('#/transaction/')) {
     const routes = useRoutes(containers)
     return (
       <ErrorBoundary>
-        <Router>{routes}</Router>
+        <Suspense fallback={<Spinner />}>
+          <Router>{routes}</Router>
+        </Suspense>
       </ErrorBoundary>
     )
   })

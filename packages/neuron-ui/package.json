@@ -15,7 +15,7 @@
   "main": "./build",
   "license": "MIT",
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
     "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "build": "react-app-rewired build",
@@ -26,9 +26,6 @@
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -82,17 +79,17 @@
     "electron": "16.0.6",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.2",
-    "eslint-config-airbnb": "18.0.1",
-    "eslint-config-prettier": "6.7.0",
-    "eslint-plugin-import": "2.18.2",
-    "eslint-plugin-jsx-a11y": "6.2.3",
-    "eslint-plugin-prettier": "3.1.1",
-    "eslint-plugin-react": "7.17.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-import": "2.25.2",
+    "eslint-plugin-jsx-a11y": "6.5.1",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-react": "7.29.4",
     "jest-styled-components": "7.0.0-beta.1",
     "lint-staged": "9.5.0",
     "prettier": "1.19.1",
-    "react-app-rewired": "2.1.5",
-    "react-scripts": "3.4.1",
+    "react-app-rewired": "2.2.1",
+    "react-scripts": "5.0.1",
     "react-test-renderer": "16.12.0",
     "rimraf": "3.0.0",
     "storybook-react-router": "1.0.8"

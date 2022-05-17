@@ -224,7 +224,7 @@ const SUDTCreateDialog = ({
       }
     }
   }
-  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet);
+  const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet)
   return (
     <div className={styles.container}>
       {step === 0 ? (
@@ -252,10 +252,10 @@ const SUDTCreateDialog = ({
                 text: t(accType.label),
                 checked: accountType === accType.key,
                 disabled: insufficient[accType.key],
-                onRenderLabel: ({ text }: IChoiceGroupOption) => {
+                onRenderLabel: props => {
                   return (
                     <span className="ms-ChoiceFieldLabel">
-                      <div>{text}</div>
+                      <div>{props?.text}</div>
                       <span className={styles.capacityRequired} data-insufficient={insufficient[accType.key]}>
                         {t(
                           `s-udt.create-dialog.${AccountType.CKB === accType.key ? 'occupy-61-ckb' : 'occupy-142-ckb'}`
@@ -303,18 +303,16 @@ const SUDTCreateDialog = ({
                   }
                 />
               ))}
-            {
-              accountType === AccountType.SUDT && !tokenErrors.tokenId && info.tokenId && (
-                <button
-                  type="button"
-                  className={styles.explorerNavButton}
-                  title={t('history.view-in-explorer-button-title')}
-                  onClick={openSUDTTokenUrl}
-                >
-                  {t('history.view-in-explorer-button-title')}
-                </button>
-              )
-            }
+            {accountType === AccountType.SUDT && !tokenErrors.tokenId && info.tokenId && (
+              <button
+                type="button"
+                className={styles.explorerNavButton}
+                title={t('history.view-in-explorer-button-title')}
+                onClick={openSUDTTokenUrl}
+              >
+                {t('history.view-in-explorer-button-title')}
+              </button>
+            )}
             <div className={styles.footer}>
               <Button type="cancel" label={t('s-udt.create-dialog.back')} onClick={onBack} />
               <Button

@@ -11,11 +11,12 @@ export interface SelectOptions {
 
 export interface SelectProps {
   options: SelectOptions[]
+  // eslint-disable-next-line react/no-unused-prop-types
   className?: string
   disabled?: boolean
   onChange?: (arg: SelectOptions) => void
   value?: SelectOptions | string
-  placeholder?: String
+  placeholder?: string
 }
 
 function parseValue(value: string | SelectOptions, options: SelectOptions[]) {

@@ -54,47 +54,38 @@ describe('unit tests for IndexerConnector', () => {
 
   jest.doMock('@nervina-labs/ckb-indexer', () => {
     return {
-      CkbIndexer: stubbedIndexerConstructor.mockImplementation(
-        () => ({
-          tip: stubbedTipFn,
-        })
-      ),
-      CellCollector: stubbedCellCollectorConstructor.mockImplementation(
-        () => ({
-          collect: stubbedCellCellectFn
-        })
-      )
+      CkbIndexer: stubbedIndexerConstructor.mockImplementation(() => ({
+        tip: stubbedTipFn
+      })),
+      CellCollector: stubbedCellCollectorConstructor.mockImplementation(() => ({
+        collect: stubbedCellCellectFn
+      }))
     }
-  });
+  })
   jest.doMock('services/rpc-service', () => {
-    return stubbedRPCServiceConstructor.mockImplementation(
-      () => ({
-        getTransaction: stubbedGetTransactionFn,
-        getHeader: stubbedGetHeaderFn
-      })
-    )
-  });
+    return stubbedRPCServiceConstructor.mockImplementation(() => ({
+      getTransaction: stubbedGetTransactionFn,
+      getHeader: stubbedGetHeaderFn
+    }))
+  })
   jest.doMock('utils/logger', () => {
     return { error: stubbedLoggerErrorFn }
-  });
+  })
   jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
-    return stubbedIndexerCacheService.mockImplementation(
-      () => ({
-        upsertTxHashes: stubbedUpsertTxHashesFn,
-        nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
-      })
-    )
-  });
+    return stubbedIndexerCacheService.mockImplementation(() => ({
+      upsertTxHashes: stubbedUpsertTxHashesFn,
+      nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn
+    }))
+  })
   stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
 
   beforeEach(() => {
     resetMocks()
-    jest.useFakeTimers()
-
-  });
+    jest.useFakeTimers('legacy')
+  })
   afterEach(() => {
     jest.clearAllTimers()
-  });
+  })
 
   describe('#constructor', () => {
     const STUB_URI = 'stub_uri'
@@ -102,23 +93,20 @@ describe('unit tests for IndexerConnector', () => {
     describe('when init with indexer folder path', () => {
       beforeEach(() => {
         new stubbedIndexerConnector([], nodeUrl, STUB_URI)
-      });
+      })
       it('inits lumos indexer with a node url and indexer folder path', () => {
         expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
-      });
-    });
+      })
+    })
     describe('when init without indexer folder path', () => {
       beforeEach(() => {
         new stubbedIndexerConnector([], nodeUrl)
-      });
-      it('inits merucry indexer with a node url and a default port', () => {
-        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(
-          nodeUrl,
-          STUB_URI
-        )
       })
-    });
-  });
+      it('inits merucry indexer with a node url and a default port', () => {
+        expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
+      })
+    })
+  })
   describe('#connect', () => {
     const fakeTip1 = { block_number: '1', block_hash: 'hash1', indexer_tip_number: '1' }
     const fakeTip2 = { block_number: '2', block_hash: 'hash2', indexer_tip_number: '2' }
@@ -139,18 +127,24 @@ describe('unit tests for IndexerConnector', () => {
     }
 
     const fakeTxHashCache1 = {
-      txHash: fakeTx1.transaction.hash, blockNumber: fakeTx1.transaction.blockNumber, blockTimestamp: fakeTx1.transaction.blockTimestamp
+      txHash: fakeTx1.transaction.hash,
+      blockNumber: fakeTx1.transaction.blockNumber,
+      blockTimestamp: fakeTx1.transaction.blockTimestamp
     }
     const fakeTxHashCache2 = {
-      txHash: fakeTx2.transaction.hash, blockNumber: fakeTx2.transaction.blockNumber, blockTimestamp: fakeTx2.transaction.blockTimestamp
+      txHash: fakeTx2.transaction.hash,
+      blockNumber: fakeTx2.transaction.blockNumber,
+      blockTimestamp: fakeTx2.transaction.blockTimestamp
     }
     const fakeTxHashCache3 = {
-      txHash: fakeTx3.transaction.hash, blockNumber: fakeTx3.transaction.blockNumber, blockTimestamp: fakeTx3.transaction.blockTimestamp
+      txHash: fakeTx3.transaction.hash,
+      blockNumber: fakeTx3.transaction.blockNumber,
+      blockTimestamp: fakeTx3.transaction.blockTimestamp
     }
 
     let indexerConnector: IndexerConnector
     const shortAddressInfo = {
-      lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
+      lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
     }
     const address = scriptToAddress(shortAddressInfo.lock, false)
     const walletId1 = 'walletid1'
@@ -187,7 +181,7 @@ describe('unit tests for IndexerConnector', () => {
 
     beforeEach(() => {
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
-    });
+    })
     describe('polls for new data', () => {
       describe('#transactionsSubject', () => {
         let transactionsSubject: any
@@ -196,83 +190,76 @@ describe('unit tests for IndexerConnector', () => {
 
           indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
           transactionsSubject = indexerConnector.transactionsSubject
-        });
+        })
 
         describe('when there are transactions', () => {
           let txObserver: any
           beforeEach(() => {
-
             stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
             stubbedUpsertTxHashesFn.mockResolvedValueOnce([fakeTx3.transaction.hash])
 
             when(stubbedGetTransactionFn)
-              .calledWith(fakeTx1.transaction.hash).mockResolvedValue(fakeTx1)
-              .calledWith(fakeTx2.transaction.hash).mockResolvedValue(fakeTx2)
-              .calledWith(fakeTx3.transaction.hash).mockResolvedValue(fakeTx3)
+              .calledWith(fakeTx1.transaction.hash)
+              .mockResolvedValue(fakeTx1)
+              .calledWith(fakeTx2.transaction.hash)
+              .mockResolvedValue(fakeTx2)
+              .calledWith(fakeTx3.transaction.hash)
+              .mockResolvedValue(fakeTx3)
 
             when(stubbedGetHeaderFn)
-              .calledWith(fakeBlock1.hash).mockResolvedValue(fakeBlock1)
-              .calledWith(fakeBlock2.hash).mockResolvedValue(fakeBlock2)
+              .calledWith(fakeBlock1.hash)
+              .mockResolvedValue(fakeBlock1)
+              .calledWith(fakeBlock2.hash)
+              .mockResolvedValue(fakeBlock2)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-          });
+          })
           describe('attempts to upsert tx hash caches', () => {
             beforeEach(async () => {
               await connectIndexer(indexerConnector)
-            });
+            })
             it('upserts tx hash caches', () => {
               expect(stubbedUpsertTxHashesFn).toHaveBeenCalled()
             })
-          });
+          })
           describe('when loaded block number is already in order', () => {
             beforeEach(async () => {
               when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
-                .calledWith().mockResolvedValueOnce([
-                  fakeTxHashCache1,
-                ])
-                .calledWith().mockResolvedValueOnce([
-                  fakeTxHashCache2,
-                  fakeTxHashCache3
-                ])
+                .calledWith()
+                .mockResolvedValueOnce([fakeTxHashCache1])
+                .calledWith()
+                .mockResolvedValueOnce([fakeTxHashCache2, fakeTxHashCache3])
 
               await connectIndexer(indexerConnector)
               await flushPromises()
-            });
+            })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
-            });
-          });
+            })
+          })
           describe('when loaded block number is not in order', () => {
             beforeEach(async () => {
               when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
-                .calledWith().mockResolvedValueOnce([
-                  fakeTxHashCache2,
-                  fakeTxHashCache3
-                ])
-                .calledWith().mockResolvedValueOnce([
-                  fakeTxHashCache1,
-                ])
+                .calledWith()
+                .mockResolvedValueOnce([fakeTxHashCache2, fakeTxHashCache3])
+                .calledWith()
+                .mockResolvedValueOnce([fakeTxHashCache1])
 
               await connectIndexer(indexerConnector)
               await flushPromises()
-            });
+            })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
-            });
-          });
+            })
+          })
           describe('#notifyCurrentBlockNumberProcessed', () => {
             beforeEach(async () => {
               stubbedNextUnprocessedTxsGroupedByBlockNumberFn
-                .mockResolvedValueOnce([
-                  fakeTxHashCache1,
-                  fakeTxHashCache2
-                ])
-                .mockResolvedValueOnce([
-                  fakeTxHashCache3,
-                ])
+                .mockResolvedValueOnce([fakeTxHashCache1, fakeTxHashCache2])
+                .mockResolvedValueOnce([fakeTxHashCache3])
 
               await connectIndexer(indexerConnector)
               await flushPromises()
@@ -284,50 +271,40 @@ describe('unit tests for IndexerConnector', () => {
               describe('having unprocessed transactions', () => {
                 beforeEach(async () => {
                   stubbedNextUnprocessedTxsGroupedByBlockNumberFn
-                    .mockResolvedValueOnce([
-                      fakeTxHashCache3
-                    ])
-                    .mockResolvedValueOnce([
-                      fakeTxHashCache3,
-                    ])
+                    .mockResolvedValueOnce([fakeTxHashCache3])
+                    .mockResolvedValueOnce([fakeTxHashCache3])
                   indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
                   await flushPromises()
                 })
                 it('emits new transactions', async () => {
                   expect(txObserver).toHaveBeenCalledTimes(2)
                 })
-              });
+              })
               describe('having no unprocessed transactions', () => {
                 beforeEach(async () => {
-                  stubbedNextUnprocessedTxsGroupedByBlockNumberFn
-                    .mockResolvedValueOnce([])
-                    .mockResolvedValueOnce([])
+                  stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValueOnce([]).mockResolvedValueOnce([])
                   indexerConnector.notifyCurrentBlockNumberProcessed(fakeTx1.transaction.blockNumber)
                   await flushPromises()
                 })
                 it('emits new transactions', async () => {
                   expect(txObserver).toHaveBeenCalledTimes(1)
                 })
-              });
-            });
+              })
+            })
             describe('when not match with the current block number in process', () => {
               beforeEach(async () => {
                 stubbedNextUnprocessedTxsGroupedByBlockNumberFn
-                  .mockResolvedValueOnce([
-                    fakeTxHashCache3
-                  ])
-                  .mockResolvedValueOnce([
-                    fakeTxHashCache3,
-                  ])
+                  .mockResolvedValueOnce([fakeTxHashCache3])
+                  .mockResolvedValueOnce([fakeTxHashCache3])
                 indexerConnector.notifyCurrentBlockNumberProcessed('3')
                 await flushPromises()
               })
               it('should not emit new transactions', async () => {
                 expect(txObserver).toHaveBeenCalledTimes(1)
               })
-            });
+            })
           })
-        });
+        })
         describe('when there are no transactions matched', () => {
           let txObserver: any
           let errSpy: any
@@ -337,32 +314,35 @@ describe('unit tests for IndexerConnector', () => {
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             errSpy = await connectIndexer(indexerConnector)
             expect(errSpy).toHaveBeenCalledTimes(0)
-          });
+          })
           it('should not emit transactions', () => {
             expect(txObserver).toHaveBeenCalledTimes(0)
-          });
+          })
           it('attempts checking transactions in next unprocessed block number', () => {
             expect(stubbedNextUnprocessedTxsGroupedByBlockNumberFn).toHaveBeenCalled()
           })
-        });
+        })
         describe('failure cases when there no transaction matched to a hash from #processNextBlockNumberQueue', () => {
           let txObserver: any
           beforeEach(async () => {
             stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
             stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([fakeTxHashCache3])
             when(stubbedGetTransactionFn)
-              .calledWith(fakeTxHashCache3.txHash).mockResolvedValueOnce(undefined)
+              .calledWith(fakeTxHashCache3.txHash)
+              .mockResolvedValueOnce(undefined)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             await connectIndexer(indexerConnector)
             await flushPromises()
-          });
+          })
           it('throws error', async () => {
-            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith('Error in processing next block number queue: Error: failed to fetch transaction for hash hash3')
-          });
-        });
-      });
+            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
+              'Error in processing next block number queue: Error: failed to fetch transaction for hash hash3'
+            )
+          })
+        })
+      })
       describe('#blockTipsSubject', () => {
         let tipObserver: any
         beforeEach(async () => {
@@ -378,48 +358,48 @@ describe('unit tests for IndexerConnector', () => {
           stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([])
           stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
           await connectIndexer(indexerConnector)
-        });
+        })
         it('observes an indexer tip', () => {
           expect(tipObserver).toHaveBeenCalledTimes(1)
           expect(tipObserver).toHaveBeenCalledWith({
             cacheTipNumber: parseInt(fakeTip1.block_number),
-            indexerTipNumber: parseInt(fakeTip1.block_number),
+            indexerTipNumber: parseInt(fakeTip1.block_number)
           })
-        });
+        })
         describe('fast forward the interval time', () => {
           describe('when there is no unprocessed blocks', () => {
             beforeEach(async () => {
               stubbedNextUnprocessedBlock.mockResolvedValue(undefined)
               jest.advanceTimersByTime(5000)
               await flushPromises()
-            });
+            })
             it('observes another indexer tip', async () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
                 cacheTipNumber: parseInt(fakeTip2.block_number),
-                indexerTipNumber: parseInt(fakeTip2.block_number),
+                indexerTipNumber: parseInt(fakeTip2.block_number)
               })
             })
-          });
+          })
           describe('when there are unprocessed blocks', () => {
             beforeEach(async () => {
               stubbedNextUnprocessedBlock.mockResolvedValue({
                 blockNumber: fakeBlock3.number,
-                blockHash: fakeBlock3.hash,
+                blockHash: fakeBlock3.hash
               })
               jest.advanceTimersByTime(5000)
               await flushPromises()
-            });
+            })
             it('observes next unprocessed block tip', async () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
                 cacheTipNumber: parseInt(fakeBlock3.number),
-                indexerTipNumber: parseInt(fakeTip2.block_number),
+                indexerTipNumber: parseInt(fakeTip2.block_number)
               })
             })
-          });
-        });
-      });
+          })
+        })
+      })
     })
     describe('#getLiveCellsByScript', () => {
       let fakeCell1: any, fakeCell2: any
@@ -473,26 +453,24 @@ describe('unit tests for IndexerConnector', () => {
         }
 
         beforeEach(async () => {
-          stubbedCellCellectFn.mockReturnValueOnce(
-            [
-              new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[0])))),
-              new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
-            ]
-          )
+          stubbedCellCellectFn.mockReturnValueOnce([
+            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[0])))),
+            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
+          ])
 
           cells = await indexerConnector.getLiveCellsByScript(query)
-        });
+        })
         it('transform the query parameter', () => {
           expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
             lock: {
               hash_type: query.lock!.hashType,
               code_hash: query.lock!.codeHash,
-              args: query.lock!.args,
+              args: query.lock!.args
             },
             type: {
               hash_type: query.type!.hashType,
               code_hash: query.type!.codeHash,
-              args: query.type!.args,
+              args: query.type!.args
             },
             data: 'any'
           })
@@ -501,7 +479,7 @@ describe('unit tests for IndexerConnector', () => {
           fakeCell2.cell_output.type.hash_type = 'data'
           expect(cells).toEqual([fakeCell1, fakeCell2])
         })
-      });
+      })
       describe('when handling concurrent requests', () => {
         const query1: LumosCellQuery = {
           lock: {
@@ -532,40 +510,33 @@ describe('unit tests for IndexerConnector', () => {
 
         const results: unknown[] = []
         beforeEach(async () => {
-
           const stubbedCellCellect1 = jest.fn()
-          stubbedCellCellect1.mockReturnValueOnce(
-            [
-              new Promise(resolve => {
-                //fake the waiting, the other concurrent requests should wait until this is finished
-                setTimeout(() => {
-                  resolve(JSON.parse(JSON.stringify(fakeCells[0])))
-                }, 500)
-              }),
-            ]
-          )
+          stubbedCellCellect1.mockReturnValueOnce([
+            new Promise(resolve => {
+              //fake the waiting, the other concurrent requests should wait until this is finished
+              setTimeout(() => {
+                resolve(JSON.parse(JSON.stringify(fakeCells[0])))
+              }, 500)
+            })
+          ])
 
           const stubbedCellCellect2 = jest.fn()
-          stubbedCellCellect2.mockReturnValueOnce(
-            [
-              new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1])))),
-            ]
-          )
+          stubbedCellCellect2.mockReturnValueOnce([
+            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
+          ])
 
-          stubbedCellCollectorConstructor.mockImplementation(
-            (_indexer: any, query: any) => {
-              if (query.lock.args === '0x1') {
-                return {
-                  collect: stubbedCellCellect1,
-                }
-              }
-              if (query.lock.args === '0x2') {
-                return {
-                  collect: stubbedCellCellect2,
-                }
+          stubbedCellCollectorConstructor.mockImplementation((_indexer: any, query: any) => {
+            if (query.lock.args === '0x1') {
+              return {
+                collect: stubbedCellCellect1
               }
             }
-          )
+            if (query.lock.args === '0x2') {
+              return {
+                collect: stubbedCellCellect2
+              }
+            }
+          })
 
           const promises = Promise.all([
             new Promise<void>(resolve => {
@@ -584,12 +555,12 @@ describe('unit tests for IndexerConnector', () => {
 
           jest.advanceTimersByTime(500)
           await promises
-        });
+        })
         it('process one by one in order', () => {
           expect(results.length).toEqual(2)
           expect(results[0]).toEqual([fakeCells[0]])
         })
-      });
+      })
       describe('when fails', () => {
         describe('when both type and lock parameter is not specified', () => {
           it('throws error', async () => {
@@ -601,8 +572,8 @@ describe('unit tests for IndexerConnector', () => {
             }
             expect(err).toEqual(new Error('at least one parameter is required'))
           })
-        });
-      });
+        })
+      })
     })
-  });
-});
+  })
+})

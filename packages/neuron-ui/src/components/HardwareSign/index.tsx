@@ -196,7 +196,9 @@ const HardwareSign = ({
         // getDeviceCkbAppVersion will halt forever while in win32 sleep mode.
         const ckbVersionRes = await Promise.race([
           getDeviceCkbAppVersion(descriptor),
-          new Promise<ControllerResponse>((_, reject) => setTimeout(() => reject(), 1000)),
+          new Promise<ControllerResponse>((_, reject) => {
+            setTimeout(() => reject(), 1000)
+          }),
         ]).catch(() => {
           return { status: ErrorCode.DeviceInSleep }
         })
@@ -210,7 +212,7 @@ const HardwareSign = ({
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)
@@ -309,6 +311,7 @@ const HardwareSign = ({
             if (isSuccessResponse(res)) {
               history!.push(RoutePath.History)
             } else {
+              // @ts-ignore
               setError(res.message.content)
             }
           })
@@ -407,7 +410,7 @@ const HardwareSign = ({
   }, [offlineSignType, generatedTx, onCancel, description, experimental])
 
   useDidMount(() => {
-    // eslint-disable-next-line no-unused-expressions
+    // @ts-ignore
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })

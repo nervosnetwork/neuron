@@ -30,7 +30,6 @@ import styles from './transactionList.module.scss'
 const { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 interface TransactionListProps {
-  isLoading?: boolean
   walletName: string
   walletID: string
   items: State.Transaction[]

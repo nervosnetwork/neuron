@@ -17,6 +17,7 @@ const baseProps = {
   },
   onCancel: () => action('cancel')(),
   existingAccountNames: ['name1', 'name2'],
+  isMainnet: true,
 }
 const propsList: { [name: string]: SUDTCreateDialogProps } = {
   Basic: baseProps,

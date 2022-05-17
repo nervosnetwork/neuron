@@ -125,11 +125,11 @@ const ApproveMultisigTx = ({
         ) : (
           <>
             <h5>Inputs</h5>
-            {offlineSignJson.transaction?.inputs?.map(v => (
+            {offlineSignJson.transaction?.inputs?.map((v: any) => (
               <Cell cell={v} isMainnet={isMainnet} key={v.lockHash} />
             ))}
             <h5>Outputs</h5>
-            {offlineSignJson.transaction?.outputs?.map(v => (
+            {offlineSignJson.transaction?.outputs?.map((v: any) => (
               <Cell cell={v} isMainnet={isMainnet} key={v.lockHash} />
             ))}
           </>

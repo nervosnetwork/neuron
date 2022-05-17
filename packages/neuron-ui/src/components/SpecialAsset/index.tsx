@@ -137,7 +137,7 @@ const SpecialAsset = ({
     case PresetScript.SUDT: {
       status = 'user-defined-token'
       const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
-      const amountInfo = getSUDTAmount({ tokenInfo, type, data })
+      const amountInfo = getSUDTAmount({ tokenInfo, data })
       amount = amountInfo.amount
       amountToCopy = amountInfo.amountToCopy
       break

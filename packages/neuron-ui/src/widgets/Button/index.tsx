@@ -25,9 +25,9 @@ const Button = ({
   const btnType = isNativeType(type) ? type : 'button'
 
   return (
-    // eslint-disable-next-line react/button-has-type
     <button
       className={`${styles.button} ${className}`}
+      // eslint-disable-next-line react/button-has-type
       type={btnType}
       data-type={type}
       onClick={onClick}
