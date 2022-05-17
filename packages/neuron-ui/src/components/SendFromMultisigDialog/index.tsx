@@ -51,6 +51,7 @@ const SendFromMultisigDialog = ({
     try {
       validateTotalAmount(totalAmount, fee, balance)
     } catch (err) {
+      // `AmountNotEnoughException` is the only possible Error thrown by `validateTotalAmount`
       if (err instanceof AmountNotEnoughException) {
         errorMessageUnderTotal = t(err.message)
       }
