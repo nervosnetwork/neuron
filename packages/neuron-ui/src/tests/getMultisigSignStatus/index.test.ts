@@ -2,17 +2,19 @@ import { MultisigConfig } from 'services/remote'
 import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 
+const addresses = [
+  'ckt1qyqwh5hmt8j59njztrfz6z0s9wug3nv5qysqrnfm2h',
+  'ckt1qyqwjt5p4axvmx9tl4lrrnqd0ld9pr9wjqsqv87474',
+  'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
+]
 const multisigConfig: MultisigConfig = {
   id: 1,
   walletId: 'walletId',
   r: 1,
   m: 2,
   n: 3,
-  addresses: [
-    'ckt1qyqwh5hmt8j59njztrfz6z0s9wug3nv5qysqrnfm2h',
-    'ckt1qyqwjt5p4axvmx9tl4lrrnqd0ld9pr9wjqsqv87474',
-    'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
-  ],
+  addresses,
+  blake160s: addresses.map(v => addressToScript(v).args),
   fullPayload: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2f2scddm0lvmq36hmzx8nfhw8ucxzslhqussgky',
 }
 const fullPayloadHash = scriptToHash(addressToScript(multisigConfig.fullPayload))
