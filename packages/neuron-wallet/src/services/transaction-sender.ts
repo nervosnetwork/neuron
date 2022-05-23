@@ -128,11 +128,11 @@ export default class TransactionSender {
     }
 
     // Only one multi sign input now.
-    const isMultiSign =
+    const isMultisig =
       tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
     const addressInfos = await this.getAddressInfos(walletID)
-    const multiSignBlake160s = isMultiSign
+    const multiSignBlake160s = isMultisig
       ? addressInfos.map(i => {
           return {
             multiSignBlake160: Multisig.hash([i.blake160]),
@@ -196,19 +196,19 @@ export default class TransactionSender {
       })
       let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
-      if (isMultiSign) {
+      if (isMultisig) {
         const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160]))!
           .blake160
-        const serializedMultiSign: string = Multisig.serialize([blake160])
+        const serializedMultisig: string = Multisig.serialize([blake160])
         signed = await TransactionSender.signSingleMultiSignScript(
           privateKey,
           serializedWitnesses,
           txHash,
-          serializedMultiSign,
+          serializedMultisig,
           wallet
         )
         const wit = signed[0] as WitnessArgs
-        wit.lock = serializedMultiSign + wit.lock!.slice(2)
+        wit.lock = serializedMultisig + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
       } else {
         signed = ckb.signWitnesses(privateKey)({

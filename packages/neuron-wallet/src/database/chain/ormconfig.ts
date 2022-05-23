@@ -46,7 +46,7 @@ import { AddMultisigConfig1646817547204 } from './migrations/1646817547204-AddMu
 import { AddMultisigOutput1649729996969 } from './migrations/1649729996969-AddMultisigOutput'
 import { UpdateAddressDescription1650984779265 } from './migrations/1650984779265-UpdateAddressDescription'
 import { RemoveDuplicateBlake160s1651133703535 } from './migrations/1651133703535-RemoveDuplicateBlake160s'
-import { RemoveAddressesMultisigConfig1651820157100 } from './migrations/1651820157094-RemoveAddressesMultisigConfig'
+import { RemoveAddressesMultisigConfig1651820157100 } from './migrations/1651820157100-RemoveAddressesMultisigConfig'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 

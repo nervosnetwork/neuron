@@ -13,13 +13,13 @@ export default class Multisig {
   // 1 epoch = 4h = 240min
   EPOCH_MINUTES = 240
 
-  static defaultS: string = '0x00'
+  static defaultS: string = '00'
 
   static serialize(blake160s: string[], r: number = 0, m: number = 1, n: number = 1) {
     const hexR = Multisig.getMultisigParamsHex(r)
     const hexM = Multisig.getMultisigParamsHex(m)
     const hexN = Multisig.getMultisigParamsHex(n)
-    return `0x00${hexR}${hexM}${hexN}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
+    return `0x${Multisig.defaultS}${hexR}${hexM}${hexN}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
   }
 
   static hash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {

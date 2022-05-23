@@ -8,11 +8,13 @@ function getMultisigParamsHex(v: number) {
   return v.toString(16).padStart(2, '0')
 }
 
+const MULTI_DEFAULT_S = '00'
+
 function multisigSerialize(blake160s: string[], r: number = 0, m: number = 1, n: number = 1) {
   const hexR = getMultisigParamsHex(r)
   const hexM = getMultisigParamsHex(m)
   const hexN = getMultisigParamsHex(n)
-  return `0x00${hexR}${hexM}${hexN}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
+  return `0x${MULTI_DEFAULT_S}${hexR}${hexM}${hexN}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
 }
 
 function multisigHash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {

@@ -65,7 +65,7 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
         setEntities(res.result)
       }
     })
-  }, [setEntities, walletId, isMainnet])
+  }, [setEntities, walletId])
   const updateConfig = useCallback(
     (id: number) => (alias: string | undefined) => {
       updateMultisigConfig({ id, alias: alias || '' }).then(res => {

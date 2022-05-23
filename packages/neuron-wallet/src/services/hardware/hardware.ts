@@ -37,10 +37,10 @@ export abstract class Hardware {
       }
     })
 
-    const isMultiSign = tx.inputs.length === 1 &&
+    const isMultisig = tx.inputs.length === 1 &&
       tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
-    const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
+    const multiSignBlake160s = isMultisig ? addressInfos.map(i => {
       return {
         multiSignBlake160: Multisig.hash([i.blake160]),
         path: i.path
@@ -70,7 +70,7 @@ export abstract class Hardware {
 
       const path = findPath(witnessesArgs[0].lockArgs)
 
-      if (isMultiSign) {
+      if (isMultisig) {
         const serializedWitnesses = witnessesArgs.map(value => {
           const args = value.witnessArgs
           if (index === 0) {
