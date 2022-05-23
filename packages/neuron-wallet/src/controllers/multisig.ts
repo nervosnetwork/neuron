@@ -10,6 +10,7 @@ import MultisigService from 'services/multisig'
 import CellsService from 'services/cells'
 import OfflineSignService from 'services/offline-sign'
 
+const SPEC256_BLAKE160_LEN = 42
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
   #multisigService: MultisigService;
@@ -111,7 +112,12 @@ export default class MultisigController {
         configs.some(config => config.r === undefined
           || config.m === undefined
           || config.n === undefined
-          || config.blake160s === undefined)
+          || config.blake160s === undefined
+          || config.r > config.n
+          || config.m > config.n
+          || !config.blake160s.length
+          || config.blake160s.some(v => v.length !== SPEC256_BLAKE160_LEN)
+        )
       ) {
         dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
         return

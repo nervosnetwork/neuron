@@ -5,12 +5,13 @@ import CellsService from '../../src/services/cells'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
+const showErrorBoxMock = jest.fn()
 jest.mock('electron', () => ({
   dialog: {
     showMessageBox: jest.fn().mockImplementation(() => ({ response })),
     showOpenDialog: jest.fn().mockImplementation(() => dialogRes),
     showSaveDialog: jest.fn().mockImplementation(() => dialogRes),
-    showErrorBox: jest.fn()
+    showErrorBox: () => showErrorBoxMock()
   },
   BrowserWindow: {
     getFocusedWindow: jest.fn()
@@ -24,17 +25,17 @@ let fileContent: {
   r?: number
   m?: number
   n?: number
-  addresses?: string[]
+  blake160s?: string[]
 } | {
   r?: number
   m?: number
   n?: number
-  addresses?: string[]
+  blake160s?: string[]
 }[] = [{
   r: 1,
   m: 2,
   n: 3,
-  addresses: ['ckt1qyqvmm64mjmcwftjx6a73kxr8z23ks5sef5sv2702w', 'ckt1qyqrgqluh0v7yrarreezawvcrv3q8t28tyzqveg4zl']
+  blake160s: ['0xcdef55dcb787257236bbe8d8c338951b4290ca69', '0x3403fcbbd9e20fa31e722eb9981b2203ad475904']
 }]
 
 jest.mock('fs', () => {
@@ -164,6 +165,43 @@ describe('test for multisig controller', () => {
       }]
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation r > n', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        r: 4
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation m > n', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        m: 4
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation blake160s empty', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        blake160s: []
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation blake160 length not 42', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        blake160s: ['0xcdef55dcb787257236bbe8d8c338951b4290ca6911']
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import object success', async () => {
       fileContent = multisigConfig.testnet.params
