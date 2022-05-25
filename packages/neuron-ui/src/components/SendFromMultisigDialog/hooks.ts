@@ -12,11 +12,11 @@ import { useDispatch } from 'states'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   generateMultisigTx,
-  MultisigConfig,
   generateMultisigSendAllTx,
   exportTransactionAsJSON,
   OfflineSignStatus,
   OfflineSignType,
+  MultisigConfig,
 } from 'services/remote'
 import { TFunction } from 'i18next'
 
@@ -95,8 +95,8 @@ export const useSendInfo = ({
   t: TFunction
 }) => {
   const [sendInfoList, setSendInfoList] = useState<
-    { address: string | undefined; amount: string | undefined; unit: CapacityUnit; disabled: boolean }[]
-  >([{ address: undefined, amount: undefined, unit: CapacityUnit.CKB, disabled: false }])
+    { address: string | undefined; amount: string | undefined; unit: CapacityUnit; disabled?: boolean }[]
+  >([{ address: undefined, amount: undefined, unit: CapacityUnit.CKB }])
   const addSendInfo = useCallback(() => {
     setSendInfoList(v => [...v, { address: undefined, amount: undefined, unit: CapacityUnit.CKB, disabled: false }])
   }, [setSendInfoList])

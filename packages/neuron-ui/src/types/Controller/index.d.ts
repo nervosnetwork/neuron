@@ -65,9 +65,8 @@ declare namespace Controller {
       r: number
       m: number
       n: number
-      addresses: string[]
+      blake160s: string[]
       alias?: string
-      fullPayload: string
     }
   }
 

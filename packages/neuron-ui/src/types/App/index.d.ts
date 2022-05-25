@@ -101,9 +101,7 @@ declare namespace State {
       r: number
       m: number
       n: number
-      addresses: string[]
-      alias?: string
-      fullPayload: string
+      blake160s: string[]
     }
   }
 

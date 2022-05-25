@@ -5,12 +5,13 @@ import CellsService from '../../src/services/cells'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
+const showErrorBoxMock = jest.fn()
 jest.mock('electron', () => ({
   dialog: {
     showMessageBox: jest.fn().mockImplementation(() => ({ response })),
     showOpenDialog: jest.fn().mockImplementation(() => dialogRes),
     showSaveDialog: jest.fn().mockImplementation(() => dialogRes),
-    showErrorBox: jest.fn()
+    showErrorBox: () => showErrorBoxMock()
   },
   BrowserWindow: {
     getFocusedWindow: jest.fn()
@@ -24,17 +25,17 @@ let fileContent: {
   r?: number
   m?: number
   n?: number
-  addresses?: string[]
+  blake160s?: string[]
 } | {
   r?: number
   m?: number
   n?: number
-  addresses?: string[]
+  blake160s?: string[]
 }[] = [{
   r: 1,
   m: 2,
   n: 3,
-  addresses: ['ckt1qyqvmm64mjmcwftjx6a73kxr8z23ks5sef5sv2702w', 'ckt1qyqrgqluh0v7yrarreezawvcrv3q8t28tyzqveg4zl']
+  blake160s: ['0xcdef55dcb787257236bbe8d8c338951b4290ca69', '0x3403fcbbd9e20fa31e722eb9981b2203ad475904']
 }]
 
 jest.mock('fs', () => {
@@ -58,6 +59,14 @@ jest.mock('../../src/services/cells', () => ({
   getMultisigBalances: jest.fn(),
 }))
 
+const isMainnetMock = jest.fn().mockReturnValue(false)
+
+jest.mock('../../src/services/networks', () => ({
+  getInstance: () => ({
+    isMainnet: isMainnetMock
+  })
+}))
+
 const loadTransactionJSONMock = jest.fn()
 jest.mock('../../src/services/offline-sign', () => ({
   loadTransactionJSON: () => loadTransactionJSONMock()
@@ -69,10 +78,10 @@ const multisigConfig = {
       r: 1,
       m: 2,
       n: 3,
-      addresses: [
-        'ckt1qyqvmm64mjmcwftjx6a73kxr8z23ks5sef5sv2702w',
-        'ckt1qyqrgqluh0v7yrarreezawvcrv3q8t28tyzqveg4zl',
-        'ckt1qyqvwh396xsgcqmp0ltjz9s85zn50xkjascsz88vrw'
+      blake160s: [
+        '0xcdef55dcb787257236bbe8d8c338951b4290ca69',
+        '0x3403fcbbd9e20fa31e722eb9981b2203ad475904',
+        '0xc75e25d1a08c03617fd7211607a0a7479ad2ec31'
       ],
       isMainnet: false
     },
@@ -83,10 +92,10 @@ const multisigConfig = {
       r: 1,
       m: 2,
       n: 3,
-      addresses: [
-        'ckt1qyqvmm64mjmcwftjx6a73kxr8z23ks5sef5sv2702w',
-        'ckt1qyqrgqluh0v7yrarreezawvcrv3q8t28tyzqveg4zl',
-        'ckt1qyqvwh396xsgcqmp0ltjz9s85zn50xkjascsz88vrw'
+      blake160s: [
+        '0xcdef55dcb787257236bbe8d8c338951b4290ca69',
+        '0x3403fcbbd9e20fa31e722eb9981b2203ad475904',
+        '0xc75e25d1a08c03617fd7211607a0a7479ad2ec31'
       ],
       isMainnet: true
     },
@@ -101,26 +110,14 @@ describe('test for multisig controller', () => {
     dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
   })
 
-  describe('test createMultisigAddress', () => {
-    it('test net', () => {
-      const multisigAddress = multisigController.createMultisigAddress(multisigConfig.testnet.params)
-      expect(multisigAddress.result).toEqual(multisigConfig.testnet.result)
-    })
-    it('main net', () => {
-      const multisigAddress = multisigController.createMultisigAddress(multisigConfig.mainnet.params)
-      expect(multisigAddress.result).toEqual(multisigConfig.mainnet.result)
-    })
-  })
-
   it('test save config', async () => {
     const params = {
       walletId: 'string',
       r: 1,
       m: 1,
       n: 1,
-      addresses: [],
+      blake160s: [],
       alias: 'string',
-      fullPayload: 'string',
       changed: expect.any(Function)
     }
     await multisigController.saveConfig(params)
@@ -151,15 +148,14 @@ describe('test for multisig controller', () => {
   })
 
   it('get config', async () => {
-    const params = { walletId: 'abcd' }
-    await multisigController.getConfig(params)
-    expect(MultiSigServiceMock.prototype.getMultisigConfig).toHaveBeenCalledWith(params.walletId)
+    await multisigController.getConfig('abcd')
+    expect(MultiSigServiceMock.prototype.getMultisigConfig).toHaveBeenCalledWith('abcd')
   })
 
   describe('import config', () => {
     it('cancel import', async () => {
       dialogRes = { canceled: true, filePaths: [], filePath: './' }
-      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
+      const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
     })
     it('import data is error', async () => {
@@ -167,8 +163,45 @@ describe('test for multisig controller', () => {
         ...multisigConfig.testnet.params,
         r: undefined
       }]
-      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
+      const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation r > n', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        r: 4
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation m > n', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        m: 4
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation blake160s empty', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        blake160s: []
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is invalidation blake160 length not 42', async () => {
+      fileContent = [{
+        ...multisigConfig.testnet.params,
+        blake160s: ['0xcdef55dcb787257236bbe8d8c338951b4290ca6911']
+      }]
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import object success', async () => {
       fileContent = multisigConfig.testnet.params
@@ -176,11 +209,10 @@ describe('test for multisig controller', () => {
         ...multisigConfig.testnet.params,
         id: 1,
         walletId: '1234',
-        alias: '',
-        fullPayload: multisigConfig.testnet.result,
+        alias: ''
       } as any)
-      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
-      expect(res?.result[0].fullPayload).toBe(multisigConfig.testnet.result)
+      const res = await multisigController.importConfig('1234')
+      expect(res?.result[0].blake160s).toBe(multisigConfig.testnet.params.blake160s)
     })
     it('import success', async () => {
       fileContent = multisigConfig.testnet.params
@@ -189,10 +221,9 @@ describe('test for multisig controller', () => {
         id: 1,
         walletId: '1234',
         alias: '',
-        fullPayload: multisigConfig.testnet.result,
       } as any)
-      const res = await multisigController.importConfig({ isMainnet: false, walletId: '1234'})
-      expect(res?.result[0].fullPayload).toBe(multisigConfig.testnet.result)
+      const res = await multisigController.importConfig('1234')
+      expect(res?.result[0].blake160s).toBe(multisigConfig.testnet.params.blake160s)
     })
   })
 

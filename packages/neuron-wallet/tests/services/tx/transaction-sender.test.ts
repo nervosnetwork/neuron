@@ -152,9 +152,8 @@ import {
 } from '../../../src/exceptions'
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
-import Multisig from '../../../src/models/multi-sign'
-import { addressToScript, scriptToAddress, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import MultiSign from '../../../src/models/multi-sign'
+import Multisig from '../../../src/models/multisig'
+import { addressToScript, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 
 const fakeScript = new Script(
   '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
@@ -610,8 +609,7 @@ describe('TransactionSender Test', () => {
           m: 1,
           n: 1,
           r: 1,
-          fullPayload: 'fullPayload',
-          addresses: ['addresses']
+          blake160s: ['blake160s']
         })
         await transactionSender.generateMultisigSendAllTx(targetOutputs, multisigConfig)
         expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith('', targetOutputs, '0', '1000', multisigConfig)
@@ -836,12 +834,8 @@ describe('TransactionSender Test', () => {
       }
 
       const createMultisigConfig = (r: number, m: number, addresses: string[]): [string, MultisigConfigModel] => {
-        const multiArgs = new Multisig().hash(addresses, {
-          S: '0x00',
-          R: `0x${r.toString(16).padStart(2, '0')}`,
-          M: `0x${r.toString(16).padStart(2, '0')}`,
-          N: `0x${addresses.length.toString(16).padStart(2, '0')}`
-        })
+        const blake160s = addresses.map(v => addressToScript(v).args)
+        const multiArgs = Multisig.hash(blake160s, r, m, addresses.length)
         return [
           multiArgs,
           MultisigConfigModel.fromObject({
@@ -849,12 +843,7 @@ describe('TransactionSender Test', () => {
             r,
             m,
             n: addresses.length,
-            addresses,
-            fullPayload: scriptToAddress({
-              args: multiArgs,
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
-            })
+            blake160s: addresses.map(v => addressToScript(v).args)
           })
         ]
       }
@@ -884,17 +873,7 @@ describe('TransactionSender Test', () => {
       })
 
       describe('m is 2', () => {
-        const addresses = [
-          'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
-          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
-          'ckt1qyqt9wqszk2lurw7h86wrt826cg8zx2f0lnq6e4vpl'
-        ]
-        const multisigPrefix = {
-          S: '0x00',
-          R: '0x01',
-          M: '0x02',
-          N: '0x03'
-        }
+        const addresses = ['ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4', 'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6', 'ckt1qyqt9wqszk2lurw7h86wrt826cg8zx2f0lnq6e4vpl']
         const [multiArgs, multisigConfig] = createMultisigConfig(1, 2, addresses)
         const addr = {
           walletId: fakeWallet.id,
@@ -914,10 +893,7 @@ describe('TransactionSender Test', () => {
           tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
           tx = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const lock = (tx.witnesses[0] as WitnessArgs).lock!
-          const serializedMultiSign: string = new MultiSign().serialize(
-            addresses.map(v => addressToScript(v).args),
-            multisigPrefix
-          )
+          const serializedMultiSign: string = Multisig.serialize(addresses.map(v => addressToScript(v).args), 1, 2, 3)
           expect(lock.startsWith(serializedMultiSign)).toBeTruthy()
           transactionSender.getAddressInfos = getAddressInfos
         })
@@ -1002,16 +978,7 @@ describe('TransactionSender Test', () => {
           const expectedValue = serializeWitnessArgs({
             inputType: undefined,
             outputType: undefined,
-            lock:
-              new MultiSign().serialize(
-                addresses.map(v => addressToScript(v).args),
-                {
-                  S: '0x00',
-                  R: `0x01`,
-                  M: `0x01`,
-                  N: `0x02`
-                }
-              ) + witnessLock
+            lock: Multisig.serialize(addresses.map(v => addressToScript(v).args), 1, 1, 2) + witnessLock
           })
           expect(res.witnesses[0]).toBe(expectedValue)
         })

@@ -1,6 +1,6 @@
 import WalletService, { Wallet } from 'services/wallets'
 import NodeService from './node'
-import { addressToScript, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import { Address } from 'models/address'
@@ -19,7 +19,7 @@ import WitnessArgs from 'models/chain/witness-args'
 import Transaction from 'models/chain/transaction'
 import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
-import MultiSign from 'models/multi-sign'
+import Multisig from 'models/multisig'
 import Blake2b from 'models/blake2b'
 import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
@@ -39,6 +39,7 @@ import { Hardware } from './hardware/hardware'
 import MultisigService from './multisig'
 import { getMultisigStatus } from 'utils/multisig'
 import { SignStatus } from 'models/offline-sign'
+import NetworksService from './networks'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -127,14 +128,14 @@ export default class TransactionSender {
     }
 
     // Only one multi sign input now.
-    const isMultiSign =
+    const isMultisig =
       tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
     const addressInfos = await this.getAddressInfos(walletID)
-    const multiSignBlake160s = isMultiSign
+    const multiSignBlake160s = isMultisig
       ? addressInfos.map(i => {
           return {
-            multiSignBlake160: new MultiSign().hash(i.blake160),
+            multiSignBlake160: Multisig.hash([i.blake160]),
             path: i.path
           }
         })
@@ -195,20 +196,19 @@ export default class TransactionSender {
       })
       let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
-      if (isMultiSign) {
-        const blake160 = addressInfos.find(
-          i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160)
-        )!.blake160
-        const serializedMultiSign: string = new MultiSign().serialize([blake160])
+      if (isMultisig) {
+        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160]))!
+          .blake160
+        const serializedMultisig: string = Multisig.serialize([blake160])
         signed = await TransactionSender.signSingleMultiSignScript(
           privateKey,
           serializedWitnesses,
           txHash,
-          serializedMultiSign,
+          serializedMultisig,
           wallet
         )
         const wit = signed[0] as WitnessArgs
-        wit.lock = serializedMultiSign + wit.lock!.slice(2)
+        wit.lock = serializedMultisig + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
       } else {
         signed = ckb.signWitnesses(privateKey)({
@@ -317,8 +317,7 @@ export default class TransactionSender {
       if (!multisigConfig) {
         throw new MultisigConfigNeedError()
       }
-      const multisigArgses = multisigConfig.addresses.map(v => addressToScript(v).args)
-      const [privateKey, blake160] = findPrivateKeyAndBlake160(multisigArgses, tx.signatures?.[lockHash])
+      const [privateKey, blake160] = findPrivateKeyAndBlake160(multisigConfig.blake160s, tx.signatures?.[lockHash])
 
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs.map((value: SignInfo, index: number) => {
@@ -332,12 +331,12 @@ export default class TransactionSender {
         return serializeWitnessArgs(args.toSDK())
       })
       let witnesses: (string | WitnessArgs)[] = []
-      const serializedMultiSign: string = new MultiSign().serialize(multisigArgses, {
-        M: HexUtils.toHex(multisigConfig.m, 2),
-        N: HexUtils.toHex(multisigConfig.n, 2),
-        R: HexUtils.toHex(multisigConfig.r, 2),
-        S: MultiSign.defaultS
-      })
+      const serializedMultiSign: string = Multisig.serialize(
+        multisigConfig.blake160s,
+        multisigConfig.r,
+        multisigConfig.m,
+        multisigConfig.n
+      )
       witnesses = await TransactionSender.signSingleMultiSignScript(
         privateKey!,
         serializedWitnesses,
@@ -500,11 +499,17 @@ export default class TransactionSender {
     }))
 
     try {
-      const lockScript = addressToScript(multisigConfig.fullPayload)
+      const lockScript = Multisig.getMultisigScript(
+        multisigConfig.blake160s,
+        multisigConfig.r,
+        multisigConfig.m,
+        multisigConfig.n
+      )
+      const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
       const tx: Transaction = await TransactionGenerator.generateTx(
         '',
         targetOutputs,
-        multisigConfig.fullPayload,
+        multisigAddresses,
         '0',
         '1000',
         {

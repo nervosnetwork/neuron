@@ -17,9 +17,6 @@ import styles from './history.module.scss'
 
 const History = () => {
   const {
-    app: {
-      loadings: { transactionList: isLoading },
-    },
     wallet: { id, name: walletName },
     chain: {
       networkID,
@@ -111,7 +108,6 @@ const History = () => {
     keywords,
     onKeywordsChange,
     onSearch,
-    isLoading,
     id,
     walletName,
     items,
