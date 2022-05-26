@@ -1085,6 +1085,8 @@ export class TransactionGenerator {
 
     const chequeCell = Output.fromObject({
       ...chequeCellTmp,
+      // recreate lockHash
+      lockHash: undefined,
       data: BufferUtils.writeBigUInt128LE(BigInt(gatheredSudtInputResult.amount)),
       lock: assetAccountInfo.generateChequeScript(
         receiverLockScript.computeHash(),
