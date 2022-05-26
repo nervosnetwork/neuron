@@ -17,7 +17,7 @@ import SystemScriptInfo from '../../src/models/system-script-info'
 import TransactionPersistor from '../../src/services/tx/transaction-persistor'
 import OutPoint from '../../src/models/chain/out-point'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
-import MultiSign from '../../src/models/multi-sign'
+import Multisig from '../../src/models/multisig'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import MultisigOutput from '../../src/database/chain/entities/multisig-output'
 import { MultisigConfigNeedError, TransactionInputParamterMiss } from '../../src/exceptions'
@@ -982,7 +982,7 @@ describe('CellsService', () => {
     const assetAccountInfo = new AssetAccountInfo()
     const publicKeyHash = bob.lockScript.args
     const bobDefaultLock = SystemScriptInfo.generateSecpScript(publicKeyHash)
-    const multiSignHash = new MultiSign().hash(publicKeyHash)
+    const multiSignHash = Multisig.hash([publicKeyHash])
     const multiSignLockScript = SystemScriptInfo.generateMultiSignScript(multiSignHash)
     const pageSize = 2
 

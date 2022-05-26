@@ -908,7 +908,9 @@
         "copy-address": "复制地址",
         "m-n": {
           "title": "请选择 m-of-n 类型的多重签名地址配置，从 n 个密钥中通过 m 个确认来转移资产。",
-          "error": "对于 m-of-n 多重签名地址，m 不应大于 n"
+          "m-less-equal-n": "对于 m-of-n 多重签名地址，m 不应大于 n",
+          "m-n-required": "请输入或选择 m/n",
+          "m-n-between-0-256": "m/n 应该在 0-256 之间"
         },
         "multi-address-info": {
           "title": "对于 {{m}}-of-{{n}}, 请输入 {{n}} 个签名者地址",

@@ -1,8 +1,9 @@
-import React, { useCallback, useState, useEffect } from 'react'
-import { useDialogWrapper, isSuccessResponse } from 'utils'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
+import { useDialogWrapper, isSuccessResponse, getMultisigAddress, DefaultLockInfo } from 'utils'
 import { MultisigOutputUpdate } from 'services/subjects'
 import {
   MultisigConfig,
+  MultisigEntity,
   saveMultisigConfig,
   getMultisigConfig,
   importMultisigConfig,
@@ -13,10 +14,10 @@ import {
   loadMultisigTxJson,
   OfflineSignJSON,
 } from 'services/remote'
+import { addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 
-export const useSearch = (clearSelected: () => void) => {
+export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
-  const [searchKeywords, setSearchKeywords] = useState('')
 
   const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     if (undefined !== newValue) {
@@ -26,90 +27,111 @@ export const useSearch = (clearSelected: () => void) => {
 
   const onSearch = useCallback(
     value => {
-      setSearchKeywords(value)
+      onFilterConfig(value)
       clearSelected()
     },
-    [setSearchKeywords, clearSelected]
+    [onFilterConfig, clearSelected]
   )
 
   const onClear = useCallback(() => {
     onSearch('')
   }, [onSearch])
-  return { keywords, onKeywordsChange, setKeywords, onSearch, searchKeywords, onClear }
+  return { keywords, onKeywordsChange, setKeywords, onSearch, onClear }
 }
 
 export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {
-  const [configs, setConfigs] = useState<MultisigConfig[]>([])
+  const [entities, setEntities] = useState<MultisigEntity[]>([])
   const saveConfig = useCallback(
-    ({ m, n, r, addresses, fullPayload }) => {
+    ({ m, n, r, addresses }: { m: number; n: number; r: number; addresses: string[] }) => {
       return saveMultisigConfig({
         m,
         n,
         r,
-        addresses,
-        fullPayload,
+        blake160s: addresses.map(v => addressToScript(v).args),
         walletId,
       }).then(res => {
         if (isSuccessResponse(res)) {
-          if (res.result) {
-            setConfigs(v => [res.result!, ...v])
-          }
+          setEntities(v => (res.result ? [res.result, ...v] : v))
         } else {
           throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
         }
       })
     },
-    [walletId, setConfigs]
+    [walletId, setEntities]
   )
   useEffect(() => {
-    getMultisigConfig({
-      walletId,
-    }).then(res => {
-      if (isSuccessResponse(res)) {
-        setConfigs(res.result)
+    getMultisigConfig(walletId).then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setEntities(res.result)
       }
     })
-  }, [setConfigs, walletId])
+  }, [setEntities, walletId])
   const updateConfig = useCallback(
     (id: number) => (alias: string | undefined) => {
       updateMultisigConfig({ id, alias: alias || '' }).then(res => {
         if (isSuccessResponse(res)) {
-          setConfigs(v => v.map(config => (config.id === res.result?.id ? res.result : config)))
+          setEntities(v => v.map(config => (res.result && config.id === res.result?.id ? res.result : config)))
         }
       })
     },
-    [setConfigs]
+    [setEntities]
   )
-  const filterConfig = useCallback((key: string) => {
-    setConfigs(v =>
-      v.filter(config => {
-        return config.alias?.includes(key) || config.fullPayload === key
-      })
-    )
-  }, [])
   const deleteConfigById = useCallback(
     (id: number) => {
-      setConfigs(v => v.filter(config => config.id !== id))
+      setEntities(v => v.filter(config => config.id !== id))
     },
-    [setConfigs]
+    [setEntities]
   )
   const onImportConfig = useCallback(() => {
-    importMultisigConfig({ isMainnet, walletId }).then(res => {
+    importMultisigConfig(walletId).then(res => {
       if (isSuccessResponse(res) && res.result) {
         const { result } = res
         if (result) {
-          setConfigs(v => [...result, ...v])
+          setEntities(v => [...result, ...v])
         }
       }
     })
-  }, [walletId, isMainnet])
+  }, [walletId])
+  const [searchKeywords, setSearchKeywords] = useState('')
+  const onFilterConfig = useCallback(
+    (v: string) => {
+      setSearchKeywords(v)
+    },
+    [setSearchKeywords]
+  )
+  const allConfigs = useMemo<MultisigConfig[]>(
+    () =>
+      entities.map(entity => ({
+        ...entity,
+        addresses: entity.blake160s.map(args =>
+          scriptToAddress(
+            {
+              args,
+              codeHash: DefaultLockInfo.CodeHash,
+              hashType: DefaultLockInfo.HashType,
+            },
+            isMainnet
+          )
+        ),
+        fullPayload: getMultisigAddress(entity.blake160s, entity.r, entity.m, entity.n, isMainnet),
+      })),
+    [entities, isMainnet]
+  )
+  const configs = useMemo<MultisigConfig[]>(
+    () =>
+      searchKeywords
+        ? allConfigs.filter(v => v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords)
+        : allConfigs,
+    [allConfigs, searchKeywords]
+  )
   return {
     saveConfig,
-    allConfigs: configs,
+    allConfigs,
     updateConfig,
     deleteConfigById,
-    filterConfig,
     onImportConfig,
+    configs,
+    onFilterConfig,
   }
 }
 

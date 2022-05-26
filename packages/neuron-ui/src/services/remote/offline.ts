@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { remoteApi } from './remoteApiWrapper'
-import { MultisigConfig } from './multisig'
+import { MultisigEntity } from './multisig'
 
 export enum OfflineSignStatus {
   Signed = 'Signed',
@@ -41,7 +41,7 @@ export interface OfflineSignJSON {
   multisig_configs?: MultisigConfigs
 }
 
-export type SignProps = OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigConfig }
+export type SignProps = OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigEntity }
 
 export type BroadcastProps = OfflineSignJSON & { walletID: string }
 

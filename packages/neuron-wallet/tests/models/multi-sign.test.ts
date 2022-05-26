@@ -1,4 +1,4 @@
-import MultiSign from "../../src/models/multi-sign"
+import Multisig from "../../src/models/multisig"
 
 describe('MultiSign Test', () => {
   const minutes = 360
@@ -15,39 +15,39 @@ describe('MultiSign Test', () => {
   const serialized = "0x0000010136c329ed630d6ce750712a477543672adab57f4c"
 
   it('since', () => {
-    const since = new MultiSign().since(minutes, headerEpoch)
+    const since = new Multisig().since(minutes, headerEpoch)
     expect(since).toEqual(expectedSince)
   })
 
   it('since, minutes < 0', () => {
     expect(() => {
-      new MultiSign().since(-1, headerEpoch)
+      new Multisig().since(-1, headerEpoch)
     }).toThrowError()
   })
 
   it('serialize', () => {
-    const s = new MultiSign().serialize([bob.blake160])
+    const s = Multisig.serialize([bob.blake160])
     expect(s).toEqual(serialized)
   })
 
   it('serialize with r/m/n', () => {
-    const s = new MultiSign().serialize([bob.blake160], { S: '0x00', R: '0x01', M: '0x02', N: '0x03'})
+    const s = Multisig.serialize([bob.blake160], 1, 2, 3)
     expect(s).toEqual('0x0001020336c329ed630d6ce750712a477543672adab57f4c')
   })
 
   it('serialize with r/m/n exception', () => {
     expect(() => {
-      new MultiSign().serialize([bob.blake160], { S: '0x00', R: '0x01', M: '0x02', N: '0xf000'})
+      Multisig.serialize([bob.blake160], 1, 2, 300)
     }).toThrow()
   })
 
   it('hash', () => {
-    const hash = new MultiSign().hash(bob.blake160)
+    const hash = Multisig.hash([bob.blake160])
     expect(hash).toEqual(bob.hash)
   })
 
   it('args', () => {
-    const args = new MultiSign().args(bob.blake160, minutes, headerEpoch)
+    const args = new Multisig().args(bob.blake160, minutes, headerEpoch)
     expect(args).toEqual(expectedArgs)
   })
 })

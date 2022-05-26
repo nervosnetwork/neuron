@@ -15,8 +15,7 @@ describe('getMultisigStatus test', () => {
       r: 1,
       m: 2,
       n: 3,
-      addresses: Object.keys(addressesToArgs),
-      fullPayload: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sqv94200sn94mc90xxe4lawp0d7ywg4epzcajyg9d'
+      blake160s: Object.values(addressesToArgs),
     })
     it('Unsigned', () => {
       expect(getMultisigStatus(multisigConfig, {})).toBe(SignStatus.Unsigned)

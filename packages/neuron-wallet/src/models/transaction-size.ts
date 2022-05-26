@@ -4,7 +4,7 @@ import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
-import MultiSign from './multi-sign'
+import Multisig from './multisig'
 import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from 'utils/buffer'
 
@@ -81,20 +81,14 @@ export default class TransactionSize {
 
   public static singleMultiSignWitness(): number {
     const blake160 = '0x' + '0'.repeat(40)
-    const lock = new MultiSign().serialize([blake160]) + '0'.repeat(130)
+    const lock = Multisig.serialize([blake160]) + '0'.repeat(130)
     const wit = new WitnessArgs(lock)
     return TransactionSize.witness(wit)
   }
 
   public static multiSignWitness(r: number, m: number, n: number): number {
     const blake160 = '0x' + '0'.repeat(40)
-    const lock =
-      new MultiSign().serialize(new Array(n).fill(blake160), {
-        R: HexUtils.toHex(r, 2),
-        M: HexUtils.toHex(m, 2),
-        N: HexUtils.toHex(n, 2),
-        S: MultiSign.defaultS
-      }) + '0'.repeat(130 * m)
+    const lock = Multisig.serialize(new Array(n).fill(blake160), r, m, n) + '0'.repeat(130 * m)
     const wit = new WitnessArgs(lock)
     return TransactionSize.witness(wit)
   }

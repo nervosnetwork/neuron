@@ -12,7 +12,7 @@ import Transaction, { TransactionStatus } from '../../../src/models/chain/transa
 import OutPoint from '../../../src/models/chain/out-point'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
 import BlockHeader from '../../../src/models/chain/block-header'
-import MultiSign from '../../../src/models/multi-sign'
+import Multisig from '../../../src/models/multisig'
 import SystemScriptInfo from '../../../src/models/system-script-info'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
@@ -461,7 +461,7 @@ describe('TransactionGenerator', () => {
           const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH)
           expect(multiSignOutput).toBeDefined()
 
-          const multiSign = new MultiSign()
+          const multiSign = new Multisig()
           const epoch = multiSign.parseSince(multiSignOutput!.lock.args)
           // @ts-ignore: Private method
           const parsedEpoch = multiSign.parseEpoch(epoch)
@@ -715,7 +715,7 @@ describe('TransactionGenerator', () => {
 
         expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
 
-        const multiSign = new MultiSign()
+        const multiSign = new Multisig()
         const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
         // @ts-ignore: Private method
         const parsedEpoch = multiSign.parseEpoch(epoch)
@@ -744,13 +744,9 @@ describe('TransactionGenerator', () => {
           r: 1,
           m: 2,
           n: 3,
-          addresses: [
-            'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
-            'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
-            'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda'
-          ],
-          fullPayload:
-            'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sqv8hxhzc8r3pqtcuuym7j5fkumtcrc2ucqe3z37y'
+          blake160s: (
+            ['ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y', 'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y', 'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda']
+          ).map(v => addressToScript(v).args),
         })
       )
 
@@ -1029,7 +1025,7 @@ describe('TransactionGenerator', () => {
   describe('generateWithdrawMultiSignTx', () => {
     const prevOutput = Output.fromObject({
       capacity: toShannon('1000'),
-      lock: SystemScriptInfo.generateMultiSignScript(new MultiSign().args(bob.lockScript.args, 100, '0x7080018000001'))
+      lock: SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.lockScript.args, 100, '0x7080018000001'))
     })
     const outPoint = OutPoint.fromObject({
       txHash: '0x' + '0'.repeat(64),

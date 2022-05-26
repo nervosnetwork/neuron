@@ -10,7 +10,7 @@ import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
 import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
-import MultiSign from 'models/multi-sign'
+import Multisig from 'models/multisig'
 import TxAddressFinder from './tx-address-finder'
 import IndexerConnector, { BlockTips } from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
@@ -40,9 +40,8 @@ export default class Queue {
     this.#assetAccountInfo = new AssetAccountInfo()
     this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
 
-    const multiSign = new MultiSign()
     const blake160s = this.#addresses.map(meta => meta.blake160)
-    this.#multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
+    this.#multiSignBlake160s = blake160s.map(blake160 => Multisig.hash([blake160]))
     this.#anyoneCanPayLockHashes = blake160s.map(b => this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
   }
 
