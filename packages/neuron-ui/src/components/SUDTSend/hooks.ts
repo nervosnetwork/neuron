@@ -123,7 +123,7 @@ export function useSendType({
         setSendType(undefined)
         break
       case AddressLockType.unknow:
-        setSendType(SendType.unknowNewCell)
+        setSendType(undefined)
         break
       default:
         break

@@ -368,7 +368,12 @@ const SUDTSend = () => {
             {options?.length &&
               options.map(v => (
                 <div className={`${styles[v.key]} ${styles.option}`} key={v.key}>
-                  <input type="checkbox" id={v.key} checked={v.key === sendType} onChange={onChangeSendType} />
+                  <input
+                    type={options?.length > 1 ? 'radio' : 'checkbox'}
+                    id={v.key}
+                    checked={v.key === sendType}
+                    onChange={onChangeSendType}
+                  />
                   <label htmlFor={v.key}>{t(`s-udt.send.${v.tValue}`, v?.params)}</label>
                 </div>
               ))}
