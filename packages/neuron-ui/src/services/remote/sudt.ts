@@ -22,8 +22,8 @@ export const generateSUDTTransaction = remoteApi<Controller.GenerateSUDTTransact
   'generate-send-to-anyone-can-pay-tx'
 )
 
-export const generateSendAllSUDTTransaction = remoteApi<Controller.GenerateSendAllSUDTTransaction.Params>(
-  'generate-send-all-to-anyone-can-pay-tx'
+export const getSUDTCellExtraCkb = remoteApi<{ address: string; tokenID: string }, string | undefined>(
+  'get-sudt-cell-extra-ckb'
 )
 
 export const sendSUDTTransaction = remoteApi<Controller.SendSUDTTransaction.Params>('send-to-anyone-can-pay')

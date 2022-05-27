@@ -285,11 +285,12 @@ const HardwareSign = ({
           })
           break
         }
-        case 'send-acp':
-        case 'send-acp-to-default':
+        case 'send-ckb':
+        case 'send-acp-sudt-to-new-cell':
+        case 'send-acp-ckb-to-new-cell':
         case 'send-sudt': {
           let skipLastInputs = true
-          if (actionType === 'send-acp-to-default') {
+          if (actionType === 'send-acp-sudt-to-new-cell' || actionType === 'send-acp-ckb-to-new-cell') {
             skipLastInputs = false
           }
           const params: Controller.SendSUDTTransaction.Params = {

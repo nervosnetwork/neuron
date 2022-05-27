@@ -130,7 +130,8 @@ export default {
       'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
-      'no-match-address-for-sign': 'Not found matched address'
+      'no-match-address-for-sign': 'Not found matched address',
+      'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address'
     },
     messageBox: {
       button: {

@@ -1594,7 +1594,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
@@ -1667,7 +1668,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
@@ -1707,7 +1709,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
         })
         it('throws error CapacityNotEnough', async () => {
@@ -1747,7 +1750,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
@@ -1824,7 +1828,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
@@ -1897,7 +1902,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
         })
         it('throws error CapacityNotEnough', async () => {
@@ -1937,7 +1943,8 @@ describe('TransactionGenerator', () => {
             capacity: targetLiveCell.capacity,
             lock: targetLiveCell.lock(),
             type: targetLiveCell.type(),
-            data: targetLiveCell.data
+            data: targetLiveCell.data,
+            outPoint: new OutPoint('0x1558c9aed78d657eba858302b56800a8270aa7b43426d82c58cf96ae4afd6774', '0x0')
           })
 
           tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
@@ -1988,6 +1995,83 @@ describe('TransactionGenerator', () => {
             BufferUtils.writeBigUInt128LE(BigInt(1100))
           ])
           expect(tx.sudtInfo!.amount).toEqual('1000')
+        })
+      })
+
+      describe('ouput is a new cell', () => {
+        beforeEach(async () => {
+          const targetLiveCellEntity = generateLiveCell(toShannon('142'), '0', tokenID, aliceAnyoneCanPayLockScript)
+
+          when(stubbedQueryIndexer)
+            .calledWith({
+              lock: bobAnyoneCanPayLockScript,
+              type: assetAccountInfo.generateSudtScript(tokenID),
+              data: null
+            })
+            .mockResolvedValue([generateLiveCell(toShannon('150'), '1000', tokenID)])
+
+          const targetLiveCell: LiveCell = LiveCell.fromLumos(targetLiveCellEntity)
+
+          const targetOutput: Output = Output.fromObject({
+            capacity: targetLiveCell.capacity,
+            lock: targetLiveCell.lock(),
+            type: targetLiveCell.type(),
+            data: targetLiveCell.data
+          })
+
+          tx = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+            walletId1,
+            [bobAnyoneCanPayLockScript],
+            targetOutput,
+            '100',
+            bob.lockScript.args,
+            feeRate,
+            '0'
+          )
+          tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+          tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+          expectedTxSize = TransactionSize.tx(tx)
+          expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+        })
+        it('input 2, ouputs 3', () => {
+          expect(tx.inputs.length).toEqual(2)
+          expect(tx.outputs.length).toEqual(3)
+          expect(tx.inputs.map(o => o.lockHash)).toEqual([
+            bobAnyoneCanPayLockScript.computeHash(),
+            alice.lockScript.computeHash()
+          ])
+          expect(tx.outputs.map(o => o.lockHash)).toEqual([
+            bobAnyoneCanPayLockScript.computeHash(),
+            aliceAnyoneCanPayLockScript.computeHash(),
+            bob.lockScript.computeHash(),
+          ])
+        })
+        it('calculates fees', () => {
+          expect(tx.fee).toEqual(expectedTxFee)
+
+          const expectedOutputCapacities: bigint[] = [
+            BigInt(toShannon('142')),
+            BigInt(toShannon('142')),
+            BigInt(toShannon('1008')) - BigInt(toShannon('142')) - BigInt(tx.fee),
+          ]
+          expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
+
+          const inputCapacities = tx.inputs
+            .map(input => BigInt(input.capacity))
+            .reduce((result, c) => result + c, BigInt(0))
+          const outputCapacities = tx.outputs
+            .map(output => BigInt(output.capacity))
+            .reduce((result, c) => result + c, BigInt(0))
+
+          expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+        })
+        it('updates output data', () => {
+          expect(tx.outputsData).toEqual([
+            BufferUtils.writeBigUInt128LE(BigInt(900)),
+            BufferUtils.writeBigUInt128LE(BigInt(100)),
+            '0x'
+          ])
         })
       })
     })

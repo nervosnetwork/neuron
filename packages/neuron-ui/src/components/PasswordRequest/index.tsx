@@ -65,8 +65,9 @@ const PasswordRequest = () => {
     switch (actionType) {
       case 'create-sudt-account':
         return OfflineSignType.CreateSUDTAccount
-      case 'send-acp':
-      case 'send-acp-to-default':
+      case 'send-ckb':
+      case 'send-acp-ckb-to-new-cell':
+      case 'send-acp-sudt-to-new-cell':
       case 'send-sudt':
         return OfflineSignType.SendSUDT
       case 'unlock':
@@ -103,8 +104,9 @@ const PasswordRequest = () => {
       'unlock',
       'create-sudt-account',
       'send-sudt',
-      'send-acp',
-      'send-acp-to-default',
+      'send-ckb',
+      'send-acp-ckb-to-new-cell',
+      'send-acp-sudt-to-new-cell',
       'send-cheque',
       'withdraw-cheque',
       'claim-cheque',
@@ -206,11 +208,12 @@ const PasswordRequest = () => {
             await sendCreateSUDTAccountTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
-          case 'send-acp':
-          case 'send-acp-to-default':
+          case 'send-ckb':
+          case 'send-acp-ckb-to-new-cell':
+          case 'send-acp-sudt-to-new-cell':
           case 'send-sudt': {
             let skipLastInputs = true
-            if (actionType === 'send-acp-to-default') {
+            if (actionType === 'send-acp-sudt-to-new-cell' || actionType === 'send-acp-ckb-to-new-cell') {
               skipLastInputs = false
             }
             const params: Controller.SendSUDTTransaction.Params = {
@@ -372,8 +375,8 @@ const PasswordRequest = () => {
           'unlock',
           'create-sudt-account',
           'send-sudt',
-          'send-acp',
-          'send-acp-to-default',
+          'send-acp-ckb-to-new-cell',
+          'send-acp-sudt-to-new-cell',
           'send-cheque',
           'withdraw-cheque',
           'claim-cheque',

@@ -398,10 +398,16 @@
       "send-sudt": {
         "title": "Send sUDT"
       },
+      "send-ckb": {
+        "title": "Send CKB"
+      },
       "send-acp": {
         "title": "Send CKB"
       },
-      "send-acp-to-default": {
+      "send-acp-sudt-to-new-cell": {
+        "title": "Send sUDT"
+      },
+      "send-acp-ckb-to-new-cell": {
         "title": "Send CKB"
       },
       "migrate-acp": {
@@ -848,7 +854,11 @@
         "cheque-address-hint": "162 CKBytes capacity is going to be temporarily locked to initialize the token transfer, and it will be automatically unlocked after the token being claimed by the receiver.",
         "destroy": "Destroy",
         "destroy-ckb-desc": "Will return all CKB of this CKB Asset account to your change address.",
-        "destroy-sudt-desc": "Will return the asset account occupied CKB to your change address."
+        "destroy-sudt-desc": "Will return the asset account occupied CKB to your change address.",
+        "extra-ckb-send-to-secp256": "Send extra 142 CKBytes along with {{assetName}}, and tooltip of info icon is Extra 142 CKBytes will be sent along with {{assetName}} to hold the asset",
+        "extra-ckb-send-to-acp": "Send extra {{extraCKB}} CKBytes to create an asset account for receiver",
+        "extra-ckb-send-to-unknow": "Receive address has an unknown lock script, please make sure receiver knowns how to handle it, and extra {{extraCKB}} CKBytes will be sent along with {{assetName}} to hold the asset",
+        "select-option": "Please select option"
       },
       "receive": {
         "notation": "Accept {{symbol}} only"

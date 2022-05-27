@@ -69,9 +69,12 @@
 .sendContainer {
   display: grid;
   grid-template:
-    'remote-error remote-error' auto
+    'remote-error .' auto
     'address .' auto
     'amount send-all' auto
+    'option-0 .' auto
+    'option-1 .' auto
+    'select-error .' auto
     'fee fee' auto
     'description .' auto /
     1fr 70px;
@@ -82,6 +85,23 @@
   }
   .amount {
     grid-area: amount;
+  }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    font-size: 10px;
+    line-height: 19px;
+  }
+  .cheque {
+    grid-area: option-0;
+  }
+  .acpNewCell, .secp256NewCell, .unknowNewCell, .acpExistCell {
+    grid-area: option-1;
+  }
+  .selectError {
+    grid-area: select-error;
+    color: #d50000;
+    font-size: 10px;
   }
   .sendAll {
     grid-area: send-all;
