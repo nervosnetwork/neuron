@@ -398,7 +398,7 @@
       "send-sudt": {
         "title": "Send sUDT"
       },
-      "send-ckb": {
+      "send-ckb-asset": {
         "title": "Send CKB"
       },
       "send-acp": {

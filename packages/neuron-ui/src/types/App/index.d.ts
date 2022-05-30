@@ -81,7 +81,7 @@ declare namespace State {
       | 'delete'
       | 'unlock'
       | 'create-sudt-account'
-      | 'send-ckb'
+      | 'send-ckb-asset'
       | 'send-sudt'
       | 'send-acp-sudt-to-new-cell'
       | 'send-acp-ckb-to-new-cell'

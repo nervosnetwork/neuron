@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { AccountType, isAnyoneCanPayAddress, isSecp256k1Address, isSuccessResponse, shannonToCKBFormatter } from 'utils'
 import { SUDTAccount } from 'components/SUDTAccountList'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
-import { generateChequeTransaction, generateSUDTTransaction, getSUDTCellExtraCkb } from 'services/remote'
+import { generateChequeTransaction, generateSUDTTransaction, getHoldSUDTCellCapacity } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 
 export enum SendType {
@@ -48,7 +48,7 @@ export function useOptions({
   accountInfo: SUDTAccount | null
   isAddressCorrect: boolean
 }) {
-  const [extraCKB, setExtraCKB] = useState<string | undefined | null>()
+  const [holdSUDTCellCapacity, setHoldSUDTCellCapacity] = useState<string | undefined | null>()
   useEffect(() => {
     if (
       accountInfo?.tokenId &&
@@ -56,20 +56,20 @@ export function useOptions({
       isAddressCorrect &&
       address
     ) {
-      getSUDTCellExtraCkb({
+      getHoldSUDTCellCapacity({
         address,
         tokenID: accountInfo.tokenId,
       })
         .then(res => {
           if (isSuccessResponse(res)) {
-            setExtraCKB(res.result)
+            setHoldSUDTCellCapacity(res.result)
           }
         })
         .catch(() => {
-          setExtraCKB(undefined)
+          setHoldSUDTCellCapacity(undefined)
         })
     } else {
-      setExtraCKB(undefined)
+      setHoldSUDTCellCapacity(undefined)
     }
   }, [accountInfo, address, isAddressCorrect])
   return useMemo<Option[] | undefined>(() => {
@@ -89,17 +89,17 @@ export function useOptions({
         },
       ]
     }
-    if (extraCKB) {
+    if (holdSUDTCellCapacity) {
       return [
         {
           tValue: addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp' : 'extra-ckb-send-to-unknow',
           key: addressLockType === AddressLockType.acp ? SendType.acpNewCell : SendType.unknowNewCell,
-          params: { assetName: accountInfo?.accountName, extraCKB: shannonToCKBFormatter(extraCKB) },
+          params: { assetName: accountInfo?.accountName, extraCKB: shannonToCKBFormatter(holdSUDTCellCapacity) },
         },
       ]
     }
     return undefined
-  }, [addressLockType, extraCKB, accountInfo])
+  }, [addressLockType, holdSUDTCellCapacity, accountInfo])
 }
 
 export function useSendType({
@@ -171,7 +171,7 @@ export function useOnSumbit({
         let actionType: State.PasswordRequest['actionType'] = 'send-sudt'
         switch (sendType) {
           case SendType.sendCKB:
-            actionType = addressLockType === AddressLockType.secp256 ? 'send-acp-ckb-to-new-cell' : 'send-ckb'
+            actionType = addressLockType === AddressLockType.secp256 ? 'send-acp-ckb-to-new-cell' : 'send-ckb-asset'
             break
           case SendType.secp256Cheque:
             actionType = 'send-cheque'

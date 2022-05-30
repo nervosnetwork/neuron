@@ -271,28 +271,28 @@ describe('anyone-can-pay-service', () => {
     })
   })
 
-  describe('getSUDTCellCapacity', () => {
+  describe('getHoldSUDTCellCapacity', () => {
     it('is secp256 address', async () => {
-      const res = await AnyoneCanPayServece.getSUDTCellCapacity(SystemScriptInfo.generateSecpScript(assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(SystemScriptInfo.generateSecpScript(assetAccount.blake160), '0x00')
       expect(res).toBe(undefined)
     })
     it('CKB acp', async () => {
-      const res = await AnyoneCanPayServece.getSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), 'CKBytes')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), 'CKBytes')
       expect(res).toBe(undefined)
     })
     it('acp cell exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue({})
-      const res = await AnyoneCanPayServece.getSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), '0x00')
       expect(res).toBe(undefined)
     })
     it('acp cell not exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
-      const res = await AnyoneCanPayServece.getSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), '0x00')
       expect(res).toBe(BigInt(MIN_SUDT_CAPACITY).toString())
     })
     it('unknow lock not exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
-      const res = await AnyoneCanPayServece.getSUDTCellCapacity(new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160), '0x00')
       expect(res).toBe(BigInt(162 * 10 ** 8).toString())
     })
   })

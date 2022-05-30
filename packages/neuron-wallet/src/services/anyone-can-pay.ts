@@ -138,7 +138,7 @@ export default class AnyoneCanPayService {
     return (addArgsLength + BigInt(MIN_SUDT_CAPACITY)).toString()
   }
 
-  public static async getSUDTCellCapacity(lockScript: Script, tokenID: string) {
+  public static async getHoldSUDTCellCapacity(lockScript: Script, tokenID: string) {
     if (SystemScriptInfo.isSecpScript(lockScript) || tokenID === 'CKBytes') {
       return undefined
     }

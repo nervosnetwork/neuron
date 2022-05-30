@@ -7,13 +7,13 @@ import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 
 const generateAnyoneCanPayTxMock = jest.fn()
 const generateSudtMigrateAcpTxMock = jest.fn()
-const getSUDTCellCapacityMock = jest.fn()
+const getHoldSUDTCellCapacityMock = jest.fn()
 jest.mock('../../src/services/anyone-can-pay', () => ({
   // @ts-ignore
   generateAnyoneCanPayTx: (...args) => generateAnyoneCanPayTxMock(...args),
   generateSudtMigrateAcpTx: () => generateSudtMigrateAcpTxMock(),
   // @ts-ignore
-  getSUDTCellCapacity: (...args) => getSUDTCellCapacityMock(...args),
+  getHoldSUDTCellCapacity: (...args) => getHoldSUDTCellCapacityMock(...args),
 }))
 
 const fromObjectMock = jest.fn()
@@ -131,18 +131,18 @@ describe('anyone-can-pay-controller', () => {
     expect(generateSudtMigrateAcpTxMock).toHaveBeenCalled()
   })
 
-  describe('getSudtCellExtraCkb', () => {
+  describe('getHoldSudtCellExtraCkb', () => {
     it('correct address', async () => {
       const address = 'ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'
-      await anyoneCanPayController.getSudtCellExtraCkb(address, 'tokenID')
-      expect(getSUDTCellCapacityMock).toHaveBeenCalledWith(
+      await anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID')
+      expect(getHoldSUDTCellCapacityMock).toHaveBeenCalledWith(
         addressToScript(address),
         'tokenID'
       )
     })
     it('error address', async () => {
       const address = 'ct1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'
-      await expect(anyoneCanPayController.getSudtCellExtraCkb(address, 'tokenID')).rejects.toThrow(new Error('Address format error'))
+      await expect(anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID')).rejects.toThrow(new Error('Address format error'))
     })
   })
 })

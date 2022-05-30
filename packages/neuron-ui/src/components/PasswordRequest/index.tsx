@@ -65,7 +65,7 @@ const PasswordRequest = () => {
     switch (actionType) {
       case 'create-sudt-account':
         return OfflineSignType.CreateSUDTAccount
-      case 'send-ckb':
+      case 'send-ckb-asset':
       case 'send-acp-ckb-to-new-cell':
       case 'send-acp-sudt-to-new-cell':
       case 'send-sudt':
@@ -104,7 +104,7 @@ const PasswordRequest = () => {
       'unlock',
       'create-sudt-account',
       'send-sudt',
-      'send-ckb',
+      'send-ckb-asset',
       'send-acp-ckb-to-new-cell',
       'send-acp-sudt-to-new-cell',
       'send-cheque',
@@ -208,7 +208,7 @@ const PasswordRequest = () => {
             await sendCreateSUDTAccountTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
-          case 'send-ckb':
+          case 'send-ckb-asset':
           case 'send-acp-ckb-to-new-cell':
           case 'send-acp-sudt-to-new-cell':
           case 'send-sudt': {

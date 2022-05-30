@@ -46,12 +46,12 @@ export default class AnyoneCanPayController {
     }
   }
 
-  public async getSudtCellExtraCkb(
+  public async getHoldSudtCellCapacity(
     receiveAddress: string,
     tokenID: string
   ): Promise<Controller.Response<string | undefined>> {
     const lockScript = AddressParser.parse(receiveAddress)
-    const extraCKB = await AnyoneCanPayService.getSUDTCellCapacity(lockScript, tokenID)
+    const extraCKB = await AnyoneCanPayService.getHoldSUDTCellCapacity(lockScript, tokenID)
     return {
       status: ResponseCode.Success,
       result: extraCKB

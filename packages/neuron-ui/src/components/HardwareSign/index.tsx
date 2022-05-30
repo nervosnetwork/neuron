@@ -285,7 +285,7 @@ const HardwareSign = ({
           })
           break
         }
-        case 'send-ckb':
+        case 'send-ckb-asset':
         case 'send-acp-sudt-to-new-cell':
         case 'send-acp-ckb-to-new-cell':
         case 'send-sudt': {

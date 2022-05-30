@@ -391,7 +391,7 @@
       "send-sudt": {
         "title": "发起 sUDT 交易"
       },
-      "send-ckb": {
+      "send-ckb-asset": {
         "title": "发起 CKB 交易"
       },
       "send-acp": {
@@ -849,7 +849,7 @@
         "destroy-sudt-desc": "将会返还该资产账户所占用的 CKB 到你的找零地址中",
         "extra-ckb-send-to-secp256": "额外 142 CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产",
         "extra-ckb-send-to-acp": "额外发送 {{extraCKB}} CKBytes 为收款方创建资产账户",
-        "extra-ckb-send-to-unknow": "收款地址包含未知 Lock Script, 请确保接受者知道如何处理该资产, 额外 {{extraCKB}} CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产",
+        "extra-ckb-send-to-unknow": "收款地址包含未知 Lock Script, 请确保接收者知道如何处理该资产, 额外 {{extraCKB}} CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产",
         "select-option": "请选择对应的选项"
       },
       "receive": {

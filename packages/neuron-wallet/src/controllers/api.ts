@@ -517,8 +517,8 @@ export default class ApiController {
       return this.#anyoneCanPayController.generateTx(params)
     })
 
-    handle('get-sudt-cell-extra-ckb', async (_, params: { address: string, tokenID: string }) => {
-      return this.#anyoneCanPayController.getSudtCellExtraCkb(params.address, params.tokenID)
+    handle('get-hold-sudt-cell-capacity', async (_, params: { address: string, tokenID: string }) => {
+      return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID)
     })
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
