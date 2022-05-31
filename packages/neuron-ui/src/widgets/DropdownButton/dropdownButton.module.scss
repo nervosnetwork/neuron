@@ -22,9 +22,11 @@
       background-color: #fff;
       font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
 
-      &:hover {
-        background-color: #d1d1d1;
-        font-weight: bold;
+      &:not(:disabled) {
+        &:hover {
+          background-color: #d1d1d1;
+          font-weight: bold;
+        }
       }
 
       &:disabled {

@@ -1,6 +1,7 @@
 import type OfflineSignController from '../../src/controllers/offline-sign'
 import { SignStatus, SignType } from '../../src/models/offline-sign'
 import { connectDeviceFailed, MultisigNotSignedNeedError, OfflineSignFailed } from '../../src/exceptions'
+import { ResponseCode } from '../../src/utils/const'
 
 const stubbedElectronShowSaveDialog = jest.fn()
 const stubbedElectronShowErrorBox = jest.fn()
@@ -224,7 +225,10 @@ describe('OfflineSignController', () => {
           canceled: true
         })
 
-        expect(offlineSignController.exportTransactionAsJSON({} as any)).rejects.toThrow()
+        const res = await offlineSignController.exportTransactionAsJSON({} as any)
+        expect(res).toEqual({
+          status: ResponseCode.Success
+        })
       })
 
       it('throws if file path is not provider', async () => {
@@ -232,7 +236,10 @@ describe('OfflineSignController', () => {
           canceled: false
         })
 
-        expect(offlineSignController.exportTransactionAsJSON({} as any)).rejects.toThrow()
+        const res = await offlineSignController.exportTransactionAsJSON({} as any)
+        expect(res).toEqual({
+          status: ResponseCode.Success
+        })
       })
     })
 
@@ -255,7 +262,7 @@ describe('OfflineSignController', () => {
           type: SignType.Regular,
         } as any)
 
-        expect(res.result.json).toEqual({
+        expect(res?.result?.json).toEqual({
           transaction: mockTransaction,
           status: 'Signed',
           context: [],
@@ -274,7 +281,7 @@ describe('OfflineSignController', () => {
           type: SignType.Regular,
         } as any)
 
-        expect(res.result.json).toEqual({
+        expect(res?.result?.json).toEqual({
           transaction: mockTransaction,
           status: SignStatus.Unsigned,
           type: SignType.Regular,
@@ -409,15 +416,16 @@ describe('OfflineSignController', () => {
       })
 
       it('should signed', async () => {
-        const { result: { json } } = await offlineSignController.signAndExportTransaction({
+        const { result } = await offlineSignController.signAndExportTransaction({
           transaction: mockTransaction,
           status: SignStatus.Unsigned,
           type: SignType.SendSUDT,
         } as any)
 
-        expect(json.transaction).toEqual(mockTransaction)
-        expect(json.status).toEqual(SignStatus.Signed)
-        expect(json.type).toEqual(SignType.SendSUDT)
+        const json = result?.json
+        expect(json?.transaction).toEqual(mockTransaction)
+        expect(json?.status).toEqual(SignStatus.Signed)
+        expect(json?.type).toEqual(SignType.SendSUDT)
       })
     })
   })

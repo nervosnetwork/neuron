@@ -58,15 +58,20 @@ const HardwareSign = ({
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const dispatch = useDispatch()
-  const onCancel = useCallback(() => {
-    if (signType === 'transaction') {
-      dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: { sending: false },
-      })
-    }
-    onDismiss()
-  }, [dispatch, signType, onDismiss])
+  const onCancel = useCallback(
+    (dismiss: boolean = true) => {
+      if (signType === 'transaction') {
+        dispatch({
+          type: AppActions.UpdateLoadings,
+          payload: { sending: false },
+        })
+      }
+      if (dismiss) {
+        onDismiss()
+      }
+    },
+    [dispatch, signType, onDismiss]
+  )
   const isWin32 = useMemo(() => {
     return getPlatform() === 'win32'
   }, [])
@@ -91,7 +96,7 @@ const HardwareSign = ({
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
   const isLoading = useMemo(() => {
-    return status === userInputStatus || isReconnecting
+    return status === userInputStatus || isReconnecting || isSending
   }, [status, userInputStatus, isReconnecting])
 
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
@@ -121,11 +126,13 @@ const HardwareSign = ({
       setError(errorFormatter(res.message, t))
       return
     }
-    dispatch({
-      type: AppActions.UpdateLoadedTransaction,
-      payload: res.result!,
-    })
-    onCancel()
+    if (res.result) {
+      dispatch({
+        type: AppActions.UpdateLoadedTransaction,
+        payload: res.result!,
+      })
+    }
+    onCancel(!!res.result)
   }, [offlineSignJSON, dispatch, onCancel, t, wallet.id])
 
   const signAndExportFromGenerateTx = useCallback(async () => {
@@ -143,16 +150,19 @@ const HardwareSign = ({
       password: '',
       multisigConfig,
     })
+    setStatus(connectStatus)
     if (!isSuccessResponse(res)) {
       setStatus(connectStatus)
       setError(errorFormatter(res.message, t))
       return
     }
-    dispatch({
-      type: AppActions.UpdateLoadedTransaction,
-      payload: res.result!,
-    })
-    onCancel()
+    if (res.result) {
+      dispatch({
+        type: AppActions.UpdateLoadedTransaction,
+        payload: res.result!,
+      })
+    }
+    onCancel(!!res.result)
   }, [
     dispatch,
     onCancel,
@@ -399,14 +409,18 @@ const HardwareSign = ({
   }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
 
   const exportTransaction = useCallback(async () => {
-    await exportTransactionAsJSON({
+    const res = await exportTransactionAsJSON({
       transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Unsigned,
       type: offlineSignType!,
       description,
       asset_account: experimental?.assetAccount,
     })
-    onCancel()
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    onCancel(!!res.result)
   }, [offlineSignType, generatedTx, onCancel, description, experimental])
 
   useDidMount(() => {

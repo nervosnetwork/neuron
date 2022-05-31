@@ -10,7 +10,7 @@ import AssetAccountController from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
 import NodeService from 'services/node'
-import { MultisigNotSignedNeedError, OfflineSignFailed, SaveOfflineJSONFailed } from 'exceptions'
+import { MultisigNotSignedNeedError, OfflineSignFailed } from 'exceptions'
 import MultisigConfigModel from 'models/multisig-config'
 import { getMultisigStatus } from 'utils/multisig'
 
@@ -29,7 +29,9 @@ export default class OfflineSignController {
     })
 
     if (canceled || !filePath) {
-      throw new SaveOfflineJSONFailed()
+      return {
+        status: ResponseCode.Success
+      }
     }
 
     const tx = Transaction.fromObject(transaction)
