@@ -1,4 +1,4 @@
-import { dialog } from 'electron'
+import { BrowserWindow, dialog } from 'electron'
 import { t } from 'i18next'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
 import AppUpdaterSubject from 'models/subjects/app-updater'
@@ -56,7 +56,7 @@ export default class UpdateController {
       UpdateController.isChecking = false
       this.notify()
 
-      dialog.showMessageBox({
+      dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
         type: 'info',
         message: t('updater.update-not-available'),
         buttons: [t('common.ok')]
