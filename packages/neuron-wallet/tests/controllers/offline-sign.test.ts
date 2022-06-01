@@ -215,12 +215,12 @@ describe('OfflineSignController', () => {
       resetMocks()
     })
 
-    describe('it throws', () => {
+    describe('cancel or no filepath', () => {
       beforeEach(() => {
         resetMocks()
       })
 
-      it('throws if user cancel', async () => {
+      it('if user cancel', async () => {
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: true
         })
@@ -231,7 +231,7 @@ describe('OfflineSignController', () => {
         })
       })
 
-      it('throws if file path is not provider', async () => {
+      it('if file path is not provider', async () => {
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: false
         })
