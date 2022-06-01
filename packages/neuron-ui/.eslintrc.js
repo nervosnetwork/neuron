@@ -18,6 +18,7 @@ module.exports = {
       2,
       {
         printWidth: 120,
+        endOfLine: 'auto',
       },
     ],
     semi: [2, 'never'],

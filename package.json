@@ -58,5 +58,8 @@
     "typescript": "3.8.2",
     "wait-on": "6.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "resolutions": {
+    "@types/react": "16.9.15"
+  }
 }
