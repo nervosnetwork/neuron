@@ -32,8 +32,30 @@
 }
 
 .address {
+  display: flex;
+  align-items: center;
+  width: max-content;
   margin: 14px auto 0;
-  text-align: center;
+}
+
+.addressToggle{
+  display: flex;
+  align-items: center;
+  appearance: none;
+  border: none;
+  background: none;
+
+  svg {
+    pointer-events: none;
+  }
+
+  &:hover {
+    g,
+    path {
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
+  }
 }
 
 .notation {
