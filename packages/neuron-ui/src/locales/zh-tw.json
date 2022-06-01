@@ -217,7 +217,9 @@
       "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址簿頁面。",
       "address-qrcode": "地址二維碼",
       "address": "{{network}} 地址",
-      "verify-address": "驗證地址"
+      "verify-address": "驗證地址",
+      "turn-into-full-version-fomrat": "轉換為長地址格式",
+      "turn-into-deprecated-format": "轉換為廢棄地址格式"
     },
     "history": {
       "meta": "元信息",

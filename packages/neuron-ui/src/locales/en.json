@@ -224,7 +224,9 @@
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
       "address-qrcode": "Address QR Code",
       "address": "{{network}} Address",
-      "verify-address": "Verify Address"
+      "verify-address": "Verify Address",
+      "turn-into-full-version-fomrat": "Turn into full version format",
+      "turn-into-deprecated-format": "Turn into deprecated format"
     },
     "history": {
       "meta": "Meta",

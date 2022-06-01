@@ -13,6 +13,24 @@
   justify-content: center;
 }
 
+.addressToggle{
+  display: flex;
+  align-items: center;
+  appearance: none;
+  border: none;
+  background: none;
+  svg {
+    pointer-events: none;
+  }
+  &:hover {
+    g,
+    path {
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
+  }
+}
+
 .copyBtn {
   appearance: none;
   border: none;
