@@ -9,6 +9,7 @@ import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
+import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { getSUDTAccount, destoryAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
@@ -374,7 +375,12 @@ const SUDTSend = () => {
                     checked={v.key === sendType}
                     onChange={onChangeSendType}
                   />
-                  <label htmlFor={v.key}>{t(`s-udt.send.${v.tValue}`, v?.params)}</label>
+                  <label htmlFor={v.key}>{t(`s-udt.send.${v.label}`, v?.params)}</label>
+                  {v.tooltip ? (
+                    <span className={styles.optionTooltip} data-tooltip={t(`s-udt.send.${v.tooltip}`, v?.params)}>
+                      <TooltipIcon width={12} height={12} />
+                    </span>
+                  ) : null}
                 </div>
               ))}
             {!isOptionCorrect && <div className={styles.selectError}>{t('s-udt.send.select-option')}</div>}
