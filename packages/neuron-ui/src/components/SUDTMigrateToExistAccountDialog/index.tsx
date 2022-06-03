@@ -5,7 +5,7 @@ import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
 import InputSelect from 'widgets/InputSelect'
-import { generateSudtMigrateAcpTx, invokeShowErrorMessage } from 'services/remote'
+import { generateSudtMigrateAcpTx } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 import styles from './sUDTMigrateToExistAccountDialog.module.scss'
 
@@ -49,9 +49,9 @@ const SUDTMigrateToExistAccountDialog = ({
       outPoint: cell.outPoint,
       acpAddress: address,
     }).then(res => {
+      closeDialog()
       if (isSuccessResponse(res)) {
         if (res.result) {
-          closeDialog()
           dispatch({
             type: AppActions.UpdateExperimentalParams,
             payload: {
@@ -67,9 +67,13 @@ const SUDTMigrateToExistAccountDialog = ({
           })
         }
       } else {
-        invokeShowErrorMessage({
-          title: t('messages.error'),
-          content: typeof res.message === 'string' ? res.message : res.message.content || '',
+        dispatch({
+          type: AppActions.AddNotification,
+          payload: {
+            type: 'alert',
+            timestamp: +new Date(),
+            content: typeof res.message === 'string' ? res.message : res.message.content!,
+          },
         })
       }
     })
