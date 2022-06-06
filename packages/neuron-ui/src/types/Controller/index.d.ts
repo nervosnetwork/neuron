@@ -270,18 +270,6 @@ declare namespace Controller {
     type Response = SerializedTx
   }
 
-  namespace GenerateSendAllSUDTTransaction {
-    type SerializedTx = string
-    interface Params {
-      assetAccountID: string
-      walletID: string
-      address: string
-      feeRate: string
-      description?: string
-    }
-    type Response = SerializedTx
-  }
-
   namespace SendSUDTTransaction {
     type Hash = string
     interface Params {

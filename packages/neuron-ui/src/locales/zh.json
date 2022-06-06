@@ -391,10 +391,16 @@
       "send-sudt": {
         "title": "发起 sUDT 交易"
       },
+      "send-ckb-asset": {
+        "title": "发起 CKB 交易"
+      },
       "send-acp": {
         "title": "发起 CKB 交易"
       },
-      "send-acp-to-default": {
+      "send-acp-sudt-to-new-cell": {
+        "title": "发起 sUDT 交易"
+      },
+      "send-acp-ckb-to-new-cell": {
         "title": "发起 CKB 交易"
       },
       "migrate-acp": {
@@ -837,10 +843,24 @@
         "description": "备注",
         "submit": "提交",
         "click-to-edit": "点击编辑",
-        "cheque-address-hint": "向该地址转账需要临时锁定 162 CKB，对方领取后自动解锁。",
+        "cheque-address-hint": {
+          "label": "临时锁定 Lock 162 CKBytes",
+          "tooltip": "向该地址转账需要临时锁定 162 CKBytes，对方领取后自动解锁。"
+        },
         "destroy": "销毁",
         "destroy-ckb-desc": "将会返还所有该 CKB 资产账户的 CKB 到你的找零地址中",
-        "destroy-sudt-desc": "将会返还该资产账户所占用的 CKB 到你的找零地址中"
+        "destroy-sudt-desc": "将会返还该资产账户所占用的 CKB 到你的找零地址中",
+        "extra-ckb-send-to-secp256": {
+          "label": "额外发送 142 CKBytes",
+          "tooltip": "额外 142 CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产"
+        },
+        "extra-ckb-send-to-acp": {
+          "label": "额外发送 {{extraCKB}} CKBytes 为收款方创建资产账户"
+        },
+        "extra-ckb-send-to-unknow": {
+          "label": "收款地址包含未知 Lock Script, 请确保接收者知道如何处理该资产, 额外 {{extraCKB}} CKBytes 将与 {{assetName}} 一同发给收款方用于维持资产"
+        },
+        "select-option": "请选择对应的选项"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 转账"

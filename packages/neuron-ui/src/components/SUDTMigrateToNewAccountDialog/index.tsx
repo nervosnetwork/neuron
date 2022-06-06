@@ -4,7 +4,7 @@ import { SpecialAssetCell } from 'components/SpecialAssetList'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { getSUDTAmount, isSuccessResponse } from 'utils'
-import { generateSudtMigrateAcpTx, invokeShowErrorMessage } from 'services/remote'
+import { generateSudtMigrateAcpTx } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 import { useTokenInfo, TokenInfoType } from './hooks'
 import styles from './sUDTMigrateToNewAccountDialog.module.scss'
@@ -47,9 +47,9 @@ const SUDTMigrateToNewAccountDialog = ({
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
     }).then(res => {
+      closeDialog()
       if (isSuccessResponse(res)) {
         if (res.result) {
-          closeDialog()
           dispatch({
             type: AppActions.UpdateExperimentalParams,
             payload: {
@@ -74,9 +74,13 @@ const SUDTMigrateToNewAccountDialog = ({
           })
         }
       } else {
-        invokeShowErrorMessage({
-          title: t('messages.error'),
-          content: typeof res.message === 'string' ? res.message : res.message.content || '',
+        dispatch({
+          type: AppActions.AddNotification,
+          payload: {
+            type: 'alert',
+            timestamp: +new Date(),
+            content: typeof res.message === 'string' ? res.message : res.message.content!,
+          },
         })
       }
     })

@@ -3,13 +3,17 @@ import Transaction from '../../src/models/chain/transaction'
 import { ServiceHasNoResponse } from '../../src/exceptions'
 import { ResponseCode } from '../../src/utils/const'
 import AssetAccountInfo from '../../src/models/asset-account-info'
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 
 const generateAnyoneCanPayTxMock = jest.fn()
 const generateSudtMigrateAcpTxMock = jest.fn()
+const getHoldSUDTCellCapacityMock = jest.fn()
 jest.mock('../../src/services/anyone-can-pay', () => ({
   // @ts-ignore
   generateAnyoneCanPayTx: (...args) => generateAnyoneCanPayTxMock(...args),
-  generateSudtMigrateAcpTx: () => generateSudtMigrateAcpTxMock()
+  generateSudtMigrateAcpTx: () => generateSudtMigrateAcpTxMock(),
+  // @ts-ignore
+  getHoldSUDTCellCapacity: (...args) => getHoldSUDTCellCapacityMock(...args),
 }))
 
 const fromObjectMock = jest.fn()
@@ -71,13 +75,13 @@ describe('anyone-can-pay-controller', () => {
     const params = {
       walletID: 'string',
       address: 'string',
-      amount: 'string',
+      amount: 'all',
       assetAccountID: 1,
       feeRate: '0',
       fee: '1000'
     }
     generateAnyoneCanPayTxMock.mockResolvedValueOnce({})
-    await anyoneCanPayController.generateSendAllTx(params)
+    await anyoneCanPayController.generateTx(params)
     expect(generateAnyoneCanPayTxMock).toHaveBeenCalledWith(
       params.walletID,
       params.address,
@@ -125,5 +129,20 @@ describe('anyone-can-pay-controller', () => {
   it('generateSudtMigrateAcpTx', async () => {
     await anyoneCanPayController.generateSudtMigrateAcpTx({ outPoint: { txHash: 'txHash', index: '1' }})
     expect(generateSudtMigrateAcpTxMock).toHaveBeenCalled()
+  })
+
+  describe('getHoldSudtCellExtraCkb', () => {
+    it('correct address', async () => {
+      const address = 'ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'
+      await anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID')
+      expect(getHoldSUDTCellCapacityMock).toHaveBeenCalledWith(
+        addressToScript(address),
+        'tokenID'
+      )
+    })
+    it('error address', async () => {
+      const address = 'ct1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'
+      await expect(anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID')).rejects.toThrow(new Error('Address format error'))
+    })
   })
 })

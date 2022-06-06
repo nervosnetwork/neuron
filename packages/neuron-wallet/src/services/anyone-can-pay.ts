@@ -6,7 +6,7 @@ import Output from 'models/chain/output'
 import LiveCell from 'models/chain/live-cell'
 import Transaction from 'models/chain/transaction'
 import AssetAccountEntity from 'database/chain/entities/asset-account'
-import { TargetOutputNotFoundError } from 'exceptions'
+import { TargetLockError, TargetOutputNotFoundError } from 'exceptions'
 import { AcpSendSameAccountError } from 'exceptions'
 import Script from 'models/chain/script'
 import OutPoint from 'models/chain/out-point'
@@ -14,6 +14,7 @@ import LiveCellService from './live-cell-service'
 import WalletService from './wallets'
 import SystemScriptInfo from 'models/system-script-info'
 import CellsService from './cells'
+import { MIN_SUDT_CAPACITY } from 'utils/const'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -35,7 +36,6 @@ export default class AnyoneCanPayService {
     if (!assetAccount) {
       throw new Error(`Asset Account not found!`)
     }
-    const tokenID = assetAccount.tokenID
 
     const targetLockScript = AddressParser.parse(targetAddress)
     if (assetAccount.blake160 === targetLockScript.args) {
@@ -44,42 +44,14 @@ export default class AnyoneCanPayService {
 
     const assetAccountInfo = new AssetAccountInfo()
 
+    const tokenID = assetAccount.tokenID
     const isCKB = !tokenID || tokenID === 'CKBytes'
 
     const anyoneCanPayLocks: Script[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160)]
 
-    const liveCellService = LiveCellService.getInstance()
-
-    // find target output
-    const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
-      targetLockScript,
-      isCKB ? null : assetAccountInfo.generateSudtScript(tokenID)
-    )
-
-    let targetOutput: Output
-
-    if (isCKB && targetOutputLiveCell?.type()) {
-      throw new TargetOutputNotFoundError()
-    }
-
-    if (SystemScriptInfo.isSecpScript(targetLockScript)) {
-      targetOutput = Output.fromObject({
-        capacity: '0',
-        lock: targetLockScript,
-        type: null
-      })
-    } else {
-      if (!targetOutputLiveCell) {
-        throw new TargetOutputNotFoundError()
-      }
-      targetOutput = Output.fromObject({
-        capacity: targetOutputLiveCell.capacity,
-        lock: targetOutputLiveCell.lock(),
-        type: targetOutputLiveCell.type(),
-        data: targetOutputLiveCell.data,
-        outPoint: targetOutputLiveCell.outPoint()
-      })
-    }
+    const targetOutput = isCKB
+      ? await AnyoneCanPayService.getCKBTargetOutput(targetLockScript)
+      : await AnyoneCanPayService.getSUDTTargetOutput(targetLockScript, tokenID)
 
     const wallet = WalletService.getInstance().get(walletID)
     const changeBlake160: string = (await wallet.getNextChangeAddress())!.blake160
@@ -101,5 +73,83 @@ export default class AnyoneCanPayService {
     }
 
     return await TransactionGenerator.generateSudtMigrateAcpTx(sudtLiveCell, acpAddress)
+  }
+
+  private static async getCKBTargetOutput(lockScript: Script) {
+    if (SystemScriptInfo.isSecpScript(lockScript)) {
+      return Output.fromObject({
+        capacity: '0',
+        lock: lockScript,
+        type: null
+      })
+    }
+    const liveCellService = LiveCellService.getInstance()
+    const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
+      lockScript,
+      null
+    )
+    if (new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
+      if (!targetOutputLiveCell) {
+        throw new TargetOutputNotFoundError()
+      }
+      return Output.fromObject({
+        capacity: targetOutputLiveCell.capacity,
+        lock: targetOutputLiveCell.lock(),
+        type: targetOutputLiveCell.type(),
+        data: targetOutputLiveCell.data,
+        outPoint: targetOutputLiveCell.outPoint()
+      })
+    }
+    throw new TargetLockError()
+  }
+
+  private static async getSUDTTargetOutput(lockScript: Script, tokenID: string) {
+    if (SystemScriptInfo.isSecpScript(lockScript)) {
+      return Output.fromObject({
+        capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
+        lock: lockScript,
+        type: new AssetAccountInfo().generateSudtScript(tokenID)
+      })
+    }
+    const liveCellService = LiveCellService.getInstance()
+    const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
+      lockScript,
+      new AssetAccountInfo().generateSudtScript(tokenID)
+    )
+    if (targetOutputLiveCell && new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
+      return Output.fromObject({
+        capacity: targetOutputLiveCell.capacity,
+        lock: targetOutputLiveCell.lock(),
+        type: targetOutputLiveCell.type(),
+        data: targetOutputLiveCell.data,
+        outPoint: targetOutputLiveCell.outPoint()
+      })
+    }
+
+    return Output.fromObject({
+      capacity: AnyoneCanPayService.getSUDTAddCapacity(lockScript.args),
+      lock: lockScript,
+      type: new AssetAccountInfo().generateSudtScript(tokenID)
+    })
+  }
+
+  private static getSUDTAddCapacity(args: string) {
+    const addArgsLength = BigInt(args.slice(2).length / 2 - 20) * BigInt(10 ** 8)
+    return (addArgsLength + BigInt(MIN_SUDT_CAPACITY)).toString()
+  }
+
+  public static async getHoldSUDTCellCapacity(lockScript: Script, tokenID: string) {
+    if (SystemScriptInfo.isSecpScript(lockScript) || tokenID === 'CKBytes') {
+      return undefined
+    }
+    const liveCellService = LiveCellService.getInstance()
+    const targetOutputLiveCell: LiveCell | null = await liveCellService.getOneByLockScriptAndTypeScript(
+      lockScript,
+      new AssetAccountInfo().generateSudtScript(tokenID)
+    )
+    if (targetOutputLiveCell && new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
+      return undefined
+    }
+    return AnyoneCanPayService.getSUDTAddCapacity(lockScript.args)
   }
 }

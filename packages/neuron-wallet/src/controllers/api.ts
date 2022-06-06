@@ -45,7 +45,7 @@ import {
   GenerateClaimChequeTxParams,
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
-import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
+import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
@@ -517,8 +517,8 @@ export default class ApiController {
       return this.#anyoneCanPayController.generateTx(params)
     })
 
-    handle('generate-send-all-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayAllTxParams) => {
-      return this.#anyoneCanPayController.generateSendAllTx(params)
+    handle('get-hold-sudt-cell-capacity', async (_, params: { address: string, tokenID: string }) => {
+      return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID)
     })
 
     handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {

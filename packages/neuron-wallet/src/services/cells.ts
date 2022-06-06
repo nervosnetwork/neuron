@@ -891,7 +891,8 @@ export default class CellsService {
     feeRate: string = '0',
     baseSize: number = 0,
     changeOutputSize: number = 0,
-    changeOutputDataSize: number = 0
+    changeOutputDataSize: number = 0,
+    addCapacity: string = '0'
   ) {
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -955,19 +956,19 @@ export default class CellsService {
       throw new CapacityNotEnough()
     }
 
-    let currentFee: bigint = needFee
+    let extraPayCapacity: bigint = needFee + BigInt(addCapacity)
     const anyoneCanPayOutputs = inputOriginCells.map(cell => {
       const cellCapacity: bigint = inputs
         .filter(i => i.lockHash === cell.lockHash)
         .map(i => BigInt(i.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       let capacity: bigint = BigInt(0)
-      if (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= currentFee) {
-        capacity = BigInt(cellCapacity) - currentFee
-        currentFee = BigInt(0)
+      if (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= extraPayCapacity) {
+        capacity = BigInt(cellCapacity) - extraPayCapacity
+        extraPayCapacity = BigInt(0)
       } else {
         capacity = this.ANYONE_CAN_PAY_SUDT_CELL_MIN
-        currentFee = currentFee - (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
+        extraPayCapacity = extraPayCapacity - (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
       }
       const output = Output.fromObject({
         capacity: capacity.toString(),
@@ -983,9 +984,9 @@ export default class CellsService {
     let finalFee: bigint = needFee
     let changeOutput: Output | undefined
     let changeInputs: Input[] = []
-    if (inputCapacities < needFee) {
+    if (inputCapacities < needFee + BigInt(addCapacity)) {
       const normalCellInputsInfo = await CellsService.gatherInputs(
-        (-inputCapacities).toString(),
+        (BigInt(addCapacity) - inputCapacities).toString(),
         walletId,
         fee,
         feeRate,
@@ -998,7 +999,10 @@ export default class CellsService {
 
       if (normalCellInputsInfo.hasChangeOutput) {
         const changeCapacity =
-          BigInt(normalCellInputsInfo.capacities) - BigInt(normalCellInputsInfo.finalFee) + inputCapacities
+          BigInt(normalCellInputsInfo.capacities) -
+          BigInt(normalCellInputsInfo.finalFee) +
+          inputCapacities -
+          BigInt(addCapacity)
 
         changeOutput = Output.fromObject({
           capacity: changeCapacity.toString(),

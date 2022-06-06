@@ -872,20 +872,22 @@ export class TransactionGenerator {
       ...targetOutput,
       data: BufferUtils.writeBigUInt128LE(targetAmount)
     })
-    const targetInput = Input.fromObject({
-      previousOutput: targetOutput.outPoint!,
-      since: '0',
-      capacity: targetOutput.capacity,
-      lock: targetOutput.lock,
-      lockHash: targetOutput.lockHash,
-      type: targetOutput.type,
-      data: targetOutput.data
-    })
+    const targetInput = targetOutput.outPoint
+      ? Input.fromObject({
+          previousOutput: targetOutput.outPoint!,
+          since: '0',
+          capacity: targetOutput.capacity,
+          lock: targetOutput.lock,
+          lockHash: targetOutput.lockHash,
+          type: targetOutput.type,
+          data: targetOutput.data
+        })
+      : undefined
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
-      inputs: [targetInput],
+      inputs: targetInput ? [targetInput] : [],
       outputs: [output],
       outputsData: [output.data],
       witnesses: []
@@ -905,7 +907,8 @@ export class TransactionGenerator {
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      targetOutput.outPoint ? '0' : targetOutput.capacity
     )
 
     if (amount === 'all') {

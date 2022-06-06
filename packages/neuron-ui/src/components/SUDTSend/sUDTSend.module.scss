@@ -69,9 +69,12 @@
 .sendContainer {
   display: grid;
   grid-template:
-    'remote-error remote-error' auto
+    'remote-error .' auto
     'address .' auto
     'amount send-all' auto
+    'option-0 .' auto
+    'option-1 .' auto
+    'select-error .' auto
     'fee fee' auto
     'description .' auto /
     1fr 70px;
@@ -82,6 +85,87 @@
   }
   .amount {
     grid-area: amount;
+  }
+  .option {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    line-height: 19px;
+
+    input[type='radio'], input[type='checkbox'] {
+      margin: 0 4px 0 0;
+      accent-color: var(--nervos-green-light);
+    }
+
+    .optionTooltip {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-left: 5px;
+
+      &:before {
+        width: 200px;
+        text-align: left;
+        box-sizing: border-box;
+        position: absolute;
+        display: none;
+        content: attr(data-tooltip);
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.5625rem;
+        line-height: 2em;
+        letter-spacing: 0.45px;
+        background: #fff;
+        color: #000000;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        padding: 3px 9px;
+      }
+
+      &:after {
+        display: none;
+        position: absolute;
+        content: '';
+        border: 9px solid transparent;
+        border-top-color: #fff;
+        bottom: calc(100% - 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.1));
+        opacity: 0;
+      }
+
+      &:hover {
+        &:before,
+        &:after {
+          display: block;
+          animation: popup 0.2s ease-in forwards;
+        }
+      }
+
+      @keyframes popup {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  .cheque {
+    grid-area: option-0;
+  }
+  .acpNewCell, .secp256NewCell, .unknowNewCell, .acpExistCell {
+    grid-area: option-1;
+  }
+  .selectError {
+    grid-area: select-error;
+    color: #d50000;
+    font-size: 10px;
   }
   .sendAll {
     grid-area: send-all;
@@ -129,6 +213,7 @@
       margin-right: 5px;
     }
   }
+
 }
 
 .footer {
