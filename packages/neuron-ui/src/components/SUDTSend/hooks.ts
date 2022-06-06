@@ -33,7 +33,8 @@ export function useAddressLockType(address: string, isMainnet: boolean) {
 }
 
 type Option = {
-  tValue: string
+  tooltip?: string
+  label: string
   key: SendType
   params?: object
 }
@@ -79,11 +80,13 @@ export function useOptions({
     if (addressLockType === AddressLockType.secp256) {
       return [
         {
-          tValue: 'cheque-address-hint',
+          label: 'cheque-address-hint.label',
+          tooltip: 'cheque-address-hint.tooltip',
           key: SendType.secp256Cheque,
         },
         {
-          tValue: 'extra-ckb-send-to-secp256',
+          label: 'extra-ckb-send-to-secp256.label',
+          tooltip: 'extra-ckb-send-to-secp256.tooltip',
           key: SendType.secp256NewCell,
           params: { assetName: accountInfo?.accountName },
         },
@@ -92,7 +95,8 @@ export function useOptions({
     if (holdSUDTCellCapacity) {
       return [
         {
-          tValue: addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp' : 'extra-ckb-send-to-unknow',
+          label:
+            addressLockType === AddressLockType.acp ? 'extra-ckb-send-to-acp.label' : 'extra-ckb-send-to-unknow.label',
           key: addressLockType === AddressLockType.acp ? SendType.acpNewCell : SendType.unknowNewCell,
           params: { assetName: accountInfo?.accountName, extraCKB: shannonToCKBFormatter(holdSUDTCellCapacity) },
         },
