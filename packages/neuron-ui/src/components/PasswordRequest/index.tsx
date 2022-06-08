@@ -84,14 +84,20 @@ const PasswordRequest = () => {
   }, [actionType])
 
   const exportTransaction = useCallback(async () => {
-    onDismiss()
-    await exportTransactionAsJSON({
+    const res = await exportTransactionAsJSON({
       transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Unsigned,
       type: signType,
       description,
       asset_account: experimental?.assetAccount,
     })
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    if (res.result) {
+      onDismiss()
+    }
   }, [signType, generatedTx, onDismiss, description, experimental])
 
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
@@ -325,29 +331,28 @@ const PasswordRequest = () => {
       password,
       multisigConfig,
     })
-    if (!isSuccessResponse(res)) {
-      dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: { sending: false },
-      })
-      setError(errorFormatter(res.message, t))
-      return
-    }
-    dispatch({
-      type: AppActions.UpdateLoadedTransaction,
-      payload: res.result!,
-    })
     dispatch({
       type: AppActions.UpdateLoadings,
       payload: { sending: false },
     })
-    onDismiss()
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    if (res.result) {
+      dispatch({
+        type: AppActions.UpdateLoadedTransaction,
+        payload: res.result!,
+      })
+      onDismiss()
+    }
   }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
   const dropdownList = [
     {
       text: t('offline-sign.sign-and-export'),
       onClick: signAndExportFromGenerateTx,
+      disabled: !password,
     },
   ]
 

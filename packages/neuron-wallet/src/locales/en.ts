@@ -118,7 +118,6 @@ export default {
       'unsupported-manufacturer': 'Devices from {{manufacturer}} are not yet supported.',
       'wallet-not-supported-function': 'This wallet does not support {name} function.',
       'invalid-transaction-file': 'Invalid transaction file.',
-      'save-offline-json-failed': 'Unable to save JSON file.',
       'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
       'multisig-script-prefix-error': 'The multisig config is error',
       'multisig-config-not-exist': 'The multisig config is not exist',

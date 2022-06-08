@@ -109,7 +109,6 @@ export default {
       'acp-same-account': "The payment account and receive account shouldn't be the same.",
       'device-sign-canceled': '您取消了簽名。否則，請確保設備上 Nervos app 設置開啟了 “allow contract data”。',
       'connect-device-failed': '設備無法連接，請檢查設備連接狀況。',
-      'save-offline-json-failed': '無法保存 JSON 文件。',
       'offline-sign-failed': '簽名失敗，請檢查是否使用了正確的錢包進行簽名。',
       'multisig-script-prefix-error': '多簽配置錯誤',
       'multisig-config-not-exist': '多簽配置不存在',
