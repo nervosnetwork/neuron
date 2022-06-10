@@ -860,7 +860,7 @@
         "extra-ckb-send-to-unknow": {
           "label": "收款地址包含未知 Lock Script, 請確保接收者知道如何處理該資產, 額外 {{extraCKB}} CKBytes 將與 {{assetName}} 壹同發給收款方用於維持資產"
         },
-        "select-option": "請選擇對應的選項"
+        "select-option": "提交前請確認上述選項"
       },
       "receive": {
         "notation": "只接收 {{symbol}} 轉賬"
