@@ -3,78 +3,55 @@ import { storiesOf } from '@storybook/react'
 import { withKnobs, text, select, number } from '@storybook/addon-knobs'
 import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
 
+const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'> = {
+  network: {
+    name: 'network',
+    remote: 'http://localhost:3000',
+    type: 0,
+    id: 'd',
+    chain: 'ckb',
+  },
+  onAction: () => {},
+  isLookingValidTarget: false,
+  onOpenValidTarget: () => {},
+}
+
 const states: { [index: string]: NetworkStatusProps } = {
   Online: {
-    network: {
-      name: 'network name',
-      remote: 'http://localhost:3000',
-      type: 0,
-      id: 'd',
-      chain: 'ckb',
-    },
+    ...defaultProps,
     syncPercents: 1,
     syncBlockNumbers: '1/200',
-    onAction: () => {},
   },
   Offline: {
-    network: {
-      name: 'network',
-      remote: 'http://localhost:3000',
-      type: 0,
-      id: 'd',
-      chain: 'ckb',
-    },
+    ...defaultProps,
     syncPercents: 1,
     syncBlockNumbers: '1/100',
-    onAction: () => {},
+  },
+  isLookingValidTarget: {
+    ...defaultProps,
+    syncPercents: 1,
+    syncBlockNumbers: '1/100',
+    isLookingValidTarget: true,
   },
   '100 synced and 0 tip': {
-    network: {
-      name: 'network',
-      remote: 'http://localhost:3000',
-      type: 0,
-      id: 'd',
-      chain: 'ckb',
-    },
+    ...defaultProps,
     syncPercents: 100,
     syncBlockNumbers: '100/0',
-    onAction: () => {},
   },
   '100 synced and empty tip': {
-    network: {
-      name: 'network',
-      remote: 'http://localhost:3000',
-      type: 0,
-      id: 'd',
-      chain: 'ckb',
-    },
+    ...defaultProps,
     syncPercents: 100,
     syncBlockNumbers: '-/100',
-    onAction: () => {},
   },
   'not sycned and 100 tip': {
-    network: {
-      name: 'network',
-      remote: 'http://localhost:3000',
-      type: 0,
-      id: 'd',
-      chain: 'ckb',
-    },
+    ...defaultProps,
     syncPercents: 0,
     syncBlockNumbers: '-/100',
-    onAction: () => {},
   },
   'not synced and empty tip': {
-    network: {
-      name: 'network',
-      remote: 'http://localhost:3000',
-      type: 0,
-      id: 'd',
-      chain: 'ckb',
-    },
+    ...defaultProps,
     syncPercents: 0,
     syncBlockNumbers: '-/-',
-    onAction: () => {},
   },
 }
 
@@ -98,6 +75,8 @@ stories.add('With knobs', () => {
     syncPercents: number('Sync Percents', 1),
     syncBlockNumbers: text('Sync Block Number', '1/100'),
     onAction: () => {},
+    isLookingValidTarget: false,
+    onOpenValidTarget: () => {},
   }
   return <NetworkStatus {...props} />
 })

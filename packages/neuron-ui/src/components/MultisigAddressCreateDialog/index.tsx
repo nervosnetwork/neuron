@@ -18,11 +18,13 @@ const SetMN = ({
   n,
   changeM,
   changeN,
+  errorI18nKey,
 }: {
   m: string
   n: string
   changeM: (v: string) => void
   changeN: (v: string) => void
+  errorI18nKey?: string
 }) => {
   const [t] = useTranslation()
   return (
@@ -34,9 +36,7 @@ const SetMN = ({
         &nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;&nbsp;&nbsp;&nbsp;
         <InputSelect options={keysCountArr} value={n} onChange={changeN} />
       </div>
-      {m && n && Number(m) > Number(n) && (
-        <span className={styles.error}>{t('multisig-address.create-dialog.m-n.error')}</span>
-      )}
+      {errorI18nKey && <span className={styles.error}>{t(`multisig-address.create-dialog.m-n.${errorI18nKey}`)}</span>}
     </div>
   )
 }
@@ -46,11 +46,11 @@ const MultisigAddressCreateDialog = ({
   confirm: saveConfig,
 }: {
   closeDialog: () => void
-  confirm: (v: Omit<MultisigConfig, 'id' | 'walletId'>) => Promise<void>
+  confirm: (v: Omit<MultisigConfig, 'id' | 'walletId' | 'fullPayload' | 'blake160s'>) => Promise<void>
 }) => {
   const [step, changeStep] = useState(Step.setMN)
   const [t] = useTranslation()
-  const { m, n, setMBySelect, setNBySelect, isError: mnErr } = useMAndN()
+  const { m, n, setMBySelect, setNBySelect, errorI18nKey: mnErr } = useMAndN()
   const next = useCallback(() => {
     changeStep(step + 1)
   }, [changeStep, step])
@@ -87,18 +87,17 @@ const MultisigAddressCreateDialog = ({
     saveConfig({
       m: Number(m),
       n: Number(n),
-      r,
+      r: Number(r),
       addresses,
-      fullPayload: multisigAddress,
     }).then(() => {
       closeDialog()
     })
-  }, [m, n, r, addresses, multisigAddress, saveConfig, closeDialog])
+  }, [m, n, r, addresses, saveConfig, closeDialog])
 
   return (
     <>
       <p>{t('multisig-address.create-dialog.title')}</p>
-      {step === Step.setMN && <SetMN m={m} n={n} changeM={setMBySelect} changeN={setNBySelect} />}
+      {step === Step.setMN && <SetMN m={m} n={n} changeM={setMBySelect} changeN={setNBySelect} errorI18nKey={mnErr} />}
       {step === Step.setMultiAddress && (
         <>
           <p>{t('multisig-address.create-dialog.multi-address-info.title', { m, n })}</p>
@@ -126,7 +125,7 @@ const MultisigAddressCreateDialog = ({
         <Button
           label={t(`multisig-address.create-dialog.actions.${step === Step.viewMultiAddress ? 'confirm' : 'next'}`)}
           type="primary"
-          disabled={(step === Step.setMN && mnErr) || (step === Step.setMultiAddress && addressErr)}
+          disabled={(step === Step.setMN && !!mnErr) || (step === Step.setMultiAddress && addressErr)}
           onClick={step === Step.viewMultiAddress ? confirm : next}
         />
       </div>

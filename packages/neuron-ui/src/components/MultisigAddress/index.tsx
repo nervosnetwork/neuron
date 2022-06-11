@@ -53,7 +53,15 @@ const MultisigAddress = () => {
   }, [i18n.language])
   const isMainnet = isMainnetUtil(networks, networkID)
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const { allConfigs, saveConfig, updateConfig, deleteConfigById, onImportConfig } = useConfigManage({
+  const {
+    allConfigs,
+    saveConfig,
+    updateConfig,
+    deleteConfigById,
+    onImportConfig,
+    configs,
+    onFilterConfig,
+  } = useConfigManage({
     walletId,
     isMainnet,
   })
@@ -96,17 +104,8 @@ const MultisigAddress = () => {
     onChangeCheckedAll,
     exportConfig,
     clearSelected,
-  } = useExportConfig(allConfigs)
-  const { keywords, onKeywordsChange, onSearch, searchKeywords, onClear } = useSearch(clearSelected)
-  const configs = useMemo(
-    () =>
-      searchKeywords
-        ? allConfigs.filter(v => {
-            return v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords
-          })
-        : allConfigs,
-    [allConfigs, searchKeywords]
-  )
+  } = useExportConfig(configs)
+  const { keywords, onKeywordsChange, onSearch, onClear } = useSearch(clearSelected, onFilterConfig)
   const sendTotalBalance = useMemo(() => {
     if (sendAction.sendFromMultisig?.fullPayload) {
       return multisigBanlances[sendAction.sendFromMultisig.fullPayload]
@@ -117,7 +116,6 @@ const MultisigAddress = () => {
     <div>
       <div className={styles.head}>
         <SearchBox
-          data-
           value={keywords}
           className={styles.searchBox}
           styles={searchBoxStyles}

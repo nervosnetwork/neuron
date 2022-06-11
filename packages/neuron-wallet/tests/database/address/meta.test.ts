@@ -1,7 +1,7 @@
 import { Address, AddressVersion } from '../../../src/models/address'
 import { AddressType } from '../../../src/models/keys/address'
 import AddressMeta from '../../../src/database/address/meta'
-import MultiSign from "../../../src/models/multi-sign";
+import Multisig from "../../../src/models/multisig";
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 
 describe('Address Dao tests', () => {
@@ -43,7 +43,7 @@ describe('Address Dao tests', () => {
     it('#generateSingleMultiSignLockScript', () => {
       const script = addressMeta.generateSingleMultiSignLockScript()
       expect(script).toEqual({
-        args: new MultiSign().hash(address.blake160),
+        args: Multisig.hash([address.blake160]),
         codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
         hashType: 'type'
       })

@@ -3,12 +3,13 @@ import MultisigConfig from 'database/chain/entities/multisig-config'
 import MultisigOutput from 'database/chain/entities/multisig-output'
 import { MultisigConfigNotExistError, MultisigConfigExistError } from 'exceptions/multisig'
 import { rpcBatchRequest } from 'utils/rpc-request'
-import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
 import Transaction from 'models/chain/transaction'
 import { OutputStatus } from 'models/chain/output'
 import IndexerService from './indexer'
 import NetworksService from './networks'
+import Multisig from 'models/multisig'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -18,7 +19,10 @@ export default class MultisigService {
       .createQueryBuilder()
       .where({
         walletId: multisigConfig.walletId,
-        fullPayload: multisigConfig.fullPayload
+        r: multisigConfig.r,
+        m: multisigConfig.m,
+        n: multisigConfig.n,
+        blake160s: multisigConfig.blake160s
       })
       .getCount()
     if (result > 0) {
@@ -33,9 +37,8 @@ export default class MultisigService {
     r?: number
     m?: number
     n?: number
-    addresses?: string[]
+    blake160s?: string[]
     alias?: string
-    fullPayload?: string
   }) {
     const result = await getConnection()
       .getRepository(MultisigConfig)
@@ -56,8 +59,7 @@ export default class MultisigService {
         r: params.r ?? result.r,
         m: params.m ?? result.m,
         n: params.n ?? result.n,
-        addresses: params.addresses ?? result.addresses,
-        fullPayload: params.fullPayload ?? result.fullPayload
+        blake160s: params.blake160s ?? result.blake160s
       })
       .where('id = :id', { id: params.id })
       .execute()
@@ -95,7 +97,7 @@ export default class MultisigService {
       const res = await rpcBatchRequest(
         IndexerService.LISTEN_URI,
         currentMultisigConfigs.map(v => {
-          const script = addressToScript(v.fullPayload)
+          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
           return {
             method: 'get_cells',
             params: [
@@ -112,7 +114,7 @@ export default class MultisigService {
               },
               'desc',
               '0x64',
-              addressCursorMap.get(v.fullPayload)
+              addressCursorMap.get(script.args)
             ]
           }
         })
@@ -120,7 +122,9 @@ export default class MultisigService {
       const nextMultisigConfigs: MultisigConfig[] = []
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
-          addressCursorMap.set(currentMultisigConfigs[idx].fullPayload, v?.result?.last_cursor)
+          const config = currentMultisigConfigs[idx]
+          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+          addressCursorMap.set(script.args, v?.result?.last_cursor)
           liveCells.push(
             ...v.result.objects
               .filter((object: any) => !object?.output?.type)
@@ -154,7 +158,7 @@ export default class MultisigService {
       const res = await rpcBatchRequest(
         IndexerService.LISTEN_URI,
         currentMultisigConfigs.map(v => {
-          const script = addressToScript(v.fullPayload)
+          const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
           return {
             method: 'get_transactions',
             params: [
@@ -171,7 +175,7 @@ export default class MultisigService {
               },
               'desc',
               '0x64',
-              addressCursorMap.get(v.fullPayload)
+              addressCursorMap.get(script.args)
             ]
           }
         })
@@ -179,7 +183,9 @@ export default class MultisigService {
       const nextMultisigConfigs: MultisigConfig[] = []
       res.forEach((v, idx) => {
         if (!v.error && v?.result?.objects?.length) {
-          addressCursorMap.set(currentMultisigConfigs[idx].fullPayload, v?.result?.last_cursor)
+          const config = currentMultisigConfigs[idx]
+          const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
+          addressCursorMap.set(script.args, v?.result?.last_cursor)
           v.result.objects.forEach((transaction: any) => {
             multisigOutputTxHashList.add(transaction.tx_hash)
           })
@@ -227,7 +233,9 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .getMany()
-    const multisigLockHashList = multisigConfigs.map(v => scriptToHash(addressToScript(v.fullPayload)))
+    const multisigLockHashList = multisigConfigs.map(v =>
+      scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+    )
     await getConnection()
       .createQueryBuilder()
       .delete()

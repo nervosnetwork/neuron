@@ -37,7 +37,7 @@ const SettingsTabs = () => {
   }, [])
 
   return (
-    <div>
+    <div className={styles.settingRoot}>
       <h1 className={styles.title}>{t(`settings.title.${isMac ? 'mac' : 'normal'}`)}</h1>
       <Pivot
         selectedKey={location.pathname}

@@ -1,5 +1,6 @@
 import { MultisigPrefixError } from 'exceptions'
 import Blake2b from './blake2b'
+import SystemScriptInfo from './system-script-info'
 
 export interface MultisigPrefix {
   S: string
@@ -8,32 +9,22 @@ export interface MultisigPrefix {
   N: string
 }
 
-const defaultMultisigPrefix = {
-  S: '0x00',
-  R: '0x00',
-  M: '0x01',
-  N: '0x01'
-}
-
-export default class MultiSign {
+export default class Multisig {
   // 1 epoch = 4h = 240min
   EPOCH_MINUTES = 240
 
-  static defaultS: string = '0x00'
+  static defaultS: string = '00'
 
-  serialize(blake160s: string[], { S, R, M, N }: MultisigPrefix = defaultMultisigPrefix) {
-    this.validateMultisigPrefix(S)
-    this.validateMultisigPrefix(R)
-    this.validateMultisigPrefix(M)
-    this.validateMultisigPrefix(N)
-    return `${S}${R.slice(2)}${M.slice(2)}${N.slice(2)}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
+  static serialize(blake160s: string[], r: number = 0, m: number = 1, n: number = 1) {
+    const hexR = Multisig.getMultisigParamsHex(r)
+    const hexM = Multisig.getMultisigParamsHex(m)
+    const hexN = Multisig.getMultisigParamsHex(n)
+    return `0x${Multisig.defaultS}${hexR}${hexM}${hexN}${blake160s.reduce((pre, cur) => pre + cur.slice(2), '')}`
   }
 
-  hash(blake160: string | string[], multisigPrefix: MultisigPrefix = defaultMultisigPrefix): string {
-    return Blake2b.digest(this.serialize(typeof blake160 === 'string' ? [blake160] : blake160, multisigPrefix)).slice(
-      0,
-      42
-    )
+  static hash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {
+    const serializeResult = Multisig.serialize(blake160s, r, m, n)
+    return Blake2b.digest(serializeResult).slice(0, 42)
   }
 
   since(minutes: number, headerEpoch: string): string {
@@ -59,7 +50,11 @@ export default class MultiSign {
   }
 
   args(blake160: string, minutes: number, headerEpoch: string): string {
-    return this.hash(blake160) + this.since(minutes, headerEpoch).slice(2)
+    return Multisig.hash([blake160]) + this.since(minutes, headerEpoch).slice(2)
+  }
+
+  static getMultisigScript(blake160s: string[], r: number, m: number, n: number) {
+    return SystemScriptInfo.generateMultiSignScript(Multisig.hash(blake160s, r, m, n))
   }
 
   parseSince(args: string): bigint {
@@ -81,9 +76,10 @@ export default class MultiSign {
     }
   }
 
-  private validateMultisigPrefix(v: string) {
-    if (!v.startsWith('0x') || v.length !== 4) {
+  private static getMultisigParamsHex(v: number) {
+    if (v < 0 || v > 255) {
       throw new MultisigPrefixError()
     }
+    return v.toString(16).padStart(2, '0')
   }
 }

@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.4.0
+          - 16.10.0
         os:
           - macos-latest
           - ubuntu-20.04
@@ -20,6 +20,11 @@ jobs:
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
     steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - name: Checkout
         uses: actions/checkout@v2
 

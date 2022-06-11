@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { ChoiceGroup } from 'office-ui-fabric-react'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 import { ReactComponent as EditWallet } from 'widgets/Icons/Edit.svg'
@@ -108,7 +108,7 @@ const WalletSetting = ({
           key: wallet.id,
           text: wallet.name,
           checked: wallet.id === currentID,
-          onRenderLabel: ({ text }: IChoiceGroupOption) => {
+          onRenderLabel: props => {
             return (
               <span
                 role="presentation"
@@ -117,7 +117,7 @@ const WalletSetting = ({
                 data-action="select"
                 onClick={onHandleWallet}
               >
-                <span className={styles.walletName}>{text}</span>
+                <span className={styles.walletName}>{props?.text}</span>
 
                 <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
                   <EditWallet />

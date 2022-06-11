@@ -96,7 +96,15 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
   return (
     <div className={styles.container}>
       <div className={`${styles.version} ${styles.label}`}>{t('settings.general.version')}</div>
-      {showNewVersion ? null : (
+      {showNewVersion ? (
+        <div className={styles.newVersion}>
+          <UpdateDownloadStatus
+            progress={updater.downloadProgress}
+            newVersion={updater.version}
+            releaseNotes={updater.releaseNotes}
+          />
+        </div>
+      ) : (
         <>
           <div className={`${styles.version} ${styles.value}`}>{version}</div>
           <div className={`${styles.version} ${styles.action}`}>
@@ -119,15 +127,6 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
           </div>
         </>
       )}
-      <div className={styles.newVersion}>
-        {showNewVersion ? (
-          <UpdateDownloadStatus
-            progress={updater.downloadProgress}
-            newVersion={updater.version}
-            releaseNotes={updater.releaseNotes}
-          />
-        ) : null}
-      </div>
       <ClearCache dispatch={dispatch} />
       <div className={`${styles.language} ${styles.label}`}>{t('settings.general.language')}</div>
       <div className={`${styles.language} ${styles.select}`}>

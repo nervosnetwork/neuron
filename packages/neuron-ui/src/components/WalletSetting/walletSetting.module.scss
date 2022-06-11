@@ -1,10 +1,11 @@
 .container {
   display: flex;
   margin-top: 10px;
+  height: calc(100% - 75px);
 }
 
 .wallets {
-  height: calc(100vh - 150px);
+  height: 100%;
   width: 1200px;
   overflow: auto;
   padding: 0 0 5px 8px;

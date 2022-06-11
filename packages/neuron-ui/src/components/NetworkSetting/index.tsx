@@ -56,7 +56,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
             key: network.id,
             text: network.name,
             checked: chain.networkID === network.id,
-            onRenderLabel: ({ text }: IChoiceGroupOption) => {
+            onRenderLabel: props => {
               const isDefault = network.type === 0
               return (
                 <div
@@ -64,10 +64,10 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                   className={`ms-ChoiceFieldLabel ${styles.choiceLabel}`}
                   data-id={network.id}
                   onClick={onHandleNetwork}
-                  title={`${text}: ${network.remote}`}
+                  title={`${props?.text}: ${network.remote}`}
                 >
                   <span className={styles.networkLabel}>
-                    {text}
+                    {props?.text}
                     <span className={styles.url}>{`(${network.remote}`}</span>
                     <NetworkTypeLabel type={network.chain} />
                   </span>

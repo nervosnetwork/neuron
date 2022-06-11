@@ -9,14 +9,9 @@ import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
+import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-import {
-  getSUDTAccount,
-  generateSUDTTransaction,
-  generateSendAllSUDTTransaction,
-  generateChequeTransaction,
-  destoryAssetAccount,
-} from 'services/remote'
+import { getSUDTAccount, destoryAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
   validateAssetAccountAddress as validateAddress,
@@ -30,10 +25,10 @@ import {
   AccountType,
   isSuccessResponse,
   validateAmountRange,
-  isSecp256k1Address,
   CONSTANTS,
 } from 'utils'
 import { AmountNotEnoughException } from 'exceptions'
+import { AddressLockType, getGenerator, useAddressLockType, useOnSumbit, useOptions, useSendType } from './hooks'
 import styles from './sUDTSend.module.scss'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
@@ -94,17 +89,19 @@ const SUDTSend = () => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [remoteError, setRemoteError] = useState('')
 
-  const isSecp256k1Addr = isSecp256k1Address(sendState.address)
+  const isMainnet = isMainnetUtil(networks, networkID)
+  const addressLockType = useAddressLockType(sendState.address, isMainnet)
+  const isSecp256k1Addr = addressLockType === AddressLockType.secp256
 
   const [accountInfo, setAccountInfo] = useState<Pick<
     Required<SUDTAccount>,
     'accountId' | 'accountName' | 'tokenName' | 'balance' | 'tokenId' | 'decimal' | 'symbol'
   > | null>(null)
+  const accountType = accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? AccountType.CKB : AccountType.SUDT
+  const { sendType, onChange: onChangeSendType } = useSendType({ addressLockType, accountType })
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const isMainnet = isMainnetUtil(networks, networkID)
-  const accountType = accountInfo?.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId ? AccountType.CKB : AccountType.SUDT
   const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)}` : '0'
 
   useEffect(() => {
@@ -173,9 +170,14 @@ const SUDTSend = () => {
     !isSending &&
     Object.values(errors).every(v => !v) &&
     [Fields.Address, Fields.Amount].every(key => sendState[key as Fields.Address | Fields.Amount].trim())
-
-  const isSubmittable = isFormReady && experimental?.tx && !remoteError
-
+  const options = useOptions({
+    address: sendState.address,
+    addressLockType,
+    accountInfo,
+    isAddressCorrect: !errors.address,
+  })
+  const isOptionCorrect = !!(!options?.length || sendType)
+  const isSubmittable = isFormReady && experimental?.tx && !remoteError && isOptionCorrect
   useEffect(() => {
     const clearTimer = () => {
       if (timerRef.current) {
@@ -184,7 +186,7 @@ const SUDTSend = () => {
     }
     clearTimer()
 
-    if (!accountInfo) {
+    if (!accountInfo || !isOptionCorrect) {
       return clearTimer
     }
     const amount = sudtAmountToValue(sendState.amount, accountInfo?.decimal)
@@ -209,19 +211,11 @@ const SUDTSend = () => {
         assetAccountID: accountInfo?.accountId,
         walletID: walletId,
         address: sendState.address,
-        amount,
+        amount: sendState.sendAll ? 'all' : amount,
         feeRate: sendState.price,
         description: sendState.description,
       }
-      let generator = generateSUDTTransaction
-      if (isSecp256k1Addr && accountType === AccountType.SUDT) {
-        generator = generateChequeTransaction
-        if (sendState.sendAll) {
-          params.amount = 'all'
-        }
-      } else if (sendState.sendAll) {
-        generator = generateSendAllSUDTTransaction
-      }
+      const generator = getGenerator(sendType)
       generator(params)
         .then(res => {
           if (isSuccessResponse(res)) {
@@ -248,6 +242,8 @@ const SUDTSend = () => {
     setRemoteError,
     accountInfo,
     timerRef,
+    sendType,
+    isOptionCorrect,
   ])
 
   useEffect(() => {
@@ -287,31 +283,6 @@ const SUDTSend = () => {
     [dispatch]
   )
 
-  const onSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-      if (isSubmittable) {
-        let actionType: 'send-sudt' | 'send-acp' | 'send-cheque' | 'send-acp-to-default' = 'send-sudt'
-        if (accountType === AccountType.CKB && isSecp256k1Addr) {
-          actionType = 'send-acp-to-default'
-        } else if (accountType === AccountType.CKB) {
-          actionType = 'send-acp'
-        } else if (isSecp256k1Addr) {
-          actionType = 'send-cheque'
-        }
-        globalDispatch({
-          type: AppActions.RequestPassword,
-          payload: {
-            walletID: walletId as string,
-            actionType,
-          },
-        })
-      }
-    },
-    [isSubmittable, globalDispatch, walletId, accountType, isSecp256k1Addr]
-  )
-
   const [isDestroying, setIsDestroying] = useState(false)
   const onDestroy = useCallback(() => {
     setIsDestroying(true)
@@ -347,6 +318,7 @@ const SUDTSend = () => {
     () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
     [accountType, accountInfo]
   )
+  const onSubmit = useOnSumbit({ isSubmittable, accountType, walletId, addressLockType, sendType })
 
   if (!isLoaded) {
     return (
@@ -391,14 +363,27 @@ const SUDTSend = () => {
                   disabled={sendState.sendAll}
                   error={errors[field.key]}
                   className={styles[field.key]}
-                  hint={
-                    field.key === Fields.Address && isSecp256k1Addr && accountType === AccountType.SUDT
-                      ? t('s-udt.send.cheque-address-hint')
-                      : undefined
-                  }
                 />
               )
             })}
+            {options?.length &&
+              options.map(v => (
+                <div className={`${styles[v.key]} ${styles.option}`} key={v.key}>
+                  <input
+                    type={options?.length > 1 ? 'radio' : 'checkbox'}
+                    id={v.key}
+                    checked={v.key === sendType}
+                    onChange={onChangeSendType}
+                  />
+                  <label htmlFor={v.key}>{t(`s-udt.send.${v.label}`, v?.params)}</label>
+                  {v.tooltip ? (
+                    <span className={styles.optionTooltip} data-tooltip={t(`s-udt.send.${v.tooltip}`, v?.params)}>
+                      <TooltipIcon width={12} height={12} />
+                    </span>
+                  ) : null}
+                </div>
+              ))}
+            {!isOptionCorrect && <div className={styles.selectError}>{t('s-udt.send.select-option')}</div>}
             <div className={styles.sendAll}>
               <Button
                 type="primary"

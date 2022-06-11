@@ -58,15 +58,20 @@ const HardwareSign = ({
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const dispatch = useDispatch()
-  const onCancel = useCallback(() => {
-    if (signType === 'transaction') {
-      dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: { sending: false },
-      })
-    }
-    onDismiss()
-  }, [dispatch, signType, onDismiss])
+  const onCancel = useCallback(
+    (dismiss: boolean = true) => {
+      if (signType === 'transaction') {
+        dispatch({
+          type: AppActions.UpdateLoadings,
+          payload: { sending: false },
+        })
+      }
+      if (dismiss) {
+        onDismiss()
+      }
+    },
+    [dispatch, signType, onDismiss]
+  )
   const isWin32 = useMemo(() => {
     return getPlatform() === 'win32'
   }, [])
@@ -91,7 +96,7 @@ const HardwareSign = ({
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
   const isLoading = useMemo(() => {
-    return status === userInputStatus || isReconnecting
+    return status === userInputStatus || isReconnecting || isSending
   }, [status, userInputStatus, isReconnecting])
 
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
@@ -121,11 +126,13 @@ const HardwareSign = ({
       setError(errorFormatter(res.message, t))
       return
     }
-    dispatch({
-      type: AppActions.UpdateLoadedTransaction,
-      payload: res.result!,
-    })
-    onCancel()
+    if (res.result) {
+      dispatch({
+        type: AppActions.UpdateLoadedTransaction,
+        payload: res.result!,
+      })
+    }
+    onCancel(!!res.result)
   }, [offlineSignJSON, dispatch, onCancel, t, wallet.id])
 
   const signAndExportFromGenerateTx = useCallback(async () => {
@@ -143,16 +150,19 @@ const HardwareSign = ({
       password: '',
       multisigConfig,
     })
+    setStatus(connectStatus)
     if (!isSuccessResponse(res)) {
       setStatus(connectStatus)
       setError(errorFormatter(res.message, t))
       return
     }
-    dispatch({
-      type: AppActions.UpdateLoadedTransaction,
-      payload: res.result!,
-    })
-    onCancel()
+    if (res.result) {
+      dispatch({
+        type: AppActions.UpdateLoadedTransaction,
+        payload: res.result!,
+      })
+    }
+    onCancel(!!res.result)
   }, [
     dispatch,
     onCancel,
@@ -196,7 +206,9 @@ const HardwareSign = ({
         // getDeviceCkbAppVersion will halt forever while in win32 sleep mode.
         const ckbVersionRes = await Promise.race([
           getDeviceCkbAppVersion(descriptor),
-          new Promise<ControllerResponse>((_, reject) => setTimeout(() => reject(), 1000)),
+          new Promise<ControllerResponse>((_, reject) => {
+            setTimeout(() => reject(), 1000)
+          }),
         ]).catch(() => {
           return { status: ErrorCode.DeviceInSleep }
         })
@@ -210,7 +222,7 @@ const HardwareSign = ({
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)
@@ -283,11 +295,12 @@ const HardwareSign = ({
           })
           break
         }
-        case 'send-acp':
-        case 'send-acp-to-default':
+        case 'send-ckb-asset':
+        case 'send-acp-sudt-to-new-cell':
+        case 'send-acp-ckb-to-new-cell':
         case 'send-sudt': {
           let skipLastInputs = true
-          if (actionType === 'send-acp-to-default') {
+          if (actionType === 'send-acp-sudt-to-new-cell' || actionType === 'send-acp-ckb-to-new-cell') {
             skipLastInputs = false
           }
           const params: Controller.SendSUDTTransaction.Params = {
@@ -309,6 +322,7 @@ const HardwareSign = ({
             if (isSuccessResponse(res)) {
               history!.push(RoutePath.History)
             } else {
+              // @ts-ignore
               setError(res.message.content)
             }
           })
@@ -396,18 +410,22 @@ const HardwareSign = ({
   }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
 
   const exportTransaction = useCallback(async () => {
-    await exportTransactionAsJSON({
+    const res = await exportTransactionAsJSON({
       transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Unsigned,
       type: offlineSignType!,
       description,
       asset_account: experimental?.assetAccount,
     })
-    onCancel()
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    onCancel(!!res.result)
   }, [offlineSignType, generatedTx, onCancel, description, experimental])
 
   useDidMount(() => {
-    // eslint-disable-next-line no-unused-expressions
+    // @ts-ignore
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })

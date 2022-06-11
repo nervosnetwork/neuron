@@ -118,7 +118,6 @@ export default {
       'unsupported-manufacturer': 'Devices from {{manufacturer}} are not yet supported.',
       'wallet-not-supported-function': 'This wallet does not support {name} function.',
       'invalid-transaction-file': 'Invalid transaction file.',
-      'save-offline-json-failed': 'Unable to save JSON file.',
       'offline-sign-failed': 'Signing failed, please check if you are signing with the correct wallet.',
       'multisig-script-prefix-error': 'The multisig config is error',
       'multisig-config-not-exist': 'The multisig config is not exist',
@@ -130,7 +129,8 @@ export default {
       'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
-      'no-match-address-for-sign': 'Not found matched address'
+      'no-match-address-for-sign': 'Not found matched address',
+      'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address'
     },
     messageBox: {
       button: {

@@ -110,7 +110,6 @@ export default {
       'acp-same-account': '请设置与转出账户不同的收款账户。',
       'device-sign-canceled': '您取消了签名。否则，请确保设备上 Nervos app 设置开启了 “allow contract data”。',
       'connect-device-failed': '设备无法连接，请检查设备连接状况。',
-      'save-offline-json-failed': '无法保存 JSON 文件。',
       'offline-sign-failed': '签名失败，请检查是否使用了正确的钱包进行签名。',
       'multisig-script-prefix-error': '多签配置错误',
       'multisig-config-not-exist': '多签配置不存在',
@@ -122,7 +121,8 @@ export default {
       'multisig-lock-hash-mismatch': '当前多签地址与需要确认交易不匹配',
       'multisig-not-signed': '多签交易缺少部分签名',
       'sudt-acp-have-data': '待销毁的 sUDT 账户资产不为 0',
-      'no-match-address-for-sign': '没有找到匹配的地址'
+      'no-match-address-for-sign': '没有找到匹配的地址',
+      'target-lock-error': 'CKB 资产只能转账到 secp256k1 或者 acp 地址'
     },
     messageBox: {
       button: {

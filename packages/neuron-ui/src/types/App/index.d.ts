@@ -81,9 +81,10 @@ declare namespace State {
       | 'delete'
       | 'unlock'
       | 'create-sudt-account'
+      | 'send-ckb-asset'
       | 'send-sudt'
-      | 'send-acp'
-      | 'send-acp-to-default'
+      | 'send-acp-sudt-to-new-cell'
+      | 'send-acp-ckb-to-new-cell'
       | 'send-cheque'
       | 'withdraw-cheque'
       | 'claim-cheque'
@@ -101,9 +102,7 @@ declare namespace State {
       r: number
       m: number
       n: number
-      addresses: string[]
-      alias?: string
-      fullPayload: string
+      blake160s: string[]
     }
   }
 
@@ -154,14 +153,6 @@ declare namespace State {
     id: NetworkID
   }
 
-  interface WalletIdentity {
-    id: string
-    name: string
-    device?: DeviceInfo
-    isHD?: boolean
-    isWatchOnly?: boolean
-  }
-
   enum Manufacturer {
     Ledger = 'Ledger',
   }
@@ -171,6 +162,14 @@ declare namespace State {
     vendorId: string
     manufacturer: Manufacturer
     product: string
+  }
+
+  interface WalletIdentity {
+    id: string
+    name: string
+    device?: DeviceInfo
+    isHD?: boolean
+    isWatchOnly?: boolean
   }
 
   interface DeviceInfo {

@@ -85,7 +85,9 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
         // getDeviceCkbAppVersion will halt forever while in win32 sleep mode.
         const ckbVersionRes = await Promise.race([
           getDeviceCkbAppVersion(descriptor),
-          new Promise<ControllerResponse>((_, reject) => setTimeout(() => reject(), 1000)),
+          new Promise<ControllerResponse>((_, reject) => {
+            setTimeout(() => reject(), 1000)
+          }),
         ]).catch(() => {
           return { status: ErrorCode.DeviceInSleep }
         })
@@ -99,7 +101,7 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
         }
         setStatus(connectStatus)
       } catch (err) {
-        if (err.code === ErrorCode.CkbAppNotFound) {
+        if (err instanceof CkbAppNotFoundException) {
           setStatus(ckbAppNotFoundStatus)
         } else {
           setStatus(disconnectStatus)
@@ -148,7 +150,7 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
   }, [deviceInfo, address, userInputStatus, verifiedStatus, invalidStatus, ensureDeviceAvailable, t])
 
   useDidMount(() => {
-    // eslint-disable-next-line no-unused-expressions
+    // @ts-ignore
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })

@@ -5,20 +5,12 @@ import { ResponseCode } from 'utils/const'
 import AnyoneCanPayService from 'services/anyone-can-pay'
 import TransactionSender from 'services/transaction-sender'
 import { set as setDescription } from 'services/tx/transaction-description'
+import AddressParser from 'models/address-parser'
 
 export interface GenerateAnyoneCanPayTxParams {
   walletID: string
   address: string
   amount: string
-  assetAccountID: number
-  feeRate: string
-  fee: string
-  description?: string
-}
-
-export interface GenerateAnyoneCanPayAllTxParams {
-  walletID: string
-  address: string
   assetAccountID: number
   feeRate: string
   fee: string
@@ -54,11 +46,16 @@ export default class AnyoneCanPayController {
     }
   }
 
-  public async generateSendAllTx(params: GenerateAnyoneCanPayAllTxParams): Promise<Controller.Response<Transaction>> {
-    return this.generateTx({
-      ...params,
-      amount: 'all'
-    })
+  public async getHoldSudtCellCapacity(
+    receiveAddress: string,
+    tokenID: string
+  ): Promise<Controller.Response<string | undefined>> {
+    const lockScript = AddressParser.parse(receiveAddress)
+    const extraCKB = await AnyoneCanPayService.getHoldSUDTCellCapacity(lockScript, tokenID)
+    return {
+      status: ResponseCode.Success,
+      result: extraCKB
+    }
   }
 
   public async sendTx(params: SendAnyoneCanPayTxParams, skipSign = false): Promise<Controller.Response<string>> {

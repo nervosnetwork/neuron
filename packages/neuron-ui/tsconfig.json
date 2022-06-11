@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
+    "types": ["@types/jest"],
     "typeRoots": [
       "src/types",
       "node_modules/@nervosnetwork/ckb-types",

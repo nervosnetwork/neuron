@@ -16,7 +16,7 @@ import Script, { ScriptHashType } from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
 import AddressParser from 'models/address-parser'
-import MultiSign from 'models/multi-sign'
+import Multisig from 'models/multisig'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
@@ -179,9 +179,7 @@ export class TransactionGenerator {
       if (date) {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
-        const script = SystemScriptInfo.generateMultiSignScript(
-          new MultiSign().args(blake160, +minutes, tipHeaderEpoch)
-        )
+        const script = SystemScriptInfo.generateMultiSignScript(new Multisig().args(blake160, +minutes, tipHeaderEpoch))
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
@@ -260,7 +258,11 @@ export class TransactionGenerator {
 
     const allInputs: Input[] = await CellsService.gatherAllInputs(
       walletId,
-      multisigConfig?.fullPayload ? Script.fromSDK(addressToScript(multisigConfig?.fullPayload)) : undefined
+      multisigConfig
+        ? Script.fromSDK(
+            Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
+          )
+        : undefined
     )
 
     if (allInputs.length === 0) {
@@ -281,7 +283,7 @@ export class TransactionGenerator {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script: Script = SystemScriptInfo.generateMultiSignScript(
-          new MultiSign().args(blake160, minutes, tipHeaderEpoch)
+          new Multisig().args(blake160, minutes, tipHeaderEpoch)
         )
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
@@ -566,7 +568,7 @@ export class TransactionGenerator {
       lock: lockScript
     })
 
-    const since = new MultiSign().parseSince(prevOutput.lock.args)
+    const since = new Multisig().parseSince(prevOutput.lock.args)
 
     const input = new Input(outPoint, since.toString(), prevOutput.capacity, prevOutput.lock)
     const tx = Transaction.fromObject({
@@ -870,20 +872,22 @@ export class TransactionGenerator {
       ...targetOutput,
       data: BufferUtils.writeBigUInt128LE(targetAmount)
     })
-    const targetInput = Input.fromObject({
-      previousOutput: targetOutput.outPoint!,
-      since: '0',
-      capacity: targetOutput.capacity,
-      lock: targetOutput.lock,
-      lockHash: targetOutput.lockHash,
-      type: targetOutput.type,
-      data: targetOutput.data
-    })
+    const targetInput = targetOutput.outPoint
+      ? Input.fromObject({
+          previousOutput: targetOutput.outPoint!,
+          since: '0',
+          capacity: targetOutput.capacity,
+          lock: targetOutput.lock,
+          lockHash: targetOutput.lockHash,
+          type: targetOutput.type,
+          data: targetOutput.data
+        })
+      : undefined
     const tx = Transaction.fromObject({
       version: '0',
       headerDeps: [],
       cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
-      inputs: [targetInput],
+      inputs: targetInput ? [targetInput] : [],
       outputs: [output],
       outputsData: [output.data],
       witnesses: []
@@ -903,7 +907,8 @@ export class TransactionGenerator {
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      targetOutput.outPoint ? '0' : targetOutput.capacity
     )
 
     if (amount === 'all') {
@@ -1083,6 +1088,8 @@ export class TransactionGenerator {
 
     const chequeCell = Output.fromObject({
       ...chequeCellTmp,
+      // recreate lockHash
+      lockHash: undefined,
       data: BufferUtils.writeBigUInt128LE(BigInt(gatheredSudtInputResult.amount)),
       lock: assetAccountInfo.generateChequeScript(
         receiverLockScript.computeHash(),

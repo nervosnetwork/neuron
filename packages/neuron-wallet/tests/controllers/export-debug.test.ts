@@ -14,20 +14,20 @@ jest.mock('electron', () => ({
 
 jest.mock('../../src/services/addresses', () => {
   return {
-    getAddressesByAllWallets: () => ([
+    getAddressesByAllWallets: () => [
       {
         walletId: '0',
         addressType: '0',
         addressIndex: '0',
-        blake160: 'hash1',
+        blake160: 'hash1'
       },
       {
         walletId: '1',
         addressType: '1',
         addressIndex: '1',
-        blake160: 'hash2',
-      },
-    ])
+        blake160: 'hash2'
+      }
+    ]
   }
 })
 
@@ -86,7 +86,7 @@ describe('Test ExportDebugController', () => {
     addStatusFileMock = jest.spyOn(exportDebugController, 'addStatusFile')
     archiveAppendMock = jest.spyOn(exportDebugController.archive, 'append')
     jest.spyOn(exportDebugController.archive, 'file')
-    jest.spyOn(exportDebugController.archive, 'pipe').mockImplementation(() => { })
+    jest.spyOn(exportDebugController.archive, 'pipe').mockImplementation(() => {})
     jest.spyOn(logger, 'error')
   })
 
@@ -116,15 +116,8 @@ describe('Test ExportDebugController', () => {
       expect(showErrorBoxMock).not.toHaveBeenCalled()
       expect(logger.error).not.toHaveBeenCalled()
 
-      const csv = [
-        'walletId,addressType,addressIndex,publicKeyInBlake160\n',
-        '0,0,0,hash1\n',
-        '1,1,1,hash2\n',
-      ].join('')
-      expect(archiveAppendMock).toHaveBeenCalledWith(
-        csv,
-        expect.objectContaining({name: 'hd_public_key_info.csv'})
-      )
+      const csv = ['walletId,addressType,addressIndex,publicKeyInBlake160\n', '0,0,0,hash1\n', '1,1,1,hash2\n'].join('')
+      expect(archiveAppendMock).toHaveBeenCalledWith(csv, expect.objectContaining({ name: 'hd_public_key_info.csv' }))
     })
   })
 

@@ -10,13 +10,13 @@ export default class CommonUtils {
 
     while (++retryTime < times) {
       try {
-        return callback()
+        return await callback()
       } catch (err) {
         logger.warn(`function call error: ${err}, retry ${retryTime + 1} ...`)
         await CommonUtils.sleep(interval)
       }
     }
-    return callback()
+    return await callback()
   }
 
   public static timeout<T>(time: number, promise: Promise<T>, value: T): Promise<T> {

@@ -65,8 +65,9 @@ const PasswordRequest = () => {
     switch (actionType) {
       case 'create-sudt-account':
         return OfflineSignType.CreateSUDTAccount
-      case 'send-acp':
-      case 'send-acp-to-default':
+      case 'send-ckb-asset':
+      case 'send-acp-ckb-to-new-cell':
+      case 'send-acp-sudt-to-new-cell':
       case 'send-sudt':
         return OfflineSignType.SendSUDT
       case 'unlock':
@@ -83,14 +84,20 @@ const PasswordRequest = () => {
   }, [actionType])
 
   const exportTransaction = useCallback(async () => {
-    onDismiss()
-    await exportTransactionAsJSON({
+    const res = await exportTransactionAsJSON({
       transaction: generatedTx || experimental?.tx,
       status: OfflineSignStatus.Unsigned,
       type: signType,
       description,
       asset_account: experimental?.assetAccount,
     })
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    if (res.result) {
+      onDismiss()
+    }
   }, [signType, generatedTx, onDismiss, description, experimental])
 
   useDialog({ show: actionType, dialogRef, onClose: onDismiss })
@@ -103,8 +110,9 @@ const PasswordRequest = () => {
       'unlock',
       'create-sudt-account',
       'send-sudt',
-      'send-acp',
-      'send-acp-to-default',
+      'send-ckb-asset',
+      'send-acp-ckb-to-new-cell',
+      'send-acp-sudt-to-new-cell',
       'send-cheque',
       'withdraw-cheque',
       'claim-cheque',
@@ -206,11 +214,12 @@ const PasswordRequest = () => {
             await sendCreateSUDTAccountTransaction(params)(dispatch).then(handleSendTxRes)
             break
           }
-          case 'send-acp':
-          case 'send-acp-to-default':
+          case 'send-ckb-asset':
+          case 'send-acp-ckb-to-new-cell':
+          case 'send-acp-sudt-to-new-cell':
           case 'send-sudt': {
             let skipLastInputs = true
-            if (actionType === 'send-acp-to-default') {
+            if (actionType === 'send-acp-sudt-to-new-cell' || actionType === 'send-acp-ckb-to-new-cell') {
               skipLastInputs = false
             }
             const params: Controller.SendSUDTTransaction.Params = {
@@ -322,29 +331,28 @@ const PasswordRequest = () => {
       password,
       multisigConfig,
     })
-    if (!isSuccessResponse(res)) {
-      dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: { sending: false },
-      })
-      setError(errorFormatter(res.message, t))
-      return
-    }
-    dispatch({
-      type: AppActions.UpdateLoadedTransaction,
-      payload: res.result!,
-    })
     dispatch({
       type: AppActions.UpdateLoadings,
       payload: { sending: false },
     })
-    onDismiss()
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    if (res.result) {
+      dispatch({
+        type: AppActions.UpdateLoadedTransaction,
+        payload: res.result!,
+      })
+      onDismiss()
+    }
   }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
   const dropdownList = [
     {
       text: t('offline-sign.sign-and-export'),
       onClick: signAndExportFromGenerateTx,
+      disabled: !password,
     },
   ]
 
@@ -372,8 +380,8 @@ const PasswordRequest = () => {
           'unlock',
           'create-sudt-account',
           'send-sudt',
-          'send-acp',
-          'send-acp-to-default',
+          'send-acp-ckb-to-new-cell',
+          'send-acp-sudt-to-new-cell',
           'send-cheque',
           'withdraw-cheque',
           'claim-cheque',

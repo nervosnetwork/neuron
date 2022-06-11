@@ -14,7 +14,6 @@ export interface SUDTAccountPileProps {
   symbol?: string
   balance: string
   tokenId: string
-  address: string
   decimal: string
   onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>
 }

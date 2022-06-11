@@ -56,7 +56,7 @@ declare namespace Controller {
 
   interface SendTransactionParams {
     walletID: string
-    tx: string
+    tx: any
     password?: string
     description?: string
     multisigConfig?: {
@@ -65,9 +65,8 @@ declare namespace Controller {
       r: number
       m: number
       n: number
-      addresses: string[]
+      blake160s: string[]
       alias?: string
-      fullPayload: string
     }
   }
 
@@ -268,18 +267,6 @@ declare namespace Controller {
       description?: string
     }
 
-    type Response = SerializedTx
-  }
-
-  namespace GenerateSendAllSUDTTransaction {
-    type SerializedTx = string
-    interface Params {
-      assetAccountID: string
-      walletID: string
-      address: string
-      feeRate: string
-      description?: string
-    }
     type Response = SerializedTx
   }
 

@@ -100,6 +100,8 @@ $action-button-width: 11.25rem;
 
   .releaseNotesStyle {
     grid-area: release-note;
+    width: 100%;
+    box-sizing: border-box;
     overflow: scroll;
     min-height: 200px;
     height: calc(100vh - 400px);

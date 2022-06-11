@@ -194,6 +194,22 @@ export enum ChequeLockInfoOnLina {
   TagName = 'cheque',
 }
 
+export enum PwAcpLockInfoOnMainNet {
+  CodeHash = '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
+  HashType = 'type',
+  CodeHashIndex = '0x00',
+  ArgsLen = '20,21,22',
+  TagName = 'pw_anyone_can_pay',
+}
+
+export enum PwAcpLockInfoOnTestNet {
+  CodeHash = '0x58c5f491aba6d61678b7cf7edf4910b1f5e00ec0cde2f42e0abb4fd9aff25a63',
+  HashType = 'type',
+  CodeHashIndex = '0x00',
+  ArgsLen = '20,21,22',
+  TagName = 'pw_anyone_can_pay',
+}
+
 export enum AccountType {
   CKB,
   SUDT,

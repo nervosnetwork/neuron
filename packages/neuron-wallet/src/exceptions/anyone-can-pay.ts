@@ -6,6 +6,12 @@ export class TargetOutputNotFoundError extends Error {
   }
 }
 
+export class TargetLockError extends Error {
+  constructor() {
+    super(t('messages.target-lock-error'))
+  }
+}
+
 export class AcpSendSameAccountError extends Error {
   constructor() {
     super(t('messages.acp-same-account'))

@@ -1,13 +1,25 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useRouteMatch, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import Button from 'widgets/Button'
 import QRCode from 'widgets/QRCode'
 import CopyZone from 'widgets/CopyZone'
 import { RoutePath } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
+import { ReactComponent as AddressToggleIcon } from 'widgets/Icons/AddressTransform.svg'
 import VerifyHardwareAddress from 'components/VerifyHardwareAddress'
 import styles from './receive.module.scss'
+
+const toShortAddr = (addr: string) => {
+  try {
+    const script = addressToScript(addr)
+    const isMainnet = addr.startsWith('ckb')
+    return bech32Address(script.args, { prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet })
+  } catch {
+    return ''
+  }
+}
 
 const Receive = () => {
   const { wallet } = useGlobalState()
@@ -18,15 +30,19 @@ const Receive = () => {
   } = useRouteMatch()
   const history = useHistory()
   const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
+  const [isInShortFormat, setIsInShortFormat] = useState(false)
   const { addresses } = wallet
   const isSingleAddress = addresses.length === 1
 
   const accountAddress = useMemo(() => {
+    let addr = ''
     if (isSingleAddress) {
-      return addresses[0].address
+      addr = addresses[0].address
+    } else {
+      addr = (address || addresses.find(a => a.type === 0 && a.txCount === 0)?.address) ?? ''
     }
-    return (address || addresses.find(addr => addr.type === 0 && addr.txCount === 0)?.address) ?? ''
-  }, [address, addresses, isSingleAddress])
+    return isInShortFormat ? toShortAddr(addr) : addr
+  }, [address, addresses, isSingleAddress, isInShortFormat])
 
   const onAddressBookClick = useCallback(() => {
     history.push(RoutePath.Addresses)
@@ -53,6 +69,14 @@ const Receive = () => {
         <CopyZone content={accountAddress} name={t('receive.copy-address')} style={{ lineHeight: '1.625rem' }}>
           {accountAddress}
         </CopyZone>
+        <button
+          type="button"
+          className={styles.addressToggle}
+          onClick={() => setIsInShortFormat(is => !is)}
+          title={t(isInShortFormat ? `receive.turn-into-full-version-fomrat` : `receive.turn-into-deprecated-format`)}
+        >
+          <AddressToggleIcon />
+        </button>
       </div>
       {isSingleAddress ? null : <p className={styles.notation}>{t('receive.prompt')}</p>}
       {isSingleAddress ? null : (

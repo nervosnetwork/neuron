@@ -15,7 +15,7 @@ export interface InputSelectProps {
   disabled?: boolean
   onChange?: (value: string, arg?: SelectOptions) => void
   value?: string
-  placeholder?: String
+  placeholder?: string
 }
 
 function parseValue(value: string, options: SelectOptions[]) {

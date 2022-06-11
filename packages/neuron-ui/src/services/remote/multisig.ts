@@ -1,33 +1,40 @@
 import { remoteApi } from './remoteApiWrapper'
 import { OfflineSignJSON } from './offline'
 
-interface MultisigParams {
+type PartialSome<T, R extends keyof T> = Omit<T, R> &
+  {
+    [P in R]?: T[P]
+  }
+
+type RequiredSome<T, R extends keyof T> = Omit<T, R> &
+  {
+    [P in R]-?: T[P]
+  }
+
+type MultisigParams = {
+  id: number
   r: number
   m: number
   n: number
-  addresses: string[]
-  isMainnet: boolean
+  blake160s: string[]
 }
 
-export interface MultisigConfig {
-  id: number
+export type MultisigEntity = MultisigParams & {
+  id?: number
   walletId: string
-  r: number
-  m: number
-  n: number
-  addresses: string[]
   alias?: string
+}
+
+export type MultisigConfig = MultisigEntity & {
+  addresses: string[]
   fullPayload: string
 }
 
-export const createMultisigAddress = remoteApi<MultisigParams>('create-multisig-address')
-export const saveMultisigConfig = remoteApi<Omit<MultisigConfig, 'id'>, MultisigConfig>('save-multisig-config')
-export const getMultisigConfig = remoteApi<{ walletId: string }>('get-multisig-config')
-export const importMultisigConfig = remoteApi<{ isMainnet: boolean; walletId: string }, MultisigConfig[]>(
-  'import-multisig-config'
-)
+export const saveMultisigConfig = remoteApi<PartialSome<MultisigEntity, 'id'>, MultisigEntity>('save-multisig-config')
+export const getMultisigConfig = remoteApi<string, MultisigEntity[]>('get-multisig-config')
+export const importMultisigConfig = remoteApi<string, MultisigConfig[]>('import-multisig-config')
 export const exportMultisigConfig = remoteApi<MultisigConfig[]>('export-multisig-config')
-export const updateMultisigConfig = remoteApi<{ id: number } & Omit<Partial<MultisigConfig>, 'id'>, MultisigConfig>(
+export const updateMultisigConfig = remoteApi<RequiredSome<Partial<MultisigEntity>, 'id'>, MultisigEntity>(
   'update-multisig-config'
 )
 export const deleteMultisigConfig = remoteApi<number, boolean>('delete-multisig-config')

@@ -220,21 +220,7 @@ export class HardwareWallet extends Wallet {
     return this.device!
   }
 
-  public checkAndGenerateAddresses = async (
-    isImporting: boolean = false,
-    receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change
-  ): Promise<AddressInterface[] | undefined> => {
-    if (this.isHD) {
-      return await AddressService.generateAndSaveForExtendedKey(
-        this.id,
-        this.accountExtendedPublicKey(),
-        isImporting,
-        receivingAddressCount,
-        changeAddressCount
-      )
-    }
-
+  public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
     const { addressType, addressIndex } = this.getDeviceInfo()
     const { publicKey } = AccountExtendedPublicKey.parse(this.extendedKey)
     const address = await AddressService.generateAndSaveForPublicKey(this.id, publicKey, addressType, addressIndex)
@@ -245,23 +231,14 @@ export class HardwareWallet extends Wallet {
   }
 
   public getNextAddress = async (): Promise<AddressInterface | undefined> => {
-    if (this.isHD) {
-      return AddressService.getNextUnusedAddressByWalletId(this.id)
-    }
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
   public getNextChangeAddress = async (): Promise<AddressInterface | undefined> => {
-    if (this.isHD) {
-      return AddressService.getNextUnusedChangeAddressByWalletId(this.id)
-    }
     return AddressService.getFirstAddressByWalletId(this.id)
   }
 
   public getNextReceivingAddresses = async (): Promise<AddressInterface[]> => {
-    if (this.isHD) {
-      return AddressService.getUnusedReceivingAddressesByWalletId(this.id)
-    }
     const address = await AddressService.getFirstAddressByWalletId(this.id)
     if (address) {
       return [address]

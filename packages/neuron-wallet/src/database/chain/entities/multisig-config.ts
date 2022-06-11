@@ -21,13 +21,10 @@ export default class MultisigConfig {
   r!: number
 
   @Column('simple-array')
-  addresses!: string[]
+  blake160s!: string[]
 
   @Column()
   alias!: string
-
-  @Column()
-  fullPayload!: string
 
   @Column()
   lastestBlockNumber!: string
@@ -36,15 +33,13 @@ export default class MultisigConfig {
     const multisigConfig = new MultisigConfig()
 
     multisigConfig.walletId = model.walletId
+    multisigConfig.r = model.r
     multisigConfig.m = model.m
     multisigConfig.n = model.n
-    multisigConfig.r = model.r
-    multisigConfig.addresses = model.addresses
+    multisigConfig.blake160s = model.blake160s
     if (model.alias) {
       multisigConfig.alias = model.alias
     }
-    multisigConfig.fullPayload = model.fullPayload
-
     return multisigConfig
   }
 

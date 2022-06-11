@@ -5,6 +5,12 @@ import MultisigConfigModel from '../../src/models/multisig-config'
 import MultisigService from '../../src/services/multisig'
 import MultisigOutput from '../../src/database/chain/entities/multisig-output'
 import { OutputStatus } from '../../src/models/chain/output'
+import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
+import Multisig from '../../src/models/multisig'
+import SystemScriptInfo from '../../src/models/system-script-info'
+import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+
+const [alice, bob, charlie] = keyInfos
 
 const rpcBatchRequestMock = jest.fn()
 jest.mock('../../src/utils/rpc-request', () => ({
@@ -26,16 +32,15 @@ describe('multisig service', () => {
     1,
     2,
     3,
-    ['addresses'],
-    'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2y0lufgxn0q93dyx2wndvjhvjnfglxkaqlz8tny',
+    [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
     'alias'
   );
   const defaultMultisigConfig = MultisigConfig.fromModel(multisigConfigModel)
   defaultMultisigConfig.lastestBlockNumber = '0x0'
   const lock = {
-    args: '0x447ff8941a6f0162d2194e9b592bb2534a3e6b74',
-    code_hash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
-    hash_type: 'type'
+    args: Multisig.hash(multisigConfigModel.blake160s, multisigConfigModel.r, multisigConfigModel.m, multisigConfigModel.n),
+    code_hash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+    hash_type: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
   }
   const defaultTxOutpoint = { tx_hash: 'tx_hash', index: '0x0' }
   const defaultOutput = {
@@ -257,7 +262,7 @@ describe('multisig service', () => {
   describe('deleteRemovedMultisigOutput', () => {
     it('delete cell thats config not in db', async () => {
       const output =  MultisigOutput.fromIndexer(defaultOutput)
-      output.lockHash = '0x8a281512ae899c8cb2bfd177c7747e1ff20b5980'
+      output.lockHash = scriptToHash(alice.lockScript)
       output.outPointTxHash = '0x9821d3184b5743726e4686541a74213eaa63e2d8f4fb9ee9ff50878aa9177c87'
       await getConnection().manager.save(output)
       await MultisigService.deleteRemovedMultisigOutput()
