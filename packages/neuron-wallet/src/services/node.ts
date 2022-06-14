@@ -132,21 +132,38 @@ class NodeService {
       )
   }
 
-  public async tryStartNodeOnDefaultURI(): Promise<boolean> {
+  public async tryStartNodeOnDefaultURI() {
+    const isDefaultCKBNeedStart = await this.isDefaultCKBNeedRestart()
+    if (isDefaultCKBNeedStart) {
+      logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
+      const redistReady = await redistCheck()
+      await (redistReady ? this.startNode() : this.showGuideDialog())
+    } else {
+      logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
+    }
+  }
+
+  public async isDefaultCKBNeedRestart() {
     let network = NetworksService.getInstance().getCurrent()
     if (network.remote !== BUNDLED_CKB_URL) {
       return false
     }
     try {
       await new RpcService(network.remote).getChain()
-      logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
       return false
     } catch (err) {
-      logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
-      const redistReady = await redistCheck()
-      this.startedBundledNode = await (redistReady ? this.startNode() : this.showGuideDialog())
+      return true
+    }
+  }
 
-      return this.startedBundledNode
+  public async startNode() {
+    try {
+      await startCkbNode()
+      this.startedBundledNode = true
+    } catch (error) {
+      this.startedBundledNode = false
+      logger.info('CKB:\tfail to start bundled CKB with error:')
+      logger.error(error)
     }
   }
 
@@ -167,16 +184,6 @@ class NodeService {
         const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
         shell.openExternal(VC_REDIST_URL)
         env.app.quit()
-        return false
-      })
-  }
-
-  private startNode = () => {
-    return startCkbNode()
-      .then(() => true)
-      .catch(err => {
-        logger.info('CKB:\tfail to start bundled CKB with error:')
-        logger.error(err)
         return false
       })
   }
