@@ -11,7 +11,7 @@ export default abstract class Monitor {
 
   abstract restart(): Promise<void>
 
-  startMonitor() {
+  startMonitor(intervalTime: number = 10000) {
     this.interval = setInterval(async () => {
       if (this.isReStarting) {
         return
@@ -23,7 +23,7 @@ export default abstract class Monitor {
           timeout = setTimeout(() => {
             logger.info(`Monitor ${this.name}: isLiving function timeout`)
             resolve(true)
-          }, 5000)
+          }, intervalTime / 2)
         })
       ])
       clearTimeout(timeout!)
@@ -37,7 +37,7 @@ export default abstract class Monitor {
           this.isReStarting = false
         }
       }
-    }, 10000)
+    }, intervalTime)
   }
 
   clearMonitor() {
