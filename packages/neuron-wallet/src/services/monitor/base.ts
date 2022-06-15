@@ -1,7 +1,9 @@
 import logger from 'utils/logger'
+import { interval, timer, Subscription, race, from } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 export default abstract class Monitor {
-  interval: ReturnType<typeof setInterval> | null = null
+  interval: Subscription | null = null
 
   isReStarting: boolean = false
 
@@ -12,21 +14,12 @@ export default abstract class Monitor {
   abstract restart(): Promise<void>
 
   startMonitor(intervalTime: number = 10000) {
-    this.interval = setInterval(async () => {
+    this.interval = interval(intervalTime).subscribe(async () => {
       if (this.isReStarting) {
         return
       }
-      let timeout: ReturnType<typeof setTimeout>
-      const isLiving = await Promise.race([
-        this.isLiving(),
-        new Promise<boolean>(resolve => {
-          timeout = setTimeout(() => {
-            logger.info(`Monitor ${this.name}: isLiving function timeout`)
-            resolve(true)
-          }, intervalTime / 2)
-        })
-      ])
-      clearTimeout(timeout!)
+      const timeout = timer(intervalTime / 2).pipe(map(() => true))
+      const isLiving = await race(timeout, from(this.isLiving())).toPromise()
       if (!isLiving) {
         logger.info(`Monitor: is restarting ${this.name} process`)
         this.isReStarting = true
@@ -37,13 +30,10 @@ export default abstract class Monitor {
           this.isReStarting = false
         }
       }
-    }, intervalTime)
+    })
   }
 
   clearMonitor() {
-    if (this.interval) {
-      clearInterval(this.interval)
-    }
-    this.interval = null
+    this.interval?.unsubscribe()
   }
 }
