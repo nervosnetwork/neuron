@@ -61,7 +61,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
     }
 
     case 'unmount': {
-      if (!syncQueue) { return }
+      if (!syncQueue) { process.exit(0); return }
       logger.debug("Sync:\tstopping")
       await syncQueue.stopAndWait()
       syncQueue = null
