@@ -1,23 +1,29 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { createHardwareWallet } from 'services/remote'
 import { isSuccessResponse } from 'utils'
-import { RoutePath, LocationState } from './common'
+import { ImportStep, ActionType, ImportHardwareState } from './common'
 
 import styles from './findDevice.module.scss'
 
-const NameWallet = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const NameWallet = ({
+  dispatch,
+  model,
+  extendedPublicKey,
+}: {
+  dispatch: React.Dispatch<ActionType>
+  model: ImportHardwareState['model']
+  extendedPublicKey: ImportHardwareState['extendedPublicKey']
+}) => {
   const [t] = useTranslation()
-  const { entryPath, model, extendedPublicKey } = location.state
-  const [walletName, setWalletName] = useState(`${model.manufacturer} ${model.product}`)
+  const [walletName, setWalletName] = useState(`${model?.manufacturer} ${model?.product}`)
   const [errorMsg, setErrorMsg] = useState('')
 
   const onBack = useCallback(() => {
-    history.push(entryPath)
-  }, [history, entryPath])
+    dispatch({ step: ImportStep.ImportHardware })
+  }, [dispatch])
 
   const onNext = useCallback(
     (e: React.FormEvent) => {
@@ -27,16 +33,13 @@ const NameWallet = ({ history, location }: RouteComponentProps<{}, {}, LocationS
         walletName,
       }).then(res => {
         if (isSuccessResponse(res)) {
-          history.push({
-            pathname: entryPath + RoutePath.Success,
-            state: location.state,
-          })
+          dispatch({ step: ImportStep.Success })
         } else {
           setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
         }
       })
     },
-    [history, entryPath, walletName, location.state, extendedPublicKey]
+    [walletName, extendedPublicKey]
   )
 
   const onInput = useCallback(e => {
