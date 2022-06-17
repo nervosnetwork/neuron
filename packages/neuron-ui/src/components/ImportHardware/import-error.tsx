@@ -1,22 +1,26 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
 import { errorFormatter } from 'utils'
-import { LocationState } from './common'
+import { ActionType, ImportHardwareState, ImportStep } from './common'
 
 import styles from './findDevice.module.scss'
 
-const ImportError = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const ImportError = ({
+  dispatch,
+  error,
+}: {
+  dispatch: React.Dispatch<ActionType>
+  error: ImportHardwareState['error']
+}) => {
   const [t] = useTranslation()
-  const { error, entryPath } = location.state
   const onBack = useCallback(() => {
-    history.push(entryPath)
-  }, [history, entryPath])
+    dispatch({ step: ImportStep.ImportHardware })
+  }, [dispatch])
 
-  const errorMsg = errorFormatter(error!, t)
+  const errorMsg = error ? errorFormatter(error, t) : ''
 
   return (
     <div className={styles.container}>

@@ -1,5 +1,4 @@
-import React, { useRef, useEffect } from 'react'
-import { Switch, Route, RouteComponentProps } from 'react-router-dom'
+import React, { useRef, useEffect, useReducer } from 'react'
 import Experimental from 'widgets/ExperimentalRibbon'
 import Comfirming from './confirming'
 import ImportError from './import-error'
@@ -7,11 +6,41 @@ import SelectModel from './select-model'
 import DetectDevice from './detect-device'
 import ImportSuccess from './import-success'
 import NameWallet from './name-wallet'
-import { RoutePath } from './common'
+import { ImportStep, ImportHardwareState, ActionType } from './common'
 
 import styles from './findDevice.module.scss'
 
-const ImportHardware = ({ match }: RouteComponentProps) => {
+const reducer: React.Reducer<ImportHardwareState, ActionType> = (state, action) => {
+  return { ...state, ...action }
+}
+
+const Content = () => {
+  const [importHardwareStates, dispatch] = useReducer(reducer, { step: ImportStep.ImportHardware })
+  switch (importHardwareStates.step) {
+    case ImportStep.ImportHardware:
+      return <SelectModel dispatch={dispatch} />
+    case ImportStep.DetectDevice:
+      return <DetectDevice dispatch={dispatch} model={importHardwareStates.model!} />
+    case ImportStep.Comfirming:
+      return <Comfirming dispatch={dispatch} />
+    case ImportStep.Error:
+      return <ImportError dispatch={dispatch} error={importHardwareStates.error} />
+    case ImportStep.Success:
+      return <ImportSuccess dispatch={dispatch} />
+    case ImportStep.NameWallet:
+      return (
+        <NameWallet
+          dispatch={dispatch}
+          model={importHardwareStates.model}
+          extendedPublicKey={importHardwareStates.extendedPublicKey}
+        />
+      )
+    default:
+      return <SelectModel dispatch={dispatch} />
+  }
+}
+
+const ImportHardware = () => {
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const EXPERIMENTAL_TAG = 'import-hardware'
 
@@ -22,14 +51,7 @@ const ImportHardware = ({ match }: RouteComponentProps) => {
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
       <Experimental tag={EXPERIMENTAL_TAG} showRibbon={false} message="messages.experimental-message-hardware" />
-      <Switch>
-        <Route component={SelectModel} exact path={match.url} />
-        <Route component={DetectDevice} exact path={match.url + RoutePath.DetectDevice} />
-        <Route component={Comfirming} exact path={match.url + RoutePath.Comfirming} />
-        <Route component={ImportError} exact path={match.url + RoutePath.Error} />
-        <Route component={ImportSuccess} exact path={match.url + RoutePath.Success} />
-        <Route component={NameWallet} exact path={match.url + RoutePath.NameWallet} />
-      </Switch>
+      <Content />
     </dialog>
   )
 }

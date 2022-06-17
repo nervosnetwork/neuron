@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
 
-export enum RoutePath {
+export enum ImportStep {
   DetectDevice = '/detect-device',
   Comfirming = '/confirming',
   Error = '/error',
@@ -15,12 +15,14 @@ export interface Model {
   product: string
 }
 
-export interface LocationState {
-  entryPath: string
-  model: Model
+export interface ImportHardwareState {
+  model?: Model
   extendedPublicKey?: {
     publicKey: string
     chainCode: string
   }
   error?: FailureFromController['message']
+  step: ImportStep
 }
+
+export type ActionType = Partial<ImportHardwareState>

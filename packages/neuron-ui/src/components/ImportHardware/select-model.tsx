@@ -1,11 +1,12 @@
 import React, { useCallback, useState } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import Select from 'widgets/Select'
 import { Text } from 'office-ui-fabric-react'
+import { useHistory } from 'react-router-dom'
+import { useGoBack } from 'utils'
 import styles from './findDevice.module.scss'
-import { LocationState, Model, RoutePath } from './common'
+import { ActionType, Model, ImportStep } from './common'
 
 const supportedHardwareModels = [
   {
@@ -26,23 +27,17 @@ const supportedHardwareModels = [
   },
 ]
 
-const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationState>) => {
+const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => {
   const [t] = useTranslation()
   const [model, setModel] = useState<Model>()
-
-  const onBack = useCallback(() => {
-    history.push(match.url.replace(RoutePath.ImportHardware, ''))
-  }, [history, match.url])
-
+  const history = useHistory()
+  const onBack = useGoBack(history)
   const onNext = useCallback(() => {
-    history.push({
-      pathname: match.url + RoutePath.DetectDevice,
-      state: {
-        model: model!,
-        entryPath: match.url,
-      },
+    dispatch({
+      model,
+      step: ImportStep.DetectDevice,
     })
-  }, [history, match.url, model])
+  }, [dispatch, model])
 
   const onDropDownChange = useCallback(({ data }) => {
     setModel(data)
