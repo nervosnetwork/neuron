@@ -10,22 +10,10 @@ import transactions from '../../setupAndTeardown/transactions.fixture'
 import { getConnection } from 'typeorm'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 
-jest.doMock('../../../src/services/networks', () => {
-  const originalModule = jest.requireActual('../../../src/services/networks').default
-  return {
-    getInstance() {
-      const res = new originalModule()
-      const current = res.getCurrent()
-      return {
-        ...res,
-        getCurrent() {
-          return {
-            ...current,
-            genesisHash: '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e6'
-          }
-        }
-      }
-    }
+jest.doMock('../../../src/models/asset-account-info', () => {
+  const originalModule = jest.requireActual('../../../src/models/asset-account-info').default
+  return function() {
+    return new originalModule('0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5')
   }
 })
 
