@@ -31,9 +31,11 @@ jest.mock('../../src/utils/rpc-request', () => ({
   rpcRequest: () => rpcRequestMock()
 }))
 
-const resetSyncTaskMock = jest.fn()
+const asyncPushMock = jest.fn()
 jest.mock('../../src/block-sync-renderer/index', () => ({
-  resetSyncTask: () => resetSyncTaskMock()
+  resetSyncTaskQueue: {
+    asyncPush: (v: boolean) => asyncPushMock(v)
+  }
 }))
 
 describe('ckb indexer monitor', () => {
@@ -56,7 +58,7 @@ describe('ckb indexer monitor', () => {
   })
   it('restart', async () => {
     await monitor.restart()
-    expect(resetSyncTaskMock).toHaveBeenCalled()
+    expect(asyncPushMock).toHaveBeenCalledWith(true)
   })
 })
 

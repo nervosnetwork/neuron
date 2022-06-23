@@ -14,6 +14,7 @@ import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
 import { WorkerMessage, StartParams, QueryIndexerParams } from './task'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
+import queueWrapper from 'utils/queue'
 import env from 'env'
 
 let network: Network | null
@@ -65,6 +66,8 @@ export const resetSyncTask = async (startTask = true) => {
   }
 }
 
+export const resetSyncTaskQueue = queueWrapper(resetSyncTask)
+
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
   if (!reconnected && network?.id === newNetwork.id && network?.genesisHash === newNetwork.genesisHash) {
     return
@@ -78,7 +81,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
     logger.info('Network:\tswitched to:', network)
   }
 
-  await resetSyncTask(shouldSync)
+  await resetSyncTaskQueue.asyncPush(shouldSync)
 }
 
 export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> => {
@@ -130,6 +133,9 @@ export const createBlockSyncTask = async () => {
         case 'cache-tip-block-updated':
           SyncApiController.emiter.emit('cache-tip-block-updated', message)
           break
+        case 'check-and-save-wallet-address':
+          WalletService.getInstance().checkAndGenerateAddress(message)
+          break
         case 'tx-db-changed':
           TxDbChangedSubject.getSubject().next(message)
           break
@@ -139,7 +145,7 @@ export const createBlockSyncTask = async () => {
         case 'wallet-deleted':
         case 'address-created':
         case 'indexer-error':
-          resetSyncTask()
+          resetSyncTaskQueue.push(true)
           break
         default:
           break
@@ -188,5 +194,5 @@ export const registerRequest = (c: ChildProcess, msg: Required<WorkerMessage>) =
     })
   })
 
-AddressCreatedSubject.getSubject().subscribe(() => resetSyncTask())
-WalletDeletedSubject.getSubject().subscribe(() => resetSyncTask())
+AddressCreatedSubject.getSubject().subscribe(() => resetSyncTaskQueue.push(true))
+WalletDeletedSubject.getSubject().subscribe(() => resetSyncTaskQueue.push(true))

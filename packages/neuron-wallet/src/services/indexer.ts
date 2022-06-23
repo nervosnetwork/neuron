@@ -10,7 +10,7 @@ import { Network } from 'models/network'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from './networks'
 import CommonUtils from 'utils/common'
-import { resetSyncTask } from 'block-sync-renderer'
+import { resetSyncTaskQueue } from 'block-sync-renderer'
 import { clean as cleanChain } from 'database/chain'
 
 const platform = (): string => {
@@ -68,7 +68,7 @@ export default class IndexerService {
   }
 
   static clearCache = async (clearIndexerFolder = false) => {
-    await resetSyncTask(false)
+    await resetSyncTaskQueue.asyncPush(false)
     await cleanChain()
 
     if (clearIndexerFolder) {
@@ -76,7 +76,7 @@ export default class IndexerService {
       await new SyncedBlockNumber().setNextBlock(BigInt(0))
     }
 
-    await resetSyncTask(true)
+    await resetSyncTaskQueue.asyncPush(true)
   }
 
   static createFolder(dir: string) {
