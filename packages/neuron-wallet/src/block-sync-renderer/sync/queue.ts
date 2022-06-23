@@ -193,7 +193,7 @@ export default class Queue {
         .map(addr => addr.walletId)
     )
     if (process.send) {
-      process.send({ channel: 'check-and-save-wallet-address', walletIds: [...walletIds] })
+      process.send({ channel: 'check-and-save-wallet-address', message: [...walletIds] })
     } else {
       throw new ShouldInChildProcess()
     }
