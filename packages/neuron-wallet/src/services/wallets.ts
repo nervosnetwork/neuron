@@ -342,7 +342,7 @@ export default class WalletService {
   }
 
   public async checkAndGenerateAddress(walletIds: string[]) {
-    for (const walletId of walletIds) {
+    for (const walletId of new Set(walletIds)) {
       const wallet = this.get(walletId)
       await wallet.checkAndGenerateAddresses()
     }

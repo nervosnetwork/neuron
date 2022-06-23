@@ -683,14 +683,16 @@ describe('integration tests for AddressService', () => {
             publicKeyInBlake160: addr.blake160
           })
         }))
-        await AddressService.create(receiving)
+        await AddressService.create({ addresses: receiving })
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(0)
       })
       it('create with more than one wallet', async () => {
-        await expect(AddressService.create([
-          { walletId: '1' },
-          { walletId: '2' }
-        ])).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
+        await expect(AddressService.create({
+          addresses: [
+            { walletId: '1' },
+            { walletId: '2' }
+          ]
+        })).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
       })
       it('create with some exist', async () => {
         const { receiving, change } = await AddressService.generateAddresses(
@@ -707,7 +709,9 @@ describe('integration tests for AddressService', () => {
             publicKeyInBlake160: addr.blake160
           })
         }))
-        await AddressService.create([...receiving, ...change])
+        await AddressService.create({
+          addresses: [...receiving, ...change]
+        })
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(1)
       })
     })

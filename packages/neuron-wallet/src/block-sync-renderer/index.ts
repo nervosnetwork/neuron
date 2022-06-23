@@ -66,7 +66,7 @@ export const resetSyncTask = async (startTask = true) => {
   }
 }
 
-export const resetSyncTaskQueue = queueWrapper(resetSyncTask)
+export const resetSyncTaskQueue = queueWrapper(resetSyncTask, 1, true)
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
   if (!reconnected && network?.id === newNetwork.id && network?.genesisHash === newNetwork.genesisHash) {
@@ -145,7 +145,7 @@ export const createBlockSyncTask = async () => {
         case 'wallet-deleted':
         case 'address-created':
         case 'indexer-error':
-          resetSyncTaskQueue.push(true)
+          resetSyncTaskQueue.asyncPush(true)
           break
         default:
           break
@@ -194,5 +194,5 @@ export const registerRequest = (c: ChildProcess, msg: Required<WorkerMessage>) =
     })
   })
 
-AddressCreatedSubject.getSubject().subscribe(() => resetSyncTaskQueue.push(true))
-WalletDeletedSubject.getSubject().subscribe(() => resetSyncTaskQueue.push(true))
+AddressCreatedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
+WalletDeletedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))

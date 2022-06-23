@@ -31,7 +31,7 @@ export default class AddressService {
 
   public static generateAndSaveForPublicKeyQueue = queueWrapper(AddressService.generateAndSaveForPublicKey)
 
-  private static async create(addresses: AddressInterface[]) {
+  private static async create({ addresses }: { addresses: AddressInterface[] }) {
     const walletIds = new Set(addresses.map(v => v.walletId))
     if (walletIds.size !== 1) {
       throw new Error('Addresses can only be created for one wallet at a time')
@@ -74,7 +74,7 @@ export default class AddressService {
     )
 
     const generatedAddresses: AddressInterface[] = [...addresses.receiving, ...addresses.change]
-    await AddressService.createQueue.asyncPush([generatedAddresses])
+    await AddressService.createQueue.asyncPush({ addresses: generatedAddresses })
 
     return generatedAddresses
   }

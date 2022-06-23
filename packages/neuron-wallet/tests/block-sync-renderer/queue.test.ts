@@ -220,7 +220,7 @@ describe('queue', () => {
               }
             })
             it('checks and generate new addresses', () => {
-              expect(stubbedProcessSend).toHaveBeenCalledWith({ channel: "check-and-save-wallet-address", walletIds: [fakeWalletId]})
+              expect(stubbedProcessSend).toHaveBeenCalledWith({ channel: "check-and-save-wallet-address", message: [fakeWalletId]})
             })
             it('notify indexer connector of processed block number', () => {
               expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
