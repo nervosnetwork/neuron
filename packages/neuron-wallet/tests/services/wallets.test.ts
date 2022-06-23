@@ -464,4 +464,24 @@ describe('wallet service', () => {
       })
     });
   });
+
+  describe('checkAndGenerateAddress', () => {
+    const walletServiceMock = new WalletService()
+    const getMock = jest.spyOn(walletServiceMock, 'get')
+    const checkAndGenerateAddressesMock = jest.fn()
+    // @ts-ignore
+    getMock.mockReturnValue({ checkAndGenerateAddresses: () => checkAndGenerateAddressesMock() })
+
+    beforeEach(() => {
+      checkAndGenerateAddressesMock.mockReset()
+    })
+    it('no duplicate walletId', async () => {
+      await walletServiceMock.checkAndGenerateAddress(['walletId1'])
+      expect(checkAndGenerateAddressesMock).toHaveBeenCalledTimes(1)
+    })
+    it('with duplicate walletId', async () => {
+      await walletServiceMock.checkAndGenerateAddress(['walletId1', 'walletId1'])
+      expect(checkAndGenerateAddressesMock).toHaveBeenCalledTimes(1)
+    })
+  })
 })
