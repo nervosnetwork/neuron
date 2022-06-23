@@ -1,6 +1,5 @@
 import { queue, AsyncQueue } from 'async'
 import { TransactionPersistor } from 'services/tx'
-import WalletService from 'services/wallets'
 import RpcService from 'services/rpc-service'
 import AssetAccountService from 'services/asset-account-service'
 import OutPoint from 'models/chain/out-point'
@@ -193,10 +192,10 @@ export default class Queue {
         )
         .map(addr => addr.walletId)
     )
-    const walletService = WalletService.getInstance()
-    for (const walletId of walletIds) {
-      const wallet = walletService.get(walletId)
-      await wallet.checkAndGenerateAddresses()
+    if (process.send) {
+      process.send({ channel: 'check-and-save-wallet-address', walletIds: [...walletIds] })
+    } else {
+      throw new ShouldInChildProcess()
     }
   }
 

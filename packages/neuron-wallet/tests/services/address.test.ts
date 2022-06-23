@@ -317,10 +317,12 @@ describe('integration tests for AddressService', () => {
         const addressIndex = 0
         beforeEach(async () => {
           await AddressService.generateAndSaveForPublicKey(
-            walletId,
-            publicKey,
-            addressType,
-            addressIndex
+            {
+              walletId,
+              publicKey,
+              addressType,
+              addressIndex
+            }
           )
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
         });
@@ -334,12 +336,13 @@ describe('integration tests for AddressService', () => {
         describe('when trying to generate for the same public key', () => {
           beforeEach(async () => {
             notifyAddressCreatedStub.mockReset()
-            await AddressService.generateAndSaveForPublicKey(
+            // @ts-ignore private-method
+            await AddressService.generateAndSaveForPublicKey({
               walletId,
               publicKey,
               addressType,
               addressIndex
-            )
+            })
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
           });
           it('should not generate new address', () => {
