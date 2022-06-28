@@ -2,13 +2,13 @@ import React, { useEffect, useCallback, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import WarningIcon from 'widgets/Icons/Warning.png'
 import { StateDispatch, addPopup } from 'states'
 import { clearCellCache } from 'services/remote'
 import { cacheClearDate } from 'services/localCache'
 import { isSuccessResponse, useDialog, uniformTimeFormatter } from 'utils'
 
+import { Tooltip } from 'widgets/Icons/icon'
 import styles from './style.module.scss'
 
 const I18N_PATH = 'settings.clear-cache'
@@ -71,28 +71,25 @@ const ClearCache = ({ dispatch }: { dispatch: StateDispatch }) => {
 
   return (
     <>
-      <div className={`${styles.clearCache} ${styles.detail}`}>
-        {clearedDate ? (
-          <div className={styles.date}>{t('settings.general.cache-cleared-on', { date: clearedDate })}</div>
-        ) : null}
-        <div className={styles.desc}>
-          <Attention />
-          {t('settings.general.clear-cache-description')}
-        </div>
+      <div className={styles.clearCache}>
+        {t('settings.data.cache')}
+        <span className={styles.tooltip} data-tooltip={t('settings.data.clear-cache-description')}>
+          <Tooltip />
+        </span>
+        :
       </div>
-      <div className={`${styles.clearCache} ${styles.action}`}>
-        <Button label={t(`settings.general.clear-cache`)} onClick={showDialog} disabled={isClearing}>
-          {isClearing ? (
-            <Spinner
-              label={t('settings.general.clear-cache')}
-              labelPosition="right"
-              styles={{ root: { marginRight: 5 } }}
-            />
-          ) : (
-            (t('settings.general.clear-cache') as string)
-          )}
-        </Button>
-      </div>
+      <div className={styles.clearedDate}>{t('settings.data.cache-cleared-on', { date: clearedDate })}</div>
+      <Button label={t('settings.data.clear-cache')} onClick={showDialog} disabled={isClearing}>
+        {isClearing ? (
+          <Spinner
+            label={t('settings.data.clearing-cache')}
+            labelPosition="right"
+            styles={{ root: { marginRight: 5 } }}
+          />
+        ) : (
+          (t('settings.data.clear-cache') as string)
+        )}
+      </Button>
       <dialog ref={dialogRef} className={styles.dialog}>
         <img src={WarningIcon} alt="warning" className={styles.warningIcon} />
         <div className={styles.title}>{t(`${I18N_PATH}.title`)}</div>

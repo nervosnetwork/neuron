@@ -33,7 +33,10 @@ jest.mock('../../src/services/addresses', () => {
 
 jest.mock('fs', () => {
   return {
-    createWriteStream: () => null
+    createWriteStream: () => null,
+    readFileSync: () => JSON.stringify({}),
+    writeFileSync: () => jest.fn(),
+    existsSync: () => jest.fn()
   }
 })
 

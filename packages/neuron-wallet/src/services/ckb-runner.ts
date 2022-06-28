@@ -4,6 +4,7 @@ import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
 import process from 'process'
 import logger from 'utils/logger'
+import SettingsService from './settings'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -30,19 +31,15 @@ const ckbBinary = (): string => {
   return platform() === 'win' ? binary + '.exe' : binary
 }
 
-export const ckbDataPath = (): string => {
-  return path.resolve(app.getPath('userData'), 'chains/mainnet')
-}
-
 const initCkb = async () => {
   logger.info('CKB:\tInitializing node...')
   return new Promise<void>((resolve, reject) => {
-    if (fs.existsSync(path.join(ckbDataPath(), 'ckb.toml'))) {
+    if (fs.existsSync(path.join(SettingsService.getInstance().ckbDataPath, 'ckb.toml'))) {
       logger.log('CKB:\tinit: config file detected, skip ckb init.')
       return resolve()
     }
 
-    const initCmd = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', ckbDataPath()])
+    const initCmd = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', SettingsService.getInstance().ckbDataPath])
     initCmd.stderr.on('data', data => {
       logger.error('CKB:\tinit fail:', data.toString())
     })
@@ -71,7 +68,7 @@ export const startCkbNode = async () => {
   await initCkb()
 
   logger.info('CKB:\tstarting node...')
-  const options = ['run', '-C', ckbDataPath()]
+  const options = ['run', '-C', SettingsService.getInstance().ckbDataPath]
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
   }
@@ -130,6 +127,6 @@ export const stopCkbNode = () => {
  */
 export const clearCkbNodeCache = async () => {
   await stopCkbNode()
-  fs.rmSync(ckbDataPath(), { recursive: true, force: true })
+  fs.rmSync(SettingsService.getInstance().ckbDataPath, { recursive: true, force: true })
   await startCkbNode()
 }

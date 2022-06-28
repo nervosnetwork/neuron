@@ -3,6 +3,9 @@ import env from 'env'
 import Store from 'models/store'
 import { changeLanguage } from 'locales/i18n'
 import { updateApplicationMenu } from 'controllers/app/menu'
+import path from 'path'
+
+const { app } = env
 
 export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
 export type Locale = typeof locales[number]
@@ -31,8 +34,34 @@ export default class SettingsService extends Store {
     }
   }
 
+  get indexerDataPath() {
+    return this.readSync('indexerDataPath')
+  }
+
+  set indexerDataPath(dataPath: string) {
+    this.writeSync('indexerDataPath', dataPath)
+  }
+
+  get ckbDataPath() {
+    return this.readSync('ckbDataPath')
+  }
+
+  set ckbDataPath(dataPath: string) {
+    this.writeSync('ckbDataPath', dataPath)
+  }
+
   constructor() {
-    super('', 'settings.json', JSON.stringify({ locale: env.app.getLocale() }))
+    super(
+      '',
+      'settings.json',
+      JSON.stringify({
+        locale: app.getLocale(),
+        ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet')
+      })
+    )
+    if (!this.ckbDataPath) {
+      this.ckbDataPath = path.resolve(app.getPath('userData'), 'chains/mainnet')
+    }
   }
 
   private onLocaleChanged = (lng: Locale) => {

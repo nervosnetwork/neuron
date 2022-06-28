@@ -1,30 +1,36 @@
 @import '../../styles//mixin.scss';
 
 .clearCache {
-  &.detail {
-    grid-area: clear-cache-detail;
-    .date {
-      display: flex;
-      align-items: center;
-      font-size: 0.875rem;
-      height: 1.125rem;
-      margin-bottom: 5px;
+  font-weight: bold;
+  display: flex;
+
+  .tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding-left: 4px;
+
+    &::after {
+      display: none;
+      position: absolute;
+      left: -20px;
+      top: 120%;
+      content: attr(data-tooltip);
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: #cccccc99;
+      font-weight: 300;
+      width: 600px;
     }
-    .desc {
-      display: flex;
-      font-size: 0.6875rem;
-      color: #666;
-    }
-    svg {
-      height: 0.6875rem;
-      width: 0.6875rem;
-      filter: grayscale(1) opacity(0.6);
-      margin: 2px 5px 0 0;
+
+    &:hover::after {
+      display: block;
     }
   }
-  &.action {
-    grid-area: clear-cache-action;
-  }
+}
+
+.clearedDate {
+  font-size: 12px;
 }
 
 .dialog {

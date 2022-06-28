@@ -22,6 +22,14 @@ const resetMocks = () => {
   stubbedAssetAccountServiceDestoryAssetAccount.mockReset()
 }
 
+jest.mock('../../src/services/settings', () => {
+  return {
+    getInstance() {
+      return {}
+    }
+  }
+})
+
 describe('AssetAccountController', () => {
   let assetAccountController: any;
   let AssetAccountController: any;

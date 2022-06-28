@@ -18,6 +18,7 @@ export enum RoutePath {
   SettingsGeneral = '/settings/general',
   SettingsWallets = '/settings/wallets',
   SettingsNetworks = '/settings/networks',
+  SettingsData = '/settings/data',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   ImportKeystore = '/keystore/import',

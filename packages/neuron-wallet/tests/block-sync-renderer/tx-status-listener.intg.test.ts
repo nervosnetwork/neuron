@@ -39,7 +39,9 @@ jest.doMock('rxjs', () => {
     __esModule: true,
     interval: stubbedRxJsIntervalFn,
     ReplaySubject: jest.fn(),
-    Subject: jest.fn(),
+    Subject: jest.fn().mockReturnValue({
+      pipe: jest.fn().mockReturnValue({ subscribe: jest.fn() })
+    }),
     BehaviorSubject: jest.fn(),
   }
 });

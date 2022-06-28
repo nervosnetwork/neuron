@@ -20,5 +20,5 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
   const props = {
     ...initStates,
   }
-  return <GeneralSetting {...props} dispatch={() => {}} />
+  return <GeneralSetting {...props} />
 })

@@ -1,4 +1,12 @@
-import { OpenDialogOptions, MenuItemConstructorOptions, MenuItem, Size, OpenDialogReturnValue } from 'electron'
+import {
+  OpenDialogOptions,
+  MenuItemConstructorOptions,
+  MenuItem,
+  Size,
+  OpenDialogReturnValue,
+  MessageBoxOptions,
+  MessageBoxReturnValue,
+} from 'electron'
 import { LOCALES } from 'utils/const'
 import { remoteApi } from './remoteApiWrapper'
 
@@ -9,6 +17,12 @@ export const requestOpenInExplorer = remoteApi<Controller.RequestOpenInExplorerP
 export const handleViewError = remoteApi<string>('handle-view-error')
 export const showSettings = remoteApi<Controller.ShowSettingsParams>('show-settings')
 export const setLocale = remoteApi<typeof LOCALES[number]>('set-locale')
+export const getCkbNodeDataPath = remoteApi<undefined, string>('get-ckb-node-data-path')
+export const setCkbNodeDataPath = remoteApi<string, string>('set-ckb-node-data-path')
+export const getIndexerDataPath = remoteApi<undefined, string>('get-indexer-data-path')
+export const setIndexerDataPath = remoteApi<string, string>('set-indexer-data-path')
+export const stopProcessMonitor = remoteApi<'ckb' | 'ckb-indexer'>('stop-process-monitor')
+export const startProcessMonitor = remoteApi<'ckb' | 'ckb-indexer'>('start-process-monitor')
 
 export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
 
@@ -17,3 +31,4 @@ export const invokeShowOpenDialog = remoteApi<OpenDialogOptions, OpenDialogRetur
 export const invokeShowOpenDialogModal = remoteApi<OpenDialogOptions, OpenDialogReturnValue>('show-open-dialog-modal')
 export const invokeOpenContextMenu = remoteApi<Array<MenuItemConstructorOptions | MenuItem>>('open-context-menu')
 export const invokeGetAllDisplaysSize = remoteApi<void, Size[]>('get-all-displays-size')
+export const invokeShowMessageBox = remoteApi<MessageBoxOptions, MessageBoxReturnValue>('show-message-box')

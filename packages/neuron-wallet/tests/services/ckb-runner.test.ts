@@ -55,6 +55,13 @@ jest.doMock('utils/logger', () => {
 jest.doMock('process', () => {
   return stubbedProcess
 })
+jest.mock('../../src/services/settings', () => ({
+  getInstance() {
+    return {
+      ckbDataPath: '/chains/mainnet'
+    }
+  }
+}))
 const { startCkbNode, stopCkbNode, getLookingValidTargetStatus } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
