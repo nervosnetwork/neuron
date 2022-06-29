@@ -23,7 +23,7 @@
     "start:dev": "yarn run build && electron .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
     "clean": "rimraf dist/*",
-    "test": "jest --runInBand --collect-coverage --forceExit packages/neuron-wallet/tests/services/setting.test.ts",
+    "test": "jest --runInBand --collect-coverage --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
