@@ -55,7 +55,8 @@
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name",
-      "select-model": "Select Model"
+      "select-model": "Select Model",
+      "other-device": "Other"
     },
     "hardware-sign": {
       "cancel": "Cancel",

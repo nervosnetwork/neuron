@@ -50,7 +50,8 @@
       "app-version": "檢測到 CKB 應用版本 v{{version}}。",
       "firmware-version": "檢測到固件版本 v{{version}}。",
       "wallet-name": "錢包名稱",
-      "select-model": "選擇型號"
+      "select-model": "選擇型號",
+      "other-device": "其他型號"
     },
     "hardware-sign": {
       "cancel": "取消",

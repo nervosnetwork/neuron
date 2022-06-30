@@ -44,7 +44,7 @@ const Info = (
   )
 }
 
-const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType>; model: Model }) => {
+const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType>; model: Model | null }) => {
   const [t] = useTranslation()
   const onBack = useCallback(() => {
     dispatch({ step: ImportStep.ImportHardware })
@@ -65,6 +65,14 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
         if (rest.length > 0) {
           setScaning(false)
           throw new MultiDeviceException()
+        }
+        if (!model) {
+          dispatch({
+            model: {
+              manufacturer: device.manufacturer,
+              product: device.product,
+            },
+          })
         }
         const conectionRes = await connectDevice(device)
         if (!isSuccessResponse(conectionRes)) {
@@ -101,7 +109,7 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
 
   const errorMsg = error.startsWith('messages.codes.') ? t(error) : error
   const ready = error === '' && appVersion !== ''
-  const productName = `${model.manufacturer} ${model.product}`
+  const productName = model ? `${model.manufacturer} ${model.product}` : ''
 
   return (
     <form onSubmit={onNext} className={styles.container}>

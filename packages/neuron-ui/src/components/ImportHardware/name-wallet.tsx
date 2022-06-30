@@ -44,6 +44,7 @@ const NameWallet = ({
 
   const onInput = useCallback(e => {
     setWalletName(e.target.value)
+    setErrorMsg('')
   }, [])
 
   return (
