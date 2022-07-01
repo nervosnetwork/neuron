@@ -55,10 +55,12 @@ jest.doMock('utils/logger', () => {
 jest.doMock('process', () => {
   return stubbedProcess
 })
+
+const ckbDataPath = '/chains/mainnet'
 jest.mock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      ckbDataPath: '/chains/mainnet'
+      ckbDataPath
     }
   }
 }))
@@ -94,13 +96,13 @@ describe('ckb runner', () => {
             '--chain',
             'mainnet',
             '-C',
-            expect.stringContaining(path.join('chains', 'mainnet'))
+            ckbDataPath
           ])
         })
         it('runs ckb binary', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join(platformPath, 'ckb')),
-            ['run', '-C', expect.stringContaining(path.join('chains', 'mainnet'))],
+            ['run', '-C', ckbDataPath],
             { stdio: ['ignore', 'pipe', 'pipe'] }
           )
         })
@@ -123,13 +125,13 @@ describe('ckb runner', () => {
               '--chain',
               'mainnet',
               '-C',
-              expect.stringContaining(path.join('chains', 'mainnet'))
+              ckbDataPath
             ])
           })
           it('runs ckb binary', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
               expect.stringContaining(path.join(platformPath, 'ckb')),
-              ['run', '-C', expect.stringContaining(path.join('chains', 'mainnet'))],
+              ['run', '-C', ckbDataPath],
               { stdio: ['ignore', 'pipe', 'pipe'] }
             )
           })
