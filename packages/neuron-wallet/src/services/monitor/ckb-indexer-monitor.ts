@@ -20,5 +20,9 @@ export default class CkbIndexerMonitor extends BaseMonitor {
     await resetSyncTask()
   }
 
+  async stop(): Promise<void> {
+    await resetSyncTask(false)
+  }
+
   name: string = 'ckb-indexer'
 }

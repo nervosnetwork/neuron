@@ -1,11 +1,9 @@
 import React, { useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ProgressIndicator } from 'office-ui-fabric-react'
-import ClearCache from 'components/ClearCache'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import Dropdown from 'widgets/Dropdown'
-import { StateDispatch } from 'states'
 import { checkForUpdates, downloadUpdate, installUpdate, setLocale, getVersion } from 'services/remote'
 import { CONSTANTS } from 'utils'
 
@@ -72,10 +70,9 @@ const UpdateDownloadStatus = ({ progress = 0, newVersion = '', releaseNotes = ''
 
 interface GeneralSettingProps {
   updater: State.AppUpdater
-  dispatch: StateDispatch
 }
 
-const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
+const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [t, i18n] = useTranslation()
   const [lng, setLng] = useState(i18n.language)
 
@@ -127,7 +124,6 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
           </div>
         </>
       )}
-      <ClearCache dispatch={dispatch} />
       <div className={`${styles.language} ${styles.label}`}>{t('settings.general.language')}</div>
       <div className={`${styles.language} ${styles.select}`}>
         <Dropdown

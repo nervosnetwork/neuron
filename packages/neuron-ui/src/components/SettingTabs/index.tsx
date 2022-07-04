@@ -8,6 +8,7 @@ import { useState as useGloablState, useDispatch } from 'states'
 import GeneralSetting from 'components/GeneralSetting'
 import WalletSetting from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
+import DataSetting from 'components/DataSetting'
 
 import { getPlatform } from 'services/remote'
 import { RoutePath } from 'utils'
@@ -18,12 +19,14 @@ const pivotItems = [
   { label: 'settings.setting-tabs.general', url: RoutePath.SettingsGeneral },
   { label: 'settings.setting-tabs.wallets', url: RoutePath.SettingsWallets },
   { label: 'settings.setting-tabs.network', url: RoutePath.SettingsNetworks },
+  { label: 'settings.setting-tabs.data', url: RoutePath.SettingsData },
 ]
 
 const settingPanels: CustomRouter.Route[] = [
   { name: `GeneralSetting`, path: RoutePath.SettingsGeneral, exact: false, component: GeneralSetting },
   { name: `WalletsSetting`, path: RoutePath.SettingsWallets, exact: false, component: WalletSetting },
   { name: `NetworkSetting`, path: RoutePath.SettingsNetworks, exact: true, component: NetworkSetting },
+  { name: `DataSetting`, path: RoutePath.SettingsData, exact: true, component: DataSetting },
 ]
 
 const SettingsTabs = () => {

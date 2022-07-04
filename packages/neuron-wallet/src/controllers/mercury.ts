@@ -1,14 +1,14 @@
-import { ckbDataPath } from 'services/ckb-runner'
 import path from 'path'
 import fs from 'fs'
 import env from 'env'
 import { dialog } from 'electron'
 import { t } from 'i18next'
+import SettingsService from 'services/settings'
 
 const { app } = env
 
 export const migrate = async () => {
-  const ckbPath = ckbDataPath()
+  const ckbPath = SettingsService.getInstance().ckbDataPath
 
   const lumosDataPath = path.resolve(app.getPath('userData'), app.isPackaged ? '' : 'dev', 'indexer_data')
   const ckbIndexerDataPath = path.resolve(app.getPath('userData'), app.isPackaged ? '' : 'dev', 'ckb-indexer')

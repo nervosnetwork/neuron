@@ -12,6 +12,7 @@ import NetworksService from './networks'
 import CommonUtils from 'utils/common'
 import { resetSyncTask } from 'block-sync-renderer'
 import { clean as cleanChain } from 'database/chain'
+import SettingsService from './settings'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -186,6 +187,11 @@ export default class IndexerService {
 
 
   #getDataPath = (network: Network): string => {
-    return path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data', `${network.genesisHash}`)
+    let indexerDataPath = SettingsService.getInstance().indexerDataPath
+    if (!indexerDataPath) {
+      indexerDataPath = path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data', `${network.genesisHash}`)
+      SettingsService.getInstance().indexerDataPath = indexerDataPath
+    }
+    return indexerDataPath
   }
 }

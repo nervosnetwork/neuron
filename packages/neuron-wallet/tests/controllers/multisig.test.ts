@@ -63,7 +63,7 @@ const isMainnetMock = jest.fn().mockReturnValue(false)
 
 jest.mock('../../src/services/networks', () => ({
   getInstance: () => ({
-    isMainnet: isMainnetMock
+    isMainnet: () => isMainnetMock()
   })
 }))
 
