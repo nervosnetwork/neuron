@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
@@ -6,6 +6,8 @@ import { useDispatch } from 'states'
 import { getCkbNodeDataPath, getIndexerDataPath, setCkbNodeDataPath, setIndexerDataPath } from 'services/remote'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import CopyZone from 'widgets/CopyZone'
+import { OpenFolder } from 'widgets/Icons/icon'
+import { shell } from 'electron'
 import { useDataPath } from './hooks'
 
 import styles from './index.module.scss'
@@ -44,12 +46,20 @@ const SetItem = ({ type }: { type: keyof typeof itemProps }) => {
     props.setPath,
     props.type
   )
+  const openPath = useCallback(() => {
+    if (prevPath) {
+      shell.openPath(prevPath!)
+    }
+  }, [prevPath])
   return (
     <>
       <div className={styles.name}>{t(`settings.data.${props.titleI18nKey}`)}:</div>
-      <CopyZone content={prevPath || ''} className={styles.content}>
-        {prevPath}
-      </CopyZone>
+      <div className={styles.path}>
+        <CopyZone content={prevPath || ''} className={styles.content}>
+          {prevPath}
+        </CopyZone>
+        <OpenFolder onClick={openPath} />
+      </div>
       <Button label={t('settings.data.set')} onClick={onSetting} />
       <dialog ref={dialogRef} className={styles.dialog}>
         <div className={styles.describe}>{t(`settings.data.${props.tipI18nKey}`, { prevPath, currentPath })}</div>
