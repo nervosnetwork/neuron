@@ -1,8 +1,8 @@
 import { In, MigrationInterface, QueryRunner } from "typeorm";
 import HdPublicKeyInfo from "../entities/hd-public-key-info";
 
-export class RemoveDuplicateBlake160s1651133703535 implements MigrationInterface {
-  name = 'RemoveDuplicateBlake160s1651133703535'
+export class RemoveDuplicateBlake160s1656930265386 implements MigrationInterface {
+  name = 'RemoveDuplicateBlake160s1656930265386'
 
   public async up(queryRunner: QueryRunner): Promise<any> {
     const duplicateList = await queryRunner.connection

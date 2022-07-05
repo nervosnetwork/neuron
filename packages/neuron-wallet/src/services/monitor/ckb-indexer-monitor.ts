@@ -1,4 +1,4 @@
-import { resetSyncTask } from 'block-sync-renderer/index'
+import { resetSyncTaskQueue } from 'block-sync-renderer/index'
 import IndexerService from 'services/indexer'
 import { rpcRequest } from 'utils/rpc-request'
 import BaseMonitor from './base'
@@ -17,11 +17,11 @@ export default class CkbIndexerMonitor extends BaseMonitor {
   }
 
   async restart(): Promise<void> {
-    await resetSyncTask()
+    await resetSyncTaskQueue.asyncPush(true)
   }
 
   async stop(): Promise<void> {
-    await resetSyncTask(false)
+    await resetSyncTaskQueue.asyncPush(false)
   }
 
   name: string = 'ckb-indexer'

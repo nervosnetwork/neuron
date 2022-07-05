@@ -41,9 +41,11 @@ jest.mock('../../src/utils/rpc-request', () => ({
   rpcRequest: () => rpcRequestMock()
 }))
 
-const resetSyncTaskMock = jest.fn()
+const asyncPushMock = jest.fn()
 jest.mock('../../src/block-sync-renderer/index', () => ({
-  resetSyncTask: (v: boolean) => resetSyncTaskMock(v)
+  resetSyncTaskQueue: {
+    asyncPush: (v: boolean) => asyncPushMock(v)
+  }
 }))
 
 describe('ckb indexer monitor', () => {
@@ -66,11 +68,11 @@ describe('ckb indexer monitor', () => {
   })
   it('restart', async () => {
     await monitor.restart()
-    expect(resetSyncTaskMock).toHaveBeenCalled()
+    expect(asyncPushMock).toHaveBeenCalledWith(true)
   })
   it('stop', async () => {
     await monitor.stop()
-    expect(resetSyncTaskMock).toHaveBeenCalledWith(false)
+    expect(asyncPushMock).toHaveBeenCalledWith(false)
   })
 })
 
@@ -162,7 +164,7 @@ describe('monitor index', () => {
   beforeEach(() => {
     rpcRequestMock.mockReset()
     stopCkbNodeMock.mockReset()
-    resetSyncTaskMock.mockReset()
+    asyncPushMock.mockReset()
   })
   it('start ckb monitor', () => {
     startMonitor('ckb', true)
@@ -180,7 +182,7 @@ describe('monitor index', () => {
     expect(rpcRequestMock).toHaveBeenCalled()
     stopMonitor()
     expect(stopCkbNodeMock).toHaveBeenCalled()
-    expect(resetSyncTaskMock).toHaveBeenCalledWith(false)
+    expect(asyncPushMock).toHaveBeenCalledWith(false)
   })
   it('stop-ckb-monitor', () => {
     stopMonitor('ckb')
@@ -188,6 +190,6 @@ describe('monitor index', () => {
   })
   it('stop-ckb-indexer-monitor', () => {
     stopMonitor('ckb-indexer')
-    expect(resetSyncTaskMock).toHaveBeenCalledWith(false)
+    expect(asyncPushMock).toHaveBeenCalledWith(false)
   })
 })
