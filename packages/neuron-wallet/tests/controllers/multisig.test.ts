@@ -2,6 +2,7 @@ import { ResponseCode } from '../../src/utils/const'
 import MultisigService from '../../src/services/multisig'
 import MultisigController from '../../src/controllers/multisig'
 import CellsService from '../../src/services/cells'
+import { scriptToAddress, systemScripts } from '@nervosnetwork/ckb-sdk-utils'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -21,26 +22,10 @@ jest.mock('electron', () => ({
 jest.mock('../../src/services/multisig')
 const MultiSigServiceMock = MultisigService as jest.MockedClass<typeof MultisigService>
 
-let fileContent: {
-  r?: number
-  m?: number
-  n?: number
-  blake160s?: string[]
-} | {
-  r?: number
-  m?: number
-  n?: number
-  blake160s?: string[]
-}[] = [{
-  r: 1,
-  m: 2,
-  n: 3,
-  blake160s: ['0xcdef55dcb787257236bbe8d8c338951b4290ca69', '0x3403fcbbd9e20fa31e722eb9981b2203ad475904']
-}]
-
+const readFileSyncMock = jest.fn()
 jest.mock('fs', () => {
   return {
-    readFileSync: () => JSON.stringify(fileContent),
+    readFileSync: () => readFileSyncMock(),
     writeFileSync: () => jest.fn(),
     existsSync: () => jest.fn()
   }
@@ -72,31 +57,39 @@ jest.mock('../../src/services/offline-sign', () => ({
   loadTransactionJSON: () => loadTransactionJSONMock()
 }))
 
+const multisigArgs = '0x40518821915b81de0614d8c45dbef77151a22ad1'
+const multisigBlake160s = [
+  '0xcdef55dcb787257236bbe8d8c338951b4290ca69',
+  '0x3403fcbbd9e20fa31e722eb9981b2203ad475904',
+  '0xc75e25d1a08c03617fd7211607a0a7479ad2ec31'
+]
 const multisigConfig = {
   testnet: {
     params: {
-      r: 1,
-      m: 2,
-      n: 3,
-      blake160s: [
-        '0xcdef55dcb787257236bbe8d8c338951b4290ca69',
-        '0x3403fcbbd9e20fa31e722eb9981b2203ad475904',
-        '0xc75e25d1a08c03617fd7211607a0a7479ad2ec31'
-      ],
+      multisig_configs: {
+        sighash_addresses: multisigBlake160s.map(args => scriptToAddress({
+          args,
+          codeHash: systemScripts.SECP256K1_BLAKE160.codeHash,
+          hashType: systemScripts.SECP256K1_BLAKE160.hashType
+        }, false)),
+        require_first_n: 1,
+        threshold: 2
+      },
       isMainnet: false
     },
     result: 'ckt1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2q2xyzry2ms80qv9xcc3wmaam32x3z45gut5d40'
   },
   mainnet: {
     params: {
-      r: 1,
-      m: 2,
-      n: 3,
-      blake160s: [
-        '0xcdef55dcb787257236bbe8d8c338951b4290ca69',
-        '0x3403fcbbd9e20fa31e722eb9981b2203ad475904',
-        '0xc75e25d1a08c03617fd7211607a0a7479ad2ec31'
-      ],
+      multisig_configs: {
+        sighash_addresses: multisigBlake160s.map(args => scriptToAddress({
+          args,
+          codeHash: systemScripts.SECP256K1_BLAKE160.codeHash,
+          hashType: systemScripts.SECP256K1_BLAKE160.hashType
+        }, true)),
+        require_first_n: 1,
+        threshold: 2
+      },
       isMainnet: true
     },
     result: 'ckb1qpw9q60tppt7l3j7r09qcp7lxnp3vcanvgha8pmvsa3jplykxn32sq2q2xyzry2ms80qv9xcc3wmaam32x3z45gjelzlh'
@@ -153,77 +146,103 @@ describe('test for multisig controller', () => {
   })
 
   describe('import config', () => {
+    beforeEach(() => {
+      readFileSyncMock.mockReset()
+    })
     it('cancel import', async () => {
       dialogRes = { canceled: true, filePaths: [], filePath: './' }
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
     })
+    it('no multisig_configs', async () => {
+      readFileSyncMock.mockReturnValue(JSON.stringify({}))
+      await multisigController.importConfig('1234')
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    }),
+    it('multisig_configs is empty', async () => {
+      readFileSyncMock.mockReturnValue(JSON.stringify({ multisig_configs: {} }))
+      await multisigController.importConfig('1234')
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    }),
     it('import data is error', async () => {
-      fileContent = [{
-        ...multisigConfig.testnet.params,
-        r: undefined
-      }]
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            require_first_n: undefined
+          }
+        }
+      }))
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
       expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation r > n', async () => {
-      fileContent = [{
-        ...multisigConfig.testnet.params,
-        r: 4
-      }]
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            require_first_n: 4
+          }
+        }
+      }))
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
       expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation m > n', async () => {
-      fileContent = [{
-        ...multisigConfig.testnet.params,
-        m: 4
-      }]
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            threshold: 4
+          }
+        }
+      }))
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
       expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation blake160s empty', async () => {
-      fileContent = [{
-        ...multisigConfig.testnet.params,
-        blake160s: []
-      }]
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            sighash_addresses: []
+          }
+        }
+      }))
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
       expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation blake160 length not 42', async () => {
-      fileContent = [{
-        ...multisigConfig.testnet.params,
-        blake160s: ['0xcdef55dcb787257236bbe8d8c338951b4290ca6911']
-      }]
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            sighash_addresses: [multisigConfig.testnet.params.multisig_configs.sighash_addresses[0]]
+          }
+        }
+      }))
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
       expect(showErrorBoxMock).toHaveBeenCalledWith()
     })
     it('import object success', async () => {
-      fileContent = multisigConfig.testnet.params
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: multisigConfig.testnet.params.multisig_configs
+        }
+      }))
       MultiSigServiceMock.prototype.saveMultisigConfig.mockResolvedValueOnce({
-        ...multisigConfig.testnet.params,
+        blake160s: multisigBlake160s,
         id: 1,
         walletId: '1234',
         alias: ''
       } as any)
       const res = await multisigController.importConfig('1234')
-      expect(res?.result[0].blake160s).toBe(multisigConfig.testnet.params.blake160s)
-    })
-    it('import success', async () => {
-      fileContent = multisigConfig.testnet.params
-      MultiSigServiceMock.prototype.saveMultisigConfig.mockResolvedValueOnce({
-        ...multisigConfig.testnet.params,
-        id: 1,
-        walletId: '1234',
-        alias: '',
-      } as any)
-      const res = await multisigController.importConfig('1234')
-      expect(res?.result[0].blake160s).toBe(multisigConfig.testnet.params.blake160s)
+      expect(res?.result[0].blake160s).toBe(multisigBlake160s)
     })
   })
 

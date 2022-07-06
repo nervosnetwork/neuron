@@ -2,15 +2,26 @@ import fs from 'fs'
 import path from 'path'
 import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
-import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { ResponseCode } from 'utils/const'
 import MultisigConfig from 'database/chain/entities/multisig-config'
 import MultisigConfigModel from 'models/multisig-config'
 import MultisigService from 'services/multisig'
 import CellsService from 'services/cells'
 import OfflineSignService from 'services/offline-sign'
+import Multisig from 'models/multisig'
+import SystemScriptInfo from 'models/system-script-info'
+import NetworksService from 'services/networks'
 
-const SPEC256_BLAKE160_LEN = 42
+interface MultisigConfigOutput {
+  multisig_configs: Record<string, {
+    sighash_addresses: string[],
+    require_first_n: number,
+    threshold: number
+    alias?: string
+  }>
+}
+
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
   #multisigService: MultisigService;
@@ -25,7 +36,7 @@ export default class MultisigController {
     m: number
     n: number
     blake160s: string[]
-    alias: string
+    alias?: string
   }) {
     const multiSignConfig = MultisigConfig.fromModel(new MultisigConfigModel(
       params.walletId,
@@ -104,27 +115,28 @@ export default class MultisigController {
     }
     try {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
-      let configs: Array<{r: number, m: number, n: number, blake160s: string[], alias: string}> = JSON.parse(json)
-      if (!Array.isArray(configs)) {
-        configs = [configs]
-      }
+      let configOutput: MultisigConfigOutput = JSON.parse(json)
       if (
-        configs.some(config => config.r === undefined
-          || config.m === undefined
-          || config.n === undefined
-          || config.blake160s === undefined
-          || config.r > config.n
-          || config.m > config.n
-          || !config.blake160s.length
-          || config.blake160s.some(v => v.length !== SPEC256_BLAKE160_LEN)
+        !configOutput.multisig_configs ||
+        !Object.values(configOutput.multisig_configs).length ||
+        Object.values(configOutput.multisig_configs).some(config => config.require_first_n === undefined
+          || config.threshold === undefined
+          || config.sighash_addresses === undefined
+          || !config.sighash_addresses?.length
+          || config.sighash_addresses?.length < +config.require_first_n
+          || config.sighash_addresses?.length < +config.threshold
         )
       ) {
         dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
         return
       }
-      const saveConfigs = configs.map(config => ({
-        ...config,
+      const saveConfigs = Object.values(configOutput.multisig_configs).map(config => ({
+        r: config.require_first_n,
+        m: config.threshold,
+        n: config.sighash_addresses.length,
+        blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
         walletId,
+        alias: config.alias
       }))
       const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
       const saveSuccessConfigs: MultisigConfig[] = []
@@ -169,8 +181,19 @@ export default class MultisigController {
     if (canceled || !filePath) {
       return
     }
+    const isMainnet = NetworksService.getInstance().isMainnet()
+    const output: MultisigConfigOutput = { multisig_configs: {} }
+    configs.forEach(v => {
+      output.multisig_configs[Multisig.hash(v.blake160s, v.r, v.m, v.n)] = {
+        sighash_addresses: v.blake160s.map(args => scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)),
+        require_first_n: v.r,
+        threshold: v.m,
+        alias: v.alias
+      }
+    })
 
-    fs.writeFileSync(filePath, JSON.stringify(configs))
+
+    fs.writeFileSync(filePath, JSON.stringify(output, undefined, 2))
 
     dialog.showMessageBox({
       type: 'info',
