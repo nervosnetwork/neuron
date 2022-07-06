@@ -98,7 +98,6 @@ const Receive = () => {
       {displayVerifyDialog && (
         <VerifyHardwareAddress
           address={accountAddress}
-          shortAddress={isInShortFormat ? accountAddress : toShortAddr(accountAddress)}
           wallet={wallet}
           onDismiss={() => {
             setDisplayVerifyDialog(false)

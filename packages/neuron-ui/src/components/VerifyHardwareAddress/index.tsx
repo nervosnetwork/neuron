@@ -18,17 +18,37 @@ import { ErrorCode, errorFormatter, isSuccessResponse, useDidMount } from 'utils
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
 import CopyZone from 'widgets/CopyZone'
 import { ADDRESS_LENGTH } from 'utils/const'
+import { AddressPrefix, addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import styles from './verifyHardwareAddress.module.scss'
 import VerifyError from './verify-error'
 
 export interface VerifyHardwareAddressProps {
   address: string
-  shortAddress: string
   wallet: State.WalletIdentity
   onDismiss: () => void
 }
 
-const VerifyHardwareAddress = ({ shortAddress, address, wallet, onDismiss }: VerifyHardwareAddressProps) => {
+const toLongAddr = (addr: string) => {
+  try {
+    const script = addressToScript(addr)
+    const isMainnet = addr.startsWith(AddressPrefix.Mainnet)
+    return scriptToAddress(script, isMainnet)
+  } catch {
+    return ''
+  }
+}
+
+const verifyAddressEqual = (address: string, compared?: string) => {
+  if (!compared) {
+    return false
+  }
+  if (address.length !== compared.length) {
+    return toLongAddr(address) === toLongAddr(compared)
+  }
+  return address === compared
+}
+
+const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAddressProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   // const dispatch = useDispatch()
@@ -141,7 +161,7 @@ const VerifyHardwareAddress = ({ shortAddress, address, wallet, onDismiss }: Ver
     const res = await getDevicePublicKey()
     if (isSuccessResponse(res)) {
       const { result } = res
-      if (result?.address === address || result?.address === shortAddress) {
+      if (verifyAddressEqual(address, result?.address)) {
         setStatus(verifiedStatus)
       } else {
         setStatus(invalidStatus)
@@ -182,7 +202,7 @@ const VerifyHardwareAddress = ({ shortAddress, address, wallet, onDismiss }: Ver
                 >
                   {address.length > ADDRESS_LENGTH ? (
                     <>
-                      <span className={styles.addressOverflow}>{address.slice(0, -20)}</span>
+                      <span className={styles.addressOverflow}>{address.slice(0, -21)}</span>
                       <span>...</span>
                       <span>{address.slice(-20)}</span>
                     </>
