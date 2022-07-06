@@ -17,16 +17,18 @@ import {
 import { ErrorCode, errorFormatter, isSuccessResponse, useDidMount } from 'utils'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
 import CopyZone from 'widgets/CopyZone'
+import { ADDRESS_LENGTH } from 'utils/const'
 import styles from './verifyHardwareAddress.module.scss'
 import VerifyError from './verify-error'
 
 export interface VerifyHardwareAddressProps {
   address: string
+  shortAddress: string
   wallet: State.WalletIdentity
   onDismiss: () => void
 }
 
-const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAddressProps) => {
+const VerifyHardwareAddress = ({ shortAddress, address, wallet, onDismiss }: VerifyHardwareAddressProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   // const dispatch = useDispatch()
@@ -139,7 +141,7 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
     const res = await getDevicePublicKey()
     if (isSuccessResponse(res)) {
       const { result } = res
-      if (result?.address === address) {
+      if (result?.address === address || result?.address === shortAddress) {
         setStatus(verifiedStatus)
       } else {
         setStatus(invalidStatus)
@@ -176,9 +178,17 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
                 <CopyZone
                   content={address}
                   name={t('hardware-verify-address.actions.copy-address')}
-                  style={{ lineHeight: '1.625rem' }}
+                  style={{ lineHeight: '1.625rem', width: '400px', display: 'flex' }}
                 >
-                  {address}
+                  {address.length > ADDRESS_LENGTH ? (
+                    <>
+                      <span className={styles.addressOverflow}>{address.slice(0, -20)}</span>
+                      <span>...</span>
+                      <span>{address.slice(-20)}</span>
+                    </>
+                  ) : (
+                    address
+                  )}
                 </CopyZone>
               </td>
             </tr>
