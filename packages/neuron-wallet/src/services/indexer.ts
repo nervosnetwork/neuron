@@ -168,10 +168,12 @@ export default class IndexerService {
     }
 
 
-    // REFACTOR: use message to return the promise
-    while (!(await IndexerService.isPortReachable(+IndexerService.PORT))) {
-      await CommonUtils.sleep(1000)
-    }
+    await CommonUtils.retry(5, 1000, async () => {
+      const portReachable = await IndexerService.isPortReachable(+IndexerService.PORT)
+      if (!portReachable) {
+        throw new Error('Port is not reachable')
+      }
+    })
   }
 
   clearData = () => {
