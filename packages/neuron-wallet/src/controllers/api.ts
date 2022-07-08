@@ -464,7 +464,8 @@ export default class ApiController {
 
     handle('set-ckb-node-data-path', (_, dataPath: string) => {
       SettingsService.getInstance().ckbDataPath = dataPath
-      startMonitor('ckb', true)
+      stopMonitor('ckb-indexer')
+      startMonitor(undefined, true)
       return {
         status: ResponseCode.Success,
         result: SettingsService.getInstance().ckbDataPath
@@ -483,7 +484,7 @@ export default class ApiController {
       startMonitor('ckb-indexer', true)
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath
+        result: SettingsService.getInstance().indexerDataPath
       }
     })
 

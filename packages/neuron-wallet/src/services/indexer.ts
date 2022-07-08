@@ -191,9 +191,9 @@ export default class IndexerService {
   #getDataPath = (network: Network): string => {
     let indexerDataPath = SettingsService.getInstance().indexerDataPath
     if (!indexerDataPath) {
-      indexerDataPath = path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data', `${network.genesisHash}`)
+      indexerDataPath = path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data')
       SettingsService.getInstance().indexerDataPath = indexerDataPath
     }
-    return indexerDataPath
+    return path.resolve(indexerDataPath, `${network.genesisHash}`)
   }
 }
