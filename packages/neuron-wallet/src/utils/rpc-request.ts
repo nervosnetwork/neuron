@@ -1,14 +1,41 @@
 import axios from 'axios'
 
+export const rpcRequest = async (
+  url: string,
+  options: {
+    method: string
+    params?: any
+  }
+): Promise<any[]> => {
+  const res = await axios.post<{ id: number; error?: any; result: any }[]>(
+    url,
+    {
+      id: 0,
+      jsonrpc: '2.0',
+      method: options.method,
+      params: options.params
+    },
+    {
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
+  )
+  if (res.status !== 200) {
+    throw new Error(`indexer request failed with HTTP code ${res.status}`)
+  }
+  return res.data
+}
+
 export const rpcBatchRequest = async (
-  ckbIndexerUrl: string,
+  url: string,
   options: {
     method: string
     params?: any
   }[]
 ): Promise<any[]> => {
   const res = await axios.post<{ id: number; error?: any; result: any }[]>(
-    ckbIndexerUrl,
+    url,
     options.map((v, idx) => ({
       id: idx,
       jsonrpc: '2.0',
@@ -28,5 +55,6 @@ export const rpcBatchRequest = async (
 }
 
 export default {
-  rpcBatchRequest
+  rpcBatchRequest,
+  rpcRequest
 }

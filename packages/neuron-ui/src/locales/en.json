@@ -55,7 +55,8 @@
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name",
-      "select-model": "Select Model"
+      "select-model": "Select Model",
+      "other-device": "Other"
     },
     "hardware-sign": {
       "cancel": "Cancel",
@@ -312,17 +313,14 @@
       "setting-tabs": {
         "general": "General",
         "wallets": "Wallets",
-        "network": "Network"
+        "network": "Network",
+        "data": "Data"
       },
       "general": {
-        "clear-cache": "Clear Cache",
-        "clearing-cache": "Clearing...",
-        "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
         "hide": "Hide",
         "version": "Version",
         "language": "Language",
-        "cache-cleared-on": "Cache cleared on {{date}}",
         "apply": "Apply"
       },
       "wallet-manager": {
@@ -372,6 +370,22 @@
           "cancel": "Cancel",
           "ok": "OK"
         }
+      },
+      "data": {
+        "ckb-node-data": "CKB Node Data",
+        "ckb-indexer-data": "CKB Indexer Data",
+        "set": "Set",
+        "cache": "Cache",
+        "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
+        "cache-cleared-on": "Cache cleared on {{date}}",
+        "clear-cache": "Clear Cache",
+        "clearing-cache": "Clearing...",
+        "remove-ckb-data-tip": "Please move CKB Node Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
+        "remove-indexer-data-tip": "Please move Indexer Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
+        "resync-describe": "Attention: Synchronize from scratch won't remove previously downloaded CKB Node(or Indexer) Data.",
+        "cancel": "Cancel",
+        "move-data-finish": "Data have been moved",
+        "re-sync": "Synchronize from scratch"
       }
     },
     "password-request": {

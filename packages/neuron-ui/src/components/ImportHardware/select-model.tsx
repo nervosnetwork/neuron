@@ -1,13 +1,22 @@
-import React, { useCallback, useState } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import Select from 'widgets/Select'
+import Select, { SelectOptions } from 'widgets/Select'
 import { Text } from 'office-ui-fabric-react'
+import { useHistory } from 'react-router-dom'
+import { useGoBack } from 'utils'
 import styles from './findDevice.module.scss'
-import { LocationState, Model, RoutePath } from './common'
+import { ActionType, Model, ImportStep } from './common'
 
 const supportedHardwareModels = [
+  {
+    label: 'Ledger Nano S Plus',
+    value: 'Ledger Nano S Plus',
+    data: {
+      manufacturer: 'Ledger',
+      product: 'Nano S Plus',
+    },
+  },
   {
     label: 'Ledger Nano S',
     value: 'Ledger Nano S',
@@ -24,39 +33,46 @@ const supportedHardwareModels = [
       product: 'Nano X',
     },
   },
+  {
+    labelI18n: 'import-hardware.other-device',
+    value: 'Other Device',
+    data: null,
+  },
 ]
 
-const SelectModel = ({ match, history }: RouteComponentProps<{}, {}, LocationState>) => {
+const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => {
   const [t] = useTranslation()
   const [model, setModel] = useState<Model>()
-
-  const onBack = useCallback(() => {
-    history.push(match.url.replace(RoutePath.ImportHardware, ''))
-  }, [history, match.url])
-
+  const history = useHistory()
+  const onBack = useGoBack(history)
   const onNext = useCallback(() => {
-    history.push({
-      pathname: match.url + RoutePath.DetectDevice,
-      state: {
-        model: model!,
-        entryPath: match.url,
-      },
+    dispatch({
+      model,
+      step: ImportStep.DetectDevice,
     })
-  }, [history, match.url, model])
+  }, [dispatch, model])
 
   const onDropDownChange = useCallback(({ data }) => {
     setModel(data)
   }, [])
+  const options = useMemo(
+    () =>
+      supportedHardwareModels.map(v =>
+        v.labelI18n
+          ? {
+              ...v,
+              label: t(v.labelI18n),
+            }
+          : v
+      ) as SelectOptions[],
+    []
+  )
 
   return (
     <form onSubmit={onNext} className={styles.container}>
       <header className={styles.title}>{t('import-hardware.title.select-model')}</header>
       <section className={styles.main}>
-        <Select
-          onChange={onDropDownChange}
-          placeholder={t('import-hardware.select-model')}
-          options={supportedHardwareModels}
-        />
+        <Select onChange={onDropDownChange} placeholder={t('import-hardware.select-model')} options={options} />
         <Text variant="tiny">{t('messages.experimental-message-hardware')}</Text>
       </section>
       <footer className={styles.footer}>

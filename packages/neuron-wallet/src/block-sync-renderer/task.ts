@@ -12,7 +12,7 @@ let syncQueue: SyncQueue | null
 export interface WorkerMessage<T = any> {
   type: 'call' | 'response' | 'kill',
   id?: number,
-  channel: 'start' | 'queryIndexer' | 'unmount' | 'cache-tip-block-updated' | 'tx-db-changed' | 'wallet-deleted' | 'address-created' | 'indexer-error'
+  channel: 'start' | 'queryIndexer' | 'unmount' | 'cache-tip-block-updated' | 'tx-db-changed' | 'wallet-deleted' | 'address-created' | 'indexer-error' | 'check-and-save-wallet-address'
   message: T
 }
 
@@ -61,7 +61,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
     }
 
     case 'unmount': {
-      if (!syncQueue) { return }
+      if (!syncQueue) { process.exit(0); return }
       logger.debug("Sync:\tstopping")
       await syncQueue.stopAndWait()
       syncQueue = null

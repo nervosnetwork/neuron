@@ -10,8 +10,9 @@ import { Network } from 'models/network'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from './networks'
 import CommonUtils from 'utils/common'
-import { resetSyncTask } from 'block-sync-renderer'
+import { resetSyncTaskQueue } from 'block-sync-renderer'
 import { clean as cleanChain } from 'database/chain'
+import SettingsService from './settings'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -68,7 +69,7 @@ export default class IndexerService {
   }
 
   static clearCache = async (clearIndexerFolder = false) => {
-    await resetSyncTask(false)
+    await resetSyncTaskQueue.asyncPush(false)
     await cleanChain()
 
     if (clearIndexerFolder) {
@@ -76,7 +77,7 @@ export default class IndexerService {
       await new SyncedBlockNumber().setNextBlock(BigInt(0))
     }
 
-    await resetSyncTask(true)
+    await resetSyncTaskQueue.asyncPush(true)
   }
 
   static createFolder(dir: string) {
@@ -167,10 +168,12 @@ export default class IndexerService {
     }
 
 
-    // REFACTOR: use message to return the promise
-    while (!(await IndexerService.isPortReachable(+IndexerService.PORT))) {
-      await CommonUtils.sleep(1000)
-    }
+    await CommonUtils.retry(5, 1000, async () => {
+      const portReachable = await IndexerService.isPortReachable(+IndexerService.PORT)
+      if (!portReachable) {
+        throw new Error('Port is not reachable')
+      }
+    })
   }
 
   clearData = () => {
@@ -186,6 +189,11 @@ export default class IndexerService {
 
 
   #getDataPath = (network: Network): string => {
-    return path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data', `${network.genesisHash}`)
+    let indexerDataPath = SettingsService.getInstance().indexerDataPath
+    if (!indexerDataPath) {
+      indexerDataPath = path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data')
+      SettingsService.getInstance().indexerDataPath = indexerDataPath
+    }
+    return path.resolve(indexerDataPath, `${network.genesisHash}`)
   }
 }

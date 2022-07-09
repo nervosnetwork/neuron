@@ -8,7 +8,7 @@ import { Manufacturer } from '../../src/services/hardware/common'
 
 const stubbedDeletedByWalletIdFn = jest.fn()
 const stubbedGenerateAndSaveForExtendedKeyFn = jest.fn()
-const stubbedGenerateAndSaveForPublicKeyFn = jest.fn()
+const stubbedGenerateAndSaveForPublicKeyQueueAsyncPush = jest.fn()
 const stubbedGetNextUnusedAddressByWalletIdFn = jest.fn()
 const stubbedGetNextUnusedChangeAddressByWalletIdFn = jest.fn()
 const stubbedGetUnusedReceivingAddressesByWalletIdFn = jest.fn()
@@ -21,7 +21,9 @@ jest.doMock('../../src/services/addresses', () => {
   return {
     deleteByWalletId: stubbedDeleteByWalletId,
     generateAndSaveForExtendedKey: stubbedGenerateAndSaveForExtendedKeyFn,
-    generateAndSaveForPublicKey: stubbedGenerateAndSaveForPublicKeyFn,
+    generateAndSaveForPublicKeyQueue: {
+      asyncPush: stubbedGenerateAndSaveForPublicKeyQueueAsyncPush
+    },
     getNextUnusedAddressByWalletId: stubbedGetNextUnusedAddressByWalletIdFn,
     getNextUnusedChangeAddressByWalletId: stubbedGetNextUnusedChangeAddressByWalletIdFn,
     getUnusedReceivingAddressesByWalletId: stubbedGetUnusedReceivingAddressesByWalletIdFn,
@@ -36,7 +38,7 @@ import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-inf
 const resetMocks = () => {
   stubbedDeletedByWalletIdFn.mockReset()
   stubbedGenerateAndSaveForExtendedKeyFn.mockReset()
-  stubbedGenerateAndSaveForPublicKeyFn.mockReset()
+  stubbedGenerateAndSaveForPublicKeyQueueAsyncPush.mockReset()
   stubbedGetNextUnusedAddressByWalletIdFn.mockReset()
   stubbedGetNextUnusedChangeAddressByWalletIdFn.mockReset()
   stubbedGetUnusedReceivingAddressesByWalletIdFn.mockReset()
@@ -274,12 +276,12 @@ describe('wallet service', () => {
       })
       it('calls AddressService.generateAndSaveForExtendedKey', async () => {
         const { publicKey } = AccountExtendedPublicKey.parse(wallet4.extendedKey)
-        expect(stubbedGenerateAndSaveForPublicKeyFn).toHaveBeenCalledWith(
-          createdWallet.id,
+        expect(stubbedGenerateAndSaveForPublicKeyQueueAsyncPush).toHaveBeenCalledWith({
+          walletId: createdWallet.id,
           publicKey,
-          0,
-          0
-        )
+          addressType: 0,
+          addressIndex: 0,
+        })
       })
     });
     describe('#getNextAddressByWalletId', () => {
@@ -462,4 +464,24 @@ describe('wallet service', () => {
       })
     });
   });
+
+  describe('checkAndGenerateAddress', () => {
+    const walletServiceMock = new WalletService()
+    const getMock = jest.spyOn(walletServiceMock, 'get')
+    const checkAndGenerateAddressesMock = jest.fn()
+    // @ts-ignore
+    getMock.mockReturnValue({ checkAndGenerateAddresses: () => checkAndGenerateAddressesMock() })
+
+    beforeEach(() => {
+      checkAndGenerateAddressesMock.mockReset()
+    })
+    it('no duplicate walletId', async () => {
+      await walletServiceMock.checkAndGenerateAddress(['walletId1'])
+      expect(checkAndGenerateAddressesMock).toHaveBeenCalledTimes(1)
+    })
+    it('with duplicate walletId', async () => {
+      await walletServiceMock.checkAndGenerateAddress(['walletId1', 'walletId1'])
+      expect(checkAndGenerateAddressesMock).toHaveBeenCalledTimes(1)
+    })
+  })
 })

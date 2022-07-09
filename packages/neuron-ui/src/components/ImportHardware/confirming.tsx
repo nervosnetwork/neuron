@@ -1,42 +1,41 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
 import Button from 'widgets/Button'
 import { ReactComponent as PendingIcon } from 'widgets/Icons/Pending.svg'
 import { getDeviceExtendedPublickey } from 'services/remote'
-import { isSuccessResponse, useDidMount } from 'utils'
-import { RoutePath, LocationState } from './common'
+import { isSuccessResponse } from 'utils'
+import { ImportStep, ActionType } from './common'
 
 import styles from './findDevice.module.scss'
 
-const Confirming = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const Confirming = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => {
   const [t] = useTranslation()
-  const { entryPath } = location.state
   const onBack = useCallback(() => {
-    history.push(entryPath)
-  }, [history, entryPath])
+    dispatch({ step: ImportStep.ImportHardware })
+  }, [dispatch])
 
-  useDidMount(() => {
+  useEffect(() => {
+    let cancel = false
     getDeviceExtendedPublickey().then(res => {
+      if (cancel) {
+        return
+      }
       if (isSuccessResponse(res)) {
-        history.push({
-          pathname: entryPath + RoutePath.NameWallet,
-          state: {
-            ...location.state,
-            extendedPublicKey: res.result!,
-          },
+        dispatch({
+          step: ImportStep.NameWallet,
+          extendedPublicKey: res.result!,
         })
       } else {
-        history.push({
-          pathname: entryPath + RoutePath.Error,
-          state: {
-            ...location.state,
-            error: res.message,
-          },
+        dispatch({
+          step: ImportStep.Error,
+          error: res.message,
         })
       }
     })
-  })
+    return () => {
+      cancel = true
+    }
+  }, [])
 
   return (
     <div className={styles.container}>

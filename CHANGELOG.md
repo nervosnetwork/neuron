@@ -1,3 +1,22 @@
+# 0.103.2 (2022-07-09)
+
+### New features
+* #2422: Add heart beat and retry closed ckb/ckb-indexer process(@yanguoyu)
+* #2433: Add ckb node/indexer data path config in setting(@yanguoyu)
+* #2434: Adapt to ledger nano s plus(@yanguoyu)
+* #2441: Verify short and long address for hard wallet(@yanguoyu)
+
+
+### Bug fixes
+* #2425: Fix dialog route error after importing seed(@yanguoyu)
+* #2436: Fix link to Nervos DAO rule(@Keith-CY)
+* #2438: Fix duplicated addressd(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.103.1...v0.103.2
+
+
+
 # 0.103.1 (2022-06-11)
 
 ### New features

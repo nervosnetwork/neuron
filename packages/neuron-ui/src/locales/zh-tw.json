@@ -50,7 +50,8 @@
       "app-version": "檢測到 CKB 應用版本 v{{version}}。",
       "firmware-version": "檢測到固件版本 v{{version}}。",
       "wallet-name": "錢包名稱",
-      "select-model": "選擇型號"
+      "select-model": "選擇型號",
+      "other-device": "其他型號"
     },
     "hardware-sign": {
       "cancel": "取消",
@@ -305,17 +306,14 @@
       "setting-tabs": {
         "general": "通用",
         "wallets": "錢包",
-        "network": "網絡"
+        "network": "網絡",
+        "data": "數據"
       },
       "general": {
-        "clear-cache": "清理緩存",
-        "clearing-cache": "清理中…",
-        "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清理緩存，Neuron 會重新同步所有塊數據。",
         "show": "顯示",
         "hide": "隱藏",
         "version": "版本",
         "language": "語言",
-        "cache-cleared-on": "上次清理緩存時間 {{date}}",
         "apply": "應用"
       },
       "wallet-manager": {
@@ -365,6 +363,22 @@
           "cancel": "取消",
           "ok": "確認"
         }
+      },
+      "data": {
+        "ckb-node-data": "節點數據",
+        "ckb-indexer-data": "Indexer 數據",
+        "set": "設置",
+        "cache": "緩存",
+        "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清理緩存，Neuron 會重新同步所有塊數據。",
+        "cache-cleared-on": "上次清理緩存時間 {{date}}",
+        "clear-cache": "清理緩存",
+        "clearing-cache": "清理中…",
+        "remove-ckb-data-tip": "請將 CKB Node 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
+        "remove-indexer-data-tip": "請將 Indexer 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
+        "cancel": "取消",
+        "resync-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node(Indexer) 數據.",
+        "move-data-finish": "數據轉移完成",
+        "re-sync": "重新同步"
       }
     },
     "password-request": {

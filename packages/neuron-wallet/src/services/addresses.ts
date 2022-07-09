@@ -13,6 +13,7 @@ import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 import AddressDescription from 'database/chain/entities/address-description'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import AddressMeta from 'database/address/meta'
+import queueWrapper from 'utils/queue'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -26,7 +27,11 @@ export interface AddressMetaInfo {
 export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
-  private static async create(addresses: AddressInterface[]) {
+  private static createQueue = queueWrapper(AddressService.create)
+
+  public static generateAndSaveForPublicKeyQueue = queueWrapper(AddressService.generateAndSaveForPublicKey)
+
+  private static async create({ addresses }: { addresses: AddressInterface[] }) {
     const walletIds = new Set(addresses.map(v => v.walletId))
     if (walletIds.size !== 1) {
       throw new Error('Addresses can only be created for one wallet at a time')
@@ -69,7 +74,7 @@ export default class AddressService {
     )
 
     const generatedAddresses: AddressInterface[] = [...addresses.receiving, ...addresses.change]
-    await this.create(generatedAddresses)
+    await AddressService.createQueue.asyncPush({ addresses: generatedAddresses })
 
     return generatedAddresses
   }
@@ -158,12 +163,17 @@ export default class AddressService {
     return generatedAddresses
   }
 
-  public static async generateAndSaveForPublicKey(
-    walletId: string,
-    publicKey: string,
-    addressType: AddressType,
+  private static async generateAndSaveForPublicKey({
+    walletId,
+    publicKey,
+    addressType,
+    addressIndex
+  }: {
+    walletId: string
+    publicKey: string
+    addressType: AddressType
     addressIndex: number
-  ): Promise<AddressInterface | undefined> {
+  }): Promise<AddressInterface | undefined> {
     const isMainnet = NetworksService.getInstance().isMainnet()
     const address = publicKeyToAddress(publicKey, isMainnet)
     const publicKeyHash = AddressParser.toBlake160(address)

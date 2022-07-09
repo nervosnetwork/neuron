@@ -6,11 +6,11 @@ import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
 import logger from 'utils/logger'
 import { t } from 'i18next'
-import { ckbDataPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
 import AddressService from 'services/addresses'
 import redistCheck from 'utils/redist-check'
+import SettingsService from 'services/settings'
 
 export default class ExportDebugController {
   // eslint-disable-next-line prettier/prettier
@@ -101,7 +101,7 @@ export default class ExportDebugController {
     const SIZE_TO_READ = 32_000
 
     return new Promise((resolve, reject) => {
-      const logPath = path.resolve(ckbDataPath(), 'data', 'logs', 'run.log')
+      const logPath = path.resolve(SettingsService.getInstance().ckbDataPath, 'data', 'logs', 'run.log')
       if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
 
       const fileStats = fs.statSync(logPath)

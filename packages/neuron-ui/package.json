@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.103.1",
+  "version": "0.103.2",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -77,7 +77,7 @@
     "@types/storybook__addon-storyshots": "5.1.2",
     "@types/styled-components": "4.4.0",
     "babel-jest": "25.1.0",
-    "electron": "16.0.6",
+    "electron": "16.2.6",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.2",
     "eslint-config-airbnb": "19.0.4",

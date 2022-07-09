@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-import { useHistory, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
@@ -12,7 +11,7 @@ import {
   DeviceNotFoundException,
   MultiDeviceException,
 } from 'exceptions'
-import { RoutePath, LocationState } from './common'
+import { ImportStep, ActionType, Model } from './common'
 
 import styles from './findDevice.module.scss'
 
@@ -45,13 +44,11 @@ const Info = (
   )
 }
 
-const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, LocationState>) => {
+const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType>; model: Model | null }) => {
   const [t] = useTranslation()
-  const histroy = useHistory()
-  const { model, entryPath } = location.state
   const onBack = useCallback(() => {
-    histroy.goBack()
-  }, [histroy])
+    dispatch({ step: ImportStep.ImportHardware })
+  }, [dispatch])
 
   const [scaning, setScaning] = useState(true)
   const [error, setError] = useState('')
@@ -68,6 +65,14 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
         if (rest.length > 0) {
           setScaning(false)
           throw new MultiDeviceException()
+        }
+        if (!model) {
+          dispatch({
+            model: {
+              manufacturer: device.manufacturer,
+              product: device.product,
+            },
+          })
         }
         const conectionRes = await connectDevice(device)
         if (!isSuccessResponse(conectionRes)) {
@@ -99,15 +104,12 @@ const DetectDevice = ({ history, location }: RouteComponentProps<{}, {}, Locatio
   })
 
   const onNext = useCallback(() => {
-    history.push({
-      pathname: entryPath + RoutePath.Comfirming,
-      state: location.state,
-    })
-  }, [history, entryPath, location.state])
+    dispatch({ step: ImportStep.Comfirming })
+  }, [dispatch])
 
   const errorMsg = error.startsWith('messages.codes.') ? t(error) : error
   const ready = error === '' && appVersion !== ''
-  const productName = `${model.manufacturer} ${model.product}`
+  const productName = model ? `${model.manufacturer} ${model.product}` : ''
 
   return (
     <form onSubmit={onNext} className={styles.container}>

@@ -223,7 +223,12 @@ export class HardwareWallet extends Wallet {
   public checkAndGenerateAddresses = async (): Promise<AddressInterface[] | undefined> => {
     const { addressType, addressIndex } = this.getDeviceInfo()
     const { publicKey } = AccountExtendedPublicKey.parse(this.extendedKey)
-    const address = await AddressService.generateAndSaveForPublicKey(this.id, publicKey, addressType, addressIndex)
+    const address = await AddressService.generateAndSaveForPublicKeyQueue.asyncPush({
+      walletId: this.id,
+      publicKey,
+      addressType,
+      addressIndex
+    })
 
     if (address) {
       return [address]
@@ -334,6 +339,13 @@ export default class WalletService {
     }
 
     await this.cleanupAddresses()
+  }
+
+  public async checkAndGenerateAddress(walletIds: string[]) {
+    for (const walletId of new Set(walletIds)) {
+      const wallet = this.get(walletId)
+      await wallet.checkAndGenerateAddresses()
+    }
   }
 
   public create = (props: WalletProperties) => {

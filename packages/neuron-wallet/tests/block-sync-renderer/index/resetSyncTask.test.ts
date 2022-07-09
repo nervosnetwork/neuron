@@ -1,8 +1,9 @@
 describe(`Reset sync task`, () => {
   const stubbedmaintainAddressesIfNecessary = jest.fn()
   const stubbedSleep = jest.fn()
+  const stubbedTimeout = jest.fn().mockReturnValue(Promise.resolve(10))
   jest.doMock('services/wallets', () => ({ getInstance: () => ({ maintainAddressesIfNecessary: stubbedmaintainAddressesIfNecessary }) }))
-  jest.doMock('utils/common', () => ({ sleep: stubbedSleep }))
+  jest.doMock('utils/common', () => ({ sleep: stubbedSleep, timeout: stubbedTimeout }))
 
   const blockSyncRenderer = require('block-sync-renderer')
   const spyCreateBlockSyncTask = jest.spyOn(blockSyncRenderer, 'createBlockSyncTask').mockImplementation(() => jest.fn())

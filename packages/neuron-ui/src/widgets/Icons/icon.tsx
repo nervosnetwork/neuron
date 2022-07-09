@@ -23,6 +23,8 @@ import { ReactComponent as KeystoreSvg } from './Keystore.svg'
 import { ReactComponent as SettingsSvg } from './Settings.svg'
 import { ReactComponent as PendingIconSvg } from './PendingIcon.svg'
 import { ReactComponent as NewTabSvg } from './new_tab.svg'
+import { ReactComponent as TooltipSvg } from './Tooltip.svg'
+import { ReactComponent as OpenFolderSvg } from './OpenFolder.svg'
 
 import styles from './icon.module.scss'
 
@@ -60,3 +62,5 @@ export const Keystore = WrapSvg(KeystoreSvg)
 export const Settings = WrapSvg(SettingsSvg)
 export const PendingIcon = WrapSvg(PendingIconSvg)
 export const NewTab = WrapSvg(NewTabSvg)
+export const Tooltip = WrapSvg(TooltipSvg)
+export const OpenFolder = WrapSvg(OpenFolderSvg)

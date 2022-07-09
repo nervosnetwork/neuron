@@ -53,6 +53,7 @@ import SUDTController from "controllers/sudt"
 import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
+import startMonitor, { stopMonitor } from 'services/monitor'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -453,6 +454,54 @@ export default class ApiController {
       await IndexerService.clearCache(params?.resetIndexerData)
       return { status: ResponseCode.Success, result: true }
     })
+
+    handle('get-ckb-node-data-path', () => {
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().ckbDataPath
+      }
+    })
+
+    handle('set-ckb-node-data-path', (_, dataPath: string) => {
+      SettingsService.getInstance().ckbDataPath = dataPath
+      stopMonitor('ckb-indexer')
+      startMonitor(undefined, true)
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().ckbDataPath
+      }
+    })
+
+    handle('get-indexer-data-path', () => {
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().indexerDataPath
+      }
+    })
+
+    handle('set-indexer-data-path', (_, dataPath: string) => {
+      SettingsService.getInstance().indexerDataPath = dataPath
+      startMonitor('ckb-indexer', true)
+      return {
+        status: ResponseCode.Success,
+        result: SettingsService.getInstance().indexerDataPath
+      }
+    })
+
+    handle('start-process-monitor', (_, monitorName: string) => {
+      startMonitor(monitorName, true)
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
+    handle('stop-process-monitor', async (_, monitorName: string) => {
+      await stopMonitor(monitorName)
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
     // Sign and Verify
     handle('sign-message', async (_, params: Controller.Params.SignParams) => {
       return this.#signAndVerifyController.sign(params)

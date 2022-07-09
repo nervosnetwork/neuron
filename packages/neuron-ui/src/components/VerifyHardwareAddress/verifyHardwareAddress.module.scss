@@ -183,3 +183,10 @@
   margin: 0;
   margin-bottom: 26px;
 }
+
+.addressOverflow {
+  word-break: break-all;
+  height: 1.625rem;
+  overflow: hidden;
+  text-align: right;
+}
