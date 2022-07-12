@@ -164,12 +164,51 @@ describe('test for multisig controller', () => {
       await multisigController.importConfig('1234')
       expect(showErrorBoxMock).toHaveBeenCalledWith()
     }),
-    it('import data is error', async () => {
+    it('import data is error no require_first_n', async () => {
       readFileSyncMock.mockReturnValue(JSON.stringify({
         multisig_configs: {
           [multisigArgs]: {
             ...multisigConfig.testnet.params.multisig_configs,
             require_first_n: undefined
+          }
+        }
+      }))
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is error no threshold', async () => {
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            threshold: undefined
+          }
+        }
+      }))
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is error require_first_n is not number', async () => {
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            require_first_n: 'dd'
+          }
+        }
+      }))
+      const res = await multisigController.importConfig('1234')
+      expect(res).toBeUndefined()
+      expect(showErrorBoxMock).toHaveBeenCalledWith()
+    })
+    it('import data is error threshold is not number', async () => {
+      readFileSyncMock.mockReturnValue(JSON.stringify({
+        multisig_configs: {
+          [multisigArgs]: {
+            ...multisigConfig.testnet.params.multisig_configs,
+            threshold: 'undefined'
           }
         }
       }))

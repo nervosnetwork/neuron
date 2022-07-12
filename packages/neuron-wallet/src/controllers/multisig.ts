@@ -22,6 +22,20 @@ interface MultisigConfigOutput {
   }>
 }
 
+const validImportConfig = (configOutput: MultisigConfigOutput) => {
+  return configOutput.multisig_configs &&
+  Object.values(configOutput.multisig_configs).length &&
+  Object.values(configOutput.multisig_configs).every(config => config.require_first_n !== undefined
+    && config.threshold !== undefined
+    && config.sighash_addresses !== undefined
+    && !Number.isNaN(+config.require_first_n)
+    && !Number.isNaN(+config.threshold)
+    && config.sighash_addresses?.length
+    && config.sighash_addresses?.length >= +config.require_first_n
+    && config.sighash_addresses?.length >= +config.threshold
+  )
+}
+
 export default class MultisigController {
   // eslint-disable-next-line prettier/prettier
   #multisigService: MultisigService;
@@ -115,24 +129,14 @@ export default class MultisigController {
     }
     try {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
-      let configOutput: MultisigConfigOutput = JSON.parse(json)
-      if (
-        !configOutput.multisig_configs ||
-        !Object.values(configOutput.multisig_configs).length ||
-        Object.values(configOutput.multisig_configs).some(config => config.require_first_n === undefined
-          || config.threshold === undefined
-          || config.sighash_addresses === undefined
-          || !config.sighash_addresses?.length
-          || config.sighash_addresses?.length < +config.require_first_n
-          || config.sighash_addresses?.length < +config.threshold
-        )
-      ) {
+      const configOutput: MultisigConfigOutput = JSON.parse(json)
+      if (!validImportConfig(configOutput)) {
         dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
         return
       }
       const saveConfigs = Object.values(configOutput.multisig_configs).map(config => ({
-        r: config.require_first_n,
-        m: config.threshold,
+        r: +config.require_first_n,
+        m: +config.threshold,
         n: config.sighash_addresses.length,
         blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
         walletId,
