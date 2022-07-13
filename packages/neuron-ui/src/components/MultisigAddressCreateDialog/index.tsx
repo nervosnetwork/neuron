@@ -51,11 +51,14 @@ const MultisigAddressCreateDialog = ({
   const [step, changeStep] = useState(Step.setMN)
   const [t] = useTranslation()
   const { m, n, setMBySelect, setNBySelect, errorI18nKey: mnErr } = useMAndN()
+  const [confirmErr, setConfirmErr] = useState<string | null>(null)
   const next = useCallback(() => {
     changeStep(step + 1)
+    setConfirmErr(null)
   }, [changeStep, step])
   const back = useCallback(() => {
     changeStep(step - 1)
+    setConfirmErr(null)
   }, [changeStep, step])
   const {
     chain: { networkID },
@@ -89,9 +92,13 @@ const MultisigAddressCreateDialog = ({
       n: Number(n),
       r: Number(r),
       addresses,
-    }).then(() => {
-      closeDialog()
     })
+      .then(() => {
+        closeDialog()
+      })
+      .catch(err => {
+        setConfirmErr(err.message)
+      })
   }, [m, n, r, addresses, saveConfig, closeDialog])
 
   return (
@@ -116,6 +123,7 @@ const MultisigAddressCreateDialog = ({
       {step === Step.viewMultiAddress && (
         <MultisigAddressInfo m={m} n={n} r={r} addresses={addresses} multisigAddress={multisigAddress} />
       )}
+      {confirmErr && <div className={styles.errorMessage}>{confirmErr}</div>}
       <div className={styles.actions}>
         <Button
           label={t(`multisig-address.create-dialog.actions.${step === Step.setMN ? 'cancel' : 'back'}`)}
