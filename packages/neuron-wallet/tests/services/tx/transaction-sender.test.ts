@@ -983,6 +983,47 @@ describe('TransactionSender Test', () => {
           expect(res.witnesses[0]).toBe(expectedValue)
         })
       })
+
+      it(`input cell's length is 2`, async() => {
+        const addresses = [
+          'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
+          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6'
+        ]
+        const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
+        const addr = {
+          walletId: fakeWallet.id,
+          path: `m/44'/309'/0'/0/0`,
+          blake160: addressToScript(addresses[0]).args,
+          version: 'testnet'
+        }
+
+        const mockGAI = jest.fn()
+        mockGAI.mockReturnValueOnce([addr])
+        transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
+        const tx = Transaction.fromObject(transcationObject)
+        tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
+        tx.inputs.push(
+          Input.fromObject({
+            previousOutput: OutPoint.fromObject({
+              txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
+              index: '0x0'
+            }),
+            since: '0x0',
+            lock: Script.fromObject({
+              args: multiArgs,
+              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+            })
+          })
+        )
+        tx.witnesses = ['0x', '0x']
+        const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
+        expect(res.witnesses).toHaveLength(2)
+        expect(res.witnesses[1]).toBe('0x')
+        expect(res.witnesses[0]).toBe(
+          '0x810000001000000081000000810000006d00000000010102729a884056fed321daaca410d94a5d6425a6ca1f0fbd88910d2348d69da5a980f2376a7a1a04feb595163e5edf15f297453a64f3248c69823afcfdaabc6771b088e4f6250e2e2f91136f5c6a9cbf49a79d955644d7381481f3c5c8ab93bcc52a71de4b072e0697c001'
+        )
+      })
     })
   })
 })
