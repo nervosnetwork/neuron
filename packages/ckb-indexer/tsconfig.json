@@ -5,11 +5,7 @@
     "lib": ["es2020", "dom"],
     "module": "commonjs",
     "declaration": true,
-    "sourceMap": true,
-    "typeRoots": [
-      "../../node_modules/@types"
-    ],
-    "skipLibCheck": true
+    "sourceMap": true
   },
   "include": ["src"]
 }
