@@ -25,6 +25,7 @@ import {
   OfflineSignType,
   signAndExportTransaction,
   requestOpenInExplorer,
+  invokeShowErrorMessage,
 } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
@@ -144,11 +145,16 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password, multisigConfig })(dispatch).then(
-              (res: { result: string; status: number }) => {
+              (res: { result: string; status: number; message: string | { content: string } }) => {
                 if (isSuccessResponse(res)) {
                   requestOpenInExplorer({ type: 'transaction', key: res.result })
                 } else if (res.status === ErrorCode.PasswordIncorrect) {
                   throw new PasswordIncorrectException()
+                } else {
+                  invokeShowErrorMessage({
+                    title: t('messages.error'),
+                    content: typeof res.message === 'string' ? res.message : res.message.content!,
+                  })
                 }
               }
             )
