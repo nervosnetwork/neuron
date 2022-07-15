@@ -24,14 +24,10 @@ interface MultisigConfigOutput {
 
 const validateImportConfig = (configOutput: MultisigConfigOutput) => {
   return configOutput.multisig_configs &&
-  Object.values(configOutput.multisig_configs).length &&
-  Object.values(configOutput.multisig_configs).every(config => config.require_first_n !== undefined
-    && config.threshold !== undefined
-    && config.sighash_addresses !== undefined
-    && !Number.isNaN(+config.require_first_n)
-    && !Number.isNaN(+config.threshold)
-    && config.sighash_addresses?.length
-    && config.sighash_addresses?.length >= Math.max(+config.require_first_n, +config.threshold)
+    Object.values(configOutput.multisig_configs).length &&
+    Object.values(configOutput.multisig_configs).every(
+      config => config.sighash_addresses?.length >= Math.max(+config.require_first_n, +config.threshold
+    )
   )
 }
 
