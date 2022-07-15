@@ -293,9 +293,6 @@ export default class TransactionSender {
       const lockArgs: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
       const witnessArgs: WitnessArgs = wit instanceof WitnessArgs ? wit : WitnessArgs.generateEmpty()
-      if (typeof wit === 'string' && wit.length) {
-        witnessArgs.lock = wit
-      }
       return {
         witnessArgs,
         lockHash: input.lockHash!,
