@@ -6,6 +6,9 @@
     "module": "commonjs",
     "declaration": true,
     "sourceMap": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "include": ["src"]
 }
