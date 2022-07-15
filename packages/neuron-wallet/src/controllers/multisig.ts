@@ -22,7 +22,7 @@ interface MultisigConfigOutput {
   }>
 }
 
-const validImportConfig = (configOutput: MultisigConfigOutput) => {
+const validateImportConfig = (configOutput: MultisigConfigOutput) => {
   return configOutput.multisig_configs &&
   Object.values(configOutput.multisig_configs).length &&
   Object.values(configOutput.multisig_configs).every(config => config.require_first_n !== undefined
@@ -31,8 +31,7 @@ const validImportConfig = (configOutput: MultisigConfigOutput) => {
     && !Number.isNaN(+config.require_first_n)
     && !Number.isNaN(+config.threshold)
     && config.sighash_addresses?.length
-    && config.sighash_addresses?.length >= +config.require_first_n
-    && config.sighash_addresses?.length >= +config.threshold
+    && config.sighash_addresses?.length >= Math.max(+config.require_first_n, +config.threshold)
   )
 }
 
@@ -130,7 +129,7 @@ export default class MultisigController {
     try {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
       const configOutput: MultisigConfigOutput = JSON.parse(json)
-      if (!validImportConfig(configOutput)) {
+      if (!validateImportConfig(configOutput)) {
         dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
         return
       }
