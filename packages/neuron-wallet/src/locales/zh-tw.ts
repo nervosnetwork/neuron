@@ -50,6 +50,8 @@ export default {
         'nervos-website': 'Nervos 官方網站',
         'source-code': '原始程式碼',
         'report-issue': '回報問題',
+        'contact-us': '聯繫我們',
+        'contact-us-message': '> 請通過 "菜單" -> "幫助" -> "導出調試信息" 獲得 Neuron 的調試信息並附在郵件中.',
         documentation: '使用說明',
         settings: '設定',
         'export-debug-info': '導出除錯信息'

@@ -50,6 +50,9 @@ export default {
         'nervos-website': 'Nervos Website',
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
+        'contact-us': 'Contact Us',
+        'contact-us-message':
+          '> Please append debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
         documentation: 'Documentation',
         settings: 'Settings',
         'export-debug-info': 'Export Debug Information'

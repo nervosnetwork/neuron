@@ -31,7 +31,8 @@ enum ExternalURL {
   Website = 'https://www.nervos.org/',
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
-  Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet'
+  Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet',
+  MailUs = 'mailto:neuron@magickbase.com'
 }
 
 const separator: MenuItemConstructorOptions = {
@@ -398,6 +399,14 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.help.report-issue'),
       click: () => {
         shell.openExternal(ExternalURL.Issues)
+      }
+    },
+    {
+      label: t('application-menu.help.contact-us'),
+      click: () => {
+        shell.openExternal(
+          `${ExternalURL.MailUs}?body=${encodeURIComponent(t('application-menu.help.contact-us-message') as string)}`
+        )
       }
     },
     {
