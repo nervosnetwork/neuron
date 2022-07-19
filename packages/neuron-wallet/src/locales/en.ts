@@ -200,7 +200,8 @@ export default {
           'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.'
       },
       'fail-to-open-mail': {
-        message: 'Unable to launch mail client, please copy the mail address',
+        message:
+          'Unable to launch mail client, please copy the mail address, append debug information exported by "Menu" -> "Help" -> "Export Debug Information" and send us.',
         'copy-mail-addr': 'Copy mail address'
       }
     },
