@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
+import { app, shell, clipboard, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
 import { t } from 'i18next'
 import { Subject } from 'rxjs'
 import { throttleTime } from 'rxjs/operators'
@@ -32,7 +32,7 @@ enum ExternalURL {
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
   Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet',
-  MailUs = 'mailto:neuron@magickbase.com'
+  MailUs = 'neuron@magickbase.com'
 }
 
 const separator: MenuItemConstructorOptions = {
@@ -403,10 +403,29 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     },
     {
       label: t('application-menu.help.contact-us'),
-      click: () => {
-        shell.openExternal(
-          `${ExternalURL.MailUs}?body=${encodeURIComponent(t('application-menu.help.contact-us-message') as string)}`
-        )
+      click: async () => {
+        try {
+          await shell.openExternal(
+            `mailto:${ExternalURL.MailUs}?body=${encodeURIComponent(
+              t('application-menu.help.contact-us-message') as string
+            )}`
+          )
+        } catch {
+          dialog
+            .showMessageBox(BrowserWindow.getFocusedWindow()!, {
+              type: 'info',
+              message: t(`messageBox.fail-to-open-mail.message`),
+              buttons: [t(`messageBox.button.discard`), t(`messageBox.fail-to-open-mail.copy-mail-addr`)],
+              defaultId: 1,
+              cancelId: 0
+            })
+            .then(({ response }) => {
+              if (response === 1) {
+                clipboard.writeText(ExternalURL.MailUs)
+                return
+              }
+            })
+        }
       }
     },
     {
