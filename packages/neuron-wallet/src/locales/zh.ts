@@ -189,8 +189,10 @@ export default {
       'hard-fork-migrate': {
         message: '为适配最新版本的 CKB 节点，Neuron 将会重新同步链上数据，整个同步可能时间较长'
       },
-      'fail-to-open-mail': {
-        message:
+      'mail-us': {
+        message: '请将问题及调试信息通过邮件发给我们, 调试信息可以通过 "菜单" -> "帮助" -> "导出调试信息" 获得',
+        'open-client': '打开邮件客户端',
+        'fail-message':
           '未能打开邮件客户端, 请复制邮件地址, 并通过 "菜单" -> "帮助" -> "导出调试信息" 获得 Neuron 的调试信息附在邮件中发送给我们',
         'copy-mail-addr': '复制邮件地址'
       }

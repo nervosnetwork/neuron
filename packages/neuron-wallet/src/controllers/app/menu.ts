@@ -404,27 +404,47 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     {
       label: t('application-menu.help.contact-us'),
       click: async () => {
-        try {
-          await shell.openExternal(
-            `mailto:${ExternalURL.MailUs}?body=${encodeURIComponent(
-              t('application-menu.help.contact-us-message') as string
-            )}`
-          )
-        } catch {
-          dialog
-            .showMessageBox(BrowserWindow.getFocusedWindow()!, {
-              type: 'info',
-              message: t(`messageBox.fail-to-open-mail.message`),
-              buttons: [t(`messageBox.button.discard`), t(`messageBox.fail-to-open-mail.copy-mail-addr`)],
-              defaultId: 1,
-              cancelId: 0
-            })
-            .then(({ response }) => {
-              if (response === 1) {
+        const { response: methodId } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+          type: 'info',
+          message: t(`messageBox.mail-us.message`),
+          buttons: [
+            t(`messageBox.button.discard`),
+            t(`messageBox.mail-us.copy-mail-addr`),
+            t(`messageBox.mail-us.open-client`)
+          ],
+          defaultId: 1,
+          cancelId: 0
+        })
+
+        switch (methodId) {
+          case 1: {
+            clipboard.writeText(ExternalURL.MailUs)
+            return
+          }
+          case 2: {
+            try {
+              await shell.openExternal(
+                `mailto:${ExternalURL.MailUs}?body=${encodeURIComponent(
+                  t('application-menu.help.contact-us-message') as string
+                )}`
+              )
+            } catch {
+              const { response: subMethodId } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+                type: 'info',
+                message: t(`messageBox.mail-us.fail-message`),
+                buttons: [t(`messageBox.button.discard`), t(`messageBox.mail-us.copy-mail-addr`)],
+                defaultId: 1,
+                cancelId: 0
+              })
+              if (subMethodId === 1) {
                 clipboard.writeText(ExternalURL.MailUs)
-                return
               }
-            })
+            }
+            return
+          }
+          default: {
+            return
+          }
         }
       }
     },
