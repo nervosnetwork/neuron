@@ -50,6 +50,8 @@ export default {
         'nervos-website': 'Nervos 网站',
         'source-code': '源代码',
         'report-issue': '报告问题',
+        'contact-us': '联系我们',
+        'contact-us-message': '> 请通过 "菜单" -> "帮助" -> "导出调试信息" 获得 Neuron 的调试信息并附在邮件中.',
         documentation: '使用文档',
         settings: '设置',
         'export-debug-info': '导出调试信息'
@@ -186,6 +188,13 @@ export default {
       },
       'hard-fork-migrate': {
         message: '为适配最新版本的 CKB 节点，Neuron 将会重新同步链上数据，整个同步可能时间较长'
+      },
+      'mail-us': {
+        message: '请将问题及调试信息通过邮件发给我们, 调试信息可以通过 "菜单" -> "帮助" -> "导出调试信息" 获得',
+        'open-client': '打开邮件客户端',
+        'fail-message':
+          '未能打开邮件客户端, 请复制邮件地址, 并通过 "菜单" -> "帮助" -> "导出调试信息" 获得 Neuron 的调试信息附在邮件中发送给我们',
+        'copy-mail-addr': '复制邮件地址'
       }
     },
     prompt: {

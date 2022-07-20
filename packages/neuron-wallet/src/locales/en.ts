@@ -50,6 +50,9 @@ export default {
         'nervos-website': 'Nervos Website',
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
+        'contact-us': 'Contact Us',
+        'contact-us-message':
+          '> Please append debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
         documentation: 'Documentation',
         settings: 'Settings',
         'export-debug-info': 'Export Debug Information'
@@ -195,6 +198,13 @@ export default {
       'hard-fork-migrate': {
         message:
           'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.'
+      },
+      'mail-us': {
+        message: 'Please mail us with debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
+        'open-client': 'Open Mail Client',
+        'fail-message':
+          'Unable to launch mail client, please copy the mail address, append debug information exported by "Menu" -> "Help" -> "Export Debug Information" and send us.',
+        'copy-mail-addr': 'Copy mail address'
       }
     },
     prompt: {
