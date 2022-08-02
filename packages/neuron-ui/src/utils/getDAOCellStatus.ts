@@ -1,13 +1,10 @@
 import { epochParser } from 'utils/parsers'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
-import { IMMATURE_EPOCHS } from 'utils/const'
 
 export enum CellStatus {
   Depositing,
-  ImmatureForWithdraw,
   Deposited,
   Withdrawing,
-  ImmatureForUnlock,
   Locked,
   Unlockable,
   Unlocking,
@@ -57,12 +54,8 @@ export const getDAOCellStatus = ({
 
       const unlockEpochValue = calculateClaimEpochValue(depositEpochInfo, withdrawEpochInfo)
 
-      if (unlockEpochValue + IMMATURE_EPOCHS <= currentEpochInfo.value) {
-        return CellStatus.Unlockable
-      }
-
       if (unlockEpochValue < currentEpochInfo.value) {
-        return CellStatus.ImmatureForUnlock
+        return CellStatus.Unlockable
       }
     }
 
@@ -72,13 +65,6 @@ export const getDAOCellStatus = ({
   // deposit
   if (status === 'sent') {
     return CellStatus.Depositing
-  }
-  const currentEpochInfo = epochParser(currentEpoch)
-  const depositEpochInfo = epochParser(depositEpoch)
-
-  if (currentEpochInfo.value < depositEpochInfo.value + IMMATURE_EPOCHS) {
-    // deposited but immature
-    return CellStatus.ImmatureForWithdraw
   }
   return CellStatus.Deposited
 }

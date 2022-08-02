@@ -22,7 +22,6 @@ export const SHANNON_CKB_RATIO = 1e8
 
 export const MEDIUM_FEE_RATE = 2000
 export const WITHDRAW_EPOCHS = 180
-export const IMMATURE_EPOCHS = 4
 export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
 export const HOURS_PER_EPOCH = 4
 export const HOURS_PER_DAY = 24
