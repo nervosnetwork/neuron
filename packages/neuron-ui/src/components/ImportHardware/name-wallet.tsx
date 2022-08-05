@@ -3,10 +3,19 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { createHardwareWallet } from 'services/remote'
-import { isSuccessResponse } from 'utils'
+import { isSuccessResponse, useDialogWrapper } from 'utils'
+import Alert, { AlertStatus } from 'widgets/Alert'
+import { FinishCreateLoading } from 'components/WalletWizard'
 import { ImportStep, ActionType, ImportHardwareState } from './common'
 
 import styles from './findDevice.module.scss'
+
+const getAlertStatus = (fieldInit: boolean, success: boolean) => {
+  if (fieldInit) {
+    return success ? AlertStatus.Success : AlertStatus.Error
+  }
+  return AlertStatus.Init
+}
 
 const NameWallet = ({
   dispatch,
@@ -20,6 +29,7 @@ const NameWallet = ({
   const [t] = useTranslation()
   const [walletName, setWalletName] = useState(`${model?.manufacturer} ${model?.product}`)
   const [errorMsg, setErrorMsg] = useState('')
+  const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
 
   const onBack = useCallback(() => {
     dispatch({ step: ImportStep.ImportHardware })
@@ -27,17 +37,22 @@ const NameWallet = ({
 
   const onNext = useCallback(
     (e: React.FormEvent) => {
+      openDialog()
       e.preventDefault()
       createHardwareWallet({
         ...extendedPublicKey!,
         walletName,
-      }).then(res => {
-        if (isSuccessResponse(res)) {
-          dispatch({ step: ImportStep.Success })
-        } else {
-          setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
-        }
       })
+        .then(res => {
+          if (isSuccessResponse(res)) {
+            dispatch({ step: ImportStep.Success })
+          } else {
+            setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
+          }
+        })
+        .finally(() => {
+          closeDialog()
+        })
     },
     [walletName, extendedPublicKey]
   )
@@ -54,17 +69,20 @@ const NameWallet = ({
         <TextField
           required
           autoFocus
-          label={t('import-hardware.wallet-name')}
+          placeholder={t('wizard.set-wallet-name')}
           onChange={onInput}
           field="wallet-name"
           value={walletName}
-          error={errorMsg}
         />
       </section>
+      <Alert status={getAlertStatus(!!walletName, !errorMsg)} className={styles.alert}>
+        <span>{errorMsg || t('wizard.new-name')}</span>
+      </Alert>
       <footer className={styles.footer}>
-        <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
-        <Button type="submit" label={t('import-hardware.actions.next')} onClick={onNext} />
+        <Button type="submit" label={t('import-hardware.actions.finish')} onClick={onNext} />
+        <Button type="text" label={t('import-hardware.actions.back')} onClick={onBack} />
       </footer>
+      <FinishCreateLoading dialogRef={dialogRef} />
     </form>
   )
 }

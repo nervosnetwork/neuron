@@ -4,12 +4,20 @@ import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
 import { importKeystore, showOpenDialogModal, showErrorMessage } from 'services/remote'
 import { useState as useGlobalState } from 'states'
-import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
 import { PasswordIncorrectException } from 'exceptions'
-import { generateWalletName, RoutePath, ErrorCode, CONSTANTS, useGoBack, isSuccessResponse } from 'utils'
+import {
+  generateWalletName,
+  RoutePath,
+  ErrorCode,
+  CONSTANTS,
+  useGoBack,
+  isSuccessResponse,
+  useDialogWrapper,
+} from 'utils'
 
+import { FinishCreateLoading, NoWalletCreateNew } from 'components/WalletWizard'
+import TextField from 'widgets/TextField'
 import styles from './importKeystore.module.scss'
 
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
@@ -39,20 +47,17 @@ const ImportKeystore = () => {
   } = useGlobalState()
   const history = useHistory()
   const [fields, setFields] = useState(defaultFields)
-  const [loading, setLoading] = useState(false)
   const [openingFile, setOpeningFile] = useState(false)
   const goBack = useGoBack(history)
 
-  const disabled =
-    loading ||
-    !!(
-      !fields.name ||
-      !fields.path ||
-      !fields.password ||
-      fields.nameError ||
-      fields.passwordError ||
-      fields.passwordError
-    )
+  const disabled = !!(
+    !fields.name ||
+    !fields.path ||
+    !fields.password ||
+    fields.nameError ||
+    fields.passwordError ||
+    fields.passwordError
+  )
 
   useEffect(() => {
     if (fields.name === undefined) {
@@ -88,14 +93,15 @@ const ImportKeystore = () => {
         setOpeningFile(false)
       })
   }, [fields])
+  const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault()
-      if (loading || disabled) {
+      if (disabled) {
         return
       }
-      setLoading(true)
+      openDialog()
       importKeystore({ name: fields.name!, keystorePath: fields.path, password: fields.password })
         .then(res => {
           if (isSuccessResponse(res)) {
@@ -122,10 +128,10 @@ const ImportKeystore = () => {
           showErrorMessage(i18n.t(`messages.error`), err.message)
         })
         .finally(() => {
-          setLoading(false)
+          closeDialog()
         })
     },
-    [fields.name, fields.password, fields.path, history, loading, disabled, setFields, t]
+    [fields.name, fields.password, fields.path, history, openDialog, closeDialog, disabled, setFields, t]
   )
 
   const handleChange = useCallback(
@@ -186,6 +192,8 @@ const ImportKeystore = () => {
 
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
+      <div className={styles.title}>{t('import-keystore.title')}</div>
+      <NoWalletCreateNew />
       {Object.entries(fields)
         .filter(([key]) => !key.endsWith('Error'))
         .map(([key, value]) => {
@@ -194,7 +202,6 @@ const ImportKeystore = () => {
               key={key}
               field={key}
               onClick={key === 'path' ? handleFileClick : undefined}
-              label={t(`import-keystore.label.${key}`)}
               placeholder={t(`import-keystore.placeholder.${key}`)}
               type={key === 'password' ? 'password' : 'text'}
               readOnly={key === 'path'}
@@ -202,16 +209,30 @@ const ImportKeystore = () => {
               value={value}
               error={fields[`${key}Error` as keyof KeystoreFields]}
               onChange={handleChange}
+              suffix={
+                key === 'path' ? (
+                  <span
+                    onClick={handleFileClick}
+                    className={styles.chooseFileSuffix}
+                    onKeyDown={() => {}}
+                    role="button"
+                    tabIndex={-1}
+                  >
+                    {t('import-keystore.select-file')}
+                  </span>
+                ) : null
+              }
               required
             />
           )
         })}
       <div className={styles.actions}>
-        <Button type="cancel" onClick={goBack} label={t('import-keystore.button.back')} />
         <Button type="submit" label={t('import-keystore.button.submit')} disabled={disabled}>
-          {loading ? <Spinner /> : (t('import-keystore.button.submit') as string)}
+          {t('import-keystore.button.submit') as string}
         </Button>
+        <Button type="text" onClick={goBack} label={t('import-keystore.button.back')} />
       </div>
+      <FinishCreateLoading dialogRef={dialogRef} />
     </form>
   )
 }

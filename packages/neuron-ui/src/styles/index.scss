@@ -5,8 +5,8 @@
 * {
   outline: none !important;
   -webkit-tap-highlight-color: none !important;
-  cursor: default !important;
   user-select: none;
+  font-family: 'PingFang SC';
 }
 
 [type='button'],
@@ -239,4 +239,8 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.main-content {
+  background-color: var(--main-background-color);
 }

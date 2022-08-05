@@ -25,6 +25,11 @@ import { ReactComponent as PendingIconSvg } from './PendingIcon.svg'
 import { ReactComponent as NewTabSvg } from './new_tab.svg'
 import { ReactComponent as TooltipSvg } from './Tooltip.svg'
 import { ReactComponent as OpenFolderSvg } from './OpenFolder.svg'
+import { ReactComponent as SuccessInfoSvg } from './SuccessInfo.svg'
+import { ReactComponent as ErrorSvg } from './Error.svg'
+import { ReactComponent as LoadingSvg } from './Loading.svg'
+import { ReactComponent as AttentionSvg } from './ExperimentalAttention.svg'
+import { ReactComponent as AttentionOutlineSvg } from './AttentionOutline.svg'
 
 import styles from './icon.module.scss'
 
@@ -64,3 +69,8 @@ export const PendingIcon = WrapSvg(PendingIconSvg)
 export const NewTab = WrapSvg(NewTabSvg)
 export const Tooltip = WrapSvg(TooltipSvg)
 export const OpenFolder = WrapSvg(OpenFolderSvg)
+export const SuccessInfo = WrapSvg(SuccessInfoSvg)
+export const Error = WrapSvg(ErrorSvg)
+export const Loading = WrapSvg(LoadingSvg)
+export const Attention = WrapSvg(AttentionSvg)
+export const AttentionOutline = WrapSvg(AttentionOutlineSvg)

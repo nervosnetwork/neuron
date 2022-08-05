@@ -1,3 +1,7 @@
+.root {
+  background-color: var(--main-background-color);
+}
+
 .autoDismissMessages {
   display: flex;
   flex-direction: column;
@@ -47,4 +51,36 @@
 
 .moreBtn {
   top: -4px;
+}
+
+.notification {
+  height: 40px;
+  background: var(--notice-background-color);
+  color: var(--notice-text-color);
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .attention {
+    margin-right: 4px;
+  }
+
+  .close {
+    right: 14px;
+    position: absolute;
+    cursor: pointer;
+    path {
+      fill: var(--svg-color);
+    }
+  }
 }

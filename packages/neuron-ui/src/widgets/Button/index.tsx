@@ -14,7 +14,7 @@ const Button = ({
   children,
   ...rest
 }: {
-  type?: 'default' | 'cancel' | 'ok' | 'submit' | 'confirm' | 'primary' | 'reset'
+  type?: 'default' | 'cancel' | 'ok' | 'submit' | 'confirm' | 'primary' | 'reset' | 'text'
   label: string
   onClick?: any
   disabled?: boolean
