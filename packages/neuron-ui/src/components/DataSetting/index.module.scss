@@ -9,6 +9,7 @@
 
   .name {
     font-weight: bold;
+    display: flex;
   }
 
   .content {
@@ -62,5 +63,48 @@
 
   & > svg {
     flex-shrink: 0;
+  }
+}
+
+.infoIconContainer {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-left: 4px;
+  &:after {
+    display: none;
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    font-size: 0.75rem;
+    color: #000000;
+    padding: 10px 15px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.22);
+    min-width: 300px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &::before {
+    z-index: 2;
+    display: none;
+    content: '';
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+    border: 10px solid transparent;
+    border-bottom-color: #fff;
+    filter: drop-shadow(0 -2px 1px rgba(0, 0, 0, 0.12));
+    pointer-events: none;
+  }
+  &:hover {
+    &::after,
+    &::before {
+      display: block;
+    }
   }
 }

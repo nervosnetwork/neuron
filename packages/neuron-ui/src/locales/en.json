@@ -372,7 +372,7 @@
         }
       },
       "data": {
-        "ckb-node-data": "CKB Node Data",
+        "ckb-node-data": "CKB Node Config & Storage",
         "ckb-indexer-data": "CKB Indexer Data",
         "set": "Set",
         "cache": "Cache",
@@ -382,10 +382,12 @@
         "clearing-cache": "Clearing...",
         "remove-ckb-data-tip": "Please move CKB Node Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
         "remove-indexer-data-tip": "Please move Indexer Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
-        "resync-describe": "Attention: Synchronize from scratch won't remove previously downloaded CKB Node(or Indexer) Data.",
+        "resync-ckb-node-describe": "Attention: Synchronize from scratch won't remove previously downloaded CKB Node Data, but it will remove downloaded Indexer Data",
+        "resync-indexer-describe": "Attention: Synchronize from scratch won't remove previously downloaded Indexer Data.",
         "cancel": "Cancel",
         "move-data-finish": "Data have been moved",
-        "re-sync": "Synchronize from scratch"
+        "re-sync": "Synchronize from scratch",
+        "disabled-set-path": "When the CKB node is started locally, the CKB Node Config and Storage path configuration cannot take effect"
       }
     },
     "password-request": {

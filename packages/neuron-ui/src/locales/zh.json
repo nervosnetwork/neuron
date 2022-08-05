@@ -365,7 +365,7 @@
         }
       },
       "data": {
-        "ckb-node-data": "节点数据",
+        "ckb-node-data": "节点配置和数据",
         "ckb-indexer-data": "Indexer 数据",
         "set": "设置",
         "cache": "缓存",
@@ -375,10 +375,12 @@
         "clearing-cache": "清空中...",
         "remove-ckb-data-tip": "请将 CKB Node 数据从 {{prevPath}} 移动至 {{currentPath}}然后点击 \"数据转移完成\" 开始从已知区块同步; 否则点击 \"重新同步\" 开始重新同步.",
         "remove-indexer-data-tip": "请将 Indexer 数据从 {{prevPath}} 移动至 {{currentPath}}然后点击 \"数据转移完成\" 开始从已知区块同步; 否则点击 \"重新同步\" 开始重新同步.",
-        "resync-describe": "注意: 重新同步不会删除当前已同步的 CKB Node(Indexer) 数据.",
+        "resync-ckb-node-describe": "注意: 重新同步不会删除当前已同步的 CKB Node 数据，但会删除已同步的 Indexer 数据。",
+        "resync-indexer-describe": "注意: 重新同步不会删除当前已同步的 Indexer 数据.",
         "cancel": "取消",
         "move-data-finish": "数据转移完成",
-        "re-sync": "重新同步"
+        "re-sync": "重新同步",
+        "disabled-set-path": "本地启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效"
       }
     },
     "password-request": {

@@ -462,9 +462,12 @@ export default class ApiController {
       }
     })
 
-    handle('set-ckb-node-data-path', (_, dataPath: string) => {
+    handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
       SettingsService.getInstance().ckbDataPath = dataPath
-      stopMonitor('ckb-indexer')
+      await stopMonitor('ckb-indexer')
+      if (clearCache) {
+        await IndexerService.clearCache(true)
+      }
       startMonitor(undefined, true)
       return {
         status: ResponseCode.Success,
@@ -479,7 +482,7 @@ export default class ApiController {
       }
     })
 
-    handle('set-indexer-data-path', (_, dataPath: string) => {
+    handle('set-indexer-data-path', (_, { dataPath }: { dataPath: string }) => {
       SettingsService.getInstance().indexerDataPath = dataPath
       startMonitor('ckb-indexer', true)
       return {
