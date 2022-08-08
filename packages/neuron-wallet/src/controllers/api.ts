@@ -13,6 +13,8 @@ import {
   BrowserWindow
 } from 'electron'
 import { t } from 'i18next'
+import path from 'path'
+import fs from 'fs'
 import env from 'env'
 import { showWindow } from './app/show-window'
 import CommonUtils from 'utils/common'
@@ -463,9 +465,24 @@ export default class ApiController {
     })
 
     handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
+      let finallyClearCache = clearCache
+      if (!finallyClearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+        const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+          type: 'info',
+          message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          buttons: [t('common.ok'), t('common.cancel')]
+        })
+        if (response === 1) {
+          return {
+            status: ResponseCode.Fail,
+          }
+        } else {
+          finallyClearCache = true
+        }
+      }
       SettingsService.getInstance().ckbDataPath = dataPath
       await stopMonitor('ckb-indexer')
-      if (clearCache) {
+      if (finallyClearCache) {
         await IndexerService.clearCache(true)
       }
       startMonitor(undefined, true)

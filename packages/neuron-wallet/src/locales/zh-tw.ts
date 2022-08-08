@@ -123,7 +123,8 @@ export default {
       'multisig-not-signed': '多簽交易缺少部分簽名',
       'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0',
       'no-match-address-for-sign': '没有找到匹配的地址',
-      'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址'
+      'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址',
+      'no-exist-ckb-node-data': '{{path}}目錄下沒有找到 CKB Node 配置和數據, 點擊繼續重新同步'
     },
     messageBox: {
       button: {
