@@ -67,6 +67,9 @@ $secondary-font-size: 0.63rem;
       color: #434343;
       padding: 0 10px;
       font-size: 0.75rem;
+      max-width: 200px;
+      @include text-overflow-ellipsis;
+      line-height: 24px;
     }
 
     &:focus-within {

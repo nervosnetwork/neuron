@@ -58,7 +58,6 @@ $pending-color: #b3b3b3;
       justify-self: flex-end;
       align-self: center;
       text-align: right;
-      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -70,6 +69,11 @@ $pending-color: #b3b3b3;
       grid-area: wallet-name;
       font-weight: 600;
       align-self: center;
+      @include tooltip;
+
+      & > span {
+        @include text-overflow-ellipsis;
+      }
     }
 
     &:before {

@@ -56,7 +56,9 @@ const SUDTReceive = () => {
           <SUDTAvatar name={accountName} />
         </div>
         <div className={styles.accountName}>{accountName || DEFAULT_SUDT_FIELDS.accountName}</div>
-        <div className={styles.tokenName}>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</div>
+        <div className={styles.tokenName} data-tooltip={tokenName}>
+          <span>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</span>
+        </div>
       </div>
       <QRCode value={displayedAddr} size={220} includeMargin dispatch={dispatch} />
       <div className={styles.address}>

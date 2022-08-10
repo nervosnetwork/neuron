@@ -184,7 +184,7 @@ const Overview = () => {
               {['date', 'type', 'amount', 'status'].map(field => {
                 const title = t(`overview.${field}`)
                 return (
-                  <th key={field} title={title} aria-label={title}>
+                  <th key={field} title={title} aria-label={title} data-field={field}>
                     {title}
                   </th>
                 )

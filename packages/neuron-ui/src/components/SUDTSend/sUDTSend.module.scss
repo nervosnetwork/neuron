@@ -46,6 +46,7 @@
     white-space: nowrap;
     font-size: 0.75rem;
     align-self: center;
+    @include text-overflow-ellipsis;
   }
   .balance {
     grid-area: balance;
@@ -60,6 +61,8 @@
   .symbol {
     grid-area: symbol;
     font-size: 0.875rem;
+    max-width: 800px;
+    @include text-overflow-ellipsis;
   }
 
   border-bottom: 1px solid #aaa;

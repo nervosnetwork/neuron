@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .title {
   height: 28px;
   font-size: 1.375rem;
@@ -27,7 +29,12 @@
   .tokenName {
     font-size: 0.75rem;
     grid-area: token-name;
-    white-space: nowrap;
+    @include tooltip;
+    max-width: 500px;
+
+    & > span {
+      @include text-overflow-ellipsis;
+    }
   }
 }
 
@@ -67,6 +74,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  word-break: break-word;
   svg {
     width: 0.75rem;
     height: 0.75rem;

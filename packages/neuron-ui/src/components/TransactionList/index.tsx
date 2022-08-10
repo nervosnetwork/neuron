@@ -221,7 +221,9 @@ const TransactionList = ({
               <span className={styles.type} title={typeLabel}>
                 {typeLabel}
               </span>
-              <span className={styles.walletName}>{name}</span>
+              <div className={styles.walletName} data-tooltip={name}>
+                <span>{name}</span>
+              </div>
               <div className={styles.indicator}>{indicator}</div>
             </div>
             <div className={styles.detail}>
