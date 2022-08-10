@@ -377,10 +377,10 @@
         "remove-indexer-data-tip": "請將 Indexer 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
         "cancel": "取消",
         "resync-ckb-node-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node 數據，但會刪除已同步的 Indexer 數據。",
-        "resync-indexer-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node(Indexer) 數據.",
+        "resync-indexer-describe": "註意: 重新同步不會刪除當前已同步的 Indexer 數據.",
         "move-data-finish": "數據轉移完成",
         "re-sync": "重新同步",
-        "disabled-set-path": "本地啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效"
+        "disabled-set-path": "手動啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效"
       }
     },
     "password-request": {

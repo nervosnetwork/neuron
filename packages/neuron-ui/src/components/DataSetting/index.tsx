@@ -42,7 +42,7 @@ const itemProps: Record<
 const SetItem = ({ type }: { type: keyof typeof itemProps }) => {
   const props = itemProps[type]
   const [t] = useTranslation()
-  const { onSetting, prevPath, currentPath, dialogRef, onCancel, onConfirm, isSaving, saveingType } = useDataPath(
+  const { onSetting, prevPath, currentPath, dialogRef, onCancel, onConfirm, isSaving, savingType } = useDataPath(
     props.getPath,
     props.setPath,
     props.type
@@ -87,7 +87,7 @@ const SetItem = ({ type }: { type: keyof typeof itemProps }) => {
             type="primary"
             onClick={onConfirm}
           >
-            {isSaving && saveingType === 'move' ? (
+            {isSaving && savingType === 'move' ? (
               <Spinner
                 label={t('settings.data.move-data-finish')}
                 labelPosition="right"
@@ -105,7 +105,7 @@ const SetItem = ({ type }: { type: keyof typeof itemProps }) => {
             type="primary"
             onClick={onConfirm}
           >
-            {isSaving && saveingType === 'resync' ? (
+            {isSaving && savingType === 'resync' ? (
               <Spinner
                 label={t('settings.data.re-sync')}
                 labelPosition="right"

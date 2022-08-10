@@ -380,7 +380,7 @@
         "cancel": "取消",
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
-        "disabled-set-path": "本地启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效"
+        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效"
       }
     },
     "password-request": {

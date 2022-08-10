@@ -18,7 +18,7 @@ export const useDataPath = (
 ) => {
   const [t] = useTranslation()
   const [isSaving, setIsSaveing] = useState(false)
-  const [saveingType, setSaveingType] = useState<string | null>()
+  const [savingType, setSavingType] = useState<string | null>()
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
   const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
@@ -55,7 +55,7 @@ export const useDataPath = (
     e => {
       const { dataset } = e.currentTarget
       setIsSaveing(true)
-      setSaveingType(dataset.syncType)
+      setSavingType(dataset.syncType)
       setPath({
         dataPath: currentPath!,
         clearCache: type === 'ckb' && dataset?.resync === 'true',
@@ -68,7 +68,7 @@ export const useDataPath = (
         })
         .finally(() => {
           setIsSaveing(false)
-          setSaveingType(null)
+          setSavingType(null)
         })
     },
     [currentPath, closeDialog, setPrevPath, setPath]
@@ -81,7 +81,7 @@ export const useDataPath = (
     onCancel,
     onConfirm,
     isSaving,
-    saveingType,
+    savingType,
   }
 }
 
