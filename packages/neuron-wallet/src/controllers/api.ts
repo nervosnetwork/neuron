@@ -496,7 +496,7 @@ export default class ApiController {
     })
 
     handle('stop-process-monitor', async (_, monitorName: string) => {
-      await stopMonitor(monitorName)
+      await Promise.race([stopMonitor(monitorName), CommonUtils.sleep(1000)])
       return {
         status: ResponseCode.Success,
       }

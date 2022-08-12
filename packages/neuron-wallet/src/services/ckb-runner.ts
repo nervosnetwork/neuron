@@ -114,7 +114,7 @@ export const stopCkbNode = () => {
     if (ckb) {
       logger.info('CKB:\tkilling node')
       ckb.once('close', () => resolve())
-      ckb.kill()
+      ckb.kill(2)
       ckb = null
     } else {
       resolve()
