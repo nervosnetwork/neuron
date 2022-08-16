@@ -49,17 +49,17 @@ const fixtures = {
     },
     exception: ErrorCode.ValueReserved,
   },
-  'Should throw an error when token name is longer than 16 chars': {
+  'Should throw an error when token name is longer than 101 chars': {
     params: {
-      tokenName: 't'.repeat(17),
+      tokenName: 't'.repeat(101),
       required: false,
       isCKB: true,
     },
     exception: ErrorCode.FieldTooLong,
   },
-  'Should pass when token name is less than or equal to 16 chars': {
+  'Should pass when token name is less than or equal to 100 chars': {
     params: {
-      tokenName: 't'.repeat(16),
+      tokenName: 't'.repeat(100),
       required: false,
       isCKB: true,
     },
