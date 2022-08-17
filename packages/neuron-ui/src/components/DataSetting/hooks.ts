@@ -17,6 +17,8 @@ export const useDataPath = (
   type: Parameters<typeof stopProcessMonitor>[0]
 ) => {
   const [t] = useTranslation()
+  const [isSaving, setIsSaveing] = useState(false)
+  const [savingType, setSavingType] = useState<string | null>()
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
   const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
@@ -49,14 +51,28 @@ export const useDataPath = (
       }
     })
   }, [closeDialog, type])
-  const onConfirm = useCallback(() => {
-    setPath(currentPath!).then(res => {
-      if (isSuccessResponse(res)) {
-        setPrevPath(currentPath)
-        closeDialog()
-      }
-    })
-  }, [currentPath, closeDialog, setPrevPath, setPath])
+  const onConfirm = useCallback(
+    e => {
+      const { dataset } = e.currentTarget
+      setIsSaveing(true)
+      setSavingType(dataset.syncType)
+      setPath({
+        dataPath: currentPath!,
+        clearCache: type === 'ckb' && dataset?.resync === 'true',
+      })
+        .then(res => {
+          if (isSuccessResponse(res)) {
+            setPrevPath(currentPath)
+            closeDialog()
+          }
+        })
+        .finally(() => {
+          setIsSaveing(false)
+          setSavingType(null)
+        })
+    },
+    [currentPath, closeDialog, setPrevPath, setPath]
+  )
   return {
     prevPath,
     currentPath,
@@ -64,6 +80,8 @@ export const useDataPath = (
     dialogRef,
     onCancel,
     onConfirm,
+    isSaving,
+    savingType,
   }
 }
 
