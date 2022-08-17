@@ -1,9 +1,3 @@
-body[data-theme="dark"] {
-  .root {
-    border: none;
-  }
-}
-
 .root {
   width: 624px;
   background: var(--secondary-background-color);
@@ -16,20 +10,26 @@ body[data-theme="dark"] {
   padding: 32px;
   margin: 0 auto;
   color: var(--main-text-color);
+  @media (prefers-color-scheme: dark) {
+    border: none;
+  }
 
   & * {
     font-family: 'Proxima Nova';
   }
 
-  & .activity {
-    color: #00C891;
-  }
-
-  & .errorWords {
-    color: #FF1E1E;
-    & > input {
-      border-bottom: 1px solid #FF1E1E;
-      color: #FF1E1E;
+  & .wordItem {
+    &:focus-within {
+      color: #00C891;
+    }
+    &:not(:focus-within) {
+      &.errorWords {
+        color: #FF1E1E;
+        & > input {
+          border-bottom: 1px solid #FF1E1E;
+          color: #FF1E1E;
+        }
+      }
     }
   }
 

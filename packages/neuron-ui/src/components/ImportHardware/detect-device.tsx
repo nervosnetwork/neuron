@@ -16,9 +16,9 @@ import { ImportStep, ActionType, Model } from './common'
 import styles from './findDevice.module.scss'
 
 const Info = (
-  { isError, waiting, msg }: { isError?: boolean; waiting?: boolean; msg: string } = {
+  { isError, isWaiting, msg }: { isError?: boolean; isWaiting?: boolean; msg: string } = {
     isError: false,
-    waiting: false,
+    isWaiting: false,
     msg: '',
   }
 ) => {
@@ -38,7 +38,7 @@ const Info = (
   }
   return (
     <div className={styles.info}>
-      <span>{waiting ? null : <SuccessInfo />}</span>
+      <span>{isWaiting ? null : <SuccessInfo />}</span>
       <span>{msg}</span>
     </div>
   )
@@ -117,7 +117,7 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
       <section className={styles.detect}>
         <h3 className={styles.model}>{productName}</h3>
         {errorMsg ? <Info isError msg={errorMsg} /> : null}
-        {scaning ? <Info waiting={scaning} msg={t('import-hardware.waiting')} /> : null}
+        {scaning ? <Info isWaiting={scaning} msg={t('import-hardware.waiting')} /> : null}
         {firmwareVersion && !errorMsg && !scaning ? (
           <Info msg={t('import-hardware.firmware-version', { version: firmwareVersion })} />
         ) : null}

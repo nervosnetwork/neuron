@@ -46,6 +46,11 @@ $secondary-font-size: 0.63rem;
     width: 480px;
     height: 46px;
     padding: 0 16px;
+
+    @media (prefers-color-scheme: dark) {
+      background: transparent;
+    }
+
     &[data-disabled='true'] {
       background-color: var(--input-disabled-color);
     }
@@ -150,11 +155,5 @@ $secondary-font-size: 0.63rem;
     input {
       width: 100px;
     }
-  }
-}
-
-body[data-theme="dark"] {
-  .input {
-    background: transparent;
   }
 }

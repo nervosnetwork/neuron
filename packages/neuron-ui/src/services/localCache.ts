@@ -8,7 +8,6 @@ export enum LocalCacheKey {
   CurrentNetworkID = 'currentNetworkID',
   CacheClearDate = 'cacheClearDate',
   SyncRebuildNotification = 'syncRebuildNotification',
-  Theme = 'theme',
 }
 
 export const addresses = {
@@ -127,27 +126,5 @@ export const syncRebuildNotification = {
   },
   load: () => {
     return window.localStorage.getItem(LocalCacheKey.SyncRebuildNotification)
-  },
-}
-
-export enum Theme {
-  Light = 'light',
-  Dark = 'dark',
-}
-
-export const theme = {
-  save: (type: Theme) => {
-    window.localStorage.setItem(LocalCacheKey.Theme, type)
-    document.body.setAttribute('data-theme', type)
-    document.body.className = `${document.body.className.replace(
-      new RegExp(`(${Theme.Dark})|(${Theme.Light})`, 'g'),
-      ''
-    )} ${type}`
-    return true
-  },
-  load: () => {
-    const themeType = window.localStorage.getItem(LocalCacheKey.Theme) || Theme.Light
-    document.body.setAttribute('data-theme', themeType)
-    return themeType
   },
 }

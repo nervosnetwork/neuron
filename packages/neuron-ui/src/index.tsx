@@ -6,7 +6,7 @@ import 'theme'
 import 'styles/theme.scss'
 import 'styles/index.scss'
 import 'utils/i18n'
-import { useDidMount, useRoutes } from 'utils'
+import { useRoutes } from 'utils'
 
 import Navbar from 'containers/Navbar'
 import Main from 'containers/Main'
@@ -16,7 +16,6 @@ import MultiSignAddress from 'components/MultisigAddress'
 import ErrorBoundary from 'components/ErrorBoundary'
 import Spinner from 'widgets/Spinner'
 import { withProvider } from 'states'
-import { theme } from 'services/localCache'
 
 const Notification = lazy(() => import('containers/Notification'))
 const Settings = lazy(() => import('containers/Settings'))
@@ -52,9 +51,6 @@ if (window.location.hash.startsWith('#/transaction/')) {
 
   const App = withProvider(() => {
     const routes = useRoutes(containers)
-    useDidMount(() => {
-      theme.load()
-    })
     return (
       <ErrorBoundary>
         <Suspense fallback={<Spinner />}>

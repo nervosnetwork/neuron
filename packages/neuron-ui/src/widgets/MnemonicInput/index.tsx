@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import styles from './index.module.scss'
 
 const MnemonicInput = ({
@@ -12,17 +12,7 @@ const MnemonicInput = ({
   inputsWords: string[]
   onChangeInputWord: React.ChangeEventHandler<HTMLInputElement>
 }) => {
-  const wordList = useMemo(() => (words ? words.split(' ') : new Array(12).fill('')), [words])
-  const [activityInputIndex, setActivityInputIndex] = useState<number | null>(null)
-  const onFocusInput = useCallback(
-    e => {
-      setActivityInputIndex(+e.target.dataset.idx)
-    },
-    [setActivityInputIndex]
-  )
-  const onBlurInput = useCallback(() => {
-    setActivityInputIndex(null)
-  }, [setActivityInputIndex])
+  const wordList = useMemo(() => Object.assign(new Array(12).fill(''), words?.split(' ')), [words])
   return (
     <div className={styles.root}>
       {disabled
@@ -35,19 +25,11 @@ const MnemonicInput = ({
         : wordList.map((v, idx) => (
             <div
               key={v || idx.toString()}
-              className={`${activityInputIndex === idx ? styles.activity : ''}
-              ${
-                activityInputIndex !== idx && inputsWords[idx] && v && v !== inputsWords[idx] ? styles.errorWords : ''
-              }`}
+              className={`${styles.wordItem}
+              ${inputsWords[idx] && v && v !== inputsWords[idx] ? styles.errorWords : ''}`}
             >
               {idx + 1}
-              <input
-                data-idx={idx}
-                className={styles.input}
-                onFocus={onFocusInput}
-                onBlur={onBlurInput}
-                onChange={onChangeInputWord}
-              />
+              <input data-idx={idx} className={styles.input} onChange={onChangeInputWord} />
             </div>
           ))}
     </div>

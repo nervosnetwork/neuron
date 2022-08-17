@@ -3,22 +3,9 @@ import { SuccessInfo, Error as ErrorIcon } from 'widgets/Icons/icon'
 import styles from './index.module.scss'
 
 export enum AlertStatus {
-  Init = 0,
-  Success = 1,
-  Error = 2,
-}
-
-const getClassName = (status: AlertStatus) => {
-  switch (status) {
-    case AlertStatus.Init:
-      return styles.init
-    case AlertStatus.Error:
-      return styles.error
-    case AlertStatus.Success:
-      return styles.success
-    default:
-      return styles.init
-  }
+  Init = 'init',
+  Success = 'success',
+  Error = 'error',
 }
 
 const Alert = ({
@@ -31,7 +18,7 @@ const Alert = ({
   className?: string
 }) => {
   return (
-    <li className={`${getClassName(status)} ${className || ''} ${styles.alert}`}>
+    <li className={`${styles[status]} ${className || ''} ${styles.alert}`}>
       {status === AlertStatus.Success && <SuccessInfo type="success" />}
       {status === AlertStatus.Error && <ErrorIcon type="error" />}
       {children}

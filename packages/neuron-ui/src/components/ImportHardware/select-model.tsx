@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { useHistory } from 'react-router-dom'
-import { NoWalletCreateNew } from 'components/WalletWizard'
+import { CreateFirstWalletNav } from 'components/WalletWizard'
 import { useGoBack } from 'utils'
 import { AttentionOutline } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
@@ -80,7 +80,7 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
   return (
     <div className={styles.container}>
       <header className={styles.title}>{t('import-hardware.title.select-model')}</header>
-      <NoWalletCreateNew />
+      <CreateFirstWalletNav />
       <section className={styles.selectDevice}>
         {options.map(v => (
           <TextField

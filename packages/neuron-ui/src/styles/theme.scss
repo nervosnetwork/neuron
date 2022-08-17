@@ -1,4 +1,4 @@
-body[data-theme="light"] {
+body {
   --primary-color: #00C891;
   --primary-text-color: #FFFFFF;
   --main-background-color: #E6F3F3;
@@ -19,27 +19,27 @@ body[data-theme="light"] {
   --input-button-color: #999999;
   --button-cancel-color: #999999;
   --svg-color: #666666;
-}
 
-body[data-theme="dark"] {
-  --primary-color: #00C891;
-  --primary-text-color: #232323;
-  --main-background-color: #111614;
-  --secondary-background-color: #1E2423;
-  --main-text-color: #FFFFFF;
-  --secondary-text-color: #8DA394;
-  --link-color: #00C891;
-  --notice-background-color: rgba(255, 140, 0, 0.2);
-  --notice-text-color: #F78C2A;
-  --border-color: #343E3C;
-  --input-border-color: #343E3C;
-  --divide-line-color: rgba(240, 240, 240, 0.2);
-  --step-no-activity-color: #666666;
-  --activity-color: #00C891;
-  --success-color: #00C891;
-  --error-color: #FF1E1E;
-  --input-disabled-color: #171B1A;
-  --input-button-color: #FFFFFF;
-  --button-cancel-color: #FFFFFF;
-  --svg-color: #FFFFFF;
+  @media (prefers-color-scheme: dark) {
+    --primary-color: #00C891;
+    --primary-text-color: #232323;
+    --main-background-color: #111614;
+    --secondary-background-color: #1E2423;
+    --main-text-color: #FFFFFF;
+    --secondary-text-color: #8DA394;
+    --link-color: #00C891;
+    --notice-background-color: rgba(255, 140, 0, 0.2);
+    --notice-text-color: #F78C2A;
+    --border-color: #343E3C;
+    --input-border-color: #343E3C;
+    --divide-line-color: rgba(240, 240, 240, 0.2);
+    --step-no-activity-color: #666666;
+    --activity-color: #00C891;
+    --success-color: #00C891;
+    --error-color: #FF1E1E;
+    --input-disabled-color: #171B1A;
+    --input-button-color: #FFFFFF;
+    --button-cancel-color: #FFFFFF;
+    --svg-color: #FFFFFF;
+  }
 }

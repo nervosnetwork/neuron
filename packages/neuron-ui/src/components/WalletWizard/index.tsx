@@ -99,11 +99,11 @@ const submissionInputs = [
   },
 ]
 
-export const NoWalletCreateNew = ({ className }: { className?: string }) => {
+export const CreateFirstWalletNav = ({ className }: { className?: string }) => {
   const [t] = useTranslation()
   return (
     <div className={`${styles.hint} ${className || ''}`}>
-      <span>{t('wizard.no-mnemonic')}</span>
+      <span>{t('wizard.no-wallet')}</span>
       <Link to={`/wizard${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`}>{t('wizard.create-wallet')}</Link>
     </div>
   )
@@ -196,7 +196,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
   const { inputsWords, onChangeInput, setInputsWords } = useInputWords()
   const disableNext =
     (type === MnemonicAction.Import && inputsWords.some(v => !v)) ||
-    (type === MnemonicAction.Verify && !(generated === inputsWords.join(' ')))
+    (type === MnemonicAction.Verify && generated !== inputsWords.join(' '))
 
   const [step, changeStep] = useState(0)
   useEffect(() => {
@@ -274,7 +274,11 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
         </div>
       )}
       <div className={styles.text}>{t(message)}</div>
-      {type === MnemonicAction.Import ? <NoWalletCreateNew /> : <div className={styles.hint}>{t(typeHits[type])}</div>}
+      {type === MnemonicAction.Import ? (
+        <CreateFirstWalletNav />
+      ) : (
+        <div className={styles.hint}>{t(typeHits[type])}</div>
+      )}
       <MnemonicInput
         disabled={isCreate}
         words={generated}
@@ -291,7 +295,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
 
 Mnemonic.displayName = 'Mnemonic'
 
-const getAlertStatus = (fieldInit: boolean, success: boolean) => {
+export const getAlertStatus = (fieldInit: boolean, success: boolean) => {
   if (fieldInit) {
     return success ? AlertStatus.Success : AlertStatus.Error
   }

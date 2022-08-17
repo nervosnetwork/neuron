@@ -4,18 +4,11 @@ import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { createHardwareWallet } from 'services/remote'
 import { isSuccessResponse, useDialogWrapper } from 'utils'
-import Alert, { AlertStatus } from 'widgets/Alert'
-import { FinishCreateLoading } from 'components/WalletWizard'
+import Alert from 'widgets/Alert'
+import { FinishCreateLoading, getAlertStatus } from 'components/WalletWizard'
 import { ImportStep, ActionType, ImportHardwareState } from './common'
 
 import styles from './findDevice.module.scss'
-
-const getAlertStatus = (fieldInit: boolean, success: boolean) => {
-  if (fieldInit) {
-    return success ? AlertStatus.Success : AlertStatus.Error
-  }
-  return AlertStatus.Init
-}
 
 const NameWallet = ({
   dispatch,

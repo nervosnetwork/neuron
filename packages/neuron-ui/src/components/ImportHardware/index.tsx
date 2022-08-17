@@ -16,7 +16,7 @@ const reducer: React.Reducer<ImportHardwareState, ActionType> = (state, action) 
 
 const Content = () => {
   const [importHardwareStates, dispatch] = useReducer(reducer, { step: ImportStep.ImportHardware })
-  const { dialogRef, openDialog, closeDialog, isDialogOpen } = useDialogWrapper()
+  const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
   useEffect(() => {
     if (!dialogRef) {
       return
@@ -26,10 +26,10 @@ const Content = () => {
       importHardwareStates.step === ImportStep.NameWallet
     ) {
       closeDialog()
-    } else if (!isDialogOpen) {
+    } else {
       openDialog()
     }
-  }, [importHardwareStates.step, isDialogOpen])
+  }, [importHardwareStates.step, dialogRef, closeDialog, openDialog])
   switch (importHardwareStates.step) {
     case ImportStep.ImportHardware:
     case ImportStep.DetectDevice:

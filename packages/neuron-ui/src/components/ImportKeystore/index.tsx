@@ -16,7 +16,7 @@ import {
   useDialogWrapper,
 } from 'utils'
 
-import { FinishCreateLoading, NoWalletCreateNew } from 'components/WalletWizard'
+import { FinishCreateLoading, CreateFirstWalletNav } from 'components/WalletWizard'
 import TextField from 'widgets/TextField'
 import styles from './importKeystore.module.scss'
 
@@ -193,7 +193,7 @@ const ImportKeystore = () => {
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
       <div className={styles.title}>{t('import-keystore.title')}</div>
-      <NoWalletCreateNew />
+      <CreateFirstWalletNav />
       {Object.entries(fields)
         .filter(([key]) => !key.endsWith('Error'))
         .map(([key, value]) => {
