@@ -47,7 +47,7 @@ const NameWallet = ({
           closeDialog()
         })
     },
-    [walletName, extendedPublicKey]
+    [walletName, extendedPublicKey, dispatch, setErrorMsg, openDialog, closeDialog]
   )
 
   const onInput = useCallback(e => {
