@@ -26,7 +26,7 @@ $pending-color: #b3b3b3;
     grid-template:
       'avatar wallet-name amount indicator' auto
       'toggle type time indicator' auto/
-      30px minmax(130px, 300px) 1fr 30px;
+      30px minmax(130px, auto) minmax(130px, auto) 30px;
     grid-gap: 7px 10px;
     font-size: 0.875rem;
 
@@ -50,6 +50,9 @@ $pending-color: #b3b3b3;
 
     .type {
       grid-area: type;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .amount {

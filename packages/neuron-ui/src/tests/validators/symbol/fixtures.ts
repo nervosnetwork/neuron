@@ -41,9 +41,9 @@ const fixtures = {
     },
     exception: null,
   },
-  'Should throw an error when symbol is longer than 201 chars': {
+  'Should throw an error when symbol is longer than 101 chars': {
     params: {
-      symbol: 'n'.repeat(201),
+      symbol: 'n'.repeat(101),
       required: true,
       isCKB: false,
     },
@@ -57,9 +57,9 @@ const fixtures = {
     },
     exception: ErrorCode.FieldInvalid,
   },
-  'Should pass when symbol is less than or equal to 200 chars without non-ascii chars': {
+  'Should pass when symbol is less than or equal to 100 chars without non-ascii chars': {
     params: {
-      symbol: 'n'.repeat(200),
+      symbol: 'n'.repeat(100),
       required: true,
       isCKB: false,
     },
