@@ -41,12 +41,21 @@
     font-weight: 600;
     align-self: center;
   }
-  .tokenName {
+  .tokenNameContainer {
     grid-area: token-name;
     white-space: nowrap;
     font-size: 0.75rem;
     align-self: center;
-    @include text-overflow-ellipsis;
+    min-width: 200px;
+
+    .tokenName {
+      width: 100%;
+      display: inline-block;
+
+      & > span {
+        width: 100%;
+      }
+    }
   }
   .balance {
     grid-area: balance;
@@ -58,15 +67,26 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .symbol {
+  .symbolConatiner {
     grid-area: symbol;
     font-size: 0.875rem;
     max-width: 800px;
-    @include text-overflow-ellipsis;
   }
 
   border-bottom: 1px solid #aaa;
   padding-bottom: 20px;
+}
+
+.symbol {
+  max-width: 100%;
+  display: inline-block;
+  & > span {
+    max-width: 100%;
+  }
+  &::after {
+    right: -20px;
+    left: auto;
+  }
 }
 
 .sendContainer {

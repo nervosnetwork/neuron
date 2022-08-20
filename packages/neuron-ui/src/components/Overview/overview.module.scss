@@ -89,7 +89,29 @@ $confirming-color: #b3b3b3;
     line-height: 1em;
     padding: 8px 2px;
     color: #000;
-    word-break: break-word;
+    white-space: nowrap;
+  }
+
+  .tokenName {
+    max-width: 50%;
+    display: inline-flex;
+    line-height: 24px;
+
+    &::after {
+      min-width: 300px;
+    }
+    & > span {
+      max-width: 100%;
+    }
+  }
+
+  .symbol {
+    max-width: 90%;
+    display: inline-flex;
+
+    &::after {
+      max-width: 400px;
+    }
   }
 
   .txStatus {

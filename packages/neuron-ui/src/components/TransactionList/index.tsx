@@ -25,6 +25,7 @@ import {
 import { StateDispatch } from 'states'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
+import { getDisplayName, isTonkenInfoStandardUAN, UANTokenName } from 'components/UANDisplay'
 import styles from './transactionList.module.scss'
 
 const { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } = CONSTANTS
@@ -143,6 +144,7 @@ const TransactionList = ({
         let amount = '--'
         let typeLabel = '--'
         let sudtAmount = ''
+        let showWithUANFormatter = false
 
         if (tx.nftInfo) {
           // NFT
@@ -155,7 +157,8 @@ const TransactionList = ({
           name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
           if (['create', 'destroy'].includes(tx.type)) {
             // create/destroy an account
-            typeLabel = `${t(`history.${tx.type}`, { name })}`
+            showWithUANFormatter = isTonkenInfoStandardUAN(tx.sudtInfo.sUDT.tokenName, tx.sudtInfo.sUDT.symbol)
+            typeLabel = `${t(`history.${tx.type}`, { name: getDisplayName(name, tx.sudtInfo.sUDT.symbol) })}`
           } else {
             // send/receive to/from an account
             const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
@@ -221,9 +224,13 @@ const TransactionList = ({
               <span className={styles.type} title={typeLabel}>
                 {typeLabel}
               </span>
-              <div className={styles.walletName} data-tooltip={name}>
-                <span>{name}</span>
-              </div>
+              {showWithUANFormatter ? (
+                <UANTokenName name={name} symbol={tx.sudtInfo!.sUDT.symbol} className={styles.walletName} />
+              ) : (
+                <div className={`${styles.walletName} ${styles.tooltip}`} data-tooltip={name}>
+                  <span>{name}</span>
+                </div>
+              )}
               <div className={styles.indicator}>{indicator}</div>
             </div>
             <div className={styles.detail}>

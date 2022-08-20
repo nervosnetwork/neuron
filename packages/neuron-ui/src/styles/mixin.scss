@@ -118,6 +118,7 @@
 
 @mixin tooltip {
   position: relative;
+  pointer-events: initial !important;
 
   &::after {
     display: none;
@@ -131,6 +132,7 @@
     font-weight: 300;
     max-width: 600px;
     word-wrap: break-word;
+    white-space: normal;
     z-index: 100;
   }
 

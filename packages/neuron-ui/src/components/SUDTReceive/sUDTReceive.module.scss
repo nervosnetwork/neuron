@@ -30,6 +30,7 @@
     font-size: 0.75rem;
     grid-area: token-name;
     @include tooltip;
+    min-width: 300px;
     max-width: 500px;
 
     & > span {
@@ -80,5 +81,14 @@
     height: 0.75rem;
     margin-right: 5px;
     filter: grayscale(1) brightness(2);
+  }
+  .symbol {
+    display: inline-flex;
+    margin: 0 2px;
+
+    &::after {
+      min-width: 140px;
+      text-align: left;
+    }
   }
 }

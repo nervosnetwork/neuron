@@ -141,7 +141,9 @@
       },
       "copy-balance": "Copy Balance",
       "create": "Create {{name}} Asset Account",
-      "destroy": "Destroy {{name}} Asset Account"
+      "destroy": "Destroy {{name}} Asset Account",
+      "createSUDT": "Create <0></0> Asset Account",
+      "destroySUDT": "Destroy <0></0> Asset Account"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -885,7 +887,7 @@
         "select-option": "Please confirm the above option before submitting"
       },
       "receive": {
-        "notation": "Accept {{symbol}} only"
+        "notation": "Accept <0></0> only"
       },
       "update-dialog": {
         "update-asset-account": "Account setup",

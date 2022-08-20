@@ -50,9 +50,19 @@ $pending-color: #b3b3b3;
 
     .type {
       grid-area: type;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @include text-overflow-ellipsis;
+    }
+
+    .uanType {
+      grid-area: type;
+
+      & > span {
+        pointer-events: initial;
+
+        &::after {
+          white-space: nowrap;
+        }
+      }
     }
 
     .amount {
@@ -72,11 +82,14 @@ $pending-color: #b3b3b3;
       grid-area: wallet-name;
       font-weight: 600;
       align-self: center;
-      @include tooltip;
 
       & > span {
         @include text-overflow-ellipsis;
       }
+    }
+
+    .tooltip {
+      @include tooltip;
     }
 
     &:before {
