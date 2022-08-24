@@ -1,0 +1,21 @@
+@import '../../styles/mixin.scss';
+
+.tokenName {
+  @include tooltip;
+  white-space: nowrap;
+
+  & > span {
+    @include text-overflow-ellipsis;
+    display: inline-block;
+  }
+}
+
+.tokenSymbol {
+  @include tooltip;
+  white-space: nowrap;
+
+  & > span {
+    @include text-overflow-ellipsis;
+    display: inline-block;
+  }
+}

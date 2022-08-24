@@ -31,8 +31,8 @@ export const INIT_SEND_PRICE = '1000'
 export const MIN_CKB_REQUIRED_BY_CKB_SUDT = 61
 export const MIN_CKB_REQUIRED_BY_NORMAL_SUDT = 142
 export const MAX_SUDT_ACCOUNT_NAME_LENGTH = 16
-export const MAX_SUDT_TOKEN_NAME_LENGTH = 16
-export const MAX_SYMBOL_LENGTH = 8
+export const MAX_SUDT_TOKEN_NAME_LENGTH = 200
+export const MAX_SYMBOL_LENGTH = 100
 export const MIN_DECIMAL = 0
 export const MAX_DECIMAL = 32
 

@@ -28,6 +28,7 @@ import {
   CONSTANTS,
 } from 'utils'
 import { AmountNotEnoughException } from 'exceptions'
+import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
 import { AddressLockType, getGenerator, useAddressLockType, useOnSumbit, useOptions, useSendType } from './hooks'
 import styles from './sUDTSend.module.scss'
 
@@ -341,11 +342,23 @@ const SUDTSend = () => {
               <SUDTAvatar name={accountInfo?.accountName} />
             </div>
             <div className={styles.accountName}>{accountInfo?.accountName}</div>
-            <div className={styles.tokenName}>{accountInfo?.tokenName}</div>
+            <div className={styles.tokenNameContainer}>
+              <UANTokenName
+                name={accountInfo?.tokenName || DEFAULT_SUDT_FIELDS.tokenName}
+                symbol={accountInfo?.symbol || ''}
+                className={styles.tokenName}
+              />
+            </div>
             <div className={styles.balance}>
               {accountInfo ? sudtValueToAmount(accountInfo.balance, accountInfo.decimal) : '--'}
             </div>
-            <div className={styles.symbol}>{accountInfo?.symbol}</div>
+            <div className={styles.symbolConatiner}>
+              <UANTonkenSymbol
+                name={accountInfo?.tokenName || ''}
+                symbol={accountInfo?.symbol || ''}
+                className={styles.symbol}
+              />
+            </div>
           </div>
           <div className={styles.sendContainer}>
             {fields.map(field => {
@@ -359,7 +372,15 @@ const SUDTSend = () => {
                   required
                   field={field.key}
                   onChange={onInput}
-                  suffix={field.key === Fields.Amount && accountInfo?.symbol}
+                  suffix={
+                    field.key === Fields.Amount ? (
+                      <UANTonkenSymbol
+                        name={accountInfo?.tokenName || ''}
+                        symbol={accountInfo?.symbol || ''}
+                        className={styles.symbol}
+                      />
+                    ) : null
+                  }
                   disabled={sendState.sendAll}
                   error={errors[field.key]}
                   className={styles[field.key]}

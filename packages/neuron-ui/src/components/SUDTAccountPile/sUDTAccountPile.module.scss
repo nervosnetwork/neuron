@@ -1,8 +1,10 @@
+@import '../../styles/mixin.scss';
+
 .container {
   background: #fff;
   width: 290px;
   display: grid;
-  grid-template: 'avatar account-name account-name edit-btn' auto 'avatar token-name symbol .' auto '. footer footer footer' 25px/ 33px auto 1fr 15px;
+  grid-template: 'avatar account-name account-name edit-btn' auto 'avatar token-name symbol .' auto '. footer footer footer' 25px/ 33px 106px 106px 15px;
   box-sizing: border-box;
 
   & > div {
@@ -40,11 +42,36 @@
 .tokenName {
   grid-area: token-name;
   font-size: 0.75rem;
+  overflow: initial !important;
+  position: relative;
+  
+  &[data-tooltip] {
+    &:not([data-tooltip='']) {
+      @include tooltip;
+    }
+  }
+   
+  & > span {
+    @include text-overflow-ellipsis;
+  }
 }
 
 .symbol {
   grid-area: symbol;
   font-size: 0.75rem;
+  overflow: initial !important;
+  position: relative;
+  &[data-tooltip] {
+    @include tooltip;
+  }
+
+  &::after {
+    top: -120%;
+  }
+   
+  & > span {
+    @include text-overflow-ellipsis;
+  }
 }
 
 .editBtn {

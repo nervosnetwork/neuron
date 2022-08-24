@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Balance from 'components/Balance'
 
 import { showTransactionDetails } from 'services/remote'
@@ -20,6 +20,7 @@ import {
   nftFormatter,
 } from 'utils'
 
+import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
 import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
@@ -110,7 +111,15 @@ const Overview = () => {
       let confirmations = ''
       let typeLabel: string = '--'
       let amount = '--'
+      let amountValue = ''
       let { status } = item
+      let typeTransProps: {
+        i18nKey: string
+        components: JSX.Element[]
+      } = {
+        i18nKey: '',
+        components: [],
+      }
 
       if (item.blockNumber !== undefined) {
         const confirmationCount =
@@ -141,7 +150,16 @@ const Overview = () => {
           // Asset Account
           if (['create', 'destroy'].includes(item.type)) {
             // create/destroy an account
-            typeLabel = `${t(`overview.${item.type}`, { name: item.sudtInfo.sUDT.tokenName || 'UDT' })}`
+            typeTransProps = {
+              i18nKey: `overview.${item.type}SUDT`,
+              components: [
+                <UANTokenName
+                  name={item.sudtInfo.sUDT.tokenName}
+                  symbol={item.sudtInfo.sUDT.symbol}
+                  className={styles.tokenName}
+                />,
+              ],
+            }
           } else {
             // send/receive to/from an account
             const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
@@ -151,6 +169,7 @@ const Overview = () => {
             amount = `${sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))} ${
               item.sudtInfo.sUDT.symbol
             }`
+            amountValue = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
           }
         } else {
           // normal tx
@@ -174,6 +193,8 @@ const Overview = () => {
         amount,
         confirmations,
         typeLabel,
+        amountValue,
+        typeTransProps,
       }
     })
     return (
@@ -184,7 +205,7 @@ const Overview = () => {
               {['date', 'type', 'amount', 'status'].map(field => {
                 const title = t(`overview.${field}`)
                 return (
-                  <th key={field} title={title} aria-label={title}>
+                  <th key={field} title={title} aria-label={title} data-field={field}>
                     {title}
                   </th>
                 )
@@ -193,14 +214,43 @@ const Overview = () => {
           </thead>
           <tbody>
             {activities.map(item => {
-              const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, amount } = item
+              const {
+                confirmations,
+                createdAt,
+                status,
+                hash,
+                statusLabel,
+                timestamp,
+                typeLabel,
+                amount,
+                typeTransProps,
+                amountValue,
+                sudtInfo,
+              } = item
               const time = uniformTimeFormatter(timestamp || createdAt)
 
               return (
                 <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
                   <td title={time}>{time.split(' ')[0]}</td>
-                  <td>{typeLabel}</td>
-                  <td>{amount}</td>
+                  {typeTransProps.i18nKey ? (
+                    <td>
+                      <Trans {...typeTransProps} />
+                    </td>
+                  ) : (
+                    <td>{typeLabel}</td>
+                  )}
+                  {amountValue ? (
+                    <td>
+                      {amountValue}&nbsp;
+                      <UANTonkenSymbol
+                        className={styles.symbol}
+                        name={sudtInfo!.sUDT.tokenName}
+                        symbol={sudtInfo!.sUDT.symbol}
+                      />
+                    </td>
+                  ) : (
+                    <td>{amount}</td>
+                  )}
                   <td className={styles.txStatus} data-status={status}>
                     <div>
                       <span>{statusLabel}</span>

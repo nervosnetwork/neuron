@@ -115,3 +115,28 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@mixin tooltip {
+  position: relative;
+  pointer-events: initial !important;
+
+  &::after {
+    display: none;
+    position: absolute;
+    left: -20px;
+    top: 120%;
+    content: attr(data-tooltip);
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: #cccccc;
+    font-weight: 300;
+    max-width: 600px;
+    word-wrap: break-word;
+    white-space: normal;
+    z-index: 100;
+  }
+
+  &:hover::after {
+    display: block;
+  }
+}

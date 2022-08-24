@@ -53,6 +53,7 @@ $confirming-color: #b3b3b3;
   table {
     border-collapse: collapse;
     width: 100%;
+    table-layout: fixed;
   }
 
   tr {
@@ -74,13 +75,43 @@ $confirming-color: #b3b3b3;
     color: #000;
     line-height: 1em;
     padding: 16px 0;
+
+    &[data-field='date'] {
+      width: 100px;
+    }
+    &[data-field='status'] {
+      width: 130px;
+    }
   }
 
   td {
     font-size: 0.875rem;
     line-height: 1em;
-    padding: 2px 0;
+    padding: 8px 2px;
     color: #000;
+    white-space: nowrap;
+  }
+
+  .tokenName {
+    max-width: 50%;
+    display: inline-flex;
+    line-height: 24px;
+
+    &::after {
+      min-width: 300px;
+    }
+    & > span {
+      max-width: 100%;
+    }
+  }
+
+  .symbol {
+    max-width: 90%;
+    display: inline-flex;
+
+    &::after {
+      max-width: 400px;
+    }
   }
 
   .txStatus {

@@ -26,7 +26,7 @@ $pending-color: #b3b3b3;
     grid-template:
       'avatar wallet-name amount indicator' auto
       'toggle type time indicator' auto/
-      30px minmax(130px, 300px) 1fr 30px;
+      30px minmax(130px, auto) minmax(130px, auto) 30px;
     grid-gap: 7px 10px;
     font-size: 0.875rem;
 
@@ -50,6 +50,19 @@ $pending-color: #b3b3b3;
 
     .type {
       grid-area: type;
+      @include text-overflow-ellipsis;
+    }
+
+    .uanType {
+      grid-area: type;
+
+      & > span {
+        pointer-events: initial;
+
+        &::after {
+          white-space: nowrap;
+        }
+      }
     }
 
     .amount {
@@ -58,7 +71,6 @@ $pending-color: #b3b3b3;
       justify-self: flex-end;
       align-self: center;
       text-align: right;
-      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -70,6 +82,14 @@ $pending-color: #b3b3b3;
       grid-area: wallet-name;
       font-weight: 600;
       align-self: center;
+
+      & > span {
+        @include text-overflow-ellipsis;
+      }
+    }
+
+    .tooltip {
+      @include tooltip;
     }
 
     &:before {

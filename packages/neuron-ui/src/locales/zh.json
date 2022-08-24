@@ -134,7 +134,9 @@
       },
       "copy-balance": "复制余额",
       "create": "创建 {{name}} 资产账户",
-      "destroy": "销毁 {{name}} 资产账户"
+      "destroy": "销毁 {{name}} 资产账户",
+      "createSUDT": "创建 <0></0> 资产账户",
+      "destroySUDT": "销毁 <0></0> 资产账户"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -879,7 +881,7 @@
         "select-option": "提交前请确认上述选项"
       },
       "receive": {
-        "notation": "只接收 {{symbol}} 转账"
+        "notation": "只接收 <0></0> 转账"
       },
       "update-dialog": {
         "update-asset-account": "账户设置",
