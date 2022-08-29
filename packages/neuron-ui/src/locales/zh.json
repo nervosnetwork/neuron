@@ -167,7 +167,7 @@
       "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中至少三类字符组成的字符串。",
       "same-password": "两次输入密码应一致",
       "input-seed-verify": "输入新生成的助记词进行验证",
-      "no-wallet": "还没有钱包? ",
+      "no-wallet": "还没有钱包?",
       "create-wallet": "立即创建新钱包",
       "repeat-password": "重复密码",
       "finish-create": "完成创建",

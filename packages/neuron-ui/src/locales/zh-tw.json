@@ -167,7 +167,7 @@
       "complex-password": "密碼為 8 至 50 字元由大寫字母、小寫字母、數位、特殊符號中至少三種字元組成的字串。",
       "same-password": "兩次輸入密碼應一致",
       "input-seed-verify": "輸入新生成的助記詞進行驗證",
-      "no-wallet": "還沒有錢包? ",
+      "no-wallet": "還沒有錢包?",
       "create-wallet": "立即創建新錢包",
       "repeat-password": "重復密碼",
       "finish-create": "完成創建",

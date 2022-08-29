@@ -103,7 +103,7 @@ export const CreateFirstWalletNav = ({ className }: { className?: string }) => {
   const [t] = useTranslation()
   return (
     <div className={`${styles.hint} ${className || ''}`}>
-      <span>{t('wizard.no-wallet')}</span>
+      <span>{t('wizard.no-wallet')}&nbsp;</span>
       <Link to={`/wizard${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`}>{t('wizard.create-wallet')}</Link>
     </div>
   )

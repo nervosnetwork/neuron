@@ -174,7 +174,7 @@
       "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
       "same-password": "The password and confirm password should match",
       "input-seed-verify": "Input created seed to verify",
-      "no-wallet": "No wallet? ",
+      "no-wallet": "No wallet?",
       "create-wallet": "Create Wallet",
       "repeat-password": "Repeat Password",
       "finish-create": "Finish Creating",
