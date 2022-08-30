@@ -481,11 +481,10 @@ export default class ApiController {
         }
       }
       SettingsService.getInstance().ckbDataPath = dataPath
-      await stopMonitor('ckb-indexer')
+      await startMonitor('ckb', true)
       if (finallyClearCache) {
-        await IndexerService.clearCache(true)
+        await IndexerService.clearCache(true, true)
       }
-      startMonitor(undefined, true)
       return {
         status: ResponseCode.Success,
         result: SettingsService.getInstance().ckbDataPath

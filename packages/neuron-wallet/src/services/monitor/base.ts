@@ -21,7 +21,7 @@ export default abstract class Monitor {
     if (this.isReStarting) {
       return
     }
-    const timeout = timer(intervalTime / 2).pipe(map(() => true))
+    const timeout = timer(intervalTime / 2).pipe(map(() => false))
     const isLiving = await race(timeout, from(this.isLiving())).toPromise()
     if (!isLiving) {
       logger.info(`Monitor: is restarting ${this.name} process`)
@@ -35,18 +35,19 @@ export default abstract class Monitor {
     }
   }
 
-  startMonitor(intervalTime: number = 10000, startNow: boolean = false) {
+  async startMonitor(intervalTime: number = 10000, startNow: boolean = false) {
     this.interval = interval(intervalTime)
-    if (startNow) {
-      this.monitor(intervalTime)
-    }
     if (!this.subcription?.closed) {
       this.subcription?.unsubscribe()
     }
     this.subcription = this.interval.subscribe(async () => this.monitor(intervalTime))
+    if (startNow) {
+      await this.monitor(intervalTime)
+    }
   }
 
-  clearMonitor() {
+  async stopMonitor() {
     this.subcription?.unsubscribe()
+    await this.stop()
   }
 }

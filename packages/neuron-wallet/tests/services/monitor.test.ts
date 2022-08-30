@@ -107,13 +107,15 @@ describe('base monitor', () => {
   })
 
   describe('start monitor', () => {
+    afterEach(async () => {
+      await monitor.stopMonitor()
+    })
     it('is living', async () => {
       isLivingMock.mockResolvedValue(true)
       monitor.startMonitor(100)
       await wait(200)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(0)
-      monitor.clearMonitor()
     })
     it('not living', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
@@ -121,15 +123,13 @@ describe('base monitor', () => {
       await wait(200)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalled()
-      monitor.clearMonitor()
     })
     it('isLiving timeout', async () => {
       isLivingMock.mockImplementation(() => wait(200))
       monitor.startMonitor(100)
       await wait(200)
       expect(isLivingMock).toHaveBeenCalled()
-      expect(restartMock).toHaveBeenCalledTimes(0)
-      monitor.clearMonitor()
+      expect(restartMock).toHaveBeenCalledTimes(1)
     })
     it('not living wait restart', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
@@ -138,7 +138,6 @@ describe('base monitor', () => {
       await wait(800)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
-      monitor.clearMonitor()
     })
     it('start monitor with first', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
@@ -146,7 +145,6 @@ describe('base monitor', () => {
       await wait(500)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalled()
-      monitor.clearMonitor()
     })
     it('twice start monitor', async () => {
       isLivingMock.mockReset()
@@ -155,7 +153,6 @@ describe('base monitor', () => {
       monitor.startMonitor(500)
       await wait(800)
       expect(isLivingMock).toHaveBeenCalledTimes(1)
-      monitor.clearMonitor()
     })
   })
 })
