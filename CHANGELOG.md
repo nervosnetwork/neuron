@@ -1,3 +1,33 @@
+# 0.104.0 (2022-09-07)
+
+### CKB
+[CKB v0.104.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.104.0) was released on Jul. 19th, 2022. This version of CKB node is now bundled and preconfigured in Neuron.
+
+### Assumed valid target
+
+// TODO
+Blocks before `` will be skipped in validation.
+
+
+### New features
+* #2442: Import and export multisig configuration which is compatible with ckb-cli.(@yanguoyu)
+* #2454: Add the 'contact us' item in the help menu.(@Keith-CY)
+* #2461: Remove maturity restriction of header deps.(@yanguoyu)
+* #2465: Adapt new UAN for sUDT.(@yanguoyu)
+* #2472: Bump ckb to v0.104.0 (@Keith-CY)
+
+### Bug fixes
+* #2447: Show friendly error on creating multisig address.(@yanguoyu)
+* #2450: Fix sending multisig tx of multiple input cells.(@yanguoyu)
+* #2451: Refine textfield component.(@yanguoyu
+* #2464, #2478: Optimize setting data path of ckb node/indexer.(@yanguoyu)
+* #2467: Fix ckb process killed unexpectedly.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.103.2...v0.104.0
+
+
+
 # 0.103.2 (2022-07-09)
 
 ### New features
