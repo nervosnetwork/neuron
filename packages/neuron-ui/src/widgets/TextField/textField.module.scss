@@ -64,6 +64,9 @@ $secondary-font-size: 0.63rem;
       &[data-selected='true'] {
         color: var(--activity-color);
         border-color: var(--activity-color);
+        & > input {
+          color: var(--activity-color);
+        }
       }
       &[data-disabled='true'] {
         cursor: not-allowed;
@@ -78,7 +81,7 @@ $secondary-font-size: 0.63rem;
   
     input {
       font-family: inherit;
-      font-size: 0.75rem;
+      font-size: 14px;
       flex: 1;
       border: none;
       overflow: hidden;
@@ -101,6 +104,10 @@ $secondary-font-size: 0.63rem;
       padding: 0 10px;
       font-size: 0.75rem;
       max-width: 200px;
+
+      &.password {
+        cursor: pointer;
+      }
     }
   }
 }

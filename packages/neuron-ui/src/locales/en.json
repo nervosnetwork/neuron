@@ -490,7 +490,9 @@
       "experimental": "Experimental",
       "close": "Close",
       "copy": "Copy",
-      "copied": "Copied"
+      "copied": "Copied",
+      "verification-failure": "Verification Failed",
+      "back": "Back"
     },
     "notification-panel": {
       "title": "Notifications"

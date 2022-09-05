@@ -19,6 +19,7 @@ body {
   --input-button-color: #999999;
   --button-cancel-color: #999999;
   --svg-color: #666666;
+  --dialog-secondary-text-color: #666666;
 
   @media (prefers-color-scheme: dark) {
     --primary-color: #00C891;
@@ -41,5 +42,6 @@ body {
     --input-button-color: #FFFFFF;
     --button-cancel-color: #FFFFFF;
     --svg-color: #FFFFFF;
+    --dialog-secondary-text-color: #FFFFFF;
   }
 }

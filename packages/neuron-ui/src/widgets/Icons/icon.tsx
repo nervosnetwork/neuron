@@ -30,6 +30,8 @@ import { ReactComponent as ErrorSvg } from './Error.svg'
 import { ReactComponent as LoadingSvg } from './Loading.svg'
 import { ReactComponent as AttentionSvg } from './ExperimentalAttention.svg'
 import { ReactComponent as AttentionOutlineSvg } from './AttentionOutline.svg'
+import { ReactComponent as PasswordHideSvg } from './PasswordHide.svg'
+import { ReactComponent as PasswordShowSvg } from './PasswordShow.svg'
 
 import styles from './icon.module.scss'
 
@@ -74,3 +76,5 @@ export const Error = WrapSvg(ErrorSvg)
 export const Loading = WrapSvg(LoadingSvg)
 export const Attention = WrapSvg(AttentionSvg)
 export const AttentionOutline = WrapSvg(AttentionOutlineSvg)
+export const PasswordHide = WrapSvg(PasswordHideSvg)
+export const PasswordShow = WrapSvg(PasswordShowSvg)

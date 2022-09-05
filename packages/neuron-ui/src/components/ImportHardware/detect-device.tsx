@@ -4,7 +4,7 @@ import Button from 'widgets/Button'
 import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
 import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
-import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
+import { Error } from 'widgets/Icons/icon'
 import {
   CkbAppNotFoundException,
   ConnectFailedException,
@@ -22,17 +22,15 @@ const Info = (
     msg: '',
   }
 ) => {
-  const [t] = useTranslation()
   if (isError) {
     return (
       <>
         <div className={styles.errorInfo}>
           <span>
-            <FailedInfo />
+            <Error type="error" />
           </span>
           <span className={styles.error}>{msg}</span>
         </div>
-        <div className={styles.aborted}>{t('import-hardware.abort')}</div>
       </>
     )
   }

@@ -483,7 +483,9 @@
       "experimental": "實驗室",
       "close": "關閉",
       "copy": "複製",
-      "copied": "已複製"
+      "copied": "已複製",
+      "verification-failure": "驗證失敗",
+      "back": "上一步"
     },
     "notification-panel": {
       "title": "通知中心"

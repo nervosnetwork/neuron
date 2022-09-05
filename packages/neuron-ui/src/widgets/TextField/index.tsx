@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import Alert, { AlertStatus } from 'widgets/Alert'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
+import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
 import styles from './textField.module.scss'
 
 const TextField = React.forwardRef(
@@ -44,6 +45,10 @@ const TextField = React.forwardRef(
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
+    const [isPasswordHide, setIsPasswordHide] = useState(true)
+    const changePasswordHide = useCallback(() => {
+      setIsPasswordHide(v => !v)
+    }, [setIsPasswordHide])
     return (
       <div
         className={`${styles.textField} ${stack ? styles.stack : ''} ${className}`}
@@ -60,7 +65,7 @@ const TextField = React.forwardRef(
           <input
             id={field}
             data-field={field}
-            type={type}
+            type={!isPasswordHide && type === 'password' ? 'text' : type}
             value={value}
             placeholder={placeholder}
             title={label}
@@ -73,6 +78,17 @@ const TextField = React.forwardRef(
             {...rest}
           />
           {suffix ? <span className={styles.suffix}>{suffix}</span> : null}
+          {!suffix && type === 'password' && (
+            <span
+              className={`${styles.suffix} ${styles.password}`}
+              onClick={changePasswordHide}
+              role="button"
+              aria-hidden="true"
+              tabIndex={0}
+            >
+              {isPasswordHide ? <PasswordHide /> : <PasswordShow />}
+            </span>
+          )}
         </div>
         {hint ? <span className={styles.hint}>{hint}</span> : null}
         {error ? (

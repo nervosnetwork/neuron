@@ -17,7 +17,7 @@ const MnemonicInput = ({
     <div className={styles.root}>
       {disabled
         ? wordList.map((v, idx) => (
-            <div key={v || idx.toString()}>
+            <div key={v || idx.toString()} className={styles.showItem}>
               {idx + 1}
               <span>{v}</span>
             </div>

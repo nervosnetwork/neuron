@@ -21,6 +21,7 @@ import MnemonicInput from 'widgets/MnemonicInput'
 import Alert, { AlertStatus } from 'widgets/Alert'
 import { Loading } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
+import { showAlertDialog, useDispatch } from 'states'
 import { useInputWords } from './hooks'
 import styles from './walletWizard.module.scss'
 
@@ -218,6 +219,8 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
     }
   }, [dispatch, type, history])
 
+  const globalDispatch = useDispatch()
+
   const onNext = useCallback(() => {
     if (disableNext) {
       return
@@ -246,14 +249,19 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
             }`
           )
         } else {
-          showErrorMessage(
-            t(`messages.error`),
-            t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'mnemonic', fieldValue: trimmedMnemonic })
-          )
+          showAlertDialog({
+            show: true,
+            title: t('common.verification-failure'),
+            message: t(`messages.codes.${ErrorCode.FieldInvalid}`, {
+              fieldName: 'mnemonic',
+              fieldValue: trimmedMnemonic,
+            }),
+            type: 'failed',
+          })(globalDispatch)
         }
       })
     }
-  }, [isCreate, history, rootPath, type, imported, t, dispatch, disableNext, inputsWords])
+  }, [isCreate, history, rootPath, type, imported, t, dispatch, disableNext, inputsWords, globalDispatch])
 
   const onBack = useCallback(() => {
     changeStep(v => v - 1)

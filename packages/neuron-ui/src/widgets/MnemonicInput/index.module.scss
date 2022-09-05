@@ -15,7 +15,12 @@
   }
 
   & * {
-    font-family: 'Proxima Nova';
+    font-family: 'ProximaNova-Regular';
+    font-size: 14px;
+  }
+
+  & .showItem {
+    font-weight: 600;
   }
 
   & .wordItem {
@@ -48,6 +53,7 @@
       margin-left: 8px;
       background-color: transparent;
       color: var(--main-text-color);
+      padding-bottom: 4px;
 
       &:focus {
         border-bottom: 1px solid #00C891;;

@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import i18n from 'i18next'
-import { importKeystore, showOpenDialogModal, showErrorMessage } from 'services/remote'
+import { importKeystore, showOpenDialogModal } from 'services/remote'
 import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import { PasswordIncorrectException } from 'exceptions'
@@ -56,7 +55,7 @@ const ImportKeystore = () => {
     !fields.password ||
     fields.nameError ||
     fields.passwordError ||
-    fields.passwordError
+    fields.pathError
   )
 
   useEffect(() => {
@@ -85,6 +84,7 @@ const ImportKeystore = () => {
           setFields({
             ...fields,
             path: filePath,
+            pathError: '',
           })
         }
       })
@@ -125,7 +125,7 @@ const ImportKeystore = () => {
             setFields(state => ({ ...state, passwordError: t(err.message) }))
             return
           }
-          showErrorMessage(i18n.t(`messages.error`), err.message)
+          setFields(state => ({ ...state, pathError: err.message }))
         })
         .finally(() => {
           closeDialog()
@@ -199,6 +199,7 @@ const ImportKeystore = () => {
         .map(([key, value]) => {
           return (
             <TextField
+              className={styles.field}
               key={key}
               field={key}
               onClick={key === 'path' ? handleFileClick : undefined}

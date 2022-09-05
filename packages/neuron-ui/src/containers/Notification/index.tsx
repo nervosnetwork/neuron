@@ -9,14 +9,16 @@ import {
   toggleAllNotificationVisibility,
   toggleTopAlertVisibility,
   dismissNotification,
+  dismissAlertDialog,
 } from 'states'
 import { useOnLocaleChange, useGlobalNotifications } from 'utils'
 
+import AlertDialog from 'widgets/AlertDialog'
 import styles from './Notification.module.scss'
 
 export const NoticeContent = () => {
   const {
-    app: { notifications = [], popups = [], showTopAlert = false, showAllNotifications = false },
+    app: { notifications = [], popups = [], showTopAlert = false, showAllNotifications = false, alertDialog },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, i18n] = useTranslation()
@@ -40,6 +42,10 @@ export const NoticeContent = () => {
     },
     [dispatch]
   )
+
+  const onDismissAlertDialog = useCallback(() => {
+    dismissAlertDialog()(dispatch)
+  }, [dispatch])
 
   return (
     <div className={styles.root}>
@@ -111,6 +117,7 @@ export const NoticeContent = () => {
           )
         })}
       </Panel>
+      {alertDialog && <AlertDialog onCancel={onDismissAlertDialog} {...alertDialog} />}
     </div>
   )
 }

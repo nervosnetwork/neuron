@@ -117,7 +117,15 @@ declare namespace State {
     decimal: string
   }
 
-  type AlertDialog = Record<'title' | 'message', string> | null
+  type AlertDialog = {
+    show?: boolean
+    title?: string
+    message?: string
+    type: 'success' | 'failed' | 'warning'
+    onClose?: () => void
+    onOk?: () => void
+    onCancel?: () => void
+  } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
 
   interface App {
