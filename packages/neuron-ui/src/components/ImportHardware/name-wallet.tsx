@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { createHardwareWallet } from 'services/remote'
-import { isSuccessResponse, useDialogWrapper } from 'utils'
+import { CONSTANTS, isSuccessResponse, useDialogWrapper } from 'utils'
 import Alert from 'widgets/Alert'
 import { FinishCreateLoading, getAlertStatus } from 'components/WalletWizard'
 import { ImportStep, ActionType, ImportHardwareState } from './common'
 
 import styles from './findDevice.module.scss'
+
+const { MAX_WALLET_NAME_LENGTH } = CONSTANTS
 
 const NameWallet = ({
   dispatch,
@@ -66,13 +68,19 @@ const NameWallet = ({
           onChange={onInput}
           field="wallet-name"
           value={walletName}
+          maxLength={MAX_WALLET_NAME_LENGTH}
         />
       </section>
       <Alert status={getAlertStatus(!!walletName, !errorMsg)} className={styles.alert}>
         <span>{errorMsg || t('wizard.new-name')}</span>
       </Alert>
       <footer className={styles.footer}>
-        <Button type="submit" label={t('import-hardware.actions.finish')} onClick={onNext} />
+        <Button
+          type="submit"
+          label={t('import-hardware.actions.finish')}
+          onClick={onNext}
+          disabled={!walletName || !!errorMsg}
+        />
         <Button type="text" label={t('import-hardware.actions.back')} onClick={onBack} />
       </footer>
       <FinishCreateLoading dialogRef={dialogRef} />
