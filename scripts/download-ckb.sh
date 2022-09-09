@@ -86,7 +86,7 @@ function download_mercury_windows() {
 
 function download_macos() {
   # macOS
-  CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-apple-darwin"
+  CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-apple-darwin-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/mac
 
   curl -O -L "https://github.com/nervosnetwork/ckb/releases/download/${CKB_VERSION}/${CKB_FILENAME}.zip"
@@ -101,7 +101,7 @@ function download_macos() {
 
 function download_linux() {
   # Linux
-  CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-unknown-linux-gnu"
+  CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-unknown-linux-gnu-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/linux
 
   curl -O -L "https://github.com/nervosnetwork/ckb/releases/download/${CKB_VERSION}/${CKB_FILENAME}.tar.gz"
