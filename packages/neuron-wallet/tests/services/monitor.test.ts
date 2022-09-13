@@ -112,7 +112,7 @@ describe('base monitor', () => {
     })
     it('is living', async () => {
       isLivingMock.mockResolvedValue(true)
-      monitor.startMonitor(100)
+      await monitor.startMonitor(100)
       await wait(200)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(0)
@@ -163,30 +163,30 @@ describe('monitor index', () => {
     stopCkbNodeMock.mockReset()
     asyncPushMock.mockReset()
   })
-  it('start ckb monitor', () => {
-    startMonitor('ckb', true)
+  it('start ckb monitor', async () => {
+    await startMonitor('ckb', true)
     expect(isDefaultCKBNeedRestartMock).toHaveBeenCalled()
     stopMonitor('ckb')
   })
-  it('start indexer monitor', () => {
-    startMonitor('ckb-indexer', true)
+  it('start indexer monitor', async () => {
+    await startMonitor('ckb-indexer', true)
     expect(rpcRequestMock).toHaveBeenCalled()
-    stopMonitor('ckb-indexer')
+    await stopMonitor('ckb-indexer')
   })
-  it('start and stop all', () => {
-    startMonitor(undefined, true)
+  it('start and stop all', async () => {
+    await startMonitor(undefined, true)
     expect(isDefaultCKBNeedRestartMock).toHaveBeenCalled()
     expect(rpcRequestMock).toHaveBeenCalled()
-    stopMonitor()
+    await stopMonitor()
     expect(stopCkbNodeMock).toHaveBeenCalled()
     expect(asyncPushMock).toHaveBeenCalledWith(false)
   })
-  it('stop-ckb-monitor', () => {
-    stopMonitor('ckb')
+  it('stop-ckb-monitor', async () => {
+    await stopMonitor('ckb')
     expect(stopCkbNodeMock).toHaveBeenCalled()
   })
-  it('stop-ckb-indexer-monitor', () => {
-    stopMonitor('ckb-indexer')
+  it('stop-ckb-indexer-monitor', async () => {
+    await stopMonitor('ckb-indexer')
     expect(asyncPushMock).toHaveBeenCalledWith(false)
   })
 })
