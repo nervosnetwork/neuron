@@ -45,10 +45,10 @@ const TextField = React.forwardRef(
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
-    const [isPasswordHide, setIsPasswordHide] = useState(true)
+    const [isPasswordHidden, setIsPasswordHidden] = useState(true)
     const changePasswordHide = useCallback(() => {
-      setIsPasswordHide(v => !v)
-    }, [setIsPasswordHide])
+      setIsPasswordHidden(v => !v)
+    }, [setIsPasswordHidden])
     return (
       <div
         className={`${styles.textField} ${stack ? styles.stack : ''} ${className}`}
@@ -65,7 +65,7 @@ const TextField = React.forwardRef(
           <input
             id={field}
             data-field={field}
-            type={!isPasswordHide && type === 'password' ? 'text' : type}
+            type={!isPasswordHidden && type === 'password' ? 'text' : type}
             value={value}
             placeholder={placeholder}
             title={label}
@@ -86,7 +86,7 @@ const TextField = React.forwardRef(
               aria-hidden="true"
               tabIndex={0}
             >
-              {isPasswordHide ? <PasswordHide /> : <PasswordShow />}
+              {isPasswordHidden ? <PasswordHide /> : <PasswordShow />}
             </span>
           )}
         </div>
