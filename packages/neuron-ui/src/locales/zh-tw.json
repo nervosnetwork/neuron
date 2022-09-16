@@ -134,7 +134,9 @@
       },
       "copy-balance": "複製餘額",
       "create": "創建 {{name}} 資產賬戶",
-      "destroy": "銷毀 {{name}} 資產賬戶"
+      "destroy": "銷毀 {{name}} 資產賬戶",
+      "createSUDT": "創建 <0></0> 資產賬戶",
+      "destroySUDT": "銷毀 <0></0> 資產賬戶"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -365,7 +367,7 @@
         }
       },
       "data": {
-        "ckb-node-data": "節點數據",
+        "ckb-node-data": "節點配置和數據",
         "ckb-indexer-data": "Indexer 數據",
         "set": "設置",
         "cache": "緩存",
@@ -376,9 +378,11 @@
         "remove-ckb-data-tip": "請將 CKB Node 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
         "remove-indexer-data-tip": "請將 Indexer 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
         "cancel": "取消",
-        "resync-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node(Indexer) 數據.",
+        "resync-ckb-node-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node 數據，但會刪除已同步的 Indexer 數據。",
+        "resync-indexer-describe": "註意: 重新同步不會刪除當前已同步的 Indexer 數據.",
         "move-data-finish": "數據轉移完成",
-        "re-sync": "重新同步"
+        "re-sync": "重新同步",
+        "disabled-set-path": "手動啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效"
       }
     },
     "password-request": {
@@ -877,7 +881,7 @@
         "select-option": "提交前請確認上述選項"
       },
       "receive": {
-        "notation": "只接收 {{symbol}} 轉賬"
+        "notation": "只接收 <0></0> 轉賬"
       },
       "update-dialog": {
         "update-asset-account": "賬戶設置",

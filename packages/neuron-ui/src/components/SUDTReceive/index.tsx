@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import { ReactComponent as AddressToggleIcon } from 'widgets/Icons/AddressTransform.svg'
@@ -12,6 +12,7 @@ import CopyZone from 'widgets/CopyZone'
 import { useDispatch } from 'states'
 
 import { RoutePath, CONSTANTS } from 'utils'
+import { getDisplayName, UANTonkenSymbol } from 'components/UANDisplay'
 import styles from './sUDTReceive.module.scss'
 
 const { DEFAULT_SUDT_FIELDS } = CONSTANTS
@@ -56,7 +57,9 @@ const SUDTReceive = () => {
           <SUDTAvatar name={accountName} />
         </div>
         <div className={styles.accountName}>{accountName || DEFAULT_SUDT_FIELDS.accountName}</div>
-        <div className={styles.tokenName}>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</div>
+        <div className={styles.tokenName} data-tooltip={tokenName}>
+          <span>{getDisplayName(tokenName || DEFAULT_SUDT_FIELDS.tokenName, symbol)}</span>
+        </div>
       </div>
       <QRCode value={displayedAddr} size={220} includeMargin dispatch={dispatch} />
       <div className={styles.address}>
@@ -74,7 +77,10 @@ const SUDTReceive = () => {
       </div>
       <p className={styles.notation}>
         <Attention />
-        {t('s-udt.receive.notation', { symbol: symbol || DEFAULT_SUDT_FIELDS.symbol })}
+        <Trans
+          i18nKey="s-udt.receive.notation"
+          components={[<UANTonkenSymbol name={tokenName} symbol={symbol} className={styles.symbol} />]}
+        />
       </p>
     </div>
   )

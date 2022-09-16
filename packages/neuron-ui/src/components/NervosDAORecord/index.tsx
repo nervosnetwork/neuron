@@ -6,7 +6,6 @@ import CopyZone from 'widgets/CopyZone'
 import {
   calculateClaimEpochValue,
   ConnectionStatus,
-  CONSTANTS,
   shannonToCKBFormatter,
   uniformTimeFormatter,
   getDAOCellStatus,
@@ -17,8 +16,6 @@ import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
-
-const { IMMATURE_EPOCHS, HOURS_PER_EPOCH } = CONSTANTS
 
 const EPOCHS_PER_DAY = 6
 
@@ -122,28 +119,8 @@ export const DAORecord = ({
         message = t('nervos-dao.compensation-period.stage-messages.pending')
         break
       }
-      case CellStatus.ImmatureForWithdraw: {
-        let hours: string | number = (depositEpochValue + IMMATURE_EPOCHS - currentEpochValue) * HOURS_PER_EPOCH
-        if (Number.isNaN(hours) || hours < 0 || hours > HOURS_PER_EPOCH * IMMATURE_EPOCHS) {
-          hours = '--'
-        } else {
-          hours = hours.toFixed(1)
-        }
-        message = t('nervos-dao.compensation-period.stage-messages.immature-for-withdraw', { hours })
-        break
-      }
       case CellStatus.Deposited: {
         message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
-        break
-      }
-      case CellStatus.ImmatureForUnlock: {
-        let hours: number | string = (compensationEndEpochValue + IMMATURE_EPOCHS - currentEpochValue) * HOURS_PER_EPOCH
-        if (Number.isNaN(hours) || hours < 0 || hours > HOURS_PER_EPOCH * IMMATURE_EPOCHS) {
-          hours = '--'
-        } else {
-          hours = hours.toFixed(1)
-        }
-        message = t('nervos-dao.compensation-period.stage-messages.immature-for-unlock', { hours })
         break
       }
       case CellStatus.Locked: {
@@ -186,7 +163,7 @@ export const DAORecord = ({
       <>
         <div className={styles.stage}>
           <CompensationProgressBar
-            pending={[CellStatus.Depositing, CellStatus.ImmatureForWithdraw].includes(cellStatus)}
+            pending={CellStatus.Depositing === cellStatus}
             currentEpochValue={currentEpochValue}
             endEpochValue={compensationEndEpochValue}
             withdrawEpochValue={withdrawEpochValue}

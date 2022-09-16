@@ -6,13 +6,13 @@ import { ChildProcess, spawn } from 'child_process'
 import process from 'process'
 import { dialog } from 'electron'
 import logger from 'utils/logger'
-import { Network } from 'models/network'
+import { MAINNET_GENESIS_HASH, Network } from 'models/network'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from './networks'
 import CommonUtils from 'utils/common'
-import { resetSyncTaskQueue } from 'block-sync-renderer'
 import { clean as cleanChain } from 'database/chain'
 import SettingsService from './settings'
+import startMonitor, { stopMonitor } from './monitor'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -68,16 +68,16 @@ export default class IndexerService {
     await IndexerService.ensurePortUsable()
   }
 
-  static clearCache = async (clearIndexerFolder = false) => {
-    await resetSyncTaskQueue.asyncPush(false)
+  static clearCache = async (clearIndexerFolder = false, forceClearMainnet?: boolean) => {
+    await stopMonitor('ckb-indexer')
     await cleanChain()
 
     if (clearIndexerFolder) {
-      IndexerService.getInstance().clearData()
+      IndexerService.getInstance().clearData(forceClearMainnet)
       await new SyncedBlockNumber().setNextBlock(BigInt(0))
     }
 
-    await resetSyncTaskQueue.asyncPush(true)
+    await startMonitor('ckb-indexer')
   }
 
   static createFolder(dir: string) {
@@ -142,6 +142,7 @@ export default class IndexerService {
     try {
       const bin = IndexerService.getBinary()
       const params = ['-c', network.remote, '-s', dataPath, '-l', `127.0.0.1:${IndexerService.PORT}`]
+      logger.info(params)
       const indexer = spawn(bin, params)
       this.indexer = indexer
       logger.info(`Indexer:\tstart: PORT: ${IndexerService.PORT}...`)
@@ -176,9 +177,9 @@ export default class IndexerService {
     })
   }
 
-  clearData = () => {
+  clearData = (forceClearMainnet?: boolean) => {
     const network = NetworksService.getInstance().getCurrent()
-    const dataPath = this.#getDataPath(network)
+    const dataPath = this.#getDataPath(network, forceClearMainnet)
     logger.debug(`Removing data ${dataPath}`)
     fs.rmSync(dataPath, { recursive: true, force: true })
 
@@ -188,12 +189,12 @@ export default class IndexerService {
 
 
 
-  #getDataPath = (network: Network): string => {
+  #getDataPath = (network: Network, forceClearMainnet?: boolean): string => {
     let indexerDataPath = SettingsService.getInstance().indexerDataPath
     if (!indexerDataPath) {
       indexerDataPath = path.resolve(env.fileBasePath, IndexerService.indexerDataFolder, 'data')
       SettingsService.getInstance().indexerDataPath = indexerDataPath
     }
-    return path.resolve(indexerDataPath, `${network.genesisHash}`)
+    return path.resolve(indexerDataPath, `${forceClearMainnet ? MAINNET_GENESIS_HASH : network.genesisHash}`)
   }
 }

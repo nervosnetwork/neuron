@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { getCompensatedTime, getCompensationPeriod, CONSTANTS, CompensationPeriod, uniformTimeFormatter } from 'utils'
 import styles from './compensationPeriodTooltip.module.scss'
 
-const { WITHDRAW_EPOCHS, IMMATURE_EPOCHS } = CONSTANTS
+const { WITHDRAW_EPOCHS } = CONSTANTS
 
 const HOUR = 3_600_000
 const HOURS_PER_EPOCH = 4 * HOUR
@@ -47,22 +47,6 @@ const CompensationPeriodTooltip = ({
     endEpochTimestamp - (1 - CompensationPeriod.REQUEST_START) * WITHDRAW_EPOCHS * HOURS_PER_EPOCH
 
   const { days, hours } = getCompensatedTime({ currentEpochValue: baseEpochValue, depositEpochValue })
-  const isImmature = baseEpochValue < depositEpochValue + IMMATURE_EPOCHS
-
-  if (isImmature) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.compensated}>
-          <span>{t('nervos-dao.compensation-period.tooltip.compensated-period')}</span>
-          <span>{t('nervos-dao.compensation-period.tooltip.days-hours', { days, hours })}</span>
-        </div>
-        <div className={styles.divider} />
-        <div className={styles.times}>
-          <div className={styles.immature}>{t('nervos-dao.compensation-period.tooltip.immature-for-withdraw')}</div>
-        </div>
-      </div>
-    )
-  }
 
   let stage = 'normal'
   if (baseEpochTimestamp > endingStartEpochTimestamp) {

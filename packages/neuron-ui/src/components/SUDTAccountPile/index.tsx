@@ -40,10 +40,10 @@ const SUDTAccountPile = ({
       <div className={styles.accountName}>
         <span>{accountName || DEFAULT_SUDT_FIELDS.accountName}</span>
       </div>
-      <div className={styles.tokenName}>
+      <div className={styles.tokenName} data-tooltip={tokenName}>
         <span>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</span>
       </div>
-      <div className={styles.symbol}>
+      <div className={styles.symbol} data-tooltip={symbol}>
         <span>{`(${symbol || DEFAULT_SUDT_FIELDS.symbol})`}</span>
       </div>
       <div className={styles.editBtn}>
