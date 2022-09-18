@@ -134,15 +134,18 @@ describe('base monitor', () => {
       await wait(200)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
+      console.log('isLiving timeout end')
     })
     it('not living wait restart', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
-      restartMock.mockImplementation(() => wait(1000))
+      restartMock.mockImplementation(() => wait(800))
       monitor.name = 'not living wait restart'
       await monitor.startMonitor(100)
       await wait(800)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
+      await wait(400)
+      console.log('not living wait restart end')
     })
     it('start monitor with first', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
