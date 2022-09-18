@@ -128,7 +128,7 @@ describe('base monitor', () => {
     it('isLiving timeout', async () => {
       isLivingMock.mockImplementation(() => wait(200))
       await monitor.startMonitor(200)
-      await wait(400)
+      await wait(300)
       await monitor.stopMonitor()
       await wait(400)
       expect(isLivingMock).toHaveBeenCalled()
