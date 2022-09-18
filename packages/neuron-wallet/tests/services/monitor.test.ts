@@ -101,14 +101,11 @@ function wait(times: number) {
 describe('base monitor', () => {
   let monitor: MonitorTest
 
-  beforeEach(() => {
-    isLivingMock.mockReset()
-    restartMock.mockReset()
-  })
-
   describe('start monitor', () => {
     beforeEach(() => {
       monitor = new MonitorTest()
+      isLivingMock.mockReset()
+      restartMock.mockReset()
     })
     afterEach(async () => {
       await monitor.stopMonitor()
