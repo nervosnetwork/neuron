@@ -101,12 +101,13 @@ function wait(times: number) {
 describe('base monitor', () => {
   let monitor: MonitorTest
 
+  beforeEach(() => {
+    monitor = new MonitorTest()
+    isLivingMock.mockReset()
+    restartMock.mockReset()
+  })
+
   describe('start monitor', () => {
-    beforeEach(() => {
-      monitor = new MonitorTest()
-      isLivingMock.mockReset()
-      restartMock.mockReset()
-    })
     afterEach(async () => {
       await monitor.stopMonitor()
     })
@@ -125,30 +126,25 @@ describe('base monitor', () => {
       expect(restartMock).toHaveBeenCalled()
     })
     it('isLiving timeout', async () => {
-      isLivingMock.mockImplementation(() => wait(1000))
-      monitor.name = 'isLiving timeout'
-      await monitor.startMonitor(100)
-      await wait(200)
-      console.log('isLiving timeout end')
+      isLivingMock.mockImplementation(() => wait(200))
+      await monitor.startMonitor(200)
+      await wait(400)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
     })
     it('not living wait restart', async () => {
-      isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
-      restartMock.mockImplementation(() => wait(800))
-      monitor.name = 'not living wait restart'
+      isLivingMock.mockResolvedValue(false)
+      restartMock.mockImplementation(() => wait(1000))
       await monitor.startMonitor(100)
       await wait(800)
-      console.log('not living wait restart end')
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
-      await wait(400)
     })
     it('start monitor with first', async () => {
-      isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
-      await monitor.startMonitor(1000, true)
-      expect(isLivingMock).toHaveBeenCalled()
-      expect(restartMock).toHaveBeenCalled()
+      isLivingMock.mockResolvedValue(false)
+      await monitor.startMonitor(10000, true)
+      expect(isLivingMock).toHaveBeenCalledTimes(1)
+      expect(restartMock).toHaveBeenCalledTimes(1)
     })
     it('twice start monitor', async () => {
       isLivingMock.mockReset()
