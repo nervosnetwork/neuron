@@ -99,7 +99,7 @@ function wait(times: number) {
   })
 }
 describe('base monitor', () => {
-  const monitor = new MonitorTest()
+  let monitor: MonitorTest
 
   beforeEach(() => {
     isLivingMock.mockReset()
@@ -107,6 +107,9 @@ describe('base monitor', () => {
   })
 
   describe('start monitor', () => {
+    beforeEach(() => {
+      monitor = new MonitorTest()
+    })
     afterEach(async () => {
       await monitor.stopMonitor()
     })
@@ -125,7 +128,7 @@ describe('base monitor', () => {
       expect(restartMock).toHaveBeenCalled()
     })
     it('isLiving timeout', async () => {
-      isLivingMock.mockImplementation(() => wait(200))
+      isLivingMock.mockImplementation(() => wait(1000))
       await monitor.startMonitor(100)
       await wait(200)
       expect(isLivingMock).toHaveBeenCalled()
@@ -133,7 +136,7 @@ describe('base monitor', () => {
     })
     it('not living wait restart', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
-      restartMock.mockImplementation(() => wait(400))
+      restartMock.mockImplementation(() => wait(1000))
       await monitor.startMonitor(100)
       await wait(800)
       expect(isLivingMock).toHaveBeenCalled()
@@ -142,7 +145,6 @@ describe('base monitor', () => {
     it('start monitor with first', async () => {
       isLivingMock.mockResolvedValue(true).mockResolvedValueOnce(false)
       await monitor.startMonitor(1000, true)
-      await wait(500)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalled()
     })
