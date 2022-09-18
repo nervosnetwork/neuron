@@ -129,6 +129,8 @@ describe('base monitor', () => {
       isLivingMock.mockImplementation(() => wait(200))
       await monitor.startMonitor(200)
       await wait(400)
+      await monitor.stopMonitor()
+      await wait(400)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
     })
@@ -137,6 +139,8 @@ describe('base monitor', () => {
       restartMock.mockImplementation(() => wait(1000))
       monitor.name = 'not living wait restart'
       await monitor.startMonitor(100)
+      await wait(400)
+      await monitor.stopMonitor()
       await wait(400)
       expect(isLivingMock).toHaveBeenCalled()
       expect(restartMock).toHaveBeenCalledTimes(1)
