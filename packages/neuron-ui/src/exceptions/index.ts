@@ -110,3 +110,21 @@ export class ValueReservedException extends Error {
     this.i18n = { value }
   }
 }
+
+export type ErrorWithI18n = {
+  message: string
+  code: ErrorCode
+  i18n?: Record<string, string>
+}
+
+export function isErrorWithI18n(error: unknown): error is ErrorWithI18n {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as { message: string }).message === 'string' &&
+    'code' in error &&
+    typeof (error as { code: ErrorCode }).code === 'number' &&
+    (!('i18n' in error) || typeof (error as { i18n: Record<string, string> }).i18n === 'object')
+  )
+}

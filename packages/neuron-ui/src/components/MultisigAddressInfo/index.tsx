@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import CopyZone from 'widgets/CopyZone'
+import { ErrorWithI18n } from 'exceptions'
 
 import styles from './multisig-address-info.module.scss'
 
@@ -18,7 +19,7 @@ export const MultisigAddressTable = ({
   changeR?: (e: React.ChangeEvent<HTMLInputElement>) => void
   changeAddress?: (e: React.ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean
-  addressErrors?: ((Error & { i18n: Record<string, string> }) | undefined)[]
+  addressErrors?: (ErrorWithI18n | undefined)[]
 }) => {
   const [t] = useTranslation()
   return (

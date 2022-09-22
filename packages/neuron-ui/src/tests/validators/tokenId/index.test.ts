@@ -1,3 +1,4 @@
+import { isErrorWithI18n } from 'exceptions'
 import { validateTokenId } from 'utils/validators'
 import fixtures from './fixtures'
 
@@ -7,14 +8,16 @@ const fixtureTable: Fixture.Validator<typeof validateTokenId>[] = Object.entries
 
 describe('Test token validator', () => {
   test.each(fixtureTable)(`%s`, (_title, [tokenId], exception) => {
-    expect.assertions(1)
     if (exception) {
+      expect.assertions(2)
       try {
         validateTokenId(tokenId)
       } catch (err) {
-        expect(err.code).toBe(exception)
+        expect(isErrorWithI18n(err)).toBeTruthy()
+        expect((err as { code: number }).code).toBe(exception)
       }
     } else {
+      expect.assertions(1)
       expect(validateTokenId(tokenId)).toBeTruthy()
     }
   })

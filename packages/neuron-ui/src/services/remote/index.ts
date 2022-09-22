@@ -122,7 +122,10 @@ export const captureScreenshot = async () => {
       try {
         return window.navigator.mediaDevices.getUserMedia(constraints)
       } catch (err) {
-        return err
+        if (err instanceof Error) {
+          return err
+        }
+        return new Error('unknown error')
       }
     })
   )

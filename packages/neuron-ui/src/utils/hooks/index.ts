@@ -23,6 +23,7 @@ import {
   validateAmountRange,
 } from 'utils/validators'
 import { MenuItemConstructorOptions } from 'electron'
+import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 
 export * from './createSUDTAccount'
 export * from './tokenInfoList'
@@ -285,7 +286,9 @@ export const useSUDTAccountInfoErrors = ({
       try {
         validator(params)
       } catch (err) {
-        tokenErrors[name as keyof typeof tokenErrors] = t(err.message, err.i18n)
+        if (isErrorWithI18n(err)) {
+          tokenErrors[name as keyof typeof tokenErrors] = t(err.message, err.i18n)
+        }
       }
     })
 
@@ -468,23 +471,27 @@ export const useOutputErrors = (
   return useMemo(
     () =>
       outputs.map(({ address, amount, date }) => {
-        let amountError: (Error & { i18n: Record<string, string> }) | undefined
+        let amountError: ErrorWithI18n | undefined
         if (amount !== undefined) {
           try {
             const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
             validateAmount(amount)
             validateAmountRange(amount, extraSize)
           } catch (err) {
-            amountError = err
+            if (isErrorWithI18n(err)) {
+              amountError = err
+            }
           }
         }
 
-        let addrError: (Error & { i18n: Record<string, string> }) | undefined
+        let addrError: ErrorWithI18n | undefined
         if (address !== undefined) {
           try {
             validateAddress(address, isMainnet)
           } catch (err) {
-            addrError = err
+            if (isErrorWithI18n(err)) {
+              addrError = err
+            }
           }
         }
 

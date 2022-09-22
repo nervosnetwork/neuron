@@ -1,3 +1,4 @@
+import { isErrorWithI18n } from 'exceptions'
 import { validateAmountRange } from 'utils/validators'
 import fixtures from './fixtures'
 
@@ -7,14 +8,16 @@ const fixtureTable: Fixture.Validator<typeof validateAmountRange>[] = Object.ent
 
 describe('Verify amount range', () => {
   test.each(fixtureTable)(`%s`, (_title, [amount, extraSize], exception) => {
-    expect.assertions(1)
     if (exception) {
+      expect.assertions(2)
       try {
         validateAmountRange(amount, extraSize)
       } catch (err) {
-        expect(err.code).toBe(exception)
+        expect(isErrorWithI18n(err)).toBeTruthy()
+        expect((err as { code: number }).code).toBe(exception)
       }
     } else {
+      expect.assertions(1)
       expect(validateAmountRange(amount, extraSize)).toBeTruthy()
     }
   })
