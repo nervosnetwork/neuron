@@ -119,10 +119,8 @@ export type ErrorWithI18n = {
 
 export function isErrorWithI18n(error: any): error is ErrorWithI18n {
   return (
-    typeof error === 'object' &&
-    error !== null &&
     typeof error?.message === 'string' &&
     typeof error?.code === 'number' &&
-    (!('i18n' in error) || typeof error.i18n === 'object')
+    (typeof error?.i18n === 'undefined' || typeof error.i18n === 'object')
   )
 }

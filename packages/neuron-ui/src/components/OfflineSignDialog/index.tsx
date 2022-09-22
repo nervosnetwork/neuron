@@ -16,7 +16,7 @@ import {
   sendSUDTTransaction,
 } from 'states'
 import { OfflineSignJSON, signAndExportTransaction, OfflineSignType } from 'services/remote'
-import { PasswordIncorrectException, isErrorWithI18n } from 'exceptions'
+import { PasswordIncorrectException } from 'exceptions'
 import styles from '../PasswordRequest/passwordRequest.module.scss'
 
 interface SignDialogProps {
@@ -157,7 +157,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
           }
         }
       } catch (err) {
-        if (isErrorWithI18n(err) && err.code === ErrorCode.PasswordIncorrect) {
+        if (err instanceof PasswordIncorrectException) {
           setError(t(err.message))
         }
       }

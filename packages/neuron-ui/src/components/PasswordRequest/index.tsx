@@ -27,7 +27,7 @@ import {
   requestOpenInExplorer,
   invokeShowErrorMessage,
 } from 'services/remote'
-import { PasswordIncorrectException, isErrorWithI18n } from 'exceptions'
+import { PasswordIncorrectException } from 'exceptions'
 import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
@@ -286,7 +286,7 @@ const PasswordRequest = () => {
           }
         }
       } catch (err) {
-        if (isErrorWithI18n(err) && err.code === ErrorCode.PasswordIncorrect) {
+        if (err instanceof PasswordIncorrectException) {
           setError(t(err.message))
         }
       }
