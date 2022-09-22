@@ -25,7 +25,7 @@ import {
 import { Migrate } from 'services/subjects'
 import styles from './navbar.module.scss'
 
-export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`]
+export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`, RoutePath.ImportHardware]
 
 const throttledShowSettings = (() => {
   const THROTTLE_TIME = 1000

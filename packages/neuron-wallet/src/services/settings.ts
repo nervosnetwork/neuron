@@ -50,6 +50,14 @@ export default class SettingsService extends Store {
     this.writeSync('ckbDataPath', dataPath)
   }
 
+  get themeSource() {
+    return this.readSync('themeSource') || 'system'
+  }
+
+  set themeSource(theme: 'system' | 'light' | 'dark') {
+    this.writeSync('themeSource', theme)
+  }
+
   constructor() {
     super(
       '',

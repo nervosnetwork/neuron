@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
+import Alert, { AlertStatus } from 'widgets/Alert'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
+import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
 import styles from './textField.module.scss'
 
 const TextField = React.forwardRef(
@@ -20,6 +21,8 @@ const TextField = React.forwardRef(
       stack = true,
       required = false,
       readOnly = false,
+      disabled,
+      selected,
       ...rest
     }: {
       field: string
@@ -36,11 +39,16 @@ const TextField = React.forwardRef(
       required?: boolean
       readOnly?: boolean
       placeholder?: string
-
+      disabled?: boolean
+      selected?: boolean
       [key: string]: any
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
+    const [isPasswordHidden, setIsPasswordHidden] = useState(true)
+    const changePasswordHide = useCallback(() => {
+      setIsPasswordHidden(v => !v)
+    }, [setIsPasswordHidden])
     return (
       <div
         className={`${styles.textField} ${stack ? styles.stack : ''} ${className}`}
@@ -53,11 +61,11 @@ const TextField = React.forwardRef(
             {label}
           </label>
         ) : null}
-        <div className={styles.input}>
+        <div className={styles.input} data-disabled={disabled} data-type={type} data-selected={selected}>
           <input
             id={field}
             data-field={field}
-            type={type}
+            type={!isPasswordHidden && type === 'password' ? 'text' : type}
             value={value}
             placeholder={placeholder}
             title={label}
@@ -66,16 +74,27 @@ const TextField = React.forwardRef(
             onChange={onChange}
             onClick={onClick}
             readOnly={readOnly}
+            disabled={disabled}
             {...rest}
           />
           {suffix ? <span className={styles.suffix}>{suffix}</span> : null}
+          {!suffix && type === 'password' && (
+            <span
+              className={`${styles.suffix} ${styles.password}`}
+              onClick={changePasswordHide}
+              role="button"
+              aria-hidden="true"
+              tabIndex={0}
+            >
+              {isPasswordHidden ? <PasswordHide /> : <PasswordShow />}
+            </span>
+          )}
         </div>
         {hint ? <span className={styles.hint}>{hint}</span> : null}
         {error ? (
-          <span className={styles.errorMessage}>
-            <Attention />
+          <Alert status={AlertStatus.Error} className={styles.errorMessage}>
             {error}
-          </span>
+          </Alert>
         ) : null}
       </div>
     )

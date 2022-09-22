@@ -27,8 +27,6 @@ footer {
 .main-content {
   grid-area: content;
   overflow: auto;
-  padding: var(--main-content-vertical-padding)
-    var(--main-content-horizontal-padding);
 }
 
 .notification {
