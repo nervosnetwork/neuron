@@ -1,0 +1,63 @@
+.root {
+  width: 624px;
+  background: var(--secondary-background-color);
+  border: 1px solid #F0F0F0;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: repeat(6, 60px);
+  grid-template-rows: repeat(2, auto);
+  grid-gap: 46px;
+  padding: 32px;
+  margin: 0 auto;
+  color: var(--main-text-color);
+  @media (prefers-color-scheme: dark) {
+    border: none;
+  }
+
+  & * {
+    font-family: 'ProximaNova-Regular';
+    font-size: 14px;
+  }
+
+  & .showItem {
+    font-weight: 600;
+  }
+
+  & .wordItem {
+    &:focus-within {
+      color: #00C891;
+    }
+    &:not(:focus-within) {
+      &.errorWords {
+        color: #FF1E1E;
+        & > input {
+          border-bottom: 1px solid #FF1E1E;
+          color: #FF1E1E;
+        }
+      }
+    }
+  }
+
+  & > div {
+    display: flex;
+    text-align: left;
+
+    & > span {
+      margin-left: 8px;
+    }
+
+    & > input {
+      border: none;
+      border-bottom: 1px solid var(--input-border-color);
+      width: 60px;
+      margin-left: 8px;
+      background-color: transparent;
+      color: var(--main-text-color);
+      padding-bottom: 4px;
+
+      &:focus {
+        border-bottom: 1px solid #00C891;;
+      }
+    }
+  }
+}

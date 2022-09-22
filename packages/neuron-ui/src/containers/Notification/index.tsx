@@ -1,78 +1,24 @@
-import React, { useMemo, useCallback, MouseEventHandler } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
+import { Close, AttentionOutline } from 'widgets/Icons/icon'
 import {
   useState as useGlobalState,
   useDispatch,
-  StateDispatch,
   toggleAllNotificationVisibility,
   toggleTopAlertVisibility,
   dismissNotification,
-  dismissGlobalDialog,
+  dismissAlertDialog,
 } from 'states'
 import { useOnLocaleChange, useGlobalNotifications } from 'utils'
 
-import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import styles from './Notification.module.scss'
 
-const notificationType = (type: 'success' | 'warning' | 'alert') => {
-  switch (type) {
-    case 'success': {
-      return MessageBarType.success
-    }
-    case 'warning': {
-      return MessageBarType.warning
-    }
-    case 'alert': {
-      return MessageBarType.error
-    }
-    default: {
-      return MessageBarType.info
-    }
-  }
-}
-
-const DismissTopAlertButton = ({ onDismiss }: { onDismiss: React.MouseEventHandler<HTMLButtonElement> }) => (
-  <IconButton iconProps={{ iconName: 'Dismiss' }} onClick={onDismiss} />
-)
-
-const TopAlertActions = ({
-  count = 0,
-  dispatch,
-  onDismiss,
-}: {
-  count: number
-  dispatch: StateDispatch
-  onDismiss: MouseEventHandler
-}) => (
-  <Stack horizontal verticalAlign="center">
-    {count > 1 ? (
-      <IconButton
-        iconProps={{ iconName: 'More' }}
-        onClick={() => {
-          toggleAllNotificationVisibility()(dispatch)
-        }}
-        className={styles.moreBtn}
-      >
-        more
-      </IconButton>
-    ) : null}
-    <DismissTopAlertButton onDismiss={onDismiss} />
-  </Stack>
-)
-
 export const NoticeContent = () => {
   const {
-    app: {
-      notifications = [],
-      alertDialog = null,
-      popups = [],
-      showTopAlert = false,
-      showAllNotifications = false,
-      globalDialog = null,
-    },
+    app: { notifications = [], popups = [], showTopAlert = false, showAllNotifications = false, alertDialog },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, i18n] = useTranslation()
@@ -97,35 +43,20 @@ export const NoticeContent = () => {
     [dispatch]
   )
 
-  const onGlobalDialogDismiss = useCallback(() => {
-    dismissGlobalDialog()(dispatch)
+  const onDismissAlertDialog = useCallback(() => {
+    dismissAlertDialog()(dispatch)
   }, [dispatch])
 
   return (
-    <div>
+    <div className={styles.root}>
       {showTopAlert && notification ? (
-        <MessageBar
-          messageBarType={notificationType(notification.type)}
-          styles={{
-            root: {
-              flexDirection: 'row',
-            },
-            text: {
-              alignItems: 'center',
-            },
-            actions: {
-              margin: 0,
-              marginRight: '12px',
-            },
-          }}
-          actions={
-            <TopAlertActions dispatch={dispatch} count={notificationsInDesc.length} onDismiss={onTopAlertDismiss} />
-          }
-        >
+        <div className={styles.notification}>
+          <AttentionOutline className={styles.attention} />
           {notification.code
             ? t(`messages.codes.${notification.code}`, notification.meta)
             : notification.content || t('messages.unknown-error')}
-        </MessageBar>
+          <Close className={styles.close} onClick={onTopAlertDismiss} />
+        </div>
       ) : null}
 
       <div className={styles.autoDismissMessages}>
@@ -186,8 +117,7 @@ export const NoticeContent = () => {
           )
         })}
       </Panel>
-      <GlobalDialog type={globalDialog} onDismiss={onGlobalDialogDismiss} />
-      <AlertDialog content={alertDialog} dispatch={dispatch} />
+      {alertDialog && <AlertDialog onCancel={onDismissAlertDialog} {...alertDialog} />}
     </div>
   )
 }

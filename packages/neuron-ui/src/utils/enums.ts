@@ -31,7 +31,7 @@ export enum RoutePath {
   SUDTSend = '/s-udt/send',
   SUDTReceive = '/s-udt/receive',
   NFTSend = '/nft',
-  ImportHardware = '/*/import-hardware',
+  ImportHardware = '/import-hardware',
   OfflineSign = '/*/offline-sign',
 }
 

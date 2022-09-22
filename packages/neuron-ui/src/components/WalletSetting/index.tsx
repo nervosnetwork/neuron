@@ -80,7 +80,7 @@ const WalletSetting = ({
   const navTo = useCallback(
     (url: string = '/') => () => {
       if (url === RoutePath.ImportHardware) {
-        history.push(`${location.pathname}/import-hardware`)
+        history.push(RoutePath.ImportHardware)
       } else {
         history.push(url)
       }

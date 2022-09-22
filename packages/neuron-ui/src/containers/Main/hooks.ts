@@ -208,15 +208,10 @@ export const useSubscription = ({
       if (winID && getWinID() === winID) {
         switch (type) {
           // TODO: is this used anymore?
-          case 'navigate-to-url': {
-            if (payload) {
-              history.push(payload)
-            }
-            break
-          }
+          case 'navigate-to-url':
           case 'import-hardware': {
             if (payload) {
-              history.push(location.pathname + payload)
+              history.push(payload)
             }
             break
           }
