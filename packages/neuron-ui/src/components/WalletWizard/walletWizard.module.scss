@@ -15,11 +15,15 @@ $line-gap: 15px;
 }
 
 .welcome {
-  @include center;
-  align-items: inherit;
-  flex-direction: row;
-  height: calc(100vh - 110px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 55px 140px;
+
+  & > * {
+    flex-shrink: 0;
+  }
 
   .banner {
     flex: 1;
@@ -29,14 +33,29 @@ $line-gap: 15px;
     flex-direction: column;
   }
 
-  hr {
-    color: #aeaeae;
+  .dividingLine {
+    width: 376px;
+    font-size: 14px;
+    border: none;
+    border-top: 1px solid var(--divide-line-color);
+    text-align: center;
+    overflow: visible;
+
+    &:after {
+      background: var(--main-background-color);
+      color: #999;
+      content: attr(data-content);
+      padding: 0 4px;
+      position: relative;
+      top: -10px;
+    }
   }
 
   .slogan {
-    font-size: 1.5rem;
-    padding: 60px 0 55px 0;
-    font-weight: 600;
+    font-size: 20px;
+    padding: 16px 0 26px 0;
+    font-weight: 500;
+    color: var(--main-text-color);
   }
 
   .actions {
@@ -56,45 +75,56 @@ $line-gap: 15px;
   }
 
   button {
-    width: 270px;
-    height: 40px;
+    width: 376px;
     display: flex;
     justify-content: center;
     align-items: center;
-
-    svg {
-      width: 14px;
-      height: 14px;
-      margin-right: 4px;
-
-      path {
-        fill: #fff;
-      }
-    }
-
-    &[data-type="default"] {
-      svg {
-        path {
-          fill: #000;
-        }
-      }
-    }
+    margin-bottom: 16px;
   }
 }
 
 .mnemonic {
-  @include center;
+  text-align: center;
+  padding-top: 96px;
 
+  .text {
+    @include header-title;
+    margin: 0px 0 6px 0;
+  }
   .actions {
     @include form-footer;
   }
 }
 
-.submission {
-  @include center;
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
+.submission {
+  padding-top: 96px;
+  
+  .title {
+    @include header-title;
+    margin-bottom: 16px;
+  }
+  
   .input {
-    margin-bottom: 5px;
+    width: 500px;
+    margin: 0 auto;
+  }
+
+  .inputNotice {
+    margin: 12px auto;
+    width: 500px;
+
+    & > li {
+      margin-bottom: 8px;
+    }
   }
 
   .chars {
@@ -103,25 +133,62 @@ $line-gap: 15px;
 
   .actions {
     @include form-footer;
+    &.createWallet {
+      margin-top: 34px;
+    }
+  }
+}
+
+.hint {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--secondary-text-color);
+  margin-bottom: 40px;
+  & > a {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+}
+
+.steps {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: relative;
+  bottom: 36px;
+
+  & > .step {
+    width: 136px;
+    height: 4px;
+    margin-right: 12px;
+    background: var(--step-no-activity-color);
+    border-radius: 2px;
+
+    &.activity {
+      background: var(--activity-color);
+    }
+  }
+}
+
+.loadingCreateDialog {
+  @include dialog-container;
+  text-align: center;
+  color: var(--main-text-color);
+  width: 360px;
+  height: 180px;
+  font-weight: 500;
+  font-size: 16px;
+
+  &[open] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 
-  .submissionField {
-    label {
-      font-size: 1rem;
-      line-height: 1.5rem;
-    }
-
-    input + span {
-      background: #fff !important;
-      font-size: 0.8rem !important;
-      justify-content: flex-end !important;
-      align-items: flex-end !important;
-      padding: 0 3px 3px 0 !important;
-    }
-
-    span {
-      font-size: 0.75rem;
-      color: grey;
-    }
+  & > svg {
+    margin-bottom: 24px;
+    animation: rotating 3s linear infinite;
   }
 }

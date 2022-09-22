@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { HashRouter as Router } from 'react-router-dom'
 
 import 'theme'
+import 'styles/theme.scss'
 import 'styles/index.scss'
 import 'utils/i18n'
 import { useRoutes } from 'utils'
@@ -62,7 +63,6 @@ if (window.location.hash.startsWith('#/transaction/')) {
   Object.defineProperty(App, 'displayName', {
     value: 'App',
   })
-
   ReactDOM.render(<App />, document.getElementById('root'))
 }
 

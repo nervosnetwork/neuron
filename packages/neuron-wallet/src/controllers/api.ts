@@ -10,7 +10,8 @@ import {
   MenuItem,
   Menu,
   screen,
-  BrowserWindow
+  BrowserWindow,
+  nativeTheme
 } from 'electron'
 import { t } from 'i18next'
 import path from 'path'
@@ -78,6 +79,8 @@ export default class ApiController {
     this.#registerHandlers()
 
     await this.#networksController.start()
+
+    nativeTheme.themeSource = SettingsService.getInstance().themeSource
   }
 
   public runCommand(command: Command, params: string) {
@@ -254,6 +257,10 @@ export default class ApiController {
 
     handle('set-locale', async (_, locale: Locale) => {
       return SettingsService.getInstance().locale = locale
+    })
+
+    handle('set-theme', async (_, theme: 'system' | 'light' | 'dark') => {
+      return SettingsService.getInstance().themeSource = theme
     })
 
     // Wallets

@@ -91,8 +91,8 @@ export const dismissGlobalDialog = () => (dispatch: StateDispatch) => {
   })
 }
 
-export const showAlertDialog = (content: { title: string; message: string }) => (
-  dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>
+export const showAlertDialog = (content: State.AlertDialog) => (
+  dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }>
 ) => {
   dispatch({
     type: AppActions.UpdateAlertDialog,

@@ -43,7 +43,8 @@
         "cancel": "Cancel",
         "back": "Back",
         "rescan": "Rescan",
-        "close": "close"
+        "close": "close",
+        "finish": "Finish Creating"
       },
       "errors": {
         "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
@@ -51,7 +52,7 @@
         "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
       },
       "waiting": "Waiting for CKB app...",
-      "abort": "Waiting for CKB app... Action aborted.",
+      "abort": "Waiting for CKB app... Action aborted",
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name",
@@ -171,9 +172,17 @@
       "write-down-seed": "Write down your wallet seed and save it in a safe place",
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
-      "same-password": "The password and confirm password should match"
+      "same-password": "The password and confirm password should match",
+      "input-seed-verify": "Input created seed to verify",
+      "no-wallet": "No wallet?",
+      "create-wallet": "Create Wallet",
+      "repeat-password": "Repeat Password",
+      "finish-create": "Finish Creating",
+      "creating-wallet": "Wallet is being preparing, please wait"
     },
     "import-keystore": {
+      "title": "Import Keystore File",
+      "select-file": "Choose File",
       "label": {
         "path": "Keystore File",
         "name": "Wallet Name",
@@ -481,7 +490,9 @@
       "experimental": "Experimental",
       "close": "Close",
       "copy": "Copy",
-      "copied": "Copied"
+      "copied": "Copied",
+      "verification-failure": "Verification Failed",
+      "back": "Back"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -570,7 +581,7 @@
         "309": "The receiver needs to upgrade her account address to accept more transfer.",
         "310": "Please enter a {{tagName}} address",
         "402": "CKB App does not open. Please open the CKB App on your device.",
-        "403": "No device detected. Please connect your device.",
+        "403": "No device detected. Please connect your device",
         "404": "Multiple device detected. Only one device of the same model can be connected.",
         "600": "Please make sure the sync has finalized before you do any transaction related operation."
       }

@@ -1,0 +1,47 @@
+body {
+  --primary-color: #00C891;
+  --primary-text-color: #FFFFFF;
+  --main-background-color: #E6F3F3;
+  --secondary-background-color: #FFFFFF;
+  --main-text-color: #333333;
+  --secondary-text-color: #8DA394;
+  --link-color: #00C891;
+  --notice-background-color: #FFF6EB;
+  --notice-text-color: #F78C2A;
+  --border-color: #666666;
+  --input-border-color: #F0F0F0;
+  --divide-line-color: #E5E5E5;
+  --step-no-activity-color: #E5E5E5;
+  --activity-color: #00C891;
+  --success-color: #00C891;
+  --error-color: #FF1E1E;
+  --input-disabled-color: #FAFAFA;
+  --input-button-color: #999999;
+  --button-cancel-color: #999999;
+  --svg-color: #666666;
+  --dialog-secondary-text-color: #666666;
+
+  @media (prefers-color-scheme: dark) {
+    --primary-color: #00C891;
+    --primary-text-color: #232323;
+    --main-background-color: #111614;
+    --secondary-background-color: #1E2423;
+    --main-text-color: #FFFFFF;
+    --secondary-text-color: #8DA394;
+    --link-color: #00C891;
+    --notice-background-color: rgba(255, 140, 0, 0.2);
+    --notice-text-color: #F78C2A;
+    --border-color: #343E3C;
+    --input-border-color: #343E3C;
+    --divide-line-color: rgba(240, 240, 240, 0.2);
+    --step-no-activity-color: #666666;
+    --activity-color: #00C891;
+    --success-color: #00C891;
+    --error-color: #FF1E1E;
+    --input-disabled-color: #171B1A;
+    --input-button-color: #FFFFFF;
+    --button-cancel-color: #FFFFFF;
+    --svg-color: #FFFFFF;
+    --dialog-secondary-text-color: #FFFFFF;
+  }
+}

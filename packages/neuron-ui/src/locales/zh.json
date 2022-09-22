@@ -33,7 +33,7 @@
       "title": {
         "select-model": "请连接设备并选择型号",
         "detect-device": "搜索设备",
-        "name-wallet": "命名钱包",
+        "name-wallet": "为新钱包命名",
         "choose-address": "从设备中选择地址"
       },
       "actions": {
@@ -43,10 +43,11 @@
         "cancel": "取消",
         "back": "上一步",
         "rescan": "重新搜索",
-        "close": "关闭"
+        "close": "关闭",
+        "finish": "完成创建"
       },
       "waiting": "等待 CKB 应用响应...",
-      "abort": "等待 CKB 应用响应... 操作终止。",
+      "abort": "等待 CKB 应用响应... 操作终止",
       "app-version": "检测到 CKB 应用版本 v{{version}}。",
       "firmware-version": "检测到固件版本 v{{version}}。",
       "wallet-name": "钱包名称",
@@ -164,9 +165,17 @@
       "write-down-seed": "请记下您的助记词并保存到安全的地方",
       "new-name": "输入新的钱包名称",
       "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中至少三类字符组成的字符串。",
-      "same-password": "两次输入密码应一致"
+      "same-password": "两次输入密码应一致",
+      "input-seed-verify": "输入新生成的助记词进行验证",
+      "no-wallet": "还没有钱包?",
+      "create-wallet": "立即创建新钱包",
+      "repeat-password": "重复密码",
+      "finish-create": "完成创建",
+      "creating-wallet": "钱包准备中，请稍后"
     },
     "import-keystore": {
+      "title": "导入 Keystore 文件",
+      "select-file": "选择文件",
       "label": {
         "path": "Keystore 文件",
         "name": "钱包名称",
@@ -178,8 +187,8 @@
         "password": "输入密码以验证 Keystore"
       },
       "button": {
-        "back": "返回",
-        "submit": "提交"
+        "back": "上一步",
+        "submit": "导入"
       }
     },
     "detail": {
@@ -474,7 +483,9 @@
       "experimental": "实验室",
       "close": "关闭",
       "copy": "复制",
-      "copied": "已复制"
+      "copied": "已复制",
+      "verification-failure": "验证失败",
+      "back": "上一步"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -563,7 +574,7 @@
         "309": "收款人需要升级资产账户才能继续接收转账。",
         "310": "请输入 {{tagName}} 地址",
         "402": "CKB 应用未打开。请在你的设备打开 CKB 应用。",
-        "403": "未检测到设备，请检查你的设备连接。",
+        "403": "未检测到设备，请检查你的设备连接",
         "404": "检查到多个设备，同一型号的设备只能同时连接一个。",
         "600": "做任何交易相关的钱包操作前请先确保同步已完成。"
       }
