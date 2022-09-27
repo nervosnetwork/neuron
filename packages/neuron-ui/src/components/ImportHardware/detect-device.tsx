@@ -91,7 +91,9 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
         throw new DeviceNotFoundException()
       }
     } catch (err) {
-      setError(err.message)
+      if (err instanceof Error) {
+        setError(err.message)
+      }
     } finally {
       setScaning(false)
     }

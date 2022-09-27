@@ -27,7 +27,7 @@ import {
   validateAmountRange,
   CONSTANTS,
 } from 'utils'
-import { AmountNotEnoughException } from 'exceptions'
+import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
 import { AddressLockType, getGenerator, useAddressLockType, useOnSumbit, useOptions, useSendType } from './hooks'
 import styles from './sUDTSend.module.scss'
@@ -149,7 +149,9 @@ const SUDTSend = () => {
     try {
       validateAddress({ address: sendState.address, isMainnet, required: false })
     } catch (err) {
-      errMap.address = t(err.message, err.i18n)
+      if (isErrorWithI18n(err)) {
+        errMap.address = t(err.message, err.i18n)
+      }
     }
     try {
       validateAmount({ amount: sendState.amount, decimal: accountInfo?.decimal ?? '32', required: false })
@@ -162,7 +164,9 @@ const SUDTSend = () => {
         validateAmountRange(sendState.amount)
       }
     } catch (err) {
-      errMap.amount = t(err.message, err.i18n)
+      if (isErrorWithI18n(err)) {
+        errMap.amount = t(err.message, err.i18n)
+      }
     }
     return errMap
   }, [sendState.address, sendState.amount, isMainnet, accountInfo, t, accountType, isSecp256k1Addr])

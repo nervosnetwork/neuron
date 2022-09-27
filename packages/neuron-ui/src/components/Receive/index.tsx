@@ -27,7 +27,7 @@ const Receive = () => {
   const [t] = useTranslation()
   const {
     params: { address },
-  } = useRouteMatch()
+  } = useRouteMatch<{ address: string }>()
   const history = useHistory()
   const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
   const [isInShortFormat, setIsInShortFormat] = useState(false)

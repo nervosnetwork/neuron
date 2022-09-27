@@ -8,6 +8,7 @@ import Spinner from 'widgets/Spinner'
 
 import { useGoBack, validateNetworkName, validateURL } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
+import { isErrorWithI18n } from 'exceptions'
 import { useOnSubmit } from './hooks'
 import styles from './networkEditor.module.scss'
 
@@ -16,7 +17,7 @@ const NetworkEditor = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const history = useHistory()
   const cachedNetworks = useRef(networks)
   const cachedNetwork = useMemo(() => cachedNetworks.current.find(network => network.id === id), [cachedNetworks, id])
@@ -67,7 +68,9 @@ const NetworkEditor = () => {
           validateURL(value)
         }
       } catch (err) {
-        error = t(err.message, err.i18n)
+        if (isErrorWithI18n(err)) {
+          error = t(err.message, err.i18n)
+        }
       }
 
       setEditor(state => ({

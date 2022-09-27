@@ -7,6 +7,7 @@ import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validat
 import InputSelect from 'widgets/InputSelect'
 import { generateSudtMigrateAcpTx } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
+import { isErrorWithI18n } from 'exceptions'
 import styles from './sUDTMigrateToExistAccountDialog.module.scss'
 
 const SUDTMigrateToExistAccountDialog = ({
@@ -33,7 +34,9 @@ const SUDTMigrateToExistAccountDialog = ({
         validateSpecificAddress(value, isMainnet, AnyoneCanPayLockInfoOnAggron.TagName)
         setAddressError('')
       } catch (error) {
-        setAddressError(t(error.message, error.i18n))
+        if (isErrorWithI18n(error)) {
+          setAddressError(t(error.message, error.i18n))
+        }
       }
       setAddress(value)
     },
