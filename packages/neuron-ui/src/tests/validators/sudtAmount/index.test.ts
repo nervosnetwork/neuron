@@ -1,3 +1,4 @@
+import { isErrorWithI18n } from 'exceptions'
 import { validateAssetAccountAmount } from 'utils/validators'
 
 import fixtures from './fixtures'
@@ -8,14 +9,16 @@ const fixtureTable: Fixture.Validator<typeof validateAssetAccountAmount>[] = Obj
 
 describe(`Test sudt amount validator`, () => {
   test.each(fixtureTable)(`%s`, (_title, [params], exception) => {
-    expect.assertions(1)
     if (exception) {
+      expect.assertions(2)
       try {
         validateAssetAccountAmount(params)
       } catch (err) {
-        expect(err.code).toBe(exception)
+        expect(isErrorWithI18n(err)).toBeTruthy()
+        expect((err as { code: number }).code).toBe(exception)
       }
     } else {
+      expect.assertions(1)
       expect(validateAssetAccountAmount(params)).toBeTruthy()
     }
   })
