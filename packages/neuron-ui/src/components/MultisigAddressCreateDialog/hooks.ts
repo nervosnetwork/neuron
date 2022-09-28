@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { validateAddress, isSecp256k1Address, getMultisigAddress } from 'utils'
 import { useTranslation } from 'react-i18next'
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 
 export enum Step {
   setMN = 0,
@@ -54,9 +55,7 @@ export const useMAndN = () => {
 export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolean }) => {
   const [t] = useTranslation()
   const [addresses, setAddresses] = useState(new Array(n).fill(''))
-  const [addressErrors, setAddressErrors] = useState<((Error & { i18n: Record<string, string> }) | undefined)[]>(
-    new Array(n).fill(undefined)
-  )
+  const [addressErrors, setAddressErrors] = useState<(ErrorWithI18n | undefined)[]>(new Array(n).fill(undefined))
   const [r, setR] = useState(0)
   const changeR = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +80,10 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
         }
         setAddressErrors(v => v.map((item, index) => (index === +idx ? undefined : item)))
       } catch (error) {
-        setAddressErrors(v => v.map((item, index) => (index === +idx ? error : item)))
+        if (isErrorWithI18n(error)) {
+          const i18nErr: ErrorWithI18n = error
+          setAddressErrors(v => v.map((item, index) => (index === +idx ? i18nErr : item)))
+        }
       }
       setAddresses(v => v.map((item, index) => (+idx === index ? value : item)))
     },

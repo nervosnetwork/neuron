@@ -21,6 +21,7 @@ import {
   useOutputErrors,
 } from 'utils'
 
+import { isErrorWithI18n } from 'exceptions'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -104,7 +105,9 @@ const Send = () => {
   try {
     validateTotalAmount(totalAmount, fee, balance)
   } catch (err) {
-    errorMessageUnderTotal = t(err.message)
+    if (isErrorWithI18n(err)) {
+      errorMessageUnderTotal = t(err.message)
+    }
   }
 
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx

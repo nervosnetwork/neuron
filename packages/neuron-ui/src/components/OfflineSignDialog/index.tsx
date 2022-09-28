@@ -157,7 +157,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
           }
         }
       } catch (err) {
-        if (err.code === ErrorCode.PasswordIncorrect) {
+        if (err instanceof PasswordIncorrectException) {
           setError(t(err.message))
         }
       }
