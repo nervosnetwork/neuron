@@ -4,7 +4,7 @@ import Button from 'widgets/Button'
 import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
 import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
-import { Error } from 'widgets/Icons/icon'
+import { Error as ErrorIcon } from 'widgets/Icons/icon'
 import {
   CkbAppNotFoundException,
   ConnectFailedException,
@@ -27,7 +27,7 @@ const Info = (
       <>
         <div className={styles.errorInfo}>
           <span>
-            <Error type="error" />
+            <ErrorIcon type="error" />
           </span>
           <span className={styles.error}>{msg}</span>
         </div>
