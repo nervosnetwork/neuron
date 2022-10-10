@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
@@ -45,7 +45,7 @@ const PasswordRequest = () => {
 
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
   const [password, setPassword] = useState('')
@@ -134,7 +134,7 @@ const PasswordRequest = () => {
       }
       const handleSendTxRes = ({ status }: { status: number }) => {
         if (isSuccessResponse({ status })) {
-          history.push(RoutePath.History)
+          navigate(RoutePath.History)
         } else if (status === ErrorCode.PasswordIncorrect) {
           throw new PasswordIncorrectException()
         }
@@ -187,7 +187,7 @@ const PasswordRequest = () => {
           case 'migrate-acp': {
             await migrateAcp({ id: walletID, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -297,7 +297,7 @@ const PasswordRequest = () => {
       password,
       actionType,
       description,
-      history,
+      navigate,
       isSending,
       generatedTx,
       disabled,
@@ -370,7 +370,7 @@ const PasswordRequest = () => {
     return (
       <HardwareSign
         signType="transaction"
-        history={history}
+        navigate={navigate}
         wallet={wallet}
         onDismiss={onDismiss}
         offlineSignType={signType}

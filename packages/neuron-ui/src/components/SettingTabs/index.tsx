@@ -1,40 +1,23 @@
 import React, { useMemo } from 'react'
-import { Route, useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Pivot, PivotItem } from 'office-ui-fabric-react'
-
-import { useState as useGloablState, useDispatch } from 'states'
-
-import GeneralSetting from 'components/GeneralSetting'
-import WalletSetting from 'components/WalletSetting'
-import NetworkSetting from 'components/NetworkSetting'
-import DataSetting from 'components/DataSetting'
-
 import { getPlatform } from 'services/remote'
 import { RoutePath } from 'utils'
 
 import styles from './settingTabs.module.scss'
 
 const pivotItems = [
-  { label: 'settings.setting-tabs.general', url: RoutePath.SettingsGeneral },
-  { label: 'settings.setting-tabs.wallets', url: RoutePath.SettingsWallets },
-  { label: 'settings.setting-tabs.network', url: RoutePath.SettingsNetworks },
-  { label: 'settings.setting-tabs.data', url: RoutePath.SettingsData },
-]
-
-const settingPanels: CustomRouter.Route[] = [
-  { name: `GeneralSetting`, path: RoutePath.SettingsGeneral, exact: false, component: GeneralSetting },
-  { name: `WalletsSetting`, path: RoutePath.SettingsWallets, exact: false, component: WalletSetting },
-  { name: `NetworkSetting`, path: RoutePath.SettingsNetworks, exact: true, component: NetworkSetting },
-  { name: `DataSetting`, path: RoutePath.SettingsData, exact: true, component: DataSetting },
+  { label: 'settings.setting-tabs.general', url: `${RoutePath.Settings}/${RoutePath.SettingsGeneral}` },
+  { label: 'settings.setting-tabs.wallets', url: `${RoutePath.Settings}/${RoutePath.SettingsWallets}` },
+  { label: 'settings.setting-tabs.network', url: `${RoutePath.Settings}/${RoutePath.SettingsNetworks}` },
+  { label: 'settings.setting-tabs.data', url: `${RoutePath.Settings}/${RoutePath.SettingsData}` },
 ]
 
 const SettingsTabs = () => {
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
-  const globalState = useGloablState()
-  const dispatch = useDispatch()
   const isMac = useMemo(() => {
     return getPlatform() === 'darwin'
   }, [])
@@ -46,7 +29,7 @@ const SettingsTabs = () => {
         selectedKey={location.pathname}
         onLinkClick={(pivotItem?: PivotItem) => {
           if (pivotItem && pivotItem.props && pivotItem.props.itemKey) {
-            history.replace(pivotItem.props.itemKey)
+            navigate(pivotItem.props.itemKey)
           }
         }}
         headersOnly
@@ -60,15 +43,7 @@ const SettingsTabs = () => {
           <PivotItem key={pivotItem.url} headerText={t(pivotItem.label)} itemKey={pivotItem.url} />
         ))}
       </Pivot>
-
-      {settingPanels.map(container => (
-        <Route
-          exact={container.exact}
-          path={`${container.path}${container.params || ''}`}
-          key={container.name}
-          render={() => <container.component {...globalState} dispatch={dispatch} />}
-        />
-      ))}
+      <Outlet />
     </div>
   )
 }

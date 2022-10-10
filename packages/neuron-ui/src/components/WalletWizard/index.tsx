@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import { Link, useHistory, useRouteMatch } from 'react-router-dom'
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
@@ -28,11 +28,11 @@ import styles from './walletWizard.module.scss'
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 
 const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  history: ReturnType<typeof useHistory>
+  navigate: ReturnType<typeof useNavigate>
 ) => {
   return createWallet(params).then(res => {
     if (isSuccessResponse(res)) {
-      history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+      navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
@@ -45,11 +45,11 @@ const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
 }
 
 const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  history: ReturnType<typeof useHistory>
+  navigate: ReturnType<typeof useNavigate>
 ) => {
   return importMnemonic(params).then(res => {
     if (isSuccessResponse(res)) {
-      history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+      navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
@@ -62,9 +62,9 @@ const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
 }
 
 export enum WalletWizardPath {
-  Welcome = '/welcome',
-  Mnemonic = '/mnemonic',
-  Submission = '/submission',
+  Welcome = 'welcome',
+  Mnemonic = 'mnemonic',
+  Submission = 'submission',
 }
 
 const initState: WithWizardState = {
@@ -105,7 +105,7 @@ export const CreateFirstWalletNav = ({ className }: { className?: string }) => {
   return (
     <div className={`${styles.hint} ${className || ''}`}>
       <span>{t('wizard.no-wallet')}&nbsp;</span>
-      <Link to={`/wizard${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`}>{t('wizard.create-wallet')}</Link>
+      <Link to={`/wizard/${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`}>{t('wizard.create-wallet')}</Link>
     </div>
   )
 }
@@ -120,15 +120,15 @@ export const FinishCreateLoading = ({ dialogRef }: { dialogRef: React.LegacyRef<
   )
 }
 
-const Welcome = ({ rootPath = '/wizard', wallets = [], dispatch }: WizardElementProps) => {
+const Welcome = ({ rootPath = '/wizard/', wallets = [], dispatch }: WizardElementProps) => {
   const [t] = useTranslation()
-  const history = useHistory()
-  const match = useRouteMatch()
+  const navigate = useNavigate()
+  const location = useLocation()
   useEffect(() => {
     if (wallets.length) {
-      history.push(RoutePath.Overview)
+      navigate(RoutePath.Overview)
     }
-  }, [wallets, history])
+  }, [wallets, navigate])
 
   useDidMount(() => {
     dispatch({
@@ -139,14 +139,14 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], dispatch }: WizardElement
 
   const next = useCallback(
     (link: string) => () => {
-      history.push(link)
+      navigate(link)
     },
-    [history]
+    [navigate]
   )
 
   const importHardware = useCallback(() => {
-    history.push(RoutePath.ImportHardware)
-  }, [match.url, history])
+    navigate(RoutePath.ImportHardware)
+  }, [location, navigate])
 
   return (
     <div className={styles.welcome}>
@@ -185,12 +185,10 @@ const typeHits: Record<MnemonicAction, string> = {
   [MnemonicAction.Import]: '',
 }
 
-const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardElementProps) => {
+const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch, isSettings }: WizardElementProps) => {
   const { generated, imported } = state
-  const history = useHistory()
-  const {
-    params: { type = MnemonicAction.Create },
-  } = useRouteMatch<{ type: MnemonicAction }>()
+  const navigate = useNavigate()
+  const { type = MnemonicAction.Create } = useParams<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const isCreate = type === MnemonicAction.Create
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
@@ -217,7 +215,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
         payload: '',
       })
     }
-  }, [dispatch, type, history])
+  }, [dispatch, type, navigate])
 
   const globalDispatch = useDispatch()
 
@@ -226,7 +224,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
       return
     }
     if (isCreate) {
-      history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
+      navigate(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
       changeStep(v => v + 1)
     } else {
       const trimmedMnemonic = inputsWords
@@ -243,7 +241,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
           isMnemonicValid = res.result
         }
         if (isMnemonicValid) {
-          history.push(
+          navigate(
             `${rootPath}${WalletWizardPath.Submission}/${
               type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
             }`
@@ -261,15 +259,16 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
         }
       })
     }
-  }, [isCreate, history, rootPath, type, imported, t, dispatch, disableNext, inputsWords, globalDispatch])
+  }, [isCreate, navigate, rootPath, type, imported, t, dispatch, disableNext, inputsWords, globalDispatch])
 
   const onBack = useCallback(() => {
     changeStep(v => v - 1)
-    if (type === MnemonicAction.Create) {
-      history.push(`${rootPath}${WalletWizardPath.Welcome}`)
+    if (type === MnemonicAction.Create && !isSettings) {
+      navigate(`${rootPath}${WalletWizardPath.Welcome}`)
     } else {
-      history.goBack()
+      navigate(-1)
     }
+    navigate(-1)
   }, [changeStep, type])
 
   return (
@@ -312,10 +311,8 @@ export const getAlertStatus = (fieldInit: boolean, success: boolean) => {
 
 const Submission = ({ state = initState, wallets = [], dispatch }: WizardElementProps) => {
   const { name, password, confirmPassword, imported } = state
-  const history = useHistory()
-  const {
-    params: { type = MnemonicAction.Create },
-  } = useRouteMatch<{ type: MnemonicAction }>()
+  const navigate = useNavigate()
+  const { type = MnemonicAction.Create } = useParams<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const message = 'wizard.set-wallet-name-and-password'
 
@@ -374,13 +371,13 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
       openDialog()
       setTimeout(() => {
         if (type === MnemonicAction.Create) {
-          createWalletWithMnemonic(p)(history).finally(() => closeDialog())
+          createWalletWithMnemonic(p)(navigate).finally(() => closeDialog())
         } else {
-          importWalletWithMnemonic(p)(history).finally(() => closeDialog())
+          importWalletWithMnemonic(p)(navigate).finally(() => closeDialog())
         }
       }, 0)
     },
-    [type, name, password, imported, history, disableNext, openDialog, closeDialog]
+    [type, name, password, imported, navigate, disableNext, openDialog, closeDialog]
   )
 
   return (
@@ -425,7 +422,7 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
         <Button type="submit" label={t('wizard.finish-create')} disabled={disableNext}>
           {t('wizard.finish-create') as string}
         </Button>
-        <Button type="text" onClick={history.goBack} label={t('wizard.back')} />
+        <Button type="text" onClick={() => navigate(-1)} label={t('wizard.back')} />
       </div>
       <FinishCreateLoading dialogRef={dialogRef} />
     </form>

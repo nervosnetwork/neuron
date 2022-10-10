@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import Balance from 'components/Balance'
 
@@ -67,7 +67,7 @@ const Overview = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const syncStatus = getSyncStatus({
     bestKnownBlockNumber,
@@ -92,8 +92,8 @@ const Overview = () => {
     })(dispatch)
   }, [id, dispatch])
   const onGoToHistory = useCallback(() => {
-    history.push(RoutePath.History)
-  }, [history])
+    navigate(RoutePath.History)
+  }, [navigate])
 
   const onRecentActivityDoubleClick = useCallback((e: React.SyntheticEvent) => {
     const cellElement = e.target as HTMLTableCellElement

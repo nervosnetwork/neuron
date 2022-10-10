@@ -100,7 +100,7 @@ const NFTSend = () => {
     [isSubmittable, globalDispatch, walletId]
   )
 
-  const location = useLocation<{ outPoint?: any }>()
+  const location = useLocation()
 
   const outPoint = location.state?.outPoint
 

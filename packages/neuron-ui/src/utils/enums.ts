@@ -7,7 +7,7 @@ export enum ConnectionStatus {
 export enum RoutePath {
   Launch = '/',
   Overview = '/overview',
-  WalletWizard = '/wizard',
+  WalletWizard = '/wizard/',
   Wallet = '/wallet',
   Send = '/send',
   Receive = '/receive',
@@ -15,10 +15,10 @@ export enum RoutePath {
   Transaction = '/transaction',
   Addresses = '/addresses',
   Settings = '/settings',
-  SettingsGeneral = '/settings/general',
-  SettingsWallets = '/settings/wallets',
-  SettingsNetworks = '/settings/networks',
-  SettingsData = '/settings/data',
+  SettingsGeneral = 'general',
+  SettingsWallets = 'wallets',
+  SettingsNetworks = 'networks',
+  SettingsData = 'data',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   ImportKeystore = '/keystore/import',
@@ -32,7 +32,7 @@ export enum RoutePath {
   SUDTReceive = '/s-udt/receive',
   NFTSend = '/nft',
   ImportHardware = '/import-hardware',
-  OfflineSign = '/*/offline-sign',
+  OfflineSign = 'offline-sign',
 }
 
 export enum CapacityUnit {

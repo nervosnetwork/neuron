@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
@@ -39,7 +39,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
 
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
   const [password, setPassword] = useState('')
@@ -98,7 +98,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
             }
             await sendTransaction({ walletID, tx: transaction, description, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -130,7 +130,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
             }
             await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -145,7 +145,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
             }
             await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -168,7 +168,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
       password,
       signType,
       description,
-      history,
+      navigate,
       isSigning,
       transaction,
       disabled,
@@ -198,7 +198,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
     return (
       <HardwareSign
         signType="transaction"
-        history={history}
+        navigate={navigate}
         wallet={wallet}
         onDismiss={onDismiss}
         offlineSignJSON={offlineSignJSON}
