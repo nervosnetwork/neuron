@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { useNavigate } from 'react-router-dom'
 import { CreateFirstWalletNav } from 'components/WalletWizard'
 import { useGoBack } from 'utils'
 import { AttentionOutline } from 'widgets/Icons/icon'
@@ -44,8 +43,7 @@ const supportedHardwareModels = [
 const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => {
   const [t] = useTranslation()
   const [model, setModel] = useState<Model | null>()
-  const navigate = useNavigate()
-  const onBack = useGoBack(navigate)
+  const onBack = useGoBack()
   const onNext = useCallback(() => {
     dispatch({
       model,

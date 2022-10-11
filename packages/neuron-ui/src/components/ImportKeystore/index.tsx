@@ -47,7 +47,7 @@ const ImportKeystore = () => {
   const navigate = useNavigate()
   const [fields, setFields] = useState(defaultFields)
   const [openingFile, setOpeningFile] = useState(false)
-  const goBack = useGoBack(navigate)
+  const goBack = useGoBack()
 
   const disabled = !!(
     !fields.name ||

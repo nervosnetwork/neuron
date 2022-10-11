@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useLocation, NavigateFunction } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -86,8 +86,7 @@ export const useOnCurrentWalletChange = ({
 }: {
   walletID: string
   chain: State.Chain
-  navigate: ReturnType<typeof useNavigate>
-
+  navigate: NavigateFunction
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
@@ -106,7 +105,7 @@ export const useSubscription = ({
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
-  navigate: ReturnType<typeof useNavigate>
+  navigate: NavigateFunction
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
 }) => {

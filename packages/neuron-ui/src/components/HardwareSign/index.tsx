@@ -12,7 +12,7 @@ import {
 } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import Spinner from 'widgets/Spinner'
-import { useNavigate } from 'react-router-dom'
+import { NavigateFunction } from 'react-router-dom'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import {
   connectDevice,
@@ -43,7 +43,7 @@ export interface HardwareSignProps {
   offlineSignType?: OfflineSignType
   onDismiss: () => void
   signMessage?: (password: string) => Promise<any>
-  navigate?: ReturnType<typeof useNavigate>
+  navigate?: NavigateFunction
 }
 
 const HardwareSign = ({

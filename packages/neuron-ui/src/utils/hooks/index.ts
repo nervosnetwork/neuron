@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
 import { syncRebuildNotification } from 'services/localCache'
@@ -28,7 +28,8 @@ import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 export * from './createSUDTAccount'
 export * from './tokenInfoList'
 
-export const useGoBack = (navigate: ReturnType<typeof useNavigate>) => {
+export const useGoBack = () => {
+  const navigate = useNavigate()
   return useCallback(() => {
     navigate(-1)
   }, [navigate])
@@ -323,13 +324,7 @@ export const useOnLocaleChange = (i18n: i18nType) => {
   }, [i18n])
 }
 
-export const useOnHandleWallet = ({
-  navigate,
-  dispatch,
-}: {
-  navigate: ReturnType<typeof useNavigate>
-  dispatch: StateDispatch
-}) =>
+export const useOnHandleWallet = ({ navigate, dispatch }: { navigate: NavigateFunction; dispatch: StateDispatch }) =>
   useCallback(
     (e: React.SyntheticEvent) => {
       const {
@@ -404,7 +399,7 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
     }
   }, [containerSelector, borderClassName])
 
-export const useOnHandleNetwork = ({ navigate }: { navigate: ReturnType<typeof useNavigate> }) =>
+export const useOnHandleNetwork = ({ navigate }: { navigate: NavigateFunction }) =>
   useCallback(
     (e: React.SyntheticEvent) => {
       const {

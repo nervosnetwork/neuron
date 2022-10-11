@@ -1,10 +1,14 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
 import { RoutePath, failureResToNotification } from 'utils'
+import { NavigateFunction } from 'react-router-dom'
 import { addNotification, addPopup } from './app'
 
 import { AppActions, StateDispatch } from '../reducer'
 
-export const createNetwork = (params: Controller.CreateNetworkParams) => (dispatch: StateDispatch, navigate: any) => {
+export const createNetwork = (params: Controller.CreateNetworkParams) => (
+  dispatch: StateDispatch,
+  navigate: NavigateFunction
+) => {
   dispatch({
     type: AppActions.UpdateLoadings,
     payload: {

@@ -46,7 +46,7 @@ const WalletEditor = () => {
   const hint = useHint(editor.name.value, usedNames, t)
   const disabled = hint !== null || editor.name.value === wallet.name
 
-  const goBack = useGoBack(navigate)
+  const goBack = useGoBack()
   const onSubmit = useOnSubmit(editor.name.value, wallet.id, navigate, dispatch, disabled)
 
   if (!wallet.id) {

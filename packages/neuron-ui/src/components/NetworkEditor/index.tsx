@@ -81,7 +81,7 @@ const NetworkEditor = () => {
     },
     [setEditor, t, usedNetworkNames]
   )
-  const goBack = useGoBack(navigate)
+  const goBack = useGoBack()
 
   const onSubmit = useOnSubmit({
     id: id!,

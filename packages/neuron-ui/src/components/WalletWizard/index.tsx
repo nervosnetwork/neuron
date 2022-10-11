@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import { Link, useNavigate, useLocation, useParams } from 'react-router-dom'
+import { Link, useNavigate, useLocation, useParams, NavigateFunction } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
@@ -27,9 +27,7 @@ import styles from './walletWizard.module.scss'
 
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 
-const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  navigate: ReturnType<typeof useNavigate>
-) => {
+const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (navigate: NavigateFunction) => {
   return createWallet(params).then(res => {
     if (isSuccessResponse(res)) {
       navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
@@ -44,9 +42,7 @@ const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
   })
 }
 
-const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  navigate: ReturnType<typeof useNavigate>
-) => {
+const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (navigate: NavigateFunction) => {
   return importMnemonic(params).then(res => {
     if (isSuccessResponse(res)) {
       navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)

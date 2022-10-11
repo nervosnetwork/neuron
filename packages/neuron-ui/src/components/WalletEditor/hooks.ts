@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavigateFunction } from 'react-router-dom'
 import { StateDispatch, updateWalletProperty } from 'states'
 import { ErrorCode, ResponseCode, RoutePath, CONSTANTS } from 'utils'
 import i18n from 'utils/i18n'
@@ -43,7 +43,7 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
 export const useOnSubmit = (
   name: string = '',
   id: string = '',
-  navigate: ReturnType<typeof useNavigate>,
+  navigate: NavigateFunction,
   dispatch: StateDispatch,
   disabled: boolean
 ) => {

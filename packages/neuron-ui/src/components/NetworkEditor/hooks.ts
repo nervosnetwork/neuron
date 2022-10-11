@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavigateFunction } from 'react-router-dom'
 
 import { StateDispatch, createNetwork, updateNetwork, addNotification } from 'states'
 import { ErrorCode, CONSTANTS } from 'utils'
@@ -20,7 +20,7 @@ export const useOnSubmit = ({
   name: string
   remote: string
   networks: Readonly<State.Network[]>
-  navigate: ReturnType<typeof useNavigate>
+  navigate: NavigateFunction
   dispatch: StateDispatch
   disabled: boolean
   setIsUpdating: React.Dispatch<boolean>
