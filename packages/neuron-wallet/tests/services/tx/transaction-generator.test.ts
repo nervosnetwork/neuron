@@ -249,7 +249,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -279,7 +279,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -308,7 +308,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -337,7 +337,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -494,7 +494,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -517,7 +517,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -540,7 +540,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -563,7 +563,7 @@ describe('TransactionGenerator', () => {
         )
 
         const inputCapacities = tx
-          .inputs!.map(input => BigInt(input.capacity))
+          .inputs!.map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx
           .outputs!.map(output => BigInt(output.capacity))
@@ -607,7 +607,7 @@ describe('TransactionGenerator', () => {
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletId1, targetOutputs, fee)
 
       const inputCapacities = tx
-        .inputs!.map(input => BigInt(input.capacity))
+        .inputs!.map(input => BigInt(input.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       const outputCapacities = tx
         .outputs!.map(output => BigInt(output.capacity))
@@ -620,7 +620,7 @@ describe('TransactionGenerator', () => {
           expect(o.capacity).toEqual(tx.outputs![index].capacity)
         }
       })
-      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+      expect(outputCapacities + BigInt(tx.fee!)).toEqual(totalCapacities)
     })
 
     it('with feeRate 1000', async () => {
@@ -628,7 +628,7 @@ describe('TransactionGenerator', () => {
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletId1, targetOutputs, '0', feeRate)
 
       const inputCapacities = tx
-        .inputs!.map(input => BigInt(input.capacity))
+        .inputs!.map(input => BigInt(input.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       const outputCapacities = tx
         .outputs!.map(output => BigInt(output.capacity))
@@ -647,7 +647,7 @@ describe('TransactionGenerator', () => {
           expect(o.capacity).toEqual(tx.outputs![index].capacity)
         }
       })
-      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+      expect(outputCapacities + BigInt(tx.fee!)).toEqual(totalCapacities)
     })
 
     it('full address with feeRate 1000, 43 capacity', async () => {
@@ -678,7 +678,7 @@ describe('TransactionGenerator', () => {
       const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
       expect(tx.fee).toEqual(expectedFee.toString())
       expect(tx.outputs[0].capacity).toEqual(toShannon('43'))
-      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+      expect(outputCapacities + BigInt(tx.fee!)).toEqual(totalCapacities)
     })
 
     it('full address with feeRate 1000, 42 capacity', async () => {
@@ -757,7 +757,7 @@ describe('TransactionGenerator', () => {
       )
 
       const inputCapacities = tx
-        .inputs!.map(input => BigInt(input.capacity))
+        .inputs!.map(input => BigInt(input.capacity!))
         .reduce((result, c) => result + c, BigInt(0))
       const outputCapacities = tx
         .outputs!.map(output => BigInt(output.capacity))
@@ -774,7 +774,7 @@ describe('TransactionGenerator', () => {
         }
       })
       const totalCapacities: bigint = BigInt(toShannon('3000'))
-      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+      expect(outputCapacities + BigInt(tx.fee!)).toEqual(totalCapacities)
     })
   })
 
@@ -1054,7 +1054,7 @@ describe('TransactionGenerator', () => {
         expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.SECP_CODE_HASH)
 
         const inputCapacities = tx.inputs
-          .map(input => BigInt(input.capacity))
+          .map(input => BigInt(input.capacity!))
           .reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx.outputs
           .map(output => BigInt(output.capacity))
@@ -1171,7 +1171,7 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.length).toEqual(2)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1221,7 +1221,7 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.length).toEqual(2)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1278,7 +1278,7 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.length).toEqual(2)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1358,7 +1358,7 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedTxFee)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1408,7 +1408,7 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedTxFee)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1537,7 +1537,7 @@ describe('TransactionGenerator', () => {
                 BigInt(targetOutput.capacity) +
                 BigInt(toShannon('70')) +
                 (BigInt(toShannon('70')) - BigInt(changeOutput!.capacity)) -
-                BigInt(tx.fee)
+                BigInt(tx.fee!)
               ).toString()
             )
           })
@@ -1633,13 +1633,13 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedTxFee)
 
           const expectedOutputCapacities: bigint[] = [
-            BigInt(toShannon('150')) - BigInt(tx.fee),
+            BigInt(toShannon('150')) - BigInt(tx.fee!),
             BigInt(toShannon('142'))
           ]
           expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1791,12 +1791,12 @@ describe('TransactionGenerator', () => {
           const expectedOutputCapacities: bigint[] = [
             BigInt(toShannon('142')),
             BigInt(toShannon('142')),
-            BigInt(toShannon('1000')) - BigInt(tx.fee)
+            BigInt(toShannon('1000')) - BigInt(tx.fee!)
           ]
           expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1867,7 +1867,7 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedTxFee)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -1876,7 +1876,7 @@ describe('TransactionGenerator', () => {
           expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
 
           const expectedOutputCapacities: bigint[] = [
-            BigInt(toShannon('143')) + BigInt(toShannon('142')) - BigInt(tx.fee),
+            BigInt(toShannon('143')) + BigInt(toShannon('142')) - BigInt(tx.fee!),
             BigInt(toShannon('142'))
           ]
           expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
@@ -1972,13 +1972,13 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedTxFee)
 
           const expectedOutputCapacities: bigint[] = [
-            BigInt(toShannon('1000')) - BigInt(tx.fee),
+            BigInt(toShannon('1000')) - BigInt(tx.fee!),
             BigInt(toShannon('142'))
           ]
           expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -2059,12 +2059,12 @@ describe('TransactionGenerator', () => {
           const expectedOutputCapacities: bigint[] = [
             BigInt(toShannon('142')),
             BigInt(toShannon('142')),
-            BigInt(toShannon('1008')) - BigInt(toShannon('142')) - BigInt(tx.fee),
+            BigInt(toShannon('1008')) - BigInt(toShannon('142')) - BigInt(tx.fee!),
           ]
           expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
 
           const inputCapacities = tx.inputs
-            .map(input => BigInt(input.capacity))
+            .map(input => BigInt(input.capacity!))
             .reduce((result, c) => result + c, BigInt(0))
           const outputCapacities = tx.outputs
             .map(output => BigInt(output.capacity))
@@ -2095,7 +2095,7 @@ describe('TransactionGenerator', () => {
         )
 
         // check fee
-        const inputCapacities = tx.inputs.map(i => BigInt(i.capacity)).reduce((result, c) => result + c, BigInt(0))
+        const inputCapacities = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0))
         expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
 
@@ -2130,7 +2130,7 @@ describe('TransactionGenerator', () => {
         )
 
         // check fee
-        const inputCapacities = tx.inputs.map(i => BigInt(i.capacity)).reduce((result, c) => result + c, BigInt(0))
+        const inputCapacities = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
         const outputCapacities = tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0))
         expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
 
@@ -2406,7 +2406,7 @@ describe('TransactionGenerator', () => {
             const senderDefaultLockOutput = tx.outputs.find(
               output => output.lockHash === senderDefaultLockInputEntity.lockHash
             )!
-            const capacityAfterFees = BigInt(chequeOutputEntity.capacity) - BigInt(tx.fee)
+            const capacityAfterFees = BigInt(chequeOutputEntity.capacity) - BigInt(tx.fee!)
             expect(senderDefaultLockOutput.capacity).toEqual(capacityAfterFees.toString())
           })
           it('use 6 relative epoch in cheque input since', () => {
@@ -2536,7 +2536,7 @@ describe('TransactionGenerator', () => {
           const res = (await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell, bobLockHash)) as Transaction
           expect(res.outputs).toHaveLength(3)
           expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
-          expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee)).toString())
+          expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee!)).toString())
           expect(res.inputs).toHaveLength(3)
           expect(res.inputs[2].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
         })
@@ -2571,7 +2571,7 @@ describe('TransactionGenerator', () => {
           const res = (await TransactionGenerator.generateSudtMigrateAcpTx(sudtCell)) as Transaction
           expect(res.outputs).toHaveLength(1)
           expect(res.outputs[0].data).toEqual(sudtCell.data)
-          expect(res.outputs[0].capacity).toEqual((BigInt(sudtCell.capacity) - BigInt(res.fee)).toString())
+          expect(res.outputs[0].capacity).toEqual((BigInt(sudtCell.capacity) - BigInt(res.fee!)).toString())
         })
 
         it('account capacity is not enough', async () => {
@@ -2615,7 +2615,7 @@ describe('TransactionGenerator', () => {
       )
 
       // check fee
-      const inputCapacities = tx.inputs.map(i => BigInt(i.capacity)).reduce((result, c) => result + c, BigInt(0))
+      const inputCapacities = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
       const outputCapacities = tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0))
       expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
 
@@ -2629,7 +2629,7 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs.length).toEqual(1)
 
       const output = tx.outputs[0]
-      expect(output.capacity).toEqual((BigInt(100 * 10 ** 8) - BigInt(tx.fee)).toString())
+      expect(output.capacity).toEqual((BigInt(100 * 10 ** 8) - BigInt(tx.fee!)).toString())
       expect(!!output.type).toBe(false)
       expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
       expect(output.data).toEqual('0x')
@@ -2649,7 +2649,7 @@ describe('TransactionGenerator', () => {
       )
 
       // check fee
-      const inputCapacities = tx.inputs.map(i => BigInt(i.capacity)).reduce((result, c) => result + c, BigInt(0))
+      const inputCapacities = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
       const outputCapacities = tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0))
       expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
 
@@ -2657,7 +2657,7 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs.length).toEqual(1)
 
       const output = tx.outputs[0]
-      expect(output.capacity).toEqual((BigInt(143 * 10 ** 8) - BigInt(tx.fee)).toString())
+      expect(output.capacity).toEqual((BigInt(143 * 10 ** 8) - BigInt(tx.fee!)).toString())
       expect(assetAccountInfo.isSudtScript(output.type!)).toBe(true)
       expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
       expect(output.data).toEqual('0x' + '0'.repeat(32))
@@ -2720,7 +2720,7 @@ describe('TransactionGenerator', () => {
         const normalInputCellCapacity = tx.inputs
           .filter(input => input.lockHash === defaultLock.computeHash())
           .reduce((sum, input) => {
-            return (sum += BigInt(input.capacity))
+            return (sum += BigInt(input.capacity!))
           }, BigInt(0))
         const normalOutputCellCapacity = tx.outputs
           .filter(output => output.lockHash === defaultLock.computeHash())
@@ -2739,7 +2739,7 @@ describe('TransactionGenerator', () => {
         expect(totalLegacyACPCellsCount).toEqual(4)
         expect(totalMigratedACPCellsCount).toEqual(4)
         expect(normalInputCellCapacity.toString()).toEqual(toShannon('161'))
-        expect(normalOutputCellCapacity.toString()).toEqual((normalInputCellCapacity - BigInt(tx.fee)).toString())
+        expect(normalOutputCellCapacity.toString()).toEqual((normalInputCellCapacity - BigInt(tx.fee!)).toString())
         expect(acpCellCapacity.toString()).toEqual(toShannon('2400'))
         expect(totalMigratedSUDTCellCount).toEqual(2)
         expect(acpCellSudtAmount).toEqual(BigInt(200))
