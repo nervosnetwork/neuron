@@ -4825,10 +4825,10 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
 
-"@types/ledgerhq__hw-transport-node-hid@4.22.1":
-  version "4.22.1"
-  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport-node-hid/-/ledgerhq__hw-transport-node-hid-4.22.1.tgz#0f075f8965c7234126eb19bc8d569b73cc9a6f8e"
-  integrity sha512-EVdR5HWKUsuQOeg8DUqyhAtCooPsYpA3q+xvEdcZsgXxD/R8XNuYxSDCKNVyl0nEfobfJisb7f3Ta+Shf58izw==
+"@types/ledgerhq__hw-transport-node-hid@4.22.2":
+  version "4.22.2"
+  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport-node-hid/-/ledgerhq__hw-transport-node-hid-4.22.2.tgz#f3de58b9b49b461dd96e5bfb646328c242e70aca"
+  integrity sha512-b9dXYEZ8Iijv20LykEVhbThVzSjchMpvj8y/mSsCSP1n7Ncs+YqD8mjEV/bGTks9jAP8CdxhRqOGq+h47/4B9g==
   dependencies:
     "@types/ledgerhq__hw-transport" "*"
     "@types/node" "*"
