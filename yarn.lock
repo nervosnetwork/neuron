@@ -4601,10 +4601,10 @@
   resolved "https://registry.yarnpkg.com/@types/electron-devtools-installer/-/electron-devtools-installer-2.2.0.tgz#32ee4ebbe99b3daf9847a6d2097dc00b5de94f10"
   integrity sha512-HJNxpaOXuykCK4rQ6FOMxAA0NLFYsf7FiPFGmab0iQmtVBHSAfxzy3MRFpLTTDDWbV0yD2YsHOQvdu8yCqtCfw==
 
-"@types/elliptic@6.4.9":
-  version "6.4.9"
-  resolved "https://registry.yarnpkg.com/@types/elliptic/-/elliptic-6.4.9.tgz#e24874622535dd022778cf56e7421799375108d8"
-  integrity sha512-Mn+OyENd6YHwJKgUSyCTUDunEDFMaFpCXt52JCA00sxtzEa1ji6H0doZHL3iXhqMTo1Ob53X+Dv0s4PAJ+IVlA==
+"@types/elliptic@6.4.14":
+  version "6.4.14"
+  resolved "https://registry.yarnpkg.com/@types/elliptic/-/elliptic-6.4.14.tgz#7bbaad60567a588c1f08b10893453e6b9b4de48e"
+  integrity sha512-z4OBcDAU0GVwDTuwJzQCiL6188QvZMkvoERgcVjq0/mPM8jCfdwZ3x5zQEVoL9WCAru3aG5wl3Z5Ww5wBWn7ZQ==
   dependencies:
     "@types/bn.js" "*"
 
