@@ -4596,10 +4596,10 @@
   dependencies:
     "@types/ms" "*"
 
-"@types/electron-devtools-installer@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@types/electron-devtools-installer/-/electron-devtools-installer-2.2.0.tgz#32ee4ebbe99b3daf9847a6d2097dc00b5de94f10"
-  integrity sha512-HJNxpaOXuykCK4rQ6FOMxAA0NLFYsf7FiPFGmab0iQmtVBHSAfxzy3MRFpLTTDDWbV0yD2YsHOQvdu8yCqtCfw==
+"@types/electron-devtools-installer@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@types/electron-devtools-installer/-/electron-devtools-installer-2.2.2.tgz#5a91929ee76b5de0d171edec5bd049292d48a2a4"
+  integrity sha512-8o2XkyAw2HZoVD5KpIoUJmEgZ7BPVv33p7rY1jmn/wJUbugtQUc44vNMDTguUNUGiLv+oqgtyYmiYctHDZEzdQ==
 
 "@types/elliptic@6.4.14":
   version "6.4.14"
