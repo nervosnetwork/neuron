@@ -73,7 +73,7 @@
     "@types/elliptic": "6.4.14",
     "@types/iarna__toml": "2.0.2",
     "@types/jest-when": "2.7.1",
-    "@types/ledgerhq__hw-transport": "4.21.2",
+    "@types/ledgerhq__hw-transport": "4.21.4",
     "@types/ledgerhq__hw-transport-node-hid": "4.22.2",
     "@types/leveldown": "4.0.2",
     "@types/levelup": "4.3.0",
