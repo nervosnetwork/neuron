@@ -77,7 +77,7 @@
     "@types/ledgerhq__hw-transport-node-hid": "4.22.2",
     "@types/leveldown": "4.0.2",
     "@types/levelup": "4.3.0",
-    "@types/sqlite3": "3.1.5",
+    "@types/sqlite3": "3.1.8",
     "@types/uuid": "8.3.4",
     "@zerollup/ts-transform-paths": "1.7.18",
     "devtron": "1.4.0",
