@@ -291,7 +291,7 @@ const SUDTSend = () => {
   const [isDestroying, setIsDestroying] = useState(false)
   const onDestroy = useCallback(() => {
     setIsDestroying(true)
-    destoryAssetAccount({ walletID: walletId, id: accountId })
+    destoryAssetAccount({ walletID: walletId, id: accountId! })
       .then(res => {
         if (isSuccessResponse(res)) {
           const tx = res.result
@@ -320,8 +320,8 @@ const SUDTSend = () => {
   }, [globalDispatch, walletId, accountId])
 
   const showDestory = useMemo(
-    () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
-    [accountType, accountInfo]
+    () => accountId && (accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0)),
+    [accountType, accountInfo, accountId]
   )
   const onSubmit = useOnSumbit({ isSubmittable, accountType, walletId, addressLockType, sendType })
 

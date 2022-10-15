@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 
@@ -55,7 +55,7 @@ const menuItems = [
 ]
 
 const Navbar = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { pathname } = useLocation()
   const neuronWallet = useGlobalState()
   const {
@@ -110,7 +110,7 @@ const Navbar = () => {
         aria-label={t(item.name)}
         data-link={item.url}
         data-active={item.key === selectedKey}
-        onClick={() => history.push(item.url)}
+        onClick={() => navigate(item.url)}
       >
         {t(item.name)}
       </button>
@@ -127,7 +127,7 @@ const Navbar = () => {
         aria-label={t(item.name)}
         data-link={item.url}
         data-active={item.key === selectedKey}
-        onClick={() => history.push(item.url)}
+        onClick={() => navigate(item.url)}
       >
         {t(item.name)}
       </button>

@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { useState as useGlobalState } from 'states'
 
 export interface Element {
@@ -17,6 +17,7 @@ export interface WizardProps {
   wallets: Readonly<State.WalletIdentity[]>
   rootPath: string
   dispatch: React.Dispatch<any>
+  isSettings?: boolean
 }
 
 export interface WizardElementProps {
@@ -24,6 +25,7 @@ export interface WizardElementProps {
   rootPath: string
   state: WithWizardState
   dispatch: React.Dispatch<any>
+  isSettings?: boolean
 }
 
 const reducer = (
@@ -43,27 +45,44 @@ const reducer = (
   }
 }
 
-const Wizard = ({ state, elements, wallets, rootPath, dispatch }: WizardProps) => (
-  <>
+const Wizard = ({ state, elements, wallets, rootPath, dispatch, isSettings }: WizardProps) => (
+  <Routes>
     {elements.map((element: any) => (
       <Route
         key={element.path}
-        path={`${rootPath}${element.path || ''}${element.params || ''}`}
-        render={() => <element.comp rootPath={rootPath} wallets={wallets} state={state} dispatch={dispatch} />}
+        path={`${element.path || ''}${element.params || ''}`}
+        element={
+          <element.comp
+            rootPath={rootPath}
+            wallets={wallets}
+            state={state}
+            dispatch={dispatch}
+            isSettings={isSettings}
+          />
+        }
       />
     ))}
-  </>
+  </Routes>
 )
 
 Wizard.displayName = 'Wizard'
 
-const withWizard = (elements: Element[], initState: WithWizardState) => () => {
+const withWizard = (elements: Element[], initState: WithWizardState) => ({ isSettings }: { isSettings?: boolean }) => {
   const {
     settings: { wallets = [] },
   } = useGlobalState()
   const [state, dispatch] = useReducer(reducer, initState)
 
-  return <Wizard rootPath="/wizard" state={state} wallets={wallets} dispatch={dispatch} elements={elements} />
+  return (
+    <Wizard
+      rootPath="/wizard/"
+      isSettings={isSettings}
+      state={state}
+      wallets={wallets}
+      dispatch={dispatch}
+      elements={elements}
+    />
+  )
 }
 
 export default withWizard

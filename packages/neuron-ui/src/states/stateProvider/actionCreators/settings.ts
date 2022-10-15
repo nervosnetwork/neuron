@@ -1,10 +1,14 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
 import { RoutePath, failureResToNotification } from 'utils'
+import { NavigateFunction } from 'react-router-dom'
 import { addNotification, addPopup } from './app'
 
 import { AppActions, StateDispatch } from '../reducer'
 
-export const createNetwork = (params: Controller.CreateNetworkParams) => (dispatch: StateDispatch, history: any) => {
+export const createNetwork = (params: Controller.CreateNetworkParams) => (
+  dispatch: StateDispatch,
+  navigate: NavigateFunction
+) => {
   dispatch({
     type: AppActions.UpdateLoadings,
     payload: {
@@ -15,7 +19,7 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (dispat
     .then(res => {
       if (res.status === 1) {
         addPopup('create-network-successfully')(dispatch)
-        history.push(RoutePath.SettingsNetworks)
+        navigate(RoutePath.SettingsNetworks)
       } else {
         addNotification(failureResToNotification(res))(dispatch)
       }
@@ -30,11 +34,11 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (dispat
     })
 }
 
-export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispatch: StateDispatch, history: any) => {
+export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispatch: StateDispatch, navigate: any) => {
   return updateRemoteNetwork(params).then(res => {
     if (res.status === 1) {
       addPopup('update-network-successfully')(dispatch)
-      history.push(RoutePath.SettingsNetworks)
+      navigate(RoutePath.SettingsNetworks)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }

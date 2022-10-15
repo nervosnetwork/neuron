@@ -41,7 +41,7 @@ const toCSVRow = (
       txType = +tx.sudtInfo.amount <= 0 ? `UDT ${SEND_TYPE}` : `UDT ${RECEIVE_TYPE}`
     }
   } else {
-    amount = shannonToCKB(BigInt(tx.value!))
+    amount = shannonToCKB(BigInt(tx.value ?? ''))
     if (tx.nervosDao) {
       txType = `Nervos DAO`
     } else if (['create', 'destroy'].includes(tx.type || '')) {

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { useRouteMatch, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import Button from 'widgets/Button'
@@ -25,10 +25,8 @@ const Receive = () => {
   const { wallet } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const {
-    params: { address },
-  } = useRouteMatch<{ address: string }>()
-  const history = useHistory()
+  const { address } = useParams<{ address: string }>()
+  const navigate = useNavigate()
   const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
   const [isInShortFormat, setIsInShortFormat] = useState(false)
   const { addresses } = wallet
@@ -45,8 +43,8 @@ const Receive = () => {
   }, [address, addresses, isSingleAddress, isInShortFormat])
 
   const onAddressBookClick = useCallback(() => {
-    history.push(RoutePath.Addresses)
-  }, [history])
+    navigate(RoutePath.Addresses)
+  }, [navigate])
 
   const onVerifyAddressClick = useCallback(() => {
     setDisplayVerifyDialog(true)

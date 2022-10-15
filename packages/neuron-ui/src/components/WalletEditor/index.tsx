@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useHistory, useRouteMatch } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
@@ -29,10 +29,8 @@ const WalletEditor = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
-  const {
-    params: { id },
-  } = useRouteMatch<{ id: string }>()
+  const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
 
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets]) || { id: '', name: '' }
   const usedNames = wallets.map(w => w.name).filter(w => w !== wallet.name)
@@ -48,8 +46,8 @@ const WalletEditor = () => {
   const hint = useHint(editor.name.value, usedNames, t)
   const disabled = hint !== null || editor.name.value === wallet.name
 
-  const goBack = useGoBack(history)
-  const onSubmit = useOnSubmit(editor.name.value, wallet.id, history, dispatch, disabled)
+  const goBack = useGoBack()
+  const onSubmit = useOnSubmit(editor.name.value, wallet.id, navigate, dispatch, disabled)
 
   if (!wallet.id) {
     return <WalletNotFound />
