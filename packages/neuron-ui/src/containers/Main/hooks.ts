@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, NavigateFunction } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -81,32 +81,31 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
 
 export const useOnCurrentWalletChange = ({
   walletID,
-  history,
+  navigate,
   dispatch,
 }: {
   walletID: string
   chain: State.Chain
-  history: ReturnType<typeof useHistory>
-
+  navigate: NavigateFunction
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
-    initAppState()(dispatch, history)
-  }, [walletID, dispatch, history])
+    initAppState()(dispatch, navigate)
+  }, [walletID, dispatch])
 }
 
 export const useSubscription = ({
   walletID,
   chain,
   isAllowedToFetchList,
-  history,
+  navigate,
   dispatch,
   location,
 }: {
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
-  history: ReturnType<typeof useHistory>
+  navigate: NavigateFunction
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
 }) => {
@@ -135,7 +134,7 @@ export const useSubscription = ({
         case 'current-wallet': {
           updateCurrentWallet()(dispatch).then(hasCurrent => {
             if (!hasCurrent) {
-              history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+              navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
             }
           })
           break
@@ -144,7 +143,7 @@ export const useSubscription = ({
           Promise.all([updateWalletList, updateCurrentWallet].map(request => request()(dispatch))).then(
             ([hasList, hasCurrent]) => {
               if (!hasList || !hasCurrent) {
-                history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+                navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
               }
             }
           )
@@ -211,7 +210,7 @@ export const useSubscription = ({
           case 'navigate-to-url':
           case 'import-hardware': {
             if (payload) {
-              history.push(payload)
+              navigate(payload)
             }
             break
           }
@@ -255,7 +254,7 @@ export const useSubscription = ({
                   filePath,
                 },
               })
-              history.push(location.pathname + url)
+              navigate(location.pathname + url)
             }
             break
           }
@@ -273,7 +272,7 @@ export const useSubscription = ({
       syncStateSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch, location.pathname])
+  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, navigate, dispatch, location.pathname])
 }
 
 export default {

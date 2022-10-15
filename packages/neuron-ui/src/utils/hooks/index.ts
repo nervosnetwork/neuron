@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { useHistory } from 'react-router-dom'
+import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
 import { syncRebuildNotification } from 'services/localCache'
@@ -28,10 +28,11 @@ import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 export * from './createSUDTAccount'
 export * from './tokenInfoList'
 
-export const useGoBack = (history: ReturnType<typeof useHistory>) => {
+export const useGoBack = () => {
+  const navigate = useNavigate()
   return useCallback(() => {
-    history.goBack()
-  }, [history])
+    navigate(-1)
+  }, [navigate])
 }
 
 export const useLocalDescription = (type: 'address' | 'transaction', walletID: string, dispatch: StateDispatch) => {
@@ -323,13 +324,7 @@ export const useOnLocaleChange = (i18n: i18nType) => {
   }, [i18n])
 }
 
-export const useOnHandleWallet = ({
-  history,
-  dispatch,
-}: {
-  history: ReturnType<typeof useHistory>
-  dispatch: StateDispatch
-}) =>
+export const useOnHandleWallet = ({ navigate, dispatch }: { navigate: NavigateFunction; dispatch: StateDispatch }) =>
   useCallback(
     (e: React.SyntheticEvent) => {
       const {
@@ -342,7 +337,7 @@ export const useOnHandleWallet = ({
       } = e as any
       switch (action) {
         case 'edit': {
-          history.push(`${RoutePath.WalletEditor}/${id}`)
+          navigate(`${RoutePath.WalletEditor}/${id}`)
           break
         }
         case 'delete': {
@@ -365,7 +360,7 @@ export const useOnHandleWallet = ({
         }
       }
     },
-    [dispatch, history]
+    [dispatch, navigate]
   )
 
 export const useOnWindowResize = (handler: () => void) => {
@@ -404,7 +399,7 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
     }
   }, [containerSelector, borderClassName])
 
-export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof useHistory> }) =>
+export const useOnHandleNetwork = ({ navigate }: { navigate: NavigateFunction }) =>
   useCallback(
     (e: React.SyntheticEvent) => {
       const {
@@ -417,7 +412,7 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
       } = e as any
       switch (action) {
         case 'edit': {
-          history.push(`${RoutePath.NetworkEditor}/${id}`)
+          navigate(`${RoutePath.NetworkEditor}/${id}`)
           break
         }
         case 'delete': {
@@ -429,7 +424,7 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
         }
       }
     },
-    [history]
+    [navigate]
   )
 
 export const useGlobalNotifications = (

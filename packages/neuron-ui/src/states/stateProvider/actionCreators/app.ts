@@ -11,7 +11,7 @@ import {
   networks as networksCache,
 } from 'services/localCache'
 
-export const initAppState = () => (dispatch: StateDispatch, history: any) => {
+export const initAppState = () => (dispatch: StateDispatch, navigate: any) => {
   getNeuronWalletState()
     .then(res => {
       if (isSuccessResponse(res)) {
@@ -38,9 +38,9 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
           },
         })
         if (!wallet) {
-          history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+          navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
         } else {
-          history.push(RoutePath.Overview)
+          navigate(RoutePath.Overview)
         }
 
         currentWalletCache.save(wallet)
@@ -49,11 +49,11 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
         networksCache.save(networks)
         currentNetworkIDCache.save(currentNetworkID)
       } else {
-        history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+        navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
       }
     })
     .catch(() => {
-      history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+      navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
     })
 }
 

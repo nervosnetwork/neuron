@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
@@ -11,7 +11,7 @@ import OfflineSignDialog from '../OfflineSignDialog'
 
 import styles from './offlineSign.module.scss'
 
-const OfflineSign = ({ history }: RouteComponentProps) => {
+const OfflineSign = () => {
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const {
     app: { loadedTransaction = {} },
@@ -42,9 +42,11 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
     }
   }, [signStatus, t])
 
+  const navigate = useNavigate()
+
   const onBack = useCallback(() => {
-    history.goBack()
-  }, [history])
+    navigate(-1)
+  }, [navigate])
 
   const onSign = useCallback(
     (e: React.FormEvent) => {
@@ -64,7 +66,7 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
           walletID: wallet!.id,
         })
         if (isSuccessResponse(res)) {
-          history.push(RoutePath.History)
+          navigate(RoutePath.History)
         } else {
           addNotification({
             type: 'alert',
@@ -79,7 +81,7 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
         setIsBroadcasting(false)
       }
     },
-    [wallet, json, history, dispatch, onBack]
+    [wallet, json, navigate, dispatch, onBack]
   )
 
   useDidMount(() => {

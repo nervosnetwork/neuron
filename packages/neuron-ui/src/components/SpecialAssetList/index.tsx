@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
 import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
@@ -66,7 +66,7 @@ const SpecialAssetList = () => {
   const [loaded, setLoaded] = useState(false)
   const [cells, setCells] = useState<SpecialAssetCell[]>([])
   const [totalCount, setTotalCount] = useState<number>(0)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [pageNo, setPageNo] = useState<number>(1)
   const { search } = useLocation()
   const dispatch = useDispatch()
@@ -214,8 +214,7 @@ const SpecialAssetList = () => {
         return
       }
       if (cell.customizedAssetInfo.type === 'NFT') {
-        history.push({
-          pathname: `${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`,
+        navigate(`${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`, {
           state: {
             outPoint: cell.outPoint,
           },
@@ -295,7 +294,7 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, history, openDialog, tokenInfoList]
+    [cells, id, dispatch, setAccountToClaim, navigate, openDialog, tokenInfoList]
   )
 
   const list = useMemo(() => {
@@ -351,7 +350,7 @@ const SpecialAssetList = () => {
             lastPageIconProps={{ iconName: 'LastPage' }}
             format="buttons"
             onPageChange={(idx: number) => {
-              history.push(`${RoutePath.SpecialAssets}?pageNo=${idx + 1}`)
+              navigate(`${RoutePath.SpecialAssets}?pageNo=${idx + 1}`)
             }}
           />
         ) : null}

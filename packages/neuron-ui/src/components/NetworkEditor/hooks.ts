@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { NavigateFunction } from 'react-router-dom'
 
 import { StateDispatch, createNetwork, updateNetwork, addNotification } from 'states'
 import { ErrorCode, CONSTANTS } from 'utils'
@@ -11,7 +11,7 @@ export const useOnSubmit = ({
   name = '',
   remote = '',
   networks = [],
-  history,
+  navigate,
   dispatch,
   disabled,
   setIsUpdating,
@@ -20,7 +20,7 @@ export const useOnSubmit = ({
   name: string
   remote: string
   networks: Readonly<State.Network[]>
-  history: ReturnType<typeof useHistory>
+  navigate: NavigateFunction
   dispatch: StateDispatch
   disabled: boolean
   setIsUpdating: React.Dispatch<boolean>
@@ -103,7 +103,7 @@ export const useOnSubmit = ({
         createNetwork({
           name,
           remote,
-        })(dispatch, history)
+        })(dispatch, navigate)
         return
       }
 
@@ -127,9 +127,9 @@ export const useOnSubmit = ({
           name,
           remote,
         },
-      })(dispatch, history).then(() => setIsUpdating(false))
+      })(dispatch, navigate).then(() => setIsUpdating(false))
     },
-    [id, name, remote, networks, history, dispatch, disabled, setIsUpdating]
+    [id, name, remote, networks, navigate, dispatch, disabled, setIsUpdating]
   )
 
 export default {

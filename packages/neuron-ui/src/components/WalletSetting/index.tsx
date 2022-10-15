@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup } from 'office-ui-fabric-react'
 
@@ -57,7 +57,7 @@ const WalletSetting = ({
   dispatch,
 }: State.AppWithNeuronWallet & { dispatch: StateDispatch }) => {
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
@@ -74,18 +74,18 @@ const WalletSetting = ({
   )
   const onHandleWallet = useOnHandleWallet({
     dispatch,
-    history,
+    navigate,
   })
 
   const navTo = useCallback(
     (url: string = '/') => () => {
       if (url === RoutePath.ImportHardware) {
-        history.push(RoutePath.ImportHardware)
+        navigate(RoutePath.ImportHardware)
       } else {
-        history.push(url)
+        navigate(url)
       }
     },
-    [history, location.pathname]
+    [navigate, location.pathname]
   )
 
   const toggleBottomBorder = useToggleChoiceGroupBorder(`.${styles.wallets}`, styles.hasBottomBorder)
