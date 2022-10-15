@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
@@ -18,7 +18,7 @@ const NetworkEditor = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { id } = useParams<{ id: string }>()
-  const history = useHistory()
+  const navigate = useNavigate()
   const cachedNetworks = useRef(networks)
   const cachedNetwork = useMemo(() => cachedNetworks.current.find(network => network.id === id), [cachedNetworks, id])
   const usedNetworkNames = useMemo(
@@ -81,14 +81,14 @@ const NetworkEditor = () => {
     },
     [setEditor, t, usedNetworkNames]
   )
-  const goBack = useGoBack(history)
+  const goBack = useGoBack()
 
   const onSubmit = useOnSubmit({
     id: id!,
     name: editor.name,
     remote: editor.url,
     networks,
-    history,
+    navigate,
     dispatch,
     disabled,
     setIsUpdating,

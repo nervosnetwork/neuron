@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, PanelType, SpinnerSize } from 'office-ui-fabric-react'
 import { useState as useGlobalState } from 'states'
@@ -11,13 +11,13 @@ export const LaunchScreen = () => {
     wallet: { id = '' },
   } = useGlobalState()
   const { t } = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (id) {
-      history.push(RoutePath.Overview)
+      navigate(RoutePath.Overview)
     }
-  }, [id, history])
+  }, [id, navigate])
 
   return (
     <Panel isOpen type={PanelType.custom} customWidth="100vw">

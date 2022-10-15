@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { importKeystore, showOpenDialogModal } from 'services/remote'
 import { useState as useGlobalState } from 'states'
@@ -44,10 +44,10 @@ const ImportKeystore = () => {
   const {
     settings: { wallets },
   } = useGlobalState()
-  const history = useHistory()
+  const navigate = useNavigate()
   const [fields, setFields] = useState(defaultFields)
   const [openingFile, setOpeningFile] = useState(false)
-  const goBack = useGoBack(history)
+  const goBack = useGoBack()
 
   const disabled = !!(
     !fields.name ||
@@ -105,7 +105,7 @@ const ImportKeystore = () => {
       importKeystore({ name: fields.name!, keystorePath: fields.path, password: fields.password })
         .then(res => {
           if (isSuccessResponse(res)) {
-            history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+            navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
             return
           }
 
@@ -131,7 +131,7 @@ const ImportKeystore = () => {
           closeDialog()
         })
     },
-    [fields.name, fields.password, fields.path, history, openDialog, closeDialog, disabled, setFields, t]
+    [fields.name, fields.password, fields.path, navigate, openDialog, closeDialog, disabled, setFields, t]
   )
 
   const handleChange = useCallback(

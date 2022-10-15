@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
 import Pagination from 'widgets/Pagination'
@@ -27,13 +27,13 @@ const History = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { search } = useLocation()
   const [isExporting, setIsExporting] = useState(false)
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
-  const onSearch = useCallback(() => history.push(`${RoutePath.History}?keywords=${keywords}`), [history, keywords])
+  const onSearch = useCallback(() => navigate(`${RoutePath.History}?keywords=${keywords}`), [navigate, keywords])
   const onExport = useCallback(() => {
     setIsExporting(true)
     const timer = setTimeout(() => {
@@ -98,7 +98,7 @@ const History = () => {
             pageSize={pageSize}
             pageNo={pageNo}
             onChange={(no: number) => {
-              history.push(`${RoutePath.History}?pageNo=${no}&keywords=${keywords}`)
+              navigate(`${RoutePath.History}?pageNo=${no}&keywords=${keywords}`)
             }}
           />
         </div>
@@ -116,7 +116,7 @@ const History = () => {
     pageNo,
     totalCount,
     pageSize,
-    history,
+    navigate,
     isMainnet,
     t,
     isExporting,

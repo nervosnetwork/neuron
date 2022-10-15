@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import NetworkTypeLabel from 'components/NetworkTypeLabel'
@@ -15,7 +15,7 @@ import styles from './networkSetting.module.scss'
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   useEffect(() => {
     backToTop()
   }, [])
@@ -32,8 +32,8 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   )
 
   const goToCreateNetwork = useCallback(() => {
-    history.push(`${RoutePath.NetworkEditor}/new`)
-  }, [history])
+    navigate(`${RoutePath.NetworkEditor}/new`)
+  }, [navigate])
 
   const toggleBottomBorder = useToggleChoiceGroupBorder(`.${styles.networks}`, styles.hasBottomBorder)
 
@@ -45,7 +45,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
 
   useOnWindowResize(toggleBottomBorder)
 
-  const onHandleNetwork = useOnHandleNetwork({ history })
+  const onHandleNetwork = useOnHandleNetwork({ navigate })
 
   return (
     <div className={styles.container}>

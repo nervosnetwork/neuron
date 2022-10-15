@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { NavigateFunction } from 'react-router-dom'
 import { StateDispatch, updateWalletProperty } from 'states'
 import { ErrorCode, ResponseCode, RoutePath, CONSTANTS } from 'utils'
 import i18n from 'utils/i18n'
@@ -43,7 +43,7 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
 export const useOnSubmit = (
   name: string = '',
   id: string = '',
-  history: ReturnType<typeof useHistory>,
+  navigate: NavigateFunction,
   dispatch: StateDispatch,
   disabled: boolean
 ) => {
@@ -58,11 +58,11 @@ export const useOnSubmit = (
         name,
       })(dispatch).then(status => {
         if (status === ResponseCode.SUCCESS) {
-          history.push(RoutePath.SettingsWallets)
+          navigate(RoutePath.SettingsWallets)
         }
       })
     },
-    [name, id, history, dispatch, disabled]
+    [name, id, navigate, dispatch, disabled]
   )
 }
 

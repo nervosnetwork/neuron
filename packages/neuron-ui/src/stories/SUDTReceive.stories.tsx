@@ -14,7 +14,7 @@ const ComponentParams = () => (
     <Link to="/s-udt/receive?address=ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j1&accountName=account name&tokenName=token name">
       Link
     </Link>
-    <Route path="/s-udt/receive" component={SUDTReceive} />
+    <Route path="/s-udt/receive" element={SUDTReceive} />
   </div>
 )
 
