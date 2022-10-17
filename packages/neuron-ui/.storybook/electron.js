@@ -1,7 +1,7 @@
-const sendSyncValues = {}
-
-sendSyncValues['get-locale'] = 'zh'
-sendSyncValues['get-version'] = '0.103.1'
+const sendSyncValues = {
+  'get-locale': 'zh',
+  'get-version': '0.103.1'
+}
 
 module.exports = {
   ipcRenderer: {
