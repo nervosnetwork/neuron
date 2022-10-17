@@ -1,11 +1,11 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import { action } from '@storybook/addon-actions'
 import SettingTabs from 'components/SettingTabs'
 import { initStates, NeuronWalletContext } from 'states'
 
-const stories = storiesOf('Settings', module).addDecorator(StoryRouter())
+const stories = storiesOf('Settings', module).addDecorator(withRouter())
 
 const dispatch = (dispatchAction: any) => action('dispatch')(dispatchAction)
 
