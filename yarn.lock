@@ -4831,10 +4831,10 @@
   dependencies:
     "@types/jest" "*"
 
-"@types/jest-when@2.7.1":
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/@types/jest-when/-/jest-when-2.7.1.tgz#0b04a33a48a17370c390e9830a975822b3ac5e32"
-  integrity sha512-PRrGzDkU859cdkFL2KwWN4fRLRDGIUkRNT0StbthhKmj+naU4wImpoJeMnhjprvSou4pKAzU0dKfdQvjceJVhg==
+"@types/jest-when@2.7.4":
+  version "2.7.4"
+  resolved "https://registry.yarnpkg.com/@types/jest-when/-/jest-when-2.7.4.tgz#1bedac232f4a54c1a1c01cc641c03ecfd0dad0ec"
+  integrity sha512-2OC69oyaD33tmSaOjtxvy7ZpBO85OWIw1AbpWVziL4bek5mr795H59qK5EKDpp4dLhtH1QIs54tXpoHEb2mE/A==
   dependencies:
     "@types/jest" "*"
 
@@ -14576,10 +14576,10 @@ jest-watcher@^28.0.0:
     jest-util "^28.1.3"
     string-length "^4.0.1"
 
-jest-when@2.7.2:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/jest-when/-/jest-when-2.7.2.tgz#b7b4225e8882bd84a1cfd09216b2c63d22f892bd"
-  integrity sha512-GuVzimG0wW18A5JlYwhHrvuwmWRAQpsnilRVdJktvrZX5V0++al1f/iwITE7+Cud8Rbw/U2eka4tyy7kvxIWnw==
+jest-when@2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/jest-when/-/jest-when-2.8.1.tgz#8a428145fa9113bc35ea053fb61bff36f4483935"
+  integrity sha512-3S9Eu1EWw9tApOwOxJ3E6vEHvZ17zDmhsb/bZU5UNL6+JkoI9nVXkIV/vxBpuF9XRlq1pza1M9KO705qJSLBYw==
   dependencies:
     bunyan "^1.8.12"
     expect "^24.8.0"
