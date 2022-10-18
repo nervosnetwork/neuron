@@ -100,7 +100,7 @@ export interface GetCellsResults {
 export interface SearchKeyFilter {
   sizeLimit?: number;
   order?: Order;
-  lastCursor?: string | undefined;
+  lastCursor?: string;
 }
 
 export interface OutputToVerify {
