@@ -1,9 +1,9 @@
 
 import { rpcBatchRequest, rpcRequest } from '../../src/utils/rpc-request'
 
-const postMock = jest.fn()
-jest.mock('axios', () => ({
-  post: () => postMock()
+const requestMock = jest.fn()
+jest.mock('undici', () => ({
+  request: () => requestMock()
 }))
 
 describe('rpc-batch-request', () => {
@@ -18,22 +18,26 @@ describe('rpc-batch-request', () => {
     }
   ]
   it('fetch error', async () => {
-    postMock.mockResolvedValueOnce({ status: 500 })
+    requestMock.mockResolvedValueOnce({ statusCode: 500 })
     await expect(rpcBatchRequest('url', options)).rejects.toThrow(new Error(`indexer request failed with HTTP code 500`))
   })
   it('result is order by id', async () => {
-    postMock.mockResolvedValueOnce({
-      status: 200,
-      data: [
-        {
-          id: 2,
-          result: 2
-        },
-        {
-          id: 1,
-          result: 1
+    requestMock.mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        json() {
+          return Promise.resolve([
+            {
+              id: 2,
+              result: 2
+            },
+            {
+              id: 1,
+              result: 1
+            }
+          ])
         }
-      ]
+      }
     })
     const res = await rpcBatchRequest('url', options)
     expect(res).toEqual([
@@ -55,15 +59,19 @@ describe('rpc-request', () => {
     params: 1
   }
   it('fetch error', async () => {
-    postMock.mockResolvedValueOnce({ status: 500 })
+    requestMock.mockResolvedValueOnce({ statusCode: 500 })
     await expect(rpcRequest('url', option)).rejects.toThrow(new Error(`indexer request failed with HTTP code 500`))
   })
   it('fetch success', async () => {
-    postMock.mockResolvedValueOnce({
-      status: 200,
-      data: {
-        id: 2,
-        result: 2
+    requestMock.mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        json() {
+          return Promise.resolve({
+            id: 2,
+            result: 2
+          })
+        }
       }
     })
     const res = await rpcRequest('url', option)
