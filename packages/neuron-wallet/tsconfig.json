@@ -9,7 +9,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": ["./src/*"]
+      "*": ["./src/*", "node_modules/*"]
     },
     "plugins": [
       { "transform": "@zerollup/ts-transform-paths" }
