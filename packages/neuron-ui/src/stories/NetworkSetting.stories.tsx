@@ -1,8 +1,8 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
 import NetworkSetting from 'components/NetworkSetting'
 import { initStates } from 'states'
+import { withRouter } from 'storybook-addon-react-router-v6'
 
 const states: { [title: string]: State.Network[] } = {
   'Empty List': [],
@@ -31,7 +31,7 @@ const states: { [title: string]: State.Network[] } = {
   ],
 }
 
-const stories = storiesOf('NetworkSetting', module).addDecorator(StoryRouter())
+const stories = storiesOf('NetworkSetting', module).addDecorator(withRouter())
 
 Object.entries(states).forEach(([title, networks]) => {
   stories.add(title, () => (
