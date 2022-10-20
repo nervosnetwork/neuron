@@ -1,10 +1,10 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import { action } from '@storybook/addon-actions'
 import ScriptTag from 'components/ScriptTag'
 
-const stories = storiesOf('Script Tag', module).addDecorator(StoryRouter())
+const stories = storiesOf('Script Tag', module).addDecorator(withRouter())
 
 const scripts: Record<string, CKBComponents.Script> = {
   secp256k1_blake160: {
