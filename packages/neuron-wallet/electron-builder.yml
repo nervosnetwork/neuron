@@ -51,6 +51,7 @@ win:
 mac:
   artifactName: "${productName}-v${version}-${arch}-${os}.${ext}"
   category: public.app-category.finance
+  'type': 'development'
   icon: assets/icons/icon.icns
   extraFiles:
     - from: 'bin/mac/ckb'
