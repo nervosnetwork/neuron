@@ -11,14 +11,14 @@ directories:
 afterSign: scripts/notarize.js
 
 files:
-  - from: "../.."
-    to: "."
-    filter: ["!**/*", ".ckb-version", "ormconfig.json"]
+  - from: '../..'
+    to: '.'
+    filter: ['!**/*', '.ckb-version', 'ormconfig.json']
   - package.json
   - dist
-  - ".env"
-  - "!**/*.map"
-  - "!**/src/"
+  - '.env'
+  - '!**/*.map'
+  - '!**/src/'
 
 publish:
   - github
@@ -33,15 +33,16 @@ dmg:
   sign: false
   artifactName: "${productName}-v${version}-${arch}.${ext}"
 
+
 win:
   verifyUpdateCodeSignature: false
-  artifactName: "${productName}-v${version}-setup.${ext}"
+  artifactName: '${productName}-v${version}-setup.${ext}'
   icon: assets/icons/icon.ico
   extraFiles:
-    - from: "bin/win/ckb.exe"
-      to: "bin/ckb.exe"
-    - from: "bin/win/ckb-indexer.exe"
-      to: "bin/ckb-indexer.exe"
+    - from: 'bin/win/ckb.exe'
+      to: 'bin/ckb.exe'
+    - from: 'bin/win/ckb-indexer.exe'
+      to: 'bin/ckb-indexer.exe'
   target:
     - target: nsis
       arch:
@@ -50,17 +51,18 @@ win:
 mac:
   artifactName: "${productName}-v${version}-${arch}-${os}.${ext}"
   category: public.app-category.finance
+  'type': 'development'
   icon: assets/icons/icon.icns
   extraFiles:
-    - from: "bin/mac/ckb"
-      to: "bin/ckb"
-    - from: "bin/mac/ckb-indexer"
-      to: "bin/ckb-indexer"
+    - from: 'bin/mac/ckb'
+      to: 'bin/ckb'
+    - from: 'bin/mac/ckb-indexer'
+      to: 'bin/ckb-indexer'
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
   entitlementsInherit: assets/entitlements.plist
-  electronLanguages: ["en", "zh", "zh_CN", "zh_TW"]
+  electronLanguages: ['en', 'zh', 'zh_CN', 'zh_TW']
   target:
     - target: default
       arch:
@@ -68,13 +70,13 @@ mac:
         - x64
 
 linux:
-  artifactName: "${productName}-v${version}-${arch}.${ext}"
+  artifactName: '${productName}-v${version}-${arch}.${ext}'
   category: Finance
   icon: assets/icons/
   extraFiles:
-    - from: "bin/linux/ckb"
-      to: "bin/ckb"
-    - from: "bin/linux/ckb-indexer"
-      to: "bin/ckb-indexer"
+    - from: 'bin/linux/ckb'
+      to: 'bin/ckb'
+    - from: 'bin/linux/ckb-indexer'
+      to: 'bin/ckb-indexer'
   target:
     - AppImage
