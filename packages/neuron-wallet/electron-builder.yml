@@ -62,7 +62,7 @@ mac:
   entitlementsInherit: assets/entitlements.plist
   electronLanguages: ["en", "zh", "zh_CN", "zh_TW"]
   target:
-    - target: ["dmg", "zip"]
+    - target: "dmg"
       arch:
         - x64
         - arm64
