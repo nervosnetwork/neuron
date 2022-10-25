@@ -44,7 +44,7 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "7.19.3",
+    "@babel/core": "7.19.6",
     "@types/jest": "27.5.2",
     "@types/node": "16.11.7",
     "@types/npmlog": "4.1.4",
