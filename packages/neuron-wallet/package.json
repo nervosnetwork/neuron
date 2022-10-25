@@ -53,7 +53,7 @@
     "electron-window-state": "5.0.3",
     "elliptic": "6.5.4",
     "hw-app-ckb": "0.1.2",
-    "i18next": "17.0.13",
+    "i18next": "17.3.1",
     "leveldown": "5.4.1",
     "levelup": "4.3.2",
     "reflect-metadata": "0.1.13",
