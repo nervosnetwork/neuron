@@ -1,62 +1,126 @@
-@import '../../styles/mixin.scss';
-
 $hover-bg-color: #3cc68a4d;
-$left-padding: 15px;
+$left-padding: 16px;
+
+@mixin navItem {
+  display: flex;
+  align-items: center;
+  & > svg, & > img {
+    &:first-child {
+      margin-right: 18px;
+    }
+  }
+
+  & > span {
+    flex-grow: 1;
+  }
+}
 
 .sidebar {
   display: grid;
   grid-template:
     'name' 75px
-    'navs' 1fr
-    'network' 4rem
-    'sync' 2.6rem /
+    'navs' 1fr /
     var(--sidebar-width);
   height: 100vh;
-  background: black;
+  background: #212524;
+
+  * {
+    font-size: 14px;
+  }
 }
 
 .name {
-  @include regular-text;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  @include navItem;
   grid-area: name;
-  font-size: 1rem;
-  padding: 20px 15px;
+  padding: 20px 0 20px $left-padding;
   color: var(--nervos-green);
   letter-spacing: 0.53px;
-  margin: 0;
+  margin: 0 8px;
   appearance: none;
   border: none;
   background: transparent;
   font-weight: 700;
 }
 
+@mixin activity {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFF;
+
+  & > svg {
+    g {
+      opacity: 1;
+    }
+    path[opacity] {
+      opacity: 1;
+    }
+    path[stroke] {
+      stroke: #FFF;
+    }
+  }
+}
 .navs {
   display: flex;
   flex-direction: column;
   grid-area: navs;
-  background-color: #191919;
 
   button {
-    @include medium-text;
+    @include navItem;
     appearance: none;
     border: none;
-    color: white;
+    color: rgba(255, 255, 255, 0.5);
     background: transparent;
-    font-size: 1rem;
     line-height: 2.5rem;
     text-align: left;
     padding: 1px 0 1px $left-padding;
+    height: 48px;
+    margin: 1px 8px;
+    border-radius: 4px;
+    cursor: pointer;
 
     &:hover {
-      font-weight: 600;
-      background-color: $hover-bg-color;
+      @include activity;
     }
 
     &[data-active='true'] {
-      font-weight: 600;
-      background-color: var(--nervos-green);
+      @include activity;
+      & .arrow {
+        transform: rotate(90deg);
+      }
+    }
+
+    & .arrow {
+      margin-right: 24px;
+    }
+  }
+
+  .child {
+    display: flex;
+    padding: 1px 0 1px $left-padding;
+    margin: 1px 8px;
+    .leftLine {
+      width: 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &::after {
+        content: '';
+        width: 1px;
+        height: 60%;
+        background-color: #464545;
+      }
+    }
+
+    button {
+      &:hover {
+        background-color: transparent;
+        color: #FFF;
+      }
+  
+      &[data-active='true'] {
+        background-color: transparent;
+        color: #FFF;
+      }
     }
   }
 }

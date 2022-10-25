@@ -32,6 +32,13 @@ import { ReactComponent as AttentionSvg } from './ExperimentalAttention.svg'
 import { ReactComponent as AttentionOutlineSvg } from './AttentionOutline.svg'
 import { ReactComponent as PasswordHideSvg } from './PasswordHide.svg'
 import { ReactComponent as PasswordShowSvg } from './PasswordShow.svg'
+import { ReactComponent as OverviewSvg } from './Overview.svg'
+import { ReactComponent as SendSvg } from './Send.svg'
+import { ReactComponent as ReceiveSvg } from './Receive.svg'
+import { ReactComponent as HistorySvg } from './History.svg'
+import { ReactComponent as NervosDAOSvg } from './NervosDAO.svg'
+import { ReactComponent as ExperimentalSvg } from './Experimental.svg'
+import { ReactComponent as ArrowOpenRightSvg } from './ArrowOpenRight.svg'
 
 import styles from './icon.module.scss'
 
@@ -78,3 +85,10 @@ export const Attention = WrapSvg(AttentionSvg)
 export const AttentionOutline = WrapSvg(AttentionOutlineSvg)
 export const PasswordHide = WrapSvg(PasswordHideSvg)
 export const PasswordShow = WrapSvg(PasswordShowSvg)
+export const Overview = WrapSvg(OverviewSvg)
+export const Send = WrapSvg(SendSvg)
+export const Receive = WrapSvg(ReceiveSvg)
+export const History = WrapSvg(HistorySvg)
+export const NervosDAO = WrapSvg(NervosDAOSvg)
+export const Experimental = WrapSvg(ExperimentalSvg)
+export const ArrowOpenRight = WrapSvg(ArrowOpenRightSvg)

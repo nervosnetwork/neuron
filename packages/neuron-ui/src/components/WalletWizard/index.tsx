@@ -264,7 +264,6 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch, isSettin
     } else {
       navigate(-1)
     }
-    navigate(-1)
   }, [changeStep, type])
 
   return (

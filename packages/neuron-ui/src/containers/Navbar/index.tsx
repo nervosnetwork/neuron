@@ -3,24 +3,10 @@ import { createPortal } from 'react-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
-
-import { openExternal, showSettings } from 'services/remote'
-
-import NetworkStatus from 'components/NetworkStatus'
-import SyncStatus from 'components/SyncStatus'
-import RingProgresBar from 'widgets/RingProgressBar'
-import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
-
-import {
-  RoutePath,
-  getSyncLeftTime,
-  localNumberFormatter,
-  useOnLocaleChange,
-  SyncStatus as SyncStatusEnum,
-  ConnectionStatus,
-  getExplorerUrl,
-  isMainnet,
-} from 'utils'
+import Logo from 'widgets/Icons/Logo.png'
+import { Overview, Send, Receive, History, NervosDAO, Settings, Experimental, ArrowOpenRight } from 'widgets/Icons/icon'
+import { showSettings } from 'services/remote'
+import { RoutePath, useOnLocaleChange } from 'utils'
 
 import styles from './navbar.module.scss'
 
@@ -39,19 +25,50 @@ const throttledShowSettings = (() => {
 })()
 
 const menuItems = [
-  { name: 'navbar.overview', key: RoutePath.Overview.slice(1), url: RoutePath.Overview, experimental: false },
-  { name: 'navbar.send', key: RoutePath.Send.slice(1), url: RoutePath.Send, experimental: false },
-  { name: 'navbar.receive', key: RoutePath.Receive.slice(1), url: RoutePath.Receive, experimental: false },
-  { name: 'navbar.history', key: RoutePath.History.slice(1), url: RoutePath.History, experimental: false },
-  { name: 'navbar.nervos-dao', key: RoutePath.NervosDAO.slice(1), url: RoutePath.NervosDAO, experimental: false },
+  { name: 'navbar.overview', key: RoutePath.Overview, url: RoutePath.Overview, icon: <Overview /> },
+  { name: 'navbar.send', key: RoutePath.Send, url: RoutePath.Send, icon: <Send /> },
+  { name: 'navbar.receive', key: RoutePath.Receive, url: RoutePath.Receive, icon: <Receive /> },
+  { name: 'navbar.history', key: RoutePath.History, url: RoutePath.History, icon: <History /> },
+  { name: 'navbar.nervos-dao', key: RoutePath.NervosDAO, url: RoutePath.NervosDAO, icon: <NervosDAO /> },
+  { name: 'navbar.settings', key: RoutePath.Settings, url: RoutePath.Settings, icon: <Settings /> },
   {
-    name: 'navbar.special-assets',
-    key: RoutePath.SpecialAssets.slice(1),
+    name: 'navbar.experimental-functions',
+    key: 'experimental-functions',
+    icon: <Experimental />,
     url: RoutePath.SpecialAssets,
-    experimental: true,
+    children: [
+      { name: 'navbar.special-assets', key: RoutePath.SpecialAssets, url: RoutePath.SpecialAssets },
+      { name: 'navbar.s-udt', key: RoutePath.SUDTAccountList, url: RoutePath.SUDTAccountList },
+    ],
   },
-  { name: 'navbar.s-udt', key: RoutePath.SUDTAccountList.slice(1), url: RoutePath.SUDTAccountList, experimental: true },
 ]
+
+const MenuButton = ({
+  menu,
+  onClick,
+  children,
+  selectedKey,
+}: React.PropsWithChildren<{
+  menu: { key: string; name: string; url: string }
+  onClick: React.MouseEventHandler<HTMLButtonElement>
+  selectedKey?: string
+}>) => {
+  const [t] = useTranslation()
+  return (
+    <button
+      type="button"
+      key={menu.key}
+      title={t(menu.name)}
+      name={t(menu.name)}
+      aria-label={t(menu.name)}
+      data-link={menu.url}
+      data-active={menu.key === selectedKey}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  )
+}
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -59,82 +76,26 @@ const Navbar = () => {
   const neuronWallet = useGlobalState()
   const {
     wallet: { name },
-    chain: {
-      connectionStatus,
-      networkID,
-      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status, isLookingValidTarget, validTarget },
-    },
-    settings: { wallets = [], networks = [] },
+    settings: { wallets = [] },
   } = neuronWallet
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
-
-  const network = networks.find(n => n.id === networkID)
-
-  const selectedKey = menuItems.find(item => item.key === pathname.substr(1))?.key ?? null
-
-  const syncStatus = status
-
-  const onOpenValidTarget = useCallback(
-    (e: React.SyntheticEvent) => {
-      e.stopPropagation()
-      const explorerUrl = getExplorerUrl(isMainnet(networks, networkID))
-      openExternal(`${explorerUrl}/block/${validTarget}`)
-    },
-    [networks, networkID, validTarget]
-  )
-
+  const selectedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
   }
 
-  const normalMenus = menuItems
-    .filter(item => !item.experimental)
-    .map(item => (
-      <button
-        type="button"
-        key={item.key}
-        title={t(item.name)}
-        name={t(item.name)}
-        aria-label={t(item.name)}
-        data-link={item.url}
-        data-active={item.key === selectedKey}
-        onClick={() => navigate(item.url)}
-      >
-        {t(item.name)}
-      </button>
-    ))
-
-  const experimentalMenus = menuItems
-    .filter(item => item.experimental)
-    .map(item => (
-      <button
-        type="button"
-        key={item.key}
-        title={t(item.name)}
-        name={t(item.name)}
-        aria-label={t(item.name)}
-        data-link={item.url}
-        data-active={item.key === selectedKey}
-        onClick={() => navigate(item.url)}
-      >
-        {t(item.name)}
-      </button>
-    ))
-
-  const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
-  const syncPercents =
-    bestBlockNumber > 0 && cacheTipBlockNumber > 0 ? +((cacheTipBlockNumber * 100) / bestBlockNumber).toFixed(2) : 0
-  let ringBarColor = '#3cc68a'
-  if (ConnectionStatus.Offline === connectionStatus || SyncStatusEnum.SyncNotStart === syncStatus) {
-    ringBarColor = '#ff0000'
-  } else if (SyncStatusEnum.SyncPending === syncStatus) {
-    ringBarColor = '#f7ae4d'
-  }
-
-  const syncBlockNumbers = `${cacheTipBlockNumber >= 0 ? localNumberFormatter(cacheTipBlockNumber) : '-'}/${
-    bestBlockNumber >= 0 ? localNumberFormatter(bestBlockNumber) : '-'
-  }`
+  const onClickNavItem = useCallback(
+    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const {
+        dataset: { link },
+      } = e.currentTarget
+      if (link) {
+        navigate(link)
+      }
+    },
+    [navigate]
+  )
 
   return (
     <aside className={styles.sidebar}>
@@ -145,36 +106,32 @@ const Navbar = () => {
         aria-label={name}
         onClick={() => throttledShowSettings({ tab: 'wallets' })}
       >
+        <img src={Logo} alt="logo" />
         {name}
       </button>
       <nav role="navigation" className={styles.navs}>
-        {normalMenus}
-        <div className={styles.experimentalDivider}>
-          <ExperimentalIcon />
-          {t('navbar.experimental-functions')}
-        </div>
-        {experimentalMenus}
+        {menuItems.map(item => (
+          <>
+            <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
+              {item.icon}
+              <span>{t(item.name)}</span>
+              {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
+            </MenuButton>
+            {item.children?.length && item.key === selectedKey && (
+              <div className={styles.child}>
+                <div className={styles.leftLine} />
+                <div>
+                  {item.children.map(child => (
+                    <MenuButton menu={child} selectedKey={pathname} onClick={onClickNavItem}>
+                      {t(child.name)}
+                    </MenuButton>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        ))}
       </nav>
-      <div className={styles.network}>
-        <NetworkStatus
-          isLookingValidTarget={isLookingValidTarget}
-          onOpenValidTarget={onOpenValidTarget}
-          syncPercents={syncPercents}
-          syncBlockNumbers={syncBlockNumbers}
-          network={network}
-          onAction={() => throttledShowSettings({ tab: 'networks' })}
-        />
-      </div>
-      <div className={styles.sync}>
-        <RingProgresBar
-          percents={syncPercents}
-          color={ringBarColor}
-          backgroundColor="#666"
-          size="16px"
-          strokeWidth="4px"
-        />
-        <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} leftTime={getSyncLeftTime(estimate)} />
-      </div>
     </aside>
   )
 }
