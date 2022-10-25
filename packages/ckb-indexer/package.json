@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "events": "3.3.0",
-    "eslint": "8.25.0"
+    "eslint": "8.26.0"
   },
   "scripts": {
     "build": "tsc",
