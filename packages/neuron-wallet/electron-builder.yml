@@ -48,7 +48,7 @@ win:
         - x64
 
 mac:
-  artifactName: "${productName}-v${version}-${arch}-${os}.${ext}"
+  artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
   category: public.app-category.finance
   icon: assets/icons/icon.icns
   extraFiles:
