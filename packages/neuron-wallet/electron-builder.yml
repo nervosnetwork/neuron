@@ -31,7 +31,7 @@ nsis:
 
 dmg:
   sign: false
-  artifactName: "${productName}-v${version}.${ext}"
+  artifactName: "${productName}-v${version}-${arch}.${ext}"
 
 win:
   verifyUpdateCodeSignature: false
@@ -48,7 +48,7 @@ win:
         - x64
 
 mac:
-  artifactName: "${productName}-v${version}-${os}.${ext}"
+  artifactName: "${productName}-v${version}-${arch}-${os}.${ext}"
   category: public.app-category.finance
   icon: assets/icons/icon.icns
   extraFiles:
@@ -66,7 +66,6 @@ mac:
       arch:
         - arm64
         - x64
-
 
 linux:
   artifactName: "${productName}-v${version}-${arch}.${ext}"
