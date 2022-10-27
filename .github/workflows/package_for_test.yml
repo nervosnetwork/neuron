@@ -98,14 +98,28 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Mac
-          path: release/Neuron-*-mac.zip
+          path: release/Neuron-*-x64-mac.zip
+
+      - name: Upload Neuron App Zip(arm64)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neuron-Mac
+          path: release/Neuron-*-arm64-mac.zip
 
       - name: Upload Neuron Dmg
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Dmg
-          path: release/Neuron-*.dmg
+          path: release/Neuron-*-x64-mac.dmg
+
+      - name: Upload Neuron Dmg(arm64)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neuron-Dmg
+          path: release/Neuron-*-arm64-mac.dmg
 
       - name: Upload Neuron Win
         if: matrix.os == 'windows-2019'
