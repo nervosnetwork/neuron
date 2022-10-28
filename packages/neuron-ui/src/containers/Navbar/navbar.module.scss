@@ -40,6 +40,11 @@ $left-padding: 16px;
   border: none;
   background: transparent;
   font-weight: 700;
+
+  .nameText {
+    width: 0;
+    flex: 1;
+  }
 }
 
 @mixin activity {

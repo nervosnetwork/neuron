@@ -7,6 +7,7 @@ import Logo from 'widgets/Icons/Logo.png'
 import { Overview, Send, Receive, History, NervosDAO, Settings, Experimental, ArrowOpenRight } from 'widgets/Icons/icon'
 import { showSettings } from 'services/remote'
 import { RoutePath, useOnLocaleChange } from 'utils'
+import Tooltip from 'components/Tooltip'
 
 import styles from './navbar.module.scss'
 
@@ -107,7 +108,9 @@ const Navbar = () => {
         onClick={() => throttledShowSettings({ tab: 'wallets' })}
       >
         <img src={Logo} alt="logo" />
-        {name}
+        <Tooltip tip={name} className={styles.nameText} placement="right">
+          <span>{name}</span>
+        </Tooltip>
       </button>
       <nav role="navigation" className={styles.navs}>
         {menuItems.map(item => (

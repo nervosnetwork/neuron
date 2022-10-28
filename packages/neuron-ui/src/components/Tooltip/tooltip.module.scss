@@ -1,0 +1,50 @@
+.tipContainer {
+  position: relative;
+  pointer-events: initial !important;
+
+  & > * {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &::after {
+    display: none;
+    position: absolute;
+    left: -20px;
+    top: 120%;
+    content: attr(data-tooltip);
+    padding: 4px 12px;
+    background: #000000;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #FFFFFF;
+    z-index: 100;
+  }
+
+  &[data-placement="left"]::after {
+    left: -120%;
+    top: 0;
+  }
+
+  &[data-placement="right"]::after {
+    left: initial;
+    right: -120%;
+    top: 0;
+  }
+
+  &[data-placement="top"]::after {
+    left: initial;
+    top: -120%;
+  }
+  
+
+  &:hover::after {
+    display: block;
+  }
+}
