@@ -1,0 +1,202 @@
+@mixin tip {
+  display: none;
+  position: absolute;
+  background: #000000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #FFFFFF;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+@mixin left($class) {
+  &[data-placement="left"] {
+    &#{$class} {
+      right: calc(100% - 4px);
+      top: 0;
+    }
+  }
+
+  &[data-placement="left"][data-placement-center="true"] {
+    &#{$class} {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+@mixin right($class) {
+  &[data-placement="right"] {
+    &#{$class} {
+      left: calc(100% - 4px);
+      top: 0;
+    }
+  }
+
+  &[data-placement="right"][data-placement-center="true"] {
+    &#{$class} {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+@mixin top($class) {
+  &[data-placement="top"] {
+    &#{$class} {
+      left: 0;
+      bottom: 100%;
+    }
+  }
+
+  &[data-placement="top"][data-placement-center="true"] {
+    &#{$class} {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@mixin bottom($class) {
+  &[data-placement="bottom"] {
+    &#{$class} {
+      left: 0;
+      top: 100%;
+    }
+  }
+  &[data-placement="bottom"][data-placement-center="true"]{
+    &#{$class} {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@mixin left-top($class) {
+  &[data-placement="left-top"] {
+    &#{$class} {
+      right: 100%;
+      bottom: 100%;
+    }
+  }
+  &[data-placement="left-top"][data-placement-center="true"]{
+    &#{$class} {
+      right: 50%;
+    }
+  }
+}
+
+@mixin right-top($class) {
+  &[data-placement="right-top"] {
+    &#{$class} {
+      left: 100%;
+      bottom: 100%;
+    }
+  }
+  &[data-placement="right-top"][data-placement-center="true"]{
+    &#{$class} {
+      left: 50%;
+    }
+  }
+}
+
+@mixin left-bottom($class) {
+  &[data-placement="left-bottom"] {
+    &#{$class} {
+      right: 100%;
+      top: 100%;
+    }
+  }
+  &[data-placement="left-bottom"][data-placement-center="true"]{
+    &#{$class} {
+      right: 50%;
+    }
+  }
+}
+
+@mixin right-bottom($class) {
+  &[data-placement="right-bottom"] {
+    &#{$class} {
+      left: 100%;
+      top: 100%;
+    }
+  }
+  &[data-placement="right-bottom"][data-placement-center="true"]{
+    &#{$class} {
+      left: 50%;
+    }
+  }
+}
+
+$placements: left, right, top, bottom, left-top, right-top, left-bottom, right-bottom;
+
+@mixin tip-placement($placement, $class) {
+  @if $placement == left {
+    @include left($class);
+  }@else if $placement == right {
+    @include right($class);
+  }@else if $placement == top {
+    @include top($class);
+  }@else if $placement == bottom {
+    @include bottom($class);
+  }@else if $placement == left-top {
+    @include left-top($class);
+  }@else if $placement == right-top {
+    @include right-top($class);
+  }@else if $placement == left-bottom {
+    @include left-bottom($class);
+  }@else if $placement == right-bottom {
+    @include right-bottom($class);
+  }
+}
+
+.tipWithString {
+  position: relative;
+  pointer-events: initial !important;
+
+  & > * {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &[data-tooltip] {
+    &:not([data-tooltip='']) {
+      &::after {
+        @include tip;
+        content: attr(data-tooltip);
+      }
+    
+      @each $placement in $placements {
+        @include tip-placement($placement, "::after");
+      }
+    
+      &:hover::after {
+        display: block;
+      }
+    }
+  }
+}
+
+.tipWithNode {
+  position: relative;
+
+  .tip {
+    @include tip;
+    z-index: 300;
+  }
+
+  @each $placement in $placements {
+    @include tip-placement($placement, " .tip");
+  }
+
+  &:hover .tip {
+    display: block;
+  }
+}

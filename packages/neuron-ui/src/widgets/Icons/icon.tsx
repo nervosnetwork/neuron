@@ -39,6 +39,7 @@ import { ReactComponent as HistorySvg } from './History.svg'
 import { ReactComponent as NervosDAOSvg } from './NervosDAO.svg'
 import { ReactComponent as ExperimentalSvg } from './Experimental.svg'
 import { ReactComponent as ArrowOpenRightSvg } from './ArrowOpenRight.svg'
+import { ReactComponent as MenuExpandSvg } from './MenuExpand.svg'
 
 import styles from './icon.module.scss'
 
@@ -92,3 +93,4 @@ export const History = WrapSvg(HistorySvg)
 export const NervosDAO = WrapSvg(NervosDAOSvg)
 export const Experimental = WrapSvg(ExperimentalSvg)
 export const ArrowOpenRight = WrapSvg(ArrowOpenRightSvg)
+export const MenuExpand = WrapSvg(MenuExpandSvg)

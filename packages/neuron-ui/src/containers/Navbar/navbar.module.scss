@@ -1,12 +1,11 @@
 $hover-bg-color: #3cc68a4d;
-$left-padding: 16px;
 
 @mixin navItem {
   display: flex;
   align-items: center;
-  & > svg, & > img {
+  & svg, & img {
     &:first-child {
-      margin-right: 18px;
+      margin-right: var(--svg-right-margin);
     }
   }
 
@@ -20,19 +19,54 @@ $left-padding: 16px;
   grid-template:
     'name' 75px
     'navs' 1fr /
-    var(--sidebar-width);
+    1fr;
   height: 100vh;
   background: #212524;
+  position: relative;
+  --left-padding: 16px;
+  --svg-right-margin: 18px;
+  &[data-expanded="false"] {
+    --left-padding: 14px;
+    --svg-right-margin: 14px;
+  }
+
 
   * {
     font-size: 14px;
   }
+  
+  & .showExpand {
+    content: '';
+    height: 100%;
+    width: 8px;
+    position: absolute;
+    right: -4px;
+    z-index: 200;
+
+    .expand {
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      display: none;
+
+      &[data-expanded="false"] {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &:hover {
+      .expand {
+        display: initial;
+      }
+    }
+  }
+  
 }
 
 .name {
   @include navItem;
   grid-area: name;
-  padding: 20px 0 20px $left-padding;
+  padding: 20px 0 20px var(--left-padding);
   color: var(--nervos-green);
   letter-spacing: 0.53px;
   margin: 0 8px;
@@ -76,7 +110,7 @@ $left-padding: 16px;
     background: transparent;
     line-height: 2.5rem;
     text-align: left;
-    padding: 1px 0 1px $left-padding;
+    padding: 1px 0 1px var(--left-padding);
     height: 48px;
     margin: 1px 8px;
     border-radius: 4px;
@@ -94,13 +128,13 @@ $left-padding: 16px;
     }
 
     & .arrow {
-      margin-right: 24px;
+      margin: 0 24px;
     }
   }
 
   .child {
     display: flex;
-    padding: 1px 0 1px $left-padding;
+    padding: 1px 0 1px var(--left-padding);
     margin: 1px 8px;
     .leftLine {
       width: 20px;
@@ -128,46 +162,9 @@ $left-padding: 16px;
       }
     }
   }
-}
 
-.network {
-  grid-area: network;
-  align-self: flex-end;
-
-  & > div {
-    align-items: flex-end;
-    padding-left: $left-padding;
-    padding-right: $left-padding;
-    padding-bottom: 5px;
-  }
-}
-
-.sync {
-  position: relative;
-  display: flex;
-  grid-area: sync;
-  font-size: 0.8rem;
-  padding-left: $left-padding;
-  color: var(--nervos-green);
-  span {
-    flex: 1;
-    padding-left: 3px;
-  }
-}
-
-.experimentalDivider {
-  color: var(--nervos-green);
-  margin: 5px $left-padding;
-  border-bottom: 1px solid currentColor;
-  padding: 4px 0;
-  pointer-events: none;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  svg {
-    display: block;
-    width: 16px;
-    height: 16px;
-    margin-right: 5px;
+  .buttonInTip {
+    padding: 10px 24px 10px 12px;
+    height: 40px;
   }
 }

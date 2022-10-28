@@ -1,13 +1,23 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Logo from 'widgets/Icons/Logo.png'
-import { Overview, Send, Receive, History, NervosDAO, Settings, Experimental, ArrowOpenRight } from 'widgets/Icons/icon'
+import {
+  Overview,
+  Send,
+  Receive,
+  History,
+  NervosDAO,
+  Settings,
+  Experimental,
+  ArrowOpenRight,
+  MenuExpand,
+} from 'widgets/Icons/icon'
 import { showSettings } from 'services/remote'
 import { RoutePath, useOnLocaleChange } from 'utils'
-import Tooltip from 'components/Tooltip'
+import Tooltip from 'widgets/Tooltip'
 
 import styles from './navbar.module.scss'
 
@@ -49,22 +59,24 @@ const MenuButton = ({
   onClick,
   children,
   selectedKey,
+  className,
 }: React.PropsWithChildren<{
   menu: { key: string; name: string; url: string }
   onClick: React.MouseEventHandler<HTMLButtonElement>
   selectedKey?: string
+  className?: string
 }>) => {
   const [t] = useTranslation()
   return (
     <button
       type="button"
-      key={menu.key}
       title={t(menu.name)}
       name={t(menu.name)}
       aria-label={t(menu.name)}
       data-link={menu.url}
       data-active={menu.key === selectedKey}
       onClick={onClick}
+      className={className}
     >
       {children}
     </button>
@@ -82,10 +94,10 @@ const Navbar = () => {
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
   const selectedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
-  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
-    return null
-  }
-
+  const [menuExpanded, setMenuExpanded] = useState(true)
+  const onClickExpand = useCallback(() => {
+    setMenuExpanded(v => !v)
+  }, [setMenuExpanded])
   const onClickNavItem = useCallback(
     (e: React.SyntheticEvent<HTMLButtonElement>) => {
       const {
@@ -97,9 +109,12 @@ const Navbar = () => {
     },
     [navigate]
   )
+  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
+    return null
+  }
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={styles.sidebar} data-expanded={menuExpanded}>
       <button
         type="button"
         className={styles.name}
@@ -107,34 +122,76 @@ const Navbar = () => {
         aria-label={name}
         onClick={() => throttledShowSettings({ tab: 'wallets' })}
       >
-        <img src={Logo} alt="logo" />
-        <Tooltip tip={name} className={styles.nameText} placement="right">
-          <span>{name}</span>
-        </Tooltip>
+        {menuExpanded ? (
+          <img src={Logo} alt="logo" />
+        ) : (
+          <Tooltip tip={name} placement="right">
+            <img src={Logo} alt="logo" />
+          </Tooltip>
+        )}
+        {menuExpanded && (
+          <Tooltip tip={name} className={styles.nameText} placement="right">
+            <span>{name}</span>
+          </Tooltip>
+        )}
       </button>
       <nav role="navigation" className={styles.navs}>
-        {menuItems.map(item => (
-          <>
-            <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
-              {item.icon}
-              <span>{t(item.name)}</span>
-              {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
-            </MenuButton>
-            {item.children?.length && item.key === selectedKey && (
-              <div className={styles.child}>
-                <div className={styles.leftLine} />
-                <div>
-                  {item.children.map(child => (
-                    <MenuButton menu={child} selectedKey={pathname} onClick={onClickNavItem}>
-                      {t(child.name)}
-                    </MenuButton>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        ))}
+        {menuExpanded
+          ? menuItems.map(item => (
+              <React.Fragment key={item.key}>
+                <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
+                  {item.icon}
+                  <span>{t(item.name)}</span>
+                  {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
+                </MenuButton>
+                {item.children?.length && item.key === selectedKey && (
+                  <div className={styles.child}>
+                    <div className={styles.leftLine} />
+                    <div>
+                      {item.children.map(child => (
+                        <MenuButton key={child.key} menu={child} selectedKey={pathname} onClick={onClickNavItem}>
+                          {t(child.name)}
+                        </MenuButton>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
+            ))
+          : menuItems.map(item => (
+              <React.Fragment key={item.key}>
+                <Tooltip
+                  tip={
+                    item.children?.length ? (
+                      <>
+                        {item.children.map(child => (
+                          <MenuButton
+                            key={child.key}
+                            menu={child}
+                            selectedKey={pathname}
+                            onClick={onClickNavItem}
+                            className={styles.buttonInTip}
+                          >
+                            {t(child.name)}
+                          </MenuButton>
+                        ))}
+                      </>
+                    ) : (
+                      t(item.name)
+                    )
+                  }
+                  placement={item.children?.length ? 'right-bottom' : 'right'}
+                >
+                  <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
+                    {item.icon}
+                  </MenuButton>
+                </Tooltip>
+              </React.Fragment>
+            ))}
       </nav>
+      <div className={styles.showExpand}>
+        <MenuExpand className={styles.expand} onClick={onClickExpand} data-expanded={menuExpanded} />
+      </div>
     </aside>
   )
 }
