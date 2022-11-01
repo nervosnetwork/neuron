@@ -48,7 +48,7 @@ export const settingRouterConfig: RouteObject[] = [
     path: '',
     element: (
       <>
-        <Settings />
+        <Settings isDetachedWindow />
         <Notification />
         <PasswordRequest />
       </>
@@ -302,6 +302,17 @@ const mainRouterConfig: RouteObject[] = [
             ),
             children: [offlineRouter],
           },
+        ],
+      },
+      {
+        path: RoutePath.Settings,
+        element: <Settings />,
+        children: [
+          { index: true, element: <InjectionProps Component={GeneralSetting} /> },
+          { path: RoutePath.SettingsWallets, element: <InjectionProps Component={WalletSetting} /> },
+          { path: RoutePath.SettingsNetworks, element: <InjectionProps Component={NetworkSetting} /> },
+          { path: RoutePath.SettingsData, element: <InjectionProps Component={DataSetting} /> },
+          offlineRouter,
         ],
       },
     ],

@@ -21,7 +21,6 @@ import {
   Connected,
   PendingIcon,
   Keystore,
-  Settings,
   ScanOutlined,
   UploadOutlined,
 } from 'widgets/Icons/icon'
@@ -77,7 +76,6 @@ registerIcons({
       <PendingIcon style={{ animation: 'rotate360 3s linear infinite', width: '14px', height: '14px' }} />
     ),
     Keystore: <Keystore />,
-    Settings: <Settings />,
     Explorer: <Explorer />,
   },
 })
