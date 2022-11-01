@@ -43,7 +43,7 @@
     "@nervosnetwork/ckb-sdk-core": "0.103.1",
     "@nervosnetwork/ckb-sdk-utils": "0.103.1",
     "@uifabric/experiments": "7.42.4",
-    "@uifabric/styling": "7.20.0",
+    "@uifabric/styling": "7.25.1",
     "canvg": "2.0.0",
     "i18next": "21.10.0",
     "immer": "9.0.16",
