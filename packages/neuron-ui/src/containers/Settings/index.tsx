@@ -12,16 +12,18 @@ import {
 import { getPlatform } from 'services/remote'
 import { useOnLocalStorageChange, useOnLocaleChange } from 'utils'
 
-const Settings = () => {
+const Settings = ({ isDetachedWindow }: { isDetachedWindow?: boolean }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [, i18n] = useTranslation()
   useOnLocaleChange(i18n)
   useEffect(() => {
-    const isMac = getPlatform() === 'darwin'
-    window.document.title = i18n.t(`settings.title.${isMac ? 'mac' : 'normal'}`)
-    // eslint-disable-next-line
-  }, [i18n.language])
+    if (isDetachedWindow) {
+      const isMac = getPlatform() === 'darwin'
+      window.document.title = i18n.t(`settings.title.${isMac ? 'mac' : 'normal'}`)
+      // eslint-disable-next-line
+    }
+  }, [i18n.language, isDetachedWindow])
 
   useEffect(() => {
     const onNavigate = (url: string) => navigate(url)
