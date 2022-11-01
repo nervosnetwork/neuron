@@ -10203,10 +10203,10 @@ electron-devtools-installer@2.2.4:
     rimraf "^2.5.2"
     semver "^5.3.0"
 
-electron-log@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-4.0.0.tgz#9315e4a5e6be5e2a158909856b2d2cb4d760cd6d"
-  integrity sha512-pj5Om0XoImjoq60zgvTv86W+2+7VMQIW0jmKWkXXTTjiC2L2WNfNDfMbpqo8Qj2szY1LsVyFhgRNBLXVrYNDJQ==
+electron-log@4.4.8:
+  version "4.4.8"
+  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-4.4.8.tgz#fcb9f714dbcaefb6ac7984c4683912c74730248a"
+  integrity sha512-QQ4GvrXO+HkgqqEOYbi+DHL7hj5JM+nHi/j+qrN9zeeXVKy8ZABgbu4CnG+BBqDZ2+tbeq9tUC4DZfIWFU5AZA==
 
 electron-notarize@0.3.0:
   version "0.3.0"
