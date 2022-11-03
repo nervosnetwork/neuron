@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, dialog } from 'electron'
 import { t } from 'i18next'
 import { debounceTime } from 'rxjs/operators'
 
@@ -13,6 +13,9 @@ import SyncStateSubject from 'models/subjects/sync-state-subject'
 import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
 import SyncApiController from 'controllers/sync-api'
 import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
+import MigrateSubject from 'models/subjects/migrate-subject'
+import startMonitor, { stopMonitor } from 'services/monitor'
+import { clearCkbNodeCache } from 'services/ckb-runner'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -88,4 +91,31 @@ export const subscribe = (dispatcher: AppResponder) => {
   MultisigOutputChangedSubject.getSubject().subscribe(params => [
     dispatcher.sendMessage('multisig-output-update', params)
   ])
+
+  MigrateSubject.subscribe(async status => {
+    dispatcher.sendMessage('migrate', status)
+    switch (status) {
+      case 'migrating':
+        stopMonitor('ckb')
+        break
+      case 'finish':
+        startMonitor('ckb', true)
+        break
+      case 'failed':
+        await dialog.showMessageBox({
+          type: 'info',
+          buttons: ['ok'].map(label => t(`messageBox.migrate-failed.buttons.${label}`)),
+          defaultId: 0,
+          title: t('messageBox.migrate-failed.title'),
+          message: t('messageBox.migrate-failed.message'),
+          cancelId: 0,
+          noLink: true
+        })
+        await clearCkbNodeCache()
+        startMonitor('ckb')
+        break
+      default:
+        break
+    }
+  })
 }

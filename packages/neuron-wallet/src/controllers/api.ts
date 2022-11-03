@@ -465,8 +465,7 @@ export default class ApiController {
     })
 
     handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
-      let finallyClearCache = clearCache
-      if (!finallyClearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+      if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
         const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
           type: 'info',
           message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
@@ -476,34 +475,13 @@ export default class ApiController {
           return {
             status: ResponseCode.Fail,
           }
-        } else {
-          finallyClearCache = true
         }
       }
       SettingsService.getInstance().ckbDataPath = dataPath
       await startMonitor('ckb', true)
-      if (finallyClearCache) {
-        await IndexerService.clearCache(true, true)
-      }
       return {
         status: ResponseCode.Success,
         result: SettingsService.getInstance().ckbDataPath
-      }
-    })
-
-    handle('get-indexer-data-path', () => {
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().indexerDataPath
-      }
-    })
-
-    handle('set-indexer-data-path', (_, { dataPath }: { dataPath: string }) => {
-      SettingsService.getInstance().indexerDataPath = dataPath
-      startMonitor('ckb-indexer', true)
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().indexerDataPath
       }
     })
 

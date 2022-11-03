@@ -45,8 +45,6 @@ type Action =
   | 'show-message-box'
   | 'get-ckb-node-data-path'
   | 'set-ckb-node-data-path'
-  | 'get-indexer-data-path'
-  | 'set-indexer-data-path'
   | 'stop-process-monitor'
   | 'start-process-monitor'
   // Wallets

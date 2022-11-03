@@ -13,7 +13,6 @@ import ApiController, { Command } from 'controllers/api'
 import { migrate as mecuryMigrate } from 'controllers/mercury'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
-import IndexerService from 'services/indexer'
 import { stopCkbNode } from 'services/ckb-runner'
 import startMonitor from 'services/monitor'
 
@@ -62,7 +61,7 @@ export default class AppController {
     if (env.isTestMode) {
       return
     }
-    await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
+    await Promise.all([stopCkbNode()])
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {

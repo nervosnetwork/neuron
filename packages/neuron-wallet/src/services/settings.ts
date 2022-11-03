@@ -34,14 +34,6 @@ export default class SettingsService extends Store {
     }
   }
 
-  get indexerDataPath() {
-    return this.readSync('indexerDataPath')
-  }
-
-  set indexerDataPath(dataPath: string) {
-    this.writeSync('indexerDataPath', dataPath)
-  }
-
   get ckbDataPath() {
     return this.readSync('ckbDataPath')
   }

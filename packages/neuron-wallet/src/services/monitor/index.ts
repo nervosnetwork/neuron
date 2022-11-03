@@ -1,12 +1,11 @@
 import Base from './base'
-import CkbIndexerMonitor from './ckb-indexer-monitor'
 import CkbMonitor from './ckb-monitor'
 
 const monitors: Base[] = []
 
 export default async function startMonitor(name?: string, startNow?: boolean) {
   if (!monitors.length) {
-    monitors.push(new CkbIndexerMonitor(), new CkbMonitor())
+    monitors.push(new CkbMonitor())
   }
   const filterMonitors = monitors.filter(v => !name || v.name === name)
   await Promise.all(filterMonitors.map((v: Base) => v.startMonitor(undefined, startNow)))

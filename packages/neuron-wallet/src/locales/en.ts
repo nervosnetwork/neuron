@@ -206,6 +206,14 @@ export default {
         'fail-message':
           'Unable to launch mail client, please copy the mail address, append debug information exported by "Menu" -> "Help" -> "Export Debug Information" and send us.',
         'copy-mail-addr': 'Copy mail address'
+      },
+      'migrate-failed': {
+        title: 'Migrate faield',
+        message:
+          'Migrate faield, press ok to delete old data and synchronize from scratch, or back-up old data and then press ok.',
+        buttons: {
+          ok: 'OK'
+        }
       }
     },
     prompt: {

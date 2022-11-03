@@ -27,7 +27,8 @@
       "tooltip": {
         "block-synced": "Block Synced",
         "looking-valid-target": "Looking for assumed valid target"
-      }
+      },
+      "migrating": "migrating..."
     },
     "import-hardware": {
       "title": {

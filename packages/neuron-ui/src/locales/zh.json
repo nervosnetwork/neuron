@@ -27,7 +27,8 @@
       "tooltip": {
         "block-synced": "已同步区块",
         "looking-valid-target": "寻找预设可信区块"
-      }
+      },
+      "migrating": "正在数据迁移..."
     },
     "import-hardware": {
       "title": {
