@@ -88,11 +88,7 @@ const Navbar = () => {
   const [isMigrate, setIsMigrate] = useState(false)
   useEffect(() => {
     const dataUpdateSubscription = Migrate.subscribe(migrateStatus => {
-      if (migrateStatus === 'migrating') {
-        setIsMigrate(true)
-      } else {
-        setIsMigrate(false)
-      }
+      setIsMigrate(migrateStatus === 'migrating')
     })
     return () => {
       dataUpdateSubscription.unsubscribe()

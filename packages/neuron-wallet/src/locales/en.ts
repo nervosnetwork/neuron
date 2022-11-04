@@ -208,9 +208,9 @@ export default {
         'copy-mail-addr': 'Copy mail address'
       },
       'migrate-failed': {
-        title: 'Migrate faield',
+        title: 'Migrate failed',
         message:
-          'Migrate faield, press ok to delete old data and synchronize from scratch, or back-up old data and then press ok.',
+          'Migrate failed, press ok to delete old data and synchronize from scratch, or back-up old data and then press ok.',
         buttons: {
           ok: 'OK'
         }

@@ -61,7 +61,7 @@ export default class AppController {
     if (env.isTestMode) {
       return
     }
-    await Promise.all([stopCkbNode()])
+    await stopCkbNode()
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {

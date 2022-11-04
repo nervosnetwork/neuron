@@ -437,13 +437,13 @@ export const useGlobalNotifications = (
 ) => {
   useEffect(() => {
     const lastVersion = syncRebuildNotification.load()
-    if (lastVersion !== null && isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)) {
-      syncRebuildNotification.save()
+    if (isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)) {
       dispatch({
         type: AppActions.SetGlobalDialog,
         payload: 'rebuild-sync',
       })
     }
+    syncRebuildNotification.save()
   }, [dispatch])
 }
 

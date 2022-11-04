@@ -20,7 +20,7 @@ export const isSuccessResponse = (res: Pick<ControllerResponse, 'status'>): res 
 
 export const isReadyByVersion = (targetVersion: string, lastVersion: string | null) => {
   if (lastVersion === null) {
-    return true
+    return false
   }
   const targetVersions = targetVersion.split('.')
   const lastVersions = lastVersion.split('.')

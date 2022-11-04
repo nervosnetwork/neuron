@@ -4,7 +4,7 @@ const fixtures = {
       lastVersion: null,
       targetVersion: '0.32',
     },
-    expected: true,
+    expected: false,
   },
   'Should return false when last version > target version': {
     params: {
