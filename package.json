@@ -32,7 +32,7 @@
     "build:main": "lerna run build --scope=neuron-wallet",
     "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "package:test": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/package-for-test.sh",
-    "test": "NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel test",
+    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel test",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run build --scope=@nervina-labs/ckb-indexer",
