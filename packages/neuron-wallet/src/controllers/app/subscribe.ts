@@ -95,6 +95,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   MigrateSubject.subscribe(async status => {
     dispatcher.sendMessage('migrate', status)
     switch (status) {
+      case 'need-migrate':
       case 'migrating':
         stopMonitor('ckb')
         break

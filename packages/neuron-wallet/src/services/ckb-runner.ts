@@ -82,7 +82,7 @@ export const startCkbNode = async () => {
       logger.error('CKB:\trun fail:', dataString)
       ckb = null
       if (dataString.includes('CKB wants to migrate the data into new format')) {
-        migrateCkbData()
+        MigrateSubject.next('need-migrate')
       }
     })
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {

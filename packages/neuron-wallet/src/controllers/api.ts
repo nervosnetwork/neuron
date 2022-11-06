@@ -56,6 +56,7 @@ import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
 import startMonitor, { stopMonitor } from 'services/monitor'
+import { migrateCkbData } from 'services/ckb-runner'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -675,6 +676,11 @@ export default class ApiController {
 
     handle('load-multisig-tx-json', async (_, fullPayload) => {
       return this.#multisigController.loadMultisigTxJson(fullPayload)
+    })
+
+    //migrate
+    handle('start-migrate', async () => {
+      return migrateCkbData()
     })
   }
 

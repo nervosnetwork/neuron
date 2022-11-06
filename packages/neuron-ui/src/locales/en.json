@@ -508,7 +508,8 @@
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
-      "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
+      "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
+      "migrate": "Migrating",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
       "fields": {
         "wallet": "Wallet",

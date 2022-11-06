@@ -145,6 +145,7 @@ type Action =
   | 'generate-multisig-send-all-tx'
   | 'load-multisig-tx-json'
   | 'get-hold-sudt-cell-capacity'
+  | 'start-migrate'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

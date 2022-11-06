@@ -443,7 +443,6 @@ export const useGlobalNotifications = (
         payload: 'rebuild-sync',
       })
     }
-    syncRebuildNotification.save()
   }, [dispatch])
 }
 
