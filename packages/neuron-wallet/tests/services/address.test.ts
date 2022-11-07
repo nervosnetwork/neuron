@@ -28,11 +28,7 @@ const randomHex = (length: number = 64): string => {
   return `0x${str}`
 }
 
-const generateCell = (
-  capacity: string,
-  lockScript: any,
-  status: OutputStatus,
-) => {
+const generateCell = (capacity: string, lockScript: any, status: OutputStatus) => {
   const output = new OutputEntity()
   output.outPointTxHash = randomHex()
   output.outPointIndex = '0'
@@ -90,17 +86,13 @@ jest.mock('models/subjects/address-db-changed-subject', () => ({
 
 describe('integration tests for AddressService', () => {
   const AddressService = require('../../src/services/addresses').default
-  const notifyAddressCreatedStub = jest.spyOn(AddressService, 'notifyAddressCreated');
-  notifyAddressCreatedStub.mockImplementation(() => { });
+  const notifyAddressCreatedStub = jest.spyOn(AddressService, 'notifyAddressCreated')
+  notifyAddressCreatedStub.mockImplementation(() => {})
 
   beforeAll(() => {
     for (let addressType = 0; addressType <= 1; addressType++) {
       for (let addressIndex = 0; addressIndex <= 7; addressIndex++) {
-        const address = extendedKey.address(
-          addressType,
-          addressIndex,
-          true,
-        )
+        const address = extendedKey.address(addressType, addressIndex, true)
         preloadedPublicKeys.push({
           address,
           addressType,
@@ -113,18 +105,14 @@ describe('integration tests for AddressService', () => {
     const stubbedExtendedKeyAddressFn = when(jest.spyOn(extendedKey, 'address'))
     for (const addressToMock of preloadedPublicKeys) {
       stubbedExtendedKeyAddressFn
-        .calledWith(
-          addressToMock.addressType,
-          addressToMock.addressIndex,
-          true,
-        )
+        .calledWith(addressToMock.addressType, addressToMock.addressIndex, true)
         .mockReturnValue(addressToMock.address)
     }
   })
 
   beforeEach(() => {
     notifyAddressCreatedStub.mockReset()
-  });
+  })
 
   describe('Key tests with db', () => {
     const isImporting = undefined
@@ -153,7 +141,6 @@ describe('integration tests for AddressService', () => {
       const changeAddressCount = 4
 
       describe('when the newly created public keys have not been used', () => {
-
         beforeEach(async () => {
           await AddressService.generateAndSaveForExtendedKey(
             walletId,
@@ -163,7 +150,7 @@ describe('integration tests for AddressService', () => {
             changeAddressCount
           )
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-        });
+        })
 
         it('generates both receiving and change addresses', () => {
           expect(generatedAddresses.length).toEqual(receivingAddressCount + changeAddressCount)
@@ -184,8 +171,12 @@ describe('integration tests for AddressService', () => {
 
         describe('when receiving and change addresses are used', () => {
           beforeEach(async () => {
-            const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
-            const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
+            const receivingAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Receiving
+            )
+            const changeAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Change
+            )
             await linkNewCell([receivingAddresses[0].blake160, changeAddresses[0].blake160])
 
             await AddressService.generateAndSaveForExtendedKey(
@@ -196,7 +187,7 @@ describe('integration tests for AddressService', () => {
               changeAddressCount
             )
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-          });
+          })
           it('generates new addresses for both receiving and change', () => {
             expect(generatedAddresses.length).toEqual((receivingAddressCount + changeAddressCount) * 2)
             const receivingAddresses = generatedAddresses.filter(addr => addr.addressType === AddressType.Receiving)
@@ -207,8 +198,8 @@ describe('integration tests for AddressService', () => {
             for (let i = 0; i < changeAddresses.length; i++) {
               expect(changeAddresses[i].addressIndex).toEqual(i)
             }
-          });
-        });
+          })
+        })
         describe('when none of public keys are used', () => {
           beforeEach(async () => {
             await AddressService.generateAndSaveForExtendedKey(
@@ -219,15 +210,17 @@ describe('integration tests for AddressService', () => {
               changeAddressCount
             )
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-          });
+          })
           it('should not generate new addresses', () => {
             expect(generatedAddresses.length).toEqual(receivingAddressCount + changeAddressCount)
-          });
-        });
+          })
+        })
 
         describe('when receiving public keys are used', () => {
           beforeEach(async () => {
-            const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
+            const receivingAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Receiving
+            )
             await linkNewCell([receivingAddresses[0].blake160])
 
             await AddressService.generateAndSaveForExtendedKey(
@@ -238,20 +231,26 @@ describe('integration tests for AddressService', () => {
               changeAddressCount
             )
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-          });
+          })
           it('generates addresses for receiving', () => {
-            const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
+            const receivingAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Receiving
+            )
             expect(receivingAddresses.length).toEqual(receivingAddressCount * 2)
-          });
+          })
           it('should not generates addresses for change', () => {
-            const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
+            const changeAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Change
+            )
             expect(changeAddresses.length).toEqual(changeAddressCount)
           })
-        });
+        })
 
         describe('when change public keys are used', () => {
           beforeEach(async () => {
-            const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
+            const changeAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Change
+            )
             await linkNewCell([changeAddresses[0].blake160])
 
             await AddressService.generateAndSaveForExtendedKey(
@@ -262,24 +261,24 @@ describe('integration tests for AddressService', () => {
               changeAddressCount
             )
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-          });
+          })
           it('generates addresses for change', () => {
-            const changeAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Change)
+            const changeAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Change
+            )
             expect(changeAddresses.length).toEqual(changeAddressCount * 2)
-          });
+          })
           it('should not generates addresses for receiving', () => {
-            const receivingAddresses = generatedAddresses.filter((addr: Address) => addr.addressType === AddressType.Receiving)
+            const receivingAddresses = generatedAddresses.filter(
+              (addr: Address) => addr.addressType === AddressType.Receiving
+            )
             expect(receivingAddresses.length).toEqual(receivingAddressCount)
           })
-        });
-      });
+        })
+      })
       describe('when newly generated public keys in the first batch are already used', () => {
         beforeEach(async () => {
-          await linkNewCell(
-            preloadedPublicKeys
-              .filter((k: any) => k.addressIndex < 4)
-              .map((k: any) => k.publicKeyHash)
-          )
+          await linkNewCell(preloadedPublicKeys.filter((k: any) => k.addressIndex < 4).map((k: any) => k.publicKeyHash))
 
           await AddressService.generateAndSaveForExtendedKey(
             walletId,
@@ -289,7 +288,7 @@ describe('integration tests for AddressService', () => {
             changeAddressCount
           )
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-        });
+        })
         it('recursively generates both receiving and change addresses', () => {
           expect(generatedAddresses.length).toEqual((receivingAddressCount + changeAddressCount) * 2)
 
@@ -307,25 +306,22 @@ describe('integration tests for AddressService', () => {
           expect(notifyAddressCreatedStub).toHaveBeenCalledWith(generatedAddresses, undefined)
         })
       })
-    });
+    })
 
     describe('#generateAndSaveForPublicKey', () => {
-
       describe('with public key info exist for the public key', () => {
         const publicKey = 'public key'
         const addressType = AddressType.Receiving
         const addressIndex = 0
         beforeEach(async () => {
-          await AddressService.generateAndSaveForPublicKey(
-            {
-              walletId,
-              publicKey,
-              addressType,
-              addressIndex
-            }
-          )
+          await AddressService.generateAndSaveForPublicKey({
+            walletId,
+            publicKey,
+            addressType,
+            addressIndex
+          })
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-        });
+        })
         it('generates one address', () => {
           expect(generatedAddresses.length).toEqual(1)
         })
@@ -344,7 +340,7 @@ describe('integration tests for AddressService', () => {
               addressIndex
             })
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
-          });
+          })
           it('should not generate new address', () => {
             expect(generatedAddresses.length).toEqual(1)
           })
@@ -353,7 +349,7 @@ describe('integration tests for AddressService', () => {
             expect(notifyAddressCreatedStub).toHaveBeenCalledTimes(0)
           })
         })
-      });
+      })
     })
 
     describe('#getAddressesByAllWallets', () => {
@@ -376,14 +372,14 @@ describe('integration tests for AddressService', () => {
           changeAddressCount
         )
         allAddresses = await AddressService.getAddressesByAllWallets()
-      });
+      })
       it('returns all addresses', () => {
         const addressCountPerWallet = receivingAddressCount + changeAddressCount
         expect(allAddresses.length).toEqual(addressCountPerWallet * 2)
         expect(allAddresses.filter(addr => addr.walletId === '1').length).toEqual(addressCountPerWallet)
         expect(allAddresses.filter(addr => addr.walletId === '2').length).toEqual(addressCountPerWallet)
       })
-    });
+    })
 
     describe('#getFirstAddressByAllWalletId', () => {
       const receivingAddressCount = 4
@@ -399,15 +395,17 @@ describe('integration tests for AddressService', () => {
           changeAddressCount
         )
         address = await AddressService.getFirstAddressByWalletId(walletId)
-      });
-      it('returns the first addresses by by wallet id', () => {
-        expect(address).toEqual(expect.objectContaining({
-          walletId,
-          addressIndex: 0,
-          addressType: 0,
-        }))
       })
-    });
+      it('returns the first addresses by by wallet id', () => {
+        expect(address).toEqual(
+          expect.objectContaining({
+            walletId,
+            addressIndex: 0,
+            addressType: 0
+          })
+        )
+      })
+    })
 
     describe('#nextUnusedAddress', () => {
       const receivingAddressCount = 2
@@ -425,13 +423,13 @@ describe('integration tests for AddressService', () => {
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
           publicKeysToUse = [generatedAddresses[0].blake160]
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns next unused receiving address', async () => {
           const nextUnusedAddress = await AddressService.getNextUnusedAddressByWalletId(walletId)
           expect(nextUnusedAddress).toEqual(generatedAddresses[publicKeysToUse.length])
           expect(nextUnusedAddress.addressType).toEqual(AddressType.Receiving)
         })
-      });
+      })
       describe('when there are unused change addresses but no receiving addresses', () => {
         beforeEach(async () => {
           await AddressService.generateAndSaveForExtendedKey(
@@ -447,13 +445,13 @@ describe('integration tests for AddressService', () => {
             .map((addr: Address) => addr.blake160)
 
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns next unused change address', async () => {
           const nextUnusedAddress = await AddressService.getNextUnusedAddressByWalletId(walletId)
           expect(nextUnusedAddress).toEqual(generatedAddresses[publicKeysToUse.length])
           expect(nextUnusedAddress.addressType).toEqual(AddressType.Change)
         })
-      });
+      })
       describe('when there is no receiving or change unused address', () => {
         beforeEach(async () => {
           await AddressService.generateAndSaveForExtendedKey(
@@ -467,13 +465,13 @@ describe('integration tests for AddressService', () => {
           publicKeysToUse = generatedAddresses.map((addr: Address) => addr.blake160)
 
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns next unused change address', async () => {
           const nextUnusedAddress = await AddressService.getNextUnusedAddressByWalletId(walletId)
           expect(nextUnusedAddress).toEqual(undefined)
         })
-      });
-    });
+      })
+    })
 
     describe('#allUnusedReceivingAddresses', () => {
       let publicKeysToUse = []
@@ -491,7 +489,7 @@ describe('integration tests for AddressService', () => {
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
           publicKeysToUse = [generatedAddresses[0].blake160]
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns the unused receiving addresses', async () => {
           const allUnusedReceivingAddresses = await AddressService.getUnusedReceivingAddressesByWalletId(walletId)
           expect(allUnusedReceivingAddresses.length).toEqual(receivingAddressCount - publicKeysToUse.length)
@@ -499,7 +497,7 @@ describe('integration tests for AddressService', () => {
             expect(unusedAddress.addressType).toEqual(AddressType.Receiving)
           }
         })
-      });
+      })
       describe('when there is no unused receiving address', () => {
         beforeEach(async () => {
           await AddressService.generateAndSaveForExtendedKey(
@@ -512,13 +510,13 @@ describe('integration tests for AddressService', () => {
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
           publicKeysToUse = generatedAddresses.map((addr: Address) => addr.blake160)
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns empty array', async () => {
           const allUnusedReceivingAddresses = await AddressService.getUnusedReceivingAddressesByWalletId(walletId)
           expect(allUnusedReceivingAddresses).toEqual([])
         })
-      });
-    });
+      })
+    })
 
     describe('#nextUnusedChangeAddress', () => {
       let publicKeysToUse = []
@@ -532,19 +530,19 @@ describe('integration tests for AddressService', () => {
           receivingAddressCount,
           changeAddressCount
         )
-      });
+      })
       describe('when there are unused change addresses', () => {
         beforeEach(async () => {
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
           publicKeysToUse = [generatedAddresses[changeAddressCount].blake160]
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns the unused receiving addresses', async () => {
           const nextUnusedChangeAddress = await AddressService.getNextUnusedChangeAddressByWalletId(walletId)
           expect(nextUnusedChangeAddress).toEqual(generatedAddresses[changeAddressCount + 1])
           expect(nextUnusedChangeAddress.addressType).toEqual(AddressType.Change)
         })
-      });
+      })
       describe('when there is no unused receiving address', () => {
         beforeEach(async () => {
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
@@ -552,13 +550,13 @@ describe('integration tests for AddressService', () => {
             .filter((addr: Address) => addr.addressType === AddressType.Change)
             .map((addr: Address) => addr.blake160)
           await linkNewCell(publicKeysToUse)
-        });
+        })
         it('returns undefined', async () => {
           const nextUnusedChangeAddress = await AddressService.getNextUnusedChangeAddressByWalletId(walletId)
           expect(nextUnusedChangeAddress).toEqual(undefined)
         })
-      });
-    });
+      })
+    })
 
     describe('#getAddressesWithBalancesByWalletId', () => {
       let publicKeysToUse: string[] = []
@@ -580,21 +578,23 @@ describe('integration tests for AddressService', () => {
         await linkNewCell([publicKeysToUse[0]], '3', OutputStatus.Pending)
         await linkNewCell([publicKeysToUse[0]], '4', OutputStatus.Failed)
         await linkNewCell([publicKeysToUse[0]], '5', OutputStatus.Dead)
-      });
+      })
       it('calculates balances', async () => {
         const allAddresses = await AddressService.getAddressesWithBalancesByWalletId(walletId)
         expect(allAddresses[0].blake160).toEqual(publicKeysToUse[0])
         expect(allAddresses[0].liveBalance).toEqual('1')
         expect(allAddresses[0].sentBalance).toEqual('2')
         expect(allAddresses[0].pendingBalance).toEqual('3')
-        expect(allAddresses[0].balance).toEqual((parseInt(allAddresses[0].liveBalance) + parseInt(allAddresses[0].sentBalance)).toString())
+        expect(allAddresses[0].balance).toEqual(
+          (parseInt(allAddresses[0].liveBalance) + parseInt(allAddresses[0].sentBalance)).toString()
+        )
 
         expect(allAddresses[1].liveBalance).toEqual('0')
         expect(allAddresses[1].sentBalance).toEqual('0')
         expect(allAddresses[1].pendingBalance).toEqual('0')
         expect(allAddresses[1].balance).toEqual('0')
       })
-    });
+    })
 
     describe('#updateDescription', () => {
       let addressToUpdate: any
@@ -663,52 +663,41 @@ describe('integration tests for AddressService', () => {
             expect(overrides.length).toEqual(1)
             expect(overrides[0].address).toEqual(addressToUpdate.address)
           })
-        });
-      });
-    });
+        })
+      })
+    })
 
     describe('create', () => {
       it('create with exist', async () => {
-        const { receiving } = await AddressService.generateAddresses(
-          walletId,
-          extendedKey,
-          0,
-          0,
-          5,
-          5
-        )
-        await getConnection().manager.save(receiving.map((addr: any) => {
-          return HdPublicKeyInfo.fromObject({
-            ...addr,
-            publicKeyInBlake160: addr.blake160
+        const { receiving } = await AddressService.generateAddresses(walletId, extendedKey, 0, 0, 5, 5)
+        await getConnection().manager.save(
+          receiving.map((addr: any) => {
+            return HdPublicKeyInfo.fromObject({
+              ...addr,
+              publicKeyInBlake160: addr.blake160
+            })
           })
-        }))
+        )
         await AddressService.create({ addresses: receiving })
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(0)
       })
       it('create with more than one wallet', async () => {
-        await expect(AddressService.create({
-          addresses: [
-            { walletId: '1' },
-            { walletId: '2' }
-          ]
-        })).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
+        await expect(
+          AddressService.create({
+            addresses: [{ walletId: '1' }, { walletId: '2' }]
+          })
+        ).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
       })
       it('create with some exist', async () => {
-        const { receiving, change } = await AddressService.generateAddresses(
-          walletId,
-          extendedKey,
-          0,
-          0,
-          5,
-          5
-        )
-        await getConnection().manager.save(receiving.map((addr: any) => {
-          return HdPublicKeyInfo.fromObject({
-            ...addr,
-            publicKeyInBlake160: addr.blake160
+        const { receiving, change } = await AddressService.generateAddresses(walletId, extendedKey, 0, 0, 5, 5)
+        await getConnection().manager.save(
+          receiving.map((addr: any) => {
+            return HdPublicKeyInfo.fromObject({
+              ...addr,
+              publicKeyInBlake160: addr.blake160
+            })
           })
-        }))
+        )
         await AddressService.create({
           addresses: [...receiving, ...change]
         })
@@ -716,4 +705,4 @@ describe('integration tests for AddressService', () => {
       })
     })
   })
-});
+})

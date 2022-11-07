@@ -11,7 +11,7 @@ Nervos CKB Full-Node Desktop Wallet
 
 ### Prerequisites
 
-You will need `node >= 16` and `yarn >= 1.14` to build and run Neuron.
+You will need `node >= 18.12.0` and `yarn >= 1.14` to build and run Neuron.
 
 #### Lerna
 
