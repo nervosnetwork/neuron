@@ -23,8 +23,8 @@ const RebuildSync = ({ onDismiss, onOk }: { onDismiss: React.MouseEventHandler; 
         .map(s => (
           <p key={s}>{s}</p>
         ))}
-      <div className={styles.rebuildFooter}>
-        <Button type="primary" label={t('common.cancel')} onClick={onDismiss} />
+      <div style={{ textAlign: 'right' }}>
+        <Button type="cancel" label={t('common.cancel')} onClick={onDismiss} style={{ marginRight: '24px' }} />
         <Button type="primary" label={t('messages.migrate')} onClick={onOk} />
       </div>
     </div>

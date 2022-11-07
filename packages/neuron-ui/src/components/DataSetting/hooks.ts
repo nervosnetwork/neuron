@@ -19,7 +19,7 @@ export const useDataPath = () => {
   const [currentPath, setCurrentPath] = useState<string | undefined>()
   const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
   useDidMount(() => {
-    getCkbNodeDataPath(undefined).then(res => {
+    getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res)) {
         setPrevPath(res.result!)
       }
