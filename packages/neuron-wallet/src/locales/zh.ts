@@ -199,7 +199,7 @@ export default {
       },
       'migrate-failed': {
         title: '数据迁移失败',
-        message: '数据迁移失败，点击确认删除数据并重新同步，或者备份数据后在进行确认。',
+        message: '数据迁移失败，点击确认删除数据并重新同步。',
         buttons: {
           ok: '确认'
         }

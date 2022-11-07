@@ -209,8 +209,7 @@ export default {
       },
       'migrate-failed': {
         title: 'Migrate failed',
-        message:
-          'Migrate failed, press ok to delete old data and synchronize from scratch, or back-up old data and then press ok.',
+        message: 'Migrate failed, press ok to delete old data and synchronize from scratch.',
         buttons: {
           ok: 'OK'
         }

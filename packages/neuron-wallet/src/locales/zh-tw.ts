@@ -198,7 +198,7 @@ export default {
       },
       'migrate-failed': {
         title: '數據遷移失敗',
-        message: '數據遷移失敗，點擊確認刪除數據並重新同步，或者備份數據後在進行確認。',
+        message: '數據遷移失敗，點擊確認刪除數據並重新同步',
         buttons: {
           ok: '確認'
         }
