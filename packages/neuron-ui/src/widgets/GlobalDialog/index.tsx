@@ -39,12 +39,14 @@ interface GlobalDialogProps {
 
 const GlobalDialog = ({ onDismiss, type, onOk }: GlobalDialogProps) => {
   let content = null
+  let maskClosable = true
   switch (type) {
     case 'unlock-success': {
       content = <UnlockSuccess />
       break
     }
     case 'rebuild-sync': {
+      maskClosable = false
       content = <RebuildSync onDismiss={onDismiss} onOk={onOk} />
       break
     }
@@ -53,7 +55,7 @@ const GlobalDialog = ({ onDismiss, type, onOk }: GlobalDialogProps) => {
     }
   }
   return (
-    <div role="presentation" className={styles.dialogContainer} onClick={onDismiss}>
+    <div role="presentation" className={styles.dialogContainer} onClick={maskClosable ? onDismiss : undefined}>
       <div
         role="presentation"
         className={styles.dialog}
