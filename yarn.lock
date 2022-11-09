@@ -5702,16 +5702,16 @@
   dependencies:
     tslib "^1.10.0"
 
-"@uifabric/styling@7.20.0":
-  version "7.20.0"
-  resolved "https://registry.yarnpkg.com/@uifabric/styling/-/styling-7.20.0.tgz#afe5e2f591e4efab7e7570579fca0661c5ce7493"
-  integrity sha512-SoaK5J4cwn8D9DWejRlWo+TmKZaHIiVlkIH+B2zLXE8Uc4ZYcotwYGxaSc1gCA16viLvGQkQU+ieWFq91RxdRw==
+"@uifabric/styling@7.25.1", "@uifabric/styling@^7.25.1":
+  version "7.25.1"
+  resolved "https://registry.yarnpkg.com/@uifabric/styling/-/styling-7.25.1.tgz#b03ba5dfe4947998da56539a19f2e815c23fd10f"
+  integrity sha512-bd4QDYyb0AS0+KmzrB8VsAfOkxZg0dpEpF1YN5Ben10COmT8L1DoE4bEF5NvybHEaoTd3SKxpJ42m+ceNzehSw==
   dependencies:
-    "@fluentui/theme" "^1.7.4"
+    "@fluentui/theme" "^1.7.13"
     "@microsoft/load-themed-styles" "^1.10.26"
-    "@uifabric/merge-styles" "^7.19.2"
+    "@uifabric/merge-styles" "^7.20.2"
     "@uifabric/set-version" "^7.0.24"
-    "@uifabric/utilities" "^7.33.5"
+    "@uifabric/utilities" "^7.38.2"
     tslib "^1.10.0"
 
 "@uifabric/styling@^7.20.0", "@uifabric/styling@^7.22.3":
@@ -5724,18 +5724,6 @@
     "@uifabric/merge-styles" "^7.20.0"
     "@uifabric/set-version" "^7.0.24"
     "@uifabric/utilities" "^7.38.0"
-    tslib "^1.10.0"
-
-"@uifabric/styling@^7.25.1":
-  version "7.25.1"
-  resolved "https://registry.yarnpkg.com/@uifabric/styling/-/styling-7.25.1.tgz#b03ba5dfe4947998da56539a19f2e815c23fd10f"
-  integrity sha512-bd4QDYyb0AS0+KmzrB8VsAfOkxZg0dpEpF1YN5Ben10COmT8L1DoE4bEF5NvybHEaoTd3SKxpJ42m+ceNzehSw==
-  dependencies:
-    "@fluentui/theme" "^1.7.13"
-    "@microsoft/load-themed-styles" "^1.10.26"
-    "@uifabric/merge-styles" "^7.20.2"
-    "@uifabric/set-version" "^7.0.24"
-    "@uifabric/utilities" "^7.38.2"
     tslib "^1.10.0"
 
 "@uifabric/theme-samples@^7.4.11":
