@@ -92,7 +92,7 @@ export const subscribe = (dispatcher: AppResponder) => {
     dispatcher.sendMessage('multisig-output-update', params)
   ])
 
-  MigrateSubject.subscribe(async status => {
+  MigrateSubject.getSubject().subscribe(async status => {
     dispatcher.sendMessage('migrate', status)
     switch (status) {
       case 'need-migrate':

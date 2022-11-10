@@ -139,7 +139,7 @@ export const clearCkbNodeCache = async () => {
   await startCkbNode()
 }
 
-export async function migrateCkbData() {
+export function migrateCkbData() {
   logger.info('CKB mirate:\tstarting...')
   const options = ['migrate', '-C', SettingsService.getInstance().ckbDataPath, '--force']
   MigrateSubject.next('migrating')

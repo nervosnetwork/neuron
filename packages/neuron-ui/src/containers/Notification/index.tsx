@@ -11,7 +11,7 @@ import {
   dismissNotification,
   dismissGlobalDialog,
 } from 'states'
-import { useOnLocaleChange, useGlobalNotifications } from 'utils'
+import { useOnLocaleChange, useGlobalNotifications, isSuccessResponse } from 'utils'
 
 import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
@@ -104,9 +104,12 @@ export const NoticeContent = () => {
   }, [dispatch])
 
   const onOk = useCallback(() => {
-    migrateData()
-    dismissGlobalDialog()(dispatch)
-    syncRebuildNotification.save()
+    migrateData().then(res => {
+      if (isSuccessResponse(res)) {
+        dismissGlobalDialog()(dispatch)
+        syncRebuildNotification.save()
+      }
+    })
   }, [dispatch])
 
   return (

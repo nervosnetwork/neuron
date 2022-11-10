@@ -30,7 +30,8 @@ const SubjectConstructor = <T>(
     | 'set-locale'
     | 'device-sign-index'
     | 'multisig-output-update'
-    | 'migrate'
+    | 'migrate',
+  isMulti?: boolean
 ) => {
   return ipcRenderer
     ? {
@@ -40,7 +41,11 @@ const SubjectConstructor = <T>(
           })
           return {
             unsubscribe: () => {
-              ipcRenderer.removeAllListeners(channel)
+              if (isMulti) {
+                ipcRenderer.removeListener(channel, handler)
+              } else {
+                ipcRenderer.removeAllListeners(channel)
+              }
             },
           }
         },
@@ -60,7 +65,7 @@ export const Navigation = SubjectConstructor<Subject.URL>('navigation')
 export const SetLocale = SubjectConstructor<typeof LOCALES[number]>('set-locale')
 export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sign-index')
 export const MultisigOutputUpdate = SubjectConstructor<string>('multisig-output-update')
-export const Migrate = SubjectConstructor<'migrating' | 'failed' | 'finish'>('migrate')
+export const Migrate = SubjectConstructor<'need-migrate' | 'migrating' | 'failed' | 'finish'>('migrate', true)
 
 export default {
   DataUpdate,

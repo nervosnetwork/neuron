@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
-import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
+import { openContextMenu, requestPassword, deleteNetwork, migrateData } from 'services/remote'
 import { syncRebuildNotification } from 'services/localCache'
-import { SetLocale as SetLocaleSubject } from 'services/subjects'
+import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
   AppActions,
@@ -437,11 +437,21 @@ export const useGlobalNotifications = (
 ) => {
   useEffect(() => {
     const lastVersion = syncRebuildNotification.load()
-    if (isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)) {
+    const isVersionUpdate = isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)
+    if (isVersionUpdate) {
       dispatch({
         type: AppActions.SetGlobalDialog,
         payload: 'rebuild-sync',
       })
+    }
+    const migrateSubscription = Migrate.subscribe(migrateStatus => {
+      if (!isVersionUpdate && migrateStatus === 'need-migrate') {
+        migrateData()
+        migrateSubscription.unsubscribe()
+      }
+    })
+    return () => {
+      migrateSubscription.unsubscribe()
     }
   }, [dispatch])
 }

@@ -1,5 +1,25 @@
-import { Subject } from 'rxjs'
+import { Subject, timer, Subscription } from 'rxjs'
 
-export const MigrateSubject = new Subject<'need-migrate' | 'migrating' | 'failed' | 'finish'>()
+type MigrateType = 'need-migrate' | 'migrating' | 'failed' | 'finish'
+export default class MigrateSubject {
+  private static subject = new Subject<MigrateType>()
 
-export default MigrateSubject
+  private static timer: Subscription
+
+  public static getSubject() {
+    return MigrateSubject.subject
+  }
+
+  static next(type: MigrateType) {
+    MigrateSubject.subject.next(type)
+    MigrateSubject.timer?.unsubscribe()
+    switch (type) {
+      case 'need-migrate':
+      case 'migrating':
+        MigrateSubject.timer = timer(2000).subscribe(() => MigrateSubject.next(type))
+        break
+      default:
+        break
+    }
+  }
+}

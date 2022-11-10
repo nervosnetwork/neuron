@@ -680,7 +680,10 @@ export default class ApiController {
 
     //migrate
     handle('start-migrate', async () => {
-      return migrateCkbData()
+      migrateCkbData()
+      return {
+        status: ResponseCode.Success,
+      }
     })
   }
 
