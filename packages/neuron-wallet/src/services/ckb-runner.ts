@@ -140,18 +140,18 @@ export const clearCkbNodeCache = async () => {
 }
 
 export function migrateCkbData() {
-  logger.info('CKB mirate:\tstarting...')
+  logger.info('CKB migrate:\tstarting...')
   const options = ['migrate', '-C', SettingsService.getInstance().ckbDataPath, '--force']
   MigrateSubject.next('migrating')
   let migrate: ChildProcess | null = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
 
   migrate.stderr &&
     migrate.stderr.on('data', data => {
-      logger.error('CKB mirate:\trun fail:', data.toString())
+      logger.error('CKB migrate:\trun fail:', data.toString())
     })
 
   migrate.on('close', code => {
-    logger.info(`CKB mirate:\tprocess process exited with code ${code}`)
+    logger.info(`CKB migrate:\tprocess process exited with code ${code}`)
     if (code === 0) {
       MigrateSubject.next('finish')
     } else {
