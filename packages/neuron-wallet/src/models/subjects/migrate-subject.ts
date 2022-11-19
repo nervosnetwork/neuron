@@ -1,8 +1,8 @@
 import { Subject, timer, Subscription } from 'rxjs'
 
-type MigrateType = 'need-migrate' | 'migrating' | 'failed' | 'finish'
+type MigrateMessage = { type: 'need-migrate' | 'migrating' | 'finish' | 'failed'; reason?: string }
 export default class MigrateSubject {
-  private static subject = new Subject<MigrateType>()
+  private static subject = new Subject<MigrateMessage>()
 
   private static timer: Subscription
 
@@ -10,13 +10,13 @@ export default class MigrateSubject {
     return MigrateSubject.subject
   }
 
-  static next(type: MigrateType) {
-    MigrateSubject.subject.next(type)
+  static next(message: MigrateMessage) {
+    MigrateSubject.subject.next(message)
     MigrateSubject.timer?.unsubscribe()
-    switch (type) {
+    switch (message.type) {
       case 'need-migrate':
       case 'migrating':
-        MigrateSubject.timer = timer(2000).subscribe(() => MigrateSubject.next(type))
+        MigrateSubject.timer = timer(2000).subscribe(() => MigrateSubject.next(message))
         break
       default:
         break

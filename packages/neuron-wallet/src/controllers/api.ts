@@ -24,7 +24,7 @@ import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SettingsService, { Locale } from 'services/settings'
 import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
-
+import { clean as cleanChain } from 'database/chain'
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
 import DaoController from 'controllers/dao'
@@ -478,6 +478,7 @@ export default class ApiController {
           }
         }
       }
+      await cleanChain()
       SettingsService.getInstance().ckbDataPath = dataPath
       await startMonitor('ckb', true)
       return {

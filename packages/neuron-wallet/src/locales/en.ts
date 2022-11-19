@@ -209,9 +209,11 @@ export default {
       },
       'migrate-failed': {
         title: 'Migrate failed',
-        message: 'Migrate failed, press ok to delete old data and synchronize from scratch.',
+        message:
+          'Migrate failed, press ok to delete old data and synchronize from scratch, or click cancel to migrate later by relanuch Neuron. Migrate fail reason: {{ reason }}',
         buttons: {
-          ok: 'OK'
+          ok: 'OK',
+          cancel: 'Cancel'
         }
       }
     },

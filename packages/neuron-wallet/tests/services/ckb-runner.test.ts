@@ -228,16 +228,16 @@ describe('ckb migrate', () => {
   })
   it('start migrate', async () => {
     await migrateCkbData()
-    expect(migrateNextMock).toBeCalledWith('migrating')
+    expect(migrateNextMock).toBeCalledWith({ type: 'migrating' })
   })
   it('migrate failed', async () => {
     stubbedCkb.emit('close', 1)
     await migrateCkbData()
-    expect(migrateNextMock).toBeCalledWith('failed')
+    expect(migrateNextMock).toBeCalledWith({ type: 'failed', reason: '' })
   })
   it('migrate finish', async () => {
     stubbedCkb.emit('close', 0)
     await migrateCkbData()
-    expect(migrateNextMock).toBeCalledWith('finish')
+    expect(migrateNextMock).toBeCalledWith({ type: 'finish' })
   })
 })

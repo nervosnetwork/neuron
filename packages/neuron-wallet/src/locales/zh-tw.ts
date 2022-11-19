@@ -198,9 +198,10 @@ export default {
       },
       'migrate-failed': {
         title: '數據遷移失敗',
-        message: '數據遷移失敗，點擊確認刪除數據並重新同步',
+        message: '數據遷移失敗, 點擊確認刪除數據並重新同步, 點擊取消稍後重啟後再次嘗試。失敗原因: {{ reason }}',
         buttons: {
-          ok: '確認'
+          ok: '確認',
+          cancel: '取消'
         }
       }
     },

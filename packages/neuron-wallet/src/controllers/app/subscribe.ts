@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog } from 'electron'
+import { BrowserWindow, dialog, MessageBoxReturnValue } from 'electron'
 import { t } from 'i18next'
 import { debounceTime } from 'rxjs/operators'
 
@@ -92,9 +92,10 @@ export const subscribe = (dispatcher: AppResponder) => {
     dispatcher.sendMessage('multisig-output-update', params)
   ])
 
-  MigrateSubject.getSubject().subscribe(async status => {
-    dispatcher.sendMessage('migrate', status)
-    switch (status) {
+  MigrateSubject.getSubject().subscribe(async message => {
+    dispatcher.sendMessage('migrate', message.type)
+    let dialogResponse: MessageBoxReturnValue
+    switch (message.type) {
       case 'need-migrate':
       case 'migrating':
         stopMonitor('ckb')
@@ -103,17 +104,19 @@ export const subscribe = (dispatcher: AppResponder) => {
         startMonitor('ckb', true)
         break
       case 'failed':
-        await dialog.showMessageBox({
+        dialogResponse = await dialog.showMessageBox({
           type: 'info',
-          buttons: ['ok'].map(label => t(`messageBox.migrate-failed.buttons.${label}`)),
+          buttons: ['ok', 'cancel'].map(label => t(`messageBox.migrate-failed.buttons.${label}`)),
           defaultId: 0,
           title: t('messageBox.migrate-failed.title'),
-          message: t('messageBox.migrate-failed.message'),
+          message: t('messageBox.migrate-failed.message', { reason: message.reason }),
           cancelId: 0,
           noLink: true
         })
-        await clearCkbNodeCache()
-        startMonitor('ckb')
+        if (dialogResponse.response === 0) {
+          await clearCkbNodeCache()
+          startMonitor('ckb')
+        }
         break
       default:
         break

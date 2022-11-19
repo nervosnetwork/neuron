@@ -199,9 +199,10 @@ export default {
       },
       'migrate-failed': {
         title: '数据迁移失败',
-        message: '数据迁移失败，点击确认删除数据并重新同步。',
+        message: '数据迁移失败, 点击确认删除数据并重新同步, 点击取消稍后重启后再次尝试。失败原因: {{ reason }}',
         buttons: {
-          ok: '确认'
+          ok: '确认',
+          cancel: '取消'
         }
       }
     },

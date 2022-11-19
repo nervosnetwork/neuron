@@ -82,7 +82,7 @@ export const startCkbNode = async () => {
       logger.error('CKB:\trun fail:', dataString)
       ckb = null
       if (dataString.includes('CKB wants to migrate the data into new format')) {
-        MigrateSubject.next('need-migrate')
+        MigrateSubject.next({ type: 'need-migrate' })
       }
     })
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
@@ -142,20 +142,22 @@ export const clearCkbNodeCache = async () => {
 export function migrateCkbData() {
   logger.info('CKB migrate:\tstarting...')
   const options = ['migrate', '-C', SettingsService.getInstance().ckbDataPath, '--force']
-  MigrateSubject.next('migrating')
+  MigrateSubject.next({ type: 'migrating' })
   let migrate: ChildProcess | null = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
 
+  let lastErrorData = ''
   migrate.stderr &&
     migrate.stderr.on('data', data => {
       logger.error('CKB migrate:\trun fail:', data.toString())
+      lastErrorData = data.toString()
     })
 
   migrate.on('close', code => {
     logger.info(`CKB migrate:\tprocess process exited with code ${code}`)
     if (code === 0) {
-      MigrateSubject.next('finish')
+      MigrateSubject.next({ type: 'finish' })
     } else {
-      MigrateSubject.next('failed')
+      MigrateSubject.next({ type: 'failed', reason: lastErrorData })
     }
     migrate = null
   })
