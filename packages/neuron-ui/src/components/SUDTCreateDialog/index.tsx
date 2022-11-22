@@ -144,7 +144,7 @@ const SUDTCreateDialog = ({
     isAccountNameReady && Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
   const onInput = useCallback(
-    e => {
+    (e: any) => {
       const {
         value: payload,
         dataset: { field: type },
@@ -175,7 +175,7 @@ const SUDTCreateDialog = ({
   )
 
   const onAccountTypeSelect = useCallback(
-    (_, option?: IChoiceGroupOption) => {
+    (_: any, option?: IChoiceGroupOption) => {
       if (option) {
         setAccountType(option.key as AccountType)
       }
@@ -183,7 +183,7 @@ const SUDTCreateDialog = ({
     [setAccountType]
   )
 
-  const onNext = (e: any) => {
+  const onNext = (e: React.BaseSyntheticEvent) => {
     e.stopPropagation()
     e.preventDefault()
     switch (step) {

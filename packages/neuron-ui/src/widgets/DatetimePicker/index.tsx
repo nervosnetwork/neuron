@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { Calendar } from 'primereact/calendar'
+import { Calendar, CalendarChangeParams } from 'primereact/calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
 import { addLocale } from 'primereact/api'
@@ -93,15 +93,15 @@ const DatetimePicker = ({
   }, [setStatus])
 
   const onInput = useCallback(
-    e => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       setDisplay(e.target.value)
     },
     [setDisplay]
   )
 
   const onCalendarChange = useCallback(
-    e => {
-      setDisplay(formatDate(new Date(+e.value)))
+    (e: CalendarChangeParams) => {
+      setDisplay(formatDate(new Date(+e.value!)))
       setStatus('done')
     },
     [setDisplay, setStatus]

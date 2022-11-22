@@ -42,19 +42,19 @@
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "0.103.1",
     "@nervosnetwork/ckb-sdk-utils": "0.103.1",
-    "@uifabric/experiments": "7.42.4",
+    "@uifabric/experiments": "7.45.14",
     "@uifabric/styling": "7.20.0",
     "canvg": "2.0.0",
     "i18next": "21.6.6",
     "immer": "9.0.15",
     "jsqr": "1.4.0",
-    "office-ui-fabric-react": "7.180.3",
-    "primereact": "7.1.0",
+    "office-ui-fabric-react": "7.199.6",
+    "primereact": "8.7.1",
     "qr.js": "0.0.0",
-    "react": "16.12.0",
-    "react-dom": "16.12.0",
-    "react-i18next": "11.15.3",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "react-router-dom": "5.1.2",
+    "react-i18next": "11.15.3",
     "sass": "1.47.0"
   },
   "devDependencies": {
@@ -69,17 +69,17 @@
     "@storybook/react": "5.3.18",
     "@types/enzyme": "3.10.12",
     "@types/enzyme-adapter-react-16": "1.0.5",
-    "@types/node": "12.20.55",
-    "@types/react": "16.14.32",
-    "@types/react-dom": "16.9.16",
+    "@types/node": "18.11.9",
+    "@types/react": "17.0.39",
+    "@types/react-dom": "17.0.11",
     "@types/react-router-dom": "5.3.3",
-    "@types/storybook-react-router": "1.0.1",
     "@types/storybook__addon-storyshots": "5.1.2",
+    "@types/storybook-react-router": "1.0.1",
     "@types/styled-components": "4.4.3",
+    "@wojtekmaj/enzyme-adapter-react-17": "0.8.0",
     "babel-jest": "25.5.1",
     "electron": "16.2.8",
     "enzyme": "3.11.0",
-    "enzyme-adapter-react-16": "1.15.2",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",
@@ -94,5 +94,8 @@
     "react-test-renderer": "16.12.0",
     "rimraf": "3.0.2",
     "storybook-react-router": "1.0.8"
+  },
+  "resolutions": {
+    "react-i18next": ">=11.16.4"
   }
 }

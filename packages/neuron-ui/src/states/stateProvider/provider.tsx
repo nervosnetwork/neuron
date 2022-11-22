@@ -9,7 +9,7 @@ export const NeuronWalletContext = createContext<{ state: State.AppWithNeuronWal
   dispatch: basicDispatch,
 })
 
-export const withProvider = (Comp: React.ComponentType) => (props: React.Props<any>) => {
+export const withProvider = (Comp: React.ComponentType) => (props: JSX.IntrinsicAttributes) => {
   const [providers, dispatch] = useReducer(reducer, initStates)
 
   Object.defineProperty(Comp, 'displayName', {

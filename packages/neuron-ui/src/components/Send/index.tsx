@@ -68,7 +68,7 @@ const Send = () => {
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
   const handleLocktimeClick = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { index, type },
       } = e.target

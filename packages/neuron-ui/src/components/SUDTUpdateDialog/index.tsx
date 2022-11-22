@@ -88,7 +88,7 @@ const SUDTUpdateDialog = ({
   const isTokenReady = Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
   const onInput = useCallback(
-    e => {
+    (e: any) => {
       const {
         value: payload,
         dataset: { field: type },
@@ -98,7 +98,7 @@ const SUDTUpdateDialog = ({
     [dispatch]
   )
 
-  const onConfirm = (e: any) => {
+  const onConfirm = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
 
