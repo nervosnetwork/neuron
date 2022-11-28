@@ -1,7 +1,8 @@
 @mixin tip {
   display: none;
   position: absolute;
-  background: #000000;
+  background: var(--third-background-color);
+  color: var(--main-text-color);
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 8px 16px;
   border-radius: 8px;
@@ -9,7 +10,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #FFFFFF;
   z-index: 300;
   white-space: nowrap;
 }
@@ -155,9 +155,23 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
   }
 }
 
+.triangle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--third-background-color);
+  transform: translateY(50%) rotate(45deg);
+  bottom: 100%;
+  right: 14px;
+}
+
 .tipWithString {
   position: relative;
   pointer-events: initial !important;
+
+  .triangle {
+    display: none;
+  }
 
   & > * {
     display: block;
@@ -172,22 +186,47 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
         @include tip;
         content: attr(data-tooltip);
       }
+
+      &[data-type="always-dark"] {
+        &::after {
+          background: #000000;
+          color: #FFFFFF;
+        }
+      }
     
       @each $placement in $placements {
         @include tip-placement($placement, "::after");
       }
-    }
-  }
 
-  &[data-trigger="hover"] {
-    &:hover::after {
-      display: block;
-    }
-  }
+      &[data-trigger="hover"] {
+        &:hover {
+          &::after {
+            display: block;
+          }
+          .triangle {
+            display: block;
+          }
+        }
+      }
+      
+      &[data-trigger="click"] {
+        &[data-tip-show="true"] .tip {
+          display: block;
+        }
+      }
 
-  &[data-trigger="click"] {
-    &[data-tip-show="true"]::after {
-      display: block;
+      &[data-has-trigger="true"] {
+        &[data-placement="bottom"] {
+          &::after {
+            top: calc(100% + 20px)
+          }
+          .triangle {
+            top: calc(100% + 4px);
+            transform: translateY(50%) rotate(45deg);
+            right: inherit;
+          }
+        }
+      }
     }
   }
 }
@@ -199,30 +238,16 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
     @include tip;
   }
 
-  &[data-trigger="click"] {
+  &[data-type="always-dark"] {
     .tip {
-      background: var(--third-background-color);
-      color: var(--main-text-color);
+      background: #000000;
+      color: #FFFFFF;
     }
+  }
 
-    &[data-placement="bottom"] {
-      & .tip {
-        top: calc(100% + 20px)
-      }
-    }
-
+  &[data-trigger="click"] {
     &[data-tip-show="true"] .tip {
       display: block;
-    }
-
-    .triangle {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: var(--third-background-color);
-      transform: translateY(50%) rotate(45deg);
-      bottom: 100%;
-      right: 14px;
     }
   }
 
@@ -231,8 +256,21 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
   }
 
   &[data-trigger="hover"] {
-    &:hover .tip {
-      display: block;
+    &:hover {
+      .tip {
+        display: block;
+      }
+      .triangle {
+        display: block;
+      }
+    }
+  }
+
+  &[data-has-trigger="true"] {
+    &[data-placement="bottom"] {
+      & .tip {
+        top: calc(100% + 20px)
+      }
     }
   }
 }

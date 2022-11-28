@@ -23,7 +23,7 @@ const SyncDetail = ({
         <br />
         <span className={styles.blockNumber}>{syncBlockNumbers}</span>
       </div>
-      {!isLookingValidTarget && (
+      {isLookingValidTarget && (
         <div
           role="link"
           className={styles.lookingValidTarget}
@@ -91,6 +91,7 @@ const SyncStatus = ({
         trigger="click"
         className={styles.tipContainer}
         tipClassName={styles.tip}
+        showTriangle
       >
         <button className={styles.synced} onClick={onChangeIsOpen} type="button">
           {t('sync.synced')}
@@ -112,6 +113,7 @@ const SyncStatus = ({
       trigger="click"
       className={styles.tipContainer}
       tipClassName={styles.tip}
+      showTriangle
     >
       <button onClick={onChangeIsOpen} className={styles.syncing} type="button">
         <Confirming className={styles.confirm} />

@@ -8,6 +8,7 @@ import { ReactComponent as Moon } from 'widgets/Icons/Moon.svg'
 import SyncStatusComponent from 'components/SyncStatus'
 import { AppActions, useDispatch, useState as useGlobalState } from 'states'
 import { isDark, openExternal, setTheme as setThemeAPI } from 'services/remote'
+import Tooltip from 'widgets/Tooltip'
 import styles from './pageContainer.module.scss'
 
 const PageHeadNotice = ({ notice }: { notice: State.PageNotice }) => {
@@ -94,7 +95,9 @@ const PageContainer: React.FC<ComponentProps> = props => {
       <div className={styles.head}>
         {head}
         <div className={styles.rightContent}>
-          {theme === 'dark' ? <Sun onClick={onSetTheme} /> : <Moon onClick={onSetTheme} />}
+          <Tooltip tip={t(theme === 'dark' ? 'common.switch-to-light' : 'common.switch-to-dark')} showTriangle>
+            {theme === 'dark' ? <Sun onClick={onSetTheme} /> : <Moon onClick={onSetTheme} />}
+          </Tooltip>
           <span className={styles.network}>
             {network ? (
               <>

@@ -489,7 +489,9 @@
       "copy": "复制",
       "copied": "已复制",
       "verification-failure": "验证失败",
-      "back": "上一步"
+      "back": "上一步",
+      "switch-to-light": "开启日间模式",
+      "switch-to-dark": "开启夜间模式"
     },
     "notification-panel": {
       "title": "通知中心"

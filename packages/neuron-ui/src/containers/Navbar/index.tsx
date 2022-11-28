@@ -125,12 +125,12 @@ const Navbar = () => {
         {menuExpanded ? (
           <img src={Logo} alt="logo" />
         ) : (
-          <Tooltip tip={name} placement="right">
+          <Tooltip tip={name} placement="right" type="always-dark">
             <img src={Logo} alt="logo" />
           </Tooltip>
         )}
         {menuExpanded && (
-          <Tooltip tip={name} className={styles.nameText} placement="right">
+          <Tooltip tip={name} className={styles.nameText} placement="right" type="always-dark">
             <span>{name}</span>
           </Tooltip>
         )}
@@ -181,6 +181,7 @@ const Navbar = () => {
                     )
                   }
                   placement={item.children?.length ? 'right-bottom' : 'right'}
+                  type="always-dark"
                 >
                   <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
                     {item.icon}
