@@ -26,6 +26,7 @@ import { ReactComponent as BalanceRight } from 'widgets/Icons/BalanceRight.svg'
 import { ArrowOpenRight, Confirming, PasswordHide, PasswordShow } from 'widgets/Icons/icon'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
+import { HIDE_BALANCE } from 'utils/const'
 import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
@@ -103,23 +104,26 @@ const TransactionStatus = ({
 const Amount = ({ item, show }: { item: State.Transaction; show: boolean }) => {
   let amount = '--'
   let sudtAmount = ''
+  let isReceive = false
 
   if (item.blockNumber !== undefined) {
     if (item.nftInfo) {
       // NFT
       const { type, data } = item.nftInfo
-      amount = show ? `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}` : '******mNFT'
+      amount = show ? `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}` : `${HIDE_BALANCE}mNFT`
+      isReceive = type === 'receive'
     } else if (item.sudtInfo?.sUDT) {
       if (item.sudtInfo.sUDT.decimal) {
         sudtAmount = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
       }
     } else {
-      amount = show ? `${shannonToCKBFormatter(item.value)} CKB` : '****** CKB'
+      amount = show ? `${shannonToCKBFormatter(item.value, true)} CKB` : `${HIDE_BALANCE} CKB`
+      isReceive = !amount.includes('-')
     }
   }
   return sudtAmount ? (
     <>
-      {show ? sudtAmount : '******'}&nbsp;
+      {show ? sudtAmount : HIDE_BALANCE}&nbsp;
       <UANTonkenSymbol
         className={styles.symbol}
         name={item.sudtInfo!.sUDT.tokenName}
@@ -127,7 +131,7 @@ const Amount = ({ item, show }: { item: State.Transaction; show: boolean }) => {
       />
     </>
   ) : (
-    <>{amount}</>
+    <span className={show && isReceive ? styles.isReceive : ''}>{amount}</span>
   )
 }
 
@@ -252,7 +256,7 @@ const Overview = () => {
             {!!showBalance || <PasswordHide onClick={onChangeShowBalance} className={styles.balanceIcon} />}
           </span>
           <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
-            <span className={styles.balanceValue}>{showBalance ? shannonToCKBFormatter(balance) : '******'}</span>
+            <span className={styles.balanceValue}>{showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE}</span>
           </CopyZone>
           <span className={styles.balanceUnit}>CKB</span>
           <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />

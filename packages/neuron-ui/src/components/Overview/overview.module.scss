@@ -1,4 +1,5 @@
 @import '../../styles/mixin.scss';
+@import '../../styles/variable.scss';
 
 .mid {
   height: 200px;
@@ -82,76 +83,6 @@
   }
 }
 
-.recentActivities {
-  grid-area: activities;
-  padding: 0px 11px 16px;
-  background-color: #fff;
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  tr {
-    height: 46px;
-    border-bottom: 1px solid #b3b3b3;
-    padding: 0 15px;
-  }
-
-  tbody {
-    tr:hover {
-      background-color: #eee;
-    }
-  }
-
-  th {
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #000;
-    line-height: 1em;
-    padding: 16px 0;
-
-    &[data-field='date'] {
-      width: 100px;
-    }
-    &[data-field='status'] {
-      width: 130px;
-    }
-  }
-
-  td {
-    font-size: 0.875rem;
-    line-height: 1em;
-    padding: 8px 2px;
-    color: #000;
-    white-space: nowrap;
-  }
-
-  .tokenName {
-    max-width: 50%;
-    display: inline-flex;
-    line-height: 24px;
-
-    &::after {
-      min-width: 300px;
-    }
-    & > span {
-      max-width: 100%;
-    }
-  }
-
-  .symbol {
-    max-width: 90%;
-    display: inline-flex;
-
-    &::after {
-      max-width: 400px;
-    }
-  }
-}
-
 .txStatusTh {
   padding-left: 34px !important;
 }
@@ -221,4 +152,8 @@
       margin-left: 4px;
     }
   }
+}
+
+.isReceive {
+  color: $main-color;
 }
