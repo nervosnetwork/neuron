@@ -49,6 +49,8 @@ type Action =
   | 'set-indexer-data-path'
   | 'stop-process-monitor'
   | 'start-process-monitor'
+  | 'is-dark'
+  | 'set-theme'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

@@ -34,3 +34,5 @@ export const invokeShowOpenDialogModal = remoteApi<OpenDialogOptions, OpenDialog
 export const invokeOpenContextMenu = remoteApi<Array<MenuItemConstructorOptions | MenuItem>>('open-context-menu')
 export const invokeGetAllDisplaysSize = remoteApi<void, Size[]>('get-all-displays-size')
 export const invokeShowMessageBox = remoteApi<MessageBoxOptions, MessageBoxReturnValue>('show-message-box')
+export const isDark = remoteApi<void, boolean>('is-dark')
+export const setTheme = remoteApi<'light' | 'dark', void>('set-theme')

@@ -148,3 +148,8 @@
   text-align: center;
   color: var(--main-text-color)
 }
+
+@mixin card {
+  background: var(--secondary-background-color);
+  border-radius: 16px;
+}

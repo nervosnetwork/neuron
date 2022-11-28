@@ -1,28 +1,77 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils'
+import { Confirming, NewTab } from 'widgets/Icons/icon'
+import { ReactComponent as UnexpandStatus } from 'widgets/Icons/UnexpandStatus.svg'
+import Tooltip from 'widgets/Tooltip'
+import styles from './syncStatus.module.scss'
+
+const SyncDetail = ({
+  syncBlockNumbers,
+  isLookingValidTarget,
+  onOpenValidTarget,
+}: {
+  syncBlockNumbers: string
+  isLookingValidTarget: boolean
+  onOpenValidTarget: (e: React.SyntheticEvent) => void
+}) => {
+  const [t] = useTranslation()
+  return (
+    <>
+      <div className={styles.blockSynced}>
+        {t('network-status.tooltip.block-synced')}:
+        <br />
+        <span className={styles.blockNumber}>{syncBlockNumbers}</span>
+      </div>
+      {!isLookingValidTarget && (
+        <div
+          role="link"
+          className={styles.lookingValidTarget}
+          onClick={onOpenValidTarget}
+          onKeyPress={onOpenValidTarget}
+          tabIndex={-1}
+        >
+          <div>
+            <span>{t('network-status.tooltip.looking-valid-target')}</span>
+            <NewTab />
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
 
 const SyncStatus = ({
   syncStatus,
   connectionStatus,
-  leftTime,
+  syncPercents,
+  syncBlockNumbers,
+  isLookingValidTarget,
+  onOpenValidTarget,
 }: React.PropsWithoutRef<{
   syncStatus: SyncStatusEnum
   connectionStatus: State.ConnectionStatus
-  leftTime: string
+  syncPercents: string
+  syncBlockNumbers: string
+  isLookingValidTarget: boolean
+  onOpenValidTarget: (e: React.SyntheticEvent) => void
 }>) => {
   const [t] = useTranslation()
+  const [isOpen, setIsOpen] = useState(false)
+  const onChangeIsOpen = useCallback(() => {
+    setIsOpen(v => !v)
+  }, [setIsOpen])
 
   if (ConnectionStatus.Connecting === connectionStatus) {
     return <span>{t('navbar.connecting')}</span>
   }
 
   if (connectionStatus === ConnectionStatus.Offline) {
-    return <span style={{ color: 'red' }}>{t('sync.sync-failed')}</span>
+    return <span style={{ color: '#FF1E1E' }}>{t('sync.sync-failed')}</span>
   }
 
   if (SyncStatusEnum.SyncNotStart === syncStatus) {
-    return <span style={{ color: 'red' }}>{t('navbar.sync-not-start')}</span>
+    return <span style={{ color: '#FF1E1E' }}>{t('navbar.sync-not-start')}</span>
   }
 
   if (SyncStatusEnum.SyncPending === syncStatus) {
@@ -30,10 +79,47 @@ const SyncStatus = ({
   }
 
   if (SyncStatusEnum.SyncCompleted === syncStatus) {
-    return <span>{t('sync.synced')}</span>
+    return (
+      <Tooltip
+        tip={
+          <SyncDetail
+            syncBlockNumbers={syncBlockNumbers}
+            isLookingValidTarget={isLookingValidTarget}
+            onOpenValidTarget={onOpenValidTarget}
+          />
+        }
+        trigger="click"
+        className={styles.tipContainer}
+        tipClassName={styles.tip}
+      >
+        <button className={styles.synced} onClick={onChangeIsOpen} type="button">
+          {t('sync.synced')}
+          <UnexpandStatus className={styles.expand} data-is-open={isOpen} />
+        </button>
+      </Tooltip>
+    )
   }
 
-  return <span>{t('sync.syncing', { leftTime })}</span>
+  return (
+    <Tooltip
+      tip={
+        <SyncDetail
+          syncBlockNumbers={syncBlockNumbers}
+          isLookingValidTarget={isLookingValidTarget}
+          onOpenValidTarget={onOpenValidTarget}
+        />
+      }
+      trigger="click"
+      className={styles.tipContainer}
+      tipClassName={styles.tip}
+    >
+      <button onClick={onChangeIsOpen} className={styles.syncing} type="button">
+        <Confirming className={styles.confirm} />
+        {t('sync.syncing', { syncPercents })}
+        <UnexpandStatus className={styles.expand} data-is-open={isOpen} />
+      </button>
+    </Tooltip>
+  )
 }
 
 SyncStatus.displayName = 'SyncStatus'

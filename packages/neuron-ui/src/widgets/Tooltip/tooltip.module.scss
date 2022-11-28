@@ -10,7 +10,7 @@
   font-size: 14px;
   line-height: 20px;
   color: #FFFFFF;
-  z-index: 100;
+  z-index: 300;
   white-space: nowrap;
 }
 
@@ -176,10 +176,18 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
       @each $placement in $placements {
         @include tip-placement($placement, "::after");
       }
-    
-      &:hover::after {
-        display: block;
-      }
+    }
+  }
+
+  &[data-trigger="hover"] {
+    &:hover::after {
+      display: block;
+    }
+  }
+
+  &[data-trigger="click"] {
+    &[data-tip-show="true"]::after {
+      display: block;
     }
   }
 }
@@ -189,14 +197,42 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 
   .tip {
     @include tip;
-    z-index: 300;
+  }
+
+  &[data-trigger="click"] {
+    .tip {
+      background: var(--third-background-color);
+      color: var(--main-text-color);
+    }
+
+    &[data-placement="bottom"] {
+      & .tip {
+        top: calc(100% + 20px)
+      }
+    }
+
+    &[data-tip-show="true"] .tip {
+      display: block;
+    }
+
+    .triangle {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--third-background-color);
+      transform: translateY(50%) rotate(45deg);
+      bottom: 100%;
+      right: 14px;
+    }
   }
 
   @each $placement in $placements {
     @include tip-placement($placement, " .tip");
   }
 
-  &:hover .tip {
-    display: block;
+  &[data-trigger="hover"] {
+    &:hover .tip {
+      display: block;
+    }
   }
 }

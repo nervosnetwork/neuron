@@ -1,48 +1,85 @@
 @import '../../styles/mixin.scss';
 
-$success-color: #3cc68a;
-$failed-color: #d50000;
-$pending-color: #b3b3b3;
-$confirming-color: #b3b3b3;
-
-.overview {
+.mid {
+  height: 200px;
   display: grid;
   grid-template:
-    'page-title page-title' auto
-    'balance balance' auto
-    'activities-title activities-title' auto
-    'activities activities' auto
-    'more-link more-link' auto/
-    1fr auto;
-}
+    'balance send receive' 200px /
+    2fr 1fr 1fr;
+  grid-column-gap: 16px;
+  margin-bottom: 16px;
+  .balance {
+    grid-area: balance;
+    border-radius: 16px;
+    background-color: #26C786;
+    position: relative;
+    padding: 24px 16px;
+    color: var(--primary-text-color);
 
-.pageTitle,
-.recentActivitiesTitle {
-  @include bold-text;
-  font-size: 1.375rem;
-  color: #000;
-  margin: 0;
-}
+    & > .backgroundImg {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+    }
 
-.pageTitle {
-  @include page-title;
-  grid-area: page-title;
-}
+    & > .copyBalance {
+      .balanceValue {
+        font-family: 'D-DIN-PRO';
+        font-weight: 500;
+        font-size: 36px;
+      }
+    }
 
-.recentActivitiesTitle {
-  grid-area: activities-title;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  font-size: 1rem;
-  font-weight: 500;
-}
+    & > .balanceUnit {
+      font-size: 16px;
+      font-weight: 500;
+      margin-left: 8px;
+    }
 
-.balance {
-  grid-area: balance;
-  display: flex;
-  align-items: center;
-  font-size: 1.25rem;
-  font-weight: 600;
+    & > .balanceTitle {
+      font-weight: 500;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 36px;
+
+      & > svg {
+        margin-left: 8px;
+
+        path {
+          fill: var(--svg-fill-color);
+        }
+      }
+    }
+  }
+  .send {
+    grid-area: send;
+  }
+  .receive {
+    grid-area: receive;
+  }
+
+  & > a {
+    border: none;
+    background: var(--secondary-background-color);
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary-color);
+    text-align: center;
+    padding-top: 48px;
+
+    @media (prefers-color-scheme: dark) {
+      & > svg {
+        :first-child {
+          fill: var(--primary-color);
+        }
+        :not(:first-child) {
+          fill: #14221C;
+        }
+     }
+    }
+  }
 }
 
 .recentActivities {
@@ -113,70 +150,27 @@ $confirming-color: #b3b3b3;
       max-width: 400px;
     }
   }
-
-  .txStatus {
-    & > div::after {
-      position: absolute;
-      display: block;
-      content: '';
-      border-radius: 50%;
-      width: 8px;
-      height: 8px;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    &[data-status='pending'] > div::after {
-      background-color: $pending-color;
-      filter: drop-shadow(0 0 1px $pending-color);
-      animation: blink 5s infinite;
-    }
-
-    &[data-status='confirming'] > div::after {
-      background-color: $pending-color;
-      filter: drop-shadow(0 0 1px $pending-color);
-      animation: blink 5s infinite;
-    }
-
-    &[data-status='success'] > div::after {
-      background-color: $success-color;
-      filter: drop-shadow(0 0 1px $success-color);
-    }
-
-    &[data-status='failed'] > div::after {
-      background-color: $failed-color;
-      filter: drop-shadow(0 0 1px $failed-color);
-    }
-
-    & > div {
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      padding-left: 20px;
-
-      & > span:first-child {
-        flex: 1;
-      }
-
-      & > span:nth-child(2) {
-        color: #626262;
-        font-size: 0.625rem;
-        line-height: 0.8125rem;
-        margin-top: 3px;
-      }
-    }
-  }
 }
 
-.linkToHistory {
-  grid-area: more-link;
-  font-size: 0.75rem;
-  color: #000;
-  margin-top: 13px;
+.txStatusTh {
+  padding-left: 34px !important;
+}
 
-  & > span:hover {
-    color: var(--nervos-green);
+.txStatus {
+  display: flex;
+  position: relative;
+  padding-left: 16px;
+  align-items: center;
+
+  .confirmText {
+    color: #999;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  .confirm {
+    position: absolute;
+    left: -4px;
   }
 }
 
@@ -194,5 +188,37 @@ $confirming-color: #b3b3b3;
 
   50% {
     opacity: 1;
+  }
+}
+
+.transactionTablleHead {
+  display: flex;
+  padding: 18px 16px;
+  justify-content: space-between;
+  align-items: center;
+
+  .recentActivitiesTitle {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-text-color);
+    margin: 0;
+  }
+
+  .linkToHistory {
+    font-size: 14px;
+    color: #8DA394;
+    cursor: pointer;
+  
+    &:hover {
+      color: var(--activity-color);
+
+      & > svg > path {
+        stroke: var(--activity-color);
+      }
+    }
+
+    & > svg {
+      margin-left: 4px;
+    }
   }
 }

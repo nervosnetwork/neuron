@@ -1,5 +1,4 @@
 @import './layout.scss';
-@import './color.scss';
 @import './mixin.scss';
 
 * {
@@ -14,6 +13,10 @@
 [type='submit'],
 button {
   -webkit-appearance: none !important;
+}
+
+a {
+  text-decoration: none;
 }
 
 ul {

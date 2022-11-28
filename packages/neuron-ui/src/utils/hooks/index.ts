@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
-import { syncRebuildNotification } from 'services/localCache'
+import { firstLoadApp, syncRebuildNotification } from 'services/localCache'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -10,6 +10,7 @@ import {
   updateTransactionDescription,
   updateAddressDescription,
   setCurrentWallet,
+  showPageNotice,
 } from 'states'
 import { epochParser, RoutePath, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
 import {
@@ -494,4 +495,14 @@ export const useOutputErrors = (
       }),
     [outputs, isMainnet]
   )
+}
+
+export const useFirstLoadApp = (dispatch: StateDispatch) => {
+  useEffect(() => {
+    const isFirstLoad = firstLoadApp.load()
+    if (isFirstLoad) {
+      showPageNotice('overview.wallet-ready')(dispatch)
+      firstLoadApp.save()
+    }
+  }, [dispatch])
 }

@@ -129,3 +129,20 @@ export const toggleIsAllowedToFetchList = (allowed?: boolean) => (dispatch: Stat
     payload: allowed,
   })
 }
+
+let timer: ReturnType<typeof setTimeout>
+export const showPageNotice = (i18nKey: string, status: State.PageNotice['status'] = 'success') => (
+  dispatch: StateDispatch
+) => {
+  clearTimeout(timer)
+  dispatch({
+    type: AppActions.SetPageNotice,
+    payload: { i18nKey, status },
+  })
+  timer = setTimeout(() => {
+    // dispatch({
+    //   type: AppActions.SetPageNotice,
+    //   payload: undefined,
+    // })
+  }, 2000)
+}

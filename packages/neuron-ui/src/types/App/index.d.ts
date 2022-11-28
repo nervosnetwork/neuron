@@ -127,6 +127,7 @@ declare namespace State {
     onCancel?: () => void
   } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
+  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn' }
 
   interface App {
     tipBlockNumber: string
@@ -148,6 +149,8 @@ declare namespace State {
     showAllNotifications: boolean
     isAllowedToFetchList: boolean
     loadedTransaction: any
+    pageNotice?: PageNotice
+    showWaitForFullySynced: boolean
   }
 
   interface NetworkProperty {
@@ -211,6 +214,7 @@ declare namespace State {
     status: number
     isLookingValidTarget: boolean
     validTarget?: string
+    syncStatus?: SyncStatus
   }>
 
   interface Chain {
