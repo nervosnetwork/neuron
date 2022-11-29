@@ -451,9 +451,7 @@ export const useUpdateWithdrawList = ({
       .then(txs => {
         const committedTx = txs.filter(v => v.txStatus.status === 'committed')
         committedTx.forEach((tx, idx) => {
-          if (tx.txStatus.status === 'committed') {
-            txMap.set(depositOutPointHashes[idx], tx)
-          }
+          txMap.set(depositOutPointHashes[idx], tx)
         })
         const blockHashes = [
           ...(committedTx.map(v => v.txStatus.blockHash).filter(v => !!v) as string[]),
@@ -468,9 +466,7 @@ export const useUpdateWithdrawList = ({
           .exec()
           .then(blockHeaders => {
             blockHeaders.forEach((header, idx) => {
-              if (header?.dao) {
-                hashHeaderMap.set(blockHashes[idx], header.dao)
-              }
+              hashHeaderMap.set(blockHashes[idx], header.dao)
             })
             const withdrawList = new Map()
             records.forEach(record => {

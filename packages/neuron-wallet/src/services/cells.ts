@@ -131,7 +131,7 @@ export default class CellsService {
     return uniqueLockArgs
   }
 
-  private static async addUnLockInfo(cells: Cell[]): Promise<Cell[]> {
+  private static async addUnlockInfo(cells: Cell[]): Promise<Cell[]> {
     // find unlock info
     const unlockTxHashes: string[] = cells
       .filter(v => v.outPoint && (v.status === OutputStatus.Dead || v.status === OutputStatus.Pending))
@@ -247,7 +247,7 @@ export default class CellsService {
       return cell
     })
 
-    await Promise.all([CellsService.addDepositInfo(cells), CellsService.addUnLockInfo(cells)])
+    await Promise.all([CellsService.addDepositInfo(cells), CellsService.addUnlockInfo(cells)])
 
     return cells
   }

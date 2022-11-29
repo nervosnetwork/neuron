@@ -488,18 +488,19 @@ export class TransactionsService {
         'input.id': 'ASC'
       })
       .getOne()
-    const txwithOutput = await getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('transaction')
-      .where('transaction.hash is :hash', { hash })
-      .leftJoinAndSelect('transaction.outputs', 'output')
-      .getOne()
+    const txOutpus = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder()
+      .where({
+        outPointTxHash: hash
+      })
+      .getMany()
 
     if (!tx) {
       return undefined
     }
 
-    tx.outputs = txwithOutput?.outputs || []
+    tx.outputs = txOutpus
     return tx.toModel()
   }
 
