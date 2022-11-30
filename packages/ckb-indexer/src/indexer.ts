@@ -54,7 +54,7 @@ export class CkbIndexer implements Indexer {
   }
 
   async tip(): Promise<Tip> {
-    const res = await request(this.ckbIndexerUrl, "get_tip");
+    const res = await request(this.ckbIndexerUrl, "get_indexer_tip");
     return res as Tip;
   }
 

@@ -195,6 +195,14 @@ export default {
         'fail-message':
           '未能打開郵件客戶端, 請複製郵件地址, 並通過 "菜單" -> "幫助" -> "導出調試信息" 獲得 Neuron 的調試信息附在郵件中發送給我們',
         'copy-mail-addr': '複製郵件地址'
+      },
+      'migrate-failed': {
+        title: '數據遷移失敗',
+        message: '數據遷移失敗, 點擊確認刪除數據並重新同步, 點擊取消稍後重啟後再次嘗試。失敗原因: {{ reason }}',
+        buttons: {
+          ok: '確認',
+          cancel: '取消'
+        }
       }
     },
     prompt: {

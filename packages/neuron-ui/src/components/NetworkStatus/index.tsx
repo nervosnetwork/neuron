@@ -5,6 +5,7 @@ import { NewTab } from 'widgets/Icons/icon'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {
+  isMigrate?: boolean
   network: State.Network | undefined
   syncPercents: number
   syncBlockNumbers: string
@@ -20,6 +21,7 @@ const NetworkStatus = ({
   onAction,
   isLookingValidTarget,
   onOpenValidTarget,
+  isMigrate,
 }: NetworkStatusProps) => {
   const [t] = useTranslation()
 
@@ -32,7 +34,7 @@ const NetworkStatus = ({
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {network ? (
+      {network && !isMigrate ? (
         <div className={styles.tooltip}>
           <div className={styles.tooltipTitle}>
             <span>{t('network-status.tooltip.block-synced')}</span>
@@ -53,6 +55,7 @@ const NetworkStatus = ({
           )}
         </div>
       ) : null}
+      {isMigrate && <div className={styles.tooltip}>{t('network-status.migrating')}</div>}
       {network ? (
         <div>
           <NetworkTypeLabel type={network.chain} />

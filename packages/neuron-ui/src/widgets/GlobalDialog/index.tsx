@@ -14,7 +14,7 @@ const UnlockSuccess = () => {
   )
 }
 
-const RebuildSync = ({ onDismiss }: { onDismiss: React.MouseEventHandler }) => {
+const RebuildSync = ({ onDismiss, onOk }: { onDismiss: React.MouseEventHandler; onOk: React.MouseEventHandler }) => {
   const [t] = useTranslation()
   return (
     <div style={{ fontWeight: 200 }}>
@@ -23,8 +23,9 @@ const RebuildSync = ({ onDismiss }: { onDismiss: React.MouseEventHandler }) => {
         .map(s => (
           <p key={s}>{s}</p>
         ))}
-      <div style={{ textAlign: 'center' }}>
-        <Button type="primary" label={t('common.dismiss')} onClick={onDismiss} />
+      <div style={{ textAlign: 'right' }}>
+        <Button type="cancel" label={t('common.cancel')} onClick={onDismiss} style={{ marginRight: '24px' }} />
+        <Button type="primary" label={t('messages.migrate')} onClick={onOk} />
       </div>
     </div>
   )
@@ -32,18 +33,21 @@ const RebuildSync = ({ onDismiss }: { onDismiss: React.MouseEventHandler }) => {
 
 interface GlobalDialogProps {
   onDismiss: React.MouseEventHandler
+  onOk: React.MouseEventHandler
   type: State.GlobalDialogType
 }
 
-const GlobalDialog = ({ onDismiss, type }: GlobalDialogProps) => {
+const GlobalDialog = ({ onDismiss, type, onOk }: GlobalDialogProps) => {
   let content = null
+  let maskClosable = true
   switch (type) {
     case 'unlock-success': {
       content = <UnlockSuccess />
       break
     }
     case 'rebuild-sync': {
-      content = <RebuildSync onDismiss={onDismiss} />
+      maskClosable = false
+      content = <RebuildSync onDismiss={onDismiss} onOk={onOk} />
       break
     }
     default: {
@@ -51,7 +55,7 @@ const GlobalDialog = ({ onDismiss, type }: GlobalDialogProps) => {
     }
   }
   return (
-    <div role="presentation" className={styles.dialogContainer} onClick={onDismiss}>
+    <div role="presentation" className={styles.dialogContainer} onClick={maskClosable ? onDismiss : undefined}>
       <div
         role="presentation"
         className={styles.dialog}
