@@ -488,7 +488,7 @@ export class TransactionsService {
         'input.id': 'ASC'
       })
       .getOne()
-    const txOutpus = await getConnection()
+    const txOutputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder()
       .where({
@@ -500,7 +500,7 @@ export class TransactionsService {
       return undefined
     }
 
-    tx.outputs = txOutpus
+    tx.outputs = txOutputs
     return tx.toModel()
   }
 
