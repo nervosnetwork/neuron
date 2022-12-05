@@ -20,7 +20,7 @@ const RebuildSync = ({ onDismiss, onOk }: { onDismiss: React.MouseEventHandler; 
     <div style={{ fontWeight: 200 }}>
       {t('messages.rebuild-sync')
         .split('\n')
-        .map(s => (
+        .map((s: string) => (
           <p key={s}>{s}</p>
         ))}
       <div style={{ textAlign: 'right' }}>
