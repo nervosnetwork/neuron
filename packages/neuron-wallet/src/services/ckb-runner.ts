@@ -5,6 +5,8 @@ import { ChildProcess, spawn } from 'child_process'
 import process from 'process'
 import logger from 'utils/logger'
 import SettingsService from './settings'
+import MigrateSubject from 'models/subjects/migrate-subject'
+import { resetSyncTaskQueue } from 'block-sync-renderer'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -68,7 +70,7 @@ export const startCkbNode = async () => {
   await initCkb()
 
   logger.info('CKB:\tstarting node...')
-  const options = ['run', '-C', SettingsService.getInstance().ckbDataPath]
+  const options = ['run', '-C', SettingsService.getInstance().ckbDataPath, '--indexer']
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
   }
@@ -76,8 +78,12 @@ export const startCkbNode = async () => {
 
   ckb.stderr &&
     ckb.stderr.on('data', data => {
-      logger.error('CKB:\trun fail:', data.toString())
+      const dataString: string = data.toString()
+      logger.error('CKB:\trun fail:', dataString)
       ckb = null
+      if (dataString.includes('CKB wants to migrate the data into new format')) {
+        MigrateSubject.next({ type: 'need-migrate' })
+      }
     })
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     ckb.stdout &&
@@ -107,10 +113,12 @@ export const startCkbNode = async () => {
     isLookingValidTarget = false
     ckb = null
   })
+  resetSyncTaskQueue.push(true)
 }
 
 export const stopCkbNode = () => {
   return new Promise<void>(resolve => {
+    resetSyncTaskQueue.push(false)
     if (ckb) {
       logger.info('CKB:\tkilling node')
       ckb.once('close', () => resolve())
@@ -129,4 +137,28 @@ export const clearCkbNodeCache = async () => {
   await stopCkbNode()
   fs.rmSync(SettingsService.getInstance().ckbDataPath, { recursive: true, force: true })
   await startCkbNode()
+}
+
+export function migrateCkbData() {
+  logger.info('CKB migrate:\tstarting...')
+  const options = ['migrate', '-C', SettingsService.getInstance().ckbDataPath, '--force']
+  MigrateSubject.next({ type: 'migrating' })
+  let migrate: ChildProcess | null = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
+
+  let lastErrorData = ''
+  migrate.stderr &&
+    migrate.stderr.on('data', data => {
+      logger.error('CKB migrate:\trun fail:', data.toString())
+      lastErrorData = data.toString()
+    })
+
+  migrate.on('close', code => {
+    logger.info(`CKB migrate:\tprocess process exited with code ${code}`)
+    if (code === 0) {
+      MigrateSubject.next({ type: 'finish' })
+    } else {
+      MigrateSubject.next({ type: 'failed', reason: lastErrorData })
+    }
+    migrate = null
+  })
 }

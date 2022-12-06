@@ -27,7 +27,8 @@
       "tooltip": {
         "block-synced": "Block Synced",
         "looking-valid-target": "Looking for assumed valid target"
-      }
+      },
+      "migrating": "migrating..."
     },
     "import-hardware": {
       "title": {
@@ -375,7 +376,6 @@
       },
       "data": {
         "ckb-node-data": "CKB Node Config & Storage",
-        "ckb-indexer-data": "CKB Indexer Data",
         "set": "Set",
         "cache": "Cache",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
@@ -383,9 +383,7 @@
         "clear-cache": "Clear Cache",
         "clearing-cache": "Clearing...",
         "remove-ckb-data-tip": "Please move CKB Node Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
-        "remove-indexer-data-tip": "Please move Indexer Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
-        "resync-ckb-node-describe": "Attention: Synchronizing from scratch won't remove previously downloaded CKB Node Data, but it will remove downloaded Indexer Data",
-        "resync-indexer-describe": "Attention: Synchronizing from scratch won't remove previously downloaded Indexer Data.",
+        "resync-ckb-node-describe": "Attention: Synchronizing from scratch won't remove previously downloaded CKB Node Data",
         "cancel": "Cancel",
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
@@ -507,7 +505,8 @@
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
-      "rebuild-sync": "For better user experience, Neuron has adopted a brand new indexing mechanism, which requires a rebuilding of cache database (estimated 30 ~ 60min).\nSorry for the inconvenience.",
+      "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
+      "migrate": "Migrating",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
       "fields": {
         "wallet": "Wallet",

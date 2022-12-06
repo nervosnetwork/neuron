@@ -206,6 +206,15 @@ export default {
         'fail-message':
           'Unable to launch mail client, please copy the mail address, append debug information exported by "Menu" -> "Help" -> "Export Debug Information" and send us.',
         'copy-mail-addr': 'Copy mail address'
+      },
+      'migrate-failed': {
+        title: 'Migrate failed',
+        message:
+          'Migrate failed, press ok to delete old data and synchronize from scratch, or click cancel to migrate later by relanuch Neuron. Migrate fail reason: {{ reason }}',
+        buttons: {
+          ok: 'OK',
+          cancel: 'Cancel'
+        }
       }
     },
     prompt: {

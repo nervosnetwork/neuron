@@ -7,7 +7,6 @@ import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
 import Transaction from 'models/chain/transaction'
 import { OutputStatus } from 'models/chain/output'
-import IndexerService from './indexer'
 import NetworksService from './networks'
 import Multisig from 'models/multisig'
 
@@ -93,9 +92,10 @@ export default class MultisigService {
     const liveCells: MultisigOutput[] = []
     const addressCursorMap: Map<string, string> = new Map()
     let currentMultisigConfigs = multisigConfigs
+    const network = NetworksService.getInstance().getCurrent()
     while (currentMultisigConfigs.length) {
       const res = await rpcBatchRequest(
-        IndexerService.LISTEN_URI,
+        network.remote,
         currentMultisigConfigs.map(v => {
           const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
           return {
@@ -154,9 +154,10 @@ export default class MultisigService {
     const multisigOutputTxHashList = new Set<string>()
     const addressCursorMap: Map<string, string> = new Map()
     let currentMultisigConfigs = [...multisigConfigs]
+    const network = NetworksService.getInstance().getCurrent()
     while (currentMultisigConfigs.length) {
       const res = await rpcBatchRequest(
-        IndexerService.LISTEN_URI,
+        network.remote,
         currentMultisigConfigs.map(v => {
           const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
           return {

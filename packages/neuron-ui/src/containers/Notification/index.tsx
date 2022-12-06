@@ -11,10 +11,12 @@ import {
   dismissNotification,
   dismissGlobalDialog,
 } from 'states'
-import { useOnLocaleChange, useGlobalNotifications } from 'utils'
+import { useOnLocaleChange, useGlobalNotifications, isSuccessResponse } from 'utils'
 
 import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
+import { syncRebuildNotification } from 'services/localCache'
+import { migrateData } from 'services/remote'
 import styles from './Notification.module.scss'
 
 const notificationType = (type: 'success' | 'warning' | 'alert') => {
@@ -99,6 +101,15 @@ export const NoticeContent = () => {
 
   const onGlobalDialogDismiss = useCallback(() => {
     dismissGlobalDialog()(dispatch)
+  }, [dispatch])
+
+  const onOk = useCallback(() => {
+    migrateData().then(res => {
+      if (isSuccessResponse(res)) {
+        dismissGlobalDialog()(dispatch)
+        syncRebuildNotification.save()
+      }
+    })
   }, [dispatch])
 
   return (
@@ -186,7 +197,7 @@ export const NoticeContent = () => {
           )
         })}
       </Panel>
-      <GlobalDialog type={globalDialog} onDismiss={onGlobalDialogDismiss} />
+      <GlobalDialog type={globalDialog} onDismiss={onGlobalDialogDismiss} onOk={onOk} />
       <AlertDialog content={alertDialog} dispatch={dispatch} />
     </div>
   )

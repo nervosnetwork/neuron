@@ -21,10 +21,8 @@ export const getCkbNodeDataPath = remoteApi<void, string>('get-ckb-node-data-pat
 export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean }, string>(
   'set-ckb-node-data-path'
 )
-export const getIndexerDataPath = remoteApi<void, string>('get-indexer-data-path')
-export const setIndexerDataPath = remoteApi<{ dataPath: string }, string>('set-indexer-data-path')
-export const stopProcessMonitor = remoteApi<'ckb' | 'ckb-indexer'>('stop-process-monitor')
-export const startProcessMonitor = remoteApi<'ckb' | 'ckb-indexer'>('start-process-monitor')
+export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
+export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
 
 export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
 

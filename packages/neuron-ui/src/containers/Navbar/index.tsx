@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -22,6 +22,7 @@ import {
   isMainnet,
 } from 'utils'
 
+import { Migrate } from 'services/subjects'
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`]
@@ -83,6 +84,16 @@ const Navbar = () => {
     },
     [networks, networkID, validTarget]
   )
+
+  const [isMigrate, setIsMigrate] = useState(false)
+  useEffect(() => {
+    const migrateSubscription = Migrate.subscribe(migrateStatus => {
+      setIsMigrate(migrateStatus === 'migrating')
+    })
+    return () => {
+      migrateSubscription.unsubscribe()
+    }
+  }, [])
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
@@ -163,6 +174,7 @@ const Navbar = () => {
           syncBlockNumbers={syncBlockNumbers}
           network={network}
           onAction={() => throttledShowSettings({ tab: 'networks' })}
+          isMigrate={isMigrate}
         />
       </div>
       <div className={styles.sync}>

@@ -196,6 +196,14 @@ export default {
         'fail-message':
           '未能打开邮件客户端, 请复制邮件地址, 并通过 "菜单" -> "帮助" -> "导出调试信息" 获得 Neuron 的调试信息附在邮件中发送给我们',
         'copy-mail-addr': '复制邮件地址'
+      },
+      'migrate-failed': {
+        title: '数据迁移失败',
+        message: '数据迁移失败, 点击确认删除数据并重新同步, 点击取消稍后重启后再次尝试。失败原因: {{ reason }}',
+        buttons: {
+          ok: '确认',
+          cancel: '取消'
+        }
       }
     },
     prompt: {

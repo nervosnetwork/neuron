@@ -18,12 +18,16 @@ export const isSuccessResponse = (res: Pick<ControllerResponse, 'status'>): res 
   return res.status === ResponseCode.SUCCESS
 }
 
-export const isReadyByVersion = (targetVersion: number, lastVersion: number | null) => {
+export const isReadyByVersion = (targetVersion: string, lastVersion: string | null) => {
   if (lastVersion === null) {
-    return true
+    return false
   }
-  if (lastVersion < targetVersion) {
-    return true
+  const targetVersions = targetVersion.split('.')
+  const lastVersions = lastVersion.split('.')
+  for (let i = 0; i < targetVersions.length; i++) {
+    if (!lastVersions[i] || +targetVersions[i] > +lastVersions[i]) {
+      return true
+    }
   }
   return false
 }

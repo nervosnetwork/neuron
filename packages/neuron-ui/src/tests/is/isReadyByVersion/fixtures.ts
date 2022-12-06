@@ -2,28 +2,35 @@ const fixtures = {
   'Should return true when last version is null': {
     params: {
       lastVersion: null,
-      targetVersion: 0.32,
+      targetVersion: '0.32',
     },
-    expected: true,
+    expected: false,
   },
   'Should return false when last version > target version': {
     params: {
-      lastVersion: 0.32,
-      targetVersion: 0.31,
+      lastVersion: '0.32',
+      targetVersion: '0.31',
     },
     expected: false,
   },
   'Should return false when last version = target version': {
     params: {
-      lastVersion: 0.32,
-      targetVersion: 0.32,
+      lastVersion: '0.32',
+      targetVersion: '0.32',
     },
     expected: false,
   },
   'Should return true when last version < target version': {
     params: {
-      lastVersion: 0.32,
-      targetVersion: 0.33,
+      lastVersion: '0.32',
+      targetVersion: '0.33',
+    },
+    expected: true,
+  },
+  'Should return true when last version < target version with different version length': {
+    params: {
+      lastVersion: '0.32',
+      targetVersion: '0.105',
     },
     expected: true,
   },
