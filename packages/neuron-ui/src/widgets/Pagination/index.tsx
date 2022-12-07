@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPageNoList } from 'utils'
-import { ReactComponent as ArrowToEndIcon } from 'widgets/Icons/ArrowToEnd.svg'
-import { ReactComponent as ArrowToNextIcon } from 'widgets/Icons/ArrowToNext.svg'
+import { ReactComponent as ArrowEnd } from 'widgets/Icons/ArrowEnd.svg'
+import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
+import { ReactComponent as DisabledArrowEnd } from 'widgets/Icons/DisabledArrowEnd.svg'
+import { ReactComponent as DisabledArrowNext } from 'widgets/Icons/DisabledArrowNext.svg'
 
 import styles from './pagination.module.scss'
 
@@ -42,32 +44,38 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
   const end = Math.min(count, pageNo * pageSize)
   const range = t(`${I18N_PATH}.range`, { start, end, count })
 
+  const disableToPrev = pageNo === 1 || pageCount === 0
+  const disableToEnd = pageNo === pageCount || pageCount === 0
+
   return (
     <div role="presentation" className={styles.container} onClick={handlePageNoClick}>
       <div className={styles.range}>{range}</div>
       <div className={styles.navigator} role="navigation" arial-label="pagination">
-        <span
-          role="button"
-          data-page-no={1}
-          tabIndex={pageNo === 1 ? -1 : 0}
-          className={styles.toPrev}
-          data-disabled={pageNo === 1}
-          title={t(`${I18N_PATH}.first-page`)}
-        >
-          <ArrowToEndIcon />
-        </span>
-        <span
-          role="button"
-          data-page-no={pageNo - 1}
-          tabIndex={pageNo === 1 ? -1 : 0}
-          className={styles.toPrev}
-          data-disabled={pageNo === 1}
-          title={t(`${I18N_PATH}.previous-page`)}
-        >
-          <ArrowToNextIcon />
-        </span>
+        <div className={styles.arrowBlock}>
+          <div
+            role="button"
+            data-page-no={1}
+            tabIndex={pageNo === 1 ? -1 : 0}
+            className={styles.toPrev}
+            data-disabled={pageNo === 1}
+            title={t(`${I18N_PATH}.first-page`)}
+          >
+            {disableToPrev ? <DisabledArrowEnd /> : <ArrowEnd />}
+          </div>
+          <div
+            role="button"
+            data-page-no={pageNo - 1}
+            tabIndex={pageNo === 1 ? -1 : 0}
+            className={styles.toPrev}
+            data-disabled={pageNo === 1}
+            title={t(`${I18N_PATH}.previous-page`)}
+          >
+            {disableToPrev ? <DisabledArrowNext /> : <ArrowNext />}
+          </div>
+        </div>
+
         {pageNoList.map(no => (
-          <span
+          <div
             role="button"
             tabIndex={pageNo === no ? -1 : 0}
             key={no}
@@ -77,28 +85,31 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.page-no`, { pageNo: no })}
           >
             {no}
-          </span>
+          </div>
         ))}
-        <span
-          role="button"
-          tabIndex={pageNo === pageCount ? -1 : 0}
-          data-page-no={pageNo + 1}
-          className={styles.toNext}
-          data-disabled={pageNo === pageCount}
-          title={t(`${I18N_PATH}.next-page`)}
-        >
-          <ArrowToNextIcon />
-        </span>
-        <span
-          role="button"
-          tabIndex={pageNo === pageCount ? -1 : 0}
-          data-page-no={pageCount}
-          className={styles.toNext}
-          data-disabled={pageNo === pageCount}
-          title={t(`${I18N_PATH}.last-page`)}
-        >
-          <ArrowToEndIcon />
-        </span>
+
+        <div className={styles.arrowBlock}>
+          <div
+            role="button"
+            tabIndex={pageNo === pageCount ? -1 : 0}
+            data-page-no={pageNo + 1}
+            className={styles.toNext}
+            data-disabled={pageNo === pageCount}
+            title={t(`${I18N_PATH}.next-page`)}
+          >
+            {disableToEnd ? <DisabledArrowNext /> : <ArrowNext />}
+          </div>
+          <div
+            role="button"
+            tabIndex={pageNo === pageCount ? -1 : 0}
+            data-page-no={pageCount}
+            className={styles.toNext}
+            data-disabled={pageNo === pageCount}
+            title={t(`${I18N_PATH}.last-page`)}
+          >
+            {disableToEnd ? <DisabledArrowEnd /> : <ArrowEnd />}
+          </div>
+        </div>
       </div>
     </div>
   )

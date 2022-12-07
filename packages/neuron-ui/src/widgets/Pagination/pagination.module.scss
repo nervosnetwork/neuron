@@ -1,7 +1,7 @@
-$primary-color: #1b73b3;
-$secondary-color: #717171;
+$primary-color: #666;
+$secondary-color: #666;
 $shadow-color: rgba(0, 0, 0, 0.05);
-$disable-color: $secondary-color;
+$disable-color: #ccc;
 
 .container {
   font-size: 0.875rem;
@@ -10,7 +10,7 @@ $disable-color: $secondary-color;
 }
 
 .range {
-  color: $secondary-color;
+  color: $primary-color;
   flex: 1;
   height: 0.875rem;
   line-height: 1em;
@@ -20,7 +20,8 @@ $disable-color: $secondary-color;
   color: $primary-color;
   display: grid;
   grid-auto-flow: column;
-  gap: 0 10px;
+  gap: 0 8px;
+
   & > span {
     border-radius: 2px;
     box-sizing: border-box;
@@ -32,13 +33,28 @@ $disable-color: $secondary-color;
     }
   }
 }
+.arrowBlock {
+  display: inline-grid;
+  width: 48px;
+  height: 24px;
+  background: rgb(255, 255, 255);
+  grid-template-columns: 12px 12px;
+  grid-column-gap: 8px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
 
 .pageNo {
-  text-decoration: underline;
+  background: #fff;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
   text-align: center;
-  padding: 0 2px;
+  border-radius: 4px;
+
   &[data-active='true'] {
-    color: #000;
+    color: #00c891;
     text-decoration: none;
     font-weight: 900;
     pointer-events: none;
@@ -47,25 +63,28 @@ $disable-color: $secondary-color;
 
 .toPrev,
 .toNext {
-  height: 14px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
   svg {
     pointer-events: none;
   }
   &[data-disabled='true'] {
     pointer-events: none;
-    g {
-      fill: $disable-color;
-    }
+    // svg > path {
+    //   fill: $disable-color;
+    // }
   }
 }
 .toPrev {
   svg {
-    transform: rotate(90deg);
+    transform: rotate(-180deg);
   }
 }
 .toNext {
   svg {
-    transform: rotate(-90deg);
+    transform: rotate(0);
   }
 }
