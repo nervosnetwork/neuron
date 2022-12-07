@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getCkbNodeDataPath,
@@ -48,7 +48,7 @@ export const useDataPath = () => {
     })
   }, [closeDialog, type])
   const onConfirm = useCallback(
-    e => {
+    (e: React.MouseEvent<HTMLDivElement>) => {
       const { dataset } = e.currentTarget
       setIsSaveing(true)
       setSavingType(dataset.syncType)

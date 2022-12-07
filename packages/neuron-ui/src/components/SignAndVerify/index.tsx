@@ -50,7 +50,7 @@ const PasswordDialog = ({ dialogRef, onCancel, onSubmit }: PasswordDialogProps) 
   }, [dialogRef.current && dialogRef.current.open, setPassword, setError])
 
   const handleInputChange = useCallback(
-    e => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setPassword(e.target.value)
     },
     [setPassword]
@@ -203,7 +203,7 @@ const SignAndVerify = () => {
   })
 
   const handleInputChange = useCallback(
-    e => {
+    (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
       const {
         dataset: { field },
         value,
@@ -230,7 +230,7 @@ const SignAndVerify = () => {
   )
 
   const handleAddrSelected = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { addr },
       } = e.target

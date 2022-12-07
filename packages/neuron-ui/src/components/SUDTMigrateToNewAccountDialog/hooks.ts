@@ -1,5 +1,5 @@
 import { TFunction } from 'i18next'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSUDTAccountInfoErrors } from 'utils'
 
 export type TokenInfoType = Omit<Controller.GetTokenInfoList.TokenInfo, 'tokenID'> & {
@@ -37,7 +37,7 @@ export const useTokenInfo = ({
     }
   }, [findTokenInfo])
   const onChangeTokenInfo = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { field },
         value,

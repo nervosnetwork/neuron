@@ -14,7 +14,7 @@ export interface BreadcumProps {
 const Breadcrum = ({ pages = [] }: BreadcumProps) => {
   const history = useHistory()
   const onClick = useCallback(
-    e => {
+    (e: React.MouseEvent) => {
       const {
         dataset: { link },
       } = e.target as HTMLSpanElement

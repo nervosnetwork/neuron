@@ -29,7 +29,7 @@ const SUDTMigrateToExistAccountDialog = ({
   const [address, setAddress] = useState('')
   const [addressError, setAddressError] = useState('')
   const onAddressChange = useCallback(
-    value => {
+    (value: string) => {
       try {
         validateSpecificAddress(value, isMainnet, AnyoneCanPayLockInfoOnAggron.TagName)
         setAddressError('')

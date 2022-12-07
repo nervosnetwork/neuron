@@ -35,7 +35,7 @@ const ClearCache = ({ dispatch }: { dispatch: StateDispatch }) => {
   }, [setIsDialogOpen])
 
   const toggleIsRebuild = useCallback(
-    e => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       setIsRebuild(e.target.checked)
     },
     [setIsRebuild]

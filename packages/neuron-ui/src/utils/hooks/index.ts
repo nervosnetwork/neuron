@@ -464,7 +464,7 @@ export const useForceUpdate = <T extends Function>(cb: T) => {
   const [, update] = useState<{}>(Object.create(null))
 
   const memoizedDispatch = useCallback(
-    (...args) => {
+    (...args: any) => {
       cb(...args)
       update(Object.create(null))
     },

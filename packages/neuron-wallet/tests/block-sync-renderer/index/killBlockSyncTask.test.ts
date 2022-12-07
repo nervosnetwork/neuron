@@ -1,11 +1,12 @@
-
 describe(`Kill block sync task`, () => {
   const stubbedQueryIndexer = jest.fn()
   const stubbedLoggerInfo = jest.fn()
   const stubbedLoggerDebug = jest.fn()
   const stubbedLoggerError = jest.fn()
   const stubbedChildProcessOn = jest.fn()
-  const stubbedChildProcessSend = jest.fn().mockImplementation(() => { throw new Error() })
+  const stubbedChildProcessSend = jest.fn().mockImplementation(() => {
+    throw new Error()
+  })
   const stubbedChildProcessOnce = jest.fn()
   const stubbedGetCurrentNetwork = jest.fn().mockReturnValue({ id: 'id', genesisHash: '0x' })
   const stubbedSyncTaskCtor = jest.fn().mockImplementation(() => ({ queryIndexer: stubbedQueryIndexer }))
@@ -36,7 +37,6 @@ describe(`Kill block sync task`, () => {
   jest.doMock('utils/logger', () => ({ info: stubbedLoggerInfo, debug: stubbedLoggerDebug, error: stubbedLoggerError }))
   jest.doMock('models/subjects/data-update', () => ({ next: jest.fn() }))
 
-
   const blockSyncRenderer = require('block-sync-renderer')
   const spyRegisterRequest = jest.spyOn(blockSyncRenderer, 'registerRequest').mockResolvedValue(0)
 
@@ -52,7 +52,6 @@ describe(`Kill block sync task`, () => {
     it(`should do nothing`, () => {
       expect(stubbedLoggerInfo).not.toHaveBeenCalled()
     })
-
   })
 
   describe(`Kill block sync task with previous task`, () => {
@@ -70,7 +69,7 @@ describe(`Kill block sync task`, () => {
     })
 
     it(`should drain pending requests`, () => {
-      expect(stubbedLoggerInfo).toHaveBeenCalledWith("Sync:\tdrain requests")
+      expect(stubbedLoggerInfo).toHaveBeenCalledWith('Sync:\tdrain requests')
     })
 
     it(`should wait for child to close`, () => {
@@ -78,9 +77,10 @@ describe(`Kill block sync task`, () => {
     })
 
     it(`should send message to child process with unmount signal`, () => {
-      expect(stubbedChildProcessSend).toHaveBeenCalledWith({ type: 'call', id: 0, channel: 'unmount', message: null }, expect.any(Function))
+      expect(stubbedChildProcessSend).toHaveBeenCalledWith(
+        { type: 'call', id: 0, channel: 'unmount', message: null },
+        expect.any(Function)
+      )
     })
-
   })
-
 })

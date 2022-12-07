@@ -46,7 +46,7 @@
   "devDependencies": {
     "@babel/core": "7.19.3",
     "@types/jest": "27.5.2",
-    "@types/node": "16.11.7",
+    "@types/node": "18.11.9",
     "@types/npmlog": "4.1.4",
     "@typescript-eslint/eslint-plugin": "5.40.1",
     "@typescript-eslint/parser": "5.40.1",
@@ -61,6 +61,7 @@
   },
   "dependencies": {},
   "resolutions": {
-    "@types/react": "16.14.32"
+    "@types/react": "17.0.39",
+    "react-i18next": ">=11.16.4"
   }
 }

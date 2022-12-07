@@ -34,7 +34,7 @@ const Select = ({ value, options, placeholder, disabled, onChange }: SelectProps
   })
 
   const onDocumentClick = useCallback(
-    e => {
+    (e: any) => {
       if (mounted.current && !root.current!.contains(e.target) && isOpen) {
         setOpen(false)
       }
@@ -43,7 +43,7 @@ const Select = ({ value, options, placeholder, disabled, onChange }: SelectProps
   )
 
   const onMouseDown = useCallback(
-    e => {
+    (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
       e.stopPropagation()
       e.preventDefault()
       if (!disabled) {
