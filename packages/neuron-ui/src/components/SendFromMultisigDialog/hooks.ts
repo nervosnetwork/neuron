@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo, useEffect } from 'react'
+import React, { useCallback, useState, useMemo, useEffect } from 'react'
 import {
   useOutputErrors,
   outputsToTotalAmount,
@@ -101,7 +101,7 @@ export const useSendInfo = ({
     setSendInfoList(v => [...v, { address: undefined, amount: undefined, unit: CapacityUnit.CKB, disabled: false }])
   }, [setSendInfoList])
   const deleteSendInfo = useCallback(
-    e => {
+    (e: React.SyntheticEvent<HTMLButtonElement, Event>) => {
       const {
         dataset: { idx = '-1' },
       } = e.currentTarget
@@ -110,7 +110,7 @@ export const useSendInfo = ({
     [setSendInfoList]
   )
   const onSendInfoChange = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { idx = '-1', field },
         value,
@@ -172,7 +172,7 @@ export const useSendInfo = ({
   }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet, outputErrors])
   const [isSendMax, setIsSendMax] = useState(false)
   const onSendMaxClick = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { isOn = 'false' },
       } = e.currentTarget
@@ -218,6 +218,7 @@ export const useSendInfo = ({
     }
     return false
   }, [sendInfoList, isMainnet])
+
   return {
     sendInfoList,
     addSendInfo,

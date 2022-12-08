@@ -42,7 +42,7 @@ const NameWallet = ({
     [walletName, extendedPublicKey]
   )
 
-  const onInput = useCallback(e => {
+  const onInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setWalletName(e.target.value)
     setErrorMsg('')
   }, [])
