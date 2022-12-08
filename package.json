@@ -62,6 +62,7 @@
   "dependencies": {},
   "resolutions": {
     "@types/react": "17.0.39",
-    "react-i18next": ">=11.16.4"
+    "react-i18next": ">=11.16.4",
+    "usb": "1.8.8"
   }
 }
