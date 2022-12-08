@@ -40,8 +40,6 @@ win:
   extraFiles:
     - from: "bin/win/ckb.exe"
       to: "bin/ckb.exe"
-    - from: "bin/win/ckb-indexer.exe"
-      to: "bin/ckb-indexer.exe"
   target:
     - target: nsis
       arch:
@@ -54,8 +52,6 @@ mac:
   extraFiles:
     - from: "bin/mac/ckb"
       to: "bin/ckb"
-    - from: "bin/mac/ckb-indexer"
-      to: "bin/ckb-indexer"
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
@@ -74,7 +70,5 @@ linux:
   extraFiles:
     - from: "bin/linux/ckb"
       to: "bin/ckb"
-    - from: "bin/linux/ckb-indexer"
-      to: "bin/ckb-indexer"
   target:
     - AppImage
