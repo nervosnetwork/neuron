@@ -130,6 +130,7 @@ export default class AppController {
         path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')
       ),
       webPreferences: {
+        nodeIntegration: true,
         devTools: env.isDevMode,
         contextIsolation: false,
         preload: path.join(__dirname, './preload.js')
