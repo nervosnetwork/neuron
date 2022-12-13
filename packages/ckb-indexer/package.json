@@ -26,7 +26,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf lib",
+    "clean": "npx rimraf lib",
     "prepublishOnly": "yarn run clean && yarn run build",
     "release": "npm publish"
   },

@@ -22,7 +22,7 @@
     "watch": "ttsc -w",
     "start:dev": "yarn run build && electron .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
-    "clean": "rimraf dist/*",
+    "clean": "npx rimraf dist/*",
     "test": "jest --runInBand --collect-coverage --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint --fix --ext .ts,.js src",
@@ -93,7 +93,6 @@
     "lint-staged": "9.5.0",
     "neuron-ui": "0.103.2",
     "prettier": "1.19.1",
-    "rimraf": "3.0.2",
     "ttypescript": "1.5.13",
     "typescript": "4.2.3"
   }
