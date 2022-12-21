@@ -9,7 +9,7 @@ jobs:
         node:
           - 16.10.0
         os:
-          - macos-latest
+          - macos-11
           - ubuntu-20.04
           - windows-2019
 
@@ -62,7 +62,7 @@ jobs:
           CI: false
 
       - name: Package for MacOS
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-11'
         run: |
           ./scripts/download-ckb.sh mac
           yarn package:test mac
@@ -94,14 +94,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Neuron App Zip
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-11'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Mac
           path: release/Neuron-*-mac.zip
 
       - name: Upload Neuron Dmg
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-11'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Dmg
