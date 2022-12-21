@@ -38,7 +38,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: 2022-05-07-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+          key: 2022-12-21-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
       - name: Add msbuild to PATH
         if: matrix.os == 'windows-2019'
