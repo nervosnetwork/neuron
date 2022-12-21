@@ -14,7 +14,7 @@ jobs:
         node:
           - 18.12.0
         os:
-          - macos-latest
+          - macos-11
           - ubuntu-20.04
           - windows-2019
 
@@ -43,7 +43,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: 2022-05-07-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+          key: 2022-12-21-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
       - name: Add msbuild to PATH
         if: matrix.os == 'windows-2019'
@@ -67,7 +67,7 @@ jobs:
           CI: false
 
       - name: Package for MacOS
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-11'
         run: |
           ./scripts/download-ckb.sh mac
           yarn release mac
@@ -99,7 +99,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Neuron App Zip
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-11'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Mac
@@ -113,7 +113,7 @@ jobs:
           path: release/Neuron-*-mac-arm64.zip
 
       - name: Upload Neuron Dmg
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-11'
         uses: actions/upload-artifact@v2
         with:
           name: Neuron-Dmg
