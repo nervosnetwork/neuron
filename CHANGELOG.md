@@ -1,3 +1,18 @@
+# 0.103.3 (2022-12-21)
+
+### Certificate
+
+We've updated the certificate of Neuron for windows, which is issued by **DigiCert** and distributed to [Magickbase](https://github.com/Magickbase/), the active developer team of Neuron. With this update, a warning may appear on updating Neuron by `check for update` inside Neuron, please don't worry and download Neuron from [GitHub Release](https://github.com/nervosnetwork/neuron/releases) to adopt the new certificate.
+
+### Bug Fixes
+
+* #2551: Fix sending multisig tx when input cell's length is greater than 1.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.103.2...v0.103.3
+
+
+
 # 0.103.2 (2022-07-09)
 
 ### New features
