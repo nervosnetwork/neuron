@@ -38,7 +38,6 @@
   "dependencies": {
     "@ckb-lumos/base": "0.18.0-rc2",
     "@ckb-lumos/rpc": "0.18.0-rc2",
-    "@electron/notarize": "1.2.3",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.6",
     "@nervina-labs/ckb-indexer": "0.1.1",
@@ -67,6 +66,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
+    "@electron/notarize": "1.2.3",
     "@nervosnetwork/ckb-types": "0.103.1",
     "@types/archiver": "3.1.1",
     "@types/async": "3.2.16",
