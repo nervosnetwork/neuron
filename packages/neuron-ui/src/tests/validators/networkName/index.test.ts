@@ -1,3 +1,4 @@
+import { isErrorWithI18n } from 'exceptions'
 import { validateNetworkName } from 'utils/validators'
 import fixtures from './fixtures'
 
@@ -7,14 +8,16 @@ const fixtureTable: Fixture.Validator<typeof validateNetworkName>[] = Object.ent
 
 describe(`Test network name validator`, () => {
   test.each(fixtureTable)(`%s`, (_title, [name, usedNames], exception) => {
-    expect.assertions(1)
     if (exception) {
+      expect.assertions(2)
       try {
         validateNetworkName(name, usedNames)
       } catch (err) {
-        expect(err.code).toBe(exception)
+        expect(isErrorWithI18n(err)).toBeTruthy()
+        expect((err as { code: number }).code).toBe(exception)
       }
     } else {
+      expect.assertions(1)
       expect(validateNetworkName(name, usedNames)).toBeTruthy()
     }
   })

@@ -21,6 +21,7 @@ import {
   generateDaoClaimTx,
 } from 'services/remote'
 import { ckbCore, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
+import { isErrorWithI18n } from 'exceptions'
 
 const {
   MIN_AMOUNT,
@@ -153,9 +154,11 @@ export const useUpdateDepositValue = ({
         try {
           validateAmount(amount)
         } catch (err) {
-          setErrorMessage(
-            t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: amount, length: MAX_DECIMAL_DIGITS })
-          )
+          if (isErrorWithI18n(err)) {
+            setErrorMessage(
+              t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: amount, length: MAX_DECIMAL_DIGITS })
+            )
+          }
           return
         }
 

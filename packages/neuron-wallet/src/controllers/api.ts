@@ -13,6 +13,8 @@ import {
   BrowserWindow
 } from 'electron'
 import { t } from 'i18next'
+import path from 'path'
+import fs from 'fs'
 import env from 'env'
 import { showWindow } from './app/show-window'
 import CommonUtils from 'utils/common'
@@ -22,7 +24,7 @@ import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SettingsService, { Locale } from 'services/settings'
 import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
-
+import { clean as cleanChain } from 'database/chain'
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
 import DaoController from 'controllers/dao'
@@ -54,6 +56,7 @@ import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
 import startMonitor, { stopMonitor } from 'services/monitor'
+import { migrateCkbData } from 'services/ckb-runner'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -462,29 +465,25 @@ export default class ApiController {
       }
     })
 
-    handle('set-ckb-node-data-path', (_, dataPath: string) => {
+    handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
+      if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
+        const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+          type: 'info',
+          message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
+          buttons: [t('common.ok'), t('common.cancel')]
+        })
+        if (response === 1) {
+          return {
+            status: ResponseCode.Fail,
+          }
+        }
+      }
+      await cleanChain()
       SettingsService.getInstance().ckbDataPath = dataPath
-      stopMonitor('ckb-indexer')
-      startMonitor(undefined, true)
+      await startMonitor('ckb', true)
       return {
         status: ResponseCode.Success,
         result: SettingsService.getInstance().ckbDataPath
-      }
-    })
-
-    handle('get-indexer-data-path', () => {
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().indexerDataPath
-      }
-    })
-
-    handle('set-indexer-data-path', (_, dataPath: string) => {
-      SettingsService.getInstance().indexerDataPath = dataPath
-      startMonitor('ckb-indexer', true)
-      return {
-        status: ResponseCode.Success,
-        result: SettingsService.getInstance().indexerDataPath
       }
     })
 
@@ -496,7 +495,7 @@ export default class ApiController {
     })
 
     handle('stop-process-monitor', async (_, monitorName: string) => {
-      await stopMonitor(monitorName)
+      await Promise.race([stopMonitor(monitorName), CommonUtils.sleep(1000)])
       return {
         status: ResponseCode.Success,
       }
@@ -678,6 +677,14 @@ export default class ApiController {
 
     handle('load-multisig-tx-json', async (_, fullPayload) => {
       return this.#multisigController.loadMultisigTxJson(fullPayload)
+    })
+
+    //migrate
+    handle('start-migrate', async () => {
+      migrateCkbData()
+      return {
+        status: ResponseCode.Success,
+      }
     })
   }
 

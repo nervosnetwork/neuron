@@ -50,6 +50,8 @@ export default {
         'nervos-website': 'Nervos 网站',
         'source-code': '源代码',
         'report-issue': '报告问题',
+        'contact-us': '联系我们',
+        'contact-us-message': '> 请通过 "菜单" -> "帮助" -> "导出调试信息" 获得 Neuron 的调试信息并附在邮件中.',
         documentation: '使用文档',
         settings: '设置',
         'export-debug-info': '导出调试信息'
@@ -122,7 +124,8 @@ export default {
       'multisig-not-signed': '多签交易缺少部分签名',
       'sudt-acp-have-data': '待销毁的 sUDT 账户资产不为 0',
       'no-match-address-for-sign': '没有找到匹配的地址',
-      'target-lock-error': 'CKB 资产只能转账到 secp256k1 或者 acp 地址'
+      'target-lock-error': 'CKB 资产只能转账到 secp256k1 或者 acp 地址',
+      'no-exist-ckb-node-data': '{{path}} 目录下没有找到 CKB Node 配置和数据, 点击继续重新同步'
     },
     messageBox: {
       button: {
@@ -186,6 +189,21 @@ export default {
       },
       'hard-fork-migrate': {
         message: '为适配最新版本的 CKB 节点，Neuron 将会重新同步链上数据，整个同步可能时间较长'
+      },
+      'mail-us': {
+        message: '请将问题及调试信息通过邮件发给我们, 调试信息可以通过 "菜单" -> "帮助" -> "导出调试信息" 获得',
+        'open-client': '打开邮件客户端',
+        'fail-message':
+          '未能打开邮件客户端, 请复制邮件地址, 并通过 "菜单" -> "帮助" -> "导出调试信息" 获得 Neuron 的调试信息附在邮件中发送给我们',
+        'copy-mail-addr': '复制邮件地址'
+      },
+      'migrate-failed': {
+        title: '数据迁移失败',
+        message: '数据迁移失败, 点击确认删除数据并重新同步, 点击取消稍后重启后再次尝试。失败原因: {{ reason }}',
+        buttons: {
+          ok: '确认',
+          cancel: '取消'
+        }
       }
     },
     prompt: {

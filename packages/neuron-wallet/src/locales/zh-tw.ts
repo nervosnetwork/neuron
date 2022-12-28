@@ -50,6 +50,8 @@ export default {
         'nervos-website': 'Nervos 官方網站',
         'source-code': '原始程式碼',
         'report-issue': '回報問題',
+        'contact-us': '聯繫我們',
+        'contact-us-message': '> 請通過 "菜單" -> "幫助" -> "導出調試信息" 獲得 Neuron 的調試信息並附在郵件中.',
         documentation: '使用說明',
         settings: '設定',
         'export-debug-info': '導出除錯信息'
@@ -121,7 +123,8 @@ export default {
       'multisig-not-signed': '多簽交易缺少部分簽名',
       'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0',
       'no-match-address-for-sign': '没有找到匹配的地址',
-      'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址'
+      'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址',
+      'no-exist-ckb-node-data': '{{path}} 目錄下沒有找到 CKB Node 配置和數據, 點擊繼續重新同步'
     },
     messageBox: {
       button: {
@@ -185,6 +188,21 @@ export default {
       },
       'hard-fork-migrate': {
         message: '為適配最新版本的 CKB 節點，Neuron 將會重新同步鏈上數據，整個同步可能時間較長'
+      },
+      'mail-us': {
+        message: '請將問題及調試信息通過郵件發給我們, 調試信息可以通過 "菜單" -> "幫助" -> "導出調試信息" 獲得',
+        'open-client': '打開郵件客戶端',
+        'fail-message':
+          '未能打開郵件客戶端, 請複製郵件地址, 並通過 "菜單" -> "幫助" -> "導出調試信息" 獲得 Neuron 的調試信息附在郵件中發送給我們',
+        'copy-mail-addr': '複製郵件地址'
+      },
+      'migrate-failed': {
+        title: '數據遷移失敗',
+        message: '數據遷移失敗, 點擊確認刪除數據並重新同步, 點擊取消稍後重啟後再次嘗試。失敗原因: {{ reason }}',
+        buttons: {
+          ok: '確認',
+          cancel: '取消'
+        }
       }
     },
     prompt: {

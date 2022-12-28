@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
+import { app, shell, clipboard, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
 import { t } from 'i18next'
 import { Subject } from 'rxjs'
 import { throttleTime } from 'rxjs/operators'
@@ -16,7 +16,6 @@ import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
 import NetworksService from 'services/networks'
 import { clearCkbNodeCache } from 'services/ckb-runner'
-import IndexerService from 'services/indexer'
 
 enum URL {
   Settings = '/settings/general',
@@ -31,7 +30,8 @@ enum ExternalURL {
   Website = 'https://www.nervos.org/',
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
-  Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet'
+  Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet',
+  MailUs = 'neuron@magickbase.com'
 }
 
 const separator: MenuItemConstructorOptions = {
@@ -339,7 +339,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           })
           if (res.response === 0) {
             await clearCkbNodeCache()
-            await IndexerService.clearCache(true)
           }
         }
       },
@@ -398,6 +397,53 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.help.report-issue'),
       click: () => {
         shell.openExternal(ExternalURL.Issues)
+      }
+    },
+    {
+      label: t('application-menu.help.contact-us'),
+      click: async () => {
+        const { response: methodId } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+          type: 'info',
+          message: t(`messageBox.mail-us.message`),
+          buttons: [
+            t(`messageBox.button.discard`),
+            t(`messageBox.mail-us.copy-mail-addr`),
+            t(`messageBox.mail-us.open-client`)
+          ],
+          defaultId: 1,
+          cancelId: 0
+        })
+
+        switch (methodId) {
+          case 1: {
+            clipboard.writeText(ExternalURL.MailUs)
+            return
+          }
+          case 2: {
+            try {
+              await shell.openExternal(
+                `mailto:${ExternalURL.MailUs}?body=${encodeURIComponent(
+                  t('application-menu.help.contact-us-message') as string
+                )}`
+              )
+            } catch {
+              const { response: subMethodId } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
+                type: 'info',
+                message: t(`messageBox.mail-us.fail-message`),
+                buttons: [t(`messageBox.button.discard`), t(`messageBox.mail-us.copy-mail-addr`)],
+                defaultId: 1,
+                cancelId: 0
+              })
+              if (subMethodId === 1) {
+                clipboard.writeText(ExternalURL.MailUs)
+              }
+            }
+            return
+          }
+          default: {
+            return
+          }
+        }
       }
     },
     {

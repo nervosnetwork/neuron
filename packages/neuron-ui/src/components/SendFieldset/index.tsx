@@ -17,13 +17,14 @@ import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention
 
 import { formatDate } from 'widgets/DatetimePicker'
 import { localNumberFormatter, PlaceHolders, isSecp256k1Address } from 'utils'
+import { ErrorWithI18n } from 'exceptions'
 
 import styles from './sendFieldset.module.scss'
 
 interface SendSubformProps {
   idx: number
   item: Readonly<{ disabled?: boolean; date?: string | undefined } & Record<'address' | 'amount', string | undefined>>
-  errors: Partial<Record<'addrError' | 'amountError', Error & { i18n: Record<string, string> }>>
+  errors: Partial<Record<'addrError' | 'amountError', ErrorWithI18n>>
   isSendMax: boolean
   isMaxBtnDisabled: boolean
   isMaxBtnShow: boolean

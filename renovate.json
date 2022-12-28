@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "labels": ["dependencies", "renovate"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@types/"],
+      "addLabels": ["types"]
+    }
+  ],
+  "reviewers": ["keith-cy", "yanguoyu", "cedar67", "jeffreyma597"]
+}

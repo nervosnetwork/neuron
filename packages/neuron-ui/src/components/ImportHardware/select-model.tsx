@@ -52,7 +52,7 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
     })
   }, [dispatch, model])
 
-  const onDropDownChange = useCallback(({ data }) => {
+  const onDropDownChange = useCallback(({ data }: SelectOptions) => {
     setModel(data)
   }, [])
   const options = useMemo(

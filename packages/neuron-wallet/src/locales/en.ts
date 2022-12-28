@@ -50,6 +50,9 @@ export default {
         'nervos-website': 'Nervos Website',
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
+        'contact-us': 'Contact Us',
+        'contact-us-message':
+          '> Please append debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
         documentation: 'Documentation',
         settings: 'Settings',
         'export-debug-info': 'Export Debug Information'
@@ -130,7 +133,8 @@ export default {
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
       'no-match-address-for-sign': 'Not found matched address',
-      'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address'
+      'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address',
+      'no-exist-ckb-node-data': '{{path}} has no CKB Node config and storage, press ok to synchronize from scratch'
     },
     messageBox: {
       button: {
@@ -195,6 +199,22 @@ export default {
       'hard-fork-migrate': {
         message:
           'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.'
+      },
+      'mail-us': {
+        message: 'Please mail us with debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
+        'open-client': 'Open Mail Client',
+        'fail-message':
+          'Unable to launch mail client, please copy the mail address, append debug information exported by "Menu" -> "Help" -> "Export Debug Information" and send us.',
+        'copy-mail-addr': 'Copy mail address'
+      },
+      'migrate-failed': {
+        title: 'Migrate failed',
+        message:
+          'Migrate failed, press ok to delete old data and synchronize from scratch, or click cancel to migrate later by relanuch Neuron. Migrate fail reason: {{ reason }}',
+        buttons: {
+          ok: 'OK',
+          cancel: 'Cancel'
+        }
       }
     },
     prompt: {

@@ -101,9 +101,11 @@ export const EditTextField = ({
     changeActive(true)
   }, [changeActive, value])
   const onBlur = useCallback(() => {
-    changeActive(false)
-    if (onChange && editedValue !== value) {
-      onChange(editedValue)
+    if (isActive) {
+      changeActive(false)
+      if (onChange && editedValue !== value) {
+        onChange(editedValue)
+      }
     }
   }, [onChange, changeActive, editedValue, value])
   const onChangeFocus = useCallback(

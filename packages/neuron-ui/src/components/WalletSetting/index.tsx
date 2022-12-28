@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChoiceGroup } from 'office-ui-fabric-react'
+import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 import { ReactComponent as EditWallet } from 'widgets/Icons/Edit.svg'
@@ -65,7 +65,7 @@ const WalletSetting = ({
   }, [])
 
   const onChange = useCallback(
-    (_e, option) => {
+    (_e?: React.FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
       if (option) {
         setCurrentWallet(option.key)(dispatch)
       }

@@ -26,7 +26,7 @@ export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey:
   }
 
   const onSearch = useCallback(
-    value => {
+    (value: string) => {
       onFilterConfig(value)
       clearSelected()
     },

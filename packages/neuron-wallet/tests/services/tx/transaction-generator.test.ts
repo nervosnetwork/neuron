@@ -615,7 +615,7 @@ describe('TransactionGenerator', () => {
 
       expect(inputCapacities - outputCapacities).toEqual(feeInt)
       expect(tx.fee).toEqual(fee)
-      targetOutputs.map((o, index) => {
+      targetOutputs.forEach((o, index) => {
         if (index !== targetOutputs.length - 1) {
           expect(o.capacity).toEqual(tx.outputs![index].capacity)
         }
@@ -642,7 +642,7 @@ describe('TransactionGenerator', () => {
       expect(expectedFee).toEqual(BigInt(762))
       expect(inputCapacities - outputCapacities).toEqual(expectedFee)
       expect(tx.fee).toEqual(expectedFee.toString())
-      targetOutputs.map((o, index) => {
+      targetOutputs.forEach((o, index) => {
         if (index !== targetOutputs.length - 1) {
           expect(o.capacity).toEqual(tx.outputs![index].capacity)
         }
@@ -768,7 +768,7 @@ describe('TransactionGenerator', () => {
       const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
       expect(inputCapacities - outputCapacities).toEqual(expectedFee)
       expect(tx.fee).toEqual(expectedFee.toString())
-      targetOutputs.map((o, index) => {
+      targetOutputs.forEach((o, index) => {
         if (index !== targetOutputs.length - 1) {
           expect(o.capacity).toEqual(tx.outputs![index].capacity)
         }

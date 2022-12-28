@@ -4,7 +4,6 @@ import SyncApiController from 'controllers/sync-api'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import WalletService from 'services/wallets'
-import IndexerService from 'services/indexer'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
@@ -37,7 +36,6 @@ export const killBlockSyncTask = async () => {
   ).finally(() => (requests = new Map()))
 
   await waitForChildClose(_child)
-  await IndexerService.getInstance().stop()
 }
 
 const waitForChildClose = (c: ChildProcess) =>
@@ -102,8 +100,6 @@ export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> 
 }
 
 export const createBlockSyncTask = async () => {
-  await IndexerService.getInstance().start()
-
   logger.info('Sync:\tstart')
 
   // prevents the sync task from being started repeatedly if fork does not finish executing.
@@ -174,7 +170,7 @@ export const createBlockSyncTask = async () => {
       genesisHash: network.genesisHash,
       url: network.remote,
       addressMetas,
-      indexerUrl: IndexerService.LISTEN_URI
+      indexerUrl: network.remote
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {

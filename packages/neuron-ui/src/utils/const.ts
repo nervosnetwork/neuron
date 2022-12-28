@@ -22,7 +22,6 @@ export const SHANNON_CKB_RATIO = 1e8
 
 export const MEDIUM_FEE_RATE = 2000
 export const WITHDRAW_EPOCHS = 180
-export const IMMATURE_EPOCHS = 4
 export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
 export const HOURS_PER_EPOCH = 4
 export const HOURS_PER_DAY = 24
@@ -32,8 +31,8 @@ export const INIT_SEND_PRICE = '1000'
 export const MIN_CKB_REQUIRED_BY_CKB_SUDT = 61
 export const MIN_CKB_REQUIRED_BY_NORMAL_SUDT = 142
 export const MAX_SUDT_ACCOUNT_NAME_LENGTH = 16
-export const MAX_SUDT_TOKEN_NAME_LENGTH = 16
-export const MAX_SYMBOL_LENGTH = 8
+export const MAX_SUDT_TOKEN_NAME_LENGTH = 200
+export const MAX_SYMBOL_LENGTH = 100
 export const MIN_DECIMAL = 0
 export const MAX_DECIMAL = 32
 
@@ -58,7 +57,7 @@ export const LONG_DATA_PREFIX = '0x02'
 export const LONG_TYPE_PREFIX = '0x04'
 
 // times
-export const SYNC_REBUILD_SINCE_VERSION = '0.32'
+export const SYNC_REBUILD_SINCE_VERSION = '0.105'
 
 export const DEPRECATED_CODE_HASH: Record<string, string> = {
   AcpOnLina: '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',

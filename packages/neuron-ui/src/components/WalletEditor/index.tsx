@@ -32,7 +32,7 @@ const WalletEditor = () => {
   const history = useHistory()
   const {
     params: { id },
-  } = useRouteMatch()
+  } = useRouteMatch<{ id: string }>()
 
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets]) || { id: '', name: '' }
   const usedNames = wallets.map(w => w.name).filter(w => w !== wallet.name)

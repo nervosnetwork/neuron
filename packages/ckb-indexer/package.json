@@ -15,17 +15,18 @@
     "test": "__tests__"
   },
   "dependencies": {
-    "@ckb-lumos/base": "0.18.0-rc2",
-    "@ckb-lumos/rpc": "0.18.0-rc2",
+    "@ckb-lumos/base": "0.18.0",
+    "@ckb-lumos/rpc": "0.18.0",
     "ckb-js-toolkit": "0.100.0-rc1",
     "cross-fetch": "3.1.5"
   },
   "devDependencies": {
-    "events": "3.3.0"
+    "events": "3.3.0",
+    "eslint": "8.30.0"
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf lib",
+    "clean": "npx rimraf lib",
     "prepublishOnly": "yarn run clean && yarn run build",
     "release": "npm publish"
   },

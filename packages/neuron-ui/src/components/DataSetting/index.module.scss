@@ -9,6 +9,7 @@
 
   .name {
     font-weight: bold;
+    display: flex;
   }
 
   .content {
@@ -62,5 +63,30 @@
 
   & > svg {
     flex-shrink: 0;
+  }
+}
+
+.infoIconContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-left: 4px;
+  z-index: 11;
+
+  &::after {
+    display: none;
+    position: absolute;
+    left: -20px;
+    top: 120%;
+    content: attr(data-tip);
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: #cccccc;
+    font-weight: 300;
+    width: 400px;
+  }
+
+  &:hover::after {
+    display: block;
   }
 }

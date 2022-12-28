@@ -21,6 +21,7 @@ import {
   useOutputErrors,
 } from 'utils'
 
+import { isErrorWithI18n } from 'exceptions'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -67,7 +68,7 @@ const Send = () => {
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
   const handleLocktimeClick = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { index, type },
       } = e.target
@@ -104,7 +105,9 @@ const Send = () => {
   try {
     validateTotalAmount(totalAmount, fee, balance)
   } catch (err) {
-    errorMessageUnderTotal = t(err.message)
+    if (isErrorWithI18n(err)) {
+      errorMessageUnderTotal = t(err.message)
+    }
   }
 
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx

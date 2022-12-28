@@ -27,7 +27,8 @@
       "tooltip": {
         "block-synced": "已同步區塊",
         "looking-valid-target": "尋找預設可信區塊"
-      }
+      },
+      "migrating": "正在數據遷移..."
     },
     "import-hardware": {
       "title": {
@@ -134,7 +135,9 @@
       },
       "copy-balance": "複製餘額",
       "create": "創建 {{name}} 資產賬戶",
-      "destroy": "銷毀 {{name}} 資產賬戶"
+      "destroy": "銷毀 {{name}} 資產賬戶",
+      "createSUDT": "創建 <0></0> 資產賬戶",
+      "destroySUDT": "銷毀 <0></0> 資產賬戶"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -365,8 +368,7 @@
         }
       },
       "data": {
-        "ckb-node-data": "節點數據",
-        "ckb-indexer-data": "Indexer 數據",
+        "ckb-node-data": "節點配置和數據",
         "set": "設置",
         "cache": "緩存",
         "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清理緩存，Neuron 會重新同步所有塊數據。",
@@ -374,11 +376,11 @@
         "clear-cache": "清理緩存",
         "clearing-cache": "清理中…",
         "remove-ckb-data-tip": "請將 CKB Node 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
-        "remove-indexer-data-tip": "請將 Indexer 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
         "cancel": "取消",
-        "resync-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node(Indexer) 數據.",
+        "resync-ckb-node-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node 數據",
         "move-data-finish": "數據轉移完成",
-        "re-sync": "重新同步"
+        "re-sync": "重新同步",
+        "disabled-set-path": "手動啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效"
       }
     },
     "password-request": {
@@ -496,7 +498,8 @@
       "decimal-range": "小數位應為 {{range}}(包括) 之間的整數",
       "experimental-message-hardware": "本功能為實驗性功能，請註意風險，謹慎使用。",
       "experimental-message": "本頁面為實驗性功能，可能隨時變更。請謹慎使用。",
-      "rebuild-sync": "為了提供更好的用戶體驗，Neuron 採取了新的索引方案，該方案需要一次性重構緩存數據庫(預期同步時間為 30~60 分鐘)。\n抱歉給您帶來不便。",
+      "rebuild-sync": "為了提供更好的用戶體驗，Neuron 採取了新的存儲方案，該方案需要壹次性遷移數據(預期同步時間為 20~60 分鐘)。\n抱歉給您帶來不便。",
+      "migrate": "遷移",
       "secp256k1/blake160-address-required": "請輸入 secp256k1/blake160 地址",
       "fields": {
         "wallet": "錢包",
@@ -877,7 +880,7 @@
         "select-option": "提交前請確認上述選項"
       },
       "receive": {
-        "notation": "只接收 {{symbol}} 轉賬"
+        "notation": "只接收 <0></0> 轉賬"
       },
       "update-dialog": {
         "update-asset-account": "賬戶設置",

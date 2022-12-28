@@ -1,27 +1,25 @@
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getCkbNodeDataPath,
-  getIndexerDataPath,
   invokeShowOpenDialog,
   startProcessMonitor,
   stopProcessMonitor,
   setCkbNodeDataPath,
-  setIndexerDataPath,
 } from 'services/remote'
 import { isSuccessResponse, useDialogWrapper, useDidMount } from 'utils'
 
-export const useDataPath = (
-  getPath: typeof getCkbNodeDataPath | typeof getIndexerDataPath,
-  setPath: typeof setCkbNodeDataPath | typeof setIndexerDataPath,
-  type: Parameters<typeof stopProcessMonitor>[0]
-) => {
+const type = 'ckb'
+
+export const useDataPath = () => {
   const [t] = useTranslation()
+  const [isSaving, setIsSaveing] = useState(false)
+  const [savingType, setSavingType] = useState<string | null>()
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
   const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
   useDidMount(() => {
-    getPath(undefined).then(res => {
+    getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res)) {
         setPrevPath(res.result!)
       }
@@ -49,14 +47,28 @@ export const useDataPath = (
       }
     })
   }, [closeDialog, type])
-  const onConfirm = useCallback(() => {
-    setPath(currentPath!).then(res => {
-      if (isSuccessResponse(res)) {
-        setPrevPath(currentPath)
-        closeDialog()
-      }
-    })
-  }, [currentPath, closeDialog, setPrevPath, setPath])
+  const onConfirm = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const { dataset } = e.currentTarget
+      setIsSaveing(true)
+      setSavingType(dataset.syncType)
+      setCkbNodeDataPath({
+        dataPath: currentPath!,
+        clearCache: type === 'ckb' && dataset?.resync === 'true',
+      })
+        .then(res => {
+          if (isSuccessResponse(res)) {
+            setPrevPath(currentPath)
+            closeDialog()
+          }
+        })
+        .finally(() => {
+          setIsSaveing(false)
+          setSavingType(null)
+        })
+    },
+    [currentPath, closeDialog, setPrevPath]
+  )
   return {
     prevPath,
     currentPath,
@@ -64,6 +76,8 @@ export const useDataPath = (
     dialogRef,
     onCancel,
     onConfirm,
+    isSaving,
+    savingType,
   }
 }
 

@@ -8,6 +8,7 @@ import { generateNFTSendTransaction } from 'services/remote'
 import Button from 'widgets/Button'
 import { MEDIUM_FEE_RATE } from 'utils/const'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
+import { isErrorWithI18n } from 'exceptions'
 import styles from './NFTSend.module.scss'
 
 enum Fields {
@@ -52,7 +53,7 @@ const NFTSend = () => {
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [remoteError, setRemoteError] = useState('')
 
-  const onInput = useCallback(e => {
+  const onInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       dataset: { field },
       value,
@@ -72,7 +73,9 @@ const NFTSend = () => {
     try {
       validateAddress(sendState.address, isMainnet)
     } catch (err) {
-      return t(err.message, err.i18n)
+      if (isErrorWithI18n(err)) {
+        return t(err.message, err.i18n)
+      }
     }
     return undefined
   }, [t, sendState.address, isMainnet])
