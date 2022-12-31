@@ -38,7 +38,7 @@
         "choose-address": "Choose an address from the device"
       },
       "actions": {
-        "confirm": "Please comfirm on your device...",
+        "confirm": "Please confirm on your device...",
         "success": "Import Success!",
         "next": "Next",
         "cancel": "Cancel",
