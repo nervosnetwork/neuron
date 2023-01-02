@@ -1,10 +1,7 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPageNoList } from 'utils'
-import { ReactComponent as ArrowEnd } from 'widgets/Icons/ArrowEnd.svg'
-import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
-import { ReactComponent as DisabledArrowEnd } from 'widgets/Icons/DisabledArrowEnd.svg'
-import { ReactComponent as DisabledArrowNext } from 'widgets/Icons/DisabledArrowNext.svg'
+import { ArrowEnd, ArrowNext, DisabledArrowEnd, DisabledArrowNext } from 'widgets/Icons/icon'
 
 import styles from './pagination.module.scss'
 
@@ -44,8 +41,8 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
   const end = Math.min(count, pageNo * pageSize)
   const range = t(`${I18N_PATH}.range`, { start, end, count })
 
-  const disableToPrev = pageNo === 1 || pageCount === 0
-  const disableToEnd = pageNo === pageCount || pageCount === 0
+  const disableToHead = pageNo === 1 || pageCount === 0
+  const disableToEnd = pageNo >= pageCount
 
   return (
     <div role="presentation" className={styles.container} onClick={handlePageNoClick}>
@@ -56,21 +53,21 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             role="button"
             data-page-no={1}
             tabIndex={pageNo === 1 ? -1 : 0}
-            className={styles.toPrev}
-            data-disabled={pageNo === 1}
+            className={styles.toHead}
+            data-disabled={disableToHead}
             title={t(`${I18N_PATH}.first-page`)}
           >
-            {disableToPrev ? <DisabledArrowEnd /> : <ArrowEnd />}
+            {disableToHead ? <DisabledArrowEnd /> : <ArrowEnd />}
           </div>
           <div
             role="button"
             data-page-no={pageNo - 1}
             tabIndex={pageNo === 1 ? -1 : 0}
-            className={styles.toPrev}
-            data-disabled={pageNo === 1}
+            className={styles.toHead}
+            data-disabled={disableToHead}
             title={t(`${I18N_PATH}.previous-page`)}
           >
-            {disableToPrev ? <DisabledArrowNext /> : <ArrowNext />}
+            {disableToHead ? <DisabledArrowNext /> : <ArrowNext />}
           </div>
         </div>
 
@@ -93,8 +90,8 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             role="button"
             tabIndex={pageNo === pageCount ? -1 : 0}
             data-page-no={pageNo + 1}
-            className={styles.toNext}
-            data-disabled={pageNo === pageCount}
+            className={styles.toEnd}
+            data-disabled={disableToEnd}
             title={t(`${I18N_PATH}.next-page`)}
           >
             {disableToEnd ? <DisabledArrowNext /> : <ArrowNext />}
@@ -103,8 +100,8 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             role="button"
             tabIndex={pageNo === pageCount ? -1 : 0}
             data-page-no={pageCount}
-            className={styles.toNext}
-            data-disabled={pageNo === pageCount}
+            className={styles.toEnd}
+            data-disabled={disableToEnd}
             title={t(`${I18N_PATH}.last-page`)}
           >
             {disableToEnd ? <DisabledArrowEnd /> : <ArrowEnd />}

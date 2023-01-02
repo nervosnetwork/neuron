@@ -1,5 +1,4 @@
 $primary-color: #666;
-$secondary-color: #666;
 $shadow-color: rgba(0, 0, 0, 0.05);
 $disable-color: #ccc;
 
@@ -61,8 +60,8 @@ $disable-color: #ccc;
   }
 }
 
-.toPrev,
-.toNext {
+.toHead,
+.toEnd {
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -73,17 +72,14 @@ $disable-color: #ccc;
   }
   &[data-disabled='true'] {
     pointer-events: none;
-    // svg > path {
-    //   fill: $disable-color;
-    // }
   }
 }
-.toPrev {
+.toHead {
   svg {
     transform: rotate(-180deg);
   }
 }
-.toNext {
+.toEnd {
   svg {
     transform: rotate(0);
   }
