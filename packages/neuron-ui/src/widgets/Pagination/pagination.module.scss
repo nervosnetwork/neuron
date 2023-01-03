@@ -1,6 +1,7 @@
-$primary-color: #666;
 $shadow-color: rgba(0, 0, 0, 0.05);
-$disable-color: #ccc;
+$disable-button-text-color: var(--disable-button-text-color);
+$enable-button-text-color: var(--enable-button-text-color);
+$secondary-background-color: var(--secondary-background-color);
 
 .container {
   font-size: 0.875rem;
@@ -9,14 +10,13 @@ $disable-color: #ccc;
 }
 
 .range {
-  color: $primary-color;
+  color: var(--main-pagination-text-color);
   flex: 1;
   height: 0.875rem;
   line-height: 1em;
 }
 
 .navigator {
-  color: $primary-color;
   display: grid;
   grid-auto-flow: column;
   gap: 0 8px;
@@ -36,7 +36,7 @@ $disable-color: #ccc;
   display: inline-grid;
   width: 48px;
   height: 24px;
-  background: rgb(255, 255, 255);
+  background: $secondary-background-color;
   grid-template-columns: 12px 12px;
   grid-column-gap: 8px;
   padding: 0 8px;
@@ -45,7 +45,8 @@ $disable-color: #ccc;
 }
 
 .pageNo {
-  background: #fff;
+  background: $secondary-background-color;
+  color: var(--main-pagination-button-text-color);
   width: 24px;
   height: 24px;
   line-height: 24px;
@@ -53,7 +54,7 @@ $disable-color: #ccc;
   border-radius: 4px;
 
   &[data-active='true'] {
-    color: #00c891;
+    color: var(--activity-color);
     text-decoration: none;
     font-weight: 900;
     pointer-events: none;
@@ -70,8 +71,33 @@ $disable-color: #ccc;
   svg {
     pointer-events: none;
   }
-  &[data-disabled='true'] {
-    pointer-events: none;
+
+  &[data-title='first-page'],
+  &[data-title='last-page'] {
+    svg > path {
+      fill: $enable-button-text-color;
+    }
+
+    &[data-disabled='true'] {
+      pointer-events: none;
+      svg > path {
+        fill: $disable-button-text-color;
+      }
+    }
+  }
+  &[data-title='previous-page'],
+  &[data-title='next-page'] {
+    svg > path {
+      stroke: $enable-button-text-color;
+    }
+
+    &[data-disabled='true'] {
+      pointer-events: none;
+
+      svg > path {
+        stroke: $disable-button-text-color;
+      }
+    }
   }
 }
 .toHead {

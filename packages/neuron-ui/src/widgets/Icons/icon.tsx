@@ -42,8 +42,6 @@ import { ReactComponent as ArrowOpenRightSvg } from './ArrowOpenRight.svg'
 import { ReactComponent as MenuExpandSvg } from './MenuExpand.svg'
 import { ReactComponent as ArrowEndSvg } from './ArrowEnd.svg'
 import { ReactComponent as ArrowNextSvg } from './ArrowNext.svg'
-import { ReactComponent as DisabledArrowEndSvg } from './DisabledArrowEnd.svg'
-import { ReactComponent as DisabledArrowNextSvg } from './DisabledArrowNext.svg'
 
 import styles from './icon.module.scss'
 
@@ -100,5 +98,3 @@ export const ArrowOpenRight = WrapSvg(ArrowOpenRightSvg)
 export const MenuExpand = WrapSvg(MenuExpandSvg)
 export const ArrowEnd = WrapSvg(ArrowEndSvg)
 export const ArrowNext = WrapSvg(ArrowNextSvg)
-export const DisabledArrowEnd = WrapSvg(DisabledArrowEndSvg)
-export const DisabledArrowNext = WrapSvg(DisabledArrowNextSvg)

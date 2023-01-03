@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPageNoList } from 'utils'
-import { ArrowEnd, ArrowNext, DisabledArrowEnd, DisabledArrowNext } from 'widgets/Icons/icon'
+import { ArrowEnd, ArrowNext } from 'widgets/Icons/icon'
 
 import styles from './pagination.module.scss'
 
@@ -55,9 +55,10 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             tabIndex={pageNo === 1 ? -1 : 0}
             className={styles.toHead}
             data-disabled={disableToHead}
+            data-title="first-page"
             title={t(`${I18N_PATH}.first-page`)}
           >
-            {disableToHead ? <DisabledArrowEnd /> : <ArrowEnd />}
+            <ArrowEnd />
           </div>
           <div
             role="button"
@@ -65,9 +66,10 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             tabIndex={pageNo === 1 ? -1 : 0}
             className={styles.toHead}
             data-disabled={disableToHead}
+            data-title="previous-page"
             title={t(`${I18N_PATH}.previous-page`)}
           >
-            {disableToHead ? <DisabledArrowNext /> : <ArrowNext />}
+            <ArrowNext />
           </div>
         </div>
 
@@ -92,19 +94,22 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             data-page-no={pageNo + 1}
             className={styles.toEnd}
             data-disabled={disableToEnd}
+            data-title="next-page"
             title={t(`${I18N_PATH}.next-page`)}
           >
-            {disableToEnd ? <DisabledArrowNext /> : <ArrowNext />}
+            <ArrowNext />
           </div>
+
           <div
             role="button"
             tabIndex={pageNo === pageCount ? -1 : 0}
             data-page-no={pageCount}
             className={styles.toEnd}
             data-disabled={disableToEnd}
+            data-title="last-page"
             title={t(`${I18N_PATH}.last-page`)}
           >
-            {disableToEnd ? <DisabledArrowEnd /> : <ArrowEnd />}
+            <ArrowEnd />
           </div>
         </div>
       </div>
