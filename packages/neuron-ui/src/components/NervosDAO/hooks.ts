@@ -442,7 +442,6 @@ export const useUpdateWithdrawList = ({
       return
     }
     const depositOutPointHashes = records.map(v => v.depositOutPoint?.txHash ?? v.outPoint.txHash)
-    const txMap = new Map<CKBComponents.Hash, CKBComponents.TransactionWithStatus>()
     ckbCore.rpc
       .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
         depositOutPointHashes.map(v => ['getTransaction', v])
@@ -450,23 +449,26 @@ export const useUpdateWithdrawList = ({
       .exec()
       .then(txs => {
         const committedTx = txs.filter(v => v.txStatus.status === 'committed')
-        committedTx.forEach((tx, idx) => {
-          txMap.set(depositOutPointHashes[idx], tx)
-        })
         const blockHashes = [
           ...(committedTx.map(v => v.txStatus.blockHash).filter(v => !!v) as string[]),
           ...(records.map(v => (v.depositOutPoint ? v.blockHash : null)).filter(v => !!v) as string[]),
           tipBlockHash,
         ]
-        const hashHeaderMap = new Map<CKBComponents.Hash, string>()
         return ckbCore.rpc
           .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(
             blockHashes.map(v => ['getHeader', v])
           )
           .exec()
           .then(blockHeaders => {
+            const hashHeaderMap = new Map<CKBComponents.Hash, string>()
             blockHeaders.forEach((header, idx) => {
               hashHeaderMap.set(blockHashes[idx], header.dao)
+            })
+            const txMap = new Map<CKBComponents.Hash, CKBComponents.TransactionWithStatus>()
+            txs.forEach((tx, idx) => {
+              if (tx.txStatus.status === 'committed') {
+                txMap.set(depositOutPointHashes[idx], tx)
+              }
             })
             const withdrawList = new Map()
             records.forEach(record => {
