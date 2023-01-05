@@ -131,6 +131,65 @@ export default class CellsService {
     return uniqueLockArgs
   }
 
+  private static async addUnlockInfo(cells: Cell[]): Promise<Cell[]> {
+    // find unlock info
+    const unlockTxHashes: string[] = cells
+      .filter(v => v.outPoint && (v.status === OutputStatus.Dead || v.status === OutputStatus.Pending))
+      .map(o => o.outPoint!.txHash)
+    const inputs: InputEntity[] = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .leftJoinAndSelect('input.transaction', 'tx')
+      .where({
+        outPointTxHash: In(unlockTxHashes)
+      })
+      .getMany()
+    const unlockTxMap = new Map<string, TransactionEntity>()
+    inputs.forEach(i => {
+      const key = i.outPointTxHash + ':' + i.outPointIndex
+      unlockTxMap.set(key, i.transaction!)
+    })
+    cells.forEach(cell => {
+      // if unlocked, set unlockInfo
+      const key = cell.outPoint?.txHash + ':' + cell.outPoint?.index
+      const unlockTx = key ? unlockTxMap.get(key) : undefined
+      if (unlockTx && (cell.status === OutputStatus.Dead || cell.status === OutputStatus.Pending)) {
+        cell.setUnlockInfo({
+          txHash: unlockTx.hash,
+          timestamp: unlockTx.timestamp!
+        })
+      }
+    })
+    return cells
+  }
+
+  private static async addDepositInfo(cells: Cell[]): Promise<Cell[]> {
+    // find deposit info
+    const depositTxHashes = cells.map(cells => cells.depositOutPoint?.txHash).filter(hash => !!hash)
+    const depositTxs = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        hash: In(depositTxHashes)
+      })
+      .getMany()
+    const depositTxMap = new Map<string, TransactionEntity>()
+    depositTxs.forEach(tx => {
+      depositTxMap.set(tx.hash, tx)
+    })
+    cells.forEach(cell => {
+      if (cell.depositOutPoint?.txHash && depositTxMap.has(cell.depositOutPoint.txHash)) {
+        const depositTx = depositTxMap.get(cell.depositOutPoint.txHash)!
+        cell.setDepositTimestamp(depositTx.timestamp!)
+        cell.setDepositInfo({
+          txHash: depositTx.hash,
+          timestamp: depositTx.timestamp!
+        })
+      }
+    })
+    return cells
+  }
+
   public static async getDaoCells(walletId: string): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
@@ -169,36 +228,6 @@ export default class CellsService {
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    // find deposit info
-    const depositTxHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
-    const depositTxs = await getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('tx')
-      .where({
-        hash: In(depositTxHashes)
-      })
-      .getMany()
-    const depositTxMap = new Map<string, TransactionEntity>()
-    depositTxs.forEach(tx => {
-      depositTxMap.set(tx.hash, tx)
-    })
-
-    // find unlock info
-    const unlockTxKeys: string[] = outputs.map(o => o.outPointTxHash + ':' + o.outPointIndex)
-    const inputs: InputEntity[] = await getConnection()
-      .getRepository(InputEntity)
-      .createQueryBuilder('input')
-      .leftJoinAndSelect('input.transaction', 'tx')
-      .where(`input.outPointTxHash || ':' || input.outPointIndex IN (:...infos)`, {
-        infos: unlockTxKeys
-      })
-      .getMany()
-    const unlockTxMap = new Map<string, TransactionEntity>()
-    inputs.forEach(i => {
-      const key = i.outPointTxHash + ':' + i.outPointIndex
-      unlockTxMap.set(key, i.transaction!)
-    })
-
     const cells: Cell[] = outputs.map(output => {
       const cell = output.toModel()
       if (!output.depositTxHash) {
@@ -208,34 +237,17 @@ export default class CellsService {
           timestamp: output.transaction!.timestamp!
         })
       } else {
-        // if not deposit cell, set deposit timestamp info, depositInfo, withdrawInfo
-        const depositTx = depositTxMap.get(output.depositTxHash)!
-        cell.setDepositTimestamp(depositTx.timestamp!)
-
-        cell.setDepositInfo({
-          txHash: depositTx.hash,
-          timestamp: depositTx.timestamp!
-        })
-
+        // if not deposit cell, set withdrawInfo
         const withdrawTx = output.transaction
         cell.setWithdrawInfo({
           txHash: withdrawTx!.hash,
           timestamp: withdrawTx!.timestamp!
         })
-
-        if (output.status === OutputStatus.Dead || output.status === OutputStatus.Pending) {
-          // if unlocked, set unlockInfo
-          const key = output.outPointTxHash + ':' + output.outPointIndex
-          const unlockTx = unlockTxMap.get(key)!
-          cell.setUnlockInfo({
-            txHash: unlockTx.hash,
-            timestamp: unlockTx.timestamp!
-          })
-        }
       }
-
       return cell
     })
+
+    await Promise.all([CellsService.addDepositInfo(cells), CellsService.addUnlockInfo(cells)])
 
     return cells
   }
