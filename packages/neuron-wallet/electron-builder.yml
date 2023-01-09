@@ -28,6 +28,7 @@ nsis:
   createDesktopShortcut: always
   createStartMenuShortcut: true
   runAfterFinish: false
+  allowToChangeInstallationDirectory: true
 
 dmg:
   sign: false
