@@ -1,8 +1,3 @@
-$shadow-color: rgba(0, 0, 0, 0.05);
-$disable-button-text-color: var(--disable-button-text-color);
-$enable-button-text-color: var(--enable-button-text-color);
-$secondary-background-color: var(--secondary-background-color);
-
 .container {
   font-size: 0.875rem;
   display: flex;
@@ -21,22 +16,18 @@ $secondary-background-color: var(--secondary-background-color);
   grid-auto-flow: column;
   gap: 0 8px;
 
-  & > span {
-    border-radius: 2px;
-    box-sizing: border-box;
-    min-width: 14px;
-    align-self: center;
-    &:hover,
-    &:focus {
-      background-color: $shadow-color;
-    }
+  button {
+    padding: unset;
+    border: none;
+    background: var(--secondary-background-color);
   }
 }
+
 .arrowBlock {
   display: inline-grid;
   width: 48px;
   height: 24px;
-  background: $secondary-background-color;
+  background: var(--secondary-background-color);
   grid-template-columns: 12px 12px;
   grid-column-gap: 8px;
   padding: 0 8px;
@@ -45,13 +36,13 @@ $secondary-background-color: var(--secondary-background-color);
 }
 
 .pageNo {
-  background: $secondary-background-color;
   color: var(--main-pagination-button-text-color);
   width: 24px;
   height: 24px;
   line-height: 24px;
   text-align: center;
   border-radius: 4px;
+  font-weight: 500;
 
   &[data-active='true'] {
     color: var(--activity-color);
@@ -75,27 +66,27 @@ $secondary-background-color: var(--secondary-background-color);
   &[data-title='first-page'],
   &[data-title='last-page'] {
     svg > path {
-      fill: $enable-button-text-color;
+      fill: var(--enable-button-text-color);
     }
 
     &[data-disabled='true'] {
       pointer-events: none;
       svg > path {
-        fill: $disable-button-text-color;
+        fill: var(--disable-button-text-color);
       }
     }
   }
   &[data-title='previous-page'],
   &[data-title='next-page'] {
     svg > path {
-      stroke: $enable-button-text-color;
+      stroke: var(--enable-button-text-color);
     }
 
     &[data-disabled='true'] {
       pointer-events: none;
 
       svg > path {
-        stroke: $disable-button-text-color;
+        stroke: var(--disable-button-text-color);
       }
     }
   }
@@ -103,10 +94,5 @@ $secondary-background-color: var(--secondary-background-color);
 .toHead {
   svg {
     transform: rotate(-180deg);
-  }
-}
-.toEnd {
-  svg {
-    transform: rotate(0);
   }
 }

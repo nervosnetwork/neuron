@@ -49,8 +49,8 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
       <div className={styles.range}>{range}</div>
       <div className={styles.navigator} role="navigation" arial-label="pagination">
         <div className={styles.arrowBlock}>
-          <div
-            role="button"
+          <button
+            type="button"
             data-page-no={1}
             tabIndex={pageNo === 1 ? -1 : 0}
             className={styles.toHead}
@@ -59,9 +59,9 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.first-page`)}
           >
             <ArrowEnd />
-          </div>
-          <div
-            role="button"
+          </button>
+          <button
+            type="button"
             data-page-no={pageNo - 1}
             tabIndex={pageNo === 1 ? -1 : 0}
             className={styles.toHead}
@@ -70,12 +70,12 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.previous-page`)}
           >
             <ArrowNext />
-          </div>
+          </button>
         </div>
 
         {pageNoList.map(no => (
-          <div
-            role="button"
+          <button
+            type="button"
             tabIndex={pageNo === no ? -1 : 0}
             key={no}
             className={styles.pageNo}
@@ -84,12 +84,12 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.page-no`, { pageNo: no })}
           >
             {no}
-          </div>
+          </button>
         ))}
 
         <div className={styles.arrowBlock}>
-          <div
-            role="button"
+          <button
+            type="button"
             tabIndex={pageNo === pageCount ? -1 : 0}
             data-page-no={pageNo + 1}
             className={styles.toEnd}
@@ -98,10 +98,10 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.next-page`)}
           >
             <ArrowNext />
-          </div>
+          </button>
 
-          <div
-            role="button"
+          <button
+            type="button"
             tabIndex={pageNo === pageCount ? -1 : 0}
             data-page-no={pageCount}
             className={styles.toEnd}
@@ -110,7 +110,7 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.last-page`)}
           >
             <ArrowEnd />
-          </div>
+          </button>
         </div>
       </div>
     </div>
