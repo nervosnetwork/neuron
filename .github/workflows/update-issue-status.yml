@@ -14,6 +14,7 @@ jobs:
         uses: actions/stale@v7
         with:
           any-of-issue-labels: replied
+          stale-issue-label: stale
           days-before-pr-close: -1
           stale-issue-message: Mark this issue stale because no activity for 60 days
           close-issue-message: Close this issue because it's inactive since marked stale
