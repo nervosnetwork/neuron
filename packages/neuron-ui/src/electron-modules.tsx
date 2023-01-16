@@ -7,4 +7,3 @@ export const { ipcRenderer } = window.electron
 export const { clipboard } = window.electron
 export const { nativeImage } = window.electron
 export const { shell } = window.electron
-export const { desktopCapturer } = window.electron

@@ -1,9 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
-import jsQR from 'jsqr'
-
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { captureScreenshot, showErrorMessage } from 'services/remote'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
 import {
@@ -12,11 +9,7 @@ import {
   shannonToCKBFormatter,
   calculateFee,
   validateOutputs,
-  validateAddress,
 } from 'utils'
-import i18n from 'utils/i18n'
-
-import styles from './send.module.scss'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
 
@@ -332,39 +325,6 @@ export const useInitialize = (
     }
   }, [updateSendingAllTransaction, setIsSendMax, isSendMax, outputs.length, updateTransactionOutput, items])
 
-  const onScan = useCallback(
-    (e: React.SyntheticEvent<HTMLButtonElement>) => {
-      const {
-        dataset: { idx },
-      } = e.target as HTMLButtonElement
-      if (idx !== undefined && !(e.target as HTMLButtonElement).classList.contains(styles.busy)) {
-        ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.add(styles.busy))
-        setTimeout(async () => {
-          const codes = await captureScreenshot().then(imageDataList =>
-            imageDataList.map(imageData =>
-              jsQR(imageData.data, imageData.width, imageData.height, {
-                inversionAttempts: 'dontInvert',
-              })
-            )
-          )
-          for (let i = 0; i < codes.length; i++) {
-            try {
-              validateAddress(codes[i]?.data ?? '', isMainnet)
-              updateTransactionOutput('address')(+idx)(codes[i]!.data)
-              ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
-              return
-            } catch {
-              // ignore
-            }
-          }
-          showErrorMessage(i18n.t('messages.error'), i18n.t('messages.no-valid-addresses-found'))
-          ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
-        }, 100)
-      }
-    },
-    [updateTransactionOutput, isMainnet]
-  )
-
   useEffect(() => {
     if (isSendMax) {
       updateSendingAllTransaction()
@@ -393,7 +353,6 @@ export const useInitialize = (
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
-    onScan,
   }
 }
 
