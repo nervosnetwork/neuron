@@ -18,4 +18,4 @@ jobs:
           days-before-pr-close: -1
           stale-issue-message: Mark this issue stale because no activity for 60 days
           close-issue-message: Close this issue because it's inactive since marked stale
-          close-issue-reason: inactive
+          close-issue-reason: completed
