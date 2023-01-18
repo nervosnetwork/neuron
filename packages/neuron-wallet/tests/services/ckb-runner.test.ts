@@ -76,6 +76,7 @@ describe('ckb runner', () => {
   beforeEach(() => {
     resetMocks()
 
+    stubbedCkb.kill = jest.fn()
     stubbedCkb.stderr = new EventEmitter()
     stubbedCkb.stdout = new EventEmitter()
     stubbedSpawn.mockReturnValue(stubbedCkb)
@@ -95,7 +96,12 @@ describe('ckb runner', () => {
           stubbedExistsSync.mockReturnValue(true)
           await startCkbNode()
         })
-        it('should not init ckb config', () => {
+        afterEach(async () => {
+          const promise = stopCkbNode()
+          stubbedCkb.emit('close')
+          await promise
+        })
+        it('should not init ckb config', async () => {
           expect(stubbedSpawn).not.toHaveBeenCalledWith(expect.stringContaining('/ckb'), [
             'init',
             '--chain',
@@ -123,6 +129,11 @@ describe('ckb runner', () => {
           beforeEach(async () => {
             stubbedCkb.emit('close')
             await promise
+          })
+          afterEach(async () => {
+            const stopPromise = stopCkbNode()
+            stubbedCkb.emit('close')
+            await stopPromise
           })
           it('inits ckb config', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(expect.stringContaining(path.join(platformPath, 'ckb')), [

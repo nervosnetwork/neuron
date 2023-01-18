@@ -67,6 +67,10 @@ let lastLogTime: number
 export const getLookingValidTargetStatus = () => isLookingValidTarget
 
 export const startCkbNode = async () => {
+  if (ckb !== null) {
+    logger.info(`CKB:\tckb is not closed, close it before start...`)
+    await stopCkbNode()
+  }
   await initCkb()
 
   logger.info('CKB:\tstarting node...')
