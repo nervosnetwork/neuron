@@ -15,7 +15,6 @@ import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import { stopCkbNode } from 'services/ckb-runner'
 import startMonitor from 'services/monitor'
-import IndexerService from 'services/indexer'
 
 const app = electronApp
 
@@ -53,8 +52,6 @@ export default class AppController {
     await this.openWindow()
 
     startMonitor()
-
-    IndexerService.cleanOldIndexerData()
   }
 
   /**
