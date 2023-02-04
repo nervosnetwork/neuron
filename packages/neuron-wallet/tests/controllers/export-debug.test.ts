@@ -63,6 +63,16 @@ jest.mock('../../src/services/networks', () => {
   }
 })
 
+jest.mock('../../src/services/settings', () => {
+  return {
+    getInstance() {
+      return {
+        ckbDataPath: ''
+      }
+    }
+  }
+})
+
 import { dialog } from 'electron'
 import logger from '../../src/utils/logger'
 import ExportDebugController from '../../src/controllers/export-debug'
