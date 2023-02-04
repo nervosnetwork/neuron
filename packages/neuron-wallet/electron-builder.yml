@@ -1,5 +1,5 @@
 appId: com.nervos.neuron
-copyright: Copyright (C) 2019-2022 Nervos Foundation.
+copyright: Copyright (C) 2019-2023 Nervos Foundation.
 productName: Neuron
 
 asar: true
@@ -28,6 +28,7 @@ nsis:
   createDesktopShortcut: always
   createStartMenuShortcut: true
   runAfterFinish: false
+  allowToChangeInstallationDirectory: true
 
 dmg:
   sign: false
