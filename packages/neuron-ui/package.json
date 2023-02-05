@@ -75,7 +75,7 @@
     "@types/react-router-dom": "5.3.3",
     "@types/storybook-react-router": "1.0.1",
     "@types/storybook__addon-storyshots": "5.1.2",
-    "@types/styled-components": "4.4.3",
+    "@types/styled-components": "5.1.26",
     "@wojtekmaj/enzyme-adapter-react-17": "0.8.0",
     "babel-jest": "25.5.1",
     "electron": "22.0.0",
