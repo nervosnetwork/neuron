@@ -20,6 +20,10 @@ body {
   --button-cancel-color: #999999;
   --svg-color: #666666;
   --dialog-secondary-text-color: #666666;
+  --disable-button-text-color: #CCCCCC;
+  --enable-button-text-color: #333333;
+  --main-pagination-button-text-color: #666666;
+  --main-pagination-text-color: #666666;
 
   @media (prefers-color-scheme: dark) {
     --primary-color: #00C891;
@@ -43,5 +47,9 @@ body {
     --button-cancel-color: #FFFFFF;
     --svg-color: #FFFFFF;
     --dialog-secondary-text-color: #FFFFFF;
+    --disable-button-text-color: #666666;
+    --enable-button-text-color: #FFFFFF;
+    --main-pagination-button-text-color: #CCCCCC;
+    --main-pagination-text-color: #999999;
   }
 }
