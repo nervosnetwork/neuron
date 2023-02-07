@@ -5055,13 +5055,6 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-native@*":
-  version "0.71.0"
-  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.71.0.tgz#a6f4d2d6c3730e86ceef0870d3cf221a54ec94c2"
-  integrity sha512-4MAoseGM8zv5PKQyc2SvKldvOmCJX4mNqj+mDqh0J9yJMzWQnGenk2vQCi+jxMXa3xWYIgx+ewaCSw0XiiGGSw==
-  dependencies:
-    "@types/react" "*"
-
 "@types/react-router-dom@5.3.3":
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-5.3.3.tgz#e9d6b4a66fcdbd651a5f106c2656a30088cc1e83"
@@ -5206,15 +5199,14 @@
   dependencies:
     "@storybook/react" "^5.2.0"
 
-"@types/styled-components@4.4.3":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@types/styled-components/-/styled-components-4.4.3.tgz#74dd00ad760845a98890a8539361d8afc32059de"
-  integrity sha512-U0udeNOZBfUkJycmGJwmzun0FBt11rZy08weVQmE2xfUNAbX8AGOEWxWna2d+qAUKxKgMlcG+TZT0+K2FfDcnQ==
+"@types/styled-components@5.1.26":
+  version "5.1.26"
+  resolved "https://registry.yarnpkg.com/@types/styled-components/-/styled-components-5.1.26.tgz#5627e6812ee96d755028a98dae61d28e57c233af"
+  integrity sha512-KuKJ9Z6xb93uJiIyxo/+ksS7yLjS1KzG6iv5i78dhVg/X3u5t1H7juRWqVmodIdz6wGVaIApo1u01kmFRdJHVw==
   dependencies:
     "@types/hoist-non-react-statics" "*"
     "@types/react" "*"
-    "@types/react-native" "*"
-    csstype "^2.2.0"
+    csstype "^3.0.2"
 
 "@types/tapable@^1", "@types/tapable@^1.0.5":
   version "1.0.8"
@@ -9380,7 +9372,7 @@ cssstyle@^2.3.0:
   dependencies:
     cssom "~0.3.6"
 
-csstype@^2.2.0, csstype@^2.5.7:
+csstype@^2.5.7:
   version "2.6.21"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.21.tgz#2efb85b7cc55c80017c66a5ad7cbd931fda3a90e"
   integrity sha512-Z1PhmomIfypOpoMjRQB70jfvy/wxT50qW08YXO5lMIJkrdq4yOTR+AW7FqutScmB9NkLwxo+jU+kZLbofZZq/w==
