@@ -92,7 +92,7 @@
     "prettier": "1.19.1",
     "react-app-rewired": "2.2.1",
     "react-scripts": "5.0.1",
-    "react-test-renderer": "16.12.0",
+    "react-test-renderer": "16.14.0",
     "storybook-react-router": "1.0.8"
   },
   "resolutions": {
