@@ -7,6 +7,7 @@ import logger from 'utils/logger'
 import SettingsService from './settings'
 import MigrateSubject from 'models/subjects/migrate-subject'
 import { resetSyncTaskQueue } from 'block-sync-renderer'
+import IndexerService from './indexer'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -66,6 +67,14 @@ let isLookingValidTarget: boolean = false
 let lastLogTime: number
 export const getLookingValidTargetStatus = () => isLookingValidTarget
 
+const removeOldIndexerIfRunSuccess = () => {
+  setTimeout(() => {
+    if (ckb !== null) {
+      IndexerService.cleanOldIndexerData()
+    }
+  }, 10000)
+}
+
 export const startCkbNode = async () => {
   if (ckb !== null) {
     logger.info(`CKB:\tckb is not closed, close it before start...`)
@@ -118,6 +127,8 @@ export const startCkbNode = async () => {
     ckb = null
   })
   resetSyncTaskQueue.push(true)
+
+  removeOldIndexerIfRunSuccess()
 }
 
 export const stopCkbNode = () => {
@@ -160,6 +171,7 @@ export function migrateCkbData() {
     logger.info(`CKB migrate:\tprocess process exited with code ${code}`)
     if (code === 0) {
       MigrateSubject.next({ type: 'finish' })
+      IndexerService.cleanOldIndexerData()
     } else {
       MigrateSubject.next({ type: 'failed', reason: lastErrorData })
     }

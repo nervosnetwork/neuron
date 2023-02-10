@@ -69,6 +69,9 @@ jest.mock('../../src/block-sync-renderer', () => ({
     push: jest.fn()
   }
 }))
+jest.mock('../../src/services/indexer', () => ({
+  cleanOldIndexerData: jest.fn()
+}))
 const { startCkbNode, stopCkbNode, getLookingValidTargetStatus, migrateCkbData } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
