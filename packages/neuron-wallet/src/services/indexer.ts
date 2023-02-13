@@ -29,6 +29,15 @@ export default class IndexerService {
     await startMonitor('ckb')
   }
 
+  static cleanOldIndexerData() {
+    const oldIndexerDataPath = SettingsService.getInstance().indexerDataPath
+    if (oldIndexerDataPath && fs.existsSync(oldIndexerDataPath)) {
+      logger.debug(`Removing old indexer data ${oldIndexerDataPath}`)
+      fs.rmSync(oldIndexerDataPath, { recursive: true, force: true })
+      SettingsService.getInstance().indexerDataPath = ''
+    }
+  }
+
   clearData = () => {
     const dataPath = this.getDataPath()
     logger.debug(`Removing data ${dataPath}`)

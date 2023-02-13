@@ -24,6 +24,14 @@ export default class SettingsService extends Store {
     return this.readSync('locale')
   }
 
+  get indexerDataPath(): string {
+    return this.readSync('indexerDataPath')
+  }
+
+  set indexerDataPath(dataPath: string) {
+    this.writeSync('indexerDataPath', dataPath)
+  }
+
   set locale(lng: Locale) {
     if (locales.includes(lng)) {
       this.writeSync('locale', lng)
