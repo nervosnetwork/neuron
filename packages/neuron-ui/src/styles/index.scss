@@ -5,7 +5,8 @@
 * {
   outline: none !important;
   -webkit-tap-highlight-color: none !important;
-  cursor: default !important;
+  // why we need this property with value of '!important'
+  // cursor: default !important;
   user-select: none;
 }
 

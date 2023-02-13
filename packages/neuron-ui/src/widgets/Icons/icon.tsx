@@ -25,6 +25,7 @@ import { ReactComponent as PendingIconSvg } from './PendingIcon.svg'
 import { ReactComponent as NewTabSvg } from './new_tab.svg'
 import { ReactComponent as TooltipSvg } from './Tooltip.svg'
 import { ReactComponent as OpenFolderSvg } from './OpenFolder.svg'
+import { ReactComponent as TransferSvg } from './Transfer.svg'
 
 import styles from './icon.module.scss'
 
@@ -64,3 +65,4 @@ export const PendingIcon = WrapSvg(PendingIconSvg)
 export const NewTab = WrapSvg(NewTabSvg)
 export const Tooltip = WrapSvg(TooltipSvg)
 export const OpenFolder = WrapSvg(OpenFolderSvg)
+export const Transfer = WrapSvg(TransferSvg)
