@@ -37,7 +37,7 @@ describe(`Unit tests of networks service`, () => {
 
     it(`has preset networks`, () => {
       const networks = service.getAll()
-      expect(networks.length).toBe(1)
+      expect(networks.length).toBe(2)
       expect(networks[0].id).toEqual('mainnet')
     })
 
@@ -114,10 +114,10 @@ describe(`Unit tests of networks service`, () => {
       const prevCurrentID = service.getCurrentID()
       const prevNetworks = service.getAll()
       expect(prevCurrentID).toBe(network.id)
-      expect(prevNetworks.map(n => n.id)).toEqual(['mainnet', network.id])
+      expect(prevNetworks.map(n => n.id)).toEqual(['mainnet', 'testnet_light', network.id])
       await service.delete(prevCurrentID || '')
       const currentNetworks = service.getAll()
-      expect(currentNetworks.map(n => n.id)).toEqual(['mainnet'])
+      expect(currentNetworks.map(n => n.id)).toEqual(['mainnet', 'testnet_light'])
       const currentID = service.getCurrentID()
       expect(currentID).toBe('mainnet')
     })

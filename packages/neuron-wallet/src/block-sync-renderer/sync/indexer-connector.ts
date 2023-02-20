@@ -1,23 +1,16 @@
 // eslint-disable-next-line prettier/prettier
-import type { ScriptHashType } from 'models/chain/script'
 import { Subject } from 'rxjs'
-import { queue, AsyncQueue } from 'async'
+import { queue, QueueObject } from 'async'
 import { Tip, QueryOptions } from '@ckb-lumos/base'
 import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { Address } from "models/address"
+import { Address } from 'models/address'
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
-
-export interface LumosCellQuery {
-  lock: { codeHash: string, hashType: ScriptHashType, args: string } | null,
-  type: { codeHash: string, hashType: ScriptHashType, args: string } | null,
-  data: string | null
-}
+import { BlockTips, LumosCellQuery, Connector } from './connector'
 
 export interface LumosCell {
   block_hash: string
@@ -41,28 +34,20 @@ export interface LumosCell {
   data?: string
 }
 
-export interface BlockTips {
-  cacheTipNumber: number
-  indexerTipNumber: number | undefined
-}
-
-export default class IndexerConnector {
+export default class IndexerConnector extends Connector<string | undefined> {
   private indexer: CkbIndexer
   private rpcService: RpcService
   private addressesByWalletId: Map<string, AddressMeta[]>
-  private processNextBlockNumberQueue: AsyncQueue<null> | undefined
-  private indexerQueryQueue: AsyncQueue<LumosCellQuery> | undefined
+  private processNextBlockNumberQueue: QueueObject<null> | undefined
+  private indexerQueryQueue: QueueObject<LumosCellQuery> | undefined
 
   private processingBlockNumber: string | undefined
-  public pollingIndexer: boolean = false
+  private pollingIndexer: boolean = false
   public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
-  public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
+  public readonly transactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[]; params: string | undefined }>()
 
-  constructor(
-    addresses: Address[],
-    nodeUrl: string,
-    indexerUrl: string
-  ) {
+  constructor(addresses: Address[], nodeUrl: string, indexerUrl: string) {
+    super()
     this.indexer = new CkbIndexer(nodeUrl, indexerUrl)
     this.rpcService = new RpcService(nodeUrl)
 
@@ -102,16 +87,15 @@ export default class IndexerConnector {
     if (nextUnprocessedBlockTip) {
       this.blockTipsSubject.next({
         cacheTipNumber: parseInt(nextUnprocessedBlockTip.blockNumber),
-        indexerTipNumber,
+        indexerTipNumber
       })
       if (!this.processingBlockNumber) {
         await this.processNextBlockNumber()
       }
-    }
-    else {
+    } else {
       this.blockTipsSubject.next({
         cacheTipNumber: indexerTipNumber,
-        indexerTipNumber,
+        indexerTipNumber
       })
     }
   }
@@ -186,7 +170,7 @@ export default class IndexerConnector {
     return result
   }
 
-  private async getTxsInNextUnprocessedBlockNumber() {
+  private async getTxsInNextUnprocessedBlockNumberAndTxHashes(): Promise<[string | undefined, string[]]> {
     const txHashCachesByNextBlockNumberAndAddress = await Promise.all(
       [...this.addressesByWalletId.entries()].map(async ([walletId, addressMetas]) => {
         const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
@@ -207,20 +191,15 @@ export default class IndexerConnector {
         return grouped
       }, new Map<string, Array<IndexerTxHashCache>>())
 
-    const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()]
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .shift()
+    const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()].sort((a, b) => parseInt(a) - parseInt(b)).shift()
 
     if (!nextUnprocessedBlockNumber) {
-      return []
+      return [undefined, []]
     }
 
     const txHashCachesInNextUnprocessedBlockNumber = groupedTxHashCaches.get(nextUnprocessedBlockNumber)
-    const txsInNextUnprocessedBlockNumber = await this.fetchTxsWithStatus(
-      txHashCachesInNextUnprocessedBlockNumber!.map(({ txHash }) => txHash)
-    )
 
-    return txsInNextUnprocessedBlockNumber
+    return [nextUnprocessedBlockNumber, txHashCachesInNextUnprocessedBlockNumber!.map(({ txHash }) => txHash)]
   }
 
   private async upsertTxHashes(): Promise<string[]> {
@@ -239,38 +218,23 @@ export default class IndexerConnector {
   }
 
   private async processTxsInNextBlockNumber() {
-    const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
-    if (txsInNextUnprocessedBlockNumber.length) {
-      this.processingBlockNumber = txsInNextUnprocessedBlockNumber[0].transaction.blockNumber
-      this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
+    const [nextBlockNumber, txHashesInNextBlock] = await this.getTxsInNextUnprocessedBlockNumberAndTxHashes()
+    if (nextBlockNumber !== undefined && txHashesInNextBlock.length) {
+      this.processingBlockNumber = nextBlockNumber
+      this.transactionsSubject.next({ txHashes: txHashesInNextBlock, params: this.processingBlockNumber })
     }
-  }
-
-  private async fetchTxsWithStatus(txHashes: string[]) {
-    const txsWithStatus: TransactionWithStatus[] = []
-
-    for (const hash of txHashes) {
-      const txWithStatus = await this.rpcService.getTransaction(hash)
-      if (!txWithStatus) {
-        throw new Error(`failed to fetch transaction for hash ${hash}`)
-      }
-      const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
-      txWithStatus!.transaction.blockNumber = blockHeader!.number
-      txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
-      txWithStatus!.transaction.timestamp = blockHeader!.timestamp
-      txsWithStatus.push(txWithStatus)
-    }
-
-    return txsWithStatus
   }
 
   public notifyCurrentBlockNumberProcessed(blockNumber: string) {
     if (blockNumber === this.processingBlockNumber) {
       delete this.processingBlockNumber
-    }
-    else {
+    } else {
       return
     }
     this.processNextBlockNumber()
+  }
+
+  public stop(): void {
+    this.pollingIndexer = false
   }
 }

@@ -10,6 +10,9 @@ const NetworkTypeLabel = ({ type }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | 
     case 'ckb_testnet': {
       return <span className="label secondary">{t('settings.network.testnet')}</span>
     }
+    case 'light_testnet': {
+      return <span className="label secondary">{t('settings.network.lightTestnet')}</span>
+    }
     default: {
       return <span className="label third">{t('settings.network.devnet')}</span>
     }

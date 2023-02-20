@@ -1,5 +1,4 @@
 import { getConnection } from 'typeorm'
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import RpcService from 'services/rpc-service'
@@ -62,8 +61,7 @@ const trackingStatus = async () => {
 
   if (successTxs.length > 0) {
     const url: string = NetworksService.getInstance().getCurrent().remote
-    const ckb = new CKB(url)
-    const rpcService = new RpcService(ckb.rpc.node.url)
+    const rpcService = new RpcService(url)
     for (const successTx of successTxs) {
       const transaction = successTx.tx!
       const { blockHash } = successTx

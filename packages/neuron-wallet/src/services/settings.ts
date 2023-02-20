@@ -42,6 +42,14 @@ export default class SettingsService extends Store {
     this.writeSync('ckbDataPath', dataPath)
   }
 
+  get lightDataPath() {
+    return this.readSync('lightDataPath')
+  }
+
+  set lightDataPath(dataPath: string) {
+    this.writeSync('lightDataPath', dataPath)
+  }
+
   constructor() {
     super(
       '',
@@ -53,6 +61,9 @@ export default class SettingsService extends Store {
     )
     if (!this.ckbDataPath) {
       this.ckbDataPath = path.resolve(app.getPath('userData'), 'chains/mainnet')
+    }
+    if (!this.lightDataPath) {
+      this.lightDataPath = path.resolve(app.getPath('userData'), 'chains/light')
     }
   }
 

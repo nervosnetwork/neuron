@@ -1,32 +1,32 @@
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry } from 'rxjs/operators'
+import { NetworkType } from '../../src/models/network'
 import { BUNDLED_CKB_URL } from '../../src/utils/const'
 
 describe('NodeService', () => {
   let nodeService: any
   const stubbedStartCKBNode = jest.fn()
+  const stubbedStartLightNode = jest.fn()
   const stubbedConnectionStatusSubjectNext = jest.fn()
   const stubbedCKBSetNode = jest.fn()
   const stubbedGetTipBlockNumber = jest.fn()
   const stubbedRxjsDebounceTime = jest.fn()
-  const stubbedCKB = jest.fn()
   const stubbedCurrentNetworkIDSubjectSubscribe = jest.fn()
   const stubbedNetworsServiceGet = jest.fn()
   const stubbedLoggerInfo = jest.fn()
   const stubbedLoggerError = jest.fn()
 
   const fakeHTTPUrl = 'http://fakeurl'
-  const fakeHTTPSUrl = 'https://fakeurl'
 
   const resetMocks = () => {
     stubbedStartCKBNode.mockReset()
     stubbedConnectionStatusSubjectNext.mockReset()
     stubbedCKBSetNode.mockReset()
     stubbedGetTipBlockNumber.mockReset()
-    stubbedCKB.mockReset()
     stubbedCurrentNetworkIDSubjectSubscribe.mockReset()
     stubbedNetworsServiceGet.mockReset()
     stubbedLoggerInfo.mockReset()
     stubbedLoggerError.mockReset()
+    stubbedStartLightNode.mockReset()
   }
 
   beforeEach(() => {
@@ -60,8 +60,14 @@ describe('NodeService', () => {
         }
       }
     })
-    jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
-      return stubbedCKB
+    jest.doMock('../../src/utils/ckb-rpc', () => {
+      return {
+        generateRPC() {
+          return {
+            getTipBlockNumber: stubbedGetTipBlockNumber,
+          }
+        }
+      }
     })
     jest.doMock('rxjs/operators', () => {
       return {
@@ -80,6 +86,18 @@ describe('NodeService', () => {
       }
     })
 
+    jest.doMock('../../src/services/light-runner', () => {
+      return {
+        CKBLightRunner: {
+          getInstance() {
+            return {
+              start: stubbedStartLightNode,
+            }
+          }
+        }
+      }
+    })
+
     stubbedRxjsDebounceTime.mockReturnValue((x: any) => x)
   });
 
@@ -89,16 +107,6 @@ describe('NodeService', () => {
 
   describe('when targets external node', () => {
     beforeEach(async () => {
-      stubbedCKB.mockImplementation(() => ({
-        setNode: stubbedCKBSetNode,
-        rpc: {
-          getTipBlockNumber: stubbedGetTipBlockNumber,
-        },
-        node: {
-          url: fakeHTTPUrl
-        }
-      }))
-
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
 
@@ -106,7 +114,7 @@ describe('NodeService', () => {
     });
     it('emits disconnected event in ConnectionStatusSubject', () => {
       expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-        url: fakeHTTPUrl,
+        url: nodeService.nodeUrl,
         connected: false,
         isBundledNode: false,
         startedBundledNode: false,
@@ -114,6 +122,7 @@ describe('NodeService', () => {
     })
     describe('advance to next event', () => {
       beforeEach(async () => {
+        nodeService.setNetwork(fakeHTTPUrl)
         stubbedConnectionStatusSubjectNext.mockReset()
         stubbedGetTipBlockNumber.mockResolvedValueOnce('0x1')
         jest.advanceTimersByTime(1000)
@@ -146,20 +155,9 @@ describe('NodeService', () => {
   });
   describe('when targets bundled node', () => {
     beforeEach(async () => {
-      stubbedCKB.mockImplementation(() => ({
-        setNode: stubbedCKBSetNode,
-        rpc: {
-          getTipBlockNumber: stubbedGetTipBlockNumber,
-        },
-        node: {
-          url: BUNDLED_CKB_URL
-        }
-      }))
-
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
-
-      stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
+      stubbedNetworsServiceGet.mockReturnValue({remote: BUNDLED_CKB_URL})
     });
     describe('when node starts', () => {
       beforeEach(async () => {
@@ -169,15 +167,16 @@ describe('NodeService', () => {
         jest.advanceTimersByTime(1000)
       });
       it('emits disconnected event in ConnectionStatusSubject', () => {
-        expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-          url: BUNDLED_CKB_URL,
+        expect(stubbedConnectionStatusSubjectNext).toHaveBeenLastCalledWith({
+          url: nodeService.nodeUrl,
           connected: false,
-          isBundledNode: true,
+          isBundledNode: false,
           startedBundledNode: false,
         })
       })
       describe('advance to next event', () => {
         beforeEach(async () => {
+          nodeService.setNetwork(BUNDLED_CKB_URL)
           stubbedConnectionStatusSubjectNext.mockReset()
           stubbedGetTipBlockNumber.mockResolvedValueOnce('0x1')
           jest.advanceTimersByTime(1000)
@@ -219,28 +218,25 @@ describe('NodeService', () => {
       });
       it('emits disconnected event in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-          url: BUNDLED_CKB_URL,
+          url: nodeService.nodeUrl,
           connected: false,
-          isBundledNode: true,
+          isBundledNode: false,
           startedBundledNode: false,
         })
       })
     });
+    describe('start light node', () => {
+      it('start light node', async () => {
+        stubbedNetworsServiceGet.mockReturnValueOnce({type: NetworkType.Light})
+        await nodeService.startNode()
+        expect(stubbedStartLightNode).toBeCalled()
+      })
+    })
   });
   describe('CurrentNetworkIDSubject#subscribe', () => {
     let eventCallback: any
     const stubbedTipNumberSubjectCallback = jest.fn()
     beforeEach(async () => {
-      stubbedCKB.mockImplementation(() => ({
-        setNode: stubbedCKBSetNode,
-        rpc: {
-          getTipBlockNumber: stubbedGetTipBlockNumber,
-        },
-        node: {
-          url: fakeHTTPUrl
-        }
-      }))
-
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
       nodeService.tipNumberSubject.subscribe(stubbedTipNumberSubjectCallback)
@@ -249,7 +245,7 @@ describe('NodeService', () => {
     });
     it('emits disconnected event in ConnectionStatusSubject', () => {
       expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-        url: fakeHTTPUrl,
+        url: nodeService.nodeUrl,
         connected: false,
         isBundledNode: false,
         startedBundledNode: false,
@@ -282,10 +278,7 @@ describe('NodeService', () => {
       describe('switches to other network', () => {
         beforeEach(async () => {
           stubbedConnectionStatusSubjectNext.mockReset()
-          stubbedCKBSetNode.mockImplementation(() => {
-            nodeService.ckb.node.url = fakeHTTPUrl
-          })
-
+          stubbedNetworsServiceGet.mockReturnValue({remote: fakeHTTPUrl})
           await eventCallback({currentNetworkID: 'network2'})
           jest.advanceTimersByTime(10000)
         });
@@ -297,34 +290,6 @@ describe('NodeService', () => {
             startedBundledNode: false,
           })
         })
-      });
-    });
-    describe('with http url', () => {
-      beforeEach(async () => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({remote: fakeHTTPUrl})
-        await eventCallback({currentNetworkID: 'test'})
-      });
-      it('sets http agent', () => {
-        expect(stubbedCKBSetNode).toHaveBeenCalledWith(
-          expect.objectContaining({
-            url: fakeHTTPUrl,
-            httpAgent: expect.anything()
-          })
-        )
-      });
-    });
-    describe('with https url', () => {
-      beforeEach(async () => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({remote: fakeHTTPSUrl})
-        await eventCallback({currentNetworkID: 'test'})
-      });
-      it('sets https agent', () => {
-        expect(stubbedCKBSetNode).toHaveBeenCalledWith(
-          expect.objectContaining({
-            url: fakeHTTPSUrl,
-            httpsAgent: expect.anything()
-          })
-        )
       });
     });
     describe('with invalid url', () => {

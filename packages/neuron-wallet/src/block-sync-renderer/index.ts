@@ -9,7 +9,8 @@ import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
-import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
+import { LumosCellQuery } from './sync/connector'
+import { LumosCell } from './sync/indexer-connector'
 import { WorkerMessage, StartParams, QueryIndexerParams } from './task'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
@@ -105,7 +106,8 @@ export const createBlockSyncTask = async () => {
   // prevents the sync task from being started repeatedly if fork does not finish executing.
   child = fork(path.join(__dirname, 'task-wrapper.js'), [], {
     env: { fileBasePath: env.fileBasePath },
-    stdio: ['ipc', process.stdout, 'pipe']
+    stdio: ['ipc', process.stdout, 'pipe'],
+    execArgv: ['--inspect']
   })
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {

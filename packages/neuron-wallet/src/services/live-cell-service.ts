@@ -1,7 +1,8 @@
 import Script from 'models/chain/script'
 import LiveCell from 'models/chain/live-cell'
 import { queryIndexer } from 'block-sync-renderer/index'
-import { LumosCellQuery, LumosCell } from 'block-sync-renderer/sync/indexer-connector'
+import { LumosCell } from 'block-sync-renderer/sync/indexer-connector'
+import { LumosCellQuery } from 'block-sync-renderer/sync/connector'
 
 export default class LiveCellService {
   private static instance: LiveCellService

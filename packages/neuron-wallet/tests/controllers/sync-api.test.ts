@@ -132,10 +132,8 @@ describe('SyncApiController', () => {
         bestKnownBlockTimestamp: `0x${bestKnownBlockTimestamp.toString(16)}`
       })
       stubbedNodeGetInstance.mockReturnValue({
-        ckb: {
-          node: {
-            url: fakeNodeUrl
-          }
+        get nodeUrl() {
+          return fakeNodeUrl
         }
       })
       stubbedGetTipHeader.mockResolvedValue({ timestamp: '180000' })
@@ -358,10 +356,8 @@ describe('SyncApiController', () => {
               describe('with another node url', () => {
                 beforeEach(async () => {
                   stubbedNodeGetInstance.mockReturnValue({
-                    ckb: {
-                      node: {
-                        url: 'anotherfakeurl'
-                      }
+                    get nodeUrl() {
+                      return 'anotherfakeurl'
                     }
                   })
                   await sendFakeCacheBlockTipEvent(newFakeState)
@@ -470,10 +466,8 @@ describe('SyncApiController', () => {
           describe('when node url changed', () => {
             beforeEach(async () => {
               stubbedNodeGetInstance.mockImplementation(() => ({
-                ckb: {
-                  node: {
-                    url: 'http://diffurl'
-                  }
+                get nodeUrl() {
+                  return 'http://diffurl'
                 }
               }))
               await sendFakeCacheBlockTipEvent(fakeState3)

@@ -340,7 +340,7 @@ export class TransactionGenerator {
   }
 
   private static async getTipHeader(): Promise<BlockHeader> {
-    const rpcService = new RpcService(NodeService.getInstance().ckb.node.url)
+    const rpcService = new RpcService(NodeService.getInstance().nodeUrl)
     const tipHeader = await rpcService.getTipHeader()
     return tipHeader
   }

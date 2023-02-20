@@ -71,11 +71,12 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                     <span className={styles.url}>{`(${network.remote}`}</span>
                     <NetworkTypeLabel type={network.chain} />
                   </span>
-
-                  <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
-                    <EditNetwork />
-                  </button>
-                  {isDefault ? null : (
+                  {network.chain === 'light_testnet' || (
+                    <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
+                      <EditNetwork />
+                    </button>
+                  )}
+                  {isDefault || network.chain === 'light_testnet' ? null : (
                     <button
                       type="button"
                       data-action="delete"

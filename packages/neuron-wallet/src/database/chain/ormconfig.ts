@@ -48,6 +48,8 @@ import { UpdateAddressDescription1650984779265 } from './migrations/165098477926
 import { RemoveDuplicateBlake160s1656930265386 } from './migrations/1656930265386-RemoveDuplicateBlake160s'
 import { UpdateOutputChequeLockHash1652945662504 } from './migrations/1652945662504-UpdateOutputChequeLockHash'
 import { RemoveAddressesMultisigConfig1651820157100 } from './migrations/1651820157100-RemoveAddressesMultisigConfig'
+import { AddSyncProgress1676441837373 } from './migrations/1676441837373-AddSyncProgress'
+import SyncProgress from './entities/sync-progress'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -79,7 +81,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       IndexerTxHashCache,
       AddressDescription,
       MultisigConfig,
-      MultisigOuput
+      MultisigOuput,
+      SyncProgress
     ],
     migrations: [
       InitMigration1566959757554,
@@ -111,7 +114,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       UpdateAddressDescription1650984779265,
       RemoveDuplicateBlake160s1656930265386,
       UpdateOutputChequeLockHash1652945662504,
-      RemoveAddressesMultisigConfig1651820157100
+      RemoveAddressesMultisigConfig1651820157100,
+      AddSyncProgress1676441837373
     ],
     logger: 'simple-console',
     logging,
