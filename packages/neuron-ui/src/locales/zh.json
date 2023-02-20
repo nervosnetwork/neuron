@@ -981,6 +981,9 @@
         "view-concise-data": "查看概要",
         "view-raw-data": "查看原始数据"
       }
+    },
+    "dropdown": {
+      "placeholder": "请选择 ..."
     }
   }
 }

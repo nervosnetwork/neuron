@@ -1,7 +1,11 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react'
 import { Price, localNumberFormatter } from 'utils'
 import { Dropdown, IDropdownProps, Icon, IDropdownOption } from 'office-ui-fabric-react'
 import { Transfer } from 'widgets/Icons/icon'
+import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
+import { useTranslation } from 'react-i18next'
+
 import styles from './pricePanel.module.scss'
 
 interface PricePanelProps {
@@ -15,6 +19,7 @@ enum PriceTypeEnum {
 }
 
 const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, onPriceChange }: PricePanelProps) => {
+  const [t] = useTranslation()
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
   const isStandard = type === PriceTypeEnum.Standard
   const label = isStandard ? '单价' : '自定义价格'
@@ -72,6 +77,15 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     />
   )
 
+  const options = [
+    {
+      value: Price.Low,
+      label: <div style={{ color: 'red' }}>{`慢速 ( 单价${Price.Low}shannons/byte | 费用50CKB )`}</div>,
+    },
+    { value: Price.Medium, label: `标准 ( 单价${Price.Medium}shannons/byte | 费用100CKB )` },
+    { value: Price.High, label: `快速 ( 单价${Price.High}shannons/byte | 费用200CKB )` },
+  ]
+
   return (
     <div>
       <div
@@ -125,6 +139,13 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
           <span className={styles.suffix}>shannons/kB</span>
         </div>
       )}
+      <DropdownWithCustomRender
+        onChange={e => {
+          console.log(e, 'changedValue')
+        }}
+        options={options}
+        placeholder={t('dropdown.placeholder')}
+      />
     </div>
   )
 }

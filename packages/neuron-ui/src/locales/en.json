@@ -989,6 +989,9 @@
         "view-concise-data": "View concise data",
         "view-raw-data": "View raw data"
       }
+    },
+    "dropdown": {
+      "placeholder": "Please select..."
     }
   }
 }
