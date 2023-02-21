@@ -53,7 +53,6 @@
   justify-content: flex-start;
   align-items: stretch;
   box-sizing: border-box;
-  margin-bottom: 10px;
 
   input {
     font-family: inherit;
@@ -75,4 +74,27 @@
   padding: 0 10px;
   font-size: 0.75rem;
   max-width: 200px;
+}
+.timeout-wrap {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 4px;
+}
+.label-wrap {
+  color: #333;
+  font-weight: 500;
+  font-size: 12px;
+
+  .label-comment {
+    display: inline-block;
+    font-weight: 400;
+    background-color: #effaf7;
+    color: #00c891;
+    padding: 2px 8px;
+    border-radius: 24px;
+    margin-left: 8px;
+    font-size: 10px;
+    line-height: 14px;
+  }
 }

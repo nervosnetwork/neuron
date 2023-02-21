@@ -21,7 +21,6 @@ interface DropdownWithCustomRenderProps {
 }
 
 const DEFAULT_PLACEHOLDER_STRING = 'Please select...'
-// mainBtnLabel, mainBtnOnClick, mainBtnDisabled, list
 
 const DropdownWithCustomRender = ({
   options: optionsFromProps,
@@ -148,9 +147,9 @@ const DropdownWithCustomRender = ({
     }
   }, [])
 
-  const disabledClass = disabled ? 'dropdown-disabled' : ''
   const placeHolderValue = selectedValue.label || DEFAULT_PLACEHOLDER_STRING
 
+  const disabledClass = disabled ? `${styles['dropdown-disabled']}` : ''
   const dropdownClass = `${styles['dropdown-root']} ${className} ${isOpen ? styles['is-open'] : ''}`
   const controlClass = `${styles['dropdown-control']} ${disabledClass}`
   const placeholderClass = `${styles['dropdown-placeholder']} ${isValueSelected ? styles['is-selected'] : ''}`

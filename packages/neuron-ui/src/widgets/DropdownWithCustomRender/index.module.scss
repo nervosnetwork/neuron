@@ -16,16 +16,16 @@
   box-sizing: border-box;
   cursor: pointer;
   outline: none;
-  padding: 0px 10px;
   transition: all 200ms ease;
   font-size: 0.75rem;
-  line-height: 1.625rem;
   font-weight: 400;
   color: var(--dropdown-base-font-color);
   border-color: rgb(96, 94, 92);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 2.5px 10px;
+  padding-bottom: 3px;
 }
 
 .dropdown-control:hover {
@@ -75,8 +75,15 @@
 }
 
 .dropdown-option.is-selected {
-  background-color: var(--selected-color);
   color: var(--dropdown-base-font-color);
+}
+
+.dropdown-disabled {
+  background-color: var(--selected-color);
+}
+
+.dropdown-placeholder {
+  font-size: 12px;
 }
 
 .dropdown-noresults {
