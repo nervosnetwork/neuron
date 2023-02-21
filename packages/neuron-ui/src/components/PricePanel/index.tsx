@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Price, localNumberFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
+import TextField from 'widgets/TextField'
 import { Transfer } from 'widgets/Icons/icon'
 import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
 import { useTranslation } from 'react-i18next'
@@ -23,44 +23,27 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   const intervalHandle = useRef<any>(null)
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
   const [time, setTime] = useState(8)
+  const [inputError, setInputError] = useState<string | null>(null)
+  const [inputHint, setInputHint] = useState<string | null>(null)
   const [dropdownValue, setDropdowValue] = useState(Object.values(Price).includes(price as any) ? price : Price.Medium)
 
   const isStandard = type === PriceTypeEnum.Standard
   const label = isStandard ? '单价' : '自定义价格'
   const percent = (time / 8) * 100
 
-  useEffect(() => {
-    intervalHandle.current = setInterval(() => {
-      setTime(timeState => timeState - 1)
-    }, 1000)
+  const handleDropdownChange = useCallback((e: any) => {
+    const { value: dropdownChangedValue } = e
+    setDropdowValue(dropdownChangedValue)
+    onPriceChange?.({ target: { value: dropdownChangedValue } })
+  }, [])
 
-    if (time < 0) {
-      // TODO: handlereseach
-      setTime(8)
-      console.log('do reasearch')
-    }
+  const handleInputChange = useCallback((e: any) => {
+    const { value: inputChangedValue } = e.target
+    const handledValue = inputChangedValue.replace(/,/g, '')
 
-    return () => {
-      clearInterval(intervalHandle.current)
-    }
-  }, [time])
-
-  const handleDropdownChange = (e: any) => {
-    console.log(e, 'handleDropdownChange')
-    setDropdowValue(e.value)
-  }
-
-  const TransferIcon = () => (
-    <button
-      data-content={isStandard ? '切换到自定义价格' : '切换到单价'}
-      className={styles['transfer-wrap']}
-      onClick={() => setType(isStandard ? PriceTypeEnum.Customer : PriceTypeEnum.Standard)}
-      onKeyDown={() => {}}
-      type="button"
-    >
-      <Transfer />
-    </button>
-  )
+    setInputError(Number(handledValue) < 1000 ? '价格设定最少不得少于 1000 shannons/byte，请重新输入' : null)
+    onPriceChange?.(e)
+  }, [])
 
   const options = [
     {
@@ -93,7 +76,25 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     },
   ]
 
-  console.log(time, 'time')
+  const handleQueryFeeRateStatics = useCallback(() => {
+    setInputHint(`建议设置为${new Date().toLocaleDateString()}`)
+  }, [])
+
+  useEffect(() => {
+    intervalHandle.current = setInterval(() => {
+      setTime(timeState => timeState - 1)
+    }, 1000)
+
+    if (time < 0) {
+      // TODO: handlereseach
+      handleQueryFeeRateStatics()
+      setTime(8)
+    }
+
+    return () => {
+      clearInterval(intervalHandle.current)
+    }
+  }, [time])
 
   return (
     <div>
@@ -110,9 +111,17 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
           <label htmlFor={field} aria-label={label} title={label}>
             {label}
           </label>
-          <TransferIcon />
+          <button
+            data-content={isStandard ? '切换到自定义价格' : '切换到单价'}
+            className={styles['transfer-wrap']}
+            onClick={() => setType(isStandard ? PriceTypeEnum.Customer : PriceTypeEnum.Standard)}
+            onKeyDown={() => {}}
+            type="button"
+          >
+            <Transfer />
+          </button>
         </div>
-        {isStandard ? (
+        {!isStandard ? (
           <div className={styles['timeout-wrap']}>
             <RingProgressBar percents={percent} color="#00C891" strokeWidth="3px" size="16px" backgroundColor="#CCC" />
             <span>{`单价将在${time}秒后刷新`}</span>
@@ -130,17 +139,14 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
           />
         </div>
       ) : (
-        <div className={styles['input-box']}>
-          <input
-            id={field}
-            type="text"
-            value={localNumberFormatter(price)}
-            title={label}
-            name={label}
-            onChange={onPriceChange}
-          />
-          <span className={styles.suffix}>shannons/kB</span>
-        </div>
+        <TextField
+          field="price"
+          value={localNumberFormatter(price)}
+          onChange={handleInputChange}
+          suffix="shannons/kB"
+          error={inputError ?? null}
+          hint={!inputError && inputHint ? inputHint : null}
+        />
       )}
     </div>
   )
