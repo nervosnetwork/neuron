@@ -22,10 +22,8 @@ abstract class CKBRunner {
     throw new Error('should be called by instance')
   }
 
-  abstract get ckbBinary(): string
+  protected abstract get ckbBinary(): string
   abstract start(): Promise<void>
-  abstract stop(): Promise<void>
-  abstract isLiving(): Promise<boolean>
   platform(): string {
     switch (process.platform) {
       case 'win32':
@@ -37,6 +35,20 @@ abstract class CKBRunner {
       default:
         return ''
     }
+  }
+
+  async stop() {
+    return new Promise<void>(resolve => {
+      resetSyncTaskQueue.push(false)
+      if (this.runnerProces) {
+        logger.info('Runner:\tkilling node')
+        this.runnerProces.once('close', () => resolve())
+        this.runnerProces.kill('SIGKILL')
+        this.runnerProces = undefined
+      } else {
+        resolve()
+      }
+    })
   }
 }
 
@@ -50,7 +62,7 @@ export class CKBLightRunner extends CKBRunner {
     return CKBLightRunner.instance as CKBLightRunner
   }
 
-  get ckbBinary() {
+  protected get ckbBinary() {
     const appPath = app.isPackaged
       ? path.join(path.dirname(app.getAppPath()), '..', './bin')
       : path.join(__dirname, '../../bin')
@@ -60,14 +72,14 @@ export class CKBLightRunner extends CKBRunner {
     return this.platform() === 'win' ? binary + '.exe' : binary
   }
 
-  get templateConfigFile() {
+  private get templateConfigFile() {
     const appPath = app.isPackaged
       ? path.join(path.dirname(app.getAppPath()), '..', './light')
       : path.join(__dirname, '../../light')
     return path.resolve(appPath, './ckb_light.toml')
   }
 
-  get configFile() {
+  private get configFile() {
     return path.resolve(SettingsService.getInstance().lightDataPath, './ckb_light.toml')
   }
 
@@ -132,22 +144,5 @@ export class CKBLightRunner extends CKBRunner {
       this.runnerProces = undefined
     })
     resetSyncTaskQueue.push(true)
-  }
-
-  async stop() {
-    return new Promise<void>(resolve => {
-      if (this.runnerProces) {
-        logger.info('CKBLightRunner:\tkilling node')
-        this.runnerProces.once('close', () => resolve())
-        this.runnerProces.kill('SIGKILL')
-        this.runnerProces = undefined
-      } else {
-        resolve()
-      }
-    })
-  }
-
-  async isLiving() {
-    return false
   }
 }

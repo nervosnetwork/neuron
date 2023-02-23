@@ -11,6 +11,28 @@ export interface LumosCellQuery {
   data: string | null
 }
 
+export interface LumosCell {
+  block_hash: string
+  out_point: {
+    tx_hash: string
+    index: string
+  }
+  cell_output: {
+    capacity: string
+    lock: {
+      code_hash: string
+      args: string
+      hash_type: string
+    }
+    type?: {
+      code_hash: string
+      args: string
+      hash_type: string
+    }
+  }
+  data?: string
+}
+
 export abstract class Connector<T = unknown> {
   abstract blockTipsSubject: Subject<BlockTips>
   abstract transactionsSubject: Subject<{ txHashes: CKBComponents.Hash[]; params: T }>

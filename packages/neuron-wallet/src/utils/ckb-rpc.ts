@@ -82,7 +82,7 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
   }
 }
 
-class FullCKBRPC extends CKBRPC {
+export class FullCKBRPC extends CKBRPC {
   getGenesisBlockHash = async () => {
     return this.getBlockHash('0x0')
   }

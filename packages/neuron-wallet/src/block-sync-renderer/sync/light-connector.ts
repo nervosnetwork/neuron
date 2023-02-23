@@ -12,28 +12,6 @@ import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import HexUtils from 'utils/hex'
 
-export interface LumosCell {
-  block_hash: string
-  out_point: {
-    tx_hash: string
-    index: string
-  }
-  cell_output: {
-    capacity: string
-    lock: {
-      code_hash: string
-      args: string
-      hash_type: string
-    }
-    type?: {
-      code_hash: string
-      args: string
-      hash_type: string
-    }
-  }
-  data?: string
-}
-
 interface SyncQueueParam {
   script: CKBComponents.Script
   scriptType: CKBRPC.ScriptType
@@ -46,7 +24,6 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   private indexer: CkbIndexer
   private addressMetas: AddressMeta[]
   private syncQueue: QueueObject<SyncQueueParam> = queue(this.syncNextWithScript.bind(this), 1)
-  private syncProgressService: SyncProgressService = new SyncProgressService()
   private indexerQueryQueue: QueueObject<LumosCellQuery> | undefined
   private pollingIndexer: boolean = false
   private syncInQueue: Map<
@@ -70,7 +47,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     if (this.syncQueue.idle()) {
       await this.subscribeSync()
       const syncScripts = await this.lightRpc.getScripts()
-      const syncStatusMap = await this.syncProgressService.getAllSyncStatusToMap()
+      const syncStatusMap = await SyncProgressService.getAllSyncStatusToMap()
       syncStatusMap.forEach(v => {
         if (v.cursor && !this.syncInQueue.has(v.hash)) {
           this.syncQueue.push({
@@ -106,7 +83,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   }
 
   private async subscribeSync() {
-    const minSyncBlockNumber = await this.syncProgressService.getMinBlockNumber()
+    const minSyncBlockNumber = await SyncProgressService.getMinBlockNumber()
     const header = await this.lightRpc.getTipHeader()
     this.blockTipsSubject.next({
       cacheTipNumber: minSyncBlockNumber,
@@ -115,6 +92,9 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   }
 
   private async initSyncProgress() {
+    if (!this.addressMetas.length) {
+      return
+    }
     const sycnScripts = await this.lightRpc.getScripts()
     const existSyncscripts: Record<string, LightScriptFilter> = {}
     sycnScripts.forEach(v => {
@@ -139,7 +119,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       blockNumber: existSyncscripts[scriptToHash(v.script)]?.blockNumber || '0x0'
     }))
     await this.lightRpc.setScripts(setScriptsParams)
-    await this.syncProgressService.addSyncProgress(allScripts)
+    await SyncProgressService.resetSyncProgress(allScripts)
   }
 
   private async initSync() {
@@ -151,13 +131,13 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   }
 
   private async syncNextWithScript({ script, scriptType, blockRange, cursor }: SyncQueueParam) {
-    const syncProgress = await this.syncProgressService.getSyncStatus(script)
+    const syncProgress = await SyncProgressService.getSyncStatus(script)
     if (!syncProgress) {
       return
     }
     const result = await this.lightRpc.getTransactions({ script, blockRange, scriptType }, 'asc', '0x64', cursor!)
     if (!result.txs.length) {
-      await this.syncProgressService.updateSyncStatus(syncProgress.hash, {
+      await SyncProgressService.updateSyncStatus(syncProgress.hash, {
         blockStartNumber: parseInt(blockRange[1]),
         blockEndNumber: parseInt(blockRange[1]),
         cursor: undefined
@@ -235,7 +215,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     const nextSyncParams = this.syncInQueue.get(hash)
     if (nextSyncParams) {
       try {
-        await this.syncProgressService.updateSyncStatus(hash, nextSyncParams)
+        await SyncProgressService.updateSyncStatus(hash, nextSyncParams)
       } finally {
         this.syncInQueue.delete(hash)
       }

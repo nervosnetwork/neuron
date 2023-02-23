@@ -24,7 +24,7 @@ export default class ChainInfo {
 
       return genesisHash === this.network.genesisHash
     } catch (err) {
-      logger.error('Network:\tfail to connect to the network. Is CKB node running?', this.network)
+      logger.error('Network:\tfail to connect to the network. Is CKB node running?')
 
       await initConnection(this.network.genesisHash)
 

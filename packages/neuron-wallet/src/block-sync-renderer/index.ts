@@ -10,7 +10,7 @@ import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import { LumosCellQuery } from './sync/connector'
-import { LumosCell } from './sync/indexer-connector'
+import { LumosCell } from './sync/connector'
 import { WorkerMessage, StartParams, QueryIndexerParams } from './task'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
@@ -107,7 +107,7 @@ export const createBlockSyncTask = async () => {
   child = fork(path.join(__dirname, 'task-wrapper.js'), [], {
     env: { fileBasePath: env.fileBasePath },
     stdio: ['ipc', process.stdout, 'pipe'],
-    execArgv: ['--inspect']
+    execArgv: env.app.isPackaged ? [] : ['--inspect']
   })
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {

@@ -12,28 +12,6 @@ import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 import { BlockTips, LumosCellQuery, Connector } from './connector'
 
-export interface LumosCell {
-  block_hash: string
-  out_point: {
-    tx_hash: string
-    index: string
-  }
-  cell_output: {
-    capacity: string
-    lock: {
-      code_hash: string
-      args: string
-      hash_type: string
-    }
-    type?: {
-      code_hash: string
-      args: string
-      hash_type: string
-    }
-  }
-  data?: string
-}
-
 export default class IndexerConnector extends Connector<string | undefined> {
   private indexer: CkbIndexer
   private rpcService: RpcService
