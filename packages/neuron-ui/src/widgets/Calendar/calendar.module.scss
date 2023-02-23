@@ -1,0 +1,90 @@
+@import '../../styles/mixin.scss';
+
+@mixin button {
+    @include medium-text;
+    appearance: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    padding: 7px 7px;
+    border: none;
+    border-radius: 2px;
+    margin: 0;
+    box-sizing: border-box;
+    border-radius: 2px;
+    background-color: transparent;
+    &:hover {
+        @include semi-bold-text;
+        background-color: #efefef;
+    }
+    &[disabled] {
+        cursor: none;
+        opacity: 0.5;
+        box-shadow: none !important;
+        pointer-events: none;
+        &:hover {
+            background-color: transparent;
+        }
+    }
+}
+
+.calendar {
+    width: 374px;
+    .calOptions {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        list-style-type: none;
+        list-style: none;
+        padding: 0;
+        button {
+            @include button;
+            width: 100px;
+        }
+    }
+}
+
+.calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    .calPrev, .calNext {
+        @include button;
+        width: 30px;
+    }
+    .calTitle {
+        button {
+            @include button;
+            @include semi-bold-text;
+            height: 100%;
+            min-width: 100px;
+            margin-right: 10px;
+        }
+    }
+}
+
+.calendarTable {
+    width: 100%;
+
+    .calTableHeader {
+        @include semi-bold-text;
+        font-size: 13px;
+    }
+
+    .calDateItem {
+        @include button;
+        width: 100%;
+        &:global(.today) {
+            border: 1px solid var(--nervos-green-light);
+            margin: -1px;
+        }
+        &:global(.active) {
+            background-color: var(--nervos-green);
+        }
+    }
+}

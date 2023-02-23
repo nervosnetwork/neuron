@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { Calendar, CalendarChangeParams } from 'primereact/calendar'
+import Calendar from 'widgets/Calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
-import { addLocale } from 'primereact/api'
 import styles from './datetimePicker.module.scss'
 
 const SECONDS_PER_DAY = 24 * 3600 * 1000
@@ -42,32 +41,6 @@ const DatetimePicker = ({
   const [display, setDisplay] = useState<string>(preset ? formatDate(new Date(+preset)) : '')
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const locale: any = {
-    firstDayOfWeek: 0,
-    dayNames: ['sun', 'mon', 'tues', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.full`)),
-    dayNamesShort: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.short`)),
-    dayNamesMin: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.tag`)),
-    monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec'].map(monname =>
-      t(`datetime.${monname}.short`)
-    ),
-    monthNamesShort: [
-      'jan',
-      'feb',
-      'mar',
-      'apr',
-      'may',
-      'june',
-      'july',
-      'aug',
-      'sept',
-      'oct',
-      'nov',
-      'dec',
-    ].map(monname => t(`datetime.${monname}.short`)),
-  }
-
-  addLocale('es', locale)
-
   let selected: Date | undefined = display ? new Date(display) : undefined
   if (selected?.toString() === 'Invalid Date') {
     selected = undefined
@@ -100,8 +73,8 @@ const DatetimePicker = ({
   )
 
   const onCalendarChange = useCallback(
-    (e: CalendarChangeParams) => {
-      setDisplay(formatDate(new Date(+e.value!)))
+    (date: Date) => {
+      setDisplay(formatDate(new Date(+date)))
       setStatus('done')
     },
     [setDisplay, setStatus]
@@ -155,14 +128,7 @@ const DatetimePicker = ({
             onKeyPress={onKeyPress}
           />
         )}
-        <Calendar
-          value={selected}
-          minDate={new Date()}
-          onChange={onCalendarChange}
-          inline
-          locale="es"
-          className={styles.calendar}
-        />
+        <Calendar value={selected} minDate={tomorrow} onChange={onCalendarChange} />
         {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}
         {notice ? (
           <div className={styles.notice}>
