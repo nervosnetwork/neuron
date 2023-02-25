@@ -6,10 +6,9 @@ export interface Day {
   month: number
   date: number
   weekday: number
-  curMonth: boolean
+  isCurMonth: boolean
   isToday: boolean
   label: string
-  selectable: boolean
 }
 
 interface DateRange {
@@ -18,27 +17,39 @@ interface DateRange {
 }
 
 export function dayInRange(date: Date, range: DateRange) {
-  if (range.minDate !== null) {
-    range.minDate.setHours(0, 0, 0, 0)
-    if (date < range.minDate) {
-      return false
-    }
+  const dayBegin = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
+
+  if (range.minDate !== null && dayEnd <= range.minDate) {
+    return false
   }
-  if (range.maxDate !== null) {
-    range.maxDate.setHours(0, 0, 0, 0)
-    if (date > range.maxDate) {
-      return false
-    }
+  if (range.maxDate !== null && dayBegin > range.maxDate) {
+    return false
   }
   return true
 }
 
-export function monthInRange(year: number, month: number, range: DateRange) {
-  return dayInRange(new Date(year, month + 1, 1), range)
+export function monthInRange(year: number, monthIndex: number, range: DateRange) {
+  const monthBegin = new Date(year, monthIndex, 1)
+  const monthEnd = new Date(year, monthIndex + 1, 1)
+
+  if (range.minDate !== null && monthEnd <= range.minDate) {
+    return false
+  }
+  if (range.maxDate !== null && monthBegin > range.maxDate) {
+    return false
+  }
+  return true
 }
 
 export function yearInRange(year: number, range: DateRange) {
-  return dayInRange(new Date(year + 1, 1, 1), range)
+  if (range.minDate !== null && year < range.minDate.getFullYear()) {
+    return false
+  }
+  if (range.maxDate !== null && year > range.maxDate.getFullYear()) {
+    return false
+  }
+  return true
 }
 
 export function dateEqual(a: Date | undefined, b: Date | undefined) {
@@ -51,7 +62,7 @@ export function dateEqual(a: Date | undefined, b: Date | undefined) {
 /**
  * @description Generate monthly calendar 2D table data
  */
-export function getMonthCalendar(year: number, month: number, range: DateRange): Day[][] {
+export function getMonthCalendar(year: number, month: number): Day[][] {
   const today = new Date()
   const weekdayOfFirstDay = new Date(year, month - 1, 1).getDay()
   const numOfDaysInCalendar = 42
@@ -67,10 +78,9 @@ export function getMonthCalendar(year: number, month: number, range: DateRange):
       month: instance.getMonth() + 1,
       date: instance.getDate(),
       weekday: instance.getDay(),
-      curMonth: instance.getMonth() + 1 === month,
+      isCurMonth: instance.getMonth() + 1 === month,
       isToday: instance.toDateString() === today.toDateString(),
       label: instance.toLocaleDateString(),
-      selectable: dayInRange(instance, range),
     }
     dateList.push(day)
   }
@@ -87,28 +97,16 @@ export function getMonthCalendar(year: number, month: number, range: DateRange):
 export const useLocalNames = () => {
   const [t] = useTranslation()
 
+  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat']
+  const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec']
+
   const locale = {
     firstDayOfWeek: 0,
-    dayNames: ['sun', 'mon', 'tues', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.full`)),
-    dayNamesShort: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.short`)),
-    dayNamesMin: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.tag`)),
-    monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec'].map(monname =>
-      t(`datetime.${monname}.short`)
-    ),
-    monthNamesShort: [
-      'jan',
-      'feb',
-      'mar',
-      'apr',
-      'may',
-      'june',
-      'july',
-      'aug',
-      'sept',
-      'oct',
-      'nov',
-      'dec',
-    ].map(monname => t(`datetime.${monname}.short`)),
+    dayNames: dayNames.map(dayname => t(`datetime.${dayname}.full`)),
+    dayNamesShort: dayNames.map(dayname => t(`datetime.${dayname}.short`)),
+    dayNamesMin: dayNames.map(dayname => t(`datetime.${dayname}.tag`)),
+    monthNames: monthNames.map(monname => t(`datetime.${monname}.short`)),
+    monthNamesShort: monthNames.map(monname => t(`datetime.${monname}.short`)),
   }
 
   return locale

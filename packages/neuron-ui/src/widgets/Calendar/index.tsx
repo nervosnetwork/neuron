@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { getMonthCalendar, useLocalNames, monthInRange, yearInRange, dateEqual } from './utils'
+import React, { useState, useEffect, useMemo } from 'react'
+import { getMonthCalendar, useLocalNames, monthInRange, yearInRange, dateEqual, dayInRange } from './utils'
 import styles from './calendar.module.scss'
 
 interface Option {
@@ -33,22 +33,25 @@ export interface CalendarProps {
   maxDate?: Date
 }
 const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, maxDate = null }) => {
-  const today = new Date()
-
-  const [year, setYear] = useState(value === undefined ? today.getFullYear() : value.getFullYear())
-  const [month, setMonth] = useState(value === undefined ? today.getMonth() + 1 : value.getMonth() + 1)
+  const [year, setYear] = useState(new Date().getFullYear())
+  const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
 
-  React.useEffect(() => {
-    setYear(value === undefined ? today.getFullYear() : value.getFullYear())
-    setMonth(value === undefined ? today.getMonth() + 1 : value.getMonth() + 1)
+  useEffect(() => {
+    setYear(value?.getFullYear() ?? new Date().getFullYear())
+    setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
   }, [value])
 
   const locale = useLocalNames()
-  const weeknames = [...Array(7).keys()].map(_ => locale.dayNamesMin[(_ + locale.firstDayOfWeek) % 7])
+  const weeknames = useMemo(() => [...Array(7).keys()].map(_ => locale.dayNamesMin[(_ + locale.firstDayOfWeek) % 7]), [
+    locale,
+  ])
   const monthname = locale.monthNames[month - 1]
 
-  const calendar = getMonthCalendar(year, month, { minDate, maxDate })
+  const calendar = useMemo(() => getMonthCalendar(year, month), [year, month])
+  function disabledTime(date: Date) {
+    return !dayInRange(date, { minDate, maxDate })
+  }
   const calendarTable = (
     <table className={styles.calendarTable}>
       <thead>
@@ -76,7 +79,7 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
                     ${date.isToday ? 'today' : ''}
                     ${dateEqual(date.instance, value) ? 'active' : ''}
                   `}
-                  disabled={!date.curMonth || !date.selectable}
+                  disabled={!date.isCurMonth || disabledTime(date.instance)}
                   onClick={() => onChange(date.instance)}
                 >
                   {date.date}
@@ -169,18 +172,11 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
   )
 }
 
-export default React.memo(Calendar, (prevProps, nextProps) => {
-  if (prevProps.value?.toDateString() !== nextProps.value?.toDateString()) {
-    return false
-  }
-  if (prevProps.minDate?.toDateString() !== nextProps.minDate?.toDateString()) {
-    return false
-  }
-  if (prevProps.maxDate?.toDateString() !== nextProps.maxDate?.toDateString()) {
-    return false
-  }
-  if (prevProps.onChange !== nextProps.onChange) {
-    return false
-  }
-  return true
-})
+export default React.memo(
+  Calendar,
+  (prevProps, nextProps) =>
+    dateEqual(prevProps.value, nextProps.value) &&
+    dateEqual(prevProps.minDate, nextProps.minDate) &&
+    dateEqual(prevProps.maxDate, nextProps.maxDate) &&
+    prevProps.onChange === nextProps.onChange
+)
