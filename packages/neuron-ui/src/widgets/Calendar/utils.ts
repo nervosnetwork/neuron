@@ -16,7 +16,9 @@ interface DateRange {
   maxDate: Date | null
 }
 
-export function dayInRange(date: Date, range: DateRange) {
+export type WeekDayRange = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+export function isDayInRange(date: Date, range: DateRange): boolean {
   const dayBegin = new Date(date.getFullYear(), date.getMonth(), date.getDate())
   const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
 
@@ -29,9 +31,9 @@ export function dayInRange(date: Date, range: DateRange) {
   return true
 }
 
-export function monthInRange(year: number, monthIndex: number, range: DateRange) {
-  const monthBegin = new Date(year, monthIndex, 1)
-  const monthEnd = new Date(year, monthIndex + 1, 1)
+export function isMonthInRange(year: number, month: number, range: DateRange): boolean {
+  const monthBegin = new Date(year, month - 1, 1)
+  const monthEnd = new Date(year, month, 1)
 
   if (range.minDate !== null && monthEnd <= range.minDate) {
     return false
@@ -42,7 +44,7 @@ export function monthInRange(year: number, monthIndex: number, range: DateRange)
   return true
 }
 
-export function yearInRange(year: number, range: DateRange) {
+export function isYearInRange(year: number, range: DateRange): boolean {
   if (range.minDate !== null && year < range.minDate.getFullYear()) {
     return false
   }
@@ -52,7 +54,7 @@ export function yearInRange(year: number, range: DateRange) {
   return true
 }
 
-export function dateEqual(a: Date | undefined, b: Date | undefined) {
+export function isDateEqual(a: Date | undefined, b: Date | undefined): boolean {
   if (a === undefined || b === undefined) {
     return false
   }
@@ -62,11 +64,12 @@ export function dateEqual(a: Date | undefined, b: Date | undefined) {
 /**
  * @description Generate monthly calendar 2D table data
  */
-export function getMonthCalendar(year: number, month: number): Day[][] {
+export function getMonthCalendar(year: number, month: number, firstDayOfWeek: WeekDayRange = 0): Day[][] {
   const today = new Date()
   const weekdayOfFirstDay = new Date(year, month - 1, 1).getDay()
-  const numOfDaysInCalendar = 42
-  const firstDayOfWeek = 0
+  const DAYS_IN_WEEK = 7
+  const ROWS_IN_CALENDAR = 6
+  const numOfDaysInCalendar = DAYS_IN_WEEK * ROWS_IN_CALENDAR
 
   const dateList: Day[] = []
 
@@ -101,12 +104,10 @@ export const useLocalNames = () => {
   const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec']
 
   const locale = {
-    firstDayOfWeek: 0,
     dayNames: dayNames.map(dayname => t(`datetime.${dayname}.full`)),
     dayNamesShort: dayNames.map(dayname => t(`datetime.${dayname}.short`)),
     dayNamesMin: dayNames.map(dayname => t(`datetime.${dayname}.tag`)),
     monthNames: monthNames.map(monname => t(`datetime.${monname}.short`)),
-    monthNamesShort: monthNames.map(monname => t(`datetime.${monname}.short`)),
   }
 
   return locale

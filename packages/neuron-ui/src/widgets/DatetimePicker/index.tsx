@@ -74,7 +74,7 @@ const DatetimePicker = ({
 
   const onCalendarChange = useCallback(
     (date: Date) => {
-      setDisplay(formatDate(new Date(+date)))
+      setDisplay(formatDate(date))
       setStatus('done')
     },
     [setDisplay, setStatus]

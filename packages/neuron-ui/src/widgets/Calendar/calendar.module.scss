@@ -19,7 +19,7 @@
         background-color: #efefef;
     }
     &[disabled] {
-        cursor: none;
+        cursor: not-allowed;
         opacity: 0.5;
         box-shadow: none !important;
         pointer-events: none;
@@ -79,11 +79,11 @@
     .calDateItem {
         @include button;
         width: 100%;
-        &:global(.today) {
+        &[aria-current="date"] {
             border: 1px solid var(--nervos-green-light);
             margin: -1px;
         }
-        &:global(.active) {
+        &[aria-pressed="true"] {
             background-color: var(--nervos-green);
         }
     }

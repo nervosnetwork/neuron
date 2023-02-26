@@ -1,5 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { getMonthCalendar, useLocalNames, monthInRange, yearInRange, dateEqual, dayInRange } from './utils'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import {
+  getMonthCalendar,
+  useLocalNames,
+  isMonthInRange,
+  isYearInRange,
+  isDateEqual,
+  isDayInRange,
+  WeekDayRange,
+} from './utils'
 import styles from './calendar.module.scss'
 
 interface Option {
@@ -29,10 +37,11 @@ const Selector = ({ options, onChange }: { options: Option[]; onChange: (option:
 export interface CalendarProps {
   value: Date | undefined
   onChange: (value: Date) => void
+  firstDayOfWeek?: WeekDayRange
   minDate?: Date
   maxDate?: Date
 }
-const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, maxDate = null }) => {
+const Calendar: React.FC<CalendarProps> = ({ value, onChange, firstDayOfWeek = 0, minDate = null, maxDate = null }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
@@ -43,14 +52,14 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
   }, [value])
 
   const locale = useLocalNames()
-  const weeknames = useMemo(() => [...Array(7).keys()].map(_ => locale.dayNamesMin[(_ + locale.firstDayOfWeek) % 7]), [
+  const weeknames = useMemo(() => Array.from({ length: 7 }, (_, i) => locale.dayNamesMin[(i + firstDayOfWeek) % 7]), [
     locale,
   ])
-  const monthname = locale.monthNames[month - 1]
+  const monthName = locale.monthNames[month - 1]
 
-  const calendar = useMemo(() => getMonthCalendar(year, month), [year, month])
-  function disabledTime(date: Date) {
-    return !dayInRange(date, { minDate, maxDate })
+  const calendar = useMemo(() => getMonthCalendar(year, month, firstDayOfWeek), [year, month, firstDayOfWeek])
+  function isDisabledTime(date: Date): boolean {
+    return !isDayInRange(date, { minDate, maxDate })
   }
   const calendarTable = (
     <table className={styles.calendarTable}>
@@ -72,14 +81,11 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
                   type="button"
                   data-type="button"
                   aria-label={date.label}
-                  aria-pressed={dateEqual(date.instance, value)}
+                  aria-pressed={isDateEqual(date.instance, value)}
+                  aria-current={date.isToday ? 'date' : 'false'}
                   title={date.label}
-                  className={`
-                    ${styles.calDateItem}
-                    ${date.isToday ? 'today' : ''}
-                    ${dateEqual(date.instance, value) ? 'active' : ''}
-                  `}
-                  disabled={!date.isCurMonth || disabledTime(date.instance)}
+                  className={styles.calDateItem}
+                  disabled={!date.isCurMonth || isDisabledTime(date.instance)}
                   onClick={() => onChange(date.instance)}
                 >
                   {date.date}
@@ -92,15 +98,15 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
     </table>
   )
 
-  const monthOptions: Option[] = [...Array(12).keys()].map(index => ({
+  const monthOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
     value: index + 1,
     title: locale.monthNames[index],
-    selectable: monthInRange(year, index, { minDate, maxDate }),
+    selectable: isMonthInRange(year, index + 1, { minDate, maxDate }),
   }))
-  const yearOptions: Option[] = [...Array(12).keys()].map(index => ({
+  const yearOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
     value: year - 6 + index,
     title: `${year - 6 + index}`,
-    selectable: yearInRange(year - 6 + index, { minDate, maxDate }),
+    selectable: isYearInRange(year - 6 + index, { minDate, maxDate }),
   }))
 
   const prevMonth = () => {
@@ -128,13 +134,13 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
       <div className={styles.calTitle}>
         <button
           type="button"
-          aria-label={monthname}
-          title={monthname}
+          aria-label={monthName}
+          title={monthName}
           aria-haspopup="true"
           aria-controls="menu"
           onClick={() => setStatus('month')}
         >
-          {monthname}
+          {monthName}
         </button>
         <button
           type="button"
@@ -153,14 +159,20 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
     </div>
   )
 
-  const onChangeMonth = (monthOptionItem: Option) => {
-    setMonth(monthOptionItem.value)
-    setStatus('date')
-  }
-  const onChangeYear = (yearOptionItem: Option) => {
-    setYear(yearOptionItem.value)
-    setStatus('month')
-  }
+  const onChangeMonth = useCallback(
+    (monthOptionItem: Option) => {
+      setMonth(monthOptionItem.value)
+      setStatus('date')
+    },
+    [setStatus, setMonth]
+  )
+  const onChangeYear = useCallback(
+    (yearOptionItem: Option) => {
+      setYear(yearOptionItem.value)
+      setStatus('month')
+    },
+    [setStatus, setYear]
+  )
 
   return (
     <div className={styles.calendar}>
@@ -175,8 +187,9 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate = null, ma
 export default React.memo(
   Calendar,
   (prevProps, nextProps) =>
-    dateEqual(prevProps.value, nextProps.value) &&
-    dateEqual(prevProps.minDate, nextProps.minDate) &&
-    dateEqual(prevProps.maxDate, nextProps.maxDate) &&
+    isDateEqual(prevProps.value, nextProps.value) &&
+    isDateEqual(prevProps.minDate, nextProps.minDate) &&
+    isDateEqual(prevProps.maxDate, nextProps.maxDate) &&
+    prevProps.firstDayOfWeek === nextProps.firstDayOfWeek &&
     prevProps.onChange === nextProps.onChange
 )
