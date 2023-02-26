@@ -79,6 +79,7 @@ type Action =
   | 'generate-dao-deposit-all-tx'
   | 'start-withdraw-from-dao'
   | 'withdraw-from-dao'
+  | 'get_fee_rate_statics'
   // Special Assets
   | 'get-customized-asset-cells'
   | 'generate-withdraw-customized-cell-tx'

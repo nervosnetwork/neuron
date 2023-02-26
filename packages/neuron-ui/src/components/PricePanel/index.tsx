@@ -5,6 +5,9 @@ import TextField from 'widgets/TextField'
 import { Transfer } from 'widgets/Icons/icon'
 import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useState as useGlobalState } from 'states'
+import { getFeeRateStatics } from 'services/remote'
+import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 
 import styles from './pricePanel.module.scss'
 
@@ -17,19 +20,25 @@ enum PriceTypeEnum {
   Customer = 'customer',
   Standard = 'standard',
 }
+const DefaultCountDown = 30
 
 const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, onPriceChange }: PricePanelProps) => {
   const [t] = useTranslation()
   const intervalHandle = useRef<any>(null)
+  const dispatch = useDispatch()
+  const states = useGlobalState()
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
-  const [time, setTime] = useState(8)
   const [inputError, setInputError] = useState<string | null>(null)
   const [inputHint, setInputHint] = useState<string | null>(null)
   const [dropdownValue, setDropdowValue] = useState(Object.values(Price).includes(price as any) ? price : Price.Medium)
+  const [time, setTime] = useState(DefaultCountDown)
+  const [suggestedFeeRate, setSuggestedFeeRate] = useState<number>(0)
 
+  const mean = states?.app?.feeRateStatics?.mean || 0
+  const median = states?.app?.feeRateStatics?.median || 0
   const isStandard = type === PriceTypeEnum.Standard
   const label = isStandard ? '单价' : '自定义价格'
-  const percent = (time / 8) * 100
+  const percent = (time / DefaultCountDown) * 100
 
   const handleDropdownChange = useCallback((e: any) => {
     const { value: dropdownChangedValue } = e
@@ -60,7 +69,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
       label: (
         <div className={styles['label-wrap']}>
           <span>标准</span>
-          <span className={styles['label-comment']}>{`单价${Price.Medium}shannons/byte | 费用100CKB`}</span>
+          <span className={styles['label-comment']}>{`单价${suggestedFeeRate}shannons/byte | 费用100CKB`}</span>
         </div>
       ),
     },
@@ -70,25 +79,53 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
       label: (
         <div className={styles['label-wrap']}>
           <span>快速</span>
-          <span className={styles['label-comment']}>{`单价${Price.High}shannons/byte | 费用200CKB`}</span>
+          <span className={styles['label-comment']}>{`单价${
+            suggestedFeeRate ? suggestedFeeRate * 2 - 1000 : null
+          }shannons/byte | 费用200CKB`}</span>
         </div>
       ),
     },
   ]
 
-  const handleQueryFeeRateStatics = useCallback(() => {
-    setInputHint(`建议设置为${new Date().toLocaleDateString()}`)
+  const handleGetFeeRateStatics = useCallback((stateDispatch: StateDispatch) => {
+    getFeeRateStatics()
+      .then(res => {
+        const { result } = res as any
+        stateDispatch({
+          type: AppActions.GetFeeRateStatics,
+          payload: result,
+        })
+      })
+      .catch((err: Error) => {
+        dispatch({
+          type: AppActions.AddNotification,
+          payload: {
+            type: 'alert',
+            timestamp: +new Date(),
+            content: err.message,
+          },
+        })
+      })
   }, [])
+
+  useEffect(() => {
+    const suggest = Math.max(1000, mean, median)
+
+    setSuggestedFeeRate(suggest)
+    setInputHint(`建议设置为${suggest}`)
+  }, [mean, median])
 
   useEffect(() => {
     intervalHandle.current = setInterval(() => {
       setTime(timeState => timeState - 1)
     }, 1000)
 
+    if (time === DefaultCountDown) {
+      handleGetFeeRateStatics(dispatch)
+    }
     if (time < 0) {
-      // TODO: handlereseach
-      handleQueryFeeRateStatics()
-      setTime(8)
+      handleGetFeeRateStatics(dispatch)
+      setTime(DefaultCountDown)
     }
 
     return () => {
@@ -121,7 +158,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
             <Transfer />
           </button>
         </div>
-        {!isStandard ? (
+        {isStandard ? (
           <div className={styles['timeout-wrap']}>
             <RingProgressBar percents={percent} color="#00C891" strokeWidth="3px" size="16px" backgroundColor="#CCC" />
             <span>{`单价将在${time}秒后刷新`}</span>

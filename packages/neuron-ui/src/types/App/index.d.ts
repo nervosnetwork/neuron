@@ -140,6 +140,7 @@ declare namespace State {
     showAllNotifications: boolean
     isAllowedToFetchList: boolean
     loadedTransaction: any
+    feeRateStatics: any
   }
 
   interface NetworkProperty {

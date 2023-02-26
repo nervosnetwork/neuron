@@ -40,6 +40,7 @@ import MultisigService from './multisig'
 import { getMultisigStatus } from 'utils/multisig'
 import { SignStatus } from 'models/offline-sign'
 import NetworksService from './networks'
+import { rpcRequest } from 'utils/rpc-request'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -827,5 +828,12 @@ export default class TransactionSender {
       path,
       privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`
     }))
+  }
+
+  public getFeeRateStatics = async (): Promise<any> => {
+    const network = await NetworksService.getInstance().getCurrent()
+    const res = await rpcRequest(network.remote, { method: 'get_fee_rate_statics', params: [] })
+
+    return res
   }
 }

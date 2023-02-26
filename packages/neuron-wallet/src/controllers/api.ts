@@ -394,6 +394,11 @@ export default class ApiController {
       return this.#daoController.withdrawFromDao(params)
     });
 
+    handle('get_fee_rate_statics', async () => {
+      return this.#daoController.getFeeRateStatics()
+    });
+
+
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
       return this.#customizedAssetsController.getCustomizedAssetCells(params)

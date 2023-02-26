@@ -110,4 +110,13 @@ export default class DaoController {
       result: tx
     }
   }
+
+  public async getFeeRateStatics(): Promise<Controller.Response> {
+    const tx = await new TransactionSender().getFeeRateStatics()
+
+    return {
+      status: ResponseCode.Success,
+      result: tx?.result
+    }
+  }
 }
