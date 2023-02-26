@@ -41,7 +41,7 @@ export interface CalendarProps {
   minDate?: Date
   maxDate?: Date
 }
-const Calendar: React.FC<CalendarProps> = ({ value, onChange, firstDayOfWeek = 0, minDate = null, maxDate = null }) => {
+const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, firstDayOfWeek = 0 }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')

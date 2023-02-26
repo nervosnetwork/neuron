@@ -12,8 +12,8 @@ export interface Day {
 }
 
 interface DateRange {
-  minDate: Date | null
-  maxDate: Date | null
+  minDate?: Date
+  maxDate?: Date
 }
 
 export type WeekDayRange = 0 | 1 | 2 | 3 | 4 | 5 | 6
@@ -22,10 +22,10 @@ export function isDayInRange(date: Date, range: DateRange): boolean {
   const dayBegin = new Date(date.getFullYear(), date.getMonth(), date.getDate())
   const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
 
-  if (range.minDate !== null && dayEnd <= range.minDate) {
+  if (range.minDate !== undefined && dayEnd <= range.minDate) {
     return false
   }
-  if (range.maxDate !== null && dayBegin > range.maxDate) {
+  if (range.maxDate !== undefined && dayBegin > range.maxDate) {
     return false
   }
   return true
@@ -35,20 +35,20 @@ export function isMonthInRange(year: number, month: number, range: DateRange): b
   const monthBegin = new Date(year, month - 1, 1)
   const monthEnd = new Date(year, month, 1)
 
-  if (range.minDate !== null && monthEnd <= range.minDate) {
+  if (range.minDate !== undefined && monthEnd <= range.minDate) {
     return false
   }
-  if (range.maxDate !== null && monthBegin > range.maxDate) {
+  if (range.maxDate !== undefined && monthBegin > range.maxDate) {
     return false
   }
   return true
 }
 
 export function isYearInRange(year: number, range: DateRange): boolean {
-  if (range.minDate !== null && year < range.minDate.getFullYear()) {
+  if (range.minDate !== undefined && year < range.minDate.getFullYear()) {
     return false
   }
-  if (range.maxDate !== null && year > range.maxDate.getFullYear()) {
+  if (range.maxDate !== undefined && year > range.maxDate.getFullYear()) {
     return false
   }
   return true
@@ -74,7 +74,7 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
   const dateList: Day[] = []
 
   for (let i = 1; i <= numOfDaysInCalendar; i++) {
-    const instance = new Date(year, month - 1, firstDayOfWeek - weekdayOfFirstDay + i)
+    const instance = new Date(year, month - 1, ((firstDayOfWeek - weekdayOfFirstDay - 7) % 7) + i)
     const day: Day = {
       instance,
       year: instance.getFullYear(),
