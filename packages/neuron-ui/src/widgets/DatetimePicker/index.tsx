@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react'
 import Calendar from 'widgets/Calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
+import i18n from 'i18next'
 import styles from './datetimePicker.module.scss'
 
 const SECONDS_PER_DAY = 24 * 3600 * 1000
@@ -128,7 +129,7 @@ const DatetimePicker = ({
             onKeyPress={onKeyPress}
           />
         )}
-        <Calendar value={selected} minDate={tomorrow} onChange={onCalendarChange} />
+        <Calendar value={selected} minDate={tomorrow} onChange={onCalendarChange} lang={i18n.language} />
         {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}
         {notice ? (
           <div className={styles.notice}>

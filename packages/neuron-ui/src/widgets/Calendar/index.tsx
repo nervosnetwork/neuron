@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import {
   getMonthCalendar,
-  useLocalNames,
+  getLocalMonthNames,
+  getLocalWeekNames,
   isMonthInRange,
   isYearInRange,
   isDateEqual,
@@ -37,11 +38,12 @@ const Selector = ({ options, onChange }: { options: Option[]; onChange: (option:
 export interface CalendarProps {
   value: Date | undefined
   onChange: (value: Date) => void
+  lang?: string
   firstDayOfWeek?: WeekDayRange
   minDate?: Date
   maxDate?: Date
 }
-const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, firstDayOfWeek = 0 }) => {
+const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, lang = 'en', firstDayOfWeek = 0 }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
@@ -51,11 +53,11 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
     setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
   }, [value])
 
-  const locale = useLocalNames()
-  const weeknames = useMemo(() => Array.from({ length: 7 }, (_, i) => locale.dayNamesMin[(i + firstDayOfWeek) % 7]), [
-    locale,
-  ])
-  const monthName = locale.monthNames[month - 1]
+  const monthNames = useMemo(() => getLocalMonthNames(lang), [lang])
+  const weekNames = useMemo(() => getLocalWeekNames(lang), [lang])
+
+  const weekTitle = useMemo(() => Array.from({ length: 7 }, (_, i) => weekNames[(i + firstDayOfWeek) % 7]), [weekNames])
+  const monthName = monthNames[month - 1]
 
   const calendar = useMemo(() => getMonthCalendar(year, month, firstDayOfWeek), [year, month, firstDayOfWeek])
   function isDisabledTime(date: Date): boolean {
@@ -65,7 +67,7 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
     <table className={styles.calendarTable}>
       <thead>
         <tr>
-          {weeknames.map(weekname => (
+          {weekTitle.map(weekname => (
             <th className={styles.calTableHeader} scope="col" key={weekname}>
               {weekname}
             </th>
@@ -100,7 +102,7 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
 
   const monthOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
     value: index + 1,
-    title: locale.monthNames[index],
+    title: monthNames[index],
     selectable: isMonthInRange(year, index + 1, { minDate, maxDate }),
   }))
   const yearOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({

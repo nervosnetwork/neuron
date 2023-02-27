@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 export interface Day {
   instance: Date
   year: number
@@ -97,18 +95,12 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
   return calendarData
 }
 
-export const useLocalNames = () => {
-  const [t] = useTranslation()
+export const getLocalMonthNames = (lang: string) => {
+  const formater = new Intl.DateTimeFormat(lang, { month: 'short' })
+  return Array.from({ length: 12 }, (_, i) => formater.format(new Date(Date.UTC(2023, i, 1))))
+}
 
-  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat']
-  const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec']
-
-  const locale = {
-    dayNames: dayNames.map(dayname => t(`datetime.${dayname}.full`)),
-    dayNamesShort: dayNames.map(dayname => t(`datetime.${dayname}.short`)),
-    dayNamesMin: dayNames.map(dayname => t(`datetime.${dayname}.tag`)),
-    monthNames: monthNames.map(monname => t(`datetime.${monname}.short`)),
-  }
-
-  return locale
+export const getLocalWeekNames = (lang: string) => {
+  const formater = new Intl.DateTimeFormat(lang, { weekday: 'short' })
+  return Array.from({ length: 7 }, (_, i) => formater.format(new Date(Date.UTC(2023, 0, 1 + i))))
 }

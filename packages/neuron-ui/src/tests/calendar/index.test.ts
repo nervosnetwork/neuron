@@ -4,6 +4,8 @@ import {
   isYearInRange,
   isDateEqual,
   getMonthCalendar,
+  getLocalMonthNames,
+  getLocalWeekNames,
 } from '../../widgets/Calendar/utils'
 
 describe('Check day in range', () => {
@@ -88,5 +90,39 @@ describe('Generate monthly calendar data', () => {
       ['2023/1/23', '2023/1/24', '2023/1/25', '2023/1/26', '2023/1/27', '2023/1/28', '2023/1/29'],
       ['2023/1/30', '2023/1/31', '2023/2/1', '2023/2/2', '2023/2/3', '2023/2/4', '2023/2/5'],
     ])
+  })
+})
+
+describe('Get Local Month Names', () => {
+  it('Chinese', () => {
+    const names = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+    expect(getLocalMonthNames('zh')).toEqual(names)
+  })
+
+  it('English', () => {
+    const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    expect(getLocalMonthNames('en')).toEqual(names)
+  })
+})
+
+describe('Get Local Week Names', () => {
+  it('Chinese', () => {
+    const names = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    expect(getLocalWeekNames('zh')).toEqual(names)
+  })
+
+  it('English', () => {
+    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    expect(getLocalWeekNames('en')).toEqual(names)
+  })
+
+  it('Traditional Chinese', () => {
+    const names = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+    expect(getLocalWeekNames('zh-TW')).toEqual(names)
+  })
+
+  it('Japanese', () => {
+    const names = ['日', '月', '火', '水', '木', '金', '土']
+    expect(getLocalWeekNames('ja')).toEqual(names)
   })
 })
