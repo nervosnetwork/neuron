@@ -67,7 +67,7 @@ describe('Check date equal', () => {
 
 describe('Generate monthly calendar data', () => {
   it('Test month calendar output', () => {
-    expect(getMonthCalendar(2023, 1).map(week => week.map(date => date.label))).toEqual([
+    expect(getMonthCalendar(2023, 1).map(week => week.map(date => `${date.year}/${date.month}/${date.date}`))).toEqual([
       ['2023/1/1', '2023/1/2', '2023/1/3', '2023/1/4', '2023/1/5', '2023/1/6', '2023/1/7'],
       ['2023/1/8', '2023/1/9', '2023/1/10', '2023/1/11', '2023/1/12', '2023/1/13', '2023/1/14'],
       ['2023/1/15', '2023/1/16', '2023/1/17', '2023/1/18', '2023/1/19', '2023/1/20', '2023/1/21'],
@@ -78,7 +78,9 @@ describe('Generate monthly calendar data', () => {
   })
 
   it('Test month canlendar with specified start weekday', () => {
-    expect(getMonthCalendar(2023, 1, 1).map(week => week.map(date => date.label))).toEqual([
+    expect(
+      getMonthCalendar(2023, 1, 1).map(week => week.map(date => `${date.year}/${date.month}/${date.date}`))
+    ).toEqual([
       ['2022/12/26', '2022/12/27', '2022/12/28', '2022/12/29', '2022/12/30', '2022/12/31', '2023/1/1'],
       ['2023/1/2', '2023/1/3', '2023/1/4', '2023/1/5', '2023/1/6', '2023/1/7', '2023/1/8'],
       ['2023/1/9', '2023/1/10', '2023/1/11', '2023/1/12', '2023/1/13', '2023/1/14', '2023/1/15'],
