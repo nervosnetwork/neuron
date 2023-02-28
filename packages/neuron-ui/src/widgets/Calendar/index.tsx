@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   getMonthCalendar,
   getLocalMonthNames,
@@ -38,12 +39,13 @@ const Selector = ({ options, onChange }: { options: Option[]; onChange: (option:
 export interface CalendarProps {
   value: Date | undefined
   onChange: (value: Date) => void
+  // lang tags: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
   lang?: string
   firstDayOfWeek?: WeekDayRange
   minDate?: Date
   maxDate?: Date
 }
-const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, lang = 'en', firstDayOfWeek = 0 }) => {
+const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, lang, firstDayOfWeek = 0 }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
@@ -53,8 +55,11 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
     setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
   }, [value])
 
-  const monthNames = useMemo(() => getLocalMonthNames(lang), [lang])
-  const weekNames = useMemo(() => getLocalWeekNames(lang), [lang])
+  const [, i18n] = useTranslation()
+  const language = lang === undefined ? i18n.language : lang
+
+  const monthNames = useMemo(() => getLocalMonthNames(language), [language])
+  const weekNames = useMemo(() => getLocalWeekNames(language), [language])
 
   const weekTitle = useMemo(() => Array.from({ length: 7 }, (_, i) => weekNames[(i + firstDayOfWeek) % 7]), [weekNames])
   const monthName = monthNames[month - 1]
