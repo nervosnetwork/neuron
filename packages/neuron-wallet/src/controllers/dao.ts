@@ -113,10 +113,21 @@ export default class DaoController {
 
   public async getFeeRateStatics(): Promise<Controller.Response> {
     const tx = await new TransactionSender().getFeeRateStatics()
+    const { result } = tx
+    let suggestFeeRate
+
+    const { mean, median } = result
+    if (result) {
+      suggestFeeRate = Math.max(1000, mean, median)
+    }
 
     return {
       status: ResponseCode.Success,
-      result: tx?.result
+      result: {
+        mean,
+        median,
+        suggestFeeRate
+      }
     }
   }
 }

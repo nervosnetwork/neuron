@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Price, localNumberFormatter } from 'utils'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
 import TextField from 'widgets/TextField'
 import { Transfer } from 'widgets/Icons/icon'
 import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useState as useGlobalState } from 'states'
+import { appState, useDispatch, useState as useGlobalState } from 'states'
 import { getFeeRateStatics } from 'services/remote'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { useGetbatchGeneratedTx } from 'components/Send/hooks'
 
 import styles from './pricePanel.module.scss'
 
 interface PricePanelProps {
   field: string
-  price: string | Price
+  price: string
   onPriceChange: any
 }
 enum PriceTypeEnum {
@@ -26,19 +27,25 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   const [t] = useTranslation()
   const intervalHandle = useRef<any>(null)
   const dispatch = useDispatch()
-  const states = useGlobalState()
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
   const [inputError, setInputError] = useState<string | null>(null)
   const [inputHint, setInputHint] = useState<string | null>(null)
-  const [dropdownValue, setDropdowValue] = useState(Object.values(Price).includes(price as any) ? price : Price.Medium)
+  const [dropdownValue, setDropdowValue] = useState()
   const [time, setTime] = useState(DefaultCountDown)
-  const [suggestedFeeRate, setSuggestedFeeRate] = useState<number>(0)
+  const [feeMap, setFeeMap] = useState([])
+  const [priceArray, setPriceArray] = useState(['1000', '2000', '3000'])
 
-  const mean = states?.app?.feeRateStatics?.mean || 0
-  const median = states?.app?.feeRateStatics?.median || 0
   const isStandard = type === PriceTypeEnum.Standard
   const label = isStandard ? '单价' : '自定义价格'
   const percent = (time / DefaultCountDown) * 100
+
+  const {
+    app: {
+      send = appState.send,
+      feeRateStatics: { suggestFeeRate = 0 },
+    },
+    wallet: { id: walletID = '' },
+  } = useGlobalState()
 
   const handleDropdownChange = useCallback((e: any) => {
     const { value: dropdownChangedValue } = e
@@ -54,34 +61,43 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     onPriceChange?.(e)
   }, [])
 
+  const newMap = feeMap?.map((item: any) => ({
+    feeValue: item.selectedValue,
+    value: shannonToCKBFormatter(item.value),
+  }))
+
   const options = [
     {
-      value: Price.Low,
+      value: priceArray[0],
       label: (
         <div className={styles['label-wrap']}>
           <span>慢速</span>
-          <span className={styles['label-comment']}>{`单价${Price.Low}shannons/byte | 费用50CKB`}</span>
+          <span
+            className={styles['label-comment']}
+          >{`单价${newMap?.[0]?.feeValue}shannons/byte | 费用${newMap?.[0]?.value}CKB`}</span>
         </div>
       ),
     },
     {
-      value: Price.Medium,
+      value: priceArray[1],
       label: (
         <div className={styles['label-wrap']}>
           <span>标准</span>
-          <span className={styles['label-comment']}>{`单价${suggestedFeeRate}shannons/byte | 费用100CKB`}</span>
+          <span
+            className={styles['label-comment']}
+          >{`单价${newMap?.[1]?.feeValue}shannons/byte | 费用${newMap?.[1]?.value}CKB`}</span>
         </div>
       ),
     },
 
     {
-      value: Price.High,
+      value: priceArray[2],
       label: (
         <div className={styles['label-wrap']}>
           <span>快速</span>
-          <span className={styles['label-comment']}>{`单价${
-            suggestedFeeRate ? suggestedFeeRate * 2 - 1000 : null
-          }shannons/byte | 费用200CKB`}</span>
+          <span
+            className={styles['label-comment']}
+          >{`单价${newMap?.[2]?.feeValue}shannons/byte | 费用${newMap?.[2]?.value}CKB`}</span>
         </div>
       ),
     },
@@ -109,11 +125,11 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   }, [])
 
   useEffect(() => {
-    const suggest = Math.max(1000, mean, median)
-
-    setSuggestedFeeRate(suggest)
-    setInputHint(`建议设置为${suggest}`)
-  }, [mean, median])
+    if (suggestFeeRate) {
+      setPriceArray(['1000', `${suggestFeeRate}`, `${Number(suggestFeeRate) * 2 - 1000}`])
+    }
+    setInputHint(`建议设置为${suggestFeeRate}`)
+  }, [suggestFeeRate])
 
   useEffect(() => {
     intervalHandle.current = setInterval(() => {
@@ -132,6 +148,12 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
       clearInterval(intervalHandle.current)
     }
   }, [time])
+
+  useEffect(() => {
+    useGetbatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
+      setFeeMap(res as any)
+    })
+  }, [send.outputs])
 
   return (
     <div>

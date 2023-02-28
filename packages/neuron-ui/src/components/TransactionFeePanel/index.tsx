@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react'
 import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'

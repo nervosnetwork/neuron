@@ -168,6 +168,7 @@ const useOnTransactionChange = (
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
+
       updateTransactionWith(generateTx)({
         walletID,
         items,
@@ -263,6 +264,51 @@ const clear = (dispatch: StateDispatch) => {
 }
 
 const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
+
+export const useGetbatchGeneratedTx = async ({
+  walletID,
+  priceArray = [],
+  items,
+}: {
+  walletID: string
+  priceArray?: string[]
+  items: Readonly<State.Output[]>
+}) => {
+  const getUpdateGeneratedTx = (params: any) =>
+    generateTx(params)
+      .then((res: any) => {
+        if (res.status === 1) {
+          return res.result
+        }
+        if (res.status === 0 || res.status === 114) {
+          throw new Error(res.message.content)
+        }
+        return res
+      })
+      .catch((err: Error) => {
+        // eslint-disable-next-line no-console
+        console.log(err, 'err')
+        return undefined
+      })
+
+  const realParams = {
+    walletID,
+    items: items.map(item => ({
+      address: item.address || '',
+      capacity: CKBToShannonFormatter(item.amount, item.unit),
+      date: item.date,
+    })),
+  }
+
+  const requestArray = priceArray.map(itemPrice => getUpdateGeneratedTx({ ...realParams, feeRate: itemPrice }))
+  const allPromiseResult = await Promise.allSettled(requestArray)
+  const feeRateMap = allPromiseResult?.map((batchItem: any, index: number) => ({
+    selectedValue: priceArray[index],
+    value: calculateFee(batchItem?.value),
+  }))
+
+  return feeRateMap
+}
 
 export const useInitialize = (
   walletID: string,

@@ -55,7 +55,11 @@ export const appState: State.App = {
   showAllNotifications: false,
   isAllowedToFetchList: true,
   loadedTransaction: null,
-  feeRateStatics: null,
+  feeRateStatics: {
+    mean: 0,
+    median: 0,
+    suggestFeeRate: 0,
+  },
 }
 
 export default appState

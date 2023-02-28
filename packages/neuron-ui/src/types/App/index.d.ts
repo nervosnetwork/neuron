@@ -140,7 +140,11 @@ declare namespace State {
     showAllNotifications: boolean
     isAllowedToFetchList: boolean
     loadedTransaction: any
-    feeRateStatics: any
+    feeRateStatics: {
+      mean: string | number
+      median: string | number
+      suggestFeeRate: string | number
+    }
   }
 
   interface NetworkProperty {
