@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react'
 import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
@@ -8,10 +7,10 @@ import { useTranslation } from 'react-i18next'
 interface TransactionFeeProps {
   fee: string
   price: string
-  onPriceChange: any
+  onPriceChange: React.EventHandler<React.SyntheticEvent>
 }
 
-const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
+const TransactionFeePanel: React.FunctionComponent<TransactionFeeProps> = ({
   price,
   fee,
   onPriceChange,
@@ -28,6 +27,6 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
   )
 }
 
-TransactionFee.displayName = 'TransactionFee'
+TransactionFeePanel.displayName = 'TransactionFeePanel'
 
-export default TransactionFee
+export default TransactionFeePanel

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
 import TextField from 'widgets/TextField'
@@ -15,7 +15,7 @@ import styles from './pricePanel.module.scss'
 interface PricePanelProps {
   field: string
   price: string
-  onPriceChange: any
+  onPriceChange: React.EventHandler<React.SyntheticEvent>
 }
 enum PriceTypeEnum {
   Customer = 'customer',
@@ -33,7 +33,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   const [dropdownValue, setDropdowValue] = useState()
   const [time, setTime] = useState(DefaultCountDown)
   const [feeMap, setFeeMap] = useState([])
-  const [priceArray, setPriceArray] = useState(['1000', '2000', '3000'])
+  const [priceArray, setPriceArray] = useState(['1000', '1000', '1000'])
 
   const isStandard = type === PriceTypeEnum.Standard
   const label = isStandard ? '单价' : '自定义价格'
@@ -50,7 +50,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   const handleDropdownChange = useCallback((e: any) => {
     const { value: dropdownChangedValue } = e
     setDropdowValue(dropdownChangedValue)
-    onPriceChange?.({ target: { value: dropdownChangedValue } })
+    onPriceChange?.({ target: { value: dropdownChangedValue } } as any)
   }, [])
 
   const handleInputChange = useCallback((e: any) => {
@@ -61,47 +61,47 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     onPriceChange?.(e)
   }, [])
 
-  const newMap = feeMap?.map((item: any) => ({
-    feeValue: item.selectedValue,
-    value: shannonToCKBFormatter(item.value),
+  const feeValuesMap = feeMap?.map((item: any) => ({
+    feeRateValue: item.feeRateValue,
+    value: shannonToCKBFormatter(item.feeValue),
   }))
 
-  const options = [
-    {
-      value: priceArray[0],
-      label: (
-        <div className={styles['label-wrap']}>
-          <span>慢速</span>
-          <span
-            className={styles['label-comment']}
-          >{`单价${newMap?.[0]?.feeValue}shannons/byte | 费用${newMap?.[0]?.value}CKB`}</span>
-        </div>
-      ),
-    },
-    {
-      value: priceArray[1],
-      label: (
-        <div className={styles['label-wrap']}>
-          <span>标准</span>
-          <span
-            className={styles['label-comment']}
-          >{`单价${newMap?.[1]?.feeValue}shannons/byte | 费用${newMap?.[1]?.value}CKB`}</span>
-        </div>
-      ),
-    },
+  const options = useMemo(
+    () => [
+      {
+        value: priceArray[0],
+        label: (
+          <div className={styles['label-wrap']}>
+            <span>慢速</span>
+            <span className={styles['label-comment']}>{`单价${feeValuesMap?.[0]?.feeRateValue ||
+              priceArray[0]}shannons/byte | 费用${feeValuesMap?.[0]?.value || 0}CKB`}</span>
+          </div>
+        ),
+      },
+      {
+        value: priceArray[1],
+        label: (
+          <div className={styles['label-wrap']}>
+            <span>标准</span>
+            <span className={styles['label-comment']}>{`单价${feeValuesMap?.[1]?.feeRateValue ||
+              priceArray[1]}shannons/byte | 费用${feeValuesMap?.[1]?.value || 0}CKB`}</span>
+          </div>
+        ),
+      },
 
-    {
-      value: priceArray[2],
-      label: (
-        <div className={styles['label-wrap']}>
-          <span>快速</span>
-          <span
-            className={styles['label-comment']}
-          >{`单价${newMap?.[2]?.feeValue}shannons/byte | 费用${newMap?.[2]?.value}CKB`}</span>
-        </div>
-      ),
-    },
-  ]
+      {
+        value: priceArray[2],
+        label: (
+          <div className={styles['label-wrap']}>
+            <span>快速</span>
+            <span className={styles['label-comment']}>{`单价${feeValuesMap?.[2]?.feeRateValue ||
+              priceArray[2]}shannons/byte | 费用${feeValuesMap?.[2]?.value || 0}CKB`}</span>
+          </div>
+        ),
+      },
+    ],
+    [priceArray, feeValuesMap]
+  )
 
   const handleGetFeeRateStatics = useCallback((stateDispatch: StateDispatch) => {
     getFeeRateStatics()
@@ -125,13 +125,6 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   }, [])
 
   useEffect(() => {
-    if (suggestFeeRate) {
-      setPriceArray(['1000', `${suggestFeeRate}`, `${Number(suggestFeeRate) * 2 - 1000}`])
-    }
-    setInputHint(`建议设置为${suggestFeeRate}`)
-  }, [suggestFeeRate])
-
-  useEffect(() => {
     intervalHandle.current = setInterval(() => {
       setTime(timeState => timeState - 1)
     }, 1000)
@@ -153,7 +146,12 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     useGetbatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
       setFeeMap(res as any)
     })
-  }, [send.outputs])
+  }, [send.outputs, priceArray])
+
+  useEffect(() => {
+    setPriceArray(['1000', `${suggestFeeRate}`, `${Number(suggestFeeRate) * 2 - 1000}`])
+    setInputHint(`建议设置为${suggestFeeRate}`)
+  }, [suggestFeeRate])
 
   return (
     <div>

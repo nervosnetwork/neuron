@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
@@ -41,6 +42,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   dispatch: StateDispatch
   t: TFunction
 }) => {
+  console.log(price, 'price')
   const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
   if (items.length === 1 && items[0].amount === undefined) {
     setTotalAmount('0')
@@ -237,6 +239,8 @@ const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value } = e.target as HTMLInputElement
       const price = value.split('.')[0].replace(/[^\d]/g, '')
+
+      console.log(price, 'price selected')
       dispatch({
         type: AppActions.UpdateSendPrice,
         payload: price.replace(/,/g, ''),
@@ -303,8 +307,8 @@ export const useGetbatchGeneratedTx = async ({
   const requestArray = priceArray.map(itemPrice => getUpdateGeneratedTx({ ...realParams, feeRate: itemPrice }))
   const allPromiseResult = await Promise.allSettled(requestArray)
   const feeRateMap = allPromiseResult?.map((batchItem: any, index: number) => ({
-    selectedValue: priceArray[index],
-    value: calculateFee(batchItem?.value),
+    feeRateValue: priceArray[index],
+    feeValue: calculateFee(batchItem?.value),
   }))
 
   return feeRateMap

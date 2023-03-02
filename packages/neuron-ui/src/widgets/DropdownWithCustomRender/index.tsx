@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
+/* eslint-disable no-console */
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { LineDownArrow } from 'widgets/Icons/icon'
 
 import styles from './index.module.scss'
@@ -35,6 +36,7 @@ const DropdownWithCustomRender = ({
   const [isMounted, setIsMounted] = useState(true)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
 
+  // render selected value in options
   const parseValue = (value: string, options: OptionProps[]) => {
     let option
 
@@ -134,11 +136,14 @@ const DropdownWithCustomRender = ({
     return ops.length ? ops : <div className={`${styles['dropdown-noresults']}`}>No options found</div>
   }
 
+  const memoedMenu = useMemo(() => buildMenu(), [optionsFromProps])
+
   const isValueSelected = selectedValue.value !== ''
 
   useEffect(() => {
     document.addEventListener('click', handleDocumentClick, false)
     document.addEventListener('touchend', handleDocumentClick, false)
+    setIsMounted(true)
 
     return () => {
       setIsMounted(false)
@@ -157,11 +162,16 @@ const DropdownWithCustomRender = ({
   const menuClass = `${styles['dropdown-menu']}`
 
   const inputValue = <div className={placeholderClass}>{placeHolderValue}</div>
-  const menu = isOpen ? (
-    <div className={menuClass} aria-expanded="true">
-      {buildMenu()}
-    </div>
-  ) : null
+
+  const menu = useMemo(
+    () =>
+      isOpen ? (
+        <div className={menuClass} aria-expanded="true">
+          {memoedMenu}
+        </div>
+      ) : null,
+    [isOpen, memoedMenu]
+  )
 
   return (
     <div ref={dropdownRef} className={dropdownClass}>
