@@ -10,7 +10,11 @@ import {
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
 } from 'services/remote'
-import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
+import {
+  wallets as walletsCache,
+  currentWallet as currentWalletCache,
+  addresses as addressesCache,
+} from 'services/localCache'
 
 import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData } from 'states'
 import { ErrorCode, addressesToBalance, failureResToNotification, isSuccessResponse, sendTxBaseAction } from 'utils'
@@ -83,6 +87,7 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
         type: NeuronWalletActions.UpdateAddressListAndBalance,
         payload: { addresses, balance },
       })
+      addressesCache.save(addresses)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
