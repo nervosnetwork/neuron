@@ -1,5 +1,12 @@
 @import '../../styles/mixin.scss';
 
+.price-panel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
 .transfer-wrap {
   display: flex;
   align-items: center;
@@ -64,6 +71,9 @@
     text-overflow: ellipsis;
     word-break: keep-all;
   }
+}
+.dropdown-box {
+  margin: 4px 0px 19px 0px;
 }
 .suffix {
   font-family: inherit;

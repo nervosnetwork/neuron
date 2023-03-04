@@ -12,7 +12,6 @@
   overflow: hidden;
   background-color: white;
   border: 1px solid rgb(96, 94, 92);
-  border-radius: 2px;
   box-sizing: border-box;
   cursor: pointer;
   outline: none;
@@ -24,8 +23,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2.5px 10px;
-  padding-bottom: 3px;
+  padding: 3px 10px;
+  padding-bottom: 3.5px;
 }
 
 .dropdown-control:hover {

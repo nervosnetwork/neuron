@@ -107,20 +107,12 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
 
   useEffect(() => {
     setPriceArray(['1000', `${suggestFeeRate}`, `${Number(suggestFeeRate) * 2 - 1000}`])
-    setInputHint(`建议设置为${suggestFeeRate}`)
+    setInputHint(`建议价格 ${suggestFeeRate} shannons/byte`)
   }, [suggestFeeRate])
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontSize: '0.875rem',
-          lineHeight: '1.125rem',
-          marginBottom: '4px',
-        }}
-      >
+      <div className={styles['price-panel']}>
         <div style={{ display: 'flex' }}>
           <label htmlFor={field} aria-label={label} title={label}>
             {label}
