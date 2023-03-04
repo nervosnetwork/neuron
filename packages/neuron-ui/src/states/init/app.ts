@@ -1,6 +1,6 @@
 import { CapacityUnit, CONSTANTS, ErrorCode } from 'utils'
 
-const { INIT_SEND_PRICE } = CONSTANTS
+const { INIT_SEND_PRICE, DEFAULT_COUNT_DOWN } = CONSTANTS
 
 const initNotifications: Array<State.Message> = [
   {
@@ -60,6 +60,7 @@ export const appState: State.App = {
     median: 0,
     suggestFeeRate: 0,
   },
+  countDown: DEFAULT_COUNT_DOWN,
 }
 
 export default appState

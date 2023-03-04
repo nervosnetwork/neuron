@@ -6,7 +6,6 @@ import { isMainnet as isMainnetUtil, isSuccessResponse, validateAddress } from '
 import TextField from 'widgets/TextField'
 import { generateNFTSendTransaction } from 'services/remote'
 import Button from 'widgets/Button'
-import { MEDIUM_FEE_RATE } from 'utils/const'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { isErrorWithI18n } from 'exceptions'
 import styles from './NFTSend.module.scss'
@@ -42,6 +41,7 @@ const NFTSend = () => {
     wallet: { id: walletId },
     app: {
       loadings: { sending: isSending = false },
+      feeRateStatics: { suggestFeeRate = 0 },
     },
     settings: { networks },
     chain: { networkID },
@@ -122,7 +122,7 @@ const NFTSend = () => {
         receiveAddress: sendState.address,
         outPoint,
         description: sendState.description,
-        feeRate: `${MEDIUM_FEE_RATE}`,
+        feeRate: `${suggestFeeRate}`,
       }
 
       generateNFTSendTransaction(params)
@@ -141,7 +141,7 @@ const NFTSend = () => {
         })
     }, TIMER_DELAY)
     return clearTimer
-  }, [isSubmittable, globalDispatch, sendState, walletId, outPoint])
+  }, [isSubmittable, globalDispatch, sendState, walletId, outPoint, suggestFeeRate])
 
   return (
     <div>

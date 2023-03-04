@@ -28,6 +28,8 @@ export const HOURS_PER_DAY = 24
 
 export const INIT_SEND_PRICE = '1000'
 
+export const DEFAULT_COUNT_DOWN = 30
+
 export const MIN_CKB_REQUIRED_BY_CKB_SUDT = 61
 export const MIN_CKB_REQUIRED_BY_NORMAL_SUDT = 142
 export const MAX_SUDT_ACCOUNT_NAME_LENGTH = 16

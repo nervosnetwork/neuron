@@ -145,6 +145,7 @@ declare namespace State {
       median: string | number
       suggestFeeRate: string | number
     }
+    countDown: number
   }
 
   interface NetworkProperty {

@@ -36,7 +36,7 @@ import {
 } from './hooks'
 import styles from './specialAssetList.module.scss'
 
-const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
+const { PAGE_SIZE } = CONSTANTS
 
 export interface SpecialAssetCell {
   blockHash: string
@@ -100,7 +100,11 @@ const SpecialAssetList = () => {
   }, [closeNewAccount, closeExistAccount, setMigrateCell])
 
   const {
-    app: { epoch, globalDialog },
+    app: {
+      epoch,
+      globalDialog,
+      feeRateStatics: { suggestFeeRate = 0 },
+    },
     wallet: { id },
     settings: { networks },
     chain: {
@@ -248,7 +252,7 @@ const SpecialAssetList = () => {
           unlockSpecialAsset({
             walletID: id,
             outPoint: cell.outPoint,
-            feeRate: `${MEDIUM_FEE_RATE}`,
+            feeRate: `${suggestFeeRate}`,
             customizedAssetInfo: cell.customizedAssetInfo,
           }).then(handleRes('unlock'))
           return

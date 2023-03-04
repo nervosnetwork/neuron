@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useState as useGlobalState } from 'states'
-
-import { openExternal, showSettings } from 'services/remote'
+import { useDispatch, useState as useGlobalState } from 'states'
+import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { openExternal, showSettings, getFeeRateStatics } from 'services/remote'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
@@ -23,6 +23,8 @@ import {
 } from 'utils'
 
 import { Migrate } from 'services/subjects'
+import { DEFAULT_COUNT_DOWN } from 'utils/const'
+
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`]
@@ -58,6 +60,7 @@ const Navbar = () => {
   const history = useHistory()
   const { pathname } = useLocation()
   const neuronWallet = useGlobalState()
+  const dispatch = useDispatch()
   const {
     wallet: { name },
     chain: {
@@ -66,7 +69,9 @@ const Navbar = () => {
       syncState: { cacheTipBlockNumber, bestKnownBlockNumber, estimate, status, isLookingValidTarget, validTarget },
     },
     settings: { wallets = [], networks = [] },
+    app: { countDown },
   } = neuronWallet
+  const intervalHandle = useRef<any>(null)
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
 
@@ -146,6 +151,46 @@ const Navbar = () => {
   const syncBlockNumbers = `${cacheTipBlockNumber >= 0 ? localNumberFormatter(cacheTipBlockNumber) : '-'}/${
     bestBlockNumber >= 0 ? localNumberFormatter(bestBlockNumber) : '-'
   }`
+
+  useEffect(() => {
+    intervalHandle.current = setTimeout(() => {
+      dispatch({
+        type: AppActions.UpdateCountDown,
+        payload: countDown <= 0 ? DEFAULT_COUNT_DOWN : countDown - 1,
+      })
+    }, 1000)
+
+    return () => {
+      clearTimeout(intervalHandle.current)
+    }
+  }, [countDown])
+
+  const handleGetFeeRateStatics = useCallback((stateDispatch: StateDispatch) => {
+    getFeeRateStatics()
+      .then(res => {
+        const { result } = res as any
+        stateDispatch({
+          type: AppActions.GetFeeRateStatics,
+          payload: result,
+        })
+      })
+      .catch((err: Error) => {
+        stateDispatch({
+          type: AppActions.AddNotification,
+          payload: {
+            type: 'alert',
+            timestamp: +new Date(),
+            content: err.message,
+          },
+        })
+      })
+  }, [])
+
+  useEffect(() => {
+    if (countDown === DEFAULT_COUNT_DOWN) {
+      handleGetFeeRateStatics(dispatch)
+    }
+  }, [countDown])
 
   return (
     <aside className={styles.sidebar}>

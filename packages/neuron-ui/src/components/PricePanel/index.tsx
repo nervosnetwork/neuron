@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
 import TextField from 'widgets/TextField'
 import { Transfer } from 'widgets/Icons/icon'
 import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
 import { useTranslation } from 'react-i18next'
-import { appState, useDispatch, useState as useGlobalState } from 'states'
-import { getFeeRateStatics } from 'services/remote'
-import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { appState, useState as useGlobalState } from 'states'
+
 import { useGetbatchGeneratedTx } from 'components/Send/hooks'
+import { DEFAULT_COUNT_DOWN } from 'utils/const'
 
 import styles from './pricePanel.module.scss'
 
@@ -21,31 +21,27 @@ enum PriceTypeEnum {
   Customer = 'customer',
   Standard = 'standard',
 }
-const DefaultCountDown = 30
 
 const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, onPriceChange }: PricePanelProps) => {
   const [t] = useTranslation()
-  const intervalHandle = useRef<any>(null)
-  const dispatch = useDispatch()
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
   const [inputError, setInputError] = useState<string | null>(null)
   const [inputHint, setInputHint] = useState<string | null>(null)
   const [dropdownValue, setDropdowValue] = useState()
-  const [time, setTime] = useState(DefaultCountDown)
   const [feeMap, setFeeMap] = useState([])
   const [priceArray, setPriceArray] = useState(['1000', '1000', '1000'])
-
-  const isStandard = type === PriceTypeEnum.Standard
-  const label = isStandard ? '单价' : '自定义价格'
-  const percent = (time / DefaultCountDown) * 100
-
   const {
     app: {
       send = appState.send,
       feeRateStatics: { suggestFeeRate = 0 },
+      countDown,
     },
     wallet: { id: walletID = '' },
   } = useGlobalState()
+
+  const isStandard = type === PriceTypeEnum.Standard
+  const label = isStandard ? '单价' : '自定义价格'
+  const percent = (countDown / DEFAULT_COUNT_DOWN) * 100
 
   const handleDropdownChange = useCallback((e: any) => {
     const { value: dropdownChangedValue } = e
@@ -103,45 +99,6 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     [priceArray, feeValuesMap]
   )
 
-  const handleGetFeeRateStatics = useCallback((stateDispatch: StateDispatch) => {
-    getFeeRateStatics()
-      .then(res => {
-        const { result } = res as any
-        stateDispatch({
-          type: AppActions.GetFeeRateStatics,
-          payload: result,
-        })
-      })
-      .catch((err: Error) => {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            timestamp: +new Date(),
-            content: err.message,
-          },
-        })
-      })
-  }, [])
-
-  useEffect(() => {
-    intervalHandle.current = setInterval(() => {
-      setTime(timeState => timeState - 1)
-    }, 1000)
-
-    if (time === DefaultCountDown) {
-      handleGetFeeRateStatics(dispatch)
-    }
-    if (time < 0) {
-      handleGetFeeRateStatics(dispatch)
-      setTime(DefaultCountDown)
-    }
-
-    return () => {
-      clearInterval(intervalHandle.current)
-    }
-  }, [time])
-
   useEffect(() => {
     useGetbatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
       setFeeMap(res as any)
@@ -181,7 +138,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
         {isStandard ? (
           <div className={styles['timeout-wrap']}>
             <RingProgressBar percents={percent} color="#00C891" strokeWidth="3px" size="16px" backgroundColor="#CCC" />
-            <span>{`单价将在${time}秒后刷新`}</span>
+            <span>{`单价将在${countDown}秒后刷新`}</span>
           </div>
         ) : null}
       </div>

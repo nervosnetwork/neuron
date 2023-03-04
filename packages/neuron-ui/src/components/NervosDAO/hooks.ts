@@ -44,17 +44,19 @@ export const useUpdateMaxDeposit = ({
   setMaxDepositTx,
   setMaxDepositErrorMessage,
   isBalanceReserved,
+  suggestFeeRate,
 }: {
   wallet: State.Wallet
   setMaxDepositAmount: React.Dispatch<React.SetStateAction<bigint>>
   setMaxDepositTx: React.Dispatch<React.SetStateAction<any>>
   setMaxDepositErrorMessage: React.Dispatch<React.SetStateAction<string>>
   isBalanceReserved: boolean
+  suggestFeeRate: number | string
 }) => {
   useEffect(() => {
     generateDaoDepositAllTx({
       walletID: wallet.id,
-      feeRate: `${MEDIUM_FEE_RATE}`,
+      feeRate: `${suggestFeeRate}`,
       isBalanceReserved,
     })
       .then((res: any) => {
@@ -72,7 +74,15 @@ export const useUpdateMaxDeposit = ({
         setMaxDepositTx(undefined)
         setMaxDepositErrorMessage(err.message)
       })
-  }, [wallet.id, wallet.balance, setMaxDepositAmount, setMaxDepositErrorMessage, setMaxDepositTx, isBalanceReserved])
+  }, [
+    wallet.id,
+    wallet.balance,
+    setMaxDepositAmount,
+    setMaxDepositErrorMessage,
+    setMaxDepositTx,
+    isBalanceReserved,
+    suggestFeeRate,
+  ])
 }
 
 export const useInitData = ({
@@ -129,6 +139,7 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage,
   isBalanceReserved,
   t,
+  suggestFeeRate,
 }: {
   setDepositValue: React.Dispatch<React.SetStateAction<string>>
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
@@ -140,6 +151,7 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage: string
   isBalanceReserved: boolean
   t: TFunction
+  suggestFeeRate: number | string
 }) =>
   useCallback(
     (value: string) => {
@@ -171,7 +183,7 @@ export const useUpdateDepositValue = ({
         const capacity = CKBToShannonFormatter(amount, CapacityUnit.CKB)
         if (BigInt(capacity) < maxDepositAmount) {
           generateDaoDepositTx({
-            feeRate: `${MEDIUM_FEE_RATE}`,
+            feeRate: `${suggestFeeRate}`,
             capacity,
             walletID,
           }).then(res => {
@@ -213,6 +225,7 @@ export const useUpdateDepositValue = ({
       setDepositValue,
       setErrorMessage,
       isBalanceReserved,
+      suggestFeeRate,
     ]
   )
 
@@ -298,19 +311,21 @@ export const useOnWithdrawDialogSubmit = ({
   clearGeneratedTx,
   walletID,
   dispatch,
+  suggestFeeRate,
 }: {
   activeRecord: State.NervosDAORecord | null
   setActiveRecord: React.Dispatch<null>
   clearGeneratedTx: () => void
   walletID: string
   dispatch: React.Dispatch<StateAction>
+  suggestFeeRate: number | string
 }) =>
   useCallback(() => {
     if (activeRecord) {
       generateDaoWithdrawTx({
         walletID,
         outPoint: activeRecord.outPoint,
-        feeRate: `${MEDIUM_FEE_RATE}`,
+        feeRate: `${suggestFeeRate}`,
       })
         .then(res => {
           if (isSuccessResponse(res)) {
@@ -342,7 +357,7 @@ export const useOnWithdrawDialogSubmit = ({
         })
     }
     setActiveRecord(null)
-  }, [activeRecord, setActiveRecord, clearGeneratedTx, walletID, dispatch])
+  }, [activeRecord, setActiveRecord, clearGeneratedTx, walletID, dispatch, suggestFeeRate])
 
 export const useOnActionClick = ({
   records,

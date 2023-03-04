@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 
 import appState from 'states/init/app'
-import { useState as useGlobalState, useDispatch } from 'states'
 
 import {
   CONSTANTS,
@@ -15,9 +15,12 @@ import {
   getCurrentUrl,
   getSyncStatus,
   CKBToShannonFormatter,
+  ErrorCode,
+  CapacityUnit,
+  isSuccessResponse,
 } from 'utils'
 
-import { openExternal } from 'services/remote'
+import { generateDaoDepositTx, openExternal } from 'services/remote'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -43,6 +46,7 @@ const NervosDAO = () => {
       tipBlockHash,
       tipBlockTimestamp,
       epoch,
+      feeRateStatics: { suggestFeeRate = 0 },
     },
     wallet,
     nervosDAO: { records },
@@ -79,6 +83,7 @@ const NervosDAO = () => {
     maxDepositErrorMessage,
     isBalanceReserved,
     t,
+    suggestFeeRate,
   })
 
   const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
@@ -102,6 +107,7 @@ const NervosDAO = () => {
     setMaxDepositTx,
     setMaxDepositErrorMessage,
     isBalanceReserved,
+    suggestFeeRate,
   })
   hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
@@ -111,6 +117,7 @@ const NervosDAO = () => {
     clearGeneratedTx,
     walletID: wallet.id,
     dispatch,
+    suggestFeeRate,
   })
 
   const onActionClick = hooks.useOnActionClick({
@@ -243,6 +250,28 @@ const NervosDAO = () => {
       setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
     }
   }, [maxDepositAmount, depositValue, setDepositValue])
+
+  // use to update fee with suggestFeeRate
+  useEffect(() => {
+    generateDaoDepositTx({
+      feeRate: `${suggestFeeRate}`,
+      capacity: CKBToShannonFormatter(depositValue, CapacityUnit.CKB),
+      walletID: wallet.id,
+    }).then(res => {
+      if (isSuccessResponse(res)) {
+        dispatch({
+          type: AppActions.UpdateGeneratedTx,
+          payload: res.result,
+        })
+      } else if (res.status === 0) {
+        setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+      } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
+        setErrorMessage(t(`messages.codes.106`))
+      } else {
+        setErrorMessage(t(`messages.codes.${res.status}`))
+      }
+    })
+  }, [suggestFeeRate, generateDaoDepositTx])
 
   const MemoizedDepositDialog = useMemo(() => {
     return (
