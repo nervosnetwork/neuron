@@ -58,6 +58,9 @@ export enum AppActions {
   UpdateExperimentalParams = 'updateExperimentalParams',
   // offline sign
   UpdateLoadedTransaction = 'updateLoadedTransaction',
+
+  GetFeeRateStats = 'getFeeRateStats',
+  UpdateCountDown = 'updateCountDown',
 }
 
 export type StateAction =
@@ -89,6 +92,8 @@ export type StateAction =
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: { tx: any; assetAccount?: any } | null }
   | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
+  | { type: AppActions.GetFeeRateStats; payload: State.FeeRateStatsType }
+  | { type: AppActions.UpdateCountDown; payload: number }
   | { type: NeuronWalletActions.InitAppState; payload: any }
   | { type: NeuronWalletActions.UpdateCurrentWallet; payload: Partial<State.Wallet> }
   | { type: NeuronWalletActions.UpdateWalletList; payload: State.WalletIdentity[] }
@@ -365,6 +370,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       }
       break
     }
+
     default: {
       break
     }
