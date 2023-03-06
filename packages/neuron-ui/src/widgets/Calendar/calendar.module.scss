@@ -78,10 +78,11 @@
 
     .calDateItem {
         @include button;
-        width: 100%;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
         &[aria-current="date"] {
-            border: 1px solid var(--nervos-green-light);
-            margin: -1px;
+            color: var(--nervos-green-light);
         }
         &[aria-pressed="true"] {
             background-color: var(--nervos-green);

@@ -39,13 +39,11 @@ const Selector = ({ options, onChange }: { options: Option[]; onChange: (option:
 export interface CalendarProps {
   value: Date | undefined
   onChange: (value: Date) => void
-  // lang tags: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
-  lang?: string
   firstDayOfWeek?: WeekDayRange
   minDate?: Date
   maxDate?: Date
 }
-const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, lang, firstDayOfWeek = 0 }) => {
+const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, firstDayOfWeek = 0 }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
@@ -53,11 +51,9 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
   useEffect(() => {
     setYear(value?.getFullYear() ?? new Date().getFullYear())
     setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
-  }, [value])
+  }, [value?.toDateString()])
 
-  const [, i18n] = useTranslation()
-  const language = lang === undefined ? i18n.language : lang
-
+  const [, { language }] = useTranslation()
   const monthNames = useMemo(() => getLocalMonthNames(language), [language])
   const weekNames = useMemo(() => getLocalWeekNames(language), [language])
 
@@ -104,17 +100,6 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
       </tbody>
     </table>
   )
-
-  const monthOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
-    value: index + 1,
-    title: monthNames[index],
-    selectable: isMonthInRange(year, index + 1, { minDate, maxDate }),
-  }))
-  const yearOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
-    value: year - 6 + index,
-    title: `${year - 6 + index}`,
-    selectable: isYearInRange(year - 6 + index, { minDate, maxDate }),
-  }))
 
   const prevMonth = () => {
     if (month > 1) {
@@ -180,6 +165,16 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
     },
     [setStatus, setYear]
   )
+  const monthOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
+    value: index + 1,
+    title: monthNames[index],
+    selectable: isMonthInRange(year, index + 1, { minDate, maxDate }),
+  }))
+  const yearOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
+    value: year - 6 + index,
+    title: `${year - 6 + index}`,
+    selectable: isYearInRange(year - 6 + index, { minDate, maxDate }),
+  }))
 
   return (
     <div className={styles.calendar}>
@@ -194,9 +189,9 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
 export default React.memo(
   Calendar,
   (prevProps, nextProps) =>
-    isDateEqual(prevProps.value, nextProps.value) &&
-    isDateEqual(prevProps.minDate, nextProps.minDate) &&
-    isDateEqual(prevProps.maxDate, nextProps.maxDate) &&
+    prevProps.value?.toDateString() === nextProps.value?.toDateString() &&
+    prevProps.minDate?.toDateString() === nextProps.minDate?.toDateString() &&
+    prevProps.maxDate?.toDateString() === nextProps.maxDate?.toDateString() &&
     prevProps.firstDayOfWeek === nextProps.firstDayOfWeek &&
     prevProps.onChange === nextProps.onChange
 )
