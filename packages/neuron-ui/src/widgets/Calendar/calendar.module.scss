@@ -86,6 +86,7 @@
         }
         &[aria-pressed="true"] {
             background-color: var(--nervos-green);
+            color: white;
         }
     }
 }
