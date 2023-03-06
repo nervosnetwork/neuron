@@ -71,6 +71,10 @@
 .calendarTable {
     width: 100%;
 
+    :global(td) {
+        text-align: center;
+    }
+
     .calTableHeader {
         @include semi-bold-text;
         font-size: 13px;
