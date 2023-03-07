@@ -58,7 +58,7 @@
     "sass": "1.58.3"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "7.20.5",
+    "@babel/plugin-proposal-private-property-in-object": "7.21.0",
     "@storybook/addon-actions": "5.3.18",
     "@storybook/addon-knobs": "5.3.21",
     "@storybook/addon-links": "5.3.18",
