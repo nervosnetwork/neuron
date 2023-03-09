@@ -13,16 +13,16 @@ export enum NetworkType {
   Full
 }
 
-abstract class CKBRunner {
+abstract class NodeRunner {
   protected constructor() {}
   protected abstract networkType: NetworkType
-  protected runnerProces: ChildProcess | undefined
-  protected static instance: CKBRunner | undefined
-  static getInstance(): CKBRunner {
+  protected runnerProcess: ChildProcess | undefined
+  protected static instance: NodeRunner | undefined
+  static getInstance(): NodeRunner {
     throw new Error('should be called by instance')
   }
 
-  protected abstract get ckbBinary(): string
+  protected abstract get binary(): string
   abstract start(): Promise<void>
   platform(): string {
     switch (process.platform) {
@@ -40,11 +40,11 @@ abstract class CKBRunner {
   async stop() {
     return new Promise<void>(resolve => {
       resetSyncTaskQueue.push(false)
-      if (this.runnerProces) {
+      if (this.runnerProcess) {
         logger.info('Runner:\tkilling node')
-        this.runnerProces.once('close', () => resolve())
-        this.runnerProces.kill('SIGKILL')
-        this.runnerProces = undefined
+        this.runnerProcess.once('close', () => resolve())
+        this.runnerProcess.kill('SIGKILL')
+        this.runnerProcess = undefined
       } else {
         resolve()
       }
@@ -52,7 +52,7 @@ abstract class CKBRunner {
   }
 }
 
-export class CKBLightRunner extends CKBRunner {
+export class CKBLightRunner extends NodeRunner {
   protected networkType: NetworkType = NetworkType.Full
 
   static getInstance(): CKBLightRunner {
@@ -62,7 +62,7 @@ export class CKBLightRunner extends CKBRunner {
     return CKBLightRunner.instance as CKBLightRunner
   }
 
-  protected get ckbBinary() {
+  protected get binary() {
     const appPath = app.isPackaged
       ? path.join(path.dirname(app.getAppPath()), '..', './bin')
       : path.join(__dirname, '../../bin')
@@ -80,7 +80,7 @@ export class CKBLightRunner extends CKBRunner {
   }
 
   private get configFile() {
-    return path.resolve(SettingsService.getInstance().lightDataPath, './ckb_light.toml')
+    return path.resolve(SettingsService.getInstance().testnetLightDataPath, './ckb_light.toml')
   }
 
   initConfig() {
@@ -97,11 +97,11 @@ export class CKBLightRunner extends CKBRunner {
     const newValues = values.map(v => {
       if (isStorePath) {
         isStorePath = false
-        return `path = "${path.join(SettingsService.getInstance().lightDataPath, './store')}"`
+        return `path = "${path.join(SettingsService.getInstance().testnetLightDataPath, './store')}"`
       }
       if (isNetworkPath) {
         isNetworkPath = false
-        return `path = "${path.join(SettingsService.getInstance().lightDataPath, './network')}"`
+        return `path = "${path.join(SettingsService.getInstance().testnetLightDataPath, './network')}"`
       }
       if (v === '[store]') {
         isStorePath = true
@@ -110,38 +110,38 @@ export class CKBLightRunner extends CKBRunner {
       }
       return v
     })
-    if (!fs.existsSync(SettingsService.getInstance().lightDataPath)) {
-      fs.mkdirSync(SettingsService.getInstance().lightDataPath, { recursive: true })
+    if (!fs.existsSync(SettingsService.getInstance().testnetLightDataPath)) {
+      fs.mkdirSync(SettingsService.getInstance().testnetLightDataPath, { recursive: true })
     }
     fs.writeFileSync(this.configFile, newValues.join('\n'))
   }
 
   async start() {
-    if (this.runnerProces) {
+    if (this.runnerProcess) {
       logger.info(`CKBLightRunner:\tckb is not closed, close it before start...`)
       await this.stop()
     }
     this.initConfig()
 
     const options = ['run', '--config-file', this.configFile]
-    const runnerProcess = spawn(this.ckbBinary, options, { stdio: ['ignore', 'pipe', 'pipe'] })
-    this.runnerProces = runnerProcess
+    const runnerProcess = spawn(this.binary, options, { stdio: ['ignore', 'pipe', 'pipe'] })
+    this.runnerProcess = runnerProcess
 
     runnerProcess.stderr &&
       runnerProcess.stderr.on('data', data => {
         const dataString: string = data.toString()
         logger.error('CKBLightRunner:\trun fail:', dataString)
-        this.runnerProces = undefined
+        this.runnerProcess = undefined
       })
 
     runnerProcess.on('error', error => {
       logger.error('CKBLightRunner:\trun fail:', error)
-      this.runnerProces = undefined
+      this.runnerProcess = undefined
     })
 
     runnerProcess.on('close', () => {
       logger.info('CKBLightRunner:\tprocess closed')
-      this.runnerProces = undefined
+      this.runnerProcess = undefined
     })
     resetSyncTaskQueue.push(true)
   }

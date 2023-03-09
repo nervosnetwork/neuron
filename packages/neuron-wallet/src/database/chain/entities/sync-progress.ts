@@ -32,7 +32,7 @@ export default class SyncProgress {
   cursor?: HexString
 
   @Column({ type: 'boolean' })
-  softDelete: boolean = false
+  delete: boolean = false
 
   static fromObject(obj: { script: CKBComponents.Script; scriptType: CKBRPC.ScriptType; walletId: string }) {
     const res = new SyncProgress()
@@ -42,7 +42,7 @@ export default class SyncProgress {
     res.hashType = obj.script.hashType
     res.walletId = obj.walletId
     res.scriptType = obj.scriptType
-    res.softDelete = false
+    res.delete = false
     return res
   }
 }

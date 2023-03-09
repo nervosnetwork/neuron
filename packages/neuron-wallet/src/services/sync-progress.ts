@@ -18,7 +18,7 @@ export default class SyncProgressService {
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
-      .set({ softDelete: true })
+      .set({ delete: true })
       .where({ walletId: Not(In(walletIds)) })
       .execute()
   }

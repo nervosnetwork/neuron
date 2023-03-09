@@ -7,7 +7,7 @@ import { Validate, Required } from 'utils/validators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network, TESTNET_GENESIS_HASH } from 'models/network'
 import CommonUtils from 'utils/common'
-import { BUNDLED_LIGHT_CKB_URL, LIGHT_CHAIN } from 'utils/const'
+import { BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from 'utils/const'
 import { generateRPC } from 'utils/ckb-rpc'
 
 const presetNetworks: { selected: string; networks: Network[] } = {
@@ -26,19 +26,19 @@ const presetNetworks: { selected: string; networks: Network[] } = {
 
 const lightClientNetwork: Network[] = [
   {
-    id: 'testnet_light',
-    name: 'Light Testnet',
+    id: 'light_client_testnet',
+    name: 'Light Client Testnet',
     remote: BUNDLED_LIGHT_CKB_URL,
     genesisHash: TESTNET_GENESIS_HASH,
     type: NetworkType.Light,
-    chain: LIGHT_CHAIN
+    chain: LIGHT_CLIENT_TESTNET
   }
 ]
 
 enum NetworksKey {
   List = 'networks',
   Current = 'selected',
-  AddedLight = 'AddedLight'
+  AddedLightNetwork = 'AddedLightNetwork'
 }
 
 export default class NetworksService extends Store {
@@ -56,11 +56,11 @@ export default class NetworksService extends Store {
 
     const currentNetwork = this.getCurrent()
     this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
-    const addLight = this.readSync<boolean>(NetworksKey.AddedLight)
+    const addLight = this.readSync<boolean>(NetworksKey.AddedLightNetwork)
     if (!addLight) {
       const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
       this.updateAll([...networks, ...lightClientNetwork])
-      this.writeSync(NetworksKey.AddedLight, true)
+      this.writeSync(NetworksKey.AddedLightNetwork, true)
     }
   }
 

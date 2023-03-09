@@ -19,6 +19,7 @@ import { ShouldInChildProcess } from 'exceptions'
 import { BlockTips, Connector } from './connector'
 import LightConnector from './light-connector'
 import { generateRPC } from 'utils/ckb-rpc'
+import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
 
 export default class Queue {
   // eslint-disable-next-line prettier/prettier
@@ -50,7 +51,7 @@ export default class Queue {
   start = async () => {
     logger.info("Queue:\tstart")
     try {
-      if (this.#url === 'http://localhost:9000') {
+      if (this.#url === BUNDLED_LIGHT_CKB_URL) {
         this.#indexerConnector = new LightConnector(this.#addresses, this.#url)
       } else {
         this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl)
@@ -89,8 +90,7 @@ export default class Queue {
     })
 
     this.#indexerConnector.transactionsSubject
-      .subscribe(({ txHashes, params }) => {
-        const task = { txHashes, params }
+      .subscribe(task => {
         this.#checkAndSaveQueue!.push(task)
       })
   }
@@ -115,12 +115,14 @@ export default class Queue {
     const blockHashes = []
     for (let index = 0; index < txsWithStatus.length; index++) {
       if (txsWithStatus[index]?.transaction) {
-        const tx = Transaction.fromSDK(txsWithStatus[index]?.transaction)
+        const tx = Transaction.fromSDK(txsWithStatus[index].transaction)
         tx.blockHash = txsWithStatus[index].txStatus.blockHash!
         blockHashes.push(tx.blockHash)
         txs.push(tx)
-      } else if ((txsWithStatus[index].txStatus as any) === 'rejected') {
-        logger.warn(`Transaction[${txHashes[index]}] was rejected`)
+      } else {
+        if ((txsWithStatus[index].txStatus as any) === 'rejected')  {
+          logger.warn(`Transaction[${txHashes[index]}] was rejected`)
+        }
         throw new Error(`failed to fetch transaction for hash ${txHashes[index]}`)
       }
     }

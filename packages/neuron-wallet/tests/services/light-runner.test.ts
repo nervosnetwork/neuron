@@ -61,7 +61,7 @@ jest.doMock('../../src/block-sync-renderer', () => ({
 jest.doMock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      get lightDataPath() { return lightDataPathMock() }
+      get testnetLightDataPath() { return lightDataPathMock() }
     }
   }
 }))
@@ -102,7 +102,7 @@ describe('test light runner', () => {
     })
   })
 
-  describe('test ckbBinary', () => {
+  describe('test binary', () => {
     it('is packaged and is win', () => {
       const tmp = CKBLightRunner.getInstance().platform
       CKBLightRunner.getInstance().platform = mockFn
@@ -112,7 +112,7 @@ describe('test light runner', () => {
       joinMock.mockReturnValue('joinpath')
       mockFn.mockReturnValue('win')
       dirnameMock.mockReturnValue('dir')
-      expect(CKBLightRunner.getInstance().ckbBinary).toBe('prefixpath.exe')
+      expect(CKBLightRunner.getInstance().binary).toBe('prefixpath.exe')
       expect(dirnameMock).toBeCalledWith('apppath')
       expect(joinMock).toBeCalledWith('dir', '..', './bin')
       expect(resolveMock).toBeCalledWith('joinpath', './ckb-light-client')
@@ -124,7 +124,7 @@ describe('test light runner', () => {
       isPackagedMock.mockReturnValue(true)
       resolveMock.mockReturnValue('prefixpath')
       mockFn.mockReturnValue('mac')
-      expect(CKBLightRunner.getInstance().ckbBinary).toBe('prefixpath')
+      expect(CKBLightRunner.getInstance().binary).toBe('prefixpath')
       CKBLightRunner.getInstance().platform = tmp
     })
     it('is packaged and is linux', () => {
@@ -133,7 +133,7 @@ describe('test light runner', () => {
       isPackagedMock.mockReturnValue(true)
       resolveMock.mockReturnValue('prefixpath')
       mockFn.mockReturnValue('linux')
-      expect(CKBLightRunner.getInstance().ckbBinary).toBe('prefixpath')
+      expect(CKBLightRunner.getInstance().binary).toBe('prefixpath')
       CKBLightRunner.getInstance().platform = tmp
     })
     it('is not packaged', () => {
@@ -143,7 +143,7 @@ describe('test light runner', () => {
       resolveMock.mockReturnValue('prefixpath')
       joinMock.mockReturnValue('joinpath')
       mockFn.mockReturnValue('mac')
-      expect(CKBLightRunner.getInstance().ckbBinary).toBe('prefixpath')
+      expect(CKBLightRunner.getInstance().binary).toBe('prefixpath')
       expect(dirnameMock).toBeCalledTimes(0)
       expect(getAppPathMock).toBeCalledTimes(0)
       expect(joinMock).toBeCalledWith(lightRunnerDirpath, '../../bin')
@@ -198,10 +198,10 @@ describe('test light runner', () => {
   })
 
   describe('test start', () => {
-    it('when runnerProces is not undefined', async () => {
+    it('when runnerProcess is not undefined', async () => {
       const tmp = CKBLightRunner.getInstance().stop
       CKBLightRunner.getInstance().stop = mockFn
-      CKBLightRunner.getInstance().runnerProces = {}
+      CKBLightRunner.getInstance().runnerProcess = {}
       const eventEmitter = new EventEmitter()
       spawnMock.mockReturnValue(eventEmitter)
       existsSyncMock.mockReturnValue(true)
@@ -210,10 +210,10 @@ describe('test light runner', () => {
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       CKBLightRunner.getInstance().stop = tmp
     })
-    it('when runnerProces is undefined', async () => {
+    it('when runnerProcess is undefined', async () => {
       const tmp = CKBLightRunner.getInstance().stop
       CKBLightRunner.getInstance().stop = mockFn
-      CKBLightRunner.getInstance().runnerProces = undefined
+      CKBLightRunner.getInstance().runnerProcess = undefined
       const eventEmitter = new EventEmitter()
       spawnMock.mockReturnValue(eventEmitter)
       existsSyncMock.mockReturnValue(true)
@@ -222,62 +222,62 @@ describe('test light runner', () => {
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       CKBLightRunner.getInstance().stop = tmp
     })
-    it('when runnerProces is undefined and on error', async () => {
-      CKBLightRunner.getInstance().runnerProces = undefined
+    it('when runnerProcess is undefined and on error', async () => {
+      CKBLightRunner.getInstance().runnerProcess = undefined
       const eventEmitter = new EventEmitter()
       spawnMock.mockReturnValue(eventEmitter)
       existsSyncMock.mockReturnValue(true)
       await CKBLightRunner.getInstance().start()
-      expect(CKBLightRunner.getInstance().runnerProces).toBeDefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
       expect(mockFn).toBeCalledTimes(0)
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.emit('error', 'errorInfo')
       expect(loggerErrorMock).toBeCalledWith('CKBLightRunner:\trun fail:', 'errorInfo')
-      expect(CKBLightRunner.getInstance().runnerProces).toBeUndefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
-    it('when runnerProces is undefined and on close', async () => {
-      CKBLightRunner.getInstance().runnerProces = undefined
+    it('when runnerProcess is undefined and on close', async () => {
+      CKBLightRunner.getInstance().runnerProcess = undefined
       const eventEmitter = new EventEmitter()
       spawnMock.mockReturnValue(eventEmitter)
       existsSyncMock.mockReturnValue(true)
       await CKBLightRunner.getInstance().start()
-      expect(CKBLightRunner.getInstance().runnerProces).toBeDefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
       expect(mockFn).toBeCalledTimes(0)
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.emit('close', 'closeInfo')
       expect(loggerInfoMock).toBeCalledWith('CKBLightRunner:\tprocess closed')
-      expect(CKBLightRunner.getInstance().runnerProces).toBeUndefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
-    it('when runnerProces is undefined and on stderr', async () => {
-      CKBLightRunner.getInstance().runnerProces = undefined
+    it('when runnerProcess is undefined and on stderr', async () => {
+      CKBLightRunner.getInstance().runnerProcess = undefined
       const eventEmitter: EventEmitter & { stderr?: EventEmitter } = new EventEmitter()
       eventEmitter.stderr = new EventEmitter()
       spawnMock.mockReturnValue(eventEmitter)
       existsSyncMock.mockReturnValue(true)
       await CKBLightRunner.getInstance().start()
-      expect(CKBLightRunner.getInstance().runnerProces).toBeDefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
       expect(mockFn).toBeCalledTimes(0)
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.stderr.emit('data', 'error-data')
       expect(loggerErrorMock).toBeCalledWith('CKBLightRunner:\trun fail:', 'error-data')
-      expect(CKBLightRunner.getInstance().runnerProces).toBeUndefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
   })
 
   describe('test stop', () => {
-    it('runnerProces is undefined', async () => {
-      CKBLightRunner.getInstance().runnerProces = undefined
+    it('runnerProcess is undefined', async () => {
+      CKBLightRunner.getInstance().runnerProcess = undefined
       await CKBLightRunner.getInstance().stop()
       expect(resetSyncTaskQueueMock).toBeCalledWith(false)
     })
-    it('runnerProces is defined', async () => {
+    it('runnerProcess is defined', async () => {
       const emitter: EventEmitter & { kill?: Function } = new EventEmitter()
       emitter.kill = mockFn
-      CKBLightRunner.getInstance().runnerProces = emitter
+      CKBLightRunner.getInstance().runnerProcess = emitter
       mockFn.mockImplementation(() => { emitter.emit('close') })
       await CKBLightRunner.getInstance().stop()
       expect(mockFn).toBeCalledWith('SIGKILL')
-      expect(CKBLightRunner.getInstance().runnerProces).toBeUndefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
   })
 })

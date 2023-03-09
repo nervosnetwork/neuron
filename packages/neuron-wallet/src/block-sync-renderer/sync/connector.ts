@@ -33,12 +33,12 @@ export interface LumosCell {
   data?: string
 }
 
-export abstract class Connector<T = unknown> {
+export abstract class Connector<TransactionsSubjectParam = unknown> {
   abstract blockTipsSubject: Subject<BlockTips>
-  abstract transactionsSubject: Subject<{ txHashes: CKBComponents.Hash[]; params: T }>
+  abstract transactionsSubject: Subject<{ txHashes: CKBComponents.Hash[]; params: TransactionsSubjectParam }>
 
   abstract connect(): Promise<void>
-  abstract notifyCurrentBlockNumberProcessed(param: T): void
+  abstract notifyCurrentBlockNumberProcessed(param: TransactionsSubjectParam): void
   abstract stop(): void
   abstract getLiveCellsByScript(query: LumosCellQuery): Promise<unknown>
 }

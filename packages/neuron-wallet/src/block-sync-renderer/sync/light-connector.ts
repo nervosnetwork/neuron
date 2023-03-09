@@ -156,7 +156,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   private async collectLiveCellsByScript(query: LumosCellQuery) {
     const { lock, type, data } = query
     if (!lock && !type) {
-      throw new Error('at least one parameter is required')
+      throw new Error('at least one script is required')
     }
 
     const queries: QueryOptions = {}

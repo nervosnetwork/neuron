@@ -148,7 +148,7 @@ export default class IndexerConnector extends Connector<string | undefined> {
     return result
   }
 
-  private async getTxsInNextUnprocessedBlockNumberAndTxHashes(): Promise<[string | undefined, string[]]> {
+  private async getTxHashesWithNextUnprocessedBlockNumber(): Promise<[string | undefined, string[]]> {
     const txHashCachesByNextBlockNumberAndAddress = await Promise.all(
       [...this.addressesByWalletId.entries()].map(async ([walletId, addressMetas]) => {
         const indexerCacheService = new IndexerCacheService(walletId, addressMetas, this.rpcService, this.indexer)
@@ -196,7 +196,7 @@ export default class IndexerConnector extends Connector<string | undefined> {
   }
 
   private async processTxsInNextBlockNumber() {
-    const [nextBlockNumber, txHashesInNextBlock] = await this.getTxsInNextUnprocessedBlockNumberAndTxHashes()
+    const [nextBlockNumber, txHashesInNextBlock] = await this.getTxHashesWithNextUnprocessedBlockNumber()
     if (nextBlockNumber !== undefined && txHashesInNextBlock.length) {
       this.processingBlockNumber = nextBlockNumber
       this.transactionsSubject.next({ txHashes: txHashesInNextBlock, params: this.processingBlockNumber })

@@ -8,7 +8,7 @@ import { MethodInBatchNotFoundException, PayloadInBatchException, IdNotMatchedIn
 import https from 'https'
 import http from 'http'
 import { request } from 'undici'
-import { BUNDLED_LIGHT_CKB_URL, LIGHT_CHAIN } from './const'
+import { BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from './const'
 
 export interface LightScriptFilter {
   script: CKBComponents.Script
@@ -147,7 +147,7 @@ export class LightRPC extends Base {
   getBlockchainInfo = async () => {
     await this.localNodeInfo()
     return {
-      chain: LIGHT_CHAIN
+      chain: LIGHT_CLIENT_TESTNET
     } as CKBComponents.BlockchainInfo
   }
 

@@ -11,6 +11,7 @@ import { chainState } from 'states'
 import { setCurrentNetowrk } from 'services/remote'
 
 import { backToTop, RoutePath, useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
+import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
@@ -71,12 +72,12 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                     <span className={styles.url}>{`(${network.remote}`}</span>
                     <NetworkTypeLabel type={network.chain} />
                   </span>
-                  {network.chain === 'light_testnet' || (
+                  {network.chain === LIGHT_CLIENT_TESTNET || (
                     <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
                       <EditNetwork />
                     </button>
                   )}
-                  {isDefault || network.chain === 'light_testnet' ? null : (
+                  {isDefault || network.chain === LIGHT_CLIENT_TESTNET ? null : (
                     <button
                       type="button"
                       data-action="delete"
