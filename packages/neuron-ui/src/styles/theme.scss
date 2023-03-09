@@ -24,6 +24,9 @@ body {
   --enable-button-text-color: #333333;
   --main-pagination-button-text-color: #666666;
   --main-pagination-text-color: #666666;
+  // table
+  --table-head-background-color: #FAFAFA;
+  --table-head-border-color: #F0F0F0;
 
   @media (prefers-color-scheme: dark) {
     --primary-color: #00C891;
@@ -51,5 +54,8 @@ body {
     --enable-button-text-color: #FFFFFF;
     --main-pagination-button-text-color: #CCCCCC;
     --main-pagination-text-color: #999999;
+    // table
+    --table-head-background-color: #171B1A;
+    --table-head-border-color: #282E2D;
   }
 }
