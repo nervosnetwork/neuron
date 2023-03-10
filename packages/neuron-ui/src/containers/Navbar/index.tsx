@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -19,7 +19,7 @@ import { showSettings } from 'services/remote'
 import { RoutePath, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
-import { Migrate } from 'services/subjects'
+// import { Migrate } from 'services/subjects'
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`, RoutePath.ImportHardware]
@@ -110,16 +110,17 @@ const Navbar = () => {
     },
     [navigate]
   )
- 
-  const [isMigrate, setIsMigrate] = useState(false)
-  useEffect(() => {
-    const migrateSubscription = Migrate.subscribe(migrateStatus => {
-      setIsMigrate(migrateStatus === 'migrating')
-    })
-    return () => {
-      migrateSubscription.unsubscribe()
-    }
-  }, [])
+
+  // TODO remove to pages head
+  // const [isMigrate, setIsMigrate] = useState(false)
+  // useEffect(() => {
+  //   const migrateSubscription = Migrate.subscribe(migrateStatus => {
+  //     setIsMigrate(migrateStatus === 'migrating')
+  //   })
+  //   return () => {
+  //     migrateSubscription.unsubscribe()
+  //   }
+  // }, [])
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null

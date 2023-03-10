@@ -10,9 +10,11 @@ import {
   toggleTopAlertVisibility,
   dismissNotification,
   dismissAlertDialog,
+  dismissGlobalDialog,
 } from 'states'
 import { useOnLocaleChange, useGlobalNotifications, isSuccessResponse } from 'utils'
 
+import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { syncRebuildNotification } from 'services/localCache'
 import { migrateData } from 'services/remote'
@@ -20,7 +22,14 @@ import styles from './Notification.module.scss'
 
 export const NoticeContent = () => {
   const {
-    app: { notifications = [], popups = [], showTopAlert = false, showAllNotifications = false, alertDialog },
+    app: {
+      notifications = [],
+      popups = [],
+      showTopAlert = false,
+      showAllNotifications = false,
+      alertDialog,
+      globalDialog = null,
+    },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, i18n] = useTranslation()
@@ -44,6 +53,10 @@ export const NoticeContent = () => {
     },
     [dispatch]
   )
+
+  const onGlobalDialogDismiss = useCallback(() => {
+    dismissGlobalDialog()(dispatch)
+  }, [dispatch])
 
   const onDismissAlertDialog = useCallback(() => {
     dismissAlertDialog()(dispatch)
