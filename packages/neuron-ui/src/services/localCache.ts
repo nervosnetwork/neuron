@@ -88,13 +88,13 @@ export const currentWallet = {
     window.localStorage.setItem(LocalCacheKey.CurrentWallet, walletStr)
     return true
   },
-  load: (): { [index: string]: string } => {
+  load: (): State.WalletIdentity | undefined => {
     const walletStr = window.localStorage.getItem(LocalCacheKey.CurrentWallet) || '{}'
     try {
-      return JSON.parse(walletStr)
+      return JSON.parse(walletStr) as State.WalletIdentity
     } catch (err) {
       console.error(`Cannot parse current wallet`)
-      return {}
+      return undefined
     }
   },
 }

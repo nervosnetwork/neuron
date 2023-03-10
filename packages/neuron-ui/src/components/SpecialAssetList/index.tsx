@@ -159,7 +159,7 @@ const SpecialAssetList = () => {
   }, [dispatch])
 
   const fetchList = useCallback(
-    (walletID, pageNum: number) => {
+    (walletID: string, pageNum: number) => {
       getSpecialAssets({
         walletID,
         pageNo: pageNum,
@@ -202,7 +202,7 @@ const SpecialAssetList = () => {
   }, [globalDialog, fetchList, id, pageNo])
 
   const handleAction = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { txHash, idx },
       } = e.target

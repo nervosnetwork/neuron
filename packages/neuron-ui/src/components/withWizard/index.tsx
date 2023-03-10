@@ -4,7 +4,7 @@ import { useState as useGlobalState } from 'states'
 
 export interface Element {
   path: string
-  comp: React.SFC<any>
+  comp: React.FC<any>
 }
 
 export interface WithWizardState {

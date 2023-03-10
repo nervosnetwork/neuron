@@ -952,6 +952,155 @@ describe('CellsService', () => {
     })
   })
 
+  describe('#addUnlockInfo', () => {
+    const depositData = '0x0000000000000000'
+    const withdrawData = '0x000000000000000a'
+    const generateTx = (hash: string, timestamp: string) => {
+      const tx = new TransactionEntity()
+      tx.hash = hash
+      tx.version = '0x0'
+      tx.timestamp = timestamp
+      tx.status = TransactionStatus.Success
+      tx.witnesses = []
+      tx.blockNumber = '1'
+      tx.blockHash = '0x' + '10'.repeat(32)
+      return tx
+    }
+
+    const withdrawTxHash = '0x' + '2'.repeat(64)
+
+    const unlockTxHash = '0x' + '4'.repeat(64)
+    const unlockTx = Transaction.fromObject({
+      hash: unlockTxHash,
+      version: '0x0',
+      timestamp: '1572862777483',
+      status: TransactionStatus.Success,
+      witnesses: [],
+      blockNumber: '3',
+      blockHash: '0x' + '5'.repeat(64),
+      inputs: [
+        Input.fromObject({
+          previousOutput: new OutPoint(withdrawTxHash, '0'),
+          since: '0'
+        })
+      ],
+      outputs: [
+        Output.fromObject({
+          capacity: '1000',
+          lock: bob.lockScript
+        })
+      ]
+    })
+    
+    const tx1 = generateTx('0x1234', '1572862777481')
+
+    it('output cells is not cost', async () => {
+      const cells = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1).toModel()
+      ]
+      //@ts-ignore private property
+      await CellsService.addUnlockInfo(cells)
+      expect(cells[0].unlockInfo).toBeUndefined()
+    })
+
+    it('output cells no transaction', async () => {
+      const cells = [
+        generateCell(toShannon('1000'), OutputStatus.Dead, false, null, bob, depositData, tx1).toModel()
+      ]
+      //@ts-ignore private property
+      await CellsService.addUnlockInfo(cells)
+      expect(cells[0].unlockInfo).toBeUndefined()
+    })
+
+    it('output cells has cost', async () => {
+      await TransactionPersistor.saveFetchTx(unlockTx)
+      const outputs = Output.fromObject({
+        capacity: '1000',
+        daoData: withdrawData,
+        lock: bob.lockScript,
+        type: SystemScriptInfo.generateDaoScript(),
+        outPoint: new OutPoint(withdrawTxHash, '0'),
+        status: OutputStatus.Dead
+      })
+      //@ts-ignore private property
+      await CellsService.addUnlockInfo([outputs])
+      expect(outputs.unlockInfo?.txHash).toEqual(unlockTxHash)
+    })
+  })
+
+  describe('#addDepositInfo', () => {
+    const depositData = '0x0000000000000000'
+    const withdrawData = '0x000000000000000a'
+    const generateTx = (hash: string, timestamp: string) => {
+      const tx = new TransactionEntity()
+      tx.hash = hash
+      tx.version = '0x0'
+      tx.timestamp = timestamp
+      tx.status = TransactionStatus.Success
+      tx.witnesses = []
+      tx.blockNumber = '1'
+      tx.blockHash = '0x' + '10'.repeat(32)
+      return tx
+    }
+
+    const depositTxHash = '0x' + '0'.repeat(64)
+    const depositTx = Transaction.fromObject({
+      hash: depositTxHash,
+      version: '0x0',
+      timestamp: '1572862777481',
+      status: TransactionStatus.Success,
+      witnesses: [],
+      blockNumber: '1',
+      blockHash: '0x' + '1'.repeat(64),
+      inputs: [],
+      outputs: [
+        Output.fromObject({
+          capacity: '1000',
+          daoData: depositData,
+          lock: bob.lockScript,
+          type: SystemScriptInfo.generateDaoScript()
+        })
+      ]
+    })
+    
+    const tx1 = generateTx('0x1234', '1572862777481')
+
+    it('output cells is not deposit', async () => {
+      const cells = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1).toModel()
+      ]
+      //@ts-ignore private property
+      await CellsService.addDepositInfo(cells)
+      expect(cells[0].depositInfo).toBeUndefined()
+    })
+
+    it('output cells no transaction', async () => {
+      const cells = [
+        generateCell(toShannon('1000'), OutputStatus.Dead, false, null, bob, depositData, tx1).toModel()
+      ]
+      cells[0].depositOutPoint = new OutPoint('0x' + '0'.repeat(64), '0x0')
+      //@ts-ignore private property
+      await CellsService.addDepositInfo(cells)
+      expect(cells[0].depositInfo).toBeUndefined()
+    })
+
+    it('output cells has cost', async () => {
+      await TransactionPersistor.saveFetchTx(depositTx)
+      const outputs = Output.fromObject({
+        capacity: '1000',
+        daoData: withdrawData,
+        lock: bob.lockScript,
+        type: SystemScriptInfo.generateDaoScript(),
+        depositOutPoint: new OutPoint(depositTx.hash!, '0'),
+        status: OutputStatus.Dead
+      })
+      //@ts-ignore
+      await CellsService.addDepositInfo([outputs])
+      expect(outputs.depositInfo?.txHash).toEqual(depositTxHash)
+    })
+  })
+
+
   describe('#usedByAnyoneCanPayBlake160s', () => {
     const fakeArgs1 = '0x1'
     const fakeArgs2 = '0x2'

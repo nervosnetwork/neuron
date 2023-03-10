@@ -62,13 +62,12 @@ const Send = () => {
     setErrorMessage,
     isSendMax,
     onSendMaxClick: handleSendMaxClick,
-    onScan: handleScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
   const handleLocktimeClick = useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { index, type },
       } = e.target
@@ -175,7 +174,6 @@ const Send = () => {
                 onOutputAdd={handleOutputAdd}
                 onOutputRemove={handleOutputRemove}
                 onItemChange={handleItemChange}
-                onScan={handleScan}
                 onSendMaxClick={handleSendMaxClick}
                 onLocktimeClick={handleLocktimeClick}
                 isTimeLockable={!device}

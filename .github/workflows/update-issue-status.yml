@@ -1,0 +1,21 @@
+name: Update issue status
+on:
+  schedule:
+    - cron: '30 5 * * *'
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update stale issues
+        uses: actions/stale@v7
+        with:
+          any-of-issue-labels: replied
+          stale-issue-label: stale
+          days-before-pr-close: -1
+          stale-issue-message: Mark this issue stale because no activity for 60 days
+          close-issue-message: Close this issue because it's inactive since marked stale
+          close-issue-reason: completed

@@ -1,3 +1,56 @@
+# 0.106.0 (2022-12-28)
+
+### CKB
+
+[CKB v0.106.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.106.0) was released on Dec. 23rd, 2022. This version of CKB node is now bundled and preconfigured in Neuron.
+
+### Assumed valid target
+
+Block before `0x076ffa81f8c6f2e1f22a778a1aa5d48531cc33bfd9b302e0d73fb2ce6fa4de3b` will be skipped in validation.
+
+### New features
+* #2442: Make multisig import and export config compatible with ckb-cli.(@yanguoyu)
+* #2454: Add 'contact us' in the menu -> help submenu.(@Keith-CY)
+* #2461: Remove 4 epochs maturity requirement of header deps.(@yanguoyu)
+* #2465: Adapt new UAN.(@yanguoyu)
+* #2508: Use undici, an official http client, to replace axios.(@yanguoyu)
+* #2515, #2542: Support Apple silicon chip.(@JeffreyMa597, @yanguoyu)
+* #2518: Bump node.js from 16 to 18.(@JeffreyMa597)
+* #2519: Bump react.js from 16 to 18.(@JeffreyMa597)
+* #2555: Upgrade ckb node to v0.106.0.(@Keith-CY)
+
+### Bug fixes
+* #2447: Prevent from importing the same multisig configuration repeatedly.(@yanguoyu)
+* #2451: Refine the input field component.(@yanguoyu)
+* #2464, #2478: Optimize setting data path.(@yanguoyu)
+* #2467: Fix ckb process killed unexpectedly.(@yanguoyu)
+* #2483: Fix ckb node not working with Apple silicon chip.(@yanguoyu)
+* #2488: Create a new instance for every test case to avoid side effect.(@yanguoyu)
+* #2531: Handle uncaughtException and output it in the log.(@yanguoyu)
+* #2541: Remove CKB Indexer module and set a specified version of usb module.(@yanguoyu)
+
+## New contributors
+* @JeffreyMa597 made their first contribution in #2515
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.103.3...v0.106.0
+
+
+
+# 0.103.3 (2022-12-21)
+
+### Certificate
+
+We've updated the certificate of Neuron for windows, which is issued by **DigiCert** and distributed to [Magickbase](https://github.com/Magickbase/), the active developer team of Neuron. With this update, a warning may appear on updating Neuron by `check for update` inside Neuron, please don't worry and download Neuron from [GitHub Release](https://github.com/nervosnetwork/neuron/releases) to adopt the new certificate.
+
+### Bug Fixes
+
+* #2551: Fix sending multisig tx when input cell's length is greater than 1.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.103.2...v0.103.3
+
+
+
 # 0.103.2 (2022-07-09)
 
 ### New features

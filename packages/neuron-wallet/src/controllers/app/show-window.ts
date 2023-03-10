@@ -27,6 +27,7 @@ const showWindow = (
       skipTaskbar: true,
       autoHideMenuBar: true,
       webPreferences: {
+        nodeIntegration: true,
         devTools: env.isDevMode,
         contextIsolation: false,
         preload: path.join(__dirname, './preload.js')

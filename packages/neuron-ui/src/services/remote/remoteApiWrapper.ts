@@ -45,8 +45,6 @@ type Action =
   | 'show-message-box'
   | 'get-ckb-node-data-path'
   | 'set-ckb-node-data-path'
-  | 'get-indexer-data-path'
-  | 'set-indexer-data-path'
   | 'stop-process-monitor'
   | 'start-process-monitor'
   // Wallets
@@ -147,6 +145,7 @@ type Action =
   | 'generate-multisig-send-all-tx'
   | 'load-multisig-tx-json'
   | 'get-hold-sudt-cell-capacity'
+  | 'start-migrate'
 
 export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
   const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({

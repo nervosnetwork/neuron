@@ -41,6 +41,5 @@ Common.args = {
   onOutputRemove: (e: any) => action('Remove Transaction Output')(JSON.stringify(e.target.dataset)),
   onLocktimeClick: (e: any) => action('Timelock Click')(JSON.stringify(e.target.dataset)),
   onItemChange: (e: any) => action('Item Change')(JSON.stringify(e.target.dataset), e.target.value),
-  onScan: () => action('Scan'),
   onSendMaxClick: (e: any) => action('Click Send Max button')(JSON.stringify(e.target.dataset)),
 }
