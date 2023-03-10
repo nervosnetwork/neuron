@@ -13,7 +13,6 @@ import ApiController, { Command } from 'controllers/api'
 import { migrate as mecuryMigrate } from 'controllers/mercury'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
-import IndexerService from 'services/indexer'
 import { stopCkbNode } from 'services/ckb-runner'
 import startMonitor from 'services/monitor'
 
@@ -62,7 +61,7 @@ export default class AppController {
     if (env.isTestMode) {
       return
     }
-    await Promise.all([stopCkbNode(), IndexerService.getInstance().stop()])
+    await stopCkbNode()
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {
@@ -131,6 +130,7 @@ export default class AppController {
         path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')
       ),
       webPreferences: {
+        nodeIntegration: true,
         devTools: env.isDevMode,
         contextIsolation: false,
         preload: path.join(__dirname, './preload.js')

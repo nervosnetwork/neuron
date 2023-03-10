@@ -64,13 +64,22 @@ jest.mock('../../src/services/settings', () => ({
     }
   }
 }))
-const { startCkbNode, stopCkbNode, getLookingValidTargetStatus } = require('../../src/services/ckb-runner')
+jest.mock('../../src/block-sync-renderer', () => ({
+  resetSyncTaskQueue: {
+    push: jest.fn()
+  }
+}))
+jest.mock('../../src/services/indexer', () => ({
+  cleanOldIndexerData: jest.fn()
+}))
+const { startCkbNode, stopCkbNode, getLookingValidTargetStatus, migrateCkbData } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
   beforeEach(() => {
     resetMocks()
 
+    stubbedCkb.kill = jest.fn()
     stubbedCkb.stderr = new EventEmitter()
     stubbedCkb.stdout = new EventEmitter()
     stubbedSpawn.mockReturnValue(stubbedCkb)
@@ -90,7 +99,12 @@ describe('ckb runner', () => {
           stubbedExistsSync.mockReturnValue(true)
           await startCkbNode()
         })
-        it('should not init ckb config', () => {
+        afterEach(async () => {
+          const promise = stopCkbNode()
+          stubbedCkb.emit('close')
+          await promise
+        })
+        it('should not init ckb config', async () => {
           expect(stubbedSpawn).not.toHaveBeenCalledWith(expect.stringContaining('/ckb'), [
             'init',
             '--chain',
@@ -102,7 +116,7 @@ describe('ckb runner', () => {
         it('runs ckb binary', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join(platformPath, 'ckb')),
-            ['run', '-C', ckbDataPath],
+            ['run', '-C', ckbDataPath, '--indexer'],
             { stdio: ['ignore', 'pipe', 'pipe'] }
           )
         })
@@ -119,6 +133,11 @@ describe('ckb runner', () => {
             stubbedCkb.emit('close')
             await promise
           })
+          afterEach(async () => {
+            const stopPromise = stopCkbNode()
+            stubbedCkb.emit('close')
+            await stopPromise
+          })
           it('inits ckb config', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(expect.stringContaining(path.join(platformPath, 'ckb')), [
               'init',
@@ -131,7 +150,7 @@ describe('ckb runner', () => {
           it('runs ckb binary', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
               expect.stringContaining(path.join(platformPath, 'ckb')),
-              ['run', '-C', ckbDataPath],
+              ['run', '-C', ckbDataPath, '--indexer'],
               { stdio: ['ignore', 'pipe', 'pipe'] }
             )
           })
@@ -206,5 +225,33 @@ describe('ckb runner', () => {
     it('kill ckb process', () => {
       expect(stubbedCkb.kill).toHaveBeenCalled()
     })
+  })
+})
+
+const migrateNextMock = jest.fn()
+
+jest.mock('../../src/models/subjects/migrate-subject', () => ({
+  next: (v: string) => migrateNextMock(v)
+}))
+
+describe('ckb migrate', () => {
+  let stubbedCkb: any = new EventEmitter()
+  beforeEach(() => {
+    resetMocks()
+    stubbedSpawn.mockReturnValue(stubbedCkb)
+  })
+  it('start migrate', async () => {
+    await migrateCkbData()
+    expect(migrateNextMock).toBeCalledWith({ type: 'migrating' })
+  })
+  it('migrate failed', async () => {
+    stubbedCkb.emit('close', 1)
+    await migrateCkbData()
+    expect(migrateNextMock).toBeCalledWith({ type: 'failed', reason: '' })
+  })
+  it('migrate finish', async () => {
+    stubbedCkb.emit('close', 0)
+    await migrateCkbData()
+    expect(migrateNextMock).toBeCalledWith({ type: 'finish' })
   })
 })

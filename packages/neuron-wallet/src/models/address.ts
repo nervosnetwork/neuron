@@ -19,6 +19,6 @@ export interface Address {
   balance?: string
   version?: AddressVersion
   description?: string
-  isImporting?: boolean | undefined
-  usedByAnyoneCanPay?: boolean | undefined
+  isImporting?: boolean
+  usedByAnyoneCanPay?: boolean
 }

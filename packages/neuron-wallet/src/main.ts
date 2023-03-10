@@ -3,6 +3,7 @@ import { app } from 'electron'
 import AppController from 'controllers/app'
 import SettingsService from 'services/settings'
 import { changeLanguage } from 'locales/i18n'
+import logger from 'utils/logger'
 
 const appController = AppController.getInstance()
 
@@ -28,6 +29,10 @@ if (singleInstanceLock) {
     if (process.platform !== 'darwin') {
       app.quit()
     }
+  })
+  process.on('uncaughtException', (err, origin) => {
+    logger.error(`UncaughtException:\tCaught exception: `, err)
+    logger.error(`UncaughtException:\tException origin: `, origin)
   })
 } else {
   app.quit()

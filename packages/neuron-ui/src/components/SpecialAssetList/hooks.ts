@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { getSUDTAccountList } from 'services/remote'
 import { NeuronWalletActions, useDispatch } from 'states'
 import { isSuccessResponse, useDialogWrapper, useDidMount } from 'utils'
@@ -6,7 +6,7 @@ import { isSuccessResponse, useDialogWrapper, useDidMount } from 'utils'
 export const useMigrate = () => {
   const { openDialog, dialogRef, closeDialog } = useDialogWrapper()
   const onDocumentClick = useCallback(
-    e => {
+    (e: any) => {
       if (!dialogRef?.current?.children?.[0]?.contains(e.target) && dialogRef?.current?.open) {
         closeDialog()
       }
@@ -52,7 +52,7 @@ export const useClickMigrate = ({
   openMigrateToExistAccountDialog: () => void
 }) => {
   return useCallback(
-    e => {
+    (e: React.BaseSyntheticEvent) => {
       const {
         dataset: { type },
       } = e.currentTarget

@@ -53,7 +53,7 @@ const NFTSend = () => {
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [remoteError, setRemoteError] = useState('')
 
-  const onInput = useCallback(e => {
+  const onInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       dataset: { field },
       value,

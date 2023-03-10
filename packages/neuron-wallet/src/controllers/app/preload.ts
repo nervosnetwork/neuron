@@ -1,4 +1,4 @@
-import { clipboard, nativeImage, IpcRenderer, ipcRenderer, shell, desktopCapturer, DesktopCapturer } from 'electron'
+import { clipboard, nativeImage, IpcRenderer, ipcRenderer, shell } from 'electron'
 
 declare global {
   interface Window {
@@ -7,7 +7,6 @@ declare global {
       nativeImage: any
       ipcRenderer: IpcRenderer
       shell: Electron.Shell
-      desktopCapturer: DesktopCapturer
     }
   }
 }
@@ -25,6 +24,5 @@ window.electron = {
   clipboard,
   nativeImage,
   ipcRenderer,
-  shell,
-  desktopCapturer
+  shell
 }

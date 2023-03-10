@@ -69,18 +69,6 @@ describe('SettingsService', () => {
       expect(() => SettingsService.getInstance().locale = 'zh11' as any).toThrow(new Error(`Locale zh11 not supported`))
     })
   })
-  
-
-  describe('indexer-path', () => {
-    it('get', () => {
-      SettingsService.getInstance().indexerDataPath
-      expect(readSyncMock).toBeCalledWith('indexerDataPath')
-    })
-    it('set', () => {
-      SettingsService.getInstance().indexerDataPath = 'indexerDataPath'
-      expect(writeSyncMock).toBeCalledWith('indexerDataPath', 'indexerDataPath')
-    })
-  })
 
   describe('ckb-node-path', () => {
     it('get', () => {

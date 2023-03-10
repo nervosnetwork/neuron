@@ -35,7 +35,7 @@ export default abstract class Monitor {
     }
   }
 
-  async startMonitor(intervalTime: number = 10000, startNow: boolean = false) {
+  async startMonitor(intervalTime: number = 30000, startNow: boolean = false) {
     this.interval = interval(intervalTime)
     if (!this.subcription?.closed) {
       this.subcription?.unsubscribe()

@@ -22,11 +22,11 @@
   },
   "devDependencies": {
     "events": "3.3.0",
-    "eslint": "8.25.0"
+    "eslint": "8.31.0"
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf lib",
+    "clean": "npx rimraf lib",
     "prepublishOnly": "yarn run clean && yarn run build",
     "release": "npm publish"
   },

@@ -20,8 +20,9 @@ import {
   generateDaoDepositTx,
   generateDaoClaimTx,
 } from 'services/remote'
-import { ckbCore, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
+import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { isErrorWithI18n } from 'exceptions'
+import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
 
 const {
   MIN_AMOUNT,
@@ -91,7 +92,7 @@ export const useInitData = ({
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
     const intervalId = setInterval(() => {
       updateNervosDaoData({ walletID: wallet.id })(dispatch)
-    }, 3000)
+    }, 10000)
     updateDepositValue(
       `${
         BigInt(wallet.balance) > BigInt(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`))
@@ -436,35 +437,77 @@ export const useUpdateWithdrawList = ({
   setWithdrawList: React.Dispatch<React.SetStateAction<Map<string, string | null>>>
 }) =>
   useEffect(() => {
-    Promise.all(
-      records.map(async ({ outPoint, depositOutPoint, blockHash }) => {
-        if (!tipBlockHash) {
-          return null
-        }
-        const withdrawBlockHash = depositOutPoint ? blockHash : tipBlockHash
-        const formattedDepositOutPoint = depositOutPoint
-          ? {
-              txHash: depositOutPoint.txHash,
-              index: `0x${BigInt(depositOutPoint.index).toString(16)}`,
-            }
-          : {
-              txHash: outPoint.txHash,
-              index: `0x${BigInt(outPoint.index).toString(16)}`,
-            }
-        return calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash).catch(() => null)
-      })
-    )
-      .then(res => {
-        const withdrawList = new Map()
-        if (tipBlockHash) {
-          records.forEach((record, idx) => {
-            const key = getRecordKey(record)
-            withdrawList.set(key, res[idx])
+    if (!tipBlockHash) {
+      setWithdrawList(new Map())
+      return
+    }
+    const depositOutPointHashes = records.map(v => v.depositOutPoint?.txHash ?? v.outPoint.txHash)
+    ckbCore.rpc
+      .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
+        depositOutPointHashes.map(v => ['getTransaction', v])
+      )
+      .exec()
+      .then(txs => {
+        const committedTx = txs.filter(v => v.txStatus.status === 'committed')
+        const blockHashes = [
+          ...(committedTx.map(v => v.txStatus.blockHash).filter(v => !!v) as string[]),
+          ...(records.map(v => (v.depositOutPoint ? v.blockHash : null)).filter(v => !!v) as string[]),
+          tipBlockHash,
+        ]
+        return ckbCore.rpc
+          .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(
+            blockHashes.map(v => ['getHeader', v])
+          )
+          .exec()
+          .then(blockHeaders => {
+            const hashHeaderMap = new Map<CKBComponents.Hash, string>()
+            blockHeaders.forEach((header, idx) => {
+              hashHeaderMap.set(blockHashes[idx], header.dao)
+            })
+            const txMap = new Map<CKBComponents.Hash, CKBComponents.TransactionWithStatus>()
+            txs.forEach((tx, idx) => {
+              if (tx.txStatus.status === 'committed') {
+                txMap.set(depositOutPointHashes[idx], tx)
+              }
+            })
+            const withdrawList = new Map()
+            records.forEach(record => {
+              const key = getRecordKey(record)
+              const withdrawBlockHash = record.depositOutPoint ? record.blockHash : tipBlockHash
+              const formattedDepositOutPoint = record.depositOutPoint
+                ? {
+                    txHash: record.depositOutPoint.txHash,
+                    index: `0x${BigInt(record.depositOutPoint.index).toString(16)}`,
+                  }
+                : {
+                    txHash: record.outPoint.txHash,
+                    index: `0x${BigInt(record.outPoint.index).toString(16)}`,
+                  }
+              const tx = txMap.get(formattedDepositOutPoint.txHash)
+              if (!tx) {
+                return
+              }
+              const depositDAO = hashHeaderMap.get(tx.txStatus.blockHash!)
+              const withdrawDAO = hashHeaderMap.get(withdrawBlockHash)
+              if (!depositDAO || !withdrawDAO) {
+                return
+              }
+              withdrawList.set(
+                key,
+                calculateMaximumWithdraw(
+                  tx.transaction.outputs[+formattedDepositOutPoint.index],
+                  tx.transaction.outputsData[+formattedDepositOutPoint.index],
+                  depositDAO,
+                  withdrawDAO
+                )
+              )
+            })
+            setWithdrawList(withdrawList)
           })
-        }
-        setWithdrawList(withdrawList)
       })
-      .catch(console.error)
+      .catch(() => {
+        setWithdrawList(new Map())
+      })
   }, [records, tipBlockHash, setWithdrawList])
 
 export const useUpdateDepositEpochList = ({
@@ -478,24 +521,28 @@ export const useUpdateDepositEpochList = ({
 }) =>
   useEffect(() => {
     if (connectionStatus === 'online') {
-      Promise.all(
-        records.map(({ daoData, depositOutPoint, blockNumber }) => {
-          const depositBlockNumber = depositOutPoint ? ckbCore.utils.toUint64Le(daoData) : blockNumber
-          if (!depositBlockNumber) {
-            return null
-          }
-          return getHeaderByNumber(BigInt(depositBlockNumber))
-            .then(header => header.epoch)
-            .catch(() => null)
-        })
-      ).then(res => {
-        const epochList = new Map()
-        records.forEach((record, idx) => {
-          const key = getRecordKey(record)
-          epochList.set(key, res[idx])
-        })
-        setDepositEpochList(epochList)
+      const recordKeyIdxMap = new Map<string, number>()
+      const batchParams: ['getHeaderByNumber', bigint][] = []
+      records.forEach((record, idx) => {
+        const depositBlockNumber = record.depositOutPoint
+          ? ckbCore.utils.toUint64Le(record.daoData)
+          : record.blockNumber
+        if (depositBlockNumber) {
+          batchParams.push(['getHeaderByNumber', BigInt(depositBlockNumber)])
+          recordKeyIdxMap.set(getRecordKey(record), idx)
+        }
       })
+      ckbCore.rpc
+        .createBatchRequest<'getHeaderByNumber', any, CKBComponents.BlockHeader[]>(batchParams)
+        .exec()
+        .then(res => {
+          const epochList = new Map()
+          records.forEach(record => {
+            const key = getRecordKey(record)
+            epochList.set(key, recordKeyIdxMap.get(key) ? res[recordKeyIdxMap.get(key)!]?.epoch : null)
+          })
+          setDepositEpochList(epochList)
+        })
     }
   }, [records, setDepositEpochList, connectionStatus])
 

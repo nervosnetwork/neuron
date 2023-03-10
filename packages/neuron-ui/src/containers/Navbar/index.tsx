@@ -19,6 +19,7 @@ import { showSettings } from 'services/remote'
 import { RoutePath, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
+// import { Migrate } from 'services/subjects'
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`, RoutePath.ImportHardware]
@@ -109,6 +110,18 @@ const Navbar = () => {
     },
     [navigate]
   )
+
+  // TO DO will remove to page but not in navbar
+  // const [isMigrate, setIsMigrate] = useState(false)
+  // useEffect(() => {
+  //   const migrateSubscription = Migrate.subscribe(migrateStatus => {
+  //     setIsMigrate(migrateStatus === 'migrating')
+  //   })
+  //   return () => {
+  //     migrateSubscription.unsubscribe()
+  //   }
+  // }, [])
+
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
   }

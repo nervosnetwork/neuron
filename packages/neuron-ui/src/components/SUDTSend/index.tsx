@@ -262,7 +262,7 @@ const SUDTSend = () => {
   }, [sendState.sendAll, experimental, accountInfo])
 
   const onInput = useCallback(
-    e => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const {
         dataset: { field },
         value,

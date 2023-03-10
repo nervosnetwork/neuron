@@ -1,6 +1,6 @@
 name: Check Checksums
 
-on: 
+on:
   release:
     types: [published, prereleased]
 
@@ -10,16 +10,16 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Generate checksums from artifacts
-        run: 
+        run:
           ruby ./scripts/release-checksums.rb ${{ github.event.release.tag_name }} | tee generated_checksums.txt
 
       - name: Fetch checksums from release note
         run: |
           curl "https://api.github.com/repos/nervosnetwork/neuron/releases/tags/${{ github.event.release.tag_name }}" |\
-          python3 -c "import sys, json; print(\"\n\".join(json.load(sys.stdin)['body'].splitlines()[-9:]))" |\
+          python3 -c "import sys, json; print(\"\n\".join(json.load(sys.stdin)['body'].splitlines()[-11:]))" |\
           tee release_note_checksums.txt
 
       - name: Compare
@@ -30,7 +30,7 @@ jobs:
           body=$(cat generated_checksums.txt)
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}" 
+          body="${body//$'\r'/'%0D'}"
           echo ::set-output name=body::$body
 
       - uses: peter-evans/commit-comment@v1

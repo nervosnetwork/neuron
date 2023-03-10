@@ -24,6 +24,14 @@ export default class SettingsService extends Store {
     return this.readSync('locale')
   }
 
+  get indexerDataPath(): string {
+    return this.readSync('indexerDataPath')
+  }
+
+  set indexerDataPath(dataPath: string) {
+    this.writeSync('indexerDataPath', dataPath)
+  }
+
   set locale(lng: Locale) {
     if (locales.includes(lng)) {
       this.writeSync('locale', lng)
@@ -32,14 +40,6 @@ export default class SettingsService extends Store {
     } else {
       throw new Error(`Locale ${lng} not supported`)
     }
-  }
-
-  get indexerDataPath() {
-    return this.readSync('indexerDataPath')
-  }
-
-  set indexerDataPath(dataPath: string) {
-    this.writeSync('indexerDataPath', dataPath)
   }
 
   get ckbDataPath() {

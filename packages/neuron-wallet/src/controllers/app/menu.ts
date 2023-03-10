@@ -16,7 +16,6 @@ import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
 import NetworksService from 'services/networks'
 import { clearCkbNodeCache } from 'services/ckb-runner'
-import IndexerService from 'services/indexer'
 
 enum URL {
   Settings = '/settings/general',
@@ -340,7 +339,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           })
           if (res.response === 0) {
             await clearCkbNodeCache()
-            await IndexerService.clearCache(true)
           }
         }
       },

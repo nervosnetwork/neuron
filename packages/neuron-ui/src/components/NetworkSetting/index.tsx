@@ -23,7 +23,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   const { networkID: currentId } = chain
 
   const onChoiceChange = useCallback(
-    (_e, option?: IChoiceGroupOption) => {
+    (_e: React.FormEvent<HTMLInputElement | HTMLElement> | undefined, option?: IChoiceGroupOption) => {
       if (option && option.key !== currentId) {
         setCurrentNetowrk(option.key)
       }

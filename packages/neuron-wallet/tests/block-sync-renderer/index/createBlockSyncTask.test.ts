@@ -1,9 +1,7 @@
 
 describe(`Create block sync task`, () => {
   const STUB_ADDRESS_METAS = 'address metas'
-  const STUB_LISTEN_URI = 'stub_listen_uri'
   const STUB_NETWORK = { id: 'id', genesisHash: '0x1', remote: 'stub_network_url' }
-  const stubbedIndexerServiceStart = jest.fn()
   const stubbedLoggerInfo = jest.fn()
   const stubbedChildProcessOn = jest.fn()
   const stubbedChildProcessSend = jest.fn()
@@ -31,7 +29,6 @@ describe(`Create block sync task`, () => {
   }))
 
   jest.doMock(`utils/logger`, () => ({ info: stubbedLoggerInfo }))
-  jest.doMock('services/indexer', () => ({ LISTEN_URI: STUB_LISTEN_URI, getInstance: () => ({ start: stubbedIndexerServiceStart }) }))
   jest.doMock('services/addresses', () => ({ getAddressesByAllWallets: stubbedGetAddressesByAllWallets }))
   jest.doMock('services/networks', () => ({ getInstance: jest.fn().mockReturnValue({ getCurrent: () => STUB_NETWORK }) }))
 
@@ -40,10 +37,6 @@ describe(`Create block sync task`, () => {
 
   beforeAll(() => {
     return blockSyncRenderer.createBlockSyncTask()
-  })
-
-  it(`should start indexer service`, () => {
-    expect(stubbedIndexerServiceStart).toHaveBeenCalled()
   })
 
   it(`should log info a message`, () => {
@@ -79,7 +72,7 @@ describe(`Create block sync task`, () => {
       message: {
         addressMetas: STUB_ADDRESS_METAS,
         genesisHash: STUB_NETWORK.genesisHash,
-        indexerUrl: STUB_LISTEN_URI,
+        indexerUrl: STUB_NETWORK.remote,
         url: STUB_NETWORK.remote
       }
     })

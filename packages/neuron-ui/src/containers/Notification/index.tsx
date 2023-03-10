@@ -10,15 +10,26 @@ import {
   toggleTopAlertVisibility,
   dismissNotification,
   dismissAlertDialog,
+  dismissGlobalDialog,
 } from 'states'
-import { useOnLocaleChange, useGlobalNotifications } from 'utils'
+import { useOnLocaleChange, useGlobalNotifications, isSuccessResponse } from 'utils'
 
 import AlertDialog from 'widgets/AlertDialog'
+import { syncRebuildNotification } from 'services/localCache'
+import { migrateData } from 'services/remote'
+import GlobalDialog from 'widgets/GlobalDialog'
 import styles from './Notification.module.scss'
 
 export const NoticeContent = () => {
   const {
-    app: { notifications = [], popups = [], showTopAlert = false, showAllNotifications = false, alertDialog },
+    app: {
+      notifications = [],
+      popups = [],
+      showTopAlert = false,
+      showAllNotifications = false,
+      alertDialog,
+      globalDialog = null,
+    },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, i18n] = useTranslation()
@@ -43,8 +54,21 @@ export const NoticeContent = () => {
     [dispatch]
   )
 
+  const onGlobalDialogDismiss = useCallback(() => {
+    dismissGlobalDialog()(dispatch)
+  }, [dispatch])
+
   const onDismissAlertDialog = useCallback(() => {
     dismissAlertDialog()(dispatch)
+  }, [dispatch])
+
+  const onOk = useCallback(() => {
+    migrateData().then(res => {
+      if (isSuccessResponse(res)) {
+        dismissGlobalDialog()(dispatch)
+        syncRebuildNotification.save()
+      }
+    })
   }, [dispatch])
 
   return (
@@ -118,6 +142,7 @@ export const NoticeContent = () => {
         })}
       </Panel>
       {alertDialog && <AlertDialog onCancel={onDismissAlertDialog} {...alertDialog} />}
+      <GlobalDialog type={globalDialog} onDismiss={onGlobalDialogDismiss} onOk={onOk} />
     </div>
   )
 }
