@@ -1,5 +1,11 @@
 @import '../../styles/mixin.scss';
 
+.srOnly {
+    position: absolute;
+    top: -10000px;
+    left: -10000px;
+}
+
 @mixin button {
     @include medium-text;
     appearance: none;
@@ -14,7 +20,8 @@
     box-sizing: border-box;
     border-radius: 2px;
     background-color: transparent;
-    &:hover {
+    min-width: 0;
+    &:hover, &:focus {
         @include semi-bold-text;
         background-color: #efefef;
     }
@@ -30,18 +37,26 @@
 }
 
 .calendar {
-    width: 374px;
     .calOptions {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-start;
         list-style-type: none;
         list-style: none;
         padding: 0;
+
+        li {
+            flex-grow: 1;
+        }
+
         button {
             @include button;
             width: 100px;
+            &[aria-checked="true"] {
+                background-color: var(--nervos-green);
+                color: white;
+            }
         }
     }
 }
@@ -57,7 +72,26 @@
         @include button;
         width: 30px;
     }
+    .calPrev {
+        order: 1;
+
+        &::before {
+            content: '<';
+        }
+    }
+    .calNext {
+        order: 3;
+
+        &::before {
+            content: '>';
+        }
+    }
+
     .calTitle {
+        order: 2;
+        margin: 0;
+        font-size: 0;
+
         button {
             @include button;
             @include semi-bold-text;
@@ -71,7 +105,7 @@
 .calendarTable {
     width: 100%;
 
-    :global(td) {
+    td {
         text-align: center;
     }
 
@@ -86,7 +120,7 @@
         height: 30px;
         border-radius: 50%;
         &[aria-current="date"] {
-            color: var(--nervos-green-light);
+            color: var(--nervos-green);
         }
         &[aria-pressed="true"] {
             background-color: var(--nervos-green);

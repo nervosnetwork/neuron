@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   getMonthCalendar,
   getLocalMonthNames,
+  getLocalMonthShortNames,
   getLocalWeekNames,
   isMonthInRange,
   isYearInRange,
@@ -10,40 +11,61 @@ import {
   isDayInRange,
   WeekDayRange,
 } from './utils'
+import { ButtonHasFocus, useTableFocusControl, useSelectorFocusControl } from './focusControl'
 import styles from './calendar.module.scss'
 
 interface Option {
   value: number
   title: string
+  label: string
   selectable: boolean
 }
-const Selector = ({ options, onChange }: { options: Option[]; onChange: (option: Option) => void }) => (
-  <ol className={styles.calOptions}>
-    {options.map(option => (
-      <li key={option.value} role="presentation">
-        <button
-          type="button"
-          aria-label={option.title}
-          title={option.title}
-          role="menuitem"
-          onClick={() => onChange(option)}
-          disabled={!option.selectable}
-        >
-          {option.title}
-        </button>
-      </li>
-    ))}
-  </ol>
-)
+interface SelectorProps {
+  value: number
+  options: Option[]
+  onChange: (option: Option) => void
+}
+const Selector = ({ value, options, onChange }: SelectorProps) => {
+  const { focusIndex, onKeyDown } = useSelectorFocusControl(value, options, onChange)
+  return (
+    <ol className={styles.calOptions} role="menu" onKeyDown={onKeyDown}>
+      {options.map((option, idx) => (
+        <li key={option.value} role="presentation">
+          <ButtonHasFocus
+            isFocus={focusIndex === idx}
+            type="button"
+            aria-label={option.label}
+            aria-disabled={!option.selectable}
+            aria-checked={value === option.value}
+            title={option.label}
+            role="menuitemradio"
+            onClick={() => onChange(option)}
+            disabled={!option.selectable}
+          >
+            {option.title}
+          </ButtonHasFocus>
+        </li>
+      ))}
+    </ol>
+  )
+}
 
 export interface CalendarProps {
   value: Date | undefined
   onChange: (value: Date) => void
-  firstDayOfWeek?: WeekDayRange
   minDate?: Date
   maxDate?: Date
+  firstDayOfWeek?: WeekDayRange
+  className?: string
 }
-const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, firstDayOfWeek = 0 }) => {
+const Calendar: React.FC<CalendarProps> = ({
+  value,
+  onChange,
+  minDate,
+  maxDate,
+  firstDayOfWeek = 0,
+  className = '',
+}) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
@@ -53,54 +75,24 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
     setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
   }, [value?.toDateString()])
 
-  const [, { language }] = useTranslation()
+  const [t, { language }] = useTranslation()
   const monthNames = useMemo(() => getLocalMonthNames(language), [language])
+  const monthShortNames = useMemo(() => getLocalMonthShortNames(language), [language])
   const weekNames = useMemo(() => getLocalWeekNames(language), [language])
 
   const weekTitle = useMemo(() => Array.from({ length: 7 }, (_, i) => weekNames[(i + firstDayOfWeek) % 7]), [weekNames])
   const monthName = monthNames[month - 1]
+  const monthShortName = monthShortNames[month - 1]
 
-  const calendar = useMemo(() => getMonthCalendar(year, month, firstDayOfWeek), [year, month, firstDayOfWeek])
+  const calendar = useMemo(() => getMonthCalendar(year, month, firstDayOfWeek, language), [
+    year,
+    month,
+    firstDayOfWeek,
+    language,
+  ])
   function isDisabledTime(date: Date): boolean {
     return !isDayInRange(date, { minDate, maxDate })
   }
-  const calendarTable = (
-    <table className={styles.calendarTable}>
-      <thead>
-        <tr>
-          {weekTitle.map(weekname => (
-            <th className={styles.calTableHeader} scope="col" key={weekname}>
-              {weekname}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {calendar.map(week => (
-          <tr key={week[0].label}>
-            {week.map(date => (
-              <td key={`${date.month}${date.date}`}>
-                <button
-                  type="button"
-                  data-type="button"
-                  aria-label={date.label}
-                  aria-pressed={isDateEqual(date.instance, value)}
-                  aria-current={date.isToday ? 'date' : 'false'}
-                  title={date.label}
-                  className={styles.calDateItem}
-                  disabled={!date.isCurMonth || isDisabledTime(date.instance)}
-                  onClick={() => onChange(date.instance)}
-                >
-                  {date.date}
-                </button>
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
-
   const prevMonth = () => {
     if (month > 1) {
       setMonth(m => m - 1)
@@ -117,13 +109,59 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
       setMonth(1)
     }
   }
+  const { focusDate, onKeyDown } = useTableFocusControl(
+    value,
+    minDate,
+    maxDate,
+    year,
+    month,
+    prevMonth,
+    nextMonth,
+    onChange
+  )
+  const calendarTable = (
+    <table className={styles.calendarTable} role="grid" onKeyDown={onKeyDown}>
+      <thead aria-hidden="true">
+        <tr>
+          {weekTitle.map(weekname => (
+            <th className={styles.calTableHeader} scope="col" key={weekname}>
+              {weekname}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {calendar.map(week => (
+          <tr key={week[0].label}>
+            {week.map(date => (
+              <td key={`${date.month}${date.date}`} role="gridcell">
+                <ButtonHasFocus
+                  isFocus={isDateEqual(date.instance, focusDate)}
+                  type="button"
+                  data-type="button"
+                  aria-label={date.label}
+                  aria-pressed={isDateEqual(date.instance, value)}
+                  aria-current={date.isToday ? 'date' : 'false'}
+                  aria-hidden={!date.isCurMonth}
+                  aria-disabled={isDisabledTime(date.instance)}
+                  title={date.label}
+                  className={styles.calDateItem}
+                  disabled={!date.isCurMonth || isDisabledTime(date.instance)}
+                  onClick={() => onChange(date.instance)}
+                >
+                  {date.date}
+                </ButtonHasFocus>
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
 
   const calendarHeader = (
-    <div className={styles.calendarHeader}>
-      <button type="button" aria-label="prev" title="prev" className={styles.calPrev} onClick={prevMonth}>
-        {'<'}
-      </button>
-      <div className={styles.calTitle}>
+    <header className={styles.calendarHeader}>
+      <h2 className={styles.calTitle} aria-live="polite">
         <button
           type="button"
           aria-label={monthName}
@@ -132,7 +170,7 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
           aria-controls="menu"
           onClick={() => setStatus('month')}
         >
-          {monthName}
+          {monthShortName}
         </button>
         <button
           type="button"
@@ -144,13 +182,38 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
         >
           {year}
         </button>
-      </div>
-      <button type="button" aria-label="next" title="next" className={styles.calNext} onClick={nextMonth}>
-        {'>'}
-      </button>
-    </div>
+      </h2>
+      <button
+        type="button"
+        aria-label={t('datetime.previous-month')}
+        title={t('datetime.previous-month')}
+        className={styles.calPrev}
+        disabled={!isMonthInRange(year, month - 1, { minDate, maxDate })}
+        onClick={prevMonth}
+      />
+      <button
+        type="button"
+        aria-label={t('datetime.next-month')}
+        title={t('datetime.next-month')}
+        className={styles.calNext}
+        onClick={nextMonth}
+        disabled={!isMonthInRange(year, month + 1, { minDate, maxDate })}
+      />
+    </header>
   )
 
+  const monthOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
+    value: index + 1,
+    title: monthShortNames[index],
+    label: monthNames[index],
+    selectable: isMonthInRange(year, index + 1, { minDate, maxDate }),
+  }))
+  const yearOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
+    value: year - 6 + index,
+    title: `${year - 6 + index}`,
+    label: `${year - 6 + index}`,
+    selectable: isYearInRange(year - 6 + index, { minDate, maxDate }),
+  }))
   const onChangeMonth = useCallback(
     (monthOptionItem: Option) => {
       setMonth(monthOptionItem.value)
@@ -161,27 +224,18 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, minDate, maxDate, 
   const onChangeYear = useCallback(
     (yearOptionItem: Option) => {
       setYear(yearOptionItem.value)
+      setMonth((monthOptions.find(option => option.selectable) as Option).value)
       setStatus('month')
     },
     [setStatus, setYear]
   )
-  const monthOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
-    value: index + 1,
-    title: monthNames[index],
-    selectable: isMonthInRange(year, index + 1, { minDate, maxDate }),
-  }))
-  const yearOptions: Option[] = Array.from({ length: 12 }, (_, index) => ({
-    value: year - 6 + index,
-    title: `${year - 6 + index}`,
-    selectable: isYearInRange(year - 6 + index, { minDate, maxDate }),
-  }))
 
   return (
-    <div className={styles.calendar}>
+    <div className={`${styles.calendar} ${className}`}>
       {calendarHeader}
       {status === 'date' && calendarTable}
-      {status === 'year' && <Selector options={yearOptions} onChange={onChangeYear} />}
-      {status === 'month' && <Selector options={monthOptions} onChange={onChangeMonth} />}
+      {status === 'year' && <Selector value={year} options={yearOptions} onChange={onChangeYear} />}
+      {status === 'month' && <Selector value={month} options={monthOptions} onChange={onChangeMonth} />}
     </div>
   )
 }
@@ -192,6 +246,7 @@ export default React.memo(
     prevProps.value?.toDateString() === nextProps.value?.toDateString() &&
     prevProps.minDate?.toDateString() === nextProps.minDate?.toDateString() &&
     prevProps.maxDate?.toDateString() === nextProps.maxDate?.toDateString() &&
+    prevProps.className === nextProps.className &&
     prevProps.firstDayOfWeek === nextProps.firstDayOfWeek &&
     prevProps.onChange === nextProps.onChange
 )

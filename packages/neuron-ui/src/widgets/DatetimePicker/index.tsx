@@ -128,7 +128,7 @@ const DatetimePicker = ({
             onKeyPress={onKeyPress}
           />
         )}
-        <Calendar value={selected} minDate={tomorrow} onChange={onCalendarChange} />
+        <Calendar className={styles.calendar} value={selected} minDate={tomorrow} onChange={onCalendarChange} />
         {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}
         {notice ? (
           <div className={styles.notice}>

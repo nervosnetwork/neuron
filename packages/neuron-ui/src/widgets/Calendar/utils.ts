@@ -62,7 +62,7 @@ export function isDateEqual(a: Date | undefined, b: Date | undefined): boolean {
 /**
  * @description Generate monthly calendar 2D table data
  */
-export function getMonthCalendar(year: number, month: number, firstDayOfWeek: WeekDayRange = 0): Day[][] {
+export function getMonthCalendar(year: number, month: number, firstDayOfWeek: WeekDayRange = 0, lang = 'en'): Day[][] {
   const today = new Date()
   const weekdayOfFirstDay = new Date(year, month - 1, 1).getDay()
   const DAYS_IN_WEEK = 7
@@ -70,6 +70,7 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
   const numOfDaysInCalendar = DAYS_IN_WEEK * ROWS_IN_CALENDAR
 
   const dateList: Day[] = []
+  const formater = new Intl.DateTimeFormat(lang, { dateStyle: 'full' })
 
   for (let i = 1; i <= numOfDaysInCalendar; i++) {
     const instance = new Date(year, month - 1, ((firstDayOfWeek - weekdayOfFirstDay - 7) % 7) + i)
@@ -81,7 +82,7 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
       weekday: instance.getDay(),
       isCurMonth: instance.getMonth() + 1 === month,
       isToday: instance.toDateString() === today.toDateString(),
-      label: instance.toLocaleDateString(),
+      label: formater.format(instance),
     }
     dateList.push(day)
   }
@@ -95,8 +96,16 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
   return calendarData
 }
 
-export const getLocalMonthNames = (lang: string) => {
+export const getLocalMonthShortNames = (lang: string) => {
   const formater = new Intl.DateTimeFormat(lang, { month: 'short' })
+  return Array.from(
+    { length: 12 },
+    (_, i) => `${formater.format(new Date(Date.UTC(2023, i, 1)))}${lang.startsWith('en') ? '.' : ''}`
+  )
+}
+
+export const getLocalMonthNames = (lang: string) => {
+  const formater = new Intl.DateTimeFormat(lang, { month: 'long' })
   return Array.from({ length: 12 }, (_, i) => formater.format(new Date(Date.UTC(2023, i, 1))))
 }
 
