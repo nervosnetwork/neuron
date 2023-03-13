@@ -75,6 +75,8 @@ const Calendar: React.FC<CalendarProps> = ({
     setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
   }, [value?.toDateString()])
 
+  const [uId] = useState(Math.floor(Math.random() * 1e4))
+
   const [t, { language }] = useTranslation()
   const monthNames = useMemo(() => getLocalMonthNames(language), [language])
   const monthShortNames = useMemo(() => getLocalMonthShortNames(language), [language])
@@ -115,12 +117,12 @@ const Calendar: React.FC<CalendarProps> = ({
     maxDate,
     year,
     month,
-    prevMonth,
-    nextMonth,
+    setYear,
+    setMonth,
     onChange
   )
   const calendarTable = (
-    <table className={styles.calendarTable} role="grid" onKeyDown={onKeyDown}>
+    <table className={styles.calendarTable} role="grid" aria-labelledby={`calendar-title-${uId}`} onKeyDown={onKeyDown}>
       <thead aria-hidden="true">
         <tr>
           {weekTitle.map(weekname => (
@@ -160,14 +162,14 @@ const Calendar: React.FC<CalendarProps> = ({
   )
 
   const calendarHeader = (
-    <header className={styles.calendarHeader}>
-      <h2 className={styles.calTitle} aria-live="polite">
+    <header className={styles.calendarHeader} aria-labelledby={`calendar-title-${uId}`} role="toolbar">
+      <h2 className={styles.calTitle} aria-live="polite" id={`calendar-title-${uId}`}>
         <button
           type="button"
           aria-label={monthName}
           title={monthName}
           aria-haspopup="true"
-          aria-controls="menu"
+          aria-expanded={status === 'month'}
           onClick={() => setStatus('month')}
         >
           {monthShortName}
@@ -177,7 +179,7 @@ const Calendar: React.FC<CalendarProps> = ({
           aria-label={`${year}`}
           title={`${year}`}
           aria-haspopup="true"
-          aria-controls="menu"
+          aria-expanded={status === 'year'}
           onClick={() => setStatus('year')}
         >
           {year}
@@ -186,6 +188,7 @@ const Calendar: React.FC<CalendarProps> = ({
       <button
         type="button"
         aria-label={t('datetime.previous-month')}
+        tabIndex={status === 'date' ? 0 : -1}
         title={t('datetime.previous-month')}
         className={styles.calPrev}
         disabled={!isMonthInRange(year, month - 1, { minDate, maxDate })}
@@ -194,6 +197,7 @@ const Calendar: React.FC<CalendarProps> = ({
       <button
         type="button"
         aria-label={t('datetime.next-month')}
+        tabIndex={status === 'date' ? 0 : -1}
         title={t('datetime.next-month')}
         className={styles.calNext}
         onClick={nextMonth}
@@ -231,7 +235,7 @@ const Calendar: React.FC<CalendarProps> = ({
   )
 
   return (
-    <div className={`${styles.calendar} ${className}`}>
+    <div className={`${styles.calendar} ${className}`} aria-labelledby={`calendar-title-${uId}`}>
       {calendarHeader}
       {status === 'date' && calendarTable}
       {status === 'year' && <Selector value={year} options={yearOptions} onChange={onChangeYear} />}

@@ -69,94 +69,82 @@ export const useTableFocusControl = (
   value: Date | undefined,
   minDate: Date | undefined,
   maxDate: Date | undefined,
-  year: number,
-  month: number,
-  prevMonth: () => void,
-  nextMonth: () => void,
+  calendarYear: number,
+  calendarMonth: number,
+  setYear: (month: number) => void,
+  setMonth: (month: number) => void,
   onChange: (value: Date) => void
 ) => {
   const [focusDate, setFocusDate] = useState(value || new Date())
+  const curFocusYear = focusDate.getFullYear()
+  const curFocusMonth = focusDate.getMonth() + 1
+  const curFocusDate = focusDate.getDate()
 
-  function moveNextMonth() {
-    if (isMonthInRange(focusDate.getFullYear(), focusDate.getMonth() + 2, { minDate, maxDate })) {
-      nextMonth()
+  function moveDate(year: number, month: number, date: number) {
+    if (!isMonthInRange(year, month, { minDate, maxDate })) {
+      return
     }
-  }
-  function movePrevMonth() {
-    if (isMonthInRange(focusDate.getFullYear(), focusDate.getMonth(), { minDate, maxDate })) {
-      prevMonth()
-    }
-  }
-  function moveDate(diff: number) {
-    const date = new Date(focusDate)
-    date.setDate(date.getDate() + diff)
-    if (date.getMonth() !== focusDate.getMonth() && date > focusDate) {
-      moveNextMonth()
-    }
-    if (date.getMonth() !== focusDate.getMonth() && date < focusDate) {
-      movePrevMonth()
-    }
-    if (isDayInRange(date, { minDate, maxDate })) {
-      setFocusDate(date)
-    }
-  }
-  function moveBackward(date: Date) {
-    if (isDayInRange(date, { minDate, maxDate })) {
-      setFocusDate(date)
+    setYear(year)
+    setMonth(month)
+
+    const daysInMonth = new Date(year, month, 0).getDate()
+    const instance = new Date(year, month - 1, daysInMonth < date ? daysInMonth : date)
+
+    if (!isDayInRange(instance, { minDate, maxDate })) {
+      if (isDayInRange(instance, { minDate })) {
+        setFocusDate(maxDate as Date)
+      } else {
+        setFocusDate(minDate as Date)
+      }
     } else {
-      setFocusDate(minDate as Date)
+      setFocusDate(instance)
     }
   }
-  function moveForward(date: Date) {
-    if (isDayInRange(date, { minDate, maxDate })) {
-      setFocusDate(date)
-    } else {
-      setFocusDate(maxDate as Date)
-    }
+
+  function moveDateDiff(diff: number) {
+    const instance = new Date(focusDate)
+    instance.setDate(instance.getDate() + diff)
+    moveDate(instance.getFullYear(), instance.getMonth() + 1, instance.getDate())
   }
 
   useEffect(() => {
-    setFocusDate(value || new Date())
+    const instance = value || new Date()
+    moveDate(instance.getFullYear(), instance.getMonth() + 1, instance.getDate())
   }, [value?.toDateString()])
 
   useEffect(() => {
-    if (focusDate.getFullYear() !== year || focusDate.getMonth() + 1 !== month) {
-      moveBackward(new Date(year, month - 1, 1))
-    }
-  }, [year, month])
+    moveDate(calendarYear, calendarMonth, focusDate.getDate())
+  }, [calendarYear, calendarMonth])
 
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     const keyEventMap = {
       Enter: () => onChange(focusDate),
       ' ': () => onChange(focusDate),
 
-      ArrowLeft: () => moveDate(-1),
-      ArrowRight: () => moveDate(1),
-      ArrowUp: () => moveDate(-7),
-      ArrowDown: () => moveDate(7),
+      ArrowLeft: () => moveDateDiff(-1),
+      ArrowRight: () => moveDateDiff(1),
+      ArrowUp: () => moveDateDiff(-7),
+      ArrowDown: () => moveDateDiff(7),
 
       PageUp() {
-        movePrevMonth()
-        const date = new Date(focusDate)
-        date.setMonth(focusDate.getMonth() - 1)
-        moveBackward(date)
+        if (curFocusMonth <= 1) {
+          moveDate(curFocusYear - 1, 12, curFocusDate)
+        } else {
+          moveDate(curFocusYear, curFocusMonth - 1, curFocusDate)
+        }
       },
       PageDown() {
-        moveNextMonth()
-        const date = new Date(focusDate)
-        date.setMonth(focusDate.getMonth() + 1)
-        moveForward(date)
+        if (curFocusMonth >= 12) {
+          moveDate(curFocusYear + 1, 1, curFocusDate)
+        } else {
+          moveDate(curFocusYear, curFocusMonth + 1, curFocusDate)
+        }
       },
       Home() {
-        const date = new Date(focusDate)
-        date.setDate(1)
-        moveBackward(date)
+        moveDate(curFocusYear, curFocusMonth, 1)
       },
       End() {
-        const date = new Date(focusDate)
-        date.setMonth(focusDate.getMonth() + 1)
-        date.setDate(0)
-        moveForward(date)
+        moveDate(curFocusYear, curFocusMonth, 100)
       },
     }
 
