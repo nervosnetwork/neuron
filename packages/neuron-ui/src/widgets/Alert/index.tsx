@@ -1,18 +1,15 @@
 import React from 'react'
-import { SuccessInfo, Error as ErrorIcon } from 'widgets/Icons/icon'
+import { SuccessInfo, Error as ErrorIcon, AttentionOutline } from 'widgets/Icons/icon'
 import styles from './index.module.scss'
 
-export enum AlertStatus {
-  Init = 'init',
-  Success = 'success',
-  Error = 'error',
-}
+type AlertStatus = 'init' | 'success' | 'error' | 'warn'
 
 const Alert: React.FC<{ status: AlertStatus; className?: string }> = ({ status, children, className }) => {
   return (
     <li className={`${styles[status]} ${className || ''} ${styles.alert}`}>
-      {status === AlertStatus.Success && <SuccessInfo type="success" />}
-      {status === AlertStatus.Error && <ErrorIcon type="error" />}
+      {status === 'success' && <SuccessInfo type="success" />}
+      {status === 'error' && <ErrorIcon type="error" />}
+      {status === 'warn' && <AttentionOutline />}
       {children}
     </li>
   )

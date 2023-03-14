@@ -1,19 +1,22 @@
+$main-color: #00C891;
+
 body {
-  --primary-color: #00C891;
+  --primary-color: #{$main-color};
   --primary-text-color: #FFFFFF;
   --main-background-color: #E6F3F3;
   --secondary-background-color: #FFFFFF;
+  --third-background-color: #FFFFFF;
   --main-text-color: #333333;
   --secondary-text-color: #8DA394;
-  --link-color: #00C891;
-  --notice-background-color: #FFF6EB;
+  --link-color: #{$main-color};
+  --notice-background-color: #D4F8E9;
   --notice-text-color: #F78C2A;
   --border-color: #666666;
   --input-border-color: #F0F0F0;
   --divide-line-color: #E5E5E5;
   --step-no-activity-color: #E5E5E5;
-  --activity-color: #00C891;
-  --success-color: #00C891;
+  --activity-color: #{$main-color};
+  --success-color: #{$main-color};
   --error-color: #FF1E1E;
   --input-disabled-color: #FAFAFA;
   --input-button-color: #999999;
@@ -24,26 +27,29 @@ body {
   --enable-button-text-color: #333333;
   --main-pagination-button-text-color: #666666;
   --main-pagination-text-color: #666666;
+  --warn-background-color: #FFF6EB;
+  --svg-fill-color: #FFFFFF;
   // table
   --table-head-background-color: #FAFAFA;
   --table-head-border-color: #F0F0F0;
 
   @media (prefers-color-scheme: dark) {
-    --primary-color: #00C891;
+    --primary-color: #{$main-color};
     --primary-text-color: #232323;
     --main-background-color: #111614;
     --secondary-background-color: #1E2423;
     --main-text-color: #FFFFFF;
     --secondary-text-color: #8DA394;
-    --link-color: #00C891;
+    --link-color: #{$main-color};
+    --third-background-color: #2D3534;
     --notice-background-color: rgba(255, 140, 0, 0.2);
     --notice-text-color: #F78C2A;
     --border-color: #343E3C;
     --input-border-color: #343E3C;
     --divide-line-color: rgba(240, 240, 240, 0.2);
     --step-no-activity-color: #666666;
-    --activity-color: #00C891;
-    --success-color: #00C891;
+    --activity-color: #{$main-color};
+    --success-color: #{$main-color};
     --error-color: #FF1E1E;
     --input-disabled-color: #171B1A;
     --input-button-color: #FFFFFF;
@@ -54,6 +60,8 @@ body {
     --enable-button-text-color: #FFFFFF;
     --main-pagination-button-text-color: #CCCCCC;
     --main-pagination-text-color: #999999;
+    --warn-background-color: #FF8C0033;
+    --svg-fill-color: #333333;
     // table
     --table-head-background-color: #171B1A;
     --table-head-border-color: #282E2D;

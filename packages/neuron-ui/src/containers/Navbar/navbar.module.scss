@@ -67,7 +67,7 @@ $hover-bg-color: #3cc68a4d;
   @include navItem;
   grid-area: name;
   padding: 20px 0 20px var(--left-padding);
-  color: var(--nervos-green);
+  color: var(--primary-color);
   letter-spacing: 0.53px;
   margin: 0 8px;
   appearance: none;
@@ -78,6 +78,7 @@ $hover-bg-color: #3cc68a4d;
   .nameText {
     width: 0;
     flex: 1;
+    text-align: left;
   }
 }
 

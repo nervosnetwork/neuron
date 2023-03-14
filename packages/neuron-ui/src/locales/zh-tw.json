@@ -128,7 +128,7 @@
       "sending": "正在發送",
       "received": "已收款",
       "receiving": "正在收款",
-      "more": "查看更多記錄",
+      "more": "查看更多",
       "statusLabel": {
         "success": "成功",
         "failed": "失敗",
@@ -139,7 +139,10 @@
       "create": "創建 {{name}} 資產賬戶",
       "destroy": "銷毀 {{name}} 資產賬戶",
       "createSUDT": "創建 <0></0> 資產賬戶",
-      "destroySUDT": "銷毀 <0></0> 資產賬戶"
+      "destroySUDT": "銷毀 <0></0> 資產賬戶",
+      "wallet-ready": "錢包準備完成，歡迎使用",
+      "send": "轉賬",
+      "receive": "收款"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -580,8 +583,8 @@
       }
     },
     "sync": {
-      "synced": "同步完成",
-      "syncing": "區塊同步中, 還需約 {{ leftTime }}",
+      "synced": "已同步區塊 100%",
+      "syncing": "區塊同步中 {{ syncPercents }}",
       "block-number": "區塊高度",
       "syncing-balance": "區塊同步中, 正在獲取最新余額",
       "slow": "同步緩慢，請檢查網絡",

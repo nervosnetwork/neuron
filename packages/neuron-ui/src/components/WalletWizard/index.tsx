@@ -18,7 +18,7 @@ import {
 } from 'utils'
 import i18n from 'utils/i18n'
 import MnemonicInput from 'widgets/MnemonicInput'
-import Alert, { AlertStatus } from 'widgets/Alert'
+import Alert from 'widgets/Alert'
 import { Loading } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
 import { showAlertDialog, useDispatch } from 'states'
@@ -299,9 +299,9 @@ Mnemonic.displayName = 'Mnemonic'
 
 export const getAlertStatus = (fieldInit: boolean, success: boolean) => {
   if (fieldInit) {
-    return success ? AlertStatus.Success : AlertStatus.Error
+    return success ? 'success' : 'error'
   }
-  return AlertStatus.Init
+  return 'init'
 }
 
 const Submission = ({ state = initState, wallets = [], dispatch }: WizardElementProps) => {
