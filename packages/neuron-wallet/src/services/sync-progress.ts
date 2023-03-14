@@ -14,12 +14,14 @@ export default class SyncProgressService {
       .orIgnore()
       .values(params.map(v => SyncProgress.fromObject(v)))
       .execute()
-    const walletIds = [...new Set(params.map(v => v.walletId))]
+  }
+
+  static async removeWalletsByExists(existWalletIds: string[]) {
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ delete: true })
-      .where({ walletId: Not(In(walletIds)) })
+      .where({ walletId: Not(In(existWalletIds)) })
       .execute()
   }
 
@@ -37,7 +39,7 @@ export default class SyncProgressService {
     const res = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
-      .where({ softDelete: false, hash: scriptHash })
+      .where({ delete: false, hash: scriptHash })
       .getOne()
     return res
   }
@@ -47,7 +49,7 @@ export default class SyncProgressService {
     const syncProgresses = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
-      .where({ softDelete: false })
+      .where({ delete: false })
       .getMany()
     syncProgresses.forEach(v => {
       result.set(v.hash, v)

@@ -232,7 +232,7 @@ describe('test light runner', () => {
       expect(mockFn).toBeCalledTimes(0)
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.emit('error', 'errorInfo')
-      expect(loggerErrorMock).toBeCalledWith('CKBLightRunner:\trun fail:', 'errorInfo')
+      expect(loggerErrorMock).toBeCalledWith('CKB Light Runner:\trun fail:', 'errorInfo')
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
     it('when runnerProcess is undefined and on close', async () => {
@@ -245,7 +245,7 @@ describe('test light runner', () => {
       expect(mockFn).toBeCalledTimes(0)
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.emit('close', 'closeInfo')
-      expect(loggerInfoMock).toBeCalledWith('CKBLightRunner:\tprocess closed')
+      expect(loggerInfoMock).toBeCalledWith('CKB Light Runner:\tprocess closed')
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
     it('when runnerProcess is undefined and on stderr', async () => {
@@ -259,7 +259,7 @@ describe('test light runner', () => {
       expect(mockFn).toBeCalledTimes(0)
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.stderr.emit('data', 'error-data')
-      expect(loggerErrorMock).toBeCalledWith('CKBLightRunner:\trun fail:', 'error-data')
+      expect(loggerErrorMock).toBeCalledWith('CKB Light Runner:\trun fail:', 'error-data')
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
   })

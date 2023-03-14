@@ -87,7 +87,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     const header = await this.lightRpc.getTipHeader()
     this.blockTipsSubject.next({
       cacheTipNumber: minSyncBlockNumber,
-      indexerTipNumber: parseInt(header.number, 16)
+      indexerTipNumber: +header.number
     })
   }
 
@@ -120,6 +120,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     }))
     await this.lightRpc.setScripts(setScriptsParams)
     await SyncProgressService.resetSyncProgress(allScripts)
+    const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
+    await SyncProgressService.removeWalletsByExists(walletIds)
   }
 
   private async initSync() {
@@ -144,9 +146,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       })
       return
     }
-    const scriptHash = scriptToHash(script)
-    this.transactionsSubject.next({ txHashes: result.txs.map(v => v.txHash), params: scriptHash })
-    this.syncInQueue.set(scriptToHash(script), {
+    this.transactionsSubject.next({ txHashes: result.txs.map(v => v.txHash), params: syncProgress.hash })
+    this.syncInQueue.set(syncProgress.hash, {
       blockStartNumber: result.lastCursor === '0x' ? parseInt(blockRange[1]) : parseInt(blockRange[0]),
       blockEndNumber: parseInt(blockRange[1]),
       cursor: result.lastCursor === '0x' ? undefined : result.lastCursor

@@ -18,12 +18,23 @@ abstract class NodeRunner {
   protected abstract networkType: NetworkType
   protected runnerProcess: ChildProcess | undefined
   protected static instance: NodeRunner | undefined
+  protected abstract binaryName: string
   static getInstance(): NodeRunner {
-    throw new Error('should be called by instance')
+    throw new Error('should be called by concrete class')
   }
 
-  protected abstract get binary(): string
   abstract start(): Promise<void>
+
+  protected get binary() {
+    const appPath = app.isPackaged
+      ? path.join(path.dirname(app.getAppPath()), '..', './bin')
+      : path.join(__dirname, '../../bin')
+    const binary = app.isPackaged
+      ? path.resolve(appPath, `./${this.binaryName}`)
+      : path.resolve(appPath, `./${this.platform()}`, `./${this.binaryName}`)
+    return this.platform() === 'win' ? binary + '.exe' : binary
+  }
+
   platform(): string {
     switch (process.platform) {
       case 'win32':
@@ -53,23 +64,14 @@ abstract class NodeRunner {
 }
 
 export class CKBLightRunner extends NodeRunner {
-  protected networkType: NetworkType = NetworkType.Full
+  protected networkType: NetworkType = NetworkType.Light
+  protected binaryName: string = 'ckb-light-client'
 
   static getInstance(): CKBLightRunner {
     if (!CKBLightRunner.instance) {
       CKBLightRunner.instance = new CKBLightRunner()
     }
     return CKBLightRunner.instance as CKBLightRunner
-  }
-
-  protected get binary() {
-    const appPath = app.isPackaged
-      ? path.join(path.dirname(app.getAppPath()), '..', './bin')
-      : path.join(__dirname, '../../bin')
-    const binary = app.isPackaged
-      ? path.resolve(appPath, './ckb-light-client')
-      : path.resolve(appPath, `./${this.platform()}`, './ckb-light-client')
-    return this.platform() === 'win' ? binary + '.exe' : binary
   }
 
   private get templateConfigFile() {
@@ -85,7 +87,7 @@ export class CKBLightRunner extends NodeRunner {
 
   initConfig() {
     if (fs.existsSync(this.configFile)) {
-      logger.info(`CKBLightRunner:\tconfig has init, skip init...`)
+      logger.info(`CKB Light Runner:\tconfig has init, skip init...`)
       return
     }
     const values = fs
@@ -118,7 +120,7 @@ export class CKBLightRunner extends NodeRunner {
 
   async start() {
     if (this.runnerProcess) {
-      logger.info(`CKBLightRunner:\tckb is not closed, close it before start...`)
+      logger.info(`CKB Light Runner:\tckb light is not closed, close it before start...`)
       await this.stop()
     }
     this.initConfig()
@@ -130,17 +132,17 @@ export class CKBLightRunner extends NodeRunner {
     runnerProcess.stderr &&
       runnerProcess.stderr.on('data', data => {
         const dataString: string = data.toString()
-        logger.error('CKBLightRunner:\trun fail:', dataString)
+        logger.error('CKB Light Runner:\trun fail:', dataString)
         this.runnerProcess = undefined
       })
 
     runnerProcess.on('error', error => {
-      logger.error('CKBLightRunner:\trun fail:', error)
+      logger.error('CKB Light Runner:\trun fail:', error)
       this.runnerProcess = undefined
     })
 
     runnerProcess.on('close', () => {
-      logger.info('CKBLightRunner:\tprocess closed')
+      logger.info('CKB Light Runner:\tprocess closed')
       this.runnerProcess = undefined
     })
     resetSyncTaskQueue.push(true)

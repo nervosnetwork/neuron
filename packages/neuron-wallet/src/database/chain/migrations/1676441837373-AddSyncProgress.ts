@@ -16,7 +16,7 @@ export class AddSyncProgress1676441837373 implements MigrationInterface {
         "blockStartNumber" integer NOT NULL,
         "blockEndNumber" integer,
         "cursor" varchar,
-        "softDelete" boolean
+        "delete" boolean
       )
     `);
   }

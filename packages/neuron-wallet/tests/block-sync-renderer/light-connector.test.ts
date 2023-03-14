@@ -9,6 +9,7 @@ const getMinBlockNumberMock = jest.fn()
 const getAllSyncStatusToMapMock = jest.fn()
 const resetSyncProgressMock = jest.fn()
 const updateSyncStatusMock = jest.fn()
+const removeWalletsByExistsMock = jest.fn()
 
 const setScriptsMock = jest.fn()
 const getScriptsMock = jest.fn()
@@ -39,6 +40,7 @@ jest.mock('../../src/services/sync-progress', () => {
     static getAllSyncStatusToMap: any = () => getAllSyncStatusToMapMock()
     static resetSyncProgress: any = (arg: any) => resetSyncProgressMock(arg)
     static updateSyncStatus: any = (hash: string, update: any) => updateSyncStatusMock(hash, update)
+    static removeWalletsByExists: any = (walletIds: string[]) => removeWalletsByExistsMock(walletIds)
   }
 })
 
@@ -243,6 +245,7 @@ describe('test light connector', () => {
         { script: addressMeta.generateACPLockScript().toSDK(), scriptType: 'lock', walletId: 'walletId' },
         { script: addressMeta.generateLegacyACPLockScript().toSDK(), scriptType: 'lock', walletId: 'walletId' },
       ])
+      expect(removeWalletsByExistsMock).toBeCalledWith(['walletId'])
     })
   })
 
