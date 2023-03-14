@@ -7,8 +7,10 @@ export const ButtonHasFocus = ({ isFocus, children, ...props }: ButtonHasFocusPr
   useEffect(() => {
     if (isFocus && ref.current) {
       ref.current.focus()
+    } else {
+      // ignore
     }
-  }, [isFocus])
+  }, [isFocus, ref])
 
   return (
     // eslint-disable-next-line react/button-has-type
@@ -29,7 +31,7 @@ export const useSelectorFocusControl = (value: number, options: Option[], onChan
 
   useEffect(() => {
     setFocusIndex(options.findIndex(option => option.value === value))
-  }, [value])
+  }, [value, options])
 
   function moveBackward() {
     const index = focusIndex - 1
@@ -110,11 +112,11 @@ export const useTableFocusControl = (
   useEffect(() => {
     const instance = value || new Date()
     moveDate(instance.getFullYear(), instance.getMonth() + 1, instance.getDate())
-  }, [value?.toDateString()])
+  }, [value?.toDateString(), minDate?.toDateString(), maxDate?.toDateString()])
 
   useEffect(() => {
     moveDate(calendarYear, calendarMonth, focusDate.getDate())
-  }, [calendarYear, calendarMonth])
+  }, [calendarYear, calendarMonth, minDate?.toDateString(), maxDate?.toDateString()])
 
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     const keyEventMap = {

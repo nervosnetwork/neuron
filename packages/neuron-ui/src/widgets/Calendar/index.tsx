@@ -75,7 +75,7 @@ const Calendar: React.FC<CalendarProps> = ({
     setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
   }, [value?.toDateString()])
 
-  const [uId] = useState(Math.floor(Math.random() * 1e4))
+  const [uId] = useState(() => (+new Date()).toString(16).slice(-4))
 
   const [t, { language }] = useTranslation()
   const monthNames = useMemo(() => getLocalMonthNames(language), [language])
