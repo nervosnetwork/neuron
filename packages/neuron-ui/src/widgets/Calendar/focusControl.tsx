@@ -1,20 +1,23 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { isMonthInRange, isDayInRange } from './utils'
 
-type ButtonHasFocusProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { isFocus: boolean }
-export const ButtonHasFocus = ({ isFocus, children, ...props }: ButtonHasFocusProps) => {
+type ButtonHasFocusProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  isFocusable: boolean
+  isMoveFocus: boolean
+}
+export const ButtonHasFocus = ({ isFocusable, isMoveFocus, children, ...props }: ButtonHasFocusProps) => {
   const ref = useRef<HTMLButtonElement | null>(null)
   useEffect(() => {
-    if (isFocus && ref.current) {
+    if (isFocusable && isMoveFocus && ref.current) {
       ref.current.focus()
     } else {
       // ignore
     }
-  }, [isFocus, ref])
+  }, [isFocusable, isMoveFocus])
 
   return (
     // eslint-disable-next-line react/button-has-type
-    <button {...props} ref={ref} tabIndex={isFocus ? 0 : -1}>
+    <button {...props} ref={ref} tabIndex={isFocusable ? 0 : -1}>
       {children}
     </button>
   )
@@ -161,4 +164,11 @@ export const useTableFocusControl = (
   return { focusDate, onKeyDown }
 }
 
-export default useTableFocusControl
+export const useFocusObserve = () => {
+  const [isComponetFocused, setIsComponetFocused] = useState(false)
+
+  const onFocus = () => setIsComponetFocused(true)
+  const onBlur = () => setIsComponetFocused(false)
+
+  return { isComponetFocused, onFocus, onBlur }
+}

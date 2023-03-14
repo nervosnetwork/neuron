@@ -11,7 +11,7 @@ import {
   isDayInRange,
   WeekDayRange,
 } from './utils'
-import { ButtonHasFocus, useTableFocusControl, useSelectorFocusControl } from './focusControl'
+import { ButtonHasFocus, useTableFocusControl, useSelectorFocusControl, useFocusObserve } from './focusControl'
 import styles from './calendar.module.scss'
 
 interface Option {
@@ -32,7 +32,8 @@ const Selector = ({ value, options, onChange }: SelectorProps) => {
       {options.map((option, idx) => (
         <li key={option.value} role="presentation">
           <ButtonHasFocus
-            isFocus={focusIndex === idx}
+            isMoveFocus
+            isFocusable={focusIndex === idx}
             type="button"
             aria-label={option.label}
             aria-disabled={!option.selectable}
@@ -121,8 +122,15 @@ const Calendar: React.FC<CalendarProps> = ({
     setMonth,
     onChange
   )
+  const { isComponetFocused, ...focusListeners } = useFocusObserve()
   const calendarTable = (
-    <table className={styles.calendarTable} role="grid" aria-labelledby={`calendar-title-${uId}`} onKeyDown={onKeyDown}>
+    <table
+      className={styles.calendarTable}
+      role="grid"
+      aria-labelledby={`calendar-title-${uId}`}
+      onKeyDown={onKeyDown}
+      {...focusListeners}
+    >
       <thead aria-hidden="true">
         <tr>
           {weekTitle.map(weekname => (
@@ -138,7 +146,8 @@ const Calendar: React.FC<CalendarProps> = ({
             {week.map(date => (
               <td key={`${date.month}${date.date}`} role="gridcell">
                 <ButtonHasFocus
-                  isFocus={isDateEqual(date.instance, focusDate)}
+                  isMoveFocus={isComponetFocused}
+                  isFocusable={isDateEqual(date.instance, focusDate)}
                   type="button"
                   data-type="button"
                   aria-label={date.label}
@@ -218,20 +227,19 @@ const Calendar: React.FC<CalendarProps> = ({
     label: `${year - 6 + index}`,
     selectable: isYearInRange(year - 6 + index, { minDate, maxDate }),
   }))
-  const onChangeMonth = useCallback(
-    (monthOptionItem: Option) => {
-      setMonth(monthOptionItem.value)
-      setStatus('date')
-    },
-    [setStatus, setMonth]
-  )
+  const onChangeMonth = useCallback((monthOptionItem: Option) => {
+    setMonth(monthOptionItem.value)
+    setStatus('date')
+  }, [])
   const onChangeYear = useCallback(
     (yearOptionItem: Option) => {
       setYear(yearOptionItem.value)
-      setMonth((monthOptions.find(option => option.selectable) as Option).value)
+      if (!isMonthInRange(yearOptionItem.value, month, { minDate, maxDate })) {
+        setMonth((minDate?.getMonth() || 0) + 1)
+      }
       setStatus('month')
     },
-    [setStatus, setYear]
+    [month, minDate?.toDateString(), maxDate?.toDateString()]
   )
 
   return (
