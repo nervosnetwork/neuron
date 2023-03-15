@@ -44,42 +44,43 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   }
 
   private async synchronize() {
-    if (this.syncQueue.idle()) {
-      await this.subscribeSync()
-      const syncScripts = await this.lightRpc.getScripts()
-      const syncStatusMap = await SyncProgressService.getAllSyncStatusToMap()
-      syncStatusMap.forEach(v => {
-        if (v.cursor && !this.syncInQueue.has(v.hash)) {
-          this.syncQueue.push({
-            script: {
-              codeHash: v.codeHash,
-              hashType: v.hashType,
-              args: v.args
-            },
-            blockRange: [HexUtils.toHex(v.blockStartNumber), HexUtils.toHex(v.blockEndNumber)],
-            scriptType: v.scriptType,
-            cursor: v.cursor
-          })
-        }
-      })
-      syncScripts.forEach(syncScript => {
-        const scriptHash = scriptToHash(syncScript.script)
-        const syncStatus = syncStatusMap.get(scriptHash)
-        if (
-          syncStatus &&
-          !this.syncInQueue.has(scriptHash) &&
-          !syncStatus.cursor &&
-          syncStatus.blockEndNumber < parseInt(syncScript.blockNumber)
-        ) {
-          this.syncQueue.push({
-            script: syncScript.script,
-            blockRange: [HexUtils.toHex(syncStatus.blockEndNumber), syncScript.blockNumber],
-            scriptType: syncScript.scriptType,
-            cursor: undefined
-          })
-        }
-      })
+    if (!this.syncQueue.idle()) {
+      return
     }
+    await this.subscribeSync()
+    const syncScripts = await this.lightRpc.getScripts()
+    const syncStatusMap = await SyncProgressService.getAllSyncStatusToMap()
+    syncStatusMap.forEach(v => {
+      if (v.cursor && !this.syncInQueue.has(v.hash)) {
+        this.syncQueue.push({
+          script: {
+            codeHash: v.codeHash,
+            hashType: v.hashType,
+            args: v.args
+          },
+          blockRange: [HexUtils.toHex(v.blockStartNumber), HexUtils.toHex(v.blockEndNumber)],
+          scriptType: v.scriptType,
+          cursor: v.cursor
+        })
+      }
+    })
+    syncScripts.forEach(syncScript => {
+      const scriptHash = scriptToHash(syncScript.script)
+      const syncStatus = syncStatusMap.get(scriptHash)
+      if (
+        syncStatus &&
+        !this.syncInQueue.has(scriptHash) &&
+        !syncStatus.cursor &&
+        syncStatus.blockEndNumber < parseInt(syncScript.blockNumber)
+      ) {
+        this.syncQueue.push({
+          script: syncScript.script,
+          blockRange: [HexUtils.toHex(syncStatus.blockEndNumber), syncScript.blockNumber],
+          scriptType: syncScript.scriptType,
+          cursor: undefined
+        })
+      }
+    })
   }
 
   private async subscribeSync() {
