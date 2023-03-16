@@ -215,6 +215,12 @@ export default {
           ok: 'OK',
           cancel: 'Cancel'
         }
+      },
+      'node-version-different': {
+        message: '节点版本与Neuron不一致，请确认后使用'
+      },
+      'ckb-without-indexer': {
+        message: "Please add '--indexer' parameter to start local node"
       }
     },
     prompt: {

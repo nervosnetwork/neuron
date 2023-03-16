@@ -203,6 +203,12 @@ export default {
           ok: '確認',
           cancel: '取消'
         }
+      },
+      'node-version-different': {
+        message: '節點版本與Neuron不壹致，請確認後使用'
+      },
+      'ckb-without-indexer': {
+        message: "請添加 '--indexer'參數來啟動本地節點"
       }
     },
     prompt: {

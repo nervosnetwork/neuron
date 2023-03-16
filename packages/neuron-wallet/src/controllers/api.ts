@@ -57,6 +57,7 @@ import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
 import startMonitor, { stopMonitor } from 'services/monitor'
 import { migrateCkbData } from 'services/ckb-runner'
+import NodeService from 'services/node'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -257,6 +258,12 @@ export default class ApiController {
       return SettingsService.getInstance().locale = locale
     })
 
+    handle('is-ckb-run-external', () => {
+      return {
+        status: ResponseCode.Success,
+        result: NodeService.getInstance().isCkbNodeExternal
+      }
+    })
     // Wallets
 
     handle('get-all-wallets', async () => {

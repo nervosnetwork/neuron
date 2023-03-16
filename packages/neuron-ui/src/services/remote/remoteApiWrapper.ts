@@ -47,6 +47,7 @@ type Action =
   | 'set-ckb-node-data-path'
   | 'stop-process-monitor'
   | 'start-process-monitor'
+  | 'is-ckb-run-external'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

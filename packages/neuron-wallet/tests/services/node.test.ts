@@ -1,5 +1,5 @@
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry } from 'rxjs/operators'
-import { BUNDLED_CKB_URL } from '../../src/utils/const'
+import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER } from '../../src/utils/const'
 
 describe('NodeService', () => {
   let nodeService: any
@@ -13,6 +13,16 @@ describe('NodeService', () => {
   const stubbedNetworsServiceGet = jest.fn()
   const stubbedLoggerInfo = jest.fn()
   const stubbedLoggerError = jest.fn()
+  const existsSyncMock = jest.fn()
+  const readFileSyncMock = jest.fn()
+  const isPackagedMock = jest.fn()
+  const getAppPathMock = jest.fn()
+  const showMessageBoxMock = jest.fn()
+  const shellMock = jest.fn()
+  const startMonitorMock = jest.fn()
+  const rpcRequestMock = jest.fn()
+  const getChainMock = jest.fn()
+  const getLocalNodeInfoMock = jest.fn()
 
   const fakeHTTPUrl = 'http://fakeurl'
   const fakeHTTPSUrl = 'https://fakeurl'
@@ -27,6 +37,16 @@ describe('NodeService', () => {
     stubbedNetworsServiceGet.mockReset()
     stubbedLoggerInfo.mockReset()
     stubbedLoggerError.mockReset()
+    existsSyncMock.mockReset()
+    readFileSyncMock.mockReset()
+    isPackagedMock.mockReset()
+    getAppPathMock.mockReset()
+    showMessageBoxMock.mockReset()
+    shellMock.mockReset()
+    startMonitorMock.mockReset()
+    rpcRequestMock.mockReset()
+    getChainMock.mockReset()
+    getLocalNodeInfoMock.mockReset()
   }
 
   beforeEach(() => {
@@ -80,7 +100,47 @@ describe('NodeService', () => {
       }
     })
 
+    jest.doMock('fs', () => ({
+      existsSync: existsSyncMock,
+      readFileSync: readFileSyncMock
+    }))
+
+    jest.doMock('electron', () => {
+      return {
+        app: {
+          get isPackaged() { return isPackagedMock() },
+          getAppPath: getAppPathMock
+        },
+        dialog: {
+          showMessageBox: showMessageBoxMock
+        },
+        shell: shellMock,
+      }
+    })
+
+    jest.doMock('../../src/env.ts', () => ({
+      app: {
+        quit: () => {}
+      },
+    }))
+
+    jest.doMock('../../src/services/monitor', () => startMonitorMock)
+
+    jest.doMock('../../src/utils/rpc-request', () => ({
+      rpcRequest: rpcRequestMock
+    }))
+
+    jest.doMock('../../src/services/rpc-service', () => {
+      return function() {
+        return {
+          getChain: getChainMock,
+          getLocalNodeInfo: getLocalNodeInfoMock
+        }
+      }
+    })
+
     stubbedRxjsDebounceTime.mockReturnValue((x: any) => x)
+    getChainMock.mockRejectedValue('no chain')
   });
 
   afterEach(() => {
@@ -158,6 +218,8 @@ describe('NodeService', () => {
 
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
+      nodeService.verifyNodeVersion = () => {}
+      nodeService.verifyStartWithIndexer = () => {}
 
       stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
     });
@@ -244,7 +306,8 @@ describe('NodeService', () => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
       nodeService.tipNumberSubject.subscribe(stubbedTipNumberSubjectCallback)
-
+      nodeService.verifyNodeVersion = () => {}
+      nodeService.verifyStartWithIndexer = () => {}
       eventCallback = stubbedCurrentNetworkIDSubjectSubscribe.mock.calls[0][0]
     });
     it('emits disconnected event in ConnectionStatusSubject', () => {
@@ -356,4 +419,78 @@ describe('NodeService', () => {
       });
     });
   });
+  describe('test get node version', () => {
+    beforeEach(() => {
+      const NodeService = require('../../src/services/node').default
+      nodeService = new NodeService()
+    })
+    it('no exist version file', () => {
+      existsSyncMock.mockReturnValue(false)
+      expect(nodeService.getInternalNodeVersion()).toBeUndefined()
+    })
+    it('exist version file but read error', () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue(new Error('read failed'))
+      expect(nodeService.getInternalNodeVersion()).toBeUndefined()
+      expect(stubbedLoggerError).toBeCalledWith('App\t: get ckb node version failed')
+    })
+    it('exist version file with new line', () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v0.107.0\n")
+      expect(nodeService.getInternalNodeVersion()).toBe('v0.107.0')
+    })
+    it('exist version file without new line', () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v0.107.0")
+      expect(nodeService.getInternalNodeVersion()).toBe('v0.107.0')
+    })
+  })
+  describe('test verify node version', () => {
+    beforeEach(() => {
+      const NodeService = require('../../src/services/node').default
+      nodeService = new NodeService()
+      stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
+    })
+    it('get internal version failed', async () => {
+      existsSyncMock.mockReturnValue(false)
+      await nodeService.verifyNodeVersion()
+      expect(showMessageBoxMock).toBeCalledTimes(0)
+    })
+    it('get internal version success and same', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v0.107.0")
+      getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
+      await nodeService.verifyNodeVersion()
+      expect(showMessageBoxMock).toBeCalledTimes(0)
+    })
+    it('get internal version success and not same', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v0.107.0")
+      getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
+      await nodeService.verifyNodeVersion()
+      expect(showMessageBoxMock).toBeCalledTimes(1)
+    })
+  })
+  describe('test verify start with indexer', () => {
+    beforeEach(() => {
+      const NodeService = require('../../src/services/node').default
+      nodeService = new NodeService()
+      stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
+    })
+    it('start with indexer', async () => {
+      rpcRequestMock.mockResolvedValue({})
+      await nodeService.verifyStartWithIndexer()
+      expect(showMessageBoxMock).toBeCalledTimes(0)
+    })
+    it('start without indexer', async () => {
+      rpcRequestMock.mockResolvedValue({ error: { code: START_WITHOUT_INDEXER }})
+      await nodeService.verifyStartWithIndexer()
+      expect(showMessageBoxMock).toBeCalledTimes(1)
+    })
+    it('get indexer rpc failed', async () => {
+      rpcRequestMock.mockRejectedValue('get tip header error')
+      await nodeService.verifyStartWithIndexer()
+      expect(showMessageBoxMock).toBeCalledTimes(1)
+    })
+  })
 });

@@ -138,6 +138,10 @@ export default class RpcService {
     return syncState
   }
 
+  public async getLocalNodeInfo() {
+    return this.ckb.rpc.localNodeInfo()
+  }
+
   private async retry<T>(func: () => T): Promise<T> {
     return CommonUtils.retry(this.retryTime, this.retryInterval, func)
   }

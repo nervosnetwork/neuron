@@ -204,6 +204,12 @@ export default {
           ok: '确认',
           cancel: '取消'
         }
+      },
+      'node-version-different': {
+        message: '节点版本与Neuron不一致，请确认后使用'
+      },
+      'ckb-without-indexer': {
+        message: "请添加 '--indexer'参数来启动本地节点"
       }
     },
     prompt: {
