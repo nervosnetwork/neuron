@@ -437,12 +437,12 @@ describe('NodeService', () => {
     it('exist version file with new line', () => {
       existsSyncMock.mockReturnValue(true)
       readFileSyncMock.mockReturnValue("v0.107.0\n")
-      expect(nodeService.getInternalNodeVersion()).toBe('v0.107.0')
+      expect(nodeService.getInternalNodeVersion()).toBe('0.107.0')
     })
     it('exist version file without new line', () => {
       existsSyncMock.mockReturnValue(true)
       readFileSyncMock.mockReturnValue("v0.107.0")
-      expect(nodeService.getInternalNodeVersion()).toBe('v0.107.0')
+      expect(nodeService.getInternalNodeVersion()).toBe('0.107.0')
     })
   })
   describe('test verify node version', () => {
@@ -453,12 +453,20 @@ describe('NodeService', () => {
     })
     it('get internal version failed', async () => {
       existsSyncMock.mockReturnValue(false)
+      getLocalNodeInfoMock.mockResolvedValue({})
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(0)
     })
     it('get internal version success and same', async () => {
       existsSyncMock.mockReturnValue(true)
       readFileSyncMock.mockReturnValue("v0.107.0")
+      getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
+      await nodeService.verifyNodeVersion()
+      expect(showMessageBoxMock).toBeCalledTimes(0)
+    })
+    it('get internal version success and patch not same', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v0.107.1")
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(0)

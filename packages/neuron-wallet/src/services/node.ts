@@ -206,7 +206,10 @@ class NodeService {
     const ckbVersionPath = path.join(appPath, '.ckb-version')
     if (fs.existsSync(ckbVersionPath)) {
       try {
-        return fs.readFileSync(ckbVersionPath, 'utf8')?.split('\n')[0]
+        return fs
+          .readFileSync(ckbVersionPath, 'utf8')
+          ?.split('\n')?.[0]
+          ?.slice(1)
       } catch (err) {
         logger.error('App\t: get ckb node version failed')
       }
@@ -217,10 +220,13 @@ class NodeService {
     const network = NetworksService.getInstance().getCurrent()
     const localNodeInfo = await new RpcService(network.remote).getLocalNodeInfo()
     const internalNodeVersion = this.getInternalNodeVersion()
-    if (internalNodeVersion && !localNodeInfo.version?.startsWith(internalNodeVersion.slice(1))) {
+    const [internalMajor, internalMinor] = internalNodeVersion?.split('.') ?? []
+    const [externalMajor, externalMinor] = localNodeInfo.version?.split('.') ?? []
+
+    if (internalMajor !== externalMajor || internalMinor !== externalMinor) {
       dialog.showMessageBox({
         type: 'warning',
-        message: t('messageBox.node-version-different.message')
+        message: t('messageBox.node-version-different.message', { version: internalNodeVersion })
       })
     }
   }
