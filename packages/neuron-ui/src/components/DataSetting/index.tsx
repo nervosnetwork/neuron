@@ -47,7 +47,7 @@ const SetItem = () => {
         </CopyZone>
         <OpenFolder onClick={openPath} />
       </div>
-      <Button label={t('settings.data.set')} onClick={onSetting} disabled={isCkbRunExternal === true} />
+      <Button label={t('settings.data.set')} onClick={onSetting} disabled={isCkbRunExternal} />
       <dialog ref={dialogRef} className={styles.dialog}>
         <div className={styles.describe}>{t('settings.data.remove-ckb-data-tip', { prevPath, currentPath })}</div>
         <div className={styles.attention}>

@@ -205,10 +205,10 @@ export default {
         }
       },
       'node-version-different': {
-        message: '節點版本與Neuron不壹致，請確認後使用'
+        message: '節點版本與 Neuron 不壹致，請確認後使用'
       },
       'ckb-without-indexer': {
-        message: "請添加 '--indexer'參數來啟動本地節點"
+        message: "請添加 '--indexer' 參數來啟動本地節點"
       }
     },
     prompt: {
