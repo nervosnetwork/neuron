@@ -471,9 +471,23 @@ describe('NodeService', () => {
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(0)
     })
-    it('get internal version success and not same', async () => {
+    it('major is same and minor is not same with major 0', async () => {
       existsSyncMock.mockReturnValue(true)
       readFileSyncMock.mockReturnValue("v0.107.0")
+      getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
+      await nodeService.verifyNodeVersion()
+      expect(showMessageBoxMock).toBeCalledTimes(1)
+    })
+    it('major is same and minor is not same with major 1', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v1.107.0")
+      getLocalNodeInfoMock.mockResolvedValue({ version: '1.108.0 (30e1255 2023-01-30)' })
+      await nodeService.verifyNodeVersion()
+      expect(showMessageBoxMock).toBeCalledTimes(0)
+    })
+    it('major is not same', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue("v1.107.0")
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(1)

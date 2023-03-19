@@ -223,7 +223,7 @@ class NodeService {
     const [internalMajor, internalMinor] = internalNodeVersion?.split('.') ?? []
     const [externalMajor, externalMinor] = localNodeInfo.version?.split('.') ?? []
 
-    if (internalMajor !== externalMajor || internalMinor !== externalMinor) {
+    if (internalMajor !== externalMajor || (externalMajor === '0' && internalMinor !== externalMinor)) {
       dialog.showMessageBox({
         type: 'warning',
         message: t('messageBox.node-version-different.message', { version: internalNodeVersion })
