@@ -78,7 +78,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
           })}
         </tbody>
       </table>
-      {!dataSource.length && (
+      {dataSource.length ? null : (
         <div className={styles.noData}>
           <img src={TableNoData} alt="No Data" />
           {noDataContent}
