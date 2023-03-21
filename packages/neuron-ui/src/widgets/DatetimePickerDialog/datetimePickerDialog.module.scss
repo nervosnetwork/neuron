@@ -1,0 +1,198 @@
+@import '../../styles';
+
+$width: 380px;
+
+:global {
+    .p-calendar {
+      @include regular-text;
+      // width: $width;
+      margin: auto;
+
+      .p-datepicker-today span {
+        color: var(--nervos-green);
+        pointer-events: none;
+      }
+
+      .p-datepicker-header {
+        display: flex;
+        justify-content: space-between;
+        width: $width;
+        margin-bottom: 16px;
+
+        .p-datepicker-next.p-link {
+          order: 1;
+        }
+
+        @mixin chevron-line {
+          display: block;
+          content: '';
+          width: 8px;
+          height: 2px;
+          background: #000;
+          position: absolute;
+        }
+
+        button {
+          background-color: transparent;
+          border: none;
+          font-weight: bolder;
+          position: relative;
+          padding: 0;
+          width: 30px;
+        }
+
+        .pi-chevron-left {
+          &::before {
+            @include chevron-line;
+            left: 0;
+            top: 50%;
+            transform-origin: left center;
+            position: absolute;
+            transform: rotate(-45deg) translateY(50%);
+          }
+
+          &::after {
+            @include chevron-line;
+            left: 0;
+            top: 50%;
+            transform-origin: left center;
+            transform: rotate(45deg) translateY(-50%);
+          }
+        }
+
+        .pi-chevron-right {
+          &::before {
+            @include chevron-line;
+            right: 0;
+            top: 50%;
+            transform-origin: right center;
+            position: absolute;
+            transform: rotate(-45deg) translateY(-50%);
+          }
+
+          &::after {
+            @include chevron-line;
+            right: 0;
+            top: 50%;
+            transform-origin: right center;
+            transform: rotate(45deg) translateY(50%);
+          }
+        }
+
+        .p-datepicker-month {
+          margin-right: 5px;
+        }
+      }
+
+      .p-highlight {
+        background: var(--nervos-green);
+        color: #fff !important;
+      }
+
+      .p-disabled {
+        opacity: 0.2;
+      }
+
+      th {
+        color: rgba(0, 0, 0, 0.38);
+        font-size: 12px;
+      }
+
+      td {
+        span {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          color: #000;
+
+          font-size: 12px;
+          margin: auto 10px;
+
+          &:not(.p-disabled):hover {
+            color: #fff;
+            background-color: var(--nervos-green);
+          }
+        }
+      }
+    }
+}
+
+.container {
+  margin: 16px 168px 0;
+  width: $width;
+  .calendar-wrap {
+    position: relative;
+  }
+  .popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    border-radius: 2px;
+
+    .title {
+      @include dialog-title;
+    }
+
+    .timezone {
+      span:first-child {
+        @include semi-bold-text;
+        margin-right: 5px;
+      }
+
+      @include regular-text;
+      margin-bottom: 8px;
+    }
+
+    .edit {
+      margin-top: 16px;
+      position: relative;
+      background: #FFFFFF;
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      p {
+        position: absolute;
+        left: 16px;
+        margin: 0;
+        font-size: px(14);
+        color: #999999;
+      }
+    }
+
+    input {
+      border: none;
+      width: 100%;
+      font-weight: 500;
+      text-align: center;
+      font-size: px(14);
+      line-height: px(24)
+    }
+  }
+
+  .notice {
+    @include regular-text;
+    font-size: px(12);
+    margin: 11px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--notice-text-color);
+    svg {
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+  }
+
+  .error {
+    @include regular-text;
+    color: red;
+    font-size: px(12);
+    margin-top: 5px;
+  }
+}

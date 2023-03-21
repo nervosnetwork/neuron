@@ -42,6 +42,16 @@ import { ReactComponent as ArrowOpenRightSvg } from './ArrowOpenRight.svg'
 import { ReactComponent as MenuExpandSvg } from './MenuExpand.svg'
 import { ReactComponent as ArrowEndSvg } from './ArrowEnd.svg'
 import { ReactComponent as ArrowNextSvg } from './ArrowNext.svg'
+import { ReactComponent as AddLightSvg } from './AddLight.svg'
+import { ReactComponent as AddDarkSvg } from './AddDark.svg'
+import { ReactComponent as ArrowActiveSvg } from './ArrowActive.svg'
+import { ReactComponent as ArrowCloseSvg } from './ArrowClose.svg'
+import { ReactComponent as DeleteSvg } from './Delete.svg'
+import { ReactComponent as DeleteHoverSvg } from './DeleteHover.svg'
+import { ReactComponent as SelectSvg } from './Select.svg'
+import { ReactComponent as SignSvg } from './Sign.svg'
+import { ReactComponent as SignHoverSvg } from './SignHover.svg'
+import { ReactComponent as ExportSvg } from './Export.svg'
 
 import styles from './icon.module.scss'
 
@@ -98,3 +108,13 @@ export const ArrowOpenRight = WrapSvg(ArrowOpenRightSvg)
 export const MenuExpand = WrapSvg(MenuExpandSvg)
 export const ArrowEnd = WrapSvg(ArrowEndSvg)
 export const ArrowNext = WrapSvg(ArrowNextSvg)
+export const AddLight = WrapSvg(AddLightSvg)
+export const AddDarkS = WrapSvg(AddDarkSvg)
+export const ArrowActive = WrapSvg(ArrowActiveSvg)
+export const ArrowClose = WrapSvg(ArrowCloseSvg)
+export const Delete = WrapSvg(DeleteSvg)
+export const DeleteHover = WrapSvg(DeleteHoverSvg)
+export const Select = WrapSvg(SelectSvg)
+export const Export = WrapSvg(ExportSvg)
+export const Sign = WrapSvg(SignSvg)
+export const SignHover = WrapSvg(SignHoverSvg)

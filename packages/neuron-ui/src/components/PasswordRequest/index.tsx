@@ -1,12 +1,13 @@
-import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
-import Spinner from 'widgets/Spinner'
 import HardwareSign from 'components/HardwareSign'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
-import { useDialog, ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
+import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
+import Dialog from 'widgets/Dialog'
+import { Export, Sign, SignHover } from 'widgets/Icons/icon'
 
 import {
   useState as useGlobalState,
@@ -28,7 +29,6 @@ import {
   invokeShowErrorMessage,
 } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
-import DropdownButton from 'widgets/DropdownButton'
 import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = () => {
@@ -46,7 +46,6 @@ const PasswordRequest = () => {
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const navigate = useNavigate()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -100,8 +99,6 @@ const PasswordRequest = () => {
       onDismiss()
     }
   }, [signType, generatedTx, onDismiss, description, experimental])
-
-  useDialog({ show: actionType, dialogRef, onClose: onDismiss })
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
@@ -354,14 +351,6 @@ const PasswordRequest = () => {
     }
   }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
-  const dropdownList = [
-    {
-      text: t('offline-sign.sign-and-export'),
-      onClick: signAndExportFromGenerateTx,
-      disabled: !password,
-    },
-  ]
-
   if (!wallet) {
     return null
   }
@@ -377,11 +366,18 @@ const PasswordRequest = () => {
       />
     )
   }
-
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
+    <Dialog
+      show={!!actionType}
+      title={t(`password-request.${actionType}.title`)}
+      onCancel={onDismiss}
+      onConfirm={onSubmit}
+      disabled={disabled}
+      isLoading={isLoading}
+      cancelText={t('common.cancel')}
+      confirmText={t('common.confirm')}
+    >
       <form onSubmit={onSubmit}>
-        <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
         {[
           'unlock',
           'create-sudt-account',
@@ -413,33 +409,30 @@ const PasswordRequest = () => {
             title={t('password-request.password')}
             onChange={onChange}
             autoFocus
-            required
             className={styles.passwordInput}
             error={error}
           />
         )}
-        <div className={styles.footer}>
-          {signType !== OfflineSignType.Invalid ? (
-            <div className={styles.left}>
-              <DropdownButton
-                mainBtnLabel={t('offline-sign.export')}
-                mainBtnOnClick={exportTransaction}
-                mainBtnDisabled={isLoading}
-                list={currentWallet.isWatchOnly ? [] : dropdownList}
-              />
-            </div>
-          ) : null}
-          <div className={styles.right}>
-            <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-            {signType === OfflineSignType.SendFromMultisigOnlySig || currentWallet.isWatchOnly || (
-              <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-                {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+        {signType !== OfflineSignType.Invalid ? (
+          <div className={styles.footer}>
+            <Button type="text" onClick={exportTransaction} disabled={isLoading}>
+              {t('offline-sign.export')} <Export />
+            </Button>
+            {!currentWallet.isWatchOnly && (
+              <Button
+                type="text"
+                className={!password ? styles['sign-disabled'] : ''}
+                onClick={signAndExportFromGenerateTx}
+                disabled={!password}
+                loading
+              >
+                {t('offline-sign.sign-and-export')} {password ? <SignHover /> : <Sign />}
               </Button>
             )}
           </div>
-        </div>
+        ) : null}
       </form>
-    </dialog>
+    </Dialog>
   )
 }
 

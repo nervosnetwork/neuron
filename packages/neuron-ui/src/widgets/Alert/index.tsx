@@ -8,11 +8,16 @@ export enum AlertStatus {
   Error = 'error',
 }
 
-const Alert: React.FC<{ status: AlertStatus; className?: string }> = ({ status, children, className }) => {
+const Alert: React.FC<{ status: AlertStatus; className?: string; withIcon?: boolean }> = ({
+  status,
+  children,
+  className,
+  withIcon = false,
+}) => {
   return (
     <li className={`${styles[status]} ${className || ''} ${styles.alert}`}>
-      {status === AlertStatus.Success && <SuccessInfo type="success" />}
-      {status === AlertStatus.Error && <ErrorIcon type="error" />}
+      {withIcon && status === AlertStatus.Success && <SuccessInfo type="success" />}
+      {withIcon && status === AlertStatus.Error && <ErrorIcon type="error" />}
       {children}
     </li>
   )

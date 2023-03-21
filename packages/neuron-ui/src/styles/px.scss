@@ -1,0 +1,13 @@
+@use 'sass:math';
+@use 'sass:list';
+
+@function px($vals...) {
+  $items: ();
+
+  @each $item in $vals {
+    $res: math.div($item, 16);
+    $items: list.append($items, #{$res}rem);
+  }
+
+  @return $items;
+}

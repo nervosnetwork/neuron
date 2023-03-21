@@ -23,6 +23,7 @@ const TextField = React.forwardRef(
       readOnly = false,
       disabled,
       selected,
+      width,
       ...rest
     }: {
       field: string
@@ -42,6 +43,7 @@ const TextField = React.forwardRef(
       disabled?: boolean
       selected?: boolean
       [key: string]: any
+      width?: string
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
@@ -61,7 +63,13 @@ const TextField = React.forwardRef(
             {label}
           </label>
         ) : null}
-        <div className={styles.input} data-disabled={disabled} data-type={type} data-selected={selected}>
+        <div
+          style={{ ...(width ? { width } : '') }}
+          className={styles.input}
+          data-disabled={disabled}
+          data-type={type}
+          data-selected={selected}
+        >
           <input
             id={field}
             data-field={field}
@@ -70,14 +78,13 @@ const TextField = React.forwardRef(
             placeholder={placeholder}
             title={label}
             name={label}
-            arial-label={label}
             onChange={onChange}
             onClick={onClick}
             readOnly={readOnly}
             disabled={disabled}
             {...rest}
           />
-          {suffix ? <span className={styles.suffix}>{suffix}</span> : null}
+          {suffix && (typeof suffix === 'string' ? <span className={styles.suffix}>{suffix}</span> : suffix)}
           {!suffix && type === 'password' && (
             <span
               className={`${styles.suffix} ${styles.password}`}
