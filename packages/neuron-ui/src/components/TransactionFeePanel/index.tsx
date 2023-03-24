@@ -1,12 +1,10 @@
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, useCallback } from 'react'
 import clsx from 'clsx'
-import { Stack } from 'office-ui-fabric-react'
-import { useClickAway } from 'ahooks'
 import TextField from 'widgets/TextField'
 import { useTranslation } from 'react-i18next'
-import { Price, localNumberFormatter } from 'utils'
+import { Price, localNumberFormatter, useDidMount } from 'utils'
 import Button from 'widgets/Button'
-import { ArrowActive, ArrowClose, Select } from 'widgets/Icons/icon'
+import { Arrow, Select, Change } from 'widgets/Icons/icon'
 
 import styles from './transactionFeePanel.module.scss'
 
@@ -23,7 +21,7 @@ interface PriceObj {
 }
 
 interface SelectItemProps {
-  priceObj: PriceObj
+  priceObj: PriceObj | undefined
   className?: any
   onClick: any
   sufIcon?: any
@@ -67,27 +65,32 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  useClickAway(() => {
-    if (isDropdownOpen) {
-      setIsDropdownOpen(false)
-    }
-  }, dropdownRef)
+  const onDocumentClick = useCallback(
+    (e: any) => {
+      if (!dropdownRef.current?.contains(e.target)) {
+        setIsDropdownOpen(false)
+      }
+    },
+    [isDropdownOpen]
+  )
 
-  const selectedPrice = useMemo(() => priceOptions.filter(item => item.key === price)?.[0], [price])
+  useDidMount(() => {
+    document.addEventListener('click', onDocumentClick, false)
+    return () => document.removeEventListener('click', onDocumentClick, false)
+  })
 
-  const onTroggle = (e: any) => {
+  const selectedPrice = useMemo(() => priceOptions.find(item => item.key === price), [price])
+
+  const onTroggle = () => {
     if (isCustom && !selectedPrice) {
-      e.target.value = priceOptions[0].key
-      onPriceChange(e)
+      onPriceChange({ target: { value: priceOptions[0].key } })
     }
-    setIsCustom(() => !isCustom)
+    setIsCustom(v => !v)
   }
 
   return (
-    <Stack tokens={{ childrenGap: 15 }} aria-label="transaction fee">
-      <Stack tokens={{ childrenGap: 15 }}>
-        <TextField label={t('send.fee')} field="fee" value={fee} readOnly disabled width="100%" />
-      </Stack>
+    <div>
+      <TextField label={t('send.fee')} field="fee" value={fee} readOnly disabled width="100%" />
 
       {isCustom ? (
         <TextField
@@ -99,7 +102,9 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
           label={
             <div className={styles.header}>
               <div>{t('send.custom-price')}</div>
-              <Button onClick={onTroggle} className={styles['change-btn']} type="text" />
+              <Button onClick={onTroggle} className={styles['change-btn']} type="text">
+                <Change />
+              </Button>
             </div>
           }
         />
@@ -108,9 +113,10 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
           <div className={styles.header}>
             <div className={styles.left}>
               <div>{t('send.price')}</div>
-              <Button type="text" onClick={onTroggle} className={styles['change-btn']} />
+              <Button type="text" onClick={onTroggle} className={styles['change-btn']}>
+                <Change />
+              </Button>
             </div>
-            {/* <div className={styles.right}>单价将在8秒后刷新</div> */}
           </div>
 
           <div className={styles.dropdown} ref={dropdownRef}>
@@ -118,7 +124,8 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
               priceObj={selectedPrice}
               className={styles.content}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              sufIcon={isDropdownOpen ? <ArrowActive /> : <ArrowClose />}
+              data-active={isDropdownOpen}
+              sufIcon={<Arrow />}
             />
             {isDropdownOpen && (
               <div className={styles.selects}>
@@ -138,7 +145,7 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
           </div>
         </div>
       )}
-    </Stack>
+    </div>
   )
 }
 

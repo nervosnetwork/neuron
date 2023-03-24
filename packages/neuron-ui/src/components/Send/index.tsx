@@ -2,15 +2,13 @@ import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
-
-// import Balance from 'components/Balance'
 import SendMetaInfo from 'components/SendMetaInfo'
 import SendFieldset from 'components/SendFieldset'
 
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePickerDialog from 'widgets/DatetimePickerDialog'
-import { AddLight } from 'widgets/Icons/icon'
+import { Add } from 'widgets/Icons/icon'
 
 import { validateTotalAmount, isMainnet as isMainnetUtil, validateOutputs, useOutputErrors } from 'utils'
 
@@ -25,11 +23,7 @@ const Send = () => {
       loadings: { sending = false },
     },
     wallet: { id: walletID = '', balance = '', device },
-    chain: {
-      networkID,
-      connectionStatus,
-      // syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
-    },
+    chain: { networkID, connectionStatus },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -129,12 +123,6 @@ const Send = () => {
 
   return (
     <div className={styles.container}>
-      {/* <div>
-        <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
-        <div className={styles.balance}>
-          <Balance balance={balance} connectionStatus={connectionStatus}  />
-        </div>
-      </div> */}
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
         <div className={styles.layout}>
           <div className={styles.left}>
@@ -167,7 +155,6 @@ const Send = () => {
                   )
                 }}
               />
-              {/* <div style={{ height: '2000px' }}>dd</div> */}
             </div>
             <div className={styles['left-footer']}>
               <Button
@@ -177,7 +164,7 @@ const Send = () => {
                 className={styles['add-button']}
               >
                 <>
-                  <AddLight className={styles['add-button_icon']} /> {t('send.add-receiving-address')}
+                  <Add className={styles['add-button_icon']} /> {t('send.add-receiving-address')}
                 </>
               </Button>
             </div>

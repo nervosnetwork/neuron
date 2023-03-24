@@ -5,7 +5,6 @@ $width: 380px;
 :global {
     .p-calendar {
       @include regular-text;
-      // width: $width;
       margin: auto;
 
       .p-datepicker-today span {
