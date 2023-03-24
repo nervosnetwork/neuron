@@ -17,6 +17,7 @@ release
 /packages/neuron-wallet/bin/mac
 /packages/neuron-wallet/bin/linux
 /packages/neuron-wallet/bin/win
+/packages/neuron-wallet/light
 
 # misc
 .DS_Store

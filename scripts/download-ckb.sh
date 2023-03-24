@@ -41,6 +41,8 @@ function download_macos_light() {
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"
   tar -xzvf ${CKB_FILENAME}.tar.gz
+  cp ./config/testnet.toml ../../light/ckb_light.toml
+  rm -rf ./config
   rm ${CKB_FILENAME}.tar.gz
 }
 
@@ -63,6 +65,8 @@ function download_linux_light() {
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"
   tar -xzvf ${CKB_FILENAME}.tar.gz
+  cp ./config/testnet.toml ../../light/ckb_light.toml
+  rm -rf ./config
   rm ${CKB_FILENAME}.tar.gz
 }
 
@@ -85,13 +89,15 @@ function download_windows_light() {
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"
   tar -xzvf ${CKB_FILENAME}.tar.gz
+  cp ./config/testnet.toml ../../light/ckb_light.toml
+  rm -rf ./config
   rm ${CKB_FILENAME}.tar.gz
 }
 
 case $1 in
-  mac)    download_macos ;;
-  linux)  download_linux ;;
-  win)    download_windows ;;
+  mac)    download_macos; download_macos_light;;
+  linux)  download_linux; download_linux_light;;
+  win)    download_windows; download_windows_light;;
   *)
     if [[ "$OSTYPE" == "darwin"* ]]; then
       download_macos
