@@ -23,6 +23,15 @@
   .content {
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
+    &[data-active="true"] {
+      svg {
+        g, 
+        path {
+          stroke: var(--primary-color);
+        }
+        transform: rotate(180deg);
+      }
+    }
   }
 
   .selects {
@@ -92,8 +101,12 @@
   width: px(16);
   min-width: 0;
   cursor: pointer;
-  background: url('../../widgets/Icons/Change.svg');
   &:hover {
-    background: url('../../widgets/Icons/ChangeHover.svg');
+    svg {
+      g,
+      path {
+        fill: var(--primary-color)
+      }
+    }
   }
 }

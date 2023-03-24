@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.n-dialog {
+.dialog-wrap {
   @include dialog-container;
   max-width: 90vw;
   padding: 0;

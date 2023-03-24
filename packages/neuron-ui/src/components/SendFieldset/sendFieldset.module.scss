@@ -20,9 +20,13 @@ $textfieldWidth: calc(100vw - 370px);
       width: px(16);
       min-width: 0;
       cursor: pointer;
-      background: url('../../widgets/Icons/Delete.svg');
       &:hover {
-        background: url('../../widgets/Icons/DeleteHover.svg');
+        svg {
+          g,
+          path {
+            fill: var(--error-color)
+          }
+        }
       }
     }
   }
@@ -107,10 +111,6 @@ $textfieldWidth: calc(100vw - 370px);
     &[alt$='calendar'] {
       margin-right: 6px;
     }
-
-    &[data-status='active'] {
-      display: none;
-    }
   }
 
   button {
@@ -125,14 +125,14 @@ $textfieldWidth: calc(100vw - 370px);
     font-size: px(14) !important;
     background-color: transparent;
     border: none;
+    cursor: pointer;
 
     &:hover {
-      img[data-status='inactive'] {
-        display: none;
-      }
-
-      img[data-status='active'] {
-        display: block;
+      svg {
+        g,
+        path {
+          fill: var(--error-color)
+        }
       }
     }
   }

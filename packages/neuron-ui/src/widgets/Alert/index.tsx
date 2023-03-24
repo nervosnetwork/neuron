@@ -16,8 +16,8 @@ const Alert: React.FC<{ status: AlertStatus; className?: string; withIcon?: bool
 }) => {
   return (
     <li className={`${styles[status]} ${className || ''} ${styles.alert}`}>
-      {withIcon && status === AlertStatus.Success && <SuccessInfo type="success" />}
-      {withIcon && status === AlertStatus.Error && <ErrorIcon type="error" />}
+      {withIcon && status === AlertStatus.Success ? <SuccessInfo type="success" /> : null}
+      {withIcon && status === AlertStatus.Error ? <ErrorIcon type="error" /> : null}
       {children}
     </li>
   )

@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next'
 import AlertDialog from 'widgets/AlertDialog'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import Trash from 'widgets/Icons/Delete.svg'
-import ActiveTrash from 'widgets/Icons/DeleteHover.svg'
+import { Trash } from 'widgets/Icons/icon'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import TimeClock from 'widgets/Icons/TimeClock.svg'
 
@@ -82,7 +81,9 @@ const SendFieldset = ({
                 disabled={isSendMax}
                 className={styles['remove-btn']}
                 type="text"
-              />
+              >
+                <Trash />
+              </Button>
             )}
           </div>
         }
@@ -123,9 +124,8 @@ const SendFieldset = ({
               <div className={styles.content}>
                 <img className={styles.icon} src={TimeClock} alt="calendar" />
                 <p>{`${t('send.release-on')}: ${formatDate(new Date(+item.date))}`}</p>
-                <button type="button" data-index={idx} data-type="remove" onClick={onLocktimeClick}>
-                  <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
-                  <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
+                <button type="button" onClick={onLocktimeClick}>
+                  <Trash data-index={idx} data-type="remove" />
                 </button>
               </div>
               <div className={styles.locktimeWarn}>

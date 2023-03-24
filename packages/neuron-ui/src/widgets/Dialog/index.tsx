@@ -49,9 +49,7 @@ const Dialog = ({
       if (disabled) {
         return
       }
-      if (onConfirm) {
-        onConfirm()
-      }
+      onConfirm?.()
     },
     [onConfirm, disabled]
   )
@@ -61,7 +59,7 @@ const Dialog = ({
   }
 
   return (
-    <dialog ref={dialogRef} className={styles['n-dialog']}>
+    <dialog ref={dialogRef} className={styles['dialog-wrap']}>
       <div className={styles.header}>
         <div className={styles.title}>
           {title}

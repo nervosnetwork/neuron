@@ -7,7 +7,7 @@ import HardwareSign from 'components/HardwareSign'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 import Dialog from 'widgets/Dialog'
-import { Export, Sign, SignHover } from 'widgets/Icons/icon'
+import { Export, Sign } from 'widgets/Icons/icon'
 
 import {
   useState as useGlobalState,
@@ -426,7 +426,7 @@ const PasswordRequest = () => {
                 disabled={!password}
                 loading
               >
-                {t('offline-sign.sign-and-export')} {password ? <SignHover /> : <Sign />}
+                {t('offline-sign.sign-and-export')} <Sign />
               </Button>
             )}
           </div>
