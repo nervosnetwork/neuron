@@ -32,6 +32,10 @@
     color: var(--error-color);
   }
 
+  &.warn {
+    color: var(--notice-text-color);
+  }
+  
   & > * {
     &:not(svg) {
       font-weight: 400;

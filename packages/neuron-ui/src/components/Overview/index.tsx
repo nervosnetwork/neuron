@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import Balance from 'components/Balance'
-
+import PageContainer from 'components/PageContainer'
 import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 
@@ -18,6 +18,7 @@ import {
   getCurrentUrl,
   getSyncStatus,
   nftFormatter,
+  useFirstLoadApp,
 } from 'utils'
 
 import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
@@ -56,6 +57,7 @@ const genTypeLabel = (
 
 const Overview = () => {
   const {
+    app: { pageNotice },
     wallet: { id, balance = '' },
     chain: {
       syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
@@ -68,6 +70,7 @@ const Overview = () => {
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const navigate = useNavigate()
+  useFirstLoadApp(dispatch)
 
   const syncStatus = getSyncStatus({
     bestKnownBlockNumber,
@@ -267,28 +270,30 @@ const Overview = () => {
   }, [recentItems, cacheTipBlockNumber, bestKnownBlockNumber, t, onRecentActivityDoubleClick])
 
   return (
-    <div className={styles.overview}>
-      <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
-      <div className={styles.balance}>
-        <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
-      </div>
+    <PageContainer head={t('navbar.overview')} notice={pageNotice}>
+      <div className={styles.overview}>
+        <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
+        <div className={styles.balance}>
+          <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
+        </div>
 
-      <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
-      {items.length ? (
-        <>
-          {RecentActivites}
-          {items.length > 10 ? (
-            <div className={styles.linkToHistory}>
-              <span role="link" onClick={onGoToHistory} onKeyPress={() => {}} tabIndex={0}>
-                {t('overview.more')}
-              </span>
-            </div>
-          ) : null}
-        </>
-      ) : (
-        <div className={styles.noActivities}>{t('overview.no-recent-activities')}</div>
-      )}
-    </div>
+        <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
+        {items.length ? (
+          <>
+            {RecentActivites}
+            {items.length > 10 ? (
+              <div className={styles.linkToHistory}>
+                <span role="link" onClick={onGoToHistory} onKeyPress={() => {}} tabIndex={0}>
+                  {t('overview.more')}
+                </span>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className={styles.noActivities}>{t('overview.no-recent-activities')}</div>
+        )}
+      </div>
+    </PageContainer>
   )
 }
 

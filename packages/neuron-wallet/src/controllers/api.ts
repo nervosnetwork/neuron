@@ -260,10 +260,20 @@ export default class ApiController {
       return SettingsService.getInstance().locale = locale
     })
 
-    handle('set-theme', async (_, theme: 'system' | 'light' | 'dark') => {
-      return SettingsService.getInstance().themeSource = theme
+    handle('is-dark', async () => {
+      return {
+        status: ResponseCode.Success,
+        result: nativeTheme.shouldUseDarkColors
+      }
     })
 
+    handle('set-theme', async (_, theme: 'system' | 'light' | 'dark') => {
+      SettingsService.getInstance().themeSource = theme
+      return {
+        status: ResponseCode.Success
+      }
+    })
+    
     // Wallets
 
     handle('get-all-wallets', async () => {
