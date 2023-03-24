@@ -71,9 +71,9 @@ function download_windows_light() {
 }
 
 case $1 in
-  mac)    download_macos ;;
-  linux)  download_linux ;;
-  win)    download_windows ;;
+  mac)    download_macos; download_macos_light;;
+  linux)  download_linux; download_linux_light;;
+  win)    download_windows; download_windows_light;;
   *)
     if [[ "$OSTYPE" == "darwin"* ]]; then
       download_macos
