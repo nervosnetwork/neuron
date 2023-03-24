@@ -1,7 +1,7 @@
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'
-import { ConnectionStatus, ErrorCode, sortAccounts } from 'utils'
+import { ConnectionStatus, ErrorCode, getCurrentUrl, getSyncStatus, sortAccounts } from 'utils'
 
 export enum NeuronWalletActions {
   InitAppState = 'initAppState',
@@ -58,6 +58,8 @@ export enum AppActions {
   UpdateExperimentalParams = 'updateExperimentalParams',
   // offline sign
   UpdateLoadedTransaction = 'updateLoadedTransaction',
+  SetPageNotice = 'setPageNotice',
+  HideWaitForFullySynced = 'hideWaitForFullySynced',
 }
 
 export type StateAction =
@@ -89,6 +91,8 @@ export type StateAction =
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: { tx: any; assetAccount?: any } | null }
   | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
+  | { type: AppActions.SetPageNotice; payload?: State.PageNotice }
+  | { type: AppActions.HideWaitForFullySynced }
   | { type: NeuronWalletActions.InitAppState; payload: any }
   | { type: NeuronWalletActions.UpdateCurrentWallet; payload: Partial<State.Wallet> }
   | { type: NeuronWalletActions.UpdateWalletList; payload: State.WalletIdentity[] }
@@ -184,7 +188,16 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       break
     }
     case NeuronWalletActions.UpdateSyncState: {
-      state.chain.syncState = action.payload
+      state.chain.syncState = {
+        ...action.payload,
+        syncStatus: getSyncStatus({
+          bestKnownBlockNumber: action.payload.bestKnownBlockNumber,
+          bestKnownBlockTimestamp: action.payload.bestKnownBlockTimestamp,
+          cacheTipBlockNumber: action.payload.cacheTipBlockNumber,
+          currentTimestamp: Date.now(),
+          url: getCurrentUrl(state.chain.networkID, state.settings.networks),
+        }),
+      }
       break
     }
     case NeuronWalletActions.UpdateAppUpdaterStatus: {
@@ -363,6 +376,14 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
         ...state.app.loadedTransaction,
         ...action.payload,
       }
+      break
+    }
+    case AppActions.SetPageNotice: {
+      state.app.pageNotice = action.payload
+      break
+    }
+    case AppActions.HideWaitForFullySynced: {
+      state.app.showWaitForFullySynced = false
       break
     }
     default: {
