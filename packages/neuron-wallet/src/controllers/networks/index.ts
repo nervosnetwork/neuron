@@ -1,13 +1,13 @@
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import env from 'env'
-import { skip, distinctUntilChanged, debounceTime } from 'rxjs/operators'
+import { distinctUntilChanged, skip } from 'rxjs/operators'
 import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
 import NodeService from 'services/node'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
-import { switchToNetwork } from 'block-sync-renderer'
+import { resetSyncTaskQueue, switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import ChainInfo from './chain-info'
 import logger from 'utils/logger'
@@ -18,7 +18,7 @@ export default class NetworksController {
   public async start() {
     NodeService.getInstance()
       .connectionStatusSubject // TODO: find out the redundant message and remove skip
-      .pipe(distinctUntilChanged(), debounceTime(3000), skip(1))
+      .pipe(distinctUntilChanged(), skip(1))
       .subscribe(async (connected: boolean) => {
         if (connected) {
           await networksService.update(networksService.getCurrentID(), {})
@@ -26,6 +26,7 @@ export default class NetworksController {
           await this.connectToNetwork(true)
         } else {
           logger.debug('Network:\tconnection dropped')
+          resetSyncTaskQueue.push(false)
         }
       })
 

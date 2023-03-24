@@ -6,7 +6,6 @@ import process from 'process'
 import logger from 'utils/logger'
 import SettingsService from './settings'
 import MigrateSubject from 'models/subjects/migrate-subject'
-import { resetSyncTaskQueue } from 'block-sync-renderer'
 import IndexerService from './indexer'
 
 const platform = (): string => {
@@ -126,14 +125,12 @@ export const startCkbNode = async () => {
     isLookingValidTarget = false
     ckb = null
   })
-  resetSyncTaskQueue.push(true)
 
   removeOldIndexerIfRunSuccess()
 }
 
 export const stopCkbNode = () => {
   return new Promise<void>(resolve => {
-    resetSyncTaskQueue.push(false)
     if (ckb) {
       logger.info('CKB:\tkilling node')
       ckb.once('close', () => resolve())
