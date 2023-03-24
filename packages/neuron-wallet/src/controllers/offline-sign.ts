@@ -13,6 +13,7 @@ import NodeService from 'services/node'
 import { MultisigNotSignedNeedError, OfflineSignFailed } from 'exceptions'
 import MultisigConfigModel from 'models/multisig-config'
 import { getMultisigStatus } from 'utils/multisig'
+import { generateRPC } from 'utils/ckb-rpc'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -35,12 +36,12 @@ export default class OfflineSignController {
     }
 
     const tx = Transaction.fromObject(transaction)
-    const { ckb } = NodeService.getInstance()
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
 
     if (context === undefined) {
-      const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
-      const txs = await Promise.all(rawTx.inputs.map(i => ckb.rpc.getTransaction(i.previous_output!.tx_hash)))
-      context = txs.map(i => ckb.rpc.paramsFormatter.toRawTransaction(i.transaction))
+      const rawTx = rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
+      const txs = await Promise.all(rawTx.inputs.map(i => rpc.getTransaction(i.previous_output!.tx_hash)))
+      context = txs.map(i => rpc.paramsFormatter.toRawTransaction(i.transaction))
     }
 
     const signer = OfflineSign.fromJSON({

@@ -1,6 +1,6 @@
 import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
-import { LumosCell } from 'block-sync-renderer/sync/indexer-connector'
+import { LumosCell } from 'block-sync-renderer/sync/connector'
 
 const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
   type: ScriptHashType.Type,

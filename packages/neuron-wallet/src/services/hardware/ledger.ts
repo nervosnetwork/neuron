@@ -13,6 +13,7 @@ import Address, { AddressType } from 'models/keys/address'
 import HexUtils from 'utils/hex'
 import logger from 'utils/logger'
 import NetworksService from 'services/networks'
+import { generateRPC } from 'utils/ckb-rpc'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
@@ -50,12 +51,12 @@ export default class Ledger extends Hardware {
   }
 
   public async signTransaction (_: string, tx: Transaction, witnesses: string[], path: string, context?: RPC.RawTransaction[]) {
-    const { ckb } = NodeService.getInstance()
-    const rawTx = ckb.rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const rawTx = rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
 
     if (!context) {
-      const txs = await Promise.all(rawTx.inputs.map(i => ckb.rpc.getTransaction(i.previous_output!.tx_hash)))
-      context = txs.map(i => ckb.rpc.paramsFormatter.toRawTransaction(i.transaction))
+      const txs = await Promise.all(rawTx.inputs.map(i => rpc.getTransaction(i.previous_output!.tx_hash)))
+      context = txs.map(i => rpc.paramsFormatter.toRawTransaction(i.transaction))
     }
 
     const signature = await this.ledgerCKB!.signTransaction(

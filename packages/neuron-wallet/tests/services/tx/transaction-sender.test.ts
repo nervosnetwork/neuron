@@ -130,6 +130,22 @@ jest.doMock('services/hardware', () => ({
   })
 }))
 
+jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
+  return function() {
+    return {
+      calculateDaoMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
+    }
+  }
+})
+
+jest.doMock('utils/ckb-rpc.ts', () => ({
+  generateRPC() {
+    return {
+      sendTransaction: stubbedSendTransaction
+    }
+  }
+}))
+
 import Transaction from '../../../src/models/chain/transaction'
 import TxStatus from '../../../src/models/chain/tx-status'
 import CellDep, { DepType } from '../../../src/models/chain/cell-dep'
@@ -142,7 +158,6 @@ import { AddressType } from '../../../src/models/keys/address'
 import WitnessArgs from '../../../src/models/chain/witness-args'
 import CellWithStatus from '../../../src/models/chain/cell-with-status'
 import SystemScriptInfo from '../../../src/models/system-script-info'
-import NodeService from '../../../src/services/node'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import {
   CapacityNotEnoughForChange,
@@ -260,12 +275,6 @@ describe('TransactionSender Test', () => {
     resetMocks()
 
     stubbedGetWallet.mockReturnValue(fakeWallet)
-
-    //@ts-ignore
-    NodeService.getInstance().ckb.rpc = {
-      sendTransaction: stubbedSendTransaction
-    }
-    NodeService.getInstance().ckb.calculateDaoMaximumWithdraw = stubbedCalculateDaoMaximumWithdraw
   })
 
   describe('sign', () => {
