@@ -9,6 +9,10 @@ const { app } = env
 
 export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
 export type Locale = typeof locales[number]
+const settingKeys = {
+  testnetLightDataPath: 'testnetLightDataPath',
+  ckbDataPath: 'ckbDataPath'
+}
 
 export default class SettingsService extends Store {
   private static instance: SettingsService | null = null
@@ -43,11 +47,19 @@ export default class SettingsService extends Store {
   }
 
   get ckbDataPath() {
-    return this.readSync('ckbDataPath')
+    return this.readSync(settingKeys.ckbDataPath)
   }
 
   set ckbDataPath(dataPath: string) {
-    this.writeSync('ckbDataPath', dataPath)
+    this.writeSync(settingKeys.ckbDataPath, dataPath)
+  }
+
+  get testnetLightDataPath() {
+    return this.readSync(settingKeys.testnetLightDataPath)
+  }
+
+  set testnetLightDataPath(dataPath: string) {
+    this.writeSync(settingKeys.testnetLightDataPath, dataPath)
   }
 
   constructor() {
@@ -61,6 +73,9 @@ export default class SettingsService extends Store {
     )
     if (!this.ckbDataPath) {
       this.ckbDataPath = path.resolve(app.getPath('userData'), 'chains/mainnet')
+    }
+    if (!this.testnetLightDataPath) {
+      this.testnetLightDataPath = path.resolve(app.getPath('userData'), 'chains/light/testnet')
     }
   }
 

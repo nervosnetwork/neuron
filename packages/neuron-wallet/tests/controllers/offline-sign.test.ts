@@ -156,15 +156,7 @@ describe('OfflineSignController', () => {
     jest.doMock('services/node', () => {
       return class {
         static getInstance() {
-          return {
-            ckb: {
-              rpc: {
-                paramsFormatter: {
-                  toRawTransaction: (tx: any) => tx
-                }
-              }
-            }
-          }
+          return {}
         }
       }
     })
@@ -205,6 +197,18 @@ describe('OfflineSignController', () => {
     jest.doMock('../../src/utils/multisig', () => ({
       getMultisigStatus: getMultisigStatusMock
     }))
+
+    jest.doMock('../../src/utils/ckb-rpc', () => {
+      return {
+        generateRPC() {
+          return {
+            paramsFormatter: {
+              toRawTransaction: (tx: any) => tx
+            }
+          }
+        }
+      }
+    })
 
     const OfflineSignController = require('../../src/controllers/offline-sign').default
     offlineSignController = new OfflineSignController()

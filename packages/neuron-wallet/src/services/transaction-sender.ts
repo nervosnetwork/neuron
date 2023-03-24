@@ -1,4 +1,5 @@
 import WalletService, { Wallet } from 'services/wallets'
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
 import { scriptToAddress, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
@@ -40,6 +41,8 @@ import MultisigService from './multisig'
 import { getMultisigStatus } from 'utils/multisig'
 import { SignStatus } from 'models/offline-sign'
 import NetworksService from './networks'
+import { generateRPC } from 'utils/ckb-rpc'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -86,8 +89,8 @@ export default class TransactionSender {
   }
 
   public async broadcastTx(walletID: string = '', tx: Transaction) {
-    const { ckb } = NodeService.getInstance()
-    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
     await TransactionPersistor.saveSentTx(tx, txHash)
@@ -107,7 +110,6 @@ export default class TransactionSender {
   ) {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
-    const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
     if (wallet.isHardware()) {
       let device = HardwareWalletService.getInstance().getCurrent()
@@ -211,7 +213,7 @@ export default class TransactionSender {
         wit.lock = serializedMultisig + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
       } else {
-        signed = ckb.signWitnesses(privateKey)({
+        signed = signWitnesses(privateKey)({
           transactionHash: txHash,
           witnesses: serializedWitnesses.map(wit => {
             if (typeof wit === 'string') {
@@ -533,7 +535,7 @@ export default class TransactionSender {
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const changeAddress: string = await this.getChangeAddress()
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
     // for some reason with data won't work
     const cellWithStatus = await rpcService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index), true)
@@ -588,7 +590,7 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
     const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
     if (!cellWithStatus.isLive()) {
@@ -631,7 +633,7 @@ export default class TransactionSender {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
 
     const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
@@ -750,7 +752,7 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
     const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
     if (!cellWithStatus.isLive()) {
@@ -781,7 +783,7 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawBlockHash: string
   ): Promise<bigint> => {
-    const { ckb } = NodeService.getInstance()
+    const ckb = new CKB(NodeService.getInstance().nodeUrl)
     const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
 
     return BigInt(result)

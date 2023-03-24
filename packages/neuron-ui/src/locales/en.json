@@ -351,6 +351,7 @@
         },
         "mainnet": "Mainnet",
         "testnet": "Testnet",
+        "lightTestnet": "Light Testnet",
         "devnet": "Devnet"
       },
       "locale": {

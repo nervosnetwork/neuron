@@ -1,6 +1,6 @@
 import { request } from 'undici'
 
-export const rpcRequest = async <T>(
+export const rpcRequest = async <T = any>(
   url: string,
   options: {
     method: string
@@ -22,7 +22,8 @@ export const rpcRequest = async <T>(
   if (res.statusCode !== 200) {
     throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
   }
-  return res.body.json()
+  const body = await res.body.json()
+  return body?.result as T
 }
 
 export const rpcBatchRequest = async (

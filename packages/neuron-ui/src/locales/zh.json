@@ -344,6 +344,7 @@
         },
         "mainnet": "主网",
         "testnet": "测试网",
+        "lightTestnet": "轻节点测试网",
         "devnet": "开发网"
       },
       "locale": {

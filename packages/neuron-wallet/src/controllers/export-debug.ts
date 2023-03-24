@@ -2,7 +2,6 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import archiver from 'archiver'
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
 import logger from 'utils/logger'
 import { t } from 'i18next'
@@ -11,6 +10,7 @@ import SyncedBlockNumber from 'models/synced-block-number'
 import AddressService from 'services/addresses'
 import redistCheck from 'utils/redist-check'
 import SettingsService from 'services/settings'
+import { generateRPC } from 'utils/ckb-rpc'
 
 export default class ExportDebugController {
   // eslint-disable-next-line prettier/prettier
@@ -51,22 +51,22 @@ export default class ExportDebugController {
   private addStatusFile = async () => {
     const neuronVersion = app.getVersion()
     const url = NetworksService.getInstance().getCurrent().remote
-    const ckb = new CKB(url)
+    const rpcService = generateRPC(url)
 
     const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers, vcredist] = await Promise.all([
       new SyncedBlockNumber()
         .getNextBlock()
         .then(n => n.toString())
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .localNodeInfo()
-        .then(res => res.version)
+        .then(v => v.version)
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .getPeers()
         .catch(() => []),
       redistCheck()
