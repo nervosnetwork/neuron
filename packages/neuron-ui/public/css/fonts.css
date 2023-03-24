@@ -19,3 +19,9 @@
   src: url('../fonts/ProximaNova-Semibold.otf') format('opentype'),
       url('../fonts/ProximaNova-Semibold.ttf') format('opentype');
 }
+
+@font-face {
+  font-family: 'D-DIN-PRO';
+  src: url('../fonts/D-DIN-PRO-500-Medium.otf') format('opentype'),
+      url('../fonts/D-DIN-PRO-500-Medium.ttf') format('opentype');
+}
