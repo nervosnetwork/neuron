@@ -756,6 +756,8 @@
         "tag": "十二月"
       },
       "timezone": "时区",
+      "previous-month": "上个月",
+      "next-month": "下个月",
       "start-tomorrow": "所选时间不能早于明天。"
     },
     "sign-and-verify": {

@@ -756,6 +756,8 @@
         "tag": "十二月"
       },
       "timezone": "時區",
+      "previous-month": "上個月",
+      "next-month": "下個月",
       "start-tomorrow": "所選時間不能早於明天。"
     },
     "sign-and-verify": {

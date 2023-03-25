@@ -215,6 +215,12 @@ export default {
           ok: 'OK',
           cancel: 'Cancel'
         }
+      },
+      'node-version-different': {
+        message: 'The node version is inconsistent with Neuron(v {{ version }}), please use after confirmation'
+      },
+      'ckb-without-indexer': {
+        message: "Please add '--indexer' option to start local node"
       }
     },
     prompt: {
