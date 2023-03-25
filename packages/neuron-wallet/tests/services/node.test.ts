@@ -5,7 +5,9 @@ import { NetworkType } from '../../src/models/network'
 describe('NodeService', () => {
   let nodeService: any
   const stubbedStartCKBNode = jest.fn()
+  const stubbedStopCkbNode = jest.fn()
   const stubbedStartLightNode = jest.fn()
+  const stubbedStopLightNode = jest.fn()
   const stubbedConnectionStatusSubjectNext = jest.fn()
   const stubbedCKBSetNode = jest.fn()
   const stubbedGetTipBlockNumber = jest.fn()
@@ -29,6 +31,7 @@ describe('NodeService', () => {
 
   const resetMocks = () => {
     stubbedStartCKBNode.mockReset()
+    stubbedStopCkbNode.mockReset()
     stubbedConnectionStatusSubjectNext.mockReset()
     stubbedCKBSetNode.mockReset()
     stubbedGetTipBlockNumber.mockReset()
@@ -47,6 +50,7 @@ describe('NodeService', () => {
     getChainMock.mockReset()
     getLocalNodeInfoMock.mockReset()
     stubbedStartLightNode.mockReset()
+    stubbedStopLightNode.mockReset()
   }
 
   beforeEach(() => {
@@ -55,7 +59,8 @@ describe('NodeService', () => {
 
     jest.doMock('../../src/services/ckb-runner', () => {
       return {
-        startCkbNode: stubbedStartCKBNode
+        startCkbNode: stubbedStartCKBNode,
+        stopCkbNode: stubbedStopCkbNode,
       }
     })
     jest.doMock('../../src/services/networks', () => {
@@ -151,6 +156,7 @@ describe('NodeService', () => {
           getInstance() {
             return {
               start: stubbedStartLightNode,
+              stop: stubbedStopLightNode,
             }
           }
         }
@@ -293,6 +299,7 @@ describe('NodeService', () => {
         stubbedNetworsServiceGet.mockReturnValueOnce({type: NetworkType.Light})
         await nodeService.startNode()
         expect(stubbedStartLightNode).toBeCalled()
+        expect(stubbedStopCkbNode).toBeCalled()
       })
     })
   });

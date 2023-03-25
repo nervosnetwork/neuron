@@ -36,7 +36,7 @@ function download_macos_aarch64() {
 
 function download_macos_light() {
   # macOS
-  CKB_FILENAME="ckb-light-client_${CKB_LIGHT_VERSION}-x86_64-darwin"
+  CKB_FILENAME="ckb-light-client_${CKB_LIGHT_VERSION}-x86_64-darwin-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/mac
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"

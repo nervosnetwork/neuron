@@ -10,7 +10,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
 import NetworksService from 'services/networks'
 import RpcService from 'services/rpc-service'
-import { startCkbNode } from 'services/ckb-runner'
+import { startCkbNode, stopCkbNode } from 'services/ckb-runner'
 import HexUtils from 'utils/hex'
 import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER, BUNDLED_LIGHT_CKB_URL } from 'utils/const'
 import logger from 'utils/logger'
@@ -166,8 +166,10 @@ class NodeService {
     try {
       const network = NetworksService.getInstance().getCurrent()
       if (network.type === NetworkType.Light) {
+        await stopCkbNode()
         await CKBLightRunner.getInstance().start()
       } else {
+        await CKBLightRunner.getInstance().stop()
         await startCkbNode()
       }
       this.startedBundledNode = true
