@@ -763,6 +763,8 @@
         "tag": "D"
       },
       "timezone": "Time Zone",
+      "previous-month": "previous month",
+      "next-month": "next month",
       "start-tomorrow": "Selected time should start from tomorrow."
     },
     "sign-and-verify": {
