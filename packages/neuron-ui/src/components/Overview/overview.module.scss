@@ -103,6 +103,10 @@
     position: absolute;
     left: -4px;
   }
+
+  &[data-status="failed"] {
+    color: #FF1E1E;
+  }
 }
 
 .noActivities {
