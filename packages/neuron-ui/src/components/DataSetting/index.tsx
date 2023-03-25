@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
@@ -8,6 +8,8 @@ import CopyZone from 'widgets/CopyZone'
 import { OpenFolder, InfoCircleOutlined } from 'widgets/Icons/icon'
 import { shell } from 'electron'
 import Spinner from 'widgets/Spinner'
+import { getIsCkbRunExternal } from 'services/remote'
+import { isSuccessResponse } from 'utils'
 import { useDataPath } from './hooks'
 
 import styles from './index.module.scss'
@@ -20,6 +22,16 @@ const SetItem = () => {
       shell.openPath(prevPath!)
     }
   }, [prevPath])
+  const [isCkbRunExternal, setIsCkbRunExternal] = useState<boolean | undefined>()
+  useEffect(() => {
+    getIsCkbRunExternal().then(res => {
+      if (isSuccessResponse(res)) {
+        setIsCkbRunExternal(res.result ?? false)
+      } else {
+        // ignore
+      }
+    })
+  }, [])
   return (
     <>
       <div className={styles.name}>
@@ -35,7 +47,7 @@ const SetItem = () => {
         </CopyZone>
         <OpenFolder onClick={openPath} />
       </div>
-      <Button label={t('settings.data.set')} onClick={onSetting} />
+      <Button label={t('settings.data.set')} onClick={onSetting} disabled={isCkbRunExternal} />
       <dialog ref={dialogRef} className={styles.dialog}>
         <div className={styles.describe}>{t('settings.data.remove-ckb-data-tip', { prevPath, currentPath })}</div>
         <div className={styles.attention}>
