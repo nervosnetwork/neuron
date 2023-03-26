@@ -421,7 +421,7 @@ const PasswordRequest = () => {
             {!currentWallet.isWatchOnly && (
               <Button
                 type="text"
-                className={!password ? styles['sign-disabled'] : ''}
+                className={!password ? styles.signDisabled : ''}
                 onClick={signAndExportFromGenerateTx}
                 disabled={!password}
                 loading

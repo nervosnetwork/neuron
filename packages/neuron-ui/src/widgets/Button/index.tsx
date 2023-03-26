@@ -1,5 +1,4 @@
 import React from 'react'
-import clsx from 'clsx'
 import styles from './button.module.scss'
 
 const isNativeType = (type: string): type is 'button' | 'submit' | 'reset' => {
@@ -32,7 +31,7 @@ const Button = React.forwardRef(
     return (
       <button
         ref={ref}
-        className={clsx(styles.button, className)}
+        className={`${styles.button} ${className}`}
         // eslint-disable-next-line react/button-has-type
         type={btnType}
         data-type={type}

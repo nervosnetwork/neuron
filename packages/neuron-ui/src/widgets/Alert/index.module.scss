@@ -1,10 +1,8 @@
-@import '../../styles/px.scss';
-
 .alert {
   list-style: none;
   color: var(--main-text-color);
-  font-size: px(14);
-  line-height: px(24);
+  font-size: 14px;
+  line-height: 24px;
   display: flex;
 
   &.init {

@@ -12,7 +12,7 @@ const Alert: React.FC<{ status: AlertStatus; className?: string; withIcon?: bool
   status,
   children,
   className,
-  withIcon = false,
+  withIcon = true,
 }) => {
   return (
     <li className={`${styles[status]} ${className || ''} ${styles.alert}`}>

@@ -12,13 +12,13 @@ $headerHeight: 72px;
     flex: 1;
     position: relative;
 
-    .left-content {
+    .leftContent {
       height: calc(100vh - $headerHeight - 100px);
       overflow-y: scroll;
       margin-bottom: 100px;
     }
 
-    .left-footer {
+    .leftFooter {
       position: absolute;
       width: 100%;
       bottom: 0;
@@ -28,7 +28,7 @@ $headerHeight: 72px;
       justify-content: center;
       align-items: center;
 
-      .add-button {
+      .addButton {
         min-width: 216px;
         padding: 20px;
         box-shadow: 0 0 10px var(--primary-color);
@@ -37,6 +37,12 @@ $headerHeight: 72px;
         justify-content: center;
         &_icon {
           margin-right: 8px;
+        }
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color)
+          }
         }
       }
     }
@@ -49,12 +55,12 @@ $headerHeight: 72px;
     border-radius: 16px;
     background: var(--secondary-background-color);
 
-    .right-content {
+    .rightContent {
       padding: 16px;
       margin-bottom: 120px;
     }
 
-    .right-footer {
+    .rightFooter {
       position: absolute;
       width: 100%;
       bottom: 16px;
@@ -71,23 +77,3 @@ $headerHeight: 72px;
     }
   }
 }
-
-// .pageTitle {
-//   @include page-title;
-// }
-
-// .info {
-//   display: grid;
-//   grid-template: 'textfield' auto;
-//   grid-gap: 15px;
-//   padding: 24px 0 34px;
-// }
-
-// .balance {
-//   grid-area: balance;
-//   display: flex;
-//   align-items: center;
-//   font-size: 1.25rem;
-//   font-weight: 600;
-// }
-

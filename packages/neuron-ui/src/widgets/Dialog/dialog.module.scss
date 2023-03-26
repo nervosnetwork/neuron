@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.dialog-wrap {
+.dialogWrap {
   @include dialog-container;
   max-width: 90vw;
   padding: 0;
@@ -18,18 +18,25 @@
   align-items: center;
   padding: 14px 16px 12px;
   font-weight: 900;
-  font-size: px(16);
+  font-size: 16px;
   font-weight: 500;
-  line-height: px(22);
+  line-height: 22px;
   border-bottom: 1px solid var(--divide-line-color);
+  svg {
+    g,
+    path {
+      fill: var(--main-text-color);
+    }
+    cursor: pointer;
+  }
   .title {
     font-weight: 500;
-    font-size: px(16);
+    font-size: 16px;
     color: var(--main-text-color);
   }
   .subTitle {
     font-weight: 400;
-    font-size: px(12);
+    font-size: 12px;
     margin-left: 6px;
     color: var(--dialog-secondary-text-color);
   }

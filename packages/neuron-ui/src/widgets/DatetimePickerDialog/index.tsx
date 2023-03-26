@@ -21,7 +21,7 @@ export const formatDate = (datetime: Date) => {
     .toString()
     .padStart(2, '0')
   const year = datetime.getFullYear()
-  return `${month}/${date}/${year}`
+  return `${year}-${month}-${date}`
 }
 
 export interface DatetimePickerDialogProps {
@@ -142,15 +142,17 @@ const DatetimePickerDialog = ({
             e.preventDefault()
           }}
         >
-          <div className={styles['calendar-wrap']}>
-            <Calendar
-              value={selected}
-              minDate={new Date()}
-              onChange={onCalendarChange}
-              inline
-              locale="es"
-              className={styles.calendar}
-            />
+          <div className={styles.calendarContainer}>
+            <div className={styles.calendarWrap}>
+              <Calendar
+                value={selected}
+                minDate={new Date()}
+                onChange={onCalendarChange}
+                inline
+                locale="es"
+                className={styles.calendar}
+              />
+            </div>
           </div>
 
           {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}

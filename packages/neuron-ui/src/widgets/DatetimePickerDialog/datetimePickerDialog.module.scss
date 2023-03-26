@@ -1,22 +1,24 @@
 @import '../../styles';
 
-$width: 380px;
-
 :global {
     .p-calendar {
       @include regular-text;
       margin: auto;
 
       .p-datepicker-today span {
-        color: var(--nervos-green);
+        color: var(--primary-color);
         pointer-events: none;
       }
 
       .p-datepicker-header {
         display: flex;
         justify-content: space-between;
-        width: $width;
+        width: 266px;
         margin-bottom: 16px;
+
+        button {
+          color: var(--main-text-color);
+        }
 
         .p-datepicker-next.p-link {
           order: 1;
@@ -27,7 +29,7 @@ $width: 380px;
           content: '';
           width: 8px;
           height: 2px;
-          background: #000;
+          background: var(--main-text-color);
           position: absolute;
         }
 
@@ -84,35 +86,52 @@ $width: 380px;
       }
 
       .p-highlight {
-        background: var(--nervos-green);
+        background: var(--primary-color);
         color: #fff !important;
       }
 
       .p-disabled {
-        opacity: 0.2;
+        opacity: 0.3;
+      }
+
+      thead {
+        position: relative;
+        tr {
+          height: 40px;
+        }
+        &::after {
+          position: absolute;
+          content: "";
+          background: var(--input-border-color);
+          left: 0;
+          bottom: -0;
+          height: 1px;
+          width: 100%;
+        }
       }
 
       th {
-        color: rgba(0, 0, 0, 0.38);
+        color: var(--main-text-color);
         font-size: 12px;
       }
 
       td {
+        height: 30px;
         span {
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 30px;
-          height: 30px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
-          color: #000;
+          color: var(--main-text-color);
 
           font-size: 12px;
-          margin: auto 10px;
+          margin: auto 5px;
 
           &:not(.p-disabled):hover {
             color: #fff;
-            background-color: var(--nervos-green);
+            background-color: var(--primary-color);
           }
         }
       }
@@ -121,9 +140,20 @@ $width: 380px;
 
 .container {
   margin: 16px 168px 0;
-  width: $width;
-  .calendar-wrap {
+  width: 344px;
+  .calendarContainer {
+    width: 344px;
     position: relative;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 0;
+  }
+  .calendarWrap {
+    position: relative;
+    width: 266px;
   }
   .popup {
     display: flex;
@@ -149,8 +179,8 @@ $width: 380px;
     .edit {
       margin-top: 16px;
       position: relative;
-      background: #FFFFFF;
-      border: 1px solid #E5E5E5;
+      background: var(--secondary-background-color);
+      border: 1px solid var(--input-border-color);
       border-radius: 8px;
       height: 56px;
       display: flex;
@@ -159,8 +189,8 @@ $width: 380px;
         position: absolute;
         left: 16px;
         margin: 0;
-        font-size: px(14);
-        color: #999999;
+        font-size: 14px;
+        color: var(--input-second-color);
       }
     }
 
@@ -169,14 +199,16 @@ $width: 380px;
       width: 100%;
       font-weight: 500;
       text-align: center;
-      font-size: px(14);
-      line-height: px(24)
+      font-size: 14px;
+      line-height: 24px;
+      background: var(--secondary-background-color);
+      color: var(--main-text-color)
     }
   }
 
   .notice {
     @include regular-text;
-    font-size: px(12);
+    font-size: 12px;
     margin: 11px 0;
     display: flex;
     align-items: center;
@@ -190,8 +222,8 @@ $width: 380px;
 
   .error {
     @include regular-text;
-    color: red;
-    font-size: px(12);
+    color: var(--error-color);
+    font-size: 12px;
     margin-top: 5px;
   }
 }

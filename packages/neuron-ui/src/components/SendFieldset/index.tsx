@@ -64,13 +64,14 @@ const SendFieldset = ({
   return (
     <div className={styles.container}>
       <TextField
+        rows={2}
         label={
-          <div className={styles['remove-label']}>
+          <div className={styles.removeLabel}>
             <div>{t('send.address')}</div>
             {isRemoveBtnShow && (
               <Button
                 ref={removeRef}
-                onClick={(e: any) => {
+                onClick={(e: React.SyntheticEvent<HTMLButtonElement>) => {
                   if (showDeleteDialog) {
                     onOutputRemove(e)
                   } else {
@@ -79,7 +80,7 @@ const SendFieldset = ({
                 }}
                 data-idx={idx}
                 disabled={isSendMax}
-                className={styles['remove-btn']}
+                className={styles.removeBtn}
                 type="text"
               >
                 <Trash />

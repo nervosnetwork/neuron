@@ -8,16 +8,16 @@ $textfieldWidth: calc(100vw - 370px);
   border-radius: 16px;
   margin-bottom: 16px;
 
-  .remove-label {
+  .removeLabel {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     color: var(--secondary-text-color);
-    font-size: px(14);
-    .remove-btn {
-      height: px(16) !important;
-      width: px(16);
+    font-size: 14px;
+    .removeBtn {
+      height: 16px !important;
+      width: 16px;
       min-width: 0;
       cursor: pointer;
       &:hover {
@@ -88,9 +88,9 @@ $textfieldWidth: calc(100vw - 370px);
     padding: 4px 16px;
     background-color: var(--notice-background-color);
     color: var(--notice-text-color);
-    margin-top: 4px;
-    font-size: px(12);
-    line-height: px(24);
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 24px;
     font-weight: 500;
     border: 1px solid rgba(252, 136, 0, 0.2);
     border-radius: 4px;
@@ -122,7 +122,7 @@ $textfieldWidth: calc(100vw - 370px);
     align-items: center;
     margin: 0;
     padding: 0;
-    font-size: px(14) !important;
+    font-size: 14px !important;
     background-color: transparent;
     border: none;
     cursor: pointer;

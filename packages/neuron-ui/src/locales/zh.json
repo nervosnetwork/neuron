@@ -680,39 +680,39 @@
     },
     "datetime": {
       "mon": {
-        "full": "周一",
-        "short": "周一",
-        "tag": "周一"
+        "full": "一",
+        "short": "一",
+        "tag": "一"
       },
       "tue": {
-        "full": "周二",
-        "short": "周二",
-        "tag": "周二"
+        "full": "二",
+        "short": "二",
+        "tag": "二"
       },
       "wed": {
-        "full": "周三",
-        "short": "周三",
-        "tag": "周三"
+        "full": "三",
+        "short": "三",
+        "tag": "三"
       },
       "thur": {
-        "full": "周四",
-        "short": "周四",
-        "tag": "周四"
+        "full": "四",
+        "short": "四",
+        "tag": "四"
       },
       "fri": {
-        "full": "周五",
-        "short": "周五",
-        "tag": "周五"
+        "full": "五",
+        "short": "五",
+        "tag": "五"
       },
       "sat": {
-        "full": "周六",
-        "short": "周六",
-        "tag": "周六"
+        "full": "六",
+        "short": "六",
+        "tag": "六"
       },
       "sun": {
-        "full": "周日",
-        "short": "周日",
-        "tag": "周日"
+        "full": "日",
+        "short": "日",
+        "tag": "日"
       },
       "jan": {
         "full": "一月",

@@ -59,7 +59,7 @@ const Dialog = ({
   }
 
   return (
-    <dialog ref={dialogRef} className={styles['dialog-wrap']}>
+    <dialog ref={dialogRef} className={styles.dialogWrap}>
       <div className={styles.header}>
         <div className={styles.title}>
           {title}
@@ -73,13 +73,8 @@ const Dialog = ({
           { footer }
         ) : (
           <div className={styles.footer}>
-            <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('nervos-dao.cancel')} />
-            <Button
-              type="submit"
-              label={confirmText || t('nervos-dao.proceed')}
-              loading={isLoading}
-              disabled={disabled}
-            />
+            <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
+            <Button type="submit" label={confirmText || t('common.confirm')} loading={isLoading} disabled={disabled} />
           </div>
         )}
       </form>

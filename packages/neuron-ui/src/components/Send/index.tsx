@@ -126,7 +126,7 @@ const Send = () => {
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
         <div className={styles.layout}>
           <div className={styles.left}>
-            <div className={styles['left-content']}>
+            <div className={styles.leftContent}>
               <List
                 items={outputs}
                 onRenderCell={(_, idx) => {
@@ -156,22 +156,22 @@ const Send = () => {
                 }}
               />
             </div>
-            <div className={styles['left-footer']}>
+            <div className={styles.leftFooter}>
               <Button
                 type="primary"
                 disabled={isAddOneBtnDisabled}
                 onClick={handleOutputAdd}
-                className={styles['add-button']}
+                className={styles.addButton}
               >
                 <>
-                  <Add className={styles['add-button_icon']} /> {t('send.add-receiving-address')}
+                  <Add className={styles.addButton_icon} /> {t('send.add-receiving-address')}
                 </>
               </Button>
             </div>
           </div>
 
           <div className={styles.right}>
-            <div className={styles['right-content']}>
+            <div className={styles.rightContent}>
               <SendMetaInfo
                 outputs={outputs}
                 errorMessage={errorMessageUnderTotal}
@@ -184,7 +184,7 @@ const Send = () => {
                 handlePriceChange={handlePriceChange}
               />
             </div>
-            <div className={styles['right-footer']}>
+            <div className={styles.rightFooter}>
               <Button type="reset" onClick={handleClear} label={t('send.reset')} />
               <Button type="submit" disabled={disabled} label={t('send.send')}>
                 {sending ? <Spinner /> : (t('send.send') as string)}
