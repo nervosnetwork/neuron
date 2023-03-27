@@ -3,7 +3,9 @@ import TextField from 'widgets/TextField'
 import { useTranslation } from 'react-i18next'
 import { Price, localNumberFormatter, useDidMount } from 'utils'
 import Button from 'widgets/Button'
-import { Arrow, Select, Change } from 'widgets/Icons/icon'
+import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
+import { ReactComponent as Select } from 'widgets/Icons/Select.svg'
+import { ReactComponent as Change } from 'widgets/Icons/Change.svg'
 
 import styles from './transactionFeePanel.module.scss'
 
@@ -80,12 +82,12 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
 
   const selectedPrice = useMemo(() => priceOptions.find(item => item.key === price), [price])
 
-  const onTroggle = () => {
+  const onTroggle = useCallback(() => {
     if (isCustom && !selectedPrice) {
       onPriceChange({ target: { value: priceOptions[0].key } })
     }
     setIsCustom(v => !v)
-  }
+  }, [isCustom, selectedPrice, onPriceChange, setIsCustom])
 
   return (
     <div>

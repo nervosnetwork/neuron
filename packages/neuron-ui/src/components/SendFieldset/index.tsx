@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import AlertDialog from 'widgets/AlertDialog'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { Trash } from 'widgets/Icons/icon'
+import { ReactComponent as Trash } from 'widgets/Icons/Trash.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import TimeClock from 'widgets/Icons/TimeClock.svg'
 

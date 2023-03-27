@@ -42,13 +42,8 @@ import { ReactComponent as ArrowOpenRightSvg } from './ArrowOpenRight.svg'
 import { ReactComponent as MenuExpandSvg } from './MenuExpand.svg'
 import { ReactComponent as ArrowEndSvg } from './ArrowEnd.svg'
 import { ReactComponent as ArrowNextSvg } from './ArrowNext.svg'
-import { ReactComponent as AddSvg } from './Add.svg'
-import { ReactComponent as ArrowSvg } from './Arrow.svg'
-import { ReactComponent as SelectSvg } from './Select.svg'
 import { ReactComponent as SignSvg } from './Sign.svg'
 import { ReactComponent as ExportSvg } from './Export.svg'
-import { ReactComponent as TrashSvg } from './Trash.svg'
-import { ReactComponent as ChangeSvg } from './Change.svg'
 
 import styles from './icon.module.scss'
 
@@ -105,10 +100,5 @@ export const ArrowOpenRight = WrapSvg(ArrowOpenRightSvg)
 export const MenuExpand = WrapSvg(MenuExpandSvg)
 export const ArrowEnd = WrapSvg(ArrowEndSvg)
 export const ArrowNext = WrapSvg(ArrowNextSvg)
-export const Add = WrapSvg(AddSvg)
-export const Arrow = WrapSvg(ArrowSvg)
-export const Select = WrapSvg(SelectSvg)
 export const Export = WrapSvg(ExportSvg)
 export const Sign = WrapSvg(SignSvg)
-export const Trash = WrapSvg(TrashSvg)
-export const Change = WrapSvg(ChangeSvg)

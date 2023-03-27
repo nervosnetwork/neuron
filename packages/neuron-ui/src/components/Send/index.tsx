@@ -8,7 +8,7 @@ import SendFieldset from 'components/SendFieldset'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePickerDialog from 'widgets/DatetimePickerDialog'
-import { Add } from 'widgets/Icons/icon'
+import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
 
 import { validateTotalAmount, isMainnet as isMainnetUtil, validateOutputs, useOutputErrors } from 'utils'
 
