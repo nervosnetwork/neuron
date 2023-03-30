@@ -161,32 +161,6 @@
       line-height: 24px;
     }
   }
-  .copyAddress {
-    word-break: break-all;
-    text-align: center;
-    margin: 32px 16px 82px 16px;
-    line-height: 24px;
-    font-family: "JetBrains Mono";
-  
-    .addressToggle{
-      margin: 0 0 0 4px;
-      padding: 0;
-      vertical-align: sub;
-      appearance: none;
-      border: none;
-      background: none;
-      padding-right: 20px;
-      svg {
-        pointer-events: none;
-      }
-    
-      &:hover {
-        & + div {
-          display: none;
-        }
-      }
-    }
-  }
 }
 
 .qrCode {
@@ -228,6 +202,33 @@
   }
 }
 
+.copyAddress {
+  word-break: break-all;
+  text-align: center;
+  margin: 32px 16px 82px 16px;
+  line-height: 24px;
+  font-family: "JetBrains Mono";
+
+  .addressToggle{
+    margin: 0 0 0 4px;
+    padding: 0;
+    vertical-align: sub;
+    appearance: none;
+    border: none;
+    background: none;
+    padding-right: 20px;
+    svg {
+      pointer-events: none;
+    }
+  
+    &:hover {
+      & + div {
+        display: none;
+      }
+    }
+  }
+}
+
 .singleAddressRoot {
   height: 100%;
   text-align: center;
@@ -241,7 +242,7 @@
   .copyContainer {
     width: 100%;
     text-align: center;
-    .addressCopy {
+    .copyAddress {
       width: 450px;
       margin: 16px 0 42px 0;
     }

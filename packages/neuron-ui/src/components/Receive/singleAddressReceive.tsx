@@ -36,7 +36,7 @@ const SignleAddressReceive = ({ address, wallet }: { address: string; wallet: St
         <QRCode value={showAddress} size={128} includeMargin ref={ref} />
       </div>
       <div className={styles.copyContainer}>
-        <CopyZone content={showAddress} name={t('receive.copy-address')} className={styles.addressCopy}>
+        <CopyZone content={showAddress} name={t('receive.copy-address')} className={styles.copyAddress}>
           {showAddress}
           <button
             type="button"
