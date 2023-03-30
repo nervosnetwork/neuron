@@ -20,6 +20,7 @@
     user-select: none;
     white-space: nowrap;
     border-radius: 16px;
+    z-index: 10;
 
     & > svg {
       margin-right: 4px;
@@ -30,10 +31,9 @@
     padding-right: 14px;
     .hoverShow {
       display: flex;
-    }
-
-    .copyIcon {
-      visibility: visible;
+      .copyIcon {
+        visibility: visible;
+      }
     }
   }
 }

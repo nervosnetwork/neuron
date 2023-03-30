@@ -81,11 +81,7 @@ const ClearCache = ({ dispatch }: { dispatch: StateDispatch }) => {
       <div className={styles.clearedDate}>{t('settings.data.cache-cleared-on', { date: clearedDate })}</div>
       <Button label={t('settings.data.clear-cache')} onClick={showDialog} disabled={isClearing}>
         {isClearing ? (
-          <Spinner
-            label={t('settings.data.clearing-cache')}
-            labelPosition="right"
-            styles={{ root: { marginRight: 5 } }}
-          />
+          <Spinner label={t('settings.data.clearing-cache')} labelPosition="right" />
         ) : (
           (t('settings.data.clear-cache') as string)
         )}

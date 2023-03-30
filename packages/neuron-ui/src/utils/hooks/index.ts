@@ -36,7 +36,12 @@ export const useGoBack = () => {
   }, [navigate])
 }
 
-export const useLocalDescription = (type: 'address' | 'transaction', walletID: string, dispatch: StateDispatch) => {
+export const useLocalDescription = (
+  type: 'address' | 'transaction',
+  walletID: string,
+  dispatch: StateDispatch,
+  inputType = 'input'
+) => {
   const [localDescription, setLocalDescription] = useState<{ description: string; key: string }>({
     key: '',
     description: '',
@@ -87,6 +92,8 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
         submitDescription(key, originDesc)
+        const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
+        input?.blur()
       }
     },
     [submitDescription]
@@ -110,7 +117,7 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     (e: React.SyntheticEvent<any>) => {
       const {
         dataset: { descriptionKey: key, descriptionValue: originDesc = '' },
-      } = e.target as HTMLElement
+      } = e.currentTarget
       if (key) {
         dispatch({
           type: AppActions.ToggleIsAllowedToFetchList,
@@ -118,9 +125,10 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
         })
         setLocalDescription({ key, description: originDesc })
         try {
-          const input = document.querySelector<HTMLInputElement>(`input[data-description-key="${key}"]`)
+          const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
           if (input) {
             input.focus()
+            input.setSelectionRange(-1, -1)
           }
         } catch (err) {
           console.warn(err)

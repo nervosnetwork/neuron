@@ -112,11 +112,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
               disabled={updater.checking}
             >
               {updater.checking ? (
-                <Spinner
-                  styles={{ root: { marginRight: 5 } }}
-                  label={t('updates.checking-updates')}
-                  labelPosition="right"
-                />
+                <Spinner label={t('updates.checking-updates')} labelPosition="right" />
               ) : (
                 (t('updates.check-updates') as string)
               )}

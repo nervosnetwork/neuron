@@ -10,7 +10,6 @@ import Send from 'components/Send'
 import Receive from 'components/Receive'
 import History from 'components/History'
 import Transaction from 'components/Transaction'
-import Addresses from 'components/Addresses'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
@@ -166,16 +165,6 @@ const mainRouterConfig: RouteObject[] = [
         element: (
           <>
             <Transaction />
-            <Outlet />
-          </>
-        ),
-        children: [offlineRouter],
-      },
-      {
-        path: RoutePath.Addresses,
-        element: (
-          <>
-            <Addresses />
             <Outlet />
           </>
         ),

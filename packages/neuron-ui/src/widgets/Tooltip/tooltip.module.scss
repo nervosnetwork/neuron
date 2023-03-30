@@ -217,8 +217,10 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 
       &[data-has-trigger="true"] {
         &[data-placement="bottom"] {
-          &::after {
-            top: calc(100% + 20px)
+          &:not([data-trigger-next-to-child="true"]) {
+            &::after {
+              top: calc(100% + 20px)
+            }
           }
           .triangle {
             top: calc(100% + 4px);
@@ -268,8 +270,10 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 
   &[data-has-trigger="true"] {
     &[data-placement="bottom"] {
-      & .tip {
-        top: calc(100% + 20px)
+      &:not([data-trigger-next-to-child="true"]) {
+        & .tip {
+          top: calc(100% + 20px)
+        }
       }
     }
   }

@@ -94,7 +94,7 @@ const TransactionStatus = ({
   }
   return (
     <div className={styles.txStatus} data-status={status}>
-      {status === 'confirming' ? <Confirming className={styles.confirm} /> : null}
+      {status === 'confirming' ? <Confirming /> : null}
       <span>{t(`overview.statusLabel.${status}`)}</span>
       {confirmations ? <span className={styles.confirmText}>{confirmations}</span> : null}
     </div>
@@ -320,7 +320,6 @@ const Overview = () => {
             title: t('overview.status'),
             dataIndex: 'status',
             align: 'left',
-            className: styles.txStatusTh,
             render(_, __, item) {
               return (
                 <TransactionStatus

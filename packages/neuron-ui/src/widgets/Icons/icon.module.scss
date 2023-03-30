@@ -30,3 +30,11 @@ $activity-color: #1b73b3;
     fill: $activity-color;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .addressTransform {
+    & > path {
+      stroke: #1E2423;
+    }
+  }
+}

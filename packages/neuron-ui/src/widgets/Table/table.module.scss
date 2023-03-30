@@ -53,10 +53,52 @@
   }
 }
 
+.fixedTableRoot {
+  &[data-have-head="true"] {
+    .table {
+      height: calc(100% - 52px);
+    }
+  }
+  .table {
+    tbody {
+      height: 100%;
+      display: block;
+      height: calc(100% - 48px);
+      overflow: hidden auto;
+      &::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+      }
+      &::-webkit-scrollbar-corner {
+        background-color: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        width: 8px;
+        background: #CCCCCC;
+        border-radius: 48px;
+      }
+    }
+
+    thead, tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    thead {
+      width: calc( 100% - 8px)
+    }
+  }
+}
+
 .noData {
   padding: 22px 0 44px 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.head {
+  padding: 16px;
 }
