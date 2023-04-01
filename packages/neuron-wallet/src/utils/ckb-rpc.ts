@@ -79,7 +79,12 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     method: 'get_genesis_block',
     paramsFormatters: [],
     resultFormatters: resultFormatter.toBlock
-  }
+  },
+  sendTransaction: {
+    method: 'send_transaction',
+    paramsFormatters: [paramsFormatter.toRawTransaction],
+    resultFormatters: resultFormatter.toHash,
+  },
 }
 
 export class FullCKBRPC extends CKBRPC {
@@ -104,7 +109,7 @@ export class LightRPC extends Base {
 
   getGenesisBlock: () => Promise<CKBComponents.Block>
   exceptionMethods = ['getCurrentEpoch', 'getEpochByNumber', 'getBlockHash']
-  coverMethods = ['getTipBlockNumber', 'syncState', 'getBlockchainInfo']
+  coverMethods = ['getTipBlockNumber', 'syncState', 'getBlockchainInfo', 'sendTransaction']
 
 
   constructor(url: string) {
@@ -124,6 +129,8 @@ export class LightRPC extends Base {
     this.getScripts = new Method(this.node, { name: 'getScripts', ...lightRPCProperties['getScripts'] }).call
     this.getTransactions = new Method(this.node, { name: 'getTransactions', ...lightRPCProperties['getTransactions'] }).call
     this.getGenesisBlock = new Method(this.node, { name: 'getGenesisBlock', ...lightRPCProperties['getGenesisBlock'] }).call
+    const sendTransactionMethod = new Method(this.node, { name: 'sendTransaction', ...lightRPCProperties['sendTransaction'] })
+    this.sendTransaction = (tx: CKBComponents.RawTransaction) => sendTransactionMethod.call(tx)
   }
 
   getTipBlockNumber = async () => {
