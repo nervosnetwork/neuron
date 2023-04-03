@@ -66,16 +66,23 @@
       height: calc(100% - 48px);
       overflow: hidden auto;
       &::-webkit-scrollbar {
-        height: 8px;
-        width: 8px;
+        height: 6px;
+        width: 6px;
       }
       &::-webkit-scrollbar-corner {
         background-color: transparent;
       }
       &::-webkit-scrollbar-thumb {
-        width: 8px;
+        width: 6px;
         background: #CCCCCC;
         border-radius: 48px;
+      }
+      @media (prefers-color-scheme: dark) {
+        &::-webkit-scrollbar-thumb {
+          background: #000;
+          border: 1px solid #343E3C;
+          border-radius: 48px;
+        }
       }
     }
 
