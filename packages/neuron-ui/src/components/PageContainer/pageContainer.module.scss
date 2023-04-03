@@ -1,11 +1,15 @@
 .page {
   background: var(--main-background-color);
   color: var(--main-text-color);
-  padding: 0 24px 24px;
+  padding: 0 24px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   
   .head {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     height: 72px;
     margin: 0;
@@ -76,6 +80,7 @@
 }
 
 .syncNotification {
+  flex: 0 0 auto;
   background: var(--warn-background-color);
   border-radius: 16px;
   padding: 10px 0;
@@ -99,4 +104,9 @@
     transform: translateY(-50%);
     cursor: pointer;
   }
+}
+
+.body {
+  flex: 1 1 auto;
+  padding-bottom: 24px;
 }

@@ -139,7 +139,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
           <Close className={styles.close} onClick={closeSyncNotice} />
         </Alert>
       )}
-      {children}
+      <div className={styles.body}>{children}</div>
     </div>
   )
 }
