@@ -34,7 +34,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className }: 
 
   const onDocumentClick = useCallback(
     (e: any) => {
-      if (mounted.current && !root.current!.contains(e.target) && openRef.current) {
+      if (mounted.current && !root.current?.contains(e.target) && openRef.current) {
         setOpen(false)
       }
     },
