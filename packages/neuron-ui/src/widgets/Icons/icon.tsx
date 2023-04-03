@@ -27,6 +27,7 @@ import { ReactComponent as TooltipSvg } from './Tooltip.svg'
 import { ReactComponent as OpenFolderSvg } from './OpenFolder.svg'
 import { ReactComponent as SuccessInfoSvg } from './SuccessInfo.svg'
 import { ReactComponent as ErrorSvg } from './Error.svg'
+import { ReactComponent as SuccessNoBorderSvg } from './SuccessNoBorder.svg'
 import { ReactComponent as LoadingSvg } from './Loading.svg'
 import { ReactComponent as AttentionSvg } from './ExperimentalAttention.svg'
 import { ReactComponent as AttentionOutlineSvg } from './AttentionOutline.svg'
@@ -43,6 +44,7 @@ import { ReactComponent as MenuExpandSvg } from './MenuExpand.svg'
 import { ReactComponent as ArrowEndSvg } from './ArrowEnd.svg'
 import { ReactComponent as ArrowNextSvg } from './ArrowNext.svg'
 import { ReactComponent as ConfirmingSvg } from './Confirming.svg'
+import { ReactComponent as CopySvg } from './Copy.svg'
 
 import styles from './icon.module.scss'
 
@@ -100,3 +102,5 @@ export const MenuExpand = WrapSvg(MenuExpandSvg)
 export const ArrowEnd = WrapSvg(ArrowEndSvg)
 export const ArrowNext = WrapSvg(ArrowNextSvg)
 export const Confirming = WrapSvg(ConfirmingSvg)
+export const SuccessNoBorder = WrapSvg(SuccessNoBorderSvg)
+export const Copy = WrapSvg(CopySvg)
