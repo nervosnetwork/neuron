@@ -133,7 +133,7 @@ const DatetimePickerDialog = ({
       cancelText={t('common.cancel')}
       disabled={disabled}
     >
-      <div className={styles.container} onClick={onCancel} role="presentation">
+      <div className={styles.container} role="presentation">
         <div
           role="presentation"
           className={styles.popup}

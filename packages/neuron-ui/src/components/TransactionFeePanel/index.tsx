@@ -23,7 +23,7 @@ interface PriceObj {
 
 interface SelectItemProps {
   priceObj: PriceObj | undefined
-  className?: any
+  className?: string
   onClick: any
   sufIcon?: any
 }
