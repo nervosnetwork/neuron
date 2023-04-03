@@ -4,12 +4,17 @@ import styles from './index.module.scss'
 
 type AlertStatus = 'init' | 'success' | 'error' | 'warn'
 
-const Alert: React.FC<{ status: AlertStatus; className?: string }> = ({ status, children, className }) => {
+const Alert: React.FC<{ status: AlertStatus; className?: string; withIcon?: boolean }> = ({
+  status,
+  children,
+  className,
+  withIcon = true,
+}) => {
   return (
     <li className={`${styles[status]} ${className || ''} ${styles.alert}`}>
-      {status === 'success' && <SuccessInfo type="success" />}
-      {status === 'error' && <ErrorIcon type="error" />}
-      {status === 'warn' && <AttentionOutline />}
+      {withIcon && status === 'success' ? <SuccessInfo type="success" /> : null}
+      {withIcon && status === 'error' ? <ErrorIcon type="error" /> : null}
+      {withIcon && status === 'warn' && <AttentionOutline />}
       {children}
     </li>
   )

@@ -43,6 +43,8 @@ import { ReactComponent as ArrowOpenRightSvg } from './ArrowOpenRight.svg'
 import { ReactComponent as MenuExpandSvg } from './MenuExpand.svg'
 import { ReactComponent as ArrowEndSvg } from './ArrowEnd.svg'
 import { ReactComponent as ArrowNextSvg } from './ArrowNext.svg'
+import { ReactComponent as SignSvg } from './Sign.svg'
+import { ReactComponent as ExportSvg } from './Export.svg'
 import { ReactComponent as ConfirmingSvg } from './Confirming.svg'
 import { ReactComponent as CopySvg } from './Copy.svg'
 
@@ -101,6 +103,8 @@ export const ArrowOpenRight = WrapSvg(ArrowOpenRightSvg)
 export const MenuExpand = WrapSvg(MenuExpandSvg)
 export const ArrowEnd = WrapSvg(ArrowEndSvg)
 export const ArrowNext = WrapSvg(ArrowNextSvg)
+export const Export = WrapSvg(ExportSvg)
+export const Sign = WrapSvg(SignSvg)
 export const Confirming = WrapSvg(ConfirmingSvg)
 export const SuccessNoBorder = WrapSvg(SuccessNoBorderSvg)
 export const Copy = WrapSvg(CopySvg)

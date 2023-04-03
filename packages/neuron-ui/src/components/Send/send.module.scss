@@ -1,27 +1,79 @@
 @import '../../styles/mixin.scss';
-$textfieldWidth: calc(100vw - 370px);
+$headerHeight: 72px;
 
-.pageTitle {
-  @include page-title;
+.container {
+  padding: 0 24px;
 }
 
-.info {
-  width: $textfieldWidth;
-  display: grid;
-  grid-template: 'textfield' auto;
-  grid-gap: 15px;
-  padding: 24px 0 34px;
-}
-
-.balance {
-  grid-area: balance;
+.layout {
   display: flex;
-  align-items: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
 
-.actions {
-  @include form-footer;
-}
+  .left {
+    flex: 1;
+    position: relative;
 
+    .leftContent {
+      height: calc(100vh - $headerHeight - 100px);
+      overflow-y: scroll;
+      margin-bottom: 100px;
+    }
+
+    .leftFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .addButton {
+        min-width: 216px;
+        padding: 20px;
+        box-shadow: 0 0 10px var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &_icon {
+          margin-right: 8px;
+        }
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color)
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    margin-left: 16px;
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+
+    .rightContent {
+      padding: 16px;
+      margin-bottom: 120px;
+    }
+
+    .rightFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 16px;
+      left: 0;
+      display: flex;
+      justify-content: center;
+
+      button {
+        width: 216px;
+        &:last-child {
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+}

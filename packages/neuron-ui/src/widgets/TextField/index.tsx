@@ -23,6 +23,8 @@ const TextField = React.forwardRef(
       readOnly = false,
       disabled,
       selected,
+      width,
+      rows = 1,
       ...rest
     }: {
       field: string
@@ -31,8 +33,8 @@ const TextField = React.forwardRef(
       hint?: string
       error?: string
       type?: 'text' | 'password' | 'file'
-      onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
-      onClick?: (e: React.SyntheticEvent<HTMLInputElement>) => void
+      onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+      onClick?: (e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => void
       className?: string
       suffix?: string | React.ReactNode | undefined
       stack?: boolean
@@ -42,6 +44,8 @@ const TextField = React.forwardRef(
       disabled?: boolean
       selected?: boolean
       [key: string]: any
+      width?: string
+      rows?: number
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
@@ -61,22 +65,45 @@ const TextField = React.forwardRef(
             {label}
           </label>
         ) : null}
-        <div className={styles.input} data-disabled={disabled} data-type={type} data-selected={selected}>
-          <input
-            id={field}
-            data-field={field}
-            type={!isPasswordHidden && type === 'password' ? 'text' : type}
-            value={value}
-            placeholder={placeholder}
-            title={label}
-            name={label}
-            onChange={onChange}
-            onClick={onClick}
-            readOnly={readOnly}
-            disabled={disabled}
-            {...rest}
-          />
-          {suffix ? <span className={styles.suffix}>{suffix}</span> : null}
+        <div
+          style={{ ...(width ? { width } : '') }}
+          className={styles.input}
+          data-disabled={disabled}
+          data-type={type}
+          data-selected={selected}
+        >
+          {rows > 1 ? (
+            <textarea
+              id={field}
+              data-field={field}
+              rows={rows}
+              value={value}
+              placeholder={placeholder}
+              title={label}
+              name={label}
+              onChange={onChange}
+              onClick={onClick}
+              readOnly={readOnly}
+              disabled={disabled}
+              {...rest}
+            />
+          ) : (
+            <input
+              id={field}
+              data-field={field}
+              type={!isPasswordHidden && type === 'password' ? 'text' : type}
+              value={value}
+              placeholder={placeholder}
+              title={label}
+              name={label}
+              onChange={onChange}
+              onClick={onClick}
+              readOnly={readOnly}
+              disabled={disabled}
+              {...rest}
+            />
+          )}
+          {suffix && (typeof suffix === 'string' ? <span className={styles.suffix}>{suffix}</span> : suffix)}
           {!suffix && type === 'password' && (
             <span
               className={`${styles.suffix} ${styles.password}`}
@@ -91,7 +118,7 @@ const TextField = React.forwardRef(
         </div>
         {hint ? <span className={styles.hint}>{hint}</span> : null}
         {error ? (
-          <Alert status="error" className={styles.errorMessage}>
+          <Alert status="error" className={styles.errorMessage} withIcon={false}>
             {error}
           </Alert>
         ) : null}
@@ -127,7 +154,7 @@ export const EditTextField = ({
     }
   }, [onChange, changeActive, editedValue, value])
   const onChangeFocus = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       changeEditValue(e.target.value)
     },
     [changeEditValue]

@@ -1,0 +1,229 @@
+@import '../../styles';
+
+:global {
+    .p-calendar {
+      @include regular-text;
+      margin: auto;
+
+      .p-datepicker-today span {
+        color: var(--primary-color);
+        pointer-events: none;
+      }
+
+      .p-datepicker-header {
+        display: flex;
+        justify-content: space-between;
+        width: 266px;
+        margin-bottom: 16px;
+
+        button {
+          color: var(--main-text-color);
+        }
+
+        .p-datepicker-next.p-link {
+          order: 1;
+        }
+
+        @mixin chevron-line {
+          display: block;
+          content: '';
+          width: 8px;
+          height: 2px;
+          background: var(--main-text-color);
+          position: absolute;
+        }
+
+        button {
+          background-color: transparent;
+          border: none;
+          font-weight: bolder;
+          position: relative;
+          padding: 0;
+          width: 30px;
+        }
+
+        .pi-chevron-left {
+          &::before {
+            @include chevron-line;
+            left: 0;
+            top: 50%;
+            transform-origin: left center;
+            position: absolute;
+            transform: rotate(-45deg) translateY(50%);
+          }
+
+          &::after {
+            @include chevron-line;
+            left: 0;
+            top: 50%;
+            transform-origin: left center;
+            transform: rotate(45deg) translateY(-50%);
+          }
+        }
+
+        .pi-chevron-right {
+          &::before {
+            @include chevron-line;
+            right: 0;
+            top: 50%;
+            transform-origin: right center;
+            position: absolute;
+            transform: rotate(-45deg) translateY(-50%);
+          }
+
+          &::after {
+            @include chevron-line;
+            right: 0;
+            top: 50%;
+            transform-origin: right center;
+            transform: rotate(45deg) translateY(50%);
+          }
+        }
+
+        .p-datepicker-month {
+          margin-right: 5px;
+        }
+      }
+
+      .p-highlight {
+        background: var(--primary-color);
+        color: #fff !important;
+      }
+
+      .p-disabled {
+        opacity: 0.3;
+      }
+
+      thead {
+        position: relative;
+        tr {
+          height: 40px;
+        }
+        &::after {
+          position: absolute;
+          content: "";
+          background: var(--input-border-color);
+          left: 0;
+          bottom: -0;
+          height: 1px;
+          width: 100%;
+        }
+      }
+
+      th {
+        color: var(--main-text-color);
+        font-size: 12px;
+      }
+
+      td {
+        height: 30px;
+        span {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          color: var(--main-text-color);
+
+          font-size: 12px;
+          margin: auto 5px;
+
+          &:not(.p-disabled):hover {
+            color: #fff;
+            background-color: var(--primary-color);
+          }
+        }
+      }
+    }
+}
+
+.container {
+  margin: 16px 168px 0;
+  width: 344px;
+  .calendarContainer {
+    width: 344px;
+    position: relative;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 0;
+  }
+  .calendarWrap {
+    position: relative;
+    width: 266px;
+  }
+  .popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    border-radius: 2px;
+
+    .title {
+      @include dialog-title;
+    }
+
+    .timezone {
+      span:first-child {
+        @include semi-bold-text;
+        margin-right: 5px;
+      }
+
+      @include regular-text;
+      margin-bottom: 8px;
+    }
+
+    .edit {
+      margin-top: 16px;
+      position: relative;
+      background: var(--secondary-background-color);
+      border: 1px solid var(--input-border-color);
+      border-radius: 8px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      p {
+        position: absolute;
+        left: 16px;
+        margin: 0;
+        font-size: 14px;
+        color: var(--input-second-color);
+      }
+    }
+
+    input {
+      border: none;
+      width: 100%;
+      font-weight: 500;
+      text-align: center;
+      font-size: 14px;
+      line-height: 24px;
+      background: var(--secondary-background-color);
+      color: var(--main-text-color)
+    }
+  }
+
+  .notice {
+    @include regular-text;
+    font-size: 12px;
+    margin: 11px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--notice-text-color);
+    svg {
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+  }
+
+  .error {
+    @include regular-text;
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 5px;
+  }
+}

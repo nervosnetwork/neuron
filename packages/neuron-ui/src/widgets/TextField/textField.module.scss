@@ -1,12 +1,11 @@
-@import '../../styles/mixin.scss';
-
-$secondary-font-size: 0.63rem;
+@import '../../styles';
 
 .textField {
   @include regular-text;
   display: grid;
   grid-template: 'label input' auto 'blank message' minmax(0.6875rem, auto) / auto 1fr;
   grid-gap: 4px;
+  margin-bottom: 10px;
 
   &[data-required='true'] {
     label::after {
@@ -24,13 +23,14 @@ $secondary-font-size: 0.63rem;
 
   label {
     grid-area: label;
-    font-size: 0.875rem;
-    line-height: 1.125rem;
-    color: #000000;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--secondary-text-color);
     display: flex;
     justify-content: flex-start;
     align-items: center;
     font-family: inherit;
+    margin-bottom: 8px;
   }
 
   .input {
@@ -44,7 +44,7 @@ $secondary-font-size: 0.63rem;
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
     width: 480px;
-    height: 46px;
+    height: 56px;
     padding: 0 16px;
 
     @media (prefers-color-scheme: dark) {
@@ -79,7 +79,7 @@ $secondary-font-size: 0.63rem;
       border-color: var(--activity-color);
     }
   
-    input {
+    input, textarea {
       font-family: inherit;
       font-size: 14px;
       flex: 1;
@@ -91,8 +91,13 @@ $secondary-font-size: 0.63rem;
       background-color: transparent;
     
       &::placeholder {
-        color: #999;
+        color: var(--input-second-color);
       }
+    }
+
+    textarea {
+      resize: none;
+      padding: 10px 0;
     }
 
     .suffix {
@@ -100,10 +105,11 @@ $secondary-font-size: 0.63rem;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #434343;
+      color: var(--input-second-color);
       padding: 0 10px;
-      font-size: 0.75rem;
+      font-size: 14px;
       max-width: 200px;
+      font-weight: 500;
 
       &.password {
         cursor: pointer;
@@ -119,7 +125,8 @@ $secondary-font-size: 0.63rem;
 .hint {
   font-family: inherit;
   grid-area: message;
-  font-size: $secondary-font-size;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .errorMessage {
@@ -151,7 +158,7 @@ $secondary-font-size: 0.63rem;
   }
 
   input {
-    font-size: 0.875rem;
+    font-size: 14px;
   }
 
   & > div {

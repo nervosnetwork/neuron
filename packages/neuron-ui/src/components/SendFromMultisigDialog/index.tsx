@@ -35,8 +35,6 @@ const SendFromMultisigDialog = ({
   const {
     sendInfoList,
     outputErrors,
-    isAddOneBtnDisabled,
-    addSendInfo,
     deleteSendInfo,
     onSendInfoChange,
     totalAmount,
@@ -92,13 +90,10 @@ const SendFromMultisigDialog = ({
               item={item}
               errors={outputErrors[idx]}
               isSendMax={isSendMax}
-              isAddBtnShow={idx === sendInfoList.length - 1 && !item.disabled}
-              isAddOneBtnDisabled={isAddOneBtnDisabled}
               isMaxBtnDisabled={isMaxBtnDisabled}
               isTimeLockable={false}
               isMaxBtnShow={idx === sendInfoList.length - 1}
               isRemoveBtnShow={sendInfoList.length > 1}
-              onOutputAdd={addSendInfo}
               onOutputRemove={deleteSendInfo}
               onItemChange={onSendInfoChange}
               onSendMaxClick={onSendMaxClick}

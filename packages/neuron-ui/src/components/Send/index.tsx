@@ -1,25 +1,16 @@
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
-
 import { useState as useGlobalState, useDispatch, appState } from 'states'
-
-import Balance from 'components/Balance'
 import SendMetaInfo from 'components/SendMetaInfo'
 import SendFieldset from 'components/SendFieldset'
 
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import DatetimePicker from 'widgets/DatetimePicker'
+import DatetimePickerDialog from 'widgets/DatetimePickerDialog'
+import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
 
-import {
-  getCurrentUrl,
-  getSyncStatus,
-  validateTotalAmount,
-  isMainnet as isMainnetUtil,
-  validateOutputs,
-  useOutputErrors,
-} from 'utils'
+import { validateTotalAmount, isMainnet as isMainnetUtil, validateOutputs, useOutputErrors } from 'utils'
 
 import { isErrorWithI18n } from 'exceptions'
 import { useInitialize } from './hooks'
@@ -32,11 +23,7 @@ const Send = () => {
       loadings: { sending = false },
     },
     wallet: { id: walletID = '', balance = '', device },
-    chain: {
-      networkID,
-      connectionStatus,
-      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
-    },
+    chain: { networkID, connectionStatus },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -111,14 +98,6 @@ const Send = () => {
 
   const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
 
-  const syncStatus = getSyncStatus({
-    bestKnownBlockNumber,
-    bestKnownBlockTimestamp,
-    cacheTipBlockNumber,
-    currentTimestamp: Date.now(),
-    url: getCurrentUrl(networkID, networks),
-  })
-
   const outputErrors = useOutputErrors(outputs, isMainnet)
 
   const isMaxBtnDisabled = (() => {
@@ -143,84 +122,91 @@ const Send = () => {
   })()
 
   return (
-    <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
-      <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
-      <div className={styles.balance}>
-        <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
-      </div>
-      <div>
-        <List
-          items={outputs}
-          onRenderCell={(_, idx) => {
-            if (idx === undefined || outputs[idx] === undefined) {
-              return null
-            }
+    <div className={styles.container}>
+      <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
+        <div className={styles.layout}>
+          <div className={styles.left}>
+            <div className={styles.leftContent}>
+              <List
+                items={outputs}
+                onRenderCell={(_, idx) => {
+                  if (idx === undefined || outputs[idx] === undefined) {
+                    return null
+                  }
 
-            const isRemoveBtnShow = outputs.length > 1
-            const isAddBtnShow = outputs.length - 1 === idx
-            const isMaxBtnShow = outputs.length - 1 === idx
+                  const isRemoveBtnShow = outputs.length > 1
+                  const isMaxBtnShow = outputs.length - 1 === idx
 
-            return (
-              <SendFieldset
-                item={outputs[idx]}
-                idx={idx}
-                errors={outputErrors[idx]}
-                isMaxBtnDisabled={isMaxBtnDisabled}
-                isAddOneBtnDisabled={isAddOneBtnDisabled}
-                isSendMax={isSendMax}
-                isAddBtnShow={isAddBtnShow}
-                isRemoveBtnShow={isRemoveBtnShow}
-                isMaxBtnShow={isMaxBtnShow}
-                onOutputAdd={handleOutputAdd}
-                onOutputRemove={handleOutputRemove}
-                onItemChange={handleItemChange}
-                onSendMaxClick={handleSendMaxClick}
-                onLocktimeClick={handleLocktimeClick}
-                isTimeLockable={!device}
+                  return (
+                    <SendFieldset
+                      item={outputs[idx]}
+                      idx={idx}
+                      errors={outputErrors[idx]}
+                      isMaxBtnDisabled={isMaxBtnDisabled}
+                      isSendMax={isSendMax}
+                      isRemoveBtnShow={isRemoveBtnShow}
+                      isMaxBtnShow={isMaxBtnShow}
+                      onOutputRemove={handleOutputRemove}
+                      onItemChange={handleItemChange}
+                      onSendMaxClick={handleSendMaxClick}
+                      onLocktimeClick={handleLocktimeClick}
+                      isTimeLockable={!device}
+                    />
+                  )
+                }}
               />
-            )
-          }}
-        />
-      </div>
+            </div>
+            <div className={styles.leftFooter}>
+              <Button
+                type="primary"
+                disabled={isAddOneBtnDisabled}
+                onClick={handleOutputAdd}
+                className={styles.addButton}
+              >
+                <>
+                  <Add className={styles.addButton_icon} /> {t('send.add-receiving-address')}
+                </>
+              </Button>
+            </div>
+          </div>
 
-      <div className={styles.info}>
-        <SendMetaInfo
-          outputs={outputs}
-          errorMessage={errorMessageUnderTotal}
-          totalAmount={totalAmount}
-          sending={sending}
-          description={send.description}
-          fee={fee}
-          price={send.price}
-          handleDescriptionChange={handleDescriptionChange}
-          handlePriceChange={handlePriceChange}
-        />
-      </div>
-
-      <div className={styles.actions}>
-        <Button type="reset" onClick={handleClear} label={t('send.clear')} />
-        <Button type="submit" disabled={disabled} label={t('send.send')}>
-          {sending ? <Spinner /> : (t('send.send') as string)}
-        </Button>
-      </div>
-
-      {locktimeIndex > -1 ? (
-        <div className={styles.datetimePicker}>
-          <div className={styles.datetimeDialog}>
-            <DatetimePicker
-              onConfirm={(time: number) => {
-                updateTransactionOutput('date')(locktimeIndex)(`${time}`)
-                setLocktimeIndex(-1)
-              }}
-              preset={send.outputs[locktimeIndex]?.date}
-              onCancel={() => setLocktimeIndex(-1)}
-              title={t('send.set-locktime')}
-              notice={t('send.locktime-notice-content')}
-            />
+          <div className={styles.right}>
+            <div className={styles.rightContent}>
+              <SendMetaInfo
+                outputs={outputs}
+                errorMessage={errorMessageUnderTotal}
+                totalAmount={totalAmount}
+                sending={sending}
+                description={send.description}
+                fee={fee}
+                price={send.price}
+                handleDescriptionChange={handleDescriptionChange}
+                handlePriceChange={handlePriceChange}
+              />
+            </div>
+            <div className={styles.rightFooter}>
+              <Button type="reset" onClick={handleClear} label={t('send.reset')} />
+              <Button type="submit" disabled={disabled} label={t('send.send')}>
+                {sending ? <Spinner /> : (t('send.send') as string)}
+              </Button>
+            </div>
           </div>
         </div>
-      ) : null}
-    </form>
+      </form>
+
+      <DatetimePickerDialog
+        show={locktimeIndex > -1}
+        notice={t('send.locktime-notice-content')}
+        preset={send.outputs[locktimeIndex]?.date}
+        onConfirm={(time: number) => {
+          updateTransactionOutput('date')(locktimeIndex)(`${time}`)
+          setLocktimeIndex(-1)
+        }}
+        onCancel={() => {
+          setLocktimeIndex(-1)
+        }}
+      />
+    </div>
   )
 }
 

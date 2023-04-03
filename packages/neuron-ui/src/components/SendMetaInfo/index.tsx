@@ -36,9 +36,10 @@ const SendMetaInfo = ({
         <TextField
           field="totalAmount"
           label={t('send.total-amount')}
-          value={`${shannonToCKBFormatter(totalAmount)} CKB`}
+          value={shannonToCKBFormatter(totalAmount)}
           readOnly
           error={errorMessage}
+          width="100%"
         />
       ) : null}
       <TextField
@@ -47,6 +48,7 @@ const SendMetaInfo = ({
         value={description}
         onChange={handleDescriptionChange}
         disabled={sending}
+        width="100%"
       />
       <TransactionFeePanel fee={shannonToCKBFormatter(fee)} price={price} onPriceChange={handlePriceChange} />
     </>

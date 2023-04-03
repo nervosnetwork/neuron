@@ -200,27 +200,34 @@
       "more-transactions": "更多交易記錄"
     },
     "send": {
-      "address": "地址",
-      "amount": "金額",
+      "address": "收款地址",
+      "amount": "转账金額（CKB）",
       "send": "發送",
-      "clear": "清除",
+      "reset": "重置",
       "confirm-password": "確認密碼",
       "to": "收款地址",
+      "add-receiving-address": "添加收款地址",
       "input-password-to-confirm": "輸入密碼以確認本次交易",
       "scan-to-get-address": "掃描二維碼以獲取地址",
-      "total-amount": "總金額",
+      "total-amount": "總金額（CKB）",
       "description": "備註",
       "description-optional": "備註(選填)",
       "balance": "餘額",
       "add-one": "添加",
       "remove-this": "删除",
-      "fee": "交易費",
+      "fee": "交易費（CKB）",
       "advanced-fee-settings": "交易費高級設定",
       "price": "單價",
       "pick-price": "快速選擇單價",
+      "custom-price": "自定義價格",
+      "slow": "慢速",
+      "standard": "標準",
+      "fast": "快速",
       "total-cycles": "RISC-V Cycles 總數",
       "scan-screen-qr-code": "掃描螢幕上的二維碼",
       "set-locktime": "設置鎖定時間",
+      "remove-receiving-address": "刪除收款地址",
+      "remove-receiving-address-msg": "確定要刪除所選收款地址？",
       "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
       "release-on": "鎖定至",
       "locktime-warning": "請確保對方錢包能夠支持到期解鎖功能。一般情況下，交易所不支持到期解鎖功能，請謹慎使用！"
@@ -676,39 +683,39 @@
     },
     "datetime": {
       "mon": {
-        "full": "周一",
-        "short": "周一",
-        "tag": "周一"
+        "full": "一",
+        "short": "一",
+        "tag": "一"
       },
       "tue": {
-        "full": "周二",
-        "short": "周二",
-        "tag": "周二"
+        "full": "二",
+        "short": "二",
+        "tag": "二"
       },
       "wed": {
-        "full": "周三",
-        "short": "周三",
-        "tag": "周三"
+        "full": "三",
+        "short": "三",
+        "tag": "三"
       },
       "thur": {
-        "full": "周四",
-        "short": "周四",
-        "tag": "周四"
+        "full": "四",
+        "short": "四",
+        "tag": "四"
       },
       "fri": {
-        "full": "周五",
-        "short": "周五",
-        "tag": "周五"
+        "full": "五",
+        "short": "五",
+        "tag": "五"
       },
       "sat": {
-        "full": "周六",
-        "short": "周六",
-        "tag": "周六"
+        "full": "六",
+        "short": "六",
+        "tag": "六"
       },
       "sun": {
-        "full": "周日",
-        "short": "周日",
-        "tag": "周日"
+        "full": "日",
+        "short": "日",
+        "tag": "日"
       },
       "jan": {
         "full": "一月",
