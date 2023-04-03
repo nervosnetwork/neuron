@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react'
-import Alert, { AlertStatus } from 'widgets/Alert'
+import Alert from 'widgets/Alert'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
 import styles from './textField.module.scss'
@@ -118,7 +118,7 @@ const TextField = React.forwardRef(
         </div>
         {hint ? <span className={styles.hint}>{hint}</span> : null}
         {error ? (
-          <Alert status={AlertStatus.Error} className={styles.errorMessage} withIcon={false}>
+          <Alert status="error" className={styles.errorMessage} withIcon={false}>
             {error}
           </Alert>
         ) : null}

@@ -30,7 +30,6 @@ import NetworkSetting from 'components/NetworkSetting'
 import DataSetting from 'components/DataSetting'
 import { useState as useGloablState, useDispatch } from 'states'
 
-const Notification = lazy(() => import('containers/Notification'))
 const Settings = lazy(() => import('containers/Settings'))
 
 const InjectionProps = ({
@@ -49,7 +48,6 @@ export const settingRouterConfig: RouteObject[] = [
     element: (
       <>
         <Settings isDetachedWindow />
-        <Notification />
         <PasswordRequest />
       </>
     ),
@@ -85,7 +83,6 @@ const mainRouterConfig: RouteObject[] = [
       <>
         <Navbar />
         <Main />
-        <Notification />
         <PasswordRequest />
       </>
     ),

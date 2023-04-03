@@ -8,6 +8,7 @@ export enum LocalCacheKey {
   CurrentNetworkID = 'currentNetworkID',
   CacheClearDate = 'cacheClearDate',
   SyncRebuildNotification = 'syncRebuildNotification',
+  FirstLoadApp = 'FirstLoadApp',
 }
 
 export const addresses = {
@@ -126,5 +127,14 @@ export const syncRebuildNotification = {
   },
   load: () => {
     return window.localStorage.getItem(LocalCacheKey.SyncRebuildNotification)
+  },
+}
+
+export const firstLoadApp = {
+  save: () => {
+    window.localStorage.setItem(LocalCacheKey.FirstLoadApp, 'false')
+  },
+  load: () => {
+    return window.localStorage.getItem(LocalCacheKey.FirstLoadApp) !== 'false'
   },
 }

@@ -128,7 +128,7 @@
       "sending": "正在发送",
       "received": "已收款",
       "receiving": "正在收款",
-      "more": "查看更多记录",
+      "more": "查看更多",
       "statusLabel": {
         "success": "成功",
         "failed": "失败",
@@ -139,7 +139,10 @@
       "create": "创建 {{name}} 资产账户",
       "destroy": "销毁 {{name}} 资产账户",
       "createSUDT": "创建 <0></0> 资产账户",
-      "destroySUDT": "销毁 <0></0> 资产账户"
+      "destroySUDT": "销毁 <0></0> 资产账户",
+      "wallet-ready": "钱包准备完成，欢迎使用",
+      "send": "转账",
+      "receive": "收款"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -491,7 +494,9 @@
       "copy": "复制",
       "copied": "已复制",
       "verification-failure": "验证失败",
-      "back": "上一步"
+      "back": "上一步",
+      "switch-to-light": "开启日间模式",
+      "switch-to-dark": "开启夜间模式"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -587,8 +592,8 @@
       }
     },
     "sync": {
-      "synced": "同步完成",
-      "syncing": "区块同步中, 还需约 {{ leftTime }}",
+      "synced": "已同步区块 100%",
+      "syncing": "区块同步中 {{ syncPercents }}",
       "block-number": "区块高度",
       "syncing-balance": "区块同步中, 正在获取最新余额",
       "slow": "同步缓慢，请检查网络",

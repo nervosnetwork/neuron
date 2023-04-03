@@ -1,34 +1,68 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import styles from './tooltip.module.scss'
 
 export type Placement = 'top' | 'right' | 'left' | 'bottom' | 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
 
-const Tooltip: React.FC<{ tip: React.ReactNode; className?: string; placement?: Placement; center?: boolean }> = ({
+interface TooltipProps {
+  tip: React.ReactNode
+  className?: string
+  tipClassName?: string
+  placement?: Placement
+  center?: boolean
+  trigger?: 'hover' | 'click'
+  type?: 'normal' | 'always-dark'
+  showTriangle?: boolean
+}
+const Tooltip: React.FC<TooltipProps> = ({
   children,
   tip,
-  className,
+  className = '',
+  tipClassName = '',
   placement = 'bottom',
   center = true,
+  trigger = 'hover',
+  type = 'normal',
+  showTriangle,
 }) => {
+  const [isTipShow, setIsTipShow] = useState(false)
+  const onChangeIsTipShow = useCallback(() => {
+    setIsTipShow(v => !v)
+  }, [setIsTipShow])
   if (typeof tip === 'string') {
     return (
       <div
-        className={`${styles.tipWithString} ${className || ''}`}
+        className={`${styles.tipWithString} ${className}`}
         data-tooltip={tip}
         data-placement={placement}
         data-placement-center={center}
+        data-trigger={trigger}
+        onClick={trigger === 'click' ? onChangeIsTipShow : undefined}
+        data-tip-show={isTipShow}
+        onKeyPress={undefined}
+        data-type={type}
+        data-has-trigger={showTriangle}
       >
         {children}
+        {showTriangle && <div className={styles.triangle} />}
       </div>
     )
   }
   return (
     <div
-      className={`${styles.tipWithNode} ${className || ''}`}
+      className={`${styles.tipWithNode} ${className}`}
       data-placement={placement}
       data-placement-center={center}
+      data-trigger={trigger}
+      onClick={trigger === 'click' ? onChangeIsTipShow : undefined}
+      data-tip-show={isTipShow}
+      onKeyPress={undefined}
+      data-type={type}
+      data-has-trigger={showTriangle}
     >
-      <div className={styles.tip}>{tip}</div>
+      <div className={`${styles.tip} ${tipClassName}`}>
+        {tip}
+        {showTriangle && <div className={styles.triangle} />}
+      </div>
       {children}
     </div>
   )
