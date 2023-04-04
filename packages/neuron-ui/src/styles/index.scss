@@ -249,3 +249,23 @@ body {
 .main-content {
   background-color: var(--main-background-color);
 }
+
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  width: 6px;
+  background: #CCCCCC;
+  border-radius: 48px;
+}
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #000;
+    border: 1px solid #343E3C;
+    border-radius: 48px;
+  }
+}

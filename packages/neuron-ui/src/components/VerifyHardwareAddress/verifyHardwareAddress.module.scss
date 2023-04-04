@@ -10,6 +10,7 @@
 
   .body {
     padding: 0 16px;
+    color: var(--main-text-color);
     .main {
       & > header {
         font-size: 16px;
@@ -28,6 +29,7 @@
         font-family: 'ProximaNova-Regular';
         font-weight: 600;
         font-size: 18px;
+        color: var(--main-text-color);
       }
       .address {
         span {
@@ -114,6 +116,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--main-text-color);
 
   svg {
     cursor: pointer;
@@ -121,5 +124,5 @@
 }
 
 .divider {
-  border-top: 1px solid #E5E5E5;
+  border-top: 1px solid var(--divide-line-color);
 }

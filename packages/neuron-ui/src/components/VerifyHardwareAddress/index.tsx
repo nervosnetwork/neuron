@@ -175,10 +175,6 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
     ensureDeviceAvailable(deviceInfo)
   })
 
-  // const onCopyAddress = useCallback(() => {
-  //   window.navigator.clipboard.writeText(address)
-  // }, [address])
-
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
       <header className={styles.title}>
