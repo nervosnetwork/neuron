@@ -46,7 +46,7 @@
     "@uifabric/styling": "7.25.1",
     "canvg": "2.0.0",
     "i18next": "21.10.0",
-    "immer": "9.0.16",
+    "immer": "9.0.21",
     "jsqr": "1.4.0",
     "office-ui-fabric-react": "7.204.0",
     "qr.js": "0.0.0",
