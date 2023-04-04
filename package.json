@@ -52,7 +52,7 @@
     "@typescript-eslint/parser": "5.54.1",
     "concurrently": "7.6.0",
     "cross-env": "7.0.3",
-    "husky": "3.1.0",
+    "husky": "8.0.3",
     "lerna": "5.6.2",
     "ncp": "2.0.0",
     "ts-jest": "27.1.5",
