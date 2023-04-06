@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { SpinnerSize, SearchBox } from 'office-ui-fabric-react'
+import { SearchBox } from 'office-ui-fabric-react'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
 import SUDTCreateDialog, { TokenInfo, AccountType } from 'components/SUDTCreateDialog'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
 import Experimental from 'widgets/ExperimentalRibbon'
-import Spinner from 'widgets/Spinner'
+import Spinner, { SpinnerSize } from 'widgets/Spinner'
 
 import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import {

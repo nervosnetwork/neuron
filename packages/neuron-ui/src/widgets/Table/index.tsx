@@ -4,44 +4,50 @@ import TableNoData from 'widgets/Icons/TableNoData.png'
 
 import styles from './table.module.scss'
 
-type TableProps<T> = {
+export type TableProps<T> = {
   head?: React.ReactNode
   columns: {
-    title: string
+    title: React.ReactNode
     dataIndex: string
     key?: string
     isBalance?: boolean
     render?: (v: any, idx: number, item: T, showBalance: boolean) => React.ReactNode
     align?: 'left' | 'right' | 'center'
     className?: string
+    tdClassName?: string
   }[]
   dataKey?: string
   dataSource: T[]
   noDataContent?: string
   onRowDoubleClick?: (e: React.SyntheticEvent, item: T, idx: number) => void
+  className?: string
+  isFixedTable?: boolean
 }
 
 const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
-  const { head, columns, dataSource, noDataContent, onRowDoubleClick, dataKey } = props
+  const { head, columns, dataSource, noDataContent, onRowDoubleClick, dataKey, className = '', isFixedTable } = props
   const [showBalance, setShowBalance] = useState(true)
   const onClickBalanceIcon = useCallback(() => {
     setShowBalance(v => !v)
   }, [setShowBalance])
   return (
-    <div className={styles.tableRoot}>
-      {head}
+    <div
+      className={`${styles.tableRoot} ${className} ${isFixedTable ? styles.fixedTableRoot : ''}`}
+      data-have-head={!!head}
+    >
+      {head && typeof head === 'string' ? <div className={styles.head}>{head}</div> : head}
       <table className={`${styles.table} ${head === null || head === undefined ? styles.noHead : ''}`}>
         <thead>
           <tr>
-            {columns.map(({ title, dataIndex, key, isBalance, align, className }) => {
+            {columns.map(({ title, dataIndex, key, isBalance, align, className: headClassName }) => {
               return (
                 <th
                   key={key || dataIndex}
-                  title={title}
-                  aria-label={title}
+                  title={typeof title === 'string' ? title : dataIndex}
+                  aria-label={typeof title === 'string' ? title : dataIndex}
                   data-field={dataIndex}
                   align={align ?? 'left'}
-                  className={className}
+                  className={headClassName}
                 >
                   {!!dataSource.length && isBalance ? (
                     <div className={styles.headWithBalance} style={{ justifyContent: align }}>
@@ -68,8 +74,8 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                 onDoubleClick={onRowDoubleClick ? e => onRowDoubleClick(e, item, idx) : undefined}
                 key={dataKey ? item[dataKey] : idx}
               >
-                {columns.map(({ dataIndex, key, render, align }) => (
-                  <td align={align ?? 'left'} key={key ?? dataIndex}>
+                {columns.map(({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName }) => (
+                  <td align={align ?? 'left'} key={key ?? dataIndex} className={tdClassName ?? bodyTdClassName}>
                     {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
                   </td>
                 ))}

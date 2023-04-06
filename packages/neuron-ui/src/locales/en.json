@@ -93,9 +93,10 @@
       },
       "actions": {
         "close": "Close",
-        "rescan": "Rescan",
+        "rescan": "Reconnect",
         "copy-address": "Copy Address",
-        "verify": "Verify"
+        "verify": "Verify Address",
+        "verify-again": "Verify Again"
       }
     },
     "offline-sign": {
@@ -250,7 +251,9 @@
       "address": "{{network}} Address",
       "verify-address": "Verify Address",
       "turn-into-full-version-fomrat": "Turn into full version format",
-      "turn-into-deprecated-format": "Turn into deprecated format"
+      "turn-into-deprecated-format": "Turn into deprecated format",
+      "save-qr-code": "Download",
+      "copy-qr-code": "Copy"
     },
     "history": {
       "meta": "Meta",
@@ -325,7 +328,8 @@
       "change-address": "Change",
       "copy-address": "Copy Address",
       "request-payment": "Request Payment",
-      "view-on-explorer": "View on Explorer"
+      "view-on-explorer": "View on Explorer",
+      "default-description": "None"
     },
     "settings": {
       "title": {

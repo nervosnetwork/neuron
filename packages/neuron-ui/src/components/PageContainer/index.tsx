@@ -35,7 +35,11 @@ const getNetworkTypeLable = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) =
   }
 }
 
-type ComponentProps = { head: React.ReactNode; notice?: State.PageNotice; className?: string }
+type ComponentProps = {
+  head: React.ReactNode
+  notice?: State.PageNotice
+  className?: string
+} & React.AllHTMLAttributes<HTMLDivElement>
 const PageContainer: React.FC<ComponentProps> = props => {
   const {
     app: { showWaitForFullySynced },
@@ -61,7 +65,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
         setTheme(res.result ? 'dark' : 'light')
       }
     })
-  })
+  }, [])
   const onSetTheme = useCallback(() => {
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     setThemeAPI(newTheme).then(res => {

@@ -83,14 +83,9 @@
   }
 }
 
-.txStatusTh {
-  padding-left: 34px !important;
-}
-
 .txStatus {
   display: flex;
   position: relative;
-  padding-left: 16px;
   align-items: center;
 
   .confirmText {
@@ -99,9 +94,8 @@
     margin-left: 4px;
   }
 
-  .confirm {
-    position: absolute;
-    left: -4px;
+  & > svg {
+    margin-right: 4px;
   }
 
   &[data-status="failed"] {

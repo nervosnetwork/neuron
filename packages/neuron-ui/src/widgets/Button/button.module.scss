@@ -11,8 +11,16 @@
   box-sizing: border-box;
   border-radius: 16px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  &[data-type='default'],
+  &[data-type='default'] {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+  }
+
   &[data-type='reset'] {
     background-color: transparent;
     color: var(--button-cancel-color);
@@ -42,6 +50,16 @@
     opacity: 0.5;
     box-shadow: none !important;
     cursor: not-allowed;
+  }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    vertical-align: sub;
+    margin-left: 4px;
+    & > path {
+      fill: white;
+    }
   }
 }
 

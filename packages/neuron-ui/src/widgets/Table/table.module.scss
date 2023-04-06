@@ -4,6 +4,9 @@
   @include card;
 }
 
+$table-head-height: 48px;
+$head-height: 52px;
+
 .noHead {
   thead {
     :first-child {
@@ -21,7 +24,7 @@
   border-spacing: 0;
 
   thead {
-    height: 48px;
+    height: $table-head-height;
     background-color: var(--table-head-background-color);
     font-weight: 400;
     color: #999;
@@ -53,10 +56,42 @@
   }
 }
 
+.fixedTableRoot {
+  &[data-have-head="true"] {
+    .table {
+      height: calc(100% - $head-height);
+    }
+  }
+  .table {
+    tbody {
+      height: 100%;
+      display: block;
+      height: calc(100% - $table-head-height);
+      overflow: hidden auto;
+    }
+
+    thead, tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    thead {
+      width: calc( 100% - 8px)
+    }
+  }
+}
+
 .noData {
   padding: 22px 0 44px 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.head {
+  padding: 0 16px;
+  height: $head-height;
+  line-height: $head-height;
 }

@@ -47,16 +47,17 @@ import { ReactComponent as SignSvg } from './Sign.svg'
 import { ReactComponent as ExportSvg } from './Export.svg'
 import { ReactComponent as ConfirmingSvg } from './Confirming.svg'
 import { ReactComponent as CopySvg } from './Copy.svg'
+import { ReactComponent as AddressTransformSvg } from './AddressTransform.svg'
 
 import styles from './icon.module.scss'
 
-function WrapSvg(SvgComponent: React.FC<React.SVGProps<SVGSVGElement>>) {
+function WrapSvg(SvgComponent: React.FC<React.SVGProps<SVGSVGElement>>, classNameForTheme: string = '') {
   return ({
     type,
     className,
     ...props
   }: { type?: 'success' | 'activity' | 'error' } & React.SVGProps<SVGSVGElement> = {}) => {
-    return <SvgComponent className={`${type ? styles[type] : ''} ${className || ''}`} {...props} />
+    return <SvgComponent className={`${type ? styles[type] : ''} ${className || ''} ${classNameForTheme}`} {...props} />
   }
 }
 
@@ -108,3 +109,4 @@ export const Sign = WrapSvg(SignSvg)
 export const Confirming = WrapSvg(ConfirmingSvg)
 export const SuccessNoBorder = WrapSvg(SuccessNoBorderSvg)
 export const Copy = WrapSvg(CopySvg)
+export const AddressTransform = WrapSvg(AddressTransformSvg, styles.addressTransform)

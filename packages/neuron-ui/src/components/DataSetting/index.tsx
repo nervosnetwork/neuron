@@ -52,11 +52,7 @@ const SetItem = () => {
             onClick={onConfirm}
           >
             {isSaving && savingType === 'move' ? (
-              <Spinner
-                label={t('settings.data.move-data-finish')}
-                labelPosition="right"
-                styles={{ root: { marginRight: 5 }, label: { color: '#FFF' } }}
-              />
+              <Spinner label={t('settings.data.move-data-finish')} labelPosition="right" />
             ) : (
               (t('settings.data.move-data-finish') as string)
             )}
@@ -70,11 +66,7 @@ const SetItem = () => {
             onClick={onConfirm}
           >
             {isSaving && savingType === 'resync' ? (
-              <Spinner
-                label={t('settings.data.re-sync')}
-                labelPosition="right"
-                styles={{ root: { marginRight: 5 }, label: { color: '#FFF' } }}
-              />
+              <Spinner label={t('settings.data.re-sync')} labelPosition="right" />
             ) : (
               (t('settings.data.re-sync') as string)
             )}

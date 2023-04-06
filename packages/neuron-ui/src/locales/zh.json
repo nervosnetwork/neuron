@@ -76,19 +76,20 @@
       "title": "使用硬件钱包进行地址验证",
       "device": "设备：",
       "address": "地址：",
-      "verified": "验证通过",
+      "verified": "地址验证通过",
       "invalid": "地址不正确",
       "status": {
         "label": "状态：",
-        "connect": "已连接",
+        "connect": "设备已连接，点击验证按钮进行地址验证",
         "user-input": "已连接，等待确认...",
         "disconnect": "未连接，请检查设备连接。"
       },
       "actions": {
-        "close": "关闭",
-        "rescan": "再次检测",
+        "close": "取消",
+        "reconnect": "连接设备",
         "copy-address": "复制地址",
-        "verify": "验证"
+        "verify": "地址验证",
+        "verify-again": "再次验证"
       }
     },
     "offline-sign": {
@@ -243,7 +244,9 @@
       "address": "{{network}} 地址",
       "verify-address": "验证地址",
       "turn-into-full-version-fomrat": "转换为长地址格式",
-      "turn-into-deprecated-format": "转换为废弃地址格式"
+      "turn-into-deprecated-format": "转换为废弃地址格式",
+      "save-qr-code": "保存收款码",
+      "copy-qr-code": "复制收款码图片"
     },
     "history": {
       "meta": "元信息",
@@ -318,7 +321,8 @@
       "change-address": "找零地址",
       "copy-address": "复制地址",
       "request-payment": "请求支付",
-      "view-on-explorer": "在浏览器中查看"
+      "view-on-explorer": "在浏览器中查看",
+      "default-description": "无"
     },
     "settings": {
       "title": {

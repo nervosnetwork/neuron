@@ -25,3 +25,15 @@
   src: url('../fonts/D-DIN-PRO-500-Medium.otf') format('opentype'),
       url('../fonts/D-DIN-PRO-500-Medium.ttf') format('opentype');
 }
+
+@font-face {
+  font-family: 'JetBrains Mono Medium';
+  src: url('../fonts/JetBrainsMonoNL-Medium.otf') format('opentype'),
+      url('../fonts/JetBrainsMonoNL-Medium.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMonoNL-Regular.otf') format('opentype'),
+      url('../fonts/JetBrainsMonoNL-Regular.ttf') format('opentype');
+}

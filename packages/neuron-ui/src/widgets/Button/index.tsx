@@ -1,4 +1,5 @@
 import React from 'react'
+import Spinner from 'widgets/Spinner'
 import styles from './button.module.scss'
 
 const isNativeType = (type: string): type is 'button' | 'submit' | 'reset' => {
@@ -14,6 +15,7 @@ const Button = React.forwardRef(
       disabled = false,
       className = '',
       children,
+      loading,
       ...rest
     }: {
       type?: 'default' | 'cancel' | 'ok' | 'submit' | 'confirm' | 'primary' | 'reset' | 'text'
@@ -22,6 +24,7 @@ const Button = React.forwardRef(
       disabled?: boolean
       className?: string
       children?: React.ReactChild
+      loading?: boolean
       [key: string]: any
     },
     ref: React.LegacyRef<HTMLButtonElement>
@@ -38,10 +41,11 @@ const Button = React.forwardRef(
         onClick={onClick}
         aria-label={label}
         title={label}
-        disabled={disabled}
+        disabled={disabled || loading}
         {...rest}
       >
         {children || label}
+        {loading ? <Spinner className={styles.spinner} /> : null}
       </button>
     )
   }

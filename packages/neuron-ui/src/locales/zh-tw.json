@@ -76,19 +76,20 @@
       "title": "使用硬件錢包進行地址驗證",
       "device": "設備：",
       "address": "地址：",
-      "verified": "驗證通過",
+      "verified": "地址驗證通過",
       "invalid": "地址不正確",
       "status": {
         "label": "狀態：",
-        "connect": "已連接",
+        "connect": "設備已連接，點擊驗證按鈕進行地址驗證",
         "user-input": "已連接，等待確認...",
         "disconnect": "未連接，請檢查設備連接。"
       },
       "actions": {
-        "close": "關閉",
-        "rescan": "再次檢測",
+        "close": "取消",
+        "rescan": "連接設備",
         "copy-address": "复制地址",
-        "verify": "驗證"
+        "verify": "地址驗證",
+        "verify-again": "再次驗證"
       }
     },
     "offline-sign": {
@@ -243,7 +244,9 @@
       "address": "{{network}} 地址",
       "verify-address": "驗證地址",
       "turn-into-full-version-fomrat": "轉換為長地址格式",
-      "turn-into-deprecated-format": "轉換為廢棄地址格式"
+      "turn-into-deprecated-format": "轉換為廢棄地址格式",
+      "save-qr-code": "保存收款碼",
+      "copy-qr-code": "復制收款碼圖片"
     },
     "history": {
       "meta": "元信息",
@@ -318,7 +321,8 @@
       "change-address": "找零地址",
       "copy-address": "複製地址",
       "request-payment": "請求支付",
-      "view-on-explorer": "在瀏覽器中查看"
+      "view-on-explorer": "在瀏覽器中查看",
+      "default-description": "無"
     },
     "settings": {
       "title": {
