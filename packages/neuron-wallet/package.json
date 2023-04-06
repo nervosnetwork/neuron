@@ -86,7 +86,7 @@
     "electron-build-env": "0.2.0",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",
-    "eslint": "8.35.0",
+    "eslint": "8.37.0",
     "eslint-config-prettier": "8.7.0",
     "eslint-plugin-prettier": "4.2.1",
     "jest-when": "2.8.1",
