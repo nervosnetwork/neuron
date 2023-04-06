@@ -3059,6 +3059,11 @@
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.103.1.tgz#b5626ce905353e70136bfaccf9def0819b76ca27"
   integrity sha512-gGRR1VvUS/KRq2ChhXHPiHpgyLYazPM2R8lK87shQI82Gp2/m6k1HVDeNR5XOYwQ3YmBbxHGQtQr/kMq7DUlZA==
 
+"@nervosnetwork/ckb-types@0.107.0":
+  version "0.107.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.107.0.tgz#980947e20d17edd145ff3805e7312bbeb38be2f6"
+  integrity sha512-vaPQXzfbwVJnSqPtGFbdH8/WrL6YQmNQz1Tf1dRBIZbIEIXjVGO5DUHwAiU6pjC6j1QsrlBrvv/P622vM4Q1sA==
+
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/eslint-scope-5-internals/-/eslint-scope-5-internals-5.1.1-v1.tgz#dbf733a965ca47b1973177dc0bb6c889edcfb129"
