@@ -41,7 +41,7 @@
   ],
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "0.103.1",
-    "@nervosnetwork/ckb-sdk-utils": "0.103.1",
+    "@nervosnetwork/ckb-sdk-utils": "0.107.0",
     "@uifabric/experiments": "7.45.14",
     "@uifabric/styling": "7.25.1",
     "canvg": "2.0.0",
