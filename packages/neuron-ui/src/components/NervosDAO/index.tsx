@@ -239,8 +239,12 @@ const NervosDAO = () => {
   }, [])
 
   useEffect(() => {
-    if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
-      setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+    try {
+      if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
+        setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+      }
+    } catch (error) {
+      // ignore error
     }
   }, [maxDepositAmount, depositValue, setDepositValue])
 
