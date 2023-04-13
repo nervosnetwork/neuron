@@ -42,7 +42,7 @@ function download_linux() {
 
 function download_linux_light() {
   # macOS
-  CKB_FILENAME="ckb-light-client_${CKB_LIGHT_VERSION}-x86_64-linux"
+  CKB_FILENAME="ckb-light-client_${CKB_LIGHT_VERSION}-x86_64-linux-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/linux
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"
