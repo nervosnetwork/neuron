@@ -142,7 +142,6 @@ export class CKBLightRunner extends NodeRunner {
       runnerProcess.stderr.on('data', data => {
         const dataString: string = data.toString()
         logger.error('CKB Light Runner:\trun fail:', dataString)
-        this.runnerProcess = undefined
         this.logStream?.write(data)
       })
 

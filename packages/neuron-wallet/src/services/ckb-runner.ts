@@ -92,7 +92,6 @@ export const startCkbNode = async () => {
     ckb.stderr.on('data', data => {
       const dataString: string = data.toString()
       logger.error('CKB:\trun fail:', dataString)
-      ckb = null
       if (dataString.includes('CKB wants to migrate the data into new format')) {
         MigrateSubject.next({ type: 'need-migrate' })
       }

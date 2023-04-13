@@ -274,7 +274,7 @@ describe('test light runner', () => {
       expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.stderr.emit('data', 'error-data')
       expect(loggerErrorMock).toBeCalledWith('CKB Light Runner:\trun fail:', 'error-data')
-      expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
     })
   })
 
