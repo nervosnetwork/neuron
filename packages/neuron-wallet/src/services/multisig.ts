@@ -9,6 +9,8 @@ import Transaction from 'models/chain/transaction'
 import { OutputStatus } from 'models/chain/output'
 import NetworksService from './networks'
 import Multisig from 'models/multisig'
+import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
+import SyncProgress, { SyncAddressType } from 'database/chain/entities/sync-progress'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -248,14 +250,32 @@ export default class MultisigService {
     MultisigOutputChangedSubject.getSubject().next('delete')
   }
 
-  static async syncMultisigOutput(lastestBlockNumber: string) {
-    try {
-      const multisigConfigs = await getConnection()
-        .getRepository(MultisigConfig)
+  static async saveMultisigSyncBlockNumber(multisigConfigs: MultisigConfig[], lastestBlockNumber: string) {
+    const network = await NetworksService.getInstance().getCurrent()
+    if (network.remote === BUNDLED_LIGHT_CKB_URL) {
+      const multisigScriptHashList = multisigConfigs.map(v =>
+        scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+      )
+      const syncBlockNumbers = await getConnection()
+        .getRepository(SyncProgress)
         .createQueryBuilder()
+        .where({ hash: In(multisigScriptHashList) })
         .getMany()
-      await MultisigService.saveLiveMultisigOutput()
-      await MultisigService.deleteDeadMultisigOutput(multisigConfigs)
+      const syncBlockNumbersMap: Record<string, number> = syncBlockNumbers.reduce(
+        (pre, cur) => ({ ...pre, [cur.hash]: cur.blockStartNumber }),
+        {}
+      )
+      await getConnection()
+        .getRepository(MultisigConfig)
+        .save(
+          multisigConfigs.map(v => {
+            const blockNumber =
+              syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))]
+            v.lastestBlockNumber = `0x${BigInt(blockNumber).toString(16)}`
+            return v
+          })
+        )
+    } else {
       await getConnection()
         .getRepository(MultisigConfig)
         .save(
@@ -264,6 +284,19 @@ export default class MultisigService {
             lastestBlockNumber
           }))
         )
+    }
+  }
+
+  static async syncMultisigOutput(lastestBlockNumber: string) {
+    try {
+      const multisigConfigs = await getConnection()
+        .getRepository(MultisigConfig)
+        .createQueryBuilder()
+        .getMany()
+      await MultisigService.saveLiveMultisigOutput()
+      await MultisigService.deleteDeadMultisigOutput(multisigConfigs)
+      await MultisigService.saveMultisigSyncBlockNumber(multisigConfigs, lastestBlockNumber)
+      MultisigOutputChangedSubject.getSubject().next('update')
     } catch (error) {
       // ignore error, if lastestBlockNumber not update, it will try next time
     }
@@ -298,5 +331,18 @@ export default class MultisigService {
       })
       .execute()
     MultisigOutputChangedSubject.getSubject().next('update')
+  }
+
+  static async getMultisigConfigForLight() {
+    const multisigConfigs = await getConnection()
+      .getRepository(MultisigConfig)
+      .createQueryBuilder()
+      .getMany()
+    return multisigConfigs.map(v => ({
+      walletId: v.walletId,
+      script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n),
+      addressType: SyncAddressType.Multisig,
+      scriptType: 'lock' as CKBRPC.ScriptType
+    }))
   }
 }

@@ -1,4 +1,5 @@
 import { stopCkbNode } from 'services/ckb-runner'
+import { CKBLightRunner } from 'services/light-runner'
 import NodeService from '../node'
 import BaseMonitor from './base'
 
@@ -13,6 +14,7 @@ export default class CkbMonitor extends BaseMonitor {
 
   async stop(): Promise<void> {
     await stopCkbNode()
+    await CKBLightRunner.getInstance().stop()
   }
 
   name: string = 'ckb'

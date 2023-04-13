@@ -15,6 +15,10 @@ import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import queueWrapper from 'utils/queue'
 import env from 'env'
+import MultisigConfigDbChangedSubject from 'models/subjects/multisig-config-db-changed-subject'
+import Multisig from 'services/multisig'
+import { SyncAddressType } from 'database/chain/entities/sync-progress'
+import { debounceTime } from 'rxjs/operators'
 
 let network: Network | null
 let child: ChildProcess | null = null
@@ -193,3 +197,17 @@ export const registerRequest = (c: ChildProcess, msg: Required<WorkerMessage>) =
 
 AddressCreatedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
 WalletDeletedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
+MultisigConfigDbChangedSubject.getSubject()
+  .pipe(debounceTime(1000))
+  .subscribe(async () => {
+    if (!child) {
+      return
+    }
+    const appendScripts = await Multisig.getMultisigConfigForLight()
+    const msg: Required<WorkerMessage<
+      { walletId: string; script: CKBComponents.Script; addressType: SyncAddressType }[]
+    >> = { type: 'call', channel: 'append_scripts', id: requestId++, message: appendScripts }
+    return registerRequest(child, msg).catch(err => {
+      logger.error(`Sync:\ffailed to append script to light client`, err)
+    })
+  })

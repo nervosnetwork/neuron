@@ -12,10 +12,11 @@ import WalletsService from 'services/wallets'
 import OfflineSignService from 'services/offline-sign'
 import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
-import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
+import { BUNDLED_LIGHT_CKB_URL, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
 import NetworksService from 'services/networks'
 import { clearCkbNodeCache } from 'services/ckb-runner'
+import { CKBLightRunner } from 'services/light-runner'
 
 enum URL {
   Settings = '/settings/general',
@@ -116,7 +117,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   let isMainWindow = mainWindow === currentWindow
 
   const walletsService = WalletsService.getInstance()
-  const isMainnet = new NetworksService().getCurrent().chain === 'ckb'
+  const network = new NetworksService().getCurrent()
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
@@ -316,7 +317,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             `#/multisig-address/${currentWallet!.id}`,
             t(`messageBox.multisig-address.title`),
             {
-              width: 900,
+              width: 1000,
               maxWidth: 900,
               minWidth: 900,
               resizable: true
@@ -327,7 +328,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       },
       {
         label: t('application-menu.tools.clear-sync-data'),
-        enabled: hasCurrentWallet && isMainnet,
+        enabled: hasCurrentWallet && (network.chain === 'ckb' || BUNDLED_LIGHT_CKB_URL === network.remote),
         click: async () => {
           const res = await dialog.showMessageBox({
             type: 'warning',
@@ -338,7 +339,12 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             cancelId: 1
           })
           if (res.response === 0) {
-            await clearCkbNodeCache()
+            const network = new NetworksService().getCurrent()
+            if (network.remote === BUNDLED_LIGHT_CKB_URL) {
+              await CKBLightRunner.getInstance().clearNodeCache()
+            } else {
+              await clearCkbNodeCache()
+            }
           }
         }
       },

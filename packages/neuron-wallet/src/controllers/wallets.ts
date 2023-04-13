@@ -8,7 +8,7 @@ import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from 'models/keys/key'
 import CommandSubject from 'models/subjects/command'
-import { ResponseCode } from 'utils/const'
+import { BUNDLED_LIGHT_CKB_URL, ResponseCode } from 'utils/const'
 import {
   CurrentWalletNotSet,
   IsRequired,
@@ -31,6 +31,9 @@ import HardwareWalletService from 'services/hardware'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import AddressParser from 'models/address-parser'
 import MultisigConfigModel from 'models/multisig-config'
+import NodeService from 'services/node'
+import { generateRPC } from 'utils/ckb-rpc'
+import { resetSyncTaskQueue } from 'block-sync-renderer'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
@@ -116,11 +119,13 @@ export default class WalletsController {
     )
 
     const walletsService = WalletsService.getInstance()
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
     const wallet = walletsService.create({
       id: '',
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
-      keystore
+      keystore,
+      startBlockNumberInLight: isImporting ? undefined : await rpc.getTipBlockNumber()
     })
 
     wallet.checkAndGenerateAddresses(isImporting)
@@ -361,6 +366,10 @@ export default class WalletsController {
     const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
     if (!currentWallet || id !== currentWallet.id) {
       throw new CurrentWalletNotSet()
+    }
+    const network = NetworksService.getInstance().getCurrent()
+    if (network.remote === BUNDLED_LIGHT_CKB_URL) {
+      resetSyncTaskQueue.asyncPush(true)
     }
     return {
       status: ResponseCode.Success,

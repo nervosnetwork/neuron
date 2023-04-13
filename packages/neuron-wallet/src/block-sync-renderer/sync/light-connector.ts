@@ -7,10 +7,13 @@ import { Address } from 'models/address'
 import AddressMeta from 'database/address/meta'
 import { scheduler } from 'timers/promises'
 import SyncProgressService from 'services/sync-progress'
-import { BlockTips, LumosCellQuery, Connector } from './connector'
+import { BlockTips, LumosCellQuery, Connector, AppendScript } from './connector'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import HexUtils from 'utils/hex'
+import Multisig from 'services/multisig'
+import { SyncAddressType } from 'database/chain/entities/sync-progress'
+import WalletService from 'services/wallets'
 
 interface SyncQueueParam {
   script: CKBComponents.Script
@@ -84,7 +87,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   }
 
   private async subscribeSync() {
-    const minSyncBlockNumber = await SyncProgressService.getMinBlockNumber()
+    const minSyncBlockNumber = await SyncProgressService.getCurrentWalletMinBlockNumber()
     const header = await this.lightRpc.getTipHeader()
     this.blockTipsSubject.next({
       cacheTipNumber: minSyncBlockNumber,
@@ -92,8 +95,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     })
   }
 
-  private async initSyncProgress() {
-    if (!this.addressMetas.length) {
+  private async initSyncProgress(appendScripts?: AppendScript[]) {
+    if (!this.addressMetas.length && !appendScripts?.length) {
       return
     }
     const sycnScripts = await this.lightRpc.getScripts()
@@ -101,7 +104,9 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     sycnScripts.forEach(v => {
       existSyncscripts[scriptToHash(v.script)] = v
     })
+    const currentWalletId = WalletService.getInstance().getCurrent()?.id
     const allScripts = this.addressMetas
+      .filter(v => (currentWalletId ? v.walletId === currentWalletId : true))
       .map(addressMeta => {
         const lockScripts = [
           addressMeta.generateDefaultLockScript(),
@@ -115,18 +120,33 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
         }))
       })
       .flat()
+      .concat(appendScripts ?? [])
+    const walletMinBlockNumber = await SyncProgressService.getWalletMinBlockNumber()
+    const wallets = await WalletService.getInstance().getAll()
+    const walletStartBlockMap = wallets.reduce<Record<string, string | undefined>>(
+      (pre, cur) => ({ ...pre, [cur.id]: cur.startBlockNumberInLight }),
+      {}
+    )
     const setScriptsParams = allScripts.map(v => ({
       ...v,
-      blockNumber: existSyncscripts[scriptToHash(v.script)]?.blockNumber || '0x0'
+      blockNumber:
+        existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
+        walletStartBlockMap[v.walletId] ??
+        `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`
     }))
     await this.lightRpc.setScripts(setScriptsParams)
     await SyncProgressService.resetSyncProgress(allScripts)
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
     await SyncProgressService.removeWalletsByExists(walletIds)
+    await SyncProgressService.removeByHashesAndAddressType(
+      SyncAddressType.Multisig,
+      appendScripts?.map(v => scriptToHash(v.script))
+    )
   }
 
   private async initSync() {
-    await this.initSyncProgress()
+    const appendScripts = await Multisig.getMultisigConfigForLight()
+    await this.initSyncProgress(appendScripts)
     while (this.pollingIndexer) {
       await this.synchronize()
       await scheduler.wait(5000)
@@ -223,5 +243,12 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       }
     }
     await this.subscribeSync()
+  }
+
+  async appendScript(scripts: AppendScript[]) {
+    if (!scripts.length) {
+      return
+    }
+    this.initSyncProgress(scripts)
   }
 }

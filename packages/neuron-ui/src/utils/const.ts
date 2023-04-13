@@ -65,3 +65,4 @@ export const DEPRECATED_CODE_HASH: Record<string, string> = {
 }
 
 export const LIGHT_CLIENT_TESTNET = 'light_client_testnet'
+export const BUNDLED_LIGHT_CKB_URL = 'http://localhost:9000'

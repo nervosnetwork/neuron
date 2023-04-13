@@ -1,3 +1,4 @@
+import { SyncAddressType } from 'database/chain/entities/sync-progress'
 import { Subject } from 'rxjs'
 
 export interface BlockTips {
@@ -33,6 +34,13 @@ export interface LumosCell {
   data?: string
 }
 
+export interface AppendScript {
+  walletId: string
+  script: CKBComponents.Script
+  addressType: SyncAddressType
+  scriptType: CKBRPC.ScriptType
+}
+
 export abstract class Connector<TransactionsSubjectParam = unknown> {
   abstract blockTipsSubject: Subject<BlockTips>
   abstract transactionsSubject: Subject<{ txHashes: CKBComponents.Hash[]; params: TransactionsSubjectParam }>
@@ -41,4 +49,7 @@ export abstract class Connector<TransactionsSubjectParam = unknown> {
   abstract notifyCurrentBlockNumberProcessed(param: TransactionsSubjectParam): void
   abstract stop(): void
   abstract getLiveCellsByScript(query: LumosCellQuery): Promise<unknown>
+  async appendScript(_scripts: AppendScript[]) {
+    // do nothing
+  }
 }

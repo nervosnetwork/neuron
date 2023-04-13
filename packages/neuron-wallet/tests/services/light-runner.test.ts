@@ -15,9 +15,11 @@ const existsSyncMock = jest.fn()
 const readFileSyncMock = jest.fn()
 const mkdirSyncMock = jest.fn()
 const writeFileSyncMock = jest.fn()
+const createWriteStreamMock = jest.fn()
 const spawnMock = jest.fn()
 const loggerErrorMock = jest.fn()
 const loggerInfoMock = jest.fn()
+const transportsGetFileMock = jest.fn()
 
 function resetMock() {
   mockFn.mockReset()
@@ -33,9 +35,11 @@ function resetMock() {
   readFileSyncMock.mockReset()
   mkdirSyncMock.mockReset()
   writeFileSyncMock.mockReset()
+  createWriteStreamMock.mockReset()
   spawnMock.mockReset()
   loggerErrorMock.mockReset()
   loggerInfoMock.mockReset()
+  transportsGetFileMock.mockReset()
 }
 
 jest.doMock('../../src/env', () => ({
@@ -50,6 +54,11 @@ jest.doMock('../../src/env', () => ({
 jest.doMock('../../src/utils/logger', () => ({
   info: loggerInfoMock,
   error: loggerErrorMock,
+  transports: {
+    file: {
+      getFile: transportsGetFileMock
+    }
+  }
 }))
 
 jest.doMock('../../src/block-sync-renderer', () => ({
@@ -83,6 +92,7 @@ jest.doMock('fs', () => ({
   readFileSync: readFileSyncMock,
   mkdirSync: mkdirSyncMock,
   writeFileSync: writeFileSyncMock,
+  createWriteStream: createWriteStreamMock
 }))
 
 jest.doMock('child_process', () => ({
@@ -92,6 +102,10 @@ jest.doMock('child_process', () => ({
 const { CKBLightRunner } = require('../../src/services/light-runner')
 
 describe('test light runner', () => {
+  beforeEach(() => {
+    transportsGetFileMock.mockReturnValue({ path: ''})
+    createWriteStreamMock.mockReturnValue({ write() {} })
+  })
   afterEach(() => {
     resetMock()
   })

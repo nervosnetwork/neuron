@@ -53,7 +53,7 @@ export default class MultisigConfig {
     this.changed('AfterRemove')
   }
 
-  private changed = (event: string) => {
+  private changed = (event: 'AfterInsert' | 'AfterRemove') => {
     MultisigConfigDbChangedSubject.getSubject().next(event)
   }
 }

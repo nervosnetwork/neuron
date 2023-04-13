@@ -5,6 +5,7 @@ import { ChildProcess, spawn } from 'child_process'
 import logger from 'utils/logger'
 import { resetSyncTaskQueue } from 'block-sync-renderer'
 import SettingsService from 'services/settings'
+import { clean } from 'database/chain'
 
 const { app } = env
 
@@ -66,6 +67,7 @@ abstract class NodeRunner {
 export class CKBLightRunner extends NodeRunner {
   protected networkType: NetworkType = NetworkType.Light
   protected binaryName: string = 'ckb-light-client'
+  protected logStream?: fs.WriteStream
 
   static getInstance(): CKBLightRunner {
     if (!CKBLightRunner.instance) {
@@ -126,16 +128,28 @@ export class CKBLightRunner extends NodeRunner {
     this.initConfig()
 
     const options = ['run', '--config-file', this.configFile]
-    const runnerProcess = spawn(this.binary, options, { stdio: ['ignore', 'pipe', 'pipe'] })
+    const runnerProcess = spawn(this.binary, options, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { RUST_LOG: 'info', ckb_light_client: 'info' }
+    })
     this.runnerProcess = runnerProcess
+
+    if (!this.logStream) {
+      this.logStream = fs.createWriteStream(this.logPath)
+    }
 
     runnerProcess.stderr &&
       runnerProcess.stderr.on('data', data => {
         const dataString: string = data.toString()
         logger.error('CKB Light Runner:\trun fail:', dataString)
         this.runnerProcess = undefined
+        this.logStream?.write(data)
       })
 
+    runnerProcess.stdout &&
+      runnerProcess.stdout.on('data', data => {
+        this.logStream?.write(data)
+      })
     runnerProcess.on('error', error => {
       logger.error('CKB Light Runner:\trun fail:', error)
       this.runnerProcess = undefined
@@ -146,5 +160,16 @@ export class CKBLightRunner extends NodeRunner {
       this.runnerProcess = undefined
     })
     resetSyncTaskQueue.push(true)
+  }
+
+  get logPath() {
+    return path.join(logger.transports.file.getFile().path, '..', 'light_client_run.log')
+  }
+
+  async clearNodeCache(): Promise<void> {
+    await this.stop()
+    fs.rmSync(SettingsService.getInstance().testnetLightDataPath, { recursive: true, force: true })
+    await clean()
+    await this.start()
   }
 }

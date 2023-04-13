@@ -11,6 +11,7 @@ import AddressService from 'services/addresses'
 import redistCheck from 'utils/redist-check'
 import SettingsService from 'services/settings'
 import { generateRPC } from 'utils/ckb-rpc'
+import { CKBLightRunner } from 'services/light-runner'
 
 export default class ExportDebugController {
   // eslint-disable-next-line prettier/prettier
@@ -37,7 +38,13 @@ export default class ExportDebugController {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await Promise.all([this.addStatusFile(), this.addBundledCKBLog(), this.addLogFiles(), this.addHdPublicKeyInfoCsv()])
+      await Promise.all([
+        this.addStatusFile(),
+        this.addBundledCKBLog(),
+        this.addLogFiles(),
+        this.addHdPublicKeyInfoCsv(),
+        this.addBundledCKBLightClientLog()
+      ])
       await this.archive.finalize()
       dialog.showMessageBox({
         type: 'info',
@@ -146,5 +153,11 @@ export default class ExportDebugController {
     files.forEach(file => {
       this.archive.file(path.join(logFile.path, '..', file), { name: file })
     })
+  }
+
+  private addBundledCKBLightClientLog() {
+    const logPath = CKBLightRunner.getInstance().logPath
+    if (!fs.existsSync(logPath)) {return}
+    this.archive.file(logPath, { name: 'bundled-ckb-lignt-client.log' })
   }
 }

@@ -24,6 +24,7 @@ export interface WalletProperties {
   isHDWallet?: boolean
   device?: DeviceInfo
   keystore?: Keystore
+  startBlockNumberInLight?: string
 }
 
 export abstract class Wallet {
@@ -32,9 +33,10 @@ export abstract class Wallet {
   public device?: DeviceInfo
   protected extendedKey: string = ''
   protected isHD: boolean
+  protected startBlockNumberInLight?: string
 
   constructor(props: WalletProperties) {
-    const { id, name, extendedKey, device, isHDWallet } = props
+    const { id, name, extendedKey, device, isHDWallet, startBlockNumberInLight } = props
 
     if (id === undefined) {
       throw new IsRequired('ID')
@@ -52,6 +54,7 @@ export abstract class Wallet {
     this.extendedKey = extendedKey
     this.device = device
     this.isHD = isHDWallet ?? true
+    this.startBlockNumberInLight = startBlockNumberInLight
   }
 
   public toJSON = () => ({
@@ -138,7 +141,8 @@ export class FileKeystoreWallet extends Wallet {
       name: this.name,
       extendedKey: this.extendedKey,
       device: this.device,
-      isHD: this.isHD
+      isHD: this.isHD,
+      startBlockNumberInLight: this.startBlockNumberInLight
     }
   }
 
