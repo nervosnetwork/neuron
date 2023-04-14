@@ -539,7 +539,7 @@ export const useUpdateDepositEpochList = ({
           const epochList = new Map()
           records.forEach(record => {
             const key = getRecordKey(record)
-            epochList.set(key, recordKeyIdxMap.get(key) ? res[recordKeyIdxMap.get(key)!]?.epoch : null)
+            epochList.set(key, recordKeyIdxMap.get(key) !== undefined ? res[recordKeyIdxMap.get(key)!]?.epoch : null)
           })
           setDepositEpochList(epochList)
         })
