@@ -1,0 +1,94 @@
+:root {
+  --dropdown-base-font-color: rgb(50, 49, 48);
+  --selected-color: rgb(227, 227, 227);
+}
+
+.dropdown-root {
+  position: relative;
+}
+
+.dropdown-control {
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  border: 1px solid rgb(96, 94, 92);
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  transition: all 200ms ease;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--dropdown-base-font-color);
+  border-color: rgb(96, 94, 92);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 10px;
+  padding-bottom: 3.5px;
+}
+
+.dropdown-control:hover {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.dropdown-arrow {
+  transition: 0.2s;
+}
+
+.is-open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  background-color: white;
+  box-shadow: rgb(0 0 0 / 13%) 0px 3.2px 7.2px 0px,
+    rgb(0 0 0 / 11%) 0px 0.6px 1.8px 0px;
+  box-sizing: border-box;
+  margin-top: 0px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  z-index: 1000;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dropdown-option {
+  box-sizing: border-box;
+  color: var(--dropdown-base-font-color);
+  cursor: pointer;
+  display: block;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+}
+
+.dropdown-option:last-child {
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.dropdown-option:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: var(--dropdown-base-font-color);
+}
+
+.dropdown-option.is-selected {
+  color: var(--dropdown-base-font-color);
+}
+
+.dropdown-disabled {
+  background-color: var(--selected-color);
+}
+
+.dropdown-placeholder {
+  font-size: 12px;
+}
+
+.dropdown-noresults {
+  box-sizing: border-box;
+  color: #ccc;
+  cursor: default;
+  display: block;
+  padding: 8px 10px;
+}

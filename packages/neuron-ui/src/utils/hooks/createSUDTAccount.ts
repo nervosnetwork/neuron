@@ -10,6 +10,7 @@ import {
   invokeShowErrorMessage,
 } from 'services/remote'
 import { getExplorerUrl } from 'utils'
+import useGetCountDownAndFeeRateStats from './useGetCountDownAndFeeRateStats'
 import { ErrorCode } from '../enums'
 import { isSuccessResponse } from '../is'
 import {
@@ -29,8 +30,10 @@ export const useIsInsufficientToCreateSUDTAccount = ({
   walletId,
   balance,
   setInsufficient,
-}: IsInsufficientToCreateSudtAccountProps) =>
-  useEffect(() => {
+}: IsInsufficientToCreateSudtAccountProps) => {
+  const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
+
+  return useEffect(() => {
     const createDummySUDTAccount = () => {
       if (balance <= BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
         return true
@@ -42,7 +45,7 @@ export const useIsInsufficientToCreateSUDTAccount = ({
         accountName: DEFAULT_SUDT_FIELDS.accountName,
         symbol: DEFAULT_SUDT_FIELDS.symbol,
         decimal: '0',
-        feeRate: `${MEDIUM_FEE_RATE}`,
+        feeRate: `${suggestFeeRate}`,
       }
       return generateCreateSUDTAccountTransaction(params).catch(() => false)
     }
@@ -57,7 +60,7 @@ export const useIsInsufficientToCreateSUDTAccount = ({
         accountName: DEFAULT_SUDT_FIELDS.accountName,
         symbol: DEFAULT_SUDT_FIELDS.CKBSymbol,
         decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
-        feeRate: `${MEDIUM_FEE_RATE}`,
+        feeRate: `${suggestFeeRate}`,
       }
       return generateCreateSUDTAccountTransaction(params).catch(() => false)
     }
@@ -76,7 +79,8 @@ export const useIsInsufficientToCreateSUDTAccount = ({
           [AccountType.SUDT]: insufficientToCreateSUDTAccount,
         })
       })
-  }, [walletId, balance, setInsufficient])
+  }, [walletId, balance, setInsufficient, suggestFeeRate])
+}
 
 export const useOnGenerateNewAccountTransaction = ({
   walletId,
