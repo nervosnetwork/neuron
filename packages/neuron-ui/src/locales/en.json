@@ -991,6 +991,22 @@
         "view-concise-data": "View concise data",
         "view-raw-data": "View raw data"
       }
+    },
+    "dropdown": {
+      "placeholder": "Please select..."
+    },
+    "price-switch": {
+      "price": "Price",
+      "customPrice": "Custom Price",
+      "errorTip": "Price cannot be less than {{minPrice}} shannons/KB, please re-enter",
+      "hintTip": "Suggested price is {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "Price {{priceValue}} shannons/KB | Fee {{feeValue}} CKB",
+      "fast": "Fast",
+      "standard": "Standard",
+      "slow": "Slow",
+      "countDownTip": "The price will refresh after {{countDown}} seconds",
+      "switchToCustomPrice": "Switch to custom price",
+      "switchToPrice": "Switch to price"
     }
   }
 }

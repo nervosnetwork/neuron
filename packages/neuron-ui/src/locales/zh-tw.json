@@ -983,6 +983,22 @@
         "view-concise-data": "查看概要",
         "view-raw-data": "查看原始數據"
       }
+    },
+    "dropdown": {
+      "placeholder": "請選擇 ..."
+    },
+    "price-switch": {
+      "price": "單價",
+      "customPrice": "自定義價格",
+      "errorTip": "價格設定最少不得少於 {{minPrice}} shannons/byte，請重新輸入",
+      "hintTip": "建議價格 {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "單價 {{priceValue}} shannons/KB | 費用 {{feeValue}} CKB",
+      "fast": "快速",
+      "standard": "標準",
+      "slow": "慢速",
+      "countDownTip": "單價將在{{countDown}}秒後刷新",
+      "switchToCustomPrice": "切換到自定義價格",
+      "switchToPrice": "切換到單價"
     }
   }
 }

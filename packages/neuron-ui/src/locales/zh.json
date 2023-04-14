@@ -983,6 +983,22 @@
         "view-concise-data": "查看概要",
         "view-raw-data": "查看原始数据"
       }
+    },
+    "dropdown": {
+      "placeholder": "请选择 ..."
+    },
+    "price-switch": {
+      "price": "单价",
+      "customPrice": "自定义价格",
+      "errorTip": "价格设定最少不得少于 {{minPrice}} shannons/KB，请重新输入",
+      "hintTip": "建议价格 {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "单价 {{priceValue}} shannons/KB | 费用 {{feeValue}} CKB",
+      "fast": "快速",
+      "standard": "标准",
+      "slow": "慢速",
+      "countDownTip": "单价将在{{countDown}}秒后刷新",
+      "switchToCustomPrice": "切换到自定义价格",
+      "switchToPrice": "切换到单价"
     }
   }
 }
