@@ -32,6 +32,7 @@ export enum RoutePath {
   NFTSend = '/nft',
   ImportHardware = '/import-hardware',
   OfflineSign = 'offline-sign',
+  SignVerify = 'sign-verify',
 }
 
 export enum CapacityUnit {

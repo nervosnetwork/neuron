@@ -40,7 +40,7 @@
     justify-content: flex-start;
     align-items: stretch;
     box-sizing: border-box;
-    background: #FFFFFF;
+    background: #ffffff;
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
     width: 480px;
@@ -54,13 +54,13 @@
     &[data-disabled='true'] {
       background-color: var(--input-disabled-color);
     }
-    &[data-type="button"] {
+    &[data-type='button'] {
       color: var(--input-button-color);
       cursor: pointer;
       & > input {
         cursor: pointer;
       }
-  
+
       &[data-selected='true'] {
         color: var(--activity-color);
         border-color: var(--activity-color);
@@ -78,8 +78,9 @@
     &:focus-within {
       border-color: var(--activity-color);
     }
-  
-    input, textarea {
+
+    input,
+    textarea {
       font-family: inherit;
       font-size: 14px;
       flex: 1;
@@ -89,7 +90,7 @@
       word-break: keep-all;
       color: var(--main-text-color);
       background-color: transparent;
-    
+
       &::placeholder {
         color: var(--input-second-color);
       }
@@ -127,6 +128,7 @@
   grid-area: message;
   font-size: 14px;
   line-height: 20px;
+  color: var(--input-hint-color);
 }
 
 .errorMessage {

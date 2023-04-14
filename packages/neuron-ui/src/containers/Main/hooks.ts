@@ -258,6 +258,11 @@ export const useSubscription = ({
             }
             break
           }
+          case 'sign-verify':
+            if (!location.pathname.includes('/sign-verify')) {
+              navigate(`${location.pathname}/sign-verify?id=${payload}`)
+            }
+            break
           default: {
             break
           }
