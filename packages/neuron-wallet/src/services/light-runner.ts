@@ -3,7 +3,6 @@ import path from 'path'
 import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
 import logger from 'utils/logger'
-import { resetSyncTaskQueue } from 'block-sync-renderer'
 import SettingsService from 'services/settings'
 import { clean } from 'database/chain'
 
@@ -51,7 +50,6 @@ abstract class NodeRunner {
 
   async stop() {
     return new Promise<void>(resolve => {
-      resetSyncTaskQueue.push(false)
       if (this.runnerProcess) {
         logger.info('Runner:\tkilling node')
         this.runnerProcess.once('close', () => resolve())
@@ -158,7 +156,6 @@ export class CKBLightRunner extends NodeRunner {
       logger.info('CKB Light Runner:\tprocess closed')
       this.runnerProcess = undefined
     })
-    resetSyncTaskQueue.push(true)
   }
 
   get logPath() {

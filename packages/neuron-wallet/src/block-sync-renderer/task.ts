@@ -75,7 +75,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
       break
     }
     case 'append_scripts': {
-      if (message && Array.isArray(message)) {
+      if (Array.isArray(message)) {
         await syncQueue?.appendLightScript(message)
       }
       break

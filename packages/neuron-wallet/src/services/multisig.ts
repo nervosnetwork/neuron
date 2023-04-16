@@ -9,8 +9,8 @@ import Transaction from 'models/chain/transaction'
 import { OutputStatus } from 'models/chain/output'
 import NetworksService from './networks'
 import Multisig from 'models/multisig'
-import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
 import SyncProgress, { SyncAddressType } from 'database/chain/entities/sync-progress'
+import { NetworkType } from 'models/network'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -252,7 +252,7 @@ export default class MultisigService {
 
   static async saveMultisigSyncBlockNumber(multisigConfigs: MultisigConfig[], lastestBlockNumber: string) {
     const network = await NetworksService.getInstance().getCurrent()
-    if (network.remote === BUNDLED_LIGHT_CKB_URL) {
+    if (network.type === NetworkType.Light) {
       const multisigScriptHashList = multisigConfigs.map(v =>
         scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
       )

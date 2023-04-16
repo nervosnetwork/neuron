@@ -12,11 +12,12 @@ import WalletsService from 'services/wallets'
 import OfflineSignService from 'services/offline-sign'
 import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
-import { BUNDLED_LIGHT_CKB_URL, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
+import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
 import NetworksService from 'services/networks'
 import { clearCkbNodeCache } from 'services/ckb-runner'
 import { CKBLightRunner } from 'services/light-runner'
+import { NetworkType } from 'models/network'
 
 enum URL {
   Settings = '/settings/general',
@@ -318,8 +319,8 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             t(`messageBox.multisig-address.title`),
             {
               width: 1000,
-              maxWidth: 900,
-              minWidth: 900,
+              maxWidth: 1000,
+              minWidth: 1000,
               resizable: true
             },
             ['multisig-output-update']
@@ -328,7 +329,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       },
       {
         label: t('application-menu.tools.clear-sync-data'),
-        enabled: hasCurrentWallet && (network.chain === 'ckb' || BUNDLED_LIGHT_CKB_URL === network.remote),
+        enabled: hasCurrentWallet && (network.chain === 'ckb' || NetworkType.Light === network.type),
         click: async () => {
           const res = await dialog.showMessageBox({
             type: 'warning',
@@ -340,7 +341,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           })
           if (res.response === 0) {
             const network = new NetworksService().getCurrent()
-            if (network.remote === BUNDLED_LIGHT_CKB_URL) {
+            if (network.type === NetworkType.Light) {
               await CKBLightRunner.getInstance().clearNodeCache()
             } else {
               await clearCkbNodeCache()

@@ -8,7 +8,7 @@ import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from 'models/keys/key'
 import CommandSubject from 'models/subjects/command'
-import { BUNDLED_LIGHT_CKB_URL, ResponseCode } from 'utils/const'
+import { ResponseCode } from 'utils/const'
 import {
   CurrentWalletNotSet,
   IsRequired,
@@ -34,6 +34,7 @@ import MultisigConfigModel from 'models/multisig-config'
 import NodeService from 'services/node'
 import { generateRPC } from 'utils/ckb-rpc'
 import { resetSyncTaskQueue } from 'block-sync-renderer'
+import { NetworkType } from 'models/network'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
@@ -368,7 +369,7 @@ export default class WalletsController {
       throw new CurrentWalletNotSet()
     }
     const network = NetworksService.getInstance().getCurrent()
-    if (network.remote === BUNDLED_LIGHT_CKB_URL) {
+    if (network.type === NetworkType.Light) {
       resetSyncTaskQueue.asyncPush(true)
     }
     return {

@@ -20,7 +20,7 @@ import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
 import PasswordRequest from 'components/PasswordRequest'
 import ApproveMultisigTx from 'components/ApproveMultisigTx'
-import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
@@ -53,7 +53,7 @@ const MultisigAddress = () => {
     // eslint-disable-next-line
   }, [i18n.language])
   const isMainnet = isMainnetUtil(networks, networkID)
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.remote === BUNDLED_LIGHT_CKB_URL, [
+  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
     networks,
     networkID,
   ])

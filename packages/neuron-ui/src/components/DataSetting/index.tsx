@@ -8,7 +8,7 @@ import CopyZone from 'widgets/CopyZone'
 import { OpenFolder, InfoCircleOutlined } from 'widgets/Icons/icon'
 import { shell } from 'electron'
 import Spinner from 'widgets/Spinner'
-import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useDataPath } from './hooks'
 
 import styles from './index.module.scss'
@@ -92,7 +92,7 @@ const DataSetting = () => {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.remote === BUNDLED_LIGHT_CKB_URL, [
+  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
     networkID,
     networks,
   ])
