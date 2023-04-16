@@ -1,0 +1,32 @@
+name: Add 'replied' label
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+    steps:
+      - id: check-access
+        name: Check if the commenter has write access
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const response = await github.repos.checkCollaborator({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.payload.comment.user.login,
+            })
+            return { hasWriteAccess: response.data.permission === 'write' }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: add-label
+        name: Add 'replied' label
+        if: steps.check-access.outputs.hasWriteAccess
+        uses: actions-ecosystem/action-add-label@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          label: replied
