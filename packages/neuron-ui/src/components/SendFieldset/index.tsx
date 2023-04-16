@@ -64,6 +64,7 @@ const SendFieldset = ({
   return (
     <div className={styles.container}>
       <TextField
+        className={styles.textFieldClass}
         rows={2}
         label={
           <div className={styles.removeLabel}>
@@ -99,7 +100,7 @@ const SendFieldset = ({
       />
 
       <TextField
-        className={styles.amountField}
+        className={`${styles.amountField} ${styles.textFieldClass}`}
         label={t('send.amount')}
         field="amount"
         data-idx={idx}

@@ -52,12 +52,16 @@ $head-height: 52px;
     td {
       padding: 0 0 0 18px;
       border-bottom: 1px solid var(--table-head-border-color);
+
+      &.noBorder {
+        border: none;
+      }
     }
   }
 }
 
 .fixedTableRoot {
-  &[data-have-head="true"] {
+  &[data-have-head='true'] {
     .table {
       height: calc(100% - $head-height);
     }
@@ -70,14 +74,15 @@ $head-height: 52px;
       overflow: hidden auto;
     }
 
-    thead, tbody tr {
+    thead,
+    tbody tr {
       display: table;
       width: 100%;
       table-layout: fixed;
     }
 
     thead {
-      width: calc( 100% - 8px)
+      width: calc(100% - 8px);
     }
   }
 }

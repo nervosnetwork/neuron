@@ -1,0 +1,26 @@
+@import '../../styles/mixin.scss';
+
+.tabs {
+  position: relative;
+
+  .tab {
+    position: relative;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tabs-default-color);
+    background-color: transparent;
+    border: none;
+    margin-right: 10px;
+
+    &:hover {
+      font-weight: bold;
+      color: var(--tabs-active);
+    }
+
+    &.active {
+      color: var(--tabs-active);
+      border-bottom: 2px solid var(--tabs-active);
+    }
+  }
+}

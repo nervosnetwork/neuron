@@ -24,6 +24,7 @@ interface DialogProps {
   className?: string
   footer?: React.ReactChild
   contentClassName?: string
+  enableCloseWithEsc?: boolean
 }
 
 const Dialog = ({
@@ -41,9 +42,10 @@ const Dialog = ({
   showHeader = true,
   showConfirm = true,
   showCancel = true,
-  showFooter = true,
   className = '',
   contentClassName,
+  showFooter = true,
+  enableCloseWithEsc = true,
 }: DialogProps) => {
   const [t] = useTranslation()
   const { isDialogOpen, openDialog, closeDialog, dialogRef } = useDialogWrapper({ onClose: onCancel })
@@ -55,6 +57,15 @@ const Dialog = ({
       closeDialog()
     }
   }, [show])
+
+  const onDialogClicked = useCallback(
+    (e: React.MouseEvent<HTMLDialogElement>) => {
+      if (e.target instanceof HTMLDialogElement && e.target.tagName === 'DIALOG') {
+        onCancel?.()
+      }
+    },
+    [onCancel]
+  )
 
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -72,7 +83,13 @@ const Dialog = ({
   }
 
   return (
-    <dialog ref={dialogRef} className={`${styles.dialogWrap} ${className}`}>
+    <dialog
+      ref={dialogRef}
+      className={`${styles.dialogWrap} ${className}`}
+      onClick={onDialogClicked}
+      onKeyDown={e => (e.key === 'Escape' && enableCloseWithEsc ? onCancel : undefined)}
+      role="none"
+    >
       {showHeader ? (
         <div className={styles.header}>
           <div className={styles.title}>

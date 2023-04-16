@@ -250,6 +250,8 @@
       "copy-qr-code": "复制收款码图片"
     },
     "history": {
+      "title": "交易历史",
+      "title-detail": "交易详情",
       "meta": "元信息",
       "type": "交易类型",
       "date": "时间",
@@ -278,12 +280,20 @@
         "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
+      "table": {
+        "name": "钱包名称",
+        "type": "类型",
+        "amount": "金额",
+        "timestamp": "时间",
+        "status": "状态",
+        "operation": "操作"
+      },
       "export-history": "导出交易历史",
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "no-txs": "没有交易记录",
-      "view-in-explorer": "浏览器",
+      "view-in-explorer": "浏览器打开",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
@@ -306,7 +316,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "cell-from-cellbase": "来自 Cellbase",
-      "lock-script": "锁脚本",
+      "lock-script": "脚本锁定",
+      "lock-script-title": "地址信息",
       "deprecated-address-format": "废弃格式地址"
     },
     "addresses": {

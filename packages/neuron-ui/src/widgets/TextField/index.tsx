@@ -18,6 +18,7 @@ const TextField = React.forwardRef(
       className = '',
       placeholder = '',
       suffix,
+      prefix,
       stack = true,
       required = false,
       readOnly = false,
@@ -36,6 +37,7 @@ const TextField = React.forwardRef(
       onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
       onClick?: (e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => void
       className?: string
+      prefix?: string | React.ReactNode | undefined
       suffix?: string | React.ReactNode | undefined
       stack?: boolean
       required?: boolean
@@ -72,6 +74,7 @@ const TextField = React.forwardRef(
           data-type={type}
           data-selected={selected}
         >
+          {prefix && (typeof prefix === 'string' ? <span className={styles.prefix}>{prefix}</span> : prefix)}
           {rows > 1 ? (
             <textarea
               id={field}
