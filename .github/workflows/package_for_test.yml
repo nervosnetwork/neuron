@@ -140,7 +140,7 @@ jobs:
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/commit-comment@v1
+      - uses: peter-evans/commit-comment@v2
         with:
           body: |
             Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
