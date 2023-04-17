@@ -13,8 +13,9 @@ import {
   getMultisigBalances,
   loadMultisigTxJson,
   OfflineSignJSON,
+  getMultisigSyncProgress,
 } from 'services/remote'
-import { addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 
 export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey: string) => void) => {
   const [keywords, setKeywords] = useState('')
@@ -279,12 +280,15 @@ export const useSubscription = ({
   walletId,
   isMainnet,
   configs,
+  isLightClient,
 }: {
   walletId: string
   isMainnet: boolean
   configs: MultisigConfig[]
+  isLightClient: boolean
 }) => {
   const [multisigBanlances, setMultisigBanlances] = useState<Record<string, string>>({})
+  const [multisigSyncProgress, setMultisigSyncProgress] = useState<Record<string, number>>({})
   const getAndSaveMultisigBalances = useCallback(() => {
     getMultisigBalances({ isMainnet, multisigAddresses: configs.map(v => v.fullPayload) }).then(res => {
       if (isSuccessResponse(res) && res.result) {
@@ -292,14 +296,41 @@ export const useSubscription = ({
       }
     })
   }, [setMultisigBanlances, isMainnet, configs])
+  const hashToPayload = useMemo(
+    () =>
+      configs.reduce<Record<string, string>>(
+        (pre, cur) => ({ ...pre, [scriptToHash(addressToScript(cur.fullPayload))]: cur.fullPayload }),
+        {}
+      ),
+    [configs]
+  )
+  const getAndSaveMultisigSyncProgress = useCallback(() => {
+    getMultisigSyncProgress(Object.keys(hashToPayload)).then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        const tmp: Record<string, number> = {}
+        res.result.forEach(v => {
+          if (hashToPayload[v.hash]) {
+            tmp[hashToPayload[v.hash]] = v.blockStartNumber
+          }
+        })
+        setMultisigSyncProgress(tmp)
+      }
+    })
+  }, [hashToPayload])
   useEffect(() => {
     const dataUpdateSubscription = MultisigOutputUpdate.subscribe(() => {
       getAndSaveMultisigBalances()
+      if (isLightClient) {
+        getAndSaveMultisigSyncProgress()
+      }
     })
     getAndSaveMultisigBalances()
+    if (isLightClient) {
+      getAndSaveMultisigSyncProgress()
+    }
     return () => {
       dataUpdateSubscription.unsubscribe()
     }
   }, [walletId, getAndSaveMultisigBalances])
-  return multisigBanlances
+  return { multisigBanlances, multisigSyncProgress }
 }

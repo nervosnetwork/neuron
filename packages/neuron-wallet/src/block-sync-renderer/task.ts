@@ -12,7 +12,7 @@ let syncQueue: SyncQueue | null
 export interface WorkerMessage<T = any> {
   type: 'call' | 'response' | 'kill',
   id?: number,
-  channel: 'start' | 'queryIndexer' | 'unmount' | 'cache-tip-block-updated' | 'tx-db-changed' | 'wallet-deleted' | 'address-created' | 'indexer-error' | 'check-and-save-wallet-address'
+  channel: 'start' | 'queryIndexer' | 'unmount' | 'cache-tip-block-updated' | 'tx-db-changed' | 'wallet-deleted' | 'address-created' | 'indexer-error' | 'check-and-save-wallet-address' | 'append_scripts'
   message: T
 }
 
@@ -72,6 +72,12 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
 
     case 'queryIndexer': {
       res = message ? await syncQueue?.getIndexerConnector()?.getLiveCellsByScript(message) : []
+      break
+    }
+    case 'append_scripts': {
+      if (Array.isArray(message)) {
+        await syncQueue?.appendLightScript(message)
+      }
       break
     }
     default: {

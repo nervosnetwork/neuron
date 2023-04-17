@@ -16,7 +16,7 @@ import IndexerCacheService from './indexer-cache-service'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import { ShouldInChildProcess } from 'exceptions'
-import { BlockTips, Connector } from './connector'
+import { AppendScript, BlockTips, Connector } from './connector'
 import LightConnector from './light-connector'
 import { generateRPC } from 'utils/ckb-rpc'
 import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
@@ -104,6 +104,10 @@ export default class Queue {
     if (this.#checkAndSaveQueue) {
       this.#checkAndSaveQueue.idle() ? true : await this.#checkAndSaveQueue.drain()
     }
+  }
+
+  async appendLightScript(scripts: AppendScript[]) {
+    await this.#indexerConnector?.appendScript(scripts)
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {

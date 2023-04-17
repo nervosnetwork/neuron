@@ -918,6 +918,7 @@
         "type": "类型",
         "balance": "余额",
         "copy-address": "复制地址",
+        "sync-block": "同步高度",
         "actions": {
           "info": "详情",
           "send": "转账",

@@ -6,19 +6,18 @@ import TransactionEntity from './entities/transaction'
 import SyncInfoEntity from './entities/sync-info'
 import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import MultisigOutput from './entities/multisig-output'
-import SyncProgressService from 'services/sync-progress'
+import SyncProgress from './entities/sync-progress'
 
 /*
  * Clean local sqlite storage
  */
 export const clean = async () => {
   await Promise.all([
-    ...[InputEntity, OutputEntity, TransactionEntity, IndexerTxHashCache, MultisigOutput].map(entity => {
+    ...[InputEntity, OutputEntity, TransactionEntity, IndexerTxHashCache, MultisigOutput, SyncProgress].map(entity => {
       return getConnection()
         .getRepository(entity)
         .clear()
-    }),
-    SyncProgressService.clear()
+    })
   ])
   MultisigOutputChangedSubject.getSubject().next('reset')
 

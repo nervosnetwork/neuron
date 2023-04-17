@@ -926,6 +926,7 @@
         "type": "type",
         "balance": "balance",
         "copy-address": "Copy Address",
+        "sync-block": "Synced Block",
         "actions": {
           "info": "Info",
           "send": "Send",
