@@ -245,6 +245,8 @@ const NervosDAO = () => {
       }
     } catch (error) {
       // ignore error
+      // When the depositValue is invalid, it displays the error in the textField, but it will throw an exception when valid wheater it's big than the max deposit value
+      // and when the depositValue is invalid, it's no need to set max depositValue.
     }
   }, [maxDepositAmount, depositValue, setDepositValue])
 
