@@ -9,15 +9,16 @@ const platformMock = jest.fn()
 const joinMock = jest.fn()
 const dirnameMock = jest.fn()
 const resolveMock = jest.fn()
-const resetSyncTaskQueueMock = jest.fn()
 const lightDataPathMock = jest.fn()
 const existsSyncMock = jest.fn()
 const readFileSyncMock = jest.fn()
 const mkdirSyncMock = jest.fn()
 const writeFileSyncMock = jest.fn()
+const createWriteStreamMock = jest.fn()
 const spawnMock = jest.fn()
 const loggerErrorMock = jest.fn()
 const loggerInfoMock = jest.fn()
+const transportsGetFileMock = jest.fn()
 
 function resetMock() {
   mockFn.mockReset()
@@ -27,15 +28,16 @@ function resetMock() {
   joinMock.mockReset()
   dirnameMock.mockReset()
   resolveMock.mockReset()
-  resetSyncTaskQueueMock.mockReset()
   lightDataPathMock.mockReset()
   existsSyncMock.mockReset()
   readFileSyncMock.mockReset()
   mkdirSyncMock.mockReset()
   writeFileSyncMock.mockReset()
+  createWriteStreamMock.mockReset()
   spawnMock.mockReset()
   loggerErrorMock.mockReset()
   loggerInfoMock.mockReset()
+  transportsGetFileMock.mockReset()
 }
 
 jest.doMock('../../src/env', () => ({
@@ -50,11 +52,10 @@ jest.doMock('../../src/env', () => ({
 jest.doMock('../../src/utils/logger', () => ({
   info: loggerInfoMock,
   error: loggerErrorMock,
-}))
-
-jest.doMock('../../src/block-sync-renderer', () => ({
-  resetSyncTaskQueue: {
-    push: resetSyncTaskQueueMock
+  transports: {
+    file: {
+      getFile: transportsGetFileMock
+    }
   }
 }))
 
@@ -83,6 +84,7 @@ jest.doMock('fs', () => ({
   readFileSync: readFileSyncMock,
   mkdirSync: mkdirSyncMock,
   writeFileSync: writeFileSyncMock,
+  createWriteStream: createWriteStreamMock
 }))
 
 jest.doMock('child_process', () => ({
@@ -92,6 +94,10 @@ jest.doMock('child_process', () => ({
 const { CKBLightRunner } = require('../../src/services/light-runner')
 
 describe('test light runner', () => {
+  beforeEach(() => {
+    transportsGetFileMock.mockReturnValue({ path: ''})
+    createWriteStreamMock.mockReturnValue({ write() {} })
+  })
   afterEach(() => {
     resetMock()
   })
@@ -207,7 +213,6 @@ describe('test light runner', () => {
       existsSyncMock.mockReturnValue(true)
       await CKBLightRunner.getInstance().start()
       expect(mockFn).toBeCalledTimes(1)
-      expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       CKBLightRunner.getInstance().stop = tmp
     })
     it('when runnerProcess is undefined', async () => {
@@ -219,7 +224,6 @@ describe('test light runner', () => {
       existsSyncMock.mockReturnValue(true)
       await CKBLightRunner.getInstance().start()
       expect(mockFn).toBeCalledTimes(0)
-      expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       CKBLightRunner.getInstance().stop = tmp
     })
     it('when runnerProcess is undefined and on error', async () => {
@@ -230,7 +234,6 @@ describe('test light runner', () => {
       await CKBLightRunner.getInstance().start()
       expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
       expect(mockFn).toBeCalledTimes(0)
-      expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.emit('error', 'errorInfo')
       expect(loggerErrorMock).toBeCalledWith('CKB Light Runner:\trun fail:', 'errorInfo')
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
@@ -243,7 +246,6 @@ describe('test light runner', () => {
       await CKBLightRunner.getInstance().start()
       expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
       expect(mockFn).toBeCalledTimes(0)
-      expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.emit('close', 'closeInfo')
       expect(loggerInfoMock).toBeCalledWith('CKB Light Runner:\tprocess closed')
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
@@ -257,10 +259,9 @@ describe('test light runner', () => {
       await CKBLightRunner.getInstance().start()
       expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
       expect(mockFn).toBeCalledTimes(0)
-      expect(resetSyncTaskQueueMock).toHaveBeenLastCalledWith(true)
       eventEmitter.stderr.emit('data', 'error-data')
       expect(loggerErrorMock).toBeCalledWith('CKB Light Runner:\trun fail:', 'error-data')
-      expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
+      expect(CKBLightRunner.getInstance().runnerProcess).toBeDefined()
     })
   })
 
@@ -268,7 +269,6 @@ describe('test light runner', () => {
     it('runnerProcess is undefined', async () => {
       CKBLightRunner.getInstance().runnerProcess = undefined
       await CKBLightRunner.getInstance().stop()
-      expect(resetSyncTaskQueueMock).toBeCalledWith(false)
     })
     it('runnerProcess is defined', async () => {
       const emitter: EventEmitter & { kill?: Function } = new EventEmitter()

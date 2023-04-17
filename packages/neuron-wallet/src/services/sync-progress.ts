@@ -1,11 +1,17 @@
 import { getConnection, In, Not } from 'typeorm'
-import SyncProgress from 'database/chain/entities/sync-progress'
+import SyncProgress, { SyncAddressType } from 'database/chain/entities/sync-progress'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { HexString } from '@ckb-lumos/base'
+import WalletService from './wallets'
 
 export default class SyncProgressService {
   static async resetSyncProgress(
-    params: { script: CKBComponents.Script; scriptType: CKBRPC.ScriptType; walletId: string }[]
+    params: {
+      script: CKBComponents.Script
+      scriptType: CKBRPC.ScriptType
+      walletId: string
+      addressType?: SyncAddressType
+    }[]
   ) {
     await getConnection()
       .getRepository(SyncProgress)
@@ -22,6 +28,15 @@ export default class SyncProgressService {
       .update(SyncProgress)
       .set({ delete: true })
       .where({ walletId: Not(In(existWalletIds)) })
+      .execute()
+  }
+
+  static async removeByHashesAndAddressType(addressType: SyncAddressType, existHashes?: string[]) {
+    await getConnection()
+      .createQueryBuilder()
+      .update(SyncProgress)
+      .set({ delete: true })
+      .where({ ...(existHashes?.length ? { hash: Not(In(existHashes)) } : {}), addressType })
       .execute()
   }
 
@@ -64,20 +79,33 @@ export default class SyncProgressService {
     await getConnection().manager.update(SyncProgress, { hash }, { blockStartNumber, blockEndNumber, cursor })
   }
 
-  static async getMinBlockNumber() {
+  static async getCurrentWalletMinBlockNumber() {
+    const currentWallet = WalletService.getInstance().getCurrent()
     const item = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
+      .where({ delete: false, ...(currentWallet ? { walletId: currentWallet.id } : {}) })
       .orderBy('blockEndNumber', 'ASC')
       .getOne()
     return item?.blockEndNumber || 0
   }
 
-  static async clear() {
-    await getConnection()
+  static async getWalletMinBlockNumber() {
+    const items = await getConnection()
+      .getRepository(SyncProgress)
       .createQueryBuilder()
-      .update(SyncProgress)
-      .set({ blockStartNumber: 0, blockEndNumber: 0 })
-      .execute()
+      .select('MIN(blockStartNumber) as blockStartNumber, walletId')
+      .where({ addressType: SyncAddressType.Default })
+      .groupBy('walletId')
+      .getMany()
+    return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.walletId]: cur.blockStartNumber }), {})
+  }
+
+  static async getSyncProgressByHashes(hashes: string[]) {
+    return await getConnection()
+      .getRepository(SyncProgress)
+      .createQueryBuilder()
+      .where({ hash: In(hashes) })
+      .getMany()
   }
 }

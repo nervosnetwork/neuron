@@ -915,6 +915,7 @@
         "type": "類型",
         "balance": "余额",
         "copy-address": "復製地址",
+        "sync-block": "同步高度",
         "actions": {
           "info": "詳情",
           "send": "轉賬",

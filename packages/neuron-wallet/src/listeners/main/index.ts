@@ -21,7 +21,7 @@ export const register = () => {
 
   MultisigConfigDbChangedSubject.getSubject()
     .pipe(debounceTime(500))
-    .subscribe(async (event: string) => {
+    .subscribe(async event => {
       try {
         if (event === 'AfterInsert') {
           await MultisigService.saveLiveMultisigOutput()

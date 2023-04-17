@@ -15,6 +15,7 @@ import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import { stopCkbNode } from 'services/ckb-runner'
 import startMonitor from 'services/monitor'
+import { CKBLightRunner } from 'services/light-runner'
 
 const app = electronApp
 
@@ -62,6 +63,7 @@ export default class AppController {
       return
     }
     await stopCkbNode()
+    await CKBLightRunner.getInstance().stop()
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {

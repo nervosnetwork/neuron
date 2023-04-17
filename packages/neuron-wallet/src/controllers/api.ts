@@ -57,6 +57,7 @@ import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
 import startMonitor, { stopMonitor } from 'services/monitor'
 import { migrateCkbData } from 'services/ckb-runner'
+import SyncProgressService from 'services/sync-progress'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -683,6 +684,14 @@ export default class ApiController {
     handle('start-migrate', async () => {
       migrateCkbData()
       return {
+        status: ResponseCode.Success,
+      }
+    })
+
+    //light client
+    handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
+      return {
+        result: (await SyncProgressService.getSyncProgressByHashes(hashes)),
         status: ResponseCode.Success,
       }
     })
