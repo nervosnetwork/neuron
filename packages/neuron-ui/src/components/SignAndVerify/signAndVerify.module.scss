@@ -30,7 +30,7 @@
 }
 
 .resultDialog {
-  img {
+  svg {
     width: 64px;
     height: 64px;
     margin-bottom: 12px;
@@ -193,7 +193,7 @@
   justify-content: center;
   animation-name: notification;
   animation-duration: 0.4s;
-  div {
+  .content {
     z-index: 1000;
     padding: 14px 32px;
     color: var(--primary-color);

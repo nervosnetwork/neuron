@@ -9,7 +9,7 @@ import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
-import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.svg'
+import { ReactComponent as VerificationFailureIcon } from 'widgets/Icons/VerificationFailure.svg'
 import { InfoCircleOutlined } from 'widgets/Icons/icon'
 import Dialog from 'widgets/Dialog'
 import Tooltip from 'widgets/Tooltip'
@@ -112,7 +112,7 @@ const Notifications = ({ notification, onDismiss, t, failReason }: Notifications
         }}
       >
         <div className={styles.resultDialog}>
-          <img src={VerificationFailureIcon} alt="failure" />
+          <VerificationFailureIcon />
           <span>{t('sign-and-verify.verification-failure')}</span>
           <span className={styles.failReason}>
             {notification === 'address-not-found' ? t('sign-and-verify.address-not-found') : failReason}
@@ -137,7 +137,7 @@ const VerifySuccess = ({ onDismiss, t }: { onDismiss: () => void; t: TFunction }
 
   return (
     <div className={styles.successNotification}>
-      <div>
+      <div className={styles.content}>
         <SuccessCircle />
         {t('sign-and-verify.verification-success')}
       </div>
