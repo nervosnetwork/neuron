@@ -97,7 +97,7 @@ export default class SyncProgressService {
       .select('MIN(blockStartNumber) as blockStartNumber, walletId')
       .where({ addressType: SyncAddressType.Default })
       .groupBy('walletId')
-      .getMany()
+      .getRawMany<{ blockStartNumber: number; walletId: string }>()
     return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.walletId]: cur.blockStartNumber }), {})
   }
 

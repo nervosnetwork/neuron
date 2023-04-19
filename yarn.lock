@@ -1230,6 +1230,20 @@
   dependencies:
     jsbi "^4.1.0"
 
+"@ckb-lumos/bi@0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.19.0.tgz#ccd7e9e32e58eec7effc78cd171eb79f0f858d4a"
+  integrity sha512-+EFkUOqCtIwilAfrd680wEeMTXME9Wjjyl436+0x32jlbfo4sa+iNqwPaTjUQ2/SDwsuqK3eB+DntYxxFxoEtw==
+  dependencies:
+    jsbi "^4.1.0"
+
+"@ckb-lumos/codec@0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.19.0.tgz#c9cda5e37fd5591abeaac9d5ed9577cfad206c09"
+  integrity sha512-MAts5rm5xLcvPslW6HwU/TlRoJ3jTtgsdtyakIa7qQo+0DlHdV6BOxTNDPtP3yqp8p5YFef7uCi/rcpi/KOGwA==
+  dependencies:
+    "@ckb-lumos/bi" "^0.19.0"
+
 "@ckb-lumos/rpc@0.18.0":
   version "0.18.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.18.0.tgz#3858b5eaa4b06a90d4a0931cc3168fab835f4a0c"

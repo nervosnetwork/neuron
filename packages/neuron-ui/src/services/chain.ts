@@ -1,17 +1,14 @@
 import CKBCore from '@nervosnetwork/ckb-sdk-core'
 
 export const ckbCore = new CKBCore('')
-export const { getHeader, getBlockchainInfo, getTipHeader, getHeaderByNumber } = ckbCore.rpc
-
-export const { calculateDaoMaximumWithdraw } = ckbCore
+export const { getHeader, getTipHeader, getTransaction } = ckbCore.rpc
 
 export const { toUint64Le, parseEpoch } = ckbCore.utils
+
 export default {
   ckbCore,
-  getBlockchainInfo,
   getHeader,
   getTipHeader,
-  getHeaderByNumber,
-  calculateDaoMaximumWithdraw,
+  getTransaction,
   toUint64Le,
 }
