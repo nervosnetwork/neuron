@@ -12,6 +12,9 @@ import AddressService from './addresses'
 import { DeviceInfo } from './hardware/common'
 import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
 import { getConnection, In, Not } from 'typeorm'
+import NetworksService from './networks'
+import { NetworkType } from 'models/network'
+import { resetSyncTaskQueue } from 'block-sync-renderer'
 
 const fileService = FileService.getInstance()
 
@@ -444,6 +447,11 @@ export default class WalletService {
       if (!wallet) {
         throw new WalletNotFound(id)
       }
+    }
+
+    const network = NetworksService.getInstance().getCurrent()
+    if (network.type === NetworkType.Light) {
+      resetSyncTaskQueue.asyncPush(true)
     }
 
     this.listStore.writeSync(this.currentWalletKey, id)

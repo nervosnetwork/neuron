@@ -33,8 +33,6 @@ import AddressParser from 'models/address-parser'
 import MultisigConfigModel from 'models/multisig-config'
 import NodeService from 'services/node'
 import { generateRPC } from 'utils/ckb-rpc'
-import { resetSyncTaskQueue } from 'block-sync-renderer'
-import { NetworkType } from 'models/network'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
@@ -367,10 +365,6 @@ export default class WalletsController {
     const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
     if (!currentWallet || id !== currentWallet.id) {
       throw new CurrentWalletNotSet()
-    }
-    const network = NetworksService.getInstance().getCurrent()
-    if (network.type === NetworkType.Light) {
-      resetSyncTaskQueue.asyncPush(true)
     }
     return {
       status: ResponseCode.Success,
