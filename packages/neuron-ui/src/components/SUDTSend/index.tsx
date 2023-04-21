@@ -414,7 +414,7 @@ const SUDTSend = () => {
                       <TooltipIcon width={12} height={12} />
                     </span>
                   ) : null}
-                  {v.key === SendType.secp256Cheque ? (
+                  {(v.key === SendType.secp256Cheque && !isMainnet) ? (
                     <div className={styles.chequeWarning}>
                       <WarningAttention />
                       {t('messages.light-client-cheque-warning')}

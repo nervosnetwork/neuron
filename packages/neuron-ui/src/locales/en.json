@@ -509,8 +509,8 @@
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
       "migrate": "Migrate",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
-      "light-client-locktime-warning": "Warning: Light client is not support show lock-time CKBytes.",
-      "light-client-cheque-warning": "Warning: Light client is not support show Cheque assets.",
+      "light-client-locktime-warning": "Warning: Light client mode doesn't support showing lock-time CKBytes.",
+      "light-client-cheque-warning": "Warning: Light client mode doesn't support showing Cheque assets.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",

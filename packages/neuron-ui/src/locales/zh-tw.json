@@ -501,8 +501,8 @@
       "rebuild-sync": "為了提供更好的用戶體驗，Neuron 採取了新的存儲方案，該方案需要壹次性遷移數據(預期同步時間為 20~60 分鐘)。\n抱歉給您帶來不便。",
       "migrate": "遷移",
       "secp256k1/blake160-address-required": "請輸入 secp256k1/blake160 地址",
-      "light-client-locktime-warning": "註意: 輕節點錢包不支持展示到期解鎖的 CKBytes。",
-      "light-client-cheque-warning": "註意: 輕節點錢包不支持展示 Cheque 資產。",
+      "light-client-locktime-warning": "註意: 輕節點模式不支持展示到期解鎖的 CKBytes。",
+      "light-client-cheque-warning": "註意: 輕節點模式不支持展示 Cheque 資產。",
       "fields": {
         "wallet": "錢包",
         "name": "名稱",
