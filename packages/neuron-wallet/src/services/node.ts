@@ -222,7 +222,7 @@ class NodeService {
 
   private async verifyNodeVersion() {
     const network = NetworksService.getInstance().getCurrent()
-    const localNodeInfo = await new RpcService(network.remote).getLocalNodeInfo()
+    const localNodeInfo = await new RpcService(network.remote).localNodeInfo()
     const internalNodeVersion = this.getInternalNodeVersion()
     const [internalMajor, internalMinor] = internalNodeVersion?.split('.') ?? []
     const [externalMajor, externalMinor] = localNodeInfo.version?.split('.') ?? []

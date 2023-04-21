@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getFeeRateStats } from 'services/chain'
 import { AppActions, StateDispatch, useDispatch } from 'states'
-import { MEDIUM_FEE_RATE } from 'utils/const'
+import { MEDIUM_FEE_RATE, METHOD_NOT_FOUND } from 'utils/const'
 
 type CountdownOptions = {
   seconds?: number
@@ -27,6 +27,14 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
           setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
         })
         .catch((err: Error) => {
+          try {
+            const errMsg = JSON.parse(err.message)
+            if (errMsg?.code === METHOD_NOT_FOUND) {
+              return
+            }
+          } catch (error) {
+            //ignore, show error default
+          }
           stateDispatch({
             type: AppActions.AddNotification,
             payload: {
