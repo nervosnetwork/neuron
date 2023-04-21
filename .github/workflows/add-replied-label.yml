@@ -25,7 +25,7 @@ jobs:
       - id: add-label
         name: Add 'replied' label
         if: steps.check-access.outputs.hasWriteAccess
-        uses: actions-ecosystem/action-add-label@v1
+        uses: actions-ecosystem/action-add-labels@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
