@@ -44,7 +44,7 @@ const NervosDAO = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
-      tipBlockHash,
+      tipDao,
       tipBlockTimestamp,
       epoch,
     },
@@ -110,7 +110,15 @@ const NervosDAO = () => {
     isBalanceReserved,
     suggestFeeRate,
   })
-  hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
+  const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
+  hooks.useInitData({
+    clearGeneratedTx,
+    dispatch,
+    updateDepositValue,
+    wallet,
+    setGenesisBlockTimestamp,
+    genesisBlockHash,
+  })
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
   const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
     activeRecord,
@@ -146,7 +154,7 @@ const NervosDAO = () => {
   )} CKB`
   hooks.useUpdateWithdrawList({
     records,
-    tipBlockHash,
+    tipDao,
     setWithdrawList,
   })
 
@@ -198,13 +206,14 @@ const NervosDAO = () => {
             const key = record.depositOutPoint
               ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
               : `${record.outPoint.txHash}-${record.outPoint.index}`
+            const txHash = record.depositOutPoint ? record.depositOutPoint.txHash : record.outPoint.txHash
 
             const props: DAORecordProps = {
               ...record,
               tipBlockTimestamp,
               withdrawCapacity: withdrawList.get(key) || null,
               onClick: onActionClick,
-              depositEpoch: depositEpochList.get(key) || '',
+              depositEpoch: depositEpochList.get(txHash) || '',
               currentEpoch: epoch,
               genesisBlockTimestamp,
               connectionStatus,
@@ -321,11 +330,11 @@ const NervosDAO = () => {
         record={activeRecord}
         onDismiss={onWithdrawDialogDismiss}
         onSubmit={onWithdrawDialogSubmit}
-        tipBlockHash={tipBlockHash}
+        tipDao={tipDao}
         currentEpoch={epoch}
       />
     ) : null
-  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
+  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipDao, epoch])
 
   const free = BigInt(wallet.balance)
   const locked = records

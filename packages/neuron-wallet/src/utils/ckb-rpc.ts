@@ -9,6 +9,7 @@ import https from 'https'
 import http from 'http'
 import { request } from 'undici'
 import { BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from './const'
+import CommonUtils from './common'
 
 export interface LightScriptFilter {
   script: CKBComponents.Script
@@ -85,6 +86,14 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     paramsFormatters: [paramsFormatter.toRawTransaction],
     resultFormatters: resultFormatter.toHash,
   },
+  fetchTransaction: {
+    method: 'fetch_transaction',
+    paramsFormatters: [paramsFormatter.toHash],
+    resultFormatters: (result: { status: 'fetched' | 'fetching' | 'added' | 'not_found', data?: RPC.TransactionWithStatus }) => {
+      if (result.status === 'fetched' && result.data) {return resultFormatter.toTransactionWithStatus(result.data)}
+      return null
+    }
+  }
 }
 
 export class FullCKBRPC extends CKBRPC {
@@ -107,10 +116,12 @@ export class LightRPC extends Base {
     afterCursor: HexString
   ) => Promise<{ lastCursor: HexString, txs: { txHash: HexString, txIndex: HexString, blockNumber: CKBComponents.BlockNumber }[]}>
 
-  getGenesisBlock: () => Promise<CKBComponents.Block>
-  exceptionMethods = ['getCurrentEpoch', 'getEpochByNumber', 'getBlockHash']
-  coverMethods = ['getTipBlockNumber', 'syncState', 'getBlockchainInfo', 'sendTransaction']
+  getTransactionInLight: Base['getTransaction']
+  fetchTransaction: (hash: string) => Promise<CKBComponents.TransactionWithStatus | null>
 
+  getGenesisBlock: () => Promise<CKBComponents.Block>
+  exceptionMethods = ['getCurrentEpoch', 'getEpochByNumber', 'getBlockHash', 'getLiveCell']
+  coverMethods = ['getTipBlockNumber', 'syncState', 'getBlockchainInfo', 'sendTransaction', 'getTransaction']
 
   constructor(url: string) {
     super()
@@ -131,6 +142,21 @@ export class LightRPC extends Base {
     this.getGenesisBlock = new Method(this.node, { name: 'getGenesisBlock', ...lightRPCProperties['getGenesisBlock'] }).call
     const sendTransactionMethod = new Method(this.node, { name: 'sendTransaction', ...lightRPCProperties['sendTransaction'] })
     this.sendTransaction = (tx: CKBComponents.RawTransaction) => sendTransactionMethod.call(tx)
+    this.getTransactionInLight = new Method(this.node, { name: 'getTransaction', ...this.rpcProperties['getTransaction'] }).call
+    this.fetchTransaction = new Method(this.node, { name: 'fetchTransaction', ...lightRPCProperties['fetchTransaction'] }).call
+  }
+
+  getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
+    let tx = await this.getTransactionInLight(hash)
+    if (!tx?.transaction) {
+      tx = await CommonUtils.retry(3, 100, async () => {
+        const tmp = await this.fetchTransaction(hash)
+        if (tmp === null) {throw new Error('Not fetch the transaction current')}
+        return tmp
+      })
+      if (!tx) {throw new Error(`Fetch transaction tx failed, please try it later: ${hash}`)}
+    }
+    return tx
   }
 
   getTipBlockNumber = async () => {
@@ -238,7 +264,7 @@ export class LightRPC extends Base {
         async value() {
           const payload = proxied.map(([f, ...p], i) => {
             try {
-              const method = new Method(ctx.node, { ...ctx.rpcProperties[f], name: f })
+              const method = new Method(ctx.node, { ...({ ...ctx.rpcProperties, ...lightRPCProperties }[f]), name: f })
               return method.getPayload(...p)
             } catch (err) {
               throw new PayloadInBatchException(i, err.message)
@@ -256,7 +282,7 @@ export class LightRPC extends Base {
             if (res.id !== payload[i].id) {
               return new IdNotMatchedInBatchException(i, payload[i].id, res.id)
             }
-            return ctx.rpcProperties[proxied[i][0]].resultFormatters?.(res.result) ?? res.result
+            return ({ ...ctx.rpcProperties, ...lightRPCProperties })[proxied[i][0]].resultFormatters?.(res.result) ?? res.result
           })
         },
       },

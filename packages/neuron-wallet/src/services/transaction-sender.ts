@@ -18,7 +18,6 @@ import Output from 'models/chain/output'
 import RpcService from 'services/rpc-service'
 import WitnessArgs from 'models/chain/witness-args'
 import Transaction from 'models/chain/transaction'
-import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
 import Multisig from 'models/multisig'
 import Blake2b from 'models/blake2b'
@@ -43,6 +42,7 @@ import { SignStatus } from 'models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from 'utils/ckb-rpc'
 import CKB from '@nervosnetwork/ckb-sdk-core'
+import CellsService from './cells'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -535,19 +535,15 @@ export default class TransactionSender {
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const changeAddress: string = await this.getChangeAddress()
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
-    // for some reason with data won't work
-    const cellWithStatus = await rpcService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index), true)
-    const prevOutput = cellWithStatus.cell!.output
-    if (!cellWithStatus.isLive()) {
+    const nftCellOutput = await CellsService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index))
+    if (!nftCellOutput) {
       throw new CellIsNotYetLive()
     }
 
     const tx = await TransactionGenerator.generateTransferNftTx(
       walletId,
       outPoint,
-      prevOutput,
+      nftCellOutput,
       receiveAddress,
       changeAddress,
       fee,
@@ -592,8 +588,8 @@ export default class TransactionSender {
 
     const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
-    const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
-    if (!cellWithStatus.isLive()) {
+    const depositeOutput = await CellsService.getLiveCell(outPoint)
+    if (!depositeOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = await rpcService.getTransaction(outPoint.txHash)
@@ -605,11 +601,10 @@ export default class TransactionSender {
 
     const wallet = WalletService.getInstance().get(walletID)
     const changeAddress = await wallet.getNextChangeAddress()
-    const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
       outPoint,
-      prevOutput,
+      depositeOutput,
       depositBlockHeader!.number,
       depositBlockHeader!.hash,
       changeAddress!.address,
@@ -636,8 +631,8 @@ export default class TransactionSender {
     const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
 
-    const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
-    if (!cellStatus.isLive()) {
+    const withdrawOutput = await CellsService.getLiveCell(withdrawingOutPoint)
+    if (!withdrawOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = (await rpcService.getTransaction(withdrawingOutPoint.txHash))!
@@ -648,12 +643,23 @@ export default class TransactionSender {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
 
-    const content = cellStatus.cell!.data!.content
-    const buf = Buffer.from(content.slice(2), 'hex')
-    const depositBlockNumber: bigint = buf.readBigUInt64LE()
-    const depositBlockHeader: BlockHeader = (await rpcService.getHeaderByNumber(depositBlockNumber.toString()))!
+    const content = withdrawOutput.daoData
+    if (!content) {
+      throw new Error(`Withdraw output cell is not a dao cell, ${withdrawOutput.outPoint?.txHash}`)
+    }
+    if (!withdrawOutput.depositOutPoint) {
+      throw new Error('DAO has not finish step first withdraw')
+    }
+    const depositeTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
+    if (!depositeTx?.txStatus.blockHash) {
+      throw new Error(`Get deposite block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
+    }
+    const depositBlockHeader = await rpcService.getHeader(depositeTx.txStatus.blockHash)
+    if (!depositBlockHeader) {
+      throw new Error(`Get Header failed with blockHash ${depositeTx.txStatus.blockHash}`)
+    }
     const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
-    const depositCapacity: bigint = BigInt(cellStatus.cell!.output.capacity)
+    const depositCapacity: bigint = BigInt(withdrawOutput.capacity)
 
     const withdrawBlockHeader = (await rpcService.getHeader(prevTx.txStatus.blockHash!))!
     const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlockHeader.epoch))
@@ -687,12 +693,11 @@ export default class TransactionSender {
 
     const outputs: Output[] = [output]
 
-    const previousOutput = cellStatus.cell!.output
     const input: Input = new Input(
       withdrawingOutPoint,
       minimalSince.toString(),
-      previousOutput.capacity,
-      previousOutput.lock
+      withdrawOutput.capacity,
+      withdrawOutput.lock
     )
 
     const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(WitnessArgs.EMPTY_LOCK, '0x0000000000000000')
@@ -754,8 +759,8 @@ export default class TransactionSender {
 
     const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
-    const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
-    if (!cellWithStatus.isLive()) {
+    const locktimeOutput = await CellsService.getLiveCell(outPoint)
+    if (!locktimeOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = await rpcService.getTransaction(outPoint.txHash)
@@ -767,10 +772,9 @@ export default class TransactionSender {
     const receivingAddressInfo = await wallet.getNextAddress()
 
     const receivingAddress = receivingAddressInfo!.address
-    const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
       outPoint,
-      prevOutput,
+      locktimeOutput,
       receivingAddress,
       fee,
       feeRate

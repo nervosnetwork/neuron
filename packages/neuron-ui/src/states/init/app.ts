@@ -12,10 +12,7 @@ const initNotifications: Array<State.Message> = [
 
 export const appState: State.App = {
   tipBlockNumber: '',
-  tipBlockHash: '',
   tipBlockTimestamp: 0,
-  chain: '',
-  difficulty: BigInt(0),
   epoch: '',
   send: {
     txID: '',

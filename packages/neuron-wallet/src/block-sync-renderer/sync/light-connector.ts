@@ -14,6 +14,9 @@ import HexUtils from 'utils/hex'
 import Multisig from 'services/multisig'
 import { SyncAddressType } from 'database/chain/entities/sync-progress'
 import WalletService from 'services/wallets'
+import AssetAccountInfo from 'models/asset-account-info'
+import { DepType } from 'models/chain/cell-dep'
+import { molecule, number } from '@ckb-lumos/codec'
 
 interface SyncQueueParam {
   script: CKBComponents.Script
@@ -21,6 +24,16 @@ interface SyncQueueParam {
   blockRange: [HexString, HexString]
   cursor?: HexString
 }
+
+const unpackGroup = molecule.vector(
+  molecule.struct(
+    {
+      tx_hash: number.Uint256BE,
+      index: number.Uint32LE
+    },
+    ['tx_hash', 'index']
+  )
+)
 
 export default class LightConnector extends Connector<CKBComponents.Hash> {
   private lightRpc: LightRPC
@@ -42,8 +55,50 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     this.indexer = new CkbIndexer(nodeUrl, nodeUrl)
     this.lightRpc = new LightRPC(nodeUrl)
     this.addressMetas = addresses.map(address => AddressMeta.fromObject(address))
+    this.indexerQueryQueue = queue(this.collectLiveCellsByScript.bind(this))
 
-    this.indexerQueryQueue = queue(this.collectLiveCellsByScript)
+    // fetch some dep cell
+    this.fetchDepCell()
+  }
+
+  private async fetchDepCell() {
+    const assetAccountInfo = new AssetAccountInfo()
+    const fetchCellDeps = [
+      assetAccountInfo.anyoneCanPayCellDep,
+      assetAccountInfo.sudtCellDep,
+      assetAccountInfo.getNftClassInfo().cellDep,
+      assetAccountInfo.getNftInfo().cellDep,
+      assetAccountInfo.getNftIssuerInfo().cellDep,
+      assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep,
+      assetAccountInfo.getChequeInfo().cellDep
+    ]
+    const fetchTxHashes = fetchCellDeps
+      .map(v => v.outPoint.txHash)
+      .map<[string, string]>(v => ['fetchTransaction', v])
+    let txs = await this.lightRpc
+      .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | null)[]>(fetchTxHashes)
+      .exec()
+    if (txs.some(v => !v)) {
+      // if some txs fetch to added, then fetch the actural txs
+      txs = await this.lightRpc
+        .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | null)[]>(fetchTxHashes)
+        .exec()
+    }
+    const depGroupOutputsData: string[] = fetchCellDeps
+      .map((v, idx) => {
+        if (v.depType === DepType.DepGroup) {
+          return txs[idx]?.transaction?.outputsData?.[+v.outPoint.index]
+        }
+      })
+      .filter<string>((v): v is string => !!v)
+    const depGroupTxHashes = [
+      ...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.tx_hash.toHexString())).flat())
+    ]
+    await this.lightRpc
+      .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | null)[]>(
+        depGroupTxHashes.map(v => ['fetchTransaction', v])
+      )
+      .exec()
   }
 
   private async synchronize() {
