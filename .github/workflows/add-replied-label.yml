@@ -22,9 +22,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - id: check-issue
+        name: Check if the comment is replied in an issue
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const response = await github.repos.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            return { isIssue: !response.data.pull_request }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - id: add-label
         name: Add 'replied' label
-        if: steps.check-access.outputs.hasWriteAccess
+        if: ${{ steps.check-access.outputs.hasWriteAccess && steps.check-issue.outputs.isIssue }}
         uses: actions-ecosystem/action-add-labels@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
