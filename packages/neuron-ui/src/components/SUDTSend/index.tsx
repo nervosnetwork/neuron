@@ -11,6 +11,7 @@ import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
+import { ReactComponent as WarningAttention } from 'widgets/Icons/ExperimentalAttention.svg'
 import { getSUDTAccount, destoryAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
@@ -415,7 +416,7 @@ const SUDTSend = () => {
                   ) : null}
                   {v.key === SendType.secp256Cheque ? (
                     <div className={styles.chequeWarning}>
-                      <Attention />
+                      <WarningAttention />
                       {t('messages.light-client-cheque-warning')}
                     </div>
                   ) : null}
