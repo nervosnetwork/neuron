@@ -134,7 +134,8 @@ export default {
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
       'no-match-address-for-sign': 'Not found matched address',
       'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address',
-      'no-exist-ckb-node-data': '{{path}} has no CKB Node config and storage, press ok to synchronize from scratch'
+      'no-exist-ckb-node-data': '{{path}} has no CKB Node config and storage, press ok to synchronize from scratch',
+      'light-client-sudt-acp-error': "Light client is not support send assets to other's asset address"
     },
     messageBox: {
       button: {

@@ -29,7 +29,15 @@ import {
 } from 'utils'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
-import { AddressLockType, getGenerator, useAddressLockType, useOnSumbit, useOptions, useSendType } from './hooks'
+import {
+  AddressLockType,
+  SendType,
+  getGenerator,
+  useAddressLockType,
+  useOnSumbit,
+  useOptions,
+  useSendType,
+} from './hooks'
 import styles from './sUDTSend.module.scss'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
@@ -404,6 +412,12 @@ const SUDTSend = () => {
                     <span className={styles.optionTooltip} data-tooltip={t(`s-udt.send.${v.tooltip}`, v?.params)}>
                       <TooltipIcon width={12} height={12} />
                     </span>
+                  ) : null}
+                  {v.key === SendType.secp256Cheque ? (
+                    <div className={styles.chequeWarning}>
+                      <Attention />
+                      {t('messages.light-client-cheque-warning')}
+                    </div>
                   ) : null}
                 </div>
               ))}

@@ -163,6 +163,7 @@ const SendFieldset = ({
             <div className={styles.locktimeWarn}>
               <Attention />
               {t('send.locktime-warning')}
+              {t('messages.light-client-locktime-warning')}
             </div>
           )}
         </div>
