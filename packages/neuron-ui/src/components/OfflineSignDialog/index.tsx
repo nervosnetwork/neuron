@@ -1,11 +1,10 @@
-import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
-import Spinner from 'widgets/Spinner'
+import Dialog from 'widgets/Dialog'
 import HardwareSign from 'components/HardwareSign'
-import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter, useDidMount } from 'utils'
+import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
   useState as useGlobalState,
@@ -40,7 +39,6 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const navigate = useNavigate()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -50,12 +48,6 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
     setPassword('')
     setError('')
   }, [signType, setError, setPassword])
-
-  useDidMount(() => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal()
-    }
-  })
 
   const disabled = !password || isSigning
 
@@ -207,29 +199,19 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
   }
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
-      <form onSubmit={onSubmit}>
-        <h2 className={styles.title}>{title}</h2>
-        <TextField
-          label={t('password-request.password')}
-          value={password}
-          field="password"
-          type="password"
-          title={t('password-request.password')}
-          onChange={onChange}
-          autoFocus
-          required
-          className={styles.passwordInput}
-          error={error}
-        />
-        <div className={styles.footer}>
-          <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-          <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-            {isSigning ? <Spinner /> : (t('common.confirm') as string)}
-          </Button>
-        </div>
-      </form>
-    </dialog>
+    <Dialog show title={title} onCancel={onDismiss} onConfirm={onSubmit} disabled={disabled} isLoading={isSigning}>
+      <TextField
+        label={t('password-request.password')}
+        value={password}
+        field="password"
+        type="password"
+        title={t('password-request.password')}
+        onChange={onChange}
+        autoFocus
+        className={styles.passwordInput}
+        error={error}
+      />
+    </Dialog>
   )
 }
 

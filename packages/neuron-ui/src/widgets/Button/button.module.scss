@@ -58,8 +58,7 @@
     vertical-align: sub;
     margin-left: 4px;
     & > path {
-      fill: white;
+      fill: var(--primary-text-color);
     }
   }
 }
-
