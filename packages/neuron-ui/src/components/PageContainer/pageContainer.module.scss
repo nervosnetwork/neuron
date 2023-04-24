@@ -116,3 +116,26 @@
   flex: 1 1 auto;
   padding-bottom: 24px;
 }
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #999;
+
+  @media (prefers-color-scheme: dark) {
+    color: #666;
+  }
+
+  & > a {
+    color: inherit;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  & > :last-child {
+    color: var(--main-text-color);
+  }
+}
