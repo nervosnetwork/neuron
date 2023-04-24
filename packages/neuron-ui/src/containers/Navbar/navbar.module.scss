@@ -102,7 +102,7 @@ $hover-bg-color: #3cc68a4d;
   flex-direction: column;
   grid-area: navs;
 
-  button {
+  a {
     @include navItem;
     appearance: none;
     border: none;
@@ -120,7 +120,7 @@ $hover-bg-color: #3cc68a4d;
       @include activity;
     }
 
-    &[data-active='true'] {
+    &.active {
       @include activity;
       & .arrow {
         transform: rotate(90deg);
@@ -150,13 +150,13 @@ $hover-bg-color: #3cc68a4d;
       }
     }
 
-    button {
+    a {
       &:hover {
         background-color: transparent;
         color: #fff;
       }
 
-      &[data-active='true'] {
+      &.active {
         background-color: transparent;
         color: #fff;
       }
