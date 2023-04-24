@@ -92,6 +92,9 @@
     position: relative;
     .content {
       width: 648px;
+      textarea {
+        font-family: 'JetBrains Mono';
+      }
     }
     .arrow {
       display: flex;
@@ -118,6 +121,12 @@
       background: var(--secondary-background-color);
       box-shadow: 0px 1px 4px #eeeeee;
       border-radius: 8px;
+      .title {
+        font-family: 'JetBrains Mono';
+        span {
+          font-family: 'JetBrains Mono';
+        }
+      }
       @media (prefers-color-scheme: dark) {
         box-shadow: none;
         border: 1px solid var(--border-color);

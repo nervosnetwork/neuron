@@ -129,9 +129,7 @@ const VerifySuccess = ({ onDismiss, t }: { onDismiss: () => void; t: TFunction }
       onDismiss()
     }, 3000)
     return () => {
-      if (timer) {
-        clearTimeout(timer)
-      }
+      clearTimeout(timer)
     }
   }, [])
 
@@ -227,7 +225,7 @@ const SignAndVerify = () => {
           setNotification('verify-failure')
           setShowDialog(false)
           if (typeof res.message === 'object') {
-            setFailReason(res.message.content || '')
+            setFailReason(res.message.content ?? '')
           }
         }
       })
@@ -310,7 +308,7 @@ const SignAndVerify = () => {
                   width="100%"
                 />
               </div>
-              {isDropdownOpen && wallet && wallet.addresses ? (
+              {isDropdownOpen && wallet?.addresses ? (
                 <div className={styles.selects}>
                   {wallet.addresses.map(addr => (
                     <Button
