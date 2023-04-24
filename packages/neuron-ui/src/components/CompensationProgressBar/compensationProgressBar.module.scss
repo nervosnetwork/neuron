@@ -9,7 +9,10 @@ $progress-grey-hover: #888;
 $progress-indicator-color: #000;
 $progress-indicator-height: 20px;
 $progress-bar-height: 10px;
-$progress-indicator-offet: math.div($progress-bar-height - $progress-indicator-height, 2);
+$progress-indicator-offet: math.div(
+  $progress-bar-height - $progress-indicator-height,
+  2
+);
 
 @mixin basic {
   display: block;
@@ -19,7 +22,6 @@ $progress-indicator-offet: math.div($progress-bar-height - $progress-indicator-h
   height: $progress-bar-height;
 }
 
-
 .pendingProgress {
   @include basic;
 
@@ -27,7 +29,13 @@ $progress-indicator-offet: math.div($progress-bar-height - $progress-indicator-h
     display: none;
   }
 
-  background: repeating-linear-gradient(-45deg, #ccc, #ccc 6.8px, #e3e3e3 6.8px, #e3e3e3 13.6px);
+  background: repeating-linear-gradient(
+    -45deg,
+    #ccc,
+    #ccc 6.8px,
+    #e3e3e3 6.8px,
+    #e3e3e3 13.6px
+  );
   background-size: 200% 100%;
   border-radius: math.div($progress-bar-height, 2);
   animation: move 35s linear infinite;
@@ -39,13 +47,28 @@ $progress-indicator-offet: math.div($progress-bar-height - $progress-indicator-h
   &::-webkit-progress-bar {
     height: $progress-bar-height;
     border-radius: 2px;
-    background: linear-gradient(90deg, $progress-grey 0%, $progress-grey 76.7%, $progress-green 76.7%, $progress-green 96.7%, $progress-yellow 96.7%, $progress-yellow 100%);
+    background: linear-gradient(
+      90deg,
+      $progress-grey 0%,
+      $progress-grey 76.7%,
+      $progress-green 76.7%,
+      $progress-green 96.7%,
+      $progress-yellow 96.7%,
+      $progress-yellow 100%
+    );
     border-radius: math.div($progress-bar-height, 2);
   }
 
-
   &:hover::-webkit-progress-bar {
-    background: linear-gradient(90deg, $progress-grey-hover 0%, $progress-grey-hover 76.7%, $progress-green-hover 76.7%, $progress-green-hover 96.7%, $progress-yellow-hover 96.7%, $progress-yellow-hover 100%);
+    background: linear-gradient(
+      90deg,
+      $progress-grey-hover 0%,
+      $progress-grey-hover 76.7%,
+      $progress-green-hover 76.7%,
+      $progress-green-hover 96.7%,
+      $progress-yellow-hover 96.7%,
+      $progress-yellow-hover 100%
+    );
   }
 
   &::-webkit-progress-value {
@@ -67,7 +90,6 @@ $progress-indicator-offet: math.div($progress-bar-height - $progress-indicator-h
       box-shadow: 0 0 0 1500px rgba(255, 255, 255, 0.4);
     }
   }
-
 }
 
 .container {

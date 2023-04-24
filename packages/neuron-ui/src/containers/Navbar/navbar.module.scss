@@ -3,7 +3,8 @@ $hover-bg-color: #3cc68a4d;
 @mixin navItem {
   display: flex;
   align-items: center;
-  & svg, & img {
+  & svg,
+  & img {
     &:first-child {
       margin-right: var(--svg-right-margin);
     }
@@ -25,16 +26,15 @@ $hover-bg-color: #3cc68a4d;
   position: relative;
   --left-padding: 16px;
   --svg-right-margin: 18px;
-  &[data-expanded="false"] {
+  &[data-expanded='false'] {
     --left-padding: 14px;
     --svg-right-margin: 14px;
   }
 
-
   * {
     font-size: 14px;
   }
-  
+
   & .showExpand {
     content: '';
     height: 100%;
@@ -49,7 +49,7 @@ $hover-bg-color: #3cc68a4d;
       top: 50%;
       display: none;
 
-      &[data-expanded="false"] {
+      &[data-expanded='false'] {
         transform: rotate(-180deg);
       }
     }
@@ -60,7 +60,6 @@ $hover-bg-color: #3cc68a4d;
       }
     }
   }
-  
 }
 
 .name {
@@ -84,7 +83,7 @@ $hover-bg-color: #3cc68a4d;
 
 @mixin activity {
   background-color: rgba(255, 255, 255, 0.2);
-  color: #FFF;
+  color: #fff;
 
   & > svg {
     g {
@@ -94,7 +93,7 @@ $hover-bg-color: #3cc68a4d;
       opacity: 1;
     }
     path[stroke] {
-      stroke: #FFF;
+      stroke: #fff;
     }
   }
 }
@@ -154,12 +153,12 @@ $hover-bg-color: #3cc68a4d;
     button {
       &:hover {
         background-color: transparent;
-        color: #FFF;
+        color: #fff;
       }
-  
+
       &[data-active='true'] {
         background-color: transparent;
-        color: #FFF;
+        color: #fff;
       }
     }
   }

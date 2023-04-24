@@ -61,11 +61,12 @@ $arrow-size: 10px;
         height: 13px;
       }
     }
-    .immature{
+    .immature {
       font-weight: 900;
     }
 
-    .normal::before,.immature::before {
+    .normal::before,
+    .immature::before {
       background-color: $tile-grey;
     }
 

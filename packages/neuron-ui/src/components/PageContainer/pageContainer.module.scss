@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  
+
   .head {
     display: flex;
     flex: 0 0 auto;
@@ -30,7 +30,7 @@
 
       .syncStatus {
         height: 32px;
-        background-color: #FFFFFF99;
+        background-color: #ffffff99;
         color: var(--main-text-color);
         border-radius: 8px;
         display: flex;
@@ -41,7 +41,7 @@
         z-index: 11;
 
         @media (prefers-color-scheme: dark) {
-          background-color: #2D3534;
+          background-color: #2d3534;
         }
       }
     }
@@ -106,7 +106,7 @@
 
     @media (prefers-color-scheme: dark) {
       path {
-        fill: #8DA394;
+        fill: #8da394;
       }
     }
   }
