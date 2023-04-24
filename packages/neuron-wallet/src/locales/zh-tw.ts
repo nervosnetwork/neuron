@@ -235,7 +235,8 @@ export default {
     },
     about: {
       'app-version': '{{name}} 版本: {{version}}',
-      'ckb-client-version': 'CKB 節點版本: {{version}}'
+      'ckb-client-version': 'CKB 節點版本: {{version}}',
+      'ckb-light-client-version': 'CKB 輕節點版本: {{version}}'
     },
     settings: {
       title: {

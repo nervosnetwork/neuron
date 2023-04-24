@@ -247,7 +247,8 @@ export default {
     },
     about: {
       'app-version': '{{name}} Version: {{version}}',
-      'ckb-client-version': 'CKB Client Version: {{version}}'
+      'ckb-client-version': 'CKB Client Version: {{version}}',
+      'ckb-light-client-version': 'CKB Light Client Version: {{version}}'
     },
     settings: {
       title: {
