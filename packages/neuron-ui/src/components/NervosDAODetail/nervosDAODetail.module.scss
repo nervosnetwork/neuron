@@ -1,0 +1,88 @@
+@import '../../styles/mixin.scss';
+
+.txTypes {
+  display: flex;
+  gap: 16px;
+}
+
+.txType {
+  min-width: 94px;
+  line-height: 40px;
+  padding: 0 16px;
+  border-radius: 40px;
+  background: var(--fourth-background-color);
+  color: var(--secondary-text-color);
+  font-weight: 500;
+  font-size: 14px;
+  text-align: center;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  &.active,
+  &:hover {
+    background: var(--third-background-color);
+    color: var(--primary-color);
+  }
+
+  &.active {
+    cursor: default;
+  }
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(112px, auto) 1fr);
+  grid-auto-rows: minmax(56px, auto);
+  margin-top: 16px;
+  border-radius: 16px;
+  background: var(--secondary-background-color);
+
+  .row {
+    border-top: 1px solid var(--table-head-border-color);
+    min-height: 56px;
+    padding: 0 16px;
+
+    &:first-child {
+      border-top: none;
+    }
+  }
+
+  .title {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-text-color);
+  }
+
+  .fieldName {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--table-head-border-color);
+    padding: 0 16px;
+    color: #999999;
+  }
+
+  .fieldValue {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--table-head-border-color);
+    padding-right: 16px;
+    color: var(--main-text-color);
+
+    &.fullRow {
+      grid-column: 2 / -1;
+    }
+
+    &.bold {
+      font-weight: 500;
+    }
+  }
+
+  .txHash {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}

@@ -630,7 +630,7 @@
       "completed-records": "Completed",
       "apc": "Current APC",
       "apc-tooltip": "Current Annual Percentage Compensation",
-      "fee": "Transaction fee",
+      "fee": "Transaction fee: ",
       "deposit-to-nervos-dao": "Deposit to Nervos DAO",
       "withdraw-from-nervos-dao": "Withdraw from Nervos DAO",
       "cancel": "Cancel",
@@ -642,7 +642,8 @@
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
-      "balance-not-reserved": "(Not recommended) Don't reserve any CKBytes for future DAO operations",
+      "balance-not-reserved": "Don't reserve any CKBytes for future DAO operations (Not recommended)",
+      "deposit-amount": "Deposit Amount (CKB)",
       "deposit-record": {
         "deposited-at": "Deposited",
         "completed-at": "Completed",
@@ -681,6 +682,27 @@
           "unlocking": "Unlocking..."
         }
       }
+    },
+    "nervos-dao-detail": {
+      "tx-detail": "Transaction Detail",
+      "deposited": "Deposited",
+      "withdrawn": "Withdrawn",
+      "unlocked": "Unlocked",
+      "basic-information": "Basic Information",
+      "transaction-hash": "Transaction Hash",
+      "blockNumber": "Block Number",
+      "datetime": "Date & Time",
+      "income": "Income",
+      "index": "Index",
+      "address": "Address",
+      "amount": "Amount",
+      "cell-from-cellbase": "From cellbase",
+      "cancel": "Cancel",
+      "next": "Next"
+    },
+    "lock-info-dialog": {
+      "address-info": "Address Information",
+      "deprecated-address": "Deprecated address"
     },
     "updates": {
       "check-updates": "Check for Updates",

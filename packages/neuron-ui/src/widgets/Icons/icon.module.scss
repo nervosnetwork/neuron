@@ -36,4 +36,14 @@ $activity-color: #1b73b3;
       stroke: #1e2423;
     }
   }
+
+  .deposit {
+    & > path[fill='#DCF9E3'] {
+      fill: var(--primary-color);
+    }
+
+    & > path[fill='#00C891'] {
+      fill: var(--secondary-background-color);
+    }
+  }
 }

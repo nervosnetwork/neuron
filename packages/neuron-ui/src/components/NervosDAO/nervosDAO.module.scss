@@ -1,186 +1,256 @@
 @import '../../styles/mixin.scss';
-$infoHeight: 1.75rem;
 
-.nervosDAOContainer {
-  display: grid;
-  grid-template:
-    'title title title' auto
-    'free network-alert deposit' auto
-    'locked . deposit-rules' auto
-    'apc . .' auto
-    'records records records' auto/
-    minmax(350px, 500px) 35px 1fr;
-}
-
-.title {
-  @include page-title;
-  grid-area: title;
-  margin-bottom: 10px;
-}
-
-.free {
-  grid-area: free;
-}
-
-.locked {
-  grid-area: locked;
-}
-
-.apc {
-  grid-area: apc;
-}
-
-.networkAlert {
-  grid-area: network-alert;
-  align-self: center;
-  justify-self: center;
-}
-
-.free,
-.locked,
-.apc {
+.pageHead {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  height: $infoHeight;
-  font-size: 0.875rem;
+  gap: 8px;
 
-  & > span {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    padding-right: 15px;
-    white-space: nowrap;
+  & > svg {
+    cursor: pointer;
 
-    &:after {
-      content: ':';
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+.header {
+  display: flex;
+  gap: 16px;
+}
+
+.daoOverview {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  flex: 1 1 542px;
+  grid-template:
+    'free free' auto
+    'locked apc' auto/
+    1fr 1fr;
+  gap: 32px;
+  border-radius: 16px;
+  padding: 20px 16px;
+  background: var(--primary-color);
+  color: var(--primary-text-color);
+
+  &::after {
+    $left: 47px;
+    $top: 12px;
+
+    content: ' ';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    left: $left;
+    top: $top;
+    width: calc(100% - $left * 2);
+    height: calc(100% - $top);
+    background: var(--primary-color);
+    filter: blur(20px);
+    opacity: 0.5;
+  }
+
+  .field {
+    .name {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+
+      .tooltip {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-left: 5px;
+
+        & > svg {
+          path {
+            fill: currentColor;
+          }
+        }
+
+        &::after {
+          display: none;
+          position: absolute;
+          left: -20px;
+          bottom: 120%;
+          content: attr(data-tooltip);
+          padding: 4px 12px;
+          border-radius: 6px;
+          background: #cccccc99;
+          font-weight: 300;
+        }
+
+        &:hover::after {
+          display: block;
+        }
+      }
+    }
+
+    .value {
+      margin-top: 16px;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 22px;
+
+      .number {
+        font-family: 'D-DIN-PRO';
+        font-size: 20px;
+        line-height: 20px;
+        letter-spacing: 0.5px;
+      }
     }
   }
 
-  & > div {
-    width: 70%;
-    white-space: nowrap;
-    text-align: right;
-  }
-  .balance {
-    @include text-overflow-ellipsis;
-    padding: 0;
-  }
+  .free {
+    grid-area: free;
 
-  .tooltip {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    padding-left: 5px;
+    .value {
+      font-size: 16px;
+      line-height: 22px;
 
-    &::after {
-      display: none;
-      position: absolute;
-      left: -20px;
-      bottom: 120%;
-      content: attr(data-tooltip);
-      padding: 4px 12px;
-      border-radius: 6px;
-      background: #cccccc99;
-      font-weight: 300;
+      .number {
+        font-size: 32px;
+        line-height: 32px;
+      }
     }
+  }
 
-    &:hover::after {
-      display: block;
-    }
+  .locked {
+    grid-area: locked;
+  }
+
+  .apc {
+    grid-area: apc;
   }
 }
 
 .deposit {
-  grid-area: deposit;
-  justify-self: flex-end;
-  padding-left: 30px;
+  position: relative;
+  display: flex;
+  flex: 1 1 410px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--secondary-background-color);
+  color: var(--primary-color);
 
-  button {
-    width: 9.6875rem;
-    height: 1.875rem;
-    color: #fff;
-    font-size: 0.75rem;
-    background-color: var(--nervos-green);
-    border: none;
+  .rules {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--secondary-text-color);
+    font-size: 14px;
+    line-height: 20px;
+    cursor: pointer;
 
-    &[disabled] {
-      @include disabled-button;
+    & > svg {
+      path {
+        stroke: currentColor;
+      }
     }
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  .action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
   }
 }
 
-.depositRules {
-  grid-area: deposit-rules;
-  align-self: flex-end;
-  justify-self: flex-end;
-  color: #666;
-  font-size: 0.6875rem;
-  height: 1rem;
-  text-decoration: underline;
-}
-
-.records {
-  grid-area: records;
-  margin-top: 12px;
+.recordsContainer {
+  margin-top: 20px;
 
   .recordTab {
+    // To achieve animation on switching the selected target with pure CSS, a layout with fixed width is required.
+    $itemWidth: 96px;
+    $itemOverlapping: 8px;
+    $padding: 4px;
+
+    --selected-tab: 0;
+
     position: relative;
-    display: flex;
-    box-sizing: border-box;
-    margin: 0 0 10px 0;
-    padding: 0;
-    line-height: 1.6875rem;
-    font-size: 1.375rem;
-    color: #000;
-    border-bottom: 1px solid #ccc;
+    width: max-content;
+    margin: 0;
+    padding: $padding;
+    background: var(--fourth-background-color);
+    border-radius: 40px;
 
     button {
       @include bold-text;
+      position: relative;
       appearance: none;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 1.875rem;
-      font-size: 1rem;
+      width: $itemWidth;
+      height: 40px;
+      font-weight: 500;
+      font-size: 14px;
       background-color: transparent;
-      padding: 0 0 6px 0;
-      margin: 0;
+      color: var(--primary-color);
+      padding: 0;
       border: none;
+      margin-left: -$itemOverlapping;
+      cursor: pointer;
 
-      &:hover {
-        color: var(--nervos-green);
-        opacity: 0.8;
+      &:first-of-type {
+        margin-left: 0;
+      }
+
+      &.active {
+        cursor: default;
       }
     }
 
     .underline {
       display: block;
       position: absolute;
-      bottom: -1px;
-      left: 0;
-      height: 4px;
-      width: 50%;
-      background: var(--nervos-green);
-      box-sizing: border-box;
-      padding: 0;
+      top: $padding;
+      left: $padding;
+      height: 40px;
+      width: $itemWidth;
+      background: var(--third-background-color);
+      border-radius: 40px;
       transition: transform 0.1s ease-in-out;
-    }
-
-    &[data-idx='1'] {
-      .underline {
-        transform: translateX(100%);
-      }
+      transform: translateX(
+        calc(var(--selected-tab) * ($itemWidth - $itemOverlapping))
+      );
     }
   }
 
-  & > div {
-    margin: 10px auto;
+  .records {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
   }
 
   .noRecords {
-    font-size: 0.875rem;
-    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 22px 0 44px 0;
+    background: var(--secondary-background-color);
+    border-radius: 16px;
+    font-size: 14px;
   }
 }

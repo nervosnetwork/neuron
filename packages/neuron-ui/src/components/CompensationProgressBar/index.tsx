@@ -1,5 +1,6 @@
 import React, { CSSProperties } from 'react'
 import { WITHDRAW_EPOCHS } from 'utils/const'
+import { ArrowDownRound } from 'widgets/Icons/icon'
 import styles from './compensationProgressBar.module.scss'
 
 export interface CompensationProgressBarProps {
@@ -38,7 +39,10 @@ const CompensationProgressBar = ({
 
   return (
     <div className={styles.container} style={style}>
-      <div className={styles.indicator} style={{ left: `calc(${(100 * currentCursor) / WITHDRAW_EPOCHS}% - 5px)` }} />
+      <ArrowDownRound
+        className={styles.indicator}
+        style={{ marginLeft: `${(100 * currentCursor) / WITHDRAW_EPOCHS}%` }}
+      />
       <progress
         className={styles.progress}
         max={WITHDRAW_EPOCHS}

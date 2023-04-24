@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { useDialogWrapper } from 'utils'
+import { clsx, useDialogWrapper } from 'utils'
 import { Close } from 'widgets/Icons/icon'
 import styles from './dialog.module.scss'
 
@@ -15,8 +15,9 @@ interface DialogProps {
   cancelText?: string
   disabled?: boolean | undefined
   children?: React.ReactChild
-  footer?: React.ReactNode
+  footer?: React.ReactChild
   isLoading?: boolean
+  contentClassName?: string
 }
 
 const Dialog = ({
@@ -31,6 +32,7 @@ const Dialog = ({
   children,
   footer,
   isLoading,
+  contentClassName,
 }: DialogProps) => {
   const [t] = useTranslation()
   const { isDialogOpen, openDialog, closeDialog, dialogRef } = useDialogWrapper({ onClose: onCancel })
@@ -68,10 +70,8 @@ const Dialog = ({
         <Close onClick={onCancel} />
       </div>
       <form onSubmit={onSubmit}>
-        <div className={styles.content}>{children}</div>
-        {footer ? (
-          { footer }
-        ) : (
+        <div className={clsx(styles.content, contentClassName)}>{children}</div>
+        {footer ?? (
           <div className={styles.footer}>
             <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
             <Button type="submit" label={confirmText || t('common.confirm')} loading={isLoading} disabled={disabled} />

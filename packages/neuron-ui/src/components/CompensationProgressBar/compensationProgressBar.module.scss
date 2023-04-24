@@ -1,11 +1,5 @@
 @use "sass:math";
 
-$progress-green: #3cc68a;
-$progress-yellow: #f7ae4d;
-$progress-grey: #e3e3e3;
-$progress-green-hover: #21b574;
-$progress-yellow-hover: #fa8f00;
-$progress-grey-hover: #888;
 $progress-indicator-color: #000;
 $progress-indicator-height: 20px;
 $progress-bar-height: 10px;
@@ -49,26 +43,14 @@ $progress-indicator-offet: math.div(
     border-radius: 2px;
     background: linear-gradient(
       90deg,
-      $progress-grey 0%,
-      $progress-grey 76.7%,
-      $progress-green 76.7%,
-      $progress-green 96.7%,
-      $progress-yellow 96.7%,
-      $progress-yellow 100%
+      var(--progress-grey) 0%,
+      var(--progress-grey) 76.7%,
+      var(--progress-green) 76.7%,
+      var(--progress-green) 96.7%,
+      var(--progress-yellow) 96.7%,
+      var(--progress-yellow) 100%
     );
     border-radius: math.div($progress-bar-height, 2);
-  }
-
-  &:hover::-webkit-progress-bar {
-    background: linear-gradient(
-      90deg,
-      $progress-grey-hover 0%,
-      $progress-grey-hover 76.7%,
-      $progress-green-hover 76.7%,
-      $progress-green-hover 96.7%,
-      $progress-yellow-hover 96.7%,
-      $progress-yellow-hover 100%
-    );
   }
 
   &::-webkit-progress-value {
@@ -93,17 +75,48 @@ $progress-indicator-offet: math.div(
 }
 
 .container {
+  --progress-grey: #f0f0f0;
+  --progress-grey-hover: #{darken(#f0f0f0, 10%)};
+  --progress-green: #00c891;
+  --progress-green-hover: #{darken(#00c891, 10%)};
+  --progress-yellow: #f78c2a;
+  --progress-yellow-hover: #{darken(#f78c2a, 10%)};
+
+  @media (prefers-color-scheme: dark) {
+    --progress-grey: #666666;
+    --progress-grey-hover: #{lighten(#666666, 10%)};
+    --progress-green-hover: #{lighten(#00c891, 10%)};
+    --progress-yellow-hover: #{lighten(#f78c2a, 10%)};
+  }
+
   position: relative;
   box-sizing: border-box;
-  padding-top: 10px;
 
   .indicator {
-    position: absolute;
     display: block;
-    content: '';
-    border: 5px solid transparent;
-    border-top-color: $progress-indicator-color;
-    bottom: calc(100% - 13px);
+    transform: translateX(-50%);
+
+    & > path {
+      fill: currentColor;
+    }
+  }
+
+  progress {
+    margin-top: 4px;
+  }
+
+  &:hover {
+    .progress::-webkit-progress-bar {
+      background: linear-gradient(
+        90deg,
+        var(--progress-grey-hover) 0%,
+        var(--progress-grey-hover) 76.7%,
+        var(--progress-green-hover) 76.7%,
+        var(--progress-green-hover) 96.7%,
+        var(--progress-yellow-hover) 96.7%,
+        var(--progress-yellow-hover) 100%
+      );
+    }
   }
 }
 

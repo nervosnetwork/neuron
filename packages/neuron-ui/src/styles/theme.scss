@@ -6,8 +6,11 @@ body {
   --main-background-color: #e6f3f3;
   --secondary-background-color: #ffffff;
   --third-background-color: #ffffff;
+  --fourth-background-color: #ecf9f0;
   --main-text-color: #333333;
+  --main-shadow-color: #eeeeee;
   --secondary-text-color: #8da394;
+  --third-text-color: #666666;
   --link-color: #{$main-color};
   --notice-background-color: #d4f8e9;
   --notice-text-color: #ff9737;
@@ -41,9 +44,12 @@ body {
     --main-background-color: #111614;
     --secondary-background-color: #1e2423;
     --main-text-color: #ffffff;
+    --main-shadow-color: #141b1a;
     --secondary-text-color: #8da394;
+    --third-text-color: #cccccc;
     --link-color: #{$main-color};
     --third-background-color: #2d3534;
+    --fourth-background-color: var(--secondary-background-color);
     --notice-background-color: #093f29;
     --notice-text-color: #f78c2a;
     --border-color: #343e3c;
