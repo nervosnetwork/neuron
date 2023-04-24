@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import { WITHDRAW_EPOCHS } from 'utils/const'
 import styles from './compensationProgressBar.module.scss'
 
 export interface CompensationProgressBarProps {
-  style?: object
+  style?: CSSProperties
   endEpochValue: number
   currentEpochValue: number
   withdrawEpochValue?: number
