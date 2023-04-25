@@ -38,9 +38,6 @@ const mainRouterConfig: RouteObject[] = [
       </>
     ),
     children: [
-      { path: `${RoutePath.WalletWizard}*`, element: <WalletWizard isSettings /> },
-      { path: RoutePath.ImportKeystore, element: <ImportKeystore /> },
-      { path: RoutePath.ImportHardware, element: <ImportHardware /> },
       {
         path: RoutePath.Launch,
         element: <LaunchScreen />,

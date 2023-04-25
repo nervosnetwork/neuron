@@ -54,14 +54,13 @@ export default class UpdateController {
 
     autoUpdater.on('update-not-available', () => {
       UpdateController.isChecking = false
+      this.notify()
 
       dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
         type: 'info',
         message: t('updater.update-not-available'),
         buttons: [t('common.ok')]
       })
-
-      this.notify()
     })
 
     autoUpdater.on('download-progress', progress => {

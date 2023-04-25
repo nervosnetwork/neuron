@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 import Dialog from 'widgets/Dialog'
 import LanguageDialog from 'components/LanguageDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
@@ -91,6 +92,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [showCheck, setShowCheck] = useState(false)
   const [showLangDialog, setShowLangDialog] = useState(false)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
+  const { search } = useLocation()
 
   const [dialogType, setDialogType] = useState<'checking' | 'updating' | 'updated'>('checking')
 
@@ -104,11 +106,11 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   }, [])
 
   useEffect(() => {
-    const checkUpdate = window.location.href.includes('?checkUpdate=1')
+    const checkUpdate = search.includes('checkUpdate=1')
     if (checkUpdate) {
       setShowCheck(true)
     }
-  }, [])
+  }, [search, setShowCheck])
 
   useEffect(() => {
     if (showCheck) {

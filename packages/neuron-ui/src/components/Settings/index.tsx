@@ -15,7 +15,7 @@ import WalletSetting from 'components/WalletSetting'
 import GeneralSetting from 'components/GeneralSetting'
 import NetworkSetting from 'components/NetworkSetting'
 import DataSetting from 'components/DataSetting'
-import styles from './setting.module.scss'
+import styles from './settings.module.scss'
 
 const items = [
   ['wallets', WalletSetting],

@@ -36,7 +36,7 @@ const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: (
 
   useEffect(() => {
     initialize(wallet.name)
-  }, [id, initialize, wallet.name])
+  }, [initialize, wallet.name])
 
   const inputs = useInputs(editor)
   const hint = useHint(editor.name.value, usedNames, t)

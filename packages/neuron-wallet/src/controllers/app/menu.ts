@@ -132,7 +132,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.neuron.check-updates'),
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
-          navigateTo(URL.Settings + '?checkUpdate=1')
+          navigateTo(`${URL.Settings}?checkUpdate=1`)
         }
       },
       separator,
@@ -455,7 +455,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.neuron.check-updates'),
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
-        navigateTo(URL.Settings + '?checkUpdate=1')
+        navigateTo(`${URL.Settings}?checkUpdate=1`)
       }
     })
     helpSubmenu.push({

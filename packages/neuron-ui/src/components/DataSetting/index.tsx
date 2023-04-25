@@ -88,7 +88,7 @@ const DataSetting = () => {
               {isSaving && savingType === 'resync' ? (
                 <Spinner label={t('settings.data.re-sync')} labelPosition="right" />
               ) : (
-                (t('settings.data.re-sync') as string)
+                t('settings.data.re-sync')
               )}
             </Button>
 
@@ -103,7 +103,7 @@ const DataSetting = () => {
               {isSaving && savingType === 'move' ? (
                 <Spinner label={t('settings.data.move-data-finish')} labelPosition="right" />
               ) : (
-                (t('settings.data.move-data-finish') as string)
+                t('settings.data.move-data-finish')
               )}
             </Button>
           </div>
