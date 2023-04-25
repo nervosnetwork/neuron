@@ -17,6 +17,7 @@ const setScriptsMock = jest.fn()
 const getScriptsMock = jest.fn()
 const getTipHeaderMock = jest.fn()
 const getTransactionsMock = jest.fn()
+const createBatchRequestMock = jest.fn()
 
 const schedulerWaitMock = jest.fn()
 const getMultisigConfigForLightMock = jest.fn()
@@ -35,6 +36,7 @@ function mockReset() {
   getScriptsMock.mockReset()
   getTipHeaderMock.mockReset()
   getTransactionsMock.mockReset()
+  createBatchRequestMock.mockReset()
 
   schedulerWaitMock.mockReset()
   getMultisigConfigForLightMock.mockReset()
@@ -63,6 +65,7 @@ jest.mock('../../src/utils/ckb-rpc', () => ({
       getScripts: getScriptsMock,
       getTipHeader: getTipHeaderMock,
       getTransactions: getTransactionsMock,
+      createBatchRequest: () => ({ exec: createBatchRequestMock }),
     }
   }
 }))
@@ -97,6 +100,7 @@ const address = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2q8ux
 describe('test light connector', () => {
   beforeEach(() => {
     walletGetAllMock.mockReturnValue([])
+    createBatchRequestMock.mockResolvedValue([])
   })
   afterEach(() => {
     mockReset()
@@ -401,29 +405,31 @@ describe('test light connector', () => {
     beforeEach(() => {
       mockFn.mockReset()
     })
-    it ('connect success', async () => {
+    it('connect success', async () => {
       const connect = new LightConnector([], '')
       //@ts-ignore
       connect.initSync = mockFn
       await connect.connect()
       expect(mockFn).toBeCalledTimes(1)
     })
-    it ('connect failed', async () => {
+    it('connect failed', async () => {
       const connect = new LightConnector([], '')
       //@ts-ignore
       connect.initSync = mockFn
-      mockFn.mockRejectedValue('error')
-      expect(connect.connect()).rejects.toThrowError('error')
+      mockFn.mockImplementation(() => { throw new Error('error') })
+      expect(connect.connect()).rejects.toThrowError(new Error('error'))
     })
   })
 
   describe('test stop', () => {
-    const connect = new LightConnector([], '')
-    //@ts-ignore
-    connect.pollingIndexer = true
-    connect.stop()
-    //@ts-ignore
-    expect(connect.pollingIndexer).toBeFalsy()
+    it('test stop', () => {
+      const connect = new LightConnector([], '')
+      //@ts-ignore
+      connect.pollingIndexer = true
+      connect.stop()
+      //@ts-ignore
+      expect(connect.pollingIndexer).toBeFalsy()
+    })
   })
 
   describe('test notifyCurrentBlockNumberProcessed', () => {

@@ -145,7 +145,7 @@ describe('NodeService', () => {
       return function() {
         return {
           getChain: getChainMock,
-          getLocalNodeInfo: getLocalNodeInfoMock
+          localNodeInfo: getLocalNodeInfoMock
         }
       }
     })
@@ -231,7 +231,7 @@ describe('NodeService', () => {
     describe('when node starts', () => {
       beforeEach(async () => {
         stubbedStartCKBNode.mockResolvedValue(true)
-        await nodeService.tryStartNodeOnDefaultURI()
+        await nodeService.startNode()
 
         jest.advanceTimersByTime(1000)
       });
@@ -279,7 +279,7 @@ describe('NodeService', () => {
     describe('when node failed to start', () => {
       beforeEach(async () => {
         stubbedStartCKBNode.mockRejectedValue(new Error())
-        await nodeService.tryStartNodeOnDefaultURI()
+        await nodeService.startNode()
       });
       it('logs error', () => {
         expect(stubbedLoggerInfo).toHaveBeenCalledWith('CKB:	fail to start bundled CKB with error:')
@@ -295,6 +295,9 @@ describe('NodeService', () => {
       })
     });
     describe('start light node', () => {
+      beforeEach(() => {
+        stubbedNetworsServiceGet.mockReset()
+      })
       it('start light node', async () => {
         stubbedNetworsServiceGet.mockReturnValueOnce({type: NetworkType.Light})
         await nodeService.startNode()
@@ -333,6 +336,7 @@ describe('NodeService', () => {
         })
         stubbedStartCKBNode.mockResolvedValue(true)
         stubbedNetworsServiceGet.mockReturnValue({remote: bundledNodeUrl})
+        getLocalNodeInfoMock.mockRejectedValue('not start')
         await nodeService.tryStartNodeOnDefaultURI()
 
         await eventCallback({currentNetworkID: 'network1'})
