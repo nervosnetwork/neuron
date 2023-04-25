@@ -433,27 +433,31 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
   )
 
 export const useGlobalNotifications = (
-  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>
+  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>,
+  hasDismiss: boolean
 ) => {
   useEffect(() => {
     const lastVersion = syncRebuildNotification.load()
     const isVersionUpdate = isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)
-    if (isVersionUpdate) {
-      dispatch({
-        type: AppActions.SetGlobalDialog,
-        payload: 'rebuild-sync',
-      })
-    }
     const migrateSubscription = Migrate.subscribe(migrateStatus => {
-      if (!isVersionUpdate && migrateStatus === 'need-migrate') {
-        migrateData()
-        migrateSubscription.unsubscribe()
+      if (migrateStatus === 'need-migrate') {
+        if (lastVersion && !isVersionUpdate) {
+          // means has click migrate for current version, so migrate silent
+          migrateData()
+          migrateSubscription.unsubscribe()
+        } else if (!hasDismiss) {
+          // means need click ok to migrate
+          dispatch({
+            type: AppActions.SetGlobalDialog,
+            payload: 'rebuild-sync',
+          })
+        }
       }
     })
     return () => {
       migrateSubscription.unsubscribe()
     }
-  }, [dispatch])
+  }, [dispatch, hasDismiss])
 }
 
 export const useDidMount = (cb: () => void) => {
