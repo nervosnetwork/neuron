@@ -40,7 +40,7 @@ jest.mock('../../src/models/synced-block-number', () => ({
 }))
 
 jest.mock('../../src/database/chain', () => ({
-  
+  clean: () => jest.fn()
 }))
 
 jest.mock('../../src/services/monitor', () => {
