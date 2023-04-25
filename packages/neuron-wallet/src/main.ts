@@ -17,7 +17,7 @@ if (singleInstanceLock) {
   })
 
   app.on('before-quit', async () => {
-    logger.info('App:\tNeuron will exist')
+    logger.info('App:\tNeuron will exit')
     await appController.end()
   })
 
