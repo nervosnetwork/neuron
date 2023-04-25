@@ -15,12 +15,16 @@ jobs:
         uses: actions/github-script@v4
         with:
           script: |
-            const response = await github.repos.checkCollaborator({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              username: context.payload.comment.user.login,
-            })
-            return response.status === 204
+            try{
+              const response = await github.repos.checkCollaborator({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: context.payload.comment.user.login,
+              })
+              return response.status === 204
+            } catch {
+              return false
+            }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
