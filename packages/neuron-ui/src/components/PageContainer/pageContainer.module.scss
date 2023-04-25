@@ -103,6 +103,12 @@
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
+
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: #8DA394;
+      }
+    }
   }
 }
 

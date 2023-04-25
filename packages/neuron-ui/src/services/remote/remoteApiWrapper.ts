@@ -34,7 +34,6 @@ type Action =
   | 'open-in-window'
   | 'request-open-in-explorer'
   | 'handle-view-error'
-  | 'show-settings'
   | 'set-locale'
   | 'show-error-message'
   | 'show-open-dialog'

@@ -15,25 +15,12 @@ import {
   ArrowOpenRight,
   MenuExpand,
 } from 'widgets/Icons/icon'
-import { showSettings } from 'services/remote'
 import { RoutePath, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`, RoutePath.ImportHardware]
-
-const throttledShowSettings = (() => {
-  const THROTTLE_TIME = 1000
-  let lastRun = 0
-  return (params: Parameters<typeof showSettings>[0]) => {
-    if (Date.now() - lastRun < THROTTLE_TIME) {
-      return false
-    }
-    lastRun = Date.now()
-    return showSettings(params)
-  }
-})()
 
 const menuItems = [
   { name: 'navbar.overview', key: RoutePath.Overview, url: RoutePath.Overview, icon: <Overview /> },
@@ -121,7 +108,7 @@ const Navbar = () => {
         className={styles.name}
         title={name}
         aria-label={name}
-        onClick={() => throttledShowSettings({ tab: 'wallets' })}
+        onClick={() => navigate('/settings')}
       >
         {menuExpanded ? (
           <img src={Logo} alt="logo" />

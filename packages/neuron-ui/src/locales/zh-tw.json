@@ -76,19 +76,20 @@
       "title": "使用硬件錢包進行地址驗證",
       "device": "設備：",
       "address": "地址：",
-      "verified": "驗證通過",
+      "verified": "地址驗證通過",
       "invalid": "地址不正確",
       "status": {
         "label": "狀態：",
-        "connect": "已連接",
+        "connect": "設備已連接，點擊驗證按鈕進行地址驗證",
         "user-input": "已連接，等待確認...",
         "disconnect": "未連接，請檢查設備連接。"
       },
       "actions": {
-        "close": "關閉",
-        "rescan": "再次檢測",
+        "close": "取消",
+        "rescan": "連接設備",
         "copy-address": "复制地址",
-        "verify": "驗證"
+        "verify": "地址驗證",
+        "verify-again": "再次驗證"
       }
     },
     "offline-sign": {
@@ -176,7 +177,8 @@
       "create-wallet": "立即創建新錢包",
       "repeat-password": "重復密碼",
       "finish-create": "完成創建",
-      "creating-wallet": "錢包準備中，請稍後"
+      "creating-wallet": "錢包準備中，請稍後",
+      "add-one": "添加錢包"
     },
     "import-keystore": {
       "title": "導入 Keystore 文件",
@@ -243,7 +245,9 @@
       "address": "{{network}} 地址",
       "verify-address": "驗證地址",
       "turn-into-full-version-fomrat": "轉換為長地址格式",
-      "turn-into-deprecated-format": "轉換為廢棄地址格式"
+      "turn-into-deprecated-format": "轉換為廢棄地址格式",
+      "save-qr-code": "保存收款碼",
+      "copy-qr-code": "復制收款碼圖片"
     },
     "history": {
       "meta": "元信息",
@@ -318,7 +322,8 @@
       "change-address": "找零地址",
       "copy-address": "複製地址",
       "request-payment": "請求支付",
-      "view-on-explorer": "在瀏覽器中查看"
+      "view-on-explorer": "在瀏覽器中查看",
+      "default-description": "無"
     },
     "settings": {
       "title": {
@@ -337,6 +342,7 @@
         "hide": "隱藏",
         "version": "版本",
         "language": "語言",
+        "select-language": "選擇語言",
         "apply": "應用"
       },
       "wallet-manager": {
@@ -360,7 +366,7 @@
         "edit-network": {
           "title": "添加或編輯網路",
           "rpc-url": "RPC地址",
-          "name": "名稱"
+          "name": "網路名稱"
         },
         "mainnet": "主網",
         "testnet": "測試網",
@@ -394,13 +400,15 @@
         "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清理緩存，Neuron 會重新同步所有塊數據。",
         "cache-cleared-on": "上次清理緩存時間 {{date}}",
         "clear-cache": "清理緩存",
-        "clearing-cache": "清理中…",
-        "remove-ckb-data-tip": "請將 CKB Node 數據從 {{prevPath}} 移動至 {{currentPath}}然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 否則點擊 \"重新同步\" 開始重新同步.",
+        "clearing-cache": "正在清除緩存中，請稍候",
+        "set-path": "設置路徑",
+        "remove-ckb-data-tip": "請將 CKB Node 數據從 【{{prevPath}}】 移動至 【{{currentPath}}】 然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 或者點擊 \"重新同步\" 開始重新同步.",
         "cancel": "取消",
         "resync-ckb-node-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node 數據",
         "move-data-finish": "數據轉移完成",
         "re-sync": "重新同步",
-        "disabled-set-path": "手動啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效"
+        "disabled-set-path": "手動啟動 CKB 節點時，設置 CKB Node 節點配置和路徑無法生效",
+        "ckb-node-storage": "CKB節點數據"
       }
     },
     "password-request": {
@@ -673,7 +681,8 @@
     },
     "updates": {
       "check-updates": "檢查更新",
-      "checking-updates": "正在檢查…",
+      "checking-updates": "正在檢查更新…",
+      "update-available": "檢測到新版本",
       "downloading-update": "正在下載更新…",
       "update-not-available": "已經在使用最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載",

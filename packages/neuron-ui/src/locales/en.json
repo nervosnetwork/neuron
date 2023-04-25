@@ -93,9 +93,10 @@
       },
       "actions": {
         "close": "Close",
-        "rescan": "Rescan",
+        "rescan": "Reconnect",
         "copy-address": "Copy Address",
-        "verify": "Verify"
+        "verify": "Verify Address",
+        "verify-again": "Verify Again"
       }
     },
     "offline-sign": {
@@ -183,7 +184,8 @@
       "create-wallet": "Create Wallet",
       "repeat-password": "Repeat Password",
       "finish-create": "Finish Creating",
-      "creating-wallet": "Wallet is being preparing, please wait"
+      "creating-wallet": "Wallet is being preparing, please wait",
+      "add-one": "Add One More"
     },
     "import-keystore": {
       "title": "Import Keystore File",
@@ -250,7 +252,9 @@
       "address": "{{network}} Address",
       "verify-address": "Verify Address",
       "turn-into-full-version-fomrat": "Turn into full version format",
-      "turn-into-deprecated-format": "Turn into deprecated format"
+      "turn-into-deprecated-format": "Turn into deprecated format",
+      "save-qr-code": "Download",
+      "copy-qr-code": "Copy"
     },
     "history": {
       "meta": "Meta",
@@ -325,7 +329,8 @@
       "change-address": "Change",
       "copy-address": "Copy Address",
       "request-payment": "Request Payment",
-      "view-on-explorer": "View on Explorer"
+      "view-on-explorer": "View on Explorer",
+      "default-description": "None"
     },
     "settings": {
       "title": {
@@ -344,6 +349,7 @@
         "hide": "Hide",
         "version": "Version",
         "language": "Language",
+        "select-language": "Select Language",
         "apply": "Apply"
       },
       "wallet-manager": {
@@ -367,7 +373,7 @@
         "edit-network": {
           "title": "Add or Edit Network",
           "rpc-url": "RPC URL",
-          "name": "Name"
+          "name": "Network Name"
         },
         "mainnet": "Mainnet",
         "testnet": "Testnet",
@@ -401,13 +407,15 @@
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "cache-cleared-on": "Cache cleared on {{date}}",
         "clear-cache": "Clear Cache",
-        "clearing-cache": "Clearing...",
-        "remove-ckb-data-tip": "Please move CKB Node Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
+        "clearing-cache": "Clearing Cache, please wait a moment",
+        "set-path": "Set Path",
+        "remove-ckb-data-tip": "Please move CKB Node Data from 【{{prevPath}}】 to 【{{currentPath}}】 and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
         "resync-ckb-node-describe": "Attention: Synchronizing from scratch won't remove previously downloaded CKB Node Data",
         "cancel": "Cancel",
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
-        "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect"
+        "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect",
+        "ckb-node-storage": "CKB Node Storage"
       }
     },
     "password-request": {
@@ -681,6 +689,7 @@
     "updates": {
       "check-updates": "Check for Updates",
       "checking-updates": "Checking...",
+      "update-available": "There are currently updates available.",
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",

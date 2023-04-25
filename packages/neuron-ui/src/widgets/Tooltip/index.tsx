@@ -12,6 +12,7 @@ interface TooltipProps {
   trigger?: 'hover' | 'click'
   type?: 'normal' | 'always-dark'
   showTriangle?: boolean
+  isTriggerNextToChild?: boolean
 }
 const Tooltip: React.FC<TooltipProps> = ({
   children,
@@ -23,6 +24,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   trigger = 'hover',
   type = 'normal',
   showTriangle,
+  isTriggerNextToChild,
 }) => {
   const [isTipShow, setIsTipShow] = useState(false)
   const onChangeIsTipShow = useCallback(() => {
@@ -41,6 +43,7 @@ const Tooltip: React.FC<TooltipProps> = ({
         onKeyPress={undefined}
         data-type={type}
         data-has-trigger={showTriangle}
+        data-trigger-next-to-child={isTriggerNextToChild}
       >
         {children}
         {showTriangle && <div className={styles.triangle} />}
@@ -58,6 +61,7 @@ const Tooltip: React.FC<TooltipProps> = ({
       onKeyPress={undefined}
       data-type={type}
       data-has-trigger={showTriangle}
+      data-trigger-next-to-child={isTriggerNextToChild}
     >
       <div className={`${styles.tip} ${tipClassName}`}>
         {tip}

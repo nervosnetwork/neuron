@@ -1,13 +1,12 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
-import { RoutePath, failureResToNotification } from 'utils'
-import { NavigateFunction } from 'react-router-dom'
+import { failureResToNotification } from 'utils'
 import { addNotification, addPopup } from './app'
 
 import { AppActions, StateDispatch } from '../reducer'
 
 export const createNetwork = (params: Controller.CreateNetworkParams) => (
   dispatch: StateDispatch,
-  navigate: NavigateFunction
+  callback: () => void
 ) => {
   dispatch({
     type: AppActions.UpdateLoadings,
@@ -19,7 +18,7 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (
     .then(res => {
       if (res.status === 1) {
         addPopup('create-network-successfully')(dispatch)
-        navigate(RoutePath.SettingsNetworks)
+        callback()
       } else {
         addNotification(failureResToNotification(res))(dispatch)
       }
@@ -34,11 +33,14 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (
     })
 }
 
-export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispatch: StateDispatch, navigate: any) => {
+export const updateNetwork = (params: Controller.UpdateNetworkParams) => (
+  dispatch: StateDispatch,
+  callback: () => void
+) => {
   return updateRemoteNetwork(params).then(res => {
     if (res.status === 1) {
       addPopup('update-network-successfully')(dispatch)
-      navigate(RoutePath.SettingsNetworks)
+      callback()
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }

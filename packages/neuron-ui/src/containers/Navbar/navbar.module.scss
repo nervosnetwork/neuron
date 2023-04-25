@@ -75,6 +75,10 @@ $hover-bg-color: #3cc68a4d;
   background: transparent;
   font-weight: 700;
 
+  span {
+    color: var(--primary-color);
+  }
+
   .nameText {
     width: 0;
     flex: 1;
