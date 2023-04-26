@@ -27,7 +27,7 @@ const buttons = [
   {
     label: 'wizard.create-new-wallet',
     ariaLabel: 'create a wallet',
-    url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+    url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}?isSettings=1`,
     icon: <CreateWallet />,
   },
   {

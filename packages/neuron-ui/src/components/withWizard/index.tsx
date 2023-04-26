@@ -17,7 +17,6 @@ export interface WizardProps {
   wallets: Readonly<State.WalletIdentity[]>
   rootPath: string
   dispatch: React.Dispatch<any>
-  isSettings?: boolean
 }
 
 export interface WizardElementProps {
@@ -25,7 +24,6 @@ export interface WizardElementProps {
   rootPath: string
   state: WithWizardState
   dispatch: React.Dispatch<any>
-  isSettings?: boolean
 }
 
 const reducer = (
@@ -45,21 +43,13 @@ const reducer = (
   }
 }
 
-const Wizard = ({ state, elements, wallets, rootPath, dispatch, isSettings }: WizardProps) => (
+const Wizard = ({ state, elements, wallets, rootPath, dispatch }: WizardProps) => (
   <Routes>
     {elements.map((element: any) => (
       <Route
         key={element.path}
         path={`${element.path || ''}${element.params || ''}`}
-        element={
-          <element.comp
-            rootPath={rootPath}
-            wallets={wallets}
-            state={state}
-            dispatch={dispatch}
-            isSettings={isSettings}
-          />
-        }
+        element={<element.comp rootPath={rootPath} wallets={wallets} state={state} dispatch={dispatch} />}
       />
     ))}
   </Routes>
@@ -67,22 +57,13 @@ const Wizard = ({ state, elements, wallets, rootPath, dispatch, isSettings }: Wi
 
 Wizard.displayName = 'Wizard'
 
-const withWizard = (elements: Element[], initState: WithWizardState) => ({ isSettings }: { isSettings?: boolean }) => {
+const withWizard = (elements: Element[], initState: WithWizardState) => () => {
   const {
     settings: { wallets = [] },
   } = useGlobalState()
   const [state, dispatch] = useReducer(reducer, initState)
 
-  return (
-    <Wizard
-      rootPath="/wizard/"
-      isSettings={isSettings}
-      state={state}
-      wallets={wallets}
-      dispatch={dispatch}
-      elements={elements}
-    />
-  )
+  return <Wizard rootPath="/wizard/" state={state} wallets={wallets} dispatch={dispatch} elements={elements} />
 }
 
 export default withWizard
