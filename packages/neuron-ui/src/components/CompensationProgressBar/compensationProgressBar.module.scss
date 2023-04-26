@@ -1,92 +1,10 @@
-@use "sass:math";
-
-$progress-indicator-color: #000;
-$progress-indicator-height: 20px;
-$progress-bar-height: 10px;
-$progress-indicator-offet: math.div(
-  $progress-bar-height - $progress-indicator-height,
-  2
-);
-
-@mixin basic {
-  display: block;
-  appearance: none;
-  width: 100%;
-  position: relative;
-  height: $progress-bar-height;
-}
-
-.pendingProgress {
-  @include basic;
-
-  &::-webkit-progress-bar {
-    display: none;
-  }
-
-  background: repeating-linear-gradient(
-    -45deg,
-    #ccc,
-    #ccc 6.8px,
-    #e3e3e3 6.8px,
-    #e3e3e3 13.6px
-  );
-  background-size: 200% 100%;
-  border-radius: math.div($progress-bar-height, 2);
-  animation: move 35s linear infinite;
-}
-
-.progress {
-  @include basic;
-
-  &::-webkit-progress-bar {
-    height: $progress-bar-height;
-    border-radius: 2px;
-    background: linear-gradient(
-      90deg,
-      var(--progress-grey) 0%,
-      var(--progress-grey) 76.7%,
-      var(--progress-green) 76.7%,
-      var(--progress-green) 96.7%,
-      var(--progress-yellow) 96.7%,
-      var(--progress-yellow) 100%
-    );
-    border-radius: math.div($progress-bar-height, 2);
-  }
-
-  &::-webkit-progress-value {
-    position: relative;
-    background-color: transparent;
-  }
-
-  &[data-is-withdrawn='true'] {
-    pointer-events: none;
-
-    &::-webkit-progress-bar {
-      overflow: hidden;
-    }
-
-    &::-webkit-progress-value {
-      border-top-left-radius: math.div($progress-bar-height, 2);
-      border-bottom-left-radius: math.div($progress-bar-height, 2);
-      border-right: 1px solid #000;
-      box-shadow: 0 0 0 1500px rgba(255, 255, 255, 0.4);
-    }
-  }
-}
-
 .container {
   --progress-grey: #f0f0f0;
-  --progress-grey-hover: #{darken(#f0f0f0, 10%)};
   --progress-green: #00c891;
-  --progress-green-hover: #{darken(#00c891, 10%)};
   --progress-yellow: #f78c2a;
-  --progress-yellow-hover: #{darken(#f78c2a, 10%)};
 
   @media (prefers-color-scheme: dark) {
     --progress-grey: #666666;
-    --progress-grey-hover: #{lighten(#666666, 10%)};
-    --progress-green-hover: #{lighten(#00c891, 10%)};
-    --progress-yellow-hover: #{lighten(#f78c2a, 10%)};
   }
 
   position: relative;
@@ -101,22 +19,60 @@ $progress-indicator-offet: math.div(
     }
   }
 
-  progress {
-    margin-top: 4px;
+  &:hover {
+    .progress {
+      filter: brightness(0.9);
+
+      @media (prefers-color-scheme: dark) {
+        filter: brightness(1.2);
+      }
+    }
+  }
+}
+
+.progress {
+  position: relative;
+  display: flex;
+  justify-content: right;
+  margin-top: 4px;
+  height: 8px;
+  border-radius: 8px;
+  background: var(--progress-grey);
+
+  .withdrawCursor {
+    position: absolute;
+    left: 10%;
+    width: 2px;
+    height: 100%;
+    margin-left: -1px;
+    background: var(--main-text-color);
+    border-radius: 4px;
   }
 
-  &:hover {
-    .progress::-webkit-progress-bar {
-      background: linear-gradient(
-        90deg,
-        var(--progress-grey-hover) 0%,
-        var(--progress-grey-hover) 76.7%,
-        var(--progress-green-hover) 76.7%,
-        var(--progress-green-hover) 96.7%,
-        var(--progress-yellow-hover) 96.7%,
-        var(--progress-yellow-hover) 100%
-      );
-    }
+  .suggest {
+    width: 20%;
+    height: 100%;
+    background: var(--progress-green);
+    border-radius: 8px 0 0 8px;
+  }
+
+  .warning {
+    width: 3.3%;
+    height: 100%;
+    background: var(--progress-yellow);
+    border-radius: 0 8px 8px 0;
+  }
+
+  &.pendingProgress {
+    background: repeating-linear-gradient(
+      -45deg,
+      #ccc,
+      #ccc 6.8px,
+      #e3e3e3 6.8px,
+      #e3e3e3 13.6px
+    );
+    background-size: 200% 100%;
+    animation: move 35s linear infinite;
   }
 }
 
