@@ -440,18 +440,17 @@ export const useGlobalNotifications = (
     const lastVersion = syncRebuildNotification.load()
     const isVersionUpdate = isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)
     const migrateSubscription = Migrate.subscribe(migrateStatus => {
-      if (migrateStatus === 'need-migrate') {
-        if (lastVersion && !isVersionUpdate) {
-          // means has click migrate for current version, so migrate silent
-          migrateData()
-          migrateSubscription.unsubscribe()
-        } else if (!hasDismiss) {
-          // means need click ok to migrate
-          dispatch({
-            type: AppActions.SetGlobalDialog,
-            payload: 'rebuild-sync',
-          })
-        }
+      if (migrateStatus !== 'need-migrate') return
+      if (lastVersion && !isVersionUpdate) {
+        // means has click migrate for current version, so migrate silent
+        migrateData()
+        migrateSubscription.unsubscribe()
+      } else if (!hasDismiss) {
+        // means need click ok to migrate
+        dispatch({
+          type: AppActions.SetGlobalDialog,
+          payload: 'rebuild-sync',
+        })
       }
     })
     return () => {
