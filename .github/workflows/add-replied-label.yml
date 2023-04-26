@@ -7,26 +7,53 @@ on:
 jobs:
   add-label:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - id: check-access
-        name: Check if the commenter has write access
+        name: Check if the commenter is a collaborator
         uses: actions/github-script@v4
         with:
           script: |
-            const response = await github.repos.checkCollaborator({
+            try{
+              const response = await github.repos.checkCollaborator({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: context.payload.comment.user.login,
+              })
+              return response.status === 204
+            } catch {
+              return false
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: check-issue
+        name: Check if the comment is replied in an issue
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const response = await github.issues.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              username: context.payload.comment.user.login,
+              issue_number: context.issue.number,
             })
-            return { hasWriteAccess: response.data.permission === 'write' }
+            return response.data.pull_request === undefined
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - id: add-label
         name: Add 'replied' label
-        if: steps.check-access.outputs.hasWriteAccess
-        uses: actions-ecosystem/action-add-label@v1
+        if: ${{ steps.check-access.outputs.result == 'true' && steps.check-issue.outputs.result == 'true' }}
+        uses: actions/github-script@v4
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.issue.number }}
-          label: replied
+          script: |
+            await github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: process.env.labels.split(', '),
+            })
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          labels: 'replied'
