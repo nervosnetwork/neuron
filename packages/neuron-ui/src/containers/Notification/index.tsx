@@ -80,8 +80,8 @@ export const NoticeContent = () => {
   const dispatch = useDispatch()
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
-  const [hasDismiss, setHasDismiss] = useState(false)
-  useGlobalNotifications(dispatch, hasDismiss)
+  const [hasDismissMigrate, setHasDismissMigrate] = useState(false)
+  useGlobalNotifications(dispatch, hasDismissMigrate)
 
   const notificationsInDesc = useMemo(() => [...notifications].reverse(), [notifications])
   const notification: State.Message | undefined = notificationsInDesc[0]
@@ -103,8 +103,10 @@ export const NoticeContent = () => {
 
   const onGlobalDialogDismiss = useCallback(() => {
     dismissGlobalDialog()(dispatch)
-    setHasDismiss(true)
-  }, [dispatch])
+    if (globalDialog === 'rebuild-sync') {
+      setHasDismissMigrate(true)
+    }
+  }, [dispatch, globalDialog])
 
   const onOk = useCallback(() => {
     migrateData().then(res => {
