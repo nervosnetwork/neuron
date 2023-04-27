@@ -6,7 +6,7 @@ import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
 const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'> = {
   network: {
     name: 'network',
-    remote: 'http://localhost:3000',
+    remote: 'http://127.0.0.1:3000',
     type: 0,
     id: 'd',
     chain: 'ckb',
@@ -67,7 +67,7 @@ stories.add('With knobs', () => {
   const props = {
     network: {
       name: text('Network name', 'network name'),
-      remote: text('Remote', 'http://localhost:3000'),
+      remote: text('Remote', 'http://127.0.0.1:3000'),
       type: select('Type', [0, 1], 0) as any,
       id: text('id', 'd'),
       chain: select('Chain', ['ckb', 'ckb_testnet', 'ckb_dev'], 'ckb'),
