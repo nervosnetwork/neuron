@@ -217,7 +217,7 @@
       "set-locktime": "Set Locktime",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
-      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. In general, exchanges do not support expiration unlocking, please use with caution!"
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
     },
     "receive": {
       "title": "Receive",
@@ -509,7 +509,7 @@
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
       "migrate": "Migrate",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
-      "light-client-locktime-warning": "Warning: Light client mode doesn't support showing lock-time CKBytes.",
+      "light-client-locktime-warning": "2.Light client mode doesn't support showing lock-time CKBytes.",
       "light-client-cheque-warning": "Warning: Light client mode doesn't support showing Cheque assets.",
       "fields": {
         "wallet": "Wallet",

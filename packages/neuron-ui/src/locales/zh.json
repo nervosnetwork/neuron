@@ -210,7 +210,7 @@
       "set-locktime": "设置锁定时间",
       "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
       "release-on": "锁定至",
-      "locktime-warning": "请确保对方钱包能够支持到期解锁功能。一般情况下，交易所不支持到期解锁功能，请谨慎使用！"
+      "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）"
     },
     "receive": {
       "title": "收款",
@@ -502,7 +502,7 @@
       "rebuild-sync": "为了提供更好的用户体验，Neuron 採取了新的存储方案，该方案需要一次性迁移数据(预期同步时间为 20~60 分钟)。\n抱歉给您带来不便。",
       "migrate": "迁移",
       "secp256k1/blake160-address-required": "请输入 secp256k1/blake160 地址",
-      "light-client-locktime-warning": "注意: 轻节点模式不支持展示到期解锁的 CKBytes。",
+      "light-client-locktime-warning": "2.轻节点模式不支持展示到期解锁的 CKBytes。",
       "light-client-cheque-warning": "注意: 轻节点模式不支持展示 Cheque 资产。",
       "fields": {
         "wallet": "钱包",
