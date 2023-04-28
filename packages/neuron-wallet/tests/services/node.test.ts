@@ -329,7 +329,7 @@ describe('NodeService', () => {
       expect(stubbedTipNumberSubjectCallback).toHaveBeenCalledWith('0')
     })
     describe('targets to bundled node', () => {
-      const bundledNodeUrl = 'http://localhost:8114'
+      const bundledNodeUrl = 'http://127.0.0.1:8114'
       beforeEach(async () => {
         stubbedCKBSetNode.mockImplementation(() => {
           nodeService.ckb.node.url = bundledNodeUrl

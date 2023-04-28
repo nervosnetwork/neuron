@@ -55,7 +55,7 @@ jest.mock('../../src/services/networks', () => {
       return {
         getCurrent() {
           return {
-            remote: 'http://localhost:8114'
+            remote: 'http://127.0.0.1:8114'
           }
         }
       }
