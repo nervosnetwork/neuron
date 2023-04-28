@@ -21,10 +21,12 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
     (stateDispatch: StateDispatch) => {
       getFeeRateStats()
         .then(res => {
-          const { mean, median } = res
-          const suggested = mean && median ? Math.max(1000, Number(mean), Number(median)) : MEDIUM_FEE_RATE
-
-          setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
+          if (res) {
+            const { mean, median } = res
+            const suggested = mean && median ? Math.max(1000, Number(mean), Number(median)) : MEDIUM_FEE_RATE
+  
+            setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
+          }
         })
         .catch((err: Error) => {
           try {

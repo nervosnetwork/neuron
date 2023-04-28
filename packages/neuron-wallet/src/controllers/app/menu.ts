@@ -40,18 +40,27 @@ const separator: MenuItemConstructorOptions = {
   type: 'separator'
 }
 
+const getVerionFromFile = (filePath: string) => {
+  if (fs.existsSync(filePath)) {
+    try {
+      return fs.readFileSync(filePath, 'utf8')
+    } catch (err) {
+      logger.error(`[Menu]: `, err)
+    }
+  }
+}
+
 const showAbout = () => {
   let applicationVersion = t('about.app-version', { name: app.name, version: app.getVersion() })
 
   const appPath = app.isPackaged ? app.getAppPath() : path.join(__dirname, '../../../../..')
-  const ckbVersionPath = path.join(appPath, '.ckb-version')
-  if (fs.existsSync(ckbVersionPath)) {
-    try {
-      const ckbVersion = fs.readFileSync(ckbVersionPath, 'utf8')
-      applicationVersion += `\n${t('about.ckb-client-version', { version: ckbVersion })}`
-    } catch (err) {
-      logger.error(`[Menu]: `, err)
-    }
+  const ckbVersion = getVerionFromFile(path.join(appPath, '.ckb-version'))
+  if (ckbVersion) {
+    applicationVersion += `\n${t('about.ckb-client-version', { version: ckbVersion })}`
+  }
+  const ckbLightClientVersion = getVerionFromFile(path.join(appPath, '.ckb-light-version'))
+  if (ckbLightClientVersion) {
+    applicationVersion += `${t('about.ckb-light-client-version', { version: ckbLightClientVersion })}`
   }
 
   const isWin = process.platform === 'win32'

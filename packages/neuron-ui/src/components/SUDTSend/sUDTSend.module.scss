@@ -178,6 +178,20 @@
         }
       }
     }
+
+    .chequeWarning {
+      padding: 0 8px;
+      margin-left: 8px;
+      background-color: rgb(255, 244, 206);
+      color: rgb(50, 49, 48);
+  
+      & > svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+        transform: translateY(20%);
+      }
+    }
   }
   .cheque {
     grid-area: option-0;

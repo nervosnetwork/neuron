@@ -119,12 +119,20 @@ export default class WalletsController {
 
     const walletsService = WalletsService.getInstance()
     const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    let startBlockNumberInLight: string | undefined = undefined
+    if (!isImporting) {
+      try {
+        startBlockNumberInLight = await rpc.getTipBlockNumber()
+      } catch (error) {
+        startBlockNumberInLight = undefined
+      }
+    }
     const wallet = walletsService.create({
       id: '',
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
-      startBlockNumberInLight: isImporting ? undefined : await rpc.getTipBlockNumber()
+      startBlockNumberInLight,
     })
 
     wallet.checkAndGenerateAddresses(isImporting)

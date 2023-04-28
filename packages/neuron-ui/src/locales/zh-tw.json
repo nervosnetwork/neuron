@@ -210,7 +210,7 @@
       "set-locktime": "設置鎖定時間",
       "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
       "release-on": "鎖定至",
-      "locktime-warning": "請確保對方錢包能夠支持到期解鎖功能。一般情況下，交易所不支持到期解鎖功能，請謹慎使用！"
+      "locktime-warning": "請確保對方錢包支持到期解鎖功能。（註：1.交易所壹般不支持到期解鎖功能 {{extraNote}}）"
     },
     "receive": {
       "title": "收款",
@@ -502,6 +502,8 @@
       "migrate-warning": "註意：遷移過程中可能由於未知原因失敗導致需要重新同步，請備份完成後開始遷移！",
       "migrate": "遷移",
       "secp256k1/blake160-address-required": "請輸入 secp256k1/blake160 地址",
+      "light-client-locktime-warning": "2.輕節點模式不支持展示到期解鎖的 CKBytes。",
+      "light-client-cheque-warning": "註意: 輕節點模式不支持展示 Cheque 資產。",
       "fields": {
         "wallet": "錢包",
         "name": "名稱",

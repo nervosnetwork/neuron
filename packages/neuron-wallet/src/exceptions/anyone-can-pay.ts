@@ -30,6 +30,12 @@ export class SudtAcpHaveDataError extends Error {
   }
 }
 
+export class LightClientNotSupportSendToACPError extends Error {
+  constructor() {
+    super(t('messages.light-client-sudt-acp-error'))
+  }
+}
+
 export default {
   TargetOutputNotFoundError,
   AcpSendSameAccountError
