@@ -17,6 +17,7 @@ import {
 import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 import { Clock } from 'widgets/Icons/icon'
 import { Link } from 'react-router-dom'
+import { HIDE_BALANCE } from 'utils/const'
 
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
@@ -209,7 +210,7 @@ export const DAORecord = ({
     <div className={styles.container}>
       <div className={styles.amountAndBadge}>
         <CopyZone className={styles.amount} content={shannonToCKBFormatter(capacity, false, '')}>
-          {`${isPrivacyMode ? '******' : shannonToCKBFormatter(capacity)} CKB`}
+          {`${isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(capacity)} CKB`}
         </CopyZone>
         {badge}
       </div>
@@ -217,10 +218,10 @@ export const DAORecord = ({
       <div className={styles.compensationAndAPC}>
         <span className={styles.compensation}>
           {CellStatus.Depositing !== cellStatus && compensation >= BigInt(0)
-            ? `${isPrivacyMode ? '******' : `+${shannonToCKBFormatter(compensation.toString()).toString()}`} CKB`
+            ? `${isPrivacyMode ? HIDE_BALANCE : `+${shannonToCKBFormatter(compensation.toString()).toString()}`} CKB`
             : '- CKB'}
         </span>
-        <span className={styles.apc}>{apc ? `APC ≈ ${isPrivacyMode ? '******' : `${apc}%`}` : `APC ≈ - %`}</span>
+        <span className={styles.apc}>{apc ? `APC ≈ ${isPrivacyMode ? HIDE_BALANCE : `${apc}%`}` : `APC ≈ - %`}</span>
       </div>
 
       {CellStatus.Completed === cellStatus ? (

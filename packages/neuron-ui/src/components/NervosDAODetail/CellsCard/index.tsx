@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { onEnter } from 'utils/inputDevice'
 import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
-import { MAINNET_TAG } from 'utils/const'
+import { HIDE_BALANCE, MAINNET_TAG } from 'utils/const'
 import ScriptTag from 'components/ScriptTag'
 import LockInfoDialog from 'components/LockInfoDialog'
 import { useState as useGlobalState } from 'states'
@@ -76,7 +76,7 @@ const TabsVariantWithCellsCard: FC<
                   </>
                 )}
               </div>
-              <div>{`${isPrivacyMode ? '******' : capacity} CKB`}</div>
+              <div>{`${isPrivacyMode ? HIDE_BALANCE : capacity} CKB`}</div>
             </div>
           )
         })}

@@ -26,6 +26,7 @@ import PageContainer from 'components/PageContainer'
 import CopyZone from 'widgets/CopyZone'
 import { ArrowNext, Deposit, EyesClose, EyesOpen, Tooltip } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
+import { HIDE_BALANCE } from 'utils/const'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
@@ -332,7 +333,8 @@ const NervosDAO = () => {
                 name={t('nervos-dao.copy-balance')}
                 className={styles.balance}
               >
-                <span className={styles.number}>{isPrivacyMode ? '******' : shannonToCKBFormatter(`${free}`)}</span> CKB
+                <span className={styles.number}>{isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(`${free}`)}</span>{' '}
+                CKB
               </CopyZone>
             </div>
           </div>
@@ -346,7 +348,9 @@ const NervosDAO = () => {
                   name={t('nervos-dao.copy-balance')}
                   className={styles.balance}
                 >
-                  <span className={styles.number}>{isPrivacyMode ? '******' : shannonToCKBFormatter(`${locked}`)}</span>{' '}
+                  <span className={styles.number}>
+                    {isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(`${locked}`)}
+                  </span>{' '}
                   CKB
                 </CopyZone>
               ) : (
