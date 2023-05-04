@@ -416,7 +416,7 @@
     },
     "password-request": {
       "wallet-not-found": "The wallet is not found",
-      "password": "Password",
+      "password": "Enter Password",
       "send": {
         "title": "Submit the transaction"
       },

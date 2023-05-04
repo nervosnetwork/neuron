@@ -409,7 +409,7 @@
     },
     "password-request": {
       "wallet-not-found": "找不到该钱包",
-      "password": "密码",
+      "password": "输入密码",
       "send": {
         "title": "发起交易"
       },
