@@ -138,7 +138,7 @@ describe('Get Local Week Names', () => {
   })
 
   it('English', () => {
-    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
     expect(getLocalWeekNames('en')).toEqual(names)
   })
 

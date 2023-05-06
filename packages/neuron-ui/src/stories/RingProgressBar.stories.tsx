@@ -7,7 +7,7 @@ export default {
   component: RingProgressBar,
 }
 
-const Template: ComponentStory<typeof RingProgressBar> = props => <RingProgressBar {...props} />
+const Template: ComponentStory<typeof RingProgressBar> = (props: any) => <RingProgressBar {...props} />
 
 export const CssColor = Template.bind({})
 CssColor.args = {

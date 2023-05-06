@@ -42,7 +42,7 @@ const basicProps: Omit<DAORecordProps, 'onToggle'> = {
   blockNumber: '7712',
 }
 
-const Template: ComponentStory<typeof NervosDAORecord> = props => {
+const Template: ComponentStory<typeof NervosDAORecord> = (props: any) => {
   const { isCollapsed: isCollapsedInit } = props
   const [isCollapsed, setIsCollapsed] = useState(isCollapsedInit ?? true)
   return <NervosDAORecord {...props} isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />

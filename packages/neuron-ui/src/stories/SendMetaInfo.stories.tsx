@@ -20,7 +20,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof SendMetaInfo> = props => <SendMetaInfo {...props} />
+const Template: ComponentStory<typeof SendMetaInfo> = (props: any) => <SendMetaInfo {...props} />
 
 export const Common = Template.bind({})
 Common.args = {

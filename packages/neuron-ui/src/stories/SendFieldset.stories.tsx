@@ -16,7 +16,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof SendFieldset> = props => <SendFieldset {...props} />
+const Template: ComponentStory<typeof SendFieldset> = (props: any) => <SendFieldset {...props} />
 
 export const Common = Template.bind({})
 Common.args = {

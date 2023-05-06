@@ -31,7 +31,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof NetworkStatus> = props => <NetworkStatus {...props} />
+const Template: ComponentStory<typeof NetworkStatus> = (props: any) => <NetworkStatus {...props} />
 
 export const Online = Template.bind({})
 Online.args = {
