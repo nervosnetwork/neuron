@@ -88,6 +88,7 @@ const SendFieldset = ({
             )}
           </div>
         }
+        className={styles.addresstField}
         field="address"
         data-idx={idx}
         disabled={item.disabled}
@@ -99,7 +100,6 @@ const SendFieldset = ({
       />
 
       <TextField
-        className={styles.amountField}
         label={t('send.amount')}
         field="amount"
         data-idx={idx}

@@ -127,6 +127,8 @@
   grid-area: message;
   font-size: 14px;
   line-height: 20px;
+  margin-top: 10px;
+  color: var(--input-hint-color);
 }
 
 .errorMessage {
