@@ -263,6 +263,7 @@
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
+      "opening": "正在打开",
       "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
       "copy-address": "复制地址",

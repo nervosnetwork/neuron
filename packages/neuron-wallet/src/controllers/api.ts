@@ -370,8 +370,24 @@ export default class ApiController {
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`#/transaction/${hash}`, t(`messageBox.transaction.title`, { hash }), {
-        height: 750
+      const win = showWindow(
+        `#/transaction/${hash}`,
+        t(`messageBox.transaction.title`, { hash }),
+        {
+          height: 750
+        },
+        undefined,
+        (win) => win.webContents.getURL().endsWith(`#/transaction/${hash}`)
+      )
+
+      if (win.isVisible()) return
+
+      return new Promise((resolve, reject) => {
+        win.once('ready-to-show', resolve)
+        CommonUtils.sleep(3e3).then(() => {
+          win.off('ready-to-show', resolve)
+          reject(new Error('Show window timeout'))
+        })
       })
     })
 
