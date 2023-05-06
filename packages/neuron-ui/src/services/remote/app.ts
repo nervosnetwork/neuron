@@ -23,6 +23,7 @@ export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boo
 )
 export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
+export const getIsCkbRunExternal = remoteApi<void, boolean>('is-ckb-run-external')
 
 export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
 

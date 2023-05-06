@@ -8,6 +8,7 @@ import { Validate, Required } from 'utils/validators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
 import CommonUtils from 'utils/common'
+import { BUNDLED_CKB_URL } from 'utils/const'
 
 const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',
@@ -15,7 +16,7 @@ const presetNetworks: { selected: string; networks: Network[] } = {
     {
       id: 'mainnet',
       name: 'Default',
-      remote: 'http://localhost:8114',
+      remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
       chain: 'ckb'
@@ -47,6 +48,12 @@ export default class NetworksService extends Store {
 
   public getAll = () => {
     const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
+    networks.forEach((network) => {
+      // Currently, the RPC interface of the CKB node is bound to IPv4 by default.
+      // Starting from node17, its DNS resolution is no longer `ipv4first`.
+      // Therefore, to ensure normal connection to the ckb node, manual resolution needs to be done here.
+      network.remote = applyLocalhostIPv4Resolve(network.remote)
+    })
     const defaultNetwork = networks[0]
     const isOldDefaultName = ['Default', 'Mainnet'].includes(networks[0].name)
     defaultNetwork.name = isOldDefaultName ? 'default node' : defaultNetwork.name
@@ -175,4 +182,18 @@ export default class NetworksService extends Store {
 
     return network
   }
+}
+
+function applyLocalhostIPv4Resolve(url: string): string {
+  let urlObj
+  try {
+    urlObj = new URL(url)
+  } catch (err) {
+    return url
+  }
+
+  if (urlObj.hostname !== 'localhost') return url
+
+  urlObj.hostname = '127.0.0.1'
+  return urlObj.href
 }

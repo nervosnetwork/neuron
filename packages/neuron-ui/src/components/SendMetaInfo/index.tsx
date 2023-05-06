@@ -15,7 +15,7 @@ interface SendMetaInfoProps {
   fee: string
   price: string
   handleDescriptionChange: React.EventHandler<React.SyntheticEvent>
-  handlePriceChange: React.EventHandler<React.SyntheticEvent>
+  handlePriceChange: (value: string) => void
 }
 
 const SendMetaInfo = ({
@@ -42,6 +42,7 @@ const SendMetaInfo = ({
           width="100%"
         />
       ) : null}
+      <TransactionFeePanel fee={shannonToCKBFormatter(fee)} price={price} onPriceChange={handlePriceChange} />
       <TextField
         field="description"
         label={t('send.description')}
@@ -50,7 +51,6 @@ const SendMetaInfo = ({
         disabled={sending}
         width="100%"
       />
-      <TransactionFeePanel fee={shannonToCKBFormatter(fee)} price={price} onPriceChange={handlePriceChange} />
     </>
   )
 }

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
+import { ControllerResponse, SuccessFromController } from 'services/remote/remoteApiWrapper'
 
 import {
   outputsToTotalAmount,
@@ -168,6 +169,7 @@ const useOnTransactionChange = (
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
+
       updateTransactionWith(generateTx)({
         walletID,
         items,
@@ -233,9 +235,9 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
 
 const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { value } = e.target as HTMLInputElement
+    (value: string) => {
       const price = value.split('.')[0].replace(/[^\d]/g, '')
+
       dispatch({
         type: AppActions.UpdateSendPrice,
         payload: price.replace(/,/g, ''),
@@ -263,6 +265,50 @@ const clear = (dispatch: StateDispatch) => {
 }
 
 const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
+
+export type FeeRateValueArrayItemType = {
+  feeRateValue: string
+  feeValue: string
+}
+
+export const useGetBatchGeneratedTx = async ({
+  walletID,
+  priceArray = [],
+  items,
+}: {
+  walletID: string
+  priceArray?: string[]
+  items: Readonly<State.Output[]>
+}) => {
+  const getUpdateGeneratedTx = (params: Controller.GenerateTransactionParams) =>
+    generateTx(params).then((res: ControllerResponse<State.Transaction>) => {
+      if (res.status === 1) {
+        return (res as SuccessFromController).result
+      }
+      return res
+    })
+
+  const realParams = {
+    walletID,
+    items: items.map(item => ({
+      address: item.address!,
+      capacity: CKBToShannonFormatter(item.amount, item.unit),
+      date: item.date,
+    })),
+  }
+
+  const requestArray = priceArray.map(itemPrice => getUpdateGeneratedTx({ ...realParams, feeRate: itemPrice }))
+  const allPromiseResult = await Promise.allSettled<State.Transaction>(requestArray)
+
+  const feeRateValueArray: FeeRateValueArrayItemType[] = allPromiseResult?.map(
+    (batchItem: PromiseSettledResult<State.Transaction>, index: number) => ({
+      feeRateValue: priceArray[index],
+      feeValue: batchItem.status === 'fulfilled' ? calculateFee(batchItem.value) : '',
+    })
+  )
+
+  return feeRateValueArray
+}
 
 export const useInitialize = (
   walletID: string,

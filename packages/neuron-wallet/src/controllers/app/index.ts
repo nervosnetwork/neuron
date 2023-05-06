@@ -14,7 +14,6 @@ import { migrate as mecuryMigrate } from 'controllers/mercury'
 import SyncApiController from 'controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import { stopCkbNode } from 'services/ckb-runner'
-import startMonitor from 'services/monitor'
 
 const app = electronApp
 
@@ -50,8 +49,6 @@ export default class AppController {
     SyncApiController.getInstance().mount()
 
     await this.openWindow()
-
-    startMonitor()
   }
 
   /**

@@ -5,6 +5,7 @@ import SyncedBlockNumber from 'models/synced-block-number'
 import { clean as cleanChain } from 'database/chain'
 import SettingsService from './settings'
 import startMonitor, { stopMonitor } from './monitor'
+import NodeService from './node'
 
 export default class IndexerService {
   private constructor() {}
@@ -18,7 +19,9 @@ export default class IndexerService {
   }
 
   static clearCache = async (clearIndexerFolder = false) => {
-    await stopMonitor('ckb')
+    if (!NodeService.getInstance().isCkbNodeExternal) {
+      await stopMonitor('ckb')
+    }
     await cleanChain()
 
     if (clearIndexerFolder) {
@@ -26,7 +29,9 @@ export default class IndexerService {
       await new SyncedBlockNumber().setNextBlock(BigInt(0))
     }
 
-    await startMonitor('ckb')
+    if (!NodeService.getInstance().isCkbNodeExternal) {
+      await startMonitor('ckb')
+    }
   }
 
   static cleanOldIndexerData() {

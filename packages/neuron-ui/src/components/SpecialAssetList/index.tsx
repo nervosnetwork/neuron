@@ -27,6 +27,7 @@ import { TokenInfo } from 'components/SUDTCreateDialog'
 import SUDTMigrateDialog from 'components/SUDTMigrateDialog'
 import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDialog'
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
+import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import {
   useMigrate,
   useClickMigrate,
@@ -36,7 +37,7 @@ import {
 } from './hooks'
 import styles from './specialAssetList.module.scss'
 
-const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
+const { PAGE_SIZE } = CONSTANTS
 
 export interface SpecialAssetCell {
   blockHash: string
@@ -110,6 +111,7 @@ const SpecialAssetList = () => {
     },
     sUDTAccounts,
   } = useGlobalState()
+  const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const isMainnet = isMainnetUtil(networks, networkID)
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
   const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
@@ -248,7 +250,7 @@ const SpecialAssetList = () => {
           unlockSpecialAsset({
             walletID: id,
             outPoint: cell.outPoint,
-            feeRate: `${MEDIUM_FEE_RATE}`,
+            feeRate: `${suggestFeeRate}`,
             customizedAssetInfo: cell.customizedAssetInfo,
           }).then(handleRes('unlock'))
           return

@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 
 import appState from 'states/init/app'
-import { useState as useGlobalState, useDispatch } from 'states'
 
 import {
   CONSTANTS,
@@ -15,9 +15,12 @@ import {
   getCurrentUrl,
   getSyncStatus,
   CKBToShannonFormatter,
+  ErrorCode,
+  CapacityUnit,
+  isSuccessResponse,
 } from 'utils'
 
-import { openExternal } from 'services/remote'
+import { generateDaoDepositTx, openExternal } from 'services/remote'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -26,6 +29,7 @@ import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 
+import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
@@ -55,6 +59,7 @@ const NervosDAO = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, { language }] = useTranslation()
+  const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
@@ -79,6 +84,7 @@ const NervosDAO = () => {
     maxDepositErrorMessage,
     isBalanceReserved,
     t,
+    suggestFeeRate,
   })
 
   const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
@@ -102,6 +108,7 @@ const NervosDAO = () => {
     setMaxDepositTx,
     setMaxDepositErrorMessage,
     isBalanceReserved,
+    suggestFeeRate,
   })
   hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
@@ -111,6 +118,7 @@ const NervosDAO = () => {
     clearGeneratedTx,
     walletID: wallet.id,
     dispatch,
+    suggestFeeRate,
   })
 
   const onActionClick = hooks.useOnActionClick({
@@ -239,10 +247,37 @@ const NervosDAO = () => {
   }, [])
 
   useEffect(() => {
-    if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
-      setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+    try {
+      if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
+        setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+      }
+    } catch (error) {
+      // ignore error
+      // When the depositValue is invalid, it displays the error in the textField, but it will throw an exception when valid wheater it's big than the max deposit value
+      // and when the depositValue is invalid, it's no need to set max depositValue.
     }
   }, [maxDepositAmount, depositValue, setDepositValue])
+
+  useEffect(() => {
+    generateDaoDepositTx({
+      feeRate: `${suggestFeeRate}`,
+      capacity: CKBToShannonFormatter(depositValue, CapacityUnit.CKB),
+      walletID: wallet.id,
+    }).then(res => {
+      if (isSuccessResponse(res)) {
+        dispatch({
+          type: AppActions.UpdateGeneratedTx,
+          payload: res.result,
+        })
+      } else if (res.status === 0) {
+        setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+      } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
+        setErrorMessage(t(`messages.codes.106`))
+      } else {
+        setErrorMessage(t(`messages.codes.${res.status}`))
+      }
+    })
+  }, [suggestFeeRate, depositValue])
 
   const MemoizedDepositDialog = useMemo(() => {
     return (

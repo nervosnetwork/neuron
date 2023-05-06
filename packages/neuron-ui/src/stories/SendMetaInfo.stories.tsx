@@ -32,5 +32,5 @@ Common.args = {
   fee: '',
   price: '',
   handleDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => action('Update Description')(e.target.value),
-  handlePriceChange: (e: React.ChangeEvent<HTMLInputElement>) => action('Update Price')(e.target.value),
+  handlePriceChange: (value: string) => action('Update Price')(value),
 }

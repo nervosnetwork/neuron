@@ -33,7 +33,7 @@ jobs:
           body="${body//$'\r'/'%0D'}"
           echo ::set-output name=body::$body
 
-      - uses: peter-evans/commit-comment@v1
+      - uses: peter-evans/commit-comment@v2
         with:
           body: ${{ steps.comment_body.outputs.body }}
 

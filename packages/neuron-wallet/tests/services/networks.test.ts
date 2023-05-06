@@ -11,7 +11,7 @@ const ERROR_MESSAGE = {
 describe(`Unit tests of networks service`, () => {
   const newNetwork: Network = {
     name: `new network`,
-    remote: `http://localhost:8114`,
+    remote: `http://127.0.0.1:8114`,
     type: 0,
     genesisHash: '0x',
     id: '',
@@ -20,7 +20,7 @@ describe(`Unit tests of networks service`, () => {
 
   const newNetworkWithDefaultTypeOf1 = {
     name: `new network with the default type of 1`,
-    remote: `http://localhost:8114`,
+    remote: `http://127.0.0.1:8114`,
     id: '',
   }
 
@@ -82,10 +82,19 @@ describe(`Unit tests of networks service`, () => {
 
     it(`update the network' address`, async () => {
       const network = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
-      const address = `http://localhost:8115`
+      const address = `http://127.0.0.1:8115`
       await service.update(network.id, { remote: address })
       const updated = service.get(network.id)
       expect(updated && updated.remote).toBe(address)
+    })
+
+    it(`use ipv4 to resolve the localhost in network' remote`, async () => {
+      const network = await service.create(newNetworkWithDefaultTypeOf1.name, 'http://localhost:8114/')
+      const created = service.get(network.id)
+      expect(created && created.remote).toBe('http://127.0.0.1:8114/')
+      await service.update(network.id, { remote: 'http://localhost:8114/' })
+      const updated = service.get(network.id)
+      expect(updated && updated.remote).toBe('http://127.0.0.1:8114/')
     })
 
     it(`set the network to be the current one`, async () => {
@@ -151,11 +160,11 @@ describe(`Unit tests of networks service`, () => {
 
   describe(`validation on network existence`, () => {
     beforeEach(async () => {
-      await service.create('Default', 'http://localhost:8114')
+      await service.create('Default', 'http://127.0.0.1:8114')
     });
 
     it(`create network with existing name of Default`, () => {
-      expect(service.create('Default', 'http://localhost:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
+      expect(service.create('Default', 'http://127.0.0.1:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))
     })
 
     it(`update network which is not existing`, () => {

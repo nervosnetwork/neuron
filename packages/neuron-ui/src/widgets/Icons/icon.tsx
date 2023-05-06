@@ -48,6 +48,8 @@ import { ReactComponent as ExportSvg } from './Export.svg'
 import { ReactComponent as ConfirmingSvg } from './Confirming.svg'
 import { ReactComponent as CopySvg } from './Copy.svg'
 import { ReactComponent as AddressTransformSvg } from './AddressTransform.svg'
+import { ReactComponent as TransferSvg } from './Transfer.svg'
+import { ReactComponent as LineDownArrowSvg } from './LineDownArrow.svg'
 
 import styles from './icon.module.scss'
 
@@ -110,3 +112,5 @@ export const Confirming = WrapSvg(ConfirmingSvg)
 export const SuccessNoBorder = WrapSvg(SuccessNoBorderSvg)
 export const Copy = WrapSvg(CopySvg)
 export const AddressTransform = WrapSvg(AddressTransformSvg, styles.addressTransform)
+export const Transfer = WrapSvg(TransferSvg)
+export const LineDownArrow = WrapSvg(LineDownArrowSvg)

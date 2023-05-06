@@ -279,8 +279,7 @@ const SUDTSend = () => {
   }, [dispatch, sendState.sendAll])
 
   const onPriceChange = useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { value } = e.target as HTMLInputElement
+    (value: string) => {
       const price = value.split('.')[0].replace(/[^\d]/, '')
       dispatch({ type: Fields.Price, payload: price })
     },
