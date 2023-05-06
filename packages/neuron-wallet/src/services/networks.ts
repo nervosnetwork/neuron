@@ -195,5 +195,8 @@ function applyLocalhostIPv4Resolve(url: string): string {
   if (urlObj.hostname !== 'localhost') return url
 
   urlObj.hostname = '127.0.0.1'
-  return urlObj.href
+  // When the pathname is empty, the URL constructor automatically sets the pathname
+  // to '/' and this needs to be handled.
+  const hasExtraPathSeparator = urlObj.pathname === '/' && !url.endsWith('/')
+  return hasExtraPathSeparator ? urlObj.href.slice(0, -1) : urlObj.href
 }
