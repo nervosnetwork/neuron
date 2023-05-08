@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ErrorCode, getExplorerUrl, isMainnet, isSuccessResponse, localNumberFormatter } from 'utils'
 import Alert from 'widgets/Alert'
@@ -144,6 +144,24 @@ const PageContainer: React.FC<ComponentProps> = props => {
         </Alert>
       )}
       <div className={styles.body}>{children}</div>
+    </div>
+  )
+}
+
+export const Breadcrumbs: FC<PropsWithChildren<{}>> = ({ children }) => {
+  const childList = React.Children.toArray(children).filter(child => {
+    return React.isValidElement(child)
+  })
+
+  return (
+    <div className={styles.breadcrumbs}>
+      {childList.map((child, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <React.Fragment key={index}>
+          {index !== 0 && <span>/</span>}
+          {child}
+        </React.Fragment>
+      ))}
     </div>
   )
 }

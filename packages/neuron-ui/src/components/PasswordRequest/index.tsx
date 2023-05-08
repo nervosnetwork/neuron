@@ -370,6 +370,7 @@ const PasswordRequest = () => {
     <Dialog
       show={!!actionType}
       title={t(`password-request.${actionType}.title`)}
+      contentClassName={styles.content}
       onCancel={onDismiss}
       onConfirm={onSubmit}
       disabled={disabled}
@@ -402,6 +403,8 @@ const PasswordRequest = () => {
         )}
         {currentWallet.isWatchOnly || (
           <TextField
+            className={styles.passwordInput}
+            width="100%"
             label={t('password-request.password')}
             value={password}
             field="password"
@@ -409,7 +412,6 @@ const PasswordRequest = () => {
             title={t('password-request.password')}
             onChange={onChange}
             autoFocus
-            className={styles.passwordInput}
             error={error}
           />
         )}
@@ -419,15 +421,18 @@ const PasswordRequest = () => {
               {t('offline-sign.export')} <Export />
             </Button>
             {!currentWallet.isWatchOnly && (
-              <Button
-                type="text"
-                className={!password ? styles.signDisabled : ''}
-                onClick={signAndExportFromGenerateTx}
-                disabled={!password}
-                loading
-              >
-                {t('offline-sign.sign-and-export')} <Sign />
-              </Button>
+              <>
+                <div className={styles.divider} />
+                <Button
+                  type="text"
+                  className={styles.signAndExportFromGenerateTx}
+                  onClick={signAndExportFromGenerateTx}
+                  disabled={!password}
+                  loading={isLoading}
+                >
+                  {t('offline-sign.sign-and-export')} <Sign />
+                </Button>
+              </>
             )}
           </div>
         ) : null}

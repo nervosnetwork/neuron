@@ -1,54 +1,29 @@
 @import '../../styles/mixin.scss';
 
-.dialog {
-  @include dialog-container;
-  padding: 0;
-
-  &::backdrop {
-    @include overlay;
-  }
-}
-
-.container {
-  padding: 30px 50px;
+.content {
+  padding: 24px 16px;
+  color: var(--main-text-color);
 }
 
 .title {
-  font-weight: 900;
-  font-size: 1.125rem;
-}
+  margin-top: 24px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
 
-.infoWrap {
-  padding: 20px;
-  border-radius: 6px;
-  background-color: rgb(249, 249, 249);
-
-  li:not(:first-child) {
-    margin-top: 10px;
-  }
-
-  li {
-    display: flex;
-
-    > div:first-child {
-      width: 110px;
-      font-weight: 600;
-      margin-right: 10px;
-    }
-
-    > div:last-child {
-      flex: 1;
-      word-break: break-all;
-    }
+  &:first-child {
+    margin-top: 0;
   }
 }
 
-.lock {
+.codeBlock {
   position: relative;
+  margin-top: 13px;
 
   pre {
+    margin: 0;
     overflow: auto;
-    background: #eee;
+    background: var(--table-head-background-color);
     padding: 10px;
     border-radius: 6px;
     font-size: 12px;
@@ -60,10 +35,10 @@
     right: 5px;
     width: 15px;
     height: 15px;
-    cursor: pointer!important;
+    cursor: pointer;
     opacity: 0;
 
-    svg{
+    svg {
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -73,8 +48,7 @@
       filter: brightness(0.5);
     }
   }
- &:hover .copyBtn {
+  &:hover .copyBtn {
     opacity: 100%;
   }
 }
-

@@ -409,7 +409,7 @@
     },
     "password-request": {
       "wallet-not-found": "找不到该钱包",
-      "password": "密码",
+      "password": "输入密码",
       "send": {
         "title": "发起交易"
       },
@@ -625,7 +625,7 @@
       "completed-records": "已解锁",
       "apc": "当前年化锁定补贴率",
       "apc-tooltip": "当前年化锁定补贴率",
-      "fee": "手续费",
+      "fee": "手续费：",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "从 Nervos DAO 取出",
       "cancel": "取消",
@@ -637,16 +637,17 @@
       "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
-      "balance-not-reserved": "（不建议）不预留未来操作手续费",
+      "balance-not-reserved": "不预留未来操作手续费（不建议）",
+      "deposit-amount": "存入金额 (CKB)",
       "deposit-record": {
         "deposited-at": "存入于",
         "completed-at": "已取出",
         "deposit-pending": "存入 提交中",
-        "withdraw-action-label": "取出",
+        "withdraw-action-label": "发起提取",
         "unlock-action-label": "解锁",
         "record": "记录",
         "deposited": "存入",
-        "withdrawn": "提取",
+        "withdrawn": "发起提取",
         "unlocked": "解锁",
         "tx-record": "交易记录",
         "locked-period": "锁定时间",
@@ -676,6 +677,27 @@
           "unlocking": "解锁中..."
         }
       }
+    },
+    "nervos-dao-detail": {
+      "tx-detail": "交易详情",
+      "deposited": "存入",
+      "withdrawn": "发起提取",
+      "unlocked": "解锁",
+      "basic-information": "基本信息",
+      "transaction-hash": "交易哈希",
+      "blockNumber": "区块高度",
+      "datetime": "时间",
+      "income": "收入",
+      "index": "序号",
+      "address": "地址",
+      "amount": "数量",
+      "cell-from-cellbase": "来自 Cellbase",
+      "cancel": "取消",
+      "next": "下一步"
+    },
+    "lock-info-dialog": {
+      "address-info": "地址信息",
+      "deprecated-address": "已弃用格式的地址"
     },
     "updates": {
       "check-updates": "检查更新",

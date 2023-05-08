@@ -259,13 +259,13 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   width: 6px;
-  background: #CCCCCC;
+  background: #cccccc;
   border-radius: 48px;
 }
 @media (prefers-color-scheme: dark) {
   ::-webkit-scrollbar-thumb {
     background: #000;
-    border: 1px solid #343E3C;
+    border: 1px solid #343e3c;
     border-radius: 48px;
   }
 }

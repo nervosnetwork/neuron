@@ -90,7 +90,7 @@
     "eslint-plugin-react": "7.31.10",
     "jest-styled-components": "7.1.1",
     "lint-staged": "9.5.0",
-    "prettier": "1.19.1",
+    "prettier": "2.3.0",
     "react-app-rewired": "2.2.1",
     "react-scripts": "5.0.1",
     "react-test-renderer": "16.12.0",
