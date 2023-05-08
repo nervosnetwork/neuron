@@ -60,6 +60,7 @@ export enum AppActions {
   UpdateLoadedTransaction = 'updateLoadedTransaction',
   SetPageNotice = 'setPageNotice',
   HideWaitForFullySynced = 'hideWaitForFullySynced',
+  SignVerify = 'signVerify',
 }
 
 export type StateAction =
@@ -107,6 +108,7 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateNervosDaoData; payload: State.NervosDAO }
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
   | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
+  | { type: AppActions.SignVerify; payload: string }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 

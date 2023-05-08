@@ -96,13 +96,14 @@ const WalletSetting = ({
   )
 
   const navTo = useCallback(
-    (url: string = '/') => () => {
-      if (url === RoutePath.ImportHardware) {
-        navigate(RoutePath.ImportHardware)
-      } else {
-        navigate(url)
-      }
-    },
+    (url: string = '/') =>
+      () => {
+        if (url === RoutePath.ImportHardware) {
+          navigate(RoutePath.ImportHardware)
+        } else {
+          navigate(url)
+        }
+      },
     [navigate, location.pathname]
   )
 

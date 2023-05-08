@@ -14,6 +14,7 @@ declare namespace Command {
     | 'import-hardware'
     | 'load-transaction-json'
     | 'migrate-acp'
+    | 'sign-verify'
   type Payload = string | null
 }
 

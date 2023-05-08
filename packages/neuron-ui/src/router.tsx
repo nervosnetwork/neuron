@@ -22,10 +22,16 @@ import ImportHardware from 'components/ImportHardware'
 import OfflineSign from 'components/OfflineSign'
 import NFTSend from 'components/NFTSend'
 import Settings from 'components/Settings'
+import SignAndVerify from 'components/SignAndVerify'
 
 const offlineRouter = {
   path: RoutePath.OfflineSign,
   element: <OfflineSign />,
+}
+
+const signVerifyRouter = {
+  path: RoutePath.SignVerify,
+  element: <SignAndVerify />,
 }
 
 const mainRouterConfig: RouteObject[] = [
@@ -51,7 +57,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.Send,
@@ -64,7 +70,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
           {
             path: ':address?',
@@ -74,7 +80,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
         ],
       },
@@ -89,7 +95,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
           {
             path: ':address?',
@@ -99,7 +105,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
         ],
       },
@@ -111,7 +117,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: `${RoutePath.Transaction}/:hash`,
@@ -121,7 +127,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: `${RoutePath.WalletWizard}*`,
@@ -131,7 +137,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.ImportKeystore,
@@ -141,7 +147,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.NervosDAO,
@@ -176,7 +182,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.SUDTAccountList,
@@ -186,7 +192,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.SUDTSend,
@@ -199,7 +205,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
           {
             path: ':accountId',
@@ -209,7 +215,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
         ],
       },
@@ -221,7 +227,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.ImportHardware,
@@ -231,7 +237,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.NFTSend,
@@ -244,7 +250,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
           {
             path: ':nftId',
@@ -254,7 +260,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
         ],
       },

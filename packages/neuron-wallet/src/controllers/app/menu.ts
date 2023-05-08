@@ -291,11 +291,20 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         label: t('application-menu.tools.sign-and-verify'),
         enabled: hasCurrentWallet,
-        click: () => {
-          const currentWallet = walletsService.getCurrent()
-          showWindow(`#/sign-verify/${currentWallet!.id}`, t(`messageBox.sign-and-verify.title`), {
-            width: 900
-          })
+        click: async () => {
+          const result = await walletsService.getCurrent()
+          if (!result) {
+            return
+          }
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({
+              winID: window.id,
+              type: 'sign-verify',
+              payload: currentWallet!.id,
+              dispatchToUI: true
+            })
+          }
         }
       },
       {
