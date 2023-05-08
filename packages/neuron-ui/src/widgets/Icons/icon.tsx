@@ -48,6 +48,12 @@ import { ReactComponent as ExportSvg } from './Export.svg'
 import { ReactComponent as ConfirmingSvg } from './Confirming.svg'
 import { ReactComponent as CopySvg } from './Copy.svg'
 import { ReactComponent as AddressTransformSvg } from './AddressTransform.svg'
+import { ReactComponent as DepositSvg } from './Deposit.svg'
+import { ReactComponent as ClockSvg } from './Clock.svg'
+import { ReactComponent as ArrowDownRoundSvg } from './ArrowDownRound.svg'
+import { ReactComponent as EyesOpenSvg } from './EyesOpen.svg'
+import { ReactComponent as EyesCloseSvg } from './EyesClose.svg'
+import { ReactComponent as SuccessSvg } from './Success.svg'
 
 import styles from './icon.module.scss'
 
@@ -110,3 +116,9 @@ export const Confirming = WrapSvg(ConfirmingSvg)
 export const SuccessNoBorder = WrapSvg(SuccessNoBorderSvg)
 export const Copy = WrapSvg(CopySvg)
 export const AddressTransform = WrapSvg(AddressTransformSvg, styles.addressTransform)
+export const Deposit = WrapSvg(DepositSvg, styles.deposit)
+export const Clock = WrapSvg(ClockSvg)
+export const ArrowDownRound = WrapSvg(ArrowDownRoundSvg)
+export const EyesOpen = WrapSvg(EyesOpenSvg)
+export const EyesClose = WrapSvg(EyesCloseSvg)
+export const Success = WrapSvg(SuccessSvg)

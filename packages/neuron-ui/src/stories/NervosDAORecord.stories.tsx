@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ComponentStory } from '@storybook/react'
 import NervosDAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 
@@ -43,9 +43,7 @@ const basicProps: Omit<DAORecordProps, 'onToggle'> = {
 }
 
 const Template: ComponentStory<typeof NervosDAORecord> = props => {
-  const { isCollapsed: isCollapsedInit } = props
-  const [isCollapsed, setIsCollapsed] = useState(isCollapsedInit ?? true)
-  return <NervosDAORecord {...props} isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
+  return <NervosDAORecord {...props} />
 }
 
 export const Depositing = Template.bind({})
@@ -187,7 +185,6 @@ Unfolded.args = {
   depositOutPoint: undefined,
   depositEpoch: '0xa0009000284', // 644.9
   currentEpoch: '0xa000000030f', // 783
-  isCollapsed: false,
   depositTimestamp: (Date.now() - 25 * 3600000).toString(),
   unlockInfo: {
     timestamp: Date.now().toString(),

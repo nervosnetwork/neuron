@@ -1,6 +1,7 @@
 import React from 'react'
 import { ComponentStory } from '@storybook/react'
 import Table from 'widgets/Table'
+import { HIDE_BALANCE } from 'utils/const'
 
 export default {
   title: 'Table',
@@ -93,7 +94,7 @@ TableWithColumnRender.args = {
       dataIndex: 'balance',
       isBalance: true,
       render(v: string, _idx, _item, showBalance) {
-        return <span style={{ color: v.includes('-') ? undefined : '#00C891' }}>{showBalance ? v : '******'}</span>
+        return <span style={{ color: v.includes('-') ? undefined : '#00C891' }}>{showBalance ? v : HIDE_BALANCE}</span>
       },
     },
   ],

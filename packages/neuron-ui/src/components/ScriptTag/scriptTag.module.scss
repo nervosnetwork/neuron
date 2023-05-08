@@ -1,8 +1,19 @@
-.tag {
-  margin: auto 4px;
-  padding: 0 6px;
-  border-radius: 4px;
-  border: 0.5px solid rgb(177, 202, 255);
-  background-color: rgb(216, 228, 255);
-  cursor: pointer !important;
+.tag[type='button'] {
+  line-height: 22px;
+  margin: auto 8px;
+  padding: 0 8px;
+  background: #eafbf6;
+  border: 1px solid #bbe7d4;
+  color: #999;
+  border-radius: 48px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary-color);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: #171b1a;
+    border-color: #343e3c;
+  }
 }

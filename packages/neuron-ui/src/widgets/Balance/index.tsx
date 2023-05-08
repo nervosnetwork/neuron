@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import styles from './balance.module.scss'
 
-const Balance = ({ balance, style }: { balance: string; style?: object }) => {
+const Balance = ({ balance, style }: { balance: string; style?: CSSProperties }) => {
   const [balanceInt, balanceDec] = balance.split('.')
   const balanceIntEl = <span className={styles.int}>{balanceInt}</span>
   const balanceDecEl = balanceDec ? <span className={styles.decimal}>{`.${balanceDec}`}</span> : null
