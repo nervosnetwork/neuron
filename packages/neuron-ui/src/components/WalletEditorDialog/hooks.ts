@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
-import { NavigateFunction } from 'react-router-dom'
 import { StateDispatch, updateWalletProperty } from 'states'
-import { ErrorCode, ResponseCode, RoutePath, CONSTANTS } from 'utils'
+import { ErrorCode, ResponseCode, CONSTANTS } from 'utils'
 import i18n from 'utils/i18n'
 
 const { MAX_WALLET_NAME_LENGTH } = CONSTANTS
@@ -43,27 +42,23 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
 export const useOnSubmit = (
   name: string = '',
   id: string = '',
-  navigate: NavigateFunction,
   dispatch: StateDispatch,
-  disabled: boolean
+  disabled: boolean,
+  callback: Function
 ) => {
-  return useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      if (disabled) {
-        return
+  return useCallback(() => {
+    if (disabled) {
+      return
+    }
+    updateWalletProperty({
+      id,
+      name,
+    })(dispatch).then(status => {
+      if (status === ResponseCode.SUCCESS) {
+        callback()
       }
-      updateWalletProperty({
-        id,
-        name,
-      })(dispatch).then(status => {
-        if (status === ResponseCode.SUCCESS) {
-          navigate(RoutePath.SettingsWallets)
-        }
-      })
-    },
-    [name, id, navigate, dispatch, disabled]
-  )
+    })
+  }, [name, id, dispatch, disabled])
 }
 
 export const useHint = (name: string, usedNames: string[], t: Function): string | null => {

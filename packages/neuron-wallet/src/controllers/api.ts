@@ -24,7 +24,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SettingsService, { Locale } from 'services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
+import { ResponseCode } from 'utils/const'
 import { clean as cleanChain } from 'database/chain'
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -462,12 +462,6 @@ export default class ApiController {
 
     handle('quit-and-install-update', async () => {
       new UpdateController(false).quitAndInstall()
-    })
-
-    // Settings
-
-    handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
     })
 
     handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {

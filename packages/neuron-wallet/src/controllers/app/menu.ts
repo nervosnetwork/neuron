@@ -2,8 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import { app, shell, clipboard, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
 import { t } from 'i18next'
-import { Subject } from 'rxjs'
-import { throttleTime } from 'rxjs/operators'
 import env from 'env'
 import UpdateController from 'controllers/update'
 import ExportDebugController from 'controllers/export-debug'
@@ -12,13 +10,13 @@ import WalletsService from 'services/wallets'
 import OfflineSignService from 'services/offline-sign'
 import CommandSubject from 'models/subjects/command'
 import logger from 'utils/logger'
-import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
+import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 import { OfflineSignJSON } from 'models/offline-sign'
 import NetworksService from 'services/networks'
 import { clearCkbNodeCache } from 'services/ckb-runner'
 
 enum URL {
-  Settings = '/settings/general',
+  Settings = '/settings',
   CreateWallet = '/wizard/mnemonic/create',
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
@@ -93,14 +91,8 @@ const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) =
   }
 }
 
-const showSettings$ = new Subject()
-
-showSettings$.pipe(throttleTime(1000)).subscribe(() => {
-  showWindow(`#${URL.Settings}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
-})
-
 const showSettings = () => {
-  showSettings$.next()
+  navigateTo(URL.Settings)
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
@@ -140,8 +132,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.neuron.check-updates'),
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
-          new UpdateController().checkUpdates()
-          showSettings()
+          navigateTo(`${URL.Settings}?checkUpdate=1`)
         }
       },
       separator,
@@ -464,8 +455,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.neuron.check-updates'),
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
-        new UpdateController().checkUpdates()
-        showSettings()
+        navigateTo(`${URL.Settings}?checkUpdate=1`)
       }
     })
     helpSubmenu.push({

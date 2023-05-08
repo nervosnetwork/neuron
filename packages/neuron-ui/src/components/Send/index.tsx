@@ -4,17 +4,47 @@ import { List } from 'office-ui-fabric-react'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
 import SendMetaInfo from 'components/SendMetaInfo'
 import SendFieldset from 'components/SendFieldset'
-
+import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePickerDialog from 'widgets/DatetimePickerDialog'
 import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
+import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
+import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
 
-import { validateTotalAmount, isMainnet as isMainnetUtil, validateOutputs, useOutputErrors } from 'utils'
+import {
+  validateTotalAmount,
+  isMainnet as isMainnetUtil,
+  validateOutputs,
+  useOutputErrors,
+  shannonToCKBFormatter,
+} from 'utils'
+import { HIDE_BALANCE } from 'utils/const'
 
 import { isErrorWithI18n } from 'exceptions'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
+
+const SendHeader = ({ balance }: { balance: string }) => {
+  const { t } = useTranslation()
+
+  const [showBalance, setShowBalance] = useState(true)
+  const onChangeShowBalance = useCallback(() => {
+    setShowBalance(v => !v)
+  }, [setShowBalance])
+
+  return (
+    <div className={styles.headerContainer}>
+      <p>{t('navbar.send')}</p>
+      <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
+        {showBalance ? <EyesOpen /> : <EyesClose />}
+      </Button>
+      <p className={styles.balance}>
+        {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
+      </p>
+    </div>
+  )
+}
 
 const Send = () => {
   const {
@@ -122,7 +152,7 @@ const Send = () => {
   })()
 
   return (
-    <div className={styles.container}>
+    <PageContainer head={<SendHeader balance={balance} />}>
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
         <div className={styles.layout}>
           <div className={styles.left}>
@@ -206,7 +236,7 @@ const Send = () => {
           setLocktimeIndex(-1)
         }}
       />
-    </div>
+    </PageContainer>
   )
 }
 

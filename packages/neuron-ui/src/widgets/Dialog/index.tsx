@@ -15,8 +15,14 @@ interface DialogProps {
   cancelText?: string
   disabled?: boolean | undefined
   children?: React.ReactChild
-  footer?: React.ReactChild
   isLoading?: boolean
+  confirmProps?: object
+  showHeader?: boolean
+  showConfirm?: boolean
+  showCancel?: boolean
+  showFooter?: boolean
+  className?: string
+  footer?: React.ReactChild
   contentClassName?: string
 }
 
@@ -30,8 +36,13 @@ const Dialog = ({
   confirmText,
   cancelText,
   children,
-  footer,
   isLoading,
+  confirmProps = {},
+  showHeader = true,
+  showConfirm = true,
+  showCancel = true,
+  showFooter = true,
+  className = '',
   contentClassName,
 }: DialogProps) => {
   const [t] = useTranslation()
@@ -61,23 +72,35 @@ const Dialog = ({
   }
 
   return (
-    <dialog ref={dialogRef} className={styles.dialogWrap}>
-      <div className={styles.header}>
-        <div className={styles.title}>
-          {title}
-          <span className={styles.subTitle}>{subTitle}</span>
-        </div>
-        <Close onClick={onCancel} />
-      </div>
-      <form onSubmit={onSubmit}>
-        <div className={clsx(styles.content, contentClassName)}>{children}</div>
-        {footer ?? (
-          <div className={styles.footer}>
-            <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
-            <Button type="submit" label={confirmText || t('common.confirm')} loading={isLoading} disabled={disabled} />
+    <dialog ref={dialogRef} className={`${styles.dialogWrap} ${className}`}>
+      {showHeader ? (
+        <div className={styles.header}>
+          <div className={styles.title}>
+            {title}
+            <span className={styles.subTitle}>{subTitle}</span>
           </div>
-        )}
-      </form>
+          <Close onClick={onCancel} />
+        </div>
+      ) : null}
+      <div className={clsx(styles.content, contentClassName)}>{children}</div>
+      {showFooter ? (
+        <form onSubmit={onSubmit}>
+          <div className={styles.footer}>
+            {showCancel ? (
+              <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
+            ) : null}
+            {showConfirm ? (
+              <Button
+                type="submit"
+                label={confirmText || t('common.confirm')}
+                loading={isLoading}
+                disabled={disabled}
+                {...confirmProps}
+              />
+            ) : null}
+          </div>
+        </form>
+      ) : null}
     </dialog>
   )
 }

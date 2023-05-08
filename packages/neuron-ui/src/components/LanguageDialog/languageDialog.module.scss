@@ -1,0 +1,78 @@
+@import '../../styles';
+
+.container {
+  margin-bottom: 8px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--secondary-text-color);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.dropdown {
+  margin-top: 8px;
+  position: relative;
+  .content {
+    border: 1px solid var(--divide-line-color);
+    border-radius: 8px;
+    &[data-active="true"] {
+      svg {
+        g, 
+        path {
+          stroke: var(--primary-color);
+        }
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .selects {
+    position: fixed;
+    width: 50vw;
+    margin-top: 8px;
+    padding: 16px 0;
+    z-index: 1;
+    background: var(--secondary-background-color);
+    box-shadow: 0px 1px 4px #EEEEEE;
+    border-radius: 8px;
+    @media (prefers-color-scheme: dark) {
+      box-shadow: none;
+      border: 1px solid var(--border-color);
+    }
+
+    .wrap {
+      &:hover {
+        border-radius: 8px;
+        background-color: var(--hover-background-color);
+      }
+    }
+  }
+
+
+  .selectItem {
+    display: block;
+    width: 50vw;
+    padding: 0 16px;
+
+    .wrap {
+      padding: 0 8px;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    p {
+      margin: 0;
+    }
+    .title {
+      display: inline-block;
+      color: var(--main-text-color);
+      font-size: 14px;
+    }
+  }
+}

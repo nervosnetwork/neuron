@@ -1,4 +1,4 @@
-import React, { lazy } from 'react'
+import React from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 import Main from 'containers/Main'
 import Navbar from 'containers/Navbar'
@@ -21,55 +21,7 @@ import SUDTReceive from 'components/SUDTReceive'
 import ImportHardware from 'components/ImportHardware'
 import OfflineSign from 'components/OfflineSign'
 import NFTSend from 'components/NFTSend'
-import SettingTabs from 'components/SettingTabs'
-import NetworkEditor from 'components/NetworkEditor'
-import WalletEditor from 'components/WalletEditor'
-import GeneralSetting from 'components/GeneralSetting'
-import WalletSetting from 'components/WalletSetting'
-import NetworkSetting from 'components/NetworkSetting'
-import DataSetting from 'components/DataSetting'
-import { useState as useGloablState, useDispatch } from 'states'
-
-const Settings = lazy(() => import('containers/Settings'))
-
-const InjectionProps = ({
-  Component,
-}: {
-  Component: typeof GeneralSetting | typeof WalletSetting | typeof NetworkSetting | typeof DataSetting
-}) => {
-  const globalState = useGloablState()
-  const dispatch = useDispatch()
-  return <Component {...globalState} dispatch={dispatch} />
-}
-
-export const settingRouterConfig: RouteObject[] = [
-  {
-    path: '',
-    element: (
-      <>
-        <Settings isDetachedWindow />
-        <PasswordRequest />
-      </>
-    ),
-    children: [
-      {
-        path: RoutePath.Settings,
-        element: <SettingTabs />,
-        children: [
-          { path: RoutePath.SettingsGeneral, element: <InjectionProps Component={GeneralSetting} /> },
-          { path: RoutePath.SettingsWallets, element: <InjectionProps Component={WalletSetting} /> },
-          { path: RoutePath.SettingsNetworks, element: <InjectionProps Component={NetworkSetting} /> },
-          { path: RoutePath.SettingsData, element: <InjectionProps Component={DataSetting} /> },
-        ],
-      },
-      { path: `${RoutePath.NetworkEditor}/:id`, element: <NetworkEditor /> },
-      { path: `${RoutePath.WalletEditor}/:id`, element: <WalletEditor /> },
-      { path: `${RoutePath.WalletWizard}*`, element: <WalletWizard isSettings /> },
-      { path: RoutePath.ImportKeystore, element: <ImportKeystore /> },
-      { path: RoutePath.ImportHardware, element: <ImportHardware /> },
-    ],
-  },
-]
+import Settings from 'components/Settings'
 
 const offlineRouter = {
   path: RoutePath.OfflineSign,
@@ -308,14 +260,13 @@ const mainRouterConfig: RouteObject[] = [
       },
       {
         path: RoutePath.Settings,
-        element: <Settings />,
-        children: [
-          { index: true, element: <InjectionProps Component={GeneralSetting} /> },
-          { path: RoutePath.SettingsWallets, element: <InjectionProps Component={WalletSetting} /> },
-          { path: RoutePath.SettingsNetworks, element: <InjectionProps Component={NetworkSetting} /> },
-          { path: RoutePath.SettingsData, element: <InjectionProps Component={DataSetting} /> },
-          offlineRouter,
-        ],
+        element: (
+          <>
+            <Settings />
+            <Outlet />
+          </>
+        ),
+        children: [offlineRouter],
       },
     ],
   },

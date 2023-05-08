@@ -1,24 +1,18 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
-import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
-
-import { useGoBack, validateNetworkName, validateURL } from 'utils'
+import Dialog from 'widgets/Dialog'
+import { validateNetworkName, validateURL } from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { isErrorWithI18n } from 'exceptions'
 import { useOnSubmit } from './hooks'
-import styles from './networkEditor.module.scss'
+import styles from './networkEditorDialog.module.scss'
 
-const NetworkEditor = () => {
+const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => void; id: 'new' | string }) => {
   const {
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const cachedNetworks = useRef(networks)
   const cachedNetwork = useMemo(() => cachedNetworks.current.find(network => network.id === id), [cachedNetworks, id])
   const usedNetworkNames = useMemo(
@@ -81,55 +75,52 @@ const NetworkEditor = () => {
     },
     [setEditor, t, usedNetworkNames]
   )
-  const goBack = useGoBack()
 
   const onSubmit = useOnSubmit({
     id: id!,
     name: editor.name,
     remote: editor.url,
     networks,
-    navigate,
+    callback: close,
     dispatch,
     disabled,
     setIsUpdating,
   })
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
-      <form onSubmit={onSubmit}>
-        <h1>{t('settings.network.edit-network.title')}</h1>
-        <Stack tokens={{ childrenGap: 15 }}>
-          <TextField
-            value={editor.url}
-            field="url"
-            onChange={onChange}
-            label={t('settings.network.edit-network.rpc-url')}
-            error={editor.urlError}
-            placeholder="http://localhost:8114"
-            required
-            autoFocus
-          />
-          <TextField
-            value={editor.name}
-            field="name"
-            onChange={onChange}
-            label={t('settings.network.edit-network.name')}
-            error={editor.nameError}
-            placeholder="My Custom Node"
-            required
-          />
-        </Stack>
-        <div className={styles.actions}>
-          <Button type="cancel" label={t('common.cancel')} onClick={goBack} />
-          <Button type="submit" label={isUpdating ? 'updating' : t('common.save')} disabled={disabled}>
-            {isUpdating ? <Spinner /> : (t('common.save') as string)}
-          </Button>
-        </div>
-      </form>
-    </Stack>
+    <Dialog
+      show={show}
+      title={id === 'new' ? t('settings.network.add-network') : t('settings.network.edit-network.title')}
+      onCancel={close}
+      onConfirm={onSubmit}
+      disabled={disabled}
+      cancelText={t('wizard.back')}
+      confirmText={id === 'new' ? t('common.ok') : t('common.save')}
+      isLoading={isUpdating}
+    >
+      <div className={styles.container}>
+        <TextField
+          value={editor.url}
+          field="url"
+          onChange={onChange}
+          label={t('settings.network.edit-network.rpc-url')}
+          error={editor.urlError}
+          placeholder="http://localhost:8114"
+          autoFocus
+        />
+        <TextField
+          value={editor.name}
+          field="name"
+          onChange={onChange}
+          label={t('settings.network.edit-network.name')}
+          error={editor.nameError}
+          placeholder="My Custom Node"
+        />
+      </div>
+    </Dialog>
   )
 }
 
-NetworkEditor.displayName = 'NetworkEditor'
+NetworkEditorDialog.displayName = 'NetworkEditorDialog'
 
-export default NetworkEditor
+export default NetworkEditorDialog

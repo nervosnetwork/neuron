@@ -1,9 +1,6 @@
 @import '../../styles/mixin.scss';
-$headerHeight: 72px;
-
-.container {
-  padding: 0 24px;
-}
+$headerHeight: 126px;
+$bottomHeight: 124px;
 
 .layout {
   display: flex;
@@ -13,7 +10,7 @@ $headerHeight: 72px;
     position: relative;
 
     .leftContent {
-      height: calc(100vh - $headerHeight - 100px);
+      height: calc(100vh - $headerHeight - $bottomHeight);
       overflow-y: scroll;
       margin-bottom: 100px;
     }
@@ -75,5 +72,29 @@ $headerHeight: 72px;
         }
       }
     }
+  }
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+
+  .btn {
+    margin-left: 12px;
+    min-width: 30px;
+    height: 16px;
+    padding: 0 8px;
+    border-radius: 0;
+    border-left: 1px solid var(--button-cancel-color);
+    svg {
+      g,
+      path {
+        fill: var(--main-text-color);
+      }
+    }
+  }
+
+  .balance {
+    font-size: 14px;
   }
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useLocation, NavLink } from 'react-router-dom'
+import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Logo from 'widgets/Icons/Logo.png'
@@ -15,25 +15,12 @@ import {
   ArrowOpenRight,
   MenuExpand,
 } from 'widgets/Icons/icon'
-import { showSettings } from 'services/remote'
 import { RoutePath, clsx, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
 import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`, RoutePath.ImportHardware]
-
-const throttledShowSettings = (() => {
-  const THROTTLE_TIME = 1000
-  let lastRun = 0
-  return (params: Parameters<typeof showSettings>[0]) => {
-    if (Date.now() - lastRun < THROTTLE_TIME) {
-      return false
-    }
-    lastRun = Date.now()
-    return showSettings(params)
-  }
-})()
 
 const menuItems = [
   { name: 'navbar.overview', key: RoutePath.Overview, url: RoutePath.Overview, icon: <Overview /> },
@@ -92,6 +79,7 @@ const Navbar = () => {
   const onClickExpand = useCallback(() => {
     setMenuExpanded(v => !v)
   }, [setMenuExpanded])
+  const navigate = useNavigate()
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
@@ -104,7 +92,7 @@ const Navbar = () => {
         className={styles.name}
         title={name}
         aria-label={name}
-        onClick={() => throttledShowSettings({ tab: 'wallets' })}
+        onClick={() => navigate('/settings')}
       >
         {menuExpanded ? (
           <img src={Logo} alt="logo" />

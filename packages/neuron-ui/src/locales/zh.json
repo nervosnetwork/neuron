@@ -177,7 +177,8 @@
       "create-wallet": "立即创建新钱包",
       "repeat-password": "重复密码",
       "finish-create": "完成创建",
-      "creating-wallet": "钱包准备中，请稍后"
+      "creating-wallet": "钱包准备中，请稍后",
+      "add-one": "添加钱包"
     },
     "import-keystore": {
       "title": "导入 Keystore 文件",
@@ -340,7 +341,8 @@
         "show": "显示",
         "hide": "隐藏",
         "version": "版本",
-        "language": "语言",
+        "language": "系统语言",
+        "select-language": "选择语言",
         "apply": "应用"
       },
       "wallet-manager": {
@@ -364,7 +366,7 @@
         "edit-network": {
           "title": "添加或编辑网络",
           "rpc-url": "RPC地址",
-          "name": "名称"
+          "name": "网络名称"
         },
         "mainnet": "主网",
         "testnet": "测试网",
@@ -398,13 +400,15 @@
         "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "cache-cleared-on": "上次清空缓存时间 {{date}}",
         "clear-cache": "清空缓存",
-        "clearing-cache": "清空中...",
-        "remove-ckb-data-tip": "请将 CKB Node 数据从 {{prevPath}} 移动至 {{currentPath}}然后点击 \"数据转移完成\" 开始从已知区块同步; 否则点击 \"重新同步\" 开始重新同步.",
+        "clearing-cache": "正在清除缓存中，请稍候",
+        "set-path": "设置路径",
+        "remove-ckb-data-tip": "请将 CKB Node 数据从 【{{prevPath}}】 移动至 【{{currentPath}}】 然后点击 \"数据转移完成\" 开始从已知区块同步; 或者点击 \"重新同步\" 开始重新同步.",
         "resync-ckb-node-describe": "注意: 重新同步不会删除当前已同步的 CKB Node 数据",
         "cancel": "取消",
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
-        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效"
+        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
+        "ckb-node-storage": "CKB节点数据"
       }
     },
     "password-request": {
@@ -701,7 +705,8 @@
     },
     "updates": {
       "check-updates": "检查更新",
-      "checking-updates": "正在检查...",
+      "checking-updates": "正在检查更新...",
+      "update-available": "检测到新版本",
       "downloading-update": "正在下载更新...",
       "update-not-available": "已经在使用最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",

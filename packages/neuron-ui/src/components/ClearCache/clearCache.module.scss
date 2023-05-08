@@ -1,0 +1,58 @@
+@import '../../styles/mixin.scss';
+
+.clearTime {
+  color: var(--input-second-color);
+  font-size: 12px;
+}
+
+.clearDialog {
+  @include dialog-container;
+  height: 180px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  &::backdrop {
+    @include overlay;
+  }
+  p {
+    margin-top: 24px;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-text-color)
+  }
+}
+
+.clearBtn {
+  &[disabled] {
+    opacity: 0.5;
+    box-shadow: none !important;
+    cursor: not-allowed;
+  }
+}
+
+.options {
+  min-width: 600px;
+  label {
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 24px;
+    color: var(--main-text-color);
+  }
+  input[type="checkbox"] {
+    display: none;
+    margin-right: 8px;
+  }
+  input[type="checkbox"]+span {
+    display: inline-block;
+    padding-left: 26px;
+    line-height: 20px;
+    background: url('../../widgets/Icons/Checkbox.svg') no-repeat left top;
+              user-select: none;
+  }
+  input[type="checkbox"]:checked+span {
+    background: url('../../widgets/Icons/CheckboxSelected.svg') no-repeat left top;
+  }
+}
