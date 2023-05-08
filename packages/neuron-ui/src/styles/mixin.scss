@@ -153,3 +153,30 @@
   background: var(--secondary-background-color);
   border-radius: 16px;
 }
+
+@mixin icon-hover-button($normalColor: var(--secondary-text-color), $hoverColor: var(--primary-color)) {
+  border: none;
+  background: transparent;
+  color: $normalColor !important;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  svg {
+    margin-right: 4px;
+    g,
+    path {
+      fill: $normalColor;
+    }
+  }
+  &:hover {
+    color: $hoverColor !important;
+    svg {
+      g,
+      path {
+        fill: $hoverColor
+      }
+    }
+  }
+}

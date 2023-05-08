@@ -37,6 +37,10 @@ body {
   // table
   --table-head-background-color: #fafafa;
   --table-head-border-color: #f0f0f0;
+  --hover-background-color: #f5f9f4;
+  --tooltip-hover-background-color: #f5f9f4;
+
+  --process-background-color: #f0f0f0;
 
   @media (prefers-color-scheme: dark) {
     --primary-color: #{$main-color};
@@ -75,5 +79,9 @@ body {
     // table
     --table-head-background-color: #171b1a;
     --table-head-border-color: #282e2d;
+    --hover-background-color: #2d3534;
+    --tooltip-hover-background-color: rgba(255, 255, 255, 0.2);
+
+    --process-background-color: #282e2d;
   }
 }

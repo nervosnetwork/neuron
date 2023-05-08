@@ -24,7 +24,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SettingsService, { Locale } from 'services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
+import { ResponseCode } from 'utils/const'
 import { clean as cleanChain } from 'database/chain'
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -45,14 +45,14 @@ import {
   UpdateAssetAccountParams,
   MigrateACPParams,
   GenerateCreateChequeTxParams,
-  GenerateClaimChequeTxParams,
+  GenerateClaimChequeTxParams
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
-import SUDTController from "controllers/sudt"
+import SUDTController from 'controllers/sudt'
 import SyncedBlockNumber from 'models/synced-block-number'
 import IndexerService from 'services/indexer'
 import MultisigConfigModel from 'models/multisig-config'
@@ -92,8 +92,9 @@ export default class ApiController {
         break
       }
       case 'import-xpubkey': {
-        this.#walletsController.importXPubkey()
-          .catch(error => { dialog.showMessageBox({ type: 'error', buttons: [], message: error.message }) })
+        this.#walletsController.importXPubkey().catch(error => {
+          dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+        })
         break
       }
       case 'delete-wallet':
@@ -101,7 +102,6 @@ export default class ApiController {
         // delete/backup wallet with wallet id
         this.#walletsController.requestPassword(params, command)
         break
-
       }
       case 'migrate-acp': {
         this.#assetAccountController.showACPMigrationDialog(false)
@@ -181,37 +181,42 @@ export default class ApiController {
       const currentWallet = this.#walletsController.getCurrent().result
       const wallets = walletsService.getAll()
 
-      const [
-        currentNetworkID = '',
-        networks = [],
-        syncedBlockNumber = '0',
-        connectionStatus = false,
-      ] = await Promise.all([
-        networksService.getCurrentID(),
-        networksService.getAll(),
-        new SyncedBlockNumber().getNextBlock().then(
-          blockNumber => blockNumber.toString()
-        ).catch(() => '0'),
-        new Promise(resolve => {
-          ConnectionStatusSubject.pipe(take(1)).subscribe(
-            status => { resolve(status) },
-            () => { resolve(false) },
-            () => { resolve(false) }
-          )
-        }),
-      ])
+      const [currentNetworkID = '', networks = [], syncedBlockNumber = '0', connectionStatus = false] =
+        await Promise.all([
+          networksService.getCurrentID(),
+          networksService.getAll(),
+          new SyncedBlockNumber()
+            .getNextBlock()
+            .then(blockNumber => blockNumber.toString())
+            .catch(() => '0'),
+          new Promise(resolve => {
+            ConnectionStatusSubject.pipe(take(1)).subscribe(
+              status => {
+                resolve(status)
+              },
+              () => {
+                resolve(false)
+              },
+              () => {
+                resolve(false)
+              }
+            )
+          })
+        ])
 
       const addresses: Controller.Address[] = await (currentWallet
         ? this.#walletsController.getAllAddresses(currentWallet.id).then(res => res.result)
         : [])
 
       const transactions = currentWallet
-        ? await this.#transactionsController.getAll({
-          pageNo: 1,
-          pageSize: 15,
-          keywords: '',
-          walletID: currentWallet.id,
-        }).then(res => res.result)
+        ? await this.#transactionsController
+            .getAll({
+              pageNo: 1,
+              pageSize: 15,
+              keywords: '',
+              walletID: currentWallet.id
+            })
+            .then(res => res.result)
         : []
 
       const initState = {
@@ -222,32 +227,34 @@ export default class ApiController {
         addresses,
         transactions,
         syncedBlockNumber,
-        connectionStatus,
+        connectionStatus
       }
 
       return { status: ResponseCode.Success, result: initState }
     })
 
-    handle('open-in-window', async (_, { url, title }: { url: string, title: string }) => {
+    handle('open-in-window', async (_, { url, title }: { url: string; title: string }) => {
       showWindow(url, title)
     })
 
-    handle('request-open-in-explorer', (_, { key, type }: { key: string, type: 'transaction' }) => {
+    handle('request-open-in-explorer', (_, { key, type }: { key: string; type: 'transaction' }) => {
       if (type !== 'transaction' || !key) {
         return
       }
-      dialog.showMessageBox({
-        type: 'question',
-        title: t(`open-in-explorer.title`),
-        message: t(`open-in-explorer.message`, { type: t(`open-in-explorer.${type}`), key }),
-        defaultId: 0,
-        buttons: [t('common.ok'), t('common.cancel'),]
-      }).then(({ response }) => {
-        if (response === 0) {
-          const base = NetworksService.getInstance().explorerUrl()
-          shell.openExternal(`${base}/${type}/${key}`)
-        }
-      })
+      dialog
+        .showMessageBox({
+          type: 'question',
+          title: t(`open-in-explorer.title`),
+          message: t(`open-in-explorer.message`, { type: t(`open-in-explorer.${type}`), key }),
+          defaultId: 0,
+          buttons: [t('common.ok'), t('common.cancel')]
+        })
+        .then(({ response }) => {
+          if (response === 0) {
+            const base = NetworksService.getInstance().explorerUrl()
+            shell.openExternal(`${base}/${type}/${key}`)
+          }
+        })
     })
 
     handle('handle-view-error', async (_, error: string) => {
@@ -257,7 +264,7 @@ export default class ApiController {
     })
 
     handle('set-locale', async (_, locale: Locale) => {
-      return SettingsService.getInstance().locale = locale
+      return (SettingsService.getInstance().locale = locale)
     })
 
     handle('is-dark', async () => {
@@ -273,7 +280,7 @@ export default class ApiController {
         status: ResponseCode.Success
       }
     })
-    
+
     // Wallets
 
     handle('get-all-wallets', async () => {
@@ -320,42 +327,78 @@ export default class ApiController {
       return this.#walletsController.getAllAddresses(id)
     })
 
-    handle('update-address-description', async (_, params: { walletID: string, address: string, description: string }) => {
-      return this.#walletsController.updateAddressDescription(params)
-    })
+    handle(
+      'update-address-description',
+      async (_, params: { walletID: string; address: string; description: string }) => {
+        return this.#walletsController.updateAddressDescription(params)
+      }
+    )
 
-    handle('request-password', async (_, { walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) => {
-      this.#walletsController.requestPassword(walletID, action)
-    })
+    handle(
+      'request-password',
+      async (_, { walletID, action }: { walletID: string; action: 'delete-wallet' | 'backup-wallet' }) => {
+        this.#walletsController.requestPassword(walletID, action)
+      }
+    )
 
-    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string, multisigConfig?: MultisigConfigModel }) => {
-      return this.#walletsController.sendTx({
-        ...params,
-        multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined
-      })
-    })
+    handle(
+      'send-tx',
+      async (
+        _,
+        params: {
+          walletID: string
+          tx: Transaction
+          password: string
+          description?: string
+          multisigConfig?: MultisigConfigModel
+        }
+      ) => {
+        return this.#walletsController.sendTx({
+          ...params,
+          multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined
+        })
+      }
+    )
 
-    handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return this.#walletsController.generateTx(params)
-    })
+    handle(
+      'generate-tx',
+      async (
+        _,
+        params: { walletID: string; items: { address: string; capacity: string }[]; fee: string; feeRate: string }
+      ) => {
+        return this.#walletsController.generateTx(params)
+      }
+    )
 
-    handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return this.#walletsController.generateSendingAllTx(params)
-    })
+    handle(
+      'generate-send-all-tx',
+      async (
+        _,
+        params: { walletID: string; items: { address: string; capacity: string }[]; fee: string; feeRate: string }
+      ) => {
+        return this.#walletsController.generateSendingAllTx(params)
+      }
+    )
 
-    handle('generate-multisig-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel }) => {
-      return this.#walletsController.generateMultisigTx({
-        items: params.items,
-        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
-      })
-    })
+    handle(
+      'generate-multisig-tx',
+      async (_, params: { items: { address: string; capacity: string }[]; multisigConfig: MultisigConfigModel }) => {
+        return this.#walletsController.generateMultisigTx({
+          items: params.items,
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+        })
+      }
+    )
 
-    handle('generate-multisig-send-all-tx', async (_, params: { items: { address: string, capacity: string }[], multisigConfig: MultisigConfigModel }) => {
-      return this.#walletsController.generateMultisigSendAllTx({
-        items: params.items,
-        multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
-      })
-    })
+    handle(
+      'generate-multisig-send-all-tx',
+      async (_, params: { items: { address: string; capacity: string }[]; multisigConfig: MultisigConfigModel }) => {
+        return this.#walletsController.generateMultisigSendAllTx({
+          items: params.items,
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+        })
+      }
+    )
 
     handle('generate-mnemonic', async () => {
       return this.#walletsController.generateMnemonic()
@@ -371,13 +414,16 @@ export default class ApiController {
       return this.#transactionsController.getAll(params)
     })
 
-    handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
+    handle('get-transaction', async (_, { walletID, hash }: { walletID: string; hash: string }) => {
       return this.#transactionsController.get(walletID, hash)
     })
 
-    handle('update-transaction-description', async (_, params: { walletID: string; hash: string; description: string }) => {
-      return this.#transactionsController.updateDescription(params)
-    })
+    handle(
+      'update-transaction-description',
+      async (_, params: { walletID: string; hash: string; description: string }) => {
+        return this.#transactionsController.updateDescription(params)
+      }
+    )
 
     handle('show-transaction-details', async (_, hash: string) => {
       showWindow(`#/transaction/${hash}`, t(`messageBox.transaction.title`, { hash }), {
@@ -395,30 +441,54 @@ export default class ApiController {
       return this.#daoController.getDaoCells(params)
     })
 
-    handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
-      return this.#daoController.generateDepositTx(params)
-    })
+    handle(
+      'generate-dao-deposit-tx',
+      async (_, params: { walletID: string; capacity: string; fee: string; feeRate: string }) => {
+        return this.#daoController.generateDepositTx(params)
+      }
+    )
 
-    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, isBalanceReserved: boolean, fee: string, feeRate: string }) => {
-      return this.#daoController.generateDepositAllTx(params)
-    })
+    handle(
+      'generate-dao-deposit-all-tx',
+      async (_, params: { walletID: string; isBalanceReserved: boolean; fee: string; feeRate: string }) => {
+        return this.#daoController.generateDepositAllTx(params)
+      }
+    )
 
-    handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
-      return this.#daoController.startWithdrawFromDao(params)
-    })
+    handle(
+      'start-withdraw-from-dao',
+      async (_, params: { walletID: string; outPoint: OutPoint; fee: string; feeRate: string }) => {
+        return this.#daoController.startWithdrawFromDao(params)
+      }
+    )
 
-    handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
-      return this.#daoController.withdrawFromDao(params)
-    });
+    handle(
+      'withdraw-from-dao',
+      async (
+        _,
+        params: {
+          walletID: string
+          depositOutPoint: OutPoint
+          withdrawingOutPoint: OutPoint
+          fee: string
+          feeRate: string
+        }
+      ) => {
+        return this.#daoController.withdrawFromDao(params)
+      }
+    )
 
     // Customized Asset
     handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
       return this.#customizedAssetsController.getCustomizedAssetCells(params)
     })
 
-    handle('generate-withdraw-customized-cell-tx', async (_, params: Controller.Params.GenerateWithdrawCustomizedCellTxParams) => {
-      return this.#customizedAssetsController.generateWithdrawCustomizedCellTx(params)
-    })
+    handle(
+      'generate-withdraw-customized-cell-tx',
+      async (_, params: Controller.Params.GenerateWithdrawCustomizedCellTxParams) => {
+        return this.#customizedAssetsController.generateWithdrawCustomizedCellTx(params)
+      }
+    )
 
     handle('generate-transfer-nft-tx', async (_, params: Controller.Params.GenerateTransferNftTxParams) => {
       return this.#customizedAssetsController.generateTransferNftTx(params)
@@ -434,7 +504,7 @@ export default class ApiController {
       return this.#networksController.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
     })
 
-    handle('update-network', async (_, { networkID, options }: { networkID: string, options: Partial<Network> }) => {
+    handle('update-network', async (_, { networkID, options }: { networkID: string; options: Partial<Network> }) => {
       return this.#networksController.update(networkID, options)
     })
 
@@ -464,12 +534,6 @@ export default class ApiController {
       new UpdateController(false).quitAndInstall()
     })
 
-    // Settings
-
-    handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
-    })
-
     handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
       await IndexerService.clearCache(params?.resetIndexerData)
       return { status: ResponseCode.Success, result: true }
@@ -491,7 +555,7 @@ export default class ApiController {
         })
         if (response === 1) {
           return {
-            status: ResponseCode.Fail,
+            status: ResponseCode.Fail
           }
         }
       }
@@ -507,14 +571,14 @@ export default class ApiController {
     handle('start-process-monitor', (_, monitorName: string) => {
       startMonitor(monitorName, true)
       return {
-        status: ResponseCode.Success,
+        status: ResponseCode.Success
       }
     })
 
     handle('stop-process-monitor', async (_, monitorName: string) => {
       await Promise.race([stopMonitor(monitorName), CommonUtils.sleep(1000)])
       return {
-        status: ResponseCode.Success,
+        status: ResponseCode.Success
       }
     })
 
@@ -553,7 +617,7 @@ export default class ApiController {
       return this.#assetAccountController.getAll(params)
     })
 
-    handle("get-asset-account", async (_, params: { walletID: string, id: number }) => {
+    handle('get-asset-account', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.getAccount(params)
     })
 
@@ -582,7 +646,7 @@ export default class ApiController {
       return this.#anyoneCanPayController.generateTx(params)
     })
 
-    handle('get-hold-sudt-cell-capacity', async (_, params: { address: string, tokenID: string }) => {
+    handle('get-hold-sudt-cell-capacity', async (_, params: { address: string; tokenID: string }) => {
       return this.#anyoneCanPayController.getHoldSudtCellCapacity(params.address, params.tokenID)
     })
 
@@ -602,7 +666,7 @@ export default class ApiController {
       return this.#sudtController.getSUDTTypeScriptHash(params)
     })
 
-    handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string, id: number }) => {
+    handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
       return this.#assetAccountController.destoryAssetAccount(params)
     })
 
@@ -700,13 +764,13 @@ export default class ApiController {
     handle('start-migrate', async () => {
       migrateCkbData()
       return {
-        status: ResponseCode.Success,
+        status: ResponseCode.Success
       }
     })
   }
 
   // Register handler, warp and serialize API response
-  #handleChannel = (channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)) => {
+  #handleChannel = (channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<void> | any) => {
     ipcMain.handle(channel, async (event, args) => {
       try {
         const res = await listener(event, args)
@@ -728,7 +792,7 @@ export default class ApiController {
           if (!Number.isNaN(+e.code)) {
             return {
               status: ResponseCode.Fail,
-              message: e.message || err.message,
+              message: e.message || err.message
             }
           }
         } catch {
@@ -737,7 +801,7 @@ export default class ApiController {
 
         return {
           status: err.code || ResponseCode.Fail,
-          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
+          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message
         }
       }
     })

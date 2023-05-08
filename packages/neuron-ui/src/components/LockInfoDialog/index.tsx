@@ -63,7 +63,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
       contentClassName={styles.content}
       title={t('lock-info-dialog.address-info')}
       onCancel={onDismiss}
-      footer=""
+      showFooter={false}
     >
       <>
         <div className={styles.title}>{t('transaction.lock-script')}</div>

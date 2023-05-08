@@ -378,7 +378,7 @@ const PasswordRequest = () => {
       cancelText={t('common.cancel')}
       confirmText={t('common.confirm')}
     >
-      <form onSubmit={onSubmit}>
+      <div>
         {[
           'unlock',
           'create-sudt-account',
@@ -436,7 +436,7 @@ const PasswordRequest = () => {
             )}
           </div>
         ) : null}
-      </form>
+      </div>
     </Dialog>
   )
 }

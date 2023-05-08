@@ -22,7 +22,6 @@ export enum RoutePath {
   ImportWallet = '/wallets/import',
   ImportKeystore = '/keystore/import',
   NetworkEditor = '/network',
-  WalletEditor = '/editwallet',
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
   SpecialAssets = '/special-assets',

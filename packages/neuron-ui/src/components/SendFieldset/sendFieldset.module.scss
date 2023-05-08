@@ -17,14 +17,13 @@ $textfieldWidth: calc(100vw - 370px);
     font-size: 14px;
     .removeBtn {
       height: 16px !important;
-      width: 16px;
       min-width: 0;
       cursor: pointer;
       &:hover {
         svg {
           g,
           path {
-            fill: var(--error-color)
+            fill: var(--error-color);
           }
         }
       }
@@ -62,7 +61,6 @@ $textfieldWidth: calc(100vw - 370px);
     padding: 0 16px;
     margin-top: 16px;
   }
-
 }
 
 .locktime {
@@ -86,7 +84,7 @@ $textfieldWidth: calc(100vw - 370px);
 
   .locktimeWarn {
     padding: 4px 16px;
-    background-color: var(--notice-background-color);
+    background-color: var(--warn-background-color);
     color: var(--notice-text-color);
     margin-top: 10px;
     font-size: 12px;
@@ -131,7 +129,7 @@ $textfieldWidth: calc(100vw - 370px);
       svg {
         g,
         path {
-          fill: var(--error-color)
+          fill: var(--error-color);
         }
       }
     }

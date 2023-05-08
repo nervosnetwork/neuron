@@ -12,7 +12,7 @@ import MultiSignAddress from 'components/MultisigAddress'
 import ErrorBoundary from 'components/ErrorBoundary'
 import Spinner from 'widgets/Spinner'
 import { withProvider } from 'states'
-import mainRouterConfig, { settingRouterConfig } from 'router'
+import mainRouterConfig from 'router'
 
 if (window.location.hash.startsWith('#/transaction/')) {
   ReactDOM.render(<Transaction />, document.getElementById('root'))
@@ -24,13 +24,11 @@ if (window.location.hash.startsWith('#/transaction/')) {
     document.getElementById('root')
   )
 } else {
-  const isSettings = window.location.hash.startsWith('#/settings/')
-
   window.neuron = {
-    role: isSettings ? 'settings' : 'main',
+    role: 'main',
   }
 
-  const containers: RouteObject[] = isSettings ? settingRouterConfig : mainRouterConfig
+  const containers: RouteObject[] = mainRouterConfig
 
   const RouterRender = () => useRoutes(containers)
 

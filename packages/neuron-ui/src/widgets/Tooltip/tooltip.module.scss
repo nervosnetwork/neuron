@@ -3,7 +3,7 @@
   position: absolute;
   background: var(--third-background-color);
   color: var(--main-text-color);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
   padding: 8px 16px;
   border-radius: 8px;
   font-style: normal;
@@ -162,7 +162,7 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
   background: var(--third-background-color);
   transform: translateY(50%) rotate(45deg);
   bottom: 100%;
-  right: 14px;
+  right: calc(50% - 8px);
 }
 
 .tipWithString {
