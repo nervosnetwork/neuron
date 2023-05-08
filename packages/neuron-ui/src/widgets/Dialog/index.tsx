@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { useDialogWrapper } from 'utils'
+import { clsx, useDialogWrapper } from 'utils'
 import { Close } from 'widgets/Icons/icon'
 import styles from './dialog.module.scss'
 
@@ -22,6 +22,8 @@ interface DialogProps {
   showCancel?: boolean
   showFooter?: boolean
   className?: string
+  footer?: React.ReactChild
+  contentClassName?: string
 }
 
 const Dialog = ({
@@ -41,6 +43,7 @@ const Dialog = ({
   showCancel = true,
   showFooter = true,
   className = '',
+  contentClassName,
 }: DialogProps) => {
   const [t] = useTranslation()
   const { isDialogOpen, openDialog, closeDialog, dialogRef } = useDialogWrapper({ onClose: onCancel })
@@ -79,7 +82,7 @@ const Dialog = ({
           <Close onClick={onCancel} />
         </div>
       ) : null}
-      <div className={styles.content}>{children}</div>
+      <div className={clsx(styles.content, contentClassName)}>{children}</div>
       {showFooter ? (
         <form onSubmit={onSubmit}>
           <div className={styles.footer}>

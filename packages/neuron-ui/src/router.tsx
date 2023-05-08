@@ -13,6 +13,7 @@ import Transaction from 'components/Transaction'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
+import NervosDAODetail from 'components/NervosDAODetail'
 import SpecialAssetList from 'components/SpecialAssetList'
 import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
@@ -144,13 +145,28 @@ const mainRouterConfig: RouteObject[] = [
       },
       {
         path: RoutePath.NervosDAO,
-        element: (
-          <>
-            <NervosDAO />
-            <Outlet />
-          </>
-        ),
-        children: [offlineRouter],
+        children: [
+          {
+            path: '',
+            element: (
+              <>
+                <NervosDAO />
+                <Outlet />
+              </>
+            ),
+            children: [offlineRouter],
+          },
+          {
+            path: ':depositOutPoint',
+            element: (
+              <>
+                <NervosDAODetail />
+                <Outlet />
+              </>
+            ),
+            children: [offlineRouter],
+          },
+        ],
       },
       {
         path: RoutePath.SpecialAssets,

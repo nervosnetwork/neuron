@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Logo from 'widgets/Icons/Logo.png'
@@ -15,7 +15,7 @@ import {
   ArrowOpenRight,
   MenuExpand,
 } from 'widgets/Icons/icon'
-import { RoutePath, useOnLocaleChange } from 'utils'
+import { RoutePath, clsx, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
 import styles from './navbar.module.scss'
@@ -43,35 +43,29 @@ const menuItems = [
 
 const MenuButton = ({
   menu,
-  onClick,
   children,
   selectedKey,
   className,
 }: React.PropsWithChildren<{
   menu: { key: string; name: string; url: string }
-  onClick: React.MouseEventHandler<HTMLButtonElement>
   selectedKey?: string
   className?: string
 }>) => {
   const [t] = useTranslation()
+
   return (
-    <button
-      type="button"
+    <NavLink
+      to={menu.url}
+      className={({ isActive }) => clsx(className, { [styles.active]: isActive || menu.key === selectedKey })}
       title={t(menu.name)}
-      name={t(menu.name)}
       aria-label={t(menu.name)}
-      data-link={menu.url}
-      data-active={menu.key === selectedKey}
-      onClick={onClick}
-      className={className}
     >
       {children}
-    </button>
+    </NavLink>
   )
 }
 
 const Navbar = () => {
-  const navigate = useNavigate()
   const { pathname } = useLocation()
   const neuronWallet = useGlobalState()
   const {
@@ -85,17 +79,7 @@ const Navbar = () => {
   const onClickExpand = useCallback(() => {
     setMenuExpanded(v => !v)
   }, [setMenuExpanded])
-  const onClickNavItem = useCallback(
-    (e: React.SyntheticEvent<HTMLButtonElement>) => {
-      const {
-        dataset: { link },
-      } = e.currentTarget
-      if (link) {
-        navigate(link)
-      }
-    },
-    [navigate]
-  )
+  const navigate = useNavigate()
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
@@ -127,7 +111,7 @@ const Navbar = () => {
         {menuExpanded
           ? menuItems.map(item => (
               <React.Fragment key={item.key}>
-                <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
+                <MenuButton menu={item} selectedKey={selectedKey}>
                   {item.icon}
                   <span>{t(item.name)}</span>
                   {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
@@ -137,7 +121,7 @@ const Navbar = () => {
                     <div className={styles.leftLine} />
                     <div>
                       {item.children.map(child => (
-                        <MenuButton key={child.key} menu={child} selectedKey={pathname} onClick={onClickNavItem}>
+                        <MenuButton key={child.key} menu={child} selectedKey={pathname}>
                           {t(child.name)}
                         </MenuButton>
                       ))}
@@ -157,7 +141,6 @@ const Navbar = () => {
                             key={child.key}
                             menu={child}
                             selectedKey={pathname}
-                            onClick={onClickNavItem}
                             className={styles.buttonInTip}
                           >
                             {t(child.name)}
@@ -170,7 +153,7 @@ const Navbar = () => {
                   }
                   placement={item.children?.length ? 'right-bottom' : 'right'}
                 >
-                  <MenuButton menu={item} selectedKey={selectedKey} onClick={onClickNavItem}>
+                  <MenuButton menu={item} selectedKey={selectedKey}>
                     {item.icon}
                   </MenuButton>
                 </Tooltip>
