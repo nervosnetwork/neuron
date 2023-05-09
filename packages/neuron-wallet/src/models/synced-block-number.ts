@@ -4,8 +4,7 @@ import logger from '../utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
-  // eslint-disable-next-line prettier/prettier
-  #blockNumberEntity?: SyncInfoEntity
+    #blockNumberEntity?: SyncInfoEntity
   #lastSavedBlock: bigint = BigInt(-1)
 
   // Get next block to scan. If syncing hasn't run yet return 0 (genesis block number).

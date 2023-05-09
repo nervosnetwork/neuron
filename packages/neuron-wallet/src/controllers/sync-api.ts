@@ -34,8 +34,7 @@ interface SyncState {
 }
 
 export default class SyncApiController {
-  // eslint-disable-next-line prettier/prettier
-  #syncedBlockNumber = new SyncedBlockNumber()
+    #syncedBlockNumber = new SyncedBlockNumber()
   static emiter = new EventEmiter()
   private static instance: SyncApiController
 

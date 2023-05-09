@@ -18,8 +18,7 @@ import CommonUtils from '../../utils/common'
 import { ShouldInChildProcess } from '../../exceptions'
 
 export default class Queue {
-  // eslint-disable-next-line prettier/prettier
-  #lockHashes: string[]
+    #lockHashes: string[]
   #url: string // ckb node
   #indexerUrl: string
   #addresses: AddressInterface[]

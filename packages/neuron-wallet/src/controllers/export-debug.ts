@@ -13,8 +13,7 @@ import redistCheck from '../utils/redist-check'
 import SettingsService from '../services/settings'
 
 export default class ExportDebugController {
-  // eslint-disable-next-line prettier/prettier
-  #I18N_PATH = 'export-debug-info'
+    #I18N_PATH = 'export-debug-info'
   #ANONYMOUS_ADDRESS = 'http://****:port'
   private archive: archiver.Archiver
 

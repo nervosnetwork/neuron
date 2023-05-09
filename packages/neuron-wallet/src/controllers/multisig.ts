@@ -32,8 +32,7 @@ const validateImportConfig = (configOutput: MultisigConfigOutput) => {
 }
 
 export default class MultisigController {
-  // eslint-disable-next-line prettier/prettier
-  #multisigService: MultisigService;
+    #multisigService: MultisigService;
 
   constructor() {
     this.#multisigService = new MultisigService();

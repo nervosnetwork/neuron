@@ -1,4 +1,3 @@
-// eslint-disable-next-line prettier/prettier
 import type Transaction from '../../models/chain/transaction'
 import WitnessArgs from '../../models/chain/witness-args'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
