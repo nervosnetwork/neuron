@@ -41,8 +41,8 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
 }
 
 export const useOnSubmit = (
-  name: string = '',
-  id: string = '',
+  name: string,
+  id: string,
   history: ReturnType<typeof useHistory>,
   dispatch: StateDispatch,
   disabled: boolean

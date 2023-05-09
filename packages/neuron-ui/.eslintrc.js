@@ -89,7 +89,6 @@ module.exports = {
         },
       },
     ],
-    'default-param-last': 'warn',
     'react/jsx-no-useless-fragment': [
       'error',
       {
