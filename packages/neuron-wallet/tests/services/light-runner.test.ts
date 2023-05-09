@@ -19,6 +19,7 @@ const spawnMock = jest.fn()
 const loggerErrorMock = jest.fn()
 const loggerInfoMock = jest.fn()
 const transportsGetFileMock = jest.fn()
+const cleanMock = jest.fn()
 
 function resetMock() {
   mockFn.mockReset()
@@ -38,6 +39,7 @@ function resetMock() {
   loggerErrorMock.mockReset()
   loggerInfoMock.mockReset()
   transportsGetFileMock.mockReset()
+  cleanMock.mockReset()
 }
 
 jest.doMock('../../src/env', () => ({
@@ -65,6 +67,10 @@ jest.doMock('../../src/services/settings', () => ({
       get testnetLightDataPath() { return lightDataPathMock() }
     }
   }
+}))
+
+jest.doMock('../../src/database/chain', () => ({
+  clean: cleanMock
 }))
 
 jest.doMock('process', () => ({

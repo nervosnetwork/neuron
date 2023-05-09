@@ -11,6 +11,7 @@ import NetworksService from './networks'
 import Multisig from 'models/multisig'
 import SyncProgress, { SyncAddressType } from 'database/chain/entities/sync-progress'
 import { NetworkType } from 'models/network'
+import WalletService from './wallets'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -334,9 +335,13 @@ export default class MultisigService {
   }
 
   static async getMultisigConfigForLight() {
+    const currentWallet = WalletService.getInstance().getCurrent()
     const multisigConfigs = await getConnection()
       .getRepository(MultisigConfig)
       .createQueryBuilder()
+      .where({
+        walletId: currentWallet?.id
+      })
       .getMany()
     return multisigConfigs.map(v => ({
       walletId: v.walletId,

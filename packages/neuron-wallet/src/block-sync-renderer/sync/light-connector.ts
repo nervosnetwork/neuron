@@ -301,9 +301,6 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   }
 
   async appendScript(scripts: AppendScript[]) {
-    if (!scripts.length) {
-      return
-    }
     this.initSyncProgress(scripts)
   }
 }
