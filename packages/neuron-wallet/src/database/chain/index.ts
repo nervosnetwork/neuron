@@ -18,7 +18,7 @@ export const clean = async () => {
         .getRepository(entity)
         .clear()
     }),
-    SyncProgressService.clear()
+    SyncProgressService.clearCurrentWalletProgress()
   ])
   MultisigOutputChangedSubject.getSubject().next('reset')
 
