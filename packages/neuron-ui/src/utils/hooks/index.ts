@@ -258,7 +258,7 @@ export const useExitOnWalletChange = () => {
 }
 
 export const useSUDTAccountInfoErrors = ({
-  info: { accountName, tokenName, tokenId, symbol, decimal },
+  info: { accountName, tokenName, tokenId, symbol, decimal, balance },
   existingAccountNames,
   isCKB,
   t,
@@ -269,6 +269,7 @@ export const useSUDTAccountInfoErrors = ({
     tokenId: string
     symbol: string
     decimal: string
+    balance?: string
   }
   existingAccountNames: string[]
   isCKB: boolean
@@ -281,6 +282,7 @@ export const useSUDTAccountInfoErrors = ({
       tokenName: '',
       symbol: '',
       decimal: '',
+      balance: '',
     }
 
     const dataToValidate = {
@@ -292,6 +294,7 @@ export const useSUDTAccountInfoErrors = ({
       tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
+      balance: { params: { balance }, validator: validateDecimal },
     }
 
     Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {

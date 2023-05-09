@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { useDidMount, useForceUpdate } from 'utils'
+import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
+
 import styles from './input-select.module.scss'
 
 export interface SelectOptions {
@@ -86,7 +88,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
           aria-selected={isSelected ? 'true' : 'false'}
           aria-hidden="true"
         >
-          {label}
+          {typeof label === 'string' && label?.length > 68 ? `${label.slice(0, 34)}...${label.slice(-34)}` : label}
         </div>
       )
     },
@@ -128,7 +130,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
           onChange={onInputChange}
           value={value ?? innerValue}
         />
-        <div className={styles.arrow} />
+        <Arrow className={styles.arrow} />
       </div>
       {openRef.current ? (
         <div className={styles.menu} aria-expanded="true">

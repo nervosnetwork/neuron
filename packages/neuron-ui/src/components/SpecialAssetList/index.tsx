@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Pagination from 'widgets/Pagination'
-import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
-import Experimental from 'widgets/ExperimentalRibbon'
+import Table from 'widgets/Table'
+import Button from 'widgets/Button'
 import {
   unlockSpecialAsset,
   getSpecialAssets,
   generateWithdrawChequeTransaction,
   generateClaimChequeTransaction,
+  openExternal,
 } from 'services/remote'
 import {
   CONSTANTS,
@@ -19,24 +21,50 @@ import {
   useFetchTokenInfoList,
   PresetScript,
   nftFormatter,
+  uniformTimeFormatter,
+  getExplorerUrl,
+  ConnectionStatus,
 } from 'utils'
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { LIGHT_NETWORK_TYPE, HIDE_BALANCE } from 'utils/const'
+import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
 import { TokenInfo } from 'components/SUDTCreateDialog'
 import SUDTMigrateDialog from 'components/SUDTMigrateDialog'
 import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDialog'
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
-import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
-import { LIGHT_NETWORK_TYPE } from 'utils/const'
-import {
-  useMigrate,
-  useClickMigrate,
-  useMigrateToNewAccount,
-  useMigrateToExistAccount,
-  useGetAssetAccounts,
-} from './hooks'
+import PageContainer from 'components/PageContainer'
+import { useGetAssetAccounts, useGetSpecialAssetColumnInfo } from './hooks'
+
 import styles from './specialAssetList.module.scss'
+
+export interface LocktimeAssetInfo {
+  data: string
+  lock: PresetScript.Locktime
+  type: string
+}
+
+export interface ChequeAssetInfo {
+  data: 'claimable' | 'withdraw-able'
+  lock: PresetScript.Cheque
+  type: string
+}
+
+export enum NFTType {
+  NFT = 'NFT',
+  NFTClass = 'NFTClass',
+  NFTIssuer = 'NFTIssuer',
+}
+
+export interface NFTAssetInfo {
+  data: string
+  lock: string
+  type: NFTType
+}
+
+type UnknownAssetInfo = Record<'data' | 'lock' | 'type', string>
+
+export type AssetInfo = LocktimeAssetInfo | ChequeAssetInfo | UnknownAssetInfo | NFTAssetInfo
 
 const { PAGE_SIZE } = CONSTANTS
 
@@ -78,31 +106,44 @@ const SpecialAssetList = () => {
     tx: any
   } | null>(null)
   const [migrateCell, setMigrateCell] = useState<SpecialAssetCell | undefined>()
+  const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState<boolean>(false)
+  const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState<boolean>(false)
+  const [isExistAccountDialogOpen, setIsExistAccountDialogOpen] = useState<boolean>(false)
   const [migrateTokenInfo, setMigrateTokenInfo] = useState<Controller.GetTokenInfoList.TokenInfo | undefined>()
-  const { dialogRef, openDialog, closeDialog } = useMigrate()
-  const {
-    dialogRef: newAccountDialog,
-    openDialog: openNewAccount,
-    closeDialog: closeNewAccount,
-  } = useMigrateToNewAccount()
-  const {
-    dialogRef: existAccountDialog,
-    openDialog: openExistAccount,
-    closeDialog: closeExistAccount,
-  } = useMigrateToExistAccount()
-  const onClickMigrate = useClickMigrate({
-    closeMigrateDialog: closeDialog,
-    openMigrateToNewAccountDialog: openNewAccount,
-    openMigrateToExistAccountDialog: openExistAccount,
-  })
-  const onCloseDialog = useCallback(() => {
-    closeExistAccount()
-    closeNewAccount()
-    setMigrateCell(undefined)
-  }, [closeNewAccount, closeExistAccount, setMigrateCell])
+
+  const onClickMigrate = useCallback(
+    (type: string) => {
+      setIsMigrateDialogOpen(false)
+      switch (type) {
+        case 'new-account':
+          setIsNewAccountDialogOpen(true)
+          break
+        case 'exist-account':
+          setIsExistAccountDialogOpen(true)
+          break
+        default:
+          break
+      }
+    },
+    [setIsMigrateDialogOpen, setIsNewAccountDialogOpen, setIsExistAccountDialogOpen]
+  )
+
+  const onCloseDialog = useCallback(
+    (type?: string) => {
+      if (type === 'existAccount') {
+        setIsExistAccountDialogOpen(false)
+        setIsMigrateDialogOpen(true)
+      } else {
+        setIsNewAccountDialogOpen(false)
+        setIsExistAccountDialogOpen(false)
+        setMigrateCell(undefined)
+      }
+    },
+    [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setMigrateCell]
+  )
 
   const {
-    app: { epoch, globalDialog },
+    app: { epoch, globalDialog, pageNotice },
     wallet: { id },
     settings: { networks },
     chain: {
@@ -160,6 +201,33 @@ const SpecialAssetList = () => {
     : undefined
 
   useGetAssetAccounts(id)
+
+  const handleGetSpecialAssetColumnInfo = useCallback(
+    (item: SpecialAssetCell) => {
+      const { timestamp, customizedAssetInfo, capacity, lock, type, data } = item
+
+      return useGetSpecialAssetColumnInfo({
+        cell: { capacity, lock, type, data },
+        datetime: +timestamp,
+        epoch,
+        assetInfo: customizedAssetInfo,
+        bestKnownBlockTimestamp,
+        tokenInfoList,
+      })
+    },
+    [epoch, bestKnownBlockTimestamp, tokenInfoList, useGetSpecialAssetColumnInfo]
+  )
+
+  const onViewDetail = useCallback(
+    (item: SpecialAssetCell) => {
+      const {
+        outPoint: { txHash, index },
+      } = item
+      const explorerUrl = getExplorerUrl(isMainnet)
+      openExternal(`${explorerUrl}/transaction/${txHash}#${index}`)
+    },
+    [isMainnet]
+  )
 
   useEffect(() => {
     dispatch({ type: AppActions.ClearSendState })
@@ -290,9 +358,10 @@ const SpecialAssetList = () => {
           break
         }
         case PresetScript.SUDT: {
-          openDialog()
+          setIsMigrateDialogOpen(true)
           setMigrateCell(cell)
           const findTokenInfo = tokenInfoList.find(info => info.tokenID === cell.type?.args)
+
           setMigrateTokenInfo(findTokenInfo)
           break
         }
@@ -301,40 +370,95 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, navigate, openDialog, tokenInfoList]
+    [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList]
   )
 
-  const list = useMemo(() => {
-    return cells.map(({ outPoint, timestamp, customizedAssetInfo, data, lock, type, capacity }) => {
-      return (
-        <SpecialAsset
-          key={`${outPoint.txHash}-${outPoint.index}`}
-          datetime={+timestamp}
-          isMainnet={isMainnet}
-          cell={{ outPoint, capacity, data, lock, type }}
-          assetInfo={customizedAssetInfo}
-          epoch={epoch}
-          onAction={handleAction}
-          connectionStatus={connectionStatus}
-          bestKnownBlockTimestamp={bestKnownBlockTimestamp}
-          tokenInfoList={tokenInfoList}
-        />
-      )
-    })
-  }, [cells, epoch, isMainnet, handleAction, connectionStatus, bestKnownBlockTimestamp, tokenInfoList])
-
   return (
-    <div className={styles.container}>
-      <Experimental tag="customized-assset" />
-      <div className={styles.title}>{t('special-assets.title')}</div>
+    <PageContainer head={t('special-assets.title')} notice={pageNotice} className={styles.container}>
       {totalCount ? (
-        <div className={styles.listContainer}>
-          <div className={styles.listHeader}>
-            <span>{t('special-assets.date')}</span>
-            <span>{t('special-assets.assets')}</span>
-          </div>
-          {list}
-        </div>
+        <Table
+          columns={[
+            {
+              title: t('special-assets.date'),
+              dataIndex: 'timestamp',
+              align: 'left',
+              render: (_, __, item) => {
+                const [date, time] = uniformTimeFormatter(item.timestamp).split(' ')
+                return `${date} ${time}`
+              },
+            },
+            {
+              title: t('special-assets.assets'),
+              dataIndex: 'capacity',
+              align: 'left',
+              isBalance: true,
+              minWidth: '200px',
+              render(_, __, item, show) {
+                const { amount } = handleGetSpecialAssetColumnInfo(item)
+                return show ? amount : HIDE_BALANCE
+              },
+            },
+            {
+              title: '',
+              dataIndex: '#',
+              align: 'right',
+              render(_, __, item) {
+                const {
+                  outPoint: { txHash, index },
+                  customizedAssetInfo,
+                } = item
+
+                const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
+                  handleGetSpecialAssetColumnInfo(item)
+
+                return (
+                  <div className={styles.actionBtnBox}>
+                    {isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable) ? null : (
+                      <Button
+                        data-tx-hash={txHash}
+                        data-idx={index}
+                        type="primary"
+                        label={t(`special-assets.${status}`)}
+                        onClick={handleAction}
+                        disabled={
+                          ['user-defined-asset', 'locked-asset'].includes(status) ||
+                          connectionStatus === ConnectionStatus.Offline ||
+                          isLockedCheque
+                        }
+                        className={`${styles.actionBtn} ${
+                          ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) ||
+                          isLockedCheque
+                            ? styles.hasTooltip
+                            : ''
+                        }`}
+                        data-tooltip={
+                          customizedAssetInfo.lock === PresetScript.Cheque && !isLockedCheque
+                            ? null
+                            : t(`special-assets.${status}-tooltip`, {
+                                epochs: epochsInfo?.target.toFixed(2),
+                                year: targetTime ? new Date(targetTime).getFullYear() : '',
+                                month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                                day: targetTime ? new Date(targetTime).getDate() : '',
+                                hour: targetTime ? new Date(targetTime).getHours() : '',
+                                minute: targetTime ? new Date(targetTime).getMinutes() : '',
+                              })
+                        }
+                      />
+                    )}
+                    <Button
+                      type="default"
+                      label={t('special-assets.view-details')}
+                      className={styles.actionBtn}
+                      onClick={() => onViewDetail(item)}
+                    />
+                  </div>
+                )
+              },
+            },
+          ]}
+          dataSource={cells}
+          noDataContent={t('overview.no-recent-activities')}
+        />
       ) : null}
       {totalCount || !loaded ? null : <div className={styles.noItems}>{t('special-assets.no-special-assets')}</div>}
 
@@ -350,37 +474,42 @@ const SpecialAssetList = () => {
           />
         ) : null}
       </div>
+
       {updateAccountDialogProps ? <SUDTUpdateDialog {...updateAccountDialogProps} /> : null}
+
       {migrateCell && (
-        <dialog className={styles.migrateSelectDialog} ref={dialogRef}>
-          <SUDTMigrateDialog cell={migrateCell} openDialog={onClickMigrate} />
-        </dialog>
+        <SUDTMigrateDialog
+          cell={migrateCell}
+          openDialog={onClickMigrate}
+          isDialogOpen={isMigrateDialogOpen}
+          onCancel={() => setIsMigrateDialogOpen(false)}
+        />
       )}
+
       {migrateCell && (
-        <dialog className={styles.dialog} ref={newAccountDialog}>
-          <SUDTMigrateToNewAccountDialog
-            cell={migrateCell}
-            closeDialog={onCloseDialog}
-            sUDTAccounts={sUDTAccounts}
-            walletID={id}
-            tokenInfo={migrateTokenInfo}
-          />
-        </dialog>
+        <SUDTMigrateToNewAccountDialog
+          cell={migrateCell}
+          sUDTAccounts={sUDTAccounts}
+          walletID={id}
+          tokenInfo={migrateTokenInfo}
+          isDialogOpen={isNewAccountDialogOpen}
+          onCancel={onCloseDialog}
+        />
       )}
+
       {migrateCell && (
-        <dialog className={styles.dialog} ref={existAccountDialog}>
-          <SUDTMigrateToExistAccountDialog
-            cell={migrateCell}
-            closeDialog={onCloseDialog}
-            tokenInfo={migrateTokenInfo}
-            sUDTAccounts={sUDTAccounts}
-            isMainnet={isMainnet}
-            walletID={id}
-            isLightClient={isLightClient}
-          />
-        </dialog>
+        <SUDTMigrateToExistAccountDialog
+          cell={migrateCell}
+          tokenInfo={migrateTokenInfo}
+          sUDTAccounts={sUDTAccounts}
+          isMainnet={isMainnet}
+          walletID={id}
+          isDialogOpen={isExistAccountDialogOpen}
+          onCancel={() => onCloseDialog('existAccount')}
+          isLightClient={isLightClient}
+        />
       )}
-    </div>
+    </PageContainer>
   )
 }
 

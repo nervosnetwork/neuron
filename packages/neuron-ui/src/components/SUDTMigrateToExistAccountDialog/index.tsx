@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SpecialAssetCell } from 'components/SpecialAssetList'
-import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
+import Dialog from 'widgets/Dialog'
 import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
 import InputSelect from 'widgets/InputSelect'
 import { generateSudtMigrateAcpTx } from 'services/remote'
@@ -12,20 +12,22 @@ import styles from './sUDTMigrateToExistAccountDialog.module.scss'
 
 const SUDTMigrateToExistAccountDialog = ({
   cell,
-  closeDialog,
   tokenInfo,
   sUDTAccounts,
   isMainnet,
   walletID,
   isLightClient,
+  isDialogOpen,
+  onCancel,
 }: {
   cell: SpecialAssetCell
-  closeDialog: () => void
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
   sUDTAccounts: State.SUDTAccount[]
   isMainnet: boolean
   walletID: string
   isLightClient: boolean
+  isDialogOpen: boolean
+  onCancel: () => void
 }) => {
   const [t] = useTranslation()
   const [address, setAddress] = useState('')
@@ -54,7 +56,7 @@ const SUDTMigrateToExistAccountDialog = ({
       outPoint: cell.outPoint,
       acpAddress: address,
     }).then(res => {
-      closeDialog()
+      onCancel()
       if (isSuccessResponse(res)) {
         if (res.result) {
           dispatch({
@@ -82,13 +84,22 @@ const SUDTMigrateToExistAccountDialog = ({
         })
       }
     })
-  }, [cell.outPoint, address, t, closeDialog, dispatch, walletID])
+  }, [cell.outPoint, address, t, onCancel, dispatch, walletID])
+
   return (
-    <div>
-      <p>{t('migrate-sudt.transfer-to-exist-account.title')}</p>
-      <div>
+    <Dialog
+      className={styles.container}
+      show={isDialogOpen}
+      title={t('migrate-sudt.transfer-to-exist-account.title')}
+      onCancel={onCancel}
+      cancelText={t('migrate-sudt.back')}
+      confirmText={t('migrate-sudt.next')}
+      confirmProps={{ onClick: onSubmit }}
+      disabled={!address || !!addressError}
+    >
+      <>
         <div className={styles.addressContainer}>
-          <div>{`${t('migrate-sudt.address')} *`}</div>
+          <div className={styles.addressLabel}>{t('migrate-sudt.address')}</div>
           <InputSelect
             options={sUDTAddresses.map(v => ({ label: v, value: v }))}
             onChange={onAddressChange}
@@ -105,17 +116,8 @@ const SUDTMigrateToExistAccountDialog = ({
           required
           disabled
         />
-      </div>
-      <div className={styles.actions}>
-        <Button label={t('migrate-sudt.cancel')} type="cancel" onClick={closeDialog} />
-        <Button
-          label={t('migrate-sudt.confirm')}
-          type="primary"
-          onClick={onSubmit}
-          disabled={!address || !!addressError}
-        />
-      </div>
-    </div>
+      </>
+    </Dialog>
   )
 }
 

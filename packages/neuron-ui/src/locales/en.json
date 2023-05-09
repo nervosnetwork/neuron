@@ -889,6 +889,9 @@
     },
     "migrate-sudt": {
       "title": "Migrate to a sUDT Asset Account",
+      "choose-title": "Migration mode",
+      "next": "Next",
+      "back": "Back",
       "turn-into-new-account": {
         "title": "Turn into a new sUDT Asset Account",
         "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
