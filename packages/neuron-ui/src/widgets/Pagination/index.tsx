@@ -45,7 +45,7 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
   return (
     <div role="presentation" className={styles.container} onClick={handlePageNoClick}>
       <div className={styles.range}>{range}</div>
-      <div className={styles.navigator} role="navigation" arial-label="pagination">
+      <div className={styles.navigator} role="navigation" aria-label="pagination">
         <span
           role="button"
           data-page-no={1}
