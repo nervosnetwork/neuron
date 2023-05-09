@@ -12,7 +12,7 @@ export interface PaginationProps {
   count: number
   pageNo: number
   pageSize: number
-  onChange: Function
+  onChange: (page: number) => void
 }
 
 const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {

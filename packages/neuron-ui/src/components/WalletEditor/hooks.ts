@@ -66,7 +66,7 @@ export const useOnSubmit = (
   )
 }
 
-export const useHint = (name: string, usedNames: string[], t: Function): string | null => {
+export const useHint = (name: string, usedNames: string[], t: (key: string, opts: object) => string): string | null => {
   return useMemo(() => {
     if (name === '') {
       return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'name' })

@@ -21,6 +21,22 @@ Object.defineProperty(generateSendingAllTx, 'type', {
   value: 'all',
 })
 
+const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
+  useCallback(
+    (field: string) => (idx: number) => (value: string | undefined) => {
+      dispatch({
+        type: AppActions.UpdateSendOutput,
+        payload: {
+          idx,
+          item: {
+            [field]: value,
+          },
+        },
+      })
+    },
+    [dispatch]
+  )
+
 const updateTransactionWith = (generator: typeof generateTx | typeof generateSendingAllTx) => ({
   walletID,
   price,
@@ -35,9 +51,9 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   walletID: string
   price: string
   items: Readonly<State.Output[]>
-  setTotalAmount: Function
-  setErrorMessage: Function
-  updateTransactionOutput?: Function
+  setTotalAmount: (val: string) => void
+  setErrorMessage: (val: string) => void
+  updateTransactionOutput?: ReturnType<typeof useUpdateTransactionOutput>
   isMainnet: boolean
   dispatch: StateDispatch
   t: TFunction
@@ -107,22 +123,6 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   return Promise.resolve(undefined)
 }
 
-const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
-  useCallback(
-    (field: string) => (idx: number) => (value: string | undefined) => {
-      dispatch({
-        type: AppActions.UpdateSendOutput,
-        payload: {
-          idx,
-          item: {
-            [field]: value,
-          },
-        },
-      })
-    },
-    [dispatch]
-  )
-
 const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
     dispatch({
@@ -154,8 +154,8 @@ const useOnTransactionChange = (
   isMainnet: boolean,
   dispatch: StateDispatch,
   isSendMax: boolean,
-  setTotalAmount: Function,
-  setErrorMessage: Function,
+  setTotalAmount: (val: string) => void,
+  setErrorMessage: (val: string) => void,
   t: TFunction
 ) => {
   useEffect(() => {
@@ -210,7 +210,7 @@ const useOnSubmit = (items: Readonly<State.Output[]>, isMainnet: boolean, dispat
     [dispatch, items, isMainnet]
   )
 
-const useOnItemChange = (updateTransactionOutput: Function) =>
+const useOnItemChange = (updateTransactionOutput: ReturnType<typeof useUpdateTransactionOutput>) =>
   useCallback(
     (e: any) => {
       const {

@@ -221,7 +221,7 @@ declare namespace State {
     }
   }
   interface Settings {
-    general: {}
+    general: object
     networks: Network[]
     wallets: WalletIdentity[]
   }

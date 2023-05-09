@@ -79,16 +79,7 @@ module.exports = {
         unnamedComponents: 'arrow-function',
       },
     ],
-    '@typescript-eslint/ban-types': [
-      'error',
-      {
-        extendDefaults: true,
-        types: {
-          '{}': false,
-          Function: false,
-        },
-      },
-    ],
+    '@typescript-eslint/ban-types': 'error',
     'react/jsx-no-useless-fragment': [
       'error',
       {
