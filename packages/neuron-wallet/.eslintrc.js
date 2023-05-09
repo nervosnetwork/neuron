@@ -1,94 +1,61 @@
 module.exports = {
-  extends: ['eslint:recommended', 'plugin:prettier/recommended'],
+  extends: ['eslint:recommended', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
   },
   plugins: ['@typescript-eslint'],
   rules: {
-    'prettier/prettier': [
-      2,
-      {
-        printWidth: 120
-      }
-    ],
-    'no-console': 0,
-    'no-cond-assign': 0,
-    'no-extra-semi': 'warn',
-    semi: 0,
+    // This is the configuration that was set when using eslint-plugin-prettier
+    // https://github.com/prettier/eslint-plugin-prettier#arrow-body-style-and-prefer-arrow-callback-issue
+    'arrow-body-style': 'off',
+    'prefer-arrow-callback': 'off',
+
+    // TypeScript support
+    // Avoid duplicating @typescript-eslint/no-unused-vars
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
-        vars: 'local',
-        args: 'after-used',
-        ignoreRestSiblings: false,
-        argsIgnorePattern: '^_'
-      }
+        argsIgnorePattern: '^_',
+      },
     ],
-    curly: [2, 'all'],
-    'implicit-arrow-linebreak': 'off',
-    'arrow-parens': [2, 'as-needed'],
-    'max-len': [
+
+    // Unnecessary rules
+    'no-plusplus': 'off',
+
+    // Adjusted rules
+    'no-console': [
       2,
       {
-        code: 150,
-        ignoreComments: true,
-        ignoreTrailingComments: true,
-        ignoreUrls: true,
-        ignoreStrings: true,
-        ignoreTemplateLiterals: true,
-        ignoreRegExpLiterals: true
-      }
+        allow: ['info', 'warn', 'error', 'group', 'groupEnd'],
+      },
     ],
-    'object-curly-newline': [
-      'error',
-      {
-        ObjectExpression: {
-          consistent: true
-        },
-        ObjectPattern: {
-          consistent: true
-        },
-        ImportDeclaration: {
-          consistent: true
-        },
-        ExportDeclaration: {
-          multiline: true,
-          minProperties: 3
-        }
-      }
-    ],
-    'no-plusplus': [0],
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-    'max-classes-per-file': [0],
-    '@typescript-eslint/no-angle-bracket-type-assertion': [0],
-    'no-alert': [0],
-    'require-atomic-updates': [0]
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        'no-undef': 'off'
-      }
-    }
+        'no-undef': 'off',
+      },
+    },
   ],
   globals: {
-    BigInt: 'readonly'
+    BigInt: 'readonly',
   },
   env: {
     es6: true,
     node: true,
     browser: true,
-    jest: true
+    jest: true,
   },
   settings: {
     'import/resolver': {
       node: {
         paths: ['src'],
-        extensions: ['.js', '.ts']
-      }
-    }
-  }
+        extensions: ['.js', '.ts'],
+      },
+    },
+  },
 }

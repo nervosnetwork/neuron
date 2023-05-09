@@ -1,8 +1,10 @@
 module.exports = {
-  extends: ['airbnb', 'plugin:prettier/recommended'],
+  extends: ['airbnb', 'prettier'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   settings: {
+    // https://github.com/SimulatedGREG/electron-vue/issues/423#issuecomment-464807973
+    'import/core-modules': ['electron'],
     'import/resolver': {
       node: {
         paths: ['src'],
@@ -14,91 +16,54 @@ module.exports = {
     },
   },
   rules: {
-    'prettier/prettier': [
-      2,
-      {
-        printWidth: 120,
-        endOfLine: 'auto',
-      },
-    ],
-    semi: [2, 'never'],
-    curly: [2, 'all'],
-    'comma-dangle': [
-      2,
-      {
-        arrays: 'always-multiline',
-        objects: 'always-multiline',
-        imports: 'always-multiline',
-        exports: 'always-multiline',
-        functions: 'ignore',
-      },
-    ],
-    'import/no-extraneous-dependencies': [
-      2,
-      {
-        devDependencies: true,
-      },
-    ],
+    // This is the configuration that was set when using eslint-plugin-prettier
+    // https://github.com/prettier/eslint-plugin-prettier#arrow-body-style-and-prefer-arrow-callback-issue
+    'arrow-body-style': 'off',
+    'prefer-arrow-callback': 'off',
+
+    // https://github.com/jsx-eslint/eslint-plugin-react/issues/498
+    'react/prop-types': 'off',
+
+    // TypeScript support
+    // Avoid duplicating @typescript-eslint/no-unused-vars
     'no-unused-vars': 'off',
-    'implicit-arrow-linebreak': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
-        vars: 'local',
-        args: 'after-used',
-        ignoreRestSiblings: false,
+        argsIgnorePattern: '^_',
       },
     ],
-    'arrow-parens': [2, 'as-needed'],
-    'max-len': [
-      2,
-      {
-        code: 120,
-        ignoreComments: true,
-        ignoreTrailingComments: true,
-        ignoreUrls: true,
-        ignoreStrings: true,
-        ignoreTemplateLiterals: true,
-        ignoreRegExpLiterals: true,
-      },
-    ],
-    'object-curly-newline': [
-      'error',
-      {
-        ObjectExpression: {
-          consistent: true,
-        },
-        ObjectPattern: {
-          consistent: true,
-        },
-        ImportDeclaration: {
-          consistent: true,
-        },
-        ExportDeclaration: {
-          multiline: true,
-          minProperties: 3,
-        },
-      },
-    ],
-    'no-plusplus': [0],
-    'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-    'max-classes-per-file': [0],
-    'react/jsx-filename-extension': [
-      1,
-      {
-        extensions: ['.ts', '.tsx'],
-      },
-    ],
-    'react/jsx-props-no-spreading': [0],
-    'typescript-eslint/no-angle-bracket-type-assertion': [0],
-    'no-alert': [0],
+    // Avoid duplicating @typescript-eslint/no-shadow
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': 'error',
+
+    // Unnecessary rules
+    'no-plusplus': 'off',
+    'max-classes-per-file': 'off',
+    'react/require-default-props': 'off',
+    'react/jsx-props-no-spreading': 'off',
+
+    // Adjusted rules
     'no-console': [
-      2,
+      'error',
       {
         allow: ['info', 'warn', 'error', 'group', 'groupEnd'],
       },
     ],
-    'no-bitwise': [0],
+    'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
+    'react/no-unstable-nested-components': ['error', { allowAsProps: true }],
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        devDependencies: ['**/*.stories.*', 'src/setupTests.ts'],
+      },
+    ],
+    'react/jsx-filename-extension': [
+      'warn',
+      {
+        extensions: ['.jsx', '.tsx'],
+      },
+    ],
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -107,18 +72,13 @@ module.exports = {
         tsx: 'never',
       },
     ],
-    'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': ['error'],
-    '@typescript-eslint/no-var-requires': 'off',
-    'react/prop-types': 'off',
     'react/function-component-definition': [
-      2,
+      'error',
       {
         namedComponents: 'arrow-function',
         unnamedComponents: 'arrow-function',
       },
     ],
-    'react/require-default-props': 'off',
     '@typescript-eslint/ban-types': [
       'error',
       {
@@ -129,10 +89,13 @@ module.exports = {
         },
       },
     ],
-    'no-unsafe-optional-chaining': ['warn', { disallowArithmeticOperators: false }],
-    'react/no-unstable-nested-components': ['warn', { allowAsProps: true }],
-    'default-param-last': 'off',
-    'react/jsx-no-useless-fragment': 'off',
+    'default-param-last': 'warn',
+    'react/jsx-no-useless-fragment': [
+      'error',
+      {
+        allowExpressions: true,
+      },
+    ],
   },
   overrides: [
     {

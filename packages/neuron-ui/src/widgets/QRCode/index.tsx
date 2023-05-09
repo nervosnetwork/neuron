@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import React, { useEffect, useRef, useCallback } from 'react'
 import { clipboard, nativeImage } from 'electron'
 import canvg from 'canvg'
