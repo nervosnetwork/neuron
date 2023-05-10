@@ -97,7 +97,7 @@ class NodeService {
     this.stop = unsubscribe
   }
 
-  public stop: Function | null = null
+  public stop: (() => void) | null = null
 
   public tipNumber = () => {
     return interval(this.intervalTime)

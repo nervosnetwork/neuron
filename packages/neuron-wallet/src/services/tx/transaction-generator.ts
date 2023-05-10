@@ -77,7 +77,7 @@ export class TransactionGenerator {
       previousOutput: op,
       capacity: nftCell.capacity,
       lock: outputLock,
-      type: new Script(nftCell.type?.codeHash!, nftCell.type?.args!, nftCell.type?.hashType!),
+      type: nftCell.type ? new Script(nftCell.type.codeHash, nftCell.type.args, nftCell.type.hashType) : null,
       data: nftCell.data,
       since: '0'
     })

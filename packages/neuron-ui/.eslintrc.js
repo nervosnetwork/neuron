@@ -1,7 +1,5 @@
 module.exports = {
-  extends: ['airbnb', 'prettier'],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  extends: ['airbnb', 'plugin:@typescript-eslint/recommended', 'prettier'],
   settings: {
     // https://github.com/SimulatedGREG/electron-vue/issues/423#issuecomment-464807973
     'import/core-modules': ['electron'],
@@ -15,7 +13,19 @@ module.exports = {
       version: 'detect',
     },
   },
+  env: {
+    jest: true,
+    node: true,
+    browser: true,
+  },
+  globals: {
+    BigInt: 'readonly',
+  },
   rules: {
+    // TODO: Some temporarily disabled rules will be re-enabled later, considering that many files are affected and will be addressed in the future.
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+
     // This is the configuration that was set when using eslint-plugin-prettier
     // https://github.com/prettier/eslint-plugin-prettier#arrow-body-style-and-prefer-arrow-callback-issue
     'arrow-body-style': 'off',
@@ -25,8 +35,6 @@ module.exports = {
     'react/prop-types': 'off',
 
     // TypeScript support
-    // Avoid duplicating @typescript-eslint/no-unused-vars
-    'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
@@ -40,6 +48,9 @@ module.exports = {
     // Unnecessary rules
     'no-plusplus': 'off',
     'max-classes-per-file': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/ban-ts-comment': 'warn',
     'react/require-default-props': 'off',
     'react/jsx-props-no-spreading': 'off',
 
@@ -51,17 +62,10 @@ module.exports = {
       },
     ],
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-    'react/no-unstable-nested-components': ['error', { allowAsProps: true }],
     'import/no-extraneous-dependencies': [
       'error',
       {
         devDependencies: ['**/*.stories.*', 'src/setupTests.ts'],
-      },
-    ],
-    'react/jsx-filename-extension': [
-      'warn',
-      {
-        extensions: ['.jsx', '.tsx'],
       },
     ],
     'import/extensions': [
@@ -72,6 +76,13 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    'react/no-unstable-nested-components': ['error', { allowAsProps: true }],
+    'react/jsx-filename-extension': [
+      'warn',
+      {
+        extensions: ['.jsx', '.tsx'],
+      },
+    ],
     'react/function-component-definition': [
       'error',
       {
@@ -79,34 +90,11 @@ module.exports = {
         unnamedComponents: 'arrow-function',
       },
     ],
-    '@typescript-eslint/ban-types': 'error',
     'react/jsx-no-useless-fragment': [
       'error',
       {
         allowExpressions: true,
       },
     ],
-  },
-  overrides: [
-    {
-      files: ['*.ts', '*.tsx'],
-      rules: {
-        'no-undef': 'off',
-      },
-    },
-    {
-      files: ['*.ts', '*.tsx'],
-      rules: {
-        'react/jsx-no-constructed-context-values': 0,
-      },
-    },
-  ],
-  env: {
-    jest: true,
-    node: true,
-    browser: true,
-  },
-  globals: {
-    BigInt: 'readonly',
   },
 }

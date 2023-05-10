@@ -51,7 +51,7 @@ export default class Keychain {
 
   // Create a child keychain with extended public key and path.
   // Children of this keychain should not have any hardened paths.
-  public static fromPublicKey = (publicKey: Buffer, chainCode: Buffer, path: String): Keychain => {
+  public static fromPublicKey = (publicKey: Buffer, chainCode: Buffer, path: string): Keychain => {
     const keychain = new Keychain(EMPTY_BUFFER, chainCode)
     keychain.publicKey = publicKey
     keychain.calculateFingerprint()
@@ -108,6 +108,7 @@ export default class Keychain {
       return this
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let bip32: Keychain = this
 
     let entries = path.split('/')
@@ -123,7 +124,7 @@ export default class Keychain {
     return bip32
   }
 
-  isNeutered = (): Boolean => {
+  isNeutered = (): boolean => {
     return this.privateKey === EMPTY_BUFFER
   }
 

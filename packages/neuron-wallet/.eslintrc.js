@@ -1,19 +1,34 @@
 module.exports = {
-  extends: ['eslint:recommended', 'prettier'],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    sourceType: 'module',
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
+  settings: {
+    'import/resolver': {
+      node: {
+        paths: ['src'],
+        extensions: ['.js', '.ts'],
+      },
+    },
   },
-  plugins: ['@typescript-eslint'],
+  env: {
+    es6: true,
+    node: true,
+    browser: true,
+    jest: true,
+  },
+  globals: {
+    BigInt: 'readonly',
+  },
   rules: {
+    // TODO: Some temporarily disabled rules will be re-enabled later, considering that many files are affected and will be addressed in the future.
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    'prefer-const': 'off',
+
     // This is the configuration that was set when using eslint-plugin-prettier
     // https://github.com/prettier/eslint-plugin-prettier#arrow-body-style-and-prefer-arrow-callback-issue
     'arrow-body-style': 'off',
     'prefer-arrow-callback': 'off',
 
     // TypeScript support
-    // Avoid duplicating @typescript-eslint/no-unused-vars
-    'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
@@ -23,6 +38,10 @@ module.exports = {
 
     // Unnecessary rules
     'no-plusplus': 'off',
+    'max-classes-per-file': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/ban-ts-comment': 'warn',
 
     // Adjusted rules
     'no-console': [
@@ -35,27 +54,11 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.ts', '*.tsx'],
+      files: ['*.test.ts', '*.test.tsx'],
       rules: {
-        'no-undef': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
       },
     },
   ],
-  globals: {
-    BigInt: 'readonly',
-  },
-  env: {
-    es6: true,
-    node: true,
-    browser: true,
-    jest: true,
-  },
-  settings: {
-    'import/resolver': {
-      node: {
-        paths: ['src'],
-        extensions: ['.js', '.ts'],
-      },
-    },
-  },
 }

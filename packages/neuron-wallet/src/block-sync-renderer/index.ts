@@ -19,7 +19,7 @@ import env from '../env'
 let network: Network | null
 let child: ChildProcess | null = null
 let requestId = 0
-let requests = new Map<number, Record<'resolve' | 'reject', Function>>()
+let requests = new Map<number, Record<'resolve' | 'reject', (val?: unknown) => unknown>>()
 
 export const killBlockSyncTask = async () => {
   const _child = child
