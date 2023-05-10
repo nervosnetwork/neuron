@@ -37,91 +37,93 @@ const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
     [dispatch]
   )
 
-const updateTransactionWith = (generator: typeof generateTx | typeof generateSendingAllTx) => ({
-  walletID,
-  price,
-  items,
-  setTotalAmount,
-  setErrorMessage,
-  updateTransactionOutput,
-  isMainnet,
-  dispatch,
-  t,
-}: {
-  walletID: string
-  price: string
-  items: Readonly<State.Output[]>
-  setTotalAmount: (val: string) => void
-  setErrorMessage: (val: string) => void
-  updateTransactionOutput?: ReturnType<typeof useUpdateTransactionOutput>
-  isMainnet: boolean
-  dispatch: StateDispatch
-  t: TFunction
-}) => {
-  const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
-  if (items.length === 1 && items[0].amount === undefined) {
-    setTotalAmount('0')
-  } else if (type === 'common') {
+const updateTransactionWith =
+  (generator: typeof generateTx | typeof generateSendingAllTx) =>
+  ({
+    walletID,
+    price,
+    items,
+    setTotalAmount,
+    setErrorMessage,
+    updateTransactionOutput,
+    isMainnet,
+    dispatch,
+    t,
+  }: {
+    walletID: string
+    price: string
+    items: Readonly<State.Output[]>
+    setTotalAmount: (val: string) => void
+    setErrorMessage: (val: string) => void
+    updateTransactionOutput?: ReturnType<typeof useUpdateTransactionOutput>
+    isMainnet: boolean
+    dispatch: StateDispatch
+    t: TFunction
+  }) => {
+    const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
+    if (items.length === 1 && items[0].amount === undefined) {
+      setTotalAmount('0')
+    } else if (type === 'common') {
+      try {
+        const totalAmount = outputsToTotalAmount(items)
+        setTotalAmount(totalAmount)
+      } catch (err) {
+        console.warn(err)
+      }
+    }
     try {
-      const totalAmount = outputsToTotalAmount(items)
-      setTotalAmount(totalAmount)
-    } catch (err) {
-      console.warn(err)
-    }
-  }
-  try {
-    validateOutputs(items, isMainnet, type === 'all')
-    const realParams = {
-      walletID,
-      items: items.map(item => ({
-        address: item.address || '',
-        capacity: CKBToShannonFormatter(item.amount, item.unit),
-        date: item.date,
-      })),
-      feeRate: price,
-    }
-    return generator(realParams)
-      .then((res: any) => {
-        if (res.status === 1) {
+      validateOutputs(items, isMainnet, type === 'all')
+      const realParams = {
+        walletID,
+        items: items.map(item => ({
+          address: item.address || '',
+          capacity: CKBToShannonFormatter(item.amount, item.unit),
+          date: item.date,
+        })),
+        feeRate: price,
+      }
+      return generator(realParams)
+        .then((res: any) => {
+          if (res.status === 1) {
+            dispatch({
+              type: AppActions.UpdateGeneratedTx,
+              payload: res.result,
+            })
+            if (type === 'all') {
+              const fmtItems = items.map((item, i) => ({
+                ...item,
+                amount: shannonToCKBFormatter(res.result.outputs[i].capacity, false, ''),
+              }))
+              const totalAmount = outputsToTotalAmount(fmtItems)
+              setTotalAmount(totalAmount)
+              if (updateTransactionOutput) {
+                updateTransactionOutput('amount')(items.length - 1)(fmtItems[fmtItems.length - 1].amount)
+              }
+            }
+            return res.result
+          }
+          if (res.status === 0 || res.status === 114) {
+            throw new Error(res.message.content)
+          }
+          throw new Error(t(`messages.codes.${res.status}`))
+        })
+        .catch((err: Error) => {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
-            payload: res.result,
+            payload: '',
           })
-          if (type === 'all') {
-            const fmtItems = items.map((item, i) => ({
-              ...item,
-              amount: shannonToCKBFormatter(res.result.outputs[i].capacity, false, ''),
-            }))
-            const totalAmount = outputsToTotalAmount(fmtItems)
-            setTotalAmount(totalAmount)
-            if (updateTransactionOutput) {
-              updateTransactionOutput('amount')(items.length - 1)(fmtItems[fmtItems.length - 1].amount)
-            }
-          }
-          return res.result
-        }
-        if (res.status === 0 || res.status === 114) {
-          throw new Error(res.message.content)
-        }
-        throw new Error(t(`messages.codes.${res.status}`))
-      })
-      .catch((err: Error) => {
-        dispatch({
-          type: AppActions.UpdateGeneratedTx,
-          payload: '',
+          setErrorMessage(err.message)
+          return undefined
         })
-        setErrorMessage(err.message)
-        return undefined
-      })
-  } catch {
-    // ignore
+    } catch {
+      // ignore
+    }
+    dispatch({
+      type: AppActions.UpdateGeneratedTx,
+      payload: '',
+    })
+    return Promise.resolve(undefined)
   }
-  dispatch({
-    type: AppActions.UpdateGeneratedTx,
-    payload: '',
-  })
-  return Promise.resolve(undefined)
-}
 
 const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
@@ -326,11 +328,10 @@ export const useInitialize = (
   const [errorMessage, setErrorMessage] = useState('')
   const [isSendMax, setIsSendMax] = useState(false)
 
-  const outputs = useMemo(() => items.map(item => ({ ...item, disabled: isSendMax || sending })), [
-    items,
-    isSendMax,
-    sending,
-  ])
+  const outputs = useMemo(
+    () => items.map(item => ({ ...item, disabled: isSendMax || sending })),
+    [items, isSendMax, sending]
+  )
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)

@@ -7,9 +7,9 @@ import {
 import { AppActions, StateDispatch } from '../reducer'
 import { addNotification } from './app'
 
-export const sendCreateSUDTAccountTransaction = (params: Controller.SendCreateSUDTAccountTransaction.Params) => async (
-  dispatch: StateDispatch
-) => sendTxBaseAction(sendCreateAccountTx, params, dispatch, addNotification)
+export const sendCreateSUDTAccountTransaction =
+  (params: Controller.SendCreateSUDTAccountTransaction.Params) => async (dispatch: StateDispatch) =>
+    sendTxBaseAction(sendCreateAccountTx, params, dispatch, addNotification)
 
 export const sendSUDTTransaction = (params: Controller.SendSUDTTransaction.Params) => async (dispatch: StateDispatch) =>
   sendTxBaseAction(sendSUDTTx, params, dispatch, addNotification)
