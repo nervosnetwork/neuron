@@ -1,9 +1,9 @@
 import path from 'path'
 import fs from 'fs'
-import env from 'env'
+import env from '../env'
 import { dialog } from 'electron'
 import { t } from 'i18next'
-import SettingsService from 'services/settings'
+import SettingsService from '../services/settings'
 
 const { app } = env
 

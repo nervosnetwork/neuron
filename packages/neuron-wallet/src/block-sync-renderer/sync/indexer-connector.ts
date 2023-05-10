@@ -1,16 +1,16 @@
 // eslint-disable-next-line prettier/prettier
-import type { ScriptHashType } from 'models/chain/script'
+import type { ScriptHashType } from '../../models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { Tip, QueryOptions } from '@ckb-lumos/base'
 import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
-import logger from 'utils/logger'
-import CommonUtils from 'utils/common'
-import RpcService from 'services/rpc-service'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { Address } from "models/address"
-import AddressMeta from 'database/address/meta'
-import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
+import logger from '../../utils/logger'
+import CommonUtils from '../../utils/common'
+import RpcService from '../../services/rpc-service'
+import TransactionWithStatus from '../../models/chain/transaction-with-status'
+import { Address } from '../../models/address'
+import AddressMeta from '../../database/address/meta'
+import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 
 export interface LumosCellQuery {

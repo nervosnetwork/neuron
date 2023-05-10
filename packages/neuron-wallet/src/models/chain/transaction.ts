@@ -2,12 +2,12 @@ import CellDep from './cell-dep'
 import Input from './input'
 import Output from './output'
 import WitnessArgs from './witness-args'
-import HexUtils from 'utils/hex'
+import HexUtils from '../../utils/hex'
 import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
 import BlockHeader from './block-header'
-import TypeCheckerUtils from 'utils/type-checker'
+import TypeCheckerUtils from '../../utils/type-checker'
 import OutPoint from './out-point'
-import { Signatures } from 'models/offline-sign'
+import { Signatures } from '../../models/offline-sign'
 
 export enum TransactionStatus {
   Pending = 'pending',

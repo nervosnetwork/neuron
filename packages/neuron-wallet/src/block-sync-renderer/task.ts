@@ -1,11 +1,11 @@
 // eslint-disable-next-line prettier/prettier
 import type { LumosCellQuery } from './sync/indexer-connector'
-import initConnection from 'database/chain/ormconfig'
+import initConnection from '../database/chain/ormconfig'
 import { register as registerTxStatusListener, } from './tx-status-listener'
 import SyncQueue from './sync/queue'
-import logger from 'utils/logger'
-import { ShouldInChildProcess } from 'exceptions'
-import env from 'env'
+import logger from '../utils/logger'
+import { ShouldInChildProcess } from '../exceptions'
+import env from '../env'
 
 let syncQueue: SyncQueue | null
 

@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 import { t } from 'i18next'
 
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
-import { MissingRequiredArgument } from 'exceptions'
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
+import { MissingRequiredArgument } from '../exceptions'
 
 const requiredMetadataKey = Symbol('required')
 const passwordMetadataKey = Symbol('password')

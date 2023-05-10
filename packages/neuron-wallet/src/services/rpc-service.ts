@@ -1,14 +1,14 @@
 import CKB from '@nervosnetwork/ckb-sdk-core'
-import { generateCKB } from 'services/sdk-core'
+import { generateCKB } from '../services/sdk-core'
 
-import HexUtils from 'utils/hex'
-import CommonUtils from 'utils/common'
-import Block from 'models/chain/block'
-import BlockHeader from 'models/chain/block-header'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import OutPoint from 'models/chain/out-point'
-import CellWithStatus from 'models/chain/cell-with-status'
-import logger from 'utils/logger'
+import HexUtils from '../utils/hex'
+import CommonUtils from '../utils/common'
+import Block from '../models/chain/block'
+import BlockHeader from '../models/chain/block-header'
+import TransactionWithStatus from '../models/chain/transaction-with-status'
+import OutPoint from '../models/chain/out-point'
+import CellWithStatus from '../models/chain/cell-with-status'
+import logger from '../utils/logger'
 
 export default class RpcService {
   private retryTime: number

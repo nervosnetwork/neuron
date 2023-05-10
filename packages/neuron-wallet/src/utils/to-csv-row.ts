@@ -1,8 +1,8 @@
 import { t } from 'i18next'
-import shannonToCKB from 'utils/shannonToCKB'
-import sudtValueToAmount from 'utils/sudt-value-to-amount'
-import Transaction from 'models/chain/transaction'
-import { DEFAULT_UDT_SYMBOL } from 'utils/const'
+import shannonToCKB from '../utils/shannonToCKB'
+import sudtValueToAmount from '../utils/sudt-value-to-amount'
+import Transaction from '../models/chain/transaction'
+import { DEFAULT_UDT_SYMBOL } from '../utils/const'
 
 export const formatDatetime = (datetime: Date) => {
   const isoFmt = datetime.toISOString()

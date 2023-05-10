@@ -1,11 +1,11 @@
-import AssetAccountInfo from 'models/asset-account-info'
-import Transaction from 'models/chain/transaction'
-import { ServiceHasNoResponse } from 'exceptions'
-import { ResponseCode } from 'utils/const'
-import AnyoneCanPayService from 'services/anyone-can-pay'
-import TransactionSender from 'services/transaction-sender'
-import { set as setDescription } from 'services/tx/transaction-description'
-import AddressParser from 'models/address-parser'
+import AssetAccountInfo from '../models/asset-account-info'
+import Transaction from '../models/chain/transaction'
+import { ServiceHasNoResponse } from '../exceptions'
+import { ResponseCode } from '../utils/const'
+import AnyoneCanPayService from '../services/anyone-can-pay'
+import TransactionSender from '../services/transaction-sender'
+import { set as setDescription } from '../services/tx/transaction-description'
+import AddressParser from '../models/address-parser'
 
 export interface GenerateAnyoneCanPayTxParams {
   walletID: string

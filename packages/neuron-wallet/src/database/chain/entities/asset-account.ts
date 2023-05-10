@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm'
-import AssetAccountModel from 'models/asset-account'
+import AssetAccountModel from '../../../models/asset-account'
 import SudtTokenInfo from './sudt-token-info'
 
 @Entity()

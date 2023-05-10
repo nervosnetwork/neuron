@@ -1,11 +1,11 @@
-import env from 'env'
+import env from '../env'
 import path from 'path'
 import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
 import process from 'process'
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 import SettingsService from './settings'
-import MigrateSubject from 'models/subjects/migrate-subject'
+import MigrateSubject from '../models/subjects/migrate-subject'
 import IndexerService from './indexer'
 
 const platform = (): string => {

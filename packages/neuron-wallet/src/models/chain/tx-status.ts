@@ -1,4 +1,4 @@
-import TypeCheckerUtils from 'utils/type-checker'
+import TypeCheckerUtils from '../../utils/type-checker'
 
 export enum TxStatusType {
   Pending = 'pending',

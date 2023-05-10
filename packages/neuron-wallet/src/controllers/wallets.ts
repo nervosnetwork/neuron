@@ -1,14 +1,14 @@
 import fs from 'fs'
 import { t } from 'i18next'
 import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
-import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
-import NetworksService from 'services/networks'
-import Keystore from 'models/keys/keystore'
-import Keychain from 'models/keys/keychain'
-import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from 'models/keys/key'
-import CommandSubject from 'models/subjects/command'
-import { ResponseCode } from 'utils/const'
+import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../services/wallets'
+import NetworksService from '../services/networks'
+import Keystore from '../models/keys/keystore'
+import Keychain from '../models/keys/keychain'
+import { validateMnemonic, mnemonicToSeedSync } from '../models/keys/mnemonic'
+import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from '../models/keys/key'
+import CommandSubject from '../models/subjects/command'
+import { ResponseCode } from '../utils/const'
 import {
   CurrentWalletNotSet,
   IsRequired,
@@ -20,17 +20,17 @@ import {
   InvalidJSON,
   InvalidAddress,
   UsedName
-} from 'exceptions'
-import AddressService from 'services/addresses'
-import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
-import TransactionSender from 'services/transaction-sender'
-import Transaction from 'models/chain/transaction'
-import logger from 'utils/logger'
-import { set as setDescription } from 'services/tx/transaction-description'
-import HardwareWalletService from 'services/hardware'
-import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
-import AddressParser from 'models/address-parser'
-import MultisigConfigModel from 'models/multisig-config'
+} from '../exceptions'
+import AddressService from '../services/addresses'
+import { MainnetAddressRequired, TestnetAddressRequired } from '../exceptions/address'
+import TransactionSender from '../services/transaction-sender'
+import Transaction from '../models/chain/transaction'
+import logger from '../utils/logger'
+import { set as setDescription } from '../services/tx/transaction-description'
+import HardwareWalletService from '../services/hardware'
+import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
+import AddressParser from '../models/address-parser'
+import MultisigConfigModel from '../models/multisig-config'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {

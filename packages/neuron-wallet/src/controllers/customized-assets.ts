@@ -1,11 +1,11 @@
-import AddressService from 'services/addresses'
-import CellsService, { PaginationResult, CustomizedLock } from 'services/cells'
-import Cell from 'models/chain/output'
-import { ServiceHasNoResponse } from 'exceptions'
-import { ResponseCode } from 'utils/const'
-import Transaction from 'models/chain/transaction'
-import TransactionSender from 'services/transaction-sender'
-import OutPoint from 'models/chain/out-point'
+import AddressService from '../services/addresses'
+import CellsService, { PaginationResult, CustomizedLock } from '../services/cells'
+import Cell from '../models/chain/output'
+import { ServiceHasNoResponse } from '../exceptions'
+import { ResponseCode } from '../utils/const'
+import Transaction from '../models/chain/transaction'
+import TransactionSender from '../services/transaction-sender'
+import OutPoint from '../models/chain/out-point'
 
 export default class CustomizedAssetsController {
   public async getCustomizedAssetCells(

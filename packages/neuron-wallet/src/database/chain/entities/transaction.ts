@@ -10,14 +10,14 @@ import {
   AfterUpdate,
   AfterRemove
 } from 'typeorm'
-import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
+import TxDbChangedSubject from '../../../models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
-import TransactionModel, { TransactionStatus } from 'models/chain/transaction'
-import CellDep, { DepType } from 'models/chain/cell-dep'
-import OutPoint from 'models/chain/out-point'
-import Input from 'models/chain/input'
-import Output from 'models/chain/output'
+import TransactionModel, { TransactionStatus } from '../../../models/chain/transaction'
+import CellDep, { DepType } from '../../../models/chain/cell-dep'
+import OutPoint from '../../../models/chain/out-point'
+import Input from '../../../models/chain/input'
+import Output from '../../../models/chain/output'
 
 @Entity()
 export default class Transaction extends BaseEntity {

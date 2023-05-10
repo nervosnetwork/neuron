@@ -1,8 +1,8 @@
 import { BrowserWindow } from 'electron'
-import env from 'env'
-import Store from 'models/store'
-import { changeLanguage } from 'locales/i18n'
-import { updateApplicationMenu } from 'controllers/app/menu'
+import env from '../env'
+import Store from '../models/store'
+import { changeLanguage } from '../locales/i18n'
+import { updateApplicationMenu } from '../controllers/app/menu'
 import path from 'path'
 
 const { app } = env

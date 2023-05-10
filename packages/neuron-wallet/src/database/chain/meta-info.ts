@@ -1,6 +1,6 @@
-import FileService from 'services/file'
-import OutPoint from 'models/chain/out-point'
-import { ScriptHashType } from 'models/chain/script'
+import FileService from '../../services/file'
+import OutPoint from '../../models/chain/out-point'
+import { ScriptHashType } from '../../models/chain/script'
 
 const moduleName = 'cells'
 const fileName = 'meta-info.json'

@@ -1,12 +1,12 @@
 import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils/lib/serialization/transaction'
-import HexUtils from 'utils/hex'
+import HexUtils from '../utils/hex'
 import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
 import Multisig from './multisig'
 import Script, { ScriptHashType } from './chain/script'
-import BufferUtils from 'utils/buffer'
+import BufferUtils from '../utils/buffer'
 
 export default class TransactionSize {
   public static SERIALIZED_OFFSET_BYTESIZE = 4

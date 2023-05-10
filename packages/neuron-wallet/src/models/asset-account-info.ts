@@ -1,9 +1,9 @@
 import CellDep, { DepType } from './chain/cell-dep'
 import Script, { ScriptHashType } from './chain/script'
 import OutPoint from './chain/out-point'
-import NetworksService from 'services/networks'
+import NetworksService from '../services/networks'
 import Transaction from './chain/transaction'
-import HexUtils from 'utils/hex'
+import HexUtils from '../utils/hex'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
 
