@@ -10,6 +10,7 @@ import AssetAccountInfo from 'models/asset-account-info'
 import { Address as AddressInterface } from "models/address"
 import AddressParser from 'models/address-parser'
 import Multisig from 'models/multisig'
+import BlockHeader from 'models/chain/block-header'
 import TxAddressFinder from './tx-address-finder'
 import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
@@ -134,8 +135,11 @@ export default class Queue {
       blockHashes.map(v => ['getHeader', v])
     ).exec()
     headers.forEach((blockHeader, idx) => {
-      txs[idx].timestamp = blockHeader!.timestamp
-      txs[idx].blockNumber = blockHeader!.number
+      if (blockHeader) {
+        const header = BlockHeader.fromSDK(blockHeader)
+        txs[idx].timestamp = header.timestamp
+        txs[idx].blockNumber = header.number
+      }
     })
     return txs
   }
