@@ -26,8 +26,8 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
 
           setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
         })
-        .catch((err: Error) => {
-          if ('response' in err && err.response !== null && typeof err.response === 'object' && 'status' in err.response && err.response?.status === 404) {
+        .catch((err: Error & { response?: { status: number } }) => {
+          if (err?.response?.status === 404) {
             setFeeFatestatsData(states => ({ ...states, suggestFeeRate: MEDIUM_FEE_RATE }))
           } else {
             stateDispatch({
