@@ -23,9 +23,9 @@ $ yarn global add lerna # install lerna globally
 
 #### Install Dependencies
 
-> TIP: If you find that it takes a long time to download electron, you can try [proxy](https://www.electronjs.org/docs/latest/tutorial/installation#proxies) by
-> 
-> export ELECTRON_GET_USE_PROXY=http://username:password@host:port
+> Notes: 
+> 1. Please set [proxy](https://www.electronjs.org/docs/latest/tutorial/installation#proxies) if you are using a proxy locally and find the downloading is halted
+> 2. Please set [CDN](https://www.electronjs.org/docs/latest/tutorial/installation#mirror) if the downloading is slow
 
 After lerna has been installed, run this to install and link dependencies:
 
