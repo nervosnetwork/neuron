@@ -6,7 +6,7 @@ export { AddressPrefix }
 
 export enum AddressType {
   Receiving = 0, // External chain
-  Change = 1 // Internal chain
+  Change = 1, // Internal chain
 }
 
 export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {

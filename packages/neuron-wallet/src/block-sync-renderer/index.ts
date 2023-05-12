@@ -45,7 +45,7 @@ const waitForChildClose = (c: ChildProcess) =>
       type: 'call',
       id: requestId++,
       channel: 'unmount',
-      message: null
+      message: null,
     }
     c.send(msg, err => {
       if (err) {
@@ -91,7 +91,7 @@ export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> 
     type: 'call',
     id: requestId++,
     channel: 'queryIndexer',
-    message: query
+    message: query,
   }
   return registerRequest(_child, msg).catch(err => {
     logger.error(`Sync:\tfailed to register query indexer task`, err)
@@ -105,7 +105,7 @@ export const createBlockSyncTask = async () => {
   // prevents the sync task from being started repeatedly if fork does not finish executing.
   child = fork(path.join(__dirname, 'task-wrapper.js'), [], {
     env: { fileBasePath: env.fileBasePath },
-    stdio: ['ipc', process.stdout, 'pipe']
+    stdio: ['ipc', process.stdout, 'pipe'],
   })
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {
@@ -159,7 +159,7 @@ export const createBlockSyncTask = async () => {
 
   DataUpdateSubject.next({
     dataType: 'transaction',
-    actionType: 'update'
+    actionType: 'update',
   })
 
   const _child = child
@@ -170,7 +170,7 @@ export const createBlockSyncTask = async () => {
       genesisHash: network.genesisHash,
       url: network.remote,
       addressMetas,
-      indexerUrl: network.remote
+      indexerUrl: network.remote,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {

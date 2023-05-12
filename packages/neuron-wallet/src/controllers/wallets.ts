@@ -19,7 +19,7 @@ import {
   IncorrectPassword,
   InvalidJSON,
   InvalidAddress,
-  UsedName
+  UsedName,
 } from '../exceptions'
 import AddressService from '../services/addresses'
 import { MainnetAddressRequired, TestnetAddressRequired } from '../exceptions/address'
@@ -40,7 +40,7 @@ export default class WalletsController {
     }
     return {
       status: ResponseCode.Success,
-      result: wallets.map(({ name, id, device }) => ({ name, id, device }))
+      result: wallets.map(({ name, id, device }) => ({ name, id, device })),
     }
   }
 
@@ -55,14 +55,14 @@ export default class WalletsController {
     }
     return {
       status: ResponseCode.Success,
-      result: wallet
+      result: wallet,
     }
   }
 
   public async importMnemonic({
     name,
     password,
-    mnemonic
+    mnemonic,
   }: {
     name: string
     password: string
@@ -74,7 +74,7 @@ export default class WalletsController {
   public async create({
     name,
     password,
-    mnemonic
+    mnemonic,
   }: {
     name: string
     password: string
@@ -87,7 +87,7 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    isImporting
+    isImporting,
   }: {
     name: string
     password: string
@@ -120,7 +120,7 @@ export default class WalletsController {
       id: '',
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
-      keystore
+      keystore,
     })
 
     wallet.checkAndGenerateAddresses(isImporting)
@@ -129,15 +129,15 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: {
         id: wallet.id,
-        name: wallet.name
-      }
+        name: wallet.name,
+      },
     }
   }
 
   public async importKeystore({
     name,
     password,
-    keystorePath
+    keystorePath,
   }: {
     name: string
     password: string
@@ -169,14 +169,14 @@ export default class WalletsController {
       id: '',
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
-      keystore: keystoreObject
+      keystore: keystoreObject,
     })
 
     wallet.checkAndGenerateAddresses(true)
 
     return {
       status: ResponseCode.Success,
-      result: wallet
+      result: wallet,
     }
   }
 
@@ -185,7 +185,7 @@ export default class WalletsController {
     name,
     password,
     newPassword,
-    device
+    device,
   }: {
     id: string
     password: string
@@ -200,7 +200,7 @@ export default class WalletsController {
     }
 
     const props: { name: string; keystore?: Keystore; device?: DeviceInfo } = {
-      name: name || wallet.name
+      name: name || wallet.name,
     }
 
     if (!wallet.isHardware()) {
@@ -219,7 +219,7 @@ export default class WalletsController {
     walletsService.update(id, props)
     return {
       status: ResponseCode.Success,
-      result: walletsService.get(id)
+      result: walletsService.get(id),
     }
   }
 
@@ -237,7 +237,7 @@ export default class WalletsController {
 
   public async backup({
     id = '',
-    password = ''
+    password = '',
   }: Controller.Params.BackupWallet): Promise<Controller.Response<boolean>> {
     const walletsService = WalletsService.getInstance()
 
@@ -251,7 +251,7 @@ export default class WalletsController {
   public async importHardwareWallet({
     publicKey,
     chainCode,
-    walletName
+    walletName,
   }: ExtendedPublicKey & { walletName: string }): Promise<Controller.Response<Wallet>> {
     const device = HardwareWalletService.getInstance().getCurrent()!
     const accountExtendedPublicKey = new AccountExtendedPublicKey(publicKey, chainCode)
@@ -261,14 +261,14 @@ export default class WalletsController {
       id: '',
       name: walletName,
       extendedKey: accountExtendedPublicKey.serialize(),
-      keystore: Keystore.createEmpty()
+      keystore: Keystore.createEmpty(),
     })
 
     wallet.checkAndGenerateAddresses(true)
 
     return {
       status: ResponseCode.Success,
-      result: wallet
+      result: wallet,
     }
   }
 
@@ -276,17 +276,13 @@ export default class WalletsController {
     return dialog
       .showOpenDialog(BrowserWindow.getFocusedWindow()!, {
         title: t('messages.import-extended-public-key'),
-        filters: [{ name: 'JSON File', extensions: ['json'] }]
+        filters: [{ name: 'JSON File', extensions: ['json'] }],
       })
       .then((value: OpenDialogReturnValue) => {
         const filePath = value.filePaths[0]
         if (filePath) {
           try {
-            const name =
-              filePath
-                .split(/[\\/]/)
-                .pop()!
-                .split('.')[0] + '-Watch Only' // File name (without extension)
+            const name = filePath.split(/[\\/]/).pop()!.split('.')[0] + '-Watch Only' // File name (without extension)
             const content = fs.readFileSync(filePath, 'utf8')
             const json: { xpubkey: string } = JSON.parse(content)
             const accountExtendedPublicKey = AccountExtendedPublicKey.parse(json.xpubkey)
@@ -296,13 +292,13 @@ export default class WalletsController {
               id: '',
               name,
               extendedKey: accountExtendedPublicKey.serialize(),
-              keystore: Keystore.createEmpty()
+              keystore: Keystore.createEmpty(),
             })
 
             wallet.checkAndGenerateAddresses(true)
             return {
               status: ResponseCode.Success,
-              result: wallet
+              result: wallet,
             }
           } catch (e) {
             if (e instanceof UsedName) {
@@ -324,19 +320,19 @@ export default class WalletsController {
     return dialog
       .showSaveDialog(BrowserWindow.getFocusedWindow()!, {
         title: t('messages.save-extended-public-key'),
-        defaultPath: wallet.name + '-xpubkey.json'
+        defaultPath: wallet.name + '-xpubkey.json',
       })
       .then((returnValue: SaveDialogReturnValue) => {
         if (returnValue.filePath) {
           fs.writeFileSync(returnValue.filePath, JSON.stringify({ xpubkey: xpubkey.serialize() }))
           return {
             status: ResponseCode.Success,
-            result: true
+            result: true,
           }
         } else {
           return {
             status: ResponseCode.Fail,
-            result: false
+            result: false,
           }
         }
       })
@@ -349,9 +345,9 @@ export default class WalletsController {
       result: currentWallet
         ? {
             ...currentWallet.toJSON(),
-            isWatchOnly: currentWallet.isHDWallet() && currentWallet.loadKeystore().isEmpty()
+            isWatchOnly: currentWallet.isHDWallet() && currentWallet.loadKeystore().isEmpty(),
           }
-        : null
+        : null,
     }
   }
 
@@ -364,7 +360,7 @@ export default class WalletsController {
     }
     return {
       status: ResponseCode.Success,
-      result: currentWallet.toJSON()
+      result: currentWallet.toJSON(),
     }
   }
 
@@ -377,7 +373,7 @@ export default class WalletsController {
         txCount,
         balance,
         description = '',
-        addressIndex: index = ''
+        addressIndex: index = '',
       }) => ({
         address,
         identifier,
@@ -385,12 +381,12 @@ export default class WalletsController {
         txCount: txCount!,
         description,
         balance: balance!,
-        index
+        index,
       })
     )
     return {
       status: ResponseCode.Success,
-      result: addresses
+      result: addresses,
     }
   }
 
@@ -433,7 +429,7 @@ export default class WalletsController {
 
     return {
       status: ResponseCode.Success,
-      result: hash
+      result: hash,
     }
   }
 
@@ -457,7 +453,7 @@ export default class WalletsController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -481,7 +477,7 @@ export default class WalletsController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -498,7 +494,7 @@ export default class WalletsController {
     const tx: Transaction = await new TransactionSender().generateMultisigTx(params.items, params.multisigConfig)
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -515,14 +511,14 @@ export default class WalletsController {
     const tx: Transaction = await new TransactionSender().generateMultisigSendAllTx(params.items, params.multisigConfig)
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
   public async updateAddressDescription({
     walletID,
     address,
-    description
+    description,
   }: {
     walletID: string
     address: string
@@ -536,8 +532,8 @@ export default class WalletsController {
       result: {
         walletID,
         address,
-        description
-      }
+        description,
+      },
     }
   }
 
@@ -566,7 +562,7 @@ export default class WalletsController {
           winID: window.id,
           type: action,
           payload: walletID,
-          dispatchToUI: true
+          dispatchToUI: true,
         })
       }
     }
@@ -575,14 +571,14 @@ export default class WalletsController {
   public validateMnemonic(mnemonic: string) {
     return {
       status: ResponseCode.Success,
-      result: validateMnemonic(mnemonic)
+      result: validateMnemonic(mnemonic),
     }
   }
 
   public generateMnemonic() {
     return {
       status: ResponseCode.Success,
-      result: generateMnemonic()
+      result: generateMnemonic(),
     }
   }
 
@@ -619,7 +615,7 @@ export default class WalletsController {
     await walletsService.delete(id)
 
     return {
-      status: ResponseCode.Success
+      status: ResponseCode.Success,
     }
   }
 
@@ -632,24 +628,24 @@ export default class WalletsController {
     return dialog
       .showSaveDialog(BrowserWindow.getFocusedWindow()!, {
         title: t('messages.save-keystore'),
-        defaultPath: wallet.name + '.json'
+        defaultPath: wallet.name + '.json',
       })
       .then((returnValue: SaveDialogReturnValue) => {
         if (returnValue.canceled) {
           return {
             status: ResponseCode.Success,
-            result: true
+            result: true,
           }
         } else if (returnValue.filePath) {
           fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
           return {
             status: ResponseCode.Success,
-            result: true
+            result: true,
           }
         } else {
           return {
             status: ResponseCode.Fail,
-            result: false
+            result: false,
           }
         }
       })

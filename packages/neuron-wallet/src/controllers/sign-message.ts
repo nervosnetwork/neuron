@@ -16,7 +16,7 @@ export default class SignMessageController {
 
     return {
       status: ResponseCode.Success,
-      result: signature
+      result: signature,
     }
   }
 
@@ -28,7 +28,7 @@ export default class SignMessageController {
 
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 }

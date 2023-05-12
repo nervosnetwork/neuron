@@ -5,12 +5,12 @@ export default class SyncInfo {
   public static CURRENT_BLOCK_NUMBER = 'currentBlockNumber'
 
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   name!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   value!: string
 }

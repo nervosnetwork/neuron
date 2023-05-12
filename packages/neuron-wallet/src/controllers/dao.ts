@@ -17,7 +17,7 @@ export default class DaoController {
 
     return {
       status: ResponseCode.Success,
-      result: cells
+      result: cells,
     }
   }
 
@@ -39,7 +39,7 @@ export default class DaoController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -61,7 +61,7 @@ export default class DaoController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -83,7 +83,7 @@ export default class DaoController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -107,7 +107,7 @@ export default class DaoController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 }

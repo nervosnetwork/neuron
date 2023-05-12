@@ -15,7 +15,7 @@ export default class HdPublicKeyInfoModel {
       {
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
-        args: this.publicKeyInBlake160
+        args: this.publicKeyInBlake160,
       },
       NetworksService.getInstance().isMainnet()
     )

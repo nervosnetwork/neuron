@@ -13,16 +13,10 @@ import MultisigOutput from './entities/multisig-output'
 export const clean = async () => {
   await Promise.all(
     [InputEntity, OutputEntity, TransactionEntity, IndexerTxHashCache, MultisigOutput].map(entity => {
-      return getConnection()
-        .getRepository(entity)
-        .clear()
+      return getConnection().getRepository(entity).clear()
     })
   )
   MultisigOutputChangedSubject.getSubject().next('reset')
 
-  await getConnection()
-    .createQueryBuilder()
-    .delete()
-    .from(SyncInfoEntity)
-    .execute()
+  await getConnection().createQueryBuilder().delete().from(SyncInfoEntity).execute()
 }

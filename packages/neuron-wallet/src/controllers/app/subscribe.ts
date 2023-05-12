@@ -89,7 +89,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   })
 
   MultisigOutputChangedSubject.getSubject().subscribe(params => [
-    dispatcher.sendMessage('multisig-output-update', params)
+    dispatcher.sendMessage('multisig-output-update', params),
   ])
 
   MigrateSubject.getSubject().subscribe(async message => {
@@ -111,7 +111,7 @@ export const subscribe = (dispatcher: AppResponder) => {
           title: t('messageBox.migrate-failed.title'),
           message: t('messageBox.migrate-failed.message', { reason: message.reason }),
           cancelId: 0,
-          noLink: true
+          noLink: true,
         })
         if (dialogResponse.response === 0) {
           await clearCkbNodeCache()

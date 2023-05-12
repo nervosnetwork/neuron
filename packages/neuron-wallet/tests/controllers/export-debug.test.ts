@@ -2,14 +2,14 @@ jest.mock('electron', () => ({
   dialog: {
     showSaveDialog: jest.fn(),
     showMessageBox: jest.fn(),
-    showErrorBox: jest.fn()
+    showErrorBox: jest.fn(),
   },
 
   app: {
     getVersion: jest.fn().mockReturnValue('mock_version'),
     getPath: jest.fn().mockReturnValue('mock_path'),
-    getName: jest.fn().mockReturnValue('mock_name')
-  }
+    getName: jest.fn().mockReturnValue('mock_name'),
+  },
 }))
 
 jest.mock('../../src/services/addresses', () => {
@@ -19,15 +19,15 @@ jest.mock('../../src/services/addresses', () => {
         walletId: '0',
         addressType: '0',
         addressIndex: '0',
-        blake160: 'hash1'
+        blake160: 'hash1',
       },
       {
         walletId: '1',
         addressType: '1',
         addressIndex: '1',
-        blake160: 'hash2'
-      }
-    ]
+        blake160: 'hash2',
+      },
+    ],
   }
 })
 
@@ -36,7 +36,7 @@ jest.mock('fs', () => {
     createWriteStream: () => null,
     readFileSync: () => JSON.stringify({}),
     writeFileSync: () => jest.fn(),
-    existsSync: () => jest.fn()
+    existsSync: () => jest.fn(),
   }
 })
 
@@ -44,9 +44,9 @@ jest.mock('../../src/utils/logger', () => ({
   error: console.error,
   transports: {
     file: {
-      getFile: jest.fn()
-    }
-  }
+      getFile: jest.fn(),
+    },
+  },
 }))
 
 jest.mock('../../src/services/networks', () => {
@@ -55,11 +55,11 @@ jest.mock('../../src/services/networks', () => {
       return {
         getCurrent() {
           return {
-            remote: 'http://127.0.0.1:8114'
+            remote: 'http://127.0.0.1:8114',
           }
-        }
+        },
       }
-    }
+    },
   }
 })
 
@@ -67,9 +67,9 @@ jest.mock('../../src/services/settings', () => {
   return {
     getInstance() {
       return {
-        ckbDataPath: ''
+        ckbDataPath: '',
       }
-    }
+    },
   }
 })
 

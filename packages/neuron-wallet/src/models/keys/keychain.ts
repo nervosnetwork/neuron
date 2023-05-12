@@ -40,10 +40,7 @@ export default class Keychain {
   }
 
   public static fromSeed = (seed: Buffer): Keychain => {
-    const i = crypto
-      .createHmac('sha512', Buffer.from('Bitcoin seed', 'utf8'))
-      .update(seed)
-      .digest()
+    const i = crypto.createHmac('sha512', Buffer.from('Bitcoin seed', 'utf8')).update(seed).digest()
     const keychain = new Keychain(i.slice(0, 32), i.slice(32))
     keychain.calculateFingerprint()
     return keychain
@@ -77,10 +74,7 @@ export default class Keychain {
       data = Buffer.concat([this.publicKey, indexBuffer])
     }
 
-    const i = crypto
-      .createHmac('sha512', this.chainCode)
-      .update(data)
-      .digest()
+    const i = crypto.createHmac('sha512', this.chainCode).update(data).digest()
     const il = i.slice(0, 32)
     const ir = i.slice(32)
 
@@ -129,14 +123,8 @@ export default class Keychain {
   }
 
   hash160 = (data: Buffer): Buffer => {
-    const sha256 = crypto
-      .createHash('sha256')
-      .update(data)
-      .digest()
-    return crypto
-      .createHash('ripemd160')
-      .update(sha256)
-      .digest()
+    const sha256 = crypto.createHash('sha256').update(data).digest()
+    return crypto.createHash('ripemd160').update(sha256).digest()
   }
 
   private static privateKeyAdd = (privateKey: Buffer, factor: Buffer): Buffer => {
@@ -151,11 +139,7 @@ export default class Keychain {
 
   private static publicKeyAdd = (publicKey: Buffer, factor: Buffer): Buffer => {
     const x = new BN(publicKey.slice(1)).toRed(ec.curve.red)
-    let y = x
-      .redSqr()
-      .redIMul(x)
-      .redIAdd(ec.curve.b)
-      .redSqrt()
+    let y = x.redSqr().redIMul(x).redIAdd(ec.curve.b).redSqrt()
     if ((publicKey[0] === 0x03) !== y.isOdd()) {
       y = y.redNeg()
     }

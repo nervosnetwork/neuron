@@ -3,14 +3,14 @@ export default {
     keywords: {
       wallet: '錢包',
       password: '密碼',
-      'wallet-name': '錢包名稱'
+      'wallet-name': '錢包名稱',
     },
     'application-menu': {
       neuron: {
         about: '關於{{app}}',
         preferences: '偏好設定...',
         'check-updates': '檢查更新...',
-        quit: '退出{{app}}'
+        quit: '退出{{app}}',
       },
       wallet: {
         label: '錢包',
@@ -24,26 +24,26 @@ export default {
         'import-mnemonic': '導入助記詞',
         'import-keystore': '導入 Keystore 檔案',
         'import-xpubkey': '導入 Extended Public Key',
-        'import-hardware': '導入硬體錢包'
+        'import-hardware': '導入硬體錢包',
       },
       edit: {
         label: '編輯',
         cut: '剪下',
         copy: '複製',
         paste: '貼上',
-        selectall: '全選'
+        selectall: '全選',
       },
       tools: {
         label: '工具',
         'sign-and-verify': '簽名/驗簽信息',
         'multisig-address': '多簽地址',
         'offline-sign': '離線簽名',
-        'clear-sync-data': '清除所有同步數據'
+        'clear-sync-data': '清除所有同步數據',
       },
       window: {
         label: '視窗',
         minimize: '最小化',
-        close: '關閉視窗'
+        close: '關閉視窗',
       },
       help: {
         label: '幫助',
@@ -54,18 +54,18 @@ export default {
         'contact-us-message': '> 請通過 "菜單" -> "幫助" -> "導出調試信息" 獲得 Neuron 的調試信息並附在郵件中.',
         documentation: '使用說明',
         settings: '設定',
-        'export-debug-info': '導出除錯信息'
+        'export-debug-info': '導出除錯信息',
       },
       develop: {
         develop: '開發',
         'force-reload': '強制重新載入',
         reload: '重新載入',
-        'toggle-dev-tools': '開發者工具'
-      }
+        'toggle-dev-tools': '開發者工具',
+      },
     },
     services: {
       transactions: '交易',
-      wallets: '錢包'
+      wallets: '錢包',
     },
     messages: {
       'failed-to-load-networks': '載入節點失敗。',
@@ -124,41 +124,41 @@ export default {
       'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0',
       'no-match-address-for-sign': '没有找到匹配的地址',
       'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址',
-      'no-exist-ckb-node-data': '{{path}} 目錄下沒有找到 CKB Node 配置和數據, 點擊繼續重新同步'
+      'no-exist-ckb-node-data': '{{path}} 目錄下沒有找到 CKB Node 配置和數據, 點擊繼續重新同步',
     },
     messageBox: {
       button: {
         confirm: '確定',
-        discard: '放棄'
+        discard: '放棄',
       },
       'send-capacity': {
-        title: '發送交易'
+        title: '發送交易',
       },
       'clear-sync-data': {
         title: '清除同步數據',
-        message: '清除所有同步數據會重置所有本地節點數據並重新同步，整個過程可能會消耗較長時間。'
+        message: '清除所有同步數據會重置所有本地節點數據並重新同步，整個過程可能會消耗較長時間。',
       },
       'remove-network': {
         title: '删除網路',
         message: '將删除網路 {{name}}(地址: {{address}})的設定.',
-        alert: '這是當前連接網路，删除後會連接到默認網路'
+        alert: '這是當前連接網路，删除後會連接到默認網路',
       },
       'remove-wallet': {
         title: '删除錢包',
-        password: '密碼'
+        password: '密碼',
       },
       'backup-keystore': {
         title: '備份 Keystore 檔案',
-        password: '密碼'
+        password: '密碼',
       },
       transaction: {
-        title: '交易: {{hash}}'
+        title: '交易: {{hash}}',
       },
       'sign-and-verify': {
-        title: '簽名/驗簽信息'
+        title: '簽名/驗簽信息',
       },
       'multisig-address': {
-        title: '多簽地址'
+        title: '多簽地址',
       },
       'ckb-dependency': {
         title: '內置 CKB 節點',
@@ -166,8 +166,8 @@ export default {
         detail:
           'Neuron 內置的 CKB 節點需要安裝 x64 版本的 Microsoft Visual C++ Redistributable 才能正常運行。您需要安裝該組件來啟動內置節點。',
         buttons: {
-          'install-and-exit': '安裝並退出'
-        }
+          'install-and-exit': '安裝並退出',
+        },
       },
       'acp-migration': {
         title: '升級資產賬戶',
@@ -176,71 +176,71 @@ export default {
           '我們的安全團隊在近期在實驗性的資產賬戶腳本中定位了壹個潛在的安全性問題。我們已經部署了新的資產賬戶腳本來替換舊腳本，未來的資產賬戶也會采納新的腳本。建議您立即升級以使用新的賬戶腳本。',
         buttons: {
           migrate: '安全升級',
-          skip: '已知風險，稍後升級'
-        }
+          skip: '已知風險，稍後升級',
+        },
       },
       'acp-migration-completed': {
         title: '恭喜！您已經完成安全升級。',
         message: '恭喜！您已經完成安全升級。',
         buttons: {
-          ok: 'OK'
-        }
+          ok: 'OK',
+        },
       },
       'hard-fork-migrate': {
-        message: '為適配最新版本的 CKB 節點，Neuron 將會重新同步鏈上數據，整個同步可能時間較長'
+        message: '為適配最新版本的 CKB 節點，Neuron 將會重新同步鏈上數據，整個同步可能時間較長',
       },
       'mail-us': {
         message: '請將問題及調試信息通過郵件發給我們, 調試信息可以通過 "菜單" -> "幫助" -> "導出調試信息" 獲得',
         'open-client': '打開郵件客戶端',
         'fail-message':
           '未能打開郵件客戶端, 請複製郵件地址, 並通過 "菜單" -> "幫助" -> "導出調試信息" 獲得 Neuron 的調試信息附在郵件中發送給我們',
-        'copy-mail-addr': '複製郵件地址'
+        'copy-mail-addr': '複製郵件地址',
       },
       'migrate-failed': {
         title: '數據遷移失敗',
         message: '數據遷移失敗, 點擊確認刪除數據並重新同步, 點擊取消稍後重啟後再次嘗試。失敗原因: {{ reason }}',
         buttons: {
           ok: '確認',
-          cancel: '取消'
-        }
+          cancel: '取消',
+        },
       },
       'node-version-different': {
-        message: '節點版本與 Neuron(v {{ version }}) 不壹致，請確認後使用'
+        message: '節點版本與 Neuron(v {{ version }}) 不壹致，請確認後使用',
       },
       'ckb-without-indexer': {
-        message: "請添加 '--indexer' 參數來啟動本地節點"
-      }
+        message: "請添加 '--indexer' 參數來啟動本地節點",
+      },
     },
     prompt: {
       password: {
         label: '請輸入密碼',
         submit: '提交',
-        cancel: '取消'
-      }
+        cancel: '取消',
+      },
     },
     updater: {
-      'update-not-available': '沒有可供升級的新版本。'
+      'update-not-available': '沒有可供升級的新版本。',
     },
     common: {
       yes: '是',
       no: '否',
       ok: '確定',
       cancel: '取消',
-      error: '錯誤'
+      error: '錯誤',
     },
     'export-debug-info': {
       'export-debug-info': '導出除錯信息',
-      'debug-info-exported': '除錯信息已被導出至 {{ file }}'
+      'debug-info-exported': '除錯信息已被導出至 {{ file }}',
     },
     about: {
       'app-version': '{{name}} 版本: {{version}}',
-      'ckb-client-version': 'CKB 節點版本: {{version}}'
+      'ckb-client-version': 'CKB 節點版本: {{version}}',
     },
     settings: {
       title: {
         normal: '設置',
-        mac: '偏好設置'
-      }
+        mac: '偏好設置',
+      },
     },
     'export-transactions': {
       'export-transactions': '導出交易歷史',
@@ -252,19 +252,19 @@ export default {
         'tx-type': '交易類型',
         amount: 'CKB 金額',
         'udt-amount': 'UDT 金額',
-        description: '備註'
+        description: '備註',
       },
       'tx-type': {
         send: '轉賬',
         receive: '收款',
         'create-asset-account': '創建 {{name}} 資產賬戶',
-        'destroy-asset-account': '銷毀 {{name}} 資產賬戶'
-      }
+        'destroy-asset-account': '銷毀 {{name}} 資產賬戶',
+      },
     },
     'offline-signature': {
       'export-transaction': '導出交易為 JSON 檔案',
       'transaction-exported': '交易已被導出至 {{filePath}}.',
-      'load-transaction': '加載交易檔案'
+      'load-transaction': '加載交易檔案',
     },
     'multisig-config': {
       'import-config': '導入多簽配置',
@@ -276,13 +276,13 @@ export default {
       'approve-tx': '確認多簽交易',
       'delete-actions': {
         ok: '確認',
-        cancel: '取消'
-      }
+        cancel: '取消',
+      },
     },
     'open-in-explorer': {
       title: '在 CKB 瀏覽器中查看',
       transaction: '交易',
-      message: '在 CKB 瀏覽器中查看 {{type}} {{key}}'
-    }
-  }
+      message: '在 CKB 瀏覽器中查看 {{type}} {{key}}',
+    },
+  },
 }

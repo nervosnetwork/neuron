@@ -87,5 +87,5 @@ export default {
   CapacityNotEnough,
   LiveCapacityNotEnough,
   CapacityNotEnoughForChange,
-  InvalidKeystore
+  InvalidKeystore,
 }

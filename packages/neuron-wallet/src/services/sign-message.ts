@@ -70,7 +70,7 @@ export default class SignMessage {
       const options = {
         r: signature.slice(2, 66),
         s: signature.slice(66, 130),
-        recoveryParam: parseInt(signature.slice(-1))
+        recoveryParam: parseInt(signature.slice(-1)),
       }
       const msgBuffer = Buffer.from(digest.slice(2), 'hex')
       const publicKey =

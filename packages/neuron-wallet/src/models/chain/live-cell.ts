@@ -5,7 +5,7 @@ import { LumosCell } from '../../block-sync-renderer/sync/indexer-connector'
 const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
   type: ScriptHashType.Type,
   data1: ScriptHashType.Data1,
-  data: ScriptHashType.Data
+  data: ScriptHashType.Data,
 }
 
 export default class LiveCell {

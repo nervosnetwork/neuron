@@ -4,7 +4,7 @@ import logger from '../utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
-    #blockNumberEntity?: SyncInfoEntity
+  #blockNumberEntity?: SyncInfoEntity
   #lastSavedBlock: bigint = BigInt(-1)
 
   // Get next block to scan. If syncing hasn't run yet return 0 (genesis block number).
@@ -20,13 +20,15 @@ export default class SyncedBlockNumber {
       blockNumberEntity.value = current.toString()
       await getConnection().manager.save(blockNumberEntity)
 
-      logger.info("Database:\tsaved synced block #" + current.toString())
+      logger.info('Database:\tsaved synced block #' + current.toString())
     }
   }
 
   #blockNumber = async (): Promise<SyncInfoEntity> => {
     if (!this.#blockNumberEntity) {
-      let blockNumber = await getConnection().getRepository(SyncInfoEntity).findOne({ name: SyncInfoEntity.CURRENT_BLOCK_NUMBER })
+      let blockNumber = await getConnection()
+        .getRepository(SyncInfoEntity)
+        .findOne({ name: SyncInfoEntity.CURRENT_BLOCK_NUMBER })
 
       if (!blockNumber) {
         blockNumber = new SyncInfoEntity()

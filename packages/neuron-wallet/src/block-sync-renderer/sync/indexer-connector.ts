@@ -13,8 +13,8 @@ import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-ca
 import IndexerCacheService from './indexer-cache-service'
 
 export interface LumosCellQuery {
-  lock: { codeHash: string, hashType: ScriptHashType, args: string } | null,
-  type: { codeHash: string, hashType: ScriptHashType, args: string } | null,
+  lock: { codeHash: string; hashType: ScriptHashType; args: string } | null
+  type: { codeHash: string; hashType: ScriptHashType; args: string } | null
   data: string | null
 }
 
@@ -55,13 +55,11 @@ export default class IndexerConnector {
   private processingBlockNumber: string | undefined
   public pollingIndexer: boolean = false
   public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
-  public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
+  public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<
+    Array<TransactionWithStatus>
+  >()
 
-  constructor(
-    addresses: Address[],
-    nodeUrl: string,
-    indexerUrl: string
-  ) {
+  constructor(addresses: Address[], nodeUrl: string, indexerUrl: string) {
     this.indexer = new CkbIndexer(nodeUrl, indexerUrl)
     this.rpcService = new RpcService(nodeUrl)
 
@@ -106,8 +104,7 @@ export default class IndexerConnector {
       if (!this.processingBlockNumber) {
         await this.processNextBlockNumber()
       }
-    }
-    else {
+    } else {
       this.blockTipsSubject.next({
         cacheTipNumber: indexerTipNumber,
         indexerTipNumber,
@@ -158,14 +155,14 @@ export default class IndexerConnector {
       queries.lock = {
         code_hash: lock.codeHash,
         hash_type: lock.hashType,
-        args: lock.args
+        args: lock.args,
       }
     }
     if (type) {
       queries.type = {
         code_hash: type.codeHash,
         hash_type: type.hashType,
-        args: type.args
+        args: type.args,
       }
     }
     queries.data = data || 'any'
@@ -206,9 +203,7 @@ export default class IndexerConnector {
         return grouped
       }, new Map<string, Array<IndexerTxHashCache>>())
 
-    const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()]
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .shift()
+    const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()].sort((a, b) => parseInt(a) - parseInt(b)).shift()
 
     if (!nextUnprocessedBlockNumber) {
       return []
@@ -266,8 +261,7 @@ export default class IndexerConnector {
   public notifyCurrentBlockNumberProcessed(blockNumber: string) {
     if (blockNumber === this.processingBlockNumber) {
       delete this.processingBlockNumber
-    }
-    else {
+    } else {
       return
     }
     this.processNextBlockNumber()

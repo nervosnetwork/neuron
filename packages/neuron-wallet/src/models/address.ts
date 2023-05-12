@@ -2,7 +2,7 @@ import { AddressType } from '../models/keys/address'
 
 export enum AddressVersion {
   Testnet = 'testnet',
-  Mainnet = 'mainnet'
+  Mainnet = 'mainnet',
 }
 
 export interface Address {

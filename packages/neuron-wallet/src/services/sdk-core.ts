@@ -30,5 +30,5 @@ export const generateCKB = (url: string): CKB => {
 }
 
 export default {
-  generateCKB
+  generateCKB,
 }

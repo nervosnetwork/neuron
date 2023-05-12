@@ -19,14 +19,14 @@ const presetNetworks: { selected: string; networks: Network[] } = {
       remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
-      chain: 'ckb'
-    }
-  ]
+      chain: 'ckb',
+    },
+  ],
 }
 
 enum NetworksKey {
   List = 'networks',
-  Current = 'selected'
+  Current = 'selected',
 }
 
 export default class NetworksService extends Store {
@@ -48,7 +48,7 @@ export default class NetworksService extends Store {
 
   public getAll = () => {
     const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
-    networks.forEach((network) => {
+    networks.forEach(network => {
       // Currently, the RPC interface of the CKB node is bound to IPv4 by default.
       // Starting from node17, its DNS resolution is no longer `ipv4first`.
       // Therefore, to ensure normal connection to the ckb node, manual resolution needs to be done here.
@@ -89,7 +89,7 @@ export default class NetworksService extends Store {
       remote,
       type,
       genesisHash: EMPTY_GENESIS_HASH,
-      chain: 'ckb_dev'
+      chain: 'ckb_dev',
     }
     const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties).catch(
       () => properties

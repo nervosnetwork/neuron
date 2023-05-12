@@ -3,7 +3,7 @@ import {
   CapacityTooSmall,
   MigrateSudtCellNoTypeError,
   SudtAcpHaveDataError,
-  TargetOutputNotFoundError
+  TargetOutputNotFoundError,
 } from '../../exceptions'
 import FeeMode from '../../models/fee-mode'
 import TransactionSize from '../../models/transaction-size'
@@ -79,12 +79,12 @@ export class TransactionGenerator {
       lock: outputLock,
       type: nftCell.type ? new Script(nftCell.type.codeHash, nftCell.type.args, nftCell.type.hashType) : null,
       data: nftCell.data,
-      since: '0'
+      since: '0',
     })
 
     const append = {
       input: nftInput,
-      witness: WitnessArgs.emptyLock()
+      witness: WitnessArgs.emptyLock(),
     }
 
     nftCell.setLock(receiverLockScript)
@@ -96,7 +96,7 @@ export class TransactionGenerator {
       inputs: [nftInput],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     const txSize = TransactionSize.tx(tx)
@@ -199,7 +199,7 @@ export class TransactionGenerator {
       inputs: [],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     const baseSize: number = TransactionSize.tx(tx)
@@ -304,7 +304,7 @@ export class TransactionGenerator {
       headerDeps: [],
       inputs: allInputs,
       outputs,
-      witnesses: []
+      witnesses: [],
     })
 
     // change
@@ -375,7 +375,7 @@ export class TransactionGenerator {
       inputs: [],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     const baseSize: number = TransactionSize.tx(tx)
@@ -455,7 +455,7 @@ export class TransactionGenerator {
       inputs: allInputs,
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     // change
@@ -504,7 +504,7 @@ export class TransactionGenerator {
       inputs: [],
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     const baseSize: number = TransactionSize.tx(tx)
@@ -513,7 +513,7 @@ export class TransactionGenerator {
 
     const append = {
       input,
-      witness: WitnessArgs.emptyLock()
+      witness: WitnessArgs.emptyLock(),
     }
 
     const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
@@ -565,7 +565,7 @@ export class TransactionGenerator {
     // const outputs: Output[] = [output]
     const output = Output.fromObject({
       capacity: prevOutput.capacity,
-      lock: lockScript
+      lock: lockScript,
     })
 
     const since = new Multisig().parseSince(prevOutput.lock.args)
@@ -577,7 +577,7 @@ export class TransactionGenerator {
       headerDeps: [],
       inputs: [input],
       outputs: [output],
-      witnesses: []
+      witnesses: [],
     })
 
     if (mode.isFeeRateMode()) {
@@ -613,7 +613,7 @@ export class TransactionGenerator {
       capacity: needCapacities.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
       type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
-      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0))
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
     const tx = Transaction.fromObject({
       version: '0',
@@ -622,7 +622,7 @@ export class TransactionGenerator {
       inputs: [],
       outputs: [output],
       outputsData: [output.data],
-      witnesses: []
+      witnesses: [],
     })
     const baseSize: number = TransactionSize.tx(tx)
     const { inputs, capacities, finalFee, hasChangeOutput } = await CellsService.gatherInputs(
@@ -644,7 +644,7 @@ export class TransactionGenerator {
 
       const output = Output.fromObject({
         capacity: changeCapacity.toString(),
-        lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+        lock: SystemScriptInfo.generateSecpScript(changeBlake160),
       })
 
       tx.addOutput(output)
@@ -685,7 +685,7 @@ export class TransactionGenerator {
       capacity: totalCapacity.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
       type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
-      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0))
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
     })
 
     const tx = Transaction.fromObject({
@@ -695,7 +695,7 @@ export class TransactionGenerator {
       inputs: allInputs,
       outputs: [output],
       outputsData: [output.data],
-      witnesses: []
+      witnesses: [],
     })
     const keyCount = new Set(allInputs.map(i => i.lockHash!)).size
     const txSize: number =
@@ -730,7 +730,7 @@ export class TransactionGenerator {
 
     const output = Output.fromObject({
       capacity: '0',
-      lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+      lock: SystemScriptInfo.generateSecpScript(changeBlake160),
     })
 
     const tx = Transaction.fromObject({
@@ -740,7 +740,7 @@ export class TransactionGenerator {
       inputs: asssetAccountInputs,
       outputs: [output],
       outputsData: [output.data],
-      witnesses: []
+      witnesses: [],
     })
 
     let allCapacities = asssetAccountInputs.reduce((a, b) => {
@@ -788,14 +788,14 @@ export class TransactionGenerator {
       capacity === 'all' ? BigInt(targetOutput.capacity) : BigInt(targetOutput.capacity) + BigInt(capacity)
     const output = Output.fromObject({
       ...targetOutput,
-      capacity: needCapacities.toString()
+      capacity: needCapacities.toString(),
     })
     const targetInput = Input.fromObject({
       previousOutput: targetOutput.outPoint!,
       since: '0',
       capacity: targetOutput.capacity,
       lock: targetOutput.lock,
-      lockHash: targetOutput.lockHash
+      lockHash: targetOutput.lockHash,
     })
 
     if (output.type) {
@@ -809,7 +809,7 @@ export class TransactionGenerator {
       inputs: [targetInput],
       outputs: [output],
       outputsData: [output.data],
-      witnesses: []
+      witnesses: [],
     })
 
     const deps = assetAccountInfo.determineAdditionalACPCellDepsByTx(tx)
@@ -870,7 +870,7 @@ export class TransactionGenerator {
       amount === 'all' ? BigInt(0) : BufferUtils.parseAmountFromSUDTData(targetOutput.data) + BigInt(amount)
     const output = Output.fromObject({
       ...targetOutput,
-      data: BufferUtils.writeBigUInt128LE(targetAmount)
+      data: BufferUtils.writeBigUInt128LE(targetAmount),
     })
     const targetInput = targetOutput.outPoint
       ? Input.fromObject({
@@ -880,7 +880,7 @@ export class TransactionGenerator {
           lock: targetOutput.lock,
           lockHash: targetOutput.lockHash,
           type: targetOutput.type,
-          data: targetOutput.data
+          data: targetOutput.data,
         })
       : undefined
     const tx = Transaction.fromObject({
@@ -890,7 +890,7 @@ export class TransactionGenerator {
       inputs: targetInput ? [targetInput] : [],
       outputs: [output],
       outputsData: [output.data],
-      witnesses: []
+      witnesses: [],
     })
 
     const deps = assetAccountInfo.determineAdditionalACPCellDepsByTx(tx)
@@ -968,7 +968,7 @@ export class TransactionGenerator {
       inputs: legacyACPInputs,
       outputs: ACPOutputs,
       outputsData: ACPCells.map(o => o.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     const baseSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
@@ -1027,7 +1027,7 @@ export class TransactionGenerator {
     const chequeCellTmp = Output.fromObject({
       capacity: BigInt(162 * 10 ** 8).toString(),
       lock: assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40)),
-      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID)
+      type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
     })
 
     const tx = Transaction.fromObject({
@@ -1038,7 +1038,7 @@ export class TransactionGenerator {
       outputs: [],
       outputsData: [],
       witnesses: [],
-      description
+      description,
     })
 
     const changeBlake160: string = AddressParser.toBlake160(changeAddress)
@@ -1094,7 +1094,7 @@ export class TransactionGenerator {
       lock: assetAccountInfo.generateChequeScript(
         receiverLockScript.computeHash(),
         senderDefaultCell.lock!.computeHash()
-      )
+      ),
     })
     tx.outputs.unshift(chequeCell)
     tx.outputsData.unshift(chequeCell.data)
@@ -1162,12 +1162,12 @@ export class TransactionGenerator {
       lock: chequeCell.lock,
       type: chequeCell.type,
       lockHash: chequeCell.lockHash,
-      data: chequeCell.data
+      data: chequeCell.data,
     })
 
     const senderOutput = Output.fromObject({
       capacity: chequeCell.capacity,
-      lock: chequeSenderLock!
+      lock: chequeSenderLock!,
     })
 
     const tx = Transaction.fromObject({
@@ -1177,7 +1177,7 @@ export class TransactionGenerator {
       inputs: [chequeInput],
       outputs: [senderOutput],
       outputsData: [senderOutput.data],
-      witnesses: []
+      witnesses: [],
     })
 
     const receiverAcpScript = assetAccountInfo.generateAnyoneCanPayScript(receiverLockArgs)
@@ -1195,7 +1195,7 @@ export class TransactionGenerator {
         capacity: originalReceiverAcpOutput.capacity,
         lock: originalReceiverAcpOutput.lockScript(),
         type: originalReceiverAcpOutput.typeScript(),
-        data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount)
+        data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount),
       })
 
       const receiverAcpInput = Input.fromObject({
@@ -1204,7 +1204,7 @@ export class TransactionGenerator {
         capacity: originalReceiverAcpOutput.capacity,
         lock: originalReceiverAcpOutput.lockScript(),
         type: originalReceiverAcpOutput.typeScript(),
-        data: originalReceiverAcpOutput.data
+        data: originalReceiverAcpOutput.data,
       })
       tx.inputs.push(receiverAcpInput)
       tx.outputs.push(newReceiverAcpOutput)
@@ -1215,7 +1215,7 @@ export class TransactionGenerator {
         capacity: acpCellCapacity.toString(),
         lock: receiverAcpScript,
         type: chequeCell.type,
-        data: chequeCell.data
+        data: chequeCell.data,
       })
 
       tx.outputs.push(receiverAcpOutput)
@@ -1285,7 +1285,7 @@ export class TransactionGenerator {
       lock: chequeCell.lock,
       type: chequeCell.type,
       lockHash: chequeCell.lockHash,
-      data: chequeCell.data
+      data: chequeCell.data,
     })
 
     const chequeSenderAcpInput = Input.fromObject({
@@ -1294,7 +1294,7 @@ export class TransactionGenerator {
       capacity: chequeSenderLiveAcpCell.capacity,
       lock: chequeSenderLiveAcpCell.lockScript(),
       type: chequeSenderLiveAcpCell.typeScript(),
-      data: chequeSenderLiveAcpCell.data
+      data: chequeSenderLiveAcpCell.data,
     })
 
     const senderInputsByLockHash = await CellsService.searchInputsByLockHash(senderLockHash)
@@ -1305,7 +1305,7 @@ export class TransactionGenerator {
 
     const senderDefaultLockOutput = Output.fromObject({
       capacity: chequeCell.capacity,
-      lock: senderDefaultLockInput.lockScript()!
+      lock: senderDefaultLockInput.lockScript()!,
     })
 
     const senderAcpInputAmount = BufferUtils.readBigUInt128LE(chequeSenderAcpInput.data!)
@@ -1316,7 +1316,7 @@ export class TransactionGenerator {
       capacity: chequeSenderAcpInput.capacity!,
       lock: chequeSenderAcpInput.lock!,
       type: chequeSenderAcpInput.type!,
-      data: BufferUtils.writeBigUInt128LE(senderAcpOutputAmount)
+      data: BufferUtils.writeBigUInt128LE(senderAcpOutputAmount),
     })
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
@@ -1331,7 +1331,7 @@ export class TransactionGenerator {
       inputs: [chequeSenderAcpInput, chequeInput],
       outputs: [senderAcpOutput],
       outputsData: [],
-      witnesses: []
+      witnesses: [],
     })
 
     tx.outputsData = tx.outputs.map(output => output.data || '0x')
@@ -1394,8 +1394,8 @@ export class TransactionGenerator {
         type: inputSudtCell.type,
         lockHash: inputSudtCell.lockHash,
         data: inputSudtCell.data,
-        since: '0'
-      })
+        since: '0',
+      }),
     ]
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
@@ -1425,8 +1425,8 @@ export class TransactionGenerator {
           capacity: receiverAcpCell.capacity,
           lock: receiverAcpCell.lock(),
           type: receiverAcpCell.type(),
-          data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount)
-        })
+          data: BufferUtils.writeBigUInt128LE(receiverAcpOutputAmount),
+        }),
       ]
       acpInputCell = Input.fromObject({
         previousOutput: receiverAcpCell.outPoint(),
@@ -1435,7 +1435,7 @@ export class TransactionGenerator {
         type: receiverAcpCell.type(),
         lockHash: receiverAcpCell.lockHash,
         data: receiverAcpCell.data,
-        since: '0'
+        since: '0',
       })
       sudtMigrateAcpInputs.push(acpInputCell)
     } else {
@@ -1455,7 +1455,7 @@ export class TransactionGenerator {
       inputs: sudtMigrateAcpInputs,
       outputs: outputs,
       outputsData: outputs.map(v => v.data || '0x'),
-      witnesses: []
+      witnesses: [],
     })
 
     const txSize = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * tx.inputs.length
@@ -1478,7 +1478,7 @@ export class TransactionGenerator {
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
       sudtMigrateAcpInputs.map(v => ({
         input: v,
-        witness: WitnessArgs.emptyLock()
+        witness: WitnessArgs.emptyLock(),
       }))
     )
     const finalFeeInt = BigInt(finalFee)

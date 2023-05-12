@@ -11,7 +11,7 @@ export class FailedTransaction {
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
       .where({
-        status: TransactionStatus.Pending
+        status: TransactionStatus.Pending,
       })
       .getMany()
 
@@ -29,7 +29,7 @@ export class FailedTransaction {
       .leftJoinAndSelect('tx.outputs', 'output')
       .where({
         hash: In(hashes),
-        status: TransactionStatus.Pending
+        status: TransactionStatus.Pending,
       })
       .getMany()
 
@@ -54,7 +54,7 @@ export class FailedTransaction {
           .createQueryBuilder('output')
           .where({
             outPointTxHash: input.outPointTxHash,
-            outPointIndex: input.outPointIndex
+            outPointIndex: input.outPointIndex,
           })
           .getOne()
         if (output) {

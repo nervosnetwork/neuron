@@ -13,5 +13,5 @@ export const CurrentWalletSubject = new Subject<{
 
 export default {
   WalletListSubject,
-  CurrentWalletSubject
+  CurrentWalletSubject,
 }

@@ -3,7 +3,7 @@ import { AddressType } from '../../src/models/keys/address'
 import type { Subscriber } from 'rxjs'
 
 enum Manufacturer {
-  Ledger = 'Ledger'
+  Ledger = 'Ledger',
 }
 
 export const ledgerNanoS: DeviceInfo = {
@@ -13,7 +13,7 @@ export const ledgerNanoS: DeviceInfo = {
   isBluetooth: false,
   manufacturer: Manufacturer.Ledger,
   addressType: AddressType.Receiving,
-  addressIndex: 0
+  addressIndex: 0,
 }
 
 export const LedgerNanoX: DeviceInfo = {
@@ -23,29 +23,25 @@ export const LedgerNanoX: DeviceInfo = {
   isBluetooth: true,
   manufacturer: Manufacturer.Ledger,
   addressType: AddressType.Receiving,
-  addressIndex: 0
+  addressIndex: 0,
 }
 
 class LedgerTransport {
-  send () {
+  send() {}
 
-  }
-
-  close () {
-
-  }
+  close() {}
 }
 
 export class LedgerHID {
-  static async open (descriptor: string) {
+  static async open(descriptor: string) {
     if (descriptor !== ledgerNanoS.descriptor && descriptor !== LedgerNanoX.descriptor) {
-      throw new Error("")
+      throw new Error('')
     }
 
     return new LedgerTransport()
   }
 
-  static listen (subscriber: Subscriber<any>) {
+  static listen(subscriber: Subscriber<any>) {
     subscriber.next({
       type: 'add',
       descriptor: ledgerNanoS.descriptor,
@@ -53,13 +49,13 @@ export class LedgerHID {
         manufacturer: ledgerNanoS.manufacturer,
         product: ledgerNanoS.product,
         vendorId: ledgerNanoS.vendorId,
-      }
+      },
     })
   }
 }
 
 export class LedgerBLE {
-  static async open (descriptor: string) {
+  static async open(descriptor: string) {
     if (descriptor !== ledgerNanoS.descriptor || descriptor !== LedgerNanoX.descriptor) {
       throw new Error('')
     }
@@ -67,7 +63,7 @@ export class LedgerBLE {
     return new LedgerTransport()
   }
 
-  static listen (subscriber: Subscriber<any>) {
+  static listen(subscriber: Subscriber<any>) {
     subscriber.next({
       type: 'add',
       descriptor: LedgerNanoX.descriptor,
@@ -75,7 +71,7 @@ export class LedgerBLE {
         manufacturer: LedgerNanoX.manufacturer,
         product: LedgerNanoX.product,
         vendorId: LedgerNanoX.vendorId,
-      }
+      },
     })
   }
 }
@@ -87,24 +83,24 @@ export class LedgerCkbApp {
   public static lockArg = 'args'
   public static address = 'address'
 
-  async getWalletPublicKey () {
+  async getWalletPublicKey() {
     return {
       publicKey: LedgerCkbApp.publicKey,
       lockArg: LedgerCkbApp.lockArg,
-      address: LedgerCkbApp.address
+      address: LedgerCkbApp.address,
     }
   }
 
-  async getWalletExtendedPublicKey () {
+  async getWalletExtendedPublicKey() {
     return {
       public_key: LedgerCkbApp.publicKey,
-      chain_code: LedgerCkbApp.chainCode
+      chain_code: LedgerCkbApp.chainCode,
     }
   }
 
-  async getAppConfiguration () {
+  async getAppConfiguration() {
     return {
-      version: LedgerCkbApp.version
+      version: LedgerCkbApp.version,
     }
   }
 }

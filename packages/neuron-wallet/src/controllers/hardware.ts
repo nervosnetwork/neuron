@@ -14,7 +14,7 @@ export default class HardwareController {
     }
 
     return {
-      status: ResponseCode.Success
+      status: ResponseCode.Success,
     }
   }
 
@@ -24,7 +24,7 @@ export default class HardwareController {
     const devices = await HardwareWalletService.findDevices(model)
     return {
       status: ResponseCode.Success,
-      result: devices
+      result: devices,
     }
   }
 
@@ -34,7 +34,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: version
+      result: version,
     }
   }
 
@@ -44,7 +44,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: version
+      result: version,
     }
   }
 
@@ -54,7 +54,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: pubkey
+      result: pubkey,
     }
   }
 
@@ -65,7 +65,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: pubkey
+      result: pubkey,
     }
   }
 }
