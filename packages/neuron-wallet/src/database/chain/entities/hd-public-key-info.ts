@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, CreateDateColumn } from 'typeorm'
-import HdPublicKeyInfoModel from 'models/keys/hd-public-key-info'
-import { AddressType } from 'models/keys/address'
+import HdPublicKeyInfoModel from '../../../models/keys/hd-public-key-info'
+import { AddressType } from '../../../models/keys/address'
 
 @Entity()
 export default class HdPublicKeyInfo {

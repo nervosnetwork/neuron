@@ -1,14 +1,14 @@
 import { getConnection, In, Not } from 'typeorm'
-import MultisigConfig from 'database/chain/entities/multisig-config'
-import MultisigOutput from 'database/chain/entities/multisig-output'
-import { MultisigConfigNotExistError, MultisigConfigExistError } from 'exceptions/multisig'
-import { rpcBatchRequest } from 'utils/rpc-request'
+import MultisigConfig from '../database/chain/entities/multisig-config'
+import MultisigOutput from '../database/chain/entities/multisig-output'
+import { MultisigConfigNotExistError, MultisigConfigExistError } from '../exceptions/multisig'
+import { rpcBatchRequest } from '../utils/rpc-request'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
-import Transaction from 'models/chain/transaction'
-import { OutputStatus } from 'models/chain/output'
+import MultisigOutputChangedSubject from '../models/subjects/multisig-output-db-changed-subject'
+import Transaction from '../models/chain/transaction'
+import { OutputStatus } from '../models/chain/output'
 import NetworksService from './networks'
-import Multisig from 'models/multisig'
+import Multisig from '../models/multisig'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {

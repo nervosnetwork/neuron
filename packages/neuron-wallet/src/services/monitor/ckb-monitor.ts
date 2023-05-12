@@ -1,4 +1,4 @@
-import { stopCkbNode } from 'services/ckb-runner'
+import { stopCkbNode } from '../../services/ckb-runner'
 import NodeService from '../node'
 import BaseMonitor from './base'
 

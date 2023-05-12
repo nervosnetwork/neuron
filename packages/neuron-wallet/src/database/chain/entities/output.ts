@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import TransactionEntity from './transaction'
-import Script, { ScriptHashType } from 'models/chain/script'
-import OutPoint from 'models/chain/out-point'
-import OutputModel, { OutputStatus } from 'models/chain/output'
+import Script, { ScriptHashType } from '../../../models/chain/script'
+import OutPoint from '../../../models/chain/out-point'
+import OutputModel, { OutputStatus } from '../../../models/chain/output'
 
 @Entity()
 export default class Output extends BaseEntity {

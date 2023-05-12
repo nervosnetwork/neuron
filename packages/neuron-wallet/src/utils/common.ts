@@ -1,4 +1,4 @@
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 
 export default class CommonUtils {
   public static sleep = (ms: number): Promise<void> => {

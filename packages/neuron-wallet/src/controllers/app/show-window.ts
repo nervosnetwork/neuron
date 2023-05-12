@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
-import env from 'env'
+import env from '../../env'
 import AppController from '.'
 
 const showWindow = (

@@ -1,14 +1,14 @@
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
-import { DefaultNetworkUnremovable } from 'exceptions/network'
+import { DefaultNetworkUnremovable } from '../exceptions/network'
 
-import Store from 'models/store'
+import Store from '../models/store'
 
-import { Validate, Required } from 'utils/validators'
-import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
-import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
-import CommonUtils from 'utils/common'
-import { BUNDLED_CKB_URL } from 'utils/const'
+import { Validate, Required } from '../utils/validators'
+import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from '../models/network'
+import CommonUtils from '../utils/common'
+import { BUNDLED_CKB_URL } from '../utils/const'
 
 const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',

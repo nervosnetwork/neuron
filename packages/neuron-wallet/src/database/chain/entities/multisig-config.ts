@@ -1,5 +1,5 @@
-import MultisigConfigModel from 'models/multisig-config'
-import MultisigConfigDbChangedSubject from 'models/subjects/multisig-config-db-changed-subject'
+import MultisigConfigModel from '../../../models/multisig-config'
+import MultisigConfigDbChangedSubject from '../../../models/subjects/multisig-config-db-changed-subject'
 import { Entity, Column, PrimaryGeneratedColumn, Index, AfterInsert, AfterRemove } from 'typeorm'
 
 @Entity()

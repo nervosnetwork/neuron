@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
-import SyncInfoEntity from 'database/chain/entities/sync-info'
-import logger from 'utils/logger'
+import SyncInfoEntity from '../database/chain/entities/sync-info'
+import logger from '../utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {

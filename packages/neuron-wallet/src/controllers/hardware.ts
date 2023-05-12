@@ -1,8 +1,8 @@
-import { DeviceInfo, ExtendedPublicKey, PublicKey } from 'services/hardware/common'
-import { ResponseCode } from 'utils/const'
-import HardwareWalletService from 'services/hardware'
-import { connectDeviceFailed } from 'exceptions'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
+import { ResponseCode } from '../utils/const'
+import HardwareWalletService from '../services/hardware'
+import { connectDeviceFailed } from '../exceptions'
+import { AccountExtendedPublicKey } from '../models/keys/key'
 
 export default class HardwareController {
   public async connectDevice(deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {

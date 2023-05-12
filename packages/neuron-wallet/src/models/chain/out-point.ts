@@ -1,5 +1,5 @@
-import HexUtils from 'utils/hex'
-import TypeChecker from 'utils/type-checker'
+import HexUtils from '../../utils/hex'
+import TypeChecker from '../../utils/type-checker'
 
 export default class OutPoint {
   public txHash: string
