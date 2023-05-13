@@ -20,7 +20,7 @@ enum URL {
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
   ImportHardware = '/import-hardware',
-  OfflineSign = '/offline-sign'
+  OfflineSign = 'offline-sign'
 }
 
 enum ExternalURL {
