@@ -14,19 +14,23 @@ import SystemScriptInfo from 'models/system-script-info'
 import NetworksService from 'services/networks'
 
 interface MultisigConfigOutput {
-  multisig_configs: Record<string, {
-    sighash_addresses: string[],
-    require_first_n: number,
-    threshold: number
-    alias?: string
-  }>
+  multisig_configs: Record<
+    string,
+    {
+      sighash_addresses: string[]
+      require_first_n: number
+      threshold: number
+      alias?: string
+    }
+  >
 }
 
 const validateImportConfig = (configOutput: MultisigConfigOutput) => {
-  return configOutput.multisig_configs &&
+  return (
+    configOutput.multisig_configs &&
     Object.values(configOutput.multisig_configs).length &&
     Object.values(configOutput.multisig_configs).every(
-      config => config.sighash_addresses?.length >= Math.max(+config.require_first_n, +config.threshold
+      config => config.sighash_addresses?.length >= Math.max(+config.require_first_n, +config.threshold)
     )
   )
 }
@@ -36,32 +40,19 @@ export default class MultisigController {
   #multisigService: MultisigService;
 
   constructor() {
-    this.#multisigService = new MultisigService();
+    this.#multisigService = new MultisigService()
   }
 
-  async saveConfig(params: {
-    walletId: string
-    r: number
-    m: number
-    n: number
-    blake160s: string[]
-    alias?: string
-  }) {
-    const multiSignConfig = MultisigConfig.fromModel(new MultisigConfigModel(
-      params.walletId,
-      params.r,
-      params.m,
-      params.n,
-      params.blake160s,
-      params.alias
-    ))
+  async saveConfig(params: { walletId: string; r: number; m: number; n: number; blake160s: string[]; alias?: string }) {
+    const multiSignConfig = MultisigConfig.fromModel(
+      new MultisigConfigModel(params.walletId, params.r, params.m, params.n, params.blake160s, params.alias)
+    )
     const result = await this.#multisigService.saveMultisigConfig(multiSignConfig)
     return {
       status: ResponseCode.Success,
       result
     }
   }
-
 
   async updateConfig(params: {
     id: number
@@ -80,24 +71,10 @@ export default class MultisigController {
   }
 
   async deleteConfig(id: number) {
-    const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
-      message: t('multisig-config.confirm-delete'),
-      type: 'question',
-      buttons: [
-        t('multisig-config.delete-actions.ok'),
-        t('multisig-config.delete-actions.cancel')
-      ]
-    })
-    if (response === 0) {
-      await this.#multisigService.deleteConfig(id)
-      return {
-        status: ResponseCode.Success,
-        result: true
-      }
-    }
+    await this.#multisigService.deleteConfig(id)
     return {
       status: ResponseCode.Success,
-      result: false
+      result: true
     }
   }
 
@@ -112,10 +89,12 @@ export default class MultisigController {
   async importConfig(walletId: string) {
     const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.import-config'),
-      filters: [{
-        name: 'json',
-        extensions: ['json']
-      }],
+      filters: [
+        {
+          name: 'json',
+          extensions: ['json']
+        }
+      ],
       properties: ['openFile']
     })
 
@@ -147,13 +126,11 @@ export default class MultisigController {
       }
       dialog.showMessageBox({
         type: 'info',
-        message: t(
-          'multisig-config.import-result',
-          {
-            success: saveSuccessConfigs.length,
-            fail: savedResult.length - saveSuccessConfigs.length,
-            failCheck: savedResult.length > saveSuccessConfigs.length ? t('multisig-config.import-duplicate') : undefined,
-          })
+        message: t('multisig-config.import-result', {
+          success: saveSuccessConfigs.length,
+          fail: savedResult.length - saveSuccessConfigs.length,
+          failCheck: savedResult.length > saveSuccessConfigs.length ? t('multisig-config.import-duplicate') : undefined
+        })
       })
       return {
         status: ResponseCode.Success,
@@ -164,15 +141,17 @@ export default class MultisigController {
     }
   }
 
-  async exportConfig(configs: {
-    id: string
-    walletId: string
-    r: number
-    m: number
-    n: number
-    blake160s: string[]
-    alias?: string
-  }[]) {
+  async exportConfig(
+    configs: {
+      id: string
+      walletId: string
+      r: number
+      m: number
+      n: number
+      blake160s: string[]
+      alias?: string
+    }[]
+  ) {
     const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.export-config'),
       defaultPath: `multisig-config_${Date.now()}.json`
@@ -184,13 +163,14 @@ export default class MultisigController {
     const output: MultisigConfigOutput = { multisig_configs: {} }
     configs.forEach(v => {
       output.multisig_configs[Multisig.hash(v.blake160s, v.r, v.m, v.n)] = {
-        sighash_addresses: v.blake160s.map(args => scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)),
+        sighash_addresses: v.blake160s.map(args =>
+          scriptToAddress(SystemScriptInfo.generateSecpScript(args), isMainnet)
+        ),
         require_first_n: v.r,
         threshold: v.m,
         alias: v.alias
       }
     })
-
 
     fs.writeFileSync(filePath, JSON.stringify(output, undefined, 2))
 
@@ -208,7 +188,7 @@ export default class MultisigController {
     }
   }
 
-  async getMultisigBalances({ isMainnet, multisigAddresses}: { isMainnet: boolean , multisigAddresses: string[] }) {
+  async getMultisigBalances({ isMainnet, multisigAddresses }: { isMainnet: boolean; multisigAddresses: string[] }) {
     const balances = await CellsService.getMultisigBalances(isMainnet, multisigAddresses)
     return {
       status: ResponseCode.Success,
@@ -220,7 +200,7 @@ export default class MultisigController {
     const result = await OfflineSignService.loadTransactionJSON()
     if (!result) {
       return {
-        status: ResponseCode.Fail,
+        status: ResponseCode.Fail
       }
     }
     const tx = result.json

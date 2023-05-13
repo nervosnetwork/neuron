@@ -27,6 +27,14 @@ const UpdateDownloadStatus = ({
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
 
+  const handleDownload = useCallback(() => {
+    downloadUpdate()
+  }, [downloadUpdate])
+
+  const handleInstall = useCallback(() => {
+    installUpdate()
+  }, [installUpdate])
+
   if (available) {
     const releaseNotesHtml = () => {
       return { __html: releaseNotes }
@@ -37,7 +45,7 @@ const UpdateDownloadStatus = ({
     return (
       <Dialog
         show={show}
-        onConfirm={downloadUpdate}
+        onConfirm={handleDownload}
         disabled={!available}
         confirmText={t('updates.download-update')}
         onCancel={onCancel}
@@ -59,7 +67,7 @@ const UpdateDownloadStatus = ({
         show={show}
         onCancel={onCancel}
         showCancel={false}
-        onConfirm={installUpdate}
+        onConfirm={handleInstall}
         disabled={!downloaded}
         confirmText={t('updates.quit-and-install')}
         title={t('updates.update-available')}

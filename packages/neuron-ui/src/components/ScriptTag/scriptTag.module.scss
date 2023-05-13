@@ -1,19 +1,14 @@
 .tag[type='button'] {
-  line-height: 22px;
+  border: none;
+  line-height: 17px;
   margin: auto 8px;
-  padding: 0 8px;
-  background: #eafbf6;
-  border: 1px solid #bbe7d4;
-  color: #999;
-  border-radius: 48px;
+  padding: 3px 8px;
+  background: var(--tag-background-color);
+  color: var(--primary-color);
+  border-radius: 4px;
   cursor: pointer;
 
   &:hover {
     color: var(--primary-color);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    background: #171b1a;
-    border-color: #343e3c;
   }
 }

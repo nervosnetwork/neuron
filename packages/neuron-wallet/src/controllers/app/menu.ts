@@ -5,7 +5,6 @@ import { t } from 'i18next'
 import env from 'env'
 import UpdateController from 'controllers/update'
 import ExportDebugController from 'controllers/export-debug'
-import { showWindow } from 'controllers/app/show-window'
 import WalletsService from 'services/wallets'
 import OfflineSignService from 'services/offline-sign'
 import CommandSubject from 'models/subjects/command'
@@ -291,17 +290,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         label: t('application-menu.tools.sign-and-verify'),
         enabled: hasCurrentWallet,
-        click: async () => {
-          const result = await walletsService.getCurrent()
-          if (!result) {
-            return
-          }
+        click: () => {
           const window = BrowserWindow.getFocusedWindow()
           if (window) {
             CommandSubject.next({
               winID: window.id,
               type: 'sign-verify',
-              payload: currentWallet!.id,
+              payload: null,
               dispatchToUI: true
             })
           }
@@ -311,18 +306,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.tools.multisig-address'),
         enabled: hasCurrentWallet,
         click: () => {
-          const currentWallet = walletsService.getCurrent()
-          showWindow(
-            `#/multisig-address/${currentWallet!.id}`,
-            t(`messageBox.multisig-address.title`),
-            {
-              width: 900,
-              maxWidth: 900,
-              minWidth: 900,
-              resizable: true
-            },
-            ['multisig-output-update']
-          )
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({
+              winID: window.id,
+              type: 'multisig-address',
+              payload: null,
+              dispatchToUI: true
+            })
+          }
         }
       },
       {

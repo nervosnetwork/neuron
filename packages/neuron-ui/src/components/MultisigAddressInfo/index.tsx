@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import CopyZone from 'widgets/CopyZone'
+import { Copy } from 'widgets/Icons/icon'
 import { ErrorWithI18n } from 'exceptions'
-
+import Table from 'widgets/Table'
+import Tooltip from 'widgets/Tooltip'
 import styles from './multisig-address-info.module.scss'
 
 export const MultisigAddressTable = ({
@@ -22,57 +24,62 @@ export const MultisigAddressTable = ({
   addressErrors?: (ErrorWithI18n | undefined)[]
 }) => {
   const [t] = useTranslation()
+  const dataSource = useMemo(() => addresses.map((value, idx) => ({ value, idx, index: idx + 1 })), [addresses])
   return (
-    <table className={styles.multiAddressTable}>
-      <thead>
-        <tr>
-          {['index', 'required', 'signer-address'].map(field => (
-            <th key={field}>{t(`multisig-address.create-dialog.${field}`)}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {addresses.map((v, idx) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <tr key={idx.toString()}>
-            <td>{`#${idx + 1}`}</td>
-            <td>
-              <input
-                type="checkbox"
-                data-idx={idx}
-                onChange={changeR}
-                checked={idx < r}
-                disabled={idx > r || disabled}
-              />
-            </td>
-            <td className={styles.address}>
-              {disabled ? (
-                <CopyZone
-                  content={v}
-                  className={styles.copyzone}
-                  name={t('multisig-address.create-dialog.copy-address')}
-                >
-                  <span className={styles.overflow}>{v.slice(0, -6)}</span>
-                  <span>...</span>
-                  <span>{v.slice(-6)}</span>
-                </CopyZone>
-              ) : (
+    <div className={styles.tableWrap}>
+      <Table
+        columns={[
+          {
+            title: t('multisig-address.create-dialog.index'),
+            dataIndex: 'index',
+          },
+          {
+            title: t('multisig-address.create-dialog.required'),
+            dataIndex: 'idx',
+            render(_, __, item) {
+              return (
+                <label htmlFor={`${item.idx}`}>
+                  <input
+                    id={`${item.idx}`}
+                    data-idx={item.idx}
+                    type="checkbox"
+                    onChange={changeR}
+                    checked={item.idx < r}
+                    disabled={item.idx > r || disabled}
+                  />
+                  <span />
+                </label>
+              )
+            },
+          },
+          {
+            title: t('multisig-address.table.address'),
+            dataIndex: 'value',
+            align: 'left',
+            render(_, __, item) {
+              return (
                 <TextField
-                  field={`${idx}_address`}
-                  data-idx={idx}
-                  value={v}
+                  field={`${item.idx}_address`}
+                  rows={2}
+                  data-idx={item.idx}
+                  value={item.value}
                   className={styles.addressField}
                   onChange={changeAddress}
                   disabled={disabled}
                   placeholder={t('multisig-address.create-dialog.multi-address-info.ckb-address-placeholder')}
-                  error={addressErrors?.[idx] ? t(addressErrors[idx]!.message, addressErrors[idx]!.i18n) : undefined}
+                  error={
+                    addressErrors?.[item.idx]
+                      ? t(addressErrors[item.idx]!.message, addressErrors[item.idx]!.i18n)
+                      : undefined
+                  }
                 />
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+              )
+            },
+          },
+        ]}
+        dataSource={dataSource}
+      />
+    </div>
   )
 }
 
@@ -91,20 +98,27 @@ const MultiSignAddressInfo = ({
 }) => {
   const [t] = useTranslation()
   return (
-    <>
-      <p>{t('multisig-address.create-dialog.multi-address-info.view-title', { m, n })}</p>
-      <CopyZone
-        content={multisigAddress}
-        className={styles.copyzone}
-        name={t('multisig-address.create-dialog.copy-address')}
+    <div className={styles.container}>
+      <p className={styles.title}>{t('multisig-address.create-dialog.multi-address-info.view-title', { m, n })}</p>
+      <Tooltip
+        tip={
+          <CopyZone content={multisigAddress} className={styles.copyTableAddress}>
+            {multisigAddress}
+            <Copy />
+          </CopyZone>
+        }
+        showTriangle
+        isTriggerNextToChild
       >
-        <span className={styles.overflow}>{multisigAddress.slice(0, -6)}</span>
-        <span>...</span>
-        <span>{multisigAddress.slice(-6)}</span>
-      </CopyZone>
-      <p>{t('multisig-address.create-dialog.multi-list', { m, n })}</p>
+        <div className={styles.addressWrap}>
+          <span className={styles.overflow}>
+            {multisigAddress.slice(0, 34)}...{multisigAddress.slice(-34)}
+          </span>
+        </div>
+      </Tooltip>
+      <p className={styles.title}>{t('multisig-address.create-dialog.multi-list', { m, n })}</p>
       <MultisigAddressTable r={r} addresses={addresses} disabled />
-    </>
+    </div>
   )
 }
 

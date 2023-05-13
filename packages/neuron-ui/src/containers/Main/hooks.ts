@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useLocation, NavigateFunction } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
@@ -110,6 +110,22 @@ export const useSubscription = ({
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
+
+  const navigateToolsRouter = useCallback(
+    path => {
+      const { pathname } = location
+      const currentPath = [RoutePath.OfflineSign, RoutePath.SignVerify, RoutePath.MultisigAddress].find(item =>
+        pathname.includes(item)
+      )
+      if (currentPath) {
+        navigate(location.pathname.replace(currentPath, path))
+      } else {
+        navigate(`${location.pathname}/${path}`)
+      }
+    },
+    [navigate, location]
+  )
+
   useEffect(() => {
     const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
       if (walletIDOfMessage && walletIDOfMessage !== walletID) {
@@ -254,14 +270,13 @@ export const useSubscription = ({
                   filePath,
                 },
               })
-              navigate(location.pathname + url)
+              navigateToolsRouter(url)
             }
             break
           }
           case 'sign-verify':
-            if (!location.pathname.includes('/sign-verify')) {
-              navigate(`${location.pathname}/sign-verify?id=${payload}`)
-            }
+          case 'multisig-address':
+            navigateToolsRouter(type)
             break
           default: {
             break

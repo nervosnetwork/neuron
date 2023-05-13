@@ -26,6 +26,7 @@ interface SendSubformProps {
   onLocktimeClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onSendMaxClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onItemChange: React.EventHandler<React.SyntheticEvent<HTMLInputElement>>
+  className?: string
 }
 
 const SendFieldset = ({
@@ -41,6 +42,7 @@ const SendFieldset = ({
   onSendMaxClick,
   onItemChange,
   isTimeLockable = true,
+  className = '',
 }: SendSubformProps) => {
   const [t] = useTranslation()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -62,7 +64,7 @@ const SendFieldset = ({
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${className}`}>
       <TextField
         rows={2}
         label={
@@ -88,6 +90,7 @@ const SendFieldset = ({
             )}
           </div>
         }
+        className={styles.addresstField}
         field="address"
         data-idx={idx}
         disabled={item.disabled}
@@ -99,7 +102,6 @@ const SendFieldset = ({
       />
 
       <TextField
-        className={styles.amountField}
         label={t('send.amount')}
         field="amount"
         data-idx={idx}

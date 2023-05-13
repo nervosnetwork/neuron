@@ -4,28 +4,30 @@ import { useTranslation } from 'react-i18next'
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 
-export enum Step {
-  setMN = 0,
-  setMultiAddress,
-  viewMultiAddress,
+const handleEvent = (e: React.SyntheticEvent<HTMLInputElement>, cb: (val: string) => void) => {
+  const { value } = e.currentTarget
+  let val = Number(value)
+  if (val > 255) {
+    val = 255
+  }
+  if (!Number.isNaN(val)) {
+    cb(val ? `${val}` : '')
+  }
 }
 
 export const useMAndN = () => {
   const [m, setM] = useState('')
   const [n, setN] = useState('')
-  const setMBySelect = useCallback(
-    (value: string) => {
-      if (!Number.isNaN(Number(value))) {
-        setM(value)
-      }
+
+  const setMByInput = useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      handleEvent(e, setM)
     },
     [setM]
   )
-  const setNBySelect = useCallback(
-    (value: string) => {
-      if (!Number.isNaN(Number(value))) {
-        setN(value)
-      }
+  const setNByInput = useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      handleEvent(e, setN)
     },
     [setN]
   )
@@ -46,8 +48,8 @@ export const useMAndN = () => {
   return {
     m,
     n,
-    setMBySelect,
-    setNBySelect,
+    setMByInput,
+    setNByInput,
     errorI18nKey,
   }
 }
@@ -113,14 +115,14 @@ export const useMultiAddress = ({ n, isMainnet }: { n: number; isMainnet: boolea
 }
 
 export const useViewMultisigAddress = ({
-  step,
+  isView,
   m,
   n,
   r,
   addresses,
   isMainnet,
 }: {
-  step: Step
+  isView: boolean
   m: number
   n: number
   r: number
@@ -129,7 +131,7 @@ export const useViewMultisigAddress = ({
 }) => {
   const [multisigAddress, changeMultisigAddress] = useState('')
   useEffect(() => {
-    if (step === Step.viewMultiAddress) {
+    if (isView) {
       try {
         const address = getMultisigAddress(
           addresses.map(v => addressToScript(v).args),
@@ -143,6 +145,6 @@ export const useViewMultisigAddress = ({
         // ignore error. The ui ensures the correctness of the parameters
       }
     }
-  }, [step, changeMultisigAddress, m, n, r, addresses, isMainnet])
+  }, [isView, changeMultisigAddress, m, n, r, addresses, isMainnet])
   return multisigAddress
 }

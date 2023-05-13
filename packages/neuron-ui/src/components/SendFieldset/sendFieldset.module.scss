@@ -30,6 +30,10 @@ $textfieldWidth: calc(100vw - 370px);
     }
   }
 
+  .addresstField {
+    font-family: 'JetBrains Mono';
+  }
+
   button[aria-label='qr-btn'] {
     display: none;
     position: relative;

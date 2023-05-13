@@ -466,10 +466,10 @@
         "title": "销毁资产账户"
       },
       "send-from-multisig": {
-        "title": "发起交易"
+        "title": "多签地址转账"
       },
       "send-from-multisig-need-one": {
-        "title": "发起交易"
+        "title": "多签地址转账"
       },
       "xpub-notice": "对于观察钱包，只支持导出交易"
     },
@@ -954,7 +954,7 @@
         "placeholder": "使用地址或者别名搜索"
       },
       "add": {
-        "label": "添加"
+        "label": "创建"
       },
       "import": {
         "label": "导入"
@@ -962,14 +962,16 @@
       "export": {
         "label": "导出"
       },
-      "ok": "好的",
+      "ok": "确定",
       "no-data": "没有多签地址",
       "table": {
-        "address": "地址",
+        "address": "签名者地址",
         "alias": "别名",
         "type": "类型",
         "balance": "余额",
         "copy-address": "复制地址",
+        "action": "操作",
+        "more": "更多",
         "actions": {
           "info": "详情",
           "send": "转账",
@@ -984,9 +986,10 @@
         },
         "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
       },
-      "delete-failed": "删除多签配置失败，失败原因：{{reason}}",
+      "delete-failed": "删除多签配置失败",
       "send-ckb": {
-        "title": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",
+        "title": "多签地址转账",
+        "detail": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",
         "balance": "余额",
         "address": "地址",
         "amount": "金额",
@@ -994,34 +997,39 @@
         "cancel": "取消",
         "export": "导出交易"
       },
+      "multi-details": "多签地址详情",
       "create-dialog": {
         "title": "创建多重签名地址",
+        "preview-title": "多签地址已生成",
         "index": "序号",
-        "required": "必选",
+        "required": "必选项",
         "signer-address": "签名者地址",
         "copy-address": "复制地址",
+        "placeholder": "输入{{type}}的数值(1-255)",
         "m-n": {
           "title": "请选择 m-of-n 类型的多重签名地址配置，从 n 个密钥中通过 m 个确认来转移资产。",
           "m-less-equal-n": "对于 m-of-n 多重签名地址，m 不应大于 n",
-          "m-n-required": "请输入或选择 m/n",
+          "m-n-required": "请输入 m/n",
           "m-n-between-0-256": "m/n 应该在 0-256 之间"
         },
         "multi-address-info": {
           "title": "对于 {{m}}-of-{{n}}, 请输入 {{n}} 个签名者地址",
-          "view-title": " {{m}}-of-{{n}} 的多签地址是",
-          "ckb-address-placeholder": "ckb address"
+          "view-title": " {{m}}-of-{{n}} 多签地址",
+          "ckb-address-placeholder": "输入ckb地址"
         },
         "multi-list": "多签地址列表",
         "actions": {
           "cancel": "取消",
           "back": "上一步",
           "next": "下一步",
+          "generate-address": "生成地址",
           "confirm": "确认"
         },
         "duplicate-address-forbid": "地址不能重复"
       },
       "approve-dialog": {
-        "title": "从{{m}}-of-{{n}}多签地址<0></0>确认交易",
+        "title": "多签地址确认",
+        "detail": "从{{m}}-of-{{n}}多签地址<0></0>确认交易",
         "transaction": "交易",
         "cancel": "取消",
         "signAndExport": "签名并导出",
@@ -1033,8 +1041,8 @@
         "signerApprove": "缺少 {{m}} 个签名者同意, 其中包括 {{r}} 个指定签名者",
         "noRSignerApprove": "缺少 {{m}} 个签名者同意",
         "signed": "已签名",
-        "view-concise-data": "查看概要",
-        "view-raw-data": "查看原始数据"
+        "view-concise-data": "概要",
+        "view-raw-data": "原始数据"
       }
     }
   }
