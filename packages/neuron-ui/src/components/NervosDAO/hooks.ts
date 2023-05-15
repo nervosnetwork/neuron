@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
@@ -32,7 +32,6 @@ const {
   SHANNON_CKB_RATIO,
   MAX_DECIMAL_DIGITS,
 } = CONSTANTS
-let timer: NodeJS.Timeout
 
 const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
   return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
@@ -132,8 +131,8 @@ export const useClearGeneratedTx = (dispatch: React.Dispatch<StateAction>) =>
     })
   }, [dispatch])
 
-export const useUpdateDepositValue = ({
-  setDepositValue,
+
+export const useGenerateDaoDepositTx = ({
   setErrorMessage,
   clearGeneratedTx,
   maxDepositAmount,
@@ -143,9 +142,9 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage,
   isBalanceReserved,
   t,
+  depositValue,
   suggestFeeRate,
 }: {
-  setDepositValue: React.Dispatch<React.SetStateAction<string>>
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   clearGeneratedTx: () => void
   maxDepositAmount: bigint
@@ -155,36 +154,34 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage: string
   isBalanceReserved: boolean
   t: TFunction
-  suggestFeeRate: number | string
-}) =>
-  useCallback(
-    (value: string) => {
-      const amount = value.replace(/,/g, '')
-      if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
-        return
-      }
-      clearTimeout(timer)
-      timer = setTimeout(() => {
+  depositValue: string
+  suggestFeeRate: string | number
+}) => {
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(
+    () => {
+      clearTimeout(timer.current)
+      timer.current = setTimeout(() => {
         setErrorMessage('')
         clearGeneratedTx()
-
+  
         try {
-          validateAmount(amount)
+          validateAmount(depositValue)
         } catch (err) {
           if (isErrorWithI18n(err)) {
             setErrorMessage(
-              t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: amount, length: MAX_DECIMAL_DIGITS })
+              t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: depositValue, length: MAX_DECIMAL_DIGITS })
             )
           }
           return
         }
-
-        if (BigInt(CKBToShannonFormatter(amount)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
+  
+        if (BigInt(CKBToShannonFormatter(depositValue)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
           setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
           return
         }
-
-        const capacity = CKBToShannonFormatter(amount, CapacityUnit.CKB)
+  
+        const capacity = CKBToShannonFormatter(depositValue, CapacityUnit.CKB)
         if (BigInt(capacity) < maxDepositAmount) {
           generateDaoDepositTx({
             feeRate: `${suggestFeeRate}`,
@@ -215,8 +212,7 @@ export const useUpdateDepositValue = ({
         } else {
           setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
         }
-      }, 500)
-      setDepositValue(amount)
+      })
     },
     [
       clearGeneratedTx,
@@ -226,10 +222,29 @@ export const useUpdateDepositValue = ({
       walletID,
       maxDepositErrorMessage,
       t,
-      setDepositValue,
       setErrorMessage,
       isBalanceReserved,
+      depositValue,
       suggestFeeRate,
+    ]
+  )
+}
+
+export const useUpdateDepositValue = ({
+  setDepositValue,
+}: {
+  setDepositValue: React.Dispatch<React.SetStateAction<string>>
+}) =>
+  useCallback(
+    (value: string) => {
+      const amount = value.replace(/,/g, '')
+      if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+        return
+      }
+      setDepositValue(amount)
+    },
+    [
+      setDepositValue,
     ]
   )
 
@@ -294,7 +309,6 @@ export const useOnDepositDialogSubmit = ({
 }) =>
   useCallback(() => {
     setShowDepositDialog(false)
-    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
     dispatch({
       type: AppActions.RequestPassword,
       payload: {
@@ -602,4 +616,5 @@ export default {
   useOnSlide,
   useUpdateWithdrawList,
   useUpdateDepositEpochList,
+  useGenerateDaoDepositTx,
 }
