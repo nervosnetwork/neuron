@@ -250,6 +250,8 @@
       "copy-qr-code": "復制收款碼圖片"
     },
     "history": {
+      "title": "交易歷史",
+      "title-detail": "交易詳情",
       "meta": "元信息",
       "type": "交易類型",
       "date": "時間",
@@ -278,12 +280,20 @@
         "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)進行搜索"
       },
+      "table": {
+        "name": "錢包名稱",
+        "type": "類型",
+        "amount": "金額",
+        "timestamp": "時間",
+        "status": "狀態",
+        "operation": "操作"
+      },
       "export-history": "導出交易歷史",
       "confirmations": "確認次數",
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",
       "no-txs": "沒有交易記錄",
-      "view-in-explorer": "瀏覽器",
+      "view-in-explorer": "瀏覽器打開",
       "view-in-explorer-button-title": "瀏覽器中查看詳情",
       "view-detail": "詳情",
       "view-detail-button-title": "查看詳情",
@@ -306,7 +316,8 @@
       "inputs": "輸入",
       "outputs": "輸出",
       "cell-from-cellbase": "來自 Cellbase",
-      "lock-script": "鎖腳本",
+      "lock-script": "腳本鎖定",
+      "lock-script-title": "地址資訊",
       "deprecated-address-format": "廢棄格式地址"
     },
     "addresses": {

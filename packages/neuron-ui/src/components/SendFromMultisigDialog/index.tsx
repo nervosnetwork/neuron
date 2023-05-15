@@ -106,8 +106,16 @@ const SendFromMultisigDialog = ({
           value={`${shannonToCKBFormatter(totalAmount)} CKB`}
           readOnly
           error={totalAmountErrorMessage}
+          className={styles.textFieldClass}
         />
-        <TextField label={t('send.fee')} field="fee" value={`${shannonToCKBFormatter(fee)} CKB`} readOnly disabled />
+        <TextField
+          className={styles.textFieldClass}
+          label={t('send.fee')}
+          field="fee"
+          value={`${shannonToCKBFormatter(fee)} CKB`}
+          readOnly
+          disabled
+        />
       </div>
       <div className={styles.sendActions}>
         <Button label={t('multisig-address.send-ckb.cancel')} type="cancel" onClick={closeDialog} />

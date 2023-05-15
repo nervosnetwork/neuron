@@ -91,6 +91,8 @@ export const useLocalDescription = (
     (e: any) => {
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
+        e.stopPropagation()
+        e.preventDefault()
         submitDescription(key, originDesc)
         const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
         input?.blur()

@@ -257,6 +257,8 @@
       "copy-qr-code": "Copy"
     },
     "history": {
+      "title": "History",
+      "title-detail": "History Detail",
       "meta": "Meta",
       "type": "Type",
       "date": "Date",
@@ -285,12 +287,20 @@
         "button": "Search",
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
+      "table": {
+        "name": "Wallet Name",
+        "type": "Type",
+        "amount": "Amount",
+        "timestamp": "Time",
+        "status": "Status",
+        "operation": "Operation"
+      },
       "export-history": "Export Transaction History",
       "confirmations": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
       "no-txs": "No Transaction History",
-      "view-in-explorer": "Explorer",
+      "view-in-explorer": "View on explorer",
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
@@ -314,6 +324,7 @@
       "outputs": "Outputs",
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
+      "lock-script-title": "Address Information",
       "deprecated-address-format": "Address in deprecated format"
     },
     "addresses": {

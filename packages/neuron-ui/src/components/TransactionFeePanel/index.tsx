@@ -91,10 +91,19 @@ const TransactionFee: React.FunctionComponent<TransactionFeeProps> = ({
 
   return (
     <div>
-      <TextField label={t('send.fee')} field="fee" value={fee} readOnly disabled width="100%" />
+      <TextField
+        className={styles.textFieldClass}
+        label={t('send.fee')}
+        field="fee"
+        value={fee}
+        readOnly
+        disabled
+        width="100%"
+      />
 
       {isCustom ? (
         <TextField
+          className={styles.textFieldClass}
           field="price"
           value={localNumberFormatter(price)}
           onChange={onPriceChange}
