@@ -134,11 +134,7 @@ const HistoryDetailPage = () => {
     { id: 0, label: inputsTitle },
     { id: 1, label: outputsTitle },
   ]
-  const [currentTab, setCurrentTab] = useState<string | number>(tabs[0].id)
-
-  const handleTabChange = (e: number | string) => {
-    setCurrentTab(e)
-  }
+  const [currentTab, setCurrentTab] = useState(tabs[0])
 
   const handleListData = (cell: Readonly<State.DetailedInput | State.DetailedOutput>) => {
     let address = ''
@@ -256,14 +252,15 @@ const HistoryDetailPage = () => {
           head={
             <Tabs
               tabs={tabs}
-              onChange={handleTabChange}
+              onTabChange={setCurrentTab}
               tabsClassName={styles.tabsClassName}
               tabsWrapClassName={styles.tabsWrapClassName}
               tabsColumnClassName={styles.tabsColumnClassName}
+              activeColumnClassName={styles.active}
             />
           }
           columns={columns}
-          dataSource={currentTab === tabs[0].id ? inputsData : outputsData}
+          dataSource={currentTab.id === tabs[0].id ? inputsData : outputsData}
           noDataContent={t('overview.no-recent-activities')}
         />
       </div>
