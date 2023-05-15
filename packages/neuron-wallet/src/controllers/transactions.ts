@@ -1,15 +1,15 @@
 import { dialog } from 'electron'
 import { t } from 'i18next'
-import { TransactionsService, PaginationResult } from 'services/tx'
-import AddressesService from 'services/addresses'
-import WalletsService from 'services/wallets'
+import { TransactionsService, PaginationResult } from '../services/tx'
+import AddressesService from '../services/addresses'
+import WalletsService from '../services/wallets'
 
-import { ResponseCode } from 'utils/const'
-import { TransactionNotFound, CurrentWalletNotSet } from 'exceptions'
-import Transaction from 'models/chain/transaction'
+import { ResponseCode } from '../utils/const'
+import { TransactionNotFound, CurrentWalletNotSet } from '../exceptions'
+import Transaction from '../models/chain/transaction'
 
-import { set as setDescription, get as getDescription } from 'services/tx/transaction-description'
-import AddressParser from 'models/address-parser'
+import { set as setDescription, get as getDescription } from '../services/tx/transaction-description'
+import AddressParser from '../models/address-parser'
 
 export default class TransactionsController {
   public async getAll(

@@ -1,11 +1,11 @@
 import fs from 'fs'
 import { promisify } from 'util'
 import { t } from 'i18next'
-import TransactionsService from 'services/tx/transaction-service'
-import AddressService from 'services/addresses'
-import Transaction from 'models/chain/transaction'
-import toCSVRow from 'utils/to-csv-row'
-import { get as getDescription } from 'services/tx/transaction-description'
+import TransactionsService from '../services/tx/transaction-service'
+import AddressService from '../services/addresses'
+import Transaction from '../models/chain/transaction'
+import toCSVRow from '../utils/to-csv-row'
+import { get as getDescription } from '../services/tx/transaction-description'
 
 const exportHistory = async ({ walletID, filePath }: { walletID: string; filePath: string }) => {
   if (!walletID) {
@@ -25,10 +25,11 @@ const exportHistory = async ({ walletID, filePath }: { walletID: string; filePat
   const ws = fs.createWriteStream(filePath)
   const wsPromises: any = new Proxy(ws, {
     get(target, key: keyof typeof ws, receiver) {
-      if (typeof target[key] === 'function') {
-        return promisify(Reflect.get(target, key, receiver)).bind(target)
+      const meta = Reflect.get(target, key, receiver)
+      if (typeof meta === 'function') {
+        return promisify(meta).bind(target)
       }
-      return Reflect.get(target, key, receiver)
+      return meta
     }
   })
   await wsPromises.write(`${headers.map(label => t(`export-transactions.column.${label}`))}\n`)

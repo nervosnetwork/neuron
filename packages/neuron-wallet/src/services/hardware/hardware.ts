@@ -1,15 +1,15 @@
 // eslint-disable-next-line prettier/prettier
-import type Transaction from 'models/chain/transaction'
-import WitnessArgs from 'models/chain/witness-args'
+import type Transaction from '../../models/chain/transaction'
+import WitnessArgs from '../../models/chain/witness-args'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import AddressService from 'services/addresses'
-import TransactionSender from 'services/transaction-sender'
-import Multisig from 'models/multisig'
-import WalletService from 'services/wallets'
-import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
+import AddressService from '../../services/addresses'
+import TransactionSender from '../../services/transaction-sender'
+import Multisig from '../../models/multisig'
+import WalletService from '../../services/wallets'
+import DeviceSignIndexSubject from '../../models/subjects/device-sign-index-subject'
 import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
-import { AccountExtendedPublicKey } from 'models/keys/key'
-import AssetAccountInfo from 'models/asset-account-info'
+import { AccountExtendedPublicKey } from '../../models/keys/key'
+import AssetAccountInfo from '../../models/asset-account-info'
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo

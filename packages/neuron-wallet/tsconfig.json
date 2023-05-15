@@ -8,12 +8,6 @@
     "incremental": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "paths": {
-      "*": ["./src/*", "node_modules/*"]
-    },
-    "plugins": [
-      { "transform": "@zerollup/ts-transform-paths" }
-    ],
     "lib": [
       "es2019",
       "dom"

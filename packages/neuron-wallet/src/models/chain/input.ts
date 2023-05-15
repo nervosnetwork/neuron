@@ -1,7 +1,7 @@
 import OutPoint from './out-point'
 import Script from './script'
-import HexUtils from 'utils/hex'
-import TypeChecker from 'utils/type-checker'
+import HexUtils from '../../utils/hex'
+import TypeChecker from '../../utils/type-checker'
 
 export default class Input {
   public previousOutput: OutPoint | null

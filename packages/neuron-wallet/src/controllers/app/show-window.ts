@@ -1,15 +1,16 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
-import env from 'env'
+import env from '../../env'
 import AppController from '.'
 
 const showWindow = (
   url: string,
   title: string,
   options?: Electron.BrowserWindowConstructorOptions,
-  channels?: string[]
+  channels?: string[],
+  comparator: (win: BrowserWindow) => boolean = (win) => win.getTitle() === title
 ): BrowserWindow => {
-  const opened = BrowserWindow.getAllWindows().find(bw => bw.getTitle() === title)
+  const opened = BrowserWindow.getAllWindows().find(comparator)
   if (opened) {
     opened.webContents.send('navigation', url.replace(/^#/, ''))
     opened.focus()

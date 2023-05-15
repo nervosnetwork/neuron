@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
-import Script, { ScriptHashType } from 'models/chain/script'
-import OutPoint from 'models/chain/out-point'
+import Script, { ScriptHashType } from '../../../models/chain/script'
+import OutPoint from '../../../models/chain/out-point'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { OutputStatus } from 'models/chain/output'
+import { OutputStatus } from '../../../models/chain/output'
 
 @Entity()
 export default class MultisigOutput extends BaseEntity {

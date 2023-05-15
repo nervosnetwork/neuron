@@ -1,4 +1,4 @@
-import { AddressType } from 'models/keys/address'
+import { AddressType } from '../models/keys/address'
 
 export enum AddressVersion {
   Testnet = 'testnet',

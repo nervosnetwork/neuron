@@ -1,7 +1,7 @@
 import Script from './script'
 import OutPoint from './out-point'
-import HexUtils from 'utils/hex'
-import TypeChecker from 'utils/type-checker'
+import HexUtils from '../../utils/hex'
+import TypeChecker from '../../utils/type-checker'
 
 // sent: pending transaction's output
 // pending: pending transaction's input

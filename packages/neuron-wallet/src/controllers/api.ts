@@ -15,28 +15,28 @@ import {
 import { t } from 'i18next'
 import path from 'path'
 import fs from 'fs'
-import env from 'env'
+import env from '../env'
 import { showWindow } from './app/show-window'
-import CommonUtils from 'utils/common'
-import { NetworkType, Network } from 'models/network'
-import { ConnectionStatusSubject } from 'models/subjects/node'
-import NetworksService from 'services/networks'
-import WalletsService from 'services/wallets'
-import SettingsService, { Locale } from 'services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from 'utils/const'
-import { clean as cleanChain } from 'database/chain'
-import WalletsController from 'controllers/wallets'
-import TransactionsController from 'controllers/transactions'
-import DaoController from 'controllers/dao'
-import NetworksController from 'controllers/networks'
-import UpdateController from 'controllers/update'
-import MultisigController from 'controllers/multisig'
-import Transaction from 'models/chain/transaction'
-import OutPoint from 'models/chain/out-point'
-import SignMessageController from 'controllers/sign-message'
+import CommonUtils from '../utils/common'
+import { NetworkType, Network } from '../models/network'
+import { ConnectionStatusSubject } from '../models/subjects/node'
+import NetworksService from '../services/networks'
+import WalletsService from '../services/wallets'
+import SettingsService, { Locale } from '../services/settings'
+import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from '../utils/const'
+import { clean as cleanChain } from '../database/chain'
+import WalletsController from '../controllers/wallets'
+import TransactionsController from '../controllers/transactions'
+import DaoController from '../controllers/dao'
+import NetworksController from '../controllers/networks'
+import UpdateController from '../controllers/update'
+import MultisigController from '../controllers/multisig'
+import Transaction from '../models/chain/transaction'
+import OutPoint from '../models/chain/out-point'
+import SignMessageController from '../controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
-import SystemScriptInfo from 'models/system-script-info'
-import logger from 'utils/logger'
+import SystemScriptInfo from '../models/system-script-info'
+import logger from '../utils/logger'
 import AssetAccountController, { GenerateWithdrawChequeTxParams } from './asset-account'
 import {
   GenerateCreateAssetAccountTxParams,
@@ -48,17 +48,17 @@ import {
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
-import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
+import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
-import SUDTController from "controllers/sudt"
-import SyncedBlockNumber from 'models/synced-block-number'
-import IndexerService from 'services/indexer'
-import MultisigConfigModel from 'models/multisig-config'
-import startMonitor, { stopMonitor } from 'services/monitor'
-import { migrateCkbData } from 'services/ckb-runner'
-import NodeService from 'services/node'
-import SyncProgressService from 'services/sync-progress'
+import SUDTController from '../controllers/sudt'
+import SyncedBlockNumber from '../models/synced-block-number'
+import IndexerService from '../services/indexer'
+import MultisigConfigModel from '../models/multisig-config'
+import startMonitor, { stopMonitor } from '../services/monitor'
+import { migrateCkbData } from '../services/ckb-runner'
+import NodeService from '../services/node'
+import SyncProgressService from '../services/sync-progress'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -371,8 +371,24 @@ export default class ApiController {
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`#/transaction/${hash}`, t(`messageBox.transaction.title`, { hash }), {
-        height: 750
+      const win = showWindow(
+        `#/transaction/${hash}`,
+        t(`messageBox.transaction.title`, { hash }),
+        {
+          height: 750
+        },
+        undefined,
+        (win) => win.webContents.getURL().endsWith(`#/transaction/${hash}`)
+      )
+
+      if (win.isVisible()) return
+
+      return new Promise((resolve, reject) => {
+        win.once('ready-to-show', resolve)
+        CommonUtils.sleep(3e3).then(() => {
+          win.off('ready-to-show', resolve)
+          reject(new Error('Show window timeout'))
+        })
       })
     })
 

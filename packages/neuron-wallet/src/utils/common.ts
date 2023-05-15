@@ -1,4 +1,4 @@
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 
 //TODO remove it after typescript upgrade to above 4.5
 type Awaited<T> = T extends null | undefined

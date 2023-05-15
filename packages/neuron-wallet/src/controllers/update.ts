@@ -1,7 +1,7 @@
 import { BrowserWindow, dialog } from 'electron'
 import { t } from 'i18next'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
-import AppUpdaterSubject from 'models/subjects/app-updater'
+import AppUpdaterSubject from '../models/subjects/app-updater'
 
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking

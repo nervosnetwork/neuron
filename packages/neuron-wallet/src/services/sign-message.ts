@@ -1,12 +1,12 @@
 import AddressService from './addresses'
 import WalletService, { Wallet } from './wallets'
-import Keychain from 'models/keys/keychain'
-import Blake2b from 'models/blake2b'
+import Keychain from '../models/keys/keychain'
+import Blake2b from '../models/blake2b'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import { ec as EC } from 'elliptic'
-import { AddressNotFound } from 'exceptions'
+import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
-import AddressParser from 'models/address-parser'
+import AddressParser from '../models/address-parser'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
