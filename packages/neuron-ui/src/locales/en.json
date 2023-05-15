@@ -270,6 +270,7 @@
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
+      "opening": "Opening",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
       "copy-address": "Copy Address",

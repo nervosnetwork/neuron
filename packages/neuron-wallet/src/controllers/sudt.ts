@@ -1,11 +1,11 @@
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import LiveCellService from 'services/live-cell-service'
+import LiveCellService from '../services/live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
-import Script, { ScriptHashType } from 'models/chain/script'
-import parseSUDTTokenInfo from 'utils/parse_sudt_token_info'
-import { ResponseCode } from 'utils/const'
-import { SudtTokenInfo } from 'models/chain/transaction'
-import AssetAccountService from 'services/asset-account-service'
+import Script, { ScriptHashType } from '../models/chain/script'
+import parseSUDTTokenInfo from '../utils/parse_sudt_token_info'
+import { ResponseCode } from '../utils/const'
+import { SudtTokenInfo } from '../models/chain/transaction'
+import AssetAccountService from '../services/asset-account-service'
 
 export default class SUDTController {
   public async getSUDTTokenInfo(params: { tokenID: string }): Promise<Controller.Response<SudtTokenInfo>> {

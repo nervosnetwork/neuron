@@ -1,12 +1,12 @@
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
-import NodeService from 'services/node'
-import RpcService from 'services/rpc-service'
-import SyncedBlockNumber from 'models/synced-block-number'
-import SyncStateSubject from 'models/subjects/sync-state-subject'
-import { CurrentNetworkIDSubject } from 'models/subjects/networks'
-import MultisigService from 'services/multisig'
-import { getLookingValidTargetStatus } from 'services/ckb-runner'
+import NodeService from '../services/node'
+import RpcService from '../services/rpc-service'
+import SyncedBlockNumber from '../models/synced-block-number'
+import SyncStateSubject from '../models/subjects/sync-state-subject'
+import { CurrentNetworkIDSubject } from '../models/subjects/networks'
+import MultisigService from '../services/multisig'
+import { getLookingValidTargetStatus } from '../services/ckb-runner'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000

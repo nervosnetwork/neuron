@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
+import MultisigOutputChangedSubject from '../../models/subjects/multisig-output-db-changed-subject'
 import InputEntity from './entities/input'
 import OutputEntity from './entities/output'
 import TransactionEntity from './entities/transaction'

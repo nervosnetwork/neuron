@@ -1,11 +1,11 @@
 import { getConnection } from 'typeorm'
-import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
-import { FailedTransaction, TransactionPersistor } from 'services/tx'
-import RpcService from 'services/rpc-service'
-import NetworksService from 'services/networks'
-import { TransactionStatus } from 'models/chain/transaction'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import logger from 'utils/logger'
+import { CONNECTION_NOT_FOUND_NAME } from '../database/chain/ormconfig'
+import { FailedTransaction, TransactionPersistor } from '../services/tx'
+import RpcService from '../services/rpc-service'
+import NetworksService from '../services/networks'
+import { TransactionStatus } from '../models/chain/transaction'
+import TransactionWithStatus from '../models/chain/transaction-with-status'
+import logger from '../utils/logger'
 import { interval } from 'rxjs'
 
 const getTransactionStatus = async (hash: string) => {

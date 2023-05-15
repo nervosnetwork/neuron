@@ -1,11 +1,11 @@
 import { getConnection } from 'typeorm'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import OutputEntity from 'database/chain/entities/output'
-import NetworksService from 'services/networks'
-import Output from 'models/chain/output'
-import OutPoint from 'models/chain/out-point'
-import Transaction from 'models/chain/transaction'
-import SystemScriptInfo from 'models/system-script-info'
+import OutputEntity from '../../database/chain/entities/output'
+import NetworksService from '../../services/networks'
+import Output from '../../models/chain/output'
+import OutPoint from '../../models/chain/out-point'
+import Transaction from '../../models/chain/transaction'
+import SystemScriptInfo from '../../models/system-script-info'
 
 export interface AnyoneCanPayInfo {
   tokenID: string

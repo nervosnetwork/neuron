@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import Transaction from './transaction'
-import OutPoint from 'models/chain/out-point'
-import InputModel from 'models/chain/input'
-import Script, { ScriptHashType } from 'models/chain/script'
+import OutPoint from '../../../models/chain/out-point'
+import InputModel from '../../../models/chain/input'
+import Script, { ScriptHashType } from '../../../models/chain/script'
 
 // cellbase input may have same OutPoint
 @Entity()

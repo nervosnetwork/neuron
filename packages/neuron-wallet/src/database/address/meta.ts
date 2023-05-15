@@ -1,10 +1,10 @@
 import { Address, AddressVersion } from '../../models/address'
-import { AddressType } from 'models/keys/address'
-import Script from 'models/chain/script'
-import SystemScriptInfo from 'models/system-script-info'
-import AssetAccountInfo from 'models/asset-account-info'
-import HdPublicKeyInfoModel from 'models/keys/hd-public-key-info'
-import Multisig from 'models/multisig'
+import { AddressType } from '../../models/keys/address'
+import Script from '../../models/chain/script'
+import SystemScriptInfo from '../../models/system-script-info'
+import AssetAccountInfo from '../../models/asset-account-info'
+import HdPublicKeyInfoModel from '../../models/keys/hd-public-key-info'
+import Multisig from '../../models/multisig'
 
 export default class AddressMeta implements Address {
   walletId: string

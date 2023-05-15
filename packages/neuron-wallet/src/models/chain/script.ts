@@ -1,6 +1,6 @@
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import HexUtils from 'utils/hex'
-import TypeChecker from 'utils/type-checker'
+import HexUtils from '../../utils/hex'
+import TypeChecker from '../../utils/type-checker'
 
 export enum ScriptHashType {
   Data = 'data',

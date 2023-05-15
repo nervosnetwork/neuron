@@ -1,5 +1,5 @@
-import { stopCkbNode } from 'services/ckb-runner'
-import { CKBLightRunner } from 'services/light-runner'
+import { stopCkbNode } from '../../services/ckb-runner'
+import { CKBLightRunner } from '../../services/light-runner'
 import NodeService from '../node'
 import BaseMonitor from './base'
 

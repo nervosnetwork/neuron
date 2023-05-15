@@ -7,13 +7,13 @@ import type { DescriptorEvent, Subscription, Observer } from '@ledgerhq/hw-trans
 import type Transport from '@ledgerhq/hw-transport'
 import { Observable, timer } from 'rxjs'
 import { takeUntil, filter, scan } from 'rxjs/operators'
-import Transaction from 'models/chain/transaction'
-import NodeService from 'services/node'
-import Address, { AddressType } from 'models/keys/address'
-import HexUtils from 'utils/hex'
-import logger from 'utils/logger'
-import NetworksService from 'services/networks'
-import { generateRPC } from 'utils/ckb-rpc'
+import Transaction from '../../models/chain/transaction'
+import NodeService from '../../services/node'
+import Address, { AddressType } from '../../models/keys/address'
+import HexUtils from '../../utils/hex'
+import logger from '../../utils/logger'
+import NetworksService from '../../services/networks'
+import { generateRPC } from '../../utils/ckb-rpc'
 
 export default class Ledger extends Hardware {
   private ledgerCKB: LedgerCKB | null = null
