@@ -156,7 +156,7 @@ const NervosDAO = () => {
     url: getCurrentUrl(networkID, networks),
   })
 
-  const onOpenDepositeDialog = useCallback(() => {
+  const onOpenDepositDialog = useCallback(() => {
     setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
     setShowDepositDialog(true)
   }, [])
@@ -389,7 +389,7 @@ const NervosDAO = () => {
         <Button
           type="primary"
           disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-          onClick={onOpenDepositeDialog}
+          onClick={onOpenDepositDialog}
           label={t('nervos-dao.deposit')}
         />
       </div>
