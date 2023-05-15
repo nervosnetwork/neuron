@@ -108,4 +108,11 @@ export default class SyncProgressService {
       .where({ hash: In(hashes) })
       .getMany()
   }
+
+  static async clearCurrentWalletProgress() {
+    const currentWallet = WalletService.getInstance().getCurrent()
+    await getConnection()
+      .getRepository(SyncProgress)
+      .delete({ walletId: currentWallet?.id })
+  }
 }

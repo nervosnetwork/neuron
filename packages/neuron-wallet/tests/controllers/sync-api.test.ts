@@ -47,6 +47,9 @@ jest.doMock('services/ckb-runner', () => ({
 jest.mock('undici', () => ({
   request: () => jest.fn()()
 }))
+jest.mock('services/multisig', () => ({
+  syncMultisigOutput: () => jest.fn()
+}))
 
 describe('SyncApiController', () => {
   const emitter = new Emitter()

@@ -91,7 +91,7 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     paramsFormatters: [paramsFormatter.toHash],
     resultFormatters: (result: { status: 'fetched' | 'fetching' | 'added' | 'not_found', data?: RPC.TransactionWithStatus }) => {
       if (result.status === 'fetched' && result.data) {return resultFormatter.toTransactionWithStatus(result.data)}
-      return null
+      return result
     }
   }
 }
@@ -117,7 +117,7 @@ export class LightRPC extends Base {
   ) => Promise<{ lastCursor: HexString, txs: { txHash: HexString, txIndex: HexString, blockNumber: CKBComponents.BlockNumber }[]}>
 
   getTransactionInLight: Base['getTransaction']
-  fetchTransaction: (hash: string) => Promise<CKBComponents.TransactionWithStatus | null>
+  fetchTransaction: (hash: string) => Promise<CKBComponents.TransactionWithStatus | { status: 'fetching' | 'added' | 'not_found' }>
 
   getGenesisBlock: () => Promise<CKBComponents.Block>
   exceptionMethods = ['getCurrentEpoch', 'getEpochByNumber', 'getBlockHash', 'getLiveCell']
@@ -151,7 +151,9 @@ export class LightRPC extends Base {
     if (!tx?.transaction) {
       tx = await CommonUtils.retry(3, 100, async () => {
         const tmp = await this.fetchTransaction(hash)
-        if (tmp === null) {throw new Error('Not fetch the transaction current')}
+        if ('status' in tmp) {
+          throw new Error(`transaction ${hash} status: ${tmp.status}`)
+        }
         return tmp
       })
       if (!tx) {throw new Error(`Fetch transaction tx failed, please try it later: ${hash}`)}

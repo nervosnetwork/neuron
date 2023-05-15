@@ -73,7 +73,8 @@ const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
       lock: Script.fromObject({ hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash })
     })
   ]
-  fakeTx.blockNumber = '1'
+  fakeTx.blockNumber = '0x1'
+  fakeTx.timestamp = '0x1880a3fa5bc'
   const fakeTxWithStatus = {
     transaction: fakeTx,
     txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed)
@@ -81,6 +82,14 @@ const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   return fakeTxWithStatus
 }
 
+const fakeBlockHeader = {
+  version: '0x0',
+  epoch: '0x0',
+  hash: `0x${'0'.repeat(64)}`,
+  parentHash: `0x${'0'.repeat(64)}`,
+  timestamp: '0x0',
+  number: '0x0',
+}
 describe('queue', () => {
   let queue: Queue
   const fakeNodeUrl = 'http://fakenode:8114'
@@ -216,7 +225,7 @@ describe('queue', () => {
             stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
             stubbedRPCCreateBatchRequestExecFn
               .mockResolvedValueOnce(fakeTxs)
-              .mockResolvedValueOnce(fakeTxs.map(v => ({ timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
+              .mockResolvedValueOnce(fakeTxs.map(v => ({ ...fakeBlockHeader, timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
             stubbedTransactionsSubject.next({ txHashes: fakeTxs.map(v => v.transaction.hash), params: fakeTxs[0].transaction.blockNumber })
           })
           describe('when saving transactions is succeeded', () => {
@@ -226,7 +235,8 @@ describe('queue', () => {
               const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
               const tx = Transaction.fromSDK(fakeTxWithStatus2.transaction.toSDK())
               tx.blockHash = fakeTxWithStatus2.txStatus.blockHash!
-              tx.blockNumber = fakeTxWithStatus2.transaction.blockNumber
+              tx.blockNumber = BigInt(fakeTxWithStatus2.transaction.blockNumber!).toString()
+              tx.timestamp = BigInt(fakeTxWithStatus2.transaction.timestamp!).toString()
               expect(stubbedTxAddressFinderConstructor).toHaveBeenCalledWith(
                 lockHashes,
                 [new AssetAccountInfo().generateAnyoneCanPayScript(addressInfo.blake160).computeHash()],
@@ -238,7 +248,8 @@ describe('queue', () => {
               for (const { transaction } of fakeTxs) {
                 const tx = Transaction.fromSDK(transaction.toSDK())
                 tx.blockHash = fakeTxWithStatus2.txStatus.blockHash!
-                tx.blockNumber = fakeTxWithStatus2.transaction.blockNumber
+                tx.blockNumber = BigInt(fakeTxWithStatus2.transaction.blockNumber!).toString()
+                tx.timestamp = BigInt(fakeTxWithStatus2.transaction.timestamp!).toString()
                 expect(stubbedSaveFetchFn).toHaveBeenCalledWith(tx)
               }
             })
@@ -260,7 +271,7 @@ describe('queue', () => {
               stubbedSaveFetchFn.mockRejectedValueOnce(err)
               stubbedRPCCreateBatchRequestExecFn
                 .mockResolvedValueOnce(fakeTxs)
-                .mockResolvedValueOnce(fakeTxs.map(v => ({ timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
+                .mockResolvedValueOnce(fakeTxs.map(v => ({ ...fakeBlockHeader, timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
               stubbedTransactionsSubject.next({ txHashes: fakeTxs.map(v => v.transaction.hash), params: fakeTxs[0].transaction.blockNumber })
               await flushPromises()
             })

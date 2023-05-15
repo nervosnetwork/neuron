@@ -30,7 +30,7 @@ export default class IndexerService {
     }
 
     if (!NodeService.getInstance().isCkbNodeExternal) {
-      await startMonitor('ckb')
+      await startMonitor('ckb', true)
     }
   }
 
