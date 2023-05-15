@@ -18,7 +18,7 @@
     "@ckb-lumos/base": "0.18.0",
     "@ckb-lumos/rpc": "0.18.0",
     "ckb-js-toolkit": "0.100.0-rc1",
-    "cross-fetch": "3.1.5"
+    "cross-fetch": "3.1.6"
   },
   "devDependencies": {
     "events": "3.3.0",
