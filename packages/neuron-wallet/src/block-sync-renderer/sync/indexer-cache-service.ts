@@ -104,7 +104,6 @@ export default class IndexerCacheService {
         )
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
-        //@ts-ignore
         if (!fetchedTxHashes.length) {
           continue
         }

@@ -4,6 +4,7 @@ import {
   sendSUDTTransaction as sendSUDTTx,
   migrateAcp as migrateAcpIpc,
 } from 'services/remote'
+import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { AppActions, StateDispatch } from '../reducer'
 import { addNotification } from './app'
 
@@ -42,7 +43,13 @@ export const migrateAcp = (params: Controller.MigrateAcp.Params) => async (dispa
     return res
   } catch (err) {
     console.warn(err)
-    return { status: ResponseCode.FAILURE, message: err }
+    const res: FailureFromController = {
+      status: ResponseCode.FAILURE,
+      message: {
+        content: String(err),
+      },
+    }
+    return res
   } finally {
     dispatch({
       type: AppActions.UpdateLoadings,
