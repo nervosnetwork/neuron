@@ -12,7 +12,7 @@ import { Signatures } from '../../models/offline-sign'
 export enum TransactionStatus {
   Pending = 'pending',
   Success = 'success',
-  Failed = 'failed'
+  Failed = 'failed',
 }
 
 export interface SudtTokenInfo {
@@ -29,7 +29,7 @@ export interface SudtInfo {
 
 export enum NFTType {
   Send = 'send',
-  Receive = 'receive'
+  Receive = 'receive',
 }
 
 export interface NFTInfo {
@@ -39,7 +39,7 @@ export interface NFTInfo {
 
 export enum AssetAccountType {
   CKB = 'CKB',
-  SUDT = 'sUDT'
+  SUDT = 'sUDT',
 }
 
 export default class Transaction {
@@ -167,7 +167,7 @@ export default class Transaction {
     sudtInfo,
     nftInfo,
     signatures = {},
-    assetAccountType
+    assetAccountType,
   }: {
     version: string
     cellDeps?: CellDep[]
@@ -279,7 +279,7 @@ export default class Transaction {
       cellDeps: this.cellDeps.map(cd => cd.toSDK()),
       headerDeps: this.headerDeps,
       outputsData: this.outputsData,
-      witnesses: this.witnessesAsString()
+      witnesses: this.witnessesAsString(),
     }
   }
 
@@ -288,7 +288,7 @@ export default class Transaction {
     const hash = this.hash || this.computeHash()
     return {
       ...this.toSDKRawTransaction(),
-      hash
+      hash,
     }
   }
 

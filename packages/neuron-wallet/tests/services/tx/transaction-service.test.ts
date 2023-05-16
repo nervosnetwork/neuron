@@ -12,7 +12,7 @@ import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-
 
 jest.mock('../../../src/models/asset-account-info', () => {
   const originalModule = jest.requireActual('../../../src/models/asset-account-info').default
-  return function() {
+  return function () {
     return new originalModule('0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5')
   }
 })
@@ -36,7 +36,7 @@ describe('Test TransactionService', () => {
 
   describe('#filterSearchType(searchValue)', () => {
     const stubProvider = {
-      searchValue: ''
+      searchValue: '',
     }
 
     afterEach(() => {
@@ -60,7 +60,7 @@ describe('Test TransactionService', () => {
       const TESTNET_ADDRESS = 'ckt1qyqv9w4p6k695wkkg54eex9d3ckv2tj3y0rs6ctv00'
       const fixtures = [
         ['Mainnet', MAINNET_ADDRESS],
-        ['Testnet', TESTNET_ADDRESS]
+        ['Testnet', TESTNET_ADDRESS],
       ]
 
       test.each(fixtures)('Should return SearchType.Address When search value is a %s address', (_type, addr) => {
@@ -109,7 +109,7 @@ describe('Test TransactionService', () => {
 
   describe('#blake160sOfTx(transaction)', () => {
     const stubProvider: { tx: Transaction | undefined } = {
-      tx: undefined
+      tx: undefined,
     }
 
     afterEach(() => {
@@ -126,7 +126,7 @@ describe('Test TransactionService', () => {
         const res = TransactionService.blake160sOfTx(stubProvider.tx!)
         expect(res).toEqual([
           '0x36c329ed630d6ce750712a477543672adab57f4c',
-          '0xe2193df51d78411601796b35b17b4f8f2cd85bd0'
+          '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
         ])
       })
     })
@@ -135,7 +135,7 @@ describe('Test TransactionService', () => {
   describe('#getCountByLockHashesAndStatus(lockHashList, status)', () => {
     const stubProvider = {
       lockHashList: new Set<string>(),
-      status: new Set<TransactionStatus>()
+      status: new Set<TransactionStatus>(),
     }
 
     afterEach(() => {
@@ -182,7 +182,7 @@ describe('Test TransactionService', () => {
   describe('#updateDescription(hash, description)', () => {
     const stubProvider = {
       hash: '',
-      description: ''
+      description: '',
     }
 
     afterEach(() => {
@@ -224,7 +224,7 @@ describe('Test TransactionService', () => {
 
   describe('#get(hash)', () => {
     const stubProvider = {
-      hash: ''
+      hash: '',
     }
 
     afterEach(() => {
@@ -259,7 +259,7 @@ describe('Test TransactionService', () => {
   describe('#exportTransactions({ walletID, filePath })', () => {
     const stubProvider = {
       filePath: path.resolve(os.tmpdir(), 'export-transaction.csv'),
-      walletID: ''
+      walletID: '',
     }
 
     afterEach(() => {
@@ -276,7 +276,7 @@ describe('Test TransactionService', () => {
       it('Should return the total count', async () => {
         const actual = await TransactionService.exportTransactions({
           walletID: stubProvider.walletID,
-          filePath: stubProvider.filePath
+          filePath: stubProvider.filePath,
         })
         expect(actual).toBe(0)
       })
@@ -288,7 +288,7 @@ describe('Test TransactionService', () => {
     // TODO: validate complex sudt transaction, nervos dao transaction
     const ADDRESSES: string[] = [
       'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
-      'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
+      'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5',
     ]
     const stubProvider: {
       walletID: string
@@ -301,7 +301,7 @@ describe('Test TransactionService', () => {
       pageNo: 1,
       pageSize: 15,
       addresses: ADDRESSES,
-      searchValue: ''
+      searchValue: '',
     }
 
     beforeEach(async () => {
@@ -361,7 +361,7 @@ describe('Test TransactionService', () => {
                 type: 'receive',
                 status: 'success',
                 sudtInfo: undefined,
-                nervosDao: false
+                nervosDao: false,
               })
             )
           )

@@ -31,7 +31,7 @@ export default class AssetAccountService {
       .where({
         status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
-        typeHash
+        typeHash,
       })
       .getMany()
 
@@ -64,7 +64,7 @@ export default class AssetAccountService {
       .where({
         status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockHash: anyoneCanPayLockHash,
-        typeHash
+        typeHash,
       })
       .getMany()
 
@@ -86,7 +86,7 @@ export default class AssetAccountService {
         lockHash: cell.lockHash,
         typeHash: cell.typeHash,
         data: cell.data,
-        since: '0'
+        since: '0',
       })
     })
     // 1. find next unused address
@@ -103,7 +103,7 @@ export default class AssetAccountService {
 
     return {
       assetAccount,
-      tx
+      tx,
     }
   }
 
@@ -237,7 +237,7 @@ export default class AssetAccountService {
 
     return {
       assetAccount,
-      tx
+      tx,
     }
   }
 
@@ -284,7 +284,7 @@ export default class AssetAccountService {
         {
           lockHashes: anyoneCanPayLockHashes,
           sudtCodeHash: assetAccountInfo.infos.sudt.codeHash,
-          sudtHashType: assetAccountInfo.infos.sudt.hashType
+          sudtHashType: assetAccountInfo.infos.sudt.hashType,
         }
       )
       .groupBy('output.lockHash')
@@ -314,7 +314,7 @@ export default class AssetAccountService {
         .from(AssetAccountEntity)
         .where('tokenID = :tokenID AND blake160 = :blake160', {
           tokenID: output.typeArgs || 'CKBytes',
-          blake160: output.lockArgs
+          blake160: output.lockArgs,
         })
         .execute()
     }
@@ -362,7 +362,7 @@ export default class AssetAccountService {
               .from(AssetAccountEntity)
               .where('tokenID = :tokenID AND blake160 = :blake160', {
                 tokenID: assetAccount.tokenID,
-                blake160: assetAccount.blake160
+                blake160: assetAccount.blake160,
               })
               .execute()
           }
@@ -421,8 +421,8 @@ export default class AssetAccountService {
           tokenID: Not(''),
           tokenName: Not(''),
           symbol: Not(''),
-          decimal: Not('')
-        }
+          decimal: Not(''),
+        },
       })
       .then(list => list.map(item => item.toModel()))
   }

@@ -24,7 +24,7 @@ export default class CommonUtils {
       promise,
       new Promise<T>((resolve, _) => {
         setTimeout(() => resolve(value), time)
-      })
+      }),
     ])
   }
 

@@ -14,25 +14,25 @@ export default class SUDTController {
     if (sudtInfo) {
       return {
         status: ResponseCode.Success,
-        result: { ...sudtInfo, tokenID: params.tokenID }
+        result: { ...sudtInfo, tokenID: params.tokenID },
       }
     }
 
     const typeScript = Script.fromObject({
       codeHash: new AssetAccountInfo().sudtInfoCodeHash,
       args: params.tokenID,
-      hashType: ScriptHashType.Type
+      hashType: ScriptHashType.Type,
     })
     const liveCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(null, typeScript)
     if (!liveCell) {
       return {
-        status: ResponseCode.Fail
+        status: ResponseCode.Fail,
       }
     }
     const { decimal, name, symbol } = parseSUDTTokenInfo(liveCell.data)
     return {
       status: ResponseCode.Success,
-      result: { tokenID: params.tokenID, symbol: symbol, tokenName: name, decimal: decimal }
+      result: { tokenID: params.tokenID, symbol: symbol, tokenName: name, decimal: decimal },
     }
   }
 
@@ -41,7 +41,7 @@ export default class SUDTController {
     const script = new Script(assetAcount.infos.sudt.codeHash, params.tokenID, assetAcount.infos.sudt.hashType)
     return {
       status: ResponseCode.Success,
-      result: scriptToHash(script.toSDK())
+      result: scriptToHash(script.toSDK()),
     }
   }
 }

@@ -2,11 +2,7 @@ import { getConnection } from 'typeorm'
 import TxDescription from '../../database/chain/entities/tx-description'
 
 const getEntity = async (walletId: string, txHash: string) => {
-  return await getConnection()
-    .getRepository(TxDescription)
-    .createQueryBuilder()
-    .where({ walletId, txHash })
-    .getOne()
+  return await getConnection().getRepository(TxDescription).createQueryBuilder().where({ walletId, txHash }).getOne()
 }
 
 export const get = async (walletId: string, txHash: string) => {

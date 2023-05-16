@@ -1,6 +1,6 @@
-import LiveCell from "../../src/models/chain/live-cell";
-import Script, { ScriptHashType } from "../../src/models/chain/script";
-import {ResponseCode} from "../../src/utils/const";
+import LiveCell from '../../src/models/chain/live-cell'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
+import { ResponseCode } from '../../src/utils/const'
 
 describe('SUDTController', () => {
   const stubbedGetOneByLockScriptAndTypeScript = jest.fn()
@@ -23,7 +23,7 @@ describe('SUDTController', () => {
       getTokenInfoList: stubbedGetTokenInfoList,
     }
   })
-  const SUDTController = require("../../src/controllers/sudt").default
+  const SUDTController = require('../../src/controllers/sudt').default
 
   beforeEach(async () => {
     resetMocks()
@@ -43,7 +43,7 @@ describe('SUDTController', () => {
 
     it('getSUDTTokenInfo from token list success', async () => {
       const sudtController = new SUDTController()
-      const tokenInfo =  await sudtController.getSUDTTokenInfo({tokenID:testTokenID})
+      const tokenInfo = await sudtController.getSUDTTokenInfo({ tokenID: testTokenID })
       expect(tokenInfo).toEqual({
         status: ResponseCode.Success,
         result: testTokenInfo,
@@ -59,10 +59,14 @@ describe('SUDTController', () => {
       symbol: 'ET2',
       decimal: '8',
     }
-    const testLiveCell = new LiveCell('txHash', '0', '10000',
-      Script.fromObject({codeHash:'',args:'',hashType:ScriptHashType.Type}),
-      Script.fromObject({codeHash:'',args:'',hashType:ScriptHashType.Type}),
-      '0x080a456972632d320a455432')
+    const testLiveCell = new LiveCell(
+      'txHash',
+      '0',
+      '10000',
+      Script.fromObject({ codeHash: '', args: '', hashType: ScriptHashType.Type }),
+      Script.fromObject({ codeHash: '', args: '', hashType: ScriptHashType.Type }),
+      '0x080a456972632d320a455432'
+    )
     beforeEach(async () => {
       stubbedGetTokenInfoList.mockReturnValue([])
       stubbedGetOneByLockScriptAndTypeScript.mockReturnValue(testLiveCell)
@@ -70,7 +74,7 @@ describe('SUDTController', () => {
 
     it('getSUDTTokenInfo from live cell data parse', async () => {
       const sudtController = new SUDTController()
-      const tokenInfo =  await sudtController.getSUDTTokenInfo({tokenID:testTokenID})
+      const tokenInfo = await sudtController.getSUDTTokenInfo({ tokenID: testTokenID })
       expect(tokenInfo).toEqual({
         status: ResponseCode.Success,
         result: testTokenInfo,
@@ -85,7 +89,7 @@ describe('SUDTController', () => {
     })
     it('getSUDTTokenInfo from live cell data parse', async () => {
       const sudtController = new SUDTController()
-      const tokenInfo =  await sudtController.getSUDTTokenInfo({tokenID:testTokenID})
+      const tokenInfo = await sudtController.getSUDTTokenInfo({ tokenID: testTokenID })
       expect(tokenInfo).toEqual({
         status: ResponseCode.Fail,
       })

@@ -21,7 +21,7 @@ export default class MultisigService {
         r: multisigConfig.r,
         m: multisigConfig.m,
         n: multisigConfig.n,
-        blake160s: multisigConfig.blake160s
+        blake160s: multisigConfig.blake160s,
       })
       .getCount()
     if (result > 0) {
@@ -43,7 +43,7 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        id: params.id
+        id: params.id,
       })
       .getOne()
     if (!result) {
@@ -58,7 +58,7 @@ export default class MultisigService {
         r: params.r ?? result.r,
         m: params.m ?? result.m,
         n: params.n ?? result.n,
-        blake160s: params.blake160s ?? result.blake160s
+        blake160s: params.blake160s ?? result.blake160s,
       })
       .where('id = :id', { id: params.id })
       .execute()
@@ -70,7 +70,7 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        walletId
+        walletId,
       })
       .orderBy('id', 'DESC')
       .getMany()
@@ -82,7 +82,7 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        id
+        id,
       })
       .getOne()
     await getConnection().manager.remove(config)
@@ -105,17 +105,17 @@ export default class MultisigService {
                 script: {
                   code_hash: script.codeHash,
                   hash_type: script.hashType,
-                  args: script.args
+                  args: script.args,
                 },
                 script_type: 'lock',
                 filter: {
-                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined
-                }
+                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
+                },
               },
               'desc',
               '0x64',
-              addressCursorMap.get(script.args)
-            ]
+              addressCursorMap.get(script.args),
+            ],
           }
         })
       )
@@ -139,10 +139,7 @@ export default class MultisigService {
   }
 
   static async saveLiveMultisigOutput() {
-    const multisigConfigs = await getConnection()
-      .getRepository(MultisigConfig)
-      .createQueryBuilder()
-      .getMany()
+    const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     const liveCells = await MultisigService.getLiveCells(multisigConfigs)
     if (liveCells.length) {
       await getConnection().manager.save(liveCells)
@@ -167,17 +164,17 @@ export default class MultisigService {
                 script: {
                   code_hash: script.codeHash,
                   hash_type: script.hashType,
-                  args: script.args
+                  args: script.args,
                 },
                 script_type: 'lock',
                 filter: {
-                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined
-                }
+                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
+                },
               },
               'desc',
               '0x64',
-              addressCursorMap.get(script.args)
-            ]
+              addressCursorMap.get(script.args),
+            ],
           }
         })
       )
@@ -206,7 +203,7 @@ export default class MultisigService {
         network.remote,
         [...multisigOutputTxHashList].map(v => ({
           method: 'get_transaction',
-          params: [v]
+          params: [v],
         }))
       )
       const removeOutputTxHashList: string[] = []
@@ -230,10 +227,7 @@ export default class MultisigService {
   }
 
   static async deleteRemovedMultisigOutput() {
-    const multisigConfigs = await getConnection()
-      .getRepository(MultisigConfig)
-      .createQueryBuilder()
-      .getMany()
+    const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     const multisigLockHashList = multisigConfigs.map(v =>
       scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
     )
@@ -242,7 +236,7 @@ export default class MultisigService {
       .delete()
       .from(MultisigOutput)
       .where({
-        lockHash: Not(In(multisigLockHashList))
+        lockHash: Not(In(multisigLockHashList)),
       })
       .execute()
     MultisigOutputChangedSubject.getSubject().next('delete')
@@ -250,10 +244,7 @@ export default class MultisigService {
 
   static async syncMultisigOutput(lastestBlockNumber: string) {
     try {
-      const multisigConfigs = await getConnection()
-        .getRepository(MultisigConfig)
-        .createQueryBuilder()
-        .getMany()
+      const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
       await MultisigService.saveLiveMultisigOutput()
       await MultisigService.deleteDeadMultisigOutput(multisigConfigs)
       await getConnection()
@@ -261,7 +252,7 @@ export default class MultisigService {
         .save(
           multisigConfigs.map(v => ({
             ...v,
-            lastestBlockNumber
+            lastestBlockNumber,
           }))
         )
     } catch (error) {
@@ -291,10 +282,10 @@ export default class MultisigService {
       .createQueryBuilder()
       .update(MultisigOutput)
       .set({
-        status: OutputStatus.Pending
+        status: OutputStatus.Pending,
       })
       .where({
-        outPointTxHashAddIndex: In(inputsOutpointList)
+        outPointTxHashAddIndex: In(inputsOutpointList),
       })
       .execute()
     MultisigOutputChangedSubject.getSubject().next('update')

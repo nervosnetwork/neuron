@@ -28,61 +28,63 @@ Object.defineProperty(generateMultisigSendAllTx, 'type', {
   value: 'all',
 })
 
-const generateMultisigTxWith = (generator: typeof generateMultisigTx | typeof generateMultisigSendAllTx) => ({
-  sendInfoList,
-  multisigConfig,
-  dispatch,
-  setErrorMessage,
-  t,
-  isMainnet,
-}: {
-  sendInfoList: { address: string | undefined; amount: string | undefined; unit: CapacityUnit }[]
-  multisigConfig: MultisigConfig
-  dispatch: StateDispatch
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>
-  t: TFunction
-  isMainnet: boolean
-}) => {
-  try {
-    const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
-    validateOutputs(sendInfoList, isMainnet, type === 'all')
-    const realParams = {
-      items: sendInfoList.map(item => ({
-        address: item.address || '',
-        capacity: CKBToShannonFormatter(item.amount, item.unit),
-      })),
-      multisigConfig,
-    }
-    return generator(realParams)
-      .then((res: any) => {
-        if (res.status === 1) {
+const generateMultisigTxWith =
+  (generator: typeof generateMultisigTx | typeof generateMultisigSendAllTx) =>
+  ({
+    sendInfoList,
+    multisigConfig,
+    dispatch,
+    setErrorMessage,
+    t,
+    isMainnet,
+  }: {
+    sendInfoList: { address: string | undefined; amount: string | undefined; unit: CapacityUnit }[]
+    multisigConfig: MultisigConfig
+    dispatch: StateDispatch
+    setErrorMessage: React.Dispatch<React.SetStateAction<string>>
+    t: TFunction
+    isMainnet: boolean
+  }) => {
+    try {
+      const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
+      validateOutputs(sendInfoList, isMainnet, type === 'all')
+      const realParams = {
+        items: sendInfoList.map(item => ({
+          address: item.address || '',
+          capacity: CKBToShannonFormatter(item.amount, item.unit),
+        })),
+        multisigConfig,
+      }
+      return generator(realParams)
+        .then((res: any) => {
+          if (res.status === 1) {
+            dispatch({
+              type: AppActions.UpdateGeneratedTx,
+              payload: res.result,
+            })
+            return res.result
+          }
+          if (res.status === 0 || res.status === 114) {
+            throw new Error(res.message.content)
+          }
+          throw new Error(t(`messages.codes.${res.status}`))
+        })
+        .catch((err: Error) => {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
-            payload: res.result,
+            payload: '',
           })
-          return res.result
-        }
-        if (res.status === 0 || res.status === 114) {
-          throw new Error(res.message.content)
-        }
-        throw new Error(t(`messages.codes.${res.status}`))
-      })
-      .catch((err: Error) => {
-        dispatch({
-          type: AppActions.UpdateGeneratedTx,
-          payload: '',
+          setErrorMessage(err.message)
         })
-        setErrorMessage(err.message)
-      })
-  } catch {
-    // ignore catch
+    } catch {
+      // ignore catch
+    }
+    dispatch({
+      type: AppActions.UpdateGeneratedTx,
+      payload: '',
+    })
+    return Promise.resolve(undefined)
   }
-  dispatch({
-    type: AppActions.UpdateGeneratedTx,
-    payload: '',
-  })
-  return Promise.resolve(undefined)
-}
 export const useSendInfo = ({
   isMainnet,
   balance,

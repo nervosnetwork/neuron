@@ -8,7 +8,7 @@ import path from 'path'
 const { app } = env
 
 export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
-export type Locale = typeof locales[number]
+export type Locale = (typeof locales)[number]
 
 export default class SettingsService extends Store {
   private static instance: SettingsService | null = null
@@ -24,14 +24,6 @@ export default class SettingsService extends Store {
     return this.readSync('locale')
   }
 
-  get indexerDataPath(): string {
-    return this.readSync('indexerDataPath')
-  }
-
-  set indexerDataPath(dataPath: string) {
-    this.writeSync('indexerDataPath', dataPath)
-  }
-
   set locale(lng: Locale) {
     if (locales.includes(lng)) {
       this.writeSync('locale', lng)
@@ -40,6 +32,14 @@ export default class SettingsService extends Store {
     } else {
       throw new Error(`Locale ${lng} not supported`)
     }
+  }
+
+  get indexerDataPath(): string {
+    return this.readSync('indexerDataPath')
+  }
+
+  set indexerDataPath(dataPath: string) {
+    this.writeSync('indexerDataPath', dataPath)
   }
 
   get ckbDataPath() {
@@ -56,7 +56,7 @@ export default class SettingsService extends Store {
       'settings.json',
       JSON.stringify({
         locale: app.getLocale(),
-        ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet')
+        ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet'),
       })
     )
     if (!this.ckbDataPath) {

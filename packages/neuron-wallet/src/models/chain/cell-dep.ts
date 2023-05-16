@@ -2,7 +2,7 @@ import OutPoint from './out-point'
 
 export enum DepType {
   Code = 'code',
-  DepGroup = 'depGroup'
+  DepGroup = 'depGroup',
 }
 
 export default class CellDep {
@@ -21,7 +21,7 @@ export default class CellDep {
   public toSDK(): CKBComponents.CellDep {
     return {
       outPoint: this.outPoint.toSDK(),
-      depType: this.depType
+      depType: this.depType,
     }
   }
 

@@ -72,7 +72,7 @@ export default class Multisig {
     return {
       length: (epoch >> BigInt(40)) & BigInt(0xffff),
       index: (epoch >> BigInt(24)) & BigInt(0xffff),
-      number: epoch & BigInt(0xffffff)
+      number: epoch & BigInt(0xffffff),
     }
   }
 

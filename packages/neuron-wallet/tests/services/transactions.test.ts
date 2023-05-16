@@ -76,40 +76,36 @@ describe('transactions service', () => {
       const connection = getConnection()
       await connection.synchronize(true)
 
-      txs = [
-        generateTx('0x1', '1'),
-        generateTx('0x2', '2'),
-        generateTx('0x3', '3'),
-      ]
+      txs = [generateTx('0x1', '1'), generateTx('0x2', '2'), generateTx('0x3', '3')]
       await getConnection().manager.save(txs)
     })
 
     describe('when none of the transaction hashes exists', () => {
       beforeEach(() => {
         hashes = ['0x4']
-      });
+      })
       it('returns all hashes', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
         expect(nonExistHashes).toEqual(hashes)
-      });
-    });
+      })
+    })
     describe('when all of the transaction hashes exists', () => {
       beforeEach(() => {
         hashes = txs.map(tx => tx.hash)
-      });
+      })
       it('returns empty array', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
         expect(nonExistHashes).toEqual([])
       })
-    });
+    })
     describe('when some of the transaction hashes exists', () => {
       beforeEach(() => {
         hashes = ['0x4', txs[1].hash, '0x5']
-      });
+      })
       it('returns the ones not exsit', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
         expect(nonExistHashes).toEqual(['0x4', '0x5'])
       })
-    });
-  });
+    })
+  })
 })

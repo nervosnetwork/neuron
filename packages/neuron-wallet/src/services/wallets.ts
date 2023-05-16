@@ -59,7 +59,7 @@ export abstract class Wallet {
     name: this.name,
     extendedKey: this.extendedKey,
     device: this.device,
-    isHD: this.isHD
+    isHD: this.isHD,
   })
 
   public fromJSON = () => {
@@ -138,7 +138,7 @@ export class FileKeystoreWallet extends Wallet {
       name: this.name,
       extendedKey: this.extendedKey,
       device: this.device,
-      isHD: this.isHD
+      isHD: this.isHD,
     }
   }
 
@@ -227,7 +227,7 @@ export class HardwareWallet extends Wallet {
       walletId: this.id,
       publicKey,
       addressType,
-      addressIndex
+      addressIndex,
     })
 
     if (address) {
@@ -291,7 +291,7 @@ export default class WalletService {
         const walletList = this.getAll()
         CurrentWalletSubject.next({
           currentWallet,
-          walletList
+          walletList,
         })
       }
     })
@@ -309,7 +309,7 @@ export default class WalletService {
     await getConnection()
       .getRepository(HdPublicKeyInfo)
       .delete({
-        walletId: Not(In(allWallets.map(w => w.id)))
+        walletId: Not(In(allWallets.map(w => w.id))),
       })
   }
 

@@ -68,7 +68,7 @@ class NodeService {
           url: this.ckb.node.url,
           connected,
           isBundledNode,
-          startedBundledNode: isBundledNode ? this.startedBundledNode : false
+          startedBundledNode: isBundledNode ? this.startedBundledNode : false,
         })
       })
   }
@@ -97,7 +97,7 @@ class NodeService {
     this.stop = unsubscribe
   }
 
-  public stop: Function | null = null
+  public stop: (() => void) | null = null
 
   public tipNumber = () => {
     return interval(this.intervalTime)
@@ -191,7 +191,7 @@ class NodeService {
         message: t(`${I18N_PATH}.message`),
         detail: t(`${I18N_PATH}.detail`),
         cancelId: 0,
-        noLink: true
+        noLink: true,
       })
       .then(() => {
         const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
@@ -206,10 +206,7 @@ class NodeService {
     const ckbVersionPath = path.join(appPath, '.ckb-version')
     if (fs.existsSync(ckbVersionPath)) {
       try {
-        return fs
-          .readFileSync(ckbVersionPath, 'utf8')
-          ?.split('\n')?.[0]
-          ?.slice(1)
+        return fs.readFileSync(ckbVersionPath, 'utf8')?.split('\n')?.[0]?.slice(1)
       } catch (err) {
         logger.error('App\t: get ckb node version failed')
       }
@@ -226,7 +223,7 @@ class NodeService {
     if (internalMajor !== externalMajor || (externalMajor === '0' && internalMinor !== externalMinor)) {
       dialog.showMessageBox({
         type: 'warning',
-        message: t('messageBox.node-version-different.message', { version: internalNodeVersion })
+        message: t('messageBox.node-version-different.message', { version: internalNodeVersion }),
       })
     }
   }
@@ -239,14 +236,14 @@ class NodeService {
         logger.info('Node:\tthe ckb node does not start with --indexer')
         dialog.showMessageBox({
           type: 'warning',
-          message: t('messageBox.ckb-without-indexer.message')
+          message: t('messageBox.ckb-without-indexer.message'),
         })
       }
     } catch (error) {
       logger.info('Node:\tcalling get_indexer_tip failed')
       dialog.showMessageBox({
         type: 'warning',
-        message: t('messageBox.ckb-without-indexer.message')
+        message: t('messageBox.ckb-without-indexer.message'),
       })
     }
   }

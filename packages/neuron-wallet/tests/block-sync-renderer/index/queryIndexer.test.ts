@@ -14,12 +14,12 @@ const stubbedChildProcessFork = jest.fn().mockImplementation(() => ({
   once: jest.fn(),
   send: stubbedChildProcessSend,
   stderr: {
-    setEncoding: childProcessStdErrEncoding
-  }
+    setEncoding: childProcessStdErrEncoding,
+  },
 }))
 
 jest.doMock('child_process', () => ({
-  fork: stubbedChildProcessFork
+  fork: stubbedChildProcessFork,
 }))
 
 jest.doMock('models/subjects/data-update', () => ({
@@ -27,9 +27,16 @@ jest.doMock('models/subjects/data-update', () => ({
 }))
 
 jest.doMock(`utils/logger`, () => ({ info: stubbedLoggerInfo }))
-jest.doMock('services/indexer', () => ({ LISTEN_URI: 'stub_listen_uri', getInstance: () => ({ start: stubbedIndexerServiceStart }) }))
+jest.doMock('services/indexer', () => ({
+  LISTEN_URI: 'stub_listen_uri',
+  getInstance: () => ({ start: stubbedIndexerServiceStart }),
+}))
 jest.doMock('services/addresses', () => ({ getAddressesByAllWallets: stubbedGetAddressesByAllWallets }))
-jest.doMock('services/networks', () => ({ getInstance: jest.fn().mockReturnValue({ getCurrent: () => ({ id: 'id', genesisHash: '0x1', remote: 'stub_network_url' }) }) }))
+jest.doMock('services/networks', () => ({
+  getInstance: jest
+    .fn()
+    .mockReturnValue({ getCurrent: () => ({ id: 'id', genesisHash: '0x1', remote: 'stub_network_url' }) }),
+}))
 
 const blockSyncRenderer = require('block-sync-renderer')
 const spyRegisterRequest = jest.spyOn(blockSyncRenderer, 'registerRequest').mockResolvedValue(`returned cells`)
@@ -49,14 +56,11 @@ describe(``, () => {
   it(`should register a request`, async () => {
     const res = await blockSyncRenderer.queryIndexer(STUB_QUERY)
     expect(spyRegisterRequest).toHaveBeenNthCalledWith(2, expect.any(Object), {
-      channel: "queryIndexer",
+      channel: 'queryIndexer',
       id: 1,
       message: STUB_QUERY,
-      type: 'call'
+      type: 'call',
     })
     expect(res).toBe('returned cells')
   })
-
-
-
 })

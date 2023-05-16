@@ -1,4 +1,5 @@
 {
+  "editor.rulers": [120],
   "eslint.workingDirectories": [
     {
       "directory": "packages/neuron-wallet",

@@ -79,7 +79,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       IndexerTxHashCache,
       AddressDescription,
       MultisigConfig,
-      MultisigOuput
+      MultisigOuput,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -111,11 +111,11 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       UpdateAddressDescription1650984779265,
       RemoveDuplicateBlake160s1656930265386,
       UpdateOutputChequeLockHash1652945662504,
-      RemoveAddressesMultisigConfig1651820157100
+      RemoveAddressesMultisigConfig1651820157100,
     ],
     logger: 'simple-console',
     logging,
-    maxQueryExecutionTime: 30
+    maxQueryExecutionTime: 30,
   }
 }
 

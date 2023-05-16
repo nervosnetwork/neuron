@@ -22,7 +22,7 @@ export default class CustomizedAssetsController {
 
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -47,7 +47,7 @@ export default class CustomizedAssetsController {
 
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -81,7 +81,7 @@ export default class CustomizedAssetsController {
 
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 }

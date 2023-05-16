@@ -31,7 +31,7 @@ import {
   CapacityNotEnoughForChangeByTransfer,
   MultisigConfigNeedError,
   NoMatchAddressForSign,
-  SignTransactionFailed
+  SignTransactionFailed,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -136,7 +136,7 @@ export default class TransactionSender {
       ? addressInfos.map(i => {
           return {
             multiSignBlake160: Multisig.hash([i.blake160]),
-            path: i.path
+            path: i.path,
           }
         })
       : []
@@ -171,7 +171,7 @@ export default class TransactionSender {
           witnessArgs,
           lockHash: input.lockHash!,
           witness: '',
-          lockArgs
+          lockArgs,
         }
       })
 
@@ -197,8 +197,9 @@ export default class TransactionSender {
       let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
       if (isMultisig) {
-        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160]))!
-          .blake160
+        const blake160 = addressInfos.find(
+          i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160])
+        )!.blake160
         const serializedMultisig: string = Multisig.serialize([blake160])
         signed = await TransactionSender.signSingleMultiSignScript(
           privateKey,
@@ -218,7 +219,7 @@ export default class TransactionSender {
               return wit
             }
             return wit.toSDK()
-          })
+          }),
         })
       }
 
@@ -297,7 +298,7 @@ export default class TransactionSender {
         witnessArgs,
         lockHash: input.lockHash!,
         witness: '',
-        lockArgs
+        lockArgs,
       }
     })
 
@@ -305,7 +306,7 @@ export default class TransactionSender {
     const multisigConfigMap: Record<string, MultisigConfigModel> = multisigConfigs.reduce(
       (pre, cur) => ({
         ...pre,
-        [cur.getLockHash()]: cur
+        [cur.getLockHash()]: cur,
       }),
       {}
     )
@@ -393,7 +394,7 @@ export default class TransactionSender {
 
     const emptyWitness = WitnessArgs.fromObject({
       ...firstWitness,
-      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m)
+      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
     const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
@@ -427,7 +428,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const changeAddress: string = await this.getChangeAddress()
@@ -458,7 +459,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
@@ -472,7 +473,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
@@ -492,7 +493,7 @@ export default class TransactionSender {
   ): Promise<Transaction> {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     try {
@@ -512,7 +513,7 @@ export default class TransactionSender {
         {
           lockArgs: [lockScript.args],
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
         },
         multisigConfig
       )
@@ -702,7 +703,7 @@ export default class TransactionSender {
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [withdrawWitnessArgs],
-      interest: (BigInt(outputCapacity) - depositCapacity).toString()
+      interest: (BigInt(outputCapacity) - depositCapacity).toString(),
     })
     if (mode.isFeeRateMode()) {
       const txSize: number = TransactionSize.tx(tx)
@@ -791,7 +792,7 @@ export default class TransactionSender {
     return {
       length: (epoch >> BigInt(40)) & BigInt(0xffff),
       index: (epoch >> BigInt(24)) & BigInt(0xffff),
-      number: epoch & BigInt(0xffffff)
+      number: epoch & BigInt(0xffffff),
     }
   }
 
@@ -825,7 +826,7 @@ export default class TransactionSender {
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     return uniquePaths.map(path => ({
       path,
-      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`
+      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
     }))
   }
 }

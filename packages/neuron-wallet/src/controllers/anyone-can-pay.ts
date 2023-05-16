@@ -42,7 +42,7 @@ export default class AnyoneCanPayController {
 
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -54,7 +54,7 @@ export default class AnyoneCanPayController {
     const extraCKB = await AnyoneCanPayService.getHoldSUDTCellCapacity(lockScript, tokenID)
     return {
       status: ResponseCode.Success,
-      result: extraCKB
+      result: extraCKB,
     }
   }
 
@@ -79,14 +79,14 @@ export default class AnyoneCanPayController {
 
     return {
       status: ResponseCode.Success,
-      result: txHash
+      result: txHash,
     }
   }
 
   public getScript() {
     return {
       status: ResponseCode.Success,
-      result: new AssetAccountInfo().infos.anyoneCanPay
+      result: new AssetAccountInfo().infos.anyoneCanPay,
     }
   }
 
@@ -94,7 +94,7 @@ export default class AnyoneCanPayController {
     const tx = await AnyoneCanPayService.generateSudtMigrateAcpTx(params.outPoint, params.acpAddress)
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 }

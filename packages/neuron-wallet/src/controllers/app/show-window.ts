@@ -8,7 +8,7 @@ const showWindow = (
   title: string,
   options?: Electron.BrowserWindowConstructorOptions,
   channels?: string[],
-  comparator: (win: BrowserWindow) => boolean = (win) => win.getTitle() === title
+  comparator: (win: BrowserWindow) => boolean = win => win.getTitle() === title
 ): BrowserWindow => {
   const opened = BrowserWindow.getAllWindows().find(comparator)
   if (opened) {
@@ -31,9 +31,9 @@ const showWindow = (
         nodeIntegration: true,
         devTools: env.isDevMode,
         contextIsolation: false,
-        preload: path.join(__dirname, './preload.js')
+        preload: path.join(__dirname, './preload.js'),
       },
-      ...options
+      ...options,
     })
     if (channels) {
       AppController.getInstance().registerChannels(win, channels)

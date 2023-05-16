@@ -42,7 +42,7 @@ export default class HardwareWalletService {
 
   public static async findDevices(device?: Pick<DeviceInfo, 'manufacturer' | 'product'>): Promise<DeviceInfo[]> {
     const devices = await Promise.all([
-      Ledger.findDevices()
+      Ledger.findDevices(),
       // add new brand `findDevices()` here
     ])
 

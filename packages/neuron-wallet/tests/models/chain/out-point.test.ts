@@ -20,7 +20,7 @@ describe('OutPoint', () => {
   it('fromSDK', () => {
     const o = OutPoint.fromSDK({
       txHash: outPoint.txHash,
-      index: '0x0'
+      index: '0x0',
     })
     expect(o.txHash).toEqual(outPoint.txHash)
     expect(o.index).toEqual(outPoint.index)

@@ -55,29 +55,29 @@ describe('NodeService', () => {
 
     jest.doMock('../../src/services/ckb-runner', () => {
       return {
-        startCkbNode: stubbedStartCKBNode
+        startCkbNode: stubbedStartCKBNode,
       }
     })
     jest.doMock('../../src/services/networks', () => {
       return {
         getInstance: () => ({
           get: stubbedNetworsServiceGet,
-          getCurrent: stubbedNetworsServiceGet
+          getCurrent: stubbedNetworsServiceGet,
         }),
       }
     })
     jest.doMock('../../src/models/subjects/node', () => {
       return {
         ConnectionStatusSubject: {
-          next: stubbedConnectionStatusSubjectNext
-        }
+          next: stubbedConnectionStatusSubjectNext,
+        },
       }
     })
     jest.doMock('../../src/models/subjects/networks', () => {
       return {
         CurrentNetworkIDSubject: {
-          subscribe: stubbedCurrentNetworkIDSubjectSubscribe
-        }
+          subscribe: stubbedCurrentNetworkIDSubjectSubscribe,
+        },
       }
     })
     jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
@@ -102,17 +102,19 @@ describe('NodeService', () => {
 
     jest.doMock('fs', () => ({
       existsSync: existsSyncMock,
-      readFileSync: readFileSyncMock
+      readFileSync: readFileSyncMock,
     }))
 
     jest.doMock('electron', () => {
       return {
         app: {
-          get isPackaged() { return isPackagedMock() },
-          getAppPath: getAppPathMock
+          get isPackaged() {
+            return isPackagedMock()
+          },
+          getAppPath: getAppPathMock,
         },
         dialog: {
-          showMessageBox: showMessageBoxMock
+          showMessageBox: showMessageBoxMock,
         },
         shell: shellMock,
       }
@@ -120,32 +122,32 @@ describe('NodeService', () => {
 
     jest.doMock('../../src/env.ts', () => ({
       app: {
-        quit: () => {}
+        quit: () => {},
       },
     }))
 
     jest.doMock('../../src/services/monitor', () => startMonitorMock)
 
     jest.doMock('../../src/utils/rpc-request', () => ({
-      rpcRequest: rpcRequestMock
+      rpcRequest: rpcRequestMock,
     }))
 
     jest.doMock('../../src/services/rpc-service', () => {
-      return function() {
+      return function () {
         return {
           getChain: getChainMock,
-          getLocalNodeInfo: getLocalNodeInfoMock
+          getLocalNodeInfo: getLocalNodeInfoMock,
         }
       }
     })
 
     stubbedRxjsDebounceTime.mockReturnValue((x: any) => x)
     getChainMock.mockRejectedValue('no chain')
-  });
+  })
 
   afterEach(() => {
     jest.clearAllTimers()
-  });
+  })
 
   describe('when targets external node', () => {
     beforeEach(async () => {
@@ -155,15 +157,15 @@ describe('NodeService', () => {
           getTipBlockNumber: stubbedGetTipBlockNumber,
         },
         node: {
-          url: fakeHTTPUrl
-        }
+          url: fakeHTTPUrl,
+        },
       }))
 
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
 
       jest.advanceTimersByTime(1000)
-    });
+    })
     it('emits disconnected event in ConnectionStatusSubject', () => {
       expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
         url: fakeHTTPUrl,
@@ -177,7 +179,7 @@ describe('NodeService', () => {
         stubbedConnectionStatusSubjectNext.mockReset()
         stubbedGetTipBlockNumber.mockResolvedValueOnce('0x1')
         jest.advanceTimersByTime(1000)
-      });
+      })
       it('emits connected event in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
           url: fakeHTTPUrl,
@@ -192,7 +194,7 @@ describe('NodeService', () => {
           stubbedConnectionStatusSubjectNext.mockReset()
           stubbedGetTipBlockNumber.mockRejectedValueOnce(new Error())
           jest.advanceTimersByTime(1000)
-        });
+        })
         it('emits disconnected event in ConnectionStatusSubject', () => {
           expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
             url: fakeHTTPUrl,
@@ -201,9 +203,9 @@ describe('NodeService', () => {
             startedBundledNode: false,
           })
         })
-      });
-    });
-  });
+      })
+    })
+  })
   describe('when targets bundled node', () => {
     beforeEach(async () => {
       stubbedCKB.mockImplementation(() => ({
@@ -212,8 +214,8 @@ describe('NodeService', () => {
           getTipBlockNumber: stubbedGetTipBlockNumber,
         },
         node: {
-          url: BUNDLED_CKB_URL
-        }
+          url: BUNDLED_CKB_URL,
+        },
       }))
 
       const NodeService = require('../../src/services/node').default
@@ -221,15 +223,15 @@ describe('NodeService', () => {
       nodeService.verifyNodeVersion = () => {}
       nodeService.verifyStartWithIndexer = () => {}
 
-      stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
-    });
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
+    })
     describe('when node starts', () => {
       beforeEach(async () => {
         stubbedStartCKBNode.mockResolvedValue(true)
         await nodeService.tryStartNodeOnDefaultURI()
 
         jest.advanceTimersByTime(1000)
-      });
+      })
       it('emits disconnected event in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
           url: BUNDLED_CKB_URL,
@@ -243,7 +245,7 @@ describe('NodeService', () => {
           stubbedConnectionStatusSubjectNext.mockReset()
           stubbedGetTipBlockNumber.mockResolvedValueOnce('0x1')
           jest.advanceTimersByTime(1000)
-        });
+        })
         it('emits connected event in ConnectionStatusSubject', () => {
           expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
             url: BUNDLED_CKB_URL,
@@ -258,7 +260,7 @@ describe('NodeService', () => {
             stubbedConnectionStatusSubjectNext.mockReset()
             stubbedGetTipBlockNumber.mockRejectedValueOnce(new Error())
             jest.advanceTimersByTime(1000)
-          });
+          })
           it('emits disconnected event in ConnectionStatusSubject', () => {
             expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
               url: BUNDLED_CKB_URL,
@@ -267,18 +269,18 @@ describe('NodeService', () => {
               startedBundledNode: true,
             })
           })
-        });
-      });
-    });
+        })
+      })
+    })
     describe('when node failed to start', () => {
       beforeEach(async () => {
         stubbedStartCKBNode.mockRejectedValue(new Error())
         await nodeService.tryStartNodeOnDefaultURI()
-      });
+      })
       it('logs error', () => {
         expect(stubbedLoggerInfo).toHaveBeenCalledWith('CKB:	fail to start bundled CKB with error:')
         expect(stubbedLoggerError).toHaveBeenCalledWith(new Error())
-      });
+      })
       it('emits disconnected event in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
           url: BUNDLED_CKB_URL,
@@ -287,8 +289,8 @@ describe('NodeService', () => {
           startedBundledNode: false,
         })
       })
-    });
-  });
+    })
+  })
   describe('CurrentNetworkIDSubject#subscribe', () => {
     let eventCallback: any
     const stubbedTipNumberSubjectCallback = jest.fn()
@@ -299,8 +301,8 @@ describe('NodeService', () => {
           getTipBlockNumber: stubbedGetTipBlockNumber,
         },
         node: {
-          url: fakeHTTPUrl
-        }
+          url: fakeHTTPUrl,
+        },
       }))
 
       const NodeService = require('../../src/services/node').default
@@ -309,7 +311,7 @@ describe('NodeService', () => {
       nodeService.verifyNodeVersion = () => {}
       nodeService.verifyStartWithIndexer = () => {}
       eventCallback = stubbedCurrentNetworkIDSubjectSubscribe.mock.calls[0][0]
-    });
+    })
     it('emits disconnected event in ConnectionStatusSubject', () => {
       expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
         url: fakeHTTPUrl,
@@ -328,12 +330,12 @@ describe('NodeService', () => {
           nodeService.ckb.node.url = bundledNodeUrl
         })
         stubbedStartCKBNode.mockResolvedValue(true)
-        stubbedNetworsServiceGet.mockReturnValue({remote: bundledNodeUrl})
+        stubbedNetworsServiceGet.mockReturnValue({ remote: bundledNodeUrl })
         await nodeService.tryStartNodeOnDefaultURI()
 
-        await eventCallback({currentNetworkID: 'network1'})
+        await eventCallback({ currentNetworkID: 'network1' })
         jest.advanceTimersByTime(10000)
-      });
+      })
       it('sets startedBundledNode to true in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
           url: bundledNodeUrl,
@@ -349,9 +351,9 @@ describe('NodeService', () => {
             nodeService.ckb.node.url = fakeHTTPUrl
           })
 
-          await eventCallback({currentNetworkID: 'network2'})
+          await eventCallback({ currentNetworkID: 'network2' })
           jest.advanceTimersByTime(10000)
-        });
+        })
         it('sets startedBundledNode to true in ConnectionStatusSubject', () => {
           expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
             url: fakeHTTPUrl,
@@ -360,65 +362,65 @@ describe('NodeService', () => {
             startedBundledNode: false,
           })
         })
-      });
-    });
+      })
+    })
     describe('with http url', () => {
       beforeEach(async () => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({remote: fakeHTTPUrl})
-        await eventCallback({currentNetworkID: 'test'})
-      });
+        stubbedNetworsServiceGet.mockReturnValueOnce({ remote: fakeHTTPUrl })
+        await eventCallback({ currentNetworkID: 'test' })
+      })
       it('sets http agent', () => {
         expect(stubbedCKBSetNode).toHaveBeenCalledWith(
           expect.objectContaining({
             url: fakeHTTPUrl,
-            httpAgent: expect.anything()
+            httpAgent: expect.anything(),
           })
         )
-      });
-    });
+      })
+    })
     describe('with https url', () => {
       beforeEach(async () => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({remote: fakeHTTPSUrl})
-        await eventCallback({currentNetworkID: 'test'})
-      });
+        stubbedNetworsServiceGet.mockReturnValueOnce({ remote: fakeHTTPSUrl })
+        await eventCallback({ currentNetworkID: 'test' })
+      })
       it('sets https agent', () => {
         expect(stubbedCKBSetNode).toHaveBeenCalledWith(
           expect.objectContaining({
             url: fakeHTTPSUrl,
-            httpsAgent: expect.anything()
+            httpsAgent: expect.anything(),
           })
         )
-      });
-    });
+      })
+    })
     describe('with invalid url', () => {
       beforeEach(() => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({remote: 'invalidurl'})
-      });
+        stubbedNetworsServiceGet.mockReturnValueOnce({ remote: 'invalidurl' })
+      })
       it('throws error', async () => {
         let err
         try {
-          await eventCallback({currentNetworkID: 'test'})
+          await eventCallback({ currentNetworkID: 'test' })
         } catch (error) {
           err = error
         }
         expect(err).toEqual(new Error('Protocol of url should be specified'))
-      });
-    });
+      })
+    })
     describe('when url is not a string', () => {
       beforeEach(() => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({remote: {}})
-      });
+        stubbedNetworsServiceGet.mockReturnValueOnce({ remote: {} })
+      })
       it('throws error', async () => {
         let err
         try {
-          await eventCallback({currentNetworkID: 'test'})
+          await eventCallback({ currentNetworkID: 'test' })
         } catch (error) {
           err = error
         }
         expect(err).toEqual(new Error('should-be-type-of'))
-      });
-    });
-  });
+      })
+    })
+  })
   describe('test get node version', () => {
     beforeEach(() => {
       const NodeService = require('../../src/services/node').default
@@ -436,12 +438,12 @@ describe('NodeService', () => {
     })
     it('exist version file with new line', () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v0.107.0\n")
+      readFileSyncMock.mockReturnValue('v0.107.0\n')
       expect(nodeService.getInternalNodeVersion()).toBe('0.107.0')
     })
     it('exist version file without new line', () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v0.107.0")
+      readFileSyncMock.mockReturnValue('v0.107.0')
       expect(nodeService.getInternalNodeVersion()).toBe('0.107.0')
     })
   })
@@ -449,7 +451,7 @@ describe('NodeService', () => {
     beforeEach(() => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
-      stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
     })
     it('get internal version failed', async () => {
       existsSyncMock.mockReturnValue(false)
@@ -459,35 +461,35 @@ describe('NodeService', () => {
     })
     it('get internal version success and same', async () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v0.107.0")
+      readFileSyncMock.mockReturnValue('v0.107.0')
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(0)
     })
     it('get internal version success and patch not same', async () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v0.107.1")
+      readFileSyncMock.mockReturnValue('v0.107.1')
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(0)
     })
     it('major is same and minor is not same with major 0', async () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v0.107.0")
+      readFileSyncMock.mockReturnValue('v0.107.0')
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(1)
     })
     it('major is same and minor is not same with major 1', async () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v1.107.0")
+      readFileSyncMock.mockReturnValue('v1.107.0')
       getLocalNodeInfoMock.mockResolvedValue({ version: '1.108.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(0)
     })
     it('major is not same', async () => {
       existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue("v1.107.0")
+      readFileSyncMock.mockReturnValue('v1.107.0')
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
       await nodeService.verifyNodeVersion()
       expect(showMessageBoxMock).toBeCalledTimes(1)
@@ -497,7 +499,7 @@ describe('NodeService', () => {
     beforeEach(() => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
-      stubbedNetworsServiceGet.mockReturnValueOnce({remote: BUNDLED_CKB_URL})
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
     })
     it('start with indexer', async () => {
       rpcRequestMock.mockResolvedValue({})
@@ -505,7 +507,7 @@ describe('NodeService', () => {
       expect(showMessageBoxMock).toBeCalledTimes(0)
     })
     it('start without indexer', async () => {
-      rpcRequestMock.mockResolvedValue({ error: { code: START_WITHOUT_INDEXER }})
+      rpcRequestMock.mockResolvedValue({ error: { code: START_WITHOUT_INDEXER } })
       await nodeService.verifyStartWithIndexer()
       expect(showMessageBoxMock).toBeCalledTimes(1)
     })
@@ -515,4 +517,4 @@ describe('NodeService', () => {
       expect(showMessageBoxMock).toBeCalledTimes(1)
     })
   })
-});
+})

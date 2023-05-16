@@ -24,7 +24,7 @@ export default class TransactionsController {
       keywords.trim()
     ).catch(() => ({
       totalCount: 0,
-      items: [] as Transaction[]
+      items: [] as Transaction[],
     }))
     transactions.items = await Promise.all(
       transactions.items.map(async tx => {
@@ -41,7 +41,7 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: { ...params, ...transactions, keywords, walletID }
+      result: { ...params, ...transactions, keywords, walletID },
     }
   }
 
@@ -96,14 +96,14 @@ export default class TransactionsController {
       result: { ...transaction, outputsCount, inputsCount } as Transaction & {
         outputsCount: string
         inputsCount: string
-      }
+      },
     }
   }
 
   public async updateDescription({
     walletID,
     hash,
-    description
+    description,
   }: {
     walletID: string
     hash: string
@@ -113,7 +113,7 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: { hash, description }
+      result: { hash, description },
     }
   }
 
@@ -127,7 +127,7 @@ export default class TransactionsController {
     try {
       const { canceled, filePath } = await dialog.showSaveDialog({
         title: t('export-transactions.export-transactions'),
-        defaultPath: `transactions_${Date.now()}.csv`
+        defaultPath: `transactions_${Date.now()}.csv`,
       })
       if (canceled || !filePath) {
         return
@@ -135,11 +135,11 @@ export default class TransactionsController {
       const total = await TransactionsService.exportTransactions({ walletID, filePath })
       dialog.showMessageBox({
         type: 'info',
-        message: t('export-transactions.transactions-exported', { file: filePath, total })
+        message: t('export-transactions.transactions-exported', { file: filePath, total }),
       })
       return {
         status: ResponseCode.Success,
-        result: total
+        result: total,
       }
     } catch (err) {
       dialog.showErrorBox(t('common.error'), err.message)

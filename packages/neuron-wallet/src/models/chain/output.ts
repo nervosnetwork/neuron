@@ -10,7 +10,7 @@ export enum OutputStatus {
   Live = 'live',
   Pending = 'pending',
   Dead = 'dead',
-  Failed = 'failed'
+  Failed = 'failed',
 }
 
 // empty string '' means not customized lock / type / data
@@ -105,7 +105,7 @@ export default class Output {
     blockHash,
     depositOutPoint,
     depositTimestamp,
-    multiSignBlake160
+    multiSignBlake160,
   }: {
     capacity: string
     data?: string
@@ -214,7 +214,7 @@ export default class Output {
     return {
       capacity: HexUtils.toHex(this.capacity),
       lock: this.lock.toSDK(),
-      type: this.type ? this.type.toSDK() : this.type
+      type: this.type ? this.type.toSDK() : this.type,
     }
   }
 

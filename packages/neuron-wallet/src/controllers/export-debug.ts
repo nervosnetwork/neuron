@@ -13,14 +13,13 @@ import redistCheck from '../utils/redist-check'
 import SettingsService from '../services/settings'
 
 export default class ExportDebugController {
-  // eslint-disable-next-line prettier/prettier
   #I18N_PATH = 'export-debug-info'
   #ANONYMOUS_ADDRESS = 'http://****:port'
   private archive: archiver.Archiver
 
   constructor() {
     this.archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     })
     this.archive.on('error', err => {
       dialog.showErrorBox(t('common.error'), err.message)
@@ -31,17 +30,22 @@ export default class ExportDebugController {
     try {
       const { canceled, filePath } = await dialog.showSaveDialog({
         title: t(`${this.#I18N_PATH}.export-debug-info`),
-        defaultPath: `neuron_debug_${Date.now()}.zip`
+        defaultPath: `neuron_debug_${Date.now()}.zip`,
       })
       if (canceled || !filePath) {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await Promise.all([this.addStatusFile(), this.addBundledCKBLog(), this.addLogFiles(), this.addHdPublicKeyInfoCsv()])
+      await Promise.all([
+        this.addStatusFile(),
+        this.addBundledCKBLog(),
+        this.addLogFiles(),
+        this.addHdPublicKeyInfoCsv(),
+      ])
       await this.archive.finalize()
       dialog.showMessageBox({
         type: 'info',
-        message: t(`${this.#I18N_PATH}.debug-info-exported`, { file: filePath })
+        message: t(`${this.#I18N_PATH}.debug-info-exported`, { file: filePath }),
       })
     } catch (err) {
       dialog.showErrorBox(t('common.error'), err.message)
@@ -66,17 +70,15 @@ export default class ExportDebugController {
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
         .catch(() => ''),
-      ckb.rpc
-        .getPeers()
-        .catch(() => []),
-      redistCheck()
+      ckb.rpc.getPeers().catch(() => []),
+      redistCheck(),
     ])
     const { platform, arch } = process
     const release = os.release()
     const status = {
       neuron: {
         version: neuronVersion,
-        blockNumber: syncedBlockNumber
+        blockNumber: syncedBlockNumber,
       },
       ckb: {
         url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : this.#ANONYMOUS_ADDRESS,
@@ -88,11 +90,11 @@ export default class ExportDebugController {
         platform,
         arch,
         release,
-        vcredist
-      }
+        vcredist,
+      },
     }
     this.archive.append(JSON.stringify(status), {
-      name: 'status.json'
+      name: 'status.json',
     })
   }
 
@@ -102,13 +104,17 @@ export default class ExportDebugController {
 
     return new Promise((resolve, reject) => {
       const logPath = path.resolve(SettingsService.getInstance().ckbDataPath, 'data', 'logs', 'run.log')
-      if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
+      if (!fs.existsSync(logPath)) {
+        return reject(new Error('File not found'))
+      }
 
       const fileStats = fs.statSync(logPath)
       const position = fileStats.size - SIZE_TO_READ
 
       fs.open(logPath, 'r', (openErr, fd) => {
-        if (openErr) { return reject(openErr) }
+        if (openErr) {
+          return reject(openErr)
+        }
         fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
           fs.close(fd, closeErr => {
             const err = closeErr || readErr
@@ -119,12 +125,13 @@ export default class ExportDebugController {
           })
         })
       })
-
-    }).then((log: string) => {
-      this.archive.append(log, { name })
-    }).catch(err => {
-      this.archive.append(err.message, { name })
     })
+      .then((log: string) => {
+        this.archive.append(log, { name })
+      })
+      .catch(err => {
+        this.archive.append(err.message, { name })
+      })
   }
 
   private async addHdPublicKeyInfoCsv() {

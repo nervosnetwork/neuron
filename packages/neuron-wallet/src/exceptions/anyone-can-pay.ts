@@ -32,5 +32,5 @@ export class SudtAcpHaveDataError extends Error {
 
 export default {
   TargetOutputNotFoundError,
-  AcpSendSameAccountError
+  AcpSendSameAccountError,
 }
