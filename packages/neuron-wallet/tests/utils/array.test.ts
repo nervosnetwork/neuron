@@ -25,7 +25,10 @@ describe('Key tests', () => {
   it('eachSlice', () => {
     const arr: number[] = [1, 2, 3, 4, 5, 6]
     const result = ArrayUtils.eachSlice(arr, 4)
-    expect(result).toEqual([[1, 2, 3, 4], [5, 6]])
+    expect(result).toEqual([
+      [1, 2, 3, 4],
+      [5, 6],
+    ])
   })
 
   it('range', () => {

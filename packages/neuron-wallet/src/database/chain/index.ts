@@ -22,9 +22,5 @@ export const clean = async () => {
   ])
   MultisigOutputChangedSubject.getSubject().next('reset')
 
-  await getConnection()
-    .createQueryBuilder()
-    .delete()
-    .from(SyncInfoEntity)
-    .execute()
+  await getConnection().createQueryBuilder().delete().from(SyncInfoEntity).execute()
 }

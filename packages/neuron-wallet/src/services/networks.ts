@@ -19,9 +19,9 @@ const presetNetworks: { selected: string; networks: Network[] } = {
       remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
-      chain: 'ckb'
-    }
-  ]
+      chain: 'ckb',
+    },
+  ],
 }
 
 const lightClientNetwork: Network[] = [
@@ -107,7 +107,7 @@ export default class NetworksService extends Store {
       remote,
       type,
       genesisHash: EMPTY_GENESIS_HASH,
-      chain: 'ckb_dev'
+      chain: 'ckb_dev',
     }
     const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties).catch(
       () => properties

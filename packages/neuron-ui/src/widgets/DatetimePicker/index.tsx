@@ -26,7 +26,7 @@ export interface DatetimePickerProps {
   title?: string
   preset?: Date | string | number | null
   notice?: string
-  onConfirm: Function
+  onConfirm: (time: number) => void
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
 }
 const DatetimePicker = ({

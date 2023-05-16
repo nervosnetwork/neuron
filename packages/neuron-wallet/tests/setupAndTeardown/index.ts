@@ -1,9 +1,9 @@
-import initDB from "../../src/database/chain/ormconfig"
+import initDB from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { TransactionPersistor } from '../../src/services/tx'
-import AssetAccount from "../../src/models/asset-account"
-import OutputEntity from "../../src/database/chain/entities/output"
-import AssetAccountEntity from "../../src/database/chain/entities/asset-account"
+import AssetAccount from '../../src/models/asset-account'
+import OutputEntity from '../../src/database/chain/entities/output'
+import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
 
 export const initConnection = () => {
   return initDB(':memory:')
@@ -16,6 +16,7 @@ export const closeConnection = () => {
 export const saveTransactions = async (txs: any) => {
   for (const tx of txs) {
     // TODO: do not use private methods
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: Private method
     await TransactionPersistor.saveWithFetch(tx)
   }
@@ -23,7 +24,7 @@ export const saveTransactions = async (txs: any) => {
 
 export const createAccounts = async (assetAccounts: AssetAccount[], outputEntities: OutputEntity[]) => {
   const entities = assetAccounts.map(aa => AssetAccountEntity.fromModel(aa))
-  const accountIds = []
+  const accountIds: number[] = []
   for (const entity of entities) {
     await getConnection().manager.save([entity.sudtTokenInfo])
     const [assetAccount] = await getConnection().manager.save([entity])

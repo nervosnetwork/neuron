@@ -1,4 +1,4 @@
-declare module Controller {
+declare namespace Controller {
   interface Response<T = any> {
     status: number
     message?:

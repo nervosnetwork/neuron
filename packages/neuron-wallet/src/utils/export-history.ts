@@ -30,7 +30,7 @@ const exportHistory = async ({ walletID, filePath }: { walletID: string; filePat
         return promisify(meta).bind(target)
       }
       return meta
-    }
+    },
   })
   await wsPromises.write(`${headers.map(label => t(`export-transactions.column.${label}`))}\n`)
 
@@ -47,7 +47,7 @@ const exportHistory = async ({ walletID, filePath }: { walletID: string; filePat
       pageNo,
       pageSize: PAGE_SIZE,
       addresses,
-      walletID
+      walletID,
     })
     count = totalCount
     txs.push(...items.filter(item => item.status === 'success'))

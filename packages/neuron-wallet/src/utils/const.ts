@@ -12,9 +12,9 @@ export const START_WITHOUT_INDEXER = -4
 
 export enum ResponseCode {
   Fail,
-  Success
+  Success,
 }
 
 export default {
-  ResponseCode
+  ResponseCode,
 }

@@ -1,4 +1,3 @@
-// eslint-disable-next-line prettier/prettier
 import type Transaction from '../../models/chain/transaction'
 import WitnessArgs from '../../models/chain/witness-args'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
@@ -22,13 +21,19 @@ export abstract class Hardware {
   }
 
   // @TODO: After multi-signature feature is complete, refactor this function into `TransactionSender#sign`.
-  public async signTx (walletID: string, tx: Transaction, txHash: string, skipLastInputs: boolean = true, context?: RPC.RawTransaction[]) {
+  public async signTx(
+    walletID: string,
+    tx: Transaction,
+    txHash: string,
+    skipLastInputs: boolean = true,
+    context?: RPC.RawTransaction[]
+  ) {
     const wallet = WalletService.getInstance().get(walletID)
     const addressInfos = await AddressService.getAddressesByWalletId(walletID)
     const witnessSigningEntries = tx.inputs.slice(0, skipLastInputs ? -1 : tx.inputs.length).map((input, index) => {
       const lockArgs: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
-      const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
+      const witnessArgs: WitnessArgs = wit instanceof WitnessArgs ? wit : WitnessArgs.generateEmpty()
       return {
         witnessArgs,
         lockHash: input.lockHash!,
@@ -37,24 +42,24 @@ export abstract class Hardware {
       }
     })
 
-    const isMultisig = tx.inputs.length === 1 &&
-      tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
+    const isMultisig =
+      tx.inputs.length === 1 && tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
-    const multiSignBlake160s = isMultisig ? addressInfos.map(i => {
-      return {
-        multiSignBlake160: Multisig.hash([i.blake160]),
-        path: i.path
-      }
-    }) : []
+    const multiSignBlake160s = isMultisig
+      ? addressInfos.map(i => {
+          return {
+            multiSignBlake160: Multisig.hash([i.blake160]),
+            path: i.path,
+          }
+        })
+      : []
 
     const findPath = (args: string) => {
       if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
         return multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
-      }
-      else if (args.length === 42) {
+      } else if (args.length === 42) {
         return addressInfos.find(i => i.blake160 === args)!.path
-      }
-      else {
+      } else {
         const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
         return addressInfo!.path
       }
@@ -81,13 +86,21 @@ export abstract class Hardware {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160]))!.blake160
+        const blake160 = addressInfos.find(
+          i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160])
+        )!.blake160
         const serializedMultiSign: string = Multisig.serialize([blake160])
-        const witnesses = await TransactionSender.signSingleMultiSignScript(path, serializedWitnesses, txHash, serializedMultiSign, wallet)
+        const witnesses = await TransactionSender.signSingleMultiSignScript(
+          path,
+          serializedWitnesses,
+          txHash,
+          serializedMultiSign,
+          wallet
+        )
         const signature = await this.signTransaction(
           walletID,
           tx,
-          witnesses.map(w => typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())),
+          witnesses.map(w => (typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK()))),
           path
         )
         const wit = witnesses[0] as WitnessArgs
@@ -110,7 +123,7 @@ export abstract class Hardware {
         witnessEntry.witness = serializeWitnessArgs({
           lock: '0x' + signture,
           inputType: witnessEntry.witnessArgs.inputType ?? '',
-          outputType: ''
+          outputType: '',
         })
       }
     }

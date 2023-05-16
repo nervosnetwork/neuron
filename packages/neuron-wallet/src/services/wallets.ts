@@ -65,7 +65,7 @@ export abstract class Wallet {
     name: this.name,
     extendedKey: this.extendedKey,
     device: this.device,
-    isHD: this.isHD
+    isHD: this.isHD,
   })
 
   public fromJSON = () => {
@@ -234,7 +234,7 @@ export class HardwareWallet extends Wallet {
       walletId: this.id,
       publicKey,
       addressType,
-      addressIndex
+      addressIndex,
     })
 
     if (address) {
@@ -298,7 +298,7 @@ export default class WalletService {
         const walletList = this.getAll()
         CurrentWalletSubject.next({
           currentWallet,
-          walletList
+          walletList,
         })
       }
     })

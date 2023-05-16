@@ -3,9 +3,9 @@ import { validateAssetAccountAmount } from 'utils/validators'
 
 import fixtures from './fixtures'
 
-const fixtureTable: Fixture.Validator<typeof validateAssetAccountAmount>[] = Object.entries(
-  fixtures
-).map(([title, { params, exception }]) => [title, [params], exception])
+const fixtureTable: Fixture.Validator<typeof validateAssetAccountAmount>[] = Object.entries(fixtures).map(
+  ([title, { params, exception }]) => [title, [params], exception]
+)
 
 describe(`Test sudt amount validator`, () => {
   test.each(fixtureTable)(`%s`, (_title, [params], exception) => {

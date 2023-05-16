@@ -16,20 +16,20 @@ const getTransactionStatus = async (hash: string) => {
     return {
       tx: txWithStatus,
       status: TransactionStatus.Failed,
-      blockHash: null
+      blockHash: null,
     }
   }
   if (txWithStatus.txStatus.isCommitted()) {
     return {
       tx: txWithStatus.transaction,
       status: TransactionStatus.Success,
-      blockHash: txWithStatus.txStatus.blockHash
+      blockHash: txWithStatus.txStatus.blockHash,
     }
   }
   return {
     tx: txWithStatus.transaction,
     status: TransactionStatus.Pending,
-    blockHash: null
+    blockHash: null,
   }
 }
 
@@ -47,7 +47,7 @@ const trackingStatus = async () => {
         hash,
         tx: txWithStatus.tx,
         status: txWithStatus.status,
-        blockHash: txWithStatus.blockHash
+        blockHash: txWithStatus.blockHash,
       }
     })
   )

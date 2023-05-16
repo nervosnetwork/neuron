@@ -24,24 +24,24 @@ jest.mock('../../src/models/store', () => {
 })
 
 jest.mock('../../src/controllers/app/menu', () => ({
-  updateApplicationMenu: () => updateApplicationMenuMock()
+  updateApplicationMenu: () => updateApplicationMenuMock(),
 }))
 
 jest.mock('electron', () => ({
   BrowserWindow: {
-    getAllWindows: jest.fn().mockReturnValue([])
-  }
+    getAllWindows: jest.fn().mockReturnValue([]),
+  },
 }))
 
 jest.mock('path', () => ({
-  resolve: () => resolveMock()
+  resolve: () => resolveMock(),
 }))
 
 jest.mock('env', () => ({
   app: {
     getLocale: () => getLocaleMock(),
-    getPath: () => getPathMock()
-  }
+    getPath: () => getPathMock(),
+  },
 }))
 
 describe('SettingsService', () => {
@@ -66,7 +66,9 @@ describe('SettingsService', () => {
       expect(updateApplicationMenuMock).toHaveBeenCalled()
     })
     it('set exception', () => {
-      expect(() => SettingsService.getInstance().locale = 'zh11' as any).toThrow(new Error(`Locale zh11 not supported`))
+      expect(() => (SettingsService.getInstance().locale = 'zh11' as any)).toThrow(
+        new Error(`Locale zh11 not supported`)
+      )
     })
   })
 

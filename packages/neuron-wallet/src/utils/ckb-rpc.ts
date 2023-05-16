@@ -186,7 +186,6 @@ export class LightRPC extends Base {
     } as CKBComponents.BlockchainInfo
   }
 
-  // eslint-disable-next-line prettier/prettier
   #node: CKBComponents.Node = {
     url: '',
   }
@@ -230,15 +229,14 @@ export class LightRPC extends Base {
     }
   }
 
-  /* eslint-disable prettier/prettier */
   public createBatchRequest = <N extends keyof Base, P extends (string | number | object)[], R = any[]>(
     params: [method: N, ...rest: P][] = [],
   ) => {
-    const ctx = this
+    const methods = Object.keys(this)
+    const { node, rpcProperties } = this
 
     const proxied: [method: N, ...rest: P][] = new Proxy([], {
       set(...p) {
-        const methods = Object.keys(ctx)
         if (p[1] !== 'length') {
           const name = p?.[2]?.[0]
           if (methods.indexOf(name) === -1) {
@@ -266,14 +264,14 @@ export class LightRPC extends Base {
         async value() {
           const payload = proxied.map(([f, ...p], i) => {
             try {
-              const method = new Method(ctx.node, { ...({ ...ctx.rpcProperties, ...lightRPCProperties }[f]), name: f })
+              const method = new Method(node, { ...({ ...rpcProperties, ...lightRPCProperties }[f]), name: f })
               return method.getPayload(...p)
             } catch (err) {
               throw new PayloadInBatchException(i, err.message)
             }
           })
 
-          const res = await request(ctx.#node.url, {
+          const res = await request(node.url, {
             method: 'POST',
             body: JSON.stringify(payload),
             headers: { 'content-type': 'application/json' },
@@ -284,7 +282,7 @@ export class LightRPC extends Base {
             if (res.id !== payload[i].id) {
               return new IdNotMatchedInBatchException(i, payload[i].id, res.id)
             }
-            return ({ ...ctx.rpcProperties, ...lightRPCProperties })[proxied[i][0]].resultFormatters?.(res.result) ?? res.result
+            return ({ ...rpcProperties, ...lightRPCProperties })[proxied[i][0]].resultFormatters?.(res.result) ?? res.result
           })
         },
       },

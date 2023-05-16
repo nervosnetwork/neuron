@@ -121,7 +121,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ],
     logger: 'simple-console',
     logging,
-    maxQueryExecutionTime: 30
+    maxQueryExecutionTime: 30,
   }
 }
 

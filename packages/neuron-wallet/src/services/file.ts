@@ -18,7 +18,7 @@ export default class FileService {
   public basePath = process.env['fileBasePath'] ?? env.fileBasePath
 
   public config: fs.WriteFileOptions = {
-    encoding: 'utf8'
+    encoding: 'utf8',
   }
 
   constructor() {

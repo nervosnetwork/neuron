@@ -23,7 +23,7 @@ describe('hardware controller', () => {
       try {
         await hardwareControler.connectDevice({
           ...ledgerNanoS,
-          descriptor: '@throw me a error'
+          descriptor: '@throw me a error',
         })
       } catch (error) {
         expect(error).toEqual(new connectDeviceFailed())
@@ -34,26 +34,26 @@ describe('hardware controller', () => {
   it('#getCkbAppVersion', async () => {
     const { result } = await hardwareControler.getCkbAppVersion()
     expect(result).toBe(LedgerCkbApp.version)
-   })
+  })
 
-   it('#getPublicKey', async () => {
-     const { result } = await hardwareControler.getPublicKey()
-     expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
-     expect(result!.lockArg).toBe(LedgerCkbApp.lockArg)
-     expect(result!.address).toBe(LedgerCkbApp.address)
-   })
+  it('#getPublicKey', async () => {
+    const { result } = await hardwareControler.getPublicKey()
+    expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
+    expect(result!.lockArg).toBe(LedgerCkbApp.lockArg)
+    expect(result!.address).toBe(LedgerCkbApp.address)
+  })
 
-   it('#getExtendedPublicKey', async () => {
-     const { result } = await hardwareControler.getExtendedPublicKey()
-     expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
-     expect(result!.chainCode).toBe(LedgerCkbApp.chainCode)
-   })
+  it('#getExtendedPublicKey', async () => {
+    const { result } = await hardwareControler.getExtendedPublicKey()
+    expect(result!.publicKey).toBe(LedgerCkbApp.publicKey)
+    expect(result!.chainCode).toBe(LedgerCkbApp.chainCode)
+  })
 
-   it('#detectDevice', async () => {
+  it('#detectDevice', async () => {
     const { result } = await hardwareControler.detectDevice({
       manufacturer: Manufacturer.Ledger,
-      product: 'Nano S'
+      product: 'Nano S',
     })
     expect(result).toEqual([ledgerNanoS])
-   })
+  })
 })

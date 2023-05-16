@@ -15,26 +15,25 @@ export enum SyncStatus {
   SyncNotStart,
   SyncPending,
   Syncing,
-  SyncCompleted
+  SyncCompleted,
 }
 
 interface SyncState {
-  nodeUrl: string,
-  timestamp: number,
-  indexerTipNumber: number,
-  cacheTipNumber: number,
-  bestKnownBlockNumber: number,
-  bestKnownBlockTimestamp: number,
-  indexRate: number | undefined,
-  cacheRate: number | undefined,
-  estimate: number | undefined,
+  nodeUrl: string
+  timestamp: number
+  indexerTipNumber: number
+  cacheTipNumber: number
+  bestKnownBlockNumber: number
+  bestKnownBlockTimestamp: number
+  indexRate: number | undefined
+  cacheRate: number | undefined
+  estimate: number | undefined
   status: SyncStatus
-  isLookingValidTarget?: boolean,
+  isLookingValidTarget?: boolean
   validTarget?: string
 }
 
 export default class SyncApiController {
-  // eslint-disable-next-line prettier/prettier
   #syncedBlockNumber = new SyncedBlockNumber()
   static emiter = new EventEmiter()
   private static instance: SyncApiController
@@ -61,8 +60,7 @@ export default class SyncApiController {
   #getEstimatesByCurrentNode = () => {
     const nodeUrl = NodeService.getInstance().nodeUrl
     return this.#estimates.filter(
-      state => state.nodeUrl === nodeUrl &&
-        Date.now() - state.timestamp <= this.#sampleTime
+      state => state.nodeUrl === nodeUrl && Date.now() - state.timestamp <= this.#sampleTime
     )
   }
 
@@ -150,7 +148,7 @@ export default class SyncApiController {
       estimate: undefined,
       status: SyncStatus.Syncing,
       isLookingValidTarget: getLookingValidTargetStatus(),
-      validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
+      validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET,
     }
 
     if (foundBestKnownBlockNumber) {
@@ -194,7 +192,8 @@ export default class SyncApiController {
       return this.#cachedEstimation
     }
 
-    if (this.#estimates.length > 1 &&
+    if (
+      this.#estimates.length > 1 &&
       this.#estimates[this.#estimates.length - 2].cacheTipNumber === lastEstimation.cacheTipNumber
     ) {
       this.#cachedEstimation = lastEstimation
@@ -203,7 +202,8 @@ export default class SyncApiController {
 
     const nodeUrl = NodeService.getInstance().nodeUrl
 
-    if (this.#cachedEstimation.nodeUrl !== nodeUrl ||
+    if (
+      this.#cachedEstimation.nodeUrl !== nodeUrl ||
       this.#cachedEstimation.timestamp + this.#sampleTime <= Date.now()
     ) {
       this.#cachedEstimation = lastEstimation
@@ -213,14 +213,13 @@ export default class SyncApiController {
   }
 
   #registerHandlers = () => {
-
     // FIX: remove listener when sync task stopped
     // Export handler to devtools
     SyncApiController.emiter.on('cache-tip-block-updated', async states => {
       const newSyncState = await this.#estimate(states)
       this.#syncedBlockNumber.setNextBlock(BigInt(newSyncState.cacheTipNumber))
       SyncStateSubject.next(newSyncState)
-      await MultisigService.syncMultisigOutput(`0x${(BigInt(newSyncState.cacheTipNumber)).toString(16)}`)
+      await MultisigService.syncMultisigOutput(`0x${BigInt(newSyncState.cacheTipNumber).toString(16)}`)
     })
 
     CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {
@@ -236,12 +235,11 @@ export default class SyncApiController {
         cacheRate: undefined,
         estimate: undefined,
         status: SyncStatus.SyncNotStart,
-        validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET
+        validTarget: process.env.CKB_NODE_ASSUME_VALID_TARGET,
       }
       this.#estimates = [newSyncState]
 
       SyncStateSubject.next(newSyncState)
     })
   }
-
 }

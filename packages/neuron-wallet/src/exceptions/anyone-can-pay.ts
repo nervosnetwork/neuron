@@ -38,5 +38,5 @@ export class LightClientNotSupportSendToACPError extends Error {
 
 export default {
   TargetOutputNotFoundError,
-  AcpSendSameAccountError
+  AcpSendSameAccountError,
 }

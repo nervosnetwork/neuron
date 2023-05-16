@@ -41,8 +41,8 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
 }
 
 export const useOnSubmit = (
-  name: string = '',
-  id: string = '',
+  name: string,
+  id: string,
   history: ReturnType<typeof useHistory>,
   dispatch: StateDispatch,
   disabled: boolean
@@ -66,7 +66,7 @@ export const useOnSubmit = (
   )
 }
 
-export const useHint = (name: string, usedNames: string[], t: Function): string | null => {
+export const useHint = (name: string, usedNames: string[], t: (key: string, opts: object) => string): string | null => {
   return useMemo(() => {
     if (name === '') {
       return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'name' })

@@ -17,7 +17,7 @@ describe('Test exporting history', () => {
   const stubProvider = {
     walletID: WALLET_ID,
     chainType: MAINNET_CHAIN_TYPE,
-    filePath: FILE_PATH
+    filePath: FILE_PATH,
   }
 
   beforeAll(async () => {

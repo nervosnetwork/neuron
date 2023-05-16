@@ -48,17 +48,17 @@ stubbedRPCServiceConstructor.mockImplementation(() => ({
   getTransaction: stubbedGetTransaction,
   getBlockByNumber: stubbedGetBlockByNumber,
   getHeaderByNumber: stubbedGetHeaderByNumber,
-  getHeader: stubbedGetHeader
+  getHeader: stubbedGetHeader,
 }))
 
 stubbedWalletsServiceConstructor.mockImplementation(() => ({
   get: stubbedGetWallet,
-  isHardware: () => false
+  isHardware: () => false,
 }))
 //@ts-ignore
 stubbedWalletsServiceConstructor.getInstance = () => ({
   get: stubbedGetWallet,
-  getCurrent: stubbedGetCurrentWallet
+  getCurrent: stubbedGetCurrentWallet,
 })
 
 jest.doMock('services/rpc-service', () => {
@@ -75,21 +75,21 @@ jest.doMock('services/tx/transaction-generator', () => {
       generateSendingAllTx: stubbedGenerateSendingAllTx,
       generateTx: stubbedGenerateTx,
       generateDepositAllTx: stubbedGenerateDepositAllTx,
-      generateWithdrawMultiSignTx: stubbedGenerateWithdrawMultiSignTx
-    }
+      generateWithdrawMultiSignTx: stubbedGenerateWithdrawMultiSignTx,
+    },
   }
 })
 jest.doMock('services/tx/transaction-persistor', () => {
   return {
     TransactionPersistor: {
-      saveSentTx: stubbedSaveWithSentTx
-    }
+      saveSentTx: stubbedSaveWithSentTx,
+    },
   }
 })
 
 jest.doMock('services/multisig', () => {
   return {
-    saveSentMultisigOutput: jest.fn()
+    saveSentMultisigOutput: jest.fn(),
   }
 })
 
@@ -117,17 +117,17 @@ jest.mock('../../../src/models/system-script-info', () => {
             new OutPoint('0x3e6790b2f47c7de911c2def3c0a3b5bf613e457e38f185e2e566f9010e495874', '0'),
             DepType.DepGroup
           )
-        )
-    })
+        ),
+    }),
   }
 })
 jest.doMock('services/hardware', () => ({
   getInstance: () => ({
     getCurrent: stubbedHardWalletGetCurrent,
     initHardware: () => ({
-      connect: jest.fn()
-    })
-  })
+      connect: jest.fn(),
+    }),
+  }),
 }))
 
 jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
@@ -167,7 +167,7 @@ import {
   CapacityNotEnoughForChange,
   CapacityNotEnoughForChangeByTransfer,
   MultisigConfigNeedError,
-  NoMatchAddressForSign
+  NoMatchAddressForSign,
 } from '../../../src/exceptions'
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
@@ -190,15 +190,15 @@ const generateTxWithStatus = (
     Input.fromObject({
       previousOutput: new OutPoint('0x' + (parseInt(id) - 1).toString().repeat(64), '0'),
       since: '',
-      lock: fakeScript
-    })
+      lock: fakeScript,
+    }),
   ]
   const outputs = [
     Output.fromObject({
       capacity: '1',
       lock,
-      type
-    })
+      type,
+    }),
   ]
 
   return {
@@ -209,9 +209,9 @@ const generateTxWithStatus = (
       timestamp: block.timestamp.toString(),
       inputs,
       outputs,
-      outputsData
+      outputsData,
     }),
-    txStatus: TxStatus.fromSDK({ status: 'committed', blockHash: block.hash })
+    txStatus: TxStatus.fromSDK({ status: 'committed', blockHash: block.hash }),
   }
 }
 
@@ -219,7 +219,7 @@ describe('TransactionSender Test', () => {
   const transactionSender = new TransactionSender()
   const fakeBlock1 = { number: '1', hash: '0x' + '0'.repeat(64), timestamp: '1' }
   const fakeTx1 = generateTxWithStatus('1', fakeBlock1, undefined, SystemScriptInfo.generateDaoScript(), [
-    '0x0000000000000000'
+    '0x0000000000000000',
   ])
 
   const fakeWallet = {
@@ -237,16 +237,16 @@ describe('TransactionSender Test', () => {
           n: 1,
           r: 1,
           p: 1,
-          salt: '1'
+          salt: '1',
         },
-        mac: '1'
+        mac: '1',
       },
       '0'
     ),
     isHardware: () => false,
     getNextAddress: stubbedGetNextAddress,
     getNextChangeAddress: stubbedGetNextChangeAddress,
-    checkAndGenerateAddresses: stubbedCheckAndGenerateAddresses
+    checkAndGenerateAddresses: stubbedCheckAndGenerateAddresses,
   }
 
   const fakeCellWithStatus = CellWithStatus.fromSDK({
@@ -256,20 +256,20 @@ describe('TransactionSender Test', () => {
         lock: {
           args: '0x61c928dedf2afc8cb434c1af311a29cbb16f7076',
           codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-          hashType: 'type'
+          hashType: 'type',
         },
         type: {
           args: '0x',
           codeHash: '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e',
-          hashType: 'type'
-        }
+          hashType: 'type',
+        },
       },
       data: {
         content: '0x6400000000000000',
-        hash: '0xa731cac6893c41dba273a301c57e5bd2cf88dbcf8e1ddd39961b97dd0b710822'
-      }
+        hash: '0xa731cac6893c41dba273a301c57e5bd2cf88dbcf8e1ddd39961b97dd0b710822',
+      },
     },
-    status: 'live' as CKBComponents.CellStatus
+    status: 'live' as CKBComponents.CellStatus,
   })
 
   const fakeAddress1 = 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83'
@@ -284,7 +284,7 @@ describe('TransactionSender Test', () => {
   describe('sign', () => {
     const pathAndPrivateKey = {
       path: `m/44'/309'/0'/0/0`,
-      privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
+      privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3',
     }
 
     const mockGetPk = jest.fn()
@@ -303,7 +303,7 @@ describe('TransactionSender Test', () => {
       pendingBalance: '0',
       balance: '0',
       blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      version: 'testnet'
+      version: 'testnet',
     }
 
     const mockGAI = jest.fn()
@@ -318,25 +318,25 @@ describe('TransactionSender Test', () => {
             CellDep.fromObject({
               outPoint: OutPoint.fromObject({
                 txHash: '0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d',
-                index: '0x0'
+                index: '0x0',
               }),
-              depType: 'depGroup' as DepType
-            })
+              depType: 'depGroup' as DepType,
+            }),
           ],
           headerDeps: [],
           inputs: [
             Input.fromObject({
               previousOutput: OutPoint.fromObject({
                 txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
-                index: '0x0'
+                index: '0x0',
               }),
               since: '0x0',
               lock: Script.fromObject({
                 args: '0x36c329ed630d6ce750712a477543672adab57f4c',
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-                hashType: 'type' as ScriptHashType
-              })
-            })
+                hashType: 'type' as ScriptHashType,
+              }),
+            }),
           ],
           outputs: [
             Output.fromObject({
@@ -344,25 +344,25 @@ describe('TransactionSender Test', () => {
               lock: Script.fromObject({
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
                 args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-                hashType: 'type' as ScriptHashType
+                hashType: 'type' as ScriptHashType,
               }),
-              type: null
+              type: null,
             }),
             Output.fromObject({
               capacity: '0x12319d9962f4',
               lock: Script.fromObject({
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
                 args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-                hashType: 'type' as ScriptHashType
+                hashType: 'type' as ScriptHashType,
               }),
-              type: null
-            })
+              type: null,
+            }),
           ],
           outputsData: ['0x', '0x'],
           witnesses: [
-            '0x55000000100000005500000055000000410000003965f54cc684d35d886358ad57214e5f4a5fd13ecc7aba67950495b9be7740267a1d6bb14f1c215e3bc926f9655648b75e173ce6f5fd1e60218383b45503c30301'
+            '0x55000000100000005500000055000000410000003965f54cc684d35d886358ad57214e5f4a5fd13ecc7aba67950495b9be7740267a1d6bb14f1c215e3bc926f9655648b75e173ce6f5fd1e60218383b45503c30301',
           ],
-          hash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
+          hash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1',
         })
 
         it('success', async () => {
@@ -379,26 +379,26 @@ describe('TransactionSender Test', () => {
             CellDep.fromObject({
               outPoint: OutPoint.fromObject({
                 txHash: '0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d',
-                index: '0x1'
+                index: '0x1',
               }),
-              depType: 'depGroup' as DepType
-            })
+              depType: 'depGroup' as DepType,
+            }),
           ],
           headerDeps: [],
           inputs: [
             Input.fromObject({
               previousOutput: OutPoint.fromSDK({
                 txHash: '0xf1181e7d0ef95fa2e6c334f6aa647520a898d9f8259a2bb021a622434bc73a63',
-                index: '0x0'
+                index: '0x0',
               }),
               since: '0x2000f00078000002',
               lock: Script.fromObject({
                 // "args": "0x36c329ed630d6ce750712a477543672adab57f4c",
                 args: '0x56f281b3d4bb5fc73c751714af0bf78eb8aba0d80200007800f00020',
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-                hashType: 'type' as ScriptHashType
-              })
-            })
+                hashType: 'type' as ScriptHashType,
+              }),
+            }),
           ],
           outputs: [
             Output.fromObject({
@@ -406,18 +406,18 @@ describe('TransactionSender Test', () => {
               lock: Script.fromObject({
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
                 args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-                hashType: 'type' as ScriptHashType
+                hashType: 'type' as ScriptHashType,
               }),
-              type: null
-            })
+              type: null,
+            }),
           ],
           outputsData: ['0x'],
           witnesses: [new WitnessArgs()],
-          hash: '0x7e69c5b95b25aa70e6e72f0e29ec7b92d6415f4bdacfb9562f9d40c3fddb8dca'
+          hash: '0x7e69c5b95b25aa70e6e72f0e29ec7b92d6415f4bdacfb9562f9d40c3fddb8dca',
         })
 
         const expectedWitness = [
-          '0x6d000000100000006d0000006d000000590000000000010136c329ed630d6ce750712a477543672adab57f4c1c12c81448189a3455996c31022b8a5407a3d54ff1710eaf4220375f906cb53423040ca9f81e56f41f2df0d6cfd124dbda30b8213a0b15173b745e20449afd5401'
+          '0x6d000000100000006d0000006d000000590000000000010136c329ed630d6ce750712a477543672adab57f4c1c12c81448189a3455996c31022b8a5407a3d54ff1710eaf4220375f906cb53423040ca9f81e56f41f2df0d6cfd124dbda30b8213a0b15173b745e20449afd5401',
         ]
 
         it('success', async () => {
@@ -439,16 +439,16 @@ describe('TransactionSender Test', () => {
             Input.fromObject({
               previousOutput: OutPoint.fromObject({
                 txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
-                index: '0x0'
+                index: '0x0',
               }),
-              since: '0x0'
-            })
+              since: '0x0',
+            }),
           ],
           outputs: [],
           outputsData: [],
           witnesses: [
-            '0x5500000010000000550000005500000041000000b6d1e054606d7229b594820357397ececac31685646d3dbf07d6afe421c96ff72d32ed139f20c7b97b47ec8361c00c1924976ed90031380c488c1bae8ce3bd9d00'
-          ]
+            '0x5500000010000000550000005500000041000000b6d1e054606d7229b594820357397ececac31685646d3dbf07d6afe421c96ff72d32ed139f20c7b97b47ec8361c00c1924976ed90031380c488c1bae8ce3bd9d00',
+          ],
         })
         describe('when matched receiver lock hash', () => {
           beforeEach(() => {
@@ -489,16 +489,16 @@ describe('TransactionSender Test', () => {
             Input.fromObject({
               previousOutput: OutPoint.fromObject({
                 txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
-                index: '0x0'
+                index: '0x0',
               }),
-              since: '0x0'
-            })
+              since: '0x0',
+            }),
           ],
           outputs: [],
           outputsData: [],
           witnesses: [
-            '0x5500000010000000550000005500000041000000b6d1e054606d7229b594820357397ececac31685646d3dbf07d6afe421c96ff72d32ed139f20c7b97b47ec8361c00c1924976ed90031380c488c1bae8ce3bd9d00'
-          ]
+            '0x5500000010000000550000005500000041000000b6d1e054606d7229b594820357397ececac31685646d3dbf07d6afe421c96ff72d32ed139f20c7b97b47ec8361c00c1924976ed90031380c488c1bae8ce3bd9d00',
+          ],
         })
         describe('when matched sender lock hash', () => {
           beforeEach(() => {
@@ -551,12 +551,12 @@ describe('TransactionSender Test', () => {
       const feeRate = '10'
       const targetOutputs = [
         { address: '1', capacity: '1' },
-        { address: '1', capacity: '1' }
+        { address: '1', capacity: '1' },
       ]
       beforeEach(() => {
         stubbedGetCurrentWallet.mockReturnValue(fakeWallet)
         stubbedGetNextChangeAddress.mockReturnValue({
-          address: fakeAddress1
+          address: fakeAddress1,
         })
       })
       describe('success', () => {
@@ -568,7 +568,7 @@ describe('TransactionSender Test', () => {
             fakeWallet.id,
             [
               { address: '1', capacity: '1' },
-              { address: '1', capacity: '1' }
+              { address: '1', capacity: '1' },
             ],
             fakeAddress1,
             fee,
@@ -594,7 +594,7 @@ describe('TransactionSender Test', () => {
       beforeEach(async () => {
         const targetOutputs = [
           { address: '1', capacity: '1' },
-          { address: '1', capacity: '1' }
+          { address: '1', capacity: '1' },
         ]
         await transactionSender.generateSendingAllTx(fakeWallet.id, targetOutputs, fee, feeRate)
       })
@@ -603,7 +603,7 @@ describe('TransactionSender Test', () => {
           fakeWallet.id,
           [
             { address: '1', capacity: '1' },
-            { address: '1', capacity: '1' }
+            { address: '1', capacity: '1' },
           ],
           fee,
           feeRate
@@ -615,14 +615,14 @@ describe('TransactionSender Test', () => {
       it('generates transaction', async () => {
         const targetOutputs = [
           { address: '1', capacity: '1' },
-          { address: '1', capacity: '1' }
+          { address: '1', capacity: '1' },
         ]
         const multisigConfig = MultisigConfigModel.fromObject({
           walletId: 'walletId',
           m: 1,
           n: 1,
           r: 1,
-          blake160s: ['blake160s']
+          blake160s: ['blake160s'],
         })
         await transactionSender.generateMultisigSendAllTx(targetOutputs, multisigConfig)
         expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith('', targetOutputs, '0', '1000', multisigConfig)
@@ -636,10 +636,10 @@ describe('TransactionSender Test', () => {
       beforeEach(async () => {
         stubbedGetCurrentWallet.mockReturnValue(fakeWallet)
         stubbedGetNextChangeAddress.mockReturnValue({
-          address: fakeAddress1
+          address: fakeAddress1,
         })
         stubbedGetNextAddress.mockReturnValue({
-          address: fakeAddress2
+          address: fakeAddress2,
         })
         await transactionSender.generateDepositTx(fakeWallet.id, capacity, fee, feeRate)
       })
@@ -661,10 +661,10 @@ describe('TransactionSender Test', () => {
       beforeEach(async () => {
         stubbedGetWallet.mockReturnValue(fakeWallet)
         stubbedGetNextAddress.mockReturnValue({
-          address: fakeAddress1
+          address: fakeAddress1,
         })
         stubbedGetNextChangeAddress.mockReturnValue({
-          address: fakeAddress2
+          address: fakeAddress2,
         })
         await transactionSender.generateDepositAllTx(fakeWallet.id, false, fee, feeRate)
       })
@@ -709,7 +709,7 @@ describe('TransactionSender Test', () => {
         number: '100',
         epoch: '2199023255602',
         hash: '0x97b3620c97bf47b4b85f4de678165ea78768be98f080854b54a9e03b78ba21b3',
-        parentHash: '0x9ddda4dd7edd9e413cbd25f6258ad182ea4a0f8af6835a431e72553f28a61086'
+        parentHash: '0x9ddda4dd7edd9e413cbd25f6258ad182ea4a0f8af6835a431e72553f28a61086',
       }
       const fee = '1'
       const feeRate = '10'
@@ -718,7 +718,7 @@ describe('TransactionSender Test', () => {
         stubbedGetTransaction.mockResolvedValue(fakeTx1)
         stubbedGetHeader.mockResolvedValue(fakeDepositBlockHeader)
         stubbedGetNextChangeAddress.mockReturnValue({
-          address: fakeAddress1
+          address: fakeAddress1,
         })
         await transactionSender.startWithdrawFromDao(fakeWallet.id, fakeDepositOutPoint, '1', '10')
       })
@@ -747,7 +747,7 @@ describe('TransactionSender Test', () => {
         stubbedGetTransaction.mockResolvedValue(fakeTx1)
         stubbedGetBlockByNumber.mockResolvedValue({
           header: { hash: '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5' },
-          transactions: [{ hash: '0x' + '0'.repeat(64) }, { hash: '0x' + '1'.repeat(64) }]
+          transactions: [{ hash: '0x' + '0'.repeat(64) }, { hash: '0x' + '1'.repeat(64) }],
         })
         const depositBlockHeader = {
           version: '0',
@@ -755,7 +755,7 @@ describe('TransactionSender Test', () => {
           number: '100',
           epoch: '2199023255602',
           hash: '0x97b3620c97bf47b4b85f4de678165ea78768be98f080854b54a9e03b78ba21b3',
-          parentHash: '0x9ddda4dd7edd9e413cbd25f6258ad182ea4a0f8af6835a431e72553f28a61086'
+          parentHash: '0x9ddda4dd7edd9e413cbd25f6258ad182ea4a0f8af6835a431e72553f28a61086',
         }
         stubbedGetHeaderByNumber.mockResolvedValue(depositBlockHeader)
 
@@ -765,22 +765,22 @@ describe('TransactionSender Test', () => {
           number: '100',
           epoch: '2199023255602',
           hash: '0x97b3620c97bf47b4b85f4de678165ea78768be98f080854b54a9e03b78ba21b3',
-          parentHash: '0x9ddda4dd7edd9e413cbd25f6258ad182ea4a0f8af6835a431e72553f28a61086'
+          parentHash: '0x9ddda4dd7edd9e413cbd25f6258ad182ea4a0f8af6835a431e72553f28a61086',
         }
         stubbedGetHeader.mockResolvedValue(withdrawBlockHeader)
 
         stubbedCalculateDaoMaximumWithdraw.mockResolvedValue(10300000000)
         stubbedGetNextAddress.mockReturnValue({
-          address: fakeAddress1
+          address: fakeAddress1,
         })
 
         const depositOutPoint = OutPoint.fromObject({
           txHash: '0x' + '0'.repeat(64),
-          index: '0x0'
+          index: '0x0',
         })
         const withdrawingOutPoint = OutPoint.fromObject({
           txHash: '0x' + '1'.repeat(64),
-          index: '0x0'
+          index: '0x0',
         })
         tx = await transactionSender.withdrawFromDao(
           fakeWallet.id,
@@ -804,25 +804,25 @@ describe('TransactionSender Test', () => {
           CellDep.fromObject({
             outPoint: OutPoint.fromObject({
               txHash: '0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d',
-              index: '0x0'
+              index: '0x0',
             }),
-            depType: 'depGroup' as DepType
-          })
+            depType: 'depGroup' as DepType,
+          }),
         ],
         headerDeps: [],
         inputs: [
           Input.fromObject({
             previousOutput: OutPoint.fromObject({
               txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
-              index: '0x0'
+              index: '0x0',
             }),
             since: '0x0',
             lock: Script.fromObject({
               args: '',
               codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
-            })
-          })
+              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+            }),
+          }),
         ],
         outputs: [
           Output.fromObject({
@@ -830,23 +830,23 @@ describe('TransactionSender Test', () => {
             lock: Script.fromObject({
               codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
               args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-              hashType: 'type' as ScriptHashType
+              hashType: 'type' as ScriptHashType,
             }),
-            type: null
+            type: null,
           }),
           Output.fromObject({
             capacity: '0x12319d9962f4',
             lock: Script.fromObject({
               codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
               args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-              hashType: 'type' as ScriptHashType
+              hashType: 'type' as ScriptHashType,
             }),
-            type: null
-          })
+            type: null,
+          }),
         ],
         outputsData: ['0x', '0x'],
         witnesses: [],
-        hash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
+        hash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1',
       }
 
       const createMultisigConfig = (r: number, m: number, addresses: string[]): [string, MultisigConfigModel] => {
@@ -859,22 +859,22 @@ describe('TransactionSender Test', () => {
             r,
             m,
             n: addresses.length,
-            blake160s: addresses.map(v => addressToScript(v).args)
-          })
+            blake160s: addresses.map(v => addressToScript(v).args),
+          }),
         ]
       }
 
       it('m is 1', async () => {
         const addresses = [
           'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
-          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6'
+          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
         ]
         const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
           blake160: addressToScript(addresses[0]).args,
-          version: 'testnet'
+          version: 'testnet',
         }
 
         const mockGAI = jest.fn()
@@ -889,13 +889,17 @@ describe('TransactionSender Test', () => {
       })
 
       describe('m is 2', () => {
-        const addresses = ['ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4', 'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6', 'ckt1qyqt9wqszk2lurw7h86wrt826cg8zx2f0lnq6e4vpl']
+        const addresses = [
+          'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
+          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
+          'ckt1qyqt9wqszk2lurw7h86wrt826cg8zx2f0lnq6e4vpl',
+        ]
         const [multiArgs, multisigConfig] = createMultisigConfig(1, 2, addresses)
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
           blake160: '',
-          version: 'testnet'
+          version: 'testnet',
         }
 
         const mockGAI = jest.fn()
@@ -909,7 +913,12 @@ describe('TransactionSender Test', () => {
           tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
           tx = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const lock = (tx.witnesses[0] as WitnessArgs).lock!
-          const serializedMultiSign: string = Multisig.serialize(addresses.map(v => addressToScript(v).args), 1, 2, 3)
+          const serializedMultiSign: string = Multisig.serialize(
+            addresses.map(v => addressToScript(v).args),
+            1,
+            2,
+            3
+          )
           expect(lock.startsWith(serializedMultiSign)).toBeTruthy()
           transactionSender.getAddressInfos = getAddressInfos
         })
@@ -936,7 +945,7 @@ describe('TransactionSender Test', () => {
       it('throw exception no matched multisig config addresses', async () => {
         const addresses = [
           'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
-          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6'
+          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
         ]
         const noMatchAddress = 'ckt1qyqf5v66n4vrxu75kks2ku06g7trnkdwt52s8000ee'
         const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
@@ -944,7 +953,7 @@ describe('TransactionSender Test', () => {
           walletId: fakeWallet.id,
           address: noMatchAddress,
           blake160: addressToScript(noMatchAddress).args,
-          version: 'testnet'
+          version: 'testnet',
         }
 
         const mockGAI = jest.fn()
@@ -964,25 +973,25 @@ describe('TransactionSender Test', () => {
             ...fakeWallet,
             isHardware() {
               return true
-            }
+            },
           })
         })
 
         it('m is 1', async () => {
           const witnessLock = '0'.repeat(130)
           stubbedHardWalletGetCurrent.mockReturnValueOnce({
-            signTransaction: jest.fn().mockResolvedValueOnce(witnessLock)
+            signTransaction: jest.fn().mockResolvedValueOnce(witnessLock),
           })
           const addresses = [
             'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
-            'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6'
+            'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
           ]
           const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
           const addr = {
             walletId: fakeWallet.id,
             path: `m/44'/309'/0'/0/0`,
             blake160: addressToScript(addresses[0]).args,
-            version: 'testnet'
+            version: 'testnet',
           }
 
           const mockGAI = jest.fn()
@@ -994,23 +1003,29 @@ describe('TransactionSender Test', () => {
           const expectedValue = serializeWitnessArgs({
             inputType: undefined,
             outputType: undefined,
-            lock: Multisig.serialize(addresses.map(v => addressToScript(v).args), 1, 1, 2) + witnessLock
+            lock:
+              Multisig.serialize(
+                addresses.map(v => addressToScript(v).args),
+                1,
+                1,
+                2
+              ) + witnessLock,
           })
           expect(res.witnesses[0]).toBe(expectedValue)
         })
       })
 
-      it(`input cell's length is 2`, async() => {
+      it(`input cell's length is 2`, async () => {
         const addresses = [
           'ckt1qyq89x5ggpt0a5epm2k2gyxeffwkgfdxeg0s543mh4',
-          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6'
+          'ckt1qyqql0vgjyxjxjxknkj6nq8jxa485xsyl66sy7c5f6',
         ]
         const [multiArgs, multisigConfig] = createMultisigConfig(1, 1, addresses)
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
           blake160: addressToScript(addresses[0]).args,
-          version: 'testnet'
+          version: 'testnet',
         }
 
         const mockGAI = jest.fn()
@@ -1022,14 +1037,14 @@ describe('TransactionSender Test', () => {
           Input.fromObject({
             previousOutput: OutPoint.fromObject({
               txHash: '0x1879851943fa686af29bed5c95acd566d0244e7b3ca89cf7c435622a5a5b4cb3',
-              index: '0x0'
+              index: '0x0',
             }),
             since: '0x0',
             lock: Script.fromObject({
               args: multiArgs,
               codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
-            })
+              hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+            }),
           })
         )
         tx.witnesses = ['0x', '0x']

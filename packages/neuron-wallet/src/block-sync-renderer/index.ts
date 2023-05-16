@@ -23,7 +23,7 @@ import { debounceTime } from 'rxjs/operators'
 let network: Network | null
 let child: ChildProcess | null = null
 let requestId = 0
-let requests = new Map<number, Record<'resolve' | 'reject', Function>>()
+let requests = new Map<number, Record<'resolve' | 'reject', (val?: unknown) => unknown>>()
 
 export const killBlockSyncTask = async () => {
   const _child = child
@@ -49,7 +49,7 @@ const waitForChildClose = (c: ChildProcess) =>
       type: 'call',
       id: requestId++,
       channel: 'unmount',
-      message: null
+      message: null,
     }
     c.send(msg, err => {
       if (err) {
@@ -95,7 +95,7 @@ export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> 
     type: 'call',
     id: requestId++,
     channel: 'queryIndexer',
-    message: query
+    message: query,
   }
   return registerRequest(_child, msg).catch(err => {
     logger.error(`Sync:\tfailed to register query indexer task`, err)
@@ -164,7 +164,7 @@ export const createBlockSyncTask = async () => {
 
   DataUpdateSubject.next({
     dataType: 'transaction',
-    actionType: 'update'
+    actionType: 'update',
   })
 
   const _child = child
@@ -175,7 +175,7 @@ export const createBlockSyncTask = async () => {
       genesisHash: network.genesisHash,
       url: network.remote,
       addressMetas,
-      indexerUrl: network.remote
+      indexerUrl: network.remote,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {

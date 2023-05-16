@@ -3,25 +3,29 @@ import { AddressNotFound } from '../../src/exceptions'
 
 const getAddressesByWalletIdMock = jest.fn()
 jest.mock('../../src/services/addresses', () => ({
-  getAddressesByWalletId: () => getAddressesByWalletIdMock()
+  getAddressesByWalletId: () => getAddressesByWalletIdMock(),
 }))
 
 const walletMock = jest.fn().mockReturnValue({
-  isHardware: () => false
+  isHardware: () => false,
 })
 
 jest.mock('../../src/services/wallets', () => ({
   getInstance: () => ({
-    get() { return walletMock() }
-  })
+    get() {
+      return walletMock()
+    },
+  }),
 }))
 
 const hardWalletMock = jest.fn()
 
 jest.mock('../../src/services/hardware', () => ({
   getInstance: () => ({
-    getCurrent() { return hardWalletMock() }
-  })
+    getCurrent() {
+      return hardWalletMock()
+    },
+  }),
 }))
 
 // @ts-ignore: Private method
@@ -31,7 +35,7 @@ jest
   // @ts-ignore: Private method
   .spyOn(SignMessage, 'getPrivateKey')
   // @ts-ignore
-  .mockImplementation((...args) => getPrivateKeyMock(...args));
+  .mockImplementation((...args) => getPrivateKeyMock(...args))
 
 describe(`SignMessage`, () => {
   const info = {
@@ -39,7 +43,8 @@ describe(`SignMessage`, () => {
     message: 'HelloWorld',
     digest: '0xdfb48ccf7126479c052f68cb4202cd094632d30198a322e3c3638679bc73858d',
     address: 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd',
-    signture: '0x97ed8c48879eed50743532bf7cc53e641c501509d2be19d06e6496dd944a21b4509136f18c8e139cc4002822b2deb5cbaff8e44b8782769af3113ff7fb8bd92700'
+    signture:
+      '0x97ed8c48879eed50743532bf7cc53e641c501509d2be19d06e6496dd944a21b4509136f18c8e139cc4002822b2deb5cbaff8e44b8782769af3113ff7fb8bd92700',
   }
 
   const extendedKeyInfo = {
@@ -53,7 +58,8 @@ describe(`SignMessage`, () => {
     privateKey: '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14',
     message: 'HelloWorld',
     address: 'ckb1qyqgnjay335t89u0rpwlr8e3vd9msu8fgcuszgdmkp',
-    signture: '0x0050e46c60cee0b85387a3d16300d74f4761b157857f13ee0ab9cc8df419dd265bbd4babc9ef4c1fb39803d2afd0901104271da026087200a154f037fd88cef201',
+    signture:
+      '0x0050e46c60cee0b85387a3d16300d74f4761b157857f13ee0ab9cc8df419dd265bbd4babc9ef4c1fb39803d2afd0901104271da026087200a154f037fd88cef201',
   }
 
   const signInfo2 = {
@@ -66,13 +72,14 @@ describe(`SignMessage`, () => {
   }
 
   describe('with extended key', () => {
-
     SignMessage.GENERATE_COUNT = 3
 
     describe('sign', () => {
       it('not match wallet address', async () => {
         getAddressesByWalletIdMock.mockReturnValueOnce([])
-        await expect(SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)).rejects.toThrow(new AddressNotFound())
+        await expect(
+          SignMessage.sign('walletId', signInfo.address, extendedKeyInfo.password, signInfo.message)
+        ).rejects.toThrow(new AddressNotFound())
       })
 
       it('with generate', async () => {
@@ -93,7 +100,7 @@ describe(`SignMessage`, () => {
     })
   })
 
-  it("signByPrivateKey", () => {
+  it('signByPrivateKey', () => {
     // @ts-ignore: Private method
     const sig = SignMessage.signByPrivateKey(info.privateKey, info.message)
     expect(sig).toEqual(info.signture)

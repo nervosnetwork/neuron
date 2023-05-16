@@ -10,14 +10,14 @@ describe('LiveCell Test', () => {
     lock: {
       codeHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       hashType: ScriptHashType.Data,
-      args: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+      args: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
     },
     type: {
       codeHash: '0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
       hashType: ScriptHashType.Data1,
-      args: '0xdddddddddddddddddddddddddddddddddddddddd'
+      args: '0xdddddddddddddddddddddddddddddddddddddddd',
     },
-    data: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    data: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
   }
 
   let liveCell: LiveCell
@@ -29,7 +29,7 @@ describe('LiveCell Test', () => {
       INITIAL_DATA.capacity,
       new Script(INITIAL_DATA.lock.codeHash, INITIAL_DATA.lock.args, INITIAL_DATA.lock.hashType),
       new Script(INITIAL_DATA.type.codeHash, INITIAL_DATA.type.args, INITIAL_DATA.type.hashType),
-      INITIAL_DATA.data,
+      INITIAL_DATA.data
     )
   })
 
@@ -53,7 +53,7 @@ describe('LiveCell Test', () => {
   it('should have outpoint', () => {
     expect(liveCell.outPoint()).toMatchObject({
       txHash: INITIAL_DATA.txHash,
-      index: '1'
+      index: '1',
     })
   })
 
@@ -81,7 +81,7 @@ describe('LiveCell Test', () => {
         INITIAL_DATA.capacity,
         new Script(INITIAL_DATA.lock.codeHash, INITIAL_DATA.lock.args, INITIAL_DATA.lock.hashType),
         null,
-        INITIAL_DATA.data,
+        INITIAL_DATA.data
       )
       expect(cell.type()).toBe(undefined)
     })
@@ -140,7 +140,6 @@ describe('LiveCell Test', () => {
         lockArgs: INITIAL_DATA.lock.args,
         data: INITIAL_DATA.data,
       })
-
     })
   })
 })

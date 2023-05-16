@@ -27,103 +27,98 @@ function resetMocks() {
   signMultisigMock.mockReset()
 }
 
-
 describe('OfflineSignController', () => {
   let offlineSignController: OfflineSignController
   const mockTransaction = {
-    "cellDeps": [
+    cellDeps: [
       {
-        "outPoint": {
-          "txHash": "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37",
-          "index": "0"
+        outPoint: {
+          txHash: '0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37',
+          index: '0',
         },
-        "depType": "depGroup"
+        depType: 'depGroup',
       },
       {
-        "outPoint": {
-          "txHash": "0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958",
-          "index": "0"
+        outPoint: {
+          txHash: '0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958',
+          index: '0',
         },
-        "depType": "code"
+        depType: 'code',
       },
       {
-        "outPoint": {
-          "txHash": "0x4f32b3e39bd1b6350d326fdfafdfe05e5221865c3098ae323096f0bfc69e0a8c",
-          "index": "0"
+        outPoint: {
+          txHash: '0x4f32b3e39bd1b6350d326fdfafdfe05e5221865c3098ae323096f0bfc69e0a8c',
+          index: '0',
         },
-        "depType": "depGroup"
-      }
+        depType: 'depGroup',
+      },
     ],
-    "headerDeps": [],
-    "inputs": [],
-    "outputs": [
+    headerDeps: [],
+    inputs: [],
+    outputs: [
       {
-        "capacity": "14200000000",
-        "lock": {
-          "args": "0x8830a6e1db602cf8d37f5fd825c6a11c1ccd53a9",
-          "codeHash": "0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b",
-          "hashType": "type"
+        capacity: '14200000000',
+        lock: {
+          args: '0x8830a6e1db602cf8d37f5fd825c6a11c1ccd53a9',
+          codeHash: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+          hashType: 'type',
         },
-        "type": {
-          "args": "0xb58a6fa6f2c57ed45fbdfc7fcebd5c79575590ecf190b72fa6e6a767d57cb105",
-          "codeHash": "0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212",
-          "hashType": "data"
+        type: {
+          args: '0xb58a6fa6f2c57ed45fbdfc7fcebd5c79575590ecf190b72fa6e6a767d57cb105',
+          codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
+          hashType: 'data',
         },
-        "lockHash": "0xe3f6ab9a880a87ea44b10ebb6d70bac1e08ac7dfb36b754d68d15d986cf54823",
-        "typeHash": "0x7be5dd445f388c5f58b06b90cec6db09f70e47e2c6fc9c7547f2826066ba25e3",
-        "data": "0x2c420f00000000000000000000000000"
+        lockHash: '0xe3f6ab9a880a87ea44b10ebb6d70bac1e08ac7dfb36b754d68d15d986cf54823',
+        typeHash: '0x7be5dd445f388c5f58b06b90cec6db09f70e47e2c6fc9c7547f2826066ba25e3',
+        data: '0x2c420f00000000000000000000000000',
       },
       {
-        "capacity": "14200000000",
-        "lock": {
-          "args": "0x913c4f626f96b01c039a650819b0fb718ef5ad42",
-          "codeHash": "0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b",
-          "hashType": "type"
+        capacity: '14200000000',
+        lock: {
+          args: '0x913c4f626f96b01c039a650819b0fb718ef5ad42',
+          codeHash: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+          hashType: 'type',
         },
-        "type": {
-          "args": "0xb58a6fa6f2c57ed45fbdfc7fcebd5c79575590ecf190b72fa6e6a767d57cb105",
-          "codeHash": "0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212",
-          "hashType": "data"
+        type: {
+          args: '0xb58a6fa6f2c57ed45fbdfc7fcebd5c79575590ecf190b72fa6e6a767d57cb105',
+          codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
+          hashType: 'data',
         },
-        "lockHash": "0x1a729562de95cf74255da6d4a0fcf173b6d7d293452903a7290b4c0122fdd2a6",
-        "typeHash": "0x7be5dd445f388c5f58b06b90cec6db09f70e47e2c6fc9c7547f2826066ba25e3",
-        "outPoint": {
-          "txHash": "0x156ac1ddf502f121790ba316889dfb89f2c4b99f37b1af3afadc121187f87070",
-          "index": "1"
+        lockHash: '0x1a729562de95cf74255da6d4a0fcf173b6d7d293452903a7290b4c0122fdd2a6',
+        typeHash: '0x7be5dd445f388c5f58b06b90cec6db09f70e47e2c6fc9c7547f2826066ba25e3',
+        outPoint: {
+          txHash: '0x156ac1ddf502f121790ba316889dfb89f2c4b99f37b1af3afadc121187f87070',
+          index: '1',
         },
-        "data": "0x94841e00000000000000000000000000"
+        data: '0x94841e00000000000000000000000000',
       },
       {
-        "capacity": "19999998970",
-        "lock": {
-          "args": "0x8830a6e1db602cf8d37f5fd825c6a11c1ccd53a9",
-          "codeHash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
-          "hashType": "type"
+        capacity: '19999998970',
+        lock: {
+          args: '0x8830a6e1db602cf8d37f5fd825c6a11c1ccd53a9',
+          codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+          hashType: 'type',
         },
-        "lockHash": "0x0986ec9d96d5bfc7a98c9f064c684e09d9afad4952f720a7e47cda73a1389c1c",
-        "data": "0x"
-      }
+        lockHash: '0x0986ec9d96d5bfc7a98c9f064c684e09d9afad4952f720a7e47cda73a1389c1c',
+        data: '0x',
+      },
     ],
-    "witnesses": [],
-    "description": "",
-    "nervosDao": false,
-    "hash": "0x0213376e870aed74969a3f64d1e71eba88e9c0185d371e0f1ad5e6319a3fdaf4",
-    "version": "0",
-    "fee": "1030",
-    "outputsData": [
-      "0x2c420f00000000000000000000000000",
-      "0x94841e00000000000000000000000000",
-      "0x"
-    ],
-    "sudtInfo": {
-      "amount": "20"
-    }
+    witnesses: [],
+    description: '',
+    nervosDao: false,
+    hash: '0x0213376e870aed74969a3f64d1e71eba88e9c0185d371e0f1ad5e6319a3fdaf4',
+    version: '0',
+    fee: '1030',
+    outputsData: ['0x2c420f00000000000000000000000000', '0x94841e00000000000000000000000000', '0x'],
+    sudtInfo: {
+      amount: '20',
+    },
   }
 
   const mockTxInstance = {
     toSDKRawTransaction() {
       return mockTransaction
-    }
+    },
   }
 
   beforeEach(() => {
@@ -134,14 +129,14 @@ describe('OfflineSignController', () => {
         dialog: {
           showSaveDialog: stubbedElectronShowSaveDialog,
           showErrorBox: stubbedElectronShowErrorBox,
-          showMessageBox: stubbedElectronShowMessageBox
-        }
+          showMessageBox: stubbedElectronShowMessageBox,
+        },
       }
     })
 
     jest.doMock('fs', () => {
       return {
-        writeFileSync: jest.fn()
+        writeFileSync: jest.fn(),
       }
     })
 
@@ -162,40 +157,32 @@ describe('OfflineSignController', () => {
     })
 
     jest.doMock('services/transaction-sender', () => {
-      return jest.fn().mockImplementation(
-        () => ({
-          sign: stubbedTransactionSenderSign,
-          signMultisig: signMultisigMock
-        })
-      )
+      return jest.fn().mockImplementation(() => ({
+        sign: stubbedTransactionSenderSign,
+        signMultisig: signMultisigMock,
+      }))
     })
 
     jest.doMock('../../src/controllers/asset-account', () => {
-      return jest.fn().mockImplementation(
-        () => ({
-          sendCreateTx: stubbedAssetAccountControllerSend
-        })
-      )
+      return jest.fn().mockImplementation(() => ({
+        sendCreateTx: stubbedAssetAccountControllerSend,
+      }))
     })
 
     jest.doMock('../../src/controllers/anyone-can-pay', () => {
-      return jest.fn().mockImplementation(
-        () => ({
-          sendTx: stubbedAnyoneCanPayControllerSend
-        })
-      )
+      return jest.fn().mockImplementation(() => ({
+        sendTx: stubbedAnyoneCanPayControllerSend,
+      }))
     })
 
     jest.doMock('../../src/controllers/wallets', () => {
-      return jest.fn().mockImplementation(
-        () => ({
-          sendTx: stubbedWalletsControllerSend
-        })
-      )
+      return jest.fn().mockImplementation(() => ({
+        sendTx: stubbedWalletsControllerSend,
+      }))
     })
 
     jest.doMock('../../src/utils/multisig', () => ({
-      getMultisigStatus: getMultisigStatusMock
+      getMultisigStatus: getMultisigStatusMock,
     }))
 
     jest.doMock('../../src/utils/ckb-rpc', () => {
@@ -226,23 +213,23 @@ describe('OfflineSignController', () => {
 
       it('if user cancel', async () => {
         stubbedElectronShowSaveDialog.mockReturnValue({
-          canceled: true
+          canceled: true,
         })
 
         const res = await offlineSignController.exportTransactionAsJSON({} as any)
         expect(res).toEqual({
-          status: ResponseCode.Success
+          status: ResponseCode.Success,
         })
       })
 
       it('if file path is not provider', async () => {
         stubbedElectronShowSaveDialog.mockReturnValue({
-          canceled: false
+          canceled: false,
         })
 
         const res = await offlineSignController.exportTransactionAsJSON({} as any)
         expect(res).toEqual({
-          status: ResponseCode.Success
+          status: ResponseCode.Success,
         })
       })
     })
@@ -289,7 +276,7 @@ describe('OfflineSignController', () => {
           transaction: mockTransaction,
           status: SignStatus.Unsigned,
           type: SignType.Regular,
-          context: []
+          context: [],
         })
       })
     })
@@ -306,7 +293,7 @@ describe('OfflineSignController', () => {
 
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: false,
-          filePath: 'filePath.json'
+          filePath: 'filePath.json',
         })
       })
 
@@ -315,11 +302,13 @@ describe('OfflineSignController', () => {
           throw new connectDeviceFailed()
         })
 
-        expect(offlineSignController.signTransaction({
-          transaction: mockTransaction,
-          status: SignStatus.Unsigned,
-          type: SignType.Regular,
-        } as any)).rejects.toThrowError(new connectDeviceFailed())
+        expect(
+          offlineSignController.signTransaction({
+            transaction: mockTransaction,
+            status: SignStatus.Unsigned,
+            type: SignType.Regular,
+          } as any)
+        ).rejects.toThrowError(new connectDeviceFailed())
       })
 
       it('throws OfflineSignFailed error if error code is not provide', () => {
@@ -327,11 +316,13 @@ describe('OfflineSignController', () => {
           throw new Error('')
         })
 
-        expect(offlineSignController.signTransaction({
-          transaction: mockTransaction,
-          status: SignStatus.Unsigned,
-          type: SignType.Regular,
-        } as any)).rejects.toThrowError(new OfflineSignFailed())
+        expect(
+          offlineSignController.signTransaction({
+            transaction: mockTransaction,
+            status: SignStatus.Unsigned,
+            type: SignType.Regular,
+          } as any)
+        ).rejects.toThrowError(new OfflineSignFailed())
       })
     })
 
@@ -341,7 +332,7 @@ describe('OfflineSignController', () => {
 
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: false,
-          filePath: 'filePath.json'
+          filePath: 'filePath.json',
         })
 
         stubbedTransactionSenderSign.mockReturnValue(mockTransaction)
@@ -392,15 +383,9 @@ describe('OfflineSignController', () => {
           transaction: mockTransaction,
           status: SignStatus.Unsigned,
           type: SignType.SendSUDT,
-          multisigConfig: {}
+          multisigConfig: {},
         } as any)
-        expect(signMultisigMock).toHaveBeenCalledWith(
-          undefined,
-          mockTxInstance,
-          undefined,
-          [{}],
-          undefined
-        )
+        expect(signMultisigMock).toHaveBeenCalledWith(undefined, mockTxInstance, undefined, [{}], undefined)
         expect(res.result.status).toBe(SignStatus.PartiallySigned)
       })
     })
@@ -413,7 +398,7 @@ describe('OfflineSignController', () => {
 
         stubbedElectronShowSaveDialog.mockReturnValue({
           canceled: false,
-          filePath: 'filePath.json'
+          filePath: 'filePath.json',
         })
 
         stubbedTransactionSenderSign.mockReturnValue(mockTransaction)
@@ -493,11 +478,17 @@ describe('OfflineSignController', () => {
     })
     it('throw exception', async () => {
       getMultisigStatusMock.mockReturnValueOnce(SignStatus.PartiallySigned)
-      await expect(offlineSignController.signAndBroadcastTransaction({ transaction: mockTransaction, multisigConfig: {}} as any)).rejects.toThrow(new MultisigNotSignedNeedError())
+      await expect(
+        offlineSignController.signAndBroadcastTransaction({ transaction: mockTransaction, multisigConfig: {} } as any)
+      ).rejects.toThrow(new MultisigNotSignedNeedError())
     })
     it('success', async () => {
       getMultisigStatusMock.mockReturnValueOnce(SignStatus.Signed)
-      await offlineSignController.signAndBroadcastTransaction({ transaction: mockTransaction, multisigConfig: {}, type: SignType.CreateSUDTAccount } as any)
+      await offlineSignController.signAndBroadcastTransaction({
+        transaction: mockTransaction,
+        multisigConfig: {},
+        type: SignType.CreateSUDTAccount,
+      } as any)
       expect(stubbedAssetAccountControllerSend).toHaveBeenCalled()
     })
   })

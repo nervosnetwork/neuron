@@ -1,4 +1,3 @@
-// eslint-disable-next-line prettier/prettier
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
 import { Tip, QueryOptions } from '@ckb-lumos/base'
@@ -65,7 +64,7 @@ export default class IndexerConnector extends Connector<string | undefined> {
     if (nextUnprocessedBlockTip) {
       this.blockTipsSubject.next({
         cacheTipNumber: parseInt(nextUnprocessedBlockTip.blockNumber),
-        indexerTipNumber
+        indexerTipNumber,
       })
       if (!this.processingBlockNumber) {
         await this.processNextBlockNumber()
@@ -73,7 +72,7 @@ export default class IndexerConnector extends Connector<string | undefined> {
     } else {
       this.blockTipsSubject.next({
         cacheTipNumber: indexerTipNumber,
-        indexerTipNumber
+        indexerTipNumber,
       })
     }
   }
@@ -121,14 +120,14 @@ export default class IndexerConnector extends Connector<string | undefined> {
       queries.lock = {
         code_hash: lock.codeHash,
         hash_type: lock.hashType,
-        args: lock.args
+        args: lock.args,
       }
     }
     if (type) {
       queries.type = {
         code_hash: type.codeHash,
         hash_type: type.hashType,
-        args: type.args
+        args: type.args,
       }
     }
     queries.data = data || 'any'

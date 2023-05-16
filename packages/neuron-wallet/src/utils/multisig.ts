@@ -28,5 +28,5 @@ export const getMultisigStatus = (multisigConfig: MultisigConfigModel, signature
 }
 
 export default {
-  getMultisigStatus
+  getMultisigStatus,
 }

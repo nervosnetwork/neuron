@@ -21,7 +21,7 @@ export default class OutPoint {
   public toSDK(): CKBComponents.OutPoint {
     return {
       txHash: this.txHash,
-      index: HexUtils.toHex(this.index)
+      index: HexUtils.toHex(this.index),
     }
   }
 

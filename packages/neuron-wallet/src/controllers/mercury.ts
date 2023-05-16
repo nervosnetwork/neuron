@@ -36,6 +36,6 @@ const openMigrateDialog = (type: 'hard-fork' | 'mercury') => {
     defaultId: 1,
     message: t(`${I18N_PATH}.message`),
     cancelId: 0,
-    noLink: true
+    noLink: true,
   })
 }

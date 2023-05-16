@@ -7,7 +7,7 @@ const stubbedIsMainnet = jest.fn()
 jest.doMock('services/networks', () => {
   return {
     getInstance: () => ({
-      isMainnet: stubbedIsMainnet
+      isMainnet: stubbedIsMainnet,
     }),
   }
 })
@@ -24,7 +24,7 @@ describe('HdPublicKeyInfoModel', () => {
 
   beforeEach(() => {
     resetMocks()
-  });
+  })
 
   describe('#address', () => {
     describe('with mainnet', () => {
@@ -33,48 +33,54 @@ describe('HdPublicKeyInfoModel', () => {
         keyInfoModel = HdPublicKeyInfoModel.fromObject({
           publicKeyInBlake160: keyInfo.publicKeyInBlake160,
         })
-      });
+      })
       it('generates mainnet address by property', () => {
-        const address = scriptToAddress({ ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 }, true)
+        const address = scriptToAddress(
+          { ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 },
+          true
+        )
         expect(keyInfoModel.address).toEqual(address)
       })
-    });
+    })
     describe('with testnet', () => {
       beforeEach(() => {
         stubbedIsMainnet.mockReturnValue(false)
         keyInfoModel = HdPublicKeyInfoModel.fromObject({
           publicKeyInBlake160: keyInfo.publicKeyInBlake160,
         })
-      });
+      })
       it('generates testnet address by property', () => {
-        const address = scriptToAddress({ ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 }, false)
+        const address = scriptToAddress(
+          { ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 },
+          false
+        )
         expect(keyInfoModel.address).toEqual(address)
       })
-    });
-  });
+    })
+  })
 
   describe('#path', () => {
     describe('with change address type', () => {
       beforeEach(() => {
         keyInfoModel = HdPublicKeyInfoModel.fromObject({
           addressType: AddressType.Change,
-          addressIndex: 1
+          addressIndex: 1,
         })
-      });
+      })
       it('generates path by property', () => {
         expect(keyInfoModel.path).toEqual("m/44'/309'/0'/1/1")
       })
-    });
+    })
     describe('with receive address type', () => {
       beforeEach(() => {
         keyInfoModel = HdPublicKeyInfoModel.fromObject({
           addressType: AddressType.Receiving,
-          addressIndex: 1
+          addressIndex: 1,
         })
-      });
+      })
       it('generates path by property', () => {
         expect(keyInfoModel.path).toEqual("m/44'/309'/0'/0/1")
       })
-    });
-  });
-});
+    })
+  })
+})

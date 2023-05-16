@@ -2,9 +2,9 @@ import { isErrorWithI18n } from 'exceptions'
 import { validateTokenId } from 'utils/validators'
 import fixtures from './fixtures'
 
-const fixtureTable: Fixture.Validator<typeof validateTokenId>[] = Object.entries(
-  fixtures
-).map(([title, { params, exception }]) => [title, [params], exception])
+const fixtureTable: Fixture.Validator<typeof validateTokenId>[] = Object.entries(fixtures).map(
+  ([title, { params, exception }]) => [title, [params], exception]
+)
 
 describe('Test token validator', () => {
   test.each(fixtureTable)(`%s`, (_title, [tokenId], exception) => {

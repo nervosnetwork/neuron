@@ -31,7 +31,7 @@ export default class AssetAccountInfo {
     return {
       sudt: this.sudt,
       sudtInfo: this.sudtInfo,
-      anyoneCanPay: this.anyoneCanPayInfo
+      anyoneCanPay: this.anyoneCanPayInfo,
     }
   }
 
@@ -43,7 +43,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_SUDT_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_SUDT_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.sudtInfo = {
         cellDep: new CellDep(
@@ -51,7 +51,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_SUDT_INFO_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_SUDT_INFO_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.anyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -59,7 +59,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -67,7 +67,7 @@ export default class AssetAccountInfo {
           process.env.LEGACY_MAINNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.pwAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -75,7 +75,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_PW_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.chequeInfo = {
         cellDep: new CellDep(
@@ -83,7 +83,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_CHEQUE_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_CHEQUE_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.nftIssuerInfo = {
         cellDep: new CellDep(
@@ -91,7 +91,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_NFT_ISSUER_DEP_TYPE as DepType
         ),
         codeHash: process.env.MAINNET_NFT_ISSUER_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType
+        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
       this.nftClassInfo = {
         cellDep: new CellDep(
@@ -99,7 +99,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_NFT_CLASS_DEP_TYPE as DepType
         ),
         codeHash: process.env.MAINNET_NFT_CLASS_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType
+        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
       this.nftInfo = {
         cellDep: new CellDep(
@@ -107,7 +107,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_NFT_DEP_TYPE as DepType
         ),
         codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType
+        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
     } else {
       this.sudt = {
@@ -116,7 +116,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_SUDT_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_SUDT_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.sudtInfo = {
         cellDep: new CellDep(
@@ -124,7 +124,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_SUDT_INFO_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_SUDT_INFO_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.anyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -132,7 +132,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -140,7 +140,7 @@ export default class AssetAccountInfo {
           process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.pwAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -148,7 +148,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.chequeInfo = {
         cellDep: new CellDep(
@@ -156,7 +156,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_CHEQUE_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_CHEQUE_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType
+        hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType,
       }
       this.nftIssuerInfo = {
         cellDep: new CellDep(
@@ -164,7 +164,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_NFT_ISSUER_DEP_TYPE as DepType
         ),
         codeHash: process.env.TESTNET_NFT_ISSUER_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType
+        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
       this.nftClassInfo = {
         cellDep: new CellDep(
@@ -172,7 +172,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_NFT_CLASS_DEP_TYPE as DepType
         ),
         codeHash: process.env.TESTNET_NFT_CLASS_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType
+        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
       this.nftInfo = {
         cellDep: new CellDep(
@@ -180,7 +180,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_NFT_DEP_TYPE as DepType
         ),
         codeHash: process.env.TESTNET_NFT_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType
+        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
     }
   }

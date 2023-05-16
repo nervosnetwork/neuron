@@ -13,11 +13,11 @@ export const rpcRequest = async <T = any>(
       id: 0,
       jsonrpc: '2.0',
       method: options.method,
-      params: options.params
+      params: options.params,
     }),
     headers: {
-      'content-type': 'application/json'
-    }
+      'content-type': 'application/json',
+    },
   })
   if (res.statusCode !== 200) {
     throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
@@ -35,7 +35,7 @@ export const rpcBatchRequest = async (
 ): Promise<any[]> => {
   const res = await request(url, {
     headers: {
-      'content-type': 'application/json'
+      'content-type': 'application/json',
     },
     method: 'POST',
     body: JSON.stringify(
@@ -43,9 +43,9 @@ export const rpcBatchRequest = async (
         id: idx,
         jsonrpc: '2.0',
         method: v.method,
-        params: v.params
+        params: v.params,
       }))
-    )
+    ),
   })
   if (res.statusCode !== 200) {
     throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
@@ -56,5 +56,5 @@ export const rpcBatchRequest = async (
 
 export default {
   rpcBatchRequest,
-  rpcRequest
+  rpcRequest,
 }

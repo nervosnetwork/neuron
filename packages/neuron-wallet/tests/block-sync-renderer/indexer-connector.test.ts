@@ -56,17 +56,17 @@ describe('unit tests for IndexerConnector', () => {
   jest.doMock('@nervina-labs/ckb-indexer', () => {
     return {
       CkbIndexer: stubbedIndexerConstructor.mockImplementation(() => ({
-        tip: stubbedTipFn
+        tip: stubbedTipFn,
       })),
       CellCollector: stubbedCellCollectorConstructor.mockImplementation(() => ({
-        collect: stubbedCellCellectFn
-      }))
+        collect: stubbedCellCellectFn,
+      })),
     }
   })
   jest.doMock('services/rpc-service', () => {
     return stubbedRPCServiceConstructor.mockImplementation(() => ({
       getTransaction: stubbedGetTransactionFn,
-      getHeader: stubbedGetHeaderFn
+      getHeader: stubbedGetHeaderFn,
     }))
   })
   jest.doMock('utils/logger', () => {
@@ -75,7 +75,7 @@ describe('unit tests for IndexerConnector', () => {
   jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
     return stubbedIndexerCacheService.mockImplementation(() => ({
       upsertTxHashes: stubbedUpsertTxHashesFn,
-      nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn
+      nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
     }))
   })
   stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
@@ -116,36 +116,36 @@ describe('unit tests for IndexerConnector', () => {
     const fakeBlock3 = { number: '3', hash: '3', timestamp: '3' }
     const fakeTx1 = {
       transaction: { hash: 'hash1', blockNumber: fakeBlock1.number, blockTimestamp: new Date(1) },
-      txStatus: { status: 'committed', blockHash: fakeBlock1.hash }
+      txStatus: { status: 'committed', blockHash: fakeBlock1.hash },
     }
     const fakeTx2 = {
       transaction: { hash: 'hash2', blockNumber: fakeBlock2.number, blockTimestamp: new Date(2) },
-      txStatus: { status: 'committed', blockHash: fakeBlock2.hash }
+      txStatus: { status: 'committed', blockHash: fakeBlock2.hash },
     }
     const fakeTx3 = {
       transaction: { hash: 'hash3', blockNumber: fakeBlock2.number, blockTimestamp: new Date(3) },
-      txStatus: { status: 'committed', blockHash: fakeBlock2.hash }
+      txStatus: { status: 'committed', blockHash: fakeBlock2.hash },
     }
 
     const fakeTxHashCache1 = {
       txHash: fakeTx1.transaction.hash,
       blockNumber: fakeTx1.transaction.blockNumber,
-      blockTimestamp: fakeTx1.transaction.blockTimestamp
+      blockTimestamp: fakeTx1.transaction.blockTimestamp,
     }
     const fakeTxHashCache2 = {
       txHash: fakeTx2.transaction.hash,
       blockNumber: fakeTx2.transaction.blockNumber,
-      blockTimestamp: fakeTx2.transaction.blockTimestamp
+      blockTimestamp: fakeTx2.transaction.blockTimestamp,
     }
     const fakeTxHashCache3 = {
       txHash: fakeTx3.transaction.hash,
       blockNumber: fakeTx3.transaction.blockNumber,
-      blockTimestamp: fakeTx3.transaction.blockTimestamp
+      blockTimestamp: fakeTx3.transaction.blockTimestamp,
     }
 
     let indexerConnector: IndexerConnector
     const shortAddressInfo = {
-      lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+      lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
     }
     const address = scriptToAddress(shortAddressInfo.lock, false)
     const walletId1 = 'walletid1'
@@ -162,7 +162,7 @@ describe('unit tests for IndexerConnector', () => {
       sentBalance: '',
       pendingBalance: '',
       balance: '',
-      version: AddressVersion.Testnet
+      version: AddressVersion.Testnet,
     }
     const addressObj2: Address = {
       address,
@@ -176,7 +176,7 @@ describe('unit tests for IndexerConnector', () => {
       sentBalance: '',
       pendingBalance: '',
       balance: '',
-      version: AddressVersion.Testnet
+      version: AddressVersion.Testnet,
     }
     const addressesToWatch = [addressObj1, addressObj2]
 
@@ -361,7 +361,7 @@ describe('unit tests for IndexerConnector', () => {
           expect(tipObserver).toHaveBeenCalledTimes(1)
           expect(tipObserver).toHaveBeenCalledWith({
             cacheTipNumber: parseInt(fakeTip1.block_number),
-            indexerTipNumber: parseInt(fakeTip1.block_number)
+            indexerTipNumber: parseInt(fakeTip1.block_number),
           })
         })
         describe('fast forward the interval time', () => {
@@ -375,7 +375,7 @@ describe('unit tests for IndexerConnector', () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
                 cacheTipNumber: parseInt(fakeTip2.block_number),
-                indexerTipNumber: parseInt(fakeTip2.block_number)
+                indexerTipNumber: parseInt(fakeTip2.block_number),
               })
             })
           })
@@ -383,7 +383,7 @@ describe('unit tests for IndexerConnector', () => {
             beforeEach(async () => {
               stubbedNextUnprocessedBlock.mockResolvedValue({
                 blockNumber: fakeBlock3.number,
-                blockHash: fakeBlock3.hash
+                blockHash: fakeBlock3.hash,
               })
               jest.advanceTimersByTime(5000)
               await flushPromises()
@@ -392,7 +392,7 @@ describe('unit tests for IndexerConnector', () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
                 cacheTipNumber: parseInt(fakeBlock3.number),
-                indexerTipNumber: parseInt(fakeTip2.block_number)
+                indexerTipNumber: parseInt(fakeTip2.block_number),
               })
             })
           })
@@ -408,28 +408,28 @@ describe('unit tests for IndexerConnector', () => {
           lock: {
             hash_type: 'type',
             code_hash: '0xcode',
-            args: '0x1'
+            args: '0x1',
           },
           type: {
             hash_type: 'data',
             code_hash: '0xcode',
-            args: '0x1'
-          }
-        }
+            args: '0x1',
+          },
+        },
       }
       fakeCell2 = {
         cell_output: {
           lock: {
             hash_type: 'type',
             code_hash: '0xcode',
-            args: '0x2'
+            args: '0x2',
           },
           type: {
             hash_type: 'lock',
             code_hash: '0xcode',
-            args: '0x2'
-          }
-        }
+            args: '0x2',
+          },
+        },
       }
       const fakeCells = [fakeCell1, fakeCell2]
 
@@ -438,22 +438,22 @@ describe('unit tests for IndexerConnector', () => {
           lock: {
             hashType: ScriptHashType.Data,
             codeHash: '0xcode',
-            args: '0x'
+            args: '0x',
           },
           type: {
             //test the workaround for this lumos data issue
             //@ts-ignore
             hashType: 'lock',
             codeHash: '0xcode',
-            args: '0x'
+            args: '0x',
           },
-          data: null
+          data: null,
         }
 
         beforeEach(async () => {
           stubbedCellCellectFn.mockReturnValueOnce([
             new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[0])))),
-            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
+            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1])))),
           ])
 
           cells = await indexerConnector.getLiveCellsByScript(query)
@@ -463,14 +463,14 @@ describe('unit tests for IndexerConnector', () => {
             lock: {
               hash_type: query.lock!.hashType,
               code_hash: query.lock!.codeHash,
-              args: query.lock!.args
+              args: query.lock!.args,
             },
             type: {
               hash_type: query.type!.hashType,
               code_hash: query.type!.codeHash,
-              args: query.type!.args
+              args: query.type!.args,
             },
-            data: 'any'
+            data: 'any',
           })
         })
         it('returns live cells with property value fix', async () => {
@@ -483,27 +483,27 @@ describe('unit tests for IndexerConnector', () => {
           lock: {
             hashType: ScriptHashType.Data,
             codeHash: '0xcode',
-            args: '0x1'
+            args: '0x1',
           },
           type: {
             hashType: ScriptHashType.Data,
             codeHash: '0xcode',
-            args: '0x1'
+            args: '0x1',
           },
-          data: null
+          data: null,
         }
         const query2: LumosCellQuery = {
           lock: {
             hashType: ScriptHashType.Type,
             codeHash: '0xcode',
-            args: '0x2'
+            args: '0x2',
           },
           type: {
             hashType: ScriptHashType.Type,
             codeHash: '0xcode',
-            args: '0x2'
+            args: '0x2',
           },
-          data: null
+          data: null,
         }
 
         const results: unknown[] = []
@@ -515,23 +515,23 @@ describe('unit tests for IndexerConnector', () => {
               setTimeout(() => {
                 resolve(JSON.parse(JSON.stringify(fakeCells[0])))
               }, 500)
-            })
+            }),
           ])
 
           const stubbedCellCellect2 = jest.fn()
           stubbedCellCellect2.mockReturnValueOnce([
-            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
+            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1])))),
           ])
 
           stubbedCellCollectorConstructor.mockImplementation((_indexer: any, query: any) => {
             if (query.lock.args === '0x1') {
               return {
-                collect: stubbedCellCellect1
+                collect: stubbedCellCellect1,
               }
             }
             if (query.lock.args === '0x2') {
               return {
-                collect: stubbedCellCellect2
+                collect: stubbedCellCellect2,
               }
             }
           })
@@ -548,7 +548,7 @@ describe('unit tests for IndexerConnector', () => {
                 results.push(cells)
                 resolve()
               })
-            })
+            }),
           ])
 
           jest.advanceTimersByTime(500)
