@@ -4,21 +4,21 @@ import { app as electronApp, dialog, shell } from 'electron'
 import { t } from 'i18next'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
-import env from 'env'
-import { ShouldBeTypeOf } from 'exceptions'
-import { ConnectionStatusSubject } from 'models/subjects/node'
-import { CurrentNetworkIDSubject } from 'models/subjects/networks'
-import NetworksService from 'services/networks'
-import RpcService from 'services/rpc-service'
-import { startCkbNode, stopCkbNode } from 'services/ckb-runner'
-import HexUtils from 'utils/hex'
-import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER, BUNDLED_LIGHT_CKB_URL } from 'utils/const'
-import logger from 'utils/logger'
-import redistCheck from 'utils/redist-check'
-import { rpcRequest } from 'utils/rpc-request'
+import env from '../env'
+import { ShouldBeTypeOf } from '../exceptions'
+import { ConnectionStatusSubject } from '../models/subjects/node'
+import { CurrentNetworkIDSubject } from '../models/subjects/networks'
+import { NetworkType } from '../models/network'
+import NetworksService from '../services/networks'
+import RpcService from '../services/rpc-service'
+import { startCkbNode, stopCkbNode } from '../services/ckb-runner'
+import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER, BUNDLED_LIGHT_CKB_URL } from '../utils/const'
+import logger from '../utils/logger'
+import redistCheck from '../utils/redist-check'
+import { rpcRequest } from '../utils/rpc-request'
+import { generateRPC } from '../utils/ckb-rpc'
+import HexUtils from '..//utils/hex'
 import startMonitor from './monitor'
-import { NetworkType } from 'models/network'
-import { generateRPC } from 'utils/ckb-rpc'
 import { CKBLightRunner } from './light-runner'
 
 class NodeService {
@@ -39,7 +39,6 @@ class NodeService {
   private _tipBlockNumber: string = '0'
   private startedBundledNode: boolean = false
   private _isCkbNodeExternal: boolean = false
-  // eslint-disable-next-line prettier/prettier
   #nodeUrl: string = ''
 
   private constructor() {
@@ -72,7 +71,7 @@ class NodeService {
           url: this.#nodeUrl,
           connected,
           isBundledNode,
-          startedBundledNode: isBundledNode ? this.startedBundledNode : false
+          startedBundledNode: isBundledNode ? this.startedBundledNode : false,
         })
       })
   }
@@ -94,7 +93,7 @@ class NodeService {
     this.stop = unsubscribe
   }
 
-  public stop: Function | null = null
+  public stop: (() => void) | null = null
 
   public tipNumber = () => {
     return interval(this.intervalTime)
@@ -195,7 +194,7 @@ class NodeService {
         message: t(`${I18N_PATH}.message`),
         detail: t(`${I18N_PATH}.detail`),
         cancelId: 0,
-        noLink: true
+        noLink: true,
       })
       .then(() => {
         const VC_REDIST_URL = `https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads`
@@ -210,10 +209,7 @@ class NodeService {
     const ckbVersionPath = path.join(appPath, '.ckb-version')
     if (fs.existsSync(ckbVersionPath)) {
       try {
-        return fs
-          .readFileSync(ckbVersionPath, 'utf8')
-          ?.split('\n')?.[0]
-          ?.slice(1)
+        return fs.readFileSync(ckbVersionPath, 'utf8')?.split('\n')?.[0]?.slice(1)
       } catch (err) {
         logger.error('App\t: get ckb node version failed')
       }
@@ -230,7 +226,7 @@ class NodeService {
     if (internalMajor !== externalMajor || (externalMajor === '0' && internalMinor !== externalMinor)) {
       dialog.showMessageBox({
         type: 'warning',
-        message: t('messageBox.node-version-different.message', { version: internalNodeVersion })
+        message: t('messageBox.node-version-different.message', { version: internalNodeVersion }),
       })
     }
   }
@@ -243,14 +239,14 @@ class NodeService {
         logger.info('Node:\tthe ckb node does not start with --indexer')
         dialog.showMessageBox({
           type: 'warning',
-          message: t('messageBox.ckb-without-indexer.message')
+          message: t('messageBox.ckb-without-indexer.message'),
         })
       }
     } catch (error) {
       logger.info('Node:\tcalling get_indexer_tip failed')
       dialog.showMessageBox({
         type: 'warning',
-        message: t('messageBox.ckb-without-indexer.message')
+        message: t('messageBox.ckb-without-indexer.message'),
       })
     }
   }

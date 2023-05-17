@@ -1,3 +1,3 @@
-declare module CKBRPC {
+declare namespace CKBRPC {
   type ScriptType = 'lock' | 'type'
 }

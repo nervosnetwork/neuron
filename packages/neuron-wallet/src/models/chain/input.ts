@@ -1,7 +1,7 @@
 import OutPoint from './out-point'
 import Script from './script'
-import HexUtils from 'utils/hex'
-import TypeChecker from 'utils/type-checker'
+import HexUtils from '../../utils/hex'
+import TypeChecker from '../../utils/type-checker'
 
 export default class Input {
   public previousOutput: OutPoint | null
@@ -57,7 +57,7 @@ export default class Input {
     multiSignBlake160,
     type,
     typeHash,
-    data
+    data,
   }: {
     previousOutput: OutPoint | null
     since?: string
@@ -113,7 +113,7 @@ export default class Input {
   public toSDK(): CKBComponents.CellInput {
     return {
       since: HexUtils.toHex(this.since!),
-      previousOutput: this.previousOutput?.toSDK() || null
+      previousOutput: this.previousOutput?.toSDK() || null,
     }
   }
 

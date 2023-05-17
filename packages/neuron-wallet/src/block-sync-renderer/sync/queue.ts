@@ -1,29 +1,28 @@
 import { queue, QueueObject } from 'async'
-import { TransactionPersistor } from 'services/tx'
-import RpcService from 'services/rpc-service'
-import AssetAccountService from 'services/asset-account-service'
-import OutPoint from 'models/chain/out-point'
-import Transaction from 'models/chain/transaction'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import SystemScriptInfo from 'models/system-script-info'
-import AssetAccountInfo from 'models/asset-account-info'
-import { Address as AddressInterface } from "models/address"
-import AddressParser from 'models/address-parser'
-import Multisig from 'models/multisig'
-import BlockHeader from 'models/chain/block-header'
+import { TransactionPersistor } from '../../services/tx'
+import RpcService from '../../services/rpc-service'
+import AssetAccountService from '../../services/asset-account-service'
+import OutPoint from '../../models/chain/out-point'
+import Transaction from '../../models/chain/transaction'
+import TransactionWithStatus from '../../models/chain/transaction-with-status'
+import SystemScriptInfo from '../../models/system-script-info'
+import AssetAccountInfo from '../../models/asset-account-info'
+import { Address as AddressInterface } from '../../models/address'
+import AddressParser from '../../models/address-parser'
+import Multisig from '../../models/multisig'
+import BlockHeader from '../../models/chain/block-header'
 import TxAddressFinder from './tx-address-finder'
 import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
-import logger from 'utils/logger'
-import CommonUtils from 'utils/common'
-import { ShouldInChildProcess } from 'exceptions'
+import logger from '../../utils/logger'
+import CommonUtils from '../../utils/common'
+import { ShouldInChildProcess } from '../../exceptions'
 import { AppendScript, BlockTips, Connector } from './connector'
 import LightConnector from './light-connector'
-import { generateRPC } from 'utils/ckb-rpc'
-import { BUNDLED_LIGHT_CKB_URL } from 'utils/const'
+import { generateRPC } from '../../utils/ckb-rpc'
+import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 
 export default class Queue {
-  // eslint-disable-next-line prettier/prettier
   #lockHashes: string[]
   #url: string // ckb node
   #indexerUrl: string
@@ -46,11 +45,13 @@ export default class Queue {
 
     const blake160s = this.#addresses.map(meta => meta.blake160)
     this.#multiSignBlake160s = blake160s.map(blake160 => Multisig.hash([blake160]))
-    this.#anyoneCanPayLockHashes = blake160s.map(b => this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+    this.#anyoneCanPayLockHashes = blake160s.map(b =>
+      this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
+    )
   }
 
   start = async () => {
-    logger.info("Queue:\tstart")
+    logger.info('Queue:\tstart')
     try {
       if (this.#url === BUNDLED_LIGHT_CKB_URL) {
         this.#indexerConnector = new LightConnector(this.#addresses, this.#url)
@@ -165,11 +166,11 @@ export default class Queue {
       for (const [, input] of tx.inputs.entries()) {
         const previousTxHash = input.previousOutput!.txHash
         if (previousTxHash === `0x${'0'.repeat(64)}`) {
-          continue;
+          continue
         }
 
         if (txHashSet.has(previousTxHash)) {
-          continue;
+          continue
         }
 
         fetchTxQueue.push({ txHash: previousTxHash })
@@ -210,10 +211,7 @@ export default class Queue {
         ) {
           const output = tx.outputs![inputIndex]
           if (output) {
-            output.setDepositOutPoint(new OutPoint(
-              input.previousOutput!.txHash,
-              input.previousOutput!.index,
-            ))
+            output.setDepositOutPoint(new OutPoint(input.previousOutput!.txHash, input.previousOutput!.index))
           }
         }
       }
@@ -251,8 +249,8 @@ export default class Queue {
         message: {
           indexerTipNumber: tip.indexerTipNumber,
           cacheTipNumber: tip.cacheTipNumber,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       })
     } else {
       throw new ShouldInChildProcess()

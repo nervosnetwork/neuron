@@ -1,10 +1,9 @@
-import CommonUtils from 'utils/common'
-import Block from 'models/chain/block'
-import BlockHeader from 'models/chain/block-header'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import logger from 'utils/logger'
-import { generateRPC } from 'utils/ckb-rpc'
-
+import CommonUtils from '../utils/common'
+import Block from '../models/chain/block'
+import BlockHeader from '../models/chain/block-header'
+import TransactionWithStatus from '../models/chain/transaction-with-status'
+import logger from '../utils/logger'
+import { generateRPC } from '../utils/ckb-rpc'
 export default class RpcService {
   private retryTime: number
   private retryInterval: number

@@ -13,10 +13,10 @@ const stubbedGetHeaderFn = jest.fn()
 const stubbedRxJsIntervalFn = jest.fn()
 
 jest.doMock('models/subjects/address-created-subject', () => ({
-  getSubject: jest.fn().mockImplementation(() => ({ subscribe: jest.fn }))
+  getSubject: jest.fn().mockImplementation(() => ({ subscribe: jest.fn })),
 }))
 jest.doMock('models/subjects/wallet-deleted-subject', () => ({
-  getSubject: jest.fn().mockImplementation(() => ({ subscribe: jest.fn() }))
+  getSubject: jest.fn().mockImplementation(() => ({ subscribe: jest.fn() })),
 }))
 
 const resetMocks = () => {
@@ -24,27 +24,25 @@ const resetMocks = () => {
   stubbedRxJsIntervalFn.mockReset()
 }
 
-stubbedRPCServiceConstructor.mockImplementation(
-  () => ({
-    getTransaction: stubbedGetTransactionFn,
-    getHeader: stubbedGetHeaderFn,
-  })
-)
+stubbedRPCServiceConstructor.mockImplementation(() => ({
+  getTransaction: stubbedGetTransactionFn,
+  getHeader: stubbedGetHeaderFn,
+}))
 
 jest.doMock('services/rpc-service', () => {
   return stubbedRPCServiceConstructor
-});
+})
 jest.doMock('rxjs', () => {
   return {
     __esModule: true,
     interval: stubbedRxJsIntervalFn,
     ReplaySubject: jest.fn(),
     Subject: jest.fn().mockReturnValue({
-      pipe: jest.fn().mockReturnValue({ subscribe: jest.fn() })
+      pipe: jest.fn().mockReturnValue({ subscribe: jest.fn() }),
     }),
     BehaviorSubject: jest.fn(),
   }
-});
+})
 
 const { register } = require('../../src/block-sync-renderer/tx-status-listener')
 
@@ -73,9 +71,9 @@ describe('', () => {
       stubbedRxJsIntervalFn.mockReturnValue({
         subscribe: (_callback: any) => {
           trackingStatus = _callback
-        }
+        },
       })
-    });
+    })
 
     describe('when there are pending txs', () => {
       beforeEach(async () => {
@@ -89,58 +87,52 @@ describe('', () => {
           const txStatus = new TxStatus('', TxStatusType.Committed)
           stubbedGetTransactionFn.mockResolvedValue({
             transaction: tx1,
-            txStatus
+            txStatus,
           })
 
           register()
           await trackingStatus()
-        });
+        })
         it('updates tx status to success', async () => {
-          const txs = await getConnection()
-            .getRepository(TransactionEntity)
-            .find()
+          const txs = await getConnection().getRepository(TransactionEntity).find()
           expect(txs[0].status).toEqual('success')
-        });
-      });
+        })
+      })
       describe('with pending status', () => {
         beforeEach(async () => {
           const txStatus = new TxStatus('', TxStatusType.Pending)
           stubbedGetTransactionFn.mockResolvedValue({
             transaction: tx1,
-            txStatus
+            txStatus,
           })
 
           register()
           await trackingStatus()
-        });
+        })
         it('tx status remains pending', async () => {
-          const txs = await getConnection()
-            .getRepository(TransactionEntity)
-            .find()
+          const txs = await getConnection().getRepository(TransactionEntity).find()
           expect(txs[0].status).toEqual('pending')
-        });
-      });
+        })
+      })
       describe('with no transaction returned from rpc', () => {
         beforeEach(async () => {
           register()
           await trackingStatus()
-        });
+        })
         it('updates tx status to failed', async () => {
-          const txs = await getConnection()
-            .getRepository(TransactionEntity)
-            .find()
+          const txs = await getConnection().getRepository(TransactionEntity).find()
           expect(txs[0].status).toEqual('failed')
-        });
-      });
-    });
+        })
+      })
+    })
     describe('when there are no pending txs', () => {
       beforeEach(async () => {
         register()
         await trackingStatus()
-      });
+      })
       it('should not proceed', () => {
         expect(stubbedGetTransactionFn).toHaveBeenCalledTimes(0)
       })
     })
-  });
-});
+  })
+})

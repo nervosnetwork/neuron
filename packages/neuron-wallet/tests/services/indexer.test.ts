@@ -10,7 +10,7 @@ jest.mock('fs', () => {
     existsSync: () => existsSyncMock(),
     readFileSync: () => jest.fn(),
     writeFileSync: () => jest.fn(),
-    rmSync: () => rmSyncMock()
+    rmSync: () => rmSyncMock(),
   }
 })
 
@@ -25,19 +25,17 @@ jest.mock('../../src/services/settings', () => {
         },
         set indexerDataPath(value: string) {
           setIndexerDataPathMock(value)
-        }
+        },
       }
     }
   }
 })
 
 jest.mock('../../src/utils/logger', () => ({
-  debug: () => jest.fn()
+  debug: () => jest.fn(),
 }))
 
-jest.mock('../../src/models/synced-block-number', () => ({
-  
-}))
+jest.mock('../../src/models/synced-block-number', () => ({}))
 
 jest.mock('../../src/database/chain', () => ({
   clean: () => jest.fn()
@@ -54,9 +52,9 @@ jest.mock('../../src/services/node', () => ({
     return {
       get isCkbNodeExternal() {
         return isCkbNodeExternalMock()
-      }
+      },
     }
-  }
+  },
 }))
 
 describe('test IndexerService', () => {

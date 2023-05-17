@@ -26,7 +26,7 @@ describe(`Unit tests of networks service`, () => {
 
   let service: NetworksService = new NetworksService()
 
-  beforeEach(() => service = new NetworksService())
+  beforeEach(() => (service = new NetworksService()))
   afterEach(() => service.clear())
 
   describe(`success cases`, () => {
@@ -105,14 +105,17 @@ describe(`Unit tests of networks service`, () => {
     })
 
     it(`delete an inactive network`, async () => {
-      const inactiveNetwork = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
+      const inactiveNetwork = await service.create(
+        newNetworkWithDefaultTypeOf1.name,
+        newNetworkWithDefaultTypeOf1.remote
+      )
       const prevCurrentID = service.getCurrentID() || ''
       const prevNetworks = service.getAll()
       await service.delete(inactiveNetwork.id)
       const currentID = service.getCurrentID()
       const currentNetworks = service.getAll()
       expect(currentNetworks.map(n => n.id)).toEqual(
-        prevNetworks.filter(n => n.id !== inactiveNetwork.id).map(n => n.id),
+        prevNetworks.filter(n => n.id !== inactiveNetwork.id).map(n => n.id)
       )
       expect(currentID).toBe(prevCurrentID)
     })
@@ -135,16 +138,12 @@ describe(`Unit tests of networks service`, () => {
   describe(`validation on parameters`, () => {
     describe(`validation on parameters`, () => {
       it(`service.create requires name, and remote`, async () => {
-        expect(service.create(undefined as any, undefined as any)).rejects.toThrowError(
-          t(ERROR_MESSAGE.MISSING_ARG),
-        )
+        expect(service.create(undefined as any, undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
         expect(service.create('network name', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
       it(`service.update requires id, options`, () => {
-        expect(service.update(undefined as any, undefined as any)).rejects.toThrowError(
-          t(ERROR_MESSAGE.MISSING_ARG),
-        )
+        expect(service.update(undefined as any, undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
         expect(service.update('', undefined as any)).rejects.toThrowError(t(ERROR_MESSAGE.MISSING_ARG))
       })
 
@@ -161,7 +160,7 @@ describe(`Unit tests of networks service`, () => {
   describe(`validation on network existence`, () => {
     beforeEach(async () => {
       await service.create('Default', 'http://127.0.0.1:8114')
-    });
+    })
 
     it(`create network with existing name of Default`, () => {
       expect(service.create('Default', 'http://127.0.0.1:8114')).rejects.toThrowError(t(ERROR_MESSAGE.NAME_USED))

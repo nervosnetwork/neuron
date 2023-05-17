@@ -23,33 +23,33 @@ const resetMocks = () => {
 jest.doMock('child_process', () => {
   return {
     ChildProcess: stubbedChildProcess,
-    spawn: stubbedSpawn
+    spawn: stubbedSpawn,
   }
 })
 jest.doMock('fs', () => {
   return {
     __esModule: true,
     default: {
-      existsSync: stubbedExistsSync
-    }
+      existsSync: stubbedExistsSync,
+    },
   }
 })
 
 const app = {
   getAppPath: () => '/',
   getPath: () => '/',
-  isPackaged: false
+  isPackaged: false,
 }
 jest.doMock('env', () => {
   return {
-    app
+    app,
   }
 })
 jest.doMock('utils/logger', () => {
   return {
     info: stubbedLoggerInfo,
     error: stubbedLoggerError,
-    log: stubbedLoggerLog
+    log: stubbedLoggerLog,
   }
 })
 jest.doMock('process', () => {
@@ -60,19 +60,24 @@ const ckbDataPath = '/chains/mainnet'
 jest.mock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      ckbDataPath
+      ckbDataPath,
     }
-  }
+  },
 }))
 jest.mock('../../src/block-sync-renderer', () => ({
   resetSyncTaskQueue: {
-    push: jest.fn()
-  }
+    push: jest.fn(),
+  },
 }))
 jest.mock('../../src/services/indexer', () => ({
-  cleanOldIndexerData: jest.fn()
+  cleanOldIndexerData: jest.fn(),
 }))
-const { startCkbNode, stopCkbNode, getLookingValidTargetStatus, migrateCkbData } = require('../../src/services/ckb-runner')
+const {
+  startCkbNode,
+  stopCkbNode,
+  getLookingValidTargetStatus,
+  migrateCkbData,
+} = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
@@ -88,7 +93,7 @@ describe('ckb runner', () => {
     { platform: 'win32', platformPath: 'win' },
     { platform: 'linux', platformPath: 'linux' },
     { platform: 'darwin', platformPath: 'mac' },
-    { platform: '_', platformPath: '' }
+    { platform: '_', platformPath: '' },
   ].forEach(({ platform, platformPath }) => {
     describe(`#startCkbNode on ${platform}`, () => {
       beforeEach(() => {
@@ -110,7 +115,7 @@ describe('ckb runner', () => {
             '--chain',
             'mainnet',
             '-C',
-            ckbDataPath
+            ckbDataPath,
           ])
         })
         it('runs ckb binary', () => {
@@ -144,7 +149,7 @@ describe('ckb runner', () => {
               '--chain',
               'mainnet',
               '-C',
-              ckbDataPath
+              ckbDataPath,
             ])
           })
           it('runs ckb binary', () => {
@@ -231,7 +236,7 @@ describe('ckb runner', () => {
 const migrateNextMock = jest.fn()
 
 jest.mock('../../src/models/subjects/migrate-subject', () => ({
-  next: (v: string) => migrateNextMock(v)
+  next: (v: string) => migrateNextMock(v),
 }))
 
 describe('ckb migrate', () => {

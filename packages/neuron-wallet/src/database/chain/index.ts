@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
-import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
-import SyncProgressService from 'services/sync-progress'
+import MultisigOutputChangedSubject from '../../models/subjects/multisig-output-db-changed-subject'
+import SyncProgressService from '../../services/sync-progress'
 import InputEntity from './entities/input'
 import OutputEntity from './entities/output'
 import TransactionEntity from './entities/transaction'
@@ -22,9 +22,5 @@ export const clean = async () => {
   ])
   MultisigOutputChangedSubject.getSubject().next('reset')
 
-  await getConnection()
-    .createQueryBuilder()
-    .delete()
-    .from(SyncInfoEntity)
-    .execute()
+  await getConnection().createQueryBuilder().delete().from(SyncInfoEntity).execute()
 }

@@ -34,14 +34,14 @@ const stubbedRPCCreateBatchRequestExecFn = jest.fn()
 const stubbedTxAddressFinder = jest.fn().mockImplementation((...args) => {
   stubbedTxAddressFinderConstructor(...args)
   return {
-    addresses: stubbedAddressesFn
+    addresses: stubbedAddressesFn,
   }
 })
 
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
   getChain: stubbedGetChainFn,
   getTransaction: stubbedGetTransactionFn,
-  genesisBlockHash: stubbedGenesisBlockHashFn
+  genesisBlockHash: stubbedGenesisBlockHashFn,
 }))
 
 const stubbedProcessSend = jest.spyOn(process, 'send')
@@ -70,14 +70,14 @@ const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   fakeTx.outputs = [
     Output.fromObject({
       capacity: '1',
-      lock: Script.fromObject({ hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash })
-    })
+      lock: Script.fromObject({ hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash }),
+    }),
   ]
   fakeTx.blockNumber = '0x1'
   fakeTx.timestamp = '0x1880a3fa5bc'
   const fakeTxWithStatus = {
     transaction: fakeTx,
-    txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed)
+    txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed),
   }
   return fakeTxWithStatus
 }
@@ -95,7 +95,7 @@ describe('queue', () => {
   const fakeNodeUrl = 'http://fakenode:8114'
   const fakeChain = 'ckb_test'
   const shortAddressInfo = {
-    lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+    lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
   const address = scriptToAddress(shortAddressInfo.lock, false)
   const fakeWalletId = 'w1'
@@ -111,7 +111,7 @@ describe('queue', () => {
     sentBalance: '',
     pendingBalance: '',
     balance: '',
-    version: AddressVersion.Testnet
+    version: AddressVersion.Testnet,
   }
   const addresses = [addressInfo]
 
@@ -130,14 +130,14 @@ describe('queue', () => {
         connect: stubbedConnectFn,
         blockTipsSubject: stubbedBlockTipsSubject,
         transactionsSubject: stubbedTransactionsSubject,
-        notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn
+        notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn,
       }
     })
     jest.doMock('controllers/sync-api', () => {
       return {
         emiter: {
-          emit: stubbedEmiterInvokeFn
-        }
+          emit: stubbedEmiterInvokeFn,
+        },
       }
     })
     jest.doMock('services/rpc-service', () => {
@@ -146,16 +146,16 @@ describe('queue', () => {
     jest.doMock('services/tx', () => {
       return {
         TransactionPersistor: {
-          saveFetchTx: stubbedSaveFetchFn
-        }
+          saveFetchTx: stubbedSaveFetchFn,
+        },
       }
     })
     jest.doMock('services/wallets', () => ({
       getInstance: () => ({
         get: () => ({
-          checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn
-        })
-      })
+          checkAndGenerateAddresses: stubbedCheckAndGenerateAddressesFn,
+        }),
+      }),
     }))
     jest.doMock('utils/logger', () => {
       return { error: stubbedLoggerErrorFn, info: jest.fn() }
@@ -209,7 +209,7 @@ describe('queue', () => {
             stubbedBlockTipsSubject.next({ cacheTipNumber: 3, indexerTipNumber: 3 })
             expect(stubbedProcessSend).toHaveBeenCalledWith({
               channel: 'cache-tip-block-updated',
-              message: { cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything() }
+              message: { cacheTipNumber: 3, indexerTipNumber: 3, timestamp: expect.anything() },
             })
           })
         })
@@ -254,7 +254,10 @@ describe('queue', () => {
               }
             })
             it('checks and generate new addresses', () => {
-              expect(stubbedProcessSend).toHaveBeenCalledWith({ channel: "check-and-save-wallet-address", message: [fakeWalletId]})
+              expect(stubbedProcessSend).toHaveBeenCalledWith({
+                channel: 'check-and-save-wallet-address',
+                message: [fakeWalletId],
+              })
             })
             it('notify indexer connector of processed block number', () => {
               expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
@@ -293,7 +296,7 @@ describe('queue', () => {
         })
         it('emit event indexer-error', () => {
           expect(stubbedProcessSend).toHaveBeenCalledWith({
-            channel: 'indexer-error'
+            channel: 'indexer-error',
           })
         })
       })

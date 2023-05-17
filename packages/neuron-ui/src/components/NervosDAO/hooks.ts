@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
@@ -24,15 +24,8 @@ import { ckbCore, getHeader } from 'services/chain'
 import { isErrorWithI18n } from 'exceptions'
 import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
 
-const {
-  MIN_AMOUNT,
-  MILLISECONDS_IN_YEAR,
-  MIN_DEPOSIT_AMOUNT,
-  MEDIUM_FEE_RATE,
-  SHANNON_CKB_RATIO,
-  MAX_DECIMAL_DIGITS,
-} = CONSTANTS
-let timer: NodeJS.Timeout
+const { MIN_AMOUNT, MILLISECONDS_IN_YEAR, MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIGITS } =
+  CONSTANTS
 
 const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
   return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
@@ -132,8 +125,7 @@ export const useClearGeneratedTx = (dispatch: React.Dispatch<StateAction>) =>
     })
   }, [dispatch])
 
-export const useUpdateDepositValue = ({
-  setDepositValue,
+export const useGenerateDaoDepositTx = ({
   setErrorMessage,
   clearGeneratedTx,
   maxDepositAmount,
@@ -143,9 +135,9 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage,
   isBalanceReserved,
   t,
+  depositValue,
   suggestFeeRate,
 }: {
-  setDepositValue: React.Dispatch<React.SetStateAction<string>>
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   clearGeneratedTx: () => void
   maxDepositAmount: bigint
@@ -155,7 +147,87 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage: string
   isBalanceReserved: boolean
   t: TFunction
-  suggestFeeRate: number | string
+  depositValue: string
+  suggestFeeRate: string | number
+}) => {
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(() => {
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      setErrorMessage('')
+      clearGeneratedTx()
+
+      try {
+        validateAmount(depositValue)
+      } catch (err) {
+        if (isErrorWithI18n(err)) {
+          setErrorMessage(
+            t(`messages.codes.${err.code}`, {
+              fieldName: 'deposit',
+              fieldValue: depositValue,
+              length: MAX_DECIMAL_DIGITS,
+            })
+          )
+        }
+        return
+      }
+
+      if (BigInt(CKBToShannonFormatter(depositValue)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
+        setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
+        return
+      }
+
+      const capacity = CKBToShannonFormatter(depositValue, CapacityUnit.CKB)
+      if (BigInt(capacity) < maxDepositAmount) {
+        generateDaoDepositTx({
+          feeRate: `${suggestFeeRate}`,
+          capacity,
+          walletID,
+        }).then(res => {
+          if (isSuccessResponse(res)) {
+            dispatch({
+              type: AppActions.UpdateGeneratedTx,
+              payload: res.result,
+            })
+          } else if (res.status === 0) {
+            setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+          } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
+            setErrorMessage(t(`messages.codes.106`))
+          } else {
+            setErrorMessage(t(`messages.codes.${res.status}`))
+          }
+        })
+      } else if (BigInt(capacity) === maxDepositAmount) {
+        dispatch({
+          type: AppActions.UpdateGeneratedTx,
+          payload: maxDepositTx,
+        })
+        if (!isBalanceReserved) {
+          setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
+        }
+      } else {
+        setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
+      }
+    })
+  }, [
+    clearGeneratedTx,
+    maxDepositAmount,
+    maxDepositTx,
+    dispatch,
+    walletID,
+    maxDepositErrorMessage,
+    t,
+    setErrorMessage,
+    isBalanceReserved,
+    depositValue,
+    suggestFeeRate,
+  ])
+}
+
+export const useUpdateDepositValue = ({
+  setDepositValue,
+}: {
+  setDepositValue: React.Dispatch<React.SetStateAction<string>>
 }) =>
   useCallback(
     (value: string) => {
@@ -163,74 +235,9 @@ export const useUpdateDepositValue = ({
       if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
         return
       }
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        setErrorMessage('')
-        clearGeneratedTx()
-
-        try {
-          validateAmount(amount)
-        } catch (err) {
-          if (isErrorWithI18n(err)) {
-            setErrorMessage(
-              t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: amount, length: MAX_DECIMAL_DIGITS })
-            )
-          }
-          return
-        }
-
-        if (BigInt(CKBToShannonFormatter(amount)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
-          setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
-          return
-        }
-
-        const capacity = CKBToShannonFormatter(amount, CapacityUnit.CKB)
-        if (BigInt(capacity) < maxDepositAmount) {
-          generateDaoDepositTx({
-            feeRate: `${suggestFeeRate}`,
-            capacity,
-            walletID,
-          }).then(res => {
-            if (isSuccessResponse(res)) {
-              dispatch({
-                type: AppActions.UpdateGeneratedTx,
-                payload: res.result,
-              })
-            } else if (res.status === 0) {
-              setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-            } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
-              setErrorMessage(t(`messages.codes.106`))
-            } else {
-              setErrorMessage(t(`messages.codes.${res.status}`))
-            }
-          })
-        } else if (BigInt(capacity) === maxDepositAmount) {
-          dispatch({
-            type: AppActions.UpdateGeneratedTx,
-            payload: maxDepositTx,
-          })
-          if (!isBalanceReserved) {
-            setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
-          }
-        } else {
-          setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
-        }
-      }, 500)
       setDepositValue(amount)
     },
-    [
-      clearGeneratedTx,
-      maxDepositAmount,
-      maxDepositTx,
-      dispatch,
-      walletID,
-      maxDepositErrorMessage,
-      t,
-      setDepositValue,
-      setErrorMessage,
-      isBalanceReserved,
-      suggestFeeRate,
-    ]
+    [setDepositValue]
   )
 
 export const useOnDepositValueChange = ({ updateDepositValue }: { updateDepositValue: (value: string) => void }) =>
@@ -294,7 +301,6 @@ export const useOnDepositDialogSubmit = ({
 }) =>
   useCallback(() => {
     setShowDepositDialog(false)
-    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
     dispatch({
       type: AppActions.RequestPassword,
       payload: {
@@ -602,4 +608,5 @@ export default {
   useOnSlide,
   useUpdateWithdrawList,
   useUpdateDepositEpochList,
+  useGenerateDaoDepositTx,
 }

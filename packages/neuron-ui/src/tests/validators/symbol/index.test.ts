@@ -2,9 +2,9 @@ import { isErrorWithI18n } from 'exceptions'
 import { validateSymbol } from 'utils/validators'
 import fixtures from './fixtures'
 
-const fixtureTable: Fixture.Validator<typeof validateSymbol>[] = Object.entries(
-  fixtures
-).map(([title, { params, exception }]) => [title, [params], exception])
+const fixtureTable: Fixture.Validator<typeof validateSymbol>[] = Object.entries(fixtures).map(
+  ([title, { params, exception }]) => [title, [params], exception]
+)
 
 describe('Test symbol validator', () => {
   test.each(fixtureTable)(`%s`, (_title, [params], exception) => {

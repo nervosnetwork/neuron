@@ -1,9 +1,9 @@
 import { getConnection } from 'typeorm'
 import { queue } from 'async'
-import AddressMeta from 'database/address/meta'
-import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
-import RpcService from 'services/rpc-service'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
+import AddressMeta from '../../database/address/meta'
+import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
+import RpcService from '../../services/rpc-service'
+import TransactionWithStatus from '../../models/chain/transaction-with-status'
 import { TransactionCollector, CellCollector, CkbIndexer } from '@nervina-labs/ckb-indexer'
 
 export default class IndexerCacheService {
@@ -30,7 +30,7 @@ export default class IndexerCacheService {
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        walletId: this.walletId
+        walletId: this.walletId,
       })
       .getCount()
   }
@@ -40,7 +40,7 @@ export default class IndexerCacheService {
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        walletId: this.walletId
+        walletId: this.walletId,
       })
       .getMany()
   }
@@ -61,7 +61,7 @@ export default class IndexerCacheService {
 
     return {
       blockNumber: result.blockNumber.toString(),
-      blockHash: result.blockHash
+      blockHash: result.blockHash,
     }
   }
 
@@ -70,10 +70,10 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .update(IndexerTxHashCache)
       .set({
-        isProcessed: true
+        isProcessed: true,
       })
       .where({
-        txHash
+        txHash,
       })
       .execute()
   }
@@ -84,7 +84,7 @@ export default class IndexerCacheService {
       const lockScripts = [
         addressMeta.generateDefaultLockScript(),
         addressMeta.generateACPLockScript(),
-        addressMeta.generateLegacyACPLockScript()
+        addressMeta.generateLegacyACPLockScript(),
       ]
 
       for (const lockScript of lockScripts) {
@@ -94,17 +94,16 @@ export default class IndexerCacheService {
             lock: {
               code_hash: lockScript.codeHash,
               hash_type: lockScript.hashType,
-              args: lockScript.args
-            }
+              args: lockScript.args,
+            },
           },
           this.indexer.ckbRpcUrl,
           {
-            includeStatus: false
+            includeStatus: false,
           }
         )
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
-        //@ts-ignore
         if (!fetchedTxHashes.length) {
           continue
         }
@@ -113,8 +112,8 @@ export default class IndexerCacheService {
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,
-              lockHash: lockScript.computeHash()
-            }
+              lockHash: lockScript.computeHash(),
+            },
           ])
         }
       }
@@ -122,12 +121,12 @@ export default class IndexerCacheService {
       const lockScriptsForCellCollection = [
         {
           lockScript: addressMeta.generateSingleMultiSignLockScript(),
-          argsLen: 28
+          argsLen: 28,
         },
         {
           lockScript: addressMeta.generateChequeLockScriptWithReceiverLockHash(),
-          argsLen: 40
-        }
+          argsLen: 40,
+        },
       ]
 
       for (const { lockScript, argsLen } of lockScriptsForCellCollection) {
@@ -135,9 +134,9 @@ export default class IndexerCacheService {
           lock: {
             code_hash: lockScript.codeHash,
             hash_type: lockScript.hashType,
-            args: lockScript.args.slice(0, 42)
+            args: lockScript.args.slice(0, 42),
           },
-          argsLen
+          argsLen,
         })
 
         for await (const cell of cellCollector.collect()) {
@@ -145,8 +144,8 @@ export default class IndexerCacheService {
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,
-              lockHash: lockScript.computeHash()
-            }
+              lockHash: lockScript.computeHash(),
+            },
           ])
         }
       }
@@ -214,7 +213,7 @@ export default class IndexerCacheService {
             lockHash,
             address,
             walletId: this.walletId,
-            isProcessed: false
+            isProcessed: false,
           })
           .execute()
       }
@@ -228,11 +227,11 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .update(IndexerTxHashCache)
       .set({
-        isProcessed: true
+        isProcessed: true,
       })
       .where({
         blockNumber: blockNumber,
-        walletId: this.walletId
+        walletId: this.walletId,
       })
       .execute()
   }
@@ -243,7 +242,7 @@ export default class IndexerCacheService {
       .createQueryBuilder()
       .where({
         isProcessed: false,
-        walletId: this.walletId
+        walletId: this.walletId,
       })
       .orderBy('blockNumber', 'ASC')
       .getOne()
@@ -259,7 +258,7 @@ export default class IndexerCacheService {
       .where({
         blockNumber,
         isProcessed: false,
-        walletId: this.walletId
+        walletId: this.walletId,
       })
       .getMany()
   }

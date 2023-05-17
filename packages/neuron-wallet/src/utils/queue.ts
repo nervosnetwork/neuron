@@ -44,6 +44,6 @@ export default function queueWrapper<T, R, E = Error>(
       )
       return promiseList[promiseList.length - 1]
     },
-    writable: false
+    writable: false,
   }) as AsyncQueue<T> & { asyncPush: (item: T) => Promise<R | undefined> }
 }

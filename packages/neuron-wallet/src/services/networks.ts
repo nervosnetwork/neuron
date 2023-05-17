@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid'
-import { DefaultNetworkUnremovable } from 'exceptions/network'
+import { DefaultNetworkUnremovable } from '../exceptions/network'
 
-import Store from 'models/store'
+import Store from '../models/store'
 
-import { Validate, Required } from 'utils/validators'
-import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
-import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network, TESTNET_GENESIS_HASH } from 'models/network'
-import CommonUtils from 'utils/common'
-import { BUNDLED_CKB_URL, BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from 'utils/const'
-import { generateRPC } from 'utils/ckb-rpc'
+import { Validate, Required } from '../utils/validators'
+import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network, TESTNET_GENESIS_HASH } from '../models/network'
+import CommonUtils from '../utils/common'
+import { BUNDLED_CKB_URL, BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from '../utils/const'
+import { generateRPC } from '../utils/ckb-rpc'
 
 const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',
@@ -19,9 +19,9 @@ const presetNetworks: { selected: string; networks: Network[] } = {
       remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
-      chain: 'ckb'
-    }
-  ]
+      chain: 'ckb',
+    },
+  ],
 }
 
 const lightClientNetwork: Network[] = [
@@ -107,7 +107,7 @@ export default class NetworksService extends Store {
       remote,
       type,
       genesisHash: EMPTY_GENESIS_HASH,
-      chain: 'ckb_dev'
+      chain: 'ckb_dev',
     }
     const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties).catch(
       () => properties
@@ -213,5 +213,8 @@ function applyLocalhostIPv4Resolve(url: string): string {
   if (urlObj.hostname !== 'localhost') return url
 
   urlObj.hostname = '127.0.0.1'
-  return urlObj.href
+  // When the pathname is empty, the URL constructor automatically sets the pathname
+  // to '/' and this needs to be handled.
+  const hasExtraPathSeparator = urlObj.pathname === '/' && !url.endsWith('/')
+  return hasExtraPathSeparator ? urlObj.href.slice(0, -1) : urlObj.href
 }

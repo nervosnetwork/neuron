@@ -48,6 +48,7 @@ const TransactionList = ({
   dispatch,
 }: TransactionListProps) => {
   const [txHash, setTxHash] = useState('')
+  const [isDetailOpening, setIsDetailOpening] = useState(false)
   const [t] = useTranslation()
 
   const {
@@ -115,7 +116,8 @@ const TransactionList = ({
             break
           }
           case 'detail': {
-            showTransactionDetails(btn.dataset.hash)
+            setIsDetailOpening(true)
+            showTransactionDetails(btn.dataset.hash).finally(() => setIsDetailOpening(false))
             break
           }
           default: {
@@ -279,9 +281,10 @@ const TransactionList = ({
                   onClick={onActionBtnClick}
                   data-hash={tx.hash}
                   data-action="detail"
+                  disabled={isDetailOpening}
                 >
                   <Detail />
-                  <span>{t('history.view-detail')}</span>
+                  <span>{isDetailOpening ? t('history.opening') : t('history.view-detail')}</span>
                 </button>
                 <button
                   type="button"

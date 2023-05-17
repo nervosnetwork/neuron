@@ -70,18 +70,18 @@ const linkNewCell = async (
 jest.mock('services/networks', () => ({
   getInstance() {
     return {
-      isMainnet: () => true
+      isMainnet: () => true,
     }
-  }
+  },
 }))
 
 const stubbedAddressDbChangedSubjectNext = jest.fn()
 jest.mock('models/subjects/address-db-changed-subject', () => ({
   getSubject() {
     return {
-      next: stubbedAddressDbChangedSubjectNext
+      next: stubbedAddressDbChangedSubjectNext,
     }
-  }
+  },
 }))
 
 describe('integration tests for AddressService', () => {
@@ -97,7 +97,7 @@ describe('integration tests for AddressService', () => {
           address,
           addressType,
           addressIndex,
-          publicKeyHash: AddressParser.toBlake160(address.address)
+          publicKeyHash: AddressParser.toBlake160(address.address),
         })
       }
     }
@@ -318,7 +318,7 @@ describe('integration tests for AddressService', () => {
             walletId,
             publicKey,
             addressType,
-            addressIndex
+            addressIndex,
           })
           generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
         })
@@ -337,7 +337,7 @@ describe('integration tests for AddressService', () => {
               walletId,
               publicKey,
               addressType,
-              addressIndex
+              addressIndex,
             })
             generatedAddresses = await AddressService.getAddressesByWalletId(walletId)
           })
@@ -401,7 +401,7 @@ describe('integration tests for AddressService', () => {
           expect.objectContaining({
             walletId,
             addressIndex: 0,
-            addressType: 0
+            addressType: 0,
           })
         )
       })
@@ -674,7 +674,7 @@ describe('integration tests for AddressService', () => {
           receiving.map((addr: any) => {
             return HdPublicKeyInfo.fromObject({
               ...addr,
-              publicKeyInBlake160: addr.blake160
+              publicKeyInBlake160: addr.blake160,
             })
           })
         )
@@ -684,7 +684,7 @@ describe('integration tests for AddressService', () => {
       it('create with more than one wallet', async () => {
         await expect(
           AddressService.create({
-            addresses: [{ walletId: '1' }, { walletId: '2' }]
+            addresses: [{ walletId: '1' }, { walletId: '2' }],
           })
         ).rejects.toThrow(new Error('Addresses can only be created for one wallet at a time'))
       })
@@ -694,12 +694,12 @@ describe('integration tests for AddressService', () => {
           receiving.map((addr: any) => {
             return HdPublicKeyInfo.fromObject({
               ...addr,
-              publicKeyInBlake160: addr.blake160
+              publicKeyInBlake160: addr.blake160,
             })
           })
         )
         await AddressService.create({
-          addresses: [...receiving, ...change]
+          addresses: [...receiving, ...change],
         })
         expect(stubbedAddressDbChangedSubjectNext).toHaveBeenCalledTimes(1)
       })

@@ -28,15 +28,15 @@ describe('SyncedBlockNumber model', () => {
     jest.doMock('models/subjects/node', () => {
       return {
         getSubject: () => ({
-          next: stubbedSyncedBlockNumberSubjectNext
-        })
+          next: stubbedSyncedBlockNumberSubjectNext,
+        }),
       }
-    });
+    })
     jest.doMock('utils/logger', () => {
       return {
-        info: stubbedLoggerInfo
+        info: stubbedLoggerInfo,
       }
-    });
+    })
     SyncedBlockNumber = require('../../src/models/synced-block-number').default
   })
 
@@ -53,19 +53,19 @@ describe('SyncedBlockNumber model', () => {
       let nextBlock: bigint
       beforeEach(async () => {
         nextBlock = await syncedBlockNumber.getNextBlock()
-      });
+      })
       it('returns block number 0', () => {
         expect(nextBlock).toEqual(BigInt(0))
       })
-    });
+    })
     describe('#setNextBlock', () => {
       beforeEach(() => {
         resetMocks()
-      });
+      })
       describe('when setting to a block number having absolute difference with the previous one by less than 10', () => {
         beforeEach(async () => {
           await syncedBlockNumber.setNextBlock(BigInt(9))
-        });
+        })
         it('should not update logs', () => {
           expect(stubbedLoggerInfo).not.toHaveBeenCalled()
         })
@@ -73,16 +73,16 @@ describe('SyncedBlockNumber model', () => {
           let nextBlock: bigint
           beforeEach(async () => {
             nextBlock = await syncedBlockNumber.getNextBlock()
-          });
+          })
           it('returns previous block number', () => {
             expect(nextBlock).toEqual(BigInt(0))
           })
-        });
-      });
+        })
+      })
       describe('when setting to a block number having absolute difference with the previous one by greater or equals to 10', () => {
         beforeEach(async () => {
           await syncedBlockNumber.setNextBlock(BigInt(10))
-        });
+        })
         it('updates logs', () => {
           expect(stubbedLoggerInfo).toHaveBeenCalled()
         })
@@ -90,13 +90,12 @@ describe('SyncedBlockNumber model', () => {
           let nextBlock: bigint
           beforeEach(async () => {
             nextBlock = await syncedBlockNumber.getNextBlock()
-          });
+          })
           it('returns current block number', () => {
             expect(nextBlock).toEqual(BigInt(10))
           })
-        });
-      });
-    });
-  });
-
+        })
+      })
+    })
+  })
 })

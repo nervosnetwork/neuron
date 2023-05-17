@@ -14,5 +14,5 @@ export class InvalidMnemonic extends Error {
 
 export default {
   UnsupportedCipher,
-  InvalidMnemonic
+  InvalidMnemonic,
 }

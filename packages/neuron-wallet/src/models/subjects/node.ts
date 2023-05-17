@@ -12,7 +12,7 @@ export const ConnectionStatusSubject = new BehaviorSubject<ConnectionStatus>({
   url: '',
   connected: false,
   isBundledNode: true,
-  startedBundledNode: false
+  startedBundledNode: false,
 })
 
 export const getLatestConnectionStatus = async () => {

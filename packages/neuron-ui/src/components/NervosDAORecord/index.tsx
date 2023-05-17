@@ -136,9 +136,9 @@ export const DAORecord = ({
   }
 
   const lockedPeriod =
-    unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
+    unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo.timestamp - +depositInfo.timestamp : undefined
   const compensatedPeriod =
-    withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo?.timestamp - +depositInfo?.timestamp : undefined
+    withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo.timestamp - +depositInfo.timestamp : undefined
 
   const isActionAvailable =
     connectionStatus === 'online' && [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus)

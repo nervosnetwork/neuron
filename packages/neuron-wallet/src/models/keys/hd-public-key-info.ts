@@ -1,6 +1,6 @@
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import SystemScriptInfo from 'models/system-script-info'
-import NetworksService from 'services/networks'
+import SystemScriptInfo from '../../models/system-script-info'
+import NetworksService from '../../services/networks'
 import Address, { AddressType } from './address'
 
 export default class HdPublicKeyInfoModel {
@@ -15,7 +15,7 @@ export default class HdPublicKeyInfoModel {
       {
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
-        args: this.publicKeyInBlake160
+        args: this.publicKeyInBlake160,
       },
       NetworksService.getInstance().isMainnet()
     )

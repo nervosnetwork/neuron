@@ -33,7 +33,8 @@ describe('queueWrapper', () => {
 
   it('asyncPush excute by order', async () => {
     const q = queueWrapper(fnMock)
-    fnMock.mockReturnValueOnce(createPromise(400))
+    fnMock
+      .mockReturnValueOnce(createPromise(400))
       .mockReturnValueOnce(createPromise(200))
       .mockReturnValueOnce(createPromise(100))
     q.asyncPush(1)
@@ -47,7 +48,8 @@ describe('queueWrapper', () => {
 
   it('asyncPush excute by order and ignore same item', async () => {
     const q = queueWrapper(fnMock, 1, true)
-    fnMock.mockReturnValueOnce(createPromise(400))
+    fnMock
+      .mockReturnValueOnce(createPromise(400))
       .mockReturnValueOnce(createPromise(300))
       .mockReturnValueOnce(createPromise(300))
     q.asyncPush(1)

@@ -1,4 +1,4 @@
-import { SyncAddressType } from 'database/chain/entities/sync-progress'
+import { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import { Subject } from 'rxjs'
 
 export interface BlockTips {

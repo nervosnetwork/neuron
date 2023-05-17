@@ -1,4 +1,3 @@
-
 describe(`Create block sync task`, () => {
   const STUB_ADDRESS_METAS = 'address metas'
   const STUB_NETWORK = { id: 'id', genesisHash: '0x1', remote: 'stub_network_url' }
@@ -16,12 +15,12 @@ describe(`Create block sync task`, () => {
     once: jest.fn(),
     send: stubbedChildProcessSend,
     stderr: {
-      setEncoding: childProcessStdErrEncoding
-    }
+      setEncoding: childProcessStdErrEncoding,
+    },
   }))
 
   jest.doMock('child_process', () => ({
-    fork: stubbedChildProcessFork
+    fork: stubbedChildProcessFork,
   }))
 
   jest.doMock('models/subjects/data-update', () => ({
@@ -30,7 +29,9 @@ describe(`Create block sync task`, () => {
 
   jest.doMock(`utils/logger`, () => ({ info: stubbedLoggerInfo }))
   jest.doMock('services/addresses', () => ({ getAddressesByAllWallets: stubbedGetAddressesByAllWallets }))
-  jest.doMock('services/networks', () => ({ getInstance: jest.fn().mockReturnValue({ getCurrent: () => STUB_NETWORK }) }))
+  jest.doMock('services/networks', () => ({
+    getInstance: jest.fn().mockReturnValue({ getCurrent: () => STUB_NETWORK }),
+  }))
 
   const blockSyncRenderer = require('block-sync-renderer')
   const spyRegisterRequest = jest.spyOn(blockSyncRenderer, 'registerRequest').mockResolvedValue(0)
@@ -73,8 +74,8 @@ describe(`Create block sync task`, () => {
         addressMetas: STUB_ADDRESS_METAS,
         genesisHash: STUB_NETWORK.genesisHash,
         indexerUrl: STUB_NETWORK.remote,
-        url: STUB_NETWORK.remote
-      }
+        url: STUB_NETWORK.remote,
+      },
     })
   })
 })

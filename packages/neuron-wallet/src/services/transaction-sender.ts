@@ -1,46 +1,47 @@
-import WalletService, { Wallet } from 'services/wallets'
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
 import { scriptToAddress, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
-import { Address } from 'models/address'
-import { PathAndPrivateKey } from 'models/keys/key'
-import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
-import FeeMode from 'models/fee-mode'
-import TransactionSize from 'models/transaction-size'
-import TransactionFee from 'models/transaction-fee'
-import logger from 'utils/logger'
-import Keychain from 'models/keys/keychain'
-import Input from 'models/chain/input'
-import OutPoint from 'models/chain/out-point'
-import Output from 'models/chain/output'
-import RpcService from 'services/rpc-service'
-import WitnessArgs from 'models/chain/witness-args'
-import Transaction from 'models/chain/transaction'
-import Script from 'models/chain/script'
-import Multisig from 'models/multisig'
-import Blake2b from 'models/blake2b'
-import HexUtils from 'utils/hex'
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
-import SystemScriptInfo from 'models/system-script-info'
-import AddressParser from 'models/address-parser'
+import WalletService, { Wallet } from '../services/wallets'
+import RpcService from '../services/rpc-service'
+import { PathAndPrivateKey } from '../models/keys/key'
+import { Address } from '../models/address'
+import FeeMode from '../models/fee-mode'
+import TransactionSize from '../models/transaction-size'
+import TransactionFee from '../models/transaction-fee'
+import Keychain from '../models/keys/keychain'
+import Input from '../models/chain/input'
+import OutPoint from '../models/chain/out-point'
+import Output from '../models/chain/output'
+import WitnessArgs from '../models/chain/witness-args'
+import Transaction from '../models/chain/transaction'
+import Script from '../models/chain/script'
+import Multisig from '../models/multisig'
+import Blake2b from '../models/blake2b'
+import logger from '../utils/logger'
+import HexUtils from '../utils/hex'
+import SystemScriptInfo from '../models/system-script-info'
+import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
 import {
   CapacityNotEnoughForChange,
   CapacityNotEnoughForChangeByTransfer,
   MultisigConfigNeedError,
   NoMatchAddressForSign,
-  SignTransactionFailed
-} from 'exceptions'
-import AssetAccountInfo from 'models/asset-account-info'
-import MultisigConfigModel from 'models/multisig-config'
+  SignTransactionFailed,
+  CellIsNotYetLive,
+  TransactionIsNotCommittedYet
+} from '../exceptions'
+import AssetAccountInfo from '../models/asset-account-info'
+import MultisigConfigModel from '../models/multisig-config'
 import { Hardware } from './hardware/hardware'
 import MultisigService from './multisig'
-import { getMultisigStatus } from 'utils/multisig'
-import { SignStatus } from 'models/offline-sign'
+import { getMultisigStatus } from '../utils/multisig'
+import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
-import { generateRPC } from 'utils/ckb-rpc'
+import { generateRPC } from '../utils/ckb-rpc'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import CellsService from './cells'
 
@@ -138,7 +139,7 @@ export default class TransactionSender {
       ? addressInfos.map(i => {
           return {
             multiSignBlake160: Multisig.hash([i.blake160]),
-            path: i.path
+            path: i.path,
           }
         })
       : []
@@ -173,7 +174,7 @@ export default class TransactionSender {
           witnessArgs,
           lockHash: input.lockHash!,
           witness: '',
-          lockArgs
+          lockArgs,
         }
       })
 
@@ -199,8 +200,9 @@ export default class TransactionSender {
       let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
       if (isMultisig) {
-        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160]))!
-          .blake160
+        const blake160 = addressInfos.find(
+          i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160])
+        )!.blake160
         const serializedMultisig: string = Multisig.serialize([blake160])
         signed = await TransactionSender.signSingleMultiSignScript(
           privateKey,
@@ -220,7 +222,7 @@ export default class TransactionSender {
               return wit
             }
             return wit.toSDK()
-          })
+          }),
         })
       }
 
@@ -299,7 +301,7 @@ export default class TransactionSender {
         witnessArgs,
         lockHash: input.lockHash!,
         witness: '',
-        lockArgs
+        lockArgs,
       }
     })
 
@@ -307,7 +309,7 @@ export default class TransactionSender {
     const multisigConfigMap: Record<string, MultisigConfigModel> = multisigConfigs.reduce(
       (pre, cur) => ({
         ...pre,
-        [cur.getLockHash()]: cur
+        [cur.getLockHash()]: cur,
       }),
       {}
     )
@@ -395,7 +397,7 @@ export default class TransactionSender {
 
     const emptyWitness = WitnessArgs.fromObject({
       ...firstWitness,
-      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m)
+      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
     const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
@@ -429,7 +431,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const changeAddress: string = await this.getChangeAddress()
@@ -460,7 +462,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
@@ -474,7 +476,7 @@ export default class TransactionSender {
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
@@ -494,7 +496,7 @@ export default class TransactionSender {
   ): Promise<Transaction> {
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: BigInt(item.capacity).toString()
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     try {
@@ -514,7 +516,7 @@ export default class TransactionSender {
         {
           lockArgs: [lockScript.args],
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+          hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
         },
         multisigConfig
       )
@@ -709,7 +711,7 @@ export default class TransactionSender {
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [withdrawWitnessArgs],
-      interest: (BigInt(outputCapacity) - depositCapacity).toString()
+      interest: (BigInt(outputCapacity) - depositCapacity).toString(),
     })
     if (mode.isFeeRateMode()) {
       const txSize: number = TransactionSize.tx(tx)
@@ -797,7 +799,7 @@ export default class TransactionSender {
     return {
       length: (epoch >> BigInt(40)) & BigInt(0xffff),
       index: (epoch >> BigInt(24)) & BigInt(0xffff),
-      number: epoch & BigInt(0xffffff)
+      number: epoch & BigInt(0xffffff),
     }
   }
 
@@ -831,7 +833,7 @@ export default class TransactionSender {
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     return uniquePaths.map(path => ({
       path,
-      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`
+      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
     }))
   }
 }

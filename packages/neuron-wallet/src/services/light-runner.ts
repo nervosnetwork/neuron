@@ -1,10 +1,10 @@
-import env from 'env'
 import path from 'path'
 import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
-import logger from 'utils/logger'
-import SettingsService from 'services/settings'
-import { clean } from 'database/chain'
+import env from '../env'
+import logger from '../utils/logger'
+import SettingsService from '../services/settings'
+import { clean } from '../database/chain'
 
 const { app } = env
 

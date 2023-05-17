@@ -2,8 +2,8 @@ import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
 
-import logger from 'utils/logger'
-import env from 'env'
+import logger from '../../utils/logger'
+import env from '../../env'
 
 import HdPublicKeyInfo from './entities/hd-public-key-info'
 import Transaction from './entities/transaction'
@@ -121,7 +121,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ],
     logger: 'simple-console',
     logging,
-    maxQueryExecutionTime: 30
+    maxQueryExecutionTime: 30,
   }
 }
 

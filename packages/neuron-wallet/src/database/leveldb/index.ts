@@ -2,8 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import levelup, { LevelUp } from 'levelup'
 import leveldown from 'leveldown'
-import env from 'env'
-import logger from 'utils/logger'
+import env from '../../env'
+import logger from '../../utils/logger'
 
 const leveldb = (dbname: string): LevelUp => {
   const dir = env.fileBasePath
