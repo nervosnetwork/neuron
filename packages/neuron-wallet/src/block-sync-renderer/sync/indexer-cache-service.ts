@@ -4,6 +4,7 @@ import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
+import SyncInfoEntity from '../../database/chain/entities/sync-info'
 import { TransactionCollector, CellCollector, Indexer as CkbIndexer } from '@ckb-lumos/ckb-indexer'
 
 export default class IndexerCacheService {
@@ -11,6 +12,7 @@ export default class IndexerCacheService {
   private rpcService: RpcService
   private walletId: string
   private indexer: CkbIndexer
+  #cacheBlockNumberEntity?: SyncInfoEntity
 
   constructor(walletId: string, addressMetas: AddressMeta[], rpcService: RpcService, indexer: CkbIndexer) {
     for (const addressMeta of addressMetas) {
@@ -23,16 +25,6 @@ export default class IndexerCacheService {
     this.addressMetas = addressMetas
     this.rpcService = rpcService
     this.indexer = indexer
-  }
-
-  private async countTxHashes(): Promise<number> {
-    return getConnection()
-      .getRepository(IndexerTxHashCache)
-      .createQueryBuilder()
-      .where({
-        walletId: this.walletId,
-      })
-      .getCount()
   }
 
   private async getTxHashes(): Promise<IndexerTxHashCache[]> {
@@ -79,6 +71,8 @@ export default class IndexerCacheService {
   }
 
   private async fetchTxMapping(): Promise<Map<string, Array<{ address: string; lockHash: string }>>> {
+    const lastCacheBlockNumber = await this.getCachedBlockNumber()
+    const currentHeaderBlockNumber = await this.rpcService.getTipBlockNumber()
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
@@ -88,9 +82,18 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const transactionCollector = new TransactionCollector(this.indexer, { lock: lockScript }, this.rpcService.url, {
-          includeStatus: false,
-        })
+        const transactionCollector = new TransactionCollector(
+          this.indexer,
+          {
+            lock: lockScript,
+            fromBlock: lastCacheBlockNumber.value,
+            toBlock: currentHeaderBlockNumber,
+          },
+          this.rpcService.url,
+          {
+            includeStatus: false,
+          }
+        )
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
         if (!fetchedTxHashes.length) {
@@ -126,6 +129,8 @@ export default class IndexerCacheService {
             args: lockScript.args.slice(0, 42),
           },
           argsLen,
+          fromBlock: lastCacheBlockNumber.value,
+          toBlock: currentHeaderBlockNumber,
         })
 
         for await (const cell of cellCollector.collect()) {
@@ -142,17 +147,33 @@ export default class IndexerCacheService {
     return mappingsByTxHash
   }
 
+  private async getCachedBlockNumber() {
+    if (!this.#cacheBlockNumberEntity) {
+      this.#cacheBlockNumberEntity = (await getConnection().getRepository(SyncInfoEntity).findOne({ name: SyncInfoEntity.getLastCachedKey(this.walletId) })) ?? 
+        SyncInfoEntity.fromObject({
+          name: SyncInfoEntity.getLastCachedKey(this.walletId),
+          value: '0x0'
+        })
+    }
+
+    return this.#cacheBlockNumberEntity
+  }
+
+  private async saveCacheBlockNumber(cacheBlockNumber: string) {
+    let cacheBlockNumberEntity = await this.getCachedBlockNumber()
+    cacheBlockNumberEntity.value = cacheBlockNumber
+    await getConnection().manager.save(cacheBlockNumberEntity)
+  }
+
   public async upsertTxHashes(): Promise<string[]> {
+    const tipBlockNumber = await this.rpcService.getTipBlockNumber()
     const mappingsByTxHash = await this.fetchTxMapping()
 
     const fetchedTxHashes = [...mappingsByTxHash.keys()]
-    const fetchedTxHashCount = fetchedTxHashes.reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash)!.length, 0)
-
-    const txCount = await this.countTxHashes()
-    if (fetchedTxHashCount === txCount) {
+    if (!fetchedTxHashes.length) {
+      await this.saveCacheBlockNumber(tipBlockNumber)
       return []
     }
-
     const txMetasCaches = await this.getTxHashes()
     const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
 
@@ -161,6 +182,7 @@ export default class IndexerCacheService {
     const newTxHashes = fetchedTxHashes.filter(hash => !cachedTxHashesSet.has(hash))
 
     if (!newTxHashes.length) {
+      await this.saveCacheBlockNumber(tipBlockNumber)
       return []
     }
 
@@ -208,6 +230,7 @@ export default class IndexerCacheService {
       }
     }
 
+    await this.saveCacheBlockNumber(tipBlockNumber)
     return newTxHashes
   }
 

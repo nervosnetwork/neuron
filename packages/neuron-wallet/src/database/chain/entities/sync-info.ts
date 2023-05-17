@@ -13,4 +13,18 @@ export default class SyncInfo {
     type: 'varchar',
   })
   value!: string
+  
+  static fromObject(params: {
+    name: string,
+    value: string
+  }) {
+    const res = new SyncInfo()
+    res.name = params.name
+    res.value = params.value
+    return res
+  }
+
+  static getLastCachedKey(walletId: string) {
+    return `lastCachedBlockNumber_${walletId}`
+  }
 }

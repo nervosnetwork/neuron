@@ -18,6 +18,7 @@ import AddressDescription from './entities/address-description'
 import MultisigConfig from './entities/multisig-config'
 import MultisigOuput from './entities/multisig-output'
 import SyncProgress from './entities/sync-progress'
+import TxLock from './entities/tx-lock'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -51,6 +52,7 @@ import { UpdateOutputChequeLockHash1652945662504 } from './migrations/1652945662
 import { RemoveAddressesMultisigConfig1651820157100 } from './migrations/1651820157100-RemoveAddressesMultisigConfig'
 import { AddSyncProgress1676441837373 } from './migrations/1676441837373-AddSyncProgress'
 import { AddTypeSyncProgress1681360188494 } from './migrations/1681360188494-AddTypeSyncProgress'
+import { TxLock1684488676083 } from './migrations/1684488676083-TxLock'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -84,6 +86,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       MultisigConfig,
       MultisigOuput,
       SyncProgress,
+      TxLock,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -118,6 +121,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       RemoveAddressesMultisigConfig1651820157100,
       AddSyncProgress1676441837373,
       AddTypeSyncProgress1681360188494,
+      TxLock1684488676083,
     ],
     logger: 'simple-console',
     logging,

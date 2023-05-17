@@ -9,6 +9,8 @@ export const DEFAULT_UDT_SYMBOL = 'Unknown'
 export const MIN_SUDT_CAPACITY = 142 * 10 ** 8
 export const MIN_CELL_CAPACITY = 61 * 10 ** 8
 export const START_WITHOUT_INDEXER = -4
+export const DEFAULT_ARGS_LENGTH = 42
+export const CHEQUE_ARGS_LENGTH = 82
 
 export enum ResponseCode {
   Fail,
