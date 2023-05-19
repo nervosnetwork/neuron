@@ -5,6 +5,7 @@ import env from '../env'
 import logger from '../utils/logger'
 import SettingsService from '../services/settings'
 import { clean } from '../database/chain'
+import { resetSyncTaskQueue } from '../block-sync-renderer'
 
 const { app } = env
 
@@ -53,7 +54,7 @@ abstract class NodeRunner {
       if (this.runnerProcess) {
         logger.info('Runner:\tkilling node')
         this.runnerProcess.once('close', () => resolve())
-        this.runnerProcess.kill('SIGKILL')
+        this.runnerProcess.kill()
         this.runnerProcess = undefined
       } else {
         resolve()
@@ -167,5 +168,6 @@ export class CKBLightRunner extends NodeRunner {
     fs.rmSync(SettingsService.getInstance().testnetLightDataPath, { recursive: true, force: true })
     await clean()
     await this.start()
+    resetSyncTaskQueue.asyncPush(true)
   }
 }

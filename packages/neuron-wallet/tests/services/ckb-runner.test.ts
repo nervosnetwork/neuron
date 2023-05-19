@@ -1,5 +1,6 @@
 import { EventEmitter } from 'typeorm/platform/PlatformTools'
 import path from 'path'
+import { scheduler } from 'timers/promises'
 
 const stubbedChildProcess = jest.fn()
 const stubbedSpawn = jest.fn()
@@ -8,6 +9,7 @@ const stubbedExistsSync = jest.fn()
 const stubbedLoggerInfo = jest.fn()
 const stubbedLoggerError = jest.fn()
 const stubbedLoggerLog = jest.fn()
+const resetSyncTaskQueueAsyncPushMock = jest.fn()
 
 const stubbedProcess: any = {}
 
@@ -18,6 +20,7 @@ const resetMocks = () => {
   stubbedLoggerInfo.mockReset()
   stubbedLoggerError.mockReset()
   stubbedLoggerLog.mockReset()
+  resetSyncTaskQueueAsyncPushMock.mockReset()
 }
 
 jest.doMock('child_process', () => {
@@ -72,6 +75,11 @@ jest.mock('../../src/block-sync-renderer', () => ({
 jest.mock('../../src/services/indexer', () => ({
   cleanOldIndexerData: jest.fn(),
 }))
+jest.doMock('../../src/block-sync-renderer', () => ({
+  resetSyncTaskQueue: {
+    asyncPush: resetSyncTaskQueueAsyncPushMock
+  }
+}))
 const {
   startCkbNode,
   stopCkbNode,
@@ -88,6 +96,7 @@ describe('ckb runner', () => {
     stubbedCkb.stderr = new EventEmitter()
     stubbedCkb.stdout = new EventEmitter()
     stubbedSpawn.mockReturnValue(stubbedCkb)
+    resetSyncTaskQueueAsyncPushMock.mockReturnValue('')
   })
   ;[
     { platform: 'win32', platformPath: 'win' },
@@ -122,7 +131,7 @@ describe('ckb runner', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join(platformPath, 'ckb')),
             ['run', '-C', ckbDataPath, '--indexer'],
-            { stdio: ['ignore', 'pipe', 'pipe'] }
+            { stdio: ['ignore', 'ignore', 'pipe'] }
           )
         })
       })
@@ -156,7 +165,7 @@ describe('ckb runner', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(
               expect.stringContaining(path.join(platformPath, 'ckb')),
               ['run', '-C', ckbDataPath, '--indexer'],
-              { stdio: ['ignore', 'pipe', 'pipe'] }
+              { stdio: ['ignore', 'ignore', 'pipe'] }
             )
           })
         })
@@ -178,14 +187,25 @@ describe('ckb runner', () => {
 
       describe('with assume valid target', () => {
         beforeEach(async () => {
+          stubbedProcess.platform = platform
           app.isPackaged = true
           stubbedProcess.env = { CKB_NODE_ASSUME_VALID_TARGET: '0x' + '0'.repeat(64) }
           stubbedExistsSync.mockReturnValue(true)
           await startCkbNode()
         })
-        afterEach(() => {
+        afterEach(async () => {
           app.isPackaged = false
           stubbedProcess.env = {}
+          const promise = stopCkbNode()
+          stubbedCkb.emit('close')
+          await promise
+        })
+        it('runs ckb binary', () => {
+          expect(stubbedSpawn).toHaveBeenCalledWith(
+            expect.stringContaining(path.join('bin', 'ckb')),
+            ['run', '-C', ckbDataPath, '--indexer', "--assume-valid-target", '0x' + '0'.repeat(64)],
+            { stdio: ['ignore', 'pipe', 'pipe'] }
+          )
         })
         it('is Looking valid target', () => {
           stubbedCkb.stdout.emit(
@@ -193,21 +213,15 @@ describe('ckb runner', () => {
             `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`
           )
           expect(getLookingValidTargetStatus()).toBeTruthy()
-          stubbedCkb.emit('close')
         })
         it('is Looking valid target', async () => {
           stubbedCkb.stdout.emit(
             'data',
             `can't find assume valid target temporarily, hash: Byte32(0x${'0'.repeat(64)})`
           )
-          await new Promise(resolve =>
-            setTimeout(() => {
-              resolve(undefined)
-            }, 11000)
-          )
+          await scheduler.wait(11000)
           stubbedCkb.stdout.emit('data', `had find valid target`)
           expect(getLookingValidTargetStatus()).toBeFalsy()
-          stubbedCkb.emit('close')
         }, 15000)
         it('ckb has closed', async () => {
           stubbedCkb.stdout.emit(
