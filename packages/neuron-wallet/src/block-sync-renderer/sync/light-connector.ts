@@ -9,7 +9,7 @@ import { scheduler } from 'timers/promises'
 import SyncProgressService from '../../services/sync-progress'
 import { BlockTips, LumosCellQuery, Connector, AppendScript } from './connector'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
+import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import HexUtils from '../../utils/hex'
 import Multisig from '../../services/multisig'
 import { SyncAddressType } from '../../database/chain/entities/sync-progress'
@@ -76,9 +76,9 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       .map(v => v.outPoint.txHash)
       .map<[string, string]>(v => ['fetchTransaction', v])
     const txs = await this.lightRpc
-      .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | { status: 'fetching' | 'added' | 'not_found' })[]>(fetchTxHashes)
+      .createBatchRequest<any, string[], FetchTransactionReturnType[]>(fetchTxHashes)
       .exec()
-    if (txs.some(v => 'status' in v && !!v.status)) {
+    if (txs.some(v => !v.txWithStatus)) {
       // wait for light client sync the dep cell
       await scheduler.wait(10000)
       return await this.getDepTxs()
@@ -87,7 +87,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       .map((v, idx) => {
         if (v.depType === DepType.DepGroup) {
           const tx = txs[idx]
-          return 'status' in tx ? undefined : tx?.transaction?.outputsData?.[+v.outPoint.index]
+          return tx.txWithStatus ? tx?.txWithStatus?.transaction?.outputsData?.[+v.outPoint.index] : undefined
         }
       })
       .filter<string>((v): v is string => !!v)
@@ -100,7 +100,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     ]
     if (depGroupTxHashes.length) {
       await this.lightRpc
-        .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | { status: 'fetching' | 'added' | 'not_found' })[]>(
+        .createBatchRequest<any, string[], FetchTransactionReturnType[]>(
           depGroupTxHashes.map(v => ['fetchTransaction', v])
         )
         .exec()
