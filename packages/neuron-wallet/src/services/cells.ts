@@ -481,7 +481,7 @@ export default class CellsService {
       .where(
         `
         multisig_output.status IN (:...statuses) AND
-        multisig_output.lockArgs in (:lockArgs) AND
+        multisig_output.lockArgs IN (:...lockArgs) AND
         multisig_output.lockCodeHash = :lockCodeHash AND
         multisig_output.lockHashType = :lockHashType
         `,
