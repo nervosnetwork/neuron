@@ -9,7 +9,7 @@ import { scheduler } from 'timers/promises'
 import SyncProgressService from '../../services/sync-progress'
 import { BlockTips, LumosCellQuery, Connector, AppendScript } from './connector'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
+import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import HexUtils from '../../utils/hex'
 import Multisig from '../../services/multisig'
 import { SyncAddressType } from '../../database/chain/entities/sync-progress'
@@ -61,7 +61,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     this.fetchDepCell()
   }
 
-  private async fetchDepCell() {
+  private async getDepTxs(): Promise<string[]> {
     const assetAccountInfo = new AssetAccountInfo()
     const fetchCellDeps = [
       assetAccountInfo.anyoneCanPayCellDep,
@@ -75,30 +75,36 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     const fetchTxHashes = fetchCellDeps
       .map(v => v.outPoint.txHash)
       .map<[string, string]>(v => ['fetchTransaction', v])
-    let txs = await this.lightRpc
-      .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | null)[]>(fetchTxHashes)
+    const txs = await this.lightRpc
+      .createBatchRequest<any, string[], FetchTransactionReturnType[]>(fetchTxHashes)
       .exec()
-    if (txs.some(v => !v)) {
-      // if some txs fetch to added, then fetch the actural txs
-      txs = await this.lightRpc
-        .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | null)[]>(fetchTxHashes)
-        .exec()
+    if (txs.some(v => !v.txWithStatus)) {
+      // wait for light client sync the dep cell
+      await scheduler.wait(10000)
+      return await this.getDepTxs()
     }
-    const depGroupOutputsData: string[] = fetchCellDeps
+    return fetchCellDeps
       .map((v, idx) => {
         if (v.depType === DepType.DepGroup) {
-          return txs[idx]?.transaction?.outputsData?.[+v.outPoint.index]
+          const tx = txs[idx]
+          return tx.txWithStatus ? tx?.txWithStatus?.transaction?.outputsData?.[+v.outPoint.index] : undefined
         }
       })
       .filter<string>((v): v is string => !!v)
+  }
+
+  private async fetchDepCell() {
+    const depGroupOutputsData: string[] = await this.getDepTxs()
     const depGroupTxHashes = [
       ...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.tx_hash.toHexString())).flat())
     ]
-    await this.lightRpc
-      .createBatchRequest<any, string[], (CKBComponents.TransactionWithStatus | null)[]>(
-        depGroupTxHashes.map(v => ['fetchTransaction', v])
-      )
-      .exec()
+    if (depGroupTxHashes.length) {
+      await this.lightRpc
+        .createBatchRequest<any, string[], FetchTransactionReturnType[]>(
+          depGroupTxHashes.map(v => ['fetchTransaction', v])
+        )
+        .exec()
+    }
   }
 
   private async synchronize() {
@@ -154,9 +160,9 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     if (!this.addressMetas.length && !appendScripts?.length) {
       return
     }
-    const sycnScripts = await this.lightRpc.getScripts()
+    const syncScripts = await this.lightRpc.getScripts()
     const existSyncscripts: Record<string, LightScriptFilter> = {}
-    sycnScripts.forEach(v => {
+    syncScripts.forEach(v => {
       existSyncscripts[scriptToHash(v.script)] = v
     })
     const currentWalletId = WalletService.getInstance().getCurrent()?.id

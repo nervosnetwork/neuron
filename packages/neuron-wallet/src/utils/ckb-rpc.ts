@@ -90,8 +90,10 @@ const lightRPCProperties: Record<string, Omit<Parameters<CKBRPC['addMethod']>[0]
     method: 'fetch_transaction',
     paramsFormatters: [paramsFormatter.toHash],
     resultFormatters: (result: { status: 'fetched' | 'fetching' | 'added' | 'not_found', data?: RPC.TransactionWithStatus }) => {
-      if (result.status === 'fetched' && result.data) {return resultFormatter.toTransactionWithStatus(result.data)}
-      return result
+      return {
+        status: result.status,
+        txWithStatus: result.status === 'fetched' && result.data ? resultFormatter.toTransactionWithStatus(result.data) : undefined
+      }
     }
   }
 }
@@ -106,6 +108,8 @@ export class FullCKBRPC extends CKBRPC {
   }
 }
 
+export type FetchTransactionReturnType = { status: 'fetched' | 'fetching' | 'added' | 'not_found', txWithStatus?: CKBComponents.TransactionWithStatus }
+
 export class LightRPC extends Base {
   setScripts: (params: LightScriptFilter[]) => Promise<null>
   getScripts: () => Promise<LightScriptSyncStatus[]>
@@ -117,7 +121,7 @@ export class LightRPC extends Base {
   ) => Promise<{ lastCursor: HexString, txs: { txHash: HexString, txIndex: HexString, blockNumber: CKBComponents.BlockNumber }[]}>
 
   getTransactionInLight: Base['getTransaction']
-  fetchTransaction: (hash: string) => Promise<CKBComponents.TransactionWithStatus | { status: 'fetching' | 'added' | 'not_found' }>
+  fetchTransaction: (hash: string) => Promise<FetchTransactionReturnType>
 
   getGenesisBlock: () => Promise<CKBComponents.Block>
   exceptionMethods = ['getCurrentEpoch', 'getEpochByNumber', 'getBlockHash', 'getLiveCell']
@@ -151,10 +155,10 @@ export class LightRPC extends Base {
     if (!tx?.transaction) {
       tx = await CommonUtils.retry(3, 100, async () => {
         const tmp = await this.fetchTransaction(hash)
-        if ('status' in tmp) {
+        if (!tmp.txWithStatus) {
           throw new Error(`transaction ${hash} status: ${tmp.status}`)
         }
-        return tmp
+        return tmp.txWithStatus
       })
       if (!tx) {throw new Error(`Fetch transaction tx failed, please try it later: ${hash}`)}
     }

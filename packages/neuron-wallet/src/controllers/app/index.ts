@@ -59,8 +59,10 @@ export default class AppController {
     if (env.isTestMode) {
       return
     }
-    await stopCkbNode()
-    await CKBLightRunner.getInstance().stop()
+    await Promise.all([
+      stopCkbNode(),
+      CKBLightRunner.getInstance().stop(),
+    ])
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {

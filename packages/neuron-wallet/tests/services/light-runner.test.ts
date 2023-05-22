@@ -20,6 +20,7 @@ const loggerErrorMock = jest.fn()
 const loggerInfoMock = jest.fn()
 const transportsGetFileMock = jest.fn()
 const cleanMock = jest.fn()
+const resetSyncTaskQueueAsyncPushMock = jest.fn()
 
 function resetMock() {
   mockFn.mockReset()
@@ -40,6 +41,7 @@ function resetMock() {
   loggerInfoMock.mockReset()
   transportsGetFileMock.mockReset()
   cleanMock.mockReset()
+  resetSyncTaskQueueAsyncPushMock.mockReset()
 }
 
 jest.doMock('../../src/env', () => ({
@@ -71,6 +73,12 @@ jest.doMock('../../src/services/settings', () => ({
 
 jest.doMock('../../src/database/chain', () => ({
   clean: cleanMock
+}))
+
+jest.doMock('../../src/block-sync-renderer', () => ({
+  resetSyncTaskQueue: {
+    asyncPush: resetSyncTaskQueueAsyncPushMock
+  }
 }))
 
 jest.doMock('process', () => ({
@@ -282,7 +290,7 @@ describe('test light runner', () => {
       CKBLightRunner.getInstance().runnerProcess = emitter
       mockFn.mockImplementation(() => { emitter.emit('close') })
       await CKBLightRunner.getInstance().stop()
-      expect(mockFn).toBeCalledWith('SIGKILL')
+      expect(mockFn).toBeCalledWith()
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
     })
   })
