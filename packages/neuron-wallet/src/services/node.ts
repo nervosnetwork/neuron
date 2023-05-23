@@ -143,8 +143,11 @@ class NodeService {
     } else {
       logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
       this._isCkbNodeExternal = true
-      await this.verifyNodeVersion()
-      await this.verifyStartWithIndexer()
+      let network = NetworksService.getInstance().getCurrent()
+      if (network.type !== NetworkType.Light) {
+        await this.verifyNodeVersion()
+        await this.verifyStartWithIndexer()
+      }
     }
   }
 

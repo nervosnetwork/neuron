@@ -565,16 +565,19 @@ export const useUpdateDepositEpochList = ({
         depositBlockHashes => {
           const recordKeyIdxMap = new Map<string, number>()
           const batchParams: ['getHeader', string][] = []
-          records.forEach((record, idx) => {
+          let index = 0
+          records.forEach((record) => {
             if (!record.depositOutPoint && record.blockHash) {
               batchParams.push(['getHeader', record.blockHash])
-              recordKeyIdxMap.set(record.outPoint.txHash, idx)
+              recordKeyIdxMap.set(record.outPoint.txHash, index)
+              index += 1
             }
           })
-          depositBlockHashes.forEach((v, idx) => {
+          depositBlockHashes.forEach((v) => {
             if (v.blockHash) {
               batchParams.push(['getHeader', v.blockHash])
-              recordKeyIdxMap.set(v.txHash, idx)
+              recordKeyIdxMap.set(v.txHash, index)
+              index += 1
             }
           })
           ckbCore.rpc
