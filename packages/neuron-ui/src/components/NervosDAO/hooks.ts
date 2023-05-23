@@ -563,21 +563,18 @@ export const useUpdateDepositEpochList = ({
     if (connectionStatus === 'online') {
       getBlockHashes(records.map(v => v.depositOutPoint?.txHash).filter(v => !!v) as string[]).then(
         depositBlockHashes => {
-          const recordKeyIdxMap = new Map<string, number>()
+          const recordKeyIdx: string[] = []
           const batchParams: ['getHeader', string][] = []
-          let index = 0
           records.forEach((record) => {
             if (!record.depositOutPoint && record.blockHash) {
               batchParams.push(['getHeader', record.blockHash])
-              recordKeyIdxMap.set(record.outPoint.txHash, index)
-              index += 1
+              recordKeyIdx.push(record.outPoint.txHash)
             }
           })
           depositBlockHashes.forEach((v) => {
             if (v.blockHash) {
               batchParams.push(['getHeader', v.blockHash])
-              recordKeyIdxMap.set(v.txHash, index)
-              index += 1
+              recordKeyIdx.push(v.txHash)
             }
           })
           ckbCore.rpc
@@ -587,7 +584,7 @@ export const useUpdateDepositEpochList = ({
               const epochList = new Map()
               records.forEach(record => {
                 const key = record.depositOutPoint ? record.depositOutPoint.txHash : record.outPoint.txHash
-                epochList.set(key, recordKeyIdxMap.has(key) ? res[recordKeyIdxMap.get(key)!]?.epoch : null)
+                epochList.set(key, res[recordKeyIdx.indexOf(key)]?.epoch)
               })
               setDepositEpochList(epochList)
             })
