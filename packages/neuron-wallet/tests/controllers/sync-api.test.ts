@@ -1,7 +1,10 @@
 import Emitter from 'events'
 import { flushPromises } from '../test-utils'
 
-const stubbedEmitter = jest.fn()
+const stubbedEmitter = jest.fn(() => {
+  const SyncAPIController = jest.requireActual('../../src/controllers/sync-api').default
+  return SyncAPIController.emiter
+})
 const stubbedSyncedBlockNumber = jest.fn()
 const stubbedSyncStateSubjectNext = jest.fn()
 const stubbedGetSyncState = jest.fn()
@@ -66,9 +69,6 @@ describe('SyncApiController', () => {
 
     jest.doMock('services/indexer', () => ({ LISTEN_URI: 'stub_listen_uri' }))
 
-    jest.doMock('events', () => {
-      return stubbedEmitter
-    })
     jest.doMock('models/synced-block-number', () => {
       return stubbedSyncedBlockNumber
     })
@@ -114,6 +114,8 @@ describe('SyncApiController', () => {
 
     emitter.removeAllListeners()
     const SyncAPIController = require('../../src/controllers/sync-api').default
+    // TODO: starting from jest@29.4.0 or above, you can use `jest.replaceProperty` as an alternative implementation.
+    Object.defineProperty(SyncAPIController, 'emiter', { get: stubbedEmitter })
     controller = new SyncAPIController()
     controller.mount()
   })
