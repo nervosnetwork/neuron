@@ -15,12 +15,10 @@ export const getNeuronWalletState = remoteApi<void>('load-init-data')
 export const openInWindow = remoteApi<Controller.OpenInWindowParams>('open-in-window')
 export const requestOpenInExplorer = remoteApi<Controller.RequestOpenInExplorerParams, void>('request-open-in-explorer')
 export const handleViewError = remoteApi<string>('handle-view-error')
-export const showSettings = remoteApi<Controller.ShowSettingsParams>('show-settings')
 export const setLocale = remoteApi<typeof LOCALES[number]>('set-locale')
 export const getCkbNodeDataPath = remoteApi<void, string>('get-ckb-node-data-path')
-export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean }, string>(
-  'set-ckb-node-data-path'
-)
+export const setCkbNodeDataPath =
+  remoteApi<{ dataPath: string; clearCache?: boolean }, string>('set-ckb-node-data-path')
 export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
 export const getIsCkbRunExternal = remoteApi<void, boolean>('is-ckb-run-external')

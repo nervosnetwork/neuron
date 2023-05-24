@@ -12,6 +12,7 @@ export enum RoutePath {
   Send = '/send',
   Receive = '/receive',
   History = '/history',
+  HistoryDetailPage = '/history-detail-page',
   Transaction = '/transaction',
   Settings = '/settings',
   SettingsGeneral = 'general',
@@ -22,7 +23,6 @@ export enum RoutePath {
   ImportWallet = '/wallets/import',
   ImportKeystore = '/keystore/import',
   NetworkEditor = '/network',
-  WalletEditor = '/editwallet',
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
   SpecialAssets = '/special-assets',
@@ -32,6 +32,7 @@ export enum RoutePath {
   NFTSend = '/nft',
   ImportHardware = '/import-hardware',
   OfflineSign = 'offline-sign',
+  SignVerify = 'sign-verify',
 }
 
 export enum CapacityUnit {

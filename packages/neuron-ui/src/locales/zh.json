@@ -177,7 +177,8 @@
       "create-wallet": "立即创建新钱包",
       "repeat-password": "重复密码",
       "finish-create": "完成创建",
-      "creating-wallet": "钱包准备中，请稍后"
+      "creating-wallet": "钱包准备中，请稍后",
+      "add-one": "添加钱包"
     },
     "import-keystore": {
       "title": "导入 Keystore 文件",
@@ -249,6 +250,8 @@
       "copy-qr-code": "复制收款码图片"
     },
     "history": {
+      "title": "交易历史",
+      "title-detail": "交易详情",
       "meta": "元信息",
       "type": "交易类型",
       "date": "时间",
@@ -277,12 +280,20 @@
         "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
+      "table": {
+        "name": "钱包名称",
+        "type": "类型",
+        "amount": "金额",
+        "timestamp": "时间",
+        "status": "状态",
+        "operation": "操作"
+      },
       "export-history": "导出交易历史",
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "no-txs": "没有交易记录",
-      "view-in-explorer": "浏览器",
+      "view-in-explorer": "浏览器打开",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
@@ -305,7 +316,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "cell-from-cellbase": "来自 Cellbase",
-      "lock-script": "锁脚本",
+      "lock-script": "脚本锁定",
+      "lock-script-title": "地址信息",
       "deprecated-address-format": "废弃格式地址"
     },
     "addresses": {
@@ -340,7 +352,8 @@
         "show": "显示",
         "hide": "隐藏",
         "version": "版本",
-        "language": "语言",
+        "language": "系统语言",
+        "select-language": "选择语言",
         "apply": "应用"
       },
       "wallet-manager": {
@@ -364,7 +377,7 @@
         "edit-network": {
           "title": "添加或编辑网络",
           "rpc-url": "RPC地址",
-          "name": "名称"
+          "name": "网络名称"
         },
         "mainnet": "主网",
         "testnet": "测试网",
@@ -398,18 +411,20 @@
         "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "cache-cleared-on": "上次清空缓存时间 {{date}}",
         "clear-cache": "清空缓存",
-        "clearing-cache": "清空中...",
-        "remove-ckb-data-tip": "请将 CKB Node 数据从 {{prevPath}} 移动至 {{currentPath}}然后点击 \"数据转移完成\" 开始从已知区块同步; 否则点击 \"重新同步\" 开始重新同步.",
+        "clearing-cache": "正在清除缓存中，请稍候",
+        "set-path": "设置路径",
+        "remove-ckb-data-tip": "请将 CKB Node 数据从 【{{prevPath}}】 移动至 【{{currentPath}}】 然后点击 \"数据转移完成\" 开始从已知区块同步; 或者点击 \"重新同步\" 开始重新同步.",
         "resync-ckb-node-describe": "注意: 重新同步不会删除当前已同步的 CKB Node 数据",
         "cancel": "取消",
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
-        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效"
+        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
+        "ckb-node-storage": "CKB节点数据"
       }
     },
     "password-request": {
       "wallet-not-found": "找不到该钱包",
-      "password": "密码",
+      "password": "输入密码",
       "send": {
         "title": "发起交易"
       },
@@ -626,7 +641,7 @@
       "completed-records": "已解锁",
       "apc": "当前年化锁定补贴率",
       "apc-tooltip": "当前年化锁定补贴率",
-      "fee": "手续费",
+      "fee": "手续费：",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "从 Nervos DAO 取出",
       "cancel": "取消",
@@ -638,16 +653,17 @@
       "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
-      "balance-not-reserved": "（不建议）不预留未来操作手续费",
+      "balance-not-reserved": "不预留未来操作手续费（不建议）",
+      "deposit-amount": "存入金额 (CKB)",
       "deposit-record": {
         "deposited-at": "存入于",
         "completed-at": "已取出",
         "deposit-pending": "存入 提交中",
-        "withdraw-action-label": "取出",
+        "withdraw-action-label": "发起提取",
         "unlock-action-label": "解锁",
         "record": "记录",
         "deposited": "存入",
-        "withdrawn": "提取",
+        "withdrawn": "发起提取",
         "unlocked": "解锁",
         "tx-record": "交易记录",
         "locked-period": "锁定时间",
@@ -678,9 +694,31 @@
         }
       }
     },
+    "nervos-dao-detail": {
+      "tx-detail": "交易详情",
+      "deposited": "存入",
+      "withdrawn": "发起提取",
+      "unlocked": "解锁",
+      "basic-information": "基本信息",
+      "transaction-hash": "交易哈希",
+      "blockNumber": "区块高度",
+      "datetime": "时间",
+      "income": "收入",
+      "index": "序号",
+      "address": "地址",
+      "amount": "数量",
+      "cell-from-cellbase": "来自 Cellbase",
+      "cancel": "取消",
+      "next": "下一步"
+    },
+    "lock-info-dialog": {
+      "address-info": "地址信息",
+      "deprecated-address": "已弃用格式的地址"
+    },
     "updates": {
       "check-updates": "检查更新",
-      "checking-updates": "正在检查...",
+      "checking-updates": "正在检查更新...",
+      "update-available": "检测到新版本",
       "downloading-update": "正在下载更新...",
       "update-not-available": "已经在使用最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",

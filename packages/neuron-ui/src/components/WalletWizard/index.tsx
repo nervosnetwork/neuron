@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import { Link, useNavigate, useLocation, useParams, NavigateFunction } from 'react-router-dom'
+import { Link, useNavigate, useLocation, useParams, NavigateFunction, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
@@ -181,7 +181,7 @@ const typeHits: Record<MnemonicAction, string> = {
   [MnemonicAction.Import]: '',
 }
 
-const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch, isSettings }: WizardElementProps) => {
+const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: WizardElementProps) => {
   const { generated, imported } = state
   const navigate = useNavigate()
   const { type = MnemonicAction.Create } = useParams<{ type: MnemonicAction }>()
@@ -189,6 +189,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch, isSettin
   const isCreate = type === MnemonicAction.Create
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
   const { inputsWords, onChangeInput, setInputsWords } = useInputWords()
+  const [searchParams] = useSearchParams()
   const disableNext =
     (type === MnemonicAction.Import && inputsWords.some(v => !v)) ||
     (type === MnemonicAction.Verify && generated !== inputsWords.join(' '))
@@ -259,12 +260,13 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch, isSettin
 
   const onBack = useCallback(() => {
     changeStep(v => v - 1)
+    const isSettings = searchParams.get('isSettings') === '1'
     if (type === MnemonicAction.Create && !isSettings) {
       navigate(`${rootPath}${WalletWizardPath.Welcome}`)
     } else {
       navigate(-1)
     }
-  }, [changeStep, type])
+  }, [changeStep, type, searchParams])
 
   return (
     <div className={styles.mnemonic}>

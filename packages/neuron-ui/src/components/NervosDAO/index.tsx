@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { useTranslation } from 'react-i18next'
-import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 
 import appState from 'states/init/app'
 
@@ -18,6 +17,7 @@ import {
   ErrorCode,
   CapacityUnit,
   isSuccessResponse,
+  clsx,
 } from 'utils'
 
 import { generateDaoDepositTx, openExternal } from 'services/remote'
@@ -25,9 +25,11 @@ import { generateDaoDepositTx, openExternal } from 'services/remote'
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord, { DAORecordProps } from 'components/NervosDAORecord'
-import BalanceSyncIcon from 'components/BalanceSyncingIcon'
-import Button from 'widgets/Button'
+import PageContainer from 'components/PageContainer'
 import CopyZone from 'widgets/CopyZone'
+import { ArrowNext, Deposit, EyesClose, EyesOpen, Tooltip } from 'widgets/Icons/icon'
+import TableNoData from 'widgets/Icons/TableNoData.png'
+import { HIDE_BALANCE } from 'utils/const'
 
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import hooks from './hooks'
@@ -38,7 +40,6 @@ const { MIN_DEPOSIT_AMOUNT } = CONSTANTS
 const DAO_DOCS_URL = 'https://docs.nervos.org/docs/basics/guides/crypto%20wallets/neuron/#deposit-ckb-into-nervos-dao'
 
 const NervosDAO = () => {
-  const [focusedRecord, setFocusedRecord] = useState('')
   const [tabIdx, setTabIdx] = useState('0')
   const {
     app: {
@@ -47,6 +48,7 @@ const NervosDAO = () => {
       tipBlockHash,
       tipBlockTimestamp,
       epoch,
+      pageNotice,
     },
     wallet,
     nervosDAO: { records },
@@ -60,6 +62,7 @@ const NervosDAO = () => {
   const dispatch = useDispatch()
   const [t, { language }] = useTranslation()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false)
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
@@ -184,39 +187,39 @@ const NervosDAO = () => {
 
     return (
       <>
-        <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>
-          <button type="button" role="tab" data-idx="0">
+        <div role="presentation" className={styles.recordTab} style={{ '--selected-tab': tabIdx }} onClick={onTabClick}>
+          <div className={styles.underline} />
+          <button className={clsx({ [styles.active]: tabIdx === '0' })} type="button" role="tab" data-idx="0">
             {t('nervos-dao.deposit-records')}
           </button>
-          <button type="button" role="tab" data-idx="1">
+          <button className={clsx({ [styles.active]: tabIdx === '1' })} type="button" role="tab" data-idx="1">
             {t('nervos-dao.completed-records')}
           </button>
-          <div className={styles.underline} />
         </div>
         {filteredRecord.length ? (
-          filteredRecord.map(record => {
-            const key = record.depositOutPoint
-              ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
-              : `${record.outPoint.txHash}-${record.outPoint.index}`
+          <div className={styles.records}>
+            {filteredRecord.map(record => {
+              const key = record.depositOutPoint
+                ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
+                : `${record.outPoint.txHash}-${record.outPoint.index}`
 
-            const props: DAORecordProps = {
-              ...record,
-              tipBlockTimestamp,
-              withdrawCapacity: withdrawList.get(key) || null,
-              onClick: onActionClick,
-              depositEpoch: depositEpochList.get(key) || '',
-              currentEpoch: epoch,
-              genesisBlockTimestamp,
-              connectionStatus,
-              isCollapsed: focusedRecord !== key,
-              onToggle: () => {
-                setFocusedRecord(focusedRecord === key ? '' : key)
-              },
-            }
-            return <DAORecord key={key} {...props} />
-          })
+              const props: DAORecordProps = {
+                ...record,
+                tipBlockTimestamp,
+                withdrawCapacity: withdrawList.get(key) || null,
+                onClick: onActionClick,
+                depositEpoch: depositEpochList.get(key) || '',
+                currentEpoch: epoch,
+                genesisBlockTimestamp,
+                connectionStatus,
+                isPrivacyMode,
+              }
+              return <DAORecord key={key} {...props} />
+            })}
+          </div>
         ) : (
           <div className={styles.noRecords}>
+            <img src={TableNoData} alt="No Data" />
             {t(`nervos-dao.deposit-record.no-${tabIdx === '0' ? 'deposit' : 'completed'}`)}
           </div>
         )}
@@ -232,10 +235,9 @@ const NervosDAO = () => {
     genesisBlockTimestamp,
     tipBlockTimestamp,
     depositEpochList,
-    focusedRecord,
-    setFocusedRecord,
     tabIdx,
     setTabIdx,
+    isPrivacyMode,
   ])
 
   const onDepositDialogOpen = useCallback(() => {
@@ -340,90 +342,107 @@ const NervosDAO = () => {
 
   const onlineAndSynced = ConnectionStatus.Online === connectionStatus && SyncStatus.SyncCompleted === syncStatus
 
-  const info = [
-    {
-      key: 'free',
-      value: (
-        <CopyZone
-          content={shannonToCKBFormatter(`${free}`, false, '')}
-          name={t('nervos-dao.copy-balance')}
-          className={styles.balance}
-        >
-          {`${shannonToCKBFormatter(`${free}`)} CKB`}
-        </CopyZone>
-      ),
-    },
-    {
-      key: 'locked',
-      value: onlineAndSynced ? (
-        <CopyZone
-          content={shannonToCKBFormatter(`${locked}`, false, '')}
-          name={t('nervos-dao.copy-balance')}
-          className={styles.balance}
-        >
-          {`${shannonToCKBFormatter(`${locked}`)} CKB`}
-        </CopyZone>
-      ) : (
-        `-- CKB`
-      ),
-    },
-    {
-      key: 'apc',
-      tooltip: ['en', 'en-US'].includes(language) ? `apc-tooltip` : undefined,
-      value: `~${globalAPC}%`,
-    },
-  ]
+  const isEnglish = language === 'en' || language.startsWith('en-')
 
   return (
-    <div className={styles.nervosDAOContainer}>
-      <h1 className={styles.title}>Nervos DAO</h1>
-      {info.map(({ key, value, tooltip }) => {
-        const label = t(`nervos-dao.${key}`)
-        return (
-          <div key={key} title={label} aria-label={label} className={styles[key]}>
-            <span>
-              {label}
-              {tooltip ? (
-                <span className={styles.tooltip} data-tooltip={t(`nervos-dao.${tooltip}`)}>
-                  <TooltipIcon />
-                </span>
-              ) : null}
-            </span>
-
-            <div
-              style={{
-                color: onlineAndSynced ? '#000' : '#888',
-              }}
-            >
-              {value}
+    <PageContainer
+      head={
+        <div className={styles.pageHead}>
+          Nervos DAO
+          {isPrivacyMode ? (
+            <EyesClose onClick={() => setIsPrivacyMode(false)} />
+          ) : (
+            <EyesOpen onClick={() => setIsPrivacyMode(true)} />
+          )}
+        </div>
+      }
+      notice={pageNotice}
+    >
+      <div className={styles.header}>
+        <div className={styles.daoOverview}>
+          <div className={clsx(styles.field, styles.free)}>
+            <div className={styles.name}>{t(`nervos-dao.free`)}</div>
+            <div className={styles.value}>
+              <CopyZone
+                content={shannonToCKBFormatter(`${free}`, false, '')}
+                name={t('nervos-dao.copy-balance')}
+                className={styles.balance}
+              >
+                <span className={styles.number}>{isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(`${free}`)}</span>{' '}
+                CKB
+              </CopyZone>
             </div>
           </div>
-        )
-      })}
-      <div className={styles.networkAlert}>
-        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+
+          <div className={clsx(styles.field, styles.locked)}>
+            <div className={styles.name}>{t(`nervos-dao.locked`)}</div>
+            <div className={styles.value}>
+              {onlineAndSynced ? (
+                <CopyZone
+                  content={shannonToCKBFormatter(`${locked}`, false, '')}
+                  name={t('nervos-dao.copy-balance')}
+                  className={styles.balance}
+                >
+                  <span className={styles.number}>
+                    {isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(`${locked}`)}
+                  </span>{' '}
+                  CKB
+                </CopyZone>
+              ) : (
+                <div>-- CKB</div>
+              )}
+            </div>
+          </div>
+
+          <div className={clsx(styles.field, styles.apc)}>
+            <div className={styles.name}>
+              {t(`nervos-dao.apc`)}
+              {isEnglish && (
+                <span className={styles.tooltip} data-tooltip={t(`nervos-dao.apc-tooltip`)}>
+                  <Tooltip />
+                </span>
+              )}
+            </div>
+            <div className={styles.value}>
+              {isPrivacyMode ? (
+                <span className={styles.number}>******</span>
+              ) : (
+                <>
+                  ≈ <span className={styles.number}>{globalAPC}%</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.deposit}>
+          <span
+            onClick={handleOpenRules}
+            onKeyPress={handleOpenRules}
+            role="link"
+            tabIndex={0}
+            className={styles.rules}
+          >
+            {t('nervos-dao.deposit-rules')}
+            <ArrowNext />
+          </span>
+
+          <button
+            className={styles.action}
+            type="button"
+            disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
+            onClick={() => setShowDepositDialog(true)}
+          >
+            <Deposit />
+            {t('nervos-dao.deposit')}
+          </button>
+        </div>
       </div>
-      <div className={styles.deposit}>
-        <Button
-          type="primary"
-          disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-          onClick={() => setShowDepositDialog(true)}
-          label={t('nervos-dao.deposit')}
-        />
-      </div>
-      <span
-        onClick={handleOpenRules}
-        onKeyPress={handleOpenRules}
-        role="link"
-        tabIndex={0}
-        className={styles.depositRules}
-      >
-        {t('nervos-dao.deposit-rules')}
-      </span>
-      <div className={styles.records}>{MemoizedRecords}</div>
+
+      <div className={styles.recordsContainer}>{MemoizedRecords}</div>
       {MemoizedDepositDialog}
       {MemoizedWithdrawDialog}
-    </div>
+    </PageContainer>
   )
 }
 

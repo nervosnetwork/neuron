@@ -1,0 +1,98 @@
+.cells {
+  margin-top: 16px;
+  border-radius: 16px;
+  background: var(--secondary-background-color);
+
+  .cellTypes {
+    display: flex;
+    gap: 48px;
+    height: 48px;
+    padding: 0 16px;
+
+    .cellType {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      color: var(--secondary-text-color);
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+
+      &.active,
+      &:hover {
+        color: var(--primary-color);
+      }
+
+      &.active {
+        cursor: default;
+
+        &::after {
+          $padding: 12px;
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: $padding;
+          width: calc(100% - $padding * 2);
+          height: 2px;
+          background: var(--primary-color);
+        }
+      }
+    }
+  }
+
+  .cellsPanel {
+    display: grid;
+    grid-template-columns: minmax(80px, max-content) auto minmax(
+        182px,
+        max-content
+      );
+    grid-template-rows: 48px;
+    grid-auto-rows: minmax(56px, auto);
+
+    .row {
+      display: contents;
+
+      > :first-child {
+        padding-left: 16px;
+      }
+
+      > :last-child {
+        padding-right: 16px;
+      }
+
+      > div {
+        display: flex;
+        align-items: center;
+        border-top: 1px solid var(--table-head-border-color);
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--main-text-color);
+      }
+
+      &.columns > div {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--table-head-background-color);
+        font-size: 14px;
+        line-height: 20px;
+        color: #999999;
+
+        .eyes {
+          cursor: pointer;
+
+          path {
+            fill: currentColor;
+          }
+        }
+      }
+
+      .address {
+        font-family: 'JetBrains Mono';
+        font-weight: 500;
+      }
+    }
+  }
+}

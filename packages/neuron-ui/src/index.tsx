@@ -8,17 +8,14 @@ import 'styles/index.scss'
 import 'utils/i18n'
 
 import Transaction from 'components/Transaction'
-import SignAndVerify from 'components/SignAndVerify'
 import MultiSignAddress from 'components/MultisigAddress'
 import ErrorBoundary from 'components/ErrorBoundary'
 import Spinner from 'widgets/Spinner'
 import { withProvider } from 'states'
-import mainRouterConfig, { settingRouterConfig } from 'router'
+import mainRouterConfig from 'router'
 
 if (window.location.hash.startsWith('#/transaction/')) {
   ReactDOM.render(<Transaction />, document.getElementById('root'))
-} else if (window.location.hash.startsWith('#/sign-verify/')) {
-  ReactDOM.render(<SignAndVerify />, document.getElementById('root'))
 } else if (window.location.hash.startsWith('#/multisig-address/')) {
   ReactDOM.render(
     <Router>
@@ -27,13 +24,11 @@ if (window.location.hash.startsWith('#/transaction/')) {
     document.getElementById('root')
   )
 } else {
-  const isSettings = window.location.hash.startsWith('#/settings/')
-
   window.neuron = {
-    role: isSettings ? 'settings' : 'main',
+    role: 'main',
   }
 
-  const containers: RouteObject[] = isSettings ? settingRouterConfig : mainRouterConfig
+  const containers: RouteObject[] = mainRouterConfig
 
   const RouterRender = () => useRoutes(containers)
 

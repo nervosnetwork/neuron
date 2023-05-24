@@ -5,7 +5,6 @@
   display: grid;
   grid-template: 'label input' auto 'blank message' minmax(0.6875rem, auto) / auto 1fr;
   grid-gap: 4px;
-  margin-bottom: 10px;
 
   &[data-required='true'] {
     label::after {
@@ -40,10 +39,10 @@
     justify-content: flex-start;
     align-items: stretch;
     box-sizing: border-box;
-    background: #FFFFFF;
+    background: #ffffff;
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
-    width: 480px;
+    width: 100%;
     height: 56px;
     padding: 0 16px;
 
@@ -54,13 +53,13 @@
     &[data-disabled='true'] {
       background-color: var(--input-disabled-color);
     }
-    &[data-type="button"] {
+    &[data-type='button'] {
       color: var(--input-button-color);
       cursor: pointer;
       & > input {
         cursor: pointer;
       }
-  
+
       &[data-selected='true'] {
         color: var(--activity-color);
         border-color: var(--activity-color);
@@ -78,8 +77,9 @@
     &:focus-within {
       border-color: var(--activity-color);
     }
-  
-    input, textarea {
+
+    input,
+    textarea {
       font-family: inherit;
       font-size: 14px;
       flex: 1;
@@ -89,7 +89,7 @@
       word-break: keep-all;
       color: var(--main-text-color);
       background-color: transparent;
-    
+
       &::placeholder {
         color: var(--input-second-color);
       }
@@ -100,7 +100,8 @@
       padding: 10px 0;
     }
 
-    .suffix {
+    .suffix,
+    .prefix {
       font-family: inherit;
       display: flex;
       justify-content: center;
@@ -127,7 +128,6 @@
   grid-area: message;
   font-size: 14px;
   line-height: 20px;
-  margin-top: 10px;
   color: var(--input-hint-color);
 }
 

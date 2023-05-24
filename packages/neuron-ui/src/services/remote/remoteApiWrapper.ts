@@ -34,7 +34,6 @@ type Action =
   | 'open-in-window'
   | 'request-open-in-explorer'
   | 'handle-view-error'
-  | 'show-settings'
   | 'set-locale'
   | 'show-error-message'
   | 'show-open-dialog'
@@ -150,32 +149,36 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
 
-export const remoteApi = <P = any, R = any>(action: Action) => async (params: P): Promise<ControllerResponse<R>> => {
-  const res: SuccessFromController<R> | FailureFromController = await ipcRenderer.invoke(action, params).catch(() => ({
-    status: ResponseCode.FAILURE,
-    message: {
-      content: 'Invalid response format',
-    },
-  }))
+export const remoteApi =
+  <P = any, R = any>(action: Action) =>
+  async (params: P): Promise<ControllerResponse<R>> => {
+    const res: SuccessFromController<R> | FailureFromController = await ipcRenderer
+      .invoke(action, params)
+      .catch(() => ({
+        status: ResponseCode.FAILURE,
+        message: {
+          content: 'Invalid response format',
+        },
+      }))
 
-  if (!res) {
+    if (!res) {
+      return {
+        status: ResponseCode.SUCCESS,
+        result: null,
+      }
+    }
+
+    if (isSuccessResponse(res)) {
+      return {
+        status: ResponseCode.SUCCESS,
+        result: res.result ?? null,
+      }
+    }
+
     return {
-      status: ResponseCode.SUCCESS,
-      result: null,
+      status: res.status ?? ResponseCode.FAILURE,
+      message: typeof res.message === 'string' ? { content: res.message } : res.message ?? '',
     }
   }
-
-  if (isSuccessResponse(res)) {
-    return {
-      status: ResponseCode.SUCCESS,
-      result: res.result ?? null,
-    }
-  }
-
-  return {
-    status: res.status ?? ResponseCode.FAILURE,
-    message: typeof res.message === 'string' ? { content: res.message } : res.message ?? '',
-  }
-}
 
 export default { remoteApi }

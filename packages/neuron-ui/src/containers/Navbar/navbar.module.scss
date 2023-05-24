@@ -3,7 +3,8 @@ $hover-bg-color: #3cc68a4d;
 @mixin navItem {
   display: flex;
   align-items: center;
-  & svg, & img {
+  & svg,
+  & img {
     &:first-child {
       margin-right: var(--svg-right-margin);
     }
@@ -25,16 +26,15 @@ $hover-bg-color: #3cc68a4d;
   position: relative;
   --left-padding: 16px;
   --svg-right-margin: 18px;
-  &[data-expanded="false"] {
+  &[data-expanded='false'] {
     --left-padding: 14px;
     --svg-right-margin: 14px;
   }
 
-
   * {
     font-size: 14px;
   }
-  
+
   & .showExpand {
     content: '';
     height: 100%;
@@ -49,7 +49,7 @@ $hover-bg-color: #3cc68a4d;
       top: 50%;
       display: none;
 
-      &[data-expanded="false"] {
+      &[data-expanded='false'] {
         transform: rotate(-180deg);
       }
     }
@@ -60,7 +60,6 @@ $hover-bg-color: #3cc68a4d;
       }
     }
   }
-  
 }
 
 .name {
@@ -75,6 +74,10 @@ $hover-bg-color: #3cc68a4d;
   background: transparent;
   font-weight: 700;
 
+  span {
+    color: var(--primary-color);
+  }
+
   .nameText {
     width: 0;
     flex: 1;
@@ -84,7 +87,7 @@ $hover-bg-color: #3cc68a4d;
 
 @mixin activity {
   background-color: rgba(255, 255, 255, 0.2);
-  color: #FFF;
+  color: #fff;
 
   & > svg {
     g {
@@ -94,7 +97,7 @@ $hover-bg-color: #3cc68a4d;
       opacity: 1;
     }
     path[stroke] {
-      stroke: #FFF;
+      stroke: #fff;
     }
   }
 }
@@ -103,7 +106,7 @@ $hover-bg-color: #3cc68a4d;
   flex-direction: column;
   grid-area: navs;
 
-  button {
+  a {
     @include navItem;
     appearance: none;
     border: none;
@@ -121,7 +124,7 @@ $hover-bg-color: #3cc68a4d;
       @include activity;
     }
 
-    &[data-active='true'] {
+    &.active {
       @include activity;
       & .arrow {
         transform: rotate(90deg);
@@ -151,15 +154,15 @@ $hover-bg-color: #3cc68a4d;
       }
     }
 
-    button {
+    a {
       &:hover {
         background-color: transparent;
-        color: #FFF;
+        color: #fff;
       }
-  
-      &[data-active='true'] {
+
+      &.active {
         background-color: transparent;
-        color: #FFF;
+        color: #fff;
       }
     }
   }

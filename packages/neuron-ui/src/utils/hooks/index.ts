@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { NavigateFunction, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork, migrateData } from 'services/remote'
 import { firstLoadApp, syncRebuildNotification } from 'services/localCache'
@@ -12,7 +12,7 @@ import {
   setCurrentWallet,
   showPageNotice,
 } from 'states'
-import { epochParser, RoutePath, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
+import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
 import {
   validateTokenId,
   validateAssetAccountName,
@@ -91,6 +91,8 @@ export const useLocalDescription = (
     (e: any) => {
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
+        e.stopPropagation()
+        e.preventDefault()
         submitDescription(key, originDesc)
         const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
         input?.blur()
@@ -333,22 +335,13 @@ export const useOnLocaleChange = (i18n: i18nType) => {
   }, [i18n])
 }
 
-export const useOnHandleWallet = ({ navigate, dispatch }: { navigate: NavigateFunction; dispatch: StateDispatch }) =>
+export const useOnHandleWallet = ({ dispatch }: { dispatch: StateDispatch }) =>
   useCallback(
-    (e: React.SyntheticEvent) => {
+    (e: React.BaseSyntheticEvent) => {
       const {
-        target: {
-          dataset: { action },
-        },
-        currentTarget: {
-          dataset: { id },
-        },
-      } = e as any
+        dataset: { action, id },
+      } = e.target
       switch (action) {
-        case 'edit': {
-          navigate(`${RoutePath.WalletEditor}/${id}`)
-          break
-        }
         case 'delete': {
           requestPassword({ walletID: id, action: 'delete-wallet' })
           break
@@ -369,7 +362,7 @@ export const useOnHandleWallet = ({ navigate, dispatch }: { navigate: NavigateFu
         }
       }
     },
-    [dispatch, navigate]
+    [dispatch]
   )
 
 export const useOnWindowResize = (handler: () => void) => {
@@ -408,20 +401,15 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
     }
   }, [containerSelector, borderClassName])
 
-export const useOnHandleNetwork = ({ navigate }: { navigate: NavigateFunction }) =>
+export const useOnHandleNetwork = (handleNet: Function) =>
   useCallback(
-    (e: React.SyntheticEvent) => {
+    (e: React.BaseSyntheticEvent) => {
       const {
-        target: {
-          dataset: { action },
-        },
-        currentTarget: {
-          dataset: { id },
-        },
-      } = e as any
+        dataset: { action, id },
+      } = e.target
       switch (action) {
         case 'edit': {
-          navigate(`${RoutePath.NetworkEditor}/${id}`)
+          handleNet(id)
           break
         }
         case 'delete': {
@@ -433,7 +421,7 @@ export const useOnHandleNetwork = ({ navigate }: { navigate: NavigateFunction })
         }
       }
     },
-    [navigate]
+    [handleNet]
   )
 
 export const useGlobalNotifications = (

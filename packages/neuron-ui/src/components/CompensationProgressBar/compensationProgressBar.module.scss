@@ -1,87 +1,78 @@
-@use "sass:math";
+.container {
+  --progress-grey: #f0f0f0;
+  --progress-green: #00c891;
+  --progress-yellow: #f78c2a;
 
-$progress-green: #3cc68a;
-$progress-yellow: #f7ae4d;
-$progress-grey: #e3e3e3;
-$progress-green-hover: #21b574;
-$progress-yellow-hover: #fa8f00;
-$progress-grey-hover: #888;
-$progress-indicator-color: #000;
-$progress-indicator-height: 20px;
-$progress-bar-height: 10px;
-$progress-indicator-offet: math.div($progress-bar-height - $progress-indicator-height, 2);
-
-@mixin basic {
-  display: block;
-  appearance: none;
-  width: 100%;
-  position: relative;
-  height: $progress-bar-height;
-}
-
-
-.pendingProgress {
-  @include basic;
-
-  &::-webkit-progress-bar {
-    display: none;
+  @media (prefers-color-scheme: dark) {
+    --progress-grey: #666666;
   }
 
-  background: repeating-linear-gradient(-45deg, #ccc, #ccc 6.8px, #e3e3e3 6.8px, #e3e3e3 13.6px);
-  background-size: 200% 100%;
-  border-radius: math.div($progress-bar-height, 2);
-  animation: move 35s linear infinite;
+  position: relative;
+  box-sizing: border-box;
+
+  .indicator {
+    display: block;
+    transform: translateX(-50%);
+
+    & > path {
+      fill: currentColor;
+    }
+  }
+
+  &:hover {
+    .progress {
+      filter: brightness(0.9);
+
+      @media (prefers-color-scheme: dark) {
+        filter: brightness(1.2);
+      }
+    }
+  }
 }
 
 .progress {
-  @include basic;
-
-  &::-webkit-progress-bar {
-    height: $progress-bar-height;
-    border-radius: 2px;
-    background: linear-gradient(90deg, $progress-grey 0%, $progress-grey 76.7%, $progress-green 76.7%, $progress-green 96.7%, $progress-yellow 96.7%, $progress-yellow 100%);
-    border-radius: math.div($progress-bar-height, 2);
-  }
-
-
-  &:hover::-webkit-progress-bar {
-    background: linear-gradient(90deg, $progress-grey-hover 0%, $progress-grey-hover 76.7%, $progress-green-hover 76.7%, $progress-green-hover 96.7%, $progress-yellow-hover 96.7%, $progress-yellow-hover 100%);
-  }
-
-  &::-webkit-progress-value {
-    position: relative;
-    background-color: transparent;
-  }
-
-  &[data-is-withdrawn='true'] {
-    pointer-events: none;
-
-    &::-webkit-progress-bar {
-      overflow: hidden;
-    }
-
-    &::-webkit-progress-value {
-      border-top-left-radius: math.div($progress-bar-height, 2);
-      border-bottom-left-radius: math.div($progress-bar-height, 2);
-      border-right: 1px solid #000;
-      box-shadow: 0 0 0 1500px rgba(255, 255, 255, 0.4);
-    }
-  }
-
-}
-
-.container {
   position: relative;
-  box-sizing: border-box;
-  padding-top: 10px;
+  display: flex;
+  justify-content: right;
+  margin-top: 4px;
+  height: 8px;
+  border-radius: 8px;
+  background: var(--progress-grey);
 
-  .indicator {
+  .withdrawCursor {
     position: absolute;
-    display: block;
-    content: '';
-    border: 5px solid transparent;
-    border-top-color: $progress-indicator-color;
-    bottom: calc(100% - 13px);
+    left: 10%;
+    width: 2px;
+    height: 100%;
+    margin-left: -1px;
+    background: var(--main-text-color);
+    border-radius: 4px;
+  }
+
+  .suggest {
+    width: 20%;
+    height: 100%;
+    background: var(--progress-green);
+    border-radius: 8px 0 0 8px;
+  }
+
+  .warning {
+    width: 3.3%;
+    height: 100%;
+    background: var(--progress-yellow);
+    border-radius: 0 8px 8px 0;
+  }
+
+  &.pendingProgress {
+    background: repeating-linear-gradient(
+      -45deg,
+      #ccc,
+      #ccc 6.8px,
+      #e3e3e3 6.8px,
+      #e3e3e3 13.6px
+    );
+    background-size: 200% 100%;
+    animation: move 35s linear infinite;
   }
 }
 
