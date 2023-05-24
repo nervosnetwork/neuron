@@ -60,17 +60,17 @@ export default class MultisigOutput extends BaseEntity {
   }
 
   public static fromIndexer(params: {
-    out_point: { index: string; tx_hash: string }
-    output: { capacity: string; lock: { args: string; code_hash: string; hash_type: string } }
+    outPoint: { index: string; txHash: string }
+    output: { capacity: string; lock: { args: string; codeHash: string; hashType: string } }
   }): MultisigOutput {
     const entity = new MultisigOutput()
-    entity.outPointTxHash = params.out_point.tx_hash
-    entity.outPointIndex = params.out_point.index
-    entity.outPointTxHashAddIndex = params.out_point.tx_hash + params.out_point.index
+    entity.outPointTxHash = params.outPoint.txHash
+    entity.outPointIndex = params.outPoint.index
+    entity.outPointTxHashAddIndex = params.outPoint.txHash + params.outPoint.index
     entity.capacity = BigInt(params.output.capacity).toString()
     entity.lockArgs = params.output.lock.args
-    entity.lockCodeHash = params.output.lock.code_hash
-    entity.lockHashType = params.output.lock.hash_type as ScriptHashType
+    entity.lockCodeHash = params.output.lock.codeHash
+    entity.lockHashType = params.output.lock.hashType as ScriptHashType
     entity.lockHash = scriptToHash({
       args: entity.lockArgs,
       codeHash: entity.lockCodeHash,

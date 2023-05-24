@@ -3,7 +3,7 @@ import { when } from 'jest-when'
 import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import IndexerConnector, { LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
+import IndexerConnector, { LumosCell, LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
 import { flushPromises } from '../test-utils'
 import { ScriptHashType } from '../../src/models/chain/script'
 
@@ -108,8 +108,8 @@ describe('unit tests for IndexerConnector', () => {
     })
   })
   describe('#connect', () => {
-    const fakeTip1 = { block_number: '1', block_hash: 'hash1', indexer_tip_number: '1' }
-    const fakeTip2 = { block_number: '2', block_hash: 'hash2', indexer_tip_number: '2' }
+    const fakeTip1 = { blockNumber: '1', blockHash: 'hash1', indexerTipNumber: '1' }
+    const fakeTip2 = { blockNumber: '2', blockHash: 'hash2', indexerTipNumber: '2' }
     const fakeBlock1 = { number: '1', hash: '1', timestamp: '1' }
     const fakeBlock2 = { number: '2', hash: '2', timestamp: '2' }
     const fakeBlock3 = { number: '3', hash: '3', timestamp: '3' }
@@ -327,9 +327,7 @@ describe('unit tests for IndexerConnector', () => {
           beforeEach(async () => {
             stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
             stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([fakeTxHashCache3])
-            when(stubbedGetTransactionFn)
-              .calledWith(fakeTxHashCache3.txHash)
-              .mockResolvedValueOnce(undefined)
+            when(stubbedGetTransactionFn).calledWith(fakeTxHashCache3.txHash).mockResolvedValueOnce(undefined)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
@@ -362,8 +360,8 @@ describe('unit tests for IndexerConnector', () => {
         it('observes an indexer tip', () => {
           expect(tipObserver).toHaveBeenCalledTimes(1)
           expect(tipObserver).toHaveBeenCalledWith({
-            cacheTipNumber: parseInt(fakeTip1.block_number),
-            indexerTipNumber: parseInt(fakeTip1.block_number)
+            cacheTipNumber: parseInt(fakeTip1.blockNumber),
+            indexerTipNumber: parseInt(fakeTip1.blockNumber)
           })
         })
         describe('fast forward the interval time', () => {
@@ -376,8 +374,8 @@ describe('unit tests for IndexerConnector', () => {
             it('observes another indexer tip', async () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
-                cacheTipNumber: parseInt(fakeTip2.block_number),
-                indexerTipNumber: parseInt(fakeTip2.block_number)
+                cacheTipNumber: parseInt(fakeTip2.blockNumber),
+                indexerTipNumber: parseInt(fakeTip2.blockNumber)
               })
             })
           })
@@ -394,7 +392,7 @@ describe('unit tests for IndexerConnector', () => {
               expect(tipObserver).toHaveBeenCalledTimes(2)
               expect(tipObserver).toHaveBeenCalledWith({
                 cacheTipNumber: parseInt(fakeBlock3.number),
-                indexerTipNumber: parseInt(fakeTip2.block_number)
+                indexerTipNumber: parseInt(fakeTip2.blockNumber)
               })
             })
           })
@@ -402,33 +400,45 @@ describe('unit tests for IndexerConnector', () => {
       })
     })
     describe('#getLiveCellsByScript', () => {
-      let fakeCell1: any, fakeCell2: any
-      let cells: any
+      let fakeCell1: LumosCell, fakeCell2: LumosCell
+      let cells: LumosCell[]
 
       fakeCell1 = {
-        cell_output: {
+        blockHash: '0x',
+        outPoint: {
+          txHash: '0x',
+          index: '0x0',
+        },
+        cellOutput: {
+          capacity: '0x0',
           lock: {
-            hash_type: 'type',
-            code_hash: '0xcode',
+            hashType: 'type',
+            codeHash: '0xcode',
             args: '0x1'
           },
           type: {
-            hash_type: 'data',
-            code_hash: '0xcode',
+            hashType: 'data',
+            codeHash: '0xcode',
             args: '0x1'
           }
         }
       }
       fakeCell2 = {
-        cell_output: {
+        blockHash: '0x',
+        outPoint: {
+          txHash: '0x',
+          index: '0x0',
+        },
+        cellOutput: {
+          capacity: '0x0',
           lock: {
-            hash_type: 'type',
-            code_hash: '0xcode',
+            hashType: 'type',
+            codeHash: '0xcode',
             args: '0x2'
           },
           type: {
-            hash_type: 'lock',
-            code_hash: '0xcode',
+            hashType: 'lock',
+            codeHash: '0xcode',
             args: '0x2'
           }
         }
@@ -458,25 +468,26 @@ describe('unit tests for IndexerConnector', () => {
             new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1]))))
           ])
 
+          //@ts-ignore
           cells = await indexerConnector.getLiveCellsByScript(query)
         })
         it('transform the query parameter', () => {
           expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
             lock: {
-              hash_type: query.lock!.hashType,
-              code_hash: query.lock!.codeHash,
+              hashType: query.lock!.hashType,
+              codeHash: query.lock!.codeHash,
               args: query.lock!.args
             },
             type: {
-              hash_type: query.type!.hashType,
-              code_hash: query.type!.codeHash,
+              hashType: query.type!.hashType,
+              codeHash: query.type!.codeHash,
               args: query.type!.args
             },
             data: 'any'
           })
         })
         it('returns live cells with property value fix', async () => {
-          fakeCell2.cell_output.type.hash_type = 'data'
+          fakeCell2.cellOutput.type!.hashType = 'data'
           expect(cells).toEqual([fakeCell1, fakeCell2])
         })
       })

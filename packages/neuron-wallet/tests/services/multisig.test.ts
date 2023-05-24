@@ -39,12 +39,12 @@ describe('multisig service', () => {
   defaultMultisigConfig.lastestBlockNumber = '0x0'
   const lock = {
     args: Multisig.hash(multisigConfigModel.blake160s, multisigConfigModel.r, multisigConfigModel.m, multisigConfigModel.n),
-    code_hash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-    hash_type: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+    codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+    hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
   }
-  const defaultTxOutpoint = { tx_hash: 'tx_hash', index: '0x0' }
+  const defaultTxOutpoint = { txHash: 'tx_hash', index: '0x0' }
   const defaultOutput = {
-    out_point: defaultTxOutpoint,
+    outPoint: defaultTxOutpoint,
     output: { lock, capacity: '6100000000' }
   }
   const multisigOutput = MultisigOutput.fromIndexer(defaultOutput)
@@ -111,7 +111,7 @@ describe('multisig service', () => {
       expect(config?.alias).toBe('newalisa')
     })
   })
-  
+
   describe('test get config', () => {
     it('no config', async () => {
       const configs = await multisigService.getMultisigConfig('noconfigwallet')
@@ -208,11 +208,11 @@ describe('multisig service', () => {
     it('a Transaction', async () => {
       rpcBatchRequestMock.mockResolvedValueOnce([
         {
-          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] }
+          result: { objects: [{ tx_hash: defaultTxOutpoint.txHash }] }
         }
       ])
       const res = await MultisigService.getMultisigTransactionHashList([defaultMultisigConfig])
-      expect(res).toEqual(new Set([defaultTxOutpoint.tx_hash]))
+      expect(res).toEqual(new Set([defaultTxOutpoint.txHash]))
     })
   })
 
@@ -225,7 +225,7 @@ describe('multisig service', () => {
     it('no delete transaction', async () => {
       rpcBatchRequestMock.mockResolvedValueOnce([
         {
-          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] }
+          result: { objects: [{ txHash: defaultTxOutpoint.txHash }] }
         }
       ])
       // @ts-ignore Private method
@@ -240,12 +240,12 @@ describe('multisig service', () => {
     it('delete a transaction', async () => {
       rpcBatchRequestMock.mockResolvedValueOnce([
         {
-          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] }
+          result: { objects: [{ tx_hash: defaultTxOutpoint.txHash }] }
         }
       ]).mockResolvedValueOnce([])
       .mockResolvedValueOnce([
         {
-          result: { transaction: { inputs: [{ previous_output: defaultTxOutpoint }] }}
+          result: { transaction: { inputs: [{ previous_output: { tx_hash: defaultTxOutpoint.txHash, index: defaultTxOutpoint.index } }] }}
         }
       ])
       // @ts-ignore Private method
@@ -291,14 +291,14 @@ describe('multisig service', () => {
       const tx = {
         hash: '0x2fefadab413ae1f919f4e21d53c719b583e124ca817f2497ce7a7688dedfbebb',
         inputs: [{
-          previousOutput: { txHash: defaultTxOutpoint.tx_hash, index: '0x0' }
+          previousOutput: { txHash: defaultTxOutpoint.txHash, index: '0x0' }
         }],
         outputs: [
           {
             capacity: '770000000',
             lock: {
-              codeHash: lock.code_hash,
-              hashType: lock.hash_type,
+              codeHash: lock.codeHash,
+              hashType: lock.hashType,
               args: lock.args
             },
             lockHash: 'lockHash'

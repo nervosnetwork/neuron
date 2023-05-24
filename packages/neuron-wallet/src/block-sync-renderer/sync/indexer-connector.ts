@@ -2,40 +2,40 @@
 import type { ScriptHashType } from 'models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
-import { Tip, QueryOptions } from '@ckb-lumos/base'
+import { Tip } from '@ckb-lumos/base'
 import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { Address } from "models/address"
+import { Address } from 'models/address'
 import AddressMeta from 'database/address/meta'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 
 export interface LumosCellQuery {
-  lock: { codeHash: string, hashType: ScriptHashType, args: string } | null,
-  type: { codeHash: string, hashType: ScriptHashType, args: string } | null,
+  lock: { codeHash: string; hashType: ScriptHashType; args: string } | null
+  type: { codeHash: string; hashType: ScriptHashType; args: string } | null
   data: string | null
 }
 
 export interface LumosCell {
-  block_hash: string
-  out_point: {
-    tx_hash: string
+  blockHash: string
+  outPoint: {
+    txHash: string
     index: string
   }
-  cell_output: {
+  cellOutput: {
     capacity: string
     lock: {
-      code_hash: string
+      codeHash: string
       args: string
-      hash_type: string
+      hashType: string
     }
     type?: {
-      code_hash: string
+      codeHash: string
       args: string
-      hash_type: string
+      hashType: string
     }
   }
   data?: string
@@ -56,13 +56,11 @@ export default class IndexerConnector {
   private processingBlockNumber: string | undefined
   public pollingIndexer: boolean = false
   public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
-  public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
+  public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<
+    Array<TransactionWithStatus>
+  >()
 
-  constructor(
-    addresses: Address[],
-    nodeUrl: string,
-    indexerUrl: string
-  ) {
+  constructor(addresses: Address[], nodeUrl: string, indexerUrl: string) {
     this.indexer = new CkbIndexer(nodeUrl, indexerUrl)
     this.rpcService = new RpcService(nodeUrl)
 
@@ -96,22 +94,21 @@ export default class IndexerConnector {
 
     await this.upsertTxHashes()
 
-    const indexerTipNumber = parseInt(indexerTipBlock.block_number, 16)
+    const indexerTipNumber = parseInt(indexerTipBlock.blockNumber, 16)
 
     const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
     if (nextUnprocessedBlockTip) {
       this.blockTipsSubject.next({
         cacheTipNumber: parseInt(nextUnprocessedBlockTip.blockNumber),
-        indexerTipNumber,
+        indexerTipNumber
       })
       if (!this.processingBlockNumber) {
         await this.processNextBlockNumber()
       }
-    }
-    else {
+    } else {
       this.blockTipsSubject.next({
         cacheTipNumber: indexerTipNumber,
-        indexerTipNumber,
+        indexerTipNumber
       })
     }
   }
@@ -121,7 +118,10 @@ export default class IndexerConnector {
 
     while (this.pollingIndexer) {
       const indexerTipBlock = await this.indexer.tip()
-      await this.synchronize(indexerTipBlock)
+      await this.synchronize({
+        blockHash: indexerTipBlock.blockHash,
+        blockNumber: indexerTipBlock.blockNumber
+      })
       await CommonUtils.sleep(5000)
     }
   }
@@ -154,18 +154,19 @@ export default class IndexerConnector {
       throw new Error('at least one parameter is required')
     }
 
+    type QueryOptions = ConstructorParameters<typeof CellCollector>[1]
     const queries: QueryOptions = {}
     if (lock) {
       queries.lock = {
-        code_hash: lock.codeHash,
-        hash_type: lock.hashType,
+        codeHash: lock.codeHash,
+        hashType: lock.hashType,
         args: lock.args
       }
     }
     if (type) {
       queries.type = {
-        code_hash: type.codeHash,
-        hash_type: type.hashType,
+        codeHash: type.codeHash,
+        hashType: type.hashType,
         args: type.args
       }
     }
@@ -177,9 +178,10 @@ export default class IndexerConnector {
     for await (const cell of collector.collect()) {
       //somehow the lumos indexer returns an invalid hash type "lock" for hash type "data"
       //for now we have to fix it here
-      const cellOutput: any = cell.cell_output
-      if (cellOutput.type?.hash_type === 'lock') {
-        cellOutput.type.hash_type = 'data'
+      const cellOutput = cell.cellOutput
+      // @ts-ignore
+      if (cellOutput.type?.hashType === 'lock') {
+        cellOutput.type.hashType = 'data'
       }
       result.push(cell)
     }
@@ -207,9 +209,7 @@ export default class IndexerConnector {
         return grouped
       }, new Map<string, Array<IndexerTxHashCache>>())
 
-    const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()]
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .shift()
+    const nextUnprocessedBlockNumber = [...groupedTxHashCaches.keys()].sort((a, b) => parseInt(a) - parseInt(b)).shift()
 
     if (!nextUnprocessedBlockNumber) {
       return []
@@ -267,8 +267,7 @@ export default class IndexerConnector {
   public notifyCurrentBlockNumberProcessed(blockNumber: string) {
     if (blockNumber === this.processingBlockNumber) {
       delete this.processingBlockNumber
-    }
-    else {
+    } else {
       return
     }
     this.processNextBlockNumber()

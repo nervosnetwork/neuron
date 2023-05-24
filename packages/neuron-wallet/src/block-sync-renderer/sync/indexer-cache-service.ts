@@ -92,12 +92,12 @@ export default class IndexerCacheService {
           this.indexer,
           {
             lock: {
-              code_hash: lockScript.codeHash,
-              hash_type: lockScript.hashType,
+              codeHash: lockScript.codeHash,
+              hashType: lockScript.hashType,
               args: lockScript.args
             }
           },
-          this.indexer.ckbRpcUrl,
+          this.indexer.ckbRpcUrl!,
           {
             includeStatus: false
           }
@@ -133,15 +133,15 @@ export default class IndexerCacheService {
       for (const { lockScript, argsLen } of lockScriptsForCellCollection) {
         const cellCollector = new CellCollector(this.indexer, {
           lock: {
-            code_hash: lockScript.codeHash,
-            hash_type: lockScript.hashType,
+            codeHash: lockScript.codeHash,
+            hashType: lockScript.hashType,
             args: lockScript.args.slice(0, 42)
           },
           argsLen
         })
 
         for await (const cell of cellCollector.collect()) {
-          const txHash = cell.out_point!.tx_hash!
+          const txHash = cell.outPoint!.txHash!
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,

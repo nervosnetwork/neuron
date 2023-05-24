@@ -62,28 +62,28 @@ const chequeLockScript = addressMeta.generateChequeLockScriptWithReceiverLockHas
 const acpLockScript = addressMeta.generateACPLockScript()
 const legacyAcpLockScript = addressMeta.generateLegacyACPLockScript()
 const formattedDefaultLockScript = {
-  code_hash: defaultLockScript.codeHash,
-  hash_type: defaultLockScript.hashType,
+  codeHash: defaultLockScript.codeHash,
+  hashType: defaultLockScript.hashType,
   args: defaultLockScript.args
 }
 const formattedSingleMultiSignLockScript = {
-  code_hash: singleMultiSignLockScript.codeHash,
-  hash_type: singleMultiSignLockScript.hashType,
+  codeHash: singleMultiSignLockScript.codeHash,
+  hashType: singleMultiSignLockScript.hashType,
   args: singleMultiSignLockScript.args + '0'.repeat(14)
 }
 const formattedChequeLockScript = {
-  code_hash: chequeLockScript.codeHash,
-  hash_type: chequeLockScript.hashType,
+  codeHash: chequeLockScript.codeHash,
+  hashType: chequeLockScript.hashType,
   args: chequeLockScript.args
 }
 const formattedAcpLockScript = {
-  code_hash: acpLockScript.codeHash,
-  hash_type: acpLockScript.hashType,
+  codeHash: acpLockScript.codeHash,
+  hashType: acpLockScript.hashType,
   args: acpLockScript.args
 }
 const formattedLegacyAcpLockScript = {
-  code_hash: legacyAcpLockScript.codeHash,
-  hash_type: legacyAcpLockScript.hashType,
+  codeHash: legacyAcpLockScript.codeHash,
+  hashType: legacyAcpLockScript.hashType,
   args: legacyAcpLockScript.args
 }
 
@@ -260,8 +260,8 @@ describe('indexer cache service', () => {
                     return {
                       done: false,
                       value: {
-                        out_point: {
-                          tx_hash: fakeTx2.transaction.hash
+                        outPoint: {
+                          txHash: fakeTx2.transaction.hash
                         }
                       }
                     }

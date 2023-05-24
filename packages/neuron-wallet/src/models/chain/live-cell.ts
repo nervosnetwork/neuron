@@ -55,22 +55,22 @@ export default class LiveCell {
   }
 
   public static fromLumos(cell: LumosCell): LiveCell {
-    const type = cell.cell_output.type
+    const type = cell.cellOutput.type
       ? new Script(
-          cell.cell_output.type.code_hash,
-          cell.cell_output.type.args,
-          LUMOS_HASH_TYPE_MAP[cell.cell_output.type.hash_type] ?? ScriptHashType.Data
+          cell.cellOutput.type.codeHash,
+          cell.cellOutput.type.args,
+          LUMOS_HASH_TYPE_MAP[cell.cellOutput.type.hashType] ?? ScriptHashType.Data
         )
       : null
 
     return new LiveCell(
-      cell.out_point.tx_hash,
-      cell.out_point.index,
-      cell.cell_output.capacity,
+      cell.outPoint.txHash,
+      cell.outPoint.index,
+      cell.cellOutput.capacity,
       new Script(
-        cell.cell_output.lock.code_hash,
-        cell.cell_output.lock.args,
-        LUMOS_HASH_TYPE_MAP[cell.cell_output.lock.hash_type] ?? ScriptHashType.Data
+        cell.cellOutput.lock.codeHash,
+        cell.cellOutput.lock.args,
+        LUMOS_HASH_TYPE_MAP[cell.cellOutput.lock.hashType] ?? ScriptHashType.Data
       ),
       type,
       cell.data ? cell.data : '0x'
