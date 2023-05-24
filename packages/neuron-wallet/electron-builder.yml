@@ -51,7 +51,7 @@ mac:
   category: public.app-category.finance
   icon: assets/icons/icon.icns
   extraFiles:
-    - from: "bin/mac/ckb"
+    - from: "bin/mac/ckb-${arch}"
       to: "bin/ckb"
   hardenedRuntime: true
   gatekeeperAssess: false

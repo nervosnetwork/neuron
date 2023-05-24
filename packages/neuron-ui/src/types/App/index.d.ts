@@ -61,6 +61,7 @@ declare namespace State {
     content?: string
     meta?: Meta
   }
+
   interface Send {
     txID: string
     outputs: Output[]
@@ -128,6 +129,8 @@ declare namespace State {
   } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
   type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn' }
+
+  type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
 
   interface App {
     tipBlockNumber: string

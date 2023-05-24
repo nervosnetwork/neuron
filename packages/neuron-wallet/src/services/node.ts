@@ -1,6 +1,8 @@
+import fs from 'fs'
+import path from 'path'
 import https from 'https'
 import http from 'http'
-import { dialog, shell } from 'electron'
+import { app as electronApp, dialog, shell } from 'electron'
 import { t } from 'i18next'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
@@ -13,9 +15,11 @@ import NetworksService from 'services/networks'
 import RpcService from 'services/rpc-service'
 import { startCkbNode } from 'services/ckb-runner'
 import HexUtils from 'utils/hex'
-import { BUNDLED_CKB_URL } from 'utils/const'
+import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER } from 'utils/const'
 import logger from 'utils/logger'
 import redistCheck from 'utils/redist-check'
+import { rpcRequest } from 'utils/rpc-request'
+import startMonitor from './monitor'
 
 class NodeService {
   private static instance: NodeService
@@ -34,6 +38,7 @@ class NodeService {
 
   private _tipBlockNumber: string = '0'
   private startedBundledNode: boolean = false
+  private _isCkbNodeExternal: boolean = false
 
   public ckb: CKB = new CKB('')
 
@@ -138,8 +143,12 @@ class NodeService {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
       const redistReady = await redistCheck()
       await (redistReady ? this.startNode() : this.showGuideDialog())
+      await startMonitor()
     } else {
       logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
+      this._isCkbNodeExternal = true
+      await this.verifyNodeVersion()
+      await this.verifyStartWithIndexer()
     }
   }
 
@@ -167,6 +176,10 @@ class NodeService {
     }
   }
 
+  get isCkbNodeExternal() {
+    return this._isCkbNodeExternal
+  }
+
   private showGuideDialog = () => {
     const I18N_PATH = `messageBox.ckb-dependency`
     return dialog
@@ -186,6 +199,56 @@ class NodeService {
         env.app.quit()
         return false
       })
+  }
+
+  private getInternalNodeVersion() {
+    const appPath = electronApp.isPackaged ? electronApp.getAppPath() : path.join(__dirname, '../../../..')
+    const ckbVersionPath = path.join(appPath, '.ckb-version')
+    if (fs.existsSync(ckbVersionPath)) {
+      try {
+        return fs
+          .readFileSync(ckbVersionPath, 'utf8')
+          ?.split('\n')?.[0]
+          ?.slice(1)
+      } catch (err) {
+        logger.error('App\t: get ckb node version failed')
+      }
+    }
+  }
+
+  private async verifyNodeVersion() {
+    const network = NetworksService.getInstance().getCurrent()
+    const localNodeInfo = await new RpcService(network.remote).getLocalNodeInfo()
+    const internalNodeVersion = this.getInternalNodeVersion()
+    const [internalMajor, internalMinor] = internalNodeVersion?.split('.') ?? []
+    const [externalMajor, externalMinor] = localNodeInfo.version?.split('.') ?? []
+
+    if (internalMajor !== externalMajor || (externalMajor === '0' && internalMinor !== externalMinor)) {
+      dialog.showMessageBox({
+        type: 'warning',
+        message: t('messageBox.node-version-different.message', { version: internalNodeVersion })
+      })
+    }
+  }
+
+  private async verifyStartWithIndexer() {
+    const network = NetworksService.getInstance().getCurrent()
+    try {
+      const res = await rpcRequest<{ error?: { code: number } }>(network.remote, { method: 'get_indexer_tip' })
+      if (res.error?.code === START_WITHOUT_INDEXER) {
+        logger.info('Node:\tthe ckb node does not start with --indexer')
+        dialog.showMessageBox({
+          type: 'warning',
+          message: t('messageBox.ckb-without-indexer.message')
+        })
+      }
+    } catch (error) {
+      logger.info('Node:\tcalling get_indexer_tip failed')
+      dialog.showMessageBox({
+        type: 'warning',
+        message: t('messageBox.ckb-without-indexer.message')
+      })
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 export const calculateFee = (tx: any) => {
-  if (!tx) {
+  if (!tx?.inputs || !tx?.outputs) {
     return '0'
   }
   const inputCapacities = tx.inputs.reduce(

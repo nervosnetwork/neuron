@@ -5,7 +5,7 @@ import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
 const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'> = {
   network: {
     name: 'network',
-    remote: 'http://localhost:3000',
+    remote: 'http://127.0.0.1:3000',
     type: 0,
     id: 'd',
     chain: 'ckb',
@@ -31,7 +31,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof NetworkStatus> = props => <NetworkStatus {...props} />
+const Template: ComponentStory<typeof NetworkStatus> = (props: any) => <NetworkStatus {...props} />
 
 export const Online = Template.bind({})
 Online.args = {

@@ -17,7 +17,7 @@ interface SendMetaInfoProps {
   fee: string
   price: string
   handleDescriptionChange: React.EventHandler<React.SyntheticEvent>
-  handlePriceChange: React.EventHandler<React.SyntheticEvent>
+  handlePriceChange: (value: string) => void
 }
 
 const SendMetaInfo = ({

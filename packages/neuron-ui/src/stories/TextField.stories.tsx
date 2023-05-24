@@ -14,7 +14,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof TextField> = props => <TextField {...props} />
+const Template: ComponentStory<typeof TextField> = (props: any) => <TextField {...props} />
 export const Basic = Template.bind({})
 Basic.args = {
   label: 'label',

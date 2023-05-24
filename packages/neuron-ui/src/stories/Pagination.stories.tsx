@@ -17,7 +17,7 @@ export default {
 
 const onChange = action('onclick')
 
-const Template: ComponentStory<typeof Pagination> = props => <Pagination {...props} />
+const Template: ComponentStory<typeof Pagination> = (props: any) => <Pagination {...props} />
 
 export const OnlyOnePage = Template.bind({})
 OnlyOnePage.args = {

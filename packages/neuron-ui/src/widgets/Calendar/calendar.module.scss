@@ -1,0 +1,136 @@
+@import '../../styles/mixin.scss';
+
+.srOnly {
+  position: absolute;
+  top: -10000px;
+  left: -10000px;
+}
+
+@mixin button {
+  appearance: none;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: transparent;
+  min-width: 0;
+	color: var(--main-text-color);
+  &[disabled] {
+    cursor: not-allowed;
+    color: var(--disable-button-text-color);
+    box-shadow: none !important;
+    pointer-events: none;
+  }
+}
+
+.calendar {
+  .calOptions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    list-style-type: none;
+    list-style: none;
+    padding: 0;
+
+    li {
+      flex-grow: 1;
+    }
+
+    button {
+      @include button;
+      width: 100px;
+      &[aria-checked='true'] {
+        background-color: var(--primary-color);
+        color: white;
+      }
+    }
+  }
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+	align-items: center;
+
+  .calPrev,
+  .calNext {
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		svg {
+			g,
+			path {
+				stroke: var(--main-text-color)
+			}
+		}
+  }
+  .calPrev {
+    order: 1;
+		&[disabled] {
+			svg {
+				g,
+				path {
+					stroke: var(--disable-button-text-color)
+				}
+			}
+    }
+  }
+  .calNext {
+    order: 3;
+  }
+
+  .calTitle {
+    order: 2;
+    margin: 0;
+    font-size: 16px;
+    line-height: 22px;
+		color: var(--main-text-color);
+  }
+}
+
+.calendarTable {
+  width: 100%;
+
+	thead {
+		position: relative;
+		tr {
+			height: 40px;
+			color: var(--main-text-color)
+		}
+		&::after {
+			position: absolute;
+			content: "";
+			background: var(--input-border-color);
+			left: 0;
+			bottom: -0;
+			height: 1px;
+			width: 100%;
+		}
+	}
+
+  td {
+    text-align: center;
+  }
+
+  button {
+    &:hover,
+    &:focus {
+			color: #fff;
+			background-color: var(--primary-color);
+    }
+  }
+
+  .calDateItem {
+    @include button;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    &[aria-current='date'] {
+      color: var(--primary-color);
+    }
+    &[aria-pressed='true'] {
+      background-color: var(--primary-color);
+      color: white;
+    }
+  }
+}

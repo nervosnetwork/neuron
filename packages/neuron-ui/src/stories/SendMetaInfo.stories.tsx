@@ -20,7 +20,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof SendMetaInfo> = props => <SendMetaInfo {...props} />
+const Template: ComponentStory<typeof SendMetaInfo> = (props: any) => <SendMetaInfo {...props} />
 
 export const Common = Template.bind({})
 Common.args = {
@@ -32,5 +32,5 @@ Common.args = {
   fee: '',
   price: '',
   handleDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => action('Update Description')(e.target.value),
-  handlePriceChange: (e: React.ChangeEvent<HTMLInputElement>) => action('Update Price')(e.target.value),
+  handlePriceChange: (value: string) => action('Update Price')(value),
 }

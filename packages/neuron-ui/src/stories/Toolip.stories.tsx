@@ -14,7 +14,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof Tooltip> = props => (
+const Template: ComponentStory<typeof Tooltip> = (props: any) => (
   <div style={{ width: '800px', backgroundColor: '#FFF' }}>
     <Tooltip {...props} />
   </div>
@@ -38,7 +38,7 @@ TipWithReactChildren.argTypes = {
   },
 }
 
-const TemplateShortWidth: ComponentStory<typeof Tooltip> = props => (
+const TemplateShortWidth: ComponentStory<typeof Tooltip> = (props: any) => (
   <div style={{ width: '60px', backgroundColor: '#FFF' }}>
     <Tooltip {...props} />
   </div>

@@ -50,6 +50,8 @@ import { ReactComponent as ExportSvg } from './Export.svg'
 import { ReactComponent as ConfirmingSvg } from './Confirming.svg'
 import { ReactComponent as CopySvg } from './Copy.svg'
 import { ReactComponent as AddressTransformSvg } from './AddressTransform.svg'
+import { ReactComponent as TransferSvg } from './Transfer.svg'
+import { ReactComponent as LineDownArrowSvg } from './LineDownArrow.svg'
 import { ReactComponent as DepositSvg } from './Deposit.svg'
 import { ReactComponent as ClockSvg } from './Clock.svg'
 import { ReactComponent as ArrowDownRoundSvg } from './ArrowDownRound.svg'
@@ -126,6 +128,8 @@ export const DownloadIcon = WrapSvg(DownloadIconSvg)
 export const ExplorerIcon = WrapSvg(ExplorerIconSvg)
 export const DetailIcon = WrapSvg(DetailIconSvg)
 export const AddressTransform = WrapSvg(AddressTransformSvg, styles.addressTransform)
+export const Transfer = WrapSvg(TransferSvg)
+export const LineDownArrow = WrapSvg(LineDownArrowSvg)
 export const Deposit = WrapSvg(DepositSvg, styles.deposit)
 export const Clock = WrapSvg(ClockSvg)
 export const ArrowDownRound = WrapSvg(ArrowDownRoundSvg)

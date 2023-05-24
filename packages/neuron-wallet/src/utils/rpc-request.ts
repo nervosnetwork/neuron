@@ -1,12 +1,12 @@
 import { request } from 'undici'
 
-export const rpcRequest = async (
+export const rpcRequest = async <T>(
   url: string,
   options: {
     method: string
     params?: any
   }
-): Promise<any[]> => {
+): Promise<T> => {
   const res = await request(url, {
     method: 'POST',
     body: JSON.stringify({

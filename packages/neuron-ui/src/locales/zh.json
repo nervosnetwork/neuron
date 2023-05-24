@@ -542,6 +542,7 @@
       "experimental-message-hardware": "本功能为实验性功能，请注意风险，谨慎使用。",
       "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "rebuild-sync": "为了提供更好的用户体验，Neuron 採取了新的存储方案，该方案需要一次性迁移数据(预期同步时间为 20~60 分钟)。\n抱歉给您带来不便。",
+      "migrate-warning": "注意：迁移过程中可能由于未知原因失败导致需要重新同步，请备份完成后开始迁移！",
       "migrate": "迁移",
       "secp256k1/blake160-address-required": "请输入 secp256k1/blake160 地址",
       "fields": {
@@ -822,6 +823,8 @@
         "tag": "十二月"
       },
       "timezone": "时区",
+      "previous-month": "上个月",
+      "next-month": "下个月",
       "start-tomorrow": "所选时间不能早于明天。"
     },
     "sign-and-verify": {
@@ -1047,6 +1050,22 @@
         "view-concise-data": "查看概要",
         "view-raw-data": "查看原始数据"
       }
+    },
+    "dropdown": {
+      "placeholder": "请选择 ..."
+    },
+    "price-switch": {
+      "price": "单价",
+      "customPrice": "自定义价格",
+      "errorTip": "价格设定最少不得少于 {{minPrice}} shannons/KB，请重新输入",
+      "hintTip": "建议价格 {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "单价 {{priceValue}} shannons/KB | 费用 {{feeValue}} CKB",
+      "fast": "快速",
+      "standard": "标准",
+      "slow": "慢速",
+      "countDownTip": "单价将在{{countDown}}秒后刷新",
+      "switchToCustomPrice": "切换到自定义价格",
+      "switchToPrice": "切换到单价"
     }
   }
 }

@@ -520,7 +520,9 @@
       "copy": "Copy",
       "copied": "Copied",
       "verification-failure": "Verification Failed",
-      "back": "Back"
+      "back": "Back",
+      "switch-to-light": "Switch to Light Mode",
+      "switch-to-dark": "Switch to Dark Mode"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -547,6 +549,7 @@
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
+      "migrate-warning": "Warning: The migration process may fail for unknown reasons resulting in resynchronization, please back up manually and start the migration!",
       "migrate": "Migrate",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
       "fields": {
@@ -827,6 +830,8 @@
         "tag": "D"
       },
       "timezone": "Time Zone",
+      "previous-month": "previous month",
+      "next-month": "next month",
       "start-tomorrow": "Selected time should start from tomorrow."
     },
     "sign-and-verify": {
@@ -1053,6 +1058,22 @@
         "view-concise-data": "View concise data",
         "view-raw-data": "View raw data"
       }
+    },
+    "dropdown": {
+      "placeholder": "Please select..."
+    },
+    "price-switch": {
+      "price": "Price",
+      "customPrice": "Custom Price",
+      "errorTip": "Price cannot be less than {{minPrice}} shannons/KB, please re-enter",
+      "hintTip": "Suggested price is {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "Price {{priceValue}} shannons/KB | Fee {{feeValue}} CKB",
+      "fast": "Fast",
+      "standard": "Standard",
+      "slow": "Slow",
+      "countDownTip": "The price will refresh after {{countDown}} seconds",
+      "switchToCustomPrice": "Switch to custom price",
+      "switchToPrice": "Switch to price"
     }
   }
 }

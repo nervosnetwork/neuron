@@ -105,7 +105,7 @@ const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => 
           onChange={onChange}
           label={t('settings.network.edit-network.rpc-url')}
           error={editor.urlError}
-          placeholder="http://localhost:8114"
+          placeholder="http://127.0.0.1:8114"
           autoFocus
         />
         <TextField
