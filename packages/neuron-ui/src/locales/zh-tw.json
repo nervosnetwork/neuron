@@ -513,7 +513,9 @@
       "copy": "複製",
       "copied": "已複製",
       "verification-failure": "驗證失敗",
-      "back": "上一步"
+      "back": "上一步",
+      "switch-to-light": "開啟日間模式",
+      "switch-to-dark": "開啟夜間模式"
     },
     "notification-panel": {
       "title": "通知中心"

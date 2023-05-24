@@ -520,7 +520,9 @@
       "copy": "Copy",
       "copied": "Copied",
       "verification-failure": "Verification Failed",
-      "back": "Back"
+      "back": "Back",
+      "switch-to-light": "Switch to Light Mode",
+      "switch-to-dark": "Switch to Dark Mode"
     },
     "notification-panel": {
       "title": "Notifications"
