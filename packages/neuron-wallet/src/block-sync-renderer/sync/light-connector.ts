@@ -205,7 +205,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     ]
     await this.lightRpc.setScripts(setScriptsParams)
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
-    await SyncProgressService.resetSyncProgress([...allScripts, ...appendScripts])
+    await SyncProgressService.resetSyncProgress([allScripts, appendScripts].flat())
     await SyncProgressService.updateSyncProgressFlag(walletIds)
     await SyncProgressService.removeByHashesAndAddressType(
       SyncAddressType.Multisig,
