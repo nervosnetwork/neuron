@@ -420,8 +420,8 @@ describe('unit tests for IndexerConnector', () => {
             hashType: 'data',
             codeHash: '0xcode',
             args: '0x1',
-          }
-        }
+          },
+        },
       }
       fakeCell2 = {
         blockHash: '0x',
@@ -440,8 +440,8 @@ describe('unit tests for IndexerConnector', () => {
             hashType: 'lock',
             codeHash: '0xcode',
             args: '0x2',
-          }
-        }
+          },
+        },
       }
       const fakeCells = [fakeCell1, fakeCell2]
 
@@ -453,9 +453,7 @@ describe('unit tests for IndexerConnector', () => {
             args: '0x',
           },
           type: {
-            //test the workaround for this lumos data issue
-            //@ts-ignore
-            hashType: 'lock',
+            hashType: ScriptHashType.Data,
             codeHash: '0xcode',
             args: '0x',
           },

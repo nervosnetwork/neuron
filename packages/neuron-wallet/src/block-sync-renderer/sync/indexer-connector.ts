@@ -177,9 +177,13 @@ export default class IndexerConnector {
     for await (const cell of collector.collect()) {
       //somehow the lumos indexer returns an invalid hash type "lock" for hash type "data"
       //for now we have to fix it here
-      const cellOutput: any = cell.cell_output
-      if (cellOutput.type?.hash_type === 'lock') {
-        cellOutput.type.hash_type = 'data'
+      const cellOutput = cell.cellOutput
+      // FIXME
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      if (cellOutput.type?.hashType === 'lock') {
+        console.error('Unexpected hash type "lock" found with the query', JSON.stringify(queries))
+        cellOutput.type.hashType = 'data'
       }
       result.push(cell)
     }

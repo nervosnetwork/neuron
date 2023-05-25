@@ -97,7 +97,7 @@ export default class IndexerCacheService {
               args: lockScript.args,
             }
           },
-          this.indexer.ckbRpcUrl,
+          this.indexer.ckbRpcUrl!,
           {
             includeStatus: false,
           }
@@ -140,7 +140,7 @@ export default class IndexerCacheService {
         })
 
         for await (const cell of cellCollector.collect()) {
-          const txHash = cell.out_point!.tx_hash!
+          const txHash = cell.outPoint!.txHash!
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,
