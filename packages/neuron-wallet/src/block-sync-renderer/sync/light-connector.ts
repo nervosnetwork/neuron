@@ -156,8 +156,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     })
   }
 
-  private async initSyncProgress(appendScripts?: AppendScript[]) {
-    if (!this.addressMetas.length && !appendScripts?.length) {
+  private async initSyncProgress(appendScripts: AppendScript[] = []) {
+    if (!this.addressMetas.length && !appendScripts.length) {
       return
     }
     const syncScripts = await this.lightRpc.getScripts()
@@ -181,27 +181,35 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
         }))
       })
       .flat()
-      .concat(appendScripts ?? [])
     const walletMinBlockNumber = await SyncProgressService.getWalletMinBlockNumber()
     const wallets = await WalletService.getInstance().getAll()
     const walletStartBlockMap = wallets.reduce<Record<string, string | undefined>>(
       (pre, cur) => ({ ...pre, [cur.id]: cur.startBlockNumberInLight }),
       {}
     )
-    const setScriptsParams = allScripts.map(v => ({
-      ...v,
-      blockNumber:
-        existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
-        walletStartBlockMap[v.walletId] ??
-        `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`
-    }))
+    const otherTypeSyncProgress = await SyncProgressService.getOtherTypeSyncProgress()
+    const setScriptsParams = [
+      ...allScripts.map(v => ({
+        ...v,
+        blockNumber:
+          existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
+          walletStartBlockMap[v.walletId] ??
+          `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`
+      })),
+      ...appendScripts.map(v => ({
+        ...v,
+        blockNumber:
+          existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
+          `0x${(otherTypeSyncProgress[scriptToHash(v.script)] ?? 0).toString(16)}`
+      }))
+    ]
     await this.lightRpc.setScripts(setScriptsParams)
-    await SyncProgressService.resetSyncProgress(allScripts)
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
-    await SyncProgressService.removeWalletsByExists(walletIds)
+    await SyncProgressService.resetSyncProgress([...allScripts, ...appendScripts])
+    await SyncProgressService.updateSyncProgressFlag(walletIds)
     await SyncProgressService.removeByHashesAndAddressType(
       SyncAddressType.Multisig,
-      appendScripts?.map(v => scriptToHash(v.script))
+      appendScripts.map(v => scriptToHash(v.script))
     )
   }
 

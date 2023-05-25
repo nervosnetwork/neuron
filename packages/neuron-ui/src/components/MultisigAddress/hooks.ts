@@ -320,17 +320,23 @@ export const useSubscription = ({
   useEffect(() => {
     const dataUpdateSubscription = MultisigOutputUpdate.subscribe(() => {
       getAndSaveMultisigBalances()
-      if (isLightClient) {
-        getAndSaveMultisigSyncProgress()
-      }
     })
     getAndSaveMultisigBalances()
-    if (isLightClient) {
-      getAndSaveMultisigSyncProgress()
-    }
     return () => {
       dataUpdateSubscription.unsubscribe()
     }
   }, [walletId, getAndSaveMultisigBalances])
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | undefined
+    if (isLightClient) {
+      interval = setInterval(() => {
+        getAndSaveMultisigSyncProgress()
+      }, 10000)
+      getAndSaveMultisigSyncProgress()
+    }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [isLightClient, getAndSaveMultisigSyncProgress])
   return { multisigBanlances, multisigSyncProgress }
 }
