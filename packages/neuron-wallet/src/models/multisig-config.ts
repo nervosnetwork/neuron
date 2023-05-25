@@ -46,7 +46,7 @@ export default class MultisigConfigModel {
       n: this.n,
       r: this.r,
       blake160s: this.blake160s,
-      alias: this.alias
+      alias: this.alias,
     }
   }
 

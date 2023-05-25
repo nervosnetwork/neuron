@@ -167,23 +167,16 @@ describe('BIP32 Keychain tests', () => {
       '2925f5dfcbee3b6ad29100a37ed36cbe92d51069779cc96164182c779c5dc20e'
     )
 
-    expect(
-      master
-        .derivePath(`m/44'/309'/0'`)
-        .deriveChild(0, false)
-        .privateKey.toString('hex')
-    ).toEqual('047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1')
+    expect(master.derivePath(`m/44'/309'/0'`).deriveChild(0, false).privateKey.toString('hex')).toEqual(
+      '047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1'
+    )
 
     expect(master.derivePath(`m/44'/309'/0'/0`).privateKey.toString('hex')).toEqual(
       '047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1'
     )
 
     expect(
-      master
-        .derivePath(`m/44'/309'/0'`)
-        .deriveChild(0, false)
-        .deriveChild(0, false)
-        .privateKey.toString('hex')
+      master.derivePath(`m/44'/309'/0'`).deriveChild(0, false).deriveChild(0, false).privateKey.toString('hex')
     ).toEqual('848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14')
 
     expect(master.derivePath(`m/44'/309'/0'/0/0`).privateKey.toString('hex')).toEqual(
@@ -203,30 +196,22 @@ describe('BIP32 Keychain tests', () => {
       '2925f5dfcbee3b6ad29100a37ed36cbe92d51069779cc96164182c779c5dc20e'
     )
 
-    expect(
-      master
-        .derivePath(`m/44'/309'/0'`)
-        .deriveChild(0, false)
-        .privateKey.toString('hex')
-    ).toEqual('047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1')
+    expect(master.derivePath(`m/44'/309'/0'`).deriveChild(0, false).privateKey.toString('hex')).toEqual(
+      '047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1'
+    )
 
     expect(master.derivePath(`m/44'/309'/0'/0`).privateKey.toString('hex')).toEqual(
       '047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1'
     )
 
     expect(
-      master
-        .derivePath(`m/44'/309'/0'`)
-        .deriveChild(0, false)
-        .deriveChild(0, false)
-        .privateKey.toString('hex')
+      master.derivePath(`m/44'/309'/0'`).deriveChild(0, false).deriveChild(0, false).privateKey.toString('hex')
     ).toEqual('848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14')
 
     expect(master.derivePath(`m/44'/309'/0'/0/0`).privateKey.toString('hex')).toEqual(
       '848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
     )
   })
-
 
   it('private key add', () => {
     const privateKey = Buffer.from('9e919c96ac5a4caea7ba0ea1f7dd7bca5dca8a11e66ed633690c71e483a6e3c9', 'hex')

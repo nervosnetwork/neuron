@@ -16,7 +16,7 @@ const fixtures = {
   'Should return false when network id cannot be found in network list': {
     params: {
       networkID: 'testnet',
-      networks: [{ id: 'mainnet', chain: 'ckb', type: 0 as 0 | 1, name: 'Mainnet', remote: 'http://localhost:8114' }],
+      networks: [{ id: 'mainnet', chain: 'ckb', type: 0 as 0 | 1, name: 'Mainnet', remote: 'http://127.0.0.1:8114' }],
     },
     expected: false,
   },
@@ -24,7 +24,7 @@ const fixtures = {
     params: {
       networkID: 'testnet',
       networks: [
-        { id: 'testnet', chain: 'ckb_testnet', type: 0 as 0 | 1, name: 'Mainnet', remote: 'http://localhost:8114' },
+        { id: 'testnet', chain: 'ckb_testnet', type: 0 as 0 | 1, name: 'Mainnet', remote: 'http://127.0.0.1:8114' },
       ],
     },
     expected: false,
@@ -32,7 +32,7 @@ const fixtures = {
   "Should return true when network id can be found in network list and it's Mainnet": {
     params: {
       networkID: 'mainnet',
-      networks: [{ id: 'mainnet', chain: 'ckb', type: 0 as 0 | 1, name: 'Mainnet', remote: 'http://localhost:8114' }],
+      networks: [{ id: 'mainnet', chain: 'ckb', type: 0 as 0 | 1, name: 'Mainnet', remote: 'http://127.0.0.1:8114' }],
     },
     expected: true,
   },

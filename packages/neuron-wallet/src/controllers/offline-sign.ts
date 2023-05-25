@@ -2,17 +2,17 @@ import fs from 'fs'
 import path from 'path'
 import { dialog } from 'electron'
 import { t } from 'i18next'
-import { ResponseCode } from 'utils/const'
-import OfflineSign, { SignType, OfflineSignJSON, SignStatus } from 'models/offline-sign'
-import TransactionSender from 'services/transaction-sender'
-import Transaction from 'models/chain/transaction'
+import { ResponseCode } from '../utils/const'
+import OfflineSign, { SignType, OfflineSignJSON, SignStatus } from '../models/offline-sign'
+import TransactionSender from '../services/transaction-sender'
+import Transaction from '../models/chain/transaction'
 import AssetAccountController from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
-import NodeService from 'services/node'
-import { MultisigNotSignedNeedError, OfflineSignFailed } from 'exceptions'
-import MultisigConfigModel from 'models/multisig-config'
-import { getMultisigStatus } from 'utils/multisig'
+import NodeService from '../services/node'
+import { MultisigNotSignedNeedError, OfflineSignFailed } from '../exceptions'
+import MultisigConfigModel from '../models/multisig-config'
+import { getMultisigStatus } from '../utils/multisig'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -21,16 +21,16 @@ export default class OfflineSignController {
     status,
     asset_account,
     description,
-    context
+    context,
   }: OfflineSignJSON) {
     const { canceled, filePath } = await dialog.showSaveDialog({
       title: t('offline-signature.export-transaction'),
-      defaultPath: `transaction_${Date.now()}.json`
+      defaultPath: `transaction_${Date.now()}.json`,
     })
 
     if (canceled || !filePath) {
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     }
 
@@ -49,7 +49,7 @@ export default class OfflineSignController {
       status,
       asset_account,
       context,
-      description
+      description,
     })
 
     const json = signer.toJSON()
@@ -58,15 +58,15 @@ export default class OfflineSignController {
 
     dialog.showMessageBox({
       type: 'info',
-      message: t('offline-signature.transaction-exported', { filePath })
+      message: t('offline-signature.transaction-exported', { filePath }),
     })
 
     return {
       status: ResponseCode.Success,
       result: {
         filePath: path.basename(filePath),
-        json
-      }
+        json,
+      },
     }
   }
 
@@ -101,7 +101,7 @@ export default class OfflineSignController {
 
       const signer = OfflineSign.fromJSON({
         ...params,
-        transaction: tx
+        transaction: tx,
       })
 
       let signStatus = SignStatus.Signed
@@ -112,7 +112,7 @@ export default class OfflineSignController {
 
       return {
         status: ResponseCode.Success,
-        result: signer.toJSON()
+        result: signer.toJSON(),
       }
     } catch (err) {
       if (err.code) {
@@ -129,7 +129,7 @@ export default class OfflineSignController {
 
     const signer = OfflineSign.fromJSON({
       ...params,
-      ...res.result
+      ...res.result,
     })
 
     return await this.exportTransactionAsJSON(signer.toJSON())
@@ -145,7 +145,7 @@ export default class OfflineSignController {
 
     return await this.broadcastTransaction({
       ...res.result,
-      walletID: params.walletID
+      walletID: params.walletID,
     })
   }
 
@@ -154,7 +154,7 @@ export default class OfflineSignController {
     type,
     asset_account: assetAccount,
     walletID,
-    description
+    description,
   }: OfflineSignJSON & { walletID: string }) {
     const tx = Transaction.fromObject(transaction)
     switch (type) {
@@ -164,7 +164,7 @@ export default class OfflineSignController {
             walletID,
             assetAccount: assetAccount!,
             tx,
-            password: ''
+            password: '',
           },
           true
         )
@@ -174,7 +174,7 @@ export default class OfflineSignController {
           {
             walletID,
             tx,
-            password: ''
+            password: '',
           },
           true
         )
@@ -185,7 +185,7 @@ export default class OfflineSignController {
             walletID,
             tx,
             password: '',
-            description
+            description,
           },
           true
         )

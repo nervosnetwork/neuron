@@ -2,8 +2,8 @@ import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
 
-import logger from 'utils/logger'
-import env from 'env'
+import logger from '../../utils/logger'
+import env from '../../env'
 
 import HdPublicKeyInfo from './entities/hd-public-key-info'
 import Transaction from './entities/transaction'
@@ -79,7 +79,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       IndexerTxHashCache,
       AddressDescription,
       MultisigConfig,
-      MultisigOuput
+      MultisigOuput,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -111,11 +111,11 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       UpdateAddressDescription1650984779265,
       RemoveDuplicateBlake160s1656930265386,
       UpdateOutputChequeLockHash1652945662504,
-      RemoveAddressesMultisigConfig1651820157100
+      RemoveAddressesMultisigConfig1651820157100,
     ],
     logger: 'simple-console',
     logging,
-    maxQueryExecutionTime: 30
+    maxQueryExecutionTime: 30,
   }
 }
 

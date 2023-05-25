@@ -1,19 +1,19 @@
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import AssetAccount from 'models/asset-account'
-import Transaction from 'models/chain/transaction'
-import AssetAccountService from 'services/asset-account-service'
-import { ServiceHasNoResponse } from 'exceptions'
-import { ResponseCode } from 'utils/const'
-import NetworksService from 'services/networks'
-import AssetAccountInfo from 'models/asset-account-info'
-import TransactionSender from 'services/transaction-sender'
+import AssetAccount from '../models/asset-account'
+import Transaction from '../models/chain/transaction'
+import AssetAccountService from '../services/asset-account-service'
+import { ServiceHasNoResponse } from '../exceptions'
+import { ResponseCode } from '../utils/const'
+import NetworksService from '../services/networks'
+import AssetAccountInfo from '../models/asset-account-info'
+import TransactionSender from '../services/transaction-sender'
 import { BrowserWindow, dialog } from 'electron'
 import { t } from 'i18next'
-import WalletsService from 'services/wallets'
-import CommandSubject from 'models/subjects/command'
+import WalletsService from '../services/wallets'
+import CommandSubject from '../models/subjects/command'
 import SyncApiController, { SyncStatus } from './sync-api'
-import { TransactionGenerator } from 'services/tx'
-import OutPoint from 'models/chain/out-point'
+import { TransactionGenerator } from '../services/tx'
+import OutPoint from '../models/chain/out-point'
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -85,13 +85,13 @@ export default class AssetAccountController {
     const result = assetAccounts.map(aa => {
       return {
         ...aa,
-        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(aa.blake160), isMainnet)
+        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(aa.blake160), isMainnet),
       }
     })
 
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -109,7 +109,7 @@ export default class AssetAccountController {
 
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -130,14 +130,12 @@ export default class AssetAccountController {
       status: ResponseCode.Success,
       result: {
         ...account,
-        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(account.blake160), isMainnet)
-      }
+        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(account.blake160), isMainnet),
+      },
     }
   }
 
-  public async generateCreateTx(
-    params: GenerateCreateAssetAccountTxParams
-  ): Promise<
+  public async generateCreateTx(params: GenerateCreateAssetAccountTxParams): Promise<
     Controller.Response<{
       assetAccount: AssetAccount
       tx: Transaction
@@ -160,7 +158,7 @@ export default class AssetAccountController {
 
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -178,7 +176,7 @@ export default class AssetAccountController {
 
     return {
       status: ResponseCode.Success,
-      result: txHash
+      result: txHash,
     }
   }
 
@@ -187,7 +185,7 @@ export default class AssetAccountController {
 
     return {
       status: ResponseCode.Success,
-      result: undefined
+      result: undefined,
     }
   }
 
@@ -195,7 +193,7 @@ export default class AssetAccountController {
     const result = await AssetAccountService.getTokenInfoList()
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -213,12 +211,12 @@ export default class AssetAccountController {
       title: t(`${I18N_PATH}.title`),
       message: t(`${I18N_PATH}.message`),
       cancelId: 0,
-      noLink: true
+      noLink: true,
     })
 
     return {
       status: ResponseCode.Success,
-      result: txHash
+      result: txHash,
     }
   }
 
@@ -229,14 +227,14 @@ export default class AssetAccountController {
     const currentWallet = walletsService.getCurrent()
     if (!currentWallet) {
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     }
     const walletId = currentWallet.id
 
     if (!allowMultipleOpen && this.displayedACPMigrationDialogByWalletIds.has(walletId)) {
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     }
 
@@ -244,21 +242,21 @@ export default class AssetAccountController {
 
     if (syncStatus !== SyncStatus.SyncCompleted || BrowserWindow.getAllWindows().length !== 1) {
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     }
 
     const window = BrowserWindow.getFocusedWindow()
     if (!window) {
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     }
 
     const tx = await TransactionGenerator.generateMigrateLegacyACPTx(walletId)
     if (!tx) {
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     }
 
@@ -274,7 +272,7 @@ export default class AssetAccountController {
         message: t(`${I18N_PATH}.message`),
         detail: t(`${I18N_PATH}.detail`),
         cancelId: 0,
-        noLink: true
+        noLink: true,
       })
       .then(({ response }) => {
         switch (response) {
@@ -283,7 +281,7 @@ export default class AssetAccountController {
               winID: window.id,
               type: 'migrate-acp',
               payload: walletId,
-              dispatchToUI: true
+              dispatchToUI: true,
             })
             return true
           }
@@ -294,7 +292,7 @@ export default class AssetAccountController {
       })
       .then(result => ({
         status: ResponseCode.Success,
-        result
+        result,
       }))
   }
 
@@ -310,7 +308,7 @@ export default class AssetAccountController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx
+      result: tx,
     }
   }
 
@@ -321,7 +319,7 @@ export default class AssetAccountController {
     const { tx, assetAccount } = await AssetAccountService.generateClaimChequeTx(walletID, chequeCellOutPoint)
     return {
       status: ResponseCode.Success,
-      result: { tx, assetAccount }
+      result: { tx, assetAccount },
     }
   }
 
@@ -332,7 +330,7 @@ export default class AssetAccountController {
     const tx = await AssetAccountService.generateWithdrawChequeTx(chequeCellOutPoint)
     return {
       status: ResponseCode.Success,
-      result: { tx }
+      result: { tx },
     }
   }
 }

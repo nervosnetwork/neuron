@@ -26,5 +26,5 @@ export class TransactionInputParamterMiss extends Error {
 
 export default {
   TransactionNotFound,
-  CapacityTooSmall
+  CapacityTooSmall,
 }

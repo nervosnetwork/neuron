@@ -1,11 +1,11 @@
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import HexUtils from 'utils/hex'
-import TypeChecker from 'utils/type-checker'
+import HexUtils from '../../utils/hex'
+import TypeChecker from '../../utils/type-checker'
 
 export enum ScriptHashType {
   Data = 'data',
   Type = 'type',
-  Data1 = 'data1'
+  Data1 = 'data1',
 }
 
 export default class Script {
@@ -24,7 +24,7 @@ export default class Script {
   public static fromObject({
     codeHash,
     args,
-    hashType
+    hashType,
   }: {
     codeHash: string
     args: string
@@ -46,7 +46,7 @@ export default class Script {
     return {
       args: this.args,
       codeHash: this.codeHash,
-      hashType: this.hashType
+      hashType: this.hashType,
     }
   }
 

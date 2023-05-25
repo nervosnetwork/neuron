@@ -296,5 +296,9 @@ $pending-color: #b3b3b3;
     svg {
       height: 16px;
     }
+
+    &[disabled] {
+      background: #9b9bd4;
+    }
   }
 }

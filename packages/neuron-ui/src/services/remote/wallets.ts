@@ -10,9 +10,8 @@ export const updateWallet = remoteApi<Controller.UpdateWalletParams>('update-wal
 export const deleteWallet = remoteApi<Controller.DeleteWalletParams>('delete-wallet')
 export const backupWallet = remoteApi<Controller.DeleteWalletParams>('backup-wallet')
 export const getAddressesByWalletID = remoteApi<Controller.GetAddressesByWalletIDParams>('get-all-addresses')
-export const updateAddressDescription = remoteApi<Controller.UpdateAddressDescriptionParams>(
-  'update-address-description'
-)
+export const updateAddressDescription =
+  remoteApi<Controller.UpdateAddressDescriptionParams>('update-address-description')
 export const requestPassword = remoteApi<Controller.RequestPasswordParams>('request-password')
 export const sendTx = remoteApi<Controller.SendTransactionParams>('send-tx')
 export const generateTx = remoteApi<Controller.GenerateTransactionParams>('generate-tx')
@@ -23,9 +22,8 @@ export const validateMnemonic = remoteApi<string>('validate-mnemonic')
 // Dao
 export const getDaoData = remoteApi<Controller.GetNervosDaoDataParams>('get-dao-data')
 export const generateDaoDepositTx = remoteApi<Controller.DepositParams>('generate-dao-deposit-tx')
-export const generateDaoDepositAllTx = remoteApi<Controller.GenerateDepositAllTransactionParams>(
-  'generate-dao-deposit-all-tx'
-)
+export const generateDaoDepositAllTx =
+  remoteApi<Controller.GenerateDepositAllTransactionParams>('generate-dao-deposit-all-tx')
 export const generateDaoWithdrawTx = remoteApi<Controller.WithdrawParams>('start-withdraw-from-dao')
 export const generateDaoClaimTx = remoteApi<Controller.ClaimParams>('withdraw-from-dao')
 

@@ -61,6 +61,7 @@ declare namespace State {
     content?: string
     meta?: Meta
   }
+
   interface Send {
     txID: string
     outputs: Output[]
@@ -119,6 +120,8 @@ declare namespace State {
 
   type AlertDialog = Record<'title' | 'message', string> | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
+
+  type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
 
   interface App {
     tipBlockNumber: string
@@ -218,7 +221,7 @@ declare namespace State {
     }
   }
   interface Settings {
-    general: {}
+    general: object
     networks: Network[]
     wallets: WalletIdentity[]
   }

@@ -1,16 +1,15 @@
-// eslint-disable-next-line prettier/prettier
-import type { ScriptHashType } from 'models/chain/script'
+import type { ScriptHashType } from '../../models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { Tip } from '@ckb-lumos/base'
 import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
-import logger from 'utils/logger'
-import CommonUtils from 'utils/common'
-import RpcService from 'services/rpc-service'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import { Address } from 'models/address'
-import AddressMeta from 'database/address/meta'
-import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
+import logger from '../../utils/logger'
+import CommonUtils from '../../utils/common'
+import RpcService from '../../services/rpc-service'
+import TransactionWithStatus from '../../models/chain/transaction-with-status'
+import { Address } from '../../models/address'
+import AddressMeta from '../../database/address/meta'
+import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 
 export interface LumosCellQuery {
@@ -160,14 +159,14 @@ export default class IndexerConnector {
       queries.lock = {
         codeHash: lock.codeHash,
         hashType: lock.hashType,
-        args: lock.args
+        args: lock.args,
       }
     }
     if (type) {
       queries.type = {
         codeHash: type.codeHash,
         hashType: type.hashType,
-        args: type.args
+        args: type.args,
       }
     }
     queries.data = data || 'any'
@@ -178,10 +177,9 @@ export default class IndexerConnector {
     for await (const cell of collector.collect()) {
       //somehow the lumos indexer returns an invalid hash type "lock" for hash type "data"
       //for now we have to fix it here
-      const cellOutput = cell.cellOutput
-      // @ts-ignore
-      if (cellOutput.type?.hashType === 'lock') {
-        cellOutput.type.hashType = 'data'
+      const cellOutput: any = cell.cell_output
+      if (cellOutput.type?.hash_type === 'lock') {
+        cellOutput.type.hash_type = 'data'
       }
       result.push(cell)
     }

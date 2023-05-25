@@ -1,7 +1,7 @@
 import { BrowserWindow, dialog } from 'electron'
 import { t } from 'i18next'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
-import AppUpdaterSubject from 'models/subjects/app-updater'
+import AppUpdaterSubject from '../models/subjects/app-updater'
 
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking
@@ -22,7 +22,7 @@ export default class UpdateController {
       checking: true,
       downloadProgress: -1,
       version: '',
-      releaseNotes: ''
+      releaseNotes: '',
     })
   }
 
@@ -59,7 +59,7 @@ export default class UpdateController {
       dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
         type: 'info',
         message: t('updater.update-not-available'),
-        buttons: [t('common.ok')]
+        buttons: [t('common.ok')],
       })
     })
 
@@ -81,7 +81,7 @@ export default class UpdateController {
       checking: UpdateController.isChecking,
       downloadProgress,
       version,
-      releaseNotes
+      releaseNotes,
     })
   }
 }

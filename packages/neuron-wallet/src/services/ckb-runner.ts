@@ -1,12 +1,12 @@
-import env from 'env'
+import env from '../env'
 import path from 'path'
 import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
 import process from 'process'
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 import SettingsService from './settings'
-import MigrateSubject from 'models/subjects/migrate-subject'
-import { resetSyncTaskQueue } from 'block-sync-renderer'
+import MigrateSubject from '../models/subjects/migrate-subject'
+import IndexerService from './indexer'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -66,7 +66,19 @@ let isLookingValidTarget: boolean = false
 let lastLogTime: number
 export const getLookingValidTargetStatus = () => isLookingValidTarget
 
+const removeOldIndexerIfRunSuccess = () => {
+  setTimeout(() => {
+    if (ckb !== null) {
+      IndexerService.cleanOldIndexerData()
+    }
+  }, 10000)
+}
+
 export const startCkbNode = async () => {
+  if (ckb !== null) {
+    logger.info(`CKB:\tckb is not closed, close it before start...`)
+    await stopCkbNode()
+  }
   await initCkb()
 
   logger.info('CKB:\tstarting node...')
@@ -113,12 +125,12 @@ export const startCkbNode = async () => {
     isLookingValidTarget = false
     ckb = null
   })
-  resetSyncTaskQueue.push(true)
+
+  removeOldIndexerIfRunSuccess()
 }
 
 export const stopCkbNode = () => {
   return new Promise<void>(resolve => {
-    resetSyncTaskQueue.push(false)
     if (ckb) {
       logger.info('CKB:\tkilling node')
       ckb.once('close', () => resolve())
@@ -156,6 +168,7 @@ export function migrateCkbData() {
     logger.info(`CKB migrate:\tprocess process exited with code ${code}`)
     if (code === 0) {
       MigrateSubject.next({ type: 'finish' })
+      IndexerService.cleanOldIndexerData()
     } else {
       MigrateSubject.next({ type: 'failed', reason: lastErrorData })
     }

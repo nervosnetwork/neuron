@@ -1,4 +1,4 @@
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 
 export default class CommonUtils {
   public static sleep = (ms: number): Promise<void> => {
@@ -24,7 +24,7 @@ export default class CommonUtils {
       promise,
       new Promise<T>((resolve, _) => {
         setTimeout(() => resolve(value), time)
-      })
+      }),
     ])
   }
 

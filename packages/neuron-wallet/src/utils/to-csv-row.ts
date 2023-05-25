@@ -1,8 +1,8 @@
 import { t } from 'i18next'
-import shannonToCKB from 'utils/shannonToCKB'
-import sudtValueToAmount from 'utils/sudt-value-to-amount'
-import Transaction from 'models/chain/transaction'
-import { DEFAULT_UDT_SYMBOL } from 'utils/const'
+import shannonToCKB from '../utils/shannonToCKB'
+import sudtValueToAmount from '../utils/sudt-value-to-amount'
+import Transaction from '../models/chain/transaction'
+import { DEFAULT_UDT_SYMBOL } from '../utils/const'
 
 export const formatDatetime = (datetime: Date) => {
   const isoFmt = datetime.toISOString()
@@ -34,7 +34,7 @@ const toCSVRow = (
     if (['create', 'destroy'].includes(tx.type || '')) {
       // create/destroy an account
       txType = t(`export-transactions.tx-type.${tx.type}-asset-account`, {
-        name: tx.sudtInfo.sUDT.tokenName || 'Unknown'
+        name: tx.sudtInfo.sUDT.tokenName || 'Unknown',
       })
     } else {
       // transfer of an account

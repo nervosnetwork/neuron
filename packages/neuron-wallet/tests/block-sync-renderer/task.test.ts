@@ -6,20 +6,20 @@ const STUB_START_MESSAGE = {
     genesisHash: 'stub_genesis_hash',
     url: 'stub_url',
     addressMetas: 'stub_address_metas',
-    indexerUrl: 'stub_indexer_url'
-  }
+    indexerUrl: 'stub_indexer_url',
+  },
 }
 
 const STUB_QUERY_INDEXER_MESSAGE = {
   type: 'call',
   id: 1,
   channel: 'queryIndexer',
-  message: 'stub_query_indexer_message'
+  message: 'stub_query_indexer_message',
 }
 const STUB_UNMOUNT_MESSAGE = {
   type: 'call',
   id: 2,
-  channel: 'unmount'
+  channel: 'unmount',
 }
 
 const STUB_LIVE_CELLS = ['stub_live_cells']
@@ -32,8 +32,8 @@ describe(`Block Sync Task`, () => {
     start: stubbedSyncQueueStart,
     stopAndWait: stubbedSyncQueueStopAndWait,
     getIndexerConnector: jest.fn().mockImplementation(() => ({
-      getLiveCellsByScript: stubbedGetLiveCellsByScript
-    }))
+      getLiveCellsByScript: stubbedGetLiveCellsByScript,
+    })),
   }))
   const stubbedInitConnection = jest.fn()
   const stubbedLoggerError = jest.fn()
@@ -80,7 +80,7 @@ describe(`Block Sync Task`, () => {
         id: STUB_START_MESSAGE.id,
         type: 'response',
         channel: STUB_START_MESSAGE.channel,
-        message: null
+        message: null,
       })
     })
   })
@@ -96,7 +96,7 @@ describe(`Block Sync Task`, () => {
         id: STUB_QUERY_INDEXER_MESSAGE.id,
         type: 'response',
         channel: STUB_QUERY_INDEXER_MESSAGE.channel,
-        message: []
+        message: [],
       })
     })
 
@@ -106,7 +106,7 @@ describe(`Block Sync Task`, () => {
         id: STUB_QUERY_INDEXER_MESSAGE.id,
         type: 'response',
         channel: STUB_QUERY_INDEXER_MESSAGE.channel,
-        message: STUB_LIVE_CELLS
+        message: STUB_LIVE_CELLS,
       })
     })
   })

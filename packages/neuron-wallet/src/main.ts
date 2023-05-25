@@ -1,21 +1,23 @@
 import { app } from 'electron'
 
-import AppController from 'controllers/app'
-import SettingsService from 'services/settings'
-import { changeLanguage } from 'locales/i18n'
-import logger from 'utils/logger'
+import AppController from './controllers/app'
+import SettingsService from './services/settings'
+import { changeLanguage } from './locales/i18n'
+import logger from './utils/logger'
 
 const appController = AppController.getInstance()
 
 const singleInstanceLock = app.requestSingleInstanceLock()
 if (singleInstanceLock) {
   app.on('ready', async () => {
+    logger.info('App:\tNeuron is starting')
     changeLanguage(SettingsService.getInstance().locale)
 
     appController.start()
   })
 
   app.on('before-quit', async () => {
+    logger.info('App:\tNeuron will exit')
     await appController.end()
   })
 

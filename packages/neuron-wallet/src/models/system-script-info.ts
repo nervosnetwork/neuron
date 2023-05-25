@@ -1,7 +1,7 @@
 import OutPoint from './chain/out-point'
 import CellDep, { DepType } from './chain/cell-dep'
-import NetworksService from 'services/networks'
-import RpcService from 'services/rpc-service'
+import NetworksService from '../services/networks'
+import RpcService from '../services/rpc-service'
 import Script, { ScriptHashType } from './chain/script'
 
 export default class SystemScriptInfo {

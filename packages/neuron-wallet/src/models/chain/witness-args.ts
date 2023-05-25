@@ -14,7 +14,7 @@ export default class WitnessArgs {
   public static fromObject({
     lock,
     inputType,
-    outputType
+    outputType,
   }: {
     lock?: string
     inputType?: string
@@ -53,7 +53,7 @@ export default class WitnessArgs {
     return WitnessArgs.fromObject({
       lock: '0x' + buffer.slice(offset0 + 4, offset1).toString('hex'),
       inputType: inputType === '0x' ? undefined : inputType,
-      outputType: outputType === '0x' ? undefined : outputType
+      outputType: outputType === '0x' ? undefined : outputType,
     })
   }
 
@@ -73,7 +73,7 @@ export default class WitnessArgs {
     return {
       lock: this.lock,
       inputType: this.inputType,
-      outputType: this.outputType
+      outputType: this.outputType,
     }
   }
 }

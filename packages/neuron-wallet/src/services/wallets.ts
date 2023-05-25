@@ -1,16 +1,16 @@
 import { v4 as uuid } from 'uuid'
-import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported } from 'exceptions'
-import Store from 'models/store'
-import Keystore from 'models/keys/keystore'
-import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
-import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
-import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
-import { Address as AddressInterface } from 'models/address'
+import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported } from '../exceptions'
+import Store from '../models/store'
+import Keystore from '../models/keys/keystore'
+import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
+import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from '../models/keys/key'
+import { Address as AddressInterface } from '../models/address'
 
 import FileService from './file'
 import AddressService from './addresses'
 import { DeviceInfo } from './hardware/common'
-import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
+import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import { getConnection, In, Not } from 'typeorm'
 
 const fileService = FileService.getInstance()
@@ -59,7 +59,7 @@ export abstract class Wallet {
     name: this.name,
     extendedKey: this.extendedKey,
     device: this.device,
-    isHD: this.isHD
+    isHD: this.isHD,
   })
 
   public fromJSON = () => {
@@ -138,7 +138,7 @@ export class FileKeystoreWallet extends Wallet {
       name: this.name,
       extendedKey: this.extendedKey,
       device: this.device,
-      isHD: this.isHD
+      isHD: this.isHD,
     }
   }
 
@@ -227,7 +227,7 @@ export class HardwareWallet extends Wallet {
       walletId: this.id,
       publicKey,
       addressType,
-      addressIndex
+      addressIndex,
     })
 
     if (address) {
@@ -291,7 +291,7 @@ export default class WalletService {
         const walletList = this.getAll()
         CurrentWalletSubject.next({
           currentWallet,
-          walletList
+          walletList,
         })
       }
     })
@@ -309,7 +309,7 @@ export default class WalletService {
     await getConnection()
       .getRepository(HdPublicKeyInfo)
       .delete({
-        walletId: Not(In(allWallets.map(w => w.id)))
+        walletId: Not(In(allWallets.map(w => w.id))),
       })
   }
 

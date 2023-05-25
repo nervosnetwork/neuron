@@ -1,4 +1,4 @@
-import { clipboard, nativeImage, IpcRenderer, ipcRenderer, shell, desktopCapturer, DesktopCapturer } from 'electron'
+import { clipboard, nativeImage, IpcRenderer, ipcRenderer, shell } from 'electron'
 
 declare global {
   interface Window {
@@ -7,7 +7,6 @@ declare global {
       nativeImage: any
       ipcRenderer: IpcRenderer
       shell: Electron.Shell
-      desktopCapturer: DesktopCapturer
     }
   }
 }
@@ -16,8 +15,8 @@ if (process.env.NODE_ENV === 'development') {
   Object.defineProperty(window, '__devtron', {
     value: {
       require,
-      process
-    }
+      process,
+    },
   })
 }
 
@@ -26,5 +25,4 @@ window.electron = {
   nativeImage,
   ipcRenderer,
   shell,
-  desktopCapturer
 }

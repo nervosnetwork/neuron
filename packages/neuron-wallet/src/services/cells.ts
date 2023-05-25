@@ -5,31 +5,31 @@ import {
   CapacityNotEnoughForChange,
   LiveCapacityNotEnough,
   MultisigConfigNeedError,
-  TransactionInputParamterMiss
-} from 'exceptions'
-import FeeMode from 'models/fee-mode'
-import OutputEntity from 'database/chain/entities/output'
-import InputEntity from 'database/chain/entities/input'
-import TransactionEntity from 'database/chain/entities/transaction'
-import TransactionSize from 'models/transaction-size'
-import TransactionFee from 'models/transaction-fee'
-import Cell, { OutputStatus } from 'models/chain/output'
-import { TransactionStatus } from 'models/chain/transaction'
-import OutPoint from 'models/chain/out-point'
-import Input from 'models/chain/input'
-import WitnessArgs from 'models/chain/witness-args'
-import Multisig from 'models/multisig'
-import BufferUtils from 'utils/buffer'
-import LiveCell from 'models/chain/live-cell'
-import Output from 'models/chain/output'
-import SystemScriptInfo from 'models/system-script-info'
-import Script, { ScriptHashType } from 'models/chain/script'
+  TransactionInputParamterMiss,
+} from '../exceptions'
+import FeeMode from '../models/fee-mode'
+import OutputEntity from '../database/chain/entities/output'
+import InputEntity from '../database/chain/entities/input'
+import TransactionEntity from '../database/chain/entities/transaction'
+import TransactionSize from '../models/transaction-size'
+import TransactionFee from '../models/transaction-fee'
+import Cell, { OutputStatus } from '../models/chain/output'
+import { TransactionStatus } from '../models/chain/transaction'
+import OutPoint from '../models/chain/out-point'
+import Input from '../models/chain/input'
+import WitnessArgs from '../models/chain/witness-args'
+import Multisig from '../models/multisig'
+import BufferUtils from '../utils/buffer'
+import LiveCell from '../models/chain/live-cell'
+import Output from '../models/chain/output'
+import SystemScriptInfo from '../models/system-script-info'
+import Script, { ScriptHashType } from '../models/chain/script'
 import LiveCellService from './live-cell-service'
-import AssetAccountInfo from 'models/asset-account-info'
-import NFT from 'models/nft'
-import MultisigConfigModel from 'models/multisig-config'
-import MultisigOutput from 'database/chain/entities/multisig-output'
-import { MIN_CELL_CAPACITY } from 'utils/const'
+import AssetAccountInfo from '../models/asset-account-info'
+import NFT from '../models/nft'
+import MultisigConfigModel from '../models/multisig-config'
+import MultisigOutput from '../database/chain/entities/multisig-output'
+import { MIN_CELL_CAPACITY } from '../utils/const'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -39,7 +39,7 @@ export interface PaginationResult<T = any> {
 export enum CustomizedLock {
   SingleMultiSign = 'SingleMultiSign',
   Cheque = 'Cheque',
-  SUDT = 'SUDT'
+  SUDT = 'SUDT',
 }
 
 export enum CustomizedType {
@@ -47,16 +47,14 @@ export enum CustomizedType {
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
   SUDT = 'SUDT',
-  Unknown = 'Unknown'
+  Unknown = 'Unknown',
 }
 
 export default class CellsService {
   private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10 ** 8)
   private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10 ** 8)
 
-  public static async getBalancesByWalletId(
-    walletId: string
-  ): Promise<{
+  public static async getBalancesByWalletId(walletId: string): Promise<{
     liveBalances: Map<string, string>
     sentBalances: Map<string, string>
     pendingBalances: Map<string, string>
@@ -108,7 +106,7 @@ export default class CellsService {
     return {
       liveBalances,
       sentBalances,
-      pendingBalances
+      pendingBalances,
     }
   }
 
@@ -121,7 +119,7 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
-        lockHash: In(anyoneCanPayLockHashes)
+        lockHash: In(anyoneCanPayLockHashes),
       })
       .getMany()
 
@@ -129,6 +127,65 @@ export default class CellsService {
 
     const uniqueLockArgs = [...new Set(lockArgs)]
     return uniqueLockArgs
+  }
+
+  private static async addUnlockInfo(cells: Cell[]): Promise<Cell[]> {
+    // find unlock info
+    const unlockTxHashes: string[] = cells
+      .filter(v => v.outPoint && (v.status === OutputStatus.Dead || v.status === OutputStatus.Pending))
+      .map(o => o.outPoint!.txHash)
+    const inputs: InputEntity[] = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .leftJoinAndSelect('input.transaction', 'tx')
+      .where({
+        outPointTxHash: In(unlockTxHashes),
+      })
+      .getMany()
+    const unlockTxMap = new Map<string, TransactionEntity>()
+    inputs.forEach(i => {
+      const key = i.outPointTxHash + ':' + i.outPointIndex
+      unlockTxMap.set(key, i.transaction!)
+    })
+    cells.forEach(cell => {
+      // if unlocked, set unlockInfo
+      const key = cell.outPoint?.txHash + ':' + cell.outPoint?.index
+      const unlockTx = key ? unlockTxMap.get(key) : undefined
+      if (unlockTx && (cell.status === OutputStatus.Dead || cell.status === OutputStatus.Pending)) {
+        cell.setUnlockInfo({
+          txHash: unlockTx.hash,
+          timestamp: unlockTx.timestamp!,
+        })
+      }
+    })
+    return cells
+  }
+
+  private static async addDepositInfo(cells: Cell[]): Promise<Cell[]> {
+    // find deposit info
+    const depositTxHashes = cells.map(cells => cells.depositOutPoint?.txHash).filter(hash => !!hash)
+    const depositTxs = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        hash: In(depositTxHashes),
+      })
+      .getMany()
+    const depositTxMap = new Map<string, TransactionEntity>()
+    depositTxs.forEach(tx => {
+      depositTxMap.set(tx.hash, tx)
+    })
+    cells.forEach(cell => {
+      if (cell.depositOutPoint?.txHash && depositTxMap.has(cell.depositOutPoint.txHash)) {
+        const depositTx = depositTxMap.get(cell.depositOutPoint.txHash)!
+        cell.setDepositTimestamp(depositTx.timestamp!)
+        cell.setDepositInfo({
+          txHash: depositTx.hash,
+          timestamp: depositTx.timestamp!,
+        })
+      }
+    })
+    return cells
   }
 
   public static async getDaoCells(walletId: string): Promise<Cell[]> {
@@ -162,42 +219,12 @@ export default class CellsService {
           sentStatus: OutputStatus.Sent,
           failedStatus: TransactionStatus.Failed,
           deadStatus: OutputStatus.Dead,
-          pendingStatus: OutputStatus.Pending
+          pendingStatus: OutputStatus.Pending,
         }
       )
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
-
-    // find deposit info
-    const depositTxHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
-    const depositTxs = await getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('tx')
-      .where({
-        hash: In(depositTxHashes)
-      })
-      .getMany()
-    const depositTxMap = new Map<string, TransactionEntity>()
-    depositTxs.forEach(tx => {
-      depositTxMap.set(tx.hash, tx)
-    })
-
-    // find unlock info
-    const unlockTxKeys: string[] = outputs.map(o => o.outPointTxHash + ':' + o.outPointIndex)
-    const inputs: InputEntity[] = await getConnection()
-      .getRepository(InputEntity)
-      .createQueryBuilder('input')
-      .leftJoinAndSelect('input.transaction', 'tx')
-      .where(`input.outPointTxHash || ':' || input.outPointIndex IN (:...infos)`, {
-        infos: unlockTxKeys
-      })
-      .getMany()
-    const unlockTxMap = new Map<string, TransactionEntity>()
-    inputs.forEach(i => {
-      const key = i.outPointTxHash + ':' + i.outPointIndex
-      unlockTxMap.set(key, i.transaction!)
-    })
 
     const cells: Cell[] = outputs.map(output => {
       const cell = output.toModel()
@@ -205,37 +232,20 @@ export default class CellsService {
         // if deposit cell, set depositInfo
         cell.setDepositInfo({
           txHash: output.transaction!.hash,
-          timestamp: output.transaction!.timestamp!
+          timestamp: output.transaction!.timestamp!,
         })
       } else {
-        // if not deposit cell, set deposit timestamp info, depositInfo, withdrawInfo
-        const depositTx = depositTxMap.get(output.depositTxHash)!
-        cell.setDepositTimestamp(depositTx.timestamp!)
-
-        cell.setDepositInfo({
-          txHash: depositTx.hash,
-          timestamp: depositTx.timestamp!
-        })
-
+        // if not deposit cell, set withdrawInfo
         const withdrawTx = output.transaction
         cell.setWithdrawInfo({
           txHash: withdrawTx!.hash,
-          timestamp: withdrawTx!.timestamp!
+          timestamp: withdrawTx!.timestamp!,
         })
-
-        if (output.status === OutputStatus.Dead || output.status === OutputStatus.Pending) {
-          // if unlocked, set unlockInfo
-          const key = output.outPointTxHash + ':' + output.outPointIndex
-          const unlockTx = unlockTxMap.get(key)!
-          cell.setUnlockInfo({
-            txHash: unlockTx.hash,
-            timestamp: unlockTx.timestamp!
-          })
-        }
       }
-
       return cell
     })
+
+    await Promise.all([CellsService.addDepositInfo(cells), CellsService.addUnlockInfo(cells)])
 
     return cells
   }
@@ -308,7 +318,7 @@ export default class CellsService {
           chequeLockCodeHash,
           nftIssuerCodehash,
           nftClassCodehash,
-          nftCodehash
+          nftCodehash,
         }
       )
       .orderBy('tx.timestamp', 'ASC')
@@ -349,20 +359,20 @@ export default class CellsService {
         cell.setCustomizedAssetInfo({
           lock: '',
           type: CustomizedType.NFTIssuer,
-          data: ''
+          data: '',
         })
       } else if (o.typeCodeHash === nftClassCodehash) {
         cell.setCustomizedAssetInfo({
           lock: '',
           type: CustomizedType.NFTClass,
-          data: ''
+          data: '',
         })
       } else if (o.typeCodeHash === nftCodehash) {
         const isTransferable = NFT.fromString(o.data).isTransferable()
         cell.setCustomizedAssetInfo({
           lock: '',
           type: CustomizedType.NFT,
-          data: isTransferable ? 'transferable' : ''
+          data: isTransferable ? 'transferable' : '',
         })
       } else if (o.lockCodeHash === chequeLockCodeHash) {
         const receiverLockHash = o.lockArgs.slice(0, 42)
@@ -370,32 +380,32 @@ export default class CellsService {
           cell.setCustomizedAssetInfo({
             lock: CustomizedLock.Cheque,
             type: '',
-            data: 'claimable'
+            data: 'claimable',
           })
         } else {
           cell.setCustomizedAssetInfo({
             lock: CustomizedLock.Cheque,
             type: '',
-            data: 'withdraw-able'
+            data: 'withdraw-able',
           })
         }
       } else if (o.lockCodeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
         cell.setCustomizedAssetInfo({
           lock: CustomizedLock.SingleMultiSign,
           type: '',
-          data: ''
+          data: '',
         })
       } else if (o.typeCodeHash === sudtCodehash) {
         cell.setCustomizedAssetInfo({
           lock: CustomizedLock.SUDT,
           type: CustomizedType.SUDT,
-          data: ''
+          data: '',
         })
       } else {
         cell.setCustomizedAssetInfo({
           lock: '',
           type: CustomizedType.Unknown,
-          data: ''
+          data: '',
         })
       }
       return cell
@@ -403,7 +413,7 @@ export default class CellsService {
 
     return {
       totalCount: totalCount,
-      items: cells
+      items: cells,
     }
   }
 
@@ -418,13 +428,11 @@ export default class CellsService {
   }
 
   private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
-    const cellEntity: OutputEntity | undefined = await getConnection()
-      .getRepository(OutputEntity)
-      .findOne({
-        outPointTxHash: outPoint.txHash,
-        outPointIndex: outPoint.index,
-        status: 'live'
-      })
+    const cellEntity: OutputEntity | undefined = await getConnection().getRepository(OutputEntity).findOne({
+      outPointTxHash: outPoint.txHash,
+      outPointIndex: outPoint.index,
+      status: 'live',
+    })
 
     return cellEntity
   }
@@ -456,7 +464,7 @@ export default class CellsService {
           walletId,
           lockCodeHash: lockClass.codeHash,
           lockHashType: lockClass.hashType,
-          statuses: [OutputStatus.Live, OutputStatus.Sent]
+          statuses: [OutputStatus.Live, OutputStatus.Sent],
         }
       )
       .getMany()
@@ -481,7 +489,7 @@ export default class CellsService {
           lockArgs: lockClass.lockArgs,
           lockCodeHash: lockClass.codeHash,
           lockHashType: lockClass.hashType,
-          statuses: [OutputStatus.Live, OutputStatus.Sent]
+          statuses: [OutputStatus.Live, OutputStatus.Sent],
         }
       )
       .getMany()
@@ -583,7 +591,7 @@ export default class CellsService {
     const multisigConfigMap: Record<string, MultisigConfigModel> = multisigConfigs.reduce(
       (pre, cur) => ({
         ...pre,
-        [cur.getLockHash()]: cur
+        [cur.getLockHash()]: cur,
       }),
       {}
     )
@@ -655,7 +663,7 @@ export default class CellsService {
       inputs,
       capacities: inputCapacities.toString(),
       finalFee: finalFee.toString(),
-      hasChangeOutput
+      hasChangeOutput,
     }
   }
 
@@ -672,7 +680,7 @@ export default class CellsService {
       : CellsService.getLiveOrSentCellByLockArgsMultisigOutput({
           codeHash: lockClass.codeHash,
           hashType: lockClass.hashType,
-          lockArgs: [lockClass.args]
+          lockArgs: [lockClass.args],
         }))
 
     const inputs: Input[] = cellEntities
@@ -761,7 +769,7 @@ export default class CellsService {
         capacity: this.ANYONE_CAN_PAY_CKB_CELL_MIN.toString(),
         lock: cell.lock(),
         type: cell.type(),
-        data: cell.data
+        data: cell.data,
       })
       return output
     })
@@ -793,7 +801,7 @@ export default class CellsService {
 
         changeOutput = Output.fromObject({
           capacity: changeCapacity.toString(),
-          lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+          lock: SystemScriptInfo.generateSecpScript(changeBlake160),
         })
       }
 
@@ -806,7 +814,7 @@ export default class CellsService {
       anyoneCanPayOutputs,
       changeOutput,
       finalFee: finalFee.toString(),
-      sendCapacity: capacityInt.toString()
+      sendCapacity: capacityInt.toString(),
     }
   }
 
@@ -863,7 +871,7 @@ export default class CellsService {
         capacity: this.ANYONE_CAN_PAY_CKB_CELL_MIN.toString(),
         lock: cell.lock(),
         type: cell.type(),
-        data: cell.data
+        data: cell.data,
       })
       return output
     })
@@ -874,7 +882,7 @@ export default class CellsService {
       finalFee: needFee.toString(),
       sendCapacity: capacityInt.toString(),
       changeInputs: [],
-      changeOutput: undefined
+      changeOutput: undefined,
     }
   }
 
@@ -926,7 +934,7 @@ export default class CellsService {
         lockHash: cell.lockHash,
         type: cell.type(),
         typeHash: cell.typeHash,
-        data: cell.data
+        data: cell.data,
       })
       inputCapacities += BigInt(cell.capacity)
       totalSize += TransactionSize.input()
@@ -974,7 +982,7 @@ export default class CellsService {
         capacity: capacity.toString(),
         lock: cell.lock(),
         type: cell.type(),
-        data: BufferUtils.writeBigUInt128LE(BigInt(0))
+        data: BufferUtils.writeBigUInt128LE(BigInt(0)),
       })
       return output
     })
@@ -1006,7 +1014,7 @@ export default class CellsService {
 
         changeOutput = Output.fromObject({
           capacity: changeCapacity.toString(),
-          lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+          lock: SystemScriptInfo.generateSecpScript(changeBlake160),
         })
       }
 
@@ -1019,15 +1027,12 @@ export default class CellsService {
       anyoneCanPayOutputs,
       changeOutput,
       finalFee: finalFee.toString(),
-      amount: amountInt.toString()
+      amount: amountInt.toString(),
     }
   }
 
   public static allBlake160s = async (): Promise<string[]> => {
-    const outputEntities = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .getMany()
+    const outputEntities = await getConnection().getRepository(OutputEntity).createQueryBuilder('output').getMany()
     const blake160s: string[] = outputEntities
       .map(output => {
         const lock = output.lockScript()
@@ -1056,7 +1061,7 @@ export default class CellsService {
       .where({
         status: OutputStatus.Live,
         lockCodeHash: legacyACPScriptInfo.codeHash,
-        lockHashType: legacyACPScriptInfo.hashType
+        lockHashType: legacyACPScriptInfo.hashType,
       })
       .andWhere(
         `
@@ -1083,7 +1088,7 @@ export default class CellsService {
         lockArgs: lock.args,
         typeCodeHash: type.codeHash,
         typeHashType: type.hashType,
-        typeArgs: type.args
+        typeArgs: type.args,
       })
       .getMany()
 
@@ -1095,7 +1100,7 @@ export default class CellsService {
       .getRepository(InputEntity)
       .createQueryBuilder('input')
       .where('input.lockHash like :lockHash', {
-        lockHash: `%${lockHash}%`
+        lockHash: `%${lockHash}%`,
       })
       .getMany()
 
@@ -1113,7 +1118,7 @@ export default class CellsService {
       `,
         {
           status: OutputStatus.Live,
-          lockHash: lockHash
+          lockHash: lockHash,
         }
       )
       .getMany()
@@ -1126,7 +1131,7 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
-        outPointTxHash: hash
+        outPointTxHash: hash,
       })
       .getMany()
 
@@ -1153,7 +1158,7 @@ export default class CellsService {
       `,
       {
         lockHashes,
-        statuses: [OutputStatus.Live, OutputStatus.Sent]
+        statuses: [OutputStatus.Live, OutputStatus.Sent],
       },
       {}
     )
@@ -1170,7 +1175,7 @@ export default class CellsService {
           {
             args: c.lockArgs,
             codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+            hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
           },
           isMainnet
         )

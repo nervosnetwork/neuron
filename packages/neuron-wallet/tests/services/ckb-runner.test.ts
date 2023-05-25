@@ -23,33 +23,33 @@ const resetMocks = () => {
 jest.doMock('child_process', () => {
   return {
     ChildProcess: stubbedChildProcess,
-    spawn: stubbedSpawn
+    spawn: stubbedSpawn,
   }
 })
 jest.doMock('fs', () => {
   return {
     __esModule: true,
     default: {
-      existsSync: stubbedExistsSync
-    }
+      existsSync: stubbedExistsSync,
+    },
   }
 })
 
 const app = {
   getAppPath: () => '/',
   getPath: () => '/',
-  isPackaged: false
+  isPackaged: false,
 }
 jest.doMock('env', () => {
   return {
-    app
+    app,
   }
 })
 jest.doMock('utils/logger', () => {
   return {
     info: stubbedLoggerInfo,
     error: stubbedLoggerError,
-    log: stubbedLoggerLog
+    log: stubbedLoggerLog,
   }
 })
 jest.doMock('process', () => {
@@ -60,22 +60,31 @@ const ckbDataPath = '/chains/mainnet'
 jest.mock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      ckbDataPath
+      ckbDataPath,
     }
-  }
+  },
 }))
 jest.mock('../../src/block-sync-renderer', () => ({
   resetSyncTaskQueue: {
-    push: jest.fn()
-  }
+    push: jest.fn(),
+  },
 }))
-const { startCkbNode, stopCkbNode, getLookingValidTargetStatus, migrateCkbData } = require('../../src/services/ckb-runner')
+jest.mock('../../src/services/indexer', () => ({
+  cleanOldIndexerData: jest.fn(),
+}))
+const {
+  startCkbNode,
+  stopCkbNode,
+  getLookingValidTargetStatus,
+  migrateCkbData,
+} = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
   let stubbedCkb: any = new EventEmitter()
   beforeEach(() => {
     resetMocks()
 
+    stubbedCkb.kill = jest.fn()
     stubbedCkb.stderr = new EventEmitter()
     stubbedCkb.stdout = new EventEmitter()
     stubbedSpawn.mockReturnValue(stubbedCkb)
@@ -84,7 +93,7 @@ describe('ckb runner', () => {
     { platform: 'win32', platformPath: 'win' },
     { platform: 'linux', platformPath: 'linux' },
     { platform: 'darwin', platformPath: 'mac' },
-    { platform: '_', platformPath: '' }
+    { platform: '_', platformPath: '' },
   ].forEach(({ platform, platformPath }) => {
     describe(`#startCkbNode on ${platform}`, () => {
       beforeEach(() => {
@@ -95,13 +104,18 @@ describe('ckb runner', () => {
           stubbedExistsSync.mockReturnValue(true)
           await startCkbNode()
         })
-        it('should not init ckb config', () => {
+        afterEach(async () => {
+          const promise = stopCkbNode()
+          stubbedCkb.emit('close')
+          await promise
+        })
+        it('should not init ckb config', async () => {
           expect(stubbedSpawn).not.toHaveBeenCalledWith(expect.stringContaining('/ckb'), [
             'init',
             '--chain',
             'mainnet',
             '-C',
-            ckbDataPath
+            ckbDataPath,
           ])
         })
         it('runs ckb binary', () => {
@@ -124,13 +138,18 @@ describe('ckb runner', () => {
             stubbedCkb.emit('close')
             await promise
           })
+          afterEach(async () => {
+            const stopPromise = stopCkbNode()
+            stubbedCkb.emit('close')
+            await stopPromise
+          })
           it('inits ckb config', () => {
             expect(stubbedSpawn).toHaveBeenCalledWith(expect.stringContaining(path.join(platformPath, 'ckb')), [
               'init',
               '--chain',
               'mainnet',
               '-C',
-              ckbDataPath
+              ckbDataPath,
             ])
           })
           it('runs ckb binary', () => {
@@ -217,7 +236,7 @@ describe('ckb runner', () => {
 const migrateNextMock = jest.fn()
 
 jest.mock('../../src/models/subjects/migrate-subject', () => ({
-  next: (v: string) => migrateNextMock(v)
+  next: (v: string) => migrateNextMock(v),
 }))
 
 describe('ckb migrate', () => {

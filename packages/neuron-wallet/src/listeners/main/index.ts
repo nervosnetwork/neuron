@@ -1,9 +1,9 @@
 import { debounceTime } from 'rxjs/operators'
-import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
-import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
-import DataUpdateSubject from 'models/subjects/data-update'
-import MultisigConfigDbChangedSubject from 'models/subjects/multisig-config-db-changed-subject'
-import MultisigService from 'services/multisig'
+import TxDbChangedSubject from '../../models/subjects/tx-db-changed-subject'
+import AddressDbChangedSubject from '../../models/subjects/address-db-changed-subject'
+import DataUpdateSubject from '../../models/subjects/data-update'
+import MultisigConfigDbChangedSubject from '../../models/subjects/multisig-config-db-changed-subject'
+import MultisigService from '../../services/multisig'
 
 /**
  * Update addresses and transactions actively

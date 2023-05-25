@@ -1,7 +1,7 @@
-import initConnection from 'database/chain/ormconfig'
-import logger from 'utils/logger'
-import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import RpcService from 'services/rpc-service'
+import initConnection from '../../database/chain/ormconfig'
+import logger from '../../utils/logger'
+import { Network, EMPTY_GENESIS_HASH } from '../../models/network'
+import RpcService from '../../services/rpc-service'
 
 // Open connection to a network and maintain chain info in database.
 export default class ChainInfo {

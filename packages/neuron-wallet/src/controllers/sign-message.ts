@@ -1,6 +1,6 @@
-import SignMessage from 'services/sign-message'
-import { ServiceHasNoResponse } from 'exceptions'
-import { ResponseCode } from 'utils/const'
+import SignMessage from '../services/sign-message'
+import { ServiceHasNoResponse } from '../exceptions'
+import { ResponseCode } from '../utils/const'
 
 export default class SignMessageController {
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
@@ -16,7 +16,7 @@ export default class SignMessageController {
 
     return {
       status: ResponseCode.Success,
-      result: signature
+      result: signature,
     }
   }
 
@@ -28,7 +28,7 @@ export default class SignMessageController {
 
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 }

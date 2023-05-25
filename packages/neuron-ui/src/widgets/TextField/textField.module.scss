@@ -94,14 +94,12 @@ $secondary-font-size: 0.63rem;
   grid-area: message;
   color: $error-red;
   font-size: $secondary-font-size;
-  line-height: 0.6875rem;
   word-break: break-all;
 
   svg {
     width: 8px;
-    height: 8px;
+    height: 1rem;
     margin-right: 5px;
-    margin-top: 0.125rem;
   }
 }
 

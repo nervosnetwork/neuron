@@ -3,18 +3,17 @@ import { t } from 'i18next'
 import { app as electronApp, BrowserWindow, nativeImage } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
-import env from 'env'
+import env from '../../env'
 import { updateApplicationMenu } from './menu'
-import logger from 'utils/logger'
+import logger from '../../utils/logger'
 import { subscribe } from './subscribe'
-import { register as registerListeners } from 'listeners/main'
-import WalletsService from 'services/wallets'
-import ApiController, { Command } from 'controllers/api'
-import { migrate as mecuryMigrate } from 'controllers/mercury'
-import SyncApiController from 'controllers/sync-api'
-import { SETTINGS_WINDOW_TITLE } from 'utils/const'
-import { stopCkbNode } from 'services/ckb-runner'
-import startMonitor from 'services/monitor'
+import { register as registerListeners } from '../../listeners/main'
+import WalletsService from '../../services/wallets'
+import ApiController, { Command } from '../api'
+import { migrate as mecuryMigrate } from '../mercury'
+import SyncApiController from '../sync-api'
+import { SETTINGS_WINDOW_TITLE } from '../../utils/const'
+import { stopCkbNode } from '../../services/ckb-runner'
 
 const app = electronApp
 
@@ -50,8 +49,6 @@ export default class AppController {
     SyncApiController.getInstance().mount()
 
     await this.openWindow()
-
-    startMonitor()
   }
 
   /**
@@ -130,10 +127,11 @@ export default class AppController {
         path.join(__dirname, app.isPackaged ? '../../neuron-ui/icon.png' : '../../../assets/icons/icon.png')
       ),
       webPreferences: {
+        nodeIntegration: true,
         devTools: env.isDevMode,
         contextIsolation: false,
-        preload: path.join(__dirname, './preload.js')
-      }
+        preload: path.join(__dirname, './preload.js'),
+      },
     })
 
     windowState.manage(this.mainWindow)

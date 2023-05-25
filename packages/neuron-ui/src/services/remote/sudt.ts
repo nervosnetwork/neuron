@@ -12,9 +12,8 @@ export const generateCreateSUDTAccountTransaction = remoteApi<Controller.Generat
   'generate-create-asset-account-tx'
 )
 
-export const sendCreateSUDTAccountTransaction = remoteApi<Controller.SendCreateSUDTAccountTransaction.Params>(
-  'send-create-asset-account-tx'
-)
+export const sendCreateSUDTAccountTransaction =
+  remoteApi<Controller.SendCreateSUDTAccountTransaction.Params>('send-create-asset-account-tx')
 
 export const updateSUDTAccount = remoteApi<Controller.UpdateSUDTAccount.Params>('update-asset-account')
 
