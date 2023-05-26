@@ -166,7 +166,7 @@ export class CKBLightRunner extends NodeRunner {
   async clearNodeCache(): Promise<void> {
     await this.stop()
     fs.rmSync(SettingsService.getInstance().testnetLightDataPath, { recursive: true, force: true })
-    await clean()
+    await clean(true)
     await this.start()
     resetSyncTaskQueue.asyncPush(true)
   }
