@@ -22,12 +22,18 @@ export default class SyncProgressService {
       .execute()
   }
 
-  static async removeWalletsByExists(existWalletIds: string[]) {
+  static async updateSyncProgressFlag(existWalletIds: string[]) {
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ delete: true })
       .where({ walletId: Not(In(existWalletIds)) })
+      .execute()
+    await getConnection()
+      .createQueryBuilder()
+      .update(SyncProgress)
+      .set({ delete: false })
+      .where({ walletId: In(existWalletIds) })
       .execute()
   }
 
@@ -84,7 +90,7 @@ export default class SyncProgressService {
     const item = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
-      .where({ delete: false, ...(currentWallet ? { walletId: currentWallet.id } : {}) })
+      .where({ delete: false, addressType: SyncAddressType.Default, ...(currentWallet ? { walletId: currentWallet.id } : {}) })
       .orderBy('blockEndNumber', 'ASC')
       .getOne()
     return item?.blockEndNumber || 0
@@ -99,6 +105,15 @@ export default class SyncProgressService {
       .groupBy('walletId')
       .getRawMany<{ blockStartNumber: number; walletId: string }>()
     return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.walletId]: cur.blockStartNumber }), {})
+  }
+
+  static async getOtherTypeSyncProgress() {
+    const items = await getConnection()
+      .getRepository(SyncProgress)
+      .find({
+        addressType: SyncAddressType.Multisig,
+      })
+    return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.hash]: cur.blockStartNumber }), {})
   }
 
   static async getSyncProgressByHashes(hashes: string[]) {

@@ -9,9 +9,10 @@ const getCurrentWalletMinBlockNumberMock = jest.fn()
 const getAllSyncStatusToMapMock = jest.fn()
 const resetSyncProgressMock = jest.fn()
 const updateSyncStatusMock = jest.fn()
-const removeWalletsByExistsMock = jest.fn()
+const updateSyncProgressFlagMock = jest.fn()
 const getWalletMinBlockNumberMock = jest.fn()
 const removeByHashesAndAddressType = jest.fn()
+const getOtherTypeSyncProgressMock = jest.fn()
 
 const setScriptsMock = jest.fn()
 const getScriptsMock = jest.fn()
@@ -31,6 +32,7 @@ function mockReset() {
   resetSyncProgressMock.mockReset()
   updateSyncStatusMock.mockReset()
   getWalletMinBlockNumberMock.mockReset()
+  getOtherTypeSyncProgressMock.mockReset()
 
   setScriptsMock.mockReset()
   getScriptsMock.mockReset()
@@ -52,9 +54,10 @@ jest.mock('../../src/services/sync-progress', () => {
     static getAllSyncStatusToMap: any = () => getAllSyncStatusToMapMock()
     static resetSyncProgress: any = (arg: any) => resetSyncProgressMock(arg)
     static updateSyncStatus: any = (hash: string, update: any) => updateSyncStatusMock(hash, update)
-    static removeWalletsByExists: any = (walletIds: string[]) => removeWalletsByExistsMock(walletIds)
+    static updateSyncProgressFlag: any = (walletIds: string[]) => updateSyncProgressFlagMock(walletIds)
     static getWalletMinBlockNumber: any = () => getWalletMinBlockNumberMock()
     static removeByHashesAndAddressType: any = (type: number, scripts: CKBComponents.Script[]) => removeByHashesAndAddressType(type, scripts)
+    static getOtherTypeSyncProgress: any = () => getOtherTypeSyncProgressMock()
   }
 })
 
@@ -101,6 +104,8 @@ describe('test light connector', () => {
   beforeEach(() => {
     walletGetAllMock.mockReturnValue([])
     createBatchRequestMock.mockResolvedValue([])
+    getMultisigConfigForLightMock.mockResolvedValue([])
+    getOtherTypeSyncProgressMock.mockResolvedValue({})
   })
   afterEach(() => {
     mockReset()
@@ -287,7 +292,7 @@ describe('test light connector', () => {
         { script: addressMeta.generateACPLockScript().toSDK(), scriptType: 'lock', walletId: 'walletId' },
         { script: addressMeta.generateLegacyACPLockScript().toSDK(), scriptType: 'lock', walletId: 'walletId' },
       ])
-      expect(removeWalletsByExistsMock).toBeCalledWith(['walletId'])
+      expect(updateSyncProgressFlagMock).toBeCalledWith(['walletId'])
     })
     it('set new script with the synced min block number', async () => {
       getScriptsMock.mockResolvedValue([])
