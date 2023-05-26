@@ -1,4 +1,4 @@
-import { getConnection, In, Not } from 'typeorm'
+import { Equal, getConnection, In, Not } from 'typeorm'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { HexString } from '@ckb-lumos/base'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
@@ -129,5 +129,11 @@ export default class SyncProgressService {
     await getConnection()
       .getRepository(SyncProgress)
       .delete({ walletId: currentWallet?.id })
+    await getConnection()
+      .createQueryBuilder()
+      .update(SyncProgress)
+      .set({ blockEndNumber: 0, cursor: undefined })
+      .where({ walletId: Not(Equal(currentWallet?.id)) })
+      .execute()
   }
 }
