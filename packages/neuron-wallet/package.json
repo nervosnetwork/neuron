@@ -37,8 +37,8 @@
   },
   "dependencies": {
     "@ckb-lumos/base": "0.20.0-alpha.3",
-    "@ckb-lumos/rpc": "0.20.0-alpha.3",
     "@ckb-lumos/ckb-indexer": "0.20.0-alpha.3",
+    "@ckb-lumos/rpc": "0.20.0-alpha.3",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.13",
     "@nervina-labs/ckb-indexer": "0.1.1",
