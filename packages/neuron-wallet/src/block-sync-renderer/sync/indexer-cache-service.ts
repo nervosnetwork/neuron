@@ -79,6 +79,9 @@ export default class IndexerCacheService {
   }
 
   private async fetchTxMapping(): Promise<Map<string, Array<{ address: string; lockHash: string }>>> {
+    if (!this.indexer.ckbRpcUrl) {
+      throw new Error('CKB RPC URL is not set')
+    }
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
@@ -95,9 +98,9 @@ export default class IndexerCacheService {
               codeHash: lockScript.codeHash,
               hashType: lockScript.hashType,
               args: lockScript.args,
-            }
+            },
           },
-          this.indexer.ckbRpcUrl!,
+          this.indexer.ckbRpcUrl,
           {
             includeStatus: false,
           }
