@@ -31,7 +31,14 @@ const ckbPath = (): string => {
 
 const ckbBinary = (): string => {
   const binary = app.isPackaged ? path.resolve(ckbPath(), './ckb') : path.resolve(ckbPath(), `./${platform()}`, './ckb')
-  return platform() === 'win' ? binary + '.exe' : binary
+  switch (platform()) {
+    case 'win':
+      return binary + '.exe'
+    case 'mac':
+      return `${binary}-${process.arch === 'arm64' ? 'arm64' : 'x64'}`
+    default:
+      return binary
+  }
 }
 
 const initCkb = async () => {

@@ -4,7 +4,6 @@ import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
 import styles from './datetimePicker.module.scss'
 
-const SECONDS_PER_DAY = 24 * 3600 * 1000
 let UTC: string | number = -new Date().getTimezoneOffset() / 60
 if (UTC > 0) {
   UTC = `UTC+${UTC}`
@@ -14,10 +13,7 @@ if (UTC > 0) {
 
 export const formatDate = (datetime: Date) => {
   const month = (datetime.getMonth() + 1).toString().padStart(2, '0')
-  const date = datetime
-    .getDate()
-    .toString()
-    .padStart(2, '0')
+  const date = datetime.getDate().toString().padStart(2, '0')
   const year = datetime.getFullYear()
   return `${month}/${date}/${year}`
 }
@@ -28,14 +24,9 @@ export interface DatetimePickerProps {
   notice?: string
   onConfirm: (time: number) => void
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
+  confirmText?: string | ((time?: number, display?: string) => string)
 }
-const DatetimePicker = ({
-  preset = new Date(Date.now() + SECONDS_PER_DAY),
-  onConfirm,
-  onCancel,
-  title,
-  notice,
-}: DatetimePickerProps) => {
+const DatetimePicker = ({ preset, onConfirm, onCancel, confirmText, title, notice }: DatetimePickerProps) => {
   const [t] = useTranslation()
   const [status, setStatus] = useState<'done' | 'edit'>('done')
   const [display, setDisplay] = useState<string>(preset ? formatDate(new Date(+preset)) : '')
@@ -138,7 +129,16 @@ const DatetimePicker = ({
         ) : null}
         <div className={styles.actions}>
           <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
-          <Button type="submit" label={t('common.save')} onClick={onSubmit} disabled={disabled} />
+          <Button
+            type="submit"
+            label={
+              typeof confirmText === 'function'
+                ? confirmText(selected?.getTime(), display)
+                : confirmText ?? t('common.save')
+            }
+            onClick={onSubmit}
+            disabled={disabled}
+          />
         </div>
       </div>
     </div>

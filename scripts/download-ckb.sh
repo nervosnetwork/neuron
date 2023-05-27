@@ -12,7 +12,7 @@ function download_macos() {
 
 function download_macos_x86_64() {
   # for macOS x64
-  CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-apple-darwin"
+  CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-apple-darwin-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/mac
 
   curl -O -L "${GITHUB_RELEASE_URL}/${CKB_VERSION}/${CKB_FILENAME}.zip"
@@ -24,7 +24,7 @@ function download_macos_x86_64() {
 
 function download_macos_aarch64() {
   # for macOS arm64
-  CKB_FILENAME="ckb_${CKB_VERSION}_aarch64-apple-darwin"
+  CKB_FILENAME="ckb_${CKB_VERSION}_aarch64-apple-darwin-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/mac
 
   curl -O -L "${GITHUB_RELEASE_URL}/${CKB_VERSION}/${CKB_FILENAME}.zip"
