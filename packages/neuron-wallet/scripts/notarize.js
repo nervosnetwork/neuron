@@ -6,6 +6,11 @@ exports.default = async function notarizing(context) {
     return
   }
 
+  if (process.env.SKIP_NOTARIZE === 'true') {
+    console.warn('Skip notarizing when package on pull_request')
+    return Promise.resolve('skip')
+  }
+
   const appleId = process.env.APPLE_ID;
   const appleIdPassword = process.env.APPLE_ID_PASSWORD;
 
