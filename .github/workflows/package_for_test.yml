@@ -84,7 +84,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Package for Windows with main repository
-        if: ${{ matrix.os == 'windows-2019' && github.repository == 'nervosnetwork/neuron }}
+        if: ${{ matrix.os == 'windows-2019' && github.repository == 'nervosnetwork/neuron' }}
         run: |
           bash ./scripts/download-ckb.sh win
           yarn build
@@ -95,7 +95,7 @@ jobs:
           CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
       - name: Package for Windows with fork repository
-        if: ${{ matrix.os == 'windows-2019' && github.repository != 'nervosnetwork/neuron }}
+        if: ${{ matrix.os == 'windows-2019' && github.repository != 'nervosnetwork/neuron' }}
         run: |
           bash ./scripts/download-ckb.sh win
           yarn build
