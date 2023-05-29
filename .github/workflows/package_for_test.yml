@@ -63,17 +63,27 @@ jobs:
 
       - name: Package for MacOS
         if: matrix.os == 'macos-latest'
-        run: |
-          ./scripts/download-ckb.sh mac
-          yarn package:test mac
-        env:
-          REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+          - name: Package for main repository
+            if: ${{ github.repository == 'nervosnetwork/neuron' }}
+            run: |
+              ./scripts/download-ckb.sh mac
+              yarn package:test mac
+            env:
+              REPOSITORY: ${{ github.repository }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              APPLE_ID: ${{ secrets.APPLE_ID }}
+              APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+              CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
+              CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          - name: Package for fork repository
+            if: ${{ github.repository != 'nervosnetwork/neuron' }}
+            run: |
+              ./scripts/download-ckb.sh mac
+              yarn package:test mac
+            env:
+              REPOSITORY: ${{ github.repository }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Package for Windows
         if: matrix.os == 'windows-2019'
