@@ -54,6 +54,7 @@ mac:
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
   category: public.app-category.finance
   icon: assets/icons/icon.icns
+  identity: null
   extraFiles:
     - from: "bin/mac/ckb-${arch}"
       to: "bin/ckb"
