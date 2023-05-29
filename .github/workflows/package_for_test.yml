@@ -73,6 +73,7 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Package for Windows
         if: matrix.os == 'windows-2019'
