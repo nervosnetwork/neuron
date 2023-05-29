@@ -52,9 +52,9 @@ describe('unit tests for IndexerConnector', () => {
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
-  jest.doMock('@nervina-labs/ckb-indexer', () => {
+  jest.doMock('@ckb-lumos/ckb-indexer', () => {
     return {
-      CkbIndexer: stubbedIndexerConstructor.mockImplementation(() => ({
+      Indexer: stubbedIndexerConstructor.mockImplementation(() => ({
         tip: stubbedTipFn,
       })),
       CellCollector: stubbedCellCollectorConstructor.mockImplementation(() => ({

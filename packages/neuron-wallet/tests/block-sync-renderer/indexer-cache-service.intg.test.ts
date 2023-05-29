@@ -123,9 +123,9 @@ describe('indexer cache service', () => {
 
     resetMocks()
 
-    jest.doMock('@nervina-labs/ckb-indexer', () => {
+    jest.doMock('@ckb-lumos/ckb-indexer', () => {
       return {
-        CkbIndexer: stubbedIndexerConstructor,
+        Indexer: stubbedIndexerConstructor,
         TransactionCollector: stubbedTransactionCollectorConstructor,
         CellCollector: stubbedCellCollectorConstructor,
       }

@@ -35,7 +35,7 @@
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel test",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
-    "postinstall": "husky install && lerna run build --scope=@nervina-labs/ckb-indexer",
+    "postinstall": "husky install",
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "devDependencies": {

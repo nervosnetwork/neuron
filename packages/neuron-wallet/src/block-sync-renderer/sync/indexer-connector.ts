@@ -2,7 +2,7 @@ import type { ScriptHashType } from '../../models/chain/script'
 import { Subject } from 'rxjs'
 import { queue, AsyncQueue } from 'async'
 import { Tip } from '@ckb-lumos/base'
-import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
+import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
 import logger from '../../utils/logger'
 import CommonUtils from '../../utils/common'
 import RpcService from '../../services/rpc-service'
@@ -99,7 +99,7 @@ export default class IndexerConnector {
     if (nextUnprocessedBlockTip) {
       this.blockTipsSubject.next({
         cacheTipNumber: parseInt(nextUnprocessedBlockTip.blockNumber),
-        indexerTipNumber
+        indexerTipNumber,
       })
       if (!this.processingBlockNumber) {
         await this.processNextBlockNumber()
@@ -107,7 +107,7 @@ export default class IndexerConnector {
     } else {
       this.blockTipsSubject.next({
         cacheTipNumber: indexerTipNumber,
-        indexerTipNumber
+        indexerTipNumber,
       })
     }
   }
@@ -119,7 +119,7 @@ export default class IndexerConnector {
       const indexerTipBlock = await this.indexer.tip()
       await this.synchronize({
         blockHash: indexerTipBlock.blockHash,
-        blockNumber: indexerTipBlock.blockNumber
+        blockNumber: indexerTipBlock.blockNumber,
       })
       await CommonUtils.sleep(5000)
     }
