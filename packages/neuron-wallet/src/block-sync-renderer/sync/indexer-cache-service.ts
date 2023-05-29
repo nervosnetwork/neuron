@@ -4,7 +4,7 @@ import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
-import { TransactionCollector, CellCollector, CkbIndexer } from '@nervina-labs/ckb-indexer'
+import { TransactionCollector, CellCollector, Indexer as CkbIndexer } from '@ckb-lumos/ckb-indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
@@ -79,9 +79,6 @@ export default class IndexerCacheService {
   }
 
   private async fetchTxMapping(): Promise<Map<string, Array<{ address: string; lockHash: string }>>> {
-    if (!this.indexer.ckbRpcUrl) {
-      throw new Error('CKB RPC URL is not set')
-    }
     const mappingsByTxHash = new Map()
     for (const addressMeta of this.addressMetas) {
       const lockScripts = [
@@ -91,20 +88,9 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const transactionCollector = new TransactionCollector(
-          this.indexer,
-          {
-            lock: {
-              codeHash: lockScript.codeHash,
-              hashType: lockScript.hashType,
-              args: lockScript.args,
-            },
-          },
-          this.indexer.ckbRpcUrl,
-          {
-            includeStatus: false,
-          }
-        )
+        const transactionCollector = new TransactionCollector(this.indexer, { lock: lockScript }, this.rpcService.url, {
+          includeStatus: false,
+        })
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
         if (!fetchedTxHashes.length) {

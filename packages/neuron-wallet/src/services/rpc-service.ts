@@ -14,8 +14,10 @@ export default class RpcService {
   private retryTime: number
   private retryInterval: number
   private ckb: CKB
+  public readonly url: string
 
   constructor(url: string, retryTime: number = 3, retryInterval: number = 100) {
+    this.url = url;
     this.retryTime = retryTime
     this.retryInterval = retryInterval
     this.ckb = generateCKB(url)
