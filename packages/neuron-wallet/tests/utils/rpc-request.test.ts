@@ -76,9 +76,6 @@ describe('rpc-request', () => {
       },
     })
     const res = await rpcRequest('url', option)
-    expect(res).toEqual({
-      id: 2,
-      result: 2,
-    })
+    expect(res).toEqual(2)
   })
 })

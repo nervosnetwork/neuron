@@ -6,8 +6,12 @@ import Output from '../models/chain/output'
 import LiveCell from '../models/chain/live-cell'
 import Transaction from '../models/chain/transaction'
 import AssetAccountEntity from '../database/chain/entities/asset-account'
-import { TargetLockError, TargetOutputNotFoundError } from '../exceptions'
-import { AcpSendSameAccountError } from '../exceptions'
+import {
+  LightClientNotSupportSendToACPError,
+  TargetLockError,
+  TargetOutputNotFoundError,
+  AcpSendSameAccountError
+} from '../exceptions'
 import Script from '../models/chain/script'
 import OutPoint from '../models/chain/out-point'
 import LiveCellService from './live-cell-service'
@@ -15,6 +19,8 @@ import WalletService from './wallets'
 import SystemScriptInfo from '../models/system-script-info'
 import CellsService from './cells'
 import { MIN_SUDT_CAPACITY } from '../utils/const'
+import NetworksService from './networks'
+import { NetworkType } from '../models/network'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -90,6 +96,9 @@ export default class AnyoneCanPayService {
     )
     if (new AssetAccountInfo().isAnyoneCanPayScript(lockScript)) {
       if (!targetOutputLiveCell) {
+        if (NetworksService.getInstance().getCurrent().type === NetworkType.Light) {
+          throw new LightClientNotSupportSendToACPError()
+        }
         throw new TargetOutputNotFoundError()
       }
       return Output.fromObject({

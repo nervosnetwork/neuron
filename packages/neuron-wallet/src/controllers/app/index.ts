@@ -9,11 +9,12 @@ import logger from '../../utils/logger'
 import { subscribe } from './subscribe'
 import { register as registerListeners } from '../../listeners/main'
 import WalletsService from '../../services/wallets'
-import ApiController, { Command } from '../api'
-import { migrate as mecuryMigrate } from '../mercury'
-import SyncApiController from '../sync-api'
+import ApiController, { Command } from '../../controllers/api'
+import { migrate as mecuryMigrate } from '../../controllers/mercury'
+import SyncApiController from '../../controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from '../../utils/const'
 import { stopCkbNode } from '../../services/ckb-runner'
+import { CKBLightRunner } from '../../services/light-runner'
 
 const app = electronApp
 
@@ -58,7 +59,10 @@ export default class AppController {
     if (env.isTestMode) {
       return
     }
-    await stopCkbNode()
+    await Promise.all([
+      stopCkbNode(),
+      CKBLightRunner.getInstance().stop(),
+    ])
   }
 
   public registerChannels(win: BrowserWindow, channels: string[]) {

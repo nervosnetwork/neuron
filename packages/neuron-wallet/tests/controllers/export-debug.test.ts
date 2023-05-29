@@ -73,6 +73,18 @@ jest.mock('../../src/services/settings', () => {
   }
 })
 
+jest.mock('../../src/services/light-runner', () => {
+  return {
+    CKBLightRunner: {
+      getInstance() {
+        return {
+          logPath: ''
+        }
+      }
+    }
+  }
+})
+
 import { dialog } from 'electron'
 import logger from '../../src/utils/logger'
 import ExportDebugController from '../../src/controllers/export-debug'
@@ -86,6 +98,7 @@ describe('Test ExportDebugController', () => {
   let showErrorBoxMock: any
   // controller methods
   let addBundledCKBLogMock: any
+  let addBundledCKBLightClientLogMock: any
   let addLogFilesMock: any
   let addStatusFileMock: any
   let archiveAppendMock: any
@@ -95,10 +108,11 @@ describe('Test ExportDebugController', () => {
     showMessageBoxMock = jest.spyOn(dialog, 'showMessageBox')
     showErrorBoxMock = jest.spyOn(dialog, 'showErrorBox')
     addBundledCKBLogMock = jest.spyOn(exportDebugController, 'addBundledCKBLog')
+    addBundledCKBLightClientLogMock = jest.spyOn(exportDebugController, 'addBundledCKBLightClientLog')
     addLogFilesMock = jest.spyOn(exportDebugController, 'addLogFiles')
     addStatusFileMock = jest.spyOn(exportDebugController, 'addStatusFile')
     archiveAppendMock = jest.spyOn(exportDebugController.archive, 'append')
-    jest.spyOn(exportDebugController.archive, 'file')
+    jest.spyOn(exportDebugController.archive, 'file').mockReturnValue(undefined)
     jest.spyOn(exportDebugController.archive, 'pipe').mockImplementation(() => {})
     jest.spyOn(logger, 'error')
   })
@@ -118,10 +132,11 @@ describe('Test ExportDebugController', () => {
     })
 
     it('should call required methods', () => {
-      expect.assertions(8)
+      expect.assertions(9)
       expect(showSaveDialogMock).toHaveBeenCalled()
 
       expect(addBundledCKBLogMock).toHaveBeenCalled()
+      expect(addBundledCKBLightClientLogMock).toHaveBeenCalled()
       expect(addLogFilesMock).toHaveBeenCalled()
       expect(addStatusFileMock).toHaveBeenCalled()
 
@@ -141,11 +156,12 @@ describe('Test ExportDebugController', () => {
     })
 
     it('should not call required methods', () => {
-      expect.assertions(8)
+      expect.assertions(9)
 
       expect(showSaveDialogMock).toHaveBeenCalled()
 
       expect(addBundledCKBLogMock).not.toHaveBeenCalled()
+      expect(addBundledCKBLightClientLogMock).not.toHaveBeenCalled()
       expect(addLogFilesMock).not.toHaveBeenCalled()
       expect(addStatusFileMock).not.toHaveBeenCalled()
       expect(archiveAppendMock).not.toHaveBeenCalled()

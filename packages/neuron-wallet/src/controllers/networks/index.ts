@@ -26,7 +26,7 @@ export default class NetworksController {
           await this.connectToNetwork(true)
         } else {
           logger.debug('Network:\tconnection dropped')
-          resetSyncTaskQueue.push(false)
+          resetSyncTaskQueue.asyncPush(false)
         }
       })
 

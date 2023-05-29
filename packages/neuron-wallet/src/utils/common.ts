@@ -5,18 +5,18 @@ export default class CommonUtils {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  public static async retry<T>(times: number, interval: number, callback: () => T): Promise<T> {
+  public static async retry<T>(times: number, interval: number, callback: () => T): Promise<Awaited<T>> {
     let retryTime = 0
 
     while (++retryTime < times) {
       try {
-        return await callback()
+        return await (callback() as Awaited<T>)
       } catch (err) {
         logger.warn(`function call error: ${err}, retry ${retryTime + 1} ...`)
         await CommonUtils.sleep(interval)
       }
     }
-    return await callback()
+    return await (callback() as Awaited<T>)
   }
 
   public static timeout<T>(time: number, promise: Promise<T>, value: T): Promise<T> {

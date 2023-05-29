@@ -20,6 +20,7 @@ import { EditTextField } from 'widgets/TextField'
 import { MultisigConfig } from 'services/remote'
 import PasswordRequest from 'components/PasswordRequest'
 import ApproveMultisigTx from 'components/ApproveMultisigTx'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
@@ -52,6 +53,10 @@ const MultisigAddress = () => {
     // eslint-disable-next-line
   }, [i18n.language])
   const isMainnet = isMainnetUtil(networks, networkID)
+  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
+    networks,
+    networkID,
+  ])
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
   const {
     allConfigs,
@@ -65,7 +70,12 @@ const MultisigAddress = () => {
     walletId,
     isMainnet,
   })
-  const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
+  const { multisigBanlances, multisigSyncProgress } = useSubscription({
+    walletId,
+    isMainnet,
+    configs: allConfigs,
+    isLightClient,
+  })
   const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
   const onClickItem = useCallback(
     (multisigConfig: MultisigConfig) => (option: { key: string }) => {
@@ -138,8 +148,10 @@ const MultisigAddress = () => {
               <th className={styles.checkBoxTh}>
                 <input type="checkbox" onChange={onChangeCheckedAll} checked={isAllSelected} />
               </th>
-              {['address', 'alias', 'type', 'balance'].map(field => (
-                <th key={field}>{t(`multisig-address.table.${field}`)}</th>
+              {['address', 'alias', 'type', ...(isLightClient ? ['sync-block'] : []), 'balance'].map(field => (
+                <th key={field} data-field={field}>
+                  {t(`multisig-address.table.${field}`)}
+                </th>
               ))}
             </tr>
           </thead>
@@ -173,6 +185,7 @@ const MultisigAddress = () => {
                   &nbsp;of&nbsp;
                   {v.n}
                 </td>
+                {isLightClient ? <td>{multisigSyncProgress?.[v.fullPayload] ?? 0}</td> : null}
                 <td>
                   {shannonToCKBFormatter(multisigBanlances[v.fullPayload])}
                   &nbsp;CKB

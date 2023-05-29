@@ -125,10 +125,8 @@ declare namespace State {
 
   interface App {
     tipBlockNumber: string
-    tipBlockHash: string
+    tipDao?: string
     tipBlockTimestamp: number
-    chain: string
-    difficulty: bigint
     epoch: string
     send: Send
     passwordRequest: PasswordRequest
@@ -149,7 +147,8 @@ declare namespace State {
     name: string
     remote: string
     chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
-    type: 0 | 1
+    type: 0 | 1 | 2
+    genesisHash: string
   }
 
   interface Network extends NetworkProperty {
