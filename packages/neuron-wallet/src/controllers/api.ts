@@ -51,13 +51,14 @@ import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone
 import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
-import SUDTController from './sudt'
+import SUDTController from '../controllers/sudt'
 import SyncedBlockNumber from '../models/synced-block-number'
 import IndexerService from '../services/indexer'
 import MultisigConfigModel from '../models/multisig-config'
 import startMonitor, { stopMonitor } from '../services/monitor'
 import { migrateCkbData } from '../services/ckb-runner'
 import NodeService from '../services/node'
+import SyncProgressService from '../services/sync-progress'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -775,6 +776,14 @@ export default class ApiController {
     handle('start-migrate', async () => {
       migrateCkbData()
       return {
+        status: ResponseCode.Success,
+      }
+    })
+
+    //light client
+    handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
+      return {
+        result: (await SyncProgressService.getSyncProgressByHashes(hashes)),
         status: ResponseCode.Success,
       }
     })

@@ -5,9 +5,9 @@ import { t } from 'i18next'
 import { Subject } from 'rxjs'
 import { throttleTime } from 'rxjs/operators'
 import env from '../../env'
-import UpdateController from '../update'
-import ExportDebugController from '../export-debug'
-import { showWindow } from '../app/show-window'
+import UpdateController from '../../controllers/update'
+import ExportDebugController from '../../controllers/export-debug'
+import { showWindow } from '../../controllers/app/show-window'
 import WalletsService from '../../services/wallets'
 import OfflineSignService from '../../services/offline-sign'
 import CommandSubject from '../../models/subjects/command'
@@ -16,6 +16,8 @@ import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from '../../utils/const'
 import { OfflineSignJSON } from '../../models/offline-sign'
 import NetworksService from '../../services/networks'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
+import { CKBLightRunner } from '../../services/light-runner'
+import { NetworkType } from '../../models/network'
 
 enum URL {
   Settings = '/settings/general',
@@ -38,18 +40,27 @@ const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
 
+const getVerionFromFile = (filePath: string) => {
+  if (fs.existsSync(filePath)) {
+    try {
+      return fs.readFileSync(filePath, 'utf8')
+    } catch (err) {
+      logger.error(`[Menu]: `, err)
+    }
+  }
+}
+
 const showAbout = () => {
   let applicationVersion = t('about.app-version', { name: app.name, version: app.getVersion() })
 
   const appPath = app.isPackaged ? app.getAppPath() : path.join(__dirname, '../../../../..')
-  const ckbVersionPath = path.join(appPath, '.ckb-version')
-  if (fs.existsSync(ckbVersionPath)) {
-    try {
-      const ckbVersion = fs.readFileSync(ckbVersionPath, 'utf8')
-      applicationVersion += `\n${t('about.ckb-client-version', { version: ckbVersion })}`
-    } catch (err) {
-      logger.error(`[Menu]: `, err)
-    }
+  const ckbVersion = getVerionFromFile(path.join(appPath, '.ckb-version'))
+  if (ckbVersion) {
+    applicationVersion += `\n${t('about.ckb-client-version', { version: ckbVersion })}`
+  }
+  const ckbLightClientVersion = getVerionFromFile(path.join(appPath, '.ckb-light-version'))
+  if (ckbLightClientVersion) {
+    applicationVersion += `${t('about.ckb-light-client-version', { version: ckbLightClientVersion })}`
   }
 
   const isWin = process.platform === 'win32'
@@ -116,7 +127,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   let isMainWindow = mainWindow === currentWindow
 
   const walletsService = WalletsService.getInstance()
-  const isMainnet = new NetworksService().getCurrent().chain === 'ckb'
+  const network = new NetworksService().getCurrent()
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
@@ -316,10 +327,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             `#/multisig-address/${currentWallet!.id}`,
             t(`messageBox.multisig-address.title`),
             {
-              width: 900,
-              maxWidth: 900,
-              minWidth: 900,
-              resizable: true,
+              width: 1000,
+              maxWidth: 1000,
+              minWidth: 1000,
+              resizable: true
             },
             ['multisig-output-update']
           )
@@ -327,7 +338,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       },
       {
         label: t('application-menu.tools.clear-sync-data'),
-        enabled: hasCurrentWallet && isMainnet,
+        enabled: hasCurrentWallet && (network.chain === 'ckb' || NetworkType.Light === network.type),
         click: async () => {
           const res = await dialog.showMessageBox({
             type: 'warning',
@@ -338,7 +349,12 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             cancelId: 1,
           })
           if (res.response === 0) {
-            await clearCkbNodeCache()
+            const network = new NetworksService().getCurrent()
+            if (network.type === NetworkType.Light) {
+              await CKBLightRunner.getInstance().clearNodeCache()
+            } else {
+              await clearCkbNodeCache()
+            }
           }
         },
       },

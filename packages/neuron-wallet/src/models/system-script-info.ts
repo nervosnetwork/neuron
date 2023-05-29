@@ -101,7 +101,7 @@ export default class SystemScriptInfo {
 
   private async loadInfos(url: string): Promise<void> {
     const rpcService = new RpcService(url)
-    const genesisBlock = (await rpcService.getBlockByNumber('0'))!
+    const genesisBlock = (await rpcService.getGenesisBlock())!
     const genesisBlockHash = genesisBlock.header.hash
 
     // set secp info

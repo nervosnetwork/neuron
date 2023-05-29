@@ -1,28 +1,27 @@
-import WalletService, { Wallet } from '../services/wallets'
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
 import { scriptToAddress, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
-import { Address } from '../models/address'
+import WalletService, { Wallet } from '../services/wallets'
+import RpcService from '../services/rpc-service'
 import { PathAndPrivateKey } from '../models/keys/key'
-import { CellIsNotYetLive, TransactionIsNotCommittedYet } from '../exceptions/dao'
+import { Address } from '../models/address'
 import FeeMode from '../models/fee-mode'
 import TransactionSize from '../models/transaction-size'
 import TransactionFee from '../models/transaction-fee'
-import logger from '../utils/logger'
 import Keychain from '../models/keys/keychain'
 import Input from '../models/chain/input'
 import OutPoint from '../models/chain/out-point'
 import Output from '../models/chain/output'
-import RpcService from '../services/rpc-service'
 import WitnessArgs from '../models/chain/witness-args'
 import Transaction from '../models/chain/transaction'
-import BlockHeader from '../models/chain/block-header'
 import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
+import logger from '../utils/logger'
 import HexUtils from '../utils/hex'
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -32,6 +31,8 @@ import {
   MultisigConfigNeedError,
   NoMatchAddressForSign,
   SignTransactionFailed,
+  CellIsNotYetLive,
+  TransactionIsNotCommittedYet
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -40,6 +41,9 @@ import MultisigService from './multisig'
 import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
+import { generateRPC } from '../utils/ckb-rpc'
+import CKB from '@nervosnetwork/ckb-sdk-core'
+import CellsService from './cells'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -86,8 +90,8 @@ export default class TransactionSender {
   }
 
   public async broadcastTx(walletID: string = '', tx: Transaction) {
-    const { ckb } = NodeService.getInstance()
-    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
     await TransactionPersistor.saveSentTx(tx, txHash)
@@ -107,7 +111,6 @@ export default class TransactionSender {
   ) {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
-    const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
     if (wallet.isHardware()) {
       let device = HardwareWalletService.getInstance().getCurrent()
@@ -212,7 +215,7 @@ export default class TransactionSender {
         wit.lock = serializedMultisig + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
       } else {
-        signed = ckb.signWitnesses(privateKey)({
+        signed = signWitnesses(privateKey)({
           transactionHash: txHash,
           witnesses: serializedWitnesses.map(wit => {
             if (typeof wit === 'string') {
@@ -534,19 +537,15 @@ export default class TransactionSender {
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const changeAddress: string = await this.getChangeAddress()
-    const url: string = NodeService.getInstance().ckb.node.url
-    const rpcService = new RpcService(url)
-    // for some reason with data won't work
-    const cellWithStatus = await rpcService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index), true)
-    const prevOutput = cellWithStatus.cell!.output
-    if (!cellWithStatus.isLive()) {
+    const nftCellOutput = await CellsService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index))
+    if (!nftCellOutput) {
       throw new CellIsNotYetLive()
     }
 
     const tx = await TransactionGenerator.generateTransferNftTx(
       walletId,
       outPoint,
-      prevOutput,
+      nftCellOutput,
       receiveAddress,
       changeAddress,
       fee,
@@ -589,10 +588,10 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
-    const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
-    if (!cellWithStatus.isLive()) {
+    const depositeOutput = await CellsService.getLiveCell(outPoint)
+    if (!depositeOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = await rpcService.getTransaction(outPoint.txHash)
@@ -604,11 +603,10 @@ export default class TransactionSender {
 
     const wallet = WalletService.getInstance().get(walletID)
     const changeAddress = await wallet.getNextChangeAddress()
-    const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       walletID,
       outPoint,
-      prevOutput,
+      depositeOutput,
       depositBlockHeader!.number,
       depositBlockHeader!.hash,
       changeAddress!.address,
@@ -632,11 +630,11 @@ export default class TransactionSender {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
 
-    const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
-    if (!cellStatus.isLive()) {
+    const withdrawOutput = await CellsService.getLiveCell(withdrawingOutPoint)
+    if (!withdrawOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = (await rpcService.getTransaction(withdrawingOutPoint.txHash))!
@@ -647,12 +645,23 @@ export default class TransactionSender {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
 
-    const content = cellStatus.cell!.data!.content
-    const buf = Buffer.from(content.slice(2), 'hex')
-    const depositBlockNumber: bigint = buf.readBigUInt64LE()
-    const depositBlockHeader: BlockHeader = (await rpcService.getHeaderByNumber(depositBlockNumber.toString()))!
+    const content = withdrawOutput.daoData
+    if (!content) {
+      throw new Error(`Withdraw output cell is not a dao cell, ${withdrawOutput.outPoint?.txHash}`)
+    }
+    if (!withdrawOutput.depositOutPoint) {
+      throw new Error('DAO has not finish step first withdraw')
+    }
+    const depositeTx = await rpcService.getTransaction(withdrawOutput.depositOutPoint.txHash)
+    if (!depositeTx?.txStatus.blockHash) {
+      throw new Error(`Get deposite block hash failed with tx hash ${withdrawOutput.depositOutPoint.txHash}`)
+    }
+    const depositBlockHeader = await rpcService.getHeader(depositeTx.txStatus.blockHash)
+    if (!depositBlockHeader) {
+      throw new Error(`Get Header failed with blockHash ${depositeTx.txStatus.blockHash}`)
+    }
     const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
-    const depositCapacity: bigint = BigInt(cellStatus.cell!.output.capacity)
+    const depositCapacity: bigint = BigInt(withdrawOutput.capacity)
 
     const withdrawBlockHeader = (await rpcService.getHeader(prevTx.txStatus.blockHash!))!
     const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlockHeader.epoch))
@@ -686,12 +695,11 @@ export default class TransactionSender {
 
     const outputs: Output[] = [output]
 
-    const previousOutput = cellStatus.cell!.output
     const input: Input = new Input(
       withdrawingOutPoint,
       minimalSince.toString(),
-      previousOutput.capacity,
-      previousOutput.lock
+      withdrawOutput.capacity,
+      withdrawOutput.lock
     )
 
     const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(WitnessArgs.EMPTY_LOCK, '0x0000000000000000')
@@ -751,10 +759,10 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().ckb.node.url
+    const url: string = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(url)
-    const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
-    if (!cellWithStatus.isLive()) {
+    const locktimeOutput = await CellsService.getLiveCell(outPoint)
+    if (!locktimeOutput) {
       throw new CellIsNotYetLive()
     }
     const prevTx = await rpcService.getTransaction(outPoint.txHash)
@@ -766,10 +774,9 @@ export default class TransactionSender {
     const receivingAddressInfo = await wallet.getNextAddress()
 
     const receivingAddress = receivingAddressInfo!.address
-    const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
       outPoint,
-      prevOutput,
+      locktimeOutput,
       receivingAddress,
       fee,
       feeRate
@@ -782,7 +789,7 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawBlockHash: string
   ): Promise<bigint> => {
-    const { ckb } = NodeService.getInstance()
+    const ckb = new CKB(NodeService.getInstance().nodeUrl)
     const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
 
     return BigInt(result)

@@ -20,9 +20,10 @@ import {
   InvalidJSON,
   InvalidAddress,
   UsedName,
+  MainnetAddressRequired,
+  TestnetAddressRequired
 } from '../exceptions'
 import AddressService from '../services/addresses'
-import { MainnetAddressRequired, TestnetAddressRequired } from '../exceptions/address'
 import TransactionSender from '../services/transaction-sender'
 import Transaction from '../models/chain/transaction'
 import logger from '../utils/logger'
@@ -31,6 +32,8 @@ import HardwareWalletService from '../services/hardware'
 import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import AddressParser from '../models/address-parser'
 import MultisigConfigModel from '../models/multisig-config'
+import NodeService from '../services/node'
+import { generateRPC } from '../utils/ckb-rpc'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'device'>[]>> {
@@ -116,11 +119,21 @@ export default class WalletsController {
     )
 
     const walletsService = WalletsService.getInstance()
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    let startBlockNumberInLight: string | undefined = undefined
+    if (!isImporting) {
+      try {
+        startBlockNumberInLight = await rpc.getTipBlockNumber()
+      } catch (error) {
+        startBlockNumberInLight = undefined
+      }
+    }
     const wallet = walletsService.create({
       id: '',
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
+      startBlockNumberInLight
     })
 
     wallet.checkAndGenerateAddresses(isImporting)

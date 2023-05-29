@@ -91,7 +91,7 @@ declare namespace Controller {
 
     name: string
     remote: string
-    type: 0 | 1 // 0 for the default type, 1 for the normal type
+    type: 0 | 1 | 2 // 0 for the default type, 1 for the normal type, 2 for the light client
   }
 
   interface Address {

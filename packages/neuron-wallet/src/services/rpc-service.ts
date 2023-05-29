@@ -1,65 +1,27 @@
-import CKB from '@nervosnetwork/ckb-sdk-core'
-import { generateCKB } from '../services/sdk-core'
-
-import HexUtils from '../utils/hex'
 import CommonUtils from '../utils/common'
 import Block from '../models/chain/block'
 import BlockHeader from '../models/chain/block-header'
 import TransactionWithStatus from '../models/chain/transaction-with-status'
-import OutPoint from '../models/chain/out-point'
-import CellWithStatus from '../models/chain/cell-with-status'
 import logger from '../utils/logger'
-
+import { generateRPC } from '../utils/ckb-rpc'
 export default class RpcService {
   private retryTime: number
   private retryInterval: number
-  private ckb: CKB
+  private rpc: ReturnType<typeof generateRPC>
 
   constructor(url: string, retryTime: number = 3, retryInterval: number = 100) {
     this.retryTime = retryTime
     this.retryInterval = retryInterval
-    this.ckb = generateCKB(url)
-  }
-
-  public async getRangeBlocks(blockNumbers: string[]): Promise<Block[]> {
-    const blocks: Block[] = await Promise.all(
-      blockNumbers.map(async num => {
-        return (await this.retryGetBlock(num))!
-      })
-    )
-
-    return blocks
-  }
-
-  public async getRangeBlockHeaders(blockNumbers: string[]): Promise<BlockHeader[]> {
-    const headers: BlockHeader[] = await Promise.all(
-      blockNumbers.map(async num => {
-        return (await this.retryGetBlockHeader(num))!
-      })
-    )
-
-    return headers
+    this.rpc = generateRPC(url)
   }
 
   public async getTipBlockNumber(): Promise<string> {
-    return this.ckb.rpc.getTipBlockNumber()
+    return this.rpc.getTipBlockNumber()
   }
 
   public async getTipHeader(): Promise<BlockHeader> {
-    const result = await this.ckb.rpc.getTipHeader()
+    const result = await this.rpc.getTipHeader()
     return BlockHeader.fromSDK(result)
-  }
-
-  public async retryGetBlock(num: string): Promise<Block | undefined> {
-    return this.retry(async () => {
-      return await this.getBlockByNumber(num)
-    })
-  }
-
-  public async retryGetBlockHeader(num: string): Promise<BlockHeader | undefined> {
-    return this.retry(async () => {
-      return this.getBlockHeaderByNumber(num)
-    })
   }
 
   /**
@@ -70,7 +32,7 @@ export default class RpcService {
    * }
    */
   public async getTransaction(hash: string): Promise<TransactionWithStatus | undefined> {
-    const result = await this.ckb.rpc.getTransaction(hash)
+    const result = await this.rpc.getTransaction(hash)
     if (result?.transaction) {
       return TransactionWithStatus.fromSDK(result)
     }
@@ -80,66 +42,39 @@ export default class RpcService {
     return undefined
   }
 
-  public async getLiveCell(outPoint: OutPoint, withData: boolean = false): Promise<CellWithStatus> {
-    const result = await this.ckb.rpc.getLiveCell(outPoint.toSDK(), withData)
-    return CellWithStatus.fromSDK(result)
-  }
-
   public async getHeader(hash: string): Promise<BlockHeader | undefined> {
-    const result = await this.ckb.rpc.getHeader(hash)
+    const result = await this.rpc.getHeader(hash)
     if (result) {
       return BlockHeader.fromSDK(result)
     }
     return undefined
   }
 
-  public async getHeaderByNumber(num: string): Promise<BlockHeader | undefined> {
-    const result = await this.ckb.rpc.getHeaderByNumber(HexUtils.toHex(num))
-    if (result) {
-      return BlockHeader.fromSDK(result)
-    }
-    return undefined
-  }
-
-  public async getBlockByNumber(num: string): Promise<Block | undefined> {
-    const block = await this.ckb.rpc.getBlockByNumber(HexUtils.toHex(num))
+  public async getGenesisBlock(): Promise<Block | undefined> {
+    const block = await this.rpc.getGenesisBlock()
     if (block) {
       return Block.fromSDK(block)
     }
     return undefined
   }
 
-  public async getBlockHeaderByNumber(num: string): Promise<BlockHeader | undefined> {
-    const header = await this.ckb.rpc.getHeaderByNumber(HexUtils.toHex(num))
-    if (header) {
-      return BlockHeader.fromSDK(header)
-    }
-    return undefined
-  }
-
   public async genesisBlockHash(): Promise<string> {
     return this.retry(async () => {
-      return this.ckb.rpc.getBlockHash('0x0')
+      return this.rpc.getGenesisBlockHash()
     })
-  }
-
-  public async getChain(): Promise<string> {
-    const chain: string = await this.retry(async () => {
-      const i = await this.ckb.rpc.getBlockchainInfo()
-      return i.chain
-    })
-    return chain
   }
 
   public async getSyncState(): Promise<CKBComponents.SyncState> {
     const syncState = await this.retry(async () => {
-      return await this.ckb.rpc.syncState()
+      return await this.rpc.syncState()
     })
     return syncState
   }
 
-  public async getLocalNodeInfo() {
-    return this.ckb.rpc.localNodeInfo()
+  public async localNodeInfo() {
+    return this.retry(async () => {
+      return this.rpc.localNodeInfo()
+    })
   }
 
   private async retry<T>(func: () => T): Promise<T> {

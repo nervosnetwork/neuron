@@ -102,6 +102,7 @@ const SendFromMultisigDialog = ({
               onOutputRemove={deleteSendInfo}
               onItemChange={onSendInfoChange}
               onSendMaxClick={onSendMaxClick}
+              isMainnet={isMainnet}
             />
           ))}
         </div>
