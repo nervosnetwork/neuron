@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
 import { HexString, QueryOptions } from '@ckb-lumos/base'
-import { CkbIndexer, CellCollector } from '@nervina-labs/ckb-indexer'
+import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
 import logger from '../../utils/logger'
 import { Address } from '../../models/address'
 import AddressMeta from '../../database/address/meta'
@@ -252,18 +252,10 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
 
     const queries: QueryOptions = {}
     if (lock) {
-      queries.lock = {
-        code_hash: lock.codeHash,
-        hash_type: lock.hashType,
-        args: lock.args
-      }
+      queries.lock = lock
     }
     if (type) {
-      queries.type = {
-        code_hash: type.codeHash,
-        hash_type: type.hashType,
-        args: type.args
-      }
+      queries.type = type
     }
     queries.data = data || 'any'
 
