@@ -9,6 +9,7 @@ exports.default = async function notarizing(context) {
   const appleId = process.env.APPLE_ID;
   const appleIdPassword = process.env.APPLE_ID_PASSWORD;
   const repository = process.env.REPOSITORY;
+  console.info('repository:', repository)
 
   if (repository !== 'nervosnetwork/neuron') {
     console.info('It is unnecessary to notarize for a forked respositoty')
