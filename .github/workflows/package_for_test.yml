@@ -67,6 +67,7 @@ jobs:
           ./scripts/download-ckb.sh mac
           yarn package:test mac
         env:
+          REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
