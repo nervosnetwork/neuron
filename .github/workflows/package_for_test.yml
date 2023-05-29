@@ -3,7 +3,7 @@ name: Package Neuron for Test
 on: 
   pull_request:
     types: [opened, ready_for_review]
-  push
+  push:
 
 jobs:
   packaging:
