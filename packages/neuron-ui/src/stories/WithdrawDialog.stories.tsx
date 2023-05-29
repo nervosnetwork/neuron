@@ -36,7 +36,6 @@ const props = {
     timestamp: Date.now().toString(),
     depositTimestamp: Date.now().toString(),
   },
-  tipBlockHash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab61',
   currentEpoch: '0x00000000',
 }
 

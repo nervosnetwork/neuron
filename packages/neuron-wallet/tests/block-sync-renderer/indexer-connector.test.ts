@@ -3,7 +3,8 @@ import { when } from 'jest-when'
 import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import IndexerConnector, { LumosCell, LumosCellQuery } from '../../src/block-sync-renderer/sync/indexer-connector'
+import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
+import type { LumosCell, LumosCellQuery } from '../../src/block-sync-renderer/sync/connector'
 import { flushPromises } from '../test-utils'
 import { ScriptHashType } from '../../src/models/chain/script'
 
@@ -236,7 +237,7 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith([fakeTx1])
+              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
             })
           })
           describe('when loaded block number is not in order', () => {
@@ -252,7 +253,7 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith([fakeTx1])
+              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
             })
           })
           describe('#notifyCurrentBlockNumberProcessed', () => {
@@ -326,8 +327,7 @@ describe('unit tests for IndexerConnector', () => {
           let txObserver: any
           beforeEach(async () => {
             stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
-            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockResolvedValue([fakeTxHashCache3])
-            when(stubbedGetTransactionFn).calledWith(fakeTxHashCache3.txHash).mockResolvedValueOnce(undefined)
+            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockRejectedValue('exception')
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
@@ -336,7 +336,7 @@ describe('unit tests for IndexerConnector', () => {
           })
           it('throws error', async () => {
             expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
-              'Error in processing next block number queue: Error: failed to fetch transaction for hash hash3'
+              'Error in processing next block number queue: Error: exception'
             )
           })
         })

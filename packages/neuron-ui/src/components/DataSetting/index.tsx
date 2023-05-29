@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
-import { useDispatch } from 'states'
+import { useDispatch, useState as useGlobalState } from 'states'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
 import CopyZone from 'widgets/CopyZone'
 import { OpenFolder, InfoCircleOutlined } from 'widgets/Icons/icon'
@@ -10,6 +10,7 @@ import { shell } from 'electron'
 import Spinner from 'widgets/Spinner'
 import { getIsCkbRunExternal } from 'services/remote'
 import { isSuccessResponse } from 'utils'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useDataPath } from './hooks'
 
 import styles from './index.module.scss'
@@ -99,10 +100,18 @@ const SetItem = () => {
 
 const DataSetting = () => {
   const dispatch = useDispatch()
+  const {
+    chain: { networkID },
+    settings: { networks = [] },
+  } = useGlobalState()
+  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
+    networkID,
+    networks,
+  ])
   return (
     <div className={styles.root}>
-      <SetItem />
-      <ClearCache dispatch={dispatch} />
+      {isLightClient ? null : <SetItem />}
+      <ClearCache dispatch={dispatch} hideRebuild={isLightClient} />
     </div>
   )
 }

@@ -2,7 +2,6 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import archiver from 'archiver'
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
 import logger from '../utils/logger'
 import { t } from 'i18next'
@@ -11,6 +10,8 @@ import SyncedBlockNumber from '../models/synced-block-number'
 import AddressService from '../services/addresses'
 import redistCheck from '../utils/redist-check'
 import SettingsService from '../services/settings'
+import { generateRPC } from '../utils/ckb-rpc'
+import { CKBLightRunner } from '../services/light-runner'
 
 export default class ExportDebugController {
   #I18N_PATH = 'export-debug-info'
@@ -41,6 +42,7 @@ export default class ExportDebugController {
         this.addBundledCKBLog(),
         this.addLogFiles(),
         this.addHdPublicKeyInfoCsv(),
+        this.addBundledCKBLightClientLog()
       ])
       await this.archive.finalize()
       dialog.showMessageBox({
@@ -55,23 +57,25 @@ export default class ExportDebugController {
   private addStatusFile = async () => {
     const neuronVersion = app.getVersion()
     const url = NetworksService.getInstance().getCurrent().remote
-    const ckb = new CKB(url)
+    const rpcService = generateRPC(url)
 
     const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers, vcredist] = await Promise.all([
       new SyncedBlockNumber()
         .getNextBlock()
         .then(n => n.toString())
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .localNodeInfo()
-        .then(res => res.version)
+        .then(v => v.version)
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
         .catch(() => ''),
-      ckb.rpc.getPeers().catch(() => []),
-      redistCheck(),
+      rpcService
+        .getPeers()
+        .catch(() => []),
+      redistCheck()
     ])
     const { platform, arch } = process
     const release = os.release()
@@ -153,5 +157,11 @@ export default class ExportDebugController {
     files.forEach(file => {
       this.archive.file(path.join(logFile.path, '..', file), { name: file })
     })
+  }
+
+  private addBundledCKBLightClientLog() {
+    const logPath = CKBLightRunner.getInstance().logPath
+    if (!fs.existsSync(logPath)) {return}
+    this.archive.file(logPath, { name: 'bundled-ckb-lignt-client.log' })
   }
 }

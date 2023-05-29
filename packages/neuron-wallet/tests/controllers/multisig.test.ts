@@ -18,6 +18,15 @@ jest.mock('electron', () => ({
     getFocusedWindow: jest.fn(),
   },
 }))
+jest.mock('services/wallets', () => ({
+  getInstance() {
+    return {
+      getCurrent() {
+        return jest.fn()
+      }
+    }
+  }
+}))
 
 jest.mock('../../src/services/multisig')
 const MultiSigServiceMock = MultisigService as jest.MockedClass<typeof MultisigService>

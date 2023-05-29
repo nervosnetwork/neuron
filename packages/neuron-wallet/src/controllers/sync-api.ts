@@ -58,7 +58,7 @@ export default class SyncApiController {
   }
 
   #getEstimatesByCurrentNode = () => {
-    const nodeUrl = this.#getCurrentNodeUrl()
+    const nodeUrl = NodeService.getInstance().nodeUrl
     return this.#estimates.filter(
       state => state.nodeUrl === nodeUrl && Date.now() - state.timestamp <= this.#sampleTime
     )
@@ -103,8 +103,8 @@ export default class SyncApiController {
     return newSyncState
   }
 
-  #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number; bestKnownBlockTimestamp: number }> => {
-    const nodeUrl = this.#getCurrentNodeUrl()
+  #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> => {
+    const nodeUrl = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(nodeUrl)
     try {
       const syncState = await rpcService.getSyncState()
@@ -122,17 +122,12 @@ export default class SyncApiController {
     }
   }
 
-  #getCurrentNodeUrl = () => {
-    const ckb = NodeService.getInstance().ckb
-    return ckb.node.url
-  }
-
   #estimate = async (states: any): Promise<SyncState> => {
     const indexerTipNumber = parseInt(states.indexerTipNumber)
     const cacheTipNumber = parseInt(states.cacheTipNumber)
 
     const currentTimestamp = Date.now()
-    const nodeUrl = this.#getCurrentNodeUrl()
+    const nodeUrl = NodeService.getInstance().nodeUrl
     const tipHeader = await new RpcService(nodeUrl).getTipHeader()
 
     const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.#fetchBestKnownBlockInfo()
@@ -205,7 +200,7 @@ export default class SyncApiController {
       return this.#cachedEstimation
     }
 
-    const nodeUrl = this.#getCurrentNodeUrl()
+    const nodeUrl = NodeService.getInstance().nodeUrl
 
     if (
       this.#cachedEstimation.nodeUrl !== nodeUrl ||
@@ -228,7 +223,7 @@ export default class SyncApiController {
     })
 
     CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {
-      const nodeUrl = this.#getCurrentNodeUrl()
+      const nodeUrl = NodeService.getInstance().nodeUrl
       const newSyncState: SyncState = {
         nodeUrl,
         timestamp: 0,

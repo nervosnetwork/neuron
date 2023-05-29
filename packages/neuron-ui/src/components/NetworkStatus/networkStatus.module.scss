@@ -9,13 +9,17 @@ $hover-bg-color: #3cc68a4d;
   font-size: 0.8rem;
   font-weight: bold;
 
-  .name {
-    position: relative;
-    display: flex;
-    align-items: center;
-    line-height: 1em;
-    word-break: break-all;
-    margin-top: 3px;
+  .networkDisplay {
+    max-width: 100%;
+
+    .name {
+      position: relative;
+      display: block;
+      line-height: 16px;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      margin-top: 3px;
+    }
   }
 
   /* keep the tooltip popped to make it more obvious */

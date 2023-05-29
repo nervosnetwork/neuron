@@ -3,7 +3,6 @@ import { Tip } from '@ckb-lumos/base'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { AddressType } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import TransactionWithStatus from '../../src/models/chain/transaction-with-status'
 import { Address, AddressVersion } from '../../src/models/address'
 import Queue from '../../src/block-sync-renderer/sync/queue'
 import Transaction from '../../src/models/chain/transaction'
@@ -30,6 +29,7 @@ const stubbedCheckAndGenerateAddressesFn = jest.fn()
 const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
 const stubbedUpdateCacheProcessedFn = jest.fn()
 const stubbedLoggerErrorFn = jest.fn()
+const stubbedRPCCreateBatchRequestExecFn = jest.fn()
 
 const stubbedTxAddressFinder = jest.fn().mockImplementation((...args) => {
   stubbedTxAddressFinderConstructor(...args)
@@ -60,19 +60,21 @@ const resetMocks = () => {
   stubbedUpdateCacheProcessedFn.mockReset()
   stubbedLoggerErrorFn.mockReset()
   stubbedProcessSend.mockReset()
+  stubbedRPCCreateBatchRequestExecFn.mockReset()
 }
 
 const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   const fakeTx = new Transaction('')
-  fakeTx.hash = 'hash1'
-  fakeTx.inputs = [new Input(new OutPoint('0x' + id.repeat(64), '0'))]
+  fakeTx.hash = '0xhash1' + '0'.repeat(59)
+  fakeTx.inputs = [new Input(new OutPoint('0x' + id.repeat(64), '0'), '0x0')]
   fakeTx.outputs = [
     Output.fromObject({
       capacity: '1',
       lock: Script.fromObject({ hashType: ScriptHashType.Type, codeHash: '0x' + id.repeat(64), args: publicKeyHash }),
     }),
   ]
-  fakeTx.blockNumber = '1'
+  fakeTx.blockNumber = '0x1'
+  fakeTx.timestamp = '0x1880a3fa5bc'
   const fakeTxWithStatus = {
     transaction: fakeTx,
     txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed),
@@ -80,6 +82,14 @@ const generateFakeTx = (id: string, publicKeyHash: string = '0x') => {
   return fakeTxWithStatus
 }
 
+const fakeBlockHeader = {
+  version: '0x0',
+  epoch: '0x0',
+  hash: `0x${'0'.repeat(64)}`,
+  parentHash: `0x${'0'.repeat(64)}`,
+  timestamp: '0x0',
+  number: '0x0',
+}
 describe('queue', () => {
   let queue: Queue
   const fakeNodeUrl = 'http://fakenode:8114'
@@ -113,7 +123,7 @@ describe('queue', () => {
     jest.useFakeTimers('legacy')
 
     stubbedBlockTipsSubject = new Subject<Tip>()
-    stubbedTransactionsSubject = new Subject<Array<TransactionWithStatus>>()
+    stubbedTransactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[], params: unknown }>()
     const stubbedIndexerConnector = jest.fn().mockImplementation((...args) => {
       stubbedIndexerConnectorConstructor(...args)
       return {
@@ -159,6 +169,19 @@ describe('queue', () => {
     jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
       return { updateCacheProcessed: stubbedUpdateCacheProcessedFn }
     })
+    jest.doMock('../../src/utils/ckb-rpc', () => {
+      return {
+        generateRPC() {
+          return {
+            createBatchRequest() {
+              return {
+                exec: stubbedRPCCreateBatchRequestExecFn
+              }
+            }
+          }
+        }
+      }
+    })
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
     queue = new Queue(fakeNodeUrl, addresses)
   })
@@ -193,30 +216,41 @@ describe('queue', () => {
       })
       describe('subscribes to IndexerConnector#transactionsSubject', () => {
         const fakeTxWithStatus1 = generateFakeTx('1', addresses[0].blake160)
-        const fakeTxWithStatus2 = generateFakeTx('2', addresses[0].blake160)
+        const fakeTxWithStatus2 = generateFakeTx('0', addresses[0].blake160)
 
         const fakeTxs = [fakeTxWithStatus2]
         describe('processes transactions from an event', () => {
           beforeEach(() => {
             stubbedAddressesFn.mockResolvedValue([true, addresses.map(addressMeta => addressMeta.address), []])
             stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
-            stubbedTransactionsSubject.next(fakeTxs)
+            stubbedRPCCreateBatchRequestExecFn
+              .mockResolvedValueOnce(fakeTxs)
+              .mockResolvedValueOnce(fakeTxs.map(v => ({ ...fakeBlockHeader, timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
+            stubbedTransactionsSubject.next({ txHashes: fakeTxs.map(v => v.transaction.hash), params: fakeTxs[0].transaction.blockNumber })
           })
           describe('when saving transactions is succeeded', () => {
             beforeEach(flushPromises)
 
             it('check infos by hashes derived from addresses', () => {
               const lockHashes = ['0x1f2615a8dde4e28ca736ff763c2078aff990043f4cbf09eb4b3a58a140a0862d']
+              const tx = Transaction.fromSDK(fakeTxWithStatus2.transaction.toSDK())
+              tx.blockHash = fakeTxWithStatus2.txStatus.blockHash!
+              tx.blockNumber = BigInt(fakeTxWithStatus2.transaction.blockNumber!).toString()
+              tx.timestamp = BigInt(fakeTxWithStatus2.transaction.timestamp!).toString()
               expect(stubbedTxAddressFinderConstructor).toHaveBeenCalledWith(
                 lockHashes,
                 [new AssetAccountInfo().generateAnyoneCanPayScript(addressInfo.blake160).computeHash()],
-                fakeTxs[0].transaction,
+                tx,
                 [Multisig.hash([addressInfo.blake160])]
               )
             })
             it('saves transactions', () => {
               for (const { transaction } of fakeTxs) {
-                expect(stubbedSaveFetchFn).toHaveBeenCalledWith(transaction)
+                const tx = Transaction.fromSDK(transaction.toSDK())
+                tx.blockHash = fakeTxWithStatus2.txStatus.blockHash!
+                tx.blockNumber = BigInt(fakeTxWithStatus2.transaction.blockNumber!).toString()
+                tx.timestamp = BigInt(fakeTxWithStatus2.transaction.timestamp!).toString()
+                expect(stubbedSaveFetchFn).toHaveBeenCalledWith(tx)
               }
             })
             it('checks and generate new addresses', () => {
@@ -238,7 +272,10 @@ describe('queue', () => {
             const err = new Error()
             beforeEach(async () => {
               stubbedSaveFetchFn.mockRejectedValueOnce(err)
-              stubbedTransactionsSubject.next(fakeTxs)
+              stubbedRPCCreateBatchRequestExecFn
+                .mockResolvedValueOnce(fakeTxs)
+                .mockResolvedValueOnce(fakeTxs.map(v => ({ ...fakeBlockHeader, timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
+              stubbedTransactionsSubject.next({ txHashes: fakeTxs.map(v => v.transaction.hash), params: fakeTxs[0].transaction.blockNumber })
               await flushPromises()
             })
             it('handles the exception', async () => {
