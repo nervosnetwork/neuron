@@ -164,7 +164,7 @@ jobs:
           mkdir -p ./package_info
           echo $PR_NUMBER > ./package_info/pr_number
           echo $RUN_ID > ./package_info/run_id
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
           name: upload_package_info
           path: package_info/

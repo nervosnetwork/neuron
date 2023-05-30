@@ -22,7 +22,7 @@ jobs:
         run: ls -R
         working-directory: path/to/artifact
 
-      - name: Read PR number and job id, then comment
+      - name: Read PR number and job id
         run: |
           pr_number=$(cat path/to/artifact/pr_number)
           run_id=$(cat path/to/artifact/run_id)
@@ -32,7 +32,7 @@ jobs:
           echo $pr_number
           echo $run_id
         working-directory: path/to/artifact
-        uses: thollander/actions-comment-pull-request@v2
+      - uses: thollander/actions-comment-pull-request@v2
           with:
             message: |
               Packaging for test is done in [${{ env.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{env.run_id}})
