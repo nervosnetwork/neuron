@@ -1,0 +1,20 @@
+name: Comment on the pull request
+
+on:
+  workflow_run:
+    workflows: ["Package Neuron for Test"]
+    types:
+      - completed
+
+jobs:
+  comment:
+    name: Append links to the Pull Request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add package result for push commit
+        run: | 
+          echo "${{ github.head_ref }}"
+          echo "${{ github.ref }}"
+          echo "${{ github.repository }}"
+

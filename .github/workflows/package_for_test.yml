@@ -2,7 +2,6 @@ name: Package Neuron for Test
 
 on: 
   pull_request:
-    types: [opened, ready_for_review]
   push:
 
 jobs:
@@ -65,7 +64,7 @@ jobs:
           CI: false
 
       - name: Package for MacOS
-        if: matrix.os == 'macos-latest'
+        if: ${{ matrix.os == 'macos-latest' && github.event_name == 'push' }}
         run: |
           ./scripts/download-ckb.sh mac
           yarn package:test mac
@@ -76,8 +75,17 @@ jobs:
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
 
+      - name: Package for MacOS for pull_request
+        if: ${{ matrix.os == 'macos-latest' && github.event_name == 'pull_request' }}
+        run: |
+          ./scripts/download-ckb.sh mac
+          yarn package:test mac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_NOTARIZE: true
+
       - name: Package for Windows
-        if: matrix.os == 'windows-2019'
+        if: ${{ matrix.os == 'windows-2019' && github.event_name == 'push' }}
         run: |
           bash ./scripts/download-ckb.sh win
           yarn build
@@ -87,6 +95,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
+
+
+      - name: Package for Windows for pull_request
+        if: ${{ matrix.os == 'windows-2019' && github.event_name == 'pull_request' }}
+        run: |
+          bash ./scripts/download-ckb.sh win
+          yarn build
+          bash ./scripts/copy-ui-files.sh
+          bash ./scripts/package-for-test.sh win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Package for Linux
         if: matrix.os == 'ubuntu-20.04'
@@ -137,13 +156,3 @@ jobs:
         with:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
-
-  comment:
-    needs: [packaging]
-    name: Append links to the Pull Request
-    runs-on: ubuntu-latest
-    steps:
-      - uses: peter-evans/commit-comment@v2
-        with:
-          body: |
-            Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
