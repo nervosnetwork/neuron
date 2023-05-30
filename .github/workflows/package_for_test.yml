@@ -155,6 +155,7 @@ jobs:
           path: release/Neuron-*.AppImage
 
   cache-package-info:
+    if: github.event_name == 'pull_request'
     steps:
       - name: Save PR number and run id
         env:
