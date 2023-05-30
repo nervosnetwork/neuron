@@ -153,3 +153,18 @@ jobs:
         with:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
+
+  cache-package-info:
+    steps:
+      - name: Save PR number and run id
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p ./package_info
+          echo $PR_NUMBER > ./package_info/pr_number
+          echo $RUN_ID > ./package_info/run_id
+        uses: actions/upload-artifact@v3
+        with:
+          name: upload_package_info
+          path: package_info/

@@ -13,9 +13,29 @@ jobs:
 
     steps:
       - name: Add package result for push commit
-        run: | 
-          echo "test run workflow_run"
-          echo "${{ github.head_ref }}"
-          echo "${{ github.ref }}"
-          echo "${{ github.repository }}"
+        uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+          path: path/to/artifact
+          
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: path/to/artifact
+
+      - name: Read PR number and job id, then comment
+        run: |
+          pr_number=$(cat path/to/artifact/pr_number)
+          run_id=$(cat path/to/artifact/run_id)
+          echo "pr_number=$pr_number" >> "$GITHUB_ENV"
+          echo "run_id=$run_id" >> "$GITHUB_ENV"
+          echo $pr_number
+          echo $run_id
+        working-directory: path/to/artifact
+        uses: thollander/actions-comment-pull-request@v2
+          with:
+            message: |
+              Packaging for test is done in [${{ env.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{env.run_id}})
+            pr_number: env.pr_number
+
+        
 
