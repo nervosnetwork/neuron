@@ -99,7 +99,6 @@ jobs:
           CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
 
-
       - name: Package for Windows for pull_request
         if: ${{ matrix.os == 'windows-2019' && github.event_name == 'pull_request' }}
         run: |
