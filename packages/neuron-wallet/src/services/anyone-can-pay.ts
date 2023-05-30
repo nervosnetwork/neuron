@@ -10,7 +10,7 @@ import {
   LightClientNotSupportSendToACPError,
   TargetLockError,
   TargetOutputNotFoundError,
-  AcpSendSameAccountError
+  AcpSendSameAccountError,
 } from '../exceptions'
 import Script from '../models/chain/script'
 import OutPoint from '../models/chain/out-point'

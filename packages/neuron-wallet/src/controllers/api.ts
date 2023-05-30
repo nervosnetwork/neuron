@@ -783,7 +783,7 @@ export default class ApiController {
     //light client
     handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
       return {
-        result: (await SyncProgressService.getSyncProgressByHashes(hashes)),
+        result: await SyncProgressService.getSyncProgressByHashes(hashes),
         status: ResponseCode.Success,
       }
     })

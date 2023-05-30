@@ -11,7 +11,7 @@ export default class RpcService {
   public readonly url: string
 
   constructor(url: string, retryTime: number = 3, retryInterval: number = 100) {
-    this.url = url;
+    this.url = url
     this.retryTime = retryTime
     this.retryInterval = retryInterval
     this.rpc = generateRPC(url)

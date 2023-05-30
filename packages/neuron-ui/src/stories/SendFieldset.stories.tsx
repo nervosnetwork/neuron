@@ -30,7 +30,7 @@ stories.add('Common', () => {
     onItemChange: (e: any) => action('Item Change')(JSON.stringify(e.target.dataset), e.target.value),
     onScan: () => action('Scan'),
     onSendMaxClick: (e: any) => action('Click Send Max button')(JSON.stringify(e.target.dataset)),
-    isMainnet: false
+    isMainnet: false,
   }
   return <SendFieldset {...props} />
 })

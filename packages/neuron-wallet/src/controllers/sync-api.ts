@@ -103,7 +103,7 @@ export default class SyncApiController {
     return newSyncState
   }
 
-  #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number, bestKnownBlockTimestamp: number }> => {
+  #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number; bestKnownBlockTimestamp: number }> => {
     const nodeUrl = NodeService.getInstance().nodeUrl
     const rpcService = new RpcService(nodeUrl)
     try {

@@ -27,39 +27,37 @@ import styles from './walletWizard.module.scss'
 
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 
-const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  history: ReturnType<typeof useHistory>
-) => {
-  return createWallet(params).then(res => {
-    if (isSuccessResponse(res)) {
-      history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
-    } else if (res.status > 0) {
-      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
-    } else if (res.message) {
-      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
-      if (msg) {
-        showErrorMessage(i18n.t(`messages.error`), msg)
+const createWalletWithMnemonic =
+  (params: Controller.ImportMnemonicParams) => (history: ReturnType<typeof useHistory>) => {
+    return createWallet(params).then(res => {
+      if (isSuccessResponse(res)) {
+        history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+      } else if (res.status > 0) {
+        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
+      } else if (res.message) {
+        const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+        if (msg) {
+          showErrorMessage(i18n.t(`messages.error`), msg)
+        }
       }
-    }
-  })
-}
+    })
+  }
 
-const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  history: ReturnType<typeof useHistory>
-) => {
-  return importMnemonic(params).then(res => {
-    if (isSuccessResponse(res)) {
-      history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
-    } else if (res.status > 0) {
-      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
-    } else if (res.message) {
-      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
-      if (msg) {
-        showErrorMessage(i18n.t(`messages.error`), msg)
+const importWalletWithMnemonic =
+  (params: Controller.ImportMnemonicParams) => (history: ReturnType<typeof useHistory>) => {
+    return importMnemonic(params).then(res => {
+      if (isSuccessResponse(res)) {
+        history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+      } else if (res.status > 0) {
+        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
+      } else if (res.message) {
+        const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+        if (msg) {
+          showErrorMessage(i18n.t(`messages.error`), msg)
+        }
       }
-    }
-  })
-}
+    })
+  }
 
 export enum WalletWizardPath {
   Welcome = '/welcome',

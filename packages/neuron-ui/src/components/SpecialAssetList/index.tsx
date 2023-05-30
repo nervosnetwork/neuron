@@ -114,10 +114,10 @@ const SpecialAssetList = () => {
   } = useGlobalState()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const isMainnet = isMainnetUtil(networks, networkID)
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
-    networkID,
-    networks,
-  ])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networkID, networks]
+  )
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
   const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
   const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
@@ -229,27 +229,26 @@ const SpecialAssetList = () => {
         })
         return
       }
-      const handleRes = (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (
-        res: ControllerResponse<any>
-      ) => {
-        if (isSuccessResponse(res)) {
-          if (actionType === 'unlock') {
-            dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+      const handleRes =
+        (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (res: ControllerResponse<any>) => {
+          if (isSuccessResponse(res)) {
+            if (actionType === 'unlock') {
+              dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+            } else {
+              dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
+            }
+            dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
           } else {
-            dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
+            dispatch({
+              type: AppActions.AddNotification,
+              payload: {
+                type: 'alert',
+                timestamp: +new Date(),
+                content: typeof res.message === 'string' ? res.message : res.message.content!,
+              },
+            })
           }
-          dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
-        } else {
-          dispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: typeof res.message === 'string' ? res.message : res.message.content!,
-            },
-          })
         }
-      }
       switch (cell.customizedAssetInfo.lock) {
         case PresetScript.Locktime: {
           unlockSpecialAsset({

@@ -42,7 +42,7 @@ export default class ExportDebugController {
         this.addBundledCKBLog(),
         this.addLogFiles(),
         this.addHdPublicKeyInfoCsv(),
-        this.addBundledCKBLightClientLog()
+        this.addBundledCKBLightClientLog(),
       ])
       await this.archive.finalize()
       dialog.showMessageBox({
@@ -72,10 +72,8 @@ export default class ExportDebugController {
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
         .catch(() => ''),
-      rpcService
-        .getPeers()
-        .catch(() => []),
-      redistCheck()
+      rpcService.getPeers().catch(() => []),
+      redistCheck(),
     ])
     const { platform, arch } = process
     const release = os.release()
@@ -161,7 +159,9 @@ export default class ExportDebugController {
 
   private addBundledCKBLightClientLog() {
     const logPath = CKBLightRunner.getInstance().logPath
-    if (!fs.existsSync(logPath)) {return}
+    if (!fs.existsSync(logPath)) {
+      return
+    }
     this.archive.file(logPath, { name: 'bundled-ckb-lignt-client.log' })
   }
 }

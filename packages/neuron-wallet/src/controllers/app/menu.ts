@@ -330,7 +330,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               width: 1000,
               maxWidth: 1000,
               minWidth: 1000,
-              resizable: true
+              resizable: true,
             },
             ['multisig-output-update']
           )

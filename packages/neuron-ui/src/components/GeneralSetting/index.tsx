@@ -81,7 +81,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   }, [])
 
   const onApplyLanguage = useCallback(() => {
-    setLocale(lng as typeof LOCALES[number])
+    setLocale(lng as (typeof LOCALES)[number])
   }, [lng])
 
   const version = useMemo(() => {
@@ -131,7 +131,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
           selectedKey={lng}
           onChange={(_, item) => {
             if (item) {
-              setLng(item.key as typeof LOCALES[number])
+              setLng(item.key as (typeof LOCALES)[number])
             }
           }}
         />

@@ -109,13 +109,15 @@ export const NoticeContent = () => {
   }, [dispatch, globalDialog])
 
   const onOk = useCallback(() => {
-    migrateData().then(res => {
-      if (isSuccessResponse(res)) {
-        dismissGlobalDialog()(dispatch)
-      }
-    }).finally(() => {
-      syncRebuildNotification.save()
-    })
+    migrateData()
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          dismissGlobalDialog()(dispatch)
+        }
+      })
+      .finally(() => {
+        syncRebuildNotification.save()
+      })
   }, [dispatch])
 
   const [ckbDataPath, setCkbDataPath] = useState<string>()
@@ -126,7 +128,7 @@ export const NoticeContent = () => {
       }
     })
   })
-  
+
   const onOpenDataDir = useCallback(() => {
     if (ckbDataPath) {
       shell.openPath(ckbDataPath)

@@ -31,14 +31,14 @@ const lightClientNetwork: Network[] = [
     remote: BUNDLED_LIGHT_CKB_URL,
     genesisHash: TESTNET_GENESIS_HASH,
     type: NetworkType.Light,
-    chain: LIGHT_CLIENT_TESTNET
-  }
+    chain: LIGHT_CLIENT_TESTNET,
+  },
 ]
 
 enum NetworksKey {
   List = 'networks',
   Current = 'selected',
-  AddedLightNetwork = 'AddedLightNetwork'
+  AddedLightNetwork = 'AddedLightNetwork',
 }
 
 export default class NetworksService extends Store {

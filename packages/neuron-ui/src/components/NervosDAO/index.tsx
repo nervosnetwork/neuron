@@ -81,7 +81,7 @@ const NervosDAO = () => {
     isBalanceReserved,
     t,
     depositValue,
-    suggestFeeRate
+    suggestFeeRate,
   })
   const updateDepositValue = hooks.useUpdateDepositValue({ setDepositValue })
 
