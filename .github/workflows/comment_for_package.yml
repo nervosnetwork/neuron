@@ -33,6 +33,7 @@ jobs:
           echo $run_id
         working-directory: path/to/artifact
       - uses: thollander/actions-comment-pull-request@v2
+        if: ${{ pr_number != "" }}
         with:
           message: |
             Packaging for test is done in [${{ env.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{env.run_id}})
