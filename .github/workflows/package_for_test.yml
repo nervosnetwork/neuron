@@ -156,6 +156,7 @@ jobs:
 
   cache-package-info:
     if: github.event_name == 'pull_request'
+    runs-on: ubuntu-20.04
     steps:
       - name: Save PR number and run id
         env:
