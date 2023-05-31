@@ -4,14 +4,7 @@ declare interface Window {
     shell: any
     require: any
     nativeImage: any
-    desktopCapturer: any
-    ipcRenderer: {
-      invoke(channel: string, ...args: any[]): Promise<any>
-      on(channel: string, listener: Function)
-      removeListener(channel: string, listener: Function)
-      removeAllListeners(channel: string)
-      sendSync(channel: string, ...args: any[]): any
-    }
+    ipcRenderer: import('electron').IpcRenderer
   }
   neuron: {
     role: 'main' | 'settings'

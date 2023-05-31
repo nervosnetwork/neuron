@@ -1,3 +1,86 @@
+# 0.110.0 (2023-05-31)
+
+### CKB Node & Light Client
+
+- [CKB@v0.110.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.110.0) was released on May. 17th, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.2.4](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.2.4) was released on May. 28th, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+#### Caveat
+◆ **CKB Light Client** is only activated on testnet, thus only `light testnet` is enabled in Neuron. **CKB Light Client on Mainnet** requires a hardfork on the mainnet in the future.
+◆ **CKB@v0.110** requires data migration, which is irreversible. Be cautious to start the migration without a backup. [How to back up data of ckb node](https://github.com/nervosnetwork/neuron/issues/2557#issue-1512510978)
+
+> On the other hand, we strongly recommend you to back up the old data before migrating, the **ckb node data path** can be found by clicking **preference -> Data -> CKB Node Config & Storage**. Because once the migration starts, the data will be no longer compatible with all older versions of CKB.
+
+### Assumed valid target
+
+Block before `0xc0c532e10c708852d9586be46a5ed8317b2aa0835c721aa691abffb9bf4a26cd`(at height `10,004,892`) will be skipped in validation.(#2689)
+
+---
+
+### Light Client Mode
+[![Light client guide](https://github.com/Magickbase/neuron-public-issues/assets/7271329/eeed68ac-5f1b-457f-8203-c5d7b341b6b0)](https://youtu.be/tQm9YvgG7iE)
+
+YouTube: https://youtu.be/tQm9YvgG7iE
+
+---
+
+We are thrilled to introduce our new feature: **Light Client Mode**. This feature makes Neuron more practical and convenient, allowing you to manage your digital assets more easily. Please note that it is currently only available on the testnet, as activation on the mainnet will require a hardfork.
+
+#### What is the light client model?
+
+**Light Client Mode** is a connection mode of Neuron that connects to a built-in **CKB Light Client**. Compared to a full node, it downloads a portion of the blockchain data to obtain necessary information. This allows Neuron to access the CKB blockchain faster.
+
+#### Light Client Mode Advantages
+
+1. **Higher synchronization speed**: Light Client Mode enables faster synchronization of blockchain data, saving users' time and network bandwidth.
+2. **Less disk usage**: Light Client Mode requires only a fraction of the blockchain data to be stored, resulting in less storage space requirement compared to a full node.
+
+Using a **MacBook Pro (13-inch, M1, 2020)** device as an example, we conducted a realistic test of synchronization from **block 0 to the latest block 9,380,828** (2023/05/22 Pudge network data):
+
+- Light Client Mode: The synchronization process consumed about **5.5 hours** and approximately **45MB** of disk space during running. (The disk usage is related to the transaction count, and this test included 782 transactions.)
+- Full Node Mode: It took about **36 hours** to synchronize **107.8GB** of data. (Excluding the time to find an assumed valid target block.)
+
+In the above test scenario, using a light node compared to a full node **reduced synchronization time by 84.7% and disk usage by 99.9%**. (Please note that these numbers are for reference only and may vary depending on different equipment, network conditions, and account data.)
+
+#### Light Client Mode Usage Scenarios
+
+Compared to full nodes, light nodes require less disk space and network bandwidth, making them suitable for users who want to quickly access blockchain information without needing the full blockchain data. However, please note that for transactions containing time locks, Cheque contracts, or other operations that require full node data verification, you will need to switch to full nodes.
+
+---
+
+## New features
+
+- #2615: Adapt ckb light node.(@yanguoyu)
+- #2599: Implement dynamic fee rate based on fee rate statistics.(@jeffreyma597)
+- #2689: Upgrade ckb node to v0.110.0.(@Keith-CY)
+- #2627: Download ckb_aarch64 for neuron-arm64.(@Keith-CY)
+- #2651: Add dialog warn for migrate date to 0.108.(@yanguoyu)
+- #2567,#2568: Set allowToChangeInstallationDirectory for windows.(@yanguoyu)
+- #2674: Improve the interaction design of the DatetimePicker component.(@WhiteMinds)
+
+## Bug fixes
+
+- #2530: Batch request to improve performance of nervos dao records.(@yanguoyu)
+- #2574: Improve heart beating check of built-in ckb node.(@yanguoyu)
+- #2565: Remove obsolete indexer data.(@yanguoyu)
+- #2581: Skip password requirement when interact with a hardware wallet.(@yanguoyu)
+- #2609: Upgrade leveldown to fix SQLITE_MISUSE.(@devchenyan)
+- #2595: Fix latency of switching networks.(@yanguoyu)
+- #2629: Fix crash when enter over 8 decimal.(@yanguoyu)
+
+## New Contributors
+
+- @Kuzirashi made their first contribution in https://github.com/nervosnetwork/neuron/pull/2559
+- @mortoys made their first contribution in https://github.com/nervosnetwork/neuron/pull/2592
+- @devchenyan made their first contribution in https://github.com/nervosnetwork/neuron/pull/2609
+- @WhiteMinds made their first contribution in https://github.com/nervosnetwork/neuron/pull/2652
+- @homura made their first contribution in https://github.com/nervosnetwork/neuron/pull/2657
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.106.0...v0.110.0
+
+
+
 # 0.106.0 (2022-12-28)
 
 ### CKB

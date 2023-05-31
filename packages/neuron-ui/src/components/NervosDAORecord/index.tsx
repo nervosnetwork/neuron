@@ -41,7 +41,7 @@ export interface DAORecordProps extends State.NervosDAORecord {
 }
 
 export const DAORecord = ({
-  blockNumber,
+  blockHash,
   tipBlockTimestamp,
   capacity,
   outPoint: { txHash, index },
@@ -73,7 +73,7 @@ export const DAORecord = ({
     setApc,
   })
 
-  hooks.useUpdateWithdrawEpochs({ isWithdrawn, blockNumber, setWithdrawEpoch, setWithdrawTimestamp })
+  hooks.useUpdateWithdrawEpochs({ isWithdrawn, blockHash, setWithdrawEpoch, setWithdrawTimestamp })
   const onTxRecordClick = hooks.useOnTxRecordClick()
 
   const currentEpochValue = epochParser(currentEpoch).value
@@ -136,9 +136,9 @@ export const DAORecord = ({
   }
 
   const lockedPeriod =
-    unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
+    unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo.timestamp - +depositInfo.timestamp : undefined
   const compensatedPeriod =
-    withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo?.timestamp - +depositInfo?.timestamp : undefined
+    withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo.timestamp - +depositInfo.timestamp : undefined
 
   const isActionAvailable =
     connectionStatus === 'online' && [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus)

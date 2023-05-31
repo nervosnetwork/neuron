@@ -1,108 +1,108 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import TransactionEntity from './transaction'
-import Script, { ScriptHashType } from 'models/chain/script'
-import OutPoint from 'models/chain/out-point'
-import OutputModel, { OutputStatus } from 'models/chain/output'
+import Script, { ScriptHashType } from '../../../models/chain/script'
+import OutPoint from '../../../models/chain/out-point'
+import OutputModel, { OutputStatus } from '../../../models/chain/output'
 
 @Entity()
 export default class Output extends BaseEntity {
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   outPointTxHash!: string
 
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   outPointIndex!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   capacity!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockCodeHash!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockArgs!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockHashType!: ScriptHashType
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockHash!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   status!: string
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   typeCodeHash: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   typeArgs: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   typeHashType: ScriptHashType | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   typeHash: string | null = null
 
   // only first 130 chars
   @Column({
     type: 'varchar',
-    default: '0x'
+    default: '0x',
   })
   data: string = '0x'
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   daoData: string | null = null
 
   @Column({
-    type: 'boolean'
+    type: 'boolean',
   })
   hasData!: boolean
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   depositTxHash: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   depositIndex: string | null = null
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   multiSignBlake160: string | null = null
 
@@ -128,11 +128,7 @@ export default class Output extends BaseEntity {
     return undefined
   }
 
-  @ManyToOne(
-    _type => TransactionEntity,
-    transaction => transaction.outputs,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
   public toModel(): OutputModel {
@@ -152,7 +148,7 @@ export default class Output extends BaseEntity {
       blockNumber: this.transaction?.blockNumber,
       blockHash: this.transaction?.blockHash,
       depositOutPoint: this.depositOutPoint(),
-      multiSignBlake160: this.multiSignBlake160
+      multiSignBlake160: this.multiSignBlake160,
     })
   }
 }

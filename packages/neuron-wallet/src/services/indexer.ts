@@ -1,10 +1,12 @@
 import path from 'path'
 import fs from 'fs'
-import logger from 'utils/logger'
-import SyncedBlockNumber from 'models/synced-block-number'
-import { clean as cleanChain } from 'database/chain'
+import logger from '../utils/logger'
+import SyncedBlockNumber from '../models/synced-block-number'
+import { clean as cleanChain } from '../database/chain'
 import SettingsService from './settings'
 import startMonitor, { stopMonitor } from './monitor'
+import NodeService from './node'
+import { resetSyncTaskQueue } from '../block-sync-renderer'
 
 export default class IndexerService {
   private constructor() {}
@@ -18,15 +20,24 @@ export default class IndexerService {
   }
 
   static clearCache = async (clearIndexerFolder = false) => {
-    await stopMonitor('ckb')
     await cleanChain()
 
-    if (clearIndexerFolder) {
+    if (!NodeService.getInstance().isCkbNodeExternal && clearIndexerFolder) {
+      await stopMonitor('ckb')
       IndexerService.getInstance().clearData()
       await new SyncedBlockNumber().setNextBlock(BigInt(0))
+      await startMonitor('ckb', true)
     }
+    resetSyncTaskQueue.asyncPush(true)
+  }
 
-    await startMonitor('ckb')
+  static cleanOldIndexerData() {
+    const oldIndexerDataPath = SettingsService.getInstance().indexerDataPath
+    if (oldIndexerDataPath && fs.existsSync(oldIndexerDataPath)) {
+      logger.debug(`Removing old indexer data ${oldIndexerDataPath}`)
+      fs.rmSync(oldIndexerDataPath, { recursive: true, force: true })
+      SettingsService.getInstance().indexerDataPath = ''
+    }
   }
 
   clearData = () => {

@@ -14,7 +14,7 @@ const UnlockSuccess = () => {
   )
 }
 
-const RebuildSync = ({ onDismiss, onOk }: { onDismiss: React.MouseEventHandler; onOk: React.MouseEventHandler }) => {
+const RebuildSync = ({ onDismiss, onBackUp, onOk }: { onDismiss: React.MouseEventHandler; onBackUp: React.MouseEventHandler; onOk: React.MouseEventHandler }) => {
   const [t] = useTranslation()
   return (
     <div style={{ fontWeight: 200 }}>
@@ -23,8 +23,10 @@ const RebuildSync = ({ onDismiss, onOk }: { onDismiss: React.MouseEventHandler; 
         .map((s: string) => (
           <p key={s}>{s}</p>
         ))}
+      <p>{t('messages.migrate-warning')}</p>
       <div style={{ textAlign: 'right' }}>
         <Button type="cancel" label={t('common.cancel')} onClick={onDismiss} style={{ marginRight: '24px' }} />
+        <Button type="primary" label={t('common.backup')} onClick={onBackUp} style={{ marginRight: '24px' }} />
         <Button type="primary" label={t('messages.migrate')} onClick={onOk} />
       </div>
     </div>
@@ -34,10 +36,11 @@ const RebuildSync = ({ onDismiss, onOk }: { onDismiss: React.MouseEventHandler; 
 interface GlobalDialogProps {
   onDismiss: React.MouseEventHandler
   onOk: React.MouseEventHandler
+  onBackUp: React.MouseEventHandler
   type: State.GlobalDialogType
 }
 
-const GlobalDialog = ({ onDismiss, type, onOk }: GlobalDialogProps) => {
+const GlobalDialog = ({ onDismiss, type, onOk, onBackUp }: GlobalDialogProps) => {
   let content = null
   let maskClosable = true
   switch (type) {
@@ -47,7 +50,7 @@ const GlobalDialog = ({ onDismiss, type, onOk }: GlobalDialogProps) => {
     }
     case 'rebuild-sync': {
       maskClosable = false
-      content = <RebuildSync onDismiss={onDismiss} onOk={onOk} />
+      content = <RebuildSync onDismiss={onDismiss} onOk={onOk} onBackUp={onBackUp} />
       break
     }
     default: {

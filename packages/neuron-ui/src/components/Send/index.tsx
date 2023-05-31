@@ -62,7 +62,6 @@ const Send = () => {
     setErrorMessage,
     isSendMax,
     onSendMaxClick: handleSendMaxClick,
-    onScan: handleScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
@@ -175,10 +174,10 @@ const Send = () => {
                 onOutputAdd={handleOutputAdd}
                 onOutputRemove={handleOutputRemove}
                 onItemChange={handleItemChange}
-                onScan={handleScan}
                 onSendMaxClick={handleSendMaxClick}
                 onLocktimeClick={handleLocktimeClick}
                 isTimeLockable={!device}
+                isMainnet={isMainnet}
               />
             )
           }}
@@ -210,6 +209,7 @@ const Send = () => {
         <div className={styles.datetimePicker}>
           <div className={styles.datetimeDialog}>
             <DatetimePicker
+              confirmText={(time, display) => `${t('send.release-on')}${time == null ? '' : ` ${display}`}`}
               onConfirm={(time: number) => {
                 updateTransactionOutput('date')(locktimeIndex)(`${time}`)
                 setLocktimeIndex(-1)

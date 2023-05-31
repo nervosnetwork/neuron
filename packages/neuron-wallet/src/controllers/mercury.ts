@@ -1,9 +1,9 @@
 import path from 'path'
 import fs from 'fs'
-import env from 'env'
+import env from '../env'
 import { dialog } from 'electron'
 import { t } from 'i18next'
-import SettingsService from 'services/settings'
+import SettingsService from '../services/settings'
 
 const { app } = env
 
@@ -36,6 +36,6 @@ const openMigrateDialog = (type: 'hard-fork' | 'mercury') => {
     defaultId: 1,
     message: t(`${I18N_PATH}.message`),
     cancelId: 0,
-    noLink: true
+    noLink: true,
   })
 }

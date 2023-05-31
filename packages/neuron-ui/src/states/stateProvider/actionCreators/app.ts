@@ -91,23 +91,22 @@ export const dismissGlobalDialog = () => (dispatch: StateDispatch) => {
   })
 }
 
-export const showAlertDialog = (content: { title: string; message: string }) => (
-  dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>
-) => {
-  dispatch({
-    type: AppActions.UpdateAlertDialog,
-    payload: content,
-  })
-}
+export const showAlertDialog =
+  (content: { title: string; message: string }) =>
+  (dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>) => {
+    dispatch({
+      type: AppActions.UpdateAlertDialog,
+      payload: content,
+    })
+  }
 
-export const dismissAlertDialog = () => (
-  dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: null }>
-) => {
-  dispatch({
-    type: AppActions.UpdateAlertDialog,
-    payload: null,
-  })
-}
+export const dismissAlertDialog =
+  () => (dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: null }>) => {
+    dispatch({
+      type: AppActions.UpdateAlertDialog,
+      payload: null,
+    })
+  }
 
 export const toggleTopAlertVisibility = (show?: boolean) => (dispatch: StateDispatch) => {
   dispatch({

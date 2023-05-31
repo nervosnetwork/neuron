@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 
 import appState from 'states/init/app'
-import { useState as useGlobalState, useDispatch } from 'states'
 
 import {
   CONSTANTS,
@@ -26,6 +26,7 @@ import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 
+import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
@@ -40,7 +41,7 @@ const NervosDAO = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
-      tipBlockHash,
+      tipDao,
       tipBlockTimestamp,
       epoch,
     },
@@ -55,6 +56,7 @@ const NervosDAO = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t, { language }] = useTranslation()
+  const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
@@ -68,8 +70,7 @@ const NervosDAO = () => {
   const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
   const [isBalanceReserved, setIsBalanceReserved] = useState(true)
   const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
-  const updateDepositValue = hooks.useUpdateDepositValue({
-    setDepositValue,
+  hooks.useGenerateDaoDepositTx({
     setErrorMessage,
     clearGeneratedTx,
     maxDepositAmount,
@@ -79,7 +80,10 @@ const NervosDAO = () => {
     maxDepositErrorMessage,
     isBalanceReserved,
     t,
+    depositValue,
+    suggestFeeRate
   })
+  const updateDepositValue = hooks.useUpdateDepositValue({ setDepositValue })
 
   const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
   const onDepositDialogDismiss = hooks.useOnDepositDialogDismiss({
@@ -102,8 +106,17 @@ const NervosDAO = () => {
     setMaxDepositTx,
     setMaxDepositErrorMessage,
     isBalanceReserved,
+    suggestFeeRate,
   })
-  hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
+  const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
+  hooks.useInitData({
+    clearGeneratedTx,
+    dispatch,
+    updateDepositValue,
+    wallet,
+    setGenesisBlockTimestamp,
+    genesisBlockHash,
+  })
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
   const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
     activeRecord,
@@ -111,6 +124,7 @@ const NervosDAO = () => {
     clearGeneratedTx,
     walletID: wallet.id,
     dispatch,
+    suggestFeeRate,
   })
 
   const onActionClick = hooks.useOnActionClick({
@@ -138,7 +152,7 @@ const NervosDAO = () => {
   )} CKB`
   hooks.useUpdateWithdrawList({
     records,
-    tipBlockHash,
+    tipDao,
     setWithdrawList,
   })
 
@@ -149,6 +163,11 @@ const NervosDAO = () => {
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })
+
+  const onOpenDepositDialog = useCallback(() => {
+    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
+    setShowDepositDialog(true)
+  }, [])
 
   const MemoizedRecords = useMemo(() => {
     const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
@@ -190,13 +209,14 @@ const NervosDAO = () => {
             const key = record.depositOutPoint
               ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
               : `${record.outPoint.txHash}-${record.outPoint.index}`
+            const txHash = record.depositOutPoint ? record.depositOutPoint.txHash : record.outPoint.txHash
 
             const props: DAORecordProps = {
               ...record,
               tipBlockTimestamp,
               withdrawCapacity: withdrawList.get(key) || null,
               onClick: onActionClick,
-              depositEpoch: depositEpochList.get(key) || '',
+              depositEpoch: depositEpochList.get(txHash) || '',
               currentEpoch: epoch,
               genesisBlockTimestamp,
               connectionStatus,
@@ -239,8 +259,14 @@ const NervosDAO = () => {
   }, [])
 
   useEffect(() => {
-    if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
-      setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+    try {
+      if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
+        setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+      }
+    } catch (error) {
+      // ignore error
+      // When the depositValue is invalid, it displays the error in the textField, but it will throw an exception when valid wheater it's big than the max deposit value
+      // and when the depositValue is invalid, it's no need to set max depositValue.
     }
   }, [maxDepositAmount, depositValue, setDepositValue])
 
@@ -286,11 +312,11 @@ const NervosDAO = () => {
         record={activeRecord}
         onDismiss={onWithdrawDialogDismiss}
         onSubmit={onWithdrawDialogSubmit}
-        tipBlockHash={tipBlockHash}
+        tipDao={tipDao}
         currentEpoch={epoch}
       />
     ) : null
-  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
+  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipDao, epoch])
 
   const free = BigInt(wallet.balance)
   const locked = records
@@ -372,7 +398,7 @@ const NervosDAO = () => {
         <Button
           type="primary"
           disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-          onClick={() => setShowDepositDialog(true)}
+          onClick={onOpenDepositDialog}
           label={t('nervos-dao.deposit')}
         />
       </div>

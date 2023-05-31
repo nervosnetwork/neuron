@@ -11,6 +11,7 @@ import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
+import { ReactComponent as WarningAttention } from 'widgets/Icons/ExperimentalAttention.svg'
 import { getSUDTAccount, destoryAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
@@ -29,7 +30,15 @@ import {
 } from 'utils'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
-import { AddressLockType, getGenerator, useAddressLockType, useOnSumbit, useOptions, useSendType } from './hooks'
+import {
+  AddressLockType,
+  SendType,
+  getGenerator,
+  useAddressLockType,
+  useOnSumbit,
+  useOptions,
+  useSendType,
+} from './hooks'
 import styles from './sUDTSend.module.scss'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
@@ -280,8 +289,7 @@ const SUDTSend = () => {
   }, [dispatch, sendState.sendAll])
 
   const onPriceChange = useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { value } = e.target as HTMLInputElement
+    (value: string) => {
       const price = value.split('.')[0].replace(/[^\d]/, '')
       dispatch({ type: Fields.Price, payload: price })
     },
@@ -405,6 +413,12 @@ const SUDTSend = () => {
                     <span className={styles.optionTooltip} data-tooltip={t(`s-udt.send.${v.tooltip}`, v?.params)}>
                       <TooltipIcon width={12} height={12} />
                     </span>
+                  ) : null}
+                  {(v.key === SendType.secp256Cheque && !isMainnet) ? (
+                    <div className={styles.chequeWarning}>
+                      <WarningAttention />
+                      {t('messages.light-client-cheque-warning')}
+                    </div>
                   ) : null}
                 </div>
               ))}

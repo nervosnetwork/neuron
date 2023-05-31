@@ -6,10 +6,11 @@ import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
 const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'> = {
   network: {
     name: 'network',
-    remote: 'http://localhost:3000',
+    remote: 'http://127.0.0.1:3000',
     type: 0,
     id: 'd',
     chain: 'ckb',
+    genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
   },
   onAction: () => {},
   isLookingValidTarget: false,
@@ -67,10 +68,11 @@ stories.add('With knobs', () => {
   const props = {
     network: {
       name: text('Network name', 'network name'),
-      remote: text('Remote', 'http://localhost:3000'),
+      remote: text('Remote', 'http://127.0.0.1:3000'),
       type: select('Type', [0, 1], 0) as any,
       id: text('id', 'd'),
       chain: select('Chain', ['ckb', 'ckb_testnet', 'ckb_dev'], 'ckb'),
+      genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
     },
     syncPercents: number('Sync Percents', 1),
     syncBlockNumbers: text('Sync Block Number', '1/100'),

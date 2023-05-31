@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 
 const NetworkTypeLabel = ({ type }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string }) => {
   const [t] = useTranslation()
@@ -9,6 +10,9 @@ const NetworkTypeLabel = ({ type }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | 
     }
     case 'ckb_testnet': {
       return <span className="label secondary">{t('settings.network.testnet')}</span>
+    }
+    case LIGHT_CLIENT_TESTNET: {
+      return <span className="label secondary">{t('settings.network.lightTestnet')}</span>
     }
     default: {
       return <span className="label third">{t('settings.network.devnet')}</span>

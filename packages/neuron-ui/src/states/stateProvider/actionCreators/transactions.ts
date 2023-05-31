@@ -20,26 +20,25 @@ export const updateTransactionList = (params: GetTransactionListParams) => (disp
   })
 }
 
-export const updateTransactionDescription = (params: Controller.UpdateTransactionDescriptionParams) => (
-  dispatch: StateDispatch
-) => {
-  const descriptionParams = {
-    walletID: params.walletID,
-    hash: params.hash,
-    description: params.description,
-  }
-  dispatch({
-    type: NeuronWalletActions.UpdateTransactionDescription,
-    payload: descriptionParams,
-  }) // update local description before remote description to avoid the flicker on the field
-  updateRemoteTransactionDescription(params).then(res => {
-    if (res.status === 1) {
-      dispatch({
-        type: NeuronWalletActions.UpdateTransactionDescription,
-        payload: descriptionParams,
-      })
-    } else {
-      addNotification(failureResToNotification(res))(dispatch)
+export const updateTransactionDescription =
+  (params: Controller.UpdateTransactionDescriptionParams) => (dispatch: StateDispatch) => {
+    const descriptionParams = {
+      walletID: params.walletID,
+      hash: params.hash,
+      description: params.description,
     }
-  })
-}
+    dispatch({
+      type: NeuronWalletActions.UpdateTransactionDescription,
+      payload: descriptionParams,
+    }) // update local description before remote description to avoid the flicker on the field
+    updateRemoteTransactionDescription(params).then(res => {
+      if (res.status === 1) {
+        dispatch({
+          type: NeuronWalletActions.UpdateTransactionDescription,
+          payload: descriptionParams,
+        })
+      } else {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
+    })
+  }

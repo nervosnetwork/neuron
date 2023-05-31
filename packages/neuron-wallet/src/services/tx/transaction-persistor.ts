@@ -1,18 +1,18 @@
 import { getConnection, QueryRunner } from 'typeorm'
-import InputEntity from 'database/chain/entities/input'
-import OutputEntity from 'database/chain/entities/output'
-import TransactionEntity from 'database/chain/entities/transaction'
-import ArrayUtils from 'utils/array'
-import CommonUtils from 'utils/common'
-import logger from 'utils/logger'
-import OutPoint from 'models/chain/out-point'
-import Output, { OutputStatus } from 'models/chain/output'
-import Transaction, { TransactionStatus } from 'models/chain/transaction'
-import Input from 'models/chain/input'
+import InputEntity from '../../database/chain/entities/input'
+import OutputEntity from '../../database/chain/entities/output'
+import TransactionEntity from '../../database/chain/entities/transaction'
+import ArrayUtils from '../../utils/array'
+import CommonUtils from '../../utils/common'
+import logger from '../../utils/logger'
+import OutPoint from '../../models/chain/out-point'
+import Output, { OutputStatus } from '../../models/chain/output'
+import Transaction, { TransactionStatus } from '../../models/chain/transaction'
+import Input from '../../models/chain/input'
 
 export enum TxSaveType {
   Sent = 'sent',
-  Fetch = 'fetch'
+  Fetch = 'fetch',
 }
 
 export class TransactionPersistor {
@@ -68,11 +68,11 @@ export class TransactionPersistor {
               .update(OutputEntity)
               .set({
                 multiSignBlake160: o.multiSignBlake160,
-                data
+                data,
               })
               .where({
                 outPointTxHash: o.outPoint!.txHash,
-                outPointIndex: o.outPoint!.index
+                outPointIndex: o.outPoint!.index,
               })
               .execute()
 
@@ -81,11 +81,11 @@ export class TransactionPersistor {
               .update(InputEntity)
               .set({
                 multiSignBlake160: o.multiSignBlake160,
-                data
+                data,
               })
               .where({
                 outPointTxHash: o.outPoint!.txHash,
-                outPointIndex: o.outPoint!.index
+                outPointIndex: o.outPoint!.index,
               })
               .execute()
           }
@@ -100,11 +100,11 @@ export class TransactionPersistor {
                 typeCodeHash: i.type?.codeHash,
                 typeArgs: i.type?.args,
                 typeHashType: i.type?.hashType,
-                typeHash: i.typeHash
+                typeHash: i.typeHash,
               })
               .where({
                 outPointTxHash: i.previousOutput!.txHash,
-                outPointIndex: i.previousOutput!.index
+                outPointIndex: i.previousOutput!.index,
               })
               .execute()
           }
@@ -116,7 +116,7 @@ export class TransactionPersistor {
         .getRepository(InputEntity)
         .createQueryBuilder('input')
         .where({
-          transaction: txEntity
+          transaction: txEntity,
         })
         .getMany()
 
@@ -124,7 +124,7 @@ export class TransactionPersistor {
         .getRepository(OutputEntity)
         .createQueryBuilder('output')
         .where({
-          transaction: txEntity
+          transaction: txEntity,
         })
         .andWhere('status != :status', { status: OutputStatus.Dead })
         .getMany()
@@ -146,7 +146,7 @@ export class TransactionPersistor {
           if (outPoint) {
             const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
               outPointTxHash: outPoint.txHash,
-              outPointIndex: outPoint.index
+              outPointIndex: outPoint.index,
             })
             if (outputEntity && outputEntity.status !== OutputStatus.Dead) {
               outputEntity.status = OutputStatus.Dead
@@ -251,7 +251,7 @@ export class TransactionPersistor {
       if (outPoint) {
         const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
           outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index
+          outPointIndex: outPoint.index,
         })
 
         if (previousOutput && previousOutput.status !== inputStatus) {
@@ -368,7 +368,7 @@ export class TransactionPersistor {
   public static saveSentTx = async (transaction: Transaction, txHash: string): Promise<TransactionEntity> => {
     const tx = Transaction.fromObject({
       ...transaction,
-      hash: txHash
+      hash: txHash,
     })
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity

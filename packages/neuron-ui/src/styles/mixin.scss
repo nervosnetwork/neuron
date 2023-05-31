@@ -43,7 +43,7 @@
 
 @mixin dialog-confirm-button {
   border: none;
-  width: 5.125rem;
+  min-width: 5.125rem;
   height: 1.875rem;
   background-color: var(--nervos-green);
   color: #fff;

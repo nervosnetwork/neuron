@@ -36,9 +36,9 @@ const getManyByLockScriptsAndTypeScriptMock = jest.fn()
 jest.mock('../../src/services/live-cell-service', () => ({
   getInstance() {
     return {
-      getManyByLockScriptsAndTypeScript: getManyByLockScriptsAndTypeScriptMock
+      getManyByLockScriptsAndTypeScript: getManyByLockScriptsAndTypeScriptMock,
     }
-  }
+  },
 }))
 
 function resetMock() {
@@ -55,7 +55,7 @@ describe('CellsService', () => {
     lockHash: aliceLockScript.computeHash(),
     address: scriptToAddress(aliceLockScript, false),
     blake160: alicePublicKeyHash,
-    walletId: walletId1
+    walletId: walletId1,
   }
 
   const bobPublicKeyHash = '0x36c329ed630d6ce750712a477543672adab57f4c'
@@ -65,7 +65,7 @@ describe('CellsService', () => {
     lockHash: bobLockScript.computeHash(),
     address: scriptToAddress(bobLockScript, false),
     blake160: bobPublicKeyHash,
-    walletId: walletId1
+    walletId: walletId1,
   }
 
   const multisigPublicKeyHash = '0x447ff8941a6f0162d2194e9b592bb2534a3e6b74'
@@ -75,7 +75,7 @@ describe('CellsService', () => {
     lockHash: multisigLockScript.computeHash(),
     address: scriptToAddress(multisigLockScript, false),
     blake160: multisigPublicKeyHash,
-    walletId: walletId1
+    walletId: walletId1,
   }
 
   const charliePublicKeyHash = '0xe2193df51d78411601796b35b17b4f8f2cd80000'
@@ -85,7 +85,7 @@ describe('CellsService', () => {
     lockHash: charlieLockScript.computeHash(),
     address: scriptToAddress(charlieLockScript, false),
     blake160: charliePublicKeyHash,
-    walletId: walletId2
+    walletId: walletId2,
   }
 
   beforeAll(async () => {
@@ -106,7 +106,7 @@ describe('CellsService', () => {
         walletId: d.walletId,
         publicKeyInBlake160: d.lockScript.args,
         addressType: 0,
-        addressIndex: 0
+        addressIndex: 0,
       })
     )
 
@@ -216,7 +216,7 @@ describe('CellsService', () => {
         generateCell('10000', OutputStatus.Live, false, typeScript),
         generateCell('20000', OutputStatus.Sent, false, typeScript),
         generateCell('30000', OutputStatus.Pending, false, typeScript),
-        generateCell('40000', OutputStatus.Dead, false, typeScript)
+        generateCell('40000', OutputStatus.Dead, false, typeScript),
       ]
       await getConnection().manager.save(cells)
     }
@@ -265,11 +265,11 @@ describe('CellsService', () => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('1'), OutputStatus.Live, false, null, {
-          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data)
+          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data),
         }),
         generateCell(toShannon('200'), OutputStatus.Sent, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, true, null),
-        generateCell(toShannon('3000'), OutputStatus.Live, false, typeScript)
+        generateCell(toShannon('3000'), OutputStatus.Live, false, typeScript),
       ]
       await getConnection().manager.save(cells)
     }
@@ -395,7 +395,7 @@ describe('CellsService', () => {
       beforeEach(async () => {
         const cells: OutputEntity[] = [
           generateCell(toShannon('1000'), OutputStatus.Live, false, null),
-          generateCell(toShannon('2000'), OutputStatus.Live, false, null)
+          generateCell(toShannon('2000'), OutputStatus.Live, false, null),
         ]
         await getConnection().manager.save(cells)
       })
@@ -484,7 +484,7 @@ describe('CellsService', () => {
           CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
             lockArgs: ['bob.blake160'],
             hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           })
         ).rejects.toThrow(new CapacityNotEnough())
       })
@@ -494,7 +494,7 @@ describe('CellsService', () => {
           CellsService.gatherInputs(toShannon('1001'), '', '0', '1000', 0, 0, 0, undefined, {
             lockArgs: [multisigInfo.lockScript.args],
             hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           })
         ).rejects.toThrow(new MultisigConfigNeedError())
       })
@@ -513,7 +513,7 @@ describe('CellsService', () => {
             {
               lockArgs: [multisigInfo.lockScript.args],
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -522,8 +522,8 @@ describe('CellsService', () => {
                 n: 1,
                 getLockHash() {
                   return multisigInfo.lockHash
-                }
-              } as any
+                },
+              } as any,
             ]
           )
         ).rejects.toThrow(new CapacityNotEnough())
@@ -543,7 +543,7 @@ describe('CellsService', () => {
             {
               lockArgs: [multisigInfo.lockScript.args],
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -552,8 +552,8 @@ describe('CellsService', () => {
                 n: 1,
                 getLockHash() {
                   return multisigInfo.lockHash
-                }
-              } as any
+                },
+              } as any,
             ]
           )
         ).rejects.toThrow(new LiveCapacityNotEnough())
@@ -573,7 +573,7 @@ describe('CellsService', () => {
             {
               lockArgs: [multisigInfo.lockScript.args],
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -582,8 +582,8 @@ describe('CellsService', () => {
                 n: 1,
                 getLockHash() {
                   return multisigInfo.lockHash
-                }
-              } as any
+                },
+              } as any,
             ]
           )
         ).rejects.toThrow(new LiveCapacityNotEnough())
@@ -602,7 +602,7 @@ describe('CellsService', () => {
             {
               lockArgs: [multisigInfo.lockScript.args],
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+              codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
             },
             [
               {
@@ -611,8 +611,8 @@ describe('CellsService', () => {
                 n: 1,
                 getLockHash() {
                   return multisigInfo.lockHash
-                }
-              } as any
+                },
+              } as any,
             ]
           )
         ).rejects.toThrow(new CapacityNotEnoughForChange())
@@ -632,21 +632,18 @@ describe('CellsService', () => {
           {
             lockArgs: [multisigInfo.lockScript.args],
             hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH
+            codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           },
           [
             {
               ...multisigConfig,
               getLockHash() {
                 return multisigInfo.lockHash
-              }
-            } as any
+              },
+            } as any,
           ]
         )
-        const input = await getConnection()
-          .getRepository(MultisigOutput)
-          .createQueryBuilder('multisig_output')
-          .getOne()
+        const input = await getConnection().getRepository(MultisigOutput).createQueryBuilder('multisig_output').getOne()
         expect(res).toEqual({
           inputs: [new Input(input!.outPoint(), '0', input!.capacity, input!.lockScript(), input!.lockHash)],
           capacities: toShannon('1000'),
@@ -655,7 +652,7 @@ describe('CellsService', () => {
               TransactionSize.multiSignWitness(multisigConfig.r, multisigConfig.m, multisigConfig.n),
             BigInt('1000')
           ).toString(),
-          hasChangeOutput: true
+          hasChangeOutput: true,
         })
       })
     })
@@ -666,11 +663,11 @@ describe('CellsService', () => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('1'), OutputStatus.Live, false, null, {
-          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data)
+          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data),
         }),
         generateCell(toShannon('200'), OutputStatus.Sent, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, true, null),
-        generateCell(toShannon('3000'), OutputStatus.Live, false, typeScript)
+        generateCell(toShannon('3000'), OutputStatus.Live, false, typeScript),
       ]
       await getConnection().manager.save(cells)
     })
@@ -689,7 +686,7 @@ describe('CellsService', () => {
       beforeEach(async () => {
         allInputs = await CellsService.gatherAllInputs(walletId1, {
           codeHash: 'non exist lock code hash',
-          hashType: ScriptHashType.Type
+          hashType: ScriptHashType.Type,
         })
       })
       it('returns empty array', async () => {
@@ -704,7 +701,7 @@ describe('CellsService', () => {
         const inputs = await CellsService.gatherAllInputs(walletId1, {
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-          args: multisigInfo.lockScript.args
+          args: multisigInfo.lockScript.args,
         })
         expect(inputs).toHaveLength(1)
         expect(inputs[0].capacity).toEqual(toShannon('1000'))
@@ -713,7 +710,7 @@ describe('CellsService', () => {
         const inputs = await CellsService.gatherAllInputs(walletId1, {
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-          args: 'non-exist-args'
+          args: 'non-exist-args',
         })
         expect(inputs).toHaveLength(0)
       })
@@ -742,7 +739,7 @@ describe('CellsService', () => {
         generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1),
         generateCell(toShannon('2000'), OutputStatus.Live, false, null, bob, withdrawData, tx1),
         generateCell(toShannon('3000'), OutputStatus.Live, false, null, bob, depositData, tx2),
-        generateCell(toShannon('4000'), OutputStatus.Live, false, null, bob, withdrawData, tx2)
+        generateCell(toShannon('4000'), OutputStatus.Live, false, null, bob, withdrawData, tx2),
       ]
       await getConnection().manager.save([tx1, tx2, ...cells])
     }
@@ -762,9 +759,9 @@ describe('CellsService', () => {
           capacity: '1000',
           daoData: depositData,
           lock: bob.lockScript,
-          type: SystemScriptInfo.generateDaoScript()
-        })
-      ]
+          type: SystemScriptInfo.generateDaoScript(),
+        }),
+      ],
     })
 
     const withdrawTxHash = '0x' + '2'.repeat(64)
@@ -779,8 +776,8 @@ describe('CellsService', () => {
       inputs: [
         Input.fromObject({
           previousOutput: new OutPoint(depositTxHash, '0'),
-          since: '0'
-        })
+          since: '0',
+        }),
       ],
       outputs: [
         Output.fromObject({
@@ -789,9 +786,9 @@ describe('CellsService', () => {
           lock: bob.lockScript,
           type: SystemScriptInfo.generateDaoScript(),
           depositOutPoint: new OutPoint(depositTxHash, '0'),
-          depositTimestamp: depositTx.timestamp
-        })
-      ]
+          depositTimestamp: depositTx.timestamp,
+        }),
+      ],
     })
 
     const unlockTxHash = '0x' + '4'.repeat(64)
@@ -806,15 +803,15 @@ describe('CellsService', () => {
       inputs: [
         Input.fromObject({
           previousOutput: new OutPoint(withdrawTxHash, '0'),
-          since: '0'
-        })
+          since: '0',
+        }),
       ],
       outputs: [
         Output.fromObject({
           capacity: '1000',
-          lock: bob.lockScript
-        })
-      ]
+          lock: bob.lockScript,
+        }),
+      ],
     })
 
     it('deposit', async () => {
@@ -952,6 +949,146 @@ describe('CellsService', () => {
     })
   })
 
+  describe('#addUnlockInfo', () => {
+    const depositData = '0x0000000000000000'
+    const withdrawData = '0x000000000000000a'
+    const generateTx = (hash: string, timestamp: string) => {
+      const tx = new TransactionEntity()
+      tx.hash = hash
+      tx.version = '0x0'
+      tx.timestamp = timestamp
+      tx.status = TransactionStatus.Success
+      tx.witnesses = []
+      tx.blockNumber = '1'
+      tx.blockHash = '0x' + '10'.repeat(32)
+      return tx
+    }
+
+    const withdrawTxHash = '0x' + '2'.repeat(64)
+
+    const unlockTxHash = '0x' + '4'.repeat(64)
+    const unlockTx = Transaction.fromObject({
+      hash: unlockTxHash,
+      version: '0x0',
+      timestamp: '1572862777483',
+      status: TransactionStatus.Success,
+      witnesses: [],
+      blockNumber: '3',
+      blockHash: '0x' + '5'.repeat(64),
+      inputs: [
+        Input.fromObject({
+          previousOutput: new OutPoint(withdrawTxHash, '0'),
+          since: '0',
+        }),
+      ],
+      outputs: [
+        Output.fromObject({
+          capacity: '1000',
+          lock: bob.lockScript,
+        }),
+      ],
+    })
+
+    const tx1 = generateTx('0x1234', '1572862777481')
+
+    it('output cells is not cost', async () => {
+      const cells = [generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1).toModel()]
+      //@ts-ignore private property
+      await CellsService.addUnlockInfo(cells)
+      expect(cells[0].unlockInfo).toBeUndefined()
+    })
+
+    it('output cells no transaction', async () => {
+      const cells = [generateCell(toShannon('1000'), OutputStatus.Dead, false, null, bob, depositData, tx1).toModel()]
+      //@ts-ignore private property
+      await CellsService.addUnlockInfo(cells)
+      expect(cells[0].unlockInfo).toBeUndefined()
+    })
+
+    it('output cells has cost', async () => {
+      await TransactionPersistor.saveFetchTx(unlockTx)
+      const outputs = Output.fromObject({
+        capacity: '1000',
+        daoData: withdrawData,
+        lock: bob.lockScript,
+        type: SystemScriptInfo.generateDaoScript(),
+        outPoint: new OutPoint(withdrawTxHash, '0'),
+        status: OutputStatus.Dead,
+      })
+      //@ts-ignore private property
+      await CellsService.addUnlockInfo([outputs])
+      expect(outputs.unlockInfo?.txHash).toEqual(unlockTxHash)
+    })
+  })
+
+  describe('#addDepositInfo', () => {
+    const depositData = '0x0000000000000000'
+    const withdrawData = '0x000000000000000a'
+    const generateTx = (hash: string, timestamp: string) => {
+      const tx = new TransactionEntity()
+      tx.hash = hash
+      tx.version = '0x0'
+      tx.timestamp = timestamp
+      tx.status = TransactionStatus.Success
+      tx.witnesses = []
+      tx.blockNumber = '1'
+      tx.blockHash = '0x' + '10'.repeat(32)
+      return tx
+    }
+
+    const depositTxHash = '0x' + '0'.repeat(64)
+    const depositTx = Transaction.fromObject({
+      hash: depositTxHash,
+      version: '0x0',
+      timestamp: '1572862777481',
+      status: TransactionStatus.Success,
+      witnesses: [],
+      blockNumber: '1',
+      blockHash: '0x' + '1'.repeat(64),
+      inputs: [],
+      outputs: [
+        Output.fromObject({
+          capacity: '1000',
+          daoData: depositData,
+          lock: bob.lockScript,
+          type: SystemScriptInfo.generateDaoScript(),
+        }),
+      ],
+    })
+
+    const tx1 = generateTx('0x1234', '1572862777481')
+
+    it('output cells is not deposit', async () => {
+      const cells = [generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1).toModel()]
+      //@ts-ignore private property
+      await CellsService.addDepositInfo(cells)
+      expect(cells[0].depositInfo).toBeUndefined()
+    })
+
+    it('output cells no transaction', async () => {
+      const cells = [generateCell(toShannon('1000'), OutputStatus.Dead, false, null, bob, depositData, tx1).toModel()]
+      cells[0].depositOutPoint = new OutPoint('0x' + '0'.repeat(64), '0x0')
+      //@ts-ignore private property
+      await CellsService.addDepositInfo(cells)
+      expect(cells[0].depositInfo).toBeUndefined()
+    })
+
+    it('output cells has cost', async () => {
+      await TransactionPersistor.saveFetchTx(depositTx)
+      const outputs = Output.fromObject({
+        capacity: '1000',
+        daoData: withdrawData,
+        lock: bob.lockScript,
+        type: SystemScriptInfo.generateDaoScript(),
+        depositOutPoint: new OutPoint(depositTx.hash!, '0'),
+        status: OutputStatus.Dead,
+      })
+      //@ts-ignore
+      await CellsService.addDepositInfo([outputs])
+      expect(outputs.depositInfo?.txHash).toEqual(depositTxHash)
+    })
+  })
+
   describe('#usedByAnyoneCanPayBlake160s', () => {
     const fakeArgs1 = '0x1'
     const fakeArgs2 = '0x2'
@@ -1004,7 +1141,7 @@ describe('CellsService', () => {
 
     describe('with indexed customized asset outputs', () => {
       const user = {
-        lockScript: multiSignLockScript
+        lockScript: multiSignLockScript,
       }
 
       const receiverChequeLock = assetAccountInfo.generateChequeScript(bobDefaultLock.computeHash(), '0'.repeat(40))
@@ -1031,7 +1168,7 @@ describe('CellsService', () => {
           // unknown asset
           generateCell('666', OutputStatus.Live, true, typeScript, { lockScript: bobDefaultLock }),
           // sudt asset
-          generateCell('777', OutputStatus.Live, true, sudtType, { lockScript: bobDefaultLock })
+          generateCell('777', OutputStatus.Live, true, sudtType, { lockScript: bobDefaultLock }),
         ]
         await getConnection().manager.save(cells)
       })
@@ -1076,7 +1213,7 @@ describe('CellsService', () => {
             expect(cells[0].customizedAssetInfo).toEqual({
               lock: CustomizedLock.SUDT,
               type: CustomizedType.SUDT,
-              data: ''
+              data: '',
             })
           })
         })
@@ -1154,7 +1291,7 @@ describe('CellsService', () => {
         index: string
       } = {
         txHash: '0x364ded6d4f2206041d0a635d63d3cfadc5b38b3a17e0cabc0d272d142d3542b8',
-        index: '0x0'
+        index: '0x0',
       },
       data?: number
     ) => {
@@ -1170,153 +1307,224 @@ describe('CellsService', () => {
     const gliaTypeScript = Script.fromObject({
       codeHash: '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
       hashType: ScriptHashType.Type,
-      args: '0x6fe3733cd9df22d05b8a70f7b505d0fb67fb58fb88693217135ff5079713e902'
+      args: '0x6fe3733cd9df22d05b8a70f7b505d0fb67fb58fb88693217135ff5079713e902',
     })
     it('exception no live cell CapacityNotEnough', async () => {
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([])
-      await expect(CellsService.gatherSudtInputs('0', walletId1, [], gliaTypeScript, '')).rejects.toThrow(new CapacityNotEnough())
+      await expect(CellsService.gatherSudtInputs('0', walletId1, [], gliaTypeScript, '')).rejects.toThrow(
+        new CapacityNotEnough()
+      )
     })
     it('exception amount oveflow CapacityNotEnough', async () => {
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([
-        generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 1000)
+        generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 1000),
       ])
-      await expect(CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, '')).rejects.toThrow(new CapacityNotEnough())
+      await expect(CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, '')).rejects.toThrow(
+        new CapacityNotEnough()
+      )
     })
     it('no fee success with exist cell', async () => {
       const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
       const res = await CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, '')
       expect(res).toEqual({
-        anyoneCanPayInputs: [Input.fromObject({
-          previousOutput: liveCell.outPoint(),
-          since: '0',
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          lockHash: liveCell.lockHash,
-          type: liveCell.type(),
-          typeHash: liveCell.typeHash,
-          data: liveCell.data
-        })],
+        anyoneCanPayInputs: [
+          Input.fromObject({
+            previousOutput: liveCell.outPoint(),
+            since: '0',
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            lockHash: liveCell.lockHash,
+            type: liveCell.type(),
+            typeHash: liveCell.typeHash,
+            data: liveCell.data,
+          }),
+        ],
         changeInputs: [],
-        anyoneCanPayOutputs: [Output.fromObject({
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          type: liveCell.type(),
-          data: BufferUtils.writeBigUInt128LE(BigInt(1000))
-        })],
+        anyoneCanPayOutputs: [
+          Output.fromObject({
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            type: liveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(1000)),
+          }),
+        ],
         changeOutput: undefined,
         finalFee: '0',
-        amount: '2000'
+        amount: '2000',
       })
     }),
-    it('fee not enough', async () => {
-      const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
-      getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
-      await expect(CellsService.gatherSudtInputs('2000', 'w3', [], gliaTypeScript, alice.blake160, '1000'))
-        .rejects.toThrow(new CapacityNotEnough())
-    })
+      it('fee not enough', async () => {
+        const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
+        getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
+        await expect(
+          CellsService.gatherSudtInputs('2000', 'w3', [], gliaTypeScript, alice.blake160, '1000')
+        ).rejects.toThrow(new CapacityNotEnough())
+      })
     it('fee enough', async () => {
       const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
       const output = await createCell(toShannon('62'), OutputStatus.Live, false, null, { lockScript: bobLockScript })
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
       const res = await CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, alice.blake160, '1000')
       expect(res).toEqual({
-        anyoneCanPayInputs: [Input.fromObject({
-          previousOutput: liveCell.outPoint(),
-          since: '0',
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          lockHash: liveCell.lockHash,
-          type: liveCell.type(),
-          typeHash: liveCell.typeHash,
-          data: liveCell.data
-        })],
+        anyoneCanPayInputs: [
+          Input.fromObject({
+            previousOutput: liveCell.outPoint(),
+            since: '0',
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            lockHash: liveCell.lockHash,
+            type: liveCell.type(),
+            typeHash: liveCell.typeHash,
+            data: liveCell.data,
+          }),
+        ],
         changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
-        anyoneCanPayOutputs: [Output.fromObject({
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          type: liveCell.type(),
-          data: BufferUtils.writeBigUInt128LE(BigInt(1000))
-        })],
+        anyoneCanPayOutputs: [
+          Output.fromObject({
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            type: liveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(1000)),
+          }),
+        ],
         changeOutput: Output.fromObject({
           capacity: (BigInt(toShannon('62')) - BigInt('1000')).toString(),
-          lock: SystemScriptInfo.generateSecpScript(alice.blake160)
+          lock: SystemScriptInfo.generateSecpScript(alice.blake160),
         }),
         finalFee: '1000',
-        amount: '2000'
+        amount: '2000',
       })
     })
     it('add capacity and capacity not enough', async () => {
       const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
       await createCell(toShannon('61'), OutputStatus.Live, false, null, { lockScript: bobLockScript })
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
-      await expect(CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, alice.blake160, '1000', '0', 0, 0, 0, toShannon('61')))
-      .rejects.toThrow(new CapacityNotEnough())
+      await expect(
+        CellsService.gatherSudtInputs(
+          '2000',
+          walletId1,
+          [],
+          gliaTypeScript,
+          alice.blake160,
+          '1000',
+          '0',
+          0,
+          0,
+          0,
+          toShannon('61')
+        )
+      ).rejects.toThrow(new CapacityNotEnough())
     })
     it('add capacity,no fee capacity enough', async () => {
       const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
       const output = await createCell(toShannon('61'), OutputStatus.Live, false, null, { lockScript: bobLockScript })
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
-      const res = await CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, alice.blake160, '0', '0', 0, 0, 0, toShannon('61'))
+      const res = await CellsService.gatherSudtInputs(
+        '2000',
+        walletId1,
+        [],
+        gliaTypeScript,
+        alice.blake160,
+        '0',
+        '0',
+        0,
+        0,
+        0,
+        toShannon('61')
+      )
       expect(res).toEqual({
-        anyoneCanPayInputs: [Input.fromObject({
-          previousOutput: liveCell.outPoint(),
-          since: '0',
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          lockHash: liveCell.lockHash,
-          type: liveCell.type(),
-          typeHash: liveCell.typeHash,
-          data: liveCell.data
-        })],
+        anyoneCanPayInputs: [
+          Input.fromObject({
+            previousOutput: liveCell.outPoint(),
+            since: '0',
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            lockHash: liveCell.lockHash,
+            type: liveCell.type(),
+            typeHash: liveCell.typeHash,
+            data: liveCell.data,
+          }),
+        ],
         changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
-        anyoneCanPayOutputs: [Output.fromObject({
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          type: liveCell.type(),
-          data: BufferUtils.writeBigUInt128LE(BigInt(1000))
-        })],
+        anyoneCanPayOutputs: [
+          Output.fromObject({
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            type: liveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(1000)),
+          }),
+        ],
         changeOutput: undefined,
         finalFee: '0',
-        amount: '2000'
+        amount: '2000',
       })
     })
     it('add capacity,with fee capacity not enough', async () => {
       const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
       await createCell(toShannon('61'), OutputStatus.Live, false, null, { lockScript: bobLockScript })
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
-      await expect(CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, alice.blake160, '1000', '0', 0, 0, 0, toShannon('61')))
-        .rejects.toThrow(new CapacityNotEnough())
+      await expect(
+        CellsService.gatherSudtInputs(
+          '2000',
+          walletId1,
+          [],
+          gliaTypeScript,
+          alice.blake160,
+          '1000',
+          '0',
+          0,
+          0,
+          0,
+          toShannon('61')
+        )
+      ).rejects.toThrow(new CapacityNotEnough())
     })
     it('add capacity,with fee capacity enough', async () => {
       const liveCell = generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 3000)
       const output = await createCell(toShannon('123'), OutputStatus.Live, false, null, { lockScript: bobLockScript })
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([liveCell])
-      const res = await CellsService.gatherSudtInputs('2000', walletId1, [], gliaTypeScript, alice.blake160, '1000', '0', 0, 0, 0, toShannon('61'))
+      const res = await CellsService.gatherSudtInputs(
+        '2000',
+        walletId1,
+        [],
+        gliaTypeScript,
+        alice.blake160,
+        '1000',
+        '0',
+        0,
+        0,
+        0,
+        toShannon('61')
+      )
       expect(res).toEqual({
-        anyoneCanPayInputs: [Input.fromObject({
-          previousOutput: liveCell.outPoint(),
-          since: '0',
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          lockHash: liveCell.lockHash,
-          type: liveCell.type(),
-          typeHash: liveCell.typeHash,
-          data: liveCell.data
-        })],
+        anyoneCanPayInputs: [
+          Input.fromObject({
+            previousOutput: liveCell.outPoint(),
+            since: '0',
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            lockHash: liveCell.lockHash,
+            type: liveCell.type(),
+            typeHash: liveCell.typeHash,
+            data: liveCell.data,
+          }),
+        ],
         changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
-        anyoneCanPayOutputs: [Output.fromObject({
-          capacity: liveCell.capacity,
-          lock: liveCell.lock(),
-          type: liveCell.type(),
-          data: BufferUtils.writeBigUInt128LE(BigInt(1000))
-        })],
+        anyoneCanPayOutputs: [
+          Output.fromObject({
+            capacity: liveCell.capacity,
+            lock: liveCell.lock(),
+            type: liveCell.type(),
+            data: BufferUtils.writeBigUInt128LE(BigInt(1000)),
+          }),
+        ],
         changeOutput: Output.fromObject({
           capacity: (BigInt(toShannon('123')) - BigInt(toShannon('61')) - BigInt('1000')).toString(),
-          lock: SystemScriptInfo.generateSecpScript(alice.blake160)
+          lock: SystemScriptInfo.generateSecpScript(alice.blake160),
         }),
         finalFee: '1000',
-        amount: '2000'
+        amount: '2000',
       })
     })
   })

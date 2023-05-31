@@ -322,8 +322,7 @@ const HardwareSign = ({
             if (isSuccessResponse(res)) {
               history!.push(RoutePath.History)
             } else {
-              // @ts-ignore
-              setError(res.message.content)
+              setError(typeof res.message === 'string' ? res.message : res.message.content ?? 'migrate-acp error')
             }
           })
           break
@@ -425,7 +424,6 @@ const HardwareSign = ({
   }, [offlineSignType, generatedTx, onCancel, description, experimental])
 
   useDidMount(() => {
-    // @ts-ignore
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })

@@ -1,7 +1,7 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import path from 'path'
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 
 const redistCheck = async () => {
   if (process.platform !== 'win32') {

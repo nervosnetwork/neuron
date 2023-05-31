@@ -30,10 +30,7 @@ const bytesToBinary = (bytes: Buffer): string => {
 const deriveChecksumBits = (entropyBuffer: Buffer): string => {
   const ENT = entropyBuffer.length * 8
   const CS = ENT / 32
-  const hash = crypto
-    .createHash('sha256')
-    .update(entropyBuffer)
-    .digest()
+  const hash = crypto.createHash('sha256').update(entropyBuffer).digest()
   return bytesToBinary(hash).slice(0, CS)
 }
 
@@ -149,5 +146,5 @@ export default {
   mnemonicToEntropy,
   mnemonicToSeed,
   mnemonicToSeedSync,
-  validateMnemonic
+  validateMnemonic,
 }

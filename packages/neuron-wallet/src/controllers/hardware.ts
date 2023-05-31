@@ -1,8 +1,8 @@
-import { DeviceInfo, ExtendedPublicKey, PublicKey } from 'services/hardware/common'
-import { ResponseCode } from 'utils/const'
-import HardwareWalletService from 'services/hardware'
-import { connectDeviceFailed } from 'exceptions'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
+import { ResponseCode } from '../utils/const'
+import HardwareWalletService from '../services/hardware'
+import { connectDeviceFailed } from '../exceptions'
+import { AccountExtendedPublicKey } from '../models/keys/key'
 
 export default class HardwareController {
   public async connectDevice(deviceInfo: DeviceInfo): Promise<Controller.Response<void>> {
@@ -14,7 +14,7 @@ export default class HardwareController {
     }
 
     return {
-      status: ResponseCode.Success
+      status: ResponseCode.Success,
     }
   }
 
@@ -24,7 +24,7 @@ export default class HardwareController {
     const devices = await HardwareWalletService.findDevices(model)
     return {
       status: ResponseCode.Success,
-      result: devices
+      result: devices,
     }
   }
 
@@ -34,7 +34,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: version
+      result: version,
     }
   }
 
@@ -44,7 +44,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: version
+      result: version,
     }
   }
 
@@ -54,7 +54,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: pubkey
+      result: pubkey,
     }
   }
 
@@ -65,7 +65,7 @@ export default class HardwareController {
 
     return {
       status: ResponseCode.Success,
-      result: pubkey
+      result: pubkey,
     }
   }
 }

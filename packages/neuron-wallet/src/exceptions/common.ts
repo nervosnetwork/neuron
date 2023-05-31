@@ -59,5 +59,5 @@ export default {
   ServiceHasNoResponse,
   ShouldBeTypeOf,
   InvalidJSON,
-  ShouldInChildProcess
+  ShouldInChildProcess,
 }

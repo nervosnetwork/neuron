@@ -10,7 +10,11 @@ import {
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
 } from 'services/remote'
-import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
+import {
+  wallets as walletsCache,
+  currentWallet as currentWalletCache,
+  addresses as addressesCache,
+} from 'services/localCache'
 
 import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData } from 'states'
 import { ErrorCode, addressesToBalance, failureResToNotification, isSuccessResponse, sendTxBaseAction } from 'utils'
@@ -72,42 +76,41 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
 export const sendTransaction = (params: Controller.SendTransactionParams) => async (dispatch: StateDispatch) =>
   sendTxBaseAction(sendTx, params, dispatch, addNotification)
 
-export const updateAddressListAndBalance = (params: Controller.GetAddressesByWalletIDParams) => (
-  dispatch: StateDispatch
-) => {
-  getAddressesByWalletID(params).then(res => {
-    if (isSuccessResponse(res)) {
-      const addresses = res.result || []
-      const balance = addressesToBalance(addresses)
-      dispatch({
-        type: NeuronWalletActions.UpdateAddressListAndBalance,
-        payload: { addresses, balance },
-      })
-    } else {
-      addNotification(failureResToNotification(res))(dispatch)
-    }
-  })
-}
+export const updateAddressListAndBalance =
+  (params: Controller.GetAddressesByWalletIDParams) => (dispatch: StateDispatch) => {
+    getAddressesByWalletID(params).then(res => {
+      if (isSuccessResponse(res)) {
+        const addresses = res.result || []
+        const balance = addressesToBalance(addresses)
+        dispatch({
+          type: NeuronWalletActions.UpdateAddressListAndBalance,
+          payload: { addresses, balance },
+        })
+        addressesCache.save(addresses)
+      } else {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
+    })
+  }
 
-export const updateAddressDescription = (params: Controller.UpdateAddressDescriptionParams) => (
-  dispatch: StateDispatch
-) => {
-  const descriptionParams = { address: params.address, description: params.description }
-  dispatch({
-    type: NeuronWalletActions.UpdateAddressDescription,
-    payload: descriptionParams,
-  })
-  updateRemoteAddressDescription(params).then(res => {
-    if (isSuccessResponse(res)) {
-      dispatch({
-        type: NeuronWalletActions.UpdateAddressDescription,
-        payload: descriptionParams,
-      })
-    } else {
-      addNotification(failureResToNotification(res))(dispatch)
-    }
-  })
-}
+export const updateAddressDescription =
+  (params: Controller.UpdateAddressDescriptionParams) => (dispatch: StateDispatch) => {
+    const descriptionParams = { address: params.address, description: params.description }
+    dispatch({
+      type: NeuronWalletActions.UpdateAddressDescription,
+      payload: descriptionParams,
+    })
+    updateRemoteAddressDescription(params).then(res => {
+      if (isSuccessResponse(res)) {
+        dispatch({
+          type: NeuronWalletActions.UpdateAddressDescription,
+          payload: descriptionParams,
+        })
+      } else {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
+    })
+  }
 
 export const deleteWallet = (params: Controller.DeleteWalletParams) => async (dispatch: StateDispatch) => {
   dispatch({

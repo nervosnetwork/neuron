@@ -16,6 +16,7 @@ export interface InputSelectProps {
   onChange?: (value: string, arg?: SelectOptions) => void
   value?: string
   placeholder?: string
+  inputDisabeld?: boolean
 }
 
 function parseValue(value: string, options: SelectOptions[]) {
@@ -23,7 +24,7 @@ function parseValue(value: string, options: SelectOptions[]) {
   return option?.value || value
 }
 
-const Select = ({ value, options, placeholder, disabled, onChange, className }: InputSelectProps) => {
+const Select = ({ value, options, placeholder, disabled, onChange, className, inputDisabeld }: InputSelectProps) => {
   const mounted = useRef(true)
   const root = useRef<HTMLDivElement>(null)
   const openRef = useRef<boolean>(false)
@@ -34,7 +35,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className }: 
 
   const onDocumentClick = useCallback(
     (e: any) => {
-      if (mounted.current && !root.current!.contains(e.target) && openRef.current) {
+      if (mounted.current && !root.current?.contains(e.target) && openRef.current) {
         setOpen(false)
       }
     },
@@ -121,7 +122,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className }: 
         tabIndex={0}
         data-open={openRef.current}
       >
-        <input className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
+        <input disabled={inputDisabeld} className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
         <div className={styles.arrow} />
       </div>
       {openRef.current ? (

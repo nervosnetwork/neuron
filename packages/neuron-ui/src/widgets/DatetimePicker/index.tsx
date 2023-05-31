@@ -1,11 +1,9 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { Calendar, CalendarChangeParams } from 'primereact/calendar'
+import Calendar from 'widgets/Calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
-import { addLocale } from 'primereact/api'
 import styles from './datetimePicker.module.scss'
 
-const SECONDS_PER_DAY = 24 * 3600 * 1000
 let UTC: string | number = -new Date().getTimezoneOffset() / 60
 if (UTC > 0) {
   UTC = `UTC+${UTC}`
@@ -15,10 +13,7 @@ if (UTC > 0) {
 
 export const formatDate = (datetime: Date) => {
   const month = (datetime.getMonth() + 1).toString().padStart(2, '0')
-  const date = datetime
-    .getDate()
-    .toString()
-    .padStart(2, '0')
+  const date = datetime.getDate().toString().padStart(2, '0')
   const year = datetime.getFullYear()
   return `${month}/${date}/${year}`
 }
@@ -27,46 +22,15 @@ export interface DatetimePickerProps {
   title?: string
   preset?: Date | string | number | null
   notice?: string
-  onConfirm: Function
+  onConfirm: (time: number) => void
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
+  confirmText?: string | ((time?: number, display?: string) => string)
 }
-const DatetimePicker = ({
-  preset = new Date(Date.now() + SECONDS_PER_DAY),
-  onConfirm,
-  onCancel,
-  title,
-  notice,
-}: DatetimePickerProps) => {
+const DatetimePicker = ({ preset, onConfirm, onCancel, confirmText, title, notice }: DatetimePickerProps) => {
   const [t] = useTranslation()
   const [status, setStatus] = useState<'done' | 'edit'>('done')
   const [display, setDisplay] = useState<string>(preset ? formatDate(new Date(+preset)) : '')
   const inputRef = useRef<HTMLInputElement | null>(null)
-
-  const locale: any = {
-    firstDayOfWeek: 0,
-    dayNames: ['sun', 'mon', 'tues', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.full`)),
-    dayNamesShort: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.short`)),
-    dayNamesMin: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.tag`)),
-    monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec'].map(monname =>
-      t(`datetime.${monname}.short`)
-    ),
-    monthNamesShort: [
-      'jan',
-      'feb',
-      'mar',
-      'apr',
-      'may',
-      'june',
-      'july',
-      'aug',
-      'sept',
-      'oct',
-      'nov',
-      'dec',
-    ].map(monname => t(`datetime.${monname}.short`)),
-  }
-
-  addLocale('es', locale)
 
   let selected: Date | undefined = display ? new Date(display) : undefined
   if (selected?.toString() === 'Invalid Date') {
@@ -100,8 +64,8 @@ const DatetimePicker = ({
   )
 
   const onCalendarChange = useCallback(
-    (e: CalendarChangeParams) => {
-      setDisplay(formatDate(new Date(+e.value!)))
+    (date: Date) => {
+      setDisplay(formatDate(date))
       setStatus('done')
     },
     [setDisplay, setStatus]
@@ -155,14 +119,7 @@ const DatetimePicker = ({
             onKeyPress={onKeyPress}
           />
         )}
-        <Calendar
-          value={selected}
-          minDate={new Date()}
-          onChange={onCalendarChange}
-          inline
-          locale="es"
-          className={styles.calendar}
-        />
+        <Calendar className={styles.calendar} value={selected} minDate={tomorrow} onChange={onCalendarChange} />
         {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}
         {notice ? (
           <div className={styles.notice}>
@@ -172,7 +129,16 @@ const DatetimePicker = ({
         ) : null}
         <div className={styles.actions}>
           <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
-          <Button type="submit" label={t('common.save')} onClick={onSubmit} disabled={disabled} />
+          <Button
+            type="submit"
+            label={
+              typeof confirmText === 'function'
+                ? confirmText(selected?.getTime(), display)
+                : confirmText ?? t('common.save')
+            }
+            onClick={onSubmit}
+            disabled={disabled}
+          />
         </div>
       </div>
     </div>

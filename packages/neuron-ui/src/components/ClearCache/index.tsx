@@ -18,7 +18,7 @@ const IDs = {
   rebuildCacheOption: 'rebuild-cache-option',
 }
 
-const ClearCache = ({ dispatch }: { dispatch: StateDispatch }) => {
+const ClearCache = ({ dispatch, hideRebuild }: { dispatch: StateDispatch; hideRebuild?: boolean }) => {
   const [t] = useTranslation()
   const [clearedDate, setClearedDate] = useState(cacheClearDate.load())
   const [isClearing, setIsClearing] = useState(false)
@@ -96,8 +96,12 @@ const ClearCache = ({ dispatch }: { dispatch: StateDispatch }) => {
         <div className={styles.options}>
           <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
           <label htmlFor={IDs.refreshCacheOption}>{t(`${I18N_PATH}.options.refresh.label`)}</label>
-          <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
-          <label htmlFor={IDs.rebuildCacheOption}>{t(`${I18N_PATH}.options.rebuild.label`)}</label>
+          {hideRebuild ? null : (
+            <>
+              <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
+              <label htmlFor={IDs.rebuildCacheOption}>{t(`${I18N_PATH}.options.rebuild.label`)}</label>
+            </>
+          )}
         </div>
         <div className={styles.footer}>
           <Button type="submit" label={t(`${I18N_PATH}.buttons.ok`)} onClick={handleSubmit} id={IDs.submitClearCache} />

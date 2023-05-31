@@ -57,9 +57,13 @@ export const LONG_DATA_PREFIX = '0x02'
 export const LONG_TYPE_PREFIX = '0x04'
 
 // times
-export const SYNC_REBUILD_SINCE_VERSION = '0.105'
+export const SYNC_REBUILD_SINCE_VERSION = '0.108'
 
 export const DEPRECATED_CODE_HASH: Record<string, string> = {
   AcpOnLina: '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
   AcpOnAggron: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
 }
+
+export const LIGHT_CLIENT_TESTNET = 'light_client_testnet'
+export const LIGHT_NETWORK_TYPE = 2
+export const METHOD_NOT_FOUND = -32601

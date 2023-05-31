@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 
-import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 import Edit from 'widgets/Icons/Edit.png'
@@ -35,9 +34,9 @@ interface SendSubformProps {
   onOutputAdd: () => void
   onOutputRemove: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onLocktimeClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
-  onScan?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onSendMaxClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onItemChange: React.EventHandler<React.SyntheticEvent<HTMLInputElement>>
+  isMainnet: boolean
 }
 
 const SendFieldset = ({
@@ -53,10 +52,10 @@ const SendFieldset = ({
   onOutputAdd,
   onOutputRemove,
   onLocktimeClick,
-  onScan,
   onSendMaxClick,
   onItemChange,
   isTimeLockable = true,
+  isMainnet,
 }: SendSubformProps) => {
   const [t] = useTranslation()
 
@@ -103,18 +102,6 @@ const SendFieldset = ({
         suffix="CKB"
         error={amountErrorMsg}
       />
-
-      <button
-        data-idx={idx}
-        style={styles.trigger}
-        onClick={onScan}
-        type="button"
-        aria-label="qr-btn"
-        className={styles.scanBtn}
-        data-title={t('send.scan-screen-qr-code')}
-      >
-        <Scan />
-      </button>
 
       {isMaxBtnShow ? (
         <Button
@@ -177,7 +164,7 @@ const SendFieldset = ({
           {item.date && (
             <div className={styles.locktimeWarn}>
               <Attention />
-              {t('send.locktime-warning')}
+              {t('send.locktime-warning', { extraNote: isMainnet ? null : t('messages.light-client-locktime-warning') })}
             </div>
           )}
         </div>

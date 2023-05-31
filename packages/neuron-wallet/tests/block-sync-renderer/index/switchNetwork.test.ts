@@ -7,14 +7,13 @@ describe(`switch to network`, () => {
   jest.doMock('utils/logger', () => ({ info: stubbedLoggerInfo }))
   jest.doMock('utils/queue', () => ({
     __esModule: true,
-    default: jest.fn().mockReturnValue({ asyncPush: asyncPushMock })
+    default: jest.fn().mockReturnValue({ asyncPush: asyncPushMock }),
   }))
   const blockSyncRenderer = require('block-sync-renderer')
 
   afterEach(() => {
     stubbedLoggerInfo.mockClear()
   })
-
 
   it(`should do nothing when reconnected is false and network is not changed`, () => {
     blockSyncRenderer.switchToNetwork({ ...STUB_NETWOKR, id: undefined, genesisHash: undefined }, false)
@@ -40,5 +39,4 @@ describe(`switch to network`, () => {
     await blockSyncRenderer.switchToNetwork(STUB_NETWOKR, true)
     expect(asyncPushMock).toHaveBeenCalledWith(true)
   })
-
 })
