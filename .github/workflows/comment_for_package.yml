@@ -12,26 +12,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Add package result for push commit
-        uses: actions/download-artifact@v3
+      - name: 'Download artifact'
+        uses: actions/github-script@v6
         with:
-          name: my-artifact
-          path: path/to/artifact
-          
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: path/to/artifact
+          script: |
+            const allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            const matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "upload_package_info"
+            })[0];
+            const download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            const fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/upload_package_info.zip`, Buffer.from(download.data));
+
+      - name: 'Unzip artifact'
+        run: unzip upload_package_info.zip
 
       - name: Read PR number and job id
         run: |
-          pr_number=$(cat path/to/artifact/pr_number)
-          run_id=$(cat path/to/artifact/run_id)
+          pr_number=$(cat ./pr_number)
+          run_id=$(cat ./run_id)
           echo "pr_number=$pr_number" >> "$GITHUB_ENV"
           echo "run_id=$run_id" >> "$GITHUB_ENV"
           echo ${{ env.run_id }}
           echo $pr_number
           echo $run_id
-        working-directory: path/to/artifact
+
       - uses: thollander/actions-comment-pull-request@v2
         if: ${{ pr_number != "" }}
         with:
