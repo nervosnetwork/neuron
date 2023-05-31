@@ -35,6 +35,9 @@ const ckbBinary = (): string => {
     case 'win':
       return binary + '.exe'
     case 'mac':
+      if (app.isPackaged) {
+        return binary
+      }
       return `${binary}-${process.arch === 'arm64' ? 'arm64' : 'x64'}`
     default:
       return binary
