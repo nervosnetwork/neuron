@@ -171,6 +171,7 @@ jobs:
         with:
           name: upload_package_info
           path: package_info/
+          retention-days: 3
 
   comment:
     needs: [packaging]
