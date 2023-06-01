@@ -24,7 +24,7 @@ export default class MultisigService {
         r: multisigConfig.r,
         m: multisigConfig.m,
         n: multisigConfig.n,
-        blake160s: multisigConfig.blake160s,
+        blake160s: multisigConfig.blake160s.toString(),
       })
       .getCount()
     if (result > 0) {

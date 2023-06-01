@@ -60,7 +60,7 @@
     "reflect-metadata": "0.1.13",
     "rxjs": "6.6.7",
     "sha3": "2.1.4",
-    "sqlite3": "5.1.4",
+    "sqlite3": "5.1.6",
     "subleveldown": "4.1.4",
     "typeorm": "0.2.45",
     "undici": "5.21.2",
