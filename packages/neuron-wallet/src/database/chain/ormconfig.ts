@@ -2,8 +2,8 @@ import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
 
-import logger from 'utils/logger'
-import env from 'env'
+import logger from '../../utils/logger'
+import env from '../../env'
 
 import HdPublicKeyInfo from './entities/hd-public-key-info'
 import Transaction from './entities/transaction'
@@ -17,6 +17,7 @@ import TxDescription from './entities/tx-description'
 import AddressDescription from './entities/address-description'
 import MultisigConfig from './entities/multisig-config'
 import MultisigOuput from './entities/multisig-output'
+import SyncProgress from './entities/sync-progress'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -48,6 +49,8 @@ import { UpdateAddressDescription1650984779265 } from './migrations/165098477926
 import { RemoveDuplicateBlake160s1656930265386 } from './migrations/1656930265386-RemoveDuplicateBlake160s'
 import { UpdateOutputChequeLockHash1652945662504 } from './migrations/1652945662504-UpdateOutputChequeLockHash'
 import { RemoveAddressesMultisigConfig1651820157100 } from './migrations/1651820157100-RemoveAddressesMultisigConfig'
+import { AddSyncProgress1676441837373 } from './migrations/1676441837373-AddSyncProgress'
+import { AddTypeSyncProgress1681360188494 } from './migrations/1681360188494-AddTypeSyncProgress'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -79,7 +82,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       IndexerTxHashCache,
       AddressDescription,
       MultisigConfig,
-      MultisigOuput
+      MultisigOuput,
+      SyncProgress
     ],
     migrations: [
       InitMigration1566959757554,
@@ -111,11 +115,13 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       UpdateAddressDescription1650984779265,
       RemoveDuplicateBlake160s1656930265386,
       UpdateOutputChequeLockHash1652945662504,
-      RemoveAddressesMultisigConfig1651820157100
+      RemoveAddressesMultisigConfig1651820157100,
+      AddSyncProgress1676441837373,
+      AddTypeSyncProgress1681360188494
     ],
     logger: 'simple-console',
     logging,
-    maxQueryExecutionTime: 30
+    maxQueryExecutionTime: 30,
   }
 }
 

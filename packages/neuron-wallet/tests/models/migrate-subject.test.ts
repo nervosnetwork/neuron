@@ -2,17 +2,17 @@ import CommonUtils from '../../src/utils/common'
 
 const nextMock = jest.fn()
 jest.doMock('rxjs', () => {
-  const rxjs = jest.requireActual('rxjs');
+  const rxjs = jest.requireActual('rxjs')
   return {
     __esModule: true,
     ...rxjs,
-    Subject: function() {
+    Subject: function () {
       const res = new rxjs.Subject()
       res.next = nextMock
       return res
-    }
+    },
   }
-});
+})
 
 import MigrateSubject from '../../src/models/subjects/migrate-subject'
 
@@ -58,10 +58,10 @@ describe('migrate subject test', () => {
   it('migrate end with failed', async () => {
     MigrateSubject.next({ type: 'need-migrate' })
     MigrateSubject.next({ type: 'migrating' })
-    MigrateSubject.next({ type: 'failed', reason: 'failed'})
+    MigrateSubject.next({ type: 'failed', reason: 'failed' })
     await CommonUtils.sleep(3000)
     MigrateSubject.getSubject().unsubscribe()
-    expect(nextMock).toHaveBeenLastCalledWith({ type: 'failed', reason: 'failed'})
+    expect(nextMock).toHaveBeenLastCalledWith({ type: 'failed', reason: 'failed' })
     expect(nextMock).toBeCalledTimes(3)
   })
 })

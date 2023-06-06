@@ -17,6 +17,7 @@ const SUDTMigrateToExistAccountDialog = ({
   sUDTAccounts,
   isMainnet,
   walletID,
+  isLightClient,
 }: {
   cell: SpecialAssetCell
   closeDialog: () => void
@@ -24,6 +25,7 @@ const SUDTMigrateToExistAccountDialog = ({
   sUDTAccounts: State.SUDTAccount[]
   isMainnet: boolean
   walletID: string
+  isLightClient: boolean
 }) => {
   const [t] = useTranslation()
   const [address, setAddress] = useState('')
@@ -92,6 +94,7 @@ const SUDTMigrateToExistAccountDialog = ({
             onChange={onAddressChange}
             value={address}
             className={styles.addressInputSelect}
+            inputDisabeld={isLightClient}
           />
           {addressError && <div className={styles.error}>{addressError}</div>}
         </div>

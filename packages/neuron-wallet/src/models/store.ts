@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import FileService from 'services/file'
+import FileService from '../services/file'
 
 class Store extends EventEmitter {
   public moduleName: string

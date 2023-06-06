@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ReactComponent as ArrowPrev } from 'widgets/Icons/ArrowPrev.svg'
+import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import {
   getMonthCalendar,
   getLocalMonthNames,
@@ -11,8 +13,6 @@ import {
   isDayInRange,
   WeekDayRange,
 } from './utils'
-import { ReactComponent as ArrowPrev } from 'widgets/Icons/ArrowPrev.svg'
-import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import { ButtonHasFocus, useTableFocusControl, useSelectorFocusControl, useFocusObserve } from './focusControl'
 import styles from './calendar.module.scss'
 
@@ -73,11 +73,6 @@ const Calendar: React.FC<CalendarProps> = ({
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [status, setStatus] = useState<'year' | 'month' | 'date'>('date')
 
-  useEffect(() => {
-    setYear(value?.getFullYear() ?? new Date().getFullYear())
-    setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
-  }, [value?.toDateString()])
-
   const [uId] = useState(() => (+new Date()).toString(16).slice(-4))
 
   const [t, { language }] = useTranslation()
@@ -88,12 +83,10 @@ const Calendar: React.FC<CalendarProps> = ({
   const weekTitle = useMemo(() => Array.from({ length: 7 }, (_, i) => weekNames[(i + firstDayOfWeek) % 7]), [weekNames])
   const monthShortName = monthShortNames[month - 1]
 
-  const calendar = useMemo(() => getMonthCalendar(year, month, firstDayOfWeek, language), [
-    year,
-    month,
-    firstDayOfWeek,
-    language,
-  ])
+  const calendar = useMemo(
+    () => getMonthCalendar(year, month, firstDayOfWeek, language),
+    [year, month, firstDayOfWeek, language]
+  )
   function isDisabledTime(date: Date): boolean {
     return !isDayInRange(date, { minDate, maxDate })
   }

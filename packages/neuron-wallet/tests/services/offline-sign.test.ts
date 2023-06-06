@@ -2,7 +2,7 @@ const stubbedElectronShowOpenDialog = jest.fn()
 const stubbedElectronShowErrorBox = jest.fn()
 const stubbedReadfileSync = jest.fn()
 
-function resetMocks () {
+function resetMocks() {
   stubbedElectronShowErrorBox.mockReset()
   stubbedElectronShowOpenDialog.mockReset()
   stubbedReadfileSync.mockReset()
@@ -18,14 +18,14 @@ describe('OfflineSignService', () => {
       return {
         dialog: {
           showOpenDialog: stubbedElectronShowOpenDialog,
-          showErrorBox: stubbedElectronShowErrorBox
-        }
+          showErrorBox: stubbedElectronShowErrorBox,
+        },
       }
     })
 
     jest.doMock('fs', () => {
       return {
-        readFileSync: stubbedReadfileSync
+        readFileSync: stubbedReadfileSync,
       }
     })
 
@@ -33,7 +33,6 @@ describe('OfflineSignService', () => {
   })
 
   describe('loadTransactionJSON', () => {
-
     describe('early return', () => {
       beforeEach(() => {
         resetMocks()
@@ -41,7 +40,7 @@ describe('OfflineSignService', () => {
 
       it('early return if user cancel', async () => {
         stubbedElectronShowOpenDialog.mockReturnValueOnce({
-          canceled: true
+          canceled: true,
         })
         const result = await OfflineSignService.loadTransactionJSON()
         expect(stubbedElectronShowOpenDialog).toHaveBeenCalled()
@@ -51,7 +50,7 @@ describe('OfflineSignService', () => {
 
       it('early return if filePath is void', async () => {
         stubbedElectronShowOpenDialog.mockReturnValueOnce({
-          canceled: false
+          canceled: false,
         })
         const result = await OfflineSignService.loadTransactionJSON()
         expect(stubbedElectronShowOpenDialog).toHaveBeenCalled()
@@ -69,7 +68,7 @@ describe('OfflineSignService', () => {
 
       stubbedElectronShowOpenDialog.mockReturnValue({
         canceled: false,
-        filePaths: [filePath]
+        filePaths: [filePath],
       })
     })
 
@@ -99,7 +98,7 @@ describe('OfflineSignService', () => {
 
       stubbedElectronShowOpenDialog.mockReturnValueOnce({
         canceled: false,
-        filePaths: [filePath]
+        filePaths: [filePath],
       })
       stubbedReadfileSync.mockReturnValueOnce(`{ "transaction": {} }`)
     })

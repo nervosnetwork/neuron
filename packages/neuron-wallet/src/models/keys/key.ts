@@ -98,7 +98,7 @@ export class ExtendedPrivateKey {
 
 export enum DefaultAddressNumber {
   Receiving = 20,
-  Change = 10
+  Change = 10,
 }
 
 export interface Addresses {

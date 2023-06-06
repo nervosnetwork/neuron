@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm'
-import AssetAccountModel from 'models/asset-account'
+import AssetAccountModel from '../../../models/asset-account'
 import SudtTokenInfo from './sudt-token-info'
 
 @Entity()
@@ -9,31 +9,27 @@ export default class AssetAccount {
   id!: number
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   tokenID!: string
 
   @Column({
     type: 'varchar',
-    default: ''
+    default: '',
   })
   accountName!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   balance!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   blake160!: string
 
-  @ManyToOne(
-    _type => SudtTokenInfo,
-    sudtTokenInfo => sudtTokenInfo.assetAccounts,
-    { onDelete: 'CASCADE' }
-  )
+  @ManyToOne(_type => SudtTokenInfo, sudtTokenInfo => sudtTokenInfo.assetAccounts, { onDelete: 'CASCADE' })
   @JoinColumn([{ name: 'tokenID', referencedColumnName: 'tokenID' }])
   sudtTokenInfo!: SudtTokenInfo
 

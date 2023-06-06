@@ -1,25 +1,29 @@
 import path from 'path'
 import { fork, ChildProcess } from 'child_process'
-import SyncApiController from 'controllers/sync-api'
-import NetworksService from 'services/networks'
-import AddressService from 'services/addresses'
-import WalletService from 'services/wallets'
-import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import DataUpdateSubject from 'models/subjects/data-update'
-import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import WalletDeletedSubject from 'models/subjects/wallet-deleted-subject'
-import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
-import { LumosCellQuery, LumosCell } from './sync/indexer-connector'
+import SyncApiController from '../controllers/sync-api'
+import NetworksService from '../services/networks'
+import AddressService from '../services/addresses'
+import WalletService from '../services/wallets'
+import { Network, EMPTY_GENESIS_HASH } from '../models/network'
+import DataUpdateSubject from '../models/subjects/data-update'
+import AddressCreatedSubject from '../models/subjects/address-created-subject'
+import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
+import TxDbChangedSubject from '../models/subjects/tx-db-changed-subject'
+import { LumosCellQuery, LumosCell } from './sync/connector'
 import { WorkerMessage, StartParams, QueryIndexerParams } from './task'
-import logger from 'utils/logger'
-import CommonUtils from 'utils/common'
-import queueWrapper from 'utils/queue'
-import env from 'env'
+import logger from '../utils/logger'
+import CommonUtils from '../utils/common'
+import queueWrapper from '../utils/queue'
+import env from '../env'
+import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-db-changed-subject'
+import Multisig from '../services/multisig'
+import { SyncAddressType } from '../database/chain/entities/sync-progress'
+import { debounceTime } from 'rxjs/operators'
 
 let network: Network | null
 let child: ChildProcess | null = null
 let requestId = 0
-let requests = new Map<number, Record<'resolve' | 'reject', Function>>()
+let requests = new Map<number, Record<'resolve' | 'reject', (val?: unknown) => unknown>>()
 
 export const killBlockSyncTask = async () => {
   const _child = child
@@ -45,7 +49,7 @@ const waitForChildClose = (c: ChildProcess) =>
       type: 'call',
       id: requestId++,
       channel: 'unmount',
-      message: null
+      message: null,
     }
     c.send(msg, err => {
       if (err) {
@@ -91,7 +95,7 @@ export const queryIndexer = async (query: LumosCellQuery): Promise<LumosCell[]> 
     type: 'call',
     id: requestId++,
     channel: 'queryIndexer',
-    message: query
+    message: query,
   }
   return registerRequest(_child, msg).catch(err => {
     logger.error(`Sync:\tfailed to register query indexer task`, err)
@@ -105,7 +109,8 @@ export const createBlockSyncTask = async () => {
   // prevents the sync task from being started repeatedly if fork does not finish executing.
   child = fork(path.join(__dirname, 'task-wrapper.js'), [], {
     env: { fileBasePath: env.fileBasePath },
-    stdio: ['ipc', process.stdout, 'pipe']
+    stdio: ['ipc', process.stdout, 'pipe'],
+    execArgv: env.app.isPackaged ? [] : ['--inspect']
   })
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {
@@ -159,7 +164,7 @@ export const createBlockSyncTask = async () => {
 
   DataUpdateSubject.next({
     dataType: 'transaction',
-    actionType: 'update'
+    actionType: 'update',
   })
 
   const _child = child
@@ -170,7 +175,7 @@ export const createBlockSyncTask = async () => {
       genesisHash: network.genesisHash,
       url: network.remote,
       addressMetas,
-      indexerUrl: network.remote
+      indexerUrl: network.remote,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {
@@ -192,3 +197,17 @@ export const registerRequest = (c: ChildProcess, msg: Required<WorkerMessage>) =
 
 AddressCreatedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
 WalletDeletedSubject.getSubject().subscribe(() => resetSyncTaskQueue.asyncPush(true))
+MultisigConfigDbChangedSubject.getSubject()
+  .pipe(debounceTime(1000))
+  .subscribe(async () => {
+    if (!child) {
+      return
+    }
+    const appendScripts = await Multisig.getMultisigConfigForLight()
+    const msg: Required<WorkerMessage<
+      { walletId: string; script: CKBComponents.Script; addressType: SyncAddressType }[]
+    >> = { type: 'call', channel: 'append_scripts', id: requestId++, message: appendScripts }
+    return registerRequest(child, msg).catch(err => {
+      logger.error(`Sync:\ffailed to append script to light client`, err)
+    })
+  })

@@ -1,8 +1,10 @@
+/* eslint-disable no-bitwise */
 import React, { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { clipboard, nativeImage } from 'electron'
 import canvg from 'canvg'
 import styles from './qrcode.module.scss'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const QRCodeImpl = require('qr.js/lib/QRCode')
 
 enum ErrorCorrectLevel {

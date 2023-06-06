@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { useTranslation } from 'react-i18next'
 
 import appState from 'states/init/app'
@@ -14,13 +14,10 @@ import {
   getCurrentUrl,
   getSyncStatus,
   CKBToShannonFormatter,
-  ErrorCode,
-  CapacityUnit,
-  isSuccessResponse,
   clsx,
 } from 'utils'
 
-import { generateDaoDepositTx, openExternal } from 'services/remote'
+import { openExternal } from 'services/remote'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -45,7 +42,7 @@ const NervosDAO = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
-      tipBlockHash,
+      tipDao,
       tipBlockTimestamp,
       epoch,
       pageNotice,
@@ -76,8 +73,7 @@ const NervosDAO = () => {
   const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
   const [isBalanceReserved, setIsBalanceReserved] = useState(true)
   const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
-  const updateDepositValue = hooks.useUpdateDepositValue({
-    setDepositValue,
+  hooks.useGenerateDaoDepositTx({
     setErrorMessage,
     clearGeneratedTx,
     maxDepositAmount,
@@ -87,8 +83,10 @@ const NervosDAO = () => {
     maxDepositErrorMessage,
     isBalanceReserved,
     t,
-    suggestFeeRate,
+    depositValue,
+    suggestFeeRate
   })
+  const updateDepositValue = hooks.useUpdateDepositValue({ setDepositValue })
 
   const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
   const onDepositDialogDismiss = hooks.useOnDepositDialogDismiss({
@@ -113,7 +111,15 @@ const NervosDAO = () => {
     isBalanceReserved,
     suggestFeeRate,
   })
-  hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
+  const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
+  hooks.useInitData({
+    clearGeneratedTx,
+    dispatch,
+    updateDepositValue,
+    wallet,
+    setGenesisBlockTimestamp,
+    genesisBlockHash,
+  })
   hooks.useUpdateGlobalAPC({ bestKnownBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
   const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
     activeRecord,
@@ -149,7 +155,7 @@ const NervosDAO = () => {
   )} CKB`
   hooks.useUpdateWithdrawList({
     records,
-    tipBlockHash,
+    tipDao,
     setWithdrawList,
   })
 
@@ -160,6 +166,11 @@ const NervosDAO = () => {
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })
+
+  const onOpenDepositDialog = useCallback(() => {
+    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
+    setShowDepositDialog(true)
+  }, [])
 
   const MemoizedRecords = useMemo(() => {
     const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
@@ -202,13 +213,14 @@ const NervosDAO = () => {
               const key = record.depositOutPoint
                 ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
                 : `${record.outPoint.txHash}-${record.outPoint.index}`
+              const txHash = record.depositOutPoint ? record.depositOutPoint.txHash : record.outPoint.txHash
 
               const props: DAORecordProps = {
                 ...record,
                 tipBlockTimestamp,
                 withdrawCapacity: withdrawList.get(key) || null,
                 onClick: onActionClick,
-                depositEpoch: depositEpochList.get(key) || '',
+                depositEpoch: depositEpochList.get(txHash) || '',
                 currentEpoch: epoch,
                 genesisBlockTimestamp,
                 connectionStatus,
@@ -260,27 +272,6 @@ const NervosDAO = () => {
     }
   }, [maxDepositAmount, depositValue, setDepositValue])
 
-  useEffect(() => {
-    generateDaoDepositTx({
-      feeRate: `${suggestFeeRate}`,
-      capacity: CKBToShannonFormatter(depositValue, CapacityUnit.CKB),
-      walletID: wallet.id,
-    }).then(res => {
-      if (isSuccessResponse(res)) {
-        dispatch({
-          type: AppActions.UpdateGeneratedTx,
-          payload: res.result,
-        })
-      } else if (res.status === 0) {
-        setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-      } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
-        setErrorMessage(t(`messages.codes.106`))
-      } else {
-        setErrorMessage(t(`messages.codes.${res.status}`))
-      }
-    })
-  }, [suggestFeeRate, depositValue])
-
   const MemoizedDepositDialog = useMemo(() => {
     return (
       <DepositDialog
@@ -323,11 +314,11 @@ const NervosDAO = () => {
         record={activeRecord}
         onDismiss={onWithdrawDialogDismiss}
         onSubmit={onWithdrawDialogSubmit}
-        tipBlockHash={tipBlockHash}
+        tipDao={tipDao}
         currentEpoch={epoch}
       />
     ) : null
-  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
+  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipDao, epoch])
 
   const free = BigInt(wallet.balance)
   const locked = records
@@ -431,7 +422,7 @@ const NervosDAO = () => {
             className={styles.action}
             type="button"
             disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-            onClick={() => setShowDepositDialog(true)}
+            onClick={onOpenDepositDialog}
           >
             <Deposit />
             {t('nervos-dao.deposit')}

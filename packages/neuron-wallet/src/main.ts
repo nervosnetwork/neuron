@@ -1,9 +1,9 @@
 import { app } from 'electron'
 
-import AppController from 'controllers/app'
-import SettingsService from 'services/settings'
-import { changeLanguage } from 'locales/i18n'
-import logger from 'utils/logger'
+import AppController from './controllers/app'
+import SettingsService from './services/settings'
+import { changeLanguage } from './locales/i18n'
+import logger from './utils/logger'
 
 const appController = AppController.getInstance()
 

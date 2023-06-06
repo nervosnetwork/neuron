@@ -28,6 +28,7 @@ import SUDTMigrateDialog from 'components/SUDTMigrateDialog'
 import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDialog'
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import {
   useMigrate,
   useClickMigrate,
@@ -113,6 +114,10 @@ const SpecialAssetList = () => {
   } = useGlobalState()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const isMainnet = isMainnetUtil(networks, networkID)
+  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
+    networkID,
+    networks,
+  ])
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
   const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
   const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
@@ -372,6 +377,7 @@ const SpecialAssetList = () => {
             sUDTAccounts={sUDTAccounts}
             isMainnet={isMainnet}
             walletID={id}
+            isLightClient={isLightClient}
           />
         </dialog>
       )}

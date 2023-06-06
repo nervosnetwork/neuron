@@ -7,28 +7,28 @@ export default class IndexerTxHashCache extends BaseEntity {
 
   @Column({
     type: 'character',
-    length: 32
+    length: 32,
   })
   @Index()
   txHash!: string
 
   @Column({
     type: 'character',
-    length: 32
+    length: 32,
   })
   @Index()
   lockHash!: string
 
   @Column({
     type: 'character',
-    length: 32
+    length: 32,
   })
   @Index()
   address!: string
 
   @Column({
     type: 'character',
-    length: 32
+    length: 32,
   })
   @Index()
   walletId!: string
@@ -39,13 +39,13 @@ export default class IndexerTxHashCache extends BaseEntity {
 
   @Column({
     type: 'character',
-    length: 32
+    length: 32,
   })
   @Index()
   blockHash!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   @Index()
   blockTimestamp!: string
@@ -56,14 +56,14 @@ export default class IndexerTxHashCache extends BaseEntity {
 
   @CreateDateColumn({
     type: 'varchar',
-    default: () => 'CURRENT_TIMESTAMP'
+    default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt!: Date
 
   @UpdateDateColumn({
     type: 'varchar',
     default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP'
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt!: Date
 }

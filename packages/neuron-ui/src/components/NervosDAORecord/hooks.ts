@@ -1,23 +1,23 @@
 import { useEffect } from 'react'
-import { getHeaderByNumber } from 'services/chain'
+import { getHeader } from 'services/chain'
 import { calculateAPC, CONSTANTS } from 'utils'
 
 const { MILLISECONDS_IN_YEAR } = CONSTANTS
 
 export const useUpdateWithdrawEpochs = ({
   isWithdrawn,
-  blockNumber,
+  blockHash,
   setWithdrawEpoch,
   setWithdrawTimestamp,
 }: {
   isWithdrawn: boolean
-  blockNumber: CKBComponents.BlockNumber | null
+  blockHash: CKBComponents.BlockHeader['hash'] | null
   setWithdrawEpoch: React.Dispatch<string>
   setWithdrawTimestamp: React.Dispatch<string>
 }) => {
   useEffect(() => {
-    if (isWithdrawn && blockNumber) {
-      getHeaderByNumber(BigInt(blockNumber))
+    if (isWithdrawn && blockHash) {
+      getHeader(blockHash)
         .then(header => {
           setWithdrawEpoch(header.epoch)
           setWithdrawTimestamp(header.timestamp)
@@ -26,7 +26,7 @@ export const useUpdateWithdrawEpochs = ({
           console.error(err)
         })
     }
-  }, [isWithdrawn, blockNumber, setWithdrawEpoch, setWithdrawTimestamp])
+  }, [isWithdrawn, blockHash, setWithdrawEpoch, setWithdrawTimestamp])
 }
 
 export const useUpdateApc = ({

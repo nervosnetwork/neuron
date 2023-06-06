@@ -1,4 +1,4 @@
-import TypeChecker from 'utils/type-checker'
+import TypeChecker from '../../utils/type-checker'
 
 export default class TransactionPoint {
   public blockNumber: string

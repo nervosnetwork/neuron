@@ -2,14 +2,14 @@ jest.mock('electron', () => ({
   dialog: {
     showSaveDialog: jest.fn(),
     showMessageBox: jest.fn(),
-    showErrorBox: jest.fn()
+    showErrorBox: jest.fn(),
   },
 
   app: {
     getVersion: jest.fn().mockReturnValue('mock_version'),
     getPath: jest.fn().mockReturnValue('mock_path'),
-    getName: jest.fn().mockReturnValue('mock_name')
-  }
+    getName: jest.fn().mockReturnValue('mock_name'),
+  },
 }))
 
 jest.mock('../../src/services/addresses', () => {
@@ -19,15 +19,15 @@ jest.mock('../../src/services/addresses', () => {
         walletId: '0',
         addressType: '0',
         addressIndex: '0',
-        blake160: 'hash1'
+        blake160: 'hash1',
       },
       {
         walletId: '1',
         addressType: '1',
         addressIndex: '1',
-        blake160: 'hash2'
-      }
-    ]
+        blake160: 'hash2',
+      },
+    ],
   }
 })
 
@@ -36,7 +36,7 @@ jest.mock('fs', () => {
     createWriteStream: () => null,
     readFileSync: () => JSON.stringify({}),
     writeFileSync: () => jest.fn(),
-    existsSync: () => jest.fn()
+    existsSync: () => jest.fn(),
   }
 })
 
@@ -44,9 +44,9 @@ jest.mock('../../src/utils/logger', () => ({
   error: console.error,
   transports: {
     file: {
-      getFile: jest.fn()
-    }
-  }
+      getFile: jest.fn(),
+    },
+  },
 }))
 
 jest.mock('../../src/services/networks', () => {
@@ -55,11 +55,11 @@ jest.mock('../../src/services/networks', () => {
       return {
         getCurrent() {
           return {
-            remote: 'http://127.0.0.1:8114'
+            remote: 'http://127.0.0.1:8114',
           }
-        }
+        },
       }
-    }
+    },
   }
 })
 
@@ -67,7 +67,19 @@ jest.mock('../../src/services/settings', () => {
   return {
     getInstance() {
       return {
-        ckbDataPath: ''
+        ckbDataPath: '',
+      }
+    },
+  }
+})
+
+jest.mock('../../src/services/light-runner', () => {
+  return {
+    CKBLightRunner: {
+      getInstance() {
+        return {
+          logPath: ''
+        }
       }
     }
   }
@@ -86,6 +98,7 @@ describe('Test ExportDebugController', () => {
   let showErrorBoxMock: any
   // controller methods
   let addBundledCKBLogMock: any
+  let addBundledCKBLightClientLogMock: any
   let addLogFilesMock: any
   let addStatusFileMock: any
   let archiveAppendMock: any
@@ -95,10 +108,11 @@ describe('Test ExportDebugController', () => {
     showMessageBoxMock = jest.spyOn(dialog, 'showMessageBox')
     showErrorBoxMock = jest.spyOn(dialog, 'showErrorBox')
     addBundledCKBLogMock = jest.spyOn(exportDebugController, 'addBundledCKBLog')
+    addBundledCKBLightClientLogMock = jest.spyOn(exportDebugController, 'addBundledCKBLightClientLog')
     addLogFilesMock = jest.spyOn(exportDebugController, 'addLogFiles')
     addStatusFileMock = jest.spyOn(exportDebugController, 'addStatusFile')
     archiveAppendMock = jest.spyOn(exportDebugController.archive, 'append')
-    jest.spyOn(exportDebugController.archive, 'file')
+    jest.spyOn(exportDebugController.archive, 'file').mockReturnValue(undefined)
     jest.spyOn(exportDebugController.archive, 'pipe').mockImplementation(() => {})
     jest.spyOn(logger, 'error')
   })
@@ -118,10 +132,11 @@ describe('Test ExportDebugController', () => {
     })
 
     it('should call required methods', () => {
-      expect.assertions(8)
+      expect.assertions(9)
       expect(showSaveDialogMock).toHaveBeenCalled()
 
       expect(addBundledCKBLogMock).toHaveBeenCalled()
+      expect(addBundledCKBLightClientLogMock).toHaveBeenCalled()
       expect(addLogFilesMock).toHaveBeenCalled()
       expect(addStatusFileMock).toHaveBeenCalled()
 
@@ -141,11 +156,12 @@ describe('Test ExportDebugController', () => {
     })
 
     it('should not call required methods', () => {
-      expect.assertions(8)
+      expect.assertions(9)
 
       expect(showSaveDialogMock).toHaveBeenCalled()
 
       expect(addBundledCKBLogMock).not.toHaveBeenCalled()
+      expect(addBundledCKBLightClientLogMock).not.toHaveBeenCalled()
       expect(addLogFilesMock).not.toHaveBeenCalled()
       expect(addStatusFileMock).not.toHaveBeenCalled()
       expect(archiveAppendMock).not.toHaveBeenCalled()

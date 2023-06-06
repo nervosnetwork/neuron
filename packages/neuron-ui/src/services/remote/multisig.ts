@@ -1,15 +1,13 @@
 import { remoteApi } from './remoteApiWrapper'
 import { OfflineSignJSON } from './offline'
 
-type PartialSome<T, R extends keyof T> = Omit<T, R> &
-  {
-    [P in R]?: T[P]
-  }
+type PartialSome<T, R extends keyof T> = Omit<T, R> & {
+  [P in R]?: T[P]
+}
 
-type RequiredSome<T, R extends keyof T> = Omit<T, R> &
-  {
-    [P in R]-?: T[P]
-  }
+type RequiredSome<T, R extends keyof T> = Omit<T, R> & {
+  [P in R]-?: T[P]
+}
 
 type MultisigParams = {
   id: number
@@ -51,3 +49,6 @@ export const generateMultisigSendAllTx = remoteApi<{
   multisigConfig: MultisigConfig
 }>('generate-multisig-send-all-tx')
 export const loadMultisigTxJson = remoteApi<string, OfflineSignJSON>('load-multisig-tx-json')
+export const getMultisigSyncProgress = remoteApi<string[], { hash: string; blockStartNumber: number }[]>(
+  'get-sync-progress-by-addresses'
+)

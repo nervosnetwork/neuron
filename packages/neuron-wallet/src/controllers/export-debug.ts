@@ -2,25 +2,25 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import archiver from 'archiver'
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 import { t } from 'i18next'
-import NetworksService from 'services/networks'
-import SyncedBlockNumber from 'models/synced-block-number'
-import AddressService from 'services/addresses'
-import redistCheck from 'utils/redist-check'
-import SettingsService from 'services/settings'
+import NetworksService from '../services/networks'
+import SyncedBlockNumber from '../models/synced-block-number'
+import AddressService from '../services/addresses'
+import redistCheck from '../utils/redist-check'
+import SettingsService from '../services/settings'
+import { generateRPC } from '../utils/ckb-rpc'
+import { CKBLightRunner } from '../services/light-runner'
 
 export default class ExportDebugController {
-  // eslint-disable-next-line prettier/prettier
   #I18N_PATH = 'export-debug-info'
   #ANONYMOUS_ADDRESS = 'http://****:port'
   private archive: archiver.Archiver
 
   constructor() {
     this.archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     })
     this.archive.on('error', err => {
       dialog.showErrorBox(t('common.error'), err.message)
@@ -31,17 +31,23 @@ export default class ExportDebugController {
     try {
       const { canceled, filePath } = await dialog.showSaveDialog({
         title: t(`${this.#I18N_PATH}.export-debug-info`),
-        defaultPath: `neuron_debug_${Date.now()}.zip`
+        defaultPath: `neuron_debug_${Date.now()}.zip`,
       })
       if (canceled || !filePath) {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await Promise.all([this.addStatusFile(), this.addBundledCKBLog(), this.addLogFiles(), this.addHdPublicKeyInfoCsv()])
+      await Promise.all([
+        this.addStatusFile(),
+        this.addBundledCKBLog(),
+        this.addLogFiles(),
+        this.addHdPublicKeyInfoCsv(),
+        this.addBundledCKBLightClientLog()
+      ])
       await this.archive.finalize()
       dialog.showMessageBox({
         type: 'info',
-        message: t(`${this.#I18N_PATH}.debug-info-exported`, { file: filePath })
+        message: t(`${this.#I18N_PATH}.debug-info-exported`, { file: filePath }),
       })
     } catch (err) {
       dialog.showErrorBox(t('common.error'), err.message)
@@ -51,22 +57,22 @@ export default class ExportDebugController {
   private addStatusFile = async () => {
     const neuronVersion = app.getVersion()
     const url = NetworksService.getInstance().getCurrent().remote
-    const ckb = new CKB(url)
+    const rpcService = generateRPC(url)
 
     const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers, vcredist] = await Promise.all([
       new SyncedBlockNumber()
         .getNextBlock()
         .then(n => n.toString())
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .localNodeInfo()
-        .then(res => res.version)
+        .then(v => v.version)
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
         .catch(() => ''),
-      ckb.rpc
+      rpcService
         .getPeers()
         .catch(() => []),
       redistCheck()
@@ -76,7 +82,7 @@ export default class ExportDebugController {
     const status = {
       neuron: {
         version: neuronVersion,
-        blockNumber: syncedBlockNumber
+        blockNumber: syncedBlockNumber,
       },
       ckb: {
         url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : this.#ANONYMOUS_ADDRESS,
@@ -88,11 +94,11 @@ export default class ExportDebugController {
         platform,
         arch,
         release,
-        vcredist
-      }
+        vcredist,
+      },
     }
     this.archive.append(JSON.stringify(status), {
-      name: 'status.json'
+      name: 'status.json',
     })
   }
 
@@ -102,13 +108,17 @@ export default class ExportDebugController {
 
     return new Promise((resolve, reject) => {
       const logPath = path.resolve(SettingsService.getInstance().ckbDataPath, 'data', 'logs', 'run.log')
-      if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
+      if (!fs.existsSync(logPath)) {
+        return reject(new Error('File not found'))
+      }
 
       const fileStats = fs.statSync(logPath)
       const position = fileStats.size - SIZE_TO_READ
 
       fs.open(logPath, 'r', (openErr, fd) => {
-        if (openErr) { return reject(openErr) }
+        if (openErr) {
+          return reject(openErr)
+        }
         fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
           fs.close(fd, closeErr => {
             const err = closeErr || readErr
@@ -119,12 +129,13 @@ export default class ExportDebugController {
           })
         })
       })
-
-    }).then((log: string) => {
-      this.archive.append(log, { name })
-    }).catch(err => {
-      this.archive.append(err.message, { name })
     })
+      .then((log: string) => {
+        this.archive.append(log, { name })
+      })
+      .catch(err => {
+        this.archive.append(err.message, { name })
+      })
   }
 
   private async addHdPublicKeyInfoCsv() {
@@ -146,5 +157,11 @@ export default class ExportDebugController {
     files.forEach(file => {
       this.archive.file(path.join(logFile.path, '..', file), { name: file })
     })
+  }
+
+  private addBundledCKBLightClientLog() {
+    const logPath = CKBLightRunner.getInstance().logPath
+    if (!fs.existsSync(logPath)) {return}
+    this.archive.file(logPath, { name: 'bundled-ckb-lignt-client.log' })
   }
 }

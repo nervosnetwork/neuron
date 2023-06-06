@@ -1,19 +1,19 @@
-import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
-import Address, { AddressType, publicKeyToAddress } from 'models/keys/address'
-import { Address as AddressInterface } from 'models/address'
-import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import NetworksService from 'services/networks'
-import AddressParser from 'models/address-parser'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from '../models/keys/key'
+import Address, { AddressType, publicKeyToAddress } from '../models/keys/address'
+import { Address as AddressInterface } from '../models/address'
+import AddressCreatedSubject from '../models/subjects/address-created-subject'
+import NetworksService from '../services/networks'
+import AddressParser from '../models/address-parser'
 import { getConnection } from 'typeorm'
-import { TransactionsService } from 'services/tx'
+import { TransactionsService } from '../services/tx'
 import CellsService from './cells'
-import SystemScriptInfo from 'models/system-script-info'
-import Script from 'models/chain/script'
-import HdPublicKeyInfo from 'database/chain/entities/hd-public-key-info'
-import AddressDescription from 'database/chain/entities/address-description'
-import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
-import AddressMeta from 'database/address/meta'
-import queueWrapper from 'utils/queue'
+import SystemScriptInfo from '../models/system-script-info'
+import Script from '../models/chain/script'
+import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
+import AddressDescription from '../database/chain/entities/address-description'
+import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
+import AddressMeta from '../database/address/meta'
+import queueWrapper from '../utils/queue'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -47,7 +47,7 @@ export default class AddressService {
       .map(addr => {
         return HdPublicKeyInfo.fromObject({
           ...addr,
-          publicKeyInBlake160: addr.blake160
+          publicKeyInBlake160: addr.blake160,
         })
       })
     if (publicKeyInfos.length) {
@@ -167,7 +167,7 @@ export default class AddressService {
     walletId,
     publicKey,
     addressType,
-    addressIndex
+    addressIndex,
   }: {
     walletId: string
     publicKey: string
@@ -183,7 +183,7 @@ export default class AddressService {
       .createQueryBuilder()
       .where({
         walletId,
-        publicKeyInBlake160: publicKeyHash
+        publicKeyInBlake160: publicKeyHash,
       })
       .getRawOne()
 
@@ -195,7 +195,7 @@ export default class AddressService {
       walletId,
       addressType,
       addressIndex,
-      publicKeyInBlake160: publicKeyHash
+      publicKeyInBlake160: publicKeyHash,
     })
 
     await getConnection().manager.save(publicKeyInfo)
@@ -224,7 +224,7 @@ export default class AddressService {
         walletId,
         addressType: AddressType.Receiving,
         addressIndex: idx + receivingStartIndex,
-        accountExtendedPublicKey: extendedKey
+        accountExtendedPublicKey: extendedKey,
       }
       return AddressService.toAddress(addressMetaInfo)
     })
@@ -233,13 +233,13 @@ export default class AddressService {
         walletId,
         addressType: AddressType.Change,
         addressIndex: idx + changeStartIndex,
-        accountExtendedPublicKey: extendedKey
+        accountExtendedPublicKey: extendedKey,
       }
       return AddressService.toAddress(addressMetaInfo)
     })
     return {
       receiving,
-      change
+      change,
     }
   }
 
@@ -259,7 +259,7 @@ export default class AddressService {
       path,
       addressType: addressMetaInfo.addressType,
       addressIndex: addressMetaInfo.addressIndex,
-      blake160
+      blake160,
     }
 
     return addressInfo
@@ -345,10 +345,7 @@ export default class AddressService {
   }
 
   public static getAddressesByAllWallets = async (): Promise<AddressInterface[]> => {
-    const publicKeyInfos = await getConnection()
-      .getRepository(HdPublicKeyInfo)
-      .createQueryBuilder()
-      .getMany()
+    const publicKeyInfos = await getConnection().getRepository(HdPublicKeyInfo).createQueryBuilder().getMany()
 
     return publicKeyInfos.map(publicKeyInfo => AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel()))
   }
@@ -383,13 +380,13 @@ export default class AddressService {
     const { liveBalances, sentBalances, pendingBalances } = await CellsService.getBalancesByWalletId(walletId)
     const txCountsByLock = await TransactionsService.getTxCountsByWalletId(walletId, {
       codeHash: SystemScriptInfo.SECP_CODE_HASH,
-      hashType: SystemScriptInfo.SECP_HASH_TYPE
+      hashType: SystemScriptInfo.SECP_HASH_TYPE,
     })
     const allAddressesWithBalances = addresses.map(address => {
       const script = Script.fromObject({
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
-        args: address.blake160
+        args: address.blake160,
       })
       const lockHash = script.computeHash()
       const liveBalance = liveBalances.get(lockHash) || '0'
@@ -405,7 +402,7 @@ export default class AddressService {
         sentBalance,
         pendingBalance,
         balance,
-        txCount
+        txCount,
       }
     })
     return allAddressesWithBalances
@@ -434,11 +431,6 @@ export default class AddressService {
   }
 
   public static async deleteByWalletId(walletId: string): Promise<void> {
-    await getConnection()
-      .createQueryBuilder()
-      .delete()
-      .from(HdPublicKeyInfo)
-      .where({ walletId })
-      .execute()
+    await getConnection().createQueryBuilder().delete().from(HdPublicKeyInfo).where({ walletId }).execute()
   }
 }

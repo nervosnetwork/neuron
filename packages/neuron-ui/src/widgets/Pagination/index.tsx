@@ -11,7 +11,7 @@ export interface PaginationProps {
   count: number
   pageNo: number
   pageSize: number
-  onChange: Function
+  onChange: (page: number) => void
 }
 
 const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
@@ -47,7 +47,7 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
   return (
     <div role="presentation" className={styles.container} onClick={handlePageNoClick}>
       <div className={styles.range}>{range}</div>
-      <div className={styles.navigator} role="navigation" arial-label="pagination">
+      <div className={styles.navigator} role="navigation" aria-label="pagination">
         <div className={styles.arrowBlock}>
           <button
             type="button"

@@ -1,14 +1,14 @@
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
-import { DefaultNetworkUnremovable } from 'exceptions/network'
+import { DefaultNetworkUnremovable } from '../exceptions/network'
 
-import Store from 'models/store'
+import Store from '../models/store'
 
-import { Validate, Required } from 'utils/validators'
-import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
-import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
-import CommonUtils from 'utils/common'
-import { BUNDLED_CKB_URL } from 'utils/const'
+import { Validate, Required } from '../utils/validators'
+import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network, TESTNET_GENESIS_HASH } from '../models/network'
+import CommonUtils from '../utils/common'
+import { BUNDLED_CKB_URL, BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from '../utils/const'
+import { generateRPC } from '../utils/ckb-rpc'
 
 const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',
@@ -19,14 +19,26 @@ const presetNetworks: { selected: string; networks: Network[] } = {
       remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
-      chain: 'ckb'
-    }
-  ]
+      chain: 'ckb',
+    },
+  ],
 }
+
+const lightClientNetwork: Network[] = [
+  {
+    id: 'light_client_testnet',
+    name: 'Light Client Testnet',
+    remote: BUNDLED_LIGHT_CKB_URL,
+    genesisHash: TESTNET_GENESIS_HASH,
+    type: NetworkType.Light,
+    chain: LIGHT_CLIENT_TESTNET
+  }
+]
 
 enum NetworksKey {
   List = 'networks',
-  Current = 'selected'
+  Current = 'selected',
+  AddedLightNetwork = 'AddedLightNetwork'
 }
 
 export default class NetworksService extends Store {
@@ -44,11 +56,17 @@ export default class NetworksService extends Store {
 
     const currentNetwork = this.getCurrent()
     this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
+    const addLight = this.readSync<boolean>(NetworksKey.AddedLightNetwork)
+    if (!addLight) {
+      const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
+      this.updateAll([...networks, ...lightClientNetwork])
+      this.writeSync(NetworksKey.AddedLightNetwork, true)
+    }
   }
 
   public getAll = () => {
     const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
-    networks.forEach((network) => {
+    networks.forEach(network => {
       // Currently, the RPC interface of the CKB node is bound to IPv4 by default.
       // Starting from node17, its DNS resolution is no longer `ipv4first`.
       // Therefore, to ensure normal connection to the ckb node, manual resolution needs to be done here.
@@ -89,7 +107,7 @@ export default class NetworksService extends Store {
       remote,
       type,
       genesisHash: EMPTY_GENESIS_HASH,
-      chain: 'ckb_dev'
+      chain: 'ckb_dev',
     }
     const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties).catch(
       () => properties
@@ -167,10 +185,10 @@ export default class NetworksService extends Store {
 
   // Refresh a network's genesis and chain info
   private async refreshChainInfo(network: Network): Promise<Network> {
-    const ckb = new CKB(network.remote)
+    const rpc = generateRPC(network.remote)
 
-    const genesisHash = await ckb.rpc.getBlockHash('0x0').catch(() => EMPTY_GENESIS_HASH)
-    const chain = await ckb.rpc
+    const genesisHash = await rpc.getGenesisBlockHash().catch(() => EMPTY_GENESIS_HASH)
+    const chain = await rpc
       .getBlockchainInfo()
       .then(info => info.chain)
       .catch(() => '')
@@ -195,5 +213,8 @@ function applyLocalhostIPv4Resolve(url: string): string {
   if (urlObj.hostname !== 'localhost') return url
 
   urlObj.hostname = '127.0.0.1'
-  return urlObj.href
+  // When the pathname is empty, the URL constructor automatically sets the pathname
+  // to '/' and this needs to be handled.
+  const hasExtraPathSeparator = urlObj.pathname === '/' && !url.endsWith('/')
+  return hasExtraPathSeparator ? urlObj.href.slice(0, -1) : urlObj.href
 }

@@ -2,7 +2,7 @@ import BufferUtils from '../../src/utils/buffer'
 
 describe('BufferUtils', () => {
   const num = BigInt('1208925819614629174706177')
-  const leHex = "0x01000000000000000000010000000000"
+  const leHex = '0x01000000000000000000010000000000'
 
   describe('#writeBigUInt128LE', () => {
     describe('when success', () => {
@@ -10,7 +10,7 @@ describe('BufferUtils', () => {
         const result = BufferUtils.writeBigUInt128LE(num)
         expect(result).toEqual(leHex)
       })
-    });
+    })
     describe('when fails', () => {
       it('throws an error if the value < 0', () => {
         expect(() => {
@@ -23,8 +23,8 @@ describe('BufferUtils', () => {
           BufferUtils.writeBigUInt128LE(BigInt(2) ** BigInt(128))
         }).toThrowError()
       })
-    });
-  });
+    })
+  })
 
   describe('#readBigUInt128LE', () => {
     describe('when success', () => {
@@ -32,7 +32,7 @@ describe('BufferUtils', () => {
         const result = BufferUtils.readBigUInt128LE(leHex)
         expect(result).toEqual(num)
       })
-    });
+    })
     describe('when fails', () => {
       it('throws an error if hex string does not start with 0x', () => {
         const hexWithout0x = '0100000000000000000001000000000000'
@@ -52,8 +52,8 @@ describe('BufferUtils', () => {
           BufferUtils.readBigUInt128LE(hexWithInvalidLength)
         }).toThrowError()
       })
-    });
-  });
+    })
+  })
 
   describe('#parseAmountFromSUDTData', () => {
     describe('when the format of hex string aligns with the protocol', () => {
@@ -66,7 +66,7 @@ describe('BufferUtils', () => {
         const result = BufferUtils.parseAmountFromSUDTData(overflowHex)
         expect(result).toEqual(num)
       })
-    });
+    })
     describe('when the format of hex string does not align with the protocol', () => {
       it('throws an error if hex string does not start with 0x', () => {
         const hexWithout0x = '0100000000000000000001000000000000'
@@ -83,6 +83,6 @@ describe('BufferUtils', () => {
         const result = BufferUtils.parseAmountFromSUDTData(shortedHex)
         expect(result).toEqual(BigInt(0))
       })
-    });
-  });
+    })
+  })
 })

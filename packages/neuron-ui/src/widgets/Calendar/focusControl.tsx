@@ -121,6 +121,11 @@ export const useTableFocusControl = (
     moveDate(calendarYear, calendarMonth, focusDate.getDate())
   }, [calendarYear, calendarMonth, minDate?.toDateString(), maxDate?.toDateString()])
 
+  useEffect(() => {
+    setYear(value?.getFullYear() ?? new Date().getFullYear())
+    setMonth((value?.getMonth() ?? new Date().getMonth()) + 1)
+  }, [value?.toDateString()])
+
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     const keyEventMap = {
       Enter: () => onChange(focusDate),

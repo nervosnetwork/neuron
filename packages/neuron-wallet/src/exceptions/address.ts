@@ -3,7 +3,7 @@ import { t } from 'i18next'
 export class InvalidAddress extends Error {
   public code = 102
   public i18n = {
-    fieldName: 'address'
+    fieldName: 'address',
   }
 
   constructor(address: string) {
@@ -44,5 +44,5 @@ export default {
   MainnetAddressRequired,
   TestnetAddressRequired,
   AddressNotFound,
-  NoMatchAddressForSign
+  NoMatchAddressForSign,
 }

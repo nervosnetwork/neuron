@@ -1,4 +1,4 @@
-import logger from 'utils/logger'
+import logger from '../../utils/logger'
 import { interval, timer, Subscription, race, from, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 

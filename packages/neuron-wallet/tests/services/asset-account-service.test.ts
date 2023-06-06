@@ -103,8 +103,8 @@ const walletId = 'w1'
 jest.mock('services/wallets', () => {
   return {
     getInstance: () => ({
-      get: stubbedWalletServiceGet
-    })
+      get: stubbedWalletServiceGet,
+    }),
   }
 })
 jest.mock('services/tx', () => {
@@ -118,14 +118,14 @@ jest.mock('services/tx', () => {
       // @ts-ignore
       generateWithdrawChequeTx: (...args) => stubbedGenerateWithdrawChequeTx(...args),
       // @ts-ignore
-      generateDestoryAssetAccountTx: (...args) => stubbedGenerateDestoryAssetAccountTx(...args)
-    }
+      generateDestoryAssetAccountTx: (...args) => stubbedGenerateDestoryAssetAccountTx(...args),
+    },
   }
 })
 jest.mock('services/transaction-sender', () => {
-  return function() {
+  return function () {
     return {
-      sendTx: stubbedTransactionSendersendTx
+      sendTx: stubbedTransactionSendersendTx,
     }
   }
 })
@@ -150,7 +150,7 @@ describe('AssetAccountService', () => {
       walletId,
       addressType: AddressType.Receiving,
       addressIndex: 0,
-      publicKeyInBlake160: blake160
+      publicKeyInBlake160: blake160,
     })
 
     await connection.manager.save(keyInfo)
@@ -160,10 +160,7 @@ describe('AssetAccountService', () => {
     const entity = AssetAccountEntity.fromModel(assetAccount)
     const saved = await getConnection().manager.save([entity.sudtTokenInfo, entity])
 
-    const sudtTokenInfoCount = await getConnection()
-      .getRepository(SudtTokenInfo)
-      .createQueryBuilder('s')
-      .getCount()
+    const sudtTokenInfoCount = await getConnection().getRepository(SudtTokenInfo).createQueryBuilder('s').getCount()
 
     const assetAccountCount = await getConnection()
       .getRepository(AssetAccountEntity)
@@ -268,7 +265,7 @@ describe('AssetAccountService', () => {
               decimal: '0',
               balance: '0',
               accountName: 'sUDT',
-              blake160
+              blake160,
             }),
             AssetAccount.fromObject({
               tokenID: 'CKBytes',
@@ -277,14 +274,14 @@ describe('AssetAccountService', () => {
               decimal: '0',
               balance: '0',
               accountName: 'ckb',
-              blake160
-            })
+              blake160,
+            }),
           ]
           const outputs = [
             generateOutput(undefined, undefined, undefined, toShannon(1000)),
             generateOutput(undefined, undefined, undefined, toShannon(1000)),
             generateOutput(tokenID),
-            generateOutput(tokenID)
+            generateOutput(tokenID),
           ]
           await createAccounts(assetAccounts, outputs)
         })
@@ -306,7 +303,7 @@ describe('AssetAccountService', () => {
               decimal: '0',
               balance: '0',
               accountName: 'sUDT',
-              blake160
+              blake160,
             }),
             AssetAccount.fromObject({
               tokenID: 'CKBytes',
@@ -315,14 +312,14 @@ describe('AssetAccountService', () => {
               decimal: '0',
               balance: '0',
               accountName: 'ckb',
-              blake160
-            })
+              blake160,
+            }),
           ]
           const outputs = [
             generateOutput(undefined, undefined, undefined, toShannon(1000)),
             generateOutput(undefined, undefined, undefined, toShannon(1000), undefined, undefined, OutputStatus.Sent),
             generateOutput(tokenID),
-            generateOutput(tokenID, undefined, undefined, undefined, undefined, undefined, OutputStatus.Sent)
+            generateOutput(tokenID, undefined, undefined, undefined, undefined, undefined, OutputStatus.Sent),
           ]
           await createAccounts(assetAccounts, outputs)
         })
@@ -347,8 +344,8 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [generateOutput(undefined, undefined, undefined, minCapacity)]
         await createAccounts(assetAccounts, outputs)
@@ -370,8 +367,8 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs: OutputEntity[] = []
         await createAccounts(assetAccounts, outputs)
@@ -392,13 +389,13 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const customData = '0x00'
         const outputs = [
           generateOutput(undefined, undefined, undefined, toShannon(1000)),
-          generateOutput(undefined, undefined, undefined, toShannon(2000), undefined, customData)
+          generateOutput(undefined, undefined, undefined, toShannon(2000), undefined, customData),
         ]
         await createAccounts(assetAccounts, outputs)
       })
@@ -421,12 +418,12 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [
           generateOutput(undefined, undefined, undefined, minCapacity),
-          generateOutput(undefined, undefined, undefined, toShannon(100))
+          generateOutput(undefined, undefined, undefined, toShannon(100)),
         ]
         await createAccounts(assetAccounts, outputs)
       })
@@ -450,8 +447,8 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'sUDT',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [generateOutput(tokenID, undefined, undefined, minCapacity, '0')]
         await createAccounts(assetAccounts, outputs)
@@ -476,7 +473,7 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'sUDT',
-            blake160
+            blake160,
           }),
           AssetAccount.fromObject({
             tokenID: 'CKBytes',
@@ -485,8 +482,8 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs: any[] = []
         await createAccounts(assetAccounts, outputs)
@@ -511,7 +508,7 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'sUDT',
-            blake160
+            blake160,
           }),
           AssetAccount.fromObject({
             tokenID: 'CKBytes',
@@ -520,14 +517,14 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [
           generateOutput(undefined, undefined, undefined, toShannon(1000)),
           generateOutput(undefined, undefined, undefined, toShannon(1000)),
           generateOutput(tokenID),
-          generateOutput(tokenID)
+          generateOutput(tokenID),
         ]
         accountIds = await createAccounts(assetAccounts, outputs)
       })
@@ -561,8 +558,8 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [generateOutput(undefined, undefined, undefined, minCapacity)]
         accountIds = await createAccounts(assetAccounts, outputs)
@@ -589,8 +586,8 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [generateOutput(undefined, undefined, undefined, minCapacity)]
         accountIds = await createAccounts(assetAccounts, outputs)
@@ -618,12 +615,12 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const outputs = [
           generateOutput(undefined, undefined, undefined, minCapacity),
-          generateOutput(undefined, undefined, undefined, toShannon(100))
+          generateOutput(undefined, undefined, undefined, toShannon(100)),
         ]
         accountIds = await createAccounts(assetAccounts, outputs)
       })
@@ -649,13 +646,13 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'ckb',
-            blake160
-          })
+            blake160,
+          }),
         ]
         const customData = '0x00'
         const outputs = [
           generateOutput(undefined, undefined, undefined, toShannon(1000)),
-          generateOutput(undefined, undefined, undefined, toShannon(2000), undefined, customData)
+          generateOutput(undefined, undefined, undefined, toShannon(2000), undefined, customData),
         ]
         accountIds = await createAccounts(assetAccounts, outputs)
       })
@@ -721,7 +718,7 @@ describe('AssetAccountService', () => {
         .getRepository(SudtTokenInfoEntity)
         .createQueryBuilder('info')
         .where({
-          tokenID: assetAccount.tokenID
+          tokenID: assetAccount.tokenID,
         })
         .getOne()
       expect(tokenInfo).not.toBeNull()
@@ -749,7 +746,7 @@ describe('AssetAccountService', () => {
         .createQueryBuilder('aa')
         .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
         .where({
-          tokenID: assetAccount.tokenID
+          tokenID: assetAccount.tokenID,
         })
         .getOne()
       expect(aae).not.toBeNull()
@@ -784,7 +781,7 @@ describe('AssetAccountService', () => {
           decimal: '0',
           balance: '0',
           accountName: 'ckb',
-          blake160
+          blake160,
         }),
         AssetAccount.fromObject({
           tokenID: tokenID,
@@ -793,8 +790,8 @@ describe('AssetAccountService', () => {
           decimal: '0',
           balance: '0',
           accountName: 'udt',
-          blake160
-        })
+          blake160,
+        }),
       ]
 
       for (const aa of assetAccounts) {
@@ -808,7 +805,7 @@ describe('AssetAccountService', () => {
         generateOutput('CKBytes', TransactionStatus.Success, '1'),
         generateOutput('CKBytes', TransactionStatus.Success, '2'),
         generateOutput(tokenID, TransactionStatus.Success, '1'),
-        generateOutput(tokenID, TransactionStatus.Success, '2')
+        generateOutput(tokenID, TransactionStatus.Success, '2'),
       ]
       for (const e of outputEntities) {
         await getConnection().manager.save([e.transaction, e])
@@ -816,10 +813,7 @@ describe('AssetAccountService', () => {
 
       await AssetAccountService.checkAndDeleteWhenFork('1', anyoneCanPayLockHashes)
 
-      const result = await getConnection()
-        .getRepository(AssetAccountEntity)
-        .createQueryBuilder('aa')
-        .getMany()
+      const result = await getConnection().getRepository(AssetAccountEntity).createQueryBuilder('aa').getMany()
 
       expect(result.length).toEqual(0)
     })
@@ -829,7 +823,7 @@ describe('AssetAccountService', () => {
         generateOutput('CKBytes', TransactionStatus.Success, '1'),
         generateOutput('CKBytes', TransactionStatus.Success, '2'),
         generateOutput(tokenID, TransactionStatus.Success, '2'),
-        generateOutput(tokenID, TransactionStatus.Success, '3')
+        generateOutput(tokenID, TransactionStatus.Success, '3'),
       ]
       for (const e of outputEntities) {
         await getConnection().manager.save([e.transaction, e])
@@ -837,10 +831,7 @@ describe('AssetAccountService', () => {
 
       await AssetAccountService.checkAndDeleteWhenFork('2', anyoneCanPayLockHashes)
 
-      const result = await getConnection()
-        .getRepository(AssetAccountEntity)
-        .createQueryBuilder('aa')
-        .getMany()
+      const result = await getConnection().getRepository(AssetAccountEntity).createQueryBuilder('aa').getMany()
 
       expect(result.length).toEqual(1)
       expect(result[0].tokenID).toEqual('CKBytes')
@@ -851,7 +842,7 @@ describe('AssetAccountService', () => {
         generateOutput('CKBytes', TransactionStatus.Success, '1'),
         generateOutput('CKBytes', TransactionStatus.Pending, '2'),
         generateOutput(tokenID, TransactionStatus.Success, '1'),
-        generateOutput(tokenID, TransactionStatus.Success, '2')
+        generateOutput(tokenID, TransactionStatus.Success, '2'),
       ]
       for (const e of outputEntities) {
         await getConnection().manager.save([e.transaction, e])
@@ -859,10 +850,7 @@ describe('AssetAccountService', () => {
 
       await AssetAccountService.checkAndDeleteWhenFork('1', anyoneCanPayLockHashes)
 
-      const result = await getConnection()
-        .getRepository(AssetAccountEntity)
-        .createQueryBuilder('aa')
-        .getMany()
+      const result = await getConnection().getRepository(AssetAccountEntity).createQueryBuilder('aa').getMany()
 
       expect(result.length).toEqual(1)
       expect(result[0].tokenID).toEqual('CKBytes')
@@ -873,7 +861,7 @@ describe('AssetAccountService', () => {
         generateOutput('CKBytes', TransactionStatus.Success, '2'),
         generateOutput('CKBytes', TransactionStatus.Success, '3'),
         generateOutput(tokenID, TransactionStatus.Success, '1'),
-        generateOutput(tokenID, TransactionStatus.Success, '2')
+        generateOutput(tokenID, TransactionStatus.Success, '2'),
       ]
       for (const e of outputEntities) {
         await getConnection().manager.save([e.transaction, e])
@@ -881,10 +869,7 @@ describe('AssetAccountService', () => {
 
       await AssetAccountService.checkAndDeleteWhenFork('2', anyoneCanPayLockHashes)
 
-      const result = await getConnection()
-        .getRepository(AssetAccountEntity)
-        .createQueryBuilder('aa')
-        .getMany()
+      const result = await getConnection().getRepository(AssetAccountEntity).createQueryBuilder('aa').getMany()
 
       expect(result.length).toEqual(1)
       expect(result[0].tokenID).toEqual(tokenID)
@@ -895,7 +880,7 @@ describe('AssetAccountService', () => {
         generateOutput('CKBytes', TransactionStatus.Success, '1'),
         generateOutput('CKBytes', TransactionStatus.Success, '2'),
         generateOutput(tokenID, TransactionStatus.Success, '1'),
-        generateOutput(tokenID, TransactionStatus.Success, '2')
+        generateOutput(tokenID, TransactionStatus.Success, '2'),
       ]
       for (const e of outputEntities) {
         await getConnection().manager.save([e.transaction, e])
@@ -903,10 +888,7 @@ describe('AssetAccountService', () => {
 
       await AssetAccountService.checkAndDeleteWhenFork('3', anyoneCanPayLockHashes)
 
-      const result = await getConnection()
-        .getRepository(AssetAccountEntity)
-        .createQueryBuilder('aa')
-        .getMany()
+      const result = await getConnection().getRepository(AssetAccountEntity).createQueryBuilder('aa').getMany()
 
       expect(result.length).toEqual(2)
     })
@@ -919,20 +901,20 @@ describe('AssetAccountService', () => {
           tokenID: 'CKBytes',
           symbol: 'ckb',
           tokenName: 'ckb',
-          decimal: '0'
+          decimal: '0',
         },
         {
           tokenID: tokenID,
           symbol: 'udt',
           tokenName: 'udt',
-          decimal: '0'
+          decimal: '0',
         },
         {
           tokenID: 'invalid token info',
           symbol: '',
           tokenName: '',
-          decimal: ''
-        }
+          decimal: '',
+        },
       ]
       const repo = getConnection().getRepository(SudtTokenInfoEntity)
       await repo.save(tokens)
@@ -964,7 +946,7 @@ describe('AssetAccountService', () => {
     const description = 'desc'
 
     const fakeWallet = {
-      getNextChangeAddress: () => changeAddressObj
+      getNextChangeAddress: () => changeAddressObj,
     }
 
     beforeEach(async () => {
@@ -975,7 +957,7 @@ describe('AssetAccountService', () => {
         decimal: '0',
         balance: '0',
         accountName: 'udt',
-        blake160
+        blake160,
       })
 
       const e = AssetAccountEntity.fromModel(assetAccount)
@@ -1015,7 +997,7 @@ describe('AssetAccountService', () => {
     const address = 'address'
     const fakeWallet = {
       getNextChangeAddress: () => ({ address }),
-      getAllAddresses: stubbedGetAllAddresses
+      getAllAddresses: stubbedGetAllAddresses,
     }
     const expectedAssetAccount = new AssetAccount(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -1053,7 +1035,7 @@ describe('AssetAccountService', () => {
         .mockResolvedValue(tx)
       fakeChequeCellOutPoint = OutPoint.fromObject({
         txHash: output.transaction.hash,
-        index: '0x0'
+        index: '0x0',
       })
     })
     describe('without existing acp', () => {
@@ -1073,7 +1055,7 @@ describe('AssetAccountService', () => {
           decimal: '0',
           balance: '0',
           accountName: 'udt',
-          blake160
+          blake160,
         })
 
         const e = AssetAccountEntity.fromModel(assetAccount)
@@ -1094,7 +1076,7 @@ describe('AssetAccountService', () => {
       await getConnection().manager.save([output.transaction, output])
       fakeChequeCellOutPoint = OutPoint.fromObject({
         txHash: output.transaction.hash,
-        index: '0x0'
+        index: '0x0',
       })
       await AssetAccountService.generateWithdrawChequeTx(fakeChequeCellOutPoint)
     })
@@ -1103,8 +1085,8 @@ describe('AssetAccountService', () => {
         expect.objectContaining({
           outPoint: {
             index: '0',
-            txHash: fakeChequeCellOutPoint.txHash
-          }
+            txHash: fakeChequeCellOutPoint.txHash,
+          },
         }),
         undefined,
         '1000'
@@ -1121,7 +1103,7 @@ describe('AssetAccountService', () => {
         decimal: '0',
         balance: '0',
         accountName: 'ckb',
-        blake160
+        blake160,
       })
       const outputs = [generateOutput('CKBytes', undefined, undefined, toShannon(1000))]
       await createAccounts([assetAccount], outputs)
@@ -1139,8 +1121,8 @@ describe('AssetAccountService', () => {
             lockHash: outputs[0].lockHash,
             typeHash: outputs[0].typeHash,
             data: outputs[0].data,
-            since: '0'
-          })
+            since: '0',
+          }),
         ],
         'blake160',
         true
@@ -1154,7 +1136,7 @@ describe('AssetAccountService', () => {
         decimal: '0',
         balance: '0',
         accountName: 'sudt',
-        blake160
+        blake160,
       })
       const outputs = [generateOutput(assetAccount.tokenID, undefined, undefined, toShannon(1000))]
       await createAccounts([assetAccount], outputs)
@@ -1172,8 +1154,8 @@ describe('AssetAccountService', () => {
             lockHash: outputs[0].lockHash,
             typeHash: outputs[0].typeHash,
             data: outputs[0].data,
-            since: '0'
-          })
+            since: '0',
+          }),
         ],
         'blake160',
         false
@@ -1194,14 +1176,14 @@ describe('AssetAccountService', () => {
           undefined,
           OutputStatus.Live,
           assetAccountInfo.generateAnyoneCanPayScript(alice.publicKeyInBlake160)
-        )
+        ),
       ]
       await createAccounts(accounts, outputs)
     })
     describe('hd wallet', () => {
       it('exception with Asset account already exists!', async () => {
         stubbedWalletServiceGet.mockReturnValueOnce({
-          isHardware: () => false
+          isHardware: () => false,
         })
         await expect(AssetAccountService.sendTx('walletID', assetAccount)).rejects.toThrow(
           new Error('Asset account already exists!')
@@ -1212,7 +1194,7 @@ describe('AssetAccountService', () => {
       it('no next address', async () => {
         stubbedWalletServiceGet.mockReturnValueOnce({
           isHardware: () => true,
-          getNextAddress: () => undefined
+          getNextAddress: () => undefined,
         })
         await AssetAccountService.sendTx(
           'walletID',
@@ -1223,7 +1205,7 @@ describe('AssetAccountService', () => {
             decimal: '0',
             balance: '0',
             accountName: 'sUDT',
-            blake160: alice.publicKeyInBlake160
+            blake160: alice.publicKeyInBlake160,
           }),
           {},
           'password'
@@ -1234,7 +1216,7 @@ describe('AssetAccountService', () => {
           .createQueryBuilder()
           .where({
             tokenID,
-            blake160: alice.publicKeyInBlake160
+            blake160: alice.publicKeyInBlake160,
           })
           .getCount()
         expect(count).toBe(1)
@@ -1242,7 +1224,7 @@ describe('AssetAccountService', () => {
       it('exception with Asset account already exists!', async () => {
         stubbedWalletServiceGet.mockReturnValueOnce({
           isHardware: () => true,
-          getNextAddress: () => ({ blake160: alice.publicKeyInBlake160, tokenID: assetAccount.tokenID })
+          getNextAddress: () => ({ blake160: alice.publicKeyInBlake160, tokenID: assetAccount.tokenID }),
         })
         await expect(AssetAccountService.sendTx('walletID', assetAccount)).rejects.toThrow(
           new Error('Asset account already exists!')
@@ -1251,7 +1233,7 @@ describe('AssetAccountService', () => {
       it('no acp cell and delete outdate account', async () => {
         stubbedWalletServiceGet.mockReturnValueOnce({
           isHardware: () => true,
-          getNextAddress: () => ({ blake160: bob.publicKeyInBlake160, tokenID: assetAccount.tokenID })
+          getNextAddress: () => ({ blake160: bob.publicKeyInBlake160, tokenID: assetAccount.tokenID }),
         })
         await AssetAccountService.sendTx('walletID', assetAccount, {}, 'password')
         expect(stubbedTransactionSendersendTx).toHaveBeenCalledWith('walletID', {}, 'password', false, false)
@@ -1260,7 +1242,7 @@ describe('AssetAccountService', () => {
           .createQueryBuilder()
           .where({
             tokenID: assetAccount.tokenID,
-            blake160: assetAccount.blake160
+            blake160: assetAccount.blake160,
           })
           .getCount()
         expect(count).toBe(1)
@@ -1276,7 +1258,7 @@ describe('AssetAccountService', () => {
           decimal: '0',
           balance: '0',
           accountName: 'sUDT',
-          blake160: alice.publicKeyInBlake160
+          blake160: alice.publicKeyInBlake160,
         }),
         {},
         'password'
@@ -1287,7 +1269,7 @@ describe('AssetAccountService', () => {
         .createQueryBuilder()
         .where({
           tokenID,
-          blake160: alice.publicKeyInBlake160
+          blake160: alice.publicKeyInBlake160,
         })
         .getCount()
       expect(count).toBe(1)

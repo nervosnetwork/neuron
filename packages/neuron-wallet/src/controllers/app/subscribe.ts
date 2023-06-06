@@ -2,19 +2,19 @@ import { BrowserWindow, dialog, MessageBoxReturnValue } from 'electron'
 import { t } from 'i18next'
 import { debounceTime } from 'rxjs/operators'
 
-import CommandSubject from 'models/subjects/command'
-import DataUpdateSubject from 'models/subjects/data-update'
-import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
-import { ConnectionStatusSubject } from 'models/subjects/node'
-import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
-import AppUpdaterSubject from 'models/subjects/app-updater'
-import SyncStateSubject from 'models/subjects/sync-state-subject'
-import DeviceSignIndexSubject from 'models/subjects/device-sign-index-subject'
-import SyncApiController from 'controllers/sync-api'
-import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
-import MigrateSubject from 'models/subjects/migrate-subject'
-import startMonitor, { stopMonitor } from 'services/monitor'
-import { clearCkbNodeCache } from 'services/ckb-runner'
+import CommandSubject from '../../models/subjects/command'
+import DataUpdateSubject from '../../models/subjects/data-update'
+import { CurrentNetworkIDSubject, NetworkListSubject } from '../../models/subjects/networks'
+import { ConnectionStatusSubject } from '../../models/subjects/node'
+import { WalletListSubject, CurrentWalletSubject } from '../../models/subjects/wallets'
+import AppUpdaterSubject from '../../models/subjects/app-updater'
+import SyncStateSubject from '../../models/subjects/sync-state-subject'
+import DeviceSignIndexSubject from '../../models/subjects/device-sign-index-subject'
+import SyncApiController from '../sync-api'
+import MultisigOutputChangedSubject from '../../models/subjects/multisig-output-db-changed-subject'
+import MigrateSubject from '../../models/subjects/migrate-subject'
+import startMonitor, { stopMonitor } from '../../services/monitor'
+import { clearCkbNodeCache } from '../../services/ckb-runner'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -86,7 +86,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   })
 
   MultisigOutputChangedSubject.getSubject().subscribe(params => [
-    dispatcher.sendMessage('multisig-output-update', params)
+    dispatcher.sendMessage('multisig-output-update', params),
   ])
 
   MigrateSubject.getSubject().subscribe(async message => {
@@ -108,7 +108,7 @@ export const subscribe = (dispatcher: AppResponder) => {
           title: t('messageBox.migrate-failed.title'),
           message: t('messageBox.migrate-failed.message', { reason: message.reason }),
           cancelId: 0,
-          noLink: true
+          noLink: true,
         })
         if (dialogResponse.response === 0) {
           await clearCkbNodeCache()
