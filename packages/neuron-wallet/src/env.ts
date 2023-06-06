@@ -32,12 +32,13 @@ const fileBase = (() => {
   return 'dev/'
 })()
 
+const port = process.env.PORT || 3000
 const env = {
   app,
   isDevMode,
   isTestMode,
   fileBasePath: path.resolve(app.getPath('userData'), fileBase),
-  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
+  mainURL: isDevMode ? `http://localhost:${port}` : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
 }
 
 export default env
