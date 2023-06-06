@@ -1,3 +1,5 @@
+@import "../../styles/animation.scss";
+
 .syncing {
   display: flex;
   align-items: center;
@@ -6,8 +8,9 @@
   color: var(--main-text-color);
 
   .confirm {
+    @include infinite-rotation;
     margin-right: 4px;
-  
+
     path {
       fill: var(--primary-color);
     }
@@ -45,7 +48,7 @@
   .blockSynced {
     font-size: 12px;
   }
-  
+
   .blockNumber {
     font-family: D-DIN-PRO;
     font-weight: 700;
@@ -53,7 +56,7 @@
     color: var(--dialog-secondary-text-color);
     margin-top: 4px;
   }
-  
+
   .lookingValidTarget {
     font-size: 12px;
     font-weight: 400;
@@ -66,7 +69,7 @@
       background-color: var(--divide-line-color);
       margin: 12px 0 8px 0;
     }
-  
+
     & > div {
       display: flex;
       align-items: center;
