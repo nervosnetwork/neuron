@@ -2,6 +2,7 @@ import os from 'os'
 import path from 'path'
 import dotenv from 'dotenv'
 import { app as electronApp } from 'electron'
+import {loadEnv} from '@nervina-labs/neuron-shared'
 
 const app = electronApp ?? {
   getPath(aPath: string): string {
@@ -31,6 +32,8 @@ const fileBase = (() => {
   }
   return 'dev/'
 })()
+
+loadEnv()
 
 const port = process.env.PORT || 3000
 const env = {

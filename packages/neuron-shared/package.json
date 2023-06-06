@@ -1,0 +1,9 @@
+{
+  "name": "@nervina-labs/neuron-shared",
+  "version": "0.110.1",
+  "private": true,
+  "main": "./dist/main.js",
+  "dependencies": {
+    "typescript": "^5.1.3"
+  }
+}
