@@ -20,6 +20,7 @@
     "start": "electron .",
     "build": "tsc",
     "watch": "tsc -w",
+    "start:wait-ui:debug": "zx scripts/wait-ui.mjs && yarn run start:debug",
     "start:dev": "yarn run build && electron .",
     "start:debug": "yarn run build && electron --inspect=5858 .",
     "clean": "npx rimraf dist/*",
