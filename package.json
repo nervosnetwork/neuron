@@ -47,6 +47,7 @@
     "@typescript-eslint/parser": "5.58.0",
     "concurrently": "8.0.1",
     "cross-env": "7.0.3",
+    "dotenv": "^16.1.4",
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
     "husky": "8.0.3",

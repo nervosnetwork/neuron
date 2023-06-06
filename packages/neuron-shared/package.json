@@ -3,6 +3,12 @@
   "version": "0.110.1",
   "private": true,
   "main": "./dist/main.js",
+  "scripts": {
+    "test": "cross-env NODE_ENV=test jest --runInBand --collect-coverage --forceExit",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
   "dependencies": {
     "typescript": "^5.1.3"
   }

@@ -1,6 +1,5 @@
 import os from 'os'
 import path from 'path'
-import dotenv from 'dotenv'
 import { app as electronApp } from 'electron'
 import {loadEnv} from '@nervina-labs/neuron-shared'
 
@@ -17,11 +16,6 @@ const app = electronApp ?? {
 
 const isTestMode = process.env.NODE_ENV === 'test'
 const isDevMode = !app.isPackaged && !isTestMode
-
-if (isDevMode) {
-  dotenv.config({ path: path.resolve(__dirname, '..', '.env.development.local') })
-}
-dotenv.config({ path: path.join(__dirname, '..', '.env') })
 
 const fileBase = (() => {
   if (isTestMode) {

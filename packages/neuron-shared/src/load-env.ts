@@ -1,6 +1,8 @@
 import fs from 'fs'
+import dotenv from 'dotenv'
+
 const dotenvPath = '.env'
-const NODE_ENV = process.env.NODE_NEV || 'development'
+const NODE_ENV = process.env.NODE_ENV || 'development'
 
 const dotenvFiles = [
   `${dotenvPath}.${NODE_ENV}.local`,
@@ -9,10 +11,13 @@ const dotenvFiles = [
   dotenvPath,
 ].filter(Boolean)
 
+
 export const loadEnv = () => {
-  dotenvFiles.forEach(dotenvFile => {
+  for (let i = 0; i < dotenvFiles.length; i++) {
+    const dotenvFile = dotenvFiles[i]
     if (fs.existsSync(dotenvFile)) {
-      require('dotenv').config({ path: dotenvFile })
+      dotenv.config({ path: dotenvFile, override: true })
+      break
     }
-  })
+  }
 }
