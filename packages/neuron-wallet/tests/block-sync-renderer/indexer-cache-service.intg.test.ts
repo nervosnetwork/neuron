@@ -9,7 +9,18 @@ import RpcService from '../../src/services/rpc-service'
 
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
-const stubbedGetTransactionsByLockScriptFn = jest.fn()
+const stubbedCollectFn = jest.fn(() => {
+  return {
+    [Symbol.asyncIterator]: () => {
+      return {
+        next: async () => {
+          return { done: true }
+        },
+      }
+    },
+  }
+})
+const ckbRpcUrl = 'http://localhost:8114'
 
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
   getTransaction: stubbedGetTransactionFn,
@@ -17,16 +28,17 @@ const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
 }))
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(() => ({
-  getTransactionsByLockScript: stubbedGetTransactionsByLockScriptFn,
+  ckbRpcUrl
 }))
 
 const stubbedTransactionCollectorConstructor = jest.fn()
-const stubbedCellCollectorConstructor = jest.fn()
+const stubbedCellCollectorConstructor = jest.fn().mockImplementation(() => ({
+  collect: stubbedCollectFn,
+}))
 
 const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedGetHeaderFn.mockReset()
-  stubbedGetTransactionsByLockScriptFn.mockReset()
 
   mockGetTransactionHashes()
 }
@@ -88,7 +100,7 @@ const mockGetTransactionHashes = (mocks: any[] = []) => {
 
   for (const lock of [formattedDefaultLockScript, formattedAcpLockScript, formattedLegacyAcpLockScript]) {
     const { hashes } = mocks.find(mock => mock.lock === lock) || { hashes: [] }
-    stubbedConstructor.calledWith(expect.anything(), { lock }).mockReturnValue({
+    stubbedConstructor.calledWith(expect.anything(), { lock }, ckbRpcUrl, { includeStatus: false }).mockReturnValue({
       getTransactionHashes: jest.fn().mockReturnValue(hashes),
     })
   }
@@ -130,22 +142,6 @@ describe('indexer cache service', () => {
         CellCollector: stubbedCellCollectorConstructor,
       }
     })
-
-    when(stubbedCellCollectorConstructor)
-      .calledWith(expect.anything())
-      .mockReturnValue({
-        collect: () => {
-          return {
-            [Symbol.asyncIterator]: () => {
-              return {
-                next: async () => {
-                  return { done: true }
-                },
-              }
-            },
-          }
-        },
-      })
 
     rpcService = new stubbedRPCServiceConstructor()
     IndexerCacheService = require('../../src/block-sync-renderer/sync/indexer-cache-service').default
