@@ -7,6 +7,7 @@
     "test": "cross-env NODE_ENV=test jest --runInBand --collect-coverage --forceExit",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
     "build": "tsc",
+    "start": "tsc -w",
     "watch": "tsc -w"
   },
   "dependencies": {
