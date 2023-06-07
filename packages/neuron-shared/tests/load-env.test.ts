@@ -6,6 +6,7 @@ jest.mock('fs')
 
 const contentMap: Record<string, string> = {
   '.env': 'TEST_VAR="from .env"',
+  '.env.local': 'TEST_VAR="from .env.local"',
   '.env.test': 'TEST_VAR="from .env.test"',
   '.env.test.local': 'TEST_VAR="from .env.test.local"',
   '.env.development': 'TEST_VAR="from .env.development"',
@@ -47,6 +48,13 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.test')
     })
+    it(".env.local is ignored in test env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.local', '.env.test', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_VAR).toEqual('from .env.test')
+    })
     it(".env.test.local > .env.test > .env", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
         return ['.env.test.local', '.env.test', '.env'].includes(filepath)
@@ -81,16 +89,23 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.development')
     })
-    it(".env.development.local > .env.development > .env", () => {
+    it(".env.local > .env.development > .env", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
-        return ['.env.development.local', '.env.development', '.env'].includes(filepath)
+        return ['.env.local', '.env.development', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_VAR).toEqual('from .env.local')
+    })
+    it(".env.development.local > .env.local > .env.development > .env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.development.local', '.env.local', '.env.development', '.env'].includes(filepath)
       })
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.development.local')
     })
     it("neither import files nor throw error when no env file exists", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
-        return !(['.env.development.local', '.env.development', '.env'].includes(filepath))
+        return !(['.env.development.local', '.env.local', '.env.development', '.env'].includes(filepath))
       })
       expect(process.env.TEST_VAR).toBeUndefined()
       expect(() => loadEnv()).not.toThrow()
@@ -116,16 +131,23 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.production')
     })
+    it(".env.local > .env.production > .env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.local', '.env.production', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_VAR).toEqual('from .env.local')
+    })
     it(".env.production.local > .env.production > .env", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
-        return ['.env.production.local', '.env.production', '.env'].includes(filepath)
+        return ['.env.production.local', '.env.local', '.env.production', '.env'].includes(filepath)
       })
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.production.local')
     })
     it("neither import files nor throw error when no env file exists", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
-        return !(['.env.production.local', '.env.production', '.env'].includes(filepath))
+        return !(['.env.production.local', '.env.local', '.env.production', '.env'].includes(filepath))
       })
       expect(process.env.TEST_VAR).toBeUndefined()
       expect(() => loadEnv()).not.toThrow()
