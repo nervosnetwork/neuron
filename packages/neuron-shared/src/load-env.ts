@@ -1,5 +1,6 @@
 import fs from 'fs'
 import dotenv from 'dotenv'
+import dotenvExpand from 'dotenv-expand'
 
 const dotenvPath = '.env'
 
@@ -17,8 +18,7 @@ export const loadEnv = () => {
   for (let i = 0; i < dotenvFiles.length; i++) {
     const dotenvFile = dotenvFiles[i]
     if (fs.existsSync(dotenvFile)) {
-      dotenv.config({ path: dotenvFile })
-      break
+      dotenvExpand.expand(dotenv.config({ path: dotenvFile, override: false }))
     }
   }
 }
