@@ -1,8 +1,8 @@
 import { loadEnv } from "../src/load-env"
-import fs from 'fs'
+import fs from 'node:fs'
 
 
-jest.mock('fs')
+jest.mock('node:fs')
 describe("Load Env", () => {
   beforeAll(() => {
     fs.readFileSync = jest.fn().mockImplementation((filepath) => {
