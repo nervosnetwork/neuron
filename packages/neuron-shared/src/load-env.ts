@@ -9,7 +9,7 @@ export const loadEnv = () => {
 
   const dotenvFiles = [
     `${dotenvPath}.${NODE_ENV}.local`,
-    `${dotenvPath}.local`,
+    NODE_ENV !== 'test' ? `${dotenvPath}.local` : '',
     `${dotenvPath}.${NODE_ENV}`,
     dotenvPath,
   ].filter(Boolean)
