@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
-import { loadEnv } from '@nervina-labs/neuron-shared'
+import { loadEnv } from '@nervosnetwork/neuron-shared'
 import { exec } from 'node:child_process'
 
 loadEnv()

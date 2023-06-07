@@ -1,5 +1,5 @@
 {
-  "name": "@nervina-labs/neuron-shared",
+  "name": "@nervosnetwork/neuron-shared",
   "version": "0.110.1",
   "private": true,
   "main": "./dist/main.js",

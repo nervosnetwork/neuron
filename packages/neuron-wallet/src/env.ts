@@ -1,7 +1,7 @@
 import os from 'os'
 import path from 'path'
 import { app as electronApp } from 'electron'
-import {loadEnv} from '@nervina-labs/neuron-shared'
+import {loadEnv} from '@nervosnetwork/neuron-shared'
 
 const app = electronApp ?? {
   getPath(aPath: string): string {

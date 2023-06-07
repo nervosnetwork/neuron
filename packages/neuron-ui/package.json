@@ -48,7 +48,7 @@
     "i18next": "21.10.0",
     "immer": "9.0.21",
     "jsqr": "1.4.0",
-    "@nervina-labs/neuron-shared": "0.110.1",
+    "@nervosnetwork/neuron-shared": "0.110.1",
     "office-ui-fabric-react": "7.204.0",
     "qr.js": "0.0.0",
     "react": "17.0.2",
