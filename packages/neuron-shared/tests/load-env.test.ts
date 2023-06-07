@@ -54,7 +54,7 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.test.local')
     })
-    it("does not throw error when no env file exists", () => {
+    it("neither import files nor throw error when no env file exists", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
         return !(['.env.test.local', '.env.test', '.env'].includes(filepath))
       })
@@ -88,7 +88,7 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.development.local')
     })
-    it("does not throw error when no env file exists", () => {
+    it("neither import files nor throw error when no env file exists", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
         return !(['.env.development.local', '.env.development', '.env'].includes(filepath))
       })
@@ -123,7 +123,7 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_VAR).toEqual('from .env.production.local')
     })
-    it("does not throw error when no env file exists", () => {
+    it("neither import files nor throw error when no env file exists", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
         return !(['.env.production.local', '.env.production', '.env'].includes(filepath))
       })
