@@ -8,18 +8,31 @@ const contentMap: Record<string, string> = {
   '.env': 'TEST_ENV="from .env"',
   '.env.test': 'TEST_ENV="from .env.test"',
   '.env.test.local': 'TEST_ENV="from .env.test.local"',
+  '.env.development': 'TEST_ENV="from .env.development"',
+  '.env.development.local': 'TEST_ENV="from .env.development.local"',
+  '.env.production': 'TEST_ENV="from .env.production"',
+  '.env.production.local': 'TEST_ENV="from .env.production.local"',
 }
 
 describe("Load Env", () => {
+  const originalEnv = process.env;
+
   beforeAll(() => {
     fs.readFileSync = jest.fn().mockImplementation(
       (filepath: string) => contentMap[filepath] || ''
     )
   })
   afterAll(() => {
-    jest.resetAllMocks()
+    jest.restoreAllMocks()
   })
-  describe("read one by one", () => {
+  afterEach(() => {
+    process.env = originalEnv;
+  })
+  describe("in test environment", () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'test'
+      delete process.env.TEST_ENV
+    })
     it(".env", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
         return ['.env'].includes(filepath)
@@ -41,10 +54,80 @@ describe("Load Env", () => {
       loadEnv()
       expect(process.env.TEST_ENV).toEqual('from .env.test.local')
     })
-    it("does not throw error when .env not exists", () => {
+    it("does not throw error when no env file exists", () => {
       fs.existsSync = jest.fn().mockImplementation((filepath) => {
-        return !['.env.test.local', '.env.test', '.env'].includes(filepath)
+        return !(['.env.test.local', '.env.test', '.env'].includes(filepath))
       })
+      expect(process.env.TEST_ENV).toBeUndefined()
+      expect(() => loadEnv()).not.toThrow()
+    })
+  })
+  describe("in development environment", () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'development'
+      delete process.env.TEST_ENV
+    })
+    it(".env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_ENV).toEqual('from .env')
+    })
+    it(".env.development > .env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.development', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_ENV).toEqual('from .env.development')
+    })
+    it(".env.development.local > .env.development > .env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.development.local', '.env.development', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_ENV).toEqual('from .env.development.local')
+    })
+    it("does not throw error when no env file exists", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return !(['.env.development.local', '.env.development', '.env'].includes(filepath))
+      })
+      expect(process.env.TEST_ENV).toBeUndefined()
+      expect(() => loadEnv()).not.toThrow()
+    })
+  })
+
+  describe("in production environment", () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'production'
+      delete process.env.TEST_ENV
+    })
+    it(".env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_ENV).toEqual('from .env')
+    })
+    it(".env.production > .env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.production', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_ENV).toEqual('from .env.production')
+    })
+    it(".env.production.local > .env.production > .env", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return ['.env.production.local', '.env.production', '.env'].includes(filepath)
+      })
+      loadEnv()
+      expect(process.env.TEST_ENV).toEqual('from .env.production.local')
+    })
+    it("does not throw error when no env file exists", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return !(['.env.production.local', '.env.production', '.env'].includes(filepath))
+      })
+      expect(process.env.TEST_ENV).toBeUndefined()
       expect(() => loadEnv()).not.toThrow()
     })
   })
