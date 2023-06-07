@@ -15,10 +15,10 @@
   "main": "./build",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=development zx ./scripts/bootstrap.mjs start",
+    "start": "cross-env NODE_ENV=development node ./scripts/bootstrap.mjs start",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
     "test": "react-app-rewired test --env=jsdom --watchAll=false",
-    "build": "cross-env NODE_ENV=production zx ./scripts/bootstrap.mjs build",
+    "build": "cross-env NODE_ENV=production node ./scripts/bootstrap.mjs build",
     "clean": "npx rimraf build/*",
     "precommit": "lint-staged",
     "storybook": "start-storybook -p 9009 -s public",

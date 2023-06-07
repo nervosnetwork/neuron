@@ -17,7 +17,7 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "zx scripts/wait-ui.mjs && yarn run start:debug",
+    "start": "node scripts/wait-ui.mjs && yarn run start:debug",
     "build": "tsc",
     "watch": "tsc -w",
     "start:dev": "yarn run build && electron .",
