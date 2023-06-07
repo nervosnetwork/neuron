@@ -1,21 +1,20 @@
-import fs from 'node:fs'
+import fs from 'fs'
 import { loadEnv } from "../src/load-env"
 
 
-jest.mock('node:fs')
+jest.mock('fs')
+
+const contentMap: Record<string, string> = {
+  '.env': 'TEST_ENV="from .env"',
+  '.env.test': 'TEST_ENV="from .env.test"',
+  '.env.test.local': 'TEST_ENV="from .env.test.local"',
+}
+
 describe("Load Env", () => {
   beforeAll(() => {
-    fs.readFileSync = jest.fn().mockImplementation((filepath) => {
-      if (filepath === '.env.test.local') {
-        return 'TEST_ENV="from .env.test.local"'
-      } else if (filepath === '.env.test') {
-        return 'TEST_ENV="from .env.test"'
-      } else if (filepath === '.env') {
-        return 'TEST_ENV="from .env"'
-      } else {
-        return ''
-      }
-    })
+    fs.readFileSync = jest.fn().mockImplementation(
+      (filepath: string) => contentMap[filepath] || ''
+    )
   })
   afterAll(() => {
     jest.resetAllMocks()
@@ -41,6 +40,12 @@ describe("Load Env", () => {
       })
       loadEnv()
       expect(process.env.TEST_ENV).toEqual('from .env.test.local')
+    })
+    it("does not throw error when .env not exists", () => {
+      fs.existsSync = jest.fn().mockImplementation((filepath) => {
+        return !['.env.test.local', '.env.test', '.env'].includes(filepath)
+      })
+      expect(() => loadEnv()).not.toThrow()
     })
   })
 })

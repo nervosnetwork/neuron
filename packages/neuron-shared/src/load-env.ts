@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import fs from 'fs'
 import dotenv from 'dotenv'
 
 const dotenvPath = '.env'
