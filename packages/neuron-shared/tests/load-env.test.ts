@@ -1,5 +1,5 @@
-import { loadEnv } from "../src/load-env"
 import fs from 'node:fs'
+import { loadEnv } from "../src/load-env"
 
 
 jest.mock('node:fs')
