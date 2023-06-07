@@ -7,7 +7,7 @@ exports.default = async function notarizing(context) {
   }
 
   if (process.env.SKIP_NOTARIZE === 'true') {
-    console.warn('Skip notarizing when package on pull_request')
+    console.warn('Skip notarizing when apple id is empty')
     return Promise.resolve('skip')
   }
 
