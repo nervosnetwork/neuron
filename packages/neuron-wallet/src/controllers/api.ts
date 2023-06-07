@@ -11,33 +11,33 @@ import {
   Menu,
   screen,
   BrowserWindow,
-  nativeTheme
+  nativeTheme,
 } from 'electron'
 import { t } from 'i18next'
 import path from 'path'
 import fs from 'fs'
-import env from 'env'
+import env from '../env'
 import { showWindow } from './app/show-window'
-import CommonUtils from 'utils/common'
-import { NetworkType, Network } from 'models/network'
-import { ConnectionStatusSubject } from 'models/subjects/node'
-import NetworksService from 'services/networks'
-import WalletsService from 'services/wallets'
-import SettingsService, { Locale } from 'services/settings'
-import { ResponseCode } from 'utils/const'
-import { clean as cleanChain } from 'database/chain'
-import WalletsController from 'controllers/wallets'
-import TransactionsController from 'controllers/transactions'
-import DaoController from 'controllers/dao'
-import NetworksController from 'controllers/networks'
-import UpdateController from 'controllers/update'
-import MultisigController from 'controllers/multisig'
-import Transaction from 'models/chain/transaction'
-import OutPoint from 'models/chain/out-point'
-import SignMessageController from 'controllers/sign-message'
+import CommonUtils from '../utils/common'
+import { NetworkType, Network } from '../models/network'
+import { ConnectionStatusSubject } from '../models/subjects/node'
+import NetworksService from '../services/networks'
+import WalletsService from '../services/wallets'
+import SettingsService, { Locale } from '../services/settings'
+import { ResponseCode } from '../utils/const'
+import { clean as cleanChain } from '../database/chain'
+import WalletsController from '../controllers/wallets'
+import TransactionsController from '../controllers/transactions'
+import DaoController from '../controllers/dao'
+import NetworksController from '../controllers/networks'
+import UpdateController from '../controllers/update'
+import MultisigController from '../controllers/multisig'
+import Transaction from '../models/chain/transaction'
+import OutPoint from '../models/chain/out-point'
+import SignMessageController from '../controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
-import SystemScriptInfo from 'models/system-script-info'
-import logger from 'utils/logger'
+import SystemScriptInfo from '../models/system-script-info'
+import logger from '../utils/logger'
 import AssetAccountController, { GenerateWithdrawChequeTxParams } from './asset-account'
 import {
   GenerateCreateAssetAccountTxParams,
@@ -49,21 +49,21 @@ import {
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
-import { DeviceInfo, ExtendedPublicKey } from 'services/hardware/common'
+import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import HardwareController from './hardware'
 import OfflineSignController from './offline-sign'
-import SUDTController from 'controllers/sudt'
-import SyncedBlockNumber from 'models/synced-block-number'
-import IndexerService from 'services/indexer'
-import MultisigConfigModel from 'models/multisig-config'
-import startMonitor, { stopMonitor } from 'services/monitor'
-import { migrateCkbData } from 'services/ckb-runner'
-import NodeService from 'services/node'
+import SUDTController from '../controllers/sudt'
+import SyncedBlockNumber from '../models/synced-block-number'
+import IndexerService from '../services/indexer'
+import MultisigConfigModel from '../models/multisig-config'
+import startMonitor, { stopMonitor } from '../services/monitor'
+import { migrateCkbData } from '../services/ckb-runner'
+import NodeService from '../services/node'
+import SyncProgressService from '../services/sync-progress'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
 export default class ApiController {
-  // eslint-disable-next-line prettier/prettier
   #walletsController = new WalletsController()
   #transactionsController = new TransactionsController()
   #daoController = new DaoController()
@@ -138,7 +138,7 @@ export default class ApiController {
     handle('get-system-codehash', async () => {
       return {
         status: ResponseCode.Success,
-        result: SystemScriptInfo.SECP_CODE_HASH
+        result: SystemScriptInfo.SECP_CODE_HASH,
       }
     })
 
@@ -150,7 +150,7 @@ export default class ApiController {
       const result = await dialog.showOpenDialog(params)
       return {
         status: ResponseCode.Success,
-        result
+        result,
       }
     })
 
@@ -159,7 +159,7 @@ export default class ApiController {
       const result = await dialog.showOpenDialog(win, params)
       return {
         status: ResponseCode.Success,
-        result
+        result,
       }
     })
 
@@ -171,7 +171,7 @@ export default class ApiController {
       const result = screen.getAllDisplays().map(d => d.size)
       return {
         status: ResponseCode.Success,
-        result
+        result,
       }
     })
 
@@ -202,7 +202,7 @@ export default class ApiController {
                 resolve(false)
               }
             )
-          })
+          }),
         ])
 
       const addresses: Controller.Address[] = await (currentWallet
@@ -215,7 +215,7 @@ export default class ApiController {
               pageNo: 1,
               pageSize: 15,
               keywords: '',
-              walletID: currentWallet.id
+              walletID: currentWallet.id,
             })
             .then(res => res.result)
         : []
@@ -248,7 +248,7 @@ export default class ApiController {
           title: t(`open-in-explorer.title`),
           message: t(`open-in-explorer.message`, { type: t(`open-in-explorer.${type}`), key }),
           defaultId: 0,
-          buttons: [t('common.ok'), t('common.cancel')]
+          buttons: [t('common.ok'), t('common.cancel')],
         })
         .then(({ response }) => {
           if (response === 0) {
@@ -285,7 +285,7 @@ export default class ApiController {
     handle('is-ckb-run-external', () => {
       return {
         status: ResponseCode.Success,
-        result: NodeService.getInstance().isCkbNodeExternal
+        result: NodeService.getInstance().isCkbNodeExternal,
       }
     })
 
@@ -363,7 +363,7 @@ export default class ApiController {
       ) => {
         return this.#walletsController.sendTx({
           ...params,
-          multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined
+          multisigConfig: params.multisigConfig ? MultisigConfigModel.fromObject(params.multisigConfig) : undefined,
         })
       }
     )
@@ -393,7 +393,7 @@ export default class ApiController {
       async (_, params: { items: { address: string; capacity: string }[]; multisigConfig: MultisigConfigModel }) => {
         return this.#walletsController.generateMultisigTx({
           items: params.items,
-          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
         })
       }
     )
@@ -403,7 +403,7 @@ export default class ApiController {
       async (_, params: { items: { address: string; capacity: string }[]; multisigConfig: MultisigConfigModel }) => {
         return this.#walletsController.generateMultisigSendAllTx({
           items: params.items,
-          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig)
+          multisigConfig: MultisigConfigModel.fromObject(params.multisigConfig),
         })
       }
     )
@@ -434,8 +434,24 @@ export default class ApiController {
     )
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`#/transaction/${hash}`, t(`messageBox.transaction.title`, { hash }), {
-        height: 750
+      const win = showWindow(
+        `#/transaction/${hash}`,
+        t(`messageBox.transaction.title`, { hash }),
+        {
+          height: 750,
+        },
+        undefined,
+        win => win.webContents.getURL().endsWith(`#/transaction/${hash}`)
+      )
+
+      if (win.isVisible()) return
+
+      return new Promise((resolve, reject) => {
+        win.once('ready-to-show', resolve)
+        CommonUtils.sleep(3e3).then(() => {
+          win.off('ready-to-show', resolve)
+          reject(new Error('Show window timeout'))
+        })
       })
     })
 
@@ -550,7 +566,7 @@ export default class ApiController {
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath
+        result: SettingsService.getInstance().ckbDataPath,
       }
     })
 
@@ -559,7 +575,7 @@ export default class ApiController {
         const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
           type: 'info',
           message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
-          buttons: [t('common.ok'), t('common.cancel')]
+          buttons: [t('common.ok'), t('common.cancel')],
         })
         if (response === 1) {
           return {
@@ -572,7 +588,7 @@ export default class ApiController {
       await startMonitor('ckb', true)
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath
+        result: SettingsService.getInstance().ckbDataPath,
       }
     })
 
@@ -723,14 +739,14 @@ export default class ApiController {
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction({
         ...params,
-        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined
+        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined,
       })
     })
 
     handle('sign-and-broadcast-transaction', async (_, params) => {
       return this.#offlineSignController.signAndBroadcastTransaction({
         ...params,
-        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined
+        multisigConfig: params?.multisigConfig ? MultisigConfigModel.fromObject(params?.multisigConfig) : undefined,
       })
     })
 
@@ -773,6 +789,14 @@ export default class ApiController {
       migrateCkbData()
       return {
         status: ResponseCode.Success
+      }
+    })
+
+    //light client
+    handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
+      return {
+        result: (await SyncProgressService.getSyncProgressByHashes(hashes)),
+        status: ResponseCode.Success,
       }
     })
   }

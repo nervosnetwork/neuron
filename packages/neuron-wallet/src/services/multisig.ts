@@ -1,14 +1,17 @@
 import { getConnection, In, Not } from 'typeorm'
-import MultisigConfig from 'database/chain/entities/multisig-config'
-import MultisigOutput from 'database/chain/entities/multisig-output'
-import { MultisigConfigNotExistError, MultisigConfigExistError } from 'exceptions/multisig'
-import { rpcBatchRequest } from 'utils/rpc-request'
+import MultisigConfig from '../database/chain/entities/multisig-config'
+import MultisigOutput from '../database/chain/entities/multisig-output'
+import { MultisigConfigNotExistError, MultisigConfigExistError } from '../exceptions/multisig'
+import { rpcBatchRequest } from '../utils/rpc-request'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import MultisigOutputChangedSubject from 'models/subjects/multisig-output-db-changed-subject'
-import Transaction from 'models/chain/transaction'
-import { OutputStatus } from 'models/chain/output'
+import MultisigOutputChangedSubject from '../models/subjects/multisig-output-db-changed-subject'
+import Transaction from '../models/chain/transaction'
+import { OutputStatus } from '../models/chain/output'
 import NetworksService from './networks'
-import Multisig from 'models/multisig'
+import Multisig from '../models/multisig'
+import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
+import { NetworkType } from '../models/network'
+import WalletService from './wallets'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -21,7 +24,7 @@ export default class MultisigService {
         r: multisigConfig.r,
         m: multisigConfig.m,
         n: multisigConfig.n,
-        blake160s: multisigConfig.blake160s
+        blake160s: multisigConfig.blake160s.toString(),
       })
       .getCount()
     if (result > 0) {
@@ -43,7 +46,7 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        id: params.id
+        id: params.id,
       })
       .getOne()
     if (!result) {
@@ -58,7 +61,7 @@ export default class MultisigService {
         r: params.r ?? result.r,
         m: params.m ?? result.m,
         n: params.n ?? result.n,
-        blake160s: params.blake160s ?? result.blake160s
+        blake160s: params.blake160s ?? result.blake160s,
       })
       .where('id = :id', { id: params.id })
       .execute()
@@ -70,7 +73,7 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        walletId
+        walletId,
       })
       .orderBy('id', 'DESC')
       .getMany()
@@ -82,7 +85,7 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        id
+        id,
       })
       .getOne()
     await getConnection().manager.remove(config)
@@ -96,7 +99,7 @@ export default class MultisigService {
     while (currentMultisigConfigs.length) {
       const res = await rpcBatchRequest(
         network.remote,
-        currentMultisigConfigs.map(v => {
+        currentMultisigConfigs.map((v) => {
           const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
           return {
             method: 'get_cells',
@@ -105,17 +108,17 @@ export default class MultisigService {
                 script: {
                   code_hash: script.codeHash,
                   hash_type: script.hashType,
-                  args: script.args
+                  args: script.args,
                 },
                 script_type: 'lock',
                 filter: {
-                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined
-                }
+                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
+                },
               },
               'desc',
               '0x64',
-              addressCursorMap.get(script.args)
-            ]
+              addressCursorMap.get(script.args),
+            ],
           }
         })
       )
@@ -139,10 +142,7 @@ export default class MultisigService {
   }
 
   static async saveLiveMultisigOutput() {
-    const multisigConfigs = await getConnection()
-      .getRepository(MultisigConfig)
-      .createQueryBuilder()
-      .getMany()
+    const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     const liveCells = await MultisigService.getLiveCells(multisigConfigs)
     if (liveCells.length) {
       await getConnection().manager.save(liveCells)
@@ -158,7 +158,7 @@ export default class MultisigService {
     while (currentMultisigConfigs.length) {
       const res = await rpcBatchRequest(
         network.remote,
-        currentMultisigConfigs.map(v => {
+        currentMultisigConfigs.map((v) => {
           const script = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n)
           return {
             method: 'get_transactions',
@@ -167,17 +167,17 @@ export default class MultisigService {
                 script: {
                   code_hash: script.codeHash,
                   hash_type: script.hashType,
-                  args: script.args
+                  args: script.args,
                 },
                 script_type: 'lock',
                 filter: {
-                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined
-                }
+                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
+                },
               },
               'desc',
               '0x64',
-              addressCursorMap.get(script.args)
-            ]
+              addressCursorMap.get(script.args),
+            ],
           }
         })
       )
@@ -204,13 +204,13 @@ export default class MultisigService {
       const network = await NetworksService.getInstance().getCurrent()
       const txList = await rpcBatchRequest(
         network.remote,
-        [...multisigOutputTxHashList].map(v => ({
+        [...multisigOutputTxHashList].map((v) => ({
           method: 'get_transaction',
-          params: [v]
+          params: [v],
         }))
       )
       const removeOutputTxHashList: string[] = []
-      txList.forEach(v => {
+      txList.forEach((v) => {
         if (!v.error && v?.result?.transaction?.inputs?.length) {
           v?.result?.transaction?.inputs?.forEach((input: any) => {
             removeOutputTxHashList.push(input.previous_output.tx_hash + input.previous_output.index)
@@ -230,11 +230,8 @@ export default class MultisigService {
   }
 
   static async deleteRemovedMultisigOutput() {
-    const multisigConfigs = await getConnection()
-      .getRepository(MultisigConfig)
-      .createQueryBuilder()
-      .getMany()
-    const multisigLockHashList = multisigConfigs.map(v =>
+    const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
+    const multisigLockHashList = multisigConfigs.map((v) =>
       scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
     )
     await getConnection()
@@ -242,28 +239,56 @@ export default class MultisigService {
       .delete()
       .from(MultisigOutput)
       .where({
-        lockHash: Not(In(multisigLockHashList))
+        lockHash: Not(In(multisigLockHashList)),
       })
       .execute()
     MultisigOutputChangedSubject.getSubject().next('delete')
   }
 
-  static async syncMultisigOutput(lastestBlockNumber: string) {
-    try {
-      const multisigConfigs = await getConnection()
-        .getRepository(MultisigConfig)
+  static async saveMultisigSyncBlockNumber(multisigConfigs: MultisigConfig[], lastestBlockNumber: string) {
+    const network = await NetworksService.getInstance().getCurrent()
+    if (network.type === NetworkType.Light) {
+      const multisigScriptHashList = multisigConfigs.map((v) =>
+        scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
+      )
+      const syncBlockNumbers = await getConnection()
+        .getRepository(SyncProgress)
         .createQueryBuilder()
+        .where({ hash: In(multisigScriptHashList) })
         .getMany()
-      await MultisigService.saveLiveMultisigOutput()
-      await MultisigService.deleteDeadMultisigOutput(multisigConfigs)
+      const syncBlockNumbersMap: Record<string, number> = syncBlockNumbers.reduce(
+        (pre, cur) => ({ ...pre, [cur.hash]: cur.blockStartNumber }),
+        {}
+      )
       await getConnection()
         .getRepository(MultisigConfig)
         .save(
-          multisigConfigs.map(v => ({
+          multisigConfigs.map((v) => {
+            const blockNumber =
+              syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))]
+            v.lastestBlockNumber = `0x${BigInt(blockNumber).toString(16)}`
+            return v
+          })
+        )
+    } else {
+      await getConnection()
+        .getRepository(MultisigConfig)
+        .save(
+          multisigConfigs.map((v) => ({
             ...v,
-            lastestBlockNumber
+            lastestBlockNumber,
           }))
         )
+    }
+  }
+
+  static async syncMultisigOutput(lastestBlockNumber: string) {
+    try {
+      const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
+      await MultisigService.saveLiveMultisigOutput()
+      await MultisigService.deleteDeadMultisigOutput(multisigConfigs)
+      await MultisigService.saveMultisigSyncBlockNumber(multisigConfigs, lastestBlockNumber)
+      MultisigOutputChangedSubject.getSubject().next('update')
     } catch (error) {
       // ignore error, if lastestBlockNumber not update, it will try next time
     }
@@ -271,7 +296,7 @@ export default class MultisigService {
 
   static async saveSentMultisigOutput(transaction: Transaction) {
     const inputsOutpointList = transaction.inputs.map(
-      input => `${input.previousOutput?.txHash}0x${(+input.previousOutput!.index)?.toString(16)}`
+      (input) => `${input.previousOutput?.txHash}0x${(+input.previousOutput!.index)?.toString(16)}`
     )
     const multisigOutputs = transaction.outputs.map((output, idx) => {
       const entity = new MultisigOutput()
@@ -291,12 +316,29 @@ export default class MultisigService {
       .createQueryBuilder()
       .update(MultisigOutput)
       .set({
-        status: OutputStatus.Pending
+        status: OutputStatus.Pending,
       })
       .where({
-        outPointTxHashAddIndex: In(inputsOutpointList)
+        outPointTxHashAddIndex: In(inputsOutpointList),
       })
       .execute()
     MultisigOutputChangedSubject.getSubject().next('update')
+  }
+
+  static async getMultisigConfigForLight() {
+    const currentWallet = WalletService.getInstance().getCurrent()
+    const multisigConfigs = await getConnection()
+      .getRepository(MultisigConfig)
+      .createQueryBuilder()
+      .where({
+        walletId: currentWallet?.id
+      })
+      .getMany()
+    return multisigConfigs.map((v) => ({
+      walletId: v.walletId,
+      script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n),
+      addressType: SyncAddressType.Multisig,
+      scriptType: 'lock' as CKBRPC.ScriptType
+    }))
   }
 }

@@ -14,7 +14,7 @@ describe('Script', () => {
     expect(script.hashType).toEqual(hashType)
   })
 
-  it("computeHash", () => {
+  it('computeHash', () => {
     const hash = script.computeHash()
     expect(hash).toEqual(expectedLockHash)
   })
@@ -34,7 +34,7 @@ describe('Script', () => {
     const s = Script.fromSDK({
       codeHash,
       args,
-      hashType
+      hashType,
     })
     expect(s.codeHash).toEqual(script.codeHash)
     expect(s.args).toEqual(script.args)

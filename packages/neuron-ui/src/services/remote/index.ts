@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { ipcRenderer, shell, OpenDialogOptions, MenuItemConstructorOptions, MenuItem } from 'electron'
 import { invokeShowErrorMessage, invokeShowOpenDialog, invokeShowOpenDialogModal, invokeOpenContextMenu } from './app'
 

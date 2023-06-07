@@ -1,7 +1,7 @@
 import { Address, AddressVersion } from '../../../src/models/address'
 import { AddressType } from '../../../src/models/keys/address'
 import AddressMeta from '../../../src/database/address/meta'
-import Multisig from "../../../src/models/multisig";
+import Multisig from '../../../src/models/multisig'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 
 describe('Address Dao tests', () => {
@@ -29,14 +29,14 @@ describe('Address Dao tests', () => {
     let addressMeta: AddressMeta
     beforeEach(() => {
       addressMeta = AddressMeta.fromObject(address)
-    });
+    })
 
     it('#generateDefaultLockScript', () => {
       const script = addressMeta.generateDefaultLockScript()
       expect(script).toEqual({
         args: address.blake160,
         codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-        hashType: 'type'
+        hashType: 'type',
       })
     })
 
@@ -45,7 +45,7 @@ describe('Address Dao tests', () => {
       expect(script).toEqual({
         args: Multisig.hash([address.blake160]),
         codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
-        hashType: 'type'
+        hashType: 'type',
       })
     })
 
@@ -55,9 +55,8 @@ describe('Address Dao tests', () => {
       expect(script).toEqual({
         args: address.blake160,
         codeHash: assetAccountInfo.anyoneCanPayCodeHash,
-        hashType: 'type'
+        hashType: 'type',
       })
     })
-  });
-
+  })
 })

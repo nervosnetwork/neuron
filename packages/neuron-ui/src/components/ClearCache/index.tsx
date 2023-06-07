@@ -19,10 +19,12 @@ const ClearCacheDialog = ({
   dispatch,
   className,
   btnClassName,
+  hideRebuild,
 }: {
   dispatch: StateDispatch
   className?: string
   btnClassName?: string
+  hideRebuild?: boolean
 }) => {
   const [t] = useTranslation()
   const [clearedDate, setClearedDate] = useState(cacheClearDate.load())
@@ -109,10 +111,14 @@ const ClearCacheDialog = ({
             <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
             <span>{t(`${I18N_PATH}.options.refresh.label`)}</span>
           </label>
-          <label htmlFor={IDs.rebuildCacheOption}>
-            <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
-            <span>{t(`${I18N_PATH}.options.rebuild.label`)}</span>
-          </label>
+          {
+            hideRebuild ? null : (
+              <label htmlFor={IDs.rebuildCacheOption}>
+                <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
+                <span>{t(`${I18N_PATH}.options.rebuild.label`)}</span>
+              </label>
+            )
+          }
         </div>
       </Dialog>
     </>

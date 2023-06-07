@@ -1,8 +1,8 @@
-import { UnsupportedManufacturer } from 'exceptions'
+import { UnsupportedManufacturer } from '../../exceptions'
 import { DeviceInfo, Manufacturer } from './common'
 import Ledger from './ledger'
 import { Hardware, HardwareClass } from './hardware'
-import logger from 'utils/logger'
+import logger from '../../utils/logger'
 
 export default class HardwareWalletService {
   private static instance: HardwareWalletService
@@ -42,7 +42,7 @@ export default class HardwareWalletService {
 
   public static async findDevices(device?: Pick<DeviceInfo, 'manufacturer' | 'product'>): Promise<DeviceInfo[]> {
     const devices = await Promise.all([
-      Ledger.findDevices()
+      Ledger.findDevices(),
       // add new brand `findDevices()` here
     ])
 

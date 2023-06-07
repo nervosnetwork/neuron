@@ -2,9 +2,9 @@ import { isErrorWithI18n } from 'exceptions'
 import { validatePasswordComplexity } from 'utils/validators'
 import fixtures from './fixtures'
 
-const fixtureTable: Fixture.Validator<typeof validatePasswordComplexity>[] = Object.entries(
-  fixtures
-).map(([title, { params, exception }]) => [title, [params.password], exception])
+const fixtureTable: Fixture.Validator<typeof validatePasswordComplexity>[] = Object.entries(fixtures).map(
+  ([title, { params, exception }]) => [title, [params.password], exception]
+)
 
 describe('Test password complexity validator', () => {
   test.each(fixtureTable)(`%s`, (_title, [password], exception) => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { updateTransactionList } from 'states/stateProvider/actionCreators/transactions'
 import { listParams, backToTop } from 'utils'
 
-export const useSearch = (search: string = '', walletID: string = '', dispatch: React.Dispatch<any>) => {
+export const useSearch = (search: string, walletID: string, dispatch: React.Dispatch<any>) => {
   const [keywords, setKeywords] = useState('')
 
   const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {

@@ -9,14 +9,14 @@ jest.mock('../../src/services/node', () => ({
   getInstance() {
     return {
       isDefaultCKBNeedRestart: isDefaultCKBNeedRestartMock,
-      startNode: startNodeMock
+      startNode: startNodeMock,
     }
-  }
+  },
 }))
 
 const stopCkbNodeMock = jest.fn()
 jest.mock('../../src/services/ckb-runner', () => ({
-  stopCkbNode: () => stopCkbNodeMock()
+  stopCkbNode: () => stopCkbNodeMock(),
 }))
 
 describe('ckb monitor', () => {
@@ -53,8 +53,10 @@ class MonitorTest extends Monitor {
 }
 
 function wait(times: number) {
-  return new Promise((resolve) => {
-    setTimeout(() => { resolve(times) }, times)
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(times)
+    }, times)
   })
 }
 describe('base monitor', () => {

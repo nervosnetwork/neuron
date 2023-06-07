@@ -1,16 +1,16 @@
 import { dialog } from 'electron'
 import { t } from 'i18next'
-import env from 'env'
+import env from '../../env'
 import { distinctUntilChanged, skip } from 'rxjs/operators'
-import { NetworkType, Network } from 'models/network'
-import NetworksService from 'services/networks'
-import NodeService from 'services/node'
-import { ResponseCode } from 'utils/const'
-import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
-import { resetSyncTaskQueue, switchToNetwork } from 'block-sync-renderer'
-import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
+import { NetworkType, Network } from '../../models/network'
+import NetworksService from '../../services/networks'
+import NodeService from '../../services/node'
+import { ResponseCode } from '../../utils/const'
+import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from '../../exceptions'
+import { resetSyncTaskQueue, switchToNetwork } from '../../block-sync-renderer'
+import { CurrentNetworkIDSubject, NetworkListSubject } from '../../models/subjects/networks'
 import ChainInfo from './chain-info'
-import logger from 'utils/logger'
+import logger from '../../utils/logger'
 
 const networksService = NetworksService.getInstance()
 
@@ -26,7 +26,7 @@ export default class NetworksController {
           await this.connectToNetwork(true)
         } else {
           logger.debug('Network:\tconnection dropped')
-          resetSyncTaskQueue.push(false)
+          resetSyncTaskQueue.asyncPush(false)
         }
       })
 
@@ -37,7 +37,7 @@ export default class NetworksController {
     const networks = networksService.getAll()
     return {
       status: ResponseCode.Success,
-      result: networks
+      result: networks,
     }
   }
 
@@ -53,7 +53,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: network
+      result: network,
     }
   }
 
@@ -71,7 +71,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: created
+      result: created,
     }
   }
 
@@ -91,7 +91,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: true
+      result: true,
     }
   }
 
@@ -107,12 +107,12 @@ export default class NetworksController {
       title: t(`messageBox.remove-network.title`),
       message: t(`messageBox.remove-network.message`, {
         name: network.name,
-        address: network.remote
+        address: network.remote,
       }),
       detail: currentID === id ? t('messageBox.remove-network.alert') : '',
       buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
       defaultId: 0,
-      cancelId: 1
+      cancelId: 1,
     })
 
     if (messageValue.response === 0) {
@@ -128,13 +128,13 @@ export default class NetworksController {
 
         return {
           status: ResponseCode.Success,
-          result: true
+          result: true,
         }
       } catch (err) {
         logger.warn(`connect network error: ${err}`)
         dialog.showMessageBox({
           type: 'error',
-          message: err.message
+          message: err.message,
         })
       }
     }
@@ -145,7 +145,7 @@ export default class NetworksController {
     if (currentID) {
       return {
         status: ResponseCode.Success,
-        result: currentID
+        result: currentID,
       }
     }
     throw new CurrentNetworkNotSet()
@@ -163,7 +163,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: true
+      result: true,
     }
   }
 

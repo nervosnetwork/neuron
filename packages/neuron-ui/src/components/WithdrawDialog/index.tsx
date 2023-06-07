@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { CONSTANTS, shannonToCKBFormatter, localNumberFormatter, useCalculateEpochs } from 'utils'
-import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
-
+import { getTransaction, getHeader } from 'services/chain'
 import Dialog from 'widgets/Dialog'
 import { Attention } from 'widgets/Icons/icon'
+import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
 import styles from './withdrawDialog.module.scss'
 
 const { WITHDRAW_EPOCHS } = CONSTANTS
@@ -14,13 +14,13 @@ const WithdrawDialog = ({
   onDismiss,
   onSubmit,
   record,
-  tipBlockHash,
+  tipDao,
   currentEpoch,
 }: {
   onDismiss: () => void
   onSubmit: () => void
   record: State.NervosDAORecord
-  tipBlockHash: string
+  tipDao?: string
   currentEpoch: string
 }) => {
   const [t] = useTranslation()
@@ -40,24 +40,29 @@ const WithdrawDialog = ({
   }, [record])
 
   useEffect(() => {
-    if (!record || !tipBlockHash) {
+    if (!record || !tipDao) {
       return
     }
 
-    calculateDaoMaximumWithdraw(
-      {
-        txHash: record.outPoint.txHash,
-        index: `0x${BigInt(record.outPoint.index).toString(16)}`,
-      },
-      tipBlockHash
-    )
-      .then((res: string) => {
-        setWithdrawValue(res)
+    getTransaction(record.outPoint.txHash)
+      .then(tx => {
+        if (tx.txStatus.blockHash) {
+          getHeader(tx.txStatus.blockHash).then(header => {
+            setWithdrawValue(
+              calculateMaximumWithdraw(
+                tx.transaction.outputs[+record.outPoint.index],
+                tx.transaction.outputsData[+record.outPoint.index],
+                header.dao,
+                tipDao
+              )
+            )
+          })
+        }
       })
       .catch((err: Error) => {
         console.error(err)
       })
-  }, [record, tipBlockHash])
+  }, [record, tipDao])
 
   const { currentEpochInfo, targetEpochValue } = useCalculateEpochs({ depositEpoch, currentEpoch })
 

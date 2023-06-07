@@ -1,7 +1,10 @@
 import Emitter from 'events'
 import { flushPromises } from '../test-utils'
 
-const stubbedEmitter = jest.fn()
+const stubbedEmitter = jest.fn(() => {
+  const SyncAPIController = jest.requireActual('../../src/controllers/sync-api').default
+  return SyncAPIController.emiter
+})
 const stubbedSyncedBlockNumber = jest.fn()
 const stubbedSyncStateSubjectNext = jest.fn()
 const stubbedGetSyncState = jest.fn()
@@ -36,16 +39,19 @@ jest.doMock('models/subjects/networks', () => {
       pipe: () => ({
         subscribe: (callback: any) => {
           networkChangedCallback = callback
-        }
-      })
-    }
+        },
+      }),
+    },
   }
 })
 jest.doMock('services/ckb-runner', () => ({
-  getLookingValidTargetStatus: jest.fn()
+  getLookingValidTargetStatus: jest.fn(),
 }))
 jest.mock('undici', () => ({
-  request: () => jest.fn()()
+  request: () => jest.fn()(),
+}))
+jest.mock('services/multisig', () => ({
+  syncMultisigOutput: () => jest.fn()
 }))
 
 describe('SyncApiController', () => {
@@ -66,9 +72,6 @@ describe('SyncApiController', () => {
 
     jest.doMock('services/indexer', () => ({ LISTEN_URI: 'stub_listen_uri' }))
 
-    jest.doMock('events', () => {
-      return stubbedEmitter
-    })
     jest.doMock('models/synced-block-number', () => {
       return stubbedSyncedBlockNumber
     })
@@ -82,20 +85,20 @@ describe('SyncApiController', () => {
     })
     jest.doMock('services/node', () => {
       return {
-        getInstance: stubbedNodeGetInstance
+        getInstance: stubbedNodeGetInstance,
       }
     })
     jest.doMock('services/networks', () => {
       return {
         getInstance: () => ({
-          getCurrent: () => ({ remote: '' })
-        })
+          getCurrent: () => ({ remote: '' }),
+        }),
       }
     })
 
     jest.doMock('../../src/models/subjects/node', () => {
       return {
-        getLatestConnectionStatus: stubbedGetLatestConnectionStatus
+        getLatestConnectionStatus: stubbedGetLatestConnectionStatus,
       }
     })
     jest.doMock('../../src/services/rpc-service', () => {
@@ -103,8 +106,8 @@ describe('SyncApiController', () => {
         __esModule: true,
         default: stubbedRpcServiceConstructor.mockImplementation(() => ({
           getTipHeader: stubbedGetTipHeader,
-          getSyncState: stubbedGetSyncState
-        }))
+          getSyncState: stubbedGetSyncState,
+        })),
       }
     })
 
@@ -114,6 +117,8 @@ describe('SyncApiController', () => {
 
     emitter.removeAllListeners()
     const SyncAPIController = require('../../src/controllers/sync-api').default
+    // TODO: starting from jest@29.4.0 or above, you can use `jest.replaceProperty` as an alternative implementation.
+    Object.defineProperty(SyncAPIController, 'emiter', { get: stubbedEmitter })
     controller = new SyncAPIController()
     controller.mount()
   })
@@ -129,13 +134,11 @@ describe('SyncApiController', () => {
       stubbedDateNow.mockReturnValue(246000)
       stubbedGetSyncState.mockResolvedValue({
         bestKnownBlockNumber: bestKnownBlockNumber.toString(16),
-        bestKnownBlockTimestamp: `0x${bestKnownBlockTimestamp.toString(16)}`
+        bestKnownBlockTimestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
       })
       stubbedNodeGetInstance.mockReturnValue({
-        ckb: {
-          node: {
-            url: fakeNodeUrl
-          }
+        get nodeUrl() {
+          return fakeNodeUrl
         }
       })
       stubbedGetTipHeader.mockResolvedValue({ timestamp: '180000' })
@@ -146,12 +149,12 @@ describe('SyncApiController', () => {
         const fakeState1 = {
           cacheTipNumber,
           indexerTipNumber: bestKnownBlockNumber.toString(),
-          timestamp: '186000'
+          timestamp: '186000',
         }
         const fakeState2 = {
           cacheTipNumber,
           indexerTipNumber: bestKnownBlockNumber.toString(),
-          timestamp: '187000'
+          timestamp: '187000',
         }
         beforeEach(async () => {
           await sendFakeCacheBlockTipEvent(fakeState1)
@@ -168,7 +171,7 @@ describe('SyncApiController', () => {
             indexRate: undefined,
             cacheRate: undefined,
             estimate: undefined,
-            status: 3
+            status: 3,
           })
         })
         it('#getSyncStatus returns synced', async () => {
@@ -185,12 +188,12 @@ describe('SyncApiController', () => {
         const fakeState1 = {
           cacheTipNumber,
           indexerTipNumber: bestKnownBlockNumber.toString(),
-          timestamp: '186000'
+          timestamp: '186000',
         }
         const fakeState2 = {
           cacheTipNumber,
           indexerTipNumber: bestKnownBlockNumber.toString(),
-          timestamp: '187000'
+          timestamp: '187000',
         }
         beforeEach(async () => {
           await sendFakeCacheBlockTipEvent(fakeState1)
@@ -208,7 +211,7 @@ describe('SyncApiController', () => {
             indexRate: undefined,
             cacheRate: undefined,
             estimate: undefined,
-            status: 2
+            status: 2,
           })
         })
         it('#getSyncStatus returns syncing', async () => {
@@ -222,12 +225,12 @@ describe('SyncApiController', () => {
         const fakeState1 = {
           cacheTipNumber,
           indexerTipNumber: bestKnownBlockNumber.toString(),
-          timestamp: '606000'
+          timestamp: '606000',
         }
         const fakeState2 = {
           cacheTipNumber,
           indexerTipNumber: bestKnownBlockNumber.toString(),
-          timestamp: '607000'
+          timestamp: '607000',
         }
         beforeEach(async () => {
           await sendFakeCacheBlockTipEvent(fakeState1)
@@ -245,7 +248,7 @@ describe('SyncApiController', () => {
             indexRate: undefined,
             cacheRate: undefined,
             estimate: undefined,
-            status: 1
+            status: 1,
           })
         })
         it('#getSyncStatus returns sync pending', async () => {
@@ -260,7 +263,7 @@ describe('SyncApiController', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: bestKnownBlockNumber.toString(),
-            timestamp: '186000'
+            timestamp: '186000',
           }
           beforeEach(async () => {
             await sendFakeCacheBlockTipEvent(fakeState1)
@@ -276,7 +279,7 @@ describe('SyncApiController', () => {
               indexRate: undefined,
               cacheRate: undefined,
               estimate: undefined,
-              status: 2
+              status: 2,
             })
           })
           it('stores next block number', () => {
@@ -291,12 +294,12 @@ describe('SyncApiController', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 102).toString(),
-            timestamp: '186000'
+            timestamp: '186000',
           }
           const fakeState2 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 51).toString(),
-            timestamp: '187000'
+            timestamp: '187000',
           }
           const indexRate = 51 / (parseInt(fakeState2.timestamp) - parseInt(fakeState1.timestamp))
           const expectedEstimation = {
@@ -309,7 +312,7 @@ describe('SyncApiController', () => {
             indexRate,
             cacheRate: undefined,
             estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState2.indexerTipNumber)) / indexRate),
-            status: 2
+            status: 2,
           }
           beforeEach(async () => {
             await sendFakeCacheBlockTipEvent(fakeState1)
@@ -330,7 +333,7 @@ describe('SyncApiController', () => {
             const newFakeState = {
               ...fakeState2,
               cacheTipNumber: (Number(fakeState2.cacheTipNumber) + 1).toString(),
-              timestamp: '196000'
+              timestamp: '196000',
             }
             beforeEach(() => {
               cachedEstimate = controller.getCachedEstimation()
@@ -358,10 +361,8 @@ describe('SyncApiController', () => {
               describe('with another node url', () => {
                 beforeEach(async () => {
                   stubbedNodeGetInstance.mockReturnValue({
-                    ckb: {
-                      node: {
-                        url: 'anotherfakeurl'
-                      }
+                    get nodeUrl() {
+                      return 'anotherfakeurl'
                     }
                   })
                   await sendFakeCacheBlockTipEvent(newFakeState)
@@ -388,12 +389,12 @@ describe('SyncApiController', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
-            timestamp: '186000'
+            timestamp: '186000',
           }
           const fakeState2 = {
             cacheTipNumber,
             indexerTipNumber: (bestKnownBlockNumber - 1).toString(),
-            timestamp: '187000'
+            timestamp: '187000',
           }
           beforeEach(async () => {
             await sendFakeCacheBlockTipEvent(fakeState1)
@@ -410,7 +411,7 @@ describe('SyncApiController', () => {
               indexRate: undefined,
               cacheRate: undefined,
               estimate: undefined,
-              status: 2
+              status: 2,
             })
           })
           it('stores next block number', () => {
@@ -425,17 +426,17 @@ describe('SyncApiController', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: '100',
-            timestamp: '181000'
+            timestamp: '181000',
           }
           const fakeState2 = {
             cacheTipNumber,
             indexerTipNumber: '200',
-            timestamp: '186000'
+            timestamp: '186000',
           }
           const fakeState3 = {
             cacheTipNumber,
             indexerTipNumber: '6201',
-            timestamp: '246000'
+            timestamp: '246000',
           }
           beforeEach(async () => {
             stubbedSyncStateSubjectNext.mockReset()
@@ -457,7 +458,7 @@ describe('SyncApiController', () => {
               cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
               indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
               estimate: Math.round((bestKnownBlockNumber - parseInt(fakeState3.indexerTipNumber)) / indexRate),
-              status: 2
+              status: 2,
             })
           })
           it('stores next block number', () => {
@@ -470,10 +471,8 @@ describe('SyncApiController', () => {
           describe('when node url changed', () => {
             beforeEach(async () => {
               stubbedNodeGetInstance.mockImplementation(() => ({
-                ckb: {
-                  node: {
-                    url: 'http://diffurl'
-                  }
+                get nodeUrl() {
+                  return 'http://diffurl'
                 }
               }))
               await sendFakeCacheBlockTipEvent(fakeState3)
@@ -489,7 +488,7 @@ describe('SyncApiController', () => {
                 cacheTipNumber: parseInt(fakeState3.cacheTipNumber),
                 indexerTipNumber: parseInt(fakeState3.indexerTipNumber),
                 estimate: undefined,
-                status: 2
+                status: 2,
               })
             })
             it('#getSyncStatus returns syncing', async () => {
@@ -505,20 +504,20 @@ describe('SyncApiController', () => {
         const fakeState1 = {
           cacheTipNumber,
           indexerTipNumber: (bestKnownBlockNumber - 101).toString(),
-          timestamp: '186000'
+          timestamp: '186000',
         }
 
         const nextBestKnownBlockNumber = bestKnownBlockNumber + 50
         const fakeState2 = {
           cacheTipNumber: nextBestKnownBlockNumber.toString(),
           indexerTipNumber: (bestKnownBlockNumber - 50).toString(),
-          timestamp: '187000'
+          timestamp: '187000',
         }
         beforeEach(async () => {
           await sendFakeCacheBlockTipEvent(fakeState1)
           stubbedGetSyncState.mockResolvedValue({
             bestKnownBlockNumber: nextBestKnownBlockNumber.toString(16),
-            bestKnownBlockTimestamp: bestKnownBlockTimestamp
+            bestKnownBlockTimestamp: bestKnownBlockTimestamp,
           })
           await sendFakeCacheBlockTipEvent(fakeState2)
         })
@@ -533,7 +532,7 @@ describe('SyncApiController', () => {
             indexRate: undefined,
             cacheRate: undefined,
             estimate: undefined,
-            status: 2
+            status: 2,
           })
         })
         it('#getSyncStatus returns syncing', async () => {
@@ -558,7 +557,7 @@ describe('SyncApiController', () => {
           indexRate: undefined,
           cacheRate: undefined,
           estimate: undefined,
-          status: 0
+          status: 0,
         })
       })
       it('#getSyncStatus returns not started', async () => {

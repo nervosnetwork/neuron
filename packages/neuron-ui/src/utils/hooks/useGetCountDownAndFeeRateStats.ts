@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getFeeRateStats } from 'services/chain'
-import { AppActions, StateDispatch, useDispatch } from 'states'
-import { MEDIUM_FEE_RATE } from 'utils/const'
+import { MEDIUM_FEE_RATE, METHOD_NOT_FOUND } from 'utils/const'
 
 type CountdownOptions = {
   seconds?: number
@@ -15,30 +14,29 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
     median?: string
     suggestFeeRate: number
   }>({ suggestFeeRate: MEDIUM_FEE_RATE })
-  const dispatch = useDispatch()
 
-  const handleGetFeeRateStatis = useCallback(
-    (stateDispatch: StateDispatch) => {
-      getFeeRateStats()
-        .then(res => {
-          const { mean, median } = res
-          const suggested = mean && median ? Math.max(1000, Number(mean), Number(median)) : MEDIUM_FEE_RATE
+  const handleGetFeeRateStatis = useCallback(() => {
+    getFeeRateStats()
+      .then(res => {
+        const { mean, median } = res ?? {}
+        const suggested = mean && median ? Math.max(1000, Number(mean), Number(median)) : MEDIUM_FEE_RATE
 
-          setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
-        })
-        .catch((err: Error) => {
-          stateDispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: err.message,
-            },
-          })
-        })
-    },
-    [getFeeRateStats, setFeeFatestatsData]
-  )
+        setFeeFatestatsData(states => ({ ...states, ...res, suggestFeeRate: suggested }))
+      })
+      .catch((err: Error & { response?: { status: number } }) => {
+        try {
+          if (err?.response?.status === 404) {
+            throw new Error('method not found')
+          }
+          const errMsg = JSON.parse(err.message)
+          if (errMsg?.code === METHOD_NOT_FOUND) {
+            throw new Error('method not found')
+          }
+        } catch (error) {
+          setFeeFatestatsData(states => ({ ...states, suggestFeeRate: MEDIUM_FEE_RATE }))
+        }
+      })
+  }, [])
 
   useEffect(() => {
     const countInterval = setInterval(() => {
@@ -52,9 +50,9 @@ const useGetCountDownAndFeeRateStats = ({ seconds = 30, interval = 1000 }: Count
 
   useEffect(() => {
     if (countDown === seconds) {
-      handleGetFeeRateStatis(dispatch)
+      handleGetFeeRateStatis()
     }
-  }, [countDown, seconds, dispatch])
+  }, [countDown, seconds])
 
   return { countDown, ...feeFatestatsData }
 }

@@ -9,6 +9,7 @@ const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'
     type: 0,
     id: 'd',
     chain: 'ckb',
+    genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
   },
   onAction: () => {},
   isLookingValidTarget: false,

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
@@ -20,19 +20,12 @@ import {
   generateDaoDepositTx,
   generateDaoClaimTx,
 } from 'services/remote'
-import { ckbCore, getHeaderByNumber } from 'services/chain'
+import { ckbCore, getHeader } from 'services/chain'
 import { isErrorWithI18n } from 'exceptions'
 import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
 
-const {
-  MIN_AMOUNT,
-  MILLISECONDS_IN_YEAR,
-  MIN_DEPOSIT_AMOUNT,
-  MEDIUM_FEE_RATE,
-  SHANNON_CKB_RATIO,
-  MAX_DECIMAL_DIGITS,
-} = CONSTANTS
-let timer: NodeJS.Timeout
+const { MIN_AMOUNT, MILLISECONDS_IN_YEAR, MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIGITS } =
+  CONSTANTS
 
 const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
   return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
@@ -91,12 +84,14 @@ export const useInitData = ({
   updateDepositValue,
   wallet,
   setGenesisBlockTimestamp,
+  genesisBlockHash,
 }: {
   clearGeneratedTx: () => void
   dispatch: React.Dispatch<StateAction>
   updateDepositValue: (value: string) => void
   wallet: State.Wallet
   setGenesisBlockTimestamp: React.Dispatch<React.SetStateAction<number | undefined>>
+  genesisBlockHash?: string
 }) =>
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
@@ -110,9 +105,11 @@ export const useInitData = ({
           : BigInt(0)
       }`
     )
-    getHeaderByNumber('0x0')
-      .then(header => setGenesisBlockTimestamp(+header.timestamp))
-      .catch(err => console.error(err))
+    if (genesisBlockHash) {
+      getHeader(genesisBlockHash)
+        .then(header => setGenesisBlockTimestamp(+header.timestamp))
+        .catch(err => console.error(err))
+    }
     return () => {
       clearInterval(intervalId)
       clearNervosDaoData()(dispatch)
@@ -128,8 +125,7 @@ export const useClearGeneratedTx = (dispatch: React.Dispatch<StateAction>) =>
     })
   }, [dispatch])
 
-export const useUpdateDepositValue = ({
-  setDepositValue,
+export const useGenerateDaoDepositTx = ({
   setErrorMessage,
   clearGeneratedTx,
   maxDepositAmount,
@@ -139,9 +135,9 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage,
   isBalanceReserved,
   t,
+  depositValue,
   suggestFeeRate,
 }: {
-  setDepositValue: React.Dispatch<React.SetStateAction<string>>
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   clearGeneratedTx: () => void
   maxDepositAmount: bigint
@@ -151,7 +147,87 @@ export const useUpdateDepositValue = ({
   maxDepositErrorMessage: string
   isBalanceReserved: boolean
   t: TFunction
-  suggestFeeRate: number | string
+  depositValue: string
+  suggestFeeRate: string | number
+}) => {
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(() => {
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      setErrorMessage('')
+      clearGeneratedTx()
+
+      try {
+        validateAmount(depositValue)
+      } catch (err) {
+        if (isErrorWithI18n(err)) {
+          setErrorMessage(
+            t(`messages.codes.${err.code}`, {
+              fieldName: 'deposit',
+              fieldValue: depositValue,
+              length: MAX_DECIMAL_DIGITS,
+            })
+          )
+        }
+        return
+      }
+
+      if (BigInt(CKBToShannonFormatter(depositValue)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
+        setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
+        return
+      }
+
+      const capacity = CKBToShannonFormatter(depositValue, CapacityUnit.CKB)
+      if (BigInt(capacity) < maxDepositAmount) {
+        generateDaoDepositTx({
+          feeRate: `${suggestFeeRate}`,
+          capacity,
+          walletID,
+        }).then(res => {
+          if (isSuccessResponse(res)) {
+            dispatch({
+              type: AppActions.UpdateGeneratedTx,
+              payload: res.result,
+            })
+          } else if (res.status === 0) {
+            setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+          } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
+            setErrorMessage(t(`messages.codes.106`))
+          } else {
+            setErrorMessage(t(`messages.codes.${res.status}`))
+          }
+        })
+      } else if (BigInt(capacity) === maxDepositAmount) {
+        dispatch({
+          type: AppActions.UpdateGeneratedTx,
+          payload: maxDepositTx,
+        })
+        if (!isBalanceReserved) {
+          setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
+        }
+      } else {
+        setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
+      }
+    })
+  }, [
+    clearGeneratedTx,
+    maxDepositAmount,
+    maxDepositTx,
+    dispatch,
+    walletID,
+    maxDepositErrorMessage,
+    t,
+    setErrorMessage,
+    isBalanceReserved,
+    depositValue,
+    suggestFeeRate,
+  ])
+}
+
+export const useUpdateDepositValue = ({
+  setDepositValue,
+}: {
+  setDepositValue: React.Dispatch<React.SetStateAction<string>>
 }) =>
   useCallback(
     (value: string) => {
@@ -159,74 +235,9 @@ export const useUpdateDepositValue = ({
       if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
         return
       }
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        setErrorMessage('')
-        clearGeneratedTx()
-
-        try {
-          validateAmount(amount)
-        } catch (err) {
-          if (isErrorWithI18n(err)) {
-            setErrorMessage(
-              t(`messages.codes.${err.code}`, { fieldName: 'deposit', fieldValue: amount, length: MAX_DECIMAL_DIGITS })
-            )
-          }
-          return
-        }
-
-        if (BigInt(CKBToShannonFormatter(amount)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
-          setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
-          return
-        }
-
-        const capacity = CKBToShannonFormatter(amount, CapacityUnit.CKB)
-        if (BigInt(capacity) < maxDepositAmount) {
-          generateDaoDepositTx({
-            feeRate: `${suggestFeeRate}`,
-            capacity,
-            walletID,
-          }).then(res => {
-            if (isSuccessResponse(res)) {
-              dispatch({
-                type: AppActions.UpdateGeneratedTx,
-                payload: res.result,
-              })
-            } else if (res.status === 0) {
-              setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-            } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
-              setErrorMessage(t(`messages.codes.106`))
-            } else {
-              setErrorMessage(t(`messages.codes.${res.status}`))
-            }
-          })
-        } else if (BigInt(capacity) === maxDepositAmount) {
-          dispatch({
-            type: AppActions.UpdateGeneratedTx,
-            payload: maxDepositTx,
-          })
-          if (!isBalanceReserved) {
-            setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
-          }
-        } else {
-          setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
-        }
-      }, 500)
       setDepositValue(amount)
     },
-    [
-      clearGeneratedTx,
-      maxDepositAmount,
-      maxDepositTx,
-      dispatch,
-      walletID,
-      maxDepositErrorMessage,
-      t,
-      setDepositValue,
-      setErrorMessage,
-      isBalanceReserved,
-      suggestFeeRate,
-    ]
+    [setDepositValue]
   )
 
 export const useOnDepositValueChange = ({ updateDepositValue }: { updateDepositValue: (value: string) => void }) =>
@@ -290,7 +301,6 @@ export const useOnDepositDialogSubmit = ({
 }) =>
   useCallback(() => {
     setShowDepositDialog(false)
-    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
     dispatch({
       type: AppActions.RequestPassword,
       payload: {
@@ -444,15 +454,15 @@ export const useOnSlide = ({
 
 export const useUpdateWithdrawList = ({
   records,
-  tipBlockHash,
+  tipDao,
   setWithdrawList,
 }: {
   records: Readonly<State.NervosDAORecord[]>
-  tipBlockHash: string
+  tipDao?: string
   setWithdrawList: React.Dispatch<React.SetStateAction<Map<string, string | null>>>
 }) =>
   useEffect(() => {
-    if (!tipBlockHash) {
+    if (!tipDao) {
       setWithdrawList(new Map())
       return
     }
@@ -467,7 +477,6 @@ export const useUpdateWithdrawList = ({
         const blockHashes = [
           ...(committedTx.map(v => v.txStatus.blockHash).filter(v => !!v) as string[]),
           ...(records.map(v => (v.depositOutPoint ? v.blockHash : null)).filter(v => !!v) as string[]),
-          tipBlockHash,
         ]
         return ckbCore.rpc
           .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(
@@ -488,7 +497,7 @@ export const useUpdateWithdrawList = ({
             const withdrawList = new Map()
             records.forEach(record => {
               const key = getRecordKey(record)
-              const withdrawBlockHash = record.depositOutPoint ? record.blockHash : tipBlockHash
+              const withdrawBlockHash = record.depositOutPoint ? record.blockHash : undefined
               const formattedDepositOutPoint = record.depositOutPoint
                 ? {
                     txHash: record.depositOutPoint.txHash,
@@ -503,7 +512,7 @@ export const useUpdateWithdrawList = ({
                 return
               }
               const depositDAO = hashHeaderMap.get(tx.txStatus.blockHash!)
-              const withdrawDAO = hashHeaderMap.get(withdrawBlockHash)
+              const withdrawDAO = withdrawBlockHash ? hashHeaderMap.get(withdrawBlockHash) : tipDao
               if (!depositDAO || !withdrawDAO) {
                 return
               }
@@ -523,7 +532,23 @@ export const useUpdateWithdrawList = ({
       .catch(() => {
         setWithdrawList(new Map())
       })
-  }, [records, tipBlockHash, setWithdrawList])
+  }, [records, tipDao, setWithdrawList])
+
+const getBlockHashes = (txHashes: string[]) => {
+  const batchParams: ['getTransaction', string][] = txHashes.map(v => ['getTransaction', v])
+  return ckbCore.rpc
+    .createBatchRequest<'getTransaction', [string], CKBComponents.TransactionWithStatus[]>(batchParams)
+    .exec()
+    .then(res => {
+      return res.map((v, idx) => ({
+        txHash: txHashes[idx],
+        blockHash: v.txStatus.blockHash,
+      }))
+    })
+    .catch(() => {
+      return []
+    })
+}
 
 export const useUpdateDepositEpochList = ({
   records,
@@ -536,28 +561,35 @@ export const useUpdateDepositEpochList = ({
 }) =>
   useEffect(() => {
     if (connectionStatus === 'online') {
-      const recordKeyIdxMap = new Map<string, number>()
-      const batchParams: ['getHeaderByNumber', bigint][] = []
-      records.forEach((record, idx) => {
-        const depositBlockNumber = record.depositOutPoint
-          ? ckbCore.utils.toUint64Le(record.daoData)
-          : record.blockNumber
-        if (depositBlockNumber) {
-          batchParams.push(['getHeaderByNumber', BigInt(depositBlockNumber)])
-          recordKeyIdxMap.set(getRecordKey(record), idx)
-        }
-      })
-      ckbCore.rpc
-        .createBatchRequest<'getHeaderByNumber', any, CKBComponents.BlockHeader[]>(batchParams)
-        .exec()
-        .then(res => {
-          const epochList = new Map()
-          records.forEach(record => {
-            const key = getRecordKey(record)
-            epochList.set(key, recordKeyIdxMap.has(key) ? res[recordKeyIdxMap.get(key)!]?.epoch : null)
+      getBlockHashes(records.map(v => v.depositOutPoint?.txHash).filter(v => !!v) as string[]).then(
+        depositBlockHashes => {
+          const recordKeyIdx: string[] = []
+          const batchParams: ['getHeader', string][] = []
+          records.forEach((record) => {
+            if (!record.depositOutPoint && record.blockHash) {
+              batchParams.push(['getHeader', record.blockHash])
+              recordKeyIdx.push(record.outPoint.txHash)
+            }
           })
-          setDepositEpochList(epochList)
-        })
+          depositBlockHashes.forEach((v) => {
+            if (v.blockHash) {
+              batchParams.push(['getHeader', v.blockHash])
+              recordKeyIdx.push(v.txHash)
+            }
+          })
+          ckbCore.rpc
+            .createBatchRequest<'getHeader', any, CKBComponents.BlockHeader[]>(batchParams)
+            .exec()
+            .then(res => {
+              const epochList = new Map()
+              records.forEach(record => {
+                const key = record.depositOutPoint ? record.depositOutPoint.txHash : record.outPoint.txHash
+                epochList.set(key, res[recordKeyIdx.indexOf(key)]?.epoch)
+              })
+              setDepositEpochList(epochList)
+            })
+        }
+      )
     }
   }, [records, setDepositEpochList, connectionStatus])
 
@@ -576,4 +608,5 @@ export default {
   useOnSlide,
   useUpdateWithdrawList,
   useUpdateDepositEpochList,
+  useGenerateDaoDepositTx,
 }

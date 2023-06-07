@@ -1,31 +1,35 @@
-import { queue, AsyncQueue } from 'async'
-import { TransactionPersistor } from 'services/tx'
-import RpcService from 'services/rpc-service'
-import AssetAccountService from 'services/asset-account-service'
-import OutPoint from 'models/chain/out-point'
-import Transaction from 'models/chain/transaction'
-import TransactionWithStatus from 'models/chain/transaction-with-status'
-import SystemScriptInfo from 'models/system-script-info'
-import AssetAccountInfo from 'models/asset-account-info'
-import { Address as AddressInterface } from "models/address"
-import AddressParser from 'models/address-parser'
-import Multisig from 'models/multisig'
+import { queue, QueueObject } from 'async'
+import { TransactionPersistor } from '../../services/tx'
+import RpcService from '../../services/rpc-service'
+import AssetAccountService from '../../services/asset-account-service'
+import OutPoint from '../../models/chain/out-point'
+import Transaction from '../../models/chain/transaction'
+import TransactionWithStatus from '../../models/chain/transaction-with-status'
+import SystemScriptInfo from '../../models/system-script-info'
+import AssetAccountInfo from '../../models/asset-account-info'
+import { Address as AddressInterface } from '../../models/address'
+import AddressParser from '../../models/address-parser'
+import Multisig from '../../models/multisig'
+import BlockHeader from '../../models/chain/block-header'
 import TxAddressFinder from './tx-address-finder'
-import IndexerConnector, { BlockTips } from './indexer-connector'
+import IndexerConnector from './indexer-connector'
 import IndexerCacheService from './indexer-cache-service'
-import logger from 'utils/logger'
-import CommonUtils from 'utils/common'
-import { ShouldInChildProcess } from 'exceptions'
+import logger from '../../utils/logger'
+import CommonUtils from '../../utils/common'
+import { ShouldInChildProcess } from '../../exceptions'
+import { AppendScript, BlockTips, Connector } from './connector'
+import LightConnector from './light-connector'
+import { generateRPC } from '../../utils/ckb-rpc'
+import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
 
 export default class Queue {
-  // eslint-disable-next-line prettier/prettier
   #lockHashes: string[]
   #url: string // ckb node
   #indexerUrl: string
   #addresses: AddressInterface[]
   #rpcService: RpcService
-  #indexerConnector: IndexerConnector | undefined
-  #checkAndSaveQueue: AsyncQueue<{ transactions: Transaction[] }> | undefined
+  #indexerConnector: Connector | undefined
+  #checkAndSaveQueue: QueueObject<{ txHashes: CKBComponents.Hash[], params: unknown }> | undefined
 
   #multiSignBlake160s: string[]
   #anyoneCanPayLockHashes: string[]
@@ -41,15 +45,20 @@ export default class Queue {
 
     const blake160s = this.#addresses.map(meta => meta.blake160)
     this.#multiSignBlake160s = blake160s.map(blake160 => Multisig.hash([blake160]))
-    this.#anyoneCanPayLockHashes = blake160s.map(b => this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+    this.#anyoneCanPayLockHashes = blake160s.map(b =>
+      this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
+    )
   }
 
   start = async () => {
-    logger.info("Queue:\tstart")
+    logger.info('Queue:\tstart')
     try {
-      this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl)
-
-      await this.#indexerConnector.connect()
+      if (this.#url === BUNDLED_LIGHT_CKB_URL) {
+        this.#indexerConnector = new LightConnector(this.#addresses, this.#url)
+      } else {
+        this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl)
+      }
+      await this.#indexerConnector!.connect()
     } catch (error) {
       logger.error('Restarting child process due to error', error.message)
       if (process.send) {
@@ -62,12 +71,12 @@ export default class Queue {
     this.#indexerConnector.blockTipsSubject.subscribe(tip => this.#updateBlockNumberTips(tip))
 
     this.#checkAndSaveQueue = queue(async (task: any) => {
-      const { transactions } = task
+      const { txHashes, params } = task
       //need to retry after a certain period of time if throws errors
       // eslint-disable-next-line no-constant-condition
       while (true) {
         try {
-          await this.#checkAndSave(transactions)
+          await this.#checkAndSave(txHashes)
           break
         } catch (error) {
           logger.error('retry saving transactions in 2 seconds due to error:', error)
@@ -75,7 +84,7 @@ export default class Queue {
         }
       }
 
-      this.#indexerConnector!.notifyCurrentBlockNumberProcessed(transactions[0].blockNumber)
+      this.#indexerConnector!.notifyCurrentBlockNumberProcessed(params)
     })
 
     this.#checkAndSaveQueue.error((err: any, task: any) => {
@@ -83,15 +92,14 @@ export default class Queue {
     })
 
     this.#indexerConnector.transactionsSubject
-      .subscribe(transactions => {
-        const task = { transactions: transactions.map(t => t.transaction) }
+      .subscribe(task => {
         this.#checkAndSaveQueue!.push(task)
       })
   }
 
-  getIndexerConnector = (): IndexerConnector => this.#indexerConnector!
+  getIndexerConnector = (): Connector => this.#indexerConnector!
 
-  stop = () => this.#indexerConnector!.pollingIndexer = false
+  stop = () => this.#indexerConnector!.stop()
 
   stopAndWait = async () => {
     this.stop()
@@ -100,7 +108,45 @@ export default class Queue {
     }
   }
 
-  #checkAndSave = async (transactions: Transaction[]): Promise<void> => {
+  async appendLightScript(scripts: AppendScript[]) {
+    await this.#indexerConnector?.appendScript(scripts)
+  }
+
+  private async fetchTxsWithStatus(txHashes: string[]) {
+    const rpc = generateRPC(this.#url)
+    const txsWithStatus = await rpc.createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
+      txHashes.map(v => ['getTransaction', v])
+    ).exec()
+    const txs: Transaction[] = []
+    const blockHashes = []
+    for (let index = 0; index < txsWithStatus.length; index++) {
+      if (txsWithStatus[index]?.transaction) {
+        const tx = Transaction.fromSDK(txsWithStatus[index].transaction)
+        tx.blockHash = txsWithStatus[index].txStatus.blockHash!
+        blockHashes.push(tx.blockHash)
+        txs.push(tx)
+      } else {
+        if ((txsWithStatus[index].txStatus as any) === 'rejected')  {
+          logger.warn(`Transaction[${txHashes[index]}] was rejected`)
+        }
+        throw new Error(`failed to fetch transaction for hash ${txHashes[index]}`)
+      }
+    }
+    const headers = await rpc.createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(
+      blockHashes.map(v => ['getHeader', v])
+    ).exec()
+    headers.forEach((blockHeader, idx) => {
+      if (blockHeader) {
+        const header = BlockHeader.fromSDK(blockHeader)
+        txs[idx].timestamp = header.timestamp
+        txs[idx].blockNumber = header.number
+      }
+    })
+    return txs
+  }
+
+  #checkAndSave = async (txHashes: CKBComponents.Hash[]): Promise<void> => {
+    const transactions = await this.fetchTxsWithStatus(txHashes)
     const cachedPreviousTxs = new Map()
 
     const fetchTxQueue = queue(async (task: any) => {
@@ -120,11 +166,11 @@ export default class Queue {
       for (const [, input] of tx.inputs.entries()) {
         const previousTxHash = input.previousOutput!.txHash
         if (previousTxHash === `0x${'0'.repeat(64)}`) {
-          continue;
+          continue
         }
 
         if (txHashSet.has(previousTxHash)) {
-          continue;
+          continue
         }
 
         fetchTxQueue.push({ txHash: previousTxHash })
@@ -165,10 +211,7 @@ export default class Queue {
         ) {
           const output = tx.outputs![inputIndex]
           if (output) {
-            output.setDepositOutPoint(new OutPoint(
-              input.previousOutput!.txHash,
-              input.previousOutput!.index,
-            ))
+            output.setDepositOutPoint(new OutPoint(input.previousOutput!.txHash, input.previousOutput!.index))
           }
         }
       }
@@ -206,8 +249,8 @@ export default class Queue {
         message: {
           indexerTipNumber: tip.indexerTipNumber,
           cacheTipNumber: tip.cacheTipNumber,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       })
     } else {
       throw new ShouldInChildProcess()
