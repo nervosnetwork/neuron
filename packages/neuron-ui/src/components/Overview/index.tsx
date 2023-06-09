@@ -288,6 +288,7 @@ const Overview = () => {
             title: t('overview.date'),
             dataIndex: 'date',
             align: 'left',
+            minWidth: '150px',
             render: (_, __, item) => {
               const time = uniformTimeFormatter(item.timestamp || item.createdAt)
               return time.split(' ')[0]
@@ -297,6 +298,7 @@ const Overview = () => {
             title: t('overview.type'),
             dataIndex: 'type',
             align: 'left',
+            minWidth: '250px',
             render(_, __, item) {
               return (
                 <TracsactionType
@@ -312,6 +314,7 @@ const Overview = () => {
             dataIndex: 'amount',
             align: 'left',
             isBalance: true,
+            minWidth: '300px',
             render(_, __, item, show) {
               return <Amount item={item} show={show} />
             },
@@ -320,6 +323,7 @@ const Overview = () => {
             title: t('overview.status'),
             dataIndex: 'status',
             align: 'left',
+            minWidth: '150px',
             render(_, __, item) {
               return (
                 <TransactionStatus
