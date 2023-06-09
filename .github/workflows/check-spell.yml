@@ -1,0 +1,12 @@
+name: Check spell
+on:
+  - pull_request
+  - push
+
+jobs:
+  run:
+    name: Check spell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: crate-ci/typos@master
