@@ -65,7 +65,8 @@ const SendFieldset = ({
     <div className={styles.container}>
       <TextField
         className={`${styles.addresstField} ${styles.textFieldClass}`}
-        rows={2}
+        placeholder={t('send.input-address')}
+        rows={item.address ? 2 : 1}
         label={
           <div className={styles.removeLabel}>
             <div>{t('send.address')}</div>

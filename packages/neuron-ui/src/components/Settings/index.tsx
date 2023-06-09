@@ -18,10 +18,10 @@ import DataSetting from 'components/DataSetting'
 import styles from './settings.module.scss'
 
 const items = [
-  ['wallets', WalletSetting],
-  ['general', GeneralSetting],
-  ['network', NetworkSetting],
-  ['data', DataSetting],
+  ['wallets', '12px', WalletSetting],
+  ['general', '-2px', GeneralSetting],
+  ['network', '12px', NetworkSetting],
+  ['data', '9px', DataSetting],
 ]
 
 const Settings = () => {
@@ -120,9 +120,11 @@ const Settings = () => {
   return (
     <PageContainer head={t('navbar.settings')}>
       <div className={styles.container}>
-        {items.map(([title, ItemCmp]) => (
+        {items.map(([title, marginTop, ItemCmp]) => (
           <div className={styles.item} key={title as string}>
-            <div className={styles.title}>{t(`settings.setting-tabs.${title}`)}</div>
+            <div className={styles.title} style={{ marginTop: marginTop as string }}>
+              {t(`settings.setting-tabs.${title}`)}
+            </div>
             <div className={styles.content}>
               <ItemCmp {...globalState} dispatch={dispatch} />
             </div>

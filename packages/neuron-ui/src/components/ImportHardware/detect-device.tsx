@@ -5,6 +5,7 @@ import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDe
 import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
 import { Error as ErrorIcon } from 'widgets/Icons/icon'
+import Spinner from 'widgets/Spinner'
 import {
   CkbAppNotFoundException,
   ConnectFailedException,
@@ -36,7 +37,7 @@ const Info = (
   }
   return (
     <div className={styles.info}>
-      <span>{isWaiting ? null : <SuccessInfo />}</span>
+      <span>{isWaiting ? <Spinner size={1} /> : <SuccessInfo />}</span>
       <span>{msg}</span>
     </div>
   )

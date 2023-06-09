@@ -27,8 +27,8 @@ export const HasUpdater = Template.bind({})
 HasUpdater.args = {
   updater: {
     ...initStates.updater,
-    version: '0.104.0',
-    releaseNotes: 'release 0.104.0',
+    version: '0.110.1',
+    releaseNotes: 'release 0.110.1',
   },
 }
 
@@ -36,8 +36,12 @@ export const DownloadUpdate = Template.bind({})
 DownloadUpdate.args = {
   updater: {
     checking: false,
+    isUpdated: false,
     downloadProgress: 0.1,
-    version: '0.104.0',
-    releaseNotes: 'release 0.104.0',
+    progressInfo: {},
+    version: '0.110.1',
+    releaseDate: '2023-05-31T13:15:58.827Z',
+    releaseNotes: 'release 0.110.1',
+    errorMsg: '',
   },
 }

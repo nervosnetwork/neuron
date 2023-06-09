@@ -141,9 +141,13 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       Object.assign(state.settings, { networks, wallets })
       state.updater = {
         checking: false,
+        isUpdated: false,
         downloadProgress: -1,
+        progressInfo: {},
         version: '',
+        releaseDate: '',
         releaseNotes: '',
+        errorMsg: '',
       }
       break
     }

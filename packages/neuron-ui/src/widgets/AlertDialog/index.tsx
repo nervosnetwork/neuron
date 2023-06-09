@@ -40,7 +40,7 @@ const AlertDialog = ({
         <p className={styles.message}>{message}</p>
       </>
       <div className={styles.actions}>
-        {type === 'failed' && <Button type="confirm" onClick={onCancel} label={t('common.back')} />}
+        {type === 'failed' && <Button type="confirm" onClick={onCancel} label={t('common.confirm')} />}
         {type === 'success' && <Button type="confirm" onClick={onCancel || onOk} label={t('common.confirm')} />}
         {type === 'warning' && (
           <>

@@ -267,9 +267,13 @@ declare namespace State {
 
   interface AppUpdater {
     checking: boolean
+    isUpdated: boolean
     downloadProgress: number
+    progressInfo: object
     version: string
+    releaseDate: string
     releaseNotes: string
+    errorMsg: string
   }
 
   interface AppWithNeuronWallet {

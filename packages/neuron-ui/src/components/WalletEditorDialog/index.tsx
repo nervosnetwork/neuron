@@ -22,7 +22,17 @@ const WalletNotFound = () => {
   )
 }
 
-const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: () => void; id: string }) => {
+const WalletEditorDialog = ({
+  show,
+  onCancel,
+  onSuccess,
+  id,
+}: {
+  show: boolean
+  onCancel: () => void
+  onSuccess: () => void
+  id: string
+}) => {
   const {
     settings: { wallets = [] },
   } = useGlobalState()
@@ -42,7 +52,7 @@ const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: (
   const hint = useHint(editor.name.value, usedNames, t)
   const disabled = hint !== null || editor.name.value === wallet.name
 
-  const onSubmit = useOnSubmit(editor.name.value, wallet.id, dispatch, disabled, onCancel)
+  const onSubmit = useOnSubmit(editor.name.value, wallet.id, dispatch, disabled, onSuccess)
 
   return (
     <Dialog
@@ -55,7 +65,7 @@ const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: (
     >
       <>
         {wallet.id ? (
-          <div>
+          <div style={{ width: '648px' }}>
             {inputs.map(item => (
               <TextField key={item.label} {...item} field={item.label} error={hint} autoFocus />
             ))}

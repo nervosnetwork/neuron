@@ -524,8 +524,8 @@ export default class ApiController {
       return this.#networksController.activate(id)
     })
 
-    handle('delete-network', async (_, id: string) => {
-      return this.#networksController.delete(id)
+    handle('delete-network', async (_, id: string, needConfirm?: boolean) => {
+      return this.#networksController.delete(id, needConfirm)
     })
 
     // Updater
@@ -534,8 +534,16 @@ export default class ApiController {
       new UpdateController().checkUpdates()
     })
 
+    handle('cancel-check-updates', async () => {
+      new UpdateController().cancelCheckUpdates()
+    })
+
     handle('download-update', async () => {
       new UpdateController(false).downloadUpdate()
+    })
+
+    handle('cancel-download-update', async () => {
+      new UpdateController(false).cancelDownloadUpdate()
     })
 
     handle('quit-and-install-update', async () => {
@@ -556,15 +564,9 @@ export default class ApiController {
 
     handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
       if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
-        const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
-          type: 'info',
-          message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
-          buttons: [t('common.ok'), t('common.cancel')]
-        })
-        if (response === 1) {
-          return {
-            status: ResponseCode.Fail
-          }
+        return {
+          status: ResponseCode.Fail,
+          message: t('messages.no-exist-ckb-node-data', { path: dataPath })
         }
       }
       await cleanChain()

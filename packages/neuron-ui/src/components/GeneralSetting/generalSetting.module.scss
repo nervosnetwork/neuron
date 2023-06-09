@@ -40,6 +40,7 @@ $action-button-width: 11.25rem;
 }
 
 .install {
+  width: 648px;
   display: grid;
   grid-template:
     'note action' auto
@@ -101,18 +102,19 @@ $action-button-width: 11.25rem;
 }
 
 .processWrap {
+  width: 648px;
   .title {
     font-weight: 500;
     font-size: 16px;
     line-height: 22px;
     margin: 0 0 32px;
-    color: var(--main-text-color)
+    color: var(--main-text-color);
   }
   .note {
     font-size: 14px;
     line-height: 22px;
     margin: 22px 0 0;
-    color: var(--main-text-color)
+    color: var(--main-text-color);
   }
   progress {
     width: 100%;
@@ -120,12 +122,12 @@ $action-button-width: 11.25rem;
     background: var(--process-background-color);
     border-radius: 8px;
   }
-  progress::-webkit-progress-bar{     
+  progress::-webkit-progress-bar {
     background-color: var(--process-background-color);
     border-radius: 8px;
   }
   progress::-webkit-progress-value {
     background: var(--primary-color);
-    border-radius: 8px; 
+    border-radius: 8px;
   }
 }

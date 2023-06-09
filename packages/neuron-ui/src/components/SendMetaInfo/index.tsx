@@ -46,6 +46,7 @@ const SendMetaInfo = ({
         />
       ) : null}
       <TextField
+        placeholder={t('send.description-optional')}
         className={styles.textFieldClass}
         field="description"
         label={t('send.description')}

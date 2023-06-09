@@ -2,10 +2,11 @@ import React, { useEffect, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Spinner from 'widgets/Spinner'
 import Dialog from 'widgets/Dialog'
+import Toast from 'widgets/Toast'
 import { StateDispatch, addPopup } from 'states'
 import { clearCellCache } from 'services/remote'
 import { cacheClearDate } from 'services/localCache'
-import { isSuccessResponse, uniformTimeFormatter, useDialogWrapper } from 'utils'
+import { isSuccessResponse, uniformTimeFormatter } from 'utils'
 import styles from './clearCache.module.scss'
 
 const I18N_PATH = 'settings.clear-cache'
@@ -29,8 +30,7 @@ const ClearCacheDialog = ({
   const [isClearing, setIsClearing] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isRebuild, setIsRebuild] = useState(false)
-
-  const { isDialogOpen: isCleanDialogOpen, openDialog, closeDialog, dialogRef: clearDialogRef } = useDialogWrapper()
+  const [notice, setNotice] = useState('')
 
   const showDialog = useCallback(() => {
     setIsDialogOpen(true)
@@ -57,7 +57,6 @@ const ClearCacheDialog = ({
   }, [isDialogOpen, setIsRebuild])
 
   const handleSubmit = useCallback(() => {
-    openDialog()
     setIsDialogOpen(false)
     setIsClearing(true)
     clearCellCache({ resetIndexerData: isRebuild })
@@ -67,11 +66,11 @@ const ClearCacheDialog = ({
           const date = uniformTimeFormatter(Date.now()).substr(0, 10)
           cacheClearDate.save(date)
           setClearedDate(date)
+          setNotice(t('settings.data.clear-success'))
         }
       })
       .finally(() => {
         setIsClearing(false)
-        closeDialog()
       })
   }, [dispatch, setClearedDate, setIsDialogOpen, isRebuild])
 
@@ -89,19 +88,19 @@ const ClearCacheDialog = ({
         </button>
       </div>
 
-      {isCleanDialogOpen ? (
-        <dialog ref={clearDialogRef} className={styles.clearDialog}>
+      <Dialog show={isClearing} showHeader={false} showFooter={false}>
+        <div className={styles.clearDialog}>
           <Spinner size={3} />
           <p>{t('settings.data.clearing-cache')}</p>
-        </dialog>
-      ) : null}
+        </div>
+      </Dialog>
 
       <Dialog
         show={isDialogOpen}
         title={t(`${I18N_PATH}.title`)}
         onConfirm={handleSubmit}
         onCancel={dismissDialog}
-        confirmText={t(`${I18N_PATH}.buttons.ok`)}
+        confirmText={t('settings.data.confirm-clear')}
         confirmProps={{ id: IDs.submitClearCache }}
       >
         <div className={styles.options}>
@@ -115,6 +114,8 @@ const ClearCacheDialog = ({
           </label>
         </div>
       </Dialog>
+
+      <Toast content={notice} onDismiss={() => setNotice('')} />
     </>
   )
 }

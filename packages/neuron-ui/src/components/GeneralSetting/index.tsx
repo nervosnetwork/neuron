@@ -3,9 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import Dialog from 'widgets/Dialog'
 import LanguageDialog from 'components/LanguageDialog'
+import AlertDialog from 'widgets/AlertDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
 import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
-import { checkForUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
+import {
+  checkForUpdates,
+  cancelCheckUpdates,
+  downloadUpdate,
+  cancelDownloadUpdate,
+  installUpdate,
+  getVersion,
+} from 'services/remote'
+import { uniformTimeFormatter, bytesFormatter } from 'utils'
 import styles from './generalSetting.module.scss'
 
 interface UpdateDowloadStatusProps {
@@ -13,7 +22,9 @@ interface UpdateDowloadStatusProps {
   onCancel: () => void
   progress: number
   newVersion: string
+  releaseDate: string
   releaseNotes: string
+  progressInfo: object
 }
 
 const UpdateDownloadStatus = ({
@@ -21,7 +32,9 @@ const UpdateDownloadStatus = ({
   onCancel,
   progress = 0,
   newVersion = '',
+  releaseDate = '',
   releaseNotes = '',
+  progressInfo = {},
 }: UpdateDowloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
@@ -39,12 +52,14 @@ const UpdateDownloadStatus = ({
         show={show}
         onConfirm={downloadUpdate}
         disabled={!available}
-        confirmText={t('updates.download-update')}
+        confirmText={t('updates.install-update')}
         onCancel={onCancel}
         title={t('updates.update-available')}
       >
         <div className={styles.install}>
-          <p className={styles.title}>{newVersion}</p>
+          <p className={styles.title}>
+            {newVersion} ({uniformTimeFormatter(new Date(releaseDate)).split(' ')[0]})
+          </p>
           <div className={styles.releaseNotesStyle}>
             <div dangerouslySetInnerHTML={releaseNotesHtml()} />
           </div>
@@ -71,12 +86,16 @@ const UpdateDownloadStatus = ({
     )
   }
 
+  const { total, transferred } = progressInfo as { total: number; transferred: number }
+
   return (
     <Dialog show={show} onCancel={onCancel} title={t('updates.update-available')} showConfirm={false}>
       <div className={styles.processWrap}>
         <p className={styles.title}>{t('updates.downloading-update')} </p>
         <progress value={progress} max={1} />
-        <p className={styles.note}>{progress * 100}%</p>
+        <p className={styles.note}>
+          {bytesFormatter(transferred)} / {bytesFormatter(total)}
+        </p>
       </div>
     </Dialog>
   )
@@ -88,18 +107,9 @@ interface GeneralSettingProps {
 
 const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [t, i18n] = useTranslation()
-
-  const [showCheck, setShowCheck] = useState(false)
   const [showLangDialog, setShowLangDialog] = useState(false)
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [searchParams] = useSearchParams()
-
-  const [dialogType, setDialogType] = useState<'checking' | 'updating' | 'updated'>('checking')
-
-  const checkUpdates = useCallback(() => {
-    setShowCheck(true)
-    checkForUpdates()
-  }, [])
+  const [dialogType, setDialogType] = useState<'' | 'error' | 'checking' | 'updating' | 'updated'>('')
 
   const version = useMemo(() => {
     return getVersion()
@@ -108,40 +118,50 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   useEffect(() => {
     const checkUpdate = searchParams.get('checkUpdate')
     if (checkUpdate === '1') {
-      setShowCheck(true)
+      checkForUpdates()
     }
-  }, [searchParams, setShowCheck])
+  }, [searchParams, checkForUpdates])
 
   useEffect(() => {
-    if (showCheck) {
-      setShowUpdateDialog(true)
-      if (updater.checking) {
-        setDialogType('checking')
-        return
-      }
-      if (updater.version || updater.downloadProgress > 0) {
-        setDialogType('updating')
-        return
-      }
-      setDialogType('updated')
+    if (updater.errorMsg) {
+      setDialogType('error')
+      return
     }
-  }, [updater, showCheck])
+    if (updater.isUpdated) {
+      setDialogType('updated')
+      return
+    }
+    if (updater.checking) {
+      setDialogType('checking')
+      return
+    }
+    if (updater.version || updater.downloadProgress > 0) {
+      setDialogType('updating')
+      return
+    }
+    setDialogType('')
+  }, [updater, setDialogType])
+
+  const handleCancel = useCallback(() => {
+    if (dialogType === 'checking') {
+      cancelCheckUpdates()
+    }
+    setDialogType('')
+  }, [dialogType])
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <p>
-          {t('settings.general.version')} {version}
+          {t('settings.general.version')} v{version}
         </p>
-        <button type="button" onClick={checkUpdates}>
+        <button type="button" onClick={() => checkForUpdates()}>
           {t(`updates.check-updates`)} <ArrowNext />
         </button>
       </div>
 
       <div className={styles.content}>
-        <p>
-          {t('settings.general.language')} {version}
-        </p>
+        <p>{t('settings.general.language')}</p>
         <button
           type="button"
           onClick={() => {
@@ -152,12 +172,22 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         </button>
       </div>
 
+      <AlertDialog
+        show={dialogType === 'error'}
+        title={t(`updates.check-updates`)}
+        message={updater.errorMsg}
+        type="failed"
+        onCancel={() => {
+          setDialogType('')
+        }}
+      />
+
       <Dialog
-        show={['checking', 'updated'].includes(dialogType) && showUpdateDialog}
+        show={['checking', 'updated'].includes(dialogType)}
         showCancel={false}
         showHeader={false}
         confirmText={t(dialogType === 'checking' ? 'common.cancel' : 'common.ok')}
-        onConfirm={() => setShowUpdateDialog(false)}
+        onConfirm={handleCancel}
         className={styles.confirmDialog}
       >
         <div className={styles.wrap}>
@@ -167,12 +197,15 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       </Dialog>
 
       <UpdateDownloadStatus
-        show={showCheck && dialogType === 'updating'}
+        show={dialogType === 'updating'}
         onCancel={() => {
-          setShowCheck(false)
+          cancelDownloadUpdate()
+          setDialogType('')
         }}
         progress={updater.downloadProgress}
+        progressInfo={updater.progressInfo}
         newVersion={updater.version}
+        releaseDate={updater.releaseDate}
         releaseNotes={updater.releaseNotes}
       />
 

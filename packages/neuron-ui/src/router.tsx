@@ -138,7 +138,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: `${RoutePath.WalletWizard}*`,
@@ -171,7 +171,7 @@ const mainRouterConfig: RouteObject[] = [
                 <Outlet />
               </>
             ),
-            children: [offlineRouter],
+            children: [offlineRouter, signVerifyRouter],
           },
           {
             path: ':depositOutPoint',
@@ -283,7 +283,7 @@ const mainRouterConfig: RouteObject[] = [
             <Outlet />
           </>
         ),
-        children: [offlineRouter],
+        children: [offlineRouter, signVerifyRouter],
       },
     ],
   },

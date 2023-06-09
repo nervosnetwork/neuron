@@ -26,6 +26,7 @@ const TextField = React.forwardRef(
       selected,
       width,
       rows = 1,
+      errorWithIcon = false,
       ...rest
     }: {
       field: string
@@ -48,6 +49,7 @@ const TextField = React.forwardRef(
       [key: string]: any
       width?: string
       rows?: number
+      errorWithIcon?: boolean
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
@@ -121,7 +123,7 @@ const TextField = React.forwardRef(
         </div>
         {hint ? <span className={styles.hint}>{hint}</span> : null}
         {error ? (
-          <Alert status="error" className={styles.errorMessage} withIcon={false}>
+          <Alert status="error" className={styles.errorMessage} withIcon={errorWithIcon}>
             {error}
           </Alert>
         ) : null}
@@ -174,9 +176,7 @@ export const EditTextField = ({
       onDoubleClick={focusEdit}
       className={styles.editTextField}
       suffix={
-        isActive ? (
-          undefined
-        ) : (
+        isActive ? undefined : (
           <button type="button" onClick={focusEdit} className={styles.editBtn}>
             <Edit />
           </button>

@@ -210,6 +210,7 @@
     },
     "send": {
       "address": "Send to",
+      "input-address": "Please input receiving address",
       "amount": "Amount (CKB)",
       "send": "Send",
       "reset": "Reset",
@@ -220,7 +221,7 @@
       "scan-to-get-address": "Scan QR code to read the address to send to",
       "total-amount": "Total Amount (CKB)",
       "description": "Description",
-      "description-optional": "Description (optional)",
+      "description-optional": "Please input description, optional",
       "balance": "Balance",
       "add-one": "Add One More",
       "remove-this": "Remove This",
@@ -371,6 +372,7 @@
           "confirm-password": "Confirm Password",
           "edit-wallet": "Edit Wallet"
         },
+        "edit-success": "Wallet info Updated",
         "delete-wallet-title": "Please Enter {{name}} Password",
         "password": "Password",
         "wallet-detail": {
@@ -381,11 +383,16 @@
         "online": "Online",
         "offline": "Offline",
         "add-network": "Add Network",
+        "remove-network": "Remove Network",
+        "remove-network-msg": "Are you sure you want to remove the selected network?",
         "edit-network": {
-          "title": "Add or Edit Network",
+          "title": "Edit Network",
           "rpc-url": "RPC URL",
-          "name": "Network Name"
+          "name": "Network Name",
+          "input-rpc": "Please input rpc",
+          "input-network": "Please input name"
         },
+        "edit-success": "Edit network Success",
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "devnet": "Devnet"
@@ -419,10 +426,12 @@
         "cache-cleared-on": "Cache cleared on {{date}}",
         "clear-cache": "Clear Cache",
         "clearing-cache": "Clearing Cache, please wait a moment",
+        "clear-success": "Cache Cleared",
         "set-path": "Set Path",
         "remove-ckb-data-tip": "Please move CKB Node Data from 【{{prevPath}}】 to 【{{currentPath}}】 and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
         "resync-ckb-node-describe": "Attention: Synchronizing from scratch won't remove previously downloaded CKB Node Data",
         "cancel": "Cancel",
+        "confirm-clear": "Confirm",
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
         "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect",
@@ -432,6 +441,7 @@
     "password-request": {
       "wallet-not-found": "The wallet is not found",
       "password": "Enter Password",
+      "placeholder": "Please input wallet password",
       "send": {
         "title": "Submit the transaction"
       },
@@ -729,7 +739,7 @@
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
-      "download-update": "Install Update",
+      "install-update": "Install Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
     },
@@ -850,7 +860,10 @@
       "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
       "sign-with-magic-byte": "Message will be signed with magic bytes 'Nervos Message:'",
       "verify-tip": "Could be verified by Neuron from v0.33.1",
-      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1"
+      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1",
+      "input-message": "Please input message",
+      "input-choose-address": "Please input or choose an address",
+      "input-password": "Please input password"
     },
     "special-assets": {
       "title": "Customized Assets",

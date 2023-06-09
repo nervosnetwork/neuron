@@ -47,9 +47,13 @@ declare namespace Subject {
 
   interface AppUpdater {
     checking: boolean
+    isUpdated: boolean
     downloadProgress: number
+    progressInfo: object
     version: string
+    releaseDate: string
     releaseNotes: string
+    errorMsg: string
   }
   type URL = string
   type SignIndex = number

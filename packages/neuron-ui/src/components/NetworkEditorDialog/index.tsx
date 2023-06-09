@@ -8,7 +8,15 @@ import { isErrorWithI18n } from 'exceptions'
 import { useOnSubmit } from './hooks'
 import styles from './networkEditorDialog.module.scss'
 
-const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => void; id: 'new' | string }) => {
+const NetworkEditorDialog = ({
+  onCancel,
+  id,
+  onSuccess,
+}: {
+  onCancel: () => void
+  id: 'new' | string
+  onSuccess: () => void
+}) => {
   const {
     settings: { networks = [] },
   } = useGlobalState()
@@ -81,7 +89,7 @@ const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => 
     name: editor.name,
     remote: editor.url,
     networks,
-    callback: close,
+    callback: onSuccess,
     dispatch,
     disabled,
     setIsUpdating,
@@ -89,9 +97,9 @@ const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => 
 
   return (
     <Dialog
-      show={show}
+      show
       title={id === 'new' ? t('settings.network.add-network') : t('settings.network.edit-network.title')}
-      onCancel={close}
+      onCancel={onCancel}
       onConfirm={onSubmit}
       disabled={disabled}
       cancelText={t('wizard.back')}
@@ -105,7 +113,7 @@ const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => 
           onChange={onChange}
           label={t('settings.network.edit-network.rpc-url')}
           error={editor.urlError}
-          placeholder="http://127.0.0.1:8114"
+          placeholder={t('settings.network.edit-network.input-rpc')}
           autoFocus
         />
         <TextField
@@ -114,7 +122,7 @@ const NetworkEditorDialog = ({ show, close, id }: { show: boolean; close: () => 
           onChange={onChange}
           label={t('settings.network.edit-network.name')}
           error={editor.nameError}
-          placeholder="My Custom Node"
+          placeholder={t('settings.network.edit-network.input-network')}
         />
       </div>
     </Dialog>

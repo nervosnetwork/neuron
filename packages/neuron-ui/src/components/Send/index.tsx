@@ -51,6 +51,7 @@ const Send = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
+      showWaitForFullySynced,
     },
     wallet: { id: walletID = '', balance = '', device },
     chain: { networkID, connectionStatus },
@@ -154,7 +155,7 @@ const Send = () => {
   return (
     <PageContainer head={<SendHeader balance={balance} />}>
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
-        <div className={styles.layout}>
+        <div className={styles.layout} style={{ '--header-height': showWaitForFullySynced ? '164px' : '104px' }}>
           <div className={styles.left}>
             <div className={styles.leftContent}>
               <List

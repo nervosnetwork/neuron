@@ -4,25 +4,49 @@ import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
 import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
 import NetworkEditorDialog from 'components/NetworkEditorDialog'
+import AlertDialog from 'widgets/AlertDialog'
+import Toast from 'widgets/Toast'
 import { chainState } from 'states'
-import { setCurrentNetowrk } from 'services/remote'
+import { setCurrentNetowrk, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
-import { useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
+import { useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
 import styles from './networkSetting.module.scss'
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
   const [showEditorDialog, setShowEditorDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [notice, setNotice] = useState('')
 
   const { networkID: currentId } = chain
   const [netId, setNetId] = useState('new')
 
-  const handleNet = useCallback(
-    val => {
-      setNetId(val)
-      setShowEditorDialog(true)
+  const onHandleNetwork = useCallback(
+    (e: React.BaseSyntheticEvent) => {
+      const {
+        dataset: { action, id },
+      } = e.target
+      switch (action) {
+        case 'edit': {
+          setNetId(id)
+          setShowEditorDialog(true)
+          break
+        }
+        case 'delete': {
+          setNetId(id)
+          setShowDeleteDialog(true)
+          break
+        }
+        case 'add': {
+          setNetId('new')
+          setShowEditorDialog(true)
+          break
+        }
+        default:
+        // @ts-ignore
+      }
     },
-    [setNetId, setShowEditorDialog]
+    [setNetId, setShowEditorDialog, setShowDeleteDialog]
   )
 
   const toggleBottomBorder = useToggleChoiceGroupBorder(`.${styles.networks}`, styles.hasBottomBorder)
@@ -35,8 +59,6 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
 
   useOnWindowResize(toggleBottomBorder)
 
-  const onHandleNetwork = useOnHandleNetwork(handleNet)
-
   const handleChange = useCallback(
     checked => {
       if (checked !== currentId) {
@@ -45,6 +67,11 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     },
     [currentId]
   )
+
+  const onEditSuccess = useCallback(() => {
+    setShowEditorDialog(false)
+    setNotice(t('settings.network.edit-success'))
+  }, [setShowEditorDialog, setNotice])
 
   return (
     <div>
@@ -75,11 +102,29 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
         }))}
       />
 
-      <button type="button" className={styles.addBtn} onClick={() => handleNet('new')}>
-        <AddSimple /> {t('settings.network.add-network')}
+      <button type="button" className={styles.addBtn} onClick={onHandleNetwork}>
+        <span data-action="add">
+          <AddSimple /> {t('settings.network.add-network')}
+        </span>
       </button>
 
-      <NetworkEditorDialog show={showEditorDialog} close={() => setShowEditorDialog(false)} id={netId} />
+      {showEditorDialog ? (
+        <NetworkEditorDialog onSuccess={onEditSuccess} onCancel={() => setShowEditorDialog(false)} id={netId} />
+      ) : null}
+
+      <Toast content={notice} onDismiss={() => setNotice('')} />
+
+      <AlertDialog
+        show={showDeleteDialog}
+        title={t('settings.network.remove-network')}
+        message={t('settings.network.remove-network-msg')}
+        type="warning"
+        onCancel={() => setShowDeleteDialog(false)}
+        onOk={() => {
+          deleteNetwork(netId)
+          setShowDeleteDialog(false)
+        }}
+      />
     </div>
   )
 }

@@ -12,10 +12,10 @@ import TextField from 'widgets/TextField'
 import { ReactComponent as VerificationFailureIcon } from 'widgets/Icons/VerificationFailure.svg'
 import { InfoCircleOutlined } from 'widgets/Icons/icon'
 import Dialog from 'widgets/Dialog'
+import Toast from 'widgets/Toast'
 import Tooltip from 'widgets/Tooltip'
 import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
 import { ReactComponent as Sign } from 'widgets/Icons/Sign.svg'
-import { ReactComponent as SuccessCircle } from 'widgets/Icons/SuccessCircle.svg'
 import HardwareSign from 'components/HardwareSign'
 import styles from './signAndVerify.module.scss'
 
@@ -78,6 +78,7 @@ const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialog
       <div className={styles.passwordDialog}>
         <p className={styles.walletName}>{walletName}</p>
         <TextField
+          placeholder={t('sign-and-verify.password')}
           type="password"
           field="password"
           value={password}
@@ -122,26 +123,6 @@ const Notifications = ({ notification, onDismiss, t, failReason }: Notifications
       </div>
     </div>
   ) : null
-
-const VerifySuccess = ({ onDismiss, t }: { onDismiss: () => void; t: TFunction }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onDismiss()
-    }, 3000)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [])
-
-  return (
-    <div className={styles.successNotification}>
-      <div className={styles.content}>
-        <SuccessCircle />
-        {t('sign-and-verify.verification-success')}
-      </div>
-    </div>
-  )
-}
 
 const SignAndVerify = () => {
   const [t, i18n] = useTranslation()
@@ -277,11 +258,12 @@ const SignAndVerify = () => {
         <div>
           <TextField
             label={t('sign-and-verify.message')}
+            placeholder={t('sign-and-verify.input-message')}
             data-field="message"
             value={message}
             onChange={handleInputChange}
             width="100%"
-            rows={3}
+            rows={4}
           />
           <div className={styles.tips}>
             <span>{t('sign-and-verify.sign-with-magic-byte')}</span>
@@ -295,11 +277,12 @@ const SignAndVerify = () => {
               <div className={styles.content}>
                 <TextField
                   label={t('sign-and-verify.address')}
+                  placeholder={t('sign-and-verify.input-choose-address')}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   data-field="address"
                   value={address}
                   onChange={handleInputChange}
-                  rows={2}
+                  rows={address ? 2 : 1}
                   suffix={
                     <div className={styles.arrow} data-active={isDropdownOpen}>
                       <Arrow />
@@ -338,6 +321,7 @@ const SignAndVerify = () => {
 
           <TextField
             label={t('sign-and-verify.signature')}
+            placeholder="-"
             field="signature"
             value={signature}
             onChange={handleInputChange}
@@ -355,7 +339,11 @@ const SignAndVerify = () => {
           )}
 
           {notification === 'verify-success' || notification === 'verify-old-sign-success' ? (
-            <VerifySuccess onDismiss={handleNotificationDismiss} t={t} />
+            <Toast
+              type="success"
+              onDismiss={handleNotificationDismiss}
+              content={t('sign-and-verify.verification-success')}
+            />
           ) : null}
         </div>
       </Dialog>

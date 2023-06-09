@@ -1,5 +1,4 @@
 @import '../../styles/mixin.scss';
-$headerHeight: 126px;
 $bottomHeight: 124px;
 
 .layout {
@@ -10,7 +9,7 @@ $bottomHeight: 124px;
     position: relative;
 
     .leftContent {
-      height: calc(100vh - $headerHeight - $bottomHeight);
+      height: calc(100vh - $bottomHeight - var(--header-height));
       overflow-y: scroll;
       margin-bottom: 100px;
     }
@@ -38,7 +37,7 @@ $bottomHeight: 124px;
         svg {
           g,
           path {
-            fill: var(--primary-text-color)
+            fill: var(--primary-text-color);
           }
         }
       }
@@ -54,7 +53,9 @@ $bottomHeight: 124px;
 
     .rightContent {
       padding: 16px;
-      margin-bottom: 120px;
+      height: calc(100vh - $bottomHeight - var(--header-height));
+      overflow-y: scroll;
+      margin-bottom: 100px;
     }
 
     .rightFooter {

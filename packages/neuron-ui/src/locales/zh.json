@@ -203,6 +203,7 @@
     },
     "send": {
       "address": "收款地址",
+      "input-address": "请输入收款地址",
       "amount": "转账金额（CKB）",
       "send": "发送",
       "reset": "重置",
@@ -213,7 +214,7 @@
       "scan-to-get-address": "扫描二维码以获取地址",
       "total-amount": "总金额（CKB）",
       "description": "备注",
-      "description-optional": "备注 (选填)",
+      "description-optional": "请输入转账备注，选填",
       "balance": "余额",
       "add-one": "添加",
       "remove-this": "删除",
@@ -364,6 +365,7 @@
           "confirm-password": "确认密码",
           "edit-wallet": "编辑钱包"
         },
+        "edit-success": "已更新钱包信息",
         "delete-wallet-title": "请输入{{name}}的密码",
         "password": "密码",
         "wallet-detail": {
@@ -374,11 +376,16 @@
         "online": "在线",
         "offline": "离线",
         "add-network": "添加网络",
+        "remove-network": "删除网络",
+        "remove-network-msg": "确定要删除所选网络？",
         "edit-network": {
-          "title": "添加或编辑网络",
+          "title": "编辑网络",
           "rpc-url": "RPC地址",
-          "name": "网络名称"
+          "name": "网络名称",
+          "input-rpc": "请输入RPC地址",
+          "input-network": "请输入网络名称"
         },
+        "edit-success": "编辑网络成功",
         "mainnet": "主网",
         "testnet": "测试网",
         "devnet": "开发网"
@@ -412,10 +419,12 @@
         "cache-cleared-on": "上次清空缓存时间 {{date}}",
         "clear-cache": "清空缓存",
         "clearing-cache": "正在清除缓存中，请稍候",
+        "clear-success": "已清除缓存",
         "set-path": "设置路径",
         "remove-ckb-data-tip": "请将 CKB Node 数据从 【{{prevPath}}】 移动至 【{{currentPath}}】 然后点击 \"数据转移完成\" 开始从已知区块同步; 或者点击 \"重新同步\" 开始重新同步.",
         "resync-ckb-node-describe": "注意: 重新同步不会删除当前已同步的 CKB Node 数据",
         "cancel": "取消",
+        "confirm-clear": "确定清除",
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
         "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
@@ -425,6 +434,7 @@
     "password-request": {
       "wallet-not-found": "找不到该钱包",
       "password": "输入密码",
+      "placeholder": "请输入钱包密码",
       "send": {
         "title": "发起交易"
       },
@@ -720,9 +730,9 @@
       "checking-updates": "正在检查更新...",
       "update-available": "检测到新版本",
       "downloading-update": "正在下载更新...",
-      "update-not-available": "已经在使用最新版本",
+      "update-not-available": "当前是最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
-      "download-update": "下载安装",
+      "install-update": "安装更新",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
       "quit-and-install": "安装并重启应用"
     },
@@ -836,14 +846,17 @@
       "cancel": "取消",
       "sign": "签名",
       "verify": "验证",
-      "password": "密码",
+      "password": "输入密码",
       "confirm": "确认",
       "verification-success": "验证成功",
       "verification-failure": "验证失败",
       "address-not-found": "当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。",
       "sign-with-magic-byte": "信息会和 magic bytes 'Nervos Message:' 一起签名",
       "verify-tip": "可以通过 v0.33.1 及以后的 Neuron 进行验证",
-      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本签名"
+      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本签名",
+      "input-message": "请输入信息",
+      "input-choose-address": "请输入或选择地址",
+      "input-password": "请输入钱包密码"
     },
     "special-assets": {
       "title": "自定义资产",

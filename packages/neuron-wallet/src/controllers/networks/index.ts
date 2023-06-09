@@ -95,47 +95,56 @@ export default class NetworksController {
     }
   }
 
-  public async delete(id: string) {
+  public async delete(id: string, needConfirm?: boolean) {
     const network = networksService.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
     }
     const currentID = networksService.getCurrentID()
 
-    const messageValue = await dialog.showMessageBox({
-      type: 'warning',
-      title: t(`messageBox.remove-network.title`),
-      message: t(`messageBox.remove-network.message`, {
-        name: network.name,
-        address: network.remote
-      }),
-      detail: currentID === id ? t('messageBox.remove-network.alert') : '',
-      buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
-      defaultId: 0,
-      cancelId: 1
-    })
+    if (needConfirm) {
+      const messageValue = await dialog.showMessageBox({
+        type: 'warning',
+        title: t(`messageBox.remove-network.title`),
+        message: t(`messageBox.remove-network.message`, {
+          name: network.name,
+          address: network.remote
+        }),
+        detail: currentID === id ? t('messageBox.remove-network.alert') : '',
+        buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
+        defaultId: 0,
+        cancelId: 1
+      })
 
-    if (messageValue.response === 0) {
-      try {
-        networksService.delete(id)
+      if (messageValue.response === 0) {
+        try {
+          networksService.delete(id)
 
-        this.notifyListChange()
+          this.notifyListChange()
 
-        if (id === currentID) {
-          this.notifyCurrentNetworkChange()
-          await this.connectToNetwork()
+          if (id === currentID) {
+            this.notifyCurrentNetworkChange()
+            await this.connectToNetwork()
+          }
+
+          return {
+            status: ResponseCode.Success,
+            result: true
+          }
+        } catch (err) {
+          logger.warn(`connect network error: ${err}`)
+          dialog.showMessageBox({
+            type: 'error',
+            message: err.message
+          })
         }
-
-        return {
-          status: ResponseCode.Success,
-          result: true
-        }
-      } catch (err) {
-        logger.warn(`connect network error: ${err}`)
-        dialog.showMessageBox({
-          type: 'error',
-          message: err.message
-        })
+      }
+    } else {
+      networksService.delete(id)
+      this.notifyListChange()
+      if (id === currentID) {
+        this.notifyCurrentNetworkChange()
+        await this.connectToNetwork()
       }
     }
   }

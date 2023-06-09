@@ -24,7 +24,7 @@
   border: none;
   border-radius: 16px;
   background-color: var(--secondary-background-color);
-  min-width: 450px;
+  min-width: 360px;
   max-width: 650px;
   box-sizing: border-box;
 }
@@ -154,7 +154,10 @@
   border-radius: 16px;
 }
 
-@mixin icon-hover-button($normalColor: var(--secondary-text-color), $hoverColor: var(--primary-color)) {
+@mixin icon-hover-button(
+  $normalColor: var(--secondary-text-color),
+  $hoverColor: var(--primary-color)
+) {
   border: none;
   background: transparent;
   color: $normalColor !important;
@@ -175,7 +178,7 @@
     svg {
       g,
       path {
-        fill: $hoverColor
+        fill: $hoverColor;
       }
     }
   }

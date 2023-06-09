@@ -10,6 +10,7 @@ import { ReactComponent as Export } from 'widgets/Icons/Export.svg'
 import { ReactComponent as ImportHardware } from 'widgets/Icons/HardWalletImport.svg'
 import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
 import Tooltip from 'widgets/Tooltip'
+import Toast from 'widgets/Toast'
 import { StateDispatch } from 'states'
 import WalletEditorDialog from 'components/WalletEditorDialog'
 import {
@@ -31,20 +32,20 @@ const buttons = [
     icon: <CreateWallet />,
   },
   {
-    label: 'wizard.wallet-seed',
+    label: 'wizard.import-mnemonic',
     ariaLabel: 'import wallet seed',
     url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
     icon: <Export />,
   },
   {
-    label: 'wizard.keystore',
+    label: 'wizard.import-keystore',
     ariaLabel: 'import from keystore',
     url: RoutePath.ImportKeystore,
     icon: <ImportKeystore />,
     stroke: true,
   },
   {
-    label: 'wizard.hardware-wallet',
+    label: 'wizard.import-hardware-wallet',
     ariaLabel: 'import from hardware wallet',
     url: RoutePath.ImportHardware,
     icon: <ImportHardware />,
@@ -61,6 +62,7 @@ const WalletSetting = ({
   const location = useLocation()
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [editWallet, setEditWallet] = useState('')
+  const [notice, setNotice] = useState('')
 
   useEffect(() => {
     backToTop()
@@ -117,6 +119,11 @@ const WalletSetting = ({
 
   useOnWindowResize(toggleBottomBorder)
 
+  const onEditSuccess = useCallback(() => {
+    setShowEditDialog(false)
+    setNotice(t('settings.wallet-manager.edit-success'))
+  }, [setShowEditDialog, setNotice])
+
   return (
     <div>
       <RadioGroup
@@ -171,7 +178,10 @@ const WalletSetting = ({
         onCancel={() => {
           setShowEditDialog(false)
         }}
+        onSuccess={onEditSuccess}
       />
+
+      <Toast content={notice} onDismiss={() => setNotice('')} />
     </div>
   )
 }
