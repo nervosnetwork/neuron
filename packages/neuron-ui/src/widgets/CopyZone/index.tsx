@@ -36,7 +36,7 @@ const CopyZone = ({ children, content, name, style, className = '' }: CopyZonePr
       {children}
       <div className={styles.hoverShow}>
         {copied ? <SuccessNoBorder className={styles.copyIcon} /> : <Copy className={styles.copyIcon} />}
-        {prompt}
+        <span className={styles.copytext}>{prompt}</span>
       </div>
     </div>
   )

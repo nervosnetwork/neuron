@@ -1,5 +1,6 @@
 @import '../../styles/mixin.scss';
 @import '../../styles/theme.scss';
+@import '../../styles/animation.scss';
 
 .mid {
   height: 200px;
@@ -23,12 +24,10 @@
       right: 0px;
     }
 
-    & > .copyBalance {
-      .balanceValue {
-        font-family: 'D-DIN-PRO';
-        font-weight: 500;
-        font-size: 36px;
-      }
+    .balanceValue {
+      font-family: 'D-DIN-PRO';
+      font-weight: 500;
+      font-size: 36px;
     }
 
     & > .balanceUnit {
@@ -88,6 +87,10 @@
   display: flex;
   position: relative;
   align-items: center;
+
+  .confirming {
+    @include infinite-rotation;
+  }
 
   .confirmText {
     color: #999;
