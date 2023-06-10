@@ -69,7 +69,6 @@ jobs:
       - name: Package for MacOS
         if: ${{ matrix.os == 'macos-latest' && env.APPLE_ID != '' }}
         run: |
-          export CSC_FOR_PULL_REQUEST=true
           ./scripts/download-ckb.sh mac
           yarn package:test mac
         env:
