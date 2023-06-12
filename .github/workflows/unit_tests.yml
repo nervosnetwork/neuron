@@ -53,7 +53,7 @@ jobs:
 
       - name: Boostrap
         run: |
-          yarn bootstrap
+          yarn
           yarn build
         env:
           CI: false
