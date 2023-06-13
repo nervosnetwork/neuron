@@ -30,7 +30,7 @@ $ yarn global add lerna # install lerna globally
 After lerna has been installed, run this to install and link dependencies:
 
 ```shell
-$ yarn bootstrap
+$ yarn
 $ lerna run rebuild:nativemodules
 ```
 
