@@ -28,7 +28,7 @@ const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
 }))
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(() => ({
-  ckbRpcUrl
+  ckbRpcUrl,
 }))
 
 const stubbedTransactionCollectorConstructor = jest.fn()
@@ -100,9 +100,11 @@ const mockGetTransactionHashes = (mocks: any[] = []) => {
 
   for (const lock of [formattedDefaultLockScript, formattedAcpLockScript, formattedLegacyAcpLockScript]) {
     const { hashes } = mocks.find(mock => mock.lock === lock) || { hashes: [] }
-    stubbedConstructor.calledWith(expect.anything(), { lock }, ckbRpcUrl, { includeStatus: false }).mockReturnValue({
-      getTransactionHashes: jest.fn().mockReturnValue(hashes),
-    })
+    stubbedConstructor
+      .calledWith(expect.anything(), { lock }, rpcService?.url, { includeStatus: false })
+      .mockReturnValue({
+        getTransactionHashes: jest.fn().mockReturnValue(hashes),
+      })
   }
 }
 const fakeBlock1 = { number: '1', hash: '1', timestamp: '1' }
@@ -250,8 +252,8 @@ describe('indexer cache service', () => {
                       value: {
                         outPoint: {
                           txHash: fakeTx2.transaction.hash,
-                        }
-                      }
+                        },
+                      },
                     }
                   }
                   return { done: true }
