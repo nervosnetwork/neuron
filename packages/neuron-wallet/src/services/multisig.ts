@@ -106,13 +106,13 @@ export default class MultisigService {
             params: [
               {
                 script: {
-                  codeHash: script.codeHash,
-                  hashType: script.hashType,
+                  code_hash: script.codeHash,
+                  hash_type: script.hashType,
                   args: script.args,
                 },
-                scriptType: 'lock',
+                script_type: 'lock',
                 filter: {
-                  blockRange: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
+                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
                 },
               },
               'desc',
@@ -165,13 +165,13 @@ export default class MultisigService {
             params: [
               {
                 script: {
-                  codeHash: script.codeHash,
-                  hashType: script.hashType,
+                  code_hash: script.codeHash,
+                  hash_type: script.hashType,
                   args: script.args,
                 },
-                scriptType: 'lock',
+                script_type: 'lock',
                 filter: {
-                  blockRange: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
+                  block_range: v.lastestBlockNumber ? [v.lastestBlockNumber, max64Int] : undefined,
                 },
               },
               'desc',
