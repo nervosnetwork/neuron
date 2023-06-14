@@ -30,7 +30,8 @@
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "lint-staged": {
-    "src/**/*.ts": [
+    "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+      "prettier --write",
       "eslint --fix",
       "git add"
     ]
