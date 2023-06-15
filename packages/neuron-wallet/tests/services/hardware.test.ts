@@ -13,7 +13,7 @@ describe('HardwareWalletService', () => {
       it('find specific model device', async () => {
         const devices = await HardwareService.findDevices({
           manufacturer: Manufacturer.Ledger,
-          product: 'Nano S'
+          product: 'Nano S',
         })
         expect(devices).toEqual([ledgerNanoS])
       })

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, CreateDateColumn } from 'typeorm'
-import HdPublicKeyInfoModel from 'models/keys/hd-public-key-info'
-import { AddressType } from 'models/keys/address'
+import HdPublicKeyInfoModel from '../../../models/keys/hd-public-key-info'
+import { AddressType } from '../../../models/keys/address'
 
 @Entity()
 export default class HdPublicKeyInfo {
@@ -8,7 +8,7 @@ export default class HdPublicKeyInfo {
   id!: number
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   @Index()
   walletId!: string
@@ -21,13 +21,13 @@ export default class HdPublicKeyInfo {
   addressIndex!: number
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   publicKeyInBlake160!: string
 
   @CreateDateColumn({
     type: 'varchar',
-    default: () => 'CURRENT_TIMESTAMP'
+    default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt!: Date
 

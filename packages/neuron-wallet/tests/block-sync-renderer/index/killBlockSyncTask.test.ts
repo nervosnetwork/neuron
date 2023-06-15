@@ -21,16 +21,16 @@ describe(`Kill block sync task`, () => {
       send: stubbedChildProcessSend,
       stderr: {
         setEncoding: jest.fn().mockImplementation(() => ({
-          on: jest.fn()
-        }))
-      }
-    }))
+          on: jest.fn(),
+        })),
+      },
+    })),
   }))
   jest.doMock('services/indexer', () => ({ getInstance: () => ({ start: jest.fn(), stop: jest.fn() }) }))
   jest.doMock('services/addresses', () => ({
     updateTxCountAndBalances: jest.fn(),
     updateUsedByAnyoneCanPayByBlake160s: jest.fn(),
-    getAddressesByAllWallets: () => [{}]
+    getAddressesByAllWallets: () => [{}],
   }))
   jest.doMock('services/networks', () => ({ getInstance: () => ({ getCurrent: stubbedGetCurrentNetwork }) }))
   jest.doMock('block-sync-renderer/task', () => stubbedSyncTaskCtor)

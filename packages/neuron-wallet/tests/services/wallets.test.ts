@@ -22,7 +22,7 @@ jest.doMock('../../src/services/addresses', () => {
     deleteByWalletId: stubbedDeleteByWalletId,
     generateAndSaveForExtendedKey: stubbedGenerateAndSaveForExtendedKeyFn,
     generateAndSaveForPublicKeyQueue: {
-      asyncPush: stubbedGenerateAndSaveForPublicKeyQueueAsyncPush
+      asyncPush: stubbedGenerateAndSaveForPublicKeyQueueAsyncPush,
     },
     getNextUnusedAddressByWalletId: stubbedGetNextUnusedAddressByWalletIdFn,
     getNextUnusedChangeAddressByWalletId: stubbedGetNextUnusedChangeAddressByWalletIdFn,
@@ -30,7 +30,7 @@ jest.doMock('../../src/services/addresses', () => {
     getFirstAddressByWalletId: stubbedGetFirstAddressByWalletIdFn,
     getAddressesByWalletId: stubbedGetAddressesByWalletId,
   }
-});
+})
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
 import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
@@ -54,7 +54,6 @@ describe('wallet service', () => {
   let wallet4: WalletProperties
   const fakePublicKey = 'keykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykey'
   const fakeChainCode = 'codecodecodecodecodecodecodecodecodecodecodecodecodecodecodecode'
-
 
   beforeAll(async () => {
     await initConnection('')
@@ -153,7 +152,7 @@ describe('wallet service', () => {
         vendorId: '10086',
         addressIndex: 0,
         addressType: AddressType.Receiving,
-      }
+      },
     }
   })
 
@@ -169,7 +168,7 @@ describe('wallet service', () => {
     let createdWallet: Wallet
     beforeEach(() => {
       createdWallet = walletService.create(wallet1)
-    });
+    })
     it('saves name', () => {
       const wallet = walletService.get(createdWallet.id)
       expect(wallet.name).toEqual(wallet1.name)
@@ -180,7 +179,7 @@ describe('wallet service', () => {
         const keystore = wallet.loadKeystore()
         expect(keystore.crypto).toEqual(wallet1.keystore!.crypto)
       })
-    });
+    })
     describe('#accountExtendedPublicKey', () => {
       it('returns xpubkey', () => {
         const wallet = walletService.get(createdWallet.id)
@@ -188,15 +187,13 @@ describe('wallet service', () => {
         expect(extendedPublicKey.publicKey).toEqual(fakePublicKey)
         expect(extendedPublicKey.chainCode).toEqual(fakeChainCode)
       })
-    });
+    })
     describe('#getDeviceInfo', () => {
       it('throws error', () => {
         const wallet = walletService.get(createdWallet.id)
-        expect(() => wallet.getDeviceInfo()).toThrowError(
-          new WalletFunctionNotSupported(wallet.getDeviceInfo.name)
-        )
+        expect(() => wallet.getDeviceInfo()).toThrowError(new WalletFunctionNotSupported(wallet.getDeviceInfo.name))
       })
-    });
+    })
 
     describe('#checkAndGenerateAddresses', () => {
       beforeEach(async () => {
@@ -215,7 +212,7 @@ describe('wallet service', () => {
           10
         )
       })
-    });
+    })
     describe('#getNextAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
@@ -224,7 +221,7 @@ describe('wallet service', () => {
       it('calls AddressService.getNextUnusedAddressByWalletId', () => {
         expect(stubbedGetNextUnusedAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
-    });
+    })
     describe('#getNextChangeAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
@@ -233,7 +230,7 @@ describe('wallet service', () => {
       it('calls AddressService.getNextUnusedChangeAddressByWalletId', () => {
         expect(stubbedGetNextUnusedChangeAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
-    });
+    })
     describe('#getNextReceivingAddressesByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
@@ -242,13 +239,13 @@ describe('wallet service', () => {
       it('calls AddressService.getUnusedReceivingAddressesByWalletId', () => {
         expect(stubbedGetUnusedReceivingAddressesByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
-    });
-  });
+    })
+  })
   describe('with a hardware wallet', () => {
     let createdWallet: Wallet
     beforeEach(() => {
       createdWallet = walletService.create(wallet4)
-    });
+    })
     it('saves name', () => {
       const wallet = walletService.get(createdWallet.id)
       expect(wallet.name).toEqual(wallet4.name)
@@ -259,15 +256,13 @@ describe('wallet service', () => {
         const device = wallet.getDeviceInfo()
         expect(device).toEqual(wallet4.device)
       })
-    });
+    })
     describe('#loadKeystore', () => {
       it('throws error', () => {
         const wallet = walletService.get(createdWallet.id)
-        expect(() => wallet.loadKeystore()).toThrowError(
-          new WalletFunctionNotSupported(wallet.loadKeystore.name)
-        )
+        expect(() => wallet.loadKeystore()).toThrowError(new WalletFunctionNotSupported(wallet.loadKeystore.name))
       })
-    });
+    })
 
     describe('#checkAndGenerateAddresses', () => {
       beforeEach(async () => {
@@ -283,7 +278,7 @@ describe('wallet service', () => {
           addressIndex: 0,
         })
       })
-    });
+    })
     describe('#getNextAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
@@ -292,7 +287,7 @@ describe('wallet service', () => {
       it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
-    });
+    })
     describe('#getNextChangeAddressByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
@@ -301,7 +296,7 @@ describe('wallet service', () => {
       it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
-    });
+    })
     describe('#getNextReceivingAddressesByWalletId', () => {
       beforeEach(async () => {
         const wallet = await WalletService.getInstance().get(createdWallet.id)
@@ -310,21 +305,21 @@ describe('wallet service', () => {
       it('calls AddressService.getGetFirstAddressByWalletId', () => {
         expect(stubbedGetFirstAddressByWalletIdFn).toHaveBeenCalledWith(createdWallet.id)
       })
-    });
-  });
+    })
+  })
 
   describe('#update', () => {
     let createdWallet: Wallet
     beforeEach(() => {
       createdWallet = walletService.create(wallet1)
-    });
+    })
     it('renames wallet', () => {
       wallet1.name = 'renamed'
       walletService.update(createdWallet.id, wallet1)
       const updatedWallet = walletService.get(createdWallet.id)
       expect(updatedWallet.name).toEqual('renamed')
     })
-  });
+  })
 
   describe('#getCurrent', () => {
     let createdWallet1: Wallet
@@ -332,7 +327,7 @@ describe('wallet service', () => {
     beforeEach(() => {
       createdWallet1 = walletService.create(wallet2)
       createdWallet2 = walletService.create(wallet3)
-    });
+    })
     it('get all wallets', () => {
       expect(walletService.getAll().length).toBe(2)
     })
@@ -353,13 +348,13 @@ describe('wallet service', () => {
       const activeWallet = walletService.getCurrent()
       expect(activeWallet && activeWallet.id).toEqual(createdWallet2.id)
     })
-  });
+  })
 
   describe('#delete', () => {
     let w1: any
     beforeEach(() => {
       w1 = walletService.create(wallet1)
-    });
+    })
     it('delete wallet', async () => {
       walletService.create(wallet2)
       expect(walletService.getAll().length).toBe(2)
@@ -373,28 +368,28 @@ describe('wallet service', () => {
       let w2: any
       beforeEach(() => {
         w2 = walletService.create(wallet2)
-      });
+      })
       describe('when deleted current wallet', () => {
         beforeEach(async () => {
           await walletService.delete(w1.id)
-        });
+        })
         it('switches active wallet', () => {
           const activeWallet = walletService.getCurrent()
           expect(activeWallet && activeWallet.id).toEqual(w2.id)
           expect(walletService.getAll().length).toEqual(1)
         })
-      });
+      })
       describe('when deleted wallets other than current wallet', () => {
         beforeEach(async () => {
           await walletService.delete(w2.id)
-        });
+        })
         it('should not switch active wallet', () => {
           const activeWallet = walletService.getCurrent()
           expect(activeWallet && activeWallet.id).toEqual(w1.id)
         })
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('#maintainAddressesIfNecessary', () => {
     let createdWallet1: any
@@ -406,31 +401,34 @@ describe('wallet service', () => {
       createdWallet3 = walletService.create(wallet3)
 
       when(stubbedGetAddressesByWalletId)
-        .calledWith(createdWallet1.id).mockResolvedValue({length: 1})
-        .calledWith(createdWallet2.id).mockResolvedValue({length: 0})
-        .calledWith(createdWallet3.id).mockResolvedValue({length: 0})
+        .calledWith(createdWallet1.id)
+        .mockResolvedValue({ length: 1 })
+        .calledWith(createdWallet2.id)
+        .mockResolvedValue({ length: 0 })
+        .calledWith(createdWallet3.id)
+        .mockResolvedValue({ length: 0 })
 
       await walletService.maintainAddressesIfNecessary()
-    });
+    })
     it('should not generate addresses for wallets already having addresses', () => {
       expect(stubbedGenerateAndSaveForExtendedKeyFn).not.toHaveBeenCalledWith(createdWallet1.id)
     })
     it('generates addresses for wallets not having addresses', () => {
       expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
         createdWallet2.id,
-        expect.objectContaining({publicKey: 'a'}),
+        expect.objectContaining({ publicKey: 'a' }),
         false,
         20,
-        10,
+        10
       )
       expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
         createdWallet3.id,
-        expect.objectContaining({publicKey: 'a'}),
+        expect.objectContaining({ publicKey: 'a' }),
         false,
         20,
-        10,
+        10
       )
-    });
+    })
     describe('when having invalid wallet ids in key info', () => {
       const deletedWalletId = 'wallet4'
       const generateKeyInfo = (walletId: string, pk: string) => {
@@ -455,15 +453,15 @@ describe('wallet service', () => {
         expect(keyInfosByDeletedWallet.length).toEqual(2)
 
         await walletService.maintainAddressesIfNecessary()
-      });
+      })
       it('deletes related key infos in hd_public_key_info table', async () => {
         const savedKeyInfos = await getConnection().getRepository(HdPublicKeyInfo).find()
         expect(savedKeyInfos.length).toEqual(1)
         const keyInfosByDeletedWallet = savedKeyInfos.filter(key => key.walletId === deletedWalletId)
         expect(keyInfosByDeletedWallet.length).toEqual(0)
       })
-    });
-  });
+    })
+  })
 
   describe('checkAndGenerateAddress', () => {
     const walletServiceMock = new WalletService()

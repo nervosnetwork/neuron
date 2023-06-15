@@ -2046,5 +2046,5 @@ export default [
   'zebra',
   'zero',
   'zone',
-  'zoo'
+  'zoo',
 ]

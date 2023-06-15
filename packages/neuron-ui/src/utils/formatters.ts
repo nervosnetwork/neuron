@@ -101,7 +101,7 @@ export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit =
   }
 }
 
-export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: boolean, delimiter: string = ',') => {
+export const shannonToCKBFormatter = (shannon: string, showPositiveSign?: boolean, delimiter: string = ',') => {
   if (Number.isNaN(+shannon)) {
     console.warn(`Shannon is not a valid number`)
     return shannon

@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import AnyoneCanPayServece from '../../src/services/anyone-can-pay'
-import AssetAccountEntity from "../../src/database/chain/entities/asset-account"
-import AssetAccount from "../../src/models/asset-account"
+import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
+import AssetAccount from '../../src/models/asset-account'
 import { initConnection, closeConnection } from '../setupAndTeardown'
 import { AcpSendSameAccountError, TargetLockError, TargetOutputNotFoundError } from '../../src/exceptions'
 import AssetAccountInfo from '../../src/models/asset-account-info'
@@ -12,16 +12,16 @@ const addressParseMock = jest.fn()
 jest.mock('../../src/models/address-parser', () => ({
   parse(address: string) {
     return addressParseMock(address)
-  }
+  },
 }))
 
 const getOneByLockScriptAndTypeScriptMock = jest.fn()
 jest.mock('../../src/services/live-cell-service', () => ({
   getInstance() {
     return {
-      getOneByLockScriptAndTypeScript: getOneByLockScriptAndTypeScriptMock
+      getOneByLockScriptAndTypeScript: getOneByLockScriptAndTypeScriptMock,
     }
-  }
+  },
 }))
 
 const getNextChangeAddressMock = jest.fn()
@@ -29,10 +29,10 @@ jest.mock('../../src/services/wallets', () => ({
   getInstance() {
     return {
       get: () => ({
-        getNextChangeAddress: getNextChangeAddressMock
-      })
+        getNextChangeAddress: getNextChangeAddressMock,
+      }),
     }
-  }
+  },
 }))
 
 const generateAnyoneCanPayToCKBTxMock = jest.fn()
@@ -45,18 +45,18 @@ jest.mock('../../src/services/tx', () => ({
     // @ts-ignore
     generateAnyoneCanPayToSudtTx: (...args) => generateAnyoneCanPayToSudtTxMock(...args),
     // @ts-ignore
-    generateSudtMigrateAcpTx: (...args) => generateSudtMigrateAcpTxMock(...args)
-  }
+    generateSudtMigrateAcpTx: (...args) => generateSudtMigrateAcpTxMock(...args),
+  },
 }))
 
 const fromObjectMock = jest.fn()
 jest.mock('../../src/models/chain/output', () => ({
-  fromObject: (obj: any) => fromObjectMock(obj)
+  fromObject: (obj: any) => fromObjectMock(obj),
 }))
 
 const getLiveCellMock = jest.fn()
 jest.mock('../../src/services/cells', () => ({
-  getLiveCell: () => getLiveCellMock()
+  getLiveCell: () => getLiveCellMock(),
 }))
 
 function mockReset() {
@@ -71,15 +71,39 @@ function mockReset() {
 }
 
 describe('anyone-can-pay-service', () => {
-  const assetAccount = AssetAccountEntity.fromModel(new AssetAccount('tokenId', 'symbol', 'accountName', 'tokenName', '8', '0', '0x62260b4dd406bee8a021185edaa60b7a77f7e99a'))
-  const ckbAssetAccount = AssetAccountEntity.fromModel(new AssetAccount('CKBytes', 'symbol', 'accountName', 'tokenName', '8', '0', '0xb2b8101595fe0ddeb9f4e1acead6107119497fe6'))
+  const assetAccount = AssetAccountEntity.fromModel(
+    new AssetAccount(
+      'tokenId',
+      'symbol',
+      'accountName',
+      'tokenName',
+      '8',
+      '0',
+      '0x62260b4dd406bee8a021185edaa60b7a77f7e99a'
+    )
+  )
+  const ckbAssetAccount = AssetAccountEntity.fromModel(
+    new AssetAccount(
+      'CKBytes',
+      'symbol',
+      'accountName',
+      'tokenName',
+      '8',
+      '0',
+      '0xb2b8101595fe0ddeb9f4e1acead6107119497fe6'
+    )
+  )
   let assetAccountEntity: AssetAccountEntity
   let ckbAssetAccountEntity: AssetAccountEntity
   // let sudtTokenInfoEntity
   beforeAll(async () => {
     await initConnection()
-    assetAccountEntity = (await getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount]))[1] as AssetAccountEntity
-    ckbAssetAccountEntity = (await getConnection().manager.save([ckbAssetAccount.sudtTokenInfo, ckbAssetAccount]))[1] as AssetAccountEntity
+    assetAccountEntity = (
+      await getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
+    )[1] as AssetAccountEntity
+    ckbAssetAccountEntity = (
+      await getConnection().manager.save([ckbAssetAccount.sudtTokenInfo, ckbAssetAccount])
+    )[1] as AssetAccountEntity
   })
 
   afterAll(() => {
@@ -92,23 +116,46 @@ describe('anyone-can-pay-service', () => {
 
   describe('generateAnyoneCanPayTx', () => {
     it('exception no asset account', async () => {
-      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', 1000)).rejects.toThrow(new Error('Asset Account not found!'))
+      await expect(
+        AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', 1000)
+      ).rejects.toThrow(new Error('Asset Account not found!'))
     })
     it('exception AcpSendSameAccountError', async () => {
       addressParseMock.mockReturnValueOnce({ args: assetAccount.blake160 })
-      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', assetAccountEntity.id)).rejects.toThrow(new AcpSendSameAccountError())
+      await expect(
+        AnyoneCanPayServece.generateAnyoneCanPayTx(
+          'walletId',
+          'targetAddress',
+          'capacityOrAmount',
+          assetAccountEntity.id
+        )
+      ).rejects.toThrow(new AcpSendSameAccountError())
     })
     it('exception with TargetOutputNotFoundError', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValueOnce(undefined)
       const anyonePayScript = new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160)
       addressParseMock.mockReturnValueOnce(anyonePayScript)
-      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'anyoneCanPayAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)).rejects.toThrow(new TargetOutputNotFoundError())
+      await expect(
+        AnyoneCanPayServece.generateAnyoneCanPayTx(
+          'walletId',
+          'anyoneCanPayAddress',
+          'capacityOrAmount',
+          ckbAssetAccountEntity.id
+        )
+      ).rejects.toThrow(new TargetOutputNotFoundError())
     })
     it('exception with TargetLockError', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValueOnce(undefined)
       const anyonePayScript = new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160)
       addressParseMock.mockReturnValueOnce(anyonePayScript)
-      await expect(AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'anyoneCanPayAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)).rejects.toThrow(new TargetLockError())
+      await expect(
+        AnyoneCanPayServece.generateAnyoneCanPayTx(
+          'walletId',
+          'anyoneCanPayAddress',
+          'capacityOrAmount',
+          ckbAssetAccountEntity.id
+        )
+      ).rejects.toThrow(new TargetLockError())
     })
     it('isSecpScript with ckb', async () => {
       const targetLockScript = SystemScriptInfo.generateSecpScript(assetAccount.blake160)
@@ -119,11 +166,16 @@ describe('anyone-can-pay-service', () => {
       generateAnyoneCanPayToCKBTxMock.mockReturnValueOnce({})
       const output = {}
       fromObjectMock.mockReturnValueOnce(output)
-      await AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', ckbAssetAccountEntity.id)
+      await AnyoneCanPayServece.generateAnyoneCanPayTx(
+        'walletId',
+        'targetAddress',
+        'capacityOrAmount',
+        ckbAssetAccountEntity.id
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: '0',
         lock: targetLockScript,
-        type: null
+        type: null,
       })
       expect(generateAnyoneCanPayToCKBTxMock).toHaveBeenCalledWith(
         'walletId',
@@ -144,11 +196,16 @@ describe('anyone-can-pay-service', () => {
       generateAnyoneCanPayToSudtTxMock.mockReturnValueOnce({})
       const output = {}
       fromObjectMock.mockReturnValueOnce(output)
-      await AnyoneCanPayServece.generateAnyoneCanPayTx('walletId', 'targetAddress', 'capacityOrAmount', assetAccountEntity.id)
+      await AnyoneCanPayServece.generateAnyoneCanPayTx(
+        'walletId',
+        'targetAddress',
+        'capacityOrAmount',
+        assetAccountEntity.id
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: targetLockScript,
-        type: new AssetAccountInfo().generateSudtScript(assetAccount.tokenID)
+        type: new AssetAccountInfo().generateSudtScript(assetAccount.tokenID),
       })
       expect(generateAnyoneCanPayToSudtTxMock).toHaveBeenCalledWith(
         'walletId',
@@ -165,7 +222,9 @@ describe('anyone-can-pay-service', () => {
   describe('generateSudtMigrateAcpTx', () => {
     it('exception', async () => {
       getLiveCellMock.mockResolvedValueOnce(undefined)
-      await expect(AnyoneCanPayServece.generateSudtMigrateAcpTx({ txHash: '', index: '0' })).rejects.toThrow(new Error('sudt live cell not found'))
+      await expect(AnyoneCanPayServece.generateSudtMigrateAcpTx({ txHash: '', index: '0' })).rejects.toThrow(
+        new Error('sudt live cell not found')
+      )
     })
     it('normal', async () => {
       const cell = {}
@@ -182,7 +241,7 @@ describe('anyone-can-pay-service', () => {
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: '0',
         lock: SystemScriptInfo.generateSecpScript(assetAccount.blake160),
-        type: null
+        type: null,
       })
     })
     it('send to anyone pay address not exist', async () => {
@@ -195,26 +254,36 @@ describe('anyone-can-pay-service', () => {
     it('send to anyone pay address exist', async () => {
       const targetLiveCell = {
         capacity: '1000',
-        lock() { return {} },
-        type() { return {} },
+        lock() {
+          return {}
+        },
+        type() {
+          return {}
+        },
         data: '0x00',
-        outPoint() { return {}}
+        outPoint() {
+          return {}
+        },
       }
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(targetLiveCell)
       //@ts-ignore
-      await AnyoneCanPayServece.getCKBTargetOutput(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160))
+      await AnyoneCanPayServece.getCKBTargetOutput(
+        new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160)
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: targetLiveCell.capacity,
         lock: targetLiveCell.lock(),
         type: targetLiveCell.type(),
         data: targetLiveCell.data,
-        outPoint: targetLiveCell.outPoint()
+        outPoint: targetLiveCell.outPoint(),
       })
     })
     it('send to unknow address', async () => {
       await expect(
         //@ts-ignore private-method
-        AnyoneCanPayServece.getCKBTargetOutput(new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160))
+        AnyoneCanPayServece.getCKBTargetOutput(
+          new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160)
+        )
       ).rejects.toThrow(new TargetLockError())
     })
   })
@@ -222,40 +291,55 @@ describe('anyone-can-pay-service', () => {
   describe('getSUDTTargetOutput', () => {
     it('send to secp256', async () => {
       //@ts-ignore
-      await AnyoneCanPayServece.getSUDTTargetOutput(SystemScriptInfo.generateSecpScript(assetAccount.blake160), 'tokenID')
+      await AnyoneCanPayServece.getSUDTTargetOutput(
+        SystemScriptInfo.generateSecpScript(assetAccount.blake160),
+        'tokenID'
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: SystemScriptInfo.generateSecpScript(assetAccount.blake160),
-        type: new AssetAccountInfo().generateSudtScript('tokenID')
+        type: new AssetAccountInfo().generateSudtScript('tokenID'),
       })
     })
     it('send to anyone pay address not exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
       //@ts-ignore
-      await AnyoneCanPayServece.getSUDTTargetOutput(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), 'tokenID')
+      await AnyoneCanPayServece.getSUDTTargetOutput(
+        new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
+        'tokenID'
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(MIN_SUDT_CAPACITY).toString(),
         lock: new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
-        type: new AssetAccountInfo().generateSudtScript('tokenID')
+        type: new AssetAccountInfo().generateSudtScript('tokenID'),
       })
     })
     it('send to anyone pay address exist', async () => {
       const targetLiveCell = {
         capacity: '1000',
-        lock() { return {} },
-        type() { return {} },
+        lock() {
+          return {}
+        },
+        type() {
+          return {}
+        },
         data: '0x00',
-        outPoint() { return {}}
+        outPoint() {
+          return {}
+        },
       }
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(targetLiveCell)
       //@ts-ignore
-      await AnyoneCanPayServece.getSUDTTargetOutput(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), 'tokenID')
+      await AnyoneCanPayServece.getSUDTTargetOutput(
+        new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
+        'tokenID'
+      )
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: targetLiveCell.capacity,
         lock: targetLiveCell.lock(),
         type: targetLiveCell.type(),
         data: targetLiveCell.data,
-        outPoint: targetLiveCell.outPoint()
+        outPoint: targetLiveCell.outPoint(),
       })
     })
     it('send to unknow address', async () => {
@@ -266,33 +350,48 @@ describe('anyone-can-pay-service', () => {
       expect(fromObjectMock).toHaveBeenCalledWith({
         capacity: BigInt(162 * 10 ** 8).toString(),
         lock: new AssetAccountInfo().generateChequeScript(args, args),
-        type: new AssetAccountInfo().generateSudtScript('tokenID')
+        type: new AssetAccountInfo().generateSudtScript('tokenID'),
       })
     })
   })
 
   describe('getHoldSUDTCellCapacity', () => {
     it('is secp256 address', async () => {
-      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(SystemScriptInfo.generateSecpScript(assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(
+        SystemScriptInfo.generateSecpScript(assetAccount.blake160),
+        '0x00'
+      )
       expect(res).toBe(undefined)
     })
     it('CKB acp', async () => {
-      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), 'CKBytes')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(
+        new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
+        'CKBytes'
+      )
       expect(res).toBe(undefined)
     })
     it('acp cell exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue({})
-      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(
+        new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
+        '0x00'
+      )
       expect(res).toBe(undefined)
     })
     it('acp cell not exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
-      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(
+        new AssetAccountInfo().generateAnyoneCanPayScript(assetAccount.blake160),
+        '0x00'
+      )
       expect(res).toBe(BigInt(MIN_SUDT_CAPACITY).toString())
     })
     it('unknow lock not exist', async () => {
       getOneByLockScriptAndTypeScriptMock.mockResolvedValue(undefined)
-      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160), '0x00')
+      const res = await AnyoneCanPayServece.getHoldSUDTCellCapacity(
+        new AssetAccountInfo().generateChequeScript(assetAccount.blake160, assetAccount.blake160),
+        '0x00'
+      )
       expect(res).toBe(BigInt(162 * 10 ** 8).toString())
     })
   })

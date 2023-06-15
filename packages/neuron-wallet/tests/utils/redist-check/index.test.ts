@@ -9,16 +9,16 @@ jest.mock('util', () => ({
     .fn<ExecFunc, any>(() => () => Promise.resolve({ stdout: 'success' }))
     .mockImplementationOnce(() => () => Promise.resolve({ stdout: 'success' }))
     .mockImplementationOnce(() => () => Promise.resolve({ stdout: null, stderr: 'err' }))
-    .mockImplementationOnce(() => () => Promise.reject({ stdout: null, stderr: 'err' }))
+    .mockImplementationOnce(() => () => Promise.reject({ stdout: null, stderr: 'err' })),
 }))
 jest.mock('utils/logger', () => console)
 
 describe('redist check', () => {
   describe('win32', () => {
-    beforeAll(function() {
+    beforeAll(function () {
       originalPlatform = process.platform
       Object.defineProperty(process, 'platform', {
-        value: 'win32'
+        value: 'win32',
       })
     })
     it('true', async () => {
@@ -33,26 +33,26 @@ describe('redist check', () => {
       const redistStatus = await redistCheck()
       expect(redistStatus).toBe(false)
     })
-    afterAll(function() {
+    afterAll(function () {
       Object.defineProperty(process, 'platform', {
-        value: originalPlatform
+        value: originalPlatform,
       })
     })
   })
   describe('not win32', () => {
-    beforeAll(function() {
+    beforeAll(function () {
       originalPlatform = process.platform
       Object.defineProperty(process, 'platform', {
-        value: 'darwin'
+        value: 'darwin',
       })
     })
     it('true', async () => {
       const redistStatus = await redistCheck()
       expect(redistStatus).toBe(true)
     })
-    afterAll(function() {
+    afterAll(function () {
       Object.defineProperty(process, 'platform', {
-        value: originalPlatform
+        value: originalPlatform,
       })
     })
   })

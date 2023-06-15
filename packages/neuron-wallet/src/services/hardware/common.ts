@@ -1,7 +1,7 @@
-import { AddressType } from 'models/keys/address'
+import { AddressType } from '../../models/keys/address'
 
 export enum Manufacturer {
-  Ledger = 'Ledger'
+  Ledger = 'Ledger',
 }
 
 export interface DeviceInfo {

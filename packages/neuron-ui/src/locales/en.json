@@ -240,7 +240,7 @@
       "remove-receiving-address-msg": "Are you sure you want to remove the selected receiving address?",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
-      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. In general, exchanges do not support expiration unlocking, please use with caution!"
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
     },
     "receive": {
       "title": "Receive",
@@ -305,6 +305,7 @@
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
+      "opening": "Opening",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
       "copy-address": "Copy Address",
@@ -395,6 +396,7 @@
         "edit-success": "Edit network Success",
         "mainnet": "Mainnet",
         "testnet": "Testnet",
+        "lightTestnet": "Light Testnet",
         "devnet": "Devnet"
       },
       "locale": {
@@ -562,6 +564,8 @@
       "migrate-warning": "Warning: The migration process may fail for unknown reasons resulting in resynchronization, please back up manually and start the migration!",
       "migrate": "Migrate",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
+      "light-client-locktime-warning": "2.Light client mode doesn't support showing lock-time CKBytes.",
+      "light-client-cheque-warning": "Warning: Light client mode doesn't support showing Cheque assets.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -1005,6 +1009,7 @@
         "type": "type",
         "balance": "balance",
         "copy-address": "Copy Address",
+        "sync-block": "Synced Block",
         "actions": {
           "info": "Info",
           "send": "Send",

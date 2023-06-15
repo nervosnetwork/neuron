@@ -1,5 +1,5 @@
 import {MigrationInterface, QueryRunner } from "typeorm";
-import env from "env";
+import env from "../../../env";
 
 export class TxDescription1599441769473 implements MigrationInterface {
   name = 'TxDescription1599441769473'

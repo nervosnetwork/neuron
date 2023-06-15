@@ -21,5 +21,5 @@ export class CurrentNetworkNotSet extends Error {
 export default {
   NetworkNotFound,
   DefaultNetworkUnremovable,
-  CurrentNetworkNotSet
+  CurrentNetworkNotSet,
 }

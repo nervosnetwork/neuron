@@ -57,7 +57,7 @@ const NetworkStatus = ({
       ) : null}
       {isMigrate && <div className={styles.tooltip}>{t('network-status.migrating')}</div>}
       {network ? (
-        <div>
+        <div className={styles.networkDisplay}>
           <NetworkTypeLabel type={network.chain} />
           <span className={styles.name}>{network.name}</span>
         </div>

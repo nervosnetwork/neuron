@@ -2,9 +2,9 @@ import { isErrorWithI18n } from 'exceptions'
 import { validateAssetAccountAddress } from 'utils/validators'
 import fixtures from './fixtures'
 
-const fixtureTable: Fixture.Validator<typeof validateAssetAccountAddress>[] = Object.entries(
-  fixtures
-).map(([title, { params, exception }]) => [title, [params], exception])
+const fixtureTable: Fixture.Validator<typeof validateAssetAccountAddress>[] = Object.entries(fixtures).map(
+  ([title, { params, exception }]) => [title, [params], exception]
+)
 
 describe(`Test sudt address validator`, () => {
   test.each(fixtureTable)(`%s`, (_title, [params], exception) => {

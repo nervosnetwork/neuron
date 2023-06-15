@@ -432,8 +432,8 @@ export const useDidMount = (cb: () => void) => {
   useEffect(cb, [])
 }
 
-export const useForceUpdate = <T extends Function>(cb: T) => {
-  const [, update] = useState<{}>(Object.create(null))
+export const useForceUpdate = <T extends (...args: any[]) => void>(cb: T) => {
+  const [, update] = useState<unknown>(Object.create(null))
 
   const memoizedDispatch = useCallback(
     (...args: any) => {

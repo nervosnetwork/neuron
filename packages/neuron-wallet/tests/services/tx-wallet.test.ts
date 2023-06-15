@@ -14,13 +14,15 @@ describe('sign witness', () => {
   }
   const privateKey: string = '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
   const txHash = '0x00f5f31941964004d665a8762df8eb4fab53b5ef8437b7d34a38e018b1409054'
-  const expectedData = ['0x5500000010000000550000005500000041000000aa6de884b0dd0378383cedddc39790b5cad66e42d5dc7655de728ee7eb3a53be071605d76641ad26766c6ed4864e67dbc2cd1526e006c9be7ccfa9b8cbf9e7c701']
+  const expectedData = [
+    '0x5500000010000000550000005500000041000000aa6de884b0dd0378383cedddc39790b5cad66e42d5dc7655de728ee7eb3a53be071605d76641ad26766c6ed4864e67dbc2cd1526e006c9be7ccfa9b8cbf9e7c701',
+  ]
 
   it('success', () => {
     const ckb = new CKB('')
     const newWitness = ckb.signWitnesses(privateKey)({
       witnesses: [witness],
-      transactionHash: txHash
+      transactionHash: txHash,
     })
     expect(newWitness).toEqual(expectedData)
   })
@@ -66,7 +68,7 @@ describe('get keys with paths', () => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     expect(masterKeychain.privateKey.toString('hex')).toEqual(masterPrivateKey.privateKey)
 
-    const pathsAndKeys = (new TransactionSender()).getPrivateKeys(wallet, [receivingPath, changePath], password)
+    const pathsAndKeys = new TransactionSender().getPrivateKeys(wallet, [receivingPath, changePath], password)
     expect(pathsAndKeys[0]).toEqual({
       path: receivingPath,
       privateKey: receivingPrivateKey,
@@ -88,7 +90,7 @@ describe('epoch', () => {
 
   it('parse epoch', () => {
     // @ts-ignore: Private method
-    const result = (new TransactionSender()).parseEpoch(epochInfo.epoch)
+    const result = new TransactionSender().parseEpoch(epochInfo.epoch)
 
     expect(result.length).toEqual(epochInfo.length)
     expect(result.index).toEqual(epochInfo.index)
@@ -97,7 +99,7 @@ describe('epoch', () => {
 
   it('epoch since', () => {
     // @ts-ignore: Private method
-    const epoch = (new TransactionSender()).epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
+    const epoch = new TransactionSender().epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
 
     expect(epoch).toEqual(epochInfo.epoch + (BigInt(0x20) << BigInt(56)))
   })

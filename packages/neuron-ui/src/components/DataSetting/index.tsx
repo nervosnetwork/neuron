@@ -1,15 +1,16 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
-import { useDispatch } from 'states'
 import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
+import { useDispatch, useState as useGlobalState } from 'states'
 import { shell } from 'electron'
 import { getIsCkbRunExternal } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useDataPath } from './hooks'
 
 import styles from './dataSetting.module.scss'
@@ -71,6 +72,14 @@ const DataSetting = () => {
       }
     })
   }, [])
+  const {
+    chain: { networkID },
+    settings: { networks = [] },
+  } = useGlobalState()
+  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
+    networkID,
+    networks,
+  ])
   return (
     <>
       <div className={styles.root}>
@@ -97,8 +106,8 @@ const DataSetting = () => {
           </div>
         </div>
         <div className={styles.rightContainer}>
-          <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} />
-          <ClearCache className={styles.item} btnClassName={styles.itemBtn} dispatch={dispatch} />
+          { isLightClient ? null : <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} /> }
+          <ClearCache className={styles.item} btnClassName={styles.itemBtn} dispatch={dispatch} hideRebuild={isLightClient} />
         </div>
       </div>
 

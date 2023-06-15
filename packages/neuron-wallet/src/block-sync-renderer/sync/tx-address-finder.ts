@@ -1,11 +1,11 @@
 import { getConnection } from 'typeorm'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import OutputEntity from 'database/chain/entities/output'
-import NetworksService from 'services/networks'
-import Output from 'models/chain/output'
-import OutPoint from 'models/chain/out-point'
-import Transaction from 'models/chain/transaction'
-import SystemScriptInfo from 'models/system-script-info'
+import OutputEntity from '../../database/chain/entities/output'
+import NetworksService from '../../services/networks'
+import Output from '../../models/chain/output'
+import OutPoint from '../../models/chain/out-point'
+import Transaction from '../../models/chain/transaction'
+import SystemScriptInfo from '../../models/system-script-info'
 
 export interface AnyoneCanPayInfo {
   tokenID: string
@@ -38,7 +38,7 @@ export default class TxAddressFinder {
     return [
       inputAddressesResult[0] || outputsResult[0],
       inputAddressesResult[1].concat(outputAddresses),
-      inputAddressesResult[2].concat(outputsResult[2])
+      inputAddressesResult[2].concat(outputsResult[2]),
     ]
   }
 
@@ -61,7 +61,7 @@ export default class TxAddressFinder {
           // anyoneCanPayBlake160s.push(output.lock.args)
           anyoneCanPayInfos.push({
             blake160: output.lock.args,
-            tokenID: output.type?.args || 'CKBytes'
+            tokenID: output.type?.args || 'CKBytes',
           })
         }
         if (this.lockHashes.has(output.lockHash!)) {
@@ -90,18 +90,16 @@ export default class TxAddressFinder {
     let shouldSync = false
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput!
-      const output = await getConnection()
-        .getRepository(OutputEntity)
-        .findOne({
-          outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index
-        })
+      const output = await getConnection().getRepository(OutputEntity).findOne({
+        outPointTxHash: outPoint.txHash,
+        outPointIndex: outPoint.index,
+      })
       if (output && this.anyoneCanPayLockHashes.has(output.lockHash)) {
         shouldSync = true
         // anyoneCanPayBlake160s.push(output.lockArgs)
         anyoneCanPayInfos.push({
           blake160: output.lockArgs,
-          tokenID: output.typeArgs || 'CKBytes'
+          tokenID: output.typeArgs || 'CKBytes',
         })
       }
       if (output && this.lockHashes.has(output.lockHash)) {

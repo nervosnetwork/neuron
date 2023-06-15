@@ -10,6 +10,7 @@ import { chainState } from 'states'
 import { setCurrentNetowrk, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
 import { useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
+import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
@@ -89,10 +90,14 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           ),
           suffix: (
             <div className={styles.suffix}>
-              <button type="button" aria-label={t('common.edit')} onClick={onHandleNetwork}>
-                <EditNetwork data-action="edit" data-id={network.id} />
-              </button>
-              {network.type ? (
+              {
+                network.chain === LIGHT_CLIENT_TESTNET ? null : (
+                  <button type="button" aria-label={t('common.edit')} onClick={onHandleNetwork}>
+                    <EditNetwork data-action="edit" data-id={network.id} />
+                  </button>
+                )
+              }
+              {(network.type && network.chain !== LIGHT_CLIENT_TESTNET) ? (
                 <button type="button" aria-label={t('common.delete')} onClick={onHandleNetwork}>
                   <DeleteNetwork data-action="delete" data-id={network.id} />
                 </button>

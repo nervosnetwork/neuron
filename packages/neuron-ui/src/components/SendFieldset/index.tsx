@@ -26,6 +26,7 @@ interface SendSubformProps {
   onLocktimeClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onSendMaxClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onItemChange: React.EventHandler<React.SyntheticEvent<HTMLInputElement>>
+  isMainnet: boolean
 }
 
 const SendFieldset = ({
@@ -41,6 +42,7 @@ const SendFieldset = ({
   onSendMaxClick,
   onItemChange,
   isTimeLockable = true,
+  isMainnet,
 }: SendSubformProps) => {
   const [t] = useTranslation()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -133,7 +135,7 @@ const SendFieldset = ({
               </div>
               <div className={styles.locktimeWarn}>
                 <Attention />
-                {t('send.locktime-warning')}
+                {t('send.locktime-warning', { extraNote: isMainnet ? null : t('messages.light-client-locktime-warning') })}
               </div>
             </div>
           ) : (

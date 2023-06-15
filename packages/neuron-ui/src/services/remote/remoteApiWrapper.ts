@@ -150,6 +150,7 @@ type Action =
   | 'load-multisig-tx-json'
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
+  | 'get-sync-progress-by-addresses'
 
 export const remoteApi =
   <P = any, R = any>(action: Action) =>

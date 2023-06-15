@@ -182,6 +182,7 @@ const Send = () => {
                       onSendMaxClick={handleSendMaxClick}
                       onLocktimeClick={handleLocktimeClick}
                       isTimeLockable={!device}
+                      isMainnet={isMainnet}
                     />
                   )
                 }}

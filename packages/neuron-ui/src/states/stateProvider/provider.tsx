@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext } from 'react'
+import React, { createContext, useReducer, useContext, useMemo } from 'react'
 import initStates from 'states/init'
 import { StateDispatch, reducer } from './reducer'
 
@@ -16,8 +16,10 @@ export const withProvider = (Comp: React.ComponentType) => (props: JSX.Intrinsic
     value: 'ComponentWithNeuronWallet',
   })
 
+  const value = useMemo(() => ({ state: providers, dispatch }), [providers, dispatch])
+
   return (
-    <NeuronWalletContext.Provider value={{ state: providers, dispatch }}>
+    <NeuronWalletContext.Provider value={value}>
       <Comp {...props} />
     </NeuronWalletContext.Provider>
   )
