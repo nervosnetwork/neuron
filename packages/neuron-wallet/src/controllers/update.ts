@@ -1,5 +1,5 @@
 import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electron-updater'
-import AppUpdaterSubject from 'models/subjects/app-updater'
+import AppUpdaterSubject from '../models/subjects/app-updater'
 
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking

@@ -1,14 +1,14 @@
-import env from 'env'
+import env from '../../env'
 import { distinctUntilChanged, skip } from 'rxjs/operators'
-import { NetworkType, Network } from 'models/network'
-import NetworksService from 'services/networks'
-import NodeService from 'services/node'
-import { ResponseCode } from 'utils/const'
-import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
-import { resetSyncTaskQueue, switchToNetwork } from 'block-sync-renderer'
-import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
+import { NetworkType, Network } from '../../models/network'
+import NetworksService from '../../services/networks'
+import NodeService from '../../services/node'
+import { ResponseCode } from '../../utils/const'
+import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from '../../exceptions'
+import { resetSyncTaskQueue, switchToNetwork } from '../../block-sync-renderer'
+import { CurrentNetworkIDSubject, NetworkListSubject } from '../../models/subjects/networks'
 import ChainInfo from './chain-info'
-import logger from 'utils/logger'
+import logger from '../../utils/logger'
 
 const networksService = NetworksService.getInstance()
 
