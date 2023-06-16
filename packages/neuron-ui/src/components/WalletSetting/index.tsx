@@ -53,7 +53,7 @@ const buttons = [
 ]
 
 const WalletSetting = ({
-  wallet: { id: currentID = '' },
+  wallet: { id: currentID = '', isHD },
   settings: { wallets = [] },
   dispatch,
 }: State.AppWithNeuronWallet & { dispatch: StateDispatch }) => {
@@ -138,9 +138,11 @@ const WalletSetting = ({
               <button type="button" aria-label={t('common.edit')} onClick={handleEdit}>
                 <EditWallet data-id={wallet.id} />
               </button>
-              <button type="button" aria-label={t('common.backup')} onClick={onHandleWallet}>
-                <Export data-action="backup" data-id={wallet.id} />
-              </button>
+              {isHD ? (
+                <button type="button" aria-label={t('common.backup')} onClick={onHandleWallet}>
+                  <Export data-action="backup" data-id={wallet.id} />
+                </button>
+              ) : null}
               {wallet.id !== currentID ? (
                 <button type="button" onClick={onHandleWallet}>
                   <DeleteWallet data-action="delete" data-id={wallet.id} />

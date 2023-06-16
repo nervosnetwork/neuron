@@ -16,7 +16,7 @@ import {
   addresses as addressesCache,
 } from 'services/localCache'
 
-import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData } from 'states'
+import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData, showPageNotice } from 'states'
 import { ErrorCode, addressesToBalance, failureResToNotification, isSuccessResponse, sendTxBaseAction } from 'utils'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
@@ -30,6 +30,7 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch) => {
         payload,
       })
       currentWalletCache.save(payload)
+      showPageNotice('overview.wallet-ready')(dispatch)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }

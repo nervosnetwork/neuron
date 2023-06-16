@@ -1,4 +1,4 @@
-@import "../../styles/animation.scss";
+@import '../../styles/animation.scss';
 
 .syncing {
   display: flex;
@@ -21,7 +21,7 @@
   margin-left: 4px;
   transform: rotate(180deg);
 
-  &[data-is-open="true"] {
+  &[data-is-open='true'] {
     transform: rotate(0);
   }
 }
@@ -32,7 +32,7 @@
   color: var(--main-text-color);
   &::before {
     display: inline-block;
-    content: "";
+    content: '';
     width: 6px;
     height: 6px;
     border-radius: 6px;
@@ -62,7 +62,7 @@
     font-weight: 400;
 
     &::before {
-      content: "";
+      content: '';
       display: block;
       width: 100%;
       height: 1px;
@@ -73,10 +73,33 @@
     & > div {
       display: flex;
       align-items: center;
+      color: var(--primary-color);
+      cursor: pointer;
 
       & > svg {
         margin-left: 4px;
+        width: 12px;
+        height: 12px;
+        g,
+        path {
+          fill: var(--primary-color);
+        }
       }
     }
+  }
+}
+
+.redDot {
+  position: relative;
+  padding-left: 14px;
+  &::before {
+    content: '';
+    height: 6px;
+    width: 6px;
+    border-radius: 100%;
+    position: absolute;
+    left: 0;
+    top: calc(50% - 3px);
+    background: var(--error-color);
   }
 }
