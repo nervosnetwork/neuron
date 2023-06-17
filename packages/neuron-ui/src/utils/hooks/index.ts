@@ -91,6 +91,8 @@ export const useLocalDescription = (
     (e: any) => {
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
+        e.stopPropagation()
+        e.preventDefault()
         submitDescription(key, originDesc)
         const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
         input?.blur()
@@ -399,7 +401,7 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
     }
   }, [containerSelector, borderClassName])
 
-export const useOnHandleNetwork = (handleNet: Function) =>
+export const useOnHandleNetwork = (handleNet: (id: string) => void) =>
   useCallback(
     (e: React.BaseSyntheticEvent) => {
       const {
@@ -423,35 +425,38 @@ export const useOnHandleNetwork = (handleNet: Function) =>
   )
 
 export const useGlobalNotifications = (
-  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>
+  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>,
+  hasDismissMigrate: boolean
 ) => {
   useEffect(() => {
     const lastVersion = syncRebuildNotification.load()
     const isVersionUpdate = isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)
-    if (isVersionUpdate) {
-      dispatch({
-        type: AppActions.SetGlobalDialog,
-        payload: 'rebuild-sync',
-      })
-    }
     const migrateSubscription = Migrate.subscribe(migrateStatus => {
-      if (!isVersionUpdate && migrateStatus === 'need-migrate') {
+      if (migrateStatus !== 'need-migrate') return
+      if (lastVersion && !isVersionUpdate) {
+        // means has click migrate for current version, so migrate silent
         migrateData()
         migrateSubscription.unsubscribe()
+      } else if (!hasDismissMigrate) {
+        // means need click ok to migrate
+        dispatch({
+          type: AppActions.SetGlobalDialog,
+          payload: 'rebuild-sync',
+        })
       }
     })
     return () => {
       migrateSubscription.unsubscribe()
     }
-  }, [dispatch])
+  }, [dispatch, hasDismissMigrate])
 }
 
 export const useDidMount = (cb: () => void) => {
   useEffect(cb, [])
 }
 
-export const useForceUpdate = <T extends Function>(cb: T) => {
-  const [, update] = useState<{}>(Object.create(null))
+export const useForceUpdate = <T extends (...args: any[]) => void>(cb: T) => {
+  const [, update] = useState<unknown>(Object.create(null))
 
   const memoizedDispatch = useCallback(
     (...args: any) => {

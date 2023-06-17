@@ -5,7 +5,6 @@
   display: grid;
   grid-template: 'label input' auto 'blank message' minmax(0.6875rem, auto) / auto 1fr;
   grid-gap: 4px;
-  margin-bottom: 10px;
 
   &[data-required='true'] {
     label::after {
@@ -43,7 +42,7 @@
     background: #ffffff;
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
-    width: 480px;
+    width: 100%;
     height: 56px;
     padding: 0 16px;
 
@@ -101,7 +100,8 @@
       padding: 10px 0;
     }
 
-    .suffix {
+    .suffix,
+    .prefix {
       font-family: inherit;
       display: flex;
       justify-content: center;

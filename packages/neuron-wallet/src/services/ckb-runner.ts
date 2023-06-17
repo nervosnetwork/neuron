@@ -1,13 +1,13 @@
-import env from 'env'
+import env from '../env'
 import path from 'path'
 import fs from 'fs'
-import { ChildProcess, spawn } from 'child_process'
+import { ChildProcess, StdioNull, StdioPipe, spawn } from 'child_process'
 import process from 'process'
-import logger from 'utils/logger'
+import logger from '../utils/logger'
 import SettingsService from './settings'
-import MigrateSubject from 'models/subjects/migrate-subject'
-import { resetSyncTaskQueue } from 'block-sync-renderer'
+import MigrateSubject from '../models/subjects/migrate-subject'
 import IndexerService from './indexer'
+import { resetSyncTaskQueue } from '../block-sync-renderer'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -31,7 +31,17 @@ const ckbPath = (): string => {
 
 const ckbBinary = (): string => {
   const binary = app.isPackaged ? path.resolve(ckbPath(), './ckb') : path.resolve(ckbPath(), `./${platform()}`, './ckb')
-  return platform() === 'win' ? binary + '.exe' : binary
+  switch (platform()) {
+    case 'win':
+      return binary + '.exe'
+    case 'mac':
+      if (app.isPackaged) {
+        return binary
+      }
+      return `${binary}-${process.arch === 'arm64' ? 'arm64' : 'x64'}`
+    default:
+      return binary
+  }
 }
 
 const initCkb = async () => {
@@ -84,36 +94,33 @@ export const startCkbNode = async () => {
 
   logger.info('CKB:\tstarting node...')
   const options = ['run', '-C', SettingsService.getInstance().ckbDataPath, '--indexer']
+  const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'ignore', 'pipe']
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
+    stdio[1] = 'pipe'
   }
-  ckb = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
+  ckb = spawn(ckbBinary(), options, { stdio })
 
-  ckb.stderr &&
-    ckb.stderr.on('data', data => {
-      const dataString: string = data.toString()
-      logger.error('CKB:\trun fail:', dataString)
-      ckb = null
-      if (dataString.includes('CKB wants to migrate the data into new format')) {
-        MigrateSubject.next({ type: 'need-migrate' })
-      }
-    })
-  if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
-    ckb.stdout &&
-      ckb.stdout.on('data', data => {
-        const dataString: string = data.toString()
-        if (
-          dataString.includes(
-            `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
-          )
-        ) {
-          isLookingValidTarget = true
-          lastLogTime = Date.now()
-        } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
-          isLookingValidTarget = false
-        }
-      })
-  }
+  ckb.stderr?.on('data', data => {
+    const dataString: string = data.toString()
+    logger.error('CKB:\trun fail:', dataString)
+    if (dataString.includes('CKB wants to migrate the data into new format')) {
+      MigrateSubject.next({ type: 'need-migrate' })
+    }
+  })
+  ckb.stdout?.on('data', data => {
+    const dataString: string = data.toString()
+    if (
+      dataString.includes(
+        `can't find assume valid target temporarily, hash: Byte32(${process.env.CKB_NODE_ASSUME_VALID_TARGET})`
+      )
+    ) {
+      isLookingValidTarget = true
+      lastLogTime = Date.now()
+    } else if (lastLogTime && Date.now() - lastLogTime > 10000) {
+      isLookingValidTarget = false
+    }
+  })
 
   ckb.on('error', error => {
     logger.error('CKB:\trun fail:', error)
@@ -126,18 +133,16 @@ export const startCkbNode = async () => {
     isLookingValidTarget = false
     ckb = null
   })
-  resetSyncTaskQueue.push(true)
 
   removeOldIndexerIfRunSuccess()
 }
 
 export const stopCkbNode = () => {
   return new Promise<void>(resolve => {
-    resetSyncTaskQueue.push(false)
     if (ckb) {
       logger.info('CKB:\tkilling node')
       ckb.once('close', () => resolve())
-      ckb.kill('SIGKILL')
+      ckb.kill()
       ckb = null
     } else {
       resolve()
@@ -152,6 +157,7 @@ export const clearCkbNodeCache = async () => {
   await stopCkbNode()
   fs.rmSync(SettingsService.getInstance().ckbDataPath, { recursive: true, force: true })
   await startCkbNode()
+  resetSyncTaskQueue.asyncPush(true)
 }
 
 export function migrateCkbData() {

@@ -6,6 +6,8 @@ import TextField from 'widgets/TextField'
 
 import { shannonToCKBFormatter } from 'utils'
 
+import styles from './sendMetaInfo.module.scss'
+
 interface SendMetaInfoProps {
   outputs: unknown[]
   errorMessage: string
@@ -15,7 +17,7 @@ interface SendMetaInfoProps {
   fee: string
   price: string
   handleDescriptionChange: React.EventHandler<React.SyntheticEvent>
-  handlePriceChange: React.EventHandler<React.SyntheticEvent>
+  handlePriceChange: (value: string) => void
 }
 
 const SendMetaInfo = ({
@@ -34,6 +36,7 @@ const SendMetaInfo = ({
     <>
       {outputs.length > 1 || errorMessage ? (
         <TextField
+          className={styles.textFieldClass}
           field="totalAmount"
           label={t('send.total-amount')}
           value={shannonToCKBFormatter(totalAmount)}
@@ -43,6 +46,7 @@ const SendMetaInfo = ({
         />
       ) : null}
       <TextField
+        className={styles.textFieldClass}
         field="description"
         label={t('send.description')}
         value={description}

@@ -14,10 +14,12 @@ const ScriptTag = ({
   script,
   isMainnet,
   onClick,
+  className = '',
 }: {
   script: CKBComponents.Script | null
   isMainnet: boolean
   onClick?: () => void
+  className?: string
 }) => {
   if (!script) {
     return null
@@ -41,7 +43,7 @@ const ScriptTag = ({
   }
 
   return (
-    <button type="button" className={styles.tag} onClick={onClick}>
+    <button type="button" className={className || styles.tag} onClick={onClick}>
       {foundLock.TagName}
     </button>
   )

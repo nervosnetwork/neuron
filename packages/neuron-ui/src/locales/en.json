@@ -239,7 +239,7 @@
       "remove-receiving-address-msg": "Are you sure you want to remove the selected receiving address?",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
-      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. In general, exchanges do not support expiration unlocking, please use with caution!"
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
     },
     "receive": {
       "title": "Receive",
@@ -257,6 +257,8 @@
       "copy-qr-code": "Copy"
     },
     "history": {
+      "title": "History",
+      "title-detail": "History Detail",
       "meta": "Meta",
       "type": "Type",
       "date": "Date",
@@ -285,15 +287,24 @@
         "button": "Search",
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
+      "table": {
+        "name": "Wallet Name",
+        "type": "Type",
+        "amount": "Amount",
+        "timestamp": "Time",
+        "status": "Status",
+        "operation": "Operation"
+      },
       "export-history": "Export Transaction History",
       "confirmations": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
       "no-txs": "No Transaction History",
-      "view-in-explorer": "Explorer",
+      "view-in-explorer": "View on explorer",
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
+      "opening": "Opening",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
       "copy-address": "Copy Address",
@@ -314,6 +325,7 @@
       "outputs": "Outputs",
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
+      "lock-script-title": "Address Information",
       "deprecated-address-format": "Address in deprecated format"
     },
     "addresses": {
@@ -377,6 +389,7 @@
         },
         "mainnet": "Mainnet",
         "testnet": "Testnet",
+        "lightTestnet": "Light Testnet",
         "devnet": "Devnet"
       },
       "locale": {
@@ -509,7 +522,9 @@
       "copy": "Copy",
       "copied": "Copied",
       "verification-failure": "Verification Failed",
-      "back": "Back"
+      "back": "Back",
+      "switch-to-light": "Switch to Light Mode",
+      "switch-to-dark": "Switch to Dark Mode"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -536,8 +551,11 @@
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
+      "migrate-warning": "Warning: The migration process may fail for unknown reasons resulting in resynchronization, please back up manually and start the migration!",
       "migrate": "Migrate",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
+      "light-client-locktime-warning": "2.Light client mode doesn't support showing lock-time CKBytes.",
+      "light-client-cheque-warning": "Warning: Light client mode doesn't support showing Cheque assets.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -816,6 +834,8 @@
         "tag": "D"
       },
       "timezone": "Time Zone",
+      "previous-month": "previous month",
+      "next-month": "next month",
       "start-tomorrow": "Selected time should start from tomorrow."
     },
     "sign-and-verify": {
@@ -978,6 +998,7 @@
         "copy-address": "Copy Address",
         "action": "Actions",
         "more": "More",
+        "sync-block": "Synced Block",
         "actions": {
           "info": "Info",
           "send": "Send",
@@ -1050,6 +1071,22 @@
         "view-concise-data": "Concise data",
         "view-raw-data": "Raw data"
       }
+    },
+    "dropdown": {
+      "placeholder": "Please select..."
+    },
+    "price-switch": {
+      "price": "Price",
+      "customPrice": "Custom Price",
+      "errorTip": "Price cannot be less than {{minPrice}} shannons/KB, please re-enter",
+      "hintTip": "Suggested price is {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "Price {{priceValue}} shannons/KB | Fee {{feeValue}} CKB",
+      "fast": "Fast",
+      "standard": "Standard",
+      "slow": "Slow",
+      "countDownTip": "The price will refresh after {{countDown}} seconds",
+      "switchToCustomPrice": "Switch to custom price",
+      "switchToPrice": "Switch to price"
     }
   }
 }

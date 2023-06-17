@@ -7,7 +7,7 @@ export default {
   component: CompensationProgressBar,
 }
 
-const Template: ComponentStory<typeof CompensationProgressBar> = args => (
+const Template: ComponentStory<typeof CompensationProgressBar> = (args: any) => (
   <CompensationProgressBar style={{ width: '300px' }} {...args} />
 )
 

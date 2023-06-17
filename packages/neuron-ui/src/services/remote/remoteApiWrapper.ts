@@ -48,6 +48,7 @@ type Action =
   | 'start-process-monitor'
   | 'is-dark'
   | 'set-theme'
+  | 'is-ckb-run-external'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -147,6 +148,7 @@ type Action =
   | 'load-multisig-tx-json'
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
+  | 'get-sync-progress-by-addresses'
 
 export const remoteApi =
   <P = any, R = any>(action: Action) =>

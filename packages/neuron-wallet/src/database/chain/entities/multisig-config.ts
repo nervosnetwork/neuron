@@ -1,5 +1,5 @@
-import MultisigConfigModel from 'models/multisig-config'
-import MultisigConfigDbChangedSubject from 'models/subjects/multisig-config-db-changed-subject'
+import MultisigConfigModel from '../../../models/multisig-config'
+import MultisigConfigDbChangedSubject from '../../../models/subjects/multisig-config-db-changed-subject'
 import { Entity, Column, PrimaryGeneratedColumn, Index, AfterInsert, AfterRemove } from 'typeorm'
 
 @Entity()
@@ -53,7 +53,7 @@ export default class MultisigConfig {
     this.changed('AfterRemove')
   }
 
-  private changed = (event: string) => {
+  private changed = (event: 'AfterInsert' | 'AfterRemove') => {
     MultisigConfigDbChangedSubject.getSubject().next(event)
   }
 }

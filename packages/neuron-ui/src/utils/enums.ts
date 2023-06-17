@@ -12,6 +12,7 @@ export enum RoutePath {
   Send = '/send',
   Receive = '/receive',
   History = '/history',
+  HistoryDetailPage = '/history-detail-page',
   Transaction = '/transaction',
   Settings = '/settings',
   SettingsGeneral = 'general',

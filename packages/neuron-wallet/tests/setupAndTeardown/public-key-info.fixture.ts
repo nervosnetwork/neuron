@@ -1,6 +1,6 @@
-import { scriptToAddress } from "@nervosnetwork/ckb-sdk-utils"
-import { AddressType } from "../../src/models/keys/address"
-import SystemScriptInfo from "../../src/models/system-script-info"
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { AddressType } from '../../src/models/keys/address'
+import SystemScriptInfo from '../../src/models/system-script-info'
 
 const walletId1 = 'w1'
 const walletId2 = 'w2'
@@ -13,7 +13,7 @@ const alice = {
   lockHash: aliceLockScript.computeHash(),
   address: scriptToAddress(aliceLockScript, false),
   blake160: aliceLockScript.args,
-  walletId: walletId1
+  walletId: walletId1,
 }
 
 const bobPublicKeyHash = '0x36c329ed630d6ce750712a477543672adab57f4c'
@@ -23,7 +23,7 @@ const bob = {
   lockHash: bobLockScript.computeHash(),
   address: scriptToAddress(bobLockScript, false),
   blake160: bobPublicKeyHash,
-  walletId: walletId1
+  walletId: walletId1,
 }
 
 const charliePublicKeyHash = '0xe2193df51d78411601796b35b17b4f8f2cd80000'
@@ -33,7 +33,7 @@ const charlie = {
   lockHash: charlieLockScript.computeHash(),
   address: scriptToAddress(charlieLockScript, false),
   blake160: charliePublicKeyHash,
-  walletId: walletId2
+  walletId: walletId2,
 }
 
 const aliceKeyInfo = {
@@ -43,7 +43,7 @@ const aliceKeyInfo = {
   addressType: AddressType.Receiving,
   addressIndex: 0,
   publicKeyInBlake160: aliceLockScript.args,
-  lockScript: aliceLockScript
+  lockScript: aliceLockScript,
 }
 const bobKeyInfo = {
   walletId: walletId1,
@@ -52,7 +52,7 @@ const bobKeyInfo = {
   addressType: AddressType.Receiving,
   addressIndex: 1,
   publicKeyInBlake160: bobLockScript.args,
-  lockScript: bobLockScript
+  lockScript: bobLockScript,
 }
 const charlieKeyInfo = {
   walletId: walletId2,
@@ -61,7 +61,7 @@ const charlieKeyInfo = {
   addressType: AddressType.Receiving,
   addressIndex: 2,
   publicKeyInBlake160: charlieLockScript.args,
-  lockScript: charlieLockScript
+  lockScript: charlieLockScript,
 }
 
 const duplicatedAliceKeyInfo = {
@@ -71,7 +71,7 @@ const duplicatedAliceKeyInfo = {
   addressType: AddressType.Receiving,
   addressIndex: 0,
   publicKeyInBlake160: aliceLockScript.args,
-  lockScript: aliceLockScript
+  lockScript: aliceLockScript,
 }
 const duplicatedCharlieKeyInfo = {
   walletId: walletId3,
@@ -80,7 +80,7 @@ const duplicatedCharlieKeyInfo = {
   addressType: AddressType.Receiving,
   addressIndex: 2,
   publicKeyInBlake160: charlieLockScript.args,
-  lockScript: charlieLockScript
+  lockScript: charlieLockScript,
 }
 
 export default [aliceKeyInfo, bobKeyInfo, charlieKeyInfo]

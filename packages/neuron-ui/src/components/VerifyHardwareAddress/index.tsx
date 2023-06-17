@@ -170,7 +170,6 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
   }, [deviceInfo, address, userInputStatus, ensureDeviceAvailable, t])
 
   useDidMount(() => {
-    // @ts-ignore
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })

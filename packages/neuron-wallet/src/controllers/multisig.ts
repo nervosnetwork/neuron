@@ -3,15 +3,15 @@ import path from 'path'
 import { dialog, BrowserWindow } from 'electron'
 import { t } from 'i18next'
 import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { ResponseCode } from 'utils/const'
-import MultisigConfig from 'database/chain/entities/multisig-config'
-import MultisigConfigModel from 'models/multisig-config'
-import MultisigService from 'services/multisig'
-import CellsService from 'services/cells'
-import OfflineSignService from 'services/offline-sign'
-import Multisig from 'models/multisig'
-import SystemScriptInfo from 'models/system-script-info'
-import NetworksService from 'services/networks'
+import { ResponseCode } from '../utils/const'
+import MultisigConfig from '../database/chain/entities/multisig-config'
+import MultisigConfigModel from '../models/multisig-config'
+import MultisigService from '../services/multisig'
+import CellsService from '../services/cells'
+import OfflineSignService from '../services/offline-sign'
+import Multisig from '../models/multisig'
+import SystemScriptInfo from '../models/system-script-info'
+import NetworksService from '../services/networks'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -36,8 +36,7 @@ const validateImportConfig = (configOutput: MultisigConfigOutput) => {
 }
 
 export default class MultisigController {
-  // eslint-disable-next-line prettier/prettier
-  #multisigService: MultisigService;
+  #multisigService: MultisigService
 
   constructor() {
     this.#multisigService = new MultisigService()
@@ -50,7 +49,7 @@ export default class MultisigController {
     const result = await this.#multisigService.saveMultisigConfig(multiSignConfig)
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -66,7 +65,7 @@ export default class MultisigController {
     const result = await this.#multisigService.updateMultisigConfig(params)
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -82,7 +81,7 @@ export default class MultisigController {
     const result = await this.#multisigService.getMultisigConfig(walletId)
     return {
       status: ResponseCode.Success,
-      result
+      result,
     }
   }
 
@@ -92,10 +91,10 @@ export default class MultisigController {
       filters: [
         {
           name: 'json',
-          extensions: ['json']
-        }
+          extensions: ['json'],
+        },
       ],
-      properties: ['openFile']
+      properties: ['openFile'],
     })
 
     if (canceled || !filePaths || !filePaths[0]) {
@@ -114,7 +113,7 @@ export default class MultisigController {
         n: config.sighash_addresses.length,
         blake160s: config.sighash_addresses.map(v => addressToScript(v).args),
         walletId,
-        alias: config.alias
+        alias: config.alias,
       }))
       const savedResult = await Promise.allSettled(saveConfigs.map(config => this.saveConfig(config)))
       const saveSuccessConfigs: MultisigConfig[] = []
@@ -134,7 +133,7 @@ export default class MultisigController {
       })
       return {
         status: ResponseCode.Success,
-        result: saveSuccessConfigs
+        result: saveSuccessConfigs,
       }
     } catch {
       dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
@@ -154,7 +153,7 @@ export default class MultisigController {
   ) {
     const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, {
       title: t('multisig-config.export-config'),
-      defaultPath: `multisig-config_${Date.now()}.json`
+      defaultPath: `multisig-config_${Date.now()}.json`,
     })
     if (canceled || !filePath) {
       return
@@ -168,7 +167,7 @@ export default class MultisigController {
         ),
         require_first_n: v.r,
         threshold: v.m,
-        alias: v.alias
+        alias: v.alias,
       }
     })
 
@@ -176,15 +175,15 @@ export default class MultisigController {
 
     dialog.showMessageBox({
       type: 'info',
-      message: t('multisig-config.config-exported', { filePath })
+      message: t('multisig-config.config-exported', { filePath }),
     })
 
     return {
       status: ResponseCode.Success,
       result: {
         filePath: path.basename(filePath),
-        configs
-      }
+        configs,
+      },
     }
   }
 
@@ -192,7 +191,7 @@ export default class MultisigController {
     const balances = await CellsService.getMultisigBalances(isMainnet, multisigAddresses)
     return {
       status: ResponseCode.Success,
-      result: balances
+      result: balances,
     }
   }
 
@@ -208,12 +207,12 @@ export default class MultisigController {
     if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
       dialog.showErrorBox(t('common.error'), t('messages.multisig-lock-hash-mismatch'))
       return {
-        status: ResponseCode.Fail
+        status: ResponseCode.Fail,
       }
     }
     return {
       status: ResponseCode.Success,
-      result: result?.json
+      result: result?.json,
     }
   }
 }

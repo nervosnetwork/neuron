@@ -9,6 +9,7 @@ import ImportKeystore from 'components/ImportKeystore'
 import Send from 'components/Send'
 import Receive from 'components/Receive'
 import History from 'components/History'
+import HistoryDetailPage from 'components/HistoryDetailPage'
 import Transaction from 'components/Transaction'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
@@ -130,6 +131,16 @@ const mainRouterConfig: RouteObject[] = [
         element: (
           <>
             <Transaction />
+            <Outlet />
+          </>
+        ),
+        children: [...toolsRouters],
+      },
+      {
+        path: `${RoutePath.HistoryDetailPage}/:hash`,
+        element: (
+          <>
+            <HistoryDetailPage />
             <Outlet />
           </>
         ),

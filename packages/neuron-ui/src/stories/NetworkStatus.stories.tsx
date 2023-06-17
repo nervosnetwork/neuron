@@ -5,10 +5,11 @@ import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
 const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'> = {
   network: {
     name: 'network',
-    remote: 'http://localhost:3000',
+    remote: 'http://127.0.0.1:3000',
     type: 0,
     id: 'd',
     chain: 'ckb',
+    genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
   },
   onAction: () => {},
   isLookingValidTarget: false,
@@ -31,7 +32,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof NetworkStatus> = props => <NetworkStatus {...props} />
+const Template: ComponentStory<typeof NetworkStatus> = (props: any) => <NetworkStatus {...props} />
 
 export const Online = Template.bind({})
 Online.args = {

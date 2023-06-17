@@ -27,6 +27,7 @@ interface SendSubformProps {
   onSendMaxClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onItemChange: React.EventHandler<React.SyntheticEvent<HTMLInputElement>>
   className?: string
+  isMainnet: boolean
 }
 
 const SendFieldset = ({
@@ -43,6 +44,7 @@ const SendFieldset = ({
   onItemChange,
   isTimeLockable = true,
   className = '',
+  isMainnet,
 }: SendSubformProps) => {
   const [t] = useTranslation()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -66,6 +68,7 @@ const SendFieldset = ({
   return (
     <div className={`${styles.container} ${className}`}>
       <TextField
+        className={`${styles.addresstField} ${styles.textFieldClass}`}
         rows={2}
         label={
           <div className={styles.removeLabel}>
@@ -90,7 +93,6 @@ const SendFieldset = ({
             )}
           </div>
         }
-        className={styles.addresstField}
         field="address"
         data-idx={idx}
         disabled={item.disabled}
@@ -102,6 +104,7 @@ const SendFieldset = ({
       />
 
       <TextField
+        className={styles.textFieldClass}
         label={t('send.amount')}
         field="amount"
         data-idx={idx}
@@ -133,7 +136,9 @@ const SendFieldset = ({
               </div>
               <div className={styles.locktimeWarn}>
                 <Attention />
-                {t('send.locktime-warning')}
+                {t('send.locktime-warning', {
+                  extraNote: isMainnet ? null : t('messages.light-client-locktime-warning'),
+                })}
               </div>
             </div>
           ) : (

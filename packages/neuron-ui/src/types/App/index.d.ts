@@ -61,6 +61,7 @@ declare namespace State {
     content?: string
     meta?: Meta
   }
+
   interface Send {
     txID: string
     outputs: Output[]
@@ -129,12 +130,12 @@ declare namespace State {
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
   type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn' }
 
+  type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
+
   interface App {
     tipBlockNumber: string
-    tipBlockHash: string
+    tipDao?: string
     tipBlockTimestamp: number
-    chain: string
-    difficulty: bigint
     epoch: string
     send: Send
     passwordRequest: PasswordRequest
@@ -157,7 +158,8 @@ declare namespace State {
     name: string
     remote: string
     chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
-    type: 0 | 1
+    type: 0 | 1 | 2
+    genesisHash: string
   }
 
   interface Network extends NetworkProperty {
@@ -230,7 +232,7 @@ declare namespace State {
     }
   }
   interface Settings {
-    general: {}
+    general: object
     networks: Network[]
     wallets: WalletIdentity[]
   }

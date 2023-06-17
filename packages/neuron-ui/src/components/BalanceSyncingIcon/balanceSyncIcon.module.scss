@@ -1,4 +1,7 @@
+@import '../../styles/animation.scss';
+
 .confirm {
+  @include infinite-rotation;
   margin-left: 4px;
 
   path {

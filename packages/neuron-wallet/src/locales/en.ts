@@ -3,14 +3,14 @@ export default {
     keywords: {
       wallet: 'Wallet',
       password: 'Password',
-      'wallet-name': 'Wallet Name'
+      'wallet-name': 'Wallet Name',
     },
     'application-menu': {
       neuron: {
         about: 'About {{app}}',
         preferences: 'Preferences...',
         'check-updates': 'Check for Updates...',
-        quit: 'Quit {{app}}'
+        quit: 'Quit {{app}}',
       },
       wallet: {
         label: 'Wallet',
@@ -24,26 +24,26 @@ export default {
         'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
         'import-xpubkey': 'Import Extended Public Key',
-        'import-hardware': 'Import Hardware Wallet'
+        'import-hardware': 'Import Hardware Wallet',
       },
       edit: {
         label: 'Edit',
         cut: 'Cut',
         copy: 'Copy',
         paste: 'Paste',
-        selectall: 'Select All'
+        selectall: 'Select All',
       },
       tools: {
         label: 'Tools',
         'sign-and-verify': 'Sign/Verify Message',
         'multisig-address': 'Multisig Addresses',
         'offline-sign': 'Offline sign',
-        'clear-sync-data': 'Clear all synchronized data'
+        'clear-sync-data': 'Clear all synchronized data',
       },
       window: {
         label: 'Window',
         minimize: 'Minimize',
-        close: 'Close Window'
+        close: 'Close Window',
       },
       help: {
         label: 'Help',
@@ -55,18 +55,18 @@ export default {
           '> Please append debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
         documentation: 'Documentation',
         settings: 'Settings',
-        'export-debug-info': 'Export Debug Information'
+        'export-debug-info': 'Export Debug Information',
       },
       develop: {
         develop: 'Develop',
         'force-reload': 'Force Reload',
         reload: 'Reload',
-        'toggle-dev-tools': 'Toggle Developer Tools'
-      }
+        'toggle-dev-tools': 'Toggle Developer Tools',
+      },
     },
     services: {
       transactions: 'Transactions',
-      wallets: 'Wallets'
+      wallets: 'Wallets',
     },
     messages: {
       'failed-to-load-networks': 'Failed to load networks.',
@@ -134,50 +134,51 @@ export default {
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
       'no-match-address-for-sign': 'Not found matched address',
       'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address',
-      'no-exist-ckb-node-data': '{{path}} has no CKB Node config and storage, press ok to synchronize from scratch'
+      'no-exist-ckb-node-data': '{{path}} has no CKB Node config and storage, press ok to synchronize from scratch',
+      'light-client-sudt-acp-error': "Light client mode doesn't support sending assets to other's asset account"
     },
     messageBox: {
       button: {
         confirm: 'OK',
-        discard: 'Cancel'
+        discard: 'Cancel',
       },
       'clear-sync-data': {
         title: 'Clear all synchronized data',
         message:
-          'Clear all synchronized data will delete all local synchronized data and resynchronize the data on the chain, the whole synchronization may take a long time.'
+          'Clear all synchronized data will delete all local synchronized data and resynchronize the data on the chain, the whole synchronization may take a long time.',
       },
       'send-capacity': {
-        title: 'Send Transaction'
+        title: 'Send Transaction',
       },
       'remove-network': {
         title: 'Remove Network',
         message: 'Network {{name}} (address: {{address}}) will be removed.',
-        alert: 'This is the current network, by removing it, the connection will be switched to the default network'
+        alert: 'This is the current network, by removing it, the connection will be switched to the default network',
       },
       'remove-wallet': {
         title: 'Delete the wallet',
-        password: 'Password'
+        password: 'Password',
       },
       'backup-keystore': {
         title: 'Backup the Keystore',
-        password: 'Password'
+        password: 'Password',
       },
       transaction: {
-        title: 'Transaction: {{hash}}'
+        title: 'Transaction: {{hash}}',
       },
       'sign-and-verify': {
-        title: 'Sign/verify message'
+        title: 'Sign/verify message',
       },
       'multisig-address': {
-        title: 'Multisig Addresses'
+        title: 'Multisig Addresses',
       },
       'ckb-dependency': {
         title: 'Bundled CKB Node',
         message: 'Dependency Required',
         detail: `The embedded CKB node in Neuron requires x64 version of Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node.`,
         buttons: {
-          'install-and-exit': 'Install and Exit'
-        }
+          'install-and-exit': 'Install and Exit',
+        },
       },
       'acp-migration': {
         title: 'Upgrade Asset Account',
@@ -186,26 +187,26 @@ export default {
           'Recently our security team identified a potential vulnerability in the experimental Asset Account script. We have deployed a new Asset Account script with a fix on mainnet and all future Asset Account will use the new version. We suggest you to upgrade them to use the new script.',
         buttons: {
           migrate: 'Secure upgrade now',
-          skip: 'I know the risk, will upgrade later'
-        }
+          skip: 'I know the risk, will upgrade later',
+        },
       },
       'acp-migration-completed': {
         title: 'Congratulations! You have completed the secure upgrade.',
         message: 'Congratulations! You have completed the secure upgrade.',
         buttons: {
-          ok: 'OK'
-        }
+          ok: 'OK',
+        },
       },
       'hard-fork-migrate': {
         message:
-          'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.'
+          'In order to adapt to the latest version of CKB, Neuron will resynchronize the data on the chain, and the whole synchronization may take a long time.',
       },
       'mail-us': {
         message: 'Please mail us with debug information exported by "Menu" -> "Help" -> "Export Debug Information".',
         'open-client': 'Open Mail Client',
         'fail-message':
           'Unable to launch mail client, please copy the mail address, append debug information exported by "Menu" -> "Help" -> "Export Debug Information" and send us.',
-        'copy-mail-addr': 'Copy mail address'
+        'copy-mail-addr': 'Copy mail address',
       },
       'migrate-failed': {
         title: 'Migrate failed',
@@ -213,40 +214,47 @@ export default {
           'Migrate failed, press ok to delete old data and synchronize from scratch, or click cancel to migrate later by relanuch Neuron. Migrate fail reason: {{ reason }}',
         buttons: {
           ok: 'OK',
-          cancel: 'Cancel'
-        }
-      }
+          cancel: 'Cancel',
+        },
+      },
+      'node-version-different': {
+        message: 'The node version is inconsistent with Neuron(v {{ version }}), please use after confirmation',
+      },
+      'ckb-without-indexer': {
+        message: "Please add '--indexer' option to start local node",
+      },
     },
     prompt: {
       password: {
         label: 'Input your password',
         submit: 'Submit',
-        cancel: 'Cancel'
-      }
+        cancel: 'Cancel',
+      },
     },
     updater: {
-      'update-not-available': 'There are currently no updates available.'
+      'update-not-available': 'There are currently no updates available.',
     },
     common: {
       yes: 'Yes',
       no: 'No',
       ok: 'OK',
       cancel: 'Cancel',
-      error: 'Error'
+      error: 'Error',
     },
     'export-debug-info': {
       'export-debug-info': 'Export Debug Information',
-      'debug-info-exported': 'Debug information has been exported to {{ file }}'
+      'debug-info-exported': 'Debug information has been exported to {{ file }}',
     },
     about: {
       'app-version': '{{name}} Version: {{version}}',
-      'ckb-client-version': 'CKB Client Version: {{version}}'
+      'ckb-client-version': 'CKB Client Version: {{version}}',
+      'ckb-light-client-version': 'CKB Light Client Version: {{version}}'
     },
     settings: {
       title: {
         normal: 'Settings',
-        mac: 'Preference'
-      }
+        mac: 'Preference',
+      },
     },
     'export-transactions': {
       'export-transactions': 'Export Transaction History',
@@ -258,19 +266,19 @@ export default {
         'tx-type': 'Transaction Type',
         amount: 'CKB Amount',
         'udt-amount': 'UDT Amount',
-        description: 'Description'
+        description: 'Description',
       },
       'tx-type': {
         send: 'Send',
         receive: 'Receive',
         'create-asset-account': 'Create {{name}} Asset Account',
-        'destroy-asset-account': 'Destroy {{name}} Asset Account'
-      }
+        'destroy-asset-account': 'Destroy {{name}} Asset Account',
+      },
     },
     'offline-signature': {
       'export-transaction': 'Export Transaction as JSON',
       'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
-      'load-transaction': 'Load Transaction file'
+      'load-transaction': 'Load Transaction file',
     },
     'multisig-config': {
       'import-config': 'Import multisig config',
@@ -282,13 +290,13 @@ export default {
       'approve-tx': 'Confirm multisig transaction',
       'delete-actions': {
         ok: 'Confirm',
-        cancel: 'Cancel'
-      }
+        cancel: 'Cancel',
+      },
     },
     'open-in-explorer': {
       title: 'View in CKB Explorer',
       transaction: 'transaction',
-      message: 'View {{type}} {{key}} in CKB Explorer'
-    }
-  }
+      message: 'View {{type}} {{key}} in CKB Explorer',
+    },
+  },
 }

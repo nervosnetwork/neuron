@@ -42,7 +42,7 @@ const SetMN = ({
           width="100%"
         />
       </div>
-      {errorI18nKey && <span className={styles.error}>{t(`multisig-address.create-dialog.m-n.${errorI18nKey}`)}</span>}
+      {errorI18nKey && <p className={styles.error}>{t(`multisig-address.create-dialog.m-n.${errorI18nKey}`)}</p>}
     </div>
   )
 }

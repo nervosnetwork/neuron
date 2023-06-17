@@ -5,19 +5,19 @@ describe('OfflineSign', () => {
     transaction: {} as any,
     type: SignType.Regular,
     status: SignStatus.Unsigned,
-    context: []
+    context: [],
   }
 
   const jsonWithAssetAccount = {
     ...json,
     asset_account: {
-      tokenID: 'tokenID'
-    } as any
+      tokenID: 'tokenID',
+    } as any,
   }
 
   const allPropsJSON = {
     ...jsonWithAssetAccount,
-    description: 'description'
+    description: 'description',
   }
 
   describe('fromJSON', () => {

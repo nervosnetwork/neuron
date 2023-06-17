@@ -8,7 +8,7 @@ export default {
   component: GeneralSetting,
 }
 
-const Template: ComponentStory<typeof GeneralSetting> = props => <GeneralSetting {...props} />
+const Template: ComponentStory<typeof GeneralSetting> = (props: any) => <GeneralSetting {...props} />
 
 export const Normal = Template.bind({})
 Normal.args = {

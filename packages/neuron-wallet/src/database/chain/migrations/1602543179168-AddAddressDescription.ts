@@ -1,9 +1,9 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 import fs from "fs";
-import env from "env";
 import path from "path";
-import NetworksService from "services/networks";
-import AddressMeta from "database/address/meta";
+import NetworksService from "../../../services/networks";
+import AddressMeta from "../../../database/address/meta";
+import env from "../../../env";
 
 export class AddAddressDescription1602543179168 implements MigrationInterface {
     name = 'AddAddressDescription1602543179168'

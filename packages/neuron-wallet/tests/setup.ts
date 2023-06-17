@@ -8,7 +8,7 @@ jest.mock('levelup', () => {
       return new Promise(resolve => {
         resolve('description')
       })
-    }
+    },
   })
 })
 
@@ -81,7 +81,7 @@ jest.mock('dotenv', () => ({
     process.env.SECP256K1_CODE_HASH = systemScripts.SECP256K1_BLAKE160.codeHash
     process.env.DAO_CODE_HASH = systemScripts.NERVOS_DAO.codeHash
     process.env.MULTISIG_CODE_HASH = systemScripts.SECP256K1_MULTISIG.codeHash
-  }
+  },
 }))
 
 process.on('unhandledRejection', console.error)

@@ -2,13 +2,16 @@ import IndexerService from '../../src/services/indexer'
 
 const existsSyncMock = jest.fn()
 const rmSyncMock = jest.fn()
+const isCkbNodeExternalMock = jest.fn()
+const stopMonitorMock = jest.fn()
+const checkNodeMock = jest.fn()
 
 jest.mock('fs', () => {
   return {
     existsSync: () => existsSyncMock(),
     readFileSync: () => jest.fn(),
     writeFileSync: () => jest.fn(),
-    rmSync: () => rmSyncMock()
+    rmSync: () => rmSyncMock(),
   }
 })
 
@@ -23,6 +26,9 @@ jest.mock('../../src/services/settings', () => {
         },
         set indexerDataPath(value: string) {
           setIndexerDataPathMock(value)
+        },
+        get ckbDataPath() {
+          return jest.fn().mockReturnValue('')()
         }
       }
     }
@@ -30,19 +36,43 @@ jest.mock('../../src/services/settings', () => {
 })
 
 jest.mock('../../src/utils/logger', () => ({
-  debug: () => jest.fn()
+  debug: () => jest.fn(),
 }))
 
-jest.mock('../../src/models/synced-block-number', () => ({
-  
-}))
+jest.mock('../../src/models/synced-block-number', () => {
+  return function() {
+    return {
+      setNextBlock: jest.fn()
+    }
+  }
+})
 
 jest.mock('../../src/database/chain', () => ({
-  
+  clean: () => jest.fn()
 }))
 
-jest.mock('../../src/services/monitor', () => ({
-  
+jest.mock('../../src/services/monitor', () => {
+  function mockMonitor() {}
+  mockMonitor.stopMonitor = () => stopMonitorMock()
+  return mockMonitor
+})
+
+jest.mock('../../src/services/node', () => ({
+  getInstance() {
+    return {
+      get isCkbNodeExternal() {
+        return isCkbNodeExternalMock()
+      },
+      checkNode: checkNodeMock,
+    }
+  },
+}))
+
+const resetSyncTaskQueueAsyncPushMock = jest.fn()
+jest.mock('../../src/block-sync-renderer', () => ({
+  resetSyncTaskQueue: {
+    asyncPush: () => resetSyncTaskQueueAsyncPushMock()
+  }
 }))
 
 describe('test IndexerService', () => {
@@ -51,6 +81,8 @@ describe('test IndexerService', () => {
     rmSyncMock.mockReset()
     setIndexerDataPathMock.mockReset()
     getIndexerDataPathMock.mockReset()
+    isCkbNodeExternalMock.mockReset()
+    stopMonitorMock.mockReset()
   })
   describe('test remove old indexer data', () => {
     it('old indexer data path exist', () => {
@@ -70,6 +102,36 @@ describe('test IndexerService', () => {
       existsSyncMock.mockReturnValueOnce(true)
       IndexerService.cleanOldIndexerData()
       expect(rmSyncMock).toBeCalledTimes(0)
+    })
+  })
+
+  describe('test clear cache', () => {
+    beforeEach(() => {
+      resetSyncTaskQueueAsyncPushMock.mockReset()
+    })
+    it('is external ckb node', async () => {
+      isCkbNodeExternalMock.mockReturnValue(true)
+      await IndexerService.clearCache()
+      expect(stopMonitorMock).toBeCalledTimes(0)
+      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
+    })
+    it('is internal ckb node', async () => {
+      isCkbNodeExternalMock.mockReturnValue(false)
+      await IndexerService.clearCache()
+      expect(stopMonitorMock).toBeCalledTimes(0)
+      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
+    })
+    it('clear indexer data with internal ckb node', async () => {
+      isCkbNodeExternalMock.mockReturnValue(false)
+      await IndexerService.clearCache(true)
+      expect(stopMonitorMock).toBeCalledTimes(1)
+      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
+    })
+    it('clear indexer data with external ckb node', async () => {
+      isCkbNodeExternalMock.mockReturnValue(true)
+      await IndexerService.clearCache(true)
+      expect(stopMonitorMock).toBeCalledTimes(0)
+      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
     })
   })
 })

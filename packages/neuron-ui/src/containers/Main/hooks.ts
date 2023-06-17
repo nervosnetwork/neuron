@@ -18,7 +18,7 @@ import {
   SyncState as SyncStateSubject,
   Command as CommandSubject,
 } from 'services/subjects'
-import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
+import { ckbCore, getTipHeader } from 'services/chain'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { ErrorCode, RoutePath, getConnectionStatus } from 'utils'
@@ -38,18 +38,16 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
   useEffect(() => {
     let timer: NodeJS.Timeout
     const syncBlockchainInfo = () => {
-      Promise.all([getTipHeader(), getBlockchainInfo()])
-        .then(([header, chainInfo]) => {
+      getTipHeader()
+        .then(header => {
           if (isCurrentUrl(chainURL)) {
             dispatch({
               type: AppActions.UpdateChainInfo,
               payload: {
                 tipBlockNumber: `${BigInt(header.number)}`,
-                tipBlockHash: header.hash,
+                tipDao: header.dao,
                 tipBlockTimestamp: +header.timestamp,
-                chain: chainInfo.chain,
-                difficulty: BigInt(chainInfo.difficulty),
-                epoch: chainInfo.epoch,
+                epoch: header.epoch,
               },
             })
 

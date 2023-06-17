@@ -7,7 +7,7 @@ export default {
   component: CustomizedAsset,
 }
 
-const Template: ComponentStory<typeof CustomizedAsset> = props => <CustomizedAsset {...props} />
+const Template: ComponentStory<typeof CustomizedAsset> = (props: any) => <CustomizedAsset {...props} />
 
 const baseProps = {
   tokenId: 'token id',

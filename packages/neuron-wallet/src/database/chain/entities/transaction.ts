@@ -8,99 +8,93 @@ import {
   BeforeUpdate,
   AfterInsert,
   AfterUpdate,
-  AfterRemove
+  AfterRemove,
 } from 'typeorm'
-import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
+import TxDbChangedSubject from '../../../models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
-import TransactionModel, { TransactionStatus } from 'models/chain/transaction'
-import CellDep, { DepType } from 'models/chain/cell-dep'
-import OutPoint from 'models/chain/out-point'
-import Input from 'models/chain/input'
-import Output from 'models/chain/output'
+import TransactionModel, { TransactionStatus } from '../../../models/chain/transaction'
+import CellDep, { DepType } from '../../../models/chain/cell-dep'
+import OutPoint from '../../../models/chain/out-point'
+import Input from '../../../models/chain/input'
+import Output from '../../../models/chain/output'
 
 @Entity()
 export default class Transaction extends BaseEntity {
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   hash!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   version!: string
 
   @Column({
-    type: 'simple-json'
+    type: 'simple-json',
   })
   cellDeps: CellDep[] = []
 
   @Column({
-    type: 'simple-json'
+    type: 'simple-json',
   })
   headerDeps: string[] = []
 
   @Column({
-    type: 'simple-json'
+    type: 'simple-json',
   })
   witnesses!: string[]
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   timestamp: string | undefined = undefined
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   blockNumber: string | undefined = undefined
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   blockHash: string | undefined = undefined
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   description?: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   status!: TransactionStatus
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   createdAt!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   updatedAt!: string
 
   // only used for check fork in indexer mode
   @Column({
-    type: 'boolean'
+    type: 'boolean',
   })
   confirmed: boolean = false
 
-  @OneToMany(
-    _type => InputEntity,
-    input => input.transaction
-  )
+  @OneToMany(_type => InputEntity, input => input.transaction)
   inputs!: InputEntity[]
 
-  @OneToMany(
-    _type => OutputEntity,
-    output => output.transaction
-  )
+  @OneToMany(_type => OutputEntity, output => output.transaction)
   outputs!: OutputEntity[]
 
   public toModel(): TransactionModel {
@@ -128,7 +122,7 @@ export default class Transaction extends BaseEntity {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       outputsData: [],
-      nervosDao: false
+      nervosDao: false,
     })
   }
 

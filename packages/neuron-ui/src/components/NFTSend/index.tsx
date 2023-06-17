@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useLocation, useParams } from 'react-router-dom'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { isMainnet as isMainnetUtil, isSuccessResponse, validateAddress } from 'utils'
+import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import TextField from 'widgets/TextField'
 import { generateNFTSendTransaction } from 'services/remote'
 import Button from 'widgets/Button'
-import { MEDIUM_FEE_RATE } from 'utils/const'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { isErrorWithI18n } from 'exceptions'
 import styles from './NFTSend.module.scss'
@@ -48,8 +48,8 @@ const NFTSend = () => {
   } = useGlobalState()
   const [t] = useTranslation()
   const globalDispatch = useDispatch()
+  const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const timerRef = useRef<NodeJS.Timeout | null>(null)
-
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [remoteError, setRemoteError] = useState('')
 
@@ -122,7 +122,7 @@ const NFTSend = () => {
         receiveAddress: sendState.address,
         outPoint,
         description: sendState.description,
-        feeRate: `${MEDIUM_FEE_RATE}`,
+        feeRate: `${suggestFeeRate}`,
       }
 
       generateNFTSendTransaction(params)
@@ -141,7 +141,7 @@ const NFTSend = () => {
         })
     }, TIMER_DELAY)
     return clearTimer
-  }, [isSubmittable, globalDispatch, sendState, walletId, outPoint])
+  }, [isSubmittable, globalDispatch, sendState, walletId, outPoint, suggestFeeRate])
 
   return (
     <div>

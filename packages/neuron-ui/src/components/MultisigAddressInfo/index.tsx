@@ -60,7 +60,7 @@ export const MultisigAddressTable = ({
               return (
                 <TextField
                   field={`${item.idx}_address`}
-                  rows={2}
+                  rows={item.value ? 2 : 1}
                   data-idx={item.idx}
                   value={item.value}
                   className={styles.addressField}

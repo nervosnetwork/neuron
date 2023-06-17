@@ -40,11 +40,11 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
 }
 
 export const useOnSubmit = (
-  name: string = '',
-  id: string = '',
+  name: string,
+  id: string,
   dispatch: StateDispatch,
   disabled: boolean,
-  callback: Function
+  callback: () => void
 ) => {
   return useCallback(() => {
     if (disabled) {
@@ -61,7 +61,7 @@ export const useOnSubmit = (
   }, [name, id, dispatch, disabled])
 }
 
-export const useHint = (name: string, usedNames: string[], t: Function): string | null => {
+export const useHint = (name: string, usedNames: string[], t: (key: string, opts: object) => string): string | null => {
   return useMemo(() => {
     if (name === '') {
       return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'name' })

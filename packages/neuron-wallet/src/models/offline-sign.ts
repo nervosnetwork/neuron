@@ -4,14 +4,14 @@ import Transaction from './chain/transaction'
 export enum SignStatus {
   Signed = 'Signed',
   Unsigned = 'Unsigned',
-  PartiallySigned = 'PartiallySigned'
+  PartiallySigned = 'PartiallySigned',
 }
 
 export enum SignType {
   Regular = 'Regular',
   UnlockDAO = 'UnlockDAO',
   CreateSUDTAccount = 'CreateSUDTAccount',
-  SendSUDT = 'SendSUDT'
+  SendSUDT = 'SendSUDT',
 }
 
 interface MultisigConfigs {
@@ -75,7 +75,7 @@ export default class OfflineSign implements OfflineSignProps {
       transaction: this.transaction,
       type: this.type,
       status: this.status,
-      context: this.context
+      context: this.context,
     }
 
     if (this.assetAccount) {
@@ -95,7 +95,7 @@ export default class OfflineSign implements OfflineSignProps {
     asset_account: assetAcount,
     status,
     context,
-    description
+    description,
   }: OfflineSignJSON) {
     return new OfflineSign(transaction, signType, status, context, assetAcount, description)
   }

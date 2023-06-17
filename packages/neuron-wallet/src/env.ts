@@ -11,7 +11,7 @@ const app = electronApp ?? {
   name: 'Fake App',
   getLocale(): string {
     return 'en'
-  }
+  },
 }
 
 const isTestMode = process.env.NODE_ENV === 'test'
@@ -37,7 +37,7 @@ const env = {
   isDevMode,
   isTestMode,
   fileBasePath: path.resolve(app.getPath('userData'), fileBase),
-  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`
+  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
 }
 
 export default env

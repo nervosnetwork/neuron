@@ -232,7 +232,7 @@
       "remove-receiving-address-msg": "确定要删除所选收款地址？",
       "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
       "release-on": "锁定至",
-      "locktime-warning": "请确保对方钱包能够支持到期解锁功能。一般情况下，交易所不支持到期解锁功能，请谨慎使用！"
+      "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）"
     },
     "receive": {
       "title": "收款",
@@ -250,6 +250,8 @@
       "copy-qr-code": "复制收款码图片"
     },
     "history": {
+      "title": "交易历史",
+      "title-detail": "交易详情",
       "meta": "元信息",
       "type": "交易类型",
       "date": "时间",
@@ -278,15 +280,24 @@
         "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
+      "table": {
+        "name": "钱包名称",
+        "type": "类型",
+        "amount": "金额",
+        "timestamp": "时间",
+        "status": "状态",
+        "operation": "操作"
+      },
       "export-history": "导出交易历史",
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "no-txs": "没有交易记录",
-      "view-in-explorer": "浏览器",
+      "view-in-explorer": "浏览器打开",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
+      "opening": "正在打开",
       "copy-tx-hash": "复制交易哈希",
       "copy-balance": "复制余额",
       "copy-address": "复制地址",
@@ -306,7 +317,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "cell-from-cellbase": "来自 Cellbase",
-      "lock-script": "锁脚本",
+      "lock-script": "脚本锁定",
+      "lock-script-title": "地址信息",
       "deprecated-address-format": "废弃格式地址"
     },
     "addresses": {
@@ -370,6 +382,7 @@
         },
         "mainnet": "主网",
         "testnet": "测试网",
+        "lightTestnet": "轻节点测试网",
         "devnet": "开发网"
       },
       "locale": {
@@ -531,8 +544,11 @@
       "experimental-message-hardware": "本功能为实验性功能，请注意风险，谨慎使用。",
       "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "rebuild-sync": "为了提供更好的用户体验，Neuron 採取了新的存储方案，该方案需要一次性迁移数据(预期同步时间为 20~60 分钟)。\n抱歉给您带来不便。",
+      "migrate-warning": "注意：迁移过程中可能由于未知原因失败导致需要重新同步，请备份完成后开始迁移！",
       "migrate": "迁移",
       "secp256k1/blake160-address-required": "请输入 secp256k1/blake160 地址",
+      "light-client-locktime-warning": "2.轻节点模式不支持展示到期解锁的 CKBytes。",
+      "light-client-cheque-warning": "注意: 轻节点模式不支持展示 Cheque 资产。",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -811,6 +827,8 @@
         "tag": "十二月"
       },
       "timezone": "时区",
+      "previous-month": "上个月",
+      "next-month": "下个月",
       "start-tomorrow": "所选时间不能早于明天。"
     },
     "sign-and-verify": {
@@ -972,6 +990,7 @@
         "copy-address": "复制地址",
         "action": "操作",
         "more": "更多",
+        "sync-block": "同步高度",
         "actions": {
           "info": "详情",
           "send": "转账",
@@ -1044,6 +1063,22 @@
         "view-concise-data": "概要",
         "view-raw-data": "原始数据"
       }
+    },
+    "dropdown": {
+      "placeholder": "请选择 ..."
+    },
+    "price-switch": {
+      "price": "单价",
+      "customPrice": "自定义价格",
+      "errorTip": "价格设定最少不得少于 {{minPrice}} shannons/KB，请重新输入",
+      "hintTip": "建议价格 {{suggestFeeRate}} shannons/KB",
+      "priceColumn": "单价 {{priceValue}} shannons/KB | 费用 {{feeValue}} CKB",
+      "fast": "快速",
+      "standard": "标准",
+      "slow": "慢速",
+      "countDownTip": "单价将在{{countDown}}秒后刷新",
+      "switchToCustomPrice": "切换到自定义价格",
+      "switchToPrice": "切换到单价"
     }
   }
 }

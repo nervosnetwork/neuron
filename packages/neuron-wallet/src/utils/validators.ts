@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 import { t } from 'i18next'
 
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
-import { MissingRequiredArgument } from 'exceptions'
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
+import { MissingRequiredArgument } from '../exceptions'
 
 const requiredMetadataKey = Symbol('required')
 const passwordMetadataKey = Symbol('password')
@@ -36,13 +36,13 @@ export const verifyPasswordComplexity = (password: string) => {
   }
 }
 
-export const Required = (target: Object, propertyKey: string | symbol, index: number) => {
+export const Required = (target: object, propertyKey: string | symbol, index: number) => {
   const indices: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyKey) || []
   indices.push(index)
   Reflect.defineMetadata(requiredMetadataKey, indices, target, propertyKey)
 }
 
-export const Password = (target: Object, propertyKey: string | symbol, parameterIndex: number) => {
+export const Password = (target: object, propertyKey: string | symbol, parameterIndex: number) => {
   Reflect.defineMetadata(passwordMetadataKey, parameterIndex, target, propertyKey)
 }
 
@@ -65,6 +65,6 @@ export const Validate = (target: any, propertyKey: string, descriptor: PropertyD
         verifyPasswordComplexity(args[passwordIndex])
       }
       return originalMethod.apply(this, args)
-    }
+    },
   }
 }

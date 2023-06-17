@@ -135,6 +135,7 @@ const SendFromMultisigDialog = ({
                 onItemChange={onSendInfoChange}
                 onSendMaxClick={onSendMaxClick}
                 className={styles.flexWrap}
+                isMainnet={isMainnet}
               />
             ))}
           </div>

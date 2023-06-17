@@ -15,7 +15,7 @@ const SyncStateSubject = new BehaviorSubject<{
   indexRate: undefined,
   cacheRate: undefined,
   estimate: undefined,
-  status: 0
+  status: 0,
 })
 
 export default SyncStateSubject

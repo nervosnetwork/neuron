@@ -24,12 +24,10 @@ import styles from './nervosDAODetail.module.scss'
 import hooks from './hooks'
 import CellsCard from './CellsCard'
 
-const TabsVariantWithTxTypes: FC<
-  VariantProps<{
-    title: string
-    hash: string
-  }>
-> = ({ tabs, selectedTab, onTabChange }) => {
+const TabsVariantWithTxTypes: FC<VariantProps<{
+  title: string
+  hash: string
+}>> = ({ tabs, selectedTab, onTabChange }) => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState<string>()
@@ -137,7 +135,11 @@ const NervosDAODetail = () => {
         <Tabs
           Variant={TabsVariantWithTxTypes}
           tabs={[
-            { id: 'deposit', title: t('nervos-dao-detail.deposited'), hash },
+            {
+              id: 'deposit',
+              title: t('nervos-dao-detail.deposited'),
+              hash,
+            },
             daoRecord?.withdrawInfo?.txHash && {
               id: 'withdraw',
               title: t('nervos-dao-detail.withdrawn'),

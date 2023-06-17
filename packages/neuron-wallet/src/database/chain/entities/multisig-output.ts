@@ -1,53 +1,53 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
-import Script, { ScriptHashType } from 'models/chain/script'
-import OutPoint from 'models/chain/out-point'
+import Script, { ScriptHashType } from '../../../models/chain/script'
+import OutPoint from '../../../models/chain/out-point'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { OutputStatus } from 'models/chain/output'
+import { OutputStatus } from '../../../models/chain/output'
 
 @Entity()
 export default class MultisigOutput extends BaseEntity {
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   outPointTxHash!: string
 
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   outPointIndex!: string
 
   @PrimaryColumn({
-    type: 'varchar'
+    type: 'varchar',
   })
   outPointTxHashAddIndex!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   capacity!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockCodeHash!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockArgs!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockHashType!: ScriptHashType
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   lockHash!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
   })
   status!: string
 
@@ -74,7 +74,7 @@ export default class MultisigOutput extends BaseEntity {
     entity.lockHash = scriptToHash({
       args: entity.lockArgs,
       codeHash: entity.lockCodeHash,
-      hashType: entity.lockHashType
+      hashType: entity.lockHashType,
     })
     entity.status = OutputStatus.Live
     return entity

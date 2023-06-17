@@ -22,7 +22,7 @@ import { ReactComponent as Transfer } from 'widgets/Icons/Transfer.svg'
 import { ReactComponent as Search } from 'widgets/Icons/Search.svg'
 import { ReactComponent as Upload } from 'widgets/Icons/Upload.svg'
 import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
-import { HIDE_BALANCE } from 'utils/const'
+import { HIDE_BALANCE, LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
@@ -56,13 +56,22 @@ const MultisigAddress = () => {
     settings: { networks = [] },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networks, networkID]
+  )
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const { allConfigs, saveConfig, updateConfig, deleteConfigById, onImportConfig, configs, onFilterConfig } =
     useConfigManage({
       walletId,
       isMainnet,
     })
-  const multisigBanlances = useSubscription({ walletId, isMainnet, configs: allConfigs })
+  const { multisigBanlances, multisigSyncProgress } = useSubscription({
+    walletId,
+    isMainnet,
+    configs: allConfigs,
+    isLightClient,
+  })
   const { deleteAction, infoAction, sendAction, approveAction } = useActions({ deleteConfigById })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -251,6 +260,15 @@ const MultisigAddress = () => {
                         {item.m} of {item.n}
                       </div>
                     )
+                  },
+                },
+                {
+                  title: t('multisig-address.table.sync-block'),
+                  dataIndex: 'sync-block',
+                  align: 'left',
+                  hidden: !isLightClient,
+                  render(_, __, item) {
+                    return <div>{multisigSyncProgress?.[item.fullPayload] ?? 0}</div>
                   },
                 },
                 {

@@ -16,7 +16,7 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof SendFieldset> = props => <SendFieldset {...props} />
+const Template: ComponentStory<typeof SendFieldset> = (props: any) => <SendFieldset {...props} />
 
 export const Common = Template.bind({})
 Common.args = {
@@ -39,4 +39,5 @@ Common.args = {
   onLocktimeClick: (e: any) => action('Timelock Click')(JSON.stringify(e.target.dataset)),
   onItemChange: (e: any) => action('Item Change')(JSON.stringify(e.target.dataset), e.target.value),
   onSendMaxClick: (e: any) => action('Click Send Max button')(JSON.stringify(e.target.dataset)),
+  isMainnet: false,
 }
