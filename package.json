@@ -38,7 +38,7 @@
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "devDependencies": {
-    "@babel/core": "7.21.4",
+    "@babel/core": "7.22.5",
     "@types/jest": "27.5.2",
     "@types/node": "18.15.11",
     "@types/npmlog": "4.1.4",
