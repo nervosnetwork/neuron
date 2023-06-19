@@ -1,3 +1,4 @@
+import { bytes } from '@ckb-lumos/codec'
 import CellsService from '../../services/cells'
 import {
   CapacityTooSmall,
@@ -1026,7 +1027,7 @@ export class TransactionGenerator {
 
     const chequeCellTmp = Output.fromObject({
       capacity: BigInt(162 * 10 ** 8).toString(),
-      lock: assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40)),
+      lock: assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), bytes.hexify(Buffer.alloc(20))),
       type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
     })
 

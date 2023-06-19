@@ -1,3 +1,4 @@
+import { BI } from '@ckb-lumos/bi'
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
 import { HexString, QueryOptions } from '@ckb-lumos/base'
@@ -10,7 +11,6 @@ import SyncProgressService from '../../services/sync-progress'
 import { BlockTips, LumosCellQuery, Connector, AppendScript } from './connector'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
-import HexUtils from '../../utils/hex'
 import Multisig from '../../services/multisig'
 import { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import WalletService from '../../services/wallets'
@@ -29,7 +29,7 @@ const unpackGroup = molecule.vector(
   molecule.struct(
     {
       tx_hash: number.Uint256BE,
-      index: number.Uint32LE
+      index: number.Uint32LE,
     },
     ['tx_hash', 'index']
   )
@@ -42,10 +42,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   private syncQueue: QueueObject<SyncQueueParam> = queue(this.syncNextWithScript.bind(this), 1)
   private indexerQueryQueue: QueueObject<LumosCellQuery> | undefined
   private pollingIndexer: boolean = false
-  private syncInQueue: Map<
-    CKBComponents.Hash,
-    { blockStartNumber: number; blockEndNumber: number; cursor?: string }
-  > = new Map()
+  private syncInQueue: Map<CKBComponents.Hash, { blockStartNumber: number; blockEndNumber: number; cursor?: string }> =
+    new Map()
 
   public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
   public readonly transactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[]; params: CKBComponents.Hash }>()
@@ -70,11 +68,9 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       assetAccountInfo.getNftInfo().cellDep,
       assetAccountInfo.getNftIssuerInfo().cellDep,
       assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep,
-      assetAccountInfo.getChequeInfo().cellDep
+      assetAccountInfo.getChequeInfo().cellDep,
     ]
-    const fetchTxHashes = fetchCellDeps
-      .map(v => v.outPoint.txHash)
-      .map<[string, string]>(v => ['fetchTransaction', v])
+    const fetchTxHashes = fetchCellDeps.map(v => v.outPoint.txHash).map<[string, string]>(v => ['fetchTransaction', v])
     const txs = await this.lightRpc
       .createBatchRequest<any, string[], FetchTransactionReturnType[]>(fetchTxHashes)
       .exec()
@@ -96,7 +92,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   private async fetchDepCell() {
     const depGroupOutputsData: string[] = await this.getDepTxs()
     const depGroupTxHashes = [
-      ...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.tx_hash.toHexString())).flat())
+      ...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.tx_hash.toHexString())).flat()),
     ]
     if (depGroupTxHashes.length) {
       await this.lightRpc
@@ -120,11 +116,11 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
           script: {
             codeHash: v.codeHash,
             hashType: v.hashType,
-            args: v.args
+            args: v.args,
           },
-          blockRange: [HexUtils.toHex(v.blockStartNumber), HexUtils.toHex(v.blockEndNumber)],
+          blockRange: [BI.from(v.blockStartNumber).toHexString(), BI.from(v.blockEndNumber).toHexString()],
           scriptType: v.scriptType,
-          cursor: v.cursor
+          cursor: v.cursor,
         })
       }
     })
@@ -139,9 +135,9 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       ) {
         this.syncQueue.push({
           script: syncScript.script,
-          blockRange: [HexUtils.toHex(syncStatus.blockEndNumber), syncScript.blockNumber],
+          blockRange: [BI.from(syncStatus.blockEndNumber).toHexString(), syncScript.blockNumber],
           scriptType: syncScript.scriptType,
-          cursor: undefined
+          cursor: undefined,
         })
       }
     })
@@ -152,7 +148,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     const header = await this.lightRpc.getTipHeader()
     this.blockTipsSubject.next({
       cacheTipNumber: minSyncBlockNumber,
-      indexerTipNumber: +header.number
+      indexerTipNumber: +header.number,
     })
   }
 
@@ -172,12 +168,12 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
         const lockScripts = [
           addressMeta.generateDefaultLockScript(),
           addressMeta.generateACPLockScript(),
-          addressMeta.generateLegacyACPLockScript()
+          addressMeta.generateLegacyACPLockScript(),
         ]
         return lockScripts.map(v => ({
           script: v.toSDK(),
           scriptType: 'lock' as CKBRPC.ScriptType,
-          walletId: addressMeta.walletId
+          walletId: addressMeta.walletId,
         }))
       })
       .flat()
@@ -194,14 +190,14 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
         blockNumber:
           existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
           walletStartBlockMap[v.walletId] ??
-          `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`
+          `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`,
       })),
       ...appendScripts.map(v => ({
         ...v,
         blockNumber:
           existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
-          `0x${(otherTypeSyncProgress[scriptToHash(v.script)] ?? 0).toString(16)}`
-      }))
+          `0x${(otherTypeSyncProgress[scriptToHash(v.script)] ?? 0).toString(16)}`,
+      })),
     ]
     await this.lightRpc.setScripts(setScriptsParams)
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
@@ -232,7 +228,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       await SyncProgressService.updateSyncStatus(syncProgress.hash, {
         blockStartNumber: parseInt(blockRange[1]),
         blockEndNumber: parseInt(blockRange[1]),
-        cursor: undefined
+        cursor: undefined,
       })
       return
     }
@@ -240,7 +236,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     this.syncInQueue.set(syncProgress.hash, {
       blockStartNumber: result.lastCursor === '0x' ? parseInt(blockRange[1]) : parseInt(blockRange[0]),
       blockEndNumber: parseInt(blockRange[1]),
-      cursor: result.lastCursor === '0x' ? undefined : result.lastCursor
+      cursor: result.lastCursor === '0x' ? undefined : result.lastCursor,
     })
   }
 
@@ -255,14 +251,14 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       queries.lock = {
         code_hash: lock.codeHash,
         hash_type: lock.hashType,
-        args: lock.args
+        args: lock.args,
       }
     }
     if (type) {
       queries.type = {
         code_hash: type.codeHash,
         hash_type: type.hashType,
-        args: type.args
+        args: type.args,
       }
     }
     queries.data = data || 'any'

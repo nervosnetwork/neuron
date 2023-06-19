@@ -28,8 +28,13 @@
     "registry": "https://registry.npmjs.org/"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": [
+    "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+      "prettier --write",
       "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{css,scss}": [
+      "prettier --write",
       "git add"
     ]
   },

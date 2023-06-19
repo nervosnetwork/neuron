@@ -1,5 +1,6 @@
 import { when } from 'jest-when'
 import { getConnection } from 'typeorm'
+import { bytes } from '@ckb-lumos/codec'
 import { initConnection } from '../../../src/database/chain/ormconfig'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
@@ -2203,7 +2204,7 @@ describe('TransactionGenerator', () => {
           it('creates cheque output', () => {
             const chequeOutput = tx.outputs[0]
             expect(chequeOutput.lock.computeHash()).toEqual(expectedChequeOutput.lockHash)
-            expect(chequeOutput.lock.args.length).toEqual(82)
+            expect(bytes.bytify(chequeOutput.lock.args).byteLength).toEqual(40)
           })
           it('sender lock hash equals to one of default lock inputs', () => {
             const defaultLockInput = tx.inputs.find(input => {
@@ -2367,7 +2368,7 @@ describe('TransactionGenerator', () => {
 
         senderDefaultLockInputEntity = createInput(senderDefaultLock, undefined, transaction.hash)
 
-        const chequeLock = assetAccountInfo.generateChequeScript('0x' + '0'.repeat(40), senderDefaultLock.computeHash())
+        const chequeLock = assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), senderDefaultLock.computeHash())
         chequeOutputEntity = createOutput(
           chequeLock,
           typeScript,

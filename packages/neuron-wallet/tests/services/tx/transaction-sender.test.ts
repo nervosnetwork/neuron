@@ -1,3 +1,5 @@
+import { bytes } from "@ckb-lumos/codec";
+
 const stubbedRPCServiceConstructor = jest.fn()
 const stubbedWalletsServiceConstructor = jest.fn()
 const stubbedGetLiveCell = jest.fn()
@@ -452,7 +454,7 @@ describe('TransactionSender Test', () => {
         })
         describe('when matched receiver lock hash', () => {
           beforeEach(() => {
-            const chequeLock = assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), '0'.repeat(40))
+            const chequeLock = assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), bytes.hexify(Buffer.alloc(20)))
             tx.inputs[0].lock = chequeLock
           })
           it('success', async () => {
@@ -464,7 +466,7 @@ describe('TransactionSender Test', () => {
         })
         describe('when not matched receiver lock hash', () => {
           beforeEach(() => {
-            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40))
+            const chequeLock = assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), bytes.hexify(Buffer.alloc(20)))
             tx.inputs[0].lock = chequeLock
           })
           it('throws', async () => {
@@ -502,7 +504,7 @@ describe('TransactionSender Test', () => {
         })
         describe('when matched sender lock hash', () => {
           beforeEach(() => {
-            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), senderDefaultLock.computeHash())
+            const chequeLock = assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), senderDefaultLock.computeHash())
             tx.inputs[0].lock = chequeLock
           })
           it('success', async () => {
@@ -513,7 +515,7 @@ describe('TransactionSender Test', () => {
         })
         describe('when not matched sender lock hash', () => {
           beforeEach(() => {
-            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40))
+            const chequeLock = assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), bytes.hexify(Buffer.alloc(20)))
             tx.inputs[0].lock = chequeLock
           })
           it('throws', async () => {

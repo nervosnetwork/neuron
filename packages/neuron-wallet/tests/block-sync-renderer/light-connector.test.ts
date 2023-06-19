@@ -1,7 +1,7 @@
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import LightConnector from '../../src/block-sync-renderer/sync/light-connector'
 import SyncProgress from '../../src/database/chain/entities/sync-progress'
-import HexUtils from '../../src/utils/hex'
+import { BI } from '@ckb-lumos/bi'
 import AddressMeta from '../../src/database/address/meta'
 
 const getSyncStatusMock = jest.fn()
@@ -154,7 +154,7 @@ describe('test light connector', () => {
           hashType: syncProgress.hashType,
           args: syncProgress.args
         },
-        blockRange: [HexUtils.toHex(syncProgress.blockStartNumber), HexUtils.toHex(syncProgress.blockEndNumber)],
+        blockRange: [BI.from(syncProgress.blockStartNumber).toHexString(), BI.from(syncProgress.blockEndNumber).toHexString()],
         scriptType: syncProgress.scriptType,
         cursor: syncProgress.cursor
       })
@@ -209,7 +209,7 @@ describe('test light connector', () => {
           hashType: syncProgress.hashType,
           args: syncProgress.args
         },
-        blockRange: [HexUtils.toHex(syncProgress.blockEndNumber), HexUtils.toHex('0xaa')],
+        blockRange: [BI.from(syncProgress.blockEndNumber).toHexString(), BI.from('0xaa').toHexString()],
         scriptType: syncProgress.scriptType,
         cursor: syncProgress.cursor
       })
