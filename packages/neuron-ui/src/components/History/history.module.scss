@@ -146,7 +146,7 @@ body {
     }
   }
 
-  &[data-is-open='true'] {
+  &[data-is-expand-show='true'] {
     transform: rotate(90deg);
   }
 }

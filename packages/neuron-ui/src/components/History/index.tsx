@@ -213,7 +213,7 @@ const History = () => {
         return (
           <ArrowOpenRightIcon
             className={styles.arrow}
-            data-is-open={expandedRow === idx}
+            data-is-expand-show={expandedRow === idx}
             onClick={() => handleExpandClick(idx)}
           />
         )

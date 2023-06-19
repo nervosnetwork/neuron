@@ -41,6 +41,16 @@
     color: var(--main-text-color);
   }
 }
+
+.goBack {
+  margin-right: 8px;
+  cursor: pointer;
+
+  & path {
+    stroke: var(--main-text-color);
+  }
+}
+
 .address {
   font-family: 'JetBrains Mono';
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { getTransaction, showErrorMessage } from 'services/remote'
@@ -10,6 +10,7 @@ import ScriptTag from 'components/ScriptTag'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
+import { GoBack } from 'widgets/Icons/icon'
 
 import {
   ErrorCode,
@@ -18,7 +19,6 @@ import {
   uniformTimeFormatter,
   shannonToCKBFormatter,
   isSuccessResponse,
-  RoutePath,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 
@@ -37,6 +37,7 @@ const InfoItem = ({ label, value, className }: { label: string; value: React.Rea
 
 const HistoryDetailPage = () => {
   const { hash } = useParams()
+  const navigate = useNavigate()
   const {
     app: { pageNotice },
     chain: { networkID },
@@ -216,9 +217,7 @@ const HistoryDetailPage = () => {
       }}
       head={
         <div>
-          <Link className={styles.breadcrumb} to={RoutePath.History}>
-            {`${t('history.title')} / `}
-          </Link>
+          <GoBack className={styles.goBack} onClick={() => navigate(-1)} />
           <span className={styles.breadcrumbNav}>{`${t('history.title-detail')}`}</span>
         </div>
       }
