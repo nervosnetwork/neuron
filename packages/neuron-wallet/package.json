@@ -30,7 +30,8 @@
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "lint-staged": {
-    "src/**/*.ts": [
+    "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+      "prettier --write",
       "eslint --fix",
       "git add"
     ]
@@ -82,7 +83,7 @@
     "@types/sqlite3": "3.1.8",
     "@types/uuid": "8.3.4",
     "devtron": "1.4.0",
-    "electron": "24.1.1",
+    "electron": "24.5.1",
     "electron-build-env": "0.2.0",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",

@@ -22,7 +22,6 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "npx cross-env lerna bootstrap && lerna link",
     "start:ui": "cd packages/neuron-ui && yarn run start",
     "start:wallet": "cd packages/neuron-wallet && yarn run start:debug",
     "start": "lerna run --parallel start",
@@ -32,7 +31,7 @@
     "build:main": "lerna run build --scope=neuron-wallet",
     "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "package:test": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/package-for-test.sh",
-    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel test",
+    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel --load-env-files=false test",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
     "postinstall": "husky install && lerna run build --scope=@nervina-labs/ckb-indexer",
@@ -51,7 +50,7 @@
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
     "husky": "8.0.3",
-    "lerna": "5.6.2",
+    "lerna": "7.0.0",
     "lint-staged": "13.2.1",
     "ncp": "2.0.0",
     "prettier": "2.8.7",

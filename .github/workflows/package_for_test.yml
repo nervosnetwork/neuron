@@ -1,6 +1,8 @@
 name: Package Neuron for Test
 
-on: [push]
+on: 
+  pull_request:
+  push:
 
 jobs:
   packaging:
@@ -16,6 +18,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
+    env:
+      MAC_SHOULD_CODE_SIGN: ${{ github.event_name != 'pull_request' && secrets.APPLE_ID != '' }}
+      WIN_CERTIFICATE_BASE64: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
 
     steps:
       - name: Set git to use LF
@@ -57,12 +62,12 @@ jobs:
 
       - name: Boostrap
         run: |
-          yarn bootstrap
+          yarn
         env:
           CI: false
 
       - name: Package for MacOS
-        if: matrix.os == 'macos-latest'
+        if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'true' }}
         run: |
           ./scripts/download-ckb.sh mac
           yarn package:test mac
@@ -73,8 +78,18 @@ jobs:
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
 
+      - name: Package for MacOS for skip code sign
+        if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'false' }}
+        run: |
+          export CSC_IDENTITY_AUTO_DISCOVERY=false
+          ./scripts/download-ckb.sh mac
+          yarn package:test mac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_NOTARIZE: true
+
       - name: Package for Windows
-        if: matrix.os == 'windows-2019'
+        if: ${{ matrix.os == 'windows-2019' && env.WIN_CERTIFICATE_BASE64 != '' }}
         run: |
           bash ./scripts/download-ckb.sh win
           yarn build
@@ -84,6 +99,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
+
+      - name: Package for Windows for skip code sign
+        if: ${{ matrix.os == 'windows-2019' && env.WIN_CERTIFICATE_BASE64 == '' }}
+        run: |
+          bash ./scripts/download-ckb.sh win
+          yarn build
+          bash ./scripts/copy-ui-files.sh
+          bash ./scripts/package-for-test.sh win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Package for Linux
         if: matrix.os == 'ubuntu-20.04'
@@ -135,8 +160,31 @@ jobs:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
 
+  cache-package-info:
+    needs: [packaging]
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Save PR number and run id
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          RUN_ID: ${{ github.run_id }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p ./package_info
+          echo $PR_NUMBER > ./package_info/pr_number
+          echo $RUN_ID > ./package_info/run_id
+          echo $SHA > ./package_info/sha
+      - uses: actions/upload-artifact@v3
+        with:
+          name: package_info
+          path: package_info/
+          retention-days: 3
   comment:
     needs: [packaging]
+    # During a pull_request event triggered by a forked repository, actions have no write access to GitHub resources and will fail on any attempt.
+    # ref https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#restrictions-on-repository-forks
+    if: ${{ github.event_name == 'push' }}
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
     steps:
