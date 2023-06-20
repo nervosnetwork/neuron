@@ -64,15 +64,14 @@ const showAbout = () => {
   const isWin = process.platform === 'win32'
 
   if (isWin) {
-    const options = {
+    dialog.showMessageBox({
       type: 'info',
       title: app.name,
       message: app.name,
       detail: applicationVersion,
       buttons: ['OK'],
       cancelId: 0,
-    }
-    dialog.showMessageBox(options)
+    })
     return
   }
 
@@ -330,7 +329,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               width: 1000,
               maxWidth: 1000,
               minWidth: 1000,
-              resizable: true
+              resizable: true,
             },
             ['multisig-output-update']
           )
