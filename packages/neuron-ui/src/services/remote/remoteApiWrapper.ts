@@ -34,7 +34,6 @@ type Action =
   | 'open-in-window'
   | 'request-open-in-explorer'
   | 'handle-view-error'
-  | 'show-settings'
   | 'set-locale'
   | 'show-error-message'
   | 'show-open-dialog'
@@ -47,6 +46,8 @@ type Action =
   | 'set-ckb-node-data-path'
   | 'stop-process-monitor'
   | 'start-process-monitor'
+  | 'is-dark'
+  | 'set-theme'
   | 'is-ckb-run-external'
   // Wallets
   | 'get-all-wallets'

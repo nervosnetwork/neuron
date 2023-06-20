@@ -1,21 +1,29 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
-import { withKnobs, text, boolean } from '@storybook/addon-knobs'
+import { ComponentStory } from '@storybook/react'
 import TextField from 'widgets/TextField'
 
-const stories = storiesOf('TextField', module).addDecorator(withKnobs())
+export default {
+  title: 'TextField',
+  component: TextField,
+  argTypes: {
+    onChange: {
+      table: {
+        disable: true,
+      },
+    },
+  },
+}
 
-stories.add('Basic', () => {
-  const props = {
-    label: text('Label', 'label'),
-    required: boolean('Required', false),
-    stack: boolean('Stack', false),
-    field: text('Field', 'field'),
-    value: text('Value', 'value'),
-    error: text('Error', 'error'),
-    type: text('Type', 'text') as 'text' | 'password',
-    suffix: text('Suffix', 'suffix'),
-    onChange: () => {},
-  }
-  return <TextField {...props} />
-})
+const Template: ComponentStory<typeof TextField> = (props: any) => <TextField {...props} />
+export const Basic = Template.bind({})
+Basic.args = {
+  label: 'label',
+  required: false,
+  stack: false,
+  field: 'field',
+  value: 'value',
+  error: 'error',
+  type: 'text',
+  suffix: 'suffix',
+  onChange: () => {},
+}

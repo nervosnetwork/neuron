@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import Select, { SelectOptions } from 'widgets/Select'
-import { Text } from 'office-ui-fabric-react'
-import { useHistory } from 'react-router-dom'
+import { CreateFirstWalletNav } from 'components/WalletWizard'
 import { useGoBack } from 'utils'
+import { AttentionOutline } from 'widgets/Icons/icon'
+import TextField from 'widgets/TextField'
 import styles from './findDevice.module.scss'
-import { ActionType, Model, ImportStep } from './common'
+import { ActionType, ImportStep, Model } from './common'
 
 const supportedHardwareModels = [
   {
@@ -42,9 +42,8 @@ const supportedHardwareModels = [
 
 const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => {
   const [t] = useTranslation()
-  const [model, setModel] = useState<Model>()
-  const history = useHistory()
-  const onBack = useGoBack(history)
+  const [model, setModel] = useState<Model | null>()
+  const onBack = useGoBack()
   const onNext = useCallback(() => {
     dispatch({
       model,
@@ -52,8 +51,16 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
     })
   }, [dispatch, model])
 
-  const onDropDownChange = useCallback(({ data }: SelectOptions) => {
-    setModel(data)
+  const onClickDeviceType = useCallback(e => {
+    const { dataset } = e.target
+    setModel(
+      dataset.manufacturer && dataset.product
+        ? {
+            manufacturer: dataset.manufacturer,
+            product: dataset.product,
+          }
+        : null
+    )
   }, [])
   const options = useMemo(
     () =>
@@ -64,27 +71,44 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
               label: t(v.labelI18n),
             }
           : v
-      ) as SelectOptions[],
+      ),
     []
   )
 
   return (
-    <form onSubmit={onNext} className={styles.container}>
+    <div className={styles.container}>
       <header className={styles.title}>{t('import-hardware.title.select-model')}</header>
-      <section className={styles.main}>
-        <Select onChange={onDropDownChange} placeholder={t('import-hardware.select-model')} options={options} />
-        <Text variant="tiny">{t('messages.experimental-message-hardware')}</Text>
+      <CreateFirstWalletNav />
+      <section className={styles.selectDevice}>
+        {options.map(v => (
+          <TextField
+            key={v.value}
+            data-manufacturer={v.data?.manufacturer}
+            data-product={v.data?.product}
+            type="button"
+            value={v.label}
+            onClick={onClickDeviceType}
+            selected={
+              model === v.data ||
+              (!!model && model.manufacturer === v.data?.manufacturer && model.product === v.data?.product)
+            }
+          />
+        ))}
       </section>
+      <div className={styles.attention}>
+        <AttentionOutline />
+        {t('messages.experimental-message-hardware')}
+      </div>
       <footer className={styles.footer}>
-        <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />
         <Button
           type="submit"
           label={t('import-hardware.actions.next')}
           onClick={onNext}
           disabled={model === undefined}
         />
+        <Button type="text" label={t('import-hardware.actions.cancel')} onClick={onBack} />
       </footer>
-    </form>
+    </div>
   )
 }
 

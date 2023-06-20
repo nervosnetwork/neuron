@@ -2,9 +2,6 @@ import React, { useCallback, useRef, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import Spinner from 'widgets/Spinner'
-import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
-import { ReactComponent as VerifiedIcon } from 'widgets/Icons/Success.svg'
 import {
   connectDevice,
   getDevices,
@@ -16,11 +13,13 @@ import {
 } from 'services/remote'
 import { ErrorCode, errorFormatter, isSuccessResponse, useDidMount } from 'utils'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
-import CopyZone from 'widgets/CopyZone'
-import { ADDRESS_LENGTH } from 'utils/const'
+// import { ADDRESS_LENGTH } from 'utils/const'
 import { AddressPrefix, addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { ReactComponent as Device } from 'widgets/Icons/Device.svg'
+import { Close } from 'widgets/Icons/icon'
+import Alert from 'widgets/Alert'
+import CopyZoneAddress from 'widgets/CopyZoneAddress'
 import styles from './verifyHardwareAddress.module.scss'
-import VerifyError from './verify-error'
 
 export interface VerifyHardwareAddressProps {
   address: string
@@ -58,22 +57,19 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
   const isWin32 = useMemo(() => {
     return getPlatform() === 'win32'
   }, [])
-  const [status, setStatus] = useState('')
-  const [error, setError] = useState('')
+  const [status, setStatus] = useState<{ type: 'init' | 'success' | 'error'; message: string } | undefined>()
   const connectStatus = t('hardware-verify-address.status.connect')
   const userInputStatus = t('hardware-verify-address.status.user-input')
   const disconnectStatus = t('hardware-verify-address.status.disconnect')
-  const verifiedStatus = t('hardware-verify-address.verified')
-  const invalidStatus = t('hardware-verify-address.invalid')
   const ckbAppNotFoundStatus = t(CkbAppNotFoundException.message)
   const isNotAvailableToVerify = useMemo(() => {
-    return status === disconnectStatus || status === ckbAppNotFoundStatus
+    return status?.message === disconnectStatus || status?.message === ckbAppNotFoundStatus
   }, [status, disconnectStatus, ckbAppNotFoundStatus])
 
   const [deviceInfo, setDeviceInfo] = useState(wallet.device!)
   const [isReconnecting, setIsReconnecting] = useState(false)
   const isLoading = useMemo(() => {
-    return status === userInputStatus || isReconnecting
+    return status?.message === userInputStatus || isReconnecting
   }, [status, userInputStatus, isReconnecting])
 
   const productName = `${wallet.device!.manufacturer} ${wallet.device!.product}`
@@ -121,12 +117,12 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
             throw new DeviceNotFoundException()
           }
         }
-        setStatus(connectStatus)
+        setStatus({ type: 'init', message: connectStatus })
       } catch (err) {
         if (err instanceof CkbAppNotFoundException) {
-          setStatus(ckbAppNotFoundStatus)
+          setStatus({ type: 'error', message: ckbAppNotFoundStatus })
         } else {
-          setStatus(disconnectStatus)
+          setStatus({ type: 'error', message: disconnectStatus })
         }
       }
     },
@@ -149,112 +145,80 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
         await ensureDeviceAvailable(device)
       }
     } catch (err) {
-      setStatus(disconnectStatus)
+      setStatus({ type: 'error', message: disconnectStatus })
     } finally {
       setIsReconnecting(false)
     }
   }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
 
+  const [isVerifyAgain, setIsVerifyAgain] = useState(false)
   const verify = useCallback(async () => {
+    setIsVerifyAgain(true)
     await ensureDeviceAvailable(deviceInfo)
-    setStatus(userInputStatus)
+    setStatus({ type: 'init', message: userInputStatus })
     const res = await getDevicePublicKey()
     if (isSuccessResponse(res)) {
       const { result } = res
       if (verifyAddressEqual(address, result?.address)) {
-        setStatus(verifiedStatus)
+        setStatus({ type: 'success', message: t('hardware-verify-address.verified') })
       } else {
-        setStatus(invalidStatus)
+        setStatus({ type: 'error', message: t('hardware-verify-address.invalid') })
       }
     } else {
-      setError(errorFormatter(res.message, t))
+      setStatus({ type: 'error', message: errorFormatter(res.message, t) })
     }
-  }, [deviceInfo, address, userInputStatus, verifiedStatus, invalidStatus, ensureDeviceAvailable, t])
+  }, [deviceInfo, address, userInputStatus, ensureDeviceAvailable, t])
 
   useDidMount(() => {
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })
 
-  const dialogClass = `${styles.dialog}`
-
-  let container = (
-    <div className={styles.container}>
-      <header className={styles.title}>{t('hardware-verify-address.title')}</header>
-      <section className={styles.main}>
-        <table>
-          <tbody>
-            <tr>
-              <td className={styles.first}>{t('hardware-verify-address.device')}</td>
-              <td>
-                <HardWalletIcon />
-                <span>{productName}</span>
-              </td>
-            </tr>
-            <tr>
-              <td className={styles.first}>{t('hardware-verify-address.address')}</td>
-              <td className={isNotAvailableToVerify ? styles.warning : ''}>
-                <CopyZone
-                  content={address}
-                  name={t('hardware-verify-address.actions.copy-address')}
-                  style={{ lineHeight: '1.625rem', width: '400px', display: 'flex' }}
-                >
-                  {address.length > ADDRESS_LENGTH ? (
-                    <>
-                      <span className={styles.addressOverflow}>{address.slice(0, -21)}</span>
-                      <span>...</span>
-                      <span>{address.slice(-20)}</span>
-                    </>
-                  ) : (
-                    address
-                  )}
-                </CopyZone>
-              </td>
-            </tr>
-            <tr>
-              <td className={styles.first}>{t('hardware-verify-address.status.label')}</td>
-              <td className={isNotAvailableToVerify ? styles.warning : ''}>
-                {status === verifiedStatus && <VerifiedIcon />}
-                <span>{status}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-      <footer className={styles.footer}>
-        <div className={styles.right}>
+  return (
+    <dialog ref={dialogRef} className={styles.dialog}>
+      <header className={styles.title}>
+        {t('hardware-verify-address.title')}
+        <Close onClick={onCancel} />
+      </header>
+      <div className={styles.divider} />
+      <div className={styles.body}>
+        <section className={styles.main}>
+          <header>{t('hardware-verify-address.device')}</header>
+          <input value={productName} className={styles.productName} disabled />
+          <header>{t('hardware-verify-address.address')}</header>
+          <CopyZoneAddress fullPayload={address} className={styles.address} />
+          {status ? (
+            <Alert status={status.type} className={styles.alert}>
+              {status.message === connectStatus ? <Device /> : null}
+              {status.message}
+            </Alert>
+          ) : null}
+        </section>
+        <footer className={styles.footer}>
           <Button type="cancel" label={t('hardware-verify-address.actions.close')} onClick={onCancel} />
           {isNotAvailableToVerify ? (
             <Button
-              label={t('hardware-verify-address.actions.rescan')}
+              label={t('hardware-verify-address.actions.reconnect')}
               type="submit"
-              disabled={isLoading}
               onClick={reconnect}
+              loading={isLoading}
             >
-              {isLoading ? <Spinner /> : (t('hardware-verify-address.actions.rescan') as string)}
+              {t('hardware-verify-address.actions.reconnect')}
             </Button>
           ) : (
             <Button
               label={t('hardware-verify-address.actions.verify')}
               type="submit"
-              disabled={isLoading}
+              loading={isLoading}
               onClick={verify}
             >
-              {isLoading ? <Spinner /> : (t('hardware-verify-address.actions.verify') as string)}
+              {isVerifyAgain
+                ? t('hardware-verify-address.actions.verify-again')
+                : t('hardware-verify-address.actions.verify')}
             </Button>
           )}
-        </div>
-      </footer>
-    </div>
-  )
-
-  if (error) {
-    container = <VerifyError onCancel={onCancel} error={error} />
-  }
-
-  return (
-    <dialog ref={dialogRef} className={dialogClass}>
-      {container}
+        </footer>
+      </div>
     </dialog>
   )
 }

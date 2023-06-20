@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { RoutePath } from 'utils'
 import Button from 'widgets/Button'
 import { ReactComponent as CompleteIcon } from 'widgets/Icons/Complete.svg'
@@ -9,11 +9,11 @@ import styles from './hardwareSign.module.scss'
 
 const SignSuccess = ({ onCancel }: { onCancel: () => void }) => {
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const onClose = useCallback(() => {
     onCancel()
-    history.push(RoutePath.History)
-  }, [history, onCancel])
+    navigate(RoutePath.History)
+  }, [navigate, onCancel])
 
   return (
     <div className={styles.container}>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
-import StoryRouter from 'storybook-react-router'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import PasswordRequest from 'components/PasswordRequest'
 import { initStates, NeuronWalletContext } from 'states'
 
@@ -104,7 +104,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
   },
 }
 
-const stories = storiesOf('PasswordRequest', module).addDecorator(StoryRouter())
+const stories = storiesOf('PasswordRequest', module).addDecorator(withRouter())
 
 Object.entries(states).forEach(([title, state]) => {
   stories.add(title, () => (

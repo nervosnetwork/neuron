@@ -40,7 +40,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: 2022-05-07-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+          key: 2022-10-11-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
 
       - name: Install libudev
         if: matrix.os == 'ubuntu-20.04'

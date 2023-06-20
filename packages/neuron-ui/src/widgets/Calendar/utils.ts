@@ -110,6 +110,6 @@ export const getLocalMonthNames = (lang: string) => {
 }
 
 export const getLocalWeekNames = (lang: string) => {
-  const formater = new Intl.DateTimeFormat(lang, { weekday: 'short' })
+  const formater = new Intl.DateTimeFormat(lang, { weekday: 'narrow' })
   return Array.from({ length: 7 }, (_, i) => formater.format(new Date(Date.UTC(2023, 0, 1 + i))))
 }

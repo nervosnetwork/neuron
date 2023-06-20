@@ -1,25 +1,22 @@
-
-$error-color: #d50000;
-$success-color: #008000;
 $activity-color: #1b73b3;
 
 .error {
   path {
-    fill: $error-color;
-    stroke: $error-color;
+    fill: var(--error-color);
+    stroke: var(--error-color);
   }
   polygon {
-    fill: $error-color;
+    fill: var(--error-color);
   }
 }
 
 .success {
   path {
-    fill: $success-color;
-    stroke: $success-color;
+    fill: var(--success-color);
+    stroke: var(--success-color);
   }
   polygon {
-    fill: $success-color;
+    fill: var(--success-color);
   }
 }
 
@@ -30,5 +27,23 @@ $activity-color: #1b73b3;
   }
   polygon {
     fill: $activity-color;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .addressTransform {
+    & > path {
+      stroke: #1e2423;
+    }
+  }
+
+  .deposit {
+    & > path[fill='#DCF9E3'] {
+      fill: var(--primary-color);
+    }
+
+    & > path[fill='#00C891'] {
+      fill: var(--secondary-background-color);
+    }
   }
 }

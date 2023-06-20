@@ -1,37 +1,32 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import {
-  ErrorCode,
-  isSuccessResponse,
-  shannonToCKBFormatter,
-  useDialog,
-  useExitOnWalletChange,
-  useOnLocaleChange,
-} from 'utils'
+import { ErrorCode, isSuccessResponse, shannonToCKBFormatter, useExitOnWalletChange, useOnLocaleChange } from 'utils'
 import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
-import Spinner from 'widgets/Spinner'
-import DownArrow from 'widgets/Icons/DownArrow.png'
-import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
-import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
-import VerificationWarningIcon from 'widgets/Icons/Warning.png'
+import { ReactComponent as VerificationFailureIcon } from 'widgets/Icons/VerificationFailure.svg'
 import { InfoCircleOutlined } from 'widgets/Icons/icon'
-
+import Dialog from 'widgets/Dialog'
+import Tooltip from 'widgets/Tooltip'
+import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
+import { ReactComponent as Sign } from 'widgets/Icons/Sign.svg'
+import { ReactComponent as SuccessCircle } from 'widgets/Icons/SuccessCircle.svg'
 import HardwareSign from 'components/HardwareSign'
 import styles from './signAndVerify.module.scss'
 
 interface PasswordDialogProps {
-  dialogRef: React.MutableRefObject<HTMLDialogElement | null>
-  onCancel: React.MouseEventHandler
+  show: boolean
+  walletName: string
+  onCancel: () => void
   onSubmit: (pwd: string) => Promise<ControllerResponse>
 }
 
-const PasswordDialog = ({ dialogRef, onCancel, onSubmit }: PasswordDialogProps) => {
+const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialogProps) => {
   const [t, i18n] = useTranslation()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -42,12 +37,11 @@ const PasswordDialog = ({ dialogRef, onCancel, onSubmit }: PasswordDialogProps) 
   useOnLocaleChange(i18n)
 
   useEffect(() => {
-    if (!dialogRef.current?.open) {
+    if (!show) {
       setPassword('')
       setError('')
     }
-    // eslint-disable-next-line
-  }, [dialogRef.current && dialogRef.current.open, setPassword, setError])
+  }, [show, setPassword, setError])
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -73,58 +67,27 @@ const PasswordDialog = ({ dialogRef, onCancel, onSubmit }: PasswordDialogProps) 
   }, [setLoading, onSubmit, password, disabled])
 
   return (
-    <dialog ref={dialogRef} className={styles.passwordDialog}>
-      <form onSubmit={handleConfirm}>
-        <h2>{t('sign-and-verify.sign')}</h2>
+    <Dialog
+      show={show}
+      title={t('sign-and-verify.sign')}
+      onCancel={onCancel}
+      onConfirm={handleConfirm}
+      disabled={disabled}
+      isLoading={loading}
+    >
+      <div className={styles.passwordDialog}>
+        <p className={styles.walletName}>{walletName}</p>
         <TextField
           type="password"
           field="password"
           value={password}
           onChange={handleInputChange}
-          required
           label={t('sign-and-verify.password')}
           error={error}
           autoFocus
         />
-        <div className={styles.actions}>
-          <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={onCancel} />
-          <Button type="submit" label={t('sign-and-verify.confirm')} disabled={disabled} onClick={handleConfirm}>
-            {loading ? <Spinner /> : `${t('sign-and-verify.confirm')}`}
-          </Button>
-        </div>
-      </form>
-    </dialog>
-  )
-}
-
-const VerifyFailure = () => {
-  const [t] = useTranslation()
-  return (
-    <div className={styles.resultDialog}>
-      <img src={VerificationFailureIcon} alt="failure" />
-      <span>{t('sign-and-verify.verification-failure')}</span>
-    </div>
-  )
-}
-
-const VerifySuccess = () => {
-  const [t] = useTranslation()
-  return (
-    <div className={styles.resultDialog}>
-      <img src={VerificationSuccessIcon} alt="success" />
-      <span>{t('sign-and-verify.verification-success')}</span>
-    </div>
-  )
-}
-
-const AddressNotFound = ({ onDismiss }: { onDismiss: () => void }) => {
-  const [t] = useTranslation()
-  return (
-    <div className={styles.addressNotFound}>
-      <img src={VerificationWarningIcon} alt="warning" />
-      <span>{t('sign-and-verify.address-not-found')}</span>
-      <Button label="OK" type="primary" onClick={onDismiss} />
-    </div>
+      </div>
+    </Dialog>
   )
 }
 
@@ -132,13 +95,14 @@ type Notification = 'verify-success' | 'verify-old-sign-success' | 'verify-failu
 
 interface NotificationsProps {
   notification: Notification
+  failReason?: string
   onDismiss: () => void
   t: TFunction
 }
 
-const Notifications = ({ notification, onDismiss, t }: NotificationsProps) =>
-  notification !== null ? (
-    <div className={styles.dialogContainer} role="presentation" onClick={onDismiss}>
+const Notifications = ({ notification, onDismiss, t, failReason }: NotificationsProps) =>
+  notification ? (
+    <div className={styles.dialogContainer} role="presentation">
       <div
         role="presentation"
         className={styles.dialog}
@@ -147,28 +111,49 @@ const Notifications = ({ notification, onDismiss, t }: NotificationsProps) =>
           e.preventDefault()
         }}
       >
-        {notification === 'verify-failure' ? <VerifyFailure /> : null}
-        {notification === 'verify-success' ? <VerifySuccess /> : null}
-        {notification === 'verify-old-sign-success' ? (
-          <>
-            <VerifySuccess />
-            {t('sign-and-verify.verify-old-sign-success')}
-          </>
-        ) : null}
-        {notification === 'address-not-found' ? <AddressNotFound onDismiss={onDismiss} /> : null}
+        <div className={styles.resultDialog}>
+          <VerificationFailureIcon />
+          <span>{t('sign-and-verify.verification-failure')}</span>
+          <span className={styles.failReason}>
+            {notification === 'address-not-found' ? t('sign-and-verify.address-not-found') : failReason}
+          </span>
+          <Button label={t('common.back')} type="primary" onClick={onDismiss} />
+        </div>
       </div>
     </div>
   ) : null
 
+const VerifySuccess = ({ onDismiss, t }: { onDismiss: () => void; t: TFunction }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onDismiss()
+    }, 3000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [])
+
+  return (
+    <div className={styles.successNotification}>
+      <div className={styles.content}>
+        <SuccessCircle />
+        {t('sign-and-verify.verification-success')}
+      </div>
+    </div>
+  )
+}
+
 const SignAndVerify = () => {
   const [t, i18n] = useTranslation()
   const [notification, setNotification] = useState<Notification>(null)
+  const [failReason, setFailReason] = useState<string | undefined>('')
+  const [showDialog, setShowDialog] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [message, setMessage] = useState('')
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
   const { wallet } = useGlobalState()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
   useEffect(() => {
@@ -177,7 +162,7 @@ const SignAndVerify = () => {
   }, [i18n.language])
 
   useEffect(() => {
-    const id = window.location.href.split('/').pop()
+    const id = window.location.href.split('id=').pop()
     if (!id) {
       showErrorMessage(t('messages.error'), t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' }))
       window.close()
@@ -185,22 +170,20 @@ const SignAndVerify = () => {
   }, [t])
 
   const handlePasswordDialogOpen = useCallback(() => {
+    setShowDialog(false)
     setIsDialogOpen(true)
   }, [setIsDialogOpen])
 
   const handlePasswordDialogDismiss = useCallback(() => {
+    setShowDialog(true)
     setIsDialogOpen(false)
   }, [setIsDialogOpen])
 
   const handleNotificationDismiss = useCallback(() => {
+    setShowDialog(true)
     setNotification(null)
+    setFailReason('')
   }, [setNotification])
-
-  useDialog({
-    show: isDialogOpen,
-    dialogRef,
-    onClose: handlePasswordDialogDismiss,
-  })
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -229,18 +212,6 @@ const SignAndVerify = () => {
     [setMessage, setSignature, setAddress]
   )
 
-  const handleAddrSelected = useCallback(
-    (e: React.BaseSyntheticEvent) => {
-      const {
-        dataset: { addr },
-      } = e.target
-      if (addr) {
-        setAddress(addr)
-      }
-    },
-    [setAddress]
-  )
-
   const handleVerifyMessage = useCallback(() => {
     verifyMessage({ message, signature, address })
       .then(res => {
@@ -252,16 +223,16 @@ const SignAndVerify = () => {
           }
         } else {
           setNotification('verify-failure')
+          setShowDialog(false)
+          if (typeof res.message === 'object') {
+            setFailReason(res.message.content ?? '')
+          }
         }
       })
       .catch((err: Error) => {
         showErrorMessage('Error', err.message)
       })
   }, [message, address, setNotification, signature])
-
-  const handleClose = useCallback(() => {
-    window.close()
-  }, [])
 
   const handleSignMessage = useCallback(
     async (password: string) => {
@@ -288,62 +259,116 @@ const SignAndVerify = () => {
     [setSignature, handlePasswordDialogDismiss, address, wallet, message]
   )
 
+  const navigate = useNavigate()
+  const onBack = useCallback(() => {
+    navigate(-1)
+  }, [navigate])
+
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>{t('sign-and-verify.sign-or-verify-message')}</h1>
-
-      <h2 className={styles.label}>{t('sign-and-verify.message')}</h2>
-      <textarea data-field="message" value={message} onChange={handleInputChange} />
-      <div className={styles.tips}>
-        {t('sign-and-verify.sign-with-magic-byte')}
-        <span className={styles.infoIconContainer} data-tip={t('sign-and-verify.verify-tip')}>
-          <InfoCircleOutlined />
-        </span>
-      </div>
-
-      <div className={styles.address}>
-        <h2 className={styles.label}>{t('sign-and-verify.address')}</h2>
-        <input className={styles.addrInput} data-field="address" value={address} onChange={handleInputChange} />
-        <div className={styles.dropdownBtn}>
-          <img src={DownArrow} alt="more" />
-        </div>
-        {wallet && wallet.addresses ? (
-          <div role="presentation" className={styles.addrList} onClick={handleAddrSelected}>
-            {wallet.addresses.map(addr => (
-              <div key={addr.address} className={styles.addrOpt} data-addr={addr.address}>
-                <span>{`${addr.address.slice(0, 30)}...${addr.address.slice(-30)}`}</span>
-                <Balance balance={shannonToCKBFormatter(addr.balance)} />
-                <span className={styles.addrType} data-type={addr.type}>
-                  {addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : null}
-      </div>
-
-      <h2 className={styles.label}>{t('sign-and-verify.signature')}</h2>
-      <TextField field="signature" value={signature} onChange={handleInputChange} className={styles.signatureField} />
-
-      <div className={styles.actions}>
-        <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={handleClose} />
-        {wallet?.isWatchOnly || (
-          <Button
-            type="primary"
-            label={t('sign-and-verify.sign')}
-            disabled={!message || !address}
-            onClick={handlePasswordDialogOpen}
+    <div>
+      <Dialog
+        show={showDialog}
+        title={t('sign-and-verify.sign-or-verify-message')}
+        disabled={!message || !signature || !address}
+        onCancel={onBack}
+        confirmText={t('sign-and-verify.verify')}
+        onConfirm={handleVerifyMessage}
+      >
+        <div>
+          <TextField
+            label={t('sign-and-verify.message')}
+            data-field="message"
+            value={message}
+            onChange={handleInputChange}
+            width="100%"
+            rows={3}
           />
-        )}
-        <Button
-          type="primary"
-          label={t('sign-and-verify.verify')}
-          disabled={!message || !signature || !address}
-          onClick={handleVerifyMessage}
-        />
-      </div>
+          <div className={styles.tips}>
+            <span>{t('sign-and-verify.sign-with-magic-byte')}</span>
+            <Tooltip tip={t('sign-and-verify.verify-tip')}>
+              <InfoCircleOutlined />
+            </Tooltip>
+          </div>
 
-      <Notifications notification={notification} onDismiss={handleNotificationDismiss} t={t} />
+          <div className={styles.selectAddress}>
+            <div className={styles.dropdown}>
+              <div className={styles.content}>
+                <TextField
+                  label={t('sign-and-verify.address')}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  data-field="address"
+                  value={address}
+                  onChange={handleInputChange}
+                  rows={2}
+                  suffix={
+                    <div className={styles.arrow} data-active={isDropdownOpen}>
+                      <Arrow />
+                    </div>
+                  }
+                  width="100%"
+                />
+              </div>
+              {isDropdownOpen && wallet?.addresses ? (
+                <div className={styles.selects}>
+                  {wallet.addresses.map(addr => (
+                    <Button
+                      type="text"
+                      key={addr.address}
+                      className={styles.selectItem}
+                      onClick={() => {
+                        setIsDropdownOpen(false)
+                        setAddress(addr.address)
+                      }}
+                    >
+                      <div className={styles.wrap}>
+                        <div className={styles.title}>
+                          {`${addr.address.slice(0, 16)}...${addr.address.slice(-16)} `}
+                          (<Balance balance={shannonToCKBFormatter(addr.balance)} />)
+                        </div>
+                        <div className={styles.type} data-type={addr.type}>
+                          {addr.type === 1 ? t('addresses.change-address') : t('addresses.receiving-address')}
+                        </div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <TextField
+            label={t('sign-and-verify.signature')}
+            field="signature"
+            value={signature}
+            onChange={handleInputChange}
+            disabled={!signature}
+            width="100%"
+          />
+
+          {wallet?.isWatchOnly || (
+            <div className={styles.signWrap}>
+              <Button type="text" disabled={!message || !address} onClick={handlePasswordDialogOpen}>
+                <Sign />
+                {t('sign-and-verify.sign')}
+              </Button>
+            </div>
+          )}
+
+          {notification === 'verify-success' || notification === 'verify-old-sign-success' ? (
+            <VerifySuccess onDismiss={handleNotificationDismiss} t={t} />
+          ) : null}
+        </div>
+      </Dialog>
+
+      {notification && (
+        <Notifications
+          notification={notification}
+          failReason={failReason}
+          onDismiss={handleNotificationDismiss}
+          t={t}
+        />
+      )}
+
       {isDialogOpen && wallet?.device ? (
         <HardwareSign
           signType="message"
@@ -352,7 +377,12 @@ const SignAndVerify = () => {
           onDismiss={handlePasswordDialogDismiss}
         />
       ) : (
-        <PasswordDialog dialogRef={dialogRef} onCancel={handlePasswordDialogDismiss} onSubmit={handleSignMessage} />
+        <PasswordDialog
+          show={isDialogOpen}
+          walletName={wallet?.name}
+          onCancel={handlePasswordDialogDismiss}
+          onSubmit={handleSignMessage}
+        />
       )}
     </div>
   )

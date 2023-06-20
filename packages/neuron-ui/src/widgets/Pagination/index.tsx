@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPageNoList } from 'utils'
-import { ReactComponent as ArrowToEndIcon } from 'widgets/Icons/ArrowToEnd.svg'
-import { ReactComponent as ArrowToNextIcon } from 'widgets/Icons/ArrowToNext.svg'
+import { ArrowEnd, ArrowNext } from 'widgets/Icons/icon'
 
 import styles from './pagination.module.scss'
 
@@ -42,33 +41,41 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
   const end = Math.min(count, pageNo * pageSize)
   const range = t(`${I18N_PATH}.range`, { start, end, count })
 
+  const disableToHead = pageNo === 1 || pageCount === 0
+  const disableToEnd = pageNo >= pageCount
+
   return (
     <div role="presentation" className={styles.container} onClick={handlePageNoClick}>
       <div className={styles.range}>{range}</div>
       <div className={styles.navigator} role="navigation" aria-label="pagination">
-        <span
-          role="button"
-          data-page-no={1}
-          tabIndex={pageNo === 1 ? -1 : 0}
-          className={styles.toPrev}
-          data-disabled={pageNo === 1}
-          title={t(`${I18N_PATH}.first-page`)}
-        >
-          <ArrowToEndIcon />
-        </span>
-        <span
-          role="button"
-          data-page-no={pageNo - 1}
-          tabIndex={pageNo === 1 ? -1 : 0}
-          className={styles.toPrev}
-          data-disabled={pageNo === 1}
-          title={t(`${I18N_PATH}.previous-page`)}
-        >
-          <ArrowToNextIcon />
-        </span>
+        <div className={styles.arrowBlock}>
+          <button
+            type="button"
+            data-page-no={1}
+            tabIndex={pageNo === 1 ? -1 : 0}
+            className={styles.toHead}
+            data-disabled={disableToHead}
+            data-title="first-page"
+            title={t(`${I18N_PATH}.first-page`)}
+          >
+            <ArrowEnd />
+          </button>
+          <button
+            type="button"
+            data-page-no={pageNo - 1}
+            tabIndex={pageNo === 1 ? -1 : 0}
+            className={styles.toHead}
+            data-disabled={disableToHead}
+            data-title="previous-page"
+            title={t(`${I18N_PATH}.previous-page`)}
+          >
+            <ArrowNext />
+          </button>
+        </div>
+
         {pageNoList.map(no => (
-          <span
-            role="button"
+          <button
+            type="button"
             tabIndex={pageNo === no ? -1 : 0}
             key={no}
             className={styles.pageNo}
@@ -77,28 +84,34 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
             title={t(`${I18N_PATH}.page-no`, { pageNo: no })}
           >
             {no}
-          </span>
+          </button>
         ))}
-        <span
-          role="button"
-          tabIndex={pageNo === pageCount ? -1 : 0}
-          data-page-no={pageNo + 1}
-          className={styles.toNext}
-          data-disabled={pageNo === pageCount}
-          title={t(`${I18N_PATH}.next-page`)}
-        >
-          <ArrowToNextIcon />
-        </span>
-        <span
-          role="button"
-          tabIndex={pageNo === pageCount ? -1 : 0}
-          data-page-no={pageCount}
-          className={styles.toNext}
-          data-disabled={pageNo === pageCount}
-          title={t(`${I18N_PATH}.last-page`)}
-        >
-          <ArrowToEndIcon />
-        </span>
+
+        <div className={styles.arrowBlock}>
+          <button
+            type="button"
+            tabIndex={pageNo === pageCount ? -1 : 0}
+            data-page-no={pageNo + 1}
+            className={styles.toEnd}
+            data-disabled={disableToEnd}
+            data-title="next-page"
+            title={t(`${I18N_PATH}.next-page`)}
+          >
+            <ArrowNext />
+          </button>
+
+          <button
+            type="button"
+            tabIndex={pageNo === pageCount ? -1 : 0}
+            data-page-no={pageCount}
+            className={styles.toEnd}
+            data-disabled={disableToEnd}
+            data-title="last-page"
+            title={t(`${I18N_PATH}.last-page`)}
+          >
+            <ArrowEnd />
+          </button>
+        </div>
       </div>
     </div>
   )

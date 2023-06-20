@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
-import { storiesOf } from '@storybook/react'
-import { withKnobs, text } from '@storybook/addon-knobs'
+import React from 'react'
+import { ComponentStory } from '@storybook/react'
 import NervosDAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 
-const stories = storiesOf('Nervos DAO Record', module)
+export default {
+  title: 'Nervos DAO Record',
+  component: NervosDAORecord,
+}
 
 const basicProps: Omit<DAORecordProps, 'onToggle'> = {
   capacity: '10200000000',
@@ -40,159 +42,156 @@ const basicProps: Omit<DAORecordProps, 'onToggle'> = {
   blockNumber: '7712',
 }
 
-const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
-  Depositing: {
-    ...basicProps,
-    blockNumber: undefined as any,
-    status: 'sent',
-  },
-  'Immature for withdraw': {
-    ...basicProps,
-    depositEpoch: '0xa000100030a', // 778.1
-    currentEpoch: '0xa000000030e', // 782
-  },
-  'Deposited 4 epochs': {
-    ...basicProps,
-
-    depositEpoch: '0xa000000030b', // 779
-    currentEpoch: '0xa000000030f', // 783
-  },
-  'Deposited 4.1 epochs': {
-    ...basicProps,
-    depositEpoch: '0xa000900030a', // 778.9
-    currentEpoch: '0xa000000030f', // 783
-  },
-  'Deposited 137.9 epochs': {
-    ...basicProps,
-    depositEpoch: '0xa0001000285', // 645.1
-    currentEpoch: '0xa000000030f', // 783
-  },
-  'Deposited 138 epochs': {
-    ...basicProps,
-    depositEpoch: '0xa0000000285', // 645
-    currentEpoch: '0xa000000030f', // 783
-  },
-  'Deposited 138.1 epochs': {
-    ...basicProps,
-    depositEpoch: '0xa0009000284', // 644.9
-    currentEpoch: '0xa000000030f', // 783
-  },
-  Withdrawing: {
-    ...basicProps,
-    depositInfo: {
-      txHash: 'deposit tx hash',
-      timestamp: new Date('2020-02-02').getTime().toString(),
-    },
-    withdrawInfo: {
-      txHash: 'withdraw tx hash',
-      timestamp: new Date('2020-02-03').getTime().toString(),
-    },
-    depositEpoch: '0xa000900030a', // 778.9
-    currentEpoch: '0xa000000030f', // 783
-    status: 'sent',
-  },
-  'Withdrawn 5 epochs': {
-    ...basicProps,
-    depositInfo: {
-      txHash: 'deposit tx hash',
-      timestamp: new Date('2020-02-02').getTime().toString(),
-    },
-    withdrawInfo: {
-      txHash: 'withdraw tx hash',
-      timestamp: new Date('2020-02-03').getTime().toString(),
-    },
-    depositEpoch: '0xa0000000300', // 768
-    currentEpoch: '0xa000000030f', // 783
-    // withdrawnEpoch: '0xa0000000305', // 773
-  },
-  'Immature for unlock': {
-    ...basicProps,
-    depositInfo: {
-      txHash: 'deposit tx hash',
-      timestamp: new Date('2020-02-02').getTime().toString(),
-    },
-    withdrawInfo: {
-      txHash: 'withdraw tx hash',
-      timestamp: new Date('2020-02-03').getTime().toString(),
-    },
-    depositEpoch: '0xa0000000300', // 768
-    currentEpoch: '0xa00010003b4', // 948.1
-    // withdrawnEpoch: '0xa0000000305', // 773
-  },
-  Unlockable: {
-    ...basicProps,
-    depositInfo: {
-      txHash: 'deposit tx hash',
-      timestamp: new Date('2020-02-02').getTime().toString(),
-    },
-    withdrawInfo: {
-      txHash: 'withdraw tx hash',
-      timestamp: new Date('2020-02-03').getTime().toString(),
-    },
-    depositEpoch: '0xa000900030a', // 778.9
-    currentEpoch: '0xa0009000476', // 1142.9
-    // withdrawnEpoch: '0xa000900030a', // 778.9
-  },
-  Unlocking: {
-    ...basicProps,
-    depositInfo: {
-      txHash: 'deposit tx hash',
-      timestamp: new Date('2020-02-02').toString().toString(),
-    },
-    withdrawInfo: {
-      txHash: 'withdraw tx hash',
-      timestamp: new Date('2020-02-03').getTime().toString(),
-    },
-    unlockInfo: {
-      txHash: 'unlock tx hash',
-      timestamp: new Date().getTime().toString(),
-    },
-    depositEpoch: '0xa000900030a', // 778.9
-    currentEpoch: '0xa0009000476', // 1142.9
-    status: 'pending',
-    // withdrawnEpoch: '0xa000900030a', // 778.9
-  },
-  Unfolded: {
-    ...basicProps,
-    depositOutPoint: undefined,
-    depositEpoch: '0xa0009000284', // 644.9
-    currentEpoch: '0xa000000030f', // 783
-    isCollapsed: false,
-    depositTimestamp: (Date.now() - 25 * 3600000).toString(),
-    unlockInfo: {
-      timestamp: Date.now().toString(),
-      txHash: 'unlock tx hash',
-    },
-    withdrawInfo: {
-      timestamp: (Date.now() - 24 * 3600_000).toString(),
-      txHash: 'withdraw tx hash',
-    },
-  },
+const Template: ComponentStory<typeof NervosDAORecord> = props => {
+  return <NervosDAORecord {...props} />
 }
 
-Object.keys(props).forEach(name => {
-  stories.add(name, () => {
-    const [isCollapsed, setIsCollapsed] = useState(props[name].isCollapsed ?? true)
-    return <NervosDAORecord {...props[name]} isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
-  })
-})
+export const Depositing = Template.bind({})
+Depositing.args = {
+  ...basicProps,
+  blockNumber: undefined as any,
+  status: 'sent',
+}
 
-stories.addDecorator(withKnobs()).add('With Knobs', () => {
-  const knobProps = {
-    ...basicProps,
+export const ImmatureForWithdraw = Template.bind({})
+ImmatureForWithdraw.args = {
+  ...basicProps,
+  depositEpoch: '0xa000100030a', // 778.1
+  currentEpoch: '0xa000000030e', // 782
+}
 
-    depositEpoch: text('Deposit Epoch', '0xa000900030a'),
-    currentEpoch: text('Current Epoch', '0xa0009000476'),
-  }
-  const [isCollapsed, setIsCollapsed] = useState(knobProps.isCollapsed ?? true)
+export const Deposited4Epochs = Template.bind({})
+Deposited4Epochs.args = {
+  ...basicProps,
+  depositEpoch: '0xa000000030b', // 779
+  currentEpoch: '0xa000000030f', // 783
+}
 
-  return (
-    <NervosDAORecord
-      {...knobProps}
-      isCollapsed={isCollapsed}
-      onToggle={() => {
-        setIsCollapsed(!isCollapsed)
-      }}
-    />
-  )
-})
+export const Deposited4Point1Epochs = Template.bind({})
+Deposited4Point1Epochs.args = {
+  ...basicProps,
+  depositEpoch: '0xa000900030a', // 778.9
+  currentEpoch: '0xa000000030f', // 783
+}
+
+export const DepositedLess138Epochs = Template.bind({})
+DepositedLess138Epochs.args = {
+  ...basicProps,
+  depositEpoch: '0xa0001000285', // 645.1
+  currentEpoch: '0xa000000030f', // 783
+}
+DepositedLess138Epochs.storyName = 'Deposited 137.9 epochs'
+
+export const Deposited138Epochs = Template.bind({})
+Deposited138Epochs.args = {
+  ...basicProps,
+  depositEpoch: '0xa0000000285', // 645
+  currentEpoch: '0xa000000030f', // 783
+}
+Deposited138Epochs.storyName = 'Deposited 138 epochs'
+
+export const DepositedBigThan138Epochs = Template.bind({})
+DepositedBigThan138Epochs.args = {
+  ...basicProps,
+  depositEpoch: '0xa0009000284', // 644.9
+  currentEpoch: '0xa000000030f', // 783
+}
+DepositedBigThan138Epochs.storyName = 'Deposited 138.1 epochs'
+
+export const Withdrawing = Template.bind({})
+Withdrawing.args = {
+  ...basicProps,
+  depositInfo: {
+    txHash: 'deposit tx hash',
+    timestamp: new Date('2020-02-02').getTime().toString(),
+  },
+  withdrawInfo: {
+    txHash: 'withdraw tx hash',
+    timestamp: new Date('2020-02-03').getTime().toString(),
+  },
+  depositEpoch: '0xa000900030a', // 778.9
+  currentEpoch: '0xa000000030f', // 783
+  status: 'sent',
+}
+
+export const Withdrawn5Epochs = Template.bind({})
+Withdrawn5Epochs.args = {
+  ...basicProps,
+  depositInfo: {
+    txHash: 'deposit tx hash',
+    timestamp: new Date('2020-02-02').getTime().toString(),
+  },
+  withdrawInfo: {
+    txHash: 'withdraw tx hash',
+    timestamp: new Date('2020-02-03').getTime().toString(),
+  },
+  depositEpoch: '0xa0000000300', // 768
+  currentEpoch: '0xa000000030f', // 783
+}
+
+export const ImmatureForUnlock = Template.bind({})
+ImmatureForUnlock.args = {
+  ...basicProps,
+  depositInfo: {
+    txHash: 'deposit tx hash',
+    timestamp: new Date('2020-02-02').getTime().toString(),
+  },
+  withdrawInfo: {
+    txHash: 'withdraw tx hash',
+    timestamp: new Date('2020-02-03').getTime().toString(),
+  },
+  depositEpoch: '0xa0000000300', // 768
+  currentEpoch: '0xa00010003b4', // 948.1
+}
+
+export const Unlockable = Template.bind({})
+Unlockable.args = {
+  ...basicProps,
+  depositInfo: {
+    txHash: 'deposit tx hash',
+    timestamp: new Date('2020-02-02').getTime().toString(),
+  },
+  withdrawInfo: {
+    txHash: 'withdraw tx hash',
+    timestamp: new Date('2020-02-03').getTime().toString(),
+  },
+  depositEpoch: '0xa000900030a', // 778.9
+  currentEpoch: '0xa0009000476', // 1142.9
+}
+
+export const Unlocking = Template.bind({})
+Unlocking.args = {
+  ...basicProps,
+  depositInfo: {
+    txHash: 'deposit tx hash',
+    timestamp: new Date('2020-02-02').toString().toString(),
+  },
+  withdrawInfo: {
+    txHash: 'withdraw tx hash',
+    timestamp: new Date('2020-02-03').getTime().toString(),
+  },
+  unlockInfo: {
+    txHash: 'unlock tx hash',
+    timestamp: new Date().getTime().toString(),
+  },
+  depositEpoch: '0xa000900030a', // 778.9
+  currentEpoch: '0xa0009000476', // 1142.9
+  status: 'pending',
+}
+
+export const Unfolded = Template.bind({})
+Unfolded.args = {
+  ...basicProps,
+  depositOutPoint: undefined,
+  depositEpoch: '0xa0009000284', // 644.9
+  currentEpoch: '0xa000000030f', // 783
+  depositTimestamp: (Date.now() - 25 * 3600000).toString(),
+  unlockInfo: {
+    timestamp: Date.now().toString(),
+    txHash: 'unlock tx hash',
+  },
+  withdrawInfo: {
+    timestamp: (Date.now() - 24 * 3600_000).toString(),
+    txHash: 'withdraw tx hash',
+  },
+}
