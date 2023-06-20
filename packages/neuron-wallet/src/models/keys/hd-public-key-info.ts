@@ -1,4 +1,4 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { config, helpers } from '@ckb-lumos/lumos'
 import SystemScriptInfo from '../../models/system-script-info'
 import NetworksService from '../../services/networks'
 import Address, { AddressType } from './address'
@@ -11,13 +11,17 @@ export default class HdPublicKeyInfoModel {
   public description?: string
 
   public get address() {
-    return scriptToAddress(
+    const lumosOptions = NetworksService.getInstance().isMainnet()
+      ? { config: config.predefined.LINA }
+      : { config: config.predefined.AGGRON4 }
+
+    return helpers.encodeToAddress(
       {
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
         args: this.publicKeyInBlake160,
       },
-      NetworksService.getInstance().isMainnet()
+      lumosOptions
     )
   }
 

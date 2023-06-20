@@ -1,12 +1,11 @@
 import AddressService from './addresses'
 import WalletService, { Wallet } from './wallets'
 import Keychain from '../models/keys/keychain'
-import Blake2b from '../models/blake2b'
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
 import AddressParser from '../models/address-parser'
+import { hd, utils } from '@ckb-lumos/lumos'
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -40,8 +39,7 @@ export default class SignMessage {
 
   private static signByPrivateKey(privateKey: string, message: string): string {
     const digest = SignMessage.signatureHash(message)
-    const ecPair = new ECPair(privateKey)
-    const signature = ecPair.signRecoverable(digest)
+    const signature = hd.key.signRecoverable(digest, privateKey)
     return signature
   }
 
@@ -57,10 +55,8 @@ export default class SignMessage {
     }
     const oldSignature = '0x' + Buffer.from(signature, 'base64').toString('hex')
     const buffer = Buffer.from(message, 'utf-8')
-    const blake2b = new Blake2b()
-    blake2b.updateBuffer(buffer)
-    digest = blake2b.digest()
-    if (SignMessage.verify(address, oldSignature, digest)) {
+    const digestHash = utils.ckbHash(buffer)
+    if (SignMessage.verify(address, oldSignature, digestHash)) {
       return 'old-sign'
     }
   }
@@ -77,7 +73,7 @@ export default class SignMessage {
         '0x' + SignMessage.ec.recoverPubKey(msgBuffer, options, options.recoveryParam).encode('hex', true)
 
       const recoverBlake160 = AddressParser.toBlake160(address)
-      return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
+      return utils.ckbHash(publicKey).slice(0, 42) === recoverBlake160
     } catch (error) {
       return false
     }
@@ -85,9 +81,7 @@ export default class SignMessage {
 
   private static signatureHash(message: string) {
     const buffer = Buffer.from(SignMessage.magicString + message, 'utf-8')
-    const blake2b = new Blake2b()
-    blake2b.updateBuffer(buffer)
-    return blake2b.digest()
+    return utils.ckbHash(buffer)
   }
 
   private static getPrivateKey(wallet: Wallet, path: string, password: string): string {

@@ -1,5 +1,4 @@
 import { getConnection, In } from 'typeorm'
-import { addressToScript, scriptToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import {
   CapacityNotEnough,
   CapacityNotEnoughForChange,
@@ -30,6 +29,7 @@ import NFT from '../models/nft'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { MIN_CELL_CAPACITY } from '../utils/const'
+import { config, helpers, utils } from '@ckb-lumos/lumos'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -1142,7 +1142,8 @@ export default class CellsService {
     if (!multisigAddresses.length) {
       return {}
     }
-    const lockHashes = multisigAddresses.map(v => scriptToHash(addressToScript(v)))
+    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
+    const lockHashes = multisigAddresses.map(v => utils.computeScriptHash(helpers.addressToScript(v)))
     const connection = await getConnection()
     const [sql, parameters] = connection.driver.escapeQueryWithParameters(
       `
@@ -1171,13 +1172,13 @@ export default class CellsService {
 
     cells.forEach(c => {
       balances[
-        scriptToAddress(
+        helpers.encodeToAddress(
           {
             args: c.lockArgs,
             codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
             hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
           },
-          isMainnet
+          lumosOptions
         )
       ] = c.balance
     })

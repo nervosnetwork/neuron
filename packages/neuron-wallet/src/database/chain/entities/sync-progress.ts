@@ -1,10 +1,10 @@
 import { HexString } from '@ckb-lumos/base'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos'
 import { Entity, PrimaryColumn, Column } from 'typeorm'
 
 export enum SyncAddressType {
   Default,
-  Multisig
+  Multisig,
 }
 
 @Entity({ name: 'sync_progress' })
@@ -49,7 +49,7 @@ export default class SyncProgress {
     addressType?: SyncAddressType
   }) {
     const res = new SyncProgress()
-    res.hash = scriptToHash(obj.script)
+    res.hash = utils.computeScriptHash(obj.script)
     res.args = obj.script.args
     res.codeHash = obj.script.codeHash
     res.hashType = obj.script.hashType

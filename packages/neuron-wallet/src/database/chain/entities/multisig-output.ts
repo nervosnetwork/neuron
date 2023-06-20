@@ -1,7 +1,7 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
 import Script, { ScriptHashType } from '../../../models/chain/script'
 import OutPoint from '../../../models/chain/out-point'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos'
 import { OutputStatus } from '../../../models/chain/output'
 
 @Entity()
@@ -71,7 +71,7 @@ export default class MultisigOutput extends BaseEntity {
     entity.lockArgs = params.output.lock.args
     entity.lockCodeHash = params.output.lock.code_hash
     entity.lockHashType = params.output.lock.hash_type as ScriptHashType
-    entity.lockHash = scriptToHash({
+    entity.lockHash = utils.computeScriptHash({
       args: entity.lockArgs,
       codeHash: entity.lockCodeHash,
       hashType: entity.lockHashType,

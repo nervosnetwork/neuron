@@ -58,7 +58,7 @@ export default class IndexerConnector extends Connector<string | undefined> {
 
     await this.upsertTxHashes()
 
-    const indexerTipNumber = parseInt(indexerTipBlock.block_number, 16)
+    const indexerTipNumber = parseInt(indexerTipBlock.blockNumber, 16)
 
     const nextUnprocessedBlockTip = await IndexerCacheService.nextUnprocessedBlock([...this.addressesByWalletId.keys()])
     if (nextUnprocessedBlockTip) {

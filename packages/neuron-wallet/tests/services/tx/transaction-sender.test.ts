@@ -172,7 +172,9 @@ import {
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multisig'
-import { addressToScript, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { helpers } from '@ckb-lumos/lumos'
+import { bytes } from '@ckb-lumos/codec'
+import { blockchain } from '@ckb-lumos/base'
 
 const fakeScript = new Script(
   '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
@@ -850,7 +852,7 @@ describe('TransactionSender Test', () => {
       }
 
       const createMultisigConfig = (r: number, m: number, addresses: string[]): [string, MultisigConfigModel] => {
-        const blake160s = addresses.map(v => addressToScript(v).args)
+        const blake160s = addresses.map(v => helpers.addressToScript(v).args)
         const multiArgs = Multisig.hash(blake160s, r, m, addresses.length)
         return [
           multiArgs,
@@ -859,7 +861,7 @@ describe('TransactionSender Test', () => {
             r,
             m,
             n: addresses.length,
-            blake160s: addresses.map(v => addressToScript(v).args),
+            blake160s: addresses.map(v => helpers.addressToScript(v).args),
           }),
         ]
       }
@@ -873,7 +875,7 @@ describe('TransactionSender Test', () => {
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
-          blake160: addressToScript(addresses[0]).args,
+          blake160: helpers.addressToScript(addresses[0]).args,
           version: 'testnet',
         }
 
@@ -904,7 +906,7 @@ describe('TransactionSender Test', () => {
 
         const mockGAI = jest.fn()
         mockGAI.mockReturnValue(
-          [addr, addr, addr].map((v, idx) => ({ ...v, blake160: addressToScript(addresses[idx]).args }))
+          [addr, addr, addr].map((v, idx) => ({ ...v, blake160: helpers.addressToScript(addresses[idx]).args }))
         )
         let tx = Transaction.fromObject(transcationObject)
         it('first sign', async () => {
@@ -914,7 +916,7 @@ describe('TransactionSender Test', () => {
           tx = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const lock = (tx.witnesses[0] as WitnessArgs).lock!
           const serializedMultiSign: string = Multisig.serialize(
-            addresses.map(v => addressToScript(v).args),
+            addresses.map(v => helpers.addressToScript(v).args),
             1,
             2,
             3
@@ -952,7 +954,7 @@ describe('TransactionSender Test', () => {
         const addr = {
           walletId: fakeWallet.id,
           address: noMatchAddress,
-          blake160: addressToScript(noMatchAddress).args,
+          blake160: helpers.addressToScript(noMatchAddress).args,
           version: 'testnet',
         }
 
@@ -990,7 +992,7 @@ describe('TransactionSender Test', () => {
           const addr = {
             walletId: fakeWallet.id,
             path: `m/44'/309'/0'/0/0`,
-            blake160: addressToScript(addresses[0]).args,
+            blake160: helpers.addressToScript(addresses[0]).args,
             version: 'testnet',
           }
 
@@ -1000,17 +1002,18 @@ describe('TransactionSender Test', () => {
           const tx = Transaction.fromObject(transcationObject)
           tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
           const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
-          const expectedValue = serializeWitnessArgs({
+          const witness = {
             inputType: undefined,
             outputType: undefined,
             lock:
               Multisig.serialize(
-                addresses.map(v => addressToScript(v).args),
+                addresses.map(v => helpers.addressToScript(v).args),
                 1,
                 1,
                 2
               ) + witnessLock,
-          })
+          }
+          const expectedValue = bytes.hexify(blockchain.WitnessArgs.pack(witness))
           expect(res.witnesses[0]).toBe(expectedValue)
         })
       })
@@ -1024,7 +1027,7 @@ describe('TransactionSender Test', () => {
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
-          blake160: addressToScript(addresses[0]).args,
+          blake160: helpers.addressToScript(addresses[0]).args,
           version: 'testnet',
         }
 

@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos'
 import HexUtils from '../../utils/hex'
 import TypeChecker from '../../utils/type-checker'
 
@@ -34,7 +34,7 @@ export default class Script {
   }
 
   public computeHash(): string {
-    const hash: string = scriptToHash(this.toSDK())
+    const hash: string = utils.computeScriptHash(this.toSDK())
     return HexUtils.addPrefix(hash)
   }
 

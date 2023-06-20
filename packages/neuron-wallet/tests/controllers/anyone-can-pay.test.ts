@@ -3,7 +3,7 @@ import Transaction from '../../src/models/chain/transaction'
 import { ServiceHasNoResponse } from '../../src/exceptions'
 import { ResponseCode } from '../../src/utils/const'
 import AssetAccountInfo from '../../src/models/asset-account-info'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { helpers } from "@ckb-lumos/lumos"
 
 const generateAnyoneCanPayTxMock = jest.fn()
 const generateSudtMigrateAcpTxMock = jest.fn()
@@ -134,7 +134,7 @@ describe('anyone-can-pay-controller', () => {
       const address =
         'ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'
       await anyoneCanPayController.getHoldSudtCellCapacity(address, 'tokenID')
-      expect(getHoldSUDTCellCapacityMock).toHaveBeenCalledWith(addressToScript(address), 'tokenID')
+      expect(getHoldSUDTCellCapacityMock).toHaveBeenCalledWith(helpers.addressToScript(address), 'tokenID')
     })
     it('error address', async () => {
       const address = 'ct1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vqvyxgyfu4z8yq4t790um8jef7lpm40h2csv4cv7m'

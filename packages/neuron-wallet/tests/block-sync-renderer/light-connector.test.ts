@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos';
 import LightConnector from '../../src/block-sync-renderer/sync/light-connector'
 import SyncProgress from '../../src/database/chain/entities/sync-progress'
 import HexUtils from '../../src/utils/hex'
@@ -97,7 +97,7 @@ const script: CKBComponents.Script = {
   codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
   hashType: 'type'
 }
-const scriptHash = scriptToHash(script)
+const scriptHash = utils.computeScriptHash(script)
 const address = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2q8ux5aqem92xnwfmj5cl6e233phlwlysqhjx5w'
 
 describe('test light connector', () => {

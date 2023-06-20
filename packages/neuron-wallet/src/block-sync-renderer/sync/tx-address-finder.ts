@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { config, helpers } from '@ckb-lumos/lumos'
 import OutputEntity from '../../database/chain/entities/output'
 import NetworksService from '../../services/networks'
 import Output from '../../models/chain/output'
@@ -33,7 +33,8 @@ export default class TxAddressFinder {
 
     const outputsResult: [boolean, Output[], AnyoneCanPayInfo[]] = this.selectOutputs()
     const isMainnet = NetworksService.getInstance().isMainnet()
-    const outputAddresses: string[] = outputsResult[1].map(output => scriptToAddress(output.lock, isMainnet))
+    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
+    const outputAddresses: string[] = outputsResult[1].map(output => helpers.encodeToAddress(output.lock, lumosOptions))
 
     return [
       inputAddressesResult[0] || outputsResult[0],
@@ -86,6 +87,7 @@ export default class TxAddressFinder {
     const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
     const isMainnet = NetworksService.getInstance().isMainnet()
+    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
 
     let shouldSync = false
     for (const input of inputs) {
@@ -104,7 +106,7 @@ export default class TxAddressFinder {
       }
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
-        addresses.push(scriptToAddress(output.lockScript(), isMainnet))
+        addresses.push(helpers.encodeToAddress(output.lockScript(), lumosOptions))
       }
       if (output && SystemScriptInfo.isMultiSignScript(output.lockScript())) {
         const multiSignBlake160 = output.lockScript().args.slice(0, 42)

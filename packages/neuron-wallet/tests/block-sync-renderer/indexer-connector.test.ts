@@ -1,4 +1,4 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { config, helpers } from '@ckb-lumos/lumos'
 import { when } from 'jest-when'
 import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
@@ -147,7 +147,7 @@ describe('unit tests for IndexerConnector', () => {
     const shortAddressInfo = {
       lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
     }
-    const address = scriptToAddress(shortAddressInfo.lock, false)
+    const address = helpers.encodeToAddress(shortAddressInfo.lock, { config: config.predefined.AGGRON4 })
     const walletId1 = 'walletid1'
     const walletId2 = 'walletid2'
     const addressObj1: Address = {

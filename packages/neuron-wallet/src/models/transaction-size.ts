@@ -1,6 +1,7 @@
-import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils/lib/serialization/transaction'
 import HexUtils from '../utils/hex'
-import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
+import { bytes as bytesUtils, number } from '@ckb-lumos/codec'
+import { fixvec } from '@ckb-lumos/codec/lib/molecule/layout'
+import { blockchain } from '@ckb-lumos/base'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
@@ -28,7 +29,15 @@ export default class TransactionSize {
   }
 
   public static output(output: Output): number {
-    const bytes = serializeOutput(output.toSDK())
+    // const bytes = serializeOutput(output.toSDK())
+    const cellOutput = output.toSDK()
+    const bytes = bytesUtils.hexify(
+      blockchain.CellOutput.pack({
+        capacity: cellOutput.capacity,
+        lock: cellOutput.lock,
+        type: cellOutput.type || undefined, // TODO: null is not a packable type
+      })
+    )
     return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
@@ -54,9 +63,12 @@ export default class TransactionSize {
     return TransactionSize.output(sudtOutput)
   }
 
+  // TODO: the function name need to be changed, like getOutputDataSize
   public static outputData(data: string): number {
-    const bytes = serializeFixVec(data)
-    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    const fixvecCodec = fixvec(number.Uint8)
+    const serializedData = fixvecCodec.pack(Array.from(bytesUtils.bytify(data)))
+
+    return serializedData.byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
   // TODO: and here
@@ -66,9 +78,11 @@ export default class TransactionSize {
   }
 
   public static witness(witness: WitnessArgs | string): number {
-    const wit: string = typeof witness === 'string' ? witness : serializeWitnessArgs(witness.toSDK())
-    const bytes = serializeFixVec(wit)
-    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    const wit: string =
+      typeof witness === 'string' ? witness : bytesUtils.hexify(blockchain.WitnessArgs.pack(witness.toSDK()))
+    const fixvecCodec = fixvec(number.Uint8)
+    const serializedData = fixvecCodec.pack(Array.from(bytesUtils.bytify(wit)))
+    return serializedData.byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
   public static secpLockWitness(): number {

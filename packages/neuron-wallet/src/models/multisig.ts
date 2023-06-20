@@ -1,5 +1,5 @@
+import { utils } from '@ckb-lumos/lumos'
 import { MultisigPrefixError } from '../exceptions'
-import Blake2b from './blake2b'
 import SystemScriptInfo from './system-script-info'
 
 export interface MultisigPrefix {
@@ -24,7 +24,7 @@ export default class Multisig {
 
   static hash(blake160s: string[], r: number = 0, m: number = 1, n: number = 1): string {
     const serializeResult = Multisig.serialize(blake160s, r, m, n)
-    return Blake2b.digest(serializeResult).slice(0, 42)
+    return utils.ckbHash(serializeResult).slice(0, 42)
   }
 
   since(minutes: number, headerEpoch: string): string {

@@ -1,4 +1,4 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { config, helpers } from '@ckb-lumos/lumos'
 import AssetAccount from '../models/asset-account'
 import Transaction from '../models/chain/transaction'
 import AssetAccountService from '../services/asset-account-service'
@@ -81,11 +81,12 @@ export default class AssetAccountController {
     }
 
     const isMainnet = NetworksService.getInstance().isMainnet()
+    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
 
     const result = assetAccounts.map(aa => {
       return {
         ...aa,
-        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(aa.blake160), isMainnet),
+        address: helpers.encodeToAddress(assetAccountInfo.generateAnyoneCanPayScript(aa.blake160), lumosOptions),
       }
     })
 
@@ -125,12 +126,13 @@ export default class AssetAccountController {
 
     const assetAccountInfo = new AssetAccountInfo()
     const isMainnet = NetworksService.getInstance().isMainnet()
+    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
 
     return {
       status: ResponseCode.Success,
       result: {
         ...account,
-        address: scriptToAddress(assetAccountInfo.generateAnyoneCanPayScript(account.blake160), isMainnet),
+        address: helpers.encodeToAddress(assetAccountInfo.generateAnyoneCanPayScript(account.blake160), lumosOptions),
       },
     }
   }

@@ -3,11 +3,12 @@ import Input from './input'
 import Output from './output'
 import WitnessArgs from './witness-args'
 import HexUtils from '../../utils/hex'
-import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
 import BlockHeader from './block-header'
 import TypeCheckerUtils from '../../utils/type-checker'
 import OutPoint from './out-point'
 import { Signatures } from '../../models/offline-sign'
+import { bytes } from '@ckb-lumos/codec'
+import { blockchain, utils } from '@ckb-lumos/base'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -252,7 +253,7 @@ export default class Transaction {
       if (typeof wit === 'string') {
         return wit
       }
-      return serializeWitnessArgs(wit.toSDK())
+      return bytes.hexify(blockchain.WitnessArgs.pack(wit.toSDK()))
     })
   }
 
@@ -268,7 +269,24 @@ export default class Transaction {
   }
 
   public computeHash(): string {
-    return rawTransactionToHash(this.toSDKRawTransaction())
+    const rawTransaction = this.toSDKRawTransaction()
+    return utils.ckbHash(
+      blockchain.RawTransaction.pack({
+        ...rawTransaction,
+        outputs: rawTransaction.outputs.map(o => ({
+          ...o,
+          type: o.type || undefined,
+        })),
+        cellDeps: rawTransaction.cellDeps.map(cd => ({
+          ...cd,
+          outPoint: cd.outPoint!,
+        })),
+        cellInputs: rawTransaction.inputs.map(i => ({
+          ...i,
+          previousOutput: i.previousOutput!,
+        })),
+      })
+    )
   }
 
   public toSDKRawTransaction(): CKBComponents.RawTransaction {

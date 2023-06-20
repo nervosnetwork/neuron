@@ -28,7 +28,7 @@ import BufferUtils from '../../utils/buffer'
 import assert from 'assert'
 import AssetAccount from '../../models/asset-account'
 import AddressService from '../../services/addresses'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { helpers } from '@ckb-lumos/lumos'
 import MultisigConfigModel from '../../models/multisig-config'
 import WalletService from '../../services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
@@ -223,7 +223,7 @@ export class TransactionGenerator {
     if (hasChangeOutput) {
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
-      const output = new Output(changeCapacity.toString(), Script.fromSDK(addressToScript(changeAddress)))
+      const output = new Output(changeCapacity.toString(), Script.fromSDK(helpers.addressToScript(changeAddress)))
 
       tx.addOutput(output)
     }
@@ -1408,7 +1408,7 @@ export class TransactionGenerator {
         throw new MigrateSudtCellNoTypeError()
       }
       const receiverAcpCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(
-        Script.fromSDK(addressToScript(acpAddress)),
+        Script.fromSDK(helpers.addressToScript(acpAddress)),
         inputSudtCell.type
       )
       if (!receiverAcpCell) {

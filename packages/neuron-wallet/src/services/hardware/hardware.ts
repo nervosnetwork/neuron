@@ -1,6 +1,5 @@
 import type Transaction from '../../models/chain/transaction'
 import WitnessArgs from '../../models/chain/witness-args'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 import AddressService from '../../services/addresses'
 import TransactionSender from '../../services/transaction-sender'
 import Multisig from '../../models/multisig'
@@ -9,6 +8,8 @@ import DeviceSignIndexSubject from '../../models/subjects/device-sign-index-subj
 import type { DeviceInfo, ExtendedPublicKey, PublicKey } from './common'
 import { AccountExtendedPublicKey } from '../../models/keys/key'
 import AssetAccountInfo from '../../models/asset-account-info'
+import { blockchain } from '@ckb-lumos/base'
+import { bytes } from '@ckb-lumos/codec'
 
 export abstract class Hardware {
   public deviceInfo: DeviceInfo
@@ -84,7 +85,7 @@ export abstract class Hardware {
           if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
             return '0x'
           }
-          return serializeWitnessArgs(args.toSDK())
+          return bytes.hexify(blockchain.WitnessArgs.pack(args.toSDK()))
         })
         const blake160 = addressInfos.find(
           i => witnessesArgs[0].lockArgs.slice(0, 42) === Multisig.hash([i.blake160])
@@ -100,12 +101,12 @@ export abstract class Hardware {
         const signature = await this.signTransaction(
           walletID,
           tx,
-          witnesses.map(w => (typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK()))),
+          witnesses.map(w => (typeof w === 'string' ? w : bytes.hexify(blockchain.WitnessArgs.pack(w.toSDK())))),
           path
         )
         const wit = witnesses[0] as WitnessArgs
         wit.lock = serializedMultiSign + signature
-        witnesses[0] = serializeWitnessArgs(wit.toSDK())
+        witnesses[0] = bytes.hexify(blockchain.WitnessArgs.pack(wit.toSDK()))
         witnessesArgs[index].witness = witnesses[0]
         for (let i = 0; i < witnessesArgs.length; ++i) {
           witnessesArgs[i].witness = witnesses[i] as string
@@ -116,15 +117,17 @@ export abstract class Hardware {
           if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
             return '0x'
           }
-          return serializeWitnessArgs(args.toSDK())
+          return bytes.hexify(blockchain.WitnessArgs.pack(args.toSDK()))
         })
         const signture = await this.signTransaction(walletID, tx, serializedWitnesses, path, context)
         const witnessEntry = witnessSigningEntries.find(w => w.lockHash === lockHash)!
-        witnessEntry.witness = serializeWitnessArgs({
-          lock: '0x' + signture,
-          inputType: witnessEntry.witnessArgs.inputType ?? '',
-          outputType: '',
-        })
+        witnessEntry.witness = bytes.hexify(
+          blockchain.WitnessArgs.pack({
+            lock: '0x' + signture,
+            inputType: witnessEntry.witnessArgs.inputType ?? '',
+            outputType: '',
+          })
+        )
       }
     }
 

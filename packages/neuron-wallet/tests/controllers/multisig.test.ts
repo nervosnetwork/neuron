@@ -2,7 +2,7 @@ import { ResponseCode } from '../../src/utils/const'
 import MultisigService from '../../src/services/multisig'
 import MultisigController from '../../src/controllers/multisig'
 import CellsService from '../../src/services/cells'
-import { scriptToAddress, systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { config, helpers } from '@ckb-lumos/lumos'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -23,9 +23,9 @@ jest.mock('services/wallets', () => ({
     return {
       getCurrent() {
         return jest.fn()
-      }
+      },
     }
-  }
+  },
 }))
 
 jest.mock('../../src/services/multisig')
@@ -77,13 +77,13 @@ const multisigConfig = {
     params: {
       multisig_configs: {
         sighash_addresses: multisigBlake160s.map(args =>
-          scriptToAddress(
+          helpers.encodeToAddress(
             {
               args,
-              codeHash: systemScripts.SECP256K1_BLAKE160.codeHash,
-              hashType: systemScripts.SECP256K1_BLAKE160.hashType,
+              codeHash: config.predefined.AGGRON4.SCRIPTS.SECP256K1_BLAKE160.CODE_HASH,
+              hashType: config.predefined.AGGRON4.SCRIPTS.SECP256K1_BLAKE160.HASH_TYPE,
             },
-            false
+            { config: config.predefined.AGGRON4 }
           )
         ),
         require_first_n: 1,
@@ -97,13 +97,13 @@ const multisigConfig = {
     params: {
       multisig_configs: {
         sighash_addresses: multisigBlake160s.map(args =>
-          scriptToAddress(
+          helpers.encodeToAddress(
             {
               args,
-              codeHash: systemScripts.SECP256K1_BLAKE160.codeHash,
-              hashType: systemScripts.SECP256K1_BLAKE160.hashType,
+              codeHash: config.predefined.LINA.SCRIPTS.SECP256K1_BLAKE160.CODE_HASH,
+              hashType: config.predefined.LINA.SCRIPTS.SECP256K1_BLAKE160.HASH_TYPE,
             },
-            true
+            { config: config.predefined.LINA }
           )
         ),
         require_first_n: 1,

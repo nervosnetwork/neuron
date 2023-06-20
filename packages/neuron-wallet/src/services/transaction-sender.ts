@@ -1,7 +1,5 @@
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
-import { scriptToAddress, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
@@ -19,7 +17,6 @@ import WitnessArgs from '../models/chain/witness-args'
 import Transaction from '../models/chain/transaction'
 import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
-import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
 import HexUtils from '../utils/hex'
 import SystemScriptInfo from '../models/system-script-info'
@@ -32,7 +29,7 @@ import {
   NoMatchAddressForSign,
   SignTransactionFailed,
   CellIsNotYetLive,
-  TransactionIsNotCommittedYet
+  TransactionIsNotCommittedYet,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -44,6 +41,10 @@ import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import CellsService from './cells'
+import { config, hd, helpers } from '@ckb-lumos/lumos'
+import { utils } from '@ckb-lumos/lumos'
+import { blockchain } from '@ckb-lumos/base'
+import { bytes, number } from '@ckb-lumos/codec'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -195,7 +196,7 @@ export default class TransactionSender {
         if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
           return '0x'
         }
-        return serializeWitnessArgs(args.toSDK())
+        return bytes.hexify(blockchain.WitnessArgs.pack(args.toSDK()))
       })
       let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
@@ -213,7 +214,7 @@ export default class TransactionSender {
         )
         const wit = signed[0] as WitnessArgs
         wit.lock = serializedMultisig + wit.lock!.slice(2)
-        signed[0] = serializeWitnessArgs(wit.toSDK())
+        signed[0] = bytes.hexify(blockchain.WitnessArgs.pack(wit.toSDK()))
       } else {
         signed = signWitnesses(privateKey)({
           transactionHash: txHash,
@@ -329,7 +330,7 @@ export default class TransactionSender {
         if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
           return '0x'
         }
-        return serializeWitnessArgs(args.toSDK())
+        return bytes.hexify(blockchain.WitnessArgs.pack(args.toSDK()))
       })
       let witnesses: (string | WitnessArgs)[] = []
       const serializedMultiSign: string = Multisig.serialize(
@@ -351,7 +352,7 @@ export default class TransactionSender {
         wit.lock = await device!.signTransaction(
           walletID,
           tx,
-          witnesses.map(w => (typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK()))),
+          witnesses.map(w => (typeof w === 'string' ? w : bytes.hexify(blockchain.WitnessArgs.pack(w.toSDK())))),
           privateKey!,
           context
         )
@@ -366,7 +367,7 @@ export default class TransactionSender {
       tx.setSignatures(lockHash, blake160!)
       const signStatus = getMultisigStatus(multisigConfig, tx.signatures)
       if (signStatus === SignStatus.Signed) {
-        witnesses[0] = serializeWitnessArgs(wit.toSDK())
+        witnesses[0] = bytes.hexify(blockchain.WitnessArgs.pack(wit.toSDK()))
       } else {
         witnesses[0] = wit
       }
@@ -399,25 +400,24 @@ export default class TransactionSender {
       ...firstWitness,
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
-    const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
+    const serializedEmptyWitness = bytes.hexify(blockchain.WitnessArgs.pack(emptyWitness.toSDK()))
     const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
-    const blake2b = new Blake2b()
-    blake2b.update(txHash)
-    blake2b.update(toUint64Le(`0x${serialziedEmptyWitnessSize.toString(16)}`))
-    blake2b.update(serializedEmptyWitness)
+    const ckbHasher = new utils.CKBHasher()
+    ckbHasher.update(txHash)
+    ckbHasher.update(number.Uint64LE.pack(`0x${serialziedEmptyWitnessSize.toString(16)}`))
+    ckbHasher.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {
-      const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
+      const wit: string = typeof w === 'string' ? w : bytes.hexify(blockchain.WitnessArgs.pack(w.toSDK()))
       const byteLength = HexUtils.byteLength(wit)
-      blake2b.update(toUint64Le(`0x${byteLength.toString(16)}`))
-      blake2b.update(wit)
+      ckbHasher.update(number.Uint64LE.pack(`0x${byteLength.toString(16)}`))
+      ckbHasher.update(wit)
     })
 
-    const message = blake2b.digest()
+    const message = ckbHasher.digestHex()
 
     if (!wallet.isHardware()) {
-      const keyPair = new ECPair(privateKeyOrPath)
-      emptyWitness.lock = keyPair.signRecoverable(message)
+      emptyWitness.lock = hd.key.signRecoverable(message, privateKeyOrPath)
     }
 
     return [emptyWitness, ...restWitnesses]
@@ -506,7 +506,10 @@ export default class TransactionSender {
         multisigConfig.m,
         multisigConfig.n
       )
-      const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
+      const isMainnet = NetworksService.getInstance().isMainnet()
+      const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
+
+      const multisigAddresses = helpers.encodeToAddress(lockScript, lumosOptions)
       const tx: Transaction = await TransactionGenerator.generateTx(
         '',
         targetOutputs,

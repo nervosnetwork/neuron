@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { config, helpers } from '@ckb-lumos/lumos'
 import { AddressType } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { Address, AddressVersion } from '../../src/models/address'
@@ -97,7 +97,7 @@ describe('queue', () => {
   const shortAddressInfo = {
     lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
   }
-  const address = scriptToAddress(shortAddressInfo.lock, false)
+  const address = helpers.encodeToAddress(shortAddressInfo.lock, { config: config.predefined.AGGRON4 })
   const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,

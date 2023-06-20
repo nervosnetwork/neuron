@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos'
 import Multisig from './multisig'
 
 export default class MultisigConfigModel {
@@ -51,6 +51,6 @@ export default class MultisigConfigModel {
   }
 
   public getLockHash() {
-    return scriptToHash(Multisig.getMultisigScript(this.blake160s, this.r, this.m, this.n))
+    return utils.computeScriptHash(Multisig.getMultisigScript(this.blake160s, this.r, this.m, this.n))
   }
 }

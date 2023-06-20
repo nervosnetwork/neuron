@@ -8,7 +8,7 @@ import { OutputStatus } from '../../src/models/chain/output'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 import Multisig from '../../src/models/multisig'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos';
 
 const [alice, bob, charlie] = keyInfos
 
@@ -265,7 +265,7 @@ describe('multisig service', () => {
   describe('deleteRemovedMultisigOutput', () => {
     it('delete cell thats config not in db', async () => {
       const output = MultisigOutput.fromIndexer(defaultOutput)
-      output.lockHash = scriptToHash(alice.lockScript)
+      output.lockHash = utils.computeScriptHash(alice.lockScript)
       output.outPointTxHash = '0x9821d3184b5743726e4686541a74213eaa63e2d8f4fb9ee9ff50878aa9177c87'
       await getConnection().manager.save(output)
       await MultisigService.deleteRemovedMultisigOutput()

@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { utils } from '@ckb-lumos/lumos'
 import LiveCellService from '../services/live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
 import Script, { ScriptHashType } from '../models/chain/script'
@@ -41,7 +41,7 @@ export default class SUDTController {
     const script = new Script(assetAcount.infos.sudt.codeHash, params.tokenID, assetAcount.infos.sudt.hashType)
     return {
       status: ResponseCode.Success,
-      result: scriptToHash(script.toSDK()),
+      result: utils.computeScriptHash(script.toSDK()),
     }
   }
 }

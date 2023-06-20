@@ -1,11 +1,11 @@
 import Script, { ScriptHashType } from './chain/script'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { helpers } from '@ckb-lumos/lumos'
 import SystemScriptInfo from './system-script-info'
 
 export default class AddressParser {
   public static parse(address: string): Script {
     try {
-      const script = addressToScript(address)
+      const script = helpers.addressToScript(address)
       return new Script(script.codeHash, script.args, script.hashType as ScriptHashType)
     } catch {
       throw new Error('Address format error')
