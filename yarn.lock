@@ -2180,7 +2180,7 @@
     rxjs "6"
     semver "^7.3.5"
 
-"@ledgerhq/devices@^8.0.1", "@ledgerhq/devices@^8.0.3":
+"@ledgerhq/devices@^8.0.3":
   version "8.0.3"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-8.0.3.tgz#bca76789b9dec2353ea8b089f7bd183ed3047afd"
   integrity sha512-Q7/vqkGELSBuwFafFoTqlHIRyOjw8JqbSgiQwe2R38xN0RKtKIh+5E6UfMKyoExiq+SrQg0IC8P2LS+XdjOHLw==
@@ -2195,12 +2195,12 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-5.50.0.tgz#e3a6834cb8c19346efca214c1af84ed28e69dad9"
   integrity sha512-gu6aJ/BHuRlpU7kgVpy2vcYk6atjB4iauP2ymF7Gk0ez0Y/6VSMVSJvubeEQN+IV60+OBK0JgeIZG7OiHaw8ow==
 
-"@ledgerhq/errors@^6.12.4", "@ledgerhq/errors@^6.12.6":
+"@ledgerhq/errors@^6.12.6":
   version "6.12.6"
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-6.12.6.tgz#f89c82c91c2930f34bc3e0d86a27ec7b6e6e4f5f"
   integrity sha512-D+r2B09vaRO06wfGoss+rNgwqWSoK0bCtsaJWzlD2hv1zxTtucqVtSztbRFypIqxWTCb3ix5Nh2dWHEJVTp2Xw==
 
-"@ledgerhq/hw-transport-node-hid-noevents@^6.27.13":
+"@ledgerhq/hw-transport-node-hid-noevents@^6.27.15":
   version "6.27.15"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid-noevents/-/hw-transport-node-hid-noevents-6.27.15.tgz#fbf968ac6fa9345f2642da609f3bdf3236a3ae37"
   integrity sha512-cLf/Egp4+WWUlKT5Zi9BZTmlMcdVQKftmnfb/LIeVnoiN2tn6a3vx51+o7voqVzSKWYSQwwwTjVVI4ayf+Av3A==
@@ -2211,15 +2211,15 @@
     "@ledgerhq/logs" "^6.10.1"
     node-hid "^2.1.2"
 
-"@ledgerhq/hw-transport-node-hid@6.27.13":
-  version "6.27.13"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-6.27.13.tgz#741644d7b8761f682b36eda36e1bf7876357efda"
-  integrity sha512-j4c1UOMylX9cE9ebTh+qqMfzZDJpK8WZ7/kalxdY/MHWQcO+F2XAMvEqdZOaMjSIhI0vbgL/OoEvO2nxGFhObA==
+"@ledgerhq/hw-transport-node-hid@6.27.15":
+  version "6.27.15"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-6.27.15.tgz#cec5d41166731815f465d0b226f139cd33659214"
+  integrity sha512-gycGBlnc8GJPvpbMORJ2kh/Uue8KspBc5sStfc7dY8w9GrUyLUT2XMKuTlljw/qOSBhDBTsjhRXKwxxtHsytuQ==
   dependencies:
-    "@ledgerhq/devices" "^8.0.1"
-    "@ledgerhq/errors" "^6.12.4"
-    "@ledgerhq/hw-transport" "^6.28.2"
-    "@ledgerhq/hw-transport-node-hid-noevents" "^6.27.13"
+    "@ledgerhq/devices" "^8.0.3"
+    "@ledgerhq/errors" "^6.12.6"
+    "@ledgerhq/hw-transport" "^6.28.4"
+    "@ledgerhq/hw-transport-node-hid-noevents" "^6.27.15"
     "@ledgerhq/logs" "^6.10.1"
     lodash "^4.17.21"
     node-hid "^2.1.2"
@@ -2234,7 +2234,7 @@
     "@ledgerhq/errors" "^5.50.0"
     events "^3.3.0"
 
-"@ledgerhq/hw-transport@^6.28.2", "@ledgerhq/hw-transport@^6.28.4":
+"@ledgerhq/hw-transport@^6.28.4":
   version "6.28.4"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-6.28.4.tgz#c2fc5bff4fca71ac44f069b775d33d0b1b5d9000"
   integrity sha512-fB2H92YQjidmae2GFCmOGPwkZWk0lvTu0tlLlzfiY0wRheAG+DEgjnqhdU8wmydkPLIj0WUjRgldtnJtg/a2iQ==
@@ -9091,10 +9091,10 @@ electron-window-state@5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
-electron@24.1.1:
-  version "24.1.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-24.1.1.tgz#05fa6269b1ee303fed7a05de9eb4be56c46660b8"
-  integrity sha512-ymjUMe6Pvh9ytpM4lOvr+Qxd6NG5AELRtR6tw54bK3FXfKtTTKKAtZw/NbwHwkRAlWu8FNAGOuvCoap6/bm9LQ==
+electron@24.5.1:
+  version "24.5.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-24.5.1.tgz#86e314cd6b322f44e62355d3ad1f39d64f341c3f"
+  integrity sha512-OxMDJj9q+XwmHb6Annc9jpRPV/HmiXyhAcl6LEin/cqDHKR+LCLx7PcXfMs/qKMVxER/TBbG7PglpjnkUMlG+w==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^18.11.18"
