@@ -6,11 +6,12 @@ import SUDTAvatar from 'widgets/SUDTAvatar'
 import Button from 'widgets/Button'
 import Table, { TableProps } from 'widgets/Table'
 import TextField from 'widgets/TextField'
-import CopyZone from 'widgets/CopyZone'
-import { Confirming, DownloadIcon, SearchIcon, ArrowOpenRightIcon } from 'widgets/Icons/icon'
+import { DownloadIcon, SearchIcon, ArrowOpenRightIcon } from 'widgets/Icons/icon'
 
 import PageContainer from 'components/PageContainer'
-import { getDisplayName, isTonkenInfoStandardUAN, UANTonkenSymbol } from 'components/UANDisplay'
+import TransactionStatusWrap from 'components/TransactionStatusWrap'
+import FormattedTokenAmount from 'components/FormattedTokenAmount'
+import { getDisplayName, isTonkenInfoStandardUAN } from 'components/UANDisplay'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { exportTransactions } from 'services/remote'
 
@@ -27,10 +28,9 @@ import {
   sUDTAmountFormatter,
   sudtValueToAmount,
   shannonToCKBFormatter,
-  complexNumberToPureNumber,
 } from 'utils'
 import { onEnter } from 'utils/inputDevice'
-import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS, HIDE_BALANCE } from 'utils/const'
+import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import RowExtend from './RowExtend'
 
 import { useSearch } from './hooks'
@@ -150,8 +150,7 @@ const History = () => {
     {
       title: t('history.table.name'),
       dataIndex: 'name',
-      width: '130px',
-      minWidth: '',
+      minWidth: '110px',
       render(_, __, item) {
         const { name } = handleTransactionInfo(item)
         return (
@@ -170,7 +169,7 @@ const History = () => {
       title: t('history.table.type'),
       dataIndex: 'type',
       align: 'left',
-      width: '100px',
+      minWidth: '100px',
       render: (_, __, item) => {
         const { typeLabel } = handleTransactionInfo(item)
         return typeLabel
@@ -181,64 +180,29 @@ const History = () => {
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,
-      minWidth: '150px',
+      minWidth: '220px',
       render(_, __, item, show) {
-        let amount = '--'
-        let sudtAmount = ''
-        let isReceive = false
-
-        if (item.blockNumber !== undefined) {
-          if (item.nftInfo) {
-            // NFT
-            const { type, data } = item.nftInfo
-            amount = show ? `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}` : `${HIDE_BALANCE}mNFT`
-            isReceive = type === 'receive'
-          } else if (item.sudtInfo?.sUDT) {
-            if (item.sudtInfo.sUDT.decimal) {
-              sudtAmount = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
-            }
-          } else {
-            amount = show ? `${shannonToCKBFormatter(item.value, true)} CKB` : `${HIDE_BALANCE} CKB`
-            isReceive = !amount.includes('-')
-          }
-        }
-
-        return (
-          <CopyZone content={`${complexNumberToPureNumber(sudtAmount && sudtAmount !== '' ? sudtAmount : amount)}`}>
-            {sudtAmount ? (
-              <>
-                {show ? sudtAmount : HIDE_BALANCE}&nbsp;
-                <UANTonkenSymbol
-                  className={styles.symbol}
-                  name={item.sudtInfo!.sUDT.tokenName}
-                  symbol={item.sudtInfo!.sUDT.symbol}
-                />
-              </>
-            ) : (
-              <span className={show && isReceive ? styles.isReceive : ''}>{amount}</span>
-            )}
-          </CopyZone>
-        )
+        return <FormattedTokenAmount item={item} show={show} isNeedCopy />
       },
     },
     {
       title: t('history.table.timestamp'),
       dataIndex: 'timestamp',
       align: 'left',
+      minWidth: '150px',
       render: (_, __, item) => uniformTimeFormatter(item.timestamp),
     },
     {
       title: t('history.table.status'),
       dataIndex: 'status',
       align: 'left',
+      minWidth: '50px',
       render(_, __, item) {
-        const confirmations = 1 + bestBlockNumber - +item.blockNumber
-        let status = item.status as string
-        if (status === 'success' && confirmations < CONFIRMATION_THRESHOLD) {
-          status = 'confirming'
-        }
+        const confirmationCount = 1 + bestBlockNumber - +item.blockNumber
+        const status =
+          item.status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD ? 'confirming' : item.status
 
-        return status === 'confirming' ? <Confirming className={styles.confirm} /> : t(`history.${status}`)
+        return <TransactionStatusWrap status={status} confirmationCount={confirmationCount} />
       },
     },
     {

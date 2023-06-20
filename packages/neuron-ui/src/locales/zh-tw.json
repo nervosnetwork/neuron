@@ -123,19 +123,11 @@
       "status": "狀態",
       "amount": "金額",
       "address": "地址",
-      "confirmation": "{{confirmationCount}} 個確認",
-      "confirmations": "{{confirmationCount}} 個確認",
       "sent": "已發送",
       "sending": "正在發送",
       "received": "已收款",
       "receiving": "正在收款",
       "more": "查看更多",
-      "statusLabel": {
-        "success": "成功",
-        "failed": "失敗",
-        "pending": "已提交",
-        "confirming": "確認中"
-      },
       "copy-balance": "複製餘額",
       "create": "創建 {{name}} 資產賬戶",
       "destroy": "銷毀 {{name}} 資產賬戶",
@@ -249,6 +241,15 @@
       "save-qr-code": "保存收款碼",
       "copy-qr-code": "復制收款碼圖片"
     },
+
+    "transaction-status": {
+      "pending": "已提交",
+      "success": "成功",
+      "failed": "失敗",
+      "confirming": "確認中"
+    },
+    "confirmationsCount_one": "{{count}} 個確認",
+    "confirmationsCount_other": "{{count}} 個確認",
     "history": {
       "title": "交易歷史",
       "title-detail": "交易詳情",
@@ -270,10 +271,6 @@
       "last": "最後一頁",
       "description": "備註",
       "status": "狀態",
-      "pending": "已提交",
-      "success": "成功",
-      "failed": "失敗",
-      "confirming": "確認中",
       "blockNumber": "區塊高度",
       "basic-information": "基本資訊",
       "search": {
@@ -289,7 +286,7 @@
         "operation": "操作"
       },
       "export-history": "導出交易歷史",
-      "confirmations": "確認次數",
+      "confirmationTimes": "確認次數",
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",
       "no-txs": "沒有交易記錄",

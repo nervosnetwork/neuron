@@ -65,7 +65,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
         <div className={styles.extendBox} style={{ gridColumn: `${2 / columns.length}` }}>
           <div className={styles.infoBox}>
             <div className={clsx(styles.infoBlock, styles.confirmCount)}>
-              <div className={styles.infoBlockTitle}>{t('history.confirmations')}</div>
+              <div className={styles.infoBlockTitle}>{t('history.confirmationTimes')}</div>
               <div>{confirmationsLabel}</div>
             </div>
             <div className={styles.infoBlock}>
