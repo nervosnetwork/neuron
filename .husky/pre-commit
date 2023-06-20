@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-lerna run --no-bail --stream precommit
+npx lerna run --no-bail --stream precommit
