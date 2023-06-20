@@ -77,7 +77,7 @@
     "@storybook/testing-library": "0.0.13",
     "@types/enzyme": "3.10.13",
     "@types/enzyme-adapter-react-16": "1.0.6",
-    "@types/node": "18.15.11",
+    "@types/node": "18.16.18",
     "@types/react": "17.0.62",
     "@types/react-dom": "17.0.20",
     "@types/react-router-dom": "5.3.3",

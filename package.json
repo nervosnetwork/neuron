@@ -40,7 +40,7 @@
   "devDependencies": {
     "@babel/core": "7.22.5",
     "@types/jest": "27.5.2",
-    "@types/node": "18.15.11",
+    "@types/node": "18.16.18",
     "@types/npmlog": "4.1.4",
     "@typescript-eslint/eslint-plugin": "5.58.0",
     "@typescript-eslint/parser": "5.58.0",
