@@ -6,6 +6,8 @@ import TextField from 'widgets/TextField'
 
 import { shannonToCKBFormatter } from 'utils'
 
+import styles from './sendMetaInfo.module.scss'
+
 interface SendMetaInfoProps {
   outputs: unknown[]
   errorMessage: string
@@ -34,21 +36,25 @@ const SendMetaInfo = ({
     <>
       {outputs.length > 1 || errorMessage ? (
         <TextField
+          className={styles.textFieldClass}
           field="totalAmount"
           label={t('send.total-amount')}
-          value={`${shannonToCKBFormatter(totalAmount)} CKB`}
+          value={shannonToCKBFormatter(totalAmount)}
           readOnly
           error={errorMessage}
+          width="100%"
         />
       ) : null}
-      <TransactionFeePanel fee={shannonToCKBFormatter(fee)} price={price} onPriceChange={handlePriceChange} />
       <TextField
+        className={styles.textFieldClass}
         field="description"
         label={t('send.description')}
         value={description}
         onChange={handleDescriptionChange}
         disabled={sending}
+        width="100%"
       />
+      <TransactionFeePanel fee={shannonToCKBFormatter(fee)} price={price} onPriceChange={handlePriceChange} />
     </>
   )
 }

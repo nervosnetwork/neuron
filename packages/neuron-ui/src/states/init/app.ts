@@ -52,6 +52,7 @@ export const appState: State.App = {
   showAllNotifications: false,
   isAllowedToFetchList: true,
   loadedTransaction: null,
+  showWaitForFullySynced: true,
 }
 
 export default appState

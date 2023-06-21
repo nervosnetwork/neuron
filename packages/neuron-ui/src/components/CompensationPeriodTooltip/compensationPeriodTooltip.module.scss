@@ -1,45 +1,48 @@
-$tile-green: #3cc68a;
-$tile-yellow: #f7ae4d;
-$tile-grey: #e3e3e3;
-$tile-green-hover: #21b574;
-$tile-yellow-hover: #fa8f00;
-$tile-grey-hover: #888;
-$divider-color: #b3b3b3;
 $arrow-size: 10px;
 
 .container {
+  --tile-green: #00c891;
+  --tile-yellow: #f78c2a;
+  --tile-grey: #f0f0f0;
+
   position: relative;
-  background: #fff;
-  width: 320px;
+  background: var(--third-background-color);
+  width: 280px;
   margin-top: $arrow-size;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
-  border-radius: 2px;
+  border-radius: 8px;
   font-size: 0.75rem;
+  filter: drop-shadow(0px 2px 10px var(--main-shadow-color));
 
   .compensated {
     display: flex;
     justify-content: space-between;
-    padding: 10px 15px;
+    padding: 14px 12px;
     font-weight: 500;
-
-    span:first-child {
-      font-weight: 900;
-    }
+    font-size: 14px;
   }
 
   .divider {
-    margin: 0 5px;
+    margin: 0 12px;
     height: 1px;
-    background: $divider-color;
+    background: #f0f0f0;
+
+    @media (prefers-color-scheme: dark) {
+      background: var(--secondary-background-color);
+    }
   }
 
   .times {
-    padding: 0 15px;
-    color: #666;
+    padding: 0 12px;
     overflow: hidden;
+    font-size: 14px;
+    line-height: 20px;
+
+    @media (prefers-color-scheme: dark) {
+      color: #cccccc;
+    }
 
     .time {
-      color: #000;
+      font-weight: 500;
     }
 
     .immature,
@@ -47,34 +50,36 @@ $arrow-size: 10px;
     .suggested,
     .ending {
       position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       margin: 15px 0;
       padding-left: 18px;
-      line-height: 1.15;
 
       &::before {
         position: absolute;
-        top: 0;
+        top: 5px;
         left: 0;
         display: block;
         content: '';
-        width: 13px;
-        height: 13px;
+        width: 8px;
+        height: 8px;
+        border: 1px solid #e5e5e5;
+        border-radius: 50%;
       }
     }
-    .immature{
-      font-weight: 900;
-    }
 
-    .normal::before,.immature::before {
-      background-color: $tile-grey;
+    .normal::before,
+    .immature::before {
+      background-color: var(--tile-grey);
     }
 
     .suggested::before {
-      background-color: $tile-green;
+      background-color: var(--tile-green);
     }
 
     .ending::before {
-      background-color: $tile-yellow;
+      background-color: var(--tile-yellow);
     }
   }
 
@@ -88,24 +93,12 @@ $arrow-size: 10px;
     .normal {
       display: none;
     }
-
-    .suggested {
-      .time {
-        font-weight: bold;
-      }
-    }
   }
 
   &[data-stage='ending'] {
     .normal,
     .suggested {
       display: none;
-    }
-
-    .ending {
-      .time {
-        font-weight: bold;
-      }
     }
   }
 
@@ -119,7 +112,6 @@ $arrow-size: 10px;
     width: 0;
     height: 0;
     border: $arrow-size solid transparent;
-    border-bottom-color: #fff;
-    filter: drop-shadow(0px -1px 1px rgba(0, 0, 0, 0.1));
+    border-bottom-color: var(--third-background-color);
   }
 }

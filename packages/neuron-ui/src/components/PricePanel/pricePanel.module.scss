@@ -3,11 +3,13 @@
 .pricePanel {
   display: flex;
   justify-content: space-between;
-  font-size: 0.875rem;
-  line-height: 1.125rem;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 8px;
 
   .transferSwitch {
     display: flex;
+    color: var(--secondary-text-color);
   }
 }
 
@@ -17,12 +19,15 @@
   position: relative;
   border: none;
   background: none;
+  svg > path {
+    fill: var(--secondary-text-color);
+  }
 
   &:hover {
     font-size: 14px;
 
     svg > path {
-      fill: var(--active-color);
+      fill: var(--primary-color);
     }
 
     &::after {
@@ -57,6 +62,14 @@
 
 .dropdownBox {
   margin: 4px 0px 19px 0px;
+  --tag-red-bg-color: #FFE8E8;
+  --tag-green-bg-color: #EFFAF7;
+  --tag-blue-bg-color: #E8FAFF;
+  @media (prefers-color-scheme: dark) {
+    --tag-red-bg-color: #322929;
+    --tag-green-bg-color: #2E3735;
+    --tag-blue-bg-color: #2D3638;
+  }
 }
 .suffix {
   font-family: inherit;
@@ -73,21 +86,33 @@
   align-items: center;
   font-size: 14px;
   gap: 4px;
+  color: var(--secondary-text-color);
 }
 .labelWrap {
-  color: #333;
+  color: var(--main-text-color);
   font-weight: 500;
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 20px;
 
   .labelComment {
     display: inline-block;
     font-weight: 400;
-    background-color: #effaf7;
-    color: #00c891;
-    padding: 2px 8px;
+    padding: 8px 12px;
     border-radius: 24px;
     margin-left: 8px;
-    font-size: 10px;
-    line-height: 14px;
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .green {
+    color: #00C891;
+    background: var(--tag-green-bg-color);
+  }
+  .blue {
+    color: #23BFF0;
+    background: var(--tag-blue-bg-color);
+  }
+  .red {
+    color: #FF5656;
+    background: var(--tag-red-bg-color);
   }
 }

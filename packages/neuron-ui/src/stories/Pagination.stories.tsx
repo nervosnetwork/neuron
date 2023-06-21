@@ -1,51 +1,53 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { ComponentStory } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
-import { withKnobs, number } from '@storybook/addon-knobs'
-import Pagination, { PaginationProps } from 'widgets/Pagination'
+import Pagination from 'widgets/Pagination'
 
-const stories = storiesOf('Pagination', module)
-const onChange = action('onclick')
-
-const propsList: { [name: string]: PaginationProps } = {
-  '1 page': {
-    pageNo: 1,
-    count: 10,
-    pageSize: 15,
-    onChange,
-  },
-  'at the fisrt page': {
-    pageNo: 1,
-    count: 100,
-    pageSize: 15,
-    onChange,
-  },
-  'at the last page': {
-    pageNo: 7,
-    count: 100,
-    pageSize: 15,
-    onChange,
-  },
-  'more than 5 pages': {
-    pageNo: 6,
-    count: 100,
-    pageSize: 15,
-    onChange,
+export default {
+  title: 'Pagination',
+  component: Pagination,
+  argTypes: {
+    onChange: {
+      table: {
+        disable: true,
+      },
+    },
   },
 }
 
-Object.entries(propsList).forEach(([title, props]) => {
-  stories.add(title, () => {
-    return <Pagination {...props} />
-  })
-})
+const onChange = action('onclick')
 
-stories.addDecorator(withKnobs).add('with knobs', () => {
-  const props = {
-    pageNo: number('page no', 1),
-    count: number('count', 100),
-    pageSize: number('page size', 15),
-    onChange,
-  }
-  return <Pagination {...props} />
-})
+const Template: ComponentStory<typeof Pagination> = (props: any) => <Pagination {...props} />
+
+export const OnlyOnePage = Template.bind({})
+OnlyOnePage.args = {
+  pageNo: 1,
+  count: 10,
+  pageSize: 15,
+  onChange,
+}
+OnlyOnePage.storyName = '1 page'
+
+export const AtTheFisrtPage = Template.bind({})
+AtTheFisrtPage.args = {
+  pageNo: 1,
+  count: 100,
+  pageSize: 15,
+  onChange,
+}
+
+export const AtTheLastPage = Template.bind({})
+AtTheLastPage.args = {
+  pageNo: 7,
+  count: 100,
+  pageSize: 15,
+  onChange,
+}
+
+export const MoreThan5Pages = Template.bind({})
+MoreThan5Pages.args = {
+  pageNo: 6,
+  count: 100,
+  pageSize: 15,
+  onChange,
+}

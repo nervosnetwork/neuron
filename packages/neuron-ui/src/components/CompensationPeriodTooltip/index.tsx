@@ -66,7 +66,7 @@ const CompensationPeriodTooltip = ({
         <div className={styles.times}>
           <div className={styles[stage]}>
             <div className={styles.time}>{uniformTimeFormatter(baseEpochTimestamp)}</div>
-            <div style={{ fontWeight: 900 }}>{t('nervos-dao.compensation-period.tooltip.withdrawn')}</div>
+            <div>{t('nervos-dao.compensation-period.tooltip.withdrawn')}</div>
           </div>
         </div>
       </div>

@@ -11,8 +11,13 @@ import {
   getDAOCellStatus,
   CellStatus,
   epochParser,
+  clsx,
+  RoutePath,
 } from 'utils'
 import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
+import { Clock } from 'widgets/Icons/icon'
+import { Link } from 'react-router-dom'
+import { HIDE_BALANCE } from 'utils/const'
 
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
@@ -34,16 +39,16 @@ export interface DAORecordProps extends State.NervosDAORecord {
   withdrawCapacity: string | null // capacity that is available for withdraw
   connectionStatus: 'online' | 'offline' | 'connecting' // connection status
   onClick: React.EventHandler<React.MouseEvent> // on action button click
-  onToggle: () => void
-  isCollapsed?: boolean
   tipBlockTimestamp: number // tip block timestamp, used to calculate apc, dovetails with current epoch
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc
+  isPrivacyMode?: boolean
 }
 
 export const DAORecord = ({
   blockHash,
   tipBlockTimestamp,
   capacity,
+  depositOutPoint,
   outPoint: { txHash, index },
   timestamp,
   genesisBlockTimestamp,
@@ -53,11 +58,10 @@ export const DAORecord = ({
   connectionStatus,
   onClick,
   status,
-  isCollapsed = true,
-  onToggle,
   depositInfo,
   withdrawInfo,
   unlockInfo,
+  isPrivacyMode,
 }: DAORecordProps) => {
   const [t] = useTranslation()
   const [withdrawEpoch, setWithdrawEpoch] = useState('')
@@ -74,7 +78,6 @@ export const DAORecord = ({
   })
 
   hooks.useUpdateWithdrawEpochs({ isWithdrawn, blockHash, setWithdrawEpoch, setWithdrawTimestamp })
-  const onTxRecordClick = hooks.useOnTxRecordClick()
 
   const currentEpochValue = epochParser(currentEpoch).value
   const depositEpochInfo = epochParser(depositEpoch)
@@ -143,146 +146,141 @@ export const DAORecord = ({
   const isActionAvailable =
     connectionStatus === 'online' && [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus)
 
-  const progressOrPeriod =
-    CellStatus.Completed === cellStatus ? (
-      <>
-        {lockedPeriod ? (
-          <div className={styles.lockedPeriod}>
-            <span>{`${t('nervos-dao.deposit-record.locked-period')}:`}</span>
-            <span>{t('nervos-dao.deposit-record.days-hours', getDaysAndHours(lockedPeriod))}</span>
-          </div>
-        ) : null}
-        {compensatedPeriod ? (
-          <div className={styles.compensatedPeriod}>
-            <span>{`${t('nervos-dao.deposit-record.compensated-period')}:`}</span>
-            <span>{t('nervos-dao.deposit-record.days-hours', getDaysAndHours(compensatedPeriod))}</span>
-          </div>
-        ) : null}
-      </>
-    ) : (
-      <>
-        <div className={styles.stage}>
-          <CompensationProgressBar
-            pending={CellStatus.Depositing === cellStatus}
-            currentEpochValue={currentEpochValue}
-            endEpochValue={compensationEndEpochValue}
-            withdrawEpochValue={withdrawEpochValue}
-          />
-          <div className={styles.tooltip}>
-            {CellStatus.Depositing === cellStatus ? null : (
-              <CompensationPeriodTooltip
-                depositEpochValue={depositEpochValue}
-                baseEpochTimestamp={withdrawEpochValue ? +withdrawTimestamp : tipBlockTimestamp}
-                baseEpochValue={withdrawEpochValue || currentEpochValue}
-                endEpochValue={compensationEndEpochValue}
-                isWithdrawn={!!withdrawEpochValue}
-              />
-            )}
-          </div>
-          <span className={styles.message}>{message}</span>
+  const depositOutPointKey = depositOutPoint
+    ? `${depositOutPoint.txHash}-${depositOutPoint.index}`
+    : `${txHash}-${index}`
+  const badgePopover = depositOutPointKey && (
+    <div className={styles.popover}>
+      <div className={styles.content}>
+        <div className={styles.fields}>
+          {depositInfo && (
+            <>
+              <span>{t('nervos-dao.deposit-record.deposited')}</span>
+              <span>{uniformTimeFormatter(+depositInfo.timestamp)}</span>
+            </>
+          )}
+          {withdrawInfo && (
+            <>
+              <span>{t('nervos-dao.deposit-record.withdrawn')}</span>
+              <span>{uniformTimeFormatter(+withdrawInfo.timestamp)}</span>
+            </>
+          )}
+          {unlockInfo && (
+            <>
+              <span>{t('nervos-dao.deposit-record.unlocked')}</span>
+              <span>{uniformTimeFormatter(+unlockInfo.timestamp)}</span>
+            </>
+          )}
         </div>
-
-        <div className={styles.action}>
-          <Button
-            type="primary"
-            data-tx-hash={txHash}
-            data-index={index}
-            onClick={onClick}
-            disabled={!isActionAvailable}
-            label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
-          />
-        </div>
-      </>
-    )
+        <Link className={styles.send} to={`${RoutePath.NervosDAO}/${depositOutPointKey}`}>
+          <Button className={styles.txRecordBtn} type="default" label={t('nervos-dao.deposit-record.tx-record')} />
+        </Link>
+      </div>
+    </div>
+  )
 
   let badge = (
-    <div>
+    <div className={styles.badge}>
       <span>{t('nervos-dao.deposit-record.deposited-at')}</span>
       <time>{depositInfo ? uniformTimeFormatter(+depositInfo.timestamp) : ''}</time>
+      <Clock />
+      {badgePopover}
     </div>
   )
 
   if (CellStatus.Completed === cellStatus) {
     badge = (
-      <div>
+      <div className={styles.badge}>
         <span>{t('nervos-dao.deposit-record.completed-at')}</span>
         <time>{unlockInfo ? uniformTimeFormatter(+unlockInfo.timestamp) : ''}</time>
+        <Clock />
+        {badgePopover}
       </div>
     )
   } else if (CellStatus.Depositing === cellStatus) {
     badge = (
-      <div>
+      <div className={styles.badge}>
         <span>{t('nervos-dao.deposit-record.deposit-pending')}</span>
+        {badgePopover}
       </div>
     )
   }
 
   return (
-    <div className={styles.container} data-is-collapsed={isCollapsed}>
-      <div className={styles.badge}>{badge}</div>
-
-      <div className={styles.collapse}>
-        <button type="button" onClick={onToggle}>
-          <span className={styles.collapseIcon} />
-        </button>
+    <div className={styles.container}>
+      <div className={styles.amountAndBadge}>
+        <CopyZone className={styles.amount} content={shannonToCKBFormatter(capacity, false, '')}>
+          {`${isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(capacity)} CKB`}
+        </CopyZone>
+        {badge}
       </div>
 
-      <div className={styles.compensation}>
-        <span>
+      <div className={styles.compensationAndAPC}>
+        <span className={styles.compensation}>
           {CellStatus.Depositing !== cellStatus && compensation >= BigInt(0)
-            ? `+${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
+            ? `${isPrivacyMode ? HIDE_BALANCE : `+${shannonToCKBFormatter(compensation.toString()).toString()}`} CKB`
             : '- CKB'}
         </span>
+        <span className={styles.apc}>{apc ? `APC ≈ ${isPrivacyMode ? HIDE_BALANCE : `${apc}%`}` : `APC ≈ - %`}</span>
       </div>
 
-      <CopyZone className={styles.amount} content={shannonToCKBFormatter(capacity, false, '')}>
-        {`${shannonToCKBFormatter(capacity)} CKB`}
-      </CopyZone>
-      {progressOrPeriod}
+      {CellStatus.Completed === cellStatus ? (
+        <div className={styles.infoTags}>
+          {lockedPeriod ? (
+            <div className={clsx(styles.infoTag, styles.lockedPeriod)}>
+              <span className={styles.pin} />
+              <span className={styles.name}>{`${t('nervos-dao.deposit-record.locked-period')}`}</span>
+              <span className={styles.value}>
+                {t('nervos-dao.deposit-record.days-hours', getDaysAndHours(lockedPeriod))}
+              </span>
+            </div>
+          ) : null}
+          {compensatedPeriod ? (
+            <div className={clsx(styles.infoTag, styles.compensatedPeriod)}>
+              <span className={styles.pin} />
+              <span className={styles.name}>{`${t('nervos-dao.deposit-record.compensated-period')}`}</span>
+              <span className={styles.value}>
+                {t('nervos-dao.deposit-record.days-hours', getDaysAndHours(compensatedPeriod))}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className={styles.stageAndAction}>
+          <div className={styles.stage}>
+            <CompensationProgressBar
+              pending={CellStatus.Depositing === cellStatus}
+              currentEpochValue={currentEpochValue}
+              endEpochValue={compensationEndEpochValue}
+              withdrawEpochValue={withdrawEpochValue}
+              style={{ width: 348 }}
+            />
+            <div className={styles.tooltip}>
+              {CellStatus.Depositing === cellStatus ? null : (
+                <CompensationPeriodTooltip
+                  depositEpochValue={depositEpochValue}
+                  baseEpochTimestamp={withdrawEpochValue ? +withdrawTimestamp : tipBlockTimestamp}
+                  baseEpochValue={withdrawEpochValue || currentEpochValue}
+                  endEpochValue={compensationEndEpochValue}
+                  isWithdrawn={!!withdrawEpochValue}
+                />
+              )}
+            </div>
+            <span className={styles.message}>{message}</span>
+          </div>
 
-      <div className={styles.apc}>
-        <span>{apc ? `APC: ~${apc}%` : `APC: - %`}</span>
-      </div>
-
-      <div className={styles.transactions}>
-        <div className={styles.title}>{t('nervos-dao.deposit-record.record')}</div>
-        {depositInfo ? (
-          <button
-            type="button"
-            className={styles.deposited}
-            data-tx-hash={depositInfo.txHash}
-            data-text={t('nervos-dao.deposit-record.tx-record')}
-            onClick={onTxRecordClick}
-          >
-            <span>{t('nervos-dao.deposit-record.deposited')}</span>
-            <span>{uniformTimeFormatter(+depositInfo.timestamp)}</span>
-          </button>
-        ) : null}
-        {withdrawInfo ? (
-          <button
-            type="button"
-            className={styles.withdrawn}
-            data-tx-hash={withdrawInfo.txHash}
-            data-text={t('nervos-dao.deposit-record.tx-record')}
-            onClick={onTxRecordClick}
-          >
-            <span>{t('nervos-dao.deposit-record.withdrawn')}</span>
-            <span>{uniformTimeFormatter(+withdrawInfo.timestamp)}</span>
-          </button>
-        ) : null}
-        {unlockInfo ? (
-          <button
-            type="button"
-            className={styles.unlocked}
-            data-tx-hash={unlockInfo.txHash}
-            data-text={t('nervos-dao.deposit-record.tx-record')}
-            onClick={onTxRecordClick}
-          >
-            <span>{t('nervos-dao.deposit-record.unlocked')}</span>
-            <span>{uniformTimeFormatter(+unlockInfo.timestamp)}</span>
-          </button>
-        ) : null}
-      </div>
+          <div className={styles.action}>
+            <Button
+              type="primary"
+              data-tx-hash={txHash}
+              data-index={index}
+              onClick={onClick}
+              disabled={!isActionAvailable}
+              label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

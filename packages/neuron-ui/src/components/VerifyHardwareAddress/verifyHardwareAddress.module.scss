@@ -2,15 +2,75 @@
 
 .dialog {
   @include dialog-container;
-  padding: 30px 50px;
-  min-height: 225px;
-  height: 240px;
-  width: 600px;
+  padding: 0;
+  min-height: 400px;
+  width: 680px;
+  max-width: 680px;
+  text-align: left;
 
-  .container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  .body {
+    padding: 0 16px;
+    color: var(--main-text-color);
+    .main {
+      & > header {
+        font-size: 16px;
+        margin: 16px 0;
+        font-weight: 500;
+      }
+      input, .address {
+        background-color: var(--input-disabled-color);
+        border-radius: 8px;
+        border: none;
+        width: 600px;
+        height: 56px;
+        padding: 0 32px 0 16px;
+      }
+      .productName {
+        font-family: 'ProximaNova-Regular';
+        font-weight: 600;
+        font-size: 18px;
+        color: var(--main-text-color);
+      }
+      .address {
+        span {
+          font-family: 'JetBrains Mono';
+          font-weight: 500;
+          position: relative;
+          line-height: 56px;
+        }
+        
+        &::after {
+          position: relative;
+          content: url('../../widgets/Icons/Copy.svg');
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 16px;
+          height: 16px;
+        }
+      }
+      .addressContainer {
+        position: relative;
+        & > svg {
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+      .alert {
+        justify-content: center;
+        margin: 20px 0 30px 0;
+        font-size: 16px;
+        font-weight: 500;
+        align-items: baseline;
+
+        &::before {
+          content: ''
+        }
+      }
+    }
 
     .action {
       @extend .main;
@@ -19,38 +79,19 @@
         margin-top: 26px;
         font-weight: bold;
       }
-
+  
       +.footer {
         justify-content: center;
       }
-
+  
       svg {
         width: 56px;
         height: 56px;
       }
-
+  
       .rotating {
         svg {
           animation: rotating 3s linear infinite;
-        }
-      }
-    }
-
-    .main {
-      flex: 1;
-      tr {
-        td {
-          font-size: 14px;
-          svg {
-            width: 14px;
-            height: 14px;
-            margin-right: 4px;
-            position: relative;
-            top: 2px;
-          }
-        }
-        .first {
-          padding-right: 30px;
         }
       }
     }
@@ -62,131 +103,26 @@
 
   .footer {
     @include dialog-footer;
-    flex-shrink: 0;
-
-    button {
-      margin-left: 10px;
-    }
-
-    .left {
-      button {
-        margin: 0;
-      }
-    }
-
-    .right {
-      display: flex;
-      flex: 1;
-      justify-content: flex-end;
-    }
+    gap: 24px;
+    margin-bottom: 24px;
   }
-}
-
-.table {
-  overflow: auto;
-}
-
-.hd {
-  max-width: 700px;
-  width: 700px;
-  max-height: 400px;
-  height: 400px;
-}
-
-.sign {
-  table {
-    border-collapse: collapse;
-  }
-
-  thead {
-    border-bottom: 1px solid #e3e3e3;
-  }
-
-  tbody tr:hover {
-    background-color: #f5f5f5;
-  }
-
-  td {
-    height: 1.75rem;
-    word-wrap: none;
-    word-break: keep-all;
-    & > div {
-      text-overflow: ellipsis;
-      overflow: hidden;
-      width: 100%;
-      font-size: 13px;
-    }
-  }
-
-  span,
-  td,
-  th {
-    font-size: 0.875rem;
-    letter-spacing: 0.5px;
-    padding: 0;
-  }
-
-  th,
-  td {
-    &:first-of-type {
-      padding-left: 10px;
-      width: 80px;
-    }
-
-    &:last-of-type {
-      padding-right: 10px;
-      width: 336px;
-      text-align: right;
-    }
-  }
-}
-
-.active {
-  background-color: #eeeeee;
-}
-
-.signed {
-  color: #888888;
-}
-
-.tabs {
-  width: 100%;
-  display: flex;
-  margin-top: 15px;
-  flex-direction: row;
-
-  button {
-    flex: 1;
-    cursor: pointer;
-    font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
-    font-size: 14px;
-    border: none;
-    background: none;
-    height: 30px;
-
-    &.active {
-      font-weight: bold;
-      border-bottom: 4px solid #3cc68a;
-    }
-  }
-}
-
-.warning {
-  color: #d03a3a;
 }
 
 .title {
-  font-size: 1.125rem;
-  line-height: 1.375rem;
-  font-weight: bold;
-  letter-spacing: 0.9px;
-  margin: 0;
-  margin-bottom: 26px;
+  font-size: 16px;
+  line-height: 22.4px;
+  font-weight: 500;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--main-text-color);
+
+  svg {
+    cursor: pointer;
+  }
 }
 
-.addressOverflow {
-  word-break: break-all;
-  height: 1.625rem;
-  overflow: hidden;
-  text-align: right;
+.divider {
+  border-top: 1px solid var(--divide-line-color);
 }

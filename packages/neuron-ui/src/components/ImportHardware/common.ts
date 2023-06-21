@@ -16,7 +16,7 @@ export interface Model {
 }
 
 export interface ImportHardwareState {
-  model?: Model
+  model?: Model | null
   extendedPublicKey?: {
     publicKey: string
     chainCode: string

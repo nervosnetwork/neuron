@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useLocation } from 'react-router-dom'
-import { Pagination } from '@uifabric/experiments'
+import { useNavigate, useLocation } from 'react-router-dom'
+import Pagination from 'widgets/Pagination'
 import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
 import {
@@ -68,7 +68,7 @@ const SpecialAssetList = () => {
   const [loaded, setLoaded] = useState(false)
   const [cells, setCells] = useState<SpecialAssetCell[]>([])
   const [totalCount, setTotalCount] = useState<number>(0)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [pageNo, setPageNo] = useState<number>(1)
   const { search } = useLocation()
   const dispatch = useDispatch()
@@ -197,6 +197,7 @@ const SpecialAssetList = () => {
 
   useEffect(() => {
     const { pageNo: no } = listParams(search)
+
     setPageNo(no)
     fetchList(id, no)
   }, [search, id, dispatch, fetchList])
@@ -221,8 +222,7 @@ const SpecialAssetList = () => {
         return
       }
       if (cell.customizedAssetInfo.type === 'NFT') {
-        history.push({
-          pathname: `${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`,
+        navigate(`${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`, {
           state: {
             outPoint: cell.outPoint,
           },
@@ -301,7 +301,7 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, history, openDialog, tokenInfoList]
+    [cells, id, dispatch, setAccountToClaim, navigate, openDialog, tokenInfoList]
   )
 
   const list = useMemo(() => {
@@ -341,23 +341,11 @@ const SpecialAssetList = () => {
       <div className={styles.pagination}>
         {totalCount ? (
           <Pagination
-            selectedPageIndex={pageNo - 1}
-            pageCount={Math.ceil(totalCount / PAGE_SIZE)}
-            itemsPerPage={PAGE_SIZE}
-            totalItemCount={totalCount}
-            previousPageAriaLabel={t('pagination.previous-page')}
-            nextPageAriaLabel={t('pagination.next-page')}
-            firstPageAriaLabel={t('pagination.first-page')}
-            lastPageAriaLabel={t('pagination.last-page')}
-            pageAriaLabel={t('pagination.page')}
-            selectedAriaLabel={t('pagination.selected')}
-            firstPageIconProps={{ iconName: 'FirstPage' }}
-            previousPageIconProps={{ iconName: 'PrevPage' }}
-            nextPageIconProps={{ iconName: 'NextPage' }}
-            lastPageIconProps={{ iconName: 'LastPage' }}
-            format="buttons"
-            onPageChange={(idx: number) => {
-              history.push(`${RoutePath.SpecialAssets}?pageNo=${idx + 1}`)
+            pageNo={pageNo}
+            count={totalCount}
+            pageSize={PAGE_SIZE}
+            onChange={(idx: number) => {
+              navigate(`${RoutePath.SpecialAssets}?pageNo=${idx}`)
             }}
           />
         ) : null}

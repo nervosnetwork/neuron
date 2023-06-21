@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, nativeTheme } from 'electron'
 import env from '../env'
 import Store from '../models/store'
 import { changeLanguage } from '../locales/i18n'
@@ -60,6 +60,15 @@ export default class SettingsService extends Store {
 
   set testnetLightDataPath(dataPath: string) {
     this.writeSync(settingKeys.testnetLightDataPath, dataPath)
+  }
+
+  get themeSource() {
+    return this.readSync('themeSource') || 'system'
+  }
+
+  set themeSource(theme: 'system' | 'light' | 'dark') {
+    nativeTheme.themeSource = theme
+    this.writeSync('themeSource', theme)
   }
 
   constructor() {

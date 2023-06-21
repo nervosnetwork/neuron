@@ -1,27 +1,100 @@
 @import '../../styles/mixin.scss';
-$textfieldWidth: calc(100vw - 370px);
+$headerHeight: 126px;
+$bottomHeight: 124px;
 
-.pageTitle {
-  @include page-title;
+.layout {
+  display: flex;
+
+  .left {
+    flex: 1;
+    position: relative;
+
+    .leftContent {
+      height: calc(100vh - $headerHeight - $bottomHeight);
+      overflow-y: scroll;
+      margin-bottom: 100px;
+    }
+
+    .leftFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .addButton {
+        min-width: 216px;
+        padding: 20px;
+        box-shadow: 0 0 10px var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &_icon {
+          margin-right: 8px;
+        }
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color)
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    margin-left: 16px;
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+
+    .rightContent {
+      padding: 16px;
+      margin-bottom: 120px;
+    }
+
+    .rightFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 16px;
+      left: 0;
+      display: flex;
+      justify-content: center;
+
+      button {
+        width: 216px;
+        &:last-child {
+          margin-left: 12px;
+        }
+      }
+    }
+  }
 }
 
-.info {
-  width: $textfieldWidth;
-  display: grid;
-  grid-template: 'textfield' auto;
-  grid-gap: 15px;
-  padding: 24px 0 34px;
-}
-
-.balance {
-  grid-area: balance;
+.headerContainer {
   display: flex;
   align-items: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
 
-.actions {
-  @include form-footer;
-}
+  .btn {
+    margin-left: 12px;
+    min-width: 30px;
+    height: 16px;
+    padding: 0 8px;
+    border-radius: 0;
+    border-left: 1px solid var(--button-cancel-color);
+    svg {
+      g,
+      path {
+        fill: var(--main-text-color);
+      }
+    }
+  }
 
+  .balance {
+    font-size: 14px;
+  }
+}

@@ -19,7 +19,7 @@ jobs:
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
     env:
-      APPLE_ID: ${{ secrets.APPLE_ID }}
+      MAC_SHOULD_CODE_SIGN: ${{ github.event_name != 'pull_request' && secrets.APPLE_ID != '' }}
       WIN_CERTIFICATE_BASE64: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
 
     steps:
@@ -67,7 +67,7 @@ jobs:
           CI: false
 
       - name: Package for MacOS
-        if: ${{ matrix.os == 'macos-latest' && env.APPLE_ID != '' }}
+        if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'true' }}
         run: |
           ./scripts/download-ckb.sh mac
           yarn package:test mac
@@ -79,10 +79,9 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
 
       - name: Package for MacOS for skip code sign
-        if: ${{ matrix.os == 'macos-latest' && env.APPLE_ID == '' }}
+        if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'false' }}
         run: |
           export CSC_IDENTITY_AUTO_DISCOVERY=false
-          unset APPLE_ID
           ./scripts/download-ckb.sh mac
           yarn package:test mac
         env:

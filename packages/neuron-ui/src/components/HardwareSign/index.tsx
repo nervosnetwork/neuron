@@ -12,7 +12,7 @@ import {
 } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import Spinner from 'widgets/Spinner'
-import { useHistory } from 'react-router-dom'
+import { NavigateFunction } from 'react-router-dom'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import {
   connectDevice,
@@ -43,13 +43,13 @@ export interface HardwareSignProps {
   offlineSignType?: OfflineSignType
   onDismiss: () => void
   signMessage?: (password: string) => Promise<any>
-  history?: ReturnType<typeof useHistory>
+  navigate?: NavigateFunction
 }
 
 const HardwareSign = ({
   signType,
   signMessage,
-  history,
+  navigate,
   wallet,
   onDismiss,
   offlineSignJSON,
@@ -259,7 +259,7 @@ const HardwareSign = ({
             description,
           })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -272,7 +272,7 @@ const HardwareSign = ({
           }
           sendTransaction({ walletID: wallet.id, tx, description })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -288,7 +288,7 @@ const HardwareSign = ({
           }
           sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -310,7 +310,7 @@ const HardwareSign = ({
           }
           sendSUDTTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -320,7 +320,7 @@ const HardwareSign = ({
         case 'migrate-acp': {
           await migrateAcp({ id: wallet.id })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(typeof res.message === 'string' ? res.message : res.message.content ?? 'migrate-acp error')
             }
@@ -360,7 +360,7 @@ const HardwareSign = ({
     wallet.id,
     description,
     dispatch,
-    history,
+    navigate,
     signAndExportFromJSON,
     ensureDeviceAvailable,
     multisigConfig,

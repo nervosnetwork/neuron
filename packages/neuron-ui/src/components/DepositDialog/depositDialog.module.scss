@@ -1,52 +1,82 @@
 @import '../../styles/mixin.scss';
 
-.dialog {
-  @include dialog-container;
-  padding: 30px 50px;
+.slider {
+  margin-top: 16px;
 
-  &::backdrop {
-    @include overlay;
+  :global(.ms-Slider-thumb) {
+    top: -8px;
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color) !important;
+    border: 4px solid #fff !important;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+  }
+
+  :global(.ms-Slider-active) {
+    background: var(--primary-color) !important;
+    height: 8px;
+  }
+
+  :global(.ms-Slider-inactive) {
+    background: #f0f0f0 !important;
+    height: 8px;
+
+    @media (prefers-color-scheme: dark) {
+      background: #666 !important;
+    }
   }
 }
 
-.title {
-  font-weight: 900;
-  font-size: 1.125rem;
+.depositValue {
+  margin-top: 16px;
+}
+
+.depositValueLabel {
+  line-height: 20px;
+  color: var(--secondary-text-color);
+  font-size: 14px;
 }
 
 .fee {
   display: flex;
   justify-content: space-between;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  margin-bottom: 25px;
-
-  & > span:first-of-type {
-    font-weight: 900;
-
-    &:after {
-      display: inline;
-      content: ':';
-      font-weight: 600;
-    }
-  }
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--main-text-color);
 }
 
 .notice {
-  position: relative;
-  padding-left: 1rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  margin: 14px 0 20px 0;
-  color: #666;
+  $lineHeight: 24px;
+  display: flex;
+  box-sizing: border-box;
+  max-width: 648px;
+  margin-top: 22px;
+  border: 1px solid rgba(252, 136, 0, 0.2);
+  padding: 7px 54px;
+  border-radius: 4px;
+  background: #fff6eb;
+  color: #f68c2a;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: $lineHeight;
+  text-align: center;
 
-  svg {
-    position: absolute;
-    left: 0;
-    top: 0.13rem;
-    filter: grayscale(1) opacity(0.6);
-    width: 0.625rem;
-    height: 0.625rem;
+  & > svg {
+    $size: 14px;
+    flex-shrink: 0;
+    margin-top: ($lineHeight - $size) / 2;
+    width: $size;
+    height: $size;
+
+    g[fill='#D50000'] {
+      fill: currentColor;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-color: #4b391c;
+    background: #4b391c;
   }
 }
 
@@ -54,23 +84,47 @@
   font-family: inherit;
   font-size: 0.7rem;
   letter-spacing: 0.45px;
+  background: inherit;
   color: var(--nervos-green);
   border: none;
   padding: 0;
   margin: 0;
-}
-
-.footer {
-  @include dialog-footer;
-
-  button:last-of-type {
-    margin-left: 9px;
-  }
+  cursor: pointer;
 }
 
 .isBalanceReserved {
   display: flex;
   align-items: center;
-  font-size: 0.75rem;
-  color: #d50000;
+
+  & > input {
+    display: none;
+  }
+
+  & > label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    & > svg {
+      path {
+        fill: #e5e5e5;
+
+        @media (prefers-color-scheme: dark) {
+          fill: #999;
+        }
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      color: #999;
+    }
+  }
+
+  & > input:checked + label {
+    & > svg {
+      path {
+        fill: var(--primary-color);
+      }
+    }
+  }
 }
