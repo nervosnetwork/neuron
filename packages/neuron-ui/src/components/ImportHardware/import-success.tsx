@@ -20,7 +20,7 @@ const ImportSuccess = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) =
         </span>
         <div className={styles.message}>{t('import-hardware.actions.success')}</div>
       </section>
-      <footer className={styles.footer}>
+      <footer className={styles.dialogFooter}>
         <Button type="cancel" label={t('import-hardware.actions.close')} onClick={onClose} />
       </footer>
     </div>

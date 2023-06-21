@@ -1,8 +1,8 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import SUDTSend from 'components/SUDTSend'
 
-const stories = storiesOf('sUDT Send', module).addDecorator(StoryRouter())
+const stories = storiesOf('sUDT Send', module).addDecorator(withRouter())
 
 stories.add('Basic', () => <SUDTSend />)

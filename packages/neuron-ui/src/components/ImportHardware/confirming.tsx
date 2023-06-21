@@ -45,7 +45,7 @@ const Confirming = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => {
         </span>
         <div className={styles.message}>{t('import-hardware.actions.confirm')}</div>
       </section>
-      <footer className={styles.footer}>
+      <footer className={styles.dialogFooter}>
         <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
       </footer>
     </div>

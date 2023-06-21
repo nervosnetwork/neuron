@@ -1,130 +1,47 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
-import { withKnobs, text, boolean } from '@storybook/addon-knobs'
-import StoryRouter from 'storybook-react-router'
-import { action } from '@storybook/addon-actions'
+import { ComponentStory } from '@storybook/react'
 import Overview from 'components/Overview'
-import { initStates, NeuronWalletContext } from 'states'
+import { initStates } from 'states'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import transactions from './data/transactions'
-import addresses from './data/addresses'
 
-const dispatch = action('Dispatch')
+const chain = {
+  ...initStates.chain,
+  networkID: 'testnet',
+  transactions: { ...initStates.chain.transactions, items: transactions[`Content List`] },
+  tipBlockNumber: '123',
+}
 
-const stateTemplate = {
-  dispatch,
-  ...initStates,
-  app: {
-    ...initStates.app,
-    epoch: '1',
-    difficulty: BigInt('0x111111'),
-    chain: 'chain_dev',
+export default {
+  title: 'Overview',
+  component: Overview,
+  decorators: [withRouter],
+  argTypes: {
+    chain: { control: 'object', isGlobal: true },
   },
-  wallet: {
-    ...initStates.wallet,
-    id: 'wallet id',
-    name: 'Current Wallet Name',
-    balance: '213',
-    addresses: addresses['Content List'],
+}
+
+const Template: ComponentStory<typeof Overview> = () => <Overview />
+
+export const HasNoActivities = Template.bind({})
+HasNoActivities.args = {
+  chain: { ...chain, transactions: { ...chain.transactions, items: [] } },
+}
+
+export const Has10Activities = Template.bind({})
+Has10Activities.args = {
+  chain: {
+    ...chain,
+    transactions: { ...chain.transactions, items: chain.transactions.items.slice(0, 10) },
   },
+}
+
+export const HasOver10Activities = Template.bind({})
+HasOver10Activities.args = {
   chain: {
     ...initStates.chain,
     networkID: 'testnet',
     transactions: { ...initStates.chain.transactions, items: transactions[`Content List`] },
     tipBlockNumber: '123',
   },
-  settings: {
-    ...initStates.settings,
-    networks: [
-      {
-        id: 'testnet',
-        name: 'Testnet',
-        remote: 'http://testnet.nervos.com',
-        chain: 'ckb_testnet',
-        type: 1 as 0 | 1,
-        genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
-      },
-    ],
-  },
 }
-
-const states = {
-  'Has no Activities': {
-    ...stateTemplate,
-    chain: { ...stateTemplate.chain, transactions: { ...stateTemplate.chain.transactions, items: [] } },
-  },
-  'Has 10 Activities': {
-    ...stateTemplate,
-    chain: {
-      ...stateTemplate.chain,
-      transactions: { ...stateTemplate.chain.transactions, items: stateTemplate.chain.transactions.items.slice(0, 10) },
-    },
-  },
-  'Has more than 10 Activities': stateTemplate,
-}
-
-const stories = storiesOf(`Overview`, module).addDecorator(StoryRouter())
-
-Object.entries(states).forEach(([title, state]) => {
-  stories.add(title, () => (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <Overview />
-    </NeuronWalletContext.Provider>
-  ))
-})
-
-stories.addDecorator(withKnobs).add('With knobs', () => {
-  const state = {
-    dispatch,
-    ...initStates,
-    app: {
-      ...initStates.app,
-      epoch: text('Epoch', '1'),
-      difficulty: BigInt(100000),
-      chain: text('Chain', 'chain_dev'),
-    },
-    wallet: {
-      ...initStates.wallet,
-      id: text('Wallet ID', 'wallet id'),
-      name: text('Wallet Name', 'Current Wallet Name'),
-      balance: text('Balance', '213'),
-    },
-    chain: {
-      ...initStates.chain,
-      networkID: text('Network ID', 'testnet'),
-      transactions: {
-        ...initStates.chain.transactions,
-        items: transactions[`Content List`].map((tx, idx) => ({
-          type: text(`${idx}-Type`, tx.type) as 'send' | 'receive',
-          createdAt: text(`${idx}-Created at`, tx.createdAt),
-          updatedAt: text(`${idx}-Updated at`, tx.updatedAt),
-          timestamp: text(`${idx}-Timestamp`, tx.timestamp),
-          value: text(`${idx}-Value`, tx.value),
-          hash: text(`${idx}-Hash`, tx.hash),
-          description: text(`${idx}-Description`, tx.description),
-          blockNumber: text(`${idx}-BlockNumber`, tx.blockNumber),
-          status: text(`${idx}-Status`, tx.status) as 'pending' | 'success' | 'failed',
-          nervosDao: boolean('nervos dao', false),
-        })),
-      },
-      tipBlockNumber: text('Tip block number', '123'),
-    },
-    settings: {
-      ...initStates.settings,
-      networks: [
-        {
-          id: text('Network iD', 'testnet'),
-          name: text('Network Name', 'Testnet'),
-          remote: text('Network Address', 'http://testnet.nervos.com'),
-          chain: text('Chain', 'ckb_testnet'),
-          type: 1 as 0 | 1,
-          genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
-        },
-      ],
-    },
-  }
-  return (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <Overview />
-    </NeuronWalletContext.Provider>
-  )
-})

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Copy, SuccessNoBorder } from 'widgets/Icons/icon'
 import styles from './copyZone.module.scss'
 
 type CopyZoneProps = React.PropsWithChildren<{
@@ -27,13 +28,16 @@ const CopyZone = ({ children, content, name, style, className = '' }: CopyZonePr
     <div
       role="presentation"
       data-copied={copied}
-      data-prompt={prompt}
       onClick={onCopy}
       className={`${styles.container} ${className}`}
       style={style}
       title={content}
     >
       {children}
+      <div className={styles.hoverShow}>
+        {copied ? <SuccessNoBorder className={styles.copyIcon} /> : <Copy className={styles.copyIcon} />}
+        {prompt}
+      </div>
     </div>
   )
 }

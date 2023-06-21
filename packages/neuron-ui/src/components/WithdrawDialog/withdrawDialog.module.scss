@@ -9,33 +9,68 @@
   }
 }
 
-.title {
-  @include dialog-title;
+.content {
+  padding: 44px 0 0 0;
+}
+
+.depositAndCompensation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .divider {
+    width: 1px;
+    height: 48px;
+    background: var(--divide-line-color);
+  }
 }
 
 .deposit,
 .compensation {
   display: flex;
+  flex: 1;
+  flex-direction: column;
   align-items: center;
-  height: 1rem;
-  font-size: 0.875rem;
+  gap: 22px;
+  min-width: 0;
+  padding: 0 64px;
+  color: var(--main-text-color);
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+
+  .amount {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+.messages {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
 }
 
 .message,
 .errorMessage {
   display: flex;
   align-items: center;
-  font-size: 0.625rem;
+  gap: 4px;
+  margin: 44px 0 0 0;
+  border: 1px solid rgba(252, 136, 0, 0.2);
+  padding: 8px 36px;
+  width: max-content;
+  border-radius: 4px;
+  background: #fff6eb;
+  color: #f68c2a;
+
+  @media (prefers-color-scheme: dark) {
+    border-color: #4b391c;
+    background: #4b391c;
+  }
 }
 
 .errorMessage {
   color: red;
-}
-
-.footer {
-  @include dialog-footer;
-
-  button:last-of-type {
-    margin-left: 9px;
-  }
 }

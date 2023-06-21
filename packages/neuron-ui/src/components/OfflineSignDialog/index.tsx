@@ -1,11 +1,10 @@
-import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
-import Spinner from 'widgets/Spinner'
+import Dialog from 'widgets/Dialog'
 import HardwareSign from 'components/HardwareSign'
-import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter, useDidMount } from 'utils'
+import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
 
 import {
   useState as useGlobalState,
@@ -39,8 +38,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
 
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  const navigate = useNavigate()
 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -50,12 +48,6 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
     setPassword('')
     setError('')
   }, [signType, setError, setPassword])
-
-  useDidMount(() => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal()
-    }
-  })
 
   const disabled = !password || isSigning
 
@@ -98,7 +90,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
             }
             await sendTransaction({ walletID, tx: transaction, description, password })(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -130,7 +122,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
             }
             await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -145,7 +137,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
             }
             await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
               if (isSuccessResponse({ status })) {
-                history.push(RoutePath.History)
+                navigate(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -168,7 +160,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
       password,
       signType,
       description,
-      history,
+      navigate,
       isSigning,
       transaction,
       disabled,
@@ -198,7 +190,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
     return (
       <HardwareSign
         signType="transaction"
-        history={history}
+        navigate={navigate}
         wallet={wallet}
         onDismiss={onDismiss}
         offlineSignJSON={offlineSignJSON}
@@ -207,29 +199,19 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
   }
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
-      <form onSubmit={onSubmit}>
-        <h2 className={styles.title}>{title}</h2>
-        <TextField
-          label={t('password-request.password')}
-          value={password}
-          field="password"
-          type="password"
-          title={t('password-request.password')}
-          onChange={onChange}
-          autoFocus
-          required
-          className={styles.passwordInput}
-          error={error}
-        />
-        <div className={styles.footer}>
-          <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-          <Button label={t('common.confirm')} type="submit" disabled={disabled}>
-            {isSigning ? <Spinner /> : (t('common.confirm') as string)}
-          </Button>
-        </div>
-      </form>
-    </dialog>
+    <Dialog show title={title} onCancel={onDismiss} onConfirm={onSubmit} disabled={disabled} isLoading={isSigning}>
+      <TextField
+        label={t('password-request.password')}
+        value={password}
+        field="password"
+        type="password"
+        title={t('password-request.password')}
+        onChange={onChange}
+        autoFocus
+        className={styles.passwordInput}
+        error={error}
+      />
+    </Dialog>
   )
 }
 
