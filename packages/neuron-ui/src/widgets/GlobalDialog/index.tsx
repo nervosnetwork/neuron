@@ -14,7 +14,15 @@ const UnlockSuccess = () => {
   )
 }
 
-const RebuildSync = ({ onDismiss, onBackUp, onOk }: { onDismiss: React.MouseEventHandler; onBackUp: React.MouseEventHandler; onOk: React.MouseEventHandler }) => {
+const RebuildSync = ({
+  onDismiss,
+  onBackUp,
+  onOk,
+}: {
+  onDismiss: React.MouseEventHandler
+  onBackUp: React.MouseEventHandler
+  onOk: React.MouseEventHandler
+}) => {
   const [t] = useTranslation()
   return (
     <div style={{ fontWeight: 200 }}>

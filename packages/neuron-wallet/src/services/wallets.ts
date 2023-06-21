@@ -145,7 +145,7 @@ export class FileKeystoreWallet extends Wallet {
       extendedKey: this.extendedKey,
       device: this.device,
       isHD: this.isHD,
-      startBlockNumberInLight: this.startBlockNumberInLight
+      startBlockNumberInLight: this.startBlockNumberInLight,
     }
   }
 
@@ -316,7 +316,7 @@ export default class WalletService {
     await getConnection()
       .getRepository(HdPublicKeyInfo)
       .delete({
-        walletId: Not(In(allWallets.map((w) => w.id)))
+        walletId: Not(In(allWallets.map(w => w.id))),
       })
   }
 
@@ -329,7 +329,7 @@ export default class WalletService {
       throw new IsRequired('ID')
     }
 
-    const wallet = this.getAll().find((w) => w.id === id)
+    const wallet = this.getAll().find(w => w.id === id)
     if (!wallet) {
       throw new WalletNotFound(id)
     }
@@ -360,7 +360,7 @@ export default class WalletService {
       throw new IsRequired('wallet property')
     }
 
-    const index = this.getAll().findIndex((wallet) => wallet.name === props.name)
+    const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
     if (index !== -1) {
       throw new UsedName('Wallet')
@@ -387,7 +387,7 @@ export default class WalletService {
 
     const wallet = this.fromJSON(wallets[index])
 
-    if (wallet.name !== props.name && wallets.findIndex((storeWallet) => storeWallet.name === props.name) !== -1) {
+    if (wallet.name !== props.name && wallets.findIndex(storeWallet => storeWallet.name === props.name) !== -1) {
       throw new UsedName('Wallet')
     }
 
@@ -402,14 +402,14 @@ export default class WalletService {
 
   public delete = async (id: string) => {
     const wallets = this.getAll()
-    const walletJSON = wallets.find((w) => w.id === id)
+    const walletJSON = wallets.find(w => w.id === id)
 
     if (!walletJSON) {
       throw new WalletNotFound(id)
     }
 
     const wallet = this.fromJSON(walletJSON)
-    const newWallets = wallets.filter((w) => w.id !== id)
+    const newWallets = wallets.filter(w => w.id !== id)
 
     const current = this.getCurrent()
     const currentID = current ? current.id : ''
@@ -475,7 +475,7 @@ export default class WalletService {
   }
 
   public clearAll = () => {
-    this.getAll().forEach((w) => {
+    this.getAll().forEach(w => {
       const wallet = this.fromJSON(w)
       if (!wallet.isHardware()) {
         wallet.deleteKeystore()

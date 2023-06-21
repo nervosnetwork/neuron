@@ -34,7 +34,7 @@
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel --load-env-files=false test",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
-    "postinstall": "husky install && lerna run build --scope=@nervina-labs/ckb-indexer",
+    "postinstall": "husky install",
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "devDependencies": {
@@ -62,5 +62,8 @@
     "@types/react": "17.0.58",
     "react-i18next": ">=11.16.4",
     "usb": "1.8.8"
+  },
+  "volta": {
+    "node": "18.16.0"
   }
 }

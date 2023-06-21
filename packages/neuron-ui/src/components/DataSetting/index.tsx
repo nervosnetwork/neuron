@@ -63,10 +63,10 @@ const DataSetting = () => {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
-    networkID,
-    networks,
-  ])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networkID, networks]
+  )
   return (
     <>
       <div className={styles.root}>

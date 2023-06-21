@@ -28,7 +28,7 @@ const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
 }))
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(() => ({
-  ckbRpcUrl
+  ckbRpcUrl,
 }))
 
 const stubbedTransactionCollectorConstructor = jest.fn()
@@ -70,28 +70,28 @@ const chequeLockScript = addressMeta.generateChequeLockScriptWithReceiverLockHas
 const acpLockScript = addressMeta.generateACPLockScript()
 const legacyAcpLockScript = addressMeta.generateLegacyACPLockScript()
 const formattedDefaultLockScript = {
-  code_hash: defaultLockScript.codeHash,
-  hash_type: defaultLockScript.hashType,
+  codeHash: defaultLockScript.codeHash,
+  hashType: defaultLockScript.hashType,
   args: defaultLockScript.args,
 }
 const formattedSingleMultiSignLockScript = {
-  code_hash: singleMultiSignLockScript.codeHash,
-  hash_type: singleMultiSignLockScript.hashType,
+  codeHash: singleMultiSignLockScript.codeHash,
+  hashType: singleMultiSignLockScript.hashType,
   args: singleMultiSignLockScript.args + '0'.repeat(14),
 }
 const formattedChequeLockScript = {
-  code_hash: chequeLockScript.codeHash,
-  hash_type: chequeLockScript.hashType,
+  codeHash: chequeLockScript.codeHash,
+  hashType: chequeLockScript.hashType,
   args: chequeLockScript.args,
 }
 const formattedAcpLockScript = {
-  code_hash: acpLockScript.codeHash,
-  hash_type: acpLockScript.hashType,
+  codeHash: acpLockScript.codeHash,
+  hashType: acpLockScript.hashType,
   args: acpLockScript.args,
 }
 const formattedLegacyAcpLockScript = {
-  code_hash: legacyAcpLockScript.codeHash,
-  hash_type: legacyAcpLockScript.hashType,
+  codeHash: legacyAcpLockScript.codeHash,
+  hashType: legacyAcpLockScript.hashType,
   args: legacyAcpLockScript.args,
 }
 
@@ -100,9 +100,11 @@ const mockGetTransactionHashes = (mocks: any[] = []) => {
 
   for (const lock of [formattedDefaultLockScript, formattedAcpLockScript, formattedLegacyAcpLockScript]) {
     const { hashes } = mocks.find(mock => mock.lock === lock) || { hashes: [] }
-    stubbedConstructor.calledWith(expect.anything(), { lock }, ckbRpcUrl, { includeStatus: false }).mockReturnValue({
-      getTransactionHashes: jest.fn().mockReturnValue(hashes),
-    })
+    stubbedConstructor
+      .calledWith(expect.anything(), { lock }, rpcService?.url, { includeStatus: false })
+      .mockReturnValue({
+        getTransactionHashes: jest.fn().mockReturnValue(hashes),
+      })
   }
 }
 const fakeBlock1 = { number: '1', hash: '1', timestamp: '1' }
@@ -135,9 +137,9 @@ describe('indexer cache service', () => {
 
     resetMocks()
 
-    jest.doMock('@nervina-labs/ckb-indexer', () => {
+    jest.doMock('@ckb-lumos/ckb-indexer', () => {
       return {
-        CkbIndexer: stubbedIndexerConstructor,
+        Indexer: stubbedIndexerConstructor,
         TransactionCollector: stubbedTransactionCollectorConstructor,
         CellCollector: stubbedCellCollectorConstructor,
       }
@@ -248,8 +250,8 @@ describe('indexer cache service', () => {
                     return {
                       done: false,
                       value: {
-                        out_point: {
-                          tx_hash: fakeTx2.transaction.hash,
+                        outPoint: {
+                          txHash: fakeTx2.transaction.hash,
                         },
                       },
                     }

@@ -53,23 +53,16 @@ const MultisigAddress = () => {
     // eslint-disable-next-line
   }, [i18n.language])
   const isMainnet = isMainnetUtil(networks, networkID)
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
-    networks,
-    networkID,
-  ])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networks, networkID]
+  )
   const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
-  const {
-    allConfigs,
-    saveConfig,
-    updateConfig,
-    deleteConfigById,
-    onImportConfig,
-    configs,
-    onFilterConfig,
-  } = useConfigManage({
-    walletId,
-    isMainnet,
-  })
+  const { allConfigs, saveConfig, updateConfig, deleteConfigById, onImportConfig, configs, onFilterConfig } =
+    useConfigManage({
+      walletId,
+      isMainnet,
+    })
   const { multisigBanlances, multisigSyncProgress } = useSubscription({
     walletId,
     isMainnet,
@@ -107,14 +100,8 @@ const MultisigAddress = () => {
       tableActions.map(key => ({ key, label: t(`multisig-address.table.actions.${key}`), disabled: key === 'send' })),
     [t]
   )
-  const {
-    selectIds,
-    isAllSelected,
-    onChangeChecked,
-    onChangeCheckedAll,
-    exportConfig,
-    clearSelected,
-  } = useExportConfig(configs)
+  const { selectIds, isAllSelected, onChangeChecked, onChangeCheckedAll, exportConfig, clearSelected } =
+    useExportConfig(configs)
   const { keywords, onKeywordsChange, onSearch, onClear } = useSearch(clearSelected, onFilterConfig)
   const sendTotalBalance = useMemo(() => {
     if (sendAction.sendFromMultisig?.fullPayload) {

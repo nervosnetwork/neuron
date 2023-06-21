@@ -565,13 +565,13 @@ export const useUpdateDepositEpochList = ({
         depositBlockHashes => {
           const recordKeyIdx: string[] = []
           const batchParams: ['getHeader', string][] = []
-          records.forEach((record) => {
+          records.forEach(record => {
             if (!record.depositOutPoint && record.blockHash) {
               batchParams.push(['getHeader', record.blockHash])
               recordKeyIdx.push(record.outPoint.txHash)
             }
           })
-          depositBlockHashes.forEach((v) => {
+          depositBlockHashes.forEach(v => {
             if (v.blockHash) {
               batchParams.push(['getHeader', v.blockHash])
               recordKeyIdx.push(v.txHash)
