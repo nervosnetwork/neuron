@@ -273,7 +273,7 @@ const Overview = () => {
       </div>
       <Table
         head={
-          <div className={styles.transactionTablleHead}>
+          <div className={styles.transactionTableHead}>
             <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
             {items.length > 10 && (
               <Link className={styles.linkToHistory} to={RoutePath.History}>

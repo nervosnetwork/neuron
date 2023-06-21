@@ -77,9 +77,9 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
   const ensureDeviceAvailable = useCallback(
     async (device: DeviceInfo) => {
       try {
-        const conectionRes = await connectDevice(device)
+        const connectionRes = await connectDevice(device)
         let { descriptor } = device
-        if (!isSuccessResponse(conectionRes)) {
+        if (!isSuccessResponse(connectionRes)) {
           // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
           // so if we can't connect to the device, we need to re-search device automatically.
           // for unix, the descriptor never changes unless user plugs the device into another USB port,

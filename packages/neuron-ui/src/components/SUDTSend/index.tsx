@@ -11,7 +11,7 @@ import Spinner, { SpinnerSize } from 'widgets/Spinner'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { ReactComponent as WarningAttention } from 'widgets/Icons/ExperimentalAttention.svg'
-import { getSUDTAccount, destoryAssetAccount } from 'services/remote'
+import { getSUDTAccount, destroyAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
   validateAssetAccountAddress as validateAddress,
@@ -34,7 +34,7 @@ import {
   SendType,
   getGenerator,
   useAddressLockType,
-  useOnSumbit,
+  useOnSubmit,
   useOptions,
   useSendType,
 } from './hooks'
@@ -120,7 +120,7 @@ const SUDTSend = () => {
           if (isSuccessResponse(res)) {
             const account: Controller.GetSUDTAccount.Response = res.result
             if (!account.decimal) {
-              throw new Error('Decimal is undefiend')
+              throw new Error('Decimal is undefined')
             }
             setAccountInfo({
               accountId: `${account.id ?? ''}`,
@@ -298,7 +298,7 @@ const SUDTSend = () => {
   const [isDestroying, setIsDestroying] = useState(false)
   const onDestroy = useCallback(() => {
     setIsDestroying(true)
-    destoryAssetAccount({ walletID: walletId, id: accountId! })
+    destroyAssetAccount({ walletID: walletId, id: accountId! })
       .then(res => {
         if (isSuccessResponse(res)) {
           const tx = res.result
@@ -326,11 +326,11 @@ const SUDTSend = () => {
       })
   }, [globalDispatch, walletId, accountId])
 
-  const showDestory = useMemo(
+  const showDestroy = useMemo(
     () => accountId && (accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0)),
     [accountType, accountInfo, accountId]
   )
-  const onSubmit = useOnSumbit({ isSubmittable, accountType, walletId, addressLockType, sendType })
+  const onSubmit = useOnSubmit({ isSubmittable, accountType, walletId, addressLockType, sendType })
 
   if (!isLoaded) {
     return (
@@ -363,7 +363,7 @@ const SUDTSend = () => {
             <div className={styles.balance}>
               {accountInfo ? sudtValueToAmount(accountInfo.balance, accountInfo.decimal) : '--'}
             </div>
-            <div className={styles.symbolConatiner}>
+            <div className={styles.symbolContainer}>
               <UANTonkenSymbol
                 name={accountInfo?.tokenName || ''}
                 symbol={accountInfo?.symbol || ''}
@@ -413,7 +413,7 @@ const SUDTSend = () => {
                       <TooltipIcon width={12} height={12} />
                     </span>
                   ) : null}
-                  {(v.key === SendType.secp256Cheque && !isMainnet) ? (
+                  {v.key === SendType.secp256Cheque && !isMainnet ? (
                     <div className={styles.chequeWarning}>
                       <WarningAttention />
                       {t('messages.light-client-cheque-warning')}
@@ -453,8 +453,8 @@ const SUDTSend = () => {
             </div>
           </div>
         </div>
-        <div className={showDestory ? styles['ckb-footer'] : styles.footer}>
-          {showDestory ? (
+        <div className={showDestroy ? styles['ckb-footer'] : styles.footer}>
+          {showDestroy ? (
             <div className={styles.tooltip}>
               <Button type="cancel" label="" onClick={onDestroy} disabled={isDestroying}>
                 {t('s-udt.send.destroy') as string}

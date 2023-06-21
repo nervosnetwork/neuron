@@ -16,7 +16,7 @@ export interface InputSelectProps {
   onChange?: (value: string, arg?: SelectOptions) => void
   value?: string
   placeholder?: string
-  inputDisabeld?: boolean
+  inputDisabled?: boolean
 }
 
 function parseValue(value: string, options: SelectOptions[]) {
@@ -24,7 +24,7 @@ function parseValue(value: string, options: SelectOptions[]) {
   return option?.value || value
 }
 
-const Select = ({ value, options, placeholder, disabled, onChange, className, inputDisabeld }: InputSelectProps) => {
+const Select = ({ value, options, placeholder, disabled, onChange, className, inputDisabled }: InputSelectProps) => {
   const mounted = useRef(true)
   const root = useRef<HTMLDivElement>(null)
   const openRef = useRef<boolean>(false)
@@ -122,7 +122,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
         tabIndex={0}
         data-open={openRef.current}
       >
-        <input disabled={inputDisabeld} className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
+        <input disabled={inputDisabled} className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
         <div className={styles.arrow} />
       </div>
       {openRef.current ? (

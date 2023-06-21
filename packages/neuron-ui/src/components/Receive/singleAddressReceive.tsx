@@ -10,7 +10,7 @@ import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
 import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
 import styles from './receive.module.scss'
 
-const SignleAddressReceive = ({ address, wallet }: { address: string; wallet: State.Wallet }) => {
+const SingleAddressReceive = ({ address, wallet }: { address: string; wallet: State.Wallet }) => {
   const [t] = useTranslation()
   const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
   const onVerifyAddressClick = useCallback(() => {
@@ -42,7 +42,7 @@ const SignleAddressReceive = ({ address, wallet }: { address: string; wallet: St
             type="button"
             className={styles.addressToggle}
             onClick={() => setIsInShortFormat(is => !is)}
-            title={t(isInShortFormat ? `receive.turn-into-full-version-fomrat` : `receive.turn-into-deprecated-format`)}
+            title={t(isInShortFormat ? `receive.turn-into-full-version-format` : `receive.turn-into-deprecated-format`)}
             onFocus={stopPropagation}
             onMouseOver={stopPropagation}
             onMouseUp={stopPropagation}
@@ -75,6 +75,6 @@ const SignleAddressReceive = ({ address, wallet }: { address: string; wallet: St
   )
 }
 
-SignleAddressReceive.displayName = 'SignleAddressReceive'
+SingleAddressReceive.displayName = 'SingleAddressReceive'
 
-export default SignleAddressReceive
+export default SingleAddressReceive

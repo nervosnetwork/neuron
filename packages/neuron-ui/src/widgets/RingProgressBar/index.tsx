@@ -1,6 +1,6 @@
 import React from 'react'
 
-const RingProgresBar = ({
+const RingProgressBar = ({
   percents,
   color,
   backgroundColor = 'transparent',
@@ -26,6 +26,6 @@ const RingProgresBar = ({
   )
 }
 
-RingProgresBar.displayName = 'RingProgresBar'
+RingProgressBar.displayName = 'RingProgressBar'
 
-export default RingProgresBar
+export default RingProgressBar

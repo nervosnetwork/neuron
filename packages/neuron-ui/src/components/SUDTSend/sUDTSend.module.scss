@@ -67,7 +67,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .symbolConatiner {
+  .symbolContainer {
     grid-area: symbol;
     font-size: 0.875rem;
     max-width: 800px;
@@ -184,7 +184,7 @@
       margin-left: 8px;
       background-color: rgb(255, 244, 206);
       color: rgb(50, 49, 48);
-  
+
       & > svg {
         width: 14px;
         height: 14px;
@@ -250,7 +250,6 @@
       margin-right: 5px;
     }
   }
-
 }
 
 .footer {

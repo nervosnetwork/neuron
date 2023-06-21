@@ -10,7 +10,7 @@ import { useState as useGlobalState } from 'states'
 import CopyZoneAddress from 'widgets/CopyZoneAddress'
 
 import { AmountNotEnoughException } from 'exceptions'
-import { useSendInfo, useOnSumbit, useExport, useCanSign } from './hooks'
+import { useSendInfo, useOnSubmit, useExport, useCanSign } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
 
 const SendFromMultisigDialog = ({
@@ -63,7 +63,7 @@ const SendFromMultisigDialog = ({
       !!totalAmountErrorMessage,
     [outputErrors, sendInfoList, totalAmountErrorMessage]
   )
-  const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
+  const onSubmit = useOnSubmit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
   const onExport = useExport({ generatedTx, closeDialog })
   const canSign = useCanSign({ addresses: wallet.addresses, multisigConfig })
   return (
@@ -125,7 +125,7 @@ const SendFromMultisigDialog = ({
             disabled={isSendDisabled}
             label={t('multisig-address.send-ckb.send')}
             type="primary"
-            onClick={onSumbit}
+            onClick={onSubmit}
             data-wallet-id={wallet.id}
           />
         ) : (
