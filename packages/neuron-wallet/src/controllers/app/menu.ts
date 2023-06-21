@@ -22,7 +22,7 @@ enum URL {
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
   ImportHardware = '/import-hardware',
-  OfflineSign = 'offline-sign'
+  OfflineSign = 'offline-sign',
 }
 
 enum ExternalURL {
@@ -30,11 +30,11 @@ enum ExternalURL {
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
   Doc = 'https://docs.nervos.org/docs/basics/tools#neuron-wallet',
-  MailUs = 'neuron@magickbase.com'
+  MailUs = 'neuron@magickbase.com',
 }
 
 const separator: MenuItemConstructorOptions = {
-  type: 'separator'
+  type: 'separator',
 }
 
 const getVerionFromFile = (filePath: string) => {
@@ -63,15 +63,14 @@ const showAbout = () => {
   const isWin = process.platform === 'win32'
 
   if (isWin) {
-    const options = {
+    dialog.showMessageBox({
       type: 'info',
       title: app.name,
       message: app.name,
       detail: applicationVersion,
       buttons: ['OK'],
-      cancelId: 0
-    }
-    dialog.showMessageBox(options)
+      cancelId: 0,
+    })
     return
   }
 
@@ -132,18 +131,18 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'about',
         label: t('application-menu.neuron.about', {
-          app: app.name
+          app: app.name,
         }),
         click: () => {
           showAbout()
-        }
+        },
       },
       {
         label: t('application-menu.neuron.check-updates'),
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
           navigateTo(`${URL.Settings}?checkUpdate=1`)
-        }
+        },
       },
       separator,
       {
@@ -151,16 +150,16 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: isMainWindow,
         label: t('application-menu.neuron.preferences'),
         accelerator: 'CmdOrCtrl+,',
-        click: showSettings
+        click: showSettings,
       },
       separator,
       {
         label: t('application-menu.neuron.quit', {
-          app: app.name
+          app: app.name,
         }),
-        role: 'quit'
-      }
-    ]
+        role: 'quit',
+      },
+    ],
   }
 
   const selectWalletMenu: MenuItemConstructorOptions[] = wallets.map(wallet => {
@@ -171,7 +170,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       checked: currentWallet && wallet.id === currentWallet.id,
       click: () => {
         WalletsService.getInstance().setCurrent(wallet.id)
-      }
+      },
     }
   })
 
@@ -186,7 +185,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.wallet.create-new'),
         click: () => {
           navigateTo(URL.CreateWallet)
-        }
+        },
       },
       {
         id: 'import',
@@ -197,14 +196,14 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             label: t('application-menu.wallet.import-mnemonic'),
             click: () => {
               navigateTo(URL.ImportMnemonic)
-            }
+            },
           },
           {
             id: 'import-with-keystore',
             label: t('application-menu.wallet.import-keystore'),
             click: () => {
               navigateTo(URL.ImportKeystore)
-            }
+            },
           },
           {
             id: 'import-with-xpubkey',
@@ -214,16 +213,16 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               if (window) {
                 CommandSubject.next({ winID: window.id, type: 'import-xpubkey', payload: null, dispatchToUI: false })
               }
-            }
+            },
           },
           {
             id: 'import-with-hardware',
             label: t('application-menu.wallet.import-hardware'),
             click: () => {
               importHardware(URL.ImportHardware)
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       separator,
       {
@@ -235,7 +234,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             return
           }
           requestPassword(currentWallet.id, 'backup-wallet')
-        }
+        },
       },
       {
         id: 'export-xpubkey',
@@ -251,10 +250,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               winID: window.id,
               type: 'export-xpubkey',
               payload: currentWallet.id,
-              dispatchToUI: false
+              dispatchToUI: false,
             })
           }
-        }
+        },
       },
       {
         id: 'delete',
@@ -265,9 +264,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             return
           }
           requestPassword(currentWallet.id, 'delete-wallet')
-        }
-      }
-    ]
+        },
+      },
+    ],
   }
 
   const editMenuItem: MenuItemConstructorOptions = {
@@ -276,22 +275,22 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     submenu: [
       {
         label: t('application-menu.edit.cut'),
-        role: 'cut'
+        role: 'cut',
       },
       {
         label: t('application-menu.edit.copy'),
-        role: 'copy'
+        role: 'copy',
       },
       {
         label: t('application-menu.edit.paste'),
-        role: 'paste'
+        role: 'paste',
       },
       separator,
       {
         label: t('application-menu.edit.selectall'),
-        role: 'selectAll'
-      }
-    ]
+        role: 'selectAll',
+      },
+    ],
   }
 
   const toolsMenuItem: MenuItemConstructorOptions = {
@@ -308,10 +307,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               winID: window.id,
               type: 'sign-verify',
               payload: null,
-              dispatchToUI: true
+              dispatchToUI: true,
             })
           }
-        }
+        },
       },
       {
         label: t('application-menu.tools.multisig-address'),
@@ -323,10 +322,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               winID: window.id,
               type: 'multisig-address',
               payload: null,
-              dispatchToUI: true
+              dispatchToUI: true,
             })
           }
-        }
+        },
       },
       {
         label: t('application-menu.tools.clear-sync-data'),
@@ -338,7 +337,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             message: t('messageBox.clear-sync-data.message'),
             buttons: [t('messageBox.button.confirm'), t('messageBox.button.discard')],
             defaultId: 0,
-            cancelId: 1
+            cancelId: 1,
           })
           if (res.response === 0) {
             const network = new NetworksService().getCurrent()
@@ -348,7 +347,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               await clearCkbNodeCache()
             }
           }
-        }
+        },
       },
       {
         label: t('application-menu.tools.offline-sign'),
@@ -360,9 +359,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           }
           const { json, filePath } = result
           loadTransaction(URL.OfflineSign, json, filePath)
-        }
-      }
-    ]
+        },
+      },
+    ],
   }
 
   const windowMenuItem: MenuItemConstructorOptions = {
@@ -372,13 +371,13 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     submenu: [
       {
         label: t('application-menu.window.minimize'),
-        role: 'minimize'
+        role: 'minimize',
       },
       {
         label: t('application-menu.window.close'),
-        role: 'close'
-      }
-    ]
+        role: 'close',
+      },
+    ],
   }
 
   const helpSubmenu: MenuItemConstructorOptions[] = [
@@ -386,26 +385,26 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.help.documentation'),
       click: () => {
         shell.openExternal(ExternalURL.Doc)
-      }
+      },
     },
     separator,
     {
       label: t('application-menu.help.nervos-website'),
       click: () => {
         shell.openExternal(ExternalURL.Website)
-      }
+      },
     },
     {
       label: t('application-menu.help.source-code'),
       click: () => {
         shell.openExternal(ExternalURL.Repository)
-      }
+      },
     },
     {
       label: t('application-menu.help.report-issue'),
       click: () => {
         shell.openExternal(ExternalURL.Issues)
-      }
+      },
     },
     {
       label: t('application-menu.help.contact-us'),
@@ -416,10 +415,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           buttons: [
             t(`messageBox.button.discard`),
             t(`messageBox.mail-us.copy-mail-addr`),
-            t(`messageBox.mail-us.open-client`)
+            t(`messageBox.mail-us.open-client`),
           ],
           defaultId: 1,
-          cancelId: 0
+          cancelId: 0,
         })
 
         switch (methodId) {
@@ -440,7 +439,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
                 message: t(`messageBox.mail-us.fail-message`),
                 buttons: [t(`messageBox.button.discard`), t(`messageBox.mail-us.copy-mail-addr`)],
                 defaultId: 1,
-                cancelId: 0
+                cancelId: 0,
               })
               if (subMethodId === 1) {
                 clipboard.writeText(ExternalURL.MailUs)
@@ -452,37 +451,37 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
             return
           }
         }
-      }
+      },
     },
     {
       label: t('application-menu.help.export-debug-info'),
       click: () => {
         new ExportDebugController().export()
-      }
-    }
+      },
+    },
   ]
   if (!isMac) {
     helpSubmenu.push(separator)
     helpSubmenu.push({
       id: 'preference',
       label: t(SETTINGS_WINDOW_TITLE),
-      click: showSettings
+      click: showSettings,
     })
     helpSubmenu.push({
       label: t('application-menu.neuron.check-updates'),
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
         navigateTo(`${URL.Settings}?checkUpdate=1`)
-      }
+      },
     })
     helpSubmenu.push({
       id: 'about',
       label: t('application-menu.neuron.about', {
-        app: app.name
+        app: app.name,
       }),
       click: () => {
         showAbout()
-      }
+      },
     })
   }
 
@@ -490,7 +489,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     id: 'help',
     label: t('application-menu.help.label'),
     role: 'help',
-    submenu: helpSubmenu
+    submenu: helpSubmenu,
   }
 
   const developMenuItem: MenuItemConstructorOptions = {
@@ -499,17 +498,17 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     submenu: [
       {
         label: t('application-menu.develop.reload'),
-        role: 'reload'
+        role: 'reload',
       },
       {
         label: t('application-menu.develop.force-reload'),
-        role: 'forceReload'
+        role: 'forceReload',
       },
       {
         label: t('application-menu.develop.toggle-dev-tools'),
-        role: 'toggleDevTools'
-      }
-    ]
+        role: 'toggleDevTools',
+      },
+    ],
   }
 
   const applicationMenuTemplate = env.isDevMode
