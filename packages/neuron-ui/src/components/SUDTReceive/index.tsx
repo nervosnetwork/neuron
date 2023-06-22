@@ -67,7 +67,7 @@ const SUDTReceive = () => {
           type="button"
           className={styles.addressToggle}
           onClick={() => setIsInShortFormat(is => !is)}
-          title={t(isInShortFormat ? `receive.turn-into-full-version-fomrat` : `receive.turn-into-deprecated-format`)}
+          title={t(isInShortFormat ? `receive.turn-into-full-version-format` : `receive.turn-into-deprecated-format`)}
         >
           <AddressToggleIcon />
         </button>

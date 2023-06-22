@@ -43,7 +43,7 @@ const SUDTMigrateToNewAccountDialog = ({
     tokenInfo,
   ])
   const sudtAmount = getSUDTAmount({ tokenInfo: findTokenInfo, data: cell.data })
-  const onSumbit = useCallback(() => {
+  const onSubmit = useCallback(() => {
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
     }).then(res => {
@@ -106,7 +106,7 @@ const SUDTMigrateToNewAccountDialog = ({
       </div>
       <div className={styles.actions}>
         <Button label={t('migrate-sudt.cancel')} type="cancel" onClick={closeDialog} />
-        <Button label={t('migrate-sudt.confirm')} type="primary" disabled={confirmDisabled} onClick={onSumbit} />
+        <Button label={t('migrate-sudt.confirm')} type="primary" disabled={confirmDisabled} onClick={onSubmit} />
       </div>
     </div>
   )

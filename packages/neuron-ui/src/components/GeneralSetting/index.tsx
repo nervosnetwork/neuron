@@ -8,7 +8,7 @@ import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import { checkForUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
 import styles from './generalSetting.module.scss'
 
-interface UpdateDowloadStatusProps {
+interface UpdateDownloadStatusProps {
   show: boolean
   onCancel: () => void
   progress: number
@@ -22,7 +22,7 @@ const UpdateDownloadStatus = ({
   progress = 0,
   newVersion = '',
   releaseNotes = '',
-}: UpdateDowloadStatusProps) => {
+}: UpdateDownloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
