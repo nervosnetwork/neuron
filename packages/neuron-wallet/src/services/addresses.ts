@@ -119,7 +119,7 @@ export default class AddressService {
       changeCount
     )
 
-    //resursive check and generate addresses
+    // recursive check and generate addresses
     const nextGeneratedAddresses = await this.recursiveGenerateAndSave(
       walletId,
       extendedKey,

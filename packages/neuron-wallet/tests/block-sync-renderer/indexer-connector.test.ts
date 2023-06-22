@@ -103,7 +103,7 @@ describe('unit tests for IndexerConnector', () => {
       beforeEach(() => {
         new stubbedIndexerConnector([], nodeUrl)
       })
-      it('inits merucry indexer with a node url and a default port', () => {
+      it('inits mercury indexer with a node url and a default port', () => {
         expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
       })
     })

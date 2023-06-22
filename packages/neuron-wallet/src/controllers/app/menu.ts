@@ -38,7 +38,7 @@ const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
 
-const getVerionFromFile = (filePath: string) => {
+const getVersionFromFile = (filePath: string) => {
   if (fs.existsSync(filePath)) {
     try {
       return fs.readFileSync(filePath, 'utf8')
@@ -52,11 +52,11 @@ const showAbout = () => {
   let applicationVersion = t('about.app-version', { name: app.name, version: app.getVersion() })
 
   const appPath = app.isPackaged ? app.getAppPath() : path.join(__dirname, '../../../../..')
-  const ckbVersion = getVerionFromFile(path.join(appPath, '.ckb-version'))
+  const ckbVersion = getVersionFromFile(path.join(appPath, '.ckb-version'))
   if (ckbVersion) {
     applicationVersion += `\n${t('about.ckb-client-version', { version: ckbVersion })}`
   }
-  const ckbLightClientVersion = getVerionFromFile(path.join(appPath, '.ckb-light-version'))
+  const ckbLightClientVersion = getVersionFromFile(path.join(appPath, '.ckb-light-version'))
   if (ckbLightClientVersion) {
     applicationVersion += `${t('about.ckb-light-client-version', { version: ckbLightClientVersion })}`
   }

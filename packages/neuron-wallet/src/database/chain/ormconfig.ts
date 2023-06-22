@@ -16,7 +16,7 @@ import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import TxDescription from './entities/tx-description'
 import AddressDescription from './entities/address-description'
 import MultisigConfig from './entities/multisig-config'
-import MultisigOuput from './entities/multisig-output'
+import MultisigOutput from './entities/multisig-output'
 import SyncProgress from './entities/sync-progress'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
@@ -82,7 +82,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       IndexerTxHashCache,
       AddressDescription,
       MultisigConfig,
-      MultisigOuput,
+      MultisigOutput,
       SyncProgress
     ],
     migrations: [

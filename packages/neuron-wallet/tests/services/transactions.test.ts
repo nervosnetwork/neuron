@@ -102,7 +102,7 @@ describe('transactions service', () => {
       beforeEach(() => {
         hashes = ['0x4', txs[1].hash, '0x5']
       })
-      it('returns the ones not exsit', async () => {
+      it('returns the ones not exist', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
         expect(nonExistHashes).toEqual(['0x4', '0x5'])
       })
