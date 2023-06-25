@@ -118,8 +118,17 @@ declare namespace State {
     decimal: string
   }
 
-  type AlertDialog = Record<'title' | 'message', string> | null
+  type AlertDialog = {
+    show?: boolean
+    title?: string
+    message?: string
+    type: 'success' | 'failed' | 'warning'
+    onClose?: () => void
+    onOk?: () => void
+    onCancel?: () => void
+  } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
+  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn' }
 
   type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
 
@@ -141,6 +150,8 @@ declare namespace State {
     showAllNotifications: boolean
     isAllowedToFetchList: boolean
     loadedTransaction: any
+    pageNotice?: PageNotice
+    showWaitForFullySynced: boolean
   }
 
   interface NetworkProperty {
@@ -205,6 +216,7 @@ declare namespace State {
     status: number
     isLookingValidTarget: boolean
     validTarget?: string
+    syncStatus?: SyncStatus
   }>
 
   interface Chain {

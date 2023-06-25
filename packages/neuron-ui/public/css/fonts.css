@@ -7,3 +7,33 @@
   font-family: 'SourceCodePro-Regular';
   src: url('../fonts/SourceCodePro-Regular.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: 'ProximaNova-Regular';
+  src: url('../fonts/ProximaNova-Regular.otf') format('opentype'),
+      url('../fonts//Proximanova-Regular.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'ProximaNova-Semibold';
+  src: url('../fonts/ProximaNova-Semibold.otf') format('opentype'),
+      url('../fonts/ProximaNova-Semibold.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'D-DIN-PRO';
+  src: url('../fonts/D-DIN-PRO-500-Medium.otf') format('opentype'),
+      url('../fonts/D-DIN-PRO-500-Medium.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Medium';
+  src: url('../fonts/JetBrainsMonoNL-Medium.otf') format('opentype'),
+      url('../fonts/JetBrainsMonoNL-Medium.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMonoNL-Regular.otf') format('opentype'),
+      url('../fonts/JetBrainsMonoNL-Regular.ttf') format('opentype');
+}

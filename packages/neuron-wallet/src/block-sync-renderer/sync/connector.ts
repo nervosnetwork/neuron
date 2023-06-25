@@ -13,22 +13,22 @@ export interface LumosCellQuery {
 }
 
 export interface LumosCell {
-  block_hash: string
-  out_point: {
-    tx_hash: string
+  blockHash: string
+  outPoint: {
+    txHash: string
     index: string
   }
-  cell_output: {
+  cellOutput: {
     capacity: string
     lock: {
-      code_hash: string
+      codeHash: string
       args: string
-      hash_type: string
+      hashType: string
     }
     type?: {
-      code_hash: string
+      codeHash: string
       args: string
-      hash_type: string
+      hashType: string
     }
   }
   data?: string

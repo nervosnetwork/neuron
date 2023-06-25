@@ -1,130 +1,136 @@
 @import '../../styles/mixin.scss';
 
 .srOnly {
-    position: absolute;
-    top: -10000px;
-    left: -10000px;
+  position: absolute;
+  top: -10000px;
+  left: -10000px;
 }
 
 @mixin button {
-    @include medium-text;
-    appearance: none;
-    cursor: pointer;
-    font-size: 0.75rem;
-    line-height: 1rem;
-    font-weight: 500;
-    padding: 7px 7px;
-    border: none;
-    border-radius: 2px;
-    margin: 0;
-    box-sizing: border-box;
-    border-radius: 2px;
-    background-color: transparent;
-    min-width: 0;
-    &:hover, &:focus {
-        @include semi-bold-text;
-        background-color: #efefef;
-    }
-    &[disabled] {
-        cursor: not-allowed;
-        opacity: 0.5;
-        box-shadow: none !important;
-        pointer-events: none;
-        &:hover {
-            background-color: transparent;
-        }
-    }
+  appearance: none;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background-color: transparent;
+  min-width: 0;
+	color: var(--main-text-color);
+  &[disabled] {
+    cursor: not-allowed;
+    color: var(--disable-button-text-color);
+    box-shadow: none !important;
+    pointer-events: none;
+  }
 }
 
 .calendar {
-    .calOptions {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        list-style-type: none;
-        list-style: none;
-        padding: 0;
+  .calOptions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    list-style-type: none;
+    list-style: none;
+    padding: 0;
 
-        li {
-            flex-grow: 1;
-        }
-
-        button {
-            @include button;
-            width: 100px;
-            &[aria-checked="true"] {
-                background-color: var(--nervos-green);
-                color: white;
-            }
-        }
+    li {
+      flex-grow: 1;
     }
+
+    button {
+      @include button;
+      width: 100px;
+      &[aria-checked='true'] {
+        background-color: var(--primary-color);
+        color: white;
+      }
+    }
+  }
 }
 
 .calendarHeader {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #eee;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+	align-items: center;
 
-    .calPrev, .calNext {
-        @include button;
-        width: 30px;
+  .calPrev,
+  .calNext {
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		svg {
+			g,
+			path {
+				stroke: var(--main-text-color)
+			}
+		}
+  }
+  .calPrev {
+    order: 1;
+		&[disabled] {
+			svg {
+				g,
+				path {
+					stroke: var(--disable-button-text-color)
+				}
+			}
     }
-    .calPrev {
-        order: 1;
+  }
+  .calNext {
+    order: 3;
+  }
 
-        &::before {
-            content: '<';
-        }
-    }
-    .calNext {
-        order: 3;
-
-        &::before {
-            content: '>';
-        }
-    }
-
-    .calTitle {
-        order: 2;
-        margin: 0;
-        font-size: 0;
-
-        button {
-            @include button;
-            @include semi-bold-text;
-            height: 100%;
-            min-width: 100px;
-            margin-right: 10px;
-        }
-    }
+  .calTitle {
+    order: 2;
+    margin: 0;
+    font-size: 16px;
+    line-height: 22px;
+		color: var(--main-text-color);
+  }
 }
 
 .calendarTable {
-    width: 100%;
+  width: 100%;
 
-    td {
-        text-align: center;
-    }
+	thead {
+		position: relative;
+		tr {
+			height: 40px;
+			color: var(--main-text-color)
+		}
+		&::after {
+			position: absolute;
+			content: "";
+			background: var(--input-border-color);
+			left: 0;
+			bottom: -0;
+			height: 1px;
+			width: 100%;
+		}
+	}
 
-    .calTableHeader {
-        @include semi-bold-text;
-        font-size: 13px;
-    }
+  td {
+    text-align: center;
+  }
 
-    .calDateItem {
-        @include button;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        &[aria-current="date"] {
-            color: var(--nervos-green);
-        }
-        &[aria-pressed="true"] {
-            background-color: var(--nervos-green);
-            color: white;
-        }
+  button {
+    &:hover,
+    &:focus {
+			color: #fff;
+			background-color: var(--primary-color);
     }
+  }
+
+  .calDateItem {
+    @include button;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    &[aria-current='date'] {
+      color: var(--primary-color);
+    }
+    &[aria-pressed='true'] {
+      background-color: var(--primary-color);
+      color: white;
+    }
+  }
 }

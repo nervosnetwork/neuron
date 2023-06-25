@@ -1,8 +1,4 @@
-.container {
-  display: flex;
-  margin-top: 10px;
-  height: calc(100% - 75px);
-}
+@import '../../styles/mixin.scss';
 
 .wallets {
   height: 100%;
@@ -11,104 +7,71 @@
   padding: 0 0 5px 8px;
 }
 
+.addWrap {
+  position: relative;
+  display: inline-block;
+  margin: 16px 0 0 14px;
+}
+
+.addBtn {
+  @include icon-hover-button();
+}
+
 .actions {
-  margin-top: 10px;
-  padding: 0 10px;
-  border-left: 1px solid #ccc;
+  padding-top: 5px;
+
   button {
-    min-width: 9.375rem;
-  }
-}
-
-.hr {
-  height: 1px;
-  margin: 0 0 18px 0;
-  border: none;
-}
-
-.label {
-  color: #888;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.button {
-  background: none;
-  font-size: 14px;
-  margin: 18px 0;
-  width: 200px;
-  display: block;
-  color: #434343;
-  border: none;
-  text-align: left;
-  border-radius: 2px;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  span {
-    font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
-    svg {
-      width: 20px;
-      height: 20px;
-      margin-right: 5px;
-      vertical-align: bottom;
-      fill: #434343;
-    }
-  }
-  &:hover {
-    border-radius: 2px;
-    background-color: #eaeaea;
-  }
-}
-
-.choiceLabel {
-  display: flex !important;
-  align-items: center;
-  border: 1px solid transparent;
-  padding: 3px;
-  box-sizing: border-box;
-
-  .walletName {
-    display: inline-block;
-    width: 500px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  button {
+    background: none;
+    font-size: 14px;
+    min-width: 164px;
+    padding: 0 8px;
+    height: 40px;
+    color: var(--main-text-color);
+    border: none;
+    text-align: left;
     display: flex;
     align-items: center;
-    height: 1.25rem;
-    visibility: hidden;
-    appearance: none;
-    margin: 0 0 0 10px;
-    padding: 0;
-    border: none;
-    background: transparent;
+    cursor: pointer;
     svg {
-      width: 0.875rem;
-      height: 0.875rem;
-      pointer-events: none;
-      path,
-      g {
-        fill: #888;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      g,
+      path {
+        fill: var(--main-text-color);
       }
     }
-    &:hover {
+    &[data-stroke='true'] {
       svg {
-        path,
-        g {
-          fill: var(--nervos-green);
+        g,
+        path {
+          fill: none;
+          stroke: var(--main-text-color);
         }
       }
     }
+    &:hover {
+      border-radius: 8px;
+      background-color: var(--tooltip-hover-background-color);
+    }
   }
+}
+
+.radioItem {
+  margin-right: 16px;
   &:hover,
   &:focus {
-    border-color: #aeaeae;
     button {
       visibility: visible;
     }
+  }
+}
+.suffix {
+  display: flex;
+  align-items: center;
+  button {
+    @include icon-hover-button;
+    visibility: hidden;
   }
 }
 

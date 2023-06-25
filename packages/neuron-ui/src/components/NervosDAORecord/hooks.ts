@@ -1,6 +1,5 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { getHeader } from 'services/chain'
-import { showTransactionDetails } from 'services/remote'
 import { calculateAPC, CONSTANTS } from 'utils'
 
 const { MILLISECONDS_IN_YEAR } = CONSTANTS
@@ -72,14 +71,4 @@ export const useUpdateApc = ({
   }, [depositTimestamp, tipBlockTimestamp, timestamp, genesisBlockTimestamp, setApc])
 }
 
-export const useOnTxRecordClick = () =>
-  useCallback((e: React.SyntheticEvent<HTMLButtonElement, MouseEvent>) => {
-    const {
-      dataset: { txHash },
-    } = e.target as HTMLButtonElement
-    if (txHash) {
-      showTransactionDetails(txHash)
-    }
-  }, [])
-
-export default { useUpdateWithdrawEpochs, useUpdateApc, useOnTxRecordClick }
+export default { useUpdateWithdrawEpochs, useUpdateApc }

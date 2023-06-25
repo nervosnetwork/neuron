@@ -83,7 +83,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddressDescription,
       MultisigConfig,
       MultisigOuput,
-      SyncProgress
+      SyncProgress,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -117,7 +117,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       UpdateOutputChequeLockHash1652945662504,
       RemoveAddressesMultisigConfig1651820157100,
       AddSyncProgress1676441837373,
-      AddTypeSyncProgress1681360188494
+      AddTypeSyncProgress1681360188494,
     ],
     logger: 'simple-console',
     logging,

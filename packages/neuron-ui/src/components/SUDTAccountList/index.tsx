@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { SpinnerSize, SearchBox } from 'office-ui-fabric-react'
+import { SearchBox } from 'office-ui-fabric-react'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
 import SUDTCreateDialog, { TokenInfo, AccountType } from 'components/SUDTCreateDialog'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
 import Experimental from 'widgets/ExperimentalRibbon'
-import Spinner from 'widgets/Spinner'
+import Spinner, { SpinnerSize } from 'widgets/Spinner'
 
 import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import {
@@ -31,7 +31,7 @@ export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
 const SUDTAccountList = () => {
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const {
     wallet: { id: walletId, balance },
     chain: {
@@ -56,7 +56,7 @@ const SUDTAccountList = () => {
     checkMigrateAcp().then(res => {
       if (isSuccessResponse(res)) {
         if (res.result === false) {
-          history.push(RoutePath.Overview)
+          navigate(RoutePath.Overview)
         }
       } else {
         dispatch({
@@ -69,7 +69,7 @@ const SUDTAccountList = () => {
         })
       }
     })
-  }, [dispatch, history])
+  }, [dispatch, navigate])
   useIsInsufficientToCreateSUDTAccount({ walletId, balance: BigInt(balance), setInsufficient })
 
   const fetchAndUpdateList = useCallback(() => {
@@ -139,11 +139,11 @@ const SUDTAccountList = () => {
           tokenName: account.tokenName ?? DEFAULT_SUDT_FIELDS.tokenName,
           symbol: account.symbol ?? DEFAULT_SUDT_FIELDS.symbol,
         })
-        history.push(`${RoutePath.SUDTReceive}?${query}`)
+        navigate(`${RoutePath.SUDTReceive}?${query}`)
         break
       }
       case 'send': {
-        history.push(`${RoutePath.SUDTSend}/${id}`)
+        navigate(`${RoutePath.SUDTSend}/${id}`)
         break
       }
       default: {

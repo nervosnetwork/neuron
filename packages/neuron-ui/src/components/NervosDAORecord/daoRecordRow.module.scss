@@ -1,4 +1,5 @@
 @import '../../styles/mixin.scss';
+@value hoverShow from '../../widgets/CopyZone/copyZone.module.scss';
 
 @mixin text-overflow {
   white-space: nowrap;
@@ -8,16 +9,70 @@
 }
 
 .container {
-  min-height: 102px;
-  padding: 8px 5px;
-  background-color: #fff;
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
-  display: grid;
-  grid-template: 'badge badge badge' 'amount stage action' 'compensation stage action' 'apc stage action' 'transactions transactions transactions';
-  grid-template-rows: auto auto auto 1fr auto;
-  grid-template-columns: 230px 1fr 147px;
+  background-color: var(--secondary-background-color);
+  border-radius: 16px;
 
-  column-gap: 30px;
+  padding: 16px;
+
+  .amountAndBadge {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .compensationAndAPC {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .stageAndAction {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+
+  .infoTags {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .infoTag {
+    display: flex;
+    align-items: center;
+    background: var(--table-head-background-color);
+    border-radius: 4px;
+    padding: 0 12px 0 8px;
+    font-size: 14px;
+    line-height: 40px;
+
+    .pin {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-color);
+    }
+
+    .name {
+      margin-left: 8px;
+      color: #666;
+
+      @media (prefers-color-scheme: dark) {
+        color: #999;
+      }
+    }
+
+    .value {
+      margin-left: 16px;
+      color: var(--main-text-color);
+    }
+
+    &.lockedPeriod {
+      .pin {
+        background: #f78c2a;
+      }
+    }
+  }
 
   .collapse {
     grid-area: 4/1/5/2;
@@ -49,60 +104,115 @@
   }
 
   .badge {
-    grid-area: badge;
+    position: relative;
     display: flex;
-    justify-content: flex-start;
-    padding-bottom: 0.6875rem;
+    align-items: center;
+    color: var(--third-text-color);
+    font-size: 14px;
+    line-height: 20px;
 
-    & > div {
-      font-size: 0.6875rem;
-      background-color: #eee;
-      border-radius: 3px;
-      padding: 2px 4px;
+    & > time {
+      margin-left: 8px;
+    }
 
-      time {
-        padding-left: 5px;
+    & > svg {
+      margin-left: 10px;
+    }
+
+    &:hover {
+      color: var(--primary-color);
+
+      & > svg {
+        path {
+          fill: currentColor;
+        }
+      }
+
+      .popover {
+        display: block;
+      }
+    }
+
+    .popover {
+      position: absolute;
+      z-index: 1;
+      right: -8px;
+      top: 100%;
+      display: none;
+      filter: drop-shadow(0px 2px 10px var(--main-shadow-color));
+
+      &::before {
+        $arrow-size: 10px;
+
+        margin-left: calc(50% - #{$arrow-size});
+        display: block;
+        content: '';
+        width: 0;
+        height: 0;
+        margin-top: -$arrow-size;
+        border: $arrow-size solid transparent;
+        border-bottom-color: var(--third-background-color);
+      }
+
+      .content {
+        width: max-content;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--third-background-color);
+
+        .fields {
+          display: grid;
+          grid-template-columns: auto auto;
+          gap: 20px 8px;
+          margin-top: 6px;
+          font-size: 14px;
+          line-height: 20px;
+          color: var(--main-text-color);
+        }
+
+        .txRecordBtn {
+          width: 100%;
+          height: 40px;
+          margin-top: 14px;
+          border: none;
+          border-radius: 8px;
+          background: var(--fourth-background-color);
+          font-size: 14px;
+        }
       }
     }
   }
 
   .amount {
-    @include text-overflow;
-    grid-area: amount;
-    box-sizing: border-box;
-    justify-self: flex-end;
-    font-size: 0.875rem;
-    line-height: 1.125rem;
-    padding: 0 0 5px 25px;
+    font-size: 16px;
+    line-height: 22px;
+
+    .hoverShow {
+      left: -8px;
+      top: -5px;
+      padding: 5px 8px;
+      border-radius: 8px;
+    }
   }
 
   .compensation {
-    @include text-overflow;
-    grid-area: compensation;
-    box-sizing: border-box;
-    justify-self: flex-end;
-    color: var(--nervos-green);
-    font-size: 0.875rem;
-    line-height: 1.125rem;
-    padding-left: 25px;
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
   }
 
   .apc {
-    grid-area: apc;
-    justify-self: flex-end;
-    font-size: 0.75rem;
-    line-height: 0.9375rem;
-    color: #434343;
-
-    span {
-      padding-left: 25px;
-    }
+    font-size: 12px;
+    line-height: 17px;
+    margin-left: 8px;
   }
 
   .stage {
     position: relative;
-    grid-area: stage;
-    margin-top: -6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .tooltip {
       position: absolute;
@@ -118,130 +228,21 @@
 
     div:first-child:hover + .tooltip {
       opacity: 1;
-      transform: translate(-50%, 20px);
+      transform: translate(-50%, 30px);
     }
 
     .message {
-      display: block;
-      color: #434343;
-      font-size: 0.6875rem;
-      line-height: 0.875rem;
-      margin-top: 4px;
+      color: var(--third-text-color);
+      font-size: 14px;
+      line-height: 20px;
     }
   }
 
   .action {
-    grid-area: action;
-    padding-top: 7px;
-
     button {
-      width: 8.75rem;
-      height: 1.5rem;
-      line-height: 1.5rem;
+      width: 216px;
+      line-height: 56px;
       padding: 0;
-    }
-  }
-
-  .lockedPeriod {
-    grid-area: 2/2/3/4;
-  }
-
-  .compensatedPeriod {
-    grid-area: 3/2/4/4;
-  }
-
-  .lockedPeriod,
-  .compensatedPeriod {
-    display: flex;
-    justify-content: space-between;
-    margin-right: 55px;
-    font-size: 0.75rem;
-    color: #434343;
-  }
-
-  .transactions {
-    display: grid;
-    grid-template: 'title deposited' auto '. withdrawn' auto '. unlocked' auto/ 205px 1fr;
-
-    box-sizing: border-box;
-    visibility: hidden;
-    grid-area: transactions;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.1s ease-in-out;
-    margin: 0 55px;
-    opacity: 0;
-    font-size: 0.75rem;
-    color: #434343;
-
-    .title {
-      grid-area: title;
-    }
-
-    .deposited {
-      grid-area: deposited;
-    }
-
-    .withdrawn {
-      grid-area: withdrawn;
-    }
-
-    .unlocked {
-      grid-area: unlocked;
-    }
-
-    .deposited,
-    .withdrawn,
-    .unlocked {
-      @include regular-text;
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 1.7875rem;
-      padding: 0 2px;
-      appearance: none;
-      border: none;
-      box-sizing: border-box;
-      background: transparent;
-
-      &::before {
-        position: absolute;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        content: attr(data-text);
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(224, 224, 224, 0.9);
-        font-size: 0.75rem;
-        color: #666;
-      }
-
-      &:hover::before {
-        display: flex;
-      }
-
-      &:last-of-type {
-        @include semi-bold-text;
-      }
-    }
-  }
-
-  &[data-is-collapsed='false'] {
-    .transactions {
-      visibility: visible;
-      max-height: 500px;
-      margin: 20px 55px 0;
-      border-top: 1px dashed #ccc;
-      padding: 17px 0;
-      opacity: 1;
-    }
-
-    .collapseIcon {
-      transform: rotate(90deg);
     }
   }
 }

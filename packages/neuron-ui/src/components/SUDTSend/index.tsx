@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useReducer, useMemo, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { SUDTAccount } from 'components/SUDTAccountList'
 import TransactionFeePanel from 'components/TransactionFeePanel'
@@ -8,7 +7,7 @@ import SUDTAvatar from 'widgets/SUDTAvatar'
 import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
+import Spinner, { SpinnerSize } from 'widgets/Spinner'
 import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { ReactComponent as WarningAttention } from 'widgets/Icons/ExperimentalAttention.svg'
@@ -299,7 +298,7 @@ const SUDTSend = () => {
   const [isDestroying, setIsDestroying] = useState(false)
   const onDestroy = useCallback(() => {
     setIsDestroying(true)
-    destoryAssetAccount({ walletID: walletId, id: accountId })
+    destoryAssetAccount({ walletID: walletId, id: accountId! })
       .then(res => {
         if (isSuccessResponse(res)) {
           const tx = res.result
@@ -328,8 +327,8 @@ const SUDTSend = () => {
   }, [globalDispatch, walletId, accountId])
 
   const showDestory = useMemo(
-    () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
-    [accountType, accountInfo]
+    () => accountId && (accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0)),
+    [accountType, accountInfo, accountId]
   )
   const onSubmit = useOnSumbit({ isSubmittable, accountType, walletId, addressLockType, sendType })
 
@@ -414,7 +413,7 @@ const SUDTSend = () => {
                       <TooltipIcon width={12} height={12} />
                     </span>
                   ) : null}
-                  {(v.key === SendType.secp256Cheque && !isMainnet) ? (
+                  {v.key === SendType.secp256Cheque && !isMainnet ? (
                     <div className={styles.chequeWarning}>
                       <WarningAttention />
                       {t('messages.light-client-cheque-warning')}

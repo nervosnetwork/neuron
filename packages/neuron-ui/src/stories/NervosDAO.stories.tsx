@@ -1,13 +1,9 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
-import { withKnobs, text } from '@storybook/addon-knobs'
-import { action } from '@storybook/addon-actions'
+import { ComponentStory } from '@storybook/react'
 import NervosDAO from 'components/NervosDAO'
-import { initStates, NeuronWalletContext } from 'states'
+import { initStates } from 'states'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
-
-const dispatch = action('Dispatch')
 
 const stateTemplate = {
   ...initStates,
@@ -40,7 +36,6 @@ const stateTemplate = {
         remote: 'http://testnet.nervos.com',
         chain: 'ckb_testnet',
         type: 1 as 0 | 1,
-        genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
       },
     ],
   },
@@ -108,66 +103,27 @@ const stateTemplate = {
   },
 }
 
-const states = {
-  'Has no receipts': {
-    ...stateTemplate,
-    nervosDAO: {
-      records: [],
-    },
+export default {
+  title: 'Nervos DAO',
+  component: NervosDAO,
+  argTypes: {
+    app: { control: 'object', isGlobal: true },
+    wallet: { control: 'object', isGlobal: true },
+    chain: { control: 'object', isGlobal: true },
+    settings: { control: 'object', isGlobal: true },
+    nervosDAO: { control: 'object', isGlobal: true },
   },
-  'Has receipts': stateTemplate,
 }
 
-const stories = storiesOf(`Nervos DAO`, module)
+const Template: ComponentStory<typeof NervosDAO> = () => <NervosDAO />
 
-Object.entries(states).forEach(([title, state]) => {
-  console.info(state)
-  stories.add(title, () => (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <NervosDAO />
-    </NeuronWalletContext.Provider>
-  ))
-})
+export const HasNoReceipts = Template.bind({})
+HasNoReceipts.args = {
+  ...stateTemplate,
+  nervosDAO: {
+    records: [],
+  },
+}
 
-stories.addDecorator(withKnobs).add('With knobs', () => {
-  const state = {
-    dispatch: (dispatchAction: any) => action(dispatchAction),
-    ...initStates,
-    app: {
-      ...initStates.app,
-      epoch: text('Epoch', '1'),
-      difficulty: BigInt(100000),
-      chain: text('Chain', 'chain_dev'),
-    },
-    wallet: {
-      ...initStates.wallet,
-      id: text('Wallet ID', 'wallet id'),
-      name: text('Wallet Name', 'Current Wallet Name'),
-      balance: text('Balance', '213'),
-    },
-    chain: {
-      ...initStates.chain,
-      networkID: text('Network ID', 'testnet'),
-      tipBlockNumber: text('Tip block number', '123'),
-    },
-    settings: {
-      ...initStates.settings,
-      networks: [
-        {
-          id: text('Network iD', 'testnet'),
-          name: text('Network Name', 'Testnet'),
-          remote: text('Network Address', 'http://testnet.nervos.com'),
-          chain: text('Chain', 'ckb_testnet'),
-          type: 1 as 0 | 1,
-          genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
-        },
-      ],
-    },
-  }
-  console.info(state)
-  return (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <NervosDAO />
-    </NeuronWalletContext.Provider>
-  )
-})
+export const HasReceipts = Template.bind({})
+HasReceipts.args = stateTemplate

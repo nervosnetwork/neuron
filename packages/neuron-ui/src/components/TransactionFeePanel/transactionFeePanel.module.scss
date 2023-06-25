@@ -1,0 +1,131 @@
+@import '../../styles';
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--secondary-text-color);
+  font-size: 14px;
+
+  .left {
+    display: flex;
+    align-items: center;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.dropdown {
+  margin-top: 8px;
+  position: relative;
+  --tag-red-bg-color: #ffe8e8;
+  --tag-green-bg-color: #effaf7;
+  --tag-blue-bg-color: #e8faff;
+  @media (prefers-color-scheme: dark) {
+    --tag-red-bg-color: #322929;
+    --tag-green-bg-color: #2e3735;
+    --tag-blue-bg-color: #2d3638;
+  }
+  .content {
+    border: 1px solid var(--divide-line-color);
+    border-radius: 8px;
+    &[data-active='true'] {
+      svg {
+        g,
+        path {
+          stroke: var(--primary-color);
+        }
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .selects {
+    position: absolute;
+    width: 100%;
+    margin-top: 8px;
+    z-index: 1;
+    background: var(--secondary-background-color);
+    box-shadow: 0px 1px 4px #eeeeee;
+    border-radius: 8px;
+    @media (prefers-color-scheme: dark) {
+      box-shadow: none;
+      border: 1px solid var(--border-color);
+    }
+  }
+
+  .selectItem {
+    display: block;
+    width: 100%;
+    padding: 0 16px;
+
+    .wrap {
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--input-border-color);
+    }
+
+    &:first-child {
+      .wrap {
+        border: none;
+      }
+    }
+
+    p {
+      margin: 0;
+    }
+    span {
+      float: right;
+    }
+    .title {
+      display: inline-block;
+      color: var(--main-text-color);
+      font-size: 14px;
+      min-width: 80px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 7px 14px;
+      border-radius: 24px;
+      font-size: 12px;
+      line-height: 17px;
+    }
+    .green {
+      color: #00c891;
+      background: var(--tag-green-bg-color);
+    }
+    .blue {
+      color: #23bff0;
+      background: var(--tag-blue-bg-color);
+    }
+    .red {
+      color: #ff5656;
+      background: var(--tag-red-bg-color);
+    }
+  }
+}
+
+.changeBtn {
+  margin-left: 4px;
+  height: 16px;
+  width: 16px;
+  min-width: 0;
+  cursor: pointer;
+  &:hover {
+    svg {
+      g,
+      path {
+        fill: var(--primary-color);
+      }
+    }
+  }
+}
+
+.textFieldClass{
+  margin-bottom: 10px;
+}

@@ -35,8 +35,6 @@ const SendFromMultisigDialog = ({
   const {
     sendInfoList,
     outputErrors,
-    isAddOneBtnDisabled,
-    addSendInfo,
     deleteSendInfo,
     onSendInfoChange,
     totalAmount,
@@ -92,13 +90,10 @@ const SendFromMultisigDialog = ({
               item={item}
               errors={outputErrors[idx]}
               isSendMax={isSendMax}
-              isAddBtnShow={idx === sendInfoList.length - 1 && !item.disabled}
-              isAddOneBtnDisabled={isAddOneBtnDisabled}
               isMaxBtnDisabled={isMaxBtnDisabled}
               isTimeLockable={false}
               isMaxBtnShow={idx === sendInfoList.length - 1}
               isRemoveBtnShow={sendInfoList.length > 1}
-              onOutputAdd={addSendInfo}
               onOutputRemove={deleteSendInfo}
               onItemChange={onSendInfoChange}
               onSendMaxClick={onSendMaxClick}
@@ -112,8 +107,16 @@ const SendFromMultisigDialog = ({
           value={`${shannonToCKBFormatter(totalAmount)} CKB`}
           readOnly
           error={totalAmountErrorMessage}
+          className={styles.textFieldClass}
         />
-        <TextField label={t('send.fee')} field="fee" value={`${shannonToCKBFormatter(fee)} CKB`} readOnly disabled />
+        <TextField
+          className={styles.textFieldClass}
+          label={t('send.fee')}
+          field="fee"
+          value={`${shannonToCKBFormatter(fee)} CKB`}
+          readOnly
+          disabled
+        />
       </div>
       <div className={styles.sendActions}>
         <Button label={t('multisig-address.send-ckb.cancel')} type="cancel" onClick={closeDialog} />

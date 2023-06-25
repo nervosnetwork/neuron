@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useReducer } from 'react'
-import Experimental from 'widgets/ExperimentalRibbon'
+import React, { useEffect, useReducer } from 'react'
+import { useDialogWrapper } from 'utils'
 import Comfirming from './confirming'
 import ImportError from './import-error'
 import SelectModel from './select-model'
@@ -16,17 +16,41 @@ const reducer: React.Reducer<ImportHardwareState, ActionType> = (state, action) 
 
 const Content = () => {
   const [importHardwareStates, dispatch] = useReducer(reducer, { step: ImportStep.ImportHardware })
+  const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
+  useEffect(() => {
+    if (!dialogRef) {
+      return
+    }
+    if (
+      importHardwareStates.step === ImportStep.ImportHardware ||
+      importHardwareStates.step === ImportStep.NameWallet
+    ) {
+      closeDialog()
+    } else {
+      openDialog()
+    }
+  }, [importHardwareStates.step, dialogRef, closeDialog, openDialog])
   switch (importHardwareStates.step) {
     case ImportStep.ImportHardware:
-      return <SelectModel dispatch={dispatch} />
     case ImportStep.DetectDevice:
-      return <DetectDevice dispatch={dispatch} model={importHardwareStates.model!} />
     case ImportStep.Comfirming:
-      return <Comfirming dispatch={dispatch} />
     case ImportStep.Error:
-      return <ImportError dispatch={dispatch} error={importHardwareStates.error} />
     case ImportStep.Success:
-      return <ImportSuccess dispatch={dispatch} />
+      return (
+        <>
+          <SelectModel dispatch={dispatch} />
+          <dialog ref={dialogRef} className={styles.dialog}>
+            {ImportStep.DetectDevice === importHardwareStates.step && (
+              <DetectDevice dispatch={dispatch} model={importHardwareStates.model!} />
+            )}
+            {ImportStep.Comfirming === importHardwareStates.step && <Comfirming dispatch={dispatch} />}
+            {ImportStep.Error === importHardwareStates.step && (
+              <ImportError dispatch={dispatch} error={importHardwareStates.error} />
+            )}
+            {ImportStep.Success === importHardwareStates.step && <ImportSuccess dispatch={dispatch} />}
+          </dialog>
+        </>
+      )
     case ImportStep.NameWallet:
       return (
         <NameWallet
@@ -41,18 +65,10 @@ const Content = () => {
 }
 
 const ImportHardware = () => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
-  const EXPERIMENTAL_TAG = 'import-hardware'
-
-  useEffect(() => {
-    dialogRef.current!.showModal()
-  }, [])
-
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
-      <Experimental tag={EXPERIMENTAL_TAG} showRibbon={false} message="messages.experimental-message-hardware" />
+    <div className={styles.importHardwareRoot}>
       <Content />
-    </dialog>
+    </div>
   )
 }
 

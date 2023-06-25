@@ -1,6 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import WalletSetting from 'components/WalletSetting'
 import { initStates } from 'states'
 
@@ -18,7 +18,7 @@ const states: { [title: string]: State.WalletIdentity[] } = {
   ],
 }
 
-const stories = storiesOf('WalletSetting', module).addDecorator(StoryRouter())
+const stories = storiesOf('WalletSetting', module).addDecorator(withRouter())
 
 Object.entries(states).forEach(([title, wallets]) => {
   stories.add(title, () => (

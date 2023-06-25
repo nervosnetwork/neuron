@@ -11,6 +11,7 @@ const CommandSubject = new Subject<{
     | 'import-hardware'
     | 'load-transaction-json'
     | 'migrate-acp'
+    | 'sign-verify'
   payload: string | null
   dispatchToUI: boolean
 }>()

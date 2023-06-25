@@ -1,15 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-
-import SettingTabs from 'components/SettingTabs'
-import NetworkEditor from 'components/NetworkEditor'
-import WalletEditor from 'components/WalletEditor'
-import WalletWizard from 'components/WalletWizard'
-import ImportKeystore from 'components/ImportKeystore'
-import PasswordRequest from 'components/PasswordRequest'
-import ImportHardware from 'components/ImportHardware'
-
 import { useDispatch, NeuronWalletActions, AppActions } from 'states'
 
 import { LocalCacheKey } from 'services/localCache'
@@ -19,31 +10,23 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { getPlatform } from 'services/remote'
-import { RoutePath, useRoutes, useOnLocalStorageChange, useOnLocaleChange } from 'utils'
+import { useOnLocalStorageChange, useOnLocaleChange } from 'utils'
 
-export const settingContents: CustomRouter.Route[] = [
-  { name: `SettingTabs`, path: RoutePath.Settings, exact: false, component: SettingTabs },
-  { name: `NetworkEditor`, path: RoutePath.NetworkEditor, params: '/:id', exact: false, component: NetworkEditor },
-  { name: `WalletEditor`, path: RoutePath.WalletEditor, params: '/:id', exact: false, component: WalletEditor },
-  { name: `WalletWizard`, path: RoutePath.WalletWizard, exact: false, component: WalletWizard },
-  { name: `ImportKeystore`, path: RoutePath.ImportKeystore, exact: false, component: ImportKeystore },
-  { name: `PasswordRequest`, path: '/', exact: false, component: PasswordRequest },
-  { name: `ImportHardware`, path: RoutePath.ImportHardware, exact: false, component: ImportHardware },
-]
-
-const Settings = () => {
+const Settings = ({ isDetachedWindow }: { isDetachedWindow?: boolean }) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const [, i18n] = useTranslation()
   useOnLocaleChange(i18n)
   useEffect(() => {
-    const isMac = getPlatform() === 'darwin'
-    window.document.title = i18n.t(`settings.title.${isMac ? 'mac' : 'normal'}`)
-    // eslint-disable-next-line
-  }, [i18n.language])
+    if (isDetachedWindow) {
+      const isMac = getPlatform() === 'darwin'
+      window.document.title = i18n.t(`settings.title.${isMac ? 'mac' : 'normal'}`)
+      // eslint-disable-next-line
+    }
+  }, [i18n.language, isDetachedWindow])
 
   useEffect(() => {
-    const onNavigate = (url: string) => history.push(url)
+    const onNavigate = (url: string) => navigate(url)
 
     const onAppUpdaterUpdates = (info: Subject.AppUpdater) => {
       dispatch({ type: NeuronWalletActions.UpdateAppUpdaterStatus, payload: info })
@@ -78,7 +61,7 @@ const Settings = () => {
       appUpdaterSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
-  }, [dispatch, history])
+  }, [dispatch, navigate])
 
   const onChange = useCallback(
     (e: StorageEvent) => {
@@ -127,8 +110,7 @@ const Settings = () => {
   )
 
   useOnLocalStorageChange(onChange)
-  const routes = useRoutes(settingContents)
-  return <>{routes}</>
+  return <Outlet />
 }
 
 Settings.displayName = 'Settings'
