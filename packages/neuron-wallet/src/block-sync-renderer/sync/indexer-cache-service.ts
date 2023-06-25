@@ -4,7 +4,7 @@ import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
-import { TransactionCollector, CellCollector, CkbIndexer } from '@nervina-labs/ckb-indexer'
+import { TransactionCollector, CellCollector, Indexer as CkbIndexer } from '@ckb-lumos/ckb-indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
@@ -88,20 +88,9 @@ export default class IndexerCacheService {
       ]
 
       for (const lockScript of lockScripts) {
-        const transactionCollector = new TransactionCollector(
-          this.indexer,
-          {
-            lock: {
-              code_hash: lockScript.codeHash,
-              hash_type: lockScript.hashType,
-              args: lockScript.args,
-            },
-          },
-          this.indexer.ckbRpcUrl,
-          {
-            includeStatus: false,
-          }
-        )
+        const transactionCollector = new TransactionCollector(this.indexer, { lock: lockScript }, this.rpcService.url, {
+          includeStatus: false,
+        })
 
         const fetchedTxHashes = await transactionCollector.getTransactionHashes()
         if (!fetchedTxHashes.length) {
@@ -132,15 +121,15 @@ export default class IndexerCacheService {
       for (const { lockScript, argsLen } of lockScriptsForCellCollection) {
         const cellCollector = new CellCollector(this.indexer, {
           lock: {
-            code_hash: lockScript.codeHash,
-            hash_type: lockScript.hashType,
+            codeHash: lockScript.codeHash,
+            hashType: lockScript.hashType,
             args: lockScript.args.slice(0, 42),
           },
           argsLen,
         })
 
         for await (const cell of cellCollector.collect()) {
-          const txHash = cell.out_point!.tx_hash!
+          const txHash = cell.outPoint!.txHash!
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,

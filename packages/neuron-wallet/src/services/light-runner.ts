@@ -11,7 +11,7 @@ const { app } = env
 
 export enum NetworkType {
   Light,
-  Full
+  Full,
 }
 
 abstract class NodeRunner {
@@ -91,10 +91,7 @@ export class CKBLightRunner extends NodeRunner {
       logger.info(`CKB Light Runner:\tconfig has init, skip init...`)
       return
     }
-    const values = fs
-      .readFileSync(this.templateConfigFile)
-      .toString()
-      .split('\n')
+    const values = fs.readFileSync(this.templateConfigFile).toString().split('\n')
     let isStorePath = false
     let isNetworkPath = false
     const newValues = values.map(v => {
@@ -129,7 +126,7 @@ export class CKBLightRunner extends NodeRunner {
     const options = ['run', '--config-file', this.configFile]
     const runnerProcess = spawn(this.binary, options, {
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { RUST_LOG: 'info', ckb_light_client: 'info' }
+      env: { RUST_LOG: 'info', ckb_light_client: 'info' },
     })
     this.runnerProcess = runnerProcess
 

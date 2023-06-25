@@ -127,6 +127,7 @@ const MultisigAddress = () => {
   )
 
   const { keywords, onKeywordsChange, onSearch } = useSearch(clearSelected, onFilterConfig)
+
   const sendTotalBalance = useMemo(() => {
     if (sendAction.sendFromMultisig?.fullPayload) {
       return multisigBanlances[sendAction.sendFromMultisig.fullPayload]

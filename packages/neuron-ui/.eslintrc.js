@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['airbnb', 'plugin:@typescript-eslint/recommended', 'prettier'],
+  extends: ['airbnb', 'plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   settings: {
     // https://github.com/SimulatedGREG/electron-vue/issues/423#issuecomment-464807973
     'import/core-modules': ['electron'],

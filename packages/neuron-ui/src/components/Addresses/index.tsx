@@ -39,13 +39,8 @@ const Addresses = () => {
     backToTop()
   }, [])
 
-  const {
-    localDescription,
-    onDescriptionPress,
-    onDescriptionFieldBlur,
-    onDescriptionChange,
-    onDescriptionSelected,
-  } = useLocalDescription('address', walletID, dispatch)
+  const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange, onDescriptionSelected } =
+    useLocalDescription('address', walletID, dispatch)
 
   const onContextMenu = useCallback(
     (item: State.Address) => (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
@@ -125,9 +120,7 @@ const Addresses = () => {
                       onDoubleClick={onDescriptionSelected}
                       className={styles.descriptionField}
                       suffix={
-                        isSelected ? (
-                          undefined
-                        ) : (
+                        isSelected ? undefined : (
                           <button
                             type="button"
                             data-description-key={addr.address}

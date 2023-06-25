@@ -51,13 +51,8 @@ const TransactionList = ({
   const [isDetailOpening, setIsDetailOpening] = useState(false)
   const [t] = useTranslation()
 
-  const {
-    localDescription,
-    onDescriptionPress,
-    onDescriptionFieldBlur,
-    onDescriptionChange,
-    onDescriptionSelected,
-  } = useLocalDescription('transaction', walletID, dispatch)
+  const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange, onDescriptionSelected } =
+    useLocalDescription('transaction', walletID, dispatch)
 
   const onTxClick = useCallback(
     (e: React.SyntheticEvent<HTMLElement>) => {

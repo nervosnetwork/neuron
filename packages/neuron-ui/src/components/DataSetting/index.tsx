@@ -19,7 +19,7 @@ const PathItem = ({
   path,
   handleClick,
   openPath,
-  disabled
+  disabled,
 }: {
   path?: string
   handleClick: (e: React.SyntheticEvent<HTMLButtonElement>) => void
@@ -63,10 +63,10 @@ const DataSetting = () => {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
-    networkID,
-    networks,
-  ])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networkID, networks]
+  )
   return (
     <>
       <div className={styles.root}>
@@ -85,8 +85,15 @@ const DataSetting = () => {
           </div>
         </div>
         <div className={styles.rightContainer}>
-          { isLightClient ? null : <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} /> }
-          <ClearCache className={styles.item} btnClassName={styles.itemBtn} dispatch={dispatch} hideRebuild={isLightClient} />
+          {isLightClient ? null : (
+            <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} />
+          )}
+          <ClearCache
+            className={styles.item}
+            btnClassName={styles.itemBtn}
+            dispatch={dispatch}
+            hideRebuild={isLightClient}
+          />
         </div>
       </div>
 
