@@ -199,8 +199,8 @@ export default class MultisigService {
           const config = currentMultisigConfigs[idx]
           const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
           addressCursorMap.set(script.args, v?.result?.last_cursor)
-          v.result.objects.forEach((transaction: any) => {
-            multisigOutputTxHashList.add(transaction.tx_hash)
+          v.result.objects.forEach((obj: any) => {
+            multisigOutputTxHashList.add(obj.tx_hash || obj.transaction?.hash)
           })
           nextMultisigConfigs.push(currentMultisigConfigs[idx])
         }
