@@ -68,10 +68,10 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@electron/notarize": "1.2.3",
-    "@nervosnetwork/ckb-types": "0.107.0",
+    "@electron/notarize": "1.2.4",
+    "@nervosnetwork/ckb-types": "0.109.0",
     "@types/archiver": "3.1.1",
-    "@types/async": "3.2.18",
+    "@types/async": "3.2.20",
     "@types/electron-devtools-installer": "2.2.2",
     "@types/elliptic": "6.4.14",
     "@types/iarna__toml": "2.0.2",
@@ -90,7 +90,7 @@
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-prettier": "4.2.1",
-    "lint-staged": "13.2.1",
+    "lint-staged": "13.2.2",
     "prettier": "2.8.7",
     "jest-when": "3.5.2",
     "neuron-ui": "0.110.1",
