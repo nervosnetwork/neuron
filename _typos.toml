@@ -5,6 +5,7 @@ thur = "thur"
 lastest = "lastest"
 
 [files]
-extend-exclude = ["**/migrations/*.ts"]
+extend-exclude = ["CHANGELOG.md", "**/migrations/*.ts"]
+
 
 
