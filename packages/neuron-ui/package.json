@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "0.107.0",
-    "@nervosnetwork/ckb-sdk-utils": "0.107.0",
+    "@nervosnetwork/ckb-sdk-utils": "0.109.0",
     "canvg": "2.0.0",
     "i18next": "21.10.0",
     "immer": "9.0.21",
