@@ -32,7 +32,7 @@ import {
   NoMatchAddressForSign,
   SignTransactionFailed,
   CellIsNotYetLive,
-  TransactionIsNotCommittedYet
+  TransactionIsNotCommittedYet,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'

@@ -12,6 +12,7 @@ import {
   shannonToCKBFormatter,
   isSuccessResponse,
   validateAmount,
+  padFractionDigitsIfDecimal,
 } from 'utils'
 
 import {
@@ -447,7 +448,7 @@ export const useOnSlide = ({
         maxDepositAmount - BigInt(CKBToShannonFormatter(`${value}`)) < BigInt(SHANNON_CKB_RATIO * MIN_AMOUNT)
           ? shannonToCKBFormatter(`${maxDepositAmount}`, false, '')
           : `${value}`
-      updateDepositValue(amount)
+      updateDepositValue(padFractionDigitsIfDecimal(amount, 8))
     },
     [updateDepositValue, maxDepositAmount]
   )
@@ -565,13 +566,13 @@ export const useUpdateDepositEpochList = ({
         depositBlockHashes => {
           const recordKeyIdx: string[] = []
           const batchParams: ['getHeader', string][] = []
-          records.forEach((record) => {
+          records.forEach(record => {
             if (!record.depositOutPoint && record.blockHash) {
               batchParams.push(['getHeader', record.blockHash])
               recordKeyIdx.push(record.outPoint.txHash)
             }
           })
-          depositBlockHashes.forEach((v) => {
+          depositBlockHashes.forEach(v => {
             if (v.blockHash) {
               batchParams.push(['getHeader', v.blockHash])
               recordKeyIdx.push(v.txHash)

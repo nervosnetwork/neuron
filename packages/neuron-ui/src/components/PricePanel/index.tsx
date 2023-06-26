@@ -63,9 +63,10 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     [onPriceChange]
   )
 
-  const inputError = useMemo(() => (Number(price) < 1000 ? t('price-switch.errorTip', { minPrice: 1000 }) : null), [
-    price,
-  ])
+  const inputError = useMemo(
+    () => (Number(price) < 1000 ? t('price-switch.errorTip', { minPrice: 1000 }) : null),
+    [price]
+  )
 
   const feeValuesArray = useMemo(
     () =>

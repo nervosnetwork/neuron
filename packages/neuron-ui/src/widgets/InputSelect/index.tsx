@@ -122,7 +122,12 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
         tabIndex={0}
         data-open={openRef.current}
       >
-        <input disabled={inputDisabled} className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
+        <input
+          disabled={inputDisabled}
+          className={placeholderClass}
+          onChange={onInputChange}
+          value={value ?? innerValue}
+        />
         <div className={styles.arrow} />
       </div>
       {openRef.current ? (

@@ -256,14 +256,23 @@ export default class AssetAccountService {
       .values(sudtTokenInfoEntity)
       .onConflict(`("tokenID") DO NOTHING`)
       .execute()
-
-    await getConnection()
+    const existAccountAcount = await getConnection()
+      .getRepository(AssetAccountEntity)
       .createQueryBuilder()
-      .insert()
-      .into(AssetAccountEntity)
-      .values(assetAccountEntity)
-      .onConflict(`("tokenID", "blake160") DO NOTHING`)
-      .execute()
+      .where({
+        tokenID,
+        blake160
+      })
+      .getCount()
+    // check whether the entity exists before insert. Reason: https://github.com/Magickbase/neuron-public-issues/issues/184#issue-1749746997
+    if (!existAccountAcount) {
+      await getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(AssetAccountEntity)
+        .values(assetAccountEntity)
+        .execute()
+    }
   }
 
   public static async checkAndDeleteWhenFork(startBlockNumber: string, anyoneCanPayLockHashes: string[]) {

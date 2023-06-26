@@ -176,9 +176,7 @@ export const EditTextField = ({
       onDoubleClick={focusEdit}
       className={styles.editTextField}
       suffix={
-        isActive ? (
-          undefined
-        ) : (
+        isActive ? undefined : (
           <button type="button" onClick={focusEdit} className={styles.editBtn}>
             <Edit />
           </button>

@@ -125,7 +125,7 @@ export default {
       'no-match-address-for-sign': '没有找到匹配的地址',
       'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址',
       'no-exist-ckb-node-data': '{{path}} 目錄下沒有找到 CKB Node 配置和數據, 點擊繼續重新同步',
-      'light-client-sudt-acp-error': '輕節點模式不支持發送資產給其他用戶的資產賬戶'
+      'light-client-sudt-acp-error': '輕節點模式不支持發送資產給其他用戶的資產賬戶',
     },
     messageBox: {
       button: {
@@ -236,7 +236,7 @@ export default {
     about: {
       'app-version': '{{name}} 版本: {{version}}',
       'ckb-client-version': 'CKB 節點版本: {{version}}',
-      'ckb-light-client-version': 'CKB 輕節點版本: {{version}}'
+      'ckb-light-client-version': 'CKB 輕節點版本: {{version}}',
     },
     settings: {
       title: {

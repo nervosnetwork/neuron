@@ -9,9 +9,19 @@ import env from '../env'
 let syncQueue: SyncQueue | null
 
 export interface WorkerMessage<T = any> {
-  type: 'call' | 'response' | 'kill',
-  id?: number,
-  channel: 'start' | 'queryIndexer' | 'unmount' | 'cache-tip-block-updated' | 'tx-db-changed' | 'wallet-deleted' | 'address-created' | 'indexer-error' | 'check-and-save-wallet-address' | 'append_scripts'
+  type: 'call' | 'response' | 'kill'
+  id?: number
+  channel:
+    | 'start'
+    | 'queryIndexer'
+    | 'unmount'
+    | 'cache-tip-block-updated'
+    | 'tx-db-changed'
+    | 'wallet-deleted'
+    | 'address-created'
+    | 'indexer-error'
+    | 'check-and-save-wallet-address'
+    | 'append_scripts'
   message: T
 }
 

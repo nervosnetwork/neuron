@@ -15,6 +15,7 @@ import {
   getSyncStatus,
   CKBToShannonFormatter,
   clsx,
+  padFractionDigitsIfDecimal,
 } from 'utils'
 
 import { openExternal } from 'services/remote'
@@ -84,7 +85,7 @@ const NervosDAO = () => {
     isBalanceReserved,
     t,
     depositValue,
-    suggestFeeRate
+    suggestFeeRate,
   })
   const updateDepositValue = hooks.useUpdateDepositValue({ setDepositValue })
 
@@ -263,7 +264,8 @@ const NervosDAO = () => {
   useEffect(() => {
     try {
       if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
-        setDepositValue(shannonToCKBFormatter(`${maxDepositAmount}`, false, ''))
+        const amount = shannonToCKBFormatter(`${maxDepositAmount}`, false, '')
+        setDepositValue(padFractionDigitsIfDecimal(amount, 8))
       }
     } catch (error) {
       // ignore error

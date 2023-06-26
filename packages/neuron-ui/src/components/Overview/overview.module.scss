@@ -46,6 +46,7 @@
 
       & > svg {
         margin-left: 8px;
+        cursor: pointer;
 
         path {
           fill: var(--svg-fill-color);

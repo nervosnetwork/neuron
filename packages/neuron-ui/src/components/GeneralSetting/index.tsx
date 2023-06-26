@@ -4,8 +4,8 @@ import { useSearchParams } from 'react-router-dom'
 import Dialog from 'widgets/Dialog'
 import LanguageDialog from 'components/LanguageDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
-import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import { checkForUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
+import { LanguageSelect, CheckUpdateIcon } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
 interface UpdateDownloadStatusProps {
@@ -134,7 +134,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
           {t('settings.general.version')} {version}
         </p>
         <button type="button" onClick={checkUpdates}>
-          {t(`updates.check-updates`)} <ArrowNext />
+          <CheckUpdateIcon />
+          {t(`updates.check-updates`)}
         </button>
       </div>
 
@@ -148,7 +149,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
             setShowLangDialog(true)
           }}
         >
-          {t(`settings.locale.${i18n.language}`)} <ArrowNext />
+          <LanguageSelect />
+          {t(`settings.locale.${i18n.language}`)}
         </button>
       </div>
 

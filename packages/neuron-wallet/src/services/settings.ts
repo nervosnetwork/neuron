@@ -8,10 +8,10 @@ import path from 'path'
 const { app } = env
 
 export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
-export type Locale = typeof locales[number]
+export type Locale = (typeof locales)[number]
 const settingKeys = {
   testnetLightDataPath: 'testnetLightDataPath',
-  ckbDataPath: 'ckbDataPath'
+  ckbDataPath: 'ckbDataPath',
 }
 
 export default class SettingsService extends Store {
