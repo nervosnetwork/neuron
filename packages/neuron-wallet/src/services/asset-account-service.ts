@@ -256,7 +256,7 @@ export default class AssetAccountService {
       .values(sudtTokenInfoEntity)
       .onConflict(`("tokenID") DO NOTHING`)
       .execute()
-    const existAccountAcount = await getConnection()
+    const existAccountAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder()
       .where({
@@ -265,7 +265,7 @@ export default class AssetAccountService {
       })
       .getCount()
     // check whether the entity exists before insert. Reason: https://github.com/Magickbase/neuron-public-issues/issues/184#issue-1749746997
-    if (!existAccountAcount) {
+    if (!existAccountAccount) {
       await getConnection()
         .createQueryBuilder()
         .insert()
