@@ -2,9 +2,9 @@ import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
-import { isSuccessResponse, useDidMount, errorFormatter } from 'utils'
+import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
-import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
+import { Error as ErrorIcon } from 'widgets/Icons/icon'
 import {
   CkbAppNotFoundException,
   ConnectFailedException,
@@ -16,30 +16,28 @@ import { ImportStep, ActionType, Model } from './common'
 import styles from './findDevice.module.scss'
 
 const Info = (
-  { isError, isScaning, msg }: { isError?: boolean; isScaning?: boolean; msg: string } = {
+  { isError, isWaiting, msg }: { isError?: boolean; isWaiting?: boolean; msg: string } = {
     isError: false,
-    isScaning: false,
+    isWaiting: false,
     msg: '',
   }
 ) => {
-  const [t] = useTranslation()
   if (isError) {
     return (
       <>
-        <div className={styles.info}>
+        <div className={styles.errorInfo}>
           <span>
-            <FailedInfo />
+            <ErrorIcon type="error" />
           </span>
           <span className={styles.error}>{msg}</span>
         </div>
-        <div className={styles.aborted}>{t('import-hardware.abort')}</div>
       </>
     )
   }
   return (
     <div className={styles.info}>
-      <span>{isScaning ? null : <SuccessInfo />}</span>
-      <span className={isScaning ? styles.scaning : ''}>{msg}</span>
+      <span>{isWaiting ? null : <SuccessInfo />}</span>
+      <span>{msg}</span>
     </div>
   )
 }
@@ -119,17 +117,16 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
       <section className={styles.detect}>
         <h3 className={styles.model}>{productName}</h3>
         {errorMsg ? <Info isError msg={errorMsg} /> : null}
-        {scaning ? <Info isScaning={scaning} msg={t('import-hardware.waiting')} /> : null}
+        {scaning ? <Info isWaiting={scaning} msg={t('import-hardware.waiting')} /> : null}
         {firmwareVersion && !errorMsg && !scaning ? (
           <Info msg={t('import-hardware.firmware-version', { version: firmwareVersion })} />
         ) : null}
         {appVersion ? <Info msg={t('import-hardware.app-version', { version: appVersion })} /> : null}
       </section>
-      <footer className={styles.footer}>
-        <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
-        {errorMsg ? (
-          <Button type="ok" label={t('import-hardware.actions.rescan')} onClick={findDevice} />
-        ) : (
+      <footer className={styles.dialogFooter}>
+        <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />
+        {!scaning && errorMsg && <Button type="ok" label={t('import-hardware.actions.rescan')} onClick={findDevice} />}
+        {!scaning && !errorMsg && (
           <Button type="submit" label={t('import-hardware.actions.next')} onClick={onNext} disabled={!ready} />
         )}
       </footer>

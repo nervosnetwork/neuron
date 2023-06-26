@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ReactComponent as ArrowPrev } from 'widgets/Icons/ArrowPrev.svg'
+import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import {
   getMonthCalendar,
   getLocalMonthNames,
@@ -79,7 +81,6 @@ const Calendar: React.FC<CalendarProps> = ({
   const weekNames = useMemo(() => getLocalWeekNames(language), [language])
 
   const weekTitle = useMemo(() => Array.from({ length: 7 }, (_, i) => weekNames[(i + firstDayOfWeek) % 7]), [weekNames])
-  const monthName = monthNames[month - 1]
   const monthShortName = monthShortNames[month - 1]
 
   const calendar = useMemo(
@@ -127,7 +128,7 @@ const Calendar: React.FC<CalendarProps> = ({
       <thead aria-hidden="true">
         <tr>
           {weekTitle.map(weekname => (
-            <th className={styles.calTableHeader} scope="col" key={weekname}>
+            <th scope="col" key={weekname}>
               {weekname}
             </th>
           ))}
@@ -166,26 +167,7 @@ const Calendar: React.FC<CalendarProps> = ({
   const calendarHeader = (
     <header className={styles.calendarHeader} aria-labelledby={`calendar-title-${uId}`} role="toolbar">
       <h2 className={styles.calTitle} aria-live="polite" id={`calendar-title-${uId}`}>
-        <button
-          type="button"
-          aria-label={monthName}
-          title={monthName}
-          aria-haspopup="true"
-          aria-expanded={status === 'month'}
-          onClick={() => setStatus('month')}
-        >
-          {monthShortName}
-        </button>
-        <button
-          type="button"
-          aria-label={`${year}`}
-          title={`${year}`}
-          aria-haspopup="true"
-          aria-expanded={status === 'year'}
-          onClick={() => setStatus('year')}
-        >
-          {year}
-        </button>
+        {monthShortName} {year}
       </h2>
       <button
         type="button"
@@ -195,7 +177,9 @@ const Calendar: React.FC<CalendarProps> = ({
         className={styles.calPrev}
         disabled={!isMonthInRange(year, month - 1, { minDate, maxDate })}
         onClick={prevMonth}
-      />
+      >
+        <ArrowPrev />
+      </button>
       <button
         type="button"
         aria-label={t('datetime.next-month')}
@@ -204,7 +188,9 @@ const Calendar: React.FC<CalendarProps> = ({
         className={styles.calNext}
         onClick={nextMonth}
         disabled={!isMonthInRange(year, month + 1, { minDate, maxDate })}
-      />
+      >
+        <ArrowNext />
+      </button>
     </header>
   )
 

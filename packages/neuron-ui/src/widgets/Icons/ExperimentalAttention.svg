@@ -1,16 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="54px" height="54px" viewBox="0 0 54 54" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
-    <desc>Created with Sketch.</desc>
-    <g id="sUDT-*" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="sUDT_experimental-popup" transform="translate(-523.000000, -203.000000)">
-            <g id="Group-11" transform="translate(300.000000, 173.000000)">
-                <g id="Group-9" transform="translate(223.000000, 30.000000)">
-                    <circle id="Oval" fill="#F7AE4D" fill-rule="nonzero" cx="27" cy="27" r="27"></circle>
-                    <rect id="Rectangle" fill="#FFFFFF" x="25" y="14" width="4" height="18"></rect>
-                    <rect id="Rectangle-Copy-55" fill="#FFFFFF" x="25" y="35" width="4" height="4" rx="2"></rect>
-                </g>
-            </g>
-        </g>
-    </g>
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M7 12.6C10.0928 12.6 12.6 10.0928 12.6 7C12.6 3.90721 10.0928 1.4 7 1.4C3.90721 1.4 1.4 3.90721 1.4 7C1.4 10.0928 3.90721 12.6 7 12.6ZM14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0C10.866 0 14 3.13401 14 7ZM7 5.81871C7.3866 5.81871 7.7 6.13211 7.7 6.51871V9.31871C7.7 9.70531 7.3866 10.0187 7 10.0187C6.6134 10.0187 6.3 9.70531 6.3 9.31871V6.51871C6.3 6.13211 6.6134 5.81871 7 5.81871ZM7 3.01875C6.6134 3.01875 6.3 3.33215 6.3 3.71875C6.3 4.10535 6.6134 4.41875 7 4.41875H7.007C7.3936 4.41875 7.707 4.10535 7.707 3.71875C7.707 3.33215 7.3936 3.01875 7.007 3.01875H7Z" fill="#FF9737"/>
 </svg>

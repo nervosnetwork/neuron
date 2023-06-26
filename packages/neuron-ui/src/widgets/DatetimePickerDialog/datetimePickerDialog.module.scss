@@ -1,0 +1,91 @@
+@import '../../styles';
+
+.container {
+  margin: 16px 168px 0;
+  width: 344px;
+  .calendarContainer {
+    width: 344px;
+    position: relative;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 0;
+  }
+  .calendarWrap {
+    position: relative;
+    width: 266px;
+  }
+  .popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    border-radius: 2px;
+
+    .title {
+      @include dialog-title;
+    }
+
+    .timezone {
+      span:first-child {
+        @include semi-bold-text;
+        margin-right: 5px;
+      }
+
+      @include regular-text;
+      margin-bottom: 8px;
+    }
+
+    .edit {
+      margin-top: 16px;
+      position: relative;
+      background: var(--secondary-background-color);
+      border: 1px solid var(--input-border-color);
+      border-radius: 8px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      p {
+        position: absolute;
+        left: 16px;
+        margin: 0;
+        font-size: 14px;
+        color: var(--input-second-color);
+      }
+    }
+
+    input {
+      border: none;
+      width: 100%;
+      font-weight: 500;
+      text-align: center;
+      font-size: 14px;
+      line-height: 24px;
+      background: var(--secondary-background-color);
+      color: var(--main-text-color)
+    }
+  }
+
+  .notice {
+    @include regular-text;
+    font-size: 12px;
+    margin: 11px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--notice-text-color);
+    svg {
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+  }
+
+  .error {
+    @include regular-text;
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 5px;
+  }
+}

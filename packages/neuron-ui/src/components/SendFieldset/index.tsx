@@ -1,20 +1,13 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-
+import AlertDialog from 'widgets/AlertDialog'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-
-import AddOutput from 'widgets/Icons/AddOutput.png'
-import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
-import Edit from 'widgets/Icons/Edit.png'
-import ActiveEdit from 'widgets/Icons/ActiveEdit.png'
-import Trash from 'widgets/Icons/Trash.png'
-import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
-import Calendar from 'widgets/Icons/Calendar.png'
-import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
+import { ReactComponent as Trash } from 'widgets/Icons/Trash.svg'
 import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention.svg'
+import TimeClock from 'widgets/Icons/TimeClock.svg'
 
-import { formatDate } from 'widgets/DatetimePicker'
+import { formatDate } from 'widgets/DatetimePickerDialog'
 import { localNumberFormatter, PlaceHolders, isSecp256k1Address } from 'utils'
 import { ErrorWithI18n } from 'exceptions'
 
@@ -27,11 +20,8 @@ interface SendSubformProps {
   isSendMax: boolean
   isMaxBtnDisabled: boolean
   isMaxBtnShow: boolean
-  isAddOneBtnDisabled: boolean
-  isAddBtnShow: boolean
   isRemoveBtnShow: boolean
   isTimeLockable?: boolean
-  onOutputAdd: () => void
   onOutputRemove: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onLocktimeClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onSendMaxClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
@@ -46,10 +36,7 @@ const SendFieldset = ({
   isSendMax,
   isMaxBtnDisabled,
   isMaxBtnShow,
-  isAddOneBtnDisabled,
-  isAddBtnShow,
   isRemoveBtnShow,
-  onOutputAdd,
   onOutputRemove,
   onLocktimeClick,
   onSendMaxClick,
@@ -58,6 +45,8 @@ const SendFieldset = ({
   isMainnet,
 }: SendSubformProps) => {
   const [t] = useTranslation()
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const removeRef = useRef<HTMLButtonElement | null>(null)
 
   const [amountErrorMsg, addrErrorMsg] = [errors.amountError, errors.addrError].map(err =>
     err ? t(err.message, err.i18n) : ''
@@ -77,20 +66,43 @@ const SendFieldset = ({
   return (
     <div className={styles.container}>
       <TextField
-        className={styles.addressField}
-        label={t('send.address')}
+        className={`${styles.addresstField} ${styles.textFieldClass}`}
+        rows={2}
+        label={
+          <div className={styles.removeLabel}>
+            <div>{t('send.address')}</div>
+            {isRemoveBtnShow && (
+              <Button
+                ref={removeRef}
+                onClick={(e: React.SyntheticEvent<HTMLButtonElement>) => {
+                  if (showDeleteDialog) {
+                    onOutputRemove(e)
+                  } else {
+                    setShowDeleteDialog(true)
+                  }
+                }}
+                data-idx={idx}
+                disabled={isSendMax}
+                className={styles.removeBtn}
+                type="text"
+              >
+                <Trash />
+              </Button>
+            )}
+          </div>
+        }
         field="address"
         data-idx={idx}
         disabled={item.disabled}
         value={item.address || ''}
         onChange={onItemChange}
-        required
         error={addrErrorMsg}
         autoFocus
+        width="100%"
       />
 
       <TextField
-        className={styles.amountField}
+        className={styles.textFieldClass}
         label={t('send.amount')}
         field="amount"
         data-idx={idx}
@@ -98,77 +110,55 @@ const SendFieldset = ({
         placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
         onChange={onItemChange}
         disabled={item.disabled}
-        required
-        suffix="CKB"
+        suffix={
+          isMaxBtnShow && (
+            <Button disabled={isMaxBtnDisabled} type="text" onClick={onSendMaxClick} className={styles.max}>
+              Max
+            </Button>
+          )
+        }
         error={amountErrorMsg}
+        width="100%"
       />
 
-      {isMaxBtnShow ? (
-        <Button
-          className={styles.maxBtn}
-          type="primary"
-          onClick={onSendMaxClick}
-          disabled={isMaxBtnDisabled}
-          label="Max"
-          data-is-on={isSendMax}
-        />
-      ) : null}
-
-      <div className={styles.iconBtns}>
-        {isRemoveBtnShow ? (
-          <button
-            type="button"
-            disabled={isSendMax}
-            aria-label={t('send.remove-this')}
-            data-idx={idx}
-            onClick={onOutputRemove}
-            className={styles.iconBtn}
-          >
-            <img src={RemoveOutput} alt="Remove Output" data-type="remove" />
-          </button>
-        ) : null}
-        {isAddBtnShow ? (
-          <button
-            type="button"
-            disabled={isAddOneBtnDisabled}
-            onClick={onOutputAdd}
-            aria-label={t('send.add-one')}
-            className={styles.iconBtn}
-          >
-            <img src={AddOutput} alt="Add Output" data-type="add" />
-          </button>
-        ) : null}
-      </div>
-
-      {locktimeAble ? (
-        <div className={styles.locktime} data-status={item.date ? 'set' : 'unset'}>
-          <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
-          <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
-          {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
-          <button type="button" data-index={idx} data-type="set" onClick={onLocktimeClick}>
-            {item.date ? (
-              <>
-                <img data-status="inactive" className={styles.icon} src={Edit} alt="edit" />
-                <img data-status="active" className={styles.icon} src={ActiveEdit} alt="active-edit" />
-              </>
-            ) : (
-              t('send.set-locktime')
-            )}
-          </button>
+      {locktimeAble && (
+        <div className={styles.locktime}>
           {item.date ? (
-            <button type="button" data-index={idx} data-type="remove" onClick={onLocktimeClick}>
-              <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
-              <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
-            </button>
-          ) : null}
-          {item.date && (
-            <div className={styles.locktimeWarn}>
-              <Attention />
-              {t('send.locktime-warning', { extraNote: isMainnet ? null : t('messages.light-client-locktime-warning') })}
+            <div>
+              <div className={styles.content}>
+                <img className={styles.icon} src={TimeClock} alt="calendar" />
+                <p>{`${t('send.release-on')}: ${formatDate(new Date(+item.date))}`}</p>
+                <button type="button" onClick={onLocktimeClick}>
+                  <Trash data-index={idx} data-type="remove" />
+                </button>
+              </div>
+              <div className={styles.locktimeWarn}>
+                <Attention />
+                {t('send.locktime-warning', { extraNote: isMainnet ? null : t('messages.light-client-locktime-warning') })}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.content}>
+              <img className={styles.icon} src={TimeClock} alt="calendar" />
+              <button type="button" data-index={idx} data-type="set" onClick={onLocktimeClick}>
+                {t('send.set-locktime')}
+              </button>
             </div>
           )}
         </div>
-      ) : null}
+      )}
+
+      <AlertDialog
+        show={showDeleteDialog}
+        title={t('send.remove-receiving-address')}
+        message={t('send.remove-receiving-address-msg')}
+        type="warning"
+        onCancel={() => setShowDeleteDialog(false)}
+        onOk={() => {
+          removeRef?.current?.click()
+          setShowDeleteDialog(false)
+        }}
+      />
     </div>
   )
 }

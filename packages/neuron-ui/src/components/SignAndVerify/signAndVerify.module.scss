@@ -1,157 +1,4 @@
 @import '../../styles/mixin.scss';
-$inputHeight: 26px;
-
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  .title {
-    @include bold-text;
-    font-size: 1.375rem;
-    line-height: 1.75rem;
-    margin: 0 0 5px;
-    padding: 0;
-  }
-
-  .label {
-    @include medium-text;
-    padding: 0;
-    margin: 0;
-    font-size: 1rem;
-    line-height: 44px;
-    font-weight: 600;
-  }
-
-  .addrInput,
-  textarea {
-    @include regular-text;
-    font-size: 12px !important;
-    display: block;
-    resize: unset;
-    width: 100%;
-    border: 1px solid #000;
-    padding: 6px 12px;
-    box-sizing: border-box;
-  }
-
-  textarea {
-    flex: 1;
-    margin-bottom: 18px;
-  }
-
-  .addrInput {
-    height: $inputHeight;
-  }
-  .signatureField [class^='textField_input']:focus-within {
-    border-color: #000;
-  }
-}
-
-.actions {
-  @include dialog-footer;
-  margin-top: 35px;
-
-  button {
-    margin-left: 9px;
-  }
-}
-
-.address {
-  position: relative;
-  margin-bottom: 18px;
-
-  .dropdownBtn {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background: #d8d8d8;
-    border: 1px solid #000;
-    box-sizing: border-box;
-    height: $inputHeight;
-    width: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-
-    img {
-      transform: scale(0.4);
-    }
-  }
-
-  .addrList {
-    @include semi-bold-text;
-    box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.23);
-    background-color: #ffffff;
-    overflow: auto;
-    width: 100%;
-    font-size: 12px !important;
-    position: absolute;
-    top: calc(100% - 1px);
-    left: 0;
-    transition: all 0.2s 0.1s ease-in-out;
-    max-height: 0;
-    opacity: 0;
-
-    .addrOpt {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      height: $inputHeight;
-      padding: 0 12px;
-
-      * {
-        pointer-events: none;
-      }
-
-      span {
-        font-size: inherit;
-      }
-
-      & > span:nth-child(2) {
-        @include semi-bold-text;
-        padding: 0px 5px;
-        flex: 1;
-
-        &:before {
-          content: '(';
-        }
-
-        &:after {
-          content: ')';
-        }
-      }
-
-      .addrType {
-        @include regular-text;
-        color: var(--nervos-green);
-        display: block;
-        width: 65px;
-        text-align: left;
-
-        &[data-type='1'] {
-          color: #6666cc;
-        }
-      }
-
-      &:hover {
-        background-color: #f5f5f5;
-      }
-    }
-  }
-
-  &:focus-within {
-    .dropdownBtn {
-      transform: rotate(180deg);
-    }
-
-    .addrList {
-      z-index: 1;
-      max-height: 180px;
-      opacity: 1;
-    }
-  }
-}
 
 .dialogContainer {
   @include overlay;
@@ -166,108 +13,205 @@ $inputHeight: 26px;
 
   .dialog {
     @include dialog-container;
-    padding: 57px 73px;
-    background-color: #fff;
-    min-width: auto;
+    padding: 24px;
+    background-color: var(--secondary-background-color);
+    min-width: 456px;
   }
 }
 
 .passwordDialog {
-  @include dialog-container;
-  padding: 30px 50px;
-
-  &::backdrop {
-    @include overlay;
-  }
-
-  .actions {
-    @include dialog-footer;
-  }
-
-  h2 {
-    @include bold-text;
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 0.9px;
-    margin: 0 0 15px 0;
-  }
-
-  input {
-    margin: auto;
+  .walletName {
+    margin: 0 0 16px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--main-text-color);
   }
 }
 
-.resultDialog,
-.addressNotFound {
-  img {
-    width: 54px;
-    height: 54px;
-    margin-bottom: 15px;
+.resultDialog {
+  svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 12px;
   }
 
-  @include semi-bold-text;
   display: flex;
+  color: var(--main-text-color);
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  font-weight: 600;
-}
+  font-weight: 500;
 
-.addressNotFound {
-  @include medium-text;
-  font-size: 0.875rem;
-  letter-spacing: 0.7px;
-
+  .failReason {
+    margin-top: 16px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 28px;
+    color: var(--dialog-secondary-text-color);
+  }
   button {
-    margin-top: 17px;
-    height: 30px;
+    margin-top: 44px;
   }
 }
 
 .tips {
   display: flex;
   align-items: center;
+  margin: -16px 0 20px;
+  color: var(--input-hint-color);
+  span {
+    margin-right: 4px;
+  }
+  svg {
+    g,
+    path {
+      fill: var(--input-hint-color);
+    }
+  }
+}
 
-  .infoIconContainer {
-    display: inline-flex;
-    align-items: center;
+.signWrap {
+  display: flex;
+  justify-content: center;
+  svg {
+    margin-right: 4px;
+  }
+}
+
+.selectAddress {
+  .title {
+    color: var(--secondary-text-color);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .dropdown {
+    margin-top: 8px;
     position: relative;
-    &:after {
-      display: none;
-      content: attr(data-tip);
-      position: absolute;
-      top: calc(100% + 7px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff;
-      font-size: 0.75rem;
-      color: #000000;
-      padding: 10px 15px;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.22);
-      min-width: 150px;
-      pointer-events: none;
-      z-index: 1;
+    .content {
+      width: 648px;
+      textarea {
+        font-family: 'JetBrains Mono';
+      }
+    }
+    .arrow {
+      display: flex;
+      align-items: center;
+      &[data-active='true'] {
+        svg {
+          g,
+          path {
+            stroke: var(--primary-color);
+          }
+          transform: rotate(180deg);
+        }
+      }
     }
 
-    &::before {
-      z-index: 2;
-      display: none;
-      content: '';
-      top: 4px;
-      left: 50%;
-      transform: translateX(-50%);
-      position: absolute;
-      border: 10px solid transparent;
-      border-bottom-color: #fff;
-      filter: drop-shadow(0 -2px 1px rgba(0, 0, 0, 0.12));
-      pointer-events: none;
-    }
-    &:hover {
-      &::after,
-      &::before {
-        display: block;
+    .selects {
+      position: fixed;
+      overflow-x: hidden;
+      margin-top: -16px;
+      width: 648px;
+      z-index: 1;
+      max-height: 228px;
+      overflow-y: scroll;
+      background: var(--secondary-background-color);
+      box-shadow: 0px 1px 4px #eeeeee;
+      border-radius: 8px;
+      .title {
+        font-family: 'JetBrains Mono';
+        span {
+          font-family: 'JetBrains Mono';
+        }
       }
+      @media (prefers-color-scheme: dark) {
+        box-shadow: none;
+        border: 1px solid var(--border-color);
+      }
+    }
+
+    .selectItem {
+      display: block;
+      width: 648px;
+      padding: 0 16px;
+      border-radius: 0;
+      font-size: 14px;
+      font-weight: 400;
+
+      .wrap {
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--input-border-color);
+        color: var(--main-text-color);
+        &:hover {
+          color: var(--primary-color);
+          .title,
+          .type,
+          .title span {
+            color: var(--primary-color) !important;
+          }
+        }
+      }
+      &:last-child {
+        .wrap {
+          border: none;
+        }
+      }
+
+      .title {
+        display: flex;
+        font-weight: 500;
+        color: var(--main-text-color);
+        span {
+          font-size: 14px;
+          color: var(--main-text-color);
+        }
+      }
+      .type {
+        &[data-type='1'] {
+          color: var(--secondary-text-color);
+        }
+      }
+    }
+  }
+}
+
+@keyframes notification {
+  0% {
+    top: -50px;
+    left: 0;
+  }
+  100% {
+    top: 12px;
+    left: 0px;
+  }
+}
+
+.successNotification {
+  position: fixed;
+  top: 12px;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  animation-name: notification;
+  animation-duration: 0.4s;
+  .content {
+    z-index: 1000;
+    padding: 14px 32px;
+    color: var(--primary-color);
+    background: var(--notice-background-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    svg {
+      margin-right: 4px;
     }
   }
 }

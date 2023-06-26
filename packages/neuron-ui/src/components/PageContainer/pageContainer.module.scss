@@ -1,0 +1,141 @@
+.page {
+  background: var(--main-background-color);
+  color: var(--main-text-color);
+  padding: 0 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .head {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    height: 72px;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    justify-content: space-between;
+
+    .rightContent {
+      display: flex;
+      align-items: center;
+
+      .network {
+        font-weight: 500;
+        color: #666;
+        font-size: 14px;
+        margin: 0 8px;
+      }
+
+      .syncStatus {
+        height: 32px;
+        background-color: #ffffff99;
+        color: var(--main-text-color);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 400;
+        padding: 0 10px;
+        z-index: 11;
+
+        @media (prefers-color-scheme: dark) {
+          background-color: #2d3534;
+        }
+      }
+    }
+  }
+}
+
+@keyframes hidden {
+  from {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  to {
+    visibility: visible;
+    opacity: 0;
+  }
+}
+
+.notice {
+  position: absolute;
+  background-color: var(--notice-background-color);
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: center;
+  min-width: 300px;
+  padding: 14px 36px;
+  animation: 2s hidden 1 ease-in-out;
+  visibility: hidden;
+  justify-content: center;
+  & > svg {
+    margin-right: 4px;
+  }
+}
+
+.syncNotification {
+  flex: 0 0 auto;
+  background: var(--warn-background-color);
+  border-radius: 16px;
+  padding: 10px 0;
+  font-weight: 500;
+  font-size: 14px;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 16px;
+  z-index: 10;
+
+  & > svg {
+    margin-right: 4px;
+  }
+
+  .close {
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: #8da394;
+      }
+    }
+  }
+}
+
+.body {
+  flex: 1 1 auto;
+  padding-bottom: 24px;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #999;
+
+  @media (prefers-color-scheme: dark) {
+    color: #666;
+  }
+
+  & > a {
+    color: inherit;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  & > :last-child {
+    color: var(--main-text-color);
+  }
+}

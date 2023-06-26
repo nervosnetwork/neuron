@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, nativeTheme } from 'electron'
 import env from '../env'
 import Store from '../models/store'
 import { changeLanguage } from '../locales/i18n'
@@ -8,10 +8,10 @@ import path from 'path'
 const { app } = env
 
 export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
-export type Locale = typeof locales[number]
+export type Locale = (typeof locales)[number]
 const settingKeys = {
   testnetLightDataPath: 'testnetLightDataPath',
-  ckbDataPath: 'ckbDataPath'
+  ckbDataPath: 'ckbDataPath',
 }
 
 export default class SettingsService extends Store {
@@ -60,6 +60,15 @@ export default class SettingsService extends Store {
 
   set testnetLightDataPath(dataPath: string) {
     this.writeSync(settingKeys.testnetLightDataPath, dataPath)
+  }
+
+  get themeSource() {
+    return this.readSync('themeSource') || 'system'
+  }
+
+  set themeSource(theme: 'system' | 'light' | 'dark') {
+    nativeTheme.themeSource = theme
+    this.writeSync('themeSource', theme)
   }
 
   constructor() {

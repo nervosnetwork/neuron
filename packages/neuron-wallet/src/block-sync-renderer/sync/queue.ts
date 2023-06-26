@@ -29,7 +29,8 @@ export default class Queue {
   #addresses: AddressInterface[]
   #rpcService: RpcService
   #indexerConnector: Connector | undefined
-  #checkAndSaveQueue: QueueObject<{ txHashes: CKBComponents.Hash[], params: unknown }> | undefined
+  #checkAndSaveQueue: QueueObject<{ txHashes: CKBComponents.Hash[]; params: unknown }> | undefined
+  #lockArgsSet: Set<string> = new Set()
 
   #multiSignBlake160s: string[]
   #anyoneCanPayLockHashes: string[]
@@ -44,6 +45,11 @@ export default class Queue {
     this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
 
     const blake160s = this.#addresses.map(meta => meta.blake160)
+    this.#lockArgsSet = new Set(blake160s.map(blake160 => [
+      blake160,
+      Multisig.hash([blake160]),
+      SystemScriptInfo.generateSecpScript(blake160).computeHash().slice(0, 42)
+    ]).flat())
     this.#multiSignBlake160s = blake160s.map(blake160 => Multisig.hash([blake160]))
     this.#anyoneCanPayLockHashes = blake160s.map(b =>
       this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
@@ -91,10 +97,9 @@ export default class Queue {
       logger.error(err, JSON.stringify(task, undefined, 2))
     })
 
-    this.#indexerConnector.transactionsSubject
-      .subscribe(task => {
-        this.#checkAndSaveQueue!.push(task)
-      })
+    this.#indexerConnector.transactionsSubject.subscribe(task => {
+      this.#checkAndSaveQueue!.push(task)
+    })
   }
 
   getIndexerConnector = (): Connector => this.#indexerConnector!
@@ -114,9 +119,11 @@ export default class Queue {
 
   private async fetchTxsWithStatus(txHashes: string[]) {
     const rpc = generateRPC(this.#url)
-    const txsWithStatus = await rpc.createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
-      txHashes.map(v => ['getTransaction', v])
-    ).exec()
+    const txsWithStatus = await rpc
+      .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
+        txHashes.map(v => ['getTransaction', v])
+      )
+      .exec()
     const txs: Transaction[] = []
     const blockHashes = []
     for (let index = 0; index < txsWithStatus.length; index++) {
@@ -126,15 +133,15 @@ export default class Queue {
         blockHashes.push(tx.blockHash)
         txs.push(tx)
       } else {
-        if ((txsWithStatus[index].txStatus as any) === 'rejected')  {
+        if ((txsWithStatus[index].txStatus as any) === 'rejected') {
           logger.warn(`Transaction[${txHashes[index]}] was rejected`)
         }
         throw new Error(`failed to fetch transaction for hash ${txHashes[index]}`)
       }
     }
-    const headers = await rpc.createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(
-      blockHashes.map(v => ['getHeader', v])
-    ).exec()
+    const headers = await rpc
+      .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v]))
+      .exec()
     headers.forEach((blockHeader, idx) => {
       if (blockHeader) {
         const header = BlockHeader.fromSDK(blockHeader)
@@ -215,7 +222,7 @@ export default class Queue {
           }
         }
       }
-      await TransactionPersistor.saveFetchTx(tx)
+      await TransactionPersistor.saveFetchTx(tx, this.#lockArgsSet)
       for (const info of anyoneCanPayInfos) {
         await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
       }

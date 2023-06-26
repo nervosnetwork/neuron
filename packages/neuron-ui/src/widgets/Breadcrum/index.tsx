@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import styles from './breadcrum.module.scss'
 
 export interface Page {
@@ -12,17 +12,17 @@ export interface BreadcumProps {
 }
 
 const Breadcrum = ({ pages = [] }: BreadcumProps) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       const {
         dataset: { link },
       } = e.target as HTMLSpanElement
       if (link) {
-        history.push(link)
+        navigate(link)
       }
     },
-    [history]
+    [navigate]
   )
 
   return (

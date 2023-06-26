@@ -21,7 +21,7 @@ import {
   InvalidAddress,
   UsedName,
   MainnetAddressRequired,
-  TestnetAddressRequired
+  TestnetAddressRequired,
 } from '../exceptions'
 import AddressService from '../services/addresses'
 import TransactionSender from '../services/transaction-sender'
@@ -133,7 +133,7 @@ export default class WalletsController {
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
-      startBlockNumberInLight
+      startBlockNumberInLight,
     })
 
     wallet.checkAndGenerateAddresses(isImporting)

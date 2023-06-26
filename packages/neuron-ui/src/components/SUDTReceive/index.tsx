@@ -9,8 +9,6 @@ import Breadcrum from 'widgets/Breadcrum'
 import QRCode from 'widgets/QRCode'
 import CopyZone from 'widgets/CopyZone'
 
-import { useDispatch } from 'states'
-
 import { RoutePath, CONSTANTS } from 'utils'
 import { getDisplayName, UANTonkenSymbol } from 'components/UANDisplay'
 import styles from './sUDTReceive.module.scss'
@@ -30,7 +28,6 @@ const toShortAddr = (addr: string) => {
 }
 
 const SUDTReceive = () => {
-  const dispatch = useDispatch()
   const [t] = useTranslation()
   const { search } = useLocation()
   const [isInShortFormat, setIsInShortFormat] = useState(false)
@@ -61,7 +58,7 @@ const SUDTReceive = () => {
           <span>{getDisplayName(tokenName || DEFAULT_SUDT_FIELDS.tokenName, symbol)}</span>
         </div>
       </div>
-      <QRCode value={displayedAddr} size={220} includeMargin dispatch={dispatch} />
+      <QRCode value={displayedAddr} size={220} includeMargin />
       <div className={styles.address}>
         <CopyZone content={displayedAddr} name={t('receive.copy-address')} style={{ lineHeight: '1.625rem' }}>
           {displayedAddr}

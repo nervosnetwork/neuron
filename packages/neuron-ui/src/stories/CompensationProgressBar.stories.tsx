@@ -1,63 +1,39 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
-import { number, withKnobs } from '@storybook/addon-knobs'
-import CompensationProgressBar, { CompensationProgressBarProps } from 'components/CompensationProgressBar'
+import { ComponentStory } from '@storybook/react'
+import CompensationProgressBar from 'components/CompensationProgressBar'
 
-const stories = storiesOf('Compensation Progress Bar', module)
-
-const props: { [index: string]: CompensationProgressBarProps } = {
-  Normal: {
-    currentEpochValue: 0,
-    endEpochValue: 180,
-  },
-  Suggested: {
-    currentEpochValue: 139,
-    endEpochValue: 180,
-  },
-  Requested: {
-    currentEpochValue: 175,
-    endEpochValue: 180,
-  },
-  End: {
-    currentEpochValue: 180,
-    endEpochValue: 180,
-  },
-  WithdrawnInPeriod: {
-    currentEpochValue: 160,
-    endEpochValue: 180,
-    withdrawEpochValue: 30,
-  },
-  WithdrawnOuterPeriod: {
-    currentEpochValue: 181,
-    endEpochValue: 180,
-    withdrawEpochValue: 30,
-  },
-  'Current larger than end': {
-    currentEpochValue: 181,
-    endEpochValue: 180,
-  },
-  'Current less than begin': {
-    currentEpochValue: 0,
-    endEpochValue: 181,
-  },
-  Pending: {
-    pending: true,
-    currentEpochValue: 0,
-    endEpochValue: 0,
-  },
+export default {
+  title: 'Compensation Progress Bar',
+  component: CompensationProgressBar,
 }
 
-Object.keys(props).forEach(key => {
-  stories.add(key, () => {
-    return <CompensationProgressBar {...props[key]} style={{ width: '300px' }} />
-  })
-})
+const Template: ComponentStory<typeof CompensationProgressBar> = (args: any) => (
+  <CompensationProgressBar style={{ width: '300px' }} {...args} />
+)
 
-stories.addDecorator(withKnobs()).add('Knob', () => {
-  const knobProps = {
-    currentEpochValue: number('Current Epoch Value', 175),
-    endEpochValue: number('End Epoch Value', 180),
-    withdrawEpochValue: number('Withdrawn Epoch Value', 160),
-  }
-  return <CompensationProgressBar {...knobProps} style={{ width: '300px' }} />
-})
+export const Normal = Template.bind({})
+Normal.args = { currentEpochValue: 0, endEpochValue: 180 }
+
+export const Suggested = Template.bind({})
+Suggested.args = { currentEpochValue: 139, endEpochValue: 180 }
+
+export const Requested = Template.bind({})
+Requested.args = { currentEpochValue: 175, endEpochValue: 180 }
+
+export const End = Template.bind({})
+End.args = { currentEpochValue: 180, endEpochValue: 180 }
+
+export const WithdrawnInPeriod = Template.bind({})
+WithdrawnInPeriod.args = { currentEpochValue: 160, endEpochValue: 180, withdrawEpochValue: 30 }
+
+export const WithdrawnOuterPeriod = Template.bind({})
+WithdrawnOuterPeriod.args = { currentEpochValue: 181, endEpochValue: 180, withdrawEpochValue: 30 }
+
+export const CurrentLessThanEnd = Template.bind({})
+CurrentLessThanEnd.args = { currentEpochValue: 181, endEpochValue: 180 }
+
+export const CurrentLessThanBegin = Template.bind({})
+CurrentLessThanBegin.args = { currentEpochValue: 0, endEpochValue: 181 }
+
+export const Pending = Template.bind({})
+Pending.args = { pending: true, currentEpochValue: 0, endEpochValue: 0 }

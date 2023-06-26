@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useLocation } from 'react-router-dom'
-import { Pagination } from '@uifabric/experiments'
+import { useNavigate, useLocation } from 'react-router-dom'
+import Pagination from 'widgets/Pagination'
 import SpecialAsset, { AssetInfo } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
 import {
@@ -28,6 +28,7 @@ import SUDTMigrateDialog from 'components/SUDTMigrateDialog'
 import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDialog'
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import {
   useMigrate,
   useClickMigrate,
@@ -36,7 +37,6 @@ import {
   useGetAssetAccounts,
 } from './hooks'
 import styles from './specialAssetList.module.scss'
-import { LIGHT_NETWORK_TYPE } from 'utils/const'
 
 const { PAGE_SIZE } = CONSTANTS
 
@@ -68,7 +68,7 @@ const SpecialAssetList = () => {
   const [loaded, setLoaded] = useState(false)
   const [cells, setCells] = useState<SpecialAssetCell[]>([])
   const [totalCount, setTotalCount] = useState<number>(0)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [pageNo, setPageNo] = useState<number>(1)
   const { search } = useLocation()
   const dispatch = useDispatch()
@@ -114,10 +114,10 @@ const SpecialAssetList = () => {
   } = useGlobalState()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const isMainnet = isMainnetUtil(networks, networkID)
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
-    networkID,
-    networks,
-  ])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networkID, networks]
+  )
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
   const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
   const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
@@ -197,6 +197,7 @@ const SpecialAssetList = () => {
 
   useEffect(() => {
     const { pageNo: no } = listParams(search)
+
     setPageNo(no)
     fetchList(id, no)
   }, [search, id, dispatch, fetchList])
@@ -221,35 +222,33 @@ const SpecialAssetList = () => {
         return
       }
       if (cell.customizedAssetInfo.type === 'NFT') {
-        history.push({
-          pathname: `${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`,
+        navigate(`${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`, {
           state: {
             outPoint: cell.outPoint,
           },
         })
         return
       }
-      const handleRes = (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (
-        res: ControllerResponse<any>
-      ) => {
-        if (isSuccessResponse(res)) {
-          if (actionType === 'unlock') {
-            dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+      const handleRes =
+        (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (res: ControllerResponse<any>) => {
+          if (isSuccessResponse(res)) {
+            if (actionType === 'unlock') {
+              dispatch({ type: AppActions.UpdateGeneratedTx, payload: res.result })
+            } else {
+              dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
+            }
+            dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
           } else {
-            dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
+            dispatch({
+              type: AppActions.AddNotification,
+              payload: {
+                type: 'alert',
+                timestamp: +new Date(),
+                content: typeof res.message === 'string' ? res.message : res.message.content!,
+              },
+            })
           }
-          dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
-        } else {
-          dispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: typeof res.message === 'string' ? res.message : res.message.content!,
-            },
-          })
         }
-      }
       switch (cell.customizedAssetInfo.lock) {
         case PresetScript.Locktime: {
           unlockSpecialAsset({
@@ -302,7 +301,7 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, history, openDialog, tokenInfoList]
+    [cells, id, dispatch, setAccountToClaim, navigate, openDialog, tokenInfoList]
   )
 
   const list = useMemo(() => {
@@ -342,23 +341,11 @@ const SpecialAssetList = () => {
       <div className={styles.pagination}>
         {totalCount ? (
           <Pagination
-            selectedPageIndex={pageNo - 1}
-            pageCount={Math.ceil(totalCount / PAGE_SIZE)}
-            itemsPerPage={PAGE_SIZE}
-            totalItemCount={totalCount}
-            previousPageAriaLabel={t('pagination.previous-page')}
-            nextPageAriaLabel={t('pagination.next-page')}
-            firstPageAriaLabel={t('pagination.first-page')}
-            lastPageAriaLabel={t('pagination.last-page')}
-            pageAriaLabel={t('pagination.page')}
-            selectedAriaLabel={t('pagination.selected')}
-            firstPageIconProps={{ iconName: 'FirstPage' }}
-            previousPageIconProps={{ iconName: 'PrevPage' }}
-            nextPageIconProps={{ iconName: 'NextPage' }}
-            lastPageIconProps={{ iconName: 'LastPage' }}
-            format="buttons"
-            onPageChange={(idx: number) => {
-              history.push(`${RoutePath.SpecialAssets}?pageNo=${idx + 1}`)
+            pageNo={pageNo}
+            count={totalCount}
+            pageSize={PAGE_SIZE}
+            onChange={(idx: number) => {
+              navigate(`${RoutePath.SpecialAssets}?pageNo=${idx}`)
             }}
           />
         ) : null}

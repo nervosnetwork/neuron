@@ -7,15 +7,30 @@
   &::backdrop {
     @include overlay;
   }
+  color: var(--main-text-color);
 }
 
+.headerTitle {
+  font-weight: 500;
+  font-size: 16px;
+  padding: 24px 16px;
+  border-bottom: 1px solid var(--lock-info-title-border);
+}
 .container {
-  padding: 30px 50px;
+  padding: 0 16px 24px 16px;
+  background-color: var(--secondary-background-color);
 }
 
 .title {
-  font-weight: 900;
-  font-size: 1.125rem;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.shortAddr {
+  padding: 16px;
+  margin-top: 16px;
+  background: var(--table-head-background-color);
+  border-radius: 8px;
 }
 
 .infoWrap {
@@ -48,7 +63,7 @@
 
   pre {
     overflow: auto;
-    background: #eee;
+    background: var(--table-head-background-color);
     padding: 10px;
     border-radius: 6px;
     font-size: 12px;
@@ -60,10 +75,10 @@
     right: 5px;
     width: 15px;
     height: 15px;
-    cursor: pointer!important;
+    cursor: pointer !important;
     opacity: 0;
 
-    svg{
+    svg {
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -73,8 +88,7 @@
       filter: brightness(0.5);
     }
   }
- &:hover .copyBtn {
+  &:hover .copyBtn {
     opacity: 100%;
   }
 }
-

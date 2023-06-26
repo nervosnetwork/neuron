@@ -49,7 +49,13 @@ export default class Ledger extends Hardware {
     }
   }
 
-  public async signTransaction (_: string, tx: Transaction, witnesses: string[], path: string, context?: RPC.RawTransaction[]) {
+  public async signTransaction(
+    _: string,
+    tx: Transaction,
+    witnesses: string[],
+    path: string,
+    context?: RPC.RawTransaction[]
+  ) {
     const rpc = generateRPC(NodeService.getInstance().nodeUrl)
     const rawTx = rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
 

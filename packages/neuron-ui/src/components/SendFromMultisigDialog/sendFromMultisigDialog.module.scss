@@ -1,4 +1,3 @@
-
 .sendCKBTitle {
   display: flex;
   line-height: 1.625rem;
@@ -27,8 +26,8 @@
       'amount max add-or-remove' auto
       'locktime locktime locktime' auto /
       calc(100% - 130px) 50px 30px;
-      padding-top: 10px;
-      padding-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 }
 
@@ -52,4 +51,7 @@
   &:after {
     content: ' CKB';
   }
+}
+.textFieldClass {
+  margin-bottom: 10px;
 }

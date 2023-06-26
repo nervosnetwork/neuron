@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
 
-import { CONSTANTS, shannonToCKBFormatter, localNumberFormatter, useCalculateEpochs, useDialog } from 'utils'
+import { CONSTANTS, shannonToCKBFormatter, localNumberFormatter, useCalculateEpochs } from 'utils'
 import { getTransaction, getHeader } from 'services/chain'
-
+import Dialog from 'widgets/Dialog'
+import { Attention } from 'widgets/Icons/icon'
 import { calculateMaximumWithdraw } from '@nervosnetwork/ckb-sdk-utils'
 import styles from './withdrawDialog.module.scss'
 
@@ -26,9 +26,6 @@ const WithdrawDialog = ({
   const [t] = useTranslation()
   const [depositEpoch, setDepositEpoch] = useState('')
   const [withdrawValue, setWithdrawValue] = useState('')
-
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show: record, dialogRef, onClose: onDismiss })
 
   useEffect(() => {
     if (record) {
@@ -74,13 +71,18 @@ const WithdrawDialog = ({
     (Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length))
   ).toFixed(1)
   const message =
-    epochs >= 0
-      ? t('nervos-dao.notice-wait-time', {
+    epochs >= 0 ? (
+      <>
+        <Attention />
+        {t('nervos-dao.notice-wait-time', {
           epochs: localNumberFormatter(epochs),
           blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
           days: localNumberFormatter(Math.round(epochs / 6)),
-        })
-      : ''
+        })}
+      </>
+    ) : (
+      ''
+    )
 
   const alert =
     epochs <= 5 && epochs >= 0
@@ -93,39 +95,38 @@ const WithdrawDialog = ({
       : ''
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
-      <h2
-        className={styles.title}
-        title={t('nervos-dao.withdraw-from-nervos-dao')}
-        aria-label={t('nervos-dao.withdraw-from-nervos-dao')}
-      >
-        {t('nervos-dao.withdraw-from-nervos-dao')}
-      </h2>
-      {record ? (
-        <>
-          <p className={styles.deposit}>
-            <span>{`${t('nervos-dao.deposit')}: `}</span>
-            <span>{`${shannonToCKBFormatter(record.capacity)} CKB`}</span>
-          </p>
-          <p className={styles.compensation}>
-            <span>{`${t('nervos-dao.compensation')}: `}</span>
-            <span>
-              {withdrawValue
-                ? `${shannonToCKBFormatter((BigInt(withdrawValue) - BigInt(record.capacity)).toString())} CKB`
-                : ''}
-            </span>
-          </p>
-          <div>
-            <p className={styles.message}>{message}</p>
-            <p className={styles.errorMessage}>{alert}</p>
+    <Dialog
+      show={Boolean(record)}
+      contentClassName={styles.content}
+      title={t(`nervos-dao-detail.withdrawn`)}
+      onCancel={onDismiss}
+      onConfirm={onSubmit}
+      cancelText={t('nervos-dao-detail.cancel')}
+      confirmText={t('nervos-dao-detail.next')}
+    >
+      <>
+        <div className={styles.depositAndCompensation}>
+          <div className={styles.deposit}>
+            <span>{`${t('nervos-dao.deposit')}(CKB) `}</span>
+            <span className={styles.amount}>{`${shannonToCKBFormatter(record.capacity)}`}</span>
           </div>
-        </>
-      ) : null}
-      <div className={styles.footer}>
-        <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />
-        <Button type="submit" onClick={onSubmit} label={t('nervos-dao.proceed')} />
-      </div>
-    </dialog>
+          <div className={styles.divider} />
+          <div className={styles.compensation}>
+            <span>{`${t('nervos-dao.compensation')}(CKB)`}</span>
+            <span className={styles.amount}>
+              {withdrawValue
+                ? `${shannonToCKBFormatter((BigInt(withdrawValue) - BigInt(record.capacity)).toString())}`
+                : '--'}
+            </span>
+          </div>
+        </div>
+
+        <div className={styles.messages}>
+          {message && <p className={styles.message}>{message}</p>}
+          {alert && <p className={styles.errorMessage}>{alert}</p>}
+        </div>
+      </>
+    </Dialog>
   )
 }
 

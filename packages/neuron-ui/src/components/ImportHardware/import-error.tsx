@@ -32,7 +32,7 @@ const ImportError = ({
           <CopyZone content={errorMsg}>{errorMsg}</CopyZone>
         </div>
       </section>
-      <footer className={styles.footer}>
+      <footer className={styles.dialogFooter}>
         <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
       </footer>
     </div>

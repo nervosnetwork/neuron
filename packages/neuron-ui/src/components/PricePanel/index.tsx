@@ -63,9 +63,10 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     [onPriceChange]
   )
 
-  const inputError = useMemo(() => (Number(price) < 1000 ? t('price-switch.errorTip', { minPrice: 1000 }) : null), [
-    price,
-  ])
+  const inputError = useMemo(
+    () => (Number(price) < 1000 ? t('price-switch.errorTip', { minPrice: 1000 }) : null),
+    [price]
+  )
 
   const feeValuesArray = useMemo(
     () =>
@@ -84,13 +85,17 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
 
   const options = useMemo(
     () =>
-      ['slow', 'standard', 'fast'].map((mode, idx) => ({
+      [
+        ['slow', 'blue'],
+        ['standard', 'green'],
+        ['fast', 'red'],
+      ].map(([mode, color], idx) => ({
         idx,
         value: priceArray[idx],
         label: (
           <div className={styles.labelWrap}>
             <span>{t(`price-switch.${mode}`)}</span>
-            <span className={styles.labelComment}>
+            <span className={`${styles.labelComment} ${styles[color]}`}>
               {t('price-switch.priceColumn', {
                 priceValue: feeValuesArray?.[idx]?.feeRateValue || priceArray[idx],
                 feeValue: feeValuesArray?.[idx]?.value || 0,
@@ -164,6 +169,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
           suffix="shannons/kB"
           error={inputError}
           hint={!inputError && inputHint ? inputHint : null}
+          width="100%"
         />
       )}
     </div>

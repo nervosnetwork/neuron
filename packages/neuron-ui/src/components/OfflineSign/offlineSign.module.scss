@@ -1,68 +1,32 @@
-@import '../../styles/mixin.scss';
-
-.dialog {
-  @include dialog-container;
-  padding: 30px 50px;
-  min-height: 245px;
-  width: 600px;
-
-  .container {
-    display: flex;
-    flex-direction: column;
-
-    .main {
-      flex: 1;
-      margin: 25px 0;
-      tr {
-        td {
-          font-size: 14px;
-          svg {
-            width: 14px;
-            height: 14px;
-            margin-right: 4px;
-            position: relative;
-            top: 2px;
-          }
-        }
-        .first {
-          padding-right: 30px;
-          color: #434343;
-        }
+.main {
+  tr {
+    td {
+      font-size: 14px;
+      line-height: 26px;
+      color: var(--main-text-color);
+      svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+        position: relative;
+        top: 2px;
       }
     }
-  }
-
-  &::backdrop {
-    @include overlay;
-  }
-
-  .footer {
-    @include dialog-footer;
-    flex-shrink: 0;
-
-    button {
-      margin-left: 10px;
+    .first {
+      padding-right: 24px;
+      color: var(--input-second-color);
     }
   }
-}
-
-.content {
-  color: #434343;
-  font-size: 14px;
-  margin-bottom: 7px;
-}
-
-.title {
-  font-size: 1.125rem;
-  line-height: 1.375rem;
-  font-weight: bold;
-  letter-spacing: 0.9px;
-  margin: 0;
 }
 
 .textarea {
-  margin-top: 7px;
-  width: 100%;
-  height: 140px;
+  color: var(--main-text-color);
+  margin-top: 17px;
+  width: 648px;
+  height: 206px;
   resize: none;
+  background: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
+  padding: 16px;
 }
