@@ -11,7 +11,7 @@ const MAX_WORDS_SIZE = 24
 
 const INVALID_MNEMONIC = `Invalid mnemonic`
 const INVALID_CHECKSUM = `Invalid checksum`
-const ENTROPY_NOT_DIVISIBLE = `Entropy should be divisable by 4`
+const ENTROPY_NOT_DIVISIBLE = `Entropy should be divisible by 4`
 const ENTROPY_TOO_LONG = `Entropy should be shorter than ${MAX_ENTROPY_SIZE + 1}`
 const ENTROPY_TOO_SHORT = `Entropy should be longer than ${MIN_ENTROPY_SIZE - 1}`
 const WORDS_TOO_LONG = `Words should be shorter than ${MAX_WORDS_SIZE + 1}`

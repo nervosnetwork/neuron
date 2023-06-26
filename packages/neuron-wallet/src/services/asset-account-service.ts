@@ -75,7 +75,7 @@ export default class AssetAccountService {
     return totalBalance
   }
 
-  public static async destoryAssetAccount(walletID: string, assetAccount: AssetAccount) {
+  public static async destroyAssetAccount(walletID: string, assetAccount: AssetAccount) {
     const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, assetAccount.tokenID)
     const inputs = cells.map(cell => {
       return Input.fromObject({
@@ -94,7 +94,7 @@ export default class AssetAccountService {
 
     const address = await wallet.getNextChangeAddress()
 
-    const tx = await TransactionGenerator.generateDestoryAssetAccountTx(
+    const tx = await TransactionGenerator.generateDestroyAssetAccountTx(
       walletID,
       inputs,
       address!.blake160,

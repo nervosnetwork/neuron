@@ -127,7 +127,7 @@ export default {
       'multisig-config-exist': 'The multisig config has exist',
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
-      'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
+      'transaction-no-input-parameter': 'The query input cell is missing a required parameter',
       'migrate-sudt-no-type': 'The migrating cell does not have type script',
       'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
@@ -277,7 +277,7 @@ export default {
     },
     'offline-signature': {
       'export-transaction': 'Export Transaction as JSON',
-      'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
+      'transaction-exported': 'The transaction have been exported to {{filePath}}.',
       'load-transaction': 'Load Transaction file',
     },
     'multisig-config': {

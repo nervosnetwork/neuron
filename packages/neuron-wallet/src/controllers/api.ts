@@ -691,7 +691,7 @@ export default class ApiController {
     })
 
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
-      return this.#assetAccountController.destoryAssetAccount(params)
+      return this.#assetAccountController.destroyAssetAccount(params)
     })
 
     // Hardware wallet

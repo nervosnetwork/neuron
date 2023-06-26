@@ -18,9 +18,9 @@ export class CapacityTooSmall extends Error {
   }
 }
 
-export class TransactionInputParamterMiss extends Error {
+export class TransactionInputParameterMiss extends Error {
   constructor() {
-    super(t('messages.transaction-no-input-paramter'))
+    super(t('messages.transaction-no-input-parameter'))
   }
 }
 

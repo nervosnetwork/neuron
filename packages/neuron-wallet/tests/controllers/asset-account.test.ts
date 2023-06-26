@@ -8,7 +8,7 @@ const stubbedShowMessageBox = jest.fn()
 const stubbedGenerateMigrateLegacyACPTx = jest.fn()
 const stubbedCommandSubjectNext = jest.fn()
 const stubbedAssetAccountServiceGetAccount = jest.fn()
-const stubbedAssetAccountServiceDestoryAssetAccount = jest.fn()
+const stubbedAssetAccountServiceDestroyAssetAccount = jest.fn()
 
 const resetMocks = () => {
   stubbedGetSyncStatus.mockReset()
@@ -18,7 +18,7 @@ const resetMocks = () => {
   stubbedGenerateMigrateLegacyACPTx.mockReset()
   stubbedCommandSubjectNext.mockReset()
   stubbedAssetAccountServiceGetAccount.mockReset()
-  stubbedAssetAccountServiceDestoryAssetAccount.mockReset()
+  stubbedAssetAccountServiceDestroyAssetAccount.mockReset()
 }
 
 jest.mock('../../src/services/settings', () => {
@@ -76,7 +76,7 @@ describe('AssetAccountController', () => {
 
   jest.doMock('../../src/services/asset-account-service.ts', () => ({
     getAccount: stubbedAssetAccountServiceGetAccount,
-    destoryAssetAccount: stubbedAssetAccountServiceDestoryAssetAccount,
+    destroyAssetAccount: stubbedAssetAccountServiceDestroyAssetAccount,
   }))
 
   beforeEach(() => {
@@ -156,22 +156,22 @@ describe('AssetAccountController', () => {
       })
     })
   })
-  describe('destoryAssetAccount', () => {
+  describe('destroyAssetAccount', () => {
     const params = {
       walletID: 'walletID',
       id: 1,
     }
     it('no AssetAccount', async () => {
       stubbedAssetAccountServiceGetAccount.mockResolvedValueOnce(undefined)
-      await expect(assetAccountController.destoryAssetAccount(params)).rejects.toThrow(
+      await expect(assetAccountController.destroyAssetAccount(params)).rejects.toThrow(
         new ServiceHasNoResponse('AssetAccount')
       )
     })
-    it('excute success', async () => {
+    it('execute success', async () => {
       stubbedAssetAccountServiceGetAccount.mockResolvedValueOnce({})
-      stubbedAssetAccountServiceDestoryAssetAccount.mockResolvedValueOnce({})
-      await assetAccountController.destoryAssetAccount(params)
-      expect(stubbedAssetAccountServiceDestoryAssetAccount).toHaveBeenCalledWith(params.walletID, {})
+      stubbedAssetAccountServiceDestroyAssetAccount.mockResolvedValueOnce({})
+      await assetAccountController.destroyAssetAccount(params)
+      expect(stubbedAssetAccountServiceDestroyAssetAccount).toHaveBeenCalledWith(params.walletID, {})
     })
   })
 })
