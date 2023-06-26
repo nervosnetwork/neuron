@@ -9157,10 +9157,10 @@ electron-window-state@5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
-electron@24.5.1:
-  version "24.5.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-24.5.1.tgz#86e314cd6b322f44e62355d3ad1f39d64f341c3f"
-  integrity sha512-OxMDJj9q+XwmHb6Annc9jpRPV/HmiXyhAcl6LEin/cqDHKR+LCLx7PcXfMs/qKMVxER/TBbG7PglpjnkUMlG+w==
+electron@24.6.0:
+  version "24.6.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-24.6.0.tgz#4e21e739c3b63075c5e8968ee45061d1626d139f"
+  integrity sha512-XI101tybeVGl2tFyrd304KMAnNCbLKKZGrmWNWpTYK9LgsP9m5Q/LN3dFctDv/bpKmrko8sCKMtARlzbf/hTCw==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^18.11.18"
