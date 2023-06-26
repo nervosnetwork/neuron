@@ -13,6 +13,8 @@
       align-items: center;
       svg {
         margin: 4px 0 0 4px;
+        cursor: pointer;
+
         g,
         path {
           fill: var(--main-text-color);
