@@ -29,11 +29,7 @@ $action-button-width: 11.25rem;
       display: flex;
       align-items: center;
       svg {
-        margin-left: 4px;
-        g,
-        path {
-          stroke: var(--secondary-text-color);
-        }
+        margin-right: 4px;
       }
     }
   }
@@ -106,13 +102,13 @@ $action-button-width: 11.25rem;
     font-size: 16px;
     line-height: 22px;
     margin: 0 0 32px;
-    color: var(--main-text-color)
+    color: var(--main-text-color);
   }
   .note {
     font-size: 14px;
     line-height: 22px;
     margin: 22px 0 0;
-    color: var(--main-text-color)
+    color: var(--main-text-color);
   }
   progress {
     width: 100%;
@@ -120,12 +116,12 @@ $action-button-width: 11.25rem;
     background: var(--process-background-color);
     border-radius: 8px;
   }
-  progress::-webkit-progress-bar{     
+  progress::-webkit-progress-bar {
     background-color: var(--process-background-color);
     border-radius: 8px;
   }
   progress::-webkit-progress-value {
     background: var(--primary-color);
-    border-radius: 8px; 
+    border-radius: 8px;
   }
 }
