@@ -1,0 +1,138 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  width: 680px;
+}
+
+.info {
+  margin: 0px auto 16px;
+  min-width: 264px;
+  background: var(--table-head-background-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 220px;
+  padding: 8px;
+  border-radius: 16px;
+  column-gap: 16px;
+  .right {
+    .accountName {
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--main-text-color);
+    }
+    .tokenName {
+      font-size: 12px;
+      line-height: 17px;
+      margin-top: 4px;
+      color: var(--input-second-color);
+      & > span {
+        @include text-overflow-ellipsis;
+      }
+    }
+  }
+}
+
+.notation {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 24px;
+  text-align: center;
+  color: var(--notice-text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  word-break: break-word;
+  margin: 0;
+  svg {
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+  .symbol {
+    display: inline-flex;
+    margin: 0 2px;
+
+    &::after {
+      min-width: 140px;
+      text-align: left;
+    }
+  }
+}
+
+.copyContainer {
+  text-align: center;
+  .copyAddress {
+    width: 450px;
+    margin: 16px 0;
+    word-break: break-all;
+    text-align: center;
+    line-height: 24px;
+    font-family: 'JetBrains Mono';
+    color: var(--main-text-color);
+
+    .addressToggle {
+      margin: 0 0 0 4px;
+      padding: 0;
+      vertical-align: sub;
+      appearance: none;
+      border: none;
+      background: none;
+      padding-right: 20px;
+      svg {
+        pointer-events: none;
+      }
+
+      &:hover {
+        & + div {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.qrCode {
+  position: relative;
+  @keyframes fade-away {
+    from {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    to {
+      visibility: visible;
+      opacity: 0;
+    }
+  }
+
+  &[data-copy-success='true'] {
+    &::after {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 128px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(1px);
+      user-select: none;
+      border-radius: 40px;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 40px;
+      text-align: center;
+      content: attr(data-copy-success-text);
+      animation: 4s fade-away 1 forwards;
+      color: #fff;
+    }
+  }
+}
+
+.actions {
+  margin: 16px 0 24px;
+  @include dialog-footer;
+  column-gap: 24px;
+}

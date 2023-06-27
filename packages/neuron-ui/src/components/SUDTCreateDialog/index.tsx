@@ -1,9 +1,10 @@
 import React, { useState, useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import { getSUDTTokenInfo } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
+import Dialog from 'widgets/Dialog'
+import { ReactComponent as ExplorerIcon } from 'widgets/Icons/ExplorerIcon.svg'
 import {
   validateTokenId,
   isSuccessResponse,
@@ -174,15 +175,6 @@ const SUDTCreateDialog = ({
     [dispatch, tokenInfoList]
   )
 
-  const onAccountTypeSelect = useCallback(
-    (_: any, option?: IChoiceGroupOption) => {
-      if (option) {
-        setAccountType(option.key as AccountType)
-      }
-    },
-    [setAccountType]
-  )
-
   const onNext = (e: React.BaseSyntheticEvent) => {
     e.stopPropagation()
     e.preventDefault()
@@ -226,10 +218,14 @@ const SUDTCreateDialog = ({
   }
   const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet)
   return (
-    <div className={styles.container}>
-      {step === 0 ? (
-        <div className={styles.dialogContainer}>
-          <div className={styles.title}>{t('s-udt.create-dialog.create-asset-account')}</div>
+    <Dialog
+      show
+      title={step === 0 ? t('s-udt.create-dialog.create-asset-account') : t('s-udt.create-dialog.set-token-info')}
+      showFooter={false}
+      onCancel={onCancel}
+    >
+      <div className={styles.container}>
+        {step === 0 ? (
           <form onSubmit={onNext}>
             {fields
               .filter(field => !tokenInfoFields.includes(field.key))
@@ -240,33 +236,27 @@ const SUDTCreateDialog = ({
                   onChange={onInput}
                   field={field.key}
                   value={info[field.key]}
-                  required
                   error={tokenErrors.accountName}
                   autoFocus
+                  placeholder={t('s-udt.create-dialog.input-account-name')}
                 />
               ))}
-            <ChoiceGroup
-              className={styles.accountTypes}
-              options={accountTypes.map(accType => ({
-                key: accType.key,
-                text: t(accType.label),
-                checked: accountType === accType.key,
-                disabled: insufficient[accType.key],
-                onRenderLabel: props => {
-                  return (
-                    <span className="ms-ChoiceFieldLabel">
-                      <div>{props?.text}</div>
-                      <span className={styles.capacityRequired} data-insufficient={insufficient[accType.key]}>
-                        {t(
-                          `s-udt.create-dialog.${AccountType.CKB === accType.key ? 'occupy-61-ckb' : 'occupy-142-ckb'}`
-                        )}
-                      </span>
-                    </span>
-                  )
-                },
-              }))}
-              onChange={onAccountTypeSelect}
-            />
+
+            <p className={styles.choiceTitle}>{t('s-udt.create-dialog.select-account-type')}</p>
+            {accountTypes.map(accType => (
+              <Button
+                type={accountType === accType.key ? 'default' : 'cancel'}
+                disabled={insufficient[accType.key]}
+                onClick={() => setAccountType(accType.key)}
+                className={styles.itemBtn}
+              >
+                <h3>{t(accType.label)}</h3>
+                <p data-insufficient={insufficient[accType.key]}>
+                  {t(`s-udt.create-dialog.${AccountType.CKB === accType.key ? 'occupy-61-ckb' : 'occupy-142-ckb'}`)}
+                </p>
+              </Button>
+            ))}
+
             <div className={styles.footer}>
               <Button type="cancel" label={t('s-udt.create-dialog.cancel')} onClick={onBack} />
               <Button
@@ -277,32 +267,30 @@ const SUDTCreateDialog = ({
               />
             </div>
           </form>
-        </div>
-      ) : (
-        <div className={styles.dialogContainer}>
-          <div className={styles.title}>{t('s-udt.create-dialog.set-token-info')}</div>
+        ) : (
           <form onSubmit={onNext}>
-            {fields
-              .filter(field => tokenInfoFields.includes(field.key))
-              .map((field, idx) => (
-                <TextField
-                  key={field.key}
-                  label={t(`s-udt.create-dialog.${field.label}`)}
-                  onChange={onInput}
-                  field={field.key}
-                  value={info[field.key]}
-                  required={accountType === AccountType.SUDT}
-                  autoFocus={!idx}
-                  disabled={accountType === AccountType.CKB}
-                  error={tokenErrors[field.key]}
-                  className={accountType === AccountType.CKB ? styles.ckbField : undefined}
-                  hint={
-                    !tokenErrors[field.key] && field.key === 'tokenId' && accountType === AccountType.SUDT
-                      ? t(`s-udt.create-dialog.placeholder.${field.label}`)
-                      : undefined
-                  }
-                />
-              ))}
+            <div className={styles.fieldWrap}>
+              {fields
+                .filter(field => tokenInfoFields.includes(field.key))
+                .map((field, idx) => (
+                  <TextField
+                    key={field.key}
+                    label={t(`s-udt.create-dialog.${field.label}`)}
+                    onChange={onInput}
+                    field={field.key}
+                    value={info[field.key]}
+                    autoFocus={!idx}
+                    disabled={accountType === AccountType.CKB}
+                    error={tokenErrors[field.key]}
+                    className={styles.settingField}
+                    hint={
+                      !tokenErrors[field.key] && field.key === 'tokenId' && accountType === AccountType.SUDT
+                        ? t(`s-udt.create-dialog.placeholder.${field.label}`)
+                        : undefined
+                    }
+                  />
+                ))}
+            </div>
             {accountType === AccountType.SUDT && !tokenErrors.tokenId && info.tokenId && (
               <button
                 type="button"
@@ -310,22 +298,17 @@ const SUDTCreateDialog = ({
                 title={t('history.view-in-explorer-button-title')}
                 onClick={openSUDTTokenUrl}
               >
-                {t('history.view-in-explorer-button-title')}
+                <ExplorerIcon /> {t('history.view-in-explorer-button-title')}
               </button>
             )}
             <div className={styles.footer}>
               <Button type="cancel" label={t('s-udt.create-dialog.back')} onClick={onBack} />
-              <Button
-                type="submit"
-                label={t('s-udt.create-dialog.confirm')}
-                onClick={onNext}
-                disabled={!isTokenReady}
-              />
+              <Button type="submit" label={t('s-udt.create-dialog.next')} onClick={onNext} disabled={!isTokenReady} />
             </div>
           </form>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </Dialog>
   )
 }
 

@@ -1,336 +1,187 @@
 @import '../../styles/mixin.scss';
+$headerHeight: 126px;
+$bottomHeight: 186px;
 
-.cardContainer {
-  background: #fff;
-  padding: 20px;
-  margin: 20px auto;
-  border-radius: 6px;
-  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.12);
-}
-
-.title {
-  @include page-title;
-}
-
-.info {
-  display: grid;
-  grid-template:
-    'avatar account-name account-name account-name' 18px
-    'avatar token-name balance symbol' 15px/
-    38px 150px 1fr auto;
-
-  .avatar {
-    grid-area: avatar;
-    .icon {
-      width: 33px;
-      height: 33px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: 900;
-      font-size: 2rem;
-      box-sizing: border-box;
-      border: 1px solid #aaa;
-      border-radius: 2px;
-    }
-  }
-  .accountName {
-    grid-area: account-name;
-    white-space: nowrap;
-    font-size: 0.875rem;
-    font-weight: 600;
-    align-self: center;
-  }
-  .tokenNameContainer {
-    grid-area: token-name;
-    white-space: nowrap;
-    font-size: 0.75rem;
-    align-self: center;
-    min-width: 200px;
-
-    .tokenName {
-      width: 100%;
-      display: inline-block;
-
-      & > span {
-        width: 100%;
-      }
-    }
-  }
-  .balance {
-    grid-area: balance;
-    padding: 0 5px;
-    font-size: 0.875rem;
-    text-align: right;
-    align-self: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .symbolConatiner {
-    grid-area: symbol;
-    font-size: 0.875rem;
-    max-width: 800px;
-  }
-
-  border-bottom: 1px solid #aaa;
-  padding-bottom: 20px;
-}
-
-.symbol {
-  max-width: 100%;
-  display: inline-block;
-  & > span {
-    max-width: 100%;
-  }
-  &::after {
-    right: -20px;
-    left: auto;
-  }
-}
-
-.sendContainer {
-  display: grid;
-  grid-template:
-    'remote-error .' auto
-    'address .' auto
-    'amount send-all' auto
-    'option-0 .' auto
-    'option-1 .' auto
-    'select-error .' auto
-    'fee fee' auto
-    'description .' auto /
-    1fr 70px;
-  padding: 15px 30px 20px;
-
-  .address {
-    grid-area: address;
-  }
-  .amount {
-    grid-area: amount;
-  }
-  .option {
-    display: flex;
-    align-items: center;
-    font-size: 10px;
-    line-height: 19px;
-
-    input[type='radio'], input[type='checkbox'] {
-      margin: 0 4px 0 0;
-      accent-color: var(--nervos-green-light);
-    }
-
-    .optionTooltip {
-      position: relative;
-      display: flex;
-      align-items: center;
-      margin-left: 5px;
-
-      &:before {
-        width: 200px;
-        text-align: left;
-        box-sizing: border-box;
-        position: absolute;
-        display: none;
-        content: attr(data-tooltip);
-        bottom: calc(100% + 8px);
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 0.5625rem;
-        line-height: 2em;
-        letter-spacing: 0.45px;
-        background: #fff;
-        color: #000000;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        opacity: 0;
-        padding: 3px 9px;
-      }
-
-      &:after {
-        display: none;
-        position: absolute;
-        content: '';
-        border: 9px solid transparent;
-        border-top-color: #fff;
-        bottom: calc(100% - 8px);
-        left: 50%;
-        transform: translateX(-50%);
-        filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.1));
-        opacity: 0;
-      }
-
-      &:hover {
-        &:before,
-        &:after {
-          display: block;
-          animation: popup 0.2s ease-in forwards;
-        }
-      }
-
-      @keyframes popup {
-        from {
-          opacity: 0;
-        }
-
-        to {
-          opacity: 1;
-        }
-      }
-    }
-
-    .chequeWarning {
-      padding: 0 8px;
-      margin-left: 8px;
-      background-color: rgb(255, 244, 206);
-      color: rgb(50, 49, 48);
-  
-      & > svg {
-        width: 14px;
-        height: 14px;
-        margin-right: 4px;
-        transform: translateY(20%);
-      }
-    }
-  }
-  .cheque {
-    grid-area: option-0;
-  }
-  .acpNewCell, .secp256NewCell, .unknowNewCell, .acpExistCell {
-    grid-area: option-1;
-  }
-  .selectError {
-    grid-area: select-error;
-    color: #d50000;
-    font-size: 10px;
-  }
-  .sendAll {
-    grid-area: send-all;
-    justify-self: flex-end;
-    padding-top: 22px;
-    button {
-      box-sizing: border-box;
-      width: 60px;
-      height: 26px;
-      padding: 0;
-      line-height: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-width: unset;
-    }
-  }
-  .fee {
-    grid-area: fee;
-    padding-top: 20px;
-    border-top: 1px dashed #ccc;
-    margin-top: 8px;
-    padding-right: 70px;
-  }
-  .description {
-    grid-area: description;
-  }
-
-  .descriptionField {
-    & > div {
-      border-color: transparent transparent #aaa !important;
-    }
-  }
-  .remoteError {
-    display: flex;
-    align-items: center;
-    height: 15px;
-    padding-bottom: 15px;
-    grid-area: remote-error;
-    font-size: 0.75rem;
-    color: #d50000;
-    svg {
-      width: 15px;
-      height: 15px;
-      margin-right: 5px;
-    }
-  }
-
-}
-
-.footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.ckb-footer {
-  display: flex;
-  justify-content: space-between;
-}
-
-.tooltip {
+@mixin card {
   position: relative;
-  display: inline-block;
-  &:hover {
-    .tooltiptext {
-      visibility: visible;
-      opacity: 1;
+  border-radius: 16px;
+  background: var(--secondary-background-color);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  svg {
+    g,
+    path {
+      fill: var(--main-text-color);
     }
   }
 }
 
-.tooltiptext {
-  visibility: hidden;
-  position: absolute;
-  background-color: #555;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity .6s;
-  word-break: keep-all;
-  padding: 5px 10px;
-  left: 110%;
-  font-size: 12px;
-  margin-top: 2px;
-  white-space: nowrap;
-  &:hover {
-    visibility: visible;
-    opacity: 1;
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent #555 transparent transparent;
-  }
-}
-
-.modal {
-  @include overlay;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
+.layout {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  &[hidden] {
-    display: none;
+
+  .left {
+    flex: 1;
+    position: relative;
+
+    .info {
+      padding: 20px 16px 16px;
+      @include card;
+      display: flex;
+      gap: 16px;
+      color: var(--main-text-color);
+      .accountName {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .tokenName {
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 17px;
+        overflow: initial !important;
+        position: relative;
+        color: var(--input-second-color);
+      }
+      .balance {
+        margin-top: 8px;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 22px;
+        display: flex;
+        align-items: center;
+        .btn {
+          height: 16px;
+          min-width: 16px;
+          padding: 0 8px;
+          svg {
+            g,
+            path {
+              fill: var(--main-text-color);
+            }
+          }
+        }
+      }
+    }
+
+    .sendContainer {
+      margin-top: 16px;
+      padding: 20px 16px 16px;
+      @include card;
+      .address {
+        font-family: 'JetBrains Mono';
+      }
+      .radioGroup {
+        margin-bottom: 4px;
+      }
+      .optionItem {
+        padding: 6px 0 !important;
+        justify-content: start;
+        label {
+          color: var(--third-text-color);
+        }
+        input[type='radio']:checked + span {
+          color: var(--third-text-color);
+        }
+        &:hover {
+          background: none;
+        }
+      }
+      .attention {
+        margin: 6px 0 0 4px;
+        g,
+        path {
+          fill: var(--secondary-text-color);
+        }
+      }
+      .tooltip {
+        width: 340px;
+        word-break: normal;
+        white-space: normal;
+      }
+      .amount {
+        margin-top: 20px;
+      }
+      .max {
+        border-left: var(--divide-line-color) solid 1px;
+        min-width: 20px;
+        border-radius: 0;
+        height: 24px;
+        padding: 0 16px;
+        margin-top: 15px;
+      }
+      .selectError {
+        color: var(--error-color);
+        font-size: 14px;
+        margin-top: 4px;
+      }
+      .fee {
+        grid-area: fee;
+        padding-top: 20px;
+        border-top: 1px dashed #ccc;
+        margin-top: 8px;
+        padding-right: 70px;
+      }
+    }
+
+    .leftFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .addButton {
+        min-width: 216px;
+        padding: 20px;
+        box-shadow: 0 0 10px var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &_icon {
+          margin-right: 8px;
+        }
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color);
+          }
+        }
+      }
+    }
   }
-  h2 {
-    @include dialog-title;
-  }
-  .passwordDialog {
-    @include dialog-container;
-    background: #fff;
-    padding: 49px 73px;
-  }
-  .dialogFooter {
-    @include dialog-footer;
-    button {
-      margin-left: 5px;
+
+  .right {
+    margin-left: 16px;
+    flex: 1;
+    @include card;
+
+    .rightContent {
+      padding: 20px 16px 16px;
+      margin-bottom: 120px;
+      height: calc(100vh - $headerHeight - $bottomHeight);
+    }
+
+    .rightFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 16px;
+      left: 0;
+      display: flex;
+      justify-content: center;
+
+      button {
+        width: 216px;
+        &:last-child {
+          margin-left: 12px;
+        }
+      }
     }
   }
 }
