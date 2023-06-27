@@ -852,7 +852,11 @@ describe('TransactionSender Test', () => {
       }
 
       const createMultisigConfig = (r: number, m: number, addresses: string[]): [string, MultisigConfigModel] => {
-        const blake160s = addresses.map(v => helpers.addressToScript(v).args)
+        const blake160s = addresses.map(v => {
+          const isMainnet = v.startsWith('ckb')
+          const lumosOptions = isMainnet ? {config: config.predefined.LINA} : {config: config.predefined.AGGRON4};
+          return helpers.addressToScript(v, lumosOptions).args
+        })
         const multiArgs = Multisig.hash(blake160s, r, m, addresses.length)
         return [
           multiArgs,
@@ -879,7 +883,7 @@ describe('TransactionSender Test', () => {
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
-          blake160: helpers.addressToScript(addresses[0]).args,
+          blake160: helpers.addressToScript(addresses[0], {config: config.predefined.AGGRON4}).args,
           version: 'testnet',
         }
 
@@ -910,7 +914,12 @@ describe('TransactionSender Test', () => {
 
         const mockGAI = jest.fn()
         mockGAI.mockReturnValue(
-          [addr, addr, addr].map((v, idx) => ({ ...v, blake160: helpers.addressToScript(addresses[idx]).args }))
+          [addr, addr, addr].map((v, idx) => {
+            const address = addresses[idx]
+            const isMainnet = address.startsWith('ckb')
+            const lumosOptions = isMainnet ? {config: config.predefined.LINA} : {config: config.predefined.AGGRON4};
+            return { ...v, blake160: helpers.addressToScript(address, lumosOptions).args }
+          })
         )
         let tx = Transaction.fromObject(transcationObject)
         it('first sign', async () => {
@@ -962,7 +971,7 @@ describe('TransactionSender Test', () => {
         const addr = {
           walletId: fakeWallet.id,
           address: noMatchAddress,
-          blake160: helpers.addressToScript(noMatchAddress).args,
+          blake160: helpers.addressToScript(noMatchAddress, {config: config.predefined.AGGRON4}).args,
           version: 'testnet',
         }
 
@@ -1000,7 +1009,7 @@ describe('TransactionSender Test', () => {
           const addr = {
             walletId: fakeWallet.id,
             path: `m/44'/309'/0'/0/0`,
-            blake160: helpers.addressToScript(addresses[0]).args,
+            blake160: helpers.addressToScript(addresses[0], {config: config.predefined.AGGRON4}).args,
             version: 'testnet',
           }
 
@@ -1039,7 +1048,7 @@ describe('TransactionSender Test', () => {
         const addr = {
           walletId: fakeWallet.id,
           path: `m/44'/309'/0'/0/0`,
-          blake160: helpers.addressToScript(addresses[0]).args,
+          blake160: helpers.addressToScript(addresses[0], {config: config.predefined.AGGRON4}).args,
           version: 'testnet',
         }
 

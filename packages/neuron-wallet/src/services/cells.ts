@@ -1143,7 +1143,7 @@ export default class CellsService {
       return {}
     }
     const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
-    const lockHashes = multisigAddresses.map(v => utils.computeScriptHash(helpers.addressToScript(v)))
+    const lockHashes = multisigAddresses.map(v => utils.computeScriptHash(helpers.addressToScript(v, lumosOptions)))
     const connection = await getConnection()
     const [sql, parameters] = connection.driver.escapeQueryWithParameters(
       `

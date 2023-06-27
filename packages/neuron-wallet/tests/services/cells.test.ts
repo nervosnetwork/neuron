@@ -1090,9 +1090,9 @@ describe('CellsService', () => {
   })
 
   describe('#usedByAnyoneCanPayBlake160s', () => {
-    const fakeArgs1 = '0x1'
-    const fakeArgs2 = '0x2'
-    const fakeArgs3 = '0x3'
+    const fakeArgs1 = '0x01'
+    const fakeArgs2 = '0x02'
+    const fakeArgs3 = '0x03'
     const codeHash = randomHex()
     const lockScript1 = new Script(codeHash, fakeArgs1, ScriptHashType.Type)
     const lockScript2 = new Script(codeHash, fakeArgs2, ScriptHashType.Type)
