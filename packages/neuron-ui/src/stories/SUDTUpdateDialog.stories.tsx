@@ -16,6 +16,7 @@ stories.add('sUDT Token', () => {
       decimal="8"
       tokenId="token id"
       accountId="account id"
+      balance="200"
       onSubmit={info => {
         return new Promise(resolve => {
           action('submit')(info)
@@ -38,6 +39,7 @@ stories.add('CKB', () => {
       symbol="symbol"
       decimal="8"
       tokenId="token id"
+      balance="200"
       accountId="account id"
       onSubmit={info => {
         return new Promise(resolve => {

@@ -3,10 +3,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  &:hover {
-    background: var(--hover-background-color);
-    border-radius: 8px;
-  }
   label {
     padding: 0;
     cursor: pointer;
@@ -28,5 +24,9 @@
   input[type='radio']:checked + span {
     background: url('../../widgets/Icons/RadioSelected.svg') no-repeat left top;
     color: var(--primary-color);
+  }
+  &:hover {
+    background: var(--hover-background-color);
+    border-radius: 8px;
   }
 }
