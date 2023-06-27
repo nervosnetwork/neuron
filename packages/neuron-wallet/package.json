@@ -31,7 +31,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
-      "prettier --write",
+      "prettier --ignore-path ../../.prettierignore --write",
       "eslint --fix",
       "git add"
     ]
