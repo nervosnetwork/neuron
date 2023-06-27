@@ -154,10 +154,7 @@
   border-radius: 16px;
 }
 
-@mixin icon-hover-button(
-  $normalColor: var(--secondary-text-color),
-  $hoverColor: var(--primary-color)
-) {
+@mixin icon-hover-button($normalColor: var(--secondary-text-color), $hoverColor: var(--primary-color)) {
   border: none;
   background: transparent;
   color: $normalColor !important;
@@ -206,8 +203,7 @@
     background: url('../widgets/Icons/CheckboxDisabled.svg') no-repeat left top;
 
     @media (prefers-color-scheme: dark) {
-      background: url('../widgets/Icons/CheckboxDisabledDark.svg') no-repeat
-        left top;
+      background: url('../widgets/Icons/CheckboxDisabledDark.svg') no-repeat left top;
     }
   }
 }

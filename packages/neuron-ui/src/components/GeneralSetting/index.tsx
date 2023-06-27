@@ -4,8 +4,8 @@ import { useSearchParams } from 'react-router-dom'
 import Dialog from 'widgets/Dialog'
 import LanguageDialog from 'components/LanguageDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
-import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
 import { checkForUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
+import { LanguageSelect, CheckUpdateIcon } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
 interface UpdateDowloadStatusProps {
@@ -27,14 +27,6 @@ const UpdateDownloadStatus = ({
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
 
-  const handleDownload = useCallback(() => {
-    downloadUpdate()
-  }, [downloadUpdate])
-
-  const handleInstall = useCallback(() => {
-    installUpdate()
-  }, [installUpdate])
-
   if (available) {
     const releaseNotesHtml = () => {
       return { __html: releaseNotes }
@@ -45,7 +37,8 @@ const UpdateDownloadStatus = ({
     return (
       <Dialog
         show={show}
-        onConfirm={handleDownload}
+        // @ts-ignore
+        onConfirm={downloadUpdate}
         disabled={!available}
         confirmText={t('updates.download-update')}
         onCancel={onCancel}
@@ -67,7 +60,8 @@ const UpdateDownloadStatus = ({
         show={show}
         onCancel={onCancel}
         showCancel={false}
-        onConfirm={handleInstall}
+        // @ts-ignore
+        onConfirm={installUpdate}
         disabled={!downloaded}
         confirmText={t('updates.quit-and-install')}
         title={t('updates.update-available')}
@@ -142,7 +136,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
           {t('settings.general.version')} {version}
         </p>
         <button type="button" onClick={checkUpdates}>
-          {t(`updates.check-updates`)} <ArrowNext />
+          <CheckUpdateIcon />
+          {t(`updates.check-updates`)}
         </button>
       </div>
 
@@ -156,7 +151,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
             setShowLangDialog(true)
           }}
         >
-          {t(`settings.locale.${i18n.language}`)} <ArrowNext />
+          <LanguageSelect />
+          {t(`settings.locale.${i18n.language}`)}
         </button>
       </div>
 

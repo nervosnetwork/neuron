@@ -12,7 +12,7 @@
   .balance {
     grid-area: balance;
     border-radius: 16px;
-    background-color: #26C786;
+    background-color: #26c786;
     position: relative;
     padding: 24px 16px;
     color: var(--primary-text-color);
@@ -46,6 +46,7 @@
 
       & > svg {
         margin-left: 8px;
+        cursor: pointer;
 
         path {
           fill: var(--svg-fill-color);
@@ -76,9 +77,9 @@
           fill: var(--primary-color);
         }
         :not(:first-child) {
-          fill: #14221C;
+          fill: #14221c;
         }
-     }
+      }
     }
   }
 }
@@ -98,8 +99,8 @@
     margin-right: 4px;
   }
 
-  &[data-status="failed"] {
-    color: #FF1E1E;
+  &[data-status='failed'] {
+    color: #ff1e1e;
   }
 }
 
@@ -135,7 +136,7 @@
 
   .linkToHistory {
     font-size: 14px;
-    color: #8DA394;
+    color: #8da394;
     cursor: pointer;
 
     &:hover {

@@ -37,7 +37,19 @@ export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey:
   const onClear = useCallback(() => {
     onSearch('')
   }, [onSearch])
-  return { keywords, onKeywordsChange, setKeywords, onSearch, onClear }
+
+  const onChange = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      onKeywordsChange(e, e.currentTarget.value)
+    },
+    [onKeywordsChange]
+  )
+
+  const onBlur = useCallback(() => {
+    onSearch(keywords)
+  }, [onSearch, keywords])
+
+  return { keywords, onKeywordsChange, setKeywords, onSearch, onClear, onChange, onBlur }
 }
 
 export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {

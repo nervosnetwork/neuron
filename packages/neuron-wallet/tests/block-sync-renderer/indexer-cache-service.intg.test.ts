@@ -21,10 +21,12 @@ const stubbedCollectFn = jest.fn(() => {
   }
 })
 const ckbRpcUrl = 'http://localhost:8114'
+const stubbedGetTipBlockNumberFn = jest.fn()
 
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
   getTransaction: stubbedGetTransactionFn,
   getHeader: stubbedGetHeaderFn,
+  getTipBlockNumber: stubbedGetTipBlockNumberFn,
 }))
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(() => ({
@@ -39,6 +41,7 @@ const stubbedCellCollectorConstructor = jest.fn().mockImplementation(() => ({
 const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedGetHeaderFn.mockReset()
+  stubbedGetTipBlockNumberFn.mockReset()
 
   mockGetTransactionHashes()
 }
@@ -95,13 +98,15 @@ const formattedLegacyAcpLockScript = {
   args: legacyAcpLockScript.args,
 }
 
+const mockTipBlockNumber = '0x100'
+
 const mockGetTransactionHashes = (mocks: any[] = []) => {
   const stubbedConstructor = when(stubbedTransactionCollectorConstructor)
 
   for (const lock of [formattedDefaultLockScript, formattedAcpLockScript, formattedLegacyAcpLockScript]) {
     const { hashes } = mocks.find(mock => mock.lock === lock) || { hashes: [] }
     stubbedConstructor
-      .calledWith(expect.anything(), { lock }, rpcService?.url, { includeStatus: false })
+      .calledWith(expect.anything(), expect.objectContaining({ lock }), rpcService?.url, { includeStatus: false })
       .mockReturnValue({
         getTransactionHashes: jest.fn().mockReturnValue(hashes),
       })
@@ -145,6 +150,7 @@ describe('indexer cache service', () => {
       }
     })
 
+    stubbedGetTipBlockNumberFn.mockResolvedValue(mockTipBlockNumber)
     rpcService = new stubbedRPCServiceConstructor()
     IndexerCacheService = require('../../src/block-sync-renderer/sync/indexer-cache-service').default
     indexerCacheService = new IndexerCacheService(walletId, addressMetas, rpcService, stubbedIndexerConstructor())
@@ -269,21 +275,21 @@ describe('indexer cache service', () => {
 
         stubbedCellCollectorConstructor.mockReset()
         when(stubbedCellCollectorConstructor)
-          .calledWith(expect.anything(), {
+          .calledWith(expect.anything(), expect.objectContaining({
             lock: {
               ...formattedSingleMultiSignLockScript,
               args: formattedSingleMultiSignLockScript.args.slice(0, 42),
             },
             argsLen: 28,
-          })
+          }))
           .mockReturnValue(fakeCollectorObj)
-          .calledWith(expect.anything(), {
+          .calledWith(expect.anything(), expect.objectContaining({
             lock: {
               ...formattedChequeLockScript,
               args: formattedChequeLockScript.args.slice(0, 42),
             },
             argsLen: 40,
-          })
+          }))
           .mockReturnValue(fakeCollectorObj)
 
         newTxHashes = await indexerCacheService.upsertTxHashes()

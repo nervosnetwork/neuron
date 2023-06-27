@@ -3,12 +3,13 @@ import { validateAddress, isSecp256k1Address, getMultisigAddress } from 'utils'
 import { useTranslation } from 'react-i18next'
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
+import { MAX_M_N_NUMBER } from 'utils/const'
 
 const handleEvent = (e: React.SyntheticEvent<HTMLInputElement>, cb: (val: string) => void) => {
   const { value } = e.currentTarget
   let val = Number(value)
-  if (val > 255) {
-    val = 255
+  if (val > MAX_M_N_NUMBER) {
+    val = MAX_M_N_NUMBER
   }
   if (!Number.isNaN(val)) {
     cb(val ? `${val}` : '')
@@ -40,7 +41,7 @@ export const useMAndN = () => {
     if (numM > numN) {
       return 'm-less-equal-n'
     }
-    if (numM < 1 || numM > 255 || numN < 1 || numN > 255) {
+    if (numM < 1 || numM > MAX_M_N_NUMBER || numN < 1 || numN > MAX_M_N_NUMBER) {
       return 'm-n-between-0-255'
     }
     return undefined

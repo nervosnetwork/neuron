@@ -351,8 +351,6 @@ const PasswordRequest = () => {
     }
   }, [description, dispatch, experimental, generatedTx, onDismiss, password, signType, t, walletID, multisigConfig])
 
-  const hideConfirm = useMemo(() => ['send-from-multisig'].includes(actionType || ''), [actionType])
-
   if (!wallet) {
     return null
   }
@@ -380,7 +378,7 @@ const PasswordRequest = () => {
       isLoading={isLoading}
       cancelText={t('common.cancel')}
       confirmText={t('common.confirm')}
-      showConfirm={!hideConfirm}
+      showConfirm={actionType !== 'send-from-multisig'}
     >
       <div>
         {[

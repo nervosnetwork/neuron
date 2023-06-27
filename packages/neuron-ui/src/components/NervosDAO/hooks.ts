@@ -12,6 +12,7 @@ import {
   shannonToCKBFormatter,
   isSuccessResponse,
   validateAmount,
+  padFractionDigitsIfDecimal,
 } from 'utils'
 
 import {
@@ -447,7 +448,7 @@ export const useOnSlide = ({
         maxDepositAmount - BigInt(CKBToShannonFormatter(`${value}`)) < BigInt(SHANNON_CKB_RATIO * MIN_AMOUNT)
           ? shannonToCKBFormatter(`${maxDepositAmount}`, false, '')
           : `${value}`
-      updateDepositValue(amount)
+      updateDepositValue(padFractionDigitsIfDecimal(amount, 8))
     },
     [updateDepositValue, maxDepositAmount]
   )

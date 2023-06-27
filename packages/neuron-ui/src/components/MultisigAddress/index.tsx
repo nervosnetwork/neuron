@@ -23,6 +23,7 @@ import { ReactComponent as Search } from 'widgets/Icons/Search.svg'
 import { ReactComponent as Upload } from 'widgets/Icons/Upload.svg'
 import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
 import { HIDE_BALANCE, LIGHT_NETWORK_TYPE } from 'utils/const'
+import { onEnter } from 'utils/inputDevice'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
@@ -126,7 +127,7 @@ const MultisigAddress = () => {
     [t]
   )
 
-  const { keywords, onKeywordsChange, onSearch } = useSearch(clearSelected, onFilterConfig)
+  const { keywords, onChange, onBlur } = useSearch(clearSelected, onFilterConfig)
 
   const sendTotalBalance = useMemo(() => {
     if (sendAction.sendFromMultisig?.fullPayload) {
@@ -140,17 +141,6 @@ const MultisigAddress = () => {
     navigate(-1)
   }, [navigate])
 
-  const handleChange = useCallback(
-    (e: React.FormEvent<HTMLInputElement>) => {
-      onKeywordsChange(e, e.currentTarget.value)
-    },
-    [onSearch, keywords]
-  )
-
-  const handleBlur = useCallback(() => {
-    onSearch(keywords)
-  }, [onSearch, keywords])
-
   return (
     <div>
       <Dialog show={showMainDialog} title={t('multisig-address.window-title')} onCancel={onBack} showFooter={false}>
@@ -161,8 +151,9 @@ const MultisigAddress = () => {
               <input
                 value={keywords}
                 placeholder={t('multisig-address.search.placeholder')}
-                onBlur={handleBlur}
-                onChange={handleChange}
+                onBlur={onBlur}
+                onChange={onChange}
+                onKeyDown={onEnter(onBlur)}
               />
             </div>
             <div className={styles.actions}>
@@ -192,13 +183,7 @@ const MultisigAddress = () => {
                   render(_, __, item) {
                     return (
                       <label htmlFor={`${item.id}`}>
-                        <input
-                          id={`${item.id}`}
-                          data-config-id={item.id}
-                          type="checkbox"
-                          onChange={onChangeChecked}
-                          checked={selectIds.includes(item.id)}
-                        />
+                        <input id={`${item.id}`} data-config-id={item.id} type="checkbox" onChange={onChangeChecked} />
                         <span />
                       </label>
                     )

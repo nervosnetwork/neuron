@@ -61,6 +61,8 @@ import { ReactComponent as SuccessSvg } from './Success.svg'
 import { ReactComponent as DownloadIconSvg } from './DownloadIcon.svg'
 import { ReactComponent as ExplorerIconSvg } from './ExplorerIcon.svg'
 import { ReactComponent as DetailIconSvg } from './DetailIcon.svg'
+import { ReactComponent as CheckUpdateIconSvg } from './CheckUpdateIcon.svg'
+import { ReactComponent as LanguageSelectSvg } from './LanguageSelect.svg'
 
 import styles from './icon.module.scss'
 
@@ -136,3 +138,5 @@ export const ArrowDownRound = WrapSvg(ArrowDownRoundSvg)
 export const EyesOpen = WrapSvg(EyesOpenSvg)
 export const EyesClose = WrapSvg(EyesCloseSvg)
 export const Success = WrapSvg(SuccessSvg)
+export const CheckUpdateIcon = WrapSvg(CheckUpdateIconSvg)
+export const LanguageSelect = WrapSvg(LanguageSelectSvg)

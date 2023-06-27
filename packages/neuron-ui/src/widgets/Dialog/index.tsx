@@ -58,7 +58,6 @@ const Dialog = ({
     }
   }, [show])
 
-  
   const onDialogClicked = useCallback(
     (e: React.MouseEvent<HTMLDialogElement>) => {
       if (e.target instanceof HTMLDialogElement && e.target.tagName === 'DIALOG') {
@@ -103,7 +102,7 @@ const Dialog = ({
       <div className={clsx(styles.content, contentClassName)}>{children}</div>
       {showFooter ? (
         <div className={styles.footerWrap}>
-          <div className={styles.footer}>
+          <form className={styles.footer}>
             {showCancel ? (
               <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
             ) : null}
@@ -117,7 +116,7 @@ const Dialog = ({
                 {...confirmProps}
               />
             ) : null}
-          </div>
+          </form>
         </div>
       ) : null}
     </dialog>

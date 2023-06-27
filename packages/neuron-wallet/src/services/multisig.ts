@@ -91,10 +91,22 @@ export default class MultisigService {
     await getConnection().manager.remove(config)
   }
 
+  private static removeDulpicateConfig(multisigConfigs: MultisigConfig[]) {
+    const existMultisigLockHash: Set<string> = new Set()
+    return multisigConfigs.filter(v => {
+      const multisigLockHash = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n).computeHash()
+      if (existMultisigLockHash.has(multisigLockHash)) {
+        return false
+      }
+      existMultisigLockHash.add(multisigLockHash)
+      return true
+    })
+  }
+
   static async getLiveCells(multisigConfigs: MultisigConfig[]) {
     const liveCells: MultisigOutput[] = []
     const addressCursorMap: Map<string, string> = new Map()
-    let currentMultisigConfigs = multisigConfigs
+    let currentMultisigConfigs = MultisigService.removeDulpicateConfig(multisigConfigs)
     const network = NetworksService.getInstance().getCurrent()
     while (currentMultisigConfigs.length) {
       const res = await rpcBatchRequest(
@@ -187,8 +199,8 @@ export default class MultisigService {
           const config = currentMultisigConfigs[idx]
           const script = Multisig.getMultisigScript(config.blake160s, config.r, config.m, config.n)
           addressCursorMap.set(script.args, v?.result?.last_cursor)
-          v.result.objects.forEach((transaction: any) => {
-            multisigOutputTxHashList.add(transaction.tx_hash)
+          v.result.objects.forEach((obj: any) => {
+            multisigOutputTxHashList.add(obj.tx_hash || obj.transaction?.hash)
           })
           nextMultisigConfigs.push(currentMultisigConfigs[idx])
         }

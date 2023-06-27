@@ -113,7 +113,7 @@
       }
     },
     "overview": {
-      "date": "日期",
+      "date": "時間",
       "type": "類型",
       "balance": "餘額",
       "recent-activities": "最近收支",

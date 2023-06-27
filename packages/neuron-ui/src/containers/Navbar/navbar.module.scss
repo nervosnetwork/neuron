@@ -48,6 +48,7 @@ $hover-bg-color: #3cc68a4d;
       right: -14px;
       top: 50%;
       display: none;
+      cursor: pointer;
 
       &[data-expanded='false'] {
         transform: rotate(-180deg);
@@ -73,6 +74,7 @@ $hover-bg-color: #3cc68a4d;
   border: none;
   background: transparent;
   font-weight: 700;
+  cursor: pointer;
 
   span {
     color: var(--primary-color);
@@ -82,6 +84,7 @@ $hover-bg-color: #3cc68a4d;
     width: 0;
     flex: 1;
     text-align: left;
+    max-width: 90px;
   }
 }
 
@@ -120,12 +123,22 @@ $hover-bg-color: #3cc68a4d;
     border-radius: 4px;
     cursor: pointer;
 
+    &.buttonInTip {
+      color: var(--main-text-color);
+    }
+
     &:hover {
       @include activity;
+      &.buttonInTip {
+        color: var(--primary-color);
+      }
     }
 
     &.active {
       @include activity;
+      &.buttonInTip {
+        color: var(--primary-color);
+      }
       & .arrow {
         transform: rotate(90deg);
       }
@@ -168,7 +181,8 @@ $hover-bg-color: #3cc68a4d;
   }
 
   .buttonInTip {
-    padding: 10px 24px 10px 12px;
     height: 40px;
+    padding: unset;
+    margin: unset;
   }
 }
