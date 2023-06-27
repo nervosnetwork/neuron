@@ -281,7 +281,7 @@ export default class Transaction {
           ...cd,
           outPoint: cd.outPoint!,
         })),
-        cellInputs: rawTransaction.inputs.map(i => ({
+        inputs: rawTransaction.inputs.map(i => ({
           ...i,
           previousOutput: i.previousOutput!,
         })),

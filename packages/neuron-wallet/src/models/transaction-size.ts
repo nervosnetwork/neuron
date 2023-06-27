@@ -77,12 +77,19 @@ export default class TransactionSize {
     return TransactionSize.outputData(data)
   }
 
+  /**
+   * @param witness a witness object or a hex string
+   * @returns witness wraped in a fixed Uint32Le vector (+4 bytes for header) and add another +4 bytes for the offset
+   */
   public static witness(witness: WitnessArgs | string): number {
-    const wit: string =
-      typeof witness === 'string' ? witness : bytesUtils.hexify(blockchain.WitnessArgs.pack(witness.toSDK()))
-    const fixvecCodec = fixvec(number.Uint8)
-    const serializedData = fixvecCodec.pack(Array.from(bytesUtils.bytify(wit)))
-    return serializedData.byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    if (typeof witness === 'string') {
+      const fixvecCodec = fixvec(number.Uint8)
+      const serializedData = fixvecCodec.pack(Array.from(bytesUtils.bytify(witness)))
+      return serializedData.byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    } else {
+      const wit = blockchain.WitnessArgs.pack(witness.toSDK())
+      return wit.byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    }
   }
 
   public static secpLockWitness(): number {

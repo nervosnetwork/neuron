@@ -172,7 +172,7 @@ import {
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multisig'
-import { helpers } from '@ckb-lumos/lumos'
+import { config, helpers } from '@ckb-lumos/lumos'
 import { bytes } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
 
@@ -861,7 +861,11 @@ describe('TransactionSender Test', () => {
             r,
             m,
             n: addresses.length,
-            blake160s: addresses.map(v => helpers.addressToScript(v).args),
+            blake160s: addresses.map(v => {
+              const isMainnet = v.startsWith('ckb')
+              const lumosOptions = isMainnet ? config.predefined.LINA : config.predefined.AGGRON4;
+              return  helpers.addressToScript(v, {config: lumosOptions}).args
+            }),
           }),
         ]
       }
@@ -916,7 +920,11 @@ describe('TransactionSender Test', () => {
           tx = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const lock = (tx.witnesses[0] as WitnessArgs).lock!
           const serializedMultiSign: string = Multisig.serialize(
-            addresses.map(v => helpers.addressToScript(v).args),
+            addresses.map(v => {
+              const isMainnet = v.startsWith('ckb')
+              const lumosOptions = isMainnet ? config.predefined.LINA : config.predefined.AGGRON4;
+              return  helpers.addressToScript(v, {config: lumosOptions}).args
+            }),
             1,
             2,
             3
@@ -1007,7 +1015,11 @@ describe('TransactionSender Test', () => {
             outputType: undefined,
             lock:
               Multisig.serialize(
-                addresses.map(v => helpers.addressToScript(v).args),
+                addresses.map(v => {
+                  const isMainnet = v.startsWith('ckb')
+                  const lumosOptions = isMainnet ? config.predefined.LINA : config.predefined.AGGRON4;
+                  return  helpers.addressToScript(v, {config: lumosOptions}).args
+                }),
                 1,
                 1,
                 2

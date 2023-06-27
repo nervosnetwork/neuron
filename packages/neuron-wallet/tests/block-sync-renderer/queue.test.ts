@@ -101,7 +101,8 @@ describe('queue', () => {
   const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
-    blake160: '0xfakeblake160',
+    // DELETE ME: blake160: '0xfakeblake160', // not valid hex nor valid blake160
+    blake160: '0x1234567890123456789012345678901234567890',
     walletId: fakeWalletId,
     path: '',
     addressType: AddressType.Receiving,

@@ -11,7 +11,7 @@ import OfflineSignService from '../services/offline-sign'
 import Multisig from '../models/multisig'
 import SystemScriptInfo from '../models/system-script-info'
 import NetworksService from '../services/networks'
-import { config, helpers, utils } from '@ckb-lumos/lumos'
+import { config as lumosConig, helpers, utils } from '@ckb-lumos/lumos'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -122,7 +122,13 @@ export default class MultisigController {
         r: +config.require_first_n,
         m: +config.threshold,
         n: config.sighash_addresses.length,
-        blake160s: config.sighash_addresses.map(v => helpers.addressToScript(v).args),
+        blake160s: config.sighash_addresses.map(v => {
+          const isMainnet = v.startsWith('ckb')
+          const lumosOptions = isMainnet
+            ? { config: lumosConig.predefined.LINA }
+            : { config: lumosConig.predefined.AGGRON4 }
+          return helpers.addressToScript(v, lumosOptions).args
+        }),
         walletId,
         alias: config.alias,
       }))
@@ -170,7 +176,7 @@ export default class MultisigController {
       return
     }
     const isMainnet = NetworksService.getInstance().isMainnet()
-    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
+    const lumosOptions = isMainnet ? { config: lumosConig.predefined.LINA } : { config: lumosConig.predefined.AGGRON4 }
 
     const output: MultisigConfigOutput = { multisig_configs: {} }
     configs.forEach(v => {

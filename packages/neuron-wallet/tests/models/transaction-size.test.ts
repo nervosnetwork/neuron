@@ -25,12 +25,26 @@ describe('TransactionSize', () => {
 
   it('witnessArgs', () => {
     const result = TransactionSize.witness(witnessArgs)
-    expect(result).toEqual(HexUtils.byteLength('0x10000000100000001000000010000000') + 4 + 4)
+    // FIXME: this may cause bug if not used properly
+    //
+    // in `@ckb-lumos/codec` format:
+    // 0x1400000010000000100000001400000000000000 for
+    // {
+    //  lock:undefined
+    //  input_type:"0x" // more 4 bytes representin '0' in Uint32 format to indicate the length of input_type
+    //  output_type:undefined
+    // }  
+    // it has the same for 0x1000000010000000100000 (in ckb-sdk-js format)
+    // {
+    //  lock: undefined
+    //  input_type: undefined
+    //  output_type: undefined
+    // }  
+    expect(result).toEqual(HexUtils.byteLength('0x1400000010000000100000001400000000000000') + 4 + 4)
   })
 
   it('witnessArgs only lock', () => {
     const witnessArgs = WitnessArgs.emptyLock()
-
     const result = TransactionSize.witness(witnessArgs)
     expect(result).toEqual(85 + 4 + 4)
   })

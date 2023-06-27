@@ -28,7 +28,7 @@ import BufferUtils from '../../utils/buffer'
 import assert from 'assert'
 import AssetAccount from '../../models/asset-account'
 import AddressService from '../../services/addresses'
-import { helpers } from '@ckb-lumos/lumos'
+import { config, helpers } from '@ckb-lumos/lumos'
 import MultisigConfigModel from '../../models/multisig-config'
 import WalletService from '../../services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
@@ -222,8 +222,13 @@ export class TransactionGenerator {
     // change
     if (hasChangeOutput) {
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
+      const isMainnet = changeAddress.startsWith('ckb')
+      const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
 
-      const output = new Output(changeCapacity.toString(), Script.fromSDK(helpers.addressToScript(changeAddress)))
+      const output = new Output(
+        changeCapacity.toString(),
+        Script.fromSDK(helpers.addressToScript(changeAddress, lumosOptions))
+      )
 
       tx.addOutput(output)
     }
@@ -1407,8 +1412,10 @@ export class TransactionGenerator {
       if (!inputSudtCell.type) {
         throw new MigrateSudtCellNoTypeError()
       }
+      const isMainnet = acpAddress.startsWith('ckb')
+      const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
       const receiverAcpCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(
-        Script.fromSDK(helpers.addressToScript(acpAddress)),
+        Script.fromSDK(helpers.addressToScript(acpAddress, lumosOptions)),
         inputSudtCell.type
       )
       if (!receiverAcpCell) {

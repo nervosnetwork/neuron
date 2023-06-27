@@ -310,7 +310,8 @@ describe('integration tests for AddressService', () => {
 
     describe('#generateAndSaveForPublicKey', () => {
       describe('with public key info exist for the public key', () => {
-        const publicKey = 'public key'
+        // const publicKey = 'public key' // not valid public key
+        const publicKey = '0x' + '00'.repeat(65) // 65 bytes pub key
         const addressType = AddressType.Receiving
         const addressIndex = 0
         beforeEach(async () => {

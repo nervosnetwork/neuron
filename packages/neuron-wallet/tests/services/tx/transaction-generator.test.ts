@@ -758,7 +758,7 @@ describe('TransactionGenerator', () => {
             'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
             'ckt1qyqdpymnu202x3p4cnrrgek5czcdsg95xznswjr98y',
             'ckt1qyqwqcknusdreymrhhme00hg9af3pr5hcmwqzfxvda',
-          ].map(v => helpers.addressToScript(v).args),
+          ].map(v => helpers.addressToScript(v, {config: config.predefined.AGGRON4}).args),
         })
       )
 
@@ -1199,7 +1199,8 @@ describe('TransactionGenerator', () => {
           const targetOutput: Output = Output.fromObject({
             capacity: toShannon('61'),
             lock: aliceAnyoneCanPayLockScript,
-            type: assetAccountInfo.generateSudtScript('0xuuid'),
+            // DELETE ME: 0xuuid is not a valid args for sudt
+            type: assetAccountInfo.generateSudtScript('0x1234567890123456789012345678901234567890'),
             data: '0x',
           })
 
@@ -2515,7 +2516,7 @@ describe('TransactionGenerator', () => {
           const sudtCell = Output.fromObject(sudtCellObject)
           when(stubbedQueryIndexer)
             .calledWith({
-              lock: helpers.addressToScript('ckt1qyq0tejcz8rl6yyjw3m3vnu7r955d9ecj9gq46suu6'),
+              lock: helpers.addressToScript('ckt1qyq0tejcz8rl6yyjw3m3vnu7r955d9ecj9gq46suu6', {config: config.predefined.AGGRON4}),
               type: sudtCell.type,
               data: null,
             })

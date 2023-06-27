@@ -1,11 +1,14 @@
 import Script, { ScriptHashType } from './chain/script'
-import { helpers } from '@ckb-lumos/lumos'
+import { config, helpers } from '@ckb-lumos/lumos'
 import SystemScriptInfo from './system-script-info'
 
 export default class AddressParser {
   public static parse(address: string): Script {
     try {
-      const script = helpers.addressToScript(address)
+      const isMainnet = address.startsWith('ckb')
+      const script = isMainnet
+        ? helpers.addressToScript(address, { config: config.predefined.LINA })
+        : helpers.addressToScript(address, { config: config.predefined.AGGRON4 })
       return new Script(script.codeHash, script.args, script.hashType as ScriptHashType)
     } catch {
       throw new Error('Address format error')

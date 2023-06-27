@@ -70,10 +70,11 @@ export default class WitnessArgs {
   }
 
   public toSDK(): CKBComponents.WitnessArgs {
+    // values can't be empty string, `BytesOpt` should be valid hex string or undefined
     return {
-      lock: this.lock,
-      inputType: this.inputType,
-      outputType: this.outputType,
+      lock: this.lock !== '' ? this.lock : undefined,
+      inputType: this.inputType !== '' ? this.inputType : undefined,
+      outputType: this.outputType !== '' ? this.outputType : undefined,
     }
   }
 }

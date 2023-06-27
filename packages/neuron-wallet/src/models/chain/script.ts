@@ -18,6 +18,10 @@ export default class Script {
     this.codeHash = codeHash
     this.hashType = hashType
 
+    // TODO: args should be hex string, but when we create a script from SDK, it's not hex string
+    if (!this.args.startsWith('0x')) {
+      this.args = `0x${args}`
+    }
     TypeChecker.hashChecker(this.codeHash)
   }
 
