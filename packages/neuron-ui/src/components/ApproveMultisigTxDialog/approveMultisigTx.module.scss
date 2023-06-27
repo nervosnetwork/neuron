@@ -163,18 +163,3 @@
   font-size: 14px;
   color: var(--main-text-color);
 }
-
-.scriptTag {
-  border: none;
-  line-height: 17px;
-  margin: auto 8px;
-  padding: 3px 8px;
-  background: var(--tag-background-color);
-  color: var(--primary-color);
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--primary-color);
-  }
-}

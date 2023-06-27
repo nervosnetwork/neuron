@@ -8,7 +8,7 @@ import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention
 import TimeClock from 'widgets/Icons/TimeClock.svg'
 
 import { formatDate } from 'widgets/DatetimePickerDialog'
-import { localNumberFormatter, PlaceHolders, isSecp256k1Address } from 'utils'
+import { localNumberFormatter, PlaceHolders, isSecp256k1Address, clsx } from 'utils'
 import { ErrorWithI18n } from 'exceptions'
 
 import styles from './sendFieldset.module.scss'
@@ -66,7 +66,7 @@ const SendFieldset = ({
   }
 
   return (
-    <div className={`${styles.container} ${className}`}>
+    <div className={clsx(styles.container, className)}>
       <TextField
         className={`${styles.addresstField} ${styles.textFieldClass}`}
         rows={2}

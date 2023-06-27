@@ -6,7 +6,6 @@ import { useState as useGlobalState, withProvider } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
-import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import { MultisigConfig } from 'services/remote'
 import PasswordRequest from 'components/PasswordRequest'
 import ApproveMultisigTxDialog from 'components/ApproveMultisigTxDialog'
@@ -22,6 +21,7 @@ import { ReactComponent as Transfer } from 'widgets/Icons/Transfer.svg'
 import { ReactComponent as Search } from 'widgets/Icons/Search.svg'
 import { ReactComponent as Upload } from 'widgets/Icons/Upload.svg'
 import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
+import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import { HIDE_BALANCE, LIGHT_NETWORK_TYPE } from 'utils/const'
 import { onEnter } from 'utils/inputDevice'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
@@ -195,7 +195,7 @@ const MultisigAddress = () => {
                   align: 'left',
                   render(_, __, item) {
                     return (
-                      <div className={styles.addressTr}>
+                      <div className={styles.address}>
                         {item.fullPayload.slice(0, 5)}...{item.fullPayload.slice(-5)}
                       </div>
                     )
@@ -274,7 +274,7 @@ const MultisigAddress = () => {
                   align: 'left',
                   render(_, __, item) {
                     return (
-                      <div className={styles.actionTr}>
+                      <div className={styles.action}>
                         <Tooltip
                           tipClassName={styles.tip}
                           tip={

@@ -80,7 +80,7 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
     })
   }, [setEntities, walletId])
   const updateConfig = useCallback(
-    (id: number) => (e: React.SyntheticEvent<any>) => {
+    (id: number) => (e: React.SyntheticEvent<unknown>) => {
       const { value } = e.target as HTMLInputElement
       updateMultisigConfig({ id, alias: value || '' }).then(res => {
         if (isSuccessResponse(res)) {

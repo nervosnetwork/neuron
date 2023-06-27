@@ -7,6 +7,7 @@ import {
   AnyoneCanPayLockInfoOnLina,
   ChequeLockInfoOnAggron,
   ChequeLockInfoOnLina,
+  clsx,
 } from 'utils'
 import styles from './scriptTag.module.scss'
 
@@ -43,7 +44,7 @@ const ScriptTag = ({
   }
 
   return (
-    <button type="button" className={className || styles.tag} onClick={onClick}>
+    <button type="button" className={clsx(styles.tag, className)} onClick={onClick}>
       {foundLock.TagName}
     </button>
   )

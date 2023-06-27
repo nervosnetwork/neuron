@@ -89,7 +89,7 @@
     @include checkbox;
   }
 
-  .addressTr {
+  .address {
     font-family: 'JetBrains Mono';
   }
 
@@ -139,7 +139,7 @@
       color: var(--primary-color);
     }
   }
-  .actionTr {
+  .action {
     padding-right: 20px;
     .tip {
       left: 10px !important;

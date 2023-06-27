@@ -33,7 +33,7 @@ const Cell = React.memo(
           {address.slice(0, 6)}...{address.slice(-6)}
           <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
           <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
-          <ScriptTag script={cell.lock} isMainnet={isMainnet} className={styles.scriptTag} />
+          <ScriptTag script={cell.lock} isMainnet={isMainnet} />
         </div>
         <div>{`${shannonToCKBFormatter(cell.capacity)} CKB`}</div>
       </div>
@@ -157,13 +157,13 @@ const ApproveMultisigTxDialog = ({
             <div className={styles.conciseData}>
               <div className={styles.inputWrap}>
                 <h2>Inputs</h2>
-                {offlineSignJson.transaction?.inputs?.map((v: any) => (
-                  <Cell cell={v} isMainnet={isMainnet} key={v.lockHash} />
+                {offlineSignJson.transaction?.inputs?.map((input: any) => (
+                  <Cell cell={input} isMainnet={isMainnet} key={input.lockHash} />
                 ))}
               </div>
               <h2>Outputs</h2>
-              {offlineSignJson.transaction?.outputs?.map((v: any) => (
-                <Cell cell={v} isMainnet={isMainnet} key={v.lockHash} />
+              {offlineSignJson.transaction?.outputs?.map((output: any) => (
+                <Cell cell={output} isMainnet={isMainnet} key={output.lockHash} />
               ))}
             </div>
           )}

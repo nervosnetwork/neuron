@@ -37,7 +37,6 @@ const UpdateDownloadStatus = ({
     return (
       <Dialog
         show={show}
-        // @ts-ignore
         onConfirm={downloadUpdate}
         disabled={!available}
         confirmText={t('updates.download-update')}
@@ -60,7 +59,6 @@ const UpdateDownloadStatus = ({
         show={show}
         onCancel={onCancel}
         showCancel={false}
-        // @ts-ignore
         onConfirm={installUpdate}
         disabled={!downloaded}
         confirmText={t('updates.quit-and-install')}
