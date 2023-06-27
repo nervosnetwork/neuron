@@ -12,6 +12,7 @@ import Multisig from '../models/multisig'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import { NetworkType } from '../models/network'
 import WalletService from './wallets'
+import logger from '../utils/logger'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -303,6 +304,7 @@ export default class MultisigService {
       MultisigOutputChangedSubject.getSubject().next('update')
     } catch (error) {
       // ignore error, if lastestBlockNumber not update, it will try next time
+      logger.error('Multisig:\tsync multisig cells failed', error)
     }
   }
 
