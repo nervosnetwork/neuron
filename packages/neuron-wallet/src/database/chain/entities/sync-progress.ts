@@ -4,7 +4,7 @@ import { Entity, PrimaryColumn, Column } from 'typeorm'
 
 export enum SyncAddressType {
   Default,
-  Multisig
+  Multisig,
 }
 
 @Entity({ name: 'sync_progress' })

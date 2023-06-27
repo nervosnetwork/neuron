@@ -318,3 +318,9 @@ export const bytesFormatter = (bytes: number, decimals = 1) => {
 
   return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
 }
+
+export const padFractionDigitsIfDecimal = (num: string | number, minimumFractionDigits: number): string => {
+  const numText = num.toString()
+  const isDecimal = numText.includes('.')
+  return isDecimal ? numText.padEnd(numText.indexOf('.') + 1 + minimumFractionDigits, '0') : numText
+}

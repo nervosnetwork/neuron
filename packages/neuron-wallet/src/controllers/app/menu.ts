@@ -64,15 +64,14 @@ const showAbout = () => {
   const isWin = process.platform === 'win32'
 
   if (isWin) {
-    const options = {
+    dialog.showMessageBox({
       type: 'info',
       title: app.name,
       message: app.name,
       detail: applicationVersion,
       buttons: ['OK'],
       cancelId: 0,
-    }
-    dialog.showMessageBox(options)
+    })
     return
   }
 
@@ -144,7 +143,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
           navigateTo(`${URL.Settings}?checkUpdate=1`)
-        }
+        },
       },
       separator,
       {
@@ -313,10 +312,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               winID: window.id,
               type: 'sign-verify',
               payload: currentWallet!.id,
-              dispatchToUI: true
+              dispatchToUI: true,
             })
           }
-        }
+        },
       },
       {
         label: t('application-menu.tools.multisig-address'),
@@ -330,7 +329,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
               width: 1000,
               maxWidth: 1000,
               minWidth: 1000,
-              resizable: true
+              resizable: true,
             },
             ['multisig-output-update']
           )
@@ -481,7 +480,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
         navigateTo(`${URL.Settings}?checkUpdate=1`)
-      }
+      },
     })
     helpSubmenu.push({
       id: 'about',

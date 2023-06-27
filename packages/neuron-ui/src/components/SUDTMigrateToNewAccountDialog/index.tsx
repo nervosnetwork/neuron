@@ -38,10 +38,10 @@ const SUDTMigrateToNewAccountDialog = ({
     tokenId: cell.type?.args,
     sUDTAccounts,
   })
-  const confirmDisabled = useMemo(() => fields.some(v => tokenInfoErrors[v.key] || !tokenInfo[v.key]), [
-    tokenInfoErrors,
-    tokenInfo,
-  ])
+  const confirmDisabled = useMemo(
+    () => fields.some(v => tokenInfoErrors[v.key] || !tokenInfo[v.key]),
+    [tokenInfoErrors, tokenInfo]
+  )
   const sudtAmount = getSUDTAmount({ tokenInfo: findTokenInfo, data: cell.data })
   const onSumbit = useCallback(() => {
     generateSudtMigrateAcpTx({
