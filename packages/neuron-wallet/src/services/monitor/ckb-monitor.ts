@@ -13,10 +13,7 @@ export default class CkbMonitor extends BaseMonitor {
   }
 
   async stop(): Promise<void> {
-    await Promise.all([
-      stopCkbNode(),
-      CKBLightRunner.getInstance().stop()
-    ])
+    await Promise.all([stopCkbNode(), CKBLightRunner.getInstance().stop()])
   }
 
   name: string = 'ckb'

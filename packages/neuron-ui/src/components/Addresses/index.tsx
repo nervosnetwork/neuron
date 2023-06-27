@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { clipboard } from 'electron'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import TextField from 'widgets/TextField'
@@ -30,7 +30,7 @@ const Addresses = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const isMainnet = isMainnetUtil(networks, networkID)
   const breakcrum = [{ label: t('navbar.receive'), link: RoutePath.Receive }]
@@ -39,13 +39,8 @@ const Addresses = () => {
     backToTop()
   }, [])
 
-  const {
-    localDescription,
-    onDescriptionPress,
-    onDescriptionFieldBlur,
-    onDescriptionChange,
-    onDescriptionSelected,
-  } = useLocalDescription('address', walletID, dispatch)
+  const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange, onDescriptionSelected } =
+    useLocalDescription('address', walletID, dispatch)
 
   const onContextMenu = useCallback(
     (item: State.Address) => (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
@@ -62,7 +57,7 @@ const Addresses = () => {
           {
             label: t('addresses.request-payment'),
             click: () => {
-              history.push(`${RoutePath.Receive}/${item.address}`)
+              navigate(`${RoutePath.Receive}/${item.address}`)
             },
           },
           {
@@ -76,7 +71,7 @@ const Addresses = () => {
         openContextMenu(menuTemplate)
       }
     },
-    [t, isMainnet, history]
+    [t, isMainnet, navigate]
   )
 
   return (
@@ -125,9 +120,7 @@ const Addresses = () => {
                       onDoubleClick={onDescriptionSelected}
                       className={styles.descriptionField}
                       suffix={
-                        isSelected ? (
-                          undefined
-                        ) : (
+                        isSelected ? undefined : (
                           <button
                             type="button"
                             data-description-key={addr.address}

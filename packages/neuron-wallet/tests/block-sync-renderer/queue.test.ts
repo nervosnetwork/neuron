@@ -250,7 +250,11 @@ describe('queue', () => {
                 tx.blockHash = fakeTxWithStatus2.txStatus.blockHash!
                 tx.blockNumber = BigInt(fakeTxWithStatus2.transaction.blockNumber!).toString()
                 tx.timestamp = BigInt(fakeTxWithStatus2.transaction.timestamp!).toString()
-                expect(stubbedSaveFetchFn).toHaveBeenCalledWith(tx)
+                expect(stubbedSaveFetchFn).toHaveBeenCalledWith(tx, new Set([
+                  addressInfo.blake160,
+                  Multisig.hash([addressInfo.blake160]),
+                  SystemScriptInfo.generateSecpScript(addressInfo.blake160).computeHash().slice(0, 42),
+                ]))
               }
             })
             it('checks and generate new addresses', () => {

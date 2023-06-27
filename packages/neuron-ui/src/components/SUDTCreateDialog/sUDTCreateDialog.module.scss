@@ -1,108 +1,77 @@
 @import '../../styles/mixin.scss';
 
 .container {
-  @include overlay;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 648px;
+  padding-bottom: 24px;
 
-  form > div {
-    margin-bottom: 10px;
+  .choiceTitle {
+    font-size: 14px;
+    line-height: 20px;
+    color: #8da394;
+  }
 
-    input:disabled {
-      background-color: transparent !important;
-      color: #666;
-      border-color: transparent !important;
+  .itemBtn {
+    height: 80px;
+    width: 100%;
+    margin-bottom: 16px;
+    flex-direction: column;
+    align-items: start;
+    padding-left: 16px;
+    gap: 8px;
+    h3 {
+      margin: 0;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    p {
+      margin: 0;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
     }
   }
 
-  .ckbField {
-    & > div {
-      border-color: transparent;
-    }
-  }
-
-  .title {
-    margin-bottom: 25px;
-    line-height: 1.27em;
-    font-weight: 900;
-  }
-
-  .dialogContainer {
-    @include dialog-container;
-    width: 520px;
-    box-sizing: border-box;
-    background: #fff;
-    padding: 30px 50px;
-  }
-
-  .tokenIdContainer {
+  .fieldWrap {
     display: flex;
-    justify-content: center;
-    align-items: center;
-
-    button {
-      border: none;
-
-      svg {
-        width: 1rem;
-        height: 1rem;
-      }
-
-      &:hover {
-        g,
-        path {
-          stroke: var(--nervos-green);
-          fill: var(--nervos-green);
-        }
+    flex-wrap: wrap;
+    justify-content: space-between;
+    .settingField {
+      width: 648px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+      &:nth-last-of-type(-n + 2) {
+        width: 312px;
       }
     }
   }
 
   .footer {
     @include dialog-footer;
-
-    button {
-      margin-left: 10px;
-    }
-  }
-}
-
-.accountTypes {
-  label {
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-  }
-}
-
-.capacityRequired {
-  color: #666;
-  font-size: 0.6875rem;
-  &[data-insufficient='true'] {
-    color: #d50000;
-    font-weight: 600;
-    &:before {
-      content: '*';
-    }
+    gap: 24px;
+    margin-top: 16px;
   }
 }
 
 .explorerNavButton {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
   height: 24px;
   font-size: 12px;
-  color: #fff;
+  color: var(--primary-color) !important;
+  background: transparent;
   border: none;
-  border-radius: 2px;
-  padding: 4px;
-  background-color: var(--nervos-green);
-
-  &:hover {
-    background-color: #21b574;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  svg {
+    width: 16px;
+    g,
+    path {
+      fill: var(--primary-color);
+    }
   }
 }

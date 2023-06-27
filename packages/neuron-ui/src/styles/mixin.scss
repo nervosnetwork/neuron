@@ -22,9 +22,9 @@
 // layout
 @mixin dialog-container {
   border: none;
-  border-radius: 2px;
-  box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
-  min-width: 500px;
+  border-radius: 16px;
+  background-color: var(--secondary-background-color);
+  min-width: 450px;
   max-width: 650px;
   box-sizing: border-box;
 }
@@ -38,7 +38,7 @@
 
 @mixin dialog-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 @mixin dialog-confirm-button {
@@ -58,6 +58,7 @@
 @mixin overlay {
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(1px);
+  z-index: 11;
 }
 
 @mixin disabled-button {
@@ -67,15 +68,16 @@
 
 @mixin form-footer {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 104px;
 
   button {
-    margin-left: 10px;
+    width: 376px;
 
     &:first-of-type {
-      margin-left: 0;
+      margin-bottom: 8px;
     }
   }
 }
@@ -138,5 +140,48 @@
 
   &:hover::after {
     display: block;
+  }
+}
+@mixin header-title {
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 34px;
+  text-align: center;
+  color: var(--main-text-color);
+}
+
+@mixin card {
+  background: var(--secondary-background-color);
+  border-radius: 16px;
+}
+
+@mixin icon-hover-button($normalColor: var(--secondary-text-color), $hoverColor: var(--primary-color)) {
+  border: none;
+  background: transparent;
+  color: $normalColor !important;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  svg {
+    margin-right: 4px;
+    g,
+    path {
+      fill: $normalColor;
+    }
+  }
+  &:not(&[disabled]):hover {
+    color: $hoverColor !important;
+    svg {
+      g,
+      path {
+        fill: $hoverColor;
+      }
+    }
+  }
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }

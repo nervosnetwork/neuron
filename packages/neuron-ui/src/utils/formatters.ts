@@ -304,3 +304,9 @@ export const errorFormatter = (error: string | FailureFromController['message'],
 
   return error.content || unknownError
 }
+
+export const padFractionDigitsIfDecimal = (num: string | number, minimumFractionDigits: number): string => {
+  const numText = num.toString()
+  const isDecimal = numText.includes('.')
+  return isDecimal ? numText.padEnd(numText.indexOf('.') + 1 + minimumFractionDigits, '0') : numText
+}

@@ -34,33 +34,37 @@
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel --load-env-files=false test",
     "test:ci": "yarn build:main && yarn test",
     "lint": "lerna run --stream lint",
-    "postinstall": "husky install && lerna run build --scope=@nervina-labs/ckb-indexer",
+    "postinstall": "husky install",
     "db:chain": "node ./node_modules/.bin/typeorm"
   },
   "devDependencies": {
-    "@babel/core": "7.21.4",
+    "@babel/core": "7.22.5",
     "@types/jest": "27.5.2",
-    "@types/node": "18.15.11",
+    "@types/node": "18.16.18",
     "@types/npmlog": "4.1.4",
     "@typescript-eslint/eslint-plugin": "5.58.0",
     "@typescript-eslint/parser": "5.58.0",
-    "concurrently": "8.0.1",
+    "concurrently": "8.2.0",
     "cross-env": "7.0.3",
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-prettier": "4.2.1",
     "husky": "8.0.3",
-    "lerna": "7.0.0",
-    "lint-staged": "13.2.1",
+    "lerna": "7.0.2",
+    "lint-staged": "13.2.2",
     "ncp": "2.0.0",
-    "prettier": "2.8.7",
+    "prettier": "2.8.8",
     "ts-jest": "27.1.5",
     "typescript": "5.0.4",
-    "wait-on": "6.0.1"
+    "wait-on": "7.0.1"
   },
   "dependencies": {},
   "resolutions": {
-    "@types/react": "17.0.58",
+    "@types/react": "17.0.62",
     "react-i18next": ">=11.16.4",
     "usb": "1.8.8"
+  },
+  "volta": {
+    "node": "18.16.0"
   }
 }

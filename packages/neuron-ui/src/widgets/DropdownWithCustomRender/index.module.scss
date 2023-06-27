@@ -10,41 +10,47 @@
 .dropdown-control {
   position: relative;
   overflow: hidden;
-  background-color: white;
-  border: 1px solid rgb(96, 94, 92);
+  background-color: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
   box-sizing: border-box;
   cursor: pointer;
   outline: none;
   transition: all 200ms ease;
-  font-size: 0.75rem;
+  font-size: 14px;
   font-weight: 400;
   color: var(--dropdown-base-font-color);
-  border-color: rgb(96, 94, 92);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3px 10px;
-  padding-bottom: 3.5px;
-}
-
-.dropdown-control:hover {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  padding: 12px 16px;
 }
 
 .dropdown-arrow {
   transition: 0.2s;
+  path {
+    stroke: var(--secondary-text-color);
+  }
 }
 
 .is-open .dropdown-arrow {
   transform: rotate(180deg);
+  path {
+    stroke: var(--primary-color);
+  }
 }
 
 .dropdown-menu {
-  background-color: white;
-  box-shadow: rgb(0 0 0 / 13%) 0px 3.2px 7.2px 0px,
-    rgb(0 0 0 / 11%) 0px 0.6px 1.8px 0px;
+  background-color: var(--secondary-background-color);
+  box-shadow: 0px 1px 4px #EEEEEE;
+  border-radius: 8px;
+  @media (prefers-color-scheme: dark) {
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+  }
   box-sizing: border-box;
-  margin-top: 0px;
+  margin-top: 8px;
+  padding: 0 16px;
   max-height: 200px;
   overflow-y: auto;
   position: absolute;
@@ -59,18 +65,16 @@
   color: var(--dropdown-base-font-color);
   cursor: pointer;
   display: block;
-  padding: 6px 10px;
+  padding: 12px 0;
   font-size: 0.75rem;
+  border-bottom: 1px solid var(--input-border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dropdown-option:last-child {
-  border-bottom-right-radius: 2px;
-  border-bottom-left-radius: 2px;
-}
-
-.dropdown-option:hover {
-  background-color: rgba(0, 0, 0, 0.06);
-  color: var(--dropdown-base-font-color);
+  border: none;
 }
 
 .dropdown-option.is-selected {

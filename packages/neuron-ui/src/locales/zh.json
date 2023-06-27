@@ -17,6 +17,7 @@
       "history": "交易历史",
       "addresses": "地址管理",
       "nervos-dao": "Nervos DAO",
+      "settings": "设置",
       "special-assets": "自定义资产",
       "sync-not-start": "同步尚未开始",
       "connecting": "正在连接节点",
@@ -34,7 +35,7 @@
       "title": {
         "select-model": "请连接设备并选择型号",
         "detect-device": "搜索设备",
-        "name-wallet": "命名钱包",
+        "name-wallet": "为新钱包命名",
         "choose-address": "从设备中选择地址"
       },
       "actions": {
@@ -44,10 +45,11 @@
         "cancel": "取消",
         "back": "上一步",
         "rescan": "重新搜索",
-        "close": "关闭"
+        "close": "关闭",
+        "finish": "完成创建"
       },
       "waiting": "等待 CKB 应用响应...",
-      "abort": "等待 CKB 应用响应... 操作终止。",
+      "abort": "等待 CKB 应用响应... 操作终止",
       "app-version": "检测到 CKB 应用版本 v{{version}}。",
       "firmware-version": "检测到固件版本 v{{version}}。",
       "wallet-name": "钱包名称",
@@ -74,19 +76,20 @@
       "title": "使用硬件钱包进行地址验证",
       "device": "设备：",
       "address": "地址：",
-      "verified": "验证通过",
+      "verified": "地址验证通过",
       "invalid": "地址不正确",
       "status": {
         "label": "状态：",
-        "connect": "已连接",
+        "connect": "设备已连接，点击验证按钮进行地址验证",
         "user-input": "已连接，等待确认...",
         "disconnect": "未连接，请检查设备连接。"
       },
       "actions": {
-        "close": "关闭",
-        "rescan": "再次检测",
+        "close": "取消",
+        "reconnect": "连接设备",
         "copy-address": "复制地址",
-        "verify": "验证"
+        "verify": "地址验证",
+        "verify-again": "再次验证"
       }
     },
     "offline-sign": {
@@ -110,7 +113,7 @@
       }
     },
     "overview": {
-      "date": "日期",
+      "date": "时间",
       "type": "类型",
       "balance": "余额",
       "recent-activities": "最近收支",
@@ -126,7 +129,7 @@
       "sending": "正在发送",
       "received": "已收款",
       "receiving": "正在收款",
-      "more": "查看更多记录",
+      "more": "查看更多",
       "statusLabel": {
         "success": "成功",
         "failed": "失败",
@@ -137,7 +140,10 @@
       "create": "创建 {{name}} 资产账户",
       "destroy": "销毁 {{name}} 资产账户",
       "createSUDT": "创建 <0></0> 资产账户",
-      "destroySUDT": "销毁 <0></0> 资产账户"
+      "destroySUDT": "销毁 <0></0> 资产账户",
+      "wallet-ready": "钱包准备完成，欢迎使用",
+      "send": "转账",
+      "receive": "收款"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -165,9 +171,18 @@
       "write-down-seed": "请记下您的助记词并保存到安全的地方",
       "new-name": "输入新的钱包名称",
       "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中至少三类字符组成的字符串。",
-      "same-password": "两次输入密码应一致"
+      "same-password": "两次输入密码应一致",
+      "input-seed-verify": "输入新生成的助记词进行验证",
+      "no-wallet": "还没有钱包?",
+      "create-wallet": "立即创建新钱包",
+      "repeat-password": "重复密码",
+      "finish-create": "完成创建",
+      "creating-wallet": "钱包准备中，请稍后",
+      "add-one": "添加钱包"
     },
     "import-keystore": {
+      "title": "导入 Keystore 文件",
+      "select-file": "选择文件",
       "label": {
         "path": "Keystore 文件",
         "name": "钱包名称",
@@ -179,35 +194,42 @@
         "password": "输入密码以验证 Keystore"
       },
       "button": {
-        "back": "返回",
-        "submit": "提交"
+        "back": "上一步",
+        "submit": "导入"
       }
     },
     "detail": {
       "more-transactions": "更多交易记录"
     },
     "send": {
-      "address": "地址",
-      "amount": "金额",
+      "address": "收款地址",
+      "amount": "转账金额（CKB）",
       "send": "发送",
-      "clear": "清除",
+      "reset": "重置",
       "confirm-password": "确认密码",
       "to": "收款地址",
+      "add-receiving-address": "添加收款地址",
       "input-password-to-confirm": "输入密码以确认本次交易",
       "scan-to-get-address": "扫描二维码以获取地址",
-      "total-amount": "总金额",
+      "total-amount": "总金额（CKB）",
       "description": "备注",
       "description-optional": "备注 (选填)",
       "balance": "余额",
       "add-one": "添加",
       "remove-this": "删除",
-      "fee": "交易费",
+      "fee": "交易费（CKB）",
       "advanced-fee-settings": "交易费高级设置",
       "price": "单价",
       "pick-price": " 快速选择单价",
+      "custom-price": "自定义价格",
+      "slow": "慢速",
+      "standard": "标准",
+      "fast": "快速",
       "total-cycles": "RISC-V Cycles 总数",
       "scan-screen-qr-code": "扫描屏幕上的二维码",
       "set-locktime": "设置锁定时间",
+      "remove-receiving-address": "删除收款地址",
+      "remove-receiving-address-msg": "确定要删除所选收款地址？",
       "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
       "release-on": "锁定至",
       "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）"
@@ -223,9 +245,13 @@
       "address": "{{network}} 地址",
       "verify-address": "验证地址",
       "turn-into-full-version-fomrat": "转换为长地址格式",
-      "turn-into-deprecated-format": "转换为废弃地址格式"
+      "turn-into-deprecated-format": "转换为废弃地址格式",
+      "save-qr-code": "保存收款码",
+      "copy-qr-code": "复制收款码图片"
     },
     "history": {
+      "title": "交易历史",
+      "title-detail": "交易详情",
       "meta": "元信息",
       "type": "交易类型",
       "date": "时间",
@@ -254,12 +280,20 @@
         "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
+      "table": {
+        "name": "钱包名称",
+        "type": "类型",
+        "amount": "金额",
+        "timestamp": "时间",
+        "status": "状态",
+        "operation": "操作"
+      },
       "export-history": "导出交易历史",
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "no-txs": "没有交易记录",
-      "view-in-explorer": "浏览器",
+      "view-in-explorer": "浏览器打开",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
       "view-detail-button-title": "查看详情",
@@ -283,7 +317,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "cell-from-cellbase": "来自 Cellbase",
-      "lock-script": "锁脚本",
+      "lock-script": "脚本锁定",
+      "lock-script-title": "地址信息",
       "deprecated-address-format": "废弃格式地址"
     },
     "addresses": {
@@ -299,7 +334,8 @@
       "change-address": "找零地址",
       "copy-address": "复制地址",
       "request-payment": "请求支付",
-      "view-on-explorer": "在浏览器中查看"
+      "view-on-explorer": "在浏览器中查看",
+      "default-description": "无"
     },
     "settings": {
       "title": {
@@ -317,7 +353,8 @@
         "show": "显示",
         "hide": "隐藏",
         "version": "版本",
-        "language": "语言",
+        "language": "系统语言",
+        "select-language": "选择语言",
         "apply": "应用"
       },
       "wallet-manager": {
@@ -341,7 +378,7 @@
         "edit-network": {
           "title": "添加或编辑网络",
           "rpc-url": "RPC地址",
-          "name": "名称"
+          "name": "网络名称"
         },
         "mainnet": "主网",
         "testnet": "测试网",
@@ -376,18 +413,20 @@
         "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "cache-cleared-on": "上次清空缓存时间 {{date}}",
         "clear-cache": "清空缓存",
-        "clearing-cache": "清空中...",
-        "remove-ckb-data-tip": "请将 CKB Node 数据从 {{prevPath}} 移动至 {{currentPath}}然后点击 \"数据转移完成\" 开始从已知区块同步; 否则点击 \"重新同步\" 开始重新同步.",
+        "clearing-cache": "正在清除缓存中，请稍候",
+        "set-path": "设置路径",
+        "remove-ckb-data-tip": "请将 CKB Node 数据从 【{{prevPath}}】 移动至 【{{currentPath}}】 然后点击 \"数据转移完成\" 开始从已知区块同步; 或者点击 \"重新同步\" 开始重新同步.",
         "resync-ckb-node-describe": "注意: 重新同步不会删除当前已同步的 CKB Node 数据",
         "cancel": "取消",
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
-        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效"
+        "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
+        "ckb-node-storage": "CKB节点数据"
       }
     },
     "password-request": {
       "wallet-not-found": "找不到该钱包",
-      "password": "密码",
+      "password": "输入密码",
       "send": {
         "title": "发起交易"
       },
@@ -474,7 +513,11 @@
       "experimental": "实验室",
       "close": "关闭",
       "copy": "复制",
-      "copied": "已复制"
+      "copied": "已复制",
+      "verification-failure": "验证失败",
+      "back": "上一步",
+      "switch-to-light": "开启日间模式",
+      "switch-to-dark": "开启夜间模式"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -567,14 +610,14 @@
         "309": "收款人需要升级资产账户才能继续接收转账。",
         "310": "请输入 {{tagName}} 地址",
         "402": "CKB 应用未打开。请在你的设备打开 CKB 应用。",
-        "403": "未检测到设备，请检查你的设备连接。",
+        "403": "未检测到设备，请检查你的设备连接",
         "404": "检查到多个设备，同一型号的设备只能同时连接一个。",
         "600": "做任何交易相关的钱包操作前请先确保同步已完成。"
       }
     },
     "sync": {
-      "synced": "同步完成",
-      "syncing": "区块同步中, 还需约 {{ leftTime }}",
+      "synced": "已同步区块 100%",
+      "syncing": "区块同步中 {{ syncPercents }}",
       "block-number": "区块高度",
       "syncing-balance": "区块同步中, 正在获取最新余额",
       "slow": "同步缓慢，请检查网络",
@@ -602,7 +645,7 @@
       "completed-records": "已解锁",
       "apc": "当前年化锁定补贴率",
       "apc-tooltip": "当前年化锁定补贴率",
-      "fee": "手续费",
+      "fee": "手续费：",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "从 Nervos DAO 取出",
       "cancel": "取消",
@@ -614,16 +657,17 @@
       "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
-      "balance-not-reserved": "（不建议）不预留未来操作手续费",
+      "balance-not-reserved": "不预留未来操作手续费（不建议）",
+      "deposit-amount": "存入金额 (CKB)",
       "deposit-record": {
         "deposited-at": "存入于",
         "completed-at": "已取出",
         "deposit-pending": "存入 提交中",
-        "withdraw-action-label": "取出",
+        "withdraw-action-label": "发起提取",
         "unlock-action-label": "解锁",
         "record": "记录",
         "deposited": "存入",
-        "withdrawn": "提取",
+        "withdrawn": "发起提取",
         "unlocked": "解锁",
         "tx-record": "交易记录",
         "locked-period": "锁定时间",
@@ -654,9 +698,31 @@
         }
       }
     },
+    "nervos-dao-detail": {
+      "tx-detail": "交易详情",
+      "deposited": "存入",
+      "withdrawn": "发起提取",
+      "unlocked": "解锁",
+      "basic-information": "基本信息",
+      "transaction-hash": "交易哈希",
+      "blockNumber": "区块高度",
+      "datetime": "时间",
+      "income": "收入",
+      "index": "序号",
+      "address": "地址",
+      "amount": "数量",
+      "cell-from-cellbase": "来自 Cellbase",
+      "cancel": "取消",
+      "next": "下一步"
+    },
+    "lock-info-dialog": {
+      "address-info": "地址信息",
+      "deprecated-address": "已弃用格式的地址"
+    },
     "updates": {
       "check-updates": "检查更新",
-      "checking-updates": "正在检查...",
+      "checking-updates": "正在检查更新...",
+      "update-available": "检测到新版本",
       "downloading-update": "正在下载更新...",
       "update-not-available": "已经在使用最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
@@ -666,39 +732,39 @@
     },
     "datetime": {
       "mon": {
-        "full": "周一",
-        "short": "周一",
-        "tag": "周一"
+        "full": "一",
+        "short": "一",
+        "tag": "一"
       },
       "tue": {
-        "full": "周二",
-        "short": "周二",
-        "tag": "周二"
+        "full": "二",
+        "short": "二",
+        "tag": "二"
       },
       "wed": {
-        "full": "周三",
-        "short": "周三",
-        "tag": "周三"
+        "full": "三",
+        "short": "三",
+        "tag": "三"
       },
       "thur": {
-        "full": "周四",
-        "short": "周四",
-        "tag": "周四"
+        "full": "四",
+        "short": "四",
+        "tag": "四"
       },
       "fri": {
-        "full": "周五",
-        "short": "周五",
-        "tag": "周五"
+        "full": "五",
+        "short": "五",
+        "tag": "五"
       },
       "sat": {
-        "full": "周六",
-        "short": "周六",
-        "tag": "周六"
+        "full": "六",
+        "short": "六",
+        "tag": "六"
       },
       "sun": {
-        "full": "周日",
-        "short": "周日",
-        "tag": "周日"
+        "full": "日",
+        "short": "日",
+        "tag": "日"
       },
       "jan": {
         "full": "一月",
@@ -838,15 +904,18 @@
         "search": "账户名称、代币名称或简称",
         "syncing": "正在同步, 当前数据可能不准确",
         "send": "转账",
-        "receive": "收款"
+        "receive": "收款",
+        "set-account-info": "请设置账户信息"
       },
       "create-dialog": {
         "create-asset-account": "创建资产账户",
+        "input-account-name": "请输入账户名称",
+        "select-account-type": "选择账户类型",
         "account-name": "账户名称",
         "sudt-account": "sUDT 账户",
         "ckb-account": "CKB 账户",
         "set-token-info": "设置代币信息",
-        "token-id": "代币 ID",
+        "token-id": "代币ID",
         "token-name": "代币名称",
         "symbol": "简称",
         "decimal": "小数位",
@@ -861,9 +930,9 @@
         }
       },
       "send": {
-        "title": "发起交易",
-        "address": "地址",
-        "amount": "金额",
+        "title": "转账",
+        "address": "收款地址",
+        "amount": "转账金额",
         "description": "备注",
         "submit": "提交",
         "click-to-edit": "点击编辑",
@@ -887,10 +956,10 @@
         "select-option": "提交前请确认上述选项"
       },
       "receive": {
-        "notation": "只接收 <0></0> 转账"
+        "notation": "只接收 {{symbol}} 转账"
       },
       "update-dialog": {
-        "update-asset-account": "账户设置",
+        "update-asset-account": "账户详情",
         "account-name": "账户名称",
         "token-id": "代币 ID",
         "token-name": "代币名称",

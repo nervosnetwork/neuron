@@ -133,17 +133,17 @@ describe('Get Local Month Names', () => {
 
 describe('Get Local Week Names', () => {
   it('Chinese', () => {
-    const names = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const names = ['日', '一', '二', '三', '四', '五', '六']
     expect(getLocalWeekNames('zh')).toEqual(names)
   })
 
   it('English', () => {
-    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
     expect(getLocalWeekNames('en')).toEqual(names)
   })
 
   it('Traditional Chinese', () => {
-    const names = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+    const names = ['日', '一', '二', '三', '四', '五', '六']
     expect(getLocalWeekNames('zh-TW')).toEqual(names)
   })
 

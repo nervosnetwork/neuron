@@ -11,6 +11,7 @@ import {
   Menu,
   screen,
   BrowserWindow,
+  nativeTheme,
 } from 'electron'
 import { t } from 'i18next'
 import path from 'path'
@@ -23,7 +24,7 @@ import { ConnectionStatusSubject } from '../models/subjects/node'
 import NetworksService from '../services/networks'
 import WalletsService from '../services/wallets'
 import SettingsService, { Locale } from '../services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from '../utils/const'
+import { ResponseCode } from '../utils/const'
 import { clean as cleanChain } from '../database/chain'
 import WalletsController from '../controllers/wallets'
 import TransactionsController from '../controllers/transactions'
@@ -44,7 +45,7 @@ import {
   UpdateAssetAccountParams,
   MigrateACPParams,
   GenerateCreateChequeTxParams,
-  GenerateClaimChequeTxParams,
+  GenerateClaimChequeTxParams
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
@@ -80,6 +81,8 @@ export default class ApiController {
     this.#registerHandlers()
 
     await this.#networksController.start()
+
+    nativeTheme.themeSource = SettingsService.getInstance().themeSource
   }
 
   public runCommand(command: Command, params: string) {
@@ -225,7 +228,7 @@ export default class ApiController {
         addresses,
         transactions,
         syncedBlockNumber,
-        connectionStatus,
+        connectionStatus
       }
 
       return { status: ResponseCode.Success, result: initState }
@@ -265,12 +268,27 @@ export default class ApiController {
       return (SettingsService.getInstance().locale = locale)
     })
 
+    handle('is-dark', async () => {
+      return {
+        status: ResponseCode.Success,
+        result: nativeTheme.shouldUseDarkColors
+      }
+    })
+
+    handle('set-theme', async (_, theme: 'system' | 'light' | 'dark') => {
+      SettingsService.getInstance().themeSource = theme
+      return {
+        status: ResponseCode.Success
+      }
+    })
+
     handle('is-ckb-run-external', () => {
       return {
         status: ResponseCode.Success,
         result: NodeService.getInstance().isCkbNodeExternal,
       }
     })
+
     // Wallets
 
     handle('get-all-wallets', async () => {
@@ -540,12 +558,6 @@ export default class ApiController {
       new UpdateController(false).quitAndInstall()
     })
 
-    // Settings
-
-    handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
-    })
-
     handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
       await IndexerService.clearCache(params?.resetIndexerData)
       return { status: ResponseCode.Success, result: true }
@@ -567,7 +579,7 @@ export default class ApiController {
         })
         if (response === 1) {
           return {
-            status: ResponseCode.Fail,
+            status: ResponseCode.Fail
           }
         }
       }
@@ -583,14 +595,14 @@ export default class ApiController {
     handle('start-process-monitor', (_, monitorName: string) => {
       startMonitor(monitorName, true)
       return {
-        status: ResponseCode.Success,
+        status: ResponseCode.Success
       }
     })
 
     handle('stop-process-monitor', async (_, monitorName: string) => {
       await Promise.race([stopMonitor(monitorName), CommonUtils.sleep(1000)])
       return {
-        status: ResponseCode.Success,
+        status: ResponseCode.Success
       }
     })
 
@@ -776,14 +788,14 @@ export default class ApiController {
     handle('start-migrate', async () => {
       migrateCkbData()
       return {
-        status: ResponseCode.Success,
+        status: ResponseCode.Success
       }
     })
 
     //light client
     handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
       return {
-        result: (await SyncProgressService.getSyncProgressByHashes(hashes)),
+        result: await SyncProgressService.getSyncProgressByHashes(hashes),
         status: ResponseCode.Success,
       }
     })
@@ -812,7 +824,7 @@ export default class ApiController {
           if (!Number.isNaN(+e.code)) {
             return {
               status: ResponseCode.Fail,
-              message: e.message || err.message,
+              message: e.message || err.message
             }
           }
         } catch {
@@ -821,7 +833,7 @@ export default class ApiController {
 
         return {
           status: err.code || ResponseCode.Fail,
-          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
+          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message
         }
       }
     })

@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useCallback, useRef } from 'react'
-import { Slider, SpinnerSize } from 'office-ui-fabric-react'
+import React, { useEffect, useMemo } from 'react'
+import { Slider } from 'office-ui-fabric-react'
 import { useTranslation, Trans } from 'react-i18next'
 import TextField from 'widgets/TextField'
-import Spinner from 'widgets/Spinner'
-import Button from 'widgets/Button'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
+import Spinner, { SpinnerSize } from 'widgets/Spinner'
 import { openExternal } from 'services/remote'
-import { CONSTANTS, localNumberFormatter, shannonToCKBFormatter, useDialog } from 'utils'
+import { CONSTANTS, localNumberFormatter, shannonToCKBFormatter } from 'utils'
+import { Attention, Success } from 'widgets/Icons/icon'
+import Dialog from 'widgets/Dialog'
 import styles from './depositDialog.module.scss'
 
 const { SHANNON_CKB_RATIO } = CONSTANTS
@@ -48,8 +48,6 @@ const DepositDialog = ({
   onIsBalanceReservedChange,
 }: DepositDialogProps) => {
   const [t] = useTranslation()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show, dialogRef, onClose: onDismiss })
 
   useEffect(() => {
     if (show) {
@@ -74,64 +72,72 @@ const DepositDialog = ({
   const maxValue = +(maxDepositAmount / BigInt(SHANNON_CKB_RATIO)).toString()
   const disabled = !isTxGenerated
 
-  const onConfirm = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      if (disabled) {
-        return
-      }
-      onSubmit()
-    },
-    [onSubmit, disabled]
-  )
-
-  if (!show) {
-    return null
-  }
-
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
+    <Dialog
+      show={show}
+      title={t('nervos-dao.deposit')}
+      disabled={disabled}
+      onCancel={onDismiss}
+      onConfirm={onSubmit}
+      cancelText={t('nervos-dao.cancel')}
+      confirmText={t('nervos-dao.proceed')}
+    >
       {isDepositing ? (
         <Spinner size={SpinnerSize.large} />
       ) : (
-        <form onSubmit={onConfirm}>
-          <h2 title={t('nervos-dao.deposit-dialog-title`')} className={styles.title}>
-            {t('nervos-dao.deposit-dialog-title')}
-          </h2>
+        <form>
+          <label className={styles.depositValueLabel} htmlFor="depositValue">{`${t(
+            'nervos-dao.deposit-amount'
+          )}`}</label>
+          <Slider
+            className={styles.slider}
+            value={value}
+            min={0}
+            max={maxValue}
+            step={1}
+            showValue={false}
+            onChange={onSlide}
+          />
           <TextField
+            className={styles.depositValue}
+            width="100%"
             field="depositValue"
-            label={`${t('nervos-dao.deposit')}`}
             value={localNumberFormatter(value)}
             onChange={onChange}
             suffix="CKB"
             required
             error={errorMessage}
           />
-          <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
-          <div className={styles.isBalanceReserved}>
-            <input
-              type="checkbox"
-              id="is-balance-reserved"
-              checked={!isBalanceReserved}
-              onChange={onIsBalanceReservedChange}
-            />
-            <label htmlFor="is-balance-reserved">{t(`nervos-dao.balance-not-reserved`)}</label>
+
+          <div className={styles.fee}>
+            <div className={styles.isBalanceReserved}>
+              <input
+                type="checkbox"
+                id="is-balance-reserved"
+                checked={!isBalanceReserved}
+                onChange={onIsBalanceReservedChange}
+              />
+              <label htmlFor="is-balance-reserved">
+                <Success />
+                {t(`nervos-dao.balance-not-reserved`)}
+              </label>
+            </div>
+
+            <div>
+              <span>{t('nervos-dao.fee')}</span>
+              <span>{`${shannonToCKBFormatter(fee)}`}</span>
+            </div>
           </div>
+
           <div className={styles.notice}>
             <Attention />
-            <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
-          </div>
-          <div className={styles.fee}>
-            <span>{t('nervos-dao.fee')}</span>
-            <span>{`${shannonToCKBFormatter(fee)}`}</span>
-          </div>
-          <div className={styles.footer}>
-            <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />
-            <Button type="submit" label={t('nervos-dao.proceed')} disabled={disabled} />
+            <div>
+              <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
+            </div>
           </div>
         </form>
       )}
-    </dialog>
+    </Dialog>
   )
 }
 

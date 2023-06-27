@@ -1,26 +1,47 @@
 @import '../../styles/mixin.scss';
 
-.dialog {
-  @include dialog-container;
-  padding: 30px 50px;
-  min-height: 245px;
-  width: 600px;
+.importHardwareRoot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 96px;
 
   .container {
-    height: 220px;
     display: flex;
     flex-direction: column;
+    align-items: center;
 
-    .main {
-      flex: 1;
+    .selectDevice {
+      display: flex;
+      flex-direction: column;
+
+      input {
+        text-align: left;
+      }
+    }
+
+    .attention {
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--notice-text-color);
+      display: flex;
+      align-items: center;
+        & > svg {
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+        }
     }
 
     .action {
-      @extend .main;
+      flex: 1;
       text-align: center;
       .message {
         margin-top: 26px;
         font-weight: bold;
+        color: var(--main-text-color);
       }
 
       +.footer {
@@ -40,15 +61,8 @@
     }
 
     .detect {
-      @extend .main;
-      margin-left: 20px;
+      text-align: center;
     }
-  }
-
-  .model {
-    font-weight: bold;
-    font-size: 14px;
-    margin-top: 0;
   }
 
   &::backdrop {
@@ -56,11 +70,22 @@
   }
 
   .footer {
-    @include dialog-footer;
+    @include form-footer;
     flex-shrink: 0;
 
     button {
       margin-left: 10px;
+    }
+  }
+
+  .dialogFooter {
+    @include dialog-footer;
+    margin-top: 45px;
+
+    button {
+      &:not(:first-child) {
+        margin-left: 22px;
+      }
     }
   }
 }
@@ -74,10 +99,12 @@
   }
 }
 
+.errorInfo,
 .info {
-  font-size: 13px;
-  color: #888;
+  font-size: 14px;
+  color: var(--secondary-text-color);
   display: flex;
+  margin-top: 19px;
 
   svg {
     width: 14px;
@@ -88,27 +115,45 @@
   }
 
   .error {
-    color: #d03a3a;
+    color: var(--error-color);
     word-wrap:break-word;
   }
+}
 
-  .scaning {
-    margin-left: 18px;
-  }
+.errorInfo {
+  font-size: 16px;
+  word-break: break-all;
 }
 
 .aborted {
-  font-size: 13px;
-  color: #888;
-  position: relative;
-  left: 18px;
+  font-size: 14px;
+  color: var(--secondary-text-color);
+  margin: 8px 0 0;
 }
 
 .title {
-  font-size: 1.125rem;
-  line-height: 1.375rem;
-  font-weight: bold;
-  letter-spacing: 0.9px;
-  margin: 0;
-  margin-bottom: 26px;
+  @include header-title;
+  margin-bottom: 8px;
+}
+
+.dialog {
+  @include dialog-container;
+
+  .container {
+    .title {
+      font-size: 20px;
+    }
+
+    .model {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 18px;
+      margin-top: 12px;
+      color: var(--main-text-color);
+    }
+  }
+}
+
+.alert {
+  width: 100%;
 }

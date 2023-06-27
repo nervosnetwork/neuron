@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, deleteNetwork, migrateData } from 'services/remote'
-import { syncRebuildNotification } from 'services/localCache'
+import { firstLoadApp, syncRebuildNotification } from 'services/localCache'
 import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -10,8 +10,9 @@ import {
   updateTransactionDescription,
   updateAddressDescription,
   setCurrentWallet,
+  showPageNotice,
 } from 'states'
-import { epochParser, RoutePath, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
+import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
 import {
   validateTokenId,
   validateAssetAccountName,
@@ -28,13 +29,19 @@ import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 export * from './createSUDTAccount'
 export * from './tokenInfoList'
 
-export const useGoBack = (history: ReturnType<typeof useHistory>) => {
+export const useGoBack = () => {
+  const navigate = useNavigate()
   return useCallback(() => {
-    history.goBack()
-  }, [history])
+    navigate(-1)
+  }, [navigate])
 }
 
-export const useLocalDescription = (type: 'address' | 'transaction', walletID: string, dispatch: StateDispatch) => {
+export const useLocalDescription = (
+  type: 'address' | 'transaction',
+  walletID: string,
+  dispatch: StateDispatch,
+  inputType = 'input'
+) => {
   const [localDescription, setLocalDescription] = useState<{ description: string; key: string }>({
     key: '',
     description: '',
@@ -84,7 +91,11 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     (e: any) => {
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
+        e.stopPropagation()
+        e.preventDefault()
         submitDescription(key, originDesc)
+        const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
+        input?.blur()
       }
     },
     [submitDescription]
@@ -108,7 +119,7 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     (e: React.SyntheticEvent<any>) => {
       const {
         dataset: { descriptionKey: key, descriptionValue: originDesc = '' },
-      } = e.target as HTMLElement
+      } = e.currentTarget
       if (key) {
         dispatch({
           type: AppActions.ToggleIsAllowedToFetchList,
@@ -116,9 +127,10 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
         })
         setLocalDescription({ key, description: originDesc })
         try {
-          const input = document.querySelector<HTMLInputElement>(`input[data-description-key="${key}"]`)
+          const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
           if (input) {
             input.focus()
+            input.setSelectionRange(-1, -1)
           }
         } catch (err) {
           console.warn(err)
@@ -323,28 +335,13 @@ export const useOnLocaleChange = (i18n: i18nType) => {
   }, [i18n])
 }
 
-export const useOnHandleWallet = ({
-  history,
-  dispatch,
-}: {
-  history: ReturnType<typeof useHistory>
-  dispatch: StateDispatch
-}) =>
+export const useOnHandleWallet = ({ dispatch }: { dispatch: StateDispatch }) =>
   useCallback(
-    (e: React.SyntheticEvent) => {
+    (e: React.BaseSyntheticEvent) => {
       const {
-        target: {
-          dataset: { action },
-        },
-        currentTarget: {
-          dataset: { id },
-        },
-      } = e as any
+        dataset: { action, id },
+      } = e.target
       switch (action) {
-        case 'edit': {
-          history.push(`${RoutePath.WalletEditor}/${id}`)
-          break
-        }
         case 'delete': {
           requestPassword({ walletID: id, action: 'delete-wallet' })
           break
@@ -365,7 +362,7 @@ export const useOnHandleWallet = ({
         }
       }
     },
-    [dispatch, history]
+    [dispatch]
   )
 
 export const useOnWindowResize = (handler: () => void) => {
@@ -404,20 +401,15 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
     }
   }, [containerSelector, borderClassName])
 
-export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof useHistory> }) =>
+export const useOnHandleNetwork = (handleNet: (id: string) => void) =>
   useCallback(
-    (e: React.SyntheticEvent) => {
+    (e: React.BaseSyntheticEvent) => {
       const {
-        target: {
-          dataset: { action },
-        },
-        currentTarget: {
-          dataset: { id },
-        },
-      } = e as any
+        dataset: { action, id },
+      } = e.target
       switch (action) {
         case 'edit': {
-          history.push(`${RoutePath.NetworkEditor}/${id}`)
+          handleNet(id)
           break
         }
         case 'delete': {
@@ -429,7 +421,7 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
         }
       }
     },
-    [history]
+    [handleNet]
   )
 
 export const useGlobalNotifications = (
@@ -511,4 +503,14 @@ export const useOutputErrors = (
       }),
     [outputs, isMainnet]
   )
+}
+
+export const useFirstLoadApp = (dispatch: StateDispatch) => {
+  useEffect(() => {
+    const isFirstLoad = firstLoadApp.load()
+    if (isFirstLoad) {
+      showPageNotice('overview.wallet-ready')(dispatch)
+      firstLoadApp.save()
+    }
+  }, [dispatch])
 }

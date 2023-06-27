@@ -1,40 +1,30 @@
-import React, { useEffect, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
-import NetworkTypeLabel from 'components/NetworkTypeLabel'
-import Button from 'widgets/Button'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
-
+import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
+import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import { chainState } from 'states'
 import { setCurrentNetowrk } from 'services/remote'
-
-import { backToTop, RoutePath, useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
+import RadioGroup from 'widgets/RadioGroup'
+import { useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
 import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
-  const history = useHistory()
-  useEffect(() => {
-    backToTop()
-  }, [])
+  const [showEditorDialog, setShowEditorDialog] = useState(false)
 
   const { networkID: currentId } = chain
+  const [netId, setNetId] = useState('new')
 
-  const onChoiceChange = useCallback(
-    (_e: React.FormEvent<HTMLInputElement | HTMLElement> | undefined, option?: IChoiceGroupOption) => {
-      if (option && option.key !== currentId) {
-        setCurrentNetowrk(option.key)
-      }
+  const handleNet = useCallback(
+    (val: string) => {
+      setNetId(val)
+      setShowEditorDialog(true)
     },
-    [currentId]
+    [setNetId, setShowEditorDialog]
   )
-
-  const goToCreateNetwork = useCallback(() => {
-    history.push(`${RoutePath.NetworkEditor}/new`)
-  }, [history])
 
   const toggleBottomBorder = useToggleChoiceGroupBorder(`.${styles.networks}`, styles.hasBottomBorder)
 
@@ -46,57 +36,54 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
 
   useOnWindowResize(toggleBottomBorder)
 
-  const onHandleNetwork = useOnHandleNetwork({ history })
+  const onHandleNetwork = useOnHandleNetwork(handleNet)
 
+  const handleChange = useCallback(
+    checked => {
+      if (checked !== currentId) {
+        setCurrentNetowrk(checked)
+      }
+    },
+    [currentId]
+  )
   return (
-    <div className={styles.container}>
-      <ChoiceGroup
-        className={styles.networks}
-        options={networks.map(
-          (network): IChoiceGroupOption => ({
-            key: network.id,
-            text: network.name,
-            checked: chain.networkID === network.id,
-            onRenderLabel: props => {
-              const isDefault = network.type === 0
-              return (
-                <div
-                  role="presentation"
-                  className={`ms-ChoiceFieldLabel ${styles.choiceLabel}`}
-                  data-id={network.id}
-                  onClick={onHandleNetwork}
-                  title={`${props?.text}: ${network.remote}`}
-                >
-                  <span className={styles.networkLabel}>
-                    {props?.text}
-                    <span className={styles.url}>{`(${network.remote}`}</span>
-                    <NetworkTypeLabel type={network.chain} />
-                  </span>
-                  {network.chain === LIGHT_CLIENT_TESTNET ? null : (
-                    <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
-                      <EditNetwork />
-                    </button>
-                  )}
-                  {isDefault || network.chain === LIGHT_CLIENT_TESTNET ? null : (
-                    <button
-                      type="button"
-                      data-action="delete"
-                      aria-label={t('common.delete')}
-                      title={t('common.delete')}
-                    >
-                      <DeleteNetwork />
-                    </button>
-                  )}
-                </div>
-              )
-            },
-          })
-        )}
-        onChange={onChoiceChange}
+    <div>
+      <RadioGroup
+        defaultValue={currentId}
+        onChange={handleChange}
+        itemClassName={styles.radioItem}
+        options={networks.map(network => ({
+          value: network.id,
+          label: (
+            <div className={styles.networkLabel}>
+              <p>{`${network.name} (${network.remote})`}</p>
+              <div className={styles.tag}>{network.chain}</div>
+            </div>
+          ),
+          suffix: (
+            <div className={styles.suffix}>
+              {
+                network.chain === LIGHT_CLIENT_TESTNET ? null : (
+                  <button type="button" aria-label={t('common.edit')} onClick={onHandleNetwork}>
+                    <EditNetwork data-action="edit" data-id={network.id} />
+                  </button>
+                )
+              }
+              {(network.type && network.chain !== LIGHT_CLIENT_TESTNET) ? (
+                <button type="button" aria-label={t('common.delete')} onClick={onHandleNetwork}>
+                  <DeleteNetwork data-action="delete" data-id={network.id} />
+                </button>
+              ) : null}
+            </div>
+          ),
+        }))}
       />
-      <div className={styles.actions}>
-        <Button type="default" label={t('settings.network.add-network')} onClick={goToCreateNetwork} />
-      </div>
+
+      <button type="button" className={styles.addBtn} onClick={() => handleNet('new')}>
+        <AddSimple /> {t('settings.network.add-network')}
+      </button>
+
+      <NetworkEditorDialog show={showEditorDialog} close={() => setShowEditorDialog(false)} id={netId} />
     </div>
   )
 }

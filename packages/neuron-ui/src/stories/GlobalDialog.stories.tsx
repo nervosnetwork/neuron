@@ -9,6 +9,8 @@ const types: State.GlobalDialogType[] = ['unlock-success', 'rebuild-sync', null]
 
 types.forEach(type => {
   stories.add(type || 'Null', () => {
-    return <GlobalDialog type={type} onDismiss={action('Dismiss')} onBackUp={action('onBackUp')} onOk={action('onOk')} />
+    return (
+      <GlobalDialog type={type} onDismiss={action('Dismiss')} onBackUp={action('onBackUp')} onOk={action('onOk')} />
+    )
   })
 })

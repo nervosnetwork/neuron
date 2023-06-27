@@ -1,0 +1,32 @@
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  label {
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    color: var(--main-text-color);
+  }
+  input[type='radio'] {
+    display: none;
+    margin-right: 8px;
+  }
+  input[type='radio'] + span {
+    display: inline-block;
+    padding-left: 26px;
+    font-size: 14px;
+    line-height: 20px;
+    background: url('../../widgets/Icons/Radio.svg') no-repeat left top;
+    user-select: none;
+  }
+  input[type='radio']:checked + span {
+    background: url('../../widgets/Icons/RadioSelected.svg') no-repeat left top;
+    color: var(--primary-color);
+  }
+  &:hover {
+    background: var(--hover-background-color);
+    border-radius: 8px;
+  }
+}

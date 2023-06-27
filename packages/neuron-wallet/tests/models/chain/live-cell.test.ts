@@ -89,21 +89,21 @@ describe('LiveCell Test', () => {
 
   describe('get cells from lumos cell', () => {
     const LUMOS_CELL: LumosCell = {
-      block_hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      out_point: {
-        tx_hash: INITIAL_DATA.txHash,
+      blockHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      outPoint: {
+        txHash: INITIAL_DATA.txHash,
         index: INITIAL_DATA.outputIndex,
       },
-      cell_output: {
+      cellOutput: {
         capacity: INITIAL_DATA.capacity,
         lock: {
-          code_hash: INITIAL_DATA.lock.codeHash,
-          hash_type: INITIAL_DATA.lock.hashType,
+          codeHash: INITIAL_DATA.lock.codeHash,
+          hashType: INITIAL_DATA.lock.hashType,
           args: INITIAL_DATA.lock.args,
         },
         type: {
-          code_hash: INITIAL_DATA.type.codeHash,
-          hash_type: INITIAL_DATA.type.hashType,
+          codeHash: INITIAL_DATA.type.codeHash,
+          hashType: INITIAL_DATA.type.hashType,
           args: INITIAL_DATA.type.args,
         },
       },
@@ -129,7 +129,7 @@ describe('LiveCell Test', () => {
     })
 
     it('should have no type script', () => {
-      const cell = LiveCell.fromLumos({ ...LUMOS_CELL, cell_output: { ...LUMOS_CELL.cell_output, type: undefined } })
+      const cell = LiveCell.fromLumos({ ...LUMOS_CELL, cellOutput: { ...LUMOS_CELL.cellOutput, type: undefined } })
       expect(cell).toMatchObject({
         txHash: INITIAL_DATA.txHash,
         outputIndex: '1',

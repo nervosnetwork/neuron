@@ -8,7 +8,6 @@ import { CurrentNetworkIDSubject, NetworkListSubject } from '../../models/subjec
 import { ConnectionStatusSubject } from '../../models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from '../../models/subjects/wallets'
 import AppUpdaterSubject from '../../models/subjects/app-updater'
-import { SETTINGS_WINDOW_TITLE } from '../../utils/const'
 import SyncStateSubject from '../../models/subjects/sync-state-subject'
 import DeviceSignIndexSubject from '../../models/subjects/device-sign-index-subject'
 import SyncApiController from '../sync-api'
@@ -83,9 +82,7 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   AppUpdaterSubject.subscribe(params => {
     dispatcher.updateMenu()
-    BrowserWindow.getAllWindows()
-      .find(bw => bw.getTitle() === t(SETTINGS_WINDOW_TITLE))
-      ?.webContents.send('app-updater-updated', params)
+    dispatcher.sendMessage('app-updater-updated', params)
   })
 
   MultisigOutputChangedSubject.getSubject().subscribe(params => [

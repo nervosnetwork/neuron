@@ -1,72 +1,183 @@
 @import '../../styles/mixin.scss';
+@import '../../styles/theme.scss';
 
-.container {
-  min-height: calc(100vh - 2 * var(--main-content-vertical-padding));
-  .tools {
-    display: grid;
-    grid-template:
-      'search-input search-button export-button' auto/
-      1fr auto auto;
-    .searchBox {
-      grid-area: search-input;
-      button:hover {
-        background: rgb(220, 220, 220);
-      }
-    }
+$history-info-title-color: #999;
+$history-button-color: #8da394;
 
-    .searchBtn,
-    .exportBtn {
-      height: 1.625rem;
-      min-width: unset;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 2px;
-    }
+body {
+  --history-button-border: #e5e5e5;
 
-    .searchBtn {
-      grid-area: search-button;
-      padding: 0 15px;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      background-color: rgb(204, 204, 204);
-      color: rgb(97, 97, 97);
-      border: none;
-    }
-
-    .exportBtn {
-      grid-area: export-button;
-      width: 1.625rem;
-      margin-left: 10px;
-      svg {
-        width: 16px;
-        height: 16px;
-        path {
-          fill: #fff;
-        }
-      }
-    }
+  @media (prefers-color-scheme: dark) {
+    --history-button-border: #343e3c;
   }
+}
 
-  .pagination {
-    margin-top: 12px;
+.tableHeaderWrapper {
+  display: flex;
+  padding: 16px 16px 0 16px;
+  gap: 16px;
+  justify-content: space-between;
+
+  .tableHeaderInput {
+    margin: unset;
+    width: 100%;
+  }
+  .searchBoxPrefix {
+    font-family: inherit;
     display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: flex-end;
-    div[class^='visibleItemLabel'] {
-      font-size: 0.75rem;
-    }
-    button {
-      transform: scale(0.75);
-      padding-left: 10px;
-      padding-right: 10px;
+    justify-content: center;
+    align-items: center;
+    color: var(--input-second-color);
+    font-size: 14px;
+    max-width: 200px;
+    font-weight: 500;
+    padding-right: 10px;
+  }
+  .exportButton {
+    color: var(--main-text-color);
+    border-color: var(--history-button-border);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+
+    .exportIcon {
+      padding: 0 10px;
+      path {
+        fill: var(--main-text-color);
+      }
     }
   }
 }
 
-.noTxs {
-  @include medium-text;
-  padding: 20px 13px;
+.extendWrapper {
+  .extendBox {
+    background-color: var(--table-head-background-color);
+    margin: 0 8px 16px 0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-left: 36px;
+    display: grid;
+
+    .infoBox {
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .infoBlock {
+      flex: 1;
+      &Title {
+        margin-bottom: 8px;
+        color: $history-info-title-color;
+      }
+
+      .copyTableAddress {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'JetBrains Mono';
+      }
+    }
+    .infoOperationBox {
+      display: flex;
+      margin-top: 20px;
+      gap: 20px;
+
+      .explorerNavButton,
+      .detailNavButton {
+        display: flex;
+        border: none;
+        background: inherit;
+        padding: unset;
+        justify-content: center;
+        align-items: center;
+        color: $history-button-color;
+        gap: 5px;
+        cursor: pointer;
+
+        &:hover {
+          color: var(--primary-color);
+          svg > path {
+            fill: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+}
+.nameClass {
+  width: 120px;
+}
+
+.avatarBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  svg {
+    border-radius: 50%;
+    filter: invert(1);
+  }
+}
+.arrow {
+  cursor: pointer;
+  transition: transform 0.1s ease-in-out;
+
+  &:hover {
+    path {
+      stroke: var(--primary-color);
+    }
+  }
+
+  &[data-is-open='true'] {
+    transform: rotate(90deg);
+  }
+}
+
+.descTipRoot {
+  position: relative;
+  .autoHeight {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+
+    & > svg {
+      position: absolute;
+      right: 0;
+      bottom: 8px;
+    }
+  }
+  .descInput {
+    border: none;
+    word-break: break-word;
+    resize: none;
+    width: 100%;
+    height: 100%;
+    line-height: 24px;
+    background-color: transparent;
+    color: var(--main-text-color);
+    caret-color: #000000;
+    @media (prefers-color-scheme: dark) {
+      caret-color: #fff;
+    }
+  }
+  & > .hidden {
+    word-break: break-word;
+    white-space: break-spaces;
+    visibility: hidden;
+    min-width: 100px;
+    min-height: 24px;
+    padding: 2px;
+    line-height: 24px;
+  }
+}
+
+.container {
+  margin: 20px 0;
+}
+
+.isReceive {
+  color: $main-color;
 }

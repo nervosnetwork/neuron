@@ -1,0 +1,100 @@
+$main-color: #00c891;
+
+body {
+  --primary-color: #{$main-color};
+  --primary-text-color: #ffffff;
+  --main-background-color: #e6f3f3;
+  --secondary-background-color: #ffffff;
+  --third-background-color: #ffffff;
+  --fourth-background-color: #ecf9f0;
+  --main-text-color: #333333;
+  --main-shadow-color: #eeeeee;
+  --secondary-text-color: #8da394;
+  --third-text-color: #666666;
+  --link-color: #{$main-color};
+  --notice-background-color: #d4f8e9;
+  --notice-text-color: #ff9737;
+  --border-color: #999999;
+  --input-border-color: #f0f0f0;
+  --input-hint-color: #666666;
+  --divide-line-color: #e5e5e5;
+  --step-no-activity-color: #e5e5e5;
+  --activity-color: #{$main-color};
+  --success-color: #{$main-color};
+  --error-color: #ff1e1e;
+  --input-disabled-color: #fafafa;
+  --input-second-color: #999999;
+  --input-button-color: #999999;
+  --button-cancel-color: #999999;
+  --svg-color: #666666;
+  --dialog-secondary-text-color: #666666;
+  --disable-button-text-color: #cccccc;
+  --enable-button-text-color: #333333;
+  --main-pagination-button-text-color: #666666;
+  --main-pagination-text-color: #666666;
+  --warn-background-color: #fff6eb;
+  --svg-fill-color: #ffffff;
+  --lock-info-title-border: #e5e5e5;
+  --script-tag-background-color: #eafbf6;
+  --script-tag-boder-color: #bbe7d4;
+  --script-tag-color: #999;
+  // table
+  --table-head-background-color: #fafafa;
+  --table-head-border-color: #f0f0f0;
+  //tabs
+  --tabs-active: #00c891;
+  --tabs-default-color: #8da394;
+  --hover-background-color: #f5f9f4;
+  --tooltip-hover-background-color: #f5f9f4;
+  --process-background-color: #f0f0f0;
+  --orange-color: #f68c2a;
+
+  @media (prefers-color-scheme: dark) {
+    --primary-color: #{$main-color};
+    --primary-text-color: #232323;
+    --main-background-color: #111614;
+    --secondary-background-color: #1e2423;
+    --main-text-color: #ffffff;
+    --main-shadow-color: #141b1a;
+    --secondary-text-color: #8da394;
+    --third-text-color: #cccccc;
+    --link-color: #{$main-color};
+    --third-background-color: #2d3534;
+    --fourth-background-color: var(--secondary-background-color);
+    --notice-background-color: #093f29;
+    --notice-text-color: #f78c2a;
+    --border-color: #343e3c;
+    --input-border-color: #343e3c;
+    --input-hint-color: #ffffff;
+    --divide-line-color: rgba(240, 240, 240, 0.2);
+    --step-no-activity-color: #666666;
+    --activity-color: #{$main-color};
+    --success-color: #{$main-color};
+    --error-color: #ff1e1e;
+    --input-disabled-color: #171b1a;
+    --input-second-color: #999999;
+    --input-button-color: #ffffff;
+    --button-cancel-color: #999999;
+    --svg-color: #ffffff;
+    --dialog-secondary-text-color: #999999;
+    --disable-button-text-color: #666666;
+    --enable-button-text-color: #ffffff;
+    --main-pagination-button-text-color: #cccccc;
+    --main-pagination-text-color: #999999;
+    --warn-background-color: rgba(255, 140, 0, 0.2);
+    --svg-fill-color: #333333;
+    --lock-info-title-border: #343e3c;
+    --script-tag-background-color: #171b1a;
+    --script-tag-boder-color: #343e3c;
+    --script-tag-color: #999;
+    // table
+    --table-head-background-color: #171b1a;
+    --table-head-border-color: #282e2d;
+    //tabs
+    --tabs-active: #00c891;
+    --tabs-default-color: #8da394;
+    --hover-background-color: #2d3534;
+    --tooltip-hover-background-color: rgba(255, 255, 255, 0.2);
+    --process-background-color: #282e2d;
+  }
+}

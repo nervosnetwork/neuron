@@ -1,0 +1,281 @@
+@mixin tip {
+  display: none;
+  position: absolute;
+  background: var(--third-background-color);
+  color: var(--main-text-color);
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  z-index: 300;
+  white-space: nowrap;
+}
+
+@mixin left($class) {
+  &[data-placement="left"] {
+    &#{$class} {
+      right: calc(100% - 4px);
+      top: 0;
+    }
+  }
+
+  &[data-placement="left"][data-placement-center="true"] {
+    &#{$class} {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+@mixin right($class) {
+  &[data-placement="right"] {
+    &#{$class} {
+      left: calc(100% - 4px);
+      top: 0;
+    }
+  }
+
+  &[data-placement="right"][data-placement-center="true"] {
+    &#{$class} {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+@mixin top($class) {
+  &[data-placement="top"] {
+    &#{$class} {
+      left: 0;
+      bottom: 100%;
+    }
+  }
+
+  &[data-placement="top"][data-placement-center="true"] {
+    &#{$class} {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@mixin bottom($class) {
+  &[data-placement="bottom"] {
+    &#{$class} {
+      left: 0;
+      top: 100%;
+    }
+  }
+  &[data-placement="bottom"][data-placement-center="true"]{
+    &#{$class} {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@mixin left-top($class) {
+  &[data-placement="left-top"] {
+    &#{$class} {
+      right: 100%;
+      bottom: 100%;
+    }
+  }
+  &[data-placement="left-top"][data-placement-center="true"]{
+    &#{$class} {
+      right: 50%;
+    }
+  }
+}
+
+@mixin right-top($class) {
+  &[data-placement="right-top"] {
+    &#{$class} {
+      left: 100%;
+      bottom: 100%;
+    }
+  }
+  &[data-placement="right-top"][data-placement-center="true"]{
+    &#{$class} {
+      left: 50%;
+    }
+  }
+}
+
+@mixin left-bottom($class) {
+  &[data-placement="left-bottom"] {
+    &#{$class} {
+      right: 100%;
+      top: 100%;
+    }
+  }
+  &[data-placement="left-bottom"][data-placement-center="true"]{
+    &#{$class} {
+      right: 50%;
+    }
+  }
+}
+
+@mixin right-bottom($class) {
+  &[data-placement="right-bottom"] {
+    &#{$class} {
+      left: 100%;
+      top: 100%;
+    }
+  }
+  &[data-placement="right-bottom"][data-placement-center="true"]{
+    &#{$class} {
+      left: 50%;
+    }
+  }
+}
+
+$placements: left, right, top, bottom, left-top, right-top, left-bottom, right-bottom;
+
+@mixin tip-placement($placement, $class) {
+  @if $placement == left {
+    @include left($class);
+  }@else if $placement == right {
+    @include right($class);
+  }@else if $placement == top {
+    @include top($class);
+  }@else if $placement == bottom {
+    @include bottom($class);
+  }@else if $placement == left-top {
+    @include left-top($class);
+  }@else if $placement == right-top {
+    @include right-top($class);
+  }@else if $placement == left-bottom {
+    @include left-bottom($class);
+  }@else if $placement == right-bottom {
+    @include right-bottom($class);
+  }
+}
+
+.triangle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--third-background-color);
+  transform: translateY(50%) rotate(45deg);
+  bottom: 100%;
+  right: calc(50% - 8px);
+}
+
+.tipWithString {
+  position: relative;
+  pointer-events: initial !important;
+  cursor: pointer;
+
+  .triangle {
+    display: none;
+  }
+
+  & > * {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &[data-tooltip] {
+    &:not([data-tooltip='']) {
+      &::after {
+        @include tip;
+        content: attr(data-tooltip);
+      }
+
+      &[data-type="always-dark"] {
+        &::after {
+          background: #000000;
+          color: #FFFFFF;
+        }
+      }
+
+      @each $placement in $placements {
+        @include tip-placement($placement, "::after");
+      }
+
+      &[data-trigger="hover"] {
+        &:hover {
+          &::after {
+            display: block;
+          }
+          .triangle {
+            display: block;
+          }
+        }
+      }
+
+      &[data-trigger="click"] {
+        &[data-tip-show="true"] .tip {
+          display: block;
+        }
+      }
+
+      &[data-has-trigger="true"] {
+        &[data-placement="bottom"] {
+          &:not([data-trigger-next-to-child="true"]) {
+            &::after {
+              top: calc(100% + 20px)
+            }
+          }
+          .triangle {
+            top: calc(100% + 4px);
+            transform: translateY(50%) rotate(45deg);
+            right: inherit;
+          }
+        }
+      }
+    }
+  }
+}
+
+.tipWithNode {
+  position: relative;
+
+  .tip {
+    @include tip;
+  }
+
+  &[data-type="always-dark"] {
+    .tip {
+      background: #000000;
+      color: #FFFFFF;
+    }
+  }
+
+  &[data-trigger="click"] {
+    &[data-tip-show="true"] .tip {
+      display: block;
+    }
+  }
+
+  @each $placement in $placements {
+    @include tip-placement($placement, " .tip");
+  }
+
+  &[data-trigger="hover"] {
+    &:hover {
+      .tip {
+        display: block;
+      }
+      .triangle {
+        display: block;
+      }
+    }
+  }
+
+  &[data-has-trigger="true"] {
+    &[data-placement="bottom"] {
+      &:not([data-trigger-next-to-child="true"]) {
+        & .tip {
+          top: calc(100% + 20px)
+        }
+      }
+    }
+  }
+}

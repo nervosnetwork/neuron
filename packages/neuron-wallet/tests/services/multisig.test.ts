@@ -44,13 +44,20 @@ describe('multisig service', () => {
       multisigConfigModel.m,
       multisigConfigModel.n
     ),
-    code_hash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
-    hash_type: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+    codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+    hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
   }
   const defaultTxOutpoint = { tx_hash: 'tx_hash', index: '0x0' }
   const defaultOutput = {
     out_point: defaultTxOutpoint,
-    output: { lock, capacity: '6100000000' },
+    output: {
+      lock: {
+        args: lock.args,
+        code_hash: lock.codeHash,
+        hash_type: lock.hashType,
+      },
+      capacity: '6100000000',
+    },
   }
   const multisigOutput = MultisigOutput.fromIndexer(defaultOutput)
 
@@ -186,6 +193,46 @@ describe('multisig service', () => {
     })
   })
 
+  describe('removeDulpicateConfig', () => {
+    it('exist duplicate config', () => {
+      const multisigConfigModel = new MultisigConfigModel(
+        'walletId',
+        1,
+        2,
+        3,
+        [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+      )
+      const multisigConfigs = [
+        MultisigConfig.fromModel(multisigConfigModel),
+        MultisigConfig.fromModel(multisigConfigModel),
+      ]
+      //@ts-ignore private-method
+      const res = MultisigService.removeDulpicateConfig(multisigConfigs)
+      expect(res.length).toBe(1)
+    })
+    it('non-exist duplicate config', () => {
+      const multisigConfigs = [
+        MultisigConfig.fromModel(new MultisigConfigModel(
+          'walletId',
+          1,
+          2,
+          3,
+          [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+        )),
+        MultisigConfig.fromModel(new MultisigConfigModel(
+          'walletId',
+          2,
+          2,
+          3,
+          [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
+        )),
+      ]
+      //@ts-ignore private-method
+      const res = MultisigService.removeDulpicateConfig(multisigConfigs)
+      expect(res.length).toBe(2)
+    })
+  })
+
   describe('saveLiveMultisigOutput', () => {
     it('no live cell save', async () => {
       await MultisigService.saveLiveMultisigOutput()
@@ -232,7 +279,7 @@ describe('multisig service', () => {
     it('no delete transaction', async () => {
       rpcBatchRequestMock.mockResolvedValueOnce([
         {
-          result: { objects: [{ tx_hash: defaultTxOutpoint.tx_hash }] },
+          result: { objects: [{ txHash: defaultTxOutpoint.tx_hash }] },
         },
       ])
       // @ts-ignore Private method
@@ -251,7 +298,11 @@ describe('multisig service', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
           {
-            result: { transaction: { inputs: [{ previous_output: defaultTxOutpoint }] } },
+            result: {
+              transaction: {
+                inputs: [{ previous_output: { tx_hash: defaultTxOutpoint.tx_hash, index: defaultTxOutpoint.index } }],
+              },
+            },
           },
         ])
       // @ts-ignore Private method
@@ -296,8 +347,8 @@ describe('multisig service', () => {
           {
             capacity: '770000000',
             lock: {
-              codeHash: lock.code_hash,
-              hashType: lock.hash_type,
+              codeHash: lock.codeHash,
+              hashType: lock.hashType,
               args: lock.args,
             },
             lockHash: 'lockHash',

@@ -87,6 +87,7 @@ import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
 import { bytes } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
+import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -1091,19 +1092,19 @@ describe('TransactionGenerator', () => {
       tokenID: string | undefined = undefined,
       lockScript: Script = bobAnyoneCanPayLockScript,
       customData: string = '0x'
-    ) => {
-      const liveCell = {
-        block_hash: randomHex(),
-        out_point: {
-          tx_hash: randomHex(),
+    ): LumosCell => {
+      const liveCell: LumosCell = {
+        blockHash: randomHex(),
+        outPoint: {
+          txHash: randomHex(),
           index: '0x0',
         },
-        cell_output: {
+        cellOutput: {
           capacity: capacity,
           lock: {
-            code_hash: lockScript.codeHash,
+            codeHash: lockScript.codeHash,
             args: lockScript.args,
-            hash_type: lockScript.hashType.toString(),
+            hashType: lockScript.hashType.toString(),
           },
         },
         data: '0x',
@@ -1111,10 +1112,10 @@ describe('TransactionGenerator', () => {
       if (tokenID) {
         const typeScript = assetAccountInfo.generateSudtScript(tokenID)
         // @ts-ignore
-        liveCell.cell_output.type = {
-          code_hash: typeScript.codeHash,
+        liveCell.cellOutput.type = {
+          codeHash: typeScript.codeHash,
           args: typeScript.args,
-          hash_type: typeScript.hashType.toString(),
+          hashType: typeScript.hashType.toString(),
         }
       }
       liveCell.data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'

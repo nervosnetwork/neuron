@@ -1,21 +1,25 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { SpinnerSize, SearchBox } from 'office-ui-fabric-react'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
 import SUDTCreateDialog, { TokenInfo, AccountType } from 'components/SUDTCreateDialog'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
-import Experimental from 'widgets/ExperimentalRibbon'
-import Spinner from 'widgets/Spinner'
+import Button from 'widgets/Button'
+import Spinner, { SpinnerSize } from 'widgets/Spinner'
+import PageContainer from 'components/PageContainer'
+import { ReactComponent as Experiment } from 'widgets/Icons/Experiment.svg'
+import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
+import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
+import { ReactComponent as Search } from 'widgets/Icons/SearchIcon.svg'
+import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
+import SUDTReceiveDialog, { DataProps } from 'components/SUDTReceiveDialog'
+import TableNoData from 'widgets/Icons/TableNoData.png'
 
 import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import {
   isMainnet as isMainnetUtil,
   RoutePath,
-  SyncStatus,
   CONSTANTS,
-  getSyncStatus,
-  getCurrentUrl,
   isSuccessResponse,
   useIsInsufficientToCreateSUDTAccount,
   useOnGenerateNewAccountTransaction,
@@ -31,13 +35,10 @@ export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
 const SUDTAccountList = () => {
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const {
     wallet: { id: walletId, balance },
-    chain: {
-      networkID,
-      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
-    },
+    chain: { networkID },
     settings: { networks = [] },
     sUDTAccounts,
   } = useGlobalState()
@@ -49,6 +50,8 @@ const SUDTAccountList = () => {
   const [insufficient, setInsufficient] = useState({ [AccountType.CKB]: false, [AccountType.SUDT]: false })
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const [receiveData, setReceiveData] = useState<DataProps | null>(null)
+  const [showBalance, setShowBalance] = useState(true)
 
   const existingAccountNames = sUDTAccounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
 
@@ -56,7 +59,7 @@ const SUDTAccountList = () => {
     checkMigrateAcp().then(res => {
       if (isSuccessResponse(res)) {
         if (res.result === false) {
-          history.push(RoutePath.Overview)
+          navigate(RoutePath.Overview)
         }
       } else {
         dispatch({
@@ -69,7 +72,7 @@ const SUDTAccountList = () => {
         })
       }
     })
-  }, [dispatch, history])
+  }, [dispatch, navigate])
   useIsInsufficientToCreateSUDTAccount({ walletId, balance: BigInt(balance), setInsufficient })
 
   const fetchAndUpdateList = useCallback(() => {
@@ -113,11 +116,8 @@ const SUDTAccountList = () => {
 
   const onClick = (e: any) => {
     const {
-      target: {
-        dataset: { role },
-      },
       currentTarget: {
-        dataset: { id },
+        dataset: { role, id },
       },
     } = e
 
@@ -133,17 +133,16 @@ const SUDTAccountList = () => {
         if (!account) {
           break
         }
-        const query = new URLSearchParams({
+        setReceiveData({
           address: account.address,
           accountName: account.accountName ?? DEFAULT_SUDT_FIELDS.accountName,
           tokenName: account.tokenName ?? DEFAULT_SUDT_FIELDS.tokenName,
           symbol: account.symbol ?? DEFAULT_SUDT_FIELDS.symbol,
         })
-        history.push(`${RoutePath.SUDTReceive}?${query}`)
         break
       }
       case 'send': {
-        history.push(`${RoutePath.SUDTSend}/${id}`)
+        navigate(`${RoutePath.SUDTSend}/${id}`)
         break
       }
       default: {
@@ -153,10 +152,8 @@ const SUDTAccountList = () => {
   }
 
   const onKeywordChange = useCallback(
-    (_e?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
-      if (newValue !== undefined) {
-        setKeyword(newValue)
-      }
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setKeyword(e.currentTarget.value)
     },
     [setKeyword]
   )
@@ -225,72 +222,67 @@ const SUDTAccountList = () => {
       }
     : undefined
 
-  const EXPERIMENTAL_TAG = 'sudt-accounts'
-
-  if (!isLoaded) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.title}>{t('s-udt.account-list.title')}</div>
-        <Experimental tag={EXPERIMENTAL_TAG} />
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    )
-  }
-  const syncStatus = getSyncStatus({
-    bestKnownBlockNumber,
-    bestKnownBlockTimestamp,
-    cacheTipBlockNumber,
-    currentTimestamp: Date.now(),
-    url: getCurrentUrl(networkID, networks),
-  })
-
-  let prompt = ''
-  if (SyncStatus.SyncCompleted !== syncStatus) {
-    prompt = t('s-udt.account-list.syncing')
-  } else if (!filteredAccounts.length) {
-    prompt = t('s-udt.account-list.no-asset-accounts')
-  }
-
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>{t('s-udt.account-list.title')}</div>
-      <Experimental tag={EXPERIMENTAL_TAG} />
-      <div className={styles.header}>
-        <SearchBox
-          value={keyword}
-          styles={{
-            root: {
-              background: '#e3e3e3',
-              border: 'none',
-              borderRadius: 0,
-              fontSize: '1rem',
-            },
-          }}
-          placeholder={t('s-udt.account-list.search')}
-          onChange={onKeywordChange}
-          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
-        />
-        <div role="presentation" onClick={onOpenCreateDialog} className={styles.add} />
+    <PageContainer
+      head={
+        <div className={styles.pageHeader}>
+          <Experiment />
+          <p>{t('s-udt.account-list.title')}</p>
+          <Button className={styles.btn} type="text" onClick={() => setShowBalance(prev => !prev)}>
+            {showBalance ? <EyesOpen /> : <EyesClose />}
+          </Button>
+        </div>
+      }
+    >
+      <div className={styles.container}>
+        <div className={styles.head}>
+          <div className={styles.searchBox}>
+            <Search />
+            <input value={keyword} placeholder={t('s-udt.account-list.search')} onChange={onKeywordChange} />
+          </div>
+          <button type="button" onClick={onOpenCreateDialog} className={styles.addBtn}>
+            <AddSimple /> {t('s-udt.create-dialog.create-asset-account')}
+          </button>
+        </div>
+
+        {isLoaded ? (
+          <>
+            {filteredAccounts.length ? (
+              <div className={styles.list}>
+                {filteredAccounts.map(account => (
+                  <SUDTAccountPile key={account.accountId} {...account} showBalance={showBalance} onClick={onClick} />
+                ))}
+              </div>
+            ) : (
+              <div className={styles.noRecords}>
+                <img src={TableNoData} alt="No Data" />
+                {t('s-udt.account-list.no-asset-accounts')}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className={styles.loading}>
+            <Spinner size={SpinnerSize.large} />
+          </div>
+        )}
+
+        {receiveData ? <SUDTReceiveDialog data={receiveData} onClose={() => setReceiveData(null)} /> : null}
+
+        {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}
+
+        {dialog?.action === 'create' ? (
+          <SUDTCreateDialog
+            onSubmit={handleCreateAccount}
+            onCancel={() => {
+              setDialog(null)
+            }}
+            existingAccountNames={existingAccountNames}
+            insufficient={insufficient}
+            isMainnet={isMainnet}
+          />
+        ) : null}
       </div>
-      <div className={styles.notice}>{prompt}</div>
-      <div className={styles.list}>
-        {filteredAccounts.map(account => (
-          <SUDTAccountPile key={account.accountId} {...account} onClick={onClick} />
-        ))}
-      </div>
-      {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}
-      {dialog?.action === 'create' ? (
-        <SUDTCreateDialog
-          onSubmit={handleCreateAccount}
-          onCancel={() => {
-            setDialog(null)
-          }}
-          existingAccountNames={existingAccountNames}
-          insufficient={insufficient}
-          isMainnet={isMainnet}
-        />
-      ) : null}
-    </div>
+    </PageContainer>
   )
 }
 

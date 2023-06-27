@@ -46,6 +46,9 @@ export default class Keystore {
       if (object.origin === CKB_CLI_ORIGIN) {
         throw 'Keystore from CKB CLI is not supported'
       }
+      if (!object.crypto || !object.id) {
+        throw new InvalidKeystore()
+      }
       return new Keystore(object.crypto, object.id)
     } catch {
       throw new InvalidKeystore()

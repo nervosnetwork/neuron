@@ -1,104 +1,189 @@
-@import '../../styles/mixin.scss';
-
 $hover-bg-color: #3cc68a4d;
-$left-padding: 15px;
+
+@mixin navItem {
+  display: flex;
+  align-items: center;
+  & svg,
+  & img {
+    width: 20px;
+    &:first-child {
+      margin-right: var(--svg-right-margin);
+    }
+  }
+
+  & > span {
+    flex-grow: 1;
+  }
+}
 
 .sidebar {
   display: grid;
   grid-template:
     'name' 75px
-    'navs' 1fr
-    'network' 4rem
-    'sync' 2.6rem /
-    var(--sidebar-width);
+    'navs' 1fr /
+    1fr;
   height: 100vh;
-  background: black;
+  background: #212524;
+  position: relative;
+  --left-padding: 16px;
+  --svg-right-margin: 18px;
+  &[data-expanded='false'] {
+    --left-padding: 14px;
+    --svg-right-margin: 14px;
+  }
+
+  * {
+    font-size: 14px;
+  }
+
+  & .showExpand {
+    content: '';
+    height: 100%;
+    width: 8px;
+    position: absolute;
+    right: -4px;
+    z-index: 200;
+
+    .expand {
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      display: none;
+      cursor: pointer;
+
+      &[data-expanded='false'] {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &:hover {
+      .expand {
+        display: initial;
+      }
+    }
+  }
 }
 
 .name {
-  @include regular-text;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  @include navItem;
   grid-area: name;
-  font-size: 1rem;
-  padding: 20px 15px;
-  color: var(--nervos-green);
+  padding: 20px 0 20px var(--left-padding);
+  color: var(--primary-color);
   letter-spacing: 0.53px;
-  margin: 0;
+  margin: 0 8px;
   appearance: none;
   border: none;
   background: transparent;
   font-weight: 700;
+  cursor: pointer;
+
+  span {
+    color: var(--primary-color);
+  }
+
+  .nameText {
+    width: 0;
+    flex: 1;
+    text-align: left;
+    max-width: 90px;
+  }
 }
 
+@mixin activity {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+
+  & > svg {
+    g {
+      opacity: 1;
+    }
+    path[opacity] {
+      opacity: 1;
+    }
+    path[stroke] {
+      stroke: #fff;
+    }
+  }
+}
 .navs {
   display: flex;
   flex-direction: column;
   grid-area: navs;
-  background-color: #191919;
 
-  button {
-    @include medium-text;
+  a {
+    @include navItem;
     appearance: none;
     border: none;
-    color: white;
+    color: rgba(255, 255, 255, 0.5);
     background: transparent;
-    font-size: 1rem;
     line-height: 2.5rem;
     text-align: left;
-    padding: 1px 0 1px $left-padding;
+    padding: 1px 0 1px var(--left-padding);
+    height: 48px;
+    margin: 1px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &.buttonInTip {
+      color: var(--main-text-color);
+    }
 
     &:hover {
-      font-weight: 600;
-      background-color: $hover-bg-color;
+      @include activity;
+      &.buttonInTip {
+        color: var(--primary-color);
+      }
     }
 
-    &[data-active='true'] {
-      font-weight: 600;
-      background-color: var(--nervos-green);
+    &.active {
+      @include activity;
+      &.buttonInTip {
+        color: var(--primary-color);
+      }
+      & .arrow {
+        transform: rotate(90deg);
+      }
+    }
+
+    & .arrow {
+      margin: 0 24px;
     }
   }
-}
 
-.network {
-  grid-area: network;
-  align-self: flex-end;
+  .child {
+    display: flex;
+    padding: 1px 0 1px var(--left-padding);
+    margin: 1px 8px;
+    .leftLine {
+      width: 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &::after {
+        content: '';
+        width: 1px;
+        height: 60%;
+        background-color: #464545;
+      }
+    }
 
-  & > div {
-    align-items: flex-end;
-    padding-left: $left-padding;
-    padding-right: $left-padding;
-    padding-bottom: 5px;
+    a {
+      &:hover {
+        background-color: transparent;
+        color: #fff;
+      }
+
+      &.active {
+        background-color: transparent;
+        color: #fff;
+      }
+    }
   }
-}
 
-.sync {
-  position: relative;
-  display: flex;
-  grid-area: sync;
-  font-size: 0.8rem;
-  padding-left: $left-padding;
-  color: var(--nervos-green);
-  span {
-    flex: 1;
-    padding-left: 3px;
-  }
-}
-
-.experimentalDivider {
-  color: var(--nervos-green);
-  margin: 5px $left-padding;
-  border-bottom: 1px solid currentColor;
-  padding: 4px 0;
-  pointer-events: none;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  svg {
-    display: block;
-    width: 16px;
-    height: 16px;
-    margin-right: 5px;
+  .buttonInTip {
+    height: 40px;
+    padding: unset;
+    margin: unset;
   }
 }

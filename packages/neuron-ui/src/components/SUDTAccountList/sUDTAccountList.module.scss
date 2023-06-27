@@ -1,54 +1,76 @@
 @import '../../styles/mixin.scss';
 
-.container {
-  display: grid;
-}
-
-.title {
-  @include page-title;
-}
-
-.header {
+.pageHeader {
   display: flex;
-  padding-bottom: 10px;
-  & > div:first-child {
-    flex: 1;
+  align-items: center;
+  p {
+    margin: 0 8px 0 5px;
+  }
+  .btn {
+    min-width: 16px;
+    width: 16px;
+    padding: 0;
+  }
+  svg {
+    g,
+    path {
+      fill: var(--main-text-color);
+    }
+  }
+}
+
+.container {
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 24px;
+
+    .searchBox {
+      height: 48px;
+      background: var(--secondary-background-color);
+      border-radius: 16px;
+      display: flex;
+      column-gap: 10px;
+      align-items: center;
+      padding: 0 16px;
+      flex: 1;
+
+      input {
+        display: block;
+        border: none;
+        background: transparent;
+        width: 100%;
+        color: var(--input-second-color);
+      }
+    }
+
+    .addBtn {
+      @include icon-hover-button(var(--main-text-color));
+      border-radius: 32px;
+      font-weight: 400;
+      padding: 0 18px;
+      height: 48px;
+      background: var(--secondary-background-color);
+    }
   }
 }
 
 .list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 290px);
-  gap: 10px 20px;
+  grid-template-columns: repeat(auto-fill, 312px);
+  gap: 16px;
+  margin-top: 16px;
 }
 
-.add {
-  position: relative;
-  border-radius: 2px;
-  box-sizing: border-box;
-  width: 26px;
-  height: 26px;
-  margin: 0 0 0 10px;
-  background-color: var(--nervos-green);
-  &:before,
-  &:after {
-    display: block;
-    content: '';
-    height: 2px;
-    width: 16px;
-    background-color: #fff;
-    position: absolute;
-    top: 50%;
-    left: 5px;
-    transform: translateY(-50%);
-    border-radius: 1px;
-  }
-  &:after {
-    transform: translateY(-50%) rotate(90deg);
-  }
-}
-.notice {
-  margin-bottom: 10px;
+.noRecords {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 150px;
+  font-size: 14px;
 }
 
 .loading {
@@ -57,10 +79,5 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100vh;
-  .title {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+  padding-top: 100px;
 }

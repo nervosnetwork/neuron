@@ -1,58 +1,289 @@
 @import '../../styles/mixin.scss';
 
-.title {
-  font-size: 1.375rem;
-  font-weight: 700;
-  line-height: 28px;
-  margin-bottom: 20px;
-}
-
-.address {
-  margin: 20px auto 0;
+.multiAddressRoot {
   display: flex;
-  justify-content: center;
-}
+  min-height: 504px;
+  height: 100%;
+  gap: 16px;
 
-.addressToggle{
-  display: flex;
-  align-items: center;
-  appearance: none;
-  border: none;
-  background: none;
-  svg {
-    pointer-events: none;
+  .qrCodeContainer {
+    width: 354px;
+    @include card;
+    flex-shrink: 0;
+    .qrCode {
+      margin-top: 48px;
+    }
   }
-  &:hover {
-    g,
-    path {
-      stroke: var(--nervos-green);
-      fill: var(--nervos-green);
+
+  .alert {
+    margin: 16px;
+    background: rgba(255, 246, 235, 0.2);
+    padding: 8px;
+    border: 1px solid rgba(252, 136, 0, 0.2);
+    border-radius: 4px;
+    color: #ff9737;
+    text-align: center;
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 500;
+
+    & > svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 4px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: rgba(255, 140, 0, 0.2);
+      color: #f78c2a;
+      & > svg {
+        path {
+          fill: #f78c2a;
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+    align-items: center;
+
+    & > button {
+      width: 216px;
+    }
+  }
+
+  .copyBalance {
+    height: 32px;
+    line-height: 32px;
+    min-width: 80px;
+  }
+
+  .addressType {
+    width: 100px;
+  }
+
+  .balance {
+    padding-left: 48px;
+  }
+
+  .address {
+    height: 56px;
+    display: flex;
+
+    & > span {
+      line-height: 56px;
+      font-family: 'JetBrains Mono';
+    }
+
+    .overflow {
+      word-break: break-all;
+      line-height: 56px;
+      overflow: hidden;
+    }
+
+    &:hover {
+      color: var(--activity-color);
+    }
+  }
+
+  .copyTableAddress {
+    word-break: break-all;
+    text-align: center;
+    font-family: 'JetBrains Mono';
+    width: 300px;
+    white-space: normal;
+    line-height: 24px;
+
+    & > svg {
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+  }
+
+  .addresses {
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: hidden;
+  }
+
+  .description {
+    height: 56px;
+    line-height: 56px;
+    min-width: 100px;
+    &:hover {
+      color: var(--activity-color);
+    }
+    svg {
+      cursor: pointer;
+      margin-left: 4px;
+      g {
+        fill: var(--primary-color);
+      }
+    }
+    .descText {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  .descTipRoot {
+    position: relative;
+    .autoHeight {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+
+      & > svg {
+        position: absolute;
+        right: 0;
+        bottom: 8px;
+      }
+    }
+    .descInput {
+      border: none;
+      word-break: break-word;
+      resize: none;
+      width: 100%;
+      height: 100%;
+      line-height: 24px;
+      background-color: transparent;
+      color: var(--main-text-color);
+      caret-color: #000000;
+      pointer-events: none;
+
+      @media (prefers-color-scheme: dark) {
+        caret-color: #fff;
+      }
+    }
+    & > .hidden {
+      word-break: break-word;
+      white-space: break-spaces;
+      visibility: hidden;
+      min-width: 100px;
+      min-height: 24px;
+      padding: 2px;
+      line-height: 24px;
     }
   }
 }
 
-.copyBtn {
-  appearance: none;
-  border: none;
-  background: transparent;
+.qrCode {
+  position: relative;
+  @keyframes fade-away {
+    from {
+      visibility: visible;
+      opacity: 1;
+    }
 
-  &:hover {
-    g,
-    path {
-      stroke: var(--nervos-green);
-      fill: var(--nervos-green);
+    to {
+      visibility: visible;
+      opacity: 0;
+    }
+  }
+
+  &[data-copy-success='true'] {
+    &::after {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 128px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(1px);
+      user-select: none;
+      border-radius: 40px;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 40px;
+      text-align: center;
+      content: attr(data-copy-success-text);
+      animation: 4s fade-away 1 forwards;
+      color: #fff;
     }
   }
 }
 
-.notation {
-  width: 450px;
-  font-size: 0.75rem;
-  margin: 6px auto 0;
+.copyAddress {
+  word-break: break-all;
+  text-align: center;
+  margin: 32px 16px 82px 16px;
+  line-height: 24px;
+  font-family: 'JetBrains Mono';
+
+  .addressToggle {
+    margin: 0 0 0 4px;
+    padding: 0;
+    vertical-align: sub;
+    appearance: none;
+    border: none;
+    background: none;
+    padding-right: 20px;
+    svg {
+      pointer-events: none;
+    }
+
+    &:hover {
+      & + div {
+        display: none;
+      }
+    }
+  }
 }
 
-.addressBook {
-  display: block;
-  margin: 20px auto;
-  padding: 7px 15px;
+.singleAddressRoot {
+  height: 100%;
+  text-align: center;
+  @include card;
+  &::before {
+    content: '';
+    display: block;
+    height: 176px;
+  }
+
+  .copyContainer {
+    width: 100%;
+    text-align: center;
+    .copyAddress {
+      width: 450px;
+      margin: 16px 0 42px 0;
+    }
+  }
+
+  .verifyAddress {
+    width: 216px;
+  }
+
+  .actions {
+    margin-top: 8px;
+
+    svg {
+      vertical-align: sub;
+      margin-right: 4px;
+    }
+  }
+}
+
+@media screen and (max-height: 600px) {
+  .singleAddressRoot {
+    &::before {
+      height: 88px;
+    }
+  }
+
+  .multiAddressRoot {
+    .qrCode {
+      margin-top: 38px;
+    }
+
+    .copyAddress {
+      margin: 16px 16px 26px 16px;
+    }
+  }
 }

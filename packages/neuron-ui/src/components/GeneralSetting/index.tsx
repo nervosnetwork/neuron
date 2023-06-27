@@ -1,31 +1,33 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ProgressIndicator } from 'office-ui-fabric-react'
-import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
-import Dropdown from 'widgets/Dropdown'
-import { checkForUpdates, downloadUpdate, installUpdate, setLocale, getVersion } from 'services/remote'
-import { CONSTANTS } from 'utils'
+import { useSearchParams } from 'react-router-dom'
+import Dialog from 'widgets/Dialog'
+import LanguageDialog from 'components/LanguageDialog'
+import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
+import { checkForUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
+import { LanguageSelect, CheckUpdateIcon } from 'widgets/Icons/icon'
+import styles from './generalSetting.module.scss'
 
-import styles from './style.module.scss'
-
-const { LOCALES } = CONSTANTS
 interface UpdateDowloadStatusProps {
+  show: boolean
+  onCancel: () => void
   progress: number
   newVersion: string
   releaseNotes: string
 }
 
-const UpdateDownloadStatus = ({ progress = 0, newVersion = '', releaseNotes = '' }: UpdateDowloadStatusProps) => {
+const UpdateDownloadStatus = ({
+  show,
+  onCancel,
+  progress = 0,
+  newVersion = '',
+  releaseNotes = '',
+}: UpdateDowloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
 
   if (available) {
-    const download = () => {
-      downloadUpdate()
-    }
-
     const releaseNotesHtml = () => {
       return { __html: releaseNotes }
     }
@@ -33,39 +35,51 @@ const UpdateDownloadStatus = ({ progress = 0, newVersion = '', releaseNotes = ''
     /* eslint-disable react/no-danger */
 
     return (
-      <div className={styles.install}>
-        <div>{t('updates.updates-found-do-you-want-to-update', { version: newVersion })}</div>
-        <div>
-          <Button type="primary" onClick={download} disabled={!available} label={t('updates.download-update')} />
+      <Dialog
+        show={show}
+        onConfirm={downloadUpdate}
+        disabled={!available}
+        confirmText={t('updates.download-update')}
+        onCancel={onCancel}
+        title={t('updates.update-available')}
+      >
+        <div className={styles.install}>
+          <p className={styles.title}>{newVersion}</p>
+          <div className={styles.releaseNotesStyle}>
+            <div dangerouslySetInnerHTML={releaseNotesHtml()} />
+          </div>
         </div>
-        <div className={styles.releaseNotesStyle}>
-          <div dangerouslySetInnerHTML={releaseNotesHtml()} />
-        </div>
-      </div>
+      </Dialog>
     )
   }
 
   if (downloaded) {
-    const quitAndInstall = () => {
-      installUpdate()
-    }
-
     return (
-      <div className={styles.install}>
-        <div>{t('updates.updates-downloaded-about-to-quit-and-install')}</div>
-        <div>
-          <Button
-            type="primary"
-            onClick={quitAndInstall}
-            disabled={!downloaded}
-            label={t('updates.quit-and-install')}
-          />
+      <Dialog
+        show={show}
+        onCancel={onCancel}
+        showCancel={false}
+        onConfirm={installUpdate}
+        disabled={!downloaded}
+        confirmText={t('updates.quit-and-install')}
+        title={t('updates.update-available')}
+      >
+        <div className={styles.install}>
+          <div>{t('updates.updates-downloaded-about-to-quit-and-install')}</div>
         </div>
-      </div>
+      </Dialog>
     )
   }
 
-  return <ProgressIndicator percentComplete={progress} label={t('updates.downloading-update')} />
+  return (
+    <Dialog show={show} onCancel={onCancel} title={t('updates.update-available')} showConfirm={false}>
+      <div className={styles.processWrap}>
+        <p className={styles.title}>{t('updates.downloading-update')} </p>
+        <progress value={progress} max={1} />
+        <p className={styles.note}>{progress * 100}%</p>
+      </div>
+    </Dialog>
+  )
 }
 
 interface GeneralSettingProps {
@@ -74,71 +88,102 @@ interface GeneralSettingProps {
 
 const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [t, i18n] = useTranslation()
-  const [lng, setLng] = useState(i18n.language)
+
+  const [showCheck, setShowCheck] = useState(false)
+  const [showLangDialog, setShowLangDialog] = useState(false)
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false)
+  const [searchParams] = useSearchParams()
+
+  const [dialogType, setDialogType] = useState<'checking' | 'updating' | 'updated'>('checking')
 
   const checkUpdates = useCallback(() => {
+    setShowCheck(true)
     checkForUpdates()
   }, [])
-
-  const onApplyLanguage = useCallback(() => {
-    setLocale(lng as typeof LOCALES[number])
-  }, [lng])
 
   const version = useMemo(() => {
     return getVersion()
   }, [])
 
-  const showNewVersion = updater.version !== '' || updater.downloadProgress >= 0
+  useEffect(() => {
+    const checkUpdate = searchParams.get('checkUpdate')
+    if (checkUpdate === '1') {
+      setShowCheck(true)
+    }
+  }, [searchParams, setShowCheck])
+
+  useEffect(() => {
+    if (showCheck) {
+      setShowUpdateDialog(true)
+      if (updater.checking) {
+        setDialogType('checking')
+        return
+      }
+      if (updater.version || updater.downloadProgress > 0) {
+        setDialogType('updating')
+        return
+      }
+      setDialogType('updated')
+    }
+  }, [updater, showCheck])
 
   return (
     <div className={styles.container}>
-      <div className={`${styles.version} ${styles.label}`}>{t('settings.general.version')}</div>
-      {showNewVersion ? (
-        <div className={styles.newVersion}>
-          <UpdateDownloadStatus
-            progress={updater.downloadProgress}
-            newVersion={updater.version}
-            releaseNotes={updater.releaseNotes}
-          />
-        </div>
-      ) : (
-        <>
-          <div className={`${styles.version} ${styles.value}`}>{version}</div>
-          <div className={`${styles.version} ${styles.action}`}>
-            <Button
-              label={t(`updates.${updater.checking ? 'checking-updates' : 'check-updates'}`)}
-              type="default"
-              onClick={checkUpdates}
-              disabled={updater.checking}
-            >
-              {updater.checking ? (
-                <Spinner
-                  styles={{ root: { marginRight: 5 } }}
-                  label={t('updates.checking-updates')}
-                  labelPosition="right"
-                />
-              ) : (
-                (t('updates.check-updates') as string)
-              )}
-            </Button>
-          </div>
-        </>
-      )}
-      <div className={`${styles.language} ${styles.label}`}>{t('settings.general.language')}</div>
-      <div className={`${styles.language} ${styles.select}`}>
-        <Dropdown
-          options={LOCALES.map(locale => ({ key: locale, text: t(`settings.locale.${locale}`) }))}
-          selectedKey={lng}
-          onChange={(_, item) => {
-            if (item) {
-              setLng(item.key as typeof LOCALES[number])
-            }
+      <div className={styles.content}>
+        <p>
+          {t('settings.general.version')} {version}
+        </p>
+        <button type="button" onClick={checkUpdates}>
+          <CheckUpdateIcon />
+          {t(`updates.check-updates`)}
+        </button>
+      </div>
+
+      <div className={styles.content}>
+        <p>
+          {t('settings.general.language')} {version}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setShowLangDialog(true)
           }}
-        />
+        >
+          <LanguageSelect />
+          {t(`settings.locale.${i18n.language}`)}
+        </button>
       </div>
-      <div className={`${styles.language} ${styles.action}`}>
-        <Button label={t('settings.general.apply')} onClick={onApplyLanguage} disabled={lng === i18n.language} />
-      </div>
+
+      <Dialog
+        show={['checking', 'updated'].includes(dialogType) && showUpdateDialog}
+        showCancel={false}
+        showHeader={false}
+        confirmText={t(dialogType === 'checking' ? 'common.cancel' : 'common.ok')}
+        onConfirm={() => setShowUpdateDialog(false)}
+        className={styles.confirmDialog}
+      >
+        <div className={styles.wrap}>
+          <VersionLogo />
+          <p>{t(dialogType === 'checking' ? 'updates.checking-updates' : 'updates.update-not-available')}</p>
+        </div>
+      </Dialog>
+
+      <UpdateDownloadStatus
+        show={showCheck && dialogType === 'updating'}
+        onCancel={() => {
+          setShowCheck(false)
+        }}
+        progress={updater.downloadProgress}
+        newVersion={updater.version}
+        releaseNotes={updater.releaseNotes}
+      />
+
+      <LanguageDialog
+        show={showLangDialog}
+        close={() => {
+          setShowLangDialog(false)
+        }}
+      />
     </div>
   )
 }

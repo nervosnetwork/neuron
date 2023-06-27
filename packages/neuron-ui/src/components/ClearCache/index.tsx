@@ -1,15 +1,12 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import WarningIcon from 'widgets/Icons/Warning.png'
+import Dialog from 'widgets/Dialog'
 import { StateDispatch, addPopup } from 'states'
 import { clearCellCache } from 'services/remote'
 import { cacheClearDate } from 'services/localCache'
-import { isSuccessResponse, useDialog, uniformTimeFormatter } from 'utils'
-
-import { Tooltip } from 'widgets/Icons/icon'
-import styles from './style.module.scss'
+import { isSuccessResponse, uniformTimeFormatter, useDialogWrapper } from 'utils'
+import styles from './clearCache.module.scss'
 
 const I18N_PATH = 'settings.clear-cache'
 const IDs = {
@@ -18,13 +15,24 @@ const IDs = {
   rebuildCacheOption: 'rebuild-cache-option',
 }
 
-const ClearCache = ({ dispatch, hideRebuild }: { dispatch: StateDispatch; hideRebuild?: boolean }) => {
+const ClearCacheDialog = ({
+  dispatch,
+  className,
+  btnClassName,
+  hideRebuild,
+}: {
+  dispatch: StateDispatch
+  className?: string
+  btnClassName?: string
+  hideRebuild?: boolean
+}) => {
   const [t] = useTranslation()
   const [clearedDate, setClearedDate] = useState(cacheClearDate.load())
   const [isClearing, setIsClearing] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isRebuild, setIsRebuild] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+
+  const { isDialogOpen: isCleanDialogOpen, openDialog, closeDialog, dialogRef: clearDialogRef } = useDialogWrapper()
 
   const showDialog = useCallback(() => {
     setIsDialogOpen(true)
@@ -41,8 +49,6 @@ const ClearCache = ({ dispatch, hideRebuild }: { dispatch: StateDispatch; hideRe
     [setIsRebuild]
   )
 
-  useDialog({ show: isDialogOpen, dialogRef, onClose: dismissDialog })
-
   useEffect(() => {
     if (isDialogOpen) {
       /* eslint-disable-next-line no-unused-expressions */
@@ -53,6 +59,7 @@ const ClearCache = ({ dispatch, hideRebuild }: { dispatch: StateDispatch; hideRe
   }, [isDialogOpen, setIsRebuild])
 
   const handleSubmit = useCallback(() => {
+    openDialog()
     setIsDialogOpen(false)
     setIsClearing(true)
     clearCellCache({ resetIndexerData: isRebuild })
@@ -66,51 +73,57 @@ const ClearCache = ({ dispatch, hideRebuild }: { dispatch: StateDispatch; hideRe
       })
       .finally(() => {
         setIsClearing(false)
+        closeDialog()
       })
   }, [dispatch, setClearedDate, setIsDialogOpen, isRebuild])
 
   return (
     <>
-      <div className={styles.clearCache}>
-        {t('settings.data.cache')}
-        <span className={styles.tooltip} data-tooltip={t('settings.data.clear-cache-description')}>
-          <Tooltip />
-        </span>
-        :
+      <div className={className}>
+        <span className={styles.clearTime}>{t('settings.data.cache-cleared-on', { date: clearedDate })}</span>
+        <button
+          type="button"
+          className={`${btnClassName} ${styles.clearBtn}`}
+          onClick={showDialog}
+          disabled={isClearing}
+        >
+          {t('settings.data.clear-cache')}
+        </button>
       </div>
-      <div className={styles.clearedDate}>{t('settings.data.cache-cleared-on', { date: clearedDate })}</div>
-      <Button label={t('settings.data.clear-cache')} onClick={showDialog} disabled={isClearing}>
-        {isClearing ? (
-          <Spinner
-            label={t('settings.data.clearing-cache')}
-            labelPosition="right"
-            styles={{ root: { marginRight: 5 } }}
-          />
-        ) : (
-          (t('settings.data.clear-cache') as string)
-        )}
-      </Button>
-      <dialog ref={dialogRef} className={styles.dialog}>
-        <img src={WarningIcon} alt="warning" className={styles.warningIcon} />
-        <div className={styles.title}>{t(`${I18N_PATH}.title`)}</div>
+
+      {isCleanDialogOpen ? (
+        <dialog ref={clearDialogRef} className={styles.clearDialog}>
+          <Spinner size={3} />
+          <p>{t('settings.data.clearing-cache')}</p>
+        </dialog>
+      ) : null}
+
+      <Dialog
+        show={isDialogOpen}
+        title={t(`${I18N_PATH}.title`)}
+        onConfirm={handleSubmit}
+        onCancel={dismissDialog}
+        confirmText={t(`${I18N_PATH}.buttons.ok`)}
+        confirmProps={{ id: IDs.submitClearCache }}
+      >
         <div className={styles.options}>
-          <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
-          <label htmlFor={IDs.refreshCacheOption}>{t(`${I18N_PATH}.options.refresh.label`)}</label>
-          {hideRebuild ? null : (
-            <>
-              <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
-              <label htmlFor={IDs.rebuildCacheOption}>{t(`${I18N_PATH}.options.rebuild.label`)}</label>
-            </>
-          )}
+          <label htmlFor={IDs.refreshCacheOption}>
+            <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
+            <span>{t(`${I18N_PATH}.options.refresh.label`)}</span>
+          </label>
+          {
+            hideRebuild ? null : (
+              <label htmlFor={IDs.rebuildCacheOption}>
+                <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
+                <span>{t(`${I18N_PATH}.options.rebuild.label`)}</span>
+              </label>
+            )
+          }
         </div>
-        <div className={styles.footer}>
-          <Button type="submit" label={t(`${I18N_PATH}.buttons.ok`)} onClick={handleSubmit} id={IDs.submitClearCache} />
-          <Button type="cancel" label={t(`${I18N_PATH}.buttons.cancel`)} onClick={dismissDialog} />
-        </div>
-      </dialog>
+      </Dialog>
     </>
   )
 }
 
-ClearCache.displayName = 'ClearCache'
-export default ClearCache
+ClearCacheDialog.displayName = 'ClearCacheDialog'
+export default ClearCacheDialog

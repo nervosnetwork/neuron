@@ -1,18 +1,21 @@
 import React, { useState, useCallback, useReducer, useMemo, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { SUDTAccount } from 'components/SUDTAccountList'
 import TransactionFeePanel from 'components/TransactionFeePanel'
+import PageContainer from 'components/PageContainer'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
-import { ReactComponent as TooltipIcon } from 'widgets/Icons/Tooltip.svg'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-import { ReactComponent as WarningAttention } from 'widgets/Icons/ExperimentalAttention.svg'
-import { getSUDTAccount, destoryAssetAccount } from 'services/remote'
+import Tooltip from 'widgets/Tooltip'
+import Spinner, { SpinnerSize } from 'widgets/Spinner'
+import RadioGroup from 'widgets/RadioGroup'
+import { ReactComponent as Experiment } from 'widgets/Icons/Experiment.svg'
+import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
+import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
+import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
+import { getSUDTAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
   validateAssetAccountAddress as validateAddress,
@@ -29,7 +32,7 @@ import {
   CONSTANTS,
 } from 'utils'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
-import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
+import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
 import {
   AddressLockType,
   SendType,
@@ -41,7 +44,7 @@ import {
 } from './hooks'
 import styles from './sUDTSend.module.scss'
 
-const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
+const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, HIDE_BALANCE } = CONSTANTS
 
 enum Fields {
   Address = 'address',
@@ -59,7 +62,10 @@ const initState = {
   [Fields.Description]: '',
 }
 
-const reducer: React.Reducer<typeof initState, { type: Fields; payload: string | boolean }> = (state, action) => {
+const reducer: React.Reducer<typeof initState, { type: Fields | 'reset'; payload: string | boolean }> = (
+  state,
+  action
+) => {
   switch (action.type) {
     case Fields.Address: {
       return { ...state, [Fields.Address]: action.payload.toString() }
@@ -75,6 +81,9 @@ const reducer: React.Reducer<typeof initState, { type: Fields; payload: string |
     }
     case Fields.Description: {
       return { ...state, [Fields.Description]: action.payload.toString() }
+    }
+    case 'reset': {
+      return { ...initState }
     }
     default: {
       return state
@@ -98,6 +107,7 @@ const SUDTSend = () => {
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [isLoaded, setIsLoaded] = useState(false)
   const [remoteError, setRemoteError] = useState('')
+  const [showBalance, setShowBalance] = useState(true)
 
   const isMainnet = isMainnetUtil(networks, networkID)
   const addressLockType = useAddressLockType(sendState.address, isMainnet)
@@ -147,7 +157,11 @@ const SUDTSend = () => {
     }
   }, [walletId, accountId, setIsLoaded])
 
-  const breakcrum = [{ label: t('navbar.s-udt'), link: RoutePath.SUDTAccountList }]
+  const breakcrum = [
+    { label: t('navbar.s-udt'), link: RoutePath.SUDTAccountList },
+    { label: t('s-udt.send.title'), link: RoutePath.SUDTSend },
+  ]
+
   const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
     { key: Fields.Address, label: t('s-udt.send.address') },
     { key: Fields.Amount, label: t('s-udt.send.amount') },
@@ -296,42 +310,20 @@ const SUDTSend = () => {
     [dispatch]
   )
 
-  const [isDestroying, setIsDestroying] = useState(false)
-  const onDestroy = useCallback(() => {
-    setIsDestroying(true)
-    destoryAssetAccount({ walletID: walletId, id: accountId })
-      .then(res => {
-        if (isSuccessResponse(res)) {
-          const tx = res.result
-          globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx } })
-          globalDispatch({
-            type: AppActions.RequestPassword,
-            payload: {
-              walletID: walletId,
-              actionType: 'destroy-asset-account',
-            },
-          })
-        } else {
-          globalDispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: typeof res.message === 'string' ? res.message : res.message.content!,
-            },
-          })
-        }
-      })
-      .finally(() => {
-        setIsDestroying(false)
-      })
-  }, [globalDispatch, walletId, accountId])
-
-  const showDestory = useMemo(
-    () => accountType === AccountType.CKB || BigInt(accountInfo?.balance || 0) === BigInt(0),
-    [accountType, accountInfo]
-  )
   const onSubmit = useOnSumbit({ isSubmittable, accountType, walletId, addressLockType, sendType })
+
+  const [displaySymbol, displayTokenName] = useMemo(
+    () => [
+      getDisplaySymbol(accountInfo?.tokenName || '', accountInfo?.symbol || ''),
+      getDisplayName(accountInfo?.tokenName || DEFAULT_SUDT_FIELDS.tokenName, accountInfo?.symbol || ''),
+    ],
+    [accountInfo]
+  )
+
+  const balance = useMemo(
+    () => (accountInfo ? sudtValueToAmount(accountInfo.balance, accountInfo.decimal) : '--'),
+    [accountInfo]
+  )
 
   if (!isLoaded) {
     return (
@@ -342,133 +334,120 @@ const SUDTSend = () => {
   }
 
   return (
-    <div>
-      <div className={styles.breadcrum}>
-        <Breadcrum pages={breakcrum} />
-      </div>
-      <div className={styles.title}>{t('s-udt.send.title')}</div>
-      <form onSubmit={onSubmit}>
-        <div className={styles.cardContainer}>
-          <div className={styles.info}>
-            <div className={styles.avatar}>
-              <SUDTAvatar name={accountInfo?.accountName} />
-            </div>
-            <div className={styles.accountName}>{accountInfo?.accountName}</div>
-            <div className={styles.tokenNameContainer}>
-              <UANTokenName
-                name={accountInfo?.tokenName || DEFAULT_SUDT_FIELDS.tokenName}
-                symbol={accountInfo?.symbol || ''}
-                className={styles.tokenName}
-              />
-            </div>
-            <div className={styles.balance}>
-              {accountInfo ? sudtValueToAmount(accountInfo.balance, accountInfo.decimal) : '--'}
-            </div>
-            <div className={styles.symbolConatiner}>
-              <UANTonkenSymbol
-                name={accountInfo?.tokenName || ''}
-                symbol={accountInfo?.symbol || ''}
-                className={styles.symbol}
-              />
-            </div>
-          </div>
-          <div className={styles.sendContainer}>
-            {fields.map(field => {
-              return (
-                <TextField
-                  label={field.label}
-                  value={
-                    field.key === Fields.Amount ? localNumberFormatter(sendState[field.key]) : sendState[field.key]
-                  }
-                  key={field.label}
-                  required
-                  field={field.key}
-                  onChange={onInput}
-                  suffix={
-                    field.key === Fields.Amount ? (
-                      <UANTonkenSymbol
-                        name={accountInfo?.tokenName || ''}
-                        symbol={accountInfo?.symbol || ''}
-                        className={styles.symbol}
-                      />
-                    ) : null
-                  }
-                  disabled={sendState.sendAll}
-                  error={errors[field.key]}
-                  className={styles[field.key]}
-                />
-              )
-            })}
-            {options?.length &&
-              options.map(v => (
-                <div className={`${styles[v.key]} ${styles.option}`} key={v.key}>
-                  <input
-                    type={options?.length > 1 ? 'radio' : 'checkbox'}
-                    id={v.key}
-                    checked={v.key === sendType}
-                    onChange={onChangeSendType}
-                  />
-                  <label htmlFor={v.key}>{t(`s-udt.send.${v.label}`, v?.params)}</label>
-                  {v.tooltip ? (
-                    <span className={styles.optionTooltip} data-tooltip={t(`s-udt.send.${v.tooltip}`, v?.params)}>
-                      <TooltipIcon width={12} height={12} />
-                    </span>
-                  ) : null}
-                  {(v.key === SendType.secp256Cheque && !isMainnet) ? (
-                    <div className={styles.chequeWarning}>
-                      <WarningAttention />
-                      {t('messages.light-client-cheque-warning')}
-                    </div>
-                  ) : null}
-                </div>
-              ))}
-            {!isOptionCorrect && <div className={styles.selectError}>{t('s-udt.send.select-option')}</div>}
-            <div className={styles.sendAll}>
-              <Button
-                type="primary"
-                label="Max"
-                onClick={onToggleSendingAll}
-                disabled={!sendState.address || !!errors.address}
-              />
-            </div>
-            <div className={styles.fee}>
-              <TransactionFeePanel fee={fee} price={sendState.price} onPriceChange={onPriceChange} />
-            </div>
-            <div className={styles.description}>
-              <TextField
-                label={t('s-udt.send.description')}
-                value={sendState.description}
-                field={Fields.Description}
-                onChange={onInput}
-                placeholder={t('s-udt.send.click-to-edit')}
-                className={styles.descriptionField}
-              />
-            </div>
-            <div className={styles.remoteError}>
-              {remoteError ? (
-                <>
-                  <Attention />
-                  {remoteError}
-                </>
-              ) : null}
-            </div>
-          </div>
+    <PageContainer
+      head={
+        <div className={styles.pageHeader}>
+          <Experiment />
+          <Breadcrum pages={breakcrum} />
         </div>
-        <div className={showDestory ? styles['ckb-footer'] : styles.footer}>
-          {showDestory ? (
-            <div className={styles.tooltip}>
-              <Button type="cancel" label="" onClick={onDestroy} disabled={isDestroying}>
-                {t('s-udt.send.destroy') as string}
-              </Button>
-              <span className={styles.tooltiptext}>
-                {t(accountType === AccountType.CKB ? 's-udt.send.destroy-ckb-desc' : 's-udt.send.destroy-sudt-desc')}
-              </span>
+      }
+    >
+      <form onSubmit={onSubmit}>
+        <div className={styles.layout}>
+          <div className={styles.left}>
+            <div className={styles.info}>
+              <SUDTAvatar type="logo" />
+              <div>
+                <div className={styles.accountName}>{accountInfo?.accountName}</div>
+                <div className={styles.tokenName}>{displayTokenName}</div>
+                <div className={styles.balance}>
+                  {showBalance ? balance : HIDE_BALANCE} {displaySymbol}
+                  <Button className={styles.btn} type="text" onClick={() => setShowBalance(prev => !prev)}>
+                    {showBalance ? <EyesOpen /> : <EyesClose />}
+                  </Button>
+                </div>
+              </div>
             </div>
-          ) : null}
-          <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />
+            <div className={styles.sendContainer}>
+              {fields.map(field => {
+                return (
+                  <>
+                    <TextField
+                      label={field.key === Fields.Amount ? `${field.label} (${displaySymbol})` : field.label}
+                      value={
+                        field.key === Fields.Amount ? localNumberFormatter(sendState[field.key]) : sendState[field.key]
+                      }
+                      key={field.label}
+                      field={field.key}
+                      onChange={onInput}
+                      rows={field.key === Fields.Address ? 2 : 1}
+                      suffix={
+                        field.key === Fields.Amount ? (
+                          <Button
+                            disabled={!sendState.address || !!errors.address}
+                            type="text"
+                            onClick={onToggleSendingAll}
+                            className={styles.max}
+                          >
+                            Max
+                          </Button>
+                        ) : null
+                      }
+                      disabled={sendState.sendAll}
+                      error={errors[field.key]}
+                      className={styles[field.key]}
+                    />
+
+                    {field.key === Fields.Address && options?.length ? (
+                      <>
+                        <RadioGroup
+                          defaultValue={sendType}
+                          onChange={onChangeSendType}
+                          itemClassName={styles.optionItem}
+                          options={options.map(item => ({
+                            value: item.key,
+                            label: t(`s-udt.send.${item.label}`, item?.params),
+                            suffix: item.tooltip ? (
+                              <div className={styles.tipItem}>
+                                <Tooltip
+                                  tip={
+                                    <p className={styles.tooltip}>{t(`s-udt.send.${item.tooltip}`, item?.params)}</p>
+                                  }
+                                  showTriangle
+                                >
+                                  <AttentionOutline className={styles.attention} />
+                                </Tooltip>
+                              </div>
+                            ) : null,
+                            tip:
+                              item.key === SendType.secp256Cheque && !isMainnet ? (
+                                <div className={styles.selectError}>{t('messages.light-client-cheque-warning')}</div>
+                              ) : null,
+                          }))}
+                        />
+                        {!isOptionCorrect ? (
+                          <div className={styles.selectError}>{t('s-udt.send.select-option')}</div>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </>
+                )
+              })}
+            </div>
+          </div>
+          <div className={styles.right}>
+            <div className={styles.rightContent}>
+              <div className={styles.description}>
+                <TextField
+                  label={t('s-udt.send.description')}
+                  value={sendState.description}
+                  field={Fields.Description}
+                  onChange={onInput}
+                  error={remoteError}
+                />
+              </div>
+              <div className={styles.fee}>
+                <TransactionFeePanel fee={fee} price={sendState.price} onPriceChange={onPriceChange} />
+              </div>
+            </div>
+            <div className={styles.rightFooter}>
+              <Button type="reset" onClick={() => dispatch({ type: 'reset', payload: true })} label={t('send.reset')} />
+              <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />
+            </div>
+          </div>
         </div>
       </form>
-    </div>
+    </PageContainer>
   )
 }
 
