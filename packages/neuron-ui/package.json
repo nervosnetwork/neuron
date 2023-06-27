@@ -45,7 +45,7 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-core": "0.107.0",
+    "@nervosnetwork/ckb-sdk-core": "0.109.0",
     "@nervosnetwork/ckb-sdk-utils": "0.109.0",
     "canvg": "2.0.0",
     "i18next": "21.10.0",
