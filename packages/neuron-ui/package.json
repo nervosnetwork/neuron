@@ -58,7 +58,7 @@
     "react-i18next": "12.1.5",
     "react-router-dom": "6.14.0",
     "react-transition-group": "4.4.5",
-    "sass": "1.62.0"
+    "sass": "1.63.6"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
