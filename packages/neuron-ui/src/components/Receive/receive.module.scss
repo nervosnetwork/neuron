@@ -21,7 +21,7 @@
     padding: 8px;
     border: 1px solid rgba(252, 136, 0, 0.2);
     border-radius: 4px;
-    color: #FF9737;
+    color: #ff9737;
     text-align: center;
     font-size: 12px;
     line-height: 20px;
@@ -35,10 +35,10 @@
 
     @media (prefers-color-scheme: dark) {
       background: rgba(255, 140, 0, 0.2);
-      color: #F78C2A;
+      color: #f78c2a;
       & > svg {
         path {
-          fill: #F78C2A;
+          fill: #f78c2a;
         }
       }
     }
@@ -49,7 +49,7 @@
     flex-direction: column;
     row-gap: 16px;
     align-items: center;
-  
+
     & > button {
       width: 216px;
     }
@@ -92,7 +92,7 @@
   .copyTableAddress {
     word-break: break-all;
     text-align: center;
-    font-family: "JetBrains Mono";
+    font-family: 'JetBrains Mono';
     width: 300px;
     white-space: normal;
     line-height: 24px;
@@ -120,7 +120,7 @@
       cursor: pointer;
       margin-left: 4px;
       g {
-        fill: var(--primary-color)
+        fill: var(--primary-color);
       }
     }
     .descText {
@@ -153,8 +153,10 @@
       background-color: transparent;
       color: var(--main-text-color);
       caret-color: #000000;
+      pointer-events: none;
+
       @media (prefers-color-scheme: dark) {
-        caret-color: #FFF;
+        caret-color: #fff;
       }
     }
     & > .hidden {
@@ -176,14 +178,14 @@
       visibility: visible;
       opacity: 1;
     }
-  
+
     to {
       visibility: visible;
       opacity: 0;
     }
   }
 
-  &[data-copy-success="true"] {
+  &[data-copy-success='true'] {
     &::after {
       position: absolute;
       left: 50%;
@@ -203,7 +205,7 @@
       text-align: center;
       content: attr(data-copy-success-text);
       animation: 4s fade-away 1 forwards;
-      color: #FFF;
+      color: #fff;
     }
   }
 }
@@ -213,9 +215,9 @@
   text-align: center;
   margin: 32px 16px 82px 16px;
   line-height: 24px;
-  font-family: "JetBrains Mono";
+  font-family: 'JetBrains Mono';
 
-  .addressToggle{
+  .addressToggle {
     margin: 0 0 0 4px;
     padding: 0;
     vertical-align: sub;
@@ -226,7 +228,7 @@
     svg {
       pointer-events: none;
     }
-  
+
     &:hover {
       & + div {
         display: none;
@@ -240,7 +242,7 @@
   text-align: center;
   @include card;
   &::before {
-    content: "";
+    content: '';
     display: block;
     height: 176px;
   }
@@ -279,8 +281,8 @@
     .qrCode {
       margin-top: 38px;
     }
-  
-    .addressCopy {
+
+    .copyAddress {
       margin: 16px 16px 26px 16px;
     }
   }

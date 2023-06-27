@@ -31,7 +31,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
-      "prettier --write",
+      "prettier --ignore-path ../../.prettierignore --write",
       "eslint --fix",
       "git add"
     ]
@@ -87,8 +87,6 @@
     "electron-build-env": "0.2.0",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",
-    "lint-staged": "13.2.2",
-    "prettier": "2.8.7",
     "jest-when": "3.5.2",
     "neuron-ui": "0.110.1",
     "typescript": "5.0.4"

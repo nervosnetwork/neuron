@@ -58,6 +58,7 @@
 @mixin overlay {
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(1px);
+  z-index: 11;
 }
 
 @mixin disabled-button {
@@ -170,7 +171,7 @@
       fill: $normalColor;
     }
   }
-  &:hover {
+  &:not(&[disabled]):hover {
     color: $hoverColor !important;
     svg {
       g,
@@ -178,6 +179,10 @@
         fill: $hoverColor;
       }
     }
+  }
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
