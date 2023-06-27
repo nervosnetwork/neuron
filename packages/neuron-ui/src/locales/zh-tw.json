@@ -113,7 +113,7 @@
       }
     },
     "overview": {
-      "date": "日期",
+      "date": "時間",
       "type": "類型",
       "balance": "餘額",
       "recent-activities": "最近收支",
@@ -894,15 +894,18 @@
         "search": "賬戶名稱、代幣名稱或簡稱",
         "syncing": "正在同步, 當前數據可能不準確",
         "send": "轉帳",
-        "receive": "收款"
+        "receive": "收款",
+        "set-account-info": "請設置帳戶信息"
       },
       "create-dialog": {
         "create-asset-account": "創建資產賬戶",
+        "input-account-name": "請輸入帳戶名稱",
+        "select-account-type": "選擇帳戶類型",
         "account-name": "賬戶名稱",
         "sudt-account": "sUDT 賬戶",
         "ckb-account": "CKB 賬戶",
         "set-token-info": "設置代幣信息",
-        "token-id": "代幣 ID",
+        "token-id": "代幣ID",
         "token-name": "代幣名稱",
         "symbol": "簡稱",
         "decimal": "小數位",
@@ -917,9 +920,9 @@
         }
       },
       "send": {
-        "title": "發起交易",
-        "address": "地址",
-        "amount": "金額",
+        "title": "轉帳",
+        "address": "收款地址",
+        "amount": "转账金額",
         "description": "備註",
         "submit": "提交",
         "click-to-edit": "點擊編輯",
@@ -943,10 +946,10 @@
         "select-option": "提交前請確認上述選項"
       },
       "receive": {
-        "notation": "只接收 <0></0> 轉賬"
+        "notation": "只接收 {{symbol}} 轉賬"
       },
       "update-dialog": {
-        "update-asset-account": "賬戶設置",
+        "update-asset-account": "賬戶詳情",
         "account-name": "賬戶名稱",
         "token-id": "代幣 ID",
         "token-name": "代幣名稱",

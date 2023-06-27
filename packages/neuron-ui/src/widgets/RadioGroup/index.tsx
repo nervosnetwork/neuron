@@ -6,6 +6,7 @@ export interface RadioGroupOptions {
   value: string
   disabled?: boolean
   suffix?: React.ReactNode | string
+  tip?: React.ReactNode | string
 }
 
 export interface RadioGroupProps {
@@ -13,9 +14,10 @@ export interface RadioGroupProps {
   onChange?: (arg: string | number) => void
   defaultValue?: string | number
   itemClassName?: string
+  className?: string
 }
 
-const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '' }: RadioGroupProps) => {
+const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '', className = '' }: RadioGroupProps) => {
   const [checkedValue, setCheckedValue] = useState(defaultValue || options[0].value)
 
   const handleChange = useCallback(
@@ -26,25 +28,28 @@ const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '' }: Rad
         onChange?.(value)
       }
     },
-    [onChange]
+    [onChange, checkedValue, setCheckedValue]
   )
 
   return (
-    <div>
+    <div className={className}>
       {options.map(item => (
-        <div className={`${styles.item} ${itemClassName}`} key={item.value}>
-          <label htmlFor={item.value}>
-            <input
-              id={item.value}
-              type="radio"
-              value={item.value}
-              checked={item.value === checkedValue}
-              disabled={item.disabled}
-              onChange={handleChange}
-            />
-            <span>{item.label}</span>
-          </label>
-          {item.suffix ? <div>{item.suffix}</div> : null}
+        <div>
+          <div className={`${styles.item} ${itemClassName}`} key={item.value}>
+            <label htmlFor={item.value}>
+              <input
+                id={item.value}
+                type="radio"
+                value={item.value}
+                checked={item.value === checkedValue}
+                disabled={item.disabled}
+                onChange={handleChange}
+              />
+              <span>{item.label}</span>
+            </label>
+            {item.suffix ? <div>{item.suffix}</div> : null}
+          </div>
+          {item.tip ? <div>{item.tip}</div> : null}
         </div>
       ))}
     </div>

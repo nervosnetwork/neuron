@@ -924,10 +924,13 @@
         "search": "Account Name, Token Name or Symbol",
         "syncing": "Syncing, current data may be inaccurate",
         "send": "Send",
-        "receive": "Receive"
+        "receive": "Receive",
+        "set-account-info": "Set Account Info"
       },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
+        "input-account-name": "Please input account name",
+        "select-account-type": "Select account type",
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
         "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
@@ -949,7 +952,7 @@
       },
       "send": {
         "title": "Send",
-        "address": "Address",
+        "address": "Send to",
         "amount": "Amount",
         "description": "Description",
         "submit": "Submit",
@@ -974,10 +977,10 @@
         "select-option": "Please confirm the above option before submitting"
       },
       "receive": {
-        "notation": "Accept <0></0> only"
+        "notation": "Accept {{symbol}} only"
       },
       "update-dialog": {
-        "update-asset-account": "Account setup",
+        "update-asset-account": "Account Detail",
         "account-name": "Account Name",
         "token-id": "Token ID",
         "token-name": "Token Name",

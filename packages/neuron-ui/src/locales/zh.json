@@ -113,7 +113,7 @@
       }
     },
     "overview": {
-      "date": "日期",
+      "date": "时间",
       "type": "类型",
       "balance": "余额",
       "recent-activities": "最近收支",
@@ -917,15 +917,18 @@
         "search": "账户名称、代币名称或简称",
         "syncing": "正在同步, 当前数据可能不准确",
         "send": "转账",
-        "receive": "收款"
+        "receive": "收款",
+        "set-account-info": "请设置账户信息"
       },
       "create-dialog": {
         "create-asset-account": "创建资产账户",
+        "input-account-name": "请输入账户名称",
+        "select-account-type": "选择账户类型",
         "account-name": "账户名称",
         "sudt-account": "sUDT 账户",
         "ckb-account": "CKB 账户",
         "set-token-info": "设置代币信息",
-        "token-id": "代币 ID",
+        "token-id": "代币ID",
         "token-name": "代币名称",
         "symbol": "简称",
         "decimal": "小数位",
@@ -940,9 +943,9 @@
         }
       },
       "send": {
-        "title": "发起交易",
-        "address": "地址",
-        "amount": "金额",
+        "title": "转账",
+        "address": "收款地址",
+        "amount": "转账金额",
         "description": "备注",
         "submit": "提交",
         "click-to-edit": "点击编辑",
@@ -966,10 +969,10 @@
         "select-option": "提交前请确认上述选项"
       },
       "receive": {
-        "notation": "只接收 <0></0> 转账"
+        "notation": "只接收 {{symbol}} 转账"
       },
       "update-dialog": {
-        "update-asset-account": "账户设置",
+        "update-asset-account": "账户详情",
         "account-name": "账户名称",
         "token-id": "代币 ID",
         "token-name": "代币名称",

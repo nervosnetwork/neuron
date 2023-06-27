@@ -15,14 +15,14 @@
 }
 
 @mixin left($class) {
-  &[data-placement="left"] {
+  &[data-placement='left'] {
     &#{$class} {
       right: calc(100% - 4px);
       top: 0;
     }
   }
 
-  &[data-placement="left"][data-placement-center="true"] {
+  &[data-placement='left'][data-placement-center='true'] {
     &#{$class} {
       top: 50%;
       transform: translateY(-50%);
@@ -31,14 +31,14 @@
 }
 
 @mixin right($class) {
-  &[data-placement="right"] {
+  &[data-placement='right'] {
     &#{$class} {
       left: calc(100% - 4px);
       top: 0;
     }
   }
 
-  &[data-placement="right"][data-placement-center="true"] {
+  &[data-placement='right'][data-placement-center='true'] {
     &#{$class} {
       top: 50%;
       transform: translateY(-50%);
@@ -47,14 +47,14 @@
 }
 
 @mixin top($class) {
-  &[data-placement="top"] {
+  &[data-placement='top'] {
     &#{$class} {
       left: 0;
       bottom: 100%;
     }
   }
 
-  &[data-placement="top"][data-placement-center="true"] {
+  &[data-placement='top'][data-placement-center='true'] {
     &#{$class} {
       left: 50%;
       transform: translateX(-50%);
@@ -63,13 +63,13 @@
 }
 
 @mixin bottom($class) {
-  &[data-placement="bottom"] {
+  &[data-placement='bottom'] {
     &#{$class} {
       left: 0;
       top: 100%;
     }
   }
-  &[data-placement="bottom"][data-placement-center="true"]{
+  &[data-placement='bottom'][data-placement-center='true'] {
     &#{$class} {
       left: 50%;
       transform: translateX(-50%);
@@ -78,13 +78,13 @@
 }
 
 @mixin left-top($class) {
-  &[data-placement="left-top"] {
+  &[data-placement='left-top'] {
     &#{$class} {
       right: 100%;
       bottom: 100%;
     }
   }
-  &[data-placement="left-top"][data-placement-center="true"]{
+  &[data-placement='left-top'][data-placement-center='true'] {
     &#{$class} {
       right: 50%;
     }
@@ -92,13 +92,13 @@
 }
 
 @mixin right-top($class) {
-  &[data-placement="right-top"] {
+  &[data-placement='right-top'] {
     &#{$class} {
       left: 100%;
       bottom: 100%;
     }
   }
-  &[data-placement="right-top"][data-placement-center="true"]{
+  &[data-placement='right-top'][data-placement-center='true'] {
     &#{$class} {
       left: 50%;
     }
@@ -106,13 +106,13 @@
 }
 
 @mixin left-bottom($class) {
-  &[data-placement="left-bottom"] {
+  &[data-placement='left-bottom'] {
     &#{$class} {
       right: 100%;
       top: 100%;
     }
   }
-  &[data-placement="left-bottom"][data-placement-center="true"]{
+  &[data-placement='left-bottom'][data-placement-center='true'] {
     &#{$class} {
       right: 50%;
     }
@@ -120,13 +120,13 @@
 }
 
 @mixin right-bottom($class) {
-  &[data-placement="right-bottom"] {
+  &[data-placement='right-bottom'] {
     &#{$class} {
       left: 100%;
       top: 100%;
     }
   }
-  &[data-placement="right-bottom"][data-placement-center="true"]{
+  &[data-placement='right-bottom'][data-placement-center='true'] {
     &#{$class} {
       left: 50%;
     }
@@ -138,19 +138,19 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 @mixin tip-placement($placement, $class) {
   @if $placement == left {
     @include left($class);
-  }@else if $placement == right {
+  } @else if $placement == right {
     @include right($class);
-  }@else if $placement == top {
+  } @else if $placement == top {
     @include top($class);
-  }@else if $placement == bottom {
+  } @else if $placement == bottom {
     @include bottom($class);
-  }@else if $placement == left-top {
+  } @else if $placement == left-top {
     @include left-top($class);
-  }@else if $placement == right-top {
+  } @else if $placement == right-top {
     @include right-top($class);
-  }@else if $placement == left-bottom {
+  } @else if $placement == left-bottom {
     @include left-bottom($class);
-  }@else if $placement == right-bottom {
+  } @else if $placement == right-bottom {
     @include right-bottom($class);
   }
 }
@@ -168,6 +168,7 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
 .tipWithString {
   position: relative;
   pointer-events: initial !important;
+  cursor: pointer;
 
   .triangle {
     display: none;
@@ -187,18 +188,18 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
         content: attr(data-tooltip);
       }
 
-      &[data-type="always-dark"] {
+      &[data-type='always-dark'] {
         &::after {
           background: #000000;
-          color: #FFFFFF;
+          color: #ffffff;
         }
       }
-    
+
       @each $placement in $placements {
-        @include tip-placement($placement, "::after");
+        @include tip-placement($placement, '::after');
       }
 
-      &[data-trigger="hover"] {
+      &[data-trigger='hover'] {
         &:hover {
           &::after {
             display: block;
@@ -208,18 +209,18 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
           }
         }
       }
-      
-      &[data-trigger="click"] {
-        &[data-tip-show="true"] .tip {
+
+      &[data-trigger='click'] {
+        &[data-tip-show='true'] .tip {
           display: block;
         }
       }
 
-      &[data-has-trigger="true"] {
-        &[data-placement="bottom"] {
-          &:not([data-trigger-next-to-child="true"]) {
+      &[data-has-trigger='true'] {
+        &[data-placement='bottom'] {
+          &:not([data-trigger-next-to-child='true']) {
             &::after {
-              top: calc(100% + 20px)
+              top: calc(100% + 20px);
             }
           }
           .triangle {
@@ -240,24 +241,24 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
     @include tip;
   }
 
-  &[data-type="always-dark"] {
+  &[data-type='always-dark'] {
     .tip {
       background: #000000;
-      color: #FFFFFF;
+      color: #ffffff;
     }
   }
 
-  &[data-trigger="click"] {
-    &[data-tip-show="true"] .tip {
+  &[data-trigger='click'] {
+    &[data-tip-show='true'] .tip {
       display: block;
     }
   }
 
   @each $placement in $placements {
-    @include tip-placement($placement, " .tip");
+    @include tip-placement($placement, ' .tip');
   }
 
-  &[data-trigger="hover"] {
+  &[data-trigger='hover'] {
     &:hover {
       .tip {
         display: block;
@@ -268,11 +269,11 @@ $placements: left, right, top, bottom, left-top, right-top, left-bottom, right-b
     }
   }
 
-  &[data-has-trigger="true"] {
-    &[data-placement="bottom"] {
-      &:not([data-trigger-next-to-child="true"]) {
+  &[data-has-trigger='true'] {
+    &[data-placement='bottom'] {
+      &:not([data-trigger-next-to-child='true']) {
         & .tip {
-          top: calc(100% + 20px)
+          top: calc(100% + 20px);
         }
       }
     }

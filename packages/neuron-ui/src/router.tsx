@@ -18,7 +18,6 @@ import NervosDAODetail from 'components/NervosDAODetail'
 import SpecialAssetList from 'components/SpecialAssetList'
 import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
-import SUDTReceive from 'components/SUDTReceive'
 import ImportHardware from 'components/ImportHardware'
 import OfflineSign from 'components/OfflineSign'
 import NFTSend from 'components/NFTSend'
@@ -229,16 +228,6 @@ const mainRouterConfig: RouteObject[] = [
             children: [offlineRouter, signVerifyRouter],
           },
         ],
-      },
-      {
-        path: RoutePath.SUDTReceive,
-        element: (
-          <>
-            <SUDTReceive />
-            <Outlet />
-          </>
-        ),
-        children: [offlineRouter, signVerifyRouter],
       },
       {
         path: RoutePath.ImportHardware,

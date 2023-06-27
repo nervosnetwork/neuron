@@ -15,6 +15,7 @@ import {
   getVersion,
 } from 'services/remote'
 import { uniformTimeFormatter, bytesFormatter } from 'utils'
+import { LanguageSelect } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
 interface UpdateDowloadStatusProps {
@@ -168,7 +169,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
             setShowLangDialog(true)
           }}
         >
-          {t(`settings.locale.${i18n.language}`)} <ArrowNext />
+          <LanguageSelect />
+          {t(`settings.locale.${i18n.language}`)}
         </button>
       </div>
 
