@@ -1,97 +1,84 @@
 @import '../../styles/mixin.scss';
 
 .container {
-  @include overlay;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  min-height: 550px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 648px;
 
-  form > div {
-    margin-bottom: 10px;
-
-    input:disabled {
-      background-color: transparent !important;
-      color: #666;
-      border-color: transparent !important;
-      overflow-y: scroll;
-      text-overflow: unset;
-    }
+  .label {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--secondary-text-color);
+    margin: 0;
   }
 
-  .immutable {
-    & > div {
-      border-color: transparent;
-    }
-  }
-
-  .title {
-    margin-bottom: 25px;
-    line-height: 1.27em;
-    font-weight: 900;
-  }
-
-  .dialogContainer {
-    @include dialog-container;
-    width: 520px;
-    box-sizing: border-box;
-    background: #fff;
-    padding: 30px 50px;
-  }
-
-  .tokenIdContainer {
+  .tokenId {
+    margin-top: 6px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-
+    justify-content: space-between;
+    p {
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--main-text-color);
+    }
     button {
-      border: none;
-
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--input-disabled-color);
+      border: 1px solid var(--divide-line-color);
+      border-radius: 8px;
+      cursor: pointer;
       svg {
-        width: 1rem;
-        height: 1rem;
+        width: 16px;
       }
-
       &:hover {
-        g,
-        path {
-          stroke: var(--nervos-green);
-          fill: var(--nervos-green);
+        background: rgba(255, 30, 30, 0.1);
+        border: 1px solid rgba(255, 30, 30, 0.1);
+        svg {
+          g,
+          path {
+            fill: var(--error-color);
+          }
         }
       }
     }
   }
 
-  .footer {
-    @include dialog-footer;
-
-    button {
-      margin-left: 10px;
-    }
+  .fieldContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
-}
 
-.accountTypes {
-  label {
-    pointer-events: none;
+  .fieldItem {
+    margin-top: 12px;
+    width: 312px;
+    flex-shrink: 0;
   }
 }
 
 .explorerNavButton {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
   height: 24px;
   font-size: 12px;
-  color: #fff;
+  color: var(--primary-color) !important;
+  background: transparent;
   border: none;
-  border-radius: 2px;
-  padding: 4px;
-  background-color: var(--nervos-green);
-
-  &:hover {
-    background-color: #21b574;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  svg {
+    width: 16px;
+    g,
+    path {
+      fill: var(--primary-color);
+    }
   }
 }

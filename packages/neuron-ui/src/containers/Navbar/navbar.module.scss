@@ -5,6 +5,7 @@ $hover-bg-color: #3cc68a4d;
   align-items: center;
   & svg,
   & img {
+    width: 20px;
     &:first-child {
       margin-right: var(--svg-right-margin);
     }
