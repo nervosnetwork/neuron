@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { MultisigConfig } from 'services/remote'
-import Button from 'widgets/Button'
+import Tooltip from 'widgets/Tooltip'
+import { Copy } from 'widgets/Icons/icon'
 import CopyZone from 'widgets/CopyZone'
 import TextField from 'widgets/TextField'
 import SendFieldset from 'components/SendFieldset'
 import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount } from 'utils'
 import { useState as useGlobalState } from 'states'
-import CopyZoneAddress from 'widgets/CopyZoneAddress'
+import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
+import Button from 'widgets/Button'
+import Dialog from 'widgets/Dialog'
 
 import { AmountNotEnoughException } from 'exceptions'
 import { useSendInfo, useOnSubmit, useExport, useCanSign } from './hooks'
@@ -42,6 +45,8 @@ const SendFromMultisigDialog = ({
     onSendMaxClick,
     isSendMax,
     isMaxBtnDisabled,
+    addSendInfo,
+    isAddOneBtnDisabled,
   } = useSendInfo({ isMainnet, balance, multisigConfig, t })
   const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
   const totalAmountErrorMessage = useMemo(() => {
@@ -67,77 +72,101 @@ const SendFromMultisigDialog = ({
   const onExport = useExport({ generatedTx, closeDialog })
   const canSign = useCanSign({ addresses: wallet.addresses, multisigConfig })
   return (
-    <>
-      <div className={styles.sendCKBTitle}>
-        <Trans
-          i18nKey="multisig-address.send-ckb.title"
-          values={multisigConfig}
-          components={[<CopyZoneAddress fullPayload={multisigConfig.fullPayload} />]}
-        />
-      </div>
-      <div className={styles.sendContainer}>
-        <div className={styles.balance}>
-          <span>{`${t('overview.balance')}:`}</span>
-          <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
-            <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
-          </CopyZone>
+    <Dialog
+      show
+      title={t('multisig-address.send-ckb.title')}
+      onCancel={closeDialog}
+      cancelText={t('multisig-address.send-ckb.cancel')}
+      confirmText={canSign ? t('multisig-address.send-ckb.send') : t('multisig-address.send-ckb.export')}
+      onConfirm={canSign ? onSubmit : onExport}
+      disabled={isSendDisabled}
+      confirmProps={{
+        'data-wallet-id': wallet.id,
+      }}
+      contentClassName={styles.dialogContainer}
+    >
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <Tooltip
+            tipClassName={styles.tip}
+            placement="right-bottom"
+            tip={
+              <CopyZone content={multisigConfig.fullPayload} className={styles.copyTableAddress}>
+                {multisigConfig.fullPayload}
+                <Copy />
+              </CopyZone>
+            }
+            showTriangle
+            isTriggerNextToChild
+          >
+            <div>
+              <Trans
+                i18nKey="multisig-address.send-ckb.detail"
+                values={multisigConfig}
+                components={[
+                  <span className={styles.address}>
+                    <span>{multisigConfig.fullPayload.slice(0, 6)}</span>
+                    <span>...</span>
+                    <span>{multisigConfig.fullPayload.slice(-6)}</span>
+                  </span>,
+                ]}
+              />
+            </div>
+          </Tooltip>
+
+          <div className={styles.balance}>
+            {t('overview.balance')}: {shannonToCKBFormatter(balance)} CKB
+          </div>
         </div>
-        <div className={styles.sendFieldContainer}>
-          {sendInfoList.map((item, idx) => (
-            <SendFieldset
-              key={item.address || idx}
-              idx={idx}
-              item={item}
-              errors={outputErrors[idx]}
-              isSendMax={isSendMax}
-              isMaxBtnDisabled={isMaxBtnDisabled}
-              isTimeLockable={false}
-              isMaxBtnShow={idx === sendInfoList.length - 1}
-              isRemoveBtnShow={sendInfoList.length > 1}
-              onOutputRemove={deleteSendInfo}
-              onItemChange={onSendInfoChange}
-              onSendMaxClick={onSendMaxClick}
-              isMainnet={isMainnet}
+        <div className={styles.sendContainer}>
+          <div className={styles.sendFieldContainer}>
+            {sendInfoList.map((item, idx) => (
+              <SendFieldset
+                key={item.address || idx}
+                idx={idx}
+                item={item}
+                errors={outputErrors[idx]}
+                isSendMax={isSendMax}
+                isMaxBtnDisabled={isMaxBtnDisabled}
+                isTimeLockable={false}
+                isMaxBtnShow={false}
+                isRemoveBtnShow={sendInfoList.length > 1}
+                onOutputRemove={deleteSendInfo}
+                onItemChange={onSendInfoChange}
+                onSendMaxClick={onSendMaxClick}
+                className={styles.flexWrap}
+                isMainnet={isMainnet}
+              />
+            ))}
+          </div>
+
+          <div className={styles.addWrap}>
+            <Button type="text" className={styles.addButton} disabled={isAddOneBtnDisabled} onClick={addSendInfo}>
+              <Add /> {t('send.add-receiving-address')}
+            </Button>
+          </div>
+
+          <div className={styles.flexWrap}>
+            <TextField
+              field="totalAmount"
+              label={t('send.total-amount')}
+              value={`${shannonToCKBFormatter(totalAmount)} CKB`}
+              readOnly
+              error={totalAmountErrorMessage}
+              width="100%"
             />
-          ))}
+            <TextField
+              label={t('send.fee')}
+              field="fee"
+              value={`${shannonToCKBFormatter(fee)} CKB`}
+              readOnly
+              disabled
+              width="100%"
+            />
+          </div>
         </div>
-        <TextField
-          field="totalAmount"
-          label={t('send.total-amount')}
-          value={`${shannonToCKBFormatter(totalAmount)} CKB`}
-          readOnly
-          error={totalAmountErrorMessage}
-          className={styles.textFieldClass}
-        />
-        <TextField
-          className={styles.textFieldClass}
-          label={t('send.fee')}
-          field="fee"
-          value={`${shannonToCKBFormatter(fee)} CKB`}
-          readOnly
-          disabled
-        />
       </div>
-      <div className={styles.sendActions}>
-        <Button label={t('multisig-address.send-ckb.cancel')} type="cancel" onClick={closeDialog} />
-        {canSign ? (
-          <Button
-            disabled={isSendDisabled}
-            label={t('multisig-address.send-ckb.send')}
-            type="primary"
-            onClick={onSubmit}
-            data-wallet-id={wallet.id}
-          />
-        ) : (
-          <Button
-            disabled={isSendDisabled}
-            label={t('multisig-address.send-ckb.export')}
-            type="primary"
-            onClick={onExport}
-          />
-        )}
-      </div>
-    </>
+    </Dialog>
   )
 }
 

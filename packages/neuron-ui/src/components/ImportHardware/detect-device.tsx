@@ -25,11 +25,11 @@ const Info = (
   if (isError) {
     return (
       <div className={styles.errorInfo}>
-          <span>
-            <ErrorIcon type="error" />
-          </span>
-          <span className={styles.error}>{msg}</span>
-        </div>
+        <span>
+          <ErrorIcon type="error" />
+        </span>
+        <span className={styles.error}>{msg}</span>
+      </div>
     )
   }
   return (

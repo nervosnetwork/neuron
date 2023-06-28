@@ -261,17 +261,12 @@ export default class AssetAccountService {
       .createQueryBuilder()
       .where({
         tokenID,
-        blake160
+        blake160,
       })
       .getCount()
     // check whether the entity exists before insert. Reason: https://github.com/Magickbase/neuron-public-issues/issues/184#issue-1749746997
     if (!existAccountAccount) {
-      await getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(AssetAccountEntity)
-        .values(assetAccountEntity)
-        .execute()
+      await getConnection().createQueryBuilder().insert().into(AssetAccountEntity).values(assetAccountEntity).execute()
     }
   }
 

@@ -59,7 +59,7 @@
 .tips {
   display: flex;
   align-items: center;
-  margin: -16px 0 20px;
+  margin: -6px 0 20px;
   color: var(--input-hint-color);
   span {
     margin-right: 4px;
@@ -113,7 +113,7 @@
     .selects {
       position: fixed;
       overflow-x: hidden;
-      margin-top: -16px;
+      margin-top: -8px;
       width: 648px;
       z-index: 1;
       max-height: 228px;

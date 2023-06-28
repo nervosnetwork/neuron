@@ -5,7 +5,6 @@ import { t } from 'i18next'
 import env from '../../env'
 import UpdateController from '../../controllers/update'
 import ExportDebugController from '../../controllers/export-debug'
-import { showWindow } from '../../controllers/app/show-window'
 import WalletsService from '../../services/wallets'
 import OfflineSignService from '../../services/offline-sign'
 import CommandSubject from '../../models/subjects/command'
@@ -23,7 +22,7 @@ enum URL {
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
   ImportHardware = '/import-hardware',
-  OfflineSign = '/offline-sign',
+  OfflineSign = 'offline-sign',
 }
 
 enum ExternalURL {
@@ -143,7 +142,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
           navigateTo(`${URL.Settings}?checkUpdate=1`)
-        }
+        },
       },
       separator,
       {
@@ -301,38 +300,31 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         label: t('application-menu.tools.sign-and-verify'),
         enabled: hasCurrentWallet,
-        click: async () => {
-          const result = await walletsService.getCurrent()
-          if (!result) {
-            return
-          }
+        click: () => {
           const window = BrowserWindow.getFocusedWindow()
           if (window) {
             CommandSubject.next({
               winID: window.id,
               type: 'sign-verify',
-              payload: currentWallet!.id,
-              dispatchToUI: true
+              payload: null,
+              dispatchToUI: true,
             })
           }
-        }
+        },
       },
       {
         label: t('application-menu.tools.multisig-address'),
         enabled: hasCurrentWallet,
         click: () => {
-          const currentWallet = walletsService.getCurrent()
-          showWindow(
-            `#/multisig-address/${currentWallet!.id}`,
-            t(`messageBox.multisig-address.title`),
-            {
-              width: 1000,
-              maxWidth: 1000,
-              minWidth: 1000,
-              resizable: true,
-            },
-            ['multisig-output-update']
-          )
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({
+              winID: window.id,
+              type: 'multisig-address',
+              payload: null,
+              dispatchToUI: true,
+            })
+          }
         },
       },
       {
@@ -480,7 +472,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
         navigateTo(`${URL.Settings}?checkUpdate=1`)
-      }
+      },
     })
     helpSubmenu.push({
       id: 'about',

@@ -149,10 +149,13 @@ export default class IndexerCacheService {
 
   private async getCachedBlockNumber() {
     if (!this.#cacheBlockNumberEntity) {
-      this.#cacheBlockNumberEntity = (await getConnection().getRepository(SyncInfoEntity).findOne({ name: SyncInfoEntity.getLastCachedKey(this.walletId) })) ?? 
+      this.#cacheBlockNumberEntity =
+        (await getConnection()
+          .getRepository(SyncInfoEntity)
+          .findOne({ name: SyncInfoEntity.getLastCachedKey(this.walletId) })) ??
         SyncInfoEntity.fromObject({
           name: SyncInfoEntity.getLastCachedKey(this.walletId),
-          value: '0x0'
+          value: '0x0',
         })
     }
 

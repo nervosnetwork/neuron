@@ -45,11 +45,15 @@ export default class Queue {
     this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
 
     const blake160s = this.#addresses.map(meta => meta.blake160)
-    this.#lockArgsSet = new Set(blake160s.map(blake160 => [
-      blake160,
-      Multisig.hash([blake160]),
-      SystemScriptInfo.generateSecpScript(blake160).computeHash().slice(0, 42)
-    ]).flat())
+    this.#lockArgsSet = new Set(
+      blake160s
+        .map(blake160 => [
+          blake160,
+          Multisig.hash([blake160]),
+          SystemScriptInfo.generateSecpScript(blake160).computeHash().slice(0, 42),
+        ])
+        .flat()
+    )
     this.#multiSignBlake160s = blake160s.map(blake160 => Multisig.hash([blake160]))
     this.#anyoneCanPayLockHashes = blake160s.map(b =>
       this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
