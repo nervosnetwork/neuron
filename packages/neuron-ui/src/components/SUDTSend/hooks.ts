@@ -134,9 +134,8 @@ export function useSendType({
     }
   }, [addressLockType, accountType])
   const onChange = useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { id, checked } = e.target as HTMLInputElement
-      setSendType(checked ? (id as SendType) : undefined)
+    id => {
+      setSendType(id as SendType)
     },
     [setSendType]
   )
