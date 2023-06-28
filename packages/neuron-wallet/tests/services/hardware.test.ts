@@ -42,7 +42,7 @@ describe('HardwareWalletService', () => {
         expect(device.deviceInfo).toEqual(ledgerNanoS)
       })
 
-      it('mutilple init should disconect device', async () => {
+      it('mutilple init should disconnect device', async () => {
         const device = await HardwareService.getInstance().initHardware(ledgerNanoS)
         await HardwareService.getInstance().initHardware(ledgerNanoS)
         expect(device.isConnected).toBe(false)

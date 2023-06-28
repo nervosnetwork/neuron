@@ -13,7 +13,7 @@ import Button from 'widgets/Button'
 import Dialog from 'widgets/Dialog'
 
 import { AmountNotEnoughException } from 'exceptions'
-import { useSendInfo, useOnSumbit, useExport, useCanSign } from './hooks'
+import { useSendInfo, useOnSubmit, useExport, useCanSign } from './hooks'
 import styles from './sendFromMultisigDialog.module.scss'
 
 const SendFromMultisigDialog = ({
@@ -68,7 +68,7 @@ const SendFromMultisigDialog = ({
       !!totalAmountErrorMessage,
     [outputErrors, sendInfoList, totalAmountErrorMessage]
   )
-  const onSumbit = useOnSumbit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
+  const onSubmit = useOnSubmit({ outputs: sendInfoList, isMainnet, multisigConfig, closeDialog })
   const onExport = useExport({ generatedTx, closeDialog })
   const canSign = useCanSign({ addresses: wallet.addresses, multisigConfig })
   return (
@@ -78,7 +78,7 @@ const SendFromMultisigDialog = ({
       onCancel={closeDialog}
       cancelText={t('multisig-address.send-ckb.cancel')}
       confirmText={canSign ? t('multisig-address.send-ckb.send') : t('multisig-address.send-ckb.export')}
-      onConfirm={canSign ? onSumbit : onExport}
+      onConfirm={canSign ? onSubmit : onExport}
       disabled={isSendDisabled}
       confirmProps={{
         'data-wallet-id': wallet.id,

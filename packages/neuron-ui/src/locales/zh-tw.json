@@ -244,7 +244,7 @@
       "address-qrcode": "地址二維碼",
       "address": "{{network}} 地址",
       "verify-address": "驗證地址",
-      "turn-into-full-version-fomrat": "轉換為長地址格式",
+      "turn-into-full-version-format": "轉換為長地址格式",
       "turn-into-deprecated-format": "轉換為廢棄地址格式",
       "save-qr-code": "保存收款碼",
       "copy-qr-code": "復制收款碼圖片"

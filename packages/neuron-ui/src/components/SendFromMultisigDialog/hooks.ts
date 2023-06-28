@@ -260,7 +260,7 @@ export const useExport = ({ generatedTx, closeDialog }: { generatedTx: any; clos
   }, [closeDialog, generatedTx])
 }
 
-export const useOnSumbit = ({
+export const useOnSubmit = ({
   outputs,
   isMainnet,
   multisigConfig,

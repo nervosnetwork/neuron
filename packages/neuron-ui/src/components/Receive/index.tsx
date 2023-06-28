@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import PageContainer from 'components/PageContainer'
-import SignleAddressReceive from './singleAddressReceive'
+import SingleAddressReceive from './singleAddressReceive'
 import MultiAddressReceive from './multiAddressReceive'
 
 const Receive = () => {
@@ -37,7 +37,7 @@ const Receive = () => {
       notice={pageNotice}
     >
       {isSingleAddress ? (
-        <SignleAddressReceive address={accountAddress} wallet={wallet} />
+        <SingleAddressReceive address={accountAddress} wallet={wallet} />
       ) : (
         <MultiAddressReceive address={accountAddress} addresses={addresses} walletId={walletId} />
       )}

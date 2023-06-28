@@ -8,7 +8,7 @@ import { checkForUpdates, downloadUpdate, installUpdate, getVersion } from 'serv
 import { LanguageSelect, CheckUpdateIcon } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
-interface UpdateDowloadStatusProps {
+interface UpdateDownloadStatusProps {
   show: boolean
   onCancel: () => void
   progress: number
@@ -22,7 +22,7 @@ const UpdateDownloadStatus = ({
   progress = 0,
   newVersion = '',
   releaseNotes = '',
-}: UpdateDowloadStatusProps) => {
+}: UpdateDownloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1

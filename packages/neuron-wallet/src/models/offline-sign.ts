@@ -59,11 +59,11 @@ export default class OfflineSign implements OfflineSignProps {
     signType: SignType,
     status: SignStatus,
     context: RPC.RawTransaction[],
-    assetAcount?: AssetAccount,
+    assetAccount?: AssetAccount,
     description: string = ''
   ) {
     this.transaction = transaction
-    this.assetAccount = assetAcount
+    this.assetAccount = assetAccount
     this.type = signType
     this.status = status
     this.context = context
@@ -92,12 +92,12 @@ export default class OfflineSign implements OfflineSignProps {
   public static fromJSON({
     transaction,
     type: signType,
-    asset_account: assetAcount,
+    asset_account: assetAccount,
     status,
     context,
     description,
   }: OfflineSignJSON) {
-    return new OfflineSign(transaction, signType, status, context, assetAcount, description)
+    return new OfflineSign(transaction, signType, status, context, assetAccount, description)
   }
 
   public setStatus(status: SignStatus) {

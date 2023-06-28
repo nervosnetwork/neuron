@@ -20,7 +20,7 @@ import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-inf
 import Multisig from '../../src/models/multisig'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import MultisigOutput from '../../src/database/chain/entities/multisig-output'
-import { MultisigConfigNeedError, TransactionInputParamterMiss } from '../../src/exceptions'
+import { MultisigConfigNeedError, TransactionInputParameterMiss } from '../../src/exceptions'
 import LiveCell from '../../src/models/chain/live-cell'
 import BufferUtils from '../../src/utils/buffer'
 
@@ -476,7 +476,7 @@ describe('CellsService', () => {
       })
 
       it('no walletId and no lockargs', async () => {
-        await expect(CellsService.gatherInputs('', '')).rejects.toThrow(new TransactionInputParamterMiss())
+        await expect(CellsService.gatherInputs('', '')).rejects.toThrow(new TransactionInputParameterMiss())
       })
 
       it('no live cell throw CapacityNotEnough', async () => {
@@ -1315,7 +1315,7 @@ describe('CellsService', () => {
         new CapacityNotEnough()
       )
     })
-    it('exception amount oveflow CapacityNotEnough', async () => {
+    it('exception amount overflow CapacityNotEnough', async () => {
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([
         generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 1000),
       ])

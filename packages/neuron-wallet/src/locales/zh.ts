@@ -118,7 +118,7 @@ export default {
       'multisig-config-exist': '多签地址已经存在',
       'multisig-config-address-error': '多签配置的地址设置不正确',
       'multisig-config-need-error': '多签交易生成需要多签配置',
-      'transaction-no-input-paramter': '查询 Input Cell 缺少必要的参数',
+      'transaction-no-input-parameter': '查询 Input Cell 缺少必要的参数',
       'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script',
       'multisig-lock-hash-mismatch': '当前多签地址与需要确认交易不匹配',
       'multisig-not-signed': '多签交易缺少部分签名',

@@ -326,11 +326,11 @@ export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
 
 export const useOnLocaleChange = (i18n: i18nType) => {
   return useEffect(() => {
-    const subcription = SetLocaleSubject.subscribe(lng => {
+    const subscription = SetLocaleSubject.subscribe(lng => {
       i18n.changeLanguage(lng)
     })
     return () => {
-      subcription.unsubscribe()
+      subscription.unsubscribe()
     }
   }, [i18n])
 }

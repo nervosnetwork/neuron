@@ -152,7 +152,7 @@ export function getGenerator(sendType?: SendType) {
   return generateSUDTTransaction
 }
 
-export function useOnSumbit({
+export function useOnSubmit({
   isSubmittable,
   accountType,
   walletId,
