@@ -134,7 +134,9 @@ const SendFieldset = ({
               </div>
               <div className={styles.locktimeWarn}>
                 <Attention />
-                {t('send.locktime-warning', { extraNote: isMainnet ? null : t('messages.light-client-locktime-warning') })}
+                {t('send.locktime-warning', {
+                  extraNote: isMainnet ? null : t('messages.light-client-locktime-warning'),
+                })}
               </div>
             </div>
           ) : (

@@ -148,7 +148,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
   )
 }
 
-export const Breadcrumbs: FC<PropsWithChildren<{}>> = ({ children }) => {
+export const Breadcrumbs: FC<PropsWithChildren<React.ReactNode>> = ({ children }) => {
   const childList = React.Children.toArray(children).filter(child => {
     return React.isValidElement(child)
   })
