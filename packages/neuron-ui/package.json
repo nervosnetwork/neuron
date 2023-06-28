@@ -21,8 +21,8 @@
     "build": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-app-rewired build",
     "clean": "npx rimraf build/*",
     "precommit": "lint-staged",
-    "storybook": "start-storybook -p 9009 -s public",
-    "build-storybook": "build-storybook -s public"
+    "storybook": "storybook dev -p 9009 -s public",
+    "build-storybook": "storybook build -s public"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -63,18 +63,15 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@babel/preset-typescript": "7.22.5",
-    "@storybook/addon-actions": "6.5.17-alpha.0",
-    "@storybook/addon-essentials": "6.5.17-alpha.0",
-    "@storybook/addon-interactions": "6.5.17-alpha.0",
-    "@storybook/addon-links": "6.5.17-alpha.0",
-    "@storybook/builder-webpack4": "6.5.17-alpha.0",
-    "@storybook/builder-webpack5": "6.5.17-alpha.0",
-    "@storybook/manager-webpack4": "6.5.17-alpha.0",
-    "@storybook/manager-webpack5": "6.5.17-alpha.0",
-    "@storybook/node-logger": "6.5.17-alpha.0",
-    "@storybook/preset-create-react-app": "4.1.2",
-    "@storybook/react": "6.5.17-alpha.0",
-    "@storybook/testing-library": "0.0.13",
+    "@storybook/addon-actions": "7.0.24",
+    "@storybook/addon-essentials": "7.0.24",
+    "@storybook/addon-interactions": "7.0.24",
+    "@storybook/addon-links": "7.0.24",
+    "@storybook/node-logger": "7.0.24",
+    "@storybook/preset-create-react-app": "7.0.24",
+    "@storybook/react": "7.0.24",
+    "@storybook/react-webpack5": "7.0.24",
+    "@storybook/testing-library": "0.2.0",
     "@types/enzyme": "3.10.13",
     "@types/enzyme-adapter-react-16": "1.0.6",
     "@types/node": "18.16.18",
@@ -95,7 +92,8 @@
     "react-app-rewired": "2.2.1",
     "react-scripts": "5.0.1",
     "react-test-renderer": "16.14.0",
-    "storybook-addon-react-router-v6": "0.2.1",
+    "storybook": "7.0.24",
+    "storybook-addon-react-router-v6": "1.0.2",
     "webpack": "5.88.0"
   },
   "resolutions": {
