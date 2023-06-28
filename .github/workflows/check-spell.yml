@@ -1,0 +1,18 @@
+name: Check spell
+on:
+  - pull_request
+  - push
+
+jobs:
+  run:
+    name: Check spell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: changed-files
+        uses: tj-actions/changed-files@v36
+
+      - uses: crate-ci/typos@master
+        with:
+          files: ${{ steps.changed-files.outputs.all_changed_files }}

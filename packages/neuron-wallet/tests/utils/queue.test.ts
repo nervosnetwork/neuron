@@ -31,7 +31,7 @@ describe('queueWrapper', () => {
     await expect(q.asyncPush(1)).rejects.toThrow(new Error('reject error'))
   })
 
-  it('asyncPush excute by order', async () => {
+  it('asyncPush execute by order', async () => {
     const q = queueWrapper(fnMock)
     fnMock
       .mockReturnValueOnce(createPromise(400))
@@ -46,7 +46,7 @@ describe('queueWrapper', () => {
     expect(fnMock).toHaveBeenNthCalledWith(3, 3)
   })
 
-  it('asyncPush excute by order and ignore same item', async () => {
+  it('asyncPush execute by order and ignore same item', async () => {
     const q = queueWrapper(fnMock, 1, true)
     fnMock
       .mockReturnValueOnce(createPromise(400))

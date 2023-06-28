@@ -1,6 +1,6 @@
 import React, { useReducer, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { destoryAssetAccount } from 'services/remote'
+import { destroyAssetAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { isSuccessResponse } from 'utils'
 import TextField from 'widgets/TextField'
@@ -109,7 +109,7 @@ const SUDTUpdateDialog = ({
   const openSUDTTokenUrl = useOpenSUDTTokenUrl(info.tokenId, isMainnet)
 
   const onDestroy = useCallback(() => {
-    destoryAssetAccount({ walletID: walletId, id: accountId! }).then(res => {
+    destroyAssetAccount({ walletID: walletId, id: accountId! }).then(res => {
       if (isSuccessResponse(res)) {
         const tx = res.result
         globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx } })
@@ -133,7 +133,7 @@ const SUDTUpdateDialog = ({
     })
   }, [globalDispatch, walletId, accountId])
 
-  const showDestory = useMemo(
+  const showDestroy = useMemo(
     () => accountId && (isCKB || BigInt(balance || 0) === BigInt(0)),
     [isCKB, balance, accountId]
   )
@@ -150,7 +150,7 @@ const SUDTUpdateDialog = ({
         <p className={styles.label}>{t(`s-udt.update-dialog.token-id`)}</p>
         <div className={styles.tokenId}>
           <p>{tokenId}</p>
-          {showDestory ? (
+          {showDestroy ? (
             <Tooltip
               tip={t(isCKB ? 's-udt.send.destroy-ckb-desc' : 's-udt.send.destroy-sudt-desc')}
               type="always-dark"

@@ -170,10 +170,10 @@ export const useTableFocusControl = (
 }
 
 export const useFocusObserve = () => {
-  const [isComponetFocused, setIsComponetFocused] = useState(false)
+  const [isComponentFocused, setIsComponentFocused] = useState(false)
 
-  const onFocus = () => setIsComponetFocused(true)
-  const onBlur = () => setIsComponetFocused(false)
+  const onFocus = () => setIsComponentFocused(true)
+  const onBlur = () => setIsComponentFocused(false)
 
-  return { isComponetFocused, onFocus, onBlur }
+  return { isComponentFocused, onFocus, onBlur }
 }

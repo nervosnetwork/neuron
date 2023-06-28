@@ -26,7 +26,7 @@ const stubbedGenerateClaimChequeTx = jest.fn()
 const stubbedGenerateWithdrawChequeTx = jest.fn()
 const stubbedGetAllAddresses = jest.fn()
 const stubbedGenerateCreateChequeTx = jest.fn()
-const stubbedGenerateDestoryAssetAccountTx = jest.fn()
+const stubbedGenerateDestroyAssetAccountTx = jest.fn()
 const stubbedTransactionSendersendTx = jest.fn()
 
 const resetMocks = () => {
@@ -35,7 +35,7 @@ const resetMocks = () => {
   stubbedGenerateClaimChequeTx.mockReset()
   stubbedGenerateWithdrawChequeTx.mockReset()
   stubbedGetAllAddresses.mockReset()
-  stubbedGenerateDestoryAssetAccountTx.mockReset()
+  stubbedGenerateDestroyAssetAccountTx.mockReset()
   stubbedTransactionSendersendTx.mockReset()
 }
 
@@ -118,7 +118,7 @@ jest.mock('services/tx', () => {
       // @ts-ignore
       generateWithdrawChequeTx: (...args) => stubbedGenerateWithdrawChequeTx(...args),
       // @ts-ignore
-      generateDestoryAssetAccountTx: (...args) => stubbedGenerateDestoryAssetAccountTx(...args),
+      generateDestroyAssetAccountTx: (...args) => stubbedGenerateDestroyAssetAccountTx(...args),
     },
   }
 })
@@ -427,7 +427,7 @@ describe('AssetAccountService', () => {
         ]
         await createAccounts(assetAccounts, outputs)
       })
-      it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
+      it('available balance equals to total balance subtracts reserved balance (61 CKB)', async () => {
         const result = await AssetAccountService.getAll(walletId)
 
         expect(result.length).toEqual(1)
@@ -624,7 +624,7 @@ describe('AssetAccountService', () => {
         ]
         accountIds = await createAccounts(assetAccounts, outputs)
       })
-      it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
+      it('available balance equals to total balance subtracts reserved balance (61 CKB)', async () => {
         const [ckbAccountId] = accountIds
         const ckbAccount = await AssetAccountService.getAccount({ walletID: '', id: ckbAccountId })
 
@@ -939,7 +939,7 @@ describe('AssetAccountService', () => {
   describe('#generateCreateChequeTx', () => {
     let fakeAssetAccount: AssetAccountEntity
     const receiverAddress = 'receiver address'
-    const changeAddressObj = { address: 'chanage address' }
+    const changeAddressObj = { address: 'change address' }
     const amount = '1'
     const fee = '1'
     const feeRate = '1'
@@ -1094,8 +1094,8 @@ describe('AssetAccountService', () => {
     })
   })
 
-  describe('destoryAssetAccount', () => {
-    it('destory ckb account', async () => {
+  describe('destroyAssetAccount', () => {
+    it('destroy ckb account', async () => {
       const assetAccount = AssetAccount.fromObject({
         tokenID: 'CKBytes',
         symbol: 'ckb',
@@ -1109,8 +1109,8 @@ describe('AssetAccountService', () => {
       await createAccounts([assetAccount], outputs)
       const walletId = 'walletId'
       stubbedWalletServiceGet.mockReturnValue({ getNextChangeAddress: () => ({ blake160: 'blake160' }) })
-      await AssetAccountService.destoryAssetAccount(walletId, assetAccount)
-      expect(stubbedGenerateDestoryAssetAccountTx).toHaveBeenCalledWith(
+      await AssetAccountService.destroyAssetAccount(walletId, assetAccount)
+      expect(stubbedGenerateDestroyAssetAccountTx).toHaveBeenCalledWith(
         walletId,
         [
           Input.fromObject({
@@ -1128,7 +1128,7 @@ describe('AssetAccountService', () => {
         true
       )
     })
-    it('destory sudt account', async () => {
+    it('destroy sudt account', async () => {
       const assetAccount = AssetAccount.fromObject({
         tokenID: '0x1e6159a251360113fc0fb0e6edb4613fc4a149222a3bebd9710543b8be9663f9',
         symbol: 'sudt',
@@ -1142,8 +1142,8 @@ describe('AssetAccountService', () => {
       await createAccounts([assetAccount], outputs)
       const walletId = 'walletId'
       stubbedWalletServiceGet.mockReturnValue({ getNextChangeAddress: () => ({ blake160: 'blake160' }) })
-      await AssetAccountService.destoryAssetAccount(walletId, assetAccount)
-      expect(stubbedGenerateDestoryAssetAccountTx).toHaveBeenCalledWith(
+      await AssetAccountService.destroyAssetAccount(walletId, assetAccount)
+      expect(stubbedGenerateDestroyAssetAccountTx).toHaveBeenCalledWith(
         walletId,
         [
           Input.fromObject({

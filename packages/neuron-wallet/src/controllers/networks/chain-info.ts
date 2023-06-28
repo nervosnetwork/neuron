@@ -18,7 +18,7 @@ export default class ChainInfo {
 
     try {
       genesisHash = await new RpcService(this.network.remote).genesisBlockHash()
-      // If fetched genesis hash doesn't match that of the network, still initalize DB.
+      // If fetched genesis hash doesn't match that of the network, still initialize DB.
       // This would mostly only happens when using default mainnet network but connected to a wrong node.
       await initConnection(genesisHash)
 

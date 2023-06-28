@@ -51,7 +51,7 @@ describe(`Unit tests of networks service`, () => {
       expect(currentNetworkID).toBe('mainnet')
     })
 
-    it(`getting a non-exsiting network should return null`, () => {
+    it(`getting a non-existing network should return null`, () => {
       const id = `not-existing-id`
       const network = service.get(id)
       expect(network).toBeNull()

@@ -38,7 +38,7 @@ import {
   SendType,
   getGenerator,
   useAddressLockType,
-  useOnSumbit,
+  useOnSubmit,
   useOptions,
   useSendType,
 } from './hooks'
@@ -131,7 +131,7 @@ const SUDTSend = () => {
           if (isSuccessResponse(res)) {
             const account: Controller.GetSUDTAccount.Response = res.result
             if (!account.decimal) {
-              throw new Error('Decimal is undefiend')
+              throw new Error('Decimal is undefined')
             }
             setAccountInfo({
               accountId: `${account.id ?? ''}`,
@@ -310,7 +310,7 @@ const SUDTSend = () => {
     [dispatch]
   )
 
-  const onSubmit = useOnSumbit({ isSubmittable, accountType, walletId, addressLockType, sendType })
+  const onSubmit = useOnSubmit({ isSubmittable, accountType, walletId, addressLockType, sendType })
 
   const [displaySymbol, displayTokenName] = useMemo(
     () => [

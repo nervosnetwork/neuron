@@ -1741,7 +1741,7 @@ describe('TransactionGenerator', () => {
         })
       })
 
-      describe('when token balance is sufficient for transfering, but capacity is insufficient for fees', () => {
+      describe('when token balance is sufficient for transferring, but capacity is insufficient for fees', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
 
@@ -2007,7 +2007,7 @@ describe('TransactionGenerator', () => {
         })
       })
 
-      describe('ouput is a new cell', () => {
+      describe('output is a new cell', () => {
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '0', tokenID, aliceAnyoneCanPayLockScript)
 
@@ -2043,7 +2043,7 @@ describe('TransactionGenerator', () => {
           expectedTxSize = TransactionSize.tx(tx)
           expectedTxFee = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
         })
-        it('input 2, ouputs 3', () => {
+        it('input 2, outputs 3', () => {
           expect(tx.inputs.length).toEqual(2)
           expect(tx.outputs.length).toEqual(3)
           expect(tx.inputs.map(o => o.lockHash)).toEqual([
@@ -2806,14 +2806,14 @@ describe('TransactionGenerator', () => {
     })
   })
 
-  describe('generateDestoryAssetAccountTx', () => {
+  describe('generateDestroyAssetAccountTx', () => {
     describe('CKB account', () => {
       it('capacity not enough for fee', async () => {
         const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
         const asssetAccountInput = input.toModel()
         asssetAccountInput.capacity = toShannon('61')
         await expect(
-          TransactionGenerator.generateDestoryAssetAccountTx(
+          TransactionGenerator.generateDestroyAssetAccountTx(
             'walletId',
             [asssetAccountInput],
             bob.publicKeyInBlake160,
@@ -2827,7 +2827,7 @@ describe('TransactionGenerator', () => {
         asssetAccountInput.capacity = toShannon('61')
         const cell: OutputEntity = generateCell(toShannon('62'), OutputStatus.Live, false, null, alice)
         await getConnection().manager.save(cell)
-        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+        const res = await TransactionGenerator.generateDestroyAssetAccountTx(
           alice.walletId,
           [asssetAccountInput],
           bob.publicKeyInBlake160,
@@ -2842,7 +2842,7 @@ describe('TransactionGenerator', () => {
         const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
         const asssetAccountInput = input.toModel()
         asssetAccountInput.capacity = toShannon('62')
-        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+        const res = await TransactionGenerator.generateDestroyAssetAccountTx(
           alice.walletId,
           [asssetAccountInput],
           bob.publicKeyInBlake160,
@@ -2864,7 +2864,7 @@ describe('TransactionGenerator', () => {
         asssetAccountInput.capacity = toShannon('142')
         asssetAccountInput.data = BufferUtils.writeBigUInt128LE(BigInt('10'))
         await expect(
-          TransactionGenerator.generateDestoryAssetAccountTx(
+          TransactionGenerator.generateDestroyAssetAccountTx(
             alice.walletId,
             [asssetAccountInput],
             bob.publicKeyInBlake160,
@@ -2872,7 +2872,7 @@ describe('TransactionGenerator', () => {
           )
         ).rejects.toThrow(new SudtAcpHaveDataError())
       })
-      it('destory success', async () => {
+      it('destroy success', async () => {
         const typeScript = new Script(
           '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
           '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
@@ -2881,7 +2881,7 @@ describe('TransactionGenerator', () => {
         const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
         const asssetAccountInput = input.toModel()
         asssetAccountInput.capacity = toShannon('142')
-        const res = await TransactionGenerator.generateDestoryAssetAccountTx(
+        const res = await TransactionGenerator.generateDestroyAssetAccountTx(
           alice.walletId,
           [asssetAccountInput],
           bob.publicKeyInBlake160,

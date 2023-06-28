@@ -164,7 +164,7 @@ declare namespace Controller {
     message: string
   }
   // Special Assets
-  interface GetSpeicalAssetsParams {
+  interface GetSpecialAssetsParams {
     walletID: string
     pageNo: number
     pageSize: number

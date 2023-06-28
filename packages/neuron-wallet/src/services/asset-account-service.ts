@@ -75,7 +75,7 @@ export default class AssetAccountService {
     return totalBalance
   }
 
-  public static async destoryAssetAccount(walletID: string, assetAccount: AssetAccount) {
+  public static async destroyAssetAccount(walletID: string, assetAccount: AssetAccount) {
     const cells = await AssetAccountService.getACPCells(assetAccount?.blake160, assetAccount.tokenID)
     const inputs = cells.map(cell => {
       return Input.fromObject({
@@ -94,7 +94,7 @@ export default class AssetAccountService {
 
     const address = await wallet.getNextChangeAddress()
 
-    const tx = await TransactionGenerator.generateDestoryAssetAccountTx(
+    const tx = await TransactionGenerator.generateDestroyAssetAccountTx(
       walletID,
       inputs,
       address!.blake160,
@@ -256,7 +256,7 @@ export default class AssetAccountService {
       .values(sudtTokenInfoEntity)
       .onConflict(`("tokenID") DO NOTHING`)
       .execute()
-    const existAccountAcount = await getConnection()
+    const existAccountAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder()
       .where({
@@ -265,7 +265,7 @@ export default class AssetAccountService {
       })
       .getCount()
     // check whether the entity exists before insert. Reason: https://github.com/Magickbase/neuron-public-issues/issues/184#issue-1749746997
-    if (!existAccountAcount) {
+    if (!existAccountAccount) {
       await getConnection()
         .createQueryBuilder()
         .insert()

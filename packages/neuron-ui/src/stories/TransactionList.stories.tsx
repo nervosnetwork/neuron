@@ -17,7 +17,7 @@ Object.entries(transactions).forEach(([title, list]) => {
   ))
 })
 
-stories.add('Wtih empty pending list', () => (
+stories.add('With empty pending list', () => (
   <TransactionList
     isMainnet
     bestKnownBlockNumber={123}
