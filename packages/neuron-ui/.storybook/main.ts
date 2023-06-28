@@ -18,4 +18,4 @@ export default {
   features: {
     storyStoreV7: false,
   },
-};
+}

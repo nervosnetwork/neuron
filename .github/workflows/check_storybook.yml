@@ -51,7 +51,7 @@ jobs:
       - name: Install Lerna
         run: yarn global add lerna
 
-      - name: Boostrap
+      - name: Bootstrap
         run: |
           yarn
           yarn build
