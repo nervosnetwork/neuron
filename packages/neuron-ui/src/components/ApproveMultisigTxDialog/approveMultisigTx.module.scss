@@ -18,7 +18,9 @@
     border-bottom: 1px solid var(--table-head-border-color);
 
     .tip {
-      left: calc(100% - 240px) !important;
+      &:not([data-tooltip='']) {
+        left: calc(100% - 240px);
+      }
     }
 
     .copyTableAddress {

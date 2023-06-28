@@ -13,33 +13,28 @@ import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import { useBroadcast, useExport, useSignAndBroadcast, useSignAndExport, useTabView } from './hooks'
 import styles from './approveMultisigTx.module.scss'
 
-const Cell = React.memo(
-  ({
-    cell,
-    isMainnet,
-  }: {
-    cell: {
-      lock: CKBComponents.Script
-      type?: CKBComponents.Script
-      data?: string
-      capacity: string
-    }
-    isMainnet: boolean
-  }) => {
-    const address = useMemo(() => ckbCore.utils.scriptToAddress(cell.lock, isMainnet), [cell, isMainnet])
-    return (
-      <div className={styles.cellItem}>
-        <div>
-          {address.slice(0, 6)}...{address.slice(-6)}
-          <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
-          <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
-          <ScriptTag script={cell.lock} isMainnet={isMainnet} />
-        </div>
-        <div>{`${shannonToCKBFormatter(cell.capacity)} CKB`}</div>
+interface CellProps {
+  lock: CKBComponents.Script
+  type?: CKBComponents.Script
+  data?: string
+  capacity: string
+  lockHash: string
+}
+
+const Cell = React.memo(({ cell, isMainnet }: { cell: CellProps; isMainnet: boolean }) => {
+  const address = useMemo(() => ckbCore.utils.scriptToAddress(cell.lock, isMainnet), [cell, isMainnet])
+  return (
+    <div className={styles.cellItem}>
+      <div>
+        {address.slice(0, 6)}...{address.slice(-6)}
+        <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
+        <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
+        <ScriptTag script={cell.lock} isMainnet={isMainnet} />
       </div>
-    )
-  }
-)
+      <div>{`${shannonToCKBFormatter(cell.capacity)} CKB`}</div>
+    </div>
+  )
+})
 const ApproveMultisigTxDialog = ({
   multisigConfig,
   closeDialog,
@@ -157,12 +152,12 @@ const ApproveMultisigTxDialog = ({
             <div className={styles.conciseData}>
               <div className={styles.inputWrap}>
                 <h2>Inputs</h2>
-                {offlineSignJson.transaction?.inputs?.map((input: any) => (
+                {offlineSignJson.transaction?.inputs?.map((input: CellProps) => (
                   <Cell cell={input} isMainnet={isMainnet} key={input.lockHash} />
                 ))}
               </div>
               <h2>Outputs</h2>
-              {offlineSignJson.transaction?.outputs?.map((output: any) => (
+              {offlineSignJson.transaction?.outputs?.map((output: CellProps) => (
                 <Cell cell={output} isMainnet={isMainnet} key={output.lockHash} />
               ))}
             </div>
