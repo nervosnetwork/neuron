@@ -3,6 +3,7 @@ import CellDep, { DepType } from './chain/cell-dep'
 import NetworksService from '../services/networks'
 import RpcService from '../services/rpc-service'
 import Script, { ScriptHashType } from './chain/script'
+import { config, utils } from '@ckb-lumos/lumos'
 
 export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
@@ -13,11 +14,18 @@ export default class SystemScriptInfo {
   static DAO_HASH_TYPE = ScriptHashType.Type
   static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
 
-  static DAO_SCRIPT_HASH = new Script(
-    SystemScriptInfo.DAO_CODE_HASH,
-    '0x',
-    SystemScriptInfo.DAO_HASH_TYPE
-  ).computeHash()
+  // FIXME: this is werid that `blockchain.Script.pack` will throw error here
+  // static DAO_SCRIPT_HASH = new Script(
+  //   SystemScriptInfo.DAO_CODE_HASH,
+  //   '0x',
+  //   SystemScriptInfo.DAO_HASH_TYPE
+  // ).computeHash()
+
+  static DAO_SCRIPT_HASH = utils.computeScriptHash({
+    codeHash: config.predefined.LINA.SCRIPTS.DAO.CODE_HASH,
+    hashType: config.predefined.LINA.SCRIPTS.DAO.HASH_TYPE,
+    args: '0x',
+  })
 
   private static instance: SystemScriptInfo
   static getInstance(): SystemScriptInfo {

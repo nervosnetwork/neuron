@@ -11,7 +11,7 @@ import OfflineSignService from '../services/offline-sign'
 import Multisig from '../models/multisig'
 import SystemScriptInfo from '../models/system-script-info'
 import NetworksService from '../services/networks'
-import { config as lumosConig, helpers, utils } from '@ckb-lumos/lumos'
+import { config as lumosConig, helpers, utils, config } from '@ckb-lumos/lumos'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -222,7 +222,9 @@ export default class MultisigController {
       }
     }
     const tx = result.json
-    const lockHash = utils.computeScriptHash(helpers.addressToScript(fullPayload))
+    const isMainnet = fullPayload.startsWith('ckb')
+    const lumosOptions = isMainnet ? { config: config.predefined.LINA } : { config: config.predefined.AGGRON4 }
+    const lockHash = utils.computeScriptHash(helpers.addressToScript(fullPayload, lumosOptions))
     if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
       dialog.showErrorBox(t('common.error'), t('messages.multisig-lock-hash-mismatch'))
       return {
