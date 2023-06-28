@@ -148,7 +148,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       cancelCheckUpdates()
     }
     setDialogType('')
-  }, [dialogType])
+  }, [dialogType, setDialogType])
 
   return (
     <div className={styles.container}>
@@ -179,9 +179,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         title={t(`updates.check-updates`)}
         message={updater.errorMsg}
         type="failed"
-        onCancel={() => {
-          setDialogType('')
-        }}
+        onCancel={() => setDialogType('')}
       />
 
       <Dialog
