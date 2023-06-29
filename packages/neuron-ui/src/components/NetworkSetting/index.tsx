@@ -71,8 +71,10 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
 
   const onEditSuccess = useCallback(() => {
     setShowEditorDialog(false)
-    setNotice(t('settings.network.edit-success'))
-  }, [setShowEditorDialog, setNotice])
+    if (netId !== 'new') {
+      setNotice(t('settings.network.edit-success'))
+    }
+  }, [setShowEditorDialog, setNotice, netId])
 
   return (
     <div>
