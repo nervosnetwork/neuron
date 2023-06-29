@@ -32,13 +32,11 @@ const AlertDialog = ({
 
   return (
     <dialog ref={dialogRef} className={styles.alertDialog}>
-      <>
-        {type === 'failed' && <img src={Failed} alt="failed" className={styles.typeImg} />}
-        {type === 'success' && <img src={Success} alt="success" className={styles.typeImg} />}
-        {type === 'warning' && <img src={Tips} alt="warning" className={styles.typeImg} />}
-        <h2 className={styles.title}>{title}</h2>
-        <p className={styles.message}>{message}</p>
-      </>
+      {type === 'failed' && <img src={Failed} alt="failed" className={styles.typeImg} />}
+      {type === 'success' && <img src={Success} alt="success" className={styles.typeImg} />}
+      {type === 'warning' && <img src={Tips} alt="warning" className={styles.typeImg} />}
+      <h2 className={styles.title}>{title}</h2>
+      <p className={styles.message}>{message}</p>
       <div className={styles.actions}>
         {type === 'failed' && <Button type="confirm" onClick={onCancel} label={t('common.back')} />}
         {type === 'success' && <Button type="confirm" onClick={onCancel || onOk} label={t('common.confirm')} />}
