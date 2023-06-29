@@ -134,7 +134,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [t, i18n] = useTranslation()
   const [showLangDialog, setShowLangDialog] = useState(false)
   const [searchParams] = useSearchParams()
-  const [dialogType, setDialogType] = useState<'' | 'error' | 'checking' | 'updating' | 'updated'>('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [dialogType, setDialogType] = useState<'' | 'checking' | 'updating' | 'updated'>('')
 
   const version = useMemo(() => {
     return getVersion()
@@ -149,7 +150,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
 
   useEffect(() => {
     if (updater.errorMsg) {
-      setDialogType('error')
+      setErrorMsg(updater.errorMsg)
+      cancelCheckUpdates()
       return
     }
     if (updater.isUpdated) {
@@ -165,7 +167,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       return
     }
     setDialogType('')
-  }, [updater, setDialogType])
+  }, [updater, setDialogType, setErrorMsg])
 
   const handleUpdate = useCallback(
     (e: React.SyntheticEvent) => {
@@ -210,11 +212,11 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       </div>
 
       <AlertDialog
-        show={dialogType === 'error'}
+        show={!!errorMsg}
         title={t(`updates.check-updates`)}
-        message={updater.errorMsg}
+        message={errorMsg}
         type="failed"
-        onCancel={() => setDialogType('')}
+        onCancel={() => setErrorMsg('')}
       />
 
       <Dialog
