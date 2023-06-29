@@ -24,7 +24,7 @@ export interface DatetimePickerDialogProps {
   show: boolean
   preset?: Date | string | number | null
   notice?: string
-  onConfirm: Function
+  onConfirm: (time: number) => void
   onCancel: () => void
 }
 const DatetimePickerDialog = ({
@@ -107,7 +107,7 @@ const DatetimePickerDialog = ({
         <div
           role="presentation"
           className={styles.popup}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             e.preventDefault()
           }}
