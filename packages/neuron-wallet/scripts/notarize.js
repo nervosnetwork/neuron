@@ -13,9 +13,10 @@ exports.default = async function notarizing(context) {
 
   const appleId = process.env.APPLE_ID;
   const appleIdPassword = process.env.APPLE_ID_PASSWORD;
+  const teamId = process.env.TEAM_ID;
 
-  if (!appleId || !appleIdPassword) {
-    console.warn(`${appleId ? "Apple id password" : "Apple id"} is not found`)
+  if (!appleId || !appleIdPassword || !teamId) {
+    console.warn(`${appleId ? (appleIdPassword ? "Team id" : "Apple id password") : "Apple id"} is not found`)
     process.exit(1)
   }
 
@@ -27,8 +28,9 @@ exports.default = async function notarizing(context) {
     await notarize({
       appBundleId: 'com.nervos.neuron',
       appPath: `${appOutDir}/${appName}.app`,
-      appleId: appleId,
-      appleIdPassword: appleIdPassword,
+      appleId,
+      appleIdPassword,
+      teamId,
     })
     console.info("Notarization finished")
   } catch (err) {
