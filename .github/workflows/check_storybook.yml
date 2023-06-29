@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Check storybook
 
 on:
   push:
@@ -58,7 +58,9 @@ jobs:
         env:
           CI: false
 
-      - name: Unit Tests
-        run: yarn test
+      - name: Build storybook
+        run: |
+          cd packages/neuron-ui
+          yarn build-storybook
         env:
           CI: true

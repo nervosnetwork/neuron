@@ -17,8 +17,9 @@ export const requestOpenInExplorer = remoteApi<Controller.RequestOpenInExplorerP
 export const handleViewError = remoteApi<string>('handle-view-error')
 export const setLocale = remoteApi<(typeof LOCALES)[number]>('set-locale')
 export const getCkbNodeDataPath = remoteApi<void, string>('get-ckb-node-data-path')
-export const setCkbNodeDataPath =
-  remoteApi<{ dataPath: string; clearCache?: boolean }, string>('set-ckb-node-data-path')
+export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean }, string>(
+  'set-ckb-node-data-path'
+)
 export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
 export const getIsCkbRunExternal = remoteApi<void, boolean>('is-ckb-run-external')

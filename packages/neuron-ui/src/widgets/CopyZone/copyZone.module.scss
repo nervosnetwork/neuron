@@ -3,6 +3,7 @@
 .container {
   position: relative;
   display: inline-block;
+  padding: 0 5px;
 
   .hoverShow {
     position: absolute;
@@ -21,15 +22,21 @@
     white-space: nowrap;
     border-radius: 16px;
     z-index: 10;
-
-    & > svg {
-      margin-right: 4px;
-    }
   }
 
   &:hover {
     .hoverShow {
       display: flex;
+      container-type: inline-size;
+      container-name: tips;
+
+      .copytext {
+        margin-left: 4px;
+        @container tips  ( max-width : 72px ) {
+          display: none;
+        }
+      }
+
       .copyIcon {
         visibility: visible;
       }

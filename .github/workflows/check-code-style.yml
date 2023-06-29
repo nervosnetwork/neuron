@@ -1,0 +1,38 @@
+name: Check Code Style
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  default:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: "yarn"
+
+      - name: Restore
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: 2022-05-07-${{ runner.os }}-${{ hashFiles('**/yarn.lock')}}
+
+      - name: Bootstrap
+        run: |
+          yarn
+
+      - name: Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+
+      - name: Prettier Check
+        run: |
+          yarn prettier --check ${{ steps.changed-files.outputs.all_changed_files }}

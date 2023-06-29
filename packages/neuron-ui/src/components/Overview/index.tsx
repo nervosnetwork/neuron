@@ -94,7 +94,7 @@ const TransactionStatus = ({
   }
   return (
     <div className={styles.txStatus} data-status={status}>
-      {status === 'confirming' ? <Confirming /> : null}
+      {status === 'confirming' ? <Confirming className={styles.confirming} /> : null}
       <span>{t(`overview.statusLabel.${status}`)}</span>
       {confirmations ? <span className={styles.confirmText}>{confirmations}</span> : null}
     </div>
@@ -255,9 +255,13 @@ const Overview = () => {
             {showBalance && <PasswordShow onClick={onChangeShowBalance} className={styles.balanceIcon} />}
             {!!showBalance || <PasswordHide onClick={onChangeShowBalance} className={styles.balanceIcon} />}
           </span>
-          <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
-            <span className={styles.balanceValue}>{showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE}</span>
-          </CopyZone>
+          {showBalance ? (
+            <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
+              <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
+            </CopyZone>
+          ) : (
+            <span className={styles.balanceValue}>{HIDE_BALANCE}</span>
+          )}
           <span className={styles.balanceUnit}>CKB</span>
           <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
           <BalanceRight className={styles.backgroundImg} />
