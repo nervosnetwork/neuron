@@ -2,7 +2,7 @@ const appUpdaterState: State.AppUpdater = {
   checking: false,
   isUpdated: false,
   downloadProgress: -1,
-  progressInfo: {},
+  progressInfo: null,
   version: '',
   releaseDate: '',
   releaseNotes: '',

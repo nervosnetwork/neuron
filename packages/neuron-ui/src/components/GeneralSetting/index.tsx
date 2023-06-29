@@ -25,7 +25,7 @@ interface UpdateDownloadStatusProps {
   newVersion: string
   releaseDate: string
   releaseNotes: string
-  progressInfo: object
+  progressInfo: null | State.ProgressInfo
 }
 
 const UpdateDownloadStatus = ({
@@ -35,11 +35,26 @@ const UpdateDownloadStatus = ({
   newVersion = '',
   releaseDate = '',
   releaseNotes = '',
-  progressInfo = {},
+  progressInfo,
 }: UpdateDownloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
+
+  const handleConfirm = useCallback(
+    (e: React.FormEvent) => {
+      const {
+        dataset: { method },
+      } = e.target as HTMLFormElement
+
+      if (method === 'download') {
+        downloadUpdate()
+      } else if (method === 'install') {
+        installUpdate()
+      }
+    },
+    [downloadUpdate, installUpdate]
+  )
 
   if (available) {
     const releaseNotesHtml = () => {
@@ -51,11 +66,14 @@ const UpdateDownloadStatus = ({
     return (
       <Dialog
         show={show}
-        onConfirm={downloadUpdate}
+        onConfirm={handleConfirm}
         disabled={!available}
         confirmText={t('updates.install-update')}
         onCancel={onCancel}
         title={t('updates.update-available')}
+        confirmProps={{
+          'data-method': 'download',
+        }}
       >
         <div className={styles.install}>
           <p className={styles.title}>
@@ -75,10 +93,13 @@ const UpdateDownloadStatus = ({
         show={show}
         onCancel={onCancel}
         showCancel={false}
-        onConfirm={installUpdate}
+        onConfirm={handleConfirm}
         disabled={!downloaded}
         confirmText={t('updates.quit-and-install')}
         title={t('updates.update-available')}
+        confirmProps={{
+          'data-method': 'install',
+        }}
       >
         <div className={styles.install}>
           <div>{t('updates.updates-downloaded-about-to-quit-and-install')}</div>
@@ -87,19 +108,22 @@ const UpdateDownloadStatus = ({
     )
   }
 
-  const { total, transferred } = progressInfo as { total: number; transferred: number }
+  if (progressInfo) {
+    const { total, transferred } = progressInfo
+    return (
+      <Dialog show={show} onCancel={onCancel} title={t('updates.update-available')} showConfirm={false}>
+        <div className={styles.processWrap}>
+          <p className={styles.title}>{t('updates.downloading-update')} </p>
+          <progress value={progress} max={1} />
+          <p className={styles.note}>
+            {bytesFormatter(transferred)} / {bytesFormatter(total)}
+          </p>
+        </div>
+      </Dialog>
+    )
+  }
 
-  return (
-    <Dialog show={show} onCancel={onCancel} title={t('updates.update-available')} showConfirm={false}>
-      <div className={styles.processWrap}>
-        <p className={styles.title}>{t('updates.downloading-update')} </p>
-        <progress value={progress} max={1} />
-        <p className={styles.note}>
-          {bytesFormatter(transferred)} / {bytesFormatter(total)}
-        </p>
-      </div>
-    </Dialog>
-  )
+  return null
 }
 
 interface GeneralSettingProps {
@@ -143,12 +167,23 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
     setDialogType('')
   }, [updater, setDialogType])
 
-  const handleCancel = useCallback(() => {
-    if (dialogType === 'checking') {
-      cancelCheckUpdates()
-    }
-    setDialogType('')
-  }, [dialogType, setDialogType])
+  const handleUpdate = useCallback(
+    (e: React.SyntheticEvent) => {
+      const {
+        dataset: { method },
+      } = e.target as HTMLElement
+
+      if (method === 'cancelCheck') {
+        if (dialogType === 'checking') {
+          cancelCheckUpdates()
+        }
+        setDialogType('')
+      } else if (method === 'check') {
+        checkForUpdates()
+      }
+    },
+    [dialogType, setDialogType, cancelCheckUpdates, checkForUpdates]
+  )
 
   return (
     <div className={styles.container}>
@@ -156,7 +191,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         <p>
           {t('settings.general.version')} v{version}
         </p>
-        <button type="button" onClick={() => checkForUpdates()}>
+        <button type="button" onClick={handleUpdate} data-method="check">
           {t(`updates.check-updates`)} <ArrowNext />
         </button>
       </div>
@@ -187,8 +222,11 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         showCancel={false}
         showHeader={false}
         confirmText={t(dialogType === 'checking' ? 'common.cancel' : 'common.ok')}
-        onConfirm={handleCancel}
+        onConfirm={handleUpdate}
         className={styles.confirmDialog}
+        confirmProps={{
+          'data-method': 'cancelCheck',
+        }}
       >
         <div className={styles.wrap}>
           <VersionLogo />

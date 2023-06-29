@@ -22,7 +22,7 @@ const items = [
   ['general', '-2px', GeneralSetting],
   ['network', '12px', NetworkSetting],
   ['data', '9px', DataSetting],
-]
+] as [string, string, React.FC<any>][]
 
 const Settings = () => {
   const dispatch = useDispatch()
@@ -121,8 +121,8 @@ const Settings = () => {
     <PageContainer head={t('navbar.settings')}>
       <div className={styles.container}>
         {items.map(([title, marginTop, ItemCmp]) => (
-          <div className={styles.item} key={title as string}>
-            <div className={styles.title} style={{ marginTop: marginTop as string }}>
+          <div className={styles.item} key={title}>
+            <div className={styles.title} style={{ marginTop }}>
               {t(`settings.setting-tabs.${title}`)}
             </div>
             <div className={styles.content}>
