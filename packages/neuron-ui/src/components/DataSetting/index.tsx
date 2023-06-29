@@ -84,16 +84,18 @@ const DataSetting = () => {
     <>
       <div className={styles.root}>
         <div className={styles.leftContainer}>
-          <div className={styles.label}>
-            <div>{t('settings.data.ckb-node-data')}</div>
-            <Tooltip
-              placement="top"
-              tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>}
-              showTriangle
-            >
-              <AttentionOutline />
-            </Tooltip>
-          </div>
+          {isLightClient ? null : (
+            <div className={styles.label}>
+              <div>{t('settings.data.ckb-node-data')}</div>
+              <Tooltip
+                placement="top"
+                tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>}
+                showTriangle
+              >
+                <AttentionOutline />
+              </Tooltip>
+            </div>
+          )}
           <div className={styles.label}>
             <div>{t('settings.data.cache')}</div>
             <Tooltip

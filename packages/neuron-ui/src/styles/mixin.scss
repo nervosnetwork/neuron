@@ -205,6 +205,7 @@
     opacity: 0.5;
   }
   input[type='checkbox']:disabled + span {
+    cursor: not-allowed;
     background: url('../widgets/Icons/CheckboxDisabled.svg') no-repeat left top;
 
     @media (prefers-color-scheme: dark) {
