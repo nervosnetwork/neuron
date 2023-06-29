@@ -9,7 +9,7 @@ interface DialogProps {
   show: boolean
   title?: string | ReactNode
   subTitle?: string
-  onConfirm?: () => void
+  onConfirm?: (e: React.FormEvent) => void
   onCancel?: () => void
   confirmText?: string
   cancelText?: string
@@ -67,13 +67,13 @@ const Dialog = ({
     [onCancel]
   )
 
-  const onSubmit = useCallback(
+  const handleConfirm = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault()
       if (disabled) {
         return
       }
-      onConfirm?.()
+      onConfirm?.(e)
     },
     [onConfirm, disabled]
   )
@@ -101,8 +101,8 @@ const Dialog = ({
       ) : null}
       <div className={clsx(styles.content, contentClassName)}>{children}</div>
       {showFooter ? (
-        <form onSubmit={onSubmit}>
-          <div className={styles.footer}>
+        <div className={styles.footerWrap}>
+          <form className={styles.footer}>
             {showCancel ? (
               <Button type="cancel" onClick={onCancel || closeDialog} label={cancelText || t('common.cancel')} />
             ) : null}
@@ -112,11 +112,12 @@ const Dialog = ({
                 label={confirmText || t('common.confirm')}
                 loading={isLoading}
                 disabled={disabled}
+                onClick={handleConfirm}
                 {...confirmProps}
               />
             ) : null}
-          </div>
-        </form>
+          </form>
+        </div>
       ) : null}
     </dialog>
   )

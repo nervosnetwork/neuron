@@ -49,7 +49,7 @@ const SUDTMigrateToExistAccountDialog = ({
     [sUDTAccounts, tokenInfo]
   )
   const dispatch = useDispatch()
-  const onSumbit = useCallback(() => {
+  const onSubmit = useCallback(() => {
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
       acpAddress: address,
@@ -94,7 +94,7 @@ const SUDTMigrateToExistAccountDialog = ({
             onChange={onAddressChange}
             value={address}
             className={styles.addressInputSelect}
-            inputDisabeld={isLightClient}
+            inputDisabled={isLightClient}
           />
           {addressError && <div className={styles.error}>{addressError}</div>}
         </div>
@@ -111,7 +111,7 @@ const SUDTMigrateToExistAccountDialog = ({
         <Button
           label={t('migrate-sudt.confirm')}
           type="primary"
-          onClick={onSumbit}
+          onClick={onSubmit}
           disabled={!address || !!addressError}
         />
       </div>

@@ -366,6 +366,7 @@ const PasswordRequest = () => {
       />
     )
   }
+
   return (
     <Dialog
       show={!!actionType}
@@ -377,6 +378,7 @@ const PasswordRequest = () => {
       isLoading={isLoading}
       cancelText={t('common.cancel')}
       confirmText={t('common.confirm')}
+      showConfirm={actionType !== 'send-from-multisig'}
     >
       <div>
         {[

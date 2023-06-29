@@ -1,9 +1,10 @@
 import { scriptToAddress, blake2b, PERSONAL, hexToBytes } from '@nervosnetwork/ckb-sdk-utils'
 import { MultiSigLockInfo } from './enums'
+import { MAX_M_N_NUMBER } from './const'
 
 function getMultisigParamsHex(v: number) {
-  if (v < 0 || v > 255) {
-    throw new Error("Multisig's r/m/n should between 0 and 255")
+  if (v < 0 || v > MAX_M_N_NUMBER) {
+    throw new Error(`Multisig's r/m/n should between 0 and ${MAX_M_N_NUMBER}`)
   }
   return v.toString(16).padStart(2, '0')
 }

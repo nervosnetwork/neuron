@@ -27,12 +27,9 @@ const MultiAddressReceive = ({
   const dispatch = useDispatch()
   const { isInShortFormat, setIsInShortFormat, address: showAddress } = useSwitchAddress(address)
   const { ref, showCopySuccess, onCopyQrCode, onDownloadQrCode } = useCopyAndDownloadQrCode()
-  const { localDescription, onDescriptionPress, onDescriptionChange, onDescriptionSelected } = useLocalDescription(
-    'address',
-    walletId,
-    dispatch,
-    'textarea'
-  )
+  const { localDescription, onDescriptionPress, onDescriptionChange, onDescriptionFieldBlur, onDescriptionSelected } =
+    useLocalDescription('address', walletId, dispatch, 'textarea')
+
   const columns = useMemo<TableProps<State.Address>['columns']>(
     () => [
       {
@@ -109,6 +106,7 @@ const MultiAddressReceive = ({
                       value={isSelected ? localDescription.description : description}
                       onChange={onDescriptionChange}
                       onKeyDown={onDescriptionPress}
+                      onBlur={onDescriptionFieldBlur}
                     />
                     <Edit
                       data-description-key={item.address}
@@ -146,13 +144,13 @@ const MultiAddressReceive = ({
         <div className={styles.qrCode} data-copy-success={showCopySuccess} data-copy-success-text={t('common.copied')}>
           <QRCode value={showAddress} size={128} includeMargin ref={ref} />
         </div>
-        <CopyZone content={showAddress} name={t('receive.copy-address')} className={styles.copyAddress}>
+        <CopyZone content={showAddress} className={styles.copyAddress}>
           {showAddress}
           <button
             type="button"
             className={styles.addressToggle}
             onClick={() => setIsInShortFormat(is => !is)}
-            title={t(isInShortFormat ? `receive.turn-into-full-version-fomrat` : `receive.turn-into-deprecated-format`)}
+            title={t(isInShortFormat ? `receive.turn-into-full-version-format` : `receive.turn-into-deprecated-format`)}
             onFocus={stopPropagation}
             onMouseOver={stopPropagation}
             onMouseUp={stopPropagation}

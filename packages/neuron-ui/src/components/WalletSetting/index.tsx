@@ -139,10 +139,10 @@ const WalletSetting = ({
                 <EditWallet data-id={wallet.id} />
               </button>
               {wallet.isHD ? (
-                null
-              ) : <button type="button" aria-label={t('common.backup')} onClick={onHandleWallet}>
+                <button type="button" aria-label={t('common.backup')} onClick={onHandleWallet}>
                   <Export data-action="backup" data-id={wallet.id} />
-                </button>}
+                </button>
+              ) : null}
               {wallet.id !== currentID ? (
                 <button type="button" onClick={onHandleWallet}>
                   <DeleteWallet data-action="delete" data-id={wallet.id} />

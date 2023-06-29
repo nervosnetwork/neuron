@@ -35,20 +35,10 @@
     display: block;
     margin-bottom: 24px;
     color: var(--main-text-color);
+
+    .highlight {
+      color: var(--primary-color);
+    }
   }
-  input[type='checkbox'] {
-    display: none;
-    margin-right: 8px;
-  }
-  input[type='checkbox'] + span {
-    display: inline-block;
-    padding-left: 26px;
-    line-height: 20px;
-    background: url('../../widgets/Icons/Checkbox.svg') no-repeat left top;
-    user-select: none;
-  }
-  input[type='checkbox']:checked + span {
-    background: url('../../widgets/Icons/CheckboxSelected.svg') no-repeat left
-      top;
-  }
+  @include checkbox;
 }

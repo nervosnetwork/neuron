@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 
@@ -17,6 +17,7 @@ export type TableProps<T> = {
     align?: 'left' | 'right' | 'center'
     className?: string
     tdClassName?: string
+    hidden?: boolean
   }[]
   dataKey?: string
   dataSource: T[]
@@ -50,6 +51,8 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     setExpandedRow(prevIndex => (prevIndex === index ? null : index))
   }
 
+  const columnList = useMemo(() => columns.filter(item => !item.hidden), [columns])
+
   return (
     <div
       className={`${styles.tableRoot} ${className} ${isFixedTable ? styles.fixedTableRoot : ''}`}
@@ -59,32 +62,34 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
       <table className={`${styles.table} ${head === null || head === undefined ? styles.noHead : ''}`}>
         <thead>
           <tr>
-            {columns.map(({ title, dataIndex, key, isBalance, align, width, minWidth, className: headClassName }) => {
-              return (
-                <th
-                  key={key || dataIndex}
-                  title={typeof title === 'string' ? title : dataIndex}
-                  aria-label={typeof title === 'string' ? title : dataIndex}
-                  data-field={dataIndex}
-                  align={align ?? 'left'}
-                  className={headClassName}
-                  style={{ width, minWidth }}
-                >
-                  {!!dataSource.length && isBalance ? (
-                    <div className={styles.headWithBalance} style={{ justifyContent: align }}>
-                      {title}
-                      {showBalance ? (
-                        <PasswordShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
-                      ) : (
-                        <PasswordHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
-                      )}
-                    </div>
-                  ) : (
-                    title
-                  )}
-                </th>
-              )
-            })}
+            {columnList.map(
+              ({ title, dataIndex, key, isBalance, align, width, minWidth, className: headClassName }) => {
+                return (
+                  <th
+                    key={key || dataIndex}
+                    title={typeof title === 'string' ? title : dataIndex}
+                    aria-label={typeof title === 'string' ? title : dataIndex}
+                    data-field={dataIndex}
+                    align={align ?? 'left'}
+                    className={headClassName}
+                    style={{ width, minWidth }}
+                  >
+                    {!!dataSource.length && isBalance ? (
+                      <div className={styles.headWithBalance} style={{ justifyContent: align }}>
+                        {title}
+                        {showBalance ? (
+                          <PasswordShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                        ) : (
+                          <PasswordHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                        )}
+                      </div>
+                    ) : (
+                      title
+                    )}
+                  </th>
+                )
+              }
+            )}
           </tr>
         </thead>
         <tbody>
@@ -98,7 +103,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                   className={styles.trClassName}
                   data-idx={idx}
                 >
-                  {columns.map(({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName }) => (
+                  {columnList.map(({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName }) => (
                     <td
                       align={align ?? 'left'}
                       key={key ?? dataIndex}

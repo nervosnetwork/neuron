@@ -15,9 +15,10 @@ import {
   getVersion,
 } from 'services/remote'
 import { uniformTimeFormatter, bytesFormatter } from 'utils'
+import { LanguageSelect } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
-interface UpdateDowloadStatusProps {
+interface UpdateDownloadStatusProps {
   show: boolean
   onCancel: () => void
   progress: number
@@ -35,7 +36,7 @@ const UpdateDownloadStatus = ({
   releaseDate = '',
   releaseNotes = '',
   progressInfo = {},
-}: UpdateDowloadStatusProps) => {
+}: UpdateDownloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
@@ -147,7 +148,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       cancelCheckUpdates()
     }
     setDialogType('')
-  }, [dialogType])
+  }, [dialogType, setDialogType])
 
   return (
     <div className={styles.container}>
@@ -168,7 +169,8 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
             setShowLangDialog(true)
           }}
         >
-          {t(`settings.locale.${i18n.language}`)} <ArrowNext />
+          <LanguageSelect />
+          {t(`settings.locale.${i18n.language}`)}
         </button>
       </div>
 
@@ -177,9 +179,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         title={t(`updates.check-updates`)}
         message={updater.errorMsg}
         type="failed"
-        onCancel={() => {
-          setDialogType('')
-        }}
+        onCancel={() => setDialogType('')}
       />
 
       <Dialog

@@ -1,4 +1,4 @@
-import os from 'os'
+  import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import TransactionService, { SearchType } from '../../../src/services/tx/transaction-service'
@@ -9,6 +9,11 @@ import accounts from '../../setupAndTeardown/accounts.fixture'
 import transactions from '../../setupAndTeardown/transactions.fixture'
 import { getConnection } from 'typeorm'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
+import TransactionPersistor, { TxSaveType } from '../../../src/services/tx/transaction-persistor'
+import SystemScriptInfo from '../../../src/models/system-script-info'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import Input from '../../../src/models/chain/input'
+import OutPoint from '../../../src/models/chain/out-point'
 
 jest.mock('../../../src/models/asset-account-info', () => {
   const originalModule = jest.requireActual('../../../src/models/asset-account-info').default
@@ -16,6 +21,37 @@ jest.mock('../../../src/models/asset-account-info', () => {
     return new originalModule('0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5')
   }
 })
+
+const getTransactionMock = jest.fn()
+
+jest.mock('../../../src/services/rpc-service', () => {
+  return function() {
+    return {
+      getTransaction: getTransactionMock
+    }
+  }
+})
+
+const ckbRpcExecMock = jest.fn()
+
+jest.mock('@nervosnetwork/ckb-sdk-core', () => {
+  return function() {
+    return {
+      rpc: {
+        createBatchRequest() {
+          return {
+            exec: ckbRpcExecMock
+          }
+        }
+      }
+    }
+  }
+})
+
+function resetMock() {
+  getTransactionMock.mockReset()
+  ckbRpcExecMock.mockReset()
+}
 
 describe('Test TransactionService', () => {
   beforeAll(async () => {
@@ -196,9 +232,12 @@ describe('Test TransactionService', () => {
         const DESCRIPTION = 'new description'
         stubProvider.hash = HASH
         stubProvider.description = DESCRIPTION
+        resetMock()
       })
 
       it('Should update the description', async () => {
+        getTransactionMock.mockResolvedValue({ transaction: transactions[0] })
+        ckbRpcExecMock.mockResolvedValue([])
         const origin = await TransactionService.get(stubProvider.hash)
         expect(origin!.description).toBe('')
         await TransactionService.updateDescription(stubProvider.hash, stubProvider.description)
@@ -235,11 +274,32 @@ describe('Test TransactionService', () => {
       beforeEach(() => {
         const HASH = '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1'
         stubProvider.hash = HASH
+        resetMock()
       })
 
       it('Should return a transaction', async () => {
+        getTransactionMock.mockResolvedValue({ transaction: transactions[0] })
+        ckbRpcExecMock.mockResolvedValue([])
         const actual = await TransactionService.get(stubProvider.hash)
         expect(actual).not.toBeUndefined()
+      })
+
+      it('Get input and outputs from rpc', async () => {
+        getTransactionMock.mockResolvedValue({ transaction: Transaction.fromObject(transactions[0]) })
+        ckbRpcExecMock.mockResolvedValue([{ transaction: { outputs: [{ capacity: '0x100', lock: transactions[0].inputs[0].lock } ]} }])
+        const actual = await TransactionService.get(stubProvider.hash)
+        expect(actual).not.toBeUndefined()
+        expect(actual?.inputs.length).toBe(transactions[0].inputs.length)
+        expect(actual?.inputs[0].capacity).toBe((+'0x100').toString())
+      })
+
+      it('Get input and outputs from rpc no tx', async () => {
+        getTransactionMock.mockResolvedValue({ transaction: Transaction.fromObject(transactions[0]) })
+        ckbRpcExecMock.mockResolvedValue([])
+        const actual = await TransactionService.get(stubProvider.hash)
+        expect(actual).not.toBeUndefined()
+        expect(actual?.inputs.length).toBe(transactions[0].inputs.length)
+        expect(actual?.inputs[0].capacity).toBeUndefined()
       })
     })
 
@@ -384,7 +444,7 @@ describe('Test TransactionService', () => {
 
     describe('When search with an address', () => {
       describe('When address hits', () => {
-        describe('search with wallet adddress', () => {
+        describe('search with wallet address', () => {
           beforeEach(() => {
             const ADDRESS = ADDRESSES[1]
             stubProvider.searchValue = ADDRESS
@@ -395,7 +455,7 @@ describe('Test TransactionService', () => {
             expect(actual.totalCount).toBe(3)
           })
         })
-        describe('search with counterparty wallet adddress', () => {
+        describe('search with counterparty wallet address', () => {
           beforeEach(() => {
             const ADDRESS = 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83'
             stubProvider.searchValue = ADDRESS
@@ -404,6 +464,17 @@ describe('Test TransactionService', () => {
           it('Should return an array of several transactions', async () => {
             const actual = await TransactionService.getAllByAddresses(stubProvider, stubProvider.searchValue)
             expect(actual.totalCount).toBe(2)
+          })
+
+          it('find from tx lock', async () => {
+            const tx = Transaction.fromObject(transactions[0])
+            tx.hash = `0x01${'0'.repeat(62)}`
+            const args = `0x${'0'.repeat(42)}`
+            const script = SystemScriptInfo.generateSecpScript(args)
+            tx.inputs[0].setLock(script)
+            await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Fetch, new Set([tx.outputs[0].lock.args, tx.outputs[1].lock.args]))
+            const actual = await TransactionService.getAllByAddresses(stubProvider, scriptToAddress(script))
+            expect(actual.totalCount).toBe(1)
           })
         })
       })
@@ -490,6 +561,95 @@ describe('Test TransactionService', () => {
           expect(actual.totalCount).toBe(0)
         })
       })
+    })
+  })
+
+  describe('fillInputFields', () => {
+    it('inputs is empty', async () => {
+      const inputs: Input[] = []
+      //@ts-ignore private-method
+      const actual = await TransactionService.fillInputFields(inputs)
+      expect(actual).toBe(inputs)
+    })
+    it('inputs without txHash', async () => {
+      const inputs = [
+        Input.fromObject({
+          previousOutput: null
+        })
+      ]
+      //@ts-ignore private-method
+      const actual = await TransactionService.fillInputFields(inputs)
+      expect(actual).toBe(inputs)
+    })
+    it('can not get output', async () => {
+      const inputs = [
+        Input.fromObject({
+          previousOutput: new OutPoint(`0x${'0'.repeat(64)}`, '0x0')
+        })
+      ]
+      ckbRpcExecMock.mockResolvedValueOnce([])
+      //@ts-ignore private-method
+      const actual = await TransactionService.fillInputFields(inputs)
+      expect(actual).toStrictEqual(inputs)
+    })
+    it('success fill input fields without type', async () => {
+      const inputs = [
+        Input.fromObject({
+          previousOutput: new OutPoint(`0x${'0'.repeat(64)}`, '0x0')
+        })
+      ]
+      const transactionWithStatus = {
+        transaction: {
+          outputs: [
+            {
+              capacity: '0x1000',
+              lock: {
+                codeHash: `0x${'0'.repeat(64)}`,
+                hashType: 'data',
+                args: '0x0'
+              },
+            }
+          ]
+        }
+      }
+      ckbRpcExecMock.mockResolvedValueOnce([transactionWithStatus])
+      //@ts-ignore private-method
+      const actual = await TransactionService.fillInputFields(inputs)
+      expect(actual[0].capacity).toBe('4096')
+      expect(actual[0].lock?.toSDK()).toStrictEqual(transactionWithStatus.transaction.outputs[0].lock)
+      expect(actual[0].type).toBeUndefined()
+    })
+    it('success fill input fields with type', async () => {
+      const inputs = [
+        Input.fromObject({
+          previousOutput: new OutPoint(`0x${'0'.repeat(64)}`, '0x0')
+        })
+      ]
+      const transactionWithStatus = {
+        transaction: {
+          outputs: [
+            {
+              capacity: '0x1000',
+              lock: {
+                codeHash: `0x${'0'.repeat(64)}`,
+                hashType: 'data',
+                args: '0x0'
+              },
+              type: {
+                codeHash: `0x${'1'.repeat(64)}`,
+                hashType: 'data',
+                args: '0x1'
+              }
+            }
+          ]
+        }
+      }
+      ckbRpcExecMock.mockResolvedValueOnce([transactionWithStatus])
+      //@ts-ignore private-method
+      const actual = await TransactionService.fillInputFields(inputs)
+      expect(actual[0].capacity).toBe('4096')
+      expect(actual[0].lock?.toSDK()).toStrictEqual(transactionWithStatus.transaction.outputs[0].lock)
+      expect(actual[0].type?.toSDK()).toStrictEqual(transactionWithStatus.transaction.outputs[0].type)
     })
   })
 })

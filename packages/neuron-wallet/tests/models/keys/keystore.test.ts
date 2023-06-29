@@ -73,7 +73,7 @@ describe('load ckb cli origin keystore', () => {
 describe('create empty keystore', () => {
   const keystore = Keystore.createEmpty()
 
-  it('has empty cipertext and mac', () => {
+  it('has empty ciphertext and mac', () => {
     expect(keystore.crypto.ciphertext).toEqual('')
     expect(keystore.crypto.mac).toEqual('')
   })

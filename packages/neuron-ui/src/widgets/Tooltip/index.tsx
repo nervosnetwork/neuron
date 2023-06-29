@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useRef } from 'react'
+import { useDidMount } from 'utils'
 import styles from './tooltip.module.scss'
 
 export type Placement = 'top' | 'right' | 'left' | 'bottom' | 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
@@ -27,12 +28,29 @@ const Tooltip: React.FC<TooltipProps> = ({
   isTriggerNextToChild,
 }) => {
   const [isTipShow, setIsTipShow] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
   const onChangeIsTipShow = useCallback(() => {
     setIsTipShow(v => !v)
   }, [setIsTipShow])
+
+  const onDocumentClick = useCallback(
+    (e: MouseEvent) => {
+      if (e.target instanceof Node && !ref.current?.contains(e.target)) {
+        setIsTipShow(false)
+      }
+    },
+    [isTipShow]
+  )
+
+  useDidMount(() => {
+    document.addEventListener('click', onDocumentClick, false)
+    return () => document.removeEventListener('click', onDocumentClick, false)
+  })
+
   if (typeof tip === 'string') {
     return (
       <div
+        ref={ref}
         className={`${styles.tipWithString} ${className}`}
         data-tooltip={tip}
         data-placement={placement}
@@ -52,6 +70,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   }
   return (
     <div
+      ref={ref}
       className={`${styles.tipWithNode} ${className}`}
       data-placement={placement}
       data-placement-center={center}

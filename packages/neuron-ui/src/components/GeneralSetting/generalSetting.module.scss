@@ -29,11 +29,7 @@ $action-button-width: 11.25rem;
       display: flex;
       align-items: center;
       svg {
-        margin-left: 4px;
-        g,
-        path {
-          stroke: var(--secondary-text-color);
-        }
+        margin-right: 4px;
       }
     }
   }

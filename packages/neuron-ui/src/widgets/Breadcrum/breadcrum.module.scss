@@ -1,18 +1,22 @@
-$default-color: #666;
 .container {
   display: flex;
   align-items: center;
-  height: 18px;
   user-select: none;
-  color: $default-color;
-  font-size: 0.875rem;
+  color: var(--input-second-color);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
   .page {
-    &:after {
-      content: '/';
-      color: $default-color !important;
+    margin-right: 4px;
+    &:not(:last-child):after {
+      content: ' /';
+      color: var(--input-second-color) !important;
     }
-    &:hover {
-      color: var(--nervos-green);
+    &:not(:last-child):hover {
+      color: var(--primary-color);
+    }
+    &:last-child {
+      color: var(--main-text-color);
     }
   }
 }

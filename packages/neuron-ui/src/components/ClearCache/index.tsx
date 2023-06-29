@@ -108,16 +108,14 @@ const ClearCacheDialog = ({
         <div className={styles.options}>
           <label htmlFor={IDs.refreshCacheOption}>
             <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
-            <span>{t(`${I18N_PATH}.options.refresh.label`)}</span>
+            <span className={styles.highlight}>{t(`${I18N_PATH}.options.refresh.label`)}</span>
           </label>
-          {
-            hideRebuild ? null : (
-              <label htmlFor={IDs.rebuildCacheOption}>
-                <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
-                <span>{t(`${I18N_PATH}.options.rebuild.label`)}</span>
-              </label>
-            )
-          }
+          {hideRebuild ? null : (
+            <label htmlFor={IDs.rebuildCacheOption}>
+              <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
+              <span>{t(`${I18N_PATH}.options.rebuild.label`)}</span>
+            </label>
+          )}
         </div>
       </Dialog>
 

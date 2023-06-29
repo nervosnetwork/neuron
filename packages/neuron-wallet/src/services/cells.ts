@@ -5,7 +5,7 @@ import {
   CapacityNotEnoughForChange,
   LiveCapacityNotEnough,
   MultisigConfigNeedError,
-  TransactionInputParamterMiss,
+  TransactionInputParameterMiss,
 } from '../exceptions'
 import FeeMode from '../models/fee-mode'
 import OutputEntity from '../database/chain/entities/output'
@@ -270,7 +270,7 @@ export default class CellsService {
 
     const skip = (pageNo - 1) * pageSize
 
-    const allMutiSignOutputs = await getConnection()
+    const allMultiSignOutputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
@@ -324,7 +324,7 @@ export default class CellsService {
       .orderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    const matchedOutputs = allMutiSignOutputs.filter(o => {
+    const matchedOutputs = allMultiSignOutputs.filter(o => {
       if (o.multiSignBlake160) {
         return multiSignHashes.has(o.multiSignBlake160)
       }
@@ -526,7 +526,7 @@ export default class CellsService {
     hasChangeOutput: boolean
   }> => {
     if (!walletId && !lockClass.lockArgs) {
-      throw new TransactionInputParamterMiss()
+      throw new TransactionInputParameterMiss()
     }
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)

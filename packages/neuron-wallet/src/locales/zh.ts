@@ -118,15 +118,15 @@ export default {
       'multisig-config-exist': '多签地址已经存在',
       'multisig-config-address-error': '多签配置的地址设置不正确',
       'multisig-config-need-error': '多签交易生成需要多签配置',
-      'transaction-no-input-paramter': '查询 Input Cell 缺少必要的参数',
+      'transaction-no-input-parameter': '查询 Input Cell 缺少必要的参数',
       'migrate-sudt-no-type': '迁移的 sUDT Cell 没有 type script',
       'multisig-lock-hash-mismatch': '当前多签地址与需要确认交易不匹配',
       'multisig-not-signed': '多签交易缺少部分签名',
       'sudt-acp-have-data': '待销毁的 sUDT 账户资产不为 0',
       'no-match-address-for-sign': '没有找到匹配的地址',
       'target-lock-error': 'CKB 资产只能转账到 secp256k1 或者 acp 地址',
-      'no-exist-ckb-node-data': '{{path}} 目录下没有找到 CKB Node 配置和数据, 点击继续重新同步',
-      'light-client-sudt-acp-error': '轻节点模式不支持发送资产给其他用户的资产账户'
+      'no-exist-ckb-node-data': '{{path}} 目录下没有找到 CKB Node 配置和数据, 点击确认重新同步',
+      'light-client-sudt-acp-error': '轻节点模式不支持发送资产给其他用户的资产账户',
     },
     messageBox: {
       button: {
@@ -237,7 +237,7 @@ export default {
     about: {
       'app-version': '{{name}} 版本: {{version}}',
       'ckb-client-version': 'CKB 节点版本: {{version}}',
-      'ckb-light-client-version': 'CKB 轻节点版本: {{version}}'
+      'ckb-light-client-version': 'CKB 轻节点版本: {{version}}',
     },
     settings: {
       title: {

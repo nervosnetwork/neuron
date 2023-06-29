@@ -12,6 +12,7 @@ const CommandSubject = new Subject<{
     | 'load-transaction-json'
     | 'migrate-acp'
     | 'sign-verify'
+    | 'multisig-address'
   payload: string | null
   dispatchToUI: boolean
 }>()

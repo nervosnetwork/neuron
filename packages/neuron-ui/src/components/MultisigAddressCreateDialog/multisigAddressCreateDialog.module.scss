@@ -1,0 +1,50 @@
+.title {
+  color: var(--secondary-text-color);
+  margin: 20px 0 8px;
+  max-width: 646px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+
+  & > button {
+    margin-left: 12px;
+  }
+}
+
+.setMNRoot {
+  .title {
+    color: var(--secondary-text-color);
+    margin: 0 0 8px;
+  }
+
+  .countSelect {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 16px;
+
+    p {
+      color: var(--main-text-color);
+    }
+    div {
+      flex: 1;
+      height: 56px;
+    }
+  }
+}
+
+.error {
+  color: var(--error-color);
+}
+
+.errorMessage {
+  color: var(--error-color);
+  margin-top: 8px;
+}
+
+.content {
+  margin-top: 20px;
+}

@@ -422,7 +422,7 @@ describe('SyncApiController', () => {
             expect(syncStatus).toEqual(2)
           })
         })
-        describe('with samples spaning over 1 min', () => {
+        describe('with samples spanning over 1 min', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: '100',

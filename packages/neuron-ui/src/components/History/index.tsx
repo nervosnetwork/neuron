@@ -149,7 +149,7 @@ const History = () => {
         return (
           <div className={styles.avatarBox}>
             {item.sudtInfo?.sUDT ? (
-              <SUDTAvatar name={name} type="token" style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
+              <SUDTAvatar name={name} type="token" style={{ width: '30px', height: '30px' }} />
             ) : (
               <CKBAvatar />
             )}

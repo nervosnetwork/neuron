@@ -76,24 +76,26 @@ const DataSetting = () => {
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
-  const isLightClient = useMemo(() => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE, [
-    networkID,
-    networks,
-  ])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networkID, networks]
+  )
   return (
     <>
       <div className={styles.root}>
         <div className={styles.leftContainer}>
-          <div className={styles.label}>
-            <div>{t('settings.data.ckb-node-data')}</div>
-            <Tooltip
-              placement="top"
-              tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>}
-              showTriangle
-            >
-              <AttentionOutline />
-            </Tooltip>
-          </div>
+          {isLightClient ? null : (
+            <div className={styles.label}>
+              <div>{t('settings.data.ckb-node-data')}</div>
+              <Tooltip
+                placement="top"
+                tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>}
+                showTriangle
+              >
+                <AttentionOutline />
+              </Tooltip>
+            </div>
+          )}
           <div className={styles.label}>
             <div>{t('settings.data.cache')}</div>
             <Tooltip
@@ -106,8 +108,15 @@ const DataSetting = () => {
           </div>
         </div>
         <div className={styles.rightContainer}>
-          { isLightClient ? null : <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} /> }
-          <ClearCache className={styles.item} btnClassName={styles.itemBtn} dispatch={dispatch} hideRebuild={isLightClient} />
+          {isLightClient ? null : (
+            <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} />
+          )}
+          <ClearCache
+            className={styles.item}
+            btnClassName={styles.itemBtn}
+            dispatch={dispatch}
+            hideRebuild={isLightClient}
+          />
         </div>
       </div>
 

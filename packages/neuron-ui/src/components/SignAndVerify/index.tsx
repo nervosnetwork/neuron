@@ -137,18 +137,6 @@ const SignAndVerify = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
-  useEffect(() => {
-    window.document.title = i18n.t(`sign-and-verify.window-title`)
-    // eslint-disable-next-line
-  }, [i18n.language])
-
-  useEffect(() => {
-    const id = window.location.href.split('id=').pop()
-    if (!id) {
-      showErrorMessage(t('messages.error'), t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' }))
-      window.close()
-    }
-  }, [t])
 
   const handlePasswordDialogOpen = useCallback(() => {
     setShowDialog(false)

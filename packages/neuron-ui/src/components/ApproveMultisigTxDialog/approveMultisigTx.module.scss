@@ -1,0 +1,168 @@
+@import '../../styles/mixin.scss';
+
+.dialogContainer {
+  padding: 0;
+}
+
+.container {
+  width: 680px;
+
+  .header {
+    line-height: 48px;
+    padding: 0 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    background: var(--table-head-background-color);
+    color: var(--secondary-text-color);
+    border-bottom: 1px solid var(--table-head-border-color);
+
+    .tip {
+      // This selector is only used to increase weight and override the default styles in the Tooltip component.
+      &:not([data-tooltip='']) {
+        left: calc(100% - 240px);
+      }
+    }
+
+    .copyTableAddress {
+      word-break: break-all;
+      text-align: center;
+      font-family: 'JetBrains Mono';
+      width: 300px;
+      white-space: normal;
+      line-height: 24px;
+
+      & > svg {
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+    }
+
+    .address {
+      height: 56px;
+      text-decoration: underline;
+      margin: 0 4px;
+
+      &:hover {
+        color: var(--activity-color);
+      }
+    }
+  }
+}
+
+.content {
+  margin: 16px;
+  background: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
+}
+
+.textarea {
+  width: calc(100% - 32px);
+  padding: 16px 16px 0;
+  background: transparent;
+  border: none;
+  height: 206px;
+  resize: none;
+  color: var(--main-text-color);
+}
+
+.recordTab {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  color: var(--secondary-text-color);
+  border-bottom: 1px solid var(--divide-line-color);
+
+  button {
+    appearance: none;
+    flex: 1;
+    height: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: transparent;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+  }
+
+  .underline {
+    display: block;
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 50%;
+    box-sizing: border-box;
+    transition: transform 0.1s ease-in-out;
+    &::after {
+      content: '';
+      width: 100px;
+      height: 2px;
+      position: absolute;
+      top: 0;
+      left: calc(50% - 50px);
+      background: var(--primary-color);
+      border-radius: 8px;
+    }
+  }
+
+  &[data-idx='1'] {
+    .underline {
+      transform: translateX(100%);
+    }
+  }
+}
+
+.cellItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & > div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .tag {
+    background-color: var(--input-disabled-color);
+    color: var(--input-second-color);
+    margin-left: 8px;
+    padding: 3px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid var(--divide-line-color);
+
+    & + .activity {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: var(--primary-text-color);
+    }
+  }
+}
+
+.conciseData {
+  padding: 0 16px;
+  color: var(--main-text-color);
+  height: 222px;
+  overflow-y: scroll;
+  h2 {
+    margin: 12px 0 10px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .inputWrap {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divide-line-color);
+  }
+}
+
+.statusTitle {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--main-text-color);
+}

@@ -7,6 +7,7 @@ import Dialog from 'widgets/Dialog'
 import { useState as useGlobalState, useDispatch } from 'states'
 
 import { RoutePath, ErrorCode } from 'utils'
+import styles from './walletEditorDialog.module.scss'
 
 import { useHint, useOnSubmit, useInputs, useWalletEditor } from './hooks'
 
@@ -65,7 +66,7 @@ const WalletEditorDialog = ({
     >
       <>
         {wallet.id ? (
-          <div style={{ width: '648px' }}>
+          <div className={styles.content}>
             {inputs.map(item => (
               <TextField key={item.label} {...item} field={item.label} error={hint} autoFocus />
             ))}

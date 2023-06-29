@@ -32,7 +32,7 @@ import {
   NoMatchAddressForSign,
   SignTransactionFailed,
   CellIsNotYetLive,
-  TransactionIsNotCommittedYet
+  TransactionIsNotCommittedYet,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -400,10 +400,10 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
+    const serializedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(toUint64Le(`0x${serialziedEmptyWitnessSize.toString(16)}`))
+    blake2b.update(toUint64Le(`0x${serializedEmptyWitnessSize.toString(16)}`))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {

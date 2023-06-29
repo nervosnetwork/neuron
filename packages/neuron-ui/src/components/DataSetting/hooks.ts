@@ -13,7 +13,7 @@ const type = 'ckb'
 
 export const useDataPath = () => {
   const [t] = useTranslation()
-  const [isSaving, setIsSaveing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [savingType, setSavingType] = useState<string | null>()
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
@@ -53,7 +53,7 @@ export const useDataPath = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       setFaidMessage('')
       const { dataset } = e.currentTarget
-      setIsSaveing(true)
+      setIsSaving(true)
       setSavingType(dataset.syncType)
       setCkbNodeDataPath({
         dataPath: currentPath!,
@@ -68,7 +68,7 @@ export const useDataPath = () => {
           }
         })
         .finally(() => {
-          setIsSaveing(false)
+          setIsSaving(false)
           setSavingType(null)
         })
     },
