@@ -1,4 +1,4 @@
-import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electron-updater'
+import { autoUpdater, UpdateInfo, CancellationToken } from 'electron-updater'
 import AppUpdaterSubject from '../models/subjects/app-updater'
 
 export default class UpdateController {
@@ -22,7 +22,9 @@ export default class UpdateController {
   }
 
   public cancelCheckUpdates() {
+    autoUpdater.removeAllListeners()
     UpdateController.isChecking = false
+    this.notify()
   }
 
   public quitAndInstall() {
@@ -37,7 +39,9 @@ export default class UpdateController {
   }
 
   public cancelDownloadUpdate() {
+    autoUpdater.removeAllListeners()
     UpdateController.downCancellationToken.cancel()
+    this.notify()
   }
 
   private bindEvents() {
@@ -45,24 +49,24 @@ export default class UpdateController {
 
     autoUpdater.on('error', error => {
       UpdateController.isChecking = false
-      this.notify(-1, {}, false, '', '', '', error == null ? 'unknown' : (error.stack || error).toString())
+      this.notify(-1, null, false, '', '', '', error == null ? 'unknown' : (error.stack || error).toString())
     })
 
     autoUpdater.on('update-available', (info: UpdateInfo) => {
       if (UpdateController.isChecking) {
         UpdateController.isChecking = false
-        this.notify(-1, {}, false, info.version, info.releaseDate, info.releaseNotes as string)
+        this.notify(-1, null, false, info.version, info.releaseDate, info.releaseNotes as string)
       }
     })
 
     autoUpdater.on('update-not-available', () => {
       if (UpdateController.isChecking) {
         UpdateController.isChecking = false
-        this.notify(-1, {}, true)
+        this.notify(-1, null, true)
       }
     })
 
-    autoUpdater.on('download-progress', (progress: ProgressInfo) => {
+    autoUpdater.on('download-progress', progress => {
       const progressPercent = progress.percent / 100
       if (progressPercent !== 1) {
         this.notify(progressPercent, progress)
@@ -77,7 +81,7 @@ export default class UpdateController {
 
   private notify(
     downloadProgress: number = -1,
-    progressInfo: object = {},
+    progressInfo = null,
     isUpdated = false,
     version = '',
     releaseDate = '',
@@ -92,7 +96,7 @@ export default class UpdateController {
       releaseDate,
       releaseNotes,
       errorMsg,
-      checking: UpdateController.isChecking
+      checking: UpdateController.isChecking,
     })
   }
 }

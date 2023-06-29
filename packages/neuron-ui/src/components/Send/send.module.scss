@@ -1,5 +1,18 @@
 @import '../../styles/mixin.scss';
 $bottomHeight: 124px;
+$headerHeight: 104px;
+
+.content {
+  overflow-y: scroll;
+  margin-bottom: 100px;
+  height: calc(100vh - $headerHeight - $bottomHeight);
+}
+
+.withFullySynced {
+  .content {
+    height: calc(100vh - $headerHeight - $bottomHeight - 60px);
+  }
+}
 
 .layout {
   display: flex;
@@ -7,12 +20,6 @@ $bottomHeight: 124px;
   .left {
     flex: 1;
     position: relative;
-
-    .leftContent {
-      height: calc(100vh - $bottomHeight - var(--header-height));
-      overflow-y: scroll;
-      margin-bottom: 100px;
-    }
 
     .leftFooter {
       position: absolute;
@@ -51,11 +58,8 @@ $bottomHeight: 124px;
     border-radius: 16px;
     background: var(--secondary-background-color);
 
-    .rightContent {
+    .content {
       padding: 16px;
-      height: calc(100vh - $bottomHeight - var(--header-height));
-      overflow-y: scroll;
-      margin-bottom: 100px;
     }
 
     .rightFooter {

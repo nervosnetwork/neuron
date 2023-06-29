@@ -155,9 +155,9 @@ const Send = () => {
   return (
     <PageContainer head={<SendHeader balance={balance} />}>
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
-        <div className={styles.layout} style={{ '--header-height': showWaitForFullySynced ? '164px' : '104px' }}>
+        <div className={`${styles.layout} ${showWaitForFullySynced ? styles.withFullySynced : ''}`}>
           <div className={styles.left}>
-            <div className={styles.leftContent}>
+            <div className={styles.content}>
               <List
                 items={outputs}
                 onRenderCell={(_, idx) => {
@@ -203,7 +203,7 @@ const Send = () => {
           </div>
 
           <div className={styles.right}>
-            <div className={styles.rightContent}>
+            <div className={styles.content}>
               <SendMetaInfo
                 outputs={outputs}
                 errorMessage={errorMessageUnderTotal}

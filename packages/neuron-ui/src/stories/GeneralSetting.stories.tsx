@@ -38,7 +38,7 @@ DownloadUpdate.args = {
     checking: false,
     isUpdated: false,
     downloadProgress: 0.1,
-    progressInfo: {},
+    progressInfo: null,
     version: '0.110.1',
     releaseDate: '2023-05-31T13:15:58.827Z',
     releaseNotes: 'release 0.110.1',

@@ -50,7 +50,11 @@ declare namespace Subject {
     checking: boolean
     isUpdated: boolean
     downloadProgress: number
-    progressInfo: object
+    progressInfo: null | {
+      total: number
+      transferred: number
+      percent: number
+    }
     version: string
     releaseDate: string
     releaseNotes: string

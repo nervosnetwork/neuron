@@ -306,17 +306,15 @@ export const errorFormatter = (error: string | FailureFromController['message'],
 }
 
 export const bytesFormatter = (bytes: number, decimals = 1) => {
-  if (!+bytes) {
-    return '0 Bytes'
+  let i = 0
+  let value = bytes
+
+  while (value > 1023) {
+    value /= 1024
+    ++i
   }
 
-  const k = 1024
-  const dm = decimals < 0 ? 0 : decimals
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-  return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
+  return `${i ? value.toFixed(decimals) : value} ${['bytes', 'KB', 'MB', 'GB'][i]}`
 }
 
 export const padFractionDigitsIfDecimal = (num: string | number, minimumFractionDigits: number): string => {

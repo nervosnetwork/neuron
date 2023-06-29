@@ -143,7 +143,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
         checking: false,
         isUpdated: false,
         downloadProgress: -1,
-        progressInfo: {},
+        progressInfo: null,
         version: '',
         releaseDate: '',
         releaseNotes: '',
