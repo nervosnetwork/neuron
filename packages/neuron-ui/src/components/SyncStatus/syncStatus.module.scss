@@ -6,6 +6,7 @@
   border: none;
   background-color: transparent;
   color: var(--main-text-color);
+  cursor: pointer;
 
   .confirm {
     @include infinite-rotation;
@@ -30,6 +31,7 @@
   border: none;
   background-color: transparent;
   color: var(--main-text-color);
+  cursor: pointer;
   &::before {
     display: inline-block;
     content: '';

@@ -16,6 +16,10 @@
     font-size: 20px;
     font-weight: 500;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    background: var(--main-background-color);
 
     .rightContent {
       display: flex;
