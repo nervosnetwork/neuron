@@ -17,7 +17,7 @@ const items = [
   },
 ]
 
-const leastSUDTAcccountCapacity = BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigInt(SHANNON_CKB_RATIO)
+const leastSUDTAccountCapacity = BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigInt(SHANNON_CKB_RATIO)
 
 const SUDTMigrateDialog = ({
   cell,
@@ -27,7 +27,7 @@ const SUDTMigrateDialog = ({
   openDialog?: (e: React.SyntheticEvent) => void
 }) => {
   const [t] = useTranslation()
-  const isNewSUDTAccountDisabled = useMemo(() => BigInt(cell.capacity) < leastSUDTAcccountCapacity, [cell.capacity])
+  const isNewSUDTAccountDisabled = useMemo(() => BigInt(cell.capacity) < leastSUDTAccountCapacity, [cell.capacity])
   return (
     <div className={styles.container}>
       <p>{t('migrate-sudt.title')}</p>

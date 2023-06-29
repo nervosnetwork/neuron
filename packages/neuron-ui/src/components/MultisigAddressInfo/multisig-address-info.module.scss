@@ -1,26 +1,75 @@
+@import '../../styles/mixin.scss';
 
-.multiAddressTable {
-  width: 100%;
-  border-collapse: collapse;
+.container {
+  width: 646px;
+  .title {
+    color: var(--secondary-text-color);
+    margin: 0;
+  }
+
+  .copyTableAddress {
+    word-break: break-all;
+    text-align: center;
+    font-family: 'JetBrains Mono';
+    width: 300px;
+    white-space: normal;
+    line-height: 24px;
+
+    & > svg {
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+  }
+
+  .addressWrap {
+    height: 56px;
+    margin: 8px 0 20px;
+    line-height: 56px;
+    border: 1px solid var(--divide-line-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--main-text-color);
+
+    span {
+      line-height: 56px;
+      font-family: 'JetBrains Mono';
+    }
+
+    .overflow {
+      word-break: break-all;
+      line-height: 56px;
+      overflow: hidden;
+    }
+
+    &:hover {
+      color: var(--activity-color);
+    }
+  }
+}
+
+.tableWrap {
+  margin-top: 16px;
+  border: 1px solid var(--table-head-border-color);
+  border-radius: 16px;
+  border-top: none;
+  color: var(--main-text-color);
+  @include checkbox;
 
   tr {
-    border-bottom: 1px solid #b3b3b3;
-  }
-
-  tbody {
-    td {
-      padding: 8px;
-      min-width: 40px;
-      text-align: left;
+    &:last-child {
+      td {
+        border: none;
+      }
     }
   }
 
-  .address {
-    width: 400px;
-    
-    .addressField {
-      display: block;
-    }
+  .addressField {
+    margin-bottom: 0;
+    margin-right: 20px;
+    padding: 10px 0;
+    min-width: 476px;
   }
 }
 

@@ -7,7 +7,7 @@ import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import Toast from 'widgets/Toast'
 import { chainState } from 'states'
-import { setCurrentNetowrk, deleteNetwork } from 'services/remote'
+import { setCurrentNetwork, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
 import { useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
 import { LIGHT_CLIENT_TESTNET } from 'utils/const'
@@ -63,7 +63,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   const handleChange = useCallback(
     checked => {
       if (checked !== currentId) {
-        setCurrentNetowrk(checked)
+        setCurrentNetwork(checked)
       }
     },
     [currentId]

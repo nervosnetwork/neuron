@@ -25,7 +25,7 @@ export const addresses = {
     try {
       const addressList = JSON.parse(addressesStr)
       if (!Array.isArray(addressList)) {
-        throw new TypeError(`Addresses should be type fo Address[]`)
+        throw new TypeError(`Addresses should be type of Address[]`)
       }
       return addressList
     } catch (err) {

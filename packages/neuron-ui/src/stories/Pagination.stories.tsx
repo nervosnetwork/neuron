@@ -28,8 +28,8 @@ OnlyOnePage.args = {
 }
 OnlyOnePage.storyName = '1 page'
 
-export const AtTheFisrtPage = Template.bind({})
-AtTheFisrtPage.args = {
+export const AtTheFirstPage = Template.bind({})
+AtTheFirstPage.args = {
   pageNo: 1,
   count: 100,
   pageSize: 15,

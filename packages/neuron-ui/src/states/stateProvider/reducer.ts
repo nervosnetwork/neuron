@@ -306,7 +306,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       /**
        * payload: { type, content }
        */
-      // NOTICE: for simplicty, only one notification will be displayed
+      // NOTICE: for simplicity, only one notification will be displayed
       state.app.notifications.push(action.payload)
       state.app.showTopAlert = true
       break

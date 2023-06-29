@@ -32,6 +32,7 @@ export enum RoutePath {
   ImportHardware = '/import-hardware',
   OfflineSign = 'offline-sign',
   SignVerify = 'sign-verify',
+  MultisigAddress = 'multisig-address',
 }
 
 export enum CapacityUnit {

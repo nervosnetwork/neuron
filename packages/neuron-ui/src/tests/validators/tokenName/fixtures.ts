@@ -41,7 +41,7 @@ const fixtures = {
     },
     exception: null,
   },
-  'Should throw an error when isCKB is true and the token name is Uknown which is reserved': {
+  'Should throw an error when isCKB is true and the token name is Unknown which is reserved': {
     params: {
       tokenName: 'Unknown',
       required: false,

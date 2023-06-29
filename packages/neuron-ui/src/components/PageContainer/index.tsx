@@ -21,7 +21,7 @@ const PageHeadNotice = ({ notice }: { notice: State.PageNotice }) => {
   )
 }
 
-const getNetworkTypeLable = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) => {
+const getNetworkTypeLabel = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) => {
   switch (type) {
     case 'ckb': {
       return 'settings.network.mainnet'
@@ -75,7 +75,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
     })
   }, [theme])
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
-  const netWorkTypeLabel = useMemo(() => (network ? getNetworkTypeLable(network.chain) : ''), [network])
+  const netWorkTypeLabel = useMemo(() => (network ? getNetworkTypeLabel(network.chain) : ''), [network])
   const [syncPercents, syncBlockNumbers] = useMemo(() => {
     const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
     return [
@@ -152,7 +152,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
   )
 }
 
-export const Breadcrumbs: FC<PropsWithChildren<object>> = ({ children }) => {
+export const Breadcrumbs: FC<PropsWithChildren<React.ReactNode>> = ({ children }) => {
   const childList = React.Children.toArray(children).filter(child => {
     return React.isValidElement(child)
   })

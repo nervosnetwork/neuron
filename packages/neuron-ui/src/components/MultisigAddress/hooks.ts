@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
-import { useDialogWrapper, isSuccessResponse, getMultisigAddress, DefaultLockInfo } from 'utils'
+import { isSuccessResponse, getMultisigAddress, DefaultLockInfo } from 'utils'
 import { MultisigOutputUpdate } from 'services/subjects'
 import {
   MultisigConfig,
@@ -37,7 +37,19 @@ export const useSearch = (clearSelected: () => void, onFilterConfig: (searchKey:
   const onClear = useCallback(() => {
     onSearch('')
   }, [onSearch])
-  return { keywords, onKeywordsChange, setKeywords, onSearch, onClear }
+
+  const onChange = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      onKeywordsChange(e, e.currentTarget.value)
+    },
+    [onKeywordsChange]
+  )
+
+  const onBlur = useCallback(() => {
+    onSearch(keywords)
+  }, [onSearch, keywords])
+
+  return { keywords, onKeywordsChange, setKeywords, onSearch, onClear, onChange, onBlur }
 }
 
 export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isMainnet: boolean }) => {
@@ -68,8 +80,9 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
     })
   }, [setEntities, walletId])
   const updateConfig = useCallback(
-    (id: number) => (alias: string | undefined) => {
-      updateMultisigConfig({ id, alias: alias || '' }).then(res => {
+    (id: number) => (e: React.SyntheticEvent<unknown>) => {
+      const { value } = e.target as HTMLInputElement
+      updateMultisigConfig({ id, alias: value || '' }).then(res => {
         if (isSuccessResponse(res)) {
           setEntities(v => v.map(config => (res.result && config.id === res.result?.id ? res.result : config)))
         }
@@ -176,70 +189,80 @@ export const useExportConfig = (configs: MultisigConfig[]) => {
 }
 
 const useSendAction = () => {
-  const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [sendFromMultisig, setSendFromMultisig] = useState<MultisigConfig | undefined>()
   const onOpenSendDialog = useCallback(
     (option: MultisigConfig) => {
-      openDialog()
+      setIsDialogOpen(true)
       setSendFromMultisig(option)
     },
-    [openDialog, setSendFromMultisig]
+    [setIsDialogOpen, setSendFromMultisig]
   )
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
+
   return {
     action: onOpenSendDialog,
     closeDialog,
-    dialogRef,
     sendFromMultisig,
     isDialogOpen,
   }
 }
 
 const useInfoAction = () => {
-  const { openDialog: openInfoDialog, closeDialog, dialogRef } = useDialogWrapper()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
   const viewMultisigConfig = useCallback(
     (option: MultisigConfig) => {
-      openInfoDialog()
+      setIsDialogOpen(true)
       setMultisigConfig(option)
     },
-    [openInfoDialog, setMultisigConfig]
+    [setIsDialogOpen, setMultisigConfig]
   )
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
   return {
     action: viewMultisigConfig,
     closeDialog,
-    dialogRef,
     multisigConfig,
+    isDialogOpen,
   }
 }
 
 const useDeleteAction = (deleteConfigById: (id: number) => void) => {
-  const { openDialog, closeDialog, dialogRef } = useDialogWrapper()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | undefined>()
-  const deleteConfig = useCallback(
-    (option: MultisigConfig) => {
-      deleteMultisigConfig(option.id).then(res => {
+  const [config, setConfig] = useState<MultisigConfig>()
+  const deleteConfig = useCallback(() => {
+    if (config) {
+      deleteMultisigConfig(config.id).then(res => {
         if (isSuccessResponse(res)) {
           if (res.result) {
-            deleteConfigById(option.id)
+            deleteConfigById(config.id)
           }
         } else {
-          openDialog()
+          setIsDialogOpen(true)
           setDeleteErrorMessage(typeof res.message === 'string' ? res.message : res.message.content)
         }
       })
-    },
-    [deleteConfigById, setDeleteErrorMessage, openDialog]
-  )
+    }
+  }, [deleteConfigById, setDeleteErrorMessage, setIsDialogOpen, config])
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
   return {
     action: deleteConfig,
     closeDialog,
-    dialogRef,
     deleteErrorMessage,
+    setConfig,
+    isDialogOpen,
   }
 }
 
 const useApproveAction = () => {
-  const { openDialog, closeDialog, dialogRef, isDialogOpen } = useDialogWrapper()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [multisigConfig, setMultisigConfig] = useState<MultisigConfig | undefined>()
   const [offlineSignJson, setOfflineSignJson] = useState<OfflineSignJSON | undefined>()
   const action = useCallback(
@@ -248,19 +271,21 @@ const useApproveAction = () => {
       if (option.fullPayload) {
         loadMultisigTxJson(option.fullPayload).then(res => {
           if (isSuccessResponse(res) && res.result) {
-            openDialog()
+            setIsDialogOpen(true)
             setMultisigConfig(option)
             setOfflineSignJson(res.result)
           }
         })
       }
     },
-    [openDialog]
+    [setIsDialogOpen]
   )
+  const closeDialog = useCallback(() => {
+    setIsDialogOpen(false)
+  }, [setIsDialogOpen])
   return {
     action,
     closeDialog,
-    dialogRef,
     multisigConfig,
     isDialogOpen,
     offlineSignJson,

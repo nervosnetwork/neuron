@@ -116,7 +116,7 @@ const Calendar: React.FC<CalendarProps> = ({
     setMonth,
     onChange
   )
-  const { isComponetFocused, ...focusListeners } = useFocusObserve()
+  const { isComponentFocused, ...focusListeners } = useFocusObserve()
   const calendarTable = (
     <table
       className={styles.calendarTable}
@@ -140,7 +140,7 @@ const Calendar: React.FC<CalendarProps> = ({
             {week.map(date => (
               <td key={`${date.month}${date.date}`} role="gridcell">
                 <ButtonHasFocus
-                  isMoveFocus={isComponetFocused}
+                  isMoveFocus={isComponentFocused}
                   isFocusable={isDateEqual(date.instance, focusDate)}
                   type="button"
                   data-type="button"

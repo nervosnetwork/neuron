@@ -15,7 +15,7 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
   const [isMainnet, setIsMainnet] = useState(false)
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
   const [systemCodeHash, setSystemCodeHash] = useState<string>('')
-  const [inputVisable, setInputVisable] = useState(true)
+  const [inputVisible, setInputVisible] = useState(true)
   const [activeInputIndex, setActiveInputIndex] = useState(0)
 
   useDidMount(() => {
@@ -118,27 +118,27 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
   }, [activeInputIndex, tx.outputs, renderList])
 
   const showInput = useCallback(() => {
-    setInputVisable(true)
-  }, [setInputVisable])
+    setInputVisible(true)
+  }, [setInputVisible])
 
   const showOutput = useCallback(() => {
-    setInputVisable(false)
-  }, [setInputVisable])
+    setInputVisible(false)
+  }, [setInputVisible])
 
   return (
     <div className={styles.sign}>
       <div className={styles.tabs}>
-        <button className={inputVisable ? styles.active : ''} onClick={showInput} type="button">
+        <button className={inputVisible ? styles.active : ''} onClick={showInput} type="button">
           {t('hardware-sign.inputs', { index: activeInputIndex, length: tx.inputs.length })}
         </button>
-        <button className={!inputVisable ? styles.active : ''} onClick={showOutput} type="button">
+        <button className={!inputVisible ? styles.active : ''} onClick={showOutput} type="button">
           {t('hardware-sign.outputs', { length: tx.outputs.length })}
         </button>
       </div>
       <div className={styles.table}>
         <hr />
         <table className={styles.inputList}>
-          <tbody>{inputVisable ? inputBody : outputBody}</tbody>
+          <tbody>{inputVisible ? inputBody : outputBody}</tbody>
         </table>
         <hr />
       </div>

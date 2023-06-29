@@ -18,7 +18,7 @@ import { uniformTimeFormatter, bytesFormatter } from 'utils'
 import { LanguageSelect } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
-interface UpdateDowloadStatusProps {
+interface UpdateDownloadStatusProps {
   show: boolean
   onCancel: () => void
   progress: number
@@ -36,7 +36,7 @@ const UpdateDownloadStatus = ({
   releaseDate = '',
   releaseNotes = '',
   progressInfo = {},
-}: UpdateDowloadStatusProps) => {
+}: UpdateDownloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1

@@ -75,7 +75,7 @@
       "outputs": "Outputs({{length}})",
       "actions": {
         "close": "Close",
-        "success": "Transaction Succesful!",
+        "success": "Transaction Successful!",
         "rescan": "Rescan"
       }
     },
@@ -252,7 +252,7 @@
       "address-qrcode": "Address QR Code",
       "address": "{{network}} Address",
       "verify-address": "Verify Address",
-      "turn-into-full-version-fomrat": "Turn into full version format",
+      "turn-into-full-version-format": "Turn into full version format",
       "turn-into-deprecated-format": "Turn into deprecated format",
       "save-qr-code": "Download",
       "copy-qr-code": "Copy"
@@ -496,10 +496,10 @@
         "title": "Destroy Asset Account"
       },
       "send-from-multisig": {
-        "title": "Submit the transaction"
+        "title": "Send CKB from multisig address"
       },
       "send-from-multisig-need-one": {
-        "title": "Submit the transaction"
+        "title": "Send CKB from multisig address"
       },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
@@ -557,7 +557,7 @@
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "no-valid-addresses-found": "No valid addresses found",
-      "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "decimal-range": "Decimal should be an integer of {{range}}(inclusive)",
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
@@ -996,7 +996,7 @@
         "placeholder": "search by multisig address,alias"
       },
       "add": {
-        "label": "Add"
+        "label": "Create"
       },
       "import": {
         "label": "Import"
@@ -1007,11 +1007,13 @@
       "ok": "OK",
       "no-data": "No multisig address",
       "table": {
-        "address": "address",
-        "alias": "alias",
-        "type": "type",
-        "balance": "balance",
+        "address": "Signer address",
+        "alias": "Alias",
+        "type": "Type",
+        "balance": "Balance",
         "copy-address": "Copy Address",
+        "action": "Actions",
+        "more": "More",
         "sync-block": "Synced Block",
         "actions": {
           "info": "Info",
@@ -1027,9 +1029,10 @@
         },
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
-      "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
+      "delete-failed": "Delete multisig config failed",
       "send-ckb": {
-        "title": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
+        "title": "Send CKB from multisig address",
+        "detail": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
         "balance": "Balance",
         "address": "Address",
         "amount": "Amount",
@@ -1037,34 +1040,39 @@
         "cancel": "Cancel",
         "export": "Export Tx"
       },
+      "multi-details": "Multisig address details",
       "create-dialog": {
         "title": "Create multisig address",
-        "index": "index",
-        "required": "required",
-        "signer-address": "signer address",
+        "preview-title": "Multisig address has been generated",
+        "index": "Index",
+        "required": "Required",
+        "signer-address": "Signer address",
         "copy-address": "Copy Address",
+        "placeholder": "Please input {{type}}(1-255)",
         "m-n": {
-          "title": "Please choose the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
+          "title": "Please input the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
           "m-less-equal-n": "For m-of-n multisig address, m shouldn't be greater than n",
-          "m-n-required": "Please input or choose m/n",
+          "m-n-required": "Please input m/n",
           "m-n-between-0-256": "m/n should be between 0 and 256"
         },
         "multi-address-info": {
           "title": "Please input the signers for the {{m}}-of-{{n}} multisig address",
-          "view-title": "The {{m}}-of-{{n}} multisig address is",
-          "ckb-address-placeholder": "ckb address"
+          "view-title": "The {{m}}-of-{{n}} multisig address",
+          "ckb-address-placeholder": "Please input ckb address"
         },
         "multi-list": "Signer list",
         "actions": {
           "cancel": "Cancel",
           "back": "Back",
           "next": "Next",
+          "generate-address": "Generate Address",
           "confirm": "Confirm"
         },
         "duplicate-address-forbid": "Address can't be duplicated"
       },
       "approve-dialog": {
-        "title": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
+        "title": "Approve with multisig address",
+        "detail": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
         "transaction": "Transaction",
         "cancel": "Cancel",
         "signAndExport": "Sign & Export",
@@ -1076,8 +1084,8 @@
         "signerApprove": "Lack of {{m}} signer approval(s), including {{r}} from specified signer(s)",
         "noRSignerApprove": "Lack of {{m}} signer approval(s)",
         "signed": "Signed",
-        "view-concise-data": "View concise data",
-        "view-raw-data": "View raw data"
+        "view-concise-data": "Concise data",
+        "view-raw-data": "Raw data"
       }
     },
     "dropdown": {
