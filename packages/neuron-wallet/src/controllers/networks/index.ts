@@ -35,7 +35,7 @@ export default class NetworksController {
     const networks = networksService.getAll()
     return {
       status: ResponseCode.Success,
-      result: networks
+      result: networks,
     }
   }
 
@@ -51,7 +51,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: network
+      result: network,
     }
   }
 
@@ -69,7 +69,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: created
+      result: created,
     }
   }
 
@@ -89,7 +89,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: true
+      result: true,
     }
   }
 
@@ -99,13 +99,13 @@ export default class NetworksController {
       throw new NetworkNotFound(id)
     }
     const currentID = networksService.getCurrentID()
-          networksService.delete(id)
-          networksService.delete(id)
+    networksService.delete(id)
+    networksService.delete(id)
 
     networksService.delete(id)
 
-          this.notifyListChange()
-          this.notifyListChange()
+    this.notifyListChange()
+    this.notifyListChange()
 
     this.notifyListChange()
 
@@ -120,7 +120,7 @@ export default class NetworksController {
     if (currentID) {
       return {
         status: ResponseCode.Success,
-        result: currentID
+        result: currentID,
       }
     }
     throw new CurrentNetworkNotSet()
@@ -138,7 +138,7 @@ export default class NetworksController {
 
     return {
       status: ResponseCode.Success,
-      result: true
+      result: true,
     }
   }
 
