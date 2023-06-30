@@ -310,3 +310,14 @@ export const padFractionDigitsIfDecimal = (num: string | number, minimumFraction
   const isDecimal = numText.includes('.')
   return isDecimal ? numText.padEnd(numText.indexOf('.') + 1 + minimumFractionDigits, '0') : numText
 }
+
+/**
+ * Convert complex numbers for millennial counting to pure numbers.
+ * ex:
+ * -100.00002362 CKB ---> -100.00002362
+ * +10,000 CKB ---> 10000
+ *  */
+export const complexNumberToPureNumber = (value: string) => {
+  const num = Number(value.replace(/[^-0-9.]/g, ''))
+  return num
+}

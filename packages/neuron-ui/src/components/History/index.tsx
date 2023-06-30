@@ -6,7 +6,8 @@ import SUDTAvatar from 'widgets/SUDTAvatar'
 import Button from 'widgets/Button'
 import Table, { TableProps } from 'widgets/Table'
 import TextField from 'widgets/TextField'
-import { DownloadIcon, SearchIcon, ArrowOpenRightIcon } from 'widgets/Icons/icon'
+import CopyZone from 'widgets/CopyZone'
+import { Confirming, DownloadIcon, SearchIcon, ArrowOpenRightIcon } from 'widgets/Icons/icon'
 
 import PageContainer from 'components/PageContainer'
 import { getDisplayName, isTonkenInfoStandardUAN, UANTonkenSymbol } from 'components/UANDisplay'
@@ -26,6 +27,7 @@ import {
   sUDTAmountFormatter,
   sudtValueToAmount,
   shannonToCKBFormatter,
+  complexNumberToPureNumber,
 } from 'utils'
 import { onEnter } from 'utils/inputDevice'
 import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS, HIDE_BALANCE } from 'utils/const'
@@ -65,6 +67,8 @@ const History = () => {
       setIsExporting(false)
     })
   }, [id, setIsExporting])
+
+  const [expandedRow, setExpandedRow] = useState<number | null>(null)
 
   const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
 
@@ -138,6 +142,10 @@ const History = () => {
     }
   }
 
+  const handleExpandClick = (idx: number | null) => {
+    setExpandedRow(prevIndex => (prevIndex === idx ? null : idx))
+  }
+
   const columns: TableProps<State.Transaction>['columns'] = [
     {
       title: t('history.table.name'),
@@ -194,17 +202,22 @@ const History = () => {
             isReceive = !amount.includes('-')
           }
         }
-        return sudtAmount ? (
-          <>
-            {show ? sudtAmount : HIDE_BALANCE}&nbsp;
-            <UANTonkenSymbol
-              className={styles.symbol}
-              name={item.sudtInfo!.sUDT.tokenName}
-              symbol={item.sudtInfo!.sUDT.symbol}
-            />
-          </>
-        ) : (
-          <span className={show && isReceive ? styles.isReceive : ''}>{amount}</span>
+
+        return (
+          <CopyZone content={`${complexNumberToPureNumber(sudtAmount && sudtAmount !== '' ? sudtAmount : amount)}`}>
+            {sudtAmount ? (
+              <>
+                {show ? sudtAmount : HIDE_BALANCE}&nbsp;
+                <UANTonkenSymbol
+                  className={styles.symbol}
+                  name={item.sudtInfo!.sUDT.tokenName}
+                  symbol={item.sudtInfo!.sUDT.symbol}
+                />
+              </>
+            ) : (
+              <span className={show && isReceive ? styles.isReceive : ''}>{amount}</span>
+            )}
+          </CopyZone>
         )
       },
     },
@@ -225,15 +238,21 @@ const History = () => {
           status = 'confirming'
         }
 
-        return t(`history.${status}`)
+        return status === 'confirming' ? <Confirming className={styles.confirm} /> : t(`history.${status}`)
       },
     },
     {
       title: t('history.table.operation'),
       dataIndex: 'operation',
       align: 'left',
-      render(_, idx, ___, ____, expandedRow) {
-        return <ArrowOpenRightIcon className={styles.arrow} data-is-open={expandedRow === idx} />
+      render(_, idx, ___, ____) {
+        return (
+          <ArrowOpenRightIcon
+            className={styles.arrow}
+            data-is-open={expandedRow === idx}
+            onClick={() => handleExpandClick(idx)}
+          />
+        )
       },
     },
   ]
@@ -283,6 +302,7 @@ const History = () => {
             bestBlockNumber={bestBlockNumber}
           />
         )}
+        expandedRow={expandedRow}
       />
 
       <div className={styles.container}>
