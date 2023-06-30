@@ -1,11 +1,31 @@
 name: Package Neuron for Test
 
-on:
-  pull_request:
+on: 
+  issue_comment:
+    types: [created, edited]
   push:
 
 jobs:
+  check_command:
+    runs-on: ubuntu-latest
+    ## skip if trigger by issue comment but not pr comment
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request) || github.event_name == 'push' }}
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check for package command
+        uses: xt0rted/slash-command-action@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          command: package
+          reaction: "true"
+          reaction-type: "eyes"
+          allow-edits: "true"
+          permission-level: write
+
   packaging:
+    needs: [check_command]
+
     strategy:
       matrix:
         node:
@@ -18,6 +38,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
+
     env:
       MAC_SHOULD_CODE_SIGN: ${{ github.event_name != 'pull_request' && secrets.APPLE_ID != '' }}
       WIN_CERTIFICATE_BASE64: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
@@ -28,8 +49,17 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
+      - name: Get PR Branch
+        if: github.event_name == 'issue_comment'
+        id: comment-branch
+        uses: xt0rted/pull-request-comment-branch@v1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.comment-branch.outputs.ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -160,35 +190,37 @@ jobs:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
 
-  cache-package-info:
+  comment_when_package_success:
     needs: [packaging]
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Save PR number and run id
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-          RUN_ID: ${{ github.run_id }}
-          SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          mkdir -p ./package_info
-          echo $PR_NUMBER > ./package_info/pr_number
-          echo $RUN_ID > ./package_info/run_id
-          echo $SHA > ./package_info/sha
-      - uses: actions/upload-artifact@v3
-        with:
-          name: package_info
-          path: package_info/
-          retention-days: 3
-  comment:
-    needs: [packaging]
-    # During a pull_request event triggered by a forked repository, actions have no write access to GitHub resources and will fail on any attempt.
-    # ref https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#restrictions-on-repository-forks
-    if: ${{ github.event_name == 'push' }}
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/commit-comment@v2
+      - name: Comment by push event
+        if: ${{ github.event_name == 'push' }}
+        uses: peter-evans/commit-comment@v2
         with:
           body: |
             Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+
+      - name: Comment by pull request comment event
+        if: ${{ github.event_name == 'issue_comment' }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
+          edit-mode: append
+
+  comment_when_package_failed:
+    needs: [packaging]
+    if: ${{ always() && needs.packaging.result == 'failure' }}
+    name: Append failed comment to the comment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment by pull request comment event when package failed
+        if: ${{ github.event_name == 'issue_comment' }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: Packageing failed in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
+          edit-mode: append
