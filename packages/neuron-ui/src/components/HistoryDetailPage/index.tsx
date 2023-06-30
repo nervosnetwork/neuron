@@ -167,13 +167,7 @@ const HistoryDetailPage = () => {
     title: string
     dataIndex: string
     isBalance?: boolean
-    render?: (
-      v: any,
-      idx: number,
-      item: InputOrOutputType,
-      showBalance: boolean,
-      expandedRow: number | null
-    ) => React.ReactNode
+    render?: (v: any, idx: number, item: InputOrOutputType, showBalance: boolean) => React.ReactNode
     width?: string
     align?: 'left' | 'right' | 'center'
   }[] = [
@@ -194,7 +188,7 @@ const HistoryDetailPage = () => {
         const { address } = handleListData(item)
         return (
           <>
-            <CopyZone content={address} name={t('history.copy-address')} className={styles.address}>
+            <CopyZone content={address} className={styles.address}>
               {`${address.slice(0, 20)}...${address.slice(-20)}`}
             </CopyZone>
             <ScriptTag isMainnet={isMainnet} script={item.lock} onClick={() => setLockInfo(item.lock)} />
@@ -209,13 +203,7 @@ const HistoryDetailPage = () => {
       isBalance: true,
       render(_, __, item, show: boolean) {
         const { capacity } = handleListData(item)
-        return show ? (
-          <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
-            {`${capacity} CKB`}
-          </CopyZone>
-        ) : (
-          HIDE_BALANCE
-        )
+        return show ? <CopyZone content={capacity.replace(/,/g, '')}>{`${capacity} CKB`}</CopyZone> : HIDE_BALANCE
       },
     },
   ]
