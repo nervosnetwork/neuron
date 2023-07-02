@@ -11,7 +11,7 @@ export type TableProps<T> = {
     dataIndex: string
     key?: string
     isBalance?: boolean
-    render?: (v: any, idx: number, item: T, showBalance: boolean, expandedRow: number | null) => React.ReactNode
+    render?: (v: any, idx: number, item: T, showBalance: boolean) => React.ReactNode
     width?: string
     minWidth?: string
     align?: 'left' | 'right' | 'center'
@@ -23,9 +23,11 @@ export type TableProps<T> = {
   dataSource: T[]
   noDataContent?: string
   onRowDoubleClick?: (e: React.SyntheticEvent, item: T, idx: number) => void
+  onRowClick?: (e: React.SyntheticEvent, item: T, idx: number) => void
   className?: string
   isFixedTable?: boolean
   rowExtendRender?: (v: T, idx: number) => React.ReactNode
+  expandedRow?: number | null
 }
 
 const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
@@ -35,20 +37,20 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     dataSource,
     noDataContent,
     onRowDoubleClick,
+    onRowClick,
     dataKey,
     className = '',
     isFixedTable,
     rowExtendRender,
+    expandedRow,
   } = props
   const [showBalance, setShowBalance] = useState(true)
   const onClickBalanceIcon = useCallback(() => {
     setShowBalance(v => !v)
   }, [setShowBalance])
 
-  const [expandedRow, setExpandedRow] = useState<number | null>(null)
-
-  const handleRowClick = (index: number) => {
-    setExpandedRow(prevIndex => (prevIndex === index ? null : index))
+  const handleRowClick = (e: React.SyntheticEvent, item: T, idx: number) => {
+    onRowClick?.(e, item, idx)
   }
 
   const columnList = useMemo(() => columns.filter(item => !item.hidden), [columns])
@@ -98,7 +100,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
               <>
                 <tr
                   onDoubleClick={onRowDoubleClick ? e => onRowDoubleClick(e, item, idx) : undefined}
-                  onClick={() => handleRowClick(idx)}
+                  onClick={e => handleRowClick(e, item, idx)}
                   key={dataKey ? item[dataKey] : idx}
                   className={styles.trClassName}
                   data-idx={idx}
@@ -109,7 +111,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                       key={key ?? dataIndex}
                       className={`${tdClassName ?? bodyTdClassName} ${expandedRow === idx ? styles.noBorder : ''}`}
                     >
-                      {render ? render(item[dataIndex], idx, item, showBalance, expandedRow) : item[dataIndex]}
+                      {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
                     </td>
                   ))}
                 </tr>

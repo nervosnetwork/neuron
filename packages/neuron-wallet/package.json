@@ -68,7 +68,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@electron/notarize": "1.2.4",
+    "@electron/notarize": "2.0.0",
     "@nervosnetwork/ckb-types": "0.109.0",
     "@types/archiver": "3.1.1",
     "@types/async": "3.2.20",
