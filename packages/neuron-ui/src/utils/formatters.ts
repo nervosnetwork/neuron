@@ -314,7 +314,7 @@ export const bytesFormatter = (bytes: number, decimals = 1) => {
     ++i
   }
 
-  return `${i ? value.toFixed(decimals) : value} ${['Bytes', 'KB', 'MB', 'GB'][i]}`
+  return `${i ? value.toFixed(decimals) : value} ${['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'][i]}`
 }
 
 export const padFractionDigitsIfDecimal = (num: string | number, minimumFractionDigits: number): string => {
