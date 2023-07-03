@@ -1,11 +1,19 @@
 @import '../../styles/mixin.scss';
 
+.contentClassName {
+  padding: unset;
+
+  svg {
+    top: unset;
+  }
+}
+
 .container {
   width: 680px;
 }
 
 .info {
-  margin: 0px auto 16px;
+  margin: 16px auto;
   min-width: 264px;
   background: var(--table-head-background-color);
   display: flex;
@@ -34,10 +42,11 @@
   }
 }
 
-.notation {
+.notification {
   font-weight: 500;
   font-size: 12px;
-  line-height: 24px;
+  line-height: 32px;
+  height: 32px;
   text-align: center;
   color: var(--notice-text-color);
   display: flex;
@@ -45,6 +54,8 @@
   align-items: center;
   word-break: break-word;
   margin: 0;
+  background-color: var(--warn-background-color);
+
   svg {
     margin-right: 4px;
     flex-shrink: 0;
@@ -62,33 +73,13 @@
 
 .copyContainer {
   text-align: center;
-  .copyAddress {
-    width: 450px;
-    margin: 16px 0;
-    word-break: break-all;
-    text-align: center;
-    line-height: 24px;
-    font-family: 'JetBrains Mono';
-    color: var(--main-text-color);
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 16px;
 
-    .addressToggle {
-      margin: 0 0 0 4px;
-      padding: 0;
-      vertical-align: sub;
-      appearance: none;
-      border: none;
-      background: none;
-      padding-right: 20px;
-      svg {
-        pointer-events: none;
-      }
-
-      &:hover {
-        & + div {
-          display: none;
-        }
-      }
-    }
+  .copyTransformWrapper {
+    width: 452px;
   }
 }
 
