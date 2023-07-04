@@ -113,6 +113,7 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
 
       - name: Package for MacOS for skip code sign
         if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'false' }}
