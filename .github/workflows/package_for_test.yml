@@ -49,17 +49,23 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
+      - name: Checkout for push
+        uses: actions/checkout@v3
+        if: ${{ github.event_name == 'push' }}
+
       - name: Get PR Branch
         if: github.event_name == 'issue_comment'
         id: comment-branch
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: yanguoyu/pull-request-comment-branch@v2.1.0-beta
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout
+      - name: Checkout for PR
         uses: actions/checkout@v3
+        if: ${{ github.event_name == 'issue_comment' }}
         with:
-          ref: ${{ steps.comment-branch.outputs.ref }}
+          repository: ${{ steps.comment-branch.outputs.head_owner }}/${{ steps.comment-branch.outputs.head_repo }}
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
