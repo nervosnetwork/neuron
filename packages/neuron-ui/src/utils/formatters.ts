@@ -305,6 +305,18 @@ export const errorFormatter = (error: string | FailureFromController['message'],
   return error.content || unknownError
 }
 
+export const bytesFormatter = (bytes: number, decimals = 1) => {
+  let i = 0
+  let value = bytes
+
+  while (value > 1023) {
+    value /= 1024
+    ++i
+  }
+
+  return `${i ? value.toFixed(decimals) : value} ${['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'][i]}`
+}
+
 export const padFractionDigitsIfDecimal = (num: string | number, minimumFractionDigits: number): string => {
   const numText = num.toString()
   const isDecimal = numText.includes('.')

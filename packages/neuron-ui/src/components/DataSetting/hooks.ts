@@ -18,6 +18,8 @@ export const useDataPath = () => {
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [faidMessage, setFaidMessage] = useState('')
+
   useDidMount(() => {
     getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res)) {
@@ -49,6 +51,7 @@ export const useDataPath = () => {
   }, [setIsDialogOpen, type])
   const onConfirm = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      setFaidMessage('')
       const { dataset } = e.currentTarget
       setIsSaving(true)
       setSavingType(dataset.syncType)
@@ -60,6 +63,8 @@ export const useDataPath = () => {
           if (isSuccessResponse(res)) {
             setPrevPath(currentPath)
             setIsDialogOpen(false)
+          } else {
+            setFaidMessage(typeof res.message === 'string' ? res.message : res.message.content!)
           }
         })
         .finally(() => {
@@ -78,6 +83,8 @@ export const useDataPath = () => {
     isSaving,
     savingType,
     isDialogOpen,
+    faidMessage,
+    setFaidMessage,
   }
 }
 

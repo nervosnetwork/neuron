@@ -93,7 +93,9 @@ type Action =
   | 'delete-network'
   // Updater
   | 'check-for-updates'
+  | 'cancel-check-updates'
   | 'download-update'
+  | 'cancel-download-update'
   | 'quit-and-install-update'
   // Settings
   | 'clear-cache'

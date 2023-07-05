@@ -34,8 +34,8 @@ const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '', class
   return (
     <div className={className}>
       {options.map(item => (
-        <div>
-          <div className={`${styles.item} ${itemClassName}`} key={item.value}>
+        <div key={item.value}>
+          <div className={`${styles.item} ${itemClassName}`}>
             <label htmlFor={item.value}>
               <input
                 id={item.value}

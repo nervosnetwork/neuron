@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react'
+import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
 import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
 import { useDispatch, useState as useGlobalState } from 'states'
 import { shell } from 'electron'
-import Spinner from 'widgets/Spinner'
 import { getIsCkbRunExternal } from 'services/remote'
 import { isSuccessResponse } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
+import AlertDialog from 'widgets/AlertDialog'
 import { LIGHT_NETWORK_TYPE } from 'utils/const'
 import { useDataPath } from './hooks'
 
@@ -42,7 +42,20 @@ const PathItem = ({
 const DataSetting = () => {
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const { onSetting, prevPath, currentPath, isDialogOpen, onCancel, onConfirm, isSaving, savingType } = useDataPath()
+  const {
+    onSetting,
+    prevPath,
+    currentPath,
+    isDialogOpen,
+    onCancel,
+    onConfirm,
+    isSaving,
+    savingType,
+    faidMessage,
+    setFaidMessage,
+  } = useDataPath()
+
+  const resyncRef = useRef<HTMLButtonElement | null>(null)
 
   const openPath = useCallback(() => {
     if (prevPath) {
@@ -71,15 +84,25 @@ const DataSetting = () => {
     <>
       <div className={styles.root}>
         <div className={styles.leftContainer}>
-          <div className={styles.label}>
-            <div>{t('settings.data.ckb-node-data')}</div>
-            <Tooltip tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>} showTriangle>
-              <AttentionOutline />
-            </Tooltip>
-          </div>
+          {isLightClient ? null : (
+            <div className={styles.label}>
+              <div>{t('settings.data.ckb-node-data')}</div>
+              <Tooltip
+                placement="top"
+                tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>}
+                showTriangle
+              >
+                <AttentionOutline />
+              </Tooltip>
+            </div>
+          )}
           <div className={styles.label}>
             <div>{t('settings.data.cache')}</div>
-            <Tooltip tip={<p className={styles.tooltip}>{t('settings.data.clear-cache-description')}</p>} showTriangle>
+            <Tooltip
+              placement="top"
+              tip={<p className={styles.tooltip}>{t('settings.data.clear-cache-description')}</p>}
+              showTriangle
+            >
               <AttentionOutline />
             </Tooltip>
           </div>
@@ -107,6 +130,7 @@ const DataSetting = () => {
 
           <div className={styles.footer}>
             <Button
+              ref={resyncRef}
               disabled={isSaving}
               className={styles.footerBtn}
               data-sync-type="resync"
@@ -114,13 +138,8 @@ const DataSetting = () => {
               label={t('settings.data.re-sync')}
               type="primary"
               onClick={onConfirm}
-            >
-              {isSaving && savingType === 'resync' ? (
-                <Spinner label={t('settings.data.re-sync')} labelPosition="right" />
-              ) : (
-                t('settings.data.re-sync')
-              )}
-            </Button>
+              loading={isSaving && savingType === 'resync'}
+            />
 
             <Button
               disabled={isSaving}
@@ -129,16 +148,22 @@ const DataSetting = () => {
               label={t('settings.data.move-data-finish')}
               type="primary"
               onClick={onConfirm}
-            >
-              {isSaving && savingType === 'move' ? (
-                <Spinner label={t('settings.data.move-data-finish')} labelPosition="right" />
-              ) : (
-                t('settings.data.move-data-finish')
-              )}
-            </Button>
+              loading={isSaving && savingType === 'move'}
+            />
           </div>
         </div>
       </Dialog>
+
+      <AlertDialog
+        show={!!faidMessage}
+        title={t('settings.data.ckb-node-data')}
+        message={faidMessage}
+        type="warning"
+        onCancel={() => setFaidMessage('')}
+        onOk={() => {
+          resyncRef?.current?.click()
+        }}
+      />
     </>
   )
 }

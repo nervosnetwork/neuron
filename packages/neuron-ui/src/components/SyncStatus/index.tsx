@@ -73,11 +73,11 @@ const SyncStatus = ({
   }
 
   if (ConnectionStatus.Offline === connectionStatus) {
-    return <span style={{ color: '#FF1E1E' }}>{t('sync.sync-failed')}</span>
+    return <span className={styles.redDot}>{t('sync.sync-failed')}</span>
   }
 
   if (SyncStatusEnum.SyncNotStart === syncStatus) {
-    return <span style={{ color: '#FF1E1E' }}>{t('navbar.sync-not-start')}</span>
+    return <span className={styles.redDot}>{t('navbar.sync-not-start')}</span>
   }
 
   if (SyncStatusEnum.SyncPending === syncStatus) {

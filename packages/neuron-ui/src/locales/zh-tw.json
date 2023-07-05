@@ -203,6 +203,7 @@
     },
     "send": {
       "address": "收款地址",
+      "input-address": "請輸入收款地址",
       "amount": "转账金額（CKB）",
       "send": "發送",
       "reset": "重置",
@@ -213,7 +214,7 @@
       "scan-to-get-address": "掃描二維碼以獲取地址",
       "total-amount": "總金額（CKB）",
       "description": "備註",
-      "description-optional": "備註(選填)",
+      "description-optional": "請輸入轉賬備註，選填",
       "balance": "餘額",
       "add-one": "添加",
       "remove-this": "删除",
@@ -365,6 +366,7 @@
           "confirm-password": "確認密碼",
           "edit-wallet": "編輯錢包"
         },
+        "edit-success": "已更新錢包信息",
         "delete-wallet-title": "請輸入 {{name}} 的密碼",
         "password": "密碼",
         "wallet-detail": {
@@ -375,11 +377,16 @@
         "online": "線上",
         "offline": "離線",
         "add-network": "添加網路",
+        "remove-network": "刪除網絡",
+        "remove-network-msg": "確定要刪除所選網絡？",
         "edit-network": {
-          "title": "添加或編輯網路",
+          "title": "編輯網路",
           "rpc-url": "RPC地址",
-          "name": "網路名稱"
+          "name": "網路名稱",
+          "input-rpc": "請輸入RPC地址",
+          "input-network": "請輸入網絡名稱"
         },
+        "edit-success": "編輯網絡成功",
         "mainnet": "主網",
         "testnet": "測試網",
         "devnet": "開發網"
@@ -413,9 +420,11 @@
         "cache-cleared-on": "上次清理緩存時間 {{date}}",
         "clear-cache": "清理緩存",
         "clearing-cache": "正在清除緩存中，請稍候",
+        "clear-success": "已清除緩存",
         "set-path": "設置路徑",
         "remove-ckb-data-tip": "請將 CKB Node 數據從 【{{prevPath}}】 移動至 【{{currentPath}}】 然後點擊 \"數據轉移完成\" 開始從已知區塊同步; 或者點擊 \"重新同步\" 開始重新同步.",
         "cancel": "取消",
+        "confirm-clear": "確定清除",
         "resync-ckb-node-describe": "註意: 重新同步不會刪除當前已同步的 CKB Node 數據",
         "move-data-finish": "數據轉移完成",
         "re-sync": "重新同步",
@@ -425,7 +434,8 @@
     },
     "password-request": {
       "wallet-not-found": "找不到該錢包",
-      "password": "密碼",
+      "password": "輸入密碼",
+      "placeholder": "請輸入錢包密碼",
       "send": {
         "title": "發起交易"
       },
@@ -701,9 +711,9 @@
       "checking-updates": "正在檢查更新…",
       "update-available": "檢測到新版本",
       "downloading-update": "正在下載更新…",
-      "update-not-available": "已經在使用最新版本",
+      "update-not-available": "當前是最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載",
-      "download-update": "下載安裝",
+      "install-update": "安裝更新",
       "updates-downloaded-about-to-quit-and-install": "下載完成。請安裝新版本。",
       "quit-and-install": "安裝並重啓應用"
     },
@@ -817,14 +827,17 @@
       "cancel": "取消",
       "sign": "簽名",
       "verify": "驗證",
-      "password": "密碼",
+      "password": "輸入密碼",
       "confirm": "確認",
       "verification-success": "驗證成功",
       "verification-failure": "驗證失敗",
       "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。",
       "sign-with-magic-byte": "信息會和 magic bytes 'Nervos Message:' 一起簽名",
       "verify-tip": "可以通過 v0.33.1 及以後的 Neuron 進行驗證",
-      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本簽名"
+      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本簽名",
+      "input-message": "請輸入信息",
+      "input-choose-address": "請輸入或選擇地址",
+      "input-password": "請輸入錢包密碼"
     },
     "special-assets": {
       "title": "自定義資產",
