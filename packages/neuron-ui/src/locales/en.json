@@ -130,19 +130,11 @@
       "status": "Status",
       "amount": "Amount",
       "address": "Address",
-      "confirmation": "{{confirmationCount}} Confirmation",
-      "confirmations": "{{confirmationCount}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
       "receiving": "Receiving",
       "more": "More",
-      "statusLabel": {
-        "success": "Success",
-        "failed": "Failed",
-        "pending": "Pending",
-        "confirming": "Confirming"
-      },
       "copy-balance": "Copy Balance",
       "create": "Create {{name}} Asset Account",
       "destroy": "Destroy {{name}} Asset Account",
@@ -257,6 +249,14 @@
       "save-qr-code": "Download",
       "copy-qr-code": "Copy"
     },
+    "transaction-status": {
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "confirming": "Confirming"
+    },
+    "confirmationsCount_one": "{{count}} Confirmation",
+    "confirmationsCount_other": "{{count}} Confirmations",
     "history": {
       "title": "History",
       "title-detail": "History Detail",
@@ -278,10 +278,6 @@
       "last": "Last",
       "description": "Description",
       "status": "Status",
-      "pending": "Pending",
-      "success": "Success",
-      "failed": "Failed",
-      "confirming": "Confirming",
       "blockNumber": "Block Number",
       "basic-information": "Basic Information",
       "search": {
@@ -297,7 +293,7 @@
         "operation": "Operation"
       },
       "export-history": "Export Transaction History",
-      "confirmations": "Confirmations",
+      "confirmationTimes": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
       "no-txs": "No Transaction History",

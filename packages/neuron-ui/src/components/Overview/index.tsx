@@ -4,26 +4,17 @@ import { Trans, useTranslation } from 'react-i18next'
 import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 
-import {
-  localNumberFormatter,
-  shannonToCKBFormatter,
-  uniformTimeFormatter,
-  sudtValueToAmount,
-  sUDTAmountFormatter,
-  backToTop,
-  CONSTANTS,
-  RoutePath,
-  nftFormatter,
-  useFirstLoadApp,
-} from 'utils'
+import { shannonToCKBFormatter, uniformTimeFormatter, backToTop, CONSTANTS, RoutePath, useFirstLoadApp } from 'utils'
 
-import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
+import { UANTokenName } from 'components/UANDisplay'
 import PageContainer from 'components/PageContainer'
+import TransactionStatusWrap from 'components/TransactionStatusWrap'
+import FormattedTokenAmount from 'components/FormattedTokenAmount'
 import Table from 'widgets/Table'
 import { ReactComponent as Send } from 'widgets/Icons/OverviewSend.svg'
 import { ReactComponent as Receive } from 'widgets/Icons/OverviewReceive.svg'
 import { ReactComponent as BalanceRight } from 'widgets/Icons/BalanceRight.svg'
-import { ArrowOpenRight, Confirming, PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { ArrowOpenRight, PasswordHide, PasswordShow } from 'widgets/Icons/icon'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
@@ -69,69 +60,22 @@ const TransactionStatus = ({
   cacheTipBlockNumber: number
   bestKnownBlockNumber: number
 }) => {
-  const [t] = useTranslation()
-  let confirmations = ''
+  let confirmationCount
   let { status } = item
+
   if (item.blockNumber !== undefined) {
-    const confirmationCount =
+    confirmationCount =
       item.blockNumber === null || item.status === 'failed'
         ? 0
         : 1 + Math.max(cacheTipBlockNumber, bestKnownBlockNumber) - +item.blockNumber
 
-    if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
-      status = 'confirming'
-
-      if (confirmationCount === 1) {
-        confirmations = t('overview.confirmation', {
-          confirmationCount: localNumberFormatter(confirmationCount),
-        })
-      } else if (confirmationCount > 1) {
-        confirmations = `${t('overview.confirmations', {
-          confirmationCount: localNumberFormatter(confirmationCount),
-        })}`
-      }
-    }
+    status = item.status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD ? 'confirming' : item.status
   }
+
   return (
     <div className={styles.txStatus} data-status={status}>
-      {status === 'confirming' ? <Confirming className={styles.confirming} /> : null}
-      <span>{t(`overview.statusLabel.${status}`)}</span>
-      {confirmations ? <span className={styles.confirmText}>{confirmations}</span> : null}
+      <TransactionStatusWrap status={status} confirmationCount={confirmationCount} />
     </div>
-  )
-}
-
-const Amount = ({ item, show }: { item: State.Transaction; show: boolean }) => {
-  let amount = '--'
-  let sudtAmount = ''
-  let isReceive = false
-
-  if (item.blockNumber !== undefined) {
-    if (item.nftInfo) {
-      // NFT
-      const { type, data } = item.nftInfo
-      amount = show ? `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}` : `${HIDE_BALANCE}mNFT`
-      isReceive = type === 'receive'
-    } else if (item.sudtInfo?.sUDT) {
-      if (item.sudtInfo.sUDT.decimal) {
-        sudtAmount = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
-      }
-    } else {
-      amount = show ? `${shannonToCKBFormatter(item.value, true)} CKB` : `${HIDE_BALANCE} CKB`
-      isReceive = !amount.includes('-')
-    }
-  }
-  return sudtAmount ? (
-    <>
-      {show ? sudtAmount : HIDE_BALANCE}&nbsp;
-      <UANTonkenSymbol
-        className={styles.symbol}
-        name={item.sudtInfo!.sUDT.tokenName}
-        symbol={item.sudtInfo!.sUDT.symbol}
-      />
-    </>
-  ) : (
-    <span className={show && isReceive ? styles.isReceive : ''}>{amount}</span>
   )
 }
 
@@ -320,7 +264,7 @@ const Overview = () => {
             isBalance: true,
             minWidth: '300px',
             render(_, __, item, show) {
-              return <Amount item={item} show={show} />
+              return <FormattedTokenAmount item={item} show={show} />
             },
           },
           {

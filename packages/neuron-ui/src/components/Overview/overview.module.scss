@@ -88,16 +88,6 @@
   position: relative;
   align-items: center;
 
-  .confirming {
-    @include infinite-rotation;
-  }
-
-  .confirmText {
-    color: #999;
-    font-size: 12px;
-    margin-left: 4px;
-  }
-
   & > svg {
     margin-right: 4px;
   }
@@ -154,8 +144,4 @@
       margin-left: 4px;
     }
   }
-}
-
-.isReceive {
-  color: $main-color;
 }

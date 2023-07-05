@@ -134,7 +134,7 @@ const TransactionList = ({
         if (status === 'success' && confirmations < CONFIRMATION_THRESHOLD) {
           status = 'confirming'
         }
-        const statusLabel = t(`history.${status}`)
+        const statusLabel = t(`transaction-status.${status}`)
         const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
 
         let name = '--'
@@ -236,7 +236,7 @@ const TransactionList = ({
                 <span>{statusLabel}</span>
               </div>
               <div>
-                <span>{t('history.confirmations')}</span>
+                <span>{t('history.confirmationTimes')}</span>
                 {confirmations >= 0 && (status === 'success' || status === 'confirming') ? (
                   <span className={styles.confirmations} title={confirmationsLabel}>
                     {confirmationsLabel}

@@ -3,6 +3,7 @@
 .tokenName {
   @include tooltip;
   white-space: nowrap;
+  display: inline-flex;
 
   & > span {
     @include text-overflow-ellipsis;
@@ -13,6 +14,7 @@
 .tokenSymbol {
   @include tooltip;
   white-space: nowrap;
+  display: inline-flex;
 
   & > span {
     @include text-overflow-ellipsis;
