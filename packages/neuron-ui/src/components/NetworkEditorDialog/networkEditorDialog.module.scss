@@ -1,5 +1,9 @@
 @import '../../styles/mixin.scss';
 
+.container {
+  width: 648px;
+}
+
 .actions {
   @include form-footer;
 }

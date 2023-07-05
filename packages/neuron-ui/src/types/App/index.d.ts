@@ -264,11 +264,21 @@ declare namespace State {
     records: NervosDAORecord[]
   }
 
+  interface ProgressInfo {
+    total: number
+    transferred: number
+    percent: number
+  }
+
   interface AppUpdater {
     checking: boolean
+    isUpdated: boolean
     downloadProgress: number
+    progressInfo: null | ProgressInfo
     version: string
+    releaseDate: string
     releaseNotes: string
+    errorMsg: string
   }
 
   interface AppWithNeuronWallet {

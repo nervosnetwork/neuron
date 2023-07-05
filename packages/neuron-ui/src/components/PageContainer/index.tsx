@@ -110,7 +110,11 @@ const PageContainer: React.FC<ComponentProps> = props => {
         {head}
         <div className={styles.rightContent}>
           <Tooltip tip={t(theme === 'dark' ? 'common.switch-to-light' : 'common.switch-to-dark')} showTriangle>
-            {theme === 'dark' ? <Sun onClick={onSetTheme} /> : <Moon onClick={onSetTheme} />}
+            {theme === 'dark' ? (
+              <Moon className={styles.strokeSvg} onClick={onSetTheme} />
+            ) : (
+              <Sun className={styles.fillSvg} onClick={onSetTheme} />
+            )}
           </Tooltip>
           <span className={styles.network}>
             {network ? (

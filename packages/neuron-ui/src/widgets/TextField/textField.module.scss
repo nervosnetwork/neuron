@@ -43,7 +43,7 @@
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
     width: 100%;
-    height: 56px;
+    min-height: 56px;
     padding: 0 16px;
 
     @media (prefers-color-scheme: dark) {

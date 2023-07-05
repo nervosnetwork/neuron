@@ -1,0 +1,6 @@
+[
+  { "difficulty": 245, "expected": "245 Bytes" },
+  { "difficulty": 8379, "expected": "8.2 KB" },
+  { "difficulty": 29243453, "expected": "27.9 MB" },
+  { "difficulty": 3069243453, "expected": "2.9 GB" }
+]

@@ -17,11 +17,11 @@ import NetworkSetting from 'components/NetworkSetting'
 import DataSetting from 'components/DataSetting'
 import styles from './settings.module.scss'
 
-const items = [
-  ['wallets', WalletSetting],
-  ['general', GeneralSetting],
-  ['network', NetworkSetting],
-  ['data', DataSetting],
+const items: [string, string, React.FC<any>][] = [
+  ['wallets', '12px', WalletSetting],
+  ['general', '-2px', GeneralSetting],
+  ['network', '12px', NetworkSetting],
+  ['data', '9px', DataSetting],
 ]
 
 const Settings = () => {
@@ -120,9 +120,11 @@ const Settings = () => {
   return (
     <PageContainer head={t('navbar.settings')}>
       <div className={styles.container}>
-        {items.map(([title, ItemCmp]) => (
-          <div className={styles.item} key={title as string}>
-            <div className={styles.title}>{t(`settings.setting-tabs.${title}`)}</div>
+        {items.map(([title, marginTop, ItemCmp]) => (
+          <div className={styles.item} key={title}>
+            <div className={styles.title} style={{ marginTop }}>
+              {t(`settings.setting-tabs.${title}`)}
+            </div>
             <div className={styles.content}>
               <ItemCmp {...globalState} dispatch={dispatch} />
             </div>

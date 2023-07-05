@@ -15,6 +15,7 @@
     .selectDevice {
       display: flex;
       flex-direction: column;
+      width: 480px;
 
       input {
         text-align: left;
@@ -28,11 +29,11 @@
       color: var(--notice-text-color);
       display: flex;
       align-items: center;
-        & > svg {
-          width: 16px;
-          height: 16px;
-          margin-right: 8px;
-        }
+      & > svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+      }
     }
 
     .action {
@@ -44,7 +45,7 @@
         color: var(--main-text-color);
       }
 
-      +.footer {
+      + .footer {
         justify-content: center;
       }
 
@@ -99,6 +100,15 @@
   }
 }
 
+.info {
+  svg {
+    g,
+    path {
+      fill: var(--secondary-text-color);
+    }
+  }
+}
+
 .errorInfo,
 .info {
   font-size: 14px;
@@ -116,7 +126,7 @@
 
   .error {
     color: var(--error-color);
-    word-wrap:break-word;
+    word-wrap: break-word;
   }
 }
 

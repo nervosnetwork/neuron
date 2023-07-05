@@ -7,6 +7,7 @@ import Dialog from 'widgets/Dialog'
 import { useState as useGlobalState, useDispatch } from 'states'
 
 import { RoutePath, ErrorCode } from 'utils'
+import styles from './walletEditorDialog.module.scss'
 
 import { useHint, useOnSubmit, useInputs, useWalletEditor } from './hooks'
 
@@ -22,7 +23,17 @@ const WalletNotFound = () => {
   )
 }
 
-const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: () => void; id: string }) => {
+const WalletEditorDialog = ({
+  show,
+  onCancel,
+  onSuccess,
+  id,
+}: {
+  show: boolean
+  onCancel: () => void
+  onSuccess: () => void
+  id: string
+}) => {
   const {
     settings: { wallets = [] },
   } = useGlobalState()
@@ -42,7 +53,7 @@ const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: (
   const hint = useHint(editor.name.value, usedNames, t)
   const disabled = hint !== null || editor.name.value === wallet.name
 
-  const onSubmit = useOnSubmit(editor.name.value, wallet.id, dispatch, disabled, onCancel)
+  const onSubmit = useOnSubmit(editor.name.value, wallet.id, dispatch, disabled, onSuccess)
 
   return (
     <Dialog
@@ -55,7 +66,7 @@ const WalletEditorDialog = ({ show, onCancel, id }: { show: boolean; onCancel: (
     >
       <>
         {wallet.id ? (
-          <div>
+          <div className={styles.content}>
             {inputs.map(item => (
               <TextField key={item.label} {...item} field={item.label} error={hint} autoFocus />
             ))}

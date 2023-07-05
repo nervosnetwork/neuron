@@ -73,7 +73,7 @@ export default class MultisigController {
     await this.#multisigService.deleteConfig(id)
     return {
       status: ResponseCode.Success,
-      result: true
+      result: true,
     }
   }
 
@@ -128,8 +128,8 @@ export default class MultisigController {
         message: t('multisig-config.import-result', {
           success: saveSuccessConfigs.length,
           fail: savedResult.length - saveSuccessConfigs.length,
-          failCheck: savedResult.length > saveSuccessConfigs.length ? t('multisig-config.import-duplicate') : undefined
-        })
+          failCheck: savedResult.length > saveSuccessConfigs.length ? t('multisig-config.import-duplicate') : undefined,
+        }),
       })
       return {
         status: ResponseCode.Success,
@@ -199,7 +199,7 @@ export default class MultisigController {
     const result = await OfflineSignService.loadTransactionJSON()
     if (!result) {
       return {
-        status: ResponseCode.Fail
+        status: ResponseCode.Fail,
       }
     }
     const tx = result.json

@@ -209,6 +209,7 @@ const ImportKeystore = () => {
               disabled={key === 'path' && openingFile}
               value={value}
               error={fields[`${key}Error` as keyof KeystoreFields]}
+              errorWithIcon
               onChange={handleChange}
               suffix={
                 key === 'path' ? (

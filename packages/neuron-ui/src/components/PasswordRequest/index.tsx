@@ -406,6 +406,7 @@ const PasswordRequest = () => {
         {currentWallet.isWatchOnly || (
           <TextField
             className={styles.passwordInput}
+            placeholder={t('password-request.placeholder')}
             width="100%"
             label={t('password-request.password')}
             value={password}

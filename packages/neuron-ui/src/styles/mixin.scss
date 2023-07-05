@@ -24,7 +24,7 @@
   border: none;
   border-radius: 16px;
   background-color: var(--secondary-background-color);
-  min-width: 450px;
+  min-width: 360px;
   max-width: 80vw;
   box-sizing: border-box;
 }
@@ -205,6 +205,7 @@
     opacity: 0.5;
   }
   input[type='checkbox']:disabled + span {
+    cursor: not-allowed;
     background: url('../widgets/Icons/CheckboxDisabled.svg') no-repeat left top;
 
     @media (prefers-color-scheme: dark) {

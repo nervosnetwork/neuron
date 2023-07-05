@@ -20,6 +20,7 @@
 }
 
 .passwordDialog {
+  width: 680px;
   .walletName {
     margin: 0 0 16px;
     font-weight: 500;
@@ -59,7 +60,7 @@
 .tips {
   display: flex;
   align-items: center;
-  margin: -6px 0 20px;
+  margin-bottom: 20px;
   color: var(--input-hint-color);
   span {
     margin-right: 4px;
@@ -113,7 +114,6 @@
     .selects {
       position: fixed;
       overflow-x: hidden;
-      margin-top: -8px;
       width: 648px;
       z-index: 1;
       max-height: 228px;
@@ -177,41 +177,6 @@
           color: var(--secondary-text-color);
         }
       }
-    }
-  }
-}
-
-@keyframes notification {
-  0% {
-    top: -50px;
-    left: 0;
-  }
-  100% {
-    top: 12px;
-    left: 0px;
-  }
-}
-
-.successNotification {
-  position: fixed;
-  top: 12px;
-  left: 0;
-  z-index: 1000;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  animation-name: notification;
-  animation-duration: 0.4s;
-  .content {
-    z-index: 1000;
-    padding: 14px 32px;
-    color: var(--primary-color);
-    background: var(--notice-background-color);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    svg {
-      margin-right: 4px;
     }
   }
 }
