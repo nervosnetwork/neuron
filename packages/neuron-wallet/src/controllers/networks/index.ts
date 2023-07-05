@@ -24,7 +24,7 @@ export default class NetworksController {
           await this.connectToNetwork(true)
         } else {
           logger.debug('Network:\tconnection dropped')
-          resetSyncTaskQueue.push(false)
+          resetSyncTaskQueue.asyncPush(false)
         }
       })
 
@@ -100,12 +100,6 @@ export default class NetworksController {
     }
     const currentID = networksService.getCurrentID()
     networksService.delete(id)
-    networksService.delete(id)
-
-    networksService.delete(id)
-
-    this.notifyListChange()
-    this.notifyListChange()
 
     this.notifyListChange()
 

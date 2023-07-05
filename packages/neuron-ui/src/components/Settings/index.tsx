@@ -17,12 +17,12 @@ import NetworkSetting from 'components/NetworkSetting'
 import DataSetting from 'components/DataSetting'
 import styles from './settings.module.scss'
 
-const items = [
+const items: [string, string, React.FC<any>][] = [
   ['wallets', '12px', WalletSetting],
   ['general', '-2px', GeneralSetting],
   ['network', '12px', NetworkSetting],
   ['data', '9px', DataSetting],
-] as [string, string, React.FC<any>][]
+]
 
 const Settings = () => {
   const dispatch = useDispatch()

@@ -22,9 +22,9 @@ export default class UpdateController {
   }
 
   public cancelCheckUpdates() {
-    autoUpdater.removeAllListeners()
     UpdateController.isChecking = false
     this.notify()
+    autoUpdater.removeAllListeners()
   }
 
   public quitAndInstall() {
@@ -35,13 +35,14 @@ export default class UpdateController {
 
   public downloadUpdate() {
     this.notify(0)
+    UpdateController.downCancellationToken = new CancellationToken()
     autoUpdater.downloadUpdate(UpdateController.downCancellationToken)
   }
 
   public cancelDownloadUpdate() {
-    autoUpdater.removeAllListeners()
     UpdateController.downCancellationToken.cancel()
     this.notify()
+    autoUpdater.removeAllListeners()
   }
 
   private bindEvents() {
