@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -74,7 +74,15 @@ const Navbar = () => {
   } = neuronWallet
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
-  const selectedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
+  const [selectedKey, setSelectedKey] = useState<string>()
+  const computedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
+
+  useEffect(() => {
+    if (computedKey) {
+      setSelectedKey(computedKey)
+    }
+  }, [computedKey])
+
   const [menuExpanded, setMenuExpanded] = useState(true)
   const onClickExpand = useCallback(() => {
     setMenuExpanded(v => !v)
