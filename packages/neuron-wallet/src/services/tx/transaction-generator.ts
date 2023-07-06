@@ -711,7 +711,7 @@ export class TransactionGenerator {
 
   public static async generateDestroyAssetAccountTx(
     walletId: string,
-    asssetAccountInputs: Input[],
+    assetAccountInputs: Input[],
     changeBlake160: string,
     isCKBAccount: boolean
   ) {
@@ -719,7 +719,7 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
 
     const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
-    if (asssetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
+    if (assetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
       throw new SudtAcpHaveDataError()
     }
     if (!isCKBAccount) {
@@ -735,13 +735,13 @@ export class TransactionGenerator {
       version: '0',
       headerDeps: [],
       cellDeps,
-      inputs: asssetAccountInputs,
+      inputs: assetAccountInputs,
       outputs: [output],
       outputsData: [output.data],
       witnesses: [],
     })
 
-    let allCapacities = asssetAccountInputs.reduce((a, b) => {
+    let allCapacities = assetAccountInputs.reduce((a, b) => {
       return a + BigInt(b.capacity as string)
     }, BigInt(0))
     tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
