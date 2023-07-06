@@ -1,6 +1,6 @@
 import FileService from '../../services/file'
 import OutPoint from '../../models/chain/out-point'
-import { ScriptHashType } from '../../models/chain/script'
+import { HashType } from '@ckb-lumos/base'
 
 const moduleName = 'cells'
 const fileName = 'meta-info.json'
@@ -8,7 +8,7 @@ const fileName = 'meta-info.json'
 export interface SystemScript {
   codeHash: string
   outPoint: OutPoint
-  hashType: ScriptHashType
+  hashType: HashType
 }
 
 export interface MetaInfo {

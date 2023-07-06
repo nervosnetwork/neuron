@@ -21,6 +21,7 @@ import { AppendScript, BlockTips, Connector } from './connector'
 import LightConnector from './light-connector'
 import { generateRPC } from '../../utils/ckb-rpc'
 import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
+import { utils } from '@ckb-lumos/base'
 
 export default class Queue {
   #lockHashes: string[]
@@ -50,13 +51,13 @@ export default class Queue {
         .map(blake160 => [
           blake160,
           Multisig.hash([blake160]),
-          SystemScriptInfo.generateSecpScript(blake160).computeHash().slice(0, 42),
+          utils.computeScriptHash(SystemScriptInfo.generateSecpScript(blake160)).slice(0, 42),
         ])
         .flat()
     )
     this.#multiSignBlake160s = blake160s.map(blake160 => Multisig.hash([blake160]))
     this.#anyoneCanPayLockHashes = blake160s.map(b =>
-      this.#assetAccountInfo.generateAnyoneCanPayScript(b).computeHash()
+      utils.computeScriptHash(this.#assetAccountInfo.generateAnyoneCanPayScript(b))
     )
   }
 
@@ -217,7 +218,8 @@ export default class Queue {
         input.setInputIndex(inputIndex.toString())
 
         if (
-          previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
+          previousOutput.type &&
+          utils.computeScriptHash(previousOutput.type) === SystemScriptInfo.getInstance().getDaoScriptHash() &&
           previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
         ) {
           const output = tx.outputs![inputIndex]

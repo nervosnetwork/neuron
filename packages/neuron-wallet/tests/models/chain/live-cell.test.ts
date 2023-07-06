@@ -1,6 +1,6 @@
-import Script, { ScriptHashType } from '../../../src/models/chain/script'
+import { HashType } from '@ckb-lumos/base'
 import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
-import LiveCell from "../../../src/models/chain/live-cell"
+import LiveCell from '../../../src/models/chain/live-cell'
 
 describe('LiveCell Test', () => {
   const INITIAL_DATA = {
@@ -9,12 +9,12 @@ describe('LiveCell Test', () => {
     capacity: '0x2',
     lock: {
       codeHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      hashType: ScriptHashType.Data,
+      hashType: 'data' as HashType,
       args: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
     },
     type: {
       codeHash: '0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
-      hashType: ScriptHashType.Data1,
+      hashType: 'data1' as HashType,
       args: '0xdddddddddddddddddddddddddddddddddddddddd',
     },
     data: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
@@ -27,8 +27,8 @@ describe('LiveCell Test', () => {
       INITIAL_DATA.txHash,
       INITIAL_DATA.outputIndex,
       INITIAL_DATA.capacity,
-      new Script(INITIAL_DATA.lock.codeHash, INITIAL_DATA.lock.args, INITIAL_DATA.lock.hashType),
-      new Script(INITIAL_DATA.type.codeHash, INITIAL_DATA.type.args, INITIAL_DATA.type.hashType),
+      INITIAL_DATA.lock,
+      INITIAL_DATA.type,
       INITIAL_DATA.data
     )
   })
@@ -79,7 +79,7 @@ describe('LiveCell Test', () => {
         INITIAL_DATA.txHash,
         INITIAL_DATA.outputIndex,
         INITIAL_DATA.capacity,
-        new Script(INITIAL_DATA.lock.codeHash, INITIAL_DATA.lock.args, INITIAL_DATA.lock.hashType),
+        INITIAL_DATA.lock,
         null,
         INITIAL_DATA.data
       )

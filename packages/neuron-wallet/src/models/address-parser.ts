@@ -1,12 +1,16 @@
-import Script, { ScriptHashType } from './chain/script'
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import SystemScriptInfo from './system-script-info'
+import { Script, utils } from '@ckb-lumos/base'
 
 export default class AddressParser {
   public static parse(address: string): Script {
     try {
       const script = addressToScript(address)
-      return new Script(script.codeHash, script.args, script.hashType as ScriptHashType)
+      return {
+        codeHash: script.codeHash,
+        args: script.args,
+        hashType: script.hashType,
+      }
     } catch {
       throw new Error('Address format error')
     }
@@ -17,7 +21,7 @@ export default class AddressParser {
   }
 
   public static batchToLockHash(addresses: string[]): string[] {
-    return this.batchParse(addresses).map(lock => lock.computeHash())
+    return this.batchParse(addresses).map(lock => utils.computeScriptHash(lock))
   }
 
   public static toBlake160(address: string) {

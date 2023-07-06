@@ -1,12 +1,6 @@
-import Script, { ScriptHashType } from './script'
 import OutPoint from './out-point'
 import { LumosCell } from '../../block-sync-renderer/sync/connector'
-
-const LUMOS_HASH_TYPE_MAP: Record<string, ScriptHashType> = {
-  type: ScriptHashType.Type,
-  data1: ScriptHashType.Data1,
-  data: ScriptHashType.Data,
-}
+import { HashType, Script, utils } from '@ckb-lumos/base'
 
 export default class LiveCell {
   public txHash: string
@@ -26,12 +20,12 @@ export default class LiveCell {
     this.txHash = txHash
     this.outputIndex = BigInt(outputIndex).toString()
     this.capacity = BigInt(capacity).toString()
-    this.lockHash = lock.computeHash()
+    this.lockHash = utils.computeScriptHash(lock)
     this.lockHashType = lock.hashType
     this.lockCodeHash = lock.codeHash
     this.lockArgs = lock.args
     if (type) {
-      this.typeHash = type.computeHash()
+      this.typeHash = utils.computeScriptHash(type)
       this.typeHashType = type.hashType
       this.typeCodeHash = type.codeHash
       this.typeArgs = type.args
@@ -44,34 +38,32 @@ export default class LiveCell {
   }
 
   public lock(): Script {
-    return new Script(this.lockCodeHash, this.lockArgs, this.lockHashType as ScriptHashType)
+    return {
+      codeHash: this.lockCodeHash,
+      args: this.lockArgs,
+      hashType: this.lockHashType as HashType,
+    }
   }
 
   public type(): Script | undefined {
     if (this.typeCodeHash && this.typeArgs && this.typeHashType) {
-      return new Script(this.typeCodeHash, this.typeArgs, this.typeHashType as ScriptHashType)
+      return {
+        codeHash: this.typeCodeHash,
+        args: this.typeArgs,
+        hashType: this.typeHashType as HashType,
+      }
     }
     return undefined
   }
 
   public static fromLumos(cell: LumosCell): LiveCell {
-    const type = cell.cellOutput.type
-      ? new Script(
-          cell.cellOutput.type.codeHash,
-          cell.cellOutput.type.args,
-          LUMOS_HASH_TYPE_MAP[cell.cellOutput.type.hashType] ?? ScriptHashType.Data
-        )
-      : null
+    const type = (cell.cellOutput.type as Script) || null
 
     return new LiveCell(
       cell.outPoint.txHash,
       cell.outPoint.index,
       cell.cellOutput.capacity,
-      new Script(
-        cell.cellOutput.lock.codeHash,
-        cell.cellOutput.lock.args,
-        LUMOS_HASH_TYPE_MAP[cell.cellOutput.lock.hashType] ?? ScriptHashType.Data
-      ),
+      cell.cellOutput.lock as Script,
       type,
       cell.data ? cell.data : '0x'
     )

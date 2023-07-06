@@ -66,7 +66,7 @@ export default class TxAddressFinder {
         }
         if (this.lockHashes.has(output.lockHash!)) {
           if (output.type) {
-            if (output.typeHash === SystemScriptInfo.DAO_SCRIPT_HASH) {
+            if (output.typeHash === SystemScriptInfo.getInstance().getDaoScriptHash()) {
               this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
             }
           }

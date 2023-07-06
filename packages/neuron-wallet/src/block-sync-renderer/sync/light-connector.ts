@@ -171,7 +171,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
           addressMeta.generateLegacyACPLockScript(),
         ]
         return lockScripts.map(v => ({
-          script: v.toSDK(),
+          script: v,
           scriptType: 'lock' as CKBRPC.ScriptType,
           walletId: addressMeta.walletId,
         }))

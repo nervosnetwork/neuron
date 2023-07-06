@@ -3,7 +3,6 @@ import Transaction from '../../src/models/chain/transaction'
 import CellDep from '../../src/models/chain/cell-dep'
 import OutPoint from '../../src/models/chain/out-point'
 import Input from '../../src/models/chain/input'
-import Script from '../../src/models/chain/script'
 import Output from '../../src/models/chain/output'
 import { DEPLOY_KEY } from './keys'
 import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
@@ -19,12 +18,12 @@ const fromTxObject = (tx: any) =>
     inputs: tx.inputs.map((input: any) => {
       const previousOutput = OutPoint.fromObject(input.previousOutput)
       const { since } = input
-      const lock = Script.fromObject(input.lock)
+      const lock = input.lock
       return Input.fromObject({ previousOutput, since, lock })
     }),
     outputs: tx.outputs.map((output: any) => {
       const { capacity, type } = output
-      const lock = Script.fromObject(output.lock)
+      const lock = output.lock
       const outPoint = new OutPoint(output.outPoint.txHash, output.outPoint.index)
       return Output.fromObject({
         capacity,

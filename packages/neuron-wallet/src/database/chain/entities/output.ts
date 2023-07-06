@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import TransactionEntity from './transaction'
-import Script, { ScriptHashType } from '../../../models/chain/script'
 import OutPoint from '../../../models/chain/out-point'
 import OutputModel, { OutputStatus } from '../../../models/chain/output'
+import { HashType, Script } from '@ckb-lumos/base'
 
 @Entity()
 export default class Output extends BaseEntity {
@@ -34,7 +34,7 @@ export default class Output extends BaseEntity {
   @Column({
     type: 'varchar',
   })
-  lockHashType!: ScriptHashType
+  lockHashType!: HashType
 
   @Column({
     type: 'varchar',
@@ -62,7 +62,7 @@ export default class Output extends BaseEntity {
     type: 'varchar',
     nullable: true,
   })
-  typeHashType: ScriptHashType | null = null
+  typeHashType: HashType | null = null
 
   @Column({
     type: 'varchar',
@@ -118,12 +118,20 @@ export default class Output extends BaseEntity {
   }
 
   public lockScript(): Script {
-    return new Script(this.lockCodeHash, this.lockArgs, this.lockHashType)
+    return {
+      codeHash: this.lockCodeHash,
+      args: this.lockArgs,
+      hashType: this.lockHashType as HashType,
+    }
   }
 
   public typeScript(): Script | undefined {
     if (this.typeCodeHash && this.typeArgs && this.typeHashType) {
-      return new Script(this.typeCodeHash, this.typeArgs, this.typeHashType)
+      return {
+        codeHash: this.typeCodeHash,
+        args: this.typeArgs,
+        hashType: this.typeHashType as HashType,
+      }
     }
     return undefined
   }

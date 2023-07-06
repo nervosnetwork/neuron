@@ -18,8 +18,8 @@ import SudtTokenInfoEntity from '../../database/chain/entities/sudt-token-info'
 import exportTransactions from '../../utils/export-history'
 import RpcService from '../rpc-service'
 import NetworksService from '../networks'
-import Script from '../../models/chain/script'
 import Input from '../../models/chain/input'
+import { utils } from '@ckb-lumos/base'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -78,7 +78,7 @@ export class TransactionsService {
     let allTxHashes: string[] = []
 
     if (type === SearchType.Address) {
-      const lockHashToSearch = AddressParser.parse(searchValue).computeHash()
+      const lockHashToSearch = utils.computeScriptHash(AddressParser.parse(searchValue))
       allTxHashes = await connection
         .createQueryRunner()
         .query(
@@ -522,9 +522,9 @@ export class TransactionsService {
       const output = inputTxMap.get(v.previousOutput.txHash)?.outputs?.[+v.previousOutput.index]
       if (!output) return v
       v.setCapacity(output.capacity)
-      v.setLock(Script.fromSDK(output.lock))
+      v.setLock(output.lock)
       if (output.type) {
-        v.setType(Script.fromSDK(output.type))
+        v.setType(output.type)
       }
       return v
     })

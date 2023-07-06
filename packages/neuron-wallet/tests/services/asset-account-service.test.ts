@@ -17,9 +17,9 @@ import { AddressType } from '../../src/models/keys/address'
 import OutPoint from '../../src/models/chain/out-point'
 import { when } from 'jest-when'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import Script from '../../src/models/chain/script'
 import Input from '../../src/models/chain/input'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
+import { Script, utils } from '@ckb-lumos/base'
 
 const stubbedWalletServiceGet = jest.fn()
 const stubbedGenerateClaimChequeTx = jest.fn()
@@ -72,7 +72,7 @@ const generateOutput = (
   outputEntity.lockCodeHash = lockToUse.codeHash
   outputEntity.lockArgs = lockToUse.args
   outputEntity.lockHashType = lockToUse.hashType
-  outputEntity.lockHash = lockToUse.computeHash()
+  outputEntity.lockHash = utils.computeScriptHash(lockToUse)
 
   outputEntity.status = status
   outputEntity.data = customData || '0x'
@@ -82,7 +82,7 @@ const generateOutput = (
     outputEntity.typeCodeHash = type.codeHash
     outputEntity.typeArgs = type.args
     outputEntity.typeHashType = type.hashType
-    outputEntity.typeHash = type.computeHash()
+    outputEntity.typeHash = utils.computeScriptHash(type)
     outputEntity.data = BufferUtils.writeBigUInt128LE(BigInt(tokenAmount))
   }
   const tx = new TransactionEntity()
@@ -770,7 +770,7 @@ describe('AssetAccountService', () => {
   })
 
   describe('checkAndDeleteWhenFork', () => {
-    const anyoneCanPayLockHashes = [assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash()]
+    const anyoneCanPayLockHashes = [utils.computeScriptHash(assetAccountInfo.generateAnyoneCanPayScript(blake160))]
 
     beforeEach(async () => {
       const assetAccounts = [
@@ -1013,8 +1013,8 @@ describe('AssetAccountService', () => {
       const receiverDefaultLockScript = SystemScriptInfo.generateSecpScript(blake160)
       const senderDefaultLockScript = SystemScriptInfo.generateSecpScript('0x' + '1'.repeat(40))
       const chequeLock = assetAccountInfo.generateChequeScript(
-        receiverDefaultLockScript.computeHash(),
-        senderDefaultLockScript.computeHash()
+        utils.computeScriptHash(receiverDefaultLockScript),
+        utils.computeScriptHash(senderDefaultLockScript)
       )
       const output = generateOutput(
         tokenID,

@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
-import Script, { ScriptHashType } from '../../../models/chain/script'
 import OutPoint from '../../../models/chain/out-point'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { OutputStatus } from '../../../models/chain/output'
+import { HashType, Script } from '@ckb-lumos/base'
 
 @Entity()
 export default class MultisigOutput extends BaseEntity {
@@ -39,7 +39,7 @@ export default class MultisigOutput extends BaseEntity {
   @Column({
     type: 'varchar',
   })
-  lockHashType!: ScriptHashType
+  lockHashType!: HashType
 
   @Column({
     type: 'varchar',
@@ -56,7 +56,11 @@ export default class MultisigOutput extends BaseEntity {
   }
 
   public lockScript(): Script {
-    return new Script(this.lockCodeHash, this.lockArgs, this.lockHashType)
+    return {
+      codeHash: this.lockCodeHash,
+      args: this.lockArgs,
+      hashType: this.lockHashType as HashType,
+    }
   }
 
   public static fromIndexer(params: {
@@ -70,7 +74,7 @@ export default class MultisigOutput extends BaseEntity {
     entity.capacity = BigInt(params.output.capacity).toString()
     entity.lockArgs = params.output.lock.args
     entity.lockCodeHash = params.output.lock.code_hash
-    entity.lockHashType = params.output.lock.hash_type as ScriptHashType
+    entity.lockHashType = params.output.lock.hash_type as HashType
     entity.lockHash = scriptToHash({
       args: entity.lockArgs,
       codeHash: entity.lockCodeHash,

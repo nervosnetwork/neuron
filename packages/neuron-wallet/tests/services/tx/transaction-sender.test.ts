@@ -131,7 +131,7 @@ jest.doMock('services/hardware', () => ({
 }))
 
 jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
-  return function() {
+  return function () {
     return {
       calculateDaoMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
     }
@@ -141,13 +141,13 @@ jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
 jest.doMock('utils/ckb-rpc.ts', () => ({
   generateRPC() {
     return {
-      sendTransaction: stubbedSendTransaction
+      sendTransaction: stubbedSendTransaction,
     }
-  }
+  },
 }))
 
 jest.doMock('services/cells', () => ({
-  getLiveCell: stubbedGetLiveCell
+  getLiveCell: stubbedGetLiveCell,
 }))
 
 import Transaction from '../../../src/models/chain/transaction'
@@ -155,7 +155,6 @@ import TxStatus from '../../../src/models/chain/tx-status'
 import CellDep, { DepType } from '../../../src/models/chain/cell-dep'
 import OutPoint from '../../../src/models/chain/out-point'
 import Input from '../../../src/models/chain/input'
-import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Output from '../../../src/models/chain/output'
 import Keystore from '../../../src/models/keys/keystore'
 import { AddressType } from '../../../src/models/keys/address'
@@ -173,12 +172,13 @@ import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multisig'
 import { addressToScript, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { Script, utils } from '@ckb-lumos/base'
 
-const fakeScript = new Script(
-  '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-  '0x36c329ed630d6ce750712a477543672adab57f4c',
-  ScriptHashType.Type
-)
+const fakeScript: Script = {
+  codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+  hashType: 'type',
+  args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+}
 const generateTxWithStatus = (
   id: string,
   block: any,
@@ -331,30 +331,30 @@ describe('TransactionSender Test', () => {
                 index: '0x0',
               }),
               since: '0x0',
-              lock: Script.fromObject({
+              lock: {
                 args: '0x36c329ed630d6ce750712a477543672adab57f4c',
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-                hashType: 'type' as ScriptHashType,
-              }),
+                hashType: 'type',
+              },
             }),
           ],
           outputs: [
             Output.fromObject({
               capacity: '0x174876e800',
-              lock: Script.fromObject({
+              lock: {
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
                 args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-                hashType: 'type' as ScriptHashType,
-              }),
+                hashType: 'type',
+              },
               type: null,
             }),
             Output.fromObject({
               capacity: '0x12319d9962f4',
-              lock: Script.fromObject({
+              lock: {
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
                 args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-                hashType: 'type' as ScriptHashType,
-              }),
+                hashType: 'type',
+              },
               type: null,
             }),
           ],
@@ -392,22 +392,21 @@ describe('TransactionSender Test', () => {
                 index: '0x0',
               }),
               since: '0x2000f00078000002',
-              lock: Script.fromObject({
-                // "args": "0x36c329ed630d6ce750712a477543672adab57f4c",
+              lock: {
                 args: '0x56f281b3d4bb5fc73c751714af0bf78eb8aba0d80200007800f00020',
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-                hashType: 'type' as ScriptHashType,
-              }),
+                hashType: 'type',
+              },
             }),
           ],
           outputs: [
             Output.fromObject({
               capacity: '0xd18c2e2800',
-              lock: Script.fromObject({
+              lock: {
                 codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
                 args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-                hashType: 'type' as ScriptHashType,
-              }),
+                hashType: 'type',
+              },
               type: null,
             }),
           ],
@@ -452,7 +451,10 @@ describe('TransactionSender Test', () => {
         })
         describe('when matched receiver lock hash', () => {
           beforeEach(() => {
-            const chequeLock = assetAccountInfo.generateChequeScript(receiverDefaultLock.computeHash(), '0'.repeat(40))
+            const chequeLock = assetAccountInfo.generateChequeScript(
+              utils.computeScriptHash(receiverDefaultLock),
+              '0'.repeat(40)
+            )
             tx.inputs[0].lock = chequeLock
           })
           it('success', async () => {
@@ -502,7 +504,10 @@ describe('TransactionSender Test', () => {
         })
         describe('when matched sender lock hash', () => {
           beforeEach(() => {
-            const chequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), senderDefaultLock.computeHash())
+            const chequeLock = assetAccountInfo.generateChequeScript(
+              '0'.repeat(40),
+              utils.computeScriptHash(senderDefaultLock)
+            )
             tx.inputs[0].lock = chequeLock
           })
           it('success', async () => {
@@ -817,30 +822,30 @@ describe('TransactionSender Test', () => {
               index: '0x0',
             }),
             since: '0x0',
-            lock: Script.fromObject({
-              args: '',
+            lock: {
+              args: '0x',
               codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            }),
+            },
           }),
         ],
         outputs: [
           Output.fromObject({
             capacity: '0x174876e800',
-            lock: Script.fromObject({
+            lock: {
               codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
               args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-              hashType: 'type' as ScriptHashType,
-            }),
+              hashType: 'type',
+            },
             type: null,
           }),
           Output.fromObject({
             capacity: '0x12319d9962f4',
-            lock: Script.fromObject({
+            lock: {
               codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
               args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-              hashType: 'type' as ScriptHashType,
-            }),
+              hashType: 'type',
+            },
             type: null,
           }),
         ],
@@ -1040,11 +1045,11 @@ describe('TransactionSender Test', () => {
               index: '0x0',
             }),
             since: '0x0',
-            lock: Script.fromObject({
+            lock: {
               args: multiArgs,
               codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
               hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
-            }),
+            },
           })
         )
         tx.witnesses = ['0x', '0x']

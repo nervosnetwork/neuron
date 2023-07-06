@@ -23,9 +23,9 @@ jest.mock('services/wallets', () => ({
     return {
       getCurrent() {
         return jest.fn()
-      }
+      },
     }
-  }
+  },
 }))
 
 jest.mock('../../src/services/multisig')

@@ -1,6 +1,5 @@
 import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import CellDep, { DepType } from '../../../src/models/chain/cell-dep'
-import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
 import WitnessArgs from '../../../src/models/chain/witness-args'
 import OutPoint from '../../../src/models/chain/out-point'
@@ -19,8 +18,16 @@ describe('Transaction', () => {
       Output.fromObject({
         capacity: '1000',
         data: '0x',
-        lock: new Script(hash, '0x', ScriptHashType.Type),
-        type: new Script(hash, '0x00', ScriptHashType.Type),
+        lock: {
+          codeHash: hash,
+          args: '0x',
+          hashType: 'type',
+        },
+        type: {
+          codeHash: hash,
+          args: '0x00',
+          hashType: 'type',
+        },
         outPoint: new OutPoint(hash, '0'),
         status: OutputStatus.Live,
         daoData: '0x',

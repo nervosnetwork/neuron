@@ -1,7 +1,7 @@
 import OutPoint from './out-point'
-import Script from './script'
 import HexUtils from '../../utils/hex'
 import TypeChecker from '../../utils/type-checker'
+import { Script, utils } from '@ckb-lumos/base'
 
 export default class Input {
   public previousOutput: OutPoint | null
@@ -36,11 +36,16 @@ export default class Input {
     this.inputIndex = inputIndex ? (+inputIndex).toString() : undefined
     this.multiSignBlake160 = multiSignBlake160
 
-    this.lockHash = lockHash || this.lock?.computeHash()
-
+    this.lockHash = lockHash
+    if (lock) {
+      this.lockHash = utils.computeScriptHash(lock)
+    }
     this.type = type
-    this.typeHash = typeHash || this.type?.computeHash()
 
+    this.typeHash = typeHash
+    if (type) {
+      this.typeHash = utils.computeScriptHash(type)
+    }
     this.data = data
 
     TypeChecker.hashChecker(this.lockHash, this.typeHash)
@@ -74,11 +79,11 @@ export default class Input {
       previousOutput ? OutPoint.fromObject(previousOutput) : previousOutput,
       since,
       capacity,
-      lock ? Script.fromObject(lock) : lock,
+      lock,
       lockHash,
       inputIndex,
       multiSignBlake160,
-      type ? Script.fromObject(type) : type,
+      type,
       typeHash,
       data
     )
@@ -90,12 +95,12 @@ export default class Input {
 
   public setLock(value: Script) {
     this.lock = value
-    this.lockHash = this.lock.computeHash()
+    this.lockHash = utils.computeScriptHash(value)
   }
 
   public setType(value: Script) {
     this.type = value
-    this.typeHash = this.type.computeHash()
+    this.typeHash = utils.computeScriptHash(value)
   }
 
   public setData(value: string) {

@@ -1,6 +1,7 @@
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { AddressType } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
+import { utils } from '@ckb-lumos/base'
 
 const walletId1 = 'w1'
 const walletId2 = 'w2'
@@ -10,7 +11,7 @@ const alicePublicKeyHash = '0xe2193df51d78411601796b35b17b4f8f2cd85bd0'
 const aliceLockScript = SystemScriptInfo.generateSecpScript(alicePublicKeyHash)
 const alice = {
   lockScript: aliceLockScript,
-  lockHash: aliceLockScript.computeHash(),
+  lockHash: utils.computeScriptHash(aliceLockScript),
   address: scriptToAddress(aliceLockScript, false),
   blake160: aliceLockScript.args,
   walletId: walletId1,
@@ -20,7 +21,7 @@ const bobPublicKeyHash = '0x36c329ed630d6ce750712a477543672adab57f4c'
 const bobLockScript = SystemScriptInfo.generateSecpScript(bobPublicKeyHash)
 const bob = {
   lockScript: bobLockScript,
-  lockHash: bobLockScript.computeHash(),
+  lockHash: utils.computeScriptHash(bobLockScript),
   address: scriptToAddress(bobLockScript, false),
   blake160: bobPublicKeyHash,
   walletId: walletId1,
@@ -30,7 +31,7 @@ const charliePublicKeyHash = '0xe2193df51d78411601796b35b17b4f8f2cd80000'
 const charlieLockScript = SystemScriptInfo.generateSecpScript(charliePublicKeyHash)
 const charlie = {
   lockScript: charlieLockScript,
-  lockHash: charlieLockScript.computeHash(),
+  lockHash: utils.computeScriptHash(charlieLockScript),
   address: scriptToAddress(charlieLockScript, false),
   blake160: charliePublicKeyHash,
   walletId: walletId2,

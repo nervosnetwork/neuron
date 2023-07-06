@@ -6,7 +6,6 @@ import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
 import type { LumosCell, LumosCellQuery } from '../../src/block-sync-renderer/sync/connector'
 import { flushPromises } from '../test-utils'
-import { ScriptHashType } from '../../src/models/chain/script'
 
 const stubbedTipFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
@@ -237,7 +236,10 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
+              expect(txObserver).toHaveBeenCalledWith({
+                txHashes: [fakeTx1.transaction.hash],
+                params: fakeTx1.transaction.blockNumber,
+              })
             })
           })
           describe('when loaded block number is not in order', () => {
@@ -253,7 +255,10 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
+              expect(txObserver).toHaveBeenCalledWith({
+                txHashes: [fakeTx1.transaction.hash],
+                params: fakeTx1.transaction.blockNumber,
+              })
             })
           })
           describe('#notifyCurrentBlockNumberProcessed', () => {
@@ -448,12 +453,12 @@ describe('unit tests for IndexerConnector', () => {
       describe('when success', () => {
         const query: LumosCellQuery = {
           lock: {
-            hashType: ScriptHashType.Data,
+            hashType: 'data',
             codeHash: '0xcode',
             args: '0x',
           },
           type: {
-            hashType: ScriptHashType.Data,
+            hashType: 'data',
             codeHash: '0xcode',
             args: '0x',
           },
@@ -492,12 +497,12 @@ describe('unit tests for IndexerConnector', () => {
       describe('when handling concurrent requests', () => {
         const query1: LumosCellQuery = {
           lock: {
-            hashType: ScriptHashType.Data,
+            hashType: 'data',
             codeHash: '0xcode',
             args: '0x1',
           },
           type: {
-            hashType: ScriptHashType.Data,
+            hashType: 'data',
             codeHash: '0xcode',
             args: '0x1',
           },
@@ -505,12 +510,12 @@ describe('unit tests for IndexerConnector', () => {
         }
         const query2: LumosCellQuery = {
           lock: {
-            hashType: ScriptHashType.Type,
+            hashType: 'type',
             codeHash: '0xcode',
             args: '0x2',
           },
           type: {
-            hashType: ScriptHashType.Type,
+            hashType: 'type',
             codeHash: '0xcode',
             args: '0x2',
           },

@@ -1,11 +1,10 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import LiveCellService from '../services/live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
-import Script, { ScriptHashType } from '../models/chain/script'
 import parseSUDTTokenInfo from '../utils/parse_sudt_token_info'
 import { ResponseCode } from '../utils/const'
 import { SudtTokenInfo } from '../models/chain/transaction'
 import AssetAccountService from '../services/asset-account-service'
+import { Script, utils } from '@ckb-lumos/base'
 
 export default class SUDTController {
   public async getSUDTTokenInfo(params: { tokenID: string }): Promise<Controller.Response<SudtTokenInfo>> {
@@ -18,11 +17,11 @@ export default class SUDTController {
       }
     }
 
-    const typeScript = Script.fromObject({
+    const typeScript: Script = {
       codeHash: new AssetAccountInfo().sudtInfoCodeHash,
       args: params.tokenID,
-      hashType: ScriptHashType.Type,
-    })
+      hashType: 'type',
+    }
     const liveCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(null, typeScript)
     if (!liveCell) {
       return {
@@ -38,10 +37,14 @@ export default class SUDTController {
 
   public getSUDTTypeScriptHash(params: { tokenID: string }): Controller.Response<string> {
     const assetAccount = new AssetAccountInfo()
-    const script = new Script(assetAccount.infos.sudt.codeHash, params.tokenID, assetAccount.infos.sudt.hashType)
+    const script: Script = {
+      codeHash: assetAccount.sudtInfoCodeHash,
+      args: params.tokenID,
+      hashType: assetAccount.infos.sudt.hashType,
+    }
     return {
       status: ResponseCode.Success,
-      result: scriptToHash(script.toSDK()),
+      result: utils.computeScriptHash(script),
     }
   }
 }

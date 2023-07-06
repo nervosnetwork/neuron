@@ -1,5 +1,4 @@
 import LiveCell from '../../src/models/chain/live-cell'
-import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { ResponseCode } from '../../src/utils/const'
 
 describe('SUDTController', () => {
@@ -63,8 +62,8 @@ describe('SUDTController', () => {
       'txHash',
       '0',
       '10000',
-      Script.fromObject({ codeHash: '', args: '', hashType: ScriptHashType.Type }),
-      Script.fromObject({ codeHash: '', args: '', hashType: ScriptHashType.Type }),
+      { codeHash: '0x' + '0'.repeat(64), args: '0x', hashType: 'type' },
+      { codeHash: '0x' + '0'.repeat(64), args: '0x', hashType: 'type' },
       '0x080a456972632d320a455432'
     )
     beforeEach(async () => {

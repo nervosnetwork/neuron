@@ -1,9 +1,9 @@
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import CellDep, { DepType } from '../../src/models/chain/cell-dep'
 import OutPoint from '../../src/models/chain/out-point'
-import { ScriptHashType } from '../../src/models/chain/script'
 import { AddressType } from '../../src/models/keys/address'
 import AddressMeta from '../../src/database/address/meta'
+import { utils } from '@ckb-lumos/base'
 
 describe('AssetAccountInfo', () => {
   const testnetSudtInfo = {
@@ -12,7 +12,7 @@ describe('AssetAccountInfo', () => {
       DepType.Code
     ),
     codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
-    hashType: ScriptHashType.Data,
+    hashType: 'data',
   }
 
   const testnetAnyoneCanPayInfo = {
@@ -64,8 +64,8 @@ describe('AssetAccountInfo', () => {
         blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd1',
       })
       const chequeScript = assetAccountInfo.generateChequeScript(
-        receiverAddressInfo.generateDefaultLockScript().computeHash(),
-        senderAddressInfo.generateDefaultLockScript().computeHash()
+        utils.computeScriptHash(receiverAddressInfo.generateDefaultLockScript()),
+        utils.computeScriptHash(senderAddressInfo.generateDefaultLockScript())
       )
       describe('receiver address is ordered first', () => {
         const addressInfos = [receiverAddressInfo, senderAddressInfo]

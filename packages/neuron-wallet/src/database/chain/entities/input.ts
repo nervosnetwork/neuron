@@ -2,7 +2,7 @@ import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 't
 import Transaction from './transaction'
 import OutPoint from '../../../models/chain/out-point'
 import InputModel from '../../../models/chain/input'
-import Script, { ScriptHashType } from '../../../models/chain/script'
+import { HashType, Script } from '@ckb-lumos/base'
 
 // cellbase input may have same OutPoint
 @Entity()
@@ -51,7 +51,7 @@ export default class Input extends BaseEntity {
     type: 'varchar',
     nullable: true,
   })
-  lockHashType: ScriptHashType | null = null
+  lockHashType: HashType | null = null
 
   @Column({
     type: 'varchar',
@@ -69,7 +69,7 @@ export default class Input extends BaseEntity {
     type: 'varchar',
     nullable: true,
   })
-  typeHashType: ScriptHashType | null = null
+  typeHashType: HashType | null = null
 
   @Column({
     type: 'varchar',
@@ -119,14 +119,22 @@ export default class Input extends BaseEntity {
 
   public lockScript(): Script | undefined {
     if (this.lockCodeHash && this.lockArgs && this.lockHashType) {
-      return new Script(this.lockCodeHash, this.lockArgs, this.lockHashType)
+      return {
+        codeHash: this.lockCodeHash,
+        args: this.lockArgs,
+        hashType: this.lockHashType,
+      }
     }
     return undefined
   }
 
   public typeScript(): Script | undefined {
     if (this.typeCodeHash && this.typeArgs && this.typeHashType) {
-      return new Script(this.typeCodeHash, this.typeArgs, this.typeHashType)
+      return {
+        codeHash: this.typeCodeHash,
+        args: this.typeArgs,
+        hashType: this.typeHashType,
+      }
     }
     return undefined
   }

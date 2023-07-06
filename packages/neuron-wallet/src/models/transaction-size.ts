@@ -5,7 +5,6 @@ import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
 import Multisig from './multisig'
-import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from '../utils/buffer'
 
 export default class TransactionSize {
@@ -37,7 +36,11 @@ export default class TransactionSize {
     const hash20 = '0x' + '0'.repeat(40)
     const sudtOutput = Output.fromObject({
       capacity: '61',
-      lock: new Script(hash32, hash20, ScriptHashType.Type),
+      lock: {
+        codeHash: hash32,
+        hashType: 'type',
+        args: hash20,
+      },
     })
     return TransactionSize.output(sudtOutput)
   }
@@ -48,8 +51,16 @@ export default class TransactionSize {
     const hash20 = '0x' + '0'.repeat(40)
     const sudtOutput = Output.fromObject({
       capacity: '142',
-      lock: new Script(hash32, hash20, ScriptHashType.Type),
-      type: new Script(hash32, hash32, ScriptHashType.Type),
+      lock: {
+        codeHash: hash32,
+        hashType: 'type',
+        args: hash20,
+      },
+      type: {
+        codeHash: hash32,
+        hashType: 'type',
+        args: hash32,
+      },
     })
     return TransactionSize.output(sudtOutput)
   }

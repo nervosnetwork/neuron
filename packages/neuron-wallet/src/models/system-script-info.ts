@@ -2,22 +2,22 @@ import OutPoint from './chain/out-point'
 import CellDep, { DepType } from './chain/cell-dep'
 import NetworksService from '../services/networks'
 import RpcService from '../services/rpc-service'
-import Script, { ScriptHashType } from './chain/script'
+import { Hash, HashType, Script, utils } from '@ckb-lumos/base'
 
 export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
   static DAO_CODE_HASH = process.env.DAO_CODE_HASH!
   static MULTI_SIGN_CODE_HASH = process.env.MULTISIG_CODE_HASH!
 
-  static SECP_HASH_TYPE = ScriptHashType.Type
-  static DAO_HASH_TYPE = ScriptHashType.Type
-  static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
+  static SECP_HASH_TYPE = 'type' as HashType
+  static DAO_HASH_TYPE = 'type' as HashType
+  static MULTI_SIGN_HASH_TYPE = 'type' as HashType
 
-  static DAO_SCRIPT_HASH = new Script(
-    SystemScriptInfo.DAO_CODE_HASH,
-    '0x',
-    SystemScriptInfo.DAO_HASH_TYPE
-  ).computeHash()
+  static DAO_SCRIPT: Script = {
+    codeHash: SystemScriptInfo.DAO_CODE_HASH,
+    hashType: SystemScriptInfo.DAO_HASH_TYPE,
+    args: '0x',
+  }
 
   private static instance: SystemScriptInfo
   static getInstance(): SystemScriptInfo {
@@ -34,6 +34,10 @@ export default class SystemScriptInfo {
   private daoOutPointInfo = new Map<string, OutPoint>()
 
   private multiSignOutPointInfo = new Map<string, OutPoint>()
+
+  public getDaoScriptHash(): Hash {
+    return utils.computeScriptHash(SystemScriptInfo.DAO_SCRIPT)
+  }
 
   // need network url and genesisBlockHash
   public async getSecpCellDep(
@@ -73,15 +77,27 @@ export default class SystemScriptInfo {
   }
 
   public static generateSecpScript(args: string): Script {
-    return new Script(SystemScriptInfo.SECP_CODE_HASH, args, SystemScriptInfo.SECP_HASH_TYPE)
+    return {
+      codeHash: SystemScriptInfo.SECP_CODE_HASH,
+      hashType: SystemScriptInfo.SECP_HASH_TYPE,
+      args,
+    }
   }
 
   public static generateDaoScript(args: string = '0x'): Script {
-    return new Script(SystemScriptInfo.DAO_CODE_HASH, args, SystemScriptInfo.DAO_HASH_TYPE)
+    return {
+      codeHash: SystemScriptInfo.DAO_CODE_HASH,
+      hashType: SystemScriptInfo.DAO_HASH_TYPE,
+      args,
+    }
   }
 
   public static generateMultiSignScript(args: string): Script {
-    return new Script(SystemScriptInfo.MULTI_SIGN_CODE_HASH, args, SystemScriptInfo.MULTI_SIGN_HASH_TYPE)
+    return {
+      codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
+      hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
+      args,
+    }
   }
 
   public static isSecpScript(script: Script): boolean {

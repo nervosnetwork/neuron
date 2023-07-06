@@ -1,10 +1,10 @@
 import { Address, AddressVersion } from '../../models/address'
 import { AddressType } from '../../models/keys/address'
-import Script from '../../models/chain/script'
 import SystemScriptInfo from '../../models/system-script-info'
 import AssetAccountInfo from '../../models/asset-account-info'
 import HdPublicKeyInfoModel from '../../models/keys/hd-public-key-info'
 import Multisig from '../../models/multisig'
+import { Script, utils } from '@ckb-lumos/base'
 
 export default class AddressMeta implements Address {
   walletId: string
@@ -116,6 +116,6 @@ export default class AddressMeta implements Address {
   public generateChequeLockScriptWithReceiverLockHash(): Script {
     const defaultLockScript = this.generateDefaultLockScript()
     const assetAccountInfo = new AssetAccountInfo()
-    return assetAccountInfo.generateChequeScript(defaultLockScript.computeHash(), '0'.repeat(40))
+    return assetAccountInfo.generateChequeScript(utils.computeScriptHash(defaultLockScript), '0'.repeat(40))
   }
 }

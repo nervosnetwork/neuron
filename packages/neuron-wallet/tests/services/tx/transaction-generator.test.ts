@@ -7,7 +7,6 @@ import TransactionEntity from '../../../src/database/chain/entities/transaction'
 import { TargetOutput } from '../../../src/services/tx/transaction-generator'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
-import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Transaction, { TransactionStatus } from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
@@ -17,6 +16,7 @@ import SystemScriptInfo from '../../../src/models/system-script-info'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
+import { HashType, utils } from '@ckb-lumos/base'
 import { serializeWitnessArgs, scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import {
   CapacityNotEnough,
@@ -42,14 +42,14 @@ const toShannon = (ckb: string) => `${ckb}00000000`
 const [alice, bob] = keyInfos
 const walletId1 = alice.walletId
 
-const fullAddressLockScript: Script = new Script(
-  '0x0000000000000000000000000000000000000000000000000000000000000011',
-  '0x1234',
-  ScriptHashType.Type
-)
+const fullAddressLockScript: Script = {
+  codeHash: '0x0000000000000000000000000000000000000000000000000000000000000011',
+  args: '0x1234',
+  hashType: 'type',
+}
 const fullAddressInfo = {
   lockScript: fullAddressLockScript,
-  lockHash: fullAddressLockScript.computeHash(),
+  lockHash: utils.computeScriptHash(fullAddressLockScript),
   address: scriptToAddress(fullAddressLockScript, false),
 }
 
@@ -85,6 +85,7 @@ import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
 import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
+import { Script } from '@ckb-lumos/base'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -140,7 +141,7 @@ describe('TransactionGenerator', () => {
     output.lockCodeHash = who.lockScript.codeHash
     output.lockArgs = who.lockScript.args
     output.lockHashType = who.lockScript.hashType
-    output.lockHash = who.lockScript.computeHash()
+    output.lockHash = utils.computeScriptHash(who.lockScript)
     output.status = status
     output.hasData = hasData
     if (typeScript) {
@@ -164,12 +165,12 @@ describe('TransactionGenerator', () => {
     input.lockArgs = lock.args
     input.lockCodeHash = lock.codeHash
     input.lockHashType = lock.hashType
-    input.lockHash = lock.computeHash()
+    input.lockHash = utils.computeScriptHash(lock)
     if (type) {
       input.typeArgs = type!.args
       input.typeCodeHash = type!.codeHash
       input.typeHashType = type!.hashType
-      input.typeHash = type!.computeHash()
+      input.typeHash = utils.computeScriptHash(type!)
     }
 
     input.since = '0x0'
@@ -184,12 +185,12 @@ describe('TransactionGenerator', () => {
     output.lockArgs = lock.args
     output.lockCodeHash = lock.codeHash
     output.lockHashType = lock.hashType
-    output.lockHash = lock.computeHash()
+    output.lockHash = utils.computeScriptHash(lock)
     if (type) {
       output.typeArgs = type!.args
       output.typeCodeHash = type!.codeHash
       output.typeHashType = type!.hashType
-      output.typeHash = type!.computeHash()
+      output.typeHash = utils.computeScriptHash(type!)
     }
     output.hasData = true
     output.data = data
@@ -210,7 +211,7 @@ describe('TransactionGenerator', () => {
     multisigCell.lockCodeHash = who.lockScript.codeHash
     multisigCell.lockArgs = who.lockScript.args
     multisigCell.lockHashType = who.lockScript.hashType
-    multisigCell.lockHash = who.lockScript.computeHash()
+    multisigCell.lockHash = utils.computeScriptHash(who.lockScript)
     await getConnection().manager.save(multisigCell)
     return multisigCell
   }
@@ -380,13 +381,13 @@ describe('TransactionGenerator', () => {
       })
 
       describe('with full address', () => {
-        it(`only full address, 43 capacity`, async () => {
+        it(`only full address, 63 capacity`, async () => {
           const tx: Transaction = await TransactionGenerator.generateTx(
             walletId1,
             [
               {
                 address: fullAddressInfo.address,
-                capacity: BigInt(43 * 10 ** 8).toString(),
+                capacity: BigInt(63 * 10 ** 8).toString(),
               },
             ],
             bob.address,
@@ -651,14 +652,14 @@ describe('TransactionGenerator', () => {
       expect(outputCapacities + BigInt(tx.fee ?? 0)).toEqual(totalCapacities)
     })
 
-    it('full address with feeRate 1000, 43 capacity', async () => {
+    it('full address with feeRate 1000, 63 capacity', async () => {
       const feeRate = '1000'
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
         walletId1,
         [
           {
             address: fullAddressInfo.address,
-            capacity: toShannon('43'),
+            capacity: toShannon('63'),
           },
           {
             address: fullAddressInfo.address,
@@ -678,7 +679,7 @@ describe('TransactionGenerator', () => {
 
       const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
       expect(tx.fee).toEqual(expectedFee.toString())
-      expect(tx.outputs[0].capacity).toEqual(toShannon('43'))
+      expect(tx.outputs[0].capacity).toEqual(toShannon('63'))
       expect(outputCapacities + BigInt(tx.fee ?? 0)).toEqual(totalCapacities)
     })
 
@@ -734,11 +735,11 @@ describe('TransactionGenerator', () => {
 
     it('generator with multisigConfig', async () => {
       await createMultisigCell(toShannon('3000'), OutputStatus.Live, {
-        lockScript: Script.fromObject({
+        lockScript: {
           codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
-          hashType: ScriptHashType.Type,
+          hashType: 'type',
           args: '0x87b9ae2c1c7108178e709bf4a89b736bc0f0ae60',
-        }),
+        },
       })
       const feeRate = '1000'
       const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
@@ -1195,7 +1196,7 @@ describe('TransactionGenerator', () => {
           const targetOutput: Output = Output.fromObject({
             capacity: toShannon('61'),
             lock: aliceAnyoneCanPayLockScript,
-            type: assetAccountInfo.generateSudtScript('0xuuid'),
+            type: assetAccountInfo.generateSudtScript('0x1234'),
             data: '0x',
           })
 
@@ -1243,11 +1244,11 @@ describe('TransactionGenerator', () => {
             .calledWith({ lock: bobAnyoneCanPayLockScript, type: null, data: null })
             .mockResolvedValue([generateLiveCell(toShannon('70'), undefined, undefined, bobAnyoneCanPayLockScript)])
 
-          const pwAnyoneCanPayLockScript = new Script(
-            process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
-            '0x36c329ed630d6ce750712a477543672adab57f4c',
-            process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE as ScriptHashType
-          )
+          const pwAnyoneCanPayLockScript: Script = {
+            codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
+            hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE as HashType,
+            args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+          }
 
           const targetOutput: Output = Output.fromObject({
             capacity: toShannon('61'),
@@ -1527,12 +1528,12 @@ describe('TransactionGenerator', () => {
             expect(tx.outputs.length).toEqual(2)
 
             const changeOutput = tx.outputs.find(
-              output => output.lock.computeHash() === bobAnyoneCanPayLockScript.computeHash()
+              output => utils.computeScriptHash(output.lock) === utils.computeScriptHash(bobAnyoneCanPayLockScript)
             )
             expect(changeOutput!.capacity).toEqual(toShannon('61'))
 
             const aliceOutput = tx.outputs.find(
-              output => output.lock.computeHash() === aliceAnyoneCanPayLockScript.computeHash()
+              output => utils.computeScriptHash(output.lock) === utils.computeScriptHash(aliceAnyoneCanPayLockScript)
             )
 
             expect(aliceOutput!.capacity).toEqual(
@@ -1570,7 +1571,7 @@ describe('TransactionGenerator', () => {
             expect(tx.inputs.length).toEqual(2)
 
             const aliceOutputs = tx.outputs.filter(
-              output => output.lock!.computeHash() === bobAnyoneCanPayLockScript.computeHash()
+              output => utils.computeScriptHash(output.lock!) === utils.computeScriptHash(bobAnyoneCanPayLockScript)
             )
             expect(aliceOutputs.length).toEqual(1)
             expect(aliceOutputs[0].data).toEqual('0x')
@@ -1580,7 +1581,7 @@ describe('TransactionGenerator', () => {
     })
 
     describe('generateAnyoneCanPayToSudtTx, with feeRate 1000', () => {
-      const tokenID = bob.lockScript.computeHash()
+      const tokenID = utils.computeScriptHash(bob.lockScript)
       const feeRate = '1000'
       let tx: Transaction
       let expectedTxSize: number
@@ -1628,8 +1629,8 @@ describe('TransactionGenerator', () => {
           expect(tx.inputs.length).toEqual(2)
           expect(tx.outputs.length).toEqual(2)
           expect(tx.outputs.map(o => o.lockHash)).toEqual([
-            bobAnyoneCanPayLockScript.computeHash(),
-            aliceAnyoneCanPayLockScript.computeHash(),
+            utils.computeScriptHash(bobAnyoneCanPayLockScript),
+            utils.computeScriptHash(aliceAnyoneCanPayLockScript),
           ])
         })
         it('calculates fees', () => {
@@ -1659,11 +1660,11 @@ describe('TransactionGenerator', () => {
       })
 
       describe('when sending to pw acp', () => {
-        const pwAnyoneCanPayLockScript = new Script(
-          process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
-          '0x36c329ed630d6ce750712a477543672adab57f4c',
-          process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE as ScriptHashType
-        )
+        const pwAnyoneCanPayLockScript: Script = {
+          codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
+          hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE as HashType,
+          args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+        }
         beforeEach(async () => {
           const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, pwAnyoneCanPayLockScript)
 
@@ -1784,9 +1785,9 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.length).toEqual(3)
 
           expect(tx.outputs.map(o => o.lockHash)).toEqual([
-            bobAnyoneCanPayLockScript.computeHash(),
-            aliceAnyoneCanPayLockScript.computeHash(),
-            bob.lockScript.computeHash(),
+            utils.computeScriptHash(bobAnyoneCanPayLockScript),
+            utils.computeScriptHash(aliceAnyoneCanPayLockScript),
+            utils.computeScriptHash(bob.lockScript),
           ])
         })
         it('calculates fees', () => {
@@ -1862,8 +1863,8 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.length).toEqual(2)
 
           expect(tx.outputs.map(o => o.lockHash)).toEqual([
-            bobAnyoneCanPayLockScript.computeHash(),
-            aliceAnyoneCanPayLockScript.computeHash(),
+            utils.computeScriptHash(bobAnyoneCanPayLockScript),
+            utils.computeScriptHash(aliceAnyoneCanPayLockScript),
           ])
         })
         it('calculates fees', () => {
@@ -1994,8 +1995,8 @@ describe('TransactionGenerator', () => {
           expect(tx.outputs.length).toEqual(2)
 
           expect(tx.outputs.map(o => o.lockHash)).toEqual([
-            bobAnyoneCanPayLockScript.computeHash(),
-            aliceAnyoneCanPayLockScript.computeHash(),
+            utils.computeScriptHash(bobAnyoneCanPayLockScript),
+            utils.computeScriptHash(aliceAnyoneCanPayLockScript),
           ])
         })
         it('updates output data', () => {
@@ -2047,13 +2048,13 @@ describe('TransactionGenerator', () => {
           expect(tx.inputs.length).toEqual(2)
           expect(tx.outputs.length).toEqual(3)
           expect(tx.inputs.map(o => o.lockHash)).toEqual([
-            bobAnyoneCanPayLockScript.computeHash(),
-            alice.lockScript.computeHash(),
+            utils.computeScriptHash(bobAnyoneCanPayLockScript),
+            utils.computeScriptHash(alice.lockScript),
           ])
           expect(tx.outputs.map(o => o.lockHash)).toEqual([
-            bobAnyoneCanPayLockScript.computeHash(),
-            aliceAnyoneCanPayLockScript.computeHash(),
-            bob.lockScript.computeHash(),
+            utils.computeScriptHash(bobAnyoneCanPayLockScript),
+            utils.computeScriptHash(aliceAnyoneCanPayLockScript),
+            utils.computeScriptHash(bob.lockScript),
           ])
         })
         it('calculates fees', () => {
@@ -2181,8 +2182,8 @@ describe('TransactionGenerator', () => {
           expectedChequeOutput = Output.fromObject({
             capacity: toShannon('161'),
             lock: assetAccountInfo.generateChequeScript(
-              receiverDefaultLock.computeHash(),
-              senderDefaultLock.computeHash()
+              utils.computeScriptHash(receiverDefaultLock),
+              utils.computeScriptHash(senderDefaultLock)
             ),
             type: senderAcpLiveCell.type(),
             data: BufferUtils.writeBigUInt128LE(BigInt(110)),
@@ -2203,7 +2204,7 @@ describe('TransactionGenerator', () => {
           })
           it('creates cheque output', () => {
             const chequeOutput = tx.outputs[0]
-            expect(chequeOutput.lock.computeHash()).toEqual(expectedChequeOutput.lockHash)
+            expect(utils.computeScriptHash(chequeOutput.lock)).toEqual(expectedChequeOutput.lockHash)
             expect(chequeOutput.lock.args.length).toEqual(82)
           })
           it('sender lock hash equals to one of default lock inputs', () => {
@@ -2211,7 +2212,7 @@ describe('TransactionGenerator', () => {
               const isDefaultLock = input.lock!.codeHash === SystemScriptInfo.SECP_CODE_HASH
               return (
                 isDefaultLock &&
-                input.lock!.computeHash().slice(0, 42) === '0x' + expectedChequeOutput.lock.args.slice(42)
+                utils.computeScriptHash(input.lock!).slice(0, 42) === '0x' + expectedChequeOutput.lock.args.slice(42)
               )
             })
             expect(defaultLockInput).not.toEqual(undefined)
@@ -2249,8 +2250,8 @@ describe('TransactionGenerator', () => {
         const receiverDefaultLock = bob.lockScript
 
         beforeEach(async () => {
-          const receiverDefaultLockHash = receiverDefaultLock.computeHash()
-          const senderDefaultLockHash = senderDefaultLock.computeHash()
+          const receiverDefaultLockHash = utils.computeScriptHash(receiverDefaultLock)
+          const senderDefaultLockHash = utils.computeScriptHash(senderDefaultLock)
 
           const transaction = new TransactionEntity()
           transaction.hash = '0x'
@@ -2292,15 +2293,15 @@ describe('TransactionGenerator', () => {
           it('uses the existing acp cell to hold the claimed sudt amount', () => {
             const acpInput = tx.inputs.find(
               input =>
-                input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
-                input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+                utils.computeScriptHash(input.lock!) === utils.computeScriptHash(receiverAcpCell!.lockScript()!) &&
+                utils.computeScriptHash(input.type!) === utils.computeScriptHash(receiverAcpCell!.typeScript()!)
             )
             const acpInputAmount = BufferUtils.readBigUInt128LE(acpInput!.data!)
 
             const acpOutput = tx.outputs.find(
               input =>
-                input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
-                input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+                utils.computeScriptHash(input.lock!) === utils.computeScriptHash(receiverAcpCell!.lockScript()!) &&
+                utils.computeScriptHash(input.type!) === utils.computeScriptHash(receiverAcpCell!.typeScript()!)
             )
 
             const chequeCellAmount = BufferUtils.readBigUInt128LE(expectedChequeOutput.data)
@@ -2311,7 +2312,7 @@ describe('TransactionGenerator', () => {
           })
           it('returns ckb to sender', () => {
             const senderDefaultOutput = tx.outputs.find(
-              input => input.lock!.computeHash() === senderDefaultLock.computeHash()
+              input => utils.computeScriptHash(input.lock!) === utils.computeScriptHash(senderDefaultLock)
             )
             expect(senderDefaultOutput!.capacity).toEqual(expectedChequeOutput.capacity)
           })
@@ -2330,15 +2331,15 @@ describe('TransactionGenerator', () => {
           it('creates an new acp cell to hold the claimed sudt amount', () => {
             const acpInput = tx.inputs.find(
               input =>
-                input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
-                input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+                utils.computeScriptHash(input.lock!) === utils.computeScriptHash(receiverAcpCell!.lockScript()!) &&
+                utils.computeScriptHash(input.type!) === utils.computeScriptHash(receiverAcpCell!.typeScript()!)
             )
             expect(acpInput).toBe(undefined)
 
             const acpOutput = tx.outputs.find(
               input =>
-                input.lock!.computeHash() === receiverAcpCell!.lockScript()!.computeHash() &&
-                input.type!.computeHash() === receiverAcpCell!.typeScript()!.computeHash()
+                utils.computeScriptHash(input.lock!) === utils.computeScriptHash(receiverAcpCell!.lockScript()!) &&
+                utils.computeScriptHash(input.type!) === utils.computeScriptHash(receiverAcpCell!.typeScript()!)
             )
 
             const chequeCellAmount = BufferUtils.readBigUInt128LE(expectedChequeOutput.data)
@@ -2348,7 +2349,7 @@ describe('TransactionGenerator', () => {
           })
           it('returns ckb to sender', () => {
             const senderDefaultOutput = tx.outputs.find(
-              input => input.lock!.computeHash() === senderDefaultLock.computeHash()
+              input => utils.computeScriptHash(input.lock!) === utils.computeScriptHash(senderDefaultLock)
             )
             expect(senderDefaultOutput!.capacity).toEqual(expectedChequeOutput.capacity)
           })
@@ -2368,7 +2369,10 @@ describe('TransactionGenerator', () => {
 
         senderDefaultLockInputEntity = createInput(senderDefaultLock, undefined, transaction.hash)
 
-        const chequeLock = assetAccountInfo.generateChequeScript('0x' + '0'.repeat(40), senderDefaultLock.computeHash())
+        const chequeLock = assetAccountInfo.generateChequeScript(
+          '0x' + '0'.repeat(40),
+          utils.computeScriptHash(senderDefaultLock)
+        )
         chequeOutputEntity = createOutput(
           chequeLock,
           typeScript,
@@ -2541,7 +2545,7 @@ describe('TransactionGenerator', () => {
           expect(res.outputs[1].data).toEqual(BufferUtils.writeBigUInt128LE(BigInt(200)))
           expect(res.outputs[2].capacity).toEqual((BigInt(secpCell.capacity) - BigInt(res.fee ?? 0)).toString())
           expect(res.inputs).toHaveLength(3)
-          expect(res.inputs[2].lockHash).toBe(bobAnyoneCanPayLockScript.computeHash())
+          expect(res.inputs[2].lockHash).toBe(utils.computeScriptHash(bobAnyoneCanPayLockScript))
         })
       })
 
@@ -2668,14 +2672,18 @@ describe('TransactionGenerator', () => {
   })
 
   describe('#generateMigrateLegacyACPTx', () => {
-    const defaultLock = new Script(
-      SystemScriptInfo.SECP_CODE_HASH,
-      alice.publicKeyInBlake160,
-      SystemScriptInfo.SECP_HASH_TYPE
-    )
+    const defaultLock: Script = {
+      codeHash: SystemScriptInfo.SECP_CODE_HASH,
+      hashType: SystemScriptInfo.SECP_HASH_TYPE,
+      args: alice.publicKeyInBlake160,
+    }
     const legacyACPCodeHash: string = process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH as string
     const legacyACPHashType: string = process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE as string
-    const legacyACPLock = new Script(legacyACPCodeHash, alice.publicKeyInBlake160, legacyACPHashType as ScriptHashType)
+    const legacyACPLock: Script = {
+      codeHash: legacyACPCodeHash,
+      hashType: legacyACPHashType as HashType,
+      args: alice.publicKeyInBlake160,
+    }
     const assetAccountInfo = new AssetAccountInfo()
     const tokenID = '0x' + '0'.repeat(64)
 
@@ -2716,24 +2724,26 @@ describe('TransactionGenerator', () => {
       it('generates acp migration transaction', async () => {
         const tx = (await TransactionGenerator.generateMigrateLegacyACPTx(alice.walletId))!
         const totalLegacyACPCellsCount = tx.inputs.filter(
-          input => input.lockHash === legacyACPLock.computeHash()
+          input => input.lockHash === utils.computeScriptHash(legacyACPLock)
         ).length
-        const totalMigratedACPCellsCount = tx.outputs.filter(output => output.lockHash === acpLock.computeHash()).length
+        const totalMigratedACPCellsCount = tx.outputs.filter(
+          output => output.lockHash === utils.computeScriptHash(acpLock)
+        ).length
         const totalMigratedSUDTCellCount = tx.outputs.filter(
-          output => output.typeHash === sudtScript.computeHash()
+          output => output.typeHash === utils.computeScriptHash(sudtScript)
         ).length
         const normalInputCellCapacity = tx.inputs
-          .filter(input => input.lockHash === defaultLock.computeHash())
+          .filter(input => input.lockHash === utils.computeScriptHash(defaultLock))
           .reduce((sum, input) => {
             return (sum += BigInt(input.capacity ?? 0))
           }, BigInt(0))
         const normalOutputCellCapacity = tx.outputs
-          .filter(output => output.lockHash === defaultLock.computeHash())
+          .filter(output => output.lockHash === utils.computeScriptHash(defaultLock))
           .reduce((sum, output) => {
             return (sum += BigInt(output.capacity))
           }, BigInt(0))
         const acpCellCapacity = tx.outputs
-          .filter(output => output.lockHash === acpLock.computeHash())
+          .filter(output => output.lockHash === utils.computeScriptHash(acpLock))
           .reduce((sum, output) => {
             return (sum += BigInt(output.capacity))
           }, BigInt(0))
@@ -2854,11 +2864,11 @@ describe('TransactionGenerator', () => {
     })
     describe('sUDT account', () => {
       it('sUDT amount is not zero throw exception', async () => {
-        const typeScript = new Script(
-          '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
-          '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
-          ScriptHashType.Type
-        )
+        const typeScript: Script = {
+          codeHash: '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+          hashType: 'type',
+          args: '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+        }
         const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
         const asssetAccountInput = input.toModel()
         asssetAccountInput.capacity = toShannon('142')
@@ -2873,11 +2883,11 @@ describe('TransactionGenerator', () => {
         ).rejects.toThrow(new SudtAcpHaveDataError())
       })
       it('destroy success', async () => {
-        const typeScript = new Script(
-          '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
-          '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
-          ScriptHashType.Type
-        )
+        const typeScript: Script = {
+          codeHash: '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
+          hashType: 'type',
+          args: '0x2619a9dc0428f87c0921ed22d0f10707c5c4ec9e8185764d8236d7ea996a9b03',
+        }
         const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
         const asssetAccountInput = input.toModel()
         asssetAccountInput.capacity = toShannon('142')

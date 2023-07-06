@@ -12,7 +12,6 @@ import { CapacityNotEnough, CurrentWalletNotSet, LiveCapacityNotEnough } from '.
 import Output from '../../models/chain/output'
 import Input from '../../models/chain/input'
 import OutPoint from '../../models/chain/out-point'
-import Script, { ScriptHashType } from '../../models/chain/script'
 import Transaction from '../../models/chain/transaction'
 import WitnessArgs from '../../models/chain/witness-args'
 import AddressParser from '../../models/address-parser'
@@ -34,6 +33,7 @@ import WalletService from '../../services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
 import AssetAccountService from '../../services/asset-account-service'
 import LiveCellService from '../../services/live-cell-service'
+import { HashType, Script, utils } from '@ckb-lumos/base'
 
 export interface TargetOutput {
   address: string
@@ -68,7 +68,7 @@ export class TransactionGenerator {
       throw new Error('NFT cell not found')
     }
     const cellDeps = [secpCellDep, nftCellDep]
-    const outputLock = new Script(prevOutput.lock.codeHash, prevOutput.lock.args, prevOutput.lock.hashType)
+    const outputLock = prevOutput.lock
     if (assetAccountInfo.isDefaultAnyoneCanPayScript(outputLock)) {
       cellDeps.push(anyoneCanPayDep)
     }
@@ -77,7 +77,7 @@ export class TransactionGenerator {
       previousOutput: op,
       capacity: nftCell.capacity,
       lock: outputLock,
-      type: nftCell.type ? new Script(nftCell.type.codeHash, nftCell.type.args, nftCell.type.hashType) : null,
+      type: nftCell.type ?? null,
       data: nftCell.data,
       since: '0',
     })
@@ -152,8 +152,8 @@ export class TransactionGenerator {
     lockClass: {
       lockArgs?: string[]
       codeHash: string
-      hashType: ScriptHashType
-    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
+      hashType: HashType
+    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: 'type' },
     multisigConfig?: MultisigConfigModel
   ): Promise<Transaction> => {
     let cellDep: CellDep
@@ -223,7 +223,7 @@ export class TransactionGenerator {
     if (hasChangeOutput) {
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
-      const output = new Output(changeCapacity.toString(), Script.fromSDK(addressToScript(changeAddress)))
+      const output = new Output(changeCapacity.toString(), addressToScript(changeAddress))
 
       tx.addOutput(output)
     }
@@ -259,9 +259,7 @@ export class TransactionGenerator {
     const allInputs: Input[] = await CellsService.gatherAllInputs(
       walletId,
       multisigConfig
-        ? Script.fromSDK(
-            Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
-          )
+        ? Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
         : undefined
     )
 
@@ -950,7 +948,7 @@ export class TransactionGenerator {
       cell.lockCodeHash = newACPLockScript.codeHash
       cell.lockHashType = newACPLockScript.hashType
       cell.lockArgs = newACPLockScript.args
-      cell.lockHash = newACPLockScript.computeHash()
+      cell.lockHash = utils.computeScriptHash(newACPLockScript)
 
       return cell
     })
@@ -1092,8 +1090,8 @@ export class TransactionGenerator {
       lockHash: undefined,
       data: BufferUtils.writeBigUInt128LE(BigInt(gatheredSudtInputResult.amount)),
       lock: assetAccountInfo.generateChequeScript(
-        receiverLockScript.computeHash(),
-        senderDefaultCell.lock!.computeHash()
+        utils.computeScriptHash(receiverLockScript),
+        utils.computeScriptHash(senderDefaultCell.lock!)
       ),
     })
     tx.outputs.unshift(chequeCell)
@@ -1131,7 +1129,7 @@ export class TransactionGenerator {
     const receiverLockHash20 = chequeCell.lock.args.slice(0, 42)
     const allAddressInfos = await AddressService.getAddressesByWalletId(walletId)
     const receiverAddressInfo = allAddressInfos.find(info => {
-      const lockHash = SystemScriptInfo.generateSecpScript(info.blake160).computeHash()
+      const lockHash = utils.computeScriptHash(SystemScriptInfo.generateSecpScript(info.blake160))
       return lockHash.startsWith(receiverLockHash20)
     })
     if (!receiverAddressInfo) {
@@ -1408,7 +1406,7 @@ export class TransactionGenerator {
         throw new MigrateSudtCellNoTypeError()
       }
       const receiverAcpCell = await LiveCellService.getInstance().getOneByLockScriptAndTypeScript(
-        Script.fromSDK(addressToScript(acpAddress)),
+        addressToScript(acpAddress),
         inputSudtCell.type
       )
       if (!receiverAcpCell) {

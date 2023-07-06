@@ -16,14 +16,15 @@ import OutPoint from '../models/chain/out-point'
 import SystemScriptInfo from '../models/system-script-info'
 import Input from '../models/chain/input'
 import { MIN_CELL_CAPACITY } from '../utils/const'
+import { utils } from '@ckb-lumos/base'
 
 export default class AssetAccountService {
   private static async getACPCells(publicKeyHash: string, tokenId: string = 'CKBytes') {
     const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
+    const anyoneCanPayLockHash = utils.computeScriptHash(assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash))
     let typeHash = null
     if (tokenId !== 'CKBytes') {
-      typeHash = assetAccountInfo.generateSudtScript(tokenId).computeHash()
+      typeHash = utils.computeScriptHash(assetAccountInfo.generateSudtScript(tokenId))
     }
     const outputs = await getConnection()
       .getRepository(OutputEntity)
@@ -56,8 +57,8 @@ export default class AssetAccountService {
 
   private static async calculateUDTAccountBalance(publicKeyHash: string, tokenId: string) {
     const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash).computeHash()
-    const typeHash = assetAccountInfo.generateSudtScript(tokenId).computeHash()
+    const anyoneCanPayLockHash = utils.computeScriptHash(assetAccountInfo.generateAnyoneCanPayScript(publicKeyHash))
+    const typeHash = utils.computeScriptHash(assetAccountInfo.generateSudtScript(tokenId))
     const outputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
@@ -482,7 +483,7 @@ export default class AssetAccountService {
 
     const receiverDefaultLock = addressInfos
       .map(info => SystemScriptInfo.generateSecpScript(info.blake160))
-      .find(defaultLock => defaultLock.computeHash().slice(0, 42) === receiverLockHash20)
+      .find(defaultLock => utils.computeScriptHash(defaultLock).slice(0, 42) === receiverLockHash20)
 
     if (!receiverDefaultLock) {
       throw new Error('receiver default lock not found by receiver lock hash')

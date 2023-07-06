@@ -13,6 +13,7 @@ import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-p
 import { NetworkType } from '../models/network'
 import WalletService from './wallets'
 import logger from '../utils/logger'
+import { utils } from '@ckb-lumos/base'
 
 const max64Int = '0x' + 'f'.repeat(16)
 export default class MultisigService {
@@ -95,7 +96,7 @@ export default class MultisigService {
   private static removeDulpicateConfig(multisigConfigs: MultisigConfig[]) {
     const existMultisigLockHash: Set<string> = new Set()
     return multisigConfigs.filter(v => {
-      const multisigLockHash = Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n).computeHash()
+      const multisigLockHash = utils.computeScriptHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))
       if (existMultisigLockHash.has(multisigLockHash)) {
         return false
       }

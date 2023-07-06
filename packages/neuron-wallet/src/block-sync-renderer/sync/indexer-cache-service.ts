@@ -6,6 +6,7 @@ import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
 import SyncInfoEntity from '../../database/chain/entities/sync-info'
 import { TransactionCollector, CellCollector, Indexer as CkbIndexer } from '@ckb-lumos/ckb-indexer'
+import { utils } from '@ckb-lumos/base'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
@@ -104,7 +105,7 @@ export default class IndexerCacheService {
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,
-              lockHash: lockScript.computeHash(),
+              lockHash: utils.computeScriptHash(lockScript),
             },
           ])
         }
@@ -138,7 +139,7 @@ export default class IndexerCacheService {
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,
-              lockHash: lockScript.computeHash(),
+              lockHash: utils.computeScriptHash(lockScript),
             },
           ])
         }

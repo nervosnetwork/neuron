@@ -23,13 +23,13 @@ import BufferUtils from '../utils/buffer'
 import LiveCell from '../models/chain/live-cell'
 import Output from '../models/chain/output'
 import SystemScriptInfo from '../models/system-script-info'
-import Script, { ScriptHashType } from '../models/chain/script'
 import LiveCellService from './live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
 import NFT from '../models/nft'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { MIN_CELL_CAPACITY } from '../utils/const'
+import { HashType, Script, utils } from '@ckb-lumos/base'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -265,7 +265,7 @@ export default class CellsService {
     const acpCodehash = assetAccountInfo.getAcpCodeHash()
     const sudtCodehash = assetAccountInfo.getSudtCodeHash()
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 =>
-      SystemScriptInfo.generateSecpScript(blake160).computeHash()
+      utils.computeScriptHash(SystemScriptInfo.generateSecpScript(blake160))
     )
 
     const skip = (pageNo - 1) * pageSize
@@ -441,7 +441,7 @@ export default class CellsService {
     walletId: string,
     lockClass: {
       codeHash: string
-      hashType: ScriptHashType
+      hashType: HashType
     }
   ) => {
     return await getConnection()
@@ -473,7 +473,7 @@ export default class CellsService {
   private static getLiveOrSentCellByLockArgsMultisigOutput = async (lockClass: {
     lockArgs?: string[]
     codeHash: string
-    hashType: ScriptHashType
+    hashType: HashType
   }) => {
     return await getConnection()
       .getRepository(MultisigOutput)
@@ -516,8 +516,8 @@ export default class CellsService {
     lockClass: {
       lockArgs?: string[]
       codeHash: string
-      hashType: ScriptHashType
-    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
+      hashType: HashType
+    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: 'type' },
     multisigConfigs: MultisigConfigModel[] = []
   ): Promise<{
     inputs: Input[]
@@ -671,9 +671,9 @@ export default class CellsService {
     walletId: string,
     lockClass: {
       codeHash: string
-      hashType: ScriptHashType
+      hashType: HashType
       args?: string
-    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type }
+    } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: 'type' }
   ): Promise<Input[]> => {
     const cellEntities: (OutputEntity | MultisigOutput)[] = await (!lockClass.args
       ? CellsService.getLiveOrSentCellByWalletId(walletId, lockClass)

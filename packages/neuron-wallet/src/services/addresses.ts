@@ -8,12 +8,12 @@ import { getConnection } from 'typeorm'
 import { TransactionsService } from '../services/tx'
 import CellsService from './cells'
 import SystemScriptInfo from '../models/system-script-info'
-import Script from '../models/chain/script'
 import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import AddressDescription from '../database/chain/entities/address-description'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressMeta from '../database/address/meta'
 import queueWrapper from '../utils/queue'
+import { Script, utils } from '@ckb-lumos/base'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -383,12 +383,12 @@ export default class AddressService {
       hashType: SystemScriptInfo.SECP_HASH_TYPE,
     })
     const allAddressesWithBalances = addresses.map(address => {
-      const script = Script.fromObject({
+      const script: Script = {
         codeHash: SystemScriptInfo.SECP_CODE_HASH,
         hashType: SystemScriptInfo.SECP_HASH_TYPE,
         args: address.blake160,
-      })
-      const lockHash = script.computeHash()
+      }
+      const lockHash = utils.computeScriptHash(script)
       const liveBalance = liveBalances.get(lockHash) || '0'
       const sentBalance = sentBalances.get(lockHash) || '0'
       const pendingBalance = pendingBalances.get(lockHash) || '0'

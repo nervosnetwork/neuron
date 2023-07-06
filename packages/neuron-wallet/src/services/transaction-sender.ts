@@ -17,7 +17,6 @@ import OutPoint from '../models/chain/out-point'
 import Output from '../models/chain/output'
 import WitnessArgs from '../models/chain/witness-args'
 import Transaction from '../models/chain/transaction'
-import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
@@ -685,13 +684,13 @@ export default class TransactionSender {
     const wallet = WalletService.getInstance().get(walletID)
     const address = await wallet.getNextAddress()
     const blake160 = AddressParser.toBlake160(address!.address)
+    const outputLock = {
+      codeHash: SystemScriptInfo.SECP_CODE_HASH,
+      hashType: SystemScriptInfo.SECP_HASH_TYPE,
+      args: blake160,
+    }
 
-    const output: Output = new Output(
-      outputCapacity.toString(),
-      new Script(SystemScriptInfo.SECP_CODE_HASH, blake160, SystemScriptInfo.SECP_HASH_TYPE),
-      undefined,
-      '0x'
-    )
+    const output: Output = new Output(outputCapacity.toString(), outputLock, undefined, '0x')
 
     const outputs: Output[] = [output]
 

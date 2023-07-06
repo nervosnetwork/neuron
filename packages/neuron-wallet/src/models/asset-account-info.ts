@@ -1,16 +1,16 @@
 import CellDep, { DepType } from './chain/cell-dep'
-import Script, { ScriptHashType } from './chain/script'
 import OutPoint from './chain/out-point'
 import NetworksService from '../services/networks'
 import Transaction from './chain/transaction'
 import HexUtils from '../utils/hex'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
+import { HashType, Script, utils } from '@ckb-lumos/base'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
   codeHash: string
-  hashType: ScriptHashType
+  hashType: HashType
 }
 
 export default class AssetAccountInfo {
@@ -43,7 +43,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_SUDT_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_SUDT_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_SUDT_SCRIPT_HASHTYPE! as HashType,
       }
       this.sudtInfo = {
         cellDep: new CellDep(
@@ -51,7 +51,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_SUDT_INFO_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_SUDT_INFO_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_SUDT_INFO_SCRIPT_HASHTYPE! as HashType,
       }
       this.anyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -59,7 +59,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_ACP_SCRIPT_HASHTYPE! as HashType,
       }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -67,7 +67,7 @@ export default class AssetAccountInfo {
           process.env.LEGACY_MAINNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.LEGACY_MAINNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.LEGACY_MAINNET_ACP_SCRIPT_HASHTYPE! as HashType,
       }
       this.pwAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -75,7 +75,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_PW_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_PW_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_PW_ACP_SCRIPT_HASHTYPE! as HashType,
       }
       this.chequeInfo = {
         cellDep: new CellDep(
@@ -83,7 +83,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_CHEQUE_DEP_TYPE! as DepType
         ),
         codeHash: process.env.MAINNET_CHEQUE_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE! as HashType,
       }
       this.nftIssuerInfo = {
         cellDep: new CellDep(
@@ -91,7 +91,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_NFT_ISSUER_DEP_TYPE as DepType
         ),
         codeHash: process.env.MAINNET_NFT_ISSUER_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as HashType,
       }
       this.nftClassInfo = {
         cellDep: new CellDep(
@@ -99,7 +99,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_NFT_CLASS_DEP_TYPE as DepType
         ),
         codeHash: process.env.MAINNET_NFT_CLASS_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE! as HashType,
       }
       this.nftInfo = {
         cellDep: new CellDep(
@@ -107,7 +107,7 @@ export default class AssetAccountInfo {
           process.env.MAINNET_NFT_DEP_TYPE as DepType
         ),
         codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
-        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as HashType,
       }
     } else {
       this.sudt = {
@@ -116,7 +116,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_SUDT_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_SUDT_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_SUDT_SCRIPT_HASHTYPE! as HashType,
       }
       this.sudtInfo = {
         cellDep: new CellDep(
@@ -124,7 +124,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_SUDT_INFO_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_SUDT_INFO_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_SUDT_INFO_SCRIPT_HASHTYPE! as HashType,
       }
       this.anyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -132,7 +132,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_ACP_SCRIPT_HASHTYPE! as HashType,
       }
       this.legacyAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -140,7 +140,7 @@ export default class AssetAccountInfo {
           process.env.LEGACY_TESTNET_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.LEGACY_TESTNET_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.LEGACY_TESTNET_ACP_SCRIPT_HASHTYPE! as HashType,
       }
       this.pwAnyoneCanPayInfo = {
         cellDep: new CellDep(
@@ -148,7 +148,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_PW_ACP_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_PW_ACP_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_PW_ACP_SCRIPT_HASHTYPE! as HashType,
       }
       this.chequeInfo = {
         cellDep: new CellDep(
@@ -156,7 +156,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_CHEQUE_DEP_TYPE! as DepType
         ),
         codeHash: process.env.TESTNET_CHEQUE_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE! as HashType,
       }
       this.nftIssuerInfo = {
         cellDep: new CellDep(
@@ -164,7 +164,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_NFT_ISSUER_DEP_TYPE as DepType
         ),
         codeHash: process.env.TESTNET_NFT_ISSUER_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE! as HashType,
       }
       this.nftClassInfo = {
         cellDep: new CellDep(
@@ -172,7 +172,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_NFT_CLASS_DEP_TYPE as DepType
         ),
         codeHash: process.env.TESTNET_NFT_CLASS_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE! as HashType,
       }
       this.nftInfo = {
         cellDep: new CellDep(
@@ -180,7 +180,7 @@ export default class AssetAccountInfo {
           process.env.TESTNET_NFT_DEP_TYPE as DepType
         ),
         codeHash: process.env.TESTNET_NFT_SCRIPT_CODEHASH!,
-        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
+        hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as HashType,
       }
     }
   }
@@ -230,17 +230,29 @@ export default class AssetAccountInfo {
   }
 
   public generateSudtScript(args: string): Script {
-    return new Script(this.sudt.codeHash, args, this.sudt.hashType)
+    return {
+      codeHash: this.sudt.codeHash,
+      hashType: this.sudt.hashType,
+      args,
+    }
   }
 
   public generateAnyoneCanPayScript(args: string): Script {
     const info = this.anyoneCanPayInfo
-    return new Script(info.codeHash, args, info.hashType)
+    return {
+      codeHash: info.codeHash,
+      hashType: info.hashType,
+      args,
+    }
   }
 
   public generateLegacyAnyoneCanPayScript(args: string): Script {
     const info = this.legacyAnyoneCanPayInfo
-    return new Script(info.codeHash, args, info.hashType)
+    return {
+      codeHash: info.codeHash,
+      hashType: info.hashType,
+      args,
+    }
   }
 
   public generateChequeScript(receiverLockHash: string, senderLockHash: string): Script {
@@ -248,7 +260,11 @@ export default class AssetAccountInfo {
     const senderLockHash20 = HexUtils.removePrefix(senderLockHash).slice(0, 40)
     const args = `0x${receiverLockHash20}${senderLockHash20}`
     const info = this.chequeInfo
-    return new Script(info.codeHash, args, info.hashType)
+    return {
+      codeHash: info.codeHash,
+      hashType: info.hashType,
+      args,
+    }
   }
 
   public isSudtScript(script: Script): boolean {
@@ -292,7 +308,7 @@ export default class AssetAccountInfo {
     for (const lockHash20 of [receiverLockHash, senderLockHash]) {
       const foundAddressInfo = addressInfos.find(info => {
         const defaultLockScript = SystemScriptInfo.generateSecpScript(info.blake160)
-        const addressLockHash20 = HexUtils.removePrefix(defaultLockScript.computeHash()).slice(0, 40)
+        const addressLockHash20 = HexUtils.removePrefix(utils.computeScriptHash(defaultLockScript)).slice(0, 40)
         return lockHash20 === addressLockHash20
       })
       if (foundAddressInfo) {

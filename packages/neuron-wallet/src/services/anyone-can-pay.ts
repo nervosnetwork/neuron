@@ -12,7 +12,6 @@ import {
   TargetOutputNotFoundError,
   AcpSendSameAccountError,
 } from '../exceptions'
-import Script from '../models/chain/script'
 import OutPoint from '../models/chain/out-point'
 import LiveCellService from './live-cell-service'
 import WalletService from './wallets'
@@ -21,6 +20,7 @@ import CellsService from './cells'
 import { MIN_SUDT_CAPACITY } from '../utils/const'
 import NetworksService from './networks'
 import { NetworkType } from '../models/network'
+import { Script } from '@ckb-lumos/base'
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(

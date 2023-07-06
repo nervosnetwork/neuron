@@ -1,7 +1,7 @@
-import Script from '../models/chain/script'
 import LiveCell from '../models/chain/live-cell'
 import { queryIndexer } from '../block-sync-renderer/index'
 import { LumosCell, LumosCellQuery } from '../block-sync-renderer/sync/connector'
+import { Script, utils } from '@ckb-lumos/base'
 
 export default class LiveCellService {
   private static instance: LiveCellService
@@ -36,7 +36,7 @@ export default class LiveCellService {
       return null
     }
 
-    const typeHash = type ? type.computeHash() : ''
+    const typeHash = type ? utils.computeScriptHash(type) : ''
     for (let i = 0; i < result.length; i++) {
       const item = LiveCell.fromLumos(result[i])
       if (type) {
@@ -59,7 +59,7 @@ export default class LiveCellService {
 
     const cells = []
 
-    const typeHash = type ? type.computeHash() : ''
+    const typeHash = type ? utils.computeScriptHash(type) : ''
     for (let i = 0; i < result.length; i++) {
       const item = LiveCell.fromLumos(result[i])
       if (type) {

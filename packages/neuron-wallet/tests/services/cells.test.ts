@@ -8,7 +8,6 @@ import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } 
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
 import TransactionFee from '../../src/models/transaction-fee'
-import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { TransactionStatus } from '../../src/models/chain/transaction'
 import Transaction from '../../src/models/chain/transaction'
 import Output from '../../src/models/chain/output'
@@ -23,6 +22,7 @@ import MultisigOutput from '../../src/database/chain/entities/multisig-output'
 import { MultisigConfigNeedError, TransactionInputParameterMiss } from '../../src/exceptions'
 import LiveCell from '../../src/models/chain/live-cell'
 import BufferUtils from '../../src/utils/buffer'
+import { HashType, Script, utils } from '@ckb-lumos/base'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -52,7 +52,7 @@ describe('CellsService', () => {
   const aliceLockScript = SystemScriptInfo.generateSecpScript(alicePublicKeyHash)
   const alice = {
     lockScript: aliceLockScript,
-    lockHash: aliceLockScript.computeHash(),
+    lockHash: utils.computeScriptHash(aliceLockScript),
     address: scriptToAddress(aliceLockScript, false),
     blake160: alicePublicKeyHash,
     walletId: walletId1,
@@ -62,7 +62,7 @@ describe('CellsService', () => {
   const bobLockScript = SystemScriptInfo.generateSecpScript(bobPublicKeyHash)
   const bob = {
     lockScript: bobLockScript,
-    lockHash: bobLockScript.computeHash(),
+    lockHash: utils.computeScriptHash(bobLockScript),
     address: scriptToAddress(bobLockScript, false),
     blake160: bobPublicKeyHash,
     walletId: walletId1,
@@ -72,7 +72,7 @@ describe('CellsService', () => {
   const multisigLockScript = SystemScriptInfo.generateMultiSignScript(multisigPublicKeyHash)
   const multisigInfo = {
     lockScript: multisigLockScript,
-    lockHash: multisigLockScript.computeHash(),
+    lockHash: utils.computeScriptHash(multisigLockScript),
     address: scriptToAddress(multisigLockScript, false),
     blake160: multisigPublicKeyHash,
     walletId: walletId1,
@@ -82,7 +82,7 @@ describe('CellsService', () => {
   const charlieLockScript = SystemScriptInfo.generateSecpScript(charliePublicKeyHash)
   const charlie = {
     lockScript: charlieLockScript,
-    lockHash: charlieLockScript.computeHash(),
+    lockHash: utils.computeScriptHash(charlieLockScript),
     address: scriptToAddress(charlieLockScript, false),
     blake160: charliePublicKeyHash,
     walletId: walletId2,
@@ -133,14 +133,14 @@ describe('CellsService', () => {
     if (who.lockScript.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
       output.multiSignBlake160 = who.lockScript.args
     }
-    output.lockHash = who.lockScript.computeHash()
+    output.lockHash = utils.computeScriptHash(who.lockScript)
     output.status = status
     output.hasData = hasData
     if (typeScript) {
       output.typeCodeHash = typeScript.codeHash
       output.typeArgs = typeScript.args
       output.typeHashType = typeScript.hashType
-      output.typeHash = typeScript.computeHash()
+      output.typeHash = utils.computeScriptHash(typeScript)
     }
     output.daoData = daoData
     if (transaction) {
@@ -177,7 +177,11 @@ describe('CellsService', () => {
     return multisigCell
   }
 
-  const typeScript = new Script(randomHex(), '0x', ScriptHashType.Data)
+  const typeScript: Script = {
+    codeHash: randomHex(),
+    args: '0x',
+    hashType: 'data',
+  }
 
   it('getLiveCell', async () => {
     const capacity = '1000'
@@ -265,7 +269,11 @@ describe('CellsService', () => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('1'), OutputStatus.Live, false, null, {
-          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data),
+          lockScript: {
+            codeHash: bob.lockScript.codeHash,
+            args: bob.lockScript.args,
+            hashType: 'data',
+          },
         }),
         generateCell(toShannon('200'), OutputStatus.Sent, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, true, null),
@@ -460,7 +468,7 @@ describe('CellsService', () => {
             undefined,
             undefined,
             undefined,
-            { codeHash: lockCodeHash, hashType: ScriptHashType.Type }
+            { codeHash: lockCodeHash, hashType: 'type' }
           )
         } catch (e) {
           error = e
@@ -663,7 +671,11 @@ describe('CellsService', () => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('1'), OutputStatus.Live, false, null, {
-          lockScript: new Script(bob.lockScript.codeHash, bob.lockScript.args, ScriptHashType.Data),
+          lockScript: {
+            codeHash: bob.lockScript.codeHash,
+            args: bob.lockScript.args,
+            hashType: 'data',
+          },
         }),
         generateCell(toShannon('200'), OutputStatus.Sent, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, true, null),
@@ -686,7 +698,7 @@ describe('CellsService', () => {
       beforeEach(async () => {
         allInputs = await CellsService.gatherAllInputs(walletId1, {
           codeHash: 'non exist lock code hash',
-          hashType: ScriptHashType.Type,
+          hashType: 'type',
         })
       })
       it('returns empty array', async () => {
@@ -1090,17 +1102,26 @@ describe('CellsService', () => {
   })
 
   describe('#usedByAnyoneCanPayBlake160s', () => {
-    const fakeArgs1 = '0x1'
-    const fakeArgs2 = '0x2'
-    const fakeArgs3 = '0x3'
     const codeHash = randomHex()
-    const lockScript1 = new Script(codeHash, fakeArgs1, ScriptHashType.Type)
-    const lockScript2 = new Script(codeHash, fakeArgs2, ScriptHashType.Type)
-    const lockScript3 = new Script(codeHash, fakeArgs3, ScriptHashType.Type)
+    const lockScript1: Script = {
+      args: '0x01',
+      codeHash,
+      hashType: 'type',
+    }
+    const lockScript2: Script = {
+      args: '0x02',
+      codeHash,
+      hashType: 'type',
+    }
+    const lockScript3: Script = {
+      args: '0x03',
+      codeHash,
+      hashType: 'type',
+    }
 
-    const owner1 = { lockScript: lockScript1, lockHash: lockScript1.computeHash() }
-    const owner2 = { lockScript: lockScript2, lockHash: lockScript2.computeHash() }
-    const owner3 = { lockScript: lockScript3, lockHash: lockScript3.computeHash() }
+    const owner1 = { lockScript: lockScript1, lockHash: utils.computeScriptHash(lockScript1) }
+    const owner2 = { lockScript: lockScript2, lockHash: utils.computeScriptHash(lockScript2) }
+    const owner3 = { lockScript: lockScript3, lockHash: utils.computeScriptHash(lockScript3) }
 
     beforeEach(async () => {
       await createCell('1000', OutputStatus.Live, false, null, owner1)
@@ -1144,11 +1165,21 @@ describe('CellsService', () => {
         lockScript: multiSignLockScript,
       }
 
-      const receiverChequeLock = assetAccountInfo.generateChequeScript(bobDefaultLock.computeHash(), '0'.repeat(40))
-      const senderChequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), bobDefaultLock.computeHash())
+      const receiverChequeLock = assetAccountInfo.generateChequeScript(
+        utils.computeScriptHash(bobDefaultLock),
+        '0'.repeat(40)
+      )
+      const senderChequeLock = assetAccountInfo.generateChequeScript(
+        '0'.repeat(40),
+        utils.computeScriptHash(bobDefaultLock)
+      )
 
       const acpLock = assetAccountInfo.generateAnyoneCanPayScript('0x')
-      const sudtType = new Script(assetAccountInfo.getSudtCodeHash(), '0x', ScriptHashType.Type)
+      const sudtType: Script = {
+        args: '0x',
+        codeHash: assetAccountInfo.getSudtCodeHash(),
+        hashType: 'type',
+      }
 
       beforeEach(async () => {
         const cells: OutputEntity[] = [
@@ -1279,12 +1310,12 @@ describe('CellsService', () => {
       lock: {
         codeHash: string
         args: string
-        hashType: ScriptHashType
+        hashType: HashType
       },
       type: {
         codeHash: string
         args: string
-        hashType: ScriptHashType
+        hashType: HashType
       },
       outPoint: {
         txHash: string
@@ -1299,16 +1330,16 @@ describe('CellsService', () => {
         outPoint.txHash,
         outPoint.index,
         `0x${BigInt(toShannon(capacity)).toString(16)}`,
-        Script.fromObject(lock),
-        Script.fromObject(type),
+        lock,
+        type,
         data ? BufferUtils.writeBigUInt128LE(BigInt(data)) : '0x00'
       )
     }
-    const gliaTypeScript = Script.fromObject({
+    const gliaTypeScript: Script = {
       codeHash: '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
-      hashType: ScriptHashType.Type,
+      hashType: 'type',
       args: '0x6fe3733cd9df22d05b8a70f7b505d0fb67fb58fb88693217135ff5079713e902',
-    })
+    }
     it('exception no live cell CapacityNotEnough', async () => {
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([])
       await expect(CellsService.gatherSudtInputs('0', walletId1, [], gliaTypeScript, '')).rejects.toThrow(

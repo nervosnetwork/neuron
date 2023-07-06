@@ -11,6 +11,7 @@ import { TransactionStatus } from '../../src/models/chain/transaction'
 import AddressParser from '../../src/models/address-parser'
 import { when } from 'jest-when'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
+import { Script, utils } from '@ckb-lumos/base'
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(
@@ -28,7 +29,7 @@ const randomHex = (length: number = 64): string => {
   return `0x${str}`
 }
 
-const generateCell = (capacity: string, lockScript: any, status: OutputStatus) => {
+const generateCell = (capacity: string, lockScript: Script, status: OutputStatus) => {
   const output = new OutputEntity()
   output.outPointTxHash = randomHex()
   output.outPointIndex = '0'
@@ -36,7 +37,7 @@ const generateCell = (capacity: string, lockScript: any, status: OutputStatus) =
   output.lockCodeHash = lockScript.codeHash
   output.lockArgs = lockScript.args
   output.lockHashType = lockScript.hashType
-  output.lockHash = lockScript.computeHash()
+  output.lockHash = utils.computeScriptHash(lockScript)
   output.status = status
   output.hasData = false
 

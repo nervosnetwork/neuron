@@ -1,7 +1,8 @@
-import Script from './script'
 import OutPoint from './out-point'
 import HexUtils from '../../utils/hex'
 import TypeChecker from '../../utils/type-checker'
+import { Script, utils } from '@ckb-lumos/base'
+import { calculateScriptBytesize } from './script'
 
 // sent: pending transaction's output
 // pending: pending transaction's input
@@ -55,7 +56,8 @@ export default class Output {
     lock: Script,
     type?: Script | null,
     data?: string,
-    lockHash?: string,
+    // REFACTOR: remove lockHash, use lock to calculate lockHash
+    _lockHash?: string,
     typeHash?: string,
     outPoint?: OutPoint,
     status?: OutputStatus,
@@ -69,9 +71,12 @@ export default class Output {
   ) {
     this.capacity = BigInt(capacity).toString()
     this.lock = lock
+    this.lockHash = utils.computeScriptHash(lock)
     this.type = type
-    this.lockHash = lockHash || this.lock.computeHash()
-    this.typeHash = typeHash || this.type?.computeHash()
+    this.typeHash = typeHash
+    if (type) {
+      this.typeHash = utils.computeScriptHash(type)
+    }
     this.outPoint = outPoint
     this.status = status
     this.daoData = daoData
@@ -125,8 +130,8 @@ export default class Output {
   }): Output {
     return new Output(
       capacity,
-      Script.fromObject(lock),
-      type ? Script.fromObject(type) : type,
+      lock,
+      type,
       data,
       lockHash,
       typeHash,
@@ -165,13 +170,13 @@ export default class Output {
 
   public setLock(value: Script) {
     this.lock = value
-    this.lockHash = value.computeHash()
+    this.lockHash = utils.computeScriptHash(value)
   }
 
   public setType(value: Script | null) {
     if (value) {
       this.type = value
-      this.lockHash = value.computeHash()
+      this.lockHash = utils.computeScriptHash(value)
     } else {
       this.type = value
       this.typeHash = undefined
@@ -203,9 +208,9 @@ export default class Output {
   }
 
   public calculateBytesize(): number {
-    let bytesize = 8 + HexUtils.byteLength(this.data) + this.lock.calculateBytesize()
+    let bytesize = 8 + HexUtils.byteLength(this.data) + calculateScriptBytesize(this.lock)
     if (this.type) {
-      bytesize += this.type.calculateBytesize()
+      bytesize += calculateScriptBytesize(this.type)
     }
     return bytesize
   }
@@ -213,16 +218,12 @@ export default class Output {
   public toSDK(): CKBComponents.CellOutput {
     return {
       capacity: HexUtils.toHex(this.capacity),
-      lock: this.lock.toSDK(),
-      type: this.type ? this.type.toSDK() : this.type,
+      lock: this.lock,
+      type: this.type,
     }
   }
 
   public static fromSDK(output: CKBComponents.CellOutput): Output {
-    return new Output(
-      output.capacity,
-      Script.fromSDK(output.lock),
-      output.type ? Script.fromSDK(output.type) : output.type
-    )
+    return new Output(output.capacity, output.lock, output.type)
   }
 }
