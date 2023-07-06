@@ -173,6 +173,7 @@
     font-weight: 500;
     font-size: 16px;
     line-height: 22px;
+    color: inherit;
   }
 }
 
@@ -228,9 +229,7 @@
       background: var(--third-background-color);
       border-radius: 40px;
       transition: transform 0.1s ease-in-out;
-      transform: translateX(
-        calc(var(--selected-tab) * ($itemWidth - $itemOverlapping))
-      );
+      transform: translateX(calc(var(--selected-tab) * ($itemWidth - $itemOverlapping)));
     }
   }
 

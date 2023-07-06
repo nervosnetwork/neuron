@@ -2,12 +2,11 @@ import React, { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import SUDTAvatar from 'widgets/SUDTAvatar'
-import { ReactComponent as AddressToggleIcon } from 'widgets/Icons/AddressTransform.svg'
+import { AddressTransformWithCopyZone } from 'components/Receive/multiAddressReceive'
 import QRCode, { copyCanvas, downloadCanvas } from 'widgets/QRCode'
-import CopyZone from 'widgets/CopyZone'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
-import { Attention } from 'widgets/Icons/icon'
+import Alert from 'widgets/Alert'
 
 import { CONSTANTS } from 'utils'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
@@ -60,8 +59,17 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
   const displayedAddr = isInShortFormat ? toShortAddr(address) : address
 
   return (
-    <Dialog show title={t('s-udt.account-list.receive')} onCancel={onClose} showFooter={false}>
+    <Dialog
+      show
+      title={t('s-udt.account-list.receive')}
+      onCancel={onClose}
+      showFooter={false}
+      contentClassName={styles.contentClassName}
+    >
       <div className={styles.container}>
+        <Alert status="warn" className={styles.notification}>
+          {t('s-udt.receive.notation', { symbol: getDisplaySymbol(tokenName || '', symbol || '') })}
+        </Alert>
         <div className={styles.info}>
           <SUDTAvatar type="logo" />
           <div className={styles.right}>
@@ -78,25 +86,13 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
           <QRCode value={displayedAddr} size={128} includeMargin ref={ref} />
         </div>
         <div className={styles.copyContainer}>
-          <CopyZone content={displayedAddr} name={t('receive.copy-address')} className={styles.copyAddress}>
-            {displayedAddr}
-            <button
-              type="button"
-              className={styles.addressToggle}
-              onClick={() => setIsInShortFormat(is => !is)}
-              title={t(
-                isInShortFormat ? `receive.turn-into-full-version-format` : `receive.turn-into-deprecated-format`
-              )}
-            >
-              <AddressToggleIcon />
-            </button>
-          </CopyZone>
+          <AddressTransformWithCopyZone
+            className={styles.copyTransformWrapper}
+            showAddress={displayedAddr}
+            isInShortFormat={isInShortFormat}
+            onClick={() => setIsInShortFormat(is => !is)}
+          />
         </div>
-        <p className={styles.notation}>
-          <Attention />
-          {t('s-udt.receive.notation', { symbol: getDisplaySymbol(tokenName || '', symbol || '') })}
-        </p>
-
         <div className={styles.actions}>
           <Button type="default" label={t('receive.copy-qr-code')} onClick={onCopyQrCode} />
           <Button type="confirm" label={t('receive.save-qr-code')} onClick={onDownloadQrCode} />
