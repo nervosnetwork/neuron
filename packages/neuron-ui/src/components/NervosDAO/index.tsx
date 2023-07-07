@@ -86,6 +86,7 @@ const NervosDAO = () => {
     t,
     depositValue,
     suggestFeeRate,
+    showDepositDialog,
   })
   const updateDepositValue = hooks.useUpdateDepositValue({ setDepositValue })
 
