@@ -162,9 +162,9 @@ const SUDTSend = () => {
     { label: t('s-udt.send.title'), link: RoutePath.SUDTSend },
   ]
 
-  const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
-    { key: Fields.Address, label: t('s-udt.send.address') },
-    { key: Fields.Amount, label: t('s-udt.send.amount') },
+  const fields: { key: Fields.Address | Fields.Amount; label: string; placeholder: string }[] = [
+    { key: Fields.Address, label: t('s-udt.send.address'), placeholder: t('s-udt.send.address-placeholder') },
+    { key: Fields.Amount, label: t('s-udt.send.amount'), placeholder: t('s-udt.send.amount-placeholder') },
   ]
 
   const errors: { [Fields.Address]: string; [Fields.Amount]: string } = useMemo(() => {
@@ -298,6 +298,16 @@ const SUDTSend = () => {
     [dispatch, setRemoteError]
   )
 
+  const handleCheckbox = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (options && options.length) {
+        const { checked } = e.target
+        onChangeSendType(checked ? options[0].key : undefined)
+      }
+    },
+    [onChangeSendType, options]
+  )
+
   const onToggleSendingAll = useCallback(() => {
     dispatch({ type: Fields.SendAll, payload: !sendState.sendAll })
   }, [dispatch, sendState.sendAll])
@@ -370,7 +380,7 @@ const SUDTSend = () => {
                       key={field.label}
                       field={field.key}
                       onChange={onInput}
-                      rows={field.key === Fields.Address ? 2 : 1}
+                      rows={field.key === Fields.Address && sendState.address ? 2 : 1}
                       suffix={
                         field.key === Fields.Amount ? (
                           <Button
@@ -386,35 +396,42 @@ const SUDTSend = () => {
                       disabled={sendState.sendAll}
                       error={errors[field.key]}
                       className={styles[field.key]}
+                      placeholder={field.placeholder}
                     />
 
                     {field.key === Fields.Address && options?.length ? (
                       <>
-                        <RadioGroup
-                          defaultValue={sendType}
-                          onChange={onChangeSendType}
-                          itemClassName={styles.optionItem}
-                          options={options.map(item => ({
-                            value: item.key,
-                            label: t(`s-udt.send.${item.label}`, item?.params),
-                            suffix: item.tooltip ? (
-                              <div className={styles.tipItem}>
-                                <Tooltip
-                                  tip={
-                                    <p className={styles.tooltip}>{t(`s-udt.send.${item.tooltip}`, item?.params)}</p>
-                                  }
-                                  showTriangle
-                                >
-                                  <AttentionOutline className={styles.attention} />
-                                </Tooltip>
-                              </div>
-                            ) : null,
-                            tip:
-                              item.key === SendType.secp256Cheque && !isMainnet ? (
-                                <div className={styles.selectError}>{t('messages.light-client-cheque-warning')}</div>
+                        {options.length > 1 ? (
+                          <RadioGroup
+                            onChange={onChangeSendType}
+                            itemClassName={styles.optionItem}
+                            options={options.map(item => ({
+                              value: item.key,
+                              label: t(`s-udt.send.${item.label}`, item?.params),
+                              suffix: item.tooltip ? (
+                                <div className={styles.tipItem}>
+                                  <Tooltip
+                                    tip={
+                                      <p className={styles.tooltip}>{t(`s-udt.send.${item.tooltip}`, item?.params)}</p>
+                                    }
+                                    showTriangle
+                                  >
+                                    <AttentionOutline className={styles.attention} />
+                                  </Tooltip>
+                                </div>
                               ) : null,
-                          }))}
-                        />
+                              tip:
+                                item.key === SendType.secp256Cheque && !isMainnet ? (
+                                  <div className={styles.selectError}>{t('messages.light-client-cheque-warning')}</div>
+                                ) : null,
+                            }))}
+                          />
+                        ) : (
+                          <label htmlFor="sendType">
+                            <input type="checkbox" id="sendType" onChange={handleCheckbox} checked={!!sendType} />
+                            <span>{t(`s-udt.send.${options[0].label}`, options[0]?.params)}</span>
+                          </label>
+                        )}
                         {!isOptionCorrect ? (
                           <div className={styles.selectError}>{t('s-udt.send.select-option')}</div>
                         ) : null}
@@ -434,6 +451,7 @@ const SUDTSend = () => {
                   field={Fields.Description}
                   onChange={onInput}
                   error={remoteError}
+                  placeholder={t('s-udt.send.description-placeholder')}
                 />
               </div>
               <div className={styles.fee}>
