@@ -949,7 +949,7 @@
       "send": {
         "title": "Send",
         "address": "Send to",
-        "address-placeholder": "Please input adddress",
+        "address-placeholder": "Please input address",
         "amount": "Amount",
         "amount-placeholder": "Please input amount",
         "description": "Description",
