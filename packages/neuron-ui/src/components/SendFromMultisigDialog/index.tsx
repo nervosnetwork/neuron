@@ -122,7 +122,8 @@ const SendFromMultisigDialog = ({
           <div className={styles.sendFieldContainer}>
             {sendInfoList.map((item, idx) => (
               <SendFieldset
-                key={item.address || idx}
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
                 idx={idx}
                 item={item}
                 errors={outputErrors[idx]}
