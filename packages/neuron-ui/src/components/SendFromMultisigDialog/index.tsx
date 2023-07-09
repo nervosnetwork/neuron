@@ -129,7 +129,7 @@ const SendFromMultisigDialog = ({
                 isSendMax={isSendMax}
                 isMaxBtnDisabled={isMaxBtnDisabled}
                 isTimeLockable={false}
-                isMaxBtnShow={false}
+                isMaxBtnShow={idx === sendInfoList.length - 1}
                 isRemoveBtnShow={sendInfoList.length > 1}
                 onOutputRemove={deleteSendInfo}
                 onItemChange={onSendInfoChange}

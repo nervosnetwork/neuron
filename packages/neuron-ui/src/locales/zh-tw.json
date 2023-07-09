@@ -197,6 +197,7 @@
       "address": "收款地址",
       "input-address": "請輸入收款地址",
       "amount": "转账金額（CKB）",
+      "input-amount": "請輸入转账金額",
       "send": "發送",
       "reset": "重置",
       "confirm-password": "確認密碼",
@@ -996,6 +997,8 @@
         "notice": "導入配置一次只能導入一個，如果是文件內容是數組默認取第一個導入"
       },
       "delete-failed": "刪除多簽配置失敗",
+      "remove-multisig-address": "刪除多簽地址",
+      "remove-multisig-address-msg": "確定要刪除所選多簽地址？",
       "send-ckb": {
         "title": "多簽地址轉賬",
         "detail": "從 {{m}}-of-{{n}} 多簽地址 <0></0> 轉賬",
