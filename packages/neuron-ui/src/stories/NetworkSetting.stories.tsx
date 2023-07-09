@@ -1,12 +1,11 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import NetworkSetting from 'components/NetworkSetting'
 import { initStates } from 'states'
 import { withRouter } from 'storybook-addon-react-router-v6'
 
 const states: { [title: string]: State.Network[] } = {
-  'Empty List': [],
-  'Content List': [
+  EmptyList: [],
+  ContentList: [
     {
       id: 'Mainnet',
       name: 'Mainnet',
@@ -34,14 +33,26 @@ const states: { [title: string]: State.Network[] } = {
   ],
 }
 
-const stories = storiesOf('NetworkSetting', module).addDecorator(withRouter())
+const meta: Meta<typeof NetworkSetting> = {
+  component: NetworkSetting,
+  decorators: [withRouter],
+}
 
-Object.entries(states).forEach(([title, networks]) => {
-  stories.add(title, () => (
-    <NetworkSetting
-      {...initStates}
-      chain={{ ...initStates.chain, networkID: networks.length ? networks[0].id : '' }}
-      settings={{ ...initStates.settings, networks }}
-    />
-  ))
-})
+export default meta
+
+type Story = StoryObj<typeof NetworkSetting>
+
+function getArgs(networks: State.Network[] = []) {
+  return {
+    ...initStates,
+    chain: { ...initStates.chain, networkID: networks.length ? networks[0].id : '' },
+    settings: { ...initStates.settings, networks },
+  }
+}
+export const EmptyList: Story = {
+  args: getArgs(states.EmptyList),
+}
+
+export const ContentList: Story = {
+  args: getArgs(states.ContentList),
+}

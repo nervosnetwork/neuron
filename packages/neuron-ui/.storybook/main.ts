@@ -15,7 +15,4 @@ export default {
   docs: {
     autodocs: true
   },
-  features: {
-    storyStoreV7: false,
-  },
 }

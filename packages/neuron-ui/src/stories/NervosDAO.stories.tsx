@@ -1,6 +1,6 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import NervosDAO from 'components/NervosDAO'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import { initStates } from 'states'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
@@ -103,8 +103,7 @@ const stateTemplate = {
   },
 }
 
-export default {
-  title: 'Nervos DAO',
+const meta: Meta<typeof NervosDAO> = {
   component: NervosDAO,
   argTypes: {
     app: { control: 'object', isGlobal: true },
@@ -113,17 +112,22 @@ export default {
     settings: { control: 'object', isGlobal: true },
     nervosDAO: { control: 'object', isGlobal: true },
   },
+  decorators: [withRouter],
 }
 
-const Template: ComponentStory<typeof NervosDAO> = () => <NervosDAO />
+export default meta
 
-export const HasNoReceipts = Template.bind({})
-HasNoReceipts.args = {
-  ...stateTemplate,
-  nervosDAO: {
-    records: [],
+type Story = StoryObj<typeof NervosDAO>
+
+export const HasNoReceipts: Story = {
+  args: {
+    ...stateTemplate,
+    nervosDAO: {
+      records: [],
+    },
   },
 }
 
-export const HasReceipts = Template.bind({})
-HasReceipts.args = stateTemplate
+export const HasReceipts: Story = {
+  args: stateTemplate,
+}
