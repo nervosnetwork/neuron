@@ -2,7 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useState as useGlobalState } from 'states'
+import { NeuronWalletActions, useDispatch, useState as useGlobalState } from 'states'
+import { checkForUpdates } from 'services/remote'
+import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
+import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
 import {
   Overview,
@@ -67,21 +70,51 @@ const MenuButton = ({
 
 const Navbar = () => {
   const { pathname } = useLocation()
+  const dispatch = useDispatch()
   const neuronWallet = useGlobalState()
   const {
     wallet: { name },
     settings: { wallets = [] },
+    updater: { version },
   } = neuronWallet
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
-  const [selectedKey, setSelectedKey] = useState<string>()
-  const computedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
+  const [isClickedSetting, setIsClickedSetting] = useState<boolean>(false)
+  const selectedKey = menuItems.find(item => item.key === pathname || item.children?.some(v => v.key === pathname))?.key
 
   useEffect(() => {
-    if (computedKey) {
-      setSelectedKey(computedKey)
+    const onAppUpdaterUpdates = (info: Subject.AppUpdater) => {
+      dispatch({ type: NeuronWalletActions.UpdateAppUpdaterStatus, payload: info })
     }
-  }, [computedKey])
+    const appUpdaterSubscription = AppUpdaterSubject.subscribe(onAppUpdaterUpdates)
+
+    return () => {
+      appUpdaterSubscription.unsubscribe()
+    }
+  }, [dispatch])
+
+  useEffect(() => {
+    const now = new Date()
+    const nextTriggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
+
+    checkForUpdates()
+    if (nextTriggerTime) {
+      const timeDiff = nextTriggerTime.getTime() - now.getTime()
+
+      setTimeout(() => {
+        checkForUpdates()
+        setInterval(() => {
+          checkForUpdates()
+        }, 24 * 60 * 60 * 1000)
+      }, timeDiff)
+    }
+  }, [checkForUpdates])
+
+  useEffect(() => {
+    if (pathname.includes(RoutePath.Settings)) {
+      setIsClickedSetting(true)
+    }
+  }, [pathname])
 
   const [menuExpanded, setMenuExpanded] = useState(true)
   const onClickExpand = useCallback(() => {
@@ -121,9 +154,18 @@ const Navbar = () => {
               <React.Fragment key={item.key}>
                 <MenuButton menu={item} selectedKey={selectedKey}>
                   {item.icon}
-                  <span>{t(item.name)}</span>
+
+                  {!isClickedSetting && version && item.key === RoutePath.Settings ? (
+                    <Badge>
+                      <span>{t(item.name)}</span>
+                    </Badge>
+                  ) : (
+                    <span>{t(item.name)}</span>
+                  )}
+
                   {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
                 </MenuButton>
+
                 {item.children?.length && item.key === selectedKey && (
                   <div className={styles.child}>
                     <div className={styles.leftLine} />

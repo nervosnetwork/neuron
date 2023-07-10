@@ -14,13 +14,13 @@ import {
   installUpdate,
   getVersion,
 } from 'services/remote'
-import { uniformTimeFormatter, bytesFormatter } from 'utils'
+import { uniformTimeFormatter, bytesFormatter, clsx } from 'utils'
 import { LanguageSelect } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
 
 interface UpdateDownloadStatusProps {
   show: boolean
-  onCancel: () => void
+  onCancel: (status?: string) => void
   progress: number
   newVersion: string
   releaseDate: string
@@ -69,7 +69,7 @@ const UpdateDownloadStatus = ({
         onConfirm={handleConfirm}
         disabled={!available}
         confirmText={t('updates.install-update')}
-        onCancel={onCancel}
+        onCancel={() => onCancel('checked')}
         title={t('updates.update-available')}
         confirmProps={{
           'data-method': 'download',
@@ -135,7 +135,9 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [showLangDialog, setShowLangDialog] = useState(false)
   const [searchParams] = useSearchParams()
   const [errorMsg, setErrorMsg] = useState('')
-  const [dialogType, setDialogType] = useState<'' | 'checking' | 'updating' | 'updated'>('')
+  const [dialogType, setDialogType] = useState<'' | 'checking' | 'checked' | 'updating' | 'updated'>('')
+  const [isFetchUpdateByClick, setIsFetchUpdateByClick] = useState<boolean>(false)
+  const { version: newVersion } = updater
 
   const version = useMemo(() => {
     return getVersion()
@@ -145,7 +147,9 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
     const checkUpdate = searchParams.get('checkUpdate')
     if (checkUpdate === '1') {
       checkForUpdates()
+      setIsFetchUpdateByClick(true)
     }
+    return () => setIsFetchUpdateByClick(false)
   }, [searchParams, checkForUpdates])
 
   useEffect(() => {
@@ -162,7 +166,11 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       setDialogType('checking')
       return
     }
-    if (updater.version || updater.downloadProgress > 0) {
+    if (newVersion) {
+      setDialogType('checked')
+      return
+    }
+    if (updater.downloadProgress > 0) {
       setDialogType('updating')
       return
     }
@@ -175,7 +183,10 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         dataset: { method },
       } = e.target as HTMLElement
 
-      if (method === 'cancelCheck') {
+      setIsFetchUpdateByClick(true)
+      if (newVersion) {
+        setDialogType('checked')
+      } else if (method === 'cancelCheck') {
         if (dialogType === 'checking') {
           cancelCheckUpdates()
         }
@@ -189,12 +200,12 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
+      <div className={clsx(styles.content, `${newVersion ? styles.showVersion : ''}`)} data-new-version-tip="New">
         <p>
-          {t('settings.general.version')} v{version}
+          {t('settings.general.version')} v{newVersion || version}
         </p>
         <button type="button" onClick={handleUpdate} data-method="check">
-          {t(`updates.check-updates`)} <ArrowNext />
+          {t(newVersion ? 'updates.install-update' : 'updates.check-updates')} <ArrowNext />
         </button>
       </div>
 
@@ -216,11 +227,14 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         title={t(`updates.check-updates`)}
         message={errorMsg}
         type="failed"
-        onCancel={() => setErrorMsg('')}
+        onCancel={() => {
+          setIsFetchUpdateByClick(false)
+          setErrorMsg('')
+        }}
       />
 
       <Dialog
-        show={['checking', 'updated'].includes(dialogType)}
+        show={['checking', 'updated'].includes(dialogType) && isFetchUpdateByClick}
         showCancel={false}
         showHeader={false}
         confirmText={t(dialogType === 'checking' ? 'common.cancel' : 'common.ok')}
@@ -237,9 +251,12 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
       </Dialog>
 
       <UpdateDownloadStatus
-        show={dialogType === 'updating'}
-        onCancel={() => {
-          cancelDownloadUpdate()
+        show={dialogType === 'updating' || (dialogType === 'checked' && isFetchUpdateByClick)}
+        onCancel={status => {
+          if (status !== 'checked') {
+            cancelDownloadUpdate()
+          }
+          setIsFetchUpdateByClick(false)
           setDialogType('')
         }}
         progress={updater.downloadProgress}
