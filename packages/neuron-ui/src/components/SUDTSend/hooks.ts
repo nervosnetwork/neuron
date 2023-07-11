@@ -20,6 +20,14 @@ export enum AddressLockType {
   unknow = 'unknow',
 }
 
+interface GenerateResult {
+  value: {
+    result: {
+      fee: string
+    }
+  }
+}
+
 export function useAddressLockType(address: string, isMainnet: boolean) {
   return useMemo(() => {
     if (isSecp256k1Address(address)) {
@@ -150,6 +158,26 @@ export function getGenerator(sendType?: SendType) {
     return generateChequeTransaction
   }
   return generateSUDTTransaction
+}
+
+export async function batchGenerateExperimental(
+  experimental: { tx: any; assetAccount?: any; params?: any },
+  priceArray: string[]
+) {
+  if (experimental?.params) {
+    const generator = getGenerator(experimental?.params?.sendType)
+    const requestArray = priceArray.map(itemPrice => generator({ ...experimental.params, feeRate: itemPrice }))
+    const allPromiseResult = await Promise.allSettled(requestArray)
+    const resList = (allPromiseResult as GenerateResult[]).map((batchItem, index: number) => ({
+      feeRateValue: priceArray[index],
+      feeValue: batchItem.value.result.fee,
+    }))
+    return resList
+  }
+  return priceArray.map((_, index: number) => ({
+    feeRateValue: priceArray[index],
+    feeValue: '0',
+  }))
 }
 
 export function useOnSubmit({

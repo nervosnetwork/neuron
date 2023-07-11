@@ -247,7 +247,10 @@ const SUDTSend = () => {
       generator(params)
         .then(res => {
           if (isSuccessResponse(res)) {
-            globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx: res.result } })
+            globalDispatch({
+              type: AppActions.UpdateExperimentalParams,
+              payload: { tx: res.result, params: { ...params, sendType } },
+            })
             return
           }
           throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
@@ -455,7 +458,7 @@ const SUDTSend = () => {
                 />
               </div>
               <div className={styles.fee}>
-                <TransactionFeePanel fee={fee} price={sendState.price} onPriceChange={onPriceChange} />
+                <TransactionFeePanel fee={fee} price={sendState.price} onPriceChange={onPriceChange} isExperimental />
               </div>
             </div>
             <div className={styles.rightFooter}>

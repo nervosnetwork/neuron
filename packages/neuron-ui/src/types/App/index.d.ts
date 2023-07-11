@@ -289,7 +289,7 @@ declare namespace State {
     nervosDAO: NervosDAO
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
-    experimental: { tx: any; assetAccount?: any } | null
+    experimental: { tx: any; assetAccount?: any; params?: any } | null
   }
 }
 
