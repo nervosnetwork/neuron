@@ -1,21 +1,23 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import Addresses from 'components/Addresses'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import addressesStates from './data/addresses'
 
-export default {
-  title: 'Addresses',
+const meta: Meta<typeof Addresses> = {
   component: Addresses,
   decorators: [withRouter],
   argTypes: {
     wallet: { control: 'object', isGlobal: true },
   },
 }
+export default meta
 
-const Template: ComponentStory<typeof Addresses> = () => <Addresses />
+type Story = StoryObj<typeof Addresses>
 
-export const ContentList = Template.bind({})
-ContentList.args = { wallet: { addresses: addressesStates['Content List'] } }
+export const ContentList: Story = {
+  args: {
+    wallet: { addresses: addressesStates['Content List'] },
+  },
+}
 
-export const EmptyList = Template.bind({})
+export const EmptyList: Story = {}

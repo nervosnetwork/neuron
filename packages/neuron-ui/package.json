@@ -28,6 +28,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "lint-staged": {
+    ".storybook/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+      "prettier --ignore-path ../../.prettierignore --write",
+      "eslint --fix",
+      "git add"
+    ],
     "src/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
       "prettier --ignore-path ../../.prettierignore --write",
       "eslint --fix",

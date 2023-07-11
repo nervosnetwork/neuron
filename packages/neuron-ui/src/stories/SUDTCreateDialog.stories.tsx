@@ -1,5 +1,4 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import SUDTCreateDialog, { TokenInfo, SUDTCreateDialogProps } from 'components/SUDTCreateDialog'
 
@@ -21,13 +20,31 @@ const baseProps = {
 }
 const propsList: { [name: string]: SUDTCreateDialogProps } = {
   Basic: baseProps,
-  'Insufficient For SUDT': { ...baseProps, insufficient: { ckb: false, sudt: true } },
-  'Insufficient For CKB': { ...baseProps, insufficient: { ckb: true, sudt: false } },
-  'Insufficient For CKB and SUDT': { ...baseProps, insufficient: { ckb: true, sudt: true } },
+  InsufficientForSUDT: { ...baseProps, insufficient: { ckb: false, sudt: true } },
+  InsufficientForCKB: { ...baseProps, insufficient: { ckb: true, sudt: false } },
+  InsufficientForCKBAndSUDT: { ...baseProps, insufficient: { ckb: true, sudt: true } },
 }
 
-const stories = storiesOf('Create sUDT Account', module)
+const meta: Meta<typeof SUDTCreateDialog> = {
+  component: SUDTCreateDialog,
+}
 
-Object.entries(propsList).forEach(([name, props]) => {
-  stories.add(name, () => <SUDTCreateDialog {...props} />)
-})
+export default meta
+
+type Story = StoryObj<typeof SUDTCreateDialog>
+
+export const Basic: Story = {
+  args: propsList.Basic,
+}
+
+export const InsufficientForSUDT: Story = {
+  args: propsList.InsufficientForSUDT,
+}
+
+export const InsufficientForCKB: Story = {
+  args: propsList.InsufficientForCKB,
+}
+
+export const InsufficientForCKBAndSUDT: Story = {
+  args: propsList.InsufficientForCKBAndSUDT,
+}

@@ -1,8 +1,5 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import CompensationPeriodTooltip, { CompensationPeriodTooltipProps } from 'components/CompensationPeriodTooltip'
-
-const stories = storiesOf('Compensation Period Tooltip', module)
 
 const props: { [index: string]: CompensationPeriodTooltipProps } = {
   normalStart: {
@@ -56,19 +53,19 @@ const props: { [index: string]: CompensationPeriodTooltipProps } = {
     endEpochValue: 180,
     isWithdrawn: true,
   },
-  'immature for withdraw': {
+  immatureForWithdraw: {
     depositEpochValue: 1,
     baseEpochTimestamp: Date.now(),
     baseEpochValue: 4.9,
     endEpochValue: 181,
   },
-  'base less than deposit': {
+  baseLessThanDeposit: {
     depositEpochValue: 1,
     baseEpochTimestamp: Date.now(),
     baseEpochValue: 0,
     endEpochValue: 181,
   },
-  'base larger than end': {
+  baseLargerThanEnd: {
     depositEpochValue: 0,
     baseEpochTimestamp: Date.now(),
     baseEpochValue: 181,
@@ -76,8 +73,54 @@ const props: { [index: string]: CompensationPeriodTooltipProps } = {
   },
 }
 
-Object.keys(props).forEach(key => {
-  stories.add(key, () => {
-    return <CompensationPeriodTooltip {...props[key]} />
-  })
-})
+const meta: Meta<typeof CompensationPeriodTooltip> = {
+  component: CompensationPeriodTooltip,
+}
+
+export default meta
+
+type Story = StoryObj<typeof CompensationPeriodTooltip>
+
+export const NormalStart: Story = {
+  args: props.normalStart,
+}
+
+export const NormalEnd: Story = {
+  args: props.normalEnd,
+}
+
+export const SuggestedStart: Story = {
+  args: props.suggestedStart,
+}
+
+export const SuggestedEnd: Story = {
+  args: props.suggestedEnd,
+}
+
+export const EndingStart: Story = {
+  args: props.endingStart,
+}
+
+export const WithdrawInNormal: Story = {
+  args: props.withdrawInNormal,
+}
+
+export const WithdrawInSuggested: Story = {
+  args: props.withdrawInSuggested,
+}
+
+export const WithdrawnInEnding: Story = {
+  args: props.withdrawnInEnding,
+}
+
+export const ImmatureForWithdraw: Story = {
+  args: props.immatureForWithdraw,
+}
+
+export const BaseLessThanDeposit: Story = {
+  args: props.baseLessThanDeposit,
+}
+
+export const BaseLargerThanEnd: Story = {
+  args: props.baseLargerThanEnd,
+}

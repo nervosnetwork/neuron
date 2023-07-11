@@ -1,13 +1,12 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import CustomizedAsset from 'components/CustomizedAsset'
 
-export default {
-  title: 'Customized Asset',
+const meta: Meta<typeof CustomizedAsset> = {
   component: CustomizedAsset,
 }
+export default meta
 
-const Template: ComponentStory<typeof CustomizedAsset> = (props: any) => <CustomizedAsset {...props} />
+type Story = StoryObj<typeof CustomizedAsset>
 
 const baseProps = {
   tokenId: 'token id',
@@ -23,14 +22,17 @@ const baseProps = {
   isOnline: false,
 }
 
-export const ckb = Template.bind({})
-ckb.args = { type: 'ckb', ...baseProps }
-ckb.storyName = 'type = ckb'
+export const ckb: Story = {
+  args: { type: 'ckb', ...baseProps },
+  name: 'type = ckb',
+}
 
-export const sudt = Template.bind({})
-sudt.args = { type: 'sudt', ...baseProps }
-sudt.storyName = 'type = sudt'
+export const sudt: Story = {
+  args: { type: 'sudt', ...baseProps },
+  name: 'type = sudt',
+}
 
-export const unknown = Template.bind({})
-unknown.args = { type: 'unknown', ...baseProps }
-unknown.storyName = 'type = unknown'
+export const unknown: Story = {
+  args: { type: 'unknown', ...baseProps },
+  name: 'type = unknown',
+}
