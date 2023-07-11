@@ -3,7 +3,7 @@
 }
 
 .container {
-  width: 680px;
+  width: 730px;
 
   .header {
     display: flex;
@@ -93,9 +93,20 @@
   align-items: baseline;
   column-gap: 16px;
   & > div {
-    flex: 1;
+    &:first-child {
+      flex: 1;
+    }
   }
   &:last-child {
     margin-top: 16px;
+  }
+}
+
+.sendItem {
+  & > div {
+    input {
+      width: 125px !important;
+      height: 56px !important;
+    }
   }
 }
