@@ -197,6 +197,7 @@
       "address": "收款地址",
       "input-address": "请输入收款地址",
       "amount": "转账金额（CKB）",
+      "input-amount": "请输入转账金额",
       "send": "发送",
       "reset": "重置",
       "confirm-password": "确认密码",
@@ -1018,6 +1019,8 @@
         "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
       },
       "delete-failed": "删除多签配置失败",
+      "remove-multisig-address": "刪除多签地址",
+      "remove-multisig-address-msg": "确定要刪除所选多签地址？",
       "send-ckb": {
         "title": "多签地址转账",
         "detail": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",
