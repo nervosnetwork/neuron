@@ -8,7 +8,7 @@ import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention
 import TimeClock from 'widgets/Icons/TimeClock.svg'
 
 import { formatDate } from 'widgets/DatetimePickerDialog'
-import { localNumberFormatter, PlaceHolders, isSecp256k1Address } from 'utils'
+import { localNumberFormatter, isSecp256k1Address, clsx } from 'utils'
 import { ErrorWithI18n } from 'exceptions'
 
 import styles from './sendFieldset.module.scss'
@@ -26,6 +26,7 @@ interface SendSubformProps {
   onLocktimeClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onSendMaxClick?: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
   onItemChange: React.EventHandler<React.SyntheticEvent<HTMLInputElement>>
+  className?: string
   isMainnet: boolean
 }
 
@@ -42,6 +43,7 @@ const SendFieldset = ({
   onSendMaxClick,
   onItemChange,
   isTimeLockable = true,
+  className = '',
   isMainnet,
 }: SendSubformProps) => {
   const [t] = useTranslation()
@@ -64,10 +66,11 @@ const SendFieldset = ({
   }
 
   return (
-    <div className={styles.container}>
+    <div className={clsx(styles.container, className)}>
       <TextField
         className={`${styles.addresstField} ${styles.textFieldClass}`}
-        rows={2}
+        placeholder={t('send.input-address')}
+        rows={item.address ? 2 : 1}
         label={
           <div className={styles.removeLabel}>
             <div>{t('send.address')}</div>
@@ -106,8 +109,8 @@ const SendFieldset = ({
         label={t('send.amount')}
         field="amount"
         data-idx={idx}
-        value={localNumberFormatter(item.amount)}
-        placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
+        value={item.amount ? localNumberFormatter(item.amount) : ''}
+        placeholder={t('send.input-amount')}
         onChange={onItemChange}
         disabled={item.disabled}
         suffix={
@@ -134,7 +137,9 @@ const SendFieldset = ({
               </div>
               <div className={styles.locktimeWarn}>
                 <Attention />
-                {t('send.locktime-warning', { extraNote: isMainnet ? null : t('messages.light-client-locktime-warning') })}
+                {t('send.locktime-warning', {
+                  extraNote: isMainnet ? null : t('messages.light-client-locktime-warning'),
+                })}
               </div>
             </div>
           ) : (

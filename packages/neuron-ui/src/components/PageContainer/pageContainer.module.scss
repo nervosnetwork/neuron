@@ -5,6 +5,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   height: 100vh;
 
   .head {
@@ -16,14 +17,44 @@
     font-size: 20px;
     font-weight: 500;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    background: var(--main-background-color);
 
     .rightContent {
       display: flex;
       align-items: center;
 
+      .strokeSvg {
+        g,
+        path {
+          stroke: var(--dialog-secondary-text-color);
+        }
+        &:hover {
+          g,
+          path {
+            stroke: var(--primary-color);
+          }
+        }
+      }
+
+      .fillSvg {
+        g,
+        path {
+          fill: var(--dialog-secondary-text-color);
+        }
+        &:hover {
+          g,
+          path {
+            fill: var(--primary-color);
+          }
+        }
+      }
+
       .network {
         font-weight: 500;
-        color: #666;
+        color: var(--dialog-secondary-text-color);
         font-size: 14px;
         margin: 0 8px;
       }
@@ -87,27 +118,26 @@
   font-weight: 500;
   font-size: 14px;
   justify-content: center;
+  align-items: center;
   position: relative;
   margin-bottom: 16px;
   z-index: 10;
 
   & > svg {
     margin-right: 4px;
+    top: unset;
   }
 
   .close {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     position: absolute;
     right: 14px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-
-    @media (prefers-color-scheme: dark) {
-      path {
-        fill: #8da394;
-      }
+    path {
+      fill: #666666;
     }
   }
 }

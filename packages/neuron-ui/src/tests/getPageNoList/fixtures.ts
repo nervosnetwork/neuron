@@ -41,7 +41,7 @@ const fixtures = {
     },
     expected: [95, 96, 97, 98, 99],
   },
-  'shoule show 5 pages around pageNo when pageNo > 5 and pageNo < count - 4': {
+  'should show 5 pages around pageNo when pageNo > 5 and pageNo < count - 4': {
     params: {
       pageNo: 30,
       count: 100,

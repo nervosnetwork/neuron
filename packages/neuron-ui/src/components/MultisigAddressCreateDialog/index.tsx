@@ -1,17 +1,13 @@
 import React, { useState, useCallback } from 'react'
-
 import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
-import InputSelect from 'widgets/InputSelect'
 import { useState as useGlobalState } from 'states'
 import { MultisigConfig } from 'services/remote'
 import MultisigAddressInfo, { MultisigAddressTable } from 'components/MultisigAddressInfo'
 import { isMainnet as isMainnetUtil } from 'utils'
-
-import { useMAndN, useMultiAddress, Step, useViewMultisigAddress } from './hooks'
-import styles from './multisig-address-create-dialog.module.scss'
-
-const keysCountArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(number => ({ value: number.toString(), label: number }))
+import Dialog from 'widgets/Dialog'
+import TextField from 'widgets/TextField'
+import { useMAndN, useMultiAddress, useViewMultisigAddress } from './hooks'
+import styles from './multisigAddressCreateDialog.module.scss'
 
 const SetMN = ({
   m,
@@ -22,21 +18,31 @@ const SetMN = ({
 }: {
   m: string
   n: string
-  changeM: (v: string) => void
-  changeN: (v: string) => void
+  changeM: (e: React.SyntheticEvent<HTMLInputElement>) => void
+  changeN: (e: React.SyntheticEvent<HTMLInputElement>) => void
   errorI18nKey?: string
 }) => {
   const [t] = useTranslation()
+
   return (
     <div className={styles.setMNRoot}>
-      <span>{t('multisig-address.create-dialog.m-n.title')}</span>
-      <br />
+      <p className={styles.title}>{t('multisig-address.create-dialog.m-n.title')}</p>
       <div className={styles.countSelect}>
-        <InputSelect options={keysCountArr} value={m} onChange={changeM} />
-        &nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;&nbsp;&nbsp;&nbsp;
-        <InputSelect options={keysCountArr} value={n} onChange={changeN} />
+        <TextField
+          value={m}
+          placeholder={t('multisig-address.create-dialog.placeholder', { type: 'm' })}
+          onChange={changeM}
+          width="100%"
+        />
+        <p>of</p>
+        <TextField
+          value={n}
+          placeholder={t('multisig-address.create-dialog.placeholder', { type: 'n' })}
+          onChange={changeN}
+          width="100%"
+        />
       </div>
-      {errorI18nKey && <span className={styles.error}>{t(`multisig-address.create-dialog.m-n.${errorI18nKey}`)}</span>}
+      {errorI18nKey && <p className={styles.error}>{t(`multisig-address.create-dialog.m-n.${errorI18nKey}`)}</p>}
     </div>
   )
 }
@@ -48,18 +54,10 @@ const MultisigAddressCreateDialog = ({
   closeDialog: () => void
   confirm: (v: Omit<MultisigConfig, 'id' | 'walletId' | 'fullPayload' | 'blake160s'>) => Promise<void>
 }) => {
-  const [step, changeStep] = useState(Step.setMN)
+  const [isView, setIsPreview] = useState(false)
   const [t] = useTranslation()
-  const { m, n, setMBySelect, setNBySelect, errorI18nKey: mnErr } = useMAndN()
+  const { m, n, setMByInput, setNByInput, errorI18nKey: mnErr } = useMAndN()
   const [confirmErr, setConfirmErr] = useState<string | null>(null)
-  const next = useCallback(() => {
-    changeStep(step + 1)
-    setConfirmErr(null)
-  }, [changeStep, step])
-  const back = useCallback(() => {
-    changeStep(step - 1)
-    setConfirmErr(null)
-  }, [changeStep, step])
   const {
     chain: { networkID },
     settings: { networks = [] },
@@ -82,7 +80,7 @@ const MultisigAddressCreateDialog = ({
     n: Number(n),
     r,
     addresses,
-    step,
+    isView,
     isMainnet,
   })
 
@@ -101,43 +99,55 @@ const MultisigAddressCreateDialog = ({
       })
   }, [m, n, r, addresses, saveConfig, closeDialog])
 
+  const handleCancel = useCallback(() => {
+    if (isView) {
+      setIsPreview(false)
+    } else {
+      closeDialog()
+    }
+  }, [closeDialog, isView, setIsPreview])
+
+  const handleConfirm = useCallback(() => {
+    if (isView) {
+      confirm()
+    } else {
+      setIsPreview(true)
+    }
+  }, [confirm, isView, setIsPreview])
+
   return (
-    <>
-      <p>{t('multisig-address.create-dialog.title')}</p>
-      {step === Step.setMN && <SetMN m={m} n={n} changeM={setMBySelect} changeN={setNBySelect} errorI18nKey={mnErr} />}
-      {step === Step.setMultiAddress && (
-        <>
-          <p>{t('multisig-address.create-dialog.multi-address-info.title', { m, n })}</p>
-          <MultisigAddressTable
-            r={r}
-            addresses={addresses}
-            changeR={changeR}
-            changeAddress={changeAddress}
-            addressErrors={addressErrors}
-          />
-          {isAddressesDuplicated && (
-            <div className={styles.errorMessage}>{t('multisig-address.create-dialog.duplicate-address-forbid')}</div>
-          )}
-        </>
-      )}
-      {step === Step.viewMultiAddress && (
-        <MultisigAddressInfo m={m} n={n} r={r} addresses={addresses} multisigAddress={multisigAddress} />
-      )}
-      {confirmErr && <div className={styles.errorMessage}>{confirmErr}</div>}
-      <div className={styles.actions}>
-        <Button
-          label={t(`multisig-address.create-dialog.actions.${step === Step.setMN ? 'cancel' : 'back'}`)}
-          type="cancel"
-          onClick={step === Step.setMN ? closeDialog : back}
-        />
-        <Button
-          label={t(`multisig-address.create-dialog.actions.${step === Step.viewMultiAddress ? 'confirm' : 'next'}`)}
-          type="primary"
-          disabled={(step === Step.setMN && !!mnErr) || (step === Step.setMultiAddress && addressErr)}
-          onClick={step === Step.viewMultiAddress ? confirm : next}
-        />
+    <Dialog
+      show
+      title={t(`multisig-address.create-dialog.${isView ? 'preview-title' : 'title'}`)}
+      onCancel={handleCancel}
+      cancelText={t('multisig-address.create-dialog.actions.back')}
+      onConfirm={handleConfirm}
+      confirmText={t(`multisig-address.create-dialog.actions.${isView ? 'confirm' : 'generate-address'}`)}
+      disabled={!isView && (!!mnErr || addressErr)}
+    >
+      <div>
+        {isView ? (
+          <MultisigAddressInfo m={m} n={n} r={r} addresses={addresses} multisigAddress={multisigAddress} />
+        ) : (
+          <div>
+            <SetMN m={m} n={n} changeM={setMByInput} changeN={setNByInput} errorI18nKey={mnErr} />
+            <p className={styles.title}>{t('multisig-address.create-dialog.multi-address-info.title', { m, n })}</p>
+            <MultisigAddressTable
+              r={r}
+              addresses={mnErr ? ['', ''] : addresses}
+              changeR={changeR}
+              changeAddress={changeAddress}
+              addressErrors={addressErrors}
+              disabled={!!mnErr}
+            />
+            {isAddressesDuplicated && (
+              <div className={styles.errorMessage}>{t('multisig-address.create-dialog.duplicate-address-forbid')}</div>
+            )}
+          </div>
+        )}
+        {confirmErr && <div className={styles.errorMessage}>{confirmErr}</div>}
       </div>
-    </>
+    </Dialog>
   )
 }
 

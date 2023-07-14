@@ -14,6 +14,7 @@ build
 dist
 pages
 release
+/packages/neuron-ui/storybook-static
 /packages/neuron-wallet/bin/mac
 /packages/neuron-wallet/bin/linux
 /packages/neuron-wallet/bin/win

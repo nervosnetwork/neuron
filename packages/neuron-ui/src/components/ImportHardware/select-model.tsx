@@ -88,6 +88,7 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
             type="button"
             value={v.label}
             onClick={onClickDeviceType}
+            width="100%"
             selected={
               model === v.data ||
               (!!model && model.manufacturer === v.data?.manufacturer && model.product === v.data?.product)

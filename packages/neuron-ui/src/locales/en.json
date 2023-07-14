@@ -75,7 +75,7 @@
       "outputs": "Outputs({{length}})",
       "actions": {
         "close": "Close",
-        "success": "Transaction Succesful!",
+        "success": "Transaction Successful!",
         "rescan": "Rescan"
       }
     },
@@ -130,19 +130,11 @@
       "status": "Status",
       "amount": "Amount",
       "address": "Address",
-      "confirmation": "{{confirmationCount}} Confirmation",
-      "confirmations": "{{confirmationCount}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
       "receiving": "Receiving",
       "more": "More",
-      "statusLabel": {
-        "success": "Success",
-        "failed": "Failed",
-        "pending": "Pending",
-        "confirming": "Confirming"
-      },
       "copy-balance": "Copy Balance",
       "create": "Create {{name}} Asset Account",
       "destroy": "Destroy {{name}} Asset Account",
@@ -210,7 +202,9 @@
     },
     "send": {
       "address": "Send to",
+      "input-address": "Please input receiving address",
       "amount": "Amount (CKB)",
+      "input-amount": "Please input amount",
       "send": "Send",
       "reset": "Reset",
       "confirm-password": "Confirm Password",
@@ -220,7 +214,7 @@
       "scan-to-get-address": "Scan QR code to read the address to send to",
       "total-amount": "Total Amount (CKB)",
       "description": "Description",
-      "description-optional": "Description (optional)",
+      "description-optional": "Please input description, optional",
       "balance": "Balance",
       "add-one": "Add One More",
       "remove-this": "Remove This",
@@ -251,11 +245,19 @@
       "address-qrcode": "Address QR Code",
       "address": "{{network}} Address",
       "verify-address": "Verify Address",
-      "turn-into-full-version-fomrat": "Turn into full version format",
+      "turn-into-full-version-format": "Turn into full version format",
       "turn-into-deprecated-format": "Turn into deprecated format",
       "save-qr-code": "Download",
       "copy-qr-code": "Copy"
     },
+    "transaction-status": {
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "confirming": "Confirming"
+    },
+    "confirmationsCount_one": "{{count}} Confirmation",
+    "confirmationsCount_other": "{{count}} Confirmations",
     "history": {
       "title": "History",
       "title-detail": "History Detail",
@@ -277,10 +279,6 @@
       "last": "Last",
       "description": "Description",
       "status": "Status",
-      "pending": "Pending",
-      "success": "Success",
-      "failed": "Failed",
-      "confirming": "Confirming",
       "blockNumber": "Block Number",
       "basic-information": "Basic Information",
       "search": {
@@ -296,7 +294,7 @@
         "operation": "Operation"
       },
       "export-history": "Export Transaction History",
-      "confirmations": "Confirmations",
+      "confirmationTimes": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
       "no-txs": "No Transaction History",
@@ -372,6 +370,7 @@
           "confirm-password": "Confirm Password",
           "edit-wallet": "Edit Wallet"
         },
+        "edit-success": "Wallet info Updated",
         "delete-wallet-title": "Please Enter {{name}} Password",
         "password": "Password",
         "wallet-detail": {
@@ -382,11 +381,16 @@
         "online": "Online",
         "offline": "Offline",
         "add-network": "Add Network",
+        "remove-network": "Remove Network",
+        "remove-network-msg": "Are you sure you want to remove the selected network?",
         "edit-network": {
-          "title": "Add or Edit Network",
+          "title": "Edit Network",
           "rpc-url": "RPC URL",
-          "name": "Network Name"
+          "name": "Network Name",
+          "input-rpc": "Please input rpc",
+          "input-network": "Please input name"
         },
+        "edit-success": "Edit network Success",
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "lightTestnet": "Light Testnet",
@@ -421,10 +425,12 @@
         "cache-cleared-on": "Cache cleared on {{date}}",
         "clear-cache": "Clear Cache",
         "clearing-cache": "Clearing Cache, please wait a moment",
+        "clear-success": "Cache Cleared",
         "set-path": "Set Path",
         "remove-ckb-data-tip": "Please move CKB Node Data from 【{{prevPath}}】 to 【{{currentPath}}】 and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
         "resync-ckb-node-describe": "Attention: Synchronizing from scratch won't remove previously downloaded CKB Node Data",
         "cancel": "Cancel",
+        "confirm-clear": "Confirm",
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
         "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect",
@@ -434,6 +440,7 @@
     "password-request": {
       "wallet-not-found": "The wallet is not found",
       "password": "Enter Password",
+      "placeholder": "Please input wallet password",
       "send": {
         "title": "Submit the transaction"
       },
@@ -486,10 +493,10 @@
         "title": "Destroy Asset Account"
       },
       "send-from-multisig": {
-        "title": "Submit the transaction"
+        "title": "Send CKB from multisig address"
       },
       "send-from-multisig-need-one": {
-        "title": "Submit the transaction"
+        "title": "Send CKB from multisig address"
       },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
@@ -547,7 +554,7 @@
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "no-valid-addresses-found": "No valid addresses found",
-      "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "decimal-range": "Decimal should be an integer of {{range}}(inclusive)",
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
@@ -733,7 +740,7 @@
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
-      "download-update": "Install Update",
+      "install-update": "Install Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
     },
@@ -854,7 +861,10 @@
       "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
       "sign-with-magic-byte": "Message will be signed with magic bytes 'Nervos Message:'",
       "verify-tip": "Could be verified by Neuron from v0.33.1",
-      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1"
+      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1",
+      "input-message": "Please input message",
+      "input-choose-address": "Please input or choose an address",
+      "input-password": "Please input password"
     },
     "special-assets": {
       "title": "Customized Assets",
@@ -911,10 +921,13 @@
         "search": "Account Name, Token Name or Symbol",
         "syncing": "Syncing, current data may be inaccurate",
         "send": "Send",
-        "receive": "Receive"
+        "receive": "Receive",
+        "set-account-info": "Set Account Info"
       },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
+        "input-account-name": "Please input account name",
+        "select-account-type": "Select account type",
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
         "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
@@ -936,7 +949,7 @@
       },
       "send": {
         "title": "Send",
-        "address": "Address",
+        "address": "Send to",
         "amount": "Amount",
         "description": "Description",
         "submit": "Submit",
@@ -961,10 +974,10 @@
         "select-option": "Please confirm the above option before submitting"
       },
       "receive": {
-        "notation": "Accept <0></0> only"
+        "notation": "Accept {{symbol}} only"
       },
       "update-dialog": {
-        "update-asset-account": "Account setup",
+        "update-asset-account": "Account Detail",
         "account-name": "Account Name",
         "token-id": "Token ID",
         "token-name": "Token Name",
@@ -980,7 +993,7 @@
         "placeholder": "search by multisig address,alias"
       },
       "add": {
-        "label": "Add"
+        "label": "Create"
       },
       "import": {
         "label": "Import"
@@ -991,11 +1004,13 @@
       "ok": "OK",
       "no-data": "No multisig address",
       "table": {
-        "address": "address",
-        "alias": "alias",
-        "type": "type",
-        "balance": "balance",
+        "address": "Signer address",
+        "alias": "Alias",
+        "type": "Type",
+        "balance": "Balance",
         "copy-address": "Copy Address",
+        "action": "Actions",
+        "more": "More",
         "sync-block": "Synced Block",
         "actions": {
           "info": "Info",
@@ -1011,9 +1026,12 @@
         },
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
-      "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
+      "delete-failed": "Delete multisig config failed",
+      "remove-multisig-address": "Remove Multisig Address",
+      "remove-multisig-address-msg": "Are you sure you want to remove the selected multisig address?",
       "send-ckb": {
-        "title": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
+        "title": "Send CKB from multisig address",
+        "detail": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
         "balance": "Balance",
         "address": "Address",
         "amount": "Amount",
@@ -1021,34 +1039,39 @@
         "cancel": "Cancel",
         "export": "Export Tx"
       },
+      "multi-details": "Multisig address details",
       "create-dialog": {
         "title": "Create multisig address",
-        "index": "index",
-        "required": "required",
-        "signer-address": "signer address",
+        "preview-title": "Multisig address has been generated",
+        "index": "Index",
+        "required": "Required",
+        "signer-address": "Signer address",
         "copy-address": "Copy Address",
+        "placeholder": "Please input {{type}}(1-255)",
         "m-n": {
-          "title": "Please choose the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
+          "title": "Please input the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
           "m-less-equal-n": "For m-of-n multisig address, m shouldn't be greater than n",
-          "m-n-required": "Please input or choose m/n",
+          "m-n-required": "Please input m/n",
           "m-n-between-0-256": "m/n should be between 0 and 256"
         },
         "multi-address-info": {
           "title": "Please input the signers for the {{m}}-of-{{n}} multisig address",
-          "view-title": "The {{m}}-of-{{n}} multisig address is",
-          "ckb-address-placeholder": "ckb address"
+          "view-title": "The {{m}}-of-{{n}} multisig address",
+          "ckb-address-placeholder": "Please input ckb address"
         },
         "multi-list": "Signer list",
         "actions": {
           "cancel": "Cancel",
           "back": "Back",
           "next": "Next",
+          "generate-address": "Generate Address",
           "confirm": "Confirm"
         },
         "duplicate-address-forbid": "Address can't be duplicated"
       },
       "approve-dialog": {
-        "title": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
+        "title": "Approve with multisig address",
+        "detail": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
         "transaction": "Transaction",
         "cancel": "Cancel",
         "signAndExport": "Sign & Export",
@@ -1060,8 +1083,8 @@
         "signerApprove": "Lack of {{m}} signer approval(s), including {{r}} from specified signer(s)",
         "noRSignerApprove": "Lack of {{m}} signer approval(s)",
         "signed": "Signed",
-        "view-concise-data": "View concise data",
-        "view-raw-data": "View raw data"
+        "view-concise-data": "Concise data",
+        "view-raw-data": "Raw data"
       }
     },
     "dropdown": {

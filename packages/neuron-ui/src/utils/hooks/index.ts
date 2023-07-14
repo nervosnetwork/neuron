@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
-import { openContextMenu, requestPassword, deleteNetwork, migrateData } from 'services/remote'
+import { openContextMenu, requestPassword, migrateData } from 'services/remote'
 import { firstLoadApp, syncRebuildNotification } from 'services/localCache'
 import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
@@ -326,11 +326,11 @@ export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
 
 export const useOnLocaleChange = (i18n: i18nType) => {
   return useEffect(() => {
-    const subcription = SetLocaleSubject.subscribe(lng => {
+    const subscription = SetLocaleSubject.subscribe(lng => {
       i18n.changeLanguage(lng)
     })
     return () => {
-      subcription.unsubscribe()
+      subscription.unsubscribe()
     }
   }, [i18n])
 }
@@ -400,29 +400,6 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
       walletListContainer.classList.add(borderClassName)
     }
   }, [containerSelector, borderClassName])
-
-export const useOnHandleNetwork = (handleNet: (id: string) => void) =>
-  useCallback(
-    (e: React.BaseSyntheticEvent) => {
-      const {
-        dataset: { action, id },
-      } = e.target
-      switch (action) {
-        case 'edit': {
-          handleNet(id)
-          break
-        }
-        case 'delete': {
-          deleteNetwork(id)
-          break
-        }
-        default: {
-          // ignore
-        }
-      }
-    },
-    [handleNet]
-  )
 
 export const useGlobalNotifications = (
   dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>,

@@ -64,7 +64,7 @@ describe('extended private key', () => {
     expect(parsed.chainCode).toEqual(fixture.chainCode)
   })
 
-  it('derivate extended public key', () => {
+  it('derivative extended public key', () => {
     const extendedKey = new ExtendedPrivateKey(fixture.privateKey, fixture.chainCode).toExtendedPublicKey()
     expect(extendedKey.publicKey).toEqual(fixture.publicKey)
     expect(extendedKey.chainCode).toEqual(fixture.chainCode)

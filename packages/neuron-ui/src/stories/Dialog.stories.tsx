@@ -1,25 +1,34 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import Dialog from 'widgets/Dialog'
 
-const stories = storiesOf('Dialog', module)
+const meta: Meta<typeof Dialog> = {
+  component: Dialog,
+}
 
-stories.add('Basic Dialog', () => (
-  <Dialog show title="title" subTitle="subTitle" onConfirm={console.info} onCancel={() => {}}>
-    是否开始下载
-  </Dialog>
-))
+export default meta
 
-stories.add('Confirm Dialog', () => (
-  <Dialog
-    show
-    title="dialog title"
-    subTitle="dialog subTitle"
-    showHeader={false}
-    showCancel={false}
-    onConfirm={console.info}
-    onCancel={() => {}}
-  >
-    当前已是最新版本
-  </Dialog>
-))
+type Story = StoryObj<typeof Dialog>
+
+export const Default: Story = {
+  args: {
+    show: true,
+    title: 'title',
+    subTitle: 'subTitle',
+    onConfirm: console.info,
+    onCancel: () => {},
+    children: '是否开始下载',
+  },
+}
+
+export const Confirm: Story = {
+  args: {
+    show: true,
+    title: 'dialog title',
+    subTitle: 'dialog subTitle',
+    showHeader: false,
+    showCancel: false,
+    onConfirm: console.info,
+    onCancel: () => {},
+    children: '当前已是最新版本',
+  },
+}

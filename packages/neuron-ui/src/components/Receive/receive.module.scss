@@ -211,29 +211,40 @@
 }
 
 .copyAddress {
+  margin: 32px 16px 58px 16px;
+}
+
+.showAddress {
   word-break: break-all;
   text-align: center;
-  margin: 32px 16px 82px 16px;
-  line-height: 24px;
+  font-size: 14px;
+  font-style: normal;
   font-family: 'JetBrains Mono';
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--main-text-color);
+}
 
-  .addressToggle {
-    margin: 0 0 0 4px;
-    padding: 0;
-    vertical-align: sub;
-    appearance: none;
-    border: none;
-    background: none;
-    padding-right: 20px;
-    svg {
-      pointer-events: none;
-    }
+.addressToggle {
+  width: 100%;
+  margin-top: 8px;
+  appearance: none;
+  border: none;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-family: PingFang SC;
+  font-style: normal;
+  font-weight: 500;
+  color: var(--primary-color);
+  line-height: normal;
+  cursor: pointer;
 
-    &:hover {
-      & + div {
-        display: none;
-      }
-    }
+  svg {
+    pointer-events: none;
+    margin-right: 5px;
   }
 }
 
@@ -278,12 +289,13 @@
   }
 
   .multiAddressRoot {
-    .qrCode {
-      margin-top: 38px;
+    .qrCodeContainer {
+      .qrCode {
+        margin-top: 38px;
+      }
     }
-
-    .copyAddress {
-      margin: 16px 16px 26px 16px;
-    }
+  }
+  .copyAddress {
+    margin: 16px 16px 10px 16px;
   }
 }

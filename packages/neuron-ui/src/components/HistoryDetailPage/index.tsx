@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { getTransaction, showErrorMessage } from 'services/remote'
@@ -10,6 +10,7 @@ import ScriptTag from 'components/ScriptTag'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
+import { GoBack } from 'widgets/Icons/icon'
 
 import {
   ErrorCode,
@@ -18,7 +19,6 @@ import {
   uniformTimeFormatter,
   shannonToCKBFormatter,
   isSuccessResponse,
-  RoutePath,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 
@@ -37,6 +37,7 @@ const InfoItem = ({ label, value, className }: { label: string; value: React.Rea
 
 const HistoryDetailPage = () => {
   const { hash } = useParams()
+  const navigate = useNavigate()
   const {
     app: { pageNotice },
     chain: { networkID },
@@ -167,13 +168,7 @@ const HistoryDetailPage = () => {
     title: string
     dataIndex: string
     isBalance?: boolean
-    render?: (
-      v: any,
-      idx: number,
-      item: InputOrOutputType,
-      showBalance: boolean,
-      expandedRow: number | null
-    ) => React.ReactNode
+    render?: (v: any, idx: number, item: InputOrOutputType, showBalance: boolean) => React.ReactNode
     width?: string
     align?: 'left' | 'right' | 'center'
   }[] = [
@@ -194,7 +189,7 @@ const HistoryDetailPage = () => {
         const { address } = handleListData(item)
         return (
           <>
-            <CopyZone content={address} name={t('history.copy-address')} className={styles.address}>
+            <CopyZone content={address} className={styles.address}>
               {`${address.slice(0, 20)}...${address.slice(-20)}`}
             </CopyZone>
             <ScriptTag isMainnet={isMainnet} script={item.lock} onClick={() => setLockInfo(item.lock)} />
@@ -209,13 +204,7 @@ const HistoryDetailPage = () => {
       isBalance: true,
       render(_, __, item, show: boolean) {
         const { capacity } = handleListData(item)
-        return show ? (
-          <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
-            {`${capacity} CKB`}
-          </CopyZone>
-        ) : (
-          HIDE_BALANCE
-        )
+        return show ? <CopyZone content={capacity.replace(/,/g, '')}>{`${capacity} CKB`}</CopyZone> : HIDE_BALANCE
       },
     },
   ]
@@ -228,9 +217,7 @@ const HistoryDetailPage = () => {
       }}
       head={
         <div>
-          <Link className={styles.breadcrumb} to={RoutePath.History}>
-            {`${t('history.title')} / `}
-          </Link>
+          <GoBack className={styles.goBack} onClick={() => navigate(-1)} />
           <span className={styles.breadcrumbNav}>{`${t('history.title-detail')}`}</span>
         </div>
       }

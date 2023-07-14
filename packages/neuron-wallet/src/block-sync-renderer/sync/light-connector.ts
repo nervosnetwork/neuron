@@ -83,7 +83,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       .map((v, idx) => {
         if (v.depType === DepType.DepGroup) {
           const tx = txs[idx]
-          return tx.txWithStatus ? tx?.txWithStatus?.transaction?.outputsData?.[+v.outPoint.index] : undefined
+          return tx?.txWithStatus ? tx?.txWithStatus?.transaction?.outputsData?.[+v.outPoint.index] : undefined
         }
       })
       .filter<string>((v): v is string => !!v)

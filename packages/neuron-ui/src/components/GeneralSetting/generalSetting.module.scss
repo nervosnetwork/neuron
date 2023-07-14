@@ -36,6 +36,7 @@ $action-button-width: 11.25rem;
 }
 
 .install {
+  width: 648px;
   display: grid;
   grid-template:
     'note action' auto
@@ -97,6 +98,7 @@ $action-button-width: 11.25rem;
 }
 
 .processWrap {
+  width: 648px;
   .title {
     font-weight: 500;
     font-size: 16px;

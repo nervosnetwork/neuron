@@ -1,9 +1,14 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import SignAndVerify from 'components/SignAndVerify'
+import { withRouter } from 'storybook-addon-react-router-v6'
 
-const stories = storiesOf('Sign and Verify', module)
+const meta: Meta<typeof SignAndVerify> = {
+  component: SignAndVerify,
+  decorators: [withRouter()],
+}
 
-stories.add('Basic', () => {
-  return <SignAndVerify />
-})
+export default meta
+
+type Story = StoryObj<typeof SignAndVerify>
+
+export const Default: Story = {}

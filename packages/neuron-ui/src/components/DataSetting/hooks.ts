@@ -13,11 +13,13 @@ const type = 'ckb'
 
 export const useDataPath = () => {
   const [t] = useTranslation()
-  const [isSaving, setIsSaveing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [savingType, setSavingType] = useState<string | null>()
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [faidMessage, setFaidMessage] = useState('')
+
   useDidMount(() => {
     getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res)) {
@@ -49,8 +51,9 @@ export const useDataPath = () => {
   }, [setIsDialogOpen, type])
   const onConfirm = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      setFaidMessage('')
       const { dataset } = e.currentTarget
-      setIsSaveing(true)
+      setIsSaving(true)
       setSavingType(dataset.syncType)
       setCkbNodeDataPath({
         dataPath: currentPath!,
@@ -60,10 +63,12 @@ export const useDataPath = () => {
           if (isSuccessResponse(res)) {
             setPrevPath(currentPath)
             setIsDialogOpen(false)
+          } else {
+            setFaidMessage(typeof res.message === 'string' ? res.message : res.message.content!)
           }
         })
         .finally(() => {
-          setIsSaveing(false)
+          setIsSaving(false)
           setSavingType(null)
         })
     },
@@ -78,6 +83,8 @@ export const useDataPath = () => {
     isSaving,
     savingType,
     isDialogOpen,
+    faidMessage,
+    setFaidMessage,
   }
 }
 

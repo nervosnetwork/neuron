@@ -14,6 +14,49 @@ import { useDispatch } from 'states'
 import styles from './receive.module.scss'
 import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
 
+type AddressTransformWithCopyZoneProps = {
+  showAddress: string
+  isInShortFormat: boolean
+  className?: string
+  onClick: () => void
+}
+
+export const AddressTransformWithCopyZone = ({
+  showAddress,
+  isInShortFormat,
+  onClick,
+  className,
+}: AddressTransformWithCopyZoneProps) => {
+  const [t] = useTranslation()
+  const transformLabel = t(
+    isInShortFormat ? 'receive.turn-into-full-version-format' : 'receive.turn-into-deprecated-format'
+  )
+
+  const stopPropagation = useCallback((e: React.SyntheticEvent) => {
+    e.stopPropagation()
+  }, [])
+
+  return (
+    <div className={className}>
+      <CopyZone content={showAddress} className={styles.showAddress}>
+        {showAddress}
+      </CopyZone>
+      <button
+        type="button"
+        className={styles.addressToggle}
+        onClick={onClick}
+        title={transformLabel}
+        onFocus={stopPropagation}
+        onMouseOver={stopPropagation}
+        onMouseUp={stopPropagation}
+      >
+        <AddressTransform />
+        {transformLabel}
+      </button>
+    </div>
+  )
+}
+
 const MultiAddressReceive = ({
   address,
   addresses,
@@ -132,9 +175,7 @@ const MultiAddressReceive = ({
     ],
     [t, localDescription]
   )
-  const stopPropagation = useCallback((e: React.SyntheticEvent) => {
-    e.stopPropagation()
-  }, [])
+
   return (
     <div className={styles.multiAddressRoot}>
       <div className={styles.qrCodeContainer}>
@@ -144,20 +185,13 @@ const MultiAddressReceive = ({
         <div className={styles.qrCode} data-copy-success={showCopySuccess} data-copy-success-text={t('common.copied')}>
           <QRCode value={showAddress} size={128} includeMargin ref={ref} />
         </div>
-        <CopyZone content={showAddress} className={styles.copyAddress}>
-          {showAddress}
-          <button
-            type="button"
-            className={styles.addressToggle}
+        <div className={styles.copyAddress}>
+          <AddressTransformWithCopyZone
+            showAddress={showAddress}
+            isInShortFormat={isInShortFormat}
             onClick={() => setIsInShortFormat(is => !is)}
-            title={t(isInShortFormat ? `receive.turn-into-full-version-fomrat` : `receive.turn-into-deprecated-format`)}
-            onFocus={stopPropagation}
-            onMouseOver={stopPropagation}
-            onMouseUp={stopPropagation}
-          >
-            <AddressTransform />
-          </button>
-        </CopyZone>
+          />
+        </div>
         <div className={styles.actions}>
           <Button
             type="primary"

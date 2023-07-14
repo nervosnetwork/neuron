@@ -19,9 +19,9 @@
   .content {
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
-    &[data-active="true"] {
+    &[data-active='true'] {
       svg {
-        g, 
+        g,
         path {
           stroke: var(--primary-color);
         }
@@ -32,12 +32,12 @@
 
   .selects {
     position: fixed;
-    width: 50vw;
+    width: 648px;
     margin-top: 8px;
     padding: 16px 0;
-    z-index: 1;
+    z-index: 2;
     background: var(--secondary-background-color);
-    box-shadow: 0px 1px 4px #EEEEEE;
+    box-shadow: 0px 1px 4px #eeeeee;
     border-radius: 8px;
     @media (prefers-color-scheme: dark) {
       box-shadow: none;
@@ -52,10 +52,9 @@
     }
   }
 
-
   .selectItem {
     display: block;
-    width: 50vw;
+    width: 648px;
     padding: 0 16px;
 
     .wrap {
@@ -65,7 +64,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     p {
       margin: 0;
     }

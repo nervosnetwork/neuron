@@ -444,7 +444,7 @@ describe('Test TransactionService', () => {
 
     describe('When search with an address', () => {
       describe('When address hits', () => {
-        describe('search with wallet adddress', () => {
+        describe('search with wallet address', () => {
           beforeEach(() => {
             const ADDRESS = ADDRESSES[1]
             stubProvider.searchValue = ADDRESS
@@ -455,7 +455,7 @@ describe('Test TransactionService', () => {
             expect(actual.totalCount).toBe(3)
           })
         })
-        describe('search with counterparty wallet adddress', () => {
+        describe('search with counterparty wallet address', () => {
           beforeEach(() => {
             const ADDRESS = 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83'
             stubProvider.searchValue = ADDRESS

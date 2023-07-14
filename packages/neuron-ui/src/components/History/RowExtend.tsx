@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'states'
 import { openExternal } from 'services/remote'
 
-import { getExplorerUrl, localNumberFormatter, RoutePath, useLocalDescription } from 'utils'
+import { clsx, getExplorerUrl, localNumberFormatter, RoutePath, useLocalDescription } from 'utils'
 import { TableProps } from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
 import { useNavigate } from 'react-router-dom'
@@ -64,47 +64,42 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
       <td colSpan={columns.length} className={styles.extendWrapper} style={{ paddingLeft: `${columns?.[0]?.width}` }}>
         <div className={styles.extendBox} style={{ gridColumn: `${2 / columns.length}` }}>
           <div className={styles.infoBox}>
-            <div className={styles.infoBlock}>
-              <div className={styles.infoBlockTitle}>{t('history.confirmations')}</div>
+            <div className={clsx(styles.infoBlock, styles.confirmCount)}>
+              <div className={styles.infoBlockTitle}>{t('history.confirmationTimes')}</div>
               <div>{confirmationsLabel}</div>
             </div>
-
             <div className={styles.infoBlock}>
               <div className={styles.infoBlockTitle}>{t('history.description')}</div>
-              <div>
-                <Tooltip
-                  placement="left-bottom"
-                  tip={
-                    <div className={styles.descTipRoot}>
-                      <div className={styles.autoHeight}>
-                        <textarea
-                          className={styles.descInput}
-                          data-is-selected={isSelected}
-                          data-description-key={column.hash}
-                          value={isSelected ? localDescription.description : description}
-                          onChange={onDescriptionChange}
-                          onKeyDown={onDescriptionPress}
-                        />
-
-                        <Edit
-                          data-description-key={column.hash}
-                          data-description-value={column.description}
-                          onClick={onDescriptionSelected}
-                        />
-                      </div>
-                      <div className={styles.hidden}>
-                        {isSelected ? localDescription.description : description}
-                        <Edit />
-                      </div>
+              <Tooltip
+                tip={
+                  <div className={styles.descTipRoot}>
+                    <div className={styles.autoHeight}>
+                      <textarea
+                        className={styles.descInput}
+                        data-is-selected={isSelected}
+                        data-description-key={column.hash}
+                        value={isSelected ? localDescription.description : description}
+                        onChange={onDescriptionChange}
+                        onKeyDown={onDescriptionPress}
+                      />
+                      <Edit
+                        data-description-key={column.hash}
+                        data-description-value={column.description}
+                        onClick={onDescriptionSelected}
+                      />
                     </div>
-                  }
-                  showTriangle
-                  isTriggerNextToChild
-                  className={styles.description}
-                >
-                  <span className={styles.descText}>{description || t('addresses.default-description')}</span>
-                </Tooltip>
-              </div>
+                    <div className={styles.hidden}>
+                      {isSelected ? localDescription.description : description}
+                      <Edit />
+                    </div>
+                  </div>
+                }
+                showTriangle
+                isTriggerNextToChild
+                className={styles.description}
+              >
+                <div className={styles.descText}>{description || t('addresses.default-description')}</div>
+              </Tooltip>
             </div>
           </div>
 

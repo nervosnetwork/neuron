@@ -43,7 +43,7 @@
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
     width: 100%;
-    height: 56px;
+    min-height: 56px;
     padding: 0 16px;
 
     @media (prefers-color-scheme: dark) {
@@ -127,6 +127,7 @@
   font-family: inherit;
   grid-area: message;
   font-size: 14px;
+  margin: 8px 0 12px 0;
   line-height: 20px;
   color: var(--input-hint-color);
 }

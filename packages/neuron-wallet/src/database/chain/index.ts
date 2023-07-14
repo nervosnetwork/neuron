@@ -16,9 +16,7 @@ import TxLock from './entities/tx-lock'
 export const clean = async (clearAllLightClientData?: boolean) => {
   await Promise.all([
     ...[InputEntity, OutputEntity, TransactionEntity, IndexerTxHashCache, MultisigOutput, TxLock].map(entity => {
-      return getConnection()
-        .getRepository(entity)
-        .clear()
+      return getConnection().getRepository(entity).clear()
     }),
     clearAllLightClientData
       ? getConnection().getRepository(SyncProgress).clear()

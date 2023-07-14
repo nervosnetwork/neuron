@@ -400,10 +400,10 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serialziedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
+    const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(toUint64Le(`0x${serialziedEmptyWitnessSize.toString(16)}`))
+    blake2b.update(toUint64Le(`0x${serializedEmptyWitnessSize.toString(16)}`))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {

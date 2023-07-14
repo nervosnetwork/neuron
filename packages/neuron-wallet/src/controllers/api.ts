@@ -45,7 +45,7 @@ import {
   UpdateAssetAccountParams,
   MigrateACPParams,
   GenerateCreateChequeTxParams,
-  GenerateClaimChequeTxParams
+  GenerateClaimChequeTxParams,
 } from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import { GenerateAnyoneCanPayTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
@@ -228,7 +228,7 @@ export default class ApiController {
         addresses,
         transactions,
         syncedBlockNumber,
-        connectionStatus
+        connectionStatus,
       }
 
       return { status: ResponseCode.Success, result: initState }
@@ -271,14 +271,14 @@ export default class ApiController {
     handle('is-dark', async () => {
       return {
         status: ResponseCode.Success,
-        result: nativeTheme.shouldUseDarkColors
+        result: nativeTheme.shouldUseDarkColors,
       }
     })
 
     handle('set-theme', async (_, theme: 'system' | 'light' | 'dark') => {
       SettingsService.getInstance().themeSource = theme
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     })
 
@@ -550,8 +550,16 @@ export default class ApiController {
       new UpdateController().checkUpdates()
     })
 
+    handle('cancel-check-updates', async () => {
+      new UpdateController().cancelCheckUpdates()
+    })
+
     handle('download-update', async () => {
       new UpdateController(false).downloadUpdate()
+    })
+
+    handle('cancel-download-update', async () => {
+      new UpdateController(false).cancelDownloadUpdate()
     })
 
     handle('quit-and-install-update', async () => {
@@ -572,15 +580,9 @@ export default class ApiController {
 
     handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
       if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
-        const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
-          type: 'info',
+        return {
+          status: ResponseCode.Fail,
           message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
-          buttons: [t('common.ok'), t('common.cancel')],
-        })
-        if (response === 1) {
-          return {
-            status: ResponseCode.Fail
-          }
         }
       }
       await cleanChain()
@@ -595,14 +597,14 @@ export default class ApiController {
     handle('start-process-monitor', (_, monitorName: string) => {
       startMonitor(monitorName, true)
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     })
 
     handle('stop-process-monitor', async (_, monitorName: string) => {
       await Promise.race([stopMonitor(monitorName), CommonUtils.sleep(1000)])
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     })
 
@@ -691,7 +693,7 @@ export default class ApiController {
     })
 
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
-      return this.#assetAccountController.destoryAssetAccount(params)
+      return this.#assetAccountController.destroyAssetAccount(params)
     })
 
     // Hardware wallet
@@ -788,7 +790,7 @@ export default class ApiController {
     handle('start-migrate', async () => {
       migrateCkbData()
       return {
-        status: ResponseCode.Success
+        status: ResponseCode.Success,
       }
     })
 
@@ -824,7 +826,7 @@ export default class ApiController {
           if (!Number.isNaN(+e.code)) {
             return {
               status: ResponseCode.Fail,
-              message: e.message || err.message
+              message: e.message || err.message,
             }
           }
         } catch {
@@ -833,7 +835,7 @@ export default class ApiController {
 
         return {
           status: err.code || ResponseCode.Fail,
-          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message
+          message: typeof err.message === 'string' ? { content: CommonUtils.tryParseError(err.message) } : err.message,
         }
       }
     })

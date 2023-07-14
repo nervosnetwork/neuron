@@ -1,39 +1,39 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import CompensationProgressBar from 'components/CompensationProgressBar'
 
-export default {
-  title: 'Compensation Progress Bar',
+const meta: Meta<typeof CompensationProgressBar> = {
   component: CompensationProgressBar,
+  args: {
+    style: { width: '300px' },
+  },
 }
 
-const Template: ComponentStory<typeof CompensationProgressBar> = (args: any) => (
-  <CompensationProgressBar style={{ width: '300px' }} {...args} />
-)
+export default meta
 
-export const Normal = Template.bind({})
-Normal.args = { currentEpochValue: 0, endEpochValue: 180 }
+type Story = StoryObj<typeof CompensationProgressBar>
 
-export const Suggested = Template.bind({})
-Suggested.args = { currentEpochValue: 139, endEpochValue: 180 }
+export const Normal: Story = {
+  args: { currentEpochValue: 0, endEpochValue: 180 },
+}
 
-export const Requested = Template.bind({})
-Requested.args = { currentEpochValue: 175, endEpochValue: 180 }
+export const Suggested: Story = {
+  args: { currentEpochValue: 139, endEpochValue: 180 },
+}
 
-export const End = Template.bind({})
-End.args = { currentEpochValue: 180, endEpochValue: 180 }
+export const Requested: Story = {
+  args: { currentEpochValue: 175, endEpochValue: 180 },
+}
 
-export const WithdrawnInPeriod = Template.bind({})
-WithdrawnInPeriod.args = { currentEpochValue: 160, endEpochValue: 180, withdrawEpochValue: 30 }
+export const End: Story = { args: { currentEpochValue: 180, endEpochValue: 180 } }
 
-export const WithdrawnOuterPeriod = Template.bind({})
-WithdrawnOuterPeriod.args = { currentEpochValue: 181, endEpochValue: 180, withdrawEpochValue: 30 }
+export const WithdrawnInPeriod: Story = { args: { currentEpochValue: 160, endEpochValue: 180, withdrawEpochValue: 30 } }
 
-export const CurrentLessThanEnd = Template.bind({})
-CurrentLessThanEnd.args = { currentEpochValue: 181, endEpochValue: 180 }
+export const WithdrawnOuterPeriod: Story = {
+  args: { currentEpochValue: 181, endEpochValue: 180, withdrawEpochValue: 30 },
+}
 
-export const CurrentLessThanBegin = Template.bind({})
-CurrentLessThanBegin.args = { currentEpochValue: 0, endEpochValue: 181 }
+export const CurrentLessThanEnd: Story = { args: { currentEpochValue: 181, endEpochValue: 180 } }
 
-export const Pending = Template.bind({})
-Pending.args = { pending: true, currentEpochValue: 0, endEpochValue: 0 }
+export const CurrentLessThanBegin: Story = { args: { currentEpochValue: 0, endEpochValue: 181 } }
+
+export const Pending: Story = { args: { pending: true, currentEpochValue: 0, endEpochValue: 0 } }

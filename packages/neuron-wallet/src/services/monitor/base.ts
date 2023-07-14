@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators'
 export default abstract class Monitor {
   private interval: Observable<number> | null = null
 
-  private subcription: Subscription | null = null
+  private subscription: Subscription | null = null
 
   private isReStarting: boolean = false
 
@@ -37,17 +37,17 @@ export default abstract class Monitor {
 
   async startMonitor(intervalTime: number = 30000, startNow: boolean = false) {
     this.interval = interval(intervalTime)
-    if (!this.subcription?.closed) {
-      this.subcription?.unsubscribe()
+    if (!this.subscription?.closed) {
+      this.subscription?.unsubscribe()
     }
-    this.subcription = this.interval.subscribe(async () => this.monitor(intervalTime))
+    this.subscription = this.interval.subscribe(async () => this.monitor(intervalTime))
     if (startNow) {
       await this.monitor(intervalTime)
     }
   }
 
   async stopMonitor() {
-    this.subcription?.unsubscribe()
+    this.subscription?.unsubscribe()
     await this.stop()
   }
 }

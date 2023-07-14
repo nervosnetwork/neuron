@@ -32,7 +32,7 @@ const SelectItem = ({ locale, className, sufIcon, ...res }: SelectItemProps) => 
 
 const LanguageDialog = ({ show, close }: { show: boolean; close: () => void }) => {
   const [t, i18n] = useTranslation()
-  const [lng, setLng] = useState(i18n.language as typeof LOCALES[number])
+  const [lng, setLng] = useState(i18n.language as (typeof LOCALES)[number])
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 

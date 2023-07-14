@@ -800,7 +800,7 @@ describe('TransactionSender Test', () => {
     })
 
     describe('#signMultisig', () => {
-      const transcationObject = {
+      const transactionObject = {
         version: '0x0',
         cellDeps: [
           CellDep.fromObject({
@@ -882,7 +882,7 @@ describe('TransactionSender Test', () => {
         const mockGAI = jest.fn()
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
-        const tx = Transaction.fromObject(transcationObject)
+        const tx = Transaction.fromObject(transactionObject)
         tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
         const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
         expect(res.witnesses[0]).toBe(
@@ -908,7 +908,7 @@ describe('TransactionSender Test', () => {
         mockGAI.mockReturnValue(
           [addr, addr, addr].map((v, idx) => ({ ...v, blake160: addressToScript(addresses[idx]).args }))
         )
-        let tx = Transaction.fromObject(transcationObject)
+        let tx = Transaction.fromObject(transactionObject)
         it('first sign', async () => {
           const getAddressInfos = transactionSender.getAddressInfos
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
@@ -938,7 +938,7 @@ describe('TransactionSender Test', () => {
       it('throw exception no matched multisig config', async () => {
         mockGAI.mockReturnValueOnce([{ path: '' }])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
-        const tx = Transaction.fromObject(transcationObject)
+        const tx = Transaction.fromObject(transactionObject)
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [])).rejects.toThrowError(
           new MultisigConfigNeedError()
         )
@@ -962,7 +962,7 @@ describe('TransactionSender Test', () => {
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
 
-        const tx = Transaction.fromObject(transcationObject)
+        const tx = Transaction.fromObject(transactionObject)
         tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
         await expect(transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])).rejects.toThrow(
           new NoMatchAddressForSign()
@@ -999,7 +999,7 @@ describe('TransactionSender Test', () => {
           const mockGAI = jest.fn()
           mockGAI.mockReturnValueOnce([addr])
           transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
-          const tx = Transaction.fromObject(transcationObject)
+          const tx = Transaction.fromObject(transactionObject)
           tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
           const res = await transactionSender.signMultisig(fakeWallet.id, tx, '1234', [multisigConfig])
           const expectedValue = serializeWitnessArgs({
@@ -1033,7 +1033,7 @@ describe('TransactionSender Test', () => {
         const mockGAI = jest.fn()
         mockGAI.mockReturnValueOnce([addr])
         transactionSender.getAddressInfos = mockGAI.bind(transactionSender)
-        const tx = Transaction.fromObject(transcationObject)
+        const tx = Transaction.fromObject(transactionObject)
         tx.inputs[0]!.setLock(SystemScriptInfo.generateMultiSignScript(multiArgs))
         tx.inputs.push(
           Input.fromObject({

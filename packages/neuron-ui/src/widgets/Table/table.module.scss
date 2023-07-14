@@ -49,6 +49,17 @@ $head-height: 52px;
   tbody {
     tr {
       height: 58px;
+      cursor: pointer;
+      &:hover {
+        &[data-is-expand='false'] {
+          background-color: var(--hover-background-color);
+        }
+      }
+      &:last-child {
+        td {
+          border-bottom: none;
+        }
+      }
     }
     td {
       padding: 0 0 0 18px;

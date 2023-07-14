@@ -1,3 +1,29 @@
+# 0.110.2 (2023-07-07)
+
+### CKB Node & Light Client
+
+- [CKB@v0.110.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.110.0) was released on May. 17th, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.2.4](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.2.4) was released on May. 28th, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+#### Caveat
+
+◆ **CKB Light Client** is only activated on testnet, thus only `light testnet` is enabled in Neuron. **CKB Light Client on Mainnet** requires a hardfork on the mainnet in the future.
+◆ **CKB@v0.110** requires data migration, which is irreversible. Be cautious to start the migration without a backup. [How to back up data of ckb node](https://github.com/nervosnetwork/neuron/issues/2557#issue-1512510978)
+
+> On the other hand, we strongly recommend you to back up the old data before migrating, the **ckb node data path** can be found by clicking **preference -> Data -> CKB Node Config & Storage**. Because once the migration starts, the data will be no longer compatible with all older versions of CKB.
+
+### Assumed valid target
+
+Block before `0xc0c532e10c708852d9586be46a5ed8317b2aa0835c721aa691abffb9bf4a26cd`(at height `10,004,892`) will be skipped in validation.(#2689)
+
+## Bug fixes
+
+- #2760: Avoid generating deposit DAO when the dialog is not visible.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.1...v0.110.2
+
+
 # 0.110.1 (2023-05-31)
 
 ### CKB Node & Light Client

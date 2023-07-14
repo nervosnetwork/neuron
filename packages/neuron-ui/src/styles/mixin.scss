@@ -24,8 +24,8 @@
   border: none;
   border-radius: 16px;
   background-color: var(--secondary-background-color);
-  min-width: 450px;
-  max-width: 650px;
+  min-width: 360px;
+  max-width: 80vw;
   box-sizing: border-box;
 }
 
@@ -58,6 +58,7 @@
 @mixin overlay {
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(1px);
+  z-index: 11;
 }
 
 @mixin disabled-button {
@@ -170,7 +171,7 @@
       fill: $normalColor;
     }
   }
-  &:hover {
+  &:not(&[disabled]):hover {
     color: $hoverColor !important;
     svg {
       g,
@@ -179,5 +180,36 @@
       }
     }
   }
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
+@mixin checkbox {
+  input[type='checkbox'] {
+    display: none;
+  }
+  input[type='checkbox'] + span {
+    padding-left: 30px;
+    line-height: 22px;
+    background: url('../widgets/Icons/Checkbox.svg') no-repeat left top;
+    user-select: none;
+  }
+  input[type='checkbox']:checked + span {
+    background: url('../widgets/Icons/CheckboxSelected.svg') no-repeat left top;
+  }
+
+  input[type='checkbox']:disabled:checked + span {
+    background: url('../widgets/Icons/CheckboxSelected.svg') no-repeat left top;
+    opacity: 0.5;
+  }
+  input[type='checkbox']:disabled + span {
+    cursor: not-allowed;
+    background: url('../widgets/Icons/CheckboxDisabled.svg') no-repeat left top;
+
+    @media (prefers-color-scheme: dark) {
+      background: url('../widgets/Icons/CheckboxDisabledDark.svg') no-repeat left top;
+    }
+  }
+}

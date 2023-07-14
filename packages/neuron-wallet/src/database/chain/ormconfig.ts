@@ -16,7 +16,7 @@ import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import TxDescription from './entities/tx-description'
 import AddressDescription from './entities/address-description'
 import MultisigConfig from './entities/multisig-config'
-import MultisigOuput from './entities/multisig-output'
+import MultisigOutput from './entities/multisig-output'
 import SyncProgress from './entities/sync-progress'
 import TxLock from './entities/tx-lock'
 
@@ -84,7 +84,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       IndexerTxHashCache,
       AddressDescription,
       MultisigConfig,
-      MultisigOuput,
+      MultisigOutput,
       SyncProgress,
       TxLock,
     ],

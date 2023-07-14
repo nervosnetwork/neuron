@@ -1,42 +1,47 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import TransactionList from 'components/TransactionList'
 import transactions from './data/transactions'
 
-const stories = storiesOf('TransactionList', module)
-Object.entries(transactions).forEach(([title, list]) => {
-  stories.add(title, () => (
-    <TransactionList
-      isMainnet
-      bestKnownBlockNumber={123}
-      walletID="1"
-      walletName="wallet name"
-      items={list}
-      dispatch={() => {}}
-    />
-  ))
-})
+const meta: Meta<typeof TransactionList> = {
+  component: TransactionList,
+}
 
-stories.add('Wtih empty pending list', () => (
-  <TransactionList
-    isMainnet
-    bestKnownBlockNumber={123}
-    walletID="1"
-    walletName="wallet name"
-    items={transactions['Content List'].filter(item => item.status !== 'pending')}
-    dispatch={() => {}}
-  />
-))
+export default meta
 
-stories.add('Shimmered List', () => {
-  return (
-    <TransactionList
-      isMainnet
-      bestKnownBlockNumber={123}
-      walletID="1"
-      walletName="wallet name"
-      items={[]}
-      dispatch={() => {}}
-    />
-  )
-})
+type Story = StoryObj<typeof TransactionList>
+
+const commArgs = {
+  isMainnet: true,
+  bestKnownBlockNumber: 123,
+  walletID: '1',
+  walletName: 'wallet name',
+  dispatch: () => {},
+}
+
+export const EmptyList: Story = {
+  args: {
+    ...commArgs,
+    items: transactions['Empty List'],
+  },
+}
+
+export const ContentList: Story = {
+  args: {
+    ...commArgs,
+    items: transactions['Content List'],
+  },
+}
+
+export const WithEmptyPendingList: Story = {
+  args: {
+    ...commArgs,
+    items: transactions['Content List'].filter(item => item.status !== 'pending'),
+  },
+}
+
+export const ShimmeredList: Story = {
+  args: {
+    ...commArgs,
+    items: [],
+  },
+}

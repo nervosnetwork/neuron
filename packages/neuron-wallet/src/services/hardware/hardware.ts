@@ -118,10 +118,10 @@ export abstract class Hardware {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-        const signture = await this.signTransaction(walletID, tx, serializedWitnesses, path, context)
+        const signature = await this.signTransaction(walletID, tx, serializedWitnesses, path, context)
         const witnessEntry = witnessSigningEntries.find(w => w.lockHash === lockHash)!
         witnessEntry.witness = serializeWitnessArgs({
-          lock: '0x' + signture,
+          lock: '0x' + signature,
           inputType: witnessEntry.witnessArgs.inputType ?? '',
           outputType: '',
         })

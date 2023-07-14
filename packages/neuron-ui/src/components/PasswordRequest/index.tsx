@@ -366,6 +366,7 @@ const PasswordRequest = () => {
       />
     )
   }
+
   return (
     <Dialog
       show={!!actionType}
@@ -377,6 +378,7 @@ const PasswordRequest = () => {
       isLoading={isLoading}
       cancelText={t('common.cancel')}
       confirmText={t('common.confirm')}
+      showConfirm={actionType !== 'send-from-multisig'}
     >
       <div>
         {[
@@ -404,6 +406,7 @@ const PasswordRequest = () => {
         {currentWallet.isWatchOnly || (
           <TextField
             className={styles.passwordInput}
+            placeholder={t('password-request.placeholder')}
             width="100%"
             label={t('password-request.password')}
             value={password}

@@ -37,8 +37,8 @@ export default class SUDTController {
   }
 
   public getSUDTTypeScriptHash(params: { tokenID: string }): Controller.Response<string> {
-    const assetAcount = new AssetAccountInfo()
-    const script = new Script(assetAcount.infos.sudt.codeHash, params.tokenID, assetAcount.infos.sudt.hashType)
+    const assetAccount = new AssetAccountInfo()
+    const script = new Script(assetAccount.infos.sudt.codeHash, params.tokenID, assetAccount.infos.sudt.hashType)
     return {
       status: ResponseCode.Success,
       result: scriptToHash(script.toSDK()),

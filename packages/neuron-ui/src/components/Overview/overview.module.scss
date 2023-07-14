@@ -1,5 +1,6 @@
 @import '../../styles/mixin.scss';
 @import '../../styles/theme.scss';
+@import '../../styles/animation.scss';
 
 .mid {
   height: 200px;
@@ -12,7 +13,7 @@
   .balance {
     grid-area: balance;
     border-radius: 16px;
-    background-color: #26C786;
+    background-color: #26c786;
     position: relative;
     padding: 24px 16px;
     color: var(--primary-text-color);
@@ -23,12 +24,10 @@
       right: 0px;
     }
 
-    & > .copyBalance {
-      .balanceValue {
-        font-family: 'D-DIN-PRO';
-        font-weight: 500;
-        font-size: 36px;
-      }
+    .balanceValue {
+      font-family: 'D-DIN-PRO';
+      font-weight: 500;
+      font-size: 36px;
     }
 
     & > .balanceUnit {
@@ -77,9 +76,9 @@
           fill: var(--primary-color);
         }
         :not(:first-child) {
-          fill: #14221C;
+          fill: #14221c;
         }
-     }
+      }
     }
   }
 }
@@ -89,18 +88,12 @@
   position: relative;
   align-items: center;
 
-  .confirmText {
-    color: #999;
-    font-size: 12px;
-    margin-left: 4px;
-  }
-
   & > svg {
     margin-right: 4px;
   }
 
-  &[data-status="failed"] {
-    color: #FF1E1E;
+  &[data-status='failed'] {
+    color: #ff1e1e;
   }
 }
 
@@ -121,7 +114,7 @@
   }
 }
 
-.transactionTablleHead {
+.transactionTableHead {
   display: flex;
   padding: 18px 16px;
   justify-content: space-between;
@@ -136,7 +129,7 @@
 
   .linkToHistory {
     font-size: 14px;
-    color: #8DA394;
+    color: #8da394;
     cursor: pointer;
 
     &:hover {
@@ -151,8 +144,4 @@
       margin-left: 4px;
     }
   }
-}
-
-.isReceive {
-  color: $main-color;
 }

@@ -712,7 +712,7 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateDestoryAssetAccountTx(
+  public static async generateDestroyAssetAccountTx(
     walletId: string,
     asssetAccountInputs: Input[],
     changeBlake160: string,

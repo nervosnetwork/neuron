@@ -1,5 +1,4 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import WithdrawDialog from 'components/WithdrawDialog'
 
 const props = {
@@ -39,7 +38,14 @@ const props = {
   currentEpoch: '0x00000000',
 }
 
-const stories = storiesOf('Withdraw Dialog', module)
-stories.add('Basic', () => {
-  return <WithdrawDialog {...props} />
-})
+const meta: Meta<typeof WithdrawDialog> = {
+  component: WithdrawDialog,
+}
+
+export default meta
+
+type Story = StoryObj<typeof WithdrawDialog>
+
+export const Default: Story = {
+  args: props,
+}

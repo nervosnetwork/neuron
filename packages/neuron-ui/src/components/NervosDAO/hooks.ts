@@ -138,6 +138,7 @@ export const useGenerateDaoDepositTx = ({
   t,
   depositValue,
   suggestFeeRate,
+  showDepositDialog,
 }: {
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>
   clearGeneratedTx: () => void
@@ -150,10 +151,14 @@ export const useGenerateDaoDepositTx = ({
   t: TFunction
   depositValue: string
   suggestFeeRate: string | number
+  showDepositDialog: boolean
 }) => {
   const timer = useRef<ReturnType<typeof setTimeout>>()
   useEffect(() => {
     clearTimeout(timer.current)
+    if (!showDepositDialog) {
+      return
+    }
     timer.current = setTimeout(() => {
       setErrorMessage('')
       clearGeneratedTx()
@@ -222,6 +227,7 @@ export const useGenerateDaoDepositTx = ({
     isBalanceReserved,
     depositValue,
     suggestFeeRate,
+    showDepositDialog,
   ])
 }
 

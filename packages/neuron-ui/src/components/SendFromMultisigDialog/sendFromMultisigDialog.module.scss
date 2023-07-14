@@ -1,44 +1,61 @@
-.sendCKBTitle {
-  display: flex;
-  line-height: 1.625rem;
-  flex-wrap: wrap;
+.dialogContainer {
+  padding: 0;
+}
+
+.container {
+  width: 730px;
+
+  .header {
+    display: flex;
+    line-height: 48px;
+    padding: 0 16px;
+    font-size: 14px;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--table-head-background-color);
+    color: var(--secondary-text-color);
+    border-bottom: 1px solid var(--table-head-border-color);
+
+    .tip {
+      left: calc(100% - 240px) !important;
+    }
+
+    .copyTableAddress {
+      word-break: break-all;
+      text-align: center;
+      font-family: 'JetBrains Mono';
+      width: 300px;
+      white-space: normal;
+      line-height: 24px;
+
+      & > svg {
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+    }
+
+    .address {
+      height: 56px;
+      text-decoration: underline;
+
+      &:hover {
+        color: var(--activity-color);
+      }
+    }
+  }
+
+  .balance {
+    font-weight: 500;
+    color: var(--main-text-color);
+  }
 }
 
 .sendContainer {
-  margin: 16px 0;
-  padding: 8px;
-  margin-bottom: 12px;
-}
-
-.balance {
-  grid-area: balance;
-  display: flex;
-  align-items: center;
-  font-size: 1.25rem;
-  font-weight: 600;
+  padding: 16px 16px 0;
 }
 
 .sendFieldContainer {
   margin-bottom: 16px;
-  & > div {
-    grid-template:
-      'address scanner add-or-remove' auto
-      'amount max add-or-remove' auto
-      'locktime locktime locktime' auto /
-      calc(100% - 130px) 50px 30px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-}
-
-.sendActions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 12px;
-
-  & > button {
-    margin-left: 12px;
-  }
 }
 
 .balanceValue {
@@ -52,6 +69,44 @@
     content: ' CKB';
   }
 }
-.textFieldClass {
-  margin-bottom: 10px;
+
+.addWrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.addButton {
+  justify-content: flex-end;
+  height: auto;
+  svg {
+    margin-right: 6px;
+    g,
+    path {
+      fill: var(--primary-color);
+    }
+  }
+}
+
+.flexWrap {
+  padding: 0;
+  display: flex;
+  align-items: baseline;
+  column-gap: 16px;
+  & > div {
+    &:first-child {
+      flex: 1;
+    }
+  }
+  &:last-child {
+    margin-top: 16px;
+  }
+}
+
+.sendItem {
+  & > div {
+    input {
+      width: 125px !important;
+      height: 56px !important;
+    }
+  }
 }

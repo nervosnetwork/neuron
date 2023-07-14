@@ -123,19 +123,11 @@
       "status": "状态",
       "amount": "金额",
       "address": "地址",
-      "confirmation": "{{confirmationCount}} 个确认",
-      "confirmations": "{{confirmationCount}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
       "receiving": "正在收款",
       "more": "查看更多",
-      "statusLabel": {
-        "success": "成功",
-        "failed": "失败",
-        "pending": "已提交",
-        "confirming": "确认中"
-      },
       "copy-balance": "复制余额",
       "create": "创建 {{name}} 资产账户",
       "destroy": "销毁 {{name}} 资产账户",
@@ -203,7 +195,9 @@
     },
     "send": {
       "address": "收款地址",
+      "input-address": "请输入收款地址",
       "amount": "转账金额（CKB）",
+      "input-amount": "请输入转账金额",
       "send": "发送",
       "reset": "重置",
       "confirm-password": "确认密码",
@@ -213,7 +207,7 @@
       "scan-to-get-address": "扫描二维码以获取地址",
       "total-amount": "总金额（CKB）",
       "description": "备注",
-      "description-optional": "备注 (选填)",
+      "description-optional": "请输入转账备注，选填",
       "balance": "余额",
       "add-one": "添加",
       "remove-this": "删除",
@@ -244,11 +238,19 @@
       "address-qrcode": "地址二维码",
       "address": "{{network}} 地址",
       "verify-address": "验证地址",
-      "turn-into-full-version-fomrat": "转换为长地址格式",
+      "turn-into-full-version-format": "转换为长地址格式",
       "turn-into-deprecated-format": "转换为废弃地址格式",
       "save-qr-code": "保存收款码",
       "copy-qr-code": "复制收款码图片"
     },
+    "transaction-status": {
+      "pending": "已提交",
+      "success": "成功",
+      "failed": "失败",
+      "confirming": "确认中"
+    },
+    "confirmationsCount_one": "{{count}} 个确认",
+    "confirmationsCount_other": "{{count}} 个确认",
     "history": {
       "title": "交易历史",
       "title-detail": "交易详情",
@@ -270,10 +272,6 @@
       "last": "最后一页",
       "description": "备注",
       "status": "状态",
-      "pending": "已提交",
-      "success": "成功",
-      "failed": "失败",
-      "confirming": "确认中",
       "blockNumber": "区块高度",
       "basic-information": "基本信息",
       "search": {
@@ -289,7 +287,7 @@
         "operation": "操作"
       },
       "export-history": "导出交易历史",
-      "confirmations": "确认次数",
+      "confirmationTimes": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "no-txs": "没有交易记录",
@@ -365,6 +363,7 @@
           "confirm-password": "确认密码",
           "edit-wallet": "编辑钱包"
         },
+        "edit-success": "已更新钱包信息",
         "delete-wallet-title": "请输入{{name}}的密码",
         "password": "密码",
         "wallet-detail": {
@@ -375,11 +374,16 @@
         "online": "在线",
         "offline": "离线",
         "add-network": "添加网络",
+        "remove-network": "删除网络",
+        "remove-network-msg": "确定要删除所选网络？",
         "edit-network": {
-          "title": "添加或编辑网络",
+          "title": "编辑网络",
           "rpc-url": "RPC地址",
-          "name": "网络名称"
+          "name": "网络名称",
+          "input-rpc": "请输入RPC地址",
+          "input-network": "请输入网络名称"
         },
+        "edit-success": "编辑网络成功",
         "mainnet": "主网",
         "testnet": "测试网",
         "lightTestnet": "轻节点测试网",
@@ -414,10 +418,12 @@
         "cache-cleared-on": "上次清空缓存时间 {{date}}",
         "clear-cache": "清空缓存",
         "clearing-cache": "正在清除缓存中，请稍候",
+        "clear-success": "已清除缓存",
         "set-path": "设置路径",
         "remove-ckb-data-tip": "请将 CKB Node 数据从 【{{prevPath}}】 移动至 【{{currentPath}}】 然后点击 \"数据转移完成\" 开始从已知区块同步; 或者点击 \"重新同步\" 开始重新同步.",
         "resync-ckb-node-describe": "注意: 重新同步不会删除当前已同步的 CKB Node 数据",
         "cancel": "取消",
+        "confirm-clear": "确定清除",
         "move-data-finish": "数据转移完成",
         "re-sync": "重新同步",
         "disabled-set-path": "手动启动 CKB 节点时，设置 CKB Node 节点配置和路径无法生效",
@@ -427,6 +433,7 @@
     "password-request": {
       "wallet-not-found": "找不到该钱包",
       "password": "输入密码",
+      "placeholder": "请输入钱包密码",
       "send": {
         "title": "发起交易"
       },
@@ -479,10 +486,10 @@
         "title": "销毁资产账户"
       },
       "send-from-multisig": {
-        "title": "发起交易"
+        "title": "多签地址转账"
       },
       "send-from-multisig-need-one": {
-        "title": "发起交易"
+        "title": "多签地址转账"
       },
       "xpub-notice": "对于观察钱包，只支持导出交易"
     },
@@ -724,9 +731,9 @@
       "checking-updates": "正在检查更新...",
       "update-available": "检测到新版本",
       "downloading-update": "正在下载更新...",
-      "update-not-available": "已经在使用最新版本",
+      "update-not-available": "当前是最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
-      "download-update": "下载安装",
+      "install-update": "安装更新",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
       "quit-and-install": "安装并重启应用"
     },
@@ -840,14 +847,17 @@
       "cancel": "取消",
       "sign": "签名",
       "verify": "验证",
-      "password": "密码",
+      "password": "输入密码",
       "confirm": "确认",
       "verification-success": "验证成功",
       "verification-failure": "验证失败",
       "address-not-found": "当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。",
       "sign-with-magic-byte": "信息会和 magic bytes 'Nervos Message:' 一起签名",
       "verify-tip": "可以通过 v0.33.1 及以后的 Neuron 进行验证",
-      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本签名"
+      "verify-old-sign-success": "消息由 Neuron v0.33.1 之前的版本签名",
+      "input-message": "请输入信息",
+      "input-choose-address": "请输入或选择地址",
+      "input-password": "请输入钱包密码"
     },
     "special-assets": {
       "title": "自定义资产",
@@ -904,15 +914,18 @@
         "search": "账户名称、代币名称或简称",
         "syncing": "正在同步, 当前数据可能不准确",
         "send": "转账",
-        "receive": "收款"
+        "receive": "收款",
+        "set-account-info": "请设置账户信息"
       },
       "create-dialog": {
         "create-asset-account": "创建资产账户",
+        "input-account-name": "请输入账户名称",
+        "select-account-type": "选择账户类型",
         "account-name": "账户名称",
         "sudt-account": "sUDT 账户",
         "ckb-account": "CKB 账户",
         "set-token-info": "设置代币信息",
-        "token-id": "代币 ID",
+        "token-id": "代币ID",
         "token-name": "代币名称",
         "symbol": "简称",
         "decimal": "小数位",
@@ -927,9 +940,9 @@
         }
       },
       "send": {
-        "title": "发起交易",
-        "address": "地址",
-        "amount": "金额",
+        "title": "转账",
+        "address": "收款地址",
+        "amount": "转账金额",
         "description": "备注",
         "submit": "提交",
         "click-to-edit": "点击编辑",
@@ -953,10 +966,10 @@
         "select-option": "提交前请确认上述选项"
       },
       "receive": {
-        "notation": "只接收 <0></0> 转账"
+        "notation": "只接收 {{symbol}} 转账"
       },
       "update-dialog": {
-        "update-asset-account": "账户设置",
+        "update-asset-account": "账户详情",
         "account-name": "账户名称",
         "token-id": "代币 ID",
         "token-name": "代币名称",
@@ -972,7 +985,7 @@
         "placeholder": "使用地址或者别名搜索"
       },
       "add": {
-        "label": "添加"
+        "label": "创建"
       },
       "import": {
         "label": "导入"
@@ -980,14 +993,16 @@
       "export": {
         "label": "导出"
       },
-      "ok": "好的",
+      "ok": "确定",
       "no-data": "没有多签地址",
       "table": {
-        "address": "地址",
+        "address": "签名者地址",
         "alias": "别名",
         "type": "类型",
         "balance": "余额",
         "copy-address": "复制地址",
+        "action": "操作",
+        "more": "更多",
         "sync-block": "同步高度",
         "actions": {
           "info": "详情",
@@ -1003,9 +1018,12 @@
         },
         "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
       },
-      "delete-failed": "删除多签配置失败，失败原因：{{reason}}",
+      "delete-failed": "删除多签配置失败",
+      "remove-multisig-address": "刪除多签地址",
+      "remove-multisig-address-msg": "确定要刪除所选多签地址？",
       "send-ckb": {
-        "title": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",
+        "title": "多签地址转账",
+        "detail": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",
         "balance": "余额",
         "address": "地址",
         "amount": "金额",
@@ -1013,34 +1031,39 @@
         "cancel": "取消",
         "export": "导出交易"
       },
+      "multi-details": "多签地址详情",
       "create-dialog": {
         "title": "创建多重签名地址",
+        "preview-title": "多签地址已生成",
         "index": "序号",
-        "required": "必选",
+        "required": "必选项",
         "signer-address": "签名者地址",
         "copy-address": "复制地址",
+        "placeholder": "输入{{type}}的数值(1-255)",
         "m-n": {
           "title": "请选择 m-of-n 类型的多重签名地址配置，从 n 个密钥中通过 m 个确认来转移资产。",
           "m-less-equal-n": "对于 m-of-n 多重签名地址，m 不应大于 n",
-          "m-n-required": "请输入或选择 m/n",
+          "m-n-required": "请输入 m/n",
           "m-n-between-0-256": "m/n 应该在 0-256 之间"
         },
         "multi-address-info": {
           "title": "对于 {{m}}-of-{{n}}, 请输入 {{n}} 个签名者地址",
-          "view-title": " {{m}}-of-{{n}} 的多签地址是",
-          "ckb-address-placeholder": "ckb address"
+          "view-title": " {{m}}-of-{{n}} 多签地址",
+          "ckb-address-placeholder": "输入ckb地址"
         },
         "multi-list": "多签地址列表",
         "actions": {
           "cancel": "取消",
           "back": "上一步",
           "next": "下一步",
+          "generate-address": "生成地址",
           "confirm": "确认"
         },
         "duplicate-address-forbid": "地址不能重复"
       },
       "approve-dialog": {
-        "title": "从{{m}}-of-{{n}}多签地址<0></0>确认交易",
+        "title": "多签地址确认",
+        "detail": "从{{m}}-of-{{n}}多签地址<0></0>确认交易",
         "transaction": "交易",
         "cancel": "取消",
         "signAndExport": "签名并导出",
@@ -1052,8 +1075,8 @@
         "signerApprove": "缺少 {{m}} 个签名者同意, 其中包括 {{r}} 个指定签名者",
         "noRSignerApprove": "缺少 {{m}} 个签名者同意",
         "signed": "已签名",
-        "view-concise-data": "查看概要",
-        "view-raw-data": "查看原始数据"
+        "view-concise-data": "概要",
+        "view-raw-data": "原始数据"
       }
     },
     "dropdown": {

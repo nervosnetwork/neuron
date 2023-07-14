@@ -1,9 +1,6 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
-
-const stories = storiesOf('sUD Account Pile', module)
 
 const eventListeners = {
   onClick: (e: any) => action('Click')(e.target.dataset.id, e.currentTarget.dataset.role),
@@ -42,8 +39,22 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
   },
 }
 
-Object.entries(piles).forEach(([accountType, accountProps]) => {
-  stories.add(accountType, () => {
-    return <SUDTAccountPile {...accountProps} />
-  })
-})
+const meta: Meta<typeof SUDTAccountPile> = {
+  component: SUDTAccountPile,
+}
+
+export default meta
+
+type Story = StoryObj<typeof SUDTAccountPile>
+
+export const sUDT: Story = {
+  args: piles.sUDT,
+}
+
+export const Unknown: Story = {
+  args: piles.Unknown,
+}
+
+export const selected: Story = {
+  args: piles.selected,
+}
