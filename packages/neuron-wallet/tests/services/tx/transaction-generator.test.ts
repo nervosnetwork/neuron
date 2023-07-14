@@ -2369,7 +2369,10 @@ describe('TransactionGenerator', () => {
 
         senderDefaultLockInputEntity = createInput(senderDefaultLock, undefined, transaction.hash)
 
-        const chequeLock = assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), senderDefaultLock.computeHash())
+        const chequeLock = assetAccountInfo.generateChequeScript(
+          bytes.hexify(Buffer.alloc(20)),
+          senderDefaultLock.computeHash()
+        )
         chequeOutputEntity = createOutput(
           chequeLock,
           typeScript,
@@ -2811,12 +2814,12 @@ describe('TransactionGenerator', () => {
     describe('CKB account', () => {
       it('capacity not enough for fee', async () => {
         const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
-        const asssetAccountInput = input.toModel()
-        asssetAccountInput.capacity = toShannon('61')
+        const assetAccountInput = input.toModel()
+        assetAccountInput.capacity = toShannon('61')
         await expect(
           TransactionGenerator.generateDestroyAssetAccountTx(
             'walletId',
-            [asssetAccountInput],
+            [assetAccountInput],
             bob.publicKeyInBlake160,
             true
           )
@@ -2824,13 +2827,13 @@ describe('TransactionGenerator', () => {
       })
       it('account capacity not enough for fee need other address', async () => {
         const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
-        const asssetAccountInput = input.toModel()
-        asssetAccountInput.capacity = toShannon('61')
+        const assetAccountInput = input.toModel()
+        assetAccountInput.capacity = toShannon('61')
         const cell: OutputEntity = generateCell(toShannon('62'), OutputStatus.Live, false, null, alice)
         await getConnection().manager.save(cell)
         const res = await TransactionGenerator.generateDestroyAssetAccountTx(
           alice.walletId,
-          [asssetAccountInput],
+          [assetAccountInput],
           bob.publicKeyInBlake160,
           true
         )
@@ -2841,11 +2844,11 @@ describe('TransactionGenerator', () => {
       })
       it('account capacity enough for fee', async () => {
         const input = createInput(alice.lockScript, undefined, '0x' + '0'.repeat(64))
-        const asssetAccountInput = input.toModel()
-        asssetAccountInput.capacity = toShannon('62')
+        const assetAccountInput = input.toModel()
+        assetAccountInput.capacity = toShannon('62')
         const res = await TransactionGenerator.generateDestroyAssetAccountTx(
           alice.walletId,
-          [asssetAccountInput],
+          [assetAccountInput],
           bob.publicKeyInBlake160,
           true
         )
@@ -2861,13 +2864,13 @@ describe('TransactionGenerator', () => {
           ScriptHashType.Type
         )
         const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
-        const asssetAccountInput = input.toModel()
-        asssetAccountInput.capacity = toShannon('142')
-        asssetAccountInput.data = BufferUtils.writeBigUInt128LE(BigInt('10'))
+        const assetAccountInput = input.toModel()
+        assetAccountInput.capacity = toShannon('142')
+        assetAccountInput.data = BufferUtils.writeBigUInt128LE(BigInt('10'))
         await expect(
           TransactionGenerator.generateDestroyAssetAccountTx(
             alice.walletId,
-            [asssetAccountInput],
+            [assetAccountInput],
             bob.publicKeyInBlake160,
             false
           )
@@ -2880,11 +2883,11 @@ describe('TransactionGenerator', () => {
           ScriptHashType.Type
         )
         const input = createInput(alice.lockScript, typeScript, '0x' + '0'.repeat(64))
-        const asssetAccountInput = input.toModel()
-        asssetAccountInput.capacity = toShannon('142')
+        const assetAccountInput = input.toModel()
+        assetAccountInput.capacity = toShannon('142')
         const res = await TransactionGenerator.generateDestroyAssetAccountTx(
           alice.walletId,
-          [asssetAccountInput],
+          [assetAccountInput],
           bob.publicKeyInBlake160,
           false
         )

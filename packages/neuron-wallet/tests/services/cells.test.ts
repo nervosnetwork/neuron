@@ -1145,8 +1145,14 @@ describe('CellsService', () => {
         lockScript: multiSignLockScript,
       }
 
-      const receiverChequeLock = assetAccountInfo.generateChequeScript(bobDefaultLock.computeHash(), bytes.hexify(Buffer.alloc(20)))
-      const senderChequeLock = assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), bobDefaultLock.computeHash())
+      const receiverChequeLock = assetAccountInfo.generateChequeScript(
+        bobDefaultLock.computeHash(),
+        bytes.hexify(Buffer.alloc(20))
+      )
+      const senderChequeLock = assetAccountInfo.generateChequeScript(
+        bytes.hexify(Buffer.alloc(20)),
+        bobDefaultLock.computeHash()
+      )
 
       const acpLock = assetAccountInfo.generateAnyoneCanPayScript('0x')
       const sudtType = new Script(assetAccountInfo.getSudtCodeHash(), '0x', ScriptHashType.Type)
