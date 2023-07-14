@@ -5,15 +5,7 @@ import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { generateChequeTransaction, generateSUDTTransaction, getHoldSUDTCellCapacity } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-
-export enum SendType {
-  secp256Cheque = 'cheque',
-  secp256NewCell = 'secp256NewCell',
-  acpExistCell = 'acpExistCell',
-  acpNewCell = 'acpNewCell',
-  unknowNewCell = 'unknowNewCell',
-  sendCKB = 'sendCKB',
-}
+import { SendType } from 'utils/enums'
 
 export enum AddressLockType {
   secp256 = 'secp256',

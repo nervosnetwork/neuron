@@ -31,17 +31,10 @@ import {
   validateAmountRange,
   CONSTANTS,
 } from 'utils'
+import { SendType } from 'utils/enums'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
-import {
-  AddressLockType,
-  SendType,
-  getGenerator,
-  useAddressLockType,
-  useOnSubmit,
-  useOptions,
-  useSendType,
-} from './hooks'
+import { AddressLockType, getGenerator, useAddressLockType, useOnSubmit, useOptions, useSendType } from './hooks'
 import styles from './sUDTSend.module.scss'
 
 const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS, HIDE_BALANCE } = CONSTANTS
