@@ -1,5 +1,4 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
 
 const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'> = {
@@ -16,8 +15,7 @@ const defaultProps: Omit<NetworkStatusProps, 'syncPercents' | 'syncBlockNumbers'
   onOpenValidTarget: () => {},
 }
 
-export default {
-  title: 'Network Status',
+const meta: Meta<typeof NetworkStatus> = {
   component: NetworkStatus,
   parameters: {
     layout: 'padded',
@@ -32,56 +30,65 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof NetworkStatus> = (props: any) => <NetworkStatus {...props} />
+export default meta
 
-export const Online = Template.bind({})
-Online.args = {
-  ...defaultProps,
-  syncPercents: 1,
-  syncBlockNumbers: '1/200',
+type Story = StoryObj<typeof NetworkStatus>
+
+export const Online: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 1,
+    syncBlockNumbers: '1/200',
+  },
 }
 
-export const Offline = Template.bind({})
-Offline.args = {
-  ...defaultProps,
-  syncPercents: 1,
-  syncBlockNumbers: '1/100',
+export const Offline: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 1,
+    syncBlockNumbers: '1/100',
+  },
 }
 
-export const isLookingValidTarget = Template.bind({})
-isLookingValidTarget.args = {
-  ...defaultProps,
-  syncPercents: 1,
-  syncBlockNumbers: '1/100',
-  isLookingValidTarget: true,
+export const isLookingValidTarget: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 1,
+    syncBlockNumbers: '1/100',
+    isLookingValidTarget: true,
+  },
 }
 
-export const SyncedFinishedAndNotip = Template.bind({})
-SyncedFinishedAndNotip.args = {
-  ...defaultProps,
-  syncPercents: 100,
-  syncBlockNumbers: '100/0',
-}
-SyncedFinishedAndNotip.storyName = '100 synced and 0 tip'
-
-export const SyncedFinishedAndEmptytip = Template.bind({})
-SyncedFinishedAndEmptytip.args = {
-  ...defaultProps,
-  syncPercents: 100,
-  syncBlockNumbers: '-/100',
-}
-SyncedFinishedAndEmptytip.storyName = '100 synced and empty tip'
-
-export const NotSycnedAnd100Tip = Template.bind({})
-NotSycnedAnd100Tip.args = {
-  ...defaultProps,
-  syncPercents: 0,
-  syncBlockNumbers: '-/100',
+export const SyncedFinishedAndNotip: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 100,
+    syncBlockNumbers: '100/0',
+  },
+  storyName: '100 synced and 0 tip',
 }
 
-export const NotSyncedAndEmptyTip = Template.bind({})
-NotSyncedAndEmptyTip.args = {
-  ...defaultProps,
-  syncPercents: 0,
-  syncBlockNumbers: '-/-',
+export const SyncedFinishedAndEmptytip: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 100,
+    syncBlockNumbers: '-/100',
+  },
+  storyName: '100 synced and empty tip',
+}
+
+export const NotSycnedAnd100Tip: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 0,
+    syncBlockNumbers: '-/100',
+  },
+}
+
+export const NotSyncedAndEmptyTip: Story = {
+  args: {
+    ...defaultProps,
+    syncPercents: 0,
+    syncBlockNumbers: '-/-',
+  },
 }

@@ -1,12 +1,10 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import Receive from 'components/Receive'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import { initStates } from 'states'
 import addresses from './data/addresses'
 
-export default {
-  title: 'Receive',
+const meta: Meta<typeof Receive> = {
   component: Receive,
   decorators: [withRouter],
   argTypes: {
@@ -14,20 +12,24 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof Receive> = () => <Receive />
+export default meta
 
-export const HasNoAddresses = Template.bind({})
-HasNoAddresses.args = {
-  wallet: {
-    ...initStates.wallet,
-    addresses: addresses['Empty List'],
+type Story = StoryObj<typeof Receive>
+
+export const HasNoAddresses: Story = {
+  args: {
+    wallet: {
+      ...initStates.wallet,
+      addresses: addresses['Empty List'],
+    },
   },
 }
 
-export const HasAddresses = Template.bind({})
-HasAddresses.args = {
-  wallet: {
-    ...initStates.wallet,
-    addresses: addresses['Content List'],
+export const HasAddresses: Story = {
+  args: {
+    wallet: {
+      ...initStates.wallet,
+      addresses: addresses['Content List'],
+    },
   },
 }

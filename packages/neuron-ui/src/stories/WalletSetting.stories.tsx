@@ -1,5 +1,4 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import WalletSetting from 'components/WalletSetting'
 import { initStates } from 'states'
@@ -18,15 +17,30 @@ const states: { [title: string]: State.WalletIdentity[] } = {
   ],
 }
 
-const stories = storiesOf('WalletSetting', module).addDecorator(withRouter())
+const meta: Meta<typeof WalletSetting> = {
+  component: WalletSetting,
+  decorators: [withRouter],
+  args: {
+    dispatch: () => {},
+  },
+}
 
-Object.entries(states).forEach(([title, wallets]) => {
-  stories.add(title, () => (
-    <WalletSetting
-      {...initStates}
-      wallet={{ ...initStates.wallet, id: wallets.length ? wallets[0].id : '' }}
-      settings={{ ...initStates.settings, wallets }}
-      dispatch={() => {}}
-    />
-  ))
-})
+export default meta
+
+type Story = StoryObj<typeof WalletSetting>
+
+const getArgs = (wallets: State.WalletIdentity[]) => {
+  return {
+    ...initStates,
+    wallet: { ...initStates.wallet, id: wallets.length ? wallets[0].id : '' },
+    settings: { ...initStates.settings, wallets },
+  }
+}
+
+export const EmptyList: Story = {
+  args: getArgs(states['Empty List']),
+}
+
+export const ContentList: Story = {
+  args: getArgs(states['Content List']),
+}

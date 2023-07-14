@@ -204,6 +204,7 @@
       "address": "Send to",
       "input-address": "Please input receiving address",
       "amount": "Amount (CKB)",
+      "input-amount": "Please input amount",
       "send": "Send",
       "reset": "Reset",
       "confirm-password": "Confirm Password",
@@ -1029,6 +1030,8 @@
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
       "delete-failed": "Delete multisig config failed",
+      "remove-multisig-address": "Remove Multisig Address",
+      "remove-multisig-address-msg": "Are you sure you want to remove the selected multisig address?",
       "send-ckb": {
         "title": "Send CKB from multisig address",
         "detail": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",

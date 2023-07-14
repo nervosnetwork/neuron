@@ -134,7 +134,7 @@ export const useConfigManage = ({ walletId, isMainnet }: { walletId: string; isM
   const configs = useMemo<MultisigConfig[]>(
     () =>
       searchKeywords
-        ? allConfigs.filter(v => v.alias?.includes(searchKeywords) || v.fullPayload === searchKeywords)
+        ? allConfigs.filter(v => v.alias?.includes(searchKeywords) || v.fullPayload.includes(searchKeywords))
         : allConfigs,
     [allConfigs, searchKeywords]
   )

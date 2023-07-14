@@ -18,7 +18,7 @@ export interface RadioGroupProps {
 }
 
 const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '', className = '' }: RadioGroupProps) => {
-  const [checkedValue, setCheckedValue] = useState(defaultValue || options[0].value)
+  const [checkedValue, setCheckedValue] = useState(defaultValue || options[0]?.value)
 
   const handleChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {

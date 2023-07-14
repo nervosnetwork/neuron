@@ -8,7 +8,7 @@ import { ReactComponent as Attention } from 'widgets/Icons/ExperimentalAttention
 import TimeClock from 'widgets/Icons/TimeClock.svg'
 
 import { formatDate } from 'widgets/DatetimePickerDialog'
-import { localNumberFormatter, PlaceHolders, isSecp256k1Address, clsx } from 'utils'
+import { localNumberFormatter, isSecp256k1Address, clsx } from 'utils'
 import { ErrorWithI18n } from 'exceptions'
 
 import styles from './sendFieldset.module.scss'
@@ -109,8 +109,8 @@ const SendFieldset = ({
         label={t('send.amount')}
         field="amount"
         data-idx={idx}
-        value={localNumberFormatter(item.amount)}
-        placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
+        value={item.amount ? localNumberFormatter(item.amount) : ''}
+        placeholder={t('send.input-amount')}
         onChange={onItemChange}
         disabled={item.disabled}
         suffix={

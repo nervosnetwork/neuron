@@ -1,11 +1,10 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
 
 const props: {
   [name: string]: Omit<SpecialAssetProps, 'onAction'>
 } = {
-  'Type and Data': {
+  TypeAndData: {
     cell: {
       outPoint: {
         txHash: '',
@@ -87,7 +86,7 @@ const props: {
       type: '',
     },
   },
-  'User defined asset': {
+  UserDefinedAsset: {
     cell: {
       capacity: '123456789012345678',
       outPoint: {
@@ -197,10 +196,41 @@ const props: {
   },
 }
 
-const stories = storiesOf('Special Asset', module)
+const meta: Meta<typeof SpecialAsset> = {
+  component: SpecialAsset,
+  args: {
+    onAction: console.info,
+  },
+}
 
-Object.keys(props).forEach(name => {
-  stories.add(name, () => {
-    return <SpecialAsset {...props[name]} onAction={console.info} />
-  })
-})
+export default meta
+
+type Story = StoryObj<typeof SpecialAsset>
+
+export const TypeAndData: Story = {
+  args: props.TypeAndData,
+}
+
+export const Type: Story = {
+  args: props.Type,
+}
+
+export const Data: Story = {
+  args: props.Data,
+}
+
+export const UserDefinedAsset: Story = {
+  args: props.UserDefinedAsset,
+}
+
+export const Locked: Story = {
+  args: props.Locked,
+}
+
+export const Claim: Story = {
+  args: props.Claim,
+}
+
+export const Offline: Story = {
+  args: props.Offline,
+}

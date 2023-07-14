@@ -1,9 +1,9 @@
 import React from 'react'
+import { Meta, StoryObj } from '@storybook/react'
 import { ConnectionStatus, SyncStatus } from 'utils'
-import BalanceSyncIcon, { BalanceSyncIconProps } from 'components/BalanceSyncingIcon'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 
-export default {
-  title: 'Balance Sync Icon',
+const meta: Meta<typeof BalanceSyncIcon> = {
   component: BalanceSyncIcon,
   argTypes: {
     connectionStatus: { control: 'radio', options: ['online', 'offline', 'connecting'] },
@@ -12,6 +12,17 @@ export default {
     connectionStatus: ConnectionStatus.Connecting,
     syncStatus: SyncStatus.SyncNotStart,
   },
+  decorators: [
+    Component => (
+      <div style={{ backgroundColor: '#eee' }}>
+        <Component />
+      </div>
+    ),
+  ],
 }
 
-export const Basic = (props: BalanceSyncIconProps) => <BalanceSyncIcon {...props} />
+export default meta
+
+type Story = StoryObj<typeof BalanceSyncIcon>
+
+export const Default: Story = {}
