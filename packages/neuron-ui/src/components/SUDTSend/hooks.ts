@@ -153,13 +153,11 @@ export function getGenerator(sendType?: SendType) {
   return generateSUDTTransaction
 }
 
-export async function batchGenerateExperimental(
-  experimental: { tx: any; assetAccount?: any; params?: any },
-  priceArray: string[]
-) {
+export async function batchGenerateExperimental(experimental: State.Experimental, priceArray: string[]) {
   if (experimental?.params) {
-    const generator = getGenerator(experimental?.params?.sendType)
-    const requestArray = priceArray.map(itemPrice => generator({ ...experimental.params, feeRate: itemPrice }))
+    const { params } = experimental
+    const generator = getGenerator(params.sendType)
+    const requestArray = priceArray.map(itemPrice => generator({ ...params, feeRate: itemPrice }))
     const allPromiseResult = await Promise.allSettled(requestArray)
     const resList = allPromiseResult.map(
       (batchItem: PromiseSettledResult<ControllerResponse<{ fee: string }>>, index: number) => ({

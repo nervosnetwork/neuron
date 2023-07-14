@@ -374,7 +374,7 @@ const SUDTSend = () => {
             <div className={styles.sendContainer}>
               {fields.map(field => {
                 return (
-                  <>
+                  <div key={field.key}>
                     <TextField
                       label={field.key === Fields.Amount ? `${field.label} (${displaySymbol})` : field.label}
                       value={
@@ -440,7 +440,7 @@ const SUDTSend = () => {
                         ) : null}
                       </>
                     ) : null}
-                  </>
+                  </div>
                 )
               })}
             </div>
