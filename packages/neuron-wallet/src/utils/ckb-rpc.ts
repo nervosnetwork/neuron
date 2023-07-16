@@ -319,6 +319,10 @@ export class LightRPC extends Base {
             }
           })
 
+          if (!payload.length) {
+            return []
+          }
+
           const res = await request(node.url, {
             method: 'POST',
             body: JSON.stringify(payload),

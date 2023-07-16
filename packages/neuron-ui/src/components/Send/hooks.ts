@@ -110,7 +110,7 @@ const updateTransactionWith =
         .catch((err: Error) => {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
-            payload: '',
+            payload: null,
           })
           setErrorMessage(err.message)
           return undefined
@@ -120,7 +120,7 @@ const updateTransactionWith =
     }
     dispatch({
       type: AppActions.UpdateGeneratedTx,
-      payload: '',
+      payload: null,
     })
     return Promise.resolve(undefined)
   }

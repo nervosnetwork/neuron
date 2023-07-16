@@ -72,7 +72,7 @@ const generateMultisigTxWith =
         .catch((err: Error) => {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
-            payload: '',
+            payload: null,
           })
           setErrorMessage(err.message)
         })
@@ -81,7 +81,7 @@ const generateMultisigTxWith =
     }
     dispatch({
       type: AppActions.UpdateGeneratedTx,
-      payload: '',
+      payload: null,
     })
     return Promise.resolve(undefined)
   }

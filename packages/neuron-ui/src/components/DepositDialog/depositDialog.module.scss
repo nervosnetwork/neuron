@@ -44,13 +44,19 @@
   font-size: 14px;
   line-height: 20px;
   color: var(--main-text-color);
+
+  & > div {
+    &:nth-last-child(1) {
+      width: 230px;
+      text-align: right;
+    }
+  }
 }
 
 .notice {
   $lineHeight: 24px;
   display: flex;
   box-sizing: border-box;
-  max-width: 648px;
   margin-top: 22px;
   border: 1px solid rgba(252, 136, 0, 0.2);
   padding: 7px 54px;
@@ -65,7 +71,7 @@
   & > svg {
     $size: 14px;
     flex-shrink: 0;
-    margin-top: ($lineHeight - $size) / 2;
+    margin: calc(($lineHeight - $size) / 2) 4px 0 0;
     width: $size;
     height: $size;
 
