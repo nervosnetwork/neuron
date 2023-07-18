@@ -3,13 +3,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
 import TextField from 'widgets/TextField'
-import { Transfer } from 'widgets/Icons/icon'
+import { ReactComponent as Change } from 'widgets/Icons/Change.svg'
 import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import { useTranslation } from 'react-i18next'
 import { appState, useState as useGlobalState } from 'states'
-
 import { FeeRateValueArrayItemType, useGetBatchGeneratedTx } from 'components/Send/hooks'
+import { batchGenerateExperimental } from 'components/SUDTSend/hooks'
 
 import styles from './pricePanel.module.scss'
 
@@ -17,6 +17,7 @@ interface PricePanelProps {
   field: string
   price: string
   onPriceChange: (value: string) => void
+  isExperimental?: boolean
 }
 enum PriceTypeEnum {
   Custom = 'custom',
@@ -25,7 +26,12 @@ enum PriceTypeEnum {
 const DEFAULT_PRICE_ARRAY = ['1000', '2000', '3000']
 const DEFAULT_COUNT_DOWN = 30
 
-const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, onPriceChange }: PricePanelProps) => {
+const PricePanel: React.FunctionComponent<PricePanelProps> = ({
+  price,
+  field,
+  onPriceChange,
+  isExperimental,
+}: PricePanelProps) => {
   const [t] = useTranslation()
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
   const [feeRateValueArray, setFeeRateValueArray] = useState<FeeRateValueArrayItemType[]>([])
@@ -35,7 +41,9 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   const {
     app: { send = appState.send },
     wallet: { id: walletID = '' },
+    experimental,
   } = useGlobalState()
+
   const { countDown, suggestFeeRate } = useGetCountDownAndFeeRateStats({ seconds: DEFAULT_COUNT_DOWN })
 
   const isStandard = type === PriceTypeEnum.Standard
@@ -108,10 +116,16 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   )
 
   useEffect(() => {
-    useGetBatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
-      setFeeRateValueArray(res)
-    })
-  }, [send.outputs, priceArray])
+    if (isExperimental && experimental) {
+      batchGenerateExperimental(experimental, priceArray).then(res => {
+        setFeeRateValueArray(res)
+      })
+    } else {
+      useGetBatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
+        setFeeRateValueArray(res)
+      })
+    }
+  }, [send.outputs, priceArray, isExperimental, experimental, batchGenerateExperimental, setFeeRateValueArray])
 
   useEffect(() => {
     if (suggestFeeRate === 0) {
@@ -141,7 +155,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
             onKeyDown={() => {}}
             type="button"
           >
-            <Transfer />
+            <Change />
           </button>
         </div>
         {isStandard ? (

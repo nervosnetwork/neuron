@@ -950,8 +950,11 @@
       "send": {
         "title": "Send",
         "address": "Send to",
+        "address-placeholder": "Please input address",
         "amount": "Amount",
+        "amount-placeholder": "Please input amount",
         "description": "Description",
+        "description-placeholder": "Please input description, optional",
         "submit": "Submit",
         "click-to-edit": "Click to edit",
         "cheque-address-hint": {

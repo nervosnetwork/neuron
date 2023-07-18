@@ -7,19 +7,21 @@ interface TransactionFeeProps {
   fee: string
   price: string
   onPriceChange: (value: string) => void
+  isExperimental?: boolean
 }
 
 const TransactionFeePanel: React.FunctionComponent<TransactionFeeProps> = ({
   price,
   fee,
   onPriceChange,
+  isExperimental,
 }: TransactionFeeProps) => {
   const [t] = useTranslation()
 
   return (
     <div>
       <TextField label={t('send.fee')} field="fee" value={`${fee} CKB`} readOnly disabled width="100%" />
-      <PricePanel field="price" price={price} onPriceChange={onPriceChange} />
+      <PricePanel field="price" price={price} onPriceChange={onPriceChange} isExperimental={isExperimental} />
     </div>
   )
 }
