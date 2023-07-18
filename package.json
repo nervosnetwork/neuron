@@ -36,7 +36,7 @@
     "lint": "lerna run --stream lint",
     "postinstall": "husky install",
     "db:chain": "node ./node_modules/.bin/typeorm",
-    "update:valid:target": "node ./scripts/update-valid-target.js"
+    "update:valid-target": "node ./scripts/update-valid-target.js"
   },
   "devDependencies": {
     "@babel/core": "7.22.5",

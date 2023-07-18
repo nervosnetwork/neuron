@@ -1,54 +1,24 @@
-const https = require('node:https')
 const fs = require('node:fs')
 const path = require('node:path')
 
 async function rpcRequest(method, params = []) {
-  const dataString = JSON.stringify({
-    id: 0,
-    jsonrpc: '2.0',
-    method,
-    params,
-  })
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(
-      'https://mainnet.ckb.dev/rpc',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': dataString.length,
-        },
-        timeout: 10000,
+  const result = await fetch(
+    'https://mainnet.ckb.dev/rpc',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      res => {
-        if (res.statusCode < 200 || res.statusCode > 299) {
-          return reject(new Error(`HTTP status code ${res.statusCode}`))
-        }
-        const body = []
-        res.on('data', chunk => body.push(chunk))
-        res.on('end', () => {
-          try {
-            const resString = Buffer.concat(body).toString()
-            resolve(JSON.parse(resString))
-          } catch (error) {
-            reject(error)
-          }
-        })
-      }
-    )
-
-    req.on('error', err => {
-      reject(err)
-    })
-
-    req.on('timeout', () => {
-      req.destroy()
-      reject(new Error('Request time out'))
-    })
-    req.write(dataString)
-    req.end()
-  })
+      body: JSON.stringify({
+        id: 0,
+        jsonrpc: '2.0',
+        method,
+        params,
+      }),
+      timeout: 10000,
+    }
+  )
+  return result.json()
 }
 
 const ESTIMATE_BLOCK_COUNT_PER_DAY = 8_000

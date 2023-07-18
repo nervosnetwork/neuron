@@ -31,7 +31,7 @@ jobs:
 
       - name: Write env file
         run: |
-          npm run update:valid:target
+          npm run update:valid-target
 
       - name: Commit env file
         uses: actions/github-script@v6
