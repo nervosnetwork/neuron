@@ -66,9 +66,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{github.head_ref}}
           HEAD: chore-update-valid-target/${{github.head_ref}}
+          REPO: ${{github.repository}}
         with:
           script: |
-            const { BASE, HEAD } = process.env
+            const { BASE, HEAD, REPO } = process.env
             const { data: pulls } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -82,5 +83,5 @@ jobs:
               head: HEAD,
               base: BASE,
               title: 'chore: Update ckb node assume valid target',
-              body: `This PR uses to update ckb node assume valid target for PR https://github.com/yanguoyu/neuron/pull/${context.issue.number}`,
+              body: `This PR uses to update ckb node assume valid target for PR https://github.com/${REPO}/pull/${context.issue.number}`,
             })
