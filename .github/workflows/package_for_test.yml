@@ -6,25 +6,8 @@ on:
   push:
 
 jobs:
-  check_command:
-    runs-on: ubuntu-latest
-    ## skip if trigger by issue comment but not pr comment
-    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request) || github.event_name == 'push' }}
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Check for package command
-        uses: xt0rted/slash-command-action@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          command: package
-          reaction: "true"
-          reaction-type: "eyes"
-          allow-edits: "true"
-          permission-level: write
-
   packaging:
-    needs: [check_command]
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package')) || github.event_name == 'push' }}
 
     strategy:
       matrix:
