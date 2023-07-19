@@ -9,6 +9,7 @@
 
   .transferSwitch {
     display: flex;
+    align-items: center;
     color: var(--secondary-text-color);
   }
 }
@@ -29,46 +30,18 @@
     svg > path {
       fill: var(--primary-color);
     }
-
-    &::after {
-      position: absolute;
-      display: inline-block;
-      left: 50%;
-      transform: translate(-50%, -99%);
-      padding: 12px;
-      border-radius: 8px;
-      overflow-wrap: break-word;
-      background-color: var(--tooltip-background-color);
-      color: var(--tooltip-font-color);
-      user-select: text;
-      white-space: nowrap;
-      text-align: center;
-      content: attr(data-content);
-    }
-    &::before {
-      content: '';
-      user-select: text;
-      border-width: 9px;
-      border-style: solid;
-      border-color: transparent;
-      display: inline-block;
-      border-top-color: var(--tooltip-background-color);
-      transform: translate(-50%, -70%);
-      left: 50%;
-      position: absolute;
-    }
   }
 }
 
 .dropdownBox {
   margin: 4px 0px 19px 0px;
-  --tag-red-bg-color: #FFE8E8;
-  --tag-green-bg-color: #EFFAF7;
-  --tag-blue-bg-color: #E8FAFF;
+  --tag-red-bg-color: #ffe8e8;
+  --tag-green-bg-color: #effaf7;
+  --tag-blue-bg-color: #e8faff;
   @media (prefers-color-scheme: dark) {
     --tag-red-bg-color: #322929;
-    --tag-green-bg-color: #2E3735;
-    --tag-blue-bg-color: #2D3638;
+    --tag-green-bg-color: #2e3735;
+    --tag-blue-bg-color: #2d3638;
   }
 }
 .suffix {
@@ -104,15 +77,15 @@
     line-height: 17px;
   }
   .green {
-    color: #00C891;
+    color: #00c891;
     background: var(--tag-green-bg-color);
   }
   .blue {
-    color: #23BFF0;
+    color: #23bff0;
     background: var(--tag-blue-bg-color);
   }
   .red {
-    color: #FF5656;
+    color: #ff5656;
     background: var(--tag-red-bg-color);
   }
 }
