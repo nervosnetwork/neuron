@@ -4,15 +4,8 @@ import { SUDTAccount } from 'components/SUDTAccountList'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { generateChequeTransaction, generateSUDTTransaction, getHoldSUDTCellCapacity } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
-
-export enum SendType {
-  secp256Cheque = 'cheque',
-  secp256NewCell = 'secp256NewCell',
-  acpExistCell = 'acpExistCell',
-  acpNewCell = 'acpNewCell',
-  unknowNewCell = 'unknowNewCell',
-  sendCKB = 'sendCKB',
-}
+import { ControllerResponse } from 'services/remote/remoteApiWrapper'
+import { SendType } from 'utils/enums'
 
 export enum AddressLockType {
   secp256 = 'secp256',
@@ -150,6 +143,29 @@ export function getGenerator(sendType?: SendType) {
     return generateChequeTransaction
   }
   return generateSUDTTransaction
+}
+
+export async function batchGenerateExperimental(experimental: State.Experimental, priceArray: string[]) {
+  if (experimental?.params) {
+    const { params } = experimental
+    const generator = getGenerator(params.sendType)
+    const requestArray = priceArray.map(itemPrice => generator({ ...params, feeRate: itemPrice }))
+    const allPromiseResult = await Promise.allSettled(requestArray)
+    const resList = allPromiseResult.map(
+      (batchItem: PromiseSettledResult<ControllerResponse<{ fee: string }>>, index: number) => ({
+        feeRateValue: priceArray[index],
+        feeValue:
+          batchItem.status === 'fulfilled' && isSuccessResponse(batchItem.value) && batchItem.value.result
+            ? batchItem.value.result.fee
+            : '0',
+      })
+    )
+    return resList
+  }
+  return priceArray.map((_, index: number) => ({
+    feeRateValue: priceArray[index],
+    feeValue: '0',
+  }))
 }
 
 export function useOnSubmit({

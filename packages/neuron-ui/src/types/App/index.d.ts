@@ -281,6 +281,29 @@ declare namespace State {
     errorMsg: string
   }
 
+  enum SendType {
+    secp256Cheque = 'cheque',
+    secp256NewCell = 'secp256NewCell',
+    acpExistCell = 'acpExistCell',
+    acpNewCell = 'acpNewCell',
+    unknowNewCell = 'unknowNewCell',
+    sendCKB = 'sendCKB',
+  }
+
+  interface Experimental {
+    tx: any
+    assetAccount?: any
+    params?: {
+      assetAccountID: string
+      walletID: string
+      address: string
+      amount: string
+      feeRate: string
+      description: string
+      sendType?: SendType
+    }
+  }
+
   interface AppWithNeuronWallet {
     app: App
     chain: Chain
@@ -289,7 +312,7 @@ declare namespace State {
     nervosDAO: NervosDAO
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
-    experimental: { tx: any; assetAccount?: any } | null
+    experimental: Experimental | null
   }
 }
 

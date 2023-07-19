@@ -119,12 +119,11 @@ const MultisigAddress = () => {
   )
   const listNoBalanceActionOptions = useMemo(
     () =>
-      tableActions.map(item => ({
+      listActionOptions.map(item => ({
         ...item,
-        label: t(`multisig-address.table.actions.${item.key}`),
-        disabled: item.key === 'send',
+        disabled: item.disabled || item.key === 'send',
       })),
-    [t]
+    [listActionOptions]
   )
 
   const { keywords, onChange, onBlur } = useSearch(clearSelected, onFilterConfig)

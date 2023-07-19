@@ -93,7 +93,7 @@ export type StateAction =
   | { type: AppActions.ToggleAllNotificationVisibility; payload?: boolean }
   | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
   | { type: AppActions.Ignore; payload?: any }
-  | { type: AppActions.UpdateExperimentalParams; payload: { tx: any; assetAccount?: any } | null }
+  | { type: AppActions.UpdateExperimentalParams; payload: State.Experimental | null }
   | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
   | { type: AppActions.SetPageNotice; payload?: State.PageNotice }
   | { type: AppActions.HideWaitForFullySynced }

@@ -942,8 +942,11 @@
       "send": {
         "title": "转账",
         "address": "收款地址",
+        "address-placeholder": "请输入收款地址",
         "amount": "转账金额",
+        "amount-placeholder": "请输入转账金额",
         "description": "备注",
+        "description-placeholder": "请输入转账备注，选填",
         "submit": "提交",
         "click-to-edit": "点击编辑",
         "cheque-address-hint": {
