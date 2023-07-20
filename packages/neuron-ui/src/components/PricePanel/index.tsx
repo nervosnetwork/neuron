@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
@@ -10,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { appState, useState as useGlobalState } from 'states'
 import { FeeRateValueArrayItemType, useGetBatchGeneratedTx } from 'components/Send/hooks'
 import { batchGenerateExperimental } from 'components/SUDTSend/hooks'
+import Tooltip from 'widgets/Tooltip'
 
 import styles from './pricePanel.module.scss'
 
@@ -144,19 +144,24 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({
           <label htmlFor={field} aria-label={label} title={label}>
             {label}
           </label>
-          <button
-            data-content={isStandard ? t('price-switch.switchToCustomPrice') : t('price-switch.switchToPrice')}
-            className={styles.transferWrap}
-            onClick={() =>
-              setType(currentType =>
-                currentType === PriceTypeEnum.Standard ? PriceTypeEnum.Custom : PriceTypeEnum.Standard
-              )
-            }
-            onKeyDown={() => {}}
-            type="button"
+          <Tooltip
+            tip={<>{isStandard ? t('price-switch.switchToCustomPrice') : t('price-switch.switchToPrice')}</>}
+            placement="top"
+            showTriangle
           >
-            <Change />
-          </button>
+            <button
+              className={styles.transferWrap}
+              onClick={() =>
+                setType(currentType =>
+                  currentType === PriceTypeEnum.Standard ? PriceTypeEnum.Custom : PriceTypeEnum.Standard
+                )
+              }
+              onKeyDown={() => {}}
+              type="button"
+            >
+              <Change />
+            </button>
+          </Tooltip>
         </div>
         {isStandard ? (
           <div className={styles.timeoutWrap}>
