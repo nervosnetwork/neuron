@@ -1,6 +1,7 @@
 import Script from './script'
 import OutPoint from './out-point'
-import HexUtils from '../../utils/hex'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
+import { BI } from '@ckb-lumos/bi'
 import TypeChecker from '../../utils/type-checker'
 
 // sent: pending transaction's output
@@ -203,7 +204,7 @@ export default class Output {
   }
 
   public calculateBytesize(): number {
-    let bytesize = 8 + HexUtils.byteLength(this.data) + this.lock.calculateBytesize()
+    let bytesize = 8 + byteUtils.bytify(this.data).byteLength + this.lock.calculateBytesize()
     if (this.type) {
       bytesize += this.type.calculateBytesize()
     }
@@ -212,7 +213,7 @@ export default class Output {
 
   public toSDK(): CKBComponents.CellOutput {
     return {
-      capacity: HexUtils.toHex(this.capacity),
+      capacity: BI.from(this.capacity).toHexString(),
       lock: this.lock.toSDK(),
       type: this.type ? this.type.toSDK() : this.type,
     }

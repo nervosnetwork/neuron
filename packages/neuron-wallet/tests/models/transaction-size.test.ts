@@ -1,5 +1,5 @@
 import TransactionSize from '../../src/models/transaction-size'
-import HexUtils from '../../src/utils/hex'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
 import Script, { ScriptHashType } from '../../src/models/chain/script'
 import WitnessArgs from '../../src/models/chain/witness-args'
 import Transaction from '../../src/models/chain/transaction'
@@ -25,7 +25,7 @@ describe('TransactionSize', () => {
 
   it('witnessArgs', () => {
     const result = TransactionSize.witness(witnessArgs)
-    expect(result).toEqual(HexUtils.byteLength('0x10000000100000001000000010000000') + 4 + 4)
+    expect(result).toEqual(byteUtils.bytify('0x10000000100000001000000010000000').byteLength + 4 + 4)
   })
 
   it('witnessArgs only lock', () => {

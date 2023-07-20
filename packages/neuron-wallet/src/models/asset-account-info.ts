@@ -1,11 +1,12 @@
+import { bytes, molecule } from '@ckb-lumos/codec'
 import CellDep, { DepType } from './chain/cell-dep'
 import Script, { ScriptHashType } from './chain/script'
 import OutPoint from './chain/out-point'
 import NetworksService from '../services/networks'
 import Transaction from './chain/transaction'
-import HexUtils from '../utils/hex'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
+import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -244,9 +245,7 @@ export default class AssetAccountInfo {
   }
 
   public generateChequeScript(receiverLockHash: string, senderLockHash: string): Script {
-    const receiverLockHash20 = HexUtils.removePrefix(receiverLockHash).slice(0, 40)
-    const senderLockHash20 = HexUtils.removePrefix(senderLockHash).slice(0, 40)
-    const args = `0x${receiverLockHash20}${senderLockHash20}`
+    const args = bytes.hexify(bytes.concat(receiverLockHash.slice(0, 42), senderLockHash.slice(0, 42)))
     const info = this.chequeInfo
     return new Script(info.codeHash, args, info.hashType)
   }
@@ -286,20 +285,31 @@ export default class AssetAccountInfo {
   }
 
   public static findSignPathForCheque(addressInfos: Address[], chequeLockArgs: string) {
-    const receiverLockHash = HexUtils.removePrefix(chequeLockArgs).slice(0, 40)
-    const senderLockHash = HexUtils.removePrefix(chequeLockArgs).slice(40)
+    const Bytes20 = createFixedHexBytesCodec(20)
+    const ChequeLockArgsCodec = molecule.struct(
+      {
+        receiverLockHash: Bytes20,
+        senderLockHash: Bytes20,
+      },
+      ['receiverLockHash', 'senderLockHash']
+    )
 
-    for (const lockHash20 of [receiverLockHash, senderLockHash]) {
-      const foundAddressInfo = addressInfos.find(info => {
-        const defaultLockScript = SystemScriptInfo.generateSecpScript(info.blake160)
-        const addressLockHash20 = HexUtils.removePrefix(defaultLockScript.computeHash()).slice(0, 40)
-        return lockHash20 === addressLockHash20
-      })
-      if (foundAddressInfo) {
-        return foundAddressInfo
-      }
+    const { receiverLockHash, senderLockHash } = ChequeLockArgsCodec.unpack(chequeLockArgs)
+
+    const foundReceiver = addressInfos.find(info => {
+      const target = bytes.bytify(SystemScriptInfo.generateSecpScript(info.blake160).computeHash()).slice(0, 20)
+      return bytes.equal(target, receiverLockHash)
+    })
+
+    if (foundReceiver) {
+      return foundReceiver
     }
 
-    return null
+    const foundSender = addressInfos.find(info => {
+      const target = bytes.bytify(SystemScriptInfo.generateSecpScript(info.blake160).computeHash()).slice(0, 20)
+      return bytes.equal(target, senderLockHash)
+    })
+
+    return foundSender || null
   }
 }
