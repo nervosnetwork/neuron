@@ -1,3 +1,4 @@
+import { BI } from '@ckb-lumos/bi'
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
 import { HexString, QueryOptions } from '@ckb-lumos/base'
@@ -10,7 +11,6 @@ import SyncProgressService from '../../services/sync-progress'
 import { BlockTips, LumosCellQuery, Connector, AppendScript } from './connector'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
-import HexUtils from '../../utils/hex'
 import Multisig from '../../services/multisig'
 import { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import WalletService from '../../services/wallets'
@@ -118,7 +118,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
             hashType: v.hashType,
             args: v.args,
           },
-          blockRange: [HexUtils.toHex(v.blockStartNumber), HexUtils.toHex(v.blockEndNumber)],
+          blockRange: [BI.from(v.blockStartNumber).toHexString(), BI.from(v.blockEndNumber).toHexString()],
           scriptType: v.scriptType,
           cursor: v.cursor,
         })
@@ -135,7 +135,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       ) {
         this.syncQueue.push({
           script: syncScript.script,
-          blockRange: [HexUtils.toHex(syncStatus.blockEndNumber), syncScript.blockNumber],
+          blockRange: [BI.from(syncStatus.blockEndNumber).toHexString(), syncScript.blockNumber],
           scriptType: syncScript.scriptType,
           cursor: undefined,
         })

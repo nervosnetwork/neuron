@@ -11,10 +11,12 @@ import LockInfoDialog from 'components/LockInfoDialog'
 import { useState as useGlobalState } from 'states'
 import styles from './cellsCard.module.scss'
 
-const TabsVariantWithCellsCard: FC<VariantProps<{
-  title: string
-  cells: (State.DetailedInput | State.DetailedOutput)[]
-}>> = ({ tabs, selectedTab, onTabChange }) => {
+const TabsVariantWithCellsCard: FC<
+  VariantProps<{
+    title: string
+    cells: (State.DetailedInput | State.DetailedOutput)[]
+  }>
+> = ({ tabs, selectedTab, onTabChange }) => {
   const [t] = useTranslation()
   const {
     chain: { networkID },

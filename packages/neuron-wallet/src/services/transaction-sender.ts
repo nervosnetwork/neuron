@@ -21,7 +21,7 @@ import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
-import HexUtils from '../utils/hex'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -400,7 +400,7 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serializedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
+    const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
     blake2b.update(toUint64Le(`0x${serializedEmptyWitnessSize.toString(16)}`))
@@ -408,7 +408,7 @@ export default class TransactionSender {
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
-      const byteLength = HexUtils.byteLength(wit)
+      const byteLength = byteUtils.bytify(wit).byteLength
       blake2b.update(toUint64Le(`0x${byteLength.toString(16)}`))
       blake2b.update(wit)
     })

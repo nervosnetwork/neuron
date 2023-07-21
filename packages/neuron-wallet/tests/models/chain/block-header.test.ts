@@ -1,5 +1,4 @@
 import BlockHeader from '../../../src/models/chain/block-header'
-import HexUtils from '../../../src/utils/hex'
 
 describe('BlockHeader', () => {
   const sdkHeader: CKBComponents.BlockHeader = {
@@ -19,11 +18,11 @@ describe('BlockHeader', () => {
 
   it('fromSDK', () => {
     const result: BlockHeader = BlockHeader.fromSDK(sdkHeader)
-    expect(result.version).toEqual(HexUtils.toDecimal(sdkHeader.version))
-    expect(result.timestamp).toEqual(HexUtils.toDecimal(sdkHeader.timestamp))
+    expect(result.version).toEqual('0') // 0x0
+    expect(result.timestamp).toEqual('1557311767') // 0x5cd2b117
     expect(result.hash).toEqual(sdkHeader.hash)
     expect(result.parentHash).toEqual(sdkHeader.parentHash)
-    expect(result.number).toEqual(HexUtils.toDecimal(sdkHeader.number))
-    expect(result.epoch).toEqual(HexUtils.toDecimal(sdkHeader.epoch))
+    expect(result.number).toEqual('1024') // 0x400
+    expect(result.epoch).toEqual('1979121332649985') // 0x7080018000001
   })
 })

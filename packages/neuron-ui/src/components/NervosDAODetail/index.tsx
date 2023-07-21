@@ -24,10 +24,12 @@ import styles from './nervosDAODetail.module.scss'
 import hooks from './hooks'
 import CellsCard from './CellsCard'
 
-const TabsVariantWithTxTypes: FC<VariantProps<{
-  title: string
-  hash: string
-}>> = ({ tabs, selectedTab, onTabChange }) => {
+const TabsVariantWithTxTypes: FC<
+  VariantProps<{
+    title: string
+    hash: string
+  }>
+> = ({ tabs, selectedTab, onTabChange }) => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState<string>()

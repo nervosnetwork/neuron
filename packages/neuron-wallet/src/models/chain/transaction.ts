@@ -2,7 +2,7 @@ import CellDep from './cell-dep'
 import Input from './input'
 import Output from './output'
 import WitnessArgs from './witness-args'
-import HexUtils from '../../utils/hex'
+import { BI } from '@ckb-lumos/bi'
 import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
 import BlockHeader from './block-header'
 import TypeCheckerUtils from '../../utils/type-checker'
@@ -273,7 +273,7 @@ export default class Transaction {
 
   public toSDKRawTransaction(): CKBComponents.RawTransaction {
     return {
-      version: HexUtils.toHex(this.version),
+      version: BI.from(this.version).toHexString(),
       inputs: this.inputs.map(i => i.toSDK()),
       outputs: this.outputs.map(o => o.toSDK()),
       cellDeps: this.cellDeps.map(cd => cd.toSDK()),

@@ -88,12 +88,12 @@ const MultiAddressReceive = ({
         title: t('addresses.address'),
         dataIndex: 'address',
         align: 'left',
-        render(v: string) {
+        render(itemAddress: string) {
           return (
             <Tooltip
               tip={
-                <CopyZone content={v} className={styles.copyTableAddress}>
-                  {v}
+                <CopyZone content={itemAddress} className={styles.copyTableAddress}>
+                  {itemAddress}
                   <Copy />
                 </CopyZone>
               }
@@ -101,9 +101,9 @@ const MultiAddressReceive = ({
               isTriggerNextToChild
             >
               <div className={styles.address}>
-                <span className={styles.overflow}>{address.slice(0, -6)}</span>
+                <span className={styles.overflow}>{itemAddress.slice(0, -6)}</span>
                 <span>...</span>
-                <span>{address.slice(-6)}</span>
+                <span>{itemAddress.slice(-6)}</span>
               </div>
             </Tooltip>
           )
