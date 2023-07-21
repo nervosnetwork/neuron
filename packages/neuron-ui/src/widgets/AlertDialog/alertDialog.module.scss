@@ -4,6 +4,7 @@
   @include dialog-container;
   padding: 28px 24px 24px;
   text-align: center;
+  width: 456px;
 
   &::backdrop {
     @include overlay;
@@ -22,6 +23,7 @@
     line-height: 28px;
     margin: 0;
     color: var(--dialog-secondary-text-color);
+    word-break: break-word;
   }
 
   .actions {
