@@ -6,21 +6,15 @@ import LanguageDialog from 'components/LanguageDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
 import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
-import {
-  checkForUpdates,
-  cancelCheckUpdates,
-  downloadUpdate,
-  cancelDownloadUpdate,
-  installUpdate,
-  getVersion,
-} from 'services/remote'
+import { cancelCheckUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
 import { uniformTimeFormatter, bytesFormatter, clsx } from 'utils'
 import { LanguageSelect } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
+import { useCheckUpdate, useUpdateDownloadStatus } from './hooks'
 
 interface UpdateDownloadStatusProps {
   show: boolean
-  onCancel: (status?: string) => void
+  onCancel: () => void
   progress: number
   newVersion: string
   releaseDate: string
@@ -69,7 +63,7 @@ const UpdateDownloadStatus = ({
         onConfirm={handleConfirm}
         disabled={!available}
         confirmText={t('updates.install-update')}
-        onCancel={() => onCancel('checked')}
+        onCancel={onCancel}
         title={t('updates.update-available')}
         confirmProps={{
           'data-method': 'download',
@@ -135,76 +129,45 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [showLangDialog, setShowLangDialog] = useState(false)
   const [searchParams] = useSearchParams()
   const [errorMsg, setErrorMsg] = useState('')
-  const [dialogType, setDialogType] = useState<'' | 'checking' | 'checked' | 'updating' | 'updated'>('')
-  const [isFetchUpdateByClick, setIsFetchUpdateByClick] = useState<boolean>(false)
-  const { version: newVersion } = updater
+  const { showCheckDialog, setShowCheckDialog, onCancelCheckUpdates } = useCheckUpdate()
+  const { version: newVersion, checking, downloadProgress } = updater
+  const { showUpdateDownloadStatus, openShowUpdateDownloadStatus, onCheckUpdate, onCancel } = useUpdateDownloadStatus({
+    setShowCheckDialog,
+    downloadProgress,
+  })
 
-  const version = useMemo(() => {
+  useEffect(() => {
+    if (showCheckDialog && newVersion) {
+      setShowCheckDialog(false)
+      openShowUpdateDownloadStatus()
+    }
+  }, [showCheckDialog, newVersion, openShowUpdateDownloadStatus, setShowCheckDialog])
+
+  const currentVersion = useMemo(() => {
     return getVersion()
   }, [])
 
   useEffect(() => {
     const checkUpdate = searchParams.get('checkUpdate')
     if (checkUpdate === '1') {
-      checkForUpdates()
-      setIsFetchUpdateByClick(true)
+      onCheckUpdate()
     }
-    return () => setIsFetchUpdateByClick(false)
-  }, [searchParams, checkForUpdates])
+  }, [searchParams, onCheckUpdate])
 
   useEffect(() => {
     if (updater.errorMsg) {
       setErrorMsg(updater.errorMsg)
       cancelCheckUpdates()
-      return
     }
-    if (updater.isUpdated) {
-      setDialogType('updated')
-      return
-    }
-    if (updater.checking) {
-      setDialogType('checking')
-      return
-    }
-    if (newVersion) {
-      setDialogType('checked')
-      return
-    }
-    if (updater.downloadProgress > 0) {
-      setDialogType('updating')
-      return
-    }
-    setDialogType('')
-  }, [updater, setDialogType, setErrorMsg])
-
-  const handleUpdate = useCallback(
-    (e: React.SyntheticEvent) => {
-      const {
-        dataset: { method },
-      } = e.target as HTMLElement
-
-      setIsFetchUpdateByClick(true)
-      if (newVersion) {
-        setDialogType('checked')
-      } else if (method === 'cancelCheck') {
-        if (dialogType === 'checking') {
-          cancelCheckUpdates()
-        }
-        setDialogType('')
-      } else if (method === 'check') {
-        checkForUpdates()
-      }
-    },
-    [dialogType, setDialogType, cancelCheckUpdates, checkForUpdates]
-  )
+  }, [updater.errorMsg, setErrorMsg])
 
   return (
     <div className={styles.container}>
       <div className={clsx(styles.content, `${newVersion ? styles.showVersion : ''}`)} data-new-version-tip="New">
         <p>
-          {t('settings.general.version')} v{newVersion || version}
+          {t('settings.general.version')} v{newVersion || currentVersion}
         </p>
-        <button type="button" onClick={handleUpdate} data-method="check">
+        <button type="button" onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate} data-method="check">
           {t(newVersion ? 'updates.install-update' : 'updates.check-updates')} <ArrowNext />
         </button>
       </div>
@@ -228,37 +191,27 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         message={errorMsg}
         type="failed"
         onCancel={() => {
-          setIsFetchUpdateByClick(false)
           setErrorMsg('')
         }}
       />
 
       <Dialog
-        show={['checking', 'updated'].includes(dialogType) && isFetchUpdateByClick}
+        show={showCheckDialog}
         showCancel={false}
         showHeader={false}
-        confirmText={t(dialogType === 'checking' ? 'common.cancel' : 'common.ok')}
-        onConfirm={handleUpdate}
+        confirmText={t(checking ? 'common.cancel' : 'common.ok')}
+        onConfirm={onCancelCheckUpdates}
         className={styles.confirmDialog}
-        confirmProps={{
-          'data-method': 'cancelCheck',
-        }}
       >
         <div className={styles.wrap}>
           <VersionLogo />
-          <p>{t(dialogType === 'checking' ? 'updates.checking-updates' : 'updates.update-not-available')}</p>
+          <p>{t(checking || newVersion ? 'updates.checking-updates' : 'updates.update-not-available')}</p>
         </div>
       </Dialog>
 
       <UpdateDownloadStatus
-        show={dialogType === 'updating' || (dialogType === 'checked' && isFetchUpdateByClick)}
-        onCancel={status => {
-          if (status !== 'checked') {
-            cancelDownloadUpdate()
-          }
-          setIsFetchUpdateByClick(false)
-          setDialogType('')
-        }}
+        show={showUpdateDownloadStatus}
+        onCancel={onCancel}
         progress={updater.downloadProgress}
         progressInfo={updater.progressInfo}
         newVersion={updater.version}

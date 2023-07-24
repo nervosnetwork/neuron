@@ -68,6 +68,8 @@ const MenuButton = ({
   )
 }
 
+const ONE_DAY_MILLISECONDS = 24 * 3600 * 1000
+
 const Navbar = () => {
   const { pathname } = useLocation()
   const dispatch = useDispatch()
@@ -94,21 +96,14 @@ const Navbar = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const now = new Date()
-    const nextTriggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
-
     checkForUpdates()
-    if (nextTriggerTime) {
-      const timeDiff = nextTriggerTime.getTime() - now.getTime()
-
-      setTimeout(() => {
-        checkForUpdates()
-        setInterval(() => {
-          checkForUpdates()
-        }, 24 * 60 * 60 * 1000)
-      }, timeDiff)
+    const interval = setInterval(() => {
+      checkForUpdates()
+    }, ONE_DAY_MILLISECONDS)
+    return () => {
+      clearInterval(interval)
     }
-  }, [checkForUpdates])
+  }, [])
 
   useEffect(() => {
     if (pathname.includes(RoutePath.Settings)) {
