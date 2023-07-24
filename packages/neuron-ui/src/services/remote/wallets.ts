@@ -21,9 +21,10 @@ export const validateMnemonic = remoteApi<string>('validate-mnemonic')
 
 // Dao
 export const getDaoData = remoteApi<Controller.GetNervosDaoDataParams>('get-dao-data')
-export const generateDaoDepositTx = remoteApi<Controller.DepositParams>('generate-dao-deposit-tx')
-export const generateDaoDepositAllTx =
-  remoteApi<Controller.GenerateDepositAllTransactionParams>('generate-dao-deposit-all-tx')
+export const generateDaoDepositTx = remoteApi<Controller.DepositParams, State.GeneratedTx>('generate-dao-deposit-tx')
+export const generateDaoDepositAllTx = remoteApi<Controller.GenerateDepositAllTransactionParams, State.GeneratedTx>(
+  'generate-dao-deposit-all-tx'
+)
 export const generateDaoWithdrawTx = remoteApi<Controller.WithdrawParams>('start-withdraw-from-dao')
 export const generateDaoClaimTx = remoteApi<Controller.ClaimParams>('withdraw-from-dao')
 

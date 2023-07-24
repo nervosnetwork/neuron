@@ -29,6 +29,8 @@ declare namespace State {
       cell: Record<'txHash' | 'index', string> | null
     }
     lock: CKBComponents.Script | null
+    type?: CKBComponents.Script
+    data?: string
   }
 
   interface DetailedOutput {
@@ -36,6 +38,8 @@ declare namespace State {
     lock: CKBComponents.Script
     lockHash: string
     outPoint: CKBComponents.OutPoint
+    type?: CKBComponents.Script
+    data?: string
   }
   interface DetailedTransaction extends Transaction {
     blockHash: string
@@ -62,12 +66,21 @@ declare namespace State {
     meta?: Meta
   }
 
+  interface Signatures {
+    [hash: string]: string[]
+  }
+
+  type GeneratedTx = {
+    fee: string
+    signatures?: Signatures
+  } & DetailedTransaction
+
   interface Send {
     txID: string
     outputs: Output[]
     price: string
     description: string
-    generatedTx: any
+    generatedTx: GeneratedTx | null
   }
 
   interface Popup {

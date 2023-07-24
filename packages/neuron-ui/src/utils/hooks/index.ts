@@ -11,6 +11,7 @@ import {
   updateAddressDescription,
   setCurrentWallet,
   showPageNotice,
+  useDispatch,
 } from 'states'
 import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
 import {
@@ -489,5 +490,14 @@ export const useFirstLoadApp = (dispatch: StateDispatch) => {
       showPageNotice('overview.wallet-ready')(dispatch)
       firstLoadApp.save()
     }
+  }, [dispatch])
+}
+
+export const useClearGeneratedTx = () => {
+  const dispatch = useDispatch()
+  return useCallback(() => {
+    dispatch({
+      type: AppActions.ClearSendState,
+    })
   }, [dispatch])
 }

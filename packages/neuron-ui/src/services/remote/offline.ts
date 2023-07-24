@@ -25,15 +25,8 @@ interface MultisigConfigs {
   }
 }
 
-export interface Signatures {
-  [hash: string]: string[]
-}
-
 export interface OfflineSignJSON {
-  transaction: {
-    signatures?: Signatures
-    [key: string]: any
-  }
+  transaction: State.GeneratedTx
   status: OfflineSignStatus
   type: OfflineSignType
   description?: string

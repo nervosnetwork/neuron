@@ -72,7 +72,7 @@ export type StateAction =
   | { type: AppActions.UpdateSendOutput; payload: { idx: number; item: Partial<State.Output> } }
   | { type: AppActions.UpdateSendPrice; payload: string }
   | { type: AppActions.UpdateSendDescription; payload: string }
-  | { type: AppActions.UpdateGeneratedTx; payload: any }
+  | { type: AppActions.UpdateGeneratedTx; payload: State.GeneratedTx | null }
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
   | { type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }
