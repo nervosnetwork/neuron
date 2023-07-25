@@ -1,9 +1,8 @@
 import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import Tooltip from 'widgets/Tooltip'
 
-export default {
-  title: 'Tooltip',
+const meta: Meta<typeof Tooltip> = {
   component: Tooltip,
   argTypes: {
     children: {
@@ -12,52 +11,63 @@ export default {
       },
     },
   },
+  decorators: [
+    (Component, { args, parameters }) => (
+      <div style={{ width: parameters.width ?? '800px', backgroundColor: '#FFF' }}>
+        <Component {...args} />
+      </div>
+    ),
+  ],
 }
 
-const Template: ComponentStory<typeof Tooltip> = (props: any) => (
-  <div style={{ width: '800px', backgroundColor: '#FFF' }}>
-    <Tooltip {...props} />
-  </div>
-)
-export const Basic = Template.bind({})
-Basic.args = {
-  tip: 'This is a tooltip',
-  children: <span>show tooltip</span>,
+export default meta
+
+type Story = StoryObj<typeof Tooltip>
+
+export const Basic: Story = {
+  args: {
+    tip: 'This is a tooltip',
+    children: <span>show tooltip</span>,
+  },
 }
 
-export const TipWithReactChildren = Template.bind({})
-TipWithReactChildren.args = {
-  tip: <span>This is a tooltip</span>,
-  children: <span>show tooltip</span>,
-}
-TipWithReactChildren.argTypes = {
-  tip: {
-    table: {
-      disable: true,
+export const TipWithReactChildren: Story = {
+  args: {
+    tip: <span>This is a tooltip</span>,
+    children: <span>show tooltip</span>,
+  },
+  argTypes: {
+    tip: {
+      table: {
+        disable: true,
+      },
     },
   },
 }
 
-const TemplateShortWidth: ComponentStory<typeof Tooltip> = (props: any) => (
-  <div style={{ width: '60px', backgroundColor: '#FFF' }}>
-    <Tooltip {...props} />
-  </div>
-)
-export const BasicShortWidth = TemplateShortWidth.bind({})
-BasicShortWidth.args = {
-  tip: 'This is a tooltip',
-  children: <span>tooltip</span>,
+export const BasicShortWidth: Story = {
+  args: {
+    tip: 'This is a tooltip',
+    children: <span>tooltip</span>,
+  },
+  parameters: {
+    width: '60px',
+  },
 }
 
-export const TipWithReactChildrenShortWidth = TemplateShortWidth.bind({})
-TipWithReactChildrenShortWidth.args = {
-  tip: <span>This is a tooltip</span>,
-  children: <span>tooltip</span>,
-}
-TipWithReactChildrenShortWidth.argTypes = {
-  tip: {
-    table: {
-      disable: true,
+export const TipWithReactChildrenShortWidth: Story = {
+  args: {
+    tip: <span>This is a tooltip</span>,
+    children: <span>tooltip</span>,
+  },
+  argTypes: {
+    tip: {
+      table: {
+        disable: true,
+      },
     },
+  },
+  parameters: {
+    width: '60px',
   },
 }

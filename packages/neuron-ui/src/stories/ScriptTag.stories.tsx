@@ -1,10 +1,7 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import { action } from '@storybook/addon-actions'
 import ScriptTag from 'components/ScriptTag'
-
-const stories = storiesOf('Script Tag', module).addDecorator(withRouter())
 
 const scripts: Record<string, CKBComponents.Script> = {
   secp256k1_blake160: {
@@ -29,6 +26,43 @@ const scripts: Record<string, CKBComponents.Script> = {
   },
 }
 
-Object.entries(scripts).forEach(([title, script]) => {
-  stories.add(title, () => <ScriptTag isMainnet={false} script={script} onClick={action('click')} />)
-})
+const meta: Meta<typeof ScriptTag> = {
+  component: ScriptTag,
+  decorators: [withRouter],
+  args: {
+    isMainnet: false,
+    onClick: action('click'),
+  },
+}
+
+export default meta
+
+type Story = StoryObj<typeof ScriptTag>
+
+export const Secp256k1Blake160: Story = {
+  args: {
+    script: scripts.secp256k1_blake160,
+  },
+  name: 'secp256k1_blake160',
+}
+
+export const AnyoneCanPay: Story = {
+  args: {
+    script: scripts.anyone_can_pay,
+  },
+  name: 'anyone_can_pay',
+}
+
+export const Multisig: Story = {
+  args: {
+    script: scripts.multisig,
+  },
+  name: 'multisig',
+}
+
+export const Locktime: Story = {
+  args: {
+    script: scripts.locktime,
+  },
+  name: 'locktime',
+}

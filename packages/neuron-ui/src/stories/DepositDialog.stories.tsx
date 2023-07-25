@@ -1,5 +1,4 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import DepositDialog from 'components/DepositDialog'
 
@@ -20,7 +19,14 @@ const props = {
   onIsBalanceReservedChange: action('on is balance reserved change'),
 }
 
-const stories = storiesOf('Deposit Dialog', module)
-stories.add('Basic', () => {
-  return <DepositDialog {...props} />
-})
+const meta: Meta<typeof DepositDialog> = {
+  component: DepositDialog,
+}
+
+export default meta
+
+type Story = StoryObj<typeof DepositDialog>
+
+export const Default: Story = {
+  args: props,
+}

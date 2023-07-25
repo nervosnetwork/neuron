@@ -1,9 +1,7 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import TextField from 'widgets/TextField'
 
-export default {
-  title: 'TextField',
+const meta: Meta<typeof TextField> = {
   component: TextField,
   argTypes: {
     onChange: {
@@ -14,16 +12,20 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof TextField> = (props: any) => <TextField {...props} />
-export const Basic = Template.bind({})
-Basic.args = {
-  label: 'label',
-  required: false,
-  stack: false,
-  field: 'field',
-  value: 'value',
-  error: 'error',
-  type: 'text',
-  suffix: 'suffix',
-  onChange: () => {},
+export default meta
+
+type Story = StoryObj<typeof TextField>
+
+export const Default: Story = {
+  args: {
+    label: 'label',
+    required: false,
+    stack: false,
+    field: 'field',
+    value: 'value',
+    error: 'error',
+    type: 'text',
+    suffix: 'suffix',
+    onChange: () => {},
+  },
 }

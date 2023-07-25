@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import appState from 'states/init/app'
 
 import {
-  CONSTANTS,
   backToTop,
   calculateFee,
   ConnectionStatus,
@@ -13,9 +12,8 @@ import {
   shannonToCKBFormatter,
   getCurrentUrl,
   getSyncStatus,
-  CKBToShannonFormatter,
   clsx,
-  padFractionDigitsIfDecimal,
+  useClearGeneratedTx,
 } from 'utils'
 
 import { openExternal } from 'services/remote'
@@ -30,10 +28,8 @@ import TableNoData from 'widgets/Icons/TableNoData.png'
 import { HIDE_BALANCE } from 'utils/const'
 
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
-import hooks from './hooks'
+import hooks, { useDepositDialog } from './hooks'
 import styles from './nervosDAO.module.scss'
-
-const { MIN_DEPOSIT_AMOUNT } = CONSTANTS
 
 const DAO_DOCS_URL = 'https://docs.nervos.org/docs/basics/guides/crypto%20wallets/neuron/#deposit-ckb-into-nervos-dao'
 
@@ -61,63 +57,20 @@ const NervosDAO = () => {
   const [t, { language }] = useTranslation()
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const [isPrivacyMode, setIsPrivacyMode] = useState(false)
-  const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
-  const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
-  const [errorMessage, setErrorMessage] = useState('')
   const [withdrawList, setWithdrawList] = useState<Map<string, string | null>>(new Map())
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
-  const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
-  const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
-  const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
   const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
-  const [isBalanceReserved, setIsBalanceReserved] = useState(true)
-  const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
-  hooks.useGenerateDaoDepositTx({
-    setErrorMessage,
-    clearGeneratedTx,
-    maxDepositAmount,
-    maxDepositTx,
-    dispatch,
-    walletID: wallet.id,
-    maxDepositErrorMessage,
-    isBalanceReserved,
-    t,
-    depositValue,
-    suggestFeeRate,
-    showDepositDialog,
-  })
-  const updateDepositValue = hooks.useUpdateDepositValue({ setDepositValue })
+  const clearGeneratedTx = useClearGeneratedTx()
+  const { showDepositDialog, onOpenDepositDialog, onCloseDepositDialog } = useDepositDialog()
 
-  const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
-  const onDepositDialogDismiss = hooks.useOnDepositDialogDismiss({
-    setShowDepositDialog,
-    setDepositValue,
-    setErrorMessage,
-  })
-
-  const onDepositDialogSubmit = hooks.useOnDepositDialogSubmit({
-    setShowDepositDialog,
-    setDepositValue,
-    dispatch,
-    walletID: wallet.id,
-  })
   const onWithdrawDialogDismiss = hooks.useOnWithdrawDialogDismiss(setActiveRecord)
 
-  hooks.useUpdateMaxDeposit({
-    wallet,
-    setMaxDepositAmount,
-    setMaxDepositTx,
-    setMaxDepositErrorMessage,
-    isBalanceReserved,
-    suggestFeeRate,
-  })
   const genesisBlockHash = useMemo(() => networks.find(v => v.id === networkID)?.genesisHash, [networkID, networks])
   hooks.useInitData({
     clearGeneratedTx,
     dispatch,
-    updateDepositValue,
     wallet,
     setGenesisBlockTimestamp,
     genesisBlockHash,
@@ -144,13 +97,7 @@ const NervosDAO = () => {
     openExternal(DAO_DOCS_URL)
   }, [])
 
-  const onSlide = hooks.useOnSlide({ updateDepositValue, maxDepositAmount })
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
-
-  const onIsBalanceReservedChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    setErrorMessage('')
-    setIsBalanceReserved(!e.currentTarget.checked)
-  }
 
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
@@ -168,11 +115,6 @@ const NervosDAO = () => {
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
   })
-
-  const onOpenDepositDialog = useCallback(() => {
-    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
-    setShowDepositDialog(true)
-  }, [])
 
   const MemoizedRecords = useMemo(() => {
     const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
@@ -254,61 +196,32 @@ const NervosDAO = () => {
     isPrivacyMode,
   ])
 
-  const onDepositDialogOpen = useCallback(() => {
-    clearGeneratedTx()
-  }, [clearGeneratedTx])
-
   useEffect(() => {
     backToTop()
   }, [])
 
-  useEffect(() => {
-    try {
-      if (BigInt(CKBToShannonFormatter(depositValue)) > maxDepositAmount) {
-        const amount = shannonToCKBFormatter(`${maxDepositAmount}`, false, '')
-        setDepositValue(padFractionDigitsIfDecimal(amount, 8))
-      }
-    } catch (error) {
-      // ignore error
-      // When the depositValue is invalid, it displays the error in the textField, but it will throw an exception when valid wheater it's big than the max deposit value
-      // and when the depositValue is invalid, it's no need to set max depositValue.
-    }
-  }, [maxDepositAmount, depositValue, setDepositValue])
-
   const MemoizedDepositDialog = useMemo(() => {
     return (
       <DepositDialog
+        balance={wallet.balance}
+        walletID={wallet.id}
         show={showDepositDialog}
-        value={depositValue}
         fee={fee}
-        onChange={onDepositValueChange}
-        onOpen={onDepositDialogOpen}
-        onDismiss={onDepositDialogDismiss}
-        onSubmit={onDepositDialogSubmit}
-        onSlide={onSlide}
-        maxDepositAmount={maxDepositAmount}
+        onCloseDepositDialog={onCloseDepositDialog}
         isDepositing={sending}
-        errorMessage={errorMessage}
         isTxGenerated={!!send.generatedTx}
-        isBalanceReserved={isBalanceReserved}
-        onIsBalanceReservedChange={onIsBalanceReservedChange}
+        suggestFeeRate={suggestFeeRate}
       />
     )
-    // eslint-disable-next-line
   }, [
+    wallet.balance,
+    wallet.id,
     showDepositDialog,
-    depositValue,
     fee,
-    onDepositDialogOpen,
-    onDepositDialogDismiss,
-    onDepositDialogSubmit,
-    onSlide,
-    maxDepositAmount,
+    onCloseDepositDialog,
     sending,
-    errorMessage,
     send.generatedTx,
-    isBalanceReserved,
-    onIsBalanceReservedChange,
+    suggestFeeRate,
   ])
 
   const MemoizedWithdrawDialog = useMemo(() => {
@@ -424,7 +337,7 @@ const NervosDAO = () => {
           <button
             className={styles.action}
             type="button"
-            disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
+            disabled={connectionStatus === 'offline' || sending || !wallet.balance}
             onClick={onOpenDepositDialog}
           >
             <Deposit />

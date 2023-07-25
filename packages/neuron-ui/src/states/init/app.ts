@@ -26,7 +26,7 @@ export const appState: State.App = {
     ],
     price: INIT_SEND_PRICE,
     description: '',
-    generatedTx: '',
+    generatedTx: null,
   },
   passwordRequest: {
     actionType: null,

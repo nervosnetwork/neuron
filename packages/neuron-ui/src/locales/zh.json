@@ -197,6 +197,7 @@
       "address": "收款地址",
       "input-address": "请输入收款地址",
       "amount": "转账金额（CKB）",
+      "input-amount": "请输入转账金额",
       "send": "发送",
       "reset": "重置",
       "confirm-password": "确认密码",
@@ -659,7 +660,7 @@
       "compensation": "锁定补贴",
       "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(约 {{days}} 天)完成最终取出操作。",
       "deposit-dialog-title": "存入",
-      "deposit-terms": "Nervos DAO 需要 102 CKBytes 作为锁定记录的存储，这部分 CKBytes 是无法产生锁定补贴的。请查看 <0>Nervos DAO RFC</0> 以了解 Nervos DAO 更多信息。",
+      "deposit-terms": "Nervos DAO 需要 102 CKBytes 作为锁定记录的存储，这部分 CKBytes 是无法产生锁定补贴的。<br />请查看 <0>Nervos DAO RFC</0> 以了解 Nervos DAO 更多信息。",
       "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
@@ -944,8 +945,11 @@
       "send": {
         "title": "转账",
         "address": "收款地址",
+        "address-placeholder": "请输入收款地址",
         "amount": "转账金额",
+        "amount-placeholder": "请输入转账金额",
         "description": "备注",
+        "description-placeholder": "请输入转账备注，选填",
         "submit": "提交",
         "click-to-edit": "点击编辑",
         "cheque-address-hint": {
@@ -1021,6 +1025,8 @@
         "notice": "导入配置一次只能导入一个，如果是文件内容是数组默认取第一个导入"
       },
       "delete-failed": "删除多签配置失败",
+      "remove-multisig-address": "刪除多签地址",
+      "remove-multisig-address-msg": "确定要刪除所选多签地址？",
       "send-ckb": {
         "title": "多签地址转账",
         "detail": "从 {{m}}-of-{{n}} 多签地址 <0></0> 转账",

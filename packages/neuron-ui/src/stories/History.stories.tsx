@@ -1,5 +1,4 @@
-import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { withRouter } from 'storybook-addon-react-router-v6'
 import History from 'components/History'
 import { initStates } from 'states'
@@ -93,8 +92,7 @@ const states: { [title: string]: any } = {
   },
 }
 
-export default {
-  title: 'History',
+const meta: Meta<typeof History> = {
   component: History,
   decorators: [withRouter],
   argTypes: {
@@ -102,39 +100,50 @@ export default {
   },
 }
 
-const Template: ComponentStory<typeof History> = () => <History />
+export default meta
 
-export const HasNotTransactions = Template.bind({})
-HasNotTransactions.args = {
-  chain: { ...initStates.chain, transactions: states['Has not transactions'].chain.transactions },
+type Story = StoryObj<typeof History>
+
+export const HasNotTransactions: Story = {
+  args: {
+    chain: {
+      ...initStates.chain,
+      transactions: states['Has not transactions'].chain.transactions,
+    },
+  },
 }
 
-export const OneItem = Template.bind({})
-OneItem.args = { chain: { ...initStates.chain, transactions: states['1 item and PageNo.1'].chain.transactions } }
-OneItem.storyName = '1 item and PageNo.1'
-
-export const MoreItem = Template.bind({})
-MoreItem.args = { chain: { ...initStates.chain, transactions: states['15 items and PageNo.1'].chain.transactions } }
-MoreItem.storyName = '15 items and PageNo.1'
-
-export const MorePage = Template.bind({})
-MorePage.args = { chain: { ...initStates.chain, transactions: states['16 items and PageNo.2'].chain.transactions } }
-MorePage.storyName = '16 items and PageNo.2'
-
-export const MoreItemOnPage = Template.bind({})
-MoreItemOnPage.args = {
-  chain: { ...initStates.chain, transactions: states['200 items and PageNo.1'].chain.transactions },
+export const OneItem: Story = {
+  args: { chain: { ...initStates.chain, transactions: states['1 item and PageNo.1'].chain.transactions } },
+  name: '1 item and PageNo.1',
 }
-MoreItemOnPage.storyName = '200 items and PageNo.1'
 
-export const MoreItemOnNextPage = Template.bind({})
-MoreItemOnNextPage.args = {
-  chain: { ...initStates.chain, transactions: states['200 items and PageNo.2'].chain.transactions },
+export const MoreItem: Story = {
+  args: { chain: { ...initStates.chain, transactions: states['15 items and PageNo.1'].chain.transactions } },
+  name: '15 items and PageNo.1',
 }
-MoreItemOnNextPage.storyName = '200 items and PageNo.2'
 
-export const MoreItemOnPage14 = Template.bind({})
-MoreItemOnPage14.args = {
-  chain: { ...initStates.chain, transactions: states['200 items and PageNo.14'].chain.transactions },
+export const MorePage: Story = {
+  args: { chain: { ...initStates.chain, transactions: states['16 items and PageNo.2'].chain.transactions } },
+  name: '16 items and PageNo.2',
 }
-MoreItemOnPage14.storyName = '200 items and PageNo.14'
+export const MoreItemOnPage: Story = {
+  args: {
+    chain: { ...initStates.chain, transactions: states['200 items and PageNo.1'].chain.transactions },
+  },
+  name: '200 items and PageNo.1',
+}
+
+export const MoreItemOnNextPage: Story = {
+  args: {
+    chain: { ...initStates.chain, transactions: states['200 items and PageNo.2'].chain.transactions },
+  },
+  name: '200 items and PageNo.2',
+}
+
+export const MoreItemOnPage14: Story = {
+  args: {
+    chain: { ...initStates.chain, transactions: states['200 items and PageNo.14'].chain.transactions },
+  },
+  name: '200 items and PageNo.14',
+}

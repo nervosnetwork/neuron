@@ -204,6 +204,7 @@
       "address": "Send to",
       "input-address": "Please input receiving address",
       "amount": "Amount (CKB)",
+      "input-amount": "Please input amount",
       "send": "Send",
       "reset": "Reset",
       "confirm-password": "Confirm Password",
@@ -666,7 +667,7 @@
       "compensation": "Compensation",
       "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
       "deposit-dialog-title": "Deposit",
-      "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
+      "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. <br />Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
@@ -952,8 +953,11 @@
       "send": {
         "title": "Send",
         "address": "Send to",
+        "address-placeholder": "Please input address",
         "amount": "Amount",
+        "amount-placeholder": "Please input amount",
         "description": "Description",
+        "description-placeholder": "Please input description, optional",
         "submit": "Submit",
         "click-to-edit": "Click to edit",
         "cheque-address-hint": {
@@ -1029,6 +1033,8 @@
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
       "delete-failed": "Delete multisig config failed",
+      "remove-multisig-address": "Remove Multisig Address",
+      "remove-multisig-address-msg": "Are you sure you want to remove the selected multisig address?",
       "send-ckb": {
         "title": "Send CKB from multisig address",
         "detail": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",

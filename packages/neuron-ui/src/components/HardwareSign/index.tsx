@@ -460,7 +460,7 @@ const HardwareSign = ({
             </tr>
           </tbody>
         </table>
-        {wallet.isHD ? <HDWalletSign tx={generatedTx} /> : null}
+        {wallet.isHD && generatedTx ? <HDWalletSign tx={generatedTx} /> : null}
       </section>
       <footer className={styles.footer}>
         {offlineSignJSON === undefined && signType === 'transaction' ? (

@@ -119,12 +119,11 @@ const MultisigAddress = () => {
   )
   const listNoBalanceActionOptions = useMemo(
     () =>
-      tableActions.map(item => ({
+      listActionOptions.map(item => ({
         ...item,
-        label: t(`multisig-address.table.actions.${item.key}`),
-        disabled: item.key === 'send',
+        disabled: item.disabled || item.key === 'send',
       })),
-    [t]
+    [listActionOptions]
   )
 
   const { keywords, onChange, onBlur } = useSearch(clearSelected, onFilterConfig)
@@ -183,7 +182,13 @@ const MultisigAddress = () => {
                   render(_, __, item) {
                     return (
                       <label htmlFor={`${item.id}`}>
-                        <input id={`${item.id}`} data-config-id={item.id} type="checkbox" onChange={onChangeChecked} />
+                        <input
+                          id={`${item.id}`}
+                          data-config-id={item.id}
+                          type="checkbox"
+                          onChange={onChangeChecked}
+                          checked={selectIds.includes(item.id)}
+                        />
                         <span />
                       </label>
                     )
@@ -264,7 +269,9 @@ const MultisigAddress = () => {
                   isBalance: true,
                   render(_, __, item, show) {
                     return (
-                      <div>{show ? shannonToCKBFormatter(multisigBanlances[item.fullPayload]) : HIDE_BALANCE} CKB</div>
+                      <div>
+                        {show ? shannonToCKBFormatter(multisigBanlances[item.fullPayload] || '0') : HIDE_BALANCE} CKB
+                      </div>
                     )
                   },
                 },
@@ -346,8 +353,8 @@ const MultisigAddress = () => {
 
       <AlertDialog
         show={showDeleteDialog}
-        title={t('send.remove-receiving-address')}
-        message={t('send.remove-receiving-address-msg')}
+        title={t('multisig-address.remove-multisig-address')}
+        message={t('multisig-address.remove-multisig-address-msg')}
         type="warning"
         onCancel={() => setShowDeleteDialog(false)}
         onOk={() => {

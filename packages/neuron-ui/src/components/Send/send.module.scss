@@ -60,6 +60,15 @@ $headerHeight: 104px;
 
     .content {
       padding: 16px;
+      /**
+        These styles are for showing the full tips, because of content needs to scroll on the y-axis.
+        Then the overflow property that is set as scroll will truncate the tips overflow of the content.
+        So I need to expand the content's left to show the full tips.
+      */
+      position: relative;
+      left: -48px;
+      padding-left: 64px;
+      width: calc(100% - 32px);
     }
 
     .rightFooter {

@@ -1,84 +1,80 @@
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import { Slider } from 'office-ui-fabric-react'
-import { useTranslation, Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Spinner, { SpinnerSize } from 'widgets/Spinner'
 import { openExternal } from 'services/remote'
-import { CONSTANTS, localNumberFormatter, shannonToCKBFormatter } from 'utils'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import { Attention, Success } from 'widgets/Icons/icon'
 import Dialog from 'widgets/Dialog'
 import styles from './depositDialog.module.scss'
-
-const { SHANNON_CKB_RATIO } = CONSTANTS
+import {
+  useBalanceReserved,
+  useDepositValue,
+  useGenerateDaoDepositTx,
+  useOnDepositDialogCancel,
+  useOnDepositDialogSubmit,
+} from './hooks'
 
 const NERVOS_DAO_RFC_URL =
   'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
 
 interface DepositDialogProps {
+  balance: string
   show: boolean
-  value: any
   fee: string
-  onOpen: () => void
-  onDismiss: () => void
-  onChange: (e: React.SyntheticEvent<HTMLInputElement, Event>) => void
-  onSubmit: () => void
-  onSlide: (value: number) => void
-  maxDepositAmount: bigint
+  onCloseDepositDialog: () => void
   isDepositing: boolean
-  errorMessage: string
   isTxGenerated: boolean
-  isBalanceReserved: boolean
-  onIsBalanceReservedChange: (e: React.SyntheticEvent<HTMLInputElement>) => void
+  suggestFeeRate: number
+  walletID: string
 }
 
+const RfcLink = React.memo(() => (
+  <button
+    type="button"
+    onClick={() => {
+      openExternal(NERVOS_DAO_RFC_URL)
+    }}
+    className={styles.rfcLink}
+    aria-label="Nervos DAO RFC"
+    title="Nervos DAO RFC"
+  />
+))
+
 const DepositDialog = ({
+  walletID,
+  balance,
   show,
-  value,
   fee,
-  maxDepositAmount,
-  onChange,
-  onSlide,
-  onSubmit,
-  onOpen,
-  onDismiss,
+  onCloseDepositDialog,
   isDepositing,
-  errorMessage,
   isTxGenerated,
-  isBalanceReserved,
-  onIsBalanceReservedChange,
+  suggestFeeRate,
 }: DepositDialogProps) => {
   const [t] = useTranslation()
-
-  useEffect(() => {
-    if (show) {
-      onOpen()
-    }
-  }, [onOpen, show])
-
-  const rfcLink = useMemo(
-    () => (
-      <button
-        type="button"
-        onClick={() => {
-          openExternal(NERVOS_DAO_RFC_URL)
-        }}
-        className={styles.rfcLink}
-        aria-label="Nervos DAO RFC"
-        title="Nervos DAO RFC"
-      />
-    ),
-    []
-  )
-  const maxValue = +(maxDepositAmount / BigInt(SHANNON_CKB_RATIO)).toString()
   const disabled = !isTxGenerated
+  const { isBalanceReserved, onIsBalanceReservedChange, setIsBalanceReserved } = useBalanceReserved()
+  const { depositValue, onChangeDepositValue, slidePercent, onSliderChange, resetDepositValue } =
+    useDepositValue(balance)
+  const { errorMessage, maxDepositValue } = useGenerateDaoDepositTx({
+    walletID,
+    isBalanceReserved,
+    depositValue,
+    suggestFeeRate,
+    showDepositDialog: show,
+    slidePercent,
+  })
+  const onConfirm = useOnDepositDialogSubmit({ onCloseDepositDialog, walletID })
+  const onCancel = useOnDepositDialogCancel({ onCloseDepositDialog, resetDepositValue, setIsBalanceReserved })
 
   return (
     <Dialog
       show={show}
       title={t('nervos-dao.deposit')}
       disabled={disabled}
-      onCancel={onDismiss}
-      onConfirm={onSubmit}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
       cancelText={t('nervos-dao.cancel')}
       confirmText={t('nervos-dao.proceed')}
     >
@@ -91,19 +87,19 @@ const DepositDialog = ({
           )}`}</label>
           <Slider
             className={styles.slider}
-            value={value}
+            value={slidePercent}
             min={0}
-            max={maxValue}
+            max={100}
             step={1}
             showValue={false}
-            onChange={onSlide}
+            onChange={onSliderChange}
           />
           <TextField
             className={styles.depositValue}
             width="100%"
             field="depositValue"
-            value={localNumberFormatter(value)}
-            onChange={onChange}
+            value={localNumberFormatter(maxDepositValue ?? depositValue)}
+            onChange={onChangeDepositValue}
             suffix="CKB"
             required
             error={errorMessage}
@@ -132,7 +128,7 @@ const DepositDialog = ({
           <div className={styles.notice}>
             <Attention />
             <div>
-              <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
+              <Trans i18nKey="nervos-dao.deposit-terms" components={[<RfcLink />]} />
             </div>
           </div>
         </form>

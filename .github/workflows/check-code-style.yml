@@ -33,7 +33,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v37
         with:
-          files: "**/*.{js,cjs,mjs,jsx,ts,tsx,css,scss}"
+          files: "packages/**/*.{js,cjs,mjs,jsx,ts,tsx,css,scss}"
 
       - name: Prettier Check
         if: steps.changed-files.outputs.any_changed == 'true'
