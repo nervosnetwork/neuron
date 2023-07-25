@@ -28,7 +28,6 @@ export enum RoutePath {
   SpecialAssets = '/special-assets',
   SUDTAccountList = '/s-udt/accounts',
   SUDTSend = '/s-udt/send',
-  NFTSend = '/nft',
   ImportHardware = '/import-hardware',
   OfflineSign = 'offline-sign',
   SignVerify = 'sign-verify',

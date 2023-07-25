@@ -1,13 +1,11 @@
 import React, { useState, useCallback, useReducer, useMemo, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useParams } from 'react-router-dom'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { isMainnet as isMainnetUtil, isSuccessResponse, validateAddress } from 'utils'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import TextField from 'widgets/TextField'
+import Dialog from 'widgets/Dialog'
 import { generateNFTSendTransaction } from 'services/remote'
-import Button from 'widgets/Button'
-import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { isErrorWithI18n } from 'exceptions'
 import styles from './NFTSend.module.scss'
 
@@ -36,8 +34,20 @@ const reducer: React.Reducer<typeof initState, { type: Fields; payload: string }
   }
 }
 
-const NFTSend = () => {
-  const { nftId } = useParams<{ nftId: string }>()
+const NFTSend = ({
+  onCancel,
+  cell,
+}: {
+  onCancel: () => void
+  cell: {
+    nftId: string
+    outPoint: {
+      index: string
+      txHash: string
+    }
+  }
+}) => {
+  const { nftId, outPoint } = cell
   const {
     wallet: { id: walletId },
     app: {
@@ -95,14 +105,12 @@ const NFTSend = () => {
             actionType: 'send-nft',
           },
         })
+
+        onCancel()
       }
     },
     [isSubmittable, globalDispatch, walletId]
   )
-
-  const location = useLocation()
-
-  const outPoint = location.state?.outPoint
 
   useEffect(() => {
     const clearTimer = () => {
@@ -144,44 +152,36 @@ const NFTSend = () => {
   }, [isSubmittable, globalDispatch, sendState, walletId, outPoint, suggestFeeRate])
 
   return (
-    <div>
-      <div className={styles.title}>{`#${nftId} mNFT`}</div>
-      <form onSubmit={onSubmit}>
-        <div className={styles.card}>
-          <div className={styles.send}>
-            <TextField
-              label={t('s-udt.send.address')}
-              value={sendState.address}
-              required
-              field={Fields.Address}
-              onChange={onInput}
-              error={addressError}
-            />
-            <div className={styles.description}>
-              <TextField
-                label={t('s-udt.send.description')}
-                value={sendState.description}
-                field={Fields.Description}
-                onChange={onInput}
-                placeholder={t('s-udt.send.click-to-edit')}
-                className={styles.descriptionField}
-              />
-            </div>
-            <div className={styles.remoteError}>
-              {remoteError ? (
-                <>
-                  <Attention />
-                  {remoteError}
-                </>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </form>
-      <div className={styles.footer}>
-        <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />
+    <Dialog
+      show
+      title={`${t('special-assets.transfer-nft')} #${nftId} mNFT`}
+      disabled={!isSubmittable}
+      onCancel={onCancel}
+      onConfirm={onSubmit}
+      confirmText={t('wizard.next')}
+    >
+      <div className={styles.container}>
+        <TextField
+          className={styles.textFieldClass}
+          label={t('migrate-sudt.address')}
+          placeholder={t('s-udt.send.input-address')}
+          value={sendState.address}
+          rows={sendState.address ? 2 : 1}
+          field={Fields.Address}
+          onChange={onInput}
+          error={addressError}
+        />
+        <TextField
+          label={t('s-udt.send.description')}
+          value={sendState.description}
+          field={Fields.Description}
+          onChange={onInput}
+          placeholder={t('s-udt.send.input-description')}
+          className={styles.descriptionField}
+          error={remoteError}
+        />
       </div>
-    </div>
+    </Dialog>
   )
 }
 
