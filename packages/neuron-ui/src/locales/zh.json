@@ -946,6 +946,8 @@
         "title": "转账",
         "address": "收款地址",
         "address-placeholder": "请输入收款地址",
+        "input-address": "请输入地址",
+        "input-description": "请输入转账，选填",
         "amount": "转账金额",
         "amount-placeholder": "请输入转账金额",
         "description": "备注",

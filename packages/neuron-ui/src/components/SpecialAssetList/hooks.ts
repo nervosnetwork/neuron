@@ -15,7 +15,7 @@ import {
   useDialogWrapper,
   useDidMount,
 } from 'utils'
-import { MS_PER_EPOCHS } from 'utils/const'
+import { MILLISECONDS } from 'utils/const'
 import { AssetInfo, ChequeAssetInfo, NFTType } from '.'
 
 export const useMigrate = () => {
@@ -131,8 +131,8 @@ export const useGetSpecialAssetColumnInfo = ({
         target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
         current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
       }
-      targetTime = bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MS_PER_EPOCHS
-      if (epochsInfo.target - epochsInfo.current > 0) {
+      targetTime = bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MILLISECONDS
+      if (epochsInfo.target > epochsInfo.current) {
         status = 'locked-asset'
       } else {
         status = 'claim-asset'

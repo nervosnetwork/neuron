@@ -924,6 +924,8 @@
         "title": "轉帳",
         "address": "收款地址",
         "address-placeholder": "請輸入收款地址",
+        "input-address": "請輸入地址",
+        "input-description": "請輸入備註，選填",
         "amount": "转账金額",
         "amount-placeholder": "請輸入转账金額",
         "description": "備註",

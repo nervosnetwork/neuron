@@ -34,6 +34,7 @@ import SUDTMigrateDialog from 'components/SUDTMigrateDialog'
 import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDialog'
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
 import PageContainer from 'components/PageContainer'
+import NFTSend from 'components/NFTSend'
 import { useGetAssetAccounts, useGetSpecialAssetColumnInfo } from './hooks'
 
 import styles from './specialAssetList.module.scss'
@@ -109,6 +110,16 @@ const SpecialAssetList = () => {
   const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState<boolean>(false)
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState<boolean>(false)
   const [isExistAccountDialogOpen, setIsExistAccountDialogOpen] = useState<boolean>(false)
+  const [nFTSendCell, setNFTSendCell] = useState<
+    | {
+        nftId: string
+        outPoint: {
+          index: string
+          txHash: string
+        }
+      }
+    | undefined
+  >()
   const [migrateTokenInfo, setMigrateTokenInfo] = useState<Controller.GetTokenInfoList.TokenInfo | undefined>()
 
   const onClickMigrate = useCallback(
@@ -290,10 +301,9 @@ const SpecialAssetList = () => {
         return
       }
       if (cell.customizedAssetInfo.type === 'NFT') {
-        navigate(`${RoutePath.NFTSend}/${nftFormatter(cell.type?.args, true)}`, {
-          state: {
-            outPoint: cell.outPoint,
-          },
+        setNFTSendCell({
+          nftId: nftFormatter(cell.type?.args, true),
+          outPoint: cell.outPoint,
         })
         return
       }
@@ -509,6 +519,8 @@ const SpecialAssetList = () => {
           isLightClient={isLightClient}
         />
       )}
+
+      {nFTSendCell ? <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} /> : null}
     </PageContainer>
   )
 }

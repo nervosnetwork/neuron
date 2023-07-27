@@ -954,6 +954,8 @@
         "title": "Send",
         "address": "Send to",
         "address-placeholder": "Please input address",
+        "input-address": "Please input address",
+        "input-description": "Please input description, optional",
         "amount": "Amount",
         "amount-placeholder": "Please input amount",
         "description": "Description",
