@@ -60,6 +60,8 @@ import startMonitor, { stopMonitor } from '../services/monitor'
 import { migrateCkbData } from '../services/ckb-runner'
 import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
+import { resetSyncTaskQueue } from '../block-sync-renderer'
+import DataUpdateSubject from '../models/subjects/data-update'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -93,9 +95,14 @@ export default class ApiController {
         break
       }
       case 'import-xpubkey': {
-        this.#walletsController.importXPubkey().catch(error => {
-          dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
-        })
+        this.#walletsController
+          .importXPubkey()
+          .then(() => {
+            DataUpdateSubject.next({ dataType: 'new-xpubkey-wallet', actionType: 'create' })
+          })
+          .catch(error => {
+            dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+          })
         break
       }
       case 'delete-wallet':
@@ -315,9 +322,19 @@ export default class ApiController {
       return this.#walletsController.create(params)
     })
 
-    handle('update-wallet', async (_, params: { id: string; password: string; name: string; newPassword?: string }) => {
-      return this.#walletsController.update(params)
-    })
+    handle(
+      'update-wallet',
+      async (
+        _,
+        params: { id: string; password?: string; name?: string; newPassword?: string; startBlockNumberInLight?: string }
+      ) => {
+        const res = this.#walletsController.update(params)
+        if (params.startBlockNumberInLight) {
+          resetSyncTaskQueue.asyncPush(true)
+        }
+        return res
+      }
+    )
 
     handle('delete-wallet', async (_, { id = '', password = '' }) => {
       return this.#walletsController.delete({ id, password })

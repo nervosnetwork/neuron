@@ -66,6 +66,7 @@ export abstract class Wallet {
     extendedKey: this.extendedKey,
     device: this.device,
     isHD: this.isHD,
+    startBlockNumberInLight: this.startBlockNumberInLight,
   })
 
   public fromJSON = () => {
@@ -92,12 +93,19 @@ export abstract class Wallet {
     throw new WalletFunctionNotSupported(this.accountExtendedPublicKey.name)
   }
 
-  public update = ({ name, device }: Pick<WalletProperties, 'name' | 'device'>) => {
+  public update = ({
+    name,
+    device,
+    startBlockNumberInLight,
+  }: Pick<Partial<WalletProperties>, 'name' | 'device' | 'startBlockNumberInLight'>) => {
     if (name) {
       this.name = name
     }
     if (device) {
       this.device = device
+    }
+    if (startBlockNumberInLight) {
+      this.startBlockNumberInLight = startBlockNumberInLight
     }
   }
 

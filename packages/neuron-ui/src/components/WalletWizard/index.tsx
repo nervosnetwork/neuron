@@ -22,6 +22,7 @@ import Alert from 'widgets/Alert'
 import { Loading } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
 import { showAlertDialog, useDispatch } from 'states'
+import { importedWalletDialogShown } from 'services/localCache'
 import { useInputWords } from './hooks'
 import styles from './walletWizard.module.scss'
 
@@ -45,6 +46,7 @@ const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (n
 const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (navigate: NavigateFunction) => {
   return importMnemonic(params).then(res => {
     if (isSuccessResponse(res)) {
+      importedWalletDialogShown.init(res.result.id)
       navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
@@ -387,7 +389,7 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
         </div>
       )}
       <div className={styles.title}>{t(message)}</div>
-      {submissionInputs.map(input => (
+      {submissionInputs.map((input, idx) => (
         <div
           key={input.key}
           className={styles.input}
@@ -400,6 +402,7 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
             onChange={onChange}
             maxLength={input.maxLength}
             placeholder={input.hint ? t(input.hint) : undefined}
+            tabIndex={idx}
             required
           />
         </div>

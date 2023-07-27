@@ -35,6 +35,7 @@ declare namespace Controller {
     newPassword?: string
     name?: string
     device?: any
+    startBlockNumberInLight?: string
   }
 
   interface RequestPasswordParams {

@@ -9,7 +9,7 @@ import {
   initAppState,
 } from 'states/stateProvider/actionCreators'
 
-import { getWinID } from 'services/remote'
+import { getCurrentWallet, getWinID } from 'services/remote'
 import {
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
@@ -19,9 +19,13 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getTipHeader } from 'services/chain'
-import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
+import {
+  networks as networksCache,
+  currentNetworkID as currentNetworkIDCache,
+  importedWalletDialogShown,
+} from 'services/localCache'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ErrorCode, RoutePath, getConnectionStatus } from 'utils'
+import { ErrorCode, RoutePath, getConnectionStatus, isSuccessResponse } from 'utils'
 
 const SYNC_INTERVAL_TIME = 4000
 const CONNECTING_BUFFER = 15_000
@@ -149,6 +153,14 @@ export const useSubscription = ({
           updateCurrentWallet()(dispatch).then(hasCurrent => {
             if (!hasCurrent) {
               navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+            }
+          })
+          break
+        }
+        case 'new-xpubkey-wallet': {
+          getCurrentWallet().then(res => {
+            if (isSuccessResponse(res) && res.result) {
+              importedWalletDialogShown.init(res.result.id)
             }
           })
           break

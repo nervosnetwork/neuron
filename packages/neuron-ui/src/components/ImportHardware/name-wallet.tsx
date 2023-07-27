@@ -6,6 +6,7 @@ import { createHardwareWallet } from 'services/remote'
 import { CONSTANTS, isSuccessResponse, useDialogWrapper } from 'utils'
 import Alert from 'widgets/Alert'
 import { FinishCreateLoading, getAlertStatus } from 'components/WalletWizard'
+import { importedWalletDialogShown } from 'services/localCache'
 import { ImportStep, ActionType, ImportHardwareState } from './common'
 
 import styles from './findDevice.module.scss'
@@ -41,6 +42,9 @@ const NameWallet = ({
         .then(res => {
           if (isSuccessResponse(res)) {
             dispatch({ step: ImportStep.Success })
+            if (res.result) {
+              importedWalletDialogShown.init(res.result.id)
+            }
           } else {
             setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)
           }
@@ -60,7 +64,7 @@ const NameWallet = ({
   return (
     <form className={styles.container}>
       <header className={styles.title}>{t('import-hardware.title.name-wallet')}</header>
-      <section className={styles.main}>
+      <section className={styles.name}>
         <TextField
           required
           autoFocus

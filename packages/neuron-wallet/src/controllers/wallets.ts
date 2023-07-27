@@ -199,12 +199,14 @@ export default class WalletsController {
     password,
     newPassword,
     device,
+    startBlockNumberInLight,
   }: {
     id: string
-    password: string
-    name: string
+    password?: string
+    name?: string
     newPassword?: string
     device?: DeviceInfo
+    startBlockNumberInLight?: string
   }): Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
@@ -212,8 +214,9 @@ export default class WalletsController {
       throw new WalletNotFound(id)
     }
 
-    const props: { name: string; keystore?: Keystore; device?: DeviceInfo } = {
+    const props: { name: string; keystore?: Keystore; device?: DeviceInfo; startBlockNumberInLight?: string } = {
       name: name || wallet.name,
+      startBlockNumberInLight,
     }
 
     if (!wallet.isHardware()) {
@@ -225,6 +228,9 @@ export default class WalletsController {
     }
 
     if (newPassword) {
+      if (!password) {
+        throw new Error('Change password need old password')
+      }
       const extendedPrivateKey = wallet!.loadKeystore().extendedPrivateKey(password)
       props.keystore = Keystore.create(extendedPrivateKey, newPassword)
     }

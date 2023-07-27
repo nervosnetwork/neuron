@@ -185,13 +185,20 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     )
     const otherTypeSyncProgress = await SyncProgressService.getOtherTypeSyncProgress()
     const setScriptsParams = [
-      ...allScripts.map(v => ({
-        ...v,
-        blockNumber:
-          existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
-          walletStartBlockMap[v.walletId] ??
-          `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`,
-      })),
+      ...allScripts.map(v => {
+        let syncedBlockNumber = existSyncscripts[scriptToHash(v.script)]?.blockNumber
+        const walletStartBlockNumber = walletStartBlockMap[v.walletId]
+        if (
+          walletStartBlockNumber &&
+          (!syncedBlockNumber || BigInt(syncedBlockNumber) < BigInt(walletStartBlockNumber))
+        ) {
+          syncedBlockNumber = walletStartBlockNumber
+        }
+        return {
+          ...v,
+          blockNumber: syncedBlockNumber ?? `0x${(walletMinBlockNumber?.[v.walletId] ?? 0).toString(16)}`,
+        }
+      }),
       ...appendScripts.map(v => ({
         ...v,
         blockNumber:

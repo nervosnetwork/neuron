@@ -53,6 +53,7 @@ import { RemoveAddressesMultisigConfig1651820157100 } from './migrations/1651820
 import { AddSyncProgress1676441837373 } from './migrations/1676441837373-AddSyncProgress'
 import { AddTypeSyncProgress1681360188494 } from './migrations/1681360188494-AddTypeSyncProgress'
 import { TxLock1684488676083 } from './migrations/1684488676083-TxLock'
+import { AddWalletPrimary1690361215400 } from './migrations/1690361215400-AddWalletPrimary'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -122,6 +123,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddSyncProgress1676441837373,
       AddTypeSyncProgress1681360188494,
       TxLock1684488676083,
+      AddWalletPrimary1690361215400,
     ],
     logger: 'simple-console',
     logging,
