@@ -15,7 +15,7 @@ import {
   useDialogWrapper,
   useDidMount,
 } from 'utils'
-import { MILLISECONDS } from 'utils/const'
+import { MILLISECONDS, MILLISECONDS_PER_DAY } from 'utils/const'
 import { AssetInfo, ChequeAssetInfo, NFTType } from '.'
 
 export const useMigrate = () => {
@@ -143,8 +143,7 @@ export const useGetSpecialAssetColumnInfo = ({
       status = (assetInfo as ChequeAssetInfo).data === 'claimable' ? 'claim-asset' : 'withdraw-asset'
 
       if (status === 'withdraw-asset') {
-        const DAY = 86_400_000
-        targetTime = datetime + DAY
+        targetTime = datetime + MILLISECONDS_PER_DAY
       }
 
       try {
@@ -171,7 +170,7 @@ export const useGetSpecialAssetColumnInfo = ({
     }
   }
 
-  const isLockedCheque = status === 'withdraw-asset' && Date.now() < targetTime!
+  const isLockedCheque = status === 'withdraw-asset' && targetTime && Date.now() < targetTime
   const isNFTTransferable = assetInfo.type === NFTType.NFT && assetInfo.data === 'transferable'
   const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
 

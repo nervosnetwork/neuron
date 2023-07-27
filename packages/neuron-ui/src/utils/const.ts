@@ -22,7 +22,8 @@ export const SHANNON_CKB_RATIO = 1e8
 
 export const MEDIUM_FEE_RATE = 2000
 export const WITHDRAW_EPOCHS = 180
-export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
+export const MILLISECONDS_PER_DAY = 24 * 3600 * 1000
+export const MILLISECONDS_IN_YEAR = 365 * MILLISECONDS_PER_DAY
 export const HOURS_PER_EPOCH = 4
 export const HOURS_PER_DAY = 24
 
@@ -71,3 +72,6 @@ export const METHOD_NOT_FOUND = -32601
 
 export const MAX_M_N_NUMBER = 255
 export const MILLISECONDS = HOURS_PER_EPOCH * 60 * 60 * 1000
+
+export const ADDRESS_MIN_LENGTH = 86
+export const ADDRESS_HEAD_TAIL_LENGTH = 34

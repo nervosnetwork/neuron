@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { useDidMount, useForceUpdate } from 'utils'
+import { ADDRESS_MIN_LENGTH, ADDRESS_HEAD_TAIL_LENGTH } from 'utils/const'
 import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
 
 import styles from './input-select.module.scss'
@@ -88,7 +89,9 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
           aria-selected={isSelected ? 'true' : 'false'}
           aria-hidden="true"
         >
-          {typeof label === 'string' && label?.length > 68 ? `${label.slice(0, 34)}...${label.slice(-34)}` : label}
+          {typeof label === 'string' && label?.length > ADDRESS_MIN_LENGTH
+            ? `${label.slice(0, ADDRESS_HEAD_TAIL_LENGTH)}...${label.slice(-ADDRESS_HEAD_TAIL_LENGTH)}`
+            : label}
         </div>
       )
     },
