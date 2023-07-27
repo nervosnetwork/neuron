@@ -1,5 +1,5 @@
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import HexUtils from '../../utils/hex'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
 import TypeChecker from '../../utils/type-checker'
 
 export enum ScriptHashType {
@@ -34,12 +34,18 @@ export default class Script {
   }
 
   public computeHash(): string {
-    const hash: string = scriptToHash(this.toSDK())
-    return HexUtils.addPrefix(hash)
+    return scriptToHash(this.toSDK())
   }
 
+  /**
+   * @deprecated please move to `calculateOccupiedByteSize`
+   */
   public calculateBytesize(): number {
-    return 1 + HexUtils.byteLength(this.codeHash) + HexUtils.byteLength(this.args)
+    return this.calculateOccupiedByteSize()
+  }
+
+  public calculateOccupiedByteSize(): number {
+    return 1 + byteUtils.concat(this.args, this.codeHash).byteLength
   }
 
   public toSDK(): CKBComponents.Script {

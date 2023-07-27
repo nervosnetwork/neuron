@@ -16,7 +16,7 @@ import {
 } from 'states'
 import { OfflineSignJSON, signAndExportTransaction, OfflineSignType } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
-import styles from '../PasswordRequest/passwordRequest.module.scss'
+import styles from './offlineSignDialog.module.scss'
 
 interface SignDialogProps {
   isBroadcast: boolean
@@ -199,7 +199,15 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
   }
 
   return (
-    <Dialog show title={title} onCancel={onDismiss} onConfirm={onSubmit} disabled={disabled} isLoading={isSigning}>
+    <Dialog
+      show
+      title={title}
+      onCancel={onDismiss}
+      onConfirm={onSubmit}
+      disabled={disabled}
+      isLoading={isSigning}
+      contentClassName={styles.content}
+    >
       <TextField
         label={t('password-request.password')}
         value={password}

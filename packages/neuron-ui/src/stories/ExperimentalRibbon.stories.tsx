@@ -1,9 +1,16 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import ExperimentalRibbon from 'widgets/ExperimentalRibbon'
 
-const stories = storiesOf('Experimental Ribbon', module)
+const meta: Meta<typeof ExperimentalRibbon> = {
+  component: ExperimentalRibbon,
+}
 
-stories.add('Basic', () => {
-  return <ExperimentalRibbon tag="story" />
-})
+export default meta
+
+type Story = StoryObj<typeof ExperimentalRibbon>
+
+export const Default: Story = {
+  args: {
+    tag: 'story',
+  },
+}

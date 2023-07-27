@@ -72,7 +72,7 @@ const generateMultisigTxWith =
         .catch((err: Error) => {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
-            payload: '',
+            payload: null,
           })
           setErrorMessage(err.message)
         })
@@ -81,7 +81,7 @@ const generateMultisigTxWith =
     }
     dispatch({
       type: AppActions.UpdateGeneratedTx,
-      payload: '',
+      payload: null,
     })
     return Promise.resolve(undefined)
   }
@@ -120,8 +120,8 @@ export const useSendInfo = ({
       setSendInfoList(v => {
         const copy = [...v]
         if (field === 'amount') {
-          const amount = value.replace(/,/g, '') || '0'
-          if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+          const amount = value.replace(/,/g, '') || undefined
+          if (amount && (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0)) {
             return copy
           }
           copy[+idx][field] = amount
@@ -173,45 +173,40 @@ export const useSendInfo = ({
     }, 300)
   }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet, outputErrors])
   const [isSendMax, setIsSendMax] = useState(false)
-  const onSendMaxClick = useCallback(
-    (e: React.BaseSyntheticEvent) => {
-      const {
-        dataset: { isOn = 'false' },
-      } = e.currentTarget
-      setIsSendMax(isOn === 'false')
-      if (isOn === 'false') {
-        generateMultisigTxWith(generateMultisigSendAllTx)({
-          sendInfoList,
-          setErrorMessage,
-          multisigConfig,
-          dispatch,
-          t,
-          isMainnet,
-        }).then(res => {
-          if (res && res.outputs && res.outputs.length) {
-            setSendInfoList(v => [
-              ...v.slice(0, v.length - 1),
-              {
-                ...v[v.length - 1],
-                amount: shannonToCKBFormatter(res.outputs[res.outputs.length - 1].capacity, false, ''),
-                disabled: true,
-              },
-            ])
-          }
-        })
-      } else {
-        setSendInfoList(v => [
-          ...v.slice(0, v.length - 1),
-          {
-            ...v[v.length - 1],
-            amount: '0',
-            disabled: false,
-          },
-        ])
-      }
-    },
-    [setIsSendMax, sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet]
-  )
+  const onSendMaxClick = useCallback(() => {
+    if (!isSendMax) {
+      setIsSendMax(true)
+      generateMultisigTxWith(generateMultisigSendAllTx)({
+        sendInfoList,
+        setErrorMessage,
+        multisigConfig,
+        dispatch,
+        t,
+        isMainnet,
+      }).then(res => {
+        if (res && res.outputs && res.outputs.length) {
+          setSendInfoList(v => [
+            ...v.slice(0, v.length - 1),
+            {
+              ...v[v.length - 1],
+              amount: shannonToCKBFormatter(res.outputs[res.outputs.length - 1].capacity, false, ''),
+              disabled: true,
+            },
+          ])
+        }
+      })
+    } else {
+      setIsSendMax(false)
+      setSendInfoList(v => [
+        ...v.slice(0, v.length - 1),
+        {
+          ...v[v.length - 1],
+          amount: '0',
+          disabled: false,
+        },
+      ])
+    }
+  }, [setIsSendMax, sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet])
   const isMaxBtnDisabled = useMemo(() => {
     try {
       validateOutputs(sendInfoList, isMainnet, true)

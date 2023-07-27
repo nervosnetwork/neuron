@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { BI } from '@ckb-lumos/bi'
 import { app as electronApp, dialog, shell } from 'electron'
 import { t } from 'i18next'
 import { interval, BehaviorSubject, merge } from 'rxjs'
@@ -17,7 +18,6 @@ import logger from '../utils/logger'
 import redistCheck from '../utils/redist-check'
 import { rpcRequest } from '../utils/rpc-request'
 import { generateRPC } from '../utils/ckb-rpc'
-import HexUtils from '..//utils/hex'
 import startMonitor from './monitor'
 import { CKBLightRunner } from './light-runner'
 
@@ -119,7 +119,7 @@ class NodeService {
           if (!this.delayTime) {
             this.delayTime = 0
           }
-          const tip: string = HexUtils.toDecimal(tipNumber)
+          const tip: string = BI.from(tipNumber).toString()
           this._tipBlockNumber = tip
           this.tipNumberSubject.next(tip)
         },

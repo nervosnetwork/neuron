@@ -6,7 +6,7 @@ import { Copy } from 'widgets/Icons/icon'
 import CopyZone from 'widgets/CopyZone'
 import TextField from 'widgets/TextField'
 import SendFieldset from 'components/SendFieldset'
-import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount } from 'utils'
+import { calculateFee, isMainnet as isMainnetUtil, shannonToCKBFormatter, validateTotalAmount, clsx } from 'utils'
 import { useState as useGlobalState } from 'states'
 import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
 import Button from 'widgets/Button'
@@ -122,19 +122,20 @@ const SendFromMultisigDialog = ({
           <div className={styles.sendFieldContainer}>
             {sendInfoList.map((item, idx) => (
               <SendFieldset
-                key={item.address || idx}
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
                 idx={idx}
                 item={item}
                 errors={outputErrors[idx]}
                 isSendMax={isSendMax}
                 isMaxBtnDisabled={isMaxBtnDisabled}
                 isTimeLockable={false}
-                isMaxBtnShow={false}
+                isMaxBtnShow={idx === sendInfoList.length - 1}
                 isRemoveBtnShow={sendInfoList.length > 1}
                 onOutputRemove={deleteSendInfo}
                 onItemChange={onSendInfoChange}
                 onSendMaxClick={onSendMaxClick}
-                className={styles.flexWrap}
+                className={clsx(styles.flexWrap, styles.sendItem)}
                 isMainnet={isMainnet}
               />
             ))}
@@ -161,7 +162,7 @@ const SendFromMultisigDialog = ({
               value={`${shannonToCKBFormatter(fee)} CKB`}
               readOnly
               disabled
-              width="100%"
+              width="230px"
             />
           </div>
         </div>

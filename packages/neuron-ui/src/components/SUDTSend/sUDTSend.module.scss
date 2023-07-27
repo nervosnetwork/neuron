@@ -72,6 +72,7 @@ $bottomHeight: 186px;
       margin-top: 16px;
       padding: 20px 16px 16px;
       @include card;
+      @include checkbox;
       .address {
         font-family: 'JetBrains Mono';
       }

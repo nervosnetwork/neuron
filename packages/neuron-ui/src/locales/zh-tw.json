@@ -197,6 +197,7 @@
       "address": "收款地址",
       "input-address": "請輸入收款地址",
       "amount": "转账金額（CKB）",
+      "input-amount": "請輸入转账金額",
       "send": "發送",
       "reset": "重置",
       "confirm-password": "確認密碼",
@@ -659,7 +660,7 @@
       "compensation": "鎖定補貼",
       "notice-wait-time": "注意：您需要等待 {{epochs}} epochs {{blocks}} 區塊(約 {{days}} 天)完成最終取出操作。",
       "deposit-dialog-title": "存入",
-      "deposit-terms": "Nervos DAO 需要 102 CKBytes作為鎖定記錄的存儲，這部分 CKBytes 是無法產生鎖定補貼的。請查看 <0>Nervos DAO RFC</0> 以瞭解 Nervos DAO 更多資訊。",
+      "deposit-terms": "Nervos DAO 需要 102 CKBytes作為鎖定記錄的存儲，這部分 CKBytes 是無法產生鎖定補貼的。<br />請查看 <0>Nervos DAO RFC</0> 以瞭解 Nervos DAO 更多資訊。",
       "minimal-fee-required": "存入數量應不少於 {{minimal}} CKBytes",
       "compensation-accumulated": "已累計 {{blockNumber}} 個塊的鎖定補貼",
       "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
@@ -922,8 +923,11 @@
       "send": {
         "title": "轉帳",
         "address": "收款地址",
+        "address-placeholder": "請輸入收款地址",
         "amount": "转账金額",
+        "amount-placeholder": "請輸入转账金額",
         "description": "備註",
+        "description-placeholder": "請輸入转账備註，選填",
         "submit": "提交",
         "click-to-edit": "點擊編輯",
         "cheque-address-hint": {
@@ -999,6 +1003,8 @@
         "notice": "導入配置一次只能導入一個，如果是文件內容是數組默認取第一個導入"
       },
       "delete-failed": "刪除多簽配置失敗",
+      "remove-multisig-address": "刪除多簽地址",
+      "remove-multisig-address-msg": "確定要刪除所選多簽地址？",
       "send-ckb": {
         "title": "多簽地址轉賬",
         "detail": "從 {{m}}-of-{{n}} 多簽地址 <0></0> 轉賬",

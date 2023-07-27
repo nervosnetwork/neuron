@@ -215,3 +215,12 @@ export enum AccountType {
   CKB,
   SUDT,
 }
+
+export enum SendType {
+  secp256Cheque = 'cheque',
+  secp256NewCell = 'secp256NewCell',
+  acpExistCell = 'acpExistCell',
+  acpNewCell = 'acpNewCell',
+  unknowNewCell = 'unknowNewCell',
+  sendCKB = 'sendCKB',
+}
