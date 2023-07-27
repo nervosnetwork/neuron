@@ -1,9 +1,9 @@
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
+.container {
+  width: 680px;
 
-  & > button {
-    margin-left: 4px;
+  .filedWrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 24px;
   }
 }

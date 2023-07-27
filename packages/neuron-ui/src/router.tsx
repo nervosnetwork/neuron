@@ -20,7 +20,6 @@ import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
 import ImportHardware from 'components/ImportHardware'
 import OfflineSign from 'components/OfflineSign'
-import NFTSend from 'components/NFTSend'
 import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
@@ -244,31 +243,6 @@ const mainRouterConfig: RouteObject[] = [
           </>
         ),
         children: [...toolsRouters],
-      },
-      {
-        path: RoutePath.NFTSend,
-        children: [
-          {
-            path: '',
-            element: (
-              <>
-                <NFTSend />
-                <Outlet />
-              </>
-            ),
-            children: [...toolsRouters],
-          },
-          {
-            path: ':nftId',
-            element: (
-              <>
-                <NFTSend />
-                <Outlet />
-              </>
-            ),
-            children: [...toolsRouters],
-          },
-        ],
       },
       {
         path: RoutePath.Settings,

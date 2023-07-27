@@ -1,22 +1,45 @@
 @import '../../styles/mixin.scss';
 
 .container {
-  padding: 12px 48px;
+  width: 680px;
+
+  .chooseTitle {
+    margin: -4px 0 8px 0;
+    color: var(--secondary-text-color);
+  }
+  .title {
+    color: var(--main-text-color);
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
 }
 
 .actionContainer {
-  border: 1px solid #000;
-  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
   margin-bottom: 12px;
   font-size: 14px;
   cursor: pointer !important;
+
+  &:hover,
+  &.active {
+    &,
+    .title,
+    .subTitle {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+  }
 
   * {
     cursor: pointer !important;
   }
 
   .subTitle {
-    font-size: 12px;
+    font-size: 14px;
+    color: var(--third-text-color);
   }
 
   &.disabled {

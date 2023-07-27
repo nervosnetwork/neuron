@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SpecialAssetCell } from 'components/SpecialAssetList'
-import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
+import Dialog from 'widgets/Dialog'
 import { getSUDTAmount, isSuccessResponse } from 'utils'
 import { generateSudtMigrateAcpTx } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
@@ -10,8 +10,9 @@ import { useTokenInfo, TokenInfoType } from './hooks'
 import styles from './sUDTMigrateToNewAccountDialog.module.scss'
 
 const fields: { key: keyof TokenInfoType; label: string }[] = [
-  { key: 'accountName', label: 'account-name' },
   { key: 'tokenId', label: 'token-id' },
+  { key: 'balance', label: 'balance' },
+  { key: 'accountName', label: 'account-name' },
   { key: 'tokenName', label: 'token-name' },
   { key: 'symbol', label: 'symbol' },
   { key: 'decimal', label: 'decimal' },
@@ -19,16 +20,18 @@ const fields: { key: keyof TokenInfoType; label: string }[] = [
 
 const SUDTMigrateToNewAccountDialog = ({
   cell,
-  closeDialog,
   tokenInfo: findTokenInfo,
   sUDTAccounts,
   walletID,
+  isDialogOpen,
+  onCancel,
 }: {
   cell: SpecialAssetCell
-  closeDialog: () => void
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
   sUDTAccounts: State.SUDTAccount[]
   walletID: string
+  isDialogOpen: boolean
+  onCancel: () => void
 }) => {
   const [t] = useTranslation()
   const dispatch = useDispatch()
@@ -47,7 +50,7 @@ const SUDTMigrateToNewAccountDialog = ({
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
     }).then(res => {
-      closeDialog()
+      onCancel()
       if (isSuccessResponse(res)) {
         if (res.result) {
           dispatch({
@@ -84,31 +87,39 @@ const SUDTMigrateToNewAccountDialog = ({
         })
       }
     })
-  }, [cell, t, closeDialog, walletID, tokenInfo, dispatch, sudtAmount])
+  }, [cell, t, onCancel, walletID, tokenInfo, dispatch, sudtAmount])
+
+  const renderList = fields.map(field => {
+    return field.key === 'balance' ? (
+      <TextField label={t(`migrate-sudt.balance`)} field="balance" value={sudtAmount.amount} required disabled />
+    ) : (
+      <TextField
+        key={field.key}
+        label={t(`s-udt.create-dialog.${field.label}`)}
+        onChange={onChangeTokenInfo}
+        field={field.key}
+        value={tokenInfo[field.key]}
+        required
+        error={tokenInfoErrors[field.key]}
+        disabled={(!!findTokenInfo && field.key !== 'accountName') || field.key === 'tokenId'}
+        autoFocus
+      />
+    )
+  })
+
   return (
-    <div>
-      <p>{t('migrate-sudt.turn-into-new-account.title')}</p>
-      <div>
-        {fields.map(field => (
-          <TextField
-            key={field.key}
-            label={t(`s-udt.create-dialog.${field.label}`)}
-            onChange={onChangeTokenInfo}
-            field={field.key}
-            value={tokenInfo[field.key]}
-            required
-            error={tokenInfoErrors[field.key]}
-            disabled={(!!findTokenInfo && field.key !== 'accountName') || field.key === 'tokenId'}
-            autoFocus
-          />
-        ))}
-        <TextField label={t(`migrate-sudt.balance`)} field="balance" value={sudtAmount.amount} required disabled />
-      </div>
-      <div className={styles.actions}>
-        <Button label={t('migrate-sudt.cancel')} type="cancel" onClick={closeDialog} />
-        <Button label={t('migrate-sudt.confirm')} type="primary" disabled={confirmDisabled} onClick={onSubmit} />
-      </div>
-    </div>
+    <Dialog
+      className={styles.container}
+      show={isDialogOpen}
+      title={t('migrate-sudt.turn-into-new-account.title')}
+      onCancel={onCancel}
+      cancelText={t('migrate-sudt.cancel')}
+      confirmText={t('migrate-sudt.confirm')}
+      confirmProps={{ onClick: onSubmit }}
+      disabled={confirmDisabled}
+    >
+      <div className={styles.filedWrap}>{renderList}</div>
+    </Dialog>
   )
 }
 
