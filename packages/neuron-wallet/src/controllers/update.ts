@@ -2,6 +2,7 @@ import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electr
 import AppUpdaterSubject, { AppUpdater } from '../models/subjects/app-updater'
 import logger from '../utils/logger'
 
+let first = false
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking
 
@@ -72,8 +73,14 @@ export default class UpdateController {
       })
     })
 
-    autoUpdater.on('update-available', (info: UpdateInfo) => {
-      if (UpdateController.isChecking) {
+    autoUpdater.on('update-available', async (info: UpdateInfo) => {
+      if (first) {
+        first = false
+        if (UpdateController.isChecking) {
+          UpdateController.isChecking = false
+          this.notify(-1, null, true)
+        }
+      } else if (UpdateController.isChecking) {
         UpdateController.isChecking = false
         UpdateController.updatePackageSize = info.files[0].size ?? 0
         this.notify({
