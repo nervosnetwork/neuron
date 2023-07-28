@@ -2,7 +2,7 @@ import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electr
 import AppUpdaterSubject, { AppUpdater } from '../models/subjects/app-updater'
 import logger from '../utils/logger'
 
-let first = false
+let first = true
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking
 
