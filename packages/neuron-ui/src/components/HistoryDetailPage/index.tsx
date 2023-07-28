@@ -2,11 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { getTransaction, showErrorMessage } from 'services/remote'
+import { getTransaction } from 'services/remote'
 import { transactionState, useState as useGlobalState } from 'states'
 import PageContainer from 'components/PageContainer'
 import LockInfoDialog from 'components/LockInfoDialog'
 import ScriptTag from 'components/ScriptTag'
+import AlertDialog from 'widgets/AlertDialog'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
@@ -49,15 +50,13 @@ const HistoryDetailPage = () => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState({ code: '', message: '' })
+  const [faidMessage, setFaidMessage] = useState('')
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
 
   useEffect(() => {
     if (currentWallet) {
       if (!hash) {
-        showErrorMessage(
-          t(`messages.error`),
-          t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' })
-        )
+        setFaidMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' }))
         return
       }
       getTransaction({ hash, walletID: currentWallet.id })
@@ -65,11 +64,7 @@ const HistoryDetailPage = () => {
           if (isSuccessResponse(res)) {
             setTransaction(res.result)
           } else {
-            showErrorMessage(
-              t(`messages.error`),
-              t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' })
-            )
-            window.close()
+            setFaidMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' }))
           }
         })
         .catch((err: Error) => {
@@ -79,7 +74,7 @@ const HistoryDetailPage = () => {
           })
         })
     }
-  }, [t, hash, currentWallet])
+  }, [t, hash, currentWallet, navigate])
 
   const infos = [
     {
@@ -253,6 +248,14 @@ const HistoryDetailPage = () => {
       </div>
 
       {lockInfo && <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />}
+
+      <AlertDialog
+        show={!!faidMessage}
+        title={t(`messages.error`)}
+        message={faidMessage}
+        type="failed"
+        onCancel={() => navigate(-1)}
+      />
     </PageContainer>
   )
 }
