@@ -35,6 +35,7 @@ import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDia
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
 import PageContainer from 'components/PageContainer'
 import NFTSend from 'components/NFTSend'
+import TableNoData from 'widgets/Icons/TableNoData.png'
 import { useGetAssetAccounts, useGetSpecialAssetColumnInfo } from './hooks'
 
 import styles from './specialAssetList.module.scss'
@@ -470,7 +471,12 @@ const SpecialAssetList = () => {
           noDataContent={t('overview.no-recent-activities')}
         />
       ) : null}
-      {totalCount || !loaded ? null : <div className={styles.noItems}>{t('special-assets.no-special-assets')}</div>}
+      {totalCount || !loaded ? null : (
+        <div className={styles.noRecords}>
+          <img src={TableNoData} alt="No Data" />
+          {t('special-assets.no-special-assets')}
+        </div>
+      )}
 
       <div className={styles.pagination}>
         {totalCount ? (
