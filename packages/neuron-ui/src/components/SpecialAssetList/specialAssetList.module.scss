@@ -28,6 +28,17 @@
   justify-content: flex-end;
   gap: 16px;
 
+  .tip {
+    margin-top: -14px;
+  }
+
+  .tooltip {
+    width: 260px;
+    word-break: normal;
+    white-space: normal;
+    text-align: start;
+  }
+
   .actionBtn {
     width: 104px;
     height: 40px;
@@ -35,5 +46,12 @@
     border-radius: 12px;
     font-weight: 500;
     font-size: 14px;
+  }
+
+  .detailBtn {
+    &:hover {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
   }
 }

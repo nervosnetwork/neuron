@@ -35,6 +35,7 @@ import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDia
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
 import PageContainer from 'components/PageContainer'
 import NFTSend from 'components/NFTSend'
+import Tooltip from 'widgets/Tooltip'
 import { useGetAssetAccounts, useGetSpecialAssetColumnInfo } from './hooks'
 
 import styles from './specialAssetList.module.scss'
@@ -421,44 +422,77 @@ const SpecialAssetList = () => {
                 const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
                   handleGetSpecialAssetColumnInfo(item)
 
+                if (isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable)) {
+                  return (
+                    <div className={styles.actionBtnBox}>
+                      <Button
+                        type="cancel"
+                        label={t('special-assets.view-details')}
+                        className={`${styles.actionBtn} ${styles.detailBtn}`}
+                        onClick={() => onViewDetail(item)}
+                      />
+                    </div>
+                  )
+                }
+
+                let tip = ''
+
+                const showTip =
+                  ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) || isLockedCheque
+
+                if (showTip) {
+                  if (customizedAssetInfo.lock !== PresetScript.Cheque || isLockedCheque) {
+                    tip = t(`special-assets.${status}-tooltip`, {
+                      epochs: epochsInfo?.target.toFixed(2),
+                      year: targetTime ? new Date(targetTime).getFullYear() : '',
+                      month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                      day: targetTime ? new Date(targetTime).getDate() : '',
+                      hour: targetTime ? new Date(targetTime).getHours() : '',
+                      minute: targetTime ? new Date(targetTime).getMinutes() : '',
+                    })
+                  }
+                  if (status === 'user-defined-token') {
+                    tip = t('special-assets.user-defined-asset-tooltip')
+                  }
+                  if (status === 'user-defined-token') {
+                    tip = t('special-assets.user-defined-token-tooltip')
+                  }
+                }
+
+                const btnDisabled =
+                  ['user-defined-asset', 'locked-asset'].includes(status) ||
+                  connectionStatus === ConnectionStatus.Offline ||
+                  isLockedCheque
+
                 return (
                   <div className={styles.actionBtnBox}>
-                    {isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable) ? null : (
+                    {showTip ? (
+                      <Tooltip tipClassName={styles.tip} tip={<p className={styles.tooltip}>{tip}</p>} showTriangle>
+                        <Button
+                          data-tx-hash={txHash}
+                          data-idx={index}
+                          type="primary"
+                          label={t(`special-assets.${status}`)}
+                          className={styles.actionBtn}
+                          onClick={handleAction}
+                          disabled={btnDisabled}
+                        />
+                      </Tooltip>
+                    ) : (
                       <Button
                         data-tx-hash={txHash}
                         data-idx={index}
                         type="primary"
                         label={t(`special-assets.${status}`)}
+                        className={styles.actionBtn}
                         onClick={handleAction}
-                        disabled={
-                          ['user-defined-asset', 'locked-asset'].includes(status) ||
-                          connectionStatus === ConnectionStatus.Offline ||
-                          isLockedCheque
-                        }
-                        className={`${styles.actionBtn} ${
-                          ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) ||
-                          isLockedCheque
-                            ? styles.hasTooltip
-                            : ''
-                        }`}
-                        data-tooltip={
-                          customizedAssetInfo.lock === PresetScript.Cheque && !isLockedCheque
-                            ? null
-                            : t(`special-assets.${status}-tooltip`, {
-                                epochs: epochsInfo?.target.toFixed(2),
-                                year: targetTime ? new Date(targetTime).getFullYear() : '',
-                                month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
-                                day: targetTime ? new Date(targetTime).getDate() : '',
-                                hour: targetTime ? new Date(targetTime).getHours() : '',
-                                minute: targetTime ? new Date(targetTime).getMinutes() : '',
-                              })
-                        }
+                        disabled={btnDisabled}
                       />
                     )}
                     <Button
-                      type="default"
+                      type="cancel"
                       label={t('special-assets.view-details')}
-                      className={styles.actionBtn}
+                      className={`${styles.actionBtn} ${styles.detailBtn}`}
                       onClick={() => onViewDetail(item)}
                     />
                   </div>
