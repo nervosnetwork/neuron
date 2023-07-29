@@ -25,6 +25,12 @@
   }
 }
 
+.timeItem {
+  .infoItemLabel {
+    min-width: 100px !important;
+  }
+}
+
 .borderBottom {
   flex: 1;
   border-bottom: 1px solid var(--table-head-border-color);
@@ -51,8 +57,43 @@
   }
 }
 
-.address {
+.copyTableAddress {
+  word-break: break-all;
+  text-align: center;
   font-family: 'JetBrains Mono';
+  width: 300px;
+  white-space: normal;
+  line-height: 24px;
+
+  & > svg {
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+}
+
+.addressColum {
+  display: flex;
+  gap: 8px;
+  .addressContent {
+    height: 56px;
+    display: flex;
+
+    & > span {
+      line-height: 56px;
+      font-family: 'JetBrains Mono';
+    }
+
+    &:hover {
+      color: var(--activity-color);
+    }
+  }
+}
+
+.hash {
+  font-family: 'JetBrains Mono';
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .tabsClassName {

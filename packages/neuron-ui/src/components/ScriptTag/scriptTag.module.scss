@@ -6,4 +6,7 @@
   background-color: var(--script-tag-background-color);
   color: var(--script-tag-color) !important;
   cursor: pointer !important;
+  &:hover {
+    color: var(--primary-color) !important;
+  }
 }

@@ -4,6 +4,7 @@ import { bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import CopyZone from 'widgets/CopyZone'
 import Dialog from 'widgets/Dialog'
 import { useDialog } from 'utils'
+import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
 import getLockSupportShortAddress from '../../utils/getLockSupportShortAddress'
 
 import styles from './lockInfoDialog.module.scss'
@@ -36,11 +37,10 @@ const ShortAddr = ({ lockScript, isMainnet }: { lockScript: CKBComponents.Script
       <div title={t('transaction.deprecated-address-format')} className={styles.title}>
         {t('transaction.deprecated-address-format')}
       </div>
-      <div className={styles.shortAddr}>
-        <CopyZone content={shortAddr}>
-          <span>{shortAddr}</span>
-        </CopyZone>
-      </div>
+      <CopyZone content={shortAddr} className={styles.copyContent}>
+        <div>{shortAddr}</div>
+        <Copy />
+      </CopyZone>
     </>
   )
 }
@@ -74,6 +74,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
         </div>
         <div className={styles.lock}>
           <CopyZone content={rawLock}>
+            <Copy className={styles.copyBtn} />
             <pre>{rawLock}</pre>
           </CopyZone>
         </div>

@@ -11,6 +11,8 @@ import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
 import { GoBack } from 'widgets/Icons/icon'
+import Tooltip from 'widgets/Tooltip'
+import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
 
 import {
   ErrorCode,
@@ -86,8 +88,8 @@ const HistoryDetailPage = () => {
       label: t('transaction.transaction-hash'),
       value:
         (
-          <CopyZone content={transaction.hash} name={t('history.copy-tx-hash')} className={styles.address}>
-            {transaction.hash}
+          <CopyZone content={transaction.hash} name={t('history.copy-tx-hash')} className={styles.hash}>
+            {transaction.hash} <Copy />
           </CopyZone>
         ) || 'none',
     },
@@ -184,16 +186,29 @@ const HistoryDetailPage = () => {
       title: t('transaction.address'),
       dataIndex: 'type',
       align: 'left',
-      width: '550px',
+      width: '600px',
       render: (_, __, item) => {
         const { address } = handleListData(item)
         return (
-          <>
-            <CopyZone content={address} className={styles.address}>
-              {`${address.slice(0, 20)}...${address.slice(-20)}`}
-            </CopyZone>
+          <div className={styles.addressColum}>
+            <Tooltip
+              tip={
+                <CopyZone content={address} className={styles.copyTableAddress}>
+                  {address}
+                  <Copy />
+                </CopyZone>
+              }
+              showTriangle
+              isTriggerNextToChild
+            >
+              <div className={styles.addressContent}>
+                <span>
+                  {address.slice(0, 20)}...{address.slice(-20)}
+                </span>
+              </div>
+            </Tooltip>
             <ScriptTag isMainnet={isMainnet} script={item.lock} onClick={() => setLockInfo(item.lock)} />
-          </>
+          </div>
         )
       },
     },
@@ -204,7 +219,11 @@ const HistoryDetailPage = () => {
       isBalance: true,
       render(_, __, item, show: boolean) {
         const { capacity } = handleListData(item)
-        return show ? <CopyZone content={capacity.replace(/,/g, '')}>{`${capacity} CKB`}</CopyZone> : HIDE_BALANCE
+        return show ? (
+          <CopyZone content={capacity.replace(/,/g, '')}>{`${capacity} CKB`} </CopyZone>
+        ) : (
+          `${HIDE_BALANCE} CKB`
+        )
       },
     },
   ]
@@ -229,7 +248,7 @@ const HistoryDetailPage = () => {
           <InfoItem {...infos[0]} className={styles.borderBottom} />
           <div className={styles.basicInfoMiddleWrap}>
             <InfoItem {...infos[1]} className={styles.borderBottom} />
-            <InfoItem {...infos[2]} className={styles.borderBottom} />
+            <InfoItem {...infos[2]} className={`${styles.borderBottom} ${styles.timeItem}`} />
           </div>
           <InfoItem {...infos[3]} />
         </div>
