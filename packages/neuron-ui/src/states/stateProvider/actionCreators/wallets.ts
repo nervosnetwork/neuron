@@ -30,7 +30,6 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch) => {
         payload,
       })
       currentWalletCache.save(payload)
-      showPageNotice('overview.wallet-ready')(dispatch)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
@@ -43,6 +42,9 @@ export const updateWalletList = () => (dispatch: StateDispatch) => {
     if (isSuccessResponse(res)) {
       const payload = res.result || []
       dispatch({ type: NeuronWalletActions.UpdateWalletList, payload })
+      if (walletsCache.load().length < payload.length) {
+        showPageNotice('overview.wallet-ready')(dispatch)
+      }
       walletsCache.save(payload)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
