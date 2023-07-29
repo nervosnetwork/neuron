@@ -190,7 +190,7 @@ const HistoryDetailPage = () => {
       render: (_, __, item) => {
         const { address } = handleListData(item)
         return (
-          <div className={styles.addressColum}>
+          <div className={styles.addressItem}>
             <Tooltip
               tip={
                 <CopyZone content={address} className={styles.copyTableAddress}>
