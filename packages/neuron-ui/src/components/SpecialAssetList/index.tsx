@@ -36,7 +36,7 @@ import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccoun
 import PageContainer from 'components/PageContainer'
 import NFTSend from 'components/NFTSend'
 import Tooltip from 'widgets/Tooltip'
-import { useGetAssetAccounts, useGetSpecialAssetColumnInfo } from './hooks'
+import { useGetAssetAccounts, getSpecialAssetColumnInfo } from './hooks'
 
 import styles from './specialAssetList.module.scss'
 
@@ -218,16 +218,17 @@ const SpecialAssetList = () => {
     (item: SpecialAssetCell) => {
       const { timestamp, customizedAssetInfo, capacity, lock, type, data } = item
 
-      return useGetSpecialAssetColumnInfo({
+      return getSpecialAssetColumnInfo({
         cell: { capacity, lock, type, data },
         datetime: +timestamp,
         epoch,
         assetInfo: customizedAssetInfo,
         bestKnownBlockTimestamp,
         tokenInfoList,
+        t,
       })
     },
-    [epoch, bestKnownBlockTimestamp, tokenInfoList, useGetSpecialAssetColumnInfo]
+    [epoch, bestKnownBlockTimestamp, tokenInfoList, getSpecialAssetColumnInfo, t]
   )
 
   const onViewDetail = useCallback(

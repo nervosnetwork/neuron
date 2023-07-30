@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { ckbCore } from 'services/chain'
 import { getSUDTAccountList } from 'services/remote'
 import { NeuronWalletActions, useDispatch } from 'states'
@@ -15,6 +14,7 @@ import {
   useDialogWrapper,
   useDidMount,
 } from 'utils'
+import { TFunction } from 'i18next'
 import { MILLISECONDS, MILLISECONDS_PER_DAY } from 'utils/const'
 import { AssetInfo, ChequeAssetInfo, NFTType } from '.'
 
@@ -98,18 +98,18 @@ interface SpecialAssetColumnInfoProps {
   assetInfo: AssetInfo
   bestKnownBlockTimestamp: number
   tokenInfoList: Array<Controller.GetTokenInfoList.TokenInfo>
+  t: TFunction
 }
 
-export const useGetSpecialAssetColumnInfo = ({
+export const getSpecialAssetColumnInfo = ({
   cell: { capacity, lock, type, data },
   datetime,
   epoch,
   assetInfo,
   bestKnownBlockTimestamp,
   tokenInfoList,
+  t,
 }: SpecialAssetColumnInfoProps) => {
-  const [t] = useTranslation()
-
   let targetTime: undefined | number
   let status:
     | 'user-defined-asset'
