@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import { HIDE_BALANCE, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { sudtValueToAmount } from 'utils/formatters'
+import Tooltip from 'widgets/Tooltip'
 import { ReactComponent as Send } from 'widgets/Icons/SendStroke.svg'
 import { ReactComponent as Receive } from 'widgets/Icons/ReceiveStroke.svg'
 import { ReactComponent as ArrowOpenRight } from 'widgets/Icons/ArrowOpenRight.svg'
@@ -35,6 +36,16 @@ const SUDTAccountPile = ({
   const isCKB = DEFAULT_SUDT_FIELDS.CKBTokenId === tokenId
   const disabled = !isCKB && !decimal
 
+  const balanceText = sudtValueToAmount(balance, decimal)
+  let overBalanceText = ''
+
+  if (Number(decimal) > 8) {
+    const [integer, radix] = balanceText.split('.')
+    if (radix && radix.length > 8) {
+      overBalanceText = `${integer}.${radix.slice(0, 8)}`
+    }
+  }
+
   return (
     <div className={styles.container}>
       <SUDTAvatar type="logo" />
@@ -50,7 +61,13 @@ const SUDTAccountPile = ({
             </span>
           </div>
           <div className={styles.balance}>
-            {showBalance ? sudtValueToAmount(balance, decimal) || '--' : HIDE_BALANCE}
+            {overBalanceText && showBalance ? (
+              <Tooltip tipClassName={styles.tip} placement="top" tip={<span>{balanceText}</span>} showTriangle>
+                {overBalanceText}...
+              </Tooltip>
+            ) : (
+              <span>{showBalance ? balanceText || '--' : HIDE_BALANCE}</span>
+            )}
           </div>
         </div>
 

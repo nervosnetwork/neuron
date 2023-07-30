@@ -13,6 +13,7 @@ import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
 import { ReactComponent as Search } from 'widgets/Icons/SearchIcon.svg'
 import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
 import SUDTReceiveDialog, { DataProps } from 'components/SUDTReceiveDialog'
+import Toast from 'widgets/Toast'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 
 import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
@@ -52,6 +53,7 @@ const SUDTAccountList = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
   const [receiveData, setReceiveData] = useState<DataProps | null>(null)
   const [showBalance, setShowBalance] = useState(true)
+  const [notice, setNotice] = useState('')
 
   const existingAccountNames = sUDTAccounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
 
@@ -162,7 +164,7 @@ const SUDTAccountList = () => {
     setDialog(null)
   }, [setDialog])
 
-  const handleCreateAccount = useOnGenerateNewAccountTransaction({
+  const createAccount = useOnGenerateNewAccountTransaction({
     walletId,
     dispatch,
     onGenerated: onTransactionGenerated,
@@ -206,6 +208,7 @@ const SUDTAccountList = () => {
               if (isSuccessResponse(res)) {
                 fetchAndUpdateList()
                 setDialog(null)
+                setNotice(t('s-udt.edit-account-success'))
                 return true
               }
               throw new Error(typeof res.message === 'string' ? res.message : res.message.content)
@@ -221,6 +224,17 @@ const SUDTAccountList = () => {
         existingAccountNames: existingAccountNames.filter(name => name !== accountToUpdate.accountName),
       }
     : undefined
+
+  const handleCreateAccount = useCallback(
+    async (info: TokenInfo) => {
+      const isSuccess = await createAccount(info)
+      if (isSuccess) {
+        setNotice(t('s-udt.create-account-success'))
+      }
+      return isSuccess
+    },
+    [createAccount, setNotice]
+  )
 
   return (
     <PageContainer
@@ -281,6 +295,8 @@ const SUDTAccountList = () => {
             isMainnet={isMainnet}
           />
         ) : null}
+
+        <Toast content={notice} onDismiss={() => setNotice('')} />
       </div>
     </PageContainer>
   )

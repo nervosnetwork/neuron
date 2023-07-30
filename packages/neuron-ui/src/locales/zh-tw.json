@@ -597,7 +597,7 @@
         "115": "您需要有足夠的餘額來支付找零(大于 61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
-        "203": "$t(messages.fields.{{fieldName}})太長，其長度應不超過 {{length}}。",
+        "203": "$t(messages.fields.{{fieldName}})長度最大不超過{{length}}字符",
         "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短，其長度應不小於 {{length}}。",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效。",
         "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其小數位應不超過 {{length}}比特。",
@@ -889,6 +889,8 @@
       "view-in-explorer": "瀏覽器"
     },
     "s-udt": {
+      "edit-account-success": "編輯賬戶信息成功",
+      "create-account-success": "創建資產賬戶成功",
       "account-list": {
         "title": "資產賬戶",
         "no-asset-accounts": "尚未檢索到您持有的 sUDT 資產",

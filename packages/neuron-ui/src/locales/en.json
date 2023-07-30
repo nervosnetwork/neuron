@@ -604,7 +604,7 @@
         "115": "You need more capacities for change (more than 61 CKBytes), or click 'Max' button to send all your balance.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) is used.",
-        "203": "$t(messages.fields.{{fieldName}}) is too long, it should be shorter than or equal to {{length}}.",
+        "203": "$t(messages.fields.{{fieldName}}) should be shorter than or equal to {{length}}",
         "204": "$t(messages.fields.{{fieldName}}) is too short, it should be longer than or equal to {{length}}.",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid.",
         "206": "$t(messages.fields.{{fieldName}}) is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
@@ -918,6 +918,8 @@
       "view-in-explorer": "Explorer"
     },
     "s-udt": {
+      "edit-account-success": "Edit account information successfully",
+      "create-account-success": "Asset account created successfully",
       "account-list": {
         "title": "Asset Accounts",
         "no-asset-accounts": "No sUDT asset has been detected",
