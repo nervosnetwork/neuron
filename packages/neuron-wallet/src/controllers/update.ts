@@ -78,7 +78,7 @@ export default class UpdateController {
         first = false
         if (UpdateController.isChecking) {
           UpdateController.isChecking = false
-          this.notify(-1, null, true)
+          this.notify({ isUpdated: true })
         }
       } else if (UpdateController.isChecking) {
         UpdateController.isChecking = false
