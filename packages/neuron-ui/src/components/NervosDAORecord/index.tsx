@@ -173,7 +173,7 @@ export const DAORecord = ({
           )}
         </div>
         <Link className={styles.send} to={`${RoutePath.NervosDAO}/${depositOutPointKey}`}>
-          <Button className={styles.txRecordBtn} type="default" label={t('nervos-dao.deposit-record.tx-record')} />
+          <Button className={styles.txRecordBtn} type="default" label={t('nervos-dao.deposit-record.view-tx-detail')} />
         </Link>
       </div>
     </div>
@@ -209,9 +209,16 @@ export const DAORecord = ({
   return (
     <div className={styles.container}>
       <div className={styles.amountAndBadge}>
-        <CopyZone className={styles.amount} content={shannonToCKBFormatter(capacity, false, '')}>
-          {`${isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(capacity)} CKB`}
-        </CopyZone>
+        {isPrivacyMode ? (
+          <span className={styles.amount}>{`${HIDE_BALANCE} CKB`}</span>
+        ) : (
+          <CopyZone
+            className={clsx(styles.amount, styles.withCopy)}
+            content={shannonToCKBFormatter(capacity, false, '')}
+          >
+            {`${shannonToCKBFormatter(capacity)} CKB`}
+          </CopyZone>
+        )}
         {badge}
       </div>
 

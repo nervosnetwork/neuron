@@ -94,7 +94,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
             )}
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{ cursor: onRowClick ? 'pointer' : undefined }}>
           {dataSource.map((item, idx) => {
             return (
               <>

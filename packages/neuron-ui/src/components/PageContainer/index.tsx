@@ -19,7 +19,7 @@ import styles from './pageContainer.module.scss'
 const PageHeadNotice = ({ notice }: { notice: State.PageNotice }) => {
   const [t] = useTranslation()
   return (
-    <Alert status={notice.status} className={styles.notice} key={notice.i18nKey}>
+    <Alert status={notice.status} className={styles.notice} key={`${notice.i18nKey}_${notice.index}`}>
       {t(notice.i18nKey)}
     </Alert>
   )

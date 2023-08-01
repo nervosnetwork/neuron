@@ -319,7 +319,7 @@
       "cell-from-cellbase": "來自 Cellbase",
       "lock-script": "腳本鎖定",
       "lock-script-title": "地址資訊",
-      "deprecated-address-format": "廢棄格式地址"
+      "deprecated-address-format": "已棄用格式的地址"
     },
     "addresses": {
       "title": "地址簿",
@@ -586,7 +586,7 @@
         "100": "餘額不足。",
         "101": "金額 {{amount}} CKB太小，請輸入一個不小於 {{required}} CKB 的值。",
         "102": "$t(messages.fields.{{fieldName}})無效。",
-        "103": "$t(messages.fields.keystore-password)不正確。",
+        "103": "$t(messages.fields.keystore-password)錯誤",
         "104": "未連接到節點，請重啓 Neuron。",
         "105": "您需要有足夠的餘額來支付找零(大于 61 CKBytes)。",
         "106": "您需要有足夠的餘額來支付找零(大于 61 CKBytes)，或者拖動滑塊到最右端發送全部餘額。",
@@ -662,7 +662,7 @@
       "cancel": "取消",
       "proceed": "繼續",
       "compensation": "鎖定補貼",
-      "notice-wait-time": "注意：您需要等待 {{epochs}} epochs {{blocks}} 區塊(約 {{days}} 天)完成最終取出操作。",
+      "notice-wait-time": "註意: 您正在發起提取，最終取出操作需要等待 {{epochs}} epochs {{blocks}} 區塊(約 {{days}} 天)。",
       "deposit-dialog-title": "存入",
       "deposit-terms": "Nervos DAO 需要 102 CKBytes作為鎖定記錄的存儲，這部分 CKBytes 是無法產生鎖定補貼的。<br />請查看 <0>Nervos DAO RFC</0> 以瞭解 Nervos DAO 更多資訊。",
       "minimal-fee-required": "存入數量應不少於 {{minimal}} CKBytes",
@@ -679,7 +679,7 @@
         "deposited": "存入",
         "withdrawn": "提取",
         "unlocked": "解鎖",
-        "tx-record": "交易記錄",
+        "view-tx-detail": "查看交易詳情",
         "locked-period": "鎖定時間",
         "compensated-period": "補貼時間",
         "days-hours": "{{days}} 天 {{hours}} 小時",
@@ -688,7 +688,7 @@
       },
       "compensation-period": {
         "tooltip": {
-          "compensated-period": "已鎖定時間",
+          "compensated-period": "補貼時間",
           "days-hours": "{{days}} 天 {{hours}} 小時",
           "immature-for-withdraw": "Nervos DAO 要求至少約 16 小時 (4 個 Epochs) 才能進行下一步操作",
           "normal": "補償數量較低，不建議發起提現交易",

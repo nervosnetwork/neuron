@@ -144,7 +144,7 @@ declare namespace State {
     onCancel?: () => void
   } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
-  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn' }
+  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn'; index: number }
 
   type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
 

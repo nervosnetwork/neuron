@@ -83,6 +83,23 @@
   .txHash {
     display: flex;
     align-items: center;
-    gap: 8px;
+    font-family: 'JetBrains Mono';
+    & > svg {
+      cursor: pointer;
+      margin-left: 8px;
+    }
+  }
+
+  .income > svg {
+    margin-left: 8px;
+  }
+}
+
+.goBack {
+  margin-right: 8px;
+  cursor: pointer;
+
+  & path {
+    stroke: var(--main-text-color);
   }
 }

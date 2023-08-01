@@ -127,7 +127,7 @@ const SpecialAssetList = () => {
   }, [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setIsMigrateDialogOpen])
 
   const {
-    app: { epoch, pageNotice },
+    app: { epoch },
     wallet: { id },
     settings: { networks },
     chain: {
@@ -366,7 +366,7 @@ const SpecialAssetList = () => {
   )
 
   return (
-    <PageContainer head={t('special-assets.title')} notice={pageNotice} className={styles.container}>
+    <PageContainer head={t('special-assets.title')} className={styles.container}>
       {totalCount ? (
         <Table
           columns={[

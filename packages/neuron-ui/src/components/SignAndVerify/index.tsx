@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { showErrorMessage, signMessage, verifyMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import { ErrorCode, isSuccessResponse, shannonToCKBFormatter, useExitOnWalletChange, useOnLocaleChange } from 'utils'
+import {
+  ErrorCode,
+  isSuccessResponse,
+  shannonToCKBFormatter,
+  useExitOnWalletChange,
+  useGoBack,
+  useOnLocaleChange,
+} from 'utils'
 import { useState as useGlobalState } from 'states'
 import Button from 'widgets/Button'
 import Balance from 'widgets/Balance'
@@ -228,10 +234,7 @@ const SignAndVerify = () => {
     [setSignature, handlePasswordDialogDismiss, address, wallet, message]
   )
 
-  const navigate = useNavigate()
-  const onBack = useCallback(() => {
-    navigate(-1)
-  }, [navigate])
+  const onBack = useGoBack()
 
   return (
     <div>

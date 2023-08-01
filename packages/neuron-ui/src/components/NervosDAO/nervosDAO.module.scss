@@ -214,8 +214,13 @@
         margin-left: 0;
       }
 
+      &.tab {
+        color: var(--secondary-text-color);
+      }
+
       &.active {
         cursor: default;
+        color: var(--primary-color);
       }
     }
 

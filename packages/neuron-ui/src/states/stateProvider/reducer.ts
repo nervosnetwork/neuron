@@ -97,7 +97,7 @@ export type StateAction =
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: State.Experimental | null }
   | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
-  | { type: AppActions.SetPageNotice; payload?: State.PageNotice }
+  | { type: AppActions.SetPageNotice; payload?: Omit<State.PageNotice, 'index'> }
   | { type: AppActions.HideWaitForFullySynced }
   | { type: AppActions.GetFeeRateStats; payload: State.FeeRateStatsType }
   | { type: AppActions.UpdateCountDown; payload: number }
@@ -397,6 +397,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.SetPageNotice: {
       state.app.pageNotice = action.payload
+        ? {
+            ...action.payload,
+            index: (state.app.pageNotice?.index ?? 0) + 1,
+          }
+        : action.payload
       break
     }
     case AppActions.HideWaitForFullySynced: {
