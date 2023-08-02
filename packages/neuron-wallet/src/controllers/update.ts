@@ -1,5 +1,6 @@
-import { autoUpdater, UpdateInfo, CancellationToken } from 'electron-updater'
+import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electron-updater'
 import AppUpdaterSubject, { AppUpdater } from '../models/subjects/app-updater'
+import logger from '../utils/logger'
 
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking
@@ -8,8 +9,11 @@ export default class UpdateController {
 
   static lastNotifyInfo: AppUpdater
 
+  static updatePackageSize: number = 0
+
   constructor(check: boolean = true) {
     autoUpdater.autoDownload = false
+    autoUpdater.logger = logger
 
     if (check && !UpdateController.isChecking) {
       this.bindEvents()
@@ -36,7 +40,15 @@ export default class UpdateController {
   }
 
   public downloadUpdate() {
-    this.notify({ ...UpdateController.lastNotifyInfo, progressInfo: null, downloadProgress: 0 })
+    this.notify({
+      ...UpdateController.lastNotifyInfo,
+      progressInfo: {
+        total: UpdateController.updatePackageSize,
+        percent: 0,
+        transferred: 0,
+      },
+      downloadProgress: 0,
+    })
     UpdateController.downCancellationToken = new CancellationToken()
     autoUpdater.downloadUpdate(UpdateController.downCancellationToken)
   }
@@ -63,6 +75,7 @@ export default class UpdateController {
     autoUpdater.on('update-available', (info: UpdateInfo) => {
       if (UpdateController.isChecking) {
         UpdateController.isChecking = false
+        UpdateController.updatePackageSize = info.files[0].size ?? 0
         this.notify({
           version: info.version,
           releaseDate: info.releaseDate,
@@ -78,8 +91,9 @@ export default class UpdateController {
       }
     })
 
-    autoUpdater.on('download-progress', progressInfo => {
+    autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
       const progressPercent = progressInfo.percent / 100
+      UpdateController.updatePackageSize = progressInfo.total
       if (progressPercent !== 1) {
         this.notify({ ...UpdateController.lastNotifyInfo, downloadProgress: progressPercent, progressInfo })
       }
