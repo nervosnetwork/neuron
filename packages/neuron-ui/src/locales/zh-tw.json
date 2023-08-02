@@ -1085,8 +1085,8 @@
     "set-start-block-number": {
       "title": "設置同步起始區塊",
       "tip": "輕客戶端模式下的訂閱起始點是可配置的，因此您可以設置同步起始區塊以加快同步速度。",
-      "input-place-holder": "輸入同步起始區塊號，例如：10,100,101",
-      "locate-first-tx": "定位到第壹筆交易",
+      "input-place-holder": "輸入同步起始區塊高度，例如：10,100,101",
+      "locate-first-tx": "定位第一筆交易",
       "view-block": "查看區塊"
     }
   }

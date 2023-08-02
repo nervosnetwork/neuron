@@ -142,13 +142,15 @@ export const firstLoadApp = {
 
 export const importedWalletDialogShown = {
   getKey: (walletId: string) => `${walletId}_${LocalCacheKey.ImportedWallet}`,
-  init: (walletId: string) => {
-    window.localStorage.setItem(importedWalletDialogShown.getKey(walletId), 'false')
+  setStatus: (walletId: string, show: boolean) => {
+    window.localStorage.setItem(importedWalletDialogShown.getKey(walletId), show.toString())
   },
-  setShown: (walletId: string) => {
-    window.localStorage.setItem(importedWalletDialogShown.getKey(walletId), 'true')
-  },
-  needShow: (walletId: string) => {
-    return window.localStorage.getItem(importedWalletDialogShown.getKey(walletId)) === 'false'
+  getStatus: (walletId: string) => {
+    try {
+      const status = window.localStorage.getItem(importedWalletDialogShown.getKey(walletId))
+      return status ? (JSON.parse(status) as boolean) : false
+    } catch (error) {
+      return false
+    }
   },
 }

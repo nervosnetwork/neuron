@@ -43,7 +43,7 @@ const NameWallet = ({
           if (isSuccessResponse(res)) {
             dispatch({ step: ImportStep.Success })
             if (res.result) {
-              importedWalletDialogShown.init(res.result.id)
+              importedWalletDialogShown.setStatus(res.result.id, true)
             }
           } else {
             setErrorMsg(typeof res.message === 'string' ? res.message : res.message!.content!)

@@ -326,10 +326,10 @@ export default class ApiController {
       'update-wallet',
       async (
         _,
-        params: { id: string; password?: string; name?: string; newPassword?: string; startBlockNumberInLight?: string }
+        params: { id: string; password?: string; name?: string; newPassword?: string; startBlockNumber?: string }
       ) => {
         const res = this.#walletsController.update(params)
-        if (params.startBlockNumberInLight) {
+        if (params.startBlockNumber) {
           resetSyncTaskQueue.asyncPush(true)
         }
         return res

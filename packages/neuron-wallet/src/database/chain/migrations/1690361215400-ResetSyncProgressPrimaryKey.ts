@@ -1,8 +1,8 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 import SyncProgress from "../entities/sync-progress";
 
-export class AddWalletPrimary1690361215400 implements MigrationInterface {
-    name = 'AddWalletPrimary1690361215400'
+export class ResetSyncProgressPrimaryKey1690361215400 implements MigrationInterface {
+    name = 'ResetSyncProgressPrimaryKey1690361215400'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const syncProgresses = await queryRunner.manager.find(SyncProgress)

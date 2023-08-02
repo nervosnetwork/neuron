@@ -93,7 +93,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
   )
   const isMigrate = useMigrate()
   const {
-    showSetStartBlock,
+    isSetStartBlockShown,
     openDialog,
     closeDialog,
     onChangeStartBlockNumber,
@@ -156,7 +156,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
       <div className={styles.body}>{children}</div>
       <Dialog
         title={t('set-start-block-number.title')}
-        show={showSetStartBlock}
+        show={isSetStartBlockShown}
         onCancel={closeDialog}
         onConfirm={onConfirm}
       >

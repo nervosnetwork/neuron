@@ -17,7 +17,7 @@ export const useSetBlockNumber = ({
   isLightClient: boolean
   isHomePage?: boolean
 }) => {
-  const [showSetStartBlock, setShowSetStartBlock] = useState(false)
+  const [isSetStartBlockShown, setIsSetStartBlockShown] = useState(false)
   const [startBlockNumber, setStartBlockNumber] = useState('')
   const [blockNumberErr, setBlockNumberErr] = useState('')
   const onChangeStartBlockNumber = useCallback((e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -32,37 +32,38 @@ export const useSetBlockNumber = ({
   const onOpenAddressInExplorer = useCallback(() => {
     const explorerUrl = getExplorerUrl(isMainnet)
     openExternal(`${explorerUrl}/address/${firstAddress}`)
-  }, [firstAddress])
+  }, [firstAddress, isMainnet])
   const onViewBlock = useCallback(() => {
     const explorerUrl = getExplorerUrl(isMainnet)
     openExternal(`${explorerUrl}/block/${startBlockNumber}`)
   }, [startBlockNumber, isMainnet])
   const onConfirm = useCallback(() => {
-    updateWallet({ id: walletID, startBlockNumberInLight: `0x${BigInt(startBlockNumber).toString(16)}` }).then(res => {
+    updateWallet({ id: walletID, startBlockNumber: `0x${BigInt(startBlockNumber).toString(16)}` }).then(res => {
       if (isSuccessResponse(res)) {
-        setShowSetStartBlock(false)
+        setIsSetStartBlockShown(false)
       } else {
         setBlockNumberErr(typeof res.message === 'string' ? res.message : res.message.content!)
       }
     })
   }, [startBlockNumber, walletID])
   const openDialog = useCallback(() => {
-    setShowSetStartBlock(true)
+    setIsSetStartBlockShown(true)
     setStartBlockNumber('')
+    setBlockNumberErr('')
   }, [])
   useEffect(() => {
     if (isHomePage) {
-      const needShow = importedWalletDialogShown.needShow(walletID)
+      const needShow = importedWalletDialogShown.getStatus(walletID)
       if (needShow && isLightClient) {
         openDialog()
       }
-      importedWalletDialogShown.setShown(walletID)
+      importedWalletDialogShown.setStatus(walletID, false)
     }
   }, [walletID, isLightClient, isHomePage, openDialog])
   return {
     openDialog,
-    closeDialog: useCallback(() => setShowSetStartBlock(false), []),
-    showSetStartBlock,
+    closeDialog: useCallback(() => setIsSetStartBlockShown(false), []),
+    isSetStartBlockShown,
     startBlockNumber,
     onChangeStartBlockNumber,
     onOpenAddressInExplorer,

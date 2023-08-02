@@ -46,7 +46,7 @@ const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (n
 const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (navigate: NavigateFunction) => {
   return importMnemonic(params).then(res => {
     if (isSuccessResponse(res)) {
-      importedWalletDialogShown.init(res.result.id)
+      importedWalletDialogShown.setStatus(res.result.id, true)
       navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))

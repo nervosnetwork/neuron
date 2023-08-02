@@ -27,7 +27,7 @@ export interface WalletProperties {
   isHDWallet?: boolean
   device?: DeviceInfo
   keystore?: Keystore
-  startBlockNumberInLight?: string
+  startBlockNumber?: string
 }
 
 export abstract class Wallet {
@@ -36,10 +36,10 @@ export abstract class Wallet {
   public device?: DeviceInfo
   protected extendedKey: string = ''
   protected isHD: boolean
-  protected startBlockNumberInLight?: string
+  protected startBlockNumber?: string
 
   constructor(props: WalletProperties) {
-    const { id, name, extendedKey, device, isHDWallet, startBlockNumberInLight } = props
+    const { id, name, extendedKey, device, isHDWallet, startBlockNumber } = props
 
     if (id === undefined) {
       throw new IsRequired('ID')
@@ -57,7 +57,7 @@ export abstract class Wallet {
     this.extendedKey = extendedKey
     this.device = device
     this.isHD = isHDWallet ?? true
-    this.startBlockNumberInLight = startBlockNumberInLight
+    this.startBlockNumber = startBlockNumber
   }
 
   public toJSON = () => ({
@@ -66,7 +66,7 @@ export abstract class Wallet {
     extendedKey: this.extendedKey,
     device: this.device,
     isHD: this.isHD,
-    startBlockNumberInLight: this.startBlockNumberInLight,
+    startBlockNumber: this.startBlockNumber,
   })
 
   public fromJSON = () => {
@@ -96,16 +96,16 @@ export abstract class Wallet {
   public update = ({
     name,
     device,
-    startBlockNumberInLight,
-  }: Pick<Partial<WalletProperties>, 'name' | 'device' | 'startBlockNumberInLight'>) => {
+    startBlockNumber,
+  }: Pick<Partial<WalletProperties>, 'name' | 'device' | 'startBlockNumber'>) => {
     if (name) {
       this.name = name
     }
     if (device) {
       this.device = device
     }
-    if (startBlockNumberInLight) {
-      this.startBlockNumberInLight = startBlockNumberInLight
+    if (startBlockNumber) {
+      this.startBlockNumber = startBlockNumber
     }
   }
 
@@ -153,7 +153,7 @@ export class FileKeystoreWallet extends Wallet {
       extendedKey: this.extendedKey,
       device: this.device,
       isHD: this.isHD,
-      startBlockNumberInLight: this.startBlockNumberInLight,
+      startBlockNumber: this.startBlockNumber,
     }
   }
 

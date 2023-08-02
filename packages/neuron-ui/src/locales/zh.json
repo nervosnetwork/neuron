@@ -1107,8 +1107,8 @@
     "set-start-block-number": {
       "title": "设置同步起始区块",
       "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
-      "input-place-holder": "输入同步起始区块号，例如：10,100,101",
-      "locate-first-tx": "定位到第一笔交易",
+      "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
+      "locate-first-tx": "定位第一笔交易",
       "view-block": "查看区块"
     }
   }

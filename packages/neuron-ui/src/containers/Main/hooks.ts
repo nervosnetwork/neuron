@@ -160,7 +160,7 @@ export const useSubscription = ({
         case 'new-xpubkey-wallet': {
           getCurrentWallet().then(res => {
             if (isSuccessResponse(res) && res.result) {
-              importedWalletDialogShown.init(res.result.id)
+              importedWalletDialogShown.setStatus(res.result.id, true)
             }
           })
           break

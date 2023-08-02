@@ -180,7 +180,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
     const walletMinBlockNumber = await SyncProgressService.getWalletMinBlockNumber()
     const wallets = await WalletService.getInstance().getAll()
     const walletStartBlockMap = wallets.reduce<Record<string, string | undefined>>(
-      (pre, cur) => ({ ...pre, [cur.id]: cur.startBlockNumberInLight }),
+      (pre, cur) => ({ ...pre, [cur.id]: cur.startBlockNumber }),
       {}
     )
     const otherTypeSyncProgress = await SyncProgressService.getOtherTypeSyncProgress()
