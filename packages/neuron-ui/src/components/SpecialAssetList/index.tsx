@@ -38,7 +38,7 @@ import PageContainer from 'components/PageContainer'
 import NFTSend from 'components/NFTSend'
 import Tooltip from 'widgets/Tooltip'
 import TableNoData from 'widgets/Icons/TableNoData.png'
-import { useGetAssetAccounts, getSpecialAssetColumnInfo } from './hooks'
+import { useGetAssetAccounts, useSpecialAssetColumnInfo } from './hooks'
 
 import styles from './specialAssetList.module.scss'
 
@@ -209,22 +209,12 @@ const SpecialAssetList = () => {
 
   useGetAssetAccounts(id)
 
-  const handleGetSpecialAssetColumnInfo = useCallback(
-    (item: SpecialAssetCell) => {
-      const { timestamp, customizedAssetInfo, capacity, lock, type, data } = item
-
-      return getSpecialAssetColumnInfo({
-        cell: { capacity, lock, type, data },
-        datetime: +timestamp,
-        epoch,
-        assetInfo: customizedAssetInfo,
-        bestKnownBlockTimestamp,
-        tokenInfoList,
-        t,
-      })
-    },
-    [epoch, bestKnownBlockTimestamp, tokenInfoList, getSpecialAssetColumnInfo, t]
-  )
+  const handleGetSpecialAssetColumnInfo = useSpecialAssetColumnInfo({
+    epoch,
+    bestKnownBlockTimestamp,
+    tokenInfoList,
+    t,
+  })
 
   const onViewDetail = useCallback(
     (item: SpecialAssetCell) => {
