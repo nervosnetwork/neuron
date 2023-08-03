@@ -6,6 +6,7 @@ import LanguageDialog from 'components/LanguageDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
 import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
+import { ReactComponent as Update } from 'widgets/Icons/Update.svg'
 import { cancelCheckUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
 import { uniformTimeFormatter, bytesFormatter, clsx } from 'utils'
 import { LanguageSelect } from 'widgets/Icons/icon'
@@ -168,6 +169,7 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
           {t('settings.general.version')} v{newVersion || currentVersion}
         </p>
         <button type="button" onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate} data-method="check">
+          <Update />
           {t(newVersion ? 'updates.install-update' : 'updates.check-updates')} <ArrowNext />
         </button>
       </div>

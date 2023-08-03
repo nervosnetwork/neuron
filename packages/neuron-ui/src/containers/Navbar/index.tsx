@@ -199,7 +199,11 @@ const Navbar = () => {
                   placement={item.children?.length ? 'right-bottom' : 'right'}
                 >
                   <MenuButton menu={item} selectedKey={selectedKey}>
-                    {item.icon}
+                    {!isClickedSetting && version && item.key === RoutePath.Settings ? (
+                      <Badge className={styles.unexpandedBadge}>{item.icon}</Badge>
+                    ) : (
+                      item.icon
+                    )}
                   </MenuButton>
                 </Tooltip>
               </React.Fragment>
