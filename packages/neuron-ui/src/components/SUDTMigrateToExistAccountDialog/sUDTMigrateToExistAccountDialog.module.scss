@@ -7,12 +7,6 @@
 .addressContainer {
   margin-bottom: 20px;
 
-  .addressLabel::after {
-    display: inline;
-    content: '*';
-    padding-left: 10px;
-  }
-
   & > div:first-child {
     font-size: 0.875rem;
     line-height: 1.125rem;
@@ -23,8 +17,9 @@
 }
 
 .error {
+  margin-top: 10px;
   color: red;
-  font-size: 12px;
+  font-size: 14px;
   width: 100%;
   word-break: break-all;
 }

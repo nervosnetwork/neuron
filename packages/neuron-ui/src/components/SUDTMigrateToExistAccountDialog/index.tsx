@@ -19,6 +19,7 @@ const SUDTMigrateToExistAccountDialog = ({
   isLightClient,
   isDialogOpen,
   onCancel,
+  onSuccess,
 }: {
   cell: SpecialAssetCell
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
@@ -28,6 +29,7 @@ const SUDTMigrateToExistAccountDialog = ({
   isLightClient: boolean
   isDialogOpen: boolean
   onCancel: () => void
+  onSuccess: (text: string) => void
 }) => {
   const [t] = useTranslation()
   const [address, setAddress] = useState('')
@@ -69,7 +71,10 @@ const SUDTMigrateToExistAccountDialog = ({
             type: AppActions.RequestPassword,
             payload: {
               walletID,
-              actionType: 'send-sudt',
+              actionType: 'transfer-to-sudt',
+              onSuccess: () => {
+                onSuccess(t('special-assets.send-sudt-success'))
+              },
             },
           })
         }
@@ -94,7 +99,7 @@ const SUDTMigrateToExistAccountDialog = ({
       onCancel={onCancel}
       cancelText={t('migrate-sudt.back')}
       confirmText={t('migrate-sudt.next')}
-      confirmProps={{ onClick: onSubmit }}
+      onConfirm={onSubmit}
       disabled={!address || !!addressError}
     >
       <>
@@ -102,10 +107,12 @@ const SUDTMigrateToExistAccountDialog = ({
           <div className={styles.addressLabel}>{t('migrate-sudt.address')}</div>
           <InputSelect
             options={sUDTAddresses.map(v => ({ label: v, value: v }))}
+            placeholder={t('sign-and-verify.input-choose-address')}
             onChange={onAddressChange}
             value={address}
             className={styles.addressInputSelect}
             inputDisabled={isLightClient}
+            error={addressError}
           />
           {addressError && <div className={styles.error}>{addressError}</div>}
         </div>
@@ -113,7 +120,6 @@ const SUDTMigrateToExistAccountDialog = ({
           label={t('migrate-sudt.amount')}
           field="amount"
           value={getSUDTAmount({ tokenInfo, data: cell.data }).amount}
-          required
           disabled
         />
       </>

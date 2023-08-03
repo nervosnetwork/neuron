@@ -9,13 +9,13 @@ import { AppActions, useDispatch } from 'states'
 import { useTokenInfo, TokenInfoType } from './hooks'
 import styles from './sUDTMigrateToNewAccountDialog.module.scss'
 
-const fields: { key: keyof TokenInfoType; label: string }[] = [
-  { key: 'tokenId', label: 'token-id' },
-  { key: 'balance', label: 'balance' },
-  { key: 'accountName', label: 'account-name' },
-  { key: 'tokenName', label: 'token-name' },
-  { key: 'symbol', label: 'symbol' },
-  { key: 'decimal', label: 'decimal' },
+const fields: { key: keyof TokenInfoType; label: string; placeholder: string }[] = [
+  { key: 'tokenId', label: 'token-id', placeholder: '' },
+  { key: 'balance', label: 'balance', placeholder: '' },
+  { key: 'accountName', label: 'account-name', placeholder: 's-udt.create-dialog.input-account-name' },
+  { key: 'tokenName', label: 'token-name', placeholder: 'migrate-sudt.input-token' },
+  { key: 'symbol', label: 'symbol', placeholder: 'migrate-sudt.input-symbol' },
+  { key: 'decimal', label: 'decimal', placeholder: 'migrate-sudt.input-decimal' },
 ]
 
 const SUDTMigrateToNewAccountDialog = ({
@@ -25,6 +25,7 @@ const SUDTMigrateToNewAccountDialog = ({
   walletID,
   isDialogOpen,
   onCancel,
+  onSuccess,
 }: {
   cell: SpecialAssetCell
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
@@ -32,6 +33,7 @@ const SUDTMigrateToNewAccountDialog = ({
   walletID: string
   isDialogOpen: boolean
   onCancel: () => void
+  onSuccess: (text: string) => void
 }) => {
   const [t] = useTranslation()
   const dispatch = useDispatch()
@@ -41,8 +43,9 @@ const SUDTMigrateToNewAccountDialog = ({
     tokenId: cell.type?.args,
     sUDTAccounts,
   })
+
   const confirmDisabled = useMemo(
-    () => fields.some(v => tokenInfoErrors[v.key] || !tokenInfo[v.key]),
+    () => fields.some(v => (tokenInfoErrors[v.key] || !tokenInfo[v.key]) && v.key !== 'balance'),
     [tokenInfoErrors, tokenInfo]
   )
   const sudtAmount = getSUDTAmount({ tokenInfo: findTokenInfo, data: cell.data })
@@ -73,6 +76,9 @@ const SUDTMigrateToNewAccountDialog = ({
             payload: {
               walletID,
               actionType: 'create-sudt-account',
+              onSuccess: () => {
+                onSuccess(t('special-assets.migrate-sudt-success'))
+              },
             },
           })
         }
@@ -91,15 +97,23 @@ const SUDTMigrateToNewAccountDialog = ({
 
   const renderList = fields.map(field => {
     return field.key === 'balance' ? (
-      <TextField label={t(`migrate-sudt.balance`)} field="balance" value={sudtAmount.amount} required disabled />
+      <TextField
+        label={t(`migrate-sudt.balance`)}
+        field="balance"
+        className={styles.field}
+        value={sudtAmount.amount}
+        required
+        disabled
+      />
     ) : (
       <TextField
         key={field.key}
+        className={styles.field}
         label={t(`s-udt.create-dialog.${field.label}`)}
+        placeholder={t(field.placeholder)}
         onChange={onChangeTokenInfo}
         field={field.key}
         value={tokenInfo[field.key]}
-        required
         error={tokenInfoErrors[field.key]}
         disabled={(!!findTokenInfo && field.key !== 'accountName') || field.key === 'tokenId'}
         autoFocus
@@ -115,7 +129,7 @@ const SUDTMigrateToNewAccountDialog = ({
       onCancel={onCancel}
       cancelText={t('migrate-sudt.cancel')}
       confirmText={t('migrate-sudt.confirm')}
-      confirmProps={{ onClick: onSubmit }}
+      onConfirm={onSubmit}
       disabled={confirmDisabled}
     >
       <div className={styles.filedWrap}>{renderList}</div>

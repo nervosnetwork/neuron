@@ -85,7 +85,6 @@
       flex: 1;
       border: none;
       overflow: hidden;
-      text-overflow: ellipsis;
       word-break: keep-all;
       color: var(--main-text-color);
       background-color: transparent;
@@ -93,6 +92,8 @@
       &::placeholder {
         color: var(--input-second-color);
       }
+
+      caret-color: var(--primary-color);
     }
 
     textarea {

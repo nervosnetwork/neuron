@@ -16,17 +16,15 @@
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
 
+    &[data-has-error='true'] {
+      border-color: var(--error-color) !important;
+    }
+
     .placeholder {
       font-family: 'JetBrains Mono';
       font-style: normal;
       font-weight: 500;
       font-size: 14px;
-    }
-
-    &:focus,
-    &:hover,
-    &[data-open='true'] {
-      border: 1px solid var(--active-color);
     }
 
     & > input {
@@ -36,6 +34,9 @@
       background: unset;
       caret-color: var(--active-color);
       color: var(--main-text-color);
+      &::placeholder {
+        color: var(--input-second-color);
+      }
     }
   }
 

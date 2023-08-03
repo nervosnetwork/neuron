@@ -462,6 +462,9 @@
       "send-sudt": {
         "title": "Send sUDT"
       },
+      "transfer-to-sudt": {
+        "title": "Send to sUDT account"
+      },
       "send-ckb-asset": {
         "title": "Send CKB"
       },
@@ -886,13 +889,22 @@
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
       "transfer-nft": "Send",
-      "user-defined-token": "Migrate"
+      "user-defined-token": "Migrate",
+      "transfer-nft-success": "Transfer of assets successful",
+      "migrate-sudt-success": "Conversion to new sUDT asset account successful",
+      "send-sudt-success": "Transfer to sUDT account successful",
+      "unlock-success": "Asset claimed, go to transaction history for details",
+      "withdraw-cheque-success": "Asset withdrawn, go to transaction history for details",
+      "claim-cheque-success": "Asset claimed, go to transaction history for details"
     },
     "migrate-sudt": {
       "title": "Migrate to a sUDT Asset Account",
       "choose-title": "Migration mode",
       "next": "Next",
       "back": "Back",
+      "input-token": "Please input token name",
+      "input-symbol": "Please input symbol",
+      "input-decimal": "Please input decimal",
       "turn-into-new-account": {
         "title": "Turn into a new sUDT Asset Account",
         "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",

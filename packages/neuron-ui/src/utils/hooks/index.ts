@@ -295,7 +295,7 @@ export const useSUDTAccountInfoErrors = ({
       tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
-      balance: { params: { balance }, validator: validateDecimal },
+      balance: { params: { balance }, validator: typeof balance === 'undefined' ? () => {} : validateDecimal },
     }
 
     Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {

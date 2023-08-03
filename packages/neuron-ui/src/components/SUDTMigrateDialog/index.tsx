@@ -49,7 +49,7 @@ const SUDTMigrateDialog = ({
       onCancel={handleCancel}
       cancelText={t('migrate-sudt.cancel')}
       confirmText={t('migrate-sudt.next')}
-      confirmProps={{ onClick: () => openDialog?.(type) }}
+      onConfirm={() => openDialog?.(type)}
       disabled={!type}
     >
       <>

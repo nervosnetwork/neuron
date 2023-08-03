@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Pagination from 'widgets/Pagination'
 import Table from 'widgets/Table'
 import Button from 'widgets/Button'
+import Toast from 'widgets/Toast'
 import {
   unlockSpecialAsset,
   getSpecialAssets,
@@ -123,6 +124,7 @@ const SpecialAssetList = () => {
     | undefined
   >()
   const [migrateTokenInfo, setMigrateTokenInfo] = useState<Controller.GetTokenInfoList.TokenInfo | undefined>()
+  const [notice, setNotice] = useState('')
 
   const onClickMigrate = useCallback(
     (type: string) => {
@@ -141,19 +143,11 @@ const SpecialAssetList = () => {
     [setIsMigrateDialogOpen, setIsNewAccountDialogOpen, setIsExistAccountDialogOpen]
   )
 
-  const onCloseDialog = useCallback(
-    (type?: string) => {
-      if (type === 'existAccount') {
-        setIsExistAccountDialogOpen(false)
-        setIsMigrateDialogOpen(true)
-      } else {
-        setIsNewAccountDialogOpen(false)
-        setIsExistAccountDialogOpen(false)
-        setMigrateCell(undefined)
-      }
-    },
-    [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setMigrateCell]
-  )
+  const onCloseDialog = useCallback(() => {
+    setIsExistAccountDialogOpen(false)
+    setIsNewAccountDialogOpen(false)
+    setIsMigrateDialogOpen(true)
+  }, [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setIsMigrateDialogOpen])
 
   const {
     app: { epoch, globalDialog, pageNotice },
@@ -290,6 +284,14 @@ const SpecialAssetList = () => {
     }
   }, [globalDialog, fetchList, id, pageNo])
 
+  const handleActionSuccess = useCallback(
+    text => {
+      setNotice(text)
+      fetchList(id, pageNo)
+    },
+    [setNotice, fetchList, id, pageNo]
+  )
+
   const handleAction = useCallback(
     (e: React.BaseSyntheticEvent) => {
       const {
@@ -318,7 +320,16 @@ const SpecialAssetList = () => {
             } else {
               dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
             }
-            dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: id,
+                actionType,
+                onSuccess: () => {
+                  handleActionSuccess(t(`special-assets.${actionType}-success`))
+                },
+              },
+            })
           } else {
             dispatch({
               type: AppActions.AddNotification,
@@ -371,11 +382,11 @@ const SpecialAssetList = () => {
           break
         }
         case PresetScript.SUDT: {
-          setIsMigrateDialogOpen(true)
           setMigrateCell(cell)
           const findTokenInfo = tokenInfoList.find(info => info.tokenID === cell.type?.args)
 
           setMigrateTokenInfo(findTokenInfo)
+          setIsMigrateDialogOpen(true)
           break
         }
         default: {
@@ -383,7 +394,7 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList]
+    [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList, handleActionSuccess]
   )
 
   return (
@@ -473,6 +484,7 @@ const SpecialAssetList = () => {
                         <Button
                           data-tx-hash={txHash}
                           data-idx={index}
+                          data-status={status}
                           type="primary"
                           label={t(`special-assets.${status}`)}
                           className={styles.actionBtn}
@@ -484,6 +496,7 @@ const SpecialAssetList = () => {
                       <Button
                         data-tx-hash={txHash}
                         data-idx={index}
+                        data-status={status}
                         type="primary"
                         label={t(`special-assets.${status}`)}
                         className={styles.actionBtn}
@@ -512,7 +525,6 @@ const SpecialAssetList = () => {
           {t('special-assets.no-special-assets')}
         </div>
       )}
-
       <div className={styles.pagination}>
         {totalCount ? (
           <Pagination
@@ -545,9 +557,9 @@ const SpecialAssetList = () => {
           tokenInfo={migrateTokenInfo}
           isDialogOpen={isNewAccountDialogOpen}
           onCancel={onCloseDialog}
+          onSuccess={handleActionSuccess}
         />
       )}
-
       {migrateCell && (
         <SUDTMigrateToExistAccountDialog
           cell={migrateCell}
@@ -556,12 +568,15 @@ const SpecialAssetList = () => {
           isMainnet={isMainnet}
           walletID={id}
           isDialogOpen={isExistAccountDialogOpen}
-          onCancel={() => onCloseDialog('existAccount')}
+          onCancel={onCloseDialog}
           isLightClient={isLightClient}
+          onSuccess={handleActionSuccess}
         />
       )}
-
-      {nFTSendCell ? <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} /> : null}
+      {nFTSendCell ? (
+        <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} onSuccess={handleActionSuccess} />
+      ) : null}
+      <Toast content={notice} onDismiss={() => setNotice('')} />
     </PageContainer>
   )
 }
