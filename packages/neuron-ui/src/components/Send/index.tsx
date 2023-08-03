@@ -123,7 +123,7 @@ const Send = () => {
     validateTotalAmount(totalAmount, fee, balance)
   } catch (err) {
     if (isErrorWithI18n(err)) {
-      errorMessageUnderTotal = t(err.message === 'messages.codes.100' ? 'messages.codes.115' : err.message)
+      errorMessageUnderTotal = t(err.message)
     }
   }
 
