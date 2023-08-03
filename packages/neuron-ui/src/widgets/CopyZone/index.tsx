@@ -15,14 +15,18 @@ const CopyZone = ({ children, content, name, style, className = '' }: CopyZonePr
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const prompt = copied ? t('common.copied') : name || t(`common.copy`)
 
-  const onCopy = useCallback(() => {
-    setCopied(true)
-    window.navigator.clipboard.writeText(content)
-    clearTimeout(timer.current!)
-    timer.current = setTimeout(() => {
-      setCopied(false)
-    }, 1000)
-  }, [setCopied, content])
+  const onCopy = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.stopPropagation()
+      setCopied(true)
+      window.navigator.clipboard.writeText(content)
+      clearTimeout(timer.current!)
+      timer.current = setTimeout(() => {
+        setCopied(false)
+      }, 1000)
+    },
+    [setCopied, content]
+  )
 
   return (
     <div

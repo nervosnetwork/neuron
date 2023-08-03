@@ -8,7 +8,7 @@ import { HIDE_BALANCE } from 'utils/const'
 
 import styles from './formattedTokenAmount.module.scss'
 
-type FormattedTokenAmountProps = { item: State.Transaction; show: boolean; isNeedCopy?: boolean }
+type FormattedTokenAmountProps = { item: State.Transaction; show: boolean }
 type AmountProps = Omit<FormattedTokenAmountProps, 'isNeedCopy'> & {
   sudtAmount: string
   isReceive: boolean
@@ -26,7 +26,7 @@ const Amount = ({ sudtAmount, show, item, isReceive, amount }: AmountProps) => {
   )
 }
 
-export const FormattedTokenAmount = ({ item, show, isNeedCopy }: FormattedTokenAmountProps) => {
+export const FormattedTokenAmount = ({ item, show }: FormattedTokenAmountProps) => {
   let amount = '--'
   let sudtAmount = ''
   let copyText = amount
@@ -53,7 +53,7 @@ export const FormattedTokenAmount = ({ item, show, isNeedCopy }: FormattedTokenA
 
   const props = { sudtAmount, show, item, isReceive, amount }
 
-  return isNeedCopy ? (
+  return show ? (
     <CopyZone content={copyText}>
       <Amount {...props} />
     </CopyZone>
