@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import { HIDE_BALANCE, DEFAULT_SUDT_FIELDS } from 'utils/const'
@@ -36,15 +36,17 @@ const SUDTAccountPile = ({
   const isCKB = DEFAULT_SUDT_FIELDS.CKBTokenId === tokenId
   const disabled = !isCKB && !decimal
 
-  const balanceText = sudtValueToAmount(balance, decimal)
-  let overBalanceText = ''
+  const balanceText = useMemo(() => sudtValueToAmount(balance, decimal), [balance, decimal])
 
-  if (Number(decimal) > 8) {
-    const [integer, radix] = balanceText.split('.')
-    if (radix && radix.length > 8) {
-      overBalanceText = `${integer}.${radix.slice(0, 8)}`
+  const overBalanceText = useMemo(() => {
+    if (Number(decimal) > 8) {
+      const [integer, radix] = balanceText.split('.')
+      if (radix && radix.length > 8) {
+        return `${integer}.${radix.slice(0, 8)}`
+      }
     }
-  }
+    return ''
+  }, [balanceText, decimal])
 
   return (
     <div className={styles.container}>
