@@ -32,6 +32,7 @@ export enum AppActions {
   UpdateSendOutput = 'updateSendOutput',
   UpdateSendPrice = 'updateSendPrice',
   UpdateSendDescription = 'updateSendDescription',
+  UpdateSendIsSendMax = 'updateSendIsSendMax',
   UpdateGeneratedTx = 'updateGeneratedTx',
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
@@ -72,6 +73,7 @@ export type StateAction =
   | { type: AppActions.UpdateSendOutput; payload: { idx: number; item: Partial<State.Output> } }
   | { type: AppActions.UpdateSendPrice; payload: string }
   | { type: AppActions.UpdateSendDescription; payload: string }
+  | { type: AppActions.UpdateSendIsSendMax; payload: boolean }
   | { type: AppActions.UpdateGeneratedTx; payload: State.GeneratedTx | null }
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
@@ -273,6 +275,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
        * payload: new description
        */
       state.app.send.description = action.payload
+      break
+    }
+    case AppActions.UpdateSendIsSendMax: {
+      state.app.send.isSendMax = action.payload
       break
     }
     case AppActions.UpdateGeneratedTx: {

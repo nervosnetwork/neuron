@@ -121,11 +121,19 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({
         setFeeRateValueArray(res)
       })
     } else {
-      useGetBatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
+      useGetBatchGeneratedTx({ walletID, items: send.outputs, priceArray, isSendMax: send.isSendMax }).then(res => {
         setFeeRateValueArray(res)
       })
     }
-  }, [send.outputs, priceArray, isExperimental, experimental, batchGenerateExperimental, setFeeRateValueArray])
+  }, [
+    send.outputs,
+    send.isSendMax,
+    priceArray,
+    isExperimental,
+    experimental,
+    batchGenerateExperimental,
+    setFeeRateValueArray,
+  ])
 
   useEffect(() => {
     if (suggestFeeRate === 0) {
