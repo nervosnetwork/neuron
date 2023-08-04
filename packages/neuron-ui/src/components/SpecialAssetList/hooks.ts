@@ -18,7 +18,7 @@ import { TFunction } from 'i18next'
 import { MILLISECONDS, MILLISECONDS_PER_DAY } from 'utils/const'
 import { AssetInfo, ChequeAssetInfo, NFTType } from '.'
 
-interface SpecialAssetCell {
+export interface SpecialAssetCell {
   blockHash: string
   blockNumber: string
   capacity: string

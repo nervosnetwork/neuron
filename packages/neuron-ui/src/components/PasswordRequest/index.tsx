@@ -207,6 +207,7 @@ const PasswordRequest = () => {
                   type: AppActions.SetGlobalDialog,
                   payload: 'unlock-success',
                 })
+                onSuccess?.()
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }

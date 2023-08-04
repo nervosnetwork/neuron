@@ -38,7 +38,7 @@ import PageContainer from 'components/PageContainer'
 import NFTSend from 'components/NFTSend'
 import Tooltip from 'widgets/Tooltip'
 import TableNoData from 'widgets/Icons/TableNoData.png'
-import { useGetAssetAccounts, useSpecialAssetColumnInfo } from './hooks'
+import { useGetAssetAccounts, useSpecialAssetColumnInfo, SpecialAssetCell } from './hooks'
 
 import styles from './specialAssetList.module.scss'
 
@@ -71,29 +71,6 @@ type UnknownAssetInfo = Record<'data' | 'lock' | 'type', string>
 export type AssetInfo = LocktimeAssetInfo | ChequeAssetInfo | UnknownAssetInfo | NFTAssetInfo
 
 const { PAGE_SIZE } = CONSTANTS
-
-export interface SpecialAssetCell {
-  blockHash: string
-  blockNumber: string
-  capacity: string
-  customizedAssetInfo: AssetInfo
-  daoData: string | null
-  data: string
-  lock: {
-    args: string
-    codeHash: string
-    hashType: 'type' | 'data'
-  }
-  lockHash: string
-  multiSignBlake160: string
-  outPoint: {
-    index: string
-    txHash: string
-  }
-  status: 'live' | 'dead'
-  timestamp: string
-  type: CKBComponents.Script | null
-}
 
 const SpecialAssetList = () => {
   const [t] = useTranslation()

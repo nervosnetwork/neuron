@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SpecialAssetCell } from 'components/SpecialAssetList'
+import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
 import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'

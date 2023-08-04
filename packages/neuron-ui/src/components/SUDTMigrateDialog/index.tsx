@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SpecialAssetCell } from 'components/SpecialAssetList'
+import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import { MIN_CKB_REQUIRED_BY_NORMAL_SUDT, SHANNON_CKB_RATIO } from 'utils/const'
 import Dialog from 'widgets/Dialog'
 import styles from './sUDTMigrateDialog.module.scss'
