@@ -960,6 +960,13 @@
         "back": "Back",
         "occupy-142-ckb": "Occupies at least 142 CKBytes",
         "occupy-61-ckb": "Occupies at least 61 CKBytes",
+        "input": {
+          "account-name": "Please input account name",
+          "token-id": "Please input token ID",
+          "token-name": "Please input token name",
+          "symbol": "Please input symbol",
+          "decimal": "Please input decimal"
+        },
         "placeholder": {
           "token-id": "Token ID is the Args of the sUDT Type Script, which is the same as the lock hash of the token issuer."
         }

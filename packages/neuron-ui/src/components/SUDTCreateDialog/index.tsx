@@ -283,6 +283,7 @@ const SUDTCreateDialog = ({
                     disabled={accountType === AccountType.CKB}
                     error={tokenErrors[field.key]}
                     className={styles.settingField}
+                    placeholder={t(`s-udt.create-dialog.input.${field.label}`)}
                     hint={
                       !tokenErrors[field.key] && field.key === 'tokenId' && accountType === AccountType.SUDT
                         ? t(`s-udt.create-dialog.placeholder.${field.label}`)

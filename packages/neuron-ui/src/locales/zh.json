@@ -952,6 +952,13 @@
         "back": "上一步",
         "occupy-142-ckb": "至少占用 142 CKBytes",
         "occupy-61-ckb": "至少占用 61 CKBytes",
+        "input": {
+          "account-name": "请输入账户名称",
+          "token-id": "请输入代币ID",
+          "token-name": "请输入代币名称",
+          "symbol": "请输入简称",
+          "decimal": "请输入小数位"
+        },
         "placeholder": {
           "token-id": "代币 ID 即 sUDT Type Script 的 Args，等同于该 token 发行者的 lock hash。"
         }

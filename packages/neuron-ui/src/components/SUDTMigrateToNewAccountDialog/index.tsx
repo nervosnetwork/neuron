@@ -102,7 +102,6 @@ const SUDTMigrateToNewAccountDialog = ({
         field="balance"
         className={styles.field}
         value={sudtAmount.amount}
-        required
         disabled
       />
     ) : (
