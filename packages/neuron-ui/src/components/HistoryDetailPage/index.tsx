@@ -50,13 +50,13 @@ const HistoryDetailPage = () => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState({ code: '', message: '' })
-  const [faidMessage, setFaidMessage] = useState('')
+  const [failedMessage, setFailedMessage] = useState('')
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
 
   useEffect(() => {
     if (currentWallet) {
       if (!hash) {
-        setFaidMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' }))
+        setFailedMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' }))
         return
       }
       getTransaction({ hash, walletID: currentWallet.id })
@@ -64,7 +64,7 @@ const HistoryDetailPage = () => {
           if (isSuccessResponse(res)) {
             setTransaction(res.result)
           } else {
-            setFaidMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' }))
+            setFailedMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' }))
           }
         })
         .catch((err: Error) => {
@@ -74,7 +74,7 @@ const HistoryDetailPage = () => {
           })
         })
     }
-  }, [t, hash, currentWallet, navigate])
+  }, [t, hash, currentWallet])
 
   const infos = [
     {
@@ -250,9 +250,9 @@ const HistoryDetailPage = () => {
       {lockInfo && <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />}
 
       <AlertDialog
-        show={!!faidMessage}
+        show={!!failedMessage}
         title={t(`messages.error`)}
-        message={faidMessage}
+        message={failedMessage}
         type="failed"
         onCancel={() => navigate(-1)}
       />
