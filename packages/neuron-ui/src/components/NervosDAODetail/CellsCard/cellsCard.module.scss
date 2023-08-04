@@ -1,3 +1,5 @@
+@import '../../../styles/mixin.scss';
+
 .cells {
   margin-top: 16px;
   border-radius: 16px;
@@ -105,16 +107,6 @@
   }
 
   .copyTableAddress {
-    word-break: break-all;
-    text-align: center;
-    font-family: 'JetBrains Mono';
-    width: 300px;
-    white-space: normal;
-    line-height: 24px;
-
-    & > svg {
-      margin-left: 4px;
-      vertical-align: middle;
-    }
+    @include copyAddress;
   }
 }

@@ -239,7 +239,7 @@ const HistoryDetailPage = () => {
       render(_, __, item, show: boolean) {
         const { capacity } = handleListData(item)
         return show ? (
-          <CopyZone maskRadius={8} content={capacity.replace(/,/g, '')}>{`${capacity} CKB`}</CopyZone>
+          <CopyZone maskRadius={8} content={capacity.replaceAll(',', '')}>{`${capacity} CKB`}</CopyZone>
         ) : (
           `${HIDE_BALANCE} CKB`
         )
