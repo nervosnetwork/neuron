@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs'
 
-const AppUpdaterSubject = new Subject<{
+export interface AppUpdater {
   checking: boolean
   isUpdated: boolean
   downloadProgress: number // -1: not started, 1: finished, 0~1: downloading
@@ -13,6 +13,8 @@ const AppUpdaterSubject = new Subject<{
   releaseDate: string
   releaseNotes: string
   errorMsg: string
-}>()
+}
+
+const AppUpdaterSubject = new Subject<AppUpdater>()
 
 export default AppUpdaterSubject

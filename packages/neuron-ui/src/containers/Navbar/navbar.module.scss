@@ -187,3 +187,8 @@ $hover-bg-color: #3cc68a4d;
     margin: unset;
   }
 }
+
+.unexpandedBadge::after {
+  top: 0;
+  right: 0;
+}
