@@ -33,7 +33,7 @@ export interface TokenInfo extends BasicInfo {
 
 export interface SUDTCreateDialogProps extends TokenInfo {
   isMainnet: boolean
-  onSubmit: (info: TokenInfo) => Promise<boolean>
+  onSubmit: (info: TokenInfo) => void
   onCancel: () => void
   existingAccountNames?: string[]
   insufficient?: { [AccountType.CKB]: boolean; [AccountType.SUDT]: boolean }

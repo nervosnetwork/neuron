@@ -17,7 +17,6 @@ const SUDTMigrateToExistAccountDialog = ({
   isMainnet,
   walletID,
   isLightClient,
-  isDialogOpen,
   onCancel,
   onSuccess,
 }: {
@@ -27,7 +26,6 @@ const SUDTMigrateToExistAccountDialog = ({
   isMainnet: boolean
   walletID: string
   isLightClient: boolean
-  isDialogOpen: boolean
   onCancel: () => void
   onSuccess: (text: string) => void
 }) => {
@@ -94,7 +92,7 @@ const SUDTMigrateToExistAccountDialog = ({
   return (
     <Dialog
       className={styles.container}
-      show={isDialogOpen}
+      show
       title={t('migrate-sudt.transfer-to-exist-account.title')}
       onCancel={onCancel}
       cancelText={t('migrate-sudt.back')}

@@ -22,12 +22,10 @@ const leastSUDTAccountCapacity = BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigIn
 
 const SUDTMigrateDialog = ({
   cell,
-  isDialogOpen,
   onCancel,
   openDialog,
 }: {
   cell: SpecialAssetCell
-  isDialogOpen: boolean
   onCancel: () => void
   openDialog?: (type: string) => void
 }) => {
@@ -44,7 +42,7 @@ const SUDTMigrateDialog = ({
   return (
     <Dialog
       className={styles.container}
-      show={isDialogOpen}
+      show
       title={t('migrate-sudt.title')}
       onCancel={handleCancel}
       cancelText={t('migrate-sudt.cancel')}

@@ -23,7 +23,6 @@ const SUDTMigrateToNewAccountDialog = ({
   tokenInfo: findTokenInfo,
   sUDTAccounts,
   walletID,
-  isDialogOpen,
   onCancel,
   onSuccess,
 }: {
@@ -31,7 +30,6 @@ const SUDTMigrateToNewAccountDialog = ({
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
   sUDTAccounts: State.SUDTAccount[]
   walletID: string
-  isDialogOpen: boolean
   onCancel: () => void
   onSuccess: (text: string) => void
 }) => {
@@ -123,7 +121,7 @@ const SUDTMigrateToNewAccountDialog = ({
   return (
     <Dialog
       className={styles.container}
-      show={isDialogOpen}
+      show
       title={t('migrate-sudt.turn-into-new-account.title')}
       onCancel={onCancel}
       cancelText={t('migrate-sudt.cancel')}

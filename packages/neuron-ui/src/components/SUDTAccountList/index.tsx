@@ -226,12 +226,10 @@ const SUDTAccountList = () => {
     : undefined
 
   const handleCreateAccount = useCallback(
-    async (info: TokenInfo) => {
-      const isSuccess = await createAccount(info)
-      if (isSuccess) {
+    (info: TokenInfo) => {
+      createAccount(info, () => {
         setNotice(t('s-udt.create-account-success'))
-      }
-      return isSuccess
+      })
     },
     [createAccount, setNotice]
   )

@@ -508,42 +508,42 @@ const SpecialAssetList = () => {
 
       {updateAccountDialogProps ? <SUDTUpdateDialog {...updateAccountDialogProps} /> : null}
 
-      {migrateCell && (
+      {migrateCell && isMigrateDialogOpen ? (
         <SUDTMigrateDialog
           cell={migrateCell}
           openDialog={onClickMigrate}
-          isDialogOpen={isMigrateDialogOpen}
           onCancel={() => setIsMigrateDialogOpen(false)}
         />
-      )}
+      ) : null}
 
-      {migrateCell && (
+      {migrateCell && isNewAccountDialogOpen ? (
         <SUDTMigrateToNewAccountDialog
           cell={migrateCell}
           sUDTAccounts={sUDTAccounts}
           walletID={id}
           tokenInfo={migrateTokenInfo}
-          isDialogOpen={isNewAccountDialogOpen}
           onCancel={onCloseDialog}
           onSuccess={handleActionSuccess}
         />
-      )}
-      {migrateCell && (
+      ) : null}
+
+      {migrateCell && isExistAccountDialogOpen ? (
         <SUDTMigrateToExistAccountDialog
           cell={migrateCell}
           tokenInfo={migrateTokenInfo}
           sUDTAccounts={sUDTAccounts}
           isMainnet={isMainnet}
           walletID={id}
-          isDialogOpen={isExistAccountDialogOpen}
           onCancel={onCloseDialog}
           isLightClient={isLightClient}
           onSuccess={handleActionSuccess}
         />
-      )}
+      ) : null}
+
       {nFTSendCell ? (
         <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} onSuccess={handleActionSuccess} />
       ) : null}
+
       <Toast content={notice} onDismiss={() => setNotice('')} />
     </PageContainer>
   )
