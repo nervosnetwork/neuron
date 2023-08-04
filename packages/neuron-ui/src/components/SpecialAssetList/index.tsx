@@ -127,7 +127,7 @@ const SpecialAssetList = () => {
   }, [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setIsMigrateDialogOpen])
 
   const {
-    app: { epoch, globalDialog, pageNotice },
+    app: { epoch, pageNotice },
     wallet: { id },
     settings: { networks },
     chain: {
@@ -145,44 +145,6 @@ const SpecialAssetList = () => {
   )
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
   const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
-  const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
-    ? {
-        ...accountToClaim.account,
-        isMainnet,
-        accountId: '',
-        tokenId: accountToClaim.account.tokenID,
-        accountName: '',
-        tokenName: (accountToClaim.account.tokenName || foundTokenInfo?.tokenName) ?? '',
-        symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
-        decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
-        isCKB: false,
-        onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
-          const params: any = accountToClaim?.account || {}
-          Object.keys(info).forEach(key => {
-            if (
-              info[key as keyof typeof info] !==
-              accountToClaim?.account[key as keyof Controller.GenerateClaimChequeTransaction.AssetAccount]
-            ) {
-              params[key] = info[key as keyof typeof info]
-            }
-          })
-          dispatch({
-            type: AppActions.UpdateExperimentalParams,
-            payload: { tx: accountToClaim.tx, assetAccount: params },
-          })
-          dispatch({
-            type: AppActions.RequestPassword,
-            payload: { walletID: id, actionType: 'create-account-to-claim-cheque' },
-          })
-          setAccountToClaim(null)
-          return Promise.resolve(true)
-        },
-        onCancel: () => {
-          setAccountToClaim(null)
-        },
-        existingAccountNames: accountNames.filter(name => name !== accountToClaim.account.accountName),
-      }
-    : undefined
 
   useGetAssetAccounts(id)
 
@@ -245,12 +207,6 @@ const SpecialAssetList = () => {
     fetchList(id, no)
   }, [search, id, dispatch, fetchList])
 
-  useEffect(() => {
-    if (globalDialog === 'unlock-success') {
-      fetchList(id, pageNo)
-    }
-  }, [globalDialog, fetchList, id, pageNo])
-
   const handleActionSuccess = useCallback(
     text => {
       setNotice(text)
@@ -258,6 +214,51 @@ const SpecialAssetList = () => {
     },
     [setNotice, fetchList, id, pageNo]
   )
+
+  const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
+    ? {
+        ...accountToClaim.account,
+        isMainnet,
+        accountId: '',
+        tokenId: accountToClaim.account.tokenID,
+        accountName: '',
+        tokenName: (accountToClaim.account.tokenName || foundTokenInfo?.tokenName) ?? '',
+        symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
+        decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
+        isCKB: false,
+        onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
+          const params: any = accountToClaim?.account || {}
+          Object.keys(info).forEach(key => {
+            if (
+              info[key as keyof typeof info] !==
+              accountToClaim?.account[key as keyof Controller.GenerateClaimChequeTransaction.AssetAccount]
+            ) {
+              params[key] = info[key as keyof typeof info]
+            }
+          })
+          dispatch({
+            type: AppActions.UpdateExperimentalParams,
+            payload: { tx: accountToClaim.tx, assetAccount: params },
+          })
+          dispatch({
+            type: AppActions.RequestPassword,
+            payload: {
+              walletID: id,
+              actionType: 'create-account-to-claim-cheque',
+              onSuccess: () => {
+                handleActionSuccess(t('special-assets.claim-cheque-success'))
+              },
+            },
+          })
+          setAccountToClaim(null)
+          return Promise.resolve(true)
+        },
+        onCancel: () => {
+          setAccountToClaim(null)
+        },
+        existingAccountNames: accountNames.filter(name => name !== accountToClaim.account.accountName),
+      }
+    : undefined
 
   const handleAction = useCallback(
     (e: React.BaseSyntheticEvent) => {
