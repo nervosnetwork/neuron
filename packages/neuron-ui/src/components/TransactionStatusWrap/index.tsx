@@ -12,16 +12,16 @@ export type TransactionStatusWrapProps = {
 const TransactionStatusWrap = ({ status, confirmationCount }: TransactionStatusWrapProps) => {
   const [t] = useTranslation()
 
-  const confirmationLabel = t('confirmationsCount', {
-    count: confirmationCount,
-  })
-
   return (
     <div className={styles.offsetConfirming}>
       {status === 'confirming' ? <Confirming className={styles.confirm} /> : null}
       <span className={styles.statusText}>{t(`transaction-status.${status}`)}</span>
-      {confirmationCount && status === 'confirming' ? (
-        <span className={styles.confirmationLabel}>{confirmationLabel}</span>
+      {confirmationCount && confirmationCount > 0 && status === 'confirming' ? (
+        <span className={styles.confirmationLabel}>
+          {t('confirmationsCount', {
+            count: confirmationCount,
+          })}
+        </span>
       ) : null}
     </div>
   )
