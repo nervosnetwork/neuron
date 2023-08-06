@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import Dialog from 'widgets/Dialog'
-import { useDialog } from 'utils'
+import { useCopy, useDialog } from 'utils'
 import { Copy } from 'widgets/Icons/icon'
 import Alert from 'widgets/Alert'
 import getLockSupportShortAddress from '../../utils/getLockSupportShortAddress'
@@ -13,29 +13,6 @@ interface LockInfoDialogProps {
   lockInfo: CKBComponents.Script | null
   isMainnet: boolean
   onDismiss: () => void
-}
-
-const useCopy = () => {
-  const timer = useRef<ReturnType<typeof setTimeout>>()
-  const [copied, setCopied] = useState(false)
-  const [refreshKey, setRefreshKey] = useState(1)
-  const onCopy = useCallback(
-    (content: string) => {
-      setRefreshKey(key => key + 1)
-      setCopied(true)
-      window.navigator.clipboard.writeText(content)
-      clearTimeout(timer.current!)
-      timer.current = setTimeout(() => {
-        setCopied(false)
-      }, 2000)
-    },
-    [timer]
-  )
-  return {
-    copied,
-    onCopy,
-    refreshKey,
-  }
 }
 
 const ShortAddr = ({
@@ -80,7 +57,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show: !!lockInfo, dialogRef, onClose: onDismiss })
-  const { copied, onCopy, refreshKey } = useCopy()
+  const { copied, onCopy, copyTimes } = useCopy()
 
   if (!lockInfo) {
     return null
@@ -110,7 +87,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
         </div>
         <ShortAddr isMainnet={isMainnet} lockScript={lockInfo} onCopy={onCopy} />
         {copied ? (
-          <Alert status="success" className={styles.notice} key={refreshKey.toString()}>
+          <Alert status="success" className={styles.notice} key={copyTimes.toString()}>
             {t('common.copied')}
           </Alert>
         ) : null}
