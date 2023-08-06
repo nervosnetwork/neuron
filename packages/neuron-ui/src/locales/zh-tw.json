@@ -65,7 +65,7 @@
         "label": "狀態：",
         "connect": "已連接",
         "user-input": "已連接，等待確認...",
-        "disconnect": "未連接，請檢查設備連接。"
+        "disconnect": "未連接設備，請確認設備已連接並打開 Nervos 應用"
       },
       "actions": {
         "close": "關閉",
@@ -83,14 +83,14 @@
         "label": "狀態：",
         "connect": "設備已連接，點擊驗證按鈕進行地址驗證",
         "user-input": "已連接，等待確認...",
-        "disconnect": "未連接，請檢查設備連接。"
+        "disconnect": "未連接設備，請確認設備已連接並打開 Nervos 應用"
       },
       "actions": {
         "close": "取消",
         "rescan": "連接設備",
         "copy-address": "复制地址",
         "verify": "地址驗證",
-        "verify-again": "再次驗證"
+        "finish": "完成"
       }
     },
     "offline-sign": {

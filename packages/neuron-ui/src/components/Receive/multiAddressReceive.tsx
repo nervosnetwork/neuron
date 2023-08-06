@@ -166,6 +166,7 @@ const MultiAddressReceive = ({
               showTriangle
               isTriggerNextToChild
               className={styles.description}
+              tipClassName={styles.descTips}
             >
               <div className={styles.descText}>{description || t('addresses.default-description')}</div>
             </Tooltip>

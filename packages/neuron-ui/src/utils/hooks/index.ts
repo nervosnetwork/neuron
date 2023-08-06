@@ -507,3 +507,26 @@ export const useClearGeneratedTx = () => {
     })
   }, [dispatch])
 }
+
+export const useCopy = () => {
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const [copied, setCopied] = useState(false)
+  const [copyTimes, setCopyTimes] = useState(1)
+  const onCopy = useCallback(
+    (content: string) => {
+      setCopyTimes(key => key + 1)
+      setCopied(true)
+      window.navigator.clipboard.writeText(content)
+      clearTimeout(timer.current!)
+      timer.current = setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    },
+    [timer]
+  )
+  return {
+    copied,
+    onCopy,
+    copyTimes,
+  }
+}

@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .page {
   background: var(--main-background-color);
   color: var(--main-text-color);
@@ -78,34 +80,8 @@
   }
 }
 
-@keyframes hidden {
-  from {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  to {
-    visibility: visible;
-    opacity: 0;
-  }
-}
-
 .notice {
-  position: absolute;
-  background-color: var(--notice-background-color);
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 12px;
-  font-weight: 500;
-  font-size: 14px;
-  text-align: center;
-  padding: 14px 36px;
-  animation: 2s hidden 1 ease-in-out;
-  visibility: hidden;
-  justify-content: center;
-  & > svg {
-    margin-right: 4px;
-  }
+  @include notice-animation;
 }
 
 .syncNotification {

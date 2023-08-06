@@ -70,7 +70,7 @@
         "label": "Status:",
         "connect": "Connected, ready for signing.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
@@ -90,14 +90,14 @@
         "label": "Status:",
         "connect": "Connected, ready for verifying.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "actions": {
         "close": "Close",
         "rescan": "Reconnect",
         "copy-address": "Copy Address",
         "verify": "Verify Address",
-        "verify-again": "Verify Again"
+        "finish": "Ok"
       }
     },
     "offline-sign": {

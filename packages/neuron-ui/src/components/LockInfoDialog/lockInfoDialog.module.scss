@@ -111,33 +111,5 @@
 }
 
 .notice {
-  position: fixed;
-  background-color: var(--notice-background-color);
-  left: 50%;
-  top: 11px;
-  transform: translateX(-50%);
-  border-radius: 12px;
-  font-weight: 500;
-  font-size: 14px;
-  text-align: center;
-  padding: 14px 36px;
-  animation: 2s hidden 1 ease-in-out;
-  visibility: hidden;
-  justify-content: center;
-  z-index: 100;
-  & > svg {
-    margin-right: 4px;
-  }
-}
-
-@keyframes hidden {
-  from {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  to {
-    visibility: visible;
-    opacity: 0;
-  }
+  @include dialog-copy-animation;
 }
