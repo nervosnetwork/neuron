@@ -98,6 +98,7 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-ckb-asset'
       | 'send-sudt'
+      | 'transfer-to-sudt'
       | 'send-acp-sudt-to-new-cell'
       | 'send-acp-ckb-to-new-cell'
       | 'send-cheque'
@@ -119,6 +120,7 @@ declare namespace State {
       n: number
       blake160s: string[]
     }
+    onSuccess?: () => void
   }
 
   interface SUDTAccount {

@@ -30,9 +30,12 @@
         @include text-overflow-ellipsis;
       }
     }
+    .tip {
+      margin-top: -8px;
+      margin-left: -20px;
+    }
     .balance {
       margin-top: 8px;
-      text-overflow: ellipsis;
       font-weight: 500;
       font-size: 16px;
       line-height: 22px;

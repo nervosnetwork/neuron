@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SpecialAssetCell } from 'components/SpecialAssetList'
+import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import { MIN_CKB_REQUIRED_BY_NORMAL_SUDT, SHANNON_CKB_RATIO } from 'utils/const'
 import Dialog from 'widgets/Dialog'
 import styles from './sUDTMigrateDialog.module.scss'
@@ -22,12 +22,10 @@ const leastSUDTAccountCapacity = BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigIn
 
 const SUDTMigrateDialog = ({
   cell,
-  isDialogOpen,
   onCancel,
   openDialog,
 }: {
   cell: SpecialAssetCell
-  isDialogOpen: boolean
   onCancel: () => void
   openDialog?: (type: string) => void
 }) => {
@@ -44,12 +42,12 @@ const SUDTMigrateDialog = ({
   return (
     <Dialog
       className={styles.container}
-      show={isDialogOpen}
+      show
       title={t('migrate-sudt.title')}
       onCancel={handleCancel}
       cancelText={t('migrate-sudt.cancel')}
       confirmText={t('migrate-sudt.next')}
-      confirmProps={{ onClick: () => openDialog?.(type) }}
+      onConfirm={() => openDialog?.(type)}
       disabled={!type}
     >
       <>

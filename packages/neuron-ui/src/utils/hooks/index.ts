@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, migrateData } from 'services/remote'
-import { firstLoadApp, syncRebuildNotification } from 'services/localCache'
+import { loadedWalletIDs, syncRebuildNotification, wallets } from 'services/localCache'
 import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -295,7 +295,7 @@ export const useSUDTAccountInfoErrors = ({
       tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
-      balance: { params: { balance }, validator: validateDecimal },
+      balance: { params: { balance }, validator: typeof balance === 'undefined' ? () => {} : validateDecimal },
     }
 
     Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
@@ -486,14 +486,17 @@ export const useOutputErrors = (
   )
 }
 
-export const useFirstLoadApp = (dispatch: StateDispatch) => {
+export const useFirstLoadWallet = (dispatch: StateDispatch, id: string) => {
   useEffect(() => {
-    const isFirstLoad = firstLoadApp.load()
-    if (isFirstLoad) {
+    const loadedIds = loadedWalletIDs.load()
+
+    if (!loadedIds.includes(id)) {
       showPageNotice('overview.wallet-ready')(dispatch)
-      firstLoadApp.save()
     }
-  }, [dispatch])
+
+    const ids = wallets.load().map(item => item.id)
+    loadedWalletIDs.save(ids.join(','))
+  }, [dispatch, id])
 }
 
 export const useClearGeneratedTx = () => {

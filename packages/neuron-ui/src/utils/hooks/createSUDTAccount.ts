@@ -94,7 +94,7 @@ export const useOnGenerateNewAccountTransaction = ({
   t: TFunction
 }) =>
   useCallback(
-    ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo) => {
+    ({ tokenId, tokenName, accountName, symbol, decimal }: TokenInfo, onSuccess?: () => void) => {
       return generateCreateSUDTAccountTransaction({
         walletID: walletId,
         tokenID: tokenId,
@@ -114,7 +114,11 @@ export const useOnGenerateNewAccountTransaction = ({
           dispatch({ type: AppActions.UpdateExperimentalParams, payload: res })
           dispatch({
             type: AppActions.RequestPassword,
-            payload: { walletID: walletId as string, actionType: 'create-sudt-account' },
+            payload: {
+              walletID: walletId as string,
+              actionType: 'create-sudt-account',
+              onSuccess,
+            },
           })
           onGenerated()
           return true

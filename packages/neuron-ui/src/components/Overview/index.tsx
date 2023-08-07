@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 
-import { shannonToCKBFormatter, uniformTimeFormatter, backToTop, CONSTANTS, RoutePath, useFirstLoadApp } from 'utils'
+import { shannonToCKBFormatter, uniformTimeFormatter, backToTop, CONSTANTS, RoutePath, useFirstLoadWallet } from 'utils'
 
 import { UANTokenName } from 'components/UANDisplay'
 import PageContainer from 'components/PageContainer'
@@ -189,7 +189,7 @@ const Overview = () => {
     return items.slice(0, 10)
   }, [items])
 
-  useFirstLoadApp(dispatch)
+  useFirstLoadWallet(dispatch, id)
 
   const [showBalance, setShowBalance] = useState(true)
   const onChangeShowBalance = useCallback(() => {

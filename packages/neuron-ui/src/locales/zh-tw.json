@@ -456,6 +456,9 @@
       "send-sudt": {
         "title": "發起 sUDT 交易"
       },
+      "transfer-to-sudt": {
+        "title": "發起 sUDT 交易"
+      },
       "send-ckb-asset": {
         "title": "發起 CKB 交易"
       },
@@ -598,7 +601,7 @@
         "115": "您需要有足夠的餘額來支付找零(大于 61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
-        "203": "$t(messages.fields.{{fieldName}})太長，其長度應不超過 {{length}}。",
+        "203": "$t(messages.fields.{{fieldName}})長度最大不超過{{length}}字符",
         "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短，其長度應不小於 {{length}}。",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效。",
         "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其小數位應不超過 {{length}}比特。",
@@ -858,13 +861,22 @@
       "experimental": "實驗室",
       "unknown-asset": "未知資產",
       "transfer-nft": "轉讓",
-      "user-defined-token": "遷移"
+      "user-defined-token": "遷移",
+      "transfer-nft-success": "轉讓資產成功",
+      "migrate-sudt-success": "轉換成新的 sUDT 資產帳戶成功",
+      "send-sudt-success": "轉入 sUDT 帳戶成功",
+      "unlock-success": "資產已領取，可前往交易歷史查看詳情",
+      "withdraw-cheque-success": "資產已撤回，可前往交易歷史查看詳情",
+      "claim-cheque-success": "資產已領取，可前往交易歷史查看詳情"
     },
     "migrate-sudt": {
       "title": "遷移至 sUDT 資產賬戶",
       "choose-title": "選擇遷移方式",
       "next": "下一步",
       "back": "上一步",
+      "input-token": "請輸入代幣名稱",
+      "input-symbol": "請輸入簡稱",
+      "input-decimal": "請輸入小數位",
       "turn-into-new-account": {
         "title": "轉換成新的 sUDT 資產賬戶",
         "sub-title": "將 sUDT 資產轉換成 sUDT 資產賬戶, 至少占用 142 CKBytes",
@@ -890,6 +902,8 @@
       "view-in-explorer": "瀏覽器"
     },
     "s-udt": {
+      "edit-account-success": "編輯賬戶信息成功",
+      "create-account-success": "創建資產賬戶成功",
       "account-list": {
         "title": "資產賬戶",
         "no-asset-accounts": "尚未檢索到您持有的 sUDT 資產",
@@ -917,6 +931,13 @@
         "back": "上一步",
         "occupy-142-ckb": "至少佔用 142 CKBytes",
         "occupy-61-ckb": "至少佔用 61 CKBytes",
+        "input": {
+          "account-name": "請輸入賬戶名稱",
+          "token-id": "請輸入代幣ID",
+          "token-name": "請輸入代幣名稱",
+          "symbol": "請輸入簡稱",
+          "decimal": "請輸入小數位"
+        },
         "placeholder": {
           "token-id": "代幣 ID 即 sUDT Type Script 的 Args，等同於該 token 發行者的 lock hash。"
         }
