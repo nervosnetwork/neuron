@@ -555,7 +555,7 @@ export default class ApiController {
     })
 
     handle('download-update', async () => {
-      new UpdateController(false).downloadUpdate()
+      new UpdateController(true).downloadUpdate()
     })
 
     handle('cancel-download-update', async () => {

@@ -12,6 +12,7 @@ $action-button-width: 11.25rem;
     background: var(--input-disabled-color);
     border-radius: 8px;
     margin-right: 16px;
+
     p {
       font-size: 14px;
       line-height: 20px;
@@ -31,6 +32,25 @@ $action-button-width: 11.25rem;
       svg {
         margin-right: 4px;
       }
+    }
+  }
+  .showVersion {
+    position: relative;
+
+    &::after {
+      content: attr(data-new-version-tip);
+      background-color: #ff1e1e;
+      border-top-right-radius: 8px;
+      border-bottom-left-radius: 8px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+      padding: 2px 4px;
+      color: #fff;
     }
   }
 }

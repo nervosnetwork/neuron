@@ -1,10 +1,10 @@
 @import '../../styles/mixin.scss';
-$bottomHeight: 124px;
+$bottomHeight: 84px;
 $headerHeight: 104px;
 
 .content {
   overflow-y: scroll;
-  margin-bottom: 100px;
+  margin-bottom: 60px;
   height: calc(100vh - $headerHeight - $bottomHeight);
 }
 

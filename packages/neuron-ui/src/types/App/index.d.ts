@@ -81,6 +81,7 @@ declare namespace State {
     price: string
     description: string
     generatedTx: GeneratedTx | null
+    isSendMax: boolean
   }
 
   interface Popup {

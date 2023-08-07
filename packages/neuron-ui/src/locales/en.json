@@ -743,7 +743,7 @@
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
-      "install-update": "Install Update",
+      "install-update": "Immediate Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
     },
