@@ -8,7 +8,7 @@ export enum LocalCacheKey {
   CurrentNetworkID = 'currentNetworkID',
   CacheClearDate = 'cacheClearDate',
   SyncRebuildNotification = 'syncRebuildNotification',
-  FirstLoadApp = 'FirstLoadApp',
+  WalletNumber = 'WalletNumber',
 }
 
 export const addresses = {
@@ -130,11 +130,11 @@ export const syncRebuildNotification = {
   },
 }
 
-export const firstLoadApp = {
-  save: () => {
-    window.localStorage.setItem(LocalCacheKey.FirstLoadApp, 'false')
+export const walletNumber = {
+  save: (num: string) => {
+    window.localStorage.setItem(LocalCacheKey.WalletNumber, num)
   },
   load: () => {
-    return window.localStorage.getItem(LocalCacheKey.FirstLoadApp) !== 'false'
+    return window.localStorage.getItem(LocalCacheKey.WalletNumber) || '0'
   },
 }
