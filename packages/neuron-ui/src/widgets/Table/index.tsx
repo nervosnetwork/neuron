@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 
 import styles from './table.module.scss'
@@ -80,9 +80,9 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                       <div className={styles.headWithBalance} style={{ justifyContent: align }}>
                         {title}
                         {showBalance ? (
-                          <PasswordShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                          <BalanceShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
                         ) : (
-                          <PasswordHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                          <BalanceHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
                         )}
                       </div>
                     ) : (

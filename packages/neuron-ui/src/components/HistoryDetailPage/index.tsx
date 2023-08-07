@@ -11,7 +11,7 @@ import AlertDialog from 'widgets/AlertDialog'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
-import { Copy, GoBack, PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow, Copy, GoBack } from 'widgets/Icons/icon'
 import Tooltip from 'widgets/Tooltip'
 
 import {
@@ -118,12 +118,12 @@ const HistoryDetailPage = () => {
           >
             {`${shannonToCKBFormatter(transaction.value)} CKB`}
           </CopyZone>
-          <PasswordShow onClick={onChangeIncomeShow} />
+          <BalanceShow onClick={onChangeIncomeShow} />
         </div>
       ) : (
         <div className={styles.income}>
           {`${HIDE_BALANCE} CKB`}
-          <PasswordHide onClick={onChangeIncomeShow} />
+          <BalanceHide onClick={onChangeIncomeShow} />
         </div>
       ),
     },
@@ -203,7 +203,7 @@ const HistoryDetailPage = () => {
       title: t('transaction.address'),
       dataIndex: 'type',
       align: 'left',
-      width: '550px',
+      width: '580px',
       render: (_, __, item) => {
         const { address } = handleListData(item)
         return (

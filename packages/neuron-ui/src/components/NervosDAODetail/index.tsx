@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom'
 
 import Tabs, { VariantProps } from 'widgets/Tabs'
 import { onEnter } from 'utils/inputDevice'
-import { Copy, GoBack, PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { Copy, GoBack, BalanceHide, BalanceShow } from 'widgets/Icons/icon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
 import styles from './nervosDAODetail.module.scss'
@@ -106,12 +106,12 @@ const TabsVariantWithTxTypes: FC<
               >
                 {`${shannonToCKBFormatter(transaction.value)} CKB`}
               </CopyZone>
-              <PasswordShow onClick={onChangeIncomeShow} />
+              <BalanceShow onClick={onChangeIncomeShow} />
             </div>
           ) : (
             <div className={clsx(styles.fieldValue, styles.fullRow, styles.income)}>
               {`${HIDE_BALANCE} CKB`}
-              <PasswordHide onClick={onChangeIncomeShow} />
+              <BalanceHide onClick={onChangeIncomeShow} />
             </div>
           )}
         </div>

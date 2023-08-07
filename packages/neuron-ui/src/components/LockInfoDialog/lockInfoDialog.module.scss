@@ -36,9 +36,12 @@
   display: flex;
   align-items: center;
 
+  & > span {
+    font-family: 'JetBrains Mono';
+  }
   .copyIcon {
     position: absolute;
-    right: 20px;
+    right: 12px;
     cursor: pointer;
   }
 }
@@ -84,6 +87,7 @@
     padding: 16px;
     border-radius: 6px;
     font-size: 12px;
+    font-family: 'JetBrains Mono';
   }
 
   .copyBtn {
