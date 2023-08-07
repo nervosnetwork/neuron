@@ -9,6 +9,7 @@ export enum LocalCacheKey {
   CacheClearDate = 'cacheClearDate',
   SyncRebuildNotification = 'syncRebuildNotification',
   FirstLoadApp = 'FirstLoadApp',
+  ImportedWallet = 'ImportedWallet',
 }
 
 export const addresses = {
@@ -136,5 +137,20 @@ export const firstLoadApp = {
   },
   load: () => {
     return window.localStorage.getItem(LocalCacheKey.FirstLoadApp) !== 'false'
+  },
+}
+
+export const importedWalletDialogShown = {
+  getKey: (walletId: string) => `${walletId}_${LocalCacheKey.ImportedWallet}`,
+  setStatus: (walletId: string, show: boolean) => {
+    window.localStorage.setItem(importedWalletDialogShown.getKey(walletId), show.toString())
+  },
+  getStatus: (walletId: string) => {
+    try {
+      const status = window.localStorage.getItem(importedWalletDialogShown.getKey(walletId))
+      return status ? (JSON.parse(status) as boolean) : false
+    } catch (error) {
+      return false
+    }
   },
 }

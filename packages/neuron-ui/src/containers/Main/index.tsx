@@ -1,15 +1,16 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useState as useGlobalState, useDispatch } from 'states'
+import { useState as useGlobalState, useDispatch, dismissAlertDialog } from 'states'
 import { useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
+import AlertDialog from 'widgets/AlertDialog'
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 const MainContent = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const {
-    app: { isAllowedToFetchList = true },
+    app: { isAllowedToFetchList = true, alertDialog },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
@@ -45,10 +46,20 @@ const MainContent = () => {
   })
   useOnLocaleChange(i18n)
   const onContextMenu = useOnDefaultContextMenu(t)
+  const onCancelGlobalDialog = useCallback(() => {
+    dismissAlertDialog()(dispatch)
+  }, [dispatch])
 
   return (
     <div onContextMenu={onContextMenu}>
       <Outlet />
+      <AlertDialog
+        show={!!alertDialog}
+        title={alertDialog?.title}
+        message={alertDialog?.message}
+        type={alertDialog?.type ?? 'success'}
+        onCancel={onCancelGlobalDialog}
+      />
     </div>
   )
 }

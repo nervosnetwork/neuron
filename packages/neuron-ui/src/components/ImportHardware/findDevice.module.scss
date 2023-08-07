@@ -12,6 +12,10 @@
     flex-direction: column;
     align-items: center;
 
+    .name {
+      width: 480px;
+    }
+
     .selectDevice {
       display: flex;
       flex-direction: column;

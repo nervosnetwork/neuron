@@ -14,6 +14,7 @@ export const BUFFER_BLOCK_NUMBER = 10
 
 export const MAX_DECIMAL_DIGITS = 8
 export const MAINNET_TAG = 'ckb'
+export const LIGHT_MAINNET_TAG = 'light_client_mainnet'
 
 export const MIN_DEPOSIT_AMOUNT = 102
 export const TOKEN_ID_LENGTH = 66

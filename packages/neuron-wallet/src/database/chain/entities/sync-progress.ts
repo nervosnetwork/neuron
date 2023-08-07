@@ -24,7 +24,7 @@ export default class SyncProgress {
   @Column()
   scriptType!: CKBRPC.ScriptType
 
-  @Column({ type: 'varchar' })
+  @PrimaryColumn({ type: 'varchar' })
   walletId!: string
 
   @Column()

@@ -371,7 +371,7 @@ describe('test light connector', () => {
         blake160: script.args,
       })
       getWalletMinBlockNumberMock.mockResolvedValue({})
-      walletGetAllMock.mockReturnValue([{ id: 'walletId', startBlockNumberInLight: '0xaa' }])
+      walletGetAllMock.mockReturnValue([{ id: 'walletId', startBlockNumber: '0xaa' }])
       const connect = new LightConnector([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()

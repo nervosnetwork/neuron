@@ -17,6 +17,7 @@ import {
 
 import { FinishCreateLoading, CreateFirstWalletNav } from 'components/WalletWizard'
 import TextField from 'widgets/TextField'
+import { importedWalletDialogShown } from 'services/localCache'
 import styles from './importKeystore.module.scss'
 
 const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
@@ -105,6 +106,7 @@ const ImportKeystore = () => {
       importKeystore({ name: fields.name!, keystorePath: fields.path, password: fields.password })
         .then(res => {
           if (isSuccessResponse(res)) {
+            importedWalletDialogShown.setStatus(res.result.id, true)
             navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
             return
           }
