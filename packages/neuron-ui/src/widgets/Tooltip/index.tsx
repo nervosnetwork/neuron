@@ -14,6 +14,7 @@ interface TooltipProps {
   type?: 'normal' | 'always-dark'
   showTriangle?: boolean
   isTriggerNextToChild?: boolean
+  onVisibleChange?: (visible: boolean) => void
 }
 const Tooltip: React.FC<TooltipProps> = ({
   children,
@@ -26,17 +27,22 @@ const Tooltip: React.FC<TooltipProps> = ({
   type = 'normal',
   showTriangle,
   isTriggerNextToChild,
+  onVisibleChange,
 }) => {
   const [isTipShow, setIsTipShow] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const onChangeIsTipShow = useCallback(() => {
-    setIsTipShow(v => !v)
-  }, [setIsTipShow])
+    setIsTipShow(v => {
+      onVisibleChange?.(!v)
+      return !v
+    })
+  }, [setIsTipShow, onVisibleChange])
 
   const onDocumentClick = useCallback(
     (e: MouseEvent) => {
       if (e.target instanceof Node && !ref.current?.contains(e.target)) {
         setIsTipShow(false)
+        onVisibleChange?.(false)
       }
     },
     [isTipShow]

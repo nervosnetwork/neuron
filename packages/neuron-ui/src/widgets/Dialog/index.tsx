@@ -14,7 +14,7 @@ interface DialogProps {
   confirmText?: string
   cancelText?: string
   disabled?: boolean | undefined
-  children?: React.ReactChild
+  children?: React.ReactNode
   isLoading?: boolean
   confirmProps?: object
   showHeader?: boolean
@@ -58,15 +58,6 @@ const Dialog = ({
     }
   }, [show])
 
-  const onDialogClicked = useCallback(
-    (e: React.MouseEvent<HTMLDialogElement>) => {
-      if (e.target instanceof HTMLDialogElement && e.target.tagName === 'DIALOG') {
-        onCancel?.()
-      }
-    },
-    [onCancel]
-  )
-
   const handleConfirm = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault()
@@ -86,7 +77,6 @@ const Dialog = ({
     <dialog
       ref={dialogRef}
       className={`${styles.dialogWrap} ${className}`}
-      onClick={onDialogClicked}
       onKeyDown={e => (e.key === 'Escape' && enableCloseWithEsc ? onCancel : undefined)}
       role="none"
     >

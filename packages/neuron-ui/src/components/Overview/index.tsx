@@ -197,7 +197,7 @@ const Overview = () => {
   }, [setShowBalance])
 
   return (
-    <PageContainer head={t('navbar.overview')} notice={pageNotice}>
+    <PageContainer head={t('navbar.overview')} notice={pageNotice} isHomePage>
       <div className={styles.mid}>
         <div className={styles.balance}>
           <span className={styles.balanceTitle}>

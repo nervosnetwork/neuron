@@ -27,7 +27,8 @@
     "network-status": {
       "tooltip": {
         "block-synced": "Block Synced",
-        "looking-valid-target": "Looking for assumed valid target"
+        "looking-valid-target": "Looking for assumed valid target",
+        "set-start-block-number": "Set start block number"
       },
       "migrating": "migrating..."
     },
@@ -1131,6 +1132,13 @@
       "countDownTip": "The price will refresh after {{countDown}} seconds",
       "switchToCustomPrice": "Switch to custom price",
       "switchToPrice": "Switch to price"
+    },
+    "set-start-block-number": {
+      "title": "Set the start block number",
+      "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
+      "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
+      "locate-first-tx": "Locate the first transaction",
+      "view-block": "View the block"
     }
   }
 }

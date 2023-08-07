@@ -168,3 +168,22 @@
     color: var(--main-text-color);
   }
 }
+
+.startBlockTip {
+  font-weight: 400;
+  color: var(--secondary-text-color);
+}
+
+.viewAction {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+
+  & > svg {
+    width: 12px;
+    height: 12px;
+  }
+}

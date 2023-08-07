@@ -50,6 +50,7 @@ const TextField = React.forwardRef(
       width?: string
       rows?: number
       errorWithIcon?: boolean
+      tabIndex?: number
     },
     ref: React.LegacyRef<HTMLDivElement>
   ) => {

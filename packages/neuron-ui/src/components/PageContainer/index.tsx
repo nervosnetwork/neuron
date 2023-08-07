@@ -1,15 +1,19 @@
-import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { FC, PropsWithChildren, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ErrorCode, getExplorerUrl, isMainnet, isSuccessResponse, localNumberFormatter } from 'utils'
+import { ErrorCode, getExplorerUrl, isMainnet as isMainnetUtil, localNumberFormatter } from 'utils'
 import Alert from 'widgets/Alert'
-import { Close } from 'widgets/Icons/icon'
+import { Close, NewTab } from 'widgets/Icons/icon'
 import { ReactComponent as Sun } from 'widgets/Icons/Sun.svg'
 import { ReactComponent as Moon } from 'widgets/Icons/Moon.svg'
 import SyncStatusComponent from 'components/SyncStatus'
 import { AppActions, useDispatch, useState as useGlobalState } from 'states'
-import { isDark, openExternal, setTheme as setThemeAPI } from 'services/remote'
+import { openExternal } from 'services/remote'
 import Tooltip from 'widgets/Tooltip'
-import { Migrate } from 'services/subjects'
+import { LIGHT_NETWORK_TYPE } from 'utils/const'
+import Dialog from 'widgets/Dialog'
+import TextField from 'widgets/TextField'
+
+import { useMigrate, useSetBlockNumber, useTheme } from './hooks'
 import styles from './pageContainer.module.scss'
 
 const PageHeadNotice = ({ notice }: { notice: State.PageNotice }) => {
@@ -39,6 +43,7 @@ type ComponentProps = {
   head: React.ReactNode
   notice?: State.PageNotice
   className?: string
+  isHomePage?: boolean
 } & React.AllHTMLAttributes<HTMLDivElement>
 const PageContainer: React.FC<ComponentProps> = props => {
   const {
@@ -48,9 +53,10 @@ const PageContainer: React.FC<ComponentProps> = props => {
       connectionStatus,
       networkID,
     },
+    wallet: { addresses, id },
     settings: { networks },
   } = useGlobalState()
-  const { children, head, notice, className } = props
+  const { children, head, notice, className, isHomePage } = props
   const [t] = useTranslation()
   const dispatch = useDispatch()
   const closeSyncNotice = useCallback(() => {
@@ -58,23 +64,12 @@ const PageContainer: React.FC<ComponentProps> = props => {
       type: AppActions.HideWaitForFullySynced,
     })
   }, [dispatch])
-  const [theme, setTheme] = useState<'dark' | 'light'>()
-  useEffect(() => {
-    isDark().then(res => {
-      if (isSuccessResponse(res)) {
-        setTheme(res.result ? 'dark' : 'light')
-      }
-    })
-  }, [])
-  const onSetTheme = useCallback(() => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
-    setThemeAPI(newTheme).then(res => {
-      if (isSuccessResponse(res)) {
-        setTheme(newTheme)
-      }
-    })
-  }, [theme])
+  const { theme, onSetTheme } = useTheme()
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
+  const isLightClient = useMemo(
+    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    [networkID, networks]
+  )
   const netWorkTypeLabel = useMemo(() => (network ? getNetworkTypeLabel(network.chain) : ''), [network])
   const [syncPercents, syncBlockNumbers] = useMemo(() => {
     const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
@@ -87,23 +82,32 @@ const PageContainer: React.FC<ComponentProps> = props => {
       }`,
     ]
   }, [cacheTipBlockNumber, bestKnownBlockNumber])
+  const isMainnet = useMemo(() => isMainnetUtil(networks, networkID), [networks, networkID])
   const onOpenValidTarget = useCallback(
     (e: React.SyntheticEvent) => {
       e.stopPropagation()
-      const explorerUrl = getExplorerUrl(isMainnet(networks, networkID))
+      const explorerUrl = getExplorerUrl(isMainnet)
       openExternal(`${explorerUrl}/block/${validTarget}`)
     },
-    [networks, networkID, validTarget]
+    [isMainnet, validTarget]
   )
-  const [isMigrate, setIsMigrate] = useState(false)
-  useEffect(() => {
-    const migrateSubscription = Migrate.subscribe(migrateStatus => {
-      setIsMigrate(migrateStatus === 'migrating')
-    })
-    return () => {
-      migrateSubscription.unsubscribe()
-    }
-  }, [])
+  const isMigrate = useMigrate()
+  const {
+    isSetStartBlockShown,
+    openDialog,
+    closeDialog,
+    onChangeStartBlockNumber,
+    startBlockNumber,
+    onOpenAddressInExplorer,
+    onViewBlock,
+    onConfirm,
+  } = useSetBlockNumber({
+    firstAddress: addresses[0]?.address,
+    isMainnet,
+    isLightClient,
+    walletID: id,
+    isHomePage,
+  })
   return (
     <div className={`${styles.page} ${className || ''}`}>
       <div className={styles.head}>
@@ -136,6 +140,8 @@ const PageContainer: React.FC<ComponentProps> = props => {
               isLookingValidTarget={isLookingValidTarget}
               onOpenValidTarget={onOpenValidTarget}
               isMigrate={isMigrate}
+              isLightClient={isLightClient}
+              onOpenSetStartBlock={openDialog}
             />
           </div>
         </div>
@@ -148,6 +154,33 @@ const PageContainer: React.FC<ComponentProps> = props => {
         </Alert>
       )}
       <div className={styles.body}>{children}</div>
+      <Dialog
+        title={t('set-start-block-number.title')}
+        show={isSetStartBlockShown}
+        onCancel={closeDialog}
+        onConfirm={onConfirm}
+      >
+        <p className={styles.startBlockTip}>{t('set-start-block-number.tip')}</p>
+        <TextField
+          field="startBlockNumber"
+          onChange={onChangeStartBlockNumber}
+          placeholder={t('set-start-block-number.input-place-holder')}
+          value={localNumberFormatter(startBlockNumber)}
+          suffix={
+            startBlockNumber ? (
+              <button type="button" className={styles.viewAction} onClick={onViewBlock}>
+                {t('set-start-block-number.view-block')}
+                <NewTab />
+              </button>
+            ) : (
+              <button type="button" className={styles.viewAction} onClick={onOpenAddressInExplorer}>
+                {t('set-start-block-number.locate-first-tx')}
+                <NewTab />
+              </button>
+            )
+          }
+        />
+      </Dialog>
     </div>
   )
 }

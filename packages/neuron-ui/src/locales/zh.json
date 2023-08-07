@@ -27,7 +27,8 @@
     "network-status": {
       "tooltip": {
         "block-synced": "已同步区块",
-        "looking-valid-target": "寻找预设可信区块"
+        "looking-valid-target": "寻找预设可信区块",
+        "set-start-block-number": "设置同步起始区块"
       },
       "migrating": "正在数据迁移..."
     },
@@ -1123,6 +1124,13 @@
       "countDownTip": "单价将在{{countDown}}秒后刷新",
       "switchToCustomPrice": "切换到自定义价格",
       "switchToPrice": "切换到单价"
+    },
+    "set-start-block-number": {
+      "title": "设置同步起始区块",
+      "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
+      "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
+      "locate-first-tx": "定位第一笔交易",
+      "view-block": "查看区块"
     }
   }
 }
