@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, migrateData } from 'services/remote'
-import { walletNumber, syncRebuildNotification } from 'services/localCache'
+import { loadedWalletIDs, syncRebuildNotification, wallets } from 'services/localCache'
 import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -486,13 +486,17 @@ export const useOutputErrors = (
   )
 }
 
-export const useFirstLoadWallet = (dispatch: StateDispatch, num: number) => {
+export const useFirstLoadWallet = (dispatch: StateDispatch, id: string) => {
   useEffect(() => {
-    if (num > Number(walletNumber.load())) {
+    const loadedIds = loadedWalletIDs.load()
+
+    if (!loadedIds.includes(id)) {
       showPageNotice('overview.wallet-ready')(dispatch)
     }
-    walletNumber.save(`${num}`)
-  }, [dispatch, num])
+
+    const ids = wallets.load().map(item => item.id)
+    loadedWalletIDs.save(ids.join(','))
+  }, [dispatch, id])
 }
 
 export const useClearGeneratedTx = () => {

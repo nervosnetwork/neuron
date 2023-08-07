@@ -154,7 +154,6 @@ const Overview = () => {
       transactions: { items = [] },
       connectionStatus,
     },
-    settings: { wallets },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -190,7 +189,7 @@ const Overview = () => {
     return items.slice(0, 10)
   }, [items])
 
-  useFirstLoadWallet(dispatch, wallets.length)
+  useFirstLoadWallet(dispatch, id)
 
   const [showBalance, setShowBalance] = useState(true)
   const onChangeShowBalance = useCallback(() => {
