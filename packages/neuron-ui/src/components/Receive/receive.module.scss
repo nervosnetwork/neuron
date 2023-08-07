@@ -61,10 +61,6 @@
     min-width: 80px;
   }
 
-  .addressType {
-    width: 100px;
-  }
-
   .balance {
     padding-left: 48px;
   }
@@ -297,5 +293,16 @@
   }
   .copyAddress {
     margin: 16px 16px 10px 16px;
+  }
+}
+
+@media screen and (max-width: 1330px) {
+  .multiAddressRoot {
+    .balance {
+      padding-left: 18px;
+    }
+    .txCount {
+      padding-left: 64px;
+    }
   }
 }
