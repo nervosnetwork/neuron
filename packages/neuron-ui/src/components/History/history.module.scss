@@ -22,6 +22,10 @@ body {
   .tableHeaderInput {
     margin: unset;
     width: 100%;
+
+    & > div {
+      min-height: 48px;
+    }
   }
   .searchBoxPrefix {
     font-family: inherit;
@@ -40,6 +44,17 @@ body {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
+    border-radius: 32px;
+    height: 48px;
+
+    &:hover {
+      color: var(--primary-color);
+      .exportIcon {
+        path {
+          fill: var(--primary-color);
+        }
+      }
+    }
 
     .exportIcon {
       padding: 0 10px;
@@ -79,6 +94,18 @@ body {
       .descText {
         padding-bottom: 16px;
         word-break: break-all;
+        &:hover {
+          color: var(--primary-color);
+        }
+      }
+
+      .txHash {
+        display: flex;
+        align-items: center;
+
+        & > svg {
+          margin-left: 8px;
+        }
       }
     }
 
@@ -124,6 +151,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 58px;
 
   svg {
     border-radius: 50%;

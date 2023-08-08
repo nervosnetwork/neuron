@@ -1,10 +1,9 @@
 import React, { useCallback } from 'react'
-import { useDispatch } from 'states'
+import { showPageNotice, useDispatch } from 'states'
 import { openExternal } from 'services/remote'
 
 import { clsx, getExplorerUrl, localNumberFormatter, RoutePath, useLocalDescription } from 'utils'
 import { TableProps } from 'widgets/Table'
-import CopyZone from 'widgets/CopyZone'
 import { useNavigate } from 'react-router-dom'
 import { ExplorerIcon, Copy, DetailIcon } from 'widgets/Icons/icon'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
@@ -58,6 +57,10 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
   const confirmations = 1 + bestBlockNumber - +blockNumber
   const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
   const isSelected = localDescription.key === column.hash
+  const onCopy = useCallback(() => {
+    window.navigator.clipboard.writeText(hash)
+    showPageNotice('common.copied')(dispatch)
+  }, [hash, dispatch])
 
   return (
     <tr>
@@ -105,11 +108,9 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
 
           <div className={styles.infoBlock}>
             <div className={styles.infoBlockTitle}>{t('history.transaction-hash')}</div>
-            <div>
-              <CopyZone content={hash} className={styles.copyTableAddress}>
-                {hash}
-                <Copy />
-              </CopyZone>
+            <div className={styles.txHash}>
+              {hash}
+              <Copy onClick={onCopy} />
             </div>
           </div>
           <div className={styles.infoOperationBox}>
