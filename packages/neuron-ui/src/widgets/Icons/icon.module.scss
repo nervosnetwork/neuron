@@ -47,3 +47,10 @@ $activity-color: #1b73b3;
     }
   }
 }
+
+.balance {
+  cursor: pointer;
+  & > path {
+    fill: #999;
+  }
+}

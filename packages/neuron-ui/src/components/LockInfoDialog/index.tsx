@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import React, { useRef } from 'react'
 import { bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import CopyZone from 'widgets/CopyZone'
 import Dialog from 'widgets/Dialog'
-import { useDialog } from 'utils'
+import { useCopy, useDialog } from 'utils'
+import { Copy } from 'widgets/Icons/icon'
+import Alert from 'widgets/Alert'
 import getLockSupportShortAddress from '../../utils/getLockSupportShortAddress'
 
 import styles from './lockInfoDialog.module.scss'
@@ -14,7 +15,15 @@ interface LockInfoDialogProps {
   onDismiss: () => void
 }
 
-const ShortAddr = ({ lockScript, isMainnet }: { lockScript: CKBComponents.Script | null; isMainnet: boolean }) => {
+const ShortAddr = ({
+  lockScript,
+  isMainnet,
+  onCopy,
+}: {
+  lockScript: CKBComponents.Script | null
+  isMainnet: boolean
+  onCopy: (content: string) => void
+}) => {
   const [t] = useTranslation()
 
   if (!lockScript) {
@@ -37,9 +46,8 @@ const ShortAddr = ({ lockScript, isMainnet }: { lockScript: CKBComponents.Script
         {t('transaction.deprecated-address-format')}
       </div>
       <div className={styles.shortAddr}>
-        <CopyZone content={shortAddr}>
-          <span>{shortAddr}</span>
-        </CopyZone>
+        <span>{shortAddr}</span>
+        <Copy className={styles.copyIcon} onClick={() => onCopy(shortAddr)} />
       </div>
     </>
   )
@@ -49,6 +57,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show: !!lockInfo, dialogRef, onClose: onDismiss })
+  const { copied, onCopy, copyTimes } = useCopy()
 
   if (!lockInfo) {
     return null
@@ -58,7 +67,7 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
     "code_hash": "${lockInfo.codeHash}",
     "hash_type": "${lockInfo.hashType}",
     "args": "${lockInfo.args}"
-  }`
+}`
 
   return (
     <Dialog
@@ -73,11 +82,15 @@ const LockInfoDialog = ({ lockInfo, isMainnet, onDismiss }: LockInfoDialogProps)
           {t('transaction.lock-script')}
         </div>
         <div className={styles.lock}>
-          <CopyZone content={rawLock}>
-            <pre>{rawLock}</pre>
-          </CopyZone>
+          <pre>{rawLock}</pre>
+          <Copy className={styles.copyIcon} onClick={() => onCopy(rawLock)} />
         </div>
-        <ShortAddr isMainnet={isMainnet} lockScript={lockInfo} />
+        <ShortAddr isMainnet={isMainnet} lockScript={lockInfo} onCopy={onCopy} />
+        {copied ? (
+          <Alert status="success" className={styles.notice} key={copyTimes.toString()}>
+            {t('common.copied')}
+          </Alert>
+        ) : null}
       </div>
     </Dialog>
   )

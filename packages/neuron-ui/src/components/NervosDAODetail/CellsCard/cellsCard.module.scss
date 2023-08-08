@@ -1,3 +1,5 @@
+@import '../../../styles/mixin.scss';
+
 .cells {
   margin-top: 16px;
   border-radius: 16px;
@@ -43,10 +45,7 @@
 
   .cellsPanel {
     display: grid;
-    grid-template-columns: minmax(80px, max-content) auto minmax(
-        182px,
-        max-content
-      );
+    grid-template-columns: minmax(80px, max-content) auto minmax(182px, max-content);
     grid-template-rows: 48px;
     grid-auto-rows: minmax(56px, auto);
 
@@ -92,7 +91,22 @@
       .address {
         font-family: 'JetBrains Mono';
         font-weight: 500;
+        display: inline-block;
+        line-height: 56px;
+      }
+
+      .balance {
+        height: 32px;
+        line-height: 32px;
+      }
+
+      .scriptTag:hover {
+        color: var(--primary-color);
       }
     }
+  }
+
+  .copyTableAddress {
+    @include copyAddress;
   }
 }

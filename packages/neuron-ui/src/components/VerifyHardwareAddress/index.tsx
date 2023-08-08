@@ -11,14 +11,12 @@ import {
   updateWallet,
   getPlatform,
 } from 'services/remote'
-import { ErrorCode, errorFormatter, isSuccessResponse, useDidMount } from 'utils'
+import { ErrorCode, clsx, errorFormatter, isSuccessResponse, useCopy, useDidMount } from 'utils'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
-// import { ADDRESS_LENGTH } from 'utils/const'
 import { AddressPrefix, addressToScript, scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { ReactComponent as Device } from 'widgets/Icons/Device.svg'
-import { Close } from 'widgets/Icons/icon'
+import { Close, Copy } from 'widgets/Icons/icon'
 import Alert from 'widgets/Alert'
-import CopyZoneAddress from 'widgets/CopyZoneAddress'
 import styles from './verifyHardwareAddress.module.scss'
 
 export interface VerifyHardwareAddressProps {
@@ -151,15 +149,15 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
     }
   }, [deviceInfo, disconnectStatus, ensureDeviceAvailable, wallet.id])
 
-  const [isVerifyAgain, setIsVerifyAgain] = useState(false)
+  const [isVerifySuccess, setIsVerifySuccess] = useState(false)
   const verify = useCallback(async () => {
-    setIsVerifyAgain(true)
     await ensureDeviceAvailable(deviceInfo)
     setStatus({ type: 'init', message: userInputStatus })
     const res = await getDevicePublicKey()
     if (isSuccessResponse(res)) {
       const { result } = res
       if (verifyAddressEqual(address, result?.address)) {
+        setIsVerifySuccess(true)
         setStatus({ type: 'success', message: t('hardware-verify-address.verified') })
       } else {
         setStatus({ type: 'error', message: t('hardware-verify-address.invalid') })
@@ -173,6 +171,7 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
     dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })
+  const { copied, copyTimes, onCopy } = useCopy()
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
@@ -186,11 +185,21 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
           <header>{t('hardware-verify-address.device')}</header>
           <input value={productName} className={styles.productName} disabled />
           <header>{t('hardware-verify-address.address')}</header>
-          <CopyZoneAddress fullPayload={address} className={styles.address} />
+          <div content={address} className={styles.address}>
+            <span className={styles.overflow}>{address.slice(0, 20)}</span>
+            <span>...</span>
+            <span>{address.slice(-20)}</span>
+            <Copy onClick={() => onCopy(address)} />
+          </div>
           {status ? (
-            <Alert status={status.type} className={styles.alert}>
+            <Alert status={status.type} className={clsx(styles.alert, { [styles.success]: status.type === 'success' })}>
               {status.message === connectStatus ? <Device /> : null}
               {status.message}
+            </Alert>
+          ) : null}
+          {copied ? (
+            <Alert status="success" className={styles.notice} key={copyTimes.toString()}>
+              {t('common.copied')}
             </Alert>
           ) : null}
         </section>
@@ -210,10 +219,10 @@ const VerifyHardwareAddress = ({ address, wallet, onDismiss }: VerifyHardwareAdd
               label={t('hardware-verify-address.actions.verify')}
               type="submit"
               loading={isLoading}
-              onClick={verify}
+              onClick={isVerifySuccess ? onCancel : verify}
             >
-              {isVerifyAgain
-                ? t('hardware-verify-address.actions.verify-again')
+              {isVerifySuccess
+                ? t('hardware-verify-address.actions.finish')
                 : t('hardware-verify-address.actions.verify')}
             </Button>
           )}

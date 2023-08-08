@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { getTransaction } from 'services/remote'
-import { transactionState, useState as useGlobalState } from 'states'
+import { showPageNotice, transactionState, useDispatch, useState as useGlobalState } from 'states'
 import PageContainer from 'components/PageContainer'
 import LockInfoDialog from 'components/LockInfoDialog'
 import ScriptTag from 'components/ScriptTag'
@@ -11,7 +11,8 @@ import AlertDialog from 'widgets/AlertDialog'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
-import { GoBack } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow, Copy, GoBack } from 'widgets/Icons/icon'
+import Tooltip from 'widgets/Tooltip'
 
 import {
   ErrorCode,
@@ -76,15 +77,25 @@ const HistoryDetailPage = () => {
     }
   }, [t, hash, currentWallet])
 
+  const dispatch = useDispatch()
+  const onCopy = useCallback(() => {
+    window.navigator.clipboard.writeText(transaction.hash)
+    showPageNotice('common.copied')(dispatch)
+  }, [transaction.hash, dispatch])
+  const [isIncomeShow, setIsIncomeShow] = useState(true)
+  const onChangeIncomeShow = useCallback(() => {
+    setIsIncomeShow(v => !v)
+  }, [])
+
   const infos = [
     {
       label: t('transaction.transaction-hash'),
-      value:
-        (
-          <CopyZone content={transaction.hash} name={t('history.copy-tx-hash')} className={styles.address}>
-            {transaction.hash}
-          </CopyZone>
-        ) || 'none',
+      value: (
+        <div content={transaction.hash} className={styles.address}>
+          {transaction.hash}
+          <Copy onClick={onCopy} />
+        </div>
+      ),
     },
     {
       label: t('transaction.block-number'),
@@ -98,10 +109,22 @@ const HistoryDetailPage = () => {
     },
     {
       label: t('transaction.income'),
-      value: (
-        <CopyZone content={shannonToCKBFormatter(transaction.value, false, '')} name={t('history.copy-balance')}>
-          {`${shannonToCKBFormatter(transaction.value)} CKB`}
-        </CopyZone>
+      value: isIncomeShow ? (
+        <div className={styles.income}>
+          <CopyZone
+            content={shannonToCKBFormatter(transaction.value, false, '')}
+            className={styles.incomeCopy}
+            maskRadius={8}
+          >
+            {`${shannonToCKBFormatter(transaction.value)} CKB`}
+          </CopyZone>
+          <BalanceShow onClick={onChangeIncomeShow} />
+        </div>
+      ) : (
+        <div className={styles.income}>
+          {`${HIDE_BALANCE} CKB`}
+          <BalanceHide onClick={onChangeIncomeShow} />
+        </div>
       ),
     },
   ]
@@ -166,6 +189,7 @@ const HistoryDetailPage = () => {
     render?: (v: any, idx: number, item: InputOrOutputType, showBalance: boolean) => React.ReactNode
     width?: string
     align?: 'left' | 'right' | 'center'
+    className?: string
   }[] = [
     {
       title: t('transaction.index'),
@@ -179,15 +203,29 @@ const HistoryDetailPage = () => {
       title: t('transaction.address'),
       dataIndex: 'type',
       align: 'left',
-      width: '550px',
+      width: '580px',
       render: (_, __, item) => {
         const { address } = handleListData(item)
         return (
           <>
-            <CopyZone content={address} className={styles.address}>
-              {`${address.slice(0, 20)}...${address.slice(-20)}`}
-            </CopyZone>
-            <ScriptTag isMainnet={isMainnet} script={item.lock} onClick={() => setLockInfo(item.lock)} />
+            <Tooltip
+              tip={
+                <CopyZone content={address} className={styles.copyTableAddress}>
+                  {address}
+                </CopyZone>
+              }
+              className={styles.addressTips}
+              showTriangle
+              isTriggerNextToChild
+            >
+              <div className={styles.address}>{`${address.slice(0, 20)}...${address.slice(-20)}`}</div>
+            </Tooltip>
+            <ScriptTag
+              isMainnet={isMainnet}
+              className={styles.scriptTag}
+              script={item.lock}
+              onClick={() => setLockInfo(item.lock)}
+            />
           </>
         )
       },
@@ -197,9 +235,14 @@ const HistoryDetailPage = () => {
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,
+      className: styles.amount,
       render(_, __, item, show: boolean) {
         const { capacity } = handleListData(item)
-        return show ? <CopyZone content={capacity.replace(/,/g, '')}>{`${capacity} CKB`}</CopyZone> : HIDE_BALANCE
+        return show ? (
+          <CopyZone maskRadius={8} content={capacity.replaceAll(',', '')}>{`${capacity} CKB`}</CopyZone>
+        ) : (
+          `${HIDE_BALANCE} CKB`
+        )
       },
     },
   ]

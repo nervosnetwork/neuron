@@ -2,6 +2,7 @@
   --progress-grey: #f0f0f0;
   --progress-green: #00c891;
   --progress-yellow: #f78c2a;
+  cursor: pointer;
 
   @media (prefers-color-scheme: dark) {
     --progress-grey: #666666;
@@ -64,13 +65,7 @@
   }
 
   &.pendingProgress {
-    background: repeating-linear-gradient(
-      -45deg,
-      #ccc,
-      #ccc 6.8px,
-      #e3e3e3 6.8px,
-      #e3e3e3 13.6px
-    );
+    background: repeating-linear-gradient(-45deg, #ccc, #ccc 6.8px, #e3e3e3 6.8px, #e3e3e3 13.6px);
     background-size: 200% 100%;
     animation: move 35s linear infinite;
   }

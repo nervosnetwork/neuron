@@ -76,7 +76,7 @@ export default {
       'wallet-password-letter-complexity':
         'Password must contain a combination of uppercase and lowercase letters, numbers and special symbols.',
       'current-wallet-not-set': 'Current wallet is not set.',
-      'incorrect-password': 'Password is incorrect.',
+      'incorrect-password': 'Password is incorrect',
       'invalid-address': 'Address {{address}} is invalid.',
       'codehash-not-loaded': 'codehash is not loaded.',
       'wallet-not-found': 'Wallet {{id}} not found.',

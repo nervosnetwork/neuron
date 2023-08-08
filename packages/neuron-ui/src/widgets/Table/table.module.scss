@@ -49,7 +49,6 @@ $head-height: 52px;
   tbody {
     tr {
       height: 58px;
-      cursor: pointer;
       &:hover {
         &[data-is-expand='false'] {
           background-color: var(--hover-background-color);

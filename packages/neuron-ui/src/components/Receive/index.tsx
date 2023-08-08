@@ -7,10 +7,7 @@ import SingleAddressReceive from './singleAddressReceive'
 import MultiAddressReceive from './multiAddressReceive'
 
 const Receive = () => {
-  const {
-    app: { pageNotice },
-    wallet,
-  } = useGlobalState()
+  const { wallet } = useGlobalState()
   const [t] = useTranslation()
   const { address } = useParams<{ address: string }>()
   const { addresses, id: walletId } = wallet
@@ -34,7 +31,6 @@ const Receive = () => {
         e.preventDefault()
       }}
       head={t('receive.title')}
-      notice={pageNotice}
     >
       {isSingleAddress ? (
         <SingleAddressReceive address={accountAddress} wallet={wallet} />

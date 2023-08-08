@@ -46,7 +46,6 @@ const History = () => {
       transactions: { pageNo = 1, pageSize = 10, totalCount = 0, items = [] },
     },
     settings: { networks },
-    app: { pageNotice },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -228,7 +227,6 @@ const History = () => {
         e.preventDefault()
       }}
       head={t('history.title')}
-      notice={pageNotice}
     >
       <Table
         head={

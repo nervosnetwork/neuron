@@ -42,7 +42,6 @@ const NervosDAO = () => {
       tipDao,
       tipBlockTimestamp,
       epoch,
-      pageNotice,
     },
     wallet,
     nervosDAO: { records },
@@ -144,10 +143,20 @@ const NervosDAO = () => {
       <>
         <div role="presentation" className={styles.recordTab} style={{ '--selected-tab': tabIdx }} onClick={onTabClick}>
           <div className={styles.underline} />
-          <button className={clsx({ [styles.active]: tabIdx === '0' })} type="button" role="tab" data-idx="0">
+          <button
+            className={clsx({ [styles.active]: tabIdx === '0' }, styles.tab)}
+            type="button"
+            role="tab"
+            data-idx="0"
+          >
             {t('nervos-dao.deposit-records')}
           </button>
-          <button className={clsx({ [styles.active]: tabIdx === '1' })} type="button" role="tab" data-idx="1">
+          <button
+            className={clsx({ [styles.active]: tabIdx === '1' }, styles.tab)}
+            type="button"
+            role="tab"
+            data-idx="1"
+          >
             {t('nervos-dao.completed-records')}
           </button>
         </div>
@@ -263,28 +272,32 @@ const NervosDAO = () => {
           )}
         </div>
       }
-      notice={pageNotice}
     >
       <div className={styles.header}>
         <div className={styles.daoOverview}>
           <div className={clsx(styles.field, styles.free)}>
             <div className={styles.name}>{t(`nervos-dao.free`)}</div>
             <div className={styles.value}>
-              <CopyZone
-                content={shannonToCKBFormatter(`${free}`, false, '')}
-                name={t('nervos-dao.copy-balance')}
-                className={styles.balance}
-              >
-                <span className={styles.number}>{isPrivacyMode ? HIDE_BALANCE : shannonToCKBFormatter(`${free}`)}</span>{' '}
-                CKB
-              </CopyZone>
+              {isPrivacyMode ? (
+                <>
+                  <span className={styles.number}>{HIDE_BALANCE}</span> CKB
+                </>
+              ) : (
+                <CopyZone
+                  content={shannonToCKBFormatter(`${free}`, false, '')}
+                  name={t('nervos-dao.copy-balance')}
+                  className={styles.balance}
+                >
+                  <span className={styles.number}>{shannonToCKBFormatter(`${free}`)}</span> CKB
+                </CopyZone>
+              )}
             </div>
           </div>
 
           <div className={clsx(styles.field, styles.locked)}>
             <div className={styles.name}>{t(`nervos-dao.locked`)}</div>
             <div className={styles.value}>
-              {onlineAndSynced ? (
+              {onlineAndSynced && !isPrivacyMode ? (
                 <CopyZone
                   content={shannonToCKBFormatter(`${locked}`, false, '')}
                   name={t('nervos-dao.copy-balance')}
@@ -296,7 +309,9 @@ const NervosDAO = () => {
                   CKB
                 </CopyZone>
               ) : (
-                <div>-- CKB</div>
+                <div>
+                  <span className={styles.number}>{!onlineAndSynced ? '--' : HIDE_BALANCE}</span> CKB
+                </div>
               )}
             </div>
           </div>

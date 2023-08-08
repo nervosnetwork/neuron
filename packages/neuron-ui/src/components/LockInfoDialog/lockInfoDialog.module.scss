@@ -24,6 +24,7 @@
 .title {
   font-weight: 500;
   font-size: 16px;
+  color: var(--main-text-color);
 }
 
 .shortAddr {
@@ -31,6 +32,18 @@
   margin-top: 16px;
   background: var(--table-head-background-color);
   border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  & > span {
+    font-family: 'JetBrains Mono';
+  }
+  .copyIcon {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+  }
 }
 
 .infoWrap {
@@ -61,12 +74,20 @@
 .lock {
   position: relative;
 
+  .copyIcon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+  }
+
   pre {
     overflow: auto;
     background: var(--table-head-background-color);
-    padding: 10px;
+    padding: 16px;
     border-radius: 6px;
     font-size: 12px;
+    font-family: 'JetBrains Mono';
   }
 
   .copyBtn {
@@ -91,4 +112,8 @@
   &:hover .copyBtn {
     opacity: 100%;
   }
+}
+
+.notice {
+  @include dialog-copy-animation;
 }

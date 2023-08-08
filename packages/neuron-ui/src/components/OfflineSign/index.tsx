@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
+import { isSuccessResponse, RoutePath, useDidMount, useGoBack } from 'utils'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { useDispatch, useState as useGlobalState } from 'states'
@@ -42,16 +42,13 @@ const OfflineSign = () => {
     }
   }, [signStatus, t])
 
-  const navigate = useNavigate()
-
-  const onBack = useCallback(() => {
-    navigate(-1)
-  }, [navigate])
+  const onBack = useGoBack()
 
   const onSign = useCallback(() => {
     setIsSigning(true)
   }, [setIsSigning])
 
+  const navigate = useNavigate()
   const onBroadcast = useCallback(async () => {
     setIsBroadcasting(true)
     try {

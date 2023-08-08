@@ -53,6 +53,13 @@
 
 .address {
   font-family: 'JetBrains Mono';
+  display: flex;
+  align-items: center;
+
+  & > svg {
+    cursor: pointer;
+    margin-left: 4px;
+  }
 }
 
 .tabsClassName {
@@ -81,4 +88,39 @@
       }
     }
   }
+}
+
+.income {
+  display: flex;
+  align-items: center;
+
+  .incomeCopy {
+    height: 20px;
+    line-height: 20px;
+    cursor: pointer;
+  }
+
+  & > svg {
+    margin-left: 8px;
+    cursor: pointer;
+  }
+}
+
+.amount {
+  height: 32px;
+  line-height: 32px;
+}
+
+.addressTips {
+  display: inline-block;
+  line-height: 58px;
+  cursor: pointer;
+}
+
+.copyTableAddress {
+  @include copyAddress;
+}
+
+.scriptTag:hover {
+  color: var(--primary-color);
 }

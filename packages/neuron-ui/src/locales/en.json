@@ -70,7 +70,7 @@
         "label": "Status:",
         "connect": "Connected, ready for signing.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
@@ -90,14 +90,14 @@
         "label": "Status:",
         "connect": "Connected, ready for verifying.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "actions": {
         "close": "Close",
         "rescan": "Reconnect",
         "copy-address": "Copy Address",
         "verify": "Verify Address",
-        "verify-again": "Verify Again"
+        "finish": "Ok"
       }
     },
     "offline-sign": {
@@ -593,7 +593,7 @@
         "100": "Amount is not enough.",
         "101": "The amount {{amount}} CKB is too small, please enter an amount no less than {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
-        "103": "$t(messages.fields.keystore-password) is incorrect.",
+        "103": "$t(messages.fields.keystore-password) is incorrect",
         "104": "Fail to connect to the node, please restart Neuron.",
         "105": "You need more capacities for change (more than 61 CKBytes).",
         "106": "You need more capacities for change (more than 61 CKBytes), or slide to the end to send all your balance.",
@@ -669,7 +669,7 @@
       "cancel": "Cancel",
       "proceed": "Proceed",
       "compensation": "Compensation",
-      "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
+      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days} days).",
       "deposit-dialog-title": "Deposit",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. <br />Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
@@ -687,7 +687,7 @@
         "deposited": "Deposited",
         "withdrawn": "Withdrawn",
         "unlocked": "Unlocked",
-        "tx-record": "Transaction Record",
+        "view-tx-detail": "View transaction detail",
         "locked-period": "Locked Period",
         "compensated-period": "Compensation Period",
         "days-hours": "{{days}} days {{hours}} hours",
