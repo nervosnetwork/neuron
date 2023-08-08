@@ -106,17 +106,20 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                   data-idx={idx}
                   data-is-expand={expandedRow === idx}
                 >
-                  {columnList.map(({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName }) => (
-                    <td
-                      align={align ?? 'left'}
-                      key={key ?? dataIndex}
-                      className={`${tdClassName ?? bodyTdClassName} ${
-                        expandedRow === idx && rowExtendRender ? styles.noBorder : ''
-                      }`}
-                    >
-                      {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
-                    </td>
-                  ))}
+                  {columnList.map(
+                    ({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName, width }) => (
+                      <td
+                        align={align ?? 'left'}
+                        key={key ?? dataIndex}
+                        width={width}
+                        className={`${tdClassName ?? bodyTdClassName} ${
+                          expandedRow === idx && rowExtendRender ? styles.noBorder : ''
+                        }`}
+                      >
+                        {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
+                      </td>
+                    )
+                  )}
                 </tr>
                 {expandedRow === idx && rowExtendRender?.(item, idx)}
               </>

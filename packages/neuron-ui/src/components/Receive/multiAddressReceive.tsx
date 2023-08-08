@@ -79,7 +79,7 @@ const MultiAddressReceive = ({
         title: t('addresses.type'),
         dataIndex: 'type',
         align: 'left',
-        className: styles.addressType,
+        width: '60px',
         render(type) {
           return type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
         },
@@ -130,6 +130,7 @@ const MultiAddressReceive = ({
         title: t('addresses.transactions'),
         dataIndex: 'txCount',
         align: 'center',
+        className: styles.txCount,
       },
       {
         title: t('addresses.description'),
