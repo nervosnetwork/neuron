@@ -1,25 +1,26 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useState as useGlobalState, transactionState, useDispatch } from 'states'
+import { useState as useGlobalState, transactionState, useDispatch, showPageNotice } from 'states'
 import {
   backToTop,
   shannonToCKBFormatter,
   clsx,
-  RoutePath,
   isSuccessResponse,
   ErrorCode,
   localNumberFormatter,
   uniformTimeFormatter,
+  useGoBack,
 } from 'utils'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction } from 'services/remote'
 import PageContainer, { Breadcrumbs } from 'components/PageContainer'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import Tabs, { VariantProps } from 'widgets/Tabs'
 import { onEnter } from 'utils/inputDevice'
+import { Copy, GoBack, BalanceHide, BalanceShow } from 'widgets/Icons/icon'
 import CopyZone from 'widgets/CopyZone'
-import { Copy } from 'widgets/Icons/icon'
+import { HIDE_BALANCE } from 'utils/const'
 import styles from './nervosDAODetail.module.scss'
 import hooks from './hooks'
 import CellsCard from './CellsCard'
@@ -50,6 +51,15 @@ const TabsVariantWithTxTypes: FC<
         })
     }
   }, [t, selectedTab.hash])
+  const dispatch = useDispatch()
+  const onCopy = useCallback(() => {
+    window.navigator.clipboard.writeText(transaction.hash)
+    showPageNotice('common.copied')(dispatch)
+  }, [transaction.hash, dispatch])
+  const [isIncomeShow, setIsIncomeShow] = useState(true)
+  const onChangeIncomeShow = useCallback(() => {
+    setIsIncomeShow(v => !v)
+  }, [])
 
   return (
     <>
@@ -72,11 +82,9 @@ const TabsVariantWithTxTypes: FC<
         <div className={styles.overview}>
           <div className={clsx(styles.row, styles.title)}>{t('nervos-dao-detail.basic-information')}</div>
           <div className={styles.fieldName}>{t('nervos-dao-detail.transaction-hash')}</div>
-          <div className={clsx(styles.fieldValue, styles.fullRow, styles.bold)}>
-            <CopyZone className={styles.txHash} content={transaction.hash}>
-              {transaction.hash}
-              <Copy />
-            </CopyZone>
+          <div className={clsx(styles.fieldValue, styles.fullRow, styles.bold, styles.txHash)}>
+            {transaction.hash}
+            <Copy onClick={onCopy} />
           </div>
           <div className={styles.fieldName}>{t('nervos-dao-detail.blockNumber')}</div>
           <div className={styles.fieldValue}>
@@ -89,9 +97,23 @@ const TabsVariantWithTxTypes: FC<
               : 'none'}
           </div>
           <div className={styles.fieldName}>{t('nervos-dao-detail.income')}</div>
-          <div className={clsx(styles.fieldValue, styles.fullRow)}>{`${shannonToCKBFormatter(
-            transaction.value
-          )} CKB`}</div>
+          {isIncomeShow ? (
+            <div className={clsx(styles.fieldValue, styles.fullRow, styles.income)}>
+              <CopyZone
+                content={shannonToCKBFormatter(transaction.value, false, '')}
+                className={styles.incomeCopy}
+                maskRadius={8}
+              >
+                {`${shannonToCKBFormatter(transaction.value)} CKB`}
+              </CopyZone>
+              <BalanceShow onClick={onChangeIncomeShow} />
+            </div>
+          ) : (
+            <div className={clsx(styles.fieldValue, styles.fullRow, styles.income)}>
+              {`${HIDE_BALANCE} CKB`}
+              <BalanceHide onClick={onChangeIncomeShow} />
+            </div>
+          )}
         </div>
 
         <CellsCard transaction={transaction} />
@@ -122,13 +144,16 @@ const NervosDAODetail = () => {
   const { depositOutPoint } = useParams<{ depositOutPoint: string }>()
   const daoRecord = records.find(record => getRecordKey(record) === depositOutPoint)
   const hash = daoRecord?.depositOutPoint?.txHash ?? daoRecord?.outPoint.txHash
+  const onBack = useGoBack()
 
   return (
     <PageContainer
       head={
         <Breadcrumbs>
-          <Link to={RoutePath.NervosDAO}>Nervos DAO</Link>
-          <span>{t('nervos-dao-detail.tx-detail')}</span>
+          <>
+            <GoBack className={styles.goBack} onClick={onBack} />
+            <span>{t('nervos-dao-detail.tx-detail')}</span>
+          </>
         </Breadcrumbs>
       }
       notice={pageNotice}

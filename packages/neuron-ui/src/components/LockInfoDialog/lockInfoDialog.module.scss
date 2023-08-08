@@ -24,16 +24,26 @@
 .title {
   font-weight: 500;
   font-size: 16px;
+  color: var(--main-text-color);
 }
 
-.copyContent {
-  margin-top: 16px;
-  border-radius: 8px;
+.shortAddr {
   padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-top: 16px;
   background: var(--table-head-background-color);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  & > span {
+    font-family: 'JetBrains Mono';
+  }
+  .copyIcon {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+  }
 }
 
 .infoWrap {
@@ -64,17 +74,46 @@
 .lock {
   position: relative;
 
+  .copyIcon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+  }
+
   pre {
     overflow: auto;
     background: var(--table-head-background-color);
-    padding: 16px 32px 16px 16px;
+    padding: 16px;
     border-radius: 6px;
     font-size: 12px;
+    font-family: 'JetBrains Mono';
   }
 
   .copyBtn {
     position: absolute;
-    top: 24px;
-    right: 16px;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    cursor: pointer !important;
+    opacity: 0;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    &:hover {
+      filter: brightness(0.5);
+    }
   }
+  &:hover .copyBtn {
+    opacity: 100%;
+  }
+}
+
+.notice {
+  @include dialog-copy-animation;
 }

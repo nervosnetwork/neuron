@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { getTransaction, showErrorMessage } from 'services/remote'
-import { transactionState, useState as useGlobalState } from 'states'
+import { getTransaction } from 'services/remote'
+import { showPageNotice, transactionState, useDispatch, useState as useGlobalState } from 'states'
 import PageContainer from 'components/PageContainer'
 import LockInfoDialog from 'components/LockInfoDialog'
 import ScriptTag from 'components/ScriptTag'
+import AlertDialog from 'widgets/AlertDialog'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
-import { GoBack } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow, Copy, GoBack } from 'widgets/Icons/icon'
 import Tooltip from 'widgets/Tooltip'
-import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
 
 import {
   ErrorCode,
@@ -51,15 +51,13 @@ const HistoryDetailPage = () => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState({ code: '', message: '' })
+  const [failedMessage, setFailedMessage] = useState('')
   const [lockInfo, setLockInfo] = useState<CKBComponents.Script | null>(null)
 
   useEffect(() => {
     if (currentWallet) {
       if (!hash) {
-        showErrorMessage(
-          t(`messages.error`),
-          t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' })
-        )
+        setFailedMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' }))
         return
       }
       getTransaction({ hash, walletID: currentWallet.id })
@@ -67,11 +65,7 @@ const HistoryDetailPage = () => {
           if (isSuccessResponse(res)) {
             setTransaction(res.result)
           } else {
-            showErrorMessage(
-              t(`messages.error`),
-              t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' })
-            )
-            window.close()
+            setFailedMessage(t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' }))
           }
         })
         .catch((err: Error) => {
@@ -83,15 +77,25 @@ const HistoryDetailPage = () => {
     }
   }, [t, hash, currentWallet])
 
+  const dispatch = useDispatch()
+  const onCopy = useCallback(() => {
+    window.navigator.clipboard.writeText(transaction.hash)
+    showPageNotice('common.copied')(dispatch)
+  }, [transaction.hash, dispatch])
+  const [isIncomeShow, setIsIncomeShow] = useState(true)
+  const onChangeIncomeShow = useCallback(() => {
+    setIsIncomeShow(v => !v)
+  }, [])
+
   const infos = [
     {
       label: t('transaction.transaction-hash'),
-      value:
-        (
-          <CopyZone content={transaction.hash} name={t('history.copy-tx-hash')} className={styles.hash}>
-            {transaction.hash} <Copy />
-          </CopyZone>
-        ) || 'none',
+      value: (
+        <div content={transaction.hash} className={styles.address}>
+          {transaction.hash}
+          <Copy onClick={onCopy} />
+        </div>
+      ),
     },
     {
       label: t('transaction.block-number'),
@@ -105,10 +109,22 @@ const HistoryDetailPage = () => {
     },
     {
       label: t('transaction.income'),
-      value: (
-        <CopyZone content={shannonToCKBFormatter(transaction.value, false, '')} name={t('history.copy-balance')}>
-          {`${shannonToCKBFormatter(transaction.value)} CKB`}
-        </CopyZone>
+      value: isIncomeShow ? (
+        <div className={styles.income}>
+          <CopyZone
+            content={shannonToCKBFormatter(transaction.value, false, '')}
+            className={styles.incomeCopy}
+            maskRadius={8}
+          >
+            {`${shannonToCKBFormatter(transaction.value)} CKB`}
+          </CopyZone>
+          <BalanceShow onClick={onChangeIncomeShow} />
+        </div>
+      ) : (
+        <div className={styles.income}>
+          {`${HIDE_BALANCE} CKB`}
+          <BalanceHide onClick={onChangeIncomeShow} />
+        </div>
       ),
     },
   ]
@@ -173,6 +189,7 @@ const HistoryDetailPage = () => {
     render?: (v: any, idx: number, item: InputOrOutputType, showBalance: boolean) => React.ReactNode
     width?: string
     align?: 'left' | 'right' | 'center'
+    className?: string
   }[] = [
     {
       title: t('transaction.index'),
@@ -186,29 +203,30 @@ const HistoryDetailPage = () => {
       title: t('transaction.address'),
       dataIndex: 'type',
       align: 'left',
-      width: '600px',
+      width: '580px',
       render: (_, __, item) => {
         const { address } = handleListData(item)
         return (
-          <div className={styles.addressItem}>
+          <>
             <Tooltip
               tip={
                 <CopyZone content={address} className={styles.copyTableAddress}>
                   {address}
-                  <Copy />
                 </CopyZone>
               }
+              className={styles.addressTips}
               showTriangle
               isTriggerNextToChild
             >
-              <div className={styles.addressContent}>
-                <span>
-                  {address.slice(0, 20)}...{address.slice(-20)}
-                </span>
-              </div>
+              <div className={styles.address}>{`${address.slice(0, 20)}...${address.slice(-20)}`}</div>
             </Tooltip>
-            <ScriptTag isMainnet={isMainnet} script={item.lock} onClick={() => setLockInfo(item.lock)} />
-          </div>
+            <ScriptTag
+              isMainnet={isMainnet}
+              className={styles.scriptTag}
+              script={item.lock}
+              onClick={() => setLockInfo(item.lock)}
+            />
+          </>
         )
       },
     },
@@ -217,10 +235,11 @@ const HistoryDetailPage = () => {
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,
+      className: styles.amount,
       render(_, __, item, show: boolean) {
         const { capacity } = handleListData(item)
         return show ? (
-          <CopyZone content={capacity.replace(/,/g, '')}>{`${capacity} CKB`} </CopyZone>
+          <CopyZone maskRadius={8} content={capacity.replaceAll(',', '')}>{`${capacity} CKB`}</CopyZone>
         ) : (
           `${HIDE_BALANCE} CKB`
         )
@@ -248,7 +267,7 @@ const HistoryDetailPage = () => {
           <InfoItem {...infos[0]} className={styles.borderBottom} />
           <div className={styles.basicInfoMiddleWrap}>
             <InfoItem {...infos[1]} className={styles.borderBottom} />
-            <InfoItem {...infos[2]} className={`${styles.borderBottom} ${styles.timeItem}`} />
+            <InfoItem {...infos[2]} className={styles.borderBottom} />
           </div>
           <InfoItem {...infos[3]} />
         </div>
@@ -272,6 +291,14 @@ const HistoryDetailPage = () => {
       </div>
 
       {lockInfo && <LockInfoDialog lockInfo={lockInfo} isMainnet={isMainnet} onDismiss={() => setLockInfo(null)} />}
+
+      <AlertDialog
+        show={!!failedMessage}
+        title={t(`messages.error`)}
+        message={failedMessage}
+        type="failed"
+        onCancel={() => navigate(-1)}
+      />
     </PageContainer>
   )
 }

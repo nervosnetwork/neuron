@@ -31,6 +31,7 @@ import {
 } from 'utils'
 import { onEnter } from 'utils/inputDevice'
 import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } from 'utils/const'
+import Tooltip from 'widgets/Tooltip'
 import RowExtend from './RowExtend'
 
 import { useSearch } from './hooks'
@@ -46,7 +47,6 @@ const History = () => {
       transactions: { pageNo = 1, pageSize = 10, totalCount = 0, items = [] },
     },
     settings: { networks },
-    app: { pageNotice },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -153,7 +153,18 @@ const History = () => {
       minWidth: '110px',
       render(_, __, item) {
         const { name } = handleTransactionInfo(item)
-        return (
+        return name.length > 8 ? (
+          <Tooltip tip={<>{name}</>} isTriggerNextToChild showTriangle>
+            <div className={styles.avatarBox}>
+              {item.sudtInfo?.sUDT ? (
+                <SUDTAvatar name={name} type="token" style={{ width: '30px', height: '30px' }} />
+              ) : (
+                <CKBAvatar />
+              )}
+              <div className={styles.nameWrap}>{name.slice(0, 8)}...</div>
+            </div>
+          </Tooltip>
+        ) : (
           <div className={styles.avatarBox}>
             {item.sudtInfo?.sUDT ? (
               <SUDTAvatar name={name} type="token" style={{ width: '30px', height: '30px' }} />
@@ -182,7 +193,7 @@ const History = () => {
       isBalance: true,
       minWidth: '220px',
       render(_, __, item, show) {
-        return <FormattedTokenAmount item={item} show={show} isNeedCopy />
+        return <FormattedTokenAmount item={item} show={show} />
       },
     },
     {
@@ -208,15 +219,10 @@ const History = () => {
     {
       title: t('history.table.operation'),
       dataIndex: 'operation',
-      align: 'left',
-      render(_, idx, ___, ____) {
-        return (
-          <ArrowOpenRightIcon
-            className={styles.arrow}
-            data-is-expand-show={expandedRow === idx}
-            onClick={() => handleExpandClick(idx)}
-          />
-        )
+      align: 'center',
+      minWidth: '72px',
+      render(_, idx) {
+        return <ArrowOpenRightIcon className={styles.arrow} data-is-expand-show={expandedRow === idx} />
       },
     },
   ]
@@ -228,7 +234,6 @@ const History = () => {
         e.preventDefault()
       }}
       head={t('history.title')}
-      notice={pageNotice}
     >
       <Table
         head={
@@ -267,6 +272,7 @@ const History = () => {
           />
         )}
         expandedRow={expandedRow}
+        onRowClick={(_, __, idx) => handleExpandClick(idx)}
       />
 
       <div className={styles.container}>

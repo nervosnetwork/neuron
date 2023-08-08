@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SpecialAssetCell } from 'components/SpecialAssetList'
+import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
 import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
@@ -17,8 +17,8 @@ const SUDTMigrateToExistAccountDialog = ({
   isMainnet,
   walletID,
   isLightClient,
-  isDialogOpen,
   onCancel,
+  onSuccess,
 }: {
   cell: SpecialAssetCell
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
@@ -26,8 +26,8 @@ const SUDTMigrateToExistAccountDialog = ({
   isMainnet: boolean
   walletID: string
   isLightClient: boolean
-  isDialogOpen: boolean
   onCancel: () => void
+  onSuccess: (text: string) => void
 }) => {
   const [t] = useTranslation()
   const [address, setAddress] = useState('')
@@ -69,7 +69,10 @@ const SUDTMigrateToExistAccountDialog = ({
             type: AppActions.RequestPassword,
             payload: {
               walletID,
-              actionType: 'send-sudt',
+              actionType: 'transfer-to-sudt',
+              onSuccess: () => {
+                onSuccess(t('special-assets.send-sudt-success'))
+              },
             },
           })
         }
@@ -89,12 +92,12 @@ const SUDTMigrateToExistAccountDialog = ({
   return (
     <Dialog
       className={styles.container}
-      show={isDialogOpen}
+      show
       title={t('migrate-sudt.transfer-to-exist-account.title')}
       onCancel={onCancel}
       cancelText={t('migrate-sudt.back')}
       confirmText={t('migrate-sudt.next')}
-      confirmProps={{ onClick: onSubmit }}
+      onConfirm={onSubmit}
       disabled={!address || !!addressError}
     >
       <>
@@ -102,10 +105,12 @@ const SUDTMigrateToExistAccountDialog = ({
           <div className={styles.addressLabel}>{t('migrate-sudt.address')}</div>
           <InputSelect
             options={sUDTAddresses.map(v => ({ label: v, value: v }))}
+            placeholder={t('sign-and-verify.input-choose-address')}
             onChange={onAddressChange}
             value={address}
             className={styles.addressInputSelect}
             inputDisabled={isLightClient}
+            error={addressError}
           />
           {addressError && <div className={styles.error}>{addressError}</div>}
         </div>
@@ -113,7 +118,6 @@ const SUDTMigrateToExistAccountDialog = ({
           label={t('migrate-sudt.amount')}
           field="amount"
           value={getSUDTAmount({ tokenInfo, data: cell.data }).amount}
-          required
           disabled
         />
       </>

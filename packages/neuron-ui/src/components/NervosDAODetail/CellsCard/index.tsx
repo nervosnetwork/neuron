@@ -9,6 +9,8 @@ import { HIDE_BALANCE, MAINNET_TAG } from 'utils/const'
 import ScriptTag from 'components/ScriptTag'
 import LockInfoDialog from 'components/LockInfoDialog'
 import { useState as useGlobalState } from 'states'
+import CopyZone from 'widgets/CopyZone'
+import Tooltip from 'widgets/Tooltip'
 import styles from './cellsCard.module.scss'
 
 const TabsVariantWithCellsCard: FC<
@@ -71,12 +73,36 @@ const TabsVariantWithCellsCard: FC<
                   t('transaction.cell-from-cellbase')
                 ) : (
                   <>
-                    <span className={styles.address}>{`${address.slice(0, 20)}...${address.slice(-20)}`} </span>
-                    <ScriptTag isMainnet={isMainnet} script={cell.lock} onClick={() => setShowingLockInfo(cell.lock)} />
+                    <Tooltip
+                      tip={
+                        <CopyZone content={address} className={styles.copyTableAddress}>
+                          {address}
+                        </CopyZone>
+                      }
+                      className={styles.addressTips}
+                      showTriangle
+                      isTriggerNextToChild
+                    >
+                      <span className={styles.address}>{`${address.slice(0, 20)}...${address.slice(-20)}`} </span>
+                    </Tooltip>
+                    <ScriptTag
+                      className={styles.scriptTag}
+                      isMainnet={isMainnet}
+                      script={cell.lock}
+                      onClick={() => setShowingLockInfo(cell.lock)}
+                    />
                   </>
                 )}
               </div>
-              <div>{`${isPrivacyMode ? HIDE_BALANCE : capacity} CKB`}</div>
+              <div>
+                {isPrivacyMode ? (
+                  `${HIDE_BALANCE} CKB`
+                ) : (
+                  <CopyZone content={capacity} className={styles.balance} maskRadius={8}>
+                    {`${capacity} CKB`}
+                  </CopyZone>
+                )}
+              </div>
             </div>
           )
         })}

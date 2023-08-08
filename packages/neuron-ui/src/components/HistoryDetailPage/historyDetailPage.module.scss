@@ -25,12 +25,6 @@
   }
 }
 
-.timeItem {
-  .infoItemLabel {
-    min-width: 100px !important;
-  }
-}
-
 .borderBottom {
   flex: 1;
   border-bottom: 1px solid var(--table-head-border-color);
@@ -57,43 +51,15 @@
   }
 }
 
-.copyTableAddress {
-  word-break: break-all;
-  text-align: center;
-  font-family: 'JetBrains Mono';
-  width: 300px;
-  white-space: normal;
-  line-height: 24px;
-
-  & > svg {
-    margin-left: 4px;
-    vertical-align: middle;
-  }
-}
-
-.addressItem {
-  display: flex;
-  gap: 8px;
-  .addressContent {
-    height: 56px;
-    display: flex;
-
-    & > span {
-      line-height: 56px;
-      font-family: 'JetBrains Mono';
-    }
-
-    &:hover {
-      color: var(--activity-color);
-    }
-  }
-}
-
-.hash {
+.address {
   font-family: 'JetBrains Mono';
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  & > svg {
+    cursor: pointer;
+    margin-left: 4px;
+  }
 }
 
 .tabsClassName {
@@ -122,4 +88,39 @@
       }
     }
   }
+}
+
+.income {
+  display: flex;
+  align-items: center;
+
+  .incomeCopy {
+    height: 20px;
+    line-height: 20px;
+    cursor: pointer;
+  }
+
+  & > svg {
+    margin-left: 8px;
+    cursor: pointer;
+  }
+}
+
+.amount {
+  height: 32px;
+  line-height: 32px;
+}
+
+.addressTips {
+  display: inline-block;
+  line-height: 58px;
+  cursor: pointer;
+}
+
+.copyTableAddress {
+  @include copyAddress;
+}
+
+.scriptTag:hover {
+  color: var(--primary-color);
 }

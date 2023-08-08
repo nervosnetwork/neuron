@@ -36,7 +36,7 @@ const PasswordRequest = () => {
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest: { walletID = '', actionType = null, multisigConfig },
+      passwordRequest: { walletID = '', actionType = null, multisigConfig, onSuccess },
     },
     settings: { wallets = [] },
     experimental,
@@ -68,6 +68,7 @@ const PasswordRequest = () => {
       case 'send-ckb-asset':
       case 'send-acp-ckb-to-new-cell':
       case 'send-acp-sudt-to-new-cell':
+      case 'transfer-to-sudt':
       case 'send-sudt':
         return OfflineSignType.SendSUDT
       case 'unlock':
@@ -108,6 +109,7 @@ const PasswordRequest = () => {
       'unlock',
       'create-sudt-account',
       'send-sudt',
+      'transfer-to-sudt',
       'send-ckb-asset',
       'send-acp-ckb-to-new-cell',
       'send-acp-sudt-to-new-cell',
@@ -131,6 +133,10 @@ const PasswordRequest = () => {
       }
       const handleSendTxRes = ({ status }: { status: number }) => {
         if (isSuccessResponse({ status })) {
+          if (onSuccess) {
+            onSuccess()
+            return
+          }
           navigate(RoutePath.History)
         } else if (status === ErrorCode.PasswordIncorrect) {
           throw new PasswordIncorrectException()
@@ -201,6 +207,7 @@ const PasswordRequest = () => {
                   type: AppActions.SetGlobalDialog,
                   payload: 'unlock-success',
                 })
+                onSuccess?.()
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -220,7 +227,8 @@ const PasswordRequest = () => {
           case 'send-ckb-asset':
           case 'send-acp-ckb-to-new-cell':
           case 'send-acp-sudt-to-new-cell':
-          case 'send-sudt': {
+          case 'send-sudt':
+          case 'transfer-to-sudt': {
             let skipLastInputs = true
             if (actionType === 'send-acp-sudt-to-new-cell' || actionType === 'send-acp-ckb-to-new-cell') {
               skipLastInputs = false
@@ -385,6 +393,7 @@ const PasswordRequest = () => {
           'unlock',
           'create-sudt-account',
           'send-sudt',
+          'transfer-to-sudt',
           'send-acp-ckb-to-new-cell',
           'send-acp-sudt-to-new-cell',
           'send-cheque',

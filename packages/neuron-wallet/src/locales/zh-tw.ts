@@ -74,7 +74,7 @@ export default {
       'wallet-password-more-than-max-length': '密碼不能超過{{maxPasswordLength}}字元。',
       'wallet-password-letter-complexity': '密碼需至少包含大寫字母、小寫字母、數位、特殊符號其中三類。',
       'current-wallet-not-set': '未設定當前錢包。',
-      'incorrect-password': '密碼不正確。',
+      'incorrect-password': '密碼错误',
       'invalid-address': '地址 {{address}} 無效。',
       'codehash-not-loaded': 'codehash 還未加載完成。',
       'wallet-not-found': '未找到錢包 {{id}}。',

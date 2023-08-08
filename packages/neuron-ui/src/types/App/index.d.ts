@@ -81,6 +81,7 @@ declare namespace State {
     price: string
     description: string
     generatedTx: GeneratedTx | null
+    isSendMax: boolean
   }
 
   interface Popup {
@@ -97,6 +98,7 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-ckb-asset'
       | 'send-sudt'
+      | 'transfer-to-sudt'
       | 'send-acp-sudt-to-new-cell'
       | 'send-acp-ckb-to-new-cell'
       | 'send-cheque'
@@ -118,6 +120,7 @@ declare namespace State {
       n: number
       blake160s: string[]
     }
+    onSuccess?: () => void
   }
 
   interface SUDTAccount {
@@ -141,7 +144,7 @@ declare namespace State {
     onCancel?: () => void
   } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
-  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn' }
+  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn'; index: number }
 
   type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
 

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { ckbCore } from 'services/chain'
 import { getSUDTAccountList } from 'services/remote'
 import { NeuronWalletActions, useDispatch } from 'states'
@@ -15,8 +14,32 @@ import {
   useDialogWrapper,
   useDidMount,
 } from 'utils'
+import { TFunction } from 'i18next'
 import { MILLISECONDS, MILLISECONDS_PER_DAY } from 'utils/const'
 import { AssetInfo, ChequeAssetInfo, NFTType } from '.'
+
+export interface SpecialAssetCell {
+  blockHash: string
+  blockNumber: string
+  capacity: string
+  customizedAssetInfo: AssetInfo
+  daoData: string | null
+  data: string
+  lock: {
+    args: string
+    codeHash: string
+    hashType: 'type' | 'data'
+  }
+  lockHash: string
+  multiSignBlake160: string
+  outPoint: {
+    index: string
+    txHash: string
+  }
+  status: 'live' | 'dead'
+  timestamp: string
+  type: CKBComponents.Script | null
+}
 
 export const useMigrate = () => {
   const { openDialog, dialogRef, closeDialog } = useDialogWrapper()
@@ -90,96 +113,96 @@ export const useGetAssetAccounts = (walletID: string) => {
 }
 
 interface SpecialAssetColumnInfoProps {
-  cell: CKBComponents.CellOutput & {
-    data: string
-  }
-  datetime: number
   epoch: string
-  assetInfo: AssetInfo
   bestKnownBlockTimestamp: number
   tokenInfoList: Array<Controller.GetTokenInfoList.TokenInfo>
+  t: TFunction
 }
 
-export const useGetSpecialAssetColumnInfo = ({
-  cell: { capacity, lock, type, data },
-  datetime,
+export const useSpecialAssetColumnInfo = ({
   epoch,
-  assetInfo,
   bestKnownBlockTimestamp,
   tokenInfoList,
+  t,
 }: SpecialAssetColumnInfoProps) => {
-  const [t] = useTranslation()
+  return useCallback(
+    (item: SpecialAssetCell) => {
+      const { timestamp, customizedAssetInfo: assetInfo, capacity, lock, type, data } = item
+      const datetime = +timestamp
 
-  let targetTime: undefined | number
-  let status:
-    | 'user-defined-asset'
-    | 'locked-asset'
-    | 'claim-asset'
-    | 'withdraw-asset'
-    | 'transfer-nft'
-    | 'user-defined-token' = 'user-defined-asset'
-  let epochsInfo: Record<'target' | 'current', number> | undefined
-  let amount: string = `${shannonToCKBFormatter(capacity)} CKB`
+      let targetTime: undefined | number
+      let status:
+        | 'user-defined-asset'
+        | 'locked-asset'
+        | 'claim-asset'
+        | 'withdraw-asset'
+        | 'transfer-nft'
+        | 'user-defined-token' = 'user-defined-asset'
+      let epochsInfo: Record<'target' | 'current', number> | undefined
+      let amount: string = `${shannonToCKBFormatter(capacity)} CKB`
 
-  switch (assetInfo.lock) {
-    case PresetScript.Locktime: {
-      const targetEpochInfo = epochParser(ckbCore.utils.toUint64Le(`0x${lock.args.slice(-16)}`))
-      const currentEpochInfo = epochParser(epoch)
-      const targetEpochFraction =
-        Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
-      epochsInfo = {
-        target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
-        current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
-      }
-      targetTime = bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MILLISECONDS
-      if (epochsInfo.target > epochsInfo.current) {
-        status = 'locked-asset'
-      } else {
-        status = 'claim-asset'
-      }
-      break
-    }
-    case PresetScript.Cheque: {
-      status = (assetInfo as ChequeAssetInfo).data === 'claimable' ? 'claim-asset' : 'withdraw-asset'
-
-      if (status === 'withdraw-asset') {
-        targetTime = datetime + MILLISECONDS_PER_DAY
-      }
-
-      try {
-        const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
-        if (!tokenInfo) {
-          throw new Error('Token info not found')
+      switch (assetInfo.lock) {
+        case PresetScript.Locktime: {
+          const targetEpochInfo = epochParser(ckbCore.utils.toUint64Le(`0x${lock.args.slice(-16)}`))
+          const currentEpochInfo = epochParser(epoch)
+          const targetEpochFraction =
+            Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
+          epochsInfo = {
+            target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
+            current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
+          }
+          targetTime = bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MILLISECONDS
+          if (epochsInfo.target > epochsInfo.current) {
+            status = 'locked-asset'
+          } else {
+            status = 'claim-asset'
+          }
+          break
         }
-        const balance = BigInt(toUint128Le(data)).toString()
-        amount = `${sudtValueToAmount(balance, tokenInfo.decimal)} ${tokenInfo.symbol}`
-      } catch {
-        amount = 'sUDT Token'
+        case PresetScript.Cheque: {
+          status = (assetInfo as ChequeAssetInfo).data === 'claimable' ? 'claim-asset' : 'withdraw-asset'
+
+          if (status === 'withdraw-asset') {
+            targetTime = datetime + MILLISECONDS_PER_DAY
+          }
+
+          try {
+            const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
+            if (!tokenInfo) {
+              throw new Error('Token info not found')
+            }
+            const balance = BigInt(toUint128Le(data)).toString()
+            amount = `${sudtValueToAmount(balance, tokenInfo.decimal)} ${tokenInfo.symbol}`
+          } catch {
+            amount = 'sUDT Token'
+          }
+          break
+        }
+        case PresetScript.SUDT: {
+          status = 'user-defined-token'
+          const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
+          const amountInfo = getSUDTAmount({ tokenInfo, data })
+          amount = amountInfo.amount
+          break
+        }
+        default: {
+          // ignore
+        }
       }
-      break
-    }
-    case PresetScript.SUDT: {
-      status = 'user-defined-token'
-      const tokenInfo = tokenInfoList.find(info => info.tokenID === type?.args)
-      const amountInfo = getSUDTAmount({ tokenInfo, data })
-      amount = amountInfo.amount
-      break
-    }
-    default: {
-      // ignore
-    }
-  }
 
-  const isLockedCheque = status === 'withdraw-asset' && targetTime && Date.now() < targetTime
-  const isNFTTransferable = assetInfo.type === NFTType.NFT && assetInfo.data === 'transferable'
-  const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
+      const isLockedCheque = status === 'withdraw-asset' && targetTime && Date.now() < targetTime
+      const isNFTTransferable = assetInfo.type === NFTType.NFT && assetInfo.data === 'transferable'
+      const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
 
-  if (assetInfo.type === NFTType.NFT) {
-    amount = nftFormatter(type?.args)
-    status = 'transfer-nft'
-  } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
-    amount = t('special-assets.unknown-asset')
-  }
+      if (assetInfo.type === NFTType.NFT) {
+        amount = nftFormatter(type?.args)
+        status = 'transfer-nft'
+      } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
+        amount = t('special-assets.unknown-asset')
+      }
 
-  return { amount, status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo }
+      return { amount, status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo }
+    },
+    [epoch, bestKnownBlockTimestamp, tokenInfoList, t]
+  )
 }

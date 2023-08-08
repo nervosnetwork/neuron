@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Pagination from 'widgets/Pagination'
 import Table from 'widgets/Table'
 import Button from 'widgets/Button'
+import Toast from 'widgets/Toast'
 import {
   unlockSpecialAsset,
   getSpecialAssets,
@@ -35,7 +36,9 @@ import SUDTMigrateToNewAccountDialog from 'components/SUDTMigrateToNewAccountDia
 import SUDTMigrateToExistAccountDialog from 'components/SUDTMigrateToExistAccountDialog'
 import PageContainer from 'components/PageContainer'
 import NFTSend from 'components/NFTSend'
-import { useGetAssetAccounts, useGetSpecialAssetColumnInfo } from './hooks'
+import Tooltip from 'widgets/Tooltip'
+import TableNoData from 'widgets/Icons/TableNoData.png'
+import { useGetAssetAccounts, useSpecialAssetColumnInfo, SpecialAssetCell } from './hooks'
 
 import styles from './specialAssetList.module.scss'
 
@@ -69,29 +72,6 @@ export type AssetInfo = LocktimeAssetInfo | ChequeAssetInfo | UnknownAssetInfo |
 
 const { PAGE_SIZE } = CONSTANTS
 
-export interface SpecialAssetCell {
-  blockHash: string
-  blockNumber: string
-  capacity: string
-  customizedAssetInfo: AssetInfo
-  daoData: string | null
-  data: string
-  lock: {
-    args: string
-    codeHash: string
-    hashType: 'type' | 'data'
-  }
-  lockHash: string
-  multiSignBlake160: string
-  outPoint: {
-    index: string
-    txHash: string
-  }
-  status: 'live' | 'dead'
-  timestamp: string
-  type: CKBComponents.Script | null
-}
-
 const SpecialAssetList = () => {
   const [t] = useTranslation()
   const [loaded, setLoaded] = useState(false)
@@ -121,6 +101,7 @@ const SpecialAssetList = () => {
     | undefined
   >()
   const [migrateTokenInfo, setMigrateTokenInfo] = useState<Controller.GetTokenInfoList.TokenInfo | undefined>()
+  const [notice, setNotice] = useState('')
 
   const onClickMigrate = useCallback(
     (type: string) => {
@@ -139,22 +120,14 @@ const SpecialAssetList = () => {
     [setIsMigrateDialogOpen, setIsNewAccountDialogOpen, setIsExistAccountDialogOpen]
   )
 
-  const onCloseDialog = useCallback(
-    (type?: string) => {
-      if (type === 'existAccount') {
-        setIsExistAccountDialogOpen(false)
-        setIsMigrateDialogOpen(true)
-      } else {
-        setIsNewAccountDialogOpen(false)
-        setIsExistAccountDialogOpen(false)
-        setMigrateCell(undefined)
-      }
-    },
-    [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setMigrateCell]
-  )
+  const onCloseDialog = useCallback(() => {
+    setIsExistAccountDialogOpen(false)
+    setIsNewAccountDialogOpen(false)
+    setIsMigrateDialogOpen(true)
+  }, [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setIsMigrateDialogOpen])
 
   const {
-    app: { epoch, globalDialog, pageNotice },
+    app: { epoch },
     wallet: { id },
     settings: { networks },
     chain: {
@@ -172,62 +145,15 @@ const SpecialAssetList = () => {
   )
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)
   const accountNames = useMemo(() => sUDTAccounts.filter(v => !!v.accountName).map(v => v.accountName!), [sUDTAccounts])
-  const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
-    ? {
-        ...accountToClaim.account,
-        isMainnet,
-        accountId: '',
-        tokenId: accountToClaim.account.tokenID,
-        accountName: '',
-        tokenName: (accountToClaim.account.tokenName || foundTokenInfo?.tokenName) ?? '',
-        symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
-        decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
-        isCKB: false,
-        onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
-          const params: any = accountToClaim?.account || {}
-          Object.keys(info).forEach(key => {
-            if (
-              info[key as keyof typeof info] !==
-              accountToClaim?.account[key as keyof Controller.GenerateClaimChequeTransaction.AssetAccount]
-            ) {
-              params[key] = info[key as keyof typeof info]
-            }
-          })
-          dispatch({
-            type: AppActions.UpdateExperimentalParams,
-            payload: { tx: accountToClaim.tx, assetAccount: params },
-          })
-          dispatch({
-            type: AppActions.RequestPassword,
-            payload: { walletID: id, actionType: 'create-account-to-claim-cheque' },
-          })
-          setAccountToClaim(null)
-          return Promise.resolve(true)
-        },
-        onCancel: () => {
-          setAccountToClaim(null)
-        },
-        existingAccountNames: accountNames.filter(name => name !== accountToClaim.account.accountName),
-      }
-    : undefined
 
   useGetAssetAccounts(id)
 
-  const handleGetSpecialAssetColumnInfo = useCallback(
-    (item: SpecialAssetCell) => {
-      const { timestamp, customizedAssetInfo, capacity, lock, type, data } = item
-
-      return useGetSpecialAssetColumnInfo({
-        cell: { capacity, lock, type, data },
-        datetime: +timestamp,
-        epoch,
-        assetInfo: customizedAssetInfo,
-        bestKnownBlockTimestamp,
-        tokenInfoList,
-      })
-    },
-    [epoch, bestKnownBlockTimestamp, tokenInfoList, useGetSpecialAssetColumnInfo]
-  )
+  const handleGetSpecialAssetColumnInfo = useSpecialAssetColumnInfo({
+    epoch,
+    bestKnownBlockTimestamp,
+    tokenInfoList,
+    t,
+  })
 
   const onViewDetail = useCallback(
     (item: SpecialAssetCell) => {
@@ -281,11 +207,58 @@ const SpecialAssetList = () => {
     fetchList(id, no)
   }, [search, id, dispatch, fetchList])
 
-  useEffect(() => {
-    if (globalDialog === 'unlock-success') {
+  const handleActionSuccess = useCallback(
+    text => {
+      setNotice(text)
       fetchList(id, pageNo)
-    }
-  }, [globalDialog, fetchList, id, pageNo])
+    },
+    [setNotice, fetchList, id, pageNo]
+  )
+
+  const updateAccountDialogProps: SUDTUpdateDialogProps | undefined = accountToClaim?.account
+    ? {
+        ...accountToClaim.account,
+        isMainnet,
+        accountId: '',
+        tokenId: accountToClaim.account.tokenID,
+        accountName: '',
+        tokenName: (accountToClaim.account.tokenName || foundTokenInfo?.tokenName) ?? '',
+        symbol: (accountToClaim.account.symbol || foundTokenInfo?.symbol) ?? '',
+        decimal: (accountToClaim.account.decimal || foundTokenInfo?.decimal) ?? '',
+        isCKB: false,
+        onSubmit: (info: Omit<TokenInfo, 'isCKB' | 'id'>) => {
+          const params: any = accountToClaim?.account || {}
+          Object.keys(info).forEach(key => {
+            if (
+              info[key as keyof typeof info] !==
+              accountToClaim?.account[key as keyof Controller.GenerateClaimChequeTransaction.AssetAccount]
+            ) {
+              params[key] = info[key as keyof typeof info]
+            }
+          })
+          dispatch({
+            type: AppActions.UpdateExperimentalParams,
+            payload: { tx: accountToClaim.tx, assetAccount: params },
+          })
+          dispatch({
+            type: AppActions.RequestPassword,
+            payload: {
+              walletID: id,
+              actionType: 'create-account-to-claim-cheque',
+              onSuccess: () => {
+                handleActionSuccess(t('special-assets.claim-cheque-success'))
+              },
+            },
+          })
+          setAccountToClaim(null)
+          return Promise.resolve(true)
+        },
+        onCancel: () => {
+          setAccountToClaim(null)
+        },
+        existingAccountNames: accountNames.filter(name => name !== accountToClaim.account.accountName),
+      }
+    : undefined
 
   const handleAction = useCallback(
     (e: React.BaseSyntheticEvent) => {
@@ -315,7 +288,16 @@ const SpecialAssetList = () => {
             } else {
               dispatch({ type: AppActions.UpdateExperimentalParams, payload: res.result })
             }
-            dispatch({ type: AppActions.RequestPassword, payload: { walletID: id, actionType } })
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: id,
+                actionType,
+                onSuccess: () => {
+                  handleActionSuccess(t(`special-assets.${actionType}-success`))
+                },
+              },
+            })
           } else {
             dispatch({
               type: AppActions.AddNotification,
@@ -368,11 +350,11 @@ const SpecialAssetList = () => {
           break
         }
         case PresetScript.SUDT: {
-          setIsMigrateDialogOpen(true)
           setMigrateCell(cell)
           const findTokenInfo = tokenInfoList.find(info => info.tokenID === cell.type?.args)
 
           setMigrateTokenInfo(findTokenInfo)
+          setIsMigrateDialogOpen(true)
           break
         }
         default: {
@@ -380,11 +362,11 @@ const SpecialAssetList = () => {
         }
       }
     },
-    [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList]
+    [cells, id, dispatch, setAccountToClaim, navigate, setIsMigrateDialogOpen, tokenInfoList, handleActionSuccess]
   )
 
   return (
-    <PageContainer head={t('special-assets.title')} notice={pageNotice} className={styles.container}>
+    <PageContainer head={t('special-assets.title')} className={styles.container}>
       {totalCount ? (
         <Table
           columns={[
@@ -421,44 +403,79 @@ const SpecialAssetList = () => {
                 const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
                   handleGetSpecialAssetColumnInfo(item)
 
+                if (isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable)) {
+                  return (
+                    <div className={styles.actionBtnBox}>
+                      <Button
+                        type="cancel"
+                        label={t('special-assets.view-details')}
+                        className={`${styles.actionBtn} ${styles.detailBtn}`}
+                        onClick={() => onViewDetail(item)}
+                      />
+                    </div>
+                  )
+                }
+
+                let tip = ''
+
+                const showTip =
+                  ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) || isLockedCheque
+
+                if (showTip) {
+                  if (customizedAssetInfo.lock !== PresetScript.Cheque || isLockedCheque) {
+                    tip = t(`special-assets.${status}-tooltip`, {
+                      epochs: epochsInfo?.target.toFixed(2),
+                      year: targetTime ? new Date(targetTime).getFullYear() : '',
+                      month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
+                      day: targetTime ? new Date(targetTime).getDate() : '',
+                      hour: targetTime ? new Date(targetTime).getHours() : '',
+                      minute: targetTime ? new Date(targetTime).getMinutes() : '',
+                    })
+                  }
+                  if (status === 'user-defined-token') {
+                    tip = t('special-assets.user-defined-asset-tooltip')
+                  }
+                  if (status === 'user-defined-token') {
+                    tip = t('special-assets.user-defined-token-tooltip')
+                  }
+                }
+
+                const btnDisabled =
+                  ['user-defined-asset', 'locked-asset'].includes(status) ||
+                  connectionStatus === ConnectionStatus.Offline ||
+                  isLockedCheque
+
                 return (
                   <div className={styles.actionBtnBox}>
-                    {isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable) ? null : (
+                    {showTip ? (
+                      <Tooltip tipClassName={styles.tip} tip={<p className={styles.tooltip}>{tip}</p>} showTriangle>
+                        <Button
+                          data-tx-hash={txHash}
+                          data-idx={index}
+                          data-status={status}
+                          type="primary"
+                          label={t(`special-assets.${status}`)}
+                          className={styles.actionBtn}
+                          onClick={handleAction}
+                          disabled={btnDisabled}
+                        />
+                      </Tooltip>
+                    ) : (
                       <Button
                         data-tx-hash={txHash}
                         data-idx={index}
+                        data-status={status}
                         type="primary"
                         label={t(`special-assets.${status}`)}
+                        className={styles.actionBtn}
                         onClick={handleAction}
-                        disabled={
-                          ['user-defined-asset', 'locked-asset'].includes(status) ||
-                          connectionStatus === ConnectionStatus.Offline ||
-                          isLockedCheque
-                        }
-                        className={`${styles.actionBtn} ${
-                          ['user-defined-asset', 'locked-asset', 'user-defined-token'].includes(status) ||
-                          isLockedCheque
-                            ? styles.hasTooltip
-                            : ''
-                        }`}
-                        data-tooltip={
-                          customizedAssetInfo.lock === PresetScript.Cheque && !isLockedCheque
-                            ? null
-                            : t(`special-assets.${status}-tooltip`, {
-                                epochs: epochsInfo?.target.toFixed(2),
-                                year: targetTime ? new Date(targetTime).getFullYear() : '',
-                                month: targetTime ? new Date(targetTime).getMonth() + 1 : '',
-                                day: targetTime ? new Date(targetTime).getDate() : '',
-                                hour: targetTime ? new Date(targetTime).getHours() : '',
-                                minute: targetTime ? new Date(targetTime).getMinutes() : '',
-                              })
-                        }
+                        disabled={btnDisabled}
                       />
                     )}
                     <Button
-                      type="default"
+                      type="cancel"
                       label={t('special-assets.view-details')}
-                      className={styles.actionBtn}
+                      className={`${styles.actionBtn} ${styles.detailBtn}`}
                       onClick={() => onViewDetail(item)}
                     />
                   </div>
@@ -470,8 +487,12 @@ const SpecialAssetList = () => {
           noDataContent={t('overview.no-recent-activities')}
         />
       ) : null}
-      {totalCount || !loaded ? null : <div className={styles.noItems}>{t('special-assets.no-special-assets')}</div>}
-
+      {totalCount || !loaded ? null : (
+        <div className={styles.noRecords}>
+          <img src={TableNoData} alt="No Data" />
+          {t('special-assets.no-special-assets')}
+        </div>
+      )}
       <div className={styles.pagination}>
         {totalCount ? (
           <Pagination
@@ -487,40 +508,43 @@ const SpecialAssetList = () => {
 
       {updateAccountDialogProps ? <SUDTUpdateDialog {...updateAccountDialogProps} /> : null}
 
-      {migrateCell && (
+      {migrateCell && isMigrateDialogOpen ? (
         <SUDTMigrateDialog
           cell={migrateCell}
           openDialog={onClickMigrate}
-          isDialogOpen={isMigrateDialogOpen}
           onCancel={() => setIsMigrateDialogOpen(false)}
         />
-      )}
+      ) : null}
 
-      {migrateCell && (
+      {migrateCell && isNewAccountDialogOpen ? (
         <SUDTMigrateToNewAccountDialog
           cell={migrateCell}
           sUDTAccounts={sUDTAccounts}
           walletID={id}
           tokenInfo={migrateTokenInfo}
-          isDialogOpen={isNewAccountDialogOpen}
           onCancel={onCloseDialog}
+          onSuccess={handleActionSuccess}
         />
-      )}
+      ) : null}
 
-      {migrateCell && (
+      {migrateCell && isExistAccountDialogOpen ? (
         <SUDTMigrateToExistAccountDialog
           cell={migrateCell}
           tokenInfo={migrateTokenInfo}
           sUDTAccounts={sUDTAccounts}
           isMainnet={isMainnet}
           walletID={id}
-          isDialogOpen={isExistAccountDialogOpen}
-          onCancel={() => onCloseDialog('existAccount')}
+          onCancel={onCloseDialog}
           isLightClient={isLightClient}
+          onSuccess={handleActionSuccess}
         />
-      )}
+      ) : null}
 
-      {nFTSendCell ? <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} /> : null}
+      {nFTSendCell ? (
+        <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} onSuccess={handleActionSuccess} />
+      ) : null}
+
+      <Toast content={notice} onDismiss={() => setNotice('')} />
     </PageContainer>
   )
 }

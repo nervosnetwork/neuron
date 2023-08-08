@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 
 import styles from './table.module.scss'
@@ -80,9 +80,9 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                       <div className={styles.headWithBalance} style={{ justifyContent: align }}>
                         {title}
                         {showBalance ? (
-                          <PasswordShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                          <BalanceShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
                         ) : (
-                          <PasswordHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                          <BalanceHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
                         )}
                       </div>
                     ) : (
@@ -94,7 +94,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
             )}
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{ cursor: onRowClick ? 'pointer' : undefined }}>
           {dataSource.map((item, idx) => {
             return (
               <>
@@ -106,17 +106,20 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                   data-idx={idx}
                   data-is-expand={expandedRow === idx}
                 >
-                  {columnList.map(({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName }) => (
-                    <td
-                      align={align ?? 'left'}
-                      key={key ?? dataIndex}
-                      className={`${tdClassName ?? bodyTdClassName} ${
-                        expandedRow === idx && rowExtendRender ? styles.noBorder : ''
-                      }`}
-                    >
-                      {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
-                    </td>
-                  ))}
+                  {columnList.map(
+                    ({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName, width }) => (
+                      <td
+                        align={align ?? 'left'}
+                        key={key ?? dataIndex}
+                        width={width}
+                        className={`${tdClassName ?? bodyTdClassName} ${
+                          expandedRow === idx && rowExtendRender ? styles.noBorder : ''
+                        }`}
+                      >
+                        {render ? render(item[dataIndex], idx, item, showBalance) : item[dataIndex]}
+                      </td>
+                    )
+                  )}
                 </tr>
                 {expandedRow === idx && rowExtendRender?.(item, idx)}
               </>

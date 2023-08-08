@@ -27,7 +27,8 @@
     "network-status": {
       "tooltip": {
         "block-synced": "Block Synced",
-        "looking-valid-target": "Looking for assumed valid target"
+        "looking-valid-target": "Looking for assumed valid target",
+        "set-start-block-number": "Set start block number"
       },
       "migrating": "migrating..."
     },
@@ -69,7 +70,7 @@
         "label": "Status:",
         "connect": "Connected, ready for signing.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
@@ -89,14 +90,14 @@
         "label": "Status:",
         "connect": "Connected, ready for verifying.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "actions": {
         "close": "Close",
         "rescan": "Reconnect",
         "copy-address": "Copy Address",
         "verify": "Verify Address",
-        "verify-again": "Verify Again"
+        "finish": "Ok"
       }
     },
     "offline-sign": {
@@ -462,6 +463,9 @@
       "send-sudt": {
         "title": "Send sUDT"
       },
+      "transfer-to-sudt": {
+        "title": "Send to sUDT account"
+      },
       "send-ckb-asset": {
         "title": "Send CKB"
       },
@@ -589,7 +593,7 @@
         "100": "Amount is not enough.",
         "101": "The amount {{amount}} CKB is too small, please enter an amount no less than {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
-        "103": "$t(messages.fields.keystore-password) is incorrect.",
+        "103": "$t(messages.fields.keystore-password) is incorrect",
         "104": "Fail to connect to the node, please restart Neuron.",
         "105": "You need more capacities for change (more than 61 CKBytes).",
         "106": "You need more capacities for change (more than 61 CKBytes), or slide to the end to send all your balance.",
@@ -604,7 +608,7 @@
         "115": "You need more capacities for change (more than 61 CKBytes), or click 'Max' button to send all your balance.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) is used.",
-        "203": "$t(messages.fields.{{fieldName}}) is too long, it should be shorter than or equal to {{length}}.",
+        "203": "$t(messages.fields.{{fieldName}}) should be shorter than or equal to {{length}}",
         "204": "$t(messages.fields.{{fieldName}}) is too short, it should be longer than or equal to {{length}}.",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid.",
         "206": "$t(messages.fields.{{fieldName}}) is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
@@ -665,7 +669,7 @@
       "cancel": "Cancel",
       "proceed": "Proceed",
       "compensation": "Compensation",
-      "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
+      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days} days).",
       "deposit-dialog-title": "Deposit",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. <br />Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
@@ -683,7 +687,7 @@
         "deposited": "Deposited",
         "withdrawn": "Withdrawn",
         "unlocked": "Unlocked",
-        "tx-record": "Transaction Record",
+        "view-tx-detail": "View transaction detail",
         "locked-period": "Locked Period",
         "compensated-period": "Compensation Period",
         "days-hours": "{{days}} days {{hours}} hours",
@@ -740,7 +744,7 @@
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
-      "install-update": "Install Update",
+      "install-update": "Immediate Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
     },
@@ -886,13 +890,22 @@
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
       "transfer-nft": "Send",
-      "user-defined-token": "Migrate"
+      "user-defined-token": "Migrate",
+      "transfer-nft-success": "Transfer of assets successful",
+      "migrate-sudt-success": "Conversion to new sUDT asset account successful",
+      "send-sudt-success": "Transfer to sUDT account successful",
+      "unlock-success": "Asset claimed, go to transaction history for details",
+      "withdraw-cheque-success": "Asset withdrawn, go to transaction history for details",
+      "claim-cheque-success": "Asset claimed, go to transaction history for details"
     },
     "migrate-sudt": {
       "title": "Migrate to a sUDT Asset Account",
       "choose-title": "Migration mode",
       "next": "Next",
       "back": "Back",
+      "input-token": "Please input token name",
+      "input-symbol": "Please input symbol",
+      "input-decimal": "Please input decimal",
       "turn-into-new-account": {
         "title": "Turn into a new sUDT Asset Account",
         "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
@@ -918,6 +931,8 @@
       "view-in-explorer": "Explorer"
     },
     "s-udt": {
+      "edit-account-success": "Edit account information successfully",
+      "create-account-success": "Asset account created successfully",
       "account-list": {
         "title": "Asset Accounts",
         "no-asset-accounts": "No sUDT asset has been detected",
@@ -946,6 +961,13 @@
         "back": "Back",
         "occupy-142-ckb": "Occupies at least 142 CKBytes",
         "occupy-61-ckb": "Occupies at least 61 CKBytes",
+        "input": {
+          "account-name": "Please input account name",
+          "token-id": "Please input token ID",
+          "token-name": "Please input token name",
+          "symbol": "Please input symbol",
+          "decimal": "Please input decimal"
+        },
         "placeholder": {
           "token-id": "Token ID is the Args of the sUDT Type Script, which is the same as the lock hash of the token issuer."
         }
@@ -1110,6 +1132,13 @@
       "countDownTip": "The price will refresh after {{countDown}} seconds",
       "switchToCustomPrice": "Switch to custom price",
       "switchToPrice": "Switch to price"
+    },
+    "set-start-block-number": {
+      "title": "Set the start block number",
+      "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
+      "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
+      "locate-first-tx": "Locate the first transaction",
+      "view-block": "View the block"
     }
   }
 }

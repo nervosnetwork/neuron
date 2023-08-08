@@ -32,6 +32,7 @@ export enum AppActions {
   UpdateSendOutput = 'updateSendOutput',
   UpdateSendPrice = 'updateSendPrice',
   UpdateSendDescription = 'updateSendDescription',
+  UpdateSendIsSendMax = 'updateSendIsSendMax',
   UpdateGeneratedTx = 'updateGeneratedTx',
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
@@ -72,6 +73,7 @@ export type StateAction =
   | { type: AppActions.UpdateSendOutput; payload: { idx: number; item: Partial<State.Output> } }
   | { type: AppActions.UpdateSendPrice; payload: string }
   | { type: AppActions.UpdateSendDescription; payload: string }
+  | { type: AppActions.UpdateSendIsSendMax; payload: boolean }
   | { type: AppActions.UpdateGeneratedTx; payload: State.GeneratedTx | null }
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
@@ -95,7 +97,7 @@ export type StateAction =
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: State.Experimental | null }
   | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
-  | { type: AppActions.SetPageNotice; payload?: State.PageNotice }
+  | { type: AppActions.SetPageNotice; payload?: Omit<State.PageNotice, 'index'> }
   | { type: AppActions.HideWaitForFullySynced }
   | { type: AppActions.GetFeeRateStats; payload: State.FeeRateStatsType }
   | { type: AppActions.UpdateCountDown; payload: number }
@@ -275,6 +277,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.app.send.description = action.payload
       break
     }
+    case AppActions.UpdateSendIsSendMax: {
+      state.app.send.isSendMax = action.payload
+      break
+    }
     case AppActions.UpdateGeneratedTx: {
       state.app.send.generatedTx = action.payload || null
       break
@@ -391,6 +397,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.SetPageNotice: {
       state.app.pageNotice = action.payload
+        ? {
+            ...action.payload,
+            index: (state.app.pageNotice?.index ?? 0) + 1,
+          }
+        : action.payload
       break
     }
     case AppActions.HideWaitForFullySynced: {

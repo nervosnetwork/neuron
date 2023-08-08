@@ -6,17 +6,12 @@ import LanguageDialog from 'components/LanguageDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { ReactComponent as VersionLogo } from 'widgets/Icons/VersionLogo.svg'
 import { ReactComponent as ArrowNext } from 'widgets/Icons/ArrowNext.svg'
-import {
-  checkForUpdates,
-  cancelCheckUpdates,
-  downloadUpdate,
-  cancelDownloadUpdate,
-  installUpdate,
-  getVersion,
-} from 'services/remote'
-import { uniformTimeFormatter, bytesFormatter } from 'utils'
+import { ReactComponent as Update } from 'widgets/Icons/Update.svg'
+import { cancelCheckUpdates, downloadUpdate, installUpdate, getVersion } from 'services/remote'
+import { uniformTimeFormatter, bytesFormatter, clsx } from 'utils'
 import { LanguageSelect } from 'widgets/Icons/icon'
 import styles from './generalSetting.module.scss'
+import { useCheckUpdate, useUpdateDownloadStatus } from './hooks'
 
 interface UpdateDownloadStatusProps {
   show: boolean
@@ -135,66 +130,47 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
   const [showLangDialog, setShowLangDialog] = useState(false)
   const [searchParams] = useSearchParams()
   const [errorMsg, setErrorMsg] = useState('')
-  const [dialogType, setDialogType] = useState<'' | 'checking' | 'updating' | 'updated'>('')
+  const { showCheckDialog, setShowCheckDialog, onCancelCheckUpdates } = useCheckUpdate()
+  const { version: newVersion, checking, downloadProgress } = updater
+  const { showUpdateDownloadStatus, openShowUpdateDownloadStatus, onCheckUpdate, onCancel } = useUpdateDownloadStatus({
+    setShowCheckDialog,
+    downloadProgress,
+  })
 
-  const version = useMemo(() => {
+  useEffect(() => {
+    if (showCheckDialog && newVersion) {
+      setShowCheckDialog(false)
+      openShowUpdateDownloadStatus()
+    }
+  }, [showCheckDialog, newVersion, openShowUpdateDownloadStatus, setShowCheckDialog])
+
+  const currentVersion = useMemo(() => {
     return getVersion()
   }, [])
 
   useEffect(() => {
     const checkUpdate = searchParams.get('checkUpdate')
     if (checkUpdate === '1') {
-      checkForUpdates()
+      onCheckUpdate()
     }
-  }, [searchParams, checkForUpdates])
+  }, [searchParams, onCheckUpdate])
 
   useEffect(() => {
     if (updater.errorMsg) {
       setErrorMsg(updater.errorMsg)
       cancelCheckUpdates()
-      return
     }
-    if (updater.isUpdated) {
-      setDialogType('updated')
-      return
-    }
-    if (updater.checking) {
-      setDialogType('checking')
-      return
-    }
-    if (updater.version || updater.downloadProgress > 0) {
-      setDialogType('updating')
-      return
-    }
-    setDialogType('')
-  }, [updater, setDialogType, setErrorMsg])
-
-  const handleUpdate = useCallback(
-    (e: React.SyntheticEvent) => {
-      const {
-        dataset: { method },
-      } = e.target as HTMLElement
-
-      if (method === 'cancelCheck') {
-        if (dialogType === 'checking') {
-          cancelCheckUpdates()
-        }
-        setDialogType('')
-      } else if (method === 'check') {
-        checkForUpdates()
-      }
-    },
-    [dialogType, setDialogType, cancelCheckUpdates, checkForUpdates]
-  )
+  }, [updater.errorMsg, setErrorMsg])
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
+      <div className={clsx(styles.content, `${newVersion ? styles.showVersion : ''}`)} data-new-version-tip="New">
         <p>
-          {t('settings.general.version')} v{version}
+          {t('settings.general.version')} v{newVersion || currentVersion}
         </p>
-        <button type="button" onClick={handleUpdate} data-method="check">
-          {t(`updates.check-updates`)} <ArrowNext />
+        <button type="button" onClick={newVersion ? openShowUpdateDownloadStatus : onCheckUpdate} data-method="check">
+          <Update />
+          {t(newVersion ? 'updates.install-update' : 'updates.check-updates')} <ArrowNext />
         </button>
       </div>
 
@@ -216,32 +192,28 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         title={t(`updates.check-updates`)}
         message={errorMsg}
         type="failed"
-        onCancel={() => setErrorMsg('')}
+        onCancel={() => {
+          setErrorMsg('')
+        }}
       />
 
       <Dialog
-        show={['checking', 'updated'].includes(dialogType)}
+        show={showCheckDialog}
         showCancel={false}
         showHeader={false}
-        confirmText={t(dialogType === 'checking' ? 'common.cancel' : 'common.ok')}
-        onConfirm={handleUpdate}
+        confirmText={t(checking ? 'common.cancel' : 'common.ok')}
+        onConfirm={onCancelCheckUpdates}
         className={styles.confirmDialog}
-        confirmProps={{
-          'data-method': 'cancelCheck',
-        }}
       >
         <div className={styles.wrap}>
           <VersionLogo />
-          <p>{t(dialogType === 'checking' ? 'updates.checking-updates' : 'updates.update-not-available')}</p>
+          <p>{t(checking || newVersion ? 'updates.checking-updates' : 'updates.update-not-available')}</p>
         </div>
       </Dialog>
 
       <UpdateDownloadStatus
-        show={dialogType === 'updating'}
-        onCancel={() => {
-          cancelDownloadUpdate()
-          setDialogType('')
-        }}
+        show={showUpdateDownloadStatus}
+        onCancel={onCancel}
         progress={updater.downloadProgress}
         progressInfo={updater.progressInfo}
         newVersion={updater.version}

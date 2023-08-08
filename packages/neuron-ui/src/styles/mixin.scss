@@ -213,3 +213,54 @@
     }
   }
 }
+
+@mixin copyAddress {
+  word-break: break-all;
+  text-align: center;
+  font-family: 'JetBrains Mono';
+  width: 300px;
+  white-space: normal;
+  line-height: 24px;
+
+  & > svg {
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+}
+
+@keyframes hidden {
+  from {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  to {
+    visibility: visible;
+    opacity: 0;
+  }
+}
+
+@mixin notice-animation {
+  position: absolute;
+  background-color: var(--notice-background-color);
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: center;
+  padding: 14px 36px;
+  animation: 2s hidden 1 ease-in-out;
+  visibility: hidden;
+  justify-content: center;
+  & > svg {
+    margin-right: 4px;
+  }
+}
+
+@mixin dialog-copy-animation {
+  @include notice-animation;
+  position: fixed;
+  top: 11px;
+  z-index: 100;
+}

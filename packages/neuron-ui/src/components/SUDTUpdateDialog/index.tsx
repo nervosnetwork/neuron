@@ -178,6 +178,7 @@ const SUDTUpdateDialog = ({
                 autoFocus={!idx}
                 error={tokenErrors[field.key]}
                 className={styles.fieldItem}
+                placeholder={t(`s-udt.create-dialog.input.${field.label}`)}
               />
             )
           })}

@@ -37,6 +37,7 @@ const reducer: React.Reducer<typeof initState, { type: Fields; payload: string }
 const NFTSend = ({
   onCancel,
   cell,
+  onSuccess,
 }: {
   onCancel: () => void
   cell: {
@@ -46,6 +47,7 @@ const NFTSend = ({
       txHash: string
     }
   }
+  onSuccess: (text: string) => void
 }) => {
   const { nftId, outPoint } = cell
   const {
@@ -103,6 +105,9 @@ const NFTSend = ({
           payload: {
             walletID: walletId as string,
             actionType: 'send-nft',
+            onSuccess: () => {
+              onSuccess(t('special-assets.transfer-nft-success'))
+            },
           },
         })
 

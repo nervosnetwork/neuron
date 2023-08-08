@@ -27,7 +27,8 @@
     "network-status": {
       "tooltip": {
         "block-synced": "已同步区块",
-        "looking-valid-target": "寻找预设可信区块"
+        "looking-valid-target": "寻找预设可信区块",
+        "set-start-block-number": "设置同步起始区块"
       },
       "migrating": "正在数据迁移..."
     },
@@ -64,7 +65,7 @@
         "label": "状态：",
         "connect": "已连接",
         "user-input": "已连接，等待确认...",
-        "disconnect": "未连接，请检查设备连接。"
+        "disconnect": "未连接设备，请确认设备已连接并打开 Nervos 应用"
       },
       "actions": {
         "close": "关闭",
@@ -82,14 +83,14 @@
         "label": "状态：",
         "connect": "设备已连接，点击验证按钮进行地址验证",
         "user-input": "已连接，等待确认...",
-        "disconnect": "未连接，请检查设备连接。"
+        "disconnect": "未连接设备，请确认设备已连接并打开 Nervos 应用"
       },
       "actions": {
         "close": "取消",
         "reconnect": "连接设备",
         "copy-address": "复制地址",
         "verify": "地址验证",
-        "verify-again": "再次验证"
+        "finish": "完成"
       }
     },
     "offline-sign": {
@@ -317,7 +318,7 @@
       "cell-from-cellbase": "来自 Cellbase",
       "lock-script": "脚本锁定",
       "lock-script-title": "地址信息",
-      "deprecated-address-format": "废弃格式地址"
+      "deprecated-address-format": "已弃用格式的地址"
     },
     "addresses": {
       "title": "地址簿",
@@ -455,6 +456,9 @@
       "send-sudt": {
         "title": "发起 sUDT 交易"
       },
+      "transfer-to-sudt": {
+        "title": "转入 sUDT 账户"
+      },
       "send-ckb-asset": {
         "title": "发起 CKB 交易"
       },
@@ -582,7 +586,7 @@
         "100": "余额不足。",
         "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 {{required}} CKB 的值。",
         "102": "$t(messages.fields.{{fieldName}})无效。",
-        "103": "$t(messages.fields.keystore-password) 不正确。",
+        "103": "$t(messages.fields.keystore-password)错误",
         "104": "未连接到节点，请重启 Neuron。",
         "105": "您需要有足够的余额来支付找零（大于 61 CKBytes）。",
         "106": "您需要有足够的余额来支付找零（大于 61 CKBytes），或者拖动滑块到最右端发送全部余额。",
@@ -597,7 +601,7 @@
         "115": "您需要有足够的余额来支付找零（大于 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
-        "203": "$t(messages.fields.{{fieldName}})太长, 其长度应不超过 {{length}}。",
+        "203": "$t(messages.fields.{{fieldName}})长度最大不超过{{length}}个字符",
         "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短, 其长度应不小于 {{length}}。",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效。",
         "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其小数位应不超过 {{length}} 位。",
@@ -658,7 +662,7 @@
       "cancel": "取消",
       "proceed": "继续",
       "compensation": "锁定补贴",
-      "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(约 {{days}} 天)完成最终取出操作。",
+      "notice-wait-time": "注意: 您正在发起提取，最终取出操作需要等待 {{epochs}} epochs {{blocks}} 区块(约 {{days}} 天)。",
       "deposit-dialog-title": "存入",
       "deposit-terms": "Nervos DAO 需要 102 CKBytes 作为锁定记录的存储，这部分 CKBytes 是无法产生锁定补贴的。<br />请查看 <0>Nervos DAO RFC</0> 以了解 Nervos DAO 更多信息。",
       "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
@@ -676,7 +680,7 @@
         "deposited": "存入",
         "withdrawn": "发起提取",
         "unlocked": "解锁",
-        "tx-record": "交易记录",
+        "view-tx-detail": "查看交易详情",
         "locked-period": "锁定时间",
         "compensated-period": "补贴时间",
         "days-hours": "{{days}} 天 {{hours}} 小时",
@@ -685,7 +689,7 @@
       },
       "compensation-period": {
         "tooltip": {
-          "compensated-period": "已锁定时间",
+          "compensated-period": "补贴时间",
           "days-hours": "{{days}} 天 {{hours}} 小时",
           "immature-for-withdraw": "Nervos DAO 要求至少约 16 小时 (4 个 Epochs) 才能进行下一步操作",
           "normal": "补偿数量较低，不建议发起提现交易",
@@ -733,7 +737,7 @@
       "downloading-update": "正在下载更新...",
       "update-not-available": "当前是最新版本",
       "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
-      "install-update": "安装更新",
+      "install-update": "立即更新",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
       "quit-and-install": "安装并重启应用"
     },
@@ -879,13 +883,22 @@
       "experimental": "实验室",
       "unknown-asset": "未知资产",
       "transfer-nft": "转让",
-      "user-defined-token": "迁移"
+      "user-defined-token": "迁移",
+      "transfer-nft-success": "转让资产成功",
+      "migrate-sudt-success": "转换成新的 sUDT 资产账户成功",
+      "send-sudt-success": "转入 sUDT 账户成功",
+      "unlock-success": "资产已领取，可前往交易历史查看详情",
+      "withdraw-cheque-success": "资产已撤回，可前往交易历史查看详情",
+      "claim-cheque-success": "资产已领取，可前往交易历史查看详情"
     },
     "migrate-sudt": {
       "title": "迁移至 sUDT 资产账户",
       "choose-title": "选择迁移方式",
       "next": "下一步",
       "back": "上一步",
+      "input-token": "请输入代币名称",
+      "input-symbol": "请输入简称",
+      "input-decimal": "请输入小数位",
       "turn-into-new-account": {
         "title": "转换成新的 sUDT 资产账户",
         "sub-title": "将 sUDT 资产转换成 sUDT 资产账户, 至少占用 142 CKBytes",
@@ -911,6 +924,8 @@
       "view-in-explorer": "浏览器"
     },
     "s-udt": {
+      "edit-account-success": "编辑账户信息成功",
+      "create-account-success": "创建资产账户成功",
       "account-list": {
         "title": "资产账户",
         "no-asset-accounts": "尚未检索到您持有的 sUDT 资产",
@@ -938,6 +953,13 @@
         "back": "上一步",
         "occupy-142-ckb": "至少占用 142 CKBytes",
         "occupy-61-ckb": "至少占用 61 CKBytes",
+        "input": {
+          "account-name": "请输入账户名称",
+          "token-id": "请输入代币ID",
+          "token-name": "请输入代币名称",
+          "symbol": "请输入简称",
+          "decimal": "请输入小数位"
+        },
         "placeholder": {
           "token-id": "代币 ID 即 sUDT Type Script 的 Args，等同于该 token 发行者的 lock hash。"
         }
@@ -1102,6 +1124,13 @@
       "countDownTip": "单价将在{{countDown}}秒后刷新",
       "switchToCustomPrice": "切换到自定义价格",
       "switchToPrice": "切换到单价"
+    },
+    "set-start-block-number": {
+      "title": "设置同步起始区块",
+      "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
+      "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
+      "locate-first-tx": "定位第一笔交易",
+      "view-block": "查看区块"
     }
   }
 }

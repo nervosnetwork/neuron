@@ -8,21 +8,26 @@ type CopyZoneProps = React.PropsWithChildren<{
   content: string
   style?: React.CSSProperties
   className?: string
+  maskRadius?: number
 }>
-const CopyZone = ({ children, content, name, style, className = '' }: CopyZoneProps) => {
+const CopyZone = ({ children, content, name, style, className = '', maskRadius = 16 }: CopyZoneProps) => {
   const [t] = useTranslation()
   const [copied, setCopied] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const prompt = copied ? t('common.copied') : name || t(`common.copy`)
 
-  const onCopy = useCallback(() => {
-    setCopied(true)
-    window.navigator.clipboard.writeText(content)
-    clearTimeout(timer.current!)
-    timer.current = setTimeout(() => {
-      setCopied(false)
-    }, 1000)
-  }, [setCopied, content])
+  const onCopy = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.stopPropagation()
+      setCopied(true)
+      window.navigator.clipboard.writeText(content)
+      clearTimeout(timer.current!)
+      timer.current = setTimeout(() => {
+        setCopied(false)
+      }, 1000)
+    },
+    [setCopied, content]
+  )
 
   return (
     <div
@@ -34,7 +39,7 @@ const CopyZone = ({ children, content, name, style, className = '' }: CopyZonePr
       title={content}
     >
       {children}
-      <div className={styles.hoverShow}>
+      <div className={styles.hoverShow} style={{ borderRadius: `${maskRadius}px` }}>
         {copied ? <SuccessNoBorder className={styles.copyIcon} /> : <Copy className={styles.copyIcon} />}
         <span className={styles.copytext}>{prompt}</span>
       </div>

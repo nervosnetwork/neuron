@@ -36,6 +36,6 @@ export const getDeviceFirmwareVersion = remoteApi<Descriptor, Version>('get-devi
 export const getDeviceExtendedPublickey = remoteApi<void, ExtendedPublicKey>('get-device-extended-public-key')
 export const getDevicePublicKey = remoteApi<void, PublicKey>('get-device-public-key')
 export const connectDevice = remoteApi<DeviceInfo, void>('connect-device')
-export const createHardwareWallet = remoteApi<ExtendedPublicKey & { walletName: string }, void>(
+export const createHardwareWallet = remoteApi<ExtendedPublicKey & { walletName: string }, State.Wallet>(
   'create-hardware-wallet'
 )

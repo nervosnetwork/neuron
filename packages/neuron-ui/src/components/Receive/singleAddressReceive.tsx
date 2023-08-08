@@ -21,6 +21,9 @@ const SingleAddressReceive = ({ address, wallet }: { address: string; wallet: St
   const stopPropagation = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation()
   }, [])
+  const transformLabel = t(
+    isInShortFormat ? 'receive.turn-into-full-version-format' : 'receive.turn-into-deprecated-format'
+  )
   return (
     <div className={styles.singleAddressRoot}>
       {displayVerifyDialog && (
@@ -38,18 +41,19 @@ const SingleAddressReceive = ({ address, wallet }: { address: string; wallet: St
       <div className={styles.copyContainer}>
         <CopyZone content={showAddress} name={t('receive.copy-address')} className={styles.copyAddress}>
           {showAddress}
-          <button
-            type="button"
-            className={styles.addressToggle}
-            onClick={() => setIsInShortFormat(is => !is)}
-            title={t(isInShortFormat ? `receive.turn-into-full-version-format` : `receive.turn-into-deprecated-format`)}
-            onFocus={stopPropagation}
-            onMouseOver={stopPropagation}
-            onMouseUp={stopPropagation}
-          >
-            <AddressTransform />
-          </button>
         </CopyZone>
+        <button
+          type="button"
+          className={styles.addressToggle}
+          onClick={() => setIsInShortFormat(is => !is)}
+          title={transformLabel}
+          onFocus={stopPropagation}
+          onMouseOver={stopPropagation}
+          onMouseUp={stopPropagation}
+        >
+          <AddressTransform />
+          {transformLabel}
+        </button>
       </div>
       <Button
         type="primary"

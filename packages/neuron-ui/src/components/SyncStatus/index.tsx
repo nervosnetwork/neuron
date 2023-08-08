@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils'
 import { Confirming, NewTab } from 'widgets/Icons/icon'
 import { ReactComponent as UnexpandStatus } from 'widgets/Icons/UnexpandStatus.svg'
+import { ReactComponent as StartBlock } from 'widgets/Icons/StartBlock.svg'
 import Tooltip from 'widgets/Tooltip'
 import styles from './syncStatus.module.scss'
 
@@ -10,10 +11,14 @@ const SyncDetail = ({
   syncBlockNumbers,
   isLookingValidTarget,
   onOpenValidTarget,
+  isLightClient,
+  onOpenSetStartBlock,
 }: {
   syncBlockNumbers: string
   isLookingValidTarget: boolean
   onOpenValidTarget: (e: React.SyntheticEvent) => void
+  isLightClient: boolean
+  onOpenSetStartBlock: () => void
 }) => {
   const [t] = useTranslation()
   return (
@@ -26,7 +31,7 @@ const SyncDetail = ({
       {isLookingValidTarget && (
         <div
           role="link"
-          className={styles.lookingValidTarget}
+          className={styles.action}
           onClick={onOpenValidTarget}
           onKeyPress={onOpenValidTarget}
           tabIndex={-1}
@@ -34,6 +39,20 @@ const SyncDetail = ({
           <div>
             <span>{t('network-status.tooltip.looking-valid-target')}</span>
             <NewTab />
+          </div>
+        </div>
+      )}
+      {isLightClient && (
+        <div
+          role="link"
+          className={styles.action}
+          onClick={onOpenSetStartBlock}
+          onKeyPress={onOpenSetStartBlock}
+          tabIndex={-1}
+        >
+          <div>
+            <span>{t('network-status.tooltip.set-start-block-number')}</span>
+            <StartBlock />
           </div>
         </div>
       )}
@@ -49,6 +68,8 @@ const SyncStatus = ({
   isLookingValidTarget,
   onOpenValidTarget,
   isMigrate,
+  isLightClient,
+  onOpenSetStartBlock,
 }: React.PropsWithoutRef<{
   syncStatus: SyncStatusEnum
   connectionStatus: State.ConnectionStatus
@@ -57,12 +78,14 @@ const SyncStatus = ({
   isLookingValidTarget: boolean
   onOpenValidTarget: (e: React.SyntheticEvent) => void
   isMigrate: boolean
+  isLightClient: boolean
+  onOpenSetStartBlock: () => void
 }>) => {
   const [t] = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
-  const onChangeIsOpen = useCallback(() => {
-    setIsOpen(v => !v)
-  }, [setIsOpen])
+  const onVisibleChange = useCallback((v: boolean) => {
+    setIsOpen(v)
+  }, [])
 
   if (isMigrate) {
     return <span>{t('network-status.migrating')}</span>
@@ -91,20 +114,23 @@ const SyncStatus = ({
           syncBlockNumbers={syncBlockNumbers}
           isLookingValidTarget={isLookingValidTarget}
           onOpenValidTarget={onOpenValidTarget}
+          isLightClient={isLightClient}
+          onOpenSetStartBlock={onOpenSetStartBlock}
         />
       }
       trigger="click"
       className={styles.tipContainer}
       tipClassName={styles.tip}
+      onVisibleChange={onVisibleChange}
       showTriangle
     >
       {SyncStatusEnum.SyncCompleted === syncStatus ? (
-        <button className={styles.synced} onClick={onChangeIsOpen} type="button">
+        <button className={styles.synced} type="button">
           {t('sync.synced')}
           <UnexpandStatus className={styles.expand} data-is-open={isOpen} />
         </button>
       ) : (
-        <button onClick={onChangeIsOpen} className={styles.syncing} type="button">
+        <button className={styles.syncing} type="button">
           <Confirming className={styles.confirm} />
           {t('sync.syncing', { syncPercents })}
           <UnexpandStatus className={styles.expand} data-is-open={isOpen} />

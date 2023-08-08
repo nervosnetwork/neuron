@@ -39,7 +39,9 @@ const RfcLink = React.memo(() => (
     className={styles.rfcLink}
     aria-label="Nervos DAO RFC"
     title="Nervos DAO RFC"
-  />
+  >
+    Nervos DAO RFC
+  </button>
 ))
 
 const DepositDialog = ({

@@ -1,7 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { useOnLocaleChange, isMainnet as isMainnetUtil, shannonToCKBFormatter, useExitOnWalletChange } from 'utils'
+import {
+  useOnLocaleChange,
+  isMainnet as isMainnetUtil,
+  shannonToCKBFormatter,
+  useExitOnWalletChange,
+  useGoBack,
+} from 'utils'
 import { useState as useGlobalState, withProvider } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
@@ -135,10 +140,7 @@ const MultisigAddress = () => {
     return ''
   }, [multisigBanlances, sendAction.sendFromMultisig])
 
-  const navigate = useNavigate()
-  const onBack = useCallback(() => {
-    navigate(-1)
-  }, [navigate])
+  const onBack = useGoBack()
 
   return (
     <div>

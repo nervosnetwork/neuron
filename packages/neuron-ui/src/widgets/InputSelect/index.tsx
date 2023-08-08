@@ -20,6 +20,7 @@ export interface InputSelectProps {
   value?: string
   placeholder?: string
   inputDisabled?: boolean
+  error?: string
 }
 
 function parseValue(value: string, options: SelectOptions[]) {
@@ -27,7 +28,16 @@ function parseValue(value: string, options: SelectOptions[]) {
   return option?.value || value
 }
 
-const Select = ({ value, options, placeholder, disabled, onChange, className, inputDisabled }: InputSelectProps) => {
+const Select = ({
+  value,
+  options,
+  placeholder,
+  disabled,
+  onChange,
+  className,
+  inputDisabled,
+  error,
+}: InputSelectProps) => {
   const mounted = useRef(true)
   const root = useRef<HTMLDivElement>(null)
   const openRef = useRef<boolean>(false)
@@ -126,9 +136,11 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
         role="button"
         tabIndex={0}
         data-open={openRef.current}
+        data-has-error={!!error}
       >
         <input
           disabled={inputDisabled}
+          placeholder={placeholder}
           className={placeholderClass}
           onChange={onInputChange}
           value={value ?? innerValue}

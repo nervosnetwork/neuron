@@ -26,11 +26,13 @@
     font-size: 12px;
     line-height: 20px;
     font-weight: 500;
+    align-items: flex-start;
 
     & > svg {
       width: 14px;
       height: 14px;
       margin-right: 4px;
+      top: 2px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -61,12 +63,8 @@
     min-width: 80px;
   }
 
-  .addressType {
-    width: 100px;
-  }
-
   .balance {
-    padding-left: 48px;
+    padding-left: 26px;
   }
 
   .address {
@@ -113,6 +111,16 @@
     height: 56px;
     line-height: 56px;
     min-width: 100px;
+    .descTips {
+      @media screen and (max-width: 1400px) {
+        transform: translateX(-70%) !important;
+
+        & > div:nth-last-child(1) {
+          right: 25%;
+        }
+      }
+    }
+
     &:hover {
       color: var(--activity-color);
     }
@@ -260,10 +268,14 @@
 
   .copyContainer {
     width: 100%;
+    margin-bottom: 34px;
     text-align: center;
     .copyAddress {
       width: 450px;
-      margin: 16px 0 42px 0;
+      margin: 16px 0 0 0;
+      word-wrap: break-word;
+      font-family: 'JetBrains Mono';
+      line-height: 24px;
     }
   }
 
@@ -297,5 +309,16 @@
   }
   .copyAddress {
     margin: 16px 16px 10px 16px;
+  }
+}
+
+@media screen and (max-width: 1330px) {
+  .multiAddressRoot {
+    .balance {
+      padding-left: 18px;
+    }
+    .txCount {
+      padding-left: 64px;
+    }
   }
 }
