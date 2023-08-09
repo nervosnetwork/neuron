@@ -99,6 +99,7 @@ const MultiAddressReceive = ({
               }
               showTriangle
               isTriggerNextToChild
+              tipClassName={styles.addressTip}
             >
               <div className={styles.address}>
                 <span className={styles.overflow}>{itemAddress.slice(0, -6)}</span>

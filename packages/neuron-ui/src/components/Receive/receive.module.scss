@@ -130,6 +130,12 @@
     }
   }
 
+  .addressTip {
+    @media screen and (max-width: 1400px) {
+      transform: translateX(-40%) !important;
+    }
+  }
+
   .descTipRoot {
     position: relative;
     .autoHeight {
