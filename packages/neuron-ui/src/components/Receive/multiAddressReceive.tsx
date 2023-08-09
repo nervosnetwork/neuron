@@ -210,6 +210,7 @@ const MultiAddressReceive = ({
         dataSource={addresses}
         className={styles.addresses}
         isFixedTable
+        hasHoverTrBg={false}
       />
     </div>
   )

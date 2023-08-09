@@ -40,6 +40,7 @@ import styles from './history.module.scss'
 
 const History = () => {
   const {
+    app: { pageNotice },
     wallet: { id, name: walletName },
     chain: {
       networkID,
@@ -234,6 +235,7 @@ const History = () => {
         e.preventDefault()
       }}
       head={t('history.title')}
+      notice={pageNotice}
     >
       <Table
         head={
@@ -276,7 +278,6 @@ const History = () => {
       />
 
       <div className={styles.container}>
-        {totalCount ? null : <div className={styles.noTxs}>{t('history.no-txs')}</div>}
         <div className={styles.pagination}>
           <Pagination
             count={totalCount}

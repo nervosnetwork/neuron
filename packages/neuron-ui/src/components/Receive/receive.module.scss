@@ -80,6 +80,7 @@
       word-break: break-all;
       line-height: 56px;
       overflow: hidden;
+      cursor: pointer;
     }
 
     &:hover {
@@ -88,17 +89,7 @@
   }
 
   .copyTableAddress {
-    word-break: break-all;
-    text-align: center;
-    font-family: 'JetBrains Mono';
-    width: 300px;
-    white-space: normal;
-    line-height: 24px;
-
-    & > svg {
-      margin-left: 4px;
-      vertical-align: middle;
-    }
+    @include copyAddress;
   }
 
   .addresses {
@@ -135,6 +126,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+      cursor: pointer;
     }
   }
 
