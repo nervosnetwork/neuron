@@ -7,6 +7,7 @@ import {
   updateWalletList,
   updateAddressListAndBalance,
   initAppState,
+  showAlertDialog,
 } from 'states/stateProvider/actionCreators'
 
 import { getCurrentWallet, getWinID } from 'services/remote'
@@ -17,6 +18,7 @@ import {
   ConnectionStatus as ConnectionStatusSubject,
   SyncState as SyncStateSubject,
   Command as CommandSubject,
+  ShowGlobalDialog as ShowGlobalDialogSubject,
 } from 'services/subjects'
 import { ckbCore, getTipHeader } from 'services/chain'
 import {
@@ -294,6 +296,9 @@ export const useSubscription = ({
         }
       }
     })
+    const showGlobalDialogSubject = ShowGlobalDialogSubject.subscribe(params => {
+      showAlertDialog(params)(dispatch)
+    })
     return () => {
       dataUpdateSubscription.unsubscribe()
       networkListSubscription.unsubscribe()
@@ -301,6 +306,7 @@ export const useSubscription = ({
       connectionStatusSubscription.unsubscribe()
       syncStateSubscription.unsubscribe()
       commandSubscription.unsubscribe()
+      showGlobalDialogSubject.unsubscribe()
     }
   }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, navigate, dispatch, location.pathname])
 }

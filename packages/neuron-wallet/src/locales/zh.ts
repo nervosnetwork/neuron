@@ -247,6 +247,7 @@ export default {
     },
     'export-transactions': {
       'export-transactions': '导出交易历史',
+      'export-success': '交易已导出',
       'transactions-exported': '{{total}} 条交易记录已被导出至 {{file}}',
       column: {
         time: '时间',

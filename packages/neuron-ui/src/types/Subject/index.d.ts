@@ -62,4 +62,10 @@ declare namespace Subject {
   }
   type URL = string
   type SignIndex = number
+
+  interface GlobalDialog {
+    title?: string
+    message?: string
+    type: 'success' | 'failed' | 'warning'
+  }
 }

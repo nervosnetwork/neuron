@@ -30,7 +30,8 @@ const SubjectConstructor = <T>(
     | 'set-locale'
     | 'device-sign-index'
     | 'multisig-output-update'
-    | 'migrate',
+    | 'migrate'
+    | 'show-global-dialog',
   isMulti?: boolean
 ) => {
   return ipcRenderer
@@ -61,6 +62,7 @@ export const ConnectionStatus = SubjectConstructor<Subject.ConnectionStatus>('co
 export const SyncState = SubjectConstructor<Subject.SyncState>('sync-estimate-updated')
 export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-updated')
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
+export const ShowGlobalDialog = SubjectConstructor<Subject.GlobalDialog>('show-global-dialog')
 export const Navigation = SubjectConstructor<Subject.URL>('navigation')
 export const SetLocale = SubjectConstructor<(typeof LOCALES)[number]>('set-locale')
 export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sign-index')
