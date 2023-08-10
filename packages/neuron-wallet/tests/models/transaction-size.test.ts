@@ -16,7 +16,7 @@ describe('TransactionSize', () => {
     type: new Script('0xece45e0979030e2f8909f76258631c42333b1e906fd9701ec3600a464a90b8f6', '0x', ScriptHashType.Data),
   })
 
-  const witnessArgs = new WitnessArgs('', '0x', '')
+  const witnessArgs = new WitnessArgs(undefined, '0x', undefined)
 
   it('output', () => {
     const result = TransactionSize.output(output)

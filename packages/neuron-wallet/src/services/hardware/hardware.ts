@@ -1,6 +1,6 @@
 import type Transaction from '../../models/chain/transaction'
 import WitnessArgs from '../../models/chain/witness-args'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs } from '../../utils/serialization'
 import AddressService from '../../services/addresses'
 import TransactionSender from '../../services/transaction-sender'
 import Multisig from '../../models/multisig'

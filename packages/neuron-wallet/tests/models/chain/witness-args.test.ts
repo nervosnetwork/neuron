@@ -1,5 +1,5 @@
 import WitnessArgs from '../../../src/models/chain/witness-args'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs } from '../../../src/utils/serialization'
 
 describe('WitnessArgs', () => {
   describe('deserialize', () => {
