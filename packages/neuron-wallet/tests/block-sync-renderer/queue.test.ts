@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { AddressType } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { Address, AddressVersion } from '../../src/models/address'

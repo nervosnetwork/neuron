@@ -41,6 +41,8 @@
     "@ckb-lumos/bi": "0.20.0-alpha.3",
     "@ckb-lumos/ckb-indexer": "0.20.0-alpha.3",
     "@ckb-lumos/codec": "0.20.0-alpha.3",
+    "@ckb-lumos/config-manager": "0.20.0-alpha.3",
+    "@ckb-lumos/helpers": "0.20.0-alpha.3",
     "@ckb-lumos/rpc": "0.20.0-alpha.3",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.16",

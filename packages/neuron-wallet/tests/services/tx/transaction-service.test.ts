@@ -11,7 +11,7 @@ import { getConnection } from 'typeorm'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 import TransactionPersistor, { TxSaveType } from '../../../src/services/tx/transaction-persistor'
 import SystemScriptInfo from '../../../src/models/system-script-info'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import Input from '../../../src/models/chain/input'
 import OutPoint from '../../../src/models/chain/out-point'
 
