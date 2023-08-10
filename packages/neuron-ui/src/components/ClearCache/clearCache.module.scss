@@ -38,6 +38,8 @@
 
     .highlight {
       color: var(--primary-color);
+      display: inline-block;
+      min-height: 20px;
     }
   }
   @include checkbox;

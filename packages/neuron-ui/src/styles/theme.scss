@@ -52,6 +52,7 @@ body {
   --process-background-color: #f0f0f0;
   --tag-background-color: #ecf9f0;
   --orange-color: #f68c2a;
+  --disable-bg-color: #eee;
 
   @media (prefers-color-scheme: dark) {
     --primary-color: #{$main-color};
@@ -102,5 +103,6 @@ body {
     --tooltip-hover-background-color: rgba(255, 255, 255, 0.2);
     --process-background-color: #282e2d;
     --tag-background-color: #171b1a;
+    --disable-bg-color: #666;
   }
 }
