@@ -606,7 +606,7 @@ describe('Test TransactionService', () => {
               lock: {
                 codeHash: `0x${'0'.repeat(64)}`,
                 hashType: 'data',
-                args: '0x0'
+                args: '0x00'
               },
             }
           ]
@@ -633,12 +633,12 @@ describe('Test TransactionService', () => {
               lock: {
                 codeHash: `0x${'0'.repeat(64)}`,
                 hashType: 'data',
-                args: '0x0'
+                args: '0x00'
               },
               type: {
                 codeHash: `0x${'1'.repeat(64)}`,
                 hashType: 'data',
-                args: '0x1'
+                args: '0x01'
               }
             }
           ]

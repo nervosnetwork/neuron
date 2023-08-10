@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { bytes as byteUtils } from '@ckb-lumos/codec'
 import TypeChecker from '../../utils/type-checker'
 

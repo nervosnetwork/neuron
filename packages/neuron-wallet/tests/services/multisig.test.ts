@@ -8,7 +8,8 @@ import { OutputStatus } from '../../src/models/chain/output'
 import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 import Multisig from '../../src/models/multisig'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+
 
 const [alice, bob, charlie] = keyInfos
 

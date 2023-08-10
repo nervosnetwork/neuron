@@ -63,8 +63,9 @@ describe('SUDTController', () => {
       'txHash',
       '0',
       '10000',
-      Script.fromObject({ codeHash: '', args: '', hashType: ScriptHashType.Type }),
-      Script.fromObject({ codeHash: '', args: '', hashType: ScriptHashType.Type }),
+      // codeHash and args are required for Script
+      Script.fromObject({ codeHash: `0x${'00'.repeat(32)}`, args: '0x', hashType: ScriptHashType.Type }),
+      Script.fromObject({ codeHash: `0x${'00'.repeat(32)}`, args: '0x', hashType: ScriptHashType.Type }),
       '0x080a456972632d320a455432'
     )
     beforeEach(async () => {

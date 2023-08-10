@@ -1,8 +1,9 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import LightConnector from '../../src/block-sync-renderer/sync/light-connector'
 import SyncProgress from '../../src/database/chain/entities/sync-progress'
 import { BI } from '@ckb-lumos/bi'
 import AddressMeta from '../../src/database/address/meta'
+
 
 const getSyncStatusMock = jest.fn()
 const getCurrentWalletMinBlockNumberMock = jest.fn()

@@ -1196,7 +1196,7 @@ describe('TransactionGenerator', () => {
           const targetOutput: Output = Output.fromObject({
             capacity: toShannon('61'),
             lock: aliceAnyoneCanPayLockScript,
-            type: assetAccountInfo.generateSudtScript('0xuuid'),
+            type: assetAccountInfo.generateSudtScript('0x1234'),
             data: '0x',
           })
 
