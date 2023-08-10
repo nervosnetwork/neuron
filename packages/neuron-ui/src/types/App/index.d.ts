@@ -134,7 +134,7 @@ declare namespace State {
     decimal: string
   }
 
-  type AlertDialog = {
+  type GlobalAlertDialog = {
     show?: boolean
     title?: string
     message?: string
@@ -160,7 +160,7 @@ declare namespace State {
     popups: Popup[]
     notifications: Message[]
     globalDialog: GlobalDialogType
-    alertDialog: AlertDialog
+    globalAlertDialog: GlobalAlertDialog
     loadings: Record<'sending' | 'addressList' | 'transactionList', boolean>
     showTopAlert: boolean
     showAllNotifications: boolean

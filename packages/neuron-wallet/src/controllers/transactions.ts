@@ -10,6 +10,7 @@ import Transaction from '../models/chain/transaction'
 
 import { set as setDescription, get as getDescription } from '../services/tx/transaction-description'
 import AddressParser from '../models/address-parser'
+import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
 
 export default class TransactionsController {
   public async getAll(
@@ -133,8 +134,9 @@ export default class TransactionsController {
         return
       }
       const total = await TransactionsService.exportTransactions({ walletID, filePath })
-      dialog.showMessageBox({
-        type: 'info',
+      ShowGlobalDialogSubject.next({
+        type: 'success',
+        title: t('export-transactions.export-success'),
         message: t('export-transactions.transactions-exported', { file: filePath, total }),
       })
       return {

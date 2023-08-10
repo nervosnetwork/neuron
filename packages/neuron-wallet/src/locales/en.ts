@@ -259,6 +259,7 @@ export default {
     },
     'export-transactions': {
       'export-transactions': 'Export Transaction History',
+      'export-success': 'Transactions have been exported',
       'transactions-exported': '{{total}} transaction records have been exported to {{file}}',
       column: {
         time: 'Time',
