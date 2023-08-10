@@ -7,7 +7,7 @@ import {
   updateWalletList,
   updateAddressListAndBalance,
   initAppState,
-  showAlertDialog,
+  showGlobalAlertDialog,
 } from 'states/stateProvider/actionCreators'
 
 import { getCurrentWallet, getWinID } from 'services/remote'
@@ -297,7 +297,7 @@ export const useSubscription = ({
       }
     })
     const showGlobalDialogSubject = ShowGlobalDialogSubject.subscribe(params => {
-      showAlertDialog(params)(dispatch)
+      showGlobalAlertDialog(params)(dispatch)
     })
     return () => {
       dataUpdateSubscription.unsubscribe()

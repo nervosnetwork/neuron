@@ -91,19 +91,19 @@ export const dismissGlobalDialog = () => (dispatch: StateDispatch) => {
   })
 }
 
-export const showAlertDialog =
-  (content: State.AlertDialog) =>
-  (dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }>) => {
+export const showGlobalAlertDialog =
+  (content: State.GlobalAlertDialog) =>
+  (dispatch: React.Dispatch<{ type: AppActions.UpdateGlobalAlertDialog; payload: State.GlobalAlertDialog }>) => {
     dispatch({
-      type: AppActions.UpdateAlertDialog,
+      type: AppActions.UpdateGlobalAlertDialog,
       payload: content,
     })
   }
 
-export const dismissAlertDialog =
-  () => (dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: null }>) => {
+export const dismissGlobalAlertDialog =
+  () => (dispatch: React.Dispatch<{ type: AppActions.UpdateGlobalAlertDialog; payload: null }>) => {
     dispatch({
-      type: AppActions.UpdateAlertDialog,
+      type: AppActions.UpdateGlobalAlertDialog,
       payload: null,
     })
   }
