@@ -63,7 +63,10 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
       data-have-head={!!head}
     >
       {head && typeof head === 'string' ? <div className={styles.head}>{head}</div> : head}
-      <table className={`${styles.table} ${head === null || head === undefined ? styles.noHead : ''}`}>
+      <table
+        className={`${styles.table} ${head === null || head === undefined ? styles.noHead : ''}`}
+        data-hover-tr-bg={hasHoverTrBg}
+      >
         <thead>
           <tr>
             {columnList.map(
@@ -107,7 +110,6 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                   className={styles.trClassName}
                   data-idx={idx}
                   data-is-expand={expandedRow === idx}
-                  data-has-hover-bg={hasHoverTrBg}
                 >
                   {columnList.map(
                     ({ dataIndex, key, render, align, className: bodyTdClassName, tdClassName, width }) => (

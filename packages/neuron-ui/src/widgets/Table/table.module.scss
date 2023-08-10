@@ -71,6 +71,18 @@ $head-height: 52px;
       }
     }
   }
+
+  &[data-hover-tr-bg='true'] {
+    tbody {
+      tr {
+        &:hover {
+          &[data-is-expand='false'] {
+            background-color: var(--hover-background-color);
+          }
+        }
+      }
+    }
+  }
 }
 
 .fixedTableRoot {
