@@ -31,6 +31,7 @@
   padding: 16px;
   margin-top: 16px;
   background: var(--table-head-background-color);
+  color: var(--main-text-color);
   border-radius: 8px;
   position: relative;
   display: flex;
@@ -84,6 +85,7 @@
   pre {
     overflow: auto;
     background: var(--table-head-background-color);
+    color: var(--main-text-color);
     padding: 16px;
     border-radius: 6px;
     font-size: 12px;
