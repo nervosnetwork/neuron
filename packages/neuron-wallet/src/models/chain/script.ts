@@ -34,7 +34,17 @@ export default class Script {
   }
 
   public computeHash(): string {
-    return scriptToHash(this.toSDK())
+    const script = this.toSDK()
+    if (!script) {
+      return ''
+    }
+    // empty string is not allowed here
+    const formatedScript = {
+      args: script.args || '0x',
+      codeHash: script.codeHash || '0x',
+      hashType: script.hashType || '0x',
+    }
+    return scriptToHash(formatedScript)
   }
 
   /**

@@ -101,7 +101,7 @@ describe('queue', () => {
   const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
-    blake160: '0xfakeblake160',
+    blake160: `0x${'0'.repeat(40)}`,
     walletId: fakeWalletId,
     path: '',
     addressType: AddressType.Receiving,
@@ -123,7 +123,7 @@ describe('queue', () => {
     jest.useFakeTimers('legacy')
 
     stubbedBlockTipsSubject = new Subject<Tip>()
-    stubbedTransactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[], params: unknown }>()
+    stubbedTransactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[]; params: unknown }>()
     const stubbedIndexerConnector = jest.fn().mockImplementation((...args) => {
       stubbedIndexerConnectorConstructor(...args)
       return {
@@ -175,11 +175,11 @@ describe('queue', () => {
           return {
             createBatchRequest() {
               return {
-                exec: stubbedRPCCreateBatchRequestExecFn
+                exec: stubbedRPCCreateBatchRequestExecFn,
               }
-            }
+            },
           }
-        }
+        },
       }
     })
     const Queue = require('../../src/block-sync-renderer/sync/queue').default
@@ -223,10 +223,17 @@ describe('queue', () => {
           beforeEach(() => {
             stubbedAddressesFn.mockResolvedValue([true, addresses.map(addressMeta => addressMeta.address), []])
             stubbedGetTransactionFn.mockResolvedValue(fakeTxWithStatus1)
-            stubbedRPCCreateBatchRequestExecFn
-              .mockResolvedValueOnce(fakeTxs)
-              .mockResolvedValueOnce(fakeTxs.map(v => ({ ...fakeBlockHeader, timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
-            stubbedTransactionsSubject.next({ txHashes: fakeTxs.map(v => v.transaction.hash), params: fakeTxs[0].transaction.blockNumber })
+            stubbedRPCCreateBatchRequestExecFn.mockResolvedValueOnce(fakeTxs).mockResolvedValueOnce(
+              fakeTxs.map(v => ({
+                ...fakeBlockHeader,
+                timestamp: v.transaction.timestamp,
+                number: v.transaction.blockNumber,
+              }))
+            )
+            stubbedTransactionsSubject.next({
+              txHashes: fakeTxs.map(v => v.transaction.hash),
+              params: fakeTxs[0].transaction.blockNumber,
+            })
           })
           describe('when saving transactions is succeeded', () => {
             beforeEach(flushPromises)
@@ -250,11 +257,14 @@ describe('queue', () => {
                 tx.blockHash = fakeTxWithStatus2.txStatus.blockHash!
                 tx.blockNumber = BigInt(fakeTxWithStatus2.transaction.blockNumber!).toString()
                 tx.timestamp = BigInt(fakeTxWithStatus2.transaction.timestamp!).toString()
-                expect(stubbedSaveFetchFn).toHaveBeenCalledWith(tx, new Set([
-                  addressInfo.blake160,
-                  Multisig.hash([addressInfo.blake160]),
-                  SystemScriptInfo.generateSecpScript(addressInfo.blake160).computeHash().slice(0, 42),
-                ]))
+                expect(stubbedSaveFetchFn).toHaveBeenCalledWith(
+                  tx,
+                  new Set([
+                    addressInfo.blake160,
+                    Multisig.hash([addressInfo.blake160]),
+                    SystemScriptInfo.generateSecpScript(addressInfo.blake160).computeHash().slice(0, 42),
+                  ])
+                )
               }
             })
             it('checks and generate new addresses', () => {
@@ -276,10 +286,17 @@ describe('queue', () => {
             const err = new Error()
             beforeEach(async () => {
               stubbedSaveFetchFn.mockRejectedValueOnce(err)
-              stubbedRPCCreateBatchRequestExecFn
-                .mockResolvedValueOnce(fakeTxs)
-                .mockResolvedValueOnce(fakeTxs.map(v => ({ ...fakeBlockHeader, timestamp: v.transaction.timestamp, number: v.transaction.blockNumber })))
-              stubbedTransactionsSubject.next({ txHashes: fakeTxs.map(v => v.transaction.hash), params: fakeTxs[0].transaction.blockNumber })
+              stubbedRPCCreateBatchRequestExecFn.mockResolvedValueOnce(fakeTxs).mockResolvedValueOnce(
+                fakeTxs.map(v => ({
+                  ...fakeBlockHeader,
+                  timestamp: v.transaction.timestamp,
+                  number: v.transaction.blockNumber,
+                }))
+              )
+              stubbedTransactionsSubject.next({
+                txHashes: fakeTxs.map(v => v.transaction.hash),
+                params: fakeTxs[0].transaction.blockNumber,
+              })
               await flushPromises()
             })
             it('handles the exception', async () => {
