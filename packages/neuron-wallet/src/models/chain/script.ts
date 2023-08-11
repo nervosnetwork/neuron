@@ -39,12 +39,12 @@ export default class Script {
       return ''
     }
     // empty string is not allowed here
-    const formatedScript = {
+    const formattedScript = {
       args: script.args || '0x',
       codeHash: script.codeHash || '0x',
       hashType: script.hashType || '0x',
     }
-    return scriptToHash(formatedScript)
+    return scriptToHash(formattedScript)
   }
 
   /**
