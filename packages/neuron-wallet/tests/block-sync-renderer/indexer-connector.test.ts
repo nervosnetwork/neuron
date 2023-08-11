@@ -237,7 +237,10 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
+              expect(txObserver).toHaveBeenCalledWith({
+                txHashes: [fakeTx1.transaction.hash],
+                params: fakeTx1.transaction.blockNumber,
+              })
             })
           })
           describe('when loaded block number is not in order', () => {
@@ -253,7 +256,10 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
+              expect(txObserver).toHaveBeenCalledWith({
+                txHashes: [fakeTx1.transaction.hash],
+                params: fakeTx1.transaction.blockNumber,
+              })
             })
           })
           describe('#notifyCurrentBlockNumberProcessed', () => {
