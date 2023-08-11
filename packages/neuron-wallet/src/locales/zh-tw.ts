@@ -165,7 +165,7 @@ export default {
         title: '內置 CKB 節點',
         message: '缺少必要的依賴',
         detail:
-          'Neuron 內置的 CKB 節點需要安裝 x64 版本的 Microsoft Visual C++ Redistributable 才能正常運行。您需要安裝該組件來啟動內置節點。',
+          'Neuron 中的網絡節點依賴C++組件,請安裝 x64 最新版本的 Microsoft Visual C++Redistributable 來保證軟件正常運行。',
         buttons: {
           'install-and-exit': '安裝並退出',
         },
