@@ -35,14 +35,14 @@ export default class Script {
 
   public computeHash(): string {
     const script = this.toSDK()
-    if (!script) {
+    // TODO: should throw error, skip calculate hash if parameter not enough (only in test environment)
+    if (!script || !script.codeHash || !script.hashType) {
       return ''
     }
-    // empty string is not allowed here
+    // empty string is not allowed for args
     const formattedScript = {
+      ...script,
       args: script.args || '0x',
-      codeHash: script.codeHash || '0x',
-      hashType: script.hashType || '0x',
     }
     return scriptToHash(formattedScript)
   }
