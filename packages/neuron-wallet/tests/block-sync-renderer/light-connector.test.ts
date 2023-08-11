@@ -4,7 +4,6 @@ import SyncProgress from '../../src/database/chain/entities/sync-progress'
 import { BI } from '@ckb-lumos/bi'
 import AddressMeta from '../../src/database/address/meta'
 
-
 const getSyncStatusMock = jest.fn()
 const getCurrentWalletMinBlockNumberMock = jest.fn()
 const getAllSyncStatusToMapMock = jest.fn()

@@ -10,7 +10,6 @@ import Multisig from '../../src/models/multisig'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 
-
 const [alice, bob, charlie] = keyInfos
 
 const rpcBatchRequestMock = jest.fn()
@@ -196,13 +195,11 @@ describe('multisig service', () => {
 
   describe('removeDulpicateConfig', () => {
     it('exist duplicate config', () => {
-      const multisigConfigModel = new MultisigConfigModel(
-        'walletId',
-        1,
-        2,
-        3,
-        [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-      )
+      const multisigConfigModel = new MultisigConfigModel('walletId', 1, 2, 3, [
+        alice.publicKeyInBlake160,
+        bob.publicKeyInBlake160,
+        charlie.publicKeyInBlake160,
+      ])
       const multisigConfigs = [
         MultisigConfig.fromModel(multisigConfigModel),
         MultisigConfig.fromModel(multisigConfigModel),
@@ -213,20 +210,20 @@ describe('multisig service', () => {
     })
     it('non-exist duplicate config', () => {
       const multisigConfigs = [
-        MultisigConfig.fromModel(new MultisigConfigModel(
-          'walletId',
-          1,
-          2,
-          3,
-          [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-        )),
-        MultisigConfig.fromModel(new MultisigConfigModel(
-          'walletId',
-          2,
-          2,
-          3,
-          [alice.publicKeyInBlake160, bob.publicKeyInBlake160, charlie.publicKeyInBlake160],
-        )),
+        MultisigConfig.fromModel(
+          new MultisigConfigModel('walletId', 1, 2, 3, [
+            alice.publicKeyInBlake160,
+            bob.publicKeyInBlake160,
+            charlie.publicKeyInBlake160,
+          ])
+        ),
+        MultisigConfig.fromModel(
+          new MultisigConfigModel('walletId', 2, 2, 3, [
+            alice.publicKeyInBlake160,
+            bob.publicKeyInBlake160,
+            charlie.publicKeyInBlake160,
+          ])
+        ),
       ]
       //@ts-ignore private-method
       const res = MultisigService.removeDulpicateConfig(multisigConfigs)
