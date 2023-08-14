@@ -72,7 +72,6 @@ type Action =
   // Transactions
   | 'get-transaction-list'
   | 'get-transaction'
-  | 'show-transaction-details'
   | 'update-transaction-description'
   | 'export-transactions'
   // Dao

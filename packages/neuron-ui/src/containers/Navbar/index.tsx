@@ -23,7 +23,7 @@ import Tooltip from 'widgets/Tooltip'
 
 import styles from './navbar.module.scss'
 
-export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`, RoutePath.ImportHardware]
+export const FULL_SCREENS = [`/wizard/`, `/keystore/`, RoutePath.ImportHardware]
 
 const menuItems = [
   { name: 'navbar.overview', key: RoutePath.Overview, url: RoutePath.Overview, icon: <Overview /> },

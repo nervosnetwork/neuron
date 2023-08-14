@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 
 import { shannonToCKBFormatter, uniformTimeFormatter, backToTop, CONSTANTS, RoutePath, useFirstLoadWallet } from 'utils'
@@ -174,15 +173,9 @@ const Overview = () => {
     })(dispatch)
   }, [id, dispatch])
 
-  const onRecentActivityDoubleClick = useCallback((_, item: State.Transaction) => {
-    if (item?.hash) {
-      showTransactionDetails(item?.hash)
-    }
-  }, [])
-
   const onRecentActivityClick = useCallback((_, item: State.Transaction) => {
     const { hash } = item
-    navigate(`${RoutePath.HistoryDetailPage}/${hash}`)
+    navigate(`${RoutePath.Overview}/${hash}`)
   }, [])
 
   const recentItems = useMemo(() => {
@@ -291,7 +284,6 @@ const Overview = () => {
         ]}
         dataSource={recentItems}
         noDataContent={t('overview.no-recent-activities')}
-        onRowDoubleClick={onRecentActivityDoubleClick}
         onRowClick={onRecentActivityClick}
       />
     </PageContainer>

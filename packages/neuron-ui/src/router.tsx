@@ -10,7 +10,6 @@ import Send from 'components/Send'
 import Receive from 'components/Receive'
 import History from 'components/History'
 import HistoryDetailPage from 'components/HistoryDetailPage'
-import Transaction from 'components/Transaction'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
@@ -56,13 +55,28 @@ const mainRouterConfig: RouteObject[] = [
       },
       {
         path: RoutePath.Overview,
-        element: (
-          <>
-            <Overview />
-            <Outlet />
-          </>
-        ),
-        children: [...toolsRouters],
+        children: [
+          {
+            path: '',
+            element: (
+              <>
+                <Overview />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: ':hash',
+            element: (
+              <>
+                <HistoryDetailPage />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+        ],
       },
       {
         path: RoutePath.Send,
@@ -116,33 +130,28 @@ const mainRouterConfig: RouteObject[] = [
       },
       {
         path: RoutePath.History,
-        element: (
-          <>
-            <History />
-            <Outlet />
-          </>
-        ),
-        children: [...toolsRouters],
-      },
-      {
-        path: `${RoutePath.Transaction}/:hash`,
-        element: (
-          <>
-            <Transaction />
-            <Outlet />
-          </>
-        ),
-        children: [...toolsRouters],
-      },
-      {
-        path: `${RoutePath.HistoryDetailPage}/:hash`,
-        element: (
-          <>
-            <HistoryDetailPage />
-            <Outlet />
-          </>
-        ),
-        children: [...toolsRouters],
+        children: [
+          {
+            path: '',
+            element: (
+              <>
+                <History />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: ':hash',
+            element: (
+              <>
+                <HistoryDetailPage />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+        ],
       },
       {
         path: `${RoutePath.WalletWizard}*`,

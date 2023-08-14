@@ -38,7 +38,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
             break
           }
           case 'detail': {
-            navigate(`${RoutePath.HistoryDetailPage}/${btn.dataset.hash}`)
+            navigate(`${RoutePath.History}/${btn.dataset.hash}`)
             break
           }
           default: {
