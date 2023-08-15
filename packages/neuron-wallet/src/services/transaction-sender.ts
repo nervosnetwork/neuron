@@ -3,7 +3,6 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
 import { serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { scriptToAddress } from '../utils/scriptAndAddress'
-
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
