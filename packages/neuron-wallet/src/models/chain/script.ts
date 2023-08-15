@@ -35,9 +35,8 @@ export default class Script {
 
   public computeHash(): string {
     const script = this.toSDK()
-    // TODO: should throw error, skip calculate hash if parameter not enough (only in test environment)
     if (!script || !script.codeHash || !script.hashType) {
-      return ''
+      throw new Error('Invalid script')
     }
     // empty string is not allowed for args
     const formattedScript = {
