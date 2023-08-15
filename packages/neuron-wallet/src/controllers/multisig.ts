@@ -12,6 +12,7 @@ import OfflineSignService from '../services/offline-sign'
 import Multisig from '../models/multisig'
 import SystemScriptInfo from '../models/system-script-info'
 import NetworksService from '../services/networks'
+import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -205,7 +206,11 @@ export default class MultisigController {
     const tx = result.json
     const lockHash = scriptToHash(addressToScript(fullPayload))
     if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
-      dialog.showErrorBox(t('common.error'), t('messages.multisig-lock-hash-mismatch'))
+      ShowGlobalDialogSubject.next({
+        type: 'failed',
+        title: t('common.error'),
+        message: t('messages.multisig-lock-hash-mismatch'),
+      })
       return {
         status: ResponseCode.Fail,
       }

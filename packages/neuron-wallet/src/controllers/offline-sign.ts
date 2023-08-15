@@ -14,6 +14,7 @@ import { MultisigNotSignedNeedError, OfflineSignFailed } from '../exceptions'
 import MultisigConfigModel from '../models/multisig-config'
 import { getMultisigStatus } from '../utils/multisig'
 import { generateRPC } from '../utils/ckb-rpc'
+import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -57,8 +58,8 @@ export default class OfflineSignController {
 
     fs.writeFileSync(filePath, JSON.stringify(json))
 
-    dialog.showMessageBox({
-      type: 'info',
+    ShowGlobalDialogSubject.next({
+      type: 'success',
       message: t('offline-signature.transaction-exported', { filePath }),
     })
 
