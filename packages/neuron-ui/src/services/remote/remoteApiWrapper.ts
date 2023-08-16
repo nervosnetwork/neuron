@@ -49,6 +49,7 @@ type Action =
   | 'is-dark'
   | 'set-theme'
   | 'is-ckb-run-external'
+  | 'verify-external-ckb-node'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

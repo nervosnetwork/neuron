@@ -91,7 +91,7 @@ describe('NodeService', () => {
           return {
             getTipBlockNumber: stubbedGetTipBlockNumber,
           }
-        }
+        },
       }
     })
     jest.doMock('rxjs/operators', () => {
@@ -147,7 +147,7 @@ describe('NodeService', () => {
       return function () {
         return {
           getChain: getChainMock,
-          localNodeInfo: getLocalNodeInfoMock
+          localNodeInfo: getLocalNodeInfoMock,
         }
       }
     })
@@ -160,8 +160,8 @@ describe('NodeService', () => {
               start: stubbedStartLightNode,
               stop: stubbedStopLightNode,
             }
-          }
-        }
+          },
+        },
       }
     })
 
@@ -225,8 +225,8 @@ describe('NodeService', () => {
     beforeEach(async () => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
-      nodeService.verifyNodeVersion = () => {}
-      nodeService.verifyStartWithIndexer = () => {}
+      nodeService.getCompatibility = () => {}
+      nodeService.isStartWithIndexer = () => {}
 
       stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
     })
@@ -282,7 +282,7 @@ describe('NodeService', () => {
       beforeEach(async () => {
         stubbedStartCKBNode.mockRejectedValue(new Error())
         await nodeService.startNode()
-      });
+      })
       it('logs error', () => {
         expect(stubbedLoggerInfo).toHaveBeenCalledWith('CKB:	fail to start bundled CKB with error:')
         expect(stubbedLoggerError).toHaveBeenCalledWith(new Error())
@@ -295,19 +295,19 @@ describe('NodeService', () => {
           startedBundledNode: false,
         })
       })
-    });
+    })
     describe('start light node', () => {
       beforeEach(() => {
         stubbedNetworsServiceGet.mockReset()
       })
       it('start light node', async () => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({type: NetworkType.Light})
+        stubbedNetworsServiceGet.mockReturnValueOnce({ type: NetworkType.Light })
         await nodeService.startNode()
         expect(stubbedStartLightNode).toBeCalled()
         expect(stubbedStopCkbNode).toBeCalled()
       })
     })
-  });
+  })
   describe('CurrentNetworkIDSubject#subscribe', () => {
     let eventCallback: any
     const stubbedTipNumberSubjectCallback = jest.fn()
@@ -315,8 +315,8 @@ describe('NodeService', () => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
       nodeService.tipNumberSubject.subscribe(stubbedTipNumberSubjectCallback)
-      nodeService.verifyNodeVersion = () => {}
-      nodeService.verifyStartWithIndexer = () => {}
+      nodeService.getCompatibility = () => {}
+      nodeService.isStartWithIndexer = () => {}
       eventCallback = stubbedCurrentNetworkIDSubjectSubscribe.mock.calls[0][0]
     })
     it('emits disconnected event in ConnectionStatusSubject', () => {
@@ -337,7 +337,7 @@ describe('NodeService', () => {
           nodeService.ckb.node.url = bundledNodeUrl
         })
         stubbedStartCKBNode.mockResolvedValue(true)
-        stubbedNetworsServiceGet.mockReturnValue({remote: bundledNodeUrl})
+        stubbedNetworsServiceGet.mockReturnValue({ remote: bundledNodeUrl })
         getLocalNodeInfoMock.mockRejectedValue('not start')
         await nodeService.tryStartNodeOnDefaultURI()
 
@@ -355,8 +355,8 @@ describe('NodeService', () => {
       describe('switches to other network', () => {
         beforeEach(async () => {
           stubbedConnectionStatusSubjectNext.mockReset()
-          stubbedNetworsServiceGet.mockReturnValue({remote: fakeHTTPUrl})
-          await eventCallback({currentNetworkID: 'network2'})
+          stubbedNetworsServiceGet.mockReturnValue({ remote: fakeHTTPUrl })
+          await eventCallback({ currentNetworkID: 'network2' })
           jest.advanceTimersByTime(10000)
         })
         it('sets startedBundledNode to true in ConnectionStatusSubject', () => {
@@ -367,8 +367,8 @@ describe('NodeService', () => {
             startedBundledNode: false,
           })
         })
-      });
-    });
+      })
+    })
     describe('with invalid url', () => {
       beforeEach(() => {
         stubbedNetworsServiceGet.mockReturnValueOnce({ remote: 'invalidurl' })
@@ -424,52 +424,77 @@ describe('NodeService', () => {
       expect(nodeService.getInternalNodeVersion()).toBe('0.107.0')
     })
   })
-  describe('test verify node version', () => {
+  describe('test verify external ckb node', () => {
     beforeEach(() => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
-      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
+      nodeService.getNeuronCompatibilityCKB = () => ['0.109', '0.110']
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL })
     })
-    it('get internal version failed', async () => {
+    it('the ckb is running external and not light client', async () => {
+      nodeService._isCkbNodeExternal = true
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue('v0.107.0')
+      getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
+      const res = await nodeService.verifyExternalCkbNode()
+      expect(res).toStrictEqual({
+        ckb: 0,
+        withIndexer: false,
+      })
+    })
+    it('the ckb is running external and not light client, but get version failed', async () => {
+      nodeService._isCkbNodeExternal = true
       existsSyncMock.mockReturnValue(false)
       getLocalNodeInfoMock.mockResolvedValue({})
-      await nodeService.verifyNodeVersion()
-      expect(showMessageBoxMock).toBeCalledTimes(0)
+      const res = await nodeService.verifyExternalCkbNode()
+      expect(res).toBeUndefined()
     })
-    it('get internal version success and same', async () => {
-      existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue('v0.107.0')
-      getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
-      await nodeService.verifyNodeVersion()
-      expect(showMessageBoxMock).toBeCalledTimes(0)
+    it('the ckb type is light client', async () => {
+      nodeService._isCkbNodeExternal = true
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL, type: NetworkType.Light })
+      const res = await nodeService.verifyExternalCkbNode()
+      expect(res).toBeUndefined()
     })
-    it('get internal version success and patch not same', async () => {
-      existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue('v0.107.1')
-      getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
-      await nodeService.verifyNodeVersion()
-      expect(showMessageBoxMock).toBeCalledTimes(0)
+    it('the ckb is running internal', async () => {
+      nodeService._isCkbNodeExternal = false
+      const res = await nodeService.verifyExternalCkbNode()
+      expect(res).toBeUndefined()
     })
-    it('major is same and minor is not same with major 0', async () => {
-      existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue('v0.107.0')
-      getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
-      await nodeService.verifyNodeVersion()
-      expect(showMessageBoxMock).toBeCalledTimes(1)
+  })
+  describe('test get compatibility', () => {
+    let VerifyCkbVersionResult: any
+    beforeEach(() => {
+      const NodeService = require('../../src/services/node').default
+      VerifyCkbVersionResult = require('../../src/services/node').VerifyCkbVersionResult
+      nodeService = new NodeService()
+      nodeService.getNeuronCompatibilityCKB = () => ['0.109', '0.110']
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
     })
-    it('major is same and minor is not same with major 1', async () => {
-      existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue('v1.107.0')
-      getLocalNodeInfoMock.mockResolvedValue({ version: '1.108.0 (30e1255 2023-01-30)' })
-      await nodeService.verifyNodeVersion()
-      expect(showMessageBoxMock).toBeCalledTimes(0)
+    it('get internal version success and same', () => {
+      expect(nodeService.getCompatibility('0.107.0', '0.107.0 (30e1255 2023-01-30)')).toBe(VerifyCkbVersionResult.Same)
     })
-    it('major is not same', async () => {
-      existsSyncMock.mockReturnValue(true)
-      readFileSyncMock.mockReturnValue('v1.107.0')
-      getLocalNodeInfoMock.mockResolvedValue({ version: '0.108.0 (30e1255 2023-01-30)' })
-      await nodeService.verifyNodeVersion()
-      expect(showMessageBoxMock).toBeCalledTimes(1)
+    it('get internal version success and patch not same', () => {
+      expect(nodeService.getCompatibility('0.107.1', '0.107.0 (30e1255 2023-01-30)')).toBe(VerifyCkbVersionResult.Same)
+    })
+    it('major is same and minor is not same with major 0', () => {
+      expect(nodeService.getCompatibility('0.107.1', '0.108.0 (30e1255 2023-01-30)')).toBe(
+        VerifyCkbVersionResult.ShouldUpdate
+      )
+    })
+    it('major is same and minor is not same with major 1', () => {
+      expect(nodeService.getCompatibility('0.107.1', '1.108.0 (30e1255 2023-01-30)')).toBe(
+        VerifyCkbVersionResult.ShouldUpdate
+      )
+    })
+    it('major is not same', () => {
+      expect(nodeService.getCompatibility('1.107.1', '0.108.0 (30e1255 2023-01-30)')).toBe(
+        VerifyCkbVersionResult.Incompatible
+      )
+    })
+    it('is compatible', () => {
+      expect(nodeService.getCompatibility('0.110.0', '0.109.0 (30e1255 2023-01-30)')).toBe(
+        VerifyCkbVersionResult.Compatible
+      )
     })
   })
   describe('test verify start with indexer', () => {
@@ -480,18 +505,48 @@ describe('NodeService', () => {
     })
     it('start with indexer', async () => {
       rpcRequestMock.mockResolvedValue({})
-      await nodeService.verifyStartWithIndexer()
-      expect(showMessageBoxMock).toBeCalledTimes(0)
+      const res = await nodeService.isStartWithIndexer()
+      expect(res).toBe(true)
     })
     it('start without indexer', async () => {
       rpcRequestMock.mockResolvedValue({ error: { code: START_WITHOUT_INDEXER } })
-      await nodeService.verifyStartWithIndexer()
-      expect(showMessageBoxMock).toBeCalledTimes(1)
+      const res = await nodeService.isStartWithIndexer()
+      expect(res).toBe(false)
     })
     it('get indexer rpc failed', async () => {
       rpcRequestMock.mockRejectedValue('get tip header error')
-      await nodeService.verifyStartWithIndexer()
-      expect(showMessageBoxMock).toBeCalledTimes(1)
+      const res = await nodeService.isStartWithIndexer()
+      expect(res).toBe(false)
+    })
+  })
+  describe('test get Neuron compatibility CKB', () => {
+    beforeEach(() => {
+      const NodeService = require('../../src/services/node').default
+      nodeService = new NodeService()
+    })
+    it('no compatibility file', () => {
+      existsSyncMock.mockReturnValue(false)
+      expect(nodeService.getNeuronCompatibilityCKB('0.110.0')).toBeUndefined()
+    })
+    it('read file error', () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue(new Error('read failed'))
+      expect(nodeService.getNeuronCompatibilityCKB('0.110.0')).toBeUndefined()
+    })
+    it('ckb version content is wrong', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue('')
+      expect(nodeService.getNeuronCompatibilityCKB('0.110.0')).toBeUndefined()
+    })
+    it('no neuron version', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue('ckb,0.110\nNeuron,\n0.109,yes,no')
+      expect(nodeService.getNeuronCompatibilityCKB('0.110.0')).toBeUndefined()
+    })
+    it('success', async () => {
+      existsSyncMock.mockReturnValue(true)
+      readFileSyncMock.mockReturnValue('ckb,0.110,0.109\nNeuron,\n0.110,yes,no')
+      expect(nodeService.getNeuronCompatibilityCKB('0.110.0')).toStrictEqual(['0.110'])
     })
   })
 })

@@ -2,8 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { NeuronWalletActions, useDispatch, useState as useGlobalState } from 'states'
-import { checkForUpdates } from 'services/remote'
+import { NeuronWalletActions, showGlobalAlertDialog, useDispatch, useState as useGlobalState } from 'states'
+import {
+  VerifyCkbVersionResult,
+  VerifyExternalCkbNodeRes,
+  checkForUpdates,
+  getVersion,
+  verifyExternalCkbNode,
+} from 'services/remote'
 import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
@@ -18,7 +24,7 @@ import {
   ArrowOpenRight,
   MenuExpand,
 } from 'widgets/Icons/icon'
-import { RoutePath, clsx, useOnLocaleChange } from 'utils'
+import { RoutePath, clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
 import styles from './navbar.module.scss'
@@ -104,6 +110,52 @@ const Navbar = () => {
       clearInterval(interval)
     }
   }, [])
+
+  const [verifyCkbResult, setVerifyCkbResult] = useState<VerifyExternalCkbNodeRes>()
+
+  useEffect(() => {
+    verifyExternalCkbNode().then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setVerifyCkbResult(res.result)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!verifyCkbResult) {
+      return
+    }
+    switch (verifyCkbResult.ckb) {
+      case VerifyCkbVersionResult.Same:
+      case VerifyCkbVersionResult.Compatible:
+        if (!verifyCkbResult.withIndexer) {
+          showGlobalAlertDialog({
+            type: 'warning',
+            message: t('navbar.ckb-without-indexer'),
+            action: 'ok',
+          })(dispatch)
+        }
+        break
+      case VerifyCkbVersionResult.ShouldUpdate:
+        if (version) {
+          showGlobalAlertDialog({
+            type: 'warning',
+            message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
+            action: 'ok',
+          })(dispatch)
+        }
+        break
+      case VerifyCkbVersionResult.Incompatible:
+        showGlobalAlertDialog({
+          type: 'warning',
+          message: t('navbar.ckb-node-compatible', { version: getVersion() }),
+          action: 'ok',
+        })(dispatch)
+        break
+      default:
+        break
+    }
+  }, [verifyCkbResult, version])
 
   useEffect(() => {
     if (pathname.includes(RoutePath.Settings)) {

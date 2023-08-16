@@ -24,6 +24,22 @@ export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
 export const getIsCkbRunExternal = remoteApi<void, boolean>('is-ckb-run-external')
 
+export enum VerifyCkbVersionResult {
+  Same,
+  Compatible,
+  ShouldUpdate,
+  Incompatible,
+}
+
+export type VerifyExternalCkbNodeRes =
+  | {
+      ckb: VerifyCkbVersionResult
+      withIndexer: boolean
+    }
+  | undefined
+
+export const verifyExternalCkbNode = remoteApi<void, VerifyExternalCkbNodeRes>('verify-external-ckb-node')
+
 export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
 
 export const invokeShowErrorMessage = remoteApi<{ title: string; content: string }>('show-error-message')
