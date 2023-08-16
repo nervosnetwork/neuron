@@ -23,9 +23,9 @@ jest.mock('services/wallets', () => ({
     return {
       getCurrent() {
         return jest.fn()
-      }
+      },
     }
-  }
+  },
 }))
 
 jest.mock('../../src/services/multisig')
@@ -51,6 +51,11 @@ jest.mock('../../src/utils/logger', () => ({
 
 jest.mock('../../src/services/cells', () => ({
   getMultisigBalances: jest.fn(),
+}))
+
+const nextMock = jest.fn()
+jest.mock('../../src/models/subjects/show-global-dialog', () => ({
+  next: () => nextMock(),
 }))
 
 const isMainnetMock = jest.fn().mockReturnValue(false)
@@ -170,12 +175,12 @@ describe('test for multisig controller', () => {
     it('no multisig_configs', async () => {
       readFileSyncMock.mockReturnValue(JSON.stringify({}))
       await multisigController.importConfig('1234')
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     }),
       it('multisig_configs is empty', async () => {
         readFileSyncMock.mockReturnValue(JSON.stringify({ multisig_configs: {} }))
         await multisigController.importConfig('1234')
-        expect(showErrorBoxMock).toHaveBeenCalledWith()
+        expect(nextMock).toHaveBeenCalledWith()
       }),
       it('import data is error no require_first_n', async () => {
         readFileSyncMock.mockReturnValue(
@@ -190,7 +195,7 @@ describe('test for multisig controller', () => {
         )
         const res = await multisigController.importConfig('1234')
         expect(res).toBeUndefined()
-        expect(showErrorBoxMock).toHaveBeenCalledWith()
+        expect(nextMock).toHaveBeenCalledWith()
       })
     it('import data is error no threshold', async () => {
       readFileSyncMock.mockReturnValue(
@@ -205,7 +210,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import data is error require_first_n is not number', async () => {
       readFileSyncMock.mockReturnValue(
@@ -220,7 +225,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import data is error threshold is not number', async () => {
       readFileSyncMock.mockReturnValue(
@@ -235,7 +240,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation r > n', async () => {
       readFileSyncMock.mockReturnValue(
@@ -250,7 +255,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation m > n', async () => {
       readFileSyncMock.mockReturnValue(
@@ -265,7 +270,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation blake160s empty', async () => {
       readFileSyncMock.mockReturnValue(
@@ -280,7 +285,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import data is invalidation blake160 length not 42', async () => {
       readFileSyncMock.mockReturnValue(
@@ -295,7 +300,7 @@ describe('test for multisig controller', () => {
       )
       const res = await multisigController.importConfig('1234')
       expect(res).toBeUndefined()
-      expect(showErrorBoxMock).toHaveBeenCalledWith()
+      expect(nextMock).toHaveBeenCalledWith()
     })
     it('import object success', async () => {
       readFileSyncMock.mockReturnValue(

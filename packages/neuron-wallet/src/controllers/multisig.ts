@@ -128,8 +128,8 @@ export default class MultisigController {
           saveSuccessConfigs.push(item.value.result)
         }
       }
-      dialog.showMessageBox({
-        type: 'info',
+      ShowGlobalDialogSubject.next({
+        type: 'success',
         message: t('multisig-config.import-result', {
           success: saveSuccessConfigs.length,
           fail: savedResult.length - saveSuccessConfigs.length,
@@ -182,8 +182,8 @@ export default class MultisigController {
 
     fs.writeFileSync(filePath, JSON.stringify(output, undefined, 2))
 
-    dialog.showMessageBox({
-      type: 'info',
+    ShowGlobalDialogSubject.next({
+      type: 'success',
       message: t('multisig-config.config-exported', { filePath }),
     })
 
