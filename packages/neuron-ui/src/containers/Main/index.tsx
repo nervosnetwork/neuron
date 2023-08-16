@@ -60,6 +60,7 @@ const MainContent = () => {
         action={globalAlertDialog?.action}
         type={globalAlertDialog?.type ?? 'success'}
         onCancel={onCancelGlobalDialog}
+        onOk={onCancelGlobalDialog}
       />
     </div>
   )
