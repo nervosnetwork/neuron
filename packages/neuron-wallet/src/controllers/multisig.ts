@@ -105,7 +105,11 @@ export default class MultisigController {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
       const configOutput: MultisigConfigOutput = JSON.parse(json)
       if (!validateImportConfig(configOutput)) {
-        dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+        ShowGlobalDialogSubject.next({
+          type: 'failed',
+          title: t('common.error'),
+          message: t('messages.invalid-json'),
+        })
         return
       }
       const saveConfigs = Object.values(configOutput.multisig_configs).map(config => ({
@@ -137,7 +141,11 @@ export default class MultisigController {
         result: saveSuccessConfigs,
       }
     } catch {
-      dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+      ShowGlobalDialogSubject.next({
+        type: 'failed',
+        title: t('common.error'),
+        message: t('messages.invalid-json'),
+      })
     }
   }
 
