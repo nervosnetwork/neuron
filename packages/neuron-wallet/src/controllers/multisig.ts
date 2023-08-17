@@ -12,6 +12,7 @@ import OfflineSignService from '../services/offline-sign'
 import Multisig from '../models/multisig'
 import SystemScriptInfo from '../models/system-script-info'
 import NetworksService from '../services/networks'
+import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
 
 interface MultisigConfigOutput {
   multisig_configs: Record<
@@ -104,7 +105,11 @@ export default class MultisigController {
       const json = fs.readFileSync(filePaths[0], 'utf-8')
       const configOutput: MultisigConfigOutput = JSON.parse(json)
       if (!validateImportConfig(configOutput)) {
-        dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+        ShowGlobalDialogSubject.next({
+          type: 'failed',
+          title: t('common.error'),
+          message: t('messages.invalid-json'),
+        })
         return
       }
       const saveConfigs = Object.values(configOutput.multisig_configs).map(config => ({
@@ -123,8 +128,8 @@ export default class MultisigController {
           saveSuccessConfigs.push(item.value.result)
         }
       }
-      dialog.showMessageBox({
-        type: 'info',
+      ShowGlobalDialogSubject.next({
+        type: 'success',
         message: t('multisig-config.import-result', {
           success: saveSuccessConfigs.length,
           fail: savedResult.length - saveSuccessConfigs.length,
@@ -136,7 +141,11 @@ export default class MultisigController {
         result: saveSuccessConfigs,
       }
     } catch {
-      dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+      ShowGlobalDialogSubject.next({
+        type: 'failed',
+        title: t('common.error'),
+        message: t('messages.invalid-json'),
+      })
     }
   }
 
@@ -173,8 +182,8 @@ export default class MultisigController {
 
     fs.writeFileSync(filePath, JSON.stringify(output, undefined, 2))
 
-    dialog.showMessageBox({
-      type: 'info',
+    ShowGlobalDialogSubject.next({
+      type: 'success',
       message: t('multisig-config.config-exported', { filePath }),
     })
 
@@ -205,7 +214,11 @@ export default class MultisigController {
     const tx = result.json
     const lockHash = scriptToHash(addressToScript(fullPayload))
     if (tx.transaction.inputs.every(v => v.lockHash !== lockHash)) {
-      dialog.showErrorBox(t('common.error'), t('messages.multisig-lock-hash-mismatch'))
+      ShowGlobalDialogSubject.next({
+        type: 'failed',
+        title: t('common.error'),
+        message: t('messages.multisig-lock-hash-mismatch'),
+      })
       return {
         status: ResponseCode.Fail,
       }

@@ -3,6 +3,7 @@ import path from 'path'
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import type { OfflineSignJSON } from '../models/offline-sign'
+import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
 
 export default class OfflineSignService {
   public static async loadTransactionJSON() {
@@ -28,7 +29,11 @@ export default class OfflineSignService {
     try {
       const json: OfflineSignJSON = JSON.parse(file)
       if (!json.transaction) {
-        dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+        ShowGlobalDialogSubject.next({
+          type: 'failed',
+          title: t('common.error'),
+          message: t('messages.invalid-json'),
+        })
         return
       }
       return {
@@ -36,7 +41,11 @@ export default class OfflineSignService {
         filePath: path.basename(filePath),
       }
     } catch (err) {
-      dialog.showErrorBox(t('common.error'), t('messages.invalid-json'))
+      ShowGlobalDialogSubject.next({
+        type: 'failed',
+        title: t('common.error'),
+        message: t('messages.invalid-json'),
+      })
     }
   }
 }
