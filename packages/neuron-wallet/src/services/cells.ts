@@ -30,6 +30,9 @@ import NFT from '../models/nft'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { MIN_CELL_CAPACITY } from '../utils/const'
+import { bytes } from '@ckb-lumos/codec'
+import { generateRPC } from '../utils/ckb-rpc'
+import NodeService from './node'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -46,7 +49,12 @@ export enum CustomizedType {
   NFT = 'NFT',
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
+
   SUDT = 'SUDT',
+
+  Spore = 'Spore',
+  SporeCluster = 'SporeCluster',
+
   Unknown = 'Unknown',
 }
 
@@ -264,6 +272,8 @@ export default class CellsService {
     const nftCodehash = assetAccountInfo.getNftInfo().codeHash
     const acpCodehash = assetAccountInfo.getAcpCodeHash()
     const sudtCodehash = assetAccountInfo.getSudtCodeHash()
+    const sporeInfos = assetAccountInfo.getSporeInfos()
+
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 =>
       SystemScriptInfo.generateSecpScript(blake160).computeHash()
     )
@@ -323,6 +333,20 @@ export default class CellsService {
       )
       .orderBy('tx.timestamp', 'ASC')
       .getMany()
+
+    // datum in outputs has been spliced when sync
+    // to make the Spore NFT data available,
+    // we need to fetch it from RPC instead of database
+    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const sporeOutputs = allMultiSignOutputs.filter(item =>
+      sporeInfos.some(info => item.typeCodeHash && bytes.equal(info.codeHash, item.typeCodeHash))
+    )
+    await Promise.all(
+      sporeOutputs.map(async output => {
+        const tx = await rpc.getTransaction(output.outPointTxHash)
+        output.data = tx.transaction.outputsData[Number(output.outPointIndex)]
+      })
+    )
 
     const matchedOutputs = allMultiSignOutputs.filter(o => {
       if (o.multiSignBlake160) {
@@ -399,6 +423,12 @@ export default class CellsService {
         cell.setCustomizedAssetInfo({
           lock: CustomizedLock.SUDT,
           type: CustomizedType.SUDT,
+          data: '',
+        })
+      } else if (sporeInfos.some(info => o.typeCodeHash && bytes.equal(info.codeHash, o.typeCodeHash))) {
+        cell.setCustomizedAssetInfo({
+          lock: '',
+          type: CustomizedType.Spore,
           data: '',
         })
       } else {

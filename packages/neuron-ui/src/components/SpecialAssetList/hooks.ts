@@ -9,6 +9,7 @@ import {
   nftFormatter,
   PresetScript,
   shannonToCKBFormatter,
+  sporeFormatter,
   sudtValueToAmount,
   toUint128Le,
   useDialogWrapper,
@@ -16,7 +17,7 @@ import {
 } from 'utils'
 import { TFunction } from 'i18next'
 import { MILLISECONDS, MILLISECONDS_PER_DAY } from 'utils/const'
-import { AssetInfo, ChequeAssetInfo, NFTType } from '.'
+import { AssetInfo, ChequeAssetInfo, NFTType, SporeType } from '.'
 
 export interface SpecialAssetCell {
   blockHash: string
@@ -193,15 +194,18 @@ export const useSpecialAssetColumnInfo = ({
       const isLockedCheque = status === 'withdraw-asset' && targetTime && Date.now() < targetTime
       const isNFTTransferable = assetInfo.type === NFTType.NFT && assetInfo.data === 'transferable'
       const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
+      const isSpore = assetInfo.type === SporeType.Spore
 
       if (assetInfo.type === NFTType.NFT) {
         amount = nftFormatter(type?.args)
         status = 'transfer-nft'
       } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
         amount = t('special-assets.unknown-asset')
+      } else if (isSpore) {
+        amount = sporeFormatter(type?.args, item.data)
       }
 
-      return { amount, status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo }
+      return { amount, status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo, isSpore }
     },
     [epoch, bestKnownBlockTimestamp, tokenInfoList, t]
   )

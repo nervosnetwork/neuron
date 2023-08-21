@@ -7,6 +7,8 @@ import Transaction from './chain/transaction'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
 import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
+import { predefinedSporeConfigs, SporeScript } from '@spore-sdk/core'
+import { toScriptInfo } from './spore'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -24,6 +26,9 @@ export default class AssetAccountInfo {
   private nftIssuerInfo: ScriptCellInfo
   private nftClassInfo: ScriptCellInfo
   private nftInfo: ScriptCellInfo
+
+  private sporeInfos: ScriptCellInfo[]
+  private sporeClusterInfos: ScriptCellInfo[]
 
   private static MAINNET_GENESIS_BLOCK_HASH: string =
     '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
@@ -110,6 +115,10 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
+
+      // TODO infos for mainnet
+      this.sporeInfos = []
+      this.sporeClusterInfos = []
     } else {
       this.sudt = {
         cellDep: new CellDep(
@@ -183,6 +192,30 @@ export default class AssetAccountInfo {
         codeHash: process.env.TESTNET_NFT_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
+
+      const { Spore, Cluster } = predefinedSporeConfigs.Aggron4.scripts
+
+      this.sporeInfos = (
+        [
+          // TODO remove me, for devnet only
+          {
+            script: {
+              codeHash: '0xbbad126377d45f90a8ee120da988a2d7332c78ba8fd679aab478a19d6c133494',
+              hashType: 'data1',
+            },
+            cellDep: {
+              outPoint: {
+                txHash: '0xe8d710a05265e9325e4f1f28333167368026fd364a0d82dbf2866c53607fb0c6',
+                index: '0x0',
+              },
+              depType: 'code',
+            },
+          },
+          Spore,
+          ...(Spore.versions || []),
+        ] satisfies SporeScript[]
+      ).map(toScriptInfo)
+      this.sporeClusterInfos = [Cluster, ...(Cluster.versions || [])].map(toScriptInfo)
     }
   }
 
@@ -220,6 +253,14 @@ export default class AssetAccountInfo {
 
   public getNftInfo(): ScriptCellInfo {
     return this.nftInfo
+  }
+
+  public getSporeInfos(): ScriptCellInfo[] {
+    return this.sporeInfos
+  }
+
+  public getSporeClusterInfo(): ScriptCellInfo[] {
+    return this.sporeClusterInfos
   }
 
   public getAcpCodeHash(): string {

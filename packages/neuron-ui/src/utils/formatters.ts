@@ -1,3 +1,5 @@
+import { molecule } from '@ckb-lumos/codec'
+import { blockchain } from '@ckb-lumos/base'
 import { TFunction } from 'i18next'
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { CapacityUnit } from './enums'
@@ -293,6 +295,41 @@ export const nftFormatter = (hex?: string, idOnly = false) => {
     return id
   }
   return `#${id} mNFT`
+}
+
+export const sporeFormatter = (args?: string, data?: string) => {
+  let format = 'Spore'
+
+  const SporeData = molecule.table(
+    {
+      contentType: blockchain.Bytes,
+      content: blockchain.Bytes,
+      clusterId: blockchain.BytesOpt,
+    },
+    ['contentType', 'content', 'clusterId']
+  )
+
+  if (!data) {
+    format = `[Unbound] ${format}`
+  } else {
+    try {
+      const unpacked = SporeData.unpack(data)
+      if (!unpacked.clusterId) {
+        format = `[Unbound] ${format}`
+      } else {
+        format = `[${unpacked.clusterId.slice(0, 8)}...${unpacked.clusterId.slice(-8)}] ${format}`
+      }
+    } catch {
+      // the Spore contract seems not guarantee the data always valid
+      // empty catch here to avoid crash
+    }
+  }
+
+  if (args) {
+    format = `[${args.slice(0, 8)}...${args.slice(-8)}] ${format}`
+  }
+
+  return format
 }
 
 export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {

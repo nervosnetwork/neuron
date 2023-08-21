@@ -60,6 +60,11 @@ export enum NFTType {
   NFTIssuer = 'NFTIssuer',
 }
 
+export enum SporeType {
+  Spore = 'Spore',
+  Cluster = 'SporeCluster',
+}
+
 export interface NFTAssetInfo {
   data: string
   lock: string
@@ -400,10 +405,30 @@ const SpecialAssetList = () => {
                   customizedAssetInfo,
                 } = item
 
-                const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
-                  handleGetSpecialAssetColumnInfo(item)
+                const {
+                  status,
+                  targetTime,
+                  isLockedCheque,
+                  isNFTTransferable,
+                  isNFTClassOrIssuer,
+                  epochsInfo,
+                  isSpore,
+                } = handleGetSpecialAssetColumnInfo(item)
 
                 if (isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable)) {
+                  return (
+                    <div className={styles.actionBtnBox}>
+                      <Button
+                        type="cancel"
+                        label={t('special-assets.view-details')}
+                        className={`${styles.actionBtn} ${styles.detailBtn}`}
+                        onClick={() => onViewDetail(item)}
+                      />
+                    </div>
+                  )
+                }
+
+                if (isSpore) {
                   return (
                     <div className={styles.actionBtnBox}>
                       <Button
