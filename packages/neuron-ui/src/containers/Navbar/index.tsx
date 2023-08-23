@@ -3,13 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { NeuronWalletActions, showGlobalAlertDialog, useDispatch, useState as useGlobalState } from 'states'
-import {
-  VerifyCkbVersionResult,
-  VerifyExternalCkbNodeRes,
-  checkForUpdates,
-  getVersion,
-  verifyExternalCkbNode,
-} from 'services/remote'
+import { VerifyExternalCkbNodeRes, checkForUpdates, getVersion, verifyExternalCkbNode } from 'services/remote'
 import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
@@ -83,7 +77,7 @@ const Navbar = () => {
   const {
     wallet: { name },
     settings: { wallets = [] },
-    updater: { version },
+    updater: { version, isUpdated },
   } = neuronWallet
   const [t, i18n] = useTranslation()
   useOnLocaleChange(i18n)
@@ -122,40 +116,30 @@ const Navbar = () => {
   }, [])
 
   useEffect(() => {
-    if (!verifyCkbResult) {
+    // isUpdated is true or version is not empty means check update has return
+    if (!verifyCkbResult || (isUpdated !== true && !version)) {
       return
     }
-    switch (verifyCkbResult.ckb) {
-      case VerifyCkbVersionResult.Same:
-      case VerifyCkbVersionResult.Compatible:
-        if (!verifyCkbResult.withIndexer) {
-          showGlobalAlertDialog({
-            type: 'warning',
-            message: t('navbar.ckb-without-indexer'),
-            action: 'ok',
-          })(dispatch)
-        }
-        break
-      case VerifyCkbVersionResult.ShouldUpdate:
-        if (version) {
-          showGlobalAlertDialog({
-            type: 'warning',
-            message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
-            action: 'ok',
-          })(dispatch)
-        }
-        break
-      case VerifyCkbVersionResult.Incompatible:
-        showGlobalAlertDialog({
-          type: 'warning',
-          message: t('navbar.ckb-node-compatible', { version: getVersion() }),
-          action: 'ok',
-        })(dispatch)
-        break
-      default:
-        break
+    if (version && verifyCkbResult.shouldUpdate) {
+      showGlobalAlertDialog({
+        type: 'warning',
+        message: t('navbar.update-neuron-with-ckb', { version: getVersion() }),
+        action: 'ok',
+      })(dispatch)
+    } else if (!verifyCkbResult.ckbIsCompatible) {
+      showGlobalAlertDialog({
+        type: 'warning',
+        message: t('navbar.ckb-node-compatible', { version: getVersion() }),
+        action: 'ok',
+      })(dispatch)
+    } else if (!verifyCkbResult.withIndexer) {
+      showGlobalAlertDialog({
+        type: 'warning',
+        message: t('navbar.ckb-without-indexer'),
+        action: 'ok',
+      })(dispatch)
     }
-  }, [verifyCkbResult, version])
+  }, [verifyCkbResult, version, isUpdated])
 
   useEffect(() => {
     if (pathname.includes(RoutePath.Settings)) {

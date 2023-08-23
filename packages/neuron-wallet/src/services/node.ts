@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { BI } from '@ckb-lumos/bi'
-import { app as electronApp, dialog, shell } from 'electron'
+import { app as electronApp, dialog, shell, app } from 'electron'
 import { t } from 'i18next'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
@@ -159,10 +159,12 @@ class NodeService {
     if (this._isCkbNodeExternal && network.type !== NetworkType.Light) {
       const localNodeInfo = await new RpcService(network.remote).localNodeInfo()
       const internalNodeVersion = this.getInternalNodeVersion()
+      const neuronVersion = app.getVersion()
       if (!internalNodeVersion || !localNodeInfo.version) return
       return {
-        ckb: this.getCompatibility(internalNodeVersion, localNodeInfo.version),
+        ckbIsCompatible: this.isCkbCompatibility(neuronVersion, localNodeInfo.version),
         withIndexer: await this.isStartWithIndexer(),
+        shouldUpdate: this.verifyCKbNodeShouldUpdate(internalNodeVersion, localNodeInfo.version),
       }
     }
   }
@@ -235,44 +237,40 @@ class NodeService {
     }
   }
 
-  private getNeuronCompatibilityCKB(neuronVersion: string) {
+  private getNeuronCompatibilityCKB() {
     const appPath = electronApp.isPackaged ? electronApp.getAppPath() : path.join(__dirname, '../../../..')
     const compatiblePath = path.join(appPath, 'compatible.csv')
     if (fs.existsSync(compatiblePath)) {
       try {
-        const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
         const content = fs.readFileSync(compatiblePath, 'utf8')?.split('\n')
         const ckbVersions = content?.[0]?.split(',')?.slice(1)
-        const neuronCompatible = content
-          .find(v => v.startsWith(neuronCompatibleVersion))
-          ?.split(',')
-          ?.slice(1)
-        if (neuronCompatible?.length && ckbVersions?.length) {
-          return neuronCompatible
-            .map((v: 'yes' | 'no', idx) => {
-              if (v === 'yes') return ckbVersions[idx]
-            })
-            .filter((v): v is string => !!v)
+        const neuronCompatible = content?.slice(2)
+        const result: Record<string, Record<string, boolean>> = {}
+        for (let index = 0; index < neuronCompatible.length; index++) {
+          const [neuronVersion, ...campatibleValues] = neuronCompatible[index].split(',')
+          result[neuronVersion] = {}
+          campatibleValues.forEach((v, idx) => {
+            result[neuronVersion][ckbVersions[idx]] = v === 'yes'
+          })
         }
+        return result
       } catch (err) {
         logger.error('App\t: get compatible table failed')
       }
     }
   }
 
-  private getCompatibility(neuronCKBVersion: string, externalCKBVersion: string) {
+  private isCkbCompatibility(neuronVersion: string, externalCKBVersion: string) {
+    const compatibilities = this.getNeuronCompatibilityCKB()
+    const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
+    const externalCKBCompatibleVersion = externalCKBVersion.split('.').slice(0, 2).join('.')
+    return compatibilities?.[neuronCompatibleVersion]?.[externalCKBCompatibleVersion]
+  }
+
+  private verifyCKbNodeShouldUpdate(neuronCKBVersion: string, externalCKBVersion: string) {
     const [internalMajor, internalMinor] = neuronCKBVersion.split('.')?.map(v => +v) ?? []
     const [externalMajor, externalMinor] = externalCKBVersion.split('.')?.map(v => +v) ?? []
-
-    if (internalMajor === externalMajor && internalMinor === externalMinor) return VerifyCkbVersionResult.Same
-    if (internalMajor < externalMajor || (internalMajor === externalMajor && internalMinor < externalMinor)) {
-      return VerifyCkbVersionResult.ShouldUpdate
-    }
-    const supportCkbVersions = this.getNeuronCompatibilityCKB(neuronCKBVersion)
-    if (supportCkbVersions?.every(v => !externalCKBVersion.startsWith(v))) {
-      return VerifyCkbVersionResult.Incompatible
-    }
-    return VerifyCkbVersionResult.Compatible
+    return internalMajor < externalMajor || (internalMajor === externalMajor && internalMinor < externalMinor)
   }
 
   private async isStartWithIndexer() {
