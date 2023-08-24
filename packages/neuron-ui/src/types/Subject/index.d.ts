@@ -67,5 +67,6 @@ declare namespace Subject {
     title?: string
     message?: string
     type: 'success' | 'failed' | 'warning'
+    action?: 'ok' | 'cancel'
   }
 }
