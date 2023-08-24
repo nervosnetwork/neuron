@@ -1,4 +1,4 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { when } from 'jest-when'
 import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
@@ -237,7 +237,10 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
+              expect(txObserver).toHaveBeenCalledWith({
+                txHashes: [fakeTx1.transaction.hash],
+                params: fakeTx1.transaction.blockNumber,
+              })
             })
           })
           describe('when loaded block number is not in order', () => {
@@ -253,7 +256,10 @@ describe('unit tests for IndexerConnector', () => {
             })
             it('emits new transactions in batch by the next unprocessed block number', () => {
               expect(txObserver).toHaveBeenCalledTimes(1)
-              expect(txObserver).toHaveBeenCalledWith({ txHashes: [fakeTx1.transaction.hash], params: fakeTx1.transaction.blockNumber })
+              expect(txObserver).toHaveBeenCalledWith({
+                txHashes: [fakeTx1.transaction.hash],
+                params: fakeTx1.transaction.blockNumber,
+              })
             })
           })
           describe('#notifyCurrentBlockNumberProcessed', () => {

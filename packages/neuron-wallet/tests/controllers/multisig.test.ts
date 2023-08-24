@@ -2,7 +2,8 @@ import { ResponseCode } from '../../src/utils/const'
 import MultisigService from '../../src/services/multisig'
 import MultisigController from '../../src/controllers/multisig'
 import CellsService from '../../src/services/cells'
-import { scriptToAddress, systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }

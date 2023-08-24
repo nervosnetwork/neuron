@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
-import { scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress, addressToScript } from '../../../utils/scriptAndAddress'
 import AddressDescription from '../entities/address-description'
 
 export class UpdateAddressDescription1650984779265 implements MigrationInterface {
