@@ -9,26 +9,9 @@ import Toast from 'widgets/Toast'
 import { chainState } from 'states'
 import { setCurrentNetwork, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
-import { useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
+import { useOnWindowResize, useToggleChoiceGroupBorder, getNetworkLabelI18nkey } from 'utils'
 import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
-
-const getNetworkLabelI18nkey = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) => {
-  switch (type) {
-    case 'ckb': {
-      return 'settings.network.mainnet'
-    }
-    case 'ckb_testnet': {
-      return 'settings.network.testnet'
-    }
-    case LIGHT_CLIENT_TESTNET: {
-      return 'settings.network.lightTestnet'
-    }
-    default: {
-      return 'settings.network.devnet'
-    }
-  }
-}
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
