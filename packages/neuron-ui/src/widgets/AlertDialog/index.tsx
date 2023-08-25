@@ -51,7 +51,7 @@ const AlertDialog = ({
           v === 'cancel' ? (
             <Button type="cancel" onClick={onCancel} label={t('common.cancel')} />
           ) : (
-            <Button type="confirm" onClick={onCancel || onOk} label={t('common.confirm')} />
+            <Button type="confirm" onClick={onOk || onCancel} label={t('common.confirm')} />
           )
         )}
       </div>
