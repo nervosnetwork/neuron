@@ -8,6 +8,11 @@ function resetMocks() {
   stubbedReadfileSync.mockReset()
 }
 
+const nextMock = jest.fn()
+jest.mock('../../src/models/subjects/show-global-dialog', () => ({
+  next: () => nextMock(),
+}))
+
 describe('OfflineSignService', () => {
   let OfflineSignService: any
 
@@ -77,7 +82,7 @@ describe('OfflineSignService', () => {
 
       const result = await OfflineSignService.loadTransactionJSON()
       expect(stubbedReadfileSync).toHaveBeenCalled()
-      expect(stubbedElectronShowErrorBox).toHaveBeenCalledTimes(1)
+      expect(nextMock).toHaveBeenCalled()
       expect(result).toBe(undefined)
     })
 
@@ -85,7 +90,7 @@ describe('OfflineSignService', () => {
       stubbedReadfileSync.mockReturnValueOnce({})
       const result = await OfflineSignService.loadTransactionJSON()
       expect(stubbedReadfileSync).toHaveBeenCalled()
-      expect(stubbedElectronShowErrorBox).toHaveBeenCalledTimes(1)
+      expect(nextMock).toHaveBeenCalled()
       expect(result).toBe(undefined)
     })
   })

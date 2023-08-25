@@ -296,6 +296,13 @@ export default class ApiController {
       }
     })
 
+    handle('verify-external-ckb-node', async () => {
+      return {
+        status: ResponseCode.Success,
+        result: await NodeService.getInstance().verifyExternalCkbNode(),
+      }
+    })
+
     // Wallets
 
     handle('get-all-wallets', async () => {
@@ -449,28 +456,6 @@ export default class ApiController {
         return this.#transactionsController.updateDescription(params)
       }
     )
-
-    handle('show-transaction-details', async (_, hash: string) => {
-      const win = showWindow(
-        `#/transaction/${hash}`,
-        t(`messageBox.transaction.title`, { hash }),
-        {
-          height: 750,
-        },
-        undefined,
-        win => win.webContents.getURL().endsWith(`#/transaction/${hash}`)
-      )
-
-      if (win.isVisible()) return
-
-      return new Promise((resolve, reject) => {
-        win.once('ready-to-show', resolve)
-        CommonUtils.sleep(3e3).then(() => {
-          win.off('ready-to-show', resolve)
-          reject(new Error('Show window timeout'))
-        })
-      })
-    })
 
     handle('export-transactions', async (_, params: { walletID: string }) => {
       return this.#transactionsController.exportTransactions(params)

@@ -54,6 +54,12 @@
       background: var(--secondary-background-color);
     }
   }
+  container-type: inline-size;
+  @container (max-width: 968px) {
+    .list {
+      grid-template-columns: repeat(3, auto);
+    }
+  }
 }
 
 .list {

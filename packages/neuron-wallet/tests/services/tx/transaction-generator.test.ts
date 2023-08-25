@@ -18,8 +18,9 @@ import SystemScriptInfo from '../../../src/models/system-script-info'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
-import { scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { serializeWitnessArgs } from '../../../src/utils/serialization'
+import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import {
   CapacityNotEnough,
   CurrentWalletNotSet,

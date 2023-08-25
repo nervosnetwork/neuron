@@ -43,7 +43,7 @@ export const appState: State.App = {
   popups: [],
   globalDialog: null,
   notifications: initNotifications,
-  alertDialog: null,
+  globalAlertDialog: null,
   loadings: {
     sending: false,
     addressList: false,

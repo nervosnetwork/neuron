@@ -13,4 +13,3 @@ export const updateTransactionDescription = remoteApi<Controller.UpdateTransacti
   'update-transaction-description'
 )
 export const exportTransactions = remoteApi<Controller.ExportTransactions.Params>('export-transactions')
-export const showTransactionDetails = remoteApi<string>('show-transaction-details')

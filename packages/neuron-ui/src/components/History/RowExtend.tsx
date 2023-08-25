@@ -25,11 +25,8 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
   const navigate = useNavigate()
   const [t] = useTranslation()
 
-  const { localDescription, onDescriptionPress, onDescriptionChange, onDescriptionSelected } = useLocalDescription(
-    'transaction',
-    id,
-    dispatch
-  )
+  const { localDescription, onDescriptionPress, onDescriptionChange, onDescriptionFieldBlur, onDescriptionSelected } =
+    useLocalDescription('transaction', id, dispatch, 'textarea')
 
   const onActionBtnClick = useCallback(
     (e: React.SyntheticEvent<HTMLButtonElement>) => {
@@ -41,7 +38,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
             break
           }
           case 'detail': {
-            navigate(`${RoutePath.HistoryDetailPage}/${btn.dataset.hash}`)
+            navigate(`${RoutePath.History}/${btn.dataset.hash}`)
             break
           }
           default: {
@@ -84,6 +81,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
                         value={isSelected ? localDescription.description : description}
                         onChange={onDescriptionChange}
                         onKeyDown={onDescriptionPress}
+                        onBlur={onDescriptionFieldBlur}
                       />
                       <Edit
                         data-description-key={column.hash}

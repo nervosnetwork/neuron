@@ -191,8 +191,10 @@
     display: none;
   }
   input[type='checkbox'] + span {
+    display: inline-block;
+    height: 20px;
     padding-left: 30px;
-    line-height: 22px;
+    line-height: 20px;
     background: url('../widgets/Icons/Checkbox.svg') no-repeat left top;
     user-select: none;
   }

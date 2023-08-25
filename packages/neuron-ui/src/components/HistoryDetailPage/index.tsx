@@ -287,6 +287,7 @@ const HistoryDetailPage = () => {
           columns={columns}
           dataSource={currentTab.id === tabs[0].id ? inputsData : outputsData}
           noDataContent={t('overview.no-recent-activities')}
+          hasHoverTrBg={false}
         />
       </div>
 

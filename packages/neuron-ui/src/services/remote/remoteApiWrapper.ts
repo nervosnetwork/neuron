@@ -49,6 +49,7 @@ type Action =
   | 'is-dark'
   | 'set-theme'
   | 'is-ckb-run-external'
+  | 'verify-external-ckb-node'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -72,7 +73,6 @@ type Action =
   // Transactions
   | 'get-transaction-list'
   | 'get-transaction'
-  | 'show-transaction-details'
   | 'update-transaction-description'
   | 'export-transactions'
   // Dao
