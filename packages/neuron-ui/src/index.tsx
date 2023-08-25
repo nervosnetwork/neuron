@@ -7,39 +7,34 @@ import 'styles/theme.scss'
 import 'styles/index.scss'
 import 'utils/i18n'
 
-import Transaction from 'components/Transaction'
 import ErrorBoundary from 'components/ErrorBoundary'
 import Spinner from 'widgets/Spinner'
 import { withProvider } from 'states'
 import mainRouterConfig from 'router'
 
-if (window.location.hash.startsWith('#/transaction/')) {
-  ReactDOM.render(<Transaction />, document.getElementById('root'))
-} else {
-  window.neuron = {
-    role: 'main',
-  }
-
-  const containers: RouteObject[] = mainRouterConfig
-
-  const RouterRender = () => useRoutes(containers)
-
-  const App = withProvider(() => {
-    return (
-      <ErrorBoundary>
-        <Suspense fallback={<Spinner />}>
-          <Router>
-            <RouterRender />
-          </Router>
-        </Suspense>
-      </ErrorBoundary>
-    )
-  })
-
-  Object.defineProperty(App, 'displayName', {
-    value: 'App',
-  })
-  ReactDOM.render(<App />, document.getElementById('root'))
+window.neuron = {
+  role: 'main',
 }
+
+const containers: RouteObject[] = mainRouterConfig
+
+const RouterRender = () => useRoutes(containers)
+
+const App = withProvider(() => {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<Spinner />}>
+        <Router>
+          <RouterRender />
+        </Router>
+      </Suspense>
+    </ErrorBoundary>
+  )
+})
+
+Object.defineProperty(App, 'displayName', {
+  value: 'App',
+})
+ReactDOM.render(<App />, document.getElementById('root'))
 
 export default undefined

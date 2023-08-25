@@ -25,7 +25,11 @@ export default class SettingsService extends Store {
   }
 
   get locale() {
-    return this.readSync('locale')
+    const res = this.readSync<string>('locale')
+    if (locales.includes(res as Locale)) {
+      return res as Locale
+    }
+    return res?.startsWith('zh') ? 'zh' : 'en'
   }
 
   set locale(lng: Locale) {

@@ -1,4 +1,4 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../utils/scriptAndAddress'
 import SystemScriptInfo from '../../models/system-script-info'
 import NetworksService from '../../services/networks'
 import Address, { AddressType } from './address'

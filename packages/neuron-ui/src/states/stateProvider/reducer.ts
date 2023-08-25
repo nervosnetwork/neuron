@@ -47,7 +47,7 @@ export enum AppActions {
   DismissPasswordRequest = 'dismissPasswordRequest',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
-  UpdateAlertDialog = 'updateAlertDialog',
+  UpdateGlobalAlertDialog = 'updateGlobalAlertDialog',
 
   PopIn = 'popIn',
   PopOut = 'popOut',
@@ -88,7 +88,7 @@ export type StateAction =
   | { type: AppActions.DismissPasswordRequest }
   | { type: AppActions.UpdateChainInfo; payload: Partial<State.App> }
   | { type: AppActions.UpdateLoadings; payload: any }
-  | { type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }
+  | { type: AppActions.UpdateGlobalAlertDialog; payload: State.GlobalAlertDialog }
   | { type: AppActions.PopIn; payload: State.Popup }
   | { type: AppActions.PopOut }
   | { type: AppActions.ToggleTopAlertVisibility; payload?: boolean }
@@ -357,8 +357,8 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       Object.assign(state.app.loadings, action.payload)
       break
     }
-    case AppActions.UpdateAlertDialog: {
-      state.app.alertDialog = action.payload
+    case AppActions.UpdateGlobalAlertDialog: {
+      state.app.globalAlertDialog = action.payload
       break
     }
     case AppActions.PopIn: {

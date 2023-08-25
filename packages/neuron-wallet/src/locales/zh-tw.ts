@@ -165,7 +165,7 @@ export default {
         title: '內置 CKB 節點',
         message: '缺少必要的依賴',
         detail:
-          'Neuron 內置的 CKB 節點需要安裝 x64 版本的 Microsoft Visual C++ Redistributable 才能正常運行。您需要安裝該組件來啟動內置節點。',
+          'Neuron 中的網絡節點依賴C++組件,請安裝 x64 最新版本的 Microsoft Visual C++Redistributable 來保證軟件正常運行。',
         buttons: {
           'install-and-exit': '安裝並退出',
         },
@@ -205,12 +205,6 @@ export default {
           cancel: '取消',
         },
       },
-      'node-version-different': {
-        message: '節點版本與 Neuron(v {{ version }}) 不壹致，請確認後使用',
-      },
-      'ckb-without-indexer': {
-        message: "請添加 '--indexer' 參數來啟動本地節點",
-      },
     },
     prompt: {
       password: {
@@ -246,6 +240,7 @@ export default {
     },
     'export-transactions': {
       'export-transactions': '導出交易歷史',
+      'export-success': '交易已導出',
       'transactions-exported': '{{total}} 條交易記錄已被導出至 {{file}}',
       column: {
         time: '時間',

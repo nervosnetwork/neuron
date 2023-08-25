@@ -21,7 +21,7 @@ import MnemonicInput from 'widgets/MnemonicInput'
 import Alert from 'widgets/Alert'
 import { Loading } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
-import { showAlertDialog, useDispatch } from 'states'
+import { showGlobalAlertDialog, useDispatch } from 'states'
 import { importedWalletDialogShown } from 'services/localCache'
 import { useInputWords } from './hooks'
 import styles from './walletWizard.module.scss'
@@ -246,7 +246,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard/', dispatch }: Wizard
             }`
           )
         } else {
-          showAlertDialog({
+          showGlobalAlertDialog({
             show: true,
             title: t('common.verification-failure'),
             message: t(`messages.codes.${ErrorCode.FieldInvalid}`, {

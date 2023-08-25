@@ -1,4 +1,5 @@
-import { scriptToAddress, systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import { AddressType } from '../../../src/models/keys/address'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
 

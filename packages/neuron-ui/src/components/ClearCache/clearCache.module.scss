@@ -38,6 +38,7 @@
 
     .highlight {
       color: var(--primary-color);
+      display: inline-block;
     }
   }
   @include checkbox;

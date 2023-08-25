@@ -15,6 +15,7 @@ import MultisigOutputChangedSubject from '../../models/subjects/multisig-output-
 import MigrateSubject from '../../models/subjects/migrate-subject'
 import startMonitor, { stopMonitor } from '../../services/monitor'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
+import ShowGlobalDialogSubject from '../../models/subjects/show-global-dialog'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -118,5 +119,9 @@ export const subscribe = (dispatcher: AppResponder) => {
       default:
         break
     }
+  })
+
+  ShowGlobalDialogSubject.subscribe(params => {
+    BrowserWindow.getFocusedWindow()?.webContents.send('show-global-dialog', params)
   })
 }

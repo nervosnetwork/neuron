@@ -26,7 +26,7 @@ $hover-bg-color: #3cc68a4d;
   background: #212524;
   position: relative;
   --left-padding: 16px;
-  --svg-right-margin: 18px;
+  --svg-right-margin: 16px;
   &[data-expanded='false'] {
     --left-padding: 14px;
     --svg-right-margin: 14px;
@@ -146,7 +146,8 @@ $hover-bg-color: #3cc68a4d;
     }
 
     & .arrow {
-      margin: 0 24px;
+      margin: 0 16px 0 20px;
+      width: 10px;
     }
   }
 

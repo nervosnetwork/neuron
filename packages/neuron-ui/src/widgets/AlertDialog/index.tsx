@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDialog } from 'utils'
 import Button from 'widgets/Button'
@@ -8,6 +8,7 @@ import Tips from 'widgets/Icons/Tips.png'
 import styles from './alertDialog.module.scss'
 
 type AlertType = 'success' | 'failed' | 'warning'
+type Action = 'ok' | 'cancel' | 'all'
 
 const AlertDialog = ({
   show,
@@ -17,6 +18,7 @@ const AlertDialog = ({
   onClose,
   onOk,
   onCancel,
+  action,
 }: {
   show?: boolean
   title?: string
@@ -25,10 +27,17 @@ const AlertDialog = ({
   onClose?: () => void
   onOk?: () => void
   onCancel?: () => void
+  action?: Action
 }) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show, dialogRef, onClose: onClose || (() => {}) })
+  const actions = useMemo<('cancel' | 'ok')[]>(() => {
+    if (action) {
+      return action === 'all' ? ['cancel', 'ok'] : [action]
+    }
+    return type === 'warning' ? ['cancel', 'ok'] : ['ok']
+  }, [action, type])
 
   return (
     <dialog ref={dialogRef} className={styles.alertDialog}>
@@ -38,13 +47,12 @@ const AlertDialog = ({
       <h2 className={styles.title}>{title}</h2>
       <p className={styles.message}>{message}</p>
       <div className={styles.actions}>
-        {type === 'failed' && <Button type="confirm" onClick={onCancel} label={t('common.confirm')} />}
-        {type === 'success' && <Button type="confirm" onClick={onCancel || onOk} label={t('common.confirm')} />}
-        {type === 'warning' && (
-          <>
+        {actions.map(v =>
+          v === 'cancel' ? (
             <Button type="cancel" onClick={onCancel} label={t('common.cancel')} />
-            <Button type="confirm" onClick={onOk} label={t('common.confirm')} />
-          </>
+          ) : (
+            <Button type="confirm" onClick={onCancel || onOk} label={t('common.confirm')} />
+          )
         )}
       </div>
     </dialog>

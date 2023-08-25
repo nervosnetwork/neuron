@@ -23,13 +23,15 @@
   font-size: 14px;
   cursor: pointer !important;
 
-  &:hover,
-  &.active {
-    &,
-    .title,
-    .subTitle {
-      color: var(--primary-color);
-      border-color: var(--primary-color);
+  &:not(.disabled) {
+    &:hover,
+    &.active {
+      &,
+      .title,
+      .subTitle {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
     }
   }
 
@@ -44,7 +46,7 @@
 
   &.disabled {
     cursor: not-allowed !important;
-    background-color: #eee;
+    background-color: var(--disable-bg-color);
     * {
       cursor: not-allowed !important;
     }

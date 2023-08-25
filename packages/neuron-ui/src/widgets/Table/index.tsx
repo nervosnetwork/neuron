@@ -28,6 +28,7 @@ export type TableProps<T> = {
   isFixedTable?: boolean
   rowExtendRender?: (v: T, idx: number) => React.ReactNode
   expandedRow?: number | null
+  hasHoverTrBg?: boolean
 }
 
 const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
@@ -43,6 +44,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     isFixedTable,
     rowExtendRender,
     expandedRow,
+    hasHoverTrBg = true,
   } = props
   const [showBalance, setShowBalance] = useState(true)
   const onClickBalanceIcon = useCallback(() => {
@@ -61,7 +63,10 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
       data-have-head={!!head}
     >
       {head && typeof head === 'string' ? <div className={styles.head}>{head}</div> : head}
-      <table className={`${styles.table} ${head === null || head === undefined ? styles.noHead : ''}`}>
+      <table
+        className={`${styles.table} ${head === null || head === undefined ? styles.noHead : ''}`}
+        data-hover-tr-bg={hasHoverTrBg}
+      >
         <thead>
           <tr>
             {columnList.map(
