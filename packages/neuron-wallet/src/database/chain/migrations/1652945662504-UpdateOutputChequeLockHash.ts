@@ -1,7 +1,9 @@
 import { In, MigrationInterface, QueryRunner } from "typeorm";
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { ScriptHashType } from "../../../models/chain/script";
 import Output from "../entities/output";
+
+
 
 export class UpdateOutputChequeLockHash1652945662504 implements MigrationInterface {
   name = 'UpdateOutputChequeLockHash1652945662504'

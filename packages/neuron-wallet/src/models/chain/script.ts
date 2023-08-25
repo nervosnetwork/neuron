@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { bytes as byteUtils } from '@ckb-lumos/codec'
 import TypeChecker from '../../utils/type-checker'
 
@@ -34,7 +34,16 @@ export default class Script {
   }
 
   public computeHash(): string {
-    return scriptToHash(this.toSDK())
+    const script = this.toSDK()
+    if (!script || !script.codeHash || !script.hashType) {
+      throw new Error('Invalid script')
+    }
+    // empty string is not allowed for args
+    const formattedScript = {
+      ...script,
+      args: script.args || '0x',
+    }
+    return scriptToHash(formattedScript)
   }
 
   /**

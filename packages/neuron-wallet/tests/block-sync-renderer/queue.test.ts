@@ -101,7 +101,7 @@ describe('queue', () => {
   const fakeWalletId = 'w1'
   const addressInfo: Address = {
     address,
-    blake160: '0xfakeblake160',
+    blake160: `0x${'0'.repeat(40)}`,
     walletId: fakeWalletId,
     path: '',
     addressType: AddressType.Receiving,

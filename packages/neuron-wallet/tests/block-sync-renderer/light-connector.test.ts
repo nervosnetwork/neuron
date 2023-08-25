@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import LightConnector from '../../src/block-sync-renderer/sync/light-connector'
 import SyncProgress from '../../src/database/chain/entities/sync-progress'
 import { BI } from '@ckb-lumos/bi'
