@@ -13,6 +13,23 @@ import { useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
 import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
 
+const getNetworkLabelI18nkey = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) => {
+  switch (type) {
+    case 'ckb': {
+      return 'settings.network.mainnet'
+    }
+    case 'ckb_testnet': {
+      return 'settings.network.testnet'
+    }
+    case LIGHT_CLIENT_TESTNET: {
+      return 'settings.network.lightTestnet'
+    }
+    default: {
+      return 'settings.network.devnet'
+    }
+  }
+}
+
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
   const [showEditorDialog, setShowEditorDialog] = useState(false)
@@ -87,7 +104,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           label: (
             <div className={styles.networkLabel}>
               <p>{`${network.name} (${network.remote})`}</p>
-              <div className={styles.tag}>{network.chain}</div>
+              <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
             </div>
           ),
           suffix: (
