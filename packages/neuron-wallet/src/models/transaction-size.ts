@@ -1,4 +1,4 @@
-import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils/lib/serialization/transaction'
+import { serializeOutput, serializeWitnessArgs } from '../utils/serialization'
 import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
