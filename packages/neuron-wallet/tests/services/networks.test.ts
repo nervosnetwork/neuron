@@ -14,7 +14,7 @@ uuidV4Mock.mockReturnValue('mock uuid')
 
 jest.mock('uuid', () => {
   return {
-    v4: () => uuidV4Mock()
+    v4: () => uuidV4Mock(),
   }
 })
 
@@ -197,7 +197,7 @@ describe(`Unit tests of networks service`, () => {
       name: 'Internal Node',
       remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
-      chain: "ckb",
+      chain: 'ckb',
       type: NetworkType.Default,
       readonly: true,
     }
@@ -239,7 +239,9 @@ describe(`Unit tests of networks service`, () => {
       expect(updateAllMock).toBeCalledWith([defaultMainnetNetwork, defaultLightClientNetwork])
     })
     it('change the default network', () => {
-      readSyncMock.mockReturnValueOnce(false).mockReturnValueOnce([{ ...defaultMainnetNetwork, name: 'changed name' }, defaultLightClientNetwork])
+      readSyncMock
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce([{ ...defaultMainnetNetwork, name: 'changed name' }, defaultLightClientNetwork])
       uuidV4Mock.mockReturnValueOnce('uuidv4')
       //@ts-ignore private-method
       service.migrateNetwork()
@@ -253,7 +255,7 @@ describe(`Unit tests of networks service`, () => {
           name: 'changed name',
           readonly: false,
           type: NetworkType.Normal,
-        }
+        },
       ])
     })
   })
