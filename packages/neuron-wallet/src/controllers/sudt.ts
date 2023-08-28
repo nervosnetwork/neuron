@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import LiveCellService from '../services/live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
 import Script, { ScriptHashType } from '../models/chain/script'

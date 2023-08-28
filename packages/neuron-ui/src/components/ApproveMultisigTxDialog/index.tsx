@@ -25,7 +25,7 @@ const Cell = React.memo(
           {address.slice(0, 6)}...{address.slice(-6)}
           <span className={`${cell.type ? styles.activity : ''} ${styles.tag}`}>Type</span>
           <span className={`${cell.data && cell.data !== '0x' ? styles.activity : ''} ${styles.tag}`}>Data</span>
-          <ScriptTag script={cell.lock} isMainnet={isMainnet} />
+          <ScriptTag className={styles.scriptTag} script={cell.lock} isMainnet={isMainnet} />
         </div>
         <div>{`${shannonToCKBFormatter(cell.capacity ?? '0')} CKB`}</div>
       </div>

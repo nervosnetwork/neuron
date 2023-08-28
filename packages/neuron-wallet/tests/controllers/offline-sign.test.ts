@@ -190,10 +190,10 @@ describe('OfflineSignController', () => {
         generateRPC() {
           return {
             paramsFormatter: {
-              toRawTransaction: (tx: any) => tx
-            }
+              toRawTransaction: (tx: any) => tx,
+            },
           }
-        }
+        },
       }
     })
 

@@ -1,4 +1,5 @@
-import { AddressPrefix, blake160, scriptToAddress, systemScripts, bytesToHex } from '@nervosnetwork/ckb-sdk-utils'
+import { AddressPrefix, blake160, systemScripts, bytesToHex } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../utils/scriptAndAddress'
 
 import { AccountExtendedPublicKey } from './key'
 

@@ -57,6 +57,7 @@ const MainContent = () => {
         show={!!globalAlertDialog}
         title={globalAlertDialog?.title}
         message={globalAlertDialog?.message}
+        action={globalAlertDialog?.action}
         type={globalAlertDialog?.type ?? 'success'}
         onCancel={onCancelGlobalDialog}
       />

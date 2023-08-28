@@ -1,5 +1,5 @@
 import { Equal, getConnection, In, Not } from 'typeorm'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { HexString } from '@ckb-lumos/base'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'

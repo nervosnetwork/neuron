@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { BI } from '@ckb-lumos/bi'
-import { app as electronApp, dialog, shell } from 'electron'
+import { app as electronApp, dialog, shell, app } from 'electron'
 import { t } from 'i18next'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
@@ -20,6 +20,13 @@ import { rpcRequest } from '../utils/rpc-request'
 import { generateRPC } from '../utils/ckb-rpc'
 import startMonitor from './monitor'
 import { CKBLightRunner } from './light-runner'
+
+export enum VerifyCkbVersionResult {
+  Same,
+  Compatible,
+  ShouldUpdate,
+  Incompatible,
+}
 
 class NodeService {
   private static instance: NodeService
@@ -137,16 +144,27 @@ class NodeService {
     const isDefaultCKBNeedStart = await this.isDefaultCKBNeedRestart()
     if (isDefaultCKBNeedStart) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
+      this._isCkbNodeExternal = false
       const redistReady = await redistCheck()
       await (redistReady ? this.startNode() : this.showGuideDialog())
       await startMonitor()
     } else {
       logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
       this._isCkbNodeExternal = true
-      const network = NetworksService.getInstance().getCurrent()
-      if (network.type !== NetworkType.Light) {
-        await this.verifyNodeVersion()
-        await this.verifyStartWithIndexer()
+    }
+  }
+
+  public async verifyExternalCkbNode() {
+    const network = NetworksService.getInstance().getCurrent()
+    if (this._isCkbNodeExternal && network.type !== NetworkType.Light) {
+      const localNodeInfo = await new RpcService(network.remote).localNodeInfo()
+      const internalNodeVersion = this.getInternalNodeVersion()
+      const neuronVersion = app.getVersion()
+      if (!internalNodeVersion || !localNodeInfo.version) return
+      return {
+        ckbIsCompatible: this.isCkbCompatibility(neuronVersion, localNodeInfo.version),
+        withIndexer: await this.isStartWithIndexer(),
+        shouldUpdate: this.verifyCKbNodeShouldUpdate(internalNodeVersion, localNodeInfo.version),
       }
     }
   }
@@ -219,38 +237,54 @@ class NodeService {
     }
   }
 
-  private async verifyNodeVersion() {
-    const network = NetworksService.getInstance().getCurrent()
-    const localNodeInfo = await new RpcService(network.remote).localNodeInfo()
-    const internalNodeVersion = this.getInternalNodeVersion()
-    const [internalMajor, internalMinor] = internalNodeVersion?.split('.') ?? []
-    const [externalMajor, externalMinor] = localNodeInfo.version?.split('.') ?? []
-
-    if (internalMajor !== externalMajor || (externalMajor === '0' && internalMinor !== externalMinor)) {
-      dialog.showMessageBox({
-        type: 'warning',
-        message: t('messageBox.node-version-different.message', { version: internalNodeVersion }),
-      })
+  private getNeuronCompatibilityCKB() {
+    const appPath = electronApp.isPackaged ? electronApp.getAppPath() : path.join(__dirname, '../../../..')
+    const compatiblePath = path.join(appPath, 'compatible.csv')
+    if (fs.existsSync(compatiblePath)) {
+      try {
+        const content = fs.readFileSync(compatiblePath, 'utf8')?.split('\n')
+        const ckbVersions = content?.[0]?.split(',')?.slice(1)
+        const neuronCompatible = content?.slice(2)
+        const result: Record<string, Record<string, boolean>> = {}
+        for (let index = 0; index < neuronCompatible.length; index++) {
+          const [neuronVersion, ...campatibleValues] = neuronCompatible[index].split(',')
+          result[neuronVersion] = {}
+          campatibleValues.forEach((v, idx) => {
+            result[neuronVersion][ckbVersions[idx]] = v === 'yes'
+          })
+        }
+        return result
+      } catch (err) {
+        logger.error('App\t: get compatible table failed')
+      }
     }
   }
 
-  private async verifyStartWithIndexer() {
+  private isCkbCompatibility(neuronVersion: string, externalCKBVersion: string) {
+    const compatibilities = this.getNeuronCompatibilityCKB()
+    const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
+    const externalCKBCompatibleVersion = externalCKBVersion.split('.').slice(0, 2).join('.')
+    return compatibilities?.[neuronCompatibleVersion]?.[externalCKBCompatibleVersion]
+  }
+
+  private verifyCKbNodeShouldUpdate(neuronCKBVersion: string, externalCKBVersion: string) {
+    const [internalMajor, internalMinor] = neuronCKBVersion.split('.')?.map(v => +v) ?? []
+    const [externalMajor, externalMinor] = externalCKBVersion.split('.')?.map(v => +v) ?? []
+    return internalMajor < externalMajor || (internalMajor === externalMajor && internalMinor < externalMinor)
+  }
+
+  private async isStartWithIndexer() {
     const network = NetworksService.getInstance().getCurrent()
     try {
       const res = await rpcRequest<{ error?: { code: number } }>(network.remote, { method: 'get_indexer_tip' })
       if (res.error?.code === START_WITHOUT_INDEXER) {
         logger.info('Node:\tthe ckb node does not start with --indexer')
-        dialog.showMessageBox({
-          type: 'warning',
-          message: t('messageBox.ckb-without-indexer.message'),
-        })
+        return false
       }
+      return true
     } catch (error) {
       logger.info('Node:\tcalling get_indexer_tip failed')
-      dialog.showMessageBox({
-        type: 'warning',
-        message: t('messageBox.ckb-without-indexer.message'),
-      })
+      return false
     }
   }
 }

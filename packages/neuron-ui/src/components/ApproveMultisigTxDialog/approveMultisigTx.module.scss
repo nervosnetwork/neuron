@@ -84,6 +84,7 @@
     background-color: transparent;
     margin: 0;
     border: none;
+    color: var(--tabs-default-color);
     cursor: pointer;
   }
 
@@ -138,6 +139,19 @@
       background: var(--primary-color);
       border-color: var(--primary-color);
       color: var(--primary-text-color);
+    }
+  }
+
+  .scriptTag {
+    line-height: 17px;
+    margin: auto 8px;
+    padding: 3px 8px;
+    background: var(--tag-background-color);
+    color: var(--script-tag-color);
+    cursor: auto;
+    @media (prefers-color-scheme: dark) {
+      color: var(--primary-color);
+      background: transparent;
     }
   }
 }

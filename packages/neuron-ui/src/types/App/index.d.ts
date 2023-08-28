@@ -139,6 +139,7 @@ declare namespace State {
     title?: string
     message?: string
     type: 'success' | 'failed' | 'warning'
+    action?: 'ok' | 'cancel' | 'all'
     onClose?: () => void
     onOk?: () => void
     onCancel?: () => void

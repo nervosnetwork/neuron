@@ -18,7 +18,9 @@ import SystemScriptInfo from '../../../src/models/system-script-info'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
-import { serializeWitnessArgs, scriptToAddress, addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs } from '../../../src/utils/serialization'
+import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import {
   CapacityNotEnough,
   CurrentWalletNotSet,
@@ -1196,7 +1198,7 @@ describe('TransactionGenerator', () => {
           const targetOutput: Output = Output.fromObject({
             capacity: toShannon('61'),
             lock: aliceAnyoneCanPayLockScript,
-            type: assetAccountInfo.generateSudtScript('0xuuid'),
+            type: assetAccountInfo.generateSudtScript('0x1234'),
             data: '0x',
           })
 

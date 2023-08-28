@@ -296,6 +296,13 @@ export default class ApiController {
       }
     })
 
+    handle('verify-external-ckb-node', async () => {
+      return {
+        status: ResponseCode.Success,
+        result: await NodeService.getInstance().verifyExternalCkbNode(),
+      }
+    })
+
     // Wallets
 
     handle('get-all-wallets', async () => {

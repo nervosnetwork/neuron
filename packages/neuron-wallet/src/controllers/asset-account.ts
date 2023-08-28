@@ -1,4 +1,4 @@
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../utils/scriptAndAddress'
 import AssetAccount from '../models/asset-account'
 import Transaction from '../models/chain/transaction'
 import AssetAccountService from '../services/asset-account-service'
