@@ -4,7 +4,7 @@ import NetworksService from '../services/networks'
 import RpcService from '../services/rpc-service'
 import Script, { ScriptHashType } from './chain/script'
 import { predefined } from '@ckb-lumos/config-manager'
-const systemScripts = predefined.LINA.SCRIPTS
+const systemScriptsMainnet = predefined.LINA.SCRIPTS
 
 export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
@@ -16,9 +16,9 @@ export default class SystemScriptInfo {
   static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
 
   static DAO_SCRIPT_HASH = new Script(
-    systemScripts.DAO.CODE_HASH,
+    systemScriptsMainnet.DAO.CODE_HASH,
     '0x',
-    systemScripts.DAO.HASH_TYPE as ScriptHashType
+    systemScriptsMainnet.DAO.HASH_TYPE as ScriptHashType
   ).computeHash()
 
   private static instance: SystemScriptInfo

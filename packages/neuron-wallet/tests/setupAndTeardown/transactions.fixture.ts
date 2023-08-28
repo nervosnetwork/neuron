@@ -7,7 +7,7 @@ import Script from '../../src/models/chain/script'
 import Output from '../../src/models/chain/output'
 import { DEPLOY_KEY } from './keys'
 import { predefined } from '@ckb-lumos/config-manager'
-const systemScripts = predefined.LINA.SCRIPTS
+const systemScriptsMainnet = predefined.LINA.SCRIPTS
 
 const fromTxObject = (tx: any) =>
   Transaction.fromObject({
@@ -178,8 +178,8 @@ const ACPTx0 = {
       // address: ckt1qyq9t2w0l0u7rnylrxmj2uq6a28sstnctcwfu4vnst4n3u0p2luawfsmjrmsz
       lock: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-        codeHash: systemScripts.ANYONE_CAN_PAY.CODE_HASH,
-        hashType: systemScripts.ANYONE_CAN_PAY.HASH_TYPE,
+        codeHash: systemScriptsMainnet.ANYONE_CAN_PAY.CODE_HASH,
+        hashType: systemScriptsMainnet.ANYONE_CAN_PAY.HASH_TYPE,
       },
       type: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
@@ -225,8 +225,8 @@ const ACPTx1 = {
       // address: ckt1qyq9t2w0l0u7rnylrxmj2uq6a28sstnctcwfu4vnst4n3u0p2luawfsmjrmsz
       lock: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-        codeHash: systemScripts.ANYONE_CAN_PAY.CODE_HASH,
-        hashType: systemScripts.ANYONE_CAN_PAY.HASH_TYPE,
+        codeHash: systemScriptsMainnet.ANYONE_CAN_PAY.CODE_HASH,
+        hashType: systemScriptsMainnet.ANYONE_CAN_PAY.HASH_TYPE,
       },
       capacity: '0x34e62ce00',
       outPoint: { txHash: '0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a8657900', index: '0' },
