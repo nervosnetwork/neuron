@@ -36,11 +36,11 @@ const exec = async () => {
   const builtinVersions = await fetchBuiltinCkbVersion()
 
   if (latestVersions.node !== builtinVersions.node) {
-    fs.writeFileSync(BUILTIN_VERSION_PATH.node, latestVersions.node)
+    fs.writeFileSync(BUILTIN_VERSION_PATH.node, `${latestVersions.node}\n`)
   }
 
   if (latestVersions.lightClient !== builtinVersions.lightClient) {
-    fs.writeFileSync(BUILTIN_VERSION_PATH.lightClient, latestVersions.lightClient)
+    fs.writeFileSync(BUILTIN_VERSION_PATH.lightClient, `${latestVersions.lightClient}\n`)
   }
 }
 
