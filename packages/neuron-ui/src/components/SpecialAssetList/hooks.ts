@@ -202,7 +202,7 @@ export const useSpecialAssetColumnInfo = ({
       } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
         amount = t('special-assets.unknown-asset')
       } else if (isSpore) {
-        amount = sporeFormatter(type?.args, item.data)
+        amount = sporeFormatter(type?.args, item.data, item.customizedAssetInfo.data)
       }
 
       return { amount, status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo, isSpore }

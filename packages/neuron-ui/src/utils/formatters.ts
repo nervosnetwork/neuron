@@ -297,7 +297,7 @@ export const nftFormatter = (hex?: string, idOnly = false) => {
   return `#${id} mNFT`
 }
 
-export const sporeFormatter = (args?: string, data?: string) => {
+export const sporeFormatter = (args?: string, data?: string, name?: string) => {
   let format = 'Spore'
 
   const SporeData = molecule.table(
@@ -316,8 +316,10 @@ export const sporeFormatter = (args?: string, data?: string) => {
       const unpacked = SporeData.unpack(data)
       if (!unpacked.clusterId) {
         format = `[Unbound] ${format}`
-      } else {
+      } else if (!name) {
         format = `[${unpacked.clusterId.slice(0, 8)}...${unpacked.clusterId.slice(-8)}] ${format}`
+      } else {
+        format = `[${name}] ${format}`
       }
     } catch {
       // the Spore contract seems not guarantee the data always valid

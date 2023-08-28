@@ -1449,20 +1449,6 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@ckb-lumos/base@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.0.0-canary-1cb43fe-20230816060512.tgz#991cd6518a48ab9436668d7144d58f533effbc0f"
-  integrity sha512-SDb5arYtmQNbxhh/B12Ggf20NSb5fTsDs2WlJ4KtZXQq/Ud22xwdjyMCjQC/Dw08XuJsZw/suTX1FCKOiFYMtw==
-  dependencies:
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/codec" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/toolkit" "0.0.0-canary-1cb43fe-20230816060512"
-    "@types/blake2b" "^2.1.0"
-    "@types/lodash.isequal" "^4.5.5"
-    blake2b "^2.1.3"
-    js-xxhash "^1.0.4"
-    lodash.isequal "^4.5.0"
-
 "@ckb-lumos/base@0.20.0", "@ckb-lumos/base@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.20.0.tgz#d18164ec60eae3f3a97a4bc48e1399e6e0c190d9"
@@ -1491,13 +1477,6 @@
     js-xxhash "^1.0.4"
     lodash.isequal "^4.5.0"
 
-"@ckb-lumos/bi@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.0.0-canary-1cb43fe-20230816060512.tgz#07935767a3b13949d86449adf4aa8eb8815dfbd2"
-  integrity sha512-gW69UP905RLCmCy57JIt2/67gWW8TDUGwVrBs2O7JrB9kqkPVUb0Nlujev4xAwJaBb3oV9rtU6/g11B9cnu/yg==
-  dependencies:
-    jsbi "^4.1.0"
-
 "@ckb-lumos/bi@0.20.0", "@ckb-lumos/bi@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.20.0.tgz#4fa3beca641737b7b83a64d56668067e38cc288d"
@@ -1511,19 +1490,6 @@
   integrity sha512-/sGxpnkESboLQyT17UEni4Qw5DnpXw8hjuckAfiG8Hopv2fIaDdrDup613AGzmAkaWMr2Z4DK6tP6x0qR7feSw==
   dependencies:
     jsbi "^4.1.0"
-
-"@ckb-lumos/ckb-indexer@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/ckb-indexer/-/ckb-indexer-0.0.0-canary-1cb43fe-20230816060512.tgz#dacb8105ee17cd0db27942df4be8d9f9c927c075"
-  integrity sha512-5lLfS5LfPL3l/AxGtDudhCg15iWpu3uFEq/GFq2TKAzQVion5BjVNQwarHtg4OgSjkXi5eFpaDt5RNoR2tySaQ==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/codec" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/rpc" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/toolkit" "0.0.0-canary-1cb43fe-20230816060512"
-    cross-fetch "^3.1.5"
-    events "^3.3.0"
 
 "@ckb-lumos/ckb-indexer@0.20.0":
   version "0.20.0"
@@ -1549,13 +1515,6 @@
     cross-fetch "^3.1.5"
     events "^3.3.0"
 
-"@ckb-lumos/codec@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.0.0-canary-1cb43fe-20230816060512.tgz#884fa89b42e3a39f0ef16ffb677d397e523d157e"
-  integrity sha512-yJszCpZdC52oza0f0mF1g26YODxVznaN77DfeVAD7ziEOFOYdly1mCzWkP/qdBDggxPO8WIoYwUlv85HgBfu4w==
-  dependencies:
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-
 "@ckb-lumos/codec@0.20.0", "@ckb-lumos/codec@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.20.0.tgz#bb07707c5976b3b706b78f253e680cdc431ca898"
@@ -1569,20 +1528,6 @@
   integrity sha512-d+Au9tPjV3SKHIVJ/YG0ScpMPLrt1fCUwm16QTm0qcZuBljLdsSow8PyxmLWhHEatiQV13TuR9ZcOHxdufX7+A==
   dependencies:
     "@ckb-lumos/bi" "0.20.0-alpha.3"
-
-"@ckb-lumos/common-scripts@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.0.0-canary-1cb43fe-20230816060512.tgz#e8c81103773f20a41bb332f8207dccfe308adf16"
-  integrity sha512-U+D01tA+kEcuNbkcN6Vs6Y4Ay1fBFD2QbHRfEoFk3JzjAERtpYqRVuoq4fGrRZUjL0yQRWNqWsZVeu9TobqPJQ==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/codec" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/config-manager" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/helpers" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/rpc" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/toolkit" "0.0.0-canary-1cb43fe-20230816060512"
-    immutable "^4.3.0"
 
 "@ckb-lumos/common-scripts@0.20.0":
   version "0.20.0"
@@ -1598,17 +1543,6 @@
     "@ckb-lumos/toolkit" "0.20.0"
     immutable "^4.0.0-rc.12"
 
-"@ckb-lumos/config-manager@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.0.0-canary-1cb43fe-20230816060512.tgz#55d50fe6fae940907c09ee5ce5be94d64999b7b7"
-  integrity sha512-y6rhuISa/RQtx4GRZAPUsqwHfbHBTGHHt2fyjJJAdBzvLP/iDJ8xLV2qy+tF/wT0q1Tuqs2VE3wG8QEYoi2Evw==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/codec" "0.0.0-canary-1cb43fe-20230816060512"
-    "@types/deep-freeze-strict" "^1.1.0"
-    deep-freeze-strict "^1.1.1"
-
 "@ckb-lumos/config-manager@0.20.0", "@ckb-lumos/config-manager@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.20.0.tgz#f24946971005f62df62e22c3306947b5e820c181"
@@ -1619,19 +1553,6 @@
     "@ckb-lumos/codec" "0.20.0"
     "@types/deep-freeze-strict" "^1.1.0"
     deep-freeze-strict "^1.1.1"
-
-"@ckb-lumos/hd@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/hd/-/hd-0.0.0-canary-1cb43fe-20230816060512.tgz#b3120f5fe2fdcd7fb74ba5dc48a1a64d7fa6e29a"
-  integrity sha512-N/1XsB039czBrF9lTC5CCoCB3ToUD6iU7YBlaf6nYLaNeomggxXoUboGNA4m59ZNgxS3byX9NIx6syAFB/RuxA==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    bn.js "^5.1.3"
-    elliptic "^6.5.4"
-    scrypt-js "^3.0.1"
-    sha3 "^2.1.3"
-    uuid "^8.3.0"
 
 "@ckb-lumos/hd@0.20.0":
   version "0.20.0"
@@ -1646,19 +1567,6 @@
     sha3 "^2.1.3"
     uuid "^8.3.0"
 
-"@ckb-lumos/helpers@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.0.0-canary-1cb43fe-20230816060512.tgz#0b5b9427599427c980b829ca54107b164264e902"
-  integrity sha512-xqREWtCf4nOCCTHS1zCgJ+D0oInb5Eja2eIUbuKPUk1BklDIl6Kl7LYEF+NVtzCnxjzpxJh2mk90EAe3I3hDFQ==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/codec" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/config-manager" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/toolkit" "0.0.0-canary-1cb43fe-20230816060512"
-    bech32 "^2.0.0"
-    immutable "^4.3.0"
-
 "@ckb-lumos/helpers@0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.20.0.tgz#bc0555aeaba146ce90726ac87acad7e2200112c7"
@@ -1670,21 +1578,6 @@
     "@ckb-lumos/toolkit" "0.20.0"
     bech32 "^2.0.0"
     immutable "^4.0.0-rc.12"
-
-"@ckb-lumos/lumos@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/lumos/-/lumos-0.0.0-canary-1cb43fe-20230816060512.tgz#c044f2f161199e5be071e1251fb36bc066cb5e36"
-  integrity sha512-WpSczDNtiq6DlmYCJaew6S+qCwjra+TxgFQqtgIOs6bOWDKy+rms7rkDeuIl/OuejoCq6cT0JeZt2ifcrPe8Cw==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/ckb-indexer" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/common-scripts" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/config-manager" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/hd" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/helpers" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/rpc" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/toolkit" "0.0.0-canary-1cb43fe-20230816060512"
 
 "@ckb-lumos/lumos@^0.20.0":
   version "0.20.0"
@@ -1700,17 +1593,6 @@
     "@ckb-lumos/helpers" "0.20.0"
     "@ckb-lumos/rpc" "0.20.0"
     "@ckb-lumos/toolkit" "0.20.0"
-
-"@ckb-lumos/rpc@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.0.0-canary-1cb43fe-20230816060512.tgz#9ed696b8754f2e43aea178b04be9af36629bf12a"
-  integrity sha512-YvpoRmiYV0jRYwDbHljBdXAykDQ0X/OW0yr89A4UX2a9C5VGrMcNdxKUP1mxUgIK9hNEp7vrKSk8S8uA09AtZA==
-  dependencies:
-    "@ckb-lumos/base" "0.0.0-canary-1cb43fe-20230816060512"
-    "@ckb-lumos/bi" "0.0.0-canary-1cb43fe-20230816060512"
-    "@vespaiach/axios-fetch-adapter" "^0.3.1"
-    axios "0.27.2"
-    tslib "2.3.1"
 
 "@ckb-lumos/rpc@0.20.0":
   version "0.20.0"
@@ -1733,11 +1615,6 @@
     "@vespaiach/axios-fetch-adapter" "^0.3.1"
     axios "0.27.2"
     tslib "2.3.1"
-
-"@ckb-lumos/toolkit@0.0.0-canary-1cb43fe-20230816060512":
-  version "0.0.0-canary-1cb43fe-20230816060512"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.0.0-canary-1cb43fe-20230816060512.tgz#e275bf3fca1dad0dcc1fa7010b5ca0954318bf09"
-  integrity sha512-yXrzvFMqkH/zu+xznllqBulmiBob9Nq4pUJ8wBcR1/wYbAQ78jqJZwgIYbHFvOlCbNcoQa45GElX18oaCbtsLQ==
 
 "@ckb-lumos/toolkit@0.20.0":
   version "0.20.0"
@@ -10723,7 +10600,7 @@ immutable@^4.0.0:
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.0.tgz#eb1738f14ffb39fd068b1dbe1296117484dd34be"
   integrity sha512-0AOCmOip+xgJwEVTQj1EfiDDOkPmuyllDuTuEX+DDXUgapLAsBIfkg3sxCYyCEA8mQqZrrxPUGjcOQ2JS3WLkg==
 
-immutable@^4.0.0-rc.12, immutable@^4.3.0:
+immutable@^4.0.0-rc.12:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.2.tgz#f89d910f8dfb6e15c03b2cae2faaf8c1f66455fe"
   integrity sha512-oGXzbEDem9OOpDWZu88jGiYCvIsLHMvGw+8OXlpsvTFvIQplQbjg1B1cvKg8f7Hoch6+NGjpPsH1Fr+Mc2D1aA==

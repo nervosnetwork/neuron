@@ -13,7 +13,8 @@ import InputEntity from '../database/chain/entities/input'
 import TransactionEntity from '../database/chain/entities/transaction'
 import TransactionSize from '../models/transaction-size'
 import TransactionFee from '../models/transaction-fee'
-import Cell, { OutputStatus } from '../models/chain/output'
+import Cell from '../models/chain/output'
+import Output, { OutputStatus } from '../models/chain/output'
 import { TransactionStatus } from '../models/chain/transaction'
 import OutPoint from '../models/chain/out-point'
 import Input from '../models/chain/input'
@@ -21,7 +22,6 @@ import WitnessArgs from '../models/chain/witness-args'
 import Multisig from '../models/multisig'
 import BufferUtils from '../utils/buffer'
 import LiveCell from '../models/chain/live-cell'
-import Output from '../models/chain/output'
 import SystemScriptInfo from '../models/system-script-info'
 import Script, { ScriptHashType } from '../models/chain/script'
 import LiveCellService from './live-cell-service'
@@ -33,6 +33,8 @@ import { MIN_CELL_CAPACITY } from '../utils/const'
 import { bytes } from '@ckb-lumos/codec'
 import { generateRPC } from '../utils/ckb-rpc'
 import NodeService from './node'
+import { getClusterCellById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
+import { getSporeConfig } from '../models/spore'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -341,10 +343,28 @@ export default class CellsService {
     const sporeOutputs = allMultiSignOutputs.filter(item =>
       sporeInfos.some(info => item.typeCodeHash && bytes.equal(info.codeHash, item.typeCodeHash))
     )
+
+    type ClusterId = string
+    const clusterNames: Record<ClusterId, string> = {}
     await Promise.all(
       sporeOutputs.map(async output => {
         const tx = await rpc.getTransaction(output.outPointTxHash)
-        output.data = tx.transaction.outputsData[Number(output.outPointIndex)]
+        const data = tx.transaction.outputsData[Number(output.outPointIndex)]
+        output.data = data
+
+        try {
+          const { clusterId } = SporeData.unpack(data)
+
+          if (!clusterId) {
+            return
+          }
+
+          const clusterCell = await getClusterCellById(clusterId, getSporeConfig())
+          const { name } = unpackToRawClusterData(clusterCell.data)
+          clusterNames[clusterId] = name
+        } catch {
+          // avoid crash
+        }
       })
     )
 
@@ -426,10 +446,23 @@ export default class CellsService {
           data: '',
         })
       } else if (sporeInfos.some(info => o.typeCodeHash && bytes.equal(info.codeHash, o.typeCodeHash))) {
+        const data = (() => {
+          try {
+            const { clusterId } = SporeData.unpack(o.data)
+
+            if (clusterId && clusterNames[clusterId]) {
+              return clusterNames[clusterId]
+            }
+
+            return ''
+          } catch {
+            return ''
+          }
+        })()
         cell.setCustomizedAssetInfo({
           lock: '',
           type: CustomizedType.Spore,
-          data: '',
+          data: data,
         })
       } else {
         cell.setCustomizedAssetInfo({
