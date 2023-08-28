@@ -1,5 +1,5 @@
 import Script, { ScriptHashType } from './chain/script'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from '../utils/scriptAndAddress'
 import SystemScriptInfo from './system-script-info'
 
 export default class AddressParser {
