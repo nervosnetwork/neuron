@@ -1,7 +1,8 @@
-import { AddressPrefix, blake160, systemScripts, bytesToHex } from '@nervosnetwork/ckb-sdk-utils'
+import { AddressPrefix, blake160, bytesToHex } from '@nervosnetwork/ckb-sdk-utils'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
-
 import { AccountExtendedPublicKey } from './key'
+import { predefined } from '@ckb-lumos/config-manager'
+const systemScripts = predefined.LINA.SCRIPTS
 
 export { AddressPrefix }
 
@@ -12,7 +13,14 @@ export enum AddressType {
 
 export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
   const pubkey = publicKey.startsWith('0x') ? publicKey : `0x${publicKey}`
-  return scriptToAddress({ ...systemScripts.SECP256K1_BLAKE160, args: bytesToHex(blake160(pubkey)) }, isMainnet)
+  return scriptToAddress(
+    {
+      codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+      hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
+      args: bytesToHex(blake160(pubkey)),
+    },
+    isMainnet
+  )
 }
 
 export default class Address {

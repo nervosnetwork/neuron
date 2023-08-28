@@ -2,8 +2,9 @@ import { ResponseCode } from '../../src/utils/const'
 import MultisigService from '../../src/services/multisig'
 import MultisigController from '../../src/controllers/multisig'
 import CellsService from '../../src/services/cells'
-import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
+import { predefined } from '@ckb-lumos/config-manager'
+const systemScripts = predefined.LINA.SCRIPTS
 
 let response = 0
 let dialogRes = { canceled: false, filePaths: ['./'], filePath: './' }
@@ -86,8 +87,8 @@ const multisigConfig = {
           scriptToAddress(
             {
               args,
-              codeHash: systemScripts.SECP256K1_BLAKE160.codeHash,
-              hashType: systemScripts.SECP256K1_BLAKE160.hashType,
+              codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+              hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
             },
             false
           )
@@ -106,8 +107,8 @@ const multisigConfig = {
           scriptToAddress(
             {
               args,
-              codeHash: systemScripts.SECP256K1_BLAKE160.codeHash,
-              hashType: systemScripts.SECP256K1_BLAKE160.hashType,
+              codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+              hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
             },
             true
           )
