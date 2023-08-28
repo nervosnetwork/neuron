@@ -1,7 +1,8 @@
 import '../src/locales/i18n'
 import { LedgerHID, LedgerCkbApp } from './mock/hardware'
 import { predefined } from '@ckb-lumos/config-manager'
-const systemScripts = predefined.LINA.SCRIPTS
+const systemScriptsMainnet = predefined.LINA.SCRIPTS
+const systemScriptsTestnet = predefined.AGGRON4.SCRIPTS
 
 jest.mock('levelup', () => {
   return () => ({
@@ -24,8 +25,8 @@ jest.mock('dotenv', () => ({
     process.env.MAINNET_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000000'
     process.env.MAINNET_ACP_DEP_INDEX = '0'
     process.env.MAINNET_ACP_DEP_TYPE = 'code'
-    process.env.MAINNET_ACP_SCRIPT_CODEHASH = systemScripts.ANYONE_CAN_PAY.CODE_HASH
-    process.env.MAINNET_ACP_SCRIPT_HASHTYPE = systemScripts.ANYONE_CAN_PAY.HASH_TYPE
+    process.env.MAINNET_ACP_SCRIPT_CODEHASH = systemScriptsMainnet.ANYONE_CAN_PAY.CODE_HASH
+    process.env.MAINNET_ACP_SCRIPT_HASHTYPE = systemScriptsMainnet.ANYONE_CAN_PAY.HASH_TYPE
 
     process.env.LEGACY_MAINNET_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.LEGACY_MAINNET_ACP_DEP_INDEX = '0'
@@ -57,8 +58,8 @@ jest.mock('dotenv', () => ({
     process.env.TESTNET_ACP_DEP_TXHASH = '0x4f32b3e39bd1b6350d326fdfafdfe05e5221865c3098ae323096f0bfc69e0a8c'
     process.env.TESTNET_ACP_DEP_INDEX = '0'
     process.env.TESTNET_ACP_DEP_TYPE = 'depGroup'
-    process.env.TESTNET_ACP_SCRIPT_CODEHASH = systemScripts.ANYONE_CAN_PAY.CODE_HASH
-    process.env.TESTNET_ACP_SCRIPT_HASHTYPE = systemScripts.ANYONE_CAN_PAY.HASH_TYPE
+    process.env.TESTNET_ACP_SCRIPT_CODEHASH = systemScriptsTestnet.ANYONE_CAN_PAY.CODE_HASH
+    process.env.TESTNET_ACP_SCRIPT_HASHTYPE = systemScriptsTestnet.ANYONE_CAN_PAY.HASH_TYPE
 
     process.env.LEGACY_TESTNET_ACP_DEP_TXHASH = '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.LEGACY_TESTNET_ACP_DEP_INDEX = '0'
@@ -79,9 +80,9 @@ jest.mock('dotenv', () => ({
     process.env.TESTNET_CHEQUE_SCRIPT_CODEHASH = '0x0000000000000000000000000000000000000000000000000000000000000003'
     process.env.TESTNET_CHEQUE_SCRIPT_HASHTYPE = 'type'
 
-    process.env.SECP256K1_CODE_HASH = systemScripts.SECP256K1_BLAKE160.CODE_HASH
-    process.env.DAO_CODE_HASH = systemScripts.DAO.CODE_HASH
-    process.env.MULTISIG_CODE_HASH = systemScripts.SECP256K1_BLAKE160_MULTISIG.CODE_HASH
+    process.env.SECP256K1_CODE_HASH = systemScriptsMainnet.SECP256K1_BLAKE160.CODE_HASH
+    process.env.DAO_CODE_HASH = systemScriptsMainnet.DAO.CODE_HASH
+    process.env.MULTISIG_CODE_HASH = systemScriptsMainnet.SECP256K1_BLAKE160_MULTISIG.CODE_HASH
   },
 }))
 
