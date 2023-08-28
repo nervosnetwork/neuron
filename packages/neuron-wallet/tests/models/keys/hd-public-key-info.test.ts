@@ -1,8 +1,7 @@
 import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import { AddressType } from '../../../src/models/keys/address'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
-import { predefined } from '@ckb-lumos/config-manager'
-const systemScriptsMainnet = predefined.LINA.SCRIPTS
+import { systemScripts } from '../../../src/utils/systemScripts'
 
 const stubbedIsMainnet = jest.fn()
 
@@ -39,8 +38,8 @@ describe('HdPublicKeyInfoModel', () => {
       it('generates mainnet address by property', () => {
         const address = scriptToAddress(
           {
-            codeHash: systemScriptsMainnet.SECP256K1_BLAKE160.CODE_HASH,
-            hashType: systemScriptsMainnet.SECP256K1_BLAKE160.HASH_TYPE,
+            codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+            hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
             args: keyInfo.publicKeyInBlake160,
           },
           true
@@ -58,8 +57,8 @@ describe('HdPublicKeyInfoModel', () => {
       it('generates testnet address by property', () => {
         const address = scriptToAddress(
           {
-            codeHash: systemScriptsMainnet.SECP256K1_BLAKE160.CODE_HASH,
-            hashType: systemScriptsMainnet.SECP256K1_BLAKE160.HASH_TYPE,
+            codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+            hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
             args: keyInfo.publicKeyInBlake160,
           },
           false
