@@ -1,6 +1,12 @@
 import React, { FC, PropsWithChildren, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ErrorCode, getExplorerUrl, isMainnet as isMainnetUtil, localNumberFormatter } from 'utils'
+import {
+  ErrorCode,
+  getExplorerUrl,
+  isMainnet as isMainnetUtil,
+  localNumberFormatter,
+  getNetworkLabelI18nkey,
+} from 'utils'
 import Alert from 'widgets/Alert'
 import { Close, NewTab } from 'widgets/Icons/icon'
 import { ReactComponent as Sun } from 'widgets/Icons/Sun.svg'
@@ -23,20 +29,6 @@ const PageHeadNotice = ({ notice }: { notice: State.PageNotice }) => {
       {t(notice.i18nKey)}
     </Alert>
   )
-}
-
-const getNetworkTypeLabel = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) => {
-  switch (type) {
-    case 'ckb': {
-      return 'settings.network.mainnet'
-    }
-    case 'ckb_testnet': {
-      return 'settings.network.testnet'
-    }
-    default: {
-      return 'settings.network.devnet'
-    }
-  }
 }
 
 type ComponentProps = {
@@ -70,7 +62,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
     () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
     [networkID, networks]
   )
-  const netWorkTypeLabel = useMemo(() => (network ? getNetworkTypeLabel(network.chain) : ''), [network])
+  const netWorkTypeLabel = useMemo(() => (network ? getNetworkLabelI18nkey(network.chain) : ''), [network])
   const [syncPercents, syncBlockNumbers] = useMemo(() => {
     const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
     return [
