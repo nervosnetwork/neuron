@@ -1,4 +1,5 @@
-import { blake2b, PERSONAL, hexToBytes } from '@nervosnetwork/ckb-sdk-utils'
+import { bytes } from '@ckb-lumos/codec'
+import { blake2b, PERSONAL } from '@nervosnetwork/ckb-sdk-utils'
 
 export default class Blake2b {
   private blake2b: any
@@ -9,7 +10,7 @@ export default class Blake2b {
 
   public update = (message: string): void => {
     const msg = message.startsWith('0x') ? message : `0x${message}`
-    this.blake2b.update(hexToBytes(msg))
+    this.blake2b.update(bytes.bytify(msg))
   }
 
   public updateBuffer = (message: Buffer): void => {
