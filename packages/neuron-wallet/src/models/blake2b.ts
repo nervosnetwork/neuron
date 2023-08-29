@@ -1,11 +1,11 @@
+import { CKBHasher } from '@ckb-lumos/base/lib/utils'
 import { bytes } from '@ckb-lumos/codec'
-import { blake2b, PERSONAL } from '@nervosnetwork/ckb-sdk-utils'
 
 export default class Blake2b {
-  private blake2b: any
+  private blake2b: CKBHasher
 
   constructor() {
-    this.blake2b = blake2b(32, null, null, PERSONAL)
+    this.blake2b = new CKBHasher()
   }
 
   public update = (message: string): void => {
@@ -18,7 +18,7 @@ export default class Blake2b {
   }
 
   public digest = (): string => {
-    return `0x${this.blake2b.digest('hex')}`
+    return this.blake2b.digestHex()
   }
 
   public static digest = (message: string): string => {
