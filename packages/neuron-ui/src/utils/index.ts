@@ -25,5 +25,6 @@ export * from './getSyncLeftTime'
 export * from './baseActions'
 export * from './getSUDTAmount'
 export * from './multisig'
+export * from './getNetworkLabel'
 
 export { CONSTANTS }

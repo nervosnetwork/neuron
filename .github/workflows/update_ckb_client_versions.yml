@@ -1,0 +1,45 @@
+name: Update CKB client versions
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  default:
+    name: Update CKB client versions
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # open PR
+      contents: write # update version files
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Update versions
+        id: update_versions
+        run: |
+          npm run update:client-versions
+          git add .ckb-version .ckb-light-version
+
+      - name: Set GPG
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Open PR to develop branch
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: Update ckb client versions
+          commit-message: 'feat: update ckb client versions'
+          body: 'Update versions of builtin CKB node and light client'
+          committer: Chen Yu <chenyu@magickbase.com>
+          branch: update-ckb-client-versions

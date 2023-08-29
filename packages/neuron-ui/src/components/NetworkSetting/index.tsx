@@ -9,7 +9,7 @@ import Toast from 'widgets/Toast'
 import { chainState } from 'states'
 import { setCurrentNetwork, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
-import { useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
+import { useOnWindowResize, useToggleChoiceGroupBorder, getNetworkLabelI18nkey } from 'utils'
 import { LIGHT_CLIENT_TESTNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
 
@@ -87,7 +87,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           label: (
             <div className={styles.networkLabel}>
               <p>{`${network.name} (${network.remote})`}</p>
-              <div className={styles.tag}>{network.chain}</div>
+              <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
             </div>
           ),
           suffix: (
