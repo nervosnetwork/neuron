@@ -1,12 +1,12 @@
 import { serializeOutput, serializeWitnessArgs } from '../utils/serialization'
-import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
 import Multisig from './multisig'
 import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from '../utils/buffer'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
+import { bytes as byteUtils, number } from '@ckb-lumos/codec'
+import { fixvec } from '@ckb-lumos/codec/lib/molecule/layout'
 
 export default class TransactionSize {
   public static SERIALIZED_OFFSET_BYTESIZE = 4
@@ -55,7 +55,8 @@ export default class TransactionSize {
   }
 
   public static outputData(data: string): number {
-    const bytes = serializeFixVec(data)
+    const fixvecCodec = fixvec(number.Uint8)
+    const bytes = byteUtils.hexify(fixvecCodec.pack(Array.from(byteUtils.bytify(data))))
     return byteUtils.bytify(bytes).byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
@@ -67,7 +68,8 @@ export default class TransactionSize {
 
   public static witness(witness: WitnessArgs | string): number {
     const wit: string = typeof witness === 'string' ? witness : serializeWitnessArgs(witness.toSDK())
-    const bytes = serializeFixVec(wit)
+    const fixvecCodec = fixvec(number.Uint8)
+    const bytes = byteUtils.hexify(fixvecCodec.pack(Array.from(byteUtils.bytify(wit))))
     return byteUtils.bytify(bytes).byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
