@@ -7,8 +7,8 @@ import Transaction from './chain/transaction'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
 import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
-import { predefinedSporeConfigs, SporeScript } from '@spore-sdk/core'
-import { toScriptInfo } from './spore'
+import { predefinedSporeConfigs, SporeConfig, SporeScript } from '@spore-sdk/core'
+import NodeService from '../services/node'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -371,5 +371,60 @@ export default class AssetAccountInfo {
     })
 
     return foundSender || null
+  }
+
+  public getSporeConfig(): SporeConfig {
+    const spore = this.sporeInfos
+    const cluster = this.sporeClusterInfos
+
+    return {
+      scripts: {
+        Spore: {
+          ...toSporeScript(spore[0]),
+          versions: spore.slice(1).map(toSporeScript),
+        },
+
+        Cluster: {
+          ...toSporeScript(cluster[0]),
+          versions: cluster.slice(1).map(toSporeScript),
+        },
+      },
+      lumos: {
+        PREFIX: NetworksService.getInstance().isMainnet() ? 'ckb' : 'ckt',
+        SCRIPTS: {},
+      },
+      ckbIndexerUrl: NodeService.getInstance().nodeUrl,
+      ckbNodeUrl: NodeService.getInstance().nodeUrl,
+      extensions: [],
+    }
+  }
+}
+
+function toSporeScript(info: ScriptCellInfo): SporeScript {
+  return {
+    script: { codeHash: info.codeHash, hashType: info.hashType },
+    cellDep: info.cellDep,
+  }
+}
+
+function toScriptInfo(sporeConfig: SporeScript): ScriptCellInfo {
+  const cellDep = sporeConfig.cellDep
+
+  const hashType: ScriptHashType = (() => {
+    const sporeScriptHashType = sporeConfig.script.hashType
+    if (sporeScriptHashType === 'type') return ScriptHashType.Type
+    if (sporeScriptHashType === 'data') return ScriptHashType.Data
+    if (sporeScriptHashType === 'data1') return ScriptHashType.Data1
+
+    throw new Error(`Invalid hash type: ${sporeScriptHashType}`)
+  })()
+
+  return {
+    cellDep: new CellDep(
+      new OutPoint(cellDep.outPoint.txHash, cellDep.outPoint.index),
+      cellDep.depType === 'depGroup' ? DepType.DepGroup : DepType.Code
+    ),
+    hashType: hashType,
+    codeHash: sporeConfig.script.codeHash,
   }
 }

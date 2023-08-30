@@ -35,7 +35,6 @@ import { bytes } from '@ckb-lumos/codec'
 import { generateRPC } from '../utils/ckb-rpc'
 import NodeService from './node'
 import { getClusterCellById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
-import { getSporeConfig } from '../models/spore'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -360,7 +359,7 @@ export default class CellsService {
             return
           }
 
-          const clusterCell = await getClusterCellById(clusterId, getSporeConfig())
+          const clusterCell = await getClusterCellById(clusterId, assetAccountInfo.getSporeConfig())
           const { name } = unpackToRawClusterData(clusterCell.data)
           clusterNames[clusterId] = name
         } catch {
