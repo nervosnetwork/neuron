@@ -3,7 +3,7 @@ import CellDep, { DepType } from './chain/cell-dep'
 import NetworksService from '../services/networks'
 import RpcService from '../services/rpc-service'
 import Script, { ScriptHashType } from './chain/script'
-import { systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { systemScripts } from '../utils/systemScripts'
 
 export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
@@ -15,9 +15,9 @@ export default class SystemScriptInfo {
   static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
 
   static DAO_SCRIPT_HASH = new Script(
-    systemScripts.NERVOS_DAO.codeHash,
+    systemScripts.DAO.CODE_HASH,
     '0x',
-    systemScripts.NERVOS_DAO.hashType as ScriptHashType
+    systemScripts.DAO.HASH_TYPE as ScriptHashType
   ).computeHash()
 
   private static instance: SystemScriptInfo

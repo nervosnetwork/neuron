@@ -1,7 +1,6 @@
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
-import { toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
@@ -23,7 +22,7 @@ import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
-import { bytes as byteUtils } from '@ckb-lumos/codec'
+import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -405,13 +404,13 @@ export default class TransactionSender {
     const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(toUint64Le(`0x${serializedEmptyWitnessSize.toString(16)}`))
+    blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
       const byteLength = byteUtils.bytify(wit).byteLength
-      blake2b.update(toUint64Le(`0x${byteLength.toString(16)}`))
+      blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
 

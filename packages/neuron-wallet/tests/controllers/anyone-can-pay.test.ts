@@ -3,7 +3,7 @@ import Transaction from '../../src/models/chain/transaction'
 import { ServiceHasNoResponse } from '../../src/exceptions'
 import { ResponseCode } from '../../src/utils/const'
 import AssetAccountInfo from '../../src/models/asset-account-info'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from '../../src/utils/scriptAndAddress'
 
 const generateAnyoneCanPayTxMock = jest.fn()
 const generateSudtMigrateAcpTxMock = jest.fn()
