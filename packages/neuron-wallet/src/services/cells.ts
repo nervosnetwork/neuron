@@ -359,7 +359,10 @@ export default class CellsService {
             return
           }
 
-          const clusterCell = await getClusterCellById(clusterId, assetAccountInfo.getSporeConfig())
+          const clusterCell = await getClusterCellById(
+            clusterId,
+            assetAccountInfo.getSporeConfig(NodeService.getInstance().nodeUrl)
+          )
           const { name } = unpackToRawClusterData(clusterCell.data)
           clusterNames[clusterId] = name
         } catch {

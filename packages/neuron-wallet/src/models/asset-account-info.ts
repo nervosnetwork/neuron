@@ -8,7 +8,6 @@ import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
 import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
 import { predefinedSporeConfigs, SporeConfig, SporeScript } from '@spore-sdk/core'
-import NodeService from '../services/node'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -373,7 +372,7 @@ export default class AssetAccountInfo {
     return foundSender || null
   }
 
-  public getSporeConfig(): SporeConfig {
+  public getSporeConfig(nodeUrl: string): SporeConfig {
     const spore = this.sporeInfos
     const cluster = this.sporeClusterInfos
 
@@ -393,8 +392,8 @@ export default class AssetAccountInfo {
         PREFIX: NetworksService.getInstance().isMainnet() ? 'ckb' : 'ckt',
         SCRIPTS: {},
       },
-      ckbIndexerUrl: NodeService.getInstance().nodeUrl,
-      ckbNodeUrl: NodeService.getInstance().nodeUrl,
+      ckbIndexerUrl: nodeUrl,
+      ckbNodeUrl: nodeUrl,
       extensions: [],
     }
   }
