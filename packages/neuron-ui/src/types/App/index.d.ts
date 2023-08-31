@@ -177,6 +177,7 @@ declare namespace State {
     chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
     type: 0 | 1 | 2
     genesisHash: string
+    readonly: boolean
   }
 
   interface Network extends NetworkProperty {
