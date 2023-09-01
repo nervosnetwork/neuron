@@ -918,14 +918,6 @@
       "amount": "数量",
       "address": "地址"
     },
-    "customized-asset": {
-      "actions": {
-        "unlock": "解锁",
-        "mint": "铸币",
-        "burn": "销币"
-      },
-      "view-in-explorer": "浏览器"
-    },
     "s-udt": {
       "edit-account-success": "编辑账户信息成功",
       "create-account-success": "创建资产账户成功",

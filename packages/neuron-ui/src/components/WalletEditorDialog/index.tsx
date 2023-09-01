@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
 
 import { useState as useGlobalState, useDispatch } from 'states'
 
-import { RoutePath, ErrorCode } from 'utils'
+import { ErrorCode } from 'utils'
 import styles from './walletEditorDialog.module.scss'
 
 import { useHint, useOnSubmit, useInputs, useWalletEditor } from './hooks'
@@ -16,9 +15,6 @@ const WalletNotFound = () => {
   return (
     <div>
       <p>{t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' })}</p>
-      <Link to={RoutePath.SettingsWallets} className="btn btn-primary">
-        {`${t('settings.title')}-${t('settings.setting-tabs.wallets')}`}
-      </Link>
     </div>
   )
 }

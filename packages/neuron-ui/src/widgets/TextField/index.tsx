@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import Alert from 'widgets/Alert'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
-import { PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
 import styles from './textField.module.scss'
 
 const TextField = React.forwardRef(
@@ -120,7 +120,7 @@ const TextField = React.forwardRef(
               aria-hidden="true"
               tabIndex={0}
             >
-              {isPasswordHidden ? <PasswordHide /> : <PasswordShow />}
+              {isPasswordHidden ? <EyesClose /> : <EyesOpen />}
             </span>
           )}
         </div>

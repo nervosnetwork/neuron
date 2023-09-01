@@ -12,10 +12,6 @@ import Spinner from 'widgets/Spinner'
 import { withProvider } from 'states'
 import mainRouterConfig from 'router'
 
-window.neuron = {
-  role: 'main',
-}
-
 const containers: RouteObject[] = mainRouterConfig
 
 const RouterRender = () => useRoutes(containers)

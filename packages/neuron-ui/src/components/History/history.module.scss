@@ -3,7 +3,6 @@
 @import '../../styles/animation.scss';
 
 $history-info-title-color: #999;
-$history-button-color: #8da394;
 
 body {
   --history-button-border: #e5e5e5;
@@ -59,6 +58,8 @@ body {
     }
 
     .exportIcon {
+      width: 12px;
+      height: 12px;
       padding-right: 8px;
       path {
         fill: var(--main-text-color);
@@ -133,7 +134,7 @@ body {
         padding: unset;
         justify-content: center;
         align-items: center;
-        color: $history-button-color;
+        color: var(--secondary-text-color);
         gap: 5px;
         cursor: pointer;
 
@@ -174,6 +175,9 @@ body {
 .arrow {
   cursor: pointer;
   transition: transform 0.1s ease-in-out;
+  path {
+    stroke: var(--secondary-text-color);
+  }
 
   &:hover {
     path {
