@@ -35,7 +35,7 @@
       "eslint --fix",
       "git add"
     ],
-    "test/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+    "tests/**/*.{js,cjs,mjs,jsx,ts,tsx}": [
       "prettier --ignore-path ../../.prettierignore --write",
       "eslint --fix",
       "git add"

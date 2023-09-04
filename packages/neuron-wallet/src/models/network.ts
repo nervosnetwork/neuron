@@ -17,4 +17,5 @@ export interface Network {
   type: NetworkType
   genesisHash: string
   chain: ChainType | string // returned by rpc.getBlockchainInfo
+  readonly: boolean
 }
