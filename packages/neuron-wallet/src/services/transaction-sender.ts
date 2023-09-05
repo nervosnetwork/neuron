@@ -417,7 +417,7 @@ export default class TransactionSender {
     const message = blake2b.digest()
 
     if (!wallet.isHardware()) {
-      // `privateKeyOrPath` variable here is path only when wallet is hardware, otherwise it's a private key
+      // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
       const privateKey = privateKeyOrPath
       emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
     }
