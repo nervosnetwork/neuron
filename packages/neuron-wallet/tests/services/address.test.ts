@@ -309,8 +309,8 @@ describe('integration tests for AddressService', () => {
     })
     describe('#generateAndSaveForPublicKey', () => {
       describe('with public key info exist for the public key', () => {
-        // public key is a valid 32 byte hex string
-        const publicKey = '0x' + '0'.repeat(66)
+        // public key is a valid 33 byte hex string
+        const publicKey = '0x' + '00'.repeat(33)
         const addressType = AddressType.Receiving
         const addressIndex = 0
         beforeEach(async () => {
