@@ -194,46 +194,8 @@ export default class AssetAccountInfo {
 
       const { Spore, Cluster } = predefinedSporeConfigs.Aggron4.scripts
 
-      this.sporeInfos = (
-        [
-          // TODO remove me, for devnet only
-          {
-            script: {
-              codeHash: '0xbbad126377d45f90a8ee120da988a2d7332c78ba8fd679aab478a19d6c133494',
-              hashType: 'data1',
-            },
-            cellDep: {
-              outPoint: {
-                txHash: '0xe8d710a05265e9325e4f1f28333167368026fd364a0d82dbf2866c53607fb0c6',
-                index: '0x0',
-              },
-              depType: 'code',
-            },
-          },
-          Spore,
-          ...(Spore.versions || []),
-        ] satisfies SporeScript[]
-      ).map(toScriptInfo)
-      this.sporeClusterInfos = (
-        [
-          // TODO remove me, for dev net only
-          {
-            script: {
-              codeHash: '0x598d793defef36e2eeba54a9b45130e4ca92822e1d193671f490950c3b856080',
-              hashType: 'data1',
-            },
-            cellDep: {
-              outPoint: {
-                txHash: '0x251ca5eb94f4d14f532e3962cfeb356e02580db31d4d53a09e5aa080f75a2407',
-                index: '0x0',
-              },
-              depType: 'code',
-            },
-          },
-          Cluster,
-          ...(Cluster.versions || []),
-        ] satisfies SporeScript[]
-      ).map(toScriptInfo)
+      this.sporeInfos = ([Spore, ...(Spore.versions || [])] satisfies SporeScript[]).map(toScriptInfo)
+      this.sporeClusterInfos = ([Cluster, ...(Cluster.versions || [])] satisfies SporeScript[]).map(toScriptInfo)
     }
   }
 
