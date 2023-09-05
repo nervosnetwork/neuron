@@ -309,16 +309,17 @@ export const sporeFormatter = (args?: string, data?: string, name?: string) => {
     ['contentType', 'content', 'clusterId']
   )
 
-  if (!data) {
-    format = `[Unbound] ${format}`
-  } else {
+  if (data) {
     try {
-      const unpacked = SporeData.unpack(data)
-      if (!unpacked.clusterId) {
-        format = `[Unbound] ${format}`
-      } else if (!name) {
-        format = `[${unpacked.clusterId.slice(0, 8)}...${unpacked.clusterId.slice(-8)}] ${format}`
-      } else {
+      const { clusterId } = SporeData.unpack(data)
+
+      // the name may be empty when it works with the light client.
+      // a spore cell may appear before the cluster cell is found in the light client.
+      // So we need a placeholder for the name.
+      if (clusterId && !name) {
+        format = `[${clusterId.slice(0, 8)}...${clusterId.slice(-8)}] ${format}`
+      }
+      if (clusterId && name) {
         format = `[${name}] ${format}`
       }
     } catch {
