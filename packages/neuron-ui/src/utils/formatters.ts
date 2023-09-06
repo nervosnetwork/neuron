@@ -297,7 +297,14 @@ export const nftFormatter = (hex?: string, idOnly = false) => {
   return `#${id} mNFT`
 }
 
-export const sporeFormatter = (args?: string, data?: string, name?: string) => {
+export function truncateMiddle(str: string, start = 8, end = start): string {
+  if (str.length <= start + end) {
+    return str
+  }
+  return `${str.slice(0, start)}...${str.slice(-end)}`
+}
+
+export const sporeFormatter = (args: string, data?: string, name?: string) => {
   let format = 'Spore'
 
   const SporeData = molecule.table(
@@ -317,7 +324,7 @@ export const sporeFormatter = (args?: string, data?: string, name?: string) => {
       // a spore cell may appear before the cluster cell is found in the light client.
       // So we need a placeholder for the name.
       if (clusterId && !name) {
-        format = `[${clusterId.slice(0, 8)}...${clusterId.slice(-8)}] ${format}`
+        format = `[${truncateMiddle(clusterId)}] ${format}`
       }
       if (clusterId && name) {
         format = `[${name}] ${format}`
@@ -329,7 +336,7 @@ export const sporeFormatter = (args?: string, data?: string, name?: string) => {
   }
 
   if (args) {
-    format = `[${args.slice(0, 8)}...${args.slice(-8)}] ${format}`
+    format = `[${truncateMiddle(args)}] ${format}`
   }
 
   return format
