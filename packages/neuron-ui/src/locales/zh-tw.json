@@ -91,7 +91,7 @@
       "actions": {
         "close": "取消",
         "rescan": "連接設備",
-        "copy-address": "复制地址",
+        "copy-address": "複製地址",
         "verify": "地址驗證",
         "finish": "完成"
       }
@@ -139,7 +139,8 @@
       "destroySUDT": "銷毀 <0></0> 資產賬戶",
       "wallet-ready": "錢包準備完成，歡迎使用",
       "send": "轉賬",
-      "receive": "收款"
+      "receive": "收款",
+      "locked": "已鎖定餘額"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -338,7 +339,8 @@
       "copy-address": "複製地址",
       "request-payment": "請求支付",
       "view-on-explorer": "在瀏覽器中查看",
-      "default-description": "無"
+      "default-description": "無",
+      "all-address": "全部地址"
     },
     "settings": {
       "title": {

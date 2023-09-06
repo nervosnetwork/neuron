@@ -1,16 +1,66 @@
-import React, { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useMemo, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
-import PageContainer from 'components/PageContainer'
-import SingleAddressReceive from './singleAddressReceive'
-import MultiAddressReceive from './multiAddressReceive'
+import Dialog from 'widgets/Dialog'
+import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
+import Button from 'widgets/Button'
+import VerifyHardwareAddress from 'components/VerifyHardwareAddress'
+import CopyZone from 'widgets/CopyZone'
+import QRCode from 'widgets/QRCode'
+import Tooltip from 'widgets/Tooltip'
+import { AddressTransform } from 'widgets/Icons/icon'
+import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
+import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
+import styles from './receive.module.scss'
+import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
 
-const Receive = () => {
-  const { wallet } = useGlobalState()
+type AddressTransformWithCopyZoneProps = {
+  showAddress: string
+  isInShortFormat: boolean
+  className?: string
+  onClick: () => void
+}
+
+export const AddressTransformWithCopyZone = ({
+  showAddress,
+  isInShortFormat,
+  onClick,
+  className,
+}: AddressTransformWithCopyZoneProps) => {
   const [t] = useTranslation()
-  const { address } = useParams<{ address: string }>()
-  const { addresses, id: walletId } = wallet
+  const transformLabel = t(
+    isInShortFormat ? 'receive.turn-into-full-version-format' : 'receive.turn-into-deprecated-format'
+  )
+
+  const stopPropagation = useCallback((e: React.SyntheticEvent) => {
+    e.stopPropagation()
+  }, [])
+
+  return (
+    <div className={className}>
+      <CopyZone content={showAddress} className={styles.showAddress}>
+        {showAddress}
+      </CopyZone>
+      <button
+        type="button"
+        className={styles.addressToggle}
+        onClick={onClick}
+        title={transformLabel}
+        onFocus={stopPropagation}
+        onMouseOver={stopPropagation}
+        onMouseUp={stopPropagation}
+      >
+        <AddressTransform />
+        {transformLabel}
+      </button>
+    </div>
+  )
+}
+
+const Receive = ({ onClose, address }: { onClose?: () => void; address?: string }) => {
+  const [t] = useTranslation()
+  const { wallet } = useGlobalState()
+  const { addresses } = wallet
   const isSingleAddress = addresses.length === 1
 
   const accountAddress = useMemo(() => {
@@ -24,20 +74,73 @@ const Receive = () => {
     return <div>{t('receive.address-not-found')}</div>
   }
 
+  const { isInShortFormat, setIsInShortFormat, address: showAddress } = useSwitchAddress(accountAddress)
+  const { ref, onCopyQrCode, onDownloadQrCode } = useCopyAndDownloadQrCode()
+  const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
+  const onVerifyAddressClick = useCallback(() => {
+    setDisplayVerifyDialog(true)
+  }, [])
+
   return (
-    <PageContainer
-      onContextMenu={e => {
-        e.stopPropagation()
-        e.preventDefault()
-      }}
-      head={t('receive.title')}
+    <Dialog
+      show
+      title={
+        <Tooltip tip={<div className={styles.tip}>{t('receive.prompt')}</div>} placement="right-bottom">
+          <div className={styles.dialogTitle}>
+            {t('receive.title')}
+            <AttentionOutline />
+          </div>
+        </Tooltip>
+      }
+      onCancel={onClose}
+      showFooter={false}
+      className={styles.dialog}
     >
-      {isSingleAddress ? (
-        <SingleAddressReceive address={accountAddress} wallet={wallet} />
-      ) : (
-        <MultiAddressReceive address={accountAddress} addresses={addresses} walletId={walletId} />
-      )}
-    </PageContainer>
+      <div className={styles.addressRoot}>
+        <div className={styles.qrCode} data-copy-success-text={t('common.copied')}>
+          <QRCode value={showAddress} size={128} includeMargin ref={ref} />
+        </div>
+
+        <div className={styles.actions}>
+          <Button type="text" onClick={onDownloadQrCode}>
+            <Tooltip tip={t('receive.save-qr-code')} placement="top">
+              <Download />
+            </Tooltip>
+          </Button>
+          <Button type="text" onClick={onCopyQrCode}>
+            <Tooltip tip={t('receive.copy-address')} placement="top">
+              <Copy />
+            </Tooltip>
+          </Button>
+        </div>
+        <div className={styles.copyAddress}>
+          <AddressTransformWithCopyZone
+            showAddress={showAddress}
+            isInShortFormat={isInShortFormat}
+            onClick={() => setIsInShortFormat(is => !is)}
+          />
+        </div>
+
+        {isSingleAddress ? (
+          <Button
+            type="primary"
+            label={t('receive.verify-address')}
+            onClick={onVerifyAddressClick}
+            className={styles.verifyAddress}
+          />
+        ) : null}
+
+        {displayVerifyDialog && (
+          <VerifyHardwareAddress
+            address={accountAddress}
+            wallet={wallet}
+            onDismiss={() => {
+              setDisplayVerifyDialog(false)
+            }}
+          />
+        )}
+      </div>
+    </Dialog>
   )
 }
 

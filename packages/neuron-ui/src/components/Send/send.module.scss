@@ -93,6 +93,14 @@ $headerHeight: 104px;
   display: flex;
   align-items: center;
 
+  .goBack {
+    margin-right: 8px;
+    cursor: pointer;
+    g,
+    path {
+      stroke: var(--main-text-color);
+    }
+  }
   .btn {
     margin-left: 12px;
     min-width: 30px;

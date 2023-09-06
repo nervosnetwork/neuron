@@ -7,7 +7,6 @@ import Overview from 'components/Overview'
 import WalletWizard from 'components/WalletWizard'
 import ImportKeystore from 'components/ImportKeystore'
 import Send from 'components/Send'
-import Receive from 'components/Receive'
 import History from 'components/History'
 import HistoryDetailPage from 'components/HistoryDetailPage'
 import LaunchScreen from 'components/LaunchScreen'
@@ -67,60 +66,35 @@ const mainRouterConfig: RouteObject[] = [
             children: [...toolsRouters],
           },
           {
+            path: 'send',
+            children: [
+              {
+                path: '',
+                element: (
+                  <>
+                    <Send />
+                    <Outlet />
+                  </>
+                ),
+                children: [...toolsRouters],
+              },
+              {
+                path: ':address?',
+                element: (
+                  <>
+                    <Send />
+                    <Outlet />
+                  </>
+                ),
+                children: [...toolsRouters],
+              },
+            ],
+          },
+          {
             path: ':hash',
             element: (
               <>
                 <HistoryDetailPage />
-                <Outlet />
-              </>
-            ),
-            children: [...toolsRouters],
-          },
-        ],
-      },
-      {
-        path: RoutePath.Send,
-        children: [
-          {
-            path: '',
-            element: (
-              <>
-                <Send />
-                <Outlet />
-              </>
-            ),
-            children: [...toolsRouters],
-          },
-          {
-            path: ':address?',
-            element: (
-              <>
-                <Send />
-                <Outlet />
-              </>
-            ),
-            children: [...toolsRouters],
-          },
-        ],
-      },
-      {
-        path: RoutePath.Receive,
-        children: [
-          {
-            path: '',
-            element: (
-              <>
-                <Receive />
-                <Outlet />
-              </>
-            ),
-            children: [...toolsRouters],
-          },
-          {
-            path: ':address?',
-            element: (
-              <>
-                <Receive />
                 <Outlet />
               </>
             ),

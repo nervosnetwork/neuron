@@ -21,14 +21,6 @@
 .dropdown {
   margin-top: 8px;
   position: relative;
-  --tag-red-bg-color: #ffe8e8;
-  --tag-green-bg-color: #effaf7;
-  --tag-blue-bg-color: #e8faff;
-  @media (prefers-color-scheme: dark) {
-    --tag-red-bg-color: #322929;
-    --tag-green-bg-color: #2e3735;
-    --tag-blue-bg-color: #2d3638;
-  }
   .content {
     border: 1px solid var(--divide-line-color);
     border-radius: 8px;
@@ -126,6 +118,6 @@
   }
 }
 
-.textFieldClass{
+.textFieldClass {
   margin-bottom: 10px;
 }
