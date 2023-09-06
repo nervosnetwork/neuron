@@ -5,10 +5,11 @@ import Transaction from './chain/transaction'
 import Multisig from './multisig'
 import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from '../utils/buffer'
-import { bytes as byteUtils, number } from '@ckb-lumos/codec'
-import { fixvec } from '@ckb-lumos/codec/lib/molecule/layout'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
 
 export default class TransactionSize {
+  // https://github.com/zhangsoledad/rfcs/blob/zhangsoledad/ckb2023-overview/rfcs/0008-serialization/0008-serialization.md#fixvec---fixed-vector
+  public static SERIALIZED_ITEMS_COUNT_BYTESIZE = 4
   public static SERIALIZED_OFFSET_BYTESIZE = 4
 
   public static base(): number {
@@ -55,9 +56,11 @@ export default class TransactionSize {
   }
 
   public static outputData(data: string): number {
-    const fixvecCodec = fixvec(number.Uint8)
-    const bytes = byteUtils.hexify(fixvecCodec.pack(Array.from(byteUtils.bytify(data))))
-    return byteUtils.bytify(bytes).byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return (
+      byteUtils.bytify(data).byteLength +
+      TransactionSize.SERIALIZED_ITEMS_COUNT_BYTESIZE +
+      TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    )
   }
 
   // TODO: and here
@@ -68,9 +71,11 @@ export default class TransactionSize {
 
   public static witness(witness: WitnessArgs | string): number {
     const wit: string = typeof witness === 'string' ? witness : serializeWitnessArgs(witness.toSDK())
-    const fixvecCodec = fixvec(number.Uint8)
-    const bytes = byteUtils.hexify(fixvecCodec.pack(Array.from(byteUtils.bytify(wit))))
-    return byteUtils.bytify(bytes).byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return (
+      byteUtils.bytify(wit).byteLength +
+      TransactionSize.SERIALIZED_ITEMS_COUNT_BYTESIZE +
+      TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    )
   }
 
   public static secpLockWitness(): number {
