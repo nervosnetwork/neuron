@@ -58,9 +58,7 @@ export enum NFTType {
   NFT = 'NFT',
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
-}
 
-export enum SporeType {
   Spore = 'Spore',
   Cluster = 'SporeCluster',
 }
