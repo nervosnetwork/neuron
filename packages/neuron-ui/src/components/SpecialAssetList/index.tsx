@@ -419,7 +419,6 @@ const SpecialAssetList = () => {
                   return (
                     <div className={styles.actionBtnBox}>
                       <Button
-                        type="cancel"
                         label={t('special-assets.view-details')}
                         className={`${styles.actionBtn} ${styles.detailBtn}`}
                         onClick={() => onViewDetail(item)}
@@ -432,7 +431,6 @@ const SpecialAssetList = () => {
                   return (
                     <div className={styles.actionBtnBox}>
                       <Button
-                        type="cancel"
                         label={t('special-assets.view-details')}
                         className={`${styles.actionBtn} ${styles.detailBtn}`}
                         onClick={() => onViewDetail(item)}
@@ -498,7 +496,6 @@ const SpecialAssetList = () => {
                       />
                     )}
                     <Button
-                      type="cancel"
                       label={t('special-assets.view-details')}
                       className={`${styles.actionBtn} ${styles.detailBtn}`}
                       onClick={() => onViewDetail(item)}
