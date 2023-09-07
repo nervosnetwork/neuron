@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
-import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
 import { useDispatch, useState as useGlobalState } from 'states'
 import { shell } from 'electron'
 import { getIsCkbRunExternal } from 'services/remote'
@@ -11,6 +10,7 @@ import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { LIGHT_NETWORK_TYPE } from 'utils/const'
+import { Attention } from 'widgets/Icons/icon'
 import { useDataPath } from './hooks'
 
 import styles from './dataSetting.module.scss'
@@ -91,8 +91,9 @@ const DataSetting = () => {
                 placement="top"
                 tip={<p className={styles.tooltip}>{t('settings.data.disabled-set-path')}</p>}
                 showTriangle
+                className={styles.tip}
               >
-                <AttentionOutline />
+                <Attention />
               </Tooltip>
             </div>
           )}
@@ -102,8 +103,9 @@ const DataSetting = () => {
               placement="top"
               tip={<p className={styles.tooltip}>{t('settings.data.clear-cache-description')}</p>}
               showTriangle
+              className={styles.tip}
             >
-              <AttentionOutline />
+              <Attention />
             </Tooltip>
           </div>
         </div>
@@ -124,7 +126,7 @@ const DataSetting = () => {
         <div className={styles.dialogContainer}>
           <div>{t('settings.data.remove-ckb-data-tip', { prevPath, currentPath })}</div>
           <div className={styles.attention}>
-            <AttentionOutline />
+            <Attention />
             {t('settings.data.resync-ckb-node-describe')}
           </div>
 

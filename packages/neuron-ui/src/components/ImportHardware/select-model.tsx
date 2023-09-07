@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { CreateFirstWalletNav } from 'components/WalletWizard'
 import { useGoBack } from 'utils'
-import { AttentionOutline } from 'widgets/Icons/icon'
+import { Attention } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
 import styles from './findDevice.module.scss'
 import { ActionType, ImportStep, Model } from './common'
@@ -97,7 +97,7 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
         ))}
       </section>
       <div className={styles.attention}>
-        <AttentionOutline />
+        <Attention />
         {t('messages.experimental-message-hardware')}
       </div>
       <footer className={styles.footer}>
