@@ -23,7 +23,7 @@ import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 import PageContainer from 'components/PageContainer'
 import CopyZone from 'widgets/CopyZone'
-import { ArrowNext, Deposit, EyesClose, EyesOpen, Tooltip } from 'widgets/Icons/icon'
+import { ArrowNext, Attention, Deposit, EyesClose, EyesOpen } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 import { HIDE_BALANCE } from 'utils/const'
 
@@ -321,7 +321,7 @@ const NervosDAO = () => {
               {t(`nervos-dao.apc`)}
               {isEnglish && (
                 <span className={styles.tooltip} data-tooltip={t(`nervos-dao.apc-tooltip`)}>
-                  <Tooltip />
+                  <Attention />
                 </span>
               )}
             </div>

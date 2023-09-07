@@ -148,6 +148,10 @@ $hover-bg-color: #3cc68a4d;
     & .arrow {
       margin: 0 16px 0 20px;
       width: 10px;
+      height: 10px;
+      path[stroke] {
+        stroke: #808784;
+      }
     }
   }
 

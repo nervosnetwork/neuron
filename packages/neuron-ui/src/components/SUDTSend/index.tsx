@@ -14,7 +14,6 @@ import RadioGroup from 'widgets/RadioGroup'
 import { ReactComponent as Experiment } from 'widgets/Icons/Experiment.svg'
 import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
 import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
-import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
 import { getSUDTAccount } from 'services/remote'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
@@ -34,6 +33,7 @@ import {
 import { SendType } from 'utils/enums'
 import { AmountNotEnoughException, isErrorWithI18n } from 'exceptions'
 import { getDisplayName, getDisplaySymbol } from 'components/UANDisplay'
+import { Attention } from 'widgets/Icons/icon'
 import { AddressLockType, getGenerator, useAddressLockType, useOnSubmit, useOptions, useSendType } from './hooks'
 import styles from './sUDTSend.module.scss'
 
@@ -412,7 +412,7 @@ const SUDTSend = () => {
                                     }
                                     showTriangle
                                   >
-                                    <AttentionOutline className={styles.attention} />
+                                    <Attention className={styles.attention} />
                                   </Tooltip>
                                 </div>
                               ) : null,

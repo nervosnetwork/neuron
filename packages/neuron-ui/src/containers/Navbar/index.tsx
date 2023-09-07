@@ -7,7 +7,7 @@ import { VerifyExternalCkbNodeRes, checkForUpdates, getVersion, verifyExternalCk
 import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
-import { Overview, History, NervosDAO, Settings, Experimental, ArrowOpenRight, MenuExpand } from 'widgets/Icons/icon'
+import { Overview, History, NervosDAO, Settings, Experimental, MenuExpand, ArrowNext } from 'widgets/Icons/icon'
 import { RoutePath, clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
@@ -182,7 +182,7 @@ const Navbar = () => {
                     <span>{t(item.name)}</span>
                   )}
 
-                  {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
+                  {item.children?.length && <ArrowNext className={styles.arrow} />}
                 </MenuButton>
 
                 {item.children?.length && item.key === selectedKey && (

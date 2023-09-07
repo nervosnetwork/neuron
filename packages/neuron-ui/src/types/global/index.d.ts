@@ -6,9 +6,6 @@ declare interface Window {
     nativeImage: any
     ipcRenderer: import('electron').IpcRenderer
   }
-  neuron: {
-    role: 'main' | 'settings'
-  }
 }
 
 declare module '*.json' {

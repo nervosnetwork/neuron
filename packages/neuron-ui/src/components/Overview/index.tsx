@@ -16,7 +16,7 @@ import Button from 'widgets/Button'
 import { ReactComponent as Send } from 'widgets/Icons/OverviewSend.svg'
 import { ReactComponent as ReceiveIcon } from 'widgets/Icons/OverviewReceive.svg'
 import { ReactComponent as AddressbookIcon } from 'widgets/Icons/Addressbook.svg'
-import { ArrowOpenRight, PasswordHide, PasswordShow } from 'widgets/Icons/icon'
+import { ArrowNext, EyesClose, EyesOpen } from 'widgets/Icons/icon'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
@@ -204,8 +204,8 @@ const Overview = () => {
           <div className={styles.balance}>
             <span className={styles.balanceTitle}>
               {t('overview.balance')}
-              {showBalance && <PasswordShow onClick={onChangeShowBalance} className={styles.balanceIcon} />}
-              {!!showBalance || <PasswordHide onClick={onChangeShowBalance} className={styles.balanceIcon} />}
+              {showBalance && <EyesOpen onClick={onChangeShowBalance} className={styles.balanceIcon} />}
+              {!!showBalance || <EyesClose onClick={onChangeShowBalance} className={styles.balanceIcon} />}
             </span>
             {showBalance ? (
               <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
@@ -246,7 +246,7 @@ const Overview = () => {
             {items.length > 10 && (
               <Link className={styles.linkToHistory} to={RoutePath.History}>
                 {t('overview.more')}
-                <ArrowOpenRight />
+                <ArrowNext />
               </Link>
             )}
           </div>

@@ -6,7 +6,7 @@ import SUDTAvatar from 'widgets/SUDTAvatar'
 import Button from 'widgets/Button'
 import Table, { TableProps } from 'widgets/Table'
 import TextField from 'widgets/TextField'
-import { DownloadIcon, SearchIcon, ArrowOpenRightIcon } from 'widgets/Icons/icon'
+import { Download, Search, ArrowNext } from 'widgets/Icons/icon'
 
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
@@ -223,7 +223,7 @@ const History = () => {
       align: 'center',
       minWidth: '72px',
       render(_, idx) {
-        return <ArrowOpenRightIcon className={styles.arrow} data-is-expand-show={expandedRow === idx} />
+        return <ArrowNext className={styles.arrow} data-is-expand-show={expandedRow === idx} />
       },
     },
   ]
@@ -247,7 +247,7 @@ const History = () => {
               }
               prefix={
                 <span className={styles.searchBoxPrefix}>
-                  <SearchIcon onClick={onSearch} />
+                  <Search onClick={onSearch} />
                 </span>
               }
               placeholder={t('history.search.placeholder')}
@@ -257,7 +257,7 @@ const History = () => {
             />
 
             <Button disabled={isExporting} onClick={onExport} className={styles.exportButton}>
-              <DownloadIcon className={styles.exportIcon} /> {t('history.export-history')}
+              <Download className={styles.exportIcon} /> {t('history.export-history')}
             </Button>
           </div>
         }

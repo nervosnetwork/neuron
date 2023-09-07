@@ -163,19 +163,24 @@
 
   .linkToHistory {
     font-size: 14px;
-    color: #8da394;
+    color: var(--secondary-text-color);
     cursor: pointer;
 
     &:hover {
       color: var(--activity-color);
 
-      & > svg > path {
+      & > svg > path[stroke] {
         stroke: var(--activity-color);
       }
     }
 
     & > svg {
       margin-left: 4px;
+      width: 10px;
+      height: 10px;
+      path[stroke] {
+        stroke: #808784;
+      }
     }
   }
 }
