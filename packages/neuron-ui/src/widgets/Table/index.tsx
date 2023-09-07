@@ -87,7 +87,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
       setSortIndex(currentIndex)
       setSortType(type)
     },
-    [sortIndex, sortType, setSortIndex]
+    [sortIndex, sortType, setSortIndex, setSortType]
   )
 
   return (

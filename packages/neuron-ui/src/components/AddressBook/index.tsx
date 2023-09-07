@@ -135,9 +135,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
             </CopyZone>
           )
         },
-        sorter: (a: State.Address, b: State.Address) => {
-          return Number(a.balance) - Number(b.balance)
-        },
+        sorter: (a: State.Address, b: State.Address) => Number(a.balance) - Number(b.balance),
       },
       {
         title: t('addresses.transactions'),
@@ -145,9 +143,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
         align: 'center',
         className: styles.txCount,
         width: '100px',
-        sorter: (a: State.Address, b: State.Address) => {
-          return a.txCount - b.txCount
-        },
+        sorter: (a: State.Address, b: State.Address) => a.txCount - b.txCount,
       },
     ],
     [t, localDescription]

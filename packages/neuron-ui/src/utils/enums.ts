@@ -9,7 +9,7 @@ export enum RoutePath {
   Overview = '/overview',
   WalletWizard = '/wizard/',
   Wallet = '/wallet',
-  Send = '/overview/send',
+  Send = '/send',
   Receive = '/receive',
   History = '/history',
   Settings = '/settings',
