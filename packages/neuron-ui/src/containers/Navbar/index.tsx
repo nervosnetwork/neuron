@@ -15,8 +15,8 @@ import {
   NervosDAO,
   Settings,
   Experimental,
-  ArrowOpenRight,
   MenuExpand,
+  ArrowNext,
 } from 'widgets/Icons/icon'
 import { RoutePath, clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
@@ -194,7 +194,7 @@ const Navbar = () => {
                     <span>{t(item.name)}</span>
                   )}
 
-                  {item.children?.length && <ArrowOpenRight className={styles.arrow} />}
+                  {item.children?.length && <ArrowNext className={styles.arrow} />}
                 </MenuButton>
 
                 {item.children?.length && item.key === selectedKey && (

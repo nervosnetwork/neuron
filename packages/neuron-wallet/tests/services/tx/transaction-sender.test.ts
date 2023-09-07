@@ -174,7 +174,7 @@ import {
 import TransactionSender from '../../../src/services/transaction-sender'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import Multisig from '../../../src/models/multisig'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from '../../../src/utils/scriptAndAddress'
 import { serializeWitnessArgs } from '../../../src/utils/serialization'
 
 const fakeScript = new Script(

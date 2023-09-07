@@ -11,8 +11,13 @@
       height: 40px;
       margin-bottom: 24px;
       align-items: center;
+      .tip {
+        padding: 4px;
+        display: flex;
+      }
       svg {
-        margin: 4px 0 0 4px;
+        width: 12px;
+        height: 12px;
         cursor: pointer;
         g,
         path {
@@ -191,13 +196,26 @@
 .footer {
   padding: 24px 0;
   @include dialog-footer;
+  --footer-background-color: #ecf9f0;
+  @media (prefers-color-scheme: dark) {
+    --footer-background-color: #2d3534;
+  }
 
   .footerBtn {
     padding: 0 20px;
-    background: #ecf9f0;
+    background: var(--footer-background-color);
     color: var(--primary-color);
-    @media (prefers-color-scheme: dark) {
-      background: #2e3735;
+    &:not([disabled]) {
+      &:hover,
+      &:focus {
+        background-color: var(--footer-background-color);
+        color: color-mix(in srgb, #000000 20%, var(--primary-color));
+      }
+
+      &:active {
+        background-color: var(--footer-background-color);
+        color: color-mix(in srgb, #000000 20%, var(--primary-color));
+      }
     }
     &:last-of-type {
       margin-left: 24px;

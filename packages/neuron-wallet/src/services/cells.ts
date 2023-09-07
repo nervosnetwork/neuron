@@ -1,5 +1,5 @@
 import { getConnection, In } from 'typeorm'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import {
   CapacityNotEnough,

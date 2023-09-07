@@ -288,6 +288,15 @@
     svg {
       vertical-align: sub;
       margin-right: 4px;
+      path {
+        fill: var(--primary-color);
+      }
+    }
+
+    &:hover {
+      svg > path {
+        fill: color-mix(in srgb, #000000 20%, var(--primary-color));
+      }
     }
   }
 }

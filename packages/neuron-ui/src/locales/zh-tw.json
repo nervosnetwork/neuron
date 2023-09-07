@@ -90,7 +90,7 @@
       },
       "actions": {
         "close": "取消",
-        "rescan": "連接設備",
+        "reconnect": "連接設備",
         "copy-address": "复制地址",
         "verify": "地址驗證",
         "finish": "完成"
@@ -895,14 +895,6 @@
       "balance": "余額",
       "amount": "數量",
       "address": "地址"
-    },
-    "customized-asset": {
-      "actions": {
-        "unlock": "解鎖",
-        "mint": "鑄幣",
-        "burn": "銷幣"
-      },
-      "view-in-explorer": "瀏覽器"
     },
     "s-udt": {
       "edit-account-success": "編輯賬戶信息成功",

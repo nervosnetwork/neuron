@@ -107,7 +107,7 @@ const ImportKeystore = () => {
         .then(res => {
           if (isSuccessResponse(res)) {
             importedWalletDialogShown.setStatus(res.result.id, true)
-            navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+            navigate(RoutePath.Overview)
             return
           }
 

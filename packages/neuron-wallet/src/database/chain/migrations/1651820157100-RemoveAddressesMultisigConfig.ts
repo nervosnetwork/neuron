@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
-import { addressToScript } from "@nervosnetwork/ckb-sdk-utils"
+import { addressToScript } from '../../../utils/scriptAndAddress'
 import MultisigConfig from "../entities/multisig-config"
 
 export class RemoveAddressesMultisigConfig1651820157100 implements MigrationInterface {
