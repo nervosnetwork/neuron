@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
-import { useNavigate } from 'react-router-dom'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
 import SendMetaInfo from 'components/SendMetaInfo'
 import SendFieldset from 'components/SendFieldset'
@@ -20,6 +19,7 @@ import {
   validateOutputs,
   useOutputErrors,
   shannonToCKBFormatter,
+  useGoBack,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 
@@ -29,7 +29,7 @@ import styles from './send.module.scss'
 
 const SendHeader = ({ balance }: { balance: string }) => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const onBack = useGoBack()
 
   const [showBalance, setShowBalance] = useState(true)
   const onChangeShowBalance = useCallback(() => {
@@ -38,7 +38,7 @@ const SendHeader = ({ balance }: { balance: string }) => {
 
   return (
     <div className={styles.headerContainer}>
-      <GoBack className={styles.goBack} onClick={() => navigate(-1)} />
+      <GoBack className={styles.goBack} onClick={onBack} />
       <p>{t('navbar.send')}</p>
       <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
         {showBalance ? <EyesOpen /> : <EyesClose />}

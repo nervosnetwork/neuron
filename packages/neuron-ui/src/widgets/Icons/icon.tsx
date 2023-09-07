@@ -38,6 +38,8 @@ import { ReactComponent as DetailIconSvg } from './DetailIcon.svg'
 import { ReactComponent as CheckUpdateIconSvg } from './CheckUpdateIcon.svg'
 import { ReactComponent as LanguageSelectSvg } from './LanguageSelect.svg'
 import { ReactComponent as GoBackSvg } from './GoBack.svg'
+import { ReactComponent as SortSvg } from './Sort.svg'
+import { ReactComponent as EditSvg } from './Edit.svg'
 
 import styles from './icon.module.scss'
 
@@ -92,3 +94,5 @@ export const LanguageSelect = WrapSvg(LanguageSelectSvg)
 export const GoBack = WrapSvg(GoBackSvg)
 export const BalanceHide = WrapSvg(EyesCloseSvg, styles.balance)
 export const BalanceShow = WrapSvg(EyesOpenSvg, styles.balance)
+export const Sort = WrapSvg(SortSvg)
+export const Edit = WrapSvg(EditSvg)

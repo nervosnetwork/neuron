@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch } from 'states'
 import Dialog from 'widgets/Dialog'
 import CopyZone from 'widgets/CopyZone'
-import { Copy } from 'widgets/Icons/icon'
-import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
-import Table, { TableProps } from 'widgets/Table'
+import { Copy, Edit } from 'widgets/Icons/icon'
+import Table, { TableProps, SortType } from 'widgets/Table'
 import { shannonToCKBFormatter, useLocalDescription } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
@@ -16,7 +15,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
   const [t] = useTranslation()
   const { addresses, id: walletId } = wallet
 
-  const [tabIdx, setTabIdx] = useState('0')
+  const [tabIdx, setTabIdx] = useState<string>('0')
   const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
     const {
       dataset: { idx },
@@ -135,7 +134,15 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
             </CopyZone>
           )
         },
-        sorter: (a: State.Address, b: State.Address) => Number(a.balance) - Number(b.balance),
+        sorter: (a: State.Address, b: State.Address, type: SortType) => {
+          if (type === SortType.Increase) {
+            return Number(a.balance) - Number(b.balance)
+          }
+          if (type === SortType.Decrease) {
+            return Number(b.balance) - Number(a.balance)
+          }
+          return 0
+        },
       },
       {
         title: t('addresses.transactions'),
@@ -143,7 +150,15 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
         align: 'center',
         className: styles.txCount,
         width: '100px',
-        sorter: (a: State.Address, b: State.Address) => a.txCount - b.txCount,
+        sorter: (a: State.Address, b: State.Address, type: SortType) => {
+          if (type === SortType.Increase) {
+            return Number(a.txCount) - Number(b.txCount)
+          }
+          if (type === SortType.Decrease) {
+            return Number(b.txCount) - Number(a.txCount)
+          }
+          return 0
+        },
       },
     ],
     [t, localDescription]

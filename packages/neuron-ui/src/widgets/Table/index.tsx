@@ -1,9 +1,14 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import { BalanceHide, BalanceShow } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow, Sort } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
-import { ReactComponent as SortIcon } from 'widgets/Icons/Sort.svg'
 
 import styles from './table.module.scss'
+
+export enum SortType {
+  Normal = '',
+  Increase = 'increase',
+  Decrease = 'decrease',
+}
 
 export type TableProps<T> = {
   head?: React.ReactNode
@@ -19,7 +24,7 @@ export type TableProps<T> = {
     className?: string
     tdClassName?: string
     hidden?: boolean
-    sorter?: (a: T, b: T) => number
+    sorter?: (a: T, b: T, type: SortType) => number
   }[]
   dataKey?: string
   dataSource: T[]
@@ -60,14 +65,13 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
   const columnList = useMemo(() => columns.filter(item => !item.hidden), [columns])
 
   const [sortIndex, setSortIndex] = useState(-1)
-  const [sortType, setSortType] = useState('')
+  const [sortType, setSortType] = useState<SortType>(SortType.Normal)
 
   const currentDataSource = useMemo(() => {
-    if (sortIndex !== -1 && sortType) {
+    if (sortIndex !== -1 && sortType !== SortType.Normal) {
       const { sorter } = columnList[sortIndex]
       if (sorter) {
-        const list = [...dataSource].sort(sorter)
-        return sortType === 'increase' ? list : list.reverse()
+        return [...dataSource].sort((a: T, b: T) => sorter(a, b, sortType))
       }
     }
     return dataSource
@@ -76,7 +80,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
   const handleSort = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       const { dataset } = e.currentTarget
-      const { index, type = '' } = dataset
+      const { index, type } = dataset as { index: string; type: SortType }
       const currentIndex = Number(index)
 
       if (sortIndex === currentIndex && sortType === type) {
@@ -132,17 +136,17 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                       )}
                       {sorter ? (
                         <div className={styles.sorter}>
-                          <SortIcon
+                          <Sort
                             data-index={index}
-                            data-type="increase"
+                            data-type={SortType.Increase}
                             onClick={handleSort}
-                            data-active={sortIndex === index && sortType === 'increase'}
+                            data-active={sortIndex === index && sortType === SortType.Increase}
                           />
-                          <SortIcon
+                          <Sort
                             data-index={index}
-                            data-type="decrease"
+                            data-type={SortType.Decrease}
                             onClick={handleSort}
-                            data-active={sortIndex === index && sortType === 'decrease'}
+                            data-active={sortIndex === index && sortType === SortType.Decrease}
                           />
                         </div>
                       ) : null}

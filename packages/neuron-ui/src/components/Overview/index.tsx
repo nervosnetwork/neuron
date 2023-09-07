@@ -204,8 +204,11 @@ const Overview = () => {
           <div className={styles.balance}>
             <span className={styles.balanceTitle}>
               {t('overview.balance')}
-              {showBalance && <EyesOpen onClick={onChangeShowBalance} className={styles.balanceIcon} />}
-              {!!showBalance || <EyesClose onClick={onChangeShowBalance} className={styles.balanceIcon} />}
+              {showBalance ? (
+                <EyesOpen onClick={onChangeShowBalance} className={styles.balanceIcon} />
+              ) : (
+                <EyesClose onClick={onChangeShowBalance} className={styles.balanceIcon} />
+              )}
             </span>
             {showBalance ? (
               <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>

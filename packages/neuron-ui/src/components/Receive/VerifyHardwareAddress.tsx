@@ -32,14 +32,14 @@ const toLongAddr = (addr: string) => {
   }
 }
 
-const verifyAddressEqual = (address: string, compared?: string) => {
-  if (!compared) {
+const verifyAddressEqual = (source: string, target?: string) => {
+  if (!target) {
     return false
   }
-  if (address.length !== compared.length) {
-    return toLongAddr(address) === toLongAddr(compared)
+  if (source.length !== target.length) {
+    return toLongAddr(source) === toLongAddr(target)
   }
-  return address === compared
+  return source === target
 }
 
 const VerifyHardwareAddress = ({ address, wallet }: VerifyHardwareAddressProps) => {
