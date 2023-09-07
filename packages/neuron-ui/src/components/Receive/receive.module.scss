@@ -38,6 +38,10 @@
       & {
         svg {
           width: 12px;
+          g,
+          path {
+            fill: var(--primary-color);
+          }
         }
       }
     }
@@ -123,5 +127,21 @@
   svg {
     pointer-events: none;
     margin-right: 5px;
+  }
+}
+
+.verifyHardwareAddress {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+  align-items: center;
+
+  button {
+    width: 216px;
+  }
+
+  .success {
+    color: var(--main-text-color);
   }
 }

@@ -1,16 +1,16 @@
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Dialog from 'widgets/Dialog'
 import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
 import Button from 'widgets/Button'
-import VerifyHardwareAddress from 'components/VerifyHardwareAddress'
 import CopyZone from 'widgets/CopyZone'
 import QRCode from 'widgets/QRCode'
 import Tooltip from 'widgets/Tooltip'
 import { AddressTransform } from 'widgets/Icons/icon'
 import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
 import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
+import VerifyHardwareAddress from './VerifyHardwareAddress'
 import styles from './receive.module.scss'
 import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
 
@@ -76,10 +76,6 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
 
   const { isInShortFormat, setIsInShortFormat, address: showAddress } = useSwitchAddress(accountAddress)
   const { ref, onCopyQrCode, onDownloadQrCode } = useCopyAndDownloadQrCode()
-  const [displayVerifyDialog, setDisplayVerifyDialog] = useState(false)
-  const onVerifyAddressClick = useCallback(() => {
-    setDisplayVerifyDialog(true)
-  }, [])
 
   return (
     <Dialog
@@ -121,24 +117,7 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
           />
         </div>
 
-        {isSingleAddress ? (
-          <Button
-            type="primary"
-            label={t('receive.verify-address')}
-            onClick={onVerifyAddressClick}
-            className={styles.verifyAddress}
-          />
-        ) : null}
-
-        {displayVerifyDialog && (
-          <VerifyHardwareAddress
-            address={accountAddress}
-            wallet={wallet}
-            onDismiss={() => {
-              setDisplayVerifyDialog(false)
-            }}
-          />
-        )}
+        {isSingleAddress && <VerifyHardwareAddress address={accountAddress} wallet={wallet} />}
       </div>
     </Dialog>
   )
