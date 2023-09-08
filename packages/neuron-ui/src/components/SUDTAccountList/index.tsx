@@ -10,11 +10,11 @@ import PageContainer from 'components/PageContainer'
 import { ReactComponent as Experiment } from 'widgets/Icons/Experiment.svg'
 import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
 import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
-import { ReactComponent as Search } from 'widgets/Icons/SearchIcon.svg'
 import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
 import SUDTReceiveDialog, { DataProps } from 'components/SUDTReceiveDialog'
 import Toast from 'widgets/Toast'
 import TableNoData from 'widgets/Icons/TableNoData.png'
+import { Search } from 'widgets/Icons/icon'
 
 import { useState as useGlobalState, useDispatch, AppActions, NeuronWalletActions } from 'states'
 import {

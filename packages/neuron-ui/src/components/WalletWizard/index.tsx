@@ -31,7 +31,7 @@ const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (navigate: NavigateFunction) => {
   return createWallet(params).then(res => {
     if (isSuccessResponse(res)) {
-      navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+      navigate(RoutePath.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
@@ -47,7 +47,7 @@ const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (n
   return importMnemonic(params).then(res => {
     if (isSuccessResponse(res)) {
       importedWalletDialogShown.setStatus(res.result.id, true)
-      navigate(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
+      navigate(RoutePath.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {

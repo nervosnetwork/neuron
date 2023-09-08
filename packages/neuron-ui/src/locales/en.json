@@ -97,7 +97,7 @@
       },
       "actions": {
         "close": "Close",
-        "rescan": "Reconnect",
+        "reconnect": "Reconnect",
         "copy-address": "Copy Address",
         "verify": "Verify Address",
         "finish": "Ok"
@@ -924,14 +924,6 @@
       "balance": "Balance",
       "amount": "Amount",
       "address": "Address"
-    },
-    "customized-asset": {
-      "actions": {
-        "unlock": "Unlock",
-        "mint": "Mint",
-        "burn": "Burn"
-      },
-      "view-in-explorer": "Explorer"
     },
     "s-udt": {
       "edit-account-success": "Edit account information successfully",
