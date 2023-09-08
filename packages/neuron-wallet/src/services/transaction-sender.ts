@@ -1,4 +1,3 @@
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
 import { serializeWitnessArgs } from '../utils/serialization'
@@ -45,6 +44,7 @@ import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import CellsService from './cells'
+import hd from '@ckb-lumos/hd'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -417,8 +417,9 @@ export default class TransactionSender {
     const message = blake2b.digest()
 
     if (!wallet.isHardware()) {
-      const keyPair = new ECPair(privateKeyOrPath)
-      emptyWitness.lock = keyPair.signRecoverable(message)
+      // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
+      const privateKey = privateKeyOrPath
+      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]

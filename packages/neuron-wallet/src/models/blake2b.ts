@@ -1,15 +1,16 @@
-import { blake2b, PERSONAL, hexToBytes } from '@nervosnetwork/ckb-sdk-utils'
+import { CKBHasher } from '@ckb-lumos/base/lib/utils'
+import { bytes } from '@ckb-lumos/codec'
 
 export default class Blake2b {
-  private blake2b: any
+  private blake2b: CKBHasher
 
   constructor() {
-    this.blake2b = blake2b(32, null, null, PERSONAL)
+    this.blake2b = new CKBHasher()
   }
 
   public update = (message: string): void => {
     const msg = message.startsWith('0x') ? message : `0x${message}`
-    this.blake2b.update(hexToBytes(msg))
+    this.blake2b.update(bytes.bytify(msg))
   }
 
   public updateBuffer = (message: Buffer): void => {
@@ -17,7 +18,7 @@ export default class Blake2b {
   }
 
   public digest = (): string => {
-    return `0x${this.blake2b.digest('hex')}`
+    return this.blake2b.digestHex()
   }
 
   public static digest = (message: string): string => {
