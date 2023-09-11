@@ -13,10 +13,7 @@ import Receive from 'components/Receive'
 import AddressBook from 'components/AddressBook'
 import Table from 'widgets/Table'
 import Button from 'widgets/Button'
-import { ReactComponent as Send } from 'widgets/Icons/OverviewSend.svg'
-import { ReactComponent as ReceiveIcon } from 'widgets/Icons/OverviewReceive.svg'
-import { ReactComponent as AddressbookIcon } from 'widgets/Icons/Addressbook.svg'
-import { ArrowNext, EyesClose, EyesOpen } from 'widgets/Icons/icon'
+import { ArrowNext, EyesClose, EyesOpen, OverviewSend, OverviewReceive, Addressbook } from 'widgets/Icons/icon'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
@@ -222,7 +219,7 @@ const Overview = () => {
             <div className={styles.items}>
               {isSingleAddress ? null : (
                 <Button className={styles.addressBook} onClick={() => setShowAddressBook(true)}>
-                  <AddressbookIcon />
+                  <Addressbook />
                 </Button>
               )}
             </div>
@@ -230,12 +227,12 @@ const Overview = () => {
           <div className={styles.actions}>
             <Link className={styles.send} to={RoutePath.Send}>
               <Button type="primary">
-                <Send />
+                <OverviewSend />
                 <div>{t('overview.send')}</div>
               </Button>
             </Link>
             <Button type="primary" className={styles.receive} onClick={() => setShowReceive(true)}>
-              <ReceiveIcon />
+              <OverviewReceive />
               {t('overview.receive')}
             </Button>
           </div>

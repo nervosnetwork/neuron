@@ -8,10 +8,7 @@ import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePickerDialog from 'widgets/DatetimePickerDialog'
-import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
-import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
-import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
-import { GoBack } from 'widgets/Icons/icon'
+import { GoBack, EyesOpen, EyesClose, Add } from 'widgets/Icons/icon'
 
 import {
   validateTotalAmount,

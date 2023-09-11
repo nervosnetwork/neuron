@@ -2,14 +2,11 @@ import React, { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Dialog from 'widgets/Dialog'
-import { ReactComponent as AttentionOutline } from 'widgets/Icons/AttentionOutline.svg'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import QRCode from 'widgets/QRCode'
 import Tooltip from 'widgets/Tooltip'
-import { AddressTransform } from 'widgets/Icons/icon'
-import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
-import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
+import { AddressTransform, Download, Copy, Attention } from 'widgets/Icons/icon'
 import VerifyHardwareAddress from './VerifyHardwareAddress'
 import styles from './receive.module.scss'
 import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
@@ -84,7 +81,7 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
         <Tooltip tip={<div className={styles.tip}>{t('receive.prompt')}</div>} placement="right-bottom">
           <div className={styles.dialogTitle}>
             {t('receive.title')}
-            <AttentionOutline />
+            <Attention />
           </div>
         </Tooltip>
       }

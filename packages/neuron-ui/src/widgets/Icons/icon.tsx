@@ -40,6 +40,10 @@ import { ReactComponent as LanguageSelectSvg } from './LanguageSelect.svg'
 import { ReactComponent as GoBackSvg } from './GoBack.svg'
 import { ReactComponent as SortSvg } from './Sort.svg'
 import { ReactComponent as EditSvg } from './Edit.svg'
+import { ReactComponent as OverviewSendSvg } from './OverviewSend.svg'
+import { ReactComponent as OverviewReceiveSvg } from './OverviewReceive.svg'
+import { ReactComponent as AddressbookSvg } from './Addressbook.svg'
+import { ReactComponent as AddSvg } from './Add.svg'
 
 import styles from './icon.module.scss'
 
@@ -96,3 +100,7 @@ export const BalanceHide = WrapSvg(EyesCloseSvg, styles.balance)
 export const BalanceShow = WrapSvg(EyesOpenSvg, styles.balance)
 export const Sort = WrapSvg(SortSvg)
 export const Edit = WrapSvg(EditSvg)
+export const OverviewSend = WrapSvg(OverviewSendSvg)
+export const OverviewReceive = WrapSvg(OverviewReceiveSvg)
+export const Addressbook = WrapSvg(AddressbookSvg)
+export const Add = WrapSvg(AddSvg)
