@@ -24,9 +24,7 @@ export class TransactionPersistor {
   // 1. If the tx is not persisted before sending, output = sent, input = pending
   // 2. If the tx is already persisted before sending, do nothing
   private static saveWithSent = async (transaction: Transaction): Promise<TransactionEntity> => {
-    const txEntity: TransactionEntity | undefined = await getConnection()
-      .getRepository(TransactionEntity)
-      .findOne(transaction.hash)
+    const txEntity = await getConnection().getRepository(TransactionEntity).findOneBy({ hash: transaction.hash })
 
     if (txEntity && txEntity.status === TransactionStatus.Failed) {
       // delete and create a new one (OR just update all status)
@@ -51,9 +49,9 @@ export class TransactionPersistor {
     lockArgsSetNeedsDetail?: Set<string>
   ): Promise<TransactionEntity> => {
     const connection = getConnection()
-    const txEntity: TransactionEntity | undefined = await connection
+    const txEntity: TransactionEntity | null = await connection
       .getRepository(TransactionEntity)
-      .findOne(transaction.hash)
+      .findOneBy({ hash: transaction.hash })
 
     // update multiSignBlake160 / input.type / input.data / output.data
     if (txEntity) {
@@ -151,7 +149,7 @@ export class TransactionPersistor {
           const outPoint: OutPoint | null = input.previousOutput()
 
           if (outPoint) {
-            const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
+            const outputEntity = await connection.getRepository(OutputEntity).findOneBy({
               outPointTxHash: outPoint.txHash,
               outPointIndex: outPoint.index,
             })
@@ -257,7 +255,7 @@ export class TransactionPersistor {
       inputs.push(input)
 
       if (outPoint) {
-        const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
+        const previousOutput = await connection.getRepository(OutputEntity).findOneBy({
           outPointTxHash: outPoint.txHash,
           outPointIndex: outPoint.index,
         })
@@ -271,7 +269,7 @@ export class TransactionPersistor {
     }
 
     const outputsData = transaction.outputsData!
-    const useTxInputs = await connection.getRepository(InputEntity).find({ outPointTxHash: tx.hash })
+    const useTxInputs = await connection.getRepository(InputEntity).findBy({ outPointTxHash: tx.hash })
     const useTxIndices = new Set(useTxInputs.map(v => v.outPointIndex))
     const outputs: OutputEntity[] = transaction.outputs.map((o, index) => {
       const output = new OutputEntity()

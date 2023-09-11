@@ -28,7 +28,7 @@ export default class SyncedBlockNumber {
     if (!this.#blockNumberEntity) {
       let blockNumber = await getConnection()
         .getRepository(SyncInfoEntity)
-        .findOne({ name: SyncInfoEntity.CURRENT_BLOCK_NUMBER })
+        .findOneBy({ name: SyncInfoEntity.CURRENT_BLOCK_NUMBER })
 
       if (!blockNumber) {
         blockNumber = new SyncInfoEntity()

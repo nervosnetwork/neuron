@@ -123,7 +123,7 @@ describe('integration tests for AddressService', () => {
     let generatedAddresses: Address[]
 
     beforeAll(async () => {
-      await initConnection('')
+      await initConnection()
     })
 
     afterAll(async () => {

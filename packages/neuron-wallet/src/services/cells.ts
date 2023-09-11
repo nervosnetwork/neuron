@@ -506,7 +506,7 @@ export default class CellsService {
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
-    const cellEntity: OutputEntity | undefined = await CellsService.getLiveCellEntity(outPoint)
+    const cellEntity = await CellsService.getLiveCellEntity(outPoint)
 
     if (!cellEntity) {
       return undefined
@@ -515,8 +515,8 @@ export default class CellsService {
     return cellEntity.toModel()
   }
 
-  private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
-    const cellEntity: OutputEntity | undefined = await getConnection().getRepository(OutputEntity).findOne({
+  private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | null> => {
+    const cellEntity = await getConnection().getRepository(OutputEntity).findOneBy({
       outPointTxHash: outPoint.txHash,
       outPointIndex: outPoint.index,
       status: 'live',

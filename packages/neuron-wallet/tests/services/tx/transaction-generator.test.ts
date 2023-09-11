@@ -90,7 +90,7 @@ import { closeConnection, getConnection, initConnection } from '../../setupAndTe
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
-    await initConnection('0x1234')
+    await initConnection()
 
     // @ts-ignore: Private method
     SystemScriptInfo.getInstance().secpOutPointInfo = new Map<string, OutPoint>([

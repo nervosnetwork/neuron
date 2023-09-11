@@ -141,6 +141,7 @@ describe('test for multisig controller', () => {
       blake160s: [],
       alias: 'string',
       changed: expect.any(Function),
+      lastestBlockNumber: '',
     }
     await multisigController.saveConfig(params)
     expect(MultiSigServiceMock.prototype.saveMultisigConfig).toHaveBeenCalledWith(params)
