@@ -2,7 +2,7 @@ import AddressService from './addresses'
 import WalletService, { Wallet } from './wallets'
 import Keychain from '../models/keys/keychain'
 import Blake2b from '../models/blake2b'
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
+import hd from '@ckb-lumos/hd'
 import { ec as EC } from 'elliptic'
 import { AddressNotFound } from '../exceptions'
 import HardwareWalletService from './hardware'
@@ -40,8 +40,7 @@ export default class SignMessage {
 
   private static signByPrivateKey(privateKey: string, message: string): string {
     const digest = SignMessage.signatureHash(message)
-    const ecPair = new ECPair(privateKey)
-    const signature = ecPair.signRecoverable(digest)
+    const signature = hd.key.signRecoverable(digest, privateKey)
     return signature
   }
 

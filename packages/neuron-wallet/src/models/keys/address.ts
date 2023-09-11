@@ -1,8 +1,7 @@
-import { AddressPrefix, blake160, bytesToHex } from '@nervosnetwork/ckb-sdk-utils'
 import { scriptToAddress } from '../../utils/scriptAndAddress'
 import { AccountExtendedPublicKey } from './key'
 import { systemScripts } from '../../utils/systemScripts'
-export { AddressPrefix }
+import hd from '@ckb-lumos/hd'
 
 export enum AddressType {
   Receiving = 0, // External chain
@@ -15,7 +14,7 @@ export const publicKeyToAddress = (publicKey: string, isMainnet = false) => {
     {
       codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
       hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
-      args: bytesToHex(blake160(pubkey)),
+      args: hd.key.publicKeyToBlake160(pubkey),
     },
     isMainnet
   )
