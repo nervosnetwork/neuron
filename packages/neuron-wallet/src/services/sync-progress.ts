@@ -111,7 +111,7 @@ export default class SyncProgressService {
   }
 
   static async getOtherTypeSyncBlockNumber() {
-    const items = await getConnection().getRepository(SyncProgress).find({
+    const items = await getConnection().getRepository(SyncProgress).findBy({
       addressType: SyncAddressType.Multisig,
     })
     return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.hash]: cur.localSavedBlockNumber }), {})

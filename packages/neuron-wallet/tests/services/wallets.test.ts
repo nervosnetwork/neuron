@@ -58,7 +58,7 @@ describe('wallet service', () => {
   const fakeChainCode = 'codecodecodecodecodecodecodecodecodecodecodecodecodecodecodecode'
 
   beforeAll(async () => {
-    await initConnection('')
+    await initConnection()
   })
 
   afterAll(async () => {

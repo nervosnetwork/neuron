@@ -64,7 +64,7 @@ describe('transactions service', () => {
     let hashes: string[]
 
     beforeAll(async () => {
-      await initConnection('0x1234')
+      await initConnection()
     })
 
     afterAll(async () => {

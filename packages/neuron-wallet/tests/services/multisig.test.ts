@@ -70,7 +70,7 @@ describe('multisig service', () => {
   const multisigOutput = MultisigOutput.fromIndexer(defaultOutput)
 
   beforeAll(async () => {
-    await initConnection('0x1234')
+    await initConnection()
   })
 
   afterAll(async () => {
