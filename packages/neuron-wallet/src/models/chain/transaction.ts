@@ -3,12 +3,12 @@ import Input from './input'
 import Output from './output'
 import WitnessArgs from './witness-args'
 import { BI } from '@ckb-lumos/bi'
-import { rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { serializeWitnessArgs } from '../../utils/serialization'
+import { serializeRawTransaction, serializeWitnessArgs } from '../../utils/serialization'
 import BlockHeader from './block-header'
 import TypeCheckerUtils from '../../utils/type-checker'
 import OutPoint from './out-point'
 import { Signatures } from '../../models/offline-sign'
+import { utils } from '@ckb-lumos/base'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -269,7 +269,7 @@ export default class Transaction {
   }
 
   public computeHash(): string {
-    return rawTransactionToHash(this.toSDKRawTransaction())
+    return utils.ckbHash(serializeRawTransaction(this.toSDKRawTransaction()))
   }
 
   public toSDKRawTransaction(): CKBComponents.RawTransaction {
