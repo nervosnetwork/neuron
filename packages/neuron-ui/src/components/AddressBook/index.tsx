@@ -10,26 +10,32 @@ import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
 import styles from './addressBook.module.scss'
 
+enum TabIdx {
+  All = '0',
+  Receive = '1',
+  Change = '2',
+}
+
 const AddressBook = ({ onClose }: { onClose?: () => void }) => {
   const { wallet } = useGlobalState()
   const [t] = useTranslation()
   const { addresses, id: walletId } = wallet
 
-  const [tabIdx, setTabIdx] = useState<string>('0')
+  const [tabIdx, setTabIdx] = useState<TabIdx>(TabIdx.All)
   const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
     const {
       dataset: { idx },
     } = e.target as HTMLDivElement
     if (idx) {
-      setTabIdx(idx)
+      setTabIdx(idx as TabIdx)
     }
   }
 
   const tableData = useMemo(() => {
-    if (tabIdx === '1') {
+    if (tabIdx === TabIdx.Receive) {
       return addresses.filter(item => item.type === 0)
     }
-    if (tabIdx === '2') {
+    if (tabIdx === TabIdx.Change) {
       return addresses.filter(item => item.type !== 0)
     }
     return addresses
@@ -176,13 +182,13 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
             hasHoverTrBg={false}
             head={
               <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>
-                <button type="button" role="tab" data-idx="0">
+                <button type="button" role="tab" data-idx={TabIdx.All}>
                   {t('addresses.all-address')}
                 </button>
-                <button type="button" role="tab" data-idx="1">
+                <button type="button" role="tab" data-idx={TabIdx.Receive}>
                   {t('addresses.receiving-address')}
                 </button>
-                <button type="button" role="tab" data-idx="2">
+                <button type="button" role="tab" data-idx={TabIdx.Change}>
                   {t('addresses.change-address')}
                 </button>
                 <div className={styles.underline} />
