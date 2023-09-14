@@ -201,7 +201,7 @@ export default class AddressService {
     await getConnection().manager.save(publicKeyInfo)
 
     const addressMeta = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel())
-    this.notifyAddressCreated([addressMeta], undefined)
+    AddressService.notifyAddressCreated([addressMeta], undefined)
   }
 
   // Generate both receiving and change addresses.
