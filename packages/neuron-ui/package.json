@@ -83,7 +83,7 @@
     "@types/react": "17.0.65",
     "@types/react-dom": "17.0.20",
     "@types/react-router-dom": "5.3.3",
-    "@types/styled-components": "5.1.26",
+    "@types/styled-components": "5.1.27",
     "@wojtekmaj/enzyme-adapter-react-17": "0.8.0",
     "babel-jest": "25.5.1",
     "electron": "24.7.1",
