@@ -115,7 +115,7 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
           />
         </div>
 
-        {isSingleAddress && <VerifyHardwareAddress address={accountAddress} wallet={wallet} />}
+        {isSingleAddress && <VerifyHardwareAddress address={accountAddress} wallet={wallet} onClose={onClose} />}
       </div>
 
       {showCopySuccess && <Toast content={t('common.copied')} />}

@@ -20,6 +20,7 @@ import styles from './receive.module.scss'
 export interface VerifyHardwareAddressProps {
   address: string
   wallet: State.WalletIdentity
+  onClose?: () => void
 }
 
 const toLongAddr = (addr: string) => {
@@ -42,7 +43,7 @@ const verifyAddressEqual = (source: string, target?: string) => {
   return source === target
 }
 
-const VerifyHardwareAddress = ({ address, wallet }: VerifyHardwareAddressProps) => {
+const VerifyHardwareAddress = ({ address, wallet, onClose = () => {} }: VerifyHardwareAddressProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const isWin32 = useMemo(() => {
@@ -176,7 +177,9 @@ const VerifyHardwareAddress = ({ address, wallet }: VerifyHardwareAddressProps) 
       ) : (
         <>
           {isVerifySuccess ? (
-            <Button type="submit">{t('hardware-verify-address.actions.finish')}</Button>
+            <Button type="submit" onClick={onClose}>
+              {t('hardware-verify-address.actions.close')}
+            </Button>
           ) : (
             <Button type="submit" loading={isLoading} onClick={verify}>
               {t('hardware-verify-address.actions.verify')}
