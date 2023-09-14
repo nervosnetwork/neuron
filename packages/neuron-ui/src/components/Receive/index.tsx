@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Dialog from 'widgets/Dialog'
+import Toast from 'widgets/Toast'
 import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import QRCode from 'widgets/QRCode'
@@ -72,7 +73,7 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
   }
 
   const { isInShortFormat, setIsInShortFormat, address: showAddress } = useSwitchAddress(accountAddress)
-  const { ref, onCopyQrCode, onDownloadQrCode } = useCopyAndDownloadQrCode()
+  const { ref, onCopyQrCode, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
 
   return (
     <Dialog
@@ -116,6 +117,8 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
 
         {isSingleAddress && <VerifyHardwareAddress address={accountAddress} wallet={wallet} />}
       </div>
+
+      {showCopySuccess && <Toast content={t('common.copied')} />}
     </Dialog>
   )
 }

@@ -121,7 +121,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                     className={headClassName}
                     style={{ width, minWidth }}
                   >
-                    <div className={styles.thWrap}>
+                    <div className={styles.thWrap} style={{ justifyContent: align }}>
                       {!!currentDataSource.length && isBalance ? (
                         <div className={styles.headWithBalance} style={{ justifyContent: align }}>
                           {title}
