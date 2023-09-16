@@ -12,7 +12,7 @@ export default class IndexerCacheService {
   private rpcService: RpcService
   private walletId: string
   private indexer: CkbIndexer
-  #cacheBlockNumberEntity?: SyncInfoEntity
+  #cacheBlockNumberEntityMap: Map<string, SyncInfoEntity> = new Map()
 
   constructor(walletId: string, addressMetas: AddressMeta[], rpcService: RpcService, indexer: CkbIndexer) {
     for (const addressMeta of addressMetas) {
@@ -71,10 +71,10 @@ export default class IndexerCacheService {
   }
 
   private async fetchTxMapping(): Promise<Map<string, Array<{ address: string; lockHash: string }>>> {
-    const lastCacheBlockNumber = await this.getCachedBlockNumber()
     const currentHeaderBlockNumber = await this.rpcService.getTipBlockNumber()
-    const mappingsByTxHash = new Map()
+    const mappingsByTxHash = new Map<string, Array<{ address: string; lockHash: string }>>()
     for (const addressMeta of this.addressMetas) {
+      const lastCacheBlockNumber = await this.getCachedBlockNumber(addressMeta.blake160)
       const lockScripts = [
         addressMeta.generateDefaultLockScript(),
         addressMeta.generateACPLockScript(),
@@ -147,25 +147,31 @@ export default class IndexerCacheService {
     return mappingsByTxHash
   }
 
-  private async getCachedBlockNumber() {
-    if (!this.#cacheBlockNumberEntity) {
-      this.#cacheBlockNumberEntity =
+  private async getCachedBlockNumber(blake160: string) {
+    let cacheBlockNumberEntity = this.#cacheBlockNumberEntityMap.get(blake160)
+    if (!cacheBlockNumberEntity) {
+      cacheBlockNumberEntity =
         (await getConnection()
           .getRepository(SyncInfoEntity)
-          .findOne({ name: SyncInfoEntity.getLastCachedKey(this.walletId) })) ??
+          .findOne({ name: SyncInfoEntity.getLastCachedKey(blake160) })) ??
         SyncInfoEntity.fromObject({
-          name: SyncInfoEntity.getLastCachedKey(this.walletId),
+          name: SyncInfoEntity.getLastCachedKey(blake160),
           value: '0x0',
         })
+      this.#cacheBlockNumberEntityMap.set(blake160, cacheBlockNumberEntity)
     }
 
-    return this.#cacheBlockNumberEntity
+    return cacheBlockNumberEntity
   }
 
   private async saveCacheBlockNumber(cacheBlockNumber: string) {
-    let cacheBlockNumberEntity = await this.getCachedBlockNumber()
-    cacheBlockNumberEntity.value = cacheBlockNumber
-    await getConnection().manager.save(cacheBlockNumberEntity)
+    const entities = this.addressMetas.map(v =>
+      SyncInfoEntity.fromObject({
+        name: SyncInfoEntity.getLastCachedKey(v.blake160),
+        value: cacheBlockNumber,
+      })
+    )
+    await getConnection().manager.save(entities, { chunk: 100 })
   }
 
   public async upsertTxHashes(): Promise<string[]> {
@@ -210,28 +216,30 @@ export default class IndexerCacheService {
       fetchBlockDetailsQueue.drain(resolve)
     })
 
+    const indexerCaches: IndexerTxHashCache[] = []
     for (const txWithStatus of txsWithStatus) {
       const { transaction, txStatus } = txWithStatus
-      const mappings = mappingsByTxHash.get(transaction.hash!)!
+      const mappings = mappingsByTxHash.get(transaction.hash!)
+      if (!mappings) {
+        continue
+      }
 
       for (const { lockHash, address } of mappings) {
-        await getConnection()
-          .createQueryBuilder()
-          .insert()
-          .into(IndexerTxHashCache)
-          .values({
-            txHash: transaction.hash,
+        indexerCaches.push(
+          IndexerTxHashCache.fromObject({
+            txHash: transaction.hash!,
             blockNumber: parseInt(transaction.blockNumber!),
             blockHash: txStatus.blockHash!,
-            blockTimestamp: transaction.timestamp,
+            blockTimestamp: transaction.timestamp!,
             lockHash,
             address,
             walletId: this.walletId,
-            isProcessed: false,
           })
-          .execute()
+        )
       }
     }
+    indexerCaches.sort((a, b) => a.blockNumber - b.blockNumber)
+    await getConnection().manager.save(indexerCaches, { chunk: 100 })
 
     await this.saveCacheBlockNumber(tipBlockNumber)
     return newTxHashes
