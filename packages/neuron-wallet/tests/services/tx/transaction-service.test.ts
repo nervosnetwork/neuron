@@ -49,19 +49,6 @@ jest.mock('@ckb-lumos/rpc', () => {
     },
   }
 })
-jest.mock('@nervosnetwork/ckb-sdk-core', () => {
-  return function () {
-    return {
-      rpc: {
-        createBatchRequest() {
-          return {
-            exec: ckbRpcExecMock,
-          }
-        },
-      },
-    }
-  }
-})
 
 function resetMock() {
   getTransactionMock.mockReset()
