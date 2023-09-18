@@ -42,7 +42,7 @@ import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
-import CKB from '@nervosnetwork/ckb-sdk-core'
+import { CKBRPC } from '@ckb-lumos/rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
 
@@ -792,9 +792,8 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawBlockHash: string
   ): Promise<bigint> => {
-    const ckb = new CKB(NodeService.getInstance().nodeUrl)
+    const ckb = new CKBRPC(NodeService.getInstance().nodeUrl)
     const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
-
     return BigInt(result)
   }
 

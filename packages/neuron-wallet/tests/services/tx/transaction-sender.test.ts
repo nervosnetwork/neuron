@@ -139,6 +139,18 @@ jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
     }
   }
 })
+jest.doMock('@ckb-lumos/rpc', () => {
+  return {
+    CKBRPC: class CKBRPC {
+      url: string
+      constructor(url: string) {
+        this.url = url
+      }
+
+      calculateDaoMaximumWithdraw = stubbedCalculateDaoMaximumWithdraw
+    },
+  }
+})
 
 jest.doMock('utils/ckb-rpc.ts', () => ({
   generateRPC() {

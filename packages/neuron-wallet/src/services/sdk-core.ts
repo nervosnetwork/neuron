@@ -1,4 +1,4 @@
-import CKB from '@nervosnetwork/ckb-sdk-core'
+import { CKBRPC } from '@ckb-lumos/rpc'
 import https from 'https'
 import http from 'http'
 
@@ -19,14 +19,14 @@ const getHttpAgent = () => {
   return httpAgent
 }
 
-export const generateCKB = (url: string): CKB => {
-  const ckb = new CKB(url)
+export const generateCKB = (url: string): CKBRPC => {
+  const rpc = new CKBRPC(url)
   if (url.startsWith('https')) {
-    ckb.rpc.setNode({ url, httpsAgent: getHttpsAgent() })
+    rpc.setNode({ url, httpsAgent: getHttpsAgent() })
   } else {
-    ckb.rpc.setNode({ url, httpAgent: getHttpAgent() })
+    rpc.setNode({ url, httpAgent: getHttpAgent() })
   }
-  return ckb
+  return rpc
 }
 
 export default {

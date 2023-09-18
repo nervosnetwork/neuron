@@ -3,6 +3,8 @@ import { serializeWitnessArgs } from './serialization'
 import { CKBHasher } from '@ckb-lumos/base/lib/utils'
 import { key } from '@ckb-lumos/hd'
 
+type StructuredWitness = CKBComponents.WitnessArgs | CKBComponents.Witness
+
 // https://github.com/nervosnetwork/ckb-system-scripts/wiki/How-to-sign-transaction#signing
 export const signWitnesses = ({
   witnesses,
