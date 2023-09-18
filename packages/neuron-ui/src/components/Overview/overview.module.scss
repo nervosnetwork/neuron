@@ -2,82 +2,121 @@
 @import '../../styles/theme.scss';
 @import '../../styles/animation.scss';
 
-.mid {
-  height: 200px;
-  display: grid;
-  grid-template:
-    'balance send receive' 200px /
-    2fr 1fr 1fr;
-  grid-column-gap: 16px;
+.topContainer {
+  background-color: var(--secondary-background-color);
+  overflow: hidden;
+  border-radius: 16px;
   margin-bottom: 16px;
-  .balance {
-    grid-area: balance;
-    border-radius: 16px;
-    background-color: #26c786;
+
+  .mid {
+    display: flex;
+    gap: 16px;
     position: relative;
-    padding: 24px 16px;
-    color: var(--primary-text-color);
-
-    & > .backgroundImg {
-      position: absolute;
-      top: 0px;
-      right: 0px;
+    background: url('../../widgets/Icons/OverviewMask.svg') no-repeat left top;
+    background-size: cover;
+    padding: 32px 16px;
+    .balance {
+      flex: 1;
       border-radius: 16px;
-    }
+      position: relative;
+      color: var(--main-text-color);
 
-    .balanceValue {
-      font-family: 'D-DIN-PRO';
-      font-weight: 500;
-      font-size: 36px;
-    }
+      .balanceValue {
+        font-family: 'D-DIN-PRO';
+        font-weight: 500;
+        font-size: 36px;
+      }
 
-    & > .balanceUnit {
-      font-size: 16px;
-      font-weight: 500;
-      margin-left: 8px;
-    }
-
-    & > .balanceTitle {
-      font-weight: 500;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      margin-bottom: 36px;
-
-      & > svg {
+      & > .balanceUnit {
+        font-size: 16px;
+        font-weight: 500;
         margin-left: 8px;
-        cursor: pointer;
+      }
 
-        path {
-          fill: var(--svg-fill-color);
+      & > .balanceTitle {
+        font-weight: 500;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 11px;
+        color: var(--input-second-color);
+
+        & > svg {
+          margin-left: 8px;
+          cursor: pointer;
+
+          path {
+            fill: var(--input-second-color);
+          }
+        }
+      }
+
+      .items {
+        display: flex;
+        gap: 8px;
+        margin-top: 26px;
+        .addressBook {
+          min-width: 0;
+          width: 40px;
+          height: 40px;
+          background: var(--secondary-background-color);
+          border: 1px solid var(--table-head-border-color);
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          svg {
+            g,
+            path {
+              fill: var(--main-text-color);
+            }
+          }
         }
       }
     }
-  }
-  .send {
-    grid-area: send;
-  }
-  .receive {
-    grid-area: receive;
-  }
-
-  & > a {
-    border: none;
-    background: var(--secondary-background-color);
-    border-radius: 16px;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--primary-color);
-    text-align: center;
-    padding-top: 48px;
-
-    @media (prefers-color-scheme: dark) {
-      & > svg {
-        :first-child {
-          fill: var(--primary-color);
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      .send {
+        height: 56px;
+      }
+      button {
+        width: 132px;
+        svg {
+          width: 24px;
+          height: 24px;
+          margin-right: 12px;
+          g,
+          path {
+            fill: var(--primary-text-color);
+            &:last-child {
+              fill: var(--primary-color);
+            }
+          }
         }
-        :not(:first-child) {
-          fill: #14221c;
+      }
+    }
+
+    & > a {
+      border: none;
+      background: var(--secondary-background-color);
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--primary-color);
+      text-align: center;
+      padding-top: 48px;
+
+      @media (prefers-color-scheme: dark) {
+        & > svg {
+          :first-child {
+            fill: var(--primary-color);
+          }
+          :not(:first-child) {
+            fill: #14221c;
+          }
         }
       }
     }
@@ -96,12 +135,6 @@
   &[data-status='failed'] {
     color: #ff1e1e;
   }
-}
-
-.noActivities {
-  grid-area: more-link;
-  font-size: 0.75rem;
-  color: #000;
 }
 
 @keyframes blink {

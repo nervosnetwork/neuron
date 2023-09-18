@@ -1,0 +1,220 @@
+@import '../../styles/mixin.scss';
+
+.content {
+  background: var(--secondary-background-color);
+  border: 1px solid var(--divide-line-color);
+  border-radius: 8px;
+}
+
+.textarea {
+  width: calc(100% - 32px);
+  padding: 16px 16px 0;
+  background: transparent;
+  border: none;
+  height: 206px;
+  resize: none;
+  color: var(--main-text-color);
+}
+
+.recordTab {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  color: var(--secondary-text-color);
+  border-bottom: 1px solid var(--divide-line-color);
+
+  button {
+    appearance: none;
+    flex: 1;
+    height: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: transparent;
+    margin: 0;
+    border: none;
+    color: var(--tabs-default-color);
+    cursor: pointer;
+  }
+
+  .underline {
+    display: block;
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 33%;
+    box-sizing: border-box;
+    transition: transform 0.1s ease-in-out;
+    &::after {
+      content: '';
+      width: 100px;
+      height: 2px;
+      position: absolute;
+      top: 0;
+      left: calc(50% - 46px);
+      background: var(--primary-color);
+      border-radius: 8px;
+    }
+  }
+
+  &[data-idx='1'] {
+    .underline {
+      transform: translateX(100%);
+    }
+  }
+  &[data-idx='2'] {
+    .underline {
+      transform: translateX(200%);
+    }
+  }
+}
+
+.addressTable {
+  height: 440px;
+  color: var(--main-text-color);
+}
+
+.container {
+  width: 680px;
+
+  .qrCodeContainer {
+    width: 354px;
+    @include card;
+    flex-shrink: 0;
+    .qrCode {
+      margin-top: 48px;
+    }
+  }
+
+  .copyBalance {
+    height: 32px;
+    line-height: 32px;
+    min-width: 80px;
+  }
+
+  .balance {
+    padding-left: 26px;
+  }
+
+  .address {
+    height: 56px;
+    display: flex;
+    cursor: pointer;
+
+    & > span {
+      line-height: 56px;
+      font-family: 'JetBrains Mono';
+    }
+
+    .overflow {
+      word-break: break-all;
+      line-height: 56px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    &:hover {
+      color: var(--activity-color);
+    }
+  }
+
+  .copyTableAddress {
+    @include copyAddress;
+  }
+
+  .addresses {
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: hidden;
+  }
+
+  .description {
+    height: 56px;
+    line-height: 56px;
+    min-width: 100px;
+    .descTips {
+      @media screen and (max-width: 1400px) {
+        transform: translateX(-70%) !important;
+
+        & > div:nth-last-child(1) {
+          right: 25%;
+        }
+      }
+    }
+
+    &:hover {
+      color: var(--activity-color);
+    }
+    svg {
+      cursor: pointer;
+      margin-left: 4px;
+      g {
+        fill: var(--primary-color);
+      }
+    }
+    .descText {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: pointer;
+    }
+  }
+
+  .addressTip {
+    @media screen and (max-width: 1400px) {
+      transform: translateX(-40%) !important;
+    }
+  }
+
+  .descTipRoot {
+    position: relative;
+    width: 208px;
+    .autoHeight {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+
+      & > svg {
+        position: absolute;
+        right: 0;
+        bottom: 8px;
+      }
+    }
+    .descInput {
+      border: none;
+      word-break: break-word;
+      resize: none;
+      width: 100%;
+      height: 100%;
+      line-height: 24px;
+      background-color: transparent;
+      color: var(--main-text-color);
+      caret-color: #000000;
+      pointer-events: none;
+
+      @media (prefers-color-scheme: dark) {
+        caret-color: #fff;
+      }
+    }
+    & > .hidden {
+      word-break: break-word;
+      white-space: break-spaces;
+      visibility: hidden;
+      min-width: 100px;
+      min-height: 24px;
+      padding: 2px;
+      line-height: 24px;
+    }
+  }
+}
+
+@media screen and (max-width: 1330px) {
+  .container {
+    .balance {
+      padding-left: 18px;
+    }
+    .txCount {
+      padding-left: 64px;
+    }
+  }
+}
