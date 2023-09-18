@@ -1,8 +1,14 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import { BalanceHide, BalanceShow } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow, Sort } from 'widgets/Icons/icon'
 import TableNoData from 'widgets/Icons/TableNoData.png'
 
 import styles from './table.module.scss'
+
+export enum SortType {
+  Normal = '',
+  Increase = 'increase',
+  Decrease = 'decrease',
+}
 
 export type TableProps<T> = {
   head?: React.ReactNode
@@ -18,6 +24,7 @@ export type TableProps<T> = {
     className?: string
     tdClassName?: string
     hidden?: boolean
+    sorter?: (a: T, b: T, type: SortType) => number
   }[]
   dataKey?: string
   dataSource: T[]
@@ -57,6 +64,36 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
 
   const columnList = useMemo(() => columns.filter(item => !item.hidden), [columns])
 
+  const [sortIndex, setSortIndex] = useState(-1)
+  const [sortType, setSortType] = useState<SortType>(SortType.Normal)
+
+  const currentDataSource = useMemo(() => {
+    if (sortIndex !== -1 && sortType !== SortType.Normal) {
+      const { sorter } = columnList[sortIndex]
+      if (sorter) {
+        return [...dataSource].sort((a: T, b: T) => sorter(a, b, sortType))
+      }
+    }
+    return dataSource
+  }, [columnList, dataSource, sortIndex, sortType])
+
+  const handleSort = useCallback(
+    (e: React.MouseEvent<SVGSVGElement>) => {
+      const { dataset } = e.currentTarget
+      const { index, type } = dataset as { index: string; type: SortType }
+      const currentIndex = Number(index)
+
+      if (sortIndex === currentIndex && sortType === type) {
+        setSortIndex(-1)
+        return
+      }
+
+      setSortIndex(currentIndex)
+      setSortType(type)
+    },
+    [sortIndex, sortType, setSortIndex, setSortType]
+  )
+
   return (
     <div
       className={`${styles.tableRoot} ${className} ${isFixedTable ? styles.fixedTableRoot : ''}`}
@@ -70,7 +107,10 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
         <thead>
           <tr>
             {columnList.map(
-              ({ title, dataIndex, key, isBalance, align, width, minWidth, className: headClassName }) => {
+              (
+                { title, dataIndex, key, isBalance, align, width, minWidth, className: headClassName, sorter },
+                index
+              ) => {
                 return (
                   <th
                     key={key || dataIndex}
@@ -81,18 +121,36 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                     className={headClassName}
                     style={{ width, minWidth }}
                   >
-                    {!!dataSource.length && isBalance ? (
-                      <div className={styles.headWithBalance} style={{ justifyContent: align }}>
-                        {title}
-                        {showBalance ? (
-                          <BalanceShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
-                        ) : (
-                          <BalanceHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
-                        )}
-                      </div>
-                    ) : (
-                      title
-                    )}
+                    <div className={styles.thWrap} style={{ justifyContent: align }}>
+                      {!!currentDataSource.length && isBalance ? (
+                        <div className={styles.headWithBalance} style={{ justifyContent: align }}>
+                          {title}
+                          {showBalance ? (
+                            <BalanceShow onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                          ) : (
+                            <BalanceHide onClick={onClickBalanceIcon} className={styles.balanceIcon} />
+                          )}
+                        </div>
+                      ) : (
+                        title
+                      )}
+                      {sorter ? (
+                        <div className={styles.sorter}>
+                          <Sort
+                            data-index={index}
+                            data-type={SortType.Increase}
+                            onClick={handleSort}
+                            data-active={sortIndex === index && sortType === SortType.Increase}
+                          />
+                          <Sort
+                            data-index={index}
+                            data-type={SortType.Decrease}
+                            onClick={handleSort}
+                            data-active={sortIndex === index && sortType === SortType.Decrease}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                   </th>
                 )
               }
@@ -100,7 +158,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
           </tr>
         </thead>
         <tbody style={{ cursor: onRowClick ? 'pointer' : undefined }}>
-          {dataSource.map((item, idx) => {
+          {currentDataSource.map((item, idx) => {
             return (
               <>
                 <tr
@@ -132,7 +190,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
           })}
         </tbody>
       </table>
-      {dataSource.length ? null : (
+      {currentDataSource.length ? null : (
         <div className={styles.noData}>
           <img src={TableNoData} alt="No Data" />
           {noDataContent}

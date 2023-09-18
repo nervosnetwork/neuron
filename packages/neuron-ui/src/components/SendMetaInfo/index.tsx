@@ -35,15 +35,11 @@ const SendMetaInfo = ({
   return (
     <>
       {outputs.length > 1 || errorMessage ? (
-        <TextField
-          className={styles.textFieldClass}
-          field="totalAmount"
-          label={t('send.total-amount')}
-          value={shannonToCKBFormatter(totalAmount)}
-          readOnly
-          error={errorMessage}
-          width="100%"
-        />
+        <div className={styles.totalAmountField}>
+          <p className={styles.title}>{t('send.total-amount')}</p>
+          <p className={styles.value}>{shannonToCKBFormatter(totalAmount)}</p>
+          <p className={styles.errorMessage}>{errorMessage}</p>
+        </div>
       ) : null}
       <TextField
         placeholder={t('send.description-optional')}
