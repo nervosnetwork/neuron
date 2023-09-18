@@ -9,11 +9,11 @@ import { UANTokenName } from 'components/UANDisplay'
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
 import FormattedTokenAmount from 'components/FormattedTokenAmount'
+import Receive from 'components/Receive'
+import AddressBook from 'components/AddressBook'
 import Table from 'widgets/Table'
-import { ReactComponent as Send } from 'widgets/Icons/OverviewSend.svg'
-import { ReactComponent as Receive } from 'widgets/Icons/OverviewReceive.svg'
-import { ReactComponent as BalanceRight } from 'widgets/Icons/BalanceRight.svg'
-import { ArrowNext, EyesClose, EyesOpen } from 'widgets/Icons/icon'
+import Button from 'widgets/Button'
+import { ArrowNext, EyesClose, EyesOpen, OverviewSend, OverviewReceive, Addressbook } from 'widgets/Icons/icon'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
@@ -147,7 +147,7 @@ const TracsactionType = ({
 const Overview = () => {
   const {
     app: { pageNotice },
-    wallet: { id, balance = '' },
+    wallet: { id, balance = '', addresses },
     chain: {
       syncState: { cacheTipBlockNumber, bestKnownBlockNumber, syncStatus },
       transactions: { items = [] },
@@ -157,6 +157,11 @@ const Overview = () => {
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const navigate = useNavigate()
+
+  const [showReceive, setShowReceive] = useState(false)
+  const [showAddressBook, setShowAddressBook] = useState(false)
+
+  const isSingleAddress = addresses.length === 1
 
   useEffect(() => {
     if (id) {
@@ -191,33 +196,49 @@ const Overview = () => {
 
   return (
     <PageContainer head={t('navbar.overview')} notice={pageNotice} isHomePage>
-      <div className={styles.mid}>
-        <div className={styles.balance}>
-          <span className={styles.balanceTitle}>
-            {t('overview.balance')}
-            {showBalance && <EyesOpen onClick={onChangeShowBalance} className={styles.balanceIcon} />}
-            {!!showBalance || <EyesClose onClick={onChangeShowBalance} className={styles.balanceIcon} />}
-          </span>
-          {showBalance ? (
-            <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
-              <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
-            </CopyZone>
-          ) : (
-            <span className={styles.balanceValue}>{HIDE_BALANCE}</span>
-          )}
-          <span className={styles.balanceUnit}>CKB</span>
-          <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
-          <BalanceRight className={styles.backgroundImg} />
+      <div className={styles.topContainer}>
+        <div className={styles.mid}>
+          <div className={styles.balance}>
+            <span className={styles.balanceTitle}>
+              {t('overview.balance')}
+              {showBalance ? (
+                <EyesOpen onClick={onChangeShowBalance} className={styles.balanceIcon} />
+              ) : (
+                <EyesClose onClick={onChangeShowBalance} className={styles.balanceIcon} />
+              )}
+            </span>
+            {showBalance ? (
+              <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
+                <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
+              </CopyZone>
+            ) : (
+              <span className={styles.balanceValue}>{HIDE_BALANCE}</span>
+            )}
+            <span className={styles.balanceUnit}>CKB</span>
+            <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+            <div className={styles.items}>
+              {isSingleAddress ? null : (
+                <Button className={styles.addressBook} onClick={() => setShowAddressBook(true)}>
+                  <Addressbook />
+                </Button>
+              )}
+            </div>
+          </div>
+          <div className={styles.actions}>
+            <Link className={styles.send} to={RoutePath.Send}>
+              <Button type="primary">
+                <OverviewSend />
+                <div>{t('overview.send')}</div>
+              </Button>
+            </Link>
+            <Button type="primary" className={styles.receive} onClick={() => setShowReceive(true)}>
+              <OverviewReceive />
+              {t('overview.receive')}
+            </Button>
+          </div>
         </div>
-        <Link className={styles.send} to={RoutePath.Send}>
-          <Send />
-          <div>{t('overview.send')}</div>
-        </Link>
-        <Link className={styles.receive} to={RoutePath.Receive}>
-          <Receive />
-          <div>{t('overview.receive')}</div>
-        </Link>
       </div>
+
       <Table
         head={
           <div className={styles.transactionTableHead}>
@@ -286,6 +307,9 @@ const Overview = () => {
         noDataContent={t('overview.no-recent-activities')}
         onRowClick={onRecentActivityClick}
       />
+
+      {showReceive ? <Receive onClose={() => setShowReceive(false)} /> : null}
+      {showAddressBook ? <AddressBook onClose={() => setShowAddressBook(false)} /> : null}
     </PageContainer>
   )
 }

@@ -105,10 +105,6 @@ $head-height: 52px;
       width: 100%;
       table-layout: fixed;
     }
-
-    thead {
-      width: calc(100% - 8px);
-    }
   }
 }
 
@@ -124,4 +120,29 @@ $head-height: 52px;
   padding: 0 16px;
   height: $head-height;
   line-height: $head-height;
+}
+
+.thWrap {
+  display: flex;
+  .sorter {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    margin-left: 8px;
+    svg {
+      cursor: pointer;
+      display: block;
+      &:last-child {
+        transform: rotate(180deg);
+      }
+
+      &[data-active='true'] {
+        g,
+        path {
+          fill: var(--primary-color);
+        }
+      }
+    }
+  }
 }

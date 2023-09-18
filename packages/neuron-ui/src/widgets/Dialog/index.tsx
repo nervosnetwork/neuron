@@ -84,7 +84,7 @@ const Dialog = ({
         <div className={styles.header}>
           <div className={styles.title}>
             {title}
-            <span className={styles.subTitle}>{subTitle}</span>
+            {subTitle ? <span className={styles.subTitle}>{subTitle}</span> : null}
           </div>
           <Close onClick={onCancel} />
         </div>

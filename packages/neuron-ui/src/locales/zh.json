@@ -92,7 +92,7 @@
         "close": "取消",
         "reconnect": "连接设备",
         "copy-address": "复制地址",
-        "verify": "地址验证",
+        "verify": "验证地址",
         "finish": "完成"
       }
     },
@@ -139,7 +139,8 @@
       "destroySUDT": "销毁 <0></0> 资产账户",
       "wallet-ready": "钱包准备完成，欢迎使用",
       "send": "转账",
-      "receive": "收款"
+      "receive": "收款",
+      "locked": "已锁定余额"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -337,7 +338,8 @@
       "copy-address": "复制地址",
       "request-payment": "请求支付",
       "view-on-explorer": "在浏览器中查看",
-      "default-description": "无"
+      "default-description": "无",
+      "all-address": "全部地址"
     },
     "settings": {
       "title": {
