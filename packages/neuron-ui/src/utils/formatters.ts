@@ -304,7 +304,8 @@ export function truncateMiddle(str: string, start = 8, end = start): string {
   return `${str.slice(0, start)}...${str.slice(-end)}`
 }
 
-export const sporeFormatter = (args: string, data?: string, name?: string) => {
+type FormatterOptions = { args: string; data?: string; name?: string; truncate?: number }
+export const sporeFormatter = ({ args, data, name, truncate }: FormatterOptions) => {
   let format = 'Spore'
 
   const SporeData = molecule.table(
@@ -324,10 +325,10 @@ export const sporeFormatter = (args: string, data?: string, name?: string) => {
       // a spore cell may appear before the cluster cell is found in the light client.
       // So we need a placeholder for the name.
       if (clusterId && !name) {
-        format = `[${truncateMiddle(clusterId)}] ${format}`
+        format = `[${truncateMiddle(clusterId, truncate)}] ${format}`
       }
       if (clusterId && name) {
-        format = `[${name}] ${format}`
+        format = `[${truncateMiddle(name, truncate)}] ${format}`
       }
     } catch {
       // the Spore contract seems not guarantee the data always valid
@@ -336,7 +337,7 @@ export const sporeFormatter = (args: string, data?: string, name?: string) => {
   }
 
   if (args) {
-    format = `[${truncateMiddle(args)}] ${format}`
+    format = `[${truncateMiddle(args, truncate)}] ${format}`
   }
 
   return format

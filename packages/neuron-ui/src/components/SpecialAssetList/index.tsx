@@ -41,6 +41,7 @@ import TableNoData from 'widgets/Icons/TableNoData.png'
 import { useGetAssetAccounts, useSpecialAssetColumnInfo, SpecialAssetCell } from './hooks'
 
 import styles from './specialAssetList.module.scss'
+import CopyZone from '../../widgets/CopyZone'
 
 export interface LocktimeAssetInfo {
   data: string
@@ -389,7 +390,12 @@ const SpecialAssetList = () => {
               isBalance: true,
               minWidth: '200px',
               render(_, __, item, show) {
-                const { amount } = handleGetSpecialAssetColumnInfo(item)
+                const { amount, isSpore, sporeFullInfo } = handleGetSpecialAssetColumnInfo(item)
+
+                if (isSpore) {
+                  return <CopyZone content={sporeFullInfo ?? amount}>{amount}</CopyZone>
+                }
+
                 return show ? amount : HIDE_BALANCE
               },
             },

@@ -17,16 +17,16 @@ describe('sporeFormatter', () => {
   })
 
   it('should work as expected without cluster', () => {
-    const formatted = sporeFormatter(sporeArgs)
+    const formatted = sporeFormatter({ args: sporeArgs })
     expect(formatted).toBe(`[${truncatedSporeId}] Spore`)
   })
 
   it('should work as expected with cluster', () => {
-    const withoutName = sporeFormatter(sporeArgs, sporeData)
+    const withoutName = sporeFormatter({ args: sporeArgs, data: sporeData })
     expect(withoutName).toBe(`[${truncatedSporeId}] [${truncatedClusterId}] Spore`)
 
-    const clusterName = 'Testnet Spore 001'
-    const withName = sporeFormatter(sporeArgs, sporeData, clusterName)
-    expect(withName).toBe(`[${truncatedSporeId}] [${clusterName}] Spore`)
+    const clusterName = 'a very long cluster name'
+    const withName = sporeFormatter({ args: sporeArgs, data: sporeData, name: clusterName })
+    expect(withName).toBe(`[${truncatedSporeId}] [${truncateMiddle(clusterName)}] Spore`)
   })
 })
