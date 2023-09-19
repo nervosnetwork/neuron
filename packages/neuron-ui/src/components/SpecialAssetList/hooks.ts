@@ -196,7 +196,7 @@ export const useSpecialAssetColumnInfo = ({
       const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
       const isSpore = assetInfo.type === NFTType.Spore
 
-      let sporeFullInfo: undefined | string
+      let sporeClusterInfo: { name: string; description: string } | undefined
 
       switch (assetInfo.type) {
         case NFTType.NFT: {
@@ -206,17 +206,8 @@ export const useSpecialAssetColumnInfo = ({
         }
         case NFTType.Spore: {
           if (type) {
-            amount = sporeFormatter({
-              args: type.args,
-              data: item.data,
-              name: item.customizedAssetInfo.data,
-            })
-            sporeFullInfo = sporeFormatter({
-              args: type.args,
-              data: item.data,
-              name: item.customizedAssetInfo.data,
-              truncate: Infinity,
-            })
+            sporeClusterInfo = JSON.parse(item.customizedAssetInfo.data)
+            amount = sporeFormatter({ args: type.args, data: item.data, clusterName: sporeClusterInfo?.name })
           }
           break
         }
@@ -240,7 +231,7 @@ export const useSpecialAssetColumnInfo = ({
         isNFTClassOrIssuer,
         epochsInfo,
         isSpore,
-        sporeFullInfo,
+        sporeClusterInfo,
       }
     },
     [epoch, bestKnownBlockTimestamp, tokenInfoList, t]

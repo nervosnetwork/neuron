@@ -25,6 +25,7 @@ import {
   uniformTimeFormatter,
   getExplorerUrl,
   ConnectionStatus,
+  sporeFormatter,
 } from 'utils'
 import { LIGHT_NETWORK_TYPE, HIDE_BALANCE } from 'utils/const'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
@@ -390,10 +391,22 @@ const SpecialAssetList = () => {
               isBalance: true,
               minWidth: '200px',
               render(_, __, item, show) {
-                const { amount, isSpore, sporeFullInfo } = handleGetSpecialAssetColumnInfo(item)
+                const { amount, isSpore, sporeClusterInfo } = handleGetSpecialAssetColumnInfo(item)
 
-                if (isSpore) {
-                  return <CopyZone content={sporeFullInfo ?? amount}>{amount}</CopyZone>
+                if (isSpore && item.type) {
+                  return (
+                    <CopyZone
+                      content={sporeFormatter({
+                        args: item.type.args,
+                        data: item.data,
+                        truncate: Infinity,
+                        clusterName: sporeClusterInfo?.name,
+                      })}
+                      title={sporeClusterInfo?.description}
+                    >
+                      {amount}
+                    </CopyZone>
+                  )
                 }
 
                 return show ? amount : HIDE_BALANCE

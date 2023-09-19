@@ -346,7 +346,7 @@ export default class CellsService {
     )
 
     type ClusterId = string
-    const clusterNames: Record<ClusterId, string> = {}
+    const clusterInfos: Record<ClusterId, { name: string; description: string }> = {}
     await Promise.all(
       sporeOutputs.map(async output => {
         const tx = await rpc.getTransaction(output.outPointTxHash)
@@ -364,8 +364,8 @@ export default class CellsService {
             clusterId,
             assetAccountInfo.getSporeConfig(NodeService.getInstance().nodeUrl)
           )
-          const { name } = unpackToRawClusterData(clusterCell.data)
-          clusterNames[clusterId] = name
+          const { name, description } = unpackToRawClusterData(clusterCell.data)
+          clusterInfos[clusterId] = { name, description }
         } catch {
           // avoid crash
         }
@@ -454,8 +454,8 @@ export default class CellsService {
           try {
             const { clusterId } = SporeData.unpack(o.data)
 
-            if (clusterId && clusterNames[clusterId]) {
-              return clusterNames[clusterId]
+            if (clusterId && clusterInfos[clusterId]) {
+              return clusterInfos[clusterId]
             }
 
             return ''
@@ -466,7 +466,7 @@ export default class CellsService {
         cell.setCustomizedAssetInfo({
           lock: '',
           type: CustomizedType.Spore,
-          data: data,
+          data: JSON.stringify(data),
         })
       } else {
         cell.setCustomizedAssetInfo({

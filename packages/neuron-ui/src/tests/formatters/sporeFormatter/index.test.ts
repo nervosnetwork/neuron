@@ -26,7 +26,7 @@ describe('sporeFormatter', () => {
     expect(withoutName).toBe(`[${truncatedSporeId}] [${truncatedClusterId}] Spore`)
 
     const clusterName = 'a very long cluster name'
-    const withName = sporeFormatter({ args: sporeArgs, data: sporeData, name: clusterName })
+    const withName = sporeFormatter({ args: sporeArgs, data: sporeData, clusterName })
     expect(withName).toBe(`[${truncatedSporeId}] [${truncateMiddle(clusterName)}] Spore`)
   })
 })
