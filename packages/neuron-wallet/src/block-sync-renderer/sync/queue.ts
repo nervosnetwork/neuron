@@ -146,7 +146,7 @@ export default class Queue {
     const headers = await rpc
       .createBatchRequest<'getHeader', string[], CKBComponents.BlockHeader[]>(blockHashes.map(v => ['getHeader', v]))
       .exec()
-    headers.forEach((blockHeader, idx) => {
+    headers.forEach((blockHeader: CKBComponents.BlockHeader, idx: number) => {
       if (blockHeader) {
         const header = BlockHeader.fromSDK(blockHeader)
         txs[idx].timestamp = header.timestamp
