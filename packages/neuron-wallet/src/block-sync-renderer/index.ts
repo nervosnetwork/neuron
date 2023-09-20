@@ -19,6 +19,7 @@ import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-d
 import Multisig from '../services/multisig'
 import { SyncAddressType } from '../database/chain/entities/sync-progress'
 import { debounceTime } from 'rxjs/operators'
+import { TransactionPersistor } from '../services/tx'
 
 let network: Network | null
 let child: ChildProcess | null = null
@@ -63,6 +64,7 @@ export const resetSyncTask = async (startTask = true) => {
 
   if (startTask) {
     await WalletService.getInstance().maintainAddressesIfNecessary()
+    await TransactionPersistor.checkTxLock()
     await CommonUtils.sleep(3000)
     await createBlockSyncTask()
   }

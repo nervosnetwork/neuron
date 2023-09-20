@@ -7,7 +7,7 @@ import { AddressType } from '../../src/models/keys/address'
 import { Manufacturer } from '../../src/services/hardware/common'
 
 const stubbedDeletedByWalletIdFn = jest.fn()
-const stubbedGenerateAndSaveForExtendedKeyFn = jest.fn()
+const stubbedGenerateAndSaveForExtendedKeyQueue = jest.fn()
 const stubbedGenerateAndSaveForPublicKeyQueueAsyncPush = jest.fn()
 const stubbedGetNextUnusedAddressByWalletIdFn = jest.fn()
 const stubbedGetNextUnusedChangeAddressByWalletIdFn = jest.fn()
@@ -20,9 +20,11 @@ const stubbedDeleteByWalletId = jest.fn()
 jest.doMock('../../src/services/addresses', () => {
   return {
     deleteByWalletId: stubbedDeleteByWalletId,
-    generateAndSaveForExtendedKey: stubbedGenerateAndSaveForExtendedKeyFn,
     generateAndSaveForPublicKeyQueue: {
       asyncPush: stubbedGenerateAndSaveForPublicKeyQueueAsyncPush,
+    },
+    generateAndSaveForExtendedKeyQueue: {
+      asyncPush: stubbedGenerateAndSaveForExtendedKeyQueue,
     },
     getNextUnusedAddressByWalletId: stubbedGetNextUnusedAddressByWalletIdFn,
     getNextUnusedChangeAddressByWalletId: stubbedGetNextUnusedChangeAddressByWalletIdFn,
@@ -37,7 +39,7 @@ import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-inf
 
 const resetMocks = () => {
   stubbedDeletedByWalletIdFn.mockReset()
-  stubbedGenerateAndSaveForExtendedKeyFn.mockReset()
+  stubbedGenerateAndSaveForExtendedKeyQueue.mockReset()
   stubbedGenerateAndSaveForPublicKeyQueueAsyncPush.mockReset()
   stubbedGetNextUnusedAddressByWalletIdFn.mockReset()
   stubbedGetNextUnusedChangeAddressByWalletIdFn.mockReset()
@@ -201,16 +203,16 @@ describe('wallet service', () => {
         await wallet.checkAndGenerateAddresses()
       })
       it('calls AddressService.accountExtendedPublicKey', async () => {
-        expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
-          createdWallet.id,
-          expect.objectContaining({
+        expect(stubbedGenerateAndSaveForExtendedKeyQueue).toHaveBeenCalledWith({
+          walletId: createdWallet.id,
+          extendedKey: expect.objectContaining({
             chainCode: createdWallet.accountExtendedPublicKey().chainCode,
             publicKey: createdWallet.accountExtendedPublicKey().publicKey,
           }),
-          false,
-          20,
-          10
-        )
+          isImporting: false,
+          receivingAddressCount: 20,
+          changeAddressCount: 10,
+        })
       })
     })
     describe('#getNextAddressByWalletId', () => {
@@ -411,23 +413,23 @@ describe('wallet service', () => {
       await walletService.maintainAddressesIfNecessary()
     })
     it('should not generate addresses for wallets already having addresses', () => {
-      expect(stubbedGenerateAndSaveForExtendedKeyFn).not.toHaveBeenCalledWith(createdWallet1.id)
+      expect(stubbedGenerateAndSaveForExtendedKeyQueue).not.toHaveBeenCalledWith(createdWallet1.id)
     })
     it('generates addresses for wallets not having addresses', () => {
-      expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
-        createdWallet2.id,
-        expect.objectContaining({ publicKey: 'a' }),
-        false,
-        20,
-        10
-      )
-      expect(stubbedGenerateAndSaveForExtendedKeyFn).toHaveBeenCalledWith(
-        createdWallet3.id,
-        expect.objectContaining({ publicKey: 'a' }),
-        false,
-        20,
-        10
-      )
+      expect(stubbedGenerateAndSaveForExtendedKeyQueue).toHaveBeenCalledWith({
+        walletId: createdWallet2.id,
+        extendedKey: expect.objectContaining({ publicKey: 'a' }),
+        isImporting: false,
+        receivingAddressCount: 20,
+        changeAddressCount: 10,
+      })
+      expect(stubbedGenerateAndSaveForExtendedKeyQueue).toHaveBeenCalledWith({
+        walletId: createdWallet3.id,
+        extendedKey: expect.objectContaining({ publicKey: 'a' }),
+        isImporting: false,
+        receivingAddressCount: 20,
+        changeAddressCount: 10,
+      })
     })
     describe('when having invalid wallet ids in key info', () => {
       const deletedWalletId = 'wallet4'
