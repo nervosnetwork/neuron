@@ -345,7 +345,7 @@ declare namespace RPC {
     output_data: string
     tx_index: string
   }
-  export type IndexerTransaction<Goruped extends boolean = false> = Goruped extends true
+  export type IndexerTransaction<Grouped extends boolean = false> = Grouped extends true
     ? GroupedIndexerTransaction
     : UngroupedIndexerTransaction
   export interface UngroupedIndexerTransaction {
@@ -361,9 +361,9 @@ declare namespace RPC {
     tx_index: string
     cells: Array<[IOType, string]>
   }
-  export interface GetTransactionsResult<Goruped extends boolean = false> {
+  export interface GetTransactionsResult<Grouped extends boolean = false> {
     last_cursor: Hash256
-    objects: IndexerTransaction<Goruped>[]
+    objects: IndexerTransaction<Grouped>[]
   }
   export interface GetLiveCellsResult {
     last_cursor: Hash256

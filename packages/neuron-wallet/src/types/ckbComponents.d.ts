@@ -187,7 +187,7 @@ declare namespace CKBComponents {
     lastCursor: string
     objects: WithData extends true ? IndexerCell[] : IndexerCellWithoutData[]
   }
-  type IndexerTransaction<Goruped extends boolean = false> = Goruped extends true
+  type IndexerTransaction<Grouped extends boolean = false> = Grouped extends true
     ? GroupedIndexerTransaction
     : UngroupedIndexerTransaction
   type UngroupedIndexerTransaction = {
@@ -203,9 +203,9 @@ declare namespace CKBComponents {
     txIndex: number
     cells: Array<[IOType, number]>
   }
-  interface GetTransactionsResult<Goruped extends boolean = false> {
+  interface GetTransactionsResult<Grouped extends boolean = false> {
     lastCursor: Hash256
-    objects: IndexerTransaction<Goruped>[]
+    objects: IndexerTransaction<Grouped>[]
   }
   interface CKBIndexerQueryOptions extends QueryOptions {
     outputDataLenRange?: HexadecimalRange
