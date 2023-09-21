@@ -44,8 +44,8 @@ declare global {
     type Since = string
     interface Node {
       url: string
-      httpAgent?: http.Agent
-      httpsAgent?: https.Agent
+      httpAgent?: HttpAgent
+      httpsAgent?: HttpsAgent
     }
     interface Method {
       name: string
