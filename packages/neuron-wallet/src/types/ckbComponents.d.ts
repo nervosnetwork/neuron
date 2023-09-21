@@ -1,5 +1,5 @@
-import https from 'https'
-import http from 'http'
+import type { Agent as HttpsAgent } from 'node:https'
+import type { Agent as HttpAgent } from 'node:http'
 
 declare global {
   declare namespace CKBComponents {
