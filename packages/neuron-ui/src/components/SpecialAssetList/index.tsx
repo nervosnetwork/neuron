@@ -97,6 +97,7 @@ const SpecialAssetList = () => {
   const [isExistAccountDialogOpen, setIsExistAccountDialogOpen] = useState<boolean>(false)
   const [nFTSendCell, setNFTSendCell] = useState<
     | {
+        nftType?: NFTType
         nftId: string
         outPoint: {
           index: string
@@ -285,6 +286,16 @@ const SpecialAssetList = () => {
         })
         return
       }
+      if (cell.customizedAssetInfo.type === 'Spore') {
+        setNFTSendCell({
+          // unnecessary id for the spore
+          nftId: cell.type?.args ?? '',
+          outPoint: cell.outPoint,
+          nftType: NFTType.Spore,
+        })
+        return
+      }
+
       const handleRes =
         (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (res: ControllerResponse<any>) => {
           if (isSuccessResponse(res)) {
@@ -394,16 +405,14 @@ const SpecialAssetList = () => {
                 const { amount, isSpore, sporeClusterInfo } = handleGetSpecialAssetColumnInfo(item)
 
                 if (isSpore && item.type) {
+                  const formattedSporeInfo = sporeFormatter({
+                    args: item.type.args,
+                    data: item.data,
+                    truncate: Infinity,
+                    clusterName: sporeClusterInfo?.name,
+                  })
                   return (
-                    <CopyZone
-                      content={sporeFormatter({
-                        args: item.type.args,
-                        data: item.data,
-                        truncate: Infinity,
-                        clusterName: sporeClusterInfo?.name,
-                      })}
-                      title={sporeClusterInfo?.description}
-                    >
+                    <CopyZone content={formattedSporeInfo} title={sporeClusterInfo?.description}>
                       {amount}
                     </CopyZone>
                   )
@@ -422,29 +431,10 @@ const SpecialAssetList = () => {
                   customizedAssetInfo,
                 } = item
 
-                const {
-                  status,
-                  targetTime,
-                  isLockedCheque,
-                  isNFTTransferable,
-                  isNFTClassOrIssuer,
-                  epochsInfo,
-                  isSpore,
-                } = handleGetSpecialAssetColumnInfo(item)
+                const { status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo } =
+                  handleGetSpecialAssetColumnInfo(item)
 
                 if (isNFTClassOrIssuer || (customizedAssetInfo.type === NFTType.NFT && !isNFTTransferable)) {
-                  return (
-                    <div className={styles.actionBtnBox}>
-                      <Button
-                        label={t('special-assets.view-details')}
-                        className={`${styles.actionBtn} ${styles.detailBtn}`}
-                        onClick={() => onViewDetail(item)}
-                      />
-                    </div>
-                  )
-                }
-
-                if (isSpore) {
                   return (
                     <div className={styles.actionBtnBox}>
                       <Button
@@ -580,7 +570,12 @@ const SpecialAssetList = () => {
       ) : null}
 
       {nFTSendCell ? (
-        <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} onSuccess={handleActionSuccess} />
+        <NFTSend
+          nftType={nFTSendCell.nftType}
+          cell={nFTSendCell}
+          onCancel={() => setNFTSendCell(undefined)}
+          onSuccess={handleActionSuccess}
+        />
       ) : null}
 
       <Toast content={notice} onDismiss={() => setNotice('')} />

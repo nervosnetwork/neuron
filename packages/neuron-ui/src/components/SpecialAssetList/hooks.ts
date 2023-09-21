@@ -206,6 +206,8 @@ export const useSpecialAssetColumnInfo = ({
         }
         case NFTType.Spore: {
           if (type) {
+            // every spore cell is transferable
+            status = 'transfer-nft'
             sporeClusterInfo = JSON.parse(item.customizedAssetInfo.data)
             amount = sporeFormatter({ args: type.args, data: item.data, clusterName: sporeClusterInfo?.name })
           }

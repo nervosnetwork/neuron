@@ -520,6 +520,10 @@ export default class ApiController {
       return this.#customizedAssetsController.generateTransferNftTx(params)
     })
 
+    handle('generate-transfer-spore-tx', async (_, params: Controller.Params.GenerateTransferNftTxParams) => {
+      return this.#customizedAssetsController.generateTransferSporeTx(params)
+    })
+
     // Networks
 
     handle('get-all-networks', async () => {
