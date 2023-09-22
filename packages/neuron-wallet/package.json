@@ -50,7 +50,6 @@
     "@ckb-lumos/hd": "0.20.0-alpha.3",
     "@ckb-lumos/helpers": "0.20.0-alpha.3",
     "@ckb-lumos/rpc": "0.20.0-alpha.3",
-    "@ckb-lumos/toolkit": "0.20.0-alpha.3",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.16",
     "archiver": "5.3.0",
