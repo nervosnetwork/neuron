@@ -15,6 +15,7 @@
   @include tooltip;
   white-space: nowrap;
   display: inline-flex;
+  max-width: 200px;
 
   & > span {
     @include text-overflow-ellipsis;
