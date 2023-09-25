@@ -74,7 +74,7 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
 }
 
 export const sendTransaction = (params: Controller.SendTransactionParams) => async (dispatch: StateDispatch) =>
-  sendTxBaseAction(sendTx, params, dispatch, addNotification)
+  sendTxBaseAction(sendTx, params, dispatch)
 
 export const updateAddressListAndBalance =
   (params: Controller.GetAddressesByWalletIDParams) => (dispatch: StateDispatch) => {

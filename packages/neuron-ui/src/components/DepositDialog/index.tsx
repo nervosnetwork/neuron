@@ -57,8 +57,10 @@ const DepositDialog = ({
   const [t] = useTranslation()
   const disabled = !isTxGenerated
   const { isBalanceReserved, onIsBalanceReservedChange, setIsBalanceReserved } = useBalanceReserved()
-  const { depositValue, onChangeDepositValue, slidePercent, onSliderChange, resetDepositValue } =
-    useDepositValue(balance)
+  const { depositValue, onChangeDepositValue, slidePercent, onSliderChange, resetDepositValue } = useDepositValue(
+    balance,
+    show
+  )
   const { errorMessage, maxDepositValue } = useGenerateDaoDepositTx({
     walletID,
     isBalanceReserved,
