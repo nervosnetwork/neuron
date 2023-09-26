@@ -4,6 +4,7 @@
   @include tooltip;
   white-space: nowrap;
   display: inline-flex;
+  max-width: calc(100px + (100vw - 1200px) / 2);
 
   & > span {
     @include text-overflow-ellipsis;
@@ -15,7 +16,7 @@
   @include tooltip;
   white-space: nowrap;
   display: inline-flex;
-  max-width: 200px;
+  max-width: calc(180px + (100vw - 1200px) / 2);
 
   & > span {
     @include text-overflow-ellipsis;
