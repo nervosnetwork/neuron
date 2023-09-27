@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Slider } from 'office-ui-fabric-react'
 import { Trans, useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
@@ -71,6 +71,16 @@ const DepositDialog = ({
   })
   const onConfirm = useOnDepositDialogSubmit({ onCloseDepositDialog, walletID })
   const onCancel = useOnDepositDialogCancel({ onCloseDepositDialog, resetDepositValue, setIsBalanceReserved })
+  const onSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      if (disabled) {
+        return
+      }
+      onConfirm()
+    },
+    [disabled, onConfirm]
+  )
 
   return (
     <Dialog
@@ -85,7 +95,7 @@ const DepositDialog = ({
       {isDepositing ? (
         <Spinner size={SpinnerSize.large} />
       ) : (
-        <form>
+        <form onSubmit={onSubmit}>
           <label className={styles.depositValueLabel} htmlFor="depositValue">{`${t(
             'nervos-dao.deposit-amount'
           )}`}</label>
