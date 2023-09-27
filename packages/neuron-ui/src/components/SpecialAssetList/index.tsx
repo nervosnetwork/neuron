@@ -404,7 +404,7 @@ const SpecialAssetList = () => {
               render(_, __, item, show) {
                 const { amount, isSpore, sporeClusterInfo } = handleGetSpecialAssetColumnInfo(item)
 
-                if (isSpore && item.type) {
+                if (isSpore && item.type && show) {
                   const formattedSporeInfo = sporeFormatter({
                     args: item.type.args,
                     data: item.data,
