@@ -68,7 +68,7 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
     >
       <div className={styles.container}>
         <Alert status="warn" className={styles.notification}>
-          {t('s-udt.receive.notation', { symbol: getDisplaySymbol(tokenName || '', symbol || '') })}
+          <span>{t('s-udt.receive.notation', { symbol: getDisplaySymbol(tokenName || '', symbol || '') })}</span>
         </Alert>
         <div className={styles.info}>
           <SUDTAvatar type="logo" />

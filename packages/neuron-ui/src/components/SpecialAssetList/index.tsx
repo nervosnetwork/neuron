@@ -123,6 +123,12 @@ const SpecialAssetList = () => {
   const onCloseDialog = useCallback(() => {
     setIsExistAccountDialogOpen(false)
     setIsNewAccountDialogOpen(false)
+    setIsMigrateDialogOpen(false)
+  }, [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setIsMigrateDialogOpen])
+
+  const onBack = useCallback(() => {
+    setIsExistAccountDialogOpen(false)
+    setIsNewAccountDialogOpen(false)
     setIsMigrateDialogOpen(true)
   }, [setIsNewAccountDialogOpen, setIsExistAccountDialogOpen, setIsMigrateDialogOpen])
 
@@ -522,7 +528,8 @@ const SpecialAssetList = () => {
           sUDTAccounts={sUDTAccounts}
           walletID={id}
           tokenInfo={migrateTokenInfo}
-          onCancel={onCloseDialog}
+          onCloseDialog={onCloseDialog}
+          onBack={onBack}
           onSuccess={handleActionSuccess}
         />
       ) : null}
@@ -534,7 +541,8 @@ const SpecialAssetList = () => {
           sUDTAccounts={sUDTAccounts}
           isMainnet={isMainnet}
           walletID={id}
-          onCancel={onCloseDialog}
+          onCloseDialog={onCloseDialog}
+          onBack={onBack}
           isLightClient={isLightClient}
           onSuccess={handleActionSuccess}
         />

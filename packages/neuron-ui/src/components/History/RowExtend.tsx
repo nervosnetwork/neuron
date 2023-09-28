@@ -51,7 +51,7 @@ const RowExtend = ({ column, columns, isMainnet, id, bestBlockNumber }: RowExten
   )
 
   const { blockNumber, hash, description } = column
-  const confirmations = 1 + bestBlockNumber - +blockNumber
+  const confirmations = blockNumber ? 1 + bestBlockNumber - +blockNumber : 0
   const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
   const isSelected = localDescription.key === column.hash
   const onCopy = useCallback(() => {

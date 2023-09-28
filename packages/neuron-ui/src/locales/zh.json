@@ -305,7 +305,9 @@
       "copy-balance": "复制余额",
       "copy-address": "复制地址",
       "create": "创建 {{name}} 资产账户",
-      "destroy": "销毁 {{name}} 资产账户"
+      "destroy": "销毁 {{name}} 资产账户",
+      "createSUDT": "创建 <0></0> 资产账户",
+      "destroySUDT": "销毁 <0></0> 资产账户"
     },
     "transaction": {
       "window-title": "交易: {{hash}}",
