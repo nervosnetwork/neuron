@@ -23,14 +23,16 @@ const SUDTMigrateToNewAccountDialog = ({
   tokenInfo: findTokenInfo,
   sUDTAccounts,
   walletID,
-  onCancel,
+  onCloseDialog,
+  onBack,
   onSuccess,
 }: {
   cell: SpecialAssetCell
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
   sUDTAccounts: State.SUDTAccount[]
   walletID: string
-  onCancel: () => void
+  onCloseDialog: () => void
+  onBack: () => void
   onSuccess: (text: string) => void
 }) => {
   const [t] = useTranslation()
@@ -51,7 +53,7 @@ const SUDTMigrateToNewAccountDialog = ({
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
     }).then(res => {
-      onCancel()
+      onCloseDialog()
       if (isSuccessResponse(res)) {
         if (res.result) {
           dispatch({
@@ -91,7 +93,7 @@ const SUDTMigrateToNewAccountDialog = ({
         })
       }
     })
-  }, [cell, t, onCancel, walletID, tokenInfo, dispatch, sudtAmount])
+  }, [cell, t, onCloseDialog, walletID, tokenInfo, dispatch, sudtAmount])
 
   const renderList = fields.map(field => {
     return field.key === 'balance' ? (
@@ -123,7 +125,7 @@ const SUDTMigrateToNewAccountDialog = ({
       className={styles.container}
       show
       title={t('migrate-sudt.turn-into-new-account.title')}
-      onCancel={onCancel}
+      onCancel={onBack}
       cancelText={t('migrate-sudt.cancel')}
       confirmText={t('migrate-sudt.confirm')}
       onConfirm={onSubmit}
