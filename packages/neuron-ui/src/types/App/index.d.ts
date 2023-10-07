@@ -331,6 +331,55 @@ declare namespace State {
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
     experimental: Experimental | null
+    consumeOutPoints?: CKBComponents.OutPoint[]
+  }
+
+  enum LockScriptType {
+    SECP256K1 = 'SECP256K1',
+    ANYONE_CAN_PAY = 'ANYONE_CAN_PAY',
+    MULTI_LOCK_TIME = 'MULTI_LOCK_TIME',
+    MULTISIG = 'MULTISIG',
+    Cheque = 'Cheque',
+    Unknown = 'Unknown',
+  }
+
+  enum TypeScriptType {
+    DAO = 'DAO',
+    NFT = 'NFT',
+    NFTClass = 'NFTClass',
+    NFTIssuer = 'NFTIssuer',
+    SUDT = 'SUDT',
+    Unknown = 'Unknown',
+  }
+
+  interface LiveCellWithLocalInfoAPI {
+    capacity: CKBComponents.Capacity
+    outPoint: CKBComponents.OutPoint
+    lock: CKBComponents.Script
+    type?: CKBComponents.Script
+    data?: CKBComponents.Bytes
+    timestamp: string
+    description?: string
+    lockScriptType: LockScriptType
+    typeScriptType?: TypeScriptType
+    locked?: boolean
+  }
+  interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
+    lockedReason?: string
+    cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Unknown'
+  }
+
+  interface UpdateLiveCellLocalInfo {
+    outPoint: CKBComponents.OutPoint
+    description?: string
+    locked?: boolean
+  }
+
+  interface UpdateLiveCellsLockStatus {
+    outPoints: CKBComponents.OutPoint[]
+    lockScripts: CKBComponents.Script[]
+    locked: boolean
+    password: string
   }
 }
 

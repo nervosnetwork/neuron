@@ -55,22 +55,48 @@
         display: flex;
         gap: 8px;
         margin-top: 26px;
-        .addressBook {
+        .button {
           min-width: 0;
-          width: 40px;
           height: 40px;
-          background: var(--secondary-background-color);
+          border-radius: 24px;
+          background-color: var(--secondary-background-color);
           border: 1px solid var(--table-head-border-color);
-          border-radius: 50%;
+          color: var(--main-text-color);
           display: flex;
           justify-content: center;
           align-items: center;
+          padding: 10px 16px;
           cursor: pointer;
-          svg {
-            g,
-            path {
-              fill: var(--main-text-color);
-            }
+          &.icon {
+            width: 40px;
+            padding: 0;
+            justify-content: center;
+          }
+        }
+
+        .lockedTitle {
+          font-family: PingFang SC;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 0px;
+          margin-left: 4px;
+        }
+
+        .lockedBalance {
+          font-family: 'D-DIN-PRO';
+          font-weight: 500;
+          font-size: 16px;
+        }
+
+        .lockedUnit {
+          font-size: 12px;
+          margin-right: 2px;
+        }
+
+        .arrowNext {
+          path {
+            stroke-width: 1px;
+            stroke: var(--main-text-color);
           }
         }
       }

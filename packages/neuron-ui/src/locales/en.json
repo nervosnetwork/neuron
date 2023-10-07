@@ -147,7 +147,8 @@
       "wallet-ready": "Wallet is ready, welcome",
       "send": "Send",
       "receive": "Receive",
-      "locked": "Locked Amount"
+      "locked": "Locked Amount",
+      "locked-balance": "Locked Balance"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -1148,6 +1149,54 @@
         "add-network": "Add Network",
         "ignore-external-node": "Ignore external node"
       }
+    },
+    "cell-manage": {
+      "title": "Cell Manage",
+      "wallet-balance": "Wallet Balance",
+      "table": {
+        "head": {
+          "date": "Date",
+          "type": "Type",
+          "balance": "Balance",
+          "status": "Status",
+          "description": "Description",
+          "action": "Operation"
+        },
+        "locked": "Locked",
+        "unlocked": "Unlocked",
+        "default-description": "None"
+      },
+      "cell-detail-dialog": {
+        "title": "Cell Detail",
+        "capacity-used": "Used Capacity",
+        "data": "Data",
+        "total": "Total",
+        "used": "Used"
+      },
+      "locked-reason": {
+        "operate-in-special-assets": "Please use in special assets page",
+        "operate-in-assets-account": "Please use in assets account page",
+        "operate-in-dao": "Please use in Nervos DAO page",
+        "operate-in-multisig": "Please use in multisig page"
+      },
+      "cell-lock-dialog": {
+        "title": "Lock Cell",
+        "capacity": "Lock selected Cell {{capacity}} CKB",
+        "locked-cell-can-not-use": "Warn, locked Cells can not use"
+      },
+      "cell-unlock-dialog": {
+        "title": "Unlock Cell",
+        "capacity": "Unlock selected Cell {{capacity}} CKB"
+      },
+      "cell-consume-dialog": {
+        "title": "Consume Cell",
+        "warn-consume": "Consume cell will not keep any data and use all of the ckb, please ensure that no important data needs to be retained"
+      },
+      "enter-password": "Enter Password",
+      "password-placeholder": "Please input wallet password",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "consume": "Consume"
     }
   }
 }

@@ -24,6 +24,7 @@ export type TableProps<T> = {
     className?: string
     tdClassName?: string
     hidden?: boolean
+    sortable?: boolean
     sorter?: (a: T, b: T, type: SortType) => number
   }[]
   dataKey?: string
@@ -36,6 +37,7 @@ export type TableProps<T> = {
   rowExtendRender?: (v: T, idx: number) => React.ReactNode
   expandedRow?: number | null
   hasHoverTrBg?: boolean
+  onSorted?: (key?: keyof T, type?: SortType) => void
 }
 
 const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
@@ -52,6 +54,7 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     rowExtendRender,
     expandedRow,
     hasHoverTrBg = true,
+    onSorted,
   } = props
   const [showBalance, setShowBalance] = useState(true)
   const onClickBalanceIcon = useCallback(() => {
@@ -80,18 +83,20 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
   const handleSort = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       const { dataset } = e.currentTarget
-      const { index, type } = dataset as { index: string; type: SortType }
+      const { index, type, columnKey } = dataset as { index: string; type: SortType; columnKey: string }
       const currentIndex = Number(index)
 
       if (sortIndex === currentIndex && sortType === type) {
         setSortIndex(-1)
+        onSorted?.()
         return
       }
 
+      onSorted?.(columnKey, type)
       setSortIndex(currentIndex)
       setSortType(type)
     },
-    [sortIndex, sortType, setSortIndex, setSortType]
+    [sortIndex, sortType, setSortIndex, setSortType, onSorted]
   )
 
   return (
@@ -108,7 +113,18 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
           <tr>
             {columnList.map(
               (
-                { title, dataIndex, key, isBalance, align, width, minWidth, className: headClassName, sorter },
+                {
+                  title,
+                  dataIndex,
+                  key,
+                  isBalance,
+                  align,
+                  width,
+                  minWidth,
+                  className: headClassName,
+                  sorter,
+                  sortable,
+                },
                 index
               ) => {
                 return (
@@ -134,16 +150,18 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                       ) : (
                         title
                       )}
-                      {sorter ? (
+                      {sorter || sortable ? (
                         <div className={styles.sorter}>
                           <Sort
                             data-index={index}
+                            data-column-key={key || dataIndex}
                             data-type={SortType.Increase}
                             onClick={handleSort}
                             data-active={sortIndex === index && sortType === SortType.Increase}
                           />
                           <Sort
                             data-index={index}
+                            data-column-key={key || dataIndex}
                             data-type={SortType.Decrease}
                             onClick={handleSort}
                             data-active={sortIndex === index && sortType === SortType.Decrease}

@@ -7,6 +7,7 @@ export enum ConnectionStatus {
 export enum RoutePath {
   Launch = '/',
   Overview = '/overview',
+  CellManage = 'cellManage',
   WalletWizard = '/wizard/',
   Wallet = '/wallet',
   Send = '/send',
@@ -217,4 +218,22 @@ export enum SendType {
   acpNewCell = 'acpNewCell',
   unknowNewCell = 'unknowNewCell',
   sendCKB = 'sendCKB',
+}
+
+export enum LockScriptType {
+  SECP256K1 = 'SECP256K1',
+  ANYONE_CAN_PAY = 'ANYONE_CAN_PAY',
+  MULTI_LOCK_TIME = 'MULTI_LOCK_TIME',
+  MULTISIG = 'MULTISIG',
+  Cheque = 'Cheque',
+  Unknown = 'Unknown',
+}
+
+export enum TypeScriptType {
+  DAO = 'DAO',
+  NFT = 'NFT',
+  NFTClass = 'NFTClass',
+  NFTIssuer = 'NFTIssuer',
+  SUDT = 'SUDT',
+  Unknown = 'Unknown',
 }

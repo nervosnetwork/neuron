@@ -14,12 +14,12 @@ import AddressParser from '../../models/address-parser'
 import AssetAccountInfo from '../../models/asset-account-info'
 import BufferUtils from '../../utils/buffer'
 import AssetAccountEntity from '../../database/chain/entities/asset-account'
-import SudtTokenInfoEntity from '../../database/chain/entities/sudt-token-info'
 import exportTransactions from '../../utils/export-history'
 import RpcService from '../rpc-service'
 import NetworksService from '../networks'
 import Script from '../../models/chain/script'
 import Input from '../../models/chain/input'
+import SudtTokenInfoService from '../sudt-token-info'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -424,18 +424,7 @@ export class TransactionsService {
             .reduce((result, c) => result + c, BigInt(0))
 
           const amount = outputAmount - inputAmount
-          const tokenInfo = await getConnection()
-            .getRepository(SudtTokenInfoEntity)
-            .createQueryBuilder('info')
-            .leftJoinAndSelect('info.assetAccounts', 'aa')
-            .where(
-              `info.tokenID = :typeArgs AND aa.blake160 IN (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)`,
-              {
-                typeArgs,
-                walletId: params.walletID,
-              }
-            )
-            .getOne()
+          const tokenInfo = await SudtTokenInfoService.getSudtTokenInfo(typeArgs, params.walletID)
 
           if (tokenInfo) {
             sudtInfo = {
