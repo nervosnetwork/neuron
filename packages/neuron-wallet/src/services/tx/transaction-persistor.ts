@@ -400,12 +400,13 @@ export class TransactionPersistor {
 
   private static shouldSaveDetail(cell: InputEntity | OutputEntity, lockArgsSetNeedsDetail: Set<string>) {
     return (
-      cell.lockArgs &&
-      (lockArgsSetNeedsDetail.has(cell.lockArgs) ||
-        (cell.lockArgs.length === CHEQUE_ARGS_LENGTH &&
-          [cell.lockArgs.slice(0, DEFAULT_ARGS_LENGTH), `0x${cell.lockArgs.slice(DEFAULT_ARGS_LENGTH)}`].some(v =>
-            lockArgsSetNeedsDetail.has(v)
-          )))
+      (cell.multiSignBlake160 && lockArgsSetNeedsDetail.has(cell.multiSignBlake160)) ||
+      (cell.lockArgs &&
+        (lockArgsSetNeedsDetail.has(cell.lockArgs) ||
+          (cell.lockArgs.length === CHEQUE_ARGS_LENGTH &&
+            [cell.lockArgs.slice(0, DEFAULT_ARGS_LENGTH), `0x${cell.lockArgs.slice(DEFAULT_ARGS_LENGTH)}`].some(v =>
+              lockArgsSetNeedsDetail.has(v)
+            ))))
     )
   }
 
