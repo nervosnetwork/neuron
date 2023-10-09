@@ -353,11 +353,13 @@ const SUDTSend = () => {
           <div className={styles.left}>
             <div className={styles.info}>
               <SUDTAvatar type="logo" />
-              <div>
+              <div className={styles.infoDetails}>
                 <div className={styles.accountName}>{accountInfo?.accountName}</div>
                 <div className={styles.tokenName}>{displayTokenName}</div>
                 <div className={styles.balance}>
-                  {showBalance ? balance : HIDE_BALANCE} {displaySymbol}
+                  <span>
+                    {showBalance ? balance : HIDE_BALANCE} {displaySymbol}
+                  </span>
                   <Button className={styles.btn} type="text" onClick={() => setShowBalance(prev => !prev)}>
                     {showBalance ? <EyesOpen /> : <EyesClose />}
                   </Button>
