@@ -29,7 +29,7 @@ jest.mock('../../src/services/settings', () => {
         },
         get ckbDataPath() {
           return jest.fn().mockReturnValue('')()
-        }
+        },
       }
     }
   }
@@ -40,15 +40,15 @@ jest.mock('../../src/utils/logger', () => ({
 }))
 
 jest.mock('../../src/models/synced-block-number', () => {
-  return function() {
+  return function () {
     return {
-      setNextBlock: jest.fn()
+      setNextBlock: jest.fn(),
     }
   }
 })
 
 jest.mock('../../src/database/chain', () => ({
-  clean: () => jest.fn()
+  clean: () => jest.fn(),
 }))
 
 jest.mock('../../src/services/monitor', () => {
@@ -71,8 +71,8 @@ jest.mock('../../src/services/node', () => ({
 const resetSyncTaskQueueAsyncPushMock = jest.fn()
 jest.mock('../../src/block-sync-renderer', () => ({
   resetSyncTaskQueue: {
-    asyncPush: () => resetSyncTaskQueueAsyncPushMock()
-  }
+    asyncPush: () => resetSyncTaskQueueAsyncPushMock(),
+  },
 }))
 
 describe('test IndexerService', () => {

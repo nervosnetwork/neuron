@@ -107,12 +107,12 @@ $line-gap: 15px;
 
 .submission {
   padding-top: 96px;
-  
+
   .title {
     @include header-title;
     margin-bottom: 16px;
   }
-  
+
   .input {
     width: 500px;
     margin: 0 auto;

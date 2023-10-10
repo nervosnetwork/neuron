@@ -13,7 +13,7 @@
   border: none;
   background-color: transparent;
   min-width: 0;
-	color: var(--main-text-color);
+  color: var(--main-text-color);
   &[disabled] {
     cursor: not-allowed;
     color: var(--disable-button-text-color);
@@ -50,29 +50,29 @@
 .calendarHeader {
   display: flex;
   justify-content: space-between;
-	align-items: center;
+  align-items: center;
 
   .calPrev,
   .calNext {
-		background: transparent;
-		border: none;
-		cursor: pointer;
-		svg {
-			g,
-			path {
-				stroke: var(--main-text-color)
-			}
-		}
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    svg {
+      g,
+      path {
+        stroke: var(--main-text-color);
+      }
+    }
   }
   .calPrev {
     order: 1;
-		&[disabled] {
-			svg {
-				g,
-				path {
-					stroke: var(--disable-button-text-color)
-				}
-			}
+    &[disabled] {
+      svg {
+        g,
+        path {
+          stroke: var(--disable-button-text-color);
+        }
+      }
     }
   }
   .calNext {
@@ -84,29 +84,29 @@
     margin: 0;
     font-size: 16px;
     line-height: 22px;
-		color: var(--main-text-color);
+    color: var(--main-text-color);
   }
 }
 
 .calendarTable {
   width: 100%;
 
-	thead {
-		position: relative;
-		tr {
-			height: 40px;
-			color: var(--main-text-color)
-		}
-		&::after {
-			position: absolute;
-			content: "";
-			background: var(--input-border-color);
-			left: 0;
-			bottom: -0;
-			height: 1px;
-			width: 100%;
-		}
-	}
+  thead {
+    position: relative;
+    tr {
+      height: 40px;
+      color: var(--main-text-color);
+    }
+    &::after {
+      position: absolute;
+      content: '';
+      background: var(--input-border-color);
+      left: 0;
+      bottom: -0;
+      height: 1px;
+      width: 100%;
+    }
+  }
 
   td {
     text-align: center;
@@ -115,8 +115,8 @@
   button {
     &:hover,
     &:focus {
-			color: #fff;
-			background-color: var(--primary-color);
+      color: #fff;
+      background-color: var(--primary-color);
     }
   }
 
