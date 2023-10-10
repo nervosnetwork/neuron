@@ -1,14 +1,14 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
-import StoryRouter from 'storybook-react-router'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import PasswordRequest from 'components/PasswordRequest'
 import { initStates, NeuronWalletContext } from 'states'
 
 const dispatch = action('Dispatch')
 
 const states: { [title: string]: State.AppWithNeuronWallet } = {
-  'Wallet not Found': {
+  WalletNotFound: {
     ...initStates,
     app: {
       ...initStates.app,
@@ -18,21 +18,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       },
     },
   },
-  'Empty Password of Delete Wallet': {
-    ...initStates,
-    settings: {
-      ...initStates.settings,
-      wallets: [{ id: '1', name: 'test wallet' }],
-    },
-    app: {
-      ...initStates.app,
-      passwordRequest: {
-        walletID: '1',
-        actionType: 'delete',
-      },
-    },
-  },
-  'Content Password of Delete Wallet': {
+  EmptyPasswordOfDeleteWallet: {
     ...initStates,
     settings: {
       ...initStates.settings,
@@ -46,7 +32,21 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       },
     },
   },
-  'Empty Password of Backup Wallet': {
+  ContentPasswordOfDeleteWallet: {
+    ...initStates,
+    settings: {
+      ...initStates.settings,
+      wallets: [{ id: '1', name: 'test wallet' }],
+    },
+    app: {
+      ...initStates.app,
+      passwordRequest: {
+        walletID: '1',
+        actionType: 'delete',
+      },
+    },
+  },
+  EmptyPasswordOfBackupWallet: {
     ...initStates,
     settings: {
       ...initStates.settings,
@@ -60,7 +60,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       },
     },
   },
-  'Content Password of Backup Wallet': {
+  ContentPasswordOfBackupWallet: {
     ...initStates,
     settings: {
       ...initStates.settings,
@@ -74,7 +74,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       },
     },
   },
-  'Empty Password of Unlock': {
+  EmptyPasswordOfUnlock: {
     ...initStates,
     settings: {
       ...initStates.settings,
@@ -88,7 +88,7 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       },
     },
   },
-  'Send Transaction': {
+  SendTransaction: {
     ...initStates,
     settings: {
       ...initStates.settings,
@@ -104,12 +104,46 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
   },
 }
 
-const stories = storiesOf('PasswordRequest', module).addDecorator(StoryRouter())
+const meta: Meta<State.AppWithNeuronWallet> = {
+  component: PasswordRequest,
+  decorators: [
+    withRouter(),
+    (Component, { args }) => (
+      <NeuronWalletContext.Provider value={{ state: args, dispatch }}>
+        <Component />
+      </NeuronWalletContext.Provider>
+    ),
+  ],
+}
 
-Object.entries(states).forEach(([title, state]) => {
-  stories.add(title, () => (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <PasswordRequest />
-    </NeuronWalletContext.Provider>
-  ))
-})
+export default meta
+
+type Story = StoryObj<typeof PasswordRequest>
+
+export const WalletNotFound: Story = {
+  args: states.WalletNotFound,
+}
+
+export const EmptyPasswordOfDeleteWallet: Story = {
+  args: states.EmptyPasswordOfDeleteWallet,
+}
+
+export const ContentPasswordOfDeleteWallet: Story = {
+  args: states.ContentPasswordOfDeleteWallet,
+}
+
+export const EmptyPasswordOfBackupWallet: Story = {
+  args: states.EmptyPasswordOfBackupWallet,
+}
+
+export const ContentPasswordOfBackupWallet: Story = {
+  args: states.ContentPasswordOfBackupWallet,
+}
+
+export const EmptyPasswordOfUnlock: Story = {
+  args: states.EmptyPasswordOfUnlock,
+}
+
+export const SendTransaction: Story = {
+  args: states.SendTransaction,
+}

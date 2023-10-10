@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useEffect, useCallback } from 'react'
+import { useLocation, NavigateFunction } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -7,9 +7,10 @@ import {
   updateWalletList,
   updateAddressListAndBalance,
   initAppState,
+  showGlobalAlertDialog,
 } from 'states/stateProvider/actionCreators'
 
-import { getWinID } from 'services/remote'
+import { getCurrentWallet, getWinID } from 'services/remote'
 import {
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
@@ -17,11 +18,16 @@ import {
   ConnectionStatus as ConnectionStatusSubject,
   SyncState as SyncStateSubject,
   Command as CommandSubject,
+  ShowGlobalDialog as ShowGlobalDialogSubject,
 } from 'services/subjects'
 import { ckbCore, getTipHeader } from 'services/chain'
-import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
+import {
+  networks as networksCache,
+  currentNetworkID as currentNetworkIDCache,
+  importedWalletDialogShown,
+} from 'services/localCache'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ErrorCode, RoutePath, getConnectionStatus } from 'utils'
+import { ErrorCode, RoutePath, getConnectionStatus, isSuccessResponse } from 'utils'
 
 const SYNC_INTERVAL_TIME = 4000
 const CONNECTING_BUFFER = 15_000
@@ -79,36 +85,51 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
 
 export const useOnCurrentWalletChange = ({
   walletID,
-  history,
+  navigate,
   dispatch,
 }: {
   walletID: string
   chain: State.Chain
-  history: ReturnType<typeof useHistory>
-
+  navigate: NavigateFunction
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
-    initAppState()(dispatch, history)
-  }, [walletID, dispatch, history])
+    initAppState()(dispatch, navigate)
+  }, [walletID, dispatch])
 }
 
 export const useSubscription = ({
   walletID,
   chain,
   isAllowedToFetchList,
-  history,
+  navigate,
   dispatch,
   location,
 }: {
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
-  history: ReturnType<typeof useHistory>
+  navigate: NavigateFunction
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
+
+  const navigateToolsRouter = useCallback(
+    path => {
+      const { pathname } = location
+      const currentPath = [RoutePath.OfflineSign, RoutePath.SignVerify, RoutePath.MultisigAddress].find(item =>
+        pathname.includes(item)
+      )
+      if (currentPath) {
+        navigate(location.pathname.replace(currentPath, path))
+      } else {
+        navigate(`${location.pathname}/${path}`)
+      }
+    },
+    [navigate, location]
+  )
+
   useEffect(() => {
     const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
       if (walletIDOfMessage && walletIDOfMessage !== walletID) {
@@ -133,7 +154,15 @@ export const useSubscription = ({
         case 'current-wallet': {
           updateCurrentWallet()(dispatch).then(hasCurrent => {
             if (!hasCurrent) {
-              history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+              navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+            }
+          })
+          break
+        }
+        case 'new-xpubkey-wallet': {
+          getCurrentWallet().then(res => {
+            if (isSuccessResponse(res) && res.result) {
+              importedWalletDialogShown.setStatus(res.result.id, true)
             }
           })
           break
@@ -142,7 +171,7 @@ export const useSubscription = ({
           Promise.all([updateWalletList, updateCurrentWallet].map(request => request()(dispatch))).then(
             ([hasList, hasCurrent]) => {
               if (!hasList || !hasCurrent) {
-                history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+                navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
               }
             }
           )
@@ -206,15 +235,10 @@ export const useSubscription = ({
       if (winID && getWinID() === winID) {
         switch (type) {
           // TODO: is this used anymore?
-          case 'navigate-to-url': {
-            if (payload) {
-              history.push(payload)
-            }
-            break
-          }
+          case 'navigate-to-url':
           case 'import-hardware': {
             if (payload) {
-              history.push(location.pathname + payload)
+              navigate(payload)
             }
             break
           }
@@ -258,15 +282,22 @@ export const useSubscription = ({
                   filePath,
                 },
               })
-              history.push(location.pathname + url)
+              navigateToolsRouter(url)
             }
             break
           }
+          case 'sign-verify':
+          case 'multisig-address':
+            navigateToolsRouter(type)
+            break
           default: {
             break
           }
         }
       }
+    })
+    const showGlobalDialogSubject = ShowGlobalDialogSubject.subscribe(params => {
+      showGlobalAlertDialog(params)(dispatch)
     })
     return () => {
       dataUpdateSubscription.unsubscribe()
@@ -275,8 +306,9 @@ export const useSubscription = ({
       connectionStatusSubscription.unsubscribe()
       syncStateSubscription.unsubscribe()
       commandSubscription.unsubscribe()
+      showGlobalDialogSubject.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch, location.pathname])
+  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, navigate, dispatch, location.pathname])
 }
 
 export default {

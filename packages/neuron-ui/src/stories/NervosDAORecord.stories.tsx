@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
-import { storiesOf } from '@storybook/react'
-import { withKnobs, text } from '@storybook/addon-knobs'
+import { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import NervosDAORecord, { DAORecordProps } from 'components/NervosDAORecord'
 
-const stories = storiesOf('Nervos DAO Record', module)
+const meta: Meta<typeof NervosDAORecord> = {
+  component: NervosDAORecord,
+  decorators: [withRouter],
+}
+
+export default meta
 
 const basicProps: Omit<DAORecordProps, 'onToggle'> = {
   capacity: '10200000000',
@@ -40,44 +44,69 @@ const basicProps: Omit<DAORecordProps, 'onToggle'> = {
   blockNumber: '7712',
 }
 
-const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
-  Depositing: {
+type Story = StoryObj<typeof NervosDAORecord>
+
+export const Depositing: Story = {
+  args: {
     ...basicProps,
     blockNumber: undefined as any,
     status: 'sent',
   },
-  'Immature for withdraw': {
+}
+
+export const ImmatureForWithdraw: Story = {
+  args: {
     ...basicProps,
     depositEpoch: '0xa000100030a', // 778.1
     currentEpoch: '0xa000000030e', // 782
   },
-  'Deposited 4 epochs': {
-    ...basicProps,
+}
 
+export const Deposited4Epochs: Story = {
+  args: {
+    ...basicProps,
     depositEpoch: '0xa000000030b', // 779
     currentEpoch: '0xa000000030f', // 783
   },
-  'Deposited 4.1 epochs': {
+}
+
+export const Deposited4Point1Epochs: Story = {
+  args: {
     ...basicProps,
     depositEpoch: '0xa000900030a', // 778.9
     currentEpoch: '0xa000000030f', // 783
   },
-  'Deposited 137.9 epochs': {
+}
+
+export const DepositedLess138Epochs: Story = {
+  args: {
     ...basicProps,
     depositEpoch: '0xa0001000285', // 645.1
     currentEpoch: '0xa000000030f', // 783
   },
-  'Deposited 138 epochs': {
+  name: 'Deposited 137.9 epochs',
+}
+
+export const Deposited138Epochs: Story = {
+  args: {
     ...basicProps,
     depositEpoch: '0xa0000000285', // 645
     currentEpoch: '0xa000000030f', // 783
   },
-  'Deposited 138.1 epochs': {
+  name: 'Deposited 138 epochs',
+}
+
+export const DepositedBigThan138Epochs: Story = {
+  args: {
     ...basicProps,
     depositEpoch: '0xa0009000284', // 644.9
     currentEpoch: '0xa000000030f', // 783
   },
-  Withdrawing: {
+  name: 'Deposited 138.1 epochs',
+}
+
+export const Withdrawing: Story = {
+  args: {
     ...basicProps,
     depositInfo: {
       txHash: 'deposit tx hash',
@@ -91,7 +120,10 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     currentEpoch: '0xa000000030f', // 783
     status: 'sent',
   },
-  'Withdrawn 5 epochs': {
+}
+
+export const Withdrawn5Epochs: Story = {
+  args: {
     ...basicProps,
     depositInfo: {
       txHash: 'deposit tx hash',
@@ -103,9 +135,11 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     },
     depositEpoch: '0xa0000000300', // 768
     currentEpoch: '0xa000000030f', // 783
-    // withdrawnEpoch: '0xa0000000305', // 773
   },
-  'Immature for unlock': {
+}
+
+export const ImmatureForUnlock: Story = {
+  args: {
     ...basicProps,
     depositInfo: {
       txHash: 'deposit tx hash',
@@ -117,9 +151,11 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     },
     depositEpoch: '0xa0000000300', // 768
     currentEpoch: '0xa00010003b4', // 948.1
-    // withdrawnEpoch: '0xa0000000305', // 773
   },
-  Unlockable: {
+}
+
+export const Unlockable: Story = {
+  args: {
     ...basicProps,
     depositInfo: {
       txHash: 'deposit tx hash',
@@ -131,13 +167,15 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     },
     depositEpoch: '0xa000900030a', // 778.9
     currentEpoch: '0xa0009000476', // 1142.9
-    // withdrawnEpoch: '0xa000900030a', // 778.9
   },
-  Unlocking: {
+}
+
+export const Unlocking: Story = {
+  args: {
     ...basicProps,
     depositInfo: {
       txHash: 'deposit tx hash',
-      timestamp: new Date('2020-02-02').toString().toString(),
+      timestamp: new Date('2020-02-02').getTime().toString(),
     },
     withdrawInfo: {
       txHash: 'withdraw tx hash',
@@ -150,14 +188,15 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     depositEpoch: '0xa000900030a', // 778.9
     currentEpoch: '0xa0009000476', // 1142.9
     status: 'pending',
-    // withdrawnEpoch: '0xa000900030a', // 778.9
   },
-  Unfolded: {
+}
+
+export const Unfolded: Story = {
+  args: {
     ...basicProps,
     depositOutPoint: undefined,
     depositEpoch: '0xa0009000284', // 644.9
     currentEpoch: '0xa000000030f', // 783
-    isCollapsed: false,
     depositTimestamp: (Date.now() - 25 * 3600000).toString(),
     unlockInfo: {
       timestamp: Date.now().toString(),
@@ -169,30 +208,3 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     },
   },
 }
-
-Object.keys(props).forEach(name => {
-  stories.add(name, () => {
-    const [isCollapsed, setIsCollapsed] = useState(props[name].isCollapsed ?? true)
-    return <NervosDAORecord {...props[name]} isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
-  })
-})
-
-stories.addDecorator(withKnobs()).add('With Knobs', () => {
-  const knobProps = {
-    ...basicProps,
-
-    depositEpoch: text('Deposit Epoch', '0xa000900030a'),
-    currentEpoch: text('Current Epoch', '0xa0009000476'),
-  }
-  const [isCollapsed, setIsCollapsed] = useState(knobProps.isCollapsed ?? true)
-
-  return (
-    <NervosDAORecord
-      {...knobProps}
-      isCollapsed={isCollapsed}
-      onToggle={() => {
-        setIsCollapsed(!isCollapsed)
-      }}
-    />
-  )
-})

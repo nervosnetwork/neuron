@@ -17,16 +17,21 @@
       "history": "History",
       "addresses": "Addresses",
       "nervos-dao": "Nervos DAO",
+      "settings": "Settings",
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
       "experimental-functions": "Experimental",
-      "s-udt": "Asset Accounts"
+      "s-udt": "Asset Accounts",
+      "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
+      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation.",
+      "ckb-without-indexer": "Please add '--indexer' option to start local node"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "Block Synced",
-        "looking-valid-target": "Looking for assumed valid target"
+        "looking-valid-target": "Looking for assumed valid target",
+        "set-start-block-number": "Set start block number"
       },
       "migrating": "migrating..."
     },
@@ -44,7 +49,8 @@
         "cancel": "Cancel",
         "back": "Back",
         "rescan": "Rescan",
-        "close": "close"
+        "close": "close",
+        "finish": "Finish Creating"
       },
       "errors": {
         "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
@@ -52,7 +58,7 @@
         "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
       },
       "waiting": "Waiting for CKB app...",
-      "abort": "Waiting for CKB app... Action aborted.",
+      "abort": "Waiting for CKB app... Action aborted",
       "app-version": "CKB App v{{version}} running.",
       "firmware-version": "Firmware v{{version}} detected.",
       "wallet-name": "Wallet Name",
@@ -67,13 +73,13 @@
         "label": "Status:",
         "connect": "Connected, ready for signing.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
       "actions": {
         "close": "Close",
-        "success": "Transaction Succesful!",
+        "success": "Transaction Successful!",
         "rescan": "Rescan"
       }
     },
@@ -87,13 +93,14 @@
         "label": "Status:",
         "connect": "Connected, ready for verifying.",
         "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please check your connection."
+        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
       },
       "actions": {
         "close": "Close",
-        "rescan": "Rescan",
+        "reconnect": "Reconnect",
         "copy-address": "Copy Address",
-        "verify": "Verify"
+        "verify": "Verify Address",
+        "finish": "Ok"
       }
     },
     "offline-sign": {
@@ -127,24 +134,20 @@
       "status": "Status",
       "amount": "Amount",
       "address": "Address",
-      "confirmation": "{{confirmationCount}} Confirmation",
-      "confirmations": "{{confirmationCount}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
       "receiving": "Receiving",
-      "more": "More activities",
-      "statusLabel": {
-        "success": "Success",
-        "failed": "Failed",
-        "pending": "Pending",
-        "confirming": "Confirming"
-      },
+      "more": "More",
       "copy-balance": "Copy Balance",
       "create": "Create {{name}} Asset Account",
       "destroy": "Destroy {{name}} Asset Account",
       "createSUDT": "Create <0></0> Asset Account",
-      "destroySUDT": "Destroy <0></0> Asset Account"
+      "destroySUDT": "Destroy <0></0> Asset Account",
+      "wallet-ready": "Wallet is ready, welcome",
+      "send": "Send",
+      "receive": "Receive",
+      "locked": "Locked Amount"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -172,9 +175,18 @@
       "write-down-seed": "Write down your wallet seed and save it in a safe place",
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
-      "same-password": "The password and confirm password should match"
+      "same-password": "The password and confirm password should match",
+      "input-seed-verify": "Input created seed to verify",
+      "no-wallet": "No wallet?",
+      "create-wallet": "Create Wallet",
+      "repeat-password": "Repeat Password",
+      "finish-create": "Finish Creating",
+      "creating-wallet": "Wallet is being preparing, please wait",
+      "add-one": "Add One More"
     },
     "import-keystore": {
+      "title": "Import Keystore File",
+      "select-file": "Choose File",
       "label": {
         "path": "Keystore File",
         "name": "Wallet Name",
@@ -195,26 +207,35 @@
     },
     "send": {
       "address": "Send to",
-      "amount": "Amount",
+      "input-address": "Please input receiving address",
+      "amount": "Amount (CKB)",
+      "input-amount": "Please input amount",
       "send": "Send",
-      "clear": "Clear",
+      "reset": "Reset",
       "confirm-password": "Confirm Password",
       "to": "To",
+      "add-receiving-address": "Add Receiving Address",
       "input-password-to-confirm": "Input password to confirm",
       "scan-to-get-address": "Scan QR code to read the address to send to",
-      "total-amount": "Total Amount",
+      "total-amount": "Total Amount (CKB)",
       "description": "Description",
-      "description-optional": "Description (optional)",
+      "description-optional": "Please input description, optional",
       "balance": "Balance",
       "add-one": "Add One More",
       "remove-this": "Remove This",
-      "fee": "Transaction Fee",
+      "fee": "Transaction Fee (CKB)",
       "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
       "pick-price": "Quick Pick Price",
+      "custom-price": "Custom Price",
+      "slow": "Slow",
+      "standard": "Standard",
+      "fast": "Fast",
       "total-cycles": "Total RISC-V Cycles",
       "scan-screen-qr-code": "Scan the QR Code on the screen",
       "set-locktime": "Set Locktime",
+      "remove-receiving-address": "Remove Receiving Address",
+      "remove-receiving-address-msg": "Are you sure you want to remove the selected receiving address?",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
       "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
@@ -229,10 +250,22 @@
       "address-qrcode": "Address QR Code",
       "address": "{{network}} Address",
       "verify-address": "Verify Address",
-      "turn-into-full-version-fomrat": "Turn into full version format",
-      "turn-into-deprecated-format": "Turn into deprecated format"
+      "turn-into-full-version-format": "Turn into full version format",
+      "turn-into-deprecated-format": "Turn into deprecated format",
+      "save-qr-code": "Download",
+      "copy-qr-code": "Copy"
     },
+    "transaction-status": {
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "confirming": "Confirming"
+    },
+    "confirmationsCount_one": "{{count}} Confirmation",
+    "confirmationsCount_other": "{{count}} Confirmations",
     "history": {
+      "title": "History",
+      "title-detail": "History Detail",
       "meta": "Meta",
       "type": "Type",
       "date": "Date",
@@ -251,22 +284,26 @@
       "last": "Last",
       "description": "Description",
       "status": "Status",
-      "pending": "Pending",
-      "success": "Success",
-      "failed": "Failed",
-      "confirming": "Confirming",
       "blockNumber": "Block Number",
       "basic-information": "Basic Information",
       "search": {
         "button": "Search",
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
+      "table": {
+        "name": "Wallet Name",
+        "type": "Type",
+        "amount": "Amount",
+        "timestamp": "Time",
+        "status": "Status",
+        "operation": "Operation"
+      },
       "export-history": "Export Transaction History",
-      "confirmations": "Confirmations",
+      "confirmationTimes": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
       "no-txs": "No Transaction History",
-      "view-in-explorer": "Explorer",
+      "view-in-explorer": "View on explorer",
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
       "view-detail-button-title": "View Detail",
@@ -291,6 +328,7 @@
       "outputs": "Outputs",
       "cell-from-cellbase": "From cellbase",
       "lock-script": "Lock Script",
+      "lock-script-title": "Address Information",
       "deprecated-address-format": "Address in deprecated format"
     },
     "addresses": {
@@ -306,7 +344,9 @@
       "change-address": "Change",
       "copy-address": "Copy Address",
       "request-payment": "Request Payment",
-      "view-on-explorer": "View on Explorer"
+      "view-on-explorer": "View on Explorer",
+      "default-description": "None",
+      "all-address": "All"
     },
     "settings": {
       "title": {
@@ -325,6 +365,7 @@
         "hide": "Hide",
         "version": "Version",
         "language": "Language",
+        "select-language": "Select Language",
         "apply": "Apply"
       },
       "wallet-manager": {
@@ -335,6 +376,7 @@
           "confirm-password": "Confirm Password",
           "edit-wallet": "Edit Wallet"
         },
+        "edit-success": "Wallet info Updated",
         "delete-wallet-title": "Please Enter {{name}} Password",
         "password": "Password",
         "wallet-detail": {
@@ -345,11 +387,16 @@
         "online": "Online",
         "offline": "Offline",
         "add-network": "Add Network",
+        "remove-network": "Remove Network",
+        "remove-network-msg": "Are you sure you want to remove the selected network?",
         "edit-network": {
-          "title": "Add or Edit Network",
+          "title": "Edit Network",
           "rpc-url": "RPC URL",
-          "name": "Name"
+          "name": "Network Name",
+          "input-rpc": "Please input rpc",
+          "input-network": "Please input name"
         },
+        "edit-success": "Edit network Success",
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "lightTestnet": "Light Testnet",
@@ -383,18 +430,23 @@
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "cache-cleared-on": "Cache cleared on {{date}}",
         "clear-cache": "Clear Cache",
-        "clearing-cache": "Clearing...",
-        "remove-ckb-data-tip": "Please move CKB Node Data from {{prevPath}} to {{currentPath}} and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
+        "clearing-cache": "Clearing Cache, please wait a moment",
+        "clear-success": "Cache Cleared",
+        "set-path": "Set Path",
+        "remove-ckb-data-tip": "Please move CKB Node Data from 【{{prevPath}}】 to 【{{currentPath}}】 and then click on \"Data have been moved\" to start from the previously synchronized block; Or click on \"Synchronize from scratch\" to start with synchronizing from scratch.",
         "resync-ckb-node-describe": "Attention: Synchronizing from scratch won't remove previously downloaded CKB Node Data",
         "cancel": "Cancel",
+        "confirm-clear": "Confirm",
         "move-data-finish": "Data have been moved",
         "re-sync": "Synchronize from scratch",
-        "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect"
+        "disabled-set-path": "When the CKB node is started manually, the CKB Node Config and Storage path configuration doesn't take effect",
+        "ckb-node-storage": "CKB Node Storage"
       }
     },
     "password-request": {
       "wallet-not-found": "The wallet is not found",
-      "password": "Password",
+      "password": "Enter Password",
+      "placeholder": "Please input wallet password",
       "send": {
         "title": "Submit the transaction"
       },
@@ -415,6 +467,9 @@
       },
       "send-sudt": {
         "title": "Send sUDT"
+      },
+      "transfer-to-sudt": {
+        "title": "Send to sUDT account"
       },
       "send-ckb-asset": {
         "title": "Send CKB"
@@ -447,10 +502,10 @@
         "title": "Destroy Asset Account"
       },
       "send-from-multisig": {
-        "title": "Submit the transaction"
+        "title": "Send CKB from multisig address"
       },
       "send-from-multisig-need-one": {
-        "title": "Submit the transaction"
+        "title": "Send CKB from multisig address"
       },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
     },
@@ -481,7 +536,11 @@
       "experimental": "Experimental",
       "close": "Close",
       "copy": "Copy",
-      "copied": "Copied"
+      "copied": "Copied",
+      "verification-failure": "Verification Failed",
+      "back": "Back",
+      "switch-to-light": "Switch to Light Mode",
+      "switch-to-dark": "Switch to Dark Mode"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -504,7 +563,7 @@
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "no-valid-addresses-found": "No valid addresses found",
-      "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "decimal-range": "Decimal should be an integer of {{range}}(inclusive)",
       "experimental-message-hardware": "This is an experimental feature. Please pay attention to the risk and use with caution.",
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
@@ -539,7 +598,7 @@
         "100": "Amount is not enough.",
         "101": "The amount {{amount}} CKB is too small, please enter an amount no less than {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
-        "103": "$t(messages.fields.keystore-password) is incorrect.",
+        "103": "$t(messages.fields.keystore-password) is incorrect",
         "104": "Fail to connect to the node, please restart Neuron.",
         "105": "You need more capacities for change (more than 61 CKBytes).",
         "106": "You need more capacities for change (more than 61 CKBytes), or slide to the end to send all your balance.",
@@ -554,7 +613,7 @@
         "115": "You need more capacities for change (more than 61 CKBytes), or click 'Max' button to send all your balance.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) is used.",
-        "203": "$t(messages.fields.{{fieldName}}) is too long, it should be shorter than or equal to {{length}}.",
+        "203": "$t(messages.fields.{{fieldName}}) should be shorter than or equal to {{length}}",
         "204": "$t(messages.fields.{{fieldName}}) is too short, it should be longer than or equal to {{length}}.",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid.",
         "206": "$t(messages.fields.{{fieldName}}) is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
@@ -574,14 +633,14 @@
         "309": "The receiver needs to upgrade her account address to accept more transfer.",
         "310": "Please enter a {{tagName}} address",
         "402": "CKB App does not open. Please open the CKB App on your device.",
-        "403": "No device detected. Please connect your device.",
+        "403": "No device detected. Please connect your device",
         "404": "Multiple device detected. Only one device of the same model can be connected.",
         "600": "Please make sure the sync has finalized before you do any transaction related operation."
       }
     },
     "sync": {
-      "synced": "Synced",
-      "syncing": "Syncing, ~{{ leftTime }} left",
+      "synced": "Synced 100%",
+      "syncing": "Syncing {{ syncPercents }}",
       "block-number": "block number",
       "syncing-balance": "Balance is updating",
       "slow": "Sync is slow",
@@ -609,19 +668,20 @@
       "completed-records": "Completed",
       "apc": "Current APC",
       "apc-tooltip": "Current Annual Percentage Compensation",
-      "fee": "Transaction fee",
+      "fee": "Transaction fee: ",
       "deposit-to-nervos-dao": "Deposit to Nervos DAO",
       "withdraw-from-nervos-dao": "Withdraw from Nervos DAO",
       "cancel": "Cancel",
       "proceed": "Proceed",
       "compensation": "Compensation",
-      "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
+      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days} days).",
       "deposit-dialog-title": "Deposit",
-      "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
+      "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. <br />Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
-      "balance-not-reserved": "(Not recommended) Don't reserve any CKBytes for future DAO operations",
+      "balance-not-reserved": "Don't reserve any CKBytes for future DAO operations (Not recommended)",
+      "deposit-amount": "Deposit Amount (CKB)",
       "deposit-record": {
         "deposited-at": "Deposited",
         "completed-at": "Completed",
@@ -632,7 +692,7 @@
         "deposited": "Deposited",
         "withdrawn": "Withdrawn",
         "unlocked": "Unlocked",
-        "tx-record": "Transaction Record",
+        "view-tx-detail": "View transaction detail",
         "locked-period": "Locked Period",
         "compensated-period": "Compensation Period",
         "days-hours": "{{days}} days {{hours}} hours",
@@ -661,13 +721,35 @@
         }
       }
     },
+    "nervos-dao-detail": {
+      "tx-detail": "Transaction Detail",
+      "deposited": "Deposited",
+      "withdrawn": "Withdrawn",
+      "unlocked": "Unlocked",
+      "basic-information": "Basic Information",
+      "transaction-hash": "Transaction Hash",
+      "blockNumber": "Block Number",
+      "datetime": "Date & Time",
+      "income": "Income",
+      "index": "Index",
+      "address": "Address",
+      "amount": "Amount",
+      "cell-from-cellbase": "From cellbase",
+      "cancel": "Cancel",
+      "next": "Next"
+    },
+    "lock-info-dialog": {
+      "address-info": "Address Information",
+      "deprecated-address": "Deprecated address"
+    },
     "updates": {
       "check-updates": "Check for Updates",
       "checking-updates": "Checking...",
+      "update-available": "There are currently updates available.",
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
-      "download-update": "Install Update",
+      "install-update": "Immediate Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
     },
@@ -788,7 +870,10 @@
       "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.",
       "sign-with-magic-byte": "Message will be signed with magic bytes 'Nervos Message:'",
       "verify-tip": "Could be verified by Neuron from v0.33.1",
-      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1"
+      "verify-old-sign-success": "Message was signed by Neuron before v0.33.1",
+      "input-message": "Please input message",
+      "input-choose-address": "Please input or choose an address",
+      "input-password": "Please input password"
     },
     "special-assets": {
       "title": "Customized Assets",
@@ -810,10 +895,22 @@
       "experimental": "Experimental",
       "unknown-asset": "Unknown Asset",
       "transfer-nft": "Send",
-      "user-defined-token": "Migrate"
+      "user-defined-token": "Migrate",
+      "transfer-nft-success": "Transfer of assets successful",
+      "migrate-sudt-success": "Conversion to new sUDT asset account successful",
+      "send-sudt-success": "Transfer to sUDT account successful",
+      "unlock-success": "Asset claimed, go to transaction history for details",
+      "withdraw-cheque-success": "Asset withdrawn, go to transaction history for details",
+      "claim-cheque-success": "Asset claimed, go to transaction history for details"
     },
     "migrate-sudt": {
       "title": "Migrate to a sUDT Asset Account",
+      "choose-title": "Migration mode",
+      "next": "Next",
+      "back": "Back",
+      "input-token": "Please input token name",
+      "input-symbol": "Please input symbol",
+      "input-decimal": "Please input decimal",
       "turn-into-new-account": {
         "title": "Turn into a new sUDT Asset Account",
         "sub-title": "Turn the sUDT Asset into a new sUDT Account, occupies at least 142 CKBytes",
@@ -830,25 +927,22 @@
       "amount": "Amount",
       "address": "Address"
     },
-    "customized-asset": {
-      "actions": {
-        "unlock": "Unlock",
-        "mint": "Mint",
-        "burn": "Burn"
-      },
-      "view-in-explorer": "Explorer"
-    },
     "s-udt": {
+      "edit-account-success": "Edit account information successfully",
+      "create-account-success": "Asset account created successfully",
       "account-list": {
         "title": "Asset Accounts",
         "no-asset-accounts": "No sUDT asset has been detected",
         "search": "Account Name, Token Name or Symbol",
         "syncing": "Syncing, current data may be inaccurate",
         "send": "Send",
-        "receive": "Receive"
+        "receive": "Receive",
+        "set-account-info": "Set Account Info"
       },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
+        "input-account-name": "Please input account name",
+        "select-account-type": "Select account type",
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
         "delete-failed": "Failed to delete the multisig config, reason for failure: {{reason}}",
@@ -864,15 +958,27 @@
         "back": "Back",
         "occupy-142-ckb": "Occupies at least 142 CKBytes",
         "occupy-61-ckb": "Occupies at least 61 CKBytes",
+        "input": {
+          "account-name": "Please input account name",
+          "token-id": "Please input token ID",
+          "token-name": "Please input token name",
+          "symbol": "Please input symbol",
+          "decimal": "Please input decimal"
+        },
         "placeholder": {
           "token-id": "Token ID is the Args of the sUDT Type Script, which is the same as the lock hash of the token issuer."
         }
       },
       "send": {
         "title": "Send",
-        "address": "Address",
+        "address": "Send to",
+        "address-placeholder": "Please input address",
+        "input-address": "Please input address",
+        "input-description": "Please input description, optional",
         "amount": "Amount",
+        "amount-placeholder": "Please input amount",
         "description": "Description",
+        "description-placeholder": "Please input description, optional",
         "submit": "Submit",
         "click-to-edit": "Click to edit",
         "cheque-address-hint": {
@@ -895,10 +1001,10 @@
         "select-option": "Please confirm the above option before submitting"
       },
       "receive": {
-        "notation": "Accept <0></0> only"
+        "notation": "Accept {{symbol}} only"
       },
       "update-dialog": {
-        "update-asset-account": "Account setup",
+        "update-asset-account": "Account Detail",
         "account-name": "Account Name",
         "token-id": "Token ID",
         "token-name": "Token Name",
@@ -914,7 +1020,7 @@
         "placeholder": "search by multisig address,alias"
       },
       "add": {
-        "label": "Add"
+        "label": "Create"
       },
       "import": {
         "label": "Import"
@@ -925,11 +1031,13 @@
       "ok": "OK",
       "no-data": "No multisig address",
       "table": {
-        "address": "address",
-        "alias": "alias",
-        "type": "type",
-        "balance": "balance",
+        "address": "Signer address",
+        "alias": "Alias",
+        "type": "Type",
+        "balance": "Balance",
         "copy-address": "Copy Address",
+        "action": "Actions",
+        "more": "More",
         "sync-block": "Synced Block",
         "actions": {
           "info": "Info",
@@ -945,9 +1053,12 @@
         },
         "notice": "Only one configuration can be imported at a time. If the content of the file is an array, the first one is imported by default."
       },
-      "delete-failed": "Delete multisig config failed, Reason for failure: {{reason}}",
+      "delete-failed": "Delete multisig config failed",
+      "remove-multisig-address": "Remove Multisig Address",
+      "remove-multisig-address-msg": "Are you sure you want to remove the selected multisig address?",
       "send-ckb": {
-        "title": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
+        "title": "Send CKB from multisig address",
+        "detail": "Send CKB from {{m}}-of-{{n}} multisig address: <0></0>",
         "balance": "Balance",
         "address": "Address",
         "amount": "Amount",
@@ -955,34 +1066,39 @@
         "cancel": "Cancel",
         "export": "Export Tx"
       },
+      "multi-details": "Multisig address details",
       "create-dialog": {
         "title": "Create multisig address",
-        "index": "index",
-        "required": "required",
-        "signer-address": "signer address",
+        "preview-title": "Multisig address has been generated",
+        "index": "Index",
+        "required": "Required",
+        "signer-address": "Signer address",
         "copy-address": "Copy Address",
+        "placeholder": "Please input {{type}}(1-255)",
         "m-n": {
-          "title": "Please choose the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
+          "title": "Please input the multisig address configuration in the m-of-n type where any m private keys out of a possible n are required to move the asset.",
           "m-less-equal-n": "For m-of-n multisig address, m shouldn't be greater than n",
-          "m-n-required": "Please input or choose m/n",
+          "m-n-required": "Please input m/n",
           "m-n-between-0-256": "m/n should be between 0 and 256"
         },
         "multi-address-info": {
           "title": "Please input the signers for the {{m}}-of-{{n}} multisig address",
-          "view-title": "The {{m}}-of-{{n}} multisig address is",
-          "ckb-address-placeholder": "ckb address"
+          "view-title": "The {{m}}-of-{{n}} multisig address",
+          "ckb-address-placeholder": "Please input ckb address"
         },
         "multi-list": "Signer list",
         "actions": {
           "cancel": "Cancel",
           "back": "Back",
           "next": "Next",
+          "generate-address": "Generate Address",
           "confirm": "Confirm"
         },
         "duplicate-address-forbid": "Address can't be duplicated"
       },
       "approve-dialog": {
-        "title": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
+        "title": "Approve with multisig address",
+        "detail": "Approve with {{m}}-of-{{n}} multisig address <0></0>",
         "transaction": "Transaction",
         "cancel": "Cancel",
         "signAndExport": "Sign & Export",
@@ -994,8 +1110,8 @@
         "signerApprove": "Lack of {{m}} signer approval(s), including {{r}} from specified signer(s)",
         "noRSignerApprove": "Lack of {{m}} signer approval(s)",
         "signed": "Signed",
-        "view-concise-data": "View concise data",
-        "view-raw-data": "View raw data"
+        "view-concise-data": "Concise data",
+        "view-raw-data": "Raw data"
       }
     },
     "dropdown": {
@@ -1013,6 +1129,13 @@
       "countDownTip": "The price will refresh after {{countDown}} seconds",
       "switchToCustomPrice": "Switch to custom price",
       "switchToPrice": "Switch to price"
+    },
+    "set-start-block-number": {
+      "title": "Set the start block number",
+      "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
+      "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
+      "locate-first-tx": "Locate the first transaction",
+      "view-block": "View the block"
     }
   }
 }

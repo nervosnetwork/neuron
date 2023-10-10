@@ -1,26 +1,22 @@
-import React, { useCallback, useMemo, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useCallback, useMemo, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import Balance from 'components/Balance'
-
-import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 
-import {
-  localNumberFormatter,
-  shannonToCKBFormatter,
-  uniformTimeFormatter,
-  sudtValueToAmount,
-  sUDTAmountFormatter,
-  backToTop,
-  CONSTANTS,
-  RoutePath,
-  getCurrentUrl,
-  getSyncStatus,
-  nftFormatter,
-} from 'utils'
+import { shannonToCKBFormatter, uniformTimeFormatter, backToTop, CONSTANTS, RoutePath, useFirstLoadWallet } from 'utils'
 
-import { UANTokenName, UANTonkenSymbol } from 'components/UANDisplay'
+import { UANTokenName } from 'components/UANDisplay'
+import PageContainer from 'components/PageContainer'
+import TransactionStatusWrap from 'components/TransactionStatusWrap'
+import FormattedTokenAmount from 'components/FormattedTokenAmount'
+import Receive from 'components/Receive'
+import AddressBook from 'components/AddressBook'
+import Table from 'widgets/Table'
+import Button from 'widgets/Button'
+import { ArrowNext, EyesClose, EyesOpen, OverviewSend, OverviewReceive, Addressbook } from 'widgets/Icons/icon'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
+import CopyZone from 'widgets/CopyZone'
+import { HIDE_BALANCE } from 'utils/const'
 import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
@@ -54,28 +50,118 @@ const genTypeLabel = (
   }
 }
 
+const TransactionStatus = ({
+  item,
+  cacheTipBlockNumber,
+  bestKnownBlockNumber,
+}: {
+  item: Omit<State.Transaction, 'status'> & { status: State.Transaction['status'] | 'confirming' }
+  cacheTipBlockNumber: number
+  bestKnownBlockNumber: number
+}) => {
+  let confirmationCount
+  let { status } = item
+
+  if (item.blockNumber !== undefined) {
+    confirmationCount =
+      item.blockNumber === null || item.status === 'failed'
+        ? 0
+        : 1 + Math.max(cacheTipBlockNumber, bestKnownBlockNumber) - +item.blockNumber
+
+    status = item.status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD ? 'confirming' : item.status
+  }
+
+  return (
+    <div className={styles.txStatus} data-status={status}>
+      <TransactionStatusWrap status={status} confirmationCount={confirmationCount} />
+    </div>
+  )
+}
+
+const TracsactionType = ({
+  item,
+  cacheTipBlockNumber,
+  bestKnownBlockNumber,
+}: {
+  item: Omit<State.Transaction, 'status'> & { status: State.Transaction['status'] | 'confirming' }
+  cacheTipBlockNumber: number
+  bestKnownBlockNumber: number
+}) => {
+  const [t] = useTranslation()
+  let typeLabel: string = '--'
+  let { status } = item
+  let typeTransProps: {
+    i18nKey: string
+    components: JSX.Element[]
+  } = {
+    i18nKey: '',
+    components: [],
+  }
+
+  if (item.blockNumber !== undefined) {
+    const confirmationCount =
+      item.blockNumber === null || item.status === 'failed'
+        ? 0
+        : 1 + Math.max(cacheTipBlockNumber, bestKnownBlockNumber) - +item.blockNumber
+
+    if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
+      status = 'confirming'
+    }
+    if (item.nftInfo) {
+      // NFT
+      const { type } = item.nftInfo
+      typeLabel = `${t(`overview.${genTypeLabel(type, status)}`)}`
+    } else if (item.sudtInfo?.sUDT) {
+      // Asset Account
+      if (['create', 'destroy'].includes(item.type)) {
+        // create/destroy an account
+        typeTransProps = {
+          i18nKey: `overview.${item.type}SUDT`,
+          components: [
+            <UANTokenName
+              name={item.sudtInfo.sUDT.tokenName}
+              symbol={item.sudtInfo.sUDT.symbol}
+              className={styles.tokenName}
+            />,
+          ],
+        }
+      } else {
+        // send/receive to/from an account
+        const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
+        typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
+      }
+    } else if (item.type === 'create' || item.type === 'destroy') {
+      // normal tx
+      if (item.assetAccountType === 'CKB') {
+        typeLabel = `${t(`overview.${item.type}`, { name: 'CKB' })}`
+      } else {
+        typeLabel = `${t(`overview.${item.type}`, { name: 'Unknown' })}`
+      }
+    } else {
+      typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
+    }
+  }
+  return typeTransProps.i18nKey ? <Trans {...typeTransProps} /> : <>{typeLabel}</>
+}
+
 const Overview = () => {
   const {
-    wallet: { id, balance = '' },
+    app: { pageNotice },
+    wallet: { id, balance = '', addresses },
     chain: {
-      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, bestKnownBlockTimestamp },
+      syncState: { cacheTipBlockNumber, bestKnownBlockNumber, syncStatus },
       transactions: { items = [] },
       connectionStatus,
-      networkID,
     },
-    settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
-  const syncStatus = getSyncStatus({
-    bestKnownBlockNumber,
-    bestKnownBlockTimestamp,
-    cacheTipBlockNumber,
-    currentTimestamp: Date.now(),
-    url: getCurrentUrl(networkID, networks),
-  })
+  const [showReceive, setShowReceive] = useState(false)
+  const [showAddressBook, setShowAddressBook] = useState(false)
+
+  const isSingleAddress = addresses.length === 1
 
   useEffect(() => {
     if (id) {
@@ -91,204 +177,140 @@ const Overview = () => {
       walletID: id,
     })(dispatch)
   }, [id, dispatch])
-  const onGoToHistory = useCallback(() => {
-    history.push(RoutePath.History)
-  }, [history])
 
-  const onRecentActivityDoubleClick = useCallback((e: React.SyntheticEvent) => {
-    const cellElement = e.target as HTMLTableCellElement
-    if (cellElement?.parentElement?.dataset?.hash) {
-      showTransactionDetails(cellElement.parentElement.dataset.hash)
-    }
+  const onRecentActivityClick = useCallback((_, item: State.Transaction) => {
+    const { hash } = item
+    navigate(`${RoutePath.Overview}/${hash}`)
   }, [])
 
   const recentItems = useMemo(() => {
     return items.slice(0, 10)
   }, [items])
 
-  const RecentActivites = useMemo(() => {
-    const activities = recentItems.map(item => {
-      let confirmations = ''
-      let typeLabel: string = '--'
-      let amount = '--'
-      let amountValue = ''
-      let { status } = item
-      let typeTransProps: {
-        i18nKey: string
-        components: JSX.Element[]
-      } = {
-        i18nKey: '',
-        components: [],
-      }
+  useFirstLoadWallet(dispatch, id)
 
-      if (item.blockNumber !== undefined) {
-        const confirmationCount =
-          item.blockNumber === null || item.status === 'failed'
-            ? 0
-            : 1 + Math.max(cacheTipBlockNumber, bestKnownBlockNumber) - +item.blockNumber
-
-        if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
-          status = 'confirming' as any
-
-          if (confirmationCount === 1) {
-            confirmations = t('overview.confirmation', {
-              confirmationCount: localNumberFormatter(confirmationCount),
-            })
-          } else if (confirmationCount > 1) {
-            confirmations = `${t('overview.confirmations', {
-              confirmationCount: localNumberFormatter(confirmationCount),
-            })}`
-          }
-        }
-
-        if (item.nftInfo) {
-          // NFT
-          const { type, data } = item.nftInfo
-          typeLabel = `${t(`overview.${genTypeLabel(type, status)}`)}`
-          amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
-        } else if (item.sudtInfo?.sUDT) {
-          // Asset Account
-          if (['create', 'destroy'].includes(item.type)) {
-            // create/destroy an account
-            typeTransProps = {
-              i18nKey: `overview.${item.type}SUDT`,
-              components: [
-                <UANTokenName
-                  name={item.sudtInfo.sUDT.tokenName}
-                  symbol={item.sudtInfo.sUDT.symbol}
-                  className={styles.tokenName}
-                />,
-              ],
-            }
-          } else {
-            // send/receive to/from an account
-            const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
-            typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
-          }
-          if (item.sudtInfo.sUDT.decimal) {
-            amount = `${sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))} ${
-              item.sudtInfo.sUDT.symbol
-            }`
-            amountValue = sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))
-          }
-        } else {
-          // normal tx
-          amount = `${shannonToCKBFormatter(item.value)} CKB`
-          if (item.type === 'create' || item.type === 'destroy') {
-            if (item.assetAccountType === 'CKB') {
-              typeLabel = `${t(`overview.${item.type}`, { name: 'CKB' })}`
-            } else {
-              typeLabel = `${t(`overview.${item.type}`, { name: 'Unknown' })}`
-            }
-          } else {
-            typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
-          }
-        }
-      }
-
-      return {
-        ...item,
-        status,
-        statusLabel: t(`overview.statusLabel.${status}`),
-        amount,
-        confirmations,
-        typeLabel,
-        amountValue,
-        typeTransProps,
-      }
-    })
-    return (
-      <div className={styles.recentActivities}>
-        <table>
-          <thead>
-            <tr>
-              {['date', 'type', 'amount', 'status'].map(field => {
-                const title = t(`overview.${field}`)
-                return (
-                  <th key={field} title={title} aria-label={title} data-field={field}>
-                    {title}
-                  </th>
-                )
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {activities.map(item => {
-              const {
-                confirmations,
-                createdAt,
-                status,
-                hash,
-                statusLabel,
-                timestamp,
-                typeLabel,
-                amount,
-                typeTransProps,
-                amountValue,
-                sudtInfo,
-              } = item
-              const time = uniformTimeFormatter(timestamp || createdAt)
-
-              return (
-                <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
-                  <td title={time}>{time.split(' ')[0]}</td>
-                  {typeTransProps.i18nKey ? (
-                    <td>
-                      <Trans {...typeTransProps} />
-                    </td>
-                  ) : (
-                    <td>{typeLabel}</td>
-                  )}
-                  {amountValue ? (
-                    <td>
-                      {amountValue}&nbsp;
-                      <UANTonkenSymbol
-                        className={styles.symbol}
-                        name={sudtInfo!.sUDT.tokenName}
-                        symbol={sudtInfo!.sUDT.symbol}
-                      />
-                    </td>
-                  ) : (
-                    <td>{amount}</td>
-                  )}
-                  <td className={styles.txStatus} data-status={status}>
-                    <div>
-                      <span>{statusLabel}</span>
-                      {confirmations ? <span>{confirmations}</span> : null}
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    )
-  }, [recentItems, cacheTipBlockNumber, bestKnownBlockNumber, t, onRecentActivityDoubleClick])
+  const [showBalance, setShowBalance] = useState(true)
+  const onChangeShowBalance = useCallback(() => {
+    setShowBalance(v => !v)
+  }, [setShowBalance])
 
   return (
-    <div className={styles.overview}>
-      <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
-      <div className={styles.balance}>
-        <Balance balance={balance} connectionStatus={connectionStatus} syncStatus={syncStatus} />
+    <PageContainer head={t('navbar.overview')} notice={pageNotice} isHomePage>
+      <div className={styles.topContainer}>
+        <div className={styles.mid}>
+          <div className={styles.balance}>
+            <span className={styles.balanceTitle}>
+              {t('overview.balance')}
+              {showBalance ? (
+                <EyesOpen onClick={onChangeShowBalance} className={styles.balanceIcon} />
+              ) : (
+                <EyesClose onClick={onChangeShowBalance} className={styles.balanceIcon} />
+              )}
+            </span>
+            {showBalance ? (
+              <CopyZone content={shannonToCKBFormatter(balance, false, '')} className={styles.copyBalance}>
+                <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
+              </CopyZone>
+            ) : (
+              <span className={styles.balanceValue}>{HIDE_BALANCE}</span>
+            )}
+            <span className={styles.balanceUnit}>CKB</span>
+            <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+            <div className={styles.items}>
+              {isSingleAddress ? null : (
+                <Button className={styles.addressBook} onClick={() => setShowAddressBook(true)}>
+                  <Addressbook />
+                </Button>
+              )}
+            </div>
+          </div>
+          <div className={styles.actions}>
+            <Link className={styles.send} to={RoutePath.Send}>
+              <Button type="primary">
+                <OverviewSend />
+                <div>{t('overview.send')}</div>
+              </Button>
+            </Link>
+            <Button type="primary" className={styles.receive} onClick={() => setShowReceive(true)}>
+              <OverviewReceive />
+              {t('overview.receive')}
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
-      {items.length ? (
-        <>
-          {RecentActivites}
-          {items.length > 10 ? (
-            <div className={styles.linkToHistory}>
-              <span role="link" onClick={onGoToHistory} onKeyPress={() => {}} tabIndex={0}>
+      <Table
+        head={
+          <div className={styles.transactionTableHead}>
+            <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
+            {items.length > 10 && (
+              <Link className={styles.linkToHistory} to={RoutePath.History}>
                 {t('overview.more')}
-              </span>
-            </div>
-          ) : null}
-        </>
-      ) : (
-        <div className={styles.noActivities}>{t('overview.no-recent-activities')}</div>
-      )}
-    </div>
+                <ArrowNext />
+              </Link>
+            )}
+          </div>
+        }
+        columns={[
+          {
+            title: t('overview.date'),
+            dataIndex: 'date',
+            align: 'left',
+            minWidth: '150px',
+            render: (_, __, item) => {
+              const time = uniformTimeFormatter(item.timestamp || item.createdAt)
+              return time.split(' ')[0]
+            },
+          },
+          {
+            title: t('overview.type'),
+            dataIndex: 'type',
+            align: 'left',
+            minWidth: '250px',
+            render(_, __, item) {
+              return (
+                <TracsactionType
+                  item={item}
+                  cacheTipBlockNumber={cacheTipBlockNumber}
+                  bestKnownBlockNumber={bestKnownBlockNumber}
+                />
+              )
+            },
+          },
+          {
+            title: t('overview.amount'),
+            dataIndex: 'amount',
+            align: 'left',
+            isBalance: true,
+            minWidth: '300px',
+            render(_, __, item, show) {
+              return <FormattedTokenAmount item={item} show={show} />
+            },
+          },
+          {
+            title: t('overview.status'),
+            dataIndex: 'status',
+            align: 'left',
+            minWidth: '150px',
+            render(_, __, item) {
+              return (
+                <TransactionStatus
+                  item={item}
+                  cacheTipBlockNumber={cacheTipBlockNumber}
+                  bestKnownBlockNumber={bestKnownBlockNumber}
+                />
+              )
+            },
+          },
+        ]}
+        dataSource={recentItems}
+        noDataContent={t('overview.no-recent-activities')}
+        onRowClick={onRecentActivityClick}
+      />
+
+      {showReceive ? <Receive onClose={() => setShowReceive(false)} /> : null}
+      {showAddressBook ? <AddressBook onClose={() => setShowAddressBook(false)} /> : null}
+    </PageContainer>
   )
 }
 

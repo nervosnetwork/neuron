@@ -8,6 +8,8 @@ export enum LocalCacheKey {
   CurrentNetworkID = 'currentNetworkID',
   CacheClearDate = 'cacheClearDate',
   SyncRebuildNotification = 'syncRebuildNotification',
+  LoadedWalletIDs = 'loadedWalletIDs',
+  ImportedWallet = 'ImportedWallet',
 }
 
 export const addresses = {
@@ -24,7 +26,7 @@ export const addresses = {
     try {
       const addressList = JSON.parse(addressesStr)
       if (!Array.isArray(addressList)) {
-        throw new TypeError(`Addresses should be type fo Address[]`)
+        throw new TypeError(`Addresses should be type of Address[]`)
       }
       return addressList
     } catch (err) {
@@ -126,5 +128,29 @@ export const syncRebuildNotification = {
   },
   load: () => {
     return window.localStorage.getItem(LocalCacheKey.SyncRebuildNotification)
+  },
+}
+
+export const loadedWalletIDs = {
+  save: (ids: string) => {
+    window.localStorage.setItem(LocalCacheKey.LoadedWalletIDs, ids)
+  },
+  load: () => {
+    return window.localStorage.getItem(LocalCacheKey.LoadedWalletIDs) || ''
+  },
+}
+
+export const importedWalletDialogShown = {
+  getKey: (walletId: string) => `${walletId}_${LocalCacheKey.ImportedWallet}`,
+  setStatus: (walletId: string, show: boolean) => {
+    window.localStorage.setItem(importedWalletDialogShown.getKey(walletId), show.toString())
+  },
+  getStatus: (walletId: string) => {
+    try {
+      const status = window.localStorage.getItem(importedWalletDialogShown.getKey(walletId))
+      return status ? (JSON.parse(status) as boolean) : false
+    } catch (error) {
+      return false
+    }
   },
 }

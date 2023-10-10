@@ -1,58 +1,147 @@
 @import '../../styles/mixin.scss';
 
-.title {
-  font-size: 1.375rem;
-  font-weight: 700;
-  line-height: 28px;
-  margin-bottom: 20px;
-}
-
-.address {
-  margin: 20px auto 0;
-  display: flex;
-  justify-content: center;
-}
-
-.addressToggle{
+.dialogTitle {
   display: flex;
   align-items: center;
+  gap: 4px;
+}
+
+.tip {
+  width: 340px;
+  word-break: normal;
+  white-space: normal;
+}
+
+.dialog {
+  width: 680px;
+}
+
+.addressRoot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 8px;
+    & > button {
+      min-width: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      color: var(--primary-color);
+      background: var(--tag-green-bg-color);
+      & {
+        svg {
+          width: 12px;
+          g,
+          path {
+            fill: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+
+  .verifyAddress {
+    margin-top: 24px;
+    min-width: 216px;
+  }
+}
+
+.qrCode {
+  position: relative;
+  @keyframes fade-away {
+    from {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    to {
+      visibility: visible;
+      opacity: 0;
+    }
+  }
+
+  &[data-copy-success='true'] {
+    &::after {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 128px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(1px);
+      user-select: none;
+      border-radius: 40px;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 40px;
+      text-align: center;
+      content: attr(data-copy-success-text);
+      animation: 4s fade-away 1 forwards;
+      color: #fff;
+    }
+  }
+}
+
+.copyAddress {
+  width: 424px;
+}
+
+.showAddress {
+  word-break: break-all;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-family: 'JetBrains Mono';
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--main-text-color);
+}
+
+.addressToggle {
+  width: 100%;
+  margin-top: 8px;
   appearance: none;
   border: none;
   background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-family: PingFang SC;
+  font-style: normal;
+  font-weight: 500;
+  color: var(--primary-color);
+  line-height: normal;
+  cursor: pointer;
+
   svg {
     pointer-events: none;
-  }
-  &:hover {
-    g,
-    path {
-      stroke: var(--nervos-green);
-      fill: var(--nervos-green);
-    }
+    margin-right: 5px;
   }
 }
 
-.copyBtn {
-  appearance: none;
-  border: none;
-  background: transparent;
+.verifyHardwareAddress {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+  align-items: center;
 
-  &:hover {
-    g,
-    path {
-      stroke: var(--nervos-green);
-      fill: var(--nervos-green);
-    }
+  button {
+    width: 216px;
   }
-}
 
-.notation {
-  width: 450px;
-  font-size: 0.75rem;
-  margin: 6px auto 0;
-}
-
-.addressBook {
-  display: block;
-  margin: 20px auto;
-  padding: 7px 15px;
+  .success {
+    color: var(--main-text-color);
+  }
 }

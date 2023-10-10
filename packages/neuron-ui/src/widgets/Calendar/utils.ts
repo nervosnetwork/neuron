@@ -70,7 +70,7 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
   const numOfDaysInCalendar = DAYS_IN_WEEK * ROWS_IN_CALENDAR
 
   const dateList: Day[] = []
-  const formater = new Intl.DateTimeFormat(lang, { dateStyle: 'full' })
+  const formatter = new Intl.DateTimeFormat(lang, { dateStyle: 'full' })
 
   for (let i = 1; i <= numOfDaysInCalendar; i++) {
     const instance = new Date(year, month - 1, ((firstDayOfWeek - weekdayOfFirstDay - 7) % 7) + i)
@@ -82,7 +82,7 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
       weekday: instance.getDay(),
       isCurMonth: instance.getMonth() + 1 === month,
       isToday: instance.toDateString() === today.toDateString(),
-      label: formater.format(instance),
+      label: formatter.format(instance),
     }
     dateList.push(day)
   }
@@ -97,19 +97,19 @@ export function getMonthCalendar(year: number, month: number, firstDayOfWeek: We
 }
 
 export const getLocalMonthShortNames = (lang: string) => {
-  const formater = new Intl.DateTimeFormat(lang, { month: 'short' })
+  const formatter = new Intl.DateTimeFormat(lang, { month: 'short' })
   return Array.from(
     { length: 12 },
-    (_, i) => `${formater.format(new Date(Date.UTC(2023, i, 1)))}${lang.startsWith('en') ? '.' : ''}`
+    (_, i) => `${formatter.format(new Date(Date.UTC(2023, i, 1)))}${lang.startsWith('en') ? '.' : ''}`
   )
 }
 
 export const getLocalMonthNames = (lang: string) => {
-  const formater = new Intl.DateTimeFormat(lang, { month: 'long' })
-  return Array.from({ length: 12 }, (_, i) => formater.format(new Date(Date.UTC(2023, i, 1))))
+  const formatter = new Intl.DateTimeFormat(lang, { month: 'long' })
+  return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(Date.UTC(2023, i, 1))))
 }
 
 export const getLocalWeekNames = (lang: string) => {
-  const formater = new Intl.DateTimeFormat(lang, { weekday: 'short' })
-  return Array.from({ length: 7 }, (_, i) => formater.format(new Date(Date.UTC(2023, 0, 1 + i))))
+  const formatter = new Intl.DateTimeFormat(lang, { weekday: 'narrow' })
+  return Array.from({ length: 7 }, (_, i) => formatter.format(new Date(Date.UTC(2023, 0, 1 + i))))
 }

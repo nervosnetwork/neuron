@@ -1,5 +1,5 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import HexUtils from '../../utils/hex'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
 import TypeChecker from '../../utils/type-checker'
 
 export enum ScriptHashType {
@@ -34,12 +34,27 @@ export default class Script {
   }
 
   public computeHash(): string {
-    const hash: string = scriptToHash(this.toSDK())
-    return HexUtils.addPrefix(hash)
+    const script = this.toSDK()
+    if (!script || !script.codeHash || !script.hashType) {
+      throw new Error('Invalid script')
+    }
+    // empty string is not allowed for args
+    const formattedScript = {
+      ...script,
+      args: script.args || '0x',
+    }
+    return scriptToHash(formattedScript)
   }
 
+  /**
+   * @deprecated please move to `calculateOccupiedByteSize`
+   */
   public calculateBytesize(): number {
-    return 1 + HexUtils.byteLength(this.codeHash) + HexUtils.byteLength(this.args)
+    return this.calculateOccupiedByteSize()
+  }
+
+  public calculateOccupiedByteSize(): number {
+    return 1 + byteUtils.concat(this.args, this.codeHash).byteLength
   }
 
   public toSDK(): CKBComponents.Script {

@@ -2,17 +2,14 @@ import fs from 'fs'
 import path from 'path'
 import { app, shell, clipboard, BrowserWindow, dialog, MenuItemConstructorOptions, Menu } from 'electron'
 import { t } from 'i18next'
-import { Subject } from 'rxjs'
-import { throttleTime } from 'rxjs/operators'
 import env from '../../env'
 import UpdateController from '../../controllers/update'
 import ExportDebugController from '../../controllers/export-debug'
-import { showWindow } from '../../controllers/app/show-window'
 import WalletsService from '../../services/wallets'
 import OfflineSignService from '../../services/offline-sign'
 import CommandSubject from '../../models/subjects/command'
 import logger from '../../utils/logger'
-import { SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from '../../utils/const'
+import { SETTINGS_WINDOW_TITLE } from '../../utils/const'
 import { OfflineSignJSON } from '../../models/offline-sign'
 import NetworksService from '../../services/networks'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
@@ -20,12 +17,12 @@ import { CKBLightRunner } from '../../services/light-runner'
 import { NetworkType } from '../../models/network'
 
 enum URL {
-  Settings = '/settings/general',
+  Settings = '/settings',
   CreateWallet = '/wizard/mnemonic/create',
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
   ImportHardware = '/import-hardware',
-  OfflineSign = '/offline-sign',
+  OfflineSign = 'offline-sign',
 }
 
 enum ExternalURL {
@@ -40,7 +37,7 @@ const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
 
-const getVerionFromFile = (filePath: string) => {
+const getVersionFromFile = (filePath: string) => {
   if (fs.existsSync(filePath)) {
     try {
       return fs.readFileSync(filePath, 'utf8')
@@ -54,11 +51,11 @@ const showAbout = () => {
   let applicationVersion = t('about.app-version', { name: app.name, version: app.getVersion() })
 
   const appPath = app.isPackaged ? app.getAppPath() : path.join(__dirname, '../../../../..')
-  const ckbVersion = getVerionFromFile(path.join(appPath, '.ckb-version'))
+  const ckbVersion = getVersionFromFile(path.join(appPath, '.ckb-version'))
   if (ckbVersion) {
     applicationVersion += `\n${t('about.ckb-client-version', { version: ckbVersion })}`
   }
-  const ckbLightClientVersion = getVerionFromFile(path.join(appPath, '.ckb-light-version'))
+  const ckbLightClientVersion = getVersionFromFile(path.join(appPath, '.ckb-light-version'))
   if (ckbLightClientVersion) {
     applicationVersion += `${t('about.ckb-light-client-version', { version: ckbLightClientVersion })}`
   }
@@ -66,15 +63,14 @@ const showAbout = () => {
   const isWin = process.platform === 'win32'
 
   if (isWin) {
-    const options = {
+    dialog.showMessageBox({
       type: 'info',
       title: app.name,
       message: app.name,
       detail: applicationVersion,
       buttons: ['OK'],
       cancelId: 0,
-    }
-    dialog.showMessageBox(options)
+    })
     return
   }
 
@@ -104,14 +100,8 @@ const loadTransaction = (url: string, json: OfflineSignJSON, filePath: string) =
   }
 }
 
-const showSettings$ = new Subject()
-
-showSettings$.pipe(throttleTime(1000)).subscribe(() => {
-  showWindow(`#${URL.Settings}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
-})
-
 const showSettings = () => {
-  showSettings$.next()
+  navigateTo(URL.Settings)
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
@@ -151,8 +141,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.neuron.check-updates'),
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
-          new UpdateController().checkUpdates()
-          showSettings()
+          navigateTo(`${URL.Settings}?checkUpdate=1`)
         },
       },
       separator,
@@ -312,28 +301,30 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: t('application-menu.tools.sign-and-verify'),
         enabled: hasCurrentWallet,
         click: () => {
-          const currentWallet = walletsService.getCurrent()
-          showWindow(`#/sign-verify/${currentWallet!.id}`, t(`messageBox.sign-and-verify.title`), {
-            width: 900,
-          })
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({
+              winID: window.id,
+              type: 'sign-verify',
+              payload: null,
+              dispatchToUI: true,
+            })
+          }
         },
       },
       {
         label: t('application-menu.tools.multisig-address'),
         enabled: hasCurrentWallet,
         click: () => {
-          const currentWallet = walletsService.getCurrent()
-          showWindow(
-            `#/multisig-address/${currentWallet!.id}`,
-            t(`messageBox.multisig-address.title`),
-            {
-              width: 1000,
-              maxWidth: 1000,
-              minWidth: 1000,
-              resizable: true
-            },
-            ['multisig-output-update']
-          )
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({
+              winID: window.id,
+              type: 'multisig-address',
+              payload: null,
+              dispatchToUI: true,
+            })
+          }
         },
       },
       {
@@ -480,8 +471,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: t('application-menu.neuron.check-updates'),
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
-        new UpdateController().checkUpdates()
-        showSettings()
+        navigateTo(`${URL.Settings}?checkUpdate=1`)
       },
     })
     helpSubmenu.push({

@@ -1,0 +1,76 @@
+@import '../../styles';
+
+.dialogWrap {
+  @include dialog-container;
+  padding: 0;
+  position: relative;
+
+  &::backdrop {
+    @include overlay;
+  }
+}
+
+.header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--secondary-background-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 12px;
+  font-weight: 900;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  border-bottom: 1px solid var(--divide-line-color);
+  svg {
+    g,
+    path {
+      fill: var(--main-text-color);
+    }
+    cursor: pointer;
+  }
+  .title {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-text-color);
+  }
+  .subTitle {
+    font-weight: 400;
+    font-size: 12px;
+    margin-left: 6px;
+    color: var(--dialog-secondary-text-color);
+  }
+}
+
+.content {
+  padding: 20px 16px;
+  position: relative;
+  max-height: calc(100vh - 260px);
+  overflow-y: scroll;
+}
+
+.footerWrap {
+  height: 104px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background: var(--secondary-background-color);
+  padding: 4px 0 20px;
+  @include dialog-footer;
+
+  button {
+    padding: 0 20px;
+  }
+
+  button:nth-child(2) {
+    margin-left: 24px;
+  }
+}

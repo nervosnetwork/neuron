@@ -21,7 +21,7 @@ import {
   InvalidAddress,
   UsedName,
   MainnetAddressRequired,
-  TestnetAddressRequired
+  TestnetAddressRequired,
 } from '../exceptions'
 import AddressService from '../services/addresses'
 import TransactionSender from '../services/transaction-sender'
@@ -120,12 +120,12 @@ export default class WalletsController {
 
     const walletsService = WalletsService.getInstance()
     const rpc = generateRPC(NodeService.getInstance().nodeUrl)
-    let startBlockNumberInLight: string | undefined = undefined
+    let startBlockNumber: string | undefined = undefined
     if (!isImporting) {
       try {
-        startBlockNumberInLight = await rpc.getTipBlockNumber()
+        startBlockNumber = await rpc.getTipBlockNumber()
       } catch (error) {
-        startBlockNumberInLight = undefined
+        startBlockNumber = undefined
       }
     }
     const wallet = walletsService.create({
@@ -133,7 +133,7 @@ export default class WalletsController {
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
-      startBlockNumberInLight
+      startBlockNumber: startBlockNumber,
     })
 
     wallet.checkAndGenerateAddresses(isImporting)
@@ -199,12 +199,14 @@ export default class WalletsController {
     password,
     newPassword,
     device,
+    startBlockNumber,
   }: {
     id: string
-    password: string
-    name: string
+    password?: string
+    name?: string
     newPassword?: string
     device?: DeviceInfo
+    startBlockNumber?: string
   }): Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
@@ -212,8 +214,9 @@ export default class WalletsController {
       throw new WalletNotFound(id)
     }
 
-    const props: { name: string; keystore?: Keystore; device?: DeviceInfo } = {
+    const props: { name: string; keystore?: Keystore; device?: DeviceInfo; startBlockNumber?: string } = {
       name: name || wallet.name,
+      startBlockNumber,
     }
 
     if (!wallet.isHardware()) {
@@ -225,6 +228,9 @@ export default class WalletsController {
     }
 
     if (newPassword) {
+      if (!password) {
+        throw new Error('Old password is required to set a new password')
+      }
       const extendedPrivateKey = wallet!.loadKeystore().extendedPrivateKey(password)
       props.keystore = Keystore.create(extendedPrivateKey, newPassword)
     }

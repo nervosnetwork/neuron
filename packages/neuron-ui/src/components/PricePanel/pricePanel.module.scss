@@ -3,11 +3,14 @@
 .pricePanel {
   display: flex;
   justify-content: space-between;
-  font-size: 0.875rem;
-  line-height: 1.125rem;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 8px;
 
   .transferSwitch {
     display: flex;
+    align-items: center;
+    color: var(--secondary-text-color);
   }
 }
 
@@ -17,46 +20,29 @@
   position: relative;
   border: none;
   background: none;
+  svg > path {
+    fill: var(--secondary-text-color);
+  }
 
   &:hover {
     font-size: 14px;
 
     svg > path {
-      fill: var(--active-color);
-    }
-
-    &::after {
-      position: absolute;
-      display: inline-block;
-      left: 50%;
-      transform: translate(-50%, -99%);
-      padding: 12px;
-      border-radius: 8px;
-      overflow-wrap: break-word;
-      background-color: var(--tooltip-background-color);
-      color: var(--tooltip-font-color);
-      user-select: text;
-      white-space: nowrap;
-      text-align: center;
-      content: attr(data-content);
-    }
-    &::before {
-      content: '';
-      user-select: text;
-      border-width: 9px;
-      border-style: solid;
-      border-color: transparent;
-      display: inline-block;
-      border-top-color: var(--tooltip-background-color);
-      transform: translate(-50%, -70%);
-      left: 50%;
-      position: absolute;
+      fill: var(--primary-color);
     }
   }
 }
 
 .dropdownBox {
   margin: 4px 0px 19px 0px;
+  --tag-red-bg-color: #ffe8e8;
+  --tag-green-bg-color: #effaf7;
+  --tag-blue-bg-color: #e8faff;
+  @media (prefers-color-scheme: dark) {
+    --tag-red-bg-color: #322929;
+    --tag-green-bg-color: #2e3735;
+    --tag-blue-bg-color: #2d3638;
+  }
 }
 .suffix {
   font-family: inherit;
@@ -73,21 +59,33 @@
   align-items: center;
   font-size: 14px;
   gap: 4px;
+  color: var(--secondary-text-color);
 }
 .labelWrap {
-  color: #333;
+  color: var(--main-text-color);
   font-weight: 500;
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 20px;
 
   .labelComment {
     display: inline-block;
     font-weight: 400;
-    background-color: #effaf7;
-    color: #00c891;
-    padding: 2px 8px;
+    padding: 8px 12px;
     border-radius: 24px;
     margin-left: 8px;
-    font-size: 10px;
-    line-height: 14px;
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .green {
+    color: #00c891;
+    background: var(--tag-green-bg-color);
+  }
+  .blue {
+    color: #23bff0;
+    background: var(--tag-blue-bg-color);
+  }
+  .red {
+    color: #ff5656;
+    background: var(--tag-red-bg-color);
   }
 }

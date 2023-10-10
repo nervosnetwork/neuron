@@ -21,7 +21,7 @@ describe('OfflineSign', () => {
   }
 
   describe('fromJSON', () => {
-    it('should work without assetAcount', () => {
+    it('should work without assetAccount', () => {
       const model = OfflineSign.fromJSON(json)
       expect(model.assetAccount).toBe(undefined)
     })

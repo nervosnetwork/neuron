@@ -1,3 +1,4 @@
+import { bytes } from '@ckb-lumos/codec'
 import CellsService from '../../services/cells'
 import {
   CapacityTooSmall,
@@ -28,7 +29,7 @@ import BufferUtils from '../../utils/buffer'
 import assert from 'assert'
 import AssetAccount from '../../models/asset-account'
 import AddressService from '../../services/addresses'
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { addressToScript } from '../../utils/scriptAndAddress'
 import MultisigConfigModel from '../../models/multisig-config'
 import WalletService from '../../services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
@@ -711,9 +712,9 @@ export class TransactionGenerator {
     return tx
   }
 
-  public static async generateDestoryAssetAccountTx(
+  public static async generateDestroyAssetAccountTx(
     walletId: string,
-    asssetAccountInputs: Input[],
+    assetAccountInputs: Input[],
     changeBlake160: string,
     isCKBAccount: boolean
   ) {
@@ -721,7 +722,7 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
 
     const cellDeps = [secpCellDep, assetAccountInfo.anyoneCanPayCellDep]
-    if (asssetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
+    if (assetAccountInputs.some(v => v.type && v.data !== '0x' && BigInt(v.data || 0) !== BigInt(0))) {
       throw new SudtAcpHaveDataError()
     }
     if (!isCKBAccount) {
@@ -737,13 +738,13 @@ export class TransactionGenerator {
       version: '0',
       headerDeps: [],
       cellDeps,
-      inputs: asssetAccountInputs,
+      inputs: assetAccountInputs,
       outputs: [output],
       outputsData: [output.data],
       witnesses: [],
     })
 
-    let allCapacities = asssetAccountInputs.reduce((a, b) => {
+    let allCapacities = assetAccountInputs.reduce((a, b) => {
       return a + BigInt(b.capacity as string)
     }, BigInt(0))
     tx.fee = TransactionFee.fee(TransactionSize.tx(tx), BigInt(1e4)).toString()
@@ -1026,7 +1027,7 @@ export class TransactionGenerator {
 
     const chequeCellTmp = Output.fromObject({
       capacity: BigInt(162 * 10 ** 8).toString(),
-      lock: assetAccountInfo.generateChequeScript('0'.repeat(40), '0'.repeat(40)),
+      lock: assetAccountInfo.generateChequeScript(bytes.hexify(Buffer.alloc(20)), bytes.hexify(Buffer.alloc(20))),
       type: assetAccountInfo.generateSudtScript(assetAccount.tokenID),
     })
 

@@ -1,9 +1,14 @@
 name: Package Neuron for Test
 
-on: [push]
+on: 
+  issue_comment:
+    types: [created, edited]
+  push:
 
 jobs:
   packaging:
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package')) || github.event_name == 'push' }}
+
     strategy:
       matrix:
         node:
@@ -17,20 +22,31 @@ jobs:
 
     name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
 
+    env:
+      MAC_SHOULD_CODE_SIGN: ${{ github.event_name != 'pull_request' && secrets.APPLE_ID != '' }}
+      WIN_CERTIFICATE_BASE64: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
+
     steps:
       - name: Set git to use LF
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - name: Checkout
+      - name: Checkout for push
         uses: actions/checkout@v3
+        if: ${{ github.event_name == 'push' }}
+
+      - name: Checkout for PR
+        uses: actions/checkout@v3
+        if: ${{ github.event_name == 'issue_comment' }}
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Restore
         uses: actions/cache@v3
@@ -44,7 +60,7 @@ jobs:
         if: matrix.os == 'windows-2019'
         uses: microsoft/setup-msbuild@v1.3.1
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
       - name: Install libudev
         if: matrix.os == 'ubuntu-20.04'
@@ -55,14 +71,14 @@ jobs:
       - name: Install Lerna
         run: yarn global add lerna
 
-      - name: Boostrap
+      - name: Bootstrap
         run: |
           yarn
         env:
           CI: false
 
       - name: Package for MacOS
-        if: matrix.os == 'macos-latest'
+        if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'true' }}
         run: |
           ./scripts/download-ckb.sh mac
           yarn package:test mac
@@ -72,9 +88,20 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+
+      - name: Package for MacOS for skip code sign
+        if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'false' }}
+        run: |
+          export CSC_IDENTITY_AUTO_DISCOVERY=false
+          ./scripts/download-ckb.sh mac
+          yarn package:test mac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_NOTARIZE: true
 
       - name: Package for Windows
-        if: matrix.os == 'windows-2019'
+        if: ${{ matrix.os == 'windows-2019' && env.WIN_CERTIFICATE_BASE64 != '' }}
         run: |
           bash ./scripts/download-ckb.sh win
           yarn build
@@ -84,6 +111,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.WIN_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTIFICATE_PASSWORD }}
+
+      - name: Package for Windows for skip code sign
+        if: ${{ matrix.os == 'windows-2019' && env.WIN_CERTIFICATE_BASE64 == '' }}
+        run: |
+          bash ./scripts/download-ckb.sh win
+          yarn build
+          bash ./scripts/copy-ui-files.sh
+          bash ./scripts/package-for-test.sh win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Package for Linux
         if: matrix.os == 'ubuntu-20.04'
@@ -135,12 +172,37 @@ jobs:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
 
-  comment:
+  comment_when_package_success:
     needs: [packaging]
     name: Append links to the Pull Request
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/commit-comment@v2
+      - name: Comment by push event
+        if: ${{ github.event_name == 'push' }}
+        uses: peter-evans/commit-comment@v2
         with:
           body: |
             Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+
+      - name: Comment by pull request comment event
+        if: ${{ github.event_name == 'issue_comment' }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
+          edit-mode: append
+
+  comment_when_package_failed:
+    needs: [packaging]
+    if: ${{ always() && needs.packaging.result == 'failure' }}
+    name: Append failed comment to the comment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment by pull request comment event when package failed
+        if: ${{ github.event_name == 'issue_comment' }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: Packageing failed in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}). @${{ github.event.comment.user.login }}
+          edit-mode: append

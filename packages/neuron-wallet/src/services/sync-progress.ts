@@ -1,5 +1,5 @@
 import { Equal, getConnection, In, Not } from 'typeorm'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { HexString } from '@ckb-lumos/base'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'
@@ -90,7 +90,11 @@ export default class SyncProgressService {
     const item = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
-      .where({ delete: false, addressType: SyncAddressType.Default, ...(currentWallet ? { walletId: currentWallet.id } : {}) })
+      .where({
+        delete: false,
+        addressType: SyncAddressType.Default,
+        ...(currentWallet ? { walletId: currentWallet.id } : {}),
+      })
       .orderBy('blockEndNumber', 'ASC')
       .getOne()
     return item?.blockEndNumber || 0
@@ -108,11 +112,9 @@ export default class SyncProgressService {
   }
 
   static async getOtherTypeSyncProgress() {
-    const items = await getConnection()
-      .getRepository(SyncProgress)
-      .find({
-        addressType: SyncAddressType.Multisig,
-      })
+    const items = await getConnection().getRepository(SyncProgress).find({
+      addressType: SyncAddressType.Multisig,
+    })
     return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.hash]: cur.blockStartNumber }), {})
   }
 
@@ -126,9 +128,7 @@ export default class SyncProgressService {
 
   static async clearCurrentWalletProgress() {
     const currentWallet = WalletService.getInstance().getCurrent()
-    await getConnection()
-      .getRepository(SyncProgress)
-      .delete({ walletId: currentWallet?.id })
+    await getConnection().getRepository(SyncProgress).delete({ walletId: currentWallet?.id })
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)

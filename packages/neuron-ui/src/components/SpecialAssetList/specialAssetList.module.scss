@@ -1,44 +1,19 @@
 @import '../../styles/mixin.scss';
 
 .container {
-  position: relative;
-  .title {
-    @include page-title;
-    margin-bottom: 20px;
-  }
-
-  .listContainer {
-    background-color: #fff;
-    padding: 2px 15px 48px;
-
-    .listHeader {
-      @include semi-bold-text;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      height: 55px;
-      font-size: 1rem;
-      letter-spacing: 0.7px;
-      border-bottom: 1px solid #b3b3b3;
-
-      & > span {
-        flex-basis: 135px;
-      }
-    }
-  }
-
   .pagination {
-    margin-top: 20px;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: flex-end;
+    padding: 24px 0;
   }
 }
 
-.noItems {
-  @include medium-text;
-  padding: 20px 13px;
+.noRecords {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 150px;
+  font-size: 14px;
 }
 
 .migrateSelectDialog {
@@ -50,4 +25,37 @@
   @include dialog-container;
   padding: 24px 48px;
   width: 520px;
+}
+
+.actionBtnBox {
+  margin-right: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+
+  .tip {
+    margin-top: -14px;
+  }
+
+  .tooltip {
+    width: 260px;
+    word-break: normal;
+    white-space: normal;
+    text-align: start;
+  }
+
+  .actionBtn {
+    height: 40px;
+    min-width: 104px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .detailBtn {
+    &:hover {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+  }
 }

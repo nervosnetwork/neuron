@@ -5,6 +5,7 @@ import { useSUDTAccountInfoErrors } from 'utils'
 export type TokenInfoType = Omit<Controller.GetTokenInfoList.TokenInfo, 'tokenID'> & {
   tokenId: string
   accountName: string
+  balance?: string
 }
 
 export const useTokenInfo = ({
@@ -24,6 +25,7 @@ export const useTokenInfo = ({
     symbol: '',
     tokenName: '',
     decimal: '',
+    balance: '',
   })
   useEffect(() => {
     if (findTokenInfo) {
@@ -33,6 +35,7 @@ export const useTokenInfo = ({
         symbol: findTokenInfo.symbol,
         tokenName: findTokenInfo.tokenName,
         decimal: findTokenInfo.decimal,
+        balance: '',
       })
     }
   }, [findTokenInfo])

@@ -1,9 +1,12 @@
+@import '../../styles/theme.scss';
+
 .container {
   position: relative;
   display: inline-block;
-  padding: 0 3px;
+  padding: 0 5px;
+  cursor: pointer;
 
-  &::before {
+  .hoverShow {
     position: absolute;
     top: 0;
     left: 0;
@@ -12,17 +15,32 @@
     display: none;
     justify-content: center;
     align-items: center;
-    content: attr(data-prompt);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #666;
-    background-color: rgba(224, 224, 224, 0.9);
+    font-weight: 400;
+    color: $main-color;
+    background-color: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(1px);
     user-select: none;
     white-space: nowrap;
+    border-radius: 16px;
+    z-index: 10;
   }
 
-  &:hover::before {
-    display: flex;
+  &:hover {
+    .hoverShow {
+      display: flex;
+      container-type: inline-size;
+      container-name: tips;
+
+      .copytext {
+        margin-left: 4px;
+        @container tips  ( max-width : 72px ) {
+          display: none;
+        }
+      }
+
+      .copyIcon {
+        visibility: visible;
+      }
+    }
   }
 }

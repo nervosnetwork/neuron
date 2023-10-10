@@ -1,5 +1,8 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { useDidMount, useForceUpdate } from 'utils'
+import { ADDRESS_MIN_LENGTH, ADDRESS_HEAD_TAIL_LENGTH } from 'utils/const'
+import { ReactComponent as Arrow } from 'widgets/Icons/Arrow.svg'
+
 import styles from './input-select.module.scss'
 
 export interface SelectOptions {
@@ -16,7 +19,8 @@ export interface InputSelectProps {
   onChange?: (value: string, arg?: SelectOptions) => void
   value?: string
   placeholder?: string
-  inputDisabeld?: boolean
+  inputDisabled?: boolean
+  error?: string
 }
 
 function parseValue(value: string, options: SelectOptions[]) {
@@ -24,7 +28,16 @@ function parseValue(value: string, options: SelectOptions[]) {
   return option?.value || value
 }
 
-const Select = ({ value, options, placeholder, disabled, onChange, className, inputDisabeld }: InputSelectProps) => {
+const Select = ({
+  value,
+  options,
+  placeholder,
+  disabled,
+  onChange,
+  className,
+  inputDisabled,
+  error,
+}: InputSelectProps) => {
   const mounted = useRef(true)
   const root = useRef<HTMLDivElement>(null)
   const openRef = useRef<boolean>(false)
@@ -35,7 +48,7 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
 
   const onDocumentClick = useCallback(
     (e: any) => {
-      if (mounted.current && !root.current?.contains(e.target) && openRef.current) {
+      if (mounted.current && !root.current?.contains?.(e.target) && openRef.current) {
         setOpen(false)
       }
     },
@@ -86,7 +99,9 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
           aria-selected={isSelected ? 'true' : 'false'}
           aria-hidden="true"
         >
-          {label}
+          {typeof label === 'string' && label?.length > ADDRESS_MIN_LENGTH
+            ? `${label.slice(0, ADDRESS_HEAD_TAIL_LENGTH)}...${label.slice(-ADDRESS_HEAD_TAIL_LENGTH)}`
+            : label}
         </div>
       )
     },
@@ -121,9 +136,16 @@ const Select = ({ value, options, placeholder, disabled, onChange, className, in
         role="button"
         tabIndex={0}
         data-open={openRef.current}
+        data-has-error={!!error}
       >
-        <input disabled={inputDisabeld} className={placeholderClass} onChange={onInputChange} value={value ?? innerValue} />
-        <div className={styles.arrow} />
+        <input
+          disabled={inputDisabled}
+          placeholder={placeholder}
+          className={placeholderClass}
+          onChange={onInputChange}
+          value={value ?? innerValue}
+        />
+        <Arrow className={styles.arrow} />
       </div>
       {openRef.current ? (
         <div className={styles.menu} aria-expanded="true">

@@ -1,14 +1,15 @@
-import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils/lib/serialization/transaction'
-import HexUtils from '../utils/hex'
-import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
+import { serializeOutput, serializeWitnessArgs } from '../utils/serialization'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
 import Multisig from './multisig'
 import Script, { ScriptHashType } from './chain/script'
 import BufferUtils from '../utils/buffer'
+import { bytes as byteUtils } from '@ckb-lumos/codec'
 
 export default class TransactionSize {
+  // https://github.com/zhangsoledad/rfcs/blob/zhangsoledad/ckb2023-overview/rfcs/0008-serialization/0008-serialization.md#fixvec---fixed-vector
+  public static SERIALIZED_ITEMS_COUNT_BYTESIZE = 4
   public static SERIALIZED_OFFSET_BYTESIZE = 4
 
   public static base(): number {
@@ -29,7 +30,7 @@ export default class TransactionSize {
 
   public static output(output: Output): number {
     const bytes = serializeOutput(output.toSDK())
-    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return byteUtils.bytify(bytes).byteLength + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
   public static ckbAnyoneCanPayOutput(): number {
@@ -55,8 +56,11 @@ export default class TransactionSize {
   }
 
   public static outputData(data: string): number {
-    const bytes = serializeFixVec(data)
-    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return (
+      byteUtils.bytify(data).byteLength +
+      TransactionSize.SERIALIZED_ITEMS_COUNT_BYTESIZE +
+      TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    )
   }
 
   // TODO: and here
@@ -67,8 +71,11 @@ export default class TransactionSize {
 
   public static witness(witness: WitnessArgs | string): number {
     const wit: string = typeof witness === 'string' ? witness : serializeWitnessArgs(witness.toSDK())
-    const bytes = serializeFixVec(wit)
-    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return (
+      byteUtils.bytify(wit).byteLength +
+      TransactionSize.SERIALIZED_ITEMS_COUNT_BYTESIZE +
+      TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    )
   }
 
   public static secpLockWitness(): number {

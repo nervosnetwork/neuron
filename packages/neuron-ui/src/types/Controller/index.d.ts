@@ -35,6 +35,7 @@ declare namespace Controller {
     newPassword?: string
     name?: string
     device?: any
+    startBlockNumber?: string
   }
 
   interface RequestPasswordParams {
@@ -164,7 +165,7 @@ declare namespace Controller {
     message: string
   }
   // Special Assets
-  interface GetSpeicalAssetsParams {
+  interface GetSpecialAssetsParams {
     walletID: string
     pageNo: number
     pageSize: number

@@ -1,7 +1,7 @@
-import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
-import { scriptToAddress, serializeWitnessArgs, toUint64Le } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs } from '../utils/serialization'
+import { scriptToAddress } from '../utils/scriptAndAddress'
 import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
@@ -21,7 +21,7 @@ import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
-import HexUtils from '../utils/hex'
+import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
 import HardwareWalletService from './hardware'
@@ -32,7 +32,7 @@ import {
   NoMatchAddressForSign,
   SignTransactionFailed,
   CellIsNotYetLive,
-  TransactionIsNotCommittedYet
+  TransactionIsNotCommittedYet,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
 import MultisigConfigModel from '../models/multisig-config'
@@ -44,6 +44,7 @@ import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import CellsService from './cells'
+import hd from '@ckb-lumos/hd'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -400,24 +401,25 @@ export default class TransactionSender {
       lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130 * m),
     })
     const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
-    const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
+    const serializedEmptyWitnessSize = byteUtils.bytify(serializedEmptyWitness).byteLength
     const blake2b = new Blake2b()
     blake2b.update(txHash)
-    blake2b.update(toUint64Le(`0x${serialziedEmptyWitnessSize.toString(16)}`))
+    blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${serializedEmptyWitnessSize.toString(16)}`)))
     blake2b.update(serializedEmptyWitness)
 
     restWitnesses.forEach(w => {
       const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
-      const byteLength = HexUtils.byteLength(wit)
-      blake2b.update(toUint64Le(`0x${byteLength.toString(16)}`))
+      const byteLength = byteUtils.bytify(wit).byteLength
+      blake2b.update(bytes.hexify(number.Uint64LE.pack(`0x${byteLength.toString(16)}`)))
       blake2b.update(wit)
     })
 
     const message = blake2b.digest()
 
     if (!wallet.isHardware()) {
-      const keyPair = new ECPair(privateKeyOrPath)
-      emptyWitness.lock = keyPair.signRecoverable(message)
+      // `privateKeyOrPath` variable here is a private key because wallet is not a hardware one. Otherwise, it will be a private key path.
+      const privateKey = privateKeyOrPath
+      emptyWitness.lock = hd.key.signRecoverable(message, privateKey)
     }
 
     return [emptyWitness, ...restWitnesses]

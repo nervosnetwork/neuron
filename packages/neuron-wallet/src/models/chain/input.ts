@@ -1,6 +1,6 @@
 import OutPoint from './out-point'
 import Script from './script'
-import HexUtils from '../../utils/hex'
+import { BI } from '@ckb-lumos/bi'
 import TypeChecker from '../../utils/type-checker'
 
 export default class Input {
@@ -112,7 +112,7 @@ export default class Input {
 
   public toSDK(): CKBComponents.CellInput {
     return {
-      since: HexUtils.toHex(this.since!),
+      since: BI.from(this.since || 0).toHexString(),
       previousOutput: this.previousOutput?.toSDK() || null,
     }
   }

@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../utils/scriptAndAddress'
 import OutputEntity from '../../database/chain/entities/output'
 import NetworksService from '../../services/networks'
 import Output from '../../models/chain/output'

@@ -1,4 +1,5 @@
 import { getConnection } from 'typeorm'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import OutputEntity from '../../database/chain/entities/output'
 import Transaction, {
@@ -15,6 +16,10 @@ import BufferUtils from '../../utils/buffer'
 import AssetAccountEntity from '../../database/chain/entities/asset-account'
 import SudtTokenInfoEntity from '../../database/chain/entities/sudt-token-info'
 import exportTransactions from '../../utils/export-history'
+import RpcService from '../rpc-service'
+import NetworksService from '../networks'
+import Script from '../../models/chain/script'
+import Input from '../../models/chain/input'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -64,8 +69,6 @@ export class TransactionsService {
   ): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
 
-    const lockScripts = AddressParser.batchParse(params.addresses)
-    let lockHashes: string[] = lockScripts.map(s => s.computeHash())
     const assetAccountInfo = new AssetAccountInfo()
 
     const connection = getConnection()
@@ -76,32 +79,27 @@ export class TransactionsService {
 
     if (type === SearchType.Address) {
       const lockHashToSearch = AddressParser.parse(searchValue).computeHash()
-      lockHashes = [lockHashToSearch]
-      allTxHashes = await repository
-        .createQueryBuilder('tx')
-        .select('tx.hash', 'txHash')
-        .where(
-          `tx.hash
-        IN
-          (
+      allTxHashes = await connection
+        .createQueryRunner()
+        .query(
+          `
             SELECT transactionHash from (
-              SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
+              SELECT output.transactionHash FROM output WHERE output.lockHash = @0
               UNION
-              SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
+              SELECT input.transactionHash FROM input WHERE input.lockHash = @0
+              UNION
+              SELECT tx_lock.transactionHash FROM tx_lock WHERE tx_lock.lockHash = @0
             )
             INTERSECT
             SELECT transactionHash from (
-              SELECT output.transactionHash FROM output WHERE output.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)
+              SELECT output.transactionHash FROM output WHERE output.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = @1)
               UNION
-              SELECT input.transactionHash FROM input WHERE input.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)
+              SELECT input.transactionHash FROM input WHERE input.lockArgs in (select publicKeyInBlake160 from hd_public_key_info where walletId = @1)
             )
-          )
-        `,
-          { lockHashes, walletId: params.walletID }
+          `,
+          [lockHashToSearch, params.walletID]
         )
-        .orderBy('tx.timestamp', 'DESC')
-        .getRawMany()
-        .then(txs => txs.map(tx => tx.txHash))
+        .then<string[]>((txs: { transactionHash: string }[]) => txs.map(tx => tx.transactionHash))
     } else if (type === SearchType.TxHash) {
       allTxHashes = await repository
         .createQueryBuilder('tx')
@@ -485,29 +483,51 @@ export class TransactionsService {
   }
 
   public static async get(hash: string): Promise<Transaction | undefined> {
-    const tx = await getConnection()
+    const txInDB = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('transaction')
       .where('transaction.hash is :hash', { hash })
-      .leftJoinAndSelect('transaction.inputs', 'input')
-      .orderBy({
-        'input.id': 'ASC',
-      })
       .getOne()
-    const txOutputs = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder()
-      .where({
-        outPointTxHash: hash,
-      })
-      .getMany()
-
-    if (!tx) {
+    if (!txInDB) {
       return undefined
     }
+    const url: string = NetworksService.getInstance().getCurrent().remote
+    const rpcService = new RpcService(url)
+    const txWithStatus = await rpcService.getTransaction(hash)
+    if (!txWithStatus?.transaction) {
+      return undefined
+    }
+    const tx = txInDB.toModel()
+    tx.inputs = await this.fillInputFields(txWithStatus.transaction.inputs)
+    tx.outputs = txWithStatus.transaction.outputs
+    return tx
+  }
 
-    tx.outputs = txOutputs
-    return tx.toModel()
+  private static async fillInputFields(inputs: Input[]) {
+    const inputTxHashes = inputs.map(v => v.previousOutput?.txHash).filter((v): v is string => !!v)
+    if (!inputTxHashes.length) return inputs
+    const url: string = NetworksService.getInstance().getCurrent().remote
+    const ckb = new CKB(url)
+    const inputTxs = await ckb.rpc
+      .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
+        inputTxHashes.map(v => ['getTransaction', v])
+      )
+      .exec()
+    const inputTxMap = new Map<string, CKBComponents.Transaction>()
+    inputTxs.forEach((v, idx) => {
+      inputTxMap.set(inputTxHashes[idx], v.transaction)
+    })
+    return inputs.map(v => {
+      if (!v.previousOutput?.txHash) return v
+      const output = inputTxMap.get(v.previousOutput.txHash)?.outputs?.[+v.previousOutput.index]
+      if (!output) return v
+      v.setCapacity(output.capacity)
+      v.setLock(Script.fromSDK(output.lock))
+      if (output.type) {
+        v.setType(Script.fromSDK(output.type))
+      }
+      return v
+    })
   }
 
   public static blake160sOfTx(tx: Transaction) {

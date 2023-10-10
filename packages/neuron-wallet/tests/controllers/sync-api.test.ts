@@ -51,7 +51,7 @@ jest.mock('undici', () => ({
   request: () => jest.fn()(),
 }))
 jest.mock('services/multisig', () => ({
-  syncMultisigOutput: () => jest.fn()
+  syncMultisigOutput: () => jest.fn(),
 }))
 
 describe('SyncApiController', () => {
@@ -139,7 +139,7 @@ describe('SyncApiController', () => {
       stubbedNodeGetInstance.mockReturnValue({
         get nodeUrl() {
           return fakeNodeUrl
-        }
+        },
       })
       stubbedGetTipHeader.mockResolvedValue({ timestamp: '180000' })
     })
@@ -363,7 +363,7 @@ describe('SyncApiController', () => {
                   stubbedNodeGetInstance.mockReturnValue({
                     get nodeUrl() {
                       return 'anotherfakeurl'
-                    }
+                    },
                   })
                   await sendFakeCacheBlockTipEvent(newFakeState)
 
@@ -422,7 +422,7 @@ describe('SyncApiController', () => {
             expect(syncStatus).toEqual(2)
           })
         })
-        describe('with samples spaning over 1 min', () => {
+        describe('with samples spanning over 1 min', () => {
           const fakeState1 = {
             cacheTipNumber,
             indexerTipNumber: '100',
@@ -473,7 +473,7 @@ describe('SyncApiController', () => {
               stubbedNodeGetInstance.mockImplementation(() => ({
                 get nodeUrl() {
                   return 'http://diffurl'
-                }
+                },
               }))
               await sendFakeCacheBlockTipEvent(fakeState3)
             })

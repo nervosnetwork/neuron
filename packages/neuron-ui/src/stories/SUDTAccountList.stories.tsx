@@ -1,9 +1,14 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import SUDTAccountList from 'components/SUDTAccountList'
 
-const stories = storiesOf('sUDT Account List', module)
+const meta: Meta<typeof SUDTAccountList> = {
+  component: SUDTAccountList,
+  decorators: [withRouter],
+}
 
-stories.add('Basic', () => {
-  return <SUDTAccountList />
-})
+export default meta
+
+type Story = StoryObj<typeof SUDTAccountList>
+
+export const Default: Story = {}

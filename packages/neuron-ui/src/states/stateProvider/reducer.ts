@@ -1,7 +1,7 @@
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'
-import { ConnectionStatus, ErrorCode, sortAccounts } from 'utils'
+import { ConnectionStatus, ErrorCode, getCurrentUrl, getSyncStatus, sortAccounts } from 'utils'
 
 export enum NeuronWalletActions {
   InitAppState = 'initAppState',
@@ -32,6 +32,7 @@ export enum AppActions {
   UpdateSendOutput = 'updateSendOutput',
   UpdateSendPrice = 'updateSendPrice',
   UpdateSendDescription = 'updateSendDescription',
+  UpdateSendIsSendMax = 'updateSendIsSendMax',
   UpdateGeneratedTx = 'updateGeneratedTx',
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
@@ -46,7 +47,7 @@ export enum AppActions {
   DismissPasswordRequest = 'dismissPasswordRequest',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
-  UpdateAlertDialog = 'updateAlertDialog',
+  UpdateGlobalAlertDialog = 'updateGlobalAlertDialog',
 
   PopIn = 'popIn',
   PopOut = 'popOut',
@@ -58,9 +59,12 @@ export enum AppActions {
   UpdateExperimentalParams = 'updateExperimentalParams',
   // offline sign
   UpdateLoadedTransaction = 'updateLoadedTransaction',
+  SetPageNotice = 'setPageNotice',
+  HideWaitForFullySynced = 'hideWaitForFullySynced',
 
   GetFeeRateStats = 'getFeeRateStats',
   UpdateCountDown = 'updateCountDown',
+  SignVerify = 'signVerify',
 }
 
 export type StateAction =
@@ -69,7 +73,8 @@ export type StateAction =
   | { type: AppActions.UpdateSendOutput; payload: { idx: number; item: Partial<State.Output> } }
   | { type: AppActions.UpdateSendPrice; payload: string }
   | { type: AppActions.UpdateSendDescription; payload: string }
-  | { type: AppActions.UpdateGeneratedTx; payload: any }
+  | { type: AppActions.UpdateSendIsSendMax; payload: boolean }
+  | { type: AppActions.UpdateGeneratedTx; payload: State.GeneratedTx | null }
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
   | { type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }
@@ -83,15 +88,17 @@ export type StateAction =
   | { type: AppActions.DismissPasswordRequest }
   | { type: AppActions.UpdateChainInfo; payload: Partial<State.App> }
   | { type: AppActions.UpdateLoadings; payload: any }
-  | { type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }
+  | { type: AppActions.UpdateGlobalAlertDialog; payload: State.GlobalAlertDialog }
   | { type: AppActions.PopIn; payload: State.Popup }
   | { type: AppActions.PopOut }
   | { type: AppActions.ToggleTopAlertVisibility; payload?: boolean }
   | { type: AppActions.ToggleAllNotificationVisibility; payload?: boolean }
   | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
   | { type: AppActions.Ignore; payload?: any }
-  | { type: AppActions.UpdateExperimentalParams; payload: { tx: any; assetAccount?: any } | null }
+  | { type: AppActions.UpdateExperimentalParams; payload: State.Experimental | null }
   | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
+  | { type: AppActions.SetPageNotice; payload?: Omit<State.PageNotice, 'index'> }
+  | { type: AppActions.HideWaitForFullySynced }
   | { type: AppActions.GetFeeRateStats; payload: State.FeeRateStatsType }
   | { type: AppActions.UpdateCountDown; payload: number }
   | { type: NeuronWalletActions.InitAppState; payload: any }
@@ -108,6 +115,7 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateNervosDaoData; payload: State.NervosDAO }
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
   | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
+  | { type: AppActions.SignVerify; payload: string }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -135,9 +143,13 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       Object.assign(state.settings, { networks, wallets })
       state.updater = {
         checking: false,
+        isUpdated: false,
         downloadProgress: -1,
+        progressInfo: null,
         version: '',
+        releaseDate: '',
         releaseNotes: '',
+        errorMsg: '',
       }
       break
     }
@@ -189,7 +201,16 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       break
     }
     case NeuronWalletActions.UpdateSyncState: {
-      state.chain.syncState = action.payload
+      state.chain.syncState = {
+        ...action.payload,
+        syncStatus: getSyncStatus({
+          bestKnownBlockNumber: action.payload.bestKnownBlockNumber,
+          bestKnownBlockTimestamp: action.payload.bestKnownBlockTimestamp,
+          cacheTipBlockNumber: action.payload.cacheTipBlockNumber,
+          currentTimestamp: Date.now(),
+          url: getCurrentUrl(state.chain.networkID, state.settings.networks),
+        }),
+      }
       break
     }
     case NeuronWalletActions.UpdateAppUpdaterStatus: {
@@ -256,6 +277,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       state.app.send.description = action.payload
       break
     }
+    case AppActions.UpdateSendIsSendMax: {
+      state.app.send.isSendMax = action.payload
+      break
+    }
     case AppActions.UpdateGeneratedTx: {
       state.app.send.generatedTx = action.payload || null
       break
@@ -287,7 +312,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       /**
        * payload: { type, content }
        */
-      // NOTICE: for simplicty, only one notification will be displayed
+      // NOTICE: for simplicity, only one notification will be displayed
       state.app.notifications.push(action.payload)
       state.app.showTopAlert = true
       break
@@ -332,8 +357,8 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       Object.assign(state.app.loadings, action.payload)
       break
     }
-    case AppActions.UpdateAlertDialog: {
-      state.app.alertDialog = action.payload
+    case AppActions.UpdateGlobalAlertDialog: {
+      state.app.globalAlertDialog = action.payload
       break
     }
     case AppActions.PopIn: {
@@ -368,6 +393,19 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
         ...state.app.loadedTransaction,
         ...action.payload,
       }
+      break
+    }
+    case AppActions.SetPageNotice: {
+      state.app.pageNotice = action.payload
+        ? {
+            ...action.payload,
+            index: (state.app.pageNotice?.index ?? 0) + 1,
+          }
+        : action.payload
+      break
+    }
+    case AppActions.HideWaitForFullySynced: {
+      state.app.showWaitForFullySynced = false
       break
     }
 

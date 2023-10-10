@@ -74,7 +74,7 @@ export default {
       'wallet-password-more-than-max-length': '密碼不能超過{{maxPasswordLength}}字元。',
       'wallet-password-letter-complexity': '密碼需至少包含大寫字母、小寫字母、數位、特殊符號其中三類。',
       'current-wallet-not-set': '未設定當前錢包。',
-      'incorrect-password': '密碼不正確。',
+      'incorrect-password': '密碼错误',
       'invalid-address': '地址 {{address}} 無效。',
       'codehash-not-loaded': 'codehash 還未加載完成。',
       'wallet-not-found': '未找到錢包 {{id}}。',
@@ -117,15 +117,15 @@ export default {
       'multisig-config-exist': '多簽地址已經存在',
       'multisig-config-address-error': '多簽配置的地址設置不正確',
       'multisig-config-need-error': '多簽交易生成需要多簽配置',
-      'transaction-no-input-paramter': '查詢 Input Cell 缺少必要的參數',
+      'transaction-no-input-parameter': '查詢 Input Cell 缺少必要的參數',
       'migrate-sudt-no-type': '遷移的 sUDT Cell 沒有 type script',
       'multisig-lock-hash-mismatch': '當前多簽地址與需要確認交易不匹配',
       'multisig-not-signed': '多簽交易缺少部分簽名',
       'sudt-acp-have-data': '待銷毀的 sUDT 賬戶資產不為 0',
       'no-match-address-for-sign': '没有找到匹配的地址',
       'target-lock-error': 'CKB 資產只能轉賬到 secp256k1 或者 acp 地址',
-      'no-exist-ckb-node-data': '{{path}} 目錄下沒有找到 CKB Node 配置和數據, 點擊繼續重新同步',
-      'light-client-sudt-acp-error': '輕節點模式不支持發送資產給其他用戶的資產賬戶'
+      'no-exist-ckb-node-data': '{{path}} 目錄下沒有找到 CKB Node 配置和數據, 點擊確認重新同步',
+      'light-client-sudt-acp-error': '輕節點模式不支持發送資產給其他用戶的資產賬戶',
     },
     messageBox: {
       button: {
@@ -165,7 +165,7 @@ export default {
         title: '內置 CKB 節點',
         message: '缺少必要的依賴',
         detail:
-          'Neuron 內置的 CKB 節點需要安裝 x64 版本的 Microsoft Visual C++ Redistributable 才能正常運行。您需要安裝該組件來啟動內置節點。',
+          'Neuron 中的網絡節點依賴C++組件,請安裝 x64 最新版本的 Microsoft Visual C++Redistributable 來保證軟件正常運行。',
         buttons: {
           'install-and-exit': '安裝並退出',
         },
@@ -205,12 +205,6 @@ export default {
           cancel: '取消',
         },
       },
-      'node-version-different': {
-        message: '節點版本與 Neuron(v {{ version }}) 不壹致，請確認後使用',
-      },
-      'ckb-without-indexer': {
-        message: "請添加 '--indexer' 參數來啟動本地節點",
-      },
     },
     prompt: {
       password: {
@@ -236,7 +230,7 @@ export default {
     about: {
       'app-version': '{{name}} 版本: {{version}}',
       'ckb-client-version': 'CKB 節點版本: {{version}}',
-      'ckb-light-client-version': 'CKB 輕節點版本: {{version}}'
+      'ckb-light-client-version': 'CKB 輕節點版本: {{version}}',
     },
     settings: {
       title: {
@@ -246,6 +240,7 @@ export default {
     },
     'export-transactions': {
       'export-transactions': '導出交易歷史',
+      'export-success': '交易已導出',
       'transactions-exported': '{{total}} 條交易記錄已被導出至 {{file}}',
       column: {
         time: '時間',

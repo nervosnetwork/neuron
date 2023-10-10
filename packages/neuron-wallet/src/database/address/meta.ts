@@ -1,3 +1,4 @@
+import { bytes } from '@ckb-lumos/codec'
 import { Address, AddressVersion } from '../../models/address'
 import { AddressType } from '../../models/keys/address'
 import Script from '../../models/chain/script'
@@ -116,6 +117,6 @@ export default class AddressMeta implements Address {
   public generateChequeLockScriptWithReceiverLockHash(): Script {
     const defaultLockScript = this.generateDefaultLockScript()
     const assetAccountInfo = new AssetAccountInfo()
-    return assetAccountInfo.generateChequeScript(defaultLockScript.computeHash(), '0'.repeat(40))
+    return assetAccountInfo.generateChequeScript(defaultLockScript.computeHash(), bytes.hexify(Buffer.alloc(20)))
   }
 }

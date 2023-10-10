@@ -1,4 +1,4 @@
-import { getConnection, QueryRunner } from 'typeorm'
+import { getConnection, In, QueryRunner } from 'typeorm'
 import InputEntity from '../../database/chain/entities/input'
 import OutputEntity from '../../database/chain/entities/output'
 import TransactionEntity from '../../database/chain/entities/transaction'
@@ -9,6 +9,9 @@ import OutPoint from '../../models/chain/out-point'
 import Output, { OutputStatus } from '../../models/chain/output'
 import Transaction, { TransactionStatus } from '../../models/chain/transaction'
 import Input from '../../models/chain/input'
+import TxLockEntity from '../../database/chain/entities/tx-lock'
+import { CHEQUE_ARGS_LENGTH, DEFAULT_ARGS_LENGTH } from '../../utils/const'
+import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 
 export enum TxSaveType {
   Sent = 'sent',
@@ -42,7 +45,10 @@ export class TransactionPersistor {
   // After the tx is fetched:
   // 1. If the tx is not persisted before fetching, output = live, input = dead
   // 2. If the tx is already persisted before fetching, output = live, input = dead
-  private static saveWithFetch = async (transaction: Transaction): Promise<TransactionEntity> => {
+  private static saveWithFetch = async (
+    transaction: Transaction,
+    lockArgsSetNeedsDetail?: Set<string>
+  ): Promise<TransactionEntity> => {
     const connection = getConnection()
     const txEntity: TransactionEntity | undefined = await connection
       .getRepository(TransactionEntity)
@@ -190,14 +196,15 @@ export class TransactionPersistor {
       return txEntity
     }
 
-    return TransactionPersistor.create(transaction, OutputStatus.Live, OutputStatus.Dead)
+    return TransactionPersistor.create(transaction, OutputStatus.Live, OutputStatus.Dead, lockArgsSetNeedsDetail)
   }
 
   // only create, check exist before this
   public static create = async (
     transaction: Transaction,
     outputStatus: OutputStatus,
-    inputStatus: OutputStatus
+    inputStatus: OutputStatus,
+    lockArgsSetNeedsDetail?: Set<string>
   ): Promise<TransactionEntity> => {
     const connection = getConnection()
     const tx = new TransactionEntity()
@@ -263,6 +270,8 @@ export class TransactionPersistor {
     }
 
     const outputsData = transaction.outputsData!
+    const useTxInputs = await connection.getRepository(InputEntity).find({ outPointTxHash: tx.hash })
+    const useTxIndices = new Set(useTxInputs.map(v => v.outPointIndex))
     const outputs: OutputEntity[] = transaction.outputs.map((o, index) => {
       const output = new OutputEntity()
       output.outPointTxHash = transaction.hash || transaction.computeHash()
@@ -274,6 +283,9 @@ export class TransactionPersistor {
       output.lockHash = o.lockHash!
       output.transaction = tx
       output.status = outputStatus
+      if (useTxIndices.has(index.toString())) {
+        output.status = OutputStatus.Dead
+      }
       output.multiSignBlake160 = o.multiSignBlake160 || null
       if (o.type) {
         output.typeCodeHash = o.type.codeHash
@@ -297,22 +309,29 @@ export class TransactionPersistor {
       }
       return output
     })
+    let willSaveDetailInputs: InputEntity[] = inputs
+    let willSaveDetailOutputs: OutputEntity[] = outputs
+    let txLocks: TxLockEntity[] = []
+    if (lockArgsSetNeedsDetail?.size) {
+      willSaveDetailInputs = inputs.filter(v => this.shouldSaveDetail(v, lockArgsSetNeedsDetail))
+      willSaveDetailOutputs = outputs.filter(v => this.shouldSaveDetail(v, lockArgsSetNeedsDetail))
+      txLocks = await TransactionPersistor.findAndCreateTxLocks(
+        [...inputs, ...outputs],
+        lockArgsSetNeedsDetail,
+        tx.hash
+      )
+    }
 
-    const sliceSize = 100
+    const chunk = 100
     const queryRunner = connection.createQueryRunner()
     await TransactionPersistor.waitUntilTransactionFinished(queryRunner)
     await queryRunner.startTransaction()
     try {
       await queryRunner.manager.save(tx)
-      for (const slice of ArrayUtils.eachSlice(inputs, sliceSize)) {
-        await queryRunner.manager.save(slice)
-      }
-      for (const slice of ArrayUtils.eachSlice(previousOutputs, sliceSize)) {
-        await queryRunner.manager.save(slice)
-      }
-      for (const slice of ArrayUtils.eachSlice(outputs, sliceSize)) {
-        await queryRunner.manager.save(slice)
-      }
+      await queryRunner.manager.save(willSaveDetailInputs, { chunk })
+      await queryRunner.manager.save(previousOutputs, { chunk })
+      await queryRunner.manager.save(willSaveDetailOutputs, { chunk })
+      await queryRunner.manager.save(txLocks, { chunk })
       await queryRunner.commitTransaction()
     } catch (err) {
       logger.error('Database:\tcreate transaction error:', err)
@@ -342,7 +361,8 @@ export class TransactionPersistor {
   // when fetch a transaction, use TxSaveType.Fetch
   public static convertTransactionAndSave = async (
     transaction: Transaction,
-    saveType: TxSaveType
+    saveType: TxSaveType,
+    lockArgsSetNeedsDetail?: Set<string>
   ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
 
@@ -350,17 +370,21 @@ export class TransactionPersistor {
     if (saveType === TxSaveType.Sent) {
       txEntity = await TransactionPersistor.saveWithSent(tx)
     } else if (saveType === TxSaveType.Fetch) {
-      txEntity = await TransactionPersistor.saveWithFetch(tx)
+      txEntity = await TransactionPersistor.saveWithFetch(tx, lockArgsSetNeedsDetail)
     } else {
       throw new Error('Error TxSaveType!')
     }
     return txEntity
   }
 
-  public static saveFetchTx = async (transaction: Transaction): Promise<TransactionEntity> => {
+  public static saveFetchTx = async (
+    transaction: Transaction,
+    lockArgsSetNeedsDetail?: Set<string>
+  ): Promise<TransactionEntity> => {
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(
       transaction,
-      TxSaveType.Fetch
+      TxSaveType.Fetch,
+      lockArgsSetNeedsDetail
     )
     return txEntity
   }
@@ -372,6 +396,92 @@ export class TransactionPersistor {
     })
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity
+  }
+
+  private static shouldSaveDetail(cell: InputEntity | OutputEntity, lockArgsSetNeedsDetail: Set<string>) {
+    return (
+      (cell.multiSignBlake160 && lockArgsSetNeedsDetail.has(cell.multiSignBlake160)) ||
+      (cell.lockArgs &&
+        (lockArgsSetNeedsDetail.has(cell.lockArgs) ||
+          (cell.lockArgs.length === CHEQUE_ARGS_LENGTH &&
+            [cell.lockArgs.slice(0, DEFAULT_ARGS_LENGTH), `0x${cell.lockArgs.slice(DEFAULT_ARGS_LENGTH)}`].some(v =>
+              lockArgsSetNeedsDetail.has(v)
+            ))))
+    )
+  }
+
+  public static async checkTxLock() {
+    const resetTxLocks = await getConnection()
+      .getRepository(TxLockEntity)
+      .createQueryBuilder()
+      .select('transactionHash')
+      .where('lockArgs IN (SELECT publicKeyInBlake160 from hd_public_key_info)')
+      .getRawMany<{ transactionHash: string }>()
+    if (!resetTxLocks?.length) {
+      return
+    }
+    const resetTxHashes = resetTxLocks.map(v => v.transactionHash)
+    const queryRunner = getConnection().createQueryRunner()
+    await TransactionPersistor.waitUntilTransactionFinished(queryRunner)
+    await queryRunner.startTransaction()
+    try {
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(IndexerTxHashCache)
+        .set({ isProcessed: false })
+        .where({ txHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(TransactionEntity)
+        .where({ hash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(InputEntity)
+        .where({ transactionHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(OutputEntity)
+        .where({ outPointTxHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(TxLockEntity)
+        .where({ transactionHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.commitTransaction()
+    } catch (err) {
+      logger.error('Database:\tReset tx entity error:', err)
+      await queryRunner.rollbackTransaction()
+      throw err
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  private static findAndCreateTxLocks(
+    cells: (InputEntity | OutputEntity)[],
+    lockArgsSetNeedsDetail: Set<string>,
+    txHash: string
+  ) {
+    const lockHashArgs: Record<string, string> = {}
+    const lockHashSet = new Set(
+      cells
+        .filter(v => v.lockHash && !this.shouldSaveDetail(v, lockArgsSetNeedsDetail))
+        .map(v => {
+          if (v.lockHash) {
+            lockHashArgs[v.lockHash] = v.lockArgs!
+          }
+          return v.lockHash!
+        })
+    )
+    return [...lockHashSet].map(v => TxLockEntity.fromObject({ txHash, lockHash: v, lockArgs: lockHashArgs[v] }))
   }
 }
 

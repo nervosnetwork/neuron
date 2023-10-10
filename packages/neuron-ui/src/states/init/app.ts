@@ -26,7 +26,8 @@ export const appState: State.App = {
     ],
     price: INIT_SEND_PRICE,
     description: '',
-    generatedTx: '',
+    generatedTx: null,
+    isSendMax: false,
   },
   passwordRequest: {
     actionType: null,
@@ -42,7 +43,7 @@ export const appState: State.App = {
   popups: [],
   globalDialog: null,
   notifications: initNotifications,
-  alertDialog: null,
+  globalAlertDialog: null,
   loadings: {
     sending: false,
     addressList: false,
@@ -52,6 +53,7 @@ export const appState: State.App = {
   showAllNotifications: false,
   isAllowedToFetchList: true,
   loadedTransaction: null,
+  showWaitForFullySynced: true,
 }
 
 export default appState

@@ -1,12 +1,22 @@
 import { t } from 'i18next'
 import NetworksService from '../../src/services/networks'
-import { Network } from '../../src/models/network'
+import { MAINNET_GENESIS_HASH, Network, NetworkType, TESTNET_GENESIS_HASH } from '../../src/models/network'
+import { BUNDLED_CKB_URL, BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from '../../src/utils/const'
 
 const ERROR_MESSAGE = {
   MISSING_ARG: `Missing required argument`,
   NAME_USED: `Network name is used`,
   NETWORK_ID_NOT_FOUND: `messages.network-not-found`,
 }
+
+const uuidV4Mock = jest.fn()
+uuidV4Mock.mockReturnValue('mock uuid')
+
+jest.mock('uuid', () => {
+  return {
+    v4: () => uuidV4Mock(),
+  }
+})
 
 describe(`Unit tests of networks service`, () => {
   const newNetwork: Network = {
@@ -16,6 +26,7 @@ describe(`Unit tests of networks service`, () => {
     genesisHash: '0x',
     id: '',
     chain: 'ckb',
+    readonly: true,
   }
 
   const newNetworkWithDefaultTypeOf1 = {
@@ -51,7 +62,7 @@ describe(`Unit tests of networks service`, () => {
       expect(currentNetworkID).toBe('mainnet')
     })
 
-    it(`getting a non-exsiting network should return null`, () => {
+    it(`getting a non-existing network should return null`, () => {
       const id = `not-existing-id`
       const network = service.get(id)
       expect(network).toBeNull()
@@ -174,6 +185,78 @@ describe(`Unit tests of networks service`, () => {
     it(`activate network which is not existing`, () => {
       const id = `not-existing-id`
       expect(service.activate(id)).rejects.toThrowError(t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
+    })
+  })
+
+  describe('test migrate network', () => {
+    const readSyncMock = jest.fn()
+    const writeSyncMock = jest.fn()
+    const updateAllMock = jest.fn()
+    const defaultMainnetNetwork = {
+      id: 'mainnet',
+      name: 'Internal Node',
+      remote: BUNDLED_CKB_URL,
+      genesisHash: MAINNET_GENESIS_HASH,
+      chain: 'ckb',
+      type: NetworkType.Default,
+      readonly: true,
+    }
+    const defaultLightClientNetwork = {
+      id: 'light_client_testnet',
+      name: 'Light Client Testnet',
+      remote: BUNDLED_LIGHT_CKB_URL,
+      genesisHash: TESTNET_GENESIS_HASH,
+      type: NetworkType.Light,
+      chain: LIGHT_CLIENT_TESTNET,
+      readonly: true,
+    }
+    beforeEach(() => {
+      service.readSync = readSyncMock
+      service.writeSync = writeSyncMock
+      service.updateAll = updateAllMock
+    })
+    afterEach(() => {
+      readSyncMock.mockReset()
+    })
+    it('has migrate', () => {
+      readSyncMock.mockReturnValue(true)
+      //@ts-ignore private-method
+      service.migrateNetwork()
+      expect(writeSyncMock).toBeCalledTimes(0)
+    })
+    it('not find the default network', () => {
+      readSyncMock.mockReturnValueOnce(false).mockReturnValueOnce([])
+      //@ts-ignore private-method
+      service.migrateNetwork()
+      expect(writeSyncMock).toBeCalledWith('MigrateNetwork', true)
+      expect(updateAllMock).toBeCalledTimes(0)
+    })
+    it('not change the default network', () => {
+      readSyncMock.mockReturnValueOnce(false).mockReturnValueOnce([defaultMainnetNetwork, defaultLightClientNetwork])
+      //@ts-ignore private-method
+      service.migrateNetwork()
+      expect(writeSyncMock).toBeCalledWith('MigrateNetwork', true)
+      expect(updateAllMock).toBeCalledWith([defaultMainnetNetwork, defaultLightClientNetwork])
+    })
+    it('change the default network', () => {
+      readSyncMock
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce([{ ...defaultMainnetNetwork, name: 'changed name' }, defaultLightClientNetwork])
+      uuidV4Mock.mockReturnValueOnce('uuidv4')
+      //@ts-ignore private-method
+      service.migrateNetwork()
+      expect(writeSyncMock).toBeCalledWith('MigrateNetwork', true)
+      expect(updateAllMock).toBeCalledWith([
+        defaultMainnetNetwork,
+        defaultLightClientNetwork,
+        {
+          ...defaultMainnetNetwork,
+          id: 'uuidv4',
+          name: 'changed name',
+          readonly: false,
+          type: NetworkType.Normal,
+        },
+      ])
     })
   })
 })

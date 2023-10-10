@@ -1,6 +1,6 @@
 import type Transaction from '../../models/chain/transaction'
 import WitnessArgs from '../../models/chain/witness-args'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs } from '../../utils/serialization'
 import AddressService from '../../services/addresses'
 import TransactionSender from '../../services/transaction-sender'
 import Multisig from '../../models/multisig'
@@ -118,10 +118,10 @@ export abstract class Hardware {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-        const signture = await this.signTransaction(walletID, tx, serializedWitnesses, path, context)
+        const signature = await this.signTransaction(walletID, tx, serializedWitnesses, path, context)
         const witnessEntry = witnessSigningEntries.find(w => w.lockHash === lockHash)!
         witnessEntry.witness = serializeWitnessArgs({
-          lock: '0x' + signture,
+          lock: '0x' + signature,
           inputType: witnessEntry.witnessArgs.inputType ?? '',
           outputType: '',
         })

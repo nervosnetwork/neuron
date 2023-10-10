@@ -1,29 +1,26 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
-import { action } from '@storybook/addon-actions'
+import { Meta, StoryObj } from '@storybook/react'
 import Navbar from 'containers/Navbar'
-import { initStates, NeuronWalletContext } from 'states'
+import { withRouter } from 'storybook-addon-react-router-v6'
+import { initStates } from 'states'
 
 const wallets: State.WalletIdentity[] = [{ id: 'wallet id', name: 'wallet name' }]
 
-const stories = storiesOf('Navbar', module).addDecorator(StoryRouter())
+const meta: Meta<typeof Navbar> = {
+  component: Navbar,
+  decorators: [withRouter],
+  argTypes: {
+    wallet: { control: 'object', isGlobal: true },
+    settings: { control: 'object', isGlobal: true },
+  },
+}
 
-const dispatch = (dispatchAction: any) => action('dispatch')(dispatchAction)
+export default meta
 
-stories.add('Basic', () => {
-  return (
-    <NeuronWalletContext.Provider
-      value={{
-        state: {
-          ...initStates,
-          wallet: { ...initStates.wallet, id: 'wallet id', name: '中文钱包的名字最多可以达到二十个中文字符' },
-          settings: { ...initStates.settings, wallets },
-        },
-        dispatch,
-      }}
-    >
-      <Navbar />
-    </NeuronWalletContext.Provider>
-  )
-})
+type Story = StoryObj<typeof Navbar>
+
+export const Default: Story = {
+  args: {
+    wallet: { ...initStates.wallet, id: 'wallet id', name: '中文钱包的名字最多可以达到二十个中文字符' },
+    settings: { ...initStates.settings, wallets },
+  },
+}

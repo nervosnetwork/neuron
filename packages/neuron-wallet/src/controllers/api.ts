@@ -11,6 +11,7 @@ import {
   Menu,
   screen,
   BrowserWindow,
+  nativeTheme,
 } from 'electron'
 import { t } from 'i18next'
 import path from 'path'
@@ -23,7 +24,7 @@ import { ConnectionStatusSubject } from '../models/subjects/node'
 import NetworksService from '../services/networks'
 import WalletsService from '../services/wallets'
 import SettingsService, { Locale } from '../services/settings'
-import { ResponseCode, SETTINGS_WINDOW_TITLE, SETTINGS_WINDOW_WIDTH } from '../utils/const'
+import { ResponseCode } from '../utils/const'
 import { clean as cleanChain } from '../database/chain'
 import WalletsController from '../controllers/wallets'
 import TransactionsController from '../controllers/transactions'
@@ -59,6 +60,8 @@ import startMonitor, { stopMonitor } from '../services/monitor'
 import { migrateCkbData } from '../services/ckb-runner'
 import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
+import { resetSyncTaskQueue } from '../block-sync-renderer'
+import DataUpdateSubject from '../models/subjects/data-update'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -80,6 +83,8 @@ export default class ApiController {
     this.#registerHandlers()
 
     await this.#networksController.start()
+
+    nativeTheme.themeSource = SettingsService.getInstance().themeSource
   }
 
   public runCommand(command: Command, params: string) {
@@ -90,9 +95,14 @@ export default class ApiController {
         break
       }
       case 'import-xpubkey': {
-        this.#walletsController.importXPubkey().catch(error => {
-          dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
-        })
+        this.#walletsController
+          .importXPubkey()
+          .then(() => {
+            DataUpdateSubject.next({ dataType: 'new-xpubkey-wallet', actionType: 'create' })
+          })
+          .catch(error => {
+            dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+          })
         break
       }
       case 'delete-wallet':
@@ -265,12 +275,34 @@ export default class ApiController {
       return (SettingsService.getInstance().locale = locale)
     })
 
+    handle('is-dark', async () => {
+      return {
+        status: ResponseCode.Success,
+        result: nativeTheme.shouldUseDarkColors,
+      }
+    })
+
+    handle('set-theme', async (_, theme: 'system' | 'light' | 'dark') => {
+      SettingsService.getInstance().themeSource = theme
+      return {
+        status: ResponseCode.Success,
+      }
+    })
+
     handle('is-ckb-run-external', () => {
       return {
         status: ResponseCode.Success,
         result: NodeService.getInstance().isCkbNodeExternal,
       }
     })
+
+    handle('verify-external-ckb-node', async () => {
+      return {
+        status: ResponseCode.Success,
+        result: await NodeService.getInstance().verifyExternalCkbNode(),
+      }
+    })
+
     // Wallets
 
     handle('get-all-wallets', async () => {
@@ -297,9 +329,19 @@ export default class ApiController {
       return this.#walletsController.create(params)
     })
 
-    handle('update-wallet', async (_, params: { id: string; password: string; name: string; newPassword?: string }) => {
-      return this.#walletsController.update(params)
-    })
+    handle(
+      'update-wallet',
+      async (
+        _,
+        params: { id: string; password?: string; name?: string; newPassword?: string; startBlockNumber?: string }
+      ) => {
+        const res = this.#walletsController.update(params)
+        if (params.startBlockNumber) {
+          resetSyncTaskQueue.asyncPush(true)
+        }
+        return res
+      }
+    )
 
     handle('delete-wallet', async (_, { id = '', password = '' }) => {
       return this.#walletsController.delete({ id, password })
@@ -415,28 +457,6 @@ export default class ApiController {
       }
     )
 
-    handle('show-transaction-details', async (_, hash: string) => {
-      const win = showWindow(
-        `#/transaction/${hash}`,
-        t(`messageBox.transaction.title`, { hash }),
-        {
-          height: 750,
-        },
-        undefined,
-        win => win.webContents.getURL().endsWith(`#/transaction/${hash}`)
-      )
-
-      if (win.isVisible()) return
-
-      return new Promise((resolve, reject) => {
-        win.once('ready-to-show', resolve)
-        CommonUtils.sleep(3e3).then(() => {
-          win.off('ready-to-show', resolve)
-          reject(new Error('Show window timeout'))
-        })
-      })
-    })
-
     handle('export-transactions', async (_, params: { walletID: string }) => {
       return this.#transactionsController.exportTransactions(params)
     })
@@ -507,7 +527,15 @@ export default class ApiController {
     })
 
     handle('create-network', async (_, { name, remote, type = NetworkType.Normal }: Network) => {
-      return this.#networksController.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
+      return this.#networksController.create({
+        name,
+        remote,
+        type,
+        genesisHash: '0x',
+        chain: 'ckb',
+        id: '',
+        readonly: false,
+      })
     })
 
     handle('update-network', async (_, { networkID, options }: { networkID: string; options: Partial<Network> }) => {
@@ -532,18 +560,20 @@ export default class ApiController {
       new UpdateController().checkUpdates()
     })
 
+    handle('cancel-check-updates', async () => {
+      new UpdateController().cancelCheckUpdates()
+    })
+
     handle('download-update', async () => {
-      new UpdateController(false).downloadUpdate()
+      new UpdateController(true).downloadUpdate()
+    })
+
+    handle('cancel-download-update', async () => {
+      new UpdateController(false).cancelDownloadUpdate()
     })
 
     handle('quit-and-install-update', async () => {
       new UpdateController(false).quitAndInstall()
-    })
-
-    // Settings
-
-    handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, t(SETTINGS_WINDOW_TITLE), { width: SETTINGS_WINDOW_WIDTH })
     })
 
     handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
@@ -560,15 +590,9 @@ export default class ApiController {
 
     handle('set-ckb-node-data-path', async (_, { dataPath, clearCache }: { dataPath: string; clearCache: boolean }) => {
       if (!clearCache && !fs.existsSync(path.join(dataPath, 'ckb.toml'))) {
-        const { response } = await dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
-          type: 'info',
+        return {
+          status: ResponseCode.Fail,
           message: t('messages.no-exist-ckb-node-data', { path: dataPath }),
-          buttons: [t('common.ok'), t('common.cancel')],
-        })
-        if (response === 1) {
-          return {
-            status: ResponseCode.Fail,
-          }
         }
       }
       await cleanChain()
@@ -679,7 +703,7 @@ export default class ApiController {
     })
 
     handle('generate-destroy-asset-account-tx', async (_, params: { walletID: string; id: number }) => {
-      return this.#assetAccountController.destoryAssetAccount(params)
+      return this.#assetAccountController.destroyAssetAccount(params)
     })
 
     // Hardware wallet
@@ -783,7 +807,7 @@ export default class ApiController {
     //light client
     handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
       return {
-        result: (await SyncProgressService.getSyncProgressByHashes(hashes)),
+        result: await SyncProgressService.getSyncProgressByHashes(hashes),
         status: ResponseCode.Success,
       }
     })

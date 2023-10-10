@@ -27,9 +27,9 @@ export interface AddressMetaInfo {
 export default class AddressService {
   private static minUnusedAddressCount: number = 3
 
-  private static createQueue = queueWrapper(AddressService.create)
-
   public static generateAndSaveForPublicKeyQueue = queueWrapper(AddressService.generateAndSaveForPublicKey)
+
+  public static generateAndSaveForExtendedKeyQueue = queueWrapper(AddressService.generateAndSaveForExtendedKey)
 
   private static async create({ addresses }: { addresses: AddressInterface[] }) {
     const walletIds = new Set(addresses.map(v => v.walletId))
@@ -74,8 +74,7 @@ export default class AddressService {
     )
 
     const generatedAddresses: AddressInterface[] = [...addresses.receiving, ...addresses.change]
-    await AddressService.createQueue.asyncPush({ addresses: generatedAddresses })
-
+    await AddressService.create({ addresses: generatedAddresses })
     return generatedAddresses
   }
 
@@ -119,7 +118,7 @@ export default class AddressService {
       changeCount
     )
 
-    //resursive check and generate addresses
+    // recursive check and generate addresses
     const nextGeneratedAddresses = await this.recursiveGenerateAndSave(
       walletId,
       extendedKey,
@@ -141,23 +140,29 @@ export default class AddressService {
     return allGeneratedAddresses
   }
 
-  public static async generateAndSaveForExtendedKey(
-    walletId: string,
-    extendedKey: AccountExtendedPublicKey,
-    isImporting: boolean | undefined,
-    receivingAddressCount: number = DefaultAddressNumber.Receiving,
-    changeAddressCount: number = DefaultAddressNumber.Change
-  ): Promise<AddressInterface[] | undefined> {
-    const generatedAddresses = await this.recursiveGenerateAndSave(
+  public static async generateAndSaveForExtendedKey({
+    walletId,
+    extendedKey,
+    isImporting,
+    receivingAddressCount,
+    changeAddressCount,
+  }: {
+    walletId: string
+    extendedKey: AccountExtendedPublicKey
+    isImporting?: boolean
+    receivingAddressCount?: number
+    changeAddressCount?: number
+  }) {
+    const generatedAddresses = await AddressService.recursiveGenerateAndSave(
       walletId,
       extendedKey,
       isImporting,
-      receivingAddressCount,
-      changeAddressCount
+      receivingAddressCount ?? DefaultAddressNumber.Receiving,
+      changeAddressCount ?? DefaultAddressNumber.Change
     )
 
     if (generatedAddresses) {
-      this.notifyAddressCreated(generatedAddresses, isImporting)
+      AddressService.notifyAddressCreated(generatedAddresses, isImporting)
     }
 
     return generatedAddresses
@@ -201,7 +206,7 @@ export default class AddressService {
     await getConnection().manager.save(publicKeyInfo)
 
     const addressMeta = AddressMeta.fromHdPublicKeyInfoModel(publicKeyInfo.toModel())
-    this.notifyAddressCreated([addressMeta], undefined)
+    AddressService.notifyAddressCreated([addressMeta], undefined)
   }
 
   // Generate both receiving and change addresses.

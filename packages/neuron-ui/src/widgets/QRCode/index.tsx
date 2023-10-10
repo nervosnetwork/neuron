@@ -1,13 +1,7 @@
 /* eslint-disable no-bitwise */
-import React, { useEffect, useRef, useCallback } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { clipboard, nativeImage } from 'electron'
 import canvg from 'canvg'
-import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
-import { addPopup } from 'states/stateProvider/actionCreators'
-import { StateDispatch } from 'states/stateProvider/reducer'
-import { ReactComponent as Copy } from 'widgets/Icons/TinyCopy.svg'
-import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
 import styles from './qrcode.module.scss'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -77,99 +71,87 @@ const generatePath = (cells: boolean[][], margin: number = 0): string => {
   return ops.join('')
 }
 
-const QRCode = ({
-  value,
-  size = 110,
-  scale = 4,
-  level = ErrorCorrectLevel.Q,
-  bgColor = '#FFF',
-  fgColor = '#000',
-  includeMargin = false,
-  dispatch,
-}: {
-  value: string
-  size: number
-  scale?: number
-  level?: ErrorCorrectLevel
-  bgColor?: string
-  fgColor?: string
-  includeMargin?: boolean
-  dispatch: StateDispatch
-}) => {
-  const [t] = useTranslation()
-  const qrcode = new QRCodeImpl(-1, level)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  qrcode.addData(convertStr(value))
-  qrcode.make()
+const QRCode = forwardRef(
+  (
+    {
+      value,
+      size = 110,
+      scale = 4,
+      level = ErrorCorrectLevel.Q,
+      bgColor = '#FFF',
+      fgColor = '#000',
+      includeMargin = false,
+      className = '',
+    }: {
+      value: string
+      size: number
+      scale?: number
+      level?: ErrorCorrectLevel
+      bgColor?: string
+      fgColor?: string
+      includeMargin?: boolean
+      className?: string
+    },
+    ref?: React.LegacyRef<HTMLDivElement>
+  ) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+    const svgStr = useMemo(() => {
+      const qrcode = new QRCodeImpl(-1, level)
+      qrcode.addData(convertStr(value))
+      qrcode.make()
 
-  const cells = qrcode.modules || []
-  const margin = includeMargin ? 3 : 0
-  const fgPath = generatePath(cells, margin)
-  const numCells = cells.length + margin * 2
+      const cells = qrcode.modules || []
+      const margin = includeMargin ? 1 : 0
+      const fgPath = generatePath(cells, margin)
+      const numCells = cells.length + margin * 2
+      return `<svg shapeRendering="crispEdges"
+      width="${scale * size}"
+      height="${scale * size}"
+      viewBox="0 0 ${numCells} ${numCells}"
+    >
+      <path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" />
+      <path fill="${fgColor}" d="${fgPath}" />
+    </svg>`
+    }, [value, includeMargin, size, scale, bgColor, fgColor, level])
 
-  const svgStr = `<svg shapeRendering="crispEdges"
-    width="${scale * size}"
-    height="${scale * size}"
-    viewBox="0 0 ${numCells} ${numCells}"
-  >
-    <path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" />
-    <path fill="${fgColor}" d="${fgPath}" />
-  </svg>`
+    useEffect(() => {
+      if (canvasRef.current !== null) {
+        canvg(canvasRef.current, svgStr, {
+          enableRedraw: false,
+          ignoreMouse: true,
+          renderCallback: () => {
+            if (canvasRef.current) {
+              canvasRef.current.setAttribute(`style`, `width:${size}px;height:${size}px`)
+            }
+          },
+        })
+      }
+    }, [svgStr, size])
 
-  const onDownload = useCallback(() => {
-    if (canvasRef.current === null) {
-      return
-    }
-    const dataURL = canvasRef.current.toDataURL('image/png')
-    const downloadLink = document.createElement('a')
-    downloadLink.download = 'ckb-address'
-    downloadLink.href = dataURL
-    window.document.body.appendChild(downloadLink)
-    downloadLink.click()
-    window.document.body.removeChild(downloadLink)
-  }, [])
-
-  const onCopy = useCallback(() => {
-    if (canvasRef.current === null) {
-      return
-    }
-    const dataURL = canvasRef.current.toDataURL('image/png')
-    const img = nativeImage.createFromDataURL(dataURL)
-    clipboard.writeImage(img)
-    addPopup('qrcode-copied')(dispatch)
-  }, [dispatch])
-
-  useEffect(() => {
-    if (canvasRef.current !== null) {
-      canvg(canvasRef.current, svgStr, {
-        enableRedraw: false,
-        ignoreMouse: true,
-        renderCallback: () => {
-          if (canvasRef.current) {
-            canvasRef.current.setAttribute(`style`, `width:${size}px;height:${size}px`)
-          }
-        },
-      })
-    }
-  }, [svgStr, size])
-
-  return (
-    <div className={styles.qrcode}>
-      <div className={styles.pic}>
-        <canvas ref={canvasRef} width={size} height={size} />
+    return (
+      <div className={`${styles.qrcode} ${className}`} ref={ref}>
+        <div className={styles.pic}>
+          <canvas ref={canvasRef} width={size} height={size} />
+        </div>
       </div>
-      <div className={styles.actions}>
-        <Button type="default" label={t('qrcode.copy')} onClick={onCopy}>
-          <Copy />
-        </Button>
-        <Button type="default" label={t('qrcode.save')} onClick={onDownload}>
-          <Download />
-        </Button>
-      </div>
-    </div>
-  )
-}
+    )
+  }
+)
 
-QRCode.display = 'QRCode'
+QRCode.displayName = 'QRCode'
 
 export default QRCode
+
+export const downloadCanvas = (canvas: HTMLCanvasElement) => {
+  const dataURL = canvas.toDataURL('image/png')
+  const downloadLink = document.createElement('a')
+  downloadLink.download = 'ckb-address'
+  downloadLink.href = dataURL
+  downloadLink.click()
+}
+
+export const copyCanvas = (canvas: HTMLCanvasElement) => {
+  const dataURL = canvas.toDataURL('image/png')
+  const img = nativeImage.createFromDataURL(dataURL)
+  clipboard.writeImage(img)
+}

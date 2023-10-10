@@ -1,4 +1,4 @@
-import HexUtils from '../../utils/hex'
+import { BI } from '@ckb-lumos/bi'
 import TypeChecker from '../../utils/type-checker'
 
 export default class OutPoint {
@@ -21,7 +21,7 @@ export default class OutPoint {
   public toSDK(): CKBComponents.OutPoint {
     return {
       txHash: this.txHash,
-      index: HexUtils.toHex(this.index),
+      index: BI.from(this.index).toHexString(),
     }
   }
 

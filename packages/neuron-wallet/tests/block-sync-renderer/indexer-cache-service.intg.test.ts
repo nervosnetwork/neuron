@@ -9,24 +9,39 @@ import RpcService from '../../src/services/rpc-service'
 
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
-const stubbedGetTransactionsByLockScriptFn = jest.fn()
+const stubbedCollectFn = jest.fn(() => {
+  return {
+    [Symbol.asyncIterator]: () => {
+      return {
+        next: async () => {
+          return { done: true }
+        },
+      }
+    },
+  }
+})
+const ckbRpcUrl = 'http://localhost:8114'
+const stubbedGetTipBlockNumberFn = jest.fn()
 
 const stubbedRPCServiceConstructor = jest.fn().mockImplementation(() => ({
   getTransaction: stubbedGetTransactionFn,
   getHeader: stubbedGetHeaderFn,
+  getTipBlockNumber: stubbedGetTipBlockNumberFn,
 }))
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(() => ({
-  getTransactionsByLockScript: stubbedGetTransactionsByLockScriptFn,
+  ckbRpcUrl,
 }))
 
 const stubbedTransactionCollectorConstructor = jest.fn()
-const stubbedCellCollectorConstructor = jest.fn()
+const stubbedCellCollectorConstructor = jest.fn().mockImplementation(() => ({
+  collect: stubbedCollectFn,
+}))
 
 const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedGetHeaderFn.mockReset()
-  stubbedGetTransactionsByLockScriptFn.mockReset()
+  stubbedGetTipBlockNumberFn.mockReset()
 
   mockGetTransactionHashes()
 }
@@ -58,39 +73,43 @@ const chequeLockScript = addressMeta.generateChequeLockScriptWithReceiverLockHas
 const acpLockScript = addressMeta.generateACPLockScript()
 const legacyAcpLockScript = addressMeta.generateLegacyACPLockScript()
 const formattedDefaultLockScript = {
-  code_hash: defaultLockScript.codeHash,
-  hash_type: defaultLockScript.hashType,
+  codeHash: defaultLockScript.codeHash,
+  hashType: defaultLockScript.hashType,
   args: defaultLockScript.args,
 }
 const formattedSingleMultiSignLockScript = {
-  code_hash: singleMultiSignLockScript.codeHash,
-  hash_type: singleMultiSignLockScript.hashType,
+  codeHash: singleMultiSignLockScript.codeHash,
+  hashType: singleMultiSignLockScript.hashType,
   args: singleMultiSignLockScript.args + '0'.repeat(14),
 }
 const formattedChequeLockScript = {
-  code_hash: chequeLockScript.codeHash,
-  hash_type: chequeLockScript.hashType,
+  codeHash: chequeLockScript.codeHash,
+  hashType: chequeLockScript.hashType,
   args: chequeLockScript.args,
 }
 const formattedAcpLockScript = {
-  code_hash: acpLockScript.codeHash,
-  hash_type: acpLockScript.hashType,
+  codeHash: acpLockScript.codeHash,
+  hashType: acpLockScript.hashType,
   args: acpLockScript.args,
 }
 const formattedLegacyAcpLockScript = {
-  code_hash: legacyAcpLockScript.codeHash,
-  hash_type: legacyAcpLockScript.hashType,
+  codeHash: legacyAcpLockScript.codeHash,
+  hashType: legacyAcpLockScript.hashType,
   args: legacyAcpLockScript.args,
 }
+
+const mockTipBlockNumber = '0x100'
 
 const mockGetTransactionHashes = (mocks: any[] = []) => {
   const stubbedConstructor = when(stubbedTransactionCollectorConstructor)
 
   for (const lock of [formattedDefaultLockScript, formattedAcpLockScript, formattedLegacyAcpLockScript]) {
     const { hashes } = mocks.find(mock => mock.lock === lock) || { hashes: [] }
-    stubbedConstructor.calledWith(expect.anything(), { lock }).mockReturnValue({
-      getTransactionHashes: jest.fn().mockReturnValue(hashes),
-    })
+    stubbedConstructor
+      .calledWith(expect.anything(), expect.objectContaining({ lock }), rpcService?.url, { includeStatus: false })
+      .mockReturnValue({
+        getTransactionHashes: jest.fn().mockReturnValue(hashes),
+      })
   }
 }
 const fakeBlock1 = { number: '1', hash: '1', timestamp: '1' }
@@ -123,30 +142,15 @@ describe('indexer cache service', () => {
 
     resetMocks()
 
-    jest.doMock('@nervina-labs/ckb-indexer', () => {
+    jest.doMock('@ckb-lumos/ckb-indexer', () => {
       return {
-        CkbIndexer: stubbedIndexerConstructor,
+        Indexer: stubbedIndexerConstructor,
         TransactionCollector: stubbedTransactionCollectorConstructor,
         CellCollector: stubbedCellCollectorConstructor,
       }
     })
 
-    when(stubbedCellCollectorConstructor)
-      .calledWith(expect.anything())
-      .mockReturnValue({
-        collect: () => {
-          return {
-            [Symbol.asyncIterator]: () => {
-              return {
-                next: async () => {
-                  return { done: true }
-                },
-              }
-            },
-          }
-        },
-      })
-
+    stubbedGetTipBlockNumberFn.mockResolvedValue(mockTipBlockNumber)
     rpcService = new stubbedRPCServiceConstructor()
     IndexerCacheService = require('../../src/block-sync-renderer/sync/indexer-cache-service').default
     indexerCacheService = new IndexerCacheService(walletId, addressMetas, rpcService, stubbedIndexerConstructor())
@@ -252,8 +256,8 @@ describe('indexer cache service', () => {
                     return {
                       done: false,
                       value: {
-                        out_point: {
-                          tx_hash: fakeTx2.transaction.hash,
+                        outPoint: {
+                          txHash: fakeTx2.transaction.hash,
                         },
                       },
                     }
@@ -271,21 +275,27 @@ describe('indexer cache service', () => {
 
         stubbedCellCollectorConstructor.mockReset()
         when(stubbedCellCollectorConstructor)
-          .calledWith(expect.anything(), {
-            lock: {
-              ...formattedSingleMultiSignLockScript,
-              args: formattedSingleMultiSignLockScript.args.slice(0, 42),
-            },
-            argsLen: 28,
-          })
+          .calledWith(
+            expect.anything(),
+            expect.objectContaining({
+              lock: {
+                ...formattedSingleMultiSignLockScript,
+                args: formattedSingleMultiSignLockScript.args.slice(0, 42),
+              },
+              argsLen: 28,
+            })
+          )
           .mockReturnValue(fakeCollectorObj)
-          .calledWith(expect.anything(), {
-            lock: {
-              ...formattedChequeLockScript,
-              args: formattedChequeLockScript.args.slice(0, 42),
-            },
-            argsLen: 40,
-          })
+          .calledWith(
+            expect.anything(),
+            expect.objectContaining({
+              lock: {
+                ...formattedChequeLockScript,
+                args: formattedChequeLockScript.args.slice(0, 42),
+              },
+              argsLen: 40,
+            })
+          )
           .mockReturnValue(fakeCollectorObj)
 
         newTxHashes = await indexerCacheService.upsertTxHashes()

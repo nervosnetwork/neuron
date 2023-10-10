@@ -4,13 +4,15 @@ import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
-import { TransactionCollector, CellCollector, CkbIndexer } from '@nervina-labs/ckb-indexer'
+import SyncInfoEntity from '../../database/chain/entities/sync-info'
+import { TransactionCollector, CellCollector, Indexer as CkbIndexer } from '@ckb-lumos/ckb-indexer'
 
 export default class IndexerCacheService {
   private addressMetas: AddressMeta[]
   private rpcService: RpcService
   private walletId: string
   private indexer: CkbIndexer
+  #cacheBlockNumberEntityMap: Map<string, SyncInfoEntity> = new Map()
 
   constructor(walletId: string, addressMetas: AddressMeta[], rpcService: RpcService, indexer: CkbIndexer) {
     for (const addressMeta of addressMetas) {
@@ -23,16 +25,6 @@ export default class IndexerCacheService {
     this.addressMetas = addressMetas
     this.rpcService = rpcService
     this.indexer = indexer
-  }
-
-  private async countTxHashes(): Promise<number> {
-    return getConnection()
-      .getRepository(IndexerTxHashCache)
-      .createQueryBuilder()
-      .where({
-        walletId: this.walletId,
-      })
-      .getCount()
   }
 
   private async getTxHashes(): Promise<IndexerTxHashCache[]> {
@@ -79,8 +71,10 @@ export default class IndexerCacheService {
   }
 
   private async fetchTxMapping(): Promise<Map<string, Array<{ address: string; lockHash: string }>>> {
-    const mappingsByTxHash = new Map()
+    const currentHeaderBlockNumber = await this.rpcService.getTipBlockNumber()
+    const mappingsByTxHash = new Map<string, Array<{ address: string; lockHash: string }>>()
     for (const addressMeta of this.addressMetas) {
+      const lastCacheBlockNumber = await this.getCachedBlockNumber(addressMeta.blake160)
       const lockScripts = [
         addressMeta.generateDefaultLockScript(),
         addressMeta.generateACPLockScript(),
@@ -91,13 +85,11 @@ export default class IndexerCacheService {
         const transactionCollector = new TransactionCollector(
           this.indexer,
           {
-            lock: {
-              code_hash: lockScript.codeHash,
-              hash_type: lockScript.hashType,
-              args: lockScript.args,
-            },
+            lock: lockScript,
+            fromBlock: lastCacheBlockNumber.value,
+            toBlock: currentHeaderBlockNumber,
           },
-          this.indexer.ckbRpcUrl,
+          this.rpcService.url,
           {
             includeStatus: false,
           }
@@ -132,15 +124,17 @@ export default class IndexerCacheService {
       for (const { lockScript, argsLen } of lockScriptsForCellCollection) {
         const cellCollector = new CellCollector(this.indexer, {
           lock: {
-            code_hash: lockScript.codeHash,
-            hash_type: lockScript.hashType,
+            codeHash: lockScript.codeHash,
+            hashType: lockScript.hashType,
             args: lockScript.args.slice(0, 42),
           },
           argsLen,
+          fromBlock: lastCacheBlockNumber.value,
+          toBlock: currentHeaderBlockNumber,
         })
 
         for await (const cell of cellCollector.collect()) {
-          const txHash = cell.out_point!.tx_hash!
+          const txHash = cell.outPoint!.txHash!
           mappingsByTxHash.set(txHash, [
             {
               address: addressMeta.address,
@@ -153,17 +147,42 @@ export default class IndexerCacheService {
     return mappingsByTxHash
   }
 
+  private async getCachedBlockNumber(blake160: string) {
+    let cacheBlockNumberEntity = this.#cacheBlockNumberEntityMap.get(blake160)
+    if (!cacheBlockNumberEntity) {
+      cacheBlockNumberEntity =
+        (await getConnection()
+          .getRepository(SyncInfoEntity)
+          .findOne({ name: SyncInfoEntity.getLastCachedKey(blake160) })) ??
+        SyncInfoEntity.fromObject({
+          name: SyncInfoEntity.getLastCachedKey(blake160),
+          value: '0x0',
+        })
+      this.#cacheBlockNumberEntityMap.set(blake160, cacheBlockNumberEntity)
+    }
+
+    return cacheBlockNumberEntity
+  }
+
+  private async saveCacheBlockNumber(cacheBlockNumber: string) {
+    const entities = this.addressMetas.map(v =>
+      SyncInfoEntity.fromObject({
+        name: SyncInfoEntity.getLastCachedKey(v.blake160),
+        value: cacheBlockNumber,
+      })
+    )
+    await getConnection().manager.save(entities, { chunk: 100 })
+  }
+
   public async upsertTxHashes(): Promise<string[]> {
+    const tipBlockNumber = await this.rpcService.getTipBlockNumber()
     const mappingsByTxHash = await this.fetchTxMapping()
 
     const fetchedTxHashes = [...mappingsByTxHash.keys()]
-    const fetchedTxHashCount = fetchedTxHashes.reduce((sum, txHash) => sum + mappingsByTxHash.get(txHash)!.length, 0)
-
-    const txCount = await this.countTxHashes()
-    if (fetchedTxHashCount === txCount) {
+    if (!fetchedTxHashes.length) {
+      await this.saveCacheBlockNumber(tipBlockNumber)
       return []
     }
-
     const txMetasCaches = await this.getTxHashes()
     const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
 
@@ -172,6 +191,7 @@ export default class IndexerCacheService {
     const newTxHashes = fetchedTxHashes.filter(hash => !cachedTxHashesSet.has(hash))
 
     if (!newTxHashes.length) {
+      await this.saveCacheBlockNumber(tipBlockNumber)
       return []
     }
 
@@ -196,29 +216,32 @@ export default class IndexerCacheService {
       fetchBlockDetailsQueue.drain(resolve)
     })
 
+    const indexerCaches: IndexerTxHashCache[] = []
     for (const txWithStatus of txsWithStatus) {
       const { transaction, txStatus } = txWithStatus
-      const mappings = mappingsByTxHash.get(transaction.hash!)!
+      const mappings = mappingsByTxHash.get(transaction.hash!)
+      if (!mappings) {
+        continue
+      }
 
       for (const { lockHash, address } of mappings) {
-        await getConnection()
-          .createQueryBuilder()
-          .insert()
-          .into(IndexerTxHashCache)
-          .values({
-            txHash: transaction.hash,
+        indexerCaches.push(
+          IndexerTxHashCache.fromObject({
+            txHash: transaction.hash!,
             blockNumber: parseInt(transaction.blockNumber!),
             blockHash: txStatus.blockHash!,
-            blockTimestamp: transaction.timestamp,
+            blockTimestamp: transaction.timestamp!,
             lockHash,
             address,
             walletId: this.walletId,
-            isProcessed: false,
           })
-          .execute()
+        )
       }
     }
+    indexerCaches.sort((a, b) => a.blockNumber - b.blockNumber)
+    await getConnection().manager.save(indexerCaches, { chunk: 100 })
 
+    await this.saveCacheBlockNumber(tipBlockNumber)
     return newTxHashes
   }
 

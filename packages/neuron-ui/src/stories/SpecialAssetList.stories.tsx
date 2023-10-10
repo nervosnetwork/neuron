@@ -1,9 +1,14 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import SpecialAssetList from 'components/SpecialAssetList'
 
-const stories = storiesOf('Special Asset List', module)
+const meta: Meta<typeof SpecialAssetList> = {
+  component: SpecialAssetList,
+  decorators: [withRouter],
+}
 
-stories.add('basic', () => {
-  return <SpecialAssetList />
-})
+export default meta
+
+type Story = StoryObj<typeof SpecialAssetList>
+
+export const Default: Story = {}

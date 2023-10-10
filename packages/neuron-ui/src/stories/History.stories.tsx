@@ -1,13 +1,8 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
-import { withKnobs, text, number, boolean } from '@storybook/addon-knobs'
-import { action } from '@storybook/addon-actions'
+import { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import History from 'components/History'
-import { initStates, NeuronWalletContext } from 'states'
+import { initStates } from 'states'
 import transactions from './data/transactions'
-
-const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
 
 const states: { [title: string]: any } = {
   'Has not transactions': {
@@ -69,7 +64,7 @@ const states: { [title: string]: any } = {
       },
     },
   },
-  '200 items and pageNo.2': {
+  '200 items and PageNo.2': {
     ...initStates,
     chain: {
       ...initStates.chain,
@@ -82,7 +77,7 @@ const states: { [title: string]: any } = {
       },
     },
   },
-  '200 items and pageNo.14': {
+  '200 items and PageNo.14': {
     ...initStates,
     chain: {
       ...initStates.chain,
@@ -97,44 +92,58 @@ const states: { [title: string]: any } = {
   },
 }
 
-const stories = storiesOf('History', module).addDecorator(StoryRouter())
+const meta: Meta<typeof History> = {
+  component: History,
+  decorators: [withRouter],
+  argTypes: {
+    chain: { control: 'object', isGlobal: true },
+  },
+}
 
-Object.entries(states).forEach(([title, state]) => {
-  stories.add(title, () => (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <History />
-    </NeuronWalletContext.Provider>
-  ))
-})
+export default meta
 
-stories.addDecorator(withKnobs).add('With knobs', () => {
-  const state = {
-    ...initStates,
+type Story = StoryObj<typeof History>
+
+export const HasNotTransactions: Story = {
+  args: {
     chain: {
       ...initStates.chain,
-      transactions: {
-        pageNo: number('Page No', 14),
-        pageSize: number('Page Size', 15),
-        totalCount: number('Total Count', 200),
-        items: transactions['Content List'].map((tx, idx) => ({
-          type: text(`${idx}-Type`, tx.type) as 'send' | 'receive',
-          createdAt: text(`${idx}-Created at`, tx.createdAt),
-          updatedAt: text(`${idx}-Updated at`, tx.updatedAt),
-          timestamp: text(`${idx}-Timestamp`, tx.timestamp),
-          value: text(`${idx}-Value`, tx.value),
-          hash: text(`${idx}-Hash`, tx.hash),
-          description: text(`${idx}-Description`, tx.description),
-          blockNumber: text(`${idx}-BlockNumber`, tx.blockNumber),
-          status: text(`${idx}-Status`, tx.status) as 'pending' | 'success' | 'failed',
-          nervosDao: boolean('nervos dao', true),
-        })),
-        keywords: '',
-      },
+      transactions: states['Has not transactions'].chain.transactions,
     },
-  }
-  return (
-    <NeuronWalletContext.Provider value={{ state, dispatch }}>
-      <History />
-    </NeuronWalletContext.Provider>
-  )
-})
+  },
+}
+
+export const OneItem: Story = {
+  args: { chain: { ...initStates.chain, transactions: states['1 item and PageNo.1'].chain.transactions } },
+  name: '1 item and PageNo.1',
+}
+
+export const MoreItem: Story = {
+  args: { chain: { ...initStates.chain, transactions: states['15 items and PageNo.1'].chain.transactions } },
+  name: '15 items and PageNo.1',
+}
+
+export const MorePage: Story = {
+  args: { chain: { ...initStates.chain, transactions: states['16 items and PageNo.2'].chain.transactions } },
+  name: '16 items and PageNo.2',
+}
+export const MoreItemOnPage: Story = {
+  args: {
+    chain: { ...initStates.chain, transactions: states['200 items and PageNo.1'].chain.transactions },
+  },
+  name: '200 items and PageNo.1',
+}
+
+export const MoreItemOnNextPage: Story = {
+  args: {
+    chain: { ...initStates.chain, transactions: states['200 items and PageNo.2'].chain.transactions },
+  },
+  name: '200 items and PageNo.2',
+}
+
+export const MoreItemOnPage14: Story = {
+  args: {
+    chain: { ...initStates.chain, transactions: states['200 items and PageNo.14'].chain.transactions },
+  },
+  name: '200 items and PageNo.14',
+}

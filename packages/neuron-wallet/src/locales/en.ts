@@ -76,7 +76,7 @@ export default {
       'wallet-password-letter-complexity':
         'Password must contain a combination of uppercase and lowercase letters, numbers and special symbols.',
       'current-wallet-not-set': 'Current wallet is not set.',
-      'incorrect-password': 'Password is incorrect.',
+      'incorrect-password': 'Password is incorrect',
       'invalid-address': 'Address {{address}} is invalid.',
       'codehash-not-loaded': 'codehash is not loaded.',
       'wallet-not-found': 'Wallet {{id}} not found.',
@@ -127,15 +127,16 @@ export default {
       'multisig-config-exist': 'The multisig config has exist',
       'multisig-config-address-error': 'The address setting of the multisig configuration is incorrect',
       'multisig-config-need-error': 'Multisig transaction generation requires multisig configuration',
-      'transaction-no-input-paramter': 'The query input cell is missing a required parameter',
+      'transaction-no-input-parameter': 'The query input cell is missing a required parameter',
       'migrate-sudt-no-type': 'The migrating cell does not have type script',
       'multisig-not-signed': 'Partial signatures are missing for multisig transactions',
       'multisig-lock-hash-mismatch': 'The current multisig address does not match the transaction to be approved',
       'sudt-acp-have-data': 'The destroying sUDT acp account have amount',
       'no-match-address-for-sign': 'Not found matched address',
       'target-lock-error': 'CKB asset account can only transfer to sepe256k1 or acp address',
-      'no-exist-ckb-node-data': '{{path}} has no CKB Node config and storage, press ok to synchronize from scratch',
-      'light-client-sudt-acp-error': "Light client mode doesn't support sending assets to other's asset account"
+      'no-exist-ckb-node-data':
+        '{{path}} has no CKB Node config and storage, press confirm to synchronize from scratch',
+      'light-client-sudt-acp-error': "Light client mode doesn't support sending assets to other's asset account",
     },
     messageBox: {
       button: {
@@ -175,7 +176,7 @@ export default {
       'ckb-dependency': {
         title: 'Bundled CKB Node',
         message: 'Dependency Required',
-        detail: `The embedded CKB node in Neuron requires x64 version of Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node.`,
+        detail: `The network nodes in Neuron rely on C++ components, so please install the latest version of Microsoft Visual C++Redistributable for x64 to ensure that the software runs properly.`,
         buttons: {
           'install-and-exit': 'Install and Exit',
         },
@@ -217,12 +218,6 @@ export default {
           cancel: 'Cancel',
         },
       },
-      'node-version-different': {
-        message: 'The node version is inconsistent with Neuron(v {{ version }}), please use after confirmation',
-      },
-      'ckb-without-indexer': {
-        message: "Please add '--indexer' option to start local node",
-      },
     },
     prompt: {
       password: {
@@ -248,7 +243,7 @@ export default {
     about: {
       'app-version': '{{name}} Version: {{version}}',
       'ckb-client-version': 'CKB Client Version: {{version}}',
-      'ckb-light-client-version': 'CKB Light Client Version: {{version}}'
+      'ckb-light-client-version': 'CKB Light Client Version: {{version}}',
     },
     settings: {
       title: {
@@ -258,6 +253,7 @@ export default {
     },
     'export-transactions': {
       'export-transactions': 'Export Transaction History',
+      'export-success': 'Transactions have been exported',
       'transactions-exported': '{{total}} transaction records have been exported to {{file}}',
       column: {
         time: 'Time',
@@ -277,7 +273,7 @@ export default {
     },
     'offline-signature': {
       'export-transaction': 'Export Transaction as JSON',
-      'transaction-exported': 'The transaction have beed exported to {{filePath}}.',
+      'transaction-exported': 'The transaction have been exported to {{filePath}}.',
       'load-transaction': 'Load Transaction file',
     },
     'multisig-config': {

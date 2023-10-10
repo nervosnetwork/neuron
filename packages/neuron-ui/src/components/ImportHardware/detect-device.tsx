@@ -2,9 +2,10 @@ import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { getDevices, getDeviceFirmwareVersion, getDeviceCkbAppVersion, connectDevice } from 'services/remote'
-import { isSuccessResponse, useDidMount, errorFormatter } from 'utils'
+import { isSuccessResponse, errorFormatter, useDidMount } from 'utils'
 import { ReactComponent as SuccessInfo } from 'widgets/Icons/SuccessInfo.svg'
-import { ReactComponent as FailedInfo } from 'widgets/Icons/FailedInfo.svg'
+import { Error as ErrorIcon } from 'widgets/Icons/icon'
+import Spinner from 'widgets/Spinner'
 import {
   CkbAppNotFoundException,
   ConnectFailedException,
@@ -16,30 +17,26 @@ import { ImportStep, ActionType, Model } from './common'
 import styles from './findDevice.module.scss'
 
 const Info = (
-  { isError, isScaning, msg }: { isError?: boolean; isScaning?: boolean; msg: string } = {
+  { isError, isWaiting, msg }: { isError?: boolean; isWaiting?: boolean; msg: string } = {
     isError: false,
-    isScaning: false,
+    isWaiting: false,
     msg: '',
   }
 ) => {
-  const [t] = useTranslation()
   if (isError) {
     return (
-      <>
-        <div className={styles.info}>
-          <span>
-            <FailedInfo />
-          </span>
-          <span className={styles.error}>{msg}</span>
-        </div>
-        <div className={styles.aborted}>{t('import-hardware.abort')}</div>
-      </>
+      <div className={styles.errorInfo}>
+        <span>
+          <ErrorIcon type="error" />
+        </span>
+        <span className={styles.error}>{msg}</span>
+      </div>
     )
   }
   return (
     <div className={styles.info}>
-      <span>{isScaning ? null : <SuccessInfo />}</span>
-      <span className={isScaning ? styles.scaning : ''}>{msg}</span>
+      <span>{isWaiting ? <Spinner size={1} /> : <SuccessInfo />}</span>
+      <span>{msg}</span>
     </div>
   )
 }
@@ -50,20 +47,20 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
     dispatch({ step: ImportStep.ImportHardware })
   }, [dispatch])
 
-  const [scaning, setScaning] = useState(true)
+  const [scanning, setScanning] = useState(true)
   const [error, setError] = useState('')
   const [appVersion, setAppVersion] = useState('')
   const [firmwareVersion, setFirmwareVersion] = useState('')
 
   const findDevice = useCallback(async () => {
     setError('')
-    setScaning(true)
+    setScanning(true)
     try {
       const res = await getDevices(model)
       if (isSuccessResponse(res) && Array.isArray(res.result) && res.result.length > 0) {
         const [device, ...rest] = res.result
         if (rest.length > 0) {
-          setScaning(false)
+          setScanning(false)
           throw new MultiDeviceException()
         }
         if (!model) {
@@ -74,10 +71,10 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
             },
           })
         }
-        const conectionRes = await connectDevice(device)
-        if (!isSuccessResponse(conectionRes)) {
-          setScaning(false)
-          throw new ConnectFailedException(errorFormatter(conectionRes.message, t))
+        const connectionRes = await connectDevice(device)
+        if (!isSuccessResponse(connectionRes)) {
+          setScanning(false)
+          throw new ConnectFailedException(errorFormatter(connectionRes.message, t))
         }
         const firmwareVersionRes = await getDeviceFirmwareVersion(device.descriptor)
         if (isSuccessResponse(firmwareVersionRes)) {
@@ -97,9 +94,9 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
         setError(err.message)
       }
     } finally {
-      setScaning(false)
+      setScanning(false)
     }
-  }, [model, setError, setScaning, t])
+  }, [model, setError, setScanning, t])
 
   useDidMount(() => {
     findDevice()
@@ -119,17 +116,16 @@ const DetectDevice = ({ dispatch, model }: { dispatch: React.Dispatch<ActionType
       <section className={styles.detect}>
         <h3 className={styles.model}>{productName}</h3>
         {errorMsg ? <Info isError msg={errorMsg} /> : null}
-        {scaning ? <Info isScaning={scaning} msg={t('import-hardware.waiting')} /> : null}
-        {firmwareVersion && !errorMsg && !scaning ? (
+        {scanning ? <Info isWaiting={scanning} msg={t('import-hardware.waiting')} /> : null}
+        {firmwareVersion && !errorMsg && !scanning ? (
           <Info msg={t('import-hardware.firmware-version', { version: firmwareVersion })} />
         ) : null}
         {appVersion ? <Info msg={t('import-hardware.app-version', { version: appVersion })} /> : null}
       </section>
-      <footer className={styles.footer}>
-        <Button type="cancel" label={t('import-hardware.actions.back')} onClick={onBack} />
-        {errorMsg ? (
-          <Button type="ok" label={t('import-hardware.actions.rescan')} onClick={findDevice} />
-        ) : (
+      <footer className={styles.dialogFooter}>
+        <Button type="cancel" label={t('import-hardware.actions.cancel')} onClick={onBack} />
+        {!scanning && errorMsg && <Button type="ok" label={t('import-hardware.actions.rescan')} onClick={findDevice} />}
+        {!scanning && !errorMsg && (
           <Button type="submit" label={t('import-hardware.actions.next')} onClick={onNext} disabled={!ready} />
         )}
       </footer>

@@ -1,6 +1,5 @@
-import React, { useCallback, useRef, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import Button from 'widgets/Button'
 import {
   useState as useGlobalState,
   useDispatch,
@@ -11,9 +10,7 @@ import {
   migrateAcp,
 } from 'states'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import Spinner from 'widgets/Spinner'
-import { useHistory } from 'react-router-dom'
-import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
+import { NavigateFunction } from 'react-router-dom'
 import {
   connectDevice,
   getDevices,
@@ -28,9 +25,11 @@ import {
   getPlatform,
 } from 'services/remote'
 import { ErrorCode, errorFormatter, isSuccessResponse, RoutePath, useDidMount } from 'utils'
-import DropdownButton from 'widgets/DropdownButton'
+import Dialog from 'widgets/Dialog'
+import AlertDialog from 'widgets/AlertDialog'
+import Button from 'widgets/Button'
+import { Export, Sign } from 'widgets/Icons/icon'
 import { CkbAppNotFoundException, DeviceNotFoundException } from 'exceptions'
-import SignError from './sign-error'
 import HDWalletSign from '../HDWalletSign'
 import styles from './hardwareSign.module.scss'
 
@@ -43,20 +42,19 @@ export interface HardwareSignProps {
   offlineSignType?: OfflineSignType
   onDismiss: () => void
   signMessage?: (password: string) => Promise<any>
-  history?: ReturnType<typeof useHistory>
+  navigate?: NavigateFunction
 }
 
 const HardwareSign = ({
   signType,
   signMessage,
-  history,
+  navigate,
   wallet,
   onDismiss,
   offlineSignJSON,
   offlineSignType,
 }: HardwareSignProps) => {
   const [t] = useTranslation()
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
   const dispatch = useDispatch()
   const onCancel = useCallback(
     (dismiss: boolean = true) => {
@@ -180,9 +178,9 @@ const HardwareSign = ({
   const ensureDeviceAvailable = useCallback(
     async (device: DeviceInfo) => {
       try {
-        const conectionRes = await connectDevice(device)
+        const connectionRes = await connectDevice(device)
         let { descriptor } = device
-        if (!isSuccessResponse(conectionRes)) {
+        if (!isSuccessResponse(connectionRes)) {
           // for win32, opening or closing the ckb app changes the HID descriptor(deviceInfo),
           // so if we can't connect to the device, we need to re-search device automatically.
           // for unix, the descriptor never changes unless user plugs the device into another USB port,
@@ -259,7 +257,7 @@ const HardwareSign = ({
             description,
           })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -272,7 +270,7 @@ const HardwareSign = ({
           }
           sendTransaction({ walletID: wallet.id, tx, description })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -288,7 +286,7 @@ const HardwareSign = ({
           }
           sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -310,7 +308,7 @@ const HardwareSign = ({
           }
           sendSUDTTransaction(params)(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(res.message)
             }
@@ -320,7 +318,7 @@ const HardwareSign = ({
         case 'migrate-acp': {
           await migrateAcp({ id: wallet.id })(dispatch).then(res => {
             if (isSuccessResponse(res)) {
-              history!.push(RoutePath.History)
+              navigate?.(RoutePath.History)
             } else {
               setError(typeof res.message === 'string' ? res.message : res.message.content ?? 'migrate-acp error')
             }
@@ -360,7 +358,7 @@ const HardwareSign = ({
     wallet.id,
     description,
     dispatch,
-    history,
+    navigate,
     signAndExportFromJSON,
     ensureDeviceAvailable,
     multisigConfig,
@@ -424,89 +422,54 @@ const HardwareSign = ({
   }, [offlineSignType, generatedTx, onCancel, description, experimental])
 
   useDidMount(() => {
-    dialogRef.current?.showModal()
     ensureDeviceAvailable(deviceInfo)
   })
 
-  const dialogClass = `${styles.dialog} ${wallet.isHD ? styles.hd : ''}`
-
-  const dropdownList = useMemo(() => {
-    return [
-      {
-        text: t('offline-sign.sign-and-export'),
-        onClick: signAndExportFromGenerateTx,
-        disabled: isNotAvailableToSign,
-        disabledMsg: isNotAvailableToSign ? status : undefined,
-      },
-    ]
-  }, [signAndExportFromGenerateTx, status, isNotAvailableToSign, t])
-
-  let container = (
-    <div className={styles.container}>
-      <header className={styles.title}>{t('hardware-sign.title')}</header>
-      <section className={styles.main}>
-        <table>
-          <tbody>
-            <tr>
-              <td className={styles.first}>{t('hardware-sign.device')}</td>
-              <td>
-                <HardWalletIcon />
-                <span>{productName}</span>
-              </td>
-            </tr>
-            <tr>
-              <td className={styles.first}>{t('hardware-sign.status.label')}</td>
-              <td className={isNotAvailableToSign ? styles.warning : ''}>{status}</td>
-            </tr>
-          </tbody>
-        </table>
-        {wallet.isHD ? <HDWalletSign tx={generatedTx} /> : null}
-      </section>
-      <footer className={styles.footer}>
-        {offlineSignJSON === undefined && signType === 'transaction' ? (
-          <div className={styles.left}>
-            <DropdownButton
-              mainBtnLabel={t('offline-sign.export')}
-              mainBtnOnClick={exportTransaction}
-              mainBtnDisabled={isLoading}
-              list={dropdownList}
-            />
-          </div>
-        ) : null}
-        <div className={styles.right}>
-          <Button type="cancel" label={t('hardware-sign.cancel')} onClick={onCancel} />
-          {(actionType || offlineSignActionType) === 'send-from-multisig' ? null : (
-            <>
-              {isNotAvailableToSign && (
-                <Button
-                  label={t('hardware-sign.actions.rescan')}
-                  type="submit"
-                  disabled={isLoading}
-                  onClick={reconnect}
-                >
-                  {isLoading ? <Spinner /> : (t('hardware-sign.actions.rescan') as string)}
-                </Button>
-              )}
-              {!isNotAvailableToSign && (
-                <Button label={t('sign-and-verify.sign')} type="submit" disabled={isLoading} onClick={sign}>
-                  {isLoading ? <Spinner /> : (t('sign-and-verify.sign') as string)}
-                </Button>
-              )}
-            </>
-          )}
-        </div>
-      </footer>
-    </div>
-  )
-
   if (error) {
-    container = <SignError onCancel={onCancel} error={error} />
+    return <AlertDialog show message={errorFormatter(error, t)} type="failed" onCancel={onCancel} />
   }
 
   return (
-    <dialog ref={dialogRef} className={dialogClass}>
-      {container}
-    </dialog>
+    <Dialog
+      show
+      title={t('hardware-sign.title')}
+      onCancel={onCancel}
+      showConfirm={(actionType || offlineSignActionType) !== 'send-from-multisig'}
+      confirmText={isNotAvailableToSign ? t('hardware-sign.actions.rescan') : t('sign-and-verify.sign')}
+      isLoading={isLoading}
+      onConfirm={isNotAvailableToSign ? reconnect : sign}
+    >
+      <div className={styles.container}>
+        <p>
+          {t('hardware-sign.device')}
+          <span>{productName}</span>
+        </p>
+        <p>
+          {t('hardware-sign.status.label')}
+          <span className={isNotAvailableToSign ? styles.warning : ''}>{status}</span>
+        </p>
+
+        <div>{wallet.isHD && generatedTx ? <HDWalletSign tx={generatedTx} /> : null}</div>
+
+        {offlineSignJSON === undefined && signType === 'transaction' ? (
+          <div className={styles.footer}>
+            <Button type="text" onClick={exportTransaction} disabled={isLoading}>
+              {t('offline-sign.export')} <Export />
+            </Button>
+            <div className={styles.divider} />
+            <Button
+              type="text"
+              className={styles.signAndExportFromGenerateTx}
+              onClick={signAndExportFromGenerateTx}
+              disabled={isNotAvailableToSign}
+              loading={!isNotAvailableToSign && isLoading}
+            >
+              {t('offline-sign.sign-and-export')} <Sign />
+            </Button>
+          </div>
+        ) : null}
+      </div>
+    </Dialog>
   )
 }
 

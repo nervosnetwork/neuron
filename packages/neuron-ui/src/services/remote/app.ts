@@ -15,7 +15,6 @@ export const getNeuronWalletState = remoteApi<void>('load-init-data')
 export const openInWindow = remoteApi<Controller.OpenInWindowParams>('open-in-window')
 export const requestOpenInExplorer = remoteApi<Controller.RequestOpenInExplorerParams, void>('request-open-in-explorer')
 export const handleViewError = remoteApi<string>('handle-view-error')
-export const showSettings = remoteApi<Controller.ShowSettingsParams>('show-settings')
 export const setLocale = remoteApi<(typeof LOCALES)[number]>('set-locale')
 export const getCkbNodeDataPath = remoteApi<void, string>('get-ckb-node-data-path')
 export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boolean }, string>(
@@ -25,6 +24,15 @@ export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
 export const getIsCkbRunExternal = remoteApi<void, boolean>('is-ckb-run-external')
 
+export type VerifyExternalCkbNodeRes =
+  | {
+      ckbIsCompatible: boolean | undefined
+      withIndexer: boolean
+      shouldUpdate: boolean
+    }
+  | undefined
+export const verifyExternalCkbNode = remoteApi<void, VerifyExternalCkbNodeRes>('verify-external-ckb-node')
+
 export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
 
 export const invokeShowErrorMessage = remoteApi<{ title: string; content: string }>('show-error-message')
@@ -33,3 +41,5 @@ export const invokeShowOpenDialogModal = remoteApi<OpenDialogOptions, OpenDialog
 export const invokeOpenContextMenu = remoteApi<Array<MenuItemConstructorOptions | MenuItem>>('open-context-menu')
 export const invokeGetAllDisplaysSize = remoteApi<void, Size[]>('get-all-displays-size')
 export const invokeShowMessageBox = remoteApi<MessageBoxOptions, MessageBoxReturnValue>('show-message-box')
+export const isDark = remoteApi<void, boolean>('is-dark')
+export const setTheme = remoteApi<'light' | 'dark', void>('set-theme')

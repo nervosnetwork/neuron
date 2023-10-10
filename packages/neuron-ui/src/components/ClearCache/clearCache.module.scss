@@ -1,0 +1,45 @@
+@import '../../styles/mixin.scss';
+
+.clearTime {
+  color: var(--input-second-color);
+  font-size: 12px;
+}
+
+.clearDialog {
+  height: 180px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-text-color);
+  }
+}
+
+.clearBtn {
+  &[disabled] {
+    opacity: 0.5;
+    box-shadow: none !important;
+    cursor: not-allowed;
+  }
+}
+
+.options {
+  min-width: 600px;
+  label {
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 24px;
+    color: var(--main-text-color);
+
+    .highlight {
+      color: var(--primary-color);
+      display: inline-block;
+    }
+  }
+  @include checkbox;
+}

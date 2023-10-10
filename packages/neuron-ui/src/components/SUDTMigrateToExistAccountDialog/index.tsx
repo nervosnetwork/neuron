@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SpecialAssetCell } from 'components/SpecialAssetList'
-import Button from 'widgets/Button'
+import { SpecialAssetCell } from 'components/SpecialAssetList/hooks'
 import TextField from 'widgets/TextField'
+import Dialog from 'widgets/Dialog'
 import { AnyoneCanPayLockInfoOnAggron, getSUDTAmount, isSuccessResponse, validateSpecificAddress } from 'utils'
 import InputSelect from 'widgets/InputSelect'
 import { generateSudtMigrateAcpTx } from 'services/remote'
@@ -12,20 +12,24 @@ import styles from './sUDTMigrateToExistAccountDialog.module.scss'
 
 const SUDTMigrateToExistAccountDialog = ({
   cell,
-  closeDialog,
   tokenInfo,
   sUDTAccounts,
   isMainnet,
   walletID,
   isLightClient,
+  onCloseDialog,
+  onBack,
+  onSuccess,
 }: {
   cell: SpecialAssetCell
-  closeDialog: () => void
   tokenInfo?: Controller.GetTokenInfoList.TokenInfo
   sUDTAccounts: State.SUDTAccount[]
   isMainnet: boolean
   walletID: string
   isLightClient: boolean
+  onCloseDialog: () => void
+  onBack: () => void
+  onSuccess: (text: string) => void
 }) => {
   const [t] = useTranslation()
   const [address, setAddress] = useState('')
@@ -49,12 +53,12 @@ const SUDTMigrateToExistAccountDialog = ({
     [sUDTAccounts, tokenInfo]
   )
   const dispatch = useDispatch()
-  const onSumbit = useCallback(() => {
+  const onSubmit = useCallback(() => {
     generateSudtMigrateAcpTx({
       outPoint: cell.outPoint,
       acpAddress: address,
     }).then(res => {
-      closeDialog()
+      onCloseDialog()
       if (isSuccessResponse(res)) {
         if (res.result) {
           dispatch({
@@ -67,7 +71,10 @@ const SUDTMigrateToExistAccountDialog = ({
             type: AppActions.RequestPassword,
             payload: {
               walletID,
-              actionType: 'send-sudt',
+              actionType: 'transfer-to-sudt',
+              onSuccess: () => {
+                onSuccess(t('special-assets.send-sudt-success'))
+              },
             },
           })
         }
@@ -82,19 +89,30 @@ const SUDTMigrateToExistAccountDialog = ({
         })
       }
     })
-  }, [cell.outPoint, address, t, closeDialog, dispatch, walletID])
+  }, [cell.outPoint, address, t, onCloseDialog, dispatch, walletID])
+
   return (
-    <div>
-      <p>{t('migrate-sudt.transfer-to-exist-account.title')}</p>
-      <div>
+    <Dialog
+      className={styles.container}
+      show
+      title={t('migrate-sudt.transfer-to-exist-account.title')}
+      onCancel={onBack}
+      cancelText={t('migrate-sudt.back')}
+      confirmText={t('migrate-sudt.next')}
+      onConfirm={onSubmit}
+      disabled={!address || !!addressError}
+    >
+      <>
         <div className={styles.addressContainer}>
-          <div>{`${t('migrate-sudt.address')} *`}</div>
+          <div className={styles.addressLabel}>{t('migrate-sudt.address')}</div>
           <InputSelect
             options={sUDTAddresses.map(v => ({ label: v, value: v }))}
+            placeholder={t('sign-and-verify.input-choose-address')}
             onChange={onAddressChange}
             value={address}
             className={styles.addressInputSelect}
-            inputDisabeld={isLightClient}
+            inputDisabled={isLightClient}
+            error={addressError}
           />
           {addressError && <div className={styles.error}>{addressError}</div>}
         </div>
@@ -102,20 +120,10 @@ const SUDTMigrateToExistAccountDialog = ({
           label={t('migrate-sudt.amount')}
           field="amount"
           value={getSUDTAmount({ tokenInfo, data: cell.data }).amount}
-          required
           disabled
         />
-      </div>
-      <div className={styles.actions}>
-        <Button label={t('migrate-sudt.cancel')} type="cancel" onClick={closeDialog} />
-        <Button
-          label={t('migrate-sudt.confirm')}
-          type="primary"
-          onClick={onSumbit}
-          disabled={!address || !!addressError}
-        />
-      </div>
-    </div>
+      </>
+    </Dialog>
   )
 }
 

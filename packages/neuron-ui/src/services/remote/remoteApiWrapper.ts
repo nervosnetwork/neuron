@@ -34,7 +34,6 @@ type Action =
   | 'open-in-window'
   | 'request-open-in-explorer'
   | 'handle-view-error'
-  | 'show-settings'
   | 'set-locale'
   | 'show-error-message'
   | 'show-open-dialog'
@@ -47,7 +46,10 @@ type Action =
   | 'set-ckb-node-data-path'
   | 'stop-process-monitor'
   | 'start-process-monitor'
+  | 'is-dark'
+  | 'set-theme'
   | 'is-ckb-run-external'
+  | 'verify-external-ckb-node'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -71,7 +73,6 @@ type Action =
   // Transactions
   | 'get-transaction-list'
   | 'get-transaction'
-  | 'show-transaction-details'
   | 'update-transaction-description'
   | 'export-transactions'
   // Dao
@@ -92,7 +93,9 @@ type Action =
   | 'delete-network'
   // Updater
   | 'check-for-updates'
+  | 'cancel-check-updates'
   | 'download-update'
+  | 'cancel-download-update'
   | 'quit-and-install-update'
   // Settings
   | 'clear-cache'

@@ -1,15 +1,15 @@
-/* eslint-disable no-console */
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils'
 import RingProgressBar from 'widgets/RingProgressBar'
 import TextField from 'widgets/TextField'
-import { Transfer } from 'widgets/Icons/icon'
+import { ReactComponent as Change } from 'widgets/Icons/Change.svg'
 import DropdownWithCustomRender from 'widgets/DropdownWithCustomRender'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import { useTranslation } from 'react-i18next'
 import { appState, useState as useGlobalState } from 'states'
-
 import { FeeRateValueArrayItemType, useGetBatchGeneratedTx } from 'components/Send/hooks'
+import { batchGenerateExperimental } from 'components/SUDTSend/hooks'
+import Tooltip from 'widgets/Tooltip'
 
 import styles from './pricePanel.module.scss'
 
@@ -17,6 +17,7 @@ interface PricePanelProps {
   field: string
   price: string
   onPriceChange: (value: string) => void
+  isExperimental?: boolean
 }
 enum PriceTypeEnum {
   Custom = 'custom',
@@ -25,7 +26,12 @@ enum PriceTypeEnum {
 const DEFAULT_PRICE_ARRAY = ['1000', '2000', '3000']
 const DEFAULT_COUNT_DOWN = 30
 
-const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, onPriceChange }: PricePanelProps) => {
+const PricePanel: React.FunctionComponent<PricePanelProps> = ({
+  price,
+  field,
+  onPriceChange,
+  isExperimental,
+}: PricePanelProps) => {
   const [t] = useTranslation()
   const [type, setType] = useState<PriceTypeEnum>(PriceTypeEnum.Standard)
   const [feeRateValueArray, setFeeRateValueArray] = useState<FeeRateValueArrayItemType[]>([])
@@ -35,7 +41,9 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   const {
     app: { send = appState.send },
     wallet: { id: walletID = '' },
+    experimental,
   } = useGlobalState()
+
   const { countDown, suggestFeeRate } = useGetCountDownAndFeeRateStats({ seconds: DEFAULT_COUNT_DOWN })
 
   const isStandard = type === PriceTypeEnum.Standard
@@ -63,9 +71,10 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
     [onPriceChange]
   )
 
-  const inputError = useMemo(() => (Number(price) < 1000 ? t('price-switch.errorTip', { minPrice: 1000 }) : null), [
-    price,
-  ])
+  const inputError = useMemo(
+    () => (Number(price) < 1000 ? t('price-switch.errorTip', { minPrice: 1000 }) : null),
+    [price]
+  )
 
   const feeValuesArray = useMemo(
     () =>
@@ -84,13 +93,17 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
 
   const options = useMemo(
     () =>
-      ['slow', 'standard', 'fast'].map((mode, idx) => ({
+      [
+        ['slow', 'blue'],
+        ['standard', 'green'],
+        ['fast', 'red'],
+      ].map(([mode, color], idx) => ({
         idx,
         value: priceArray[idx],
         label: (
           <div className={styles.labelWrap}>
             <span>{t(`price-switch.${mode}`)}</span>
-            <span className={styles.labelComment}>
+            <span className={`${styles.labelComment} ${styles[color]}`}>
               {t('price-switch.priceColumn', {
                 priceValue: feeValuesArray?.[idx]?.feeRateValue || priceArray[idx],
                 feeValue: feeValuesArray?.[idx]?.value || 0,
@@ -103,10 +116,24 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
   )
 
   useEffect(() => {
-    useGetBatchGeneratedTx({ walletID, items: send.outputs, priceArray }).then(res => {
-      setFeeRateValueArray(res)
-    })
-  }, [send.outputs, priceArray])
+    if (isExperimental && experimental) {
+      batchGenerateExperimental(experimental, priceArray).then(res => {
+        setFeeRateValueArray(res)
+      })
+    } else {
+      useGetBatchGeneratedTx({ walletID, items: send.outputs, priceArray, isSendMax: send.isSendMax }).then(res => {
+        setFeeRateValueArray(res)
+      })
+    }
+  }, [
+    send.outputs,
+    send.isSendMax,
+    priceArray,
+    isExperimental,
+    experimental,
+    batchGenerateExperimental,
+    setFeeRateValueArray,
+  ])
 
   useEffect(() => {
     if (suggestFeeRate === 0) {
@@ -125,19 +152,24 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
           <label htmlFor={field} aria-label={label} title={label}>
             {label}
           </label>
-          <button
-            data-content={isStandard ? t('price-switch.switchToCustomPrice') : t('price-switch.switchToPrice')}
-            className={styles.transferWrap}
-            onClick={() =>
-              setType(currentType =>
-                currentType === PriceTypeEnum.Standard ? PriceTypeEnum.Custom : PriceTypeEnum.Standard
-              )
-            }
-            onKeyDown={() => {}}
-            type="button"
+          <Tooltip
+            tip={<>{isStandard ? t('price-switch.switchToCustomPrice') : t('price-switch.switchToPrice')}</>}
+            placement="top"
+            showTriangle
           >
-            <Transfer />
-          </button>
+            <button
+              className={styles.transferWrap}
+              onClick={() =>
+                setType(currentType =>
+                  currentType === PriceTypeEnum.Standard ? PriceTypeEnum.Custom : PriceTypeEnum.Standard
+                )
+              }
+              onKeyDown={() => {}}
+              type="button"
+            >
+              <Change />
+            </button>
+          </Tooltip>
         </div>
         {isStandard ? (
           <div className={styles.timeoutWrap}>
@@ -164,6 +196,7 @@ const PricePanel: React.FunctionComponent<PricePanelProps> = ({ price, field, on
           suffix="shannons/kB"
           error={inputError}
           hint={!inputError && inputHint ? inputHint : null}
+          width="100%"
         />
       )}
     </div>

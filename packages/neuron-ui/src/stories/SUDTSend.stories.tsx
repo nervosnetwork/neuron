@@ -1,8 +1,14 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
+import { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import SUDTSend from 'components/SUDTSend'
 
-const stories = storiesOf('sUDT Send', module).addDecorator(StoryRouter())
+const meta: Meta<typeof SUDTSend> = {
+  component: SUDTSend,
+  decorators: [withRouter],
+}
 
-stories.add('Basic', () => <SUDTSend />)
+export default meta
+
+type Story = StoryObj<typeof SUDTSend>
+
+export const Default: Story = {}

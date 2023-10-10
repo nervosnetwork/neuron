@@ -14,6 +14,8 @@ declare namespace Command {
     | 'import-hardware'
     | 'load-transaction-json'
     | 'migrate-acp'
+    | 'sign-verify'
+    | 'multisig-address'
   type Payload = string | null
 }
 
@@ -46,10 +48,25 @@ declare namespace Subject {
 
   interface AppUpdater {
     checking: boolean
+    isUpdated: boolean
     downloadProgress: number
+    progressInfo: null | {
+      total: number
+      transferred: number
+      percent: number
+    }
     version: string
+    releaseDate: string
     releaseNotes: string
+    errorMsg: string
   }
   type URL = string
   type SignIndex = number
+
+  interface GlobalDialog {
+    title?: string
+    message?: string
+    type: 'success' | 'failed' | 'warning'
+    action?: 'ok' | 'cancel'
+  }
 }

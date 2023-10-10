@@ -29,6 +29,8 @@ declare namespace State {
       cell: Record<'txHash' | 'index', string> | null
     }
     lock: CKBComponents.Script | null
+    type?: CKBComponents.Script
+    data?: string
   }
 
   interface DetailedOutput {
@@ -36,6 +38,8 @@ declare namespace State {
     lock: CKBComponents.Script
     lockHash: string
     outPoint: CKBComponents.OutPoint
+    type?: CKBComponents.Script
+    data?: string
   }
   interface DetailedTransaction extends Transaction {
     blockHash: string
@@ -62,12 +66,22 @@ declare namespace State {
     meta?: Meta
   }
 
+  interface Signatures {
+    [hash: string]: string[]
+  }
+
+  type GeneratedTx = {
+    fee: string
+    signatures?: Signatures
+  } & DetailedTransaction
+
   interface Send {
     txID: string
     outputs: Output[]
     price: string
     description: string
-    generatedTx: any
+    generatedTx: GeneratedTx | null
+    isSendMax: boolean
   }
 
   interface Popup {
@@ -84,6 +98,7 @@ declare namespace State {
       | 'create-sudt-account'
       | 'send-ckb-asset'
       | 'send-sudt'
+      | 'transfer-to-sudt'
       | 'send-acp-sudt-to-new-cell'
       | 'send-acp-ckb-to-new-cell'
       | 'send-cheque'
@@ -105,6 +120,7 @@ declare namespace State {
       n: number
       blake160s: string[]
     }
+    onSuccess?: () => void
   }
 
   interface SUDTAccount {
@@ -118,8 +134,18 @@ declare namespace State {
     decimal: string
   }
 
-  type AlertDialog = Record<'title' | 'message', string> | null
+  type GlobalAlertDialog = {
+    show?: boolean
+    title?: string
+    message?: string
+    type: 'success' | 'failed' | 'warning'
+    action?: 'ok' | 'cancel' | 'all'
+    onClose?: () => void
+    onOk?: () => void
+    onCancel?: () => void
+  } | null
   type GlobalDialogType = 'unlock-success' | 'rebuild-sync' | null
+  type PageNotice = { i18nKey: string; status: 'success' | 'error' | 'warn'; index: number }
 
   type FeeRateStatsType = { mean: string | number; median: string | number; suggestFeeRate: string | number }
 
@@ -135,12 +161,14 @@ declare namespace State {
     popups: Popup[]
     notifications: Message[]
     globalDialog: GlobalDialogType
-    alertDialog: AlertDialog
+    globalAlertDialog: GlobalAlertDialog
     loadings: Record<'sending' | 'addressList' | 'transactionList', boolean>
     showTopAlert: boolean
     showAllNotifications: boolean
     isAllowedToFetchList: boolean
     loadedTransaction: any
+    pageNotice?: PageNotice
+    showWaitForFullySynced: boolean
   }
 
   interface NetworkProperty {
@@ -149,6 +177,7 @@ declare namespace State {
     chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
     type: 0 | 1 | 2
     genesisHash: string
+    readonly: boolean
   }
 
   interface Network extends NetworkProperty {
@@ -205,6 +234,7 @@ declare namespace State {
     status: number
     isLookingValidTarget: boolean
     validTarget?: string
+    syncStatus?: SyncStatus
   }>
 
   interface Chain {
@@ -252,11 +282,44 @@ declare namespace State {
     records: NervosDAORecord[]
   }
 
+  interface ProgressInfo {
+    total: number
+    transferred: number
+    percent: number
+  }
+
   interface AppUpdater {
     checking: boolean
+    isUpdated: boolean
     downloadProgress: number
+    progressInfo: null | ProgressInfo
     version: string
+    releaseDate: string
     releaseNotes: string
+    errorMsg: string
+  }
+
+  enum SendType {
+    secp256Cheque = 'cheque',
+    secp256NewCell = 'secp256NewCell',
+    acpExistCell = 'acpExistCell',
+    acpNewCell = 'acpNewCell',
+    unknowNewCell = 'unknowNewCell',
+    sendCKB = 'sendCKB',
+  }
+
+  interface Experimental {
+    tx: any
+    assetAccount?: any
+    params?: {
+      assetAccountID: string
+      walletID: string
+      address: string
+      amount: string
+      feeRate: string
+      description: string
+      sendType?: SendType
+    }
   }
 
   interface AppWithNeuronWallet {
@@ -267,7 +330,7 @@ declare namespace State {
     nervosDAO: NervosDAO
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
-    experimental: { tx: any; assetAccount?: any } | null
+    experimental: Experimental | null
   }
 }
 

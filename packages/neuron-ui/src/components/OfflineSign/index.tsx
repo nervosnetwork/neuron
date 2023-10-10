@@ -1,18 +1,17 @@
-import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
-import { isSuccessResponse, RoutePath, useDidMount } from 'utils'
-import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
-import { addNotification, useDispatch, useState as useGlobalState } from 'states'
+import { useNavigate } from 'react-router-dom'
+import { isSuccessResponse, RoutePath, useDidMount, useGoBack } from 'utils'
+import Dialog from 'widgets/Dialog'
+import AlertDialog from 'widgets/AlertDialog'
+import { useDispatch, useState as useGlobalState } from 'states'
 import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import OfflineSignDialog from '../OfflineSignDialog'
 
 import styles from './offlineSign.module.scss'
 
-const OfflineSign = ({ history }: RouteComponentProps) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null)
+const OfflineSign = () => {
   const {
     app: { loadedTransaction = {} },
   } = useGlobalState()
@@ -22,6 +21,7 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
   const [isBroadCasting, setIsBroadcasting] = useState(false)
   const [t] = useTranslation()
   const dispatch = useDispatch()
+  const [errMsg, setErrMsg] = useState('')
 
   const { filePath, json } = loadedTransaction
 
@@ -42,45 +42,29 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
     }
   }, [signStatus, t])
 
-  const onBack = useCallback(() => {
-    history.goBack()
-  }, [history])
+  const onBack = useGoBack()
 
-  const onSign = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      setIsSigning(true)
-    },
-    [setIsSigning]
-  )
+  const onSign = useCallback(() => {
+    setIsSigning(true)
+  }, [setIsSigning])
 
-  const onBroadcast = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      setIsBroadcasting(true)
-      try {
-        const res = await broadcastTransaction({
-          ...json,
-          walletID: wallet!.id,
-        })
-        if (isSuccessResponse(res)) {
-          history.push(RoutePath.History)
-        } else {
-          addNotification({
-            type: 'alert',
-            timestamp: +new Date(),
-            code: res.status,
-            content: typeof res.message === 'string' ? res.message : res.message.content,
-            meta: typeof res.message === 'string' ? undefined : res.message.meta,
-          })(dispatch)
-          onBack()
-        }
-      } finally {
-        setIsBroadcasting(false)
+  const navigate = useNavigate()
+  const onBroadcast = useCallback(async () => {
+    setIsBroadcasting(true)
+    try {
+      const res = await broadcastTransaction({
+        ...json,
+        walletID: wallet!.id,
+      })
+      if (isSuccessResponse(res)) {
+        navigate(RoutePath.History)
+      } else {
+        setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
       }
-    },
-    [wallet, json, history, dispatch, onBack]
-  )
+    } finally {
+      setIsBroadcasting(false)
+    }
+  }, [wallet, json, navigate, dispatch])
 
   useDidMount(() => {
     getCurrentWallet().then(res => {
@@ -89,12 +73,6 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
       }
     })
   })
-
-  useEffect(() => {
-    if (!isSigning && dialogRef.current && !dialogRef.current.open) {
-      dialogRef.current.showModal()
-    }
-  }, [isSigning])
 
   const signDialogOnDismiss = useCallback(() => {
     setIsSigning(false)
@@ -107,10 +85,19 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
   }
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog}>
-      <form className={styles.container}>
-        <header className={styles.title}>{t('offline-sign.title')}</header>
-        <section className={styles.main}>
+    <>
+      <Dialog
+        show={!isSigning}
+        title={t('offline-sign.title')}
+        cancelText={t('offline-sign.actions.cancel')}
+        onCancel={onBack}
+        confirmText={
+          signStatus === OfflineSignStatus.Signed ? t('offline-sign.actions.broadcast') : t('offline-sign.actions.sign')
+        }
+        isLoading={signStatus === OfflineSignStatus.Signed && isBroadCasting}
+        onConfirm={signStatus === OfflineSignStatus.Signed ? onBroadcast : onSign}
+      >
+        <div className={styles.main}>
           <table>
             <tbody>
               <tr>
@@ -134,19 +121,16 @@ const OfflineSign = ({ history }: RouteComponentProps) => {
             </tbody>
           </table>
           <textarea disabled value={jsonContent} className={styles.textarea} />
-        </section>
-        <footer className={styles.footer}>
-          <Button type="cancel" label={t('offline-sign.actions.cancel')} onClick={onBack} />
-          {signStatus === OfflineSignStatus.Signed ? (
-            <Button type="submit" label={t('offline-sign.actions.broadcast')} onClick={onBroadcast}>
-              {isBroadCasting ? <Spinner /> : (t('offline-sign.actions.broadcast') as string)}
-            </Button>
-          ) : (
-            <Button type="submit" label={t('offline-sign.actions.sign')} onClick={onSign} />
-          )}
-        </footer>
-      </form>
-    </dialog>
+        </div>
+      </Dialog>
+      <AlertDialog
+        show={!!errMsg}
+        title={t('message-types.alert')}
+        message={errMsg}
+        type="failed"
+        onCancel={() => setErrMsg('')}
+      />
+    </>
   )
 }
 

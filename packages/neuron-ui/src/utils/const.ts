@@ -14,6 +14,7 @@ export const BUFFER_BLOCK_NUMBER = 10
 
 export const MAX_DECIMAL_DIGITS = 8
 export const MAINNET_TAG = 'ckb'
+export const LIGHT_MAINNET_TAG = 'light_client_mainnet'
 
 export const MIN_DEPOSIT_AMOUNT = 102
 export const TOKEN_ID_LENGTH = 66
@@ -22,7 +23,8 @@ export const SHANNON_CKB_RATIO = 1e8
 
 export const MEDIUM_FEE_RATE = 2000
 export const WITHDRAW_EPOCHS = 180
-export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
+export const MILLISECONDS_PER_DAY = 24 * 3600 * 1000
+export const MILLISECONDS_IN_YEAR = 365 * MILLISECONDS_PER_DAY
 export const HOURS_PER_EPOCH = 4
 export const HOURS_PER_DAY = 24
 
@@ -64,6 +66,13 @@ export const DEPRECATED_CODE_HASH: Record<string, string> = {
   AcpOnAggron: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
 }
 
+export const HIDE_BALANCE = '******'
 export const LIGHT_CLIENT_TESTNET = 'light_client_testnet'
 export const LIGHT_NETWORK_TYPE = 2
 export const METHOD_NOT_FOUND = -32601
+
+export const MAX_M_N_NUMBER = 255
+export const MILLISECONDS = HOURS_PER_EPOCH * 60 * 60 * 1000
+
+export const ADDRESS_MIN_LENGTH = 86
+export const ADDRESS_HEAD_TAIL_LENGTH = 34

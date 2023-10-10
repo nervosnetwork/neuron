@@ -1,24 +1,55 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
-import { withKnobs } from '@storybook/addon-knobs'
+import { Meta, StoryObj } from '@storybook/react'
 import GeneralSetting from 'components/GeneralSetting'
+import { withRouter } from 'storybook-addon-react-router-v6'
 import { initStates } from 'states'
 
-const states: { [title: string]: boolean } = {
-  'Clear cell cache on': true,
-  'Clear cell cache off': false,
+const meta: Meta<typeof GeneralSetting> = {
+  component: GeneralSetting,
+  decorators: [withRouter()],
 }
 
-const stories = storiesOf('GeneralSettings', module)
+export default meta
 
-Object.entries(states).forEach(([title]) => {
-  const props = { ...initStates, settings: { ...initStates.settings }, dispatch: () => {} }
-  stories.add(title, () => <GeneralSetting {...props} />)
-})
+type Story = StoryObj<typeof GeneralSetting>
 
-stories.addDecorator(withKnobs).add('With knobs', () => {
-  const props = {
-    ...initStates,
-  }
-  return <GeneralSetting {...props} />
-})
+export const Default: Story = {
+  args: {
+    updater: initStates.updater,
+  },
+}
+
+export const Checking: Story = {
+  args: {
+    updater: {
+      ...initStates.updater,
+      checking: true,
+    },
+  },
+}
+
+export const HasUpdater: Story = {
+  args: {
+    updater: {
+      ...initStates.updater,
+      releaseDate: '2023-05-31T13:15:58.827Z',
+      version: '0.110.1',
+      releaseNotes: 'release 0.110.1',
+    },
+  },
+}
+
+export const DownloadUpdate: Story = {
+  args: {
+    updater: {
+      ...initStates.updater,
+      checking: false,
+      isUpdated: false,
+      downloadProgress: 0.1,
+      progressInfo: null,
+      version: '0.110.1',
+      releaseDate: '2023-05-31T13:15:58.827Z',
+      releaseNotes: 'release 0.110.1',
+      errorMsg: '',
+    },
+  },
+}

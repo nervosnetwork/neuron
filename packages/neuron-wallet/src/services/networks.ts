@@ -15,11 +15,12 @@ const presetNetworks: { selected: string; networks: Network[] } = {
   networks: [
     {
       id: 'mainnet',
-      name: 'Default',
+      name: 'Internal Node',
       remote: BUNDLED_CKB_URL,
       genesisHash: MAINNET_GENESIS_HASH,
       type: NetworkType.Default,
       chain: 'ckb',
+      readonly: true,
     },
   ],
 }
@@ -31,15 +32,19 @@ const lightClientNetwork: Network[] = [
     remote: BUNDLED_LIGHT_CKB_URL,
     genesisHash: TESTNET_GENESIS_HASH,
     type: NetworkType.Light,
-    chain: LIGHT_CLIENT_TESTNET
-  }
+    chain: LIGHT_CLIENT_TESTNET,
+    readonly: true,
+  },
 ]
 
 enum NetworksKey {
   List = 'networks',
   Current = 'selected',
-  AddedLightNetwork = 'AddedLightNetwork'
+  AddedLightNetwork = 'AddedLightNetwork',
+  MigrateNetwork = 'MigrateNetwork',
 }
+
+const oldDefaultNames = ['Default', 'default node', presetNetworks.networks[0].name]
 
 export default class NetworksService extends Store {
   private static instance: NetworksService
@@ -62,6 +67,7 @@ export default class NetworksService extends Store {
       this.updateAll([...networks, ...lightClientNetwork])
       this.writeSync(NetworksKey.AddedLightNetwork, true)
     }
+    this.migrateNetwork()
   }
 
   public getAll = () => {
@@ -72,9 +78,6 @@ export default class NetworksService extends Store {
       // Therefore, to ensure normal connection to the ckb node, manual resolution needs to be done here.
       network.remote = applyLocalhostIPv4Resolve(network.remote)
     })
-    const defaultNetwork = networks[0]
-    const isOldDefaultName = ['Default', 'Mainnet'].includes(networks[0].name)
-    defaultNetwork.name = isOldDefaultName ? 'default node' : defaultNetwork.name
     return networks
   }
 
@@ -108,6 +111,7 @@ export default class NetworksService extends Store {
       type,
       genesisHash: EMPTY_GENESIS_HASH,
       chain: 'ckb_dev',
+      readonly: false,
     }
     const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties).catch(
       () => properties
@@ -199,6 +203,41 @@ export default class NetworksService extends Store {
     }
 
     return network
+  }
+
+  private migrateNetwork() {
+    const migrated = this.readSync<boolean>(NetworksKey.MigrateNetwork)
+    if (!migrated) {
+      const networks = this.readSync<Network[]>(NetworksKey.List)
+      const defaultMainnetNetwork = presetNetworks.networks[0]
+      const oldMainnetNetwork = networks.find(v => v.id === defaultMainnetNetwork.id)
+      if (oldMainnetNetwork) {
+        if (
+          // make sure that user has not change the network name
+          oldDefaultNames.includes(oldMainnetNetwork.name) &&
+          oldMainnetNetwork.remote === defaultMainnetNetwork.remote &&
+          oldMainnetNetwork.type === defaultMainnetNetwork.type
+        ) {
+          this.updateAll([
+            defaultMainnetNetwork,
+            ...lightClientNetwork,
+            ...networks
+              .filter(v => v.id !== defaultMainnetNetwork.id && v.type !== NetworkType.Light)
+              .map(v => ({ ...v, readonly: false })),
+          ])
+        } else {
+          oldMainnetNetwork.id = uuid()
+          oldMainnetNetwork.type = NetworkType.Normal
+          this.updateAll([
+            defaultMainnetNetwork,
+            ...lightClientNetwork,
+            ...networks.filter(v => v.type !== NetworkType.Light).map(v => ({ ...v, readonly: false })),
+          ])
+          this.activate(oldMainnetNetwork.id)
+        }
+      }
+      this.writeSync(NetworksKey.MigrateNetwork, true)
+    }
   }
 }
 

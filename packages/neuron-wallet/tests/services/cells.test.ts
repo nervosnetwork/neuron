@@ -1,5 +1,6 @@
 import { getConnection } from 'typeorm'
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../src/utils/scriptAndAddress'
+import { bytes } from '@ckb-lumos/codec'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
@@ -20,7 +21,7 @@ import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-inf
 import Multisig from '../../src/models/multisig'
 import AssetAccountInfo from '../../src/models/asset-account-info'
 import MultisigOutput from '../../src/database/chain/entities/multisig-output'
-import { MultisigConfigNeedError, TransactionInputParamterMiss } from '../../src/exceptions'
+import { MultisigConfigNeedError, TransactionInputParameterMiss } from '../../src/exceptions'
 import LiveCell from '../../src/models/chain/live-cell'
 import BufferUtils from '../../src/utils/buffer'
 
@@ -476,7 +477,7 @@ describe('CellsService', () => {
       })
 
       it('no walletId and no lockargs', async () => {
-        await expect(CellsService.gatherInputs('', '')).rejects.toThrow(new TransactionInputParamterMiss())
+        await expect(CellsService.gatherInputs('', '')).rejects.toThrow(new TransactionInputParameterMiss())
       })
 
       it('no live cell throw CapacityNotEnough', async () => {
@@ -1090,9 +1091,9 @@ describe('CellsService', () => {
   })
 
   describe('#usedByAnyoneCanPayBlake160s', () => {
-    const fakeArgs1 = '0x1'
-    const fakeArgs2 = '0x2'
-    const fakeArgs3 = '0x3'
+    const fakeArgs1 = '0x01'
+    const fakeArgs2 = '0x02'
+    const fakeArgs3 = '0x03'
     const codeHash = randomHex()
     const lockScript1 = new Script(codeHash, fakeArgs1, ScriptHashType.Type)
     const lockScript2 = new Script(codeHash, fakeArgs2, ScriptHashType.Type)
@@ -1144,8 +1145,14 @@ describe('CellsService', () => {
         lockScript: multiSignLockScript,
       }
 
-      const receiverChequeLock = assetAccountInfo.generateChequeScript(bobDefaultLock.computeHash(), '0'.repeat(40))
-      const senderChequeLock = assetAccountInfo.generateChequeScript('0'.repeat(40), bobDefaultLock.computeHash())
+      const receiverChequeLock = assetAccountInfo.generateChequeScript(
+        bobDefaultLock.computeHash(),
+        bytes.hexify(Buffer.alloc(20))
+      )
+      const senderChequeLock = assetAccountInfo.generateChequeScript(
+        bytes.hexify(Buffer.alloc(20)),
+        bobDefaultLock.computeHash()
+      )
 
       const acpLock = assetAccountInfo.generateAnyoneCanPayScript('0x')
       const sudtType = new Script(assetAccountInfo.getSudtCodeHash(), '0x', ScriptHashType.Type)
@@ -1315,7 +1322,7 @@ describe('CellsService', () => {
         new CapacityNotEnough()
       )
     })
-    it('exception amount oveflow CapacityNotEnough', async () => {
+    it('exception amount overflow CapacityNotEnough', async () => {
       getManyByLockScriptsAndTypeScriptMock.mockResolvedValue([
         generateSUDTLiveCell('142', bobLockScript, gliaTypeScript, undefined, 1000),
       ])

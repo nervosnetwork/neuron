@@ -19,6 +19,7 @@ import MultisigConfigDbChangedSubject from '../models/subjects/multisig-config-d
 import Multisig from '../services/multisig'
 import { SyncAddressType } from '../database/chain/entities/sync-progress'
 import { debounceTime } from 'rxjs/operators'
+import { TransactionPersistor } from '../services/tx'
 
 let network: Network | null
 let child: ChildProcess | null = null
@@ -63,6 +64,7 @@ export const resetSyncTask = async (startTask = true) => {
 
   if (startTask) {
     await WalletService.getInstance().maintainAddressesIfNecessary()
+    await TransactionPersistor.checkTxLock()
     await CommonUtils.sleep(3000)
     await createBlockSyncTask()
   }
@@ -110,7 +112,7 @@ export const createBlockSyncTask = async () => {
   child = fork(path.join(__dirname, 'task-wrapper.js'), [], {
     env: { fileBasePath: env.fileBasePath },
     stdio: ['ipc', process.stdout, 'pipe'],
-    execArgv: env.app.isPackaged ? [] : ['--inspect']
+    execArgv: env.app.isPackaged ? [] : ['--inspect'],
   })
 
   child.on('message', ({ id, message, channel }: WorkerMessage) => {
@@ -204,9 +206,9 @@ MultisigConfigDbChangedSubject.getSubject()
       return
     }
     const appendScripts = await Multisig.getMultisigConfigForLight()
-    const msg: Required<WorkerMessage<
-      { walletId: string; script: CKBComponents.Script; addressType: SyncAddressType }[]
-    >> = { type: 'call', channel: 'append_scripts', id: requestId++, message: appendScripts }
+    const msg: Required<
+      WorkerMessage<{ walletId: string; script: CKBComponents.Script; addressType: SyncAddressType }[]>
+    > = { type: 'call', channel: 'append_scripts', id: requestId++, message: appendScripts }
     return registerRequest(child, msg).catch(err => {
       logger.error(`Sync:\ffailed to append script to light client`, err)
     })

@@ -12,11 +12,11 @@ jobs:
     steps:
       - id: check-access
         name: Check if the commenter is a collaborator
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             try{
-              const response = await github.repos.checkCollaborator({
+              const response = await github.rest.repos.checkCollaborator({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 username: context.payload.comment.user.login,
@@ -30,10 +30,10 @@ jobs:
 
       - id: check-issue
         name: Check if the comment is replied in an issue
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
-            const response = await github.issues.get({
+            const response = await github.rest.issues.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
@@ -45,10 +45,10 @@ jobs:
       - id: add-label
         name: Add 'replied' label
         if: ${{ steps.check-access.outputs.result == 'true' && steps.check-issue.outputs.result == 'true' }}
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
-            await github.issues.addLabels({
+            await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,

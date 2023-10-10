@@ -7,32 +7,26 @@ export enum ConnectionStatus {
 export enum RoutePath {
   Launch = '/',
   Overview = '/overview',
-  WalletWizard = '/wizard',
+  WalletWizard = '/wizard/',
   Wallet = '/wallet',
   Send = '/send',
   Receive = '/receive',
   History = '/history',
-  Transaction = '/transaction',
-  Addresses = '/addresses',
   Settings = '/settings',
-  SettingsGeneral = '/settings/general',
-  SettingsWallets = '/settings/wallets',
-  SettingsNetworks = '/settings/networks',
-  SettingsData = '/settings/data',
+  SettingsData = 'data',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   ImportKeystore = '/keystore/import',
   NetworkEditor = '/network',
-  WalletEditor = '/editwallet',
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
   SpecialAssets = '/special-assets',
   SUDTAccountList = '/s-udt/accounts',
   SUDTSend = '/s-udt/send',
-  SUDTReceive = '/s-udt/receive',
-  NFTSend = '/nft',
-  ImportHardware = '/*/import-hardware',
-  OfflineSign = '/*/offline-sign',
+  ImportHardware = '/import-hardware',
+  OfflineSign = 'offline-sign',
+  SignVerify = 'sign-verify',
+  MultisigAddress = 'multisig-address',
 }
 
 export enum CapacityUnit {
@@ -214,4 +208,13 @@ export enum PwAcpLockInfoOnTestNet {
 export enum AccountType {
   CKB,
   SUDT,
+}
+
+export enum SendType {
+  secp256Cheque = 'cheque',
+  secp256NewCell = 'secp256NewCell',
+  acpExistCell = 'acpExistCell',
+  acpNewCell = 'acpNewCell',
+  unknowNewCell = 'unknowNewCell',
+  sendCKB = 'sendCKB',
 }

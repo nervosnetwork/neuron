@@ -1,4 +1,4 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import LiveCellService from '../services/live-cell-service'
 import AssetAccountInfo from '../models/asset-account-info'
 import Script, { ScriptHashType } from '../models/chain/script'
@@ -37,8 +37,8 @@ export default class SUDTController {
   }
 
   public getSUDTTypeScriptHash(params: { tokenID: string }): Controller.Response<string> {
-    const assetAcount = new AssetAccountInfo()
-    const script = new Script(assetAcount.infos.sudt.codeHash, params.tokenID, assetAcount.infos.sudt.hashType)
+    const assetAccount = new AssetAccountInfo()
+    const script = new Script(assetAccount.infos.sudt.codeHash, params.tokenID, assetAccount.infos.sudt.hashType)
     return {
       status: ResponseCode.Success,
       result: scriptToHash(script.toSDK()),

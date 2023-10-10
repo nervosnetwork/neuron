@@ -11,7 +11,7 @@ import {
   networks as networksCache,
 } from 'services/localCache'
 
-export const initAppState = () => (dispatch: StateDispatch, history: any) => {
+export const initAppState = () => (dispatch: StateDispatch, navigate: any) => {
   getNeuronWalletState()
     .then(res => {
       if (isSuccessResponse(res)) {
@@ -38,9 +38,9 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
           },
         })
         if (!wallet) {
-          history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+          navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
         } else {
-          history.push(RoutePath.Overview)
+          navigate(RoutePath.Overview)
         }
 
         currentWalletCache.save(wallet)
@@ -49,11 +49,11 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
         networksCache.save(networks)
         currentNetworkIDCache.save(currentNetworkID)
       } else {
-        history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+        navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
       }
     })
     .catch(() => {
-      history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+      navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
     })
 }
 
@@ -91,19 +91,19 @@ export const dismissGlobalDialog = () => (dispatch: StateDispatch) => {
   })
 }
 
-export const showAlertDialog =
-  (content: { title: string; message: string }) =>
-  (dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>) => {
+export const showGlobalAlertDialog =
+  (content: State.GlobalAlertDialog) =>
+  (dispatch: React.Dispatch<{ type: AppActions.UpdateGlobalAlertDialog; payload: State.GlobalAlertDialog }>) => {
     dispatch({
-      type: AppActions.UpdateAlertDialog,
+      type: AppActions.UpdateGlobalAlertDialog,
       payload: content,
     })
   }
 
-export const dismissAlertDialog =
-  () => (dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: null }>) => {
+export const dismissGlobalAlertDialog =
+  () => (dispatch: React.Dispatch<{ type: AppActions.UpdateGlobalAlertDialog; payload: null }>) => {
     dispatch({
-      type: AppActions.UpdateAlertDialog,
+      type: AppActions.UpdateGlobalAlertDialog,
       payload: null,
     })
   }
@@ -128,3 +128,20 @@ export const toggleIsAllowedToFetchList = (allowed?: boolean) => (dispatch: Stat
     payload: allowed,
   })
 }
+
+let timer: ReturnType<typeof setTimeout>
+export const showPageNotice =
+  (i18nKey: string, status: State.PageNotice['status'] = 'success') =>
+  (dispatch: StateDispatch) => {
+    clearTimeout(timer)
+    dispatch({
+      type: AppActions.SetPageNotice,
+      payload: { i18nKey, status },
+    })
+    timer = setTimeout(() => {
+      dispatch({
+        type: AppActions.SetPageNotice,
+        payload: undefined,
+      })
+    }, 2000)
+  }

@@ -1,27 +1,122 @@
 @import '../../styles/mixin.scss';
-$textfieldWidth: calc(100vw - 370px);
+$bottomHeight: 84px;
+$headerHeight: 104px;
 
-.pageTitle {
-  @include page-title;
+.content {
+  overflow-y: scroll;
+  margin-bottom: 60px;
+  height: calc(100vh - $headerHeight - $bottomHeight);
 }
 
-.info {
-  width: $textfieldWidth;
-  display: grid;
-  grid-template: 'textfield' auto;
-  grid-gap: 15px;
-  padding: 24px 0 34px;
+.withFullySynced {
+  .content {
+    height: calc(100vh - $headerHeight - $bottomHeight - 60px);
+  }
 }
 
-.balance {
-  grid-area: balance;
+.layout {
+  display: flex;
+
+  .left {
+    flex: 1;
+    position: relative;
+
+    .leftFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .addButton {
+        min-width: 216px;
+        padding: 20px;
+        box-shadow: 0 0 10px var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &_icon {
+          margin-right: 8px;
+        }
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color);
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    margin-left: 16px;
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+
+    .content {
+      padding: 16px;
+      /**
+        These styles are for showing the full tips, because of content needs to scroll on the y-axis.
+        Then the overflow property that is set as scroll will truncate the tips overflow of the content.
+        So I need to expand the content's left to show the full tips.
+      */
+      position: relative;
+      left: -48px;
+      padding-left: 64px;
+      width: calc(100% - 32px);
+    }
+
+    .rightFooter {
+      position: absolute;
+      width: 100%;
+      bottom: 16px;
+      left: 0;
+      display: flex;
+      justify-content: center;
+
+      button {
+        width: 216px;
+        &:last-child {
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+}
+
+.headerContainer {
   display: flex;
   align-items: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
 
-.actions {
-  @include form-footer;
-}
+  .goBack {
+    margin-right: 8px;
+    cursor: pointer;
+    g,
+    path {
+      stroke: var(--main-text-color);
+    }
+  }
+  .btn {
+    margin-left: 12px;
+    min-width: 30px;
+    height: 16px;
+    padding: 0 8px;
+    border-radius: 0;
+    border-left: 1px solid var(--button-cancel-color);
+    svg {
+      g,
+      path {
+        fill: var(--main-text-color);
+      }
+    }
+  }
 
+  .balance {
+    font-size: 14px;
+  }
+}

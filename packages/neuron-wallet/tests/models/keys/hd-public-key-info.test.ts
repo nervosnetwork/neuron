@@ -1,6 +1,7 @@
-import { scriptToAddress, systemScripts } from '@nervosnetwork/ckb-sdk-utils'
+import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import { AddressType } from '../../../src/models/keys/address'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
+import { systemScripts } from '../../../src/utils/systemScripts'
 
 const stubbedIsMainnet = jest.fn()
 
@@ -36,7 +37,11 @@ describe('HdPublicKeyInfoModel', () => {
       })
       it('generates mainnet address by property', () => {
         const address = scriptToAddress(
-          { ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 },
+          {
+            codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+            hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
+            args: keyInfo.publicKeyInBlake160,
+          },
           true
         )
         expect(keyInfoModel.address).toEqual(address)
@@ -51,7 +56,11 @@ describe('HdPublicKeyInfoModel', () => {
       })
       it('generates testnet address by property', () => {
         const address = scriptToAddress(
-          { ...systemScripts.SECP256K1_BLAKE160, args: keyInfo.publicKeyInBlake160 },
+          {
+            codeHash: systemScripts.SECP256K1_BLAKE160.CODE_HASH,
+            hashType: systemScripts.SECP256K1_BLAKE160.HASH_TYPE,
+            args: keyInfo.publicKeyInBlake160,
+          },
           false
         )
         expect(keyInfoModel.address).toEqual(address)

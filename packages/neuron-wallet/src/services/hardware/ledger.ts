@@ -9,7 +9,6 @@ import { takeUntil, filter, scan } from 'rxjs/operators'
 import Transaction from '../../models/chain/transaction'
 import NodeService from '../../services/node'
 import Address, { AddressType } from '../../models/keys/address'
-import HexUtils from '../../utils/hex'
 import logger from '../../utils/logger'
 import NetworksService from '../../services/networks'
 import { generateRPC } from '../../utils/ckb-rpc'
@@ -49,7 +48,13 @@ export default class Ledger extends Hardware {
     }
   }
 
-  public async signTransaction (_: string, tx: Transaction, witnesses: string[], path: string, context?: RPC.RawTransaction[]) {
+  public async signTransaction(
+    _: string,
+    tx: Transaction,
+    witnesses: string[],
+    path: string,
+    context?: RPC.RawTransaction[]
+  ) {
     const rpc = generateRPC(NodeService.getInstance().nodeUrl)
     const rawTx = rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
 
@@ -70,13 +75,13 @@ export default class Ledger extends Hardware {
   }
 
   async signMessage(path: string, messageHex: string) {
-    const message = HexUtils.removePrefix(messageHex)
+    const message = this.removePrefix(messageHex)
     const signed = await this.ledgerCKB!.signMessage(
       path === Address.pathForReceiving(0) ? this.defaultPath : path,
       message,
       false
     )
-    return HexUtils.addPrefix(signed)
+    return this.addPrefix(signed)
   }
 
   async getAppVersion(): Promise<string> {
@@ -142,5 +147,19 @@ export default class Ledger extends Hardware {
         // If the computer does not have Bluetooth support, ledgerjs may throw an error.
         .catch(() => [] as DeviceInfo[])
     )
+  }
+
+  private removePrefix(hex: string): string {
+    if (hex.startsWith('0x')) {
+      return hex.slice(2)
+    }
+    return hex
+  }
+
+  private addPrefix(hex: string): string {
+    if (hex.startsWith('0x')) {
+      return hex
+    }
+    return `0x${hex}`
   }
 }

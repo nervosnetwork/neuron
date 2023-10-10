@@ -1,10 +1,10 @@
 import { HexString } from '@ckb-lumos/base'
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { Entity, PrimaryColumn, Column } from 'typeorm'
 
 export enum SyncAddressType {
   Default,
-  Multisig
+  Multisig,
 }
 
 @Entity({ name: 'sync_progress' })
@@ -24,7 +24,7 @@ export default class SyncProgress {
   @Column()
   scriptType!: CKBRPC.ScriptType
 
-  @Column({ type: 'varchar' })
+  @PrimaryColumn({ type: 'varchar' })
   walletId!: string
 
   @Column()

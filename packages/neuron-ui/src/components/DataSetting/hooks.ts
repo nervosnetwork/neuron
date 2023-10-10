@@ -7,17 +7,19 @@ import {
   stopProcessMonitor,
   setCkbNodeDataPath,
 } from 'services/remote'
-import { isSuccessResponse, useDialogWrapper, useDidMount } from 'utils'
+import { isSuccessResponse, useDidMount } from 'utils'
 
 const type = 'ckb'
 
 export const useDataPath = () => {
   const [t] = useTranslation()
-  const [isSaving, setIsSaveing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [savingType, setSavingType] = useState<string | null>()
   const [prevPath, setPrevPath] = useState<string>()
   const [currentPath, setCurrentPath] = useState<string | undefined>()
-  const { dialogRef, openDialog, closeDialog } = useDialogWrapper()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [faidMessage, setFaidMessage] = useState('')
+
   useDidMount(() => {
     getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res)) {
@@ -34,7 +36,7 @@ export const useDataPath = () => {
         setCurrentPath(res.result?.filePaths?.[0])
         stopProcessMonitor(type).then(stopRes => {
           if (isSuccessResponse(stopRes)) {
-            openDialog()
+            setIsDialogOpen(true)
           }
         })
       }
@@ -43,14 +45,15 @@ export const useDataPath = () => {
   const onCancel = useCallback(() => {
     startProcessMonitor(type).then(res => {
       if (isSuccessResponse(res)) {
-        closeDialog()
+        setIsDialogOpen(false)
       }
     })
-  }, [closeDialog, type])
+  }, [setIsDialogOpen, type])
   const onConfirm = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      setFaidMessage('')
       const { dataset } = e.currentTarget
-      setIsSaveing(true)
+      setIsSaving(true)
       setSavingType(dataset.syncType)
       setCkbNodeDataPath({
         dataPath: currentPath!,
@@ -59,25 +62,29 @@ export const useDataPath = () => {
         .then(res => {
           if (isSuccessResponse(res)) {
             setPrevPath(currentPath)
-            closeDialog()
+            setIsDialogOpen(false)
+          } else {
+            setFaidMessage(typeof res.message === 'string' ? res.message : res.message.content!)
           }
         })
         .finally(() => {
-          setIsSaveing(false)
+          setIsSaving(false)
           setSavingType(null)
         })
     },
-    [currentPath, closeDialog, setPrevPath]
+    [currentPath, setIsDialogOpen, setPrevPath]
   )
   return {
     prevPath,
     currentPath,
     onSetting,
-    dialogRef,
     onCancel,
     onConfirm,
     isSaving,
     savingType,
+    isDialogOpen,
+    faidMessage,
+    setFaidMessage,
   }
 }
 

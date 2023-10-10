@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
-import { openContextMenu, requestPassword, deleteNetwork, migrateData } from 'services/remote'
-import { syncRebuildNotification } from 'services/localCache'
+import { openContextMenu, requestPassword, migrateData } from 'services/remote'
+import { loadedWalletIDs, syncRebuildNotification, wallets } from 'services/localCache'
 import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -10,8 +10,10 @@ import {
   updateTransactionDescription,
   updateAddressDescription,
   setCurrentWallet,
+  showPageNotice,
+  useDispatch,
 } from 'states'
-import { epochParser, RoutePath, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
+import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
 import {
   validateTokenId,
   validateAssetAccountName,
@@ -28,13 +30,19 @@ import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 export * from './createSUDTAccount'
 export * from './tokenInfoList'
 
-export const useGoBack = (history: ReturnType<typeof useHistory>) => {
+export const useGoBack = () => {
+  const navigate = useNavigate()
   return useCallback(() => {
-    history.goBack()
-  }, [history])
+    navigate(-1)
+  }, [navigate])
 }
 
-export const useLocalDescription = (type: 'address' | 'transaction', walletID: string, dispatch: StateDispatch) => {
+export const useLocalDescription = (
+  type: 'address' | 'transaction',
+  walletID: string,
+  dispatch: StateDispatch,
+  inputType = 'input'
+) => {
   const [localDescription, setLocalDescription] = useState<{ description: string; key: string }>({
     key: '',
     description: '',
@@ -84,7 +92,11 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     (e: any) => {
       const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
+        e.stopPropagation()
+        e.preventDefault()
         submitDescription(key, originDesc)
+        const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
+        input?.blur()
       }
     },
     [submitDescription]
@@ -108,7 +120,7 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     (e: React.SyntheticEvent<any>) => {
       const {
         dataset: { descriptionKey: key, descriptionValue: originDesc = '' },
-      } = e.target as HTMLElement
+      } = e.currentTarget
       if (key) {
         dispatch({
           type: AppActions.ToggleIsAllowedToFetchList,
@@ -116,9 +128,10 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
         })
         setLocalDescription({ key, description: originDesc })
         try {
-          const input = document.querySelector<HTMLInputElement>(`input[data-description-key="${key}"]`)
+          const input = document.querySelector<HTMLInputElement>(`${inputType}[data-description-key="${key}"]`)
           if (input) {
             input.focus()
+            input.setSelectionRange(-1, -1)
           }
         } catch (err) {
           console.warn(err)
@@ -246,7 +259,7 @@ export const useExitOnWalletChange = () => {
 }
 
 export const useSUDTAccountInfoErrors = ({
-  info: { accountName, tokenName, tokenId, symbol, decimal },
+  info: { accountName, tokenName, tokenId, symbol, decimal, balance },
   existingAccountNames,
   isCKB,
   t,
@@ -257,6 +270,7 @@ export const useSUDTAccountInfoErrors = ({
     tokenId: string
     symbol: string
     decimal: string
+    balance?: string
   }
   existingAccountNames: string[]
   isCKB: boolean
@@ -269,6 +283,7 @@ export const useSUDTAccountInfoErrors = ({
       tokenName: '',
       symbol: '',
       decimal: '',
+      balance: '',
     }
 
     const dataToValidate = {
@@ -280,6 +295,7 @@ export const useSUDTAccountInfoErrors = ({
       tokenId: { params: { tokenId, isCKB }, validator: validateTokenId },
       tokenName: { params: { tokenName, isCKB }, validator: validateTokenName },
       decimal: { params: { decimal }, validator: validateDecimal },
+      balance: { params: { balance }, validator: typeof balance === 'undefined' ? () => {} : validateDecimal },
     }
 
     Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
@@ -314,37 +330,22 @@ export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
 
 export const useOnLocaleChange = (i18n: i18nType) => {
   return useEffect(() => {
-    const subcription = SetLocaleSubject.subscribe(lng => {
+    const subscription = SetLocaleSubject.subscribe(lng => {
       i18n.changeLanguage(lng)
     })
     return () => {
-      subcription.unsubscribe()
+      subscription.unsubscribe()
     }
   }, [i18n])
 }
 
-export const useOnHandleWallet = ({
-  history,
-  dispatch,
-}: {
-  history: ReturnType<typeof useHistory>
-  dispatch: StateDispatch
-}) =>
+export const useOnHandleWallet = ({ dispatch }: { dispatch: StateDispatch }) =>
   useCallback(
-    (e: React.SyntheticEvent) => {
+    (e: React.BaseSyntheticEvent) => {
       const {
-        target: {
-          dataset: { action },
-        },
-        currentTarget: {
-          dataset: { id },
-        },
-      } = e as any
+        dataset: { action, id },
+      } = e.target
       switch (action) {
-        case 'edit': {
-          history.push(`${RoutePath.WalletEditor}/${id}`)
-          break
-        }
         case 'delete': {
           requestPassword({ walletID: id, action: 'delete-wallet' })
           break
@@ -365,7 +366,7 @@ export const useOnHandleWallet = ({
         }
       }
     },
-    [dispatch, history]
+    [dispatch]
   )
 
 export const useOnWindowResize = (handler: () => void) => {
@@ -403,34 +404,6 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
       walletListContainer.classList.add(borderClassName)
     }
   }, [containerSelector, borderClassName])
-
-export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof useHistory> }) =>
-  useCallback(
-    (e: React.SyntheticEvent) => {
-      const {
-        target: {
-          dataset: { action },
-        },
-        currentTarget: {
-          dataset: { id },
-        },
-      } = e as any
-      switch (action) {
-        case 'edit': {
-          history.push(`${RoutePath.NetworkEditor}/${id}`)
-          break
-        }
-        case 'delete': {
-          deleteNetwork(id)
-          break
-        }
-        default: {
-          // ignore
-        }
-      }
-    },
-    [history]
-  )
 
 export const useGlobalNotifications = (
   dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>,
@@ -511,4 +484,49 @@ export const useOutputErrors = (
       }),
     [outputs, isMainnet]
   )
+}
+
+export const useFirstLoadWallet = (dispatch: StateDispatch, id: string) => {
+  useEffect(() => {
+    const loadedIds = loadedWalletIDs.load()
+
+    if (!loadedIds.includes(id)) {
+      showPageNotice('overview.wallet-ready')(dispatch)
+    }
+
+    const ids = wallets.load().map(item => item.id)
+    loadedWalletIDs.save(ids.join(','))
+  }, [dispatch, id])
+}
+
+export const useClearGeneratedTx = () => {
+  const dispatch = useDispatch()
+  return useCallback(() => {
+    dispatch({
+      type: AppActions.ClearSendState,
+    })
+  }, [dispatch])
+}
+
+export const useCopy = () => {
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const [copied, setCopied] = useState(false)
+  const [copyTimes, setCopyTimes] = useState(1)
+  const onCopy = useCallback(
+    (content: string) => {
+      setCopyTimes(key => key + 1)
+      setCopied(true)
+      window.navigator.clipboard.writeText(content)
+      clearTimeout(timer.current!)
+      timer.current = setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    },
+    [timer]
+  )
+  return {
+    copied,
+    onCopy,
+    copyTimes,
+  }
 }

@@ -110,7 +110,7 @@ const updateTransactionWith =
         .catch((err: Error) => {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
-            payload: '',
+            payload: null,
           })
           setErrorMessage(err.message)
           return undefined
@@ -120,7 +120,7 @@ const updateTransactionWith =
     }
     dispatch({
       type: AppActions.UpdateGeneratedTx,
-      payload: '',
+      payload: null,
     })
     return Promise.resolve(undefined)
   }
@@ -277,13 +277,15 @@ export const useGetBatchGeneratedTx = async ({
   walletID,
   priceArray = [],
   items,
+  isSendMax,
 }: {
   walletID: string
   priceArray?: string[]
   items: Readonly<State.Output[]>
+  isSendMax: boolean
 }) => {
   const getUpdateGeneratedTx = (params: Controller.GenerateTransactionParams) =>
-    generateTx(params).then((res: ControllerResponse<State.Transaction>) => {
+    (isSendMax ? generateSendingAllTx : generateTx)(params).then((res: ControllerResponse<State.Transaction>) => {
       if (res.status === 1) {
         return (res as SuccessFromController).result
       }
@@ -333,6 +335,17 @@ export const useInitialize = (
     [items, isSendMax, sending]
   )
 
+  const updateIsSendMax = useCallback(
+    (payload: boolean) => {
+      setIsSendMax(payload)
+      dispatch({
+        type: AppActions.UpdateSendIsSendMax,
+        payload,
+      })
+    },
+    [dispatch, setIsSendMax]
+  )
+
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
@@ -355,22 +368,22 @@ export const useInitialize = (
       t,
     }).then(tx => {
       if (!tx) {
-        setIsSendMax(false)
+        updateIsSendMax(false)
       }
     })
-  }, [walletID, updateTransactionOutput, price, items, dispatch, t, isMainnet])
+  }, [walletID, updateTransactionOutput, price, items, dispatch, t, isMainnet, updateIsSendMax])
 
   const onSendMaxClick = useCallback(() => {
     if (!isSendMax) {
-      setIsSendMax(true)
+      updateIsSendMax(true)
       updateSendingAllTransaction()
     } else {
-      setIsSendMax(false)
+      updateIsSendMax(false)
       updateTransactionOutput('amount')(outputs.length - 1)('')
       const total = outputsToTotalAmount(items.filter(item => item.amount))
       setTotalAmount(total)
     }
-  }, [updateSendingAllTransaction, setIsSendMax, isSendMax, outputs.length, updateTransactionOutput, items])
+  }, [updateSendingAllTransaction, updateIsSendMax, isSendMax, outputs.length, updateTransactionOutput, items])
 
   useEffect(() => {
     if (isSendMax) {

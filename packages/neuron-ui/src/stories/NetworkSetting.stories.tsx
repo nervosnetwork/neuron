@@ -1,12 +1,11 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
+import { Meta, StoryObj } from '@storybook/react'
 import NetworkSetting from 'components/NetworkSetting'
 import { initStates } from 'states'
+import { withRouter } from 'storybook-addon-react-router-v6'
 
 const states: { [title: string]: State.Network[] } = {
-  'Empty List': [],
-  'Content List': [
+  EmptyList: [],
+  ContentList: [
     {
       id: 'Mainnet',
       name: 'Mainnet',
@@ -14,6 +13,7 @@ const states: { [title: string]: State.Network[] } = {
       chain: 'ckb',
       type: 0,
       genesisHash: '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5',
+      readonly: true,
     },
     {
       id: 'Testnet',
@@ -22,6 +22,7 @@ const states: { [title: string]: State.Network[] } = {
       chain: 'ckb_testnet',
       type: 1,
       genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
+      readonly: false,
     },
     {
       id: 'Local',
@@ -30,18 +31,31 @@ const states: { [title: string]: State.Network[] } = {
       chain: 'ckb_devnet',
       type: 1,
       genesisHash: '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
+      readonly: false,
     },
   ],
 }
 
-const stories = storiesOf('NetworkSetting', module).addDecorator(StoryRouter())
+const meta: Meta<typeof NetworkSetting> = {
+  component: NetworkSetting,
+  decorators: [withRouter],
+}
 
-Object.entries(states).forEach(([title, networks]) => {
-  stories.add(title, () => (
-    <NetworkSetting
-      {...initStates}
-      chain={{ ...initStates.chain, networkID: networks.length ? networks[0].id : '' }}
-      settings={{ ...initStates.settings, networks }}
-    />
-  ))
-})
+export default meta
+
+type Story = StoryObj<typeof NetworkSetting>
+
+function getArgs(networks: State.Network[] = []) {
+  return {
+    ...initStates,
+    chain: { ...initStates.chain, networkID: networks.length ? networks[0].id : '' },
+    settings: { ...initStates.settings, networks },
+  }
+}
+export const EmptyList: Story = {
+  args: getArgs(states.EmptyList),
+}
+
+export const ContentList: Story = {
+  args: getArgs(states.ContentList),
+}

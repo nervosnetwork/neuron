@@ -1,0 +1,11 @@
+[default.extend-words]
+thur = "thur"
+
+# defined in database schema
+lastest = "lastest"
+
+[files]
+extend-exclude = ["CHANGELOG.md", "**/migrations/*.ts"]
+
+
+

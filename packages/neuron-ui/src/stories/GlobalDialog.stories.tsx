@@ -1,14 +1,34 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import GlobalDialog from 'widgets/GlobalDialog'
 
-const stories = storiesOf('Global Dialog', module)
+const meta: Meta<typeof GlobalDialog> = {
+  component: GlobalDialog,
+  args: {
+    onDismiss: action('Dismiss'),
+    onBackUp: action('onBackUp'),
+    onOk: action('onOk'),
+  },
+}
 
-const types: State.GlobalDialogType[] = ['unlock-success', 'rebuild-sync', null]
+export default meta
 
-types.forEach(type => {
-  stories.add(type || 'Null', () => {
-    return <GlobalDialog type={type} onDismiss={action('Dismiss')} onBackUp={action('onBackUp')} onOk={action('onOk')} />
-  })
-})
+type Story = StoryObj<typeof GlobalDialog>
+
+export const Default: Story = {
+  args: {
+    type: null,
+  },
+}
+
+export const UnlockSuccess: Story = {
+  args: {
+    type: 'unlock-success',
+  },
+}
+
+export const RebuildSync: Story = {
+  args: {
+    type: 'rebuild-sync',
+  },
+}

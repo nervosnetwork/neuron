@@ -1,13 +1,24 @@
-import React from 'react'
-import { storiesOf } from '@storybook/react'
-import StoryRouter from 'storybook-react-router'
-import Breadcrum, { BreadcumProps } from 'widgets/Breadcrum'
+import { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from 'storybook-addon-react-router-v6'
+import Breadcrum from 'widgets/Breadcrum'
 
-const stories = storiesOf('Breadcum', module).addDecorator(StoryRouter())
+const meta: Meta<typeof Breadcrum> = {
+  component: Breadcrum,
+  decorators: [withRouter()],
+}
 
-const propsList: { [name: string]: BreadcumProps } = {
-  empty: { pages: [] },
-  root: {
+export default meta
+
+type Story = StoryObj<typeof Breadcrum>
+
+export const Empty: Story = {
+  args: {
+    pages: [],
+  },
+}
+
+export const Root: Story = {
+  args: {
     pages: [
       {
         label: 'root',
@@ -15,13 +26,19 @@ const propsList: { [name: string]: BreadcumProps } = {
       },
     ],
   },
-  '2 layers': {
+}
+
+export const TwoLayers: Story = {
+  args: {
     pages: [
       { label: 'root', link: 'root' },
       { label: 'first', link: 'first' },
     ],
   },
-  '3 layers': {
+}
+
+export const ThreeLayers: Story = {
+  args: {
     pages: [
       { label: 'root', link: 'root' },
       { label: 'first', link: 'first' },
@@ -29,9 +46,3 @@ const propsList: { [name: string]: BreadcumProps } = {
     ],
   },
 }
-
-Object.entries(propsList).forEach(([name, props]) => {
-  stories.add(name, () => {
-    return <Breadcrum {...props} />
-  })
-})

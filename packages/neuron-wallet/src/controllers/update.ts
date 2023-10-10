@@ -1,13 +1,19 @@
-import { BrowserWindow, dialog } from 'electron'
-import { t } from 'i18next'
-import { autoUpdater, UpdateInfo } from 'electron-updater'
-import AppUpdaterSubject from '../models/subjects/app-updater'
+import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electron-updater'
+import AppUpdaterSubject, { AppUpdater } from '../models/subjects/app-updater'
+import logger from '../utils/logger'
 
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking
 
+  static downCancellationToken = new CancellationToken()
+
+  static lastNotifyInfo: AppUpdater
+
+  static updatePackageSize: number = 0
+
   constructor(check: boolean = true) {
     autoUpdater.autoDownload = false
+    autoUpdater.logger = logger
 
     if (check && !UpdateController.isChecking) {
       this.bindEvents()
@@ -18,12 +24,13 @@ export default class UpdateController {
     UpdateController.isChecking = true
     autoUpdater.checkForUpdates()
 
-    AppUpdaterSubject.next({
-      checking: true,
-      downloadProgress: -1,
-      version: '',
-      releaseNotes: '',
-    })
+    this.notify()
+  }
+
+  public cancelCheckUpdates() {
+    UpdateController.isChecking = false
+    this.notify()
+    autoUpdater.removeAllListeners()
   }
 
   public quitAndInstall() {
@@ -33,8 +40,23 @@ export default class UpdateController {
   }
 
   public downloadUpdate() {
-    this.notify(0)
-    autoUpdater.downloadUpdate()
+    this.notify({
+      ...UpdateController.lastNotifyInfo,
+      progressInfo: {
+        total: UpdateController.updatePackageSize,
+        percent: 0,
+        transferred: 0,
+      },
+      downloadProgress: 0,
+    })
+    UpdateController.downCancellationToken = new CancellationToken()
+    autoUpdater.downloadUpdate(UpdateController.downCancellationToken)
+  }
+
+  public cancelDownloadUpdate() {
+    UpdateController.downCancellationToken.cancel()
+    this.notify({ ...UpdateController.lastNotifyInfo, progressInfo: null, downloadProgress: -1 })
+    autoUpdater.removeAllListeners()
   }
 
   private bindEvents() {
@@ -42,46 +64,59 @@ export default class UpdateController {
 
     autoUpdater.on('error', error => {
       UpdateController.isChecking = false
-      this.notify()
-
-      dialog.showErrorBox('Error', error == null ? 'unknown' : (error.stack || error).toString())
-    })
-
-    autoUpdater.on('update-available', (info: UpdateInfo) => {
-      UpdateController.isChecking = false
-      this.notify(-1, info.version, info.releaseNotes as string)
-    })
-
-    autoUpdater.on('update-not-available', () => {
-      UpdateController.isChecking = false
-      this.notify()
-
-      dialog.showMessageBox(BrowserWindow.getFocusedWindow()!, {
-        type: 'info',
-        message: t('updater.update-not-available'),
-        buttons: [t('common.ok')],
+      this.notify({
+        version: '',
+        releaseDate: '',
+        releaseNotes: '',
+        errorMsg: error == null ? 'unknown' : (error.stack || error).toString(),
       })
     })
 
-    autoUpdater.on('download-progress', progress => {
-      const progressPercent = progress.percent / 100
+    autoUpdater.on('update-available', (info: UpdateInfo) => {
+      if (UpdateController.isChecking) {
+        UpdateController.isChecking = false
+        UpdateController.updatePackageSize = info.files[0].size ?? 0
+        this.notify({
+          version: info.version,
+          releaseDate: info.releaseDate,
+          releaseNotes: info.releaseNotes as string,
+        })
+      }
+    })
+
+    autoUpdater.on('update-not-available', () => {
+      if (UpdateController.isChecking) {
+        UpdateController.isChecking = false
+        this.notify({ isUpdated: true })
+      }
+    })
+
+    autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
+      const progressPercent = progressInfo.percent / 100
+      UpdateController.updatePackageSize = progressInfo.total
       if (progressPercent !== 1) {
-        this.notify(progressPercent)
+        this.notify({ ...UpdateController.lastNotifyInfo, downloadProgress: progressPercent, progressInfo })
       }
     })
 
     autoUpdater.on('update-downloaded', () => {
       UpdateController.isChecking = false
-      this.notify(1)
+      this.notify({ ...UpdateController.lastNotifyInfo, downloadProgress: 1 })
     })
   }
 
-  private notify(downloadProgress: number = -1, version = '', releaseNotes = '') {
-    AppUpdaterSubject.next({
+  private notify(appUpdater?: Partial<Omit<AppUpdater, 'checking'>>) {
+    UpdateController.lastNotifyInfo = {
+      downloadProgress: -1,
+      progressInfo: null,
+      isUpdated: false,
+      version: '',
+      releaseDate: '',
+      releaseNotes: '',
+      errorMsg: '',
+      ...appUpdater,
       checking: UpdateController.isChecking,
-      downloadProgress,
-      version,
-      releaseNotes,
-    })
+    }
+    AppUpdaterSubject.next(UpdateController.lastNotifyInfo)
   }
 }

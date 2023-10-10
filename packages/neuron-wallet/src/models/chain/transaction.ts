@@ -2,12 +2,13 @@ import CellDep from './cell-dep'
 import Input from './input'
 import Output from './output'
 import WitnessArgs from './witness-args'
-import HexUtils from '../../utils/hex'
-import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
+import { BI } from '@ckb-lumos/bi'
+import { serializeRawTransaction, serializeWitnessArgs } from '../../utils/serialization'
 import BlockHeader from './block-header'
 import TypeCheckerUtils from '../../utils/type-checker'
 import OutPoint from './out-point'
 import { Signatures } from '../../models/offline-sign'
+import { utils } from '@ckb-lumos/base'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -268,12 +269,12 @@ export default class Transaction {
   }
 
   public computeHash(): string {
-    return rawTransactionToHash(this.toSDKRawTransaction())
+    return utils.ckbHash(serializeRawTransaction(this.toSDKRawTransaction()))
   }
 
   public toSDKRawTransaction(): CKBComponents.RawTransaction {
     return {
-      version: HexUtils.toHex(this.version),
+      version: BI.from(this.version).toHexString(),
       inputs: this.inputs.map(i => i.toSDK()),
       outputs: this.outputs.map(o => o.toSDK()),
       cellDeps: this.cellDeps.map(cd => cd.toSDK()),

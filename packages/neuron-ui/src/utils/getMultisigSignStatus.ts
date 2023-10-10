@@ -1,5 +1,5 @@
 import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
-import { MultisigConfig, Signatures } from 'services/remote'
+import { MultisigConfig } from 'services/remote'
 
 export const getMultisigSignStatus = ({
   multisigConfig,
@@ -7,7 +7,7 @@ export const getMultisigSignStatus = ({
   addresses,
 }: {
   multisigConfig: MultisigConfig
-  signatures?: Signatures
+  signatures?: State.Signatures
   addresses: State.Address[]
 }) => {
   const multisigLockHash = scriptToHash(addressToScript(multisigConfig.fullPayload))

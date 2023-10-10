@@ -7,15 +7,44 @@
   &::backdrop {
     @include overlay;
   }
+  color: var(--main-text-color);
 }
 
+.headerTitle {
+  font-weight: 500;
+  font-size: 16px;
+  padding: 24px 16px;
+  border-bottom: 1px solid var(--lock-info-title-border);
+}
 .container {
-  padding: 30px 50px;
+  padding: 0 16px 24px 16px;
+  background-color: var(--secondary-background-color);
 }
 
 .title {
-  font-weight: 900;
-  font-size: 1.125rem;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--main-text-color);
+}
+
+.shortAddr {
+  padding: 16px;
+  margin-top: 16px;
+  background: var(--table-head-background-color);
+  color: var(--main-text-color);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  & > span {
+    font-family: 'JetBrains Mono';
+  }
+  .copyIcon {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+  }
 }
 
 .infoWrap {
@@ -46,12 +75,21 @@
 .lock {
   position: relative;
 
+  .copyIcon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+  }
+
   pre {
     overflow: auto;
-    background: #eee;
-    padding: 10px;
+    background: var(--table-head-background-color);
+    color: var(--main-text-color);
+    padding: 16px;
     border-radius: 6px;
     font-size: 12px;
+    font-family: 'JetBrains Mono';
   }
 
   .copyBtn {
@@ -60,10 +98,10 @@
     right: 5px;
     width: 15px;
     height: 15px;
-    cursor: pointer!important;
+    cursor: pointer !important;
     opacity: 0;
 
-    svg{
+    svg {
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -73,8 +111,11 @@
       filter: brightness(0.5);
     }
   }
- &:hover .copyBtn {
+  &:hover .copyBtn {
     opacity: 100%;
   }
 }
 
+.notice {
+  @include dialog-copy-animation;
+}
