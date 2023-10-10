@@ -77,8 +77,8 @@ jest.mock('../../src/services/indexer', () => ({
 }))
 jest.doMock('../../src/block-sync-renderer', () => ({
   resetSyncTaskQueue: {
-    asyncPush: resetSyncTaskQueueAsyncPushMock
-  }
+    asyncPush: resetSyncTaskQueueAsyncPushMock,
+  },
 }))
 const {
   startCkbNode,
@@ -203,7 +203,7 @@ describe('ckb runner', () => {
         it('runs ckb binary', () => {
           expect(stubbedSpawn).toHaveBeenCalledWith(
             expect.stringContaining(path.join('bin', 'ckb')),
-            ['run', '-C', ckbDataPath, '--indexer', "--assume-valid-target", '0x' + '0'.repeat(64)],
+            ['run', '-C', ckbDataPath, '--indexer', '--assume-valid-target', '0x' + '0'.repeat(64)],
             { stdio: ['ignore', 'pipe', 'pipe'] }
           )
         })

@@ -50,7 +50,7 @@ jest.doMock('../../src/env', () => ({
     get isPackaged() {
       return isPackagedMock()
     },
-  }
+  },
 }))
 
 jest.doMock('../../src/utils/logger', () => ({
@@ -58,27 +58,29 @@ jest.doMock('../../src/utils/logger', () => ({
   error: loggerErrorMock,
   transports: {
     file: {
-      getFile: transportsGetFileMock
-    }
-  }
+      getFile: transportsGetFileMock,
+    },
+  },
 }))
 
 jest.doMock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      get testnetLightDataPath() { return lightDataPathMock() }
+      get testnetLightDataPath() {
+        return lightDataPathMock()
+      },
     }
-  }
+  },
 }))
 
 jest.doMock('../../src/database/chain', () => ({
-  clean: cleanMock
+  clean: cleanMock,
 }))
 
 jest.doMock('../../src/block-sync-renderer', () => ({
   resetSyncTaskQueue: {
-    asyncPush: resetSyncTaskQueueAsyncPushMock
-  }
+    asyncPush: resetSyncTaskQueueAsyncPushMock,
+  },
 }))
 
 jest.doMock('process', () => ({
@@ -98,7 +100,7 @@ jest.doMock('fs', () => ({
   readFileSync: readFileSyncMock,
   mkdirSync: mkdirSyncMock,
   writeFileSync: writeFileSyncMock,
-  createWriteStream: createWriteStreamMock
+  createWriteStream: createWriteStreamMock,
 }))
 
 jest.doMock('child_process', () => ({
@@ -109,7 +111,7 @@ const { CKBLightRunner } = require('../../src/services/light-runner')
 
 describe('test light runner', () => {
   beforeEach(() => {
-    transportsGetFileMock.mockReturnValue({ path: ''})
+    transportsGetFileMock.mockReturnValue({ path: '' })
     createWriteStreamMock.mockReturnValue({ write() {} })
   })
   afterEach(() => {
@@ -167,7 +169,11 @@ describe('test light runner', () => {
       expect(dirnameMock).toBeCalledTimes(0)
       expect(getAppPathMock).toBeCalledTimes(0)
       expect(joinMock).toBeCalledWith(lightRunnerDirpath, '../../bin')
-      expect(resolveMock).toBeCalledWith('joinpath', `./${CKBLightRunner.getInstance().platform()}`, './ckb-light-client')
+      expect(resolveMock).toBeCalledWith(
+        'joinpath',
+        `./${CKBLightRunner.getInstance().platform()}`,
+        './ckb-light-client'
+      )
       CKBLightRunner.getInstance().platform = tmp
     })
   })
@@ -285,10 +291,12 @@ describe('test light runner', () => {
       await CKBLightRunner.getInstance().stop()
     })
     it('runnerProcess is defined', async () => {
-      const emitter: EventEmitter & { kill?: Function } = new EventEmitter()
+      const emitter: EventEmitter & { kill?: () => void } = new EventEmitter()
       emitter.kill = mockFn
       CKBLightRunner.getInstance().runnerProcess = emitter
-      mockFn.mockImplementation(() => { emitter.emit('close') })
+      mockFn.mockImplementation(() => {
+        emitter.emit('close')
+      })
       await CKBLightRunner.getInstance().stop()
       expect(mockFn).toBeCalledWith()
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
