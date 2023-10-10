@@ -392,7 +392,7 @@ const SUDTSend = () => {
                         ) : null
                       }
                       disabled={sendState.sendAll}
-                      error={errors[field.key]}
+                      error={errors[field.key] || (field.key === Fields.Address ? remoteError : '')}
                       className={styles[field.key]}
                       placeholder={field.placeholder}
                     />
@@ -448,7 +448,6 @@ const SUDTSend = () => {
                   value={sendState.description}
                   field={Fields.Description}
                   onChange={onInput}
-                  error={remoteError}
                   placeholder={t('s-udt.send.description-placeholder')}
                 />
               </div>
