@@ -1689,6 +1689,20 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@ckb-lumos/base@0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.20.0.tgz#d18164ec60eae3f3a97a4bc48e1399e6e0c190d9"
+  integrity sha512-Zz4+iO7d7dJBMtn/7icD9uuld2fBUGI+RqoBumXW8mem3xDw41Vb4vL0knxVdOFF1EkuSX5yZ796f83h8Q/6zw==
+  dependencies:
+    "@ckb-lumos/bi" "0.20.0"
+    "@ckb-lumos/codec" "0.20.0"
+    "@ckb-lumos/toolkit" "0.20.0"
+    "@types/blake2b" "^2.1.0"
+    "@types/lodash.isequal" "^4.5.5"
+    blake2b "^2.1.3"
+    js-xxhash "^1.0.4"
+    lodash.isequal "^4.5.0"
+
 "@ckb-lumos/base@0.20.0-alpha.3":
   version "0.20.0-alpha.3"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.20.0-alpha.3.tgz#5cc257b708e4fc894f11028ec46616fb4750fc49"
@@ -1728,6 +1742,13 @@
     "@ckb-lumos/toolkit" "0.20.0-alpha.3"
     cross-fetch "^3.1.5"
     events "^3.3.0"
+
+"@ckb-lumos/codec@0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.20.0.tgz#bb07707c5976b3b706b78f253e680cdc431ca898"
+  integrity sha512-NHBPIaiNYz5yX0RGSM0Qz1effLnVTt0wJHPfLVAkuzNRBg5/xRZySjYOemOsogbX1t4s3Yk7N0Q17tr02AUh3A==
+  dependencies:
+    "@ckb-lumos/bi" "0.20.0"
 
 "@ckb-lumos/codec@0.20.0-alpha.3":
   version "0.20.0-alpha.3"
@@ -1782,6 +1803,11 @@
     "@vespaiach/axios-fetch-adapter" "^0.3.1"
     axios "0.27.2"
     tslib "2.3.1"
+
+"@ckb-lumos/toolkit@0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.20.0.tgz#8f71043324e50c8a3e94c65414325482d874cfca"
+  integrity sha512-nLNXRPG20NqUdXwHAnKwr0T7nZyDrf4fGwIrsxo+7ffqWeg9wNEhZoqTBJLgxEpoe0I+WHRLwYLiwUbkkqR1SQ==
 
 "@ckb-lumos/toolkit@0.20.0-alpha.3":
   version "0.20.0-alpha.3"
