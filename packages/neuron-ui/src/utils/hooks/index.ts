@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
-import { openContextMenu, requestPassword, migrateData } from 'services/remote'
+import { openContextMenu, requestPassword, migrateData, getCkbNodeDataPath } from 'services/remote'
 import { loadedWalletIDs, syncRebuildNotification, wallets } from 'services/localCache'
 import { Migrate, SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
@@ -13,7 +13,7 @@ import {
   showPageNotice,
   useDispatch,
 } from 'states'
-import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS } from 'utils'
+import { epochParser, isReadyByVersion, calculateClaimEpochValue, CONSTANTS, isSuccessResponse } from 'utils'
 import {
   validateTokenId,
   validateAssetAccountName,
@@ -24,7 +24,7 @@ import {
   validateAddress,
   validateAmountRange,
 } from 'utils/validators'
-import { MenuItemConstructorOptions } from 'electron'
+import { MenuItemConstructorOptions, shell } from 'electron'
 import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
 
 export * from './createSUDTAccount'
@@ -405,10 +405,22 @@ export const useToggleChoiceGroupBorder = (containerSelector: string, borderClas
     }
   }, [containerSelector, borderClassName])
 
-export const useGlobalNotifications = (
-  dispatch: React.Dispatch<{ type: AppActions.SetGlobalDialog; payload: State.GlobalDialogType }>,
-  hasDismissMigrate: boolean
-) => {
+export const useMigrate = () => {
+  const [isMigrateDialogShow, setIsMigrateDialogShow] = useState(false)
+  const [hasDismissMigrate, setHasDismissMigrate] = useState(false)
+  const [ckbDataPath, setCkbDataPath] = useState<string>()
+  useEffect(() => {
+    getCkbNodeDataPath().then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setCkbDataPath(res.result)
+      }
+    })
+  })
+  const onBackUp = useCallback(() => {
+    if (ckbDataPath) {
+      shell.openPath(ckbDataPath)
+    }
+  }, [ckbDataPath])
   useEffect(() => {
     const lastVersion = syncRebuildNotification.load()
     const isVersionUpdate = isReadyByVersion(CONSTANTS.SYNC_REBUILD_SINCE_VERSION, lastVersion)
@@ -420,16 +432,34 @@ export const useGlobalNotifications = (
         migrateSubscription.unsubscribe()
       } else if (!hasDismissMigrate) {
         // means need click ok to migrate
-        dispatch({
-          type: AppActions.SetGlobalDialog,
-          payload: 'rebuild-sync',
-        })
+        setIsMigrateDialogShow(true)
       }
     })
     return () => {
       migrateSubscription.unsubscribe()
     }
-  }, [dispatch, hasDismissMigrate])
+  }, [isMigrateDialogShow])
+  const onCancel = useCallback(() => {
+    setIsMigrateDialogShow(false)
+    setHasDismissMigrate(true)
+  }, [])
+  const onConfirm = useCallback(() => {
+    migrateData()
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          setIsMigrateDialogShow(false)
+        }
+      })
+      .finally(() => {
+        syncRebuildNotification.save()
+      })
+  }, [])
+  return {
+    isMigrateDialogShow,
+    onCancel,
+    onBackUp,
+    onConfirm,
+  }
 }
 
 export const useDidMount = (cb: () => void) => {
