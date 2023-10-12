@@ -20,12 +20,15 @@ $bottomHeight: 186px;
   }
 }
 
+$right-min-width: 476px;
+
 .layout {
   display: flex;
 
   .left {
     flex: 1;
     position: relative;
+    max-width: calc(100% - $right-min-width);
 
     .info {
       padding: 20px 16px 16px;
@@ -33,6 +36,9 @@ $bottomHeight: 186px;
       display: flex;
       gap: 16px;
       color: var(--main-text-color);
+      .infoDetails {
+        max-width: calc(100% - 48px);
+      }
       .accountName {
         font-weight: 500;
         font-size: 14px;
@@ -42,10 +48,9 @@ $bottomHeight: 186px;
         margin-top: 4px;
         font-size: 12px;
         line-height: 17px;
-        overflow: initial !important;
         position: relative;
         color: var(--input-second-color);
-        display: inline-flex;
+        @include text-overflow-ellipsis;
       }
       .balance {
         margin-top: 8px;
@@ -54,10 +59,14 @@ $bottomHeight: 186px;
         line-height: 22px;
         display: flex;
         align-items: center;
+        & > span {
+          @include text-overflow-ellipsis;
+        }
         .btn {
           height: 16px;
           min-width: 16px;
           padding: 0 8px;
+          flex-shrink: 0;
           svg {
             g,
             path {
@@ -106,6 +115,10 @@ $bottomHeight: 186px;
       }
       .amount {
         margin-top: 20px;
+
+        & > label {
+          @include text-overflow-ellipsis;
+        }
       }
       .max {
         border-left: var(--divide-line-color) solid 1px;
@@ -162,6 +175,7 @@ $bottomHeight: 186px;
   .right {
     margin-left: 16px;
     flex: 1;
+    min-width: $right-min-width;
     @include card;
 
     .rightContent {

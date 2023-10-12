@@ -9,6 +9,7 @@
 
   .info {
     flex: 1;
+    max-width: calc(100% - 48px);
     .baseInfo {
       cursor: pointer;
     }

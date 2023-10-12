@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import SUDTAvatar from 'widgets/SUDTAvatar'
-import { AddressTransformWithCopyZone } from 'components/Receive/multiAddressReceive'
+import { AddressTransformWithCopyZone } from 'components/Receive'
 import QRCode, { copyCanvas, downloadCanvas } from 'widgets/QRCode'
 import Dialog from 'widgets/Dialog'
 import Button from 'widgets/Button'
@@ -68,7 +68,7 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
     >
       <div className={styles.container}>
         <Alert status="warn" className={styles.notification}>
-          {t('s-udt.receive.notation', { symbol: getDisplaySymbol(tokenName || '', symbol || '') })}
+          <span>{t('s-udt.receive.notation', { symbol: getDisplaySymbol(tokenName || '', symbol || '') })}</span>
         </Alert>
         <div className={styles.info}>
           <SUDTAvatar type="logo" />

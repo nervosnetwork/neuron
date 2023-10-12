@@ -8,9 +8,7 @@ import PageContainer from 'components/PageContainer'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import DatetimePickerDialog from 'widgets/DatetimePickerDialog'
-import { ReactComponent as Add } from 'widgets/Icons/Add.svg'
-import { ReactComponent as EyesOpen } from 'widgets/Icons/EyesOpen.svg'
-import { ReactComponent as EyesClose } from 'widgets/Icons/EyesClose.svg'
+import { GoBack, EyesOpen, EyesClose, Add } from 'widgets/Icons/icon'
 
 import {
   validateTotalAmount,
@@ -18,6 +16,7 @@ import {
   validateOutputs,
   useOutputErrors,
   shannonToCKBFormatter,
+  useGoBack,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 
@@ -27,6 +26,7 @@ import styles from './send.module.scss'
 
 const SendHeader = ({ balance }: { balance: string }) => {
   const { t } = useTranslation()
+  const onBack = useGoBack()
 
   const [showBalance, setShowBalance] = useState(true)
   const onChangeShowBalance = useCallback(() => {
@@ -35,6 +35,7 @@ const SendHeader = ({ balance }: { balance: string }) => {
 
   return (
     <div className={styles.headerContainer}>
+      <GoBack className={styles.goBack} onClick={onBack} />
       <p>{t('navbar.send')}</p>
       <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
         {showBalance ? <EyesOpen /> : <EyesClose />}

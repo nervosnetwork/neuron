@@ -48,10 +48,7 @@
       "capacity": "0x123057115949"
     }
   ],
-  "outputsData": [
-    "0x0000000000000000",
-    "0x"
-  ],
+  "outputsData": ["0x0000000000000000", "0x"],
   "headerDeps": [],
   "hash": "0x6df26cc7e3f5fd38a42658f3fb520144a092179b7fd9729dd1ea1f8f2d869745",
   "version": "0x0",

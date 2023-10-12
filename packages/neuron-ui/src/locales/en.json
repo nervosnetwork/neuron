@@ -146,7 +146,8 @@
       "destroySUDT": "Destroy <0></0> Asset Account",
       "wallet-ready": "Wallet is ready, welcome",
       "send": "Send",
-      "receive": "Receive"
+      "receive": "Receive",
+      "locked": "Locked Amount"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -344,7 +345,8 @@
       "copy-address": "Copy Address",
       "request-payment": "Request Payment",
       "view-on-explorer": "View on Explorer",
-      "default-description": "None"
+      "default-description": "None",
+      "all-address": "All"
     },
     "settings": {
       "title": {

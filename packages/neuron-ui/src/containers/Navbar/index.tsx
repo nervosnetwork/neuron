@@ -7,17 +7,7 @@ import { VerifyExternalCkbNodeRes, checkForUpdates, getVersion, verifyExternalCk
 import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
-import {
-  Overview,
-  Send,
-  Receive,
-  History,
-  NervosDAO,
-  Settings,
-  Experimental,
-  MenuExpand,
-  ArrowNext,
-} from 'widgets/Icons/icon'
+import { Overview, History, NervosDAO, Settings, Experimental, MenuExpand, ArrowNext } from 'widgets/Icons/icon'
 import { RoutePath, clsx, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 
@@ -27,8 +17,6 @@ export const FULL_SCREENS = [`/wizard/`, `/keystore/`, RoutePath.ImportHardware]
 
 const menuItems = [
   { name: 'navbar.overview', key: RoutePath.Overview, url: RoutePath.Overview, icon: <Overview /> },
-  { name: 'navbar.send', key: RoutePath.Send, url: RoutePath.Send, icon: <Send /> },
-  { name: 'navbar.receive', key: RoutePath.Receive, url: RoutePath.Receive, icon: <Receive /> },
   { name: 'navbar.history', key: RoutePath.History, url: RoutePath.History, icon: <History /> },
   { name: 'navbar.nervos-dao', key: RoutePath.NervosDAO, url: RoutePath.NervosDAO, icon: <NervosDAO /> },
   { name: 'navbar.settings', key: RoutePath.Settings, url: RoutePath.Settings, icon: <Settings /> },

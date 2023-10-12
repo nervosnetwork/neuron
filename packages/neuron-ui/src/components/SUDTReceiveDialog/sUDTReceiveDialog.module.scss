@@ -24,6 +24,7 @@
   border-radius: 16px;
   column-gap: 16px;
   .right {
+    max-width: calc(100% - 48px);
     .accountName {
       font-weight: 500;
       font-size: 14px;
@@ -43,9 +44,6 @@
 }
 
 .notification {
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 32px;
   height: 32px;
   text-align: center;
   color: var(--notice-text-color);
@@ -53,12 +51,18 @@
   justify-content: center;
   align-items: center;
   word-break: break-word;
-  margin: 0;
+  margin: 0 4px;
   background-color: var(--warn-background-color);
 
   svg {
     margin-right: 4px;
     flex-shrink: 0;
+  }
+  & > span {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 32px;
+    @include text-overflow-ellipsis;
   }
   .symbol {
     display: inline-flex;

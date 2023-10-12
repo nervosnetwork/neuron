@@ -426,7 +426,7 @@ const HardwareSign = ({
   })
 
   if (error) {
-    return <AlertDialog show message={error} type="failed" onCancel={onCancel} />
+    return <AlertDialog show message={errorFormatter(error, t)} type="failed" onCancel={onCancel} />
   }
 
   return (

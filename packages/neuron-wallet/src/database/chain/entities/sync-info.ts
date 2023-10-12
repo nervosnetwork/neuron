@@ -21,7 +21,7 @@ export default class SyncInfo {
     return res
   }
 
-  static getLastCachedKey(walletId: string) {
-    return `lastCachedBlockNumber_${walletId}`
+  static getLastCachedKey(blake160: string) {
+    return `lastCachedBlockNumber_${blake160}`
   }
 }

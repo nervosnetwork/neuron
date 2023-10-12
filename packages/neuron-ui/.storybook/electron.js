@@ -1,6 +1,6 @@
 const sendSyncValues = {
   'get-locale': 'zh',
-  'get-version': '0.103.1'
+  'get-version': '0.103.1',
 }
 
 module.exports = {
@@ -12,10 +12,10 @@ module.exports = {
       return Promise.resolve({})
     },
     on() {},
-    removeAllListeners() {}
+    removeAllListeners() {},
   },
   clipboard() {},
   nativeImage() {},
   shell() {},
-  desktopCapturer() {}
+  desktopCapturer() {},
 }
