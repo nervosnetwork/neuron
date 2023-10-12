@@ -1703,6 +1703,13 @@
     js-xxhash "^1.0.4"
     lodash.isequal "^4.5.0"
 
+"@ckb-lumos/bi@0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.20.0.tgz#4fa3beca641737b7b83a64d56668067e38cc288d"
+  integrity sha512-cJtv1NnvC11oQbDC8f3jIGTYdyEs2m8GvSrZgGL5KjBoaHTWghH8v6Z2XkwFgHmmCwfX5KrdXekrsOWrcIXyqw==
+  dependencies:
+    jsbi "^4.1.0"
+
 "@ckb-lumos/bi@0.20.0-alpha.3":
   version "0.20.0-alpha.3"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.20.0-alpha.3.tgz#7c20776558d33b838e54550be22ff8eed909a3e4"
