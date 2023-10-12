@@ -6,7 +6,7 @@
   outline: none !important;
   -webkit-tap-highlight-color: none !important;
   user-select: none;
-  font-family: 'PingFang SC';
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Inter-Regular', 'Inter-Medium';
 }
 
 [type='button'],
@@ -30,7 +30,7 @@ html {
 }
 
 body {
-  @include regular-text;
+  font-family: 'Inter-Regular', 'Inter-Medium';
   margin: 0;
   padding: 0;
   background: #f8f8f8;
