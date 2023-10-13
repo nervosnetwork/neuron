@@ -279,7 +279,7 @@ export default class MultisigService {
           multisigConfigs.map(v => {
             const blockNumber =
               syncBlockNumbersMap[scriptToHash(Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n))]
-            v.lastestBlockNumber = `0x${BigInt(blockNumber).toString(16)}`
+            v.lastestBlockNumber = `0x${BigInt(blockNumber ?? v.lastestBlockNumber).toString(16)}`
             return v
           })
         )

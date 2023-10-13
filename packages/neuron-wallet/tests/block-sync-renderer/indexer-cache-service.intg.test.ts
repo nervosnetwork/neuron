@@ -275,21 +275,27 @@ describe('indexer cache service', () => {
 
         stubbedCellCollectorConstructor.mockReset()
         when(stubbedCellCollectorConstructor)
-          .calledWith(expect.anything(), expect.objectContaining({
-            lock: {
-              ...formattedSingleMultiSignLockScript,
-              args: formattedSingleMultiSignLockScript.args.slice(0, 42),
-            },
-            argsLen: 28,
-          }))
+          .calledWith(
+            expect.anything(),
+            expect.objectContaining({
+              lock: {
+                ...formattedSingleMultiSignLockScript,
+                args: formattedSingleMultiSignLockScript.args.slice(0, 42),
+              },
+              argsLen: 28,
+            })
+          )
           .mockReturnValue(fakeCollectorObj)
-          .calledWith(expect.anything(), expect.objectContaining({
-            lock: {
-              ...formattedChequeLockScript,
-              args: formattedChequeLockScript.args.slice(0, 42),
-            },
-            argsLen: 40,
-          }))
+          .calledWith(
+            expect.anything(),
+            expect.objectContaining({
+              lock: {
+                ...formattedChequeLockScript,
+                args: formattedChequeLockScript.args.slice(0, 42),
+              },
+              argsLen: 40,
+            })
+          )
           .mockReturnValue(fakeCollectorObj)
 
         newTxHashes = await indexerCacheService.upsertTxHashes()

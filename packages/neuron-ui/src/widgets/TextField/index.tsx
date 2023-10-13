@@ -30,7 +30,7 @@ const TextField = React.forwardRef(
       ...rest
     }: {
       field: string
-      label?: string
+      label?: string | React.ReactNode
       value?: string
       hint?: string
       error?: string
@@ -58,6 +58,8 @@ const TextField = React.forwardRef(
     const changePasswordHide = useCallback(() => {
       setIsPasswordHidden(v => !v)
     }, [setIsPasswordHidden])
+    // FIXME: label should be limited to a string because it has its own semantic meaning
+    const labelStr = typeof label === 'string' ? label : field
     return (
       <div
         className={`${styles.textField} ${stack ? styles.stack : ''} ${className}`}
@@ -66,7 +68,7 @@ const TextField = React.forwardRef(
         ref={ref}
       >
         {label ? (
-          <label htmlFor={field} aria-label={label} title={label}>
+          <label htmlFor={field} aria-label={labelStr} title={labelStr}>
             {label}
           </label>
         ) : null}
@@ -85,9 +87,9 @@ const TextField = React.forwardRef(
               rows={rows}
               value={value}
               placeholder={placeholder}
-              title={label}
-              name={label}
-              aria-label={label}
+              title={labelStr}
+              name={labelStr}
+              aria-label={labelStr}
               onChange={onChange}
               onClick={onClick}
               readOnly={readOnly}
@@ -101,9 +103,9 @@ const TextField = React.forwardRef(
               type={!isPasswordHidden && type === 'password' ? 'text' : type}
               value={value}
               placeholder={placeholder}
-              title={label}
-              name={label}
-              aria-label={label}
+              title={labelStr}
+              name={labelStr}
+              aria-label={labelStr}
               onChange={onChange}
               onClick={onClick}
               readOnly={readOnly}

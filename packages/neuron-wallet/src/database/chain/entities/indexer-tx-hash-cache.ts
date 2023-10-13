@@ -66,4 +66,25 @@ export default class IndexerTxHashCache extends BaseEntity {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt!: Date
+
+  static fromObject(obj: {
+    txHash: string
+    blockNumber: number
+    blockHash: string
+    blockTimestamp: string
+    lockHash: string
+    address: string
+    walletId: string
+  }) {
+    const result = new IndexerTxHashCache()
+    result.txHash = obj.txHash
+    result.blockNumber = obj.blockNumber
+    result.blockHash = obj.blockHash
+    result.blockTimestamp = obj.blockTimestamp
+    result.lockHash = obj.lockHash
+    result.address = obj.address
+    result.walletId = obj.walletId
+    result.isProcessed = false
+    return result
+  }
 }

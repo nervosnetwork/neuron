@@ -3,10 +3,17 @@ import { CONNECTION_NOT_FOUND_NAME } from '../database/chain/ormconfig'
 import { FailedTransaction, TransactionPersistor } from '../services/tx'
 import RpcService from '../services/rpc-service'
 import NetworksService from '../services/networks'
-import { TransactionStatus } from '../models/chain/transaction'
+import Transaction, { TransactionStatus } from '../models/chain/transaction'
 import TransactionWithStatus from '../models/chain/transaction-with-status'
 import logger from '../utils/logger'
 import { interval } from 'rxjs'
+
+type TransactionDetail = {
+  hash: string
+  tx: Transaction | undefined
+  status: TransactionStatus
+  blockHash: string | null
+}
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NetworksService.getInstance().getCurrent().remote
@@ -42,18 +49,26 @@ const trackingStatus = async () => {
   const pendingHashes = pendingTransactions.map(tx => tx.hash)
   const txs = await Promise.all(
     pendingHashes.map(async hash => {
-      const txWithStatus = await getTransactionStatus(hash)
-      return {
-        hash,
-        tx: txWithStatus.tx,
-        status: txWithStatus.status,
-        blockHash: txWithStatus.blockHash,
+      try {
+        const txWithStatus = await getTransactionStatus(hash)
+        return {
+          hash,
+          tx: txWithStatus.tx,
+          status: txWithStatus.status,
+          blockHash: txWithStatus.blockHash,
+        }
+      } catch (error) {
+        // ignore error, get failed skip current update
       }
     })
   )
 
-  const failedTxs = txs.filter(tx => tx.status === TransactionStatus.Failed)
-  const successTxs = txs.filter(tx => tx.status === TransactionStatus.Success)
+  const failedTxs = txs.filter(
+    (tx): tx is TransactionDetail & { status: TransactionStatus.Failed } => tx?.status === TransactionStatus.Failed
+  )
+  const successTxs = txs.filter(
+    (tx): tx is TransactionDetail & { status: TransactionStatus.Success } => tx?.status === TransactionStatus.Success
+  )
 
   if (failedTxs.length) {
     await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))

@@ -1,6 +1,6 @@
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
-import LiveCell from "../../../src/models/chain/live-cell"
+import LiveCell from '../../../src/models/chain/live-cell'
 
 describe('LiveCell Test', () => {
   const INITIAL_DATA = {

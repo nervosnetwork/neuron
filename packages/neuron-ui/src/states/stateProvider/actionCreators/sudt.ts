@@ -10,10 +10,10 @@ import { addNotification } from './app'
 
 export const sendCreateSUDTAccountTransaction =
   (params: Controller.SendCreateSUDTAccountTransaction.Params) => async (dispatch: StateDispatch) =>
-    sendTxBaseAction(sendCreateAccountTx, params, dispatch, addNotification)
+    sendTxBaseAction(sendCreateAccountTx, params, dispatch)
 
 export const sendSUDTTransaction = (params: Controller.SendSUDTTransaction.Params) => async (dispatch: StateDispatch) =>
-  sendTxBaseAction(sendSUDTTx, params, dispatch, addNotification)
+  sendTxBaseAction(sendSUDTTx, params, dispatch)
 
 export const migrateAcp = (params: Controller.MigrateAcp.Params) => async (dispatch: StateDispatch) => {
   dispatch({
