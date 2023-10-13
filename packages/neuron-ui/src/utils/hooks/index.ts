@@ -438,7 +438,7 @@ export const useMigrate = () => {
     return () => {
       migrateSubscription.unsubscribe()
     }
-  }, [isMigrateDialogShow])
+  }, [hasDismissMigrate])
   const onCancel = useCallback(() => {
     setIsMigrateDialogShow(false)
     setHasDismissMigrate(true)

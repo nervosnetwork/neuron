@@ -37,13 +37,14 @@ const SubjectConstructor = <T>(
   return ipcRenderer
     ? {
         subscribe: (handler: (data: T) => void) => {
-          ipcRenderer.on(channel, (_e: Event, data: T) => {
+          const handlerWrap = (_e: Event, data: T) => {
             handler(data)
-          })
+          }
+          ipcRenderer.on(channel, handlerWrap)
           return {
             unsubscribe: () => {
               if (isMulti) {
-                ipcRenderer.removeListener(channel, handler)
+                ipcRenderer.removeListener(channel, handlerWrap)
               } else {
                 ipcRenderer.removeAllListeners(channel)
               }
