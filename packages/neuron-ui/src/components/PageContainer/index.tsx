@@ -151,6 +151,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
         show={isSetStartBlockShown}
         onCancel={closeDialog}
         onConfirm={onConfirm}
+        disabled={!startBlockNumber}
       >
         <p className={styles.startBlockTip}>{t('set-start-block-number.tip')}</p>
         <TextField

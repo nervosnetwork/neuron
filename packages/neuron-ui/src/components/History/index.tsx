@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Pagination from 'widgets/Pagination'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import Button from 'widgets/Button'
@@ -11,7 +11,7 @@ import { Download, Search, ArrowNext } from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
 import FormattedTokenAmount from 'components/FormattedTokenAmount'
-import { getDisplayName, isTonkenInfoStandardUAN } from 'components/UANDisplay'
+import { UANTokenName, isTonkenInfoStandardUAN } from 'components/UANDisplay'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { exportTransactions } from 'services/remote'
 
@@ -76,7 +76,7 @@ const History = () => {
   const handleTransactionInfo = (tx: State.Transaction) => {
     let name = '--'
     let amount = '--'
-    let typeLabel = '--'
+    let typeLabel: React.ReactNode = '--'
     let sudtAmount = ''
     let showWithUANFormatter = false
 
@@ -92,7 +92,12 @@ const History = () => {
       if (['create', 'destroy'].includes(tx.type)) {
         // create/destroy an account
         showWithUANFormatter = isTonkenInfoStandardUAN(tx.sudtInfo.sUDT.tokenName, tx.sudtInfo.sUDT.symbol)
-        typeLabel = `${t(`history.${tx.type}`, { name: getDisplayName(name, tx.sudtInfo.sUDT.symbol) })}`
+        typeLabel = (
+          <Trans
+            i18nKey={`history.${tx.type}SUDT`}
+            components={[<UANTokenName name={tx.sudtInfo.sUDT.tokenName} symbol={tx.sudtInfo.sUDT.symbol} />]}
+          />
+        )
       } else {
         // send/receive to/from an account
         const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'

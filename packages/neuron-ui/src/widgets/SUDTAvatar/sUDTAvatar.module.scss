@@ -8,6 +8,7 @@
   background-color: var(--table-head-border-color);
   font-size: 20px;
   text-transform: uppercase;
+  flex-shrink: 0;
 
   img {
     width: 24px;

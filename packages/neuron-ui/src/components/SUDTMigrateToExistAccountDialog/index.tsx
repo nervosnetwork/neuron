@@ -17,7 +17,8 @@ const SUDTMigrateToExistAccountDialog = ({
   isMainnet,
   walletID,
   isLightClient,
-  onCancel,
+  onCloseDialog,
+  onBack,
   onSuccess,
 }: {
   cell: SpecialAssetCell
@@ -26,7 +27,8 @@ const SUDTMigrateToExistAccountDialog = ({
   isMainnet: boolean
   walletID: string
   isLightClient: boolean
-  onCancel: () => void
+  onCloseDialog: () => void
+  onBack: () => void
   onSuccess: (text: string) => void
 }) => {
   const [t] = useTranslation()
@@ -56,7 +58,7 @@ const SUDTMigrateToExistAccountDialog = ({
       outPoint: cell.outPoint,
       acpAddress: address,
     }).then(res => {
-      onCancel()
+      onCloseDialog()
       if (isSuccessResponse(res)) {
         if (res.result) {
           dispatch({
@@ -87,14 +89,14 @@ const SUDTMigrateToExistAccountDialog = ({
         })
       }
     })
-  }, [cell.outPoint, address, t, onCancel, dispatch, walletID])
+  }, [cell.outPoint, address, t, onCloseDialog, dispatch, walletID])
 
   return (
     <Dialog
       className={styles.container}
       show
       title={t('migrate-sudt.transfer-to-exist-account.title')}
-      onCancel={onCancel}
+      onCancel={onBack}
       cancelText={t('migrate-sudt.back')}
       confirmText={t('migrate-sudt.next')}
       onConfirm={onSubmit}

@@ -6,6 +6,7 @@ describe(`Reset sync task`, () => {
     getInstance: () => ({ maintainAddressesIfNecessary: stubbedmaintainAddressesIfNecessary }),
   }))
   jest.doMock('utils/common', () => ({ sleep: stubbedSleep, timeout: stubbedTimeout }))
+  jest.doMock('services/tx', () => ({ TransactionPersistor: { checkTxLock: jest.fn() } }))
 
   const blockSyncRenderer = require('block-sync-renderer')
   const spyCreateBlockSyncTask = jest

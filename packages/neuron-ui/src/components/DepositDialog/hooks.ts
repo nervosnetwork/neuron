@@ -170,7 +170,7 @@ function calculatePercent(amount: string, total: string) {
   return +((BigInt(PERCENT_100) * BigInt(amount)) / BigInt(total)).toString()
 }
 
-export const useDepositValue = (balance: string) => {
+export const useDepositValue = (balance: string, showDepositDialog: boolean) => {
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [slidePercent, setSlidePercent] = useState(
     calculatePercent(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`), balance)
@@ -209,6 +209,12 @@ export const useDepositValue = (balance: string) => {
     setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
     setSlidePercent(calculatePercent(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`), balance))
   }, [balance])
+  useEffect(() => {
+    if (showDepositDialog) {
+      resetDepositValue()
+    }
+    // ignore resetDepositValue changed, only showDepositDialog from false -> true reset
+  }, [showDepositDialog])
   return {
     onChangeDepositValue,
     setDepositValue,

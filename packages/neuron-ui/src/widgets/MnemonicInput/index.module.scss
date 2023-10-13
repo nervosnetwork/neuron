@@ -1,7 +1,7 @@
 .root {
   width: 624px;
   background: var(--secondary-background-color);
-  border: 1px solid #F0F0F0;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   display: grid;
   grid-template-columns: repeat(6, 60px);
@@ -25,14 +25,14 @@
 
   & .wordItem {
     &:focus-within {
-      color: #00C891;
+      color: #00c891;
     }
     &:not(:focus-within) {
       &.errorWords {
-        color: #FF1E1E;
+        color: #ff1e1e;
         & > input {
-          border-bottom: 1px solid #FF1E1E;
-          color: #FF1E1E;
+          border-bottom: 1px solid #ff1e1e;
+          color: #ff1e1e;
         }
       }
     }
@@ -56,7 +56,7 @@
       padding-bottom: 4px;
 
       &:focus {
-        border-bottom: 1px solid #00C891;;
+        border-bottom: 1px solid #00c891;
       }
     }
   }
