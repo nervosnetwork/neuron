@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, migrateData, getCkbNodeDataPath } from 'services/remote'
 import { loadedWalletIDs, syncRebuildNotification, wallets } from 'services/localCache'
@@ -409,13 +409,14 @@ export const useMigrate = () => {
   const [isMigrateDialogShow, setIsMigrateDialogShow] = useState(false)
   const [hasDismissMigrate, setHasDismissMigrate] = useState(false)
   const [ckbDataPath, setCkbDataPath] = useState<string>()
+  const location = useLocation()
   useEffect(() => {
     getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res) && res.result) {
         setCkbDataPath(res.result)
       }
     })
-  })
+  }, [location.pathname])
   const onBackUp = useCallback(() => {
     if (ckbDataPath) {
       shell.openPath(ckbDataPath)
