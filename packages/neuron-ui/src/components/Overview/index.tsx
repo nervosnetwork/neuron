@@ -116,8 +116,9 @@ const Overview = () => {
     setShowBalance(v => !v)
   }, [setShowBalance])
 
-  const gotoCellManage = useCallback(() => {
-    navigate(`${RoutePath.Overview}/${RoutePath.CellManage}`)
+  const gotoCellManage = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const { order } = e.currentTarget.dataset
+    navigate(`${RoutePath.Overview}/${RoutePath.CellManage}?order=${order}`)
   }, [])
   const [lockedBalance, setLockedBalance] = useState('0')
   useEffect(() => {
@@ -150,7 +151,7 @@ const Overview = () => {
             <span className={styles.balanceUnit}>CKB</span>
             <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
             <div className={styles.items}>
-              <button className={styles.button} type="button" onClick={gotoCellManage}>
+              <button className={styles.button} type="button" data-order="locked" onClick={gotoCellManage}>
                 <Lock />
                 <span className={styles.lockedTitle}>{t('overview.locked-balance')}&nbsp;:</span>
                 {showBalance ? (

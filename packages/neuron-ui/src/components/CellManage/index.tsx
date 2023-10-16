@@ -3,7 +3,7 @@ import { Attention, Consume, Copy, DetailIcon, EyesClose, EyesOpen, LockCell, Ne
 import PageContainer from 'components/PageContainer'
 import { useTranslation } from 'react-i18next'
 import Breadcrum from 'widgets/Breadcrum'
-import Table, { TableProps } from 'widgets/Table'
+import Table, { TableProps, SortType } from 'widgets/Table'
 import Pagination from 'widgets/Pagination'
 import { useState as useGlobalState } from 'states'
 import {
@@ -22,6 +22,7 @@ import Alert from 'widgets/Alert'
 import ShowOrEditDesc from 'widgets/ShowOrEditDesc'
 import { TFunction } from 'i18next'
 import TextField from 'widgets/TextField'
+import { useSearchParams } from 'react-router-dom'
 import { Actions, useAction, useLiveCells, usePassword, useSelect, useViewCell } from './hooks'
 import styles from './cellManage.module.scss'
 
@@ -172,12 +173,7 @@ const getColumns = ({
                 data-index={index}
               />
             )}
-            <Consume
-              data-disabled={!!lockedReason}
-              onClick={onAction}
-              data-action={Actions.Consume}
-              data-index={index}
-            />
+            <Consume data-disabled={!!locked} onClick={onAction} data-action={Actions.Consume} data-index={index} />
           </div>
         )
       },
@@ -193,34 +189,33 @@ const CellManage = () => {
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
   const [t] = useTranslation()
+  const [searchParams] = useSearchParams()
   const breadPages = useMemo(() => [{ label: t('cell-manage.title') }], [t])
   const [showBalance, setShowBalance] = useState(true)
   const onChangeShowBalance = useCallback(() => setShowBalance(v => !v), [])
-  const { liveCells, updateLiveCell, onSorted, updateLiveCellsLockStatus } = useLiveCells()
+  const initSortInfo = searchParams.get('order')
+    ? {
+        key: searchParams.get('order') as keyof State.LiveCellWithLocalInfo,
+        direction: SortType.Decrease,
+      }
+    : undefined
+  const { liveCells, updateLiveCell, onSorted, updateLiveCellsLockStatus } = useLiveCells({ initSortInfo })
   const { pageNo, pageSize, onPageChange } = usePagination()
   const currentPageLiveCells = useMemo(() => {
     return liveCells.slice(pageSize * (pageNo - 1), pageSize * pageNo)
   }, [pageNo, pageSize, liveCells])
-  const { onSelect, onSelectAll, isAllSelected, selectedOutPoints } = useSelect(liveCells)
+  const { onSelect, onSelectAll, isAllSelected, selectedOutPoints, hasSelectLocked } = useSelect(liveCells)
   const { password, error, onPasswordChange, setError, resetPassword } = usePassword()
-  const {
-    action,
-    operateCells,
-    onClickTableRow,
-    onActionCancel,
-    onActionConfirm,
-    onOpenActionDialog,
-    onMultiAction,
-    loading,
-  } = useAction({
-    liveCells,
-    currentPageLiveCells,
-    updateLiveCellsLockStatus,
-    selectedOutPoints,
-    setError,
-    resetPassword,
-    password,
-  })
+  const { action, operateCells, onActionCancel, onActionConfirm, onOpenActionDialog, onMultiAction, loading } =
+    useAction({
+      liveCells,
+      currentPageLiveCells,
+      updateLiveCellsLockStatus,
+      selectedOutPoints,
+      setError,
+      resetPassword,
+      password,
+    })
   const columns = useMemo(
     () =>
       getColumns({
@@ -249,7 +244,7 @@ const CellManage = () => {
         <div className={styles.head}>
           <Breadcrum pages={breadPages} showBackIcon />
           <div className={styles.balance}>
-            {showBalance ? <EyesClose onClick={onChangeShowBalance} /> : <EyesOpen onClick={onChangeShowBalance} />}
+            {showBalance ? <EyesOpen onClick={onChangeShowBalance} /> : <EyesClose onClick={onChangeShowBalance} />}
             <span>{t('cell-manage.wallet-balance')}</span>
             &nbsp;&nbsp;
             {`${showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB`}
@@ -259,11 +254,11 @@ const CellManage = () => {
     >
       <div className={styles.table}>
         <Table
-          head={<div className={styles.tableHead}>Live Cells</div>}
+          head={<div className={styles.tableHead}>Live Cells&nbsp;({liveCells.length})</div>}
           columns={columns}
           dataSource={currentPageLiveCells}
-          onRowClick={onClickTableRow}
           onSorted={onSorted}
+          initSortInfo={initSortInfo}
         />
         {selectedOutPoints.size ? (
           <div className={styles.multiActions}>
@@ -275,7 +270,7 @@ const CellManage = () => {
               <UnLock />
               {t('cell-manage.unlock')}
             </button>
-            <button type="button" onClick={onMultiAction} data-action={Actions.Consume}>
+            <button type="button" disabled={hasSelectLocked} onClick={onMultiAction} data-action={Actions.Consume}>
               <Consume />
               {t('cell-manage.consume')}
             </button>

@@ -104,11 +104,20 @@ const sortFunctions: Record<
 
 type KeyOfLiveCellWithLocalInfo = keyof State.LiveCellWithLocalInfo
 
-export const useLiveCells = () => {
-  const [sortInfo, setSortInfo] = useState<{ key: KeyOfLiveCellWithLocalInfo; type: SortType } | undefined>()
-  const onSorted = useCallback((key?: KeyOfLiveCellWithLocalInfo, type?: SortType) => {
-    if (key && type) {
-      setSortInfo({ key, type })
+export const useLiveCells = ({
+  initSortInfo,
+}: {
+  initSortInfo?: {
+    key: KeyOfLiveCellWithLocalInfo
+    direction: SortType
+  }
+}) => {
+  const [sortInfo, setSortInfo] = useState<{ key: KeyOfLiveCellWithLocalInfo; direction: SortType } | undefined>(
+    initSortInfo
+  )
+  const onSorted = useCallback((key?: KeyOfLiveCellWithLocalInfo, direction?: SortType) => {
+    if (key && direction) {
+      setSortInfo({ key, direction })
     } else {
       setSortInfo(undefined)
     }
@@ -117,7 +126,7 @@ export const useLiveCells = () => {
   const sortedLiveCells = useMemo(() => {
     if (sortInfo && sortFunctions[sortInfo.key]) {
       const sorted = [...liveCells]
-      return sorted.sort((a, b) => sortFunctions[sortInfo.key](a, b, sortInfo.type))
+      return sorted.sort((a, b) => sortFunctions[sortInfo.key](a, b, sortInfo.direction))
     }
     return liveCells
   }, [sortInfo, liveCells])
@@ -174,6 +183,7 @@ export const useLiveCells = () => {
     updateLiveCell,
     onSorted,
     updateLiveCellsLockStatus,
+    sortInfo,
   }
 }
 
@@ -206,10 +216,6 @@ export const useAction = ({
   const [action, setAction] = useState<undefined | Actions>()
   const [operateCells, setOperateCells] = useState<State.LiveCellWithLocalInfo[]>([])
   const [loading, setLoading] = useState(false)
-  const onClickTableRow = useCallback((_, item: State.LiveCellWithLocalInfo) => {
-    setAction(Actions.View)
-    setOperateCells([item])
-  }, [])
   const onOpenActionDialog = useCallback(
     (e: React.SyntheticEvent<SVGSVGElement, MouseEvent>) => {
       e.stopPropagation()
@@ -276,7 +282,6 @@ export const useAction = ({
     operateCells,
     onOpenActionDialog,
     onActionConfirm,
-    onClickTableRow,
     onActionCancel,
     onMultiAction,
   }
@@ -286,6 +291,10 @@ export const useSelect = (liveCells: State.LiveCellWithLocalInfo[]) => {
   const [selectedOutPoints, setSelectOutPoints] = useState(new Set<string>())
   const allCanSelectOutPoints = useMemo(
     () => new Set(liveCells.filter(v => !v.lockedReason).map(v => outPointToStr(v.outPoint))),
+    [liveCells]
+  )
+  const allLockedOutPoints = useMemo(
+    () => new Set(liveCells.filter(v => !v.lockedReason && v.locked).map(v => outPointToStr(v.outPoint))),
     [liveCells]
   )
   const onSelectAll = useCallback(
@@ -313,11 +322,16 @@ export const useSelect = (liveCells: State.LiveCellWithLocalInfo[]) => {
       }
     }
   }, [])
+  const hasSelectLocked = useMemo(
+    () => [...selectedOutPoints].some(v => allLockedOutPoints.has(v)),
+    [selectedOutPoints, allLockedOutPoints]
+  )
   return {
     selectedOutPoints,
     onSelect,
     onSelectAll,
     isAllSelected: selectedOutPoints.size === allCanSelectOutPoints.size && !!allCanSelectOutPoints.size,
+    hasSelectLocked,
   }
 }
 

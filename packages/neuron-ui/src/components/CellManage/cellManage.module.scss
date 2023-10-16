@@ -52,6 +52,7 @@
 
 .actions {
   & > svg {
+    cursor: pointer;
     &[data-disabled='true'] {
       cursor: not-allowed;
       opacity: 50%;
@@ -151,9 +152,8 @@
   min-width: 100px;
 
   .descText {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+    @include text-overflow-ellipsis;
+    max-width: calc(100vw - 1050px);
     cursor: pointer;
   }
 }
@@ -184,6 +184,10 @@
       color: var(--secondary-text-color);
       column-gap: 2px;
       cursor: pointer;
+      &[disabled] {
+        cursor: not-allowed;
+        opacity: 50%;
+      }
 
       & > svg {
         width: 20px;
