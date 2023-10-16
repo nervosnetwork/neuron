@@ -2,13 +2,12 @@ name: Update ckb node assume valid target
 
 on:
   create:
-    branches:
-      - "rc/**"
 
 jobs:
   ready-for-release:
     name: Update ckb node assume valid target
     runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref_name, 'rc/') }}
     steps:
       - name: Create Branch
         uses: peterjgrainger/action-create-branch@v2.2.0
