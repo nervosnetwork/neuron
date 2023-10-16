@@ -16,7 +16,7 @@ import { ArrowNext, EyesClose, EyesOpen, OverviewSend, OverviewReceive, Addressb
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
-import TracsactionType from 'components/TransactionType'
+import TransactionType from 'components/TransactionType'
 import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
@@ -174,7 +174,7 @@ const Overview = () => {
             minWidth: '250px',
             render(_, __, item) {
               return (
-                <TracsactionType
+                <TransactionType
                   item={item}
                   cacheTipBlockNumber={cacheTipBlockNumber}
                   bestKnownBlockNumber={bestKnownBlockNumber}

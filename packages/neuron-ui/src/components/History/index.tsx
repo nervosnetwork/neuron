@@ -20,7 +20,7 @@ import { RoutePath, isMainnet as isMainnetUtil, uniformTimeFormatter } from 'uti
 import { onEnter } from 'utils/inputDevice'
 import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
-import TracsactionType from 'components/TransactionType'
+import TransactionType from 'components/TransactionType'
 import RowExtend from './RowExtend'
 
 import { useSearch } from './hooks'
@@ -111,7 +111,7 @@ const History = () => {
       minWidth: '120px',
       render: (_, __, item) => {
         return (
-          <TracsactionType
+          <TransactionType
             item={item}
             cacheTipBlockNumber={cacheTipBlockNumber}
             bestKnownBlockNumber={bestKnownBlockNumber}
@@ -127,7 +127,7 @@ const History = () => {
       isBalance: true,
       minWidth: '200px',
       render(_, __, item, show) {
-        return <FormattedTokenAmount item={item} show={show} symbolClassName={styles.symbolClassName} />
+        return <FormattedTokenAmount item={item} show={show} symbolClassName={styles.symbol} />
       },
     },
     {

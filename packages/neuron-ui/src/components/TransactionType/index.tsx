@@ -26,13 +26,12 @@ const genTypeLabel = (
       }
       return 'received'
     }
-    default: {
+    default:
       return type
-    }
   }
 }
 
-const TracsactionType = ({
+const TransactionType = ({
   item,
   cacheTipBlockNumber,
   bestKnownBlockNumber,
@@ -100,6 +99,6 @@ const TracsactionType = ({
   return typeTransProps.i18nKey ? <Trans {...typeTransProps} /> : <>{typeLabel}</>
 }
 
-TracsactionType.displayName = 'TracsactionType'
+TransactionType.displayName = 'TransactionType'
 
-export default TracsactionType
+export default TransactionType
