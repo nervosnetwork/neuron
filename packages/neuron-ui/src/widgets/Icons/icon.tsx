@@ -44,6 +44,11 @@ import { ReactComponent as OverviewSendSvg } from './OverviewSend.svg'
 import { ReactComponent as OverviewReceiveSvg } from './OverviewReceive.svg'
 import { ReactComponent as AddressbookSvg } from './Addressbook.svg'
 import { ReactComponent as AddSvg } from './Add.svg'
+import { ReactComponent as ExperimentSvg } from './Experiment.svg'
+import { ReactComponent as WalletConnectSvg } from './WalletConnect.svg'
+import { ReactComponent as ScanSvg } from './Scan.svg'
+import { ReactComponent as ScanScreenSvg } from './ScanScreen.svg'
+import { ReactComponent as NumberScanSvg } from './NumberScan.svg'
 
 import styles from './icon.module.scss'
 
@@ -104,3 +109,8 @@ export const OverviewSend = WrapSvg(OverviewSendSvg)
 export const OverviewReceive = WrapSvg(OverviewReceiveSvg)
 export const Addressbook = WrapSvg(AddressbookSvg)
 export const Add = WrapSvg(AddSvg)
+export const Experiment = WrapSvg(ExperimentSvg)
+export const WalletConnect = WrapSvg(WalletConnectSvg)
+export const Scan = WrapSvg(ScanSvg)
+export const ScanScreen = WrapSvg(ScanScreenSvg)
+export const NumberScan = WrapSvg(NumberScanSvg)

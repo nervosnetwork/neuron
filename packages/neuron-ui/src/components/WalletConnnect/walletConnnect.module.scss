@@ -1,0 +1,208 @@
+@import '../../styles/mixin.scss';
+.pageHeader {
+  display: flex;
+  align-items: center;
+  p {
+    margin: 0 8px 0 5px;
+  }
+  svg {
+    g,
+    path {
+      fill: var(--main-text-color);
+    }
+  }
+}
+
+.container {
+  p {
+    margin: 0;
+  }
+  .panel {
+    padding: 24px;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+    .title {
+      color: var(--main-text-color);
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .mt24 {
+      margin-top: 24px;
+    }
+  }
+  .connectWrap {
+    position: relative;
+    .numberScan {
+      display: none;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      button {
+        padding: 0 24px;
+        svg {
+          margin-right: 4px;
+        }
+      }
+      .scanBtn {
+        margin-left: 12px;
+        svg {
+          g,
+          path {
+            fill: var(--primary-text-color);
+          }
+        }
+      }
+      .tipBtn {
+        display: block;
+        margin: 16px auto 0;
+        font-size: 12px;
+        height: 16px;
+      }
+    }
+    &[data-empty='false'] {
+      .numberScan {
+        display: block;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        height: 16px;
+        min-width: 16px;
+      }
+      .content {
+        flex-direction: row;
+        justify-content: space-between;
+        button {
+          font-size: 14px;
+          height: 44px;
+        }
+        .logo {
+          display: none;
+        }
+        .tipBtn {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .itemWrap {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--divide-line-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @include checkbox;
+    button {
+      height: 44px;
+      min-width: 124px;
+    }
+    .dangerBtn {
+      &:hover {
+        border-color: var(--error-color);
+        color: var(--error-color);
+      }
+    }
+    .title {
+      font-size: 14px;
+      span {
+        color: var(--third-text-color);
+        font-weight: 400;
+        margin-left: 8px;
+      }
+    }
+    .nameWrap {
+      display: flex;
+      p {
+        padding-right: 8px;
+        margin-right: 8px;
+        border-right: 1px solid var(--divide-line-color);
+      }
+    }
+    .itemContent {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: var(--third-text-color);
+      .hashWrap {
+        margin-left: 12px;
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+
+  .transactionItem {
+    display: block;
+  }
+}
+
+.ml12 {
+  margin-left: 12px;
+}
+
+.noRecords {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.uriDialog {
+  width: 400px;
+  padding: 24px 24px 0;
+}
+.infoContent {
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--input-disabled-color);
+  display: flex;
+  div {
+    flex: 1;
+    h3 {
+      color: var(--input-second-color);
+      margin-bottom: 8px;
+      display: block;
+      font-size: 14px;
+    }
+    .address {
+      font-weight: 500;
+      font-family: 'JetBrains Mono';
+    }
+    p {
+      margin-bottom: 16px;
+      color: var(--main-text-color);
+    }
+  }
+  .detailButton {
+    display: flex;
+    border: none;
+    background: inherit;
+    padding: unset;
+    align-items: center;
+    color: var(--secondary-text-color);
+    gap: 5px;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--primary-color);
+      svg > path {
+        fill: var(--primary-color);
+      }
+    }
+  }
+}
+
+.rightActions {
+  display: flex;
+  margin-top: 16px;
+  justify-content: flex-end;
+  gap: 12px;
+}

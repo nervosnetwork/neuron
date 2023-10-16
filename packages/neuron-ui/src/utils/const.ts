@@ -76,3 +76,7 @@ export const MILLISECONDS = HOURS_PER_EPOCH * 60 * 60 * 1000
 
 export const ADDRESS_MIN_LENGTH = 86
 export const ADDRESS_HEAD_TAIL_LENGTH = 34
+
+export const SCRIPT_BASES: Record<string, string> = {
+  '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8': 'SECP256K1/blake160',
+}

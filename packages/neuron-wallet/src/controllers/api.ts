@@ -62,6 +62,7 @@ import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
+import WalletConnectController from './wallet-connect'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -78,6 +79,7 @@ export default class ApiController {
   #offlineSignController = new OfflineSignController()
   #sudtController = new SUDTController()
   #multisigController = new MultisigController()
+  #walletConnectController = new WalletConnectController()
 
   public async mount() {
     this.#registerHandlers()
@@ -810,6 +812,26 @@ export default class ApiController {
         result: await SyncProgressService.getSyncProgressByHashes(hashes),
         status: ResponseCode.Success,
       }
+    })
+
+    // walletconnect
+    handle('wc-connect', async (_, params) => {
+      return this.#walletConnectController.connect(params)
+    })
+    handle('wc-disconnect', async (_, params) => {
+      return this.#walletConnectController.disconnect(params)
+    })
+    handle('wc-approve-session', async (_, params) => {
+      return this.#walletConnectController.approveSession(params)
+    })
+    handle('wc-reject-session', async (_, params) => {
+      return this.#walletConnectController.rejectSession(params)
+    })
+    handle('wc-approve-request', async (_, params) => {
+      return this.#walletConnectController.approveRequest(params)
+    })
+    handle('wc-reject-request', async (_, params) => {
+      return this.#walletConnectController.rejectRequest(params)
     })
   }
 

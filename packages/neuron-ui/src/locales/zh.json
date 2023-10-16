@@ -23,6 +23,7 @@
       "connecting": "正在连接节点",
       "experimental-functions": "实验性功能",
       "s-udt": "资产账户",
+      "wallet-connect": "Wallet Connect",
       "update-neuron-with-ckb": "CKB 节点版本与 Neuron (v{{ version }}) 不匹配，可能导致兼容性问题。请更新到最新版 Neuron。",
       "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。",
       "ckb-without-indexer": "请添加 '--indexer' 参数来启动本地节点"
@@ -1130,6 +1131,37 @@
       "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
       "locate-first-tx": "定位第一笔交易",
       "view-block": "查看区块"
+    },
+    "wallet-connect": {
+      "title": "通过WalletConnect连接DAPP",
+      "add-title": "新增WalletConnect连接",
+      "scan-with-camera": "使用摄像头扫描",
+      "scan-qrcode": "扫描屏幕二维码",
+      "no-camera-tip": "没有摄像头？使用连接码连接",
+      "session-request": "连接请求",
+      "no-session": "没有连接请求",
+      "reject": "拒绝",
+      "approve": "授权",
+      "next": "下一步",
+      "user-name": "用户名",
+      "use-uri": "使用连接码连接",
+      "uri-placeholder": "请输入连接码",
+      "connect": "连接",
+      "connecting": "正在通过WalletConnect连接你的钱包",
+      "invalid-qrcode": "无效的二维码",
+      "invalid-qrcode-tip": "请确保屏幕上/摄像头画面中的WalletConnect二维码有效",
+      "connected-session": "已建立的连接",
+      "disconnect": "断开连接",
+      "toast": {
+        "connected": "钱包已连接",
+        "signMessage": "您有一笔新的WalletConnect签名信息请求",
+        "sign-success": "签名成功"
+      },
+      "sign-request": "签名请求",
+      "sign-info": "签名信息",
+      "transfer-info": "支付信息",
+      "view-details": "查看详情",
+      "locked-period": "锁定时间"
     }
   }
 }

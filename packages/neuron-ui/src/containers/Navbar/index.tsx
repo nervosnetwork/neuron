@@ -4,7 +4,8 @@ import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { NeuronWalletActions, showGlobalAlertDialog, useDispatch, useState as useGlobalState } from 'states'
 import { VerifyExternalCkbNodeRes, checkForUpdates, getVersion, verifyExternalCkbNode } from 'services/remote'
-import { AppUpdater as AppUpdaterSubject } from 'services/subjects'
+import { AppUpdater as AppUpdaterSubject, WalletConnectUpdate as WalletConnectUpdateSubject } from 'services/subjects'
+import { AppActions } from 'states/stateProvider/reducer'
 import Badge from 'widgets/Badge'
 import Logo from 'widgets/Icons/Logo.png'
 import { Overview, History, NervosDAO, Settings, Experimental, MenuExpand, ArrowNext } from 'widgets/Icons/icon'
@@ -28,6 +29,11 @@ const menuItems = [
     children: [
       { name: 'navbar.special-assets', key: RoutePath.SpecialAssets, url: RoutePath.SpecialAssets },
       { name: 'navbar.s-udt', key: RoutePath.SUDTAccountList, url: RoutePath.SUDTAccountList },
+      {
+        name: 'navbar.wallet-connect',
+        key: RoutePath.WalletConnect,
+        url: RoutePath.WalletConnect,
+      },
     ],
   },
 ]
@@ -78,8 +84,16 @@ const Navbar = () => {
     }
     const appUpdaterSubscription = AppUpdaterSubject.subscribe(onAppUpdaterUpdates)
 
+    const walletConnectUpdateSubscription = WalletConnectUpdateSubject.subscribe(payload => {
+      dispatch({
+        type: AppActions.UpdateWalletConnectState,
+        payload,
+      })
+    })
+
     return () => {
       appUpdaterSubscription.unsubscribe()
+      walletConnectUpdateSubscription.unsubscribe()
     }
   }, [dispatch])
 

@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { Transaction } from 'ckb-walletconnect-wallet-sdk'
 import { remoteApi } from './remoteApiWrapper'
 import { MultisigEntity } from './multisig'
 
@@ -17,7 +18,7 @@ export enum OfflineSignType {
   Invalid = 'Invalid',
 }
 
-interface MultisigConfigs {
+export interface MultisigConfigs {
   [hash: string]: {
     sighash_addresses: string[]
     require_first_n: number
@@ -26,7 +27,7 @@ interface MultisigConfigs {
 }
 
 export interface OfflineSignJSON {
-  transaction: State.GeneratedTx
+  transaction: State.GeneratedTx | Transaction
   status: OfflineSignStatus
   type: OfflineSignType
   description?: string

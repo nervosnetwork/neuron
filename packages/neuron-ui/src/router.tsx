@@ -21,6 +21,7 @@ import OfflineSign from 'components/OfflineSign'
 import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
+import WalletConnnect from 'components/WalletConnnect'
 
 const toolsRouters = [
   {
@@ -187,6 +188,17 @@ const mainRouterConfig: RouteObject[] = [
         element: (
           <>
             <SUDTAccountList />
+            <Outlet />
+          </>
+        ),
+        children: [...toolsRouters],
+      },
+
+      {
+        path: RoutePath.WalletConnect,
+        element: (
+          <>
+            <WalletConnnect />
             <Outlet />
           </>
         ),

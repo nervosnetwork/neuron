@@ -23,6 +23,7 @@
       "connecting": "Connecting",
       "experimental-functions": "Experimental",
       "s-udt": "Asset Accounts",
+      "wallet-connect": "Wallet Connect",
       "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
       "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation.",
       "ckb-without-indexer": "Please add '--indexer' option to start local node"
@@ -1136,6 +1137,37 @@
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",
       "view-block": "View the block"
+    },
+    "wallet-connect": {
+      "title": "Connecting to DAPP via WalletConnect",
+      "add-title": "Add WalletConnect connection",
+      "scan-with-camera": "Scanning with the camera",
+      "scan-qrcode": "Scan the QR code in the screen",
+      "no-camera-tip": "Don't have a webcam? Use the uri to connect",
+      "session-request": "Connection Requests",
+      "no-session": "No connection requests",
+      "reject": "Reject",
+      "approve": "Approve",
+      "next": "Next Step",
+      "user-name": "Username",
+      "use-uri": "Use the uri to connect",
+      "uri-placeholder": "Please input the uri",
+      "connect": "Connect",
+      "connecting": "Connecting your wallet via WalletConnect now",
+      "invalid-qrcode": "Invalid QR code",
+      "invalid-qrcode-tip": "Make sure the WalletConnect QR code on the screen/camera feed is valid",
+      "connected-session": "Established connections",
+      "disconnect": "Disconnect",
+      "toast": {
+        "connected": "Wallet connected",
+        "signMessage": "You have a new WalletConnect Signature Information request",
+        "sign-success": "Signed successfully"
+      },
+      "sign-request": "Request for signature",
+      "sign-info": "Signature Information",
+      "transfer-info": "Payment Information",
+      "view-details": "View Details",
+      "locked-period": "Locked Period"
     }
   }
 }

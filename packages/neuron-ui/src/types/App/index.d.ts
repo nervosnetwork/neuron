@@ -1,3 +1,5 @@
+/// <reference types="ckb-walletconnect-wallet-sdk" />
+
 declare namespace State {
   interface Transaction {
     type: 'send' | 'receive' | 'create' | 'destroy'
@@ -331,6 +333,14 @@ declare namespace State {
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
     experimental: Experimental | null
+    walletConnect: State.WalletConnect
+  }
+
+  interface WalletConnect {
+    proposals: Proposal[]
+    sessions: Session[]
+    requests: SessionRequest[]
+    identity: string
   }
 }
 

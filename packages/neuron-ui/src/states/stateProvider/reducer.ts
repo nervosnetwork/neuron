@@ -65,6 +65,9 @@ export enum AppActions {
   GetFeeRateStats = 'getFeeRateStats',
   UpdateCountDown = 'updateCountDown',
   SignVerify = 'signVerify',
+
+  // walletConnect
+  UpdateWalletConnectState = 'updateWalletConnectState',
 }
 
 export type StateAction =
@@ -116,6 +119,10 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
   | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
   | { type: AppActions.SignVerify; payload: string }
+  | {
+      type: AppActions.UpdateWalletConnectState
+      payload: State.WalletConnect
+    }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -406,6 +413,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.HideWaitForFullySynced: {
       state.app.showWaitForFullySynced = false
+      break
+    }
+    case AppActions.UpdateWalletConnectState: {
+      state.walletConnect = action.payload
       break
     }
 
