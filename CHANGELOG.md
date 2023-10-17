@@ -1,3 +1,54 @@
+# 0.110.3 (2023-10-11)
+
+### CKB Node & Light Client
+
+- [CKB@v0.110.2](https://github.com/nervosnetwork/ckb/releases/tag/v0.110.2) was released on Sep. 12nd, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.2.4](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.2.4) was released on May. 28th, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+#### Caveat
+
+◆ **CKB Light Client** is only activated on testnet, thus only `light testnet` is enabled in Neuron. **CKB Light Client on Mainnet** requires an activation on the mainnet, the timetable can be found at https://github.com/nervosnetwork/ckb/releases/tag/v0.110.1.
+◆ **default node** has been renamed to **Internal Node** for clarity.
+
+### Assumed valid target
+
+Block before `0x6b6db6bb23e6e98f63b88e6cd38fa49f46980e5b816f620c71c6c9c74633ee54`(at height `10,985,048`) will be skipped in validation.(257c06eb95062e8ef3bf53179668965fc743b10f)
+
+---
+
+We are so excited to announce this new release of Neuron that has been completely revamped with modernizaed user interface and also enhanced your overall user experience.
+
+Say goodbye to clunky interface and hello to a smoother, more intuitive user experience. Neuron's new version is designed to make managing your assets on CKB effortless.
+
+Curious to see the magic of the new Neuron in action? Checkout our demo video on YouTube: https://youtu.be/MRuXmTLcXFo
+
+[![Brand-new Neuron](https://github.com/nervosnetwork/neuron/assets/7271329/77618118-4524-46c8-bf56-789b3e9d3206)](https://youtu.be/MRuXmTLcXFo)
+
+---
+
+## New features
+
+- Adopt brand new User Interface.(@yanguoyu, @devchenyan, @WhiteMinds, @jeffreyma597, @zhangyouxin, @homura)
+- #2672: Optimize storage of transactions to boost searching and reduce disk usage.(@yanguoyu)
+- #2783: Check new versions actively.(@yanguoyu)
+- #2786: Support synchronization from a specified block number in light client mode.(@yanguoyu)
+- #2808: Optimize compatibility checking of CKB NODE.(@yanguoyu)
+- #2813: Rename `default node` to `Internal node` for clarity.(@yanguoyu)
+- #2839: Update Ckb client versions(@github-actions)
+
+## Bug fixes
+
+- #2711: Fix exit of synchronization with exception and multisig balance.(@yanguoyu)
+- #2722: Automatically pad decimal places when the deposit dialog automatically provides a maximum value with decimals by(@WhiteMinds)
+- #2772: Fix generating transaction when deposit all without balance.(@yanguoyu)
+
+## New Contributors
+
+- @zhangyouxin made their first contribution in https://github.com/nervosnetwork/neuron/pull/2775
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.2...v0.110.3
+
+
 # 0.110.2 (2023-07-07)
 
 ### CKB Node & Light Client

@@ -34,7 +34,7 @@ $head-height: 52px;
       border-top: 1px solid var(--table-head-border-color);
       border-bottom: 1px solid var(--table-head-border-color);
 
-      & > .headWithBalance {
+      .headWithBalance {
         display: flex;
         align-items: center;
       }

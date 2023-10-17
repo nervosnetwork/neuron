@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.110.2",
+  "version": "0.110.3",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -93,12 +93,12 @@
     "@types/sqlite3": "3.1.8",
     "@types/uuid": "8.3.4",
     "devtron": "1.4.0",
-    "electron": "24.7.1",
+    "electron": "24.8.5",
     "electron-build-env": "0.2.0",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",
     "jest-when": "3.5.2",
-    "neuron-ui": "0.110.2",
+    "neuron-ui": "0.110.3",
     "typescript": "5.0.4"
   }
 }

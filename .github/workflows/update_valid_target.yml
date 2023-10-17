@@ -1,28 +1,26 @@
 name: Update ckb node assume valid target
 
 on:
-  pull_request:
-    types: [ready_for_review]
-    branches:
-      - master
+  create:
 
 jobs:
   ready-for-release:
     name: Update ckb node assume valid target
     runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref_name, 'rc/') }}
     steps:
       - name: Create Branch
         uses: peterjgrainger/action-create-branch@v2.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: 'chore-update-valid-target/${{github.head_ref}}'
-          sha: '${{ github.event.pull_request.head.sha }}'
+          branch: 'chore-update-valid-target/${{github.ref_name}}'
+          sha: '${{ github.event.create.head.sha }}'
 
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: 'chore-update-valid-target/${{github.head_ref}}'
+          ref: 'chore-update-valid-target/${{github.ref_name}}'
       
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -37,7 +35,7 @@ jobs:
         uses: actions/github-script@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BASE: ${{ github.head_ref }}
+          BASE: ${{ github.ref_name }}
         with:
           script: |
             const fs = require('node:fs')
@@ -64,8 +62,8 @@ jobs:
         uses: actions/github-script@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BASE: ${{github.head_ref}}
-          HEAD: chore-update-valid-target/${{github.head_ref}}
+          BASE: ${{github.ref}}
+          HEAD: chore-update-valid-target/${{github.ref_name}}
           REPO: ${{github.repository}}
         with:
           script: |
@@ -83,5 +81,5 @@ jobs:
               head: HEAD,
               base: BASE,
               title: 'chore: Update ckb node assume valid target',
-              body: `This PR uses to update ckb node assume valid target for PR https://github.com/${REPO}/pull/${context.issue.number}`,
+              body: `This PR uses to update ckb node assume valid target for ${BASE} branch`,
             })
