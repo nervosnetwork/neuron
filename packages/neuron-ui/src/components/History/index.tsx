@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import Pagination from 'widgets/Pagination'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import Button from 'widgets/Button'
@@ -11,27 +11,16 @@ import { Download, Search, ArrowNext } from 'widgets/Icons/icon'
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
 import FormattedTokenAmount from 'components/FormattedTokenAmount'
-import { UANTokenName, isTonkenInfoStandardUAN } from 'components/UANDisplay'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { exportTransactions } from 'services/remote'
 
 import { ReactComponent as CKBAvatar } from 'widgets/Icons/Nervos.svg'
-import { ReactComponent as Success } from 'widgets/Icons/Success.svg'
-import { ReactComponent as Pending } from 'widgets/Icons/Pending.svg'
-import { ReactComponent as Failure } from 'widgets/Icons/Failure.svg'
 
-import {
-  RoutePath,
-  isMainnet as isMainnetUtil,
-  uniformTimeFormatter,
-  nftFormatter,
-  sUDTAmountFormatter,
-  sudtValueToAmount,
-  shannonToCKBFormatter,
-} from 'utils'
+import { RoutePath, isMainnet as isMainnetUtil, uniformTimeFormatter } from 'utils'
 import { onEnter } from 'utils/inputDevice'
 import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
+import TransactionType from 'components/TransactionType'
 import RowExtend from './RowExtend'
 
 import { useSearch } from './hooks'
@@ -73,79 +62,12 @@ const History = () => {
 
   const bestBlockNumber = Math.max(cacheTipBlockNumber, bestKnownBlockNumber)
 
-  const handleTransactionInfo = (tx: State.Transaction) => {
-    let name = '--'
-    let amount = '--'
-    let typeLabel: React.ReactNode = '--'
-    let sudtAmount = ''
-    let showWithUANFormatter = false
-
-    if (tx.nftInfo) {
-      // NFT
-      name = walletName
-      const { type, data } = tx.nftInfo
-      typeLabel = `${t(`history.${type}`)} m-NFT`
-      amount = `${type === 'receive' ? '+' : '-'}${nftFormatter(data)}`
-    } else if (tx.sudtInfo?.sUDT) {
+  const getTxName = (tx: State.Transaction) => {
+    if (!tx.nftInfo && tx.sudtInfo?.sUDT) {
       // Asset Account
-      name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
-      if (['create', 'destroy'].includes(tx.type)) {
-        // create/destroy an account
-        showWithUANFormatter = isTonkenInfoStandardUAN(tx.sudtInfo.sUDT.tokenName, tx.sudtInfo.sUDT.symbol)
-        typeLabel = (
-          <Trans
-            i18nKey={`history.${tx.type}SUDT`}
-            components={[<UANTokenName name={tx.sudtInfo.sUDT.tokenName} symbol={tx.sudtInfo.sUDT.symbol} />]}
-          />
-        )
-      } else {
-        // send/receive to/from an account
-        const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
-        typeLabel = `UDT ${t(`history.${type}`)}`
-      }
-
-      if (tx.sudtInfo.sUDT.decimal) {
-        sudtAmount = sudtValueToAmount(tx.sudtInfo.amount, tx.sudtInfo.sUDT.decimal, true)
-        amount = `${sUDTAmountFormatter(sudtAmount)} ${tx.sudtInfo.sUDT.symbol}`
-      }
-    } else {
-      // normal tx
-      name = walletName
-      amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
-      if (tx.type === 'create' || tx.type === 'destroy') {
-        if (tx.assetAccountType === 'CKB') {
-          typeLabel = `${t(`history.${tx.type}`, { name: 'CKB' })}`
-        } else {
-          typeLabel = `${t(`overview.${tx.type}`, { name: 'Unknown' })}`
-        }
-      } else {
-        typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
-      }
+      return tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
     }
-
-    let indicator = <Pending />
-    switch (tx.status) {
-      case 'success': {
-        indicator = <Success />
-        break
-      }
-      case 'failed': {
-        indicator = <Failure />
-        break
-      }
-      default: {
-        // ignore
-      }
-    }
-
-    return {
-      name,
-      amount,
-      typeLabel,
-      sudtAmount,
-      showWithUANFormatter,
-      indicator,
-    }
+    return walletName ?? '--'
   }
 
   const handleExpandClick = (idx: number | null) => {
@@ -158,7 +80,7 @@ const History = () => {
       dataIndex: 'name',
       minWidth: '110px',
       render(_, __, item) {
-        const { name } = handleTransactionInfo(item)
+        const name = getTxName(item)
         return name.length > 8 ? (
           <Tooltip tip={<>{name}</>} isTriggerNextToChild showTriangle>
             <div className={styles.avatarBox}>
@@ -186,10 +108,16 @@ const History = () => {
       title: t('history.table.type'),
       dataIndex: 'type',
       align: 'left',
-      minWidth: '100px',
+      minWidth: '120px',
       render: (_, __, item) => {
-        const { typeLabel } = handleTransactionInfo(item)
-        return typeLabel
+        return (
+          <TransactionType
+            item={item}
+            cacheTipBlockNumber={cacheTipBlockNumber}
+            bestKnownBlockNumber={bestKnownBlockNumber}
+            tokenNameClassName={styles.tokenName}
+          />
+        )
       },
     },
     {
@@ -197,9 +125,9 @@ const History = () => {
       dataIndex: 'amount',
       align: 'left',
       isBalance: true,
-      minWidth: '220px',
+      minWidth: '200px',
       render(_, __, item, show) {
-        return <FormattedTokenAmount item={item} show={show} />
+        return <FormattedTokenAmount item={item} show={show} symbolClassName={styles.symbol} />
       },
     },
     {
