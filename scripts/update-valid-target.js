@@ -26,9 +26,15 @@ const envFilePath = path.resolve(__dirname, '../packages/neuron-wallet/.env')
 const validTargetReg = /(CKB_NODE_ASSUME_VALID_TARGET=)[\S]*/
 
 ;(async function () {
-  const tipBlockNumber = (await rpcRequest('get_tip_block_number')).result
-  const validTargetBlockNumber = `0x${(BigInt(tipBlockNumber) - BigInt(ESTIMATE_BLOCK_COUNT_PER_DAY)).toString(16)}`
-  const blockHash = (await rpcRequest('get_block_hash', [validTargetBlockNumber])).result
-  const originEnvContent = fs.readFileSync(envFilePath).toString('utf-8')
-  fs.writeFileSync(envFilePath, originEnvContent.replace(validTargetReg, `CKB_NODE_ASSUME_VALID_TARGET='${blockHash}'`))
+  try {
+    console.info('start update env file')
+    const tipBlockNumber = (await rpcRequest('get_tip_block_number')).result
+    const validTargetBlockNumber = `0x${(BigInt(tipBlockNumber) - BigInt(ESTIMATE_BLOCK_COUNT_PER_DAY)).toString(16)}`
+    const blockHash = (await rpcRequest('get_block_hash', [validTargetBlockNumber])).result
+    const originEnvContent = fs.readFileSync(envFilePath).toString('utf-8')
+    fs.writeFileSync(envFilePath, originEnvContent.replace(validTargetReg, `CKB_NODE_ASSUME_VALID_TARGET='${blockHash}'`))
+    console.info('write success')
+  } catch (error) {
+    console.error('write failed', error)
+  }
 })()

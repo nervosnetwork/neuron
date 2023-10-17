@@ -68,7 +68,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
     return [
       bestBlockNumber > 0 && cacheTipBlockNumber > 0
         ? `${+((cacheTipBlockNumber * 100) / bestBlockNumber).toFixed(2)}%`
-        : '0',
+        : '0.00%',
       `${cacheTipBlockNumber >= 0 ? localNumberFormatter(cacheTipBlockNumber) : '-'} / ${
         bestBlockNumber >= 0 ? localNumberFormatter(bestBlockNumber) : '-'
       }`,

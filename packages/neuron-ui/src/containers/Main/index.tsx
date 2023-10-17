@@ -2,8 +2,10 @@ import React, { useCallback, useMemo } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, dismissGlobalAlertDialog } from 'states'
-import { useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
+import { useMigrate, useOnDefaultContextMenu, useOnLocaleChange } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
+import Dialog from 'widgets/Dialog'
+import Button from 'widgets/Button'
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 const MainContent = () => {
@@ -49,6 +51,7 @@ const MainContent = () => {
   const onCancelGlobalDialog = useCallback(() => {
     dismissGlobalAlertDialog()(dispatch)
   }, [dispatch])
+  const { isMigrateDialogShow, onCancel, onBackUp, onConfirm } = useMigrate()
 
   return (
     <div onContextMenu={onContextMenu}>
@@ -61,6 +64,18 @@ const MainContent = () => {
         type={globalAlertDialog?.type ?? 'success'}
         onCancel={onCancelGlobalDialog}
       />
+      <Dialog show={isMigrateDialogShow} onCancel={onCancel} title={t('messages.migrate-ckb-data')} showFooter={false}>
+        {t('messages.rebuild-sync')
+          .split('\n')
+          .map((s: string) => (
+            <p key={s}>{s}</p>
+          ))}
+        <div style={{ display: 'flex', justifyContent: 'end', columnGap: '24px' }}>
+          <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
+          <Button type="primary" label={t('common.backup')} onClick={onBackUp} />
+          <Button type="primary" label={t('messages.migrate')} onClick={onConfirm} />
+        </div>
+      </Dialog>
     </div>
   )
 }
