@@ -48,13 +48,30 @@ function download_macos_light() {
 }
 
 function download_linux() {
+  download_linux_x86_64
+  download_linux_aarch64
+}
+
+function download_linux_x86_64() {
   # Linux
   CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-unknown-linux-gnu-portable"
   cd $ROOT_DIR/packages/neuron-wallet/bin/linux
 
   curl -O -L "${GITHUB_RELEASE_URL}/${CKB_VERSION}/${CKB_FILENAME}.tar.gz"
   tar xvzf ${CKB_FILENAME}.tar.gz
-  cp ${CKB_FILENAME}/ckb ./
+  cp ${CKB_FILENAME}/ckb ./ckb-x64
+  rm -rf $CKB_FILENAME
+  rm ${CKB_FILENAME}.tar.gz
+}
+
+function download_linux_aarch64() {
+  # for linux arm64
+  CKB_FILENAME="ckb_${CKB_VERSION}_aarch64-unknown-linux-gnu"
+  cd $ROOT_DIR/packages/neuron-wallet/bin/linux
+
+  curl -O -L "${GITHUB_RELEASE_URL}/${CKB_VERSION}/${CKB_FILENAME}.tar.gz"
+  tar xvzf ${CKB_FILENAME}.tar.gz
+  cp ${CKB_FILENAME}/ckb ./ckb-arm64
   rm -rf $CKB_FILENAME
   rm ${CKB_FILENAME}.tar.gz
 }
