@@ -37,3 +37,13 @@
   src: url('../fonts/JetBrainsMonoNL-Regular.otf') format('opentype'),
     url('../fonts/JetBrainsMonoNL-Regular.ttf') format('opentype');
 }
+
+@font-face {
+  font-family: 'Inter-Regular';
+  src: url('../fonts/Inter-Regular.otf') format('opentype'), url('../fonts/Inter-Regular.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Inter-Medium';
+  src: url('../fonts/Inter-Medium.otf') format('opentype'), url('../fonts/Inter-Medium.ttf') format('opentype');
+}
