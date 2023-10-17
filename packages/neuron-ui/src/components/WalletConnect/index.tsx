@@ -15,8 +15,8 @@ import { clsx, ErrorCode, isSuccessResponse } from 'utils'
 import { Experiment, WalletConnect as WalletConnectIcon, Scan, ScanScreen, NumberScan } from 'widgets/Icons/icon'
 import { SessionRequest } from 'ckb-walletconnect-wallet-sdk'
 import { useWalletConnect } from './hooks'
-import styles from './walletConnnect.module.scss'
 import { SessionItem, PrososalItem, MessageItem, TransactionItem } from './ItemComponents'
+import styles from './walletConnect.module.scss'
 
 const WalletConnect = () => {
   const { wallet } = useGlobalState()

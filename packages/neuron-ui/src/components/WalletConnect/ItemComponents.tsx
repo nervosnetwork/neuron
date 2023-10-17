@@ -5,7 +5,7 @@ import { clsx } from 'utils'
 import { SCRIPT_BASES } from 'utils/const'
 import { Proposal, Session, SessionRequest } from 'ckb-walletconnect-wallet-sdk'
 import { DetailIcon } from 'widgets/Icons/icon'
-import styles from './walletConnnect.module.scss'
+import styles from './walletConnect.module.scss'
 
 interface PrososalItemProps {
   data: Proposal
