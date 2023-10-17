@@ -1,3 +1,30 @@
+# 0.111.0 (2023-10-19)
+
+### CKB Node & Light Client
+
+- [CKB@v0.111.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.111.0) was released on Sep. 14nd, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.2.4](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.2.4) was released on May. 28th, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+#### Caveat
+
+◆ **CKB Light Client** is only activated on testnet, thus only `light testnet` is enabled in Neuron. **CKB Light Client on Mainnet** requires an activation on the mainnet, the timetable can be found at https://github.com/nervosnetwork/ckb/releases/tag/v0.110.1.
+
+### Assumed valid target
+
+Block before `0xd5e25ad24400f237aa5f72f3738a9ae77fe082a89937e75143fcc8ef5b009383`(at height `11,204,855`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/2881)
+
+---
+
+## Bug fixes
+
+* #2869: Add a dialog for migration.(@yanguoyu)
+* #2870: Fix width of navbar.(@yanguoyu)
+* #2873: Fix fallback font on Linux.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.3...v0.111.0
+
+
 # 0.110.3 (2023-10-11)
 
 ### CKB Node & Light Client
