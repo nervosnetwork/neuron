@@ -80,17 +80,14 @@ const WalletConnect = () => {
   const approveSignTransaction = useCallback(
     item => {
       setCurrentEvent(item)
-
       setDialogType('signTransaction')
     },
-    [onApproveRequest]
+    [setCurrentEvent, setDialogType]
   )
 
   const handleSignMessage = useCallback(
     async password => {
-      if (!currentEvent) return null
-
-      const { address, message } = currentEvent.params.request.params
+      const { address, message } = currentEvent!.params.request.params
       const res: ControllerResponse = await signMessage({
         walletID: wallet?.id ?? '',
         address,
@@ -98,7 +95,7 @@ const WalletConnect = () => {
         password,
       })
       if (isSuccessResponse(res)) {
-        onApproveRequest(currentEvent, res.result)
+        onApproveRequest(currentEvent!, res.result)
         setDialogType('')
       } else if (res.status === ErrorCode.PasswordIncorrect) {
         // pass through this kind of error
@@ -245,15 +242,17 @@ const WalletConnect = () => {
         }}
       />
 
-      <PasswordDialog
-        show={dialogType === 'pwd' && !!currentEvent}
-        walletName={wallet?.name}
-        onCancel={onDismiss}
-        onSubmit={handleSignMessage}
-      />
+      {dialogType === 'pwd' && currentEvent ? (
+        <PasswordDialog show walletName={wallet?.name} onCancel={onDismiss} onSubmit={handleSignMessage} />
+      ) : null}
 
-      {dialogType === 'signTransaction' ? (
-        <WCSignTransactionDialog wallet={wallet} onDismiss={onDismiss} data={currentEvent?.params.request.params} />
+      {dialogType === 'signTransaction' && currentEvent ? (
+        <WCSignTransactionDialog
+          wallet={wallet}
+          onDismiss={onDismiss}
+          onApproveRequest={onApproveRequest}
+          event={currentEvent}
+        />
       ) : null}
     </PageContainer>
   )

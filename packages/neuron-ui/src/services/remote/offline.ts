@@ -27,7 +27,7 @@ export interface MultisigConfigs {
 }
 
 export interface OfflineSignJSON {
-  transaction: State.GeneratedTx | Transaction
+  transaction: State.GeneratedTx
   status: OfflineSignStatus
   type: OfflineSignType
   description?: string
@@ -35,14 +35,30 @@ export interface OfflineSignJSON {
   multisig_configs?: MultisigConfigs
 }
 
-export type SignProps = OfflineSignJSON & { walletID: string; password: string; multisigConfig?: MultisigEntity }
+export interface WalletConnectSignJSON {
+  transaction: Transaction
+  status: OfflineSignStatus
+  type: OfflineSignType
+  description?: string
+  asset_account?: Pick<Controller.SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
+  multisig_configs?: MultisigConfigs
+}
+
+export type SignProps = (OfflineSignJSON | WalletConnectSignJSON) & {
+  walletID: string
+  password: string
+  multisigConfig?: MultisigEntity
+}
 
 export type BroadcastProps = OfflineSignJSON & { walletID: string }
 
-export const exportTransactionAsJSON = remoteApi<OfflineSignJSON, void>('export-transaction-as-json')
-export const signTransactionOnly = remoteApi<OfflineSignJSON, void>('sign-transaction-only')
-export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-transaction-only')
-export const signAndExportTransaction = remoteApi<SignProps, { filePath: string; json: OfflineSignJSON }>(
-  'sign-and-export-transaction'
+export const exportTransactionAsJSON = remoteApi<OfflineSignJSON | WalletConnectSignJSON, void>(
+  'export-transaction-as-json'
 )
+export const signTransactionOnly = remoteApi<SignProps, void>('sign-transaction-only')
+export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-transaction-only')
+export const signAndExportTransaction = remoteApi<
+  SignProps,
+  { filePath: string; json: OfflineSignJSON | WalletConnectSignJSON }
+>('sign-and-export-transaction')
 export const signAndBroadcastTransaction = remoteApi<SignProps>('sign-and-broadcast-transaction')

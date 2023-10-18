@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Dialog from 'widgets/Dialog'
-import { ErrorCode, RoutePath, isSuccessResponse, errorFormatter } from 'utils'
+import { ErrorCode, isSuccessResponse, errorFormatter } from 'utils'
 import {
   useState as useGlobalState,
   useDispatch,
@@ -12,19 +12,21 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { SignTransactionParams } from 'ckb-walletconnect-wallet-sdk'
-import { OfflineSignType, OfflineSignStatus, signAndExportTransaction } from 'services/remote'
+import { SessionRequest } from 'ckb-walletconnect-wallet-sdk'
+import { OfflineSignType, OfflineSignStatus, signAndExportTransaction, signTransactionOnly } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from './wcSignTransactionDialog.module.scss'
 
 const WCSignTransactionDialog = ({
   wallet,
-  data,
+  event,
   onDismiss,
+  onApproveRequest,
 }: {
   wallet: State.Wallet
-  data: SignTransactionParams
+  event: SessionRequest
   onDismiss: () => void
+  onApproveRequest: (event: SessionRequest, options: any) => void
 }) => {
   const {
     app: {
@@ -34,6 +36,7 @@ const WCSignTransactionDialog = ({
   } = useGlobalState()
 
   const walletID = wallet.id
+  const data = event.params.request.params
   const {
     transaction,
     type: signType = OfflineSignType.Regular,
@@ -78,6 +81,22 @@ const WCSignTransactionDialog = ({
     onDismiss()
   }, [data, dispatch, onDismiss, t, password, walletID])
 
+  const sign = useCallback(async () => {
+    const res = await signTransactionOnly({
+      transaction,
+      type: signType,
+      status: signStatus,
+      walletID,
+      password,
+    })
+    if (!isSuccessResponse(res)) {
+      setError(errorFormatter(res.message, t))
+      return
+    }
+    onApproveRequest(event, res.result)
+    onDismiss()
+  }, [data, dispatch, onDismiss, t, password, walletID])
+
   const onSubmit = useCallback(
     async (e?: React.FormEvent) => {
       if (e) {
@@ -88,7 +107,7 @@ const WCSignTransactionDialog = ({
       }
       setIsSigning(true)
       if (!isBroadcast) {
-        await signAndExport()
+        await sign()
         setIsSigning(false)
         return
       }
@@ -98,10 +117,11 @@ const WCSignTransactionDialog = ({
             if (isSigning) {
               break
             }
-            await sendTransaction({ walletID, tx: transaction, description, password })(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                navigate(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
+            await sendTransaction({ walletID, tx: transaction, description, password })(dispatch).then(res => {
+              if (isSuccessResponse(res.status)) {
+                onApproveRequest(event, res.result)
+                onDismiss()
+              } else if (res.status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
             })
@@ -111,13 +131,11 @@ const WCSignTransactionDialog = ({
             if (isSigning) {
               break
             }
-            await sendTransaction({ walletID, tx: transaction, description, password })(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                dispatch({
-                  type: AppActions.SetGlobalDialog,
-                  payload: 'unlock-success',
-                })
-              } else if (status === ErrorCode.PasswordIncorrect) {
+            await sendTransaction({ walletID, tx: transaction, description, password })(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                onApproveRequest(event, res.result)
+                onDismiss()
+              } else if (res.status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
             })
@@ -130,10 +148,11 @@ const WCSignTransactionDialog = ({
               tx: transaction,
               password,
             }
-            await sendCreateSUDTAccountTransaction(params)(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                navigate(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                onApproveRequest(event, res.result)
+                onDismiss()
+              } else if (res.status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
             })
@@ -145,10 +164,11 @@ const WCSignTransactionDialog = ({
               tx: transaction,
               password,
             }
-            await sendSUDTTransaction(params)(dispatch).then(({ status }) => {
-              if (isSuccessResponse({ status })) {
-                navigate(RoutePath.History)
-              } else if (status === ErrorCode.PasswordIncorrect) {
+            await sendSUDTTransaction(params)(dispatch).then(res => {
+              if (isSuccessResponse(res)) {
+                onApproveRequest(event, res.result)
+                onDismiss()
+              } else if (res.status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
             })
@@ -192,14 +212,10 @@ const WCSignTransactionDialog = ({
     [setPassword, setError]
   )
 
-  const title = useMemo(() => {
-    return !isBroadcast ? t('offline-sign.sign-and-export') : t('offline-sign.sign-and-broadcast')
-  }, [isBroadcast, t])
-
   return (
     <Dialog
       show
-      title={title}
+      title={t('wallet-connect.sign-confirmation')}
       onCancel={onDismiss}
       onConfirm={onSubmit}
       disabled={disabled}

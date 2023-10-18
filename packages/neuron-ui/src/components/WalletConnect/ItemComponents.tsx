@@ -1,11 +1,15 @@
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { clsx } from 'utils'
+import { clsx, CONSTANTS, shannonToCKBFormatter } from 'utils'
 import { SCRIPT_BASES } from 'utils/const'
-import { Proposal, Session, SessionRequest } from 'ckb-walletconnect-wallet-sdk'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { useState as useGlobalState } from 'states'
+import { Proposal, Session, SessionRequest, SignTransactionParams } from 'ckb-walletconnect-wallet-sdk'
 import { DetailIcon } from 'widgets/Icons/icon'
 import styles from './walletConnect.module.scss'
+
+const { MAINNET_TAG } = CONSTANTS
 
 interface PrososalItemProps {
   data: Proposal
@@ -169,10 +173,20 @@ interface TransactionItemProps {
 }
 
 export const TransactionItem = ({ data, approve, sessions, onRejectRequest, key }: TransactionItemProps) => {
+  const {
+    chain: { networkID },
+    settings: { networks },
+  } = useGlobalState()
   const [t] = useTranslation()
+  const network = networks.find(n => n.id === networkID)
+  const isMainnet = network != null && network.chain === MAINNET_TAG
   const session = sessions.find(item => item.topic === data.topic)
   const { name = '', url = '' } = session?.peer?.metadata || {}
-  const { params } = data.params.request
+  const params = data.params.request.params as SignTransactionParams
+
+  const { outputs = [], fee, description } = params.transaction
+  const firstOutputAddress = outputs.length ? scriptToAddress(outputs[0].lock, isMainnet) : ''
+  const capacity = outputs.reduce((pre, cur) => BigInt(pre) + BigInt(cur.capacity), BigInt(0)).toString()
 
   return (
     <div className={clsx(styles.itemWrap, styles.transactionItem)} key={key}>
@@ -188,12 +202,15 @@ export const TransactionItem = ({ data, approve, sessions, onRejectRequest, key 
           <div>
             <h3>{t('transaction.address')}</h3>
             <p>
-              <span className={styles.address}>ckb1qrfkjktl73ljn77q...v837h2rmne7esqhxzhpm</span> (+2 addresses)
+              <span className={styles.address}>
+                {firstOutputAddress.slice(0, 16)}...{firstOutputAddress.slice(-16)}
+              </span>{' '}
+              (+{outputs.length} addresses)
             </p>
             <h3>{t('send.fee')}</h3>
-            <p>{params.transaction.fee}</p>
+            <p>{shannonToCKBFormatter(fee)}</p>
             <h3>{t('send.description')}</h3>
-            <p>{params.transaction.description}</p>
+            <p>{description}</p>
             <button type="button" className={styles.detailButton} onClick={() => {}} data-hash="hash00000">
               <DetailIcon />
               {t('wallet-connect.view-details')}
@@ -201,7 +218,7 @@ export const TransactionItem = ({ data, approve, sessions, onRejectRequest, key 
           </div>
           <div>
             <h3>{t('transaction.amount')}</h3>
-            <p>-</p>
+            <p>{shannonToCKBFormatter(capacity)}</p>
             <h3>{t('wallet-connect.locked-period')}</h3>
             <p>-</p>
           </div>

@@ -1160,7 +1160,8 @@
       "sign-info": "签名信息",
       "transfer-info": "支付信息",
       "view-details": "查看详情",
-      "locked-period": "锁定时间"
+      "locked-period": "锁定时间",
+      "sign-confirmation": "签名确认"
     }
   }
 }

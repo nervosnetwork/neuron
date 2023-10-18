@@ -29,7 +29,7 @@ interface PasswordDialogProps {
   show: boolean
   walletName: string
   onCancel: () => void
-  onSubmit: (pwd: string) => Promise<ControllerResponse | void>
+  onSubmit: (pwd: string) => Promise<ControllerResponse>
 }
 
 export const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: PasswordDialogProps) => {
@@ -63,7 +63,7 @@ export const PasswordDialog = ({ show, walletName, onCancel, onSubmit }: Passwor
     setLoading(true)
     onSubmit(password)
       .then(res => {
-        if (res?.status === ErrorCode.PasswordIncorrect) {
+        if (res.status === ErrorCode.PasswordIncorrect) {
           setError((res.message as { content: string }).content)
         }
       })

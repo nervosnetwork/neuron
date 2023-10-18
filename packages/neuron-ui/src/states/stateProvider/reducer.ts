@@ -1,5 +1,5 @@
 import produce, { Draft } from 'immer'
-import { OfflineSignJSON } from 'services/remote'
+import { OfflineSignJSON, WalletConnectSignJSON } from 'services/remote'
 import initStates from 'states/init'
 import { ConnectionStatus, ErrorCode, getCurrentUrl, getSyncStatus, sortAccounts } from 'utils'
 
@@ -99,7 +99,10 @@ export type StateAction =
   | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: State.Experimental | null }
-  | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
+  | {
+      type: AppActions.UpdateLoadedTransaction
+      payload: { filePath?: string; json: OfflineSignJSON | WalletConnectSignJSON }
+    }
   | { type: AppActions.SetPageNotice; payload?: Omit<State.PageNotice, 'index'> }
   | { type: AppActions.HideWaitForFullySynced }
   | { type: AppActions.GetFeeRateStats; payload: State.FeeRateStatsType }

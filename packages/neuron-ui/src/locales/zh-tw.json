@@ -1139,7 +1139,8 @@
       "sign-info": "簽名信息",
       "transfer-info": "支付信息",
       "view-details": "查看詳情",
-      "locked-period": "鎖定時間"
+      "locked-period": "鎖定時間",
+      "sign-confirmation": "簽名確認"
     }
   }
 }

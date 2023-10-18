@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useState as useGlobalState } from 'states'
 import { connect, disconnect, approveSession, rejectSession, approveRequest, rejectRequest } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
+import { SessionRequest } from 'ckb-walletconnect-wallet-sdk'
 
 export const useWalletConnect = () => {
   const {
@@ -16,10 +17,11 @@ export const useWalletConnect = () => {
     return res
   }, [])
 
-  const onDisconnect = useCallback(async e => {
-    const { topic } = e.target.dataset
-    const res: ControllerResponse = await disconnect(topic)
-    return res
+  const onDisconnect = useCallback(async (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    const { topic } = e.currentTarget.dataset
+    if (topic) {
+      await disconnect(topic)
+    }
   }, [])
 
   const onApproveSession = useCallback(async (id, scriptBases) => {
@@ -30,13 +32,13 @@ export const useWalletConnect = () => {
     return res
   }, [])
 
-  const onRejectSession = useCallback(async e => {
-    const { id } = e.target.dataset
+  const onRejectSession = useCallback(async (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    const { id } = e.currentTarget.dataset
     await rejectSession({ id: Number(id) })
   }, [])
 
   const onApproveRequest = useCallback(
-    async (event, options) => {
+    async (event: SessionRequest, options: any) => {
       const res: ControllerResponse = await approveRequest({ event, options })
       return res
     },
@@ -44,8 +46,8 @@ export const useWalletConnect = () => {
   )
 
   const onRejectRequest = useCallback(
-    async e => {
-      const { id } = e.target.dataset
+    async (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const { id } = e.currentTarget.dataset
       const event = requests.find(item => item.id === Number(id))
       if (event) {
         await rejectRequest({ event })

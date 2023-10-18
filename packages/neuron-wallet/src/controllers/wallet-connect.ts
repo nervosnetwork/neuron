@@ -58,10 +58,8 @@ class Adapter implements CKBWalletAdapter {
     params: SignTransactionParams,
     options?: any
   ): Promise<{ transaction?: SignedTransaction; hash?: string }> {
-    logger.info(params, options)
-    return Promise.resolve({
-      hash: '',
-    })
+    logger.info('ckb_signTransaction-----', params, options)
+    return Promise.resolve(options)
   }
 
   public async ckb_signMessage(

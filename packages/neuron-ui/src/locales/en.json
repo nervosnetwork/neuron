@@ -1168,7 +1168,8 @@
       "sign-info": "Signature Information",
       "transfer-info": "Payment Information",
       "view-details": "View Details",
-      "locked-period": "Locked Period"
+      "locked-period": "Locked Period",
+      "sign-confirmation": "Signature Confirmation"
     }
   }
 }
