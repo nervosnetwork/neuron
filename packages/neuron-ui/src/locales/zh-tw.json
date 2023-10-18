@@ -563,6 +563,7 @@
       "experimental-message": "本頁面為實驗性功能，可能隨時變更。請謹慎使用。",
       "rebuild-sync": "為了提供更好的用戶體驗，Neuron 採取了新的存儲方案，該方案需要壹次性遷移數據(預期同步時間為 20~60 分鐘)。\n抱歉給您帶來不便。",
       "migrate-warning": "註意：遷移過程中可能由於未知原因失敗導致需要重新同步，請備份完成後開始遷移！",
+      "migrate-ckb-data": "數據遷移",
       "migrate": "遷移",
       "secp256k1/blake160-address-required": "請輸入 secp256k1/blake160 地址",
       "light-client-locktime-warning": "2.輕節點模式不支持展示到期解鎖的 CKBytes。",

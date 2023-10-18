@@ -569,6 +569,7 @@
       "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "rebuild-sync": "For better user experience, Neuron has adopted a new storage, which requires a migrating of data (estimated 20 ~ 60min).\nSorry for the inconvenience.",
       "migrate-warning": "Warning: The migration process may fail for unknown reasons resulting in resynchronization, please back up manually and start the migration!",
+      "migrate-ckb-data": "Migrate",
       "migrate": "Migrate",
       "secp256k1/blake160-address-required": "Secp256k1/blake160 address is required",
       "light-client-locktime-warning": "2.Light client mode doesn't support showing lock-time CKBytes.",

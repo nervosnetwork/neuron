@@ -38,13 +38,14 @@ const SubjectConstructor = <T>(
   return ipcRenderer
     ? {
         subscribe: (handler: (data: T) => void) => {
-          ipcRenderer.on(channel, (_e: Event, data: T) => {
+          const handlerWrap = (_e: Event, data: T) => {
             handler(data)
-          })
+          }
+          ipcRenderer.on(channel, handlerWrap)
           return {
             unsubscribe: () => {
               if (isMulti) {
-                ipcRenderer.removeListener(channel, handler)
+                ipcRenderer.removeListener(channel, handlerWrap)
               } else {
                 ipcRenderer.removeAllListeners(channel)
               }
@@ -68,7 +69,7 @@ export const Navigation = SubjectConstructor<Subject.URL>('navigation')
 export const SetLocale = SubjectConstructor<(typeof LOCALES)[number]>('set-locale')
 export const DeviceSignIndex = SubjectConstructor<Subject.SignIndex>('device-sign-index')
 export const MultisigOutputUpdate = SubjectConstructor<string>('multisig-output-update')
-export const Migrate = SubjectConstructor<'need-migrate' | 'migrating' | 'failed' | 'finish'>('migrate')
+export const Migrate = SubjectConstructor<'need-migrate' | 'migrating' | 'failed' | 'finish'>('migrate', true)
 export const WalletConnectUpdate = SubjectConstructor<Subject.WalletConnectState>('wallet-connect-updated')
 
 export default {
