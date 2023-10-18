@@ -220,7 +220,7 @@ export enum SendType {
   sendCKB = 'sendCKB',
 }
 
-export enum LockScriptType {
+export enum LockScriptCategory {
   SECP256K1 = 'SECP256K1',
   ANYONE_CAN_PAY = 'ANYONE_CAN_PAY',
   MULTI_LOCK_TIME = 'MULTI_LOCK_TIME',
@@ -229,7 +229,7 @@ export enum LockScriptType {
   Unknown = 'Unknown',
 }
 
-export enum TypeScriptType {
+export enum TypeScriptCategory {
   DAO = 'DAO',
   NFT = 'NFT',
   NFTClass = 'NFTClass',

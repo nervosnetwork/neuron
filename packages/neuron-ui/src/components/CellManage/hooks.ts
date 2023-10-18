@@ -8,9 +8,9 @@ import {
 } from 'services/remote'
 import { AppActions, useDispatch } from 'states'
 import {
-  LockScriptType,
+  LockScriptCategory,
   RoutePath,
-  TypeScriptType,
+  TypeScriptCategory,
   calculateUsedCapacity,
   getExplorerUrl,
   isSuccessResponse,
@@ -19,9 +19,9 @@ import {
 import { SortType } from 'widgets/Table'
 
 const cellTypeOrder: Record<string, number> = {
-  [TypeScriptType.SUDT]: 1,
-  [TypeScriptType.NFT]: 2,
-  [TypeScriptType.Unknown]: 3,
+  [TypeScriptCategory.SUDT]: 1,
+  [TypeScriptCategory.NFT]: 2,
+  [TypeScriptCategory.Unknown]: 3,
 }
 
 const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
@@ -33,16 +33,16 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
   let lockedReason = ''
   if (item.typeScriptType) {
     switch (item.typeScriptType) {
-      case TypeScriptType.NFT:
-      case TypeScriptType.NFTClass:
-      case TypeScriptType.NFTIssuer:
-      case TypeScriptType.Unknown:
+      case TypeScriptCategory.NFT:
+      case TypeScriptCategory.NFTClass:
+      case TypeScriptCategory.NFTIssuer:
+      case TypeScriptCategory.Unknown:
         lockedReason = 'cell-manage.locked-reason.operate-in-special-assets'
         break
-      case TypeScriptType.SUDT:
+      case TypeScriptCategory.SUDT:
         lockedReason = 'cell-manage.locked-reason.operate-in-assets-account'
         break
-      case TypeScriptType.DAO:
+      case TypeScriptCategory.DAO:
         lockedReason = 'cell-manage.locked-reason.operate-in-dao'
         break
       default:
@@ -50,12 +50,12 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
     }
   } else {
     switch (item.lockScriptType) {
-      case LockScriptType.Cheque:
-      case LockScriptType.ANYONE_CAN_PAY:
-      case LockScriptType.MULTI_LOCK_TIME:
+      case LockScriptCategory.Cheque:
+      case LockScriptCategory.ANYONE_CAN_PAY:
+      case LockScriptCategory.MULTI_LOCK_TIME:
         lockedReason = 'cell-manage.locked-reason.operate-in-special-assets'
         break
-      case LockScriptType.MULTISIG:
+      case LockScriptCategory.MULTISIG:
         lockedReason = 'cell-manage.locked-reason.operate-in-multisig'
         break
       default:
@@ -71,15 +71,15 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
 const getCellType = (item: State.LiveCellWithLocalInfo) => {
   if (item.typeScriptType) {
     switch (item.typeScriptType) {
-      case TypeScriptType.NFT:
-      case TypeScriptType.SUDT:
-      case TypeScriptType.Unknown:
+      case TypeScriptCategory.NFT:
+      case TypeScriptCategory.SUDT:
+      case TypeScriptCategory.Unknown:
         return item.typeScriptType
       default:
         break
     }
   }
-  return item.lockScriptType === LockScriptType.Unknown ? LockScriptType.Unknown : 'CKB'
+  return item.lockScriptType === LockScriptCategory.Unknown ? LockScriptCategory.Unknown : 'CKB'
 }
 
 const sortFunctions: Record<
@@ -326,12 +326,17 @@ export const useSelect = (liveCells: State.LiveCellWithLocalInfo[]) => {
     () => [...selectedOutPoints].some(v => allLockedOutPoints.has(v)),
     [selectedOutPoints, allLockedOutPoints]
   )
+  const isAllLocked = useMemo(
+    () => [...selectedOutPoints].every(v => allLockedOutPoints.has(v)),
+    [selectedOutPoints, allLockedOutPoints]
+  )
   return {
     selectedOutPoints,
     onSelect,
     onSelectAll,
     isAllSelected: selectedOutPoints.size === allCanSelectOutPoints.size && !!allCanSelectOutPoints.size,
     hasSelectLocked,
+    isAllLocked,
   }
 }
 

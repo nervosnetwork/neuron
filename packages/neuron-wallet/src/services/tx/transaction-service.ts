@@ -424,7 +424,7 @@ export class TransactionsService {
             .reduce((result, c) => result + c, BigInt(0))
 
           const amount = outputAmount - inputAmount
-          const tokenInfo = await SudtTokenInfoService.getSudtTokenInfo(typeArgs, params.walletID)
+          const tokenInfo = await SudtTokenInfoService.getSudtTokenInfo(typeArgs)
 
           if (tokenInfo) {
             sudtInfo = {

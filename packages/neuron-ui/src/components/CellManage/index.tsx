@@ -173,7 +173,12 @@ const getColumns = ({
                 data-index={index}
               />
             )}
-            <Consume data-disabled={!!locked} onClick={onAction} data-action={Actions.Consume} data-index={index} />
+            <Consume
+              data-disabled={!!locked}
+              onClick={locked ? undefined : onAction}
+              data-action={Actions.Consume}
+              data-index={index}
+            />
           </div>
         )
       },
@@ -204,7 +209,7 @@ const CellManage = () => {
   const currentPageLiveCells = useMemo(() => {
     return liveCells.slice(pageSize * (pageNo - 1), pageSize * pageNo)
   }, [pageNo, pageSize, liveCells])
-  const { onSelect, onSelectAll, isAllSelected, selectedOutPoints, hasSelectLocked } = useSelect(liveCells)
+  const { onSelect, onSelectAll, isAllSelected, selectedOutPoints, hasSelectLocked, isAllLocked } = useSelect(liveCells)
   const { password, error, onPasswordChange, setError, resetPassword } = usePassword()
   const { action, operateCells, onActionCancel, onActionConfirm, onOpenActionDialog, onMultiAction, loading } =
     useAction({
@@ -262,11 +267,11 @@ const CellManage = () => {
         />
         {selectedOutPoints.size ? (
           <div className={styles.multiActions}>
-            <button type="button" onClick={onMultiAction} data-action={Actions.Lock}>
+            <button type="button" disabled={isAllLocked} onClick={onMultiAction} data-action={Actions.Lock}>
               <LockCell />
               {t('cell-manage.lock')}
             </button>
-            <button type="button" onClick={onMultiAction} data-action={Actions.Unlock}>
+            <button type="button" disabled={!hasSelectLocked} onClick={onMultiAction} data-action={Actions.Unlock}>
               <UnLock />
               {t('cell-manage.unlock')}
             </button>

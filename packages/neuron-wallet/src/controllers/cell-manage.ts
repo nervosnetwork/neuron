@@ -1,6 +1,6 @@
 import { outPointTransformer } from '../database/chain/entities/cell-local-info'
 import Output from '../models/chain/output'
-import CellsService, { LockScriptType, TypeScriptType } from '../services/cells'
+import CellsService, { LockScriptCategory, TypeScriptCategory } from '../services/cells'
 import WalletService from '../services/wallets'
 import CellLocalInfoService from '../services/cell-local-info'
 import { AddressNotFound, CurrentWalletNotSet } from '../exceptions'
@@ -21,8 +21,8 @@ export default class CellManage {
     return liveCells
       .map<
         Pick<Output, 'capacity' | 'outPoint' | 'lock' | 'type' | 'timestamp'> & {
-          lockScriptType: LockScriptType
-          typeScriptType?: TypeScriptType
+          lockScriptType: LockScriptCategory
+          typeScriptType?: TypeScriptCategory
           description?: string
           locked?: boolean
         }

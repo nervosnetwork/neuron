@@ -40,18 +40,9 @@ export default class SudtTokenInfoService {
       .execute()
   }
 
-  static getSudtTokenInfo(typeArgs: string, walletId: string) {
-    return getConnection()
-      .getRepository(SudtTokenInfoEntity)
-      .createQueryBuilder('info')
-      .leftJoinAndSelect('info.assetAccounts', 'aa')
-      .where(
-        `info.tokenID = :typeArgs AND aa.blake160 IN (select publicKeyInBlake160 from hd_public_key_info where walletId = :walletId)`,
-        {
-          typeArgs,
-          walletId,
-        }
-      )
-      .getOne()
+  static getSudtTokenInfo(tokenID: string) {
+    return getConnection().getRepository(SudtTokenInfoEntity).findOne({
+      tokenID,
+    })
   }
 }

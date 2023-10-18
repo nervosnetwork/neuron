@@ -4,7 +4,12 @@ import { bytes } from '@ckb-lumos/codec'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/models/chain/output'
-import CellsService, { CustomizedLock, CustomizedType, LockScriptType, TypeScriptType } from '../../src/services/cells'
+import CellsService, {
+  CustomizedLock,
+  CustomizedType,
+  LockScriptCategory,
+  TypeScriptCategory,
+} from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
@@ -1694,35 +1699,35 @@ describe('CellsService', () => {
         capacity: '1000',
         lock: assetAccountInfo.generateChequeScript(bobDefaultLock.computeHash(), bytes.hexify(Buffer.alloc(20))),
       })
-      expect(CellsService.getCellLockType(output)).toBe(LockScriptType.Cheque)
+      expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.Cheque)
     })
     it('MULTI_LOCK_TIME', () => {
       const output = Output.fromObject({
         capacity: '1000',
         lock: SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.blake160, +10, '0x7080291000049')),
       })
-      expect(CellsService.getCellLockType(output)).toBe(LockScriptType.MULTI_LOCK_TIME)
+      expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.MULTI_LOCK_TIME)
     })
     it('MULTI_LOCK', () => {
       const output = Output.fromObject({
         capacity: '1000',
         lock: Multisig.getMultisigScript([bob.blake160], 1, 1, 1),
       })
-      expect(CellsService.getCellLockType(output)).toBe(LockScriptType.MULTISIG)
+      expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.MULTISIG)
     })
     it('ANYONE_CAN_PAY', () => {
       const output = Output.fromObject({
         capacity: '1000',
         lock: assetAccountInfo.generateAnyoneCanPayScript('0x'),
       })
-      expect(CellsService.getCellLockType(output)).toBe(LockScriptType.ANYONE_CAN_PAY)
+      expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.ANYONE_CAN_PAY)
     })
     it('SECP256K1', () => {
       const output = Output.fromObject({
         capacity: '1000',
         lock: bob.lockScript,
       })
-      expect(CellsService.getCellLockType(output)).toBe(LockScriptType.SECP256K1)
+      expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.SECP256K1)
     })
     it('Unknown', () => {
       const unknowScript = Script.fromObject(bob.lockScript)
@@ -1731,7 +1736,7 @@ describe('CellsService', () => {
         capacity: '1000',
         lock: unknowScript,
       })
-      expect(CellsService.getCellLockType(output)).toBe(LockScriptType.Unknown)
+      expect(CellsService.getCellLockType(output)).toBe(LockScriptCategory.Unknown)
     })
   })
 
@@ -1750,7 +1755,7 @@ describe('CellsService', () => {
         lock: bob.lockScript,
         type: SystemScriptInfo.generateDaoScript(),
       })
-      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptType.DAO)
+      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.DAO)
     })
     it('NFT type script', () => {
       const typeScript = new Script(
@@ -1763,7 +1768,7 @@ describe('CellsService', () => {
         lock: bob.lockScript,
         type: typeScript,
       })
-      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptType.NFT)
+      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.NFT)
     })
     it('NFTIssuer type script', () => {
       const typeScript = new Script(
@@ -1776,7 +1781,7 @@ describe('CellsService', () => {
         lock: bob.lockScript,
         type: typeScript,
       })
-      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptType.NFTIssuer)
+      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.NFTIssuer)
     })
     it('NFTClass type script', () => {
       const typeScript = new Script(
@@ -1789,7 +1794,7 @@ describe('CellsService', () => {
         lock: bob.lockScript,
         type: typeScript,
       })
-      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptType.NFTClass)
+      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.NFTClass)
     })
     it('SUDT type script', () => {
       const typeScript = assetAccountInfo.generateSudtScript('0x')
@@ -1798,7 +1803,7 @@ describe('CellsService', () => {
         lock: bob.lockScript,
         type: typeScript,
       })
-      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptType.SUDT)
+      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.SUDT)
     })
     it('Unknown type script', () => {
       const typeScript = new Script(`0x${'00'.repeat(32)}`, '0x', ScriptHashType.Type)
@@ -1807,7 +1812,7 @@ describe('CellsService', () => {
         lock: bob.lockScript,
         type: typeScript,
       })
-      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptType.Unknown)
+      expect(CellsService.getCellTypeType(output)).toBe(TypeScriptCategory.Unknown)
     })
   })
 })

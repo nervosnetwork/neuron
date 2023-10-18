@@ -151,7 +151,6 @@ describe('sudt token info service', () => {
   })
 
   describe('getSudtTokenInfo', () => {
-    const walletId = 'walletId'
     const [assetAccount] = accounts
     beforeEach(async () => {
       const keyEntity = HdPublicKeyInfo.fromObject({
@@ -164,19 +163,19 @@ describe('sudt token info service', () => {
     })
 
     it('no token info', async () => {
-      await expect(SudtTokenInfoService.getSudtTokenInfo('0x', walletId)).resolves.toBeUndefined()
+      await expect(SudtTokenInfoService.getSudtTokenInfo('0x')).resolves.toBeUndefined()
     })
 
     it('token info not match', async () => {
       const entity = AssetAccountEntity.fromModel(assetAccount)
       await getConnection().manager.save([entity.sudtTokenInfo, entity])
-      await expect(SudtTokenInfoService.getSudtTokenInfo(`0x${'00'.repeat(20)}`, walletId)).resolves.toBeUndefined()
+      await expect(SudtTokenInfoService.getSudtTokenInfo(`0x${'00'.repeat(20)}`)).resolves.toBeUndefined()
     })
 
     it('match token info', async () => {
       const entity = AssetAccountEntity.fromModel(assetAccount)
       await getConnection().manager.save([entity.sudtTokenInfo, entity])
-      const result = await SudtTokenInfoService.getSudtTokenInfo(assetAccount.tokenID, walletId)
+      const result = await SudtTokenInfoService.getSudtTokenInfo(assetAccount.tokenID)
       expect(result).toBeDefined()
       expect(result?.assetAccounts).toHaveLength(1)
     })

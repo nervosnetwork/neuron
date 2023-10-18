@@ -63,7 +63,7 @@ export enum CustomizedType {
   Unknown = 'Unknown',
 }
 
-export enum LockScriptType {
+export enum LockScriptCategory {
   SECP256K1 = 'SECP256K1',
   ANYONE_CAN_PAY = 'ANYONE_CAN_PAY',
   MULTI_LOCK_TIME = 'MULTI_LOCK_TIME',
@@ -72,7 +72,7 @@ export enum LockScriptType {
   Unknown = CustomizedType.Unknown,
 }
 
-export enum TypeScriptType {
+export enum TypeScriptCategory {
   DAO = 'DAO',
   NFT = CustomizedType.NFT,
   NFTClass = CustomizedType.NFTClass,
@@ -1329,41 +1329,41 @@ export default class CellsService {
     return balances
   }
 
-  public static getCellLockType(output: CKBComponents.CellOutput): LockScriptType {
+  public static getCellLockType(output: CKBComponents.CellOutput): LockScriptCategory {
     const assetAccountInfo = new AssetAccountInfo()
     switch (output.lock.codeHash) {
       case assetAccountInfo.getChequeInfo().codeHash:
-        return LockScriptType.Cheque
+        return LockScriptCategory.Cheque
       case SystemScriptInfo.MULTI_SIGN_CODE_HASH:
         if (output.lock.args.length === LOCKTIME_ARGS_LENGTH) {
-          return LockScriptType.MULTI_LOCK_TIME
+          return LockScriptCategory.MULTI_LOCK_TIME
         }
-        return LockScriptType.MULTISIG
+        return LockScriptCategory.MULTISIG
       case assetAccountInfo.anyoneCanPayCodeHash:
-        return LockScriptType.ANYONE_CAN_PAY
+        return LockScriptCategory.ANYONE_CAN_PAY
       case SystemScriptInfo.SECP_CODE_HASH:
-        return LockScriptType.SECP256K1
+        return LockScriptCategory.SECP256K1
       default:
-        return LockScriptType.Unknown
+        return LockScriptCategory.Unknown
     }
   }
 
-  public static getCellTypeType(output: CKBComponents.CellOutput): TypeScriptType | undefined {
+  public static getCellTypeType(output: CKBComponents.CellOutput): TypeScriptCategory | undefined {
     const assetAccountInfo = new AssetAccountInfo()
     if (output.type) {
       switch (output.type.codeHash) {
         case assetAccountInfo.getNftInfo().codeHash:
-          return TypeScriptType.NFT
+          return TypeScriptCategory.NFT
         case assetAccountInfo.getNftIssuerInfo().codeHash:
-          return TypeScriptType.NFTIssuer
+          return TypeScriptCategory.NFTIssuer
         case assetAccountInfo.getNftClassInfo().codeHash:
-          return TypeScriptType.NFTClass
+          return TypeScriptCategory.NFTClass
         case assetAccountInfo.getSudtCodeHash():
-          return TypeScriptType.SUDT
+          return TypeScriptCategory.SUDT
         case SystemScriptInfo.DAO_CODE_HASH:
-          return TypeScriptType.DAO
+          return TypeScriptCategory.DAO
         default:
-          return TypeScriptType.Unknown
+          return TypeScriptCategory.Unknown
       }
     }
   }

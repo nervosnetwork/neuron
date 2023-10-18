@@ -334,7 +334,7 @@ declare namespace State {
     consumeOutPoints?: CKBComponents.OutPoint[]
   }
 
-  enum LockScriptType {
+  enum LockScriptCategory {
     SECP256K1 = 'SECP256K1',
     ANYONE_CAN_PAY = 'ANYONE_CAN_PAY',
     MULTI_LOCK_TIME = 'MULTI_LOCK_TIME',
@@ -343,7 +343,7 @@ declare namespace State {
     Unknown = 'Unknown',
   }
 
-  enum TypeScriptType {
+  enum TypeScriptCategory {
     DAO = 'DAO',
     NFT = 'NFT',
     NFTClass = 'NFTClass',
@@ -360,8 +360,8 @@ declare namespace State {
     data?: CKBComponents.Bytes
     timestamp: string
     description?: string
-    lockScriptType: LockScriptType
-    typeScriptType?: TypeScriptType
+    lockScriptType: LockScriptCategory
+    typeScriptType?: TypeScriptCategory
     locked?: boolean
   }
   interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
