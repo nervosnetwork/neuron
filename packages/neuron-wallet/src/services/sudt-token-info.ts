@@ -40,9 +40,14 @@ export default class SudtTokenInfoService {
       .execute()
   }
 
-  static getSudtTokenInfo(tokenID: string) {
-    return getConnection().getRepository(SudtTokenInfoEntity).findOne({
-      tokenID,
-    })
+  static getSudtTokenInfo(typeArgs: string): Promise<SudtTokenInfoEntity | undefined> {
+    return getConnection()
+      .getRepository(SudtTokenInfoEntity)
+      .createQueryBuilder('info')
+      .leftJoinAndSelect('info.assetAccounts', 'aa')
+      .where(`info.tokenID = :typeArgs`, {
+        typeArgs,
+      })
+      .getOne()
   }
 }
