@@ -34,7 +34,7 @@ macOS | x64 | [zip](#{macos_x64_zip}) | <code>#{macos_x64_zip_sha256}</code>
 macOS | arm64 | [zip](#{macos_arm64_zip}) | <code>#{macos_arm64_zip_sha256}</code>
 macOS | x64 | [DMG](#{macos_x64_dmg}) | <code>#{macos_x64_dmg_sha256}</code>
 macOS | arm64 | [DMG](#{macos_arm64_dmg}) | <code>#{macos_arm64_dmg_sha256}</code>
-Linux | x64 |  [AppImage](#{linux_appimage}) | <code>#{linux_appimage_sha256}</code>
+Linux | x64 | [AppImage](#{linux_appimage}) | <code>#{linux_appimage_sha256}</code>
 )
 
 puts checksums
