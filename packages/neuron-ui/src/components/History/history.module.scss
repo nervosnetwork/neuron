@@ -236,3 +236,11 @@ body {
 .isReceive {
   color: $main-color;
 }
+
+.tokenName {
+  max-width: calc(100px + (100vw - 1300px) / 2);
+}
+
+.symbol {
+  max-width: calc(180px + (100vw - 1300px) / 2);
+}
