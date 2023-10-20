@@ -71,7 +71,7 @@
     "sqlite3": "5.1.6",
     "subleveldown": "4.1.4",
     "typeorm": "0.2.45",
-    "undici": "5.22.1",
+    "undici": "5.26.2",
     "uuid": "8.3.2"
   },
   "devDependencies": {
