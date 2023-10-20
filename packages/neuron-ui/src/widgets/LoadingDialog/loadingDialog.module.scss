@@ -1,0 +1,15 @@
+@import '../../styles/mixin.scss';
+
+.loadingDialog {
+  height: 180px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-text-color);
+  }
+}

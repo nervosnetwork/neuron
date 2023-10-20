@@ -162,28 +162,14 @@ export default class WalletConnectController {
     })
   }
 
-  public async connect({ type, uri }: { type: 'camera' | 'scanQrcode' | 'uri'; uri?: string }) {
+  public async connect(uri: string) {
     if (!WalletConnectController.client) {
       await this.init()
     }
 
-    switch (type) {
-      case 'uri':
-        if (uri) {
-          await WalletConnectController?.client?.connect(uri)
-          return {
-            status: ResponseCode.Success,
-          }
-        }
-        break
-      case 'camera':
-        // TODO:
-        break
-      case 'scanQrcode':
-        // TODO:
-        break
-      default:
-        break
+    await WalletConnectController?.client?.connect(uri)
+    return {
+      status: ResponseCode.Success,
     }
   }
 

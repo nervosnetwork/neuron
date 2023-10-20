@@ -1136,6 +1136,7 @@
       "add-title": "新增WalletConnect连接",
       "scan-with-camera": "使用摄像头扫描",
       "scan-qrcode": "扫描屏幕二维码",
+      "waiting-camera": "等待摄像头响应...",
       "no-camera-tip": "没有摄像头？使用连接码连接",
       "session-request": "连接请求",
       "no-session": "没有连接请求",

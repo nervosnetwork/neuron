@@ -1144,7 +1144,7 @@
       "add-title": "Add WalletConnect connection",
       "scan-with-camera": "Scanning with the camera",
       "scan-qrcode": "Scan the QR code in the screen",
-      "no-camera-tip": "Don't have a webcam? Use the uri to connect",
+      "no-camera-tip": "Don't have a camera? Use the uri to connect",
       "session-request": "Connection Requests",
       "no-session": "No connection requests",
       "reject": "Reject",

@@ -5,10 +5,13 @@ import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import TableNoData from 'widgets/Icons/TableNoData.png'
+import LoadingDialog from 'widgets/LoadingDialog'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { PasswordDialog } from 'components/SignAndVerify'
 import WCSignTransactionDialog from 'components/WCSignTransactionDialog'
+import CameraScanDialog from 'components/CameraScanDialog'
+import ScreenScanDialog from 'components/ScreenScanDialog'
 import { showErrorMessage, signMessage } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import { clsx, ErrorCode, isSuccessResponse } from 'utils'
@@ -18,12 +21,13 @@ import { useWalletConnect } from './hooks'
 import { SessionItem, PrososalItem, MessageItem, TransactionItem } from './ItemComponents'
 import styles from './walletConnect.module.scss'
 
+type DialogType = 'connecting' | 'invalid-qrcode' | 'uri' | 'camera' | 'screen' | 'pwd' | 'signTransaction' | ''
+
 const WalletConnect = () => {
   const { wallet } = useGlobalState()
   const [t] = useTranslation()
   const [uri, setUri] = useState<string>('')
-  const [errorMsg, setErrorMsg] = useState('')
-  const [dialogType, setDialogType] = useState<'' | 'connecting' | 'uri' | 'pwd' | 'signTransaction'>('')
+  const [dialogType, setDialogType] = useState<DialogType>('')
   const [currentEvent, setCurrentEvent] = useState<SessionRequest>()
 
   const {
@@ -39,9 +43,13 @@ const WalletConnect = () => {
     userName,
   } = useWalletConnect()
 
-  const openUriDialog = useCallback(() => {
-    setDialogType('uri')
-  }, [setDialogType])
+  const openConnectDialog = useCallback(
+    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const { cntype = '' } = e.currentTarget.dataset
+      setDialogType(cntype as DialogType)
+    },
+    [setDialogType]
+  )
 
   const handleUriChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -52,19 +60,21 @@ const WalletConnect = () => {
   )
 
   const handleConnect = useCallback(
-    async e => {
-      const { cntype } = e.target.dataset
+    async (url: string) => {
+      setDialogType('')
+      setUri('')
 
-      if (cntype === 'uri') {
-        setDialogType('')
-        setUri('')
-      }
-      const res = await onConnect(cntype, uri)
+      setDialogType('connecting')
+
+      const res = await onConnect(url)
+
       if (isSuccessResponse(res)) {
-        setDialogType('connecting')
+        setDialogType('')
+      } else {
+        setDialogType('invalid-qrcode')
       }
     },
-    [uri, uri]
+    [uri, setUri, setDialogType]
   )
 
   const hasConnect = proposals.length || sessions.length
@@ -128,22 +138,22 @@ const WalletConnect = () => {
     >
       <div className={styles.container}>
         <div className={clsx(styles.connectWrap, styles.panel)} data-empty={!hasConnect}>
-          <Button className={styles.numberScan} type="text" onClick={openUriDialog}>
+          <Button className={styles.numberScan} type="text" data-cntype="uri" onClick={openConnectDialog}>
             <NumberScan />
           </Button>
           <div className={styles.content}>
             <p className={styles.title}>{t('wallet-connect.add-title')}</p>
             <WalletConnectIcon className={styles.logo} />
             <div>
-              <Button data-cntype="camera" onClick={handleConnect}>
+              <Button data-cntype="camera" onClick={openConnectDialog}>
                 <Scan />
                 {t('wallet-connect.scan-with-camera')}
               </Button>
-              <Button type="primary" className={styles.scanBtn} data-cntype="scanQrcode" onClick={handleConnect}>
+              <Button type="primary" className={styles.scanBtn} data-cntype="screen" onClick={openConnectDialog}>
                 <ScanScreen />
                 {t('wallet-connect.scan-qrcode')}
               </Button>
-              <Button type="text" className={styles.tipBtn} onClick={openUriDialog}>
+              <Button type="text" data-cntype="uri" className={styles.tipBtn} onClick={openConnectDialog}>
                 {t('wallet-connect.no-camera-tip')}
               </Button>
             </div>
@@ -215,15 +225,16 @@ const WalletConnect = () => {
         ) : null}
       </div>
 
+      <LoadingDialog show={dialogType === 'connecting'} message={t('wallet-connect.connecting')} />
+
       {dialogType === 'uri' ? (
         <Dialog
           show
           title={t('wallet-connect.use-uri')}
           showCancel={false}
           confirmText={t('wallet-connect.connect')}
-          onConfirm={handleConnect}
+          onConfirm={() => handleConnect(uri)}
           disabled={!uri}
-          confirmProps={{ 'data-cntype': 'uri' }}
           onCancel={onDismiss}
         >
           <div className={styles.uriDialog}>
@@ -232,13 +243,17 @@ const WalletConnect = () => {
         </Dialog>
       ) : null}
 
+      {dialogType === 'camera' ? <CameraScanDialog close={() => setDialogType('')} onConfirm={handleConnect} /> : null}
+
+      {dialogType === 'screen' ? <ScreenScanDialog close={() => setDialogType('')} onConfirm={handleConnect} /> : null}
+
       <AlertDialog
-        show={!!errorMsg}
+        show={dialogType === 'invalid-qrcode'}
         title={t('wallet-connect.invalid-qrcode')}
-        message={errorMsg}
+        message={t('wallet-connect.invalid-qrcode-tip')}
         type="failed"
         onCancel={() => {
-          setErrorMsg('')
+          setDialogType('')
         }}
       />
 

@@ -733,6 +733,10 @@ export default class ApiController {
       return this.#hardwareController.getPublicKey()
     })
 
+    handle('capture-screen', async () => {
+      return this.#hardwareController.captureScreen()
+    })
+
     handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
       return await this.#walletsController.importHardwareWallet(params)
     })

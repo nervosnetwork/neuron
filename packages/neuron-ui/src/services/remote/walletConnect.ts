@@ -1,10 +1,7 @@
 import { ErrorResponse, SessionRequest } from 'ckb-walletconnect-wallet-sdk'
 import { remoteApi } from './remoteApiWrapper'
 
-export const connect = remoteApi<{
-  type: 'camera' | 'scanQrcode' | 'uri'
-  uri?: string
-}>('wc-connect')
+export const connect = remoteApi<string>('wc-connect')
 export const disconnect = remoteApi<string>('wc-disconnect')
 export const approveSession = remoteApi<{
   id: number

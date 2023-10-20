@@ -1,0 +1,15 @@
+@import '../../styles';
+
+.container {
+  margin-bottom: 8px;
+  padding: 0 16px;
+
+  .scanBox {
+    border: 2px solid var(--primary-color);
+    width: 400px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

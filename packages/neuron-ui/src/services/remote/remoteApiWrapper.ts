@@ -158,6 +158,7 @@ type Action =
   | 'wc-reject-session'
   | 'wc-approve-request'
   | 'wc-reject-request'
+  | 'capture-screen'
 
 export const remoteApi =
   <P = any, R = any>(action: Action) =>

@@ -9,11 +9,8 @@ export const useWalletConnect = () => {
     walletConnect: { proposals, sessions, requests, identity },
   } = useGlobalState()
 
-  const onConnect = useCallback(async (type, uri: string) => {
-    const res: ControllerResponse = await connect({
-      type,
-      uri,
-    })
+  const onConnect = useCallback(async (uri: string) => {
+    const res: ControllerResponse = await connect(uri)
     return res
   }, [])
 

@@ -1,3 +1,5 @@
+import { desktopCapturer, screen, BrowserWindow } from 'electron'
+import logger from '../utils/logger'
 import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
@@ -66,6 +68,31 @@ export default class HardwareController {
     return {
       status: ResponseCode.Success,
       result: pubkey,
+    }
+  }
+
+  public async captureScreen() {
+    // TODO: 权限提示
+    const currentWindow = BrowserWindow.getFocusedWindow()
+    currentWindow?.hide()
+    const display = screen.getPrimaryDisplay()
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: {
+        height: display.bounds.height * display.scaleFactor,
+        width: display.bounds.width * display.scaleFactor,
+      },
+    })
+    currentWindow?.show()
+    logger.info('sources-----', sources, display.bounds.height, display.scaleFactor)
+    const result = sources.map(item => ({
+      id: item.id,
+      name: item.name,
+      dataUrl: item.thumbnail.toDataURL(),
+    }))
+    return {
+      status: ResponseCode.Success,
+      result,
     }
   }
 }
