@@ -132,11 +132,16 @@ jest.doMock('services/hardware', () => ({
   }),
 }))
 
-jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
-  return function () {
-    return {
-      calculateDaoMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
-    }
+jest.doMock('@ckb-lumos/rpc', () => {
+  return {
+    CKBRPC: class CKBRPC {
+      url: string
+      constructor(url: string) {
+        this.url = url
+      }
+
+      calculateDaoMaximumWithdraw = stubbedCalculateDaoMaximumWithdraw
+    },
   }
 })
 

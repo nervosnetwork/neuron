@@ -33,18 +33,20 @@ jest.mock('../../../src/services/rpc-service', () => {
 })
 
 const ckbRpcExecMock = jest.fn()
+jest.mock('@ckb-lumos/rpc', () => {
+  return {
+    CKBRPC: class CKBRPC {
+      url: string
+      constructor(url: string) {
+        this.url = url
+      }
 
-jest.mock('@nervosnetwork/ckb-sdk-core', () => {
-  return function () {
-    return {
-      rpc: {
-        createBatchRequest() {
-          return {
-            exec: ckbRpcExecMock,
-          }
-        },
-      },
-    }
+      createBatchRequest() {
+        return {
+          exec: ckbRpcExecMock,
+        }
+      }
+    },
   }
 })
 

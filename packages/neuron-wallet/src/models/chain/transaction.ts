@@ -298,7 +298,7 @@ export default class Transaction {
     blockHeader?: BlockHeader
   ): Transaction {
     const txHash: string | undefined = (tx as CKBComponents.Transaction).hash
-    const outputs = tx.outputs.map((o, i) => {
+    const outputs = tx.outputs.map((o: CKBComponents.CellOutput, i: number) => {
       const output = Output.fromSDK(o)
       if (txHash) {
         output.setOutPoint(new OutPoint(txHash, i.toString()))
@@ -307,9 +307,9 @@ export default class Transaction {
     })
     return new Transaction(
       tx.version,
-      tx.cellDeps.map(cd => CellDep.fromSDK(cd)),
+      tx.cellDeps.map((cd: CKBComponents.CellDep) => CellDep.fromSDK(cd)),
       tx.headerDeps,
-      tx.inputs.map(i => Input.fromSDK(i)),
+      tx.inputs.map((i: CKBComponents.CellInput) => Input.fromSDK(i)),
       outputs,
       tx.outputsData,
       tx.witnesses,
