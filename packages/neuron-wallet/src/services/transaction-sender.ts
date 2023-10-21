@@ -1,4 +1,3 @@
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
 import NodeService from './node'
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
@@ -21,6 +20,7 @@ import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
+import { signWitnesses } from '../utils/signWitnesses'
 import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
@@ -42,7 +42,7 @@ import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
-import CKB from '@nervosnetwork/ckb-sdk-core'
+import { CKBRPC } from '@ckb-lumos/rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
 
@@ -216,7 +216,8 @@ export default class TransactionSender {
         wit.lock = serializedMultisig + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
       } else {
-        signed = signWitnesses(privateKey)({
+        signed = signWitnesses({
+          privateKey,
           transactionHash: txHash,
           witnesses: serializedWitnesses.map(wit => {
             if (typeof wit === 'string') {
@@ -791,9 +792,8 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawBlockHash: string
   ): Promise<bigint> => {
-    const ckb = new CKB(NodeService.getInstance().nodeUrl)
+    const ckb = new CKBRPC(NodeService.getInstance().nodeUrl)
     const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
-
     return BigInt(result)
   }
 

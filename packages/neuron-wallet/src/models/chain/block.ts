@@ -14,7 +14,9 @@ export default class Block {
     const header = BlockHeader.fromSDK(block.header)
     return new Block(
       header,
-      block.transactions.map(tx => Transaction.fromSDK(tx, header))
+      block.transactions.map((tx: CKBComponents.RawTransaction | CKBComponents.Transaction) =>
+        Transaction.fromSDK(tx, header)
+      )
     )
   }
 }

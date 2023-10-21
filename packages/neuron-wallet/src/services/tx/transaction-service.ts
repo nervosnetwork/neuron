@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import CKB from '@nervosnetwork/ckb-sdk-core'
+import { CKBRPC } from '@ckb-lumos/rpc'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import OutputEntity from '../../database/chain/entities/output'
 import Transaction, {
@@ -507,14 +507,14 @@ export class TransactionsService {
     const inputTxHashes = inputs.map(v => v.previousOutput?.txHash).filter((v): v is string => !!v)
     if (!inputTxHashes.length) return inputs
     const url: string = NetworksService.getInstance().getCurrent().remote
-    const ckb = new CKB(url)
-    const inputTxs = await ckb.rpc
+    const ckb = new CKBRPC(url)
+    const inputTxs = await ckb
       .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
         inputTxHashes.map(v => ['getTransaction', v])
       )
       .exec()
     const inputTxMap = new Map<string, CKBComponents.Transaction>()
-    inputTxs.forEach((v, idx) => {
+    inputTxs.forEach((v: { transaction: CKBComponents.Transaction }, idx: number) => {
       inputTxMap.set(inputTxHashes[idx], v.transaction)
     })
     return inputs.map(v => {

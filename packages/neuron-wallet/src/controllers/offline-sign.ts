@@ -40,7 +40,8 @@ export default class OfflineSignController {
     const rpc = generateRPC(NodeService.getInstance().nodeUrl)
 
     if (context === undefined) {
-      const rawTx = rpc.paramsFormatter.toRawTransaction(tx.toSDKRawTransaction())
+      const rawSdkTx = tx.toSDKRawTransaction()
+      const rawTx = rpc.paramsFormatter.toRawTransaction(rawSdkTx)
       const txs = await Promise.all(rawTx.inputs.map(i => rpc.getTransaction(i.previous_output!.tx_hash)))
       context = txs.map(i => rpc.paramsFormatter.toRawTransaction(i.transaction))
     }
