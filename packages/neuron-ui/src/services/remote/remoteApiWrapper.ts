@@ -158,6 +158,7 @@ type Action =
   | 'wc-reject-session'
   | 'wc-approve-request'
   | 'wc-reject-request'
+  | 'ask-camera-access'
   | 'capture-screen'
 
 export const remoteApi =

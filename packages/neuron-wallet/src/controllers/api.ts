@@ -733,6 +733,10 @@ export default class ApiController {
       return this.#hardwareController.getPublicKey()
     })
 
+    handle('ask-camera-access', async () => {
+      return this.#hardwareController.askForCameraAccess()
+    })
+
     handle('capture-screen', async () => {
       return this.#hardwareController.captureScreen()
     })

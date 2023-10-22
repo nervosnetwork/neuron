@@ -4,6 +4,7 @@ import Button from 'widgets/Button'
 import { isSuccessResponse } from 'utils'
 import { useTranslation } from 'react-i18next'
 import Dialog from 'widgets/Dialog'
+import AlertDialog from 'widgets/AlertDialog'
 import jsQR from 'jsqr'
 
 import styles from './screenScanDialog.module.scss'
@@ -20,6 +21,7 @@ const ScreenScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: 
   const canvas2dRef = useRef<CanvasRenderingContext2D>()
   const [sources, setSources] = useState<Controller.CaptureScreenSource[]>([])
   const [selectId, setSelectId] = useState('')
+  const [dialogType, setDialogType] = useState<'' | 'access-fail' | 'scan'>('')
   const [uri, setUri] = useState('')
 
   const drawLine = (begin: Point, end: Point) => {
@@ -65,11 +67,14 @@ const ScreenScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: 
   useEffect(() => {
     captureScreen().then(res => {
       if (isSuccessResponse(res)) {
+        setDialogType('scan')
         const result = res.result as Controller.CaptureScreenSource[]
         setSources(result)
         if (result.length) {
           setSelectId(result[0].id)
         }
+      } else {
+        setDialogType('access-fail')
       }
     })
   }, [])
@@ -87,40 +92,48 @@ const ScreenScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: 
   }
 
   return (
-    <Dialog
-      show
-      title={t('wallet-connect.scan-with-camera')}
-      onCancel={close}
-      disabled={!uri}
-      onConfirm={handleConfirm}
-      className={styles.scanDialog}
-    >
-      <div className={styles.container}>
-        <div className={styles.chooseBox}>
-          {sources.map(({ dataUrl, id }) => (
-            <Button
-              key={id}
-              className={styles.chooseItem}
-              data-idx={id}
-              data-active={selectId === id}
-              onClick={handleSelect}
-            >
-              <img src={dataUrl} alt="" />
-            </Button>
-          ))}
+    <>
+      <Dialog
+        show={dialogType === 'scan'}
+        title={t('wallet-connect.scan-qrcode')}
+        onCancel={close}
+        disabled={!uri}
+        onConfirm={handleConfirm}
+        className={styles.scanDialog}
+      >
+        <div className={styles.container}>
+          <div className={styles.chooseBox}>
+            {sources.map(({ dataUrl, id }) => (
+              <Button
+                key={id}
+                className={styles.chooseItem}
+                data-idx={id}
+                data-active={selectId === id}
+                onClick={handleSelect}
+              >
+                <img src={dataUrl} alt="" />
+              </Button>
+            ))}
+          </div>
+          <div className={styles.scanBox}>
+            <canvas ref={canvasRef} />
+            {source ? <img ref={imgRef} src={source?.dataUrl} alt="" /> : null}
+          </div>
         </div>
-        <div className={styles.scanBox}>
-          <canvas ref={canvasRef} />
-          {source ? <img ref={imgRef} src={source?.dataUrl} alt="" /> : null}
-        </div>
-      </div>
-    </Dialog>
+      </Dialog>
+
+      <AlertDialog
+        show={dialogType === 'access-fail'}
+        title={t('wallet-connect.screen-fail')}
+        message={t('wallet-connect.screen-msg')}
+        type="failed"
+        onCancel={() => {
+          close()
+        }}
+      />
+    </>
   )
 }
 
 ScreenScanDialog.displayName = 'ScreenScanDialog'
 export default ScreenScanDialog
-
-// {loading ? (
-//             <div>{t('wallet-connect.waiting-camera')}</div>
-//           )

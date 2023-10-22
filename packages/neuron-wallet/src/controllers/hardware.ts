@@ -1,9 +1,9 @@
-import { desktopCapturer, screen, BrowserWindow } from 'electron'
+import { desktopCapturer, screen, BrowserWindow, systemPreferences } from 'electron'
 import logger from '../utils/logger'
 import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
-import { connectDeviceFailed } from '../exceptions'
+import { connectDeviceFailed, AskAccessFailed } from '../exceptions'
 import { AccountExtendedPublicKey } from '../models/keys/key'
 
 export default class HardwareController {
@@ -71,8 +71,30 @@ export default class HardwareController {
     }
   }
 
+  public async askForCameraAccess() {
+    const status = await systemPreferences.getMediaAccessStatus('camera')
+    if (status === 'granted') {
+      return {
+        status: ResponseCode.Success,
+      }
+    }
+
+    const canAccess = await systemPreferences.askForMediaAccess('camera')
+    if (canAccess) {
+      return {
+        status: ResponseCode.Success,
+      }
+    }
+
+    throw new AskAccessFailed()
+  }
+
   public async captureScreen() {
-    // TODO: 权限提示
+    const status = await systemPreferences.getMediaAccessStatus('screen')
+    if (status === 'denied') {
+      throw new AskAccessFailed()
+    }
+
     const currentWindow = BrowserWindow.getFocusedWindow()
     currentWindow?.hide()
     const display = screen.getPrimaryDisplay()
