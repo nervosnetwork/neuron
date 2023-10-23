@@ -1117,6 +1117,7 @@
       "scan-qrcode": "掃描屏幕二維碼",
       "no-camera-tip": "沒有攝像頭？使用連結碼連結",
       "camera-fail": "無法獲取攝像頭數據",
+      "camera-connecting": "正在連結攝像頭",
       "camera-msg": "請檢查設置是否允許Neuron訪問攝像頭",
       "screen-fail": "無法獲取屏幕數據",
       "screen-msg": "請檢查設置是否允許Neuron訪問屏幕",

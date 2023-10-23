@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { askForCameraAccess } from 'services/remote'
 import Dialog from 'widgets/Dialog'
+import LoadingDialog from 'widgets/LoadingDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { isSuccessResponse } from 'utils'
 import jsQR from 'jsqr'
@@ -20,7 +21,7 @@ const CameraScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: 
   const videoRef = useRef<HTMLVideoElement>()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const canvas2dRef = useRef<CanvasRenderingContext2D>()
-  const [dialogType, setDialogType] = useState<'' | 'no-camera' | 'access-fail' | 'scan'>('')
+  const [dialogType, setDialogType] = useState<'' | 'opening' | 'access-fail' | 'scan'>('')
 
   const drawLine = (begin: Point, end: Point) => {
     if (!canvas2dRef.current) return
@@ -60,6 +61,7 @@ const CameraScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: 
 
     askForCameraAccess().then(accessRes => {
       if (isSuccessResponse(accessRes)) {
+        setDialogType('opening')
         navigator.mediaDevices
           .getUserMedia({
             audio: false,
@@ -104,6 +106,8 @@ const CameraScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: 
           </div>
         </div>
       </Dialog>
+
+      <LoadingDialog show={dialogType === 'opening'} message={t('wallet-connect.camera-connecting')} />
 
       <AlertDialog
         show={dialogType === 'access-fail'}

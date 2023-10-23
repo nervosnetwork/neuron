@@ -1138,6 +1138,7 @@
       "scan-qrcode": "扫描屏幕二维码",
       "no-camera-tip": "没有摄像头？使用连接码连接",
       "camera-fail": "无法获取摄像头数据",
+      "camera-connecting": "正在连接摄像头",
       "camera-msg": "请检查设置是否允许Neuron访问摄像头",
       "screen-fail": "无法获取屏幕数据",
       "screen-msg": "请检查设置是否允许Neuron访问屏幕",

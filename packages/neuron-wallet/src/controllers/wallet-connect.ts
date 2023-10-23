@@ -13,13 +13,15 @@ import {
   Session,
   SessionRequest,
   SignedTransaction,
-  Chain,
 } from 'ckb-walletconnect-wallet-sdk'
 import WalletConnectSubject from '../models/subjects/wallet-connect-subject'
 import { CurrentWalletSubject } from '../models/subjects/wallets'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'
 import { AccountExtendedPublicKey } from '../models/keys/key'
+import { Address as AddressInterface } from '../models/address'
 import { AddressType } from '../models/keys/address'
+import TxDbChangedSubject from '../models/subjects/tx-db-changed-subject'
+import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import logger from '../utils/logger'
 import { ResponseCode } from '../utils/const'
 import WalletsService from '../services/wallets'
@@ -28,9 +30,11 @@ import AddressService from '../services/addresses'
 
 class Adapter implements CKBWalletAdapter {
   private walletID: string = ''
+  private extendedKey: AccountExtendedPublicKey
 
-  constructor(props: { walletID: string }) {
+  constructor(props: { walletID: string; extendedKey: string }) {
     this.walletID = props.walletID
+    this.extendedKey = AccountExtendedPublicKey.parse(props.extendedKey)
   }
 
   public async ckb_getAddresses(params: GetAddressesParams): Promise<{
@@ -38,15 +42,45 @@ class Adapter implements CKBWalletAdapter {
   }> {
     const scriptBaseList = Object.keys(params)
     if (scriptBaseList.length) {
-      const addresses = (await AddressService.getAddressesByWalletId(this.walletID))
-        .filter(item => item.addressType === AddressType.Receiving)
-        .map(({ address, blake160: identifier, balance, description = '', addressIndex: index = '' }) => ({
+      const { page, type } = params[scriptBaseList[0]]
+      const { size = 10, before, after } = page
+      let resList = [] as AddressInterface[]
+      if (type === 'generate') {
+        resList =
+          (await AddressService.generateAndSaveForExtendedKey({
+            walletId: this.walletID,
+            extendedKey: this.extendedKey,
+            receivingAddressCount: size,
+          })) || []
+      } else {
+        const list = (await AddressService.getAddressesWithBalancesByWalletId(this.walletID)).filter(
+          item => item.addressType === AddressType.Receiving
+        )
+
+        if (before) {
+          const beforeItem = list.find(item => item.address === before)
+          if (beforeItem) {
+            resList = list.filter(item => item.addressIndex < beforeItem.addressIndex).slice(-size)
+          }
+        } else if (after) {
+          const afterItem = list.find(item => item.address === after)
+          if (afterItem) {
+            resList = list.filter(item => item.addressIndex > afterItem.addressIndex).slice(size)
+          }
+        } else {
+          resList = list.slice(0, size)
+        }
+      }
+
+      const addresses = resList.map(
+        ({ address, blake160: identifier, balance, description = '', addressIndex: index = '' }) => ({
           address,
           identifier,
           description,
           balance: balance!,
           index,
-        }))
+        })
+      )
       return Promise.resolve({
         [scriptBaseList[0]]: addresses,
       })
@@ -81,33 +115,45 @@ export default class WalletConnectController {
   private sessions: Session[] = []
   private requests: SessionRequest[] = []
 
-  private identity: string = ''
-  private chain: Chain = 'devnet'
+  private addresses: AddressInterface[] = []
 
-  private async init() {
+  private getWallet() {
     const currentWallet = WalletsService.getInstance().getCurrent()
-    const network = NetworksService.getInstance().getCurrent()
+    if (currentWallet) {
+      const { extendedKey, id } = currentWallet.toJSON()
+      const identity = AccountExtendedPublicKey.parse(extendedKey).addressPublicKey(AddressType.Receiving, 0)
 
-    if (!currentWallet) {
-      return
+      return {
+        identity,
+        id,
+        extendedKey,
+      }
     }
+    return {
+      identity: '',
+    }
+  }
 
-    const { extendedKey, id } = currentWallet.toJSON()
-    this.identity = AccountExtendedPublicKey.parse(extendedKey).addressPublicKey(AddressType.Receiving, 0)
-
+  private getNetwork() {
+    const network = NetworksService.getInstance().getCurrent()
     switch (network?.chain) {
       case 'ckb':
-        this.chain = 'mainnet'
-        break
+        return 'mainnet'
       case 'ckb_testnet':
-        this.chain = 'testnet'
-        break
+      case 'light_client_testnet':
+        return 'testnet'
       case 'ckb_dev':
-        this.chain = 'devnet'
-        break
+        return 'devnet'
       default:
-        this.chain = 'devnet'
-        break
+        return 'devnet'
+    }
+  }
+
+  private async init() {
+    const wallet = this.getWallet()
+
+    if (!wallet.id) {
+      return
     }
 
     const core = new Core({
@@ -124,7 +170,8 @@ export default class WalletConnectController {
         description: 'Neuron Wallet is a CKB wallet produced by Nervos Foundation. ',
       },
       adapter: new Adapter({
-        walletID: id,
+        walletID: wallet.id,
+        extendedKey: wallet.extendedKey,
       }),
     })
 
@@ -143,23 +190,89 @@ export default class WalletConnectController {
     })
   }
 
+  private async updateAddresses(emitEvent: boolean = true) {
+    const { id } = this.getWallet()
+    if (id) {
+      const list = await AddressService.getAddressesWithBalancesByWalletId(id)
+      const receriveList = list.filter(item => item.addressType === AddressType.Receiving)
+
+      if (!this.addresses.length) {
+        this.addresses = receriveList
+        return
+      }
+
+      if (receriveList.length > this.addresses.length) {
+        const addresses = receriveList
+          .slice(this.addresses.length)
+          .map(({ address, blake160: identifier, balance, description = '', addressIndex: index = '' }) => ({
+            address,
+            identifier,
+            description,
+            balance: balance!,
+            index,
+          }))
+        if (emitEvent) {
+          WalletConnectController.client?.changeAddresses({
+            addresses,
+            changeType: 'add',
+          })
+        }
+      } else if (receriveList.length === this.addresses.length) {
+        const addresses = [] as Address[]
+        receriveList.forEach((item, index) => {
+          if (item.txCount && (this.addresses[index]?.txCount || 0) < item.txCount)
+            addresses.push({
+              address: item.address,
+              identifier: item.blake160,
+              description: item.description || '',
+              balance: item.balance!,
+              index,
+            })
+        })
+        if (emitEvent) {
+          WalletConnectController.client?.changeAddresses({
+            addresses,
+            changeType: 'consume',
+          })
+        }
+      }
+      this.addresses = receriveList
+    }
+  }
+
   constructor() {
     this.init()
 
     CurrentWalletSubject.pipe(debounceTime(50)).subscribe(async params => {
       if (params.currentWallet && WalletConnectController.client) {
+        const { identity, id, extendedKey } = this.getWallet()
+        if (id) {
+          WalletConnectController.client.updateAdapter(new Adapter({ walletID: id, extendedKey }))
+          WalletConnectController.client.changeAccount(identity)
+          this.updateAddresses(false)
+          this.notify()
+        }
+      }
+    })
+
+    CurrentNetworkIDSubject.subscribe(() => {
+      if (WalletConnectController.client) {
         WalletConnectController.client.disconnectAllSessions()
         this.init()
       }
     })
 
-    CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
-      const currentNetwork = NetworksService.getInstance().get(currentNetworkID)
-      if (currentNetwork && WalletConnectController.client) {
-        WalletConnectController.client.disconnectAllSessions()
-        this.init()
-      }
-    })
+    TxDbChangedSubject.getSubject()
+      .pipe(debounceTime(500))
+      .subscribe(async () => {
+        this.updateAddresses()
+      })
+
+    AddressDbChangedSubject.getSubject()
+      .pipe(debounceTime(200))
+      .subscribe(async () => {
+        this.updateAddresses()
+      })
   }
 
   public async connect(uri: string) {
@@ -183,10 +296,11 @@ export default class WalletConnectController {
   public async approveSession(params: { id: number; scriptBases: string[] }) {
     await WalletConnectController.client?.approve({
       id: params.id,
-      chain: this.chain,
-      identity: this.identity,
+      network: this.getNetwork(),
+      identity: this.getWallet().identity,
       scriptBases: params.scriptBases,
     } as ApproveParams)
+    this.updateAddresses(false)
     return {
       status: ResponseCode.Success,
     }
@@ -218,7 +332,7 @@ export default class WalletConnectController {
       proposals: this.proposals,
       sessions: this.sessions,
       requests: this.requests,
-      identity: this.identity,
+      identity: this.getWallet().identity,
     })
   }
 }

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useState as useGlobalState } from 'states'
 import { connect, disconnect, approveSession, rejectSession, approveRequest, rejectRequest } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
@@ -53,7 +53,7 @@ export const useWalletConnect = () => {
     [requests]
   )
 
-  const userName = `${identity.slice(0, 6)}...${identity.slice(-6)}`
+  const userName = useMemo(() => `${identity.slice(0, 6)}...${identity.slice(-6)}`, [identity])
 
   return {
     proposals,
