@@ -841,6 +841,9 @@ export default class ApiController {
     handle('wc-reject-request', async (_, params) => {
       return this.#walletConnectController.rejectRequest(params)
     })
+    handle('wc-get-state', async _ => {
+      return this.#walletConnectController.getState()
+    })
   }
 
   // Register handler, warp and serialize API response

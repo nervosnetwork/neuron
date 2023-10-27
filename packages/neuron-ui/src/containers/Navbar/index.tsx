@@ -3,7 +3,13 @@ import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { NeuronWalletActions, showGlobalAlertDialog, useDispatch, useState as useGlobalState } from 'states'
-import { VerifyExternalCkbNodeRes, checkForUpdates, getVersion, verifyExternalCkbNode } from 'services/remote'
+import {
+  VerifyExternalCkbNodeRes,
+  checkForUpdates,
+  getVersion,
+  verifyExternalCkbNode,
+  getWCState,
+} from 'services/remote'
 import { AppUpdater as AppUpdaterSubject, WalletConnectUpdate as WalletConnectUpdateSubject } from 'services/subjects'
 import { AppActions } from 'states/stateProvider/reducer'
 import Badge from 'widgets/Badge'
@@ -113,6 +119,15 @@ const Navbar = () => {
     verifyExternalCkbNode().then(res => {
       if (isSuccessResponse(res) && res.result) {
         setVerifyCkbResult(res.result)
+      }
+    })
+
+    getWCState().then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        dispatch({
+          type: AppActions.UpdateWalletConnectState,
+          payload: res.result,
+        })
       }
     })
   }, [])

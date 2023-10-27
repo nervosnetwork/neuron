@@ -3,6 +3,7 @@ import { remoteApi } from './remoteApiWrapper'
 
 export const connect = remoteApi<string>('wc-connect')
 export const disconnect = remoteApi<string>('wc-disconnect')
+export const getWCState = remoteApi<void>('wc-get-state')
 export const approveSession = remoteApi<{
   id: number
   scriptBases: string[]

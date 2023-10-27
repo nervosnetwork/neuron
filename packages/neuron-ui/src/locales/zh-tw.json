@@ -1131,6 +1131,7 @@
       "uri-placeholder": "請輸入連結碼",
       "connect": "連結",
       "connecting": "正在通過WalletConnect連結你的錢包",
+      "scanning": "正在掃描屏幕二維碼",
       "invalid-qrcode": "無效的二維碼",
       "invalid-qrcode-tip": "請確保屏幕上/攝像頭畫面中的WalletConnect二維碼有效",
       "connected-session": "已建立的連結",

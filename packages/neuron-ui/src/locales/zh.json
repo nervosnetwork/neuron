@@ -1152,6 +1152,7 @@
       "uri-placeholder": "请输入连接码",
       "connect": "连接",
       "connecting": "正在通过WalletConnect连接你的钱包",
+      "scanning": "正在扫描屏幕二维码",
       "invalid-qrcode": "无效的二维码",
       "invalid-qrcode-tip": "请确保屏幕上/摄像头画面中的WalletConnect二维码有效",
       "connected-session": "已建立的连接",

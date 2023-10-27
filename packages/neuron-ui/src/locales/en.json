@@ -1160,6 +1160,7 @@
       "uri-placeholder": "Please input the uri",
       "connect": "Connect",
       "connecting": "Connecting your wallet via WalletConnect now",
+      "scanning": "Scanning the QR code in the screen",
       "invalid-qrcode": "Invalid QR code",
       "invalid-qrcode-tip": "Make sure the WalletConnect QR code on the screen/camera feed is valid",
       "connected-session": "Established connections",

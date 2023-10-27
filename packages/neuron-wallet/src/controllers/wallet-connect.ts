@@ -117,6 +117,26 @@ export default class WalletConnectController {
 
   private addresses: AddressInterface[] = []
 
+  public getState(): {
+    status: ResponseCode
+    result: {
+      proposals: Proposal[]
+      sessions: Session[]
+      requests: SessionRequest[]
+      identity: string
+    }
+  } {
+    return {
+      status: ResponseCode.Success,
+      result: {
+        proposals: this.proposals,
+        sessions: this.sessions,
+        requests: this.requests,
+        identity: this.getWallet().identity,
+      },
+    }
+  }
+
   private getWallet() {
     const currentWallet = WalletsService.getInstance().getCurrent()
     if (currentWallet) {

@@ -1,5 +1,4 @@
 import { desktopCapturer, screen, BrowserWindow, systemPreferences } from 'electron'
-import logger from '../utils/logger'
 import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
@@ -106,7 +105,6 @@ export default class HardwareController {
       },
     })
     currentWindow?.show()
-    logger.info('sources-----', sources, display.bounds.height, display.scaleFactor)
     const result = sources.map(item => ({
       id: item.id,
       name: item.name,

@@ -1,126 +1,62 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { captureScreen } from 'services/remote'
-import Button from 'widgets/Button'
 import { isSuccessResponse } from 'utils'
 import { useTranslation } from 'react-i18next'
-import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
+import LoadingDialog from 'widgets/LoadingDialog'
 import jsQR from 'jsqr'
 
-import styles from './screenScanDialog.module.scss'
-
-interface Point {
-  x: number
-  y: number
-}
-
-const ScreenScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: (result: string) => void }) => {
+const ScreenScanDialog = ({ close, onConfirm }: { close: () => void; onConfirm: (result: string[]) => void }) => {
   const [t] = useTranslation()
-  const imgRef = useRef<HTMLImageElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const canvas2dRef = useRef<CanvasRenderingContext2D>()
-  const [sources, setSources] = useState<Controller.CaptureScreenSource[]>([])
-  const [selectId, setSelectId] = useState('')
-  const [dialogType, setDialogType] = useState<'' | 'access-fail' | 'scan'>('')
-  const [uri, setUri] = useState('')
+  const [dialogType, setDialogType] = useState<'' | 'scanning' | 'access-fail'>('')
 
-  const drawLine = (begin: Point, end: Point) => {
-    if (!canvas2dRef.current) return
-    canvas2dRef.current.beginPath()
-    canvas2dRef.current.moveTo(begin.x, begin.y)
-    canvas2dRef.current.lineTo(end.x, end.y)
-    canvas2dRef.current.lineWidth = 4
-    canvas2dRef.current.strokeStyle = '#00c891'
-    canvas2dRef.current.stroke()
-  }
+  const handleScanResult = useCallback(async (sources: Controller.CaptureScreenSource[]) => {
+    const uriList = [] as string[]
 
-  const source = useMemo(() => sources.find(item => item.id === selectId), [selectId, sources])
+    const callArr = sources.map(async item => {
+      const image = new Image()
+      image.src = item.dataUrl
+      await new Promise(resolve => {
+        image.addEventListener('load', resolve)
+      })
 
-  useEffect(() => {
-    if (!source) return
-
-    if (imgRef.current) {
-      const { width, height } = imgRef.current
-      canvasRef.current?.setAttribute('height', `${height}px`)
-      canvasRef.current?.setAttribute('width', `${width}px`)
-      const canvas2d = canvasRef.current?.getContext('2d')
-      if (canvas2d) {
-        canvas2d.drawImage(imgRef.current, 0, 0, width, height)
-
-        canvas2dRef.current = canvas2d
-        const imageData = canvas2d.getImageData(0, 0, width, height)
-        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      const canvas = document.createElement('canvas')
+      canvas.width = image.width
+      canvas.height = image.height
+      const context = canvas.getContext('2d')
+      if (context) {
+        context.imageSmoothingEnabled = false
+        context.drawImage(image, 0, 0)
+        const imageData = context.getImageData(0, 0, image.width, image.height)
+        const code = jsQR(imageData.data, image.width, image.height, {
           inversionAttempts: 'dontInvert',
         })
-
         if (code?.data) {
-          drawLine(code.location.topLeftCorner, code.location.topRightCorner)
-          drawLine(code.location.topRightCorner, code.location.bottomRightCorner)
-          drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner)
-          drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner)
-          setUri(code.data)
+          uriList.push(code.data)
         }
       }
-    }
-  }, [source])
+    })
+
+    await Promise.all(callArr)
+
+    onConfirm(uriList)
+  }, [])
 
   useEffect(() => {
     captureScreen().then(res => {
       if (isSuccessResponse(res)) {
-        setDialogType('scan')
+        setDialogType('scanning')
         const result = res.result as Controller.CaptureScreenSource[]
-        setSources(result)
-        if (result.length) {
-          setSelectId(result[0].id)
-        }
+        handleScanResult(result)
       } else {
         setDialogType('access-fail')
       }
     })
   }, [])
 
-  const handleSelect = (e: React.SyntheticEvent<HTMLButtonElement>) => {
-    const { idx = '' } = e.currentTarget.dataset
-    if (idx !== selectId) {
-      setSelectId(idx)
-      setUri('')
-    }
-  }
-
-  const handleConfirm = () => {
-    onConfirm(uri)
-  }
-
   return (
     <>
-      <Dialog
-        show={dialogType === 'scan'}
-        title={t('wallet-connect.scan-qrcode')}
-        onCancel={close}
-        disabled={!uri}
-        onConfirm={handleConfirm}
-        className={styles.scanDialog}
-      >
-        <div className={styles.container}>
-          <div className={styles.chooseBox}>
-            {sources.map(({ dataUrl, id }) => (
-              <Button
-                key={id}
-                className={styles.chooseItem}
-                data-idx={id}
-                data-active={selectId === id}
-                onClick={handleSelect}
-              >
-                <img src={dataUrl} alt="" />
-              </Button>
-            ))}
-          </div>
-          <div className={styles.scanBox}>
-            <canvas ref={canvasRef} />
-            {source ? <img ref={imgRef} src={source?.dataUrl} alt="" /> : null}
-          </div>
-        </div>
-      </Dialog>
+      <LoadingDialog show={dialogType === 'scanning'} message={t('wallet-connect.scanning')} />
 
       <AlertDialog
         show={dialogType === 'access-fail'}

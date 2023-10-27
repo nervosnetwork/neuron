@@ -60,16 +60,31 @@ const WalletConnect = () => {
   )
 
   const handleConnect = useCallback(
-    async (url: string) => {
-      setDialogType('')
+    async (url: string | string[]) => {
+      setDialogType('connecting')
       setUri('')
 
-      setDialogType('connecting')
+      const urlArr = typeof url === 'string' ? [url] : url
 
-      const res = await onConnect(url)
+      if (!urlArr.length) {
+        setDialogType('invalid-qrcode')
+        return
+      }
 
-      if (isSuccessResponse(res)) {
-        setDialogType('')
+      let successFlag = true
+      const callArr = urlArr.map(async item => {
+        const res = await onConnect(item)
+        if (!isSuccessResponse(res)) {
+          successFlag = false
+        }
+      })
+
+      await Promise.all(callArr)
+
+      if (successFlag) {
+        setTimeout(() => {
+          setDialogType('')
+        }, 2000)
       } else {
         setDialogType('invalid-qrcode')
       }
