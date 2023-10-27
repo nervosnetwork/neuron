@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { getConnection } from '../database/chain/connection'
 import SyncInfoEntity from '../database/chain/entities/sync-info'
 import logger from '../utils/logger'
 

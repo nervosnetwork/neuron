@@ -1,3 +1,9 @@
+import Keystore from '../../src/models/keys/keystore'
+import { when } from 'jest-when'
+import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
+import { AddressType } from '../../src/models/keys/address'
+import { Manufacturer } from '../../src/services/hardware/common'
+
 const stubbedDeletedByWalletIdFn = jest.fn()
 const stubbedGenerateAndSaveForExtendedKeyQueue = jest.fn()
 const stubbedGenerateAndSaveForPublicKeyQueueAsyncPush = jest.fn()
@@ -25,16 +31,10 @@ jest.doMock('../../src/services/addresses', () => {
     getAddressesByWalletId: stubbedGetAddressesByWalletId,
   }
 })
-import Keystore from '../../src/models/keys/keystore'
-import initConnection from '../../src/database/chain/ormconfig'
-import { getConnection } from 'typeorm'
-import { when } from 'jest-when'
-import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
-import { AddressType } from '../../src/models/keys/address'
-import { Manufacturer } from '../../src/services/hardware/common'
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
 import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 
 const resetMocks = () => {
   stubbedDeletedByWalletIdFn.mockReset()
@@ -61,7 +61,7 @@ describe('wallet service', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {
