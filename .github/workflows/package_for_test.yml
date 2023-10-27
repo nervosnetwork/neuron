@@ -82,7 +82,7 @@ jobs:
         shell: bash
 
       - name: Setting up the client tools
-        if: matrix.os == 'windows-2019'
+        if: ${{ matrix.os == 'windows-2019' && env.SM_API_KEY != '' }}
         run: |
           curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o smtools-windows-x64.msi
           msiexec /i smtools-windows-x64.msi /quiet /qn
@@ -90,7 +90,7 @@ jobs:
         shell: cmd
 
       - name: Certificates Sync
-        if: matrix.os == 'windows-2019'
+        if: ${{ matrix.os == 'windows-2019' && env.SM_API_KEY != '' }}
         run: |
           smctl windows certsync
         shell: cmd
