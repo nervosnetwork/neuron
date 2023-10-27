@@ -353,11 +353,13 @@ const SUDTSend = () => {
           <div className={styles.left}>
             <div className={styles.info}>
               <SUDTAvatar type="logo" />
-              <div>
+              <div className={styles.infoDetails}>
                 <div className={styles.accountName}>{accountInfo?.accountName}</div>
                 <div className={styles.tokenName}>{displayTokenName}</div>
                 <div className={styles.balance}>
-                  {showBalance ? balance : HIDE_BALANCE} {displaySymbol}
+                  <span>
+                    {showBalance ? balance : HIDE_BALANCE} {displaySymbol}
+                  </span>
                   <Button className={styles.btn} type="text" onClick={() => setShowBalance(prev => !prev)}>
                     {showBalance ? <EyesOpen /> : <EyesClose />}
                   </Button>
@@ -390,7 +392,7 @@ const SUDTSend = () => {
                         ) : null
                       }
                       disabled={sendState.sendAll}
-                      error={errors[field.key]}
+                      error={errors[field.key] || (field.key === Fields.Address ? remoteError : '')}
                       className={styles[field.key]}
                       placeholder={field.placeholder}
                     />
@@ -446,7 +448,6 @@ const SUDTSend = () => {
                   value={sendState.description}
                   field={Fields.Description}
                   onChange={onInput}
-                  error={remoteError}
                   placeholder={t('s-udt.send.description-placeholder')}
                 />
               </div>

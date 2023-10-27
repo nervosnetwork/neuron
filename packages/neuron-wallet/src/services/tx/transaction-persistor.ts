@@ -1,4 +1,4 @@
-import { getConnection, QueryRunner } from 'typeorm'
+import { getConnection, In, QueryRunner } from 'typeorm'
 import InputEntity from '../../database/chain/entities/input'
 import OutputEntity from '../../database/chain/entities/output'
 import TransactionEntity from '../../database/chain/entities/transaction'
@@ -11,6 +11,7 @@ import Transaction, { TransactionStatus } from '../../models/chain/transaction'
 import Input from '../../models/chain/input'
 import TxLockEntity from '../../database/chain/entities/tx-lock'
 import { CHEQUE_ARGS_LENGTH, DEFAULT_ARGS_LENGTH } from '../../utils/const'
+import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 
 export enum TxSaveType {
   Sent = 'sent',
@@ -269,6 +270,8 @@ export class TransactionPersistor {
     }
 
     const outputsData = transaction.outputsData!
+    const useTxInputs = await connection.getRepository(InputEntity).find({ outPointTxHash: tx.hash })
+    const useTxIndices = new Set(useTxInputs.map(v => v.outPointIndex))
     const outputs: OutputEntity[] = transaction.outputs.map((o, index) => {
       const output = new OutputEntity()
       output.outPointTxHash = transaction.hash || transaction.computeHash()
@@ -280,6 +283,9 @@ export class TransactionPersistor {
       output.lockHash = o.lockHash!
       output.transaction = tx
       output.status = outputStatus
+      if (useTxIndices.has(index.toString())) {
+        output.status = OutputStatus.Dead
+      }
       output.multiSignBlake160 = o.multiSignBlake160 || null
       if (o.type) {
         output.typeCodeHash = o.type.codeHash
@@ -309,12 +315,11 @@ export class TransactionPersistor {
     if (lockArgsSetNeedsDetail?.size) {
       willSaveDetailInputs = inputs.filter(v => this.shouldSaveDetail(v, lockArgsSetNeedsDetail))
       willSaveDetailOutputs = outputs.filter(v => this.shouldSaveDetail(v, lockArgsSetNeedsDetail))
-      txLocks = [
-        ...new Set([
-          ...inputs.filter(v => v.lockHash && !this.shouldSaveDetail(v, lockArgsSetNeedsDetail)).map(v => v.lockHash!),
-          ...outputs.filter(v => !this.shouldSaveDetail(v, lockArgsSetNeedsDetail)).map(v => v.lockHash),
-        ]),
-      ].map(v => TxLockEntity.fromObject({ txHash: tx.hash, lockHash: v }))
+      txLocks = await TransactionPersistor.findAndCreateTxLocks(
+        [...inputs, ...outputs],
+        lockArgsSetNeedsDetail,
+        tx.hash
+      )
     }
 
     const chunk = 100
@@ -395,13 +400,88 @@ export class TransactionPersistor {
 
   private static shouldSaveDetail(cell: InputEntity | OutputEntity, lockArgsSetNeedsDetail: Set<string>) {
     return (
-      cell.lockArgs &&
-      (lockArgsSetNeedsDetail.has(cell.lockArgs) ||
-        (cell.lockArgs.length === CHEQUE_ARGS_LENGTH &&
-          [cell.lockArgs.slice(0, DEFAULT_ARGS_LENGTH), `0x${cell.lockArgs.slice(DEFAULT_ARGS_LENGTH)}`].some(v =>
-            lockArgsSetNeedsDetail.has(v)
-          )))
+      (cell.multiSignBlake160 && lockArgsSetNeedsDetail.has(cell.multiSignBlake160)) ||
+      (cell.lockArgs &&
+        (lockArgsSetNeedsDetail.has(cell.lockArgs) ||
+          (cell.lockArgs.length === CHEQUE_ARGS_LENGTH &&
+            [cell.lockArgs.slice(0, DEFAULT_ARGS_LENGTH), `0x${cell.lockArgs.slice(DEFAULT_ARGS_LENGTH)}`].some(v =>
+              lockArgsSetNeedsDetail.has(v)
+            ))))
     )
+  }
+
+  public static async checkTxLock() {
+    const resetTxLocks = await getConnection()
+      .getRepository(TxLockEntity)
+      .createQueryBuilder()
+      .select('transactionHash')
+      .where('lockArgs IN (SELECT publicKeyInBlake160 from hd_public_key_info)')
+      .getRawMany<{ transactionHash: string }>()
+    if (!resetTxLocks?.length) {
+      return
+    }
+    const resetTxHashes = resetTxLocks.map(v => v.transactionHash)
+    const queryRunner = getConnection().createQueryRunner()
+    await TransactionPersistor.waitUntilTransactionFinished(queryRunner)
+    await queryRunner.startTransaction()
+    try {
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(IndexerTxHashCache)
+        .set({ isProcessed: false })
+        .where({ txHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(TransactionEntity)
+        .where({ hash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(InputEntity)
+        .where({ transactionHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(OutputEntity)
+        .where({ outPointTxHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(TxLockEntity)
+        .where({ transactionHash: In(resetTxHashes) })
+        .execute()
+      await queryRunner.commitTransaction()
+    } catch (err) {
+      logger.error('Database:\tReset tx entity error:', err)
+      await queryRunner.rollbackTransaction()
+      throw err
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  private static findAndCreateTxLocks(
+    cells: (InputEntity | OutputEntity)[],
+    lockArgsSetNeedsDetail: Set<string>,
+    txHash: string
+  ) {
+    const lockHashArgs: Record<string, string> = {}
+    const lockHashSet = new Set(
+      cells
+        .filter(v => v.lockHash && !this.shouldSaveDetail(v, lockArgsSetNeedsDetail))
+        .map(v => {
+          if (v.lockHash) {
+            lockHashArgs[v.lockHash] = v.lockArgs!
+          }
+          return v.lockHash!
+        })
+    )
+    return [...lockHashSet].map(v => TxLockEntity.fromObject({ txHash, lockHash: v, lockArgs: lockHashArgs[v] }))
   }
 }
 

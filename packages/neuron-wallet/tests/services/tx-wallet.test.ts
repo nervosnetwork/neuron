@@ -3,8 +3,8 @@ import Keystore from '../../src/models/keys/keystore'
 import Keychain from '../../src/models/keys/keychain'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import TransactionSender from '../../src/services/transaction-sender'
+import { signWitnesses } from '../../src/utils/signWitnesses'
 
 describe('sign witness', () => {
   const witness = {
@@ -19,8 +19,8 @@ describe('sign witness', () => {
   ]
 
   it('success', () => {
-    const ckb = new CKB('')
-    const newWitness = ckb.signWitnesses(privateKey)({
+    const newWitness = signWitnesses({
+      privateKey,
       witnesses: [witness],
       transactionHash: txHash,
     })

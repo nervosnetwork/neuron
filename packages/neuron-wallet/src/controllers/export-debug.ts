@@ -137,14 +137,18 @@ export default class ExportDebugController {
   }
 
   private async addHdPublicKeyInfoCsv() {
-    const addressMetas = await AddressService.getAddressesByAllWallets()
-    let csv = 'walletId,addressType,addressIndex,publicKeyInBlake160\n'
-    for (const addressMeta of addressMetas) {
-      const row = `${addressMeta.walletId},${addressMeta.addressType},${addressMeta.addressIndex},${addressMeta.blake160}\n`
-      csv += row
+    try {
+      const addressMetas = await AddressService.getAddressesByAllWallets()
+      let csv = 'walletId,addressType,addressIndex,publicKeyInBlake160\n'
+      for (const addressMeta of addressMetas) {
+        const row = `${addressMeta.walletId},${addressMeta.addressType},${addressMeta.addressIndex},${addressMeta.blake160}\n`
+        csv += row
+      }
+      const csvFileName = 'hd_public_key_info.csv'
+      this.archive.append(csv, { name: csvFileName })
+    } catch (error) {
+      logger.error(`Export Debug:\t export public key info error: ${error}`)
     }
-    const csvFileName = 'hd_public_key_info.csv'
-    this.archive.append(csv, { name: csvFileName })
   }
 
   private addLogFiles = (files = ['main.log', 'renderer.log']) => {

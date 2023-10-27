@@ -1,14 +1,14 @@
 import { HexString } from '@ckb-lumos/base'
-import CKBRPC from '@nervosnetwork/ckb-sdk-rpc'
-import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
-import resultFormatter from '@nervosnetwork/ckb-sdk-rpc/lib/resultFormatter'
-import paramsFormatter from '@nervosnetwork/ckb-sdk-rpc/lib/paramsFormatter'
-import Base from '@nervosnetwork/ckb-sdk-rpc/lib/Base'
+import { CKBRPC } from '@ckb-lumos/rpc'
+import { Method } from '@ckb-lumos/rpc/lib/method'
+import * as resultFormatter from '@ckb-lumos/rpc/lib/resultFormatter'
+import { formatter as paramsFormatter } from '@ckb-lumos/rpc/lib/paramsFormatter'
+import { Base } from '@ckb-lumos/rpc/lib/Base'
 import {
   MethodInBatchNotFoundException,
   PayloadInBatchException,
   IdNotMatchedInBatchException,
-} from '@nervosnetwork/ckb-sdk-rpc/lib/exceptions'
+} from '@ckb-lumos/rpc/lib/exceptions'
 import https from 'https'
 import http from 'http'
 import { request } from 'undici'
@@ -137,6 +137,8 @@ export type FetchTransactionReturnType = {
 export class LightRPC extends Base {
   setScripts: (params: LightScriptFilter[]) => Promise<null>
   getScripts: () => Promise<LightScriptSyncStatus[]>
+  // TODO: the type is not the same as full node here
+  // @ts-ignore
   getTransactions: (
     searchKey: { script: CKBComponents.Script; scriptType: CKBRPC.ScriptType; blockRange: [HexString, HexString] },
     order: 'asc' | 'desc',
@@ -164,7 +166,10 @@ export class LightRPC extends Base {
     })
 
     Object.keys(this.rpcProperties).forEach(name => {
-      this.addMethod({ name, ...this.rpcProperties[name] })
+      // don't add default getTransactions method
+      if (name !== 'getTransactions') {
+        this.addMethod({ name, ...this.rpcProperties[name] })
+      }
     })
 
     this.setScripts = new Method(this.node, { name: 'setScripts', ...lightRPCProperties['setScripts'] }).call

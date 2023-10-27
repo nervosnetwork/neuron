@@ -155,6 +155,7 @@ class NodeService {
   }
 
   public async verifyExternalCkbNode() {
+    logger.info('CKB:\tstart verify external ckb node')
     const network = NetworksService.getInstance().getCurrent()
     if (this._isCkbNodeExternal && network.type !== NetworkType.Light) {
       const localNodeInfo = await new RpcService(network.remote).localNodeInfo()

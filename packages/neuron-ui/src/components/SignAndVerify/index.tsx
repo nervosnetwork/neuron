@@ -316,7 +316,6 @@ const SignAndVerify = () => {
             field="signature"
             value={signature}
             onChange={handleInputChange}
-            disabled={!signature}
             width="100%"
           />
 

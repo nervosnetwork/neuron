@@ -183,13 +183,13 @@ export class FileKeystoreWallet extends Wallet {
     receivingAddressCount: number = DefaultAddressNumber.Receiving,
     changeAddressCount: number = DefaultAddressNumber.Change
   ): Promise<AddressInterface[] | undefined> => {
-    return await AddressService.generateAndSaveForExtendedKey(
-      this.id,
-      this.accountExtendedPublicKey(),
+    return await AddressService.generateAndSaveForExtendedKeyQueue.asyncPush({
+      walletId: this.id,
+      extendedKey: this.accountExtendedPublicKey(),
       isImporting,
       receivingAddressCount,
-      changeAddressCount
-    )
+      changeAddressCount,
+    })
   }
 
   public getNextAddress = async (): Promise<AddressInterface | undefined> => {

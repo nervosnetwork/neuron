@@ -1,9 +1,8 @@
+/* eslint-disable-next-line @typescript-eslint/no-var-requires */
 const { expose } = require('./../../../dist/utils/worker')
 
 expose({
-  doNothing() {
-
-  },
+  doNothing() {},
   normal() {
     return 'normal'
   },
@@ -12,9 +11,9 @@ expose({
       setTimeout(() => {
         resolve('async/await')
       }, 2000)
-    }, )
+    })
   },
   args(...args) {
     return args
-  }
+  },
 })
