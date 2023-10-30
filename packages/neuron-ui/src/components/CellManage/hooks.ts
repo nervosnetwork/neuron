@@ -30,20 +30,22 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
       locked: true,
     }
   }
-  let lockedReason = ''
+  let lockedReason: { key: string; params?: Record<string, any> } | undefined
   if (item.typeScriptType) {
     switch (item.typeScriptType) {
       case TypeScriptCategory.NFT:
       case TypeScriptCategory.NFTClass:
       case TypeScriptCategory.NFTIssuer:
-      case TypeScriptCategory.Unknown:
-        lockedReason = 'cell-manage.locked-reason.operate-in-special-assets'
+        lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'NTF' } }
         break
       case TypeScriptCategory.SUDT:
-        lockedReason = 'cell-manage.locked-reason.operate-in-assets-account'
+        lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'SUDT' } }
         break
       case TypeScriptCategory.DAO:
-        lockedReason = 'cell-manage.locked-reason.operate-in-dao'
+        lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'Nervos DAO' } }
+        break
+      case TypeScriptCategory.Unknown:
+        lockedReason = { key: 'cell-manage.locked-reason.Unknown' }
         break
       default:
         break
@@ -51,12 +53,16 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
   } else {
     switch (item.lockScriptType) {
       case LockScriptCategory.Cheque:
+        lockedReason = { key: 'cell-manage.locked-reason.cheque-acp-multisig', params: { type: 'Cheque' } }
+        break
       case LockScriptCategory.ANYONE_CAN_PAY:
-      case LockScriptCategory.MULTI_LOCK_TIME:
-        lockedReason = 'cell-manage.locked-reason.operate-in-special-assets'
+        lockedReason = { key: 'cell-manage.locked-reason.cheque-acp-multisig', params: { type: 'Acp' } }
         break
       case LockScriptCategory.MULTISIG:
-        lockedReason = 'cell-manage.locked-reason.operate-in-multisig'
+        lockedReason = { key: 'cell-manage.locked-reason.cheque-acp-multisig', params: { type: 'Multisig' } }
+        break
+      case LockScriptCategory.MULTI_LOCK_TIME:
+        lockedReason = { key: 'cell-manage.locked-reason.multi-locktime' }
         break
       default:
         break

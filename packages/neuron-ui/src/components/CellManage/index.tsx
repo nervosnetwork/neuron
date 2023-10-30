@@ -14,6 +14,8 @@ import {
   useCopy,
   clsx,
   outPointToStr,
+  LockScriptCategory,
+  getLockTimestamp,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
@@ -34,6 +36,8 @@ const getColumns = ({
   selectedOutPoints,
   onSelectAll,
   onSelect,
+  epoch,
+  bestKnownBlockTimestamp,
 }: {
   updateLiveCell: (params: State.UpdateLiveCellLocalInfo) => void
   t: TFunction
@@ -42,6 +46,8 @@ const getColumns = ({
   selectedOutPoints: Set<string>
   onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
   onSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
+  epoch: string
+  bestKnownBlockTimestamp: number
 }): TableProps<State.LiveCellWithLocalInfo>['columns'] => {
   return [
     {
@@ -109,11 +115,24 @@ const getColumns = ({
       render(_, __, item: State.LiveCellWithLocalInfo) {
         const { locked, lockedReason } = item
         if (locked) {
+          let params = lockedReason?.params
+          if (item.lockScriptType === LockScriptCategory.MULTI_LOCK_TIME) {
+            if (bestKnownBlockTimestamp) {
+              const targetTime = new Date(
+                getLockTimestamp({ lockArgs: item.lock.args, epoch, bestKnownBlockTimestamp })
+              )
+              params = {
+                time: `${targetTime.getFullYear()}-${targetTime.getMonth() + 1}-${targetTime.getDate()}`,
+              }
+            } else {
+              params = { time: '--' }
+            }
+          }
           return (
             <div className={styles.lockedWithTip}>
               {t('cell-manage.table.locked')}
               {lockedReason ? (
-                <Tooltip tip={t(lockedReason)} className={styles.lockedTip} placement="top" showTriangle>
+                <Tooltip tip={t(lockedReason.key, params)} className={styles.lockedTip} placement="top" showTriangle>
                   <Attention />
                 </Tooltip>
               ) : null}
@@ -188,8 +207,12 @@ const getColumns = ({
 
 const CellManage = () => {
   const {
+    app: { epoch },
     wallet: { balance = '' },
-    chain: { networkID },
+    chain: {
+      networkID,
+      syncState: { bestKnownBlockTimestamp },
+    },
     settings: { networks },
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
@@ -231,8 +254,20 @@ const CellManage = () => {
         onSelectAll,
         isAllSelected,
         selectedOutPoints,
+        epoch,
+        bestKnownBlockTimestamp,
       }),
-    [updateLiveCell, t, onOpenActionDialog, onSelect, onSelectAll, isAllSelected, selectedOutPoints]
+    [
+      updateLiveCell,
+      t,
+      onOpenActionDialog,
+      onSelect,
+      onSelectAll,
+      isAllSelected,
+      selectedOutPoints,
+      epoch,
+      bestKnownBlockTimestamp,
+    ]
   )
   const { copied, onCopy, copyTimes } = useCopy()
   const { onViewDetail, rawData, rawLock, rawType, usedCapacity } = useViewCell({

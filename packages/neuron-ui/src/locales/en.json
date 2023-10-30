@@ -1174,10 +1174,10 @@
         "used": "Used"
       },
       "locked-reason": {
-        "operate-in-special-assets": "Please use in special assets page",
-        "operate-in-assets-account": "Please use in assets account page",
-        "operate-in-dao": "Please use in Nervos DAO page",
-        "operate-in-multisig": "Please use in multisig page"
+        "multi-locktime": "The cell has a time lock and you can't use it until {{time}}.",
+        "cheque-acp-multisig": "This is a {{type}} cell and does not support unlocking.",
+        "NFT-SUDT-DAO": " This is a {{type}} asset and does not support unlocking.",
+        "Unknown": "This is an uncataloged asset,please check and confirm before proceeding."
       },
       "cell-lock-dialog": {
         "title": "Lock Cell",

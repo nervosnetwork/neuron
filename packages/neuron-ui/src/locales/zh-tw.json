@@ -1145,10 +1145,10 @@
         "used": "已用"
       },
       "locked-reason": {
-        "operate-in-special-assets": "請在自定義資產操作",
-        "operate-in-assets-account": "請在資產賬戶操作",
-        "operate-in-dao": "請在 Nervos DAO 操作",
-        "operate-in-multisig": "請在多簽地址操作"
+        "multi-locktime": "The cell has a time lock and you can't use it until {{time}}.",
+        "cheque-acp-multisig": "這是壹個 {{type}} 的 cell, 不支持解鎖。",
+        "NFT-SUDT-DAO": "這是壹個 {{type}} 的資產，不支持解鎖。",
+        "Unknown": "This is an uncataloged asset,please check and confirm before proceeding."
       },
       "cell-lock-dialog": {
         "title": "鎖定 Cell",

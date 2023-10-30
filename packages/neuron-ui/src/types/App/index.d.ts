@@ -365,7 +365,7 @@ declare namespace State {
     locked?: boolean
   }
   interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
-    lockedReason?: string
+    lockedReason?: { key: string; params?: Record<string, any> }
     cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Unknown'
   }
 
