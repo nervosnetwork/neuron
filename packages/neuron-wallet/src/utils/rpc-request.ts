@@ -23,7 +23,10 @@ export const rpcRequest = async <T = any>(
     throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
   }
   const body = await res.body.json()
-  return body?.result as T
+  if (body !== null && typeof body === 'object' && 'result' in body) {
+    return body?.result as T
+  }
+  return [] as T
 }
 
 export const rpcBatchRequest = async (
@@ -50,8 +53,11 @@ export const rpcBatchRequest = async (
   if (res.statusCode !== 200) {
     throw new Error(`indexer request failed with HTTP code ${res.statusCode}`)
   }
-  const responseBody: { id: number; error?: any; result: any }[] = await res.body.json()
-  return responseBody.sort((a, b) => a.id - b.id)
+  const responseBody = await res.body.json()
+  if (Array.isArray(responseBody) && responseBody.every(i => 'id' in i)) {
+    return responseBody.sort((a, b) => a.id - b.id)
+  }
+  return []
 }
 
 export default {
