@@ -49,6 +49,9 @@ win:
     - target: nsis
       arch:
         - x64
+  sign: scripts/customSign.js
+  signingHashAlgorithms:
+    - sha256
 
 mac:
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
