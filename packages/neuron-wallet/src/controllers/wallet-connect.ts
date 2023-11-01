@@ -140,13 +140,14 @@ export default class WalletConnectController {
   private getWallet() {
     const currentWallet = WalletsService.getInstance().getCurrent()
     if (currentWallet) {
-      const { extendedKey, id } = currentWallet.toJSON()
+      const { extendedKey, id, name } = currentWallet.toJSON()
       const identity = AccountExtendedPublicKey.parse(extendedKey).addressPublicKey(AddressType.Receiving, 0)
 
       return {
         identity,
         id,
         extendedKey,
+        accountName: name,
       }
     }
     return {
@@ -265,10 +266,13 @@ export default class WalletConnectController {
 
     CurrentWalletSubject.pipe(debounceTime(50)).subscribe(async params => {
       if (params.currentWallet && WalletConnectController.client) {
-        const { identity, id, extendedKey } = this.getWallet()
+        const { identity, id, extendedKey, accountName } = this.getWallet()
         if (id) {
           WalletConnectController.client.updateAdapter(new Adapter({ walletID: id, extendedKey }))
-          WalletConnectController.client.changeAccount(identity)
+          WalletConnectController.client.changeAccount({
+            identity,
+            accountName,
+          })
           this.updateAddresses(false)
           this.notify()
         }
@@ -314,11 +318,13 @@ export default class WalletConnectController {
   }
 
   public async approveSession(params: { id: number; scriptBases: string[] }) {
+    const { identity, accountName } = this.getWallet()
     await WalletConnectController.client?.approve({
       id: params.id,
       network: this.getNetwork(),
-      identity: this.getWallet().identity,
+      identity,
       scriptBases: params.scriptBases,
+      accountName,
     } as ApproveParams)
     this.updateAddresses(false)
     return {
