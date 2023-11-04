@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getCkbNodeDataPath,
@@ -7,11 +7,11 @@ import {
   stopProcessMonitor,
   setCkbNodeDataPath,
 } from 'services/remote'
-import { isSuccessResponse, useDidMount } from 'utils'
+import { isSuccessResponse } from 'utils'
 
 const type = 'ckb'
 
-export const useDataPath = () => {
+export const useDataPath = (network?: State.Network) => {
   const [t] = useTranslation()
   const [isSaving, setIsSaving] = useState(false)
   const [savingType, setSavingType] = useState<string | null>()
@@ -20,13 +20,13 @@ export const useDataPath = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [faidMessage, setFaidMessage] = useState('')
 
-  useDidMount(() => {
+  useEffect(() => {
     getCkbNodeDataPath().then(res => {
       if (isSuccessResponse(res)) {
         setPrevPath(res.result!)
       }
     })
-  })
+  }, [network?.chain, network?.id])
   const onSetting = useCallback(() => {
     invokeShowOpenDialog({
       buttonLabel: t('settings.data.set', { lng: navigator.language }),

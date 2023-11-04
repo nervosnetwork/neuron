@@ -68,6 +68,7 @@ export const DEPRECATED_CODE_HASH: Record<string, string> = {
 
 export const HIDE_BALANCE = '******'
 export const LIGHT_CLIENT_TESTNET = 'light_client_testnet'
+export const LIGHT_CLIENT_MAINNET = 'light_client_mainnet'
 export const LIGHT_NETWORK_TYPE = 2
 export const METHOD_NOT_FOUND = -32601
 

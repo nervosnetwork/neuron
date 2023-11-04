@@ -92,7 +92,11 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
   private async fetchDepCell() {
     const depGroupOutputsData: string[] = await this.getDepTxs()
     const depGroupTxHashes = [
-      ...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.tx_hash.toHexString())).flat()),
+      ...new Set(
+        depGroupOutputsData
+          .map(v => unpackGroup.unpack(v).map(v => `0x${v.tx_hash.toString(16).padStart(64, '0')}`))
+          .flat()
+      ),
     ]
     if (depGroupTxHashes.length) {
       await this.lightRpc

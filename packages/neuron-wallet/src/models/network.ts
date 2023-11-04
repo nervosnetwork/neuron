@@ -16,6 +16,6 @@ export interface Network {
   remote: string
   type: NetworkType
   genesisHash: string
-  chain: ChainType | string // returned by rpc.getBlockchainInfo
+  chain: ChainType | string // returned by rpc.getBlockchainInfo for full node, get from setting for light client
   readonly: boolean
 }

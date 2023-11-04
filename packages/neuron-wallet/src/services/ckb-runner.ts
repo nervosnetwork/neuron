@@ -8,6 +8,9 @@ import SettingsService from './settings'
 import MigrateSubject from '../models/subjects/migrate-subject'
 import IndexerService from './indexer'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
+import { getUsablePort } from '../utils/get-usable-port'
+import { updateToml } from '../utils/toml'
+import { BUNDLED_URL_PREFIX } from '../utils/const'
 
 const platform = (): string => {
   switch (process.platform) {
@@ -44,15 +47,24 @@ const ckbBinary = (): string => {
   }
 }
 
+let rpcPort: number = 8114
+let listenPort: number = 8115
+
 const initCkb = async () => {
   logger.info('CKB:\tInitializing node...')
   return new Promise<void>((resolve, reject) => {
-    if (fs.existsSync(path.join(SettingsService.getInstance().ckbDataPath, 'ckb.toml'))) {
+    if (fs.existsSync(path.join(SettingsService.getInstance().getNodeDataPath(), 'ckb.toml'))) {
       logger.log('CKB:\tinit: config file detected, skip ckb init.')
       return resolve()
     }
 
-    const initCmd = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', SettingsService.getInstance().ckbDataPath])
+    const initCmd = spawn(ckbBinary(), [
+      'init',
+      '--chain',
+      'mainnet',
+      '-C',
+      SettingsService.getInstance().getNodeDataPath(),
+    ])
     initCmd.stderr.on('data', data => {
       logger.error('CKB:\tinit fail:', data.toString())
     })
@@ -77,6 +89,8 @@ let isLookingValidTarget: boolean = false
 let lastLogTime: number
 export const getLookingValidTargetStatus = () => isLookingValidTarget
 
+export const getNodeUrl = () => `${BUNDLED_URL_PREFIX}${rpcPort}`
+
 const removeOldIndexerIfRunSuccess = () => {
   setTimeout(() => {
     if (ckb !== null) {
@@ -91,14 +105,20 @@ export const startCkbNode = async () => {
     await stopCkbNode()
   }
   await initCkb()
+  rpcPort = await getUsablePort(rpcPort)
+  listenPort = await getUsablePort(rpcPort >= listenPort ? rpcPort + 1 : listenPort)
 
-  logger.info('CKB:\tstarting node...')
-  const options = ['run', '-C', SettingsService.getInstance().ckbDataPath, '--indexer']
+  updateToml(path.join(SettingsService.getInstance().getNodeDataPath(), 'ckb.toml'), {
+    rpc: `listen_address = "127.0.0.1:${rpcPort}"`,
+    network: `listen_addresses = ["/ip4/0.0.0.0/tcp/${listenPort}"]`,
+  })
+  const options = ['run', '-C', SettingsService.getInstance().getNodeDataPath(), '--indexer']
   const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'ignore', 'pipe']
   if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
     options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
     stdio[1] = 'pipe'
   }
+  logger.info(`CKB:\tckb full node will with rpc port ${rpcPort}, listen port ${listenPort}, with options`, options)
   ckb = spawn(ckbBinary(), options, { stdio })
 
   ckb.stderr?.on('data', data => {
@@ -155,14 +175,14 @@ export const stopCkbNode = () => {
  */
 export const clearCkbNodeCache = async () => {
   await stopCkbNode()
-  fs.rmSync(SettingsService.getInstance().ckbDataPath, { recursive: true, force: true })
+  fs.rmSync(SettingsService.getInstance().getNodeDataPath(), { recursive: true, force: true })
   await startCkbNode()
   resetSyncTaskQueue.asyncPush(true)
 }
 
 export function migrateCkbData() {
   logger.info('CKB migrate:\tstarting...')
-  const options = ['migrate', '-C', SettingsService.getInstance().ckbDataPath, '--force']
+  const options = ['migrate', '-C', SettingsService.getInstance().getNodeDataPath(), '--force']
   MigrateSubject.next({ type: 'migrating' })
   let migrate: ChildProcess | null = spawn(ckbBinary(), options, { stdio: ['ignore', 'pipe', 'pipe'] })
 

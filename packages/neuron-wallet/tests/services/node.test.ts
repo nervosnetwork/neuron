@@ -13,7 +13,7 @@ describe('NodeService', () => {
   const stubbedGetTipBlockNumber = jest.fn()
   const stubbedRxjsDebounceTime = jest.fn()
   const stubbedCurrentNetworkIDSubjectSubscribe = jest.fn()
-  const stubbedNetworsServiceGet = jest.fn()
+  const stubbedNetworsServiceGet = jest.fn().mockReturnValue({})
   const stubbedLoggerInfo = jest.fn()
   const stubbedLoggerError = jest.fn()
   const existsSyncMock = jest.fn()
@@ -24,6 +24,7 @@ describe('NodeService', () => {
   const shellMock = jest.fn()
   const getVersionMock = jest.fn()
   const startMonitorMock = jest.fn()
+  const stopMonitorMock = jest.fn()
   const rpcRequestMock = jest.fn()
   const getChainMock = jest.fn()
   const getLocalNodeInfoMock = jest.fn()
@@ -47,6 +48,7 @@ describe('NodeService', () => {
     showMessageBoxMock.mockReset()
     shellMock.mockReset()
     startMonitorMock.mockReset()
+    stopMonitorMock.mockReset()
     rpcRequestMock.mockReset()
     getChainMock.mockReset()
     getLocalNodeInfoMock.mockReset()
@@ -139,7 +141,11 @@ describe('NodeService', () => {
       },
     }))
 
-    jest.doMock('../../src/services/monitor', () => startMonitorMock)
+    jest.doMock('../../src/services/monitor', () => {
+      function mockMonitor() {}
+      mockMonitor.stopMonitor = () => stopMonitorMock()
+      return mockMonitor
+    })
 
     jest.doMock('../../src/utils/rpc-request', () => ({
       rpcRequest: rpcRequestMock,
@@ -178,13 +184,13 @@ describe('NodeService', () => {
   describe('when targets external node', () => {
     beforeEach(async () => {
       const NodeService = require('../../src/services/node').default
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: false })
       nodeService = new NodeService()
-
       jest.advanceTimersByTime(1000)
     })
     it('emits disconnected event in ConnectionStatusSubject', () => {
       expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-        url: nodeService.nodeUrl,
+        url: BUNDLED_CKB_URL,
         connected: false,
         isBundledNode: false,
         startedBundledNode: false,
@@ -192,7 +198,7 @@ describe('NodeService', () => {
     })
     describe('advance to next event', () => {
       beforeEach(async () => {
-        nodeService.setNetwork(fakeHTTPUrl)
+        stubbedNetworsServiceGet.mockReturnValue({ remote: fakeHTTPUrl, readonly: false })
         stubbedConnectionStatusSubjectNext.mockReset()
         stubbedGetTipBlockNumber.mockResolvedValueOnce('0x1')
         jest.advanceTimersByTime(1000)
@@ -226,11 +232,10 @@ describe('NodeService', () => {
   describe('when targets bundled node', () => {
     beforeEach(async () => {
       const NodeService = require('../../src/services/node').default
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: false })
       nodeService = new NodeService()
       nodeService.isCkbCompatibility = () => {}
       nodeService.isStartWithIndexer = () => {}
-
-      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
     })
     describe('when node starts', () => {
       beforeEach(async () => {
@@ -241,7 +246,7 @@ describe('NodeService', () => {
       })
       it('emits disconnected event in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenLastCalledWith({
-          url: nodeService.nodeUrl,
+          url: BUNDLED_CKB_URL,
           connected: false,
           isBundledNode: false,
           startedBundledNode: false,
@@ -249,7 +254,7 @@ describe('NodeService', () => {
       })
       describe('advance to next event', () => {
         beforeEach(async () => {
-          nodeService.setNetwork(BUNDLED_CKB_URL)
+          stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: true })
           stubbedConnectionStatusSubjectNext.mockReset()
           stubbedGetTipBlockNumber.mockResolvedValueOnce('0x1')
           jest.advanceTimersByTime(1000)
@@ -291,7 +296,7 @@ describe('NodeService', () => {
       })
       it('emits disconnected event in ConnectionStatusSubject', () => {
         expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-          url: nodeService.nodeUrl,
+          url: BUNDLED_CKB_URL,
           connected: false,
           isBundledNode: false,
           startedBundledNode: false,
@@ -303,7 +308,7 @@ describe('NodeService', () => {
         stubbedNetworsServiceGet.mockReset()
       })
       it('start light node', async () => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({ type: NetworkType.Light })
+        stubbedNetworsServiceGet.mockReturnValueOnce({ type: NetworkType.Light, readonly: true })
         await nodeService.startNode()
         expect(stubbedStartLightNode).toBeCalled()
         expect(stubbedStopCkbNode).toBeCalled()
@@ -315,6 +320,7 @@ describe('NodeService', () => {
     const stubbedTipNumberSubjectCallback = jest.fn()
     beforeEach(async () => {
       const NodeService = require('../../src/services/node').default
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: false })
       nodeService = new NodeService()
       nodeService.tipNumberSubject.subscribe(stubbedTipNumberSubjectCallback)
       nodeService.isCkbCompatibility = () => {}
@@ -323,7 +329,7 @@ describe('NodeService', () => {
     })
     it('emits disconnected event in ConnectionStatusSubject', () => {
       expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
-        url: nodeService.nodeUrl,
+        url: BUNDLED_CKB_URL,
         connected: false,
         isBundledNode: false,
         startedBundledNode: false,
@@ -339,7 +345,7 @@ describe('NodeService', () => {
           nodeService.ckb.node.url = bundledNodeUrl
         })
         stubbedStartCKBNode.mockResolvedValue(true)
-        stubbedNetworsServiceGet.mockReturnValue({ remote: bundledNodeUrl })
+        stubbedNetworsServiceGet.mockReturnValue({ remote: bundledNodeUrl, readonly: true })
         getLocalNodeInfoMock.mockRejectedValue('not start')
         await nodeService.tryStartNodeOnDefaultURI()
 
@@ -357,7 +363,7 @@ describe('NodeService', () => {
       describe('switches to other network', () => {
         beforeEach(async () => {
           stubbedConnectionStatusSubjectNext.mockReset()
-          stubbedNetworsServiceGet.mockReturnValue({ remote: fakeHTTPUrl })
+          stubbedNetworsServiceGet.mockReturnValue({ remote: fakeHTTPUrl, readonly: false })
           await eventCallback({ currentNetworkID: 'network2' })
           jest.advanceTimersByTime(10000)
         })
@@ -369,34 +375,6 @@ describe('NodeService', () => {
             startedBundledNode: false,
           })
         })
-      })
-    })
-    describe('with invalid url', () => {
-      beforeEach(() => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({ remote: 'invalidurl' })
-      })
-      it('throws error', async () => {
-        let err
-        try {
-          await eventCallback({ currentNetworkID: 'test' })
-        } catch (error) {
-          err = error
-        }
-        expect(err).toEqual(new Error('Protocol of url should be specified'))
-      })
-    })
-    describe('when url is not a string', () => {
-      beforeEach(() => {
-        stubbedNetworsServiceGet.mockReturnValueOnce({ remote: {} })
-      })
-      it('throws error', async () => {
-        let err
-        try {
-          await eventCallback({ currentNetworkID: 'test' })
-        } catch (error) {
-          err = error
-        }
-        expect(err).toEqual(new Error('should-be-type-of'))
       })
     })
   })
@@ -438,7 +416,7 @@ describe('NodeService', () => {
           '0.107': false,
         },
       })
-      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL })
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: true })
     })
     it('the ckb is running external and not light client', async () => {
       nodeService._isCkbNodeExternal = true
@@ -446,6 +424,7 @@ describe('NodeService', () => {
       getVersionMock.mockReturnValueOnce('0.110.0')
       readFileSyncMock.mockReturnValue('v0.107.0')
       getLocalNodeInfoMock.mockResolvedValue({ version: '0.107.0 (30e1255 2023-01-30)' })
+      stubbedNetworsServiceGet.mockReturnValue({ remote: BUNDLED_CKB_URL, readonly: false })
       const res = await nodeService.verifyExternalCkbNode()
       expect(res).toStrictEqual({
         ckbIsCompatible: false,
@@ -462,7 +441,7 @@ describe('NodeService', () => {
     })
     it('the ckb type is light client', async () => {
       nodeService._isCkbNodeExternal = true
-      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL, type: NetworkType.Light })
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL, type: NetworkType.Light, readonly: true })
       const res = await nodeService.verifyExternalCkbNode()
       expect(res).toBeUndefined()
     })
@@ -484,7 +463,7 @@ describe('NodeService', () => {
           '0.107': false,
         },
       })
-      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL, readonly: true })
     })
     it('neuron version not exist in compatible table', () => {
       expect(nodeService.isCkbCompatibility('0.107.0', '0.107.0 (30e1255 2023-01-30)')).toBeFalsy()
@@ -518,7 +497,7 @@ describe('NodeService', () => {
     beforeEach(() => {
       const NodeService = require('../../src/services/node').default
       nodeService = new NodeService()
-      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL })
+      stubbedNetworsServiceGet.mockReturnValueOnce({ remote: BUNDLED_CKB_URL, readonly: true })
     })
     it('start with indexer', async () => {
       rpcRequestMock.mockResolvedValue({})

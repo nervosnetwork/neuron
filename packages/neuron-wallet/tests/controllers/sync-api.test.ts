@@ -8,7 +8,6 @@ const stubbedEmitter = jest.fn(() => {
 const stubbedSyncedBlockNumber = jest.fn()
 const stubbedSyncStateSubjectNext = jest.fn()
 const stubbedGetSyncState = jest.fn()
-const stubbedNodeGetInstance = jest.fn()
 const stubbedSetNextBlock = jest.fn()
 
 const stubbedRpcServiceConstructor = jest.fn()
@@ -17,19 +16,20 @@ const stubbedGetLatestConnectionStatus = jest.fn()
 const stubbedGetTipHeader = jest.fn()
 const stubbedCurrentNetworkIDSubject = jest.fn()
 const stubbedDateNow = jest.fn()
+const getCurrentNetworkMock = jest.fn()
 
 const resetMocks = () => {
   stubbedEmitter.mockReset()
   stubbedSyncedBlockNumber.mockReset()
   stubbedSyncStateSubjectNext.mockReset()
   stubbedGetSyncState.mockReset()
-  stubbedNodeGetInstance.mockReset()
   stubbedSetNextBlock.mockReset()
   stubbedCurrentBlockNumber.mockReset()
   stubbedGetLatestConnectionStatus.mockReset()
   stubbedGetTipHeader.mockReset()
   stubbedCurrentNetworkIDSubject.mockReset()
   stubbedDateNow.mockReset()
+  getCurrentNetworkMock.mockReset()
 }
 
 let networkChangedCallback: any
@@ -83,15 +83,10 @@ describe('SyncApiController', () => {
         return { setNextBlock: stubbedSetNextBlock }
       })
     })
-    jest.doMock('services/node', () => {
-      return {
-        getInstance: stubbedNodeGetInstance,
-      }
-    })
     jest.doMock('services/networks', () => {
       return {
         getInstance: () => ({
-          getCurrent: () => ({ remote: '' }),
+          getCurrent: getCurrentNetworkMock,
         }),
       }
     })
@@ -136,11 +131,7 @@ describe('SyncApiController', () => {
         bestKnownBlockNumber: bestKnownBlockNumber.toString(16),
         bestKnownBlockTimestamp: `0x${bestKnownBlockTimestamp.toString(16)}`,
       })
-      stubbedNodeGetInstance.mockReturnValue({
-        get nodeUrl() {
-          return fakeNodeUrl
-        },
-      })
+      getCurrentNetworkMock.mockReturnValue({ remote: fakeNodeUrl })
       stubbedGetTipHeader.mockResolvedValue({ timestamp: '180000' })
     })
     describe('on cache-tip-block-updated', () => {
@@ -360,11 +351,7 @@ describe('SyncApiController', () => {
               })
               describe('with another node url', () => {
                 beforeEach(async () => {
-                  stubbedNodeGetInstance.mockReturnValue({
-                    get nodeUrl() {
-                      return 'anotherfakeurl'
-                    },
-                  })
+                  getCurrentNetworkMock.mockReturnValue({ remote: 'anotherfakeurl' })
                   await sendFakeCacheBlockTipEvent(newFakeState)
 
                   cachedEstimate = await controller.getCachedEstimation()
@@ -470,11 +457,7 @@ describe('SyncApiController', () => {
           })
           describe('when node url changed', () => {
             beforeEach(async () => {
-              stubbedNodeGetInstance.mockImplementation(() => ({
-                get nodeUrl() {
-                  return 'http://diffurl'
-                },
-              }))
+              getCurrentNetworkMock.mockReturnValue({ remote: 'http://diffurl' })
               await sendFakeCacheBlockTipEvent(fakeState3)
             })
             it('resets samples', () => {

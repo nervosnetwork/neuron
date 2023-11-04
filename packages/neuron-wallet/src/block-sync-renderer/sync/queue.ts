@@ -21,10 +21,12 @@ import { AppendScript, BlockTips, Connector } from './connector'
 import LightConnector from './light-connector'
 import { generateRPC } from '../../utils/ckb-rpc'
 import { BUNDLED_LIGHT_CKB_URL } from '../../utils/const'
+import { NetworkType } from '../../models/network'
 
 export default class Queue {
   #lockHashes: string[]
   #url: string // ckb node
+  #nodeType: NetworkType
   #indexerUrl: string
   #addresses: AddressInterface[]
   #rpcService: RpcService
@@ -36,11 +38,12 @@ export default class Queue {
   #anyoneCanPayLockHashes: string[]
   #assetAccountInfo: AssetAccountInfo
 
-  constructor(url: string, addresses: AddressInterface[], indexerUrl: string) {
+  constructor(url: string, addresses: AddressInterface[], indexerUrl: string, nodeType: NetworkType) {
     this.#url = url
     this.#indexerUrl = indexerUrl
     this.#addresses = addresses
-    this.#rpcService = new RpcService(url)
+    this.#rpcService = new RpcService(url, nodeType)
+    this.#nodeType = nodeType
     this.#assetAccountInfo = new AssetAccountInfo()
     this.#lockHashes = AddressParser.batchToLockHash(this.#addresses.map(meta => meta.address))
 
@@ -66,7 +69,7 @@ export default class Queue {
       if (this.#url === BUNDLED_LIGHT_CKB_URL) {
         this.#indexerConnector = new LightConnector(this.#addresses, this.#url)
       } else {
-        this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl)
+        this.#indexerConnector = new IndexerConnector(this.#addresses, this.#url, this.#indexerUrl, this.#nodeType)
       }
       await this.#indexerConnector!.connect()
     } catch (error) {
@@ -122,7 +125,7 @@ export default class Queue {
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
-    const rpc = generateRPC(this.#url)
+    const rpc = generateRPC(this.#url, this.#nodeType)
     const txsWithStatus = await rpc
       .createBatchRequest<'getTransaction', string[], CKBComponents.TransactionWithStatus[]>(
         txHashes.map(v => ['getTransaction', v])

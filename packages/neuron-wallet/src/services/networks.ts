@@ -7,8 +7,18 @@ import { Validate, Required } from '../utils/validators'
 import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network, TESTNET_GENESIS_HASH } from '../models/network'
 import CommonUtils from '../utils/common'
-import { BUNDLED_CKB_URL, BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from '../utils/const'
+import {
+  BUNDLED_CKB_DEFAULT_PORT,
+  BUNDLED_CKB_URL,
+  BUNDLED_LIGHT_CKB_URL,
+  BUNDLED_LIGHT_DEFAULT_PORT,
+  BUNDLED_URL_PREFIX,
+  LIGHT_CLIENT_MAINNET,
+  LIGHT_CLIENT_TESTNET,
+} from '../utils/const'
 import { generateRPC } from '../utils/ckb-rpc'
+import { CKBLightRunner } from './light-runner'
+import { getNodeUrl } from './ckb-runner'
 
 const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',
@@ -25,14 +35,16 @@ const presetNetworks: { selected: string; networks: Network[] } = {
   ],
 }
 
+const oldLightclientId = 'light_client_testnet'
+
 const lightClientNetwork: Network[] = [
   {
-    id: 'light_client_testnet',
-    name: 'Light Client Testnet',
+    id: 'light_client',
+    name: 'Light Client',
     remote: BUNDLED_LIGHT_CKB_URL,
-    genesisHash: TESTNET_GENESIS_HASH,
+    genesisHash: MAINNET_GENESIS_HASH,
     type: NetworkType.Light,
-    chain: LIGHT_CLIENT_TESTNET,
+    chain: LIGHT_CLIENT_MAINNET,
     readonly: true,
   },
 ]
@@ -42,6 +54,7 @@ enum NetworksKey {
   Current = 'selected',
   AddedLightNetwork = 'AddedLightNetwork',
   MigrateNetwork = 'MigrateNetwork',
+  SetLightDefaultMain = 'SetLightDefaultMain',
 }
 
 const oldDefaultNames = ['Default', 'default node', presetNetworks.networks[0].name]
@@ -68,6 +81,7 @@ export default class NetworksService extends Store {
       this.writeSync(NetworksKey.AddedLightNetwork, true)
     }
     this.migrateNetwork()
+    this.setLightDefaultMain()
   }
 
   public getAll = () => {
@@ -130,10 +144,13 @@ export default class NetworksService extends Store {
     }
 
     Object.assign(network, options)
-    Object.assign(
-      network,
-      await CommonUtils.timeout(2000, this.refreshChainInfo(network), network).catch(() => network)
-    )
+    if (!network.readonly) {
+      // readonly network chaininfo can not update auto
+      Object.assign(
+        network,
+        await CommonUtils.timeout(2000, this.refreshChainInfo(network), network).catch(() => network)
+      )
+    }
 
     this.updateAll(list)
     return network
@@ -163,9 +180,48 @@ export default class NetworksService extends Store {
     if (!network) {
       throw new NetworkNotFound(id)
     }
-    this.update(id, {}) // Trigger chain info refresh
+    this.update(
+      id,
+      network.readonly
+        ? {
+            remote: `${BUNDLED_URL_PREFIX}${
+              network.type === NetworkType.Light ? BUNDLED_LIGHT_DEFAULT_PORT : BUNDLED_CKB_DEFAULT_PORT
+            }`,
+          }
+        : {}
+    ) // Trigger chain info refresh
 
     this.writeSync(NetworksKey.Current, id)
+  }
+
+  public switchCurrentNetworkType() {
+    const current = this.getCurrent()
+    if (!current.readonly) {
+      throw new Error('Only internal network can switch network type')
+    }
+    const isMainnet = current.genesisHash === MAINNET_GENESIS_HASH
+    if (current.type === NetworkType.Light) {
+      this.update(current.id, {
+        genesisHash: isMainnet ? TESTNET_GENESIS_HASH : MAINNET_GENESIS_HASH,
+        chain: isMainnet ? LIGHT_CLIENT_TESTNET : LIGHT_CLIENT_MAINNET,
+      })
+    } else {
+      this.update(current.id, {
+        genesisHash: isMainnet ? TESTNET_GENESIS_HASH : MAINNET_GENESIS_HASH,
+        chain: isMainnet ? 'ckb_testnet' : 'ckb',
+      })
+    }
+  }
+
+  public updateInternalRemote() {
+    const current = this.getCurrent()
+    if (!current.readonly) {
+      return
+    }
+    const remote = current.type === NetworkType.Light ? CKBLightRunner.getInstance().nodeUrl : getNodeUrl()
+    if (current.remote !== remote) {
+      this.update(current.id, { remote })
+    }
   }
 
   public getCurrentID = () => {
@@ -189,13 +245,16 @@ export default class NetworksService extends Store {
 
   // Refresh a network's genesis and chain info
   private async refreshChainInfo(network: Network): Promise<Network> {
-    const rpc = generateRPC(network.remote)
+    const rpc = generateRPC(network.remote, network.type)
 
     const genesisHash = await rpc.getGenesisBlockHash().catch(() => EMPTY_GENESIS_HASH)
-    const chain = await rpc
-      .getBlockchainInfo()
-      .then(info => info.chain)
-      .catch(() => '')
+    let chain = network.chain
+    if (network.type !== NetworkType.Light) {
+      chain = await rpc
+        .getBlockchainInfo()
+        .then(info => info.chain)
+        .catch(() => '')
+    }
 
     if (genesisHash !== network.genesisHash && chain !== '') {
       network.genesisHash = genesisHash
@@ -237,6 +296,25 @@ export default class NetworksService extends Store {
         }
       }
       this.writeSync(NetworksKey.MigrateNetwork, true)
+    }
+  }
+
+  private setLightDefaultMain() {
+    const flag = this.readSync<boolean>(NetworksKey.SetLightDefaultMain)
+    if (!flag) {
+      const lightClientNewId = 'light_client'
+      const networks = this.readSync<Network[]>(NetworksKey.List)
+      const newNetwork = networks.map(v => {
+        if (v.id === oldLightclientId) {
+          return lightClientNetwork[0]
+        }
+        return v
+      })
+      this.updateAll(newNetwork)
+      this.writeSync(NetworksKey.SetLightDefaultMain, true)
+      if (this.getCurrentID() === oldLightclientId) {
+        this.writeSync(NetworksKey.Current, lightClientNewId)
+      }
     }
   }
 }

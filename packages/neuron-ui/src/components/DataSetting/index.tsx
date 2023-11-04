@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react'
+import React, { useCallback, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import ClearCache from 'components/ClearCache'
 import { useDispatch, useState as useGlobalState } from 'states'
 import { shell } from 'electron'
-import { getIsCkbRunExternal } from 'services/remote'
-import { isSuccessResponse } from 'utils'
 import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
@@ -42,6 +40,12 @@ const PathItem = ({
 const DataSetting = () => {
   const dispatch = useDispatch()
   const [t] = useTranslation()
+  const resyncRef = useRef<HTMLButtonElement | null>(null)
+  const {
+    chain: { networkID },
+    settings: { networks = [] },
+  } = useGlobalState()
+  const network = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
   const {
     onSetting,
     prevPath,
@@ -53,38 +57,19 @@ const DataSetting = () => {
     savingType,
     faidMessage,
     setFaidMessage,
-  } = useDataPath()
-
-  const resyncRef = useRef<HTMLButtonElement | null>(null)
+  } = useDataPath(network)
 
   const openPath = useCallback(() => {
     if (prevPath) {
       shell.openPath(prevPath!)
     }
   }, [prevPath])
-  const [isCkbRunExternal, setIsCkbRunExternal] = useState<boolean | undefined>()
-  useEffect(() => {
-    getIsCkbRunExternal().then(res => {
-      if (isSuccessResponse(res)) {
-        setIsCkbRunExternal(res.result ?? false)
-      } else {
-        // ignore
-      }
-    })
-  }, [])
-  const {
-    chain: { networkID },
-    settings: { networks = [] },
-  } = useGlobalState()
-  const isLightClient = useMemo(
-    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
-    [networkID, networks]
-  )
+  const isLightClient = network?.type === LIGHT_NETWORK_TYPE
   return (
     <>
       <div className={styles.root}>
         <div className={styles.leftContainer}>
-          {isLightClient ? null : (
+          {isLightClient || !network?.readonly ? null : (
             <div className={styles.label}>
               <div>{t('settings.data.ckb-node-data')}</div>
               <Tooltip
@@ -110,8 +95,8 @@ const DataSetting = () => {
           </div>
         </div>
         <div className={styles.rightContainer}>
-          {isLightClient ? null : (
-            <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} disabled={isCkbRunExternal} />
+          {isLightClient || !network?.readonly ? null : (
+            <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} />
           )}
           <ClearCache
             className={styles.item}

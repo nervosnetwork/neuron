@@ -289,7 +289,7 @@ export default class ApiController {
       }
     })
 
-    handle('is-ckb-run-external', () => {
+    handle('is-node-run-external', () => {
       return {
         status: ResponseCode.Success,
         result: NodeService.getInstance().isCkbNodeExternal,
@@ -300,6 +300,13 @@ export default class ApiController {
       return {
         status: ResponseCode.Success,
         result: await NodeService.getInstance().verifyExternalCkbNode(),
+      }
+    })
+
+    handle('start-node-ignore-external', async () => {
+      await this.#networksController.startNodeIgnoreExternal()
+      return {
+        status: ResponseCode.Success,
       }
     })
 
@@ -554,6 +561,10 @@ export default class ApiController {
       return this.#networksController.delete(id)
     })
 
+    handle('switch-network-type', async () => {
+      return this.#networksController.switchCurrentNetworkType()
+    })
+
     // Updater
 
     handle('check-for-updates', async () => {
@@ -584,7 +595,7 @@ export default class ApiController {
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath,
+        result: SettingsService.getInstance().getNodeDataPath(),
       }
     })
 
@@ -596,11 +607,11 @@ export default class ApiController {
         }
       }
       await cleanChain()
-      SettingsService.getInstance().ckbDataPath = dataPath
+      SettingsService.getInstance().setNodeDataPath(dataPath)
       await startMonitor('ckb', true)
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath,
+        result: SettingsService.getInstance().getNodeDataPath(),
       }
     })
 

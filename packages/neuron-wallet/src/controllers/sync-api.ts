@@ -1,12 +1,12 @@
 import EventEmiter from 'events'
 import { debounceTime } from 'rxjs/operators'
-import NodeService from '../services/node'
 import RpcService from '../services/rpc-service'
 import SyncedBlockNumber from '../models/synced-block-number'
 import SyncStateSubject from '../models/subjects/sync-state-subject'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'
 import MultisigService from '../services/multisig'
 import { getLookingValidTargetStatus } from '../services/ckb-runner'
+import NetworksService from '../services/networks'
 
 const TEN_MINS = 600000
 const MAX_TIP_BLOCK_DELAY = 180000
@@ -58,9 +58,9 @@ export default class SyncApiController {
   }
 
   #getEstimatesByCurrentNode = () => {
-    const nodeUrl = NodeService.getInstance().nodeUrl
+    const network = NetworksService.getInstance().getCurrent()
     return this.#estimates.filter(
-      state => state.nodeUrl === nodeUrl && Date.now() - state.timestamp <= this.#sampleTime
+      state => state.nodeUrl === network.remote && Date.now() - state.timestamp <= this.#sampleTime
     )
   }
 
@@ -104,8 +104,8 @@ export default class SyncApiController {
   }
 
   #fetchBestKnownBlockInfo = async (): Promise<{ bestKnownBlockNumber: number; bestKnownBlockTimestamp: number }> => {
-    const nodeUrl = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(nodeUrl)
+    const network = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(network.remote, network.type)
     try {
       const syncState = await rpcService.getSyncState()
       return {
@@ -127,8 +127,8 @@ export default class SyncApiController {
     const cacheTipNumber = parseInt(states.cacheTipNumber)
 
     const currentTimestamp = Date.now()
-    const nodeUrl = NodeService.getInstance().nodeUrl
-    const tipHeader = await new RpcService(nodeUrl).getTipHeader()
+    const network = NetworksService.getInstance().getCurrent()
+    const tipHeader = await new RpcService(network.remote, network.type).getTipHeader()
 
     const { bestKnownBlockNumber, bestKnownBlockTimestamp } = await this.#fetchBestKnownBlockInfo()
     const foundBestKnownBlockNumber = this.#foundBestKnownBlockNumber(bestKnownBlockNumber)
@@ -137,7 +137,7 @@ export default class SyncApiController {
     const remainingBlocksToIndex = bestKnownBlockNumber - indexerTipNumber
 
     const newSyncState: SyncState = {
-      nodeUrl,
+      nodeUrl: network.remote,
       timestamp: currentTimestamp,
       indexerTipNumber,
       cacheTipNumber,
@@ -200,10 +200,10 @@ export default class SyncApiController {
       return this.#cachedEstimation
     }
 
-    const nodeUrl = NodeService.getInstance().nodeUrl
+    const network = NetworksService.getInstance().getCurrent()
 
     if (
-      this.#cachedEstimation.nodeUrl !== nodeUrl ||
+      this.#cachedEstimation.nodeUrl !== network.remote ||
       this.#cachedEstimation.timestamp + this.#sampleTime <= Date.now()
     ) {
       this.#cachedEstimation = lastEstimation
@@ -223,9 +223,9 @@ export default class SyncApiController {
     })
 
     CurrentNetworkIDSubject.pipe(debounceTime(500)).subscribe(() => {
-      const nodeUrl = NodeService.getInstance().nodeUrl
+      const network = NetworksService.getInstance().getCurrent()
       const newSyncState: SyncState = {
-        nodeUrl,
+        nodeUrl: network.remote,
         timestamp: 0,
         indexerTipNumber: 0,
         cacheTipNumber: 0,

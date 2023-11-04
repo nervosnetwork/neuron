@@ -400,7 +400,9 @@
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "lightTestnet": "Light Testnet",
-        "devnet": "Devnet"
+        "lightMainnet": "Light Mainnet",
+        "devnet": "Devnet",
+        "switch-network-type": "Switch to {{type}}"
       },
       "locale": {
         "en": "English",
@@ -1137,6 +1139,14 @@
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",
       "view-block": "View the block"
+    },
+    "main": {
+      "external-node-detected-dialog": {
+        "title": "External node detected",
+        "body-tips-without-network": "You selected an internal node, but activated an external node. If you need to continue using external nodes, please add a new network.",
+        "body-tips-with-network": "You have currently selected an internal node, but have activated an external node. If you need to continue using external nodes, please switch to another external network or add a new network.",
+        "add-network": "Add Network"
+      }
     }
   }
 }

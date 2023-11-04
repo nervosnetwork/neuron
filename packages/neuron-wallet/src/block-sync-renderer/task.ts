@@ -32,6 +32,7 @@ export interface StartParams {
   url: SyncQueueParams[0]
   addressMetas: SyncQueueParams[1]
   indexerUrl: SyncQueueParams[2]
+  nodeType: SyncQueueParams[3]
 }
 
 export type QueryIndexerParams = LumosCellQuery
@@ -62,7 +63,7 @@ export const listener = async ({ type, id, channel, message }: WorkerMessage) =>
       try {
         await initConnection(message.genesisHash)
 
-        syncQueue = new SyncQueue(message.url, message.addressMetas, message.indexerUrl)
+        syncQueue = new SyncQueue(message.url, message.addressMetas, message.indexerUrl, message.nodeType)
         syncQueue.start()
       } catch (err) {
         logger.error(`Block Sync Task:\t`, err)

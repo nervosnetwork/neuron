@@ -12,8 +12,8 @@ import {
 import https from 'https'
 import http from 'http'
 import { request } from 'undici'
-import { BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from './const'
 import CommonUtils from './common'
+import { NetworkType } from '../models/network'
 
 export interface LightScriptFilter {
   script: CKBComponents.Script
@@ -233,10 +233,7 @@ export class LightRPC extends Base {
   }
 
   getBlockchainInfo = async () => {
-    await this.localNodeInfo()
-    return {
-      chain: LIGHT_CLIENT_TESTNET,
-    } as CKBComponents.BlockchainInfo
+    throw new Error('Light network can not get chain info')
   }
 
   #node: CKBComponents.Node = {
@@ -377,9 +374,9 @@ const getHttpAgent = () => {
   return httpAgent
 }
 
-export const generateRPC = (url: string) => {
+export const generateRPC = (url: string, type: NetworkType) => {
   let rpc: LightRPC | FullCKBRPC
-  if (url === BUNDLED_LIGHT_CKB_URL) {
+  if (type === NetworkType.Light) {
     rpc = new LightRPC(url)
   } else {
     rpc = new FullCKBRPC(url)

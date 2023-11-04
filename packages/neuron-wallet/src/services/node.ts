@@ -6,19 +6,18 @@ import { t } from 'i18next'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
 import env from '../env'
-import { ShouldBeTypeOf } from '../exceptions'
 import { ConnectionStatusSubject } from '../models/subjects/node'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'
 import { NetworkType } from '../models/network'
 import NetworksService from '../services/networks'
 import RpcService from '../services/rpc-service'
 import { startCkbNode, stopCkbNode } from '../services/ckb-runner'
-import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER, BUNDLED_LIGHT_CKB_URL } from '../utils/const'
+import { START_WITHOUT_INDEXER } from '../utils/const'
 import logger from '../utils/logger'
 import redistCheck from '../utils/redist-check'
 import { rpcRequest } from '../utils/rpc-request'
 import { generateRPC } from '../utils/ckb-rpc'
-import startMonitor from './monitor'
+import startMonitor, { stopMonitor } from './monitor'
 import { CKBLightRunner } from './light-runner'
 
 export enum VerifyCkbVersionResult {
@@ -45,22 +44,12 @@ class NodeService {
 
   private _tipBlockNumber: string = '0'
   private startedBundledNode: boolean = false
-  private _isCkbNodeExternal: boolean = false
-  #nodeUrl: string = ''
+  private _isCkbNodeExternal?: boolean = undefined
 
   private constructor() {
     this.start()
     this.syncConnectionStatus()
-    CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
-      const currentNetwork = NetworksService.getInstance().get(currentNetworkID)
-      if (currentNetwork) {
-        this.setNetwork(currentNetwork.remote)
-      }
-    })
-  }
-
-  get nodeUrl() {
-    return this.#nodeUrl
+    CurrentNetworkIDSubject.subscribe(this.whenNetworkUpdate)
   }
 
   public get tipBlockNumber(): string {
@@ -73,9 +62,10 @@ class NodeService {
     merge(periodSync, realtimeSync)
       .pipe(debounceTime(500))
       .subscribe(connected => {
-        const isBundledNode = this.#nodeUrl === BUNDLED_CKB_URL
+        const currentNetwork = NetworksService.getInstance().getCurrent()
+        const isBundledNode = currentNetwork.readonly
         ConnectionStatusSubject.next({
-          url: this.#nodeUrl,
+          url: currentNetwork.remote,
           connected,
           isBundledNode,
           startedBundledNode: isBundledNode ? this.startedBundledNode : false,
@@ -83,14 +73,8 @@ class NodeService {
       })
   }
 
-  private setNetwork = (url: string) => {
-    if (typeof url !== 'string') {
-      throw new ShouldBeTypeOf('URL', 'string')
-    }
-    if (!url.startsWith('http')) {
-      throw new Error('Protocol of url should be specified')
-    }
-    this.#nodeUrl = url
+  private whenNetworkUpdate = () => {
+    this._isCkbNodeExternal = undefined
     this.tipNumberSubject.next('0')
     this.connectionStatusSubject.next(false)
   }
@@ -107,7 +91,8 @@ class NodeService {
       .pipe(
         delay(this.delayTime),
         flatMap(() => {
-          return generateRPC(this.#nodeUrl)
+          const currentNetwork = NetworksService.getInstance().getCurrent()
+          return generateRPC(currentNetwork.remote, currentNetwork.type)
             .getTipBlockNumber()
             .then(tipNumber => {
               this.connectionStatusSubject.next(true)
@@ -142,6 +127,7 @@ class NodeService {
 
   public async tryStartNodeOnDefaultURI() {
     const isDefaultCKBNeedStart = await this.isDefaultCKBNeedRestart()
+    await stopMonitor('ckb')
     if (isDefaultCKBNeedStart) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
       this._isCkbNodeExternal = false
@@ -157,8 +143,8 @@ class NodeService {
   public async verifyExternalCkbNode() {
     logger.info('CKB:\tstart verify external ckb node')
     const network = NetworksService.getInstance().getCurrent()
-    if (this._isCkbNodeExternal && network.type !== NetworkType.Light) {
-      const localNodeInfo = await new RpcService(network.remote).localNodeInfo()
+    if (!network.readonly) {
+      const localNodeInfo = await new RpcService(network.remote, network.type).localNodeInfo()
       const internalNodeVersion = this.getInternalNodeVersion()
       const neuronVersion = app.getVersion()
       if (!internalNodeVersion || !localNodeInfo.version) return
@@ -172,11 +158,11 @@ class NodeService {
 
   public async isDefaultCKBNeedRestart() {
     const network = NetworksService.getInstance().getCurrent()
-    if (network.remote !== BUNDLED_CKB_URL && network.remote !== BUNDLED_LIGHT_CKB_URL) {
+    if (!network.readonly) {
       return false
     }
     try {
-      await new RpcService(network.remote).localNodeInfo()
+      await new RpcService(network.remote, network.type).localNodeInfo()
       return false
     } catch (err) {
       return true
@@ -199,6 +185,15 @@ class NodeService {
       logger.info('CKB:\tfail to start bundled CKB with error:')
       logger.error(error)
     }
+  }
+
+  public async startNodeIgnoreExternal() {
+    logger.info('CKB:\tignore running external node, and start node with another port')
+    await stopMonitor('ckb')
+    this._isCkbNodeExternal = false
+    const redistReady = await redistCheck()
+    await (redistReady ? this.startNode() : this.showGuideDialog())
+    await startMonitor()
   }
 
   get isCkbNodeExternal() {

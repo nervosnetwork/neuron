@@ -48,8 +48,9 @@ type Action =
   | 'start-process-monitor'
   | 'is-dark'
   | 'set-theme'
-  | 'is-ckb-run-external'
+  | 'is-node-run-external'
   | 'verify-external-ckb-node'
+  | 'start-node-ignore-external'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -91,6 +92,7 @@ type Action =
   | 'get-current-network-id'
   | 'set-current-network-id'
   | 'delete-network'
+  | 'switch-network-type'
   // Updater
   | 'check-for-updates'
   | 'cancel-check-updates'

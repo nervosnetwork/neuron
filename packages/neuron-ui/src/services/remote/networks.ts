@@ -6,3 +6,4 @@ export const updateNetwork = remoteApi<Controller.UpdateNetworkParams>('update-n
 export const getCurrentNetworkID = remoteApi<void>('get-current-network-id')
 export const setCurrentNetwork = remoteApi<string>('set-current-network-id')
 export const deleteNetwork = remoteApi<string>('delete-network')
+export const switchCurrentNetworkType = remoteApi<void>('switch-network-type')

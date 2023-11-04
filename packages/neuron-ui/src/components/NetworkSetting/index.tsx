@@ -2,15 +2,24 @@ import React, { useEffect, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
-import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
 import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import Toast from 'widgets/Toast'
 import { chainState } from 'states'
-import { setCurrentNetwork, deleteNetwork } from 'services/remote'
+import { setCurrentNetwork, deleteNetwork, switchCurrentNetworkType } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
 import { useOnWindowResize, useToggleChoiceGroupBorder, getNetworkLabelI18nkey } from 'utils'
+import { AddSimple, Switch } from 'widgets/Icons/icon'
+import Tooltip from 'widgets/Tooltip'
+import { LIGHT_CLIENT_MAINNET } from 'utils/const'
 import styles from './networkSetting.module.scss'
+
+const getAnotherNetworkType = (chain: State.Network['chain']): 'testnet' | 'mainnet' => {
+  if (chain === 'ckb' || chain === LIGHT_CLIENT_MAINNET) {
+    return 'testnet'
+  }
+  return 'mainnet'
+}
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
@@ -43,7 +52,6 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           break
         }
         default:
-        // @ts-ignore
       }
     },
     [setNetId, setShowEditorDialog, setShowDeleteDialog]
@@ -75,20 +83,43 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     }
   }, [setShowEditorDialog, setNotice, netId])
 
+  const onSwitchNetworkType = useCallback<React.MouseEventHandler<HTMLButtonElement>>(() => {
+    switchCurrentNetworkType()
+  }, [])
+
   return (
     <div>
       <RadioGroup
-        defaultValue={currentId}
+        value={currentId}
         onChange={handleChange}
         itemClassName={styles.radioItem}
         options={networks.map(network => ({
           value: network.id,
-          label: (
-            <div className={styles.networkLabel}>
-              <p>{`${network.name} (${network.remote})`}</p>
-              <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
-            </div>
-          ),
+          label:
+            currentId === network.id && network.readonly ? (
+              <div className={styles.networkLabel}>
+                <p>{`${network.name} (${network.remote})`}</p>
+                <Tooltip
+                  tip={
+                    <button type="button" onClick={onSwitchNetworkType} className={styles.switchBtn}>
+                      {t('settings.network.switch-network-type', { type: getAnotherNetworkType(network.chain) })}
+                    </button>
+                  }
+                  placement="top"
+                  showTriangle
+                >
+                  <div className={styles.tag}>
+                    {t(getNetworkLabelI18nkey(network.chain))}
+                    <Switch />
+                  </div>
+                </Tooltip>
+              </div>
+            ) : (
+              <div className={styles.networkLabel}>
+                <p>{`${network.name} (${network.remote})`}</p>
+                <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
+              </div>
+            ),
           suffix: (
             <div className={styles.suffix}>
               {network.readonly ? null : (

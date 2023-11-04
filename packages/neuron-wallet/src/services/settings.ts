@@ -4,14 +4,16 @@ import Store from '../models/store'
 import { changeLanguage } from '../locales/i18n'
 import { updateApplicationMenu } from '../controllers/app/menu'
 import path from 'path'
+import NetworksService from './networks'
+import { LIGHT_CLIENT_MAINNET, LIGHT_CLIENT_TESTNET } from '../utils/const'
 
 const { app } = env
 
 export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
 export type Locale = (typeof locales)[number]
 const settingKeys = {
-  testnetLightDataPath: 'testnetLightDataPath',
   ckbDataPath: 'ckbDataPath',
+  nodeDataPath: 'nodeDataPath',
 }
 
 export default class SettingsService extends Store {
@@ -50,20 +52,14 @@ export default class SettingsService extends Store {
     this.writeSync('indexerDataPath', dataPath)
   }
 
-  get ckbDataPath() {
-    return this.readSync(settingKeys.ckbDataPath)
+  getNodeDataPath(chain?: string) {
+    return this.readSync<string>(
+      `${settingKeys.nodeDataPath}_${chain ?? NetworksService.getInstance().getCurrent().chain}`
+    )
   }
 
-  set ckbDataPath(dataPath: string) {
-    this.writeSync(settingKeys.ckbDataPath, dataPath)
-  }
-
-  get testnetLightDataPath() {
-    return this.readSync(settingKeys.testnetLightDataPath)
-  }
-
-  set testnetLightDataPath(dataPath: string) {
-    this.writeSync(settingKeys.testnetLightDataPath, dataPath)
+  setNodeDataPath(dataPath: string, chain?: string) {
+    this.writeSync(`${settingKeys.nodeDataPath}_${chain ?? NetworksService.getInstance().getCurrent().chain}`, dataPath)
   }
 
   get themeSource() {
@@ -84,16 +80,34 @@ export default class SettingsService extends Store {
         ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet'),
       })
     )
-    if (!this.ckbDataPath) {
-      this.ckbDataPath = path.resolve(app.getPath('userData'), 'chains/mainnet')
-    }
-    if (!this.testnetLightDataPath) {
-      this.testnetLightDataPath = path.resolve(app.getPath('userData'), 'chains/light/testnet')
+    if (!this.getNodeDataPath(LIGHT_CLIENT_MAINNET)) {
+      this.migrateDataPath()
     }
   }
 
   private onLocaleChanged = (lng: Locale) => {
     BrowserWindow.getAllWindows().forEach(bw => bw.webContents.send('set-locale', lng))
     updateApplicationMenu(null)
+  }
+
+  migrateDataPath() {
+    const networkChain = NetworksService.getInstance().getCurrent()?.chain
+    const currentCkbDataPath = this.readSync(settingKeys.ckbDataPath)
+    this.writeSync(`${settingKeys.nodeDataPath}_${networkChain}`, currentCkbDataPath)
+    const defaultMainNetworkDir = path.resolve(app.getPath('userData'), 'chains/mainnet')
+    if (networkChain === 'ckb') {
+      this.writeSync(`${settingKeys.nodeDataPath}_ckb_testnet`, path.resolve(app.getPath('userData'), 'chains/testnet'))
+    } else {
+      // if user has changed the ckb data path and running with testnet
+      this.writeSync(`${settingKeys.nodeDataPath}_ckb`, defaultMainNetworkDir)
+    }
+    this.writeSync(
+      `${settingKeys.nodeDataPath}_${LIGHT_CLIENT_TESTNET}`,
+      path.resolve(app.getPath('userData'), 'chains/light/testnet')
+    )
+    this.writeSync(
+      `${settingKeys.nodeDataPath}_${LIGHT_CLIENT_MAINNET}`,
+      path.resolve(app.getPath('userData'), 'chains/light/mainnet')
+    )
   }
 }
