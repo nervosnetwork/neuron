@@ -65,11 +65,12 @@ const DataSetting = () => {
     }
   }, [prevPath])
   const isLightClient = network?.type === LIGHT_NETWORK_TYPE
+  const hiddenDataPath = isLightClient || !network?.readonly
   return (
     <>
       <div className={styles.root}>
         <div className={styles.leftContainer}>
-          {isLightClient || !network?.readonly ? null : (
+          {hiddenDataPath ? null : (
             <div className={styles.label}>
               <div>{t('settings.data.ckb-node-data')}</div>
               <Tooltip
@@ -95,9 +96,7 @@ const DataSetting = () => {
           </div>
         </div>
         <div className={styles.rightContainer}>
-          {isLightClient || !network?.readonly ? null : (
-            <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} />
-          )}
+          {hiddenDataPath ? null : <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} />}
           <ClearCache
             className={styles.item}
             btnClassName={styles.itemBtn}

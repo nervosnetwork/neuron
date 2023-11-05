@@ -1114,8 +1114,8 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "檢測到外部節點",
-        "body-tips-without-network": "您選擇了內部節點，但啟動了外部節點。如果您需要繼續使用外部節點，請添加壹個新網絡。",
-        "body-tips-with-network": "您目前選擇了內部節點，但啟動了外部節點。如果您需要繼續使用外部節點，請切換到另壹個外部網絡或添加壹個新網絡。",
+        "body-tips-without-network": "\"Internal Node\" 僅用於連接內置節點，請添加新的網絡選項以連接外部節點。",
+        "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請從選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
         "add-network": "添加網絡"
       }
     }

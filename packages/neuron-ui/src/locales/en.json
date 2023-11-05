@@ -1143,8 +1143,8 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "External node detected",
-        "body-tips-without-network": "You selected an internal node, but activated an external node. If you need to continue using external nodes, please add a new network.",
-        "body-tips-with-network": "You have currently selected an internal node, but have activated an external node. If you need to continue using external nodes, please switch to another external network or add a new network.",
+        "body-tips-without-network": "\"Internal node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
+        "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
         "add-network": "Add Network"
       }
     }

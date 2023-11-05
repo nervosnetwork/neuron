@@ -145,7 +145,7 @@ export default class NetworksService extends Store {
 
     Object.assign(network, options)
     if (!network.readonly) {
-      // readonly network chaininfo can not update auto
+      // readonly network chaininfo is immutable
       Object.assign(
         network,
         await CommonUtils.timeout(2000, this.refreshChainInfo(network), network).catch(() => network)
