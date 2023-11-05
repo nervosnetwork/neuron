@@ -48,7 +48,6 @@ type Action =
   | 'start-process-monitor'
   | 'is-dark'
   | 'set-theme'
-  | 'is-node-run-external'
   | 'verify-external-ckb-node'
   | 'start-node-ignore-external'
   // Wallets

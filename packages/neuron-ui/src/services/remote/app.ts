@@ -22,7 +22,6 @@ export const setCkbNodeDataPath = remoteApi<{ dataPath: string; clearCache?: boo
 )
 export const stopProcessMonitor = remoteApi<'ckb'>('stop-process-monitor')
 export const startProcessMonitor = remoteApi<'ckb'>('start-process-monitor')
-export const getIsNodeRunExternal = remoteApi<void, boolean>('is-node-run-external')
 export const startNodeIgnoreExternal = remoteApi<void, boolean>('start-node-ignore-external')
 
 export type VerifyExternalCkbNodeRes =

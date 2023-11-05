@@ -10,13 +10,7 @@ import {
   showGlobalAlertDialog,
 } from 'states/stateProvider/actionCreators'
 
-import {
-  getCurrentWallet,
-  getIsNodeRunExternal,
-  getWinID,
-  setCurrentNetwork,
-  startNodeIgnoreExternal,
-} from 'services/remote'
+import { getCurrentWallet, getWinID, setCurrentNetwork, startNodeIgnoreExternal } from 'services/remote'
 import {
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
@@ -111,6 +105,7 @@ export const useSubscription = ({
   navigate,
   dispatch,
   location,
+  showSwitchNetwork,
 }: {
   walletID: string
   chain: State.Chain
@@ -118,6 +113,7 @@ export const useSubscription = ({
   navigate: NavigateFunction
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
+  showSwitchNetwork: () => void
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
 
@@ -209,6 +205,9 @@ export const useSubscription = ({
           type: NeuronWalletActions.UpdateConnectionStatus,
           payload: getConnectionStatus({ ...status, isTimeout: Date.now() > CONNECTING_DEADLINE }),
         })
+        if (status.connected && status.isBundledNode && !status.startedBundledNode) {
+          showSwitchNetwork()
+        }
       }
     })
 
@@ -314,49 +313,32 @@ export const useSubscription = ({
       commandSubscription.unsubscribe()
       showGlobalDialogSubject.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, navigate, dispatch, location.pathname])
+  }, [
+    walletID,
+    pageNo,
+    pageSize,
+    keywords,
+    isAllowedToFetchList,
+    navigate,
+    dispatch,
+    location.pathname,
+    showSwitchNetwork,
+  ])
 }
 
-export const useCheckNode = (networks: State.Network[], network?: State.Network) => {
-  const [showSwitchNetwork, setShowSwitchNetwork] = useState<boolean>(false)
+export const useCheckNode = (networks: State.Network[]) => {
+  const [isSwitchNetworkShow, setIsSwitchNetworkShow] = useState<boolean>(false)
   const [selectNetwork, setSelectNetwork] = useState(networks[0]?.id)
-  const navigate = useNavigate()
   useEffect(() => {
-    if (!network) return () => {}
-    let timer: ReturnType<typeof setTimeout>
-    const checkNode = () => {
-      return getIsNodeRunExternal().then(res => {
-        if (isSuccessResponse(res) && res.result !== null) {
-          if (res.result) {
-            navigate(RoutePath.Settings)
-            setShowSwitchNetwork(true)
-          }
-        } else {
-          timer = setTimeout(() => {
-            checkNode()
-          }, 2_000)
-        }
-      })
-    }
-    if (network.readonly) {
-      checkNode()
-    } else {
-      setShowSwitchNetwork(false)
-    }
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [network?.readonly, network?.type, navigate])
-  useEffect(() => {
-    if (showSwitchNetwork) {
+    if (isSwitchNetworkShow) {
       setSelectNetwork(networks[0]?.id)
     }
-  }, [networks, showSwitchNetwork])
+  }, [networks, isSwitchNetworkShow])
   const [showEditorDialog, setShowEditorDialog] = useState(false)
   const onConfirm = useCallback(() => {
     if (selectNetwork) {
       setCurrentNetwork(selectNetwork)
-      setShowSwitchNetwork(false)
+      setIsSwitchNetworkShow(false)
     }
   }, [selectNetwork])
   const onCloseEditorDialog = useCallback(() => {
@@ -365,12 +347,18 @@ export const useCheckNode = (networks: State.Network[], network?: State.Network)
   const onOpenEditorDialog = useCallback(() => {
     setShowEditorDialog(true)
   }, [])
+  const navigate = useNavigate()
+  const showSwitchNetwork = useCallback(() => {
+    navigate(RoutePath.Settings)
+    setIsSwitchNetworkShow(true)
+  }, [])
   return {
     selectNetwork,
     onChangeSelected: setSelectNetwork,
+    isSwitchNetworkShow,
     showSwitchNetwork,
     onCancel: useCallback(() => {
-      setShowSwitchNetwork(false)
+      setIsSwitchNetworkShow(false)
       startNodeIgnoreExternal()
     }, []),
     onConfirm,

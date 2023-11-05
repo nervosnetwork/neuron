@@ -289,13 +289,6 @@ export default class ApiController {
       }
     })
 
-    handle('is-node-run-external', () => {
-      return {
-        status: ResponseCode.Success,
-        result: NodeService.getInstance().isCkbNodeExternal,
-      }
-    })
-
     handle('verify-external-ckb-node', async () => {
       return {
         status: ResponseCode.Success,

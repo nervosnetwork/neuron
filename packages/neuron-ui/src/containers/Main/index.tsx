@@ -25,15 +25,6 @@ const MainContent = () => {
   const { networkID } = chain
   const [t, i18n] = useTranslation()
 
-  useSubscription({
-    walletID,
-    chain,
-    isAllowedToFetchList,
-    navigate,
-    dispatch,
-    location,
-  })
-
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
 
   const sameUrlNetworks = useMemo(
@@ -44,6 +35,27 @@ const MainContent = () => {
   useSyncChainData({
     chainURL: network?.remote ?? '',
     dispatch,
+  })
+
+  const {
+    isSwitchNetworkShow,
+    showSwitchNetwork,
+    onCancel: onCloseSwitchNetwork,
+    onConfirm: onSwitchNetwork,
+    onChangeSelected,
+    showEditorDialog,
+    onCloseEditorDialog,
+    onOpenEditorDialog,
+  } = useCheckNode(sameUrlNetworks)
+
+  useSubscription({
+    walletID,
+    chain,
+    isAllowedToFetchList,
+    navigate,
+    dispatch,
+    location,
+    showSwitchNetwork,
   })
 
   useOnCurrentWalletChange({
@@ -58,15 +70,6 @@ const MainContent = () => {
     dismissGlobalAlertDialog()(dispatch)
   }, [dispatch])
   const { isMigrateDialogShow, onCancel, onBackUp, onConfirm } = useMigrate()
-  const {
-    showSwitchNetwork,
-    onCancel: onCloseSwitchNetwork,
-    onConfirm: onSwitchNetwork,
-    onChangeSelected,
-    showEditorDialog,
-    onCloseEditorDialog,
-    onOpenEditorDialog,
-  } = useCheckNode(sameUrlNetworks, network)
 
   return (
     <div onContextMenu={onContextMenu}>
@@ -92,7 +95,7 @@ const MainContent = () => {
         </div>
       </Dialog>
       <Dialog
-        show={showSwitchNetwork}
+        show={isSwitchNetworkShow}
         onCancel={onCloseSwitchNetwork}
         onConfirm={sameUrlNetworks.length ? onSwitchNetwork : onOpenEditorDialog}
         confirmText={sameUrlNetworks.length ? undefined : t('main.external-node-detected-dialog.add-network')}

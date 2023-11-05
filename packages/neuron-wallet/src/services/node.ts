@@ -43,8 +43,11 @@ class NodeService {
   public connectionStatusSubject = new BehaviorSubject<boolean>(false)
 
   private _tipBlockNumber: string = '0'
-  private startedBundledNode: boolean = false
-  private _isCkbNodeExternal?: boolean = undefined
+  #startedBundledNode: boolean = false
+
+  get startedBundledNode() {
+    return this.#startedBundledNode
+  }
 
   private constructor() {
     this.start()
@@ -68,13 +71,12 @@ class NodeService {
           url: currentNetwork.remote,
           connected,
           isBundledNode,
-          startedBundledNode: isBundledNode ? this.startedBundledNode : false,
+          startedBundledNode: isBundledNode ? this.#startedBundledNode : false,
         })
       })
   }
 
   private whenNetworkUpdate = () => {
-    this._isCkbNodeExternal = undefined
     this.tipNumberSubject.next('0')
     this.connectionStatusSubject.next(false)
   }
@@ -130,13 +132,11 @@ class NodeService {
     await stopMonitor('ckb')
     if (isDefaultCKBNeedStart) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
-      this._isCkbNodeExternal = false
       const redistReady = await redistCheck()
       await (redistReady ? this.startNode() : this.showGuideDialog())
       await startMonitor()
     } else {
       logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
-      this._isCkbNodeExternal = true
     }
   }
 
@@ -179,9 +179,9 @@ class NodeService {
         await CKBLightRunner.getInstance().stop()
         await startCkbNode()
       }
-      this.startedBundledNode = true
+      this.#startedBundledNode = true
     } catch (error) {
-      this.startedBundledNode = false
+      this.#startedBundledNode = false
       logger.info('CKB:\tfail to start bundled CKB with error:')
       logger.error(error)
     }
@@ -190,14 +190,9 @@ class NodeService {
   public async startNodeIgnoreExternal() {
     logger.info('CKB:\tignore running external node, and start node with another port')
     await stopMonitor('ckb')
-    this._isCkbNodeExternal = false
     const redistReady = await redistCheck()
     await (redistReady ? this.startNode() : this.showGuideDialog())
     await startMonitor()
-  }
-
-  get isCkbNodeExternal() {
-    return this._isCkbNodeExternal
   }
 
   private showGuideDialog = () => {

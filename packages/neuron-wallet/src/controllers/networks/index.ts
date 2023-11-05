@@ -167,7 +167,7 @@ export default class NetworksController {
     const id = networksService.getCurrentID()
     const network = await networksService.update(id, {})
     const genesisHashMatched = await new ChainInfo(network).load()
-    const isNodeMatched = !network.readonly || NodeService.getInstance().isCkbNodeExternal === false
+    const isNodeMatched = !network.readonly || (reconnected && NodeService.getInstance().startedBundledNode)
 
     await switchToNetwork(network, reconnected, genesisHashMatched && isNodeMatched)
   }
