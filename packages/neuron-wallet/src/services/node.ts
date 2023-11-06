@@ -129,8 +129,8 @@ class NodeService {
   }
 
   public async tryStartNodeOnDefaultURI() {
-    const isDefaultCKBNeedStart = await this.isDefaultCKBNeedRestart()
     await stopMonitor('ckb')
+    const isDefaultCKBNeedStart = await this.isDefaultCKBNeedRestart()
     if (isDefaultCKBNeedStart) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
       const redistReady = await redistCheck()
