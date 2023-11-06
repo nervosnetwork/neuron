@@ -349,7 +349,6 @@ describe('NodeService', () => {
         getLocalNodeInfoMock.mockRejectedValue('not start')
         await nodeService.tryStartNodeOnDefaultURI()
 
-        await eventCallback({ currentNetworkID: 'network1' })
         jest.advanceTimersByTime(10000)
       })
       it('sets startedBundledNode to true in ConnectionStatusSubject', () => {

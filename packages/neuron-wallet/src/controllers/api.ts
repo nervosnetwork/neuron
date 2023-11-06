@@ -554,10 +554,6 @@ export default class ApiController {
       return this.#networksController.delete(id)
     })
 
-    handle('switch-network-type', async () => {
-      return this.#networksController.switchCurrentNetworkType()
-    })
-
     // Updater
 
     handle('check-for-updates', async () => {

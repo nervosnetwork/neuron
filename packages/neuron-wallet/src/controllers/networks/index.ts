@@ -110,15 +110,6 @@ export default class NetworksController {
     }
   }
 
-  public async switchCurrentNetworkType() {
-    networksService.switchCurrentNetworkType()
-    this.notifyCurrentNetworkChange()
-    this.notifyListChange()
-    if (!env.isTestMode) {
-      await NodeService.getInstance().startNodeIgnoreExternal()
-    }
-  }
-
   public async startNodeIgnoreExternal() {
     this.notifyCurrentNetworkChange()
     if (!env.isTestMode) {

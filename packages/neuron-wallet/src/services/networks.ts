@@ -20,7 +20,7 @@ import { generateRPC } from '../utils/ckb-rpc'
 import { CKBLightRunner } from './light-runner'
 import { getNodeUrl } from './ckb-runner'
 
-const presetNetworks: { selected: string; networks: Network[] } = {
+export const presetNetworks: { selected: string; networks: Network[] } = {
   selected: 'mainnet',
   networks: [
     {
@@ -32,12 +32,19 @@ const presetNetworks: { selected: string; networks: Network[] } = {
       chain: 'ckb',
       readonly: true,
     },
+    {
+      id: 'testnet',
+      name: 'Internal Node',
+      remote: BUNDLED_CKB_URL,
+      genesisHash: TESTNET_GENESIS_HASH,
+      type: NetworkType.Default,
+      chain: 'ckb_testnet',
+      readonly: true,
+    },
   ],
 }
 
-const oldLightclientId = 'light_client_testnet'
-
-const lightClientNetwork: Network[] = [
+export const lightClientNetwork: Network[] = [
   {
     id: 'light_client',
     name: 'Light Client',
@@ -47,6 +54,15 @@ const lightClientNetwork: Network[] = [
     chain: LIGHT_CLIENT_MAINNET,
     readonly: true,
   },
+  {
+    id: 'light_client_testnet',
+    name: 'Light Client',
+    remote: BUNDLED_LIGHT_CKB_URL,
+    genesisHash: TESTNET_GENESIS_HASH,
+    type: NetworkType.Light,
+    chain: LIGHT_CLIENT_TESTNET,
+    readonly: true,
+  },
 ]
 
 enum NetworksKey {
@@ -54,7 +70,7 @@ enum NetworksKey {
   Current = 'selected',
   AddedLightNetwork = 'AddedLightNetwork',
   MigrateNetwork = 'MigrateNetwork',
-  SetLightDefaultMain = 'SetLightDefaultMain',
+  AddInternalNetwork = 'AddInternalNetwork',
 }
 
 const oldDefaultNames = ['Default', 'default node', presetNetworks.networks[0].name]
@@ -72,8 +88,6 @@ export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(presetNetworks))
 
-    const currentNetwork = this.getCurrent()
-    this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
     const addLight = this.readSync<boolean>(NetworksKey.AddedLightNetwork)
     if (!addLight) {
       const networks = this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
@@ -81,7 +95,9 @@ export default class NetworksService extends Store {
       this.writeSync(NetworksKey.AddedLightNetwork, true)
     }
     this.migrateNetwork()
-    this.setLightDefaultMain()
+    this.addInternalNetwork()
+    const currentNetwork = this.getCurrent()
+    this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
   }
 
   public getAll = () => {
@@ -194,25 +210,6 @@ export default class NetworksService extends Store {
     this.writeSync(NetworksKey.Current, id)
   }
 
-  public switchCurrentNetworkType() {
-    const current = this.getCurrent()
-    if (!current.readonly) {
-      throw new Error('Only internal network can switch network type')
-    }
-    const isMainnet = current.genesisHash === MAINNET_GENESIS_HASH
-    if (current.type === NetworkType.Light) {
-      this.update(current.id, {
-        genesisHash: isMainnet ? TESTNET_GENESIS_HASH : MAINNET_GENESIS_HASH,
-        chain: isMainnet ? LIGHT_CLIENT_TESTNET : LIGHT_CLIENT_MAINNET,
-      })
-    } else {
-      this.update(current.id, {
-        genesisHash: isMainnet ? TESTNET_GENESIS_HASH : MAINNET_GENESIS_HASH,
-        chain: isMainnet ? 'ckb_testnet' : 'ckb',
-      })
-    }
-  }
-
   public updateInternalRemote() {
     const current = this.getCurrent()
     if (!current.readonly) {
@@ -299,22 +296,22 @@ export default class NetworksService extends Store {
     }
   }
 
-  private setLightDefaultMain() {
-    const flag = this.readSync<boolean>(NetworksKey.SetLightDefaultMain)
+  private addInternalNetwork() {
+    const flag = this.readSync<boolean>(NetworksKey.AddInternalNetwork)
     if (!flag) {
-      const lightClientNewId = 'light_client'
-      const networks = this.readSync<Network[]>(NetworksKey.List)
-      const newNetwork = networks.map(v => {
-        if (v.id === oldLightclientId) {
-          return lightClientNetwork[0]
-        }
-        return v
-      })
-      this.updateAll(newNetwork)
-      this.writeSync(NetworksKey.SetLightDefaultMain, true)
-      if (this.getCurrentID() === oldLightclientId) {
-        this.writeSync(NetworksKey.Current, lightClientNewId)
+      const networks = this.getAll()
+      const currentNetwork = this.getCurrent()
+      const internalNodeIds = new Set([...presetNetworks.networks, ...lightClientNetwork].map(v => v.id))
+      const externalNetworks = networks.filter(v => !internalNodeIds.has(v.id))
+      this.updateAll([...presetNetworks.networks, ...lightClientNetwork, ...externalNetworks])
+      if (currentNetwork.id === lightClientNetwork[1].id) {
+        // set light client default mainnet
+        this.writeSync(NetworksKey.Current, lightClientNetwork[0].id)
+      } else if (currentNetwork.id === presetNetworks.selected && currentNetwork.genesisHash === TESTNET_GENESIS_HASH) {
+        // if the network info has been changed to testnet by connected network
+        this.writeSync(NetworksKey.Current, presetNetworks.networks[1].id)
       }
+      this.writeSync(NetworksKey.AddInternalNetwork, true)
     }
   }
 }

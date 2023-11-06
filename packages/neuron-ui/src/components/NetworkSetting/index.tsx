@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
@@ -6,12 +6,13 @@ import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import Toast from 'widgets/Toast'
 import { chainState } from 'states'
-import { setCurrentNetwork, deleteNetwork, switchCurrentNetworkType } from 'services/remote'
+import { setCurrentNetwork, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
 import { useOnWindowResize, useToggleChoiceGroupBorder, getNetworkLabelI18nkey } from 'utils'
 import { AddSimple, Switch } from 'widgets/Icons/icon'
 import Tooltip from 'widgets/Tooltip'
-import { LIGHT_CLIENT_MAINNET } from 'utils/const'
+import { LIGHT_CLIENT_MAINNET, NetworkType } from 'utils/const'
+import { lastShowInternalNodeIds } from 'services/localCache'
 import styles from './networkSetting.module.scss'
 
 const getAnotherNetworkType = (chain: State.Network['chain']): 'testnet' | 'mainnet' => {
@@ -84,8 +85,19 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   }, [setShowEditorDialog, setNotice, netId])
 
   const onSwitchNetworkType = useCallback<React.MouseEventHandler<HTMLButtonElement>>(() => {
-    switchCurrentNetworkType()
-  }, [])
+    const selectdNetwork = networks.find(v => v.id === currentId)
+    const switchNetwork = networks.find(v => v.type === selectdNetwork?.type && v.id !== currentId)
+    if (switchNetwork) {
+      setCurrentNetwork(switchNetwork.id)
+      lastShowInternalNodeIds.save(switchNetwork.type, switchNetwork.id)
+    }
+  }, [currentId, networks])
+
+  const showNetworks = useMemo(() => {
+    const internalFullNodeId = lastShowInternalNodeIds.get(NetworkType.Default)
+    const internalLightNodeId = lastShowInternalNodeIds.get(NetworkType.Light)
+    return networks.filter(v => !v.readonly || v.id === internalFullNodeId || v.id === internalLightNodeId)
+  }, [currentId, networks])
 
   return (
     <div>
@@ -93,7 +105,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
         value={currentId}
         onChange={handleChange}
         itemClassName={styles.radioItem}
-        options={networks.map(network => ({
+        options={showNetworks.map(network => ({
           value: network.id,
           label:
             currentId === network.id && network.readonly ? (

@@ -1,12 +1,7 @@
 import { t } from 'i18next'
-import NetworksService from '../../src/services/networks'
-import { MAINNET_GENESIS_HASH, Network, NetworkType, TESTNET_GENESIS_HASH } from '../../src/models/network'
-import {
-  BUNDLED_CKB_URL,
-  BUNDLED_LIGHT_CKB_URL,
-  LIGHT_CLIENT_MAINNET,
-  LIGHT_CLIENT_TESTNET,
-} from '../../src/utils/const'
+import NetworksService, { presetNetworks, lightClientNetwork } from '../../src/services/networks'
+import { MAINNET_GENESIS_HASH, Network, NetworkType } from '../../src/models/network'
+import { BUNDLED_CKB_URL, BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_MAINNET } from '../../src/utils/const'
 
 const ERROR_MESSAGE = {
   MISSING_ARG: `Missing required argument`,
@@ -53,7 +48,7 @@ describe(`Unit tests of networks service`, () => {
 
     it(`has preset networks`, () => {
       const networks = service.getAll()
-      expect(networks.length).toBe(2)
+      expect(networks.length).toBe(4)
       expect(networks[0].id).toEqual('mainnet')
     })
 
@@ -142,10 +137,17 @@ describe(`Unit tests of networks service`, () => {
       const prevCurrentID = service.getCurrentID()
       const prevNetworks = service.getAll()
       expect(prevCurrentID).toBe(network.id)
-      expect(prevNetworks.map(n => n.id)).toEqual(['mainnet', 'light_client', network.id])
+      expect(prevNetworks.map(n => n.id)).toEqual([
+        ...presetNetworks.networks.map(v => v.id),
+        ...lightClientNetwork.map(v => v.id),
+        network.id,
+      ])
       await service.delete(prevCurrentID || '')
       const currentNetworks = service.getAll()
-      expect(currentNetworks.map(n => n.id)).toEqual(['mainnet', 'light_client'])
+      expect(currentNetworks.map(n => n.id)).toEqual([
+        ...presetNetworks.networks.map(v => v.id),
+        ...lightClientNetwork.map(v => v.id),
+      ])
       const currentID = service.getCurrentID()
       expect(currentID).toBe('mainnet')
     })
@@ -241,7 +243,7 @@ describe(`Unit tests of networks service`, () => {
       //@ts-ignore private-method
       service.migrateNetwork()
       expect(writeSyncMock).toBeCalledWith('MigrateNetwork', true)
-      expect(updateAllMock).toBeCalledWith([defaultMainnetNetwork, defaultLightClientNetwork])
+      expect(updateAllMock).toBeCalledWith([defaultMainnetNetwork, ...lightClientNetwork])
     })
     it('change the default network', () => {
       readSyncMock
@@ -253,7 +255,7 @@ describe(`Unit tests of networks service`, () => {
       expect(writeSyncMock).toBeCalledWith('MigrateNetwork', true)
       expect(updateAllMock).toBeCalledWith([
         defaultMainnetNetwork,
-        defaultLightClientNetwork,
+        ...lightClientNetwork,
         {
           ...defaultMainnetNetwork,
           id: 'uuidv4',
@@ -265,19 +267,10 @@ describe(`Unit tests of networks service`, () => {
     })
   })
 
-  describe('test setLightDefaultMain', () => {
+  describe('test addInternalNetwork', () => {
     const readSyncMock = jest.fn()
     const writeSyncMock = jest.fn()
     const updateAllMock = jest.fn()
-    const defaultLightClientNetwork = {
-      id: 'light_client_testnet',
-      name: 'Light Client',
-      remote: BUNDLED_LIGHT_CKB_URL,
-      genesisHash: MAINNET_GENESIS_HASH,
-      type: NetworkType.Light,
-      chain: LIGHT_CLIENT_MAINNET,
-      readonly: true,
-    }
     beforeEach(() => {
       service.readSync = readSyncMock
       service.writeSync = writeSyncMock
@@ -286,87 +279,44 @@ describe(`Unit tests of networks service`, () => {
     afterEach(() => {
       readSyncMock.mockReset()
     })
-    it('has set light default main', () => {
+    it('has add internal network', () => {
       readSyncMock.mockReturnValue(true)
       //@ts-ignore private-method
-      service.setLightDefaultMain()
+      service.addInternalNetwork()
       expect(writeSyncMock).toBeCalledTimes(0)
     })
     it('update old light client id as new', () => {
-      readSyncMock.mockReturnValueOnce(false).mockReturnValueOnce([defaultLightClientNetwork])
+      readSyncMock.mockReturnValue(false)
       //@ts-ignore private-method
-      service.setLightDefaultMain()
-      expect(writeSyncMock).toBeCalledWith('SetLightDefaultMain', true)
-      expect(updateAllMock).toBeCalledWith([{ ...defaultLightClientNetwork, id: 'light_client' }])
+      service.addInternalNetwork()
+      expect(writeSyncMock).toBeCalledWith('AddInternalNetwork', true)
+      expect(updateAllMock).toBeCalledWith([...presetNetworks.networks, ...lightClientNetwork])
     })
     it('update old light client id as new and update current id', () => {
+      readSyncMock.mockImplementation(v => {
+        if (v === 'selected') return lightClientNetwork[1].id
+        if (v === 'networks') return [...presetNetworks.networks, ...lightClientNetwork]
+        return false
+      })
       writeSyncMock.mockReset()
-      readSyncMock
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce([defaultLightClientNetwork])
-        .mockReturnValueOnce(defaultLightClientNetwork.id)
       //@ts-ignore private-method
-      service.setLightDefaultMain()
-      expect(writeSyncMock).toHaveBeenNthCalledWith(1, 'SetLightDefaultMain', true)
-      expect(writeSyncMock).toHaveBeenNthCalledWith(2, 'selected', 'light_client')
-      expect(updateAllMock).toBeCalledWith([{ ...defaultLightClientNetwork, id: 'light_client' }])
+      service.addInternalNetwork()
+      expect(writeSyncMock).toHaveBeenNthCalledWith(1, 'selected', 'light_client')
+      expect(writeSyncMock).toHaveBeenNthCalledWith(2, 'AddInternalNetwork', true)
+      expect(updateAllMock).toBeCalledWith([...presetNetworks.networks, ...lightClientNetwork])
     })
-  })
-
-  describe('test switchCurrentNetworkType', () => {
-    const getCurrentMock = jest.fn()
-    const updateMock = jest.fn()
-    const originUpdate = service.update
-    const originGetCurrent = service.getCurrent
-
-    beforeEach(() => {
-      service.getCurrent = getCurrentMock
-      service.update = updateMock
-    })
-
-    afterEach(() => {
-      service.getCurrent = originGetCurrent
-      service.update = originUpdate
-    })
-
-    it('switch internal light node', () => {
-      getCurrentMock.mockReturnValueOnce({
-        id: 'light',
-        readonly: true,
-        genesisHash: MAINNET_GENESIS_HASH,
-        type: NetworkType.Light,
+    it('update internal current id to testnet', () => {
+      readSyncMock.mockImplementation(v => {
+        if (v === 'selected') return presetNetworks.selected
+        if (v === 'networks') return [{ ...presetNetworks.networks[1], id: 'mainnet' }, ...lightClientNetwork]
+        return false
       })
-      service.switchCurrentNetworkType()
-      expect(updateMock).toHaveBeenCalledWith('light', {
-        genesisHash: TESTNET_GENESIS_HASH,
-        chain: LIGHT_CLIENT_TESTNET,
-      })
-    })
-
-    it('switch internal full node', () => {
-      getCurrentMock.mockReturnValueOnce({
-        id: 'mainnet',
-        readonly: true,
-        genesisHash: MAINNET_GENESIS_HASH,
-        type: NetworkType.Default,
-      })
-      service.switchCurrentNetworkType()
-      expect(updateMock).toHaveBeenCalledWith('mainnet', {
-        genesisHash: TESTNET_GENESIS_HASH,
-        chain: 'ckb_testnet',
-      })
-    })
-
-    it('switch external node', () => {
-      getCurrentMock.mockReturnValueOnce({
-        id: 'mainnet',
-        readonly: false,
-        genesisHash: MAINNET_GENESIS_HASH,
-        type: NetworkType.Default,
-      })
-      expect(() => service.switchCurrentNetworkType()).toThrow(
-        new Error('Only internal network can switch network type')
-      )
+      writeSyncMock.mockReset()
+      //@ts-ignore private-method
+      service.addInternalNetwork()
+      expect(writeSyncMock).toHaveBeenNthCalledWith(1, 'selected', 'testnet')
+      expect(writeSyncMock).toHaveBeenNthCalledWith(2, 'AddInternalNetwork', true)
+      expect(updateAllMock).toBeCalledWith([...presetNetworks.networks, ...lightClientNetwork])
     })
   })
 

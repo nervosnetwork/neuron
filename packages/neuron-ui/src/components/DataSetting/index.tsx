@@ -7,7 +7,7 @@ import { shell } from 'electron'
 import Tooltip from 'widgets/Tooltip'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
-import { LIGHT_NETWORK_TYPE } from 'utils/const'
+import { NetworkType } from 'utils/const'
 import { Attention } from 'widgets/Icons/icon'
 import { useDataPath } from './hooks'
 
@@ -64,7 +64,7 @@ const DataSetting = () => {
       shell.openPath(prevPath!)
     }
   }, [prevPath])
-  const isLightClient = network?.type === LIGHT_NETWORK_TYPE
+  const isLightClient = network?.type === NetworkType.Light
   const hiddenDataPath = isLightClient || !network?.readonly
   return (
     <>

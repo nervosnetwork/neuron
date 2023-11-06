@@ -77,6 +77,7 @@ class NodeService {
   }
 
   private whenNetworkUpdate = () => {
+    this.#startedBundledNode = false
     this.tipNumberSubject.next('0')
     this.connectionStatusSubject.next(false)
   }
