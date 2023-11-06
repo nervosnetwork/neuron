@@ -46,7 +46,7 @@ const MainContent = () => {
     showEditorDialog,
     onCloseEditorDialog,
     onOpenEditorDialog,
-  } = useCheckNode(sameUrlNetworks)
+  } = useCheckNode(sameUrlNetworks, networkID)
 
   useSubscription({
     walletID,
@@ -99,6 +99,7 @@ const MainContent = () => {
         onCancel={onCloseSwitchNetwork}
         onConfirm={sameUrlNetworks.length ? onSwitchNetwork : onOpenEditorDialog}
         confirmText={sameUrlNetworks.length ? undefined : t('main.external-node-detected-dialog.add-network')}
+        cancelText={t('main.external-node-detected-dialog.ignore-external-node')}
         title={t('main.external-node-detected-dialog.title')}
         className={styles.networkDialog}
       >

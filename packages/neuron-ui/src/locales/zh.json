@@ -1137,7 +1137,8 @@
         "title": "检测到外部节点",
         "body-tips-without-network": "\"Internal Node\" 仅用于连接内置节点，请添加新的网络选项以连接外部节点。",
         "body-tips-with-network": "\"Internal Node\" 仅用于连接内置节点，请从选择以下网络选项或添加新的网络选项以连接外部节点。",
-        "add-network": "添加网络"
+        "add-network": "添加网络",
+        "ignore-external-node": "忽略外部节点"
       }
     }
   }

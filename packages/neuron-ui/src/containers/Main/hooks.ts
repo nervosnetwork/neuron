@@ -326,7 +326,7 @@ export const useSubscription = ({
   ])
 }
 
-export const useCheckNode = (networks: State.Network[]) => {
+export const useCheckNode = (networks: State.Network[], networkID: string) => {
   const [isSwitchNetworkShow, setIsSwitchNetworkShow] = useState<boolean>(false)
   const [selectNetwork, setSelectNetwork] = useState(networks[0]?.id)
   useEffect(() => {
@@ -348,10 +348,15 @@ export const useCheckNode = (networks: State.Network[]) => {
     setShowEditorDialog(true)
   }, [])
   const navigate = useNavigate()
+  const [networkIdWhenDialogShow, setNetworkIdWhenDialogShow] = useState<undefined | string>()
   const showSwitchNetwork = useCallback(() => {
-    navigate(RoutePath.Settings)
-    setIsSwitchNetworkShow(true)
-  }, [])
+    // if the use has not change network id, the dialog will only show once
+    if (networkIdWhenDialogShow !== networkID) {
+      setNetworkIdWhenDialogShow(networkID)
+      navigate(RoutePath.Settings)
+      setIsSwitchNetworkShow(true)
+    }
+  }, [networkID, networkIdWhenDialogShow])
   return {
     selectNetwork,
     onChangeSelected: setSelectNetwork,
