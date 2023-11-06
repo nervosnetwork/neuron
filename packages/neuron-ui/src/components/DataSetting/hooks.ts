@@ -26,7 +26,7 @@ export const useDataPath = (network?: State.Network) => {
         setPrevPath(res.result!)
       }
     })
-  }, [network?.chain, network?.id])
+  }, [network?.id])
   const onSetting = useCallback(() => {
     invokeShowOpenDialog({
       buttonLabel: t('settings.data.set', { lng: navigator.language }),
