@@ -15,6 +15,7 @@ import {
   BUNDLED_URL_PREFIX,
   LIGHT_CLIENT_MAINNET,
   LIGHT_CLIENT_TESTNET,
+  MAINNET_CLIENT_LIST,
 } from '../utils/const'
 import { generateRPC } from '../utils/ckb-rpc'
 import { CKBLightRunner } from './light-runner'
@@ -230,7 +231,7 @@ export default class NetworksService extends Store {
   }
 
   public isMainnet = (): boolean => {
-    return this.getCurrent().chain === 'ckb'
+    return MAINNET_CLIENT_LIST.includes(this.getCurrent().chain)
   }
 
   public explorerUrl = (): string => {

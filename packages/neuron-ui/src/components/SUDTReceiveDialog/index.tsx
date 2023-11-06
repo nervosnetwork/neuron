@@ -16,7 +16,7 @@ const { DEFAULT_SUDT_FIELDS } = CONSTANTS
 const toShortAddr = (addr: string) => {
   try {
     const script = addressToScript(addr)
-    const isMainnet = addr.startsWith('ckb')
+    const isMainnet = addr.startsWith(AddressPrefix.Mainnet)
     return bech32Address(script.args, {
       prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
       codeHashOrCodeHashIndex: '0x02',
