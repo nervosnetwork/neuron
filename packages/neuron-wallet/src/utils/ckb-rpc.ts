@@ -335,6 +335,10 @@ export class LightRPC extends Base {
           })
           const batchRes = await res.body.json()
 
+          if (!Array.isArray(batchRes)) {
+            return []
+          }
+
           return batchRes.map((res: any, i: number) => {
             if (res.id !== payload[i].id) {
               return new IdNotMatchedInBatchException(i, payload[i].id, res.id)
