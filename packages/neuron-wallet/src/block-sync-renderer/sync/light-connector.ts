@@ -69,6 +69,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       assetAccountInfo.getNftIssuerInfo().cellDep,
       assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep,
       assetAccountInfo.getChequeInfo().cellDep,
+      ...assetAccountInfo.getSporeInfos().map(info => info.cellDep),
+      ...assetAccountInfo.getSporeClusterInfo().map(info => info.cellDep),
     ]
     const fetchTxHashes = fetchCellDeps.map(v => v.outPoint.txHash).map<[string, string]>(v => ['fetchTransaction', v])
     const txs = await this.lightRpc
