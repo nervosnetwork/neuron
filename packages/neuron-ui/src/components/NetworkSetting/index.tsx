@@ -85,8 +85,8 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   }, [setShowEditorDialog, setNotice, netId])
 
   const onSwitchNetworkType = useCallback<React.MouseEventHandler<HTMLButtonElement>>(() => {
-    const selectdNetwork = networks.find(v => v.id === currentId)
-    const switchNetwork = networks.find(v => v.type === selectdNetwork?.type && v.id !== currentId)
+    const selectedNetwork = networks.find(v => v.id === currentId)
+    const switchNetwork = networks.find(v => v.type === selectedNetwork?.type && v.id !== currentId)
     if (switchNetwork) {
       setCurrentNetwork(switchNetwork.id)
       lastShowInternalNodeIds.save(switchNetwork.type, switchNetwork.id)
