@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState, useEffect } from 'react'
 import Alert from 'widgets/Alert'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
@@ -55,11 +55,19 @@ const TextField = React.forwardRef(
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
     const [isPasswordHidden, setIsPasswordHidden] = useState(true)
+    const inputRef = useRef<any>()
     const changePasswordHide = useCallback(() => {
       setIsPasswordHidden(v => !v)
     }, [setIsPasswordHidden])
     // FIXME: label should be limited to a string because it has its own semantic meaning
     const labelStr = typeof label === 'string' ? label : field
+
+    useEffect(() => {
+      inputRef.current.focus()
+      const position = value?.length || 0
+      inputRef.current.setSelectionRange(position, position)
+    }, [rows])
+
     return (
       <div
         className={`${styles.textField} ${stack ? styles.stack : ''} ${className}`}
@@ -84,6 +92,7 @@ const TextField = React.forwardRef(
             <textarea
               id={field}
               data-field={field}
+              ref={inputRef}
               rows={rows}
               value={value}
               placeholder={placeholder}
@@ -100,6 +109,7 @@ const TextField = React.forwardRef(
             <input
               id={field}
               data-field={field}
+              ref={inputRef}
               type={!isPasswordHidden && type === 'password' ? 'text' : type}
               value={value}
               placeholder={placeholder}
