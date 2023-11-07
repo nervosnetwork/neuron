@@ -118,9 +118,11 @@ export class CKBLightRunner extends NodeRunner {
   async updateConfig() {
     const usablePort = await getUsablePort(this._port)
     this._port = usablePort
+    const storePath = path.join(SettingsService.getInstance().getNodeDataPath(), './store')
+    const networkPath = path.join(SettingsService.getInstance().getNodeDataPath(), './network')
     updateToml(this.configFile, {
-      store: `path = "${path.posix.join(SettingsService.getInstance().getNodeDataPath(), './store')}"`,
-      network: `path = "${path.posix.join(SettingsService.getInstance().getNodeDataPath(), './network')}"`,
+      store: `path = "${this.platform() === 'win' ? storePath.replace('\\', '\\\\') : storePath}"`,
+      network: `path = "${this.platform() === 'win' ? networkPath.replace('\\', '\\\\') : storePath}"`,
       rpc: `listen_address = "127.0.0.1:${usablePort}"`,
     })
   }

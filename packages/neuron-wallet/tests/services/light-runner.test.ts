@@ -95,9 +95,6 @@ jest.doMock('path', () => ({
   join: joinMock,
   dirname: dirnameMock,
   resolve: resolveMock,
-  posix: {
-    join: joinMock,
-  },
 }))
 
 jest.doMock('fs', () => ({
