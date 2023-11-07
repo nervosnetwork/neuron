@@ -121,8 +121,8 @@ export class CKBLightRunner extends NodeRunner {
     const storePath = path.join(SettingsService.getInstance().getNodeDataPath(), './store')
     const networkPath = path.join(SettingsService.getInstance().getNodeDataPath(), './network')
     updateToml(this.configFile, {
-      store: `path = "${this.platform() === 'win' ? storePath.replace('\\', '\\\\') : storePath}"`,
-      network: `path = "${this.platform() === 'win' ? networkPath.replace('\\', '\\\\') : storePath}"`,
+      store: `path = "${this.platform() === 'win' ? storePath.replace(/\\/g, '\\\\') : storePath}"`,
+      network: `path = "${this.platform() === 'win' ? networkPath.replace(/\\/g, '\\\\') : storePath}"`,
       rpc: `listen_address = "127.0.0.1:${usablePort}"`,
     })
   }
