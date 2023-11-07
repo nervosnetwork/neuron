@@ -48,8 +48,10 @@ describe(`Unit tests of networks service`, () => {
 
     it(`has preset networks`, () => {
       const networks = service.getAll()
-      expect(networks.length).toBe(4)
+      expect(networks.length).toBe(3)
       expect(networks[0].id).toEqual('mainnet')
+      expect(networks[1].id).toEqual('light_client')
+      expect(networks[2].id).toEqual('light_client_testnet')
     })
 
     it(`get the default network`, () => {
@@ -305,17 +307,16 @@ describe(`Unit tests of networks service`, () => {
       expect(writeSyncMock).toHaveBeenNthCalledWith(2, 'AddInternalNetwork', true)
       expect(updateAllMock).toBeCalledWith([...presetNetworks.networks, ...lightClientNetwork])
     })
-    it('update internal current id to testnet', () => {
+    it('set readonly network options', () => {
       readSyncMock.mockImplementation(v => {
         if (v === 'selected') return presetNetworks.selected
-        if (v === 'networks') return [{ ...presetNetworks.networks[1], id: 'mainnet' }, ...lightClientNetwork]
+        if (v === 'networks') return lightClientNetwork
         return false
       })
       writeSyncMock.mockReset()
       //@ts-ignore private-method
       service.addInternalNetwork()
-      expect(writeSyncMock).toHaveBeenNthCalledWith(1, 'selected', 'testnet')
-      expect(writeSyncMock).toHaveBeenNthCalledWith(2, 'AddInternalNetwork', true)
+      expect(writeSyncMock).toHaveBeenNthCalledWith(1, 'AddInternalNetwork', true)
       expect(updateAllMock).toBeCalledWith([...presetNetworks.networks, ...lightClientNetwork])
     })
   })
