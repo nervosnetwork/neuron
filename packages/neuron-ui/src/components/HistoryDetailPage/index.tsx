@@ -16,17 +16,15 @@ import Tooltip from 'widgets/Tooltip'
 
 import {
   ErrorCode,
-  CONSTANTS,
   localNumberFormatter,
   uniformTimeFormatter,
   shannonToCKBFormatter,
   isSuccessResponse,
+  isMainnet as isMainnetUtil,
 } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 
 import styles from './historyDetailPage.module.scss'
-
-const { MAINNET_TAG } = CONSTANTS
 
 type InputOrOutputType = (State.DetailedInput | State.DetailedOutput) & { idx: number }
 
@@ -46,8 +44,7 @@ const HistoryDetailPage = () => {
     settings: { networks },
     wallet: currentWallet,
   } = useGlobalState()
-  const network = networks.find(n => n.id === networkID)
-  const isMainnet = network != null && network.chain === MAINNET_TAG
+  const isMainnet = isMainnetUtil(networks, networkID)
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState({ code: '', message: '' })

@@ -13,8 +13,10 @@ export const MAX_TIP_BLOCK_DELAY = 180000
 export const BUFFER_BLOCK_NUMBER = 10
 
 export const MAX_DECIMAL_DIGITS = 8
-export const MAINNET_TAG = 'ckb'
-export const LIGHT_MAINNET_TAG = 'light_client_mainnet'
+export const FULL_NODE_MAINNET = 'ckb'
+export const LIGHT_CLIENT_MAINNET = 'light_client_mainnet'
+export const LIGHT_CLIENT_TESTNET = 'light_client_testnet'
+export const MAINNET_CLIENT_LIST = [FULL_NODE_MAINNET, LIGHT_CLIENT_MAINNET]
 
 export const MIN_DEPOSIT_AMOUNT = 102
 export const TOKEN_ID_LENGTH = 66
@@ -67,8 +69,6 @@ export const DEPRECATED_CODE_HASH: Record<string, string> = {
 }
 
 export const HIDE_BALANCE = '******'
-export const LIGHT_CLIENT_TESTNET = 'light_client_testnet'
-export const LIGHT_CLIENT_MAINNET = 'light_client_mainnet'
 export enum NetworkType {
   Default, // internal full node
   Normal,
