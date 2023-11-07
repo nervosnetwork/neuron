@@ -108,7 +108,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
         options={showNetworks.map(network => ({
           value: network.id,
           label:
-            currentId === network.id && network.type === 2 ? (
+            currentId === network.id && network.type === NetworkType.Light ? (
               <div className={styles.networkLabel}>
                 <p>{`${network.name} (${network.remote})`}</p>
                 <Tooltip
