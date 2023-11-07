@@ -66,7 +66,8 @@ function download_linux_light() {
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"
   tar -xzvf ${CKB_FILENAME}.tar.gz
-  cp ./config/testnet.toml ../../light/ckb_light.toml
+  cp ./config/testnet.toml ../../light/ckb_light_testnet.toml
+  cp ./config/mainnet.toml ../../light/ckb_light_mainnet.toml
   rm -rf ./config
   rm ${CKB_FILENAME}.tar.gz
 }
@@ -90,7 +91,8 @@ function download_windows_light() {
 
   curl -O -L "https://github.com/nervosnetwork/ckb-light-client/releases/download/${CKB_LIGHT_VERSION}/${CKB_FILENAME}.tar.gz"
   tar -xzvf ${CKB_FILENAME}.tar.gz
-  cp ./config/testnet.toml ../../light/ckb_light.toml
+  cp ./config/testnet.toml ../../light/ckb_light_testnet.toml
+  cp ./config/mainnet.toml ../../light/ckb_light_mainnet.toml
   rm -rf ./config
   rm ${CKB_FILENAME}.tar.gz
 }
