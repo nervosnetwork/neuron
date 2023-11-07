@@ -33,15 +33,6 @@ export const presetNetworks: { selected: string; networks: Network[] } = {
       chain: 'ckb',
       readonly: true,
     },
-    {
-      id: 'testnet',
-      name: 'Internal Node',
-      remote: BUNDLED_CKB_URL,
-      genesisHash: TESTNET_GENESIS_HASH,
-      type: NetworkType.Default,
-      chain: 'ckb_testnet',
-      readonly: true,
-    },
   ],
 }
 
