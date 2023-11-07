@@ -8,7 +8,7 @@ import SettingsService from '../services/settings'
 const { app } = env
 
 export const migrate = async () => {
-  const ckbPath = SettingsService.getInstance().ckbDataPath
+  const ckbPath = SettingsService.getInstance().getNodeDataPath()
 
   const lumosDataPath = path.resolve(app.getPath('userData'), app.isPackaged ? '' : 'dev', 'indexer_data')
   const ckbIndexerDataPath = path.resolve(app.getPath('userData'), app.isPackaged ? '' : 'dev', 'ckb-indexer')

@@ -5,8 +5,8 @@ import SyncedBlockNumber from '../models/synced-block-number'
 import { clean as cleanChain } from '../database/chain'
 import SettingsService from './settings'
 import startMonitor, { stopMonitor } from './monitor'
-import NodeService from './node'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
+import NetworksService from './networks'
 
 export default class IndexerService {
   private constructor() {}
@@ -22,7 +22,7 @@ export default class IndexerService {
   static clearCache = async (clearIndexerFolder = false) => {
     await cleanChain()
 
-    if (!NodeService.getInstance().isCkbNodeExternal && clearIndexerFolder) {
+    if (NetworksService.getInstance().getCurrent().readonly && clearIndexerFolder) {
       await stopMonitor('ckb')
       IndexerService.getInstance().clearData()
       await new SyncedBlockNumber().setNextBlock(BigInt(0))
@@ -47,7 +47,7 @@ export default class IndexerService {
   }
 
   private getDataPath = (): string => {
-    let ckbDataPath = SettingsService.getInstance().ckbDataPath
+    const ckbDataPath = SettingsService.getInstance().getNodeDataPath()
     return path.resolve(ckbDataPath, './data/indexer')
   }
 }

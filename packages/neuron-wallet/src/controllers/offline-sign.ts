@@ -9,12 +9,12 @@ import Transaction from '../models/chain/transaction'
 import AssetAccountController from './asset-account'
 import AnyoneCanPayController from './anyone-can-pay'
 import WalletsController from './wallets'
-import NodeService from '../services/node'
 import { MultisigNotSignedNeedError, OfflineSignFailed } from '../exceptions'
 import MultisigConfigModel from '../models/multisig-config'
 import { getMultisigStatus } from '../utils/multisig'
 import { generateRPC } from '../utils/ckb-rpc'
 import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
+import NetworksService from '../services/networks'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -37,7 +37,8 @@ export default class OfflineSignController {
     }
 
     const tx = Transaction.fromObject(transaction)
-    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
 
     if (context === undefined) {
       const rawSdkTx = tx.toSDKRawTransaction()

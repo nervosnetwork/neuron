@@ -27,6 +27,16 @@ jest.mock('../../src/controllers/app/menu', () => ({
   updateApplicationMenu: () => updateApplicationMenuMock(),
 }))
 
+jest.mock('../../src/services/networks', () => {
+  return {
+    getInstance() {
+      return {
+        getCurrent: jest.fn().mockReturnValue({ chain: 'ckb_testnet' }),
+      }
+    },
+  }
+})
+
 jest.mock('electron', () => ({
   BrowserWindow: {
     getAllWindows: jest.fn().mockReturnValue([]),
@@ -52,7 +62,7 @@ describe('SettingsService', () => {
   it('constructor no ckbDataPath', () => {
     const instance = SettingsService.getInstance()
     readSyncMock.mockReturnValue('ckbDataPath')
-    expect(instance.ckbDataPath).toEqual('ckbDataPath')
+    expect(instance.getNodeDataPath('ckb')).toEqual('ckbDataPath')
   })
 
   describe('locale', () => {
@@ -73,13 +83,21 @@ describe('SettingsService', () => {
   })
 
   describe('ckb-node-path', () => {
-    it('get', () => {
-      SettingsService.getInstance().ckbDataPath
-      expect(readSyncMock).toBeCalledWith('ckbDataPath')
+    it('get with chain', () => {
+      SettingsService.getInstance().getNodeDataPath('ckb')
+      expect(readSyncMock).toBeCalledWith('nodeDataPath_ckb')
     })
-    it('set', () => {
-      SettingsService.getInstance().ckbDataPath = 'ckbDataPath'
-      expect(writeSyncMock).toBeCalledWith('ckbDataPath', 'ckbDataPath')
+    it('get without chain', () => {
+      SettingsService.getInstance().getNodeDataPath()
+      expect(readSyncMock).toBeCalledWith('nodeDataPath_ckb_testnet')
+    })
+    it('set with chain', () => {
+      SettingsService.getInstance().setNodeDataPath('ckbDataPath', 'ckb')
+      expect(writeSyncMock).toBeCalledWith('nodeDataPath_ckb', 'ckbDataPath')
+    })
+    it('set without chain', () => {
+      SettingsService.getInstance().setNodeDataPath('ckbDataPath')
+      expect(writeSyncMock).toBeCalledWith('nodeDataPath_ckb_testnet', 'ckbDataPath')
     })
   })
 })

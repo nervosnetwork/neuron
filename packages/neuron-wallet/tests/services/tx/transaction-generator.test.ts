@@ -64,11 +64,11 @@ const tipEpoch = '0x7080018000001'
 const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0x' + '0'.repeat(64), '0', tipEpoch)
 
 const stubbedQueryIndexer = jest.fn()
-jest.doMock('../../../src/block-sync-renderer/index', () => {
-  return { queryIndexer: stubbedQueryIndexer }
+jest.mock('../../../src/block-sync-renderer/index', () => {
+  return { queryIndexer: (query: unknown) => stubbedQueryIndexer(query) }
 })
 const getCurrentMock = jest.fn()
-jest.doMock('../../../src/services/wallets', () => ({
+jest.mock('../../../src/services/wallets', () => ({
   getInstance() {
     return {
       getCurrent: getCurrentMock,

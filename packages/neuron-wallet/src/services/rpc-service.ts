@@ -4,17 +4,18 @@ import BlockHeader from '../models/chain/block-header'
 import TransactionWithStatus from '../models/chain/transaction-with-status'
 import logger from '../utils/logger'
 import { generateRPC } from '../utils/ckb-rpc'
+import { NetworkType } from '../models/network'
 export default class RpcService {
   private retryTime: number
   private retryInterval: number
   private rpc: ReturnType<typeof generateRPC>
   public readonly url: string
 
-  constructor(url: string, retryTime: number = 3, retryInterval: number = 100) {
+  constructor(url: string, type: NetworkType, retryTime: number = 3, retryInterval: number = 100) {
     this.url = url
     this.retryTime = retryTime
     this.retryInterval = retryInterval
-    this.rpc = generateRPC(url)
+    this.rpc = generateRPC(url, type)
   }
 
   public async getTipBlockNumber(): Promise<string> {

@@ -10,6 +10,7 @@ import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import IndexerCacheService from './indexer-cache-service'
 import { BlockTips, LumosCellQuery, Connector } from './connector'
+import { NetworkType } from '../../models/network'
 
 export default class IndexerConnector extends Connector<string | undefined> {
   private indexer: CkbIndexer
@@ -23,10 +24,10 @@ export default class IndexerConnector extends Connector<string | undefined> {
   public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
   public readonly transactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[]; params: string | undefined }>()
 
-  constructor(addresses: Address[], nodeUrl: string, indexerUrl: string) {
+  constructor(addresses: Address[], nodeUrl: string, indexerUrl: string, nodeType: NetworkType) {
     super()
     this.indexer = new CkbIndexer(nodeUrl, indexerUrl)
-    this.rpcService = new RpcService(nodeUrl)
+    this.rpcService = new RpcService(nodeUrl, nodeType)
 
     this.addressesByWalletId = addresses
       .map(address => AddressMeta.fromObject(address))

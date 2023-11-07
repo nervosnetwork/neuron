@@ -1,5 +1,5 @@
-import { useEffect, useCallback } from 'react'
-import { useLocation, NavigateFunction } from 'react-router-dom'
+import { useEffect, useCallback, useState } from 'react'
+import { useLocation, NavigateFunction, useNavigate } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -10,7 +10,7 @@ import {
   showGlobalAlertDialog,
 } from 'states/stateProvider/actionCreators'
 
-import { getCurrentWallet, getWinID } from 'services/remote'
+import { getCurrentWallet, getWinID, setCurrentNetwork, startNodeIgnoreExternal } from 'services/remote'
 import {
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
@@ -105,6 +105,7 @@ export const useSubscription = ({
   navigate,
   dispatch,
   location,
+  showSwitchNetwork,
 }: {
   walletID: string
   chain: State.Chain
@@ -112,6 +113,7 @@ export const useSubscription = ({
   navigate: NavigateFunction
   location: ReturnType<typeof useLocation>
   dispatch: StateDispatch
+  showSwitchNetwork: () => void
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
 
@@ -203,6 +205,9 @@ export const useSubscription = ({
           type: NeuronWalletActions.UpdateConnectionStatus,
           payload: getConnectionStatus({ ...status, isTimeout: Date.now() > CONNECTING_DEADLINE }),
         })
+        if (status.connected && status.isBundledNode && !status.startedBundledNode) {
+          showSwitchNetwork()
+        }
       }
     })
 
@@ -308,7 +313,67 @@ export const useSubscription = ({
       commandSubscription.unsubscribe()
       showGlobalDialogSubject.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, navigate, dispatch, location.pathname])
+  }, [
+    walletID,
+    pageNo,
+    pageSize,
+    keywords,
+    isAllowedToFetchList,
+    navigate,
+    dispatch,
+    location.pathname,
+    showSwitchNetwork,
+  ])
+}
+
+export const useCheckNode = (networks: State.Network[], networkID: string) => {
+  const [isSwitchNetworkShow, setIsSwitchNetworkShow] = useState<boolean>(false)
+  const [selectNetwork, setSelectNetwork] = useState(networks[0]?.id)
+  useEffect(() => {
+    if (isSwitchNetworkShow) {
+      setSelectNetwork(networks[0]?.id)
+    }
+  }, [networks, isSwitchNetworkShow])
+  const [showEditorDialog, setShowEditorDialog] = useState(false)
+  const onConfirm = useCallback(() => {
+    if (selectNetwork) {
+      setCurrentNetwork(selectNetwork)
+      setIsSwitchNetworkShow(false)
+    }
+  }, [selectNetwork])
+  const onCloseEditorDialog = useCallback(() => {
+    setShowEditorDialog(false)
+  }, [])
+  const onOpenEditorDialog = useCallback(() => {
+    setShowEditorDialog(true)
+  }, [])
+  const navigate = useNavigate()
+  const [networkIdWhenDialogShow, setNetworkIdWhenDialogShow] = useState<undefined | string>()
+  useEffect(() => {
+    setNetworkIdWhenDialogShow(undefined)
+  }, [networkID])
+  const showSwitchNetwork = useCallback(() => {
+    // if the use has not change network id, the dialog will only show once
+    if (networkIdWhenDialogShow !== networkID) {
+      setNetworkIdWhenDialogShow(networkID)
+      navigate(RoutePath.Settings)
+      setIsSwitchNetworkShow(true)
+    }
+  }, [networkID, networkIdWhenDialogShow])
+  return {
+    selectNetwork,
+    onChangeSelected: setSelectNetwork,
+    isSwitchNetworkShow,
+    showSwitchNetwork,
+    onCancel: useCallback(() => {
+      setIsSwitchNetworkShow(false)
+      startNodeIgnoreExternal()
+    }, []),
+    onConfirm,
+    showEditorDialog,
+    onCloseEditorDialog,
+    onOpenEditorDialog,
+  }
 }
 
 export default {

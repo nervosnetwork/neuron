@@ -17,7 +17,7 @@ export default class ChainInfo {
     let genesisHash = EMPTY_GENESIS_HASH
 
     try {
-      genesisHash = await new RpcService(this.network.remote).genesisBlockHash()
+      genesisHash = await new RpcService(this.network.remote, this.network.type).genesisBlockHash()
       // If fetched genesis hash doesn't match that of the network, still initialize DB.
       // This would mostly only happens when using default mainnet network but connected to a wrong node.
       await initConnection(genesisHash)

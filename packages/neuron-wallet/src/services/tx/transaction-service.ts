@@ -491,8 +491,8 @@ export class TransactionsService {
     if (!txInDB) {
       return undefined
     }
-    const url: string = NetworksService.getInstance().getCurrent().remote
-    const rpcService = new RpcService(url)
+    const network = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(network.remote, network.type)
     const txWithStatus = await rpcService.getTransaction(hash)
     if (!txWithStatus?.transaction) {
       return undefined

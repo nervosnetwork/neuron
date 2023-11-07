@@ -1,4 +1,4 @@
-import { SYNC_REBUILD_SINCE_VERSION } from 'utils/const'
+import { NetworkType, SYNC_REBUILD_SINCE_VERSION } from 'utils/const'
 
 export enum LocalCacheKey {
   Addresses = 'addresses',
@@ -10,6 +10,7 @@ export enum LocalCacheKey {
   SyncRebuildNotification = 'syncRebuildNotification',
   LoadedWalletIDs = 'loadedWalletIDs',
   ImportedWallet = 'ImportedWallet',
+  ShownNodeId = 'ShownNodeId',
 }
 
 export const addresses = {
@@ -152,5 +153,15 @@ export const importedWalletDialogShown = {
     } catch (error) {
       return false
     }
+  },
+}
+
+export const lastShowInternalNodeIds = {
+  get: (type: NetworkType) => {
+    const savedNodeId = window.localStorage.getItem(`${type}_${LocalCacheKey.ShownNodeId}`)
+    return savedNodeId ?? networks.load().find(v => v.type === type)?.id
+  },
+  save: (type: NetworkType, id: string) => {
+    window.localStorage.setItem(`${type}_${LocalCacheKey.ShownNodeId}`, id)
   },
 }

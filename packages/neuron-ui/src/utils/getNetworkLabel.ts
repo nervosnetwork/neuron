@@ -1,6 +1,6 @@
-import { LIGHT_CLIENT_TESTNET } from './const'
+import { LIGHT_CLIENT_MAINNET, LIGHT_CLIENT_TESTNET } from './const'
 
-export const getNetworkLabelI18nkey = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string) => {
+export const getNetworkLabelI18nkey = (type: State.Network['chain']) => {
   switch (type) {
     case 'ckb': {
       return 'settings.network.mainnet'
@@ -10,6 +10,9 @@ export const getNetworkLabelI18nkey = (type: 'ckb' | 'ckb_testnet' | 'ckb_dev' |
     }
     case LIGHT_CLIENT_TESTNET: {
       return 'settings.network.lightTestnet'
+    }
+    case LIGHT_CLIENT_MAINNET: {
+      return 'settings.network.lightMainnet'
     }
     default: {
       return 'settings.network.devnet'

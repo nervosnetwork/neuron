@@ -16,8 +16,8 @@ type TransactionDetail = {
 }
 
 const getTransactionStatus = async (hash: string) => {
-  const url: string = NetworksService.getInstance().getCurrent().remote
-  const rpcService = new RpcService(url)
+  const network = NetworksService.getInstance().getCurrent()
+  const rpcService = new RpcService(network.remote, network.type)
   const txWithStatus: TransactionWithStatus | undefined = await rpcService.getTransaction(hash)
   if (!txWithStatus) {
     return {
@@ -75,8 +75,8 @@ const trackingStatus = async () => {
   }
 
   if (successTxs.length > 0) {
-    const url: string = NetworksService.getInstance().getCurrent().remote
-    const rpcService = new RpcService(url)
+    const network = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(network.remote, network.type)
     for (const successTx of successTxs) {
       const transaction = successTx.tx!
       const { blockHash } = successTx

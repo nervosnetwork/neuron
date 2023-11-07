@@ -1,8 +1,7 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
-import { ReactComponent as AddSimple } from 'widgets/Icons/AddSimple.svg'
 import NetworkEditorDialog from 'components/NetworkEditorDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import Toast from 'widgets/Toast'
@@ -10,6 +9,10 @@ import { chainState } from 'states'
 import { setCurrentNetwork, deleteNetwork } from 'services/remote'
 import RadioGroup from 'widgets/RadioGroup'
 import { useOnWindowResize, useToggleChoiceGroupBorder, getNetworkLabelI18nkey } from 'utils'
+import { AddSimple, Switch } from 'widgets/Icons/icon'
+import Tooltip from 'widgets/Tooltip'
+import { LIGHT_CLIENT_MAINNET, NetworkType } from 'utils/const'
+import { lastShowInternalNodeIds } from 'services/localCache'
 import styles from './networkSetting.module.scss'
 
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
@@ -43,7 +46,6 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           break
         }
         default:
-        // @ts-ignore
       }
     },
     [setNetId, setShowEditorDialog, setShowDeleteDialog]
@@ -75,20 +77,55 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     }
   }, [setShowEditorDialog, setNotice, netId])
 
+  const onSwitchNetworkType = useCallback<React.MouseEventHandler<HTMLButtonElement>>(() => {
+    const selectedNetwork = networks.find(v => v.id === currentId)
+    const switchNetwork = networks.find(v => v.type === selectedNetwork?.type && v.id !== currentId)
+    if (switchNetwork) {
+      setCurrentNetwork(switchNetwork.id)
+      lastShowInternalNodeIds.save(switchNetwork.type, switchNetwork.id)
+    }
+  }, [currentId, networks])
+
+  const showNetworks = useMemo(() => {
+    const internalLightNodeId = lastShowInternalNodeIds.get(NetworkType.Light)
+    return networks.filter(v => v.type !== NetworkType.Light || v.id === internalLightNodeId)
+  }, [currentId, networks])
+
   return (
     <div>
       <RadioGroup
-        defaultValue={currentId}
+        value={currentId}
         onChange={handleChange}
         itemClassName={styles.radioItem}
-        options={networks.map(network => ({
+        options={showNetworks.map(network => ({
           value: network.id,
-          label: (
-            <div className={styles.networkLabel}>
-              <p>{`${network.name} (${network.remote})`}</p>
-              <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
-            </div>
-          ),
+          label:
+            currentId === network.id && network.type === NetworkType.Light ? (
+              <div className={styles.networkLabel}>
+                <p>{`${network.name} (${network.remote})`}</p>
+                <Tooltip
+                  tip={
+                    <button type="button" onClick={onSwitchNetworkType} className={styles.switchBtn}>
+                      {t('settings.network.switch-network-type', {
+                        type: network.chain === LIGHT_CLIENT_MAINNET ? 'testnet' : 'mainnet',
+                      })}
+                    </button>
+                  }
+                  placement="top"
+                  showTriangle
+                >
+                  <div className={styles.tag}>
+                    {t(getNetworkLabelI18nkey(network.chain))}
+                    <Switch />
+                  </div>
+                </Tooltip>
+              </div>
+            ) : (
+              <div className={styles.networkLabel}>
+                <p>{`${network.name} (${network.remote})`}</p>
+                <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
+              </div>
+            ),
           suffix: (
             <div className={styles.suffix}>
               {network.readonly ? null : (

@@ -1,0 +1,27 @@
+.networkDialog {
+  width: 680px;
+
+  .chooseNetworkTip {
+    color: var(--secondary-text-color);
+  }
+
+  .networks {
+    max-height: 124px;
+    border-radius: 8px;
+    margin-top: 16px;
+    border: 1px solid var(--divide-line-color);
+    overflow-y: auto;
+  }
+
+  .addNetwork {
+    text-align: center;
+
+    & > button {
+      font-weight: 400;
+    }
+
+    svg {
+      margin-right: 4px;
+    }
+  }
+}
