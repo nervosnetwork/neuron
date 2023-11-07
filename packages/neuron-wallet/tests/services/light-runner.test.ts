@@ -253,6 +253,9 @@ describe('test light runner', () => {
   })
 
   describe('test start', () => {
+    beforeEach(() => {
+      joinMock.mockReturnValue('')
+    })
     it('when runnerProcess is not undefined', async () => {
       const tmp = CKBLightRunner.getInstance().stop
       CKBLightRunner.getInstance().stop = mockFn
