@@ -1143,7 +1143,7 @@
     "main": {
       "external-node-detected-dialog": {
         "title": "External node detected",
-        "body-tips-without-network": "\"Internal node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
+        "body-tips-without-network": "\"Internal Node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
         "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
         "add-network": "Add Network",
         "ignore-external-node": "Ignore external node"

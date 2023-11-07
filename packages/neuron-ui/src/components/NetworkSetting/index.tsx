@@ -15,13 +15,6 @@ import { LIGHT_CLIENT_MAINNET, NetworkType } from 'utils/const'
 import { lastShowInternalNodeIds } from 'services/localCache'
 import styles from './networkSetting.module.scss'
 
-const getAnotherNetworkType = (chain: State.Network['chain']): 'testnet' | 'mainnet' => {
-  if (chain === 'ckb' || chain === LIGHT_CLIENT_MAINNET) {
-    return 'testnet'
-  }
-  return 'mainnet'
-}
-
 const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
   const [showEditorDialog, setShowEditorDialog] = useState(false)
@@ -114,7 +107,9 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                 <Tooltip
                   tip={
                     <button type="button" onClick={onSwitchNetworkType} className={styles.switchBtn}>
-                      {t('settings.network.switch-network-type', { type: getAnotherNetworkType(network.chain) })}
+                      {t('settings.network.switch-network-type', {
+                        type: network.chain === LIGHT_CLIENT_MAINNET ? 'testnet' : 'mainnet',
+                      })}
                     </button>
                   }
                   placement="top"

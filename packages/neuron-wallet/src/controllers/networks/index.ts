@@ -19,7 +19,7 @@ export default class NetworksController {
       .pipe(distinctUntilChanged(), skip(1))
       .subscribe(async (connected: boolean) => {
         if (connected) {
-          logger.debug('Network:\tconnection success')
+          logger.debug('Network:\tconnected successfully')
           await networksService.update(networksService.getCurrentID(), {})
           this.notifyListChange()
           await this.connectToNetwork(true)

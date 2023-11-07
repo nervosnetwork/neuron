@@ -91,7 +91,6 @@ type Action =
   | 'get-current-network-id'
   | 'set-current-network-id'
   | 'delete-network'
-  | 'switch-network-type'
   // Updater
   | 'check-for-updates'
   | 'cancel-check-updates'

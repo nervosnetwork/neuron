@@ -95,9 +95,7 @@ export default class SettingsService extends Store {
     const currentCkbDataPath = this.readSync(settingKeys.ckbDataPath)
     this.writeSync(`${settingKeys.nodeDataPath}_${networkChain}`, currentCkbDataPath)
     const defaultMainNetworkDir = path.resolve(app.getPath('userData'), 'chains/mainnet')
-    if (networkChain === 'ckb') {
-      this.writeSync(`${settingKeys.nodeDataPath}_ckb_testnet`, path.resolve(app.getPath('userData'), 'chains/testnet'))
-    } else {
+    if (networkChain !== 'ckb') {
       // if user has changed the ckb data path and running with testnet
       this.writeSync(`${settingKeys.nodeDataPath}_ckb`, defaultMainNetworkDir)
     }
