@@ -299,9 +299,6 @@ export default class NetworksService extends Store {
       if (currentNetwork.id === lightClientNetwork[1].id) {
         // set light client default mainnet
         this.writeSync(NetworksKey.Current, lightClientNetwork[0].id)
-      } else if (currentNetwork.id === presetNetworks.selected && currentNetwork.genesisHash === TESTNET_GENESIS_HASH) {
-        // if the network info has been changed to testnet by connected network
-        this.writeSync(NetworksKey.Current, presetNetworks.networks[1].id)
       }
       this.writeSync(NetworksKey.AddInternalNetwork, true)
     }

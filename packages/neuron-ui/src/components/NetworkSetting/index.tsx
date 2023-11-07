@@ -87,9 +87,8 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   }, [currentId, networks])
 
   const showNetworks = useMemo(() => {
-    const internalFullNodeId = lastShowInternalNodeIds.get(NetworkType.Default)
     const internalLightNodeId = lastShowInternalNodeIds.get(NetworkType.Light)
-    return networks.filter(v => !v.readonly || v.id === internalFullNodeId || v.id === internalLightNodeId)
+    return networks.filter(v => v.type !== NetworkType.Light || v.id === internalLightNodeId)
   }, [currentId, networks])
 
   return (
