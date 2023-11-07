@@ -26,7 +26,7 @@ import { ReactComponent as Transfer } from 'widgets/Icons/Transfer.svg'
 import { ReactComponent as Upload } from 'widgets/Icons/Upload.svg'
 import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import { Download, Search } from 'widgets/Icons/icon'
-import { HIDE_BALANCE, LIGHT_NETWORK_TYPE } from 'utils/const'
+import { HIDE_BALANCE, NetworkType } from 'utils/const'
 import { onEnter } from 'utils/inputDevice'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
@@ -62,7 +62,7 @@ const MultisigAddress = () => {
   } = useGlobalState()
   const isMainnet = isMainnetUtil(networks, networkID)
   const isLightClient = useMemo(
-    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    () => networks.find(n => n.id === networkID)?.type === NetworkType.Light,
     [networks, networkID]
   )
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)

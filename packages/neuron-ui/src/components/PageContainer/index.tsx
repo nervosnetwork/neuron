@@ -15,7 +15,7 @@ import SyncStatusComponent from 'components/SyncStatus'
 import { AppActions, useDispatch, useState as useGlobalState } from 'states'
 import { openExternal } from 'services/remote'
 import Tooltip from 'widgets/Tooltip'
-import { LIGHT_NETWORK_TYPE } from 'utils/const'
+import { NetworkType } from 'utils/const'
 import Dialog from 'widgets/Dialog'
 import TextField from 'widgets/TextField'
 
@@ -59,7 +59,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
   const { theme, onSetTheme } = useTheme()
   const network = useMemo(() => networks.find(n => n.id === networkID), [networks, networkID])
   const isLightClient = useMemo(
-    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    () => networks.find(n => n.id === networkID)?.type === NetworkType.Light,
     [networkID, networks]
   )
   const netWorkTypeLabel = useMemo(() => (network ? getNetworkLabelI18nkey(network.chain) : ''), [network])

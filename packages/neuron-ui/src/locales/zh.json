@@ -393,7 +393,9 @@
         "mainnet": "主网",
         "testnet": "测试网",
         "lightTestnet": "轻节点测试网",
-        "devnet": "开发网"
+        "lightMainnet": "轻节点主网",
+        "devnet": "开发网",
+        "switch-network-type": "切换到 {{type}}"
       },
       "locale": {
         "en": "English",
@@ -1129,6 +1131,15 @@
       "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
       "locate-first-tx": "定位第一笔交易",
       "view-block": "查看区块"
+    },
+    "main": {
+      "external-node-detected-dialog": {
+        "title": "检测到外部节点",
+        "body-tips-without-network": "\"Internal Node\" 仅用于连接内置节点，请添加新的网络选项以连接外部节点。",
+        "body-tips-with-network": "\"Internal Node\" 仅用于连接内置节点，请选择以下网络选项或添加新的网络选项以连接外部节点。",
+        "add-network": "添加网络",
+        "ignore-external-node": "忽略外部节点"
+      }
     }
   }
 }

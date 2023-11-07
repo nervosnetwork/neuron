@@ -13,22 +13,32 @@ export interface RadioGroupProps {
   options: RadioGroupOptions[]
   onChange?: (arg: string | number) => void
   defaultValue?: string | number
+  value?: string | number
   itemClassName?: string
   className?: string
+  inputIdPrefix?: string
 }
 
-const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '', className = '' }: RadioGroupProps) => {
-  const [checkedValue, setCheckedValue] = useState(defaultValue || options[0]?.value)
+const RadioGroup = ({
+  defaultValue,
+  options,
+  onChange,
+  itemClassName = '',
+  className = '',
+  value,
+  inputIdPrefix = '',
+}: RadioGroupProps) => {
+  const [checkedValue, setCheckedValue] = useState(defaultValue ?? options[0]?.value)
 
   const handleChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
-      const { value } = e.target as HTMLInputElement
-      if (value !== checkedValue) {
-        setCheckedValue(value)
-        onChange?.(value)
+      const { value: selectedValue } = e.target as HTMLInputElement
+      if (selectedValue !== value ?? checkedValue) {
+        setCheckedValue(selectedValue)
+        onChange?.(selectedValue)
       }
     },
-    [onChange, checkedValue, setCheckedValue]
+    [onChange, checkedValue, setCheckedValue, value]
   )
 
   return (
@@ -36,12 +46,12 @@ const RadioGroup = ({ defaultValue, options, onChange, itemClassName = '', class
       {options.map(item => (
         <div key={item.value}>
           <div className={`${styles.item} ${itemClassName}`}>
-            <label htmlFor={item.value}>
+            <label htmlFor={`${inputIdPrefix}_${item.value}`}>
               <input
-                id={item.value}
+                id={`${inputIdPrefix}_${item.value}`}
                 type="radio"
                 value={item.value}
-                checked={item.value === checkedValue}
+                checked={item.value === (value ?? checkedValue)}
                 disabled={item.disabled}
                 onChange={handleChange}
               />

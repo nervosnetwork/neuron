@@ -80,9 +80,9 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   network = newNetwork
 
   if (reconnected) {
-    logger.info('Network:\treconnected to:', network)
+    logger.info('Network:\treconnected to:', network, shouldSync)
   } else {
-    logger.info('Network:\tswitched to:', network)
+    logger.info('Network:\tswitched to:', network, shouldSync)
   }
 
   await resetSyncTaskQueue.asyncPush(shouldSync)
@@ -178,6 +178,7 @@ export const createBlockSyncTask = async () => {
       url: network.remote,
       addressMetas,
       indexerUrl: network.remote,
+      nodeType: network.type,
     }
     const msg: Required<WorkerMessage<StartParams>> = { type: 'call', channel: 'start', id: requestId++, message }
     return registerRequest(_child, msg).catch(err => {

@@ -56,8 +56,8 @@ export default class ExportDebugController {
 
   private addStatusFile = async () => {
     const neuronVersion = app.getVersion()
-    const url = NetworksService.getInstance().getCurrent().remote
-    const rpcService = generateRPC(url)
+    const network = NetworksService.getInstance().getCurrent()
+    const rpcService = generateRPC(network.remote, network.type)
 
     const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers, vcredist] = await Promise.all([
       new SyncedBlockNumber()
@@ -83,7 +83,7 @@ export default class ExportDebugController {
         blockNumber: syncedBlockNumber,
       },
       ckb: {
-        url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : this.#ANONYMOUS_ADDRESS,
+        url: /https?:\/\/(localhost|127.0.0.1)/.test(network.remote) ? network.remote : this.#ANONYMOUS_ADDRESS,
         version: ckbVersion,
         blockNumber: tipBlockNumber,
         peers,
@@ -105,7 +105,7 @@ export default class ExportDebugController {
     const SIZE_TO_READ = 32_000
 
     return new Promise((resolve, reject) => {
-      const logPath = path.resolve(SettingsService.getInstance().ckbDataPath, 'data', 'logs', 'run.log')
+      const logPath = path.resolve(SettingsService.getInstance().getNodeDataPath(), 'data', 'logs', 'run.log')
       if (!fs.existsSync(logPath)) {
         return reject(new Error('File not found'))
       }
@@ -137,14 +137,18 @@ export default class ExportDebugController {
   }
 
   private async addHdPublicKeyInfoCsv() {
-    const addressMetas = await AddressService.getAddressesByAllWallets()
-    let csv = 'walletId,addressType,addressIndex,publicKeyInBlake160\n'
-    for (const addressMeta of addressMetas) {
-      const row = `${addressMeta.walletId},${addressMeta.addressType},${addressMeta.addressIndex},${addressMeta.blake160}\n`
-      csv += row
+    try {
+      const addressMetas = await AddressService.getAddressesByAllWallets()
+      let csv = 'walletId,addressType,addressIndex,publicKeyInBlake160\n'
+      for (const addressMeta of addressMetas) {
+        const row = `${addressMeta.walletId},${addressMeta.addressType},${addressMeta.addressIndex},${addressMeta.blake160}\n`
+        csv += row
+      }
+      const csvFileName = 'hd_public_key_info.csv'
+      this.archive.append(csv, { name: csvFileName })
+    } catch (error) {
+      logger.error(`Export Debug:\t export public key info error: ${error}`)
     }
-    const csvFileName = 'hd_public_key_info.csv'
-    this.archive.append(csv, { name: csvFileName })
   }
 
   private addLogFiles = (files = ['main.log', 'renderer.log']) => {

@@ -8,7 +8,7 @@ import { DeviceSignIndex as DeviceSignIndexSubject } from 'services/subjects'
 
 import styles from '../HardwareSign/hardwareSign.module.scss'
 
-const { MAINNET_TAG } = CONSTANTS
+const { MAINNET_CLIENT_LIST } = CONSTANTS
 
 const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
   const [t] = useTranslation()
@@ -33,7 +33,7 @@ const HDWalletSign = ({ tx }: { tx: State.DetailedTransaction }) => {
             throw new Error('Cannot find current network in the network list')
           }
 
-          setIsMainnet(network.chain === MAINNET_TAG)
+          setIsMainnet(MAINNET_CLIENT_LIST.includes(network.chain))
         }
       })
       .catch(err => console.warn(err))
