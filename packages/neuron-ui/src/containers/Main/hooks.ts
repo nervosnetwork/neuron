@@ -349,6 +349,9 @@ export const useCheckNode = (networks: State.Network[], networkID: string) => {
   }, [])
   const navigate = useNavigate()
   const [networkIdWhenDialogShow, setNetworkIdWhenDialogShow] = useState<undefined | string>()
+  useEffect(() => {
+    setNetworkIdWhenDialogShow(undefined)
+  }, [networkID])
   const showSwitchNetwork = useCallback(() => {
     // if the use has not change network id, the dialog will only show once
     if (networkIdWhenDialogShow !== networkID) {
