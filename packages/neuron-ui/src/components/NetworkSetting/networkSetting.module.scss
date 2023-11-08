@@ -27,15 +27,27 @@
     border-radius: 40px;
     display: flex;
     align-items: center;
+    cursor: default;
 
     & > svg {
       margin-left: 4px;
     }
   }
-  .switchBtn {
-    border: none;
-    background-color: transparent;
+  button.tag {
     cursor: pointer;
+    &:hover {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+
+      & > svg {
+        path {
+          fill: var(--primary-color);
+        }
+      }
+    }
+  }
+  .tooltip {
+    background-color: transparent;
     color: var(--main-text-color);
   }
 }

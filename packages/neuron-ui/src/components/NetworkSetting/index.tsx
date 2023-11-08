@@ -105,19 +105,19 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                 <p>{`${network.name} (${network.remote})`}</p>
                 <Tooltip
                   tip={
-                    <button type="button" onClick={onSwitchNetworkType} className={styles.switchBtn}>
+                    <div className={styles.tooltip}>
                       {t('settings.network.switch-network-type', {
                         type: network.chain === LIGHT_CLIENT_MAINNET ? 'testnet' : 'mainnet',
                       })}
-                    </button>
+                    </div>
                   }
                   placement="top"
                   showTriangle
                 >
-                  <div className={styles.tag}>
+                  <button type="button" className={styles.tag} onClick={onSwitchNetworkType}>
                     {t(getNetworkLabelI18nkey(network.chain))}
                     <Switch />
-                  </div>
+                  </button>
                 </Tooltip>
               </div>
             ) : (
