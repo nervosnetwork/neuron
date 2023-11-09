@@ -55,7 +55,8 @@ const TextField = React.forwardRef(
     ref: React.LegacyRef<HTMLDivElement>
   ) => {
     const [isPasswordHidden, setIsPasswordHidden] = useState(true)
-    const inputRef = useRef<any>()
+    const inputRef = useRef<(HTMLTextAreaElement & HTMLInputElement) | null>(null)
+    const rowsRef = useRef<number>(rows)
     const changePasswordHide = useCallback(() => {
       setIsPasswordHidden(v => !v)
     }, [setIsPasswordHidden])
@@ -63,6 +64,14 @@ const TextField = React.forwardRef(
     const labelStr = typeof label === 'string' ? label : field
 
     useEffect(() => {
+      if (rowsRef.current === rows) {
+        return
+      }
+
+      rowsRef.current = rows
+      if (!inputRef.current) {
+        return
+      }
       inputRef.current.focus()
       const position = value?.length || 0
       inputRef.current.setSelectionRange(position, position)
