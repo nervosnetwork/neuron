@@ -65,7 +65,7 @@ abstract class NodeRunner {
   async stop() {
     return new Promise<void>(resolve => {
       if (this.runnerProcess) {
-        logger.info('Runner:\tkilling node')
+        logger.info('Runner:\tkilling node', this.runnerProcess.pid)
         this.runnerProcess.once('close', () => resolve())
         this.runnerProcess.kill()
         this.runnerProcess = undefined
@@ -79,7 +79,7 @@ abstract class NodeRunner {
 export class CKBLightRunner extends NodeRunner {
   protected networkType: NetworkType = NetworkType.Light
   protected binaryName: string = 'ckb-light-client'
-  protected logStream?: fs.WriteStream
+  protected logStream: Map<string, fs.WriteStream> = new Map()
   protected _port: number = 9000
 
   static getInstance(): CKBLightRunner {
@@ -143,34 +143,41 @@ export class CKBLightRunner extends NodeRunner {
     })
     this.runnerProcess = runnerProcess
 
-    if (!this.logStream) {
-      this.logStream = fs.createWriteStream(this.logPath)
+    const network = NetworksService.getInstance().getCurrent()
+    if (!this.logStream.get(network.id)) {
+      this.logStream.set(network.id, fs.createWriteStream(this.getLogPath()))
     }
+    const logStream = this.logStream.get(network.id)
 
     runnerProcess.stderr &&
       runnerProcess.stderr.on('data', data => {
         const dataString: string = data.toString()
         logger.error('CKB Light Runner:\trun fail:', dataString)
-        this.logStream?.write(data)
+        logStream?.write(data)
       })
 
     runnerProcess.stdout &&
       runnerProcess.stdout.on('data', data => {
-        this.logStream?.write(data)
+        logStream?.write(data)
       })
-    runnerProcess.on('error', error => {
+    runnerProcess.once('error', error => {
       logger.error('CKB Light Runner:\trun fail:', error)
-      this.runnerProcess = undefined
+      if (this.runnerProcess?.pid === runnerProcess.pid) {
+        this.runnerProcess = undefined
+      }
     })
 
-    runnerProcess.on('close', () => {
+    runnerProcess.once('close', () => {
       logger.info('CKB Light Runner:\tprocess closed')
-      this.runnerProcess = undefined
+      if (this.runnerProcess?.pid === runnerProcess.pid) {
+        this.runnerProcess = undefined
+      }
     })
   }
 
-  get logPath() {
-    return path.join(logger.transports.file.getFile().path, '..', 'light_client_run.log')
+  getLogPath(chain?: string) {
+    const fileName = chain ?? NetworksService.getInstance().getCurrent().chain
+    return path.join(logger.transports.file.getFile().path, '..', `${fileName}.log`)
   }
 
   async clearNodeCache(): Promise<void> {
