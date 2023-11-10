@@ -132,6 +132,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SKIP_NOTARIZE: true
+          USE_HARD_LINKS: false
 
       - name: Package for Windows
         if: matrix.os == 'windows-2019'
@@ -150,6 +151,7 @@ jobs:
           yarn package:test linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USE_HARD_LINKS: false
 
       - name: Upload Neuron App Zip
         if: matrix.os == 'macos-latest'
