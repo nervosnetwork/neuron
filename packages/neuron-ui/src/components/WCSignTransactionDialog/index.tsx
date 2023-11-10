@@ -12,7 +12,7 @@ import {
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
 } from 'states'
-import { SessionRequest } from 'ckb-walletconnect-wallet-sdk'
+import { SessionRequest } from '@ckb-connect/walletconnect-wallet-sdk'
 import { OfflineSignType, OfflineSignStatus, signAndExportTransaction, signTransactionOnly } from 'services/remote'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from './wcSignTransactionDialog.module.scss'

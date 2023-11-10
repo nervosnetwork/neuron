@@ -1,4 +1,4 @@
-/// <reference types="ckb-walletconnect-wallet-sdk" />
+/// <reference types="@ckb-connect/walletconnect-wallet-sdk" />
 
 declare namespace Controller {
   interface Response<T = any> {

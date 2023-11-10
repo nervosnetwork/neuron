@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useState as useGlobalState } from 'states'
 import { connect, disconnect, approveSession, rejectSession, approveRequest, rejectRequest } from 'services/remote'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
-import { SessionRequest } from 'ckb-walletconnect-wallet-sdk'
+import { SessionRequest } from '@ckb-connect/walletconnect-wallet-sdk'
 
 export const useWalletConnect = () => {
   const {

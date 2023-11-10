@@ -1,4 +1,4 @@
-import { ErrorResponse, SessionRequest } from 'ckb-walletconnect-wallet-sdk'
+import { ErrorResponse, SessionRequest } from '@ckb-connect/walletconnect-wallet-sdk'
 import { remoteApi } from './remoteApiWrapper'
 
 export const connect = remoteApi<string>('wc-connect')

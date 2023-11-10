@@ -13,7 +13,7 @@ import {
   Session,
   SessionRequest,
   SignedTransaction,
-} from 'ckb-walletconnect-wallet-sdk'
+} from '@ckb-connect/walletconnect-wallet-sdk'
 import WalletConnectSubject from '../models/subjects/wallet-connect-subject'
 import { CurrentWalletSubject } from '../models/subjects/wallets'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'

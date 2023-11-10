@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Transaction } from 'ckb-walletconnect-wallet-sdk'
+import { Transaction } from '@ckb-connect/walletconnect-wallet-sdk'
 import { remoteApi } from './remoteApiWrapper'
 import { MultisigEntity } from './multisig'
 

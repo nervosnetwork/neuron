@@ -5,7 +5,7 @@ import { clsx, CONSTANTS, shannonToCKBFormatter } from 'utils'
 import { SCRIPT_BASES } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { useState as useGlobalState } from 'states'
-import { Proposal, Session, SessionRequest, SignTransactionParams } from 'ckb-walletconnect-wallet-sdk'
+import { Proposal, Session, SessionRequest, SignTransactionParams } from '@ckb-connect/walletconnect-wallet-sdk'
 import { DetailIcon } from 'widgets/Icons/icon'
 import styles from './walletConnect.module.scss'
 
