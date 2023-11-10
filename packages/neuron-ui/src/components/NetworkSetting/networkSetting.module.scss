@@ -27,28 +27,10 @@
     border-radius: 40px;
     display: flex;
     align-items: center;
-    cursor: default;
 
     & > svg {
       margin-left: 4px;
     }
-  }
-  button.tag {
-    cursor: pointer;
-    &:hover {
-      color: var(--primary-color);
-      border-color: var(--primary-color);
-
-      & > svg {
-        path {
-          fill: var(--primary-color);
-        }
-      }
-    }
-  }
-  .tooltip {
-    background-color: transparent;
-    color: var(--main-text-color);
   }
 }
 
@@ -67,5 +49,13 @@
   button {
     @include icon-hover-button;
     visibility: hidden;
+
+    & > svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  .switch {
+    margin-right: 32px;
   }
 }

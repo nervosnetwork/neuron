@@ -99,13 +99,18 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
         itemClassName={styles.radioItem}
         options={showNetworks.map(network => ({
           value: network.id,
-          label:
-            currentId === network.id && network.type === NetworkType.Light ? (
-              <div className={styles.networkLabel}>
-                <p>{`${network.name} (${network.remote})`}</p>
+          label: (
+            <div className={styles.networkLabel}>
+              <p>{`${network.name} (${network.remote})`}</p>
+              <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
+            </div>
+          ),
+          suffix: (
+            <div className={styles.suffix}>
+              {currentId === network.id && network.type === NetworkType.Light ? (
                 <Tooltip
                   tip={
-                    <div className={styles.tooltip}>
+                    <div>
                       {t('settings.network.switch-network-type', {
                         type: network.chain === LIGHT_CLIENT_MAINNET ? 'testnet' : 'mainnet',
                       })}
@@ -113,21 +118,13 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                   }
                   placement="top"
                   showTriangle
+                  className={styles.switch}
                 >
-                  <button type="button" className={styles.tag} onClick={onSwitchNetworkType}>
-                    {t(getNetworkLabelI18nkey(network.chain))}
+                  <button type="button" onClick={onSwitchNetworkType}>
                     <Switch />
                   </button>
                 </Tooltip>
-              </div>
-            ) : (
-              <div className={styles.networkLabel}>
-                <p>{`${network.name} (${network.remote})`}</p>
-                <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
-              </div>
-            ),
-          suffix: (
-            <div className={styles.suffix}>
+              ) : null}
               {network.readonly ? null : (
                 <button type="button" aria-label={t('common.edit')} onClick={onHandleNetwork}>
                   <EditNetwork data-action="edit" data-id={network.id} />
