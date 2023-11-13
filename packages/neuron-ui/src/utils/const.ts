@@ -81,3 +81,5 @@ export const MILLISECONDS = HOURS_PER_EPOCH * 60 * 60 * 1000
 
 export const ADDRESS_MIN_LENGTH = 86
 export const ADDRESS_HEAD_TAIL_LENGTH = 34
+
+export const PlaceHolderArgs = `0x${'00'.repeat(21)}`

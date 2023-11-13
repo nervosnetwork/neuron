@@ -10,7 +10,9 @@ export const validateOutputs = (
 ) => {
   for (let i = 0; i < items.length; i++) {
     try {
-      validateAddress(items[i].address || '', isMainnet)
+      if (items[i].address) {
+        validateAddress(items[i].address || '', isMainnet)
+      }
       if (i !== items.length - 1 || !ignoreLastAmount) {
         validateAmount(items[i].amount)
 
