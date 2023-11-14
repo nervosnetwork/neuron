@@ -6,11 +6,12 @@ import validateAmountRange from './amountRange'
 export const validateOutputs = (
   items: Readonly<Omit<State.Output, 'unit'>[]> = [],
   isMainnet: boolean = false,
-  ignoreLastAmount: boolean = false
+  ignoreLastAmount: boolean = false,
+  ignoreLastAddress: boolean = false
 ) => {
   for (let i = 0; i < items.length; i++) {
     try {
-      if (items[i].address) {
+      if (!!items[i].address || i !== items.length - 1 || !ignoreLastAddress) {
         validateAddress(items[i].address || '', isMainnet)
       }
       if (i !== items.length - 1 || !ignoreLastAmount) {

@@ -8,10 +8,11 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: false,
+      ignoreLastAddress: false,
     },
     exception: false,
   },
-  'Should throw an error when address is not provided': {
+  'Should pass when last address is empty and ignore last address': {
     params: {
       outputs: [
         {
@@ -20,8 +21,22 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: false,
+      ignoreLastAddress: true,
     },
     exception: false,
+  },
+  'Should throw an error when not the last address is not provided': {
+    params: {
+      outputs: [
+        {
+          address: '',
+          amount: '100',
+        },
+      ],
+      ignoreLastAmount: false,
+      ignoreLastAddress: false,
+    },
+    exception: true,
   },
   'Should throw an error when address is invalid': {
     params: {
@@ -32,6 +47,7 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: false,
+      ignoreLastAddress: false,
     },
     exception: true,
   },
@@ -44,6 +60,7 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: false,
+      ignoreLastAddress: false,
     },
     exception: true,
   },
@@ -56,6 +73,7 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: false,
+      ignoreLastAddress: false,
     },
     exception: true,
   },
@@ -68,6 +86,7 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: false,
+      ignoreLastAddress: false,
     },
     exception: true,
   },
@@ -80,6 +99,7 @@ const fixtures = {
         },
       ],
       ignoreLastAmount: true,
+      ignoreLastAddress: false,
     },
     exception: false,
   },
