@@ -21,7 +21,7 @@ const fixtures = {
       ],
       ignoreLastAmount: false,
     },
-    exception: true,
+    exception: false,
   },
   'Should throw an error when address is invalid': {
     params: {
