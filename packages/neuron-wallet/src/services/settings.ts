@@ -80,7 +80,7 @@ export default class SettingsService extends Store {
         ckbDataPath: path.resolve(app.getPath('userData'), 'chains/mainnet'),
       })
     )
-    if (!this.getNodeDataPath(LIGHT_CLIENT_MAINNET)) {
+    if (!this.getNodeDataPath(LIGHT_CLIENT_MAINNET) || !this.getNodeDataPath('ckb')) {
       this.migrateDataPath()
     }
   }
