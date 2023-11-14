@@ -48,8 +48,8 @@ type Action =
   | 'start-process-monitor'
   | 'is-dark'
   | 'set-theme'
-  | 'is-ckb-run-external'
   | 'verify-external-ckb-node'
+  | 'start-node-ignore-external'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

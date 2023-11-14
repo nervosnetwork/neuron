@@ -49,6 +49,8 @@ import { ReactComponent as WalletConnectSvg } from './WalletConnect.svg'
 import { ReactComponent as ScanSvg } from './Scan.svg'
 import { ReactComponent as ScanScreenSvg } from './ScanScreen.svg'
 import { ReactComponent as NumberScanSvg } from './NumberScan.svg'
+import { ReactComponent as AddSimpleSvg } from './AddSimple.svg'
+import { ReactComponent as SwitchSvg } from './Switch.svg'
 
 import styles from './icon.module.scss'
 
@@ -114,3 +116,5 @@ export const WalletConnect = WrapSvg(WalletConnectSvg)
 export const Scan = WrapSvg(ScanSvg)
 export const ScanScreen = WrapSvg(ScanScreenSvg)
 export const NumberScan = WrapSvg(NumberScanSvg)
+export const Switch = WrapSvg(SwitchSvg)
+export const AddSimple = WrapSvg(AddSimpleSvg)

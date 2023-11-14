@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -75,8 +75,9 @@ const Navbar = () => {
   const dispatch = useDispatch()
   const neuronWallet = useGlobalState()
   const {
+    chain: { networkID },
     wallet: { name },
-    settings: { wallets = [] },
+    settings: { wallets = [], networks = [] },
     updater: { version, isUpdated },
   } = neuronWallet
   const [t, i18n] = useTranslation()
@@ -114,6 +115,17 @@ const Navbar = () => {
   }, [])
 
   const [verifyCkbResult, setVerifyCkbResult] = useState<VerifyExternalCkbNodeRes>()
+
+  const network = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
+  useEffect(() => {
+    if (!network?.readonly) {
+      verifyExternalCkbNode().then(res => {
+        if (isSuccessResponse(res) && res.result) {
+          setVerifyCkbResult(res.result)
+        }
+      })
+    }
+  }, [network?.readonly])
 
   useEffect(() => {
     verifyExternalCkbNode().then(res => {

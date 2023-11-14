@@ -1,4 +1,5 @@
 import { bytes } from '@ckb-lumos/codec'
+import 'dotenv/config'
 
 const stubbedRPCServiceConstructor = jest.fn()
 const stubbedWalletsServiceConstructor = jest.fn()
@@ -92,6 +93,18 @@ jest.doMock('services/tx/transaction-persistor', () => {
 jest.doMock('services/multisig', () => {
   return {
     saveSentMultisigOutput: jest.fn(),
+  }
+})
+
+jest.doMock('services/networks', () => {
+  return {
+    getInstance() {
+      return {
+        getCurrent() {
+          return { remote: '', type: 1 }
+        },
+      }
+    },
   }
 })
 

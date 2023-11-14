@@ -395,7 +395,9 @@
         "edit-success": "編輯網絡成功",
         "mainnet": "主網",
         "testnet": "測試網",
-        "devnet": "開發網"
+        "lightMainnet": "輕節點主網",
+        "devnet": "開發網",
+        "switch-network-type": "切換到 {{type}}"
       },
       "locale": {
         "en": "English",
@@ -1147,6 +1149,15 @@
       "view-details": "查看詳情",
       "locked-period": "鎖定時間",
       "sign-confirmation": "簽名確認"
+    },
+    "main": {
+      "external-node-detected-dialog": {
+        "title": "檢測到外部節點",
+        "body-tips-without-network": "\"Internal Node\" 僅用於連接內置節點，請添加新的網絡選項以連接外部節點。",
+        "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
+        "add-network": "添加網絡",
+        "ignore-external-node": "忽略外部節點"
+      }
     }
   }
 }

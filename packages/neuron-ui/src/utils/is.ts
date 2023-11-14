@@ -8,11 +8,11 @@ import {
   PwAcpLockInfoOnMainNet,
   PwAcpLockInfoOnTestNet,
 } from 'utils/enums'
-import { LIGHT_MAINNET_TAG, MAINNET_TAG } from './const'
+import { MAINNET_CLIENT_LIST } from './const'
 
 export const isMainnet = (networks: Readonly<State.Network[]>, networkID: string) => {
   const network = networks.find(n => n.id === networkID)
-  return network?.chain === MAINNET_TAG || network?.chain === LIGHT_MAINNET_TAG
+  return MAINNET_CLIENT_LIST.includes(network?.chain ?? '')
 }
 
 export const isSuccessResponse = (res: Pick<ControllerResponse, 'status'>): res is SuccessFromController => {

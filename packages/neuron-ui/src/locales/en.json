@@ -401,7 +401,9 @@
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "lightTestnet": "Light Testnet",
-        "devnet": "Devnet"
+        "lightMainnet": "Light Mainnet",
+        "devnet": "Devnet",
+        "switch-network-type": "Switch to {{type}}"
       },
       "locale": {
         "en": "English",
@@ -1176,6 +1178,15 @@
       "view-details": "View Details",
       "locked-period": "Locked Period",
       "sign-confirmation": "Signature Confirmation"
+    },
+    "main": {
+      "external-node-detected-dialog": {
+        "title": "External node detected",
+        "body-tips-without-network": "\"Internal Node\" is reserved for the built-in CKB node, please add a new network option for the external node.",
+        "body-tips-with-network": "\"Internal Node\" is reserved for the built-in CKB node, please select from the following network options or add a new one for the external node.",
+        "add-network": "Add Network",
+        "ignore-external-node": "Ignore external node"
+      }
     }
   }
 }
