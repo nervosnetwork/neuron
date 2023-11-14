@@ -66,6 +66,7 @@ enum NetworksKey {
 }
 
 const oldDefaultNames = ['Default', 'default node', presetNetworks.networks[0].name]
+// Before 0.106.0 version the default remote's value is http://localhost:8114.
 const oldDefaultRemotes = ['http://localhost:8114', BUNDLED_CKB_URL]
 
 export default class NetworksService extends Store {
