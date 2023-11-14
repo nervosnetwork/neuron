@@ -150,7 +150,7 @@ const Send = () => {
 
   const isMaxBtnDisabled = (() => {
     try {
-      validateOutputs(outputs, isMainnet, true, true)
+      validateOutputs(outputs.slice(0, -1), isMainnet)
     } catch {
       return true
     }
