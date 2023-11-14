@@ -1,15 +1,13 @@
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { clsx, CONSTANTS, shannonToCKBFormatter } from 'utils'
+import { clsx, shannonToCKBFormatter, isMainnet as isMainnetUtil } from 'utils'
 import { SCRIPT_BASES } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { useState as useGlobalState } from 'states'
 import { Proposal, Session, SessionRequest, SignTransactionParams } from '@ckb-connect/walletconnect-wallet-sdk'
 import { DetailIcon } from 'widgets/Icons/icon'
 import styles from './walletConnect.module.scss'
-
-const { MAINNET_TAG } = CONSTANTS
 
 interface PrososalItemProps {
   data: Proposal
@@ -178,8 +176,7 @@ export const TransactionItem = ({ data, approve, sessions, onRejectRequest, key 
     settings: { networks },
   } = useGlobalState()
   const [t] = useTranslation()
-  const network = networks.find(n => n.id === networkID)
-  const isMainnet = network != null && network.chain === MAINNET_TAG
+  const isMainnet = isMainnetUtil(networks, networkID)
   const session = sessions.find(item => item.topic === data.topic)
   const { name = '', url = '' } = session?.peer?.metadata || {}
   const params = data.params.request.params as SignTransactionParams
