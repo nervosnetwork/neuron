@@ -151,6 +151,8 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
   | 'get-sync-progress-by-addresses'
+  // spore
+  | 'generate-transfer-spore-tx'
 
 export const remoteApi =
   <P = any, R = any>(action: Action) =>

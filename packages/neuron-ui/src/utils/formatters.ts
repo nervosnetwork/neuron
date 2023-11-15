@@ -1,3 +1,5 @@
+import { molecule } from '@ckb-lumos/codec'
+import { blockchain } from '@ckb-lumos/base'
 import { TFunction } from 'i18next'
 import { FailureFromController } from 'services/remote/remoteApiWrapper'
 import { CapacityUnit } from './enums'
@@ -293,6 +295,52 @@ export const nftFormatter = (hex?: string, idOnly = false) => {
     return id
   }
   return `#${id} mNFT`
+}
+
+export function truncateMiddle(str: string, start = 8, end = start): string {
+  if (str.length <= start + end) {
+    return str
+  }
+  return `${str.slice(0, start)}...${str.slice(-end)}`
+}
+
+type FormatterOptions = { args: string; data?: string; clusterName?: string; truncate?: number }
+export const sporeFormatter = ({ args, data, clusterName, truncate }: FormatterOptions) => {
+  let format = 'Spore'
+
+  const SporeData = molecule.table(
+    {
+      contentType: blockchain.Bytes,
+      content: blockchain.Bytes,
+      clusterId: blockchain.BytesOpt,
+    },
+    ['contentType', 'content', 'clusterId']
+  )
+
+  if (data) {
+    try {
+      const { clusterId } = SporeData.unpack(data)
+
+      // the name may be empty when it works with the light client.
+      // a spore cell may appear before the cluster cell is found in the light client.
+      // So we need a placeholder for the name.
+      if (clusterId && !clusterName) {
+        format = `[${truncateMiddle(clusterId, truncate)}] ${format}`
+      }
+      if (clusterId && clusterName) {
+        format = `[${truncateMiddle(clusterName, truncate)}] ${format}`
+      }
+    } catch {
+      // the Spore contract seems not guarantee the data always valid
+      // empty catch here to avoid crash
+    }
+  }
+
+  if (args) {
+    format = `[${truncateMiddle(args, truncate)}] ${format}`
+  }
+
+  return format
 }
 
 export const errorFormatter = (error: string | FailureFromController['message'], t: TFunction) => {

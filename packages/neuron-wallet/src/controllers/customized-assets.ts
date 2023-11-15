@@ -51,6 +51,29 @@ export default class CustomizedAssetsController {
     }
   }
 
+  public async generateTransferSporeTx(params: Controller.Params.GenerateTransferNftTxParams) {
+    const tx = await new TransactionSender().generateTransferSporeTx(
+      params.walletID,
+      params.outPoint,
+      params.receiveAddress,
+      undefined,
+      params.feeRate
+    )
+
+    if (!tx) {
+      throw new ServiceHasNoResponse('GenerateTransferNftTx')
+    }
+
+    if (params.description) {
+      tx.description = params.description
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public async generateWithdrawCustomizedCellTx(
     params: Controller.Params.GenerateWithdrawCustomizedCellTxParams
   ): Promise<Controller.Response<Transaction>> {

@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useReducer, useMemo, useRef, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import { AppActions, useDispatch, useState as useGlobalState } from 'states'
 import { isMainnet as isMainnetUtil, isSuccessResponse, validateAddress } from 'utils'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import TextField from 'widgets/TextField'
@@ -8,6 +8,8 @@ import Dialog from 'widgets/Dialog'
 import { generateNFTSendTransaction } from 'services/remote'
 import { isErrorWithI18n } from 'exceptions'
 import styles from './NFTSend.module.scss'
+import { NFTType } from '../SpecialAssetList'
+import { generateSporeSendTransaction } from '../../services/remote/spore'
 
 enum Fields {
   Address = 'address',
@@ -38,7 +40,9 @@ const NFTSend = ({
   onCancel,
   cell,
   onSuccess,
+  nftType = NFTType.NFT,
 }: {
+  nftType?: NFTType
   onCancel: () => void
   cell: {
     nftId: string
@@ -138,7 +142,17 @@ const NFTSend = ({
         feeRate: `${suggestFeeRate}`,
       }
 
-      generateNFTSendTransaction(params)
+      const generate = (() => {
+        switch (nftType) {
+          case NFTType.Spore: {
+            return generateSporeSendTransaction
+          }
+          default:
+            return generateNFTSendTransaction
+        }
+      })()
+
+      generate(params)
         .then(res => {
           if (isSuccessResponse(res)) {
             globalDispatch({
@@ -156,10 +170,15 @@ const NFTSend = ({
     return clearTimer
   }, [isSubmittable, globalDispatch, sendState, walletId, outPoint, suggestFeeRate])
 
+  const displayNftType = (() => {
+    if (nftType === NFTType.Spore) return 'Spore'
+    return 'mNFT'
+  })()
+
   return (
     <Dialog
       show
-      title={`${t('special-assets.transfer-nft')} #${nftId} mNFT`}
+      title={`${t('special-assets.transfer-nft')} #${nftId} ${displayNftType}`}
       disabled={!isSubmittable}
       onCancel={onCancel}
       onConfirm={onSubmit}
