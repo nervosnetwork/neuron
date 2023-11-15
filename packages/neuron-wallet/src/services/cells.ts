@@ -33,8 +33,8 @@ import MultisigOutput from '../database/chain/entities/multisig-output'
 import { MIN_CELL_CAPACITY } from '../utils/const'
 import { bytes } from '@ckb-lumos/codec'
 import { generateRPC } from '../utils/ckb-rpc'
-import NodeService from './node'
 import { getClusterCellById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
+import NetworksService from './networks'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -336,11 +336,13 @@ export default class CellsService {
       .orderBy('tx.timestamp', 'ASC')
       .getMany()
 
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+
     // https://github.com/nervosnetwork/neuron/blob/dbc5a5b46dc108f660c443d43aba54ea47e233ac/packages/neuron-wallet/src/services/tx/transaction-persistor.ts#L70
     // datum in outputs has been sliced when sync
     // to make the Spore NFT data available,
     // we need to fetch it from RPC instead of database
-    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     const sporeOutputs = allMultiSignOutputs.filter(item =>
       sporeInfos.some(info => item.typeCodeHash && bytes.equal(info.codeHash, item.typeCodeHash))
     )
@@ -362,7 +364,7 @@ export default class CellsService {
 
           const clusterCell = await getClusterCellById(
             clusterId,
-            assetAccountInfo.getSporeConfig(NodeService.getInstance().nodeUrl)
+            assetAccountInfo.getSporeConfig(currentNetwork.remote)
           )
           const { name, description } = unpackToRawClusterData(clusterCell.data)
           clusterInfos[clusterId] = { name, description }

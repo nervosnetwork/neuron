@@ -358,14 +358,14 @@ export class TransactionGenerator {
   }
 
   private static async getTipHeader(): Promise<BlockHeader> {
-    const network = NetworksService.getInstance().getCurrent()
-    const rpcService = new RpcService(network.remote, network.type)
+    const rpcService = TransactionGenerator.getRpcService()
     const tipHeader = await rpcService.getTipHeader()
     return tipHeader
   }
 
   private static getRpcService(): RpcService {
-    return new RpcService(NodeService.getInstance().nodeUrl)
+    const network = NetworksService.getInstance().getCurrent()
+    return new RpcService(network.remote, network.type)
   }
 
   public static generateDepositTx = async (

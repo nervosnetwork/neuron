@@ -574,7 +574,8 @@ export default class TransactionSender {
     }
 
     const assetAccountInfo = new AssetAccountInfo()
-    const rpcUrl: string = NodeService.getInstance().nodeUrl
+    // const rpcUrl: string = NodeService.getInstance().nodeUrl
+    const rpcUrl = NetworksService.getInstance().getCurrent().remote
 
     // https://github.com/sporeprotocol/spore-sdk/blob/05f2cbe1c03d03e334ebd3b440b5b3b20ec67da7/packages/core/src/api/joints/spore.ts#L154-L158
     const clusterDep = await (async () => {
