@@ -19,7 +19,6 @@ import WitnessArgs from '../../models/chain/witness-args'
 import AddressParser from '../../models/address-parser'
 import Multisig from '../../models/multisig'
 import RpcService from '../../services/rpc-service'
-import NodeService from '../../services/node'
 import BlockHeader from '../../models/chain/block-header'
 import CellDep from '../../models/chain/cell-dep'
 import SystemScriptInfo from '../../models/system-script-info'
@@ -35,6 +34,7 @@ import WalletService from '../../services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
 import AssetAccountService from '../../services/asset-account-service'
 import LiveCellService from '../../services/live-cell-service'
+import NetworksService from '../networks'
 
 export interface TargetOutput {
   address: string
@@ -54,13 +54,30 @@ export class TransactionGenerator {
     receiveAddress: string,
     changeAddress: string,
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    nftDeps?: CellDep[]
   ) => {
+    // defaults to the mNFT cell dep
     const assetAccount = new AssetAccountInfo()
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const nftCellDep = assetAccount.getNftInfo().cellDep
+    nftDeps = nftDeps ?? [nftCellDep]
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const op = new OutPoint(outPoint.txHash, outPoint.index)
     const nftCell = await CellsService.getLiveCell(op)
+
+    // the data has been sliced, so we need to get the full data from the rpc
+    // https://github.com/nervosnetwork/neuron/blob/dbc5a5b46dc108f660c443d43aba54ea47e233ac/packages/neuron-wallet/src/services/tx/transaction-persistor.ts#L70
+    await (async () => {
+      if (!nftCell) return
+
+      const nftTx = await this.getRpcService().getTransaction(outPoint.txHash)
+      const nftOriginalOutputData = nftTx?.transaction.outputsData[Number(outPoint.index)]
+      if (!nftOriginalOutputData) return
+
+      nftCell.data = nftOriginalOutputData
+    })()
+
     const receiverLockScript = AddressParser.parse(receiveAddress)
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
@@ -92,7 +109,7 @@ export class TransactionGenerator {
     const outputs: Output[] = [nftCell]
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep, nftCellDep, anyoneCanPayDep],
+      cellDeps: [secpCellDep, anyoneCanPayDep, ...nftDeps],
       headerDeps: [],
       inputs: [nftInput],
       outputs,
@@ -341,9 +358,14 @@ export class TransactionGenerator {
   }
 
   private static async getTipHeader(): Promise<BlockHeader> {
-    const rpcService = new RpcService(NodeService.getInstance().nodeUrl)
+    const rpcService = TransactionGenerator.getRpcService()
     const tipHeader = await rpcService.getTipHeader()
     return tipHeader
+  }
+
+  private static getRpcService(): RpcService {
+    const network = NetworksService.getInstance().getCurrent()
+    return new RpcService(network.remote, network.type)
   }
 
   public static generateDepositTx = async (

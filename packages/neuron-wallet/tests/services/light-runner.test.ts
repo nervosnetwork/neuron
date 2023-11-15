@@ -11,9 +11,8 @@ const dirnameMock = jest.fn()
 const resolveMock = jest.fn()
 const lightDataPathMock = jest.fn()
 const existsSyncMock = jest.fn()
-const readFileSyncMock = jest.fn()
 const mkdirSyncMock = jest.fn()
-const writeFileSyncMock = jest.fn()
+const copyFileSyncMock = jest.fn()
 const createWriteStreamMock = jest.fn()
 const spawnMock = jest.fn()
 const loggerErrorMock = jest.fn()
@@ -21,6 +20,8 @@ const loggerInfoMock = jest.fn()
 const transportsGetFileMock = jest.fn()
 const cleanMock = jest.fn()
 const resetSyncTaskQueueAsyncPushMock = jest.fn()
+const updateTomlMock = jest.fn()
+const getUsablePortMock = jest.fn()
 
 function resetMock() {
   mockFn.mockReset()
@@ -32,9 +33,8 @@ function resetMock() {
   resolveMock.mockReset()
   lightDataPathMock.mockReset()
   existsSyncMock.mockReset()
-  readFileSyncMock.mockReset()
   mkdirSyncMock.mockReset()
-  writeFileSyncMock.mockReset()
+  copyFileSyncMock.mockReset()
   createWriteStreamMock.mockReset()
   spawnMock.mockReset()
   loggerErrorMock.mockReset()
@@ -42,6 +42,8 @@ function resetMock() {
   transportsGetFileMock.mockReset()
   cleanMock.mockReset()
   resetSyncTaskQueueAsyncPushMock.mockReset()
+  updateTomlMock.mockReset()
+  getUsablePortMock.mockReset()
 }
 
 jest.doMock('../../src/env', () => ({
@@ -66,7 +68,7 @@ jest.doMock('../../src/utils/logger', () => ({
 jest.doMock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      get testnetLightDataPath() {
+      getNodeDataPath() {
         return lightDataPathMock()
       },
     }
@@ -97,14 +99,33 @@ jest.doMock('path', () => ({
 
 jest.doMock('fs', () => ({
   existsSync: existsSyncMock,
-  readFileSync: readFileSyncMock,
   mkdirSync: mkdirSyncMock,
-  writeFileSync: writeFileSyncMock,
+  copyFileSync: copyFileSyncMock,
   createWriteStream: createWriteStreamMock,
 }))
 
 jest.doMock('child_process', () => ({
   spawn: spawnMock,
+}))
+
+jest.doMock('services/networks', () => {
+  return {
+    getInstance() {
+      return {
+        getCurrent() {
+          return { remote: '', type: 1 }
+        },
+      }
+    },
+  }
+})
+
+jest.mock('utils/toml', () => ({
+  updateToml: updateTomlMock,
+}))
+
+jest.doMock('../../src/utils/get-usable-port', () => ({
+  getUsablePort: getUsablePortMock,
 }))
 
 const { CKBLightRunner } = require('../../src/services/light-runner')
@@ -186,7 +207,7 @@ describe('test light runner', () => {
       resolveMock.mockReturnValue('resolve')
       expect(CKBLightRunner.getInstance().templateConfigFile).toBe('resolve')
       expect(joinMock).toBeCalledWith('dir', '..', './light')
-      expect(resolveMock).toBeCalledWith('join', './ckb_light.toml')
+      expect(resolveMock).toBeCalledWith('join', './ckb_light_testnet.toml')
     })
     it('app is not packaged', () => {
       isPackagedMock.mockReturnValue(false)
@@ -195,7 +216,7 @@ describe('test light runner', () => {
       resolveMock.mockReturnValue('resolve')
       expect(CKBLightRunner.getInstance().templateConfigFile).toBe('resolve')
       expect(joinMock).toBeCalledWith(lightRunnerDirpath, '../../light')
-      expect(resolveMock).toBeCalledWith('join', './ckb_light.toml')
+      expect(resolveMock).toBeCalledWith('join', './ckb_light_testnet.toml')
     })
   })
 
@@ -209,21 +230,32 @@ describe('test light runner', () => {
     it('configFile is exist', () => {
       existsSyncMock.mockReturnValue(true)
       CKBLightRunner.getInstance().initConfig()
-      expect(readFileSyncMock).toBeCalledTimes(0)
+      expect(copyFileSyncMock).toBeCalledTimes(0)
     })
-    it('configFile is not exist replace store path and network path', () => {
+    it('configFile is not exist and dir not exist', () => {
       existsSyncMock.mockReturnValue(false)
-      readFileSyncMock.mockReturnValue('[store]\npath=aaa\n[network]\npath=bbb')
       lightDataPathMock.mockReturnValue('light-data-path')
       joinMock.mockReturnValue('new-path')
-      resolveMock.mockReturnValue('config')
+      resolveMock.mockImplementation((...v: string[]) => v.join(''))
       CKBLightRunner.getInstance().initConfig()
       expect(mkdirSyncMock).toBeCalledWith('light-data-path', { recursive: true })
-      expect(writeFileSyncMock).toBeCalledWith('config', '[store]\npath = "new-path"\n[network]\npath = "new-path"')
+      expect(copyFileSyncMock).toBeCalledWith('new-path./ckb_light_testnet.toml', 'light-data-path./ckb_light.toml')
+    })
+    it('configFile is not exist and dir exist', () => {
+      existsSyncMock.mockReturnValueOnce(false).mockReturnValueOnce(true)
+      lightDataPathMock.mockReturnValue('light-data-path')
+      joinMock.mockReturnValue('new-path')
+      resolveMock.mockImplementation((...v: string[]) => v.join(''))
+      CKBLightRunner.getInstance().initConfig()
+      expect(mkdirSyncMock).toBeCalledTimes(0)
+      expect(copyFileSyncMock).toBeCalledWith('new-path./ckb_light_testnet.toml', 'light-data-path./ckb_light.toml')
     })
   })
 
   describe('test start', () => {
+    beforeEach(() => {
+      joinMock.mockReturnValue('')
+    })
     it('when runnerProcess is not undefined', async () => {
       const tmp = CKBLightRunner.getInstance().stop
       CKBLightRunner.getInstance().stop = mockFn
@@ -300,6 +332,38 @@ describe('test light runner', () => {
       await CKBLightRunner.getInstance().stop()
       expect(mockFn).toBeCalledWith()
       expect(CKBLightRunner.getInstance().runnerProcess).toBeUndefined()
+    })
+  })
+
+  describe('test update config', () => {
+    it('port is used', async () => {
+      getUsablePortMock.mockResolvedValueOnce(9001)
+      lightDataPathMock.mockReturnValue('lightDataPath')
+      resolveMock.mockImplementation((...v: string[]) => v.join(''))
+      joinMock.mockImplementation((...v: string[]) => v.join(''))
+      await CKBLightRunner.getInstance().updateConfig()
+      expect(CKBLightRunner.getInstance().port).toEqual(9001)
+      expect(updateTomlMock).toHaveBeenCalledWith('lightDataPath./ckb_light.toml', {
+        store: `path = "lightDataPath./store"`,
+        network: `path = "lightDataPath./network"`,
+        rpc: `listen_address = "127.0.0.1:9001"`,
+      })
+      //reset port
+      getUsablePortMock.mockResolvedValueOnce(9000)
+      await CKBLightRunner.getInstance().updateConfig()
+    })
+    it('port is not used', async () => {
+      getUsablePortMock.mockResolvedValueOnce(9000)
+      lightDataPathMock.mockReturnValue('lightDataPath')
+      resolveMock.mockImplementation((...v: string[]) => v.join(''))
+      joinMock.mockImplementation((...v: string[]) => v.join(''))
+      await CKBLightRunner.getInstance().updateConfig()
+      expect(CKBLightRunner.getInstance().port).toEqual(9000)
+      expect(updateTomlMock).toHaveBeenCalledWith('lightDataPath./ckb_light.toml', {
+        store: `path = "lightDataPath./store"`,
+        network: `path = "lightDataPath./network"`,
+        rpc: `listen_address = "127.0.0.1:9000"`,
+      })
     })
   })
 })

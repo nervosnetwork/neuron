@@ -10,6 +10,8 @@ const stubbedLoggerInfo = jest.fn()
 const stubbedLoggerError = jest.fn()
 const stubbedLoggerLog = jest.fn()
 const resetSyncTaskQueueAsyncPushMock = jest.fn()
+const updateTomlMock = jest.fn()
+const getUsablePortMock = jest.fn()
 
 const stubbedProcess: any = {}
 
@@ -21,6 +23,8 @@ const resetMocks = () => {
   stubbedLoggerError.mockReset()
   stubbedLoggerLog.mockReset()
   resetSyncTaskQueueAsyncPushMock.mockReset()
+  updateTomlMock.mockReset()
+  getUsablePortMock.mockReset()
 }
 
 jest.doMock('child_process', () => {
@@ -63,7 +67,9 @@ const ckbDataPath = '/chains/mainnet'
 jest.mock('../../src/services/settings', () => ({
   getInstance() {
     return {
-      ckbDataPath,
+      getNodeDataPath() {
+        return ckbDataPath
+      },
     }
   },
 }))
@@ -80,11 +86,18 @@ jest.doMock('../../src/block-sync-renderer', () => ({
     asyncPush: resetSyncTaskQueueAsyncPushMock,
   },
 }))
+jest.doMock('../../src/utils/toml', () => ({
+  updateToml: updateTomlMock,
+}))
+jest.doMock('../../src/utils/get-usable-port', () => ({
+  getUsablePort: getUsablePortMock,
+}))
 const {
   startCkbNode,
   stopCkbNode,
   getLookingValidTargetStatus,
   migrateCkbData,
+  getNodeUrl,
 } = require('../../src/services/ckb-runner')
 
 describe('ckb runner', () => {
@@ -97,6 +110,7 @@ describe('ckb runner', () => {
     stubbedCkb.stdout = new EventEmitter()
     stubbedSpawn.mockReturnValue(stubbedCkb)
     resetSyncTaskQueueAsyncPushMock.mockReturnValue('')
+    getUsablePortMock.mockImplementation(v => Promise.resolve(v))
   })
   ;[
     { platform: 'win32', platformPath: 'win' },
@@ -231,6 +245,43 @@ describe('ckb runner', () => {
           stubbedCkb.emit('close')
           expect(getLookingValidTargetStatus()).toBeFalsy()
         })
+      })
+
+      it('port is not usable', async () => {
+        stubbedExistsSync.mockReturnValue(true)
+        getUsablePortMock.mockReset()
+        getUsablePortMock.mockImplementation(v => Promise.resolve(v)).mockResolvedValueOnce(8114)
+        await startCkbNode()
+        expect(getNodeUrl()).toBe('http://127.0.0.1:8114')
+        expect(getUsablePortMock).toHaveBeenLastCalledWith(8115)
+        expect(updateTomlMock).toBeCalledWith(path.join('/chains/mainnet', 'ckb.toml'), {
+          rpc: `listen_address = "127.0.0.1:8114"`,
+          network: `listen_addresses = ["/ip4/0.0.0.0/tcp/8115"]`,
+        })
+        const promise = stopCkbNode()
+        stubbedCkb.emit('close')
+        await promise
+      })
+
+      it('port is usable', async () => {
+        stubbedExistsSync.mockReturnValue(true)
+        getUsablePortMock.mockResolvedValueOnce(8115).mockResolvedValueOnce(8116)
+        await startCkbNode()
+        expect(getNodeUrl()).toBe('http://127.0.0.1:8115')
+        expect(getUsablePortMock).toHaveBeenLastCalledWith(8116)
+        expect(updateTomlMock).toBeCalledWith(path.join('/chains/mainnet', 'ckb.toml'), {
+          rpc: `listen_address = "127.0.0.1:8115"`,
+          network: `listen_addresses = ["/ip4/0.0.0.0/tcp/8116"]`,
+        })
+        let promise = stopCkbNode()
+        stubbedCkb.emit('close')
+        await promise
+        // reset port
+        getUsablePortMock.mockResolvedValueOnce(8114).mockResolvedValueOnce(8115)
+        await startCkbNode()
+        promise = stopCkbNode()
+        stubbedCkb.emit('close')
+        await promise
       })
     })
   })

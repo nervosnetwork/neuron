@@ -1,19 +1,19 @@
 import { HexString } from '@ckb-lumos/base'
-import CKBRPC from '@nervosnetwork/ckb-sdk-rpc'
-import Method from '@nervosnetwork/ckb-sdk-rpc/lib/method'
-import resultFormatter from '@nervosnetwork/ckb-sdk-rpc/lib/resultFormatter'
-import paramsFormatter from '@nervosnetwork/ckb-sdk-rpc/lib/paramsFormatter'
-import Base from '@nervosnetwork/ckb-sdk-rpc/lib/Base'
+import { CKBRPC } from '@ckb-lumos/rpc'
+import { Method } from '@ckb-lumos/rpc/lib/method'
+import * as resultFormatter from '@ckb-lumos/rpc/lib/resultFormatter'
+import { formatter as paramsFormatter } from '@ckb-lumos/rpc/lib/paramsFormatter'
+import { Base } from '@ckb-lumos/rpc/lib/Base'
 import {
   MethodInBatchNotFoundException,
   PayloadInBatchException,
   IdNotMatchedInBatchException,
-} from '@nervosnetwork/ckb-sdk-rpc/lib/exceptions'
+} from '@ckb-lumos/rpc/lib/exceptions'
 import https from 'https'
 import http from 'http'
 import { request } from 'undici'
-import { BUNDLED_LIGHT_CKB_URL, LIGHT_CLIENT_TESTNET } from './const'
 import CommonUtils from './common'
+import { NetworkType } from '../models/network'
 
 export interface LightScriptFilter {
   script: CKBComponents.Script
@@ -137,6 +137,8 @@ export type FetchTransactionReturnType = {
 export class LightRPC extends Base {
   setScripts: (params: LightScriptFilter[]) => Promise<null>
   getScripts: () => Promise<LightScriptSyncStatus[]>
+  // TODO: the type is not the same as full node here
+  // @ts-ignore
   getTransactions: (
     searchKey: { script: CKBComponents.Script; scriptType: CKBRPC.ScriptType; blockRange: [HexString, HexString] },
     order: 'asc' | 'desc',
@@ -164,7 +166,10 @@ export class LightRPC extends Base {
     })
 
     Object.keys(this.rpcProperties).forEach(name => {
-      this.addMethod({ name, ...this.rpcProperties[name] })
+      // don't add default getTransactions method
+      if (name !== 'getTransactions') {
+        this.addMethod({ name, ...this.rpcProperties[name] })
+      }
     })
 
     this.setScripts = new Method(this.node, { name: 'setScripts', ...lightRPCProperties['setScripts'] }).call
@@ -228,10 +233,7 @@ export class LightRPC extends Base {
   }
 
   getBlockchainInfo = async () => {
-    await this.localNodeInfo()
-    return {
-      chain: LIGHT_CLIENT_TESTNET,
-    } as CKBComponents.BlockchainInfo
+    throw new Error('Light network can not get chain info')
   }
 
   #node: CKBComponents.Node = {
@@ -330,6 +332,10 @@ export class LightRPC extends Base {
           })
           const batchRes = await res.body.json()
 
+          if (!Array.isArray(batchRes)) {
+            return []
+          }
+
           return batchRes.map((res: any, i: number) => {
             if (res.id !== payload[i].id) {
               return new IdNotMatchedInBatchException(i, payload[i].id, res.id)
@@ -368,9 +374,9 @@ const getHttpAgent = () => {
   return httpAgent
 }
 
-export const generateRPC = (url: string) => {
+export const generateRPC = (url: string, type: NetworkType) => {
   let rpc: LightRPC | FullCKBRPC
-  if (url === BUNDLED_LIGHT_CKB_URL) {
+  if (type === NetworkType.Light) {
     rpc = new LightRPC(url)
   } else {
     rpc = new FullCKBRPC(url)

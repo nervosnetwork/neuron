@@ -32,7 +32,6 @@ import HardwareWalletService from '../services/hardware'
 import { DeviceInfo, ExtendedPublicKey } from '../services/hardware/common'
 import AddressParser from '../models/address-parser'
 import MultisigConfigModel from '../models/multisig-config'
-import NodeService from '../services/node'
 import { generateRPC } from '../utils/ckb-rpc'
 
 export default class WalletsController {
@@ -119,7 +118,8 @@ export default class WalletsController {
     )
 
     const walletsService = WalletsService.getInstance()
-    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     let startBlockNumber: string | undefined = undefined
     if (!isImporting) {
       try {

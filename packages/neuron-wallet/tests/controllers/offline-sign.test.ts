@@ -197,6 +197,18 @@ describe('OfflineSignController', () => {
       }
     })
 
+    jest.doMock('../../src/services/networks', () => {
+      return {
+        getInstance() {
+          return {
+            getCurrent() {
+              return { remote: '', type: 1 }
+            },
+          }
+        },
+      }
+    })
+
     const OfflineSignController = require('../../src/controllers/offline-sign').default
     offlineSignController = new OfflineSignController()
   })

@@ -175,7 +175,7 @@ declare namespace State {
     name: string
     remote: string
     chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
-    type: 0 | 1 | 2
+    type: 0 | 1 | 2 // 0 for default node, 1 for full node, 2 for light client, ref: NetworkType in utils/const.ts
     genesisHash: string
     readonly: boolean
   }

@@ -44,6 +44,8 @@ import { ReactComponent as OverviewSendSvg } from './OverviewSend.svg'
 import { ReactComponent as OverviewReceiveSvg } from './OverviewReceive.svg'
 import { ReactComponent as AddressbookSvg } from './Addressbook.svg'
 import { ReactComponent as AddSvg } from './Add.svg'
+import { ReactComponent as AddSimpleSvg } from './AddSimple.svg'
+import { ReactComponent as SwitchSvg } from './Switch.svg'
 
 import styles from './icon.module.scss'
 
@@ -104,3 +106,5 @@ export const OverviewSend = WrapSvg(OverviewSendSvg)
 export const OverviewReceive = WrapSvg(OverviewReceiveSvg)
 export const Addressbook = WrapSvg(AddressbookSvg)
 export const Add = WrapSvg(AddSvg)
+export const Switch = WrapSvg(SwitchSvg)
+export const AddSimple = WrapSvg(AddSimpleSvg)

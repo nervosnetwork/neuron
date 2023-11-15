@@ -12,10 +12,12 @@ const NetworkEditorDialog = ({
   onCancel,
   id,
   onSuccess,
+  url,
 }: {
   onCancel: () => void
   id: 'new' | string
   onSuccess: () => void
+  url?: string
 }) => {
   const {
     settings: { networks = [] },
@@ -31,7 +33,7 @@ const NetworkEditorDialog = ({
   const [editor, setEditor] = useState({
     name: '',
     nameError: '',
-    url: '',
+    url: url ?? '',
     urlError: '',
   })
   const [isUpdating, setIsUpdating] = useState(false)
@@ -115,6 +117,7 @@ const NetworkEditorDialog = ({
           error={editor.urlError}
           placeholder={t('settings.network.edit-network.input-rpc')}
           autoFocus
+          disabled={!!url}
         />
         <TextField
           value={editor.name}

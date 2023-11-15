@@ -1,4 +1,5 @@
 import { bytes } from '@ckb-lumos/codec'
+import 'dotenv/config'
 
 const stubbedRPCServiceConstructor = jest.fn()
 const stubbedWalletsServiceConstructor = jest.fn()
@@ -95,6 +96,18 @@ jest.doMock('services/multisig', () => {
   }
 })
 
+jest.doMock('services/networks', () => {
+  return {
+    getInstance() {
+      return {
+        getCurrent() {
+          return { remote: '', type: 1 }
+        },
+      }
+    },
+  }
+})
+
 jest.mock('../../../src/models/system-script-info', () => {
   const originalModule = jest.requireActual('../../../src/models/system-script-info')
   return {
@@ -132,11 +145,16 @@ jest.doMock('services/hardware', () => ({
   }),
 }))
 
-jest.doMock('@nervosnetwork/ckb-sdk-core', () => {
-  return function () {
-    return {
-      calculateDaoMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
-    }
+jest.doMock('@ckb-lumos/rpc', () => {
+  return {
+    CKBRPC: class CKBRPC {
+      url: string
+      constructor(url: string) {
+        this.url = url
+      }
+
+      calculateDaoMaximumWithdraw = stubbedCalculateDaoMaximumWithdraw
+    },
   }
 })
 

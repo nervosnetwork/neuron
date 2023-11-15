@@ -9,6 +9,7 @@ import {
   currentWallet as currentWalletCache,
   currentNetworkID as currentNetworkIDCache,
   networks as networksCache,
+  lastShowInternalNodeIds,
 } from 'services/localCache'
 
 export const initAppState = () => (dispatch: StateDispatch, navigate: any) => {
@@ -48,6 +49,10 @@ export const initAppState = () => (dispatch: StateDispatch, navigate: any) => {
         addressesCache.save(addresses)
         networksCache.save(networks)
         currentNetworkIDCache.save(currentNetworkID)
+        const currentNetwork = (networks as State.Network[]).find(v => v.id === currentNetworkID)
+        if (currentNetwork) {
+          lastShowInternalNodeIds.save(currentNetwork.type, currentNetworkID)
+        }
       } else {
         navigate(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
       }

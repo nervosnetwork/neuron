@@ -289,17 +289,17 @@ export default class ApiController {
       }
     })
 
-    handle('is-ckb-run-external', () => {
-      return {
-        status: ResponseCode.Success,
-        result: NodeService.getInstance().isCkbNodeExternal,
-      }
-    })
-
     handle('verify-external-ckb-node', async () => {
       return {
         status: ResponseCode.Success,
         result: await NodeService.getInstance().verifyExternalCkbNode(),
+      }
+    })
+
+    handle('start-node-ignore-external', async () => {
+      await this.#networksController.startNodeIgnoreExternal()
+      return {
+        status: ResponseCode.Success,
       }
     })
 
@@ -520,6 +520,10 @@ export default class ApiController {
       return this.#customizedAssetsController.generateTransferNftTx(params)
     })
 
+    handle('generate-transfer-spore-tx', async (_, params: Controller.Params.GenerateTransferNftTxParams) => {
+      return this.#customizedAssetsController.generateTransferSporeTx(params)
+    })
+
     // Networks
 
     handle('get-all-networks', async () => {
@@ -584,7 +588,7 @@ export default class ApiController {
     handle('get-ckb-node-data-path', () => {
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath,
+        result: SettingsService.getInstance().getNodeDataPath(),
       }
     })
 
@@ -596,11 +600,11 @@ export default class ApiController {
         }
       }
       await cleanChain()
-      SettingsService.getInstance().ckbDataPath = dataPath
+      SettingsService.getInstance().setNodeDataPath(dataPath)
       await startMonitor('ckb', true)
       return {
         status: ResponseCode.Success,
-        result: SettingsService.getInstance().ckbDataPath,
+        result: SettingsService.getInstance().getNodeDataPath(),
       }
     })
 

@@ -43,12 +43,17 @@ win:
       to: "bin/ckb.exe"
     - from: "bin/win/ckb-light-client.exe"
       to: "bin/ckb-light-client.exe"
-    - from: "light/ckb_light.toml"
-      to: "light/ckb_light.toml"
+    - from: "light/ckb_light_testnet.toml"
+      to: "light/ckb_light_testnet.toml"
+    - from: "light/ckb_light_mainnet.toml"
+      to: "light/ckb_light_mainnet.toml"
   target:
     - target: nsis
       arch:
         - x64
+  sign: scripts/customSign.js
+  signingHashAlgorithms:
+    - sha256
 
 mac:
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
@@ -59,8 +64,10 @@ mac:
       to: "bin/ckb"
     - from: "bin/mac/ckb-light-client"
       to: "bin/ckb-light-client"
-    - from: "light/ckb_light.toml"
-      to: "light/ckb_light.toml"
+    - from: "light/ckb_light_testnet.toml"
+      to: "light/ckb_light_testnet.toml"
+    - from: "light/ckb_light_mainnet.toml"
+      to: "light/ckb_light_mainnet.toml"
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
@@ -81,7 +88,9 @@ linux:
       to: "bin/ckb"
     - from: "bin/linux/ckb-light-client"
       to: "bin/ckb-light-client"
-    - from: "light/ckb_light.toml"
-      to: "light/ckb_light.toml"
+    - from: "light/ckb_light_testnet.toml"
+      to: "light/ckb_light_testnet.toml"
+    - from: "light/ckb_light_mainnet.toml"
+      to: "light/ckb_light_mainnet.toml"
   target:
     - AppImage

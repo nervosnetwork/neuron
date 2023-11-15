@@ -16,7 +16,8 @@ import { SyncAddressType } from '../../database/chain/entities/sync-progress'
 import WalletService from '../../services/wallets'
 import AssetAccountInfo from '../../models/asset-account-info'
 import { DepType } from '../../models/chain/cell-dep'
-import { molecule, number } from '@ckb-lumos/codec'
+import { molecule } from '@ckb-lumos/codec'
+import { blockchain } from '@ckb-lumos/base'
 
 interface SyncQueueParam {
   script: CKBComponents.Script
@@ -25,15 +26,7 @@ interface SyncQueueParam {
   cursor?: HexString
 }
 
-const unpackGroup = molecule.vector(
-  molecule.struct(
-    {
-      tx_hash: number.Uint256BE,
-      index: number.Uint32LE,
-    },
-    ['tx_hash', 'index']
-  )
-)
+const unpackGroup = molecule.vector(blockchain.OutPoint)
 
 export default class LightConnector extends Connector<CKBComponents.Hash> {
   private lightRpc: LightRPC
@@ -69,6 +62,8 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       assetAccountInfo.getNftIssuerInfo().cellDep,
       assetAccountInfo.getLegacyAnyoneCanPayInfo().cellDep,
       assetAccountInfo.getChequeInfo().cellDep,
+      ...assetAccountInfo.getSporeInfos().map(info => info.cellDep),
+      ...assetAccountInfo.getSporeClusterInfo().map(info => info.cellDep),
     ]
     const fetchTxHashes = fetchCellDeps.map(v => v.outPoint.txHash).map<[string, string]>(v => ['fetchTransaction', v])
     const txs = await this.lightRpc
@@ -91,9 +86,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
 
   private async fetchDepCell() {
     const depGroupOutputsData: string[] = await this.getDepTxs()
-    const depGroupTxHashes = [
-      ...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.tx_hash.toHexString())).flat()),
-    ]
+    const depGroupTxHashes = [...new Set(depGroupOutputsData.map(v => unpackGroup.unpack(v).map(v => v.txHash)).flat())]
     if (depGroupTxHashes.length) {
       await this.lightRpc
         .createBatchRequest<any, string[], FetchTransactionReturnType[]>(

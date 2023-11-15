@@ -1,8 +1,6 @@
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses'
-import NodeService from './node'
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
-import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
+import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
 import RpcService from '../services/rpc-service'
@@ -21,6 +19,7 @@ import Script from '../models/chain/script'
 import Multisig from '../models/multisig'
 import Blake2b from '../models/blake2b'
 import logger from '../utils/logger'
+import { signWitnesses } from '../utils/signWitnesses'
 import { bytes as byteUtils, bytes, number } from '@ckb-lumos/codec'
 import SystemScriptInfo from '../models/system-script-info'
 import AddressParser from '../models/address-parser'
@@ -28,10 +27,10 @@ import HardwareWalletService from './hardware'
 import {
   CapacityNotEnoughForChange,
   CapacityNotEnoughForChangeByTransfer,
+  CellIsNotYetLive,
   MultisigConfigNeedError,
   NoMatchAddressForSign,
   SignTransactionFailed,
-  CellIsNotYetLive,
   TransactionIsNotCommittedYet,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
@@ -42,9 +41,11 @@ import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
-import CKB from '@nervosnetwork/ckb-sdk-core'
+import { CKBRPC } from '@ckb-lumos/rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
+import { getClusterCellByOutPoint } from '@spore-sdk/core'
+import CellDep, { DepType } from '../models/chain/cell-dep'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -91,7 +92,8 @@ export default class TransactionSender {
   }
 
   public async broadcastTx(walletID: string = '', tx: Transaction) {
-    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
@@ -216,7 +218,8 @@ export default class TransactionSender {
         wit.lock = serializedMultisig + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
       } else {
-        signed = signWitnesses(privateKey)({
+        signed = signWitnesses({
+          privateKey,
           transactionHash: txHash,
           witnesses: serializedWitnesses.map(wit => {
             if (typeof wit === 'string') {
@@ -557,6 +560,51 @@ export default class TransactionSender {
     return tx
   }
 
+  public generateTransferSporeTx = async (
+    walletId: string,
+    outPoint: OutPoint,
+    receiveAddress: string,
+    fee: string = '0',
+    feeRate: string = '0'
+  ): Promise<Transaction> => {
+    const changeAddress: string = await this.getChangeAddress()
+    const nftCellOutput = await CellsService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index))
+    if (!nftCellOutput) {
+      throw new CellIsNotYetLive()
+    }
+
+    const assetAccountInfo = new AssetAccountInfo()
+    // const rpcUrl: string = NodeService.getInstance().nodeUrl
+    const rpcUrl = NetworksService.getInstance().getCurrent().remote
+
+    // https://github.com/sporeprotocol/spore-sdk/blob/05f2cbe1c03d03e334ebd3b440b5b3b20ec67da7/packages/core/src/api/joints/spore.ts#L154-L158
+    const clusterDep = await (async () => {
+      const clusterCell = await getClusterCellByOutPoint(outPoint, assetAccountInfo.getSporeConfig(rpcUrl)).then(
+        _ => _,
+        () => undefined
+      )
+
+      if (!clusterCell?.outPoint) {
+        return undefined
+      }
+
+      return new CellDep(OutPoint.fromSDK(clusterCell.outPoint), DepType.Code)
+    })()
+
+    const tx = await TransactionGenerator.generateTransferNftTx(
+      walletId,
+      outPoint,
+      nftCellOutput,
+      receiveAddress,
+      changeAddress,
+      fee,
+      feeRate,
+      [assetAccountInfo.getSporeInfos()[0].cellDep].concat(clusterDep ?? [])
+    )
+
+    return tx
+  }
+
   public generateDepositTx = async (
     walletID: string = '',
     capacity: string,
@@ -590,8 +638,8 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
     const depositeOutput = await CellsService.getLiveCell(outPoint)
     if (!depositeOutput) {
       throw new CellIsNotYetLive()
@@ -632,8 +680,8 @@ export default class TransactionSender {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
 
     const withdrawOutput = await CellsService.getLiveCell(withdrawingOutPoint)
     if (!withdrawOutput) {
@@ -761,8 +809,8 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
     const locktimeOutput = await CellsService.getLiveCell(outPoint)
     if (!locktimeOutput) {
       throw new CellIsNotYetLive()
@@ -791,9 +839,9 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawBlockHash: string
   ): Promise<bigint> => {
-    const ckb = new CKB(NodeService.getInstance().nodeUrl)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const ckb = new CKBRPC(currentNetwork.remote)
     const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
-
     return BigInt(result)
   }
 

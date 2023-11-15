@@ -48,8 +48,8 @@ type Action =
   | 'start-process-monitor'
   | 'is-dark'
   | 'set-theme'
-  | 'is-ckb-run-external'
   | 'verify-external-ckb-node'
+  | 'start-node-ignore-external'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -151,6 +151,8 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
   | 'get-sync-progress-by-addresses'
+  // spore
+  | 'generate-transfer-spore-tx'
 
 export const remoteApi =
   <P = any, R = any>(action: Action) =>

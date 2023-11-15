@@ -6,6 +6,10 @@ import logger from '../utils/logger'
 import SettingsService from '../services/settings'
 import { clean } from '../database/chain'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
+import { getUsablePort } from '../utils/get-usable-port'
+import { updateToml } from '../utils/toml'
+import { BUNDLED_URL_PREFIX, LIGHT_CLIENT_MAINNET } from '../utils/const'
+import NetworksService from './networks'
 
 const { app } = env
 
@@ -20,6 +24,7 @@ abstract class NodeRunner {
   protected runnerProcess: ChildProcess | undefined
   protected static instance: NodeRunner | undefined
   protected abstract binaryName: string
+  protected abstract _port: number
   static getInstance(): NodeRunner {
     throw new Error('should be called by concrete class')
   }
@@ -34,6 +39,14 @@ abstract class NodeRunner {
       ? path.resolve(appPath, `./${this.binaryName}`)
       : path.resolve(appPath, `./${this.platform()}`, `./${this.binaryName}`)
     return this.platform() === 'win' ? binary + '.exe' : binary
+  }
+
+  get port() {
+    return this._port
+  }
+
+  get nodeUrl() {
+    return `${BUNDLED_URL_PREFIX}${this._port}`
   }
 
   platform(): string {
@@ -67,6 +80,7 @@ export class CKBLightRunner extends NodeRunner {
   protected networkType: NetworkType = NetworkType.Light
   protected binaryName: string = 'ckb-light-client'
   protected logStream?: fs.WriteStream
+  protected _port: number = 9000
 
   static getInstance(): CKBLightRunner {
     if (!CKBLightRunner.instance) {
@@ -79,11 +93,15 @@ export class CKBLightRunner extends NodeRunner {
     const appPath = app.isPackaged
       ? path.join(path.dirname(app.getAppPath()), '..', './light')
       : path.join(__dirname, '../../light')
-    return path.resolve(appPath, './ckb_light.toml')
+    const network = NetworksService.getInstance().getCurrent()
+    return path.resolve(
+      appPath,
+      network.chain === LIGHT_CLIENT_MAINNET ? 'ckb_light_mainnet.toml' : './ckb_light_testnet.toml'
+    )
   }
 
   private get configFile() {
-    return path.resolve(SettingsService.getInstance().testnetLightDataPath, './ckb_light.toml')
+    return path.resolve(SettingsService.getInstance().getNodeDataPath(), './ckb_light.toml')
   }
 
   initConfig() {
@@ -91,29 +109,22 @@ export class CKBLightRunner extends NodeRunner {
       logger.info(`CKB Light Runner:\tconfig has init, skip init...`)
       return
     }
-    const values = fs.readFileSync(this.templateConfigFile).toString().split('\n')
-    let isStorePath = false
-    let isNetworkPath = false
-    const newValues = values.map(v => {
-      if (isStorePath) {
-        isStorePath = false
-        return `path = "${path.join(SettingsService.getInstance().testnetLightDataPath, './store')}"`
-      }
-      if (isNetworkPath) {
-        isNetworkPath = false
-        return `path = "${path.join(SettingsService.getInstance().testnetLightDataPath, './network')}"`
-      }
-      if (v === '[store]') {
-        isStorePath = true
-      } else if (v === '[network]') {
-        isNetworkPath = true
-      }
-      return v
-    })
-    if (!fs.existsSync(SettingsService.getInstance().testnetLightDataPath)) {
-      fs.mkdirSync(SettingsService.getInstance().testnetLightDataPath, { recursive: true })
+    if (!fs.existsSync(SettingsService.getInstance().getNodeDataPath())) {
+      fs.mkdirSync(SettingsService.getInstance().getNodeDataPath(), { recursive: true })
     }
-    fs.writeFileSync(this.configFile, newValues.join('\n'))
+    fs.copyFileSync(this.templateConfigFile, this.configFile)
+  }
+
+  async updateConfig() {
+    const usablePort = await getUsablePort(this._port)
+    this._port = usablePort
+    const storePath = path.join(SettingsService.getInstance().getNodeDataPath(), './store')
+    const networkPath = path.join(SettingsService.getInstance().getNodeDataPath(), './network')
+    updateToml(this.configFile, {
+      store: `path = "${this.platform() === 'win' ? storePath.replace(/\\/g, '\\\\') : storePath}"`,
+      network: `path = "${this.platform() === 'win' ? networkPath.replace(/\\/g, '\\\\') : networkPath}"`,
+      rpc: `listen_address = "127.0.0.1:${usablePort}"`,
+    })
   }
 
   async start() {
@@ -122,8 +133,10 @@ export class CKBLightRunner extends NodeRunner {
       await this.stop()
     }
     this.initConfig()
+    await this.updateConfig()
 
     const options = ['run', '--config-file', this.configFile]
+    logger.info(`CKB Light Runner:\tckb light node will start with rpc port ${this._port}, with options`, options)
     const runnerProcess = spawn(this.binary, options, {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { RUST_LOG: 'info', ckb_light_client: 'info' },
@@ -162,7 +175,7 @@ export class CKBLightRunner extends NodeRunner {
 
   async clearNodeCache(): Promise<void> {
     await this.stop()
-    fs.rmSync(SettingsService.getInstance().testnetLightDataPath, { recursive: true, force: true })
+    fs.rmSync(SettingsService.getInstance().getNodeDataPath(), { recursive: true, force: true })
     await clean(true)
     await this.start()
     resetSyncTaskQueue.asyncPush(true)
