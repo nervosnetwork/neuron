@@ -1,3 +1,35 @@
+# 0.111.1 (2023-11-08)
+
+### CKB Node & Light Client
+
+- [CKB@v0.111.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.111.0) was released on Sep. 14nd, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.0](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.0) was released on Nov. 2nd, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+#### Important
+
+◆ **CKB Light Client on Mainnet** is active and available in Neuron 👏. See how to enable Light Client on Mainnet on YouTube: https://www.youtube.com/watch?v=Vl2LGRNqnvk
+
+[![Light Client on Mainnet](https://github.com/nervosnetwork/neuron/assets/7271329/97fb7848-350d-4d45-ab2d-1e79dd3c9716)](https://www.youtube.com/watch?v=Vl2LGRNqnvk)
+
+#### Caveat
+
+◆ "Internal Node" network option is reserved for the built-in CKB node for clarity, and won't be connected to an external CKB node anymore.
+
+### Assumed valid target
+
+Block before `0x79cecdd6f41361e2474290224751284312a018528d1d92f4e18dd6d542feddfe`(at height `11,204,206`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/2923)
+
+---
+
+## New features
+
+- #2913: Use KeyLocker to sign Neuron for Windows, conforming to the new industry standards effective since June 1, 2023.(@keith-cy)
+- #2921: Add network option of "Light Client(Mainnet)", and reserve "Internal Node" for built-in CKB Node only.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.111.0...v0.111.1
+
+
 # 0.111.0 (2023-10-19)
 
 ### CKB Node & Light Client
@@ -17,9 +49,9 @@ Block before `0xd5e25ad24400f237aa5f72f3738a9ae77fe082a89937e75143fcc8ef5b009383
 
 ## Bug fixes
 
-* #2869: Add a dialog for migration.(@yanguoyu)
-* #2870: Fix width of navbar.(@yanguoyu)
-* #2873: Fix fallback font on Linux.(@yanguoyu)
+- #2869: Add a dialog for migration.(@yanguoyu)
+- #2870: Fix width of navbar.(@yanguoyu)
+- #2873: Fix fallback font on Linux.(@yanguoyu)
 
 
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.110.3...v0.111.0

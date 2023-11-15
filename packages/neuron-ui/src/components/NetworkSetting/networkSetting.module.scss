@@ -25,6 +25,12 @@
     background: var(--table-head-background-color);
     border: 1px solid var(--divide-line-color);
     border-radius: 40px;
+    display: flex;
+    align-items: center;
+
+    & > svg {
+      margin-left: 4px;
+    }
   }
 }
 
@@ -43,5 +49,13 @@
   button {
     @include icon-hover-button;
     visibility: hidden;
+
+    & > svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  .switch {
+    margin-right: 32px;
   }
 }

@@ -1,5 +1,4 @@
 import { getConnection } from 'typeorm'
-import { initConnection } from '../../src/database/chain/ormconfig'
 
 const stubbedSyncedBlockNumberSubjectNext = jest.fn()
 const stubbedLoggerInfo = jest.fn()
@@ -8,6 +7,14 @@ const resetMocks = () => {
   stubbedSyncedBlockNumberSubjectNext.mockReset()
   stubbedLoggerInfo.mockReset()
 }
+
+jest.doMock('utils/logger', () => {
+  return {
+    info: stubbedLoggerInfo,
+  }
+})
+
+import { initConnection } from '../../src/database/chain/ormconfig'
 
 describe('SyncedBlockNumber model', () => {
   let SyncedBlockNumber: any
@@ -30,11 +37,6 @@ describe('SyncedBlockNumber model', () => {
         getSubject: () => ({
           next: stubbedSyncedBlockNumberSubjectNext,
         }),
-      }
-    })
-    jest.doMock('utils/logger', () => {
-      return {
-        info: stubbedLoggerInfo,
       }
     })
     SyncedBlockNumber = require('../../src/models/synced-block-number').default

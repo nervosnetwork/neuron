@@ -27,7 +27,7 @@ import {
   ConnectionStatus,
   sporeFormatter,
 } from 'utils'
-import { LIGHT_NETWORK_TYPE, HIDE_BALANCE } from 'utils/const'
+import { NetworkType, HIDE_BALANCE } from 'utils/const'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
@@ -152,7 +152,7 @@ const SpecialAssetList = () => {
   const { suggestFeeRate } = useGetCountDownAndFeeRateStats()
   const isMainnet = isMainnetUtil(networks, networkID)
   const isLightClient = useMemo(
-    () => networks.find(n => n.id === networkID)?.type === LIGHT_NETWORK_TYPE,
+    () => networks.find(n => n.id === networkID)?.type === NetworkType.Light,
     [networkID, networks]
   )
   const foundTokenInfo = tokenInfoList.find(token => token.tokenID === accountToClaim?.account.tokenID)

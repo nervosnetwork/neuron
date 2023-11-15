@@ -19,6 +19,7 @@ export default class NetworksController {
       .pipe(distinctUntilChanged(), skip(1))
       .subscribe(async (connected: boolean) => {
         if (connected) {
+          logger.debug('Network:\tconnected successfully')
           await networksService.update(networksService.getCurrentID(), {})
           this.notifyListChange()
           await this.connectToNetwork(true)
@@ -109,6 +110,14 @@ export default class NetworksController {
     }
   }
 
+  public async startNodeIgnoreExternal() {
+    this.notifyCurrentNetworkChange()
+    if (!env.isTestMode) {
+      await NodeService.getInstance().startNodeIgnoreExternal()
+      await NetworksService.getInstance().updateInternalRemote()
+    }
+  }
+
   public currentID() {
     const currentID = networksService.getCurrentID()
     if (currentID) {
@@ -149,7 +158,8 @@ export default class NetworksController {
     const id = networksService.getCurrentID()
     const network = await networksService.update(id, {})
     const genesisHashMatched = await new ChainInfo(network).load()
+    const isNodeMatched = !network.readonly || (reconnected && NodeService.getInstance().startedBundledNode)
 
-    await switchToNetwork(network, reconnected, genesisHashMatched)
+    await switchToNetwork(network, reconnected, genesisHashMatched && isNodeMatched)
   }
 }

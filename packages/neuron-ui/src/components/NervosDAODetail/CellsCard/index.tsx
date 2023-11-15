@@ -1,11 +1,11 @@
 import React, { FC, useMemo, useState } from 'react'
 import Tabs, { VariantProps } from 'widgets/Tabs'
-import { clsx, localNumberFormatter, shannonToCKBFormatter } from 'utils'
+import { clsx, localNumberFormatter, shannonToCKBFormatter, isMainnet as isMainnetUtils } from 'utils'
 import { useTranslation } from 'react-i18next'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { onEnter } from 'utils/inputDevice'
 import { EyesClose, EyesOpen } from 'widgets/Icons/icon'
-import { HIDE_BALANCE, MAINNET_TAG } from 'utils/const'
+import { HIDE_BALANCE } from 'utils/const'
 import ScriptTag from 'components/ScriptTag'
 import LockInfoDialog from 'components/LockInfoDialog'
 import { useState as useGlobalState } from 'states'
@@ -24,8 +24,7 @@ const TabsVariantWithCellsCard: FC<
     chain: { networkID },
     settings: { networks },
   } = useGlobalState()
-  const network = networks.find(n => n.id === networkID)
-  const isMainnet = network != null && network.chain === MAINNET_TAG
+  const isMainnet = isMainnetUtils(networks, networkID)
 
   const [isPrivacyMode, setIsPrivacyMode] = useState(false)
   const [showingLockInfo, setShowingLockInfo] = useState<CKBComponents.Script | null>(null)

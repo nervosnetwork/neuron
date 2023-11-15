@@ -4,6 +4,7 @@ import NetworksService from '../services/networks'
 import RpcService from '../services/rpc-service'
 import Script, { ScriptHashType } from './chain/script'
 import { systemScripts } from '../utils/systemScripts'
+import { NetworkType } from './network'
 
 export default class SystemScriptInfo {
   static SECP_CODE_HASH = process.env.SECP256K1_CODE_HASH!
@@ -38,36 +39,36 @@ export default class SystemScriptInfo {
 
   // need network url and genesisBlockHash
   public async getSecpCellDep(
-    network: { remote: string; genesisHash: string } = NetworksService.getInstance().getCurrent()
+    network: { remote: string; genesisHash: string; type: NetworkType } = NetworksService.getInstance().getCurrent()
   ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     let outPoint = this.secpOutPointInfo.get(genesisBlockHash)
     if (!outPoint) {
-      await this.loadInfos(network.remote)
+      await this.loadInfos(network.remote, network.type)
       outPoint = this.secpOutPointInfo.get(genesisBlockHash)!
     }
     return new CellDep(outPoint, DepType.DepGroup)
   }
 
   public async getDaoCellDep(
-    network: { remote: string; genesisHash: string } = NetworksService.getInstance().getCurrent()
+    network: { remote: string; genesisHash: string; type: NetworkType } = NetworksService.getInstance().getCurrent()
   ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     let outPoint = this.daoOutPointInfo.get(genesisBlockHash)
     if (!outPoint) {
-      await this.loadInfos(network.remote)
+      await this.loadInfos(network.remote, network.type)
       outPoint = this.daoOutPointInfo.get(genesisBlockHash)!
     }
     return new CellDep(outPoint, DepType.Code)
   }
 
   public async getMultiSignCellDep(
-    network: { remote: string; genesisHash: string } = NetworksService.getInstance().getCurrent()
+    network: { remote: string; genesisHash: string; type: NetworkType } = NetworksService.getInstance().getCurrent()
   ): Promise<CellDep> {
     const genesisBlockHash = network.genesisHash
     let outPoint = this.multiSignOutPointInfo.get(genesisBlockHash)
     if (!outPoint) {
-      await this.loadInfos(network.remote)
+      await this.loadInfos(network.remote, network.type)
       outPoint = this.multiSignOutPointInfo.get(genesisBlockHash)!
     }
     return new CellDep(outPoint, DepType.DepGroup)
@@ -100,8 +101,8 @@ export default class SystemScriptInfo {
     return script.codeHash === SystemScriptInfo.DAO_CODE_HASH && script.hashType === SystemScriptInfo.DAO_HASH_TYPE
   }
 
-  private async loadInfos(url: string): Promise<void> {
-    const rpcService = new RpcService(url)
+  private async loadInfos(url: string, type: NetworkType): Promise<void> {
+    const rpcService = new RpcService(url, type)
     const genesisBlock = (await rpcService.getGenesisBlock())!
     const genesisBlockHash = genesisBlock.header.hash
 

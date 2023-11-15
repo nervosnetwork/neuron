@@ -1,4 +1,3 @@
-import NodeService from './node'
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
 import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
@@ -93,7 +92,8 @@ export default class TransactionSender {
   }
 
   public async broadcastTx(walletID: string = '', tx: Transaction) {
-    const rpc = generateRPC(NodeService.getInstance().nodeUrl)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
     await rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
@@ -637,8 +637,8 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
     const depositeOutput = await CellsService.getLiveCell(outPoint)
     if (!depositeOutput) {
       throw new CellIsNotYetLive()
@@ -679,8 +679,8 @@ export default class TransactionSender {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
 
     const withdrawOutput = await CellsService.getLiveCell(withdrawingOutPoint)
     if (!withdrawOutput) {
@@ -808,8 +808,8 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().nodeUrl
-    const rpcService = new RpcService(url)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(currentNetwork.remote, currentNetwork.type)
     const locktimeOutput = await CellsService.getLiveCell(outPoint)
     if (!locktimeOutput) {
       throw new CellIsNotYetLive()
@@ -838,7 +838,8 @@ export default class TransactionSender {
     depositOutPoint: OutPoint,
     withdrawBlockHash: string
   ): Promise<bigint> => {
-    const ckb = new CKBRPC(NodeService.getInstance().nodeUrl)
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+    const ckb = new CKBRPC(currentNetwork.remote)
     const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
     return BigInt(result)
   }

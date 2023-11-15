@@ -19,7 +19,6 @@ import WitnessArgs from '../../models/chain/witness-args'
 import AddressParser from '../../models/address-parser'
 import Multisig from '../../models/multisig'
 import RpcService from '../../services/rpc-service'
-import NodeService from '../../services/node'
 import BlockHeader from '../../models/chain/block-header'
 import CellDep from '../../models/chain/cell-dep'
 import SystemScriptInfo from '../../models/system-script-info'
@@ -35,6 +34,7 @@ import WalletService from '../../services/wallets'
 import { MIN_CELL_CAPACITY, MIN_SUDT_CAPACITY } from '../../utils/const'
 import AssetAccountService from '../../services/asset-account-service'
 import LiveCellService from '../../services/live-cell-service'
+import NetworksService from '../networks'
 
 export interface TargetOutput {
   address: string
@@ -358,7 +358,8 @@ export class TransactionGenerator {
   }
 
   private static async getTipHeader(): Promise<BlockHeader> {
-    const rpcService = new RpcService(NodeService.getInstance().nodeUrl)
+    const network = NetworksService.getInstance().getCurrent()
+    const rpcService = new RpcService(network.remote, network.type)
     const tipHeader = await rpcService.getTipHeader()
     return tipHeader
   }

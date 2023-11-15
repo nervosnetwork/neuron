@@ -5,7 +5,7 @@ import { systemScripts } from '../../../src/utils/systemScripts'
 
 const stubbedIsMainnet = jest.fn()
 
-jest.doMock('services/networks', () => {
+jest.mock('services/networks', () => {
   return {
     getInstance: () => ({
       isMainnet: stubbedIsMainnet,
