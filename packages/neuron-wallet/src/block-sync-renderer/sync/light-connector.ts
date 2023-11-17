@@ -248,14 +248,14 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       .createBatchRequest<'getTransaction', string[], TransactionWithStatus[]>(txHashes.map(v => ['getTransaction', v]))
       .exec()
     const previousTxHashes = new Set<string>()
-    transactions.forEach(tx => {
-      tx.transaction.inputs.forEach(input => {
+    transactions
+      .flatMap(tx => tx.transaction.inputs)
+      .forEach(input => {
         const previousTxHash = input.previousOutput!.txHash
         if (previousTxHash !== `0x${'0'.repeat(64)}`) {
           previousTxHashes.add(previousTxHash)
         }
       })
-    })
     await this.lightRpc.createBatchRequest([...previousTxHashes].map(v => ['fetchTransaction' as keyof Base, v])).exec()
   }
 
