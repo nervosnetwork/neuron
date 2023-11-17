@@ -231,23 +231,20 @@ class NodeService {
 
   private getNeuronCompatibilityCKB() {
     const appPath = electronApp.isPackaged ? electronApp.getAppPath() : path.join(__dirname, '../../../..')
-    const compatiblePath = path.join(appPath, 'compatible.csv')
+    const compatiblePath = path.join(appPath, 'compatible.json')
     if (fs.existsSync(compatiblePath)) {
       try {
-        const content = fs.readFileSync(compatiblePath, 'utf8')?.split('\n')
-        const ckbVersions = content?.[0]?.split(',')?.slice(1)
-        const neuronCompatible = content?.slice(2)
-        const result: Record<string, Record<string, boolean>> = {}
-        for (let index = 0; index < neuronCompatible.length; index++) {
-          const [neuronVersion, ...campatibleValues] = neuronCompatible[index].split(',')
-          result[neuronVersion] = {}
-          campatibleValues.forEach((v, idx) => {
-            result[neuronVersion][ckbVersions[idx]] = v === 'yes'
-          })
-        }
-        return result
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const content = require(compatiblePath)
+        return (content?.compatible ?? {}) as Record<
+          string,
+          {
+            full: string[]
+            light: string[]
+          }
+        >
       } catch (err) {
-        logger.error('App\t: get compatible table failed')
+        logger.error('App\t: get compatible failed', err)
       }
     }
   }
@@ -256,7 +253,7 @@ class NodeService {
     const compatibilities = this.getNeuronCompatibilityCKB()
     const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
     const externalCKBCompatibleVersion = externalCKBVersion.split('.').slice(0, 2).join('.')
-    return compatibilities?.[neuronCompatibleVersion]?.[externalCKBCompatibleVersion]
+    return compatibilities?.[neuronCompatibleVersion]?.full?.includes(externalCKBCompatibleVersion)
   }
 
   private verifyCKbNodeShouldUpdate(neuronCKBVersion: string, externalCKBVersion: string) {
