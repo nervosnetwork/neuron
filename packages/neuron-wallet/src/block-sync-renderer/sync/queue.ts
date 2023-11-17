@@ -171,7 +171,10 @@ export default class Queue {
     }, 1)
 
     const drainFetchTxQueue = new Promise((resolve, reject) => {
-      fetchTxQueue.error(reject)
+      fetchTxQueue.error(err => {
+        fetchTxQueue.kill()
+        reject(err)
+      })
       fetchTxQueue.drain(() => resolve(0))
     })
 
