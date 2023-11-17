@@ -272,7 +272,7 @@ export const useAction = ({
           type: AppActions.UpdateConsumeOutPoints,
           payload: operateCells.map(v => v.outPoint),
         })
-        navigate(RoutePath.Send)
+        navigate(`${RoutePath.Send}?isSendMax=true`)
         break
       default:
         break
