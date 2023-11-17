@@ -145,7 +145,7 @@ export const startCkbNode = async () => {
   currentProcess.on('error', error => {
     logger.error('CKB:\trun fail:', error)
     isLookingValidTarget = false
-    if (ckb?.pid === currentProcess.pid) {
+    if (Object.is(ckb, currentProcess)) {
       ckb = null
     }
   })
@@ -153,7 +153,7 @@ export const startCkbNode = async () => {
   currentProcess.on('close', () => {
     logger.info('CKB:\tprocess closed')
     isLookingValidTarget = false
-    if (ckb?.pid === currentProcess.pid) {
+    if (Object.is(ckb, currentProcess)) {
       ckb = null
     }
   })

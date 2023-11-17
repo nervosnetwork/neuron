@@ -162,14 +162,14 @@ export class CKBLightRunner extends NodeRunner {
       })
     runnerProcess.once('error', error => {
       logger.error('CKB Light Runner:\trun fail:', error)
-      if (this.runnerProcess?.pid === runnerProcess.pid) {
+      if (Object.is(this.runnerProcess, runnerProcess)) {
         this.runnerProcess = undefined
       }
     })
 
     runnerProcess.once('close', () => {
       logger.info('CKB Light Runner:\tprocess closed')
-      if (this.runnerProcess?.pid === runnerProcess.pid) {
+      if (Object.is(this.runnerProcess, runnerProcess)) {
         this.runnerProcess = undefined
       }
     })
