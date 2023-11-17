@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
 import { useState as useGlobalState, useDispatch, appState } from 'states'
@@ -21,6 +21,7 @@ import {
 import { HIDE_BALANCE } from 'utils/const'
 
 import { isErrorWithI18n } from 'exceptions'
+import { useSearchParams } from 'react-router-dom'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -81,7 +82,17 @@ const Send = () => {
     setErrorMessage,
     isSendMax,
     onSendMaxClick: handleSendMaxClick,
+    updateIsSendMax,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
+
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('isSendMax')) {
+      updateIsSendMax(true)
+    }
+    // only when router change init send max
+  }, [searchParams, updateIsSendMax])
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
@@ -128,13 +139,18 @@ const Send = () => {
     }
   }
 
-  const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
+  const disabled =
+    connectionStatus === 'offline' ||
+    sending ||
+    !!errorMessageUnderTotal ||
+    !send.generatedTx ||
+    outputs.some(v => !v.address)
 
   const outputErrors = useOutputErrors(outputs, isMainnet)
 
   const isMaxBtnDisabled = (() => {
     try {
-      validateOutputs(outputs, isMainnet, true)
+      validateOutputs(outputs.slice(0, -1), isMainnet)
     } catch {
       return true
     }
