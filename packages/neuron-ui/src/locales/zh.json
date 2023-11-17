@@ -1166,7 +1166,8 @@
         "used": "已用"
       },
       "locked-reason": {
-        "multi-locktime": "The cell has a time lock and you can't use it until {{time}}。",
+        "multi-locktime": "这是一个有时间锁的 cell, 只能在 {{time}} 之后使用。",
+        "multi-locktime-reached": "此 Cell 的锁定已经结束，请在\"自定义资产\"中解锁后使用。",
         "cheque-acp-multisig": "这是一个 {{type}} 的 cell, 不支持解锁。",
         "NFT-SUDT-DAO": "这是一个 {{type}} 的资产，不支持解锁。",
         "Unknown": "這是壹項未知的資產，請在繼續操作之前進行檢查和確認。"

@@ -116,13 +116,21 @@ const getColumns = ({
         const { locked, lockedReason } = item
         if (locked) {
           let params = lockedReason?.params
+          let i18nKey = lockedReason?.key
           if (item.lockScriptType === LockScriptCategory.MULTI_LOCK_TIME) {
             if (bestKnownBlockTimestamp) {
-              const targetTime = new Date(
-                getLockTimestamp({ lockArgs: item.lock.args, epoch, bestKnownBlockTimestamp })
-              )
-              params = {
-                time: `${targetTime.getFullYear()}-${targetTime.getMonth() + 1}-${targetTime.getDate()}`,
+              const { hasReached, lockTimestamp } = getLockTimestamp({
+                lockArgs: item.lock.args,
+                epoch,
+                bestKnownBlockTimestamp,
+              })
+              if (hasReached) {
+                i18nKey = 'cell-manage.locked-reason.multi-locktime-reached'
+              } else {
+                const targetTime = new Date(lockTimestamp)
+                params = {
+                  time: `${targetTime.getFullYear()}-${targetTime.getMonth() + 1}-${targetTime.getDate()}`,
+                }
               }
             } else {
               params = { time: '--' }
@@ -132,7 +140,7 @@ const getColumns = ({
             <div className={styles.lockedWithTip}>
               {t('cell-manage.table.locked')}
               {lockedReason ? (
-                <Tooltip tip={t(lockedReason.key, params)} className={styles.lockedTip} placement="top" showTriangle>
+                <Tooltip tip={t(i18nKey!, params)} className={styles.lockedTip} placement="top" showTriangle>
                   <Attention />
                 </Tooltip>
               ) : null}

@@ -1175,6 +1175,7 @@
       },
       "locked-reason": {
         "multi-locktime": "The cell has a time lock and you can't use it until {{time}}.",
+        "multi-locktime-reached": "The time lock for this cell has expired and you need to claim it in Customized Assets before using it.",
         "cheque-acp-multisig": "This is a {{type}} cell and does not support unlocking.",
         "NFT-SUDT-DAO": " This is a {{type}} asset and does not support unlocking.",
         "Unknown": "This is an uncataloged asset,please check and confirm before proceeding."

@@ -62,5 +62,8 @@ export const getLockTimestamp = ({
     target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
     current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
   }
-  return bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MILLISECONDS
+  return {
+    hasReached: epochsInfo.target <= epochsInfo.current,
+    lockTimestamp: bestKnownBlockTimestamp + (epochsInfo.target - epochsInfo.current) * MILLISECONDS,
+  }
 }
