@@ -1,13 +1,15 @@
+import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
 import CellManage from '../../src/controllers/cell-manage'
 import { outPointTransformer } from '../../src/database/chain/entities/cell-local-info'
 import { AddressNotFound, CurrentWalletNotSet } from '../../src/exceptions'
 import OutPoint from '../../src/models/chain/out-point'
-import Output from '../../src/models/chain/output'
+import OutputEntity from '../../src/database/chain/entities/output'
 import { ScriptHashType } from '../../src/models/chain/script'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
+import Transaction from '../../src/database/chain/entities/transaction'
 
 const getCurrentWalletMock = jest.fn()
-const getLiveCellsMock = jest.fn()
+const getLiveOrSentCellByWalletIdMock = jest.fn()
 const getCellLocalInfoMapMock = jest.fn()
 const getCellLockTypeMock = jest.fn()
 const getCellTypeTypeMock = jest.fn()
@@ -19,7 +21,7 @@ const getLockedCellsMock = jest.fn()
 
 function resetMocks() {
   getCurrentWalletMock.mockReset()
-  getLiveCellsMock.mockReset()
+  getLiveOrSentCellByWalletIdMock.mockReset()
   getCellLocalInfoMapMock.mockReset()
   isMainnetMock.mockReset()
   getAddressesByWalletIdMock.mockReset()
@@ -45,7 +47,7 @@ jest.mock('../../src/services/networks', () => ({
 }))
 
 jest.mock('../../src/services/cells', () => ({
-  getLiveCells: () => getLiveCellsMock(),
+  getLiveOrSentCellByWalletId: () => getLiveOrSentCellByWalletIdMock(),
   getCellLockType: () => getCellLockTypeMock,
   getCellTypeType: () => getCellTypeTypeMock(),
 }))
@@ -60,8 +62,8 @@ jest.mock('../../src/services/sign-message', () => ({
 }))
 
 jest.mock('../../src/services/cell-local-info', () => ({
-  getCellLocalInfoMap: (outPoints: CKBComponents.OutPoint[]) => getCellLocalInfoMapMock(outPoints),
-  updateLiveCellLockStatus: (outPoints: CKBComponents.OutPoint[], locked: boolean) =>
+  getCellLocalInfoMap: (outPoints: OutPointSDK[]) => getCellLocalInfoMapMock(outPoints),
+  updateLiveCellLockStatus: (outPoints: OutPointSDK[], locked: boolean) =>
     updateLiveCellLockStatusMock(outPoints, locked),
   getLockedCells: () => getLockedCellsMock(),
 }))
@@ -71,14 +73,15 @@ function createOutput(
   capacity: string = '6100000000',
   lockArgs: string = '0x36c329ed630d6ce750712a477543672adab57f4c'
 ) {
-  return Output.fromSDK({
-    capacity,
-    lock: {
-      codeHash: secp256k1CodeHash,
-      hashType: ScriptHashType.Type,
-      args: lockArgs,
-    },
-  })
+  const output = new OutputEntity()
+  output.capacity = capacity
+  output.lockArgs = lockArgs
+  output.lockCodeHash = secp256k1CodeHash
+  output.lockHashType = ScriptHashType.Type
+  output.outPointTxHash = `0x${'00'.repeat(32)}`
+  output.outPointIndex = '0'
+  output.transaction = new Transaction()
+  return output
 }
 describe('CellManage', () => {
   beforeEach(() => {
@@ -89,31 +92,29 @@ describe('CellManage', () => {
       getCurrentWalletMock.mockReturnValue(undefined)
       await expect(CellManage.getLiveCells()).rejects.toThrow(new CurrentWalletNotSet())
     })
-    it('outpoint is null', async () => {
-      getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
-      getLiveCellsMock.mockResolvedValueOnce([createOutput()])
-      await CellManage.getLiveCells()
-      expect(getCellLocalInfoMapMock).toBeCalledWith([])
-    })
-    it('outpoint is null and order by timestamp', async () => {
+    it('outpoint is not null and order by timestamp', async () => {
       const output1 = createOutput()
-      output1.timestamp = '12'
+      output1.transaction.timestamp = '12'
       const output2 = createOutput()
-      output2.timestamp = '13'
+      output2.transaction.timestamp = '13'
       getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
-      getLiveCellsMock.mockResolvedValueOnce([output1, output2])
+      getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([output1, output2])
+      getCellLocalInfoMapMock.mockResolvedValueOnce({})
       const res = await CellManage.getLiveCells()
-      expect(getCellLocalInfoMapMock).toBeCalledWith([])
-      expect(res[0].timestamp).toBe(output2.timestamp)
+      expect(getCellLocalInfoMapMock).toBeCalledWith([
+        { txHash: output1.outPointTxHash, index: output1.outPointIndex },
+        { txHash: output2.outPointTxHash, index: output2.outPointIndex },
+      ])
+      expect(res[0].timestamp).toBe(output2.transaction.timestamp)
     })
     it('outpoint is not null', async () => {
       const output1 = createOutput()
-      output1.timestamp = '12'
-      output1.outPoint = new OutPoint(`0x${'00'.repeat(32)}`, '0')
+      output1.outPointTxHash = `0x${'01'.repeat(32)}`
+      output1.outPointIndex = '0'
       getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
-      getLiveCellsMock.mockResolvedValueOnce([output1])
+      getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([output1])
       getCellLocalInfoMapMock.mockResolvedValueOnce({
-        [outPointTransformer.to(output1.outPoint)]: { description: 'description', locked: true },
+        [outPointTransformer.to(output1.outPoint())]: { description: 'description', locked: true },
       })
       const res = await CellManage.getLiveCells()
       expect(res[0].description).toBe('description')

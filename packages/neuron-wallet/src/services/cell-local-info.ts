@@ -57,7 +57,9 @@ export default class CellLocalInfoService {
   }
 
   static async getLockedCells(walletId: string) {
-    const liveCells = await CellsService.getLiveCells(walletId)
+    const liveCells = (await CellsService.getLiveOrSentCellByWalletId(walletId, { includeCheque: true })).map(v =>
+      v.toModel()
+    )
     const outPoints = liveCells.filter(v => !!v.outPoint).map(v => v.outPoint!)
     const lockedOutPointSet = await CellLocalInfoService.getLockedOutPoints(outPoints)
     return liveCells.filter(v => v.outPoint && lockedOutPointSet.has(outPointTransformer.to(v.outPoint)))

@@ -1,3 +1,4 @@
+import type { OutPoint } from '@ckb-lumos/base'
 import { getConnection } from 'typeorm'
 import CellLocalInfoService from '../../src/services/cell-local-info'
 import { closeConnection, initConnection } from '../setupAndTeardown'
@@ -14,7 +15,7 @@ const outPoints = [
   },
 ]
 
-const createCellLocalInfo = (outPoint: CKBComponents.OutPoint, locked?: boolean, description?: string) => {
+const createCellLocalInfo = (outPoint: OutPoint, locked?: boolean, description?: string) => {
   const cellLocalInfo = new CellLocalInfo()
   cellLocalInfo.outPoint = outPoint
   cellLocalInfo.locked = locked
@@ -22,14 +23,14 @@ const createCellLocalInfo = (outPoint: CKBComponents.OutPoint, locked?: boolean,
   return cellLocalInfo
 }
 
-const getLiveCellsMock = jest.fn()
+const getLiveOrSentCellByWalletIdMock = jest.fn()
 
 function resetMocks() {
-  getLiveCellsMock.mockReset()
+  getLiveOrSentCellByWalletIdMock.mockReset()
 }
 
 jest.mock('../../src/services/cells', () => ({
-  getLiveCells: () => getLiveCellsMock(),
+  getLiveOrSentCellByWalletId: () => getLiveOrSentCellByWalletIdMock(),
 }))
 
 describe('CellLocalInfoService', () => {
@@ -142,17 +143,35 @@ describe('CellLocalInfoService', () => {
 
   describe('getLockedCells', () => {
     it('getLiveCells return without outPoint', async () => {
-      getLiveCellsMock.mockResolvedValueOnce([{}])
+      getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([
+        {
+          toModel() {
+            return {}
+          },
+        },
+      ])
       await expect(CellLocalInfoService.getLockedCells('')).resolves.toHaveLength(0)
     })
     it('no locked cell', async () => {
-      getLiveCellsMock.mockResolvedValueOnce([{ outPoint: outPoints[0] }])
+      getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([
+        {
+          toModel() {
+            return { outPoint: outPoints[0] }
+          },
+        },
+      ])
       await expect(CellLocalInfoService.getLockedCells('')).resolves.toHaveLength(0)
     })
     it('exist locked cell', async () => {
       const cellLocalInfo = createCellLocalInfo(outPoints[0], true)
       await getConnection().getRepository(CellLocalInfo).createQueryBuilder().insert().values(cellLocalInfo).execute()
-      getLiveCellsMock.mockResolvedValueOnce([{ outPoint: outPoints[0] }])
+      getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([
+        {
+          toModel() {
+            return { outPoint: outPoints[0] }
+          },
+        },
+      ])
       await expect(CellLocalInfoService.getLockedCells('')).resolves.toHaveLength(1)
     })
   })

@@ -1,4 +1,4 @@
-import { Brackets, getConnection, In } from 'typeorm'
+import { Brackets, getConnection, In, IsNull, type ObjectLiteral } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import {
@@ -526,33 +526,7 @@ export default class CellsService {
     return cellEntity
   }
 
-  public static getLiveCells = async (walletId: string) => {
-    const hdPublicKeyInfos = await getConnection()
-      .getRepository(HdPublicKeyInfo)
-      .createQueryBuilder()
-      .where({ walletId })
-      .getMany()
-    const blake160s = hdPublicKeyInfos.map(v => v.publicKeyInBlake160)
-    const multisigArgs = hdPublicKeyInfos.map(v => Multisig.hash([v.publicKeyInBlake160]))
-    // find all outputs except cheque
-    const outputs = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .leftJoinAndSelect('output.transaction', 'tx')
-      .where({
-        status: In([OutputStatus.Live, OutputStatus.Sent]),
-      })
-      .andWhere(
-        new Brackets(qb => {
-          qb.where({ lockArgs: In(blake160s) }).orWhere({ multiSignBlake160: In(multisigArgs) })
-        })
-      )
-      .getMany()
-    const currentWalletCheque = await CellsService.getChequeLiveCells(blake160s)
-    return outputs.concat(currentWalletCheque).map(v => v.toModel())
-  }
-
-  private static getChequeLiveCells = async (blake160s: string[]) => {
+  private static getChequeLiveCells = async (blake160s: string[], filter?: ObjectLiteral) => {
     const assetAccountInfo = new AssetAccountInfo()
     const chequeLockCodeHash = assetAccountInfo.getChequeInfo().codeHash
     // find cheque
@@ -561,6 +535,7 @@ export default class CellsService {
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where({
+        ...filter,
         status: In([OutputStatus.Live, OutputStatus.Sent]),
         lockCodeHash: chequeLockCodeHash,
       })
@@ -576,39 +551,45 @@ export default class CellsService {
     })
   }
 
-  private static getLiveOrSentCellByWalletId = async (
+  public static getLiveOrSentCellByWalletId = async (
     walletId: string,
-    lockClass: {
-      codeHash: string
-      hashType: ScriptHashType
+    filter?: {
+      whereCondition?: ObjectLiteral
+      filterUnlocked?: boolean
+      includeCheque?: boolean
     }
   ) => {
+    const hdPublicKeyInfos = await getConnection()
+      .getRepository(HdPublicKeyInfo)
+      .createQueryBuilder()
+      .where({ walletId })
+      .getMany()
+    const blake160s = hdPublicKeyInfos.map(v => v.publicKeyInBlake160)
+    const multisigArgs = hdPublicKeyInfos.map(v => Multisig.hash([v.publicKeyInBlake160]))
+    // find all outputs except cheque
     const outputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
-      .where(
-        `
-        output.status IN (:...statuses) AND
-        hasData = false AND
-        typeHash is null AND
-        output.lockArgs in (
-          SELECT publicKeyInBlake160
-          FROM hd_public_key_info
-          WHERE walletId = :walletId
-        ) AND
-        output.lockCodeHash = :lockCodeHash AND
-        output.lockHashType = :lockHashType
-        `,
-        {
-          walletId,
-          lockCodeHash: lockClass.codeHash,
-          lockHashType: lockClass.hashType,
-          statuses: [OutputStatus.Live, OutputStatus.Sent],
-        }
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where({
+        status: In([OutputStatus.Live, OutputStatus.Sent]),
+        ...filter?.whereCondition,
+      })
+      .andWhere(
+        new Brackets(qb => {
+          qb.where({ lockArgs: In(blake160s) }).orWhere({ multiSignBlake160: In(multisigArgs) })
+        })
       )
       .getMany()
-    const lockedOutPointSet = await CellLocalInfoService.getLockedOutPoints(outputs.map(v => v.outPoint()))
-    return outputs.filter(v => v.outPoint && !lockedOutPointSet.has(outPointTransformer.to(v.outPoint())))
+    if (filter?.includeCheque) {
+      const currentWalletCheque = await CellsService.getChequeLiveCells(blake160s, filter.whereCondition)
+      outputs.push(...currentWalletCheque)
+    }
+    if (filter?.filterUnlocked) {
+      const lockedOutPointSet = await CellLocalInfoService.getLockedOutPoints(outputs.map(v => v.outPoint()))
+      return outputs.filter(v => v.outPoint() && !lockedOutPointSet.has(outPointTransformer.to(v.outPoint())))
+    }
+    return outputs
   }
 
   private static getLiveOrSendCellByOutPoints = async (consumeOutPoints: CKBComponents.OutPoint[]) => {
@@ -700,7 +681,15 @@ export default class CellsService {
     const cellEntities: (OutputEntity | MultisigOutput)[] = await (walletId
       ? consumeOutPoints?.length
         ? CellsService.getLiveOrSendCellByOutPoints(consumeOutPoints)
-        : CellsService.getLiveOrSentCellByWalletId(walletId, lockClass)
+        : CellsService.getLiveOrSentCellByWalletId(walletId, {
+            whereCondition: {
+              lockCodeHash: lockClass.codeHash,
+              lockHashType: lockClass.hashType,
+              hasData: false,
+              typeHash: IsNull(),
+            },
+            filterUnlocked: true,
+          })
       : CellsService.getLiveOrSentCellByLockArgsMultisigOutput(lockClass))
 
     const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
@@ -845,7 +834,15 @@ export default class CellsService {
         lockArgs: [lockClass.args],
       })
     } else {
-      cellEntities = await CellsService.getLiveOrSentCellByWalletId(walletId, lockClass)
+      cellEntities = await CellsService.getLiveOrSentCellByWalletId(walletId, {
+        whereCondition: {
+          lockCodeHash: lockClass.codeHash,
+          lockHashType: lockClass.hashType,
+          hasData: false,
+          typeHash: IsNull(),
+        },
+        filterUnlocked: true,
+      })
     }
 
     const inputs: Input[] = cellEntities

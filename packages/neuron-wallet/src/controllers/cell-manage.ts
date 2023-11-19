@@ -1,3 +1,4 @@
+import type { OutPoint, Script } from '@ckb-lumos/base'
 import { outPointTransformer } from '../database/chain/entities/cell-local-info'
 import Output from '../models/chain/output'
 import CellsService, { LockScriptCategory, TypeScriptCategory } from '../services/cells'
@@ -13,10 +14,10 @@ export default class CellManage {
   static async getLiveCells() {
     const currentWallet = WalletService.getInstance().getCurrent()
     if (!currentWallet) throw new CurrentWalletNotSet()
-    const liveCells = await CellsService.getLiveCells(currentWallet.id)
-    const outPoints = liveCells
-      .filter((v): v is Output & { outPoint: CKBComponents.OutPoint } => !!v.outPoint)
-      .map(v => v.outPoint)
+    const liveCells = (await CellsService.getLiveOrSentCellByWalletId(currentWallet.id, { includeCheque: true })).map(
+      v => v.toModel()
+    )
+    const outPoints = liveCells.filter((v): v is Output & { outPoint: OutPoint } => !!v.outPoint).map(v => v.outPoint)
     const cellLocalInfoMap = await CellLocalInfoService.getCellLocalInfoMap(outPoints)
     return liveCells
       .map<
@@ -50,14 +51,14 @@ export default class CellManage {
       .sort((a, b) => +(b.timestamp ?? 0) - +(a.timestamp ?? 0))
   }
 
-  static updateLiveCellLocalInfo(outPoint: CKBComponents.OutPoint, locked?: boolean, description?: string) {
+  static updateLiveCellLocalInfo(outPoint: OutPoint, locked?: boolean, description?: string) {
     return CellLocalInfoService.saveCellLocalInfo(outPoint, locked, description)
   }
 
   static async updateLiveCellsLockStatus(
-    outPoints: CKBComponents.OutPoint[],
+    outPoints: OutPoint[],
     locked: boolean,
-    lockScripts: CKBComponents.Script[],
+    lockScripts: Script[],
     password: string
   ) {
     // check wallet password

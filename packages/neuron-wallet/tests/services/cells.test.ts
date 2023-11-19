@@ -1,4 +1,5 @@
 import { getConnection } from 'typeorm'
+import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'
 import { bytes } from '@ckb-lumos/codec'
 import { initConnection } from '../../src/database/chain/ormconfig'
@@ -169,7 +170,7 @@ describe('CellsService', () => {
     return cell
   }
 
-  const createCellLocalInfo = (outPoint: CKBComponents.OutPoint, locked?: boolean, description?: string) => {
+  const createCellLocalInfo = (outPoint: OutPointSDK, locked?: boolean, description?: string) => {
     const cellLocalInfo = new CellLocalInfo()
     cellLocalInfo.outPoint = outPoint
     cellLocalInfo.locked = locked
@@ -1640,22 +1641,22 @@ describe('CellsService', () => {
     })
   })
 
-  describe('getLiveCells', () => {
+  describe('getLiveOrSentCellByWalletId', () => {
     it('no live cell', async () => {
       await createCell('61', OutputStatus.Dead, false, null)
-      await expect(CellsService.getLiveCells(bob.walletId)).resolves.toHaveLength(0)
+      await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(0)
     })
     it('find secp256k1 output cell', async () => {
       await createCell('61', OutputStatus.Live, false, null)
-      await expect(CellsService.getLiveCells(bob.walletId)).resolves.toHaveLength(1)
+      await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
     it('find secp256k1 output cell with data', async () => {
       await createCell('61', OutputStatus.Live, true, null)
-      await expect(CellsService.getLiveCells(bob.walletId)).resolves.toHaveLength(1)
+      await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
     it('find secp256k1 output cell with type', async () => {
       await createCell('61', OutputStatus.Live, false, typeScript)
-      await expect(CellsService.getLiveCells(bob.walletId)).resolves.toHaveLength(1)
+      await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
     it('find multisig time lock output cell', async () => {
       await createCell(
@@ -1664,7 +1665,7 @@ describe('CellsService', () => {
         false,
         SystemScriptInfo.generateMultiSignScript(new Multisig().args(bob.blake160, +10, '0x7080291000049'))
       )
-      await expect(CellsService.getLiveCells(bob.walletId)).resolves.toHaveLength(1)
+      await expect(CellsService.getLiveOrSentCellByWalletId(bob.walletId)).resolves.toHaveLength(1)
     })
   })
 
