@@ -1785,6 +1785,13 @@
   dependencies:
     jsbi "^4.1.0"
 
+"@ckb-lumos/bi@0.21.0-next.2":
+  version "0.21.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.21.0-next.2.tgz#0797e8774c00d3f4e609833050529e0f6e022620"
+  integrity sha512-3c8jC94eO57vFFo30g9Rh6qrfk5EF+7OD58hX1GknXaHwykMs3EBQodmA7DUV517dswkHy5IzI5gt5ROn9asjQ==
+  dependencies:
+    jsbi "^4.1.0"
+
 "@ckb-lumos/ckb-indexer@0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/ckb-indexer/-/ckb-indexer-0.20.0.tgz#c6792821e3b903f998a891b14892ff67229d3957"
@@ -1823,6 +1830,13 @@
   integrity sha512-b1w4wbIAbuYngNTKtu6np93EYgnmM4tb6NGdaYN0vZ3kyunlODkLWyRHyMo+FGeBdWQjBwBbmxGNyXwDxtTEGQ==
   dependencies:
     "@ckb-lumos/bi" "0.21.0-next.1"
+
+"@ckb-lumos/codec@0.21.0-next.2":
+  version "0.21.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.21.0-next.2.tgz#d29465fc22c2b98182b6079453be7deb7d3fd1ba"
+  integrity sha512-yTtWIG9LESLTU3tBb9fHREWo2mO0Ts7SSL1Jp3MSqYbnl90JZeYr/skvn+vaV9/2Cl/6qEgeKYa1AnHNSLchkw==
+  dependencies:
+    "@ckb-lumos/bi" "0.21.0-next.2"
 
 "@ckb-lumos/common-scripts@0.20.0":
   version "0.20.0"
