@@ -252,6 +252,7 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       .flatMap(tx => tx.transaction.inputs)
       .forEach(input => {
         const previousTxHash = input.previousOutput!.txHash
+        // exclude the cell base transaction in a block
         if (previousTxHash !== `0x${'0'.repeat(64)}`) {
           previousTxHashes.add(previousTxHash)
         }
