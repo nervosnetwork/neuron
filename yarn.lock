@@ -4943,7 +4943,14 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.1.tgz#d3357479a0fdfdd5907fe67e17e0a85c906e1301"
   integrity sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==
 
-"@types/npmlog@4.1.4", "@types/npmlog@^4.1.2":
+"@types/npmlog@4.1.6":
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/@types/npmlog/-/npmlog-4.1.6.tgz#792341665000209ee76997df8a16300fda6d77cb"
+  integrity sha512-0l3z16vnlJGl2Mi/rgJFrdwfLZ4jfNYgE6ZShEpjqhHuGTqdEzNles03NpYHwUMVYZa+Tj46UxKIEpE78lQ3DQ==
+  dependencies:
+    "@types/node" "*"
+
+"@types/npmlog@^4.1.2":
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@types/npmlog/-/npmlog-4.1.4.tgz#30eb872153c7ead3e8688c476054ddca004115f6"
   integrity sha512-WKG4gTr8przEZBiJ5r3s8ZIAoMXNbOgQ+j/d5O4X3x6kZJRLNvyUJuUK/KoG3+8BaOHPhp2m7WC6JKKeovDSzQ==
