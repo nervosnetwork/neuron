@@ -78,7 +78,7 @@
     "@storybook/preset-create-react-app": "7.0.24",
     "@storybook/react": "7.0.24",
     "@storybook/react-webpack5": "7.0.24",
-    "@storybook/testing-library": "0.2.0",
+    "@storybook/testing-library": "0.2.2",
     "@types/enzyme": "3.10.13",
     "@types/enzyme-adapter-react-16": "1.0.9",
     "@types/node": "18.16.18",
