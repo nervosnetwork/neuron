@@ -18,8 +18,6 @@ const exec = () => {
   if (newNeuronVersion && lastNeuronVersion !== newNeuronVersion) {
     info.compatible[newNeuronVersion] = info.compatible[lastNeuronVersion]
     fs.writeFileSync(compatiblePath, `${JSON.stringify(info, null, 2)}\r\n`)
-  } else {
-    process.exit(1)
   }
 }
 
