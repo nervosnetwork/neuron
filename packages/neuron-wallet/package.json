@@ -81,7 +81,7 @@
     "@types/archiver": "3.1.1",
     "@types/async": "3.2.21",
     "@types/electron-devtools-installer": "2.2.2",
-    "@types/elliptic": "6.4.15",
+    "@types/elliptic": "6.4.17",
     "@types/iarna__toml": "2.0.2",
     "@types/jest-when": "3.5.2",
     "@types/ledgerhq__hw-transport": "4.21.7",
