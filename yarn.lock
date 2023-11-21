@@ -1891,17 +1891,6 @@
     "@types/deep-freeze-strict" "^1.1.0"
     deep-freeze-strict "^1.1.1"
 
-"@ckb-lumos/config-manager@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.21.0-next.1.tgz#927e21a5d9450155ebf766422a707fd3b0856a14"
-  integrity sha512-G8CO+q1RH/Gt8ou8p/N99AUh5hIdU+MZcTZHwABOa4CLbXk2xFenRfeGhHv4u4ddYZ3SLx1zND7pSnbImmrh2A==
-  dependencies:
-    "@ckb-lumos/base" "0.21.0-next.1"
-    "@ckb-lumos/bi" "0.21.0-next.1"
-    "@ckb-lumos/codec" "0.21.0-next.1"
-    "@types/deep-freeze-strict" "^1.1.0"
-    deep-freeze-strict "^1.1.1"
-
 "@ckb-lumos/config-manager@0.21.0-next.2":
   version "0.21.0-next.2"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.21.0-next.2.tgz#ef08003193a49b248440fc73ce9207b1bb6a2a5f"
@@ -1950,19 +1939,6 @@
     "@ckb-lumos/toolkit" "0.20.0"
     bech32 "^2.0.0"
     immutable "^4.0.0-rc.12"
-
-"@ckb-lumos/helpers@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.21.0-next.1.tgz#f0f2d9e231f5a266d53df0c60e7b7610b87e10b5"
-  integrity sha512-lSvn2L97be7IlONFTdjjz+/jG6QlpEGyETyrcSfJxeOOtgjicPFaLXLnaTBIt/IElRZ2ZpclbTFvSNcbVOvKdQ==
-  dependencies:
-    "@ckb-lumos/base" "0.21.0-next.1"
-    "@ckb-lumos/bi" "0.21.0-next.1"
-    "@ckb-lumos/codec" "0.21.0-next.1"
-    "@ckb-lumos/config-manager" "0.21.0-next.1"
-    "@ckb-lumos/toolkit" "0.21.0-next.1"
-    bech32 "^2.0.0"
-    immutable "^4.3.0"
 
 "@ckb-lumos/helpers@0.21.0-next.2":
   version "0.21.0-next.2"
@@ -5958,16 +5934,16 @@ archiver-utils@^2.1.0:
     normalize-path "^3.0.0"
     readable-stream "^2.0.0"
 
-archiver@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/archiver/-/archiver-5.3.0.tgz#dd3e097624481741df626267564f7dd8640a45ba"
-  integrity sha512-iUw+oDwK0fgNpvveEsdQ0Ase6IIKztBJU2U0E9MzszMfmVVUyv1QJhS2ITW9ZCqx8dktAxVAjWWkKehuZE8OPg==
+archiver@5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/archiver/-/archiver-5.3.2.tgz#99991d5957e53bd0303a392979276ac4ddccf3b0"
+  integrity sha512-+25nxyyznAXF7Nef3y0EbBeqmGZgeN/BxHX29Rs39djAfaFalmQ89SE6CWyDCHzGL0yt/ycBtNOmGTW0FyGWNw==
   dependencies:
     archiver-utils "^2.1.0"
-    async "^3.2.0"
+    async "^3.2.4"
     buffer-crc32 "^0.2.1"
     readable-stream "^3.6.0"
-    readdir-glob "^1.0.0"
+    readdir-glob "^1.1.2"
     tar-stream "^2.2.0"
     zip-stream "^4.1.0"
 
@@ -6233,10 +6209,15 @@ async-limiter@~1.0.0:
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.1.tgz#dd379e94f0db8310b08291f9d64c3209766617fd"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
-async@3.2.4, async@^3.2.0, async@^3.2.3:
+async@3.2.4, async@^3.2.3:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
   integrity sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==
+
+async@^3.2.4:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.2.5.tgz#ebd52a8fdaf7a2289a24df399f8d8485c8a46b66"
+  integrity sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -16109,7 +16090,7 @@ readable-stream@^3.0.0, readable-stream@^3.0.2, readable-stream@^3.0.6, readable
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-readdir-glob@^1.0.0:
+readdir-glob@^1.1.2:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/readdir-glob/-/readdir-glob-1.1.3.tgz#c3d831f51f5e7bfa62fa2ffbe4b508c640f09584"
   integrity sha512-v05I2k7xN8zXvPD9N+z/uhXPaj0sUFCe2rcWZIpBsqxfP7xXFQ0tipAd/wjj1YxWyWtUS5IDJpOG82JKt2EAVA==
