@@ -1902,6 +1902,17 @@
     "@types/deep-freeze-strict" "^1.1.0"
     deep-freeze-strict "^1.1.1"
 
+"@ckb-lumos/config-manager@0.21.0-next.2":
+  version "0.21.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.21.0-next.2.tgz#ef08003193a49b248440fc73ce9207b1bb6a2a5f"
+  integrity sha512-dVyMcd5hbnTpN2nuukLOWv2J73hpuMf3ZRSO3asqAodKGZek74JhwOtZD9saCOItLYeOWdRRmzfXad34lDgHXg==
+  dependencies:
+    "@ckb-lumos/base" "0.21.0-next.2"
+    "@ckb-lumos/bi" "0.21.0-next.2"
+    "@ckb-lumos/codec" "0.21.0-next.2"
+    "@types/deep-freeze-strict" "^1.1.0"
+    deep-freeze-strict "^1.1.1"
+
 "@ckb-lumos/hd@0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/hd/-/hd-0.20.0.tgz#4b51fb881313ca193a876ae93257f2d5a13df46c"
