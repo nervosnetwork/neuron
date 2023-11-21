@@ -4827,10 +4827,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/ledgerhq__hw-transport@4.21.7":
-  version "4.21.7"
-  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport/-/ledgerhq__hw-transport-4.21.7.tgz#0149459578d61c95ebdfe70e9d5e6a5c9236e22d"
-  integrity sha512-nAjmcngXv3EthpwhKO3/CMWQWtV69XAlEhEraw6BA27K3FQBFx0hlGYck3wlymz2k/zYfN4I5jUFKf/3ILTysA==
+"@types/ledgerhq__hw-transport@4.21.8":
+  version "4.21.8"
+  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport/-/ledgerhq__hw-transport-4.21.8.tgz#973fedb76ade14307fe85db336373a5a5da54f79"
+  integrity sha512-uO2AJYZUVCwgyqgyy2/KW+JsQaO0hcwDdubRaHgF2ehO0ngGAY41PbE8qnPnmUw1uerMXONvL68QFioA7Y6C5g==
   dependencies:
     "@types/node" "*"
 
