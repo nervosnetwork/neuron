@@ -50,7 +50,7 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
-    "@ckb-lumos/base": "0.21.0-next.1",
+    "@ckb-lumos/base": "0.21.0-next.2",
     "@ckb-lumos/codec": "0.21.0-next.2",
     "@nervosnetwork/ckb-sdk-core": "0.109.0",
     "@nervosnetwork/ckb-sdk-utils": "0.109.0",
