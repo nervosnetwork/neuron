@@ -23,7 +23,10 @@ export const getSyncStatus = ({
   networkID: string
 }) => {
   if (
+    // !timestamp10MinAgo means start sync for the first time
     (!timestamp10MinAgo && bestKnownBlockNumber >= 0) ||
+    // prevUrl for change the network remote(change network or eidt the network)
+    // prevNetworkID for change the network, sometime change network the remote is same. light client mainnet -> testnet
     (((prevUrl && url !== prevUrl) || (prevNetworkID && prevNetworkID !== networkID)) && bestKnownBlockNumber >= 0)
   ) {
     timestamp10MinAgo = currentTimestamp
