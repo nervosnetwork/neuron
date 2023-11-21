@@ -1866,18 +1866,18 @@
     "@ckb-lumos/toolkit" "0.20.0"
     immutable "^4.0.0-rc.12"
 
-"@ckb-lumos/common-scripts@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.21.0-next.1.tgz#92e0295f9e123f3fdfe80e02706cc08c6310ffca"
-  integrity sha512-KhnWbNY1fNKTxp9CR4GAGyWsjjN1eOvidNLFwltLY03n8er2jtoHRbx3t944fIhUMtIwUVkWBi43SqpUCgSJbw==
+"@ckb-lumos/common-scripts@0.21.0-next.2":
+  version "0.21.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.21.0-next.2.tgz#222e58a96d92a4ddfa9e501fe2f0a5428c036e96"
+  integrity sha512-43r7DvXSccsi80NcXh0jaZT0MdQ+rhsElWBO2U3zRUt/55rV4HBaoo26Rj8h7esi0tVfDbiDrnc16ymN1V+B3w==
   dependencies:
-    "@ckb-lumos/base" "0.21.0-next.1"
-    "@ckb-lumos/bi" "0.21.0-next.1"
-    "@ckb-lumos/codec" "0.21.0-next.1"
-    "@ckb-lumos/config-manager" "0.21.0-next.1"
-    "@ckb-lumos/helpers" "0.21.0-next.1"
-    "@ckb-lumos/rpc" "0.21.0-next.1"
-    "@ckb-lumos/toolkit" "0.21.0-next.1"
+    "@ckb-lumos/base" "0.21.0-next.2"
+    "@ckb-lumos/bi" "0.21.0-next.2"
+    "@ckb-lumos/codec" "0.21.0-next.2"
+    "@ckb-lumos/config-manager" "0.21.0-next.2"
+    "@ckb-lumos/helpers" "0.21.0-next.2"
+    "@ckb-lumos/rpc" "0.21.0-next.2"
+    "@ckb-lumos/toolkit" "0.21.0-next.2"
     immutable "^4.3.0"
 
 "@ckb-lumos/config-manager@0.20.0", "@ckb-lumos/config-manager@^0.20.0":
@@ -1961,6 +1961,19 @@
     "@ckb-lumos/codec" "0.21.0-next.1"
     "@ckb-lumos/config-manager" "0.21.0-next.1"
     "@ckb-lumos/toolkit" "0.21.0-next.1"
+    bech32 "^2.0.0"
+    immutable "^4.3.0"
+
+"@ckb-lumos/helpers@0.21.0-next.2":
+  version "0.21.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.21.0-next.2.tgz#4a3ac9ff9e52f2063ce2c3670e2c72bb94acad45"
+  integrity sha512-pZkJwn4jV9uFICtS0Un0ftBnRvlC5BHAueeIBXwa7uclSFHxAejqr2lsM0KLavLBjK/kerOq182mejK9ejX/fQ==
+  dependencies:
+    "@ckb-lumos/base" "0.21.0-next.2"
+    "@ckb-lumos/bi" "0.21.0-next.2"
+    "@ckb-lumos/codec" "0.21.0-next.2"
+    "@ckb-lumos/config-manager" "0.21.0-next.2"
+    "@ckb-lumos/toolkit" "0.21.0-next.2"
     bech32 "^2.0.0"
     immutable "^4.3.0"
 
