@@ -1964,6 +1964,19 @@
     bech32 "^2.0.0"
     immutable "^4.3.0"
 
+"@ckb-lumos/helpers@0.21.0-next.2":
+  version "0.21.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.21.0-next.2.tgz#4a3ac9ff9e52f2063ce2c3670e2c72bb94acad45"
+  integrity sha512-pZkJwn4jV9uFICtS0Un0ftBnRvlC5BHAueeIBXwa7uclSFHxAejqr2lsM0KLavLBjK/kerOq182mejK9ejX/fQ==
+  dependencies:
+    "@ckb-lumos/base" "0.21.0-next.2"
+    "@ckb-lumos/bi" "0.21.0-next.2"
+    "@ckb-lumos/codec" "0.21.0-next.2"
+    "@ckb-lumos/config-manager" "0.21.0-next.2"
+    "@ckb-lumos/toolkit" "0.21.0-next.2"
+    bech32 "^2.0.0"
+    immutable "^4.3.0"
+
 "@ckb-lumos/lumos@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/lumos/-/lumos-0.20.0.tgz#47cd173affa81051f8a8fa60c91c366001d82d6c"

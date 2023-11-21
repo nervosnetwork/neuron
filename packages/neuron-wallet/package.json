@@ -49,7 +49,7 @@
     "@ckb-lumos/common-scripts": "0.21.0-next.1",
     "@ckb-lumos/config-manager": "0.21.0-next.2",
     "@ckb-lumos/hd": "0.21.0-next.1",
-    "@ckb-lumos/helpers": "0.21.0-next.1",
+    "@ckb-lumos/helpers": "0.21.0-next.2",
     "@ckb-lumos/rpc": "0.21.0-next.1",
     "@iarna/toml": "2.2.5",
     "@ledgerhq/hw-transport-node-hid": "6.27.16",
