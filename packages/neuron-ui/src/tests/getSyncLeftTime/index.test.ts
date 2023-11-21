@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals'
 import getSyncLeftTime from 'utils/getSyncLeftTime'
 import fixtures from './fixtures.json'
 

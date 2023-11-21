@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals'
 import { isErrorWithI18n } from 'exceptions'
 import { validatePasswordComplexity } from 'utils/validators'
 import fixtures from './fixtures'
