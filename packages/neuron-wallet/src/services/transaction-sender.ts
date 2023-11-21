@@ -41,11 +41,11 @@ import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
-import { CKBRPC } from '@ckb-lumos/rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
 import { getClusterCellByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
+import { dao } from '@ckb-lumos/common-scripts'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -840,9 +840,25 @@ export default class TransactionSender {
     withdrawBlockHash: string
   ): Promise<bigint> => {
     const currentNetwork = NetworksService.getInstance().getCurrent()
-    const ckb = new CKBRPC(currentNetwork.remote)
-    const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
-    return BigInt(result)
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
+
+    let tx = await rpc.getTransaction(depositOutPoint.txHash)
+    if (tx.txStatus.status !== 'committed') throw new Error('Transaction is not committed yet')
+    const depositBlockHash = tx.txStatus.blockHash
+
+    const cellOutput = tx.transaction.outputs[+depositOutPoint.index]
+    const cellOutputData = tx.transaction.outputsData[+depositOutPoint.index]
+
+    const [depositHeader, withDrawHeader] = await Promise.all([
+      rpc.getHeader(depositBlockHash),
+      rpc.getHeader(withdrawBlockHash),
+    ])
+
+    return dao.calculateMaximumWithdraw(
+      { outPoint: depositOutPoint.toSDK(), data: cellOutputData, cellOutput: cellOutput },
+      depositHeader.dao,
+      withDrawHeader.dao
+    )
   }
 
   private parseEpoch = (epoch: bigint) => {
