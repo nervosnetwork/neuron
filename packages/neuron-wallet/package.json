@@ -46,7 +46,7 @@
     "@ckb-lumos/bi": "0.21.0-next.2",
     "@ckb-lumos/ckb-indexer": "0.21.0-next.2",
     "@ckb-lumos/codec": "0.21.0-next.2",
-    "@ckb-lumos/common-scripts": "0.21.0-next.1",
+    "@ckb-lumos/common-scripts": "0.21.0-next.2",
     "@ckb-lumos/config-manager": "0.21.0-next.2",
     "@ckb-lumos/hd": "0.21.0-next.1",
     "@ckb-lumos/helpers": "0.21.0-next.2",
