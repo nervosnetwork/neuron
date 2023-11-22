@@ -90,13 +90,13 @@ describe('CellLocalInfoService', () => {
 
   describe('saveCellLocalInfo', () => {
     it('insert entity', async () => {
-      await CellLocalInfoService.saveCellLocalInfo(outPoints[0])
+      await CellLocalInfoService.saveCellLocalInfo({ outPoint: outPoints[0] })
       await expect(getConnection().getRepository(CellLocalInfo).count()).resolves.toBe(1)
     })
     it('update entity', async () => {
-      await CellLocalInfoService.saveCellLocalInfo(outPoints[0])
+      await CellLocalInfoService.saveCellLocalInfo({ outPoint: outPoints[0] })
       await expect(getConnection().getRepository(CellLocalInfo).count()).resolves.toBe(1)
-      await CellLocalInfoService.saveCellLocalInfo(outPoints[0], true, 'desc')
+      await CellLocalInfoService.saveCellLocalInfo({ outPoint: outPoints[0], locked: true, description: 'desc' })
       const res = await getConnection().getRepository(CellLocalInfo).find()
       expect(res).toHaveLength(1)
       expect(res[0].locked).toBeTruthy()
