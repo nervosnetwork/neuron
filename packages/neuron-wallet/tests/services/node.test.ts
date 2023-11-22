@@ -1,6 +1,7 @@
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry } from 'rxjs/operators'
 import { BUNDLED_CKB_URL, START_WITHOUT_INDEXER } from '../../src/utils/const'
 import { NetworkType } from '../../src/models/network'
+import { scheduler } from 'timers/promises'
 
 describe('NodeService', () => {
   let nodeService: any
@@ -9,7 +10,6 @@ describe('NodeService', () => {
   const stubbedStartLightNode = jest.fn()
   const stubbedStopLightNode = jest.fn()
   const stubbedConnectionStatusSubjectNext = jest.fn()
-  const stubbedCKBSetNode = jest.fn()
   const stubbedGetTipBlockNumber = jest.fn()
   const stubbedRxjsDebounceTime = jest.fn()
   const stubbedCurrentNetworkIDSubjectSubscribe = jest.fn()
@@ -37,7 +37,6 @@ describe('NodeService', () => {
     stubbedStartCKBNode.mockReset()
     stubbedStopCkbNode.mockReset()
     stubbedConnectionStatusSubjectNext.mockReset()
-    stubbedCKBSetNode.mockReset()
     stubbedGetTipBlockNumber.mockReset()
     stubbedCurrentNetworkIDSubjectSubscribe.mockReset()
     stubbedNetworsServiceGet.mockReset()
@@ -351,19 +350,16 @@ describe('NodeService', () => {
     describe('targets to bundled node', () => {
       const bundledNodeUrl = 'http://127.0.0.1:8114'
       beforeEach(async () => {
-        stubbedCKBSetNode.mockImplementation(() => {
-          nodeService.ckb.node.url = bundledNodeUrl
-        })
         stubbedStartCKBNode.mockResolvedValue(true)
         redistCheckMock.mockResolvedValue(true)
         stubbedNetworsServiceGet.mockReturnValue({ remote: bundledNodeUrl, readonly: true })
         getLocalNodeInfoMock.mockRejectedValue('not start')
         await nodeService.tryStartNodeOnDefaultURI()
-
+        await scheduler.wait(1500)
         jest.advanceTimersByTime(10000)
       })
       it('sets startedBundledNode to true in ConnectionStatusSubject', () => {
-        expect(stubbedConnectionStatusSubjectNext).toHaveBeenCalledWith({
+        expect(stubbedConnectionStatusSubjectNext).toHaveBeenLastCalledWith({
           url: bundledNodeUrl,
           connected: false,
           isBundledNode: true,
