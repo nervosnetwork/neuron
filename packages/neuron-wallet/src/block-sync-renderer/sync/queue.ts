@@ -90,6 +90,7 @@ export default class Queue {
       while (true) {
         try {
           await this.#checkAndSave(txHashes)
+          process.send?.({ channel: 'tx-db-changed' })
           break
         } catch (error) {
           logger.error('retry saving transactions in 2 seconds due to error:', error)
@@ -171,7 +172,10 @@ export default class Queue {
     }, 1)
 
     const drainFetchTxQueue = new Promise((resolve, reject) => {
-      fetchTxQueue.error(reject)
+      fetchTxQueue.error(err => {
+        fetchTxQueue.kill()
+        reject(err)
+      })
       fetchTxQueue.drain(() => resolve(0))
     })
 
