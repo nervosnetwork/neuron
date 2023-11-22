@@ -1,3 +1,5 @@
+import type { ParamsFormatter } from '@ckb-lumos/rpc'
+import type { Block } from '@ckb-lumos/base'
 import { HexString } from '@ckb-lumos/base'
 import { CKBRPC } from '@ckb-lumos/rpc'
 import { Method } from '@ckb-lumos/rpc/lib/method'
@@ -124,7 +126,7 @@ export class FullCKBRPC extends CKBRPC {
     return this.getBlockHash('0x0')
   }
 
-  getGenesisBlock = async () => {
+  getGenesisBlock = async (): Promise<Block> => {
     return this.getBlockByNumber('0x0')
   }
 }
@@ -244,9 +246,9 @@ export class LightRPC extends Base {
     return this.#node
   }
 
-  #paramsFormatter = paramsFormatter
+  #paramsFormatter: typeof ParamsFormatter = paramsFormatter
 
-  get paramsFormatter() {
+  get paramsFormatter(): typeof ParamsFormatter {
     return this.#paramsFormatter
   }
 
