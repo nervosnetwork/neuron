@@ -26,7 +26,7 @@ import { TFunction } from 'i18next'
 import TextField from 'widgets/TextField'
 import { useSearchParams } from 'react-router-dom'
 import { Actions, useAction, useLiveCells, usePassword, useSelect, useViewCell } from './hooks'
-import styles from './cellManage.module.scss'
+import styles from './cellManagement.module.scss'
 
 const getColumns = ({
   updateLiveCell,
@@ -213,7 +213,7 @@ const getColumns = ({
   ]
 }
 
-const CellManage = () => {
+const CellManagement = () => {
   const {
     app: { epoch },
     wallet: { balance = '' },
@@ -427,5 +427,5 @@ const CellManage = () => {
   )
 }
 
-CellManage.displayName = 'CellManage'
-export default CellManage
+CellManagement.displayName = 'CellManage'
+export default CellManagement

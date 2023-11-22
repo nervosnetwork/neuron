@@ -1,25 +1,16 @@
+import type { OutPoint } from '@ckb-lumos/base'
 import { Entity, PrimaryColumn, Column } from 'typeorm'
-
-export const outPointTransformer = {
-  to(value: CKBComponents.OutPoint) {
-    return `${value.txHash}_${value.index}`
-  },
-  from(value: string): CKBComponents.OutPoint {
-    const [txHash, index] = value.split('_')
-    return {
-      txHash,
-      index,
-    }
-  },
-}
 
 @Entity()
 export default class CellLocalInfo {
   @PrimaryColumn({
     type: 'varchar',
-    transformer: outPointTransformer,
+    transformer: {
+      to: CellLocalInfo.getKey,
+      from: CellLocalInfo.fromKey,
+    },
   })
-  outPoint!: CKBComponents.OutPoint
+  outPoint!: OutPoint
 
   @Column({
     type: 'boolean',
@@ -32,4 +23,22 @@ export default class CellLocalInfo {
     nullable: true,
   })
   description?: string
+
+  get key() {
+    return CellLocalInfo.getKey(this.outPoint)
+  }
+
+  static getKey(value: CKBComponents.OutPoint) {
+    return `${value.txHash}_${value.index}`
+  }
+
+  static fromKey(value: string): CKBComponents.OutPoint {
+    const [txHash, index] = value.split('_')
+    return {
+      txHash,
+      index,
+    }
+  }
 }
+
+export type UpdateCellLocalInfo = Pick<CellLocalInfo, 'outPoint' | 'locked' | 'description'>

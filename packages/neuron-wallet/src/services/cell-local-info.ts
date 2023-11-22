@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import CellLocalInfo, { outPointTransformer } from '../database/chain/entities/cell-local-info'
+import CellLocalInfo, { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import CellsService from './cells'
 
 export default class CellLocalInfoService {
@@ -11,7 +11,7 @@ export default class CellLocalInfoService {
       .getMany()
     const result: Record<string, CellLocalInfo> = {}
     cellLocalInfos.forEach(v => {
-      result[outPointTransformer.to(v.outPoint)] = v
+      result[v.key] = v
     })
     return result
   }
@@ -26,7 +26,7 @@ export default class CellLocalInfoService {
       .execute()
   }
 
-  static async saveCellLocalInfo(outPoint: CKBComponents.OutPoint, locked?: boolean, description?: string) {
+  static async saveCellLocalInfo({ outPoint, locked, description }: UpdateCellLocalInfo) {
     const cellLocalInfo: CellLocalInfo =
       (await getConnection().getRepository(CellLocalInfo).findOne({ where: { outPoint } })) ?? new CellLocalInfo()
     cellLocalInfo.outPoint = outPoint
@@ -46,14 +46,14 @@ export default class CellLocalInfoService {
   }
 
   static async getLockedOutPoints(outPoints: CKBComponents.OutPoint[]) {
-    const lockedOutPoints = outPoints.map(v => outPointTransformer.to(v))
+    const lockedOutPoints = outPoints.map(v => CellLocalInfo.getKey(v))
     const lockedCells = await getConnection()
       .getRepository(CellLocalInfo)
       .createQueryBuilder()
       .where('outPoint IN (:...lockedOutPoints)', { lockedOutPoints })
       .andWhere({ locked: true })
       .getMany()
-    return new Set(lockedCells.map(v => outPointTransformer.to(v.outPoint)))
+    return new Set(lockedCells.map(v => v.key))
   }
 
   static async getLockedCells(walletId: string) {
@@ -62,6 +62,6 @@ export default class CellLocalInfoService {
     )
     const outPoints = liveCells.filter(v => !!v.outPoint).map(v => v.outPoint!)
     const lockedOutPointSet = await CellLocalInfoService.getLockedOutPoints(outPoints)
-    return liveCells.filter(v => v.outPoint && lockedOutPointSet.has(outPointTransformer.to(v.outPoint)))
+    return liveCells.filter(v => v.outPoint && lockedOutPointSet.has(CellLocalInfo.getKey(v.outPoint)))
   }
 }

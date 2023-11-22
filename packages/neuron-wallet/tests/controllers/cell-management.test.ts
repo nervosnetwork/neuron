@@ -1,6 +1,6 @@
 import type { OutPoint as OutPointSDK } from '@ckb-lumos/base'
-import CellManage from '../../src/controllers/cell-manage'
-import { outPointTransformer } from '../../src/database/chain/entities/cell-local-info'
+import CellManagement from '../../src/controllers/cell-management'
+import CellLocalInfo from '../../src/database/chain/entities/cell-local-info'
 import { AddressNotFound, CurrentWalletNotSet } from '../../src/exceptions'
 import OutPoint from '../../src/models/chain/out-point'
 import OutputEntity from '../../src/database/chain/entities/output'
@@ -90,7 +90,7 @@ describe('CellManage', () => {
   describe('getLiveCells', () => {
     it('no current wallet', async () => {
       getCurrentWalletMock.mockReturnValue(undefined)
-      await expect(CellManage.getLiveCells()).rejects.toThrow(new CurrentWalletNotSet())
+      await expect(CellManagement.getLiveCells()).rejects.toThrow(new CurrentWalletNotSet())
     })
     it('outpoint is not null and order by timestamp', async () => {
       const output1 = createOutput()
@@ -100,7 +100,7 @@ describe('CellManage', () => {
       getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
       getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([output1, output2])
       getCellLocalInfoMapMock.mockResolvedValueOnce({})
-      const res = await CellManage.getLiveCells()
+      const res = await CellManagement.getLiveCells()
       expect(getCellLocalInfoMapMock).toBeCalledWith([
         { txHash: output1.outPointTxHash, index: output1.outPointIndex },
         { txHash: output2.outPointTxHash, index: output2.outPointIndex },
@@ -114,9 +114,9 @@ describe('CellManage', () => {
       getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
       getLiveOrSentCellByWalletIdMock.mockResolvedValueOnce([output1])
       getCellLocalInfoMapMock.mockResolvedValueOnce({
-        [outPointTransformer.to(output1.outPoint())]: { description: 'description', locked: true },
+        [CellLocalInfo.getKey(output1.outPoint())]: { description: 'description', locked: true },
       })
-      const res = await CellManage.getLiveCells()
+      const res = await CellManagement.getLiveCells()
       expect(res[0].description).toBe('description')
       expect(res[0].locked).toBeTruthy()
     })
@@ -125,13 +125,15 @@ describe('CellManage', () => {
   describe('updateLiveCellsLockStatus', () => {
     it('no current wallet', async () => {
       getCurrentWalletMock.mockReturnValue(undefined)
-      await expect(CellManage.updateLiveCellsLockStatus([], true, [], '')).rejects.toThrow(new CurrentWalletNotSet())
+      await expect(CellManagement.updateLiveCellsLockStatus([], true, [], '')).rejects.toThrow(
+        new CurrentWalletNotSet()
+      )
     })
     it('address not found', async () => {
       getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
       getAddressesByWalletIdMock.mockResolvedValueOnce([])
       await expect(
-        CellManage.updateLiveCellsLockStatus(
+        CellManagement.updateLiveCellsLockStatus(
           [],
           true,
           [
@@ -152,7 +154,7 @@ describe('CellManage', () => {
       const address = scriptToAddress(lockScript, false)
       getAddressesByWalletIdMock.mockResolvedValueOnce([{ address }])
       const outPoints = [new OutPoint(`0x${'00'.repeat(32)}`, '0')]
-      await CellManage.updateLiveCellsLockStatus(outPoints, true, [lockScript], 'password')
+      await CellManagement.updateLiveCellsLockStatus(outPoints, true, [lockScript], 'password')
       expect(signMock).toBeCalledWith('walletId1', address, 'password', 'verify password')
       expect(updateLiveCellLockStatusMock).toBeCalledWith(outPoints, true)
     })
@@ -161,12 +163,12 @@ describe('CellManage', () => {
   describe('getLockedBalance', () => {
     it('no current wallet', async () => {
       getCurrentWalletMock.mockReturnValue(undefined)
-      await expect(CellManage.getLockedBalance()).rejects.toThrow(new CurrentWalletNotSet())
+      await expect(CellManagement.getLockedBalance()).rejects.toThrow(new CurrentWalletNotSet())
     })
     it('success', async () => {
       getCurrentWalletMock.mockReturnValue({ id: 'walletId1' })
       getLockedCellsMock.mockResolvedValueOnce([{ capacity: '6100000000' }, { capacity: '6100000000' }])
-      expect(await CellManage.getLockedBalance()).toBe('12200000000')
+      expect(await CellManagement.getLockedBalance()).toBe('12200000000')
     })
   })
 })

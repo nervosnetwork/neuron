@@ -37,7 +37,7 @@ import NetworksService from './networks'
 import { LOCKTIME_ARGS_LENGTH, MIN_CELL_CAPACITY } from '../utils/const'
 import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
 import CellLocalInfoService from './cell-local-info'
-import { outPointTransformer } from '../database/chain/entities/cell-local-info'
+import CellLocalInfo from '../database/chain/entities/cell-local-info'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -587,7 +587,7 @@ export default class CellsService {
     }
     if (filter?.filterUnlocked) {
       const lockedOutPointSet = await CellLocalInfoService.getLockedOutPoints(outputs.map(v => v.outPoint()))
-      return outputs.filter(v => v.outPoint() && !lockedOutPointSet.has(outPointTransformer.to(v.outPoint())))
+      return outputs.filter(v => v.outPoint() && !lockedOutPointSet.has(CellLocalInfo.getKey(v.outPoint())))
     }
     return outputs
   }

@@ -1,5 +1,5 @@
 import type { OutPoint, Script } from '@ckb-lumos/base'
-import { outPointTransformer } from '../database/chain/entities/cell-local-info'
+import CellLocalInfo, { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import Output from '../models/chain/output'
 import CellsService, { LockScriptCategory, TypeScriptCategory } from '../services/cells'
 import WalletService from '../services/wallets'
@@ -10,7 +10,7 @@ import { scriptToAddress } from '../utils/scriptAndAddress'
 import SignMessage from '../services/sign-message'
 import NetworksService from '../services/networks'
 
-export default class CellManage {
+export default class CellManagement {
   static async getLiveCells() {
     const currentWallet = WalletService.getInstance().getCurrent()
     if (!currentWallet) throw new CurrentWalletNotSet()
@@ -41,7 +41,7 @@ export default class CellManage {
         if (!v.outPoint) {
           return result
         }
-        const outPointKey = outPointTransformer.to(v.outPoint)
+        const outPointKey = CellLocalInfo.getKey(v.outPoint)
         return {
           ...result,
           description: cellLocalInfoMap[outPointKey]?.description,
@@ -51,8 +51,8 @@ export default class CellManage {
       .sort((a, b) => +(b.timestamp ?? 0) - +(a.timestamp ?? 0))
   }
 
-  static updateLiveCellLocalInfo(outPoint: OutPoint, locked?: boolean, description?: string) {
-    return CellLocalInfoService.saveCellLocalInfo(outPoint, locked, description)
+  static updateLiveCellLocalInfo(updateCellLocalInfo: UpdateCellLocalInfo) {
+    return CellLocalInfoService.saveCellLocalInfo(updateCellLocalInfo)
   }
 
   static async updateLiveCellsLockStatus(
