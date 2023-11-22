@@ -1,3 +1,4 @@
+import type { OutPoint } from '@ckb-lumos/base'
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON } from 'services/remote'
 import initStates from 'states/init'
@@ -67,7 +68,7 @@ export enum AppActions {
   SignVerify = 'signVerify',
 
   // Cell manage
-  UpdateConsumeOutPoints = 'UpdateConsumeOutPoints',
+  UpdateConsumeCells = 'UpdateConsumeCells',
 }
 
 export type StateAction =
@@ -119,7 +120,7 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
   | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
   | { type: AppActions.SignVerify; payload: string }
-  | { type: AppActions.UpdateConsumeOutPoints; payload?: CKBComponents.OutPoint[] }
+  | { type: AppActions.UpdateConsumeCells; payload?: { outPoint: OutPoint; capacity: string }[] }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -414,8 +415,8 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       break
     }
 
-    case AppActions.UpdateConsumeOutPoints: {
-      state.consumeOutPoints = action.payload
+    case AppActions.UpdateConsumeCells: {
+      state.consumeCells = action.payload
       break
     }
 

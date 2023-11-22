@@ -331,7 +331,7 @@ declare namespace State {
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
     experimental: Experimental | null
-    consumeOutPoints?: CKBComponents.OutPoint[]
+    consumeCells?: { outPoint: OutPoint; capacity: string }[]
   }
 
   enum LockScriptCategory {
@@ -349,6 +349,7 @@ declare namespace State {
     NFTClass = 'NFTClass',
     NFTIssuer = 'NFTIssuer',
     SUDT = 'SUDT',
+    Spore = 'Spore',
     Unknown = 'Unknown',
   }
 
@@ -366,7 +367,7 @@ declare namespace State {
   }
   interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
     lockedReason?: { key: string; params?: Record<string, any> }
-    cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Unknown'
+    cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Spore' | 'Unknown'
   }
 
   interface UpdateLiveCellLocalInfo {

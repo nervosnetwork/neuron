@@ -235,5 +235,6 @@ export enum TypeScriptCategory {
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
   SUDT = 'SUDT',
+  Spore = 'Spore',
   Unknown = 'Unknown',
 }

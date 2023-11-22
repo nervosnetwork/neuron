@@ -78,6 +78,7 @@ export enum TypeScriptCategory {
   NFTClass = CustomizedType.NFTClass,
   NFTIssuer = CustomizedType.NFTIssuer,
   SUDT = CustomizedType.SUDT,
+  Spore = CustomizedType.Spore,
   Unknown = CustomizedType.Unknown,
 }
 
@@ -1360,6 +1361,13 @@ export default class CellsService {
         case SystemScriptInfo.DAO_CODE_HASH:
           return TypeScriptCategory.DAO
         default:
+          if (
+            [...assetAccountInfo.getSporeInfos(), ...assetAccountInfo.getSporeClusterInfo()].some(
+              v => v.codeHash === output.type.codeHash
+            )
+          ) {
+            return TypeScriptCategory.Spore
+          }
           return TypeScriptCategory.Unknown
       }
     }

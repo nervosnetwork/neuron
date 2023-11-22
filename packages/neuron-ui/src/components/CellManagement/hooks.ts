@@ -21,7 +21,8 @@ import { SortType } from 'widgets/Table'
 const cellTypeOrder: Record<string, number> = {
   [TypeScriptCategory.SUDT]: 1,
   [TypeScriptCategory.NFT]: 2,
-  [TypeScriptCategory.Unknown]: 3,
+  [TypeScriptCategory.Spore]: 3,
+  [TypeScriptCategory.Unknown]: 4,
 }
 
 const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
@@ -37,6 +38,9 @@ const getLockStatusAndReason = (item: State.LiveCellWithLocalInfo) => {
       case TypeScriptCategory.NFTClass:
       case TypeScriptCategory.NFTIssuer:
         lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'NTF' } }
+        break
+      case TypeScriptCategory.Spore:
+        lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'Spore' } }
         break
       case TypeScriptCategory.SUDT:
         lockedReason = { key: 'cell-manage.locked-reason.NFT-SUDT-DAO', params: { type: 'SUDT' } }
@@ -79,6 +83,7 @@ const getCellType = (item: State.LiveCellWithLocalInfo) => {
     switch (item.typeScriptType) {
       case TypeScriptCategory.NFT:
       case TypeScriptCategory.SUDT:
+      case TypeScriptCategory.Spore:
       case TypeScriptCategory.Unknown:
         return item.typeScriptType
       default:
@@ -269,8 +274,8 @@ export const useAction = ({
         break
       case 'consume':
         dispatch({
-          type: AppActions.UpdateConsumeOutPoints,
-          payload: operateCells.map(v => v.outPoint),
+          type: AppActions.UpdateConsumeCells,
+          payload: operateCells.map(v => ({ outPoint: v.outPoint, capacity: v.capacity })),
         })
         navigate(`${RoutePath.Send}?isSendMax=true`)
         break

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
 import { useState as useGlobalState, useDispatch, appState, AppActions } from 'states'
@@ -58,12 +58,13 @@ const Send = () => {
     wallet: { id: walletID = '', balance = '', device },
     chain: { networkID, connectionStatus },
     settings: { networks = [] },
-    consumeOutPoints,
+    consumeCells,
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const consumeOutPoints = useMemo(() => consumeCells?.map(v => v.outPoint), [useMemo])
 
   const {
     outputs,
@@ -144,7 +145,13 @@ const Send = () => {
 
   let errorMessageUnderTotal = errorMessage
   try {
-    validateTotalAmount(totalAmount, fee, balance)
+    validateTotalAmount(
+      totalAmount,
+      fee,
+      consumeCells
+        ? consumeCells.reduce((total, addr) => total + BigInt(addr.capacity || 0), BigInt(0)).toString()
+        : balance
+    )
   } catch (err) {
     if (isErrorWithI18n(err)) {
       errorMessageUnderTotal = t(err.message)
@@ -184,7 +191,7 @@ const Send = () => {
   useEffect(() => {
     return () => {
       dispatch({
-        type: AppActions.UpdateConsumeOutPoints,
+        type: AppActions.UpdateConsumeCells,
       })
     }
   }, [])
