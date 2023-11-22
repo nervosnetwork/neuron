@@ -113,6 +113,7 @@ const NervosDAO = () => {
     cacheTipBlockNumber,
     currentTimestamp: Date.now(),
     url: getCurrentUrl(networkID, networks),
+    networkID,
   })
 
   const MemoizedRecords = useMemo(() => {

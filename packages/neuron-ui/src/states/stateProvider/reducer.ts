@@ -209,6 +209,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
           cacheTipBlockNumber: action.payload.cacheTipBlockNumber,
           currentTimestamp: Date.now(),
           url: getCurrentUrl(state.chain.networkID, state.settings.networks),
+          networkID: state.chain.networkID,
         }),
       }
       break
