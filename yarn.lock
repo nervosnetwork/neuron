@@ -5092,10 +5092,10 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
 
-"@types/react-dom@17.0.24":
-  version "17.0.24"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.24.tgz#23a1f2528d71d9a5b4ffa58788adde9b8f29d444"
-  integrity sha512-9TXTs2CPADeEQ4N5cnWRCqmOZN8O/nl1Dn11dWtj2faZEu0wJnx0it4N8/uAVGH7w2CJ/+sPcv2zMCXkqfeR9A==
+"@types/react-dom@17.0.25":
+  version "17.0.25"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.25.tgz#e0e5b3571e1069625b3a3da2b279379aa33a0cb5"
+  integrity sha512-urx7A7UxkZQmThYA4So0NelOVjx3V4rNFVJwp0WZlbIK5eM4rNJDiN3R/E9ix0MBh6kAEojk/9YL+Te6D9zHNA==
   dependencies:
     "@types/react" "^17"
 
