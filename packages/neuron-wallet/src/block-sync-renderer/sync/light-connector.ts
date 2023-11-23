@@ -1,7 +1,7 @@
 import { BI } from '@ckb-lumos/bi'
 import { Subject } from 'rxjs'
 import { queue, QueueObject } from 'async'
-import { HexString, QueryOptions } from '@ckb-lumos/base'
+import type { HexString, QueryOptions, TransactionWithStatus } from '@ckb-lumos/base'
 import { Indexer as CkbIndexer, CellCollector } from '@ckb-lumos/ckb-indexer'
 import logger from '../../utils/logger'
 import { Address } from '../../models/address'
@@ -18,6 +18,7 @@ import AssetAccountInfo from '../../models/asset-account-info'
 import { DepType } from '../../models/chain/cell-dep'
 import { molecule } from '@ckb-lumos/codec'
 import { blockchain } from '@ckb-lumos/base'
+import type { Base } from '@ckb-lumos/rpc/lib/Base'
 
 interface SyncQueueParam {
   script: CKBComponents.Script
@@ -232,12 +233,31 @@ export default class LightConnector extends Connector<CKBComponents.Hash> {
       })
       return
     }
-    this.transactionsSubject.next({ txHashes: result.txs.map(v => v.txHash), params: syncProgress.hash })
+    const txHashes = result.txs.map(v => v.txHash)
+    await this.fetchPreviousOutputs(txHashes)
+    this.transactionsSubject.next({ txHashes, params: syncProgress.hash })
     this.syncInQueue.set(syncProgress.hash, {
       blockStartNumber: result.lastCursor === '0x' ? parseInt(blockRange[1]) : parseInt(blockRange[0]),
       blockEndNumber: parseInt(blockRange[1]),
       cursor: result.lastCursor === '0x' ? undefined : result.lastCursor,
     })
+  }
+
+  private async fetchPreviousOutputs(txHashes: string[]) {
+    const transactions = await this.lightRpc
+      .createBatchRequest<'getTransaction', string[], TransactionWithStatus[]>(txHashes.map(v => ['getTransaction', v]))
+      .exec()
+    const previousTxHashes = new Set<string>()
+    transactions
+      .flatMap(tx => tx.transaction.inputs)
+      .forEach(input => {
+        const previousTxHash = input.previousOutput!.txHash
+        // exclude the cell base transaction in a block
+        if (previousTxHash !== `0x${'0'.repeat(64)}`) {
+          previousTxHashes.add(previousTxHash)
+        }
+      })
+    await this.lightRpc.createBatchRequest([...previousTxHashes].map(v => ['fetchTransaction' as keyof Base, v])).exec()
   }
 
   private async collectLiveCellsByScript(query: LumosCellQuery) {
