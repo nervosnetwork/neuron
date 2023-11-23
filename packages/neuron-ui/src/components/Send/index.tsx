@@ -25,7 +25,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const SendHeader = ({ balance }: { balance: string }) => {
+const SendHeader = ({ balance, useConsumeCell }: { balance: string; useConsumeCell: boolean }) => {
   const { t } = useTranslation()
   const onBack = useGoBack()
 
@@ -38,12 +38,16 @@ const SendHeader = ({ balance }: { balance: string }) => {
     <div className={styles.headerContainer}>
       <GoBack className={styles.goBack} onClick={onBack} />
       <p>{t('navbar.send')}</p>
-      <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
-        {showBalance ? <EyesOpen /> : <EyesClose />}
-      </Button>
-      <p className={styles.balance}>
-        {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
-      </p>
+      {useConsumeCell ? null : (
+        <>
+          <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
+            {showBalance ? <EyesOpen /> : <EyesClose />}
+          </Button>
+          <p className={styles.balance}>
+            {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
+          </p>
+        </>
+      )}
     </div>
   )
 }
@@ -197,7 +201,7 @@ const Send = () => {
   }, [])
 
   return (
-    <PageContainer head={<SendHeader balance={balance} />}>
+    <PageContainer head={<SendHeader balance={balance} useConsumeCell={!!consumeCells?.length} />}>
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
         <div className={`${styles.layout} ${showWaitForFullySynced ? styles.withFullySynced : ''}`}>
           <div className={styles.left}>
