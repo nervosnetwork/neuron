@@ -7,7 +7,7 @@ import {
   useExitOnWalletChange,
   useGoBack,
 } from 'utils'
-import { useState as useGlobalState, withProvider } from 'states'
+import { useState as useGlobalState } from 'states'
 import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
@@ -387,4 +387,4 @@ const MultisigAddress = () => {
 
 MultisigAddress.displayName = 'MultisigAddress'
 
-export default withProvider(MultisigAddress)
+export default MultisigAddress
