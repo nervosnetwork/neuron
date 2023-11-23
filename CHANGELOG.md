@@ -1,3 +1,33 @@
+# 0.112.0 (2023-11-27)
+
+### CKB Node & Light Client
+
+- [CKB@v0.112.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.112.1) was released on Nov. 21st, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
+- [CKB Light Client@v0.3.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.1) was released on Nov. 22nd, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+
+### Assumed valid target
+
+Block before `0xef2e2f0ee78e8fcf5bb5ad16892a49724e5f2d4fbc2779396e3d6c93100b9275`(at height `11,373,036`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/2955)
+
+---
+
+## New features
+
+- #2810: Support Spore Protocol.(@homura)
+- #2916: Add light client in compatibility table.(@yanguoyu)
+- #2926: Refactor switch between light client mainnet and light client testnet to make it more intuitive.(@yanguoyu)
+
+## Bug fixes
+
+- #2928: Fix condition of compatibility alert.(@yanguoyu)
+- #2935: Fix migration settings.(@yanguoyu)
+- #2945: Fix Nervos DAO withdrawal on light client mode.(@homura)
+- #2944: Fix requests jam when a synced transaction includes cellbase cells.(@yanguoyu)
+
+
+**Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.111.1...v0.112.0
+
+
 # 0.111.1 (2023-11-08)
 
 ### CKB Node & Light Client
