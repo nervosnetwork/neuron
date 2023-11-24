@@ -2,9 +2,16 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
-
-import { shannonToCKBFormatter, uniformTimeFormatter, backToTop, CONSTANTS, RoutePath, useFirstLoadWallet } from 'utils'
-
+import {
+  shannonToCKBFormatter,
+  uniformTimeFormatter,
+  backToTop,
+  CONSTANTS,
+  RoutePath,
+  useFirstLoadWallet,
+  clsx,
+  isSuccessResponse,
+} from 'utils'
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
 import FormattedTokenAmount from 'components/FormattedTokenAmount'
@@ -12,11 +19,21 @@ import Receive from 'components/Receive'
 import AddressBook from 'components/AddressBook'
 import Table from 'widgets/Table'
 import Button from 'widgets/Button'
-import { ArrowNext, EyesClose, EyesOpen, OverviewSend, OverviewReceive, Addressbook } from 'widgets/Icons/icon'
+import {
+  ArrowNext,
+  EyesClose,
+  EyesOpen,
+  OverviewSend,
+  OverviewReceive,
+  Addressbook,
+  CellManage,
+  Lock,
+} from 'widgets/Icons/icon'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
 import TransactionType from 'components/TransactionType'
+import { getLockedBalance } from 'services/remote/cellManage'
 import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
@@ -99,6 +116,18 @@ const Overview = () => {
     setShowBalance(v => !v)
   }, [setShowBalance])
 
+  const gotoCellManage = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const { order } = e.currentTarget.dataset
+    navigate(`${RoutePath.Overview}/${RoutePath.CellManage}?order=${order}`)
+  }, [])
+  const [lockedBalance, setLockedBalance] = useState('0')
+  useEffect(() => {
+    getLockedBalance().then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setLockedBalance(res.result)
+      }
+    })
+  }, [])
   return (
     <PageContainer head={t('navbar.overview')} notice={pageNotice} isHomePage>
       <div className={styles.topContainer}>
@@ -122,11 +151,31 @@ const Overview = () => {
             <span className={styles.balanceUnit}>CKB</span>
             <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
             <div className={styles.items}>
+              <button className={styles.button} type="button" data-order="locked" onClick={gotoCellManage}>
+                <Lock />
+                <span className={styles.lockedTitle}>{t('overview.locked-balance')}&nbsp;:</span>
+                {showBalance ? (
+                  <CopyZone content={shannonToCKBFormatter(balance, false, '')}>
+                    <span className={styles.lockedBalance}>{shannonToCKBFormatter(lockedBalance)}</span>
+                  </CopyZone>
+                ) : (
+                  <span className={styles.lockedBalance}>{HIDE_BALANCE}</span>
+                )}
+                <span className={styles.lockedUnit}>CKB</span>
+                <ArrowNext className={styles.arrowNext} />
+              </button>
               {isSingleAddress ? null : (
-                <Button className={styles.addressBook} onClick={() => setShowAddressBook(true)}>
+                <button
+                  className={clsx(styles.button, styles.icon)}
+                  type="button"
+                  onClick={() => setShowAddressBook(true)}
+                >
                   <Addressbook />
-                </Button>
+                </button>
               )}
+              <button className={clsx(styles.button, styles.icon)} type="button" onClick={gotoCellManage}>
+                <CellManage />
+              </button>
             </div>
           </div>
           <div className={styles.actions}>

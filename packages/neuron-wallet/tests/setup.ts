@@ -46,6 +46,13 @@ jest.mock('dotenv', () => ({
     process.env.MAINNET_CHEQUE_SCRIPT_HASHTYPE = 'type'
 
     process.env.MAINNET_SUDT_SCRIPT_CODEHASH = '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212'
+    process.env.MAINNET_NFT_SCRIPT_CODEHASH = '0xb1837b5ad01a88558731953062d1f5cb547adf89ece01e8934a9f0aeed2d959f'
+    process.env.MAINNET_NFT_SCRIPT_HASH_TYPE = 'type'
+    process.env.MAINNET_NFT_CLASS_SCRIPT_CODEHASH = '0x095b8c0b4e51a45f953acd1fcd1e39489f2675b4bc94e7af27bb38958790e3fc'
+    process.env.MAINNET_NFT_CLASS_SCRIPT_HASH_TYPE = 'type'
+    process.env.MAINNET_NFT_ISSUER_SCRIPT_CODEHASH =
+      '0xb59879b6ea6fff985223117fa499ce84f8cfb028c4ffdfdf5d3ec19e905a11ed'
+    process.env.MAINNET_NFT_ISSUER_SCRIPT_HASH_TYPE = 'type'
 
     process.env.TESTNET_SUDT_DEP_TXHASH = '0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958'
     process.env.TESTNET_SUDT_DEP_INDEX = '0'
@@ -81,6 +88,14 @@ jest.mock('dotenv', () => ({
     process.env.SECP256K1_CODE_HASH = systemScripts.SECP256K1_BLAKE160.CODE_HASH
     process.env.DAO_CODE_HASH = systemScripts.DAO.CODE_HASH
     process.env.MULTISIG_CODE_HASH = systemScripts.SECP256K1_BLAKE160_MULTISIG.CODE_HASH
+
+    process.env.TESTNET_NFT_SCRIPT_CODEHASH = '0xb1837b5ad01a88558731953062d1f5cb547adf89ece01e8934a9f0aeed2d959f'
+    process.env.TESTNET_NFT_SCRIPT_HASH_TYPE = 'type'
+    process.env.TESTNET_NFT_CLASS_SCRIPT_CODEHASH = '0x095b8c0b4e51a45f953acd1fcd1e39489f2675b4bc94e7af27bb38958790e3fc'
+    process.env.TESTNET_NFT_CLASS_SCRIPT_HASH_TYPE = 'type'
+    process.env.TESTNET_NFT_ISSUER_SCRIPT_CODEHASH =
+      '0xb59879b6ea6fff985223117fa499ce84f8cfb028c4ffdfdf5d3ec19e905a11ed'
+    process.env.TESTNET_NFT_ISSUER_SCRIPT_HASH_TYPE = 'type'
   },
 }))
 

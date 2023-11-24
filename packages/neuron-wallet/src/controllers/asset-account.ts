@@ -14,6 +14,7 @@ import CommandSubject from '../models/subjects/command'
 import SyncApiController, { SyncStatus } from './sync-api'
 import { TransactionGenerator } from '../services/tx'
 import OutPoint from '../models/chain/out-point'
+import SudtTokenInfoService from '../services/sudt-token-info'
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -190,7 +191,7 @@ export default class AssetAccountController {
   }
 
   public async getTokenInfoList() {
-    const result = await AssetAccountService.getTokenInfoList()
+    const result = await SudtTokenInfoService.getAllSudtTokenInfo()
     return {
       status: ResponseCode.Success,
       result,

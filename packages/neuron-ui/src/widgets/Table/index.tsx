@@ -24,6 +24,7 @@ export type TableProps<T> = {
     className?: string
     tdClassName?: string
     hidden?: boolean
+    sortable?: boolean
     sorter?: (a: T, b: T, type: SortType) => number
   }[]
   dataKey?: string
@@ -36,6 +37,8 @@ export type TableProps<T> = {
   rowExtendRender?: (v: T, idx: number) => React.ReactNode
   expandedRow?: number | null
   hasHoverTrBg?: boolean
+  onSorted?: (key?: keyof T, type?: SortType) => void
+  initSortInfo?: { key: string; direction: SortType }
 }
 
 const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
@@ -52,6 +55,8 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     rowExtendRender,
     expandedRow,
     hasHoverTrBg = true,
+    onSorted,
+    initSortInfo,
   } = props
   const [showBalance, setShowBalance] = useState(true)
   const onClickBalanceIcon = useCallback(() => {
@@ -64,34 +69,33 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
 
   const columnList = useMemo(() => columns.filter(item => !item.hidden), [columns])
 
-  const [sortIndex, setSortIndex] = useState(-1)
-  const [sortType, setSortType] = useState<SortType>(SortType.Normal)
+  const [sortInfo, setSortInfo] = useState<{ key: string; direction: SortType } | undefined>(initSortInfo)
 
   const currentDataSource = useMemo(() => {
-    if (sortIndex !== -1 && sortType !== SortType.Normal) {
-      const { sorter } = columnList[sortIndex]
-      if (sorter) {
-        return [...dataSource].sort((a: T, b: T) => sorter(a, b, sortType))
+    if (sortInfo && sortInfo.direction !== SortType.Normal) {
+      const sortColumn = columnList.find(v => (v.key ? v.key === sortInfo.key : v.dataIndex === sortInfo.key))
+      if (sortColumn?.sorter) {
+        return [...dataSource].sort((a: T, b: T) => sortColumn.sorter!(a, b, sortInfo.direction))
       }
     }
     return dataSource
-  }, [columnList, dataSource, sortIndex, sortType])
+  }, [columnList, dataSource, sortInfo])
 
   const handleSort = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       const { dataset } = e.currentTarget
-      const { index, type } = dataset as { index: string; type: SortType }
-      const currentIndex = Number(index)
+      const { type, columnKey } = dataset as { type: SortType; columnKey: string }
 
-      if (sortIndex === currentIndex && sortType === type) {
-        setSortIndex(-1)
+      if (sortInfo?.key === columnKey && sortInfo?.direction === type) {
+        setSortInfo(undefined)
+        onSorted?.()
         return
       }
 
-      setSortIndex(currentIndex)
-      setSortType(type)
+      onSorted?.(columnKey, type)
+      setSortInfo({ key: columnKey, direction: type })
     },
-    [sortIndex, sortType, setSortIndex, setSortType]
+    [sortInfo, setSortInfo, onSorted]
   )
 
   return (
@@ -108,7 +112,18 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
           <tr>
             {columnList.map(
               (
-                { title, dataIndex, key, isBalance, align, width, minWidth, className: headClassName, sorter },
+                {
+                  title,
+                  dataIndex,
+                  key,
+                  isBalance,
+                  align,
+                  width,
+                  minWidth,
+                  className: headClassName,
+                  sorter,
+                  sortable,
+                },
                 index
               ) => {
                 return (
@@ -134,19 +149,25 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
                       ) : (
                         title
                       )}
-                      {sorter ? (
+                      {sorter || sortable ? (
                         <div className={styles.sorter}>
                           <Sort
                             data-index={index}
+                            data-column-key={key || dataIndex}
                             data-type={SortType.Increase}
                             onClick={handleSort}
-                            data-active={sortIndex === index && sortType === SortType.Increase}
+                            data-active={
+                              sortInfo?.key === (key ?? dataIndex) && sortInfo.direction === SortType.Increase
+                            }
                           />
                           <Sort
                             data-index={index}
+                            data-column-key={key || dataIndex}
                             data-type={SortType.Decrease}
                             onClick={handleSort}
-                            data-active={sortIndex === index && sortType === SortType.Decrease}
+                            data-active={
+                              sortInfo?.key === (key ?? dataIndex) && sortInfo.direction === SortType.Decrease
+                            }
                           />
                         </div>
                       ) : null}

@@ -11,8 +11,9 @@ import AlertDialog from 'widgets/AlertDialog'
 import Tabs from 'widgets/Tabs'
 import Table from 'widgets/Table'
 import CopyZone from 'widgets/CopyZone'
-import { BalanceHide, BalanceShow, Copy, GoBack } from 'widgets/Icons/icon'
+import { BalanceHide, BalanceShow, Copy } from 'widgets/Icons/icon'
 import Tooltip from 'widgets/Tooltip'
+import Breadcrum from 'widgets/Breadcrum'
 
 import {
   ErrorCode,
@@ -244,18 +245,15 @@ const HistoryDetailPage = () => {
     },
   ]
 
+  const breadPages = useMemo(() => [{ label: t('history.title-detail') }], [t])
+
   return (
     <PageContainer
       onContextMenu={e => {
         e.stopPropagation()
         e.preventDefault()
       }}
-      head={
-        <div>
-          <GoBack className={styles.goBack} onClick={() => navigate(-1)} />
-          <span className={styles.breadcrumbNav}>{`${t('history.title-detail')}`}</span>
-        </div>
-      }
+      head={<Breadcrum pages={breadPages} showBackIcon />}
       notice={pageNotice}
     >
       <div className={styles.basicInfoWrap}>

@@ -140,7 +140,8 @@
       "wallet-ready": "钱包准备完成，欢迎使用",
       "send": "转账",
       "receive": "收款",
-      "locked": "已锁定余额"
+      "locked": "已锁定余额",
+      "locked-balance": "已锁定余额"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -1140,6 +1141,55 @@
         "add-network": "添加网络",
         "ignore-external-node": "忽略外部节点"
       }
+    },
+    "cell-manage": {
+      "title": "Cell管理",
+      "wallet-balance": "钱包余额",
+      "table": {
+        "head": {
+          "date": "日期",
+          "type": "类型",
+          "balance": "金额",
+          "status": "状态",
+          "description": "备注",
+          "action": "操作"
+        },
+        "locked": "锁定",
+        "unlocked": "解锁",
+        "default-description": "无"
+      },
+      "cell-detail-dialog": {
+        "title": "Cell详情",
+        "capacity-used": "容量使用",
+        "data": "数据",
+        "total": "总量",
+        "used": "已用"
+      },
+      "locked-reason": {
+        "multi-locktime": "这是一个有时间锁的 cell, 只能在 {{time}} 之后使用。",
+        "multi-locktime-reached": "此 Cell 的锁定已经结束，请在\"自定义资产\"中解锁后使用。",
+        "cheque-acp-multisig": "这是一个 {{type}} 的 cell, 不支持解锁。",
+        "NFT-SUDT-DAO": "这是一个 {{type}} 的资产，不支持解锁。",
+        "Unknown": "這是壹項未知的資產，請在繼續操作之前進行檢查和確認。"
+      },
+      "cell-lock-dialog": {
+        "title": "锁定 Cell",
+        "capacity": "锁定所选 Cell {{capacity}} CKB",
+        "locked-cell-can-not-use": "请注意, 锁定的 Cells 不能花费"
+      },
+      "cell-unlock-dialog": {
+        "title": "解锁 Cell",
+        "capacity": "解锁所选 Cell {{capacity}} CKB"
+      },
+      "cell-consume-dialog": {
+        "title": "消耗 Cell",
+        "warn-consume": "消耗Cell不会保留任何数据，并将花费全部的CKB，请确保没有重要数据需要保留。"
+      },
+      "enter-password": "输入密码",
+      "password-placeholder": "请输入钱包密码",
+      "lock": "锁定",
+      "unlock": "解锁",
+      "consume": "消耗"
     }
   }
 }

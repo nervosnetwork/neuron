@@ -19,6 +19,7 @@ import MultisigConfig from './entities/multisig-config'
 import MultisigOutput from './entities/multisig-output'
 import SyncProgress from './entities/sync-progress'
 import TxLock from './entities/tx-lock'
+import CellLocalInfo from './entities/cell-local-info'
 
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
@@ -55,6 +56,7 @@ import { AddTypeSyncProgress1681360188494 } from './migrations/1681360188494-Add
 import { TxLock1684488676083 } from './migrations/1684488676083-TxLock'
 import { ResetSyncProgressPrimaryKey1690361215400 } from './migrations/1690361215400-ResetSyncProgressPrimaryKey'
 import { TxLockAddArgs1694746034975 } from './migrations/1694746034975-TxLockAddArgs'
+import { CreateCellLocalInfo1694228328076 } from './migrations/1694228328076-CreateCellLocalInfo'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -89,6 +91,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       MultisigOutput,
       SyncProgress,
       TxLock,
+      CellLocalInfo,
     ],
     migrations: [
       InitMigration1566959757554,
@@ -126,6 +129,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       TxLock1684488676083,
       ResetSyncProgressPrimaryKey1690361215400,
       TxLockAddArgs1694746034975,
+      CreateCellLocalInfo1694228328076,
     ],
     logger: 'simple-console',
     logging,

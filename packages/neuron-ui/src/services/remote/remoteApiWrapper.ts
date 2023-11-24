@@ -153,6 +153,11 @@ type Action =
   | 'get-sync-progress-by-addresses'
   // spore
   | 'generate-transfer-spore-tx'
+  // cell-manage
+  | 'get-live-cells'
+  | 'update-live-cell-local-info'
+  | 'get-locked-balance'
+  | 'update-live-cells-lock-status'
 
 export const remoteApi =
   <P = any, R = any>(action: Action) =>

@@ -62,6 +62,8 @@ import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
+import CellManagement from './cell-management'
+import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -396,7 +398,13 @@ export default class ApiController {
       'generate-tx',
       async (
         _,
-        params: { walletID: string; items: { address: string; capacity: string }[]; fee: string; feeRate: string }
+        params: {
+          walletID: string
+          items: { address: string; capacity: string }[]
+          fee: string
+          feeRate: string
+          consumeOutPoints?: CKBComponents.OutPoint[]
+        }
       ) => {
         return this.#walletsController.generateTx(params)
       }
@@ -406,7 +414,13 @@ export default class ApiController {
       'generate-send-all-tx',
       async (
         _,
-        params: { walletID: string; items: { address: string; capacity: string }[]; fee: string; feeRate: string }
+        params: {
+          walletID: string
+          items: { address: string; capacity: string }[]
+          fee: string
+          feeRate: string
+          consumeOutPoints: CKBComponents.OutPoint[]
+        }
       ) => {
         return this.#walletsController.generateSendingAllTx(params)
       }
@@ -812,6 +826,51 @@ export default class ApiController {
     handle('get-sync-progress-by-addresses', async (_, hashes: string[]) => {
       return {
         result: await SyncProgressService.getSyncProgressByHashes(hashes),
+        status: ResponseCode.Success,
+      }
+    })
+
+    // cell manager
+    handle('get-live-cells', async () => {
+      return {
+        result: await CellManagement.getLiveCells(),
+        status: ResponseCode.Success,
+      }
+    })
+
+    handle('update-live-cell-local-info', async (_, params: UpdateCellLocalInfo) => {
+      return {
+        result: await CellManagement.updateLiveCellLocalInfo(params),
+        status: ResponseCode.Success,
+      }
+    })
+
+    handle(
+      'update-live-cells-lock-status',
+      async (
+        _,
+        params: {
+          outPoints: CKBComponents.OutPoint[]
+          locked: boolean
+          password: string
+          lockScripts: CKBComponents.Script[]
+        }
+      ) => {
+        return {
+          result: await CellManagement.updateLiveCellsLockStatus(
+            params.outPoints,
+            params.locked,
+            params.lockScripts,
+            params.password
+          ),
+          status: ResponseCode.Success,
+        }
+      }
+    )
+
+    handle('get-locked-balance', async () => {
+      return {
+        result: await CellManagement.getLockedBalance(),
         status: ResponseCode.Success,
       }
     })
