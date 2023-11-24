@@ -1757,20 +1757,6 @@
     js-xxhash "^1.0.4"
     lodash.isequal "^4.5.0"
 
-"@ckb-lumos/base@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.21.0-next.1.tgz#ad82d0147c479b84bc0e80c3e32ad6a39ee75285"
-  integrity sha512-dJL3pqa28oJcNfYLNOuWRIJCeWhUq9l7l2/SZItb9wIT4MX5pD0Z1tA8/s9qbvwmmsab+QGKaLCHXNNeOvS0hg==
-  dependencies:
-    "@ckb-lumos/bi" "0.21.0-next.1"
-    "@ckb-lumos/codec" "0.21.0-next.1"
-    "@ckb-lumos/toolkit" "0.21.0-next.1"
-    "@types/blake2b" "^2.1.0"
-    "@types/lodash.isequal" "^4.5.5"
-    blake2b "^2.1.3"
-    js-xxhash "^1.0.4"
-    lodash.isequal "^4.5.0"
-
 "@ckb-lumos/base@0.21.0-next.2":
   version "0.21.0-next.2"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.21.0-next.2.tgz#8d7ba32aa98f63de64f0140ef2e530a16450a382"
@@ -1789,13 +1775,6 @@
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.20.0.tgz#4fa3beca641737b7b83a64d56668067e38cc288d"
   integrity sha512-cJtv1NnvC11oQbDC8f3jIGTYdyEs2m8GvSrZgGL5KjBoaHTWghH8v6Z2XkwFgHmmCwfX5KrdXekrsOWrcIXyqw==
-  dependencies:
-    jsbi "^4.1.0"
-
-"@ckb-lumos/bi@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.21.0-next.1.tgz#357b8da31882ab5e3e3f8aca54c30dd576e4544d"
-  integrity sha512-FaMKBbtr826upcEVYt9/K/hutxHySD21t7ut5yv8lfj6LYcg6hWjtrbCM2INVV6/8HatfAf8YV2KsNRaluyt3A==
   dependencies:
     jsbi "^4.1.0"
 
@@ -1837,13 +1816,6 @@
   integrity sha512-NHBPIaiNYz5yX0RGSM0Qz1effLnVTt0wJHPfLVAkuzNRBg5/xRZySjYOemOsogbX1t4s3Yk7N0Q17tr02AUh3A==
   dependencies:
     "@ckb-lumos/bi" "0.20.0"
-
-"@ckb-lumos/codec@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.21.0-next.1.tgz#a75f5331026039799afb4f3419bea388e220d26c"
-  integrity sha512-b1w4wbIAbuYngNTKtu6np93EYgnmM4tb6NGdaYN0vZ3kyunlODkLWyRHyMo+FGeBdWQjBwBbmxGNyXwDxtTEGQ==
-  dependencies:
-    "@ckb-lumos/bi" "0.21.0-next.1"
 
 "@ckb-lumos/codec@0.21.0-next.2":
   version "0.21.0-next.2"
@@ -1979,17 +1951,6 @@
     axios "0.27.2"
     tslib "2.3.1"
 
-"@ckb-lumos/rpc@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.21.0-next.1.tgz#f31610fc1713ae63e25475d3653ee8cc3eeabc0f"
-  integrity sha512-6IjnME2wGg1rmVnajQ7CTBqbLnXkdNqRERRmnD1J9EnoHBc+onSYSfkC58ZCVCOe0xZIR2vNKmOUQ++dmlKKiQ==
-  dependencies:
-    "@ckb-lumos/base" "0.21.0-next.1"
-    "@ckb-lumos/bi" "0.21.0-next.1"
-    "@vespaiach/axios-fetch-adapter" "^0.3.1"
-    axios "0.27.2"
-    tslib "2.3.1"
-
 "@ckb-lumos/rpc@0.21.0-next.2":
   version "0.21.0-next.2"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.21.0-next.2.tgz#a840f18535c419448e982807f49ede7012ac7daf"
@@ -2004,13 +1965,6 @@
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.20.0.tgz#8f71043324e50c8a3e94c65414325482d874cfca"
   integrity sha512-nLNXRPG20NqUdXwHAnKwr0T7nZyDrf4fGwIrsxo+7ffqWeg9wNEhZoqTBJLgxEpoe0I+WHRLwYLiwUbkkqR1SQ==
-
-"@ckb-lumos/toolkit@0.21.0-next.1":
-  version "0.21.0-next.1"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.21.0-next.1.tgz#f8ce7b5fa5b388f1870efd309a114f3df2e74c61"
-  integrity sha512-CBnRM8Y0P6TV0FjACmaAz2YcPiIlcwJlU1tXDtcpzp4fcGL4uSMTcrJwFqWB8OE2s12EfN4+d0Ie4bn8/uq1Fg==
-  dependencies:
-    "@ckb-lumos/bi" "0.21.0-next.1"
 
 "@ckb-lumos/toolkit@0.21.0-next.2":
   version "0.21.0-next.2"
@@ -5226,6 +5180,11 @@
   version "1.10.6"
   resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.6.tgz#3e600c62d210c5826460858f84bcbb65805460bb"
   integrity sha512-NNm+gdePAX1VGvPcGZCDKQZKYSiAWigKhKaz5KF94hG6f2s8de9Ow5+7AbXoeKxL8gavZfk4UquSAygOF2duEQ==
+
+"@types/w3c-web-usb@^1.0.6":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@types/w3c-web-usb/-/w3c-web-usb-1.0.10.tgz#cf89cccd2d93b6245e784c19afe0a9f5038d4528"
+  integrity sha512-CHgUI5kTc/QLMP8hODUHhge0D4vx+9UiAwIGiT0sTy/B2XpdX1U5rJt6JSISgr6ikRT7vxV9EVAFeYZqUnl1gQ==
 
 "@types/ws@^8.5.5":
   version "8.5.5"
@@ -13854,6 +13813,11 @@ node-addon-api@^4.2.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
   integrity sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==
 
+node-addon-api@^6.0.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-6.1.0.tgz#ac8470034e58e67d0c6f1204a18ae6995d9c0d76"
+  integrity sha512-+eawOlIgy680F0kBzPUNFhMZGtJ1YmqM6l4+Crf4IkImjYrO/mqPwRMh352g23uIaQKFItcQ64I7KMaJxHgAVA==
+
 node-dir@^0.1.10, node-dir@^0.1.17:
   version "0.1.17"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.17.tgz#5f5665d93351335caabef8f1c554516cf5f1e4e5"
@@ -13896,6 +13860,11 @@ node-gyp-build@^4.3.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.6.0.tgz#0c52e4cbf54bbd28b709820ef7b6a3c2d6209055"
   integrity sha512-NTZVKn9IylLwUzaKjkas1e4u2DLNcV4rdYagA4PWdPwW87Bi7z+BznyKSRwS/761tV/lzCGXplWsiaMjLqP2zQ==
+
+node-gyp-build@^4.5.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.7.0.tgz#749f0033590b2a89ac8edb5e0775f95f5ae86d15"
+  integrity sha512-PbZERfeFdrHQOOXiAKOY0VPbykZy90ndPKk0d+CFDegTKmWp1VgOTz2xACVbr1BjCWxrQp68CXtvNsveFhqDJg==
 
 node-gyp@8.x:
   version "8.4.1"
@@ -18457,13 +18426,14 @@ url-parse@^1.5.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-usb@1.8.8, usb@2.9.0:
-  version "1.8.8"
-  resolved "https://registry.yarnpkg.com/usb/-/usb-1.8.8.tgz#54de33f9e57dc4efc1b5b5f72b6624a275775e80"
-  integrity sha512-xpRAoek268RE3ATqK8l6LjrF4ADHn/A3V3cXEFbYo3/D83ZCLSO0A5tFKO093F4w5IbDfBVlB9VsYzoGz6EJGw==
+usb@2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/usb/-/usb-2.9.0.tgz#8ae3b175f93bee559400bff33491eee63406b6a2"
+  integrity sha512-G0I/fPgfHUzWH8xo2KkDxTTFruUWfppgSFJ+bQxz/kVY2x15EQ/XDB7dqD1G432G4gBG4jYQuF3U7j/orSs5nw==
   dependencies:
-    node-addon-api "^4.2.0"
-    node-gyp-build "^4.3.0"
+    "@types/w3c-web-usb" "^1.0.6"
+    node-addon-api "^6.0.0"
+    node-gyp-build "^4.5.0"
 
 use-resize-observer@^9.1.0:
   version "9.1.0"

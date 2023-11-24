@@ -64,8 +64,7 @@
   "dependencies": {},
   "resolutions": {
     "@types/react": "17.0.71",
-    "react-i18next": ">=11.16.4",
-    "usb": "1.8.8"
+    "react-i18next": ">=11.16.4"
   },
   "volta": {
     "node": "18.16.1"
