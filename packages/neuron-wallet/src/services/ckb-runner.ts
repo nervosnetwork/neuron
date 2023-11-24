@@ -119,16 +119,16 @@ export const startCkbNode = async () => {
     stdio[1] = 'pipe'
   }
   logger.info(`CKB:\tckb full node will with rpc port ${rpcPort}, listen port ${listenPort}, with options`, options)
-  ckb = spawn(ckbBinary(), options, { stdio })
+  const currentProcess = spawn(ckbBinary(), options, { stdio })
 
-  ckb.stderr?.on('data', data => {
+  currentProcess.stderr?.on('data', data => {
     const dataString: string = data.toString()
     logger.error('CKB:\trun fail:', dataString)
     if (dataString.includes('CKB wants to migrate the data into new format')) {
       MigrateSubject.next({ type: 'need-migrate' })
     }
   })
-  ckb.stdout?.on('data', data => {
+  currentProcess.stdout?.on('data', data => {
     const dataString: string = data.toString()
     if (
       dataString.includes(
@@ -142,17 +142,23 @@ export const startCkbNode = async () => {
     }
   })
 
-  ckb.on('error', error => {
+  currentProcess.on('error', error => {
     logger.error('CKB:\trun fail:', error)
     isLookingValidTarget = false
-    ckb = null
+    if (Object.is(ckb, currentProcess)) {
+      ckb = null
+    }
   })
 
-  ckb.on('close', () => {
+  currentProcess.on('close', () => {
     logger.info('CKB:\tprocess closed')
     isLookingValidTarget = false
-    ckb = null
+    if (Object.is(ckb, currentProcess)) {
+      ckb = null
+    }
   })
+
+  ckb = currentProcess
 
   removeOldIndexerIfRunSuccess()
 }

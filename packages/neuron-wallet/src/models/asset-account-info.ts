@@ -7,6 +7,7 @@ import Transaction from './chain/transaction'
 import SystemScriptInfo from './system-script-info'
 import { Address } from './address'
 import { createFixedHexBytesCodec } from '@ckb-lumos/codec/lib/blockchain'
+import { predefinedSporeConfigs, SporeConfig, SporeScript } from '@spore-sdk/core'
 
 export interface ScriptCellInfo {
   cellDep: CellDep
@@ -24,6 +25,9 @@ export default class AssetAccountInfo {
   private nftIssuerInfo: ScriptCellInfo
   private nftClassInfo: ScriptCellInfo
   private nftInfo: ScriptCellInfo
+
+  private sporeInfos: ScriptCellInfo[]
+  private sporeClusterInfos: ScriptCellInfo[]
 
   private static MAINNET_GENESIS_BLOCK_HASH: string =
     '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
@@ -110,6 +114,10 @@ export default class AssetAccountInfo {
         codeHash: process.env.MAINNET_NFT_SCRIPT_CODEHASH!,
         hashType: process.env.MAINNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
+
+      // TODO infos for mainnet
+      this.sporeInfos = []
+      this.sporeClusterInfos = []
     } else {
       this.sudt = {
         cellDep: new CellDep(
@@ -183,6 +191,11 @@ export default class AssetAccountInfo {
         codeHash: process.env.TESTNET_NFT_SCRIPT_CODEHASH!,
         hashType: process.env.TESTNET_NFT_SCRIPT_HASH_TYPE! as ScriptHashType,
       }
+
+      const { Spore, Cluster } = predefinedSporeConfigs.Aggron4.scripts
+
+      this.sporeInfos = ([Spore, ...(Spore.versions || [])] satisfies SporeScript[]).map(toScriptInfo)
+      this.sporeClusterInfos = ([Cluster, ...(Cluster.versions || [])] satisfies SporeScript[]).map(toScriptInfo)
     }
   }
 
@@ -220,6 +233,14 @@ export default class AssetAccountInfo {
 
   public getNftInfo(): ScriptCellInfo {
     return this.nftInfo
+  }
+
+  public getSporeInfos(): ScriptCellInfo[] {
+    return this.sporeInfos
+  }
+
+  public getSporeClusterInfo(): ScriptCellInfo[] {
+    return this.sporeClusterInfos
   }
 
   public getAcpCodeHash(): string {
@@ -311,5 +332,60 @@ export default class AssetAccountInfo {
     })
 
     return foundSender || null
+  }
+
+  public getSporeConfig(nodeUrl: string): SporeConfig {
+    const spore = this.sporeInfos
+    const cluster = this.sporeClusterInfos
+
+    return {
+      scripts: {
+        Spore: {
+          ...toSporeScript(spore[0]),
+          versions: spore.slice(1).map(toSporeScript),
+        },
+
+        Cluster: {
+          ...toSporeScript(cluster[0]),
+          versions: cluster.slice(1).map(toSporeScript),
+        },
+      },
+      lumos: {
+        PREFIX: NetworksService.getInstance().isMainnet() ? 'ckb' : 'ckt',
+        SCRIPTS: {},
+      },
+      ckbIndexerUrl: nodeUrl,
+      ckbNodeUrl: nodeUrl,
+      extensions: [],
+    }
+  }
+}
+
+function toSporeScript(info: ScriptCellInfo): SporeScript {
+  return {
+    script: { codeHash: info.codeHash, hashType: info.hashType },
+    cellDep: info.cellDep,
+  }
+}
+
+function toScriptInfo(sporeConfig: SporeScript): ScriptCellInfo {
+  const cellDep = sporeConfig.cellDep
+
+  const hashType: ScriptHashType = (() => {
+    const sporeScriptHashType = sporeConfig.script.hashType
+    if (sporeScriptHashType === 'type') return ScriptHashType.Type
+    if (sporeScriptHashType === 'data') return ScriptHashType.Data
+    if (sporeScriptHashType === 'data1') return ScriptHashType.Data1
+
+    throw new Error(`Invalid hash type: ${sporeScriptHashType}`)
+  })()
+
+  return {
+    cellDep: new CellDep(
+      new OutPoint(cellDep.outPoint.txHash, cellDep.outPoint.index),
+      cellDep.depType === 'depGroup' ? DepType.DepGroup : DepType.Code
+    ),
+    hashType: hashType,
+    codeHash: sporeConfig.script.codeHash,
   }
 }

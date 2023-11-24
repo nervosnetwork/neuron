@@ -14,7 +14,8 @@ import InputEntity from '../database/chain/entities/input'
 import TransactionEntity from '../database/chain/entities/transaction'
 import TransactionSize from '../models/transaction-size'
 import TransactionFee from '../models/transaction-fee'
-import Cell, { OutputStatus } from '../models/chain/output'
+import Cell from '../models/chain/output'
+import Output, { OutputStatus } from '../models/chain/output'
 import { TransactionStatus } from '../models/chain/transaction'
 import OutPoint from '../models/chain/out-point'
 import Input from '../models/chain/input'
@@ -22,7 +23,6 @@ import WitnessArgs from '../models/chain/witness-args'
 import Multisig from '../models/multisig'
 import BufferUtils from '../utils/buffer'
 import LiveCell from '../models/chain/live-cell'
-import Output from '../models/chain/output'
 import SystemScriptInfo from '../models/system-script-info'
 import Script, { ScriptHashType } from '../models/chain/script'
 import LiveCellService from './live-cell-service'
@@ -31,6 +31,10 @@ import NFT from '../models/nft'
 import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { MIN_CELL_CAPACITY } from '../utils/const'
+import { bytes } from '@ckb-lumos/codec'
+import { generateRPC } from '../utils/ckb-rpc'
+import { getClusterCellById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
+import NetworksService from './networks'
 
 export interface PaginationResult<T = any> {
   totalCount: number
@@ -47,7 +51,12 @@ export enum CustomizedType {
   NFT = 'NFT',
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
+
   SUDT = 'SUDT',
+
+  Spore = 'Spore',
+  SporeCluster = 'SporeCluster',
+
   Unknown = 'Unknown',
 }
 
@@ -265,6 +274,8 @@ export default class CellsService {
     const nftCodehash = assetAccountInfo.getNftInfo().codeHash
     const acpCodehash = assetAccountInfo.getAcpCodeHash()
     const sudtCodehash = assetAccountInfo.getSudtCodeHash()
+    const sporeInfos = assetAccountInfo.getSporeInfos()
+
     const secp256k1LockHashes = [...blake160Hashes].map(blake160 =>
       SystemScriptInfo.generateSecpScript(blake160).computeHash()
     )
@@ -324,6 +335,44 @@ export default class CellsService {
       )
       .orderBy('tx.timestamp', 'ASC')
       .getMany()
+
+    const currentNetwork = NetworksService.getInstance().getCurrent()
+
+    // https://github.com/nervosnetwork/neuron/blob/dbc5a5b46dc108f660c443d43aba54ea47e233ac/packages/neuron-wallet/src/services/tx/transaction-persistor.ts#L70
+    // datum in outputs has been sliced when sync
+    // to make the Spore NFT data available,
+    // we need to fetch it from RPC instead of database
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
+    const sporeOutputs = allMultiSignOutputs.filter(item =>
+      sporeInfos.some(info => item.typeCodeHash && bytes.equal(info.codeHash, item.typeCodeHash))
+    )
+
+    type ClusterId = string
+    const clusterInfos: Record<ClusterId, { name: string; description: string }> = {}
+    await Promise.all(
+      sporeOutputs.map(async output => {
+        const tx = await rpc.getTransaction(output.outPointTxHash)
+        const data = tx.transaction.outputsData[Number(output.outPointIndex)]
+        output.data = data
+
+        try {
+          const { clusterId } = SporeData.unpack(data)
+
+          if (!clusterId) {
+            return
+          }
+
+          const clusterCell = await getClusterCellById(
+            clusterId,
+            assetAccountInfo.getSporeConfig(currentNetwork.remote)
+          )
+          const { name, description } = unpackToRawClusterData(clusterCell.data)
+          clusterInfos[clusterId] = { name, description }
+        } catch {
+          // avoid crash
+        }
+      })
+    )
 
     const matchedOutputs = allMultiSignOutputs.filter(o => {
       if (o.multiSignBlake160) {
@@ -401,6 +450,25 @@ export default class CellsService {
           lock: CustomizedLock.SUDT,
           type: CustomizedType.SUDT,
           data: '',
+        })
+      } else if (sporeInfos.some(info => o.typeCodeHash && bytes.equal(info.codeHash, o.typeCodeHash))) {
+        const data = (() => {
+          try {
+            const { clusterId } = SporeData.unpack(o.data)
+
+            if (clusterId && clusterInfos[clusterId]) {
+              return clusterInfos[clusterId]
+            }
+
+            return ''
+          } catch {
+            return ''
+          }
+        })()
+        cell.setCustomizedAssetInfo({
+          lock: '',
+          type: CustomizedType.Spore,
+          data: JSON.stringify(data),
         })
       } else {
         cell.setCustomizedAssetInfo({

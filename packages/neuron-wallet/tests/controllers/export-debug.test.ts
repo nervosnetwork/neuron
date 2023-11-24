@@ -78,7 +78,9 @@ jest.mock('../../src/services/light-runner', () => {
     CKBLightRunner: {
       getInstance() {
         return {
-          logPath: '',
+          getLogPath() {
+            return ''
+          },
         }
       },
     },

@@ -15,7 +15,7 @@ describe(`Test outputs validator`, () => {
         expect(e).not.toBeUndefined()
       }
     } else {
-      expect(validateOutputs()).toBeTruthy()
+      expect(validateOutputs(outputs, false, ignoreLastAmount)).toBeTruthy()
     }
   })
 })

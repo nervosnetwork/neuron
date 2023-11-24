@@ -10,7 +10,10 @@ import {
   shannonToCKBFormatter,
   calculateFee,
   validateOutputs,
+  DefaultLockInfo,
 } from 'utils'
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
+import { PlaceHolderArgs } from 'utils/const'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
 
@@ -330,10 +333,7 @@ export const useInitialize = (
   const [errorMessage, setErrorMessage] = useState('')
   const [isSendMax, setIsSendMax] = useState(false)
 
-  const outputs = useMemo(
-    () => items.map(item => ({ ...item, disabled: isSendMax || sending })),
-    [items, isSendMax, sending]
-  )
+  const outputs = useMemo(() => items.map(item => ({ ...item, disabled: sending })), [items, sending])
 
   const updateIsSendMax = useCallback(
     (payload: boolean) => {
@@ -358,7 +358,19 @@ export const useInitialize = (
   const updateSendingAllTransaction = useCallback(() => {
     updateTransactionWith(generateSendingAllTx)({
       walletID,
-      items,
+      items: items.map(v => ({
+        ...v,
+        address:
+          v.address ||
+          scriptToAddress(
+            {
+              codeHash: DefaultLockInfo.CodeHash,
+              hashType: DefaultLockInfo.HashType,
+              args: PlaceHolderArgs,
+            },
+            isMainnet
+          ),
+      })),
       price,
       setTotalAmount,
       setErrorMessage,
@@ -413,6 +425,7 @@ export const useInitialize = (
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
+    updateIsSendMax,
   }
 }
 

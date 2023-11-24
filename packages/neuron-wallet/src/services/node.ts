@@ -3,7 +3,7 @@ import path from 'path'
 import { BI } from '@ckb-lumos/bi'
 import { app as electronApp, dialog, shell, app } from 'electron'
 import { t } from 'i18next'
-import { interval, BehaviorSubject, merge } from 'rxjs'
+import { interval, BehaviorSubject, merge, Subject } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
 import env from '../env'
 import { ConnectionStatusSubject } from '../models/subjects/node'
@@ -42,6 +42,7 @@ class NodeService {
   public tipNumberSubject = new BehaviorSubject<string>('0')
   public connectionStatusSubject = new BehaviorSubject<boolean>(false)
 
+  #startNodeSubject = new Subject<void>()
   private _tipBlockNumber: string = '0'
   #startedBundledNode: boolean = false
 
@@ -53,6 +54,7 @@ class NodeService {
     this.start()
     this.syncConnectionStatus()
     CurrentNetworkIDSubject.subscribe(this.whenNetworkUpdate)
+    this.#startNodeSubject.pipe(debounceTime(1000)).subscribe(this.startNode)
   }
 
   public get tipBlockNumber(): string {
@@ -77,17 +79,19 @@ class NodeService {
   }
 
   private whenNetworkUpdate = () => {
+    this.stop?.()
     this.#startedBundledNode = false
     this.tipNumberSubject.next('0')
     this.connectionStatusSubject.next(false)
   }
 
   public start = () => {
-    const { unsubscribe } = this.tipNumber()
-    this.stop = unsubscribe
+    this.stop?.()
+    const subscribe = this.tipNumber()
+    this.stop = subscribe.unsubscribe.bind(subscribe)
   }
 
-  public stop: (() => void) | null = null
+  public stop?: () => void
 
   public tipNumber = () => {
     return interval(this.intervalTime)
@@ -122,8 +126,7 @@ class NodeService {
           if (this.delayTime < 10 * this.intervalTime) {
             this.delayTime = 2 * this.intervalTime
           }
-          const { unsubscribe } = this.tipNumber()
-          this.stop = unsubscribe
+          this.start()
         }
       )
   }
@@ -134,11 +137,12 @@ class NodeService {
     if (isDefaultCKBNeedStart) {
       logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
       const redistReady = await redistCheck()
-      await (redistReady ? this.startNode() : this.showGuideDialog())
+      await (redistReady ? this.#startNodeSubject.next() : this.showGuideDialog())
       await startMonitor()
     } else {
       logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
     }
+    this.start()
   }
 
   public async verifyExternalCkbNode() {
@@ -170,7 +174,7 @@ class NodeService {
     }
   }
 
-  public async startNode() {
+  public startNode = async () => {
     try {
       const network = NetworksService.getInstance().getCurrent()
       if (network.type === NetworkType.Light) {
@@ -191,6 +195,7 @@ class NodeService {
   public async startNodeIgnoreExternal() {
     logger.info('CKB:\tignore running external node, and start node with another port')
     await stopMonitor('ckb')
+    this.start()
     const redistReady = await redistCheck()
     await (redistReady ? this.startNode() : this.showGuideDialog())
     await startMonitor()
@@ -231,23 +236,20 @@ class NodeService {
 
   private getNeuronCompatibilityCKB() {
     const appPath = electronApp.isPackaged ? electronApp.getAppPath() : path.join(__dirname, '../../../..')
-    const compatiblePath = path.join(appPath, 'compatible.csv')
+    const compatiblePath = path.join(appPath, 'compatible.json')
     if (fs.existsSync(compatiblePath)) {
       try {
-        const content = fs.readFileSync(compatiblePath, 'utf8')?.split('\n')
-        const ckbVersions = content?.[0]?.split(',')?.slice(1)
-        const neuronCompatible = content?.slice(2)
-        const result: Record<string, Record<string, boolean>> = {}
-        for (let index = 0; index < neuronCompatible.length; index++) {
-          const [neuronVersion, ...campatibleValues] = neuronCompatible[index].split(',')
-          result[neuronVersion] = {}
-          campatibleValues.forEach((v, idx) => {
-            result[neuronVersion][ckbVersions[idx]] = v === 'yes'
-          })
-        }
-        return result
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const content = require(compatiblePath)
+        return (content?.compatible ?? {}) as Record<
+          string,
+          {
+            full: string[]
+            light: string[]
+          }
+        >
       } catch (err) {
-        logger.error('App\t: get compatible table failed')
+        logger.error('App\t: get compatible failed', err)
       }
     }
   }
@@ -256,7 +258,7 @@ class NodeService {
     const compatibilities = this.getNeuronCompatibilityCKB()
     const neuronCompatibleVersion = neuronVersion.split('.').slice(0, 2).join('.')
     const externalCKBCompatibleVersion = externalCKBVersion.split('.').slice(0, 2).join('.')
-    return compatibilities?.[neuronCompatibleVersion]?.[externalCKBCompatibleVersion]
+    return compatibilities?.[neuronCompatibleVersion]?.full?.includes(externalCKBCompatibleVersion)
   }
 
   private verifyCKbNodeShouldUpdate(neuronCKBVersion: string, externalCKBVersion: string) {

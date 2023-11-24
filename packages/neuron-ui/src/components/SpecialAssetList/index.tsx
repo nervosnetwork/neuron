@@ -25,6 +25,7 @@ import {
   uniformTimeFormatter,
   getExplorerUrl,
   ConnectionStatus,
+  sporeFormatter,
 } from 'utils'
 import { NetworkType, HIDE_BALANCE } from 'utils/const'
 import useGetCountDownAndFeeRateStats from 'utils/hooks/useGetCountDownAndFeeRateStats'
@@ -41,6 +42,7 @@ import TableNoData from 'widgets/Icons/TableNoData.png'
 import { useGetAssetAccounts, useSpecialAssetColumnInfo, SpecialAssetCell } from './hooks'
 
 import styles from './specialAssetList.module.scss'
+import CopyZone from '../../widgets/CopyZone'
 
 export interface LocktimeAssetInfo {
   data: string
@@ -58,6 +60,9 @@ export enum NFTType {
   NFT = 'NFT',
   NFTClass = 'NFTClass',
   NFTIssuer = 'NFTIssuer',
+
+  Spore = 'Spore',
+  Cluster = 'SporeCluster',
 }
 
 export interface NFTAssetInfo {
@@ -92,6 +97,7 @@ const SpecialAssetList = () => {
   const [isExistAccountDialogOpen, setIsExistAccountDialogOpen] = useState<boolean>(false)
   const [nFTSendCell, setNFTSendCell] = useState<
     | {
+        nftType?: NFTType
         nftId: string
         outPoint: {
           index: string
@@ -286,6 +292,16 @@ const SpecialAssetList = () => {
         })
         return
       }
+      if (cell.customizedAssetInfo.type === 'Spore') {
+        setNFTSendCell({
+          // unnecessary id for the spore
+          nftId: cell.type?.args ?? '',
+          outPoint: cell.outPoint,
+          nftType: NFTType.Spore,
+        })
+        return
+      }
+
       const handleRes =
         (actionType: 'unlock' | 'withdraw-cheque' | 'claim-cheque') => (res: ControllerResponse<any>) => {
           if (isSuccessResponse(res)) {
@@ -392,7 +408,22 @@ const SpecialAssetList = () => {
               isBalance: true,
               minWidth: '200px',
               render(_, __, item, show) {
-                const { amount } = handleGetSpecialAssetColumnInfo(item)
+                const { amount, isSpore, sporeClusterInfo } = handleGetSpecialAssetColumnInfo(item)
+
+                if (isSpore && item.type && show) {
+                  const formattedSporeInfo = sporeFormatter({
+                    args: item.type.args,
+                    data: item.data,
+                    truncate: Infinity,
+                    clusterName: sporeClusterInfo?.name,
+                  })
+                  return (
+                    <CopyZone content={formattedSporeInfo} title={sporeClusterInfo?.description}>
+                      {amount}
+                    </CopyZone>
+                  )
+                }
+
                 return show ? amount : HIDE_BALANCE
               },
             },
@@ -413,7 +444,6 @@ const SpecialAssetList = () => {
                   return (
                     <div className={styles.actionBtnBox}>
                       <Button
-                        type="cancel"
                         label={t('special-assets.view-details')}
                         className={`${styles.actionBtn} ${styles.detailBtn}`}
                         onClick={() => onViewDetail(item)}
@@ -479,7 +509,6 @@ const SpecialAssetList = () => {
                       />
                     )}
                     <Button
-                      type="cancel"
                       label={t('special-assets.view-details')}
                       className={`${styles.actionBtn} ${styles.detailBtn}`}
                       onClick={() => onViewDetail(item)}
@@ -549,7 +578,12 @@ const SpecialAssetList = () => {
       ) : null}
 
       {nFTSendCell ? (
-        <NFTSend cell={nFTSendCell} onCancel={() => setNFTSendCell(undefined)} onSuccess={handleActionSuccess} />
+        <NFTSend
+          nftType={nFTSendCell.nftType}
+          cell={nFTSendCell}
+          onCancel={() => setNFTSendCell(undefined)}
+          onSuccess={handleActionSuccess}
+        />
       ) : null}
 
       <Toast content={notice} onDismiss={() => setNotice('')} />
