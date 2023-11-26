@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getPageNoList } from 'utils'
+import { clsx, getPageNoList } from 'utils'
 import { ArrowEnd, ArrowNext } from 'widgets/Icons/icon'
 
 import styles from './pagination.module.scss'
@@ -12,9 +12,10 @@ export interface PaginationProps {
   pageNo: number
   pageSize: number
   onChange: (page: number) => void
+  className?: string
 }
 
-const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
+const Pagination = ({ count, pageNo, onChange, pageSize, className }: PaginationProps) => {
   const [t] = useTranslation()
   const pageCount = Math.ceil(count / pageSize)
   const pageNoList = getPageNoList(pageNo, pageCount)
@@ -45,7 +46,7 @@ const Pagination = ({ count, pageNo, onChange, pageSize }: PaginationProps) => {
   const disableToEnd = pageNo >= pageCount
 
   return (
-    <div role="presentation" className={styles.container} onClick={handlePageNoClick}>
+    <div role="presentation" className={clsx(styles.container, className)} onClick={handlePageNoClick}>
       <div className={styles.range}>{range}</div>
       <div className={styles.navigator} role="navigation" aria-label="pagination">
         <div className={styles.arrowBlock}>

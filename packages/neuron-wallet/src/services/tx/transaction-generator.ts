@@ -172,7 +172,8 @@ export class TransactionGenerator {
       codeHash: string
       hashType: ScriptHashType
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
-    multisigConfig?: MultisigConfigModel
+    multisigConfig?: MultisigConfigModel,
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     let cellDep: CellDep
     if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
@@ -231,7 +232,8 @@ export class TransactionGenerator {
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
       undefined,
       lockClass,
-      multisigConfig ? [multisigConfig] : []
+      multisigConfig ? [multisigConfig] : [],
+      consumeOutPoints
     )
     const finalFeeInt = BigInt(finalFee)
     tx.inputs = inputs
@@ -258,7 +260,8 @@ export class TransactionGenerator {
     targetOutputs: TargetOutput[],
     fee: string = '0',
     feeRate: string = '0',
-    multisigConfig?: MultisigConfigModel
+    multisigConfig?: MultisigConfigModel,
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     let cellDep: CellDep
     if (multisigConfig) {
@@ -280,7 +283,8 @@ export class TransactionGenerator {
         ? Script.fromSDK(
             Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
           )
-        : undefined
+        : undefined,
+      consumeOutPoints
     )
 
     if (allInputs.length === 0) {

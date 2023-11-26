@@ -615,7 +615,10 @@ describe('TransactionSender Test', () => {
             ],
             fakeAddress1,
             fee,
-            feeRate
+            feeRate,
+            undefined,
+            undefined,
+            undefined
           )
         })
       })
@@ -649,7 +652,9 @@ describe('TransactionSender Test', () => {
             { address: '1', capacity: '1' },
           ],
           fee,
-          feeRate
+          feeRate,
+          undefined,
+          undefined
         )
       })
     })

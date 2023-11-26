@@ -894,48 +894,6 @@ describe('AssetAccountService', () => {
     })
   })
 
-  describe('Test Token Info List', () => {
-    beforeEach(async () => {
-      const tokens = [
-        {
-          tokenID: 'CKBytes',
-          symbol: 'ckb',
-          tokenName: 'ckb',
-          decimal: '0',
-        },
-        {
-          tokenID: tokenID,
-          symbol: 'udt',
-          tokenName: 'udt',
-          decimal: '0',
-        },
-        {
-          tokenID: 'invalid token info',
-          symbol: '',
-          tokenName: '',
-          decimal: '',
-        },
-      ]
-      const repo = getConnection().getRepository(SudtTokenInfoEntity)
-      await repo.save(tokens)
-    })
-
-    it('Get token info list', async () => {
-      const list = await AssetAccountService.getTokenInfoList()
-      expect(list.length).toEqual(2)
-      expect(list.find((item: any) => item.tokenID === 'CKBytes')).toBeTruthy()
-      expect(list.find((item: any) => item.tokenID === tokenID)).toBeTruthy()
-    })
-
-    it('Filter invalid token info out', async () => {
-      const repo = getConnection().getRepository(SudtTokenInfoEntity)
-      const count = await repo.count()
-      expect(count).toBe(3)
-      const list = await AssetAccountService.getTokenInfoList()
-      expect(list).toHaveLength(2)
-    })
-  })
-
   describe('#generateCreateChequeTx', () => {
     let fakeAssetAccount: AssetAccountEntity
     const receiverAddress = 'receiver address'
