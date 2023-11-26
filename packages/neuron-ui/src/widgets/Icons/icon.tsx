@@ -46,7 +46,7 @@ import { ReactComponent as AddressbookSvg } from './Addressbook.svg'
 import { ReactComponent as AddSvg } from './Add.svg'
 import { ReactComponent as AddSimpleSvg } from './AddSimple.svg'
 import { ReactComponent as SwitchSvg } from './Switch.svg'
-
+import { ReactComponent as CleanSvg } from './Clean.svg'
 import styles from './icon.module.scss'
 
 function WrapSvg(SvgComponent: React.FC<React.SVGProps<SVGSVGElement>>, classNameForTheme: string = '') {
@@ -108,3 +108,4 @@ export const Addressbook = WrapSvg(AddressbookSvg)
 export const Add = WrapSvg(AddSvg)
 export const Switch = WrapSvg(SwitchSvg)
 export const AddSimple = WrapSvg(AddSimpleSvg)
+export const Clean = WrapSvg(CleanSvg)
