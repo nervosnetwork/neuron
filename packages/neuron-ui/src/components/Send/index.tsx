@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'office-ui-fabric-react'
-import { useState as useGlobalState, useDispatch, appState } from 'states'
+import { useState as useGlobalState, useDispatch, appState, AppActions } from 'states'
 import SendMetaInfo from 'components/SendMetaInfo'
 import SendFieldset from 'components/SendFieldset'
 import PageContainer from 'components/PageContainer'
@@ -21,10 +21,11 @@ import {
 import { HIDE_BALANCE } from 'utils/const'
 
 import { isErrorWithI18n } from 'exceptions'
+import { useSearchParams } from 'react-router-dom'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const SendHeader = ({ balance }: { balance: string }) => {
+const SendHeader = ({ balance, useConsumeCell }: { balance: string; useConsumeCell: boolean }) => {
   const { t } = useTranslation()
   const onBack = useGoBack()
 
@@ -37,12 +38,16 @@ const SendHeader = ({ balance }: { balance: string }) => {
     <div className={styles.headerContainer}>
       <GoBack className={styles.goBack} onClick={onBack} />
       <p>{t('navbar.send')}</p>
-      <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
-        {showBalance ? <EyesOpen /> : <EyesClose />}
-      </Button>
-      <p className={styles.balance}>
-        {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
-      </p>
+      {useConsumeCell ? null : (
+        <>
+          <Button className={styles.btn} type="text" onClick={onChangeShowBalance}>
+            {showBalance ? <EyesOpen /> : <EyesClose />}
+          </Button>
+          <p className={styles.balance}>
+            {t('send.balance')} {showBalance ? shannonToCKBFormatter(balance) : HIDE_BALANCE} CKB
+          </p>
+        </>
+      )}
     </div>
   )
 }
@@ -57,11 +62,13 @@ const Send = () => {
     wallet: { id: walletID = '', balance = '', device },
     chain: { networkID, connectionStatus },
     settings: { networks = [] },
+    consumeCells,
   } = useGlobalState()
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const consumeOutPoints = useMemo(() => consumeCells?.map(v => v.outPoint), [useMemo])
 
   const {
     outputs,
@@ -81,7 +88,27 @@ const Send = () => {
     setErrorMessage,
     isSendMax,
     onSendMaxClick: handleSendMaxClick,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, isMainnet, dispatch, t)
+    updateIsSendMax,
+  } = useInitialize(
+    walletID,
+    send.outputs,
+    send.generatedTx,
+    send.price,
+    sending,
+    isMainnet,
+    dispatch,
+    t,
+    consumeOutPoints
+  )
+
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('isSendMax')) {
+      updateIsSendMax(true)
+    }
+    // only when router change init send max
+  }, [searchParams, updateIsSendMax])
 
   const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
 
@@ -116,25 +143,37 @@ const Send = () => {
     isSendMax,
     setTotalAmount,
     setErrorMessage,
-    t
+    t,
+    consumeOutPoints
   )
 
   let errorMessageUnderTotal = errorMessage
   try {
-    validateTotalAmount(totalAmount, fee, balance)
+    validateTotalAmount(
+      totalAmount,
+      fee,
+      consumeCells
+        ? consumeCells.reduce((total, addr) => total + BigInt(addr.capacity || 0), BigInt(0)).toString()
+        : balance
+    )
   } catch (err) {
     if (isErrorWithI18n(err)) {
       errorMessageUnderTotal = t(err.message)
     }
   }
 
-  const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
+  const disabled =
+    connectionStatus === 'offline' ||
+    sending ||
+    !!errorMessageUnderTotal ||
+    !send.generatedTx ||
+    outputs.some(v => !v.address)
 
   const outputErrors = useOutputErrors(outputs, isMainnet)
 
   const isMaxBtnDisabled = (() => {
     try {
-      validateOutputs(outputs, isMainnet, true)
+      validateOutputs(outputs.slice(0, -1), isMainnet)
     } catch {
       return true
     }
@@ -153,8 +192,16 @@ const Send = () => {
     return false
   })()
 
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: AppActions.UpdateConsumeCells,
+      })
+    }
+  }, [])
+
   return (
-    <PageContainer head={<SendHeader balance={balance} />}>
+    <PageContainer head={<SendHeader balance={balance} useConsumeCell={!!consumeCells?.length} />}>
       <form onSubmit={handleSubmit} data-wallet-id={walletID} data-status={disabled ? 'not-ready' : 'ready'}>
         <div className={`${styles.layout} ${showWaitForFullySynced ? styles.withFullySynced : ''}`}>
           <div className={styles.left}>

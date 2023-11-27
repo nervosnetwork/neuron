@@ -54,13 +54,30 @@ export class TransactionGenerator {
     receiveAddress: string,
     changeAddress: string,
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    nftDeps?: CellDep[]
   ) => {
+    // defaults to the mNFT cell dep
     const assetAccount = new AssetAccountInfo()
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const nftCellDep = assetAccount.getNftInfo().cellDep
+    nftDeps = nftDeps ?? [nftCellDep]
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const op = new OutPoint(outPoint.txHash, outPoint.index)
     const nftCell = await CellsService.getLiveCell(op)
+
+    // the data has been sliced, so we need to get the full data from the rpc
+    // https://github.com/nervosnetwork/neuron/blob/dbc5a5b46dc108f660c443d43aba54ea47e233ac/packages/neuron-wallet/src/services/tx/transaction-persistor.ts#L70
+    await (async () => {
+      if (!nftCell) return
+
+      const nftTx = await this.getRpcService().getTransaction(outPoint.txHash)
+      const nftOriginalOutputData = nftTx?.transaction.outputsData[Number(outPoint.index)]
+      if (!nftOriginalOutputData) return
+
+      nftCell.data = nftOriginalOutputData
+    })()
+
     const receiverLockScript = AddressParser.parse(receiveAddress)
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
@@ -92,7 +109,7 @@ export class TransactionGenerator {
     const outputs: Output[] = [nftCell]
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [secpCellDep, nftCellDep, anyoneCanPayDep],
+      cellDeps: [secpCellDep, anyoneCanPayDep, ...nftDeps],
       headerDeps: [],
       inputs: [nftInput],
       outputs,
@@ -155,7 +172,8 @@ export class TransactionGenerator {
       codeHash: string
       hashType: ScriptHashType
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
-    multisigConfig?: MultisigConfigModel
+    multisigConfig?: MultisigConfigModel,
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     let cellDep: CellDep
     if (lockClass.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
@@ -214,7 +232,8 @@ export class TransactionGenerator {
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
       undefined,
       lockClass,
-      multisigConfig ? [multisigConfig] : []
+      multisigConfig ? [multisigConfig] : [],
+      consumeOutPoints
     )
     const finalFeeInt = BigInt(finalFee)
     tx.inputs = inputs
@@ -241,7 +260,8 @@ export class TransactionGenerator {
     targetOutputs: TargetOutput[],
     fee: string = '0',
     feeRate: string = '0',
-    multisigConfig?: MultisigConfigModel
+    multisigConfig?: MultisigConfigModel,
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     let cellDep: CellDep
     if (multisigConfig) {
@@ -263,7 +283,8 @@ export class TransactionGenerator {
         ? Script.fromSDK(
             Multisig.getMultisigScript(multisigConfig.blake160s, multisigConfig.r, multisigConfig.m, multisigConfig.n)
           )
-        : undefined
+        : undefined,
+      consumeOutPoints
     )
 
     if (allInputs.length === 0) {
@@ -341,10 +362,14 @@ export class TransactionGenerator {
   }
 
   private static async getTipHeader(): Promise<BlockHeader> {
-    const network = NetworksService.getInstance().getCurrent()
-    const rpcService = new RpcService(network.remote, network.type)
+    const rpcService = TransactionGenerator.getRpcService()
     const tipHeader = await rpcService.getTipHeader()
     return tipHeader
+  }
+
+  private static getRpcService(): RpcService {
+    const network = NetworksService.getInstance().getCurrent()
+    return new RpcService(network.remote, network.type)
   }
 
   public static generateDepositTx = async (

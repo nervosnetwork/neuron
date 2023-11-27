@@ -78,6 +78,7 @@ declare namespace Controller {
       capacity: string
     }[]
     feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
   }
 
   type GenerateSendingAllTransactionParams = GenerateTransactionParams

@@ -9,8 +9,17 @@ type CopyZoneProps = React.PropsWithChildren<{
   style?: React.CSSProperties
   className?: string
   maskRadius?: number
+  title?: string
 }>
-const CopyZone = ({ children, content, name, style, className = '', maskRadius = 16 }: CopyZoneProps) => {
+const CopyZone = ({
+  children,
+  content,
+  name,
+  style,
+  className = '',
+  maskRadius = 16,
+  title = content,
+}: CopyZoneProps) => {
   const [t] = useTranslation()
   const [copied, setCopied] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
@@ -36,7 +45,7 @@ const CopyZone = ({ children, content, name, style, className = '', maskRadius =
       onClick={onCopy}
       className={`${styles.container} ${className}`}
       style={style}
-      title={content}
+      title={title}
     >
       {children}
       <div className={styles.hoverShow} style={{ borderRadius: `${maskRadius}px` }}>

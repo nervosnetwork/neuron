@@ -148,7 +148,8 @@
       "wallet-ready": "Wallet is ready, welcome",
       "send": "Send",
       "receive": "Receive",
-      "locked": "Locked Amount"
+      "locked": "Locked Amount",
+      "locked-balance": "Locked Balance"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -1187,6 +1188,55 @@
         "add-network": "Add Network",
         "ignore-external-node": "Ignore external node"
       }
+    },
+    "cell-manage": {
+      "title": "Cell Manage",
+      "wallet-balance": "Wallet Balance",
+      "table": {
+        "head": {
+          "date": "Date",
+          "type": "Type",
+          "balance": "Balance",
+          "status": "Status",
+          "description": "Description",
+          "action": "Operation"
+        },
+        "locked": "Locked",
+        "unlocked": "Unlocked",
+        "default-description": "None"
+      },
+      "cell-detail-dialog": {
+        "title": "Cell Detail",
+        "capacity-used": "Used Capacity",
+        "data": "Data",
+        "total": "Total",
+        "used": "Used"
+      },
+      "locked-reason": {
+        "multi-locktime": "The cell has a time lock and you can't use it until {{time}}.",
+        "multi-locktime-reached": "The time lock for this cell has expired and you need to claim it in Customized Assets before using it.",
+        "cheque-acp-multisig": "This is a {{type}} cell and does not support unlocking.",
+        "NFT-SUDT-DAO": " This is a {{type}} asset and does not support unlocking.",
+        "Unknown": "This is an uncataloged asset,please check and confirm before proceeding."
+      },
+      "cell-lock-dialog": {
+        "title": "Lock Cell",
+        "capacity": "Lock selected Cell {{capacity}} CKB",
+        "locked-cell-can-not-use": "Warn, locked Cells can not use"
+      },
+      "cell-unlock-dialog": {
+        "title": "Unlock Cell",
+        "capacity": "Unlock selected Cell {{capacity}} CKB"
+      },
+      "cell-consume-dialog": {
+        "title": "Consume Cell",
+        "warn-consume": "Consume cell will not keep any data and use all of the ckb, please ensure that no important data needs to be retained"
+      },
+      "enter-password": "Enter Password",
+      "password-placeholder": "Please input wallet password",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "consume": "Consume"
     }
   }
 }

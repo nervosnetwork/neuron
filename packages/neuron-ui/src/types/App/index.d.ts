@@ -333,6 +333,7 @@ declare namespace State {
     updater: AppUpdater
     sUDTAccounts: SUDTAccount[]
     experimental: Experimental | null
+    consumeCells?: { outPoint: OutPoint; capacity: string }[]
     walletConnect: State.WalletConnect
   }
 
@@ -341,6 +342,55 @@ declare namespace State {
     sessions: Session[]
     requests: SessionRequest[]
     identity: string
+  }
+
+  enum LockScriptCategory {
+    SECP256K1 = 'SECP256K1',
+    ANYONE_CAN_PAY = 'ANYONE_CAN_PAY',
+    MULTI_LOCK_TIME = 'MULTI_LOCK_TIME',
+    MULTISIG = 'MULTISIG',
+    Cheque = 'Cheque',
+    Unknown = 'Unknown',
+  }
+
+  enum TypeScriptCategory {
+    DAO = 'DAO',
+    NFT = 'NFT',
+    NFTClass = 'NFTClass',
+    NFTIssuer = 'NFTIssuer',
+    SUDT = 'SUDT',
+    Spore = 'Spore',
+    Unknown = 'Unknown',
+  }
+
+  interface LiveCellWithLocalInfoAPI {
+    capacity: CKBComponents.Capacity
+    outPoint: CKBComponents.OutPoint
+    lock: CKBComponents.Script
+    type?: CKBComponents.Script
+    data?: CKBComponents.Bytes
+    timestamp: string
+    description?: string
+    lockScriptType: LockScriptCategory
+    typeScriptType?: TypeScriptCategory
+    locked?: boolean
+  }
+  interface LiveCellWithLocalInfo extends LiveCellWithLocalInfoAPI {
+    lockedReason?: { key: string; params?: Record<string, any> }
+    cellType?: 'CKB' | 'SUDT' | 'NFT' | 'Spore' | 'Unknown'
+  }
+
+  interface UpdateLiveCellLocalInfo {
+    outPoint: CKBComponents.OutPoint
+    description?: string
+    locked?: boolean
+  }
+
+  interface UpdateLiveCellsLockStatus {
+    outPoints: CKBComponents.OutPoint[]
+    lockScripts: CKBComponents.Script[]
+    locked: boolean
+    password: string
   }
 }
 

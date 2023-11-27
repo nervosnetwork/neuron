@@ -142,7 +142,8 @@
       "wallet-ready": "錢包準備完成，歡迎使用",
       "send": "轉賬",
       "receive": "收款",
-      "locked": "已鎖定餘額"
+      "locked": "已鎖定餘額",
+      "locked-balance": "已鎖定余額"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -1158,6 +1159,55 @@
         "add-network": "添加網絡",
         "ignore-external-node": "忽略外部節點"
       }
+    },
+    "cell-manage": {
+      "title": "Cell管理",
+      "wallet-balance": "錢包余額",
+      "table": {
+        "head": {
+          "date": "日期",
+          "type": "類型",
+          "balance": "金額",
+          "status": "狀態",
+          "description": "備註",
+          "action": "操作"
+        },
+        "locked": "鎖定",
+        "unlocked": "解鎖",
+        "default-description": "無"
+      },
+      "cell-detail-dialog": {
+        "title": "Cell詳情",
+        "capacity-used": "容量使用",
+        "data": "數據",
+        "total": "總量",
+        "used": "已用"
+      },
+      "locked-reason": {
+        "multi-locktime": "這是壹個有時間鎖的 cell, 只能在 {{time}} 之後使用。",
+        "multi-locktime-reached": "此 Cell 的鎖定已經結束，請在\"自定義資產\"中解鎖後使用。",
+        "cheque-acp-multisig": "這是壹個 {{type}} 的 cell, 不支持解鎖。",
+        "NFT-SUDT-DAO": "這是壹個 {{type}} 的資產，不支持解鎖。",
+        "Unknown": "This is an uncataloged asset,please check and confirm before proceeding."
+      },
+      "cell-lock-dialog": {
+        "title": "鎖定 Cell",
+        "capacity": "鎖定所選 Cell {{capacity}} CKB",
+        "locked-cell-can-not-use": "請註意, 鎖定的 Cells 不能花費"
+      },
+      "cell-unlock-dialog": {
+        "title": "解鎖 Cell",
+        "capacity": "解鎖所選 Cell {{capacity}} CKB"
+      },
+      "cell-consume-dialog": {
+        "title": "消耗 Cell",
+        "warn-consume": "消耗Cell不會保留任何數據，並將花費全部的CKB，請確保沒有重要數據需要保留。"
+      },
+      "enter-password": "輸入密碼",
+      "password-placeholder": "請輸入錢包密碼",
+      "lock": "鎖定",
+      "unlock": "解鎖",
+      "consume": "消耗"
     }
   }
 }

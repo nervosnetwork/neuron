@@ -1,6 +1,6 @@
 import { serializeWitnessArgs } from '../utils/serialization'
 import { scriptToAddress } from '../utils/scriptAndAddress'
-import { TransactionPersistor, TransactionGenerator, TargetOutput } from './tx'
+import { TargetOutput, TransactionGenerator, TransactionPersistor } from './tx'
 import AddressService from './addresses'
 import WalletService, { Wallet } from '../services/wallets'
 import RpcService from '../services/rpc-service'
@@ -27,10 +27,10 @@ import HardwareWalletService from './hardware'
 import {
   CapacityNotEnoughForChange,
   CapacityNotEnoughForChangeByTransfer,
+  CellIsNotYetLive,
   MultisigConfigNeedError,
   NoMatchAddressForSign,
   SignTransactionFailed,
-  CellIsNotYetLive,
   TransactionIsNotCommittedYet,
 } from '../exceptions'
 import AssetAccountInfo from '../models/asset-account-info'
@@ -41,9 +41,11 @@ import { getMultisigStatus } from '../utils/multisig'
 import { SignStatus } from '../models/offline-sign'
 import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
-import { CKBRPC } from '@ckb-lumos/rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
+import { getClusterCellByOutPoint } from '@spore-sdk/core'
+import CellDep, { DepType } from '../models/chain/cell-dep'
+import { dao } from '@ckb-lumos/common-scripts'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -430,7 +432,8 @@ export default class TransactionSender {
     walletID: string = '',
     items: TargetOutput[] = [],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
@@ -445,7 +448,10 @@ export default class TransactionSender {
         targetOutputs,
         changeAddress,
         fee,
-        feeRate
+        feeRate,
+        undefined,
+        undefined,
+        consumeOutPoints
       )
 
       return tx
@@ -461,14 +467,22 @@ export default class TransactionSender {
     walletID: string = '',
     items: TargetOutput[] = [],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+      walletID,
+      targetOutputs,
+      fee,
+      feeRate,
+      undefined,
+      consumeOutPoints
+    )
 
     return tx
   }
@@ -553,6 +567,51 @@ export default class TransactionSender {
       changeAddress,
       fee,
       feeRate
+    )
+
+    return tx
+  }
+
+  public generateTransferSporeTx = async (
+    walletId: string,
+    outPoint: OutPoint,
+    receiveAddress: string,
+    fee: string = '0',
+    feeRate: string = '0'
+  ): Promise<Transaction> => {
+    const changeAddress: string = await this.getChangeAddress()
+    const nftCellOutput = await CellsService.getLiveCell(new OutPoint(outPoint.txHash, outPoint.index))
+    if (!nftCellOutput) {
+      throw new CellIsNotYetLive()
+    }
+
+    const assetAccountInfo = new AssetAccountInfo()
+    // const rpcUrl: string = NodeService.getInstance().nodeUrl
+    const rpcUrl = NetworksService.getInstance().getCurrent().remote
+
+    // https://github.com/sporeprotocol/spore-sdk/blob/05f2cbe1c03d03e334ebd3b440b5b3b20ec67da7/packages/core/src/api/joints/spore.ts#L154-L158
+    const clusterDep = await (async () => {
+      const clusterCell = await getClusterCellByOutPoint(outPoint, assetAccountInfo.getSporeConfig(rpcUrl)).then(
+        _ => _,
+        () => undefined
+      )
+
+      if (!clusterCell?.outPoint) {
+        return undefined
+      }
+
+      return new CellDep(OutPoint.fromSDK(clusterCell.outPoint), DepType.Code)
+    })()
+
+    const tx = await TransactionGenerator.generateTransferNftTx(
+      walletId,
+      outPoint,
+      nftCellOutput,
+      receiveAddress,
+      changeAddress,
+      fee,
+      feeRate,
+      [assetAccountInfo.getSporeInfos()[0].cellDep].concat(clusterDep ?? [])
     )
 
     return tx
@@ -793,9 +852,25 @@ export default class TransactionSender {
     withdrawBlockHash: string
   ): Promise<bigint> => {
     const currentNetwork = NetworksService.getInstance().getCurrent()
-    const ckb = new CKBRPC(currentNetwork.remote)
-    const result = await ckb.calculateDaoMaximumWithdraw(depositOutPoint.toSDK(), withdrawBlockHash)
-    return BigInt(result)
+    const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
+
+    let tx = await rpc.getTransaction(depositOutPoint.txHash)
+    if (tx.txStatus.status !== 'committed') throw new Error('Transaction is not committed yet')
+    const depositBlockHash = tx.txStatus.blockHash
+
+    const cellOutput = tx.transaction.outputs[+depositOutPoint.index]
+    const cellOutputData = tx.transaction.outputsData[+depositOutPoint.index]
+
+    const [depositHeader, withDrawHeader] = await Promise.all([
+      rpc.getHeader(depositBlockHash),
+      rpc.getHeader(withdrawBlockHash),
+    ])
+
+    return dao.calculateMaximumWithdraw(
+      { outPoint: depositOutPoint.toSDK(), data: cellOutputData, cellOutput: cellOutput },
+      depositHeader.dao,
+      withDrawHeader.dao
+    )
   }
 
   private parseEpoch = (epoch: bigint) => {

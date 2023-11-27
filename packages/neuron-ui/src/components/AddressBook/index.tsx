@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch } from 'states'
 import Dialog from 'widgets/Dialog'
 import CopyZone from 'widgets/CopyZone'
-import { Copy, Edit } from 'widgets/Icons/icon'
+import { Copy } from 'widgets/Icons/icon'
 import Table, { TableProps, SortType } from 'widgets/Table'
 import { shannonToCKBFormatter, useLocalDescription } from 'utils'
 import { HIDE_BALANCE } from 'utils/const'
 import Tooltip from 'widgets/Tooltip'
+import ShowOrEditDesc from 'widgets/ShowOrEditDesc'
 import styles from './addressBook.module.scss'
 
 enum TabIdx {
@@ -42,8 +43,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
   }, [tabIdx, addresses])
 
   const dispatch = useDispatch()
-  const { localDescription, onDescriptionPress, onDescriptionChange, onDescriptionFieldBlur, onDescriptionSelected } =
-    useLocalDescription('address', walletId, dispatch, 'textarea')
+  const { onChangeEditStatus, onSubmitDescription } = useLocalDescription('address', walletId, dispatch)
 
   const columns = useMemo<TableProps<State.Address>['columns']>(
     () => [
@@ -87,32 +87,15 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
         dataIndex: 'description',
         align: 'center',
         render(description: string, _idx, item) {
-          const isSelected = localDescription.key === item.address
           return (
             <Tooltip
               tip={
-                <div className={styles.descTipRoot}>
-                  <div className={styles.autoHeight}>
-                    <textarea
-                      className={styles.descInput}
-                      data-is-selected={isSelected}
-                      data-description-key={item.address}
-                      value={isSelected ? localDescription.description : description}
-                      onChange={onDescriptionChange}
-                      onKeyDown={onDescriptionPress}
-                      onBlur={onDescriptionFieldBlur}
-                    />
-                    <Edit
-                      data-description-key={item.address}
-                      data-description-value={item.description}
-                      onClick={onDescriptionSelected}
-                    />
-                  </div>
-                  <div className={styles.hidden}>
-                    {isSelected ? localDescription.description : description}
-                    <Edit />
-                  </div>
-                </div>
+                <ShowOrEditDesc
+                  description={description}
+                  descKey={item.address}
+                  onSubmitDescription={onSubmitDescription}
+                  onChangeEditStatus={onChangeEditStatus}
+                />
               }
               showTriangle
               isTriggerNextToChild
@@ -167,7 +150,7 @@ const AddressBook = ({ onClose }: { onClose?: () => void }) => {
         },
       },
     ],
-    [t, localDescription]
+    [t]
   )
 
   return (

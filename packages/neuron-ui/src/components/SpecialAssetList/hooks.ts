@@ -9,6 +9,7 @@ import {
   nftFormatter,
   PresetScript,
   shannonToCKBFormatter,
+  sporeFormatter,
   sudtValueToAmount,
   toUint128Le,
   useDialogWrapper,
@@ -193,15 +194,47 @@ export const useSpecialAssetColumnInfo = ({
       const isLockedCheque = status === 'withdraw-asset' && targetTime && Date.now() < targetTime
       const isNFTTransferable = assetInfo.type === NFTType.NFT && assetInfo.data === 'transferable'
       const isNFTClassOrIssuer = assetInfo.type === NFTType.NFTClass || assetInfo.type === NFTType.NFTIssuer
+      const isSpore = assetInfo.type === NFTType.Spore
 
-      if (assetInfo.type === NFTType.NFT) {
-        amount = nftFormatter(type?.args)
-        status = 'transfer-nft'
-      } else if (isNFTClassOrIssuer || assetInfo.type === 'Unknown') {
-        amount = t('special-assets.unknown-asset')
+      let sporeClusterInfo: { name: string; description: string } | undefined
+
+      switch (assetInfo.type) {
+        case NFTType.NFT: {
+          amount = nftFormatter(type?.args)
+          status = 'transfer-nft'
+          break
+        }
+        case NFTType.Spore: {
+          if (type) {
+            // every spore cell is transferable
+            status = 'transfer-nft'
+            sporeClusterInfo = JSON.parse(item.customizedAssetInfo.data)
+            amount = sporeFormatter({ args: type.args, data: item.data, clusterName: sporeClusterInfo?.name })
+          }
+          break
+        }
+        case NFTType.NFTClass:
+        case NFTType.NFTIssuer:
+        case 'Unknown': {
+          amount = t('special-assets.unknown-asset')
+          break
+        }
+        default: {
+          break
+        }
       }
 
-      return { amount, status, targetTime, isLockedCheque, isNFTTransferable, isNFTClassOrIssuer, epochsInfo }
+      return {
+        amount,
+        status,
+        targetTime,
+        isLockedCheque,
+        isNFTTransferable,
+        isNFTClassOrIssuer,
+        epochsInfo,
+        isSpore,
+        sporeClusterInfo,
+      }
     },
     [epoch, bestKnownBlockTimestamp, tokenInfoList, t]
   )

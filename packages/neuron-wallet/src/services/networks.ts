@@ -66,6 +66,9 @@ enum NetworksKey {
 }
 
 const oldDefaultNames = ['Default', 'default node', presetNetworks.networks[0].name]
+// Before 0.106.0 version the default remote's value is http://localhost:8114
+// "localhost" was deprecated because of https://github.com/Magickbase/neuron-public-issues/issues/122
+const oldDefaultRemotes = ['http://localhost:8114', BUNDLED_CKB_URL]
 
 export default class NetworksService extends Store {
   private static instance: NetworksService
@@ -263,7 +266,7 @@ export default class NetworksService extends Store {
         if (
           // make sure that user has not change the network name
           oldDefaultNames.includes(oldMainnetNetwork.name) &&
-          oldMainnetNetwork.remote === defaultMainnetNetwork.remote &&
+          oldDefaultRemotes.includes(oldMainnetNetwork.remote) &&
           oldMainnetNetwork.type === defaultMainnetNetwork.type
         ) {
           this.updateAll([

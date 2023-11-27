@@ -1,3 +1,4 @@
+import type { OutPoint } from '@ckb-lumos/base'
 import produce, { Draft } from 'immer'
 import { OfflineSignJSON, WalletConnectSignJSON } from 'services/remote'
 import initStates from 'states/init'
@@ -68,6 +69,8 @@ export enum AppActions {
 
   // walletConnect
   UpdateWalletConnectState = 'updateWalletConnectState',
+  // Cell manage
+  UpdateConsumeCells = 'UpdateConsumeCells',
 }
 
 export type StateAction =
@@ -126,6 +129,7 @@ export type StateAction =
       type: AppActions.UpdateWalletConnectState
       payload: State.WalletConnect
     }
+  | { type: AppActions.UpdateConsumeCells; payload?: { outPoint: OutPoint; capacity: string }[] }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 
@@ -219,6 +223,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
           cacheTipBlockNumber: action.payload.cacheTipBlockNumber,
           currentTimestamp: Date.now(),
           url: getCurrentUrl(state.chain.networkID, state.settings.networks),
+          networkID: state.chain.networkID,
         }),
       }
       break
@@ -420,6 +425,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.UpdateWalletConnectState: {
       state.walletConnect = action.payload
+      break
+    }
+
+    case AppActions.UpdateConsumeCells: {
+      state.consumeCells = action.payload
       break
     }
 

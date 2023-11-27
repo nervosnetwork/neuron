@@ -50,7 +50,9 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
-    "@ckb-connect/walletconnect-wallet-sdk": "^0.0.1-alpha.1",
+    "@ckb-connect/walletconnect-wallet-sdk": "0.0.1-alpha.1",
+    "@ckb-lumos/base": "0.21.0-next.2",
+    "@ckb-lumos/codec": "0.21.0-next.2",
     "@nervosnetwork/ckb-sdk-core": "0.109.0",
     "@nervosnetwork/ckb-sdk-utils": "0.109.0",
     "canvg": "2.0.0",
@@ -68,7 +70,8 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
-    "@babel/preset-typescript": "7.22.5",
+    "@babel/preset-typescript": "7.23.3",
+    "@jest/globals": "27.5.1",
     "@storybook/addon-actions": "7.0.24",
     "@storybook/addon-essentials": "7.0.24",
     "@storybook/addon-interactions": "7.0.24",
@@ -77,17 +80,17 @@
     "@storybook/preset-create-react-app": "7.0.24",
     "@storybook/react": "7.0.24",
     "@storybook/react-webpack5": "7.0.24",
-    "@storybook/testing-library": "0.2.0",
-    "@types/enzyme": "3.10.13",
-    "@types/enzyme-adapter-react-16": "1.0.6",
+    "@storybook/testing-library": "0.2.2",
+    "@types/enzyme": "3.10.16",
+    "@types/enzyme-adapter-react-16": "1.0.9",
     "@types/node": "18.16.18",
-    "@types/react": "17.0.62",
-    "@types/react-dom": "17.0.20",
+    "@types/react": "17.0.71",
+    "@types/react-dom": "17.0.25",
     "@types/react-router-dom": "5.3.3",
-    "@types/styled-components": "5.1.26",
+    "@types/styled-components": "5.1.32",
     "@wojtekmaj/enzyme-adapter-react-17": "0.8.0",
     "babel-jest": "25.5.1",
-    "electron": "24.8.5",
+    "electron": "24.8.8",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.7",
     "eslint-config-airbnb": "19.0.4",
@@ -100,7 +103,7 @@
     "react-test-renderer": "16.14.0",
     "storybook": "7.0.24",
     "storybook-addon-react-router-v6": "1.0.2",
-    "webpack": "5.88.0"
+    "webpack": "5.88.2"
   },
   "resolutions": {
     "react-i18next": "12.1.5"

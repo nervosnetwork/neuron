@@ -5,7 +5,6 @@
   color: var(--input-second-color);
   font-weight: 500;
   font-size: 20px;
-  line-height: 28px;
   .page {
     margin-right: 4px;
     &:not(:last-child):after {
@@ -17,6 +16,14 @@
     }
     &:last-child {
       color: var(--main-text-color);
+    }
+  }
+  .goBack {
+    margin-right: 8px;
+    cursor: pointer;
+
+    & path {
+      stroke: var(--main-text-color);
     }
   }
 }

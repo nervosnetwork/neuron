@@ -22,6 +22,7 @@ import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
 import WalletConnect from 'components/WalletConnect'
+import CellManagement from 'components/CellManagement'
 
 const toolsRouters = [
   {
@@ -61,6 +62,16 @@ const mainRouterConfig: RouteObject[] = [
             element: (
               <>
                 <Overview />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: RoutePath.CellManage,
+            element: (
+              <>
+                <CellManagement />
                 <Outlet />
               </>
             ),

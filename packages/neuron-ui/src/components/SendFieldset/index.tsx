@@ -112,11 +112,11 @@ const SendFieldset = ({
         value={item.amount ? localNumberFormatter(item.amount) : ''}
         placeholder={t('send.input-amount')}
         onChange={onItemChange}
-        disabled={item.disabled}
+        disabled={item.disabled || isSendMax}
         suffix={
           isMaxBtnShow && (
             <Button disabled={isMaxBtnDisabled} type="text" onClick={onSendMaxClick} className={styles.max}>
-              Max
+              {isSendMax ? t('send.reset') : 'Max'}
             </Button>
           )
         }

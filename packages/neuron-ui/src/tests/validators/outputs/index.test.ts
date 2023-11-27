@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals'
 import { validateOutputs } from 'utils/validators'
 import fixtures from './fixtures'
 
@@ -15,7 +16,7 @@ describe(`Test outputs validator`, () => {
         expect(e).not.toBeUndefined()
       }
     } else {
-      expect(validateOutputs()).toBeTruthy()
+      expect(validateOutputs(outputs, false, ignoreLastAmount)).toBeTruthy()
     }
   })
 })

@@ -158,10 +158,20 @@ jest.doMock('@ckb-lumos/rpc', () => {
   }
 })
 
+jest.doMock('@ckb-lumos/common-scripts', () => {
+  return {
+    dao: {
+      calculateMaximumWithdraw: stubbedCalculateDaoMaximumWithdraw,
+    },
+  }
+})
+
 jest.doMock('utils/ckb-rpc.ts', () => ({
   generateRPC() {
     return {
       sendTransaction: stubbedSendTransaction,
+      getTransaction: stubbedGetTransaction,
+      getHeader: stubbedGetHeader,
     }
   },
 }))
@@ -605,7 +615,10 @@ describe('TransactionSender Test', () => {
             ],
             fakeAddress1,
             fee,
-            feeRate
+            feeRate,
+            undefined,
+            undefined,
+            undefined
           )
         })
       })
@@ -639,7 +652,9 @@ describe('TransactionSender Test', () => {
             { address: '1', capacity: '1' },
           ],
           fee,
-          feeRate
+          feeRate,
+          undefined,
+          undefined
         )
       })
     })
@@ -802,7 +817,7 @@ describe('TransactionSender Test', () => {
         }
         stubbedGetHeader.mockResolvedValue(withdrawBlockHeader)
 
-        stubbedCalculateDaoMaximumWithdraw.mockResolvedValue(10300000000)
+        stubbedCalculateDaoMaximumWithdraw.mockResolvedValue(BigInt(10300000000))
         stubbedGetNextAddress.mockReturnValue({
           address: fakeAddress1,
         })

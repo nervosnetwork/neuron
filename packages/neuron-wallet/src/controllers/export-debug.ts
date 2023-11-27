@@ -12,6 +12,7 @@ import redistCheck from '../utils/redist-check'
 import SettingsService from '../services/settings'
 import { generateRPC } from '../utils/ckb-rpc'
 import { CKBLightRunner } from '../services/light-runner'
+import { LIGHT_CLIENT_MAINNET, LIGHT_CLIENT_TESTNET } from '../utils/const'
 
 export default class ExportDebugController {
   #I18N_PATH = 'export-debug-info'
@@ -162,10 +163,13 @@ export default class ExportDebugController {
   }
 
   private addBundledCKBLightClientLog() {
-    const logPath = CKBLightRunner.getInstance().logPath
-    if (!fs.existsSync(logPath)) {
-      return
+    const mainnetLogPath = CKBLightRunner.getInstance().getLogPath(LIGHT_CLIENT_MAINNET)
+    const testnetLogPath = CKBLightRunner.getInstance().getLogPath(LIGHT_CLIENT_TESTNET)
+    if (fs.existsSync(mainnetLogPath)) {
+      this.archive.file(mainnetLogPath, { name: 'bundled-ckb-lignt-client-mainnet.log' })
     }
-    this.archive.file(logPath, { name: 'bundled-ckb-lignt-client.log' })
+    if (fs.existsSync(testnetLogPath)) {
+      this.archive.file(testnetLogPath, { name: 'bundled-ckb-lignt-client-testnet.log' })
+    }
   }
 }
