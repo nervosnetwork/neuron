@@ -23,6 +23,7 @@ import {
   validateAmount,
   validateAddress,
   validateAmountRange,
+  validateCapacity,
 } from 'utils/validators'
 import { MenuItemConstructorOptions, shell } from 'electron'
 import { ErrorWithI18n, isErrorWithI18n } from 'exceptions'
@@ -499,18 +500,20 @@ export const useForceUpdate = <T extends (...args: any[]) => void>(cb: T) => {
 }
 
 export const useOutputErrors = (
-  outputs: Partial<Record<'address' | 'amount' | 'date', string>>[],
-  isMainnet: boolean
+  outputs: Partial<Record<'address' | 'amount' | 'date' | 'unit', string>>[],
+  isMainnet: boolean,
+  isSendMax?: boolean
 ) => {
   return useMemo(
     () =>
-      outputs.map(({ address, amount, date }) => {
+      outputs.map(({ address, amount, date, unit }, index) => {
         let amountError: ErrorWithI18n | undefined
         if (amount !== undefined) {
           try {
             const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
             validateAmount(amount)
             validateAmountRange(amount, extraSize)
+            validateCapacity({ address, amount, unit }, isSendMax, index === outputs.length - 1)
           } catch (err) {
             if (isErrorWithI18n(err)) {
               amountError = err
