@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals'
 import { MultisigConfig } from 'services/remote'
 import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import { addressToScript, scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
