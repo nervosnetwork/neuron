@@ -1831,6 +1831,13 @@
   dependencies:
     "@ckb-lumos/bi" "0.21.0-next.2"
 
+"@ckb-lumos/codec@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.21.0-next.3.tgz#b7dddbe85ccca565029fdb154c57e66921803539"
+  integrity sha512-Y8iZBi01sXcJ+rWb8DEgX0P0IVwtElqkXmiIRsi0bs2kbF38CZ8i+5ZLKjEy/b/D0bu+rtWiBPvVf4HkHoRkHw==
+  dependencies:
+    "@ckb-lumos/bi" "0.21.0-next.3"
+
 "@ckb-lumos/common-scripts@0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.20.0.tgz#7f95fb91d3c275ff557197269225a15a634811b6"
