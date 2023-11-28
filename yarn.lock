@@ -1866,18 +1866,18 @@
     "@ckb-lumos/toolkit" "0.20.0"
     immutable "^4.0.0-rc.12"
 
-"@ckb-lumos/common-scripts@0.21.0-next.2":
-  version "0.21.0-next.2"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.21.0-next.2.tgz#222e58a96d92a4ddfa9e501fe2f0a5428c036e96"
-  integrity sha512-43r7DvXSccsi80NcXh0jaZT0MdQ+rhsElWBO2U3zRUt/55rV4HBaoo26Rj8h7esi0tVfDbiDrnc16ymN1V+B3w==
+"@ckb-lumos/common-scripts@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.21.0-next.3.tgz#66ebcff3048e0ff867bda7d807b8b4b4a13fddb0"
+  integrity sha512-vOStk9bklzAXzyLBZ16X0TbTAa65jnKV3VYTUSu6pqim35vsdcgx1OJvBwMF+ZrDuIaWhqOfup/4aoHYU064cw==
   dependencies:
-    "@ckb-lumos/base" "0.21.0-next.2"
-    "@ckb-lumos/bi" "0.21.0-next.2"
-    "@ckb-lumos/codec" "0.21.0-next.2"
-    "@ckb-lumos/config-manager" "0.21.0-next.2"
-    "@ckb-lumos/helpers" "0.21.0-next.2"
-    "@ckb-lumos/rpc" "0.21.0-next.2"
-    "@ckb-lumos/toolkit" "0.21.0-next.2"
+    "@ckb-lumos/base" "0.21.0-next.3"
+    "@ckb-lumos/bi" "0.21.0-next.3"
+    "@ckb-lumos/codec" "0.21.0-next.3"
+    "@ckb-lumos/config-manager" "0.21.0-next.3"
+    "@ckb-lumos/helpers" "0.21.0-next.3"
+    "@ckb-lumos/rpc" "0.21.0-next.3"
+    "@ckb-lumos/toolkit" "0.21.0-next.3"
     immutable "^4.3.0"
 
 "@ckb-lumos/config-manager@0.20.0", "@ckb-lumos/config-manager@^0.20.0":
@@ -1899,6 +1899,17 @@
     "@ckb-lumos/base" "0.21.0-next.2"
     "@ckb-lumos/bi" "0.21.0-next.2"
     "@ckb-lumos/codec" "0.21.0-next.2"
+    "@types/deep-freeze-strict" "^1.1.0"
+    deep-freeze-strict "^1.1.1"
+
+"@ckb-lumos/config-manager@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.21.0-next.3.tgz#9f348bb27a94281da572446ab77b6b5d0166a43d"
+  integrity sha512-fIH/hhe9kFDwqoGHfbGB8e2b5GLfk03Lf2dT/EP/wEc4sZyyALVc0noUdW/w3AcWKfH5EY69S7OFu1JHtWILtA==
+  dependencies:
+    "@ckb-lumos/base" "0.21.0-next.3"
+    "@ckb-lumos/bi" "0.21.0-next.3"
+    "@ckb-lumos/codec" "0.21.0-next.3"
     "@types/deep-freeze-strict" "^1.1.0"
     deep-freeze-strict "^1.1.1"
 
@@ -1953,6 +1964,19 @@
     bech32 "^2.0.0"
     immutable "^4.3.0"
 
+"@ckb-lumos/helpers@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.21.0-next.3.tgz#dc4d642a9a1e65e564aeecd420d8f68d86bda5ec"
+  integrity sha512-pV2dF/rdX2viv5F3g5WNTgJytiK4qVN4J8iyzvFZe6N3jLji91HHrkh7ZoXhBvuGyt/AUwQZB7ZuCV5idXaaeg==
+  dependencies:
+    "@ckb-lumos/base" "0.21.0-next.3"
+    "@ckb-lumos/bi" "0.21.0-next.3"
+    "@ckb-lumos/codec" "0.21.0-next.3"
+    "@ckb-lumos/config-manager" "0.21.0-next.3"
+    "@ckb-lumos/toolkit" "0.21.0-next.3"
+    bech32 "^2.0.0"
+    immutable "^4.3.0"
+
 "@ckb-lumos/lumos@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/lumos/-/lumos-0.20.0.tgz#47cd173affa81051f8a8fa60c91c366001d82d6c"
@@ -1986,6 +2010,16 @@
   dependencies:
     "@ckb-lumos/base" "0.21.0-next.2"
     "@ckb-lumos/bi" "0.21.0-next.2"
+    abort-controller "^3.0.0"
+    cross-fetch "^3.1.5"
+
+"@ckb-lumos/rpc@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.21.0-next.3.tgz#66013abde61a33fc3e854c7f41ffc42f04cc5e27"
+  integrity sha512-EcB7gWjYd1SEpUa99okL3mCHLEVehT3mR6LVxWTEYYKrSnmG+rcVcVL1aTNz3rK8tJz+RhTy3fCxrvpwbWP+yg==
+  dependencies:
+    "@ckb-lumos/base" "0.21.0-next.3"
+    "@ckb-lumos/bi" "0.21.0-next.3"
     abort-controller "^3.0.0"
     cross-fetch "^3.1.5"
 
