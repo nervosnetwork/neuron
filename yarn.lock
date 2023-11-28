@@ -1771,6 +1771,20 @@
     js-xxhash "^1.0.4"
     lodash.isequal "^4.5.0"
 
+"@ckb-lumos/base@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.21.0-next.3.tgz#2e7673188654cf73e9a470b22fc3e3725286d69c"
+  integrity sha512-UrqBDuAiBAUFpGuRTJaexSgaPG+SWyjF6z8wRyHKrjhCbmPIRHKis0HqQmPYYcxW1pVjG11PzOfcNfiOV6LrDQ==
+  dependencies:
+    "@ckb-lumos/bi" "0.21.0-next.3"
+    "@ckb-lumos/codec" "0.21.0-next.3"
+    "@ckb-lumos/toolkit" "0.21.0-next.3"
+    "@types/blake2b" "^2.1.0"
+    "@types/lodash.isequal" "^4.5.5"
+    blake2b "^2.1.3"
+    js-xxhash "^1.0.4"
+    lodash.isequal "^4.5.0"
+
 "@ckb-lumos/bi@0.20.0", "@ckb-lumos/bi@^0.20.0":
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.20.0.tgz#4fa3beca641737b7b83a64d56668067e38cc288d"
@@ -1901,13 +1915,13 @@
     sha3 "^2.1.3"
     uuid "^8.3.0"
 
-"@ckb-lumos/hd@0.21.0-next.2":
-  version "0.21.0-next.2"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/hd/-/hd-0.21.0-next.2.tgz#03239f9d31cd9daf70f224563e7733089194dbb6"
-  integrity sha512-wj6k0d39yJEKWlC1cjXezZ4Qjf0u6rG+R6zQdqRXZ2dUJ/n82+fX+hLSAcjOgm1mGNft/6c55IfCs5dag/xQVw==
+"@ckb-lumos/hd@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/hd/-/hd-0.21.0-next.3.tgz#6bc96096ff315536829e33230cc49255b834756e"
+  integrity sha512-BNyGm4/ZAPGzXA7nI7fe5ACwZmn8BMhvLACSvDhLmxhUfIUMZbIKM8Q1NwdxMDRtFilzW4S65ejkNXqcY5NxQQ==
   dependencies:
-    "@ckb-lumos/base" "0.21.0-next.2"
-    "@ckb-lumos/bi" "0.21.0-next.2"
+    "@ckb-lumos/base" "0.21.0-next.3"
+    "@ckb-lumos/bi" "0.21.0-next.3"
     bn.js "^5.1.3"
     elliptic "^6.5.4"
     scrypt-js "^3.0.1"
@@ -1986,6 +2000,13 @@
   integrity sha512-pTTXn6NwwNv3Ms3uj9ywzA4UtiI84IDBw5TEWCAlz4JVwh2dqlncci0O0YboaNA0gg1cVYCITQFLJBQvXQkDRw==
   dependencies:
     "@ckb-lumos/bi" "0.21.0-next.2"
+
+"@ckb-lumos/toolkit@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.21.0-next.3.tgz#0939ad3f4c169f2b2aa1189c7d9150c83a83b5c8"
+  integrity sha512-BotAV9Pax58n+nYCa6dAOHQSyCO9M3mS38iZ3Nxnwtw+UninmNqz7/O6e73Kx8q1mcTjVonVep6Gkt8+kFCEJA==
+  dependencies:
+    "@ckb-lumos/bi" "0.21.0-next.3"
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
