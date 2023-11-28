@@ -1818,16 +1818,16 @@
     cross-fetch "^3.1.5"
     events "^3.3.0"
 
-"@ckb-lumos/ckb-indexer@0.21.0-next.2":
-  version "0.21.0-next.2"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/ckb-indexer/-/ckb-indexer-0.21.0-next.2.tgz#b151ffaea0b53ca989b336d6e9b539017450a475"
-  integrity sha512-Niwx2LPU0jH9La7ItSA1IHpX8Z025+qZHcUs1hDLIDHhxtqV5OiPRDrBAPn6B8iJMf1WqyaGLuqHZ6S5R1sEWw==
+"@ckb-lumos/ckb-indexer@0.21.0-next.3":
+  version "0.21.0-next.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/ckb-indexer/-/ckb-indexer-0.21.0-next.3.tgz#2d28c15acb9b1d6b784ce96423feac6fb163b261"
+  integrity sha512-a/QiWIphJMJlDSDX67Tuww67uYh+TY2UKDTwG9S7kPfAZujeYkvLQYMc6hV7bxvqYY/TYTElrN6f0ASm71mDrA==
   dependencies:
-    "@ckb-lumos/base" "0.21.0-next.2"
-    "@ckb-lumos/bi" "0.21.0-next.2"
-    "@ckb-lumos/codec" "0.21.0-next.2"
-    "@ckb-lumos/rpc" "0.21.0-next.2"
-    "@ckb-lumos/toolkit" "0.21.0-next.2"
+    "@ckb-lumos/base" "0.21.0-next.3"
+    "@ckb-lumos/bi" "0.21.0-next.3"
+    "@ckb-lumos/codec" "0.21.0-next.3"
+    "@ckb-lumos/rpc" "0.21.0-next.3"
+    "@ckb-lumos/toolkit" "0.21.0-next.3"
     cross-fetch "^3.1.5"
     events "^3.3.0"
 
