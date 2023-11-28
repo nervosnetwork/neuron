@@ -432,7 +432,8 @@ export default class TransactionSender {
     walletID: string = '',
     items: TargetOutput[] = [],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
@@ -447,7 +448,10 @@ export default class TransactionSender {
         targetOutputs,
         changeAddress,
         fee,
-        feeRate
+        feeRate,
+        undefined,
+        undefined,
+        consumeOutPoints
       )
 
       return tx
@@ -463,14 +467,22 @@ export default class TransactionSender {
     walletID: string = '',
     items: TargetOutput[] = [],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    consumeOutPoints?: CKBComponents.OutPoint[]
   ): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(walletID, targetOutputs, fee, feeRate)
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+      walletID,
+      targetOutputs,
+      fee,
+      feeRate,
+      undefined,
+      consumeOutPoints
+    )
 
     return tx
   }

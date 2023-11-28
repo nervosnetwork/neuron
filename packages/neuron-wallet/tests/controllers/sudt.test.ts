@@ -4,11 +4,11 @@ import { ResponseCode } from '../../src/utils/const'
 
 describe('SUDTController', () => {
   const stubbedGetOneByLockScriptAndTypeScript = jest.fn()
-  const stubbedGetTokenInfoList = jest.fn()
+  const stubbedGetAllSudtTokenInfo = jest.fn()
 
   const resetMocks = () => {
     stubbedGetOneByLockScriptAndTypeScript.mockReset()
-    stubbedGetTokenInfoList.mockReset()
+    stubbedGetAllSudtTokenInfo.mockReset()
   }
 
   jest.doMock('../../src/services/live-cell-service', () => {
@@ -18,9 +18,9 @@ describe('SUDTController', () => {
       }),
     }
   })
-  jest.doMock('../../src/services/asset-account-service', () => {
+  jest.doMock('../../src/services/sudt-token-info', () => {
     return {
-      getTokenInfoList: stubbedGetTokenInfoList,
+      getAllSudtTokenInfo: stubbedGetAllSudtTokenInfo,
     }
   })
   const SUDTController = require('../../src/controllers/sudt').default
@@ -38,7 +38,7 @@ describe('SUDTController', () => {
       decimal: '8',
     }
     beforeEach(async () => {
-      stubbedGetTokenInfoList.mockReturnValue([testTokenInfo])
+      stubbedGetAllSudtTokenInfo.mockReturnValue([testTokenInfo])
     })
 
     it('getSUDTTokenInfo from token list success', async () => {
@@ -69,7 +69,7 @@ describe('SUDTController', () => {
       '0x080a456972632d320a455432'
     )
     beforeEach(async () => {
-      stubbedGetTokenInfoList.mockReturnValue([])
+      stubbedGetAllSudtTokenInfo.mockReturnValue([])
       stubbedGetOneByLockScriptAndTypeScript.mockReturnValue(testLiveCell)
     })
 
@@ -86,7 +86,7 @@ describe('SUDTController', () => {
   describe('get sudtInfo null', () => {
     const testTokenID = '0x45496bbe3525c3fc1b8a26b5c00d1238870422deab092567b8bb45d61cda1abd'
     beforeEach(async () => {
-      stubbedGetTokenInfoList.mockReturnValue([])
+      stubbedGetAllSudtTokenInfo.mockReturnValue([])
     })
     it('getSUDTTokenInfo from live cell data parse', async () => {
       const sudtController = new SUDTController()

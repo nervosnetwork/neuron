@@ -1,3 +1,4 @@
+import '../../src/types/ckbComponents.d.ts'
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/base'
 import { scriptToAddress } from '../../src/utils/scriptAndAddress'

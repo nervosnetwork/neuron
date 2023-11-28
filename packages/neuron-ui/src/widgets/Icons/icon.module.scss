@@ -54,3 +54,9 @@ $activity-color: #1b73b3;
     fill: #999;
   }
 }
+
+.withTheme {
+  path[fill] {
+    fill: var(--main-text-color);
+  }
+}

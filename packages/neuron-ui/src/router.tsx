@@ -21,6 +21,7 @@ import OfflineSign from 'components/OfflineSign'
 import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
+import CellManagement from 'components/CellManagement'
 
 const toolsRouters = [
   {
@@ -60,6 +61,16 @@ const mainRouterConfig: RouteObject[] = [
             element: (
               <>
                 <Overview />
+                <Outlet />
+              </>
+            ),
+            children: [...toolsRouters],
+          },
+          {
+            path: RoutePath.CellManage,
+            element: (
+              <>
+                <CellManagement />
                 <Outlet />
               </>
             ),

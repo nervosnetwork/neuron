@@ -457,6 +457,7 @@ export default class WalletsController {
     items: { address: string; capacity: string; date?: string }[]
     fee: string
     feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -468,7 +469,8 @@ export default class WalletsController {
       params.walletID,
       params.items,
       params.fee,
-      params.feeRate
+      params.feeRate,
+      params.consumeOutPoints
     )
     return {
       status: ResponseCode.Success,
@@ -481,6 +483,7 @@ export default class WalletsController {
     items: { address: string; capacity: string; date?: string }[]
     fee: string
     feeRate: string
+    consumeOutPoints?: CKBComponents.OutPoint[]
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -492,7 +495,8 @@ export default class WalletsController {
       params.walletID,
       params.items,
       params.fee,
-      params.feeRate
+      params.feeRate,
+      params.consumeOutPoints
     )
     return {
       status: ResponseCode.Success,

@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals'
 import { ConnectionStatus } from 'utils'
 import getConnectionStatus from 'utils/getConnectionStatus'
 import fixtures from './fixtures.json'
@@ -9,6 +10,6 @@ describe('Test getConnectionStatus', () => {
 
   test.each(fixtureTable)(`%s`, (_title, params, expected) => {
     expect.assertions(1)
-    expect(getConnectionStatus(...params)).toBe(expected)
+    expect(getConnectionStatus(params[0])).toBe(expected)
   })
 })
