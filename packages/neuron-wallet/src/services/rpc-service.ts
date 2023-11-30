@@ -1,3 +1,4 @@
+import type { LocalNode } from '@ckb-lumos/base'
 import CommonUtils from '../utils/common'
 import Block from '../models/chain/block'
 import BlockHeader from '../models/chain/block-header'
@@ -5,6 +6,7 @@ import TransactionWithStatus from '../models/chain/transaction-with-status'
 import logger from '../utils/logger'
 import { generateRPC } from '../utils/ckb-rpc'
 import { NetworkType } from '../models/network'
+
 export default class RpcService {
   private retryTime: number
   private retryInterval: number
@@ -74,7 +76,7 @@ export default class RpcService {
     return syncState
   }
 
-  public async localNodeInfo() {
+  public async localNodeInfo(): Promise<LocalNode> {
     return this.retry(async () => {
       return this.rpc.localNodeInfo()
     })
