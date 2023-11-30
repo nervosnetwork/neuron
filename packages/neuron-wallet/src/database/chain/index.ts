@@ -20,7 +20,7 @@ export const clean = async (clearAllLightClientData?: boolean) => {
     }),
     clearAllLightClientData
       ? getConnection().getRepository(SyncProgress).clear()
-      : SyncProgressService.clearCurrentWalletProgress(),
+      : SyncProgressService.clearWalletProgress(),
   ])
   MultisigOutputChangedSubject.getSubject().next('reset')
 

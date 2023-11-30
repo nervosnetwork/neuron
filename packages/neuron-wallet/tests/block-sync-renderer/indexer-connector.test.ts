@@ -4,9 +4,7 @@ import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
-import type { LumosCell, LumosCellQuery } from '../../src/block-sync-renderer/sync/connector'
 import { flushPromises } from '../test-utils'
-import { ScriptHashType } from '../../src/models/chain/script'
 
 const stubbedTipFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
@@ -50,6 +48,7 @@ describe('unit tests for IndexerConnector', () => {
   stubbedIndexerConstructor = jest.fn()
   stubbedIndexerCacheService = jest.fn()
   stubbedIndexerCacheService.nextUnprocessedBlock = stubbedNextUnprocessedBlock
+  stubbedIndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber = stubbedNextUnprocessedTxsGroupedByBlockNumberFn
   stubbedRPCServiceConstructor = jest.fn()
   stubbedCellCollectorConstructor = jest.fn()
 
@@ -75,7 +74,6 @@ describe('unit tests for IndexerConnector', () => {
   jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
     return stubbedIndexerCacheService.mockImplementation(() => ({
       upsertTxHashes: stubbedUpsertTxHashesFn,
-      nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
     }))
   })
   stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
@@ -227,9 +225,9 @@ describe('unit tests for IndexerConnector', () => {
           describe('when loaded block number is already in order', () => {
             beforeEach(async () => {
               when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
-                .calledWith()
+                .calledWith(addressObj1.walletId)
                 .mockResolvedValueOnce([fakeTxHashCache1])
-                .calledWith()
+                .calledWith(addressObj2.walletId)
                 .mockResolvedValueOnce([fakeTxHashCache2, fakeTxHashCache3])
 
               await connectIndexer(indexerConnector)
@@ -246,9 +244,9 @@ describe('unit tests for IndexerConnector', () => {
           describe('when loaded block number is not in order', () => {
             beforeEach(async () => {
               when(stubbedNextUnprocessedTxsGroupedByBlockNumberFn)
-                .calledWith()
+                .calledWith(addressObj1.walletId)
                 .mockResolvedValueOnce([fakeTxHashCache2, fakeTxHashCache3])
-                .calledWith()
+                .calledWith(addressObj2.walletId)
                 .mockResolvedValueOnce([fakeTxHashCache1])
 
               await connectIndexer(indexerConnector)
@@ -342,7 +340,7 @@ describe('unit tests for IndexerConnector', () => {
           })
           it('throws error', async () => {
             expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(
-              'Error in processing next block number queue: Error: exception'
+              'Connector: \tError in processing next block number queue: Error: exception'
             )
           })
         })
@@ -387,10 +385,7 @@ describe('unit tests for IndexerConnector', () => {
           })
           describe('when there are unprocessed blocks', () => {
             beforeEach(async () => {
-              stubbedNextUnprocessedBlock.mockResolvedValue({
-                blockNumber: fakeBlock3.number,
-                blockHash: fakeBlock3.hash,
-              })
+              stubbedNextUnprocessedBlock.mockResolvedValue(fakeBlock3.number)
               jest.advanceTimersByTime(5000)
               await flushPromises()
             })
@@ -401,191 +396,6 @@ describe('unit tests for IndexerConnector', () => {
                 indexerTipNumber: parseInt(fakeTip2.blockNumber),
               })
             })
-          })
-        })
-      })
-    })
-    describe('#getLiveCellsByScript', () => {
-      let fakeCell1: LumosCell, fakeCell2: LumosCell
-      let cells: LumosCell[]
-
-      fakeCell1 = {
-        blockHash: '0x',
-        outPoint: {
-          txHash: '0x',
-          index: '0x0',
-        },
-        cellOutput: {
-          capacity: '0x0',
-          lock: {
-            hashType: 'type',
-            codeHash: '0xcode',
-            args: '0x1',
-          },
-          type: {
-            hashType: 'data',
-            codeHash: '0xcode',
-            args: '0x1',
-          },
-        },
-      }
-      fakeCell2 = {
-        blockHash: '0x',
-        outPoint: {
-          txHash: '0x',
-          index: '0x0',
-        },
-        cellOutput: {
-          capacity: '0x0',
-          lock: {
-            hashType: 'type',
-            codeHash: '0xcode',
-            args: '0x2',
-          },
-          type: {
-            hashType: 'lock',
-            codeHash: '0xcode',
-            args: '0x2',
-          },
-        },
-      }
-      const fakeCells = [fakeCell1, fakeCell2]
-
-      describe('when success', () => {
-        const query: LumosCellQuery = {
-          lock: {
-            hashType: ScriptHashType.Data,
-            codeHash: '0xcode',
-            args: '0x',
-          },
-          type: {
-            hashType: ScriptHashType.Data,
-            codeHash: '0xcode',
-            args: '0x',
-          },
-          data: null,
-        }
-
-        beforeEach(async () => {
-          stubbedCellCellectFn.mockReturnValueOnce([
-            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[0])))),
-            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1])))),
-          ])
-
-          //@ts-ignore
-          cells = await indexerConnector.getLiveCellsByScript(query)
-        })
-        it('transform the query parameter', () => {
-          expect(stubbedCellCollectorConstructor.mock.calls[0][1]).toEqual({
-            lock: {
-              hashType: query.lock!.hashType,
-              codeHash: query.lock!.codeHash,
-              args: query.lock!.args,
-            },
-            type: {
-              hashType: query.type!.hashType,
-              codeHash: query.type!.codeHash,
-              args: query.type!.args,
-            },
-            data: 'any',
-          })
-        })
-        it('returns live cells with property value fix', async () => {
-          fakeCell2.cellOutput.type!.hashType = 'data'
-          expect(cells).toEqual([fakeCell1, fakeCell2])
-        })
-      })
-      describe('when handling concurrent requests', () => {
-        const query1: LumosCellQuery = {
-          lock: {
-            hashType: ScriptHashType.Data,
-            codeHash: '0xcode',
-            args: '0x1',
-          },
-          type: {
-            hashType: ScriptHashType.Data,
-            codeHash: '0xcode',
-            args: '0x1',
-          },
-          data: null,
-        }
-        const query2: LumosCellQuery = {
-          lock: {
-            hashType: ScriptHashType.Type,
-            codeHash: '0xcode',
-            args: '0x2',
-          },
-          type: {
-            hashType: ScriptHashType.Type,
-            codeHash: '0xcode',
-            args: '0x2',
-          },
-          data: null,
-        }
-
-        const results: unknown[] = []
-        beforeEach(async () => {
-          const stubbedCellCellect1 = jest.fn()
-          stubbedCellCellect1.mockReturnValueOnce([
-            new Promise(resolve => {
-              //fake the waiting, the other concurrent requests should wait until this is finished
-              setTimeout(() => {
-                resolve(JSON.parse(JSON.stringify(fakeCells[0])))
-              }, 500)
-            }),
-          ])
-
-          const stubbedCellCellect2 = jest.fn()
-          stubbedCellCellect2.mockReturnValueOnce([
-            new Promise(resolve => resolve(JSON.parse(JSON.stringify(fakeCells[1])))),
-          ])
-
-          stubbedCellCollectorConstructor.mockImplementation((_indexer: any, query: any) => {
-            if (query.lock.args === '0x1') {
-              return {
-                collect: stubbedCellCellect1,
-              }
-            }
-            if (query.lock.args === '0x2') {
-              return {
-                collect: stubbedCellCellect2,
-              }
-            }
-          })
-
-          const promises = Promise.all([
-            new Promise<void>(resolve => {
-              indexerConnector.getLiveCellsByScript(query1).then(cells => {
-                results.push(cells)
-                resolve()
-              })
-            }),
-            new Promise<void>(resolve => {
-              indexerConnector.getLiveCellsByScript(query2).then(cells => {
-                results.push(cells)
-                resolve()
-              })
-            }),
-          ])
-
-          jest.advanceTimersByTime(500)
-          await promises
-        })
-        it('process one by one in order', () => {
-          expect(results.length).toEqual(2)
-          expect(results[0]).toEqual([fakeCells[0]])
-        })
-      })
-      describe('when fails', () => {
-        describe('when both type and lock parameter is not specified', () => {
-          it('throws error', async () => {
-            let err
-            try {
-              await indexerConnector.getLiveCellsByScript({ lock: null, type: null, data: null })
-            } catch (error) {
-              err = error
-            }
-            expect(err).toEqual(new Error('at least one parameter is required'))
           })
         })
       })
