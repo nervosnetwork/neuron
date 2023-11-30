@@ -2,7 +2,7 @@ import type { ParamsFormatter } from '@ckb-lumos/rpc'
 import type { Block } from '@ckb-lumos/base'
 import { HexString } from '@ckb-lumos/base'
 import { CKBRPC } from '@ckb-lumos/rpc'
-import { Method as Method_ } from '@ckb-lumos/rpc/lib/method'
+import { Method as SdkRpcMethod } from '@ckb-lumos/rpc/lib/method'
 import * as resultFormatter from '@ckb-lumos/rpc/lib/resultFormatter'
 import { formatter as paramsFormatter } from '@ckb-lumos/rpc/lib/paramsFormatter'
 import { Base } from '@ckb-lumos/rpc/lib/Base'
@@ -131,7 +131,7 @@ export class FullCKBRPC extends CKBRPC {
   }
 }
 
-class Method extends Method_ {
+class Method extends SdkRpcMethod {
   constructor(node: CKBComponents.Node, options: CKBComponents.Method) {
     super(node, options, rpcConfig)
   }
