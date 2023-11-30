@@ -31,7 +31,7 @@ body:
       required: true
     attributes:
       label: Detail of the issue
-      description: Elaborate on your issue in this field
+      description: Please append detail of the issue here, including steps to reproduce, screenshots, etc.
 
   - type: markdown
     attributes:
@@ -39,7 +39,7 @@ body:
 
         ---
         ## Please add neuron logs if possible, they can be exported by `Menu -> Help -> Export Debug Information`
-        
+
         <sub>
         The debug information will be exported as a zip file, you may upload it by drag&drop into **Detail of the issue**, or paste them in the following fields, respectively.
         </sub>
