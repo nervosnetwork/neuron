@@ -37,19 +37,6 @@ export default class IndexerTxHashCache extends BaseEntity {
   @Index()
   blockNumber!: number
 
-  @Column({
-    type: 'character',
-    length: 32,
-  })
-  @Index()
-  blockHash!: string
-
-  @Column({
-    type: 'varchar',
-  })
-  @Index()
-  blockTimestamp!: string
-
   @Column()
   @Index()
   isProcessed: boolean = false
@@ -67,20 +54,10 @@ export default class IndexerTxHashCache extends BaseEntity {
   })
   updatedAt!: Date
 
-  static fromObject(obj: {
-    txHash: string
-    blockNumber: number
-    blockHash: string
-    blockTimestamp: string
-    lockHash: string
-    address: string
-    walletId: string
-  }) {
+  static fromObject(obj: { txHash: string; blockNumber: number; lockHash: string; address: string; walletId: string }) {
     const result = new IndexerTxHashCache()
     result.txHash = obj.txHash
     result.blockNumber = obj.blockNumber
-    result.blockHash = obj.blockHash
-    result.blockTimestamp = obj.blockTimestamp
     result.lockHash = obj.lockHash
     result.address = obj.address
     result.walletId = obj.walletId
