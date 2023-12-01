@@ -844,24 +844,31 @@ export default class ApiController {
     handle('wc-connect', async (_, params) => {
       return this.#walletConnectController.connect(params)
     })
+
     handle('wc-disconnect', async (_, params) => {
       return this.#walletConnectController.disconnect(params)
     })
+
     handle('wc-approve-session', async (_, params) => {
       return this.#walletConnectController.approveSession(params)
     })
+
     handle('wc-reject-session', async (_, params) => {
       return this.#walletConnectController.rejectSession(params)
     })
+
     handle('wc-approve-request', async (_, params) => {
       return this.#walletConnectController.approveRequest(params)
     })
+
     handle('wc-reject-request', async (_, params) => {
       return this.#walletConnectController.rejectRequest(params)
     })
+
     handle('wc-get-state', async _ => {
       return this.#walletConnectController.getState()
     })
+
     // cell manager
     handle('get-live-cells', async () => {
       return {

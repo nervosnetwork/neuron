@@ -34,6 +34,7 @@ const WalletConnect = () => {
     proposals,
     sessions,
     requests,
+    supportedScriptBases,
     onConnect,
     onDisconnect,
     onRejectRequest,
@@ -182,7 +183,13 @@ const WalletConnect = () => {
                 <>
                   <p className={styles.title}>{t('wallet-connect.connected-session')}</p>
                   {sessions.map(item => (
-                    <SessionItem key={item.topic} data={item} onDisconnect={onDisconnect} userName={userName} />
+                    <SessionItem
+                      key={item.topic}
+                      data={item}
+                      onDisconnect={onDisconnect}
+                      userName={userName}
+                      supportedScriptBases={supportedScriptBases}
+                    />
                   ))}
                 </>
               ) : null}
@@ -197,6 +204,7 @@ const WalletConnect = () => {
                       onApproveSession={onApproveSession}
                       onRejectSession={onRejectSession}
                       userName={userName}
+                      supportedScriptBases={supportedScriptBases}
                     />
                   ))}
                 </>

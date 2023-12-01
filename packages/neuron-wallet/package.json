@@ -42,7 +42,7 @@
     ]
   },
   "dependencies": {
-    "@ckb-connect/walletconnect-wallet-sdk": "^0.0.1-alpha.1",
+    "@ckb-connect/walletconnect-wallet-sdk": "0.0.1-alpha.2",
     "@ckb-lumos/base": "0.21.0-next.2",
     "@ckb-lumos/bi": "0.21.0-next.2",
     "@ckb-lumos/ckb-indexer": "0.21.0-next.2",

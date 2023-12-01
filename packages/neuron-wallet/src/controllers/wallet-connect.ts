@@ -19,6 +19,7 @@ import { CurrentWalletSubject } from '../models/subjects/wallets'
 import { CurrentNetworkIDSubject } from '../models/subjects/networks'
 import { AccountExtendedPublicKey } from '../models/keys/key'
 import { Address as AddressInterface } from '../models/address'
+import AssetAccount from '../models/asset-account'
 import { AddressType } from '../models/keys/address'
 import TxDbChangedSubject from '../models/subjects/tx-db-changed-subject'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
@@ -27,6 +28,16 @@ import { ResponseCode } from '../utils/const'
 import WalletsService from '../services/wallets'
 import NetworksService from '../services/networks'
 import AddressService from '../services/addresses'
+import AssetAccountController from './asset-account'
+
+function getSupportedScriptBases(): Record<string, string> {
+  const isMainnet = NetworksService.getInstance().isMainnet()
+  const acp = isMainnet ? process.env.MAINNET_ACP_SCRIPT_CODEHASH : process.env.TESTNET_ACP_SCRIPT_CODEHASH
+  return {
+    'SECP256K1/blake160': process.env.SECP256K1_CODE_HASH as string,
+    ACP: acp as string,
+  }
+}
 
 class Adapter implements CKBWalletAdapter {
   private walletID: string = ''
@@ -41,51 +52,92 @@ class Adapter implements CKBWalletAdapter {
     [scriptBase: string]: Address[]
   }> {
     const scriptBaseList = Object.keys(params)
-    if (scriptBaseList.length) {
-      const { page, type } = params[scriptBaseList[0]]
+    if (scriptBaseList.length === 0) {
+      return {}
+    }
+    const supportedScriptBases = getSupportedScriptBases()
+    const result = <{ [scriptBase: string]: Address[] }>{}
+    const list = scriptBaseList.map(async hashKey => {
+      const { page, type } = params[hashKey]
       const { size = 10, before, after } = page
-      let resList = [] as AddressInterface[]
-      if (type === 'generate') {
-        resList =
-          (await AddressService.generateAndSaveForExtendedKey({
-            walletId: this.walletID,
-            extendedKey: this.extendedKey,
-            receivingAddressCount: size,
-          })) || []
-      } else {
-        const list = (await AddressService.getAddressesWithBalancesByWalletId(this.walletID)).filter(
-          item => item.addressType === AddressType.Receiving
-        )
-
-        if (before) {
-          const beforeItem = list.find(item => item.address === before)
-          if (beforeItem) {
-            resList = list.filter(item => item.addressIndex < beforeItem.addressIndex).slice(-size)
-          }
-        } else if (after) {
-          const afterItem = list.find(item => item.address === after)
-          if (afterItem) {
-            resList = list.filter(item => item.addressIndex > afterItem.addressIndex).slice(size)
-          }
+      if (hashKey === supportedScriptBases['SECP256K1/blake160']) {
+        let resList = [] as AddressInterface[]
+        if (type === 'generate') {
+          resList =
+            (await AddressService.generateAndSaveForExtendedKey({
+              walletId: this.walletID,
+              extendedKey: this.extendedKey,
+              receivingAddressCount: size,
+            })) || []
         } else {
-          resList = list.slice(0, size)
-        }
-      }
+          const list = (await AddressService.getAddressesWithBalancesByWalletId(this.walletID)).filter(
+            item => item.addressType === AddressType.Receiving
+          )
 
-      const addresses = resList.map(
-        ({ address, blake160: identifier, balance, description = '', addressIndex: index = '' }) => ({
+          if (before) {
+            const beforeItem = list.find(item => item.address === before)
+            if (beforeItem) {
+              resList = list.filter(item => item.addressIndex < beforeItem.addressIndex).slice(-size)
+            }
+          } else if (after) {
+            const afterItem = list.find(item => item.address === after)
+            if (afterItem) {
+              resList = list.filter(item => item.addressIndex > afterItem.addressIndex).slice(size)
+            }
+          } else {
+            resList = list.slice(0, size)
+          }
+        }
+
+        return resList.map(
+          ({ address, blake160: identifier, balance, description = '', addressIndex: index = '' }) => ({
+            address,
+            identifier,
+            description,
+            balance: balance!,
+            index,
+          })
+        )
+      }
+      if (hashKey === supportedScriptBases.ACP) {
+        let resList = [] as (AssetAccount & { address: string })[]
+        if (type === 'generate') {
+          resList = []
+        } else {
+          const { status, result } = await new AssetAccountController().getAll({ walletID: this.walletID })
+          if (status === ResponseCode.Success && result) {
+            if (before) {
+              const beforeItem = result.findIndex(item => item.address === before)
+              if (beforeItem) {
+                resList = result.filter((_, index) => index < beforeItem).slice(-size)
+              }
+            } else if (after) {
+              const afterItem = result.findIndex(item => item.address === after)
+              if (afterItem) {
+                resList = result.filter((_, index) => index > afterItem).slice(size)
+              }
+            } else {
+              resList = result.slice(0, size)
+            }
+          }
+        }
+        return resList.map(({ address, blake160: identifier, balance, ...other }) => ({
           address,
           identifier,
-          description,
           balance: balance!,
-          index,
-        })
-      )
-      return Promise.resolve({
-        [scriptBaseList[0]]: addresses,
-      })
-    }
-    return Promise.resolve({})
+          ...other,
+        }))
+      }
+      return []
+    })
+    const resultList = await Promise.all(list)
+
+    resultList.forEach((item, index) => {
+      result[scriptBaseList[index]] = item
+    })
+
+    logger.info('resultList-----', resultList, scriptBaseList, result)
+    return result
   }
 
   public async ckb_signTransaction(
@@ -115,7 +167,7 @@ export default class WalletConnectController {
   private sessions: Session[] = []
   private requests: SessionRequest[] = []
 
-  private addresses: AddressInterface[] = []
+  private addresses: Address[] = []
 
   public getState(): {
     status: ResponseCode
@@ -124,6 +176,7 @@ export default class WalletConnectController {
       sessions: Session[]
       requests: SessionRequest[]
       identity: string
+      supportedScriptBases: Record<string, string>
     }
   } {
     return {
@@ -133,6 +186,7 @@ export default class WalletConnectController {
         sessions: this.sessions,
         requests: this.requests,
         identity: this.getWallet().identity,
+        supportedScriptBases: getSupportedScriptBases(),
       },
     }
   }
@@ -359,6 +413,7 @@ export default class WalletConnectController {
       sessions: this.sessions,
       requests: this.requests,
       identity: this.getWallet().identity,
+      supportedScriptBases: getSupportedScriptBases(),
     })
   }
 }

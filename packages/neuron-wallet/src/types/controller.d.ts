@@ -110,5 +110,6 @@ declare namespace Controller {
     sessions: Session[]
     requests: SessionRequest[]
     identity: string
+    supportedScriptBases: Record<string, string>
   }
 }

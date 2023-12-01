@@ -3,6 +3,7 @@ export const walletConnectState: State.WalletConnect = {
   sessions: [],
   requests: [],
   identity: '',
+  supportedScriptBases: {},
 }
 
 export default walletConnectState

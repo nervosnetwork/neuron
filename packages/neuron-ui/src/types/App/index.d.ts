@@ -342,6 +342,7 @@ declare namespace State {
     sessions: Session[]
     requests: SessionRequest[]
     identity: string
+    supportedScriptBases: Record<string, string>
   }
 
   enum LockScriptCategory {

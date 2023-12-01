@@ -6,7 +6,7 @@ import { SessionRequest } from '@ckb-connect/walletconnect-wallet-sdk'
 
 export const useWalletConnect = () => {
   const {
-    walletConnect: { proposals, sessions, requests, identity },
+    walletConnect: { proposals, sessions, requests, identity, supportedScriptBases = {} },
   } = useGlobalState()
 
   const onConnect = useCallback(async (uri: string) => {
@@ -59,6 +59,7 @@ export const useWalletConnect = () => {
     proposals,
     sessions,
     requests,
+    supportedScriptBases,
     onConnect,
     onDisconnect,
     onRejectRequest,

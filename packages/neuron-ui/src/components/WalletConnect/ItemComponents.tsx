@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { clsx, shannonToCKBFormatter, isMainnet as isMainnetUtil } from 'utils'
-import { SCRIPT_BASES } from 'utils/const'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { useState as useGlobalState } from 'states'
 import { Proposal, Session, SessionRequest, SignTransactionParams } from '@ckb-connect/walletconnect-wallet-sdk'
@@ -15,11 +14,22 @@ interface PrososalItemProps {
   onApproveSession: (id: string, scriptBases: string[]) => void
   onRejectSession: (e: React.SyntheticEvent<HTMLButtonElement>) => void
   userName: string
+  supportedScriptBases: Record<string, string>
 }
 
-export const PrososalItem = ({ data, key, onApproveSession, onRejectSession, userName }: PrososalItemProps) => {
+export const PrososalItem = ({
+  data,
+  key,
+  onApproveSession,
+  onRejectSession,
+  userName,
+  supportedScriptBases,
+}: PrososalItemProps) => {
   const [t] = useTranslation()
-  const scriptBases = data?.params?.sessionProperties?.scriptBases?.split(',') || []
+  const scriptBases =
+    Object.values(supportedScriptBases).filter(item => data?.params?.sessionProperties?.scriptBases?.includes(item)) ||
+    []
+
   const initScriptBases = scriptBases.length ? scriptBases : Object.keys(scriptBases)
   const [selectHashes, setSelectHashes] = useState<string[]>(initScriptBases)
   const metadata = data?.params?.proposer?.metadata || {}
@@ -27,12 +37,11 @@ export const PrososalItem = ({ data, key, onApproveSession, onRejectSession, use
   const onChangeChecked = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { hash } = e.target.dataset
-
       if (hash) {
-        if (e.target.checked) {
-          setSelectHashes(selectHashes.filter(v => v.toString() !== hash))
-        } else {
+        if (e.target.checked && !selectHashes.includes(hash)) {
           setSelectHashes([...selectHashes, hash])
+        } else {
+          setSelectHashes(selectHashes.filter(v => v !== hash))
         }
       }
     },
@@ -46,7 +55,7 @@ export const PrososalItem = ({ data, key, onApproveSession, onRejectSession, use
         await onApproveSession(id, selectHashes)
       }
     },
-    [onApproveSession]
+    [onApproveSession, selectHashes]
   )
 
   return (
@@ -59,7 +68,7 @@ export const PrososalItem = ({ data, key, onApproveSession, onRejectSession, use
           </p>
           <div>Lock Hash:</div>
           <div className={styles.hashWrap}>
-            {Object.entries(SCRIPT_BASES).map(([hash, hashName]) => (
+            {Object.entries(supportedScriptBases).map(([hashName, hash]) => (
               <label htmlFor={hash}>
                 <input
                   type="checkbox"
@@ -92,9 +101,10 @@ interface SessionItemProps {
   key: string
   onDisconnect: (e: React.SyntheticEvent<HTMLButtonElement>) => void
   userName: string
+  supportedScriptBases: Record<string, string>
 }
 
-export const SessionItem = ({ data, key, onDisconnect, userName }: SessionItemProps) => {
+export const SessionItem = ({ data, key, onDisconnect, userName, supportedScriptBases }: SessionItemProps) => {
   const [t] = useTranslation()
   const scriptBases = data?.sessionProperties?.scriptBases || ''
   const { name = '', url = '' } = data?.peer?.metadata || {}
@@ -109,7 +119,7 @@ export const SessionItem = ({ data, key, onDisconnect, userName }: SessionItemPr
           </p>
           <div>Lock Hash:</div>
           <div className={styles.hashWrap}>
-            {Object.entries(SCRIPT_BASES).map(([hash, hashName]) => (
+            {Object.entries(supportedScriptBases).map(([hashName, hash]) => (
               <label htmlFor={hash}>
                 <input type="checkbox" id={hash} checked={scriptBases.includes(hash)} disabled />
                 <span>{hashName}</span>
