@@ -1,6 +1,6 @@
 import type { OutPoint } from '@ckb-lumos/base'
 import produce, { Draft } from 'immer'
-import { OfflineSignJSON } from 'services/remote'
+import { OfflineSignJSON, WalletConnectSignJSON } from 'services/remote'
 import initStates from 'states/init'
 import { ConnectionStatus, ErrorCode, getCurrentUrl, getSyncStatus, sortAccounts } from 'utils'
 
@@ -67,6 +67,8 @@ export enum AppActions {
   UpdateCountDown = 'updateCountDown',
   SignVerify = 'signVerify',
 
+  // walletConnect
+  UpdateWalletConnectState = 'updateWalletConnectState',
   // Cell manage
   UpdateConsumeCells = 'UpdateConsumeCells',
 }
@@ -100,7 +102,10 @@ export type StateAction =
   | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
   | { type: AppActions.Ignore; payload?: any }
   | { type: AppActions.UpdateExperimentalParams; payload: State.Experimental | null }
-  | { type: AppActions.UpdateLoadedTransaction; payload: { filePath?: string; json: OfflineSignJSON } }
+  | {
+      type: AppActions.UpdateLoadedTransaction
+      payload: { filePath?: string; json: OfflineSignJSON | WalletConnectSignJSON }
+    }
   | { type: AppActions.SetPageNotice; payload?: Omit<State.PageNotice, 'index'> }
   | { type: AppActions.HideWaitForFullySynced }
   | { type: AppActions.GetFeeRateStats; payload: State.FeeRateStatsType }
@@ -120,6 +125,10 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
   | { type: NeuronWalletActions.GetSUDTAccountList; payload: Controller.GetSUDTAccountList.Response }
   | { type: AppActions.SignVerify; payload: string }
+  | {
+      type: AppActions.UpdateWalletConnectState
+      payload: State.WalletConnect
+    }
   | { type: AppActions.UpdateConsumeCells; payload?: { outPoint: OutPoint; capacity: string }[] }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
@@ -412,6 +421,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.HideWaitForFullySynced: {
       state.app.showWaitForFullySynced = false
+      break
+    }
+    case AppActions.UpdateWalletConnectState: {
+      state.walletConnect = action.payload
       break
     }
 

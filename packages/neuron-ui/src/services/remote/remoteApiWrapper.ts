@@ -151,6 +151,16 @@ type Action =
   | 'get-hold-sudt-cell-capacity'
   | 'start-migrate'
   | 'get-sync-progress-by-addresses'
+  // walletconnect
+  | 'wc-connect'
+  | 'wc-disconnect'
+  | 'wc-approve-session'
+  | 'wc-reject-session'
+  | 'wc-approve-request'
+  | 'wc-reject-request'
+  | 'wc-get-state'
+  | 'ask-camera-access'
+  | 'capture-screen'
   // spore
   | 'generate-transfer-spore-tx'
   // cell-manage

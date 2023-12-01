@@ -60,7 +60,7 @@ export class AccountExtendedPublicKey extends ExtendedPublicKey {
     return Address.fromPublicKey(this.addressPublicKey(type, index), Address.pathFor(type, index), isMainnet)
   }
 
-  private addressPublicKey = (type = AddressType.Receiving, index: number) => {
+  addressPublicKey = (type = AddressType.Receiving, index: number) => {
     const keychain = Keychain.fromPublicKey(
       Buffer.from(this.publicKey, 'hex'),
       Buffer.from(this.chainCode, 'hex'),

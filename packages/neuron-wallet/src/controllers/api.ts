@@ -62,6 +62,7 @@ import NodeService from '../services/node'
 import SyncProgressService from '../services/sync-progress'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
+import WalletConnectController from './wallet-connect'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 
@@ -80,6 +81,7 @@ export default class ApiController {
   #offlineSignController = new OfflineSignController()
   #sudtController = new SUDTController()
   #multisigController = new MultisigController()
+  #walletConnectController = new WalletConnectController()
 
   public async mount() {
     this.#registerHandlers()
@@ -749,6 +751,14 @@ export default class ApiController {
       return this.#hardwareController.getPublicKey()
     })
 
+    handle('ask-camera-access', async () => {
+      return this.#hardwareController.askForCameraAccess()
+    })
+
+    handle('capture-screen', async () => {
+      return this.#hardwareController.captureScreen()
+    })
+
     handle('create-hardware-wallet', async (_, params: ExtendedPublicKey & { walletName: string }) => {
       return await this.#walletsController.importHardwareWallet(params)
     })
@@ -828,6 +838,35 @@ export default class ApiController {
         result: await SyncProgressService.getSyncProgressByHashes(hashes),
         status: ResponseCode.Success,
       }
+    })
+
+    // walletconnect
+    handle('wc-connect', async (_, params) => {
+      return this.#walletConnectController.connect(params)
+    })
+
+    handle('wc-disconnect', async (_, params) => {
+      return this.#walletConnectController.disconnect(params)
+    })
+
+    handle('wc-approve-session', async (_, params) => {
+      return this.#walletConnectController.approveSession(params)
+    })
+
+    handle('wc-reject-session', async (_, params) => {
+      return this.#walletConnectController.rejectSession(params)
+    })
+
+    handle('wc-approve-request', async (_, params) => {
+      return this.#walletConnectController.approveRequest(params)
+    })
+
+    handle('wc-reject-request', async (_, params) => {
+      return this.#walletConnectController.rejectRequest(params)
+    })
+
+    handle('wc-get-state', async _ => {
+      return this.#walletConnectController.getState()
     })
 
     // cell manager

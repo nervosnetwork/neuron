@@ -395,4 +395,10 @@ declare namespace Controller {
       assetAccount?: AssetAccount
     }
   }
+
+  interface CaptureScreenSource {
+    id: string
+    name: string
+    dataUrl: string
+  }
 }

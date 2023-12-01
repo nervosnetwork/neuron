@@ -1,3 +1,5 @@
+/// <reference types="@ckb-connect/walletconnect-wallet-sdk" />
+
 declare namespace Controller {
   interface Response<T = any> {
     status: number
@@ -101,5 +103,13 @@ declare namespace Controller {
     txCount: number
     description: string
     balance: string
+  }
+
+  interface WalletConnect {
+    proposals: Proposal[]
+    sessions: Session[]
+    requests: SessionRequest[]
+    identity: string
+    supportedScriptBases: Record<string, string>
   }
 }

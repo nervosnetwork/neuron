@@ -1,3 +1,5 @@
+/// <reference types="@ckb-connect/walletconnect-wallet-sdk" />
+
 declare namespace State {
   interface Transaction {
     type: 'send' | 'receive' | 'create' | 'destroy'
@@ -332,6 +334,15 @@ declare namespace State {
     sUDTAccounts: SUDTAccount[]
     experimental: Experimental | null
     consumeCells?: { outPoint: OutPoint; capacity: string }[]
+    walletConnect: State.WalletConnect
+  }
+
+  interface WalletConnect {
+    proposals: Proposal[]
+    sessions: Session[]
+    requests: SessionRequest[]
+    identity: string
+    supportedScriptBases: Record<string, string>
   }
 
   enum LockScriptCategory {

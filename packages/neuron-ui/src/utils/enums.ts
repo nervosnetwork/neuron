@@ -28,6 +28,7 @@ export enum RoutePath {
   OfflineSign = 'offline-sign',
   SignVerify = 'sign-verify',
   MultisigAddress = 'multisig-address',
+  WalletConnect = '/wallet-connect',
 }
 
 export enum CapacityUnit {

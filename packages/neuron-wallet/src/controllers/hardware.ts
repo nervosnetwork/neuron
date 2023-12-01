@@ -1,7 +1,8 @@
+import { desktopCapturer, screen, BrowserWindow, systemPreferences } from 'electron'
 import { DeviceInfo, ExtendedPublicKey, PublicKey } from '../services/hardware/common'
 import { ResponseCode } from '../utils/const'
 import HardwareWalletService from '../services/hardware'
-import { connectDeviceFailed } from '../exceptions'
+import { connectDeviceFailed, AskAccessFailed } from '../exceptions'
 import { AccountExtendedPublicKey } from '../models/keys/key'
 
 export default class HardwareController {
@@ -66,6 +67,52 @@ export default class HardwareController {
     return {
       status: ResponseCode.Success,
       result: pubkey,
+    }
+  }
+
+  public async askForCameraAccess() {
+    const status = await systemPreferences.getMediaAccessStatus('camera')
+    if (status === 'granted') {
+      return {
+        status: ResponseCode.Success,
+      }
+    }
+
+    const canAccess = await systemPreferences.askForMediaAccess('camera')
+    if (canAccess) {
+      return {
+        status: ResponseCode.Success,
+      }
+    }
+
+    throw new AskAccessFailed()
+  }
+
+  public async captureScreen() {
+    const status = await systemPreferences.getMediaAccessStatus('screen')
+    if (status === 'denied') {
+      throw new AskAccessFailed()
+    }
+
+    const currentWindow = BrowserWindow.getFocusedWindow()
+    currentWindow?.hide()
+    const display = screen.getPrimaryDisplay()
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: {
+        height: display.bounds.height * display.scaleFactor,
+        width: display.bounds.width * display.scaleFactor,
+      },
+    })
+    currentWindow?.show()
+    const result = sources.map(item => ({
+      id: item.id,
+      name: item.name,
+      dataUrl: item.thumbnail.toDataURL(),
+    }))
+    return {
+      status: ResponseCode.Success,
+      result,
     }
   }
 }

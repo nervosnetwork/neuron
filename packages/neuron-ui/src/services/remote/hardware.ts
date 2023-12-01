@@ -39,3 +39,5 @@ export const connectDevice = remoteApi<DeviceInfo, void>('connect-device')
 export const createHardwareWallet = remoteApi<ExtendedPublicKey & { walletName: string }, State.Wallet>(
   'create-hardware-wallet'
 )
+export const askForCameraAccess = remoteApi<void>('ask-camera-access')
+export const captureScreen = remoteApi<void>('capture-screen')

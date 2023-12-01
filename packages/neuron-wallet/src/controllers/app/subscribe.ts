@@ -16,6 +16,7 @@ import MigrateSubject from '../../models/subjects/migrate-subject'
 import startMonitor, { stopMonitor } from '../../services/monitor'
 import { clearCkbNodeCache } from '../../services/ckb-runner'
 import ShowGlobalDialogSubject from '../../models/subjects/show-global-dialog'
+import { WalletConnectSubject } from '../../models/subjects/wallet-connect-subject'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -123,5 +124,9 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   ShowGlobalDialogSubject.subscribe(params => {
     BrowserWindow.getFocusedWindow()?.webContents.send('show-global-dialog', params)
+  })
+
+  WalletConnectSubject.subscribe(data => {
+    dispatcher.sendMessage('wallet-connect-updated', data)
   })
 }

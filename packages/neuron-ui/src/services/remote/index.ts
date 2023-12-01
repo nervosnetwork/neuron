@@ -14,6 +14,7 @@ export * from './hardware'
 export * from './offline'
 export * from './nft'
 export * from './multisig'
+export * from './walletConnect'
 export * from './cellManage'
 
 const REMOTE_MODULE_NOT_FOUND =

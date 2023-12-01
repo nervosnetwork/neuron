@@ -69,4 +69,6 @@ declare namespace Subject {
     type: 'success' | 'failed' | 'warning'
     action?: 'ok' | 'cancel'
   }
+
+  type WalletConnectState = State.WalletConnect
 }
