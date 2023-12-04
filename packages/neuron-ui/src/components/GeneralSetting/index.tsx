@@ -56,14 +56,6 @@ const UpdateDownloadStatus = ({
       return { __html: releaseNotes }
     }
 
-    const versionText = () => {
-      let text = releaseNotes.match(/(?<=<h1>).*?(?=<\/h1>)/)?.[0]
-      if (!text) {
-        text = `${newVersion} (${uniformTimeFormatter(new Date(releaseDate)).split(' ')[0]})`
-      }
-      return text
-    }
-
     /* eslint-disable react/no-danger */
 
     return (
@@ -79,7 +71,9 @@ const UpdateDownloadStatus = ({
         }}
       >
         <div className={styles.install}>
-          <p className={styles.title}>{versionText()}</p>
+          <p className={styles.title}>
+            {newVersion} ({uniformTimeFormatter(new Date(releaseDate)).split(' ')[0]})
+          </p>
           <div className={styles.releaseNotesStyle}>
             <div dangerouslySetInnerHTML={releaseNotesHtml()} />
           </div>

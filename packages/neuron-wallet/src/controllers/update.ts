@@ -1,4 +1,5 @@
 import { autoUpdater, UpdateInfo, CancellationToken, ProgressInfo } from 'electron-updater'
+import { net } from 'electron'
 import AppUpdaterSubject, { AppUpdater } from '../models/subjects/app-updater'
 import logger from '../utils/logger'
 
@@ -76,11 +77,18 @@ export default class UpdateController {
       if (UpdateController.isChecking) {
         UpdateController.isChecking = false
         UpdateController.updatePackageSize = info.files[0].size ?? 0
-        this.notify({
-          version: info.version,
-          releaseDate: info.releaseDate,
-          releaseNotes: info.releaseNotes as string,
+        const request = net.request(`https://api.github.com/repos/nervosnetwork/neuron/releases/tags/v${info.version}`)
+        request.on('response', response => {
+          response.on('data', chunk => {
+            const res = JSON.parse(chunk.toString())
+            this.notify({
+              version: info.version,
+              releaseDate: res.published_at,
+              releaseNotes: info.releaseNotes as string,
+            })
+          })
         })
+        request.end()
       }
     })
 

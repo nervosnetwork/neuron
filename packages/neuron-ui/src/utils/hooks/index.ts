@@ -513,7 +513,9 @@ export const useOutputErrors = (
             const extraSize = date ? CONSTANTS.SINCE_FIELD_SIZE : 0
             validateAmount(amount)
             validateAmountRange(amount, extraSize)
-            validateCapacity({ address, amount, unit }, isSendMax, index === outputs.length - 1)
+            if (!(isSendMax && index === outputs.length - 1)) {
+              validateCapacity({ address, amount, unit })
+            }
           } catch (err) {
             if (isErrorWithI18n(err)) {
               amountError = err
