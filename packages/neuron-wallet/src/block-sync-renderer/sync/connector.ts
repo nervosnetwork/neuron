@@ -97,6 +97,8 @@ export abstract class Connector {
   }
 
   protected async processNextBlockNumber() {
+    // the processNextBlockNumberQueue is a queue to ensure that ONLY one
+    // block processing task runs at a time to avoid the data conflict while syncing
     this.processNextBlockNumberQueue?.push()
     await this.processNextBlockNumberQueue?.drain()
   }
