@@ -72,7 +72,7 @@ const UpdateDownloadStatus = ({
       >
         <div className={styles.install}>
           <p className={styles.title}>
-            {newVersion} ({uniformTimeFormatter(new Date(releaseDate)).split(' ')[0]})
+            {newVersion} {releaseDate ? `(${uniformTimeFormatter(new Date(releaseDate)).split(' ')[0]})` : null}
           </p>
           <div className={styles.releaseNotesStyle}>
             <div dangerouslySetInnerHTML={releaseNotesHtml()} />

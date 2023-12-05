@@ -83,9 +83,16 @@ export default class UpdateController {
             const res = JSON.parse(chunk.toString())
             this.notify({
               version: info.version,
-              releaseDate: res.published_at,
+              releaseDate: res?.published_at || '',
               releaseNotes: info.releaseNotes as string,
             })
+          })
+        })
+        request.on('error', () => {
+          this.notify({
+            version: info.version,
+            releaseDate: '',
+            releaseNotes: info.releaseNotes as string,
           })
         })
         request.end()
