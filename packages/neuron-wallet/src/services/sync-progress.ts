@@ -1,6 +1,5 @@
-import { Equal, getConnection, In, Not } from 'typeorm'
+import { getConnection, In, LessThan, Not } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
-import { HexString } from '@ckb-lumos/base'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import WalletService from './wallets'
 
@@ -11,6 +10,7 @@ export default class SyncProgressService {
       scriptType: CKBRPC.ScriptType
       walletId: string
       addressType?: SyncAddressType
+      blockNumber: string
     }[]
   ) {
     await getConnection()
@@ -51,7 +51,7 @@ export default class SyncProgressService {
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ blockStartNumber: blockNumber })
-      .where({ blake160s: In(blake160s) })
+      .where({ args: In(blake160s), blockStartNumber: LessThan(blockNumber) })
       .execute()
   }
 
@@ -76,13 +76,6 @@ export default class SyncProgressService {
       result.set(v.hash, v)
     })
     return result
-  }
-
-  static async updateSyncStatus(
-    hash: HexString,
-    { blockStartNumber, blockEndNumber, cursor }: { blockStartNumber: number; blockEndNumber: number; cursor?: string }
-  ) {
-    await getConnection().manager.update(SyncProgress, { hash }, { blockStartNumber, blockEndNumber, cursor })
   }
 
   static async getCurrentWalletMinBlockNumber() {
@@ -111,7 +104,7 @@ export default class SyncProgressService {
     return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.walletId]: cur.blockStartNumber }), {})
   }
 
-  static async getOtherTypeSyncProgress() {
+  static async getOtherTypeSyncBlockNumber() {
     const items = await getConnection().getRepository(SyncProgress).find({
       addressType: SyncAddressType.Multisig,
     })
@@ -126,14 +119,11 @@ export default class SyncProgressService {
       .getMany()
   }
 
-  static async clearCurrentWalletProgress() {
-    const currentWallet = WalletService.getInstance().getCurrent()
-    await getConnection().getRepository(SyncProgress).delete({ walletId: currentWallet?.id })
+  static async clearWalletProgress() {
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
-      .set({ blockEndNumber: 0, cursor: undefined })
-      .where({ walletId: Not(Equal(currentWallet?.id)) })
+      .set({ blockStartNumber: 0, blockEndNumber: 0 })
       .execute()
   }
 }

@@ -364,7 +364,7 @@ describe('indexer cache service', () => {
       })
       describe('with all unprocessed transactions', () => {
         it('returns the tx hashes for the next block number', async () => {
-          const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
+          const txHashes = await IndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber(walletId)
           expect(txHashes).toHaveLength(1)
           expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock1.number))
         })
@@ -383,7 +383,7 @@ describe('indexer cache service', () => {
             .execute()
         })
         it('returns the tx hashes for the next block number', async () => {
-          const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
+          const txHashes = await IndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber(walletId)
           expect(txHashes).toHaveLength(2)
           expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock2.number))
         })
@@ -401,7 +401,7 @@ describe('indexer cache service', () => {
               .execute()
           })
           it('returns the unprocessed tx hash in the next block number', async () => {
-            const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
+            const txHashes = await IndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber(walletId)
             expect(txHashes).toHaveLength(1)
             expect(txHashes![0].blockNumber).toEqual(parseInt(fakeBlock2.number))
             expect(txHashes![0].txHash).toEqual(fakeTx3.transaction.hash)
@@ -440,7 +440,7 @@ describe('indexer cache service', () => {
           .execute()
       })
       it('returns empty array when no unprocessed transactions', async () => {
-        const txHashes = await indexerCacheService.nextUnprocessedTxsGroupedByBlockNumber()
+        const txHashes = await IndexerCacheService.nextUnprocessedTxsGroupedByBlockNumber(walletId)
         expect(txHashes).toEqual([])
       })
     })
@@ -465,10 +465,7 @@ describe('indexer cache service', () => {
           nextUnprocessedBlock = await IndexerCacheService.nextUnprocessedBlock([walletId])
         })
         it('returns next unprocessed block number', async () => {
-          expect(nextUnprocessedBlock).toEqual({
-            blockNumber: fakeBlock1.number,
-            blockHash: fakeBlock1.hash,
-          })
+          expect(nextUnprocessedBlock).toEqual(fakeBlock1.number)
         })
       })
       describe('check with walletId that does not have hash caches', () => {

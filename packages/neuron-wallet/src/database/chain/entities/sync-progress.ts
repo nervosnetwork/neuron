@@ -47,6 +47,7 @@ export default class SyncProgress {
     scriptType: CKBRPC.ScriptType
     walletId: string
     addressType?: SyncAddressType
+    blockNumber: string
   }) {
     const res = new SyncProgress()
     res.hash = scriptToHash(obj.script)
@@ -57,6 +58,8 @@ export default class SyncProgress {
     res.scriptType = obj.scriptType
     res.delete = false
     res.addressType = obj.addressType ?? SyncAddressType.Default
+    res.blockStartNumber = parseInt(obj.blockNumber)
+    res.blockEndNumber = parseInt(obj.blockNumber)
     return res
   }
 }

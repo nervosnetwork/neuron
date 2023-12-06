@@ -1,5 +1,6 @@
 import type { ParamsFormatter } from '@ckb-lumos/rpc'
 import type { Block } from '@ckb-lumos/base'
+import type { Script } from '@ckb-lumos/base'
 import { HexString } from '@ckb-lumos/base'
 import { CKBRPC } from '@ckb-lumos/rpc'
 import { Method } from '@ckb-lumos/rpc/lib/method'
@@ -18,7 +19,7 @@ import CommonUtils from './common'
 import { NetworkType } from '../models/network'
 
 export interface LightScriptFilter {
-  script: CKBComponents.Script
+  script: Script
   blockNumber: CKBComponents.BlockNumber
   scriptType: CKBRPC.ScriptType
 }

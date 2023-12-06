@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { In, getConnection } from 'typeorm'
 import { queue } from 'async'
 import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
@@ -27,19 +27,17 @@ export default class IndexerCacheService {
     this.indexer = indexer
   }
 
-  private async getTxHashes(): Promise<IndexerTxHashCache[]> {
+  private static async getTxHashes(walletIds: string[]): Promise<IndexerTxHashCache[]> {
     return getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
-        walletId: this.walletId,
+        walletId: In(walletIds),
       })
       .getMany()
   }
 
-  public static async nextUnprocessedBlock(
-    walletIds: string[]
-  ): Promise<{ blockNumber: string; blockHash: string } | undefined> {
+  public static async nextUnprocessedBlock(walletIds: string[]): Promise<string | undefined> {
     const result = await getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
@@ -51,10 +49,7 @@ export default class IndexerCacheService {
       return
     }
 
-    return {
-      blockNumber: result.blockNumber.toString(),
-      blockHash: result.blockHash,
-    }
+    return result.blockNumber.toString()
   }
 
   public static async updateCacheProcessed(txHash: string) {
@@ -183,7 +178,7 @@ export default class IndexerCacheService {
       await this.saveCacheBlockNumber(tipBlockNumber)
       return []
     }
-    const txMetasCaches = await this.getTxHashes()
+    const txMetasCaches = await IndexerCacheService.getTxHashes([this.walletId])
     const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
 
     const cachedTxHashesSet = new Set(cachedTxHashes)
@@ -218,7 +213,7 @@ export default class IndexerCacheService {
 
     const indexerCaches: IndexerTxHashCache[] = []
     for (const txWithStatus of txsWithStatus) {
-      const { transaction, txStatus } = txWithStatus
+      const { transaction } = txWithStatus
       const mappings = mappingsByTxHash.get(transaction.hash!)
       if (!mappings) {
         continue
@@ -229,8 +224,6 @@ export default class IndexerCacheService {
           IndexerTxHashCache.fromObject({
             txHash: transaction.hash!,
             blockNumber: parseInt(transaction.blockNumber!),
-            blockHash: txStatus.blockHash!,
-            blockTimestamp: transaction.timestamp!,
             lockHash,
             address,
             walletId: this.walletId,
@@ -243,6 +236,44 @@ export default class IndexerCacheService {
 
     await this.saveCacheBlockNumber(tipBlockNumber)
     return newTxHashes
+  }
+
+  public static async upsertIndexerCache(
+    txs: {
+      txHash: string
+      txIndex: string
+      blockNumber: string
+      lockHash: string
+      address: string
+      walletId: string
+    }[]
+  ): Promise<string[]> {
+    if (!txs.length) {
+      return []
+    }
+    const walletIds = txs.map(v => v.walletId)
+    const txMetasCaches = await IndexerCacheService.getTxHashes(walletIds)
+    const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
+
+    const cachedTxHashesSet = new Set(cachedTxHashes)
+
+    const newTxHashes = txs.filter(({ txHash }) => !cachedTxHashesSet.has(txHash))
+
+    if (!newTxHashes.length) {
+      return []
+    }
+    const indexerCaches: IndexerTxHashCache[] = newTxHashes.map(v =>
+      IndexerTxHashCache.fromObject({
+        txHash: v.txHash,
+        blockNumber: parseInt(v.blockNumber!),
+        lockHash: v.lockHash,
+        address: v.address,
+        walletId: v.walletId,
+      })
+    )
+    indexerCaches.sort((a, b) => a.blockNumber - b.blockNumber)
+    await getConnection().manager.save(indexerCaches, { chunk: 100 })
+    return newTxHashes.map(v => v.txHash)
   }
 
   public async updateProcessedTxHashes(blockNumber: string) {
@@ -259,13 +290,13 @@ export default class IndexerCacheService {
       .execute()
   }
 
-  public async nextUnprocessedTxsGroupedByBlockNumber(): Promise<IndexerTxHashCache[]> {
+  public static async nextUnprocessedTxsGroupedByBlockNumber(walletId: string): Promise<IndexerTxHashCache[]> {
     const cache = await getConnection()
       .getRepository(IndexerTxHashCache)
       .createQueryBuilder()
       .where({
         isProcessed: false,
-        walletId: this.walletId,
+        walletId,
       })
       .orderBy('blockNumber', 'ASC')
       .getOne()
@@ -281,7 +312,7 @@ export default class IndexerCacheService {
       .where({
         blockNumber,
         isProcessed: false,
-        walletId: this.walletId,
+        walletId,
       })
       .getMany()
   }
