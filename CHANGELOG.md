@@ -1,13 +1,13 @@
-# 0.112.0 (2023-11-27)
+# 0.112.0 (2023-12-05)
 
 ### CKB Node & Light Client
 
 - [CKB@v0.112.1](https://github.com/nervosnetwork/ckb/releases/tag/v0.112.1) was released on Nov. 21st, 2023. This version of CKB node is now bundled and preconfigured in Neuron.
-- [CKB Light Client@v0.3.1](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.1) was released on Nov. 22nd, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
+- [CKB Light Client@v0.3.2](https://github.com/nervosnetwork/ckb-light-client/releases/tag/v0.3.2) was released on Dec. 5th, 2023. This version of CKB Light Client is now bundled and preconfigured in Neuron
 
 ### Assumed valid target
 
-Block before `0xef2e2f0ee78e8fcf5bb5ad16892a49724e5f2d4fbc2779396e3d6c93100b9275`(at height `11,373,036`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/2955)
+Block before `0x1d46fe5bb62d19a004eadd7ba40564c45620905ab260d8a546a9e4b9d7cc0f85`(at height `11,511,944`) will be skipped in validation.(https://github.com/nervosnetwork/neuron/pull/2968)
 
 ---
 
@@ -23,6 +23,7 @@ Block before `0xef2e2f0ee78e8fcf5bb5ad16892a49724e5f2d4fbc2779396e3d6c93100b9275
 - #2935: Fix migration settings.(@yanguoyu)
 - #2945: Fix Nervos DAO withdrawal on light client mode.(@homura)
 - #2944: Fix requests jam when a synced transaction includes cellbase cells.(@yanguoyu)
+- #2965: Fix transaction type recognition on light client mode.(@yanguoyu)
 
 
 **Full Changelog**: https://github.com/nervosnetwork/neuron/compare/v0.111.1...v0.112.0
