@@ -1,0 +1,14 @@
+{
+  "name": "devtools",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@ckb-lumos/lumos": "0.21.0",
+    "@spore-sdk/core": "0.1.0-beta.14"
+  },
+  "devDependencies": {
+    "dotenv": "16.3.1",
+    "ts-node": "10.9.1"
+  }
+}
