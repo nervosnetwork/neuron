@@ -67,12 +67,12 @@ export default class TransactionSender {
     walletID: string = '',
     transaction: Transaction,
     password: string = '',
-    skipLastInputs: boolean = true,
+    skipLastInput: boolean = true,
     skipSign = false
   ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
-      : await this.sign(walletID, transaction, password, skipLastInputs)
+      : await this.sign(walletID, transaction, password, skipLastInput)
 
     return this.broadcastTx(walletID, tx)
   }
@@ -109,7 +109,7 @@ export default class TransactionSender {
     walletID: string = '',
     transaction: Transaction,
     password: string = '',
-    skipLastInputs: boolean = true,
+    skipLastInput: boolean = true,
     context?: RPC.RawTransaction[]
   ) {
     const wallet = this.walletService.get(walletID)
@@ -124,7 +124,7 @@ export default class TransactionSender {
         await device.connect()
       }
       try {
-        return await device.signTx(walletID, tx, txHash, skipLastInputs, context)
+        return await device.signTx(walletID, tx, txHash, skipLastInput, context)
       } catch (err) {
         if (err instanceof TypeError) {
           throw err
@@ -167,7 +167,7 @@ export default class TransactionSender {
     }
 
     const witnessSigningEntries: SignInfo[] = tx.inputs
-      .slice(0, skipLastInputs ? -1 : tx.inputs.length)
+      .slice(0, skipLastInput ? -1 : tx.inputs.length)
       .map((input: Input, index: number) => {
         const lockArgs: string = input.lock!.args!
         const wit: WitnessArgs | string = tx.witnesses[index]
