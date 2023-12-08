@@ -67,6 +67,13 @@ export abstract class Hardware {
 
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
+    const metadata = {
+      locks: {
+        skipped: new Set<string>(),
+      },
+      skipLastInput,
+    }
+
     for (const [index, lockHash] of [...lockHashes].entries()) {
       DeviceSignIndexSubject.next(index)
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
@@ -74,6 +81,17 @@ export abstract class Hardware {
       witnessesArgs[0].witnessArgs.setEmptyLock()
 
       const path = findPath(witnessesArgs[0].lockArgs)
+
+      if (!path) {
+        metadata.locks.skipped.add(lockHash)
+        witnessSigningEntries.forEach((entry, idx) => {
+          if (entry.lockHash === lockHash) {
+            const rawWitness = tx.witnesses[idx]
+            entry.witness = typeof rawWitness === 'string' ? rawWitness : serializeWitnessArgs(rawWitness)
+          }
+        })
+        continue
+      }
 
       if (isMultisig) {
         const serializedWitnesses = witnessesArgs.map(value => {
@@ -131,7 +149,7 @@ export abstract class Hardware {
     tx.witnesses = witnessSigningEntries.map(w => w.witness || '0x')
     tx.hash = txHash
 
-    return tx
+    return { tx, metadata }
   }
 
   public abstract getPublicKey(path: string): Promise<PublicKey>

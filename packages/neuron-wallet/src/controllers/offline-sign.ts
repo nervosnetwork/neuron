@@ -94,13 +94,19 @@ export default class OfflineSignController {
           context
         )
       } else {
-        tx = await new TransactionSender().sign(
-          walletID,
-          Transaction.fromObject(transaction),
-          password,
-          type === SignType.SendSUDT,
-          context
-        )
+        tx = await new TransactionSender()
+          .sign(walletID, Transaction.fromObject(transaction), password, type === SignType.SendSUDT, context)
+          .then(({ tx: t, metadata }) => {
+            // TODO: maybe unidentified inputs can be skipped in offline sign
+            if (metadata.locks.skipped.size) {
+              throw new Error(
+                `Fail to sign transaction, following lock scripts cannot be identified: ${[
+                  ...metadata.locks.skipped.values(),
+                ]}`
+              )
+            }
+            return t
+          })
       }
 
       const signer = OfflineSign.fromJSON({
