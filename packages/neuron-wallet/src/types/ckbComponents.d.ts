@@ -1,6 +1,3 @@
-import type { Agent as HttpsAgent } from 'node:https'
-import type { Agent as HttpAgent } from 'node:http'
-
 declare global {
   declare namespace CKBComponents {
     type DAO = string
@@ -44,8 +41,6 @@ declare global {
     type Since = string
     interface Node {
       url: string
-      httpAgent?: HttpAgent
-      httpsAgent?: HttpsAgent
     }
     interface Method {
       name: string

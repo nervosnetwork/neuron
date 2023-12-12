@@ -15,8 +15,8 @@ import {
 import { request } from 'undici'
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
-import { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
-import { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
+import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
+import type { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 
 export interface LightScriptFilter {
   script: Script
