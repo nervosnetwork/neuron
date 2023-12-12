@@ -67,12 +67,21 @@ export default class TransactionSender {
     walletID: string = '',
     transaction: Transaction,
     password: string = '',
-    skipLastInputs: boolean = true,
+    skipLastInput: boolean = true,
     skipSign = false
   ) {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
-      : await this.sign(walletID, transaction, password, skipLastInputs)
+      : await this.sign(walletID, transaction, password, skipLastInput).then(({ tx, metadata }) => {
+          if (metadata.locks.skipped.size) {
+            throw new Error(
+              `Fail to send transaction, following lock scripts cannot be identified: ${[
+                ...metadata.locks.skipped.values(),
+              ]} `
+            )
+          }
+          return tx
+        })
 
     return this.broadcastTx(walletID, tx)
   }
@@ -109,12 +118,13 @@ export default class TransactionSender {
     walletID: string = '',
     transaction: Transaction,
     password: string = '',
-    skipLastInputs: boolean = true,
+    skipLastInput: boolean = true,
     context?: RPC.RawTransaction[]
   ) {
     const wallet = this.walletService.get(walletID)
     const tx = Transaction.fromObject(transaction)
     const txHash: string = tx.computeHash()
+
     if (wallet.isHardware()) {
       let device = HardwareWalletService.getInstance().getCurrent()
       if (!device) {
@@ -124,7 +134,7 @@ export default class TransactionSender {
         await device.connect()
       }
       try {
-        return await device.signTx(walletID, tx, txHash, skipLastInputs, context)
+        return await device.signTx(walletID, tx, txHash, skipLastInput, context)
       } catch (err) {
         if (err instanceof TypeError) {
           throw err
@@ -151,23 +161,19 @@ export default class TransactionSender {
     const findPrivateKey = (args: string) => {
       let path: string | undefined
       if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
-        path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
+        path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)?.path
       } else if (args.length === 42) {
-        path = addressInfos.find(i => i.blake160 === args)!.path
+        path = addressInfos.find(i => i.blake160 === args)?.path
       } else {
         const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
         path = addressInfo?.path
       }
 
-      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
-      if (!pathAndPrivateKey) {
-        throw new Error('no private key found')
-      }
-      return pathAndPrivateKey.privateKey
+      return pathAndPrivateKeys.find(p => p.path === path)?.privateKey
     }
 
     const witnessSigningEntries: SignInfo[] = tx.inputs
-      .slice(0, skipLastInputs ? -1 : tx.inputs.length)
+      .slice(0, skipLastInput ? -1 : tx.inputs.length)
       .map((input: Input, index: number) => {
         const lockArgs: string = input.lock!.args!
         const wit: WitnessArgs | string = tx.witnesses[index]
@@ -183,12 +189,31 @@ export default class TransactionSender {
 
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
+    const metadata = {
+      locks: {
+        skipped: new Set<string>(),
+      },
+      skipLastInput,
+    }
+
     for (const lockHash of lockHashes) {
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
-      // A 65-byte empty signature used as placeholder
-      witnessesArgs[0].witnessArgs.setEmptyLock()
 
       const privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
+
+      if (!privateKey) {
+        metadata.locks.skipped.add(lockHash)
+        witnessSigningEntries.forEach((entry, idx) => {
+          if (entry.lockHash === lockHash) {
+            const rawWitness = tx.witnesses[idx]
+            entry.witness = typeof rawWitness === 'string' ? rawWitness : serializeWitnessArgs(rawWitness)
+          }
+        })
+        continue
+      }
+
+      // A 65-byte empty signature used as placeholder
+      witnessesArgs[0].witnessArgs.setEmptyLock()
 
       const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs.map((value: SignInfo, index: number) => {
         const args = value.witnessArgs
@@ -238,7 +263,7 @@ export default class TransactionSender {
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
     tx.hash = txHash
 
-    return tx
+    return { tx, metadata }
   }
 
   public async signMultisig(
@@ -266,7 +291,7 @@ export default class TransactionSender {
     } else {
       pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
     }
-    const findPrivateKeyAndBlake160 = (argsList: string[], signedBlake160s?: string[]) => {
+    const findPrivateKeyAndBlake160 = (argsList: string[], signedBlake160s?: string[]): [string, string] => {
       let path: string | undefined
       let matchArgs: string | undefined
       argsList.some(args => {
@@ -284,7 +309,7 @@ export default class TransactionSender {
         }
         return !!path
       })
-      if (!path) {
+      if (!path || !matchArgs) {
         throw new NoMatchAddressForSign()
       }
       if (!pathAndPrivateKeys) {

@@ -115,6 +115,8 @@ describe('OfflineSignController', () => {
     },
   }
 
+  const mockTransactionMetadata = { locks: { skipped: new Set() } }
+
   const mockTxInstance = {
     toSDKRawTransaction() {
       return mockTransaction
@@ -347,7 +349,9 @@ describe('OfflineSignController', () => {
           filePath: 'filePath.json',
         })
 
-        stubbedTransactionSenderSign.mockReturnValue(mockTransaction)
+        stubbedTransactionSenderSign.mockReturnValue(
+          Promise.resolve({ tx: mockTransaction, metadata: mockTransactionMetadata })
+        )
       })
 
       it('sign status should change to `signed`', async () => {
@@ -413,7 +417,9 @@ describe('OfflineSignController', () => {
           filePath: 'filePath.json',
         })
 
-        stubbedTransactionSenderSign.mockReturnValue(mockTransaction)
+        stubbedTransactionSenderSign.mockReturnValue(
+          Promise.resolve({ tx: mockTransaction, metadata: mockTransactionMetadata })
+        )
       })
 
       it('should signed', async () => {
@@ -486,7 +492,7 @@ describe('OfflineSignController', () => {
   describe('signAndBroadcastTransaction', () => {
     beforeEach(() => {
       resetMocks()
-      signMultisigMock.mockReturnValue(mockTransaction)
+      signMultisigMock.mockReturnValue({ tx: mockTransaction, metadata: mockTransactionMetadata })
     })
     it('throw exception', async () => {
       getMultisigStatusMock.mockReturnValueOnce(SignStatus.PartiallySigned)
