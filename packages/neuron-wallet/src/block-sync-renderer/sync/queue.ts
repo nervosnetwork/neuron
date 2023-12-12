@@ -98,7 +98,7 @@ export default class Queue {
         }
       }
 
-      this.#indexerConnector!.notifyCurrentBlockNumberProcessed(params)
+      await this.#indexerConnector!.notifyCurrentBlockNumberProcessed(params)
     })
 
     this.#checkAndSaveQueue.error((err: any, task: any) => {

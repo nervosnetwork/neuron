@@ -1,0 +1,77 @@
+name: Bug Report
+description: Create a report to help us improve Neuron
+title: '[Bug Report] **Please describe the bug shortly**'
+labels:
+  - bug
+assignees:
+  - Keith-CY
+  - yanguoyu
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check [Helpe Center](https://neuron.magickbase.com/help-center) first to see if your issue is already addressed.
+
+  - type: dropdown
+    id: type
+    validations:
+      required: true
+    attributes:
+      label: Topic Type
+      options:
+        - Cannot Synchronize
+        - Cannot Send Transaction
+        - Incorrect Balance
+        - User Experience
+        - Other
+
+  - type: textarea
+    id: detial
+    validations:
+      required: true
+    attributes:
+      label: Detail of the issue
+      description: Please append detail of the issue here, including steps to reproduce, screenshots, etc.
+
+  - type: markdown
+    attributes:
+      value: |
+
+        ---
+        ## Please add neuron logs if possible, they can be exported by `Menu -> Help -> Export Debug Information`
+
+        <sub>
+        The debug information will be exported as a zip file, you may upload it by drag&drop into **Detail of the issue**, or paste them in the following fields, respectively.
+        </sub>
+
+  - type: textarea
+    id: bundled-ckb
+    validations:
+      required: false
+    attributes:
+      label: bundled-ckb.log
+      render: shell
+
+  - type: textarea
+    id: bundled-ckb-light-mainnet
+    validations:
+      required: false
+    attributes:
+      label: bundled-ckb-light-mainnet.log
+      render: shell
+
+  - type: textarea
+    id: main-log
+    validations:
+      required: false
+    attributes:
+      label: main.log
+      render: shell
+
+  - type: textarea
+    id: status
+    validations:
+      required: false
+    attributes:
+      label: status.log
+      render: shell

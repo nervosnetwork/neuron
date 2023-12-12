@@ -145,7 +145,7 @@ export class CKBLightRunner extends NodeRunner {
 
     const network = NetworksService.getInstance().getCurrent()
     if (!this.logStream.get(network.id)) {
-      this.logStream.set(network.id, fs.createWriteStream(this.getLogPath()))
+      this.logStream.set(network.id, fs.createWriteStream(this.getLogPath(), { flags: 'a' }))
     }
     const logStream = this.logStream.get(network.id)
 
