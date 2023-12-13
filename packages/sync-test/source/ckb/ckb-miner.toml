@@ -1,0 +1,29 @@
+
+data_dir = 'data'
+
+[chain]
+
+spec = { file = 'specs/dev.toml' }
+
+[logger]
+
+filter = 'info'
+color = true
+log_to_file = true
+log_to_stdout = true
+
+[sentry]
+
+dsn = ''
+
+[miner.client]
+
+rpc_url = 'http://127.0.0.1:8114'
+block_on_submit = true
+poll_interval = 500
+
+[[miner.workers]]
+
+worker_type = 'Dummy'
+delay_type = 'Constant'
+value = 500
