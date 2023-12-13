@@ -17,5 +17,5 @@ module.exports = {
     // "electron": "<rootDir>/tests/mock/electron.ts",
     // "logger": "<rootDir>/tests/mock/logger",
   },
-  testTimeout: 8000000,
+  testTimeout: 1800000,
 }
