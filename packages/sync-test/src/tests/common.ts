@@ -1,11 +1,9 @@
-// CKB相关配置
 export const CKB_CONFIG = {
   ckbConfigPath: 'source/ckb/',
   ckbLightClientConfigPath: 'source/ckb-light-client',
   binPath: 'source/bin',
 }
 
-// CKB链数据
 export const CKB_CHAIN_DATA = {
   dbBlock2000: 'source/ckb-data/db.2000.tar.gz',
   accounts: [
@@ -14,7 +12,6 @@ export const CKB_CHAIN_DATA = {
   ],
 }
 
-// Neuron配置数据
 export const NEURON_CONFIG_DATA = {
   binPath: 'neuron',
   envPath: 'source/neuron/.env',

@@ -1,4 +1,4 @@
-process.env = Object.assign(process.env, { NODE_ENV: undefined });
+process.env = Object.assign(process.env, { NODE_ENV: undefined })
 
 module.exports = {
   displayName: 'Unit Tests',
@@ -6,7 +6,7 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: '(/tests/.*.(test|spec))\\.(ts?|js?)$',
   transform: {
-    '^.+\\.ts?$': 'ts-jest'
+    '^.+\\.ts?$': 'ts-jest',
   },
   roots: ['<rootDir>/src/'],
   moduleDirectories: ['node_modules', 'src'],

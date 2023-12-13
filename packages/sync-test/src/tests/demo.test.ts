@@ -1,5 +1,5 @@
-import {cleanCkbNode, startCkbMiner, startCkbNodeWithData, stopCkbNode} from '../services/ckb-runner'
-import {cleanLightCkbNode, startCkbLightNodeWithConfig, stopLightCkbNode} from '../services/light-runner'
+import { cleanCkbNode, startCkbMiner, startCkbNodeWithData, stopCkbNode } from '../services/ckb-runner'
+import { cleanLightCkbNode, startCkbLightNodeWithConfig, stopLightCkbNode } from '../services/light-runner'
 import {
   asyncSleep,
   backupNeuronCells,
@@ -8,9 +8,9 @@ import {
   waitNeuronSyncSuccess,
 } from '../services/neuron-runner'
 
-import {compareNeuronDatabase} from '../services/neuron-sql-server'
+import { compareNeuronDatabase } from '../services/neuron-sql-server'
 
-import {CKB_CHAIN_DATA, CKB_CONFIG, NEURON_CONFIG_DATA, SQLITE_DATA_PATH} from './common'
+import { CKB_CHAIN_DATA, CKB_CONFIG, NEURON_CONFIG_DATA, SQLITE_DATA_PATH } from './common'
 
 const TEST_CASE = {
   name: 'Sync account1 with 10000 blocks',
@@ -46,7 +46,7 @@ describe('demo', function () {
     await startNeuronWithConfig({
       cleanCells: true,
       envPath: NEURON_CONFIG_DATA.envPath,
-      network: {indexJsonPath: NEURON_CONFIG_DATA.networks.dev},
+      network: { indexJsonPath: NEURON_CONFIG_DATA.networks.dev },
       wallets: {
         walletsPath: TEST_CASE.syncAccount.path,
       },
@@ -69,7 +69,7 @@ describe('demo', function () {
     await startNeuronWithConfig({
       cleanCells: true,
       envPath: NEURON_CONFIG_DATA.envPath,
-      network: {indexJsonPath: NEURON_CONFIG_DATA.networks.light},
+      network: { indexJsonPath: NEURON_CONFIG_DATA.networks.light },
       wallets: {
         walletsPath: TEST_CASE.syncAccount.path,
       },
@@ -78,9 +78,9 @@ describe('demo', function () {
     })
     await waitNeuronSyncSuccess(60 * 60)
     await stopNeuron()
-    console.log("backupNeuronCells")
+    console.log('backupNeuronCells')
     await backupNeuronCells('tmp/lightNode/wallet1')
-    console.log("compareNeuronDatabase")
+    console.log('compareNeuronDatabase')
     const result = await compareNeuronDatabase(
       TEST_CASE.compareLightNodeSqlitePath,
       'tmp/lightNode/wallet1/cell-0x9c96d0b369b5fd42d7e6b30d6dfdb46e32dac7293bf84de9d1e2d11ca7930717.sqlite',
