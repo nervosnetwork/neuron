@@ -22,6 +22,7 @@ import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
 import CellManagement from 'components/CellManagement'
+import SendTxDetail from 'components/SendTxDetail'
 
 const toolsRouters = [
   {
@@ -112,6 +113,16 @@ const mainRouterConfig: RouteObject[] = [
             children: [...toolsRouters],
           },
         ],
+      },
+      {
+        path: RoutePath.SendTxDetail,
+        element: (
+          <>
+            <SendTxDetail />
+            <Outlet />
+          </>
+        ),
+        children: [...toolsRouters],
       },
       {
         path: RoutePath.History,

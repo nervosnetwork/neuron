@@ -11,9 +11,11 @@ import {
   calculateFee,
   validateOutputs,
   DefaultLockInfo,
+  RoutePath,
 } from 'utils'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { PlaceHolderArgs } from 'utils/const'
+import { useNavigate } from 'react-router-dom'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
 
@@ -223,8 +225,19 @@ const useOnTransactionChange = ({
   ])
 }
 
-const useOnSubmit = (items: Readonly<State.Output[]>, isMainnet: boolean, dispatch: StateDispatch) =>
-  useCallback(
+const useOnSubmit = ({
+  items,
+  isMainnet,
+  dispatch,
+  enableUseSentCell,
+}: {
+  items: Readonly<State.Output[]>
+  isMainnet: boolean
+  dispatch: StateDispatch
+  enableUseSentCell: boolean
+}) => {
+  const navigate = useNavigate()
+  return useCallback(
     (e: React.FormEvent) => {
       const {
         dataset: { walletId, status },
@@ -235,20 +248,24 @@ const useOnSubmit = (items: Readonly<State.Output[]>, isMainnet: boolean, dispat
       }
       try {
         validateOutputs(items, isMainnet)
-        dispatch({
-          type: AppActions.RequestPassword,
-          payload: {
-            walletID: walletId as string,
-            actionType: 'send',
-          },
-        })
+        if (enableUseSentCell) {
+          navigate(RoutePath.SendTxDetail)
+        } else {
+          dispatch({
+            type: AppActions.RequestPassword,
+            payload: {
+              walletID: walletId as string,
+              actionType: 'send',
+            },
+          })
+        }
       } catch {
         // ignore
       }
     },
-    [dispatch, items, isMainnet]
+    [dispatch, items, isMainnet, enableUseSentCell, navigate]
   )
-
+}
 const useOnItemChange = (updateTransactionOutput: ReturnType<typeof useUpdateTransactionOutput>) =>
   useCallback(
     (e: any) => {
@@ -403,7 +420,7 @@ export const useInitialize = ({
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
   const onDescriptionChange = useSendDescriptionChange(dispatch)
-  const onSubmit = useOnSubmit(items, isMainnet, dispatch)
+  const onSubmit = useOnSubmit({ items, isMainnet, dispatch, enableUseSentCell })
   const onClear = useClear(dispatch)
 
   const updateSendingAllTransaction = useCallback(() => {
