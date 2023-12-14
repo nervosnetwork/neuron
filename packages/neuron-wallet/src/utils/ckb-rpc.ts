@@ -3,7 +3,7 @@ import type { Block } from '@ckb-lumos/base'
 import type { Script } from '@ckb-lumos/base'
 import { HexString } from '@ckb-lumos/base'
 import { CKBRPC } from '@ckb-lumos/rpc'
-import { Method } from '@ckb-lumos/rpc/lib/method'
+import { Method as SdkRpcMethod } from '@ckb-lumos/rpc/lib/method'
 import * as resultFormatter from '@ckb-lumos/rpc/lib/resultFormatter'
 import { formatter as paramsFormatter } from '@ckb-lumos/rpc/lib/paramsFormatter'
 import { Base } from '@ckb-lumos/rpc/lib/Base'
@@ -12,11 +12,11 @@ import {
   PayloadInBatchException,
   IdNotMatchedInBatchException,
 } from '@ckb-lumos/rpc/lib/exceptions'
-import https from 'https'
-import http from 'http'
 import { request } from 'undici'
 import CommonUtils from './common'
 import { NetworkType } from '../models/network'
+import type { RPCConfig } from '@ckb-lumos/rpc/lib/types/common'
+import type { CKBComponents } from '@ckb-lumos/rpc/lib/types/api'
 
 export interface LightScriptFilter {
   script: Script
@@ -132,6 +132,12 @@ export class FullCKBRPC extends CKBRPC {
   }
 }
 
+class Method extends SdkRpcMethod {
+  constructor(node: CKBComponents.Node, options: CKBComponents.Method) {
+    super(node, options, rpcConfig)
+  }
+}
+
 export type FetchTransactionReturnType = {
   status: 'fetched' | 'fetching' | 'added' | 'not_found'
   txWithStatus?: CKBComponents.TransactionWithStatus
@@ -193,14 +199,14 @@ export class LightRPC extends Base {
     this.getTransactionInLight = new Method(this.node, {
       name: 'getTransaction',
       ...this.rpcProperties['getTransaction'],
-    }).call
+    }).call as Base['getTransaction']
     this.fetchTransaction = new Method(this.node, {
       name: 'fetchTransaction',
       ...lightRPCProperties['fetchTransaction'],
     }).call
   }
 
-  getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
+  getTransaction: Base['getTransaction'] = (async (hash: string) => {
     let tx = await this.getTransactionInLight(hash)
     if (!tx?.transaction) {
       tx = await CommonUtils.retry(3, 100, async () => {
@@ -215,7 +221,7 @@ export class LightRPC extends Base {
       }
     }
     return tx
-  }
+  }) as Base['getTransaction']
 
   getTipBlockNumber = async () => {
     const headerTip = await this.getTipHeader()
@@ -360,21 +366,8 @@ export class LightRPC extends Base {
   }
 }
 
-let httpsAgent: https.Agent
-let httpAgent: http.Agent
-
-const getHttpsAgent = () => {
-  if (!httpsAgent) {
-    httpsAgent = new https.Agent({ keepAlive: true })
-  }
-  return httpsAgent
-}
-
-const getHttpAgent = () => {
-  if (!httpAgent) {
-    httpAgent = new http.Agent({ keepAlive: true })
-  }
-  return httpAgent
+const rpcConfig: Partial<RPCConfig> = {
+  fetch: (request, init) => globalThis.fetch(request, { ...init, keepalive: true }),
 }
 
 export const generateRPC = (url: string, type: NetworkType) => {
@@ -382,12 +375,7 @@ export const generateRPC = (url: string, type: NetworkType) => {
   if (type === NetworkType.Light) {
     rpc = new LightRPC(url)
   } else {
-    rpc = new FullCKBRPC(url)
-  }
-  if (url?.startsWith('https')) {
-    rpc.setNode({ url, httpsAgent: getHttpsAgent() })
-  } else {
-    rpc.setNode({ url, httpAgent: getHttpAgent() })
+    rpc = new FullCKBRPC(url, rpcConfig)
   }
   return rpc
 }

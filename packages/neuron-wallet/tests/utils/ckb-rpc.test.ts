@@ -12,9 +12,16 @@ describe('test ckb rpc file', () => {
       const result = generateRPC(BUNDLED_CKB_URL, NetworkType.Default)
       expect(result instanceof FullCKBRPC).toBeTruthy()
     })
-    it('url is https', () => {
-      const result = generateRPC('https://localhost:8114', NetworkType.Default)
-      expect(result.node.httpsAgent).toBeDefined()
+    it('fetch should be keepalive', async () => {
+      const fetch = globalThis.fetch
+      globalThis.fetch = jest.fn()
+
+      const rpc = generateRPC('https://localhost:8114', NetworkType.Default)
+      await rpc.getTipBlockNumber().catch(() => {})
+
+      expect((globalThis.fetch as unknown as jest.Mock).mock.calls[0][1]).toMatchObject({ keepalive: true })
+
+      globalThis.fetch = fetch
     })
   })
 })
