@@ -880,7 +880,9 @@ export default class TransactionSender {
     const rpc = generateRPC(currentNetwork.remote, currentNetwork.type)
 
     let tx = await rpc.getTransaction(depositOutPoint.txHash)
-    if (tx.txStatus.status !== 'committed') throw new Error('Transaction is not committed yet')
+    if (tx.txStatus.status !== 'committed' || !tx.txStatus.blockHash) {
+      throw new Error('Transaction is not committed yet')
+    }
     const depositBlockHash = tx.txStatus.blockHash
 
     const cellOutput = tx.transaction.outputs[+depositOutPoint.index]
