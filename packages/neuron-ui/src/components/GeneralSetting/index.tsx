@@ -33,7 +33,7 @@ const UpdateDownloadStatus = ({
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
-  const [publisedAt, setPublisedAt] = useState('')
+  const [publishedAt, setPublishedAt] = useState('')
 
   const handleConfirm = useCallback(
     (e: React.FormEvent) => {
@@ -56,11 +56,11 @@ const UpdateDownloadStatus = ({
         .then(async res => {
           // eslint-disable-next-line camelcase
           const { published_at } = await res.json()
-          setPublisedAt(published_at)
+          setPublishedAt(published_at)
         })
         .catch(() => {})
     }
-  }, [available, setPublisedAt])
+  }, [available, setPublishedAt])
 
   if (available) {
     const releaseNotesHtml = () => {
@@ -83,7 +83,7 @@ const UpdateDownloadStatus = ({
       >
         <div className={styles.install}>
           <p className={styles.title}>
-            {newVersion} {publisedAt ? `(${uniformTimeFormatter(new Date(publisedAt)).split(' ')[0]})` : null}
+            {newVersion} {publishedAt ? `(${uniformTimeFormatter(new Date(publishedAt)).split(' ')[0]})` : null}
           </p>
           <div className={styles.releaseNotesStyle}>
             <div dangerouslySetInnerHTML={releaseNotesHtml()} />
