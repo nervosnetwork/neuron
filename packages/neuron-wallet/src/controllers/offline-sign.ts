@@ -15,6 +15,7 @@ import { getMultisigStatus } from '../utils/multisig'
 import { generateRPC } from '../utils/ckb-rpc'
 import ShowGlobalDialogSubject from '../models/subjects/show-global-dialog'
 import NetworksService from '../services/networks'
+import logger from '../utils/logger'
 
 export default class OfflineSignController {
   public async exportTransactionAsJSON({
@@ -99,11 +100,17 @@ export default class OfflineSignController {
           .then(({ tx: t, metadata }) => {
             // TODO: maybe unidentified inputs can be skipped in offline sign
             if (metadata.locks.skipped.size) {
-              throw new Error(
-                `Fail to sign transaction, following lock scripts cannot be identified: ${[
-                  ...metadata.locks.skipped.values(),
-                ]}`
-              )
+              try {
+                throw new Error(
+                  `Fail to sign transaction, following lock scripts cannot be identified: ${[
+                    ...metadata.locks.skipped.values(),
+                  ]}`
+                )
+              } catch (err) {
+                // FIXME: remove this before being merged into develop branch
+                logger.debug('Ignore the following error for debugging polycrypt')
+                logger.error(err)
+              }
             }
             return t
           })

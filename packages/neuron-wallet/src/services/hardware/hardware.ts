@@ -60,6 +60,7 @@ export abstract class Hardware {
       } else if (args.length === 42) {
         return addressInfos.find(i => i.blake160 === args)!.path
       } else {
+        // FIXME: should not be a fallback
         const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
         return addressInfo!.path
       }
