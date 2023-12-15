@@ -310,14 +310,6 @@ declare namespace Controller {
     }
     type Response = TokenInfo[]
   }
-
-  namespace ClearCache {
-    interface Params {
-      resetIndexerData: boolean
-    }
-    type Response = boolean
-  }
-
   namespace GetSUDTTokenInfo {
     interface Params {
       tokenID: string

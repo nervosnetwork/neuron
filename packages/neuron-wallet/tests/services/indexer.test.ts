@@ -2,8 +2,6 @@ import IndexerService from '../../src/services/indexer'
 
 const existsSyncMock = jest.fn()
 const rmSyncMock = jest.fn()
-const stopMonitorMock = jest.fn()
-const getCurrentWalletMock = jest.fn()
 
 jest.mock('fs', () => {
   return {
@@ -48,20 +46,6 @@ jest.mock('../../src/database/chain', () => ({
   clean: () => jest.fn(),
 }))
 
-jest.mock('../../src/services/monitor', () => {
-  function mockMonitor() {}
-  mockMonitor.stopMonitor = () => stopMonitorMock()
-  return mockMonitor
-})
-
-jest.mock('../../src/services/networks', () => ({
-  getInstance() {
-    return {
-      getCurrent: getCurrentWalletMock,
-    }
-  },
-}))
-
 const resetSyncTaskQueueAsyncPushMock = jest.fn()
 jest.mock('../../src/block-sync-renderer', () => ({
   resetSyncTaskQueue: {
@@ -75,8 +59,6 @@ describe('test IndexerService', () => {
     rmSyncMock.mockReset()
     setIndexerDataPathMock.mockReset()
     getIndexerDataPathMock.mockReset()
-    getCurrentWalletMock.mockReset()
-    stopMonitorMock.mockReset()
   })
   describe('test remove old indexer data', () => {
     it('old indexer data path exist', () => {
@@ -103,28 +85,8 @@ describe('test IndexerService', () => {
     beforeEach(() => {
       resetSyncTaskQueueAsyncPushMock.mockReset()
     })
-    it('is external ckb node', async () => {
-      getCurrentWalletMock.mockReturnValue({ readonly: false })
+    it('clear cache success', async () => {
       await IndexerService.clearCache()
-      expect(stopMonitorMock).toBeCalledTimes(0)
-      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
-    })
-    it('is internal ckb node', async () => {
-      getCurrentWalletMock.mockReturnValue({ readonly: true })
-      await IndexerService.clearCache()
-      expect(stopMonitorMock).toBeCalledTimes(0)
-      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
-    })
-    it('clear indexer data with internal ckb node', async () => {
-      getCurrentWalletMock.mockReturnValue({ readonly: true })
-      await IndexerService.clearCache(true)
-      expect(stopMonitorMock).toBeCalledTimes(1)
-      expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
-    })
-    it('clear indexer data with external ckb node', async () => {
-      getCurrentWalletMock.mockReturnValue({ readonly: false })
-      await IndexerService.clearCache(true)
-      expect(stopMonitorMock).toBeCalledTimes(0)
       expect(resetSyncTaskQueueAsyncPushMock).toBeCalledTimes(1)
     })
   })
