@@ -4,7 +4,7 @@ import { Address } from '../../models/address'
 import AddressMeta from '../../database/address/meta'
 import { scheduler } from 'timers/promises'
 import SyncProgressService from '../../services/sync-progress'
-import { Connector, AppendScript } from './connector'
+import { Synchronizer, AppendScript } from './synchronizer'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import Multisig from '../../services/multisig'
@@ -24,7 +24,7 @@ import NetworksService from '../../services/networks'
 
 const unpackGroup = molecule.vector(blockchain.OutPoint)
 
-export default class LightConnector extends Connector {
+export default class LightSynchronizer extends Synchronizer {
   private lightRpc: LightRPC
   private addressMetas: AddressMeta[]
 

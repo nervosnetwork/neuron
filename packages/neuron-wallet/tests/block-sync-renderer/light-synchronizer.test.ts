@@ -1,5 +1,5 @@
 import type { Script } from '@ckb-lumos/base'
-import LightConnector from '../../src/block-sync-renderer/sync/light-connector'
+import LightSynchronizer from '../../src/block-sync-renderer/sync/light-synchronizer'
 import AddressMeta from '../../src/database/address/meta'
 
 const getSyncStatusMock = jest.fn()
@@ -103,7 +103,7 @@ const script: Script = {
 // const scriptHash = scriptToHash(script)
 const address = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq2q8ux5aqem92xnwfmj5cl6e233phlwlysqhjx5w'
 
-describe('test light connector', () => {
+describe('test light synchronizer', () => {
   beforeEach(() => {
     walletGetAllMock.mockReturnValue([])
     createBatchRequestMock.mockResolvedValue([])
@@ -116,14 +116,14 @@ describe('test light connector', () => {
 
   describe('test initSyncProgress', () => {
     it('there is not exist addressmata', async () => {
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       //@ts-ignore
       await connect.initSyncProgress()
       expect(getScriptsMock).toBeCalledTimes(0)
     })
     it('append multisig script', async () => {
       getScriptsMock.mockResolvedValue([])
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       getOtherTypeSyncBlockNumberMock.mockResolvedValueOnce({})
       //@ts-ignore
       await connect.initSyncProgress([{ walletId: 'walletId', script, addressType: 1, scriptType: 'lock' }])
@@ -142,7 +142,7 @@ describe('test light connector', () => {
         addressType: 0,
         blake160: script.args,
       })
-      const connect = new LightConnector([addressMeta], '')
+      const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()
       expect(setScriptsMock).toBeCalledWith([
@@ -198,7 +198,7 @@ describe('test light connector', () => {
         blake160: script.args,
       })
       getWalletMinBlockNumberMock.mockResolvedValue({ walletId: 170 })
-      const connect = new LightConnector([addressMeta], '')
+      const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()
       expect(setScriptsMock).toBeCalledWith([
@@ -234,7 +234,7 @@ describe('test light connector', () => {
       })
       getWalletMinBlockNumberMock.mockResolvedValue({})
       walletGetAllMock.mockReturnValue([{ id: 'walletId', startBlockNumber: '0xaa' }])
-      const connect = new LightConnector([addressMeta], '')
+      const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()
       expect(setScriptsMock).toBeCalledWith([
@@ -262,7 +262,7 @@ describe('test light connector', () => {
 
   describe('test initSync', () => {
     it('pollingIndexer is false', async () => {
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       //@ts-ignore
       connect.synchronize = jest.fn()
       //@ts-ignore
@@ -270,7 +270,7 @@ describe('test light connector', () => {
       expect(schedulerWaitMock).toBeCalledTimes(0)
     })
     it('pollingIndexer is true', async () => {
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       schedulerWaitMock.mockImplementation(() => {
         connect.stop()
       })
@@ -290,14 +290,14 @@ describe('test light connector', () => {
       mockFn.mockReset()
     })
     it('connect success', async () => {
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       //@ts-ignore
       connect.initSync = mockFn
       await connect.connect()
       expect(mockFn).toBeCalledTimes(1)
     })
     it('connect failed', async () => {
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       //@ts-ignore
       connect.initSync = mockFn
       mockFn.mockImplementation(() => {
@@ -309,7 +309,7 @@ describe('test light connector', () => {
 
   describe('test stop', () => {
     it('test stop', () => {
-      const connect = new LightConnector([], '')
+      const connect = new LightSynchronizer([], '')
       //@ts-ignore
       connect.pollingIndexer = true
       connect.stop()
@@ -319,28 +319,28 @@ describe('test light connector', () => {
   })
 
   describe('#notifyCurrentBlockNumberProcessed', () => {
-    const connector = new LightConnector([], '')
+    const synchronizer = new LightSynchronizer([], '')
     const updateBlockStartNumberMock = jest.fn()
     beforeAll(() => {
       // @ts-ignore private property
-      connector.updateBlockStartNumber = updateBlockStartNumberMock
+      synchronizer.updateBlockStartNumber = updateBlockStartNumberMock
     })
     beforeEach(() => {
       updateBlockStartNumberMock.mockReset()
     })
     it('last process block number finish', async () => {
       // @ts-ignore private property
-      connector.processingBlockNumber = '0xaa'
+      synchronizer.processingBlockNumber = '0xaa'
       getCurrentWalletMinBlockNumberMock.mockResolvedValueOnce(100)
-      await connector.notifyCurrentBlockNumberProcessed('0xaa')
+      await synchronizer.notifyCurrentBlockNumberProcessed('0xaa')
       // @ts-ignore private property
-      expect(connector.processingBlockNumber).toBeUndefined()
+      expect(synchronizer.processingBlockNumber).toBeUndefined()
       expect(updateBlockStartNumberMock).toBeCalledWith(100)
     })
     it('not last process block number finish', async () => {
       // @ts-ignore private property
-      connector.processingBlockNumber = undefined
-      await connector.notifyCurrentBlockNumberProcessed('0xaa')
+      synchronizer.processingBlockNumber = undefined
+      await synchronizer.notifyCurrentBlockNumberProcessed('0xaa')
       expect(updateBlockStartNumberMock).toBeCalledTimes(0)
     })
   })

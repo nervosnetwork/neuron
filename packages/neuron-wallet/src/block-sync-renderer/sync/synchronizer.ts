@@ -49,7 +49,7 @@ export interface AppendScript {
   scriptType: CKBRPC.ScriptType
 }
 
-export abstract class Connector {
+export abstract class Synchronizer {
   public readonly blockTipsSubject: Subject<BlockTips> = new Subject<BlockTips>()
   public readonly transactionsSubject = new Subject<{ txHashes: CKBComponents.Hash[]; params: string }>()
   protected indexer: CkbIndexer
