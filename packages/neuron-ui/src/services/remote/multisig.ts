@@ -49,6 +49,6 @@ export const generateMultisigSendAllTx = remoteApi<{
   multisigConfig: MultisigConfig
 }>('generate-multisig-send-all-tx')
 export const loadMultisigTxJson = remoteApi<string, OfflineSignJSON>('load-multisig-tx-json')
-export const getMultisigSyncProgress = remoteApi<string[], { hash: string; blockStartNumber: number }[]>(
+export const getMultisigSyncProgress = remoteApi<string[], { hash: string; localSavedBlockNumber: number }[]>(
   'get-sync-progress-by-addresses'
 )

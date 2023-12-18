@@ -270,7 +270,7 @@ export default class MultisigService {
         .where({ hash: In(multisigScriptHashList) })
         .getMany()
       const syncBlockNumbersMap: Record<string, number> = syncBlockNumbers.reduce(
-        (pre, cur) => ({ ...pre, [cur.hash]: cur.blockStartNumber }),
+        (pre, cur) => ({ ...pre, [cur.hash]: cur.localSavedBlockNumber }),
         {}
       )
       await getConnection()

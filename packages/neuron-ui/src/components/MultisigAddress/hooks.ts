@@ -335,7 +335,7 @@ export const useSubscription = ({
         const tmp: Record<string, number> = {}
         res.result.forEach(v => {
           if (hashToPayload[v.hash]) {
-            tmp[hashToPayload[v.hash]] = v.blockStartNumber
+            tmp[hashToPayload[v.hash]] = v.localSavedBlockNumber
           }
         })
         setMultisigSyncProgress(tmp)

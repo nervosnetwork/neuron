@@ -3,12 +3,12 @@ import LightSynchronizer from '../../src/block-sync-renderer/sync/light-synchron
 import AddressMeta from '../../src/database/address/meta'
 
 const getSyncStatusMock = jest.fn()
-const getCurrentWalletMinBlockNumberMock = jest.fn()
+const getCurrentWalletMinSyncedBlockNumberMock = jest.fn()
 const getAllSyncStatusToMapMock = jest.fn()
 const resetSyncProgressMock = jest.fn()
 const updateSyncStatusMock = jest.fn()
 const updateSyncProgressFlagMock = jest.fn()
-const getWalletMinBlockNumberMock = jest.fn()
+const getWalletMinLocalSavedBlockNumberMock = jest.fn()
 const removeByHashesAndAddressType = jest.fn()
 const getOtherTypeSyncProgressMock = jest.fn()
 const getOtherTypeSyncBlockNumberMock = jest.fn()
@@ -26,11 +26,11 @@ const walletGetAllMock = jest.fn()
 
 function mockReset() {
   getSyncStatusMock.mockReset()
-  getCurrentWalletMinBlockNumberMock.mockReset()
+  getCurrentWalletMinSyncedBlockNumberMock.mockReset()
   getAllSyncStatusToMapMock.mockReset()
   resetSyncProgressMock.mockReset()
   updateSyncStatusMock.mockReset()
-  getWalletMinBlockNumberMock.mockReset()
+  getWalletMinLocalSavedBlockNumberMock.mockReset()
   getOtherTypeSyncProgressMock.mockReset()
   getOtherTypeSyncBlockNumberMock.mockReset()
 
@@ -50,12 +50,12 @@ function mockReset() {
 jest.mock('../../src/services/sync-progress', () => {
   return class {
     static getSyncStatus: any = () => getSyncStatusMock()
-    static getCurrentWalletMinBlockNumber: any = () => getCurrentWalletMinBlockNumberMock()
+    static getCurrentWalletMinSyncedBlockNumber: any = () => getCurrentWalletMinSyncedBlockNumberMock()
     static getAllSyncStatusToMap: any = () => getAllSyncStatusToMapMock()
     static resetSyncProgress: any = (arg: any) => resetSyncProgressMock(arg)
     static updateSyncStatus: any = (hash: string, update: any) => updateSyncStatusMock(hash, update)
     static updateSyncProgressFlag: any = (walletIds: string[]) => updateSyncProgressFlagMock(walletIds)
-    static getWalletMinBlockNumber: any = () => getWalletMinBlockNumberMock()
+    static getWalletMinLocalSavedBlockNumber: any = () => getWalletMinLocalSavedBlockNumberMock()
     static removeByHashesAndAddressType: any = (type: number, scripts: Script[]) =>
       removeByHashesAndAddressType(type, scripts)
 
@@ -128,9 +128,11 @@ describe('test light synchronizer', () => {
       //@ts-ignore
       await connect.initSyncProgress([{ walletId: 'walletId', script, addressType: 1, scriptType: 'lock' }])
       expect(getScriptsMock).toBeCalledTimes(1)
-      expect(setScriptsMock).toBeCalledWith([
-        { script, scriptType: 'lock', walletId: 'walletId', blockNumber: '0x0', addressType: 1 },
-      ])
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [{ script, scriptType: 'lock', walletId: 'walletId', blockNumber: '0x0', addressType: 1 }],
+        'partial'
+      )
     })
     it('there is not exist sync scripts with light client', async () => {
       getScriptsMock.mockResolvedValue([{ script, blockNumber: '0xaa' }])
@@ -145,33 +147,26 @@ describe('test light synchronizer', () => {
       const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()
-      expect(setScriptsMock).toBeCalledWith([
-        {
-          script: addressMeta.generateDefaultLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-        {
-          script: addressMeta.generateACPLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0x0',
-        },
-        {
-          script: addressMeta.generateLegacyACPLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0x0',
-        },
-      ])
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            script: addressMeta.generateACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0x0',
+          },
+          {
+            script: addressMeta.generateLegacyACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0x0',
+          },
+        ],
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
       expect(resetSyncProgressMock).toBeCalledWith([
-        {
-          script: addressMeta.generateDefaultLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
         {
           script: addressMeta.generateACPLockScript().toSDK(),
           scriptType: 'lock',
@@ -197,30 +192,34 @@ describe('test light synchronizer', () => {
         addressType: 0,
         blake160: script.args,
       })
-      getWalletMinBlockNumberMock.mockResolvedValue({ walletId: 170 })
+      getWalletMinLocalSavedBlockNumberMock.mockResolvedValue({ walletId: 170 })
       const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()
-      expect(setScriptsMock).toBeCalledWith([
-        {
-          script: addressMeta.generateDefaultLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-        {
-          script: addressMeta.generateACPLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-        {
-          script: addressMeta.generateLegacyACPLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-      ])
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            script: addressMeta.generateDefaultLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xaa',
+          },
+          {
+            script: addressMeta.generateACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xaa',
+          },
+          {
+            script: addressMeta.generateLegacyACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xaa',
+          },
+        ],
+        'partial'
+      )
     })
     it('set new script with start block number in wallet', async () => {
       getScriptsMock.mockResolvedValue([])
@@ -232,31 +231,36 @@ describe('test light synchronizer', () => {
         addressType: 0,
         blake160: script.args,
       })
-      getWalletMinBlockNumberMock.mockResolvedValue({})
+      getWalletMinLocalSavedBlockNumberMock.mockResolvedValue({})
       walletGetAllMock.mockReturnValue([{ id: 'walletId', startBlockNumber: '0xaa' }])
       const connect = new LightSynchronizer([addressMeta], '')
       //@ts-ignore
       await connect.initSyncProgress()
-      expect(setScriptsMock).toBeCalledWith([
-        {
-          script: addressMeta.generateDefaultLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-        {
-          script: addressMeta.generateACPLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-        {
-          script: addressMeta.generateLegacyACPLockScript().toSDK(),
-          scriptType: 'lock',
-          walletId: 'walletId',
-          blockNumber: '0xaa',
-        },
-      ])
+      expect(setScriptsMock).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            script: addressMeta.generateDefaultLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xaa',
+          },
+          {
+            script: addressMeta.generateACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xaa',
+          },
+          {
+            script: addressMeta.generateLegacyACPLockScript().toSDK(),
+            scriptType: 'lock',
+            walletId: 'walletId',
+            blockNumber: '0xaa',
+          },
+        ],
+        'partial'
+      )
+      expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
     })
   })
 
@@ -331,7 +335,7 @@ describe('test light synchronizer', () => {
     it('last process block number finish', async () => {
       // @ts-ignore private property
       synchronizer.processingBlockNumber = '0xaa'
-      getCurrentWalletMinBlockNumberMock.mockResolvedValueOnce(100)
+      getCurrentWalletMinSyncedBlockNumberMock.mockResolvedValueOnce(100)
       await synchronizer.notifyCurrentBlockNumberProcessed('0xaa')
       // @ts-ignore private property
       expect(synchronizer.processingBlockNumber).toBeUndefined()
