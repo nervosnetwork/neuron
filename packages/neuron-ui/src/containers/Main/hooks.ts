@@ -198,6 +198,7 @@ export const useSubscription = ({
       })
       CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
       currentNetworkIDCache.save(currentNetworkID)
+      updateAddressListAndBalance(walletID)(dispatch)
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
       if (isCurrentUrl(status.url)) {

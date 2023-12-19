@@ -133,7 +133,8 @@ export const useSendInfo = ({
     },
     [setSendInfoList]
   )
-  const outputErrors = useOutputErrors(sendInfoList, isMainnet)
+  const [isSendMax, setIsSendMax] = useState(false)
+  const outputErrors = useOutputErrors(sendInfoList, isMainnet, isSendMax)
   const totalAmount = useMemo(
     () => outputsToTotalAmount(sendInfoList.filter((v, idx) => !!v.amount && !outputErrors[idx].amountError)),
     [sendInfoList, outputErrors]
@@ -172,7 +173,6 @@ export const useSendInfo = ({
       }
     }, 300)
   }, [sendInfoList, setErrorMessage, multisigConfig, dispatch, t, isMainnet, outputErrors])
-  const [isSendMax, setIsSendMax] = useState(false)
   const onSendMaxClick = useCallback(() => {
     if (!isSendMax) {
       setIsSendMax(true)

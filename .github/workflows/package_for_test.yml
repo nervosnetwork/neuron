@@ -110,6 +110,14 @@ jobs:
         env:
           CI: false
 
+      - name: Write electron-build Test yml
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('node:fs')
+            const ympPath = 'packages/neuron-wallet/electron-builder.yml'
+            fs.writeFileSync(ympPath, fs.readFileSync(ympPath).toString().replace('asar: true', 'asar: false'))
+
       - name: Package for MacOS
         if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'true' }}
         run: |
@@ -122,6 +130,7 @@ jobs:
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          USE_HARD_LINKS: false
 
       - name: Package for MacOS for skip code sign
         if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'false' }}
@@ -132,6 +141,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SKIP_NOTARIZE: true
+          USE_HARD_LINKS: false
 
       - name: Package for Windows
         if: matrix.os == 'windows-2019'
@@ -150,6 +160,7 @@ jobs:
           yarn package:test linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USE_HARD_LINKS: false
 
       - name: Upload Neuron App Zip
         if: matrix.os == 'macos-latest'
