@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Dialog from 'widgets/Dialog'
@@ -7,7 +7,7 @@ import Button from 'widgets/Button'
 import CopyZone from 'widgets/CopyZone'
 import QRCode from 'widgets/QRCode'
 import Tooltip from 'widgets/Tooltip'
-import { AddressTransform, Download, Copy, Attention } from 'widgets/Icons/icon'
+import { AddressTransform, Download, Copy, Attention, SuccessNoBorder } from 'widgets/Icons/icon'
 import VerifyHardwareAddress from './VerifyHardwareAddress'
 import styles from './receive.module.scss'
 import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
@@ -58,6 +58,7 @@ export const AddressTransformWithCopyZone = ({
 const Receive = ({ onClose, address }: { onClose?: () => void; address?: string }) => {
   const [t] = useTranslation()
   const { wallet } = useGlobalState()
+  const [isCopySuccess, setIsCopySuccess] = useState(false)
   const { addresses } = wallet
   const isSingleAddress = addresses.length === 1
 
@@ -73,7 +74,16 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
   }
 
   const { isInShortFormat, setIsInShortFormat, address: showAddress } = useSwitchAddress(accountAddress)
-  const { ref, onCopyQrCode, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
+  const { ref, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
+
+  const onCopyAddress = useCallback(() => {
+    window.navigator.clipboard.writeText(showAddress)
+    setIsCopySuccess(true)
+
+    setTimeout(() => {
+      setIsCopySuccess(false)
+    }, 1000)
+  }, [showAddress, setIsCopySuccess])
 
   return (
     <Dialog
@@ -93,20 +103,22 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
       <div className={styles.addressRoot}>
         <div className={styles.qrCode} data-copy-success-text={t('common.copied')}>
           <QRCode value={showAddress} size={128} includeMargin ref={ref} />
+          <div className={styles.actions}>
+            <Button type="text" className={styles.actionBtn} onClick={onDownloadQrCode}>
+              <Download />
+            </Button>
+            {isCopySuccess ? (
+              <Button type="text">
+                <SuccessNoBorder />
+              </Button>
+            ) : (
+              <Button type="text" className={styles.actionBtn} onClick={onCopyAddress}>
+                <Copy />
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className={styles.actions}>
-          <Button type="text" onClick={onDownloadQrCode}>
-            <Tooltip tip={t('receive.save-qr-code')} placement="top">
-              <Download />
-            </Tooltip>
-          </Button>
-          <Button type="text" onClick={onCopyQrCode}>
-            <Tooltip tip={t('receive.copy-address')} placement="top">
-              <Copy />
-            </Tooltip>
-          </Button>
-        </div>
         <div className={styles.copyAddress}>
           <AddressTransformWithCopyZone
             showAddress={showAddress}
