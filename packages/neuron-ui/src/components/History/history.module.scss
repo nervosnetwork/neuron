@@ -37,6 +37,13 @@ body {
     font-weight: 500;
     padding-right: 10px;
   }
+  .searchBoxSuffix {
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    cursor: pointer;
+  }
   .exportButton {
     color: var(--main-text-color);
     border-color: var(--history-button-border);

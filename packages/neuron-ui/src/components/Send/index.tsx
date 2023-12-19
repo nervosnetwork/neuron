@@ -169,7 +169,7 @@ const Send = () => {
     !send.generatedTx ||
     outputs.some(v => !v.address)
 
-  const outputErrors = useOutputErrors(outputs, isMainnet)
+  const outputErrors = useOutputErrors(outputs, isMainnet, isSendMax)
 
   const isMaxBtnDisabled = (() => {
     try {
