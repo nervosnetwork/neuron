@@ -118,7 +118,7 @@ export const useSubscription = ({
   const { pageNo, pageSize, keywords } = chain.transactions
 
   const navigateToolsRouter = useCallback(
-    path => {
+    (path: string) => {
       const { pathname } = location
       const currentPath = [RoutePath.OfflineSign, RoutePath.SignVerify, RoutePath.MultisigAddress].find(item =>
         pathname.includes(item)
