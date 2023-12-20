@@ -33,11 +33,11 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout for push
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ github.event_name == 'push' }}
 
       - name: Checkout for PR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ github.event_name == 'issue_comment' }}
         with:
           ref: refs/pull/${{ github.event.issue.number }}/merge
@@ -111,7 +111,7 @@ jobs:
           CI: false
 
       - name: Write electron-build Test yml
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('node:fs')
