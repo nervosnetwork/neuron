@@ -18,7 +18,7 @@ jobs:
           sha: '${{ github.event.create.head.sha }}'
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: 'chore-update-valid-target/${{github.ref_name}}'
       
