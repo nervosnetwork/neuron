@@ -32,7 +32,7 @@ jobs:
           npm run update:valid-target
 
       - name: Commit env file
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{ github.ref_name }}
@@ -59,7 +59,7 @@ jobs:
             })
 
       - name: Create PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{github.ref}}
