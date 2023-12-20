@@ -202,6 +202,7 @@ declare namespace State {
     device?: DeviceInfo
     isHD?: boolean
     isWatchOnly?: boolean
+    startBlockNumber?: string
   }
 
   interface DeviceInfo {

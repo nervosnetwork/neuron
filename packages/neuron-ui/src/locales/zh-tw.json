@@ -31,6 +31,7 @@
       "tooltip": {
         "block-synced": "已同步區塊",
         "looking-valid-target": "尋找預設可信區塊",
+        "start-block-number": "起始區塊",
         "set-start-block-number": "設置同步起始區塊"
       },
       "migrating": "正在數據遷移..."
@@ -1095,10 +1096,13 @@
     },
     "set-start-block-number": {
       "title": "設置同步起始區塊",
+      "warn": "請註意，同步起始區塊之前的交易不會被同步！",
       "tip": "輕客戶端模式下的訂閱起始點是可配置的，因此您可以設置同步起始區塊以加快同步速度。",
       "input-place-holder": "輸入同步起始區塊高度，例如：10,100,101",
       "locate-first-tx": "定位第一筆交易",
-      "view-block": "查看區塊"
+      "view-block": "查看區塊",
+      "set-less-than-before": "您設置的區塊號小於之前區塊，同步將重新開始，請謹慎操作。",
+      "reset-to-header-tip-number": "無法設置比最新區塊更大的區塊號，已重置為最新區塊號。"
     },
     "main": {
       "external-node-detected-dialog": {
