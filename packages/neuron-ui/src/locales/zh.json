@@ -105,6 +105,8 @@
         "partially-signed": "部分签名",
         "signed": "已签名"
       },
+      "import-signed-transaction": "导入已签名交易",
+      "import-signed-transaction-detail": "您导入了一个已签名交易，请确认并重试。",
       "wallet": "钱包：",
       "content": "内容：",
       "export": "导出交易",
@@ -114,7 +116,10 @@
         "broadcast": "广播交易",
         "sign": "签名并导出",
         "cancel": "取消"
-      }
+      },
+      "broadcast-transaction": "广播交易",
+      "import-unsigned-transaction": "导入未签名",
+      "import-unsigned-transaction-detail": "您导入了一个未签名交易，请确认并重试。"
     },
     "overview": {
       "date": "时间",

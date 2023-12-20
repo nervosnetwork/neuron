@@ -22,6 +22,7 @@ import Settings from 'components/Settings'
 import SignAndVerify from 'components/SignAndVerify'
 import MultisigAddress from 'components/MultisigAddress'
 import CellManagement from 'components/CellManagement'
+import BroadcastTransaction from 'components/BroadcastTransaction'
 
 const toolsRouters = [
   {
@@ -35,6 +36,10 @@ const toolsRouters = [
   {
     path: RoutePath.MultisigAddress,
     element: <MultisigAddress />,
+  },
+  {
+    path: RoutePath.BroadcastTransaction,
+    element: <BroadcastTransaction />,
   },
 ]
 

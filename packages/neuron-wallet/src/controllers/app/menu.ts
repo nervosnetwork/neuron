@@ -23,6 +23,7 @@ enum URL {
   ImportKeystore = '/keystore/import',
   ImportHardware = '/import-hardware',
   OfflineSign = 'offline-sign',
+  BroadcastTransaction = 'broadcast-transaction',
 }
 
 enum ExternalURL {
@@ -359,6 +360,18 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           }
           const { json, filePath } = result
           loadTransaction(URL.OfflineSign, json, filePath)
+        },
+      },
+      {
+        label: t('application-menu.tools.broadcast-transaction'),
+        enabled: hasCurrentWallet && !isXpubWallet,
+        click: async () => {
+          const result = await OfflineSignService.loadTransactionJSON()
+          if (!result) {
+            return
+          }
+          const { json, filePath } = result
+          loadTransaction(URL.BroadcastTransaction, json, filePath)
         },
       },
     ],

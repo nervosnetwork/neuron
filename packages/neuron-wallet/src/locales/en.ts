@@ -39,6 +39,7 @@ export default {
         'multisig-address': 'Multisig Addresses',
         'offline-sign': 'Offline sign',
         'clear-sync-data': 'Clear all synchronized data',
+        'broadcast-transaction': 'Broadcast Transaction',
       },
       window: {
         label: 'Window',

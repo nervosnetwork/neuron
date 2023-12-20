@@ -1,23 +1,24 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { isSuccessResponse, useDidMount, useGoBack } from 'utils'
+import { useNavigate } from 'react-router-dom'
+import { isSuccessResponse, RoutePath, useDidMount, useGoBack } from 'utils'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
-import { useState as useGlobalState } from 'states'
-import { getCurrentWallet, OfflineSignStatus } from 'services/remote'
+import { useDispatch, useState as useGlobalState } from 'states'
+import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
-import OfflineSignDialog from '../OfflineSignDialog'
 
-import styles from './offlineSign.module.scss'
+import styles from './broadcastTransaction.module.scss'
 
-const OfflineSign = () => {
+const BroadcastTransaction = () => {
   const {
     app: { loadedTransaction = {} },
   } = useGlobalState()
 
   const [wallet, setWallet] = useState<State.Wallet | null>(null)
-  const [isSigning, setIsSigning] = useState(false)
+  const [isBroadCasting, setIsBroadcasting] = useState(false)
   const [t] = useTranslation()
+  const dispatch = useDispatch()
   const [errMsg, setErrMsg] = useState('')
 
   const { filePath, json } = loadedTransaction
@@ -30,22 +31,25 @@ const OfflineSign = () => {
 
   const isSigned = useMemo(() => signStatus === OfflineSignStatus.Signed, [signStatus])
 
-  const status = useMemo(() => {
-    switch (signStatus) {
-      case OfflineSignStatus.Unsigned:
-        return t('offline-sign.status.unsigned')
-      case OfflineSignStatus.PartiallySigned:
-        return t('offline-sign.status.partially-signed')
-      default:
-        return t('offline-sign.status.signed')
-    }
-  }, [signStatus, t])
-
   const onBack = useGoBack()
 
-  const onSign = useCallback(() => {
-    setIsSigning(true)
-  }, [setIsSigning])
+  const navigate = useNavigate()
+  const onBroadcast = useCallback(async () => {
+    setIsBroadcasting(true)
+    try {
+      const res = await broadcastTransaction({
+        ...json,
+        walletID: wallet!.id,
+      })
+      if (isSuccessResponse(res)) {
+        navigate(RoutePath.History)
+      } else {
+        setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
+      }
+    } finally {
+      setIsBroadcasting(false)
+    }
+  }, [wallet, json, navigate, dispatch])
 
   useDidMount(() => {
     getCurrentWallet().then(res => {
@@ -55,31 +59,16 @@ const OfflineSign = () => {
     })
   })
 
-  const signDialogOnDismiss = useCallback(() => {
-    setIsSigning(false)
-  }, [setIsSigning])
-
-  if (isSigning && wallet) {
-    return (
-      <OfflineSignDialog
-        isBroadcast={false}
-        wallet={wallet}
-        offlineSignJSON={json}
-        onDismiss={signDialogOnDismiss}
-        onCompleted={onBack}
-      />
-    )
-  }
-
   return (
     <>
       <Dialog
-        show={!isSigned}
-        title={t('offline-sign.title')}
+        show={isSigned}
+        title={t('offline-sign.broadcast-transaction')}
         cancelText={t('offline-sign.actions.cancel')}
         onCancel={onBack}
-        confirmText={t('offline-sign.actions.sign')}
-        onConfirm={onSign}
+        confirmText={t('offline-sign.actions.broadcast')}
+        isLoading={isBroadCasting}
+        onConfirm={onBroadcast}
       >
         <div className={styles.main}>
           <table>
@@ -90,7 +79,7 @@ const OfflineSign = () => {
               </tr>
               <tr>
                 <td className={styles.first}>{t('offline-sign.status.label')}</td>
-                <td>{status}</td>
+                <td>{t('offline-sign.status.signed')}</td>
               </tr>
               <tr>
                 <td className={styles.first}>{t('offline-sign.wallet')}</td>
@@ -109,14 +98,14 @@ const OfflineSign = () => {
       </Dialog>
 
       <Dialog
-        show={isSigned}
+        show={!isSigned}
         className={styles.warningDialog}
-        title={t('offline-sign.import-signed-transaction')}
+        title={t('offline-sign.import-unsigned-transaction')}
         cancelText={t('offline-sign.actions.cancel')}
         onCancel={onBack}
         onConfirm={onBack}
       >
-        <div className={styles.content}>{t('offline-sign.import-signed-transaction-detail')}</div>
+        <div className={styles.content}>{t('offline-sign.import-unsigned-transaction-detail')}</div>
       </Dialog>
 
       <AlertDialog
@@ -130,6 +119,6 @@ const OfflineSign = () => {
   )
 }
 
-OfflineSign.displayName = 'OfflineSign'
+BroadcastTransaction.displayName = 'BroadcastTransaction'
 
-export default OfflineSign
+export default BroadcastTransaction
