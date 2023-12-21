@@ -60,6 +60,7 @@ export default class Transaction {
 
   public value?: string
   public fee?: string
+  public size?: number
   public interest?: string
 
   public type?: string
