@@ -1,3 +1,4 @@
+import type { TOptions } from 'i18next'
 import { useState, useMemo, useCallback } from 'react'
 import { StateDispatch, updateWalletProperty } from 'states'
 import { ErrorCode, ResponseCode, CONSTANTS } from 'utils'
@@ -61,7 +62,11 @@ export const useOnSubmit = (
   }, [name, id, dispatch, disabled])
 }
 
-export const useHint = (name: string, usedNames: string[], t: (key: string, opts: object) => string): string | null => {
+export const useHint = (
+  name: string,
+  usedNames: string[],
+  t: (key: string, opts: TOptions) => string
+): string | null => {
   return useMemo(() => {
     if (name === '') {
       return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'name' })
