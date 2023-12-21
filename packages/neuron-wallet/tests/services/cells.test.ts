@@ -712,6 +712,7 @@ describe('CellsService', () => {
             BigInt('1000')
           ).toString(),
           hasChangeOutput: true,
+          totalSize: 161,
         })
       })
     })

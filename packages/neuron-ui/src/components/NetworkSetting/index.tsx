@@ -62,7 +62,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   useOnWindowResize(toggleBottomBorder)
 
   const handleChange = useCallback(
-    checked => {
+    (checked: string) => {
       if (checked !== currentId) {
         setCurrentNetwork(checked)
       }
@@ -101,7 +101,11 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           value: network.id,
           label: (
             <div className={styles.networkLabel}>
-              <p>{`${network.name} (${network.remote})`}</p>
+              <p>{`${network.name} (${
+                network.remote.length > 40
+                  ? `${network.remote.slice(0, 20)}...${network.remote.slice(-20)}`
+                  : network.remote
+              })`}</p>
               <div className={styles.tag}>{t(getNetworkLabelI18nkey(network.chain))}</div>
             </div>
           ),

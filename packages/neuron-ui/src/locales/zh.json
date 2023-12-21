@@ -232,7 +232,9 @@
       "remove-receiving-address-msg": "确定要删除所选收款地址？",
       "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
       "release-on": "锁定至",
-      "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）"
+      "locktime-warning": "请确保对方钱包支持到期解锁功能。（注：1.交易所一般不支持到期解锁功能 {{extraNote}}）",
+      "allow-use-sent-cell": "允许使用待确认的 Outputs 构建交易",
+      "submit-transaction": "发起交易"
     },
     "receive": {
       "title": "收款",

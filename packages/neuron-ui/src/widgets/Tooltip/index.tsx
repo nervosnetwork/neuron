@@ -16,7 +16,7 @@ interface TooltipProps {
   isTriggerNextToChild?: boolean
   onVisibleChange?: (visible: boolean) => void
 }
-const Tooltip: React.FC<TooltipProps> = ({
+const Tooltip: React.FC<React.PropsWithChildren<TooltipProps>> = ({
   children,
   tip,
   className = '',

@@ -453,13 +453,21 @@ export default class TransactionSender {
     return [emptyWitness, ...restWitnesses]
   }
 
-  public generateTx = async (
-    walletID: string = '',
-    items: TargetOutput[] = [],
-    fee: string = '0',
-    feeRate: string = '0',
+  public generateTx = async ({
+    walletID = '',
+    items = [],
+    fee = '0',
+    feeRate = '0',
+    consumeOutPoints,
+    enableUseSentCell,
+  }: {
+    walletID: string
+    items: TargetOutput[]
+    fee: string
+    feeRate: string
     consumeOutPoints?: CKBComponents.OutPoint[]
-  ): Promise<Transaction> => {
+    enableUseSentCell?: boolean
+  }): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
@@ -468,16 +476,15 @@ export default class TransactionSender {
     const changeAddress: string = await this.getChangeAddress()
 
     try {
-      const tx: Transaction = await TransactionGenerator.generateTx(
+      const tx: Transaction = await TransactionGenerator.generateTx({
         walletID,
         targetOutputs,
         changeAddress,
         fee,
         feeRate,
-        undefined,
-        undefined,
-        consumeOutPoints
-      )
+        consumeOutPoints,
+        enableUseSentCell,
+      })
 
       return tx
     } catch (error) {
@@ -488,26 +495,34 @@ export default class TransactionSender {
     }
   }
 
-  public generateSendingAllTx = async (
-    walletID: string = '',
-    items: TargetOutput[] = [],
-    fee: string = '0',
-    feeRate: string = '0',
+  public generateSendingAllTx = async ({
+    walletID = '',
+    items = [],
+    fee = '0',
+    feeRate = '0',
+    consumeOutPoints,
+    enableUseSentCell,
+  }: {
+    walletID: string
+    items: TargetOutput[]
+    fee: string
+    feeRate: string
     consumeOutPoints?: CKBComponents.OutPoint[]
-  ): Promise<Transaction> => {
+    enableUseSentCell?: boolean
+  }): Promise<Transaction> => {
     const targetOutputs = items.map(item => ({
       ...item,
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
       walletID,
       targetOutputs,
       fee,
       feeRate,
-      undefined,
-      consumeOutPoints
-    )
+      consumeOutPoints,
+      enableUseSentCell,
+    })
 
     return tx
   }
@@ -521,13 +536,13 @@ export default class TransactionSender {
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
-      '',
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx({
+      walletID: '',
       targetOutputs,
-      '0',
-      '1000',
-      multisigConfig
-    )
+      fee: '0',
+      feeRate: '1000',
+      multisigConfig,
+    })
 
     return tx
   }
@@ -549,19 +564,19 @@ export default class TransactionSender {
         multisigConfig.n
       )
       const multisigAddresses = scriptToAddress(lockScript, NetworksService.getInstance().isMainnet())
-      const tx: Transaction = await TransactionGenerator.generateTx(
-        '',
+      const tx: Transaction = await TransactionGenerator.generateTx({
+        walletID: '',
         targetOutputs,
-        multisigAddresses,
-        '0',
-        '1000',
-        {
+        changeAddress: multisigAddresses,
+        fee: '0',
+        feeRate: '1000',
+        lockClass: {
           lockArgs: [lockScript.args],
           codeHash: SystemScriptInfo.MULTI_SIGN_CODE_HASH,
           hashType: SystemScriptInfo.MULTI_SIGN_HASH_TYPE,
         },
-        multisigConfig
-      )
+        multisigConfig,
+      })
       return tx
     } catch (error) {
       if (error instanceof CapacityNotEnoughForChange) {

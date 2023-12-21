@@ -18,7 +18,6 @@ interface UpdateDownloadStatusProps {
   onCancel: () => void
   progress: number
   newVersion: string
-  releaseDate: string
   releaseNotes: string
   progressInfo: null | State.ProgressInfo
 }
@@ -28,13 +27,13 @@ const UpdateDownloadStatus = ({
   onCancel,
   progress = 0,
   newVersion = '',
-  releaseDate = '',
   releaseNotes = '',
   progressInfo,
 }: UpdateDownloadStatusProps) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
+  const [publishedAt, setPublishedAt] = useState('')
 
   const handleConfirm = useCallback(
     (e: React.FormEvent) => {
@@ -50,6 +49,18 @@ const UpdateDownloadStatus = ({
     },
     [downloadUpdate, installUpdate]
   )
+
+  useEffect(() => {
+    if (available) {
+      fetch(`https://api.github.com/repos/nervosnetwork/neuron/releases/tags/v${newVersion}`)
+        .then(async res => {
+          // eslint-disable-next-line camelcase
+          const { published_at } = await res.json()
+          setPublishedAt(published_at)
+        })
+        .catch(() => {})
+    }
+  }, [available, setPublishedAt])
 
   if (available) {
     const releaseNotesHtml = () => {
@@ -72,7 +83,7 @@ const UpdateDownloadStatus = ({
       >
         <div className={styles.install}>
           <p className={styles.title}>
-            {newVersion} ({uniformTimeFormatter(new Date(releaseDate)).split(' ')[0]})
+            {newVersion} {publishedAt ? `(${uniformTimeFormatter(new Date(publishedAt)).split(' ')[0]})` : null}
           </p>
           <div className={styles.releaseNotesStyle}>
             <div dangerouslySetInnerHTML={releaseNotesHtml()} />
@@ -217,7 +228,6 @@ const GeneralSetting = ({ updater }: GeneralSettingProps) => {
         progress={updater.downloadProgress}
         progressInfo={updater.progressInfo}
         newVersion={updater.version}
-        releaseDate={updater.releaseDate}
         releaseNotes={updater.releaseNotes}
       />
 
