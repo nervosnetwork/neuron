@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update stale issues
-        uses: actions/stale@v8
+        uses: actions/stale@v9
         with:
           any-of-issue-labels: replied
           stale-issue-label: stale

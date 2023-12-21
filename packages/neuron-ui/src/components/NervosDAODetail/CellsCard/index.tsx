@@ -13,12 +13,11 @@ import CopyZone from 'widgets/CopyZone'
 import Tooltip from 'widgets/Tooltip'
 import styles from './cellsCard.module.scss'
 
-const TabsVariantWithCellsCard: FC<
-  VariantProps<{
-    title: string
-    cells: (State.DetailedInput | State.DetailedOutput)[]
-  }>
-> = ({ tabs, selectedTab, onTabChange }) => {
+const TabsVariantWithCellsCard = ({
+  tabs,
+  selectedTab,
+  onTabChange,
+}: VariantProps<{ title: string; cells: (State.DetailedInput | State.DetailedOutput)[] }>): React.ReactElement => {
   const [t] = useTranslation()
   const {
     chain: { networkID },

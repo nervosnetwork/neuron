@@ -57,6 +57,7 @@ $headerHeight: 104px;
     position: relative;
     border-radius: 16px;
     background: var(--secondary-background-color);
+    min-height: 436px;
 
     .content {
       padding: 16px;
@@ -76,13 +77,34 @@ $headerHeight: 104px;
       width: 100%;
       bottom: 16px;
       left: 0;
-      display: flex;
-      justify-content: center;
+      text-align: center;
+      .actions {
+        display: flex;
+        justify-content: center;
 
-      button {
-        width: 216px;
-        &:last-child {
-          margin-left: 12px;
+        button {
+          width: 216px;
+          &:last-child {
+            margin-left: 12px;
+          }
+        }
+      }
+      .allowUseSent {
+        display: inline-block;
+        margin-bottom: 16px;
+        color: var(--secondary-text-color);
+        input[type='checkbox'] {
+          display: none;
+          margin-right: 8px;
+        }
+        input[type='checkbox'] + span {
+          display: inline-block;
+          padding-left: 26px;
+          background: url('../../widgets/Icons/Radio.svg') no-repeat left top;
+          user-select: none;
+        }
+        input[type='checkbox']:checked + span {
+          background: url('../../widgets/Icons/RadioSelected.svg') no-repeat left top;
         }
       }
     }

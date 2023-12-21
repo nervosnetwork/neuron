@@ -51,7 +51,7 @@ const SelectModel = ({ dispatch }: { dispatch: React.Dispatch<ActionType> }) => 
     })
   }, [dispatch, model])
 
-  const onClickDeviceType = useCallback(e => {
+  const onClickDeviceType: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = useCallback(e => {
     const { dataset } = e.target
     setModel(
       dataset.manufacturer && dataset.product
