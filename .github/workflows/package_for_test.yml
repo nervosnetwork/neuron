@@ -1,6 +1,6 @@
 name: Package Neuron for Test
 
-on:
+on: 
   issue_comment:
     types: [created, edited]
   push:
@@ -115,9 +115,8 @@ jobs:
         with:
           script: |
             const fs = require('node:fs')
-            const prodYmlPath = 'packages/neuron-wallet/electron-builder.yml'
-            const testYmlPath = 'packages/neuron-wallet/electron-builder.test.yml'
-            fs.writeFileSync(testYmlPath, fs.readFileSync(prodYmlPath).toString().replace('asar: true', 'asar: false'))
+            const ympPath = 'packages/neuron-wallet/electron-builder.yml'
+            fs.writeFileSync(ympPath, fs.readFileSync(ympPath).toString().replace('asar: true', 'asar: false'))
 
       - name: Package for MacOS
         if: ${{ matrix.os == 'macos-latest' && env.MAC_SHOULD_CODE_SIGN == 'true' }}
@@ -204,88 +203,6 @@ jobs:
         with:
           name: Neuron-Linux
           path: release/Neuron-*.AppImage
-
-  sync-test:
-    needs: [packaging]
-    strategy:
-      matrix:
-        node:
-          - 18.12.0
-        os:
-          - macos-latest
-          - ubuntu-20.04
-          - windows-2019
-
-    runs-on: ${{ matrix.os }}
-
-    name: ${{ matrix.os }}(Node.js ${{ matrix.node }})
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-
-      - name: Install libudev
-        if: matrix.os == 'ubuntu-20.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev
-
-      - name: Download Neuron App Zip(arm64)
-        if: matrix.os == 'macos-latest'
-        uses: actions/download-artifact@v3
-        with:
-          name: Neuron-Mac-arm64
-          path: packages/sync-test
-
-      - name: Upload Neuron Win
-        if: matrix.os == 'windows-2019'
-        uses: actions/download-artifact@v3
-        with:
-          name: Neuron-Win
-          path: packages/sync-test
-
-      - name: Upload Neuron Linux
-        if: matrix.os == 'ubuntu-20.04'
-        uses: actions/download-artifact@v3
-        with:
-          name: Neuron-Linux
-          path: packages/sync-test
-
-      - name: macos run
-        if: matrix.os == 'macos-latest'
-        run: |
-          cd packages/sync-test
-          yarn
-          bash scripts/prepare_neuron_macos.sh
-          yarn sync-test
-
-      - name:  Windows run
-        if: matrix.os == 'windows-2019'
-        run: |
-          cd packages\sync-test
-          yarn
-          .\scripts\prepare_neuron_windows.bat
-          yarn sync-test
-
-      - name: ubuntu run
-        if: matrix.os == 'ubuntu-20.04'
-        run: |
-          cd  packages/sync-test
-          yarn
-          bash scripts/prepare_neuron_linux.sh
-          xvfb-run --auto-servernum yarn sync-test
-      - name: tar result
-        if: always()
-        run: |
-          tar -zcvf tmp.${{ matrix.os  }}.tar.gz packages/sync-test/tmp
-
-      - name: Publish reports
-        if: failed()
-        uses: actions/upload-artifact@v3
-        with:
-          name: jfoa-build-reports-${{ runner.os }}
-          path: tmp.${{ matrix.os  }}.tar.gz
 
   comment_when_package_success:
     needs: [packaging]

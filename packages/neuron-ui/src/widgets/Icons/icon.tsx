@@ -46,6 +46,7 @@ import { ReactComponent as AddressbookSvg } from './Addressbook.svg'
 import { ReactComponent as AddSvg } from './Add.svg'
 import { ReactComponent as AddSimpleSvg } from './AddSimple.svg'
 import { ReactComponent as SwitchSvg } from './Switch.svg'
+import { ReactComponent as CleanSvg } from './Clean.svg'
 import { ReactComponent as CellManageSvg } from './CellManage.svg'
 import { ReactComponent as LockSvg } from './Lock.svg'
 import { ReactComponent as LockCellSvg } from './LockCell.svg'
@@ -113,6 +114,7 @@ export const Addressbook = WrapSvg(AddressbookSvg, styles.withTheme)
 export const Add = WrapSvg(AddSvg)
 export const Switch = WrapSvg(SwitchSvg)
 export const AddSimple = WrapSvg(AddSimpleSvg)
+export const Clean = WrapSvg(CleanSvg)
 export const CellManage = WrapSvg(CellManageSvg, styles.withTheme)
 export const Lock = WrapSvg(LockSvg, styles.withTheme)
 export const LockCell = WrapSvg(LockCellSvg)
