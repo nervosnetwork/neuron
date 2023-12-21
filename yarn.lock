@@ -5778,10 +5778,10 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.1.tgz#d3357479a0fdfdd5907fe67e17e0a85c906e1301"
   integrity sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==
 
-"@types/npmlog@4.1.6":
-  version "4.1.6"
-  resolved "https://registry.yarnpkg.com/@types/npmlog/-/npmlog-4.1.6.tgz#792341665000209ee76997df8a16300fda6d77cb"
-  integrity sha512-0l3z16vnlJGl2Mi/rgJFrdwfLZ4jfNYgE6ZShEpjqhHuGTqdEzNles03NpYHwUMVYZa+Tj46UxKIEpE78lQ3DQ==
+"@types/npmlog@7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/npmlog/-/npmlog-7.0.0.tgz#76602f187ee5f36f77c1a221b2cc9391c76f3dfd"
+  integrity sha512-hJWbrKFvxKyWwSUXjZMYTINsSOY6IclhvGOZ97M8ac2tmR9hMwmTnYaMdpGhvju9ctWLTPhCS+eLfQNluiEjQQ==
   dependencies:
     "@types/node" "*"
 
