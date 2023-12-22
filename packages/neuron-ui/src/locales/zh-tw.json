@@ -238,7 +238,9 @@
       "remove-receiving-address-msg": "確定要刪除所選收款地址？",
       "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
       "release-on": "鎖定至",
-      "locktime-warning": "請確保對方錢包支持到期解鎖功能。（註：1.交易所壹般不支持到期解鎖功能 {{extraNote}}）"
+      "locktime-warning": "請確保對方錢包支持到期解鎖功能。（註：1.交易所壹般不支持到期解鎖功能 {{extraNote}}）",
+      "allow-use-sent-cell": "允許使用待確認的 Outputs 構建交易",
+      "submit-transaction": "發起交易"
     },
     "receive": {
       "title": "收款",

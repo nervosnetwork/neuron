@@ -71,7 +71,7 @@ const WalletSetting = ({
   const onHandleWallet = useOnHandleWallet({ dispatch })
 
   const handleChange = useCallback(
-    checked => {
+    (checked: string) => {
       onHandleWallet({
         target: {
           dataset: {
