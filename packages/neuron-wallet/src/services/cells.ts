@@ -657,12 +657,14 @@ export default class CellsService {
       hashType: ScriptHashType
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
     multisigConfigs: MultisigConfigModel[] = [],
-    consumeOutPoints?: CKBComponents.OutPoint[]
+    consumeOutPoints?: CKBComponents.OutPoint[],
+    enableUseSentCell?: boolean
   ): Promise<{
     inputs: Input[]
     capacities: string
     finalFee: string
     hasChangeOutput: boolean
+    totalSize: number
   }> => {
     if (!walletId && !lockClass.lockArgs) {
       throw new TransactionInputParameterMiss()
@@ -693,20 +695,20 @@ export default class CellsService {
           })
       : CellsService.getLiveOrSentCellByLockArgsMultisigOutput(lockClass))
 
-    const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
+    const useCells = enableUseSentCell ? cellEntities : cellEntities.filter(c => c.status === OutputStatus.Live)
     const sentBalance: bigint = cellEntities
       .filter(c => c.status === OutputStatus.Sent)
       .map(c => BigInt(c.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
     if (
-      liveCells.length === 0 &&
+      useCells.length === 0 &&
       sentBalance === BigInt(0) &&
       ((mode.isFeeRateMode() && feeRateInt !== BigInt(0)) || (mode.isFeeMode() && feeInt !== BigInt(0)))
     ) {
       throw new CapacityNotEnough()
     }
-    liveCells.sort((a, b) => {
+    useCells.sort((a, b) => {
       const result = BigInt(a.capacity) - BigInt(b.capacity)
       if (result > BigInt(0)) {
         return 1
@@ -744,7 +746,7 @@ export default class CellsService {
       }),
       {}
     )
-    liveCells.every(cell => {
+    useCells.every(cell => {
       const input: Input = new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
@@ -771,6 +773,7 @@ export default class CellsService {
           return false
         } else if (diff - changeOutputFee >= minChangeCapacity) {
           needFee += changeOutputFee
+          totalSize += changeOutputSize + changeOutputDataSize
           hasChangeOutput = true
           return false
         }
@@ -813,6 +816,7 @@ export default class CellsService {
       capacities: inputCapacities.toString(),
       finalFee: finalFee.toString(),
       hasChangeOutput,
+      totalSize,
     }
   }
 
@@ -823,7 +827,8 @@ export default class CellsService {
       hashType: ScriptHashType
       args?: string
     } = { codeHash: SystemScriptInfo.SECP_CODE_HASH, hashType: ScriptHashType.Type },
-    consumeOutPoints?: CKBComponents.OutPoint[]
+    consumeOutPoints?: CKBComponents.OutPoint[],
+    enableUseSentCell?: boolean
   ): Promise<Input[]> => {
     let cellEntities: (OutputEntity | MultisigOutput)[] = []
     if (consumeOutPoints?.length) {
@@ -846,13 +851,11 @@ export default class CellsService {
       })
     }
 
-    const inputs: Input[] = cellEntities
-      .filter(v => v.status === OutputStatus.Live)
-      .map(cell => {
-        return new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
-      })
+    const useCells = enableUseSentCell ? cellEntities : cellEntities.filter(v => v.status === OutputStatus.Live)
 
-    return inputs
+    return useCells.map(cell => {
+      return new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
+    })
   }
 
   public static async gatherAnyoneCanPayCKBInputs(
