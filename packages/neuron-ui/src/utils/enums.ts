@@ -107,6 +107,7 @@ export enum ErrorCode {
   DeviceInSleep = 501,
   // active warning
   WaitForFullySynced = 600,
+  ImportingExitingWallet = 118,
 }
 
 export enum SyncStatus {

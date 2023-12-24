@@ -48,6 +48,11 @@ declare namespace Controller {
     password: string
   }
 
+  interface ReplaceWalletParams {
+    id: string
+    tmpId: string
+  }
+
   interface BackupWalletParams {
     id: string
     password: string

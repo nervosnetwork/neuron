@@ -18,6 +18,7 @@ import {
 } from 'utils'
 import i18n from 'utils/i18n'
 import MnemonicInput from 'widgets/MnemonicInput'
+import ReplaceDuplicateWalletDialog, { useReplaceDuplicateWallet } from 'components/ReplaceDuplicateWalletDialog'
 import Alert from 'widgets/Alert'
 import { Loading } from 'widgets/Icons/icon'
 import TextField from 'widgets/TextField'
@@ -49,6 +50,10 @@ const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (n
       importedWalletDialogShown.setStatus(res.result.id, true)
       navigate(RoutePath.Overview)
     } else if (res.status > 0) {
+      if (res.status === ErrorCode.ImportingExitingWallet) {
+        throw res
+      }
+
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
       const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
@@ -315,6 +320,8 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
   const [t] = useTranslation()
   const message = 'wizard.set-wallet-name-and-password'
 
+  const { onImportingExitingWalletError, dialogProps } = useReplaceDuplicateWallet()
+
   const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
   const isPwdComplex = useMemo(() => {
     try {
@@ -372,7 +379,13 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
         if (type === MnemonicAction.Create) {
           createWalletWithMnemonic(p)(navigate).finally(() => closeDialog())
         } else {
-          importWalletWithMnemonic(p)(navigate).finally(() => closeDialog())
+          importWalletWithMnemonic(p)(navigate)
+            .catch(error => {
+              onImportingExitingWalletError(error.message)
+            })
+            .finally(() => {
+              closeDialog()
+            })
         }
       }, 0)
     },
@@ -380,52 +393,55 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
   )
 
   return (
-    <form onSubmit={onNext} className={styles.submission}>
-      {type === MnemonicAction.Create && (
-        <div className={styles.steps}>
-          {[0, 1, 2].map(v => (
-            <div key={v.toString()} className={`${styles.step} ${styles.activity}`} />
-          ))}
+    <>
+      <form onSubmit={onNext} className={styles.submission}>
+        {type === MnemonicAction.Create && (
+          <div className={styles.steps}>
+            {[0, 1, 2].map(v => (
+              <div key={v.toString()} className={`${styles.step} ${styles.activity}`} />
+            ))}
+          </div>
+        )}
+        <div className={styles.title}>{t(message)}</div>
+        {submissionInputs.map((input, idx) => (
+          <div
+            key={input.key}
+            className={styles.input}
+            data-chars={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : ''}
+          >
+            <TextField
+              data-field={input.key}
+              type={input.type as 'password' | 'text'}
+              value={state[input.key]}
+              onChange={onChange}
+              maxLength={input.maxLength}
+              placeholder={input.hint ? t(input.hint) : undefined}
+              tabIndex={idx}
+              required
+            />
+          </div>
+        ))}
+        <div className={styles.inputNotice}>
+          <Alert status={getAlertStatus(!!state.name, !!isNameUnused)}>
+            <span>{t('wizard.new-name')}</span>
+          </Alert>
+          <Alert status={getAlertStatus(!!state.password, !!isPwdComplex)}>
+            <span>{t('wizard.complex-password')}</span>
+          </Alert>
+          <Alert status={getAlertStatus(!!state.confirmPassword, !!isPwdSame)}>
+            <span>{t('wizard.same-password')}</span>
+          </Alert>
         </div>
-      )}
-      <div className={styles.title}>{t(message)}</div>
-      {submissionInputs.map((input, idx) => (
-        <div
-          key={input.key}
-          className={styles.input}
-          data-chars={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : ''}
-        >
-          <TextField
-            data-field={input.key}
-            type={input.type as 'password' | 'text'}
-            value={state[input.key]}
-            onChange={onChange}
-            maxLength={input.maxLength}
-            placeholder={input.hint ? t(input.hint) : undefined}
-            tabIndex={idx}
-            required
-          />
+        <div className={`${styles.actions} ${styles.createWallet}`}>
+          <Button type="submit" label={t('wizard.finish-create')} disabled={disableNext}>
+            {t('wizard.finish-create') as string}
+          </Button>
+          <Button type="text" onClick={() => navigate(-1)} label={t('wizard.back')} />
         </div>
-      ))}
-      <div className={styles.inputNotice}>
-        <Alert status={getAlertStatus(!!state.name, !!isNameUnused)}>
-          <span>{t('wizard.new-name')}</span>
-        </Alert>
-        <Alert status={getAlertStatus(!!state.password, !!isPwdComplex)}>
-          <span>{t('wizard.complex-password')}</span>
-        </Alert>
-        <Alert status={getAlertStatus(!!state.confirmPassword, !!isPwdSame)}>
-          <span>{t('wizard.same-password')}</span>
-        </Alert>
-      </div>
-      <div className={`${styles.actions} ${styles.createWallet}`}>
-        <Button type="submit" label={t('wizard.finish-create')} disabled={disableNext}>
-          {t('wizard.finish-create') as string}
-        </Button>
-        <Button type="text" onClick={() => navigate(-1)} label={t('wizard.back')} />
-      </div>
-      <FinishCreateLoading dialogRef={dialogRef} />
-    </form>
+        <FinishCreateLoading dialogRef={dialogRef} />
+      </form>
+      <ReplaceDuplicateWalletDialog {...dialogProps} />
+    </>
   )
 }
 

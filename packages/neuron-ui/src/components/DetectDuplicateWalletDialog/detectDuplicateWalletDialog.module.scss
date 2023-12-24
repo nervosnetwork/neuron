@@ -1,0 +1,32 @@
+.content {
+  width: 648px;
+  .detail {
+    margin: 0;
+    color: var(--secondary-text-color);
+  }
+  .groupWrap {
+    margin-top: 16px;
+    height: 177px;
+    overflow-y: scroll;
+    border: 1px solid var(--divide-line-color);
+    border-radius: 8px;
+    padding-left: 16px;
+    > div {
+      border-bottom: 1px solid var(--divide-line-color);
+      padding-top: 16px;
+      &:last-child {
+        border: none;
+      }
+    }
+    .radioItem {
+      padding: 0 0 16px;
+      &:hover,
+      &:focus {
+        background: transparent;
+        button {
+          visibility: visible;
+        }
+      }
+    }
+  }
+}

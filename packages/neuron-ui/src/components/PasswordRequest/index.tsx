@@ -173,7 +173,9 @@ const PasswordRequest = () => {
           }
           case 'delete': {
             await deleteWallet({ id: walletID, password })(dispatch).then(status => {
-              if (status === ErrorCode.PasswordIncorrect) {
+              if (isSuccessResponse({ status })) {
+                onSuccess?.()
+              } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
             })

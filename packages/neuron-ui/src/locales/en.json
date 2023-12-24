@@ -183,7 +183,8 @@
       "repeat-password": "Repeat Password",
       "finish-create": "Finish Creating",
       "creating-wallet": "Wallet is being preparing, please wait",
-      "add-one": "Add One More"
+      "add-one": "Add One More",
+      "detect-duplicate-wallets": "Detect Duplicate Wallets"
     },
     "import-keystore": {
       "title": "Import Keystore File",
@@ -382,6 +383,15 @@
         "password": "Password",
         "wallet-detail": {
           "balance": "Balance"
+        },
+        "importing-existing": {
+          "title": "Importing an existing wallet",
+          "detail": "You imported a wallet that already exists, choose to replace the existing wallet or cancel the import.",
+          "replace": "Replace"
+        },
+        "detected-duplicate": {
+          "title": "Detected duplicate wallets",
+          "detail": "You have duplicate wallets in your account and it is recommended that you choose to keep the wallet that needs to be unique to make it less difficult to manage."
         }
       },
       "network": {

@@ -15,6 +15,7 @@ import {
   useDialogWrapper,
 } from 'utils'
 
+import ReplaceDuplicateWalletDialog, { useReplaceDuplicateWallet } from 'components/ReplaceDuplicateWalletDialog'
 import { FinishCreateLoading, CreateFirstWalletNav } from 'components/WalletWizard'
 import TextField from 'widgets/TextField'
 import { importedWalletDialogShown } from 'services/localCache'
@@ -48,6 +49,7 @@ const ImportKeystore = () => {
   const navigate = useNavigate()
   const [fields, setFields] = useState(defaultFields)
   const [openingFile, setOpeningFile] = useState(false)
+  const { onImportingExitingWalletError, dialogProps } = useReplaceDuplicateWallet()
   const goBack = useGoBack()
 
   const disabled = !!(
@@ -113,6 +115,11 @@ const ImportKeystore = () => {
 
           if (res.status === ErrorCode.PasswordIncorrect) {
             throw new PasswordIncorrectException()
+          }
+
+          if (res.status === ErrorCode.ImportingExitingWallet) {
+            onImportingExitingWalletError(res.message)
+            return
           }
 
           if (res.message) {
@@ -193,51 +200,55 @@ const ImportKeystore = () => {
   )
 
   return (
-    <form className={styles.container} onSubmit={handleSubmit}>
-      <div className={styles.title}>{t('import-keystore.title')}</div>
-      <CreateFirstWalletNav />
-      {Object.entries(fields)
-        .filter(([key]) => !key.endsWith('Error'))
-        .map(([key, value]) => {
-          return (
-            <TextField
-              className={styles.field}
-              key={key}
-              field={key}
-              onClick={key === 'path' ? handleFileClick : undefined}
-              placeholder={t(`import-keystore.placeholder.${key}`)}
-              type={key === 'password' ? 'password' : 'text'}
-              readOnly={key === 'path'}
-              disabled={key === 'path' && openingFile}
-              value={value}
-              error={fields[`${key}Error` as keyof KeystoreFields]}
-              errorWithIcon
-              onChange={handleChange}
-              suffix={
-                key === 'path' ? (
-                  <span
-                    onClick={handleFileClick}
-                    className={styles.chooseFileSuffix}
-                    onKeyDown={() => {}}
-                    role="button"
-                    tabIndex={-1}
-                  >
-                    {t('import-keystore.select-file')}
-                  </span>
-                ) : null
-              }
-              required
-            />
-          )
-        })}
-      <div className={styles.actions}>
-        <Button type="submit" label={t('import-keystore.button.submit')} disabled={disabled}>
-          {t('import-keystore.button.submit') as string}
-        </Button>
-        <Button type="text" onClick={goBack} label={t('import-keystore.button.back')} />
-      </div>
-      <FinishCreateLoading dialogRef={dialogRef} />
-    </form>
+    <>
+      <form className={styles.container} onSubmit={handleSubmit}>
+        <div className={styles.title}>{t('import-keystore.title')}</div>
+        <CreateFirstWalletNav />
+        {Object.entries(fields)
+          .filter(([key]) => !key.endsWith('Error'))
+          .map(([key, value]) => {
+            return (
+              <TextField
+                className={styles.field}
+                key={key}
+                field={key}
+                onClick={key === 'path' ? handleFileClick : undefined}
+                placeholder={t(`import-keystore.placeholder.${key}`)}
+                type={key === 'password' ? 'password' : 'text'}
+                readOnly={key === 'path'}
+                disabled={key === 'path' && openingFile}
+                value={value}
+                error={fields[`${key}Error` as keyof KeystoreFields]}
+                errorWithIcon
+                onChange={handleChange}
+                suffix={
+                  key === 'path' ? (
+                    <span
+                      onClick={handleFileClick}
+                      className={styles.chooseFileSuffix}
+                      onKeyDown={() => {}}
+                      role="button"
+                      tabIndex={-1}
+                    >
+                      {t('import-keystore.select-file')}
+                    </span>
+                  ) : null
+                }
+                required
+              />
+            )
+          })}
+        <div className={styles.actions}>
+          <Button type="submit" label={t('import-keystore.button.submit')} disabled={disabled}>
+            {t('import-keystore.button.submit') as string}
+          </Button>
+          <Button type="text" onClick={goBack} label={t('import-keystore.button.back')} />
+        </div>
+        <FinishCreateLoading dialogRef={dialogRef} />
+      </form>
+
+      <ReplaceDuplicateWalletDialog {...dialogProps} />
+    </>
   )
 }
 

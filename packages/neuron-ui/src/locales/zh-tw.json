@@ -177,7 +177,8 @@
       "repeat-password": "重復密碼",
       "finish-create": "完成創建",
       "creating-wallet": "錢包準備中，請稍後",
-      "add-one": "添加錢包"
+      "add-one": "添加錢包",
+      "detect-duplicate-wallets": "檢測重複錢包"
     },
     "import-keystore": {
       "title": "導入 Keystore 文件",
@@ -377,6 +378,15 @@
         "password": "密碼",
         "wallet-detail": {
           "balance": "餘額"
+        },
+        "importing-existing": {
+          "title": "導入已存在錢包",
+          "detail": "您導入了一個已經存在的錢包，請選擇替換現有錢包或取消導入。",
+          "replace": "替換"
+        },
+        "detected-duplicate": {
+          "title": "檢測到重複的錢包",
+          "detail": "您的帳戶中有重複的錢包，建議您選擇保留需要獨一無二的錢包，以便於更輕鬆地管理。"
         }
       },
       "network": {

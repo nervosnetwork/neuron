@@ -59,6 +59,7 @@ type Action =
   | 'create-wallet'
   | 'update-wallet'
   | 'delete-wallet'
+  | 'replace-wallet'
   | 'backup-wallet'
   | 'get-all-addresses'
   | 'update-address-description'
