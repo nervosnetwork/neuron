@@ -19,6 +19,7 @@ export const transactionState: State.DetailedTransaction = {
   blockHash: '',
   witnesses: [],
   nervosDao: false,
+  size: 0,
 }
 
 export const chainState: Readonly<State.Chain> = {

@@ -50,6 +50,7 @@ const updateTransactionWith =
     setErrorMessage,
     updateTransactionOutput,
     isMainnet,
+    enableUseSentCell,
     dispatch,
     t,
     consumeOutPoints,
@@ -61,6 +62,7 @@ const updateTransactionWith =
     setErrorMessage: (val: string) => void
     updateTransactionOutput?: ReturnType<typeof useUpdateTransactionOutput>
     isMainnet: boolean
+    enableUseSentCell: boolean
     dispatch: StateDispatch
     t: TFunction
     consumeOutPoints?: CKBComponents.OutPoint[]
@@ -87,6 +89,7 @@ const updateTransactionWith =
         })),
         feeRate: price,
         consumeOutPoints,
+        enableUseSentCell,
       }
       return generator(realParams)
         .then((res: any) => {
@@ -155,18 +158,31 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
     [dispatch]
   )
 
-const useOnTransactionChange = (
-  walletID: string,
-  items: State.Output[],
-  price: string,
-  isMainnet: boolean,
-  dispatch: StateDispatch,
-  isSendMax: boolean,
-  setTotalAmount: (val: string) => void,
-  setErrorMessage: (val: string) => void,
-  t: TFunction,
+const useOnTransactionChange = ({
+  walletID,
+  items,
+  price,
+  isMainnet,
+  dispatch,
+  isSendMax,
+  setTotalAmount,
+  setErrorMessage,
+  t,
+  consumeOutPoints,
+  enableUseSentCell,
+}: {
+  walletID: string
+  items: State.Output[]
+  price: string
+  isMainnet: boolean
+  dispatch: StateDispatch
+  isSendMax: boolean
+  setTotalAmount: (val: string) => void
+  setErrorMessage: (val: string) => void
+  t: TFunction
   consumeOutPoints?: CKBComponents.OutPoint[]
-) => {
+  enableUseSentCell: boolean
+}) => {
   useEffect(() => {
     clearTimeout(generateTxTimer)
     setErrorMessage('')
@@ -189,9 +205,22 @@ const useOnTransactionChange = (
         dispatch,
         t,
         consumeOutPoints,
+        enableUseSentCell,
       })
     }, 300)
-  }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage, t, isMainnet, consumeOutPoints])
+  }, [
+    walletID,
+    items,
+    price,
+    isSendMax,
+    dispatch,
+    setTotalAmount,
+    setErrorMessage,
+    t,
+    isMainnet,
+    consumeOutPoints,
+    enableUseSentCell,
+  ])
 }
 
 const useOnSubmit = (items: Readonly<State.Output[]>, isMainnet: boolean, dispatch: StateDispatch) =>
@@ -286,11 +315,13 @@ export const useGetBatchGeneratedTx = async ({
   priceArray = [],
   items,
   isSendMax,
+  enableUseSentCell,
 }: {
   walletID: string
   priceArray?: string[]
   items: Readonly<State.Output[]>
   isSendMax: boolean
+  enableUseSentCell?: boolean
 }) => {
   const getUpdateGeneratedTx = (params: Controller.GenerateTransactionParams) =>
     (isSendMax ? generateSendingAllTx : generateTx)(params).then((res: ControllerResponse<State.Transaction>) => {
@@ -309,7 +340,9 @@ export const useGetBatchGeneratedTx = async ({
     })),
   }
 
-  const requestArray = priceArray.map(itemPrice => getUpdateGeneratedTx({ ...realParams, feeRate: itemPrice }))
+  const requestArray = priceArray.map(itemPrice =>
+    getUpdateGeneratedTx({ ...realParams, feeRate: itemPrice, enableUseSentCell })
+  )
   const allPromiseResult = await Promise.allSettled<State.Transaction>(requestArray)
 
   const feeRateValueArray: FeeRateValueArrayItemType[] = allPromiseResult?.map(
@@ -322,17 +355,29 @@ export const useGetBatchGeneratedTx = async ({
   return feeRateValueArray
 }
 
-export const useInitialize = (
-  walletID: string,
-  items: Readonly<State.Output[]>,
-  generatedTx: any | null,
-  price: string,
-  sending: boolean,
-  isMainnet: boolean,
-  dispatch: React.Dispatch<any>,
-  t: TFunction,
+export const useInitialize = ({
+  walletID,
+  items,
+  generatedTx,
+  price,
+  sending,
+  isMainnet,
+  consumeOutPoints,
+  enableUseSentCell,
+  dispatch,
+  t,
+}: {
+  walletID: string
+  items: Readonly<State.Output[]>
+  generatedTx: any | null
+  price: string
+  sending: boolean
+  isMainnet: boolean
   consumeOutPoints?: CKBComponents.OutPoint[]
-) => {
+  enableUseSentCell: boolean
+  dispatch: React.Dispatch<any>
+  t: TFunction
+}) => {
   const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
 
   const [totalAmount, setTotalAmount] = useState('0')
@@ -382,6 +427,7 @@ export const useInitialize = (
       setErrorMessage,
       updateTransactionOutput,
       isMainnet,
+      enableUseSentCell,
       dispatch,
       t,
       consumeOutPoints,
@@ -390,7 +436,18 @@ export const useInitialize = (
         updateIsSendMax(false)
       }
     })
-  }, [walletID, updateTransactionOutput, price, items, dispatch, t, isMainnet, updateIsSendMax, consumeOutPoints])
+  }, [
+    walletID,
+    updateTransactionOutput,
+    price,
+    items,
+    dispatch,
+    t,
+    isMainnet,
+    updateIsSendMax,
+    consumeOutPoints,
+    enableUseSentCell,
+  ])
 
   const onSendMaxClick = useCallback(() => {
     if (!isSendMax) {
@@ -433,6 +490,17 @@ export const useInitialize = (
     isSendMax,
     onSendMaxClick,
     updateIsSendMax,
+  }
+}
+
+export const useSendWithSentCell = () => {
+  const [enableUseSentCell, setEnableUseSentCell] = useState(false)
+  const onChangeEnableUseSentCell = useCallback(() => {
+    setEnableUseSentCell(v => !v)
+  }, [])
+  return {
+    enableUseSentCell,
+    onChangeEnableUseSentCell,
   }
 }
 

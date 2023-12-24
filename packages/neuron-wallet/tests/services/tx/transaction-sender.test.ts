@@ -604,22 +604,26 @@ describe('TransactionSender Test', () => {
       })
       describe('success', () => {
         beforeEach(async () => {
-          await transactionSender.generateTx(fakeWallet.id, targetOutputs, fee, feeRate)
+          await transactionSender.generateTx({
+            walletID: fakeWallet.id,
+            items: targetOutputs,
+            fee,
+            feeRate,
+          })
         })
         it('generates transaction', () => {
-          expect(stubbedGenerateTx).toHaveBeenCalledWith(
-            fakeWallet.id,
-            [
+          expect(stubbedGenerateTx).toHaveBeenCalledWith({
+            walletID: fakeWallet.id,
+            targetOutputs: [
               { address: '1', capacity: '1' },
               { address: '1', capacity: '1' },
             ],
-            fakeAddress1,
+            changeAddress: fakeAddress1,
             fee,
             feeRate,
-            undefined,
-            undefined,
-            undefined
-          )
+            consumeOutPoints: undefined,
+            enableUseSentCell: undefined,
+          })
         })
       })
       describe('fail', () => {
@@ -627,9 +631,14 @@ describe('TransactionSender Test', () => {
           stubbedGenerateTx.mockRejectedValue(new CapacityNotEnoughForChange())
         })
         it('generates transaction', async () => {
-          expect(transactionSender.generateTx(fakeWallet.id, targetOutputs, fee, feeRate)).rejects.toThrowError(
-            CapacityNotEnoughForChangeByTransfer
-          )
+          expect(
+            transactionSender.generateTx({
+              walletID: fakeWallet.id,
+              items: targetOutputs,
+              fee,
+              feeRate,
+            })
+          ).rejects.toThrowError(CapacityNotEnoughForChangeByTransfer)
         })
       })
     })
@@ -642,20 +651,25 @@ describe('TransactionSender Test', () => {
           { address: '1', capacity: '1' },
           { address: '1', capacity: '1' },
         ]
-        await transactionSender.generateSendingAllTx(fakeWallet.id, targetOutputs, fee, feeRate)
+        await transactionSender.generateSendingAllTx({
+          walletID: fakeWallet.id,
+          items: targetOutputs,
+          fee,
+          feeRate,
+        })
       })
       it('generates transaction', () => {
-        expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith(
-          fakeWallet.id,
-          [
+        expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith({
+          walletID: fakeWallet.id,
+          targetOutputs: [
             { address: '1', capacity: '1' },
             { address: '1', capacity: '1' },
           ],
           fee,
           feeRate,
-          undefined,
-          undefined
-        )
+          consumeOutPoints: undefined,
+          enableUseSentCell: undefined,
+        })
       })
     })
 
@@ -673,7 +687,13 @@ describe('TransactionSender Test', () => {
           blake160s: ['blake160s'],
         })
         await transactionSender.generateMultisigSendAllTx(targetOutputs, multisigConfig)
-        expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith('', targetOutputs, '0', '1000', multisigConfig)
+        expect(stubbedGenerateSendingAllTx).toHaveBeenCalledWith({
+          walletID: '',
+          targetOutputs,
+          fee: '0',
+          feeRate: '1000',
+          multisigConfig,
+        })
       })
     })
 

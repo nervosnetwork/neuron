@@ -100,7 +100,7 @@ const Overview = () => {
     })(dispatch)
   }, [id, dispatch])
 
-  const onRecentActivityClick = useCallback((_, item: State.Transaction) => {
+  const onRecentActivityClick = useCallback((_: React.SyntheticEvent, item: State.Transaction) => {
     const { hash } = item
     navigate(`${RoutePath.Overview}/${hash}`)
   }, [])

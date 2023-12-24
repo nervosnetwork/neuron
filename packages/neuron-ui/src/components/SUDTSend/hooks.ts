@@ -1,3 +1,4 @@
+import type { TOptions } from 'i18next'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { AccountType, isAnyoneCanPayAddress, isSecp256k1Address, isSuccessResponse, shannonToCKBFormatter } from 'utils'
 import { SUDTAccount } from 'components/SUDTAccountList'
@@ -29,7 +30,7 @@ type Option = {
   tooltip?: string
   label: string
   key: SendType
-  params?: object
+  params?: TOptions
 }
 export function useOptions({
   address,
@@ -127,8 +128,8 @@ export function useSendType({
     }
   }, [addressLockType, accountType])
   const onChange = useCallback(
-    id => {
-      setSendType(id as SendType)
+    (id: SendType | undefined) => {
+      setSendType(id)
     },
     [setSendType]
   )
@@ -136,6 +137,10 @@ export function useSendType({
     sendType,
     onChange,
   }
+}
+
+export const isSendType = (v: string): v is SendType => {
+  return Object.values(SendType).includes(v as SendType)
 }
 
 export function getGenerator(sendType?: SendType) {

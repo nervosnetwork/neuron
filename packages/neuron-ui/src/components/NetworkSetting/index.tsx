@@ -62,7 +62,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   useOnWindowResize(toggleBottomBorder)
 
   const handleChange = useCallback(
-    checked => {
+    (checked: string) => {
       if (checked !== currentId) {
         setCurrentNetwork(checked)
       }
