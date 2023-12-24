@@ -240,7 +240,9 @@
       "remove-receiving-address-msg": "Are you sure you want to remove the selected receiving address?",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
-      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})",
+      "allow-use-sent-cell": "Unconfirmed Outputs are allowed in this transaction.",
+      "submit-transaction": "Submit the transaction"
     },
     "receive": {
       "title": "Receive",

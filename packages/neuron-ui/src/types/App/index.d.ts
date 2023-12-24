@@ -50,6 +50,7 @@ declare namespace State {
     outputs: DetailedOutput[]
     outputsCount: string
     witnesses: string[]
+    size: number
   }
   interface Output {
     address: string | undefined

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState, transactionState, useDispatch, showPageNotice } from 'states'
 import {
@@ -25,12 +25,11 @@ import styles from './nervosDAODetail.module.scss'
 import hooks from './hooks'
 import CellsCard from './CellsCard'
 
-const TabsVariantWithTxTypes: FC<
-  VariantProps<{
-    title: string
-    hash: string
-  }>
-> = ({ tabs, selectedTab, onTabChange }) => {
+const TabsVariantWithTxTypes = ({
+  tabs,
+  selectedTab,
+  onTabChange,
+}: VariantProps<Record<'title' | 'hash', string>>): React.ReactElement => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
   const [error, setError] = useState<string>()

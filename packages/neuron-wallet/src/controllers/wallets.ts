@@ -458,6 +458,7 @@ export default class WalletsController {
     fee: string
     feeRate: string
     consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -465,13 +466,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     this.checkAddresses(addresses)
 
-    const tx: Transaction = await new TransactionSender().generateTx(
-      params.walletID,
-      params.items,
-      params.fee,
-      params.feeRate,
-      params.consumeOutPoints
-    )
+    const tx: Transaction = await new TransactionSender().generateTx(params)
     return {
       status: ResponseCode.Success,
       result: tx,
@@ -484,6 +479,7 @@ export default class WalletsController {
     fee: string
     feeRate: string
     consumeOutPoints?: CKBComponents.OutPoint[]
+    enableUseSentCell?: boolean
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -491,13 +487,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     this.checkAddresses(addresses)
 
-    const tx: Transaction = await new TransactionSender().generateSendingAllTx(
-      params.walletID,
-      params.items,
-      params.fee,
-      params.feeRate,
-      params.consumeOutPoints
-    )
+    const tx: Transaction = await new TransactionSender().generateSendingAllTx(params)
     return {
       status: ResponseCode.Success,
       result: tx,

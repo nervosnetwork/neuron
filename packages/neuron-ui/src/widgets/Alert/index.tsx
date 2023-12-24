@@ -4,7 +4,7 @@ import styles from './index.module.scss'
 
 type AlertStatus = 'init' | 'success' | 'error' | 'warn'
 
-const Alert: React.FC<{ status: AlertStatus; className?: string; withIcon?: boolean }> = ({
+const Alert: React.FC<React.PropsWithChildren<{ status: AlertStatus; className?: string; withIcon?: boolean }>> = ({
   status,
   children,
   className,
