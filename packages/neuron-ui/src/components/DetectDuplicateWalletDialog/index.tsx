@@ -69,7 +69,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
       })
     }
 
-    let ids = deletableWallets
+    let ids = [...deletableWallets]
     if (deletableWallets.includes(currentID)) {
       ids = ids.filter(item => item !== currentID)
       ids.push(currentID)
@@ -80,9 +80,8 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
       // eslint-disable-next-line no-await-in-loop
       await getRequest(id)
     }
-
     onClose()
-  }, [deletableWallets, requestPassword, onClose, dispatch])
+  }, [wallets, deletableWallets, requestPassword, onClose, dispatch])
 
   return (
     <>

@@ -379,13 +379,13 @@ export default class WalletService {
 
     const wallet = this.fromJSON({ ...props, id })
 
+    if (!wallet.isHardware()) {
+      wallet.saveKeystore(props.keystore!)
+    }
+
     if (this.getAll().find(item => item.extendedKey === props.extendedKey)) {
       this.tmpWallet = wallet
       throw new ImportingExitingWallet(JSON.stringify({ extendedKey: props.extendedKey, id }))
-    }
-
-    if (!wallet.isHardware()) {
-      wallet.saveKeystore(props.keystore!)
     }
 
     this.listStore.writeSync(this.walletsKey, [...this.getAll(), wallet.toJSON()])
@@ -402,7 +402,7 @@ export default class WalletService {
 
     const tmp = this.tmpWallet?.toJSON()
     if (tmpId !== tmp.id) {
-      throw new WalletNotFound(id)
+      throw new WalletNotFound(tmpId)
     }
     if (wallet.toJSON().extendedKey !== tmp.extendedKey) {
       throw new Error('The wallets are not the same and cannot be replaced.')
