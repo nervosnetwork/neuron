@@ -52,7 +52,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
 
   const onConfirm = useCallback(async () => {
     const getRequest = (id: string) => {
-      if (wallets.find(item => item.id === id && item.device)) {
+      if (wallets.find(item => (item.id === id && item.device) || item.isWatchOnly)) {
         return requestPassword({ walletID: id, action: 'delete-wallet' })
       }
       return new Promise(resolve => {

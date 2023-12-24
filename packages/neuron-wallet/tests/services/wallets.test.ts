@@ -29,7 +29,7 @@ import Keystore from '../../src/models/keys/keystore'
 import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { when } from 'jest-when'
-import { WalletFunctionNotSupported } from '../../src/exceptions/wallet'
+import { WalletFunctionNotSupported, ImportingExitingWallet } from '../../src/exceptions/wallet'
 import { AddressType } from '../../src/models/keys/address'
 import { Manufacturer } from '../../src/services/hardware/common'
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
@@ -53,6 +53,7 @@ describe('wallet service', () => {
   let wallet2: WalletProperties
   let wallet3: WalletProperties
   let wallet4: WalletProperties
+  let wallet5: WalletProperties
   const fakePublicKey = 'keykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykeykey'
   const fakeChainCode = 'codecodecodecodecodecodecodecodecodecodecodecodecodecodecodecode'
 
@@ -121,7 +122,7 @@ describe('wallet service', () => {
     wallet3 = {
       name: 'wallet-test3',
       id: '',
-      extendedKey: 'a',
+      extendedKey: 'b',
       keystore: new Keystore(
         {
           cipher: 'wallet3',
@@ -154,6 +155,29 @@ describe('wallet service', () => {
         addressIndex: 0,
         addressType: AddressType.Receiving,
       },
+    }
+
+    wallet5 = {
+      name: 'wallet-test5',
+      id: '',
+      extendedKey: 'a',
+      keystore: new Keystore(
+        {
+          cipher: 'wallet5',
+          cipherparams: { iv: 'wallet1' },
+          ciphertext: 'wallet5',
+          kdf: '5',
+          kdfparams: {
+            dklen: 1,
+            n: 1,
+            r: 1,
+            p: 1,
+            salt: '1',
+          },
+          mac: '5',
+        },
+        '5'
+      ),
     }
   })
 
@@ -424,7 +448,7 @@ describe('wallet service', () => {
       })
       expect(stubbedGenerateAndSaveForExtendedKeyQueue).toHaveBeenCalledWith({
         walletId: createdWallet3.id,
-        extendedKey: expect.objectContaining({ publicKey: 'a' }),
+        extendedKey: expect.objectContaining({ publicKey: 'b' }),
         isImporting: false,
         receivingAddressCount: 20,
         changeAddressCount: 10,
@@ -481,6 +505,33 @@ describe('wallet service', () => {
     it('with duplicate walletId', async () => {
       await walletServiceMock.checkAndGenerateAddress(['walletId1', 'walletId1'])
       expect(checkAndGenerateAddressesMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('ImportingExitingWallet', () => {
+    beforeEach(() => {
+      walletService.create(wallet2)
+    })
+    it('create an exiting wallet', () => {
+      expect(() => walletService.create(wallet5)).toThrowError(ImportingExitingWallet)
+    })
+  })
+
+  describe('ReplaceWallet', () => {
+    let createdWallet2: any
+    beforeEach(() => {
+      createdWallet2 = walletService.create(wallet2)
+    })
+    it('replace an exiting wallet', async () => {
+      try {
+        walletService.create(wallet5)
+      } catch (error) {
+        const { extendedKey, id } = JSON.parse(error.message)
+        await walletService.replace(createdWallet2.id, id)
+        expect(extendedKey).toBe('a')
+        expect(() => walletService.get(createdWallet2.id)).toThrowError()
+        expect(walletService.get(id).name).toBe(wallet5.name)
+      }
     })
   })
 })
