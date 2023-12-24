@@ -32,8 +32,8 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
   }, [wallets])
 
   const handleGroupChange = useCallback(
-    value => {
-      const [extendedKey, id] = value.split('_')
+    (checked: string | number) => {
+      const [extendedKey, id] = (checked as string).split('_')
       const list: string[] = []
       wallets.forEach(item => {
         if (item.extendedKey === extendedKey) {
@@ -98,7 +98,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
           <div className={styles.groupWrap}>
             {groups.map(group => (
               <RadioGroup
-                inputIdPrefix="detect-dupliacte-wallet"
+                inputIdPrefix="detect-duplicate-wallet"
                 key={group[0].extendedKey}
                 defaultValue=""
                 onChange={handleGroupChange}

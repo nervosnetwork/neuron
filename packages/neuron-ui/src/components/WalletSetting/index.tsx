@@ -69,7 +69,7 @@ const WalletSetting = ({
   const [notice, setNotice] = useState('')
   const [showDetectDialog, setShowDetectDialog] = useState(false)
 
-  const hasDupliacteWallets = useMemo(() => {
+  const hasDuplicateWallets = useMemo(() => {
     const extendedKeys = wallets.map(item => item.extendedKey)
     const extendedKeySet = new Set(extendedKeys)
     return extendedKeys.length > extendedKeySet.size
@@ -192,7 +192,7 @@ const WalletSetting = ({
           </button>
         </Tooltip>
 
-        {hasDupliacteWallets ? (
+        {hasDuplicateWallets ? (
           <button type="button" className={styles.actionBtn} onClick={handleDetect}>
             <Detect /> {t('wizard.detect-duplicate-wallets')}
           </button>

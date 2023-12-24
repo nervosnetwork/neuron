@@ -71,8 +71,8 @@ const ReplaceDuplicateWalletDialog = ({
   const group = useMemo(() => wallets.filter(item => item.extendedKey === extendedKey), [wallets, extendedKey])
 
   const handleGroupChange = useCallback(
-    value => {
-      setSelectedId(value)
+    (checked: string | number) => {
+      setSelectedId(checked as string)
     },
     [setSelectedId]
   )
@@ -107,7 +107,7 @@ const ReplaceDuplicateWalletDialog = ({
         <p className={styles.detail}>{t('settings.wallet-manager.importing-existing.detail')}</p>
         <div className={styles.groupWrap}>
           <RadioGroup
-            inputIdPrefix="replace-dupliacte-wallet"
+            inputIdPrefix="replace-duplicate-wallet"
             defaultValue=""
             onChange={handleGroupChange}
             itemClassName={styles.radioItem}
