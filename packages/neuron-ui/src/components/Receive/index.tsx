@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 import Dialog from 'widgets/Dialog'
@@ -59,6 +59,7 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
   const [t] = useTranslation()
   const { wallet } = useGlobalState()
   const [isCopySuccess, setIsCopySuccess] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout>>()
   const { addresses } = wallet
   const isSingleAddress = addresses.length === 1
 
@@ -80,10 +81,11 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
     window.navigator.clipboard.writeText(showAddress)
     setIsCopySuccess(true)
 
-    setTimeout(() => {
+    clearTimeout(timer.current!)
+    timer.current = setTimeout(() => {
       setIsCopySuccess(false)
     }, 1000)
-  }, [showAddress, setIsCopySuccess])
+  }, [showAddress, setIsCopySuccess, timer])
 
   return (
     <Dialog
