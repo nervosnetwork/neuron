@@ -2,6 +2,7 @@ appId: com.nervos.neuron
 copyright: Copyright (C) 2019-2023 Nervos Foundation.
 productName: Neuron
 
+# This property will replace to false in package for test action
 asar: true
 
 directories:

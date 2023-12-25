@@ -6,7 +6,7 @@ import SUDTAvatar from 'widgets/SUDTAvatar'
 import Button from 'widgets/Button'
 import Table, { TableProps } from 'widgets/Table'
 import TextField from 'widgets/TextField'
-import { Download, Search, ArrowNext } from 'widgets/Icons/icon'
+import { Download, Search, ArrowNext, Clean } from 'widgets/Icons/icon'
 
 import PageContainer from 'components/PageContainer'
 import TransactionStatusWrap from 'components/TransactionStatusWrap'
@@ -47,6 +47,7 @@ const History = () => {
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
   const onSearch = useCallback(() => navigate(`${RoutePath.History}?keywords=${keywords}`), [navigate, keywords])
+  const onClean = useCallback(() => onKeywordsChange(undefined, ''), [onKeywordsChange])
   const onExport = useCallback(() => {
     setIsExporting(true)
     const timer = setTimeout(() => {
@@ -182,6 +183,13 @@ const History = () => {
                 <span className={styles.searchBoxPrefix}>
                   <Search onClick={onSearch} />
                 </span>
+              }
+              suffix={
+                keywords ? (
+                  <span className={styles.searchBoxSuffix}>
+                    <Clean onClick={onClean} />
+                  </span>
+                ) : null
               }
               placeholder={t('history.search.placeholder')}
               className={styles.tableHeaderInput}

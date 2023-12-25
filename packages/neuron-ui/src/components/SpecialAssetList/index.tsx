@@ -220,7 +220,7 @@ const SpecialAssetList = () => {
   }, [search, id, dispatch, fetchList])
 
   const handleActionSuccess = useCallback(
-    text => {
+    (text: string) => {
       setNotice(text)
       fetchList(id, pageNo)
     },

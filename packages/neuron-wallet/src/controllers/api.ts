@@ -404,6 +404,7 @@ export default class ApiController {
           fee: string
           feeRate: string
           consumeOutPoints?: CKBComponents.OutPoint[]
+          enableUseSentCell?: boolean
         }
       ) => {
         return this.#walletsController.generateTx(params)
@@ -420,6 +421,7 @@ export default class ApiController {
           fee: string
           feeRate: string
           consumeOutPoints: CKBComponents.OutPoint[]
+          enableUseSentCell?: boolean
         }
       ) => {
         return this.#walletsController.generateSendingAllTx(params)

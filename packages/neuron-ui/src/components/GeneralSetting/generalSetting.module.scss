@@ -85,6 +85,12 @@ $action-button-width: 11.25rem;
     background: var(--table-head-background-color);
     color: var(--dialog-secondary-text-color);
 
+    h1 {
+      &:first-child {
+        display: none;
+      }
+    }
+
     ul {
       list-style-type: disc;
       padding-left: 30px;

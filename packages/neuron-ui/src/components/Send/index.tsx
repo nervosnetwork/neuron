@@ -22,7 +22,7 @@ import { HIDE_BALANCE } from 'utils/const'
 
 import { isErrorWithI18n } from 'exceptions'
 import { useSearchParams } from 'react-router-dom'
-import { useInitialize } from './hooks'
+import { useInitialize, useSendWithSentCell } from './hooks'
 import styles from './send.module.scss'
 
 const SendHeader = ({ balance, useConsumeCell }: { balance: string; useConsumeCell: boolean }) => {
@@ -69,6 +69,7 @@ const Send = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
   const consumeOutPoints = useMemo(() => consumeCells?.map(v => v.outPoint), [useMemo])
+  const { enableUseSentCell, onChangeEnableUseSentCell } = useSendWithSentCell()
 
   const {
     outputs,
@@ -89,17 +90,18 @@ const Send = () => {
     isSendMax,
     onSendMaxClick: handleSendMaxClick,
     updateIsSendMax,
-  } = useInitialize(
+  } = useInitialize({
     walletID,
-    send.outputs,
-    send.generatedTx,
-    send.price,
+    items: send.outputs,
+    generatedTx: send.generatedTx,
+    price: send.price,
     sending,
     isMainnet,
+    enableUseSentCell,
+    consumeOutPoints,
     dispatch,
     t,
-    consumeOutPoints
-  )
+  })
 
   const [searchParams] = useSearchParams()
 
@@ -134,18 +136,19 @@ const Send = () => {
     [setLocktimeIndex, updateTransactionOutput]
   )
 
-  useOnTransactionChange(
+  useOnTransactionChange({
     walletID,
-    outputs,
-    send.price,
+    items: outputs,
+    price: send.price,
     isMainnet,
     dispatch,
     isSendMax,
     setTotalAmount,
     setErrorMessage,
     t,
-    consumeOutPoints
-  )
+    consumeOutPoints,
+    enableUseSentCell,
+  })
 
   let errorMessageUnderTotal = errorMessage
   try {
@@ -169,7 +172,7 @@ const Send = () => {
     !send.generatedTx ||
     outputs.some(v => !v.address)
 
-  const outputErrors = useOutputErrors(outputs, isMainnet)
+  const outputErrors = useOutputErrors(outputs, isMainnet, isSendMax)
 
   const isMaxBtnDisabled = (() => {
     try {
@@ -265,10 +268,21 @@ const Send = () => {
               />
             </div>
             <div className={styles.rightFooter}>
-              <Button type="reset" onClick={handleClear} label={t('send.reset')} />
-              <Button type="submit" disabled={disabled} label={t('send.send')}>
-                {sending ? <Spinner /> : (t('send.send') as string)}
-              </Button>
+              <label htmlFor="send-with-sent-cell" className={styles.allowUseSent}>
+                <input
+                  type="checkbox"
+                  id="send-with-sent-cell"
+                  checked={enableUseSentCell}
+                  onChange={onChangeEnableUseSentCell}
+                />
+                <span>{t('send.allow-use-sent-cell')}</span>
+              </label>
+              <div className={styles.actions}>
+                <Button type="reset" onClick={handleClear} label={t('send.reset')} />
+                <Button type="submit" disabled={disabled} label={t('send.send')}>
+                  {sending ? <Spinner /> : (t(enableUseSentCell ? 'send.submit-transaction' : 'send.send') as string)}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

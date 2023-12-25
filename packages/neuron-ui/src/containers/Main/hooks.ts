@@ -118,7 +118,7 @@ export const useSubscription = ({
   const { pageNo, pageSize, keywords } = chain.transactions
 
   const navigateToolsRouter = useCallback(
-    path => {
+    (path: string) => {
       const { pathname } = location
       const currentPath = [RoutePath.OfflineSign, RoutePath.SignVerify, RoutePath.MultisigAddress].find(item =>
         pathname.includes(item)
@@ -198,6 +198,7 @@ export const useSubscription = ({
       })
       CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
       currentNetworkIDCache.save(currentNetworkID)
+      updateAddressListAndBalance(walletID)(dispatch)
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
       if (isCurrentUrl(status.url)) {

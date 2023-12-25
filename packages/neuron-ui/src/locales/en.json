@@ -239,7 +239,9 @@
       "remove-receiving-address-msg": "Are you sure you want to remove the selected receiving address?",
       "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on",
-      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})"
+      "locktime-warning": "Please ensure that receiver's wallet can support expiration unlocking. (Note: 1.Exchanges generally do not support expiration unlocking {{extraNote}})",
+      "allow-use-sent-cell": "Unconfirmed Outputs are allowed in this transaction.",
+      "submit-transaction": "Submit the transaction"
     },
     "receive": {
       "title": "Receive",
@@ -678,7 +680,7 @@
       "cancel": "Cancel",
       "proceed": "Proceed",
       "compensation": "Compensation",
-      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days} days).",
+      "notice-wait-time": "Notice: You are initiating withdrawn and the final withdrawn will need to wait for {{epochs}} epochs {{blocks}} blocks (about {{days}} days).",
       "deposit-dialog-title": "Deposit",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. <br />Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
@@ -728,7 +730,7 @@
     "nervos-dao-detail": {
       "tx-detail": "Transaction Detail",
       "deposited": "Deposited",
-      "withdrawn": "Withdrawn",
+      "withdrawn": "Withdraw",
       "unlocked": "Unlocked",
       "basic-information": "Basic Information",
       "transaction-hash": "Transaction Hash",
