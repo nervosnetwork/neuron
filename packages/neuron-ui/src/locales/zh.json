@@ -406,28 +406,13 @@
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)"
       },
-      "clear-cache": {
-        "title": "清除缓存",
-        "options": {
-          "refresh": {
-            "label": "刷新缓存"
-          },
-          "rebuild": {
-            "label": "重建索引 (需要 30 ~ 50 分钟)"
-          }
-        },
-        "buttons": {
-          "cancel": "取消",
-          "ok": "确认"
-        }
-      },
       "data": {
         "ckb-node-data": "节点配置和数据",
         "set": "设置",
         "cache": "缓存",
         "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
-        "cache-cleared-on": "上次清空缓存时间 {{date}}",
-        "clear-cache": "清空缓存",
+        "cache-cleared-on": "上次刷新缓存时间 {{date}}",
+        "refresh": "刷新",
         "clearing-cache": "正在清除缓存中，请稍候",
         "clear-success": "已清除缓存",
         "set-path": "设置路径",

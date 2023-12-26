@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Spinner from 'widgets/Spinner'
 import Dialog from 'widgets/Dialog'
@@ -9,59 +9,23 @@ import { cacheClearDate } from 'services/localCache'
 import { isSuccessResponse, uniformTimeFormatter } from 'utils'
 import styles from './clearCache.module.scss'
 
-const I18N_PATH = 'settings.clear-cache'
-const IDs = {
-  submitClearCache: 'submit-clear-cache',
-  refreshCacheOption: 'refresh-cache-option',
-  rebuildCacheOption: 'rebuild-cache-option',
-}
-
 const ClearCacheDialog = ({
   dispatch,
   className,
   btnClassName,
-  hideRebuild,
 }: {
   dispatch: StateDispatch
   className?: string
   btnClassName?: string
-  hideRebuild?: boolean
 }) => {
   const [t] = useTranslation()
   const [clearedDate, setClearedDate] = useState(cacheClearDate.load())
   const [isClearing, setIsClearing] = useState(false)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isRebuild, setIsRebuild] = useState(false)
   const [notice, setNotice] = useState('')
 
-  const showDialog = useCallback(() => {
-    setIsDialogOpen(true)
-  }, [setIsDialogOpen])
-
-  const dismissDialog = useCallback(() => {
-    setIsDialogOpen(false)
-  }, [setIsDialogOpen])
-
-  const toggleIsRebuild = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setIsRebuild(e.target.checked)
-    },
-    [setIsRebuild]
-  )
-
-  useEffect(() => {
-    if (isDialogOpen) {
-      /* eslint-disable-next-line no-unused-expressions */
-      document.querySelector<HTMLButtonElement>(`#${IDs.submitClearCache}`)?.focus()
-    } else {
-      setIsRebuild(false)
-    }
-  }, [isDialogOpen, setIsRebuild])
-
   const handleSubmit = useCallback(() => {
-    setIsDialogOpen(false)
     setIsClearing(true)
-    clearCellCache({ resetIndexerData: isRebuild })
+    clearCellCache()
       .then(res => {
         if (isSuccessResponse(res) && res.result) {
           addPopup('clear-cache-successfully')(dispatch)
@@ -74,7 +38,7 @@ const ClearCacheDialog = ({
       .finally(() => {
         setIsClearing(false)
       })
-  }, [dispatch, setClearedDate, setIsDialogOpen, isRebuild])
+  }, [dispatch, setClearedDate])
 
   return (
     <>
@@ -83,10 +47,10 @@ const ClearCacheDialog = ({
         <button
           type="button"
           className={`${btnClassName} ${styles.clearBtn}`}
-          onClick={showDialog}
+          onClick={handleSubmit}
           disabled={isClearing}
         >
-          {t('settings.data.clear-cache')}
+          {t('settings.data.refresh')}
         </button>
       </div>
 
@@ -96,29 +60,6 @@ const ClearCacheDialog = ({
           <p>{t('settings.data.clearing-cache')}</p>
         </div>
       </Dialog>
-
-      <Dialog
-        show={isDialogOpen}
-        title={t(`${I18N_PATH}.title`)}
-        onConfirm={handleSubmit}
-        onCancel={dismissDialog}
-        confirmText={t('settings.data.confirm-clear')}
-        confirmProps={{ id: IDs.submitClearCache }}
-      >
-        <div className={styles.options}>
-          <label htmlFor={IDs.refreshCacheOption}>
-            <input type="checkbox" id={IDs.refreshCacheOption} checked disabled />
-            <span className={styles.highlight}>{t(`${I18N_PATH}.options.refresh.label`)}</span>
-          </label>
-          {hideRebuild ? null : (
-            <label htmlFor={IDs.rebuildCacheOption}>
-              <input type="checkbox" id={IDs.rebuildCacheOption} checked={isRebuild} onChange={toggleIsRebuild} />
-              <span>{t(`${I18N_PATH}.options.rebuild.label`)}</span>
-            </label>
-          )}
-        </div>
-      </Dialog>
-
       <Toast content={notice} onDismiss={() => setNotice('')} />
     </>
   )
