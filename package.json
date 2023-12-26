@@ -43,7 +43,7 @@
   "devDependencies": {
     "@babel/core": "7.23.6",
     "@types/jest": "27.5.2",
-    "@types/node": "18.19.3",
+    "@types/node": "20.10.5",
     "@types/npmlog": "7.0.0",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
@@ -67,6 +67,6 @@
     "react-i18next": ">=11.16.4"
   },
   "volta": {
-    "node": "18.19.0"
+    "node": "20.10.0"
   }
 }
