@@ -97,12 +97,7 @@ const DataSetting = () => {
         </div>
         <div className={styles.rightContainer}>
           {hiddenDataPath ? null : <PathItem path={prevPath} openPath={openPath} handleClick={onSetting} />}
-          <ClearCache
-            className={styles.item}
-            btnClassName={styles.itemBtn}
-            dispatch={dispatch}
-            hideRebuild={isLightClient}
-          />
+          <ClearCache className={styles.item} btnClassName={styles.itemBtn} dispatch={dispatch} />
         </div>
       </div>
 
