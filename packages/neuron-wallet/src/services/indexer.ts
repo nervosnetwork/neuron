@@ -1,12 +1,9 @@
 import path from 'path'
 import fs from 'fs'
 import logger from '../utils/logger'
-import SyncedBlockNumber from '../models/synced-block-number'
 import { clean as cleanChain } from '../database/chain'
 import SettingsService from './settings'
-import startMonitor, { stopMonitor } from './monitor'
 import { resetSyncTaskQueue } from '../block-sync-renderer'
-import NetworksService from './networks'
 
 export default class IndexerService {
   private constructor() {}
@@ -19,15 +16,8 @@ export default class IndexerService {
     return IndexerService.instance
   }
 
-  static clearCache = async (clearIndexerFolder = false) => {
+  static clearCache = async () => {
     await cleanChain()
-
-    if (NetworksService.getInstance().getCurrent().readonly && clearIndexerFolder) {
-      await stopMonitor('ckb')
-      IndexerService.getInstance().clearData()
-      await new SyncedBlockNumber().setNextBlock(BigInt(0))
-      await startMonitor('ckb', true)
-    }
     resetSyncTaskQueue.asyncPush(true)
   }
 

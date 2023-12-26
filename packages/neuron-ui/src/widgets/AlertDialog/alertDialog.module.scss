@@ -23,7 +23,9 @@
     line-height: 28px;
     margin: 0;
     color: var(--dialog-secondary-text-color);
-    word-break: break-word;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .actions {
