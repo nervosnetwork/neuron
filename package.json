@@ -30,6 +30,7 @@
     "build": "lerna run --stream build",
     "build:main": "lerna run build --scope=neuron-wallet",
     "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
+    "package:e2e": "yarn build && ./scripts/copy-ui-files.sh && npx ncp ./packages/neuron-wallet/dist/ ./packages/e2e/dist",
     "package:test": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/package-for-test.sh",
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider lerna run --parallel --load-env-files=false test",
     "test:ci": "yarn build:main && yarn test",

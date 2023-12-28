@@ -1,0 +1,25 @@
+{
+  "name": "@nervosnetwork/neuron-e2e",
+  "version": "0.112.0",
+  "description": "E2E tests of Neuron",
+  "author": "Keith <keithwhisper@gmail.com>",
+  "homepage": "https://github.com/nervosnetwork/neuron#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nervosnetwork/neuron.git"
+  },
+  "scripts": {
+    "build:e2e": "cd .. && yarn package:e2e",
+    "test:e2e": "npx cross-env NODE_ENV=test npx playwright test"
+  },
+  "bugs": {
+    "url": "https://github.com/nervosnetwork/neuron/issues"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.40.1",
+    "playwright": "1.40.1"
+  }
+}
