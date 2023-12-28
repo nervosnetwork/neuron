@@ -596,8 +596,8 @@ export default class ApiController {
       new UpdateController(false).quitAndInstall()
     })
 
-    handle('clear-cache', async (_, params: { resetIndexerData: boolean } | null) => {
-      await IndexerService.clearCache(params?.resetIndexerData)
+    handle('clear-cache', async () => {
+      await IndexerService.clearCache()
       return { status: ResponseCode.Success, result: true }
     })
 

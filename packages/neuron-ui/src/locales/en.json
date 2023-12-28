@@ -413,28 +413,13 @@
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)"
       },
-      "clear-cache": {
-        "title": "Clear Cache",
-        "options": {
-          "refresh": {
-            "label": "Refresh"
-          },
-          "rebuild": {
-            "label": "Fully rebuild index (cost extra 30 ~ 50 min)"
-          }
-        },
-        "buttons": {
-          "cancel": "Cancel",
-          "ok": "OK"
-        }
-      },
       "data": {
         "ckb-node-data": "CKB Node Config & Storage",
         "set": "Set",
         "cache": "Cache",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
-        "cache-cleared-on": "Cache cleared on {{date}}",
-        "clear-cache": "Clear Cache",
+        "cache-cleared-on": "Refreshed cache on {{date}}",
+        "refresh": "Refresh",
         "clearing-cache": "Clearing Cache, please wait a moment",
         "clear-success": "Cache Cleared",
         "set-path": "Set Path",

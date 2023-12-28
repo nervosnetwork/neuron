@@ -33,7 +33,7 @@ export type VerifyExternalCkbNodeRes =
   | undefined
 export const verifyExternalCkbNode = remoteApi<void, VerifyExternalCkbNodeRes>('verify-external-ckb-node')
 
-export const clearCellCache = remoteApi<Controller.ClearCache.Params>('clear-cache')
+export const clearCellCache = remoteApi<void, boolean>('clear-cache')
 
 export const invokeShowErrorMessage = remoteApi<{ title: string; content: string }>('show-error-message')
 export const invokeShowOpenDialog = remoteApi<OpenDialogOptions, OpenDialogReturnValue>('show-open-dialog')
