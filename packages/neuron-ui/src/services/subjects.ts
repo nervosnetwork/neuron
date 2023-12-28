@@ -1,5 +1,5 @@
 import { CONSTANTS } from 'utils'
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, type IpcRendererEvent } from 'electron'
 
 const { LOCALES } = CONSTANTS
 
@@ -37,7 +37,7 @@ const SubjectConstructor = <T>(
   return ipcRenderer
     ? {
         subscribe: (handler: (data: T) => void) => {
-          const handlerWrap = (_e: Event, data: T) => {
+          const handlerWrap = (_e: IpcRendererEvent, data: T) => {
             handler(data)
           }
           ipcRenderer.on(channel, handlerWrap)
