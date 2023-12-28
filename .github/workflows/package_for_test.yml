@@ -211,7 +211,7 @@ jobs:
     steps:
       - name: Comment by push event
         if: ${{ github.event_name == 'push' }}
-        uses: peter-evans/commit-comment@v2
+        uses: peter-evans/commit-comment@v3
         with:
           body: |
             Packaging for test is done in [${{ github.run_id }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
