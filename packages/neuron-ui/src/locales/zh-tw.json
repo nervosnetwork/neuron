@@ -144,7 +144,9 @@
       "send": "轉賬",
       "receive": "收款",
       "locked": "已鎖定餘額",
-      "locked-balance": "已鎖定余額"
+      "locked-balance": "已鎖定余額",
+      "first-sync-notice": "首次同步數據至少需要 {{size}} GB的磁盤空間，<br />並且數據大小會隨著時間增長，建議選擇較大磁盤空間來存儲數據。",
+      "start-sync": "開始同步"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -528,7 +530,8 @@
       "verification-failure": "驗證失敗",
       "back": "上一步",
       "switch-to-light": "開啟日間模式",
-      "switch-to-dark": "開啟夜間模式"
+      "switch-to-dark": "開啟夜間模式",
+      "ckb-node-data-path": "CKB 節點數據路徑"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -1114,6 +1117,11 @@
         "body-tips-with-network": "\"Internal Node\" 僅用於連接內置節點，請選擇以下網絡選項或添加新的網絡選項以連接外部節點。",
         "add-network": "添加網絡",
         "ignore-external-node": "忽略外部節點"
+      },
+      "no-disk-space-dialog": {
+        "tip": "由於磁盤空間不足，同步已停止。 <br /> 請分配更多磁盤空間或將數據遷移到其他磁盤。",
+        "continue-sync": "繼續同步",
+        "migrate-data": "遷移數據"
       }
     },
     "cell-manage": {

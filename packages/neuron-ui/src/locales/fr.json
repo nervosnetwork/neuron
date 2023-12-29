@@ -150,7 +150,9 @@
       "send": "Envoyer",
       "receive": "Recevoir",
       "locked": "Montant verrouillé",
-      "locked-balance": "Solde verrouillé"
+      "locked-balance": "Solde verrouillé",
+      "first-sync-notice": "La synchronisation initiale nécessite au moins {{size}} Go d'espace disque, la taille des données augmentera avec le temps. Il est recommandé de choisir un espace disque plus important pour stocker les données.",
+      "start-sync": "Démarrer la synchronisation"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenue sur Neuron",
@@ -534,7 +536,8 @@
       "verification-failure": "Échec de la vérification",
       "back": "Retour",
       "switch-to-light": "Passer en mode clair",
-      "switch-to-dark": "Passer en mode sombre"
+      "switch-to-dark": "Passer en mode sombre",
+      "ckb-node-data-path": "CKB Chemin des données du nœud"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -1143,6 +1146,11 @@
         "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
         "ignore-external-node": "Ignorer le noeud externe"
+      },
+      "no-disk-space-dialog": {
+        "tip": "En raison d'un espace disque insuffisant, la synchronisation a été interrompue. <br /> Veuillez allouer plus d'espace disque ou migrer les données vers un autre disque.",
+        "continue-sync": "Continuer la synchronisation",
+        "migrate-data": "Migration des données"
       }
     },
     "cell-manage": {

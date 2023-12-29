@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 import {
   shannonToCKBFormatter,
@@ -34,6 +34,9 @@ import CopyZone from 'widgets/CopyZone'
 import { HIDE_BALANCE } from 'utils/const'
 import TransactionType from 'components/TransactionType'
 import { getLockedBalance } from 'services/remote/cellManage'
+import { getFirstSyncInfo, setCkbNodeDataPath, startSync } from 'services/remote'
+import FirstSync from 'widgets/Icons/FirstSync.png'
+import DataPathDialog from 'widgets/DataPathDialog'
 import styles from './overview.module.scss'
 
 const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
@@ -125,6 +128,39 @@ const Overview = () => {
     getLockedBalance().then(res => {
       if (isSuccessResponse(res) && res.result) {
         setLockedBalance(res.result)
+      }
+    })
+  }, [])
+  const [isFirstSyncDialogShow, setIsFirstSyncDialogShow] = useState(false)
+  const [ckbNodeDataInfo, setCkbNodeDataInfo] = useState<{ size?: number; dataPath?: string } | undefined>()
+  useEffect(() => {
+    getFirstSyncInfo().then(res => {
+      if (isSuccessResponse(res) && res.result) {
+        setIsFirstSyncDialogShow(res.result.isFirstSync)
+        setCkbNodeDataInfo({ size: res.result.needSize, dataPath: res.result.ckbNodeDataPath })
+      }
+    })
+  }, [])
+  const onChangeDataPath = useCallback((newDataPath: string) => {
+    setCkbNodeDataPath({
+      dataPath: newDataPath,
+      onlySetPath: true,
+    }).then(res => {
+      if (isSuccessResponse(res)) {
+        setCkbNodeDataInfo(v => ({
+          size: v?.size,
+          dataPath: newDataPath,
+        }))
+      }
+    })
+  }, [])
+  const onCancel = useCallback(() => {
+    setIsFirstSyncDialogShow(false)
+  }, [])
+  const onStartSync = useCallback(() => {
+    startSync().then(res => {
+      if (isSuccessResponse(res)) {
+        setIsFirstSyncDialogShow(false)
       }
     })
   }, [])
@@ -264,6 +300,16 @@ const Overview = () => {
 
       {showReceive ? <Receive onClose={() => setShowReceive(false)} /> : null}
       {showAddressBook ? <AddressBook onClose={() => setShowAddressBook(false)} /> : null}
+      <DataPathDialog
+        show={isFirstSyncDialogShow}
+        confirmText={t('overview.start-sync')}
+        icon={<img className={styles.firstSyncIcon} src={FirstSync} alt="First Sync" />}
+        text={<Trans i18nKey="overview.first-sync-notice" values={{ size: ckbNodeDataInfo?.size }} />}
+        dataPath={ckbNodeDataInfo?.dataPath ?? ''}
+        onChangeDataPath={onChangeDataPath}
+        onCancel={onCancel}
+        onConfirm={onStartSync}
+      />
     </PageContainer>
   )
 }

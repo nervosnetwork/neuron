@@ -50,6 +50,8 @@ type Action =
   | 'set-theme'
   | 'verify-external-ckb-node'
   | 'start-node-ignore-external'
+  | 'get-first-sync-info'
+  | 'start-sync'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
