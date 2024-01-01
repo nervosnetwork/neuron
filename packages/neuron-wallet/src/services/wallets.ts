@@ -277,7 +277,7 @@ export default class WalletService {
   private listStore: Store // Save wallets (meta info except keystore, which is persisted separately)
   private walletsKey = 'wallets'
   private currentWalletKey = 'current'
-  private tmpWallet: Wallet | undefined
+  private importedWallet: Wallet | undefined
 
   public static getInstance = () => {
     if (!WalletService.instance) {
@@ -384,7 +384,7 @@ export default class WalletService {
     }
 
     if (this.getAll().find(item => item.extendedKey === props.extendedKey)) {
-      this.tmpWallet = wallet
+      this.importedWallet = wallet
       throw new ImportingExitingWallet(JSON.stringify({ extendedKey: props.extendedKey, id }))
     }
 
@@ -394,35 +394,30 @@ export default class WalletService {
     return wallet
   }
 
-  public replace = async (id: string, tmpId: string) => {
-    const wallet = this.get(id)
-    if (!wallet || !this.tmpWallet) {
-      throw new WalletNotFound(id)
+  public replace = async (existingWalletId: string, importedWalletId: string) => {
+    const wallet = this.get(existingWalletId)
+    if (!wallet || !this.importedWallet) {
+      throw new WalletNotFound(existingWalletId)
     }
 
-    const tmp = this.tmpWallet?.toJSON()
-    if (tmpId !== tmp.id) {
-      throw new WalletNotFound(tmpId)
+    const newWallet = this.importedWallet?.toJSON()
+    if (importedWalletId !== newWallet.id) {
+      throw new WalletNotFound(importedWalletId)
     }
-    if (wallet.toJSON().extendedKey !== tmp.extendedKey) {
+    if (wallet.toJSON().extendedKey !== newWallet.extendedKey) {
       throw new Error('The wallets are not the same and cannot be replaced.')
     }
 
     const wallets = this.getAll()
 
-    this.listStore.writeSync(this.walletsKey, [...wallets, tmp])
+    this.listStore.writeSync(this.walletsKey, [...wallets, newWallet])
 
-    const current = this.getCurrent()
-    const currentID = current ? current.id : ''
+    this.setCurrent(newWallet.id)
 
-    if (currentID === id) {
-      this.setCurrent(tmp.id)
-    }
+    await AddressService.deleteByWalletId(existingWalletId)
 
-    await AddressService.deleteByWalletId(id)
-
-    const newWallets = wallets.filter(w => w.id !== id)
-    this.listStore.writeSync(this.walletsKey, [...newWallets, tmp])
+    const newWallets = wallets.filter(w => w.id !== existingWalletId)
+    this.listStore.writeSync(this.walletsKey, [...newWallets, newWallet])
 
     if (!wallet.isHardware()) {
       wallet.deleteKeystore()

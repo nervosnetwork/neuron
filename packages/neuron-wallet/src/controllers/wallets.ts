@@ -632,9 +632,9 @@ export default class WalletsController {
     }
   }
 
-  public async replaceWallet(id: string, tmpId: string): Promise<Controller.Response<any>> {
+  public async replaceWallet(existingWalletId: string, importedWalletId: string): Promise<Controller.Response<any>> {
     const walletsService = WalletsService.getInstance()
-    await walletsService.replace(id, tmpId)
+    await walletsService.replace(existingWalletId, importedWalletId)
 
     return {
       status: ResponseCode.Success,

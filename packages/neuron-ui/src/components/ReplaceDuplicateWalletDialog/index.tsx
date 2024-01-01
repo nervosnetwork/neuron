@@ -10,11 +10,11 @@ import styles from './replaceDuplicateWalletDialog.module.scss'
 
 const useReplaceDuplicateWallet = () => {
   const [extendedKey, setExtendedKey] = useState('')
-  const [tmpId, setTmpId] = useState('')
+  const [importedWalletId, setImportedWalletId] = useState('')
 
   const onClose = useCallback(() => {
-    setTmpId('')
-  }, [setTmpId])
+    setImportedWalletId('')
+  }, [setImportedWalletId])
 
   const onImportingExitingWalletError = (
     message:
@@ -29,14 +29,14 @@ const useReplaceDuplicateWallet = () => {
       if (msg) {
         const obj = JSON.parse(msg)
         setExtendedKey(obj.extendedKey)
-        setTmpId(obj.id)
+        setImportedWalletId(obj.id)
       }
     } catch (error) {
       onClose()
     }
   }
 
-  const show = useMemo(() => !!extendedKey && !!tmpId, [tmpId, extendedKey])
+  const show = useMemo(() => !!extendedKey && !!importedWalletId, [importedWalletId, extendedKey])
 
   return {
     onImportingExitingWalletError,
@@ -44,7 +44,7 @@ const useReplaceDuplicateWallet = () => {
       show,
       onClose,
       extendedKey,
-      tmpId,
+      importedWalletId,
     },
   }
 }
@@ -53,12 +53,12 @@ const ReplaceDuplicateWalletDialog = ({
   show,
   onClose,
   extendedKey,
-  tmpId,
+  importedWalletId,
 }: {
   show: boolean
   onClose: () => void
   extendedKey: string
-  tmpId: string
+  importedWalletId: string
 }) => {
   const {
     settings: { wallets = [] },
@@ -79,8 +79,8 @@ const ReplaceDuplicateWalletDialog = ({
 
   const onConfirm = useCallback(async () => {
     replaceWallet({
-      id: selectedId,
-      tmpId,
+      existingWalletId: selectedId,
+      importedWalletId,
     })
       .then(res => {
         if (isSuccessResponse(res)) {

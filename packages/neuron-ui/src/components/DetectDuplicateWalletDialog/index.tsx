@@ -4,7 +4,6 @@ import Dialog from 'widgets/Dialog'
 import RadioGroup from 'widgets/RadioGroup'
 import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import { requestPassword } from 'services/remote'
-import PasswordRequest from 'components/PasswordRequest'
 import styles from './detectDuplicateWalletDialog.module.scss'
 
 const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
@@ -84,35 +83,32 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
   }, [wallets, deletableWallets, requestPassword, onClose, dispatch])
 
   return (
-    <>
-      <Dialog
-        show
-        title={t('settings.wallet-manager.detected-duplicate.title')}
-        onCancel={onClose}
-        onConfirm={onConfirm}
-        disabled={deletableWallets.length === 0}
-      >
-        <div className={styles.content}>
-          <p className={styles.detail}>{t('settings.wallet-manager.detected-duplicate.detail')}</p>
-          <div className={styles.groupWrap}>
-            {groups.map(group => (
-              <RadioGroup
-                inputIdPrefix="detect-duplicate-wallet"
-                key={group[0].extendedKey}
-                defaultValue=""
-                onChange={handleGroupChange}
-                itemClassName={styles.radioItem}
-                options={group.map(wallet => ({
-                  value: `${wallet.extendedKey}_${wallet.id}`,
-                  label: <span className={styles.walletName}>{wallet.name}</span>,
-                }))}
-              />
-            ))}
-          </div>
+    <Dialog
+      show
+      title={t('settings.wallet-manager.detected-duplicate.title')}
+      onCancel={onClose}
+      onConfirm={onConfirm}
+      disabled={deletableWallets.length === 0}
+    >
+      <div className={styles.content}>
+        <p className={styles.detail}>{t('settings.wallet-manager.detected-duplicate.detail')}</p>
+        <div className={styles.groupWrap}>
+          {groups.map(group => (
+            <RadioGroup
+              inputIdPrefix="detect-duplicate-wallet"
+              key={group[0].extendedKey}
+              defaultValue=""
+              onChange={handleGroupChange}
+              itemClassName={styles.radioItem}
+              options={group.map(wallet => ({
+                value: `${wallet.extendedKey}_${wallet.id}`,
+                label: <span className={styles.walletName}>{wallet.name}</span>,
+              }))}
+            />
+          ))}
         </div>
-      </Dialog>
-      <PasswordRequest />
-    </>
+      </div>
+    </Dialog>
   )
 }
 
