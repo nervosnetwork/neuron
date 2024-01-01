@@ -15,42 +15,74 @@ import { useCopyAndDownloadQrCode, useSwitchAddress } from './hooks'
 type AddressTransformWithCopyZoneProps = {
   showAddress: string
   isInShortFormat: boolean
-  className?: string
   onClick: () => void
 }
 
-export const AddressTransformWithCopyZone = ({
+export const AddressQrCodeWithCopyZone = ({
   showAddress,
   isInShortFormat,
   onClick,
-  className,
 }: AddressTransformWithCopyZoneProps) => {
   const [t] = useTranslation()
   const transformLabel = t(
     isInShortFormat ? 'receive.turn-into-full-version-format' : 'receive.turn-into-deprecated-format'
   )
 
+  const [isCopySuccess, setIsCopySuccess] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const { ref, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
+
   const stopPropagation = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation()
   }, [])
+  const onCopyAddress = useCallback(() => {
+    window.navigator.clipboard.writeText(showAddress)
+    setIsCopySuccess(true)
+
+    clearTimeout(timer.current!)
+    timer.current = setTimeout(() => {
+      setIsCopySuccess(false)
+    }, 1000)
+  }, [showAddress, setIsCopySuccess, timer])
 
   return (
-    <div className={className}>
-      <CopyZone content={showAddress} className={styles.showAddress}>
-        {showAddress}
-      </CopyZone>
-      <button
-        type="button"
-        className={styles.addressToggle}
-        onClick={onClick}
-        title={transformLabel}
-        onFocus={stopPropagation}
-        onMouseOver={stopPropagation}
-        onMouseUp={stopPropagation}
-      >
-        <AddressTransform />
-        {transformLabel}
-      </button>
+    <div className={styles.addressRoot}>
+      <div className={styles.qrCode} data-copy-success-text={t('common.copied')}>
+        <QRCode value={showAddress} size={128} includeMargin ref={ref} />
+        <div className={styles.actions}>
+          <Button type="text" className={styles.actionBtn} onClick={onDownloadQrCode}>
+            <Download />
+          </Button>
+          {isCopySuccess ? (
+            <Button type="text">
+              <SuccessNoBorder />
+            </Button>
+          ) : (
+            <Button type="text" className={styles.actionBtn} onClick={onCopyAddress}>
+              <Copy />
+            </Button>
+          )}
+        </div>
+        {showCopySuccess && <Toast content={t('common.copied')} />}
+      </div>
+
+      <div className={styles.copyAddress}>
+        <CopyZone content={showAddress} className={styles.showAddress}>
+          {showAddress}
+        </CopyZone>
+        <button
+          type="button"
+          className={styles.addressToggle}
+          onClick={onClick}
+          title={transformLabel}
+          onFocus={stopPropagation}
+          onMouseOver={stopPropagation}
+          onMouseUp={stopPropagation}
+        >
+          <AddressTransform />
+          {transformLabel}
+        </button>
+      </div>
     </div>
   )
 }
@@ -58,8 +90,6 @@ export const AddressTransformWithCopyZone = ({
 const Receive = ({ onClose, address }: { onClose?: () => void; address?: string }) => {
   const [t] = useTranslation()
   const { wallet } = useGlobalState()
-  const [isCopySuccess, setIsCopySuccess] = useState(false)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
   const { addresses } = wallet
   const isSingleAddress = addresses.length === 1
 
@@ -75,17 +105,6 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
   }
 
   const { isInShortFormat, setIsInShortFormat, address: showAddress } = useSwitchAddress(accountAddress)
-  const { ref, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
-
-  const onCopyAddress = useCallback(() => {
-    window.navigator.clipboard.writeText(showAddress)
-    setIsCopySuccess(true)
-
-    clearTimeout(timer.current!)
-    timer.current = setTimeout(() => {
-      setIsCopySuccess(false)
-    }, 1000)
-  }, [showAddress, setIsCopySuccess, timer])
 
   return (
     <Dialog
@@ -102,37 +121,15 @@ const Receive = ({ onClose, address }: { onClose?: () => void; address?: string 
       showFooter={false}
       className={styles.dialog}
     >
-      <div className={styles.addressRoot}>
-        <div className={styles.qrCode} data-copy-success-text={t('common.copied')}>
-          <QRCode value={showAddress} size={128} includeMargin ref={ref} />
-          <div className={styles.actions}>
-            <Button type="text" className={styles.actionBtn} onClick={onDownloadQrCode}>
-              <Download />
-            </Button>
-            {isCopySuccess ? (
-              <Button type="text">
-                <SuccessNoBorder />
-              </Button>
-            ) : (
-              <Button type="text" className={styles.actionBtn} onClick={onCopyAddress}>
-                <Copy />
-              </Button>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.copyAddress}>
-          <AddressTransformWithCopyZone
-            showAddress={showAddress}
-            isInShortFormat={isInShortFormat}
-            onClick={() => setIsInShortFormat(is => !is)}
-          />
-        </div>
+      <div>
+        <AddressQrCodeWithCopyZone
+          showAddress={showAddress}
+          isInShortFormat={isInShortFormat}
+          onClick={() => setIsInShortFormat(is => !is)}
+        />
 
         {isSingleAddress && <VerifyHardwareAddress address={accountAddress} wallet={wallet} onClose={onClose} />}
       </div>
-
-      {showCopySuccess && <Toast content={t('common.copied')} />}
     </Dialog>
   )
 }
