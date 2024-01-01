@@ -112,7 +112,7 @@
         "partially-signed": "Partially Signed",
         "signed": "Signed"
       },
-      "import-signed-transaction": "Import signed transaction",
+      "import-signed-transaction": "Import a signed transaction",
       "import-signed-transaction-detail": "You have imported a signed transaction, please confirm and try again.",
       "wallet": "Wallet:",
       "content": "Content:",
@@ -122,11 +122,12 @@
       "actions": {
         "broadcast": "Broadcast",
         "sign": "Sign and export",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "view-in-explorer": "View in Explorer"
       },
       "broadcast-transaction": "Broadcast Transaction",
-      "import-unsigned-transaction": "Import unsigned transaction",
-      "import-unsigned-transaction-detail": "You have imported a unsigned transaction, please confirm and try again."
+      "import-unsigned-transaction": "Import an unsigned transaction",
+      "import-unsigned-transaction-detail": "You have imported an unsigned transaction, please confirm and try again."
     },
     "overview": {
       "date": "Date",

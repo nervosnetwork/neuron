@@ -115,7 +115,8 @@
       "actions": {
         "broadcast": "广播交易",
         "sign": "签名并导出",
-        "cancel": "取消"
+        "cancel": "取消",
+        "view-in-explorer": "在浏览器中查看"
       },
       "broadcast-transaction": "广播交易",
       "import-unsigned-transaction": "导入未签名",

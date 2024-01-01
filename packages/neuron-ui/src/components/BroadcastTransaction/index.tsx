@@ -1,11 +1,17 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { isSuccessResponse, RoutePath, useDidMount, useGoBack } from 'utils'
+import { isSuccessResponse, RoutePath, isMainnet as isMainnetUtil, useDidMount, useGoBack, getExplorerUrl } from 'utils'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { useDispatch, useState as useGlobalState } from 'states'
-import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
+import {
+  broadcastTransactionOnly,
+  getCurrentWallet,
+  OfflineSignStatus,
+  openExternal,
+  getLiveCells,
+} from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 
 import styles from './broadcastTransaction.module.scss'
@@ -13,13 +19,17 @@ import styles from './broadcastTransaction.module.scss'
 const BroadcastTransaction = () => {
   const {
     app: { loadedTransaction = {} },
+    chain: { networkID },
+    settings: { networks },
   } = useGlobalState()
 
   const [wallet, setWallet] = useState<State.Wallet | null>(null)
   const [isBroadCasting, setIsBroadcasting] = useState(false)
+  const [broadCastedTxHash, setBroadCastedTxHash] = useState('')
   const [t] = useTranslation()
   const dispatch = useDispatch()
   const [errMsg, setErrMsg] = useState('')
+  const isMainnet = isMainnetUtil(networks, networkID)
 
   const { filePath, json } = loadedTransaction
 
@@ -35,21 +45,38 @@ const BroadcastTransaction = () => {
 
   const navigate = useNavigate()
   const onBroadcast = useCallback(async () => {
+    if (broadCastedTxHash) {
+      openExternal(`${getExplorerUrl(isMainnet)}/transaction/${broadCastedTxHash}`)
+      return
+    }
+
     setIsBroadcasting(true)
+
     try {
-      const res = await broadcastTransaction({
+      const res = await broadcastTransactionOnly({
         ...json,
-        walletID: wallet!.id,
       })
       if (isSuccessResponse(res)) {
-        navigate(RoutePath.History)
+        getLiveCells().then(cellRes => {
+          if (isSuccessResponse(cellRes) && cellRes.result) {
+            const cellWithTransaction = cellRes.result.find(item => item.outPoint.txHash === res.result)
+
+            if (cellWithTransaction) {
+              navigate(RoutePath.History)
+            }
+          }
+
+          if (res.result) {
+            setBroadCastedTxHash(res.result)
+          }
+        })
       } else {
         setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
       }
     } finally {
       setIsBroadcasting(false)
     }
-  }, [wallet, json, navigate, dispatch])
+  }, [wallet, json, navigate, dispatch, broadCastedTxHash, setBroadCastedTxHash])
 
   useDidMount(() => {
     getCurrentWallet().then(res => {
@@ -66,7 +93,9 @@ const BroadcastTransaction = () => {
         title={t('offline-sign.broadcast-transaction')}
         cancelText={t('offline-sign.actions.cancel')}
         onCancel={onBack}
-        confirmText={t('offline-sign.actions.broadcast')}
+        confirmText={
+          broadCastedTxHash ? t('offline-sign.actions.view-in-explorer') : t('offline-sign.actions.broadcast')
+        }
         isLoading={isBroadCasting}
         onConfirm={onBroadcast}
       >

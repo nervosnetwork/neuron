@@ -132,6 +132,7 @@ type Action =
   // offline-signature
   | 'export-transaction-as-json'
   | 'sign-transaction-only'
+  | 'broadcast-transaction'
   | 'broadcast-transaction-only'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'

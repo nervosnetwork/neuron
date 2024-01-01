@@ -196,4 +196,13 @@ export default class OfflineSignController {
       }
     }
   }
+
+  public async broadcastTransactionOnly({ transaction }: OfflineSignJSON) {
+    const tx = Transaction.fromObject(transaction)
+    const hash = await new TransactionSender().broadcastTx('', tx)
+    return {
+      status: ResponseCode.Success,
+      result: hash,
+    }
+  }
 }
