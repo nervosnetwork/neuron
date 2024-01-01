@@ -16,9 +16,9 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
   const [t] = useTranslation()
 
   const groups = useMemo(() => {
-    const obj = {} as {
+    const obj: {
       [key: string]: State.WalletIdentity[]
-    }
+    } = {}
     wallets.forEach(item => {
       if (item.extendedKey in obj) {
         obj[item.extendedKey].push(item)
@@ -31,7 +31,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
   }, [wallets])
 
   const handleGroupChange = useCallback(
-    (checked: string | number) => {
+    (checked: string) => {
       const [extendedKey, id] = (checked as string).split('_')
       const list: string[] = []
       wallets.forEach(item => {

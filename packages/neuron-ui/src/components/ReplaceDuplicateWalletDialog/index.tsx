@@ -71,7 +71,7 @@ const ReplaceDuplicateWalletDialog = ({
   const group = useMemo(() => wallets.filter(item => item.extendedKey === extendedKey), [wallets, extendedKey])
 
   const handleGroupChange = useCallback(
-    (checked: string | number) => {
+    (checked: string) => {
       setSelectedId(checked as string)
     },
     [setSelectedId]
