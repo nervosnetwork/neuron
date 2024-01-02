@@ -43,7 +43,7 @@ import NetworksService from './networks'
 import { generateRPC } from '../utils/ckb-rpc'
 import CellsService from './cells'
 import hd from '@ckb-lumos/hd'
-import { getClusterCellByOutPoint } from '@spore-sdk/core'
+import { getClusterByOutPoint } from '@spore-sdk/core'
 import CellDep, { DepType } from '../models/chain/cell-dep'
 import { dao } from '@ckb-lumos/common-scripts'
 
@@ -606,7 +606,7 @@ export default class TransactionSender {
 
     // https://github.com/sporeprotocol/spore-sdk/blob/05f2cbe1c03d03e334ebd3b440b5b3b20ec67da7/packages/core/src/api/joints/spore.ts#L154-L158
     const clusterDep = await (async () => {
-      const clusterCell = await getClusterCellByOutPoint(outPoint, assetAccountInfo.getSporeConfig(rpcUrl)).then(
+      const clusterCell = await getClusterByOutPoint(outPoint, assetAccountInfo.getSporeConfig(rpcUrl)).then(
         _ => _,
         () => undefined
       )
