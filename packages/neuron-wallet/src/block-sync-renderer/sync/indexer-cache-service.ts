@@ -219,13 +219,12 @@ export default class IndexerCacheService {
         continue
       }
 
-      for (const { lockHash, address } of mappings) {
+      for (const { lockHash } of mappings) {
         indexerCaches.push(
           IndexerTxHashCache.fromObject({
             txHash: transaction.hash!,
             blockNumber: parseInt(transaction.blockNumber!),
             lockHash,
-            address,
             walletId: this.walletId,
           })
         )
@@ -267,7 +266,6 @@ export default class IndexerCacheService {
         txHash: v.txHash,
         blockNumber: parseInt(v.blockNumber!),
         lockHash: v.lockHash,
-        address: v.address,
         walletId: v.walletId,
       })
     )
