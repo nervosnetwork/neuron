@@ -160,8 +160,8 @@ describe('test for multisig controller', () => {
   })
 
   it('get config', async () => {
-    await multisigController.getConfig('abcd')
-    expect(MultiSigServiceMock.prototype.getMultisigConfig).toHaveBeenCalledWith('abcd')
+    await multisigController.getConfig()
+    expect(MultiSigServiceMock.prototype.getMultisigConfig).toHaveBeenCalledWith()
   })
 
   describe('import config', () => {

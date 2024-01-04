@@ -87,8 +87,10 @@ describe('multisig service', () => {
       await expect(multisigService.saveMultisigConfig(defaultMultisigConfig)).rejects.toThrow()
     })
     it('save success', async () => {
-      defaultMultisigConfig.walletId = 'walletId1'
-      const res = await multisigService.saveMultisigConfig(defaultMultisigConfig)
+      const anotherConfig = MultisigConfig.fromModel(multisigConfigModel)
+      anotherConfig.lastestBlockNumber = '0x0'
+      anotherConfig.r = 2
+      const res = await multisigService.saveMultisigConfig(anotherConfig)
       const count = await getConnection()
         .getRepository(MultisigConfig)
         .createQueryBuilder()
@@ -97,7 +99,6 @@ describe('multisig service', () => {
         })
         .getCount()
       expect(count).toBe(1)
-      defaultMultisigConfig.walletId = 'walletId'
     })
   })
 
@@ -127,12 +128,8 @@ describe('multisig service', () => {
   })
 
   describe('test get config', () => {
-    it('no config', async () => {
-      const configs = await multisigService.getMultisigConfig('noconfigwallet')
-      expect(configs).toHaveLength(0)
-    })
     it('has config wallet', async () => {
-      const configs = await multisigService.getMultisigConfig(multisigConfigModel.walletId)
+      const configs = await multisigService.getMultisigConfig()
       expect(configs).toHaveLength(1)
     })
   })

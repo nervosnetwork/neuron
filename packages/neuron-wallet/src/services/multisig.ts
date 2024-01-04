@@ -11,7 +11,6 @@ import NetworksService from './networks'
 import Multisig from '../models/multisig'
 import SyncProgress, { SyncAddressType } from '../database/chain/entities/sync-progress'
 import { NetworkType } from '../models/network'
-import WalletService from './wallets'
 import logger from '../utils/logger'
 
 const max64Int = '0x' + 'f'.repeat(16)
@@ -21,7 +20,6 @@ export default class MultisigService {
       .getRepository(MultisigConfig)
       .createQueryBuilder()
       .where({
-        walletId: multisigConfig.walletId,
         r: multisigConfig.r,
         m: multisigConfig.m,
         n: multisigConfig.n,
@@ -69,13 +67,10 @@ export default class MultisigService {
     return { ...result, ...params }
   }
 
-  async getMultisigConfig(walletId: string) {
+  async getMultisigConfig() {
     const result = await getConnection()
       .getRepository(MultisigConfig)
       .createQueryBuilder()
-      .where({
-        walletId,
-      })
       .orderBy('id', 'DESC')
       .getMany()
     return result
@@ -340,14 +335,7 @@ export default class MultisigService {
   }
 
   static async getMultisigConfigForLight() {
-    const currentWallet = WalletService.getInstance().getCurrent()
-    const multisigConfigs = await getConnection()
-      .getRepository(MultisigConfig)
-      .createQueryBuilder()
-      .where({
-        walletId: currentWallet?.id,
-      })
-      .getMany()
+    const multisigConfigs = await getConnection().getRepository(MultisigConfig).createQueryBuilder().getMany()
     return multisigConfigs.map(v => ({
       walletId: v.walletId,
       script: Multisig.getMultisigScript(v.blake160s, v.r, v.m, v.n),

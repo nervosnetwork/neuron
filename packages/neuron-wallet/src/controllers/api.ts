@@ -796,8 +796,8 @@ export default class ApiController {
       return this.#multisigController.deleteConfig(params)
     })
 
-    handle('get-multisig-config', async (_, walletId: string) => {
-      return this.#multisigController.getConfig(walletId)
+    handle('get-multisig-config', async () => {
+      return this.#multisigController.getConfig()
     })
 
     handle('import-multisig-config', async (_, walletId: string) => {
