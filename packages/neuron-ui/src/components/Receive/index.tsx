@@ -30,13 +30,13 @@ export const AddressQrCodeWithCopyZone = ({
 
   const [isCopySuccess, setIsCopySuccess] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
-  const { ref, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
+  const { ref, onCopyQrCode, onDownloadQrCode, showCopySuccess } = useCopyAndDownloadQrCode()
 
   const stopPropagation = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation()
   }, [])
-  const onCopyAddress = useCallback(() => {
-    window.navigator.clipboard.writeText(showAddress)
+  const onCopy = useCallback(() => {
+    onCopyQrCode()
     setIsCopySuccess(true)
 
     clearTimeout(timer.current!)
@@ -58,7 +58,7 @@ export const AddressQrCodeWithCopyZone = ({
               <SuccessNoBorder />
             </Button>
           ) : (
-            <Button type="text" className={styles.actionBtn} onClick={onCopyAddress}>
+            <Button type="text" className={styles.actionBtn} onClick={onCopy}>
               <Copy />
             </Button>
           )}
