@@ -1,9 +1,9 @@
 export default {
   translation: {
     keywords: {
-      wallet: 'Portefeuille',
+      wallet: 'Wallet',
       password: 'Mot de passe',
-      'wallet-name': 'Nom du portefeuille',
+      'wallet-name': 'Nom du Wallet',
     },
     'application-menu': {
       neuron: {
@@ -13,18 +13,18 @@ export default {
         quit: 'Quitter {{app}}',
       },
       wallet: {
-        label: 'Portefeuille',
-        select: 'Sélectionner un portefeuille',
-        'create-new': 'Créer un nouveau portefeuille',
-        import: 'Importer un portefeuille',
-        backup: 'Sauvegarder le portefeuille actuel',
+        label: 'Wallet',
+        select: 'Sélectionner un Wallet',
+        'create-new': 'Créer un nouveau Wallet',
+        import: 'Importer un Wallet',
+        backup: 'Sauvegarder le Wallet actuel',
         'export-xpubkey': 'Exporter la clé publique étendue',
-        delete: 'Supprimer le portefeuille actuel',
+        delete: 'Supprimer le Wallet actuel',
         'change-password': 'Changer de mot de passe',
-        'import-mnemonic': 'Importer la graine du portefeuille',
+        'import-mnemonic': 'Importer la graine du Wallet',
         'import-keystore': 'Importer depuis le fichier Keystore',
         'import-xpubkey': 'Importer la clé publique étendue',
-        'import-hardware': 'Importer un portefeuille matériel',
+        'import-hardware': 'Importer un Wallet matériel',
       },
       edit: {
         label: 'Édition',
@@ -66,7 +66,7 @@ export default {
     },
     services: {
       transactions: 'Transactions',
-      wallets: 'Portefeuilles',
+      wallets: 'Wallets',
     },
     messages: {
       'failed-to-load-networks': 'Échec du chargement des réseaux.',
@@ -77,11 +77,11 @@ export default {
         "Le mot de passe doit comporter jusqu'à {{maxPasswordLength}} caractères.",
       'wallet-password-letter-complexity':
         'Le mot de passe doit contenir une combinaison de lettres majuscules et minuscules, de chiffres et de caractères spéciaux.',
-      'current-wallet-not-set': "Le portefeuille actuel n'est pas défini.",
+      'current-wallet-not-set': "Le Wallet actuel n'est pas défini.",
       'incorrect-password': 'Le mot de passe est incorrect',
       'invalid-address': "L'adresse {{address}} n'est pas valide.",
       'codehash-not-loaded': "Le codehash n'est pas chargé.",
-      'wallet-not-found': 'Le portefeuille {{id}} est introuvable.',
+      'wallet-not-found': 'Le Wallet {{id}} est introuvable.',
       'failed-to-create-mnemonic': 'Échec de la création de la mnémonique.',
       'network-not-found': "Le réseau de l'ID {{id}} n'a pas été trouvé.",
       'invalid-name': "Le nom {{field}} n'est pas valide.",
@@ -96,7 +96,7 @@ export default {
       'save-keystore': 'Sauvegarder le fichier Keystore.',
       'save-extended-public-key': 'Sauvegarder la clé publique étendue.',
       'import-extended-public-key': 'Importer la clé publique étendue.',
-      'invalid-mnemonic': "La graine du portefeuille n'est pas valide, veuillez la vérifier à nouveau.",
+      'invalid-mnemonic': "La graine du Wallet n'est pas valide, veuillez la vérifier à nouveau.",
       'unsupported-cipher': 'Chiffrement non pris en charge.',
       'capacity-not-enough': 'Solde insuffisant.',
       'capacity-not-enough-for-change':
@@ -115,16 +115,16 @@ export default {
       'mainnet-address-required': "{{address}} n'est pas une adresse du réseau principal.",
       'testnet-address-required': "{{address}} n'est pas une adresse du réseau de test.",
       'address-not-found':
-        "L'adresse donnée ne fait pas partie du portefeuille actuel. Veuillez vérifier votre portefeuille ou attendre la fin de la synchronisation.",
-      'target-output-not-found': "Il n'y a pas de portefeuille de compte associé à cette adresse.",
+        "L'adresse donnée ne fait pas partie du Wallet actuel. Veuillez vérifier votre Wallet ou attendre la fin de la synchronisation.",
+      'target-output-not-found': "Il n'y a pas de Wallet de compte associé à cette adresse.",
       'acp-same-account': 'Le compte de paiement et le compte de réception ne doivent pas être les mêmes.',
       'device-sign-canceled':
         'Vous avez annulé la demande de signature. Sinon, assurez-vous que l\'application Nervos sur votre appareil a la configuration "autoriser les données de contrat" activée',
       'connect-device-failed': "L'appareil ne peut pas être connecté, veuillez vérifier votre connexion.",
       'unsupported-manufacturer': 'Les appareils de {{manufacturer}} ne sont pas encore pris en charge.',
-      'wallet-not-supported-function': 'Ce portefeuille ne prend pas en charge la fonction {name}.',
+      'wallet-not-supported-function': 'Ce Wallet ne prend pas en charge la fonction {name}.',
       'invalid-transaction-file': 'Fichier de transaction non valide.',
-      'offline-sign-failed': 'Échec de la signature, veuillez vérifier si vous signez avec le bon portefeuille.',
+      'offline-sign-failed': 'Échec de la signature, veuillez vérifier si vous signez avec le bon Wallet.',
       'multisig-script-prefix-error': 'La configuration multisig est erronée',
       'multisig-config-not-exist': "La configuration multisig n'existe pas",
       'multisig-config-exist': 'La configuration multisig existe déjà',
@@ -161,7 +161,7 @@ export default {
         alert: "C'est le réseau actuel. En le supprimant, la connexion passera au réseau par défaut",
       },
       'remove-wallet': {
-        title: 'Supprimer le portefeuille',
+        title: 'Supprimer le Wallet',
         password: 'Mot de passe',
       },
       'backup-keystore': {

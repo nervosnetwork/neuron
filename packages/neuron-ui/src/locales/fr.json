@@ -1,7 +1,7 @@
 {
   "translation": {
     "launch-screen": {
-      "loading-wallets": "Chargement des portefeuilles"
+      "loading-wallets": "Chargement des Wallets"
     },
     "contextmenu": {
       "cut": "Couper",
@@ -11,7 +11,7 @@
     },
     "navbar": {
       "overview": "Aperçu",
-      "wallet": "Portefeuille",
+      "wallet": "Wallet",
       "send": "Envoyer",
       "receive": "Recevoir",
       "history": "Historique",
@@ -39,7 +39,7 @@
       "title": {
         "select-model": "Veuillez connecter votre appareil et sélectionner le modèle",
         "detect-device": "Détection de l'appareil",
-        "name-wallet": "Nommer le portefeuille",
+        "name-wallet": "Nommer le Wallet",
         "choose-address": "Choisissez une adresse de l'appareil"
       },
       "actions": {
@@ -49,37 +49,37 @@
         "cancel": "Annuler",
         "back": "Retour",
         "rescan": "Rescan",
-        "close": "close",
-        "finish": "Finish Creating"
+        "close": "fermer",
+        "finish": "fin de la création"
       },
       "errors": {
-        "multi-device": "Multiple device detected. Only one device of the same model can be connected.",
-        "device-not-found": "No device detected. Please connect your device.",
-        "ckb-app-not-found": "CKB App does not open. Please open the CKB App on your device."
+        "multi-device" : "Plusieurs appareils détectés. Un seul appareil du même modèle peut être connecté",
+        "device-not-found" : "Aucun appareil n'a été détecté. Veuillez connecter votre appareil.",
+        "ckb-app-not-found" : "L'application CKB ne s'ouvre pas. Veuillez ouvrir l'application CKB sur votre appareil."
       },
-      "waiting": "Waiting for CKB app...",
-      "abort": "Waiting for CKB app... Action aborted",
-      "app-version": "CKB App v{{version}} running.",
-      "firmware-version": "Firmware v{{version}} detected.",
-      "wallet-name": "Wallet Name",
-      "select-model": "Select Model",
-      "other-device": "Other"
+      "waiting" : "Waiting for CKB app...",
+      "abort" : "En attente de l'application CKB... Action annulée",
+      "app-version" : "CKB App v{{version}} en cours d'exécution",
+      "firmware-version" : "Firmware v{{version}} détecté",
+      "wallet-name" : "Nom du portefeuille",
+      "select-model" : "Select Model",
+      "other-device" : "Other"
     },
     "hardware-sign": {
-      "cancel": "Cancel",
-      "title": "Sign via hardware wallet",
-      "device": "Device:",
-      "status": {
-        "label": "Status:",
-        "connect": "Connected, ready for signing.",
-        "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
+      "annuler" : "Annuler",
+      "title" : "Signer via le portefeuille matériel",
+      "device" : "Device :",
+      "status" : {
+        "label" : "Status :",
+        "connect" : "Connected, ready for signing",
+        "user-input" : "Connected, waiting for confirmation on device...",
+        "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
       "outputs": "Outputs({{length}})",
       "actions": {
-        "close": "Close",
-        "success": "Transaction Successful!",
+        "close": "Fermer",
+        "success": "Transaction réussie !",
         "rescan": "Rescan"
       }
     },
@@ -90,13 +90,13 @@
       "verified": "Verified",
       "invalid": "Invalid",
       "status": {
-        "label": "Status:",
-        "connect": "Connected, ready for verifying.",
-        "user-input": "Connected, waiting for confirmation on device...",
-        "disconnect": "Disconnected, please confirm device has connect and open Nervos app"
+        "label" : "Status :",
+        "connect" : "Connecté, prêt pour la vérification",
+        "user-input" : "Connected, waiting for confirmation on device...",
+        "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "actions": {
-        "close": "Close",
+        "close": "Fermer",
         "reconnect": "Reconnecter",
         "copy-address": "Copier l'adresse",
         "verify": "Vérifier l'adresse",
@@ -112,7 +112,7 @@
         "partially-signed": "Partiellement signé",
         "signed": "Signé"
       },
-      "wallet": "Portefeuille :",
+      "wallet": "Wallet :",
       "content": "Contenu :",
       "export": "Exporter Tx",
       "sign-and-export": "Signer et exporter",
@@ -144,7 +144,7 @@
       "destroy": "Détruire le compte d'actif {{name}}",
       "createSUDT": "Créer un compte d'actif <0></0>",
       "destroySUDT": "Détruire le compte d'actif <0></0>",
-      "wallet-ready": "Le portefeuille est prêt, bienvenue",
+      "wallet-ready": "Le Wallet est prêt, bienvenue",
       "send": "Envoyer",
       "receive": "Recevoir",
       "locked": "Montant verrouillé",
@@ -152,37 +152,37 @@
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Bienvenue sur Neuron",
-      "create-or-import-your-first-wallet": "Créez ou importez votre premier portefeuille",
-      "create-new-wallet": "Créer un portefeuille",
-      "import-mnemonic": "Importer la graine du portefeuille",
+      "create-or-import-your-first-wallet": "Créez ou importez votre premier Wallet",
+      "create-new-wallet": "Créer un Wallet",
+      "import-mnemonic": "Importer la graine du Wallet",
       "import-keystore": "Importer depuis le fichier Keystore",
-      "import-wallet": "Importer un portefeuille",
-      "import-hardware-wallet": "Importer un portefeuille matériel",
-      "new-wallet": "Nouveau portefeuille",
-      "wallet-seed": "Graine du portefeuille",
+      "import-wallet": "Importer un Wallet",
+      "import-hardware-wallet": "Importer un Wallet matériel",
+      "new-wallet": "Nouveau Wallet",
+      "wallet-seed": "Graine du Wallet",
       "keystore": "Fichier Keystore",
-      "hardware-wallet": "Portefeuille matériel",
+      "hardware-wallet": "Wallet matériel",
       "next": "Suivant",
       "back": "Retour",
       "name": "Nom",
-      "your-wallet-seed-is": "Votre nouvelle graine de portefeuille a été générée",
-      "input-your-seed": "Veuillez entrer votre graine de portefeuille",
+      "your-wallet-seed-is": "Votre nouvelle graine de Wallet a été générée",
+      "input-your-seed": "Veuillez entrer votre graine de Wallet",
       "password": "Mot de passe",
       "confirm-password": "Confirmer le mot de passe",
-      "set-wallet-name-and-password": "Nommez votre nouveau portefeuille et choisissez un mot de passe fort pour le protéger",
-      "set-wallet-name": "Donnez un nom à votre nouveau portefeuille",
-      "set-a-strong-password-to-protect-your-wallet": "Créez un mot de passe fort pour protéger votre portefeuille",
-      "wallet-suffix": "Portefeuille {{suffix}}",
-      "write-down-seed": "Notez votre graine de portefeuille et enregistrez-la dans un endroit sûr",
-      "new-name": "Utilisez un nom inutilisé pour le nouveau portefeuille",
+      "set-wallet-name-and-password": "Nommez votre nouveau Wallet et choisissez un mot de passe fort pour le protéger",
+      "set-wallet-name": "Donnez un nom à votre nouveau Wallet",
+      "set-a-strong-password-to-protect-your-wallet": "Créez un mot de passe fort pour protéger votre Wallet",
+      "wallet-suffix": "Wallet {{suffix}}",
+      "write-down-seed": "Notez votre graine de Wallet et enregistrez-la dans un endroit sûr",
+      "new-name": "Utilisez un nom inutilisé pour le nouveau Wallet",
       "complex-password": "Le mot de passe doit contenir entre 8 et 50 caractères, comprenant au moins trois catégories parmi les suivantes : lettres majuscules, lettres minuscules, chiffres et symboles spéciaux.",
       "same-password": "Le mot de passe et la confirmation du mot de passe doivent correspondre",
       "input-seed-verify": "Saisissez la graine créée pour vérification",
-      "no-wallet": "Pas de portefeuille ?",
-      "create-wallet": "Créer un portefeuille",
+      "no-wallet": "Pas de Wallet ?",
+      "create-wallet": "Créer un Wallet",
       "repeat-password": "Répéter le mot de passe",
       "finish-create": "Terminer la création",
-      "creating-wallet": "Le portefeuille est en cours de préparation, veuillez patienter",
+      "creating-wallet": "Le Wallet est en cours de préparation, veuillez patienter",
       "add-one": "Ajouter un autre"
     },
     "import-keystore": {
@@ -190,12 +190,12 @@
       "select-file": "Choisir le fichier",
       "label": {
         "path": "Fichier Keystore",
-        "name": "Nom du portefeuille",
+        "name": "Nom du Wallet",
         "password": "Mot de passe"
       },
       "placeholder": {
         "path": "Cliquez pour sélectionner le fichier Keystore",
-        "name": "Nom pour le nouveau portefeuille",
+        "name": "Nom pour le nouveau Wallet",
         "password": "Mot de passe pour vérifier le fichier Keystore"
       },
       "button": {
@@ -239,7 +239,7 @@
       "remove-receiving-address-msg": "Êtes-vous sûr de vouloir supprimer l'adresse de réception sélectionnée ?",
       "locktime-notice-content": "Selon la hauteur de bloc réelle, il peut y avoir des variations temporelles dans le verrouillage temporel.",
       "release-on": "Libération le",
-      "locktime-warning": "Veuillez vous assurer que le portefeuille du destinataire peut prendre en charge le déverrouillage par expiration. (Remarque : 1. Les échanges ne prennent généralement pas en charge le déverrouillage par expiration {{extraNote}})",
+      "locktime-warning": "Veuillez vous assurer que le Wallet du destinataire peut prendre en charge le déverrouillage par expiration. (Remarque : 1. Les échanges ne prennent généralement pas en charge le déverrouillage par expiration {{extraNote}})",
       "allow-use-sent-cell": "Les sorties non confirmées sont autorisées dans cette transaction.",
       "submit-transaction": "Soumettre la transaction"
     },
@@ -294,7 +294,7 @@
         "placeholder": "Rechercher le hash de transaction, l'adresse ou la date (aaaa-mm-jj)"
      },
       "table": {
-        "name": "Nom du portefeuille",
+        "name": "Nom du Wallet",
         "type": "Type",
         "amount": "Montant",
         "timestamp": "Heure",
@@ -373,13 +373,13 @@
       },
       "wallet-manager": {
         "edit-wallet": {
-          "wallet-name": "Nom du portefeuille",
+          "wallet-name": "Nom du Wallet",
           "password": "Mot de passe",
           "new-password": "Nouveau mot de passe",
           "confirm-password": "Confirmer le mot de passe",
-          "edit-wallet": "Éditer le portefeuille"
+          "edit-wallet": "Éditer le Wallet"
         },
-        "edit-success": "Informations du portefeuille mises à jour avec succès",
+        "edit-success": "Informations du Wallet mises à jour avec succès",
         "delete-wallet-title": "Veuillez entrer le mot de passe de {{name}}",
         "password": "Mot de passe",
         "wallet-detail": {
@@ -435,9 +435,9 @@
       }
     },    
     "password-request": {
-      "wallet-not-found": "Le portefeuille n'a pas été trouvé",
+      "wallet-not-found": "Le Wallet n'a pas été trouvé",
       "password": "Entrez le mot de passe",
-      "placeholder": "Veuillez entrer le mot de passe du portefeuille",
+      "placeholder": "Veuillez entrer le mot de passe du Wallet",
       "send": {
         "title": "Soumettre la transaction"
       },
@@ -445,13 +445,13 @@
         "title": "Envoyer NFT"
       },
       "delete": {
-        "title": "Supprimer le portefeuille"
+        "title": "Supprimer le Wallet"
       },
       "backup": {
-        "title": "Sauvegarder le portefeuille"
+        "title": "Sauvegarder le Wallet"
       },
       "unlock": {
-        "title": "Veuillez entrer le mot de passe du portefeuille pour réclamer l'actif"
+        "title": "Veuillez entrer le mot de passe du Wallet pour réclamer l'actif"
       },
       "create-sudt-account": {
         "title": "Créer un compte d'actif"
@@ -498,7 +498,7 @@
       "send-from-multisig-need-one": {
         "title": "Envoyer du CKB depuis une adresse multisig"
       },
-      "xpub-notice": "Pour un portefeuille en mode lecture seule, seules les transactions exportées sont prises en charge"
+      "xpub-notice": "Pour un Wallet en mode lecture seule, seules les transactions exportées sont prises en charge"
     },
     "qrcode": {
       "copy": "Copier l'image",
@@ -544,8 +544,8 @@
     "messages": {
       "error": "Erreur",
       "unknown-error": "Erreur inconnue",
-      "update-wallet-successfully": "Le portefeuille a été mis à jour avec succès",
-      "delete-wallet-successfully": "Le portefeuille a été supprimé avec succès",
+      "update-wallet-successfully": "Le Wallet a été mis à jour avec succès",
+      "delete-wallet-successfully": "Le Wallet a été supprimé avec succès",
       "create-network-successfully": "Le réseau a été créé avec succès",
       "update-network-successfully": "Le réseau a été mis à jour avec succès",
       "clear-cache-successfully": "Le cache a été effacé avec succès",
@@ -565,7 +565,7 @@
       "light-client-locktime-warning": "2. Le mode client léger ne prend pas en charge l'affichage des CKBytes avec un temps de verrouillage.",
       "light-client-cheque-warning": "Avertissement : Le mode client léger ne prend pas en charge l'affichage des actifs Cheque.",
       "fields": {
-        "wallet": "Portefeuille",
+        "wallet": "Wallet",
         "name": "Nom",
         "password": "Mot de passe",
         "remote": "URL RPC",
@@ -576,7 +576,7 @@
         "default-address": "Adresse par défaut",
         "mnemonic": "Mnémonique",
         "keystore-path": "Fichier de clés",
-        "keystore-name": "Nom du portefeuille",
+        "keystore-name": "Nom du Wallet",
         "keystore-password": "Mot de passe",
         "deposit": "Dépôt",
         "account-name": "Nom du compte",
@@ -595,11 +595,11 @@
         "105": "Vous avez besoin de plus de capacités pour le changement (plus de 61 CKBytes).",
         "106": "Vous avez besoin de plus de capacités pour le changement (plus de 61 CKBytes), ou faites glisser jusqu'à la fin pour envoyer tout votre solde.",
         "107": "Le montant {{amount}} CKB est trop petit, le transfert avec verrouillage nécessite un montant d'au moins 69 CKB.",
-        "108": "L'adresse fournie n'appartient pas au portefeuille actuel. Veuillez vérifier votre portefeuille ou attendre la fin de la synchronisation.",
+        "108": "L'adresse fournie n'appartient pas au Wallet actuel. Veuillez vérifier votre Wallet ou attendre la fin de la synchronisation.",
         "109": "Solde insuffisant.",
         "110": "Solde disponible insuffisant, veuillez réessayer lorsque la dernière transaction a été confirmée.",
-        "111": "Le portefeuille actuel n'est pas défini.",
-        "112": "Portefeuille {{id}} introuvable.",
+        "111": "Le Wallet actuel n'est pas défini.",
+        "112": "Wallet {{id}} introuvable.",
         "113": "La clé de stockage est invalide, veuillez vérifier l'intégrité de votre fichier.",
         "114": "Le solde minimal de transfert est de {{bytes}} CKBytes.",
         "115": "Vous avez besoin de plus de capacités pour le changement (plus de 61 CKBytes), ou cliquez sur le bouton 'Max' pour envoyer tout votre solde.",
@@ -637,7 +637,7 @@
       "syncing-balance": "La balance est en cours de mise à jour",
       "slow": "La synchronisation est lente",
       "sync-failed": "Échec de la synchronisation, veuillez vérifier le réseau",
-      "sync-not-start": "La synchronisation n'a pas encore commencé, veuillez essayer de redémarrer le portefeuille Neuron",
+      "sync-not-start": "La synchronisation n'a pas encore commencé, veuillez essayer de redémarrer le Wallet Neuron",
       "connecting": "Connexion en cours"
     },
     "pagination": {
@@ -783,7 +783,7 @@
       },
       "jan": {
         "full": "Janvier",
-        "short": "Janv.",
+        "short": "Jan.",
         "tag": "J"
       },
       "feb": {
@@ -808,22 +808,22 @@
       },
       "june": {
         "full": "Juin",
-        "short": "Juin.",
+        "short": "Jui.",
         "tag": "J"
       },
       "july": {
         "full": "Juillet",
-        "short": "Juill.",
+        "short": "Juil.",
         "tag": "J"
       },
       "aug": {
         "full": "Août",
-        "short": "Août.",
+        "short": "Aoû.",
         "tag": "A"
       },
       "sept": {
         "full": "Septembre",
-        "short": "Sept.",
+        "short": "Sep.",
         "tag": "S"
       },
       "oct": {
@@ -859,7 +859,7 @@
       "confirm": "Confirmer",
       "verification-success": "Vérification réussie",
       "verification-failure": "Échec de la vérification",
-      "address-not-found": "L'adresse fournie n'appartient pas au portefeuille actuel. Veuillez vérifier votre portefeuille ou attendre la fin de la synchronisation.",
+      "address-not-found": "L'adresse fournie n'appartient pas au Wallet actuel. Veuillez vérifier votre Wallet ou attendre la fin de la synchronisation.",
       "sign-with-magic-byte": "Le message sera signé avec les octets magiques 'Nervos Message:'",
       "verify-tip": "Peut être vérifié par Neuron à partir de la version 0.33.1",
       "verify-old-sign-success": "Le message a été signé par Neuron avant la version 0.33.1",
@@ -1140,7 +1140,7 @@
     },
     "cell-manage": {
       "title": "Gestion des cellules",
-      "wallet-balance": "Solde du portefeuille",
+      "wallet-balance": "Solde du Wallet",
       "table": {
         "head": {
           "date": "Date",
@@ -1182,7 +1182,7 @@
         "warn-consume": "La consommation de la cellule ne conservera aucune donnée et utilisera tout le CKB. Veuillez vous assurer qu'aucune donnée importante ne doit être conservée."
       },
       "enter-password": "Entrez le mot de passe",
-      "password-placeholder": "Veuillez entrer le mot de passe du portefeuille",
+      "password-placeholder": "Veuillez entrer le mot de passe du Wallet",
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "consume": "Consommer"

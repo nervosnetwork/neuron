@@ -32,6 +32,7 @@ export default class SettingsService extends Store {
       return res as Locale
     }
     return res?.startsWith('zh') ? 'zh' : 'en'
+    return res?.startsWith('fr') ? 'fr' : 'en'
   }
 
   set locale(lng: Locale) {
