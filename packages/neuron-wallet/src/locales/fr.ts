@@ -87,7 +87,7 @@ export default {
       'invalid-name': "Le nom {{field}} n'est pas valide.",
       'default-network-unremovable': 'Le réseau par défaut est irréparable.',
       'lack-of-default-network': 'Manque de réseau par défaut.',
-      'current-network-not-set': "Le RPC du nœud CKB actuel n'a pas été défini.",
+      'current-network-not-set': "Le RPC du noeud CKB actuel n'a pas été défini.",
       'transaction-not-found': 'La transaction {{hash}} est introuvable.',
       'is-required': '{{field}} est requis.',
       'invalid-format': '{{field}} est dans un format invalide.',
@@ -138,7 +138,7 @@ export default {
       'no-match-address-for-sign': 'Aucune adresse correspondante trouvée',
       'target-lock-error': "Le compte d'actifs CKB ne peut être transféré qu'à l'adresse secp256k1 ou acp",
       'no-exist-ckb-node-data':
-        "{{path}} n'a pas de configuration et de stockage de nœud CKB, appuyez sur Confirmer pour synchroniser à partir de zéro",
+        "{{path}} n'a pas de configuration et de stockage de noeud CKB, appuyez sur Confirmer pour synchroniser à partir de zéro",
       'light-client-sudt-acp-error':
         "Le mode client léger ne prend pas en charge l'envoi d'actifs vers le compte d'actifs d'autrui",
     },
@@ -178,9 +178,9 @@ export default {
         title: 'Adresses multisig',
       },
       'ckb-dependency': {
-        title: 'Nœud CKB inclus',
+        title: 'Noeud CKB inclus',
         message: 'Dépendance requise',
-        detail: `Les nœuds réseau dans Neuron dépendent de composants C++, veuillez donc installer la dernière version de Microsoft Visual C++ Redistributable pour x64 pour garantir le bon fonctionnement du logiciel.`,
+        detail: `Les noeuds réseau dans Neuron dépendent de composants C++, veuillez donc installer la dernière version de Microsoft Visual C++ Redistributable pour x64 pour garantir le bon fonctionnement du logiciel.`,
         buttons: {
           'install-and-exit': 'Installer et quitter',
         },
@@ -263,7 +263,7 @@ export default {
       column: {
         time: 'Heure',
         'block-number': 'Numéro de bloc',
-        'tx-hash': 'Hachage de transaction',
+        'tx-hash': 'hash de transaction',
         'tx-type': 'Type de transaction',
         amount: 'Montant de CKB',
         'udt-amount': 'Montant UDT',

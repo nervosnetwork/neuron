@@ -23,9 +23,9 @@
       "connecting": "Connexion",
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
-      "update-neuron-with-ckb": "La version du nœud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
-      "ckb-node-compatible": "Le nœud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure.",
-      "ckb-without-indexer": "Veuillez ajouter l'option '--indexer' pour démarrer le nœud local"
+      "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
+      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure.",
+      "ckb-without-indexer": "Veuillez ajouter l'option '--indexer' pour démarrer le noeud local"
     },
     "network-status": {
       "tooltip": {
@@ -63,16 +63,16 @@
       "firmware-version" : "Firmware v{{version}} détecté",
       "wallet-name" : "Nom du portefeuille",
       "select-model" : "Select Model",
-      "other-device" : "Other"
+      "other-device" : "Autres"
     },
     "hardware-sign": {
       "annuler" : "Annuler",
       "title" : "Signer via le portefeuille matériel",
-      "device" : "Device :",
+      "device" : "Appareil :",
       "status" : {
         "label" : "Status :",
-        "connect" : "Connected, ready for signing",
-        "user-input" : "Connected, waiting for confirmation on device...",
+        "connect" : "Connecté, prêt à signer",
+        "user-input" : "Connecté, en attente de confirmation sur l'appareil...",
         "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "inputs": "Inputs(signing {{index}} of {{length}})",
@@ -85,14 +85,14 @@
     },
     "hardware-verify-address": {
       "title": "Verify address via hardware wallet",
-      "device": "Device:",
+      "device": "Appareil:",
       "address": "Address:",
-      "verified": "Verified",
+      "verified": "Vérifié",
       "invalid": "Invalid",
       "status": {
         "label" : "Status :",
         "connect" : "Connecté, prêt pour la vérification",
-        "user-input" : "Connected, waiting for confirmation on device...",
+        "user-input" : "Connecté, en attente de confirmation sur l'appareil...",
         "disconnect" : "Déconnecté, veuillez confirmer que l'appareil est connecté et ouvrir l'application Nervos"
       },
       "actions": {
@@ -361,7 +361,7 @@
         "general": "Général",
         "wallets": "Wallets",
         "network": "Réseau",
-        "data": "Données"
+        "data": "Data"
       },
       "general": {
         "show": "Afficher",
@@ -415,7 +415,7 @@
         "fr": "Français"
       },
       "data": {
-        "ckb-node-data": "Configuration et stockage du nœud CKB",
+        "ckb-node-data": "Configuration & stockage du noeud CKB",
         "set": "Définir",
         "cache": "Cache",
         "clear-cache-description": "Effacez le cache si vous rencontrez des problèmes de synchronisation des données ou d'affichage du solde. Neuron effectuera une nouvelle analyse des données de bloc.",
@@ -424,14 +424,14 @@
         "clearing-cache": "Effacement du cache en cours, veuillez patienter",
         "clear-success": "Cache effacé",
         "set-path": "Définir le chemin",
-        "remove-ckb-data-tip": "Veuillez déplacer les données du nœud CKB de 【{{prevPath}}】 vers 【{{currentPath}}】 puis cliquer sur \"Les données ont été déplacées\" pour démarrer à partir du bloc synchronisé précédemment ; ou cliquez sur \"Synchroniser depuis le début\" pour démarrer une synchronisation complète.",
-        "resync-ckb-node-describe": "Attention : Synchroniser depuis le début ne supprimera pas les données du nœud CKB déjà téléchargées.",
+        "remove-ckb-data-tip": "Veuillez déplacer les données du noeud CKB de 【{{prevPath}}】 vers 【{{currentPath}}】 puis cliquer sur \"Les données ont été déplacées\" pour démarrer à partir du bloc synchronisé précédemment ; ou cliquez sur \"Synchroniser depuis le début\" pour démarrer une synchronisation complète.",
+        "resync-ckb-node-describe": "Attention : Synchroniser depuis le début ne supprimera pas les données du noeud CKB déjà téléchargées.",
         "cancel": "Annuler",
         "confirm-clear": "Confirmer",
         "move-data-finish": "Les données ont été déplacées",
         "re-sync": "Synchroniser depuis le début",
-        "disabled-set-path": "Lorsque le nœud CKB est démarré manuellement, la configuration du chemin du nœud CKB ne prend pas effet.",
-        "ckb-node-storage": "Stockage du nœud CKB"
+        "disabled-set-path": "Lorsque le noeud CKB est démarré manuellement, la configuration du chemin du noeud CKB ne prend pas effet.",
+        "ckb-node-storage": "Stockage du noeud CKB"
       }
     },    
     "password-request": {
@@ -580,8 +580,8 @@
         "keystore-password": "Mot de passe",
         "deposit": "Dépôt",
         "account-name": "Nom du compte",
-        "token-name": "Nom du jeton",
-        "token-id": "ID du jeton",
+        "token-name": "Nom du token",
+        "token-id": "ID du token",
         "symbol": "Symbole",
         "decimal": "Décimale"
       },
@@ -591,7 +591,7 @@
         "101": "Le montant {{amount}} CKB est trop petit, veuillez saisir un montant d'au moins {{required}} CKB.",
         "102": "$t(messages.fields.{{fieldName}}) est invalide.",
         "103": "Le mot de passe $t(messages.fields.keystore-password) est incorrect",
-        "104": "Échec de la connexion au nœud, veuillez redémarrer Neuron.",
+        "104": "Échec de la connexion au noeud, veuillez redémarrer Neuron.",
         "105": "Vous avez besoin de plus de capacités pour le changement (plus de 61 CKBytes).",
         "106": "Vous avez besoin de plus de capacités pour le changement (plus de 61 CKBytes), ou faites glisser jusqu'à la fin pour envoyer tout votre solde.",
         "107": "Le montant {{amount}} CKB est trop petit, le transfert avec verrouillage nécessite un montant d'au moins 69 CKB.",
@@ -900,7 +900,7 @@
       "choose-title": "Mode de migration",
       "next": "Suivant",
       "back": "Retour",
-      "input-token": "Veuillez saisir le nom du jeton",
+      "input-token": "Veuillez saisir le nom du token",
       "input-symbol": "Veuillez saisir le symbole",
       "input-decimal": "Veuillez saisir la décimale",
       "turn-into-new-account": {
@@ -925,7 +925,7 @@
       "account-list": {
         "title": "Comptes d'actifs",
         "no-asset-accounts": "Aucun actif sUDT n'a été détecté",
-        "search": "Nom du compte, Nom du jeton ou Symbole",
+        "search": "Nom du compte, Nom du token ou Symbole",
         "syncing": "Synchronisation en cours, les données actuelles peuvent être inexactes",
         "send": "Envoyer",
         "receive": "Recevoir",
@@ -939,9 +939,9 @@
         "sudt-account": "Compte sUDT",
         "delete-failed": "Échec de la suppression de la configuration multisig, raison de l'échec : {{reason}}",
         "ckb-account": "Compte CKB",
-        "set-token-info": "Définir les informations du jeton",
-        "token-id": "Identifiant du jeton",
-        "token-name": "Nom du jeton",
+        "set-token-info": "Définir les informations du token",
+        "token-id": "Identifiant du token",
+        "token-name": "Nom du token",
         "symbol": "Symbole",
         "decimal": "Décimale",
         "confirm": "Confirmer",
@@ -952,13 +952,13 @@
         "occupy-61-ckb": "Occupe au moins 61 CKBytes",
         "input": {
           "account-name": "Veuillez saisir le nom du compte",
-          "token-id": "Veuillez saisir l'identifiant du jeton",
-          "token-name": "Veuillez saisir le nom du jeton",
+          "token-id": "Veuillez saisir l'identifiant du token",
+          "token-name": "Veuillez saisir le nom du token",
           "symbol": "Veuillez saisir le symbole",
           "decimal": "Veuillez saisir la décimale"
         },
         "placeholder": {
-          "token-id": "L'ID du jeton est l'argument du script de type sUDT, qui est identique au hachage de verrouillage de l'émetteur du jeton."
+          "token-id": "L'ID du token est l'argument du script de type sUDT, qui est identique au hachage de verrouillage de l'émetteur du token."
         }
       },
       "send": {
@@ -975,7 +975,7 @@
         "click-to-edit": "Cliquez pour éditer",
         "cheque-address-hint": {
           "label": "Verrouiller temporairement 162 CKBytes",
-          "tooltip": "162 CKBytes seront temporairement verrouillés pour initialiser le transfert de jeton, et seront automatiquement déverrouillés après que le jeton ait été réclamé par le destinataire."
+          "tooltip": "162 CKBytes seront temporairement verrouillés pour initialiser le transfert de token, et seront automatiquement déverrouillés après que le token ait été réclamé par le destinataire."
         },
         "destroy": "Détruire",
         "destroy-ckb-desc": "Retournera tous les CKB de ce compte CKB Asset à votre adresse de change.",
@@ -998,8 +998,8 @@
       "update-dialog": {
         "update-asset-account": "Détails du compte",
         "account-name": "Nom du compte",
-        "token-id": "ID du jeton",
-        "token-name": "Nom du jeton",
+        "token-id": "ID du token",
+        "token-name": "Nom du token",
         "symbol": "Symbole",
         "decimal": "Décimal",
         "confirm": "Confirmer",
@@ -1124,18 +1124,18 @@
     },
     "set-start-block-number": {
       "title": "Définir le numéro de bloc de départ",
-      "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le nœud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
+      "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le noeud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
       "input-place-holder": "Veuillez entrer le numéro de bloc de départ pour la synchronisation, par exemple : 10, 100, 101",
       "locate-first-tx": "Localiser la première transaction",
       "view-block": "Voir le bloc"
     },
     "main": {
       "external-node-detected-dialog": {
-        "title": "Détection d'un nœud externe",
-        "body-tips-without-network": "\"Nœud interne\" est réservé au nœud CKB intégré, veuillez ajouter une nouvelle option réseau pour le nœud externe.",
-        "body-tips-with-network": "\"Nœud interne\" est réservé au nœud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le nœud externe.",
+        "title": "Détection d'un noeud externe",
+        "body-tips-without-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez ajouter une nouvelle option réseau pour le noeud externe.",
+        "body-tips-with-network": "\"Noeud interne\" est réservé au noeud CKB intégré, veuillez sélectionner parmi les options réseau suivantes ou en ajouter une nouvelle pour le noeud externe.",
         "add-network": "Ajouter un réseau",
-        "ignore-external-node": "Ignorer le nœud externe"
+        "ignore-external-node": "Ignorer le noeud externe"
       }
     },
     "cell-manage": {
