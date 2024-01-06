@@ -113,3 +113,13 @@ export const getLocalWeekNames = (lang: string) => {
   const formatter = new Intl.DateTimeFormat(lang, { weekday: 'narrow' })
   return Array.from({ length: 7 }, (_, i) => formatter.format(new Date(Date.UTC(2023, 0, 1 + i))))
 }
+
+const englishMonthShortNames = getLocalMonthShortNames('en')
+const frenchMonthShortNames = getLocalMonthShortNames('fr')
+const chineseMonthShortNames = getLocalMonthShortNames('zh')
+
+
+console.log(englishMonthShortNames); // Output: ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
+console.log(frenchMonthShortNames);  // Output: ['janv..', 'févr..', 'mars.', 'avr..', 'mai.', 'juin.', 'juil..', 'août.', 'sept..', 'oct..', 'nov..', 'déc..']
+console.log(chineseMonthShortNames);  // Output: ['1月.', '2月.', '3月.', '4月.', '5月.', '6月.', '7月.', '8月.', '9月.', '10月.', '11月.', '12月.']
+
