@@ -107,7 +107,7 @@ describe('Get Local Month Short Names', () => {
   })
 
   it('French', () => {
-    const names = ['Jan.', 'Fév.', 'Mar.', 'Avr.', 'Mai.', 'Jui.', 'Juil.', 'Aoû.', 'Sep.', 'Oct.', 'Nov.', 'Déc.']
+    const names = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
     expect(getLocalMonthShortNames('fr')).toEqual(names)
   })
 })
@@ -117,7 +117,6 @@ describe('Get Local Month Names', () => {
     const names = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
     expect(getLocalMonthNames('zh')).toEqual(names)
   })
-
   it('English', () => {
     const names = [
       'January',
@@ -138,18 +137,18 @@ describe('Get Local Month Names', () => {
 
   it('French', () => {
     const names = [
-      'Janvier',
-      'Février',
-      'Mars',
-      'Avril',
-      'Mai',
-      'Juin',
-      'Juillet',
-      'Août',
-      'Septembre',
-      'Octobre',
-      'Novembre',
-      'Décembre',
+      'janvier',
+      'février',
+      'mars',
+      'avril',
+      'mai',
+      'juin',
+      'juillet',
+      'août',
+      'septembre',
+      'octobre',
+      'novembre',
+      'décembre',
     ]
     expect(getLocalMonthNames('fr')).toEqual(names)
   })
