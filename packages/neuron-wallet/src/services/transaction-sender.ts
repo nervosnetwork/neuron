@@ -73,12 +73,18 @@ export default class TransactionSender {
     const tx = skipSign
       ? Transaction.fromObject(transaction)
       : await this.sign(walletID, transaction, password, skipLastInput).then(({ tx, metadata }) => {
-          if (metadata.locks.skipped.size) {
-            throw new Error(
-              `Fail to send transaction, following lock scripts cannot be identified: ${[
-                ...metadata.locks.skipped.values(),
-              ]} `
-            )
+          try {
+            if (metadata.locks.skipped.size) {
+              throw new Error(
+                `Fail to send transaction, following lock scripts cannot be identified: ${[
+                  ...metadata.locks.skipped.values(),
+                ]} `
+              )
+            }
+          } catch (err) {
+            // FIXME: remove this before being merged into develop branch
+            logger.debug('Ignore the following error for debugging polycrypt')
+            logger.error(err)
           }
           return tx
         })
@@ -165,8 +171,13 @@ export default class TransactionSender {
       } else if (args.length === 42) {
         path = addressInfos.find(i => i.blake160 === args)?.path
       } else {
-        const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
-        path = addressInfo?.path
+        // FIXME: should not be a fallback
+        try {
+          const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
+          path = addressInfo?.path
+        } catch {
+          logger.error(`Failed to find args: ${args}`)
+        }
       }
 
       return pathAndPrivateKeys.find(p => p.path === path)?.privateKey
@@ -303,9 +314,14 @@ export default class TransactionSender {
           path = matchAddress?.path
           matchArgs = matchAddress?.blake160
         } else {
-          const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
-          path = addressInfo?.path
-          matchArgs = addressInfo?.blake160
+          // FIXME: should not be a fallback
+          try {
+            const addressInfo = AssetAccountInfo.findSignPathForCheque(addressInfos, args)
+            path = addressInfo?.path
+            matchArgs = addressInfo?.blake160
+          } catch {
+            logger.error(`Failed to find args: ${args}`)
+          }
         }
         return !!path
       })
