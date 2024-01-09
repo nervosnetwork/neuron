@@ -33,7 +33,7 @@ jobs:
           body="${body//$'\r'/'%0D'}"
           echo "body=$body" >> $GITHUB_OUTPUT
 
-      - uses: peter-evans/commit-comment@v2
+      - uses: peter-evans/commit-comment@v3
         with:
           body: ${{ steps.comment_body.outputs.body }}
 
