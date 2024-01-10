@@ -144,7 +144,7 @@ export type FetchTransactionReturnType = {
 }
 
 export class LightRPC extends Base {
-  setScripts: (params: LightScriptFilter[]) => Promise<null>
+  setScripts: (params: LightScriptFilter[], setScriptCommand: 'all' | 'partial' | 'delete') => Promise<null>
   getScripts: () => Promise<LightScriptSyncStatus[]>
   // TODO: the type is not the same as full node here
   // @ts-ignore

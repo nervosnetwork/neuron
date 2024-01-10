@@ -87,7 +87,7 @@ import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-
 import AssetAccount from '../../../src/models/asset-account'
 import MultisigConfigModel from '../../../src/models/multisig-config'
 import MultisigOutput from '../../../src/database/chain/entities/multisig-output'
-import { LumosCell } from '../../../src/block-sync-renderer/sync/connector'
+import { LumosCell } from '../../../src/block-sync-renderer/sync/synchronizer'
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
