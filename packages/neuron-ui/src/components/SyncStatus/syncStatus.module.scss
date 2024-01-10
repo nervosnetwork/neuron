@@ -46,6 +46,8 @@
 .tipContainer {
   .tip {
     padding: 12px;
+    // set left 40% to avoid horizontal scroll bar when find valid target
+    left: 40% !important;
   }
   .blockSynced {
     font-size: 12px;
@@ -92,7 +94,7 @@
     }
   }
 
-  .startBlockNumber {
+  .item {
     margin-top: 8px;
     .title {
       font-size: 12px;
