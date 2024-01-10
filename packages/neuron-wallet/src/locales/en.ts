@@ -137,6 +137,7 @@ export default {
       'no-exist-ckb-node-data':
         '{{path}} has no CKB Node config and storage, press confirm to synchronize from scratch',
       'light-client-sudt-acp-error': "Light client mode doesn't support sending assets to other's asset account",
+      'could-not-connect-service': 'Could not connect to the service, please try again later.',
     },
     messageBox: {
       button: {
