@@ -110,8 +110,12 @@ describe('Get Local Month Short Names', () => {
     const names = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
     expect(getLocalMonthShortNames('fr')).toEqual(names)
   })
-})
 
+  it('Spanish', () => {
+    const names = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic']
+    expect(getLocalMonthShortNames('es')).toEqual(names)
+  })
+})
 describe('Get Local Month Names', () => {
   it('Chinese', () => {
     const names = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
@@ -152,6 +156,24 @@ describe('Get Local Month Names', () => {
     ]
     expect(getLocalMonthNames('fr')).toEqual(names)
   })
+
+  it('Spanish', () => {
+    const names = [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ]
+    expect(getLocalMonthNames('es')).toEqual(names)
+  })
 })
 
 describe('Get Local Week Names', () => {
@@ -163,6 +185,11 @@ describe('Get Local Week Names', () => {
   it('English', () => {
     const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
     expect(getLocalWeekNames('en')).toEqual(names)
+  })
+
+  it('Spanish', () => {
+    const names = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
+    expect(getLocalWeekNames('es')).toEqual(names)
   })
 
   it('French', () => {
