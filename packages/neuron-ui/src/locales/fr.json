@@ -412,7 +412,8 @@
         "en-US": "Anglais (États-Unis)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "Configuration & stockage du noeud CKB",
