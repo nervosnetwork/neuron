@@ -5,7 +5,7 @@ import AddressMeta from '../../src/database/address/meta'
 const getSyncStatusMock = jest.fn()
 const getCurrentWalletMinSyncedBlockNumberMock = jest.fn()
 const getAllSyncStatusToMapMock = jest.fn()
-const resetSyncProgressMock = jest.fn()
+const initSyncProgressMock = jest.fn()
 const updateSyncStatusMock = jest.fn()
 const updateSyncProgressFlagMock = jest.fn()
 const getWalletMinLocalSavedBlockNumberMock = jest.fn()
@@ -28,7 +28,7 @@ function mockReset() {
   getSyncStatusMock.mockReset()
   getCurrentWalletMinSyncedBlockNumberMock.mockReset()
   getAllSyncStatusToMapMock.mockReset()
-  resetSyncProgressMock.mockReset()
+  initSyncProgressMock.mockReset()
   updateSyncStatusMock.mockReset()
   getWalletMinLocalSavedBlockNumberMock.mockReset()
   getOtherTypeSyncProgressMock.mockReset()
@@ -52,7 +52,7 @@ jest.mock('../../src/services/sync-progress', () => {
     static getSyncStatus: any = () => getSyncStatusMock()
     static getCurrentWalletMinSyncedBlockNumber: any = () => getCurrentWalletMinSyncedBlockNumberMock()
     static getAllSyncStatusToMap: any = () => getAllSyncStatusToMapMock()
-    static resetSyncProgress: any = (arg: any) => resetSyncProgressMock(arg)
+    static initSyncProgress: any = (arg: any) => initSyncProgressMock(arg)
     static updateSyncStatus: any = (hash: string, update: any) => updateSyncStatusMock(hash, update)
     static updateSyncProgressFlag: any = (walletIds: string[]) => updateSyncProgressFlagMock(walletIds)
     static getWalletMinLocalSavedBlockNumber: any = () => getWalletMinLocalSavedBlockNumberMock()
@@ -166,7 +166,7 @@ describe('test light synchronizer', () => {
         'partial'
       )
       expect(setScriptsMock).toHaveBeenLastCalledWith([], 'delete')
-      expect(resetSyncProgressMock).toBeCalledWith([
+      expect(initSyncProgressMock).toBeCalledWith([
         {
           script: addressMeta.generateACPLockScript().toSDK(),
           scriptType: 'lock',
