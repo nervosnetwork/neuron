@@ -24,7 +24,8 @@
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
-      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure.",
+      "learn-more": "En savoir plus",
+      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "Veuillez ajouter l'option '--indexer' pour démarrer le noeud local"
     },
     "network-status": {

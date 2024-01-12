@@ -24,7 +24,8 @@
       "experimental-functions": "Experimental",
       "s-udt": "Asset Accounts",
       "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
-      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation.",
+      "learn-more": "Learn More",
+      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "Please add '--indexer' option to start local node"
     },
     "network-status": {
