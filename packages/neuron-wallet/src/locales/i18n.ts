@@ -3,11 +3,13 @@ import zh from './zh'
 import en from './en'
 import zhTW from './zh-tw'
 import fr from './fr'
+import es from './es'
 
 i18n.init({
   resources: {
     en,
     fr,
+    es,
     zh,
     'zh-TW': zhTW,
   },

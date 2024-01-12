@@ -6,11 +6,13 @@ import zh from 'locales/zh.json'
 import en from 'locales/en.json'
 import zhTW from 'locales/zh-tw.json'
 import fr from 'locales/fr.json'
+import es from 'locales/es.json'
 
 i18n.use(initReactI18next).init({
   resources: {
     en,
     fr,
+    es,
     zh,
     'zh-TW': zhTW,
   },

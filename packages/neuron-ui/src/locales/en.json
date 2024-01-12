@@ -500,22 +500,22 @@
         "title": "Send CKB from multisig address"
       },
       "xpub-notice": "For watch-only wallet, only exporting transactions are supported"
-    },
-    "qrcode": {
-      "copy": "Copy image",
-      "save": "Save image"
-    },
-    "common": {
-      "or": "or",
-      "ok": "Ok",
-      "dismiss": "Dismiss",
-      "confirm": "Confirm",
-      "open": "Open",
-      "cancel": "Cancel",
-      "save": "Save",
-      "toggle": {
-        "on": "On",
-        "off": "Off"
+      },
+      "qrcode": {
+        "copy": "Copy image",
+        "save": "Save image"
+      },
+      "common": {
+        "or": "or",
+        "ok": "Ok",
+        "dismiss": "Dismiss",
+        "confirm": "Confirm",
+        "open": "Open",
+        "cancel": "Cancel",
+        "save": "Save",
+        "toggle": {
+          "on": "On",
+          "off": "Off"
       },
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-address": "Copy Address",
