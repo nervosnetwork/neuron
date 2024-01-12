@@ -32,7 +32,7 @@ import MultisigConfigModel from '../models/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { bytes } from '@ckb-lumos/codec'
 import { generateRPC } from '../utils/ckb-rpc'
-import { getClusterCellById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
+import { getClusterById, SporeData, unpackToRawClusterData } from '@spore-sdk/core'
 import NetworksService from './networks'
 import { LOCKTIME_ARGS_LENGTH, MIN_CELL_CAPACITY } from '../utils/const'
 import HdPublicKeyInfo from '../database/chain/entities/hd-public-key-info'
@@ -383,10 +383,7 @@ export default class CellsService {
             return
           }
 
-          const clusterCell = await getClusterCellById(
-            clusterId,
-            assetAccountInfo.getSporeConfig(currentNetwork.remote)
-          )
+          const clusterCell = await getClusterById(clusterId, assetAccountInfo.getSporeConfig(currentNetwork.remote))
           const { name, description } = unpackToRawClusterData(clusterCell.data)
           clusterInfos[clusterId] = { name, description }
         } catch {
