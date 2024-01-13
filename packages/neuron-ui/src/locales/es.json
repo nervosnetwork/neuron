@@ -21,7 +21,7 @@
       "special-assets": "Activos personalizados",
       "sync-not-start": "Sincronización no iniciada aún",
       "connecting": "Conectando",
-      "experimental-functions": "Funciones experimentales",
+      "experimental-functions": "Experimental",
       "s-udt": "Cuentas de activos",
       "update-neuron-with-ckb": "La versión del nodo de CKB no coincide con Neuron (v{{ version }}), lo que puede causar problemas de compatibilidad. Por favor actualice a la última versión de Neuron.",
       "ckb-node-compatible": "El nodo CKB no es compatible con Neuron (v{{ version }}), por favor compruebe antes de continuar.",
