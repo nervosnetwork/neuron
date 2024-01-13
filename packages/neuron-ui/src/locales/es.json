@@ -615,7 +615,7 @@
         "209": "$t(messages.fields.{{fieldName}}) no debe tener espacios en blanco.",
         "210": "\"{{value}}\" está reservado, por favor utilice otro.",
         "211": "La cantidad no puede ser 0",
-        "212": "$t(messages.fields.{{fieldName}}) is too simple",
+        "212": "$t(messages.fields.{{fieldName}}) es demasiado simple",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
