@@ -563,7 +563,7 @@
         "migrate-ckb-data": "Migrar",
         "migrate": "Migrar",
         "secp256k1/blake160-address-required": "Se requiere la dirección Secp256k1/Blake160",
-        "light-client-locktime-warning": "2. El modo de cliente liviano no admite mostrar los CKBytes de tiempo de bloqueo.",
+        "light-client-locktime-warning": "2. El modo de cliente ligero no admite mostrar CKBytes en tiempo de bloqueo.",
         "light-client-cheque-warning": "Advertencia: el modo de cliente liviano no admite mostrar activos de Cheque.",
         "fields": {
           "wallet": "Billetera",
