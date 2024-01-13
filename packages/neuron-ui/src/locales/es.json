@@ -627,7 +627,7 @@
         "310": "Please enter a {{tagName}} address",
         "402": "CKB App does not open. Please open the CKB App on your device.",
         "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
-        "404": "Multiple device detected. Only one device of the same model can be connected.",
+        "404": "Se detectaron varios dispositivos. Sólo se puede conectar un dispositivo del mismo modelo.",
         "600": "Please make sure the sync has finalized before you do any transaction related operation."
       }
     },
