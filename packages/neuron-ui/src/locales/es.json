@@ -635,7 +635,7 @@
       "synced": "Synced 100%",
       "syncing": "Syncing {{ syncPercents }}",
       "block-number": "block number",
-      "syncing-balance": "Balance is updating",
+      "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
       "sync-failed": "Sync failed, please check network",
       "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet",
