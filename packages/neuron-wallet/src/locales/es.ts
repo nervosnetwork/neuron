@@ -52,7 +52,7 @@ export default {
         'report-issue': 'Informar Problema',
         'contact-us': 'Contáctenos',
         'contact-us-message':
-          '> Por favor, adjunte la información de depuración exportada por "Menú" -> "Ayuda" -> "Exportar Información de Depuración".',
+          '> Por favor, adjunte la información de depuración exportada a través de "Menú" -> "Ayuda" -> "Exportar Información de Depuración".',
         documentation: 'Documentación',
         settings: 'Configuración',
         'export-debug-info': 'Exportar Información de Depuración',
