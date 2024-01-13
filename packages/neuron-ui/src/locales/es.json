@@ -40,7 +40,7 @@
         "select-model": "Por favor conecte su dispositivo y seleccione el modelo",
         "detect-device": "Detectando dispositivo",
         "name-wallet": "Nombre de la billetera",
-        "choose-address": "Elegir una dirección del dispositivo"
+        "choose-address": "Elige una dirección del dispositivo"
       },
       "actions": {
         "confirm": "Por favor confirme en su dispositivo...",
