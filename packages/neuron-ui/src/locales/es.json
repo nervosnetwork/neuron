@@ -1156,7 +1156,7 @@
         "default-description": "Ninguno"
       },
       "cell-detail-dialog": {
-        "title": "Detalles de la célula",
+        "title": "Detalles de la Cell",
         "capacity-used": "Capacidad utilizada",
         "data": "Datos",
         "total": "Total",
