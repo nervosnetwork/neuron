@@ -1176,7 +1176,7 @@
       },
       "cell-unlock-dialog": {
         "title": "Desbloquear Célula",
-        "capacity": "Desbloquear célula seleccionada {{capacity}} CKB"
+        "capacity": "Desbloquear Cell seleccionada {{capacity}} CKB"
       },
       "cell-consume-dialog": {
         "title": "Consumir Cell",
