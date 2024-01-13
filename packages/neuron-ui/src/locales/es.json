@@ -499,7 +499,7 @@
       "send-from-multisig-need-one": {
         "title": "Enviar CKB desde dirección multifirma"
       },
-      "xpub-notice": "Para billetera de solo lectura, solo se admiten las transacciones en altas"
+      "xpub-notice": "Para billetera de solo lectura, sólo es posible exportar transacciones"
       },
       "qrcode": {
         "copy": "Copiar imagen",
