@@ -546,7 +546,7 @@
         "error": "Error",
         "unknown-error": "Error desconocido",
         "update-wallet-successfully": "La billetera fue actualizada",
-        "delete-wallet-successfully": "La billetera fue borrada",
+        "delete-wallet-successfully": "La billetera fue eliminada",
         "create-network-successfully": "La red fue creada",
         "update-network-successfully": "La red fue actualizada",
         "clear-cache-successfully": "El caché fue borrado",
