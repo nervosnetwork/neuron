@@ -1061,7 +1061,7 @@
       },
       "multi-details": "Detalles de la dirección multifirma",
       "create-dialog": {
-        "title": "Crear dirección de multifirma",
+        "title": "Crear dirección multifirma",
         "preview-title": "La dirección de multifirma se ha generado",
         "index": "Índice",
         "required": "Requerido",
