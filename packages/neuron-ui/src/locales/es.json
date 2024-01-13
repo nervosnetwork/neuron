@@ -417,7 +417,7 @@
       },
       "data": {
         "ckb-node-data": "Configuración de Datos del Nodo CKB",
-        "set": "Set",
+        "set": "Establecer",
         "cache": "Caché",
         "clear-cache-description": "Borre la memoria caché si encuentra problemas de sincronización de datos o visualización de saldo. Neuron volverá a escanear los datos de los bloques.",
         "cache-cleared-on": "Caché actualizada en {{date}}",
