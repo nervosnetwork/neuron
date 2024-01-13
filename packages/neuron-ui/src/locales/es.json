@@ -638,7 +638,7 @@
       "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
       "sync-failed": "Sync failed, please check network",
-      "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet",
+      "sync-not-start": "La sincronización no se ha iniciado todavía, por favor intente reiniciar Neuron Wallet",
       "connecting": "Conectando"
     },
     "pagination": {
