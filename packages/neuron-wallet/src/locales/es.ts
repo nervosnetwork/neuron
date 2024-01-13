@@ -125,7 +125,7 @@ export default {
       'multisig-script-prefix-error': 'Error en la configuración multifirma',
       'multisig-config-not-exist': 'La configuración multifirma no existe',
       'multisig-config-exist': 'La configuración multifirma ya existe',
-      'multisig-config-address-error': 'La configuración de dirección de la configuración multisig es incorrecta',
+      'multisig-config-address-error': 'La configuración de dirección de la configuración multifirma es incorrecta',
       'multisig-config-need-error': 'La generación de transacciones multisig requiere configuración multisig',
       'transaction-no-input-parameter': 'Falta un parámetro requerido en la Cell de entrada de la consulta',
       'migrate-sudt-no-type': 'La Cell de migración no tiene un type script',
