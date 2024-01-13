@@ -234,7 +234,7 @@
       "fast": "Rápido",
       "total-cycles": "Ciclos RISC-V Totales",
       "scan-screen-qr-code": "Escanea el código QR en la pantalla",
-      "set-locktime": "Establecer Locktime",
+      "set-locktime": "Fijar hora de bloqueo",
       "remove-receiving-address": "Eliminar Dirección de Recepción",
       "remove-receiving-address-msg": "¿Estás seguro de que quieres eliminar la dirección de recepción seleccionada?",
       "locktime-notice-content": "De acuerdo al número de bloque actual, puede haber algunas variaciones de tiempo en el locktime.",
