@@ -155,7 +155,7 @@
       "create-or-import-your-first-wallet": "Crea o importa tu primera billetera",
       "create-new-wallet": "Crear una Billetera",
       "import-mnemonic": "Importar Semilla de Billetera",
-      "import-keystore": "Importar desde Archivo de Claves",
+      "import-keystore": "Importar desde Keystore",
       "import-wallet": "Importar una Billetera",
       "import-hardware-wallet": "Importar una Billetera de Hardware",
       "new-wallet": "Nueva Billetera",
