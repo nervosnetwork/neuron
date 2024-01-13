@@ -1,11 +1,9 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { addressToScript, bech32Address, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import SUDTAvatar from 'widgets/SUDTAvatar'
-import { AddressTransformWithCopyZone } from 'components/Receive'
-import QRCode, { copyCanvas, downloadCanvas } from 'widgets/QRCode'
+import { AddressQrCodeWithCopyZone } from 'components/Receive'
 import Dialog from 'widgets/Dialog'
-import Button from 'widgets/Button'
 import Alert from 'widgets/Alert'
 
 import { CONSTANTS } from 'utils'
@@ -37,24 +35,6 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
   const [t] = useTranslation()
   const [isInShortFormat, setIsInShortFormat] = useState(false)
   const { address, accountName, tokenName, symbol } = data
-  const ref = useRef<HTMLDivElement | null>(null)
-  const onDownloadQrCode = useCallback(() => {
-    const canvasElement = ref.current?.querySelector('canvas')
-    if (canvasElement) {
-      downloadCanvas(canvasElement)
-    }
-  }, [ref])
-  const [showCopySuccess, setShowCopySuccess] = useState(false)
-  const onCopyQrCode = useCallback(() => {
-    setShowCopySuccess(false)
-    const canvasElement = ref.current?.querySelector('canvas')
-    if (canvasElement) {
-      copyCanvas(canvasElement)
-      setTimeout(() => {
-        setShowCopySuccess(true)
-      }, 1)
-    }
-  }, [ref])
 
   const displayedAddr = isInShortFormat ? toShortAddr(address) : address
 
@@ -82,21 +62,12 @@ const SUDTReceiveDialog = ({ data, onClose }: { data: DataProps; onClose?: () =>
             </div>
           </div>
         </div>
-        <div className={styles.qrCode} data-copy-success={showCopySuccess} data-copy-success-text={t('common.copied')}>
-          <QRCode value={displayedAddr} size={128} includeMargin ref={ref} />
-        </div>
-        <div className={styles.copyContainer}>
-          <AddressTransformWithCopyZone
-            className={styles.copyTransformWrapper}
-            showAddress={displayedAddr}
-            isInShortFormat={isInShortFormat}
-            onClick={() => setIsInShortFormat(is => !is)}
-          />
-        </div>
-        <div className={styles.actions}>
-          <Button type="default" label={t('receive.copy-qr-code')} onClick={onCopyQrCode} />
-          <Button type="confirm" label={t('receive.save-qr-code')} onClick={onDownloadQrCode} />
-        </div>
+
+        <AddressQrCodeWithCopyZone
+          showAddress={displayedAddr}
+          isInShortFormat={isInShortFormat}
+          onClick={() => setIsInShortFormat(is => !is)}
+        />
       </div>
     </Dialog>
   )

@@ -24,24 +24,41 @@
   margin: 4px 0;
 
   .actions {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    top: 0;
+    left: 46px;
     display: flex;
     justify-content: center;
-    gap: 16px;
-    margin-top: 8px;
+    align-items: center;
+    gap: 24px;
+    &:hover {
+      background: rgba(0, 0, 0, 0.5);
+      & > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
     & > button {
+      display: none;
       min-width: 0;
       width: 24px;
       height: 24px;
       border-radius: 50%;
       color: var(--primary-color);
       background: var(--tag-green-bg-color);
-      & {
-        svg {
-          width: 12px;
-          g,
-          path {
-            fill: var(--primary-color);
-          }
+      svg {
+        width: 12px;
+      }
+    }
+
+    .actionBtn {
+      svg {
+        g,
+        path {
+          fill: var(--primary-color);
         }
       }
     }
@@ -94,6 +111,7 @@
 
 .copyAddress {
   width: 424px;
+  margin-top: 16px;
 }
 
 .showAddress {

@@ -3,7 +3,7 @@ import { when } from 'jest-when'
 import { AddressType } from '../../src/models/keys/address'
 import { Address, AddressVersion } from '../../src/models/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
-import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
+import FullSynchronizer from '../../src/block-sync-renderer/sync/full-synchronizer'
 import { flushPromises } from '../test-utils'
 
 const stubbedTipFn = jest.fn()
@@ -15,8 +15,8 @@ const stubbedLoggerErrorFn = jest.fn()
 const stubbedNextUnprocessedBlock = jest.fn()
 const stubbedCellCellectFn = jest.fn()
 
-const connectIndexer = async (indexerConnector: IndexerConnector) => {
-  const connectPromise = indexerConnector.connect()
+const connectIndexer = async (synchronizer: FullSynchronizer) => {
+  const connectPromise = synchronizer.connect()
   const errSpy = jest.fn()
   connectPromise.catch(err => {
     errSpy(err)
@@ -27,7 +27,7 @@ const connectIndexer = async (indexerConnector: IndexerConnector) => {
 
 describe('unit tests for IndexerConnector', () => {
   const nodeUrl = 'http://nodeurl:8114'
-  let stubbedIndexerConnector: any
+  let stubbedFullSynchronizer: any
 
   let stubbedIndexerConstructor: any
   let stubbedIndexerCacheService: any
@@ -76,7 +76,7 @@ describe('unit tests for IndexerConnector', () => {
       upsertTxHashes: stubbedUpsertTxHashesFn,
     }))
   })
-  stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
+  stubbedFullSynchronizer = require('../../src/block-sync-renderer/sync/full-synchronizer').default
 
   beforeEach(() => {
     resetMocks()
@@ -91,7 +91,7 @@ describe('unit tests for IndexerConnector', () => {
 
     describe('when init with indexer folder path', () => {
       beforeEach(() => {
-        new stubbedIndexerConnector([], nodeUrl, STUB_URI)
+        new stubbedFullSynchronizer([], nodeUrl, STUB_URI)
       })
       it('inits lumos indexer with a node url and indexer folder path', () => {
         expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
@@ -99,7 +99,7 @@ describe('unit tests for IndexerConnector', () => {
     })
     describe('when init without indexer folder path', () => {
       beforeEach(() => {
-        new stubbedIndexerConnector([], nodeUrl)
+        new stubbedFullSynchronizer([], nodeUrl)
       })
       it('inits mercury indexer with a node url and a default port', () => {
         expect(stubbedIndexerConstructor).toHaveBeenCalledWith(nodeUrl, STUB_URI)
@@ -141,7 +141,7 @@ describe('unit tests for IndexerConnector', () => {
       blockTimestamp: fakeTx3.transaction.blockTimestamp,
     }
 
-    let indexerConnector: IndexerConnector
+    let indexerConnector: FullSynchronizer
     const shortAddressInfo = {
       lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
     }
@@ -179,7 +179,7 @@ describe('unit tests for IndexerConnector', () => {
     const addressesToWatch = [addressObj1, addressObj2]
 
     beforeEach(() => {
-      indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
+      indexerConnector = new stubbedFullSynchronizer(addressesToWatch, '', '')
     })
     describe('polls for new data', () => {
       describe('#transactionsSubject', () => {
@@ -187,7 +187,7 @@ describe('unit tests for IndexerConnector', () => {
         beforeEach(() => {
           stubbedTipFn.mockReturnValueOnce(fakeTip1)
 
-          indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
+          indexerConnector = new stubbedFullSynchronizer(addressesToWatch, '', '')
           transactionsSubject = indexerConnector.transactionsSubject
         })
 

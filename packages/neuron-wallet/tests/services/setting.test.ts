@@ -72,7 +72,9 @@ describe('SettingsService', () => {
     })
     it('set', () => {
       SettingsService.getInstance().locale = 'zh'
+      SettingsService.getInstance().locale = 'fr'
       expect(writeSyncMock).toBeCalledWith('locale', 'zh')
+      expect(writeSyncMock).toBeCalledWith('locale', 'fr')
       expect(updateApplicationMenuMock).toHaveBeenCalled()
     })
     it('set exception', () => {

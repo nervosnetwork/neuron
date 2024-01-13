@@ -9,7 +9,7 @@ import { LIGHT_CLIENT_MAINNET, LIGHT_CLIENT_TESTNET } from '../utils/const'
 
 const { app } = env
 
-export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
+export const locales = ['zh', 'zh-TW', 'en', 'en-US', 'fr'] as const
 export type Locale = (typeof locales)[number]
 const settingKeys = {
   ckbDataPath: 'ckbDataPath',

@@ -50,8 +50,8 @@ export default class SyncProgressService {
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
-      .set({ blockStartNumber: blockNumber })
-      .where({ args: In(blake160s), blockStartNumber: LessThan(blockNumber) })
+      .set({ localSavedBlockNumber: blockNumber })
+      .where({ args: In(blake160s), localSavedBlockNumber: LessThan(blockNumber) })
       .execute()
   }
 
@@ -78,7 +78,7 @@ export default class SyncProgressService {
     return result
   }
 
-  static async getCurrentWalletMinBlockNumber() {
+  static async getCurrentWalletMinSyncedBlockNumber() {
     const currentWallet = WalletService.getInstance().getCurrent()
     const item = await getConnection()
       .getRepository(SyncProgress)
@@ -88,27 +88,30 @@ export default class SyncProgressService {
         addressType: SyncAddressType.Default,
         ...(currentWallet ? { walletId: currentWallet.id } : {}),
       })
-      .orderBy('blockEndNumber', 'ASC')
+      .orderBy('syncedBlockNumber', 'ASC')
       .getOne()
-    return item?.blockEndNumber || 0
+    return item?.syncedBlockNumber || 0
   }
 
-  static async getWalletMinBlockNumber() {
+  static async getWalletMinLocalSavedBlockNumber() {
     const items = await getConnection()
       .getRepository(SyncProgress)
       .createQueryBuilder()
-      .select('MIN(blockStartNumber) as blockStartNumber, walletId')
+      .select('MIN(localSavedBlockNumber) as localSavedBlockNumber, walletId')
       .where({ addressType: SyncAddressType.Default })
       .groupBy('walletId')
-      .getRawMany<{ blockStartNumber: number; walletId: string }>()
-    return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.walletId]: cur.blockStartNumber }), {})
+      .getRawMany<{ localSavedBlockNumber: number; walletId: string }>()
+    return items.reduce<Record<string, number>>(
+      (pre, cur) => ({ ...pre, [cur.walletId]: cur.localSavedBlockNumber }),
+      {}
+    )
   }
 
   static async getOtherTypeSyncBlockNumber() {
     const items = await getConnection().getRepository(SyncProgress).find({
       addressType: SyncAddressType.Multisig,
     })
-    return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.hash]: cur.blockStartNumber }), {})
+    return items.reduce<Record<string, number>>((pre, cur) => ({ ...pre, [cur.hash]: cur.localSavedBlockNumber }), {})
   }
 
   static async getSyncProgressByHashes(hashes: string[]) {
@@ -123,7 +126,7 @@ export default class SyncProgressService {
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
-      .set({ blockStartNumber: 0, blockEndNumber: 0 })
+      .set({ localSavedBlockNumber: 0, syncedBlockNumber: 0 })
       .execute()
   }
 }

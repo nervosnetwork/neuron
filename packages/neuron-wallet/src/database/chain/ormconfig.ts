@@ -58,6 +58,8 @@ import { ResetSyncProgressPrimaryKey1690361215400 } from './migrations/169036121
 import { TxLockAddArgs1694746034975 } from './migrations/1694746034975-TxLockAddArgs'
 import { IndexerTxHashCacheRemoveField1701234043431 } from './migrations/1701234043431-IndexerTxHashCacheRemoveField'
 import { CreateCellLocalInfo1701234043432 } from './migrations/1701234043432-CreateCellLocalInfo'
+import { RenameSyncProgress1702781527414 } from './migrations/1702781527414-RenameSyncProgress'
+import { RemoveAddressInIndexerCache1704357651876 } from './migrations/1704357651876-RemoveAddressInIndexerCache'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -132,6 +134,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       TxLockAddArgs1694746034975,
       IndexerTxHashCacheRemoveField1701234043431,
       CreateCellLocalInfo1701234043432,
+      RenameSyncProgress1702781527414,
+      RemoveAddressInIndexerCache1704357651876,
     ],
     logger: 'simple-console',
     logging,

@@ -4,7 +4,7 @@ import { Address } from '../../models/address'
 import AddressMeta from '../../database/address/meta'
 import { scheduler } from 'timers/promises'
 import SyncProgressService from '../../services/sync-progress'
-import { Connector, AppendScript } from './connector'
+import { Synchronizer, AppendScript } from './synchronizer'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
 import { FetchTransactionReturnType, LightRPC, LightScriptFilter } from '../../utils/ckb-rpc'
 import Multisig from '../../services/multisig'
@@ -24,7 +24,7 @@ import NetworksService from '../../services/networks'
 
 const unpackGroup = molecule.vector(blockchain.OutPoint)
 
-export default class LightConnector extends Connector {
+export default class LightSynchronizer extends Synchronizer {
   private lightRpc: LightRPC
   private addressMetas: AddressMeta[]
 
@@ -87,7 +87,7 @@ export default class LightConnector extends Connector {
   private async synchronize() {
     const syncScripts = await this.upsertTxHashes()
     await this.updateSyncedBlockOfScripts(syncScripts)
-    const minSyncBlockNumber = await SyncProgressService.getCurrentWalletMinBlockNumber()
+    const minSyncBlockNumber = await SyncProgressService.getCurrentWalletMinSyncedBlockNumber()
     const hasNextBlock = await this.notifyAndSyncNext(minSyncBlockNumber)
     if (!hasNextBlock) {
       await this.updateBlockStartNumber(minSyncBlockNumber)
@@ -138,7 +138,7 @@ export default class LightConnector extends Connector {
         const txs = await this.getTransactions({
           script: syncScript.script,
           scriptType: syncScript.scriptType,
-          blockRange: [BI.from(syncStatus.blockEndNumber).toHexString(), syncScript.blockNumber],
+          blockRange: [BI.from(syncStatus.syncedBlockNumber).toHexString(), syncScript.blockNumber],
         })
         insertTxCaches.push(
           ...txs.map(v => ({
@@ -164,7 +164,7 @@ export default class LightConnector extends Connector {
     syncScripts.forEach(v => {
       const currentSyncProgress = syncStatusMap.get(scriptToHash(v.script))
       if (currentSyncProgress) {
-        currentSyncProgress.blockEndNumber = parseInt(v.blockNumber)
+        currentSyncProgress.syncedBlockNumber = parseInt(v.blockNumber)
         updatedSyncProgress.push(currentSyncProgress)
       }
     })
@@ -196,35 +196,42 @@ export default class LightConnector extends Connector {
         }))
       })
       .flat()
-    const walletMinBlockNumber = await SyncProgressService.getWalletMinBlockNumber()
+    const walletMinBlockNumber = await SyncProgressService.getWalletMinLocalSavedBlockNumber()
     const wallets = await WalletService.getInstance().getAll()
     const walletStartBlockMap = wallets.reduce<Record<string, string | undefined>>(
       (pre, cur) => ({ ...pre, [cur.id]: cur.startBlockNumber }),
       {}
     )
     const otherTypeSyncBlockNumber = await SyncProgressService.getOtherTypeSyncBlockNumber()
-    const setScriptsParams = [
-      ...allScripts.map(v => {
-        const blockNumber = Math.max(
-          parseInt(walletStartBlockMap[v.walletId] ?? '0x0'),
-          walletMinBlockNumber?.[v.walletId] ?? 0,
-          parseInt(existSyncscripts[scriptToHash(v.script)]?.blockNumber ?? '0x0')
-        )
-        return {
+    const addScripts = [
+      ...allScripts
+        .filter(v => !existSyncscripts[scriptToHash(v.script)])
+        .map(v => {
+          const blockNumber = Math.max(
+            parseInt(walletStartBlockMap[v.walletId] ?? '0x0'),
+            walletMinBlockNumber?.[v.walletId] ?? 0
+          )
+          return {
+            ...v,
+            blockNumber: `0x${blockNumber.toString(16)}`,
+          }
+        }),
+      ...appendScripts
+        .filter(v => !existSyncscripts[scriptToHash(v.script)])
+        .map(v => ({
           ...v,
-          blockNumber: `0x${blockNumber.toString(16)}`,
-        }
-      }),
-      ...appendScripts.map(v => ({
-        ...v,
-        blockNumber:
-          existSyncscripts[scriptToHash(v.script)]?.blockNumber ??
-          `0x${(otherTypeSyncBlockNumber[scriptToHash(v.script)] ?? 0).toString(16)}`,
-      })),
+          blockNumber: `0x${(otherTypeSyncBlockNumber[scriptToHash(v.script)] ?? 0).toString(16)}`,
+        })),
     ]
-    await this.lightRpc.setScripts(setScriptsParams)
+    await this.lightRpc.setScripts(addScripts, 'partial')
+    const allScriptHashes = new Set([
+      ...allScripts.map(v => scriptToHash(v.script)),
+      ...appendScripts.map(v => scriptToHash(v.script)),
+    ])
+    const deleteScript = syncScripts.filter(v => !allScriptHashes.has(scriptToHash(v.script)))
+    await this.lightRpc.setScripts(deleteScript, 'delete')
     const walletIds = [...new Set(this.addressMetas.map(v => v.walletId))]
-    await SyncProgressService.resetSyncProgress(setScriptsParams)
+    await SyncProgressService.resetSyncProgress(addScripts)
     await SyncProgressService.updateSyncProgressFlag(walletIds)
     await SyncProgressService.removeByHashesAndAddressType(
       SyncAddressType.Multisig,
@@ -281,9 +288,25 @@ export default class LightConnector extends Connector {
     this.initSyncProgress(scripts)
   }
 
+  private async checkTxExist(txHashes: string[]) {
+    const transactions = await this.lightRpc
+      .createBatchRequest<'getTransaction', string[], TransactionWithStatus[]>(txHashes.map(v => ['getTransaction', v]))
+      .exec()
+    return transactions.every(v => !!v.transaction)
+  }
+
   async processTxsInNextBlockNumber() {
     const [nextBlockNumber, txHashesInNextBlock] = await this.getTxHashesWithNextUnprocessedBlockNumber()
-    if (nextBlockNumber !== undefined && txHashesInNextBlock.length) {
+    const minSyncBlockNumber = await SyncProgressService.getCurrentWalletMinSyncedBlockNumber()
+    if (
+      nextBlockNumber !== undefined &&
+      txHashesInNextBlock.length &&
+      // For light client, if tx hash has been called with fetch_transaction, the tx can not return by get_transactions
+      // So before derived address synced to bigger than next synced block number, do not sync the next block number
+      minSyncBlockNumber >= parseInt(nextBlockNumber) &&
+      // check whether the tx is sync from light client, after split the light client and full DB file, this check will remove
+      (await this.checkTxExist(txHashesInNextBlock))
+    ) {
       this.processingBlockNumber = nextBlockNumber
       await this.fetchPreviousOutputs(txHashesInNextBlock)
       this.transactionsSubject.next({ txHashes: txHashesInNextBlock, params: this.processingBlockNumber })
@@ -296,7 +319,7 @@ export default class LightConnector extends Connector {
     } else {
       return
     }
-    const minCachedBlockNumber = await SyncProgressService.getCurrentWalletMinBlockNumber()
+    const minCachedBlockNumber = await SyncProgressService.getCurrentWalletMinSyncedBlockNumber()
     await this.updateBlockStartNumber(Math.min(parseInt(blockNumber), minCachedBlockNumber))
     this.processNextBlockNumber()
   }

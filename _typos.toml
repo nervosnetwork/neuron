@@ -6,4 +6,4 @@ numer = "numer"
 lastest = "lastest"
 
 [files]
-extend-exclude = ["CHANGELOG.md", "**/migrations/*.ts"]
+extend-exclude = ["CHANGELOG.md", "**/migrations/*.ts", "**/fr.{ts,json}"]
