@@ -1059,7 +1059,7 @@
         "cancel": "Cancelar",
         "export": "Exportar Tx"
       },
-      "multi-details": "Detalles de la dirección de multifirma",
+      "multi-details": "Detalles de la dirección multifirma",
       "create-dialog": {
         "title": "Crear dirección de multifirma",
         "preview-title": "La dirección de multifirma se ha generado",
