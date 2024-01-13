@@ -126,7 +126,7 @@ export default {
       'multisig-config-not-exist': 'La configuración multifirma no existe',
       'multisig-config-exist': 'La configuración multifirma ya existe',
       'multisig-config-address-error': 'La configuración de dirección de la configuración multifirma es incorrecta',
-      'multisig-config-need-error': 'La generación de transacciones multisig requiere configuración multisig',
+      'multisig-config-need-error': 'La generación de transacciones multifirma requiere configuración multifirma',
       'transaction-no-input-parameter': 'Falta un parámetro requerido en la Cell de entrada de la consulta',
       'migrate-sudt-no-type': 'La Cell de migración no tiene un type script',
       'multisig-not-signed': 'Faltan firmas parciales para transacciones multifirma',
