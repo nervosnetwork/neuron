@@ -1163,7 +1163,7 @@
         "used": "Usado"
       },
       "locked-reason": {
-        "multi-locktime": "La célula tiene un bloqueo de tiempo y no se puede usar hasta {{time}}.",
+        "multi-locktime": "La Cell tiene un bloqueo de tiempo y no se puede usar hasta {{time}}.",
         "multi-locktime-reached": "El bloqueo de tiempo para esta célula ha expirado y debe reclamarla en Activos personalizados antes de usarla.",
         "cheque-acp-multisig": "Esta es una célula {{type}} y no admite desbloqueo.",
         "NFT-SUDT-DAO": "Esta es un activo {{type}} y no admite desbloqueo.",
