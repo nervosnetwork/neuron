@@ -609,7 +609,7 @@
         "203": "$t(messages.fields.{{fieldName}}) debería ser más corto o igual a {{length}}.",
         "204": "$t(messages.fields.{{fieldName}}) es demasiado corto, debe ser más largo o igual a {{length}}.",
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} es inválido.",
-        "206": "$t(messages.fields.{{fieldName}}) is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
+        "206": "$t(messages.fields.{{fieldName}}) no es válido, introduzca $t(messages.fields.{{fieldName}}) con no más de {{length}} decimales.",
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} es inválido, no puede ser negativo.",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} no es válido, debería comenzar con http(s)://",
         "209": "$t(messages.fields.{{fieldName}}) no debe tener espacios en blanco.",
