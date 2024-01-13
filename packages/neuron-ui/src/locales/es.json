@@ -160,7 +160,7 @@
       "import-hardware-wallet": "Importar una Billetera de Hardware",
       "new-wallet": "Nueva Billetera",
       "wallet-seed": "Semilla de Billetera",
-      "keystore": "Archivo de Claves",
+      "keystore": "Keystore",
       "hardware-wallet": "Billetera de Hardware",
       "next": "Siguiente",
       "back": "Regresar",
