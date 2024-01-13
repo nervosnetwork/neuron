@@ -1069,7 +1069,7 @@
         "copy-address": "Copiar dirección",
         "placeholder": "Ingrese {{type}} (1-255)",
         "m-n": {
-          "title": "Ingrese la configuración de dirección de multifirma en el tipo de m-de-n donde se requiere cualquier m llaves privadas de un posible n para mover el activo",
+          "title": "Ingrese la configuración de dirección multifirma en el tipo de m-de-n donde se requiere cualquier m llaves privadas de un posible n para mover el activo",
           "m-less-equal-n": "Para la dirección de multifirma m-de-n, m no debe ser mayor que n",
           "m-n-required": "Ingrese m/n",
           "m-n-between-0-256": "m/n debe estar entre 0 y 256"
