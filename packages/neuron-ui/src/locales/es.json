@@ -1125,7 +1125,7 @@
     },
     "set-start-block-number": {
       "title": "Configurar el número de bloque inicial",
-      "tip": "El número de bloque de inicio de sincronización se configura cuando se utiliza un nodo CKB de cliente liviano, luego puede configurarlo y acelerar la sincronización",
+      "tip": "El número de bloque de sincronización inicial se configura cuando se utiliza el nodo CKB de cliente ligero, por tanto puede configurarlo y acelerar la sincronización",
       "input-place-holder": "Ingrese el número de bloque de sincronización inicial, por ejemplo: 10,100,101",
       "locate-first-tx": "Ubicar la primera transacción",
       "view-block": "Ver bloque"
