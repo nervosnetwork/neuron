@@ -130,7 +130,7 @@ export default {
       'transaction-no-input-parameter': 'Falta un parámetro requerido en la celda de entrada de la consulta',
       'migrate-sudt-no-type': 'La celda de migración no tiene un script de tipo',
       'multisig-not-signed': 'Faltan firmas parciales para transacciones multifirma',
-      'multisig-lock-hash-mismatch': 'La dirección multisig actual no coincide con la transacción que se va a aprobar',
+      'multisig-lock-hash-mismatch': 'La dirección multifirma actual no coincide con la transacción que se va a aprobar',
       'sudt-acp-have-data': 'La cuenta ACP de sUDT destruida tiene saldo',
       'no-match-address-for-sign': 'No se encontró una dirección coincidente',
       'target-lock-error': 'La cuenta de activos CKB solo puede transferirse a una dirección sepe256k1 o acp',
