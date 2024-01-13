@@ -177,7 +177,7 @@
       "new-name": "Usa un nombre sin usar para la nueva billetera",
       "complex-password": "La contraseña debe tener entre 8 y 50 caracteres y contener al menos tres categorías de caracteres entre las siguientes: letras en mayúscula, letras en minúscula, números y símbolos especiales.",
       "same-password": "La contraseña y la confirmación de contraseña deben coincidir",
-      "input-seed-verify": "Ingresa la semilla creada para verificar",
+      "input-seed-verify": "Ingresa la frase semilla creada para verificar",
       "no-wallet": "¿No tienes una billetera?",
       "create-wallet": "Crear Billetera",
       "repeat-password": "Repetir Contraseña",
