@@ -618,7 +618,7 @@
         "212": "$t(messages.fields.{{fieldName}}) es demasiado simple",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} no se puede eliminar.",
         "303": "$t(messages.fields.{{fieldName}}) no se encuentra.",
-        "304": "Camera is unavailable or disabled.",
+        "304": "La cámara no está disponible o está deshabilitada.",
         "305": "$t(messages.fields.address) no puede estar vacío.",
         "306": "Please enter a mainnet address",
         "307": "Por favor introduzca una dirección de testnet",
