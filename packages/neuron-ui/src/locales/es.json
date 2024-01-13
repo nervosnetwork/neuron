@@ -1022,7 +1022,7 @@
         "label": "Exportar"
       },
       "ok": "Aceptar",
-      "no-data": "No hay direcciones de multifirma",
+      "no-data": "No hay dirección multifirma",
       "table": {
         "address": "Dirección del firmante",
         "alias": "Alias",
