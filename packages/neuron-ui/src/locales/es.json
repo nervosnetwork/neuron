@@ -1175,7 +1175,7 @@
         "locked-cell-can-not-use": "Advertencia, las Cells bloqueadas no se pueden utilizar."
       },
       "cell-unlock-dialog": {
-        "title": "Desbloquear Célula",
+        "title": "Desbloquear Cell",
         "capacity": "Desbloquear Cell seleccionada {{capacity}} CKB"
       },
       "cell-consume-dialog": {
