@@ -1171,7 +1171,7 @@
       },
       "cell-lock-dialog": {
         "title": "Bloquear Cell",
-        "capacity": "Bloquear selección de células de {{capacity}} CKB",
+        "capacity": "Bloquear selección de Cells de {{capacity}} CKB",
         "locked-cell-can-not-use": "Advertencia, las Cells bloqueadas no se pueden utilizar."
       },
       "cell-unlock-dialog": {
