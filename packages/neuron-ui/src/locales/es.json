@@ -1170,7 +1170,7 @@
         "Unknown": "Este es un activo no catalogado. Revise y confirme antes de continuar."
       },
       "cell-lock-dialog": {
-        "title": "Bloquear célula",
+        "title": "Bloquear Cell",
         "capacity": "Bloquear selección de células de {{capacity}} CKB",
         "locked-cell-can-not-use": "Advertencia, las células bloqueadas no se pueden utilizar."
       },
