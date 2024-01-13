@@ -126,7 +126,7 @@
         "view-in-explorer": "View in Explorer"
       },
       "broadcast-transaction": "Broadcast Transaction",
-      "import-unsigned-transaction": "Import a transaction to sign",
+      "import-transaction-to-sign": "Import a transaction to sign",
       "import-unsigned-transaction-detail": "You have imported an unsigned transaction, please confirm and try again."
     },
     "overview": {

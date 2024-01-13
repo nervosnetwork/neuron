@@ -364,7 +364,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       },
       {
         label: t('application-menu.tools.broadcast-transaction'),
-        enabled: hasCurrentWallet,
         click: async () => {
           const result = await OfflineSignService.loadTransactionJSON()
           if (!result) {

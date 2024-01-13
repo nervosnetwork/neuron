@@ -115,7 +115,7 @@ const BroadcastTransaction = () => {
       <Dialog
         show={!isSigned}
         className={styles.warningDialog}
-        title={t('offline-sign.import-unsigned-transaction')}
+        title={t('offline-sign.import-transaction-to-sign')}
         cancelText={t('offline-sign.actions.cancel')}
         onCancel={onBack}
         onConfirm={onBack}
