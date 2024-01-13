@@ -628,7 +628,7 @@
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
         "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
         "404": "Se detectaron varios dispositivos. Sólo se puede conectar un dispositivo del mismo modelo.",
-        "600": "Please make sure the sync has finalized before you do any transaction related operation."
+        "600": "Asegúrese de que la sincronización haya finalizado antes de realizar cualquier operación relacionada con transacciones."
       }
     },
     "sync": {
