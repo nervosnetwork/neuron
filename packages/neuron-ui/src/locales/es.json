@@ -863,7 +863,7 @@
       "verification-failure": "Error de verificación",
       "address-not-found": "La dirección proporcionada no pertenece a la billetera actual. Revise su billetera o espere hasta que se complete la sincronización.",
       "sign-with-magic-byte": "El mensaje se firmará con bytes mágicos 'Mensaje de Nervos:'",
-      "verify-tip": "Se puede verificar con Neuron a partir de la v0.33.1",
+      "verify-tip": "Se puede verificar con Neuron a partir de v0.33.1",
       "verify-old-sign-success": "El mensaje fue firmado por Neuron antes de la v0.33.1",
       "input-message": "Por favor ingrese mensaje",
       "input-choose-address": "Por favor ingrese o elija una dirección",
