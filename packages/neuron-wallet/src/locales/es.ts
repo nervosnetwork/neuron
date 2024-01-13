@@ -128,7 +128,7 @@ export default {
       'multisig-config-address-error': 'La configuración de dirección de la configuración multisig es incorrecta',
       'multisig-config-need-error': 'La generación de transacciones multisig requiere configuración multisig',
       'transaction-no-input-parameter': 'Falta un parámetro requerido en la celda de entrada de la consulta',
-      'migrate-sudt-no-type': 'La celda de migración no tiene un script de tipo',
+      'migrate-sudt-no-type': 'La Cell de migración no tiene un type script',
       'multisig-not-signed': 'Faltan firmas parciales para transacciones multifirma',
       'multisig-lock-hash-mismatch': 'La dirección multifirma actual no coincide con la transacción que se va a aprobar',
       'sudt-acp-have-data': 'La cuenta ACP de sUDT destruida tiene saldo',
