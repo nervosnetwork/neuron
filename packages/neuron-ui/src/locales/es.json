@@ -673,7 +673,7 @@
       "minimal-fee-required": "La capacidad mínima de depósito es de {{minimal}} CKBytes",
       "compensation-accumulated": "Compensación acumulada en {{blockNumber}} bloques",
       "withdraw-alert": "Advertencia: solo quedan {{epochs}} epochs ({{hours}} horas) hasta el final de su periodo de bloqueo actual. Si desea retirar en el periodo de bloqueo actual, envíe la solicitud de retiro a tiempo. Solo quedan {{nextLeftEpochs}} epochs ({{days}} días) hasta el final de su próximo periodo de bloqueo.",
-      "balance-not-reserved": "No reserve ninguna CKBytes para futuras operaciones de DAO (no se recomienda)",
+      "balance-not-reserved": "No reservar ningún CKBytes para futuras operaciones de DAO (no se recomienda)",
       "deposit-amount": "Cantidad a Depositar (CKB)",
       "deposit-record": {
         "deposited-at": "Depositado",
