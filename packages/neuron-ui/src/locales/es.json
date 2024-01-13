@@ -623,7 +623,7 @@
         "306": "Please enter a mainnet address",
         "307": "Por favor introduzca una dirección de testnet",
         "308": "Amount is not enough",
-        "309": "The receiver needs to upgrade her account address to accept more transfer.",
+        "309": "El destinatario debe actualizar la dirección de su cuenta para aceptar más transferencias.",
         "310": "Por favor introduzca una dirección {{tagName}}",
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
         "403": "No se detectó ningún dispositivo. Por favor conecte su dispositivo",
