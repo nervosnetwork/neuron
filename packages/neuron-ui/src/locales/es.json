@@ -660,7 +660,7 @@
       "deposit-records": "Depósitos",
       "completed-records": "Completados",
       "apc": "APC Actual",
-      "apc-tooltip": "Porcentaje Anual de Compensación Actual",
+      "apc-tooltip": "Porcentaje de Compensación Anual Actual",
       "fee": "Tarifa de Transacción: ",
       "deposit-to-nervos-dao": "Depositar en Nervos DAO",
       "withdraw-from-nervos-dao": "Retirar de Nervos DAO",
