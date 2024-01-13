@@ -137,7 +137,7 @@ export default {
       'no-exist-ckb-node-data':
         '{{path}} no tiene configuración y almacenamiento de nodo CKB, presiona confirmar para sincronizar desde cero',
       'light-client-sudt-acp-error':
-        'El modo cliente liviano no admite el envío de activos a la cuenta de activos de otra persona',
+        'El modo cliente ligero no admite el envío de activos a la cuenta de activos de otra persona',
       'could-not-connect-service': 'No se pudo conectar al servicio, por favor, inténtalo nuevamente más tarde.',
     },
     messageBox: {
