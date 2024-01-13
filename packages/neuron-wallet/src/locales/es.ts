@@ -80,7 +80,7 @@ export default {
       'invalid-address': 'La dirección {{address}} no es válida.',
       'codehash-not-loaded': 'codehash no está cargado.',
       'wallet-not-found': 'Billetera {{id}} no encontrada.',
-      'failed-to-create-mnemonic': 'Error al crear mnemotecnia.',
+      'failed-to-create-mnemonic': 'Error al crear mnemónico.',
       'network-not-found': 'No se encuentra la red con ID {{id}}.',
       'invalid-name': 'El nombre de {{field}} no es válido.',
       'default-network-unremovable': 'La red predeterminada no se puede quitar.',
