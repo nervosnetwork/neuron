@@ -58,7 +58,7 @@
         "ckb-app-not-found": "No se abre la aplicación CKB. Por favor abra la aplicación CKB en su dispositivo."
       },
       "waiting": "Esperando a la aplicación CKB...",
-      "abort": "Esperando a la aplicación CKB... Acción abortada",
+      "abort": "Esperando a la aplicación CKB... Acción cancelada",
       "app-version": "Aplicación CKB v{{version}} en ejecución.",
       "firmware-version": "Firmware v{{version}} detectado.",
       "wallet-name": "Nombre de la billetera",
