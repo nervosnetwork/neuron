@@ -494,7 +494,7 @@
         "title": "Destruir Cuenta de Activos"
       },
       "send-from-multisig": {
-        "title": "Enviar CKB desde dirección multisig"
+        "title": "Enviar CKB desde dirección multifirma"
       },
       "send-from-multisig-need-one": {
         "title": "Enviar CKB desde dirección multisig"
