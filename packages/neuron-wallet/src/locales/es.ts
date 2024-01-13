@@ -206,7 +206,7 @@ export default {
       },
       'mail-us': {
         message:
-          'Por favor, envíenos un correo con la información de depuración exportada por "Menú" -> "Ayuda" -> "Exportar información de depuración".',
+          'Por favor, envíenos un correo con la información de depuración exportada a través de "Menú" -> "Ayuda" -> "Exportar información de depuración".',
         'open-client': 'Abrir cliente de correo',
         'fail-message':
           'No se puede iniciar el cliente de correo, copie la dirección de correo, agregue la información de depuración exportada por "Menú" -> "Ayuda" -> "Exportar información de depuración" y envíenosla.',
