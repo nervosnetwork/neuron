@@ -186,7 +186,7 @@
       "add-one": "Añadir una más"
     },
     "import-keystore": {
-      "title": "Importar Archivo de Claves",
+      "title": "Importar Keystore",
       "select-file": "Seleccionar Archivo",
       "label": {
         "path": "Archivo de Claves",
