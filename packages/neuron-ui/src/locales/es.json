@@ -1048,7 +1048,7 @@
       },
       "delete-failed": "Error al eliminar la configuración multisig",
       "remove-multisig-address": "Eliminar dirección multifirma",
-      "remove-multisig-address-msg": "¿Está seguro de que desea eliminar la dirección de multifirma seleccionada?",
+      "remove-multisig-address-msg": "¿Está seguro de que desea eliminar la dirección multifirma seleccionada?",
       "send-ckb": {
         "title": "Enviar CKB desde una dirección multifirma",
         "detail": "Enviar desde la dirección multifirma {{m}}-de-{{n}}: <0></0>",
