@@ -654,7 +654,7 @@
     "nervos-dao": {
       "free": "Disponible",
       "locked": "Bloqueado",
-      "deposit": "Deposito",
+      "deposit": "Depósito",
       "deposit-rules": "Reglas de Depósito",
       "copy-balance": "Copiar Saldo",
       "deposit-records": "Depósitos",
