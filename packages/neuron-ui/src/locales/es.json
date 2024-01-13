@@ -744,7 +744,7 @@
       "updates-found-do-you-want-to-update": "Hay una actualización ({{versión}}) disponible",
       "install-update": "Actualización inmediata",
       "updates-downloaded-about-to-quit-and-install": "Actualización descargada. Listo para instalar y relanzar.",
-      "quit-and-install": "Instalar y relanzar"
+      "quit-and-install": "Instalar y reiniciar"
     },
     "datetime": {
       "mon": {
