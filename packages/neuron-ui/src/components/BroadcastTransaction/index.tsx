@@ -19,7 +19,7 @@ const BroadcastTransaction = () => {
   } = useGlobalState()
 
   const [isBroadcasting, setIsBroadcasting] = useState(false)
-  const [broadcastedTxHash, setBroadCastedTxHash] = useState<string | null>('')
+  const [broadcastedTxHash, setBroadcastedTxHash] = useState<string | null>('')
   const [t] = useTranslation()
   const dispatch = useDispatch()
   const [errMsg, setErrMsg] = useState('')
@@ -54,7 +54,7 @@ const BroadcastTransaction = () => {
 
     if (isSuccessResponse(res)) {
       if (!wallet?.id) {
-        setBroadCastedTxHash(res.result)
+        setBroadcastedTxHash(res.result)
         return
       }
 
@@ -62,20 +62,20 @@ const BroadcastTransaction = () => {
         getTransactionList({
           walletID: wallet.id,
           pageNo: 1,
-          pageSize: 1,
+          pageSize: 10,
           keywords: res.result,
         }).then(txRes => {
           if (isSuccessResponse(txRes) && txRes.result.items.length) {
             navigate(RoutePath.History)
           } else {
-            setBroadCastedTxHash(res.result)
+            setBroadcastedTxHash(res.result)
           }
         })
       }
     } else {
       setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
     }
-  }, [wallet, json, navigate, dispatch, broadcastedTxHash, setBroadCastedTxHash])
+  }, [wallet, json, navigate, dispatch, broadcastedTxHash, setBroadcastedTxHash])
 
   return (
     <>
