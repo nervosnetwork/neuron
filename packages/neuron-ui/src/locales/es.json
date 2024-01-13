@@ -576,7 +576,7 @@
           "transaction": "Transacción",
           "default-address": "Dirección predeterminada",
           "mnemonic": "Mnemónico",
-          "keystore-path": "Archivo de Almacenamiento",
+          "keystore-path": "Archivo Keystore",
           "keystore-name": "Nombre de la billetera",
           "keystore-password": "Contraseña",
           "deposit": "Depósito",
