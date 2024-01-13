@@ -717,7 +717,7 @@
     "nervos-dao-detail": {
       "tx-detail": "Detalles de la transacción",
       "deposited": "Depositado",
-      "withdrawn": "Retirar",
+      "withdrawn": "Retirado",
       "unlocked": "Desbloqueado",
       "basic-information": "Información básica",
       "transaction-hash": "Hash de transacción",
