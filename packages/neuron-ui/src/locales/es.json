@@ -633,7 +633,7 @@
     },
     "sync": {
       "synced": "Synced 100%",
-      "syncing": "Syncing {{ syncPercents }}",
+      "syncing": "Sincronizando {{ syncPercents }}",
       "block-number": "block number",
       "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
