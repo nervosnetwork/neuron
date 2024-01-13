@@ -1047,7 +1047,7 @@
         "notice": "Solo se puede importar una configuración a la vez. Si el contenido del archivo es una matriz, se importa el primero de forma predeterminada."
       },
       "delete-failed": "Error al eliminar la configuración multisig",
-      "remove-multisig-address": "Eliminar dirección de Multifirma",
+      "remove-multisig-address": "Eliminar dirección multifirma",
       "remove-multisig-address-msg": "¿Está seguro de que desea eliminar la dirección de multifirma seleccionada?",
       "send-ckb": {
         "title": "Enviar CKB desde una dirección de multifirma",
