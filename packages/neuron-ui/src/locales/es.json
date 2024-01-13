@@ -1075,7 +1075,7 @@
           "m-n-between-0-256": "m/n debe estar entre 0 y 256"
         },
         "multi-address-info": {
-          "title": "Ingrese los firmantes para la dirección de multifirma {{m}}-de-{{n}}",
+          "title": "Ingrese los firmantes para la dirección multifirma {{m}}-de-{{n}}",
           "view-title": "La dirección multifirma {{m}}-de-{{n}}",
           "ckb-address-placeholder": "Ingrese la dirección de ckb"
         },
