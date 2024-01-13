@@ -621,7 +621,7 @@
         "304": "Camera is unavailable or disabled.",
         "305": "$t(messages.fields.address) cannot be empty.",
         "306": "Please enter a mainnet address",
-        "307": "Please enter a testnet address",
+        "307": "Por favor introduzca una dirección de testnet",
         "308": "Amount is not enough",
         "309": "The receiver needs to upgrade her account address to accept more transfer.",
         "310": "Please enter a {{tagName}} address",
