@@ -1104,7 +1104,7 @@
         "noRSignerApprove": "Falta la aprobación de {{m}} firmante(s)",
         "signed": "Firmado",
         "view-concise-data": "Datos concisos",
-        "view-raw-data": "Datos en crudo"
+        "view-raw-data": "Datos sin procesar"
       }
     },
     "dropdown": {
