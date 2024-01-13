@@ -620,7 +620,7 @@
         "303": "$t(messages.fields.{{fieldName}}) no se encuentra.",
         "304": "La cámara no está disponible o está deshabilitada.",
         "305": "$t(messages.fields.address) no puede estar vacío.",
-        "306": "Please enter a mainnet address",
+        "306": "Por favor introduzca una dirección de red principal",
         "307": "Por favor introduzca una dirección de testnet",
         "308": "Amount is not enough",
         "309": "El destinatario debe actualizar la dirección de su cuenta para aceptar más transferencias.",
