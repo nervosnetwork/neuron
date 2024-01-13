@@ -1179,7 +1179,7 @@
         "capacity": "Desbloquear célula seleccionada {{capacity}} CKB"
       },
       "cell-consume-dialog": {
-        "title": "Consumir Célula",
+        "title": "Consumir Cell",
         "warn-consume": "Al consumir la célula, no se retendrá ningún dato y se utilizará todo el ckb, asegúrese de que no haya datos importantes que necesiten ser retenidos"
       },
       "enter-password": "Ingresar Contraseña",
