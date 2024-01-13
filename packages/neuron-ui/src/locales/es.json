@@ -980,7 +980,7 @@
         },
         "destroy": "Destruir",
         "destroy-ckb-desc": "Devolverá todo el CKB de esta cuenta de activo CKB a su dirección de cambio.",
-        "destroy-sudt-desc": "Devolverá el CKB ocupado de la cuenta de activos al cambio de su dirección.",
+        "destroy-sudt-desc": "Devolverá el CKB ocupado de la cuenta de activos a su dirección de cambio.",
         "extra-ckb-send-to-secp256": {
           "label": "Enviar 142 CKBytes adicionales junto con {{assetName}}",
           "tooltip": "Se enviarán 142 CKBytes adicionales junto con {{assetName}} para mantener el activo"
