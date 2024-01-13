@@ -555,7 +555,7 @@
         "view-the-run-node-doc": "Ver la guía en el navegador",
         "remain-ckb-for-withdraw": "Es recomendable reservar algunos CKBytes para operaciones de retiro",
         "no-valid-addresses-found": "No se encontraron direcciones válidas",
-        "decimal-range": "El decimal debe ser un número entero de {{range}}(inclusivo)",
+        "decimal-range": "El decimal debe ser un número entero de {{range}}(incluido)",
         "experimental-message-hardware": "Esta es una función experimental. Preste atención al riesgo y use con precaución.",
         "experimental-message": "Esta es una función experimental, puede cambiar en cualquier momento. Por favor, use con precaución.",
         "rebuild-sync": "Para una mejor experiencia de usuario, Neuron ha adoptado un nuevo almacenamiento, lo que requiere una migración de datos (estimado de 20 a 60 minutos).\nLo sentimos por la inconveniencia.",
