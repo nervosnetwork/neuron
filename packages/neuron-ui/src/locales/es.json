@@ -639,7 +639,7 @@
       "slow": "La sincronización es lenta",
       "sync-failed": "Sync failed, please check network",
       "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet",
-      "connecting": "Connecting"
+      "connecting": "Conectando"
     },
     "pagination": {
       "previous-page": "Página anterior",
