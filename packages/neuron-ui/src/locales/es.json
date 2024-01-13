@@ -619,7 +619,7 @@
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
-        "305": "$t(messages.fields.address) cannot be empty.",
+        "305": "$t(messages.fields.address) no puede estar vacío.",
         "306": "Please enter a mainnet address",
         "307": "Por favor introduzca una dirección de testnet",
         "308": "Amount is not enough",
