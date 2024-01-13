@@ -22,7 +22,7 @@ export default {
         delete: 'Eliminar Billetera Actual',
         'change-password': 'Cambiar Contraseña',
         'import-mnemonic': 'Importar Semilla de Billetera',
-        'import-keystore': 'Importar desde Almacén de Claves',
+        'import-keystore': 'Importar desde Keystore',
         'import-xpubkey': 'Importar Clave Pública Extendida',
         'import-hardware': 'Importar Billetera de Hardware',
       },
