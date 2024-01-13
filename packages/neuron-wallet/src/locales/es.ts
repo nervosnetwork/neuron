@@ -59,7 +59,7 @@ export default {
       },
       develop: {
         develop: 'Desarrollar',
-        'force-reload': 'Recargar Forzadamente',
+        'force-reload': 'Forzar Recarga',
         reload: 'Recargar',
         'toggle-dev-tools': 'Alternar Herramientas de Desarrollo',
       },
