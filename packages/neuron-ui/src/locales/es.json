@@ -611,7 +611,7 @@
         "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} es inválido.",
         "206": "$t(messages.fields.{{fieldName}}) is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} es inválido, no puede ser negativo.",
-        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it should start with http(s)://",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} no es válido, debería comenzar con http(s)://",
         "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
         "210": "\"{{value}}\" is reserved, please use another one.",
         "211": "The amount cannot be 0",
