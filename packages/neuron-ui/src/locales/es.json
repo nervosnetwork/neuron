@@ -169,7 +169,7 @@
       "input-your-seed": "Por favor introduce la frase semilla de tu billetera",
       "password": "Contraseña",
       "confirm-password": "Confirmar Contraseña",
-      "set-wallet-name-and-password": "Nombrar tu nueva billetera y elige una contraseña fuerte para protegerla",
+      "set-wallet-name-and-password": "Nombra tu nueva billetera y elige una contraseña segura para protegerla",
       "set-wallet-name": "Dale un nombre a tu nueva billetera",
       "set-a-strong-password-to-protect-your-wallet": "Crea una contraseña fuerte para proteger tu billetera",
       "wallet-suffix": "Billetera {{suffix}}",
