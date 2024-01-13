@@ -1062,7 +1062,7 @@
       "multi-details": "Detalles de la dirección multifirma",
       "create-dialog": {
         "title": "Crear dirección multifirma",
-        "preview-title": "La dirección de multifirma se ha generado",
+        "preview-title": "La dirección multifirma se ha generado",
         "index": "Índice",
         "required": "Requerido",
         "signer-address": "Dirección del firmante",
