@@ -291,7 +291,7 @@
       "basic-information": "Información Básica",
       "search": {
         "button": "Buscar",
-        "placeholder": "Buscar número de transacción, dirección o fecha (aaaa-mm-dd)"
+        "placeholder": "Buscar hash de transacción, dirección o fecha (aaaa-mm-dd)"
       },
       "table": {
         "name": "Nombre de la Billetera",
