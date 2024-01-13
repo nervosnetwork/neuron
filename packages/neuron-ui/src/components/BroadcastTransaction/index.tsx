@@ -5,7 +5,7 @@ import { isSuccessResponse, RoutePath, isMainnet as isMainnetUtil, useGoBack, ge
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { useDispatch, useState as useGlobalState } from 'states'
-import { broadcastTransactionOnly, OfflineSignStatus, openExternal, getLiveCells } from 'services/remote'
+import { broadcastTransactionOnly, OfflineSignStatus, openExternal, getTransactionList } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 
 import styles from './broadcastTransaction.module.scss'
@@ -19,7 +19,7 @@ const BroadcastTransaction = () => {
   } = useGlobalState()
 
   const [isBroadcasting, setIsBroadcasting] = useState(false)
-  const [broadcastedTxHash, setBroadCastedTxHash] = useState('')
+  const [broadcastedTxHash, setBroadCastedTxHash] = useState<string | null>('')
   const [t] = useTranslation()
   const dispatch = useDispatch()
   const [errMsg, setErrMsg] = useState('')
@@ -46,29 +46,34 @@ const BroadcastTransaction = () => {
 
     setIsBroadcasting(true)
 
-    try {
-      const res = await broadcastTransactionOnly({
-        ...json,
-      })
-      if (isSuccessResponse(res)) {
-        getLiveCells().then(cellRes => {
-          if (isSuccessResponse(cellRes) && cellRes.result) {
-            const cellWithTransaction = cellRes.result.find(item => item.outPoint.txHash === res.result)
+    const res = await broadcastTransactionOnly({
+      ...json,
+    })
 
-            if (cellWithTransaction) {
-              navigate(RoutePath.History)
-            }
-          }
+    setIsBroadcasting(false)
 
-          if (res.result) {
+    if (isSuccessResponse(res)) {
+      if (!wallet?.id) {
+        setBroadCastedTxHash(res.result)
+        return
+      }
+
+      if (res.result) {
+        getTransactionList({
+          walletID: wallet.id,
+          pageNo: 1,
+          pageSize: 1,
+          keywords: res.result,
+        }).then(txRes => {
+          if (isSuccessResponse(txRes) && txRes.result.items.length) {
+            navigate(RoutePath.History)
+          } else {
             setBroadCastedTxHash(res.result)
           }
         })
-      } else {
-        setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
       }
-    } finally {
-      setIsBroadcasting(false)
+    } else {
+      setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
     }
   }, [wallet, json, navigate, dispatch, broadcastedTxHash, setBroadCastedTxHash])
 
