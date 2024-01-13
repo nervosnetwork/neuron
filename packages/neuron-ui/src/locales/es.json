@@ -174,7 +174,7 @@
       "set-a-strong-password-to-protect-your-wallet": "Crea una contraseña segura para proteger tu billetera",
       "wallet-suffix": "Billetera {{suffix}}",
       "write-down-seed": "Escribe tu semilla de billetera y guárdala en un lugar seguro",
-      "new-name": "Usa un nombre sin usar para la nueva billetera",
+      "new-name": "Usa un nombre no usado previamente para la nueva billetera",
       "complex-password": "La contraseña debe tener entre 8 y 50 caracteres y contener al menos tres categorías de caracteres entre las siguientes: letras en mayúscula, letras en minúscula, números y símbolos especiales.",
       "same-password": "La contraseña y la confirmación de contraseña deben coincidir",
       "input-seed-verify": "Ingresa la frase semilla creada para verificar",
