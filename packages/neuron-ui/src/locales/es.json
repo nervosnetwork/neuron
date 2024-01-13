@@ -249,7 +249,7 @@
       "click-to-copy": "Haz clic para copiar la dirección",
       "copy-address": "Copiar Dirección",
       "address-not-found": "Dirección no encontrada",
-      "prompt": "Nervos elige una nueva dirección de recepción para una mejor privacidad. Por favor, ve al Libro de Direcciones si deseas utilizar una dirección de recepción utilizada anteriormente.",
+      "prompt": "Neuron elige una nueva dirección de recepción para una mejor privacidad. Por favor, ve al Libro de Direcciones si deseas utilizar una dirección de recepción utilizada anteriormente.",
       "address-qrcode": "Código QR de la Dirección",
       "address": "Dirección {{network}}",
       "verify-address": "Verificar Dirección",
