@@ -872,7 +872,7 @@
       "title": "Activos personalizados",
       "date": "Fecha",
       "assets": "Activos",
-      "type-script-tooltip": "Tipo de Script",
+      "type-script-tooltip": "Type Script",
       "data-tooltip": "Datos",
       "user-defined-asset": "Activo no catalogado",
       "user-defined-asset-tooltip": "Este es un activo no catalogado. Neuron no puede procesarlo actualmente. Utilice un software de terceros para verificarlo.",
