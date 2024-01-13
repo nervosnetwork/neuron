@@ -1090,7 +1090,7 @@
         "duplicate-address-forbid": "La dirección no puede ser duplicada"
       },
       "approve-dialog": {
-        "title": "Aprobar con dirección de multifirma",
+        "title": "Aprobar con dirección multifirma",
         "detail": "Aprobar con la dirección multifirma {{m}}-de-{{n}} <0></0>",
         "transaction": "Transacción",
         "cancel": "Cancelar",
