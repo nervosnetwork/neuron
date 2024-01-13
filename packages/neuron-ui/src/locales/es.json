@@ -1076,7 +1076,7 @@
         },
         "multi-address-info": {
           "title": "Ingrese los firmantes para la dirección de multifirma {{m}}-de-{{n}}",
-          "view-title": "La dirección de multifirma {{m}}-de-{{n}}",
+          "view-title": "La dirección multifirma {{m}}-de-{{n}}",
           "ckb-address-placeholder": "Ingrese la dirección de ckb"
         },
         "multi-list": "Lista de firmantes",
