@@ -1091,7 +1091,7 @@
       },
       "approve-dialog": {
         "title": "Aprobar con dirección de multifirma",
-        "detail": "Aprobar con la dirección de multifirma {{m}}-de-{{n}} <0></0>",
+        "detail": "Aprobar con la dirección multifirma {{m}}-de-{{n}} <0></0>",
         "transaction": "Transacción",
         "cancel": "Cancelar",
         "signAndExport": "Firmar y exportar",
