@@ -622,7 +622,7 @@
         "305": "$t(messages.fields.address) no puede estar vacío.",
         "306": "Por favor introduzca una dirección de red principal",
         "307": "Por favor introduzca una dirección de testnet",
-        "308": "Amount is not enough",
+        "308": "La cantidad no es suficiente",
         "309": "El destinatario debe actualizar la dirección de su cuenta para aceptar más transferencias.",
         "310": "Por favor introduzca una dirección {{tagName}}",
         "402": "La aplicación CKB no se abre. Abra la aplicación CKB en su dispositivo.",
