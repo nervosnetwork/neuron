@@ -634,7 +634,7 @@
     "sync": {
       "synced": "Synced 100%",
       "syncing": "Sincronizando {{ syncPercents }}",
-      "block-number": "block number",
+      "block-number": "número de bloque",
       "syncing-balance": "El saldo se está actualizando",
       "slow": "La sincronización es lenta",
       "sync-failed": "Sync failed, please check network",
