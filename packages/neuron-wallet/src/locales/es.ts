@@ -108,7 +108,7 @@ export default {
       'invalid-json': 'Archivo JSON no válido, por favor, verifica la integridad de tu archivo.',
       'cell-is-not-yet-live': 'Por favor, espera hasta que la última transacción sea confirmada por la cadena.',
       'transaction-is-not-committed-yet':
-        'No se pueden encontrar celdas requeridas en la cadena, por favor, asegúrate de que las transacciones relacionadas hayan sido confirmadas.',
+        'No se pueden encontrar Cells requeridas en la cadena, por favor, asegúrate de que las transacciones relacionadas hayan sido confirmadas.',
       'mainnet-address-required': '{{address}} no es una dirección de mainnet.',
       'testnet-address-required': '{{address}} no es una dirección de testnet.',
       'address-not-found':
