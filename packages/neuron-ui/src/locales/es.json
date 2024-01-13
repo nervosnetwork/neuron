@@ -1050,7 +1050,7 @@
       "remove-multisig-address": "Eliminar dirección multifirma",
       "remove-multisig-address-msg": "¿Está seguro de que desea eliminar la dirección de multifirma seleccionada?",
       "send-ckb": {
-        "title": "Enviar CKB desde una dirección de multifirma",
+        "title": "Enviar CKB desde una dirección multifirma",
         "detail": "Enviar desde la dirección multifirma {{m}}-de-{{n}}: <0></0>",
         "balance": "Balance",
         "address": "Dirección",
