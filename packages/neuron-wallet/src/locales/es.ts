@@ -122,7 +122,7 @@ export default {
       'wallet-not-supported-function': 'Esta billetera no admite la función {name}.',
       'invalid-transaction-file': 'Archivo de transacción no válido.',
       'offline-sign-failed': 'Firma fallida, por favor, verifica si estás firmando con la billetera correcta.',
-      'multisig-script-prefix-error': 'Error en la configuración de multisig',
+      'multisig-script-prefix-error': 'Error en la configuración multifirma',
       'multisig-config-not-exist': 'La configuración de multisig no existe',
       'multisig-config-exist': 'La configuración de multisig ya existe',
       'multisig-config-address-error': 'La configuración de dirección de la configuración multisig es incorrecta',
