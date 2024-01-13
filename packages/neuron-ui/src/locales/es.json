@@ -938,7 +938,7 @@
         "select-account-type": "Seleccione el tipo de cuenta",
         "account-name": "Nombre de la cuenta",
         "sudt-account": "Cuenta de activos sUDT",
-        "delete-failed": "No se pudo eliminar la configuración multisig, el motivo del fallo: {{reason}}",
+        "delete-failed": "No se pudo eliminar la configuración multifirma, el motivo del fallo: {{reason}}",
         "ckb-account": "Cuenta CKB",
         "set-token-info": "Establecer información del token",
         "token-id": "ID del token",
