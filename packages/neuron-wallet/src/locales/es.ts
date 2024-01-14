@@ -282,7 +282,7 @@ export default {
     'multisig-config': {
       'import-config': 'Importar configuración de multisig',
       'export-config': 'Exportar configuración de multisig',
-      'config-exported': 'Las configuraciones de multisig se han exportado a {{filePath}}.',
+      'config-exported': 'Las configuraciones multifirma se han exportado a {{filePath}}.',
       'import-duplicate': 'Por favor, verifique configuraciones duplicadas',
       'import-result': 'Importación exitosa {{success}}, fallida {{fail}}.{{failCheck}}',
       'confirm-delete': '¿Confirmar eliminar la configuración de multisig?',
