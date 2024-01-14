@@ -215,7 +215,7 @@ export default {
       'migrate-failed': {
         title: 'Falló la migración',
         message:
-          'La migración falló, presione Aceptar para eliminar los datos antiguos y sincronizar desde cero, o haga clic en Cancelar para migrar más tarde al relanzar Neuron. Razón del fallo de la migración: {{ reason }}',
+          'La migración falló, presione Aceptar para eliminar los datos antiguos y sincronizar desde cero, o haga clic en Cancelar para migrar más tarde al reiniciar Neuron. Razón del fallo de la migración: {{ reason }}',
         buttons: {
           ok: 'Aceptar',
           cancel: 'Cancelar',
