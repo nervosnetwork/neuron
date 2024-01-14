@@ -764,7 +764,7 @@ export default class ApiController {
       return this.#offlineSignController.signTransaction(params)
     })
 
-    handle('broadcast-transaction', async (_, params) => {
+    handle('broadcast-transaction-only', async (_, params) => {
       return this.#offlineSignController.broadcastTransaction(params)
     })
 

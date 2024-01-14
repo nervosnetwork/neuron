@@ -42,7 +42,7 @@ export type SignedTransaction = OfflineSignJSON & { status: OfflineSignStatus.Si
 
 export const exportTransactionAsJSON = remoteApi<OfflineSignJSON, void>('export-transaction-as-json')
 export const signTransactionOnly = remoteApi<OfflineSignJSON, void>('sign-transaction-only')
-export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-transaction')
+export const broadcastTransaction = remoteApi<BroadcastProps, void>('broadcast-transaction-only')
 export const broadcastSignedTransaction = remoteApi<SignedTransaction, string>('broadcast-signed-transaction')
 export const signAndExportTransaction = remoteApi<SignProps, { filePath: string; json: OfflineSignJSON }>(
   'sign-and-export-transaction'
