@@ -46,15 +46,6 @@ export interface OfflineSignJSON {
   multisig_configs?: MultisigConfigs
 }
 
-export interface SignedTransaction {
-  transaction: Transaction
-  status: SignStatus.Signed
-  type: SignType
-  description?: string
-  asset_account?: AssetAccount
-  multisig_configs?: MultisigConfigs
-}
-
 export default class OfflineSign implements OfflineSignProps {
   public transaction: Transaction
   public assetAccount?: AssetAccount

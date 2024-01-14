@@ -5,7 +5,7 @@ import { isSuccessResponse, RoutePath, isMainnet as isMainnetUtil, useGoBack, ge
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { useDispatch, useState as useGlobalState } from 'states'
-import { broadcastTransactionOnly, OfflineSignStatus, openExternal, getTransactionList } from 'services/remote'
+import { broadcastSignedTransaction, OfflineSignStatus, openExternal, getTransactionList } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 
 import styles from './broadcastTransaction.module.scss'
@@ -46,7 +46,7 @@ const BroadcastTransaction = () => {
 
     setIsBroadcasting(true)
 
-    const res = await broadcastTransactionOnly({
+    const res = await broadcastSignedTransaction({
       ...json,
     })
 

@@ -3,7 +3,7 @@ import path from 'path'
 import { dialog } from 'electron'
 import { t } from 'i18next'
 import { ResponseCode } from '../utils/const'
-import OfflineSign, { SignType, OfflineSignJSON, SignStatus, SignedTransaction } from '../models/offline-sign'
+import OfflineSign, { SignType, OfflineSignJSON, SignStatus } from '../models/offline-sign'
 import TransactionSender from '../services/transaction-sender'
 import Transaction from '../models/chain/transaction'
 import AssetAccountController from './asset-account'
@@ -187,49 +187,6 @@ export default class OfflineSignController {
         return new WalletsController().sendTx(
           {
             walletID,
-            tx,
-            password: '',
-            description,
-          },
-          true
-        )
-      }
-    }
-  }
-
-  public async broadcastTransactionOnly({
-    transaction,
-    type,
-    asset_account: assetAccount,
-    description,
-  }: SignedTransaction) {
-    const tx = Transaction.fromObject(transaction)
-    switch (type) {
-      case SignType.CreateSUDTAccount: {
-        return new AssetAccountController().sendCreateTx(
-          {
-            walletID: '',
-            assetAccount: assetAccount!,
-            tx,
-            password: '',
-          },
-          true
-        )
-      }
-      case SignType.SendSUDT: {
-        return new AnyoneCanPayController().sendTx(
-          {
-            walletID: '',
-            tx,
-            password: '',
-          },
-          true
-        )
-      }
-      default: {
-        return new WalletsController().sendTx(
-          {
-            walletID: '',
             tx,
             password: '',
             description,
