@@ -285,7 +285,7 @@ export default {
       'config-exported': 'Las configuraciones multifirma se han exportado a {{filePath}}.',
       'import-duplicate': 'Por favor, verifique configuraciones duplicadas',
       'import-result': 'Importación exitosa {{success}}, fallida {{fail}}.{{failCheck}}',
-      'confirm-delete': '¿Confirmar eliminar la configuración de multisig?',
+      'confirm-delete': '¿Confirmar eliminar la configuración multifirma?',
       'approve-tx': 'Confirmar transacción multifirma',
       'delete-actions': {
         ok: 'Confirmar',
