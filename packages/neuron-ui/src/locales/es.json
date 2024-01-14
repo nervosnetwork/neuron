@@ -669,7 +669,7 @@
       "compensation": "Compensación",
       "notice-wait-time": "Aviso: Está a punto de iniciar un retiro, el cual tardará {{epochs}} epochs {{blocks}} bloques (aproximadamente {{days}} días) para completarse.",
       "deposit-dialog-title": "Depósito",
-      "deposit-terms": "Nervos DAO requiere 102 CKBytes para el almacenamiento de celdas de depósito, las cuales no reciben compensación. Por favor visite Nervos DAO RFC para obtener más información sobre Nervos DAO",
+      "deposit-terms": "Nervos DAO requiere 102 CKBytes para el almacenamiento de Cells de depósito, las cuales no reciben compensación. Por favor visite Nervos DAO RFC para obtener más información sobre Nervos DAO",
       "minimal-fee-required": "La capacidad mínima de depósito es de {{minimal}} CKBytes",
       "compensation-accumulated": "Compensación acumulada en {{blockNumber}} bloques",
       "withdraw-alert": "Advertencia: solo quedan {{epochs}} epochs ({{hours}} horas) hasta el final de su periodo de bloqueo actual. Si desea retirar en el periodo de bloqueo actual, envíe la solicitud de retiro a tiempo. Solo quedan {{nextLeftEpochs}} epochs ({{days}} días) hasta el final de su próximo periodo de bloqueo.",
