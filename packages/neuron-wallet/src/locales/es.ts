@@ -280,7 +280,7 @@ export default {
       'load-transaction': 'Cargar archivo de transacción',
     },
     'multisig-config': {
-      'import-config': 'Importar configuración de multisig',
+      'import-config': 'Importar configuración multifirma',
       'export-config': 'Exportar configuración de multisig',
       'config-exported': 'Las configuraciones multifirma se han exportado a {{filePath}}.',
       'import-duplicate': 'Por favor, verifique configuraciones duplicadas',
