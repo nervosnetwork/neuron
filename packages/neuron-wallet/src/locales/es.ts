@@ -286,7 +286,7 @@ export default {
       'import-duplicate': 'Por favor, verifique configuraciones duplicadas',
       'import-result': 'Importación exitosa {{success}}, fallida {{fail}}.{{failCheck}}',
       'confirm-delete': '¿Confirmar eliminar la configuración de multisig?',
-      'approve-tx': 'Confirmar transacción multisig',
+      'approve-tx': 'Confirmar transacción multifirma',
       'delete-actions': {
         ok: 'Confirmar',
         cancel: 'Cancelar',
