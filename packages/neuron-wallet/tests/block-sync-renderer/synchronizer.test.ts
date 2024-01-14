@@ -156,7 +156,6 @@ describe('unit tests for IndexerConnector', () => {
                 txHash: 'hash1',
                 blockNumber: 10,
                 lockHash: script.computeHash(),
-                address,
                 walletId,
               }),
             ]
@@ -165,7 +164,6 @@ describe('unit tests for IndexerConnector', () => {
                 txHash: 'hash2',
                 blockNumber: 2,
                 lockHash: script.computeHash(),
-                address,
                 walletId,
               }),
             ]
