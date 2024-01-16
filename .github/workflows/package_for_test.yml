@@ -240,6 +240,7 @@ jobs:
           edit-mode: append
 
   sync-test:
+    if: ${{ (github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/package -test')) || github.event_name == 'push' }}
     needs: [packaging]
     strategy:
       matrix:
