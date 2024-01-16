@@ -6,7 +6,6 @@ import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
 import { useDispatch, useState as useGlobalState } from 'states'
 import { broadcastSignedTransaction, OfflineSignStatus, openExternal, getTransactionList } from 'services/remote'
-import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 
 import styles from './broadcastTransaction.module.scss'
 
@@ -100,13 +99,6 @@ const BroadcastTransaction = () => {
               <tr>
                 <td className={styles.first}>{t('offline-sign.status.label')}</td>
                 <td>{t('offline-sign.status.signed')}</td>
-              </tr>
-              <tr>
-                <td className={styles.first}>{t('offline-sign.wallet')}</td>
-                <td>
-                  {wallet?.device ? <HardWalletIcon /> : null}
-                  <span>{wallet?.name ?? ''}</span>
-                </td>
               </tr>
               <tr>
                 <td className={styles.first}>{t('offline-sign.content')}</td>
