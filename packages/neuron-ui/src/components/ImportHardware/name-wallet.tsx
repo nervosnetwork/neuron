@@ -48,7 +48,7 @@ const NameWallet = ({
               importedWalletDialogShown.setStatus(res.result.id, true)
             }
           } else {
-            if (res.status === ErrorCode.ImportingExitingWallet) {
+            if (res.status === ErrorCode.DuplicateImportWallet) {
               onImportingExitingWalletError(res.message)
               return
             }

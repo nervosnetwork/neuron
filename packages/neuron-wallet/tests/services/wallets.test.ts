@@ -29,7 +29,7 @@ import Keystore from '../../src/models/keys/keystore'
 import initConnection from '../../src/database/chain/ormconfig'
 import { getConnection } from 'typeorm'
 import { when } from 'jest-when'
-import { WalletFunctionNotSupported, ImportingExitingWallet } from '../../src/exceptions/wallet'
+import { WalletFunctionNotSupported, DuplicateImportWallet } from '../../src/exceptions/wallet'
 import { AddressType } from '../../src/models/keys/address'
 import { Manufacturer } from '../../src/services/hardware/common'
 import WalletService, { WalletProperties, Wallet } from '../../src/services/wallets'
@@ -508,12 +508,12 @@ describe('wallet service', () => {
     })
   })
 
-  describe('ImportingExitingWallet', () => {
+  describe('DuplicateImportWallet', () => {
     beforeEach(() => {
       walletService.create(wallet2)
     })
     it('create an exiting wallet', () => {
-      expect(() => walletService.create(wallet5)).toThrowError(ImportingExitingWallet)
+      expect(() => walletService.create(wallet5)).toThrowError(DuplicateImportWallet)
     })
   })
 

@@ -117,7 +117,7 @@ const ImportKeystore = () => {
             throw new PasswordIncorrectException()
           }
 
-          if (res.status === ErrorCode.ImportingExitingWallet) {
+          if (res.status === ErrorCode.DuplicateImportWallet) {
             onImportingExitingWalletError(res.message)
             return
           }

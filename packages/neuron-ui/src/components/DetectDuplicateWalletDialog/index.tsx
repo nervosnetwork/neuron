@@ -12,7 +12,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
     settings: { wallets = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const [deletableWallets, setDeletableWallets] = useState<string[]>([])
+  const [duplicatedWallets, setDuplicatedWallets] = useState<string[]>([])
   const [t] = useTranslation()
 
   const groups = useMemo(() => {
@@ -39,14 +39,14 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
           if (item.id !== id) {
             list.push(item.id)
           }
-        } else if (deletableWallets.includes(item.id)) {
+        } else if (duplicatedWallets.includes(item.id)) {
           list.push(item.id)
         }
       })
 
-      setDeletableWallets(list)
+      setDuplicatedWallets(list)
     },
-    [wallets, deletableWallets, setDeletableWallets]
+    [wallets, duplicatedWallets, setDuplicatedWallets]
   )
 
   const onConfirm = useCallback(async () => {
@@ -68,8 +68,8 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
       })
     }
 
-    let ids = [...deletableWallets]
-    if (deletableWallets.includes(currentID)) {
+    let ids = [...duplicatedWallets]
+    if (duplicatedWallets.includes(currentID)) {
       ids = ids.filter(item => item !== currentID)
       ids.push(currentID)
     }
@@ -80,7 +80,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
       await getRequest(id)
     }
     onClose()
-  }, [wallets, deletableWallets, requestPassword, onClose, dispatch])
+  }, [wallets, duplicatedWallets, requestPassword, onClose, dispatch])
 
   return (
     <Dialog
@@ -88,7 +88,7 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
       title={t('settings.wallet-manager.detected-duplicate.title')}
       onCancel={onClose}
       onConfirm={onConfirm}
-      disabled={deletableWallets.length === 0}
+      disabled={duplicatedWallets.length === 0}
     >
       <div className={styles.content}>
         <p className={styles.detail}>{t('settings.wallet-manager.detected-duplicate.detail')}</p>

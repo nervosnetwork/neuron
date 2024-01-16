@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, ImportingExitingWallet } from '../exceptions'
+import { WalletNotFound, IsRequired, UsedName, WalletFunctionNotSupported, DuplicateImportWallet } from '../exceptions'
 import Store from '../models/store'
 import Keystore from '../models/keys/keystore'
 import WalletDeletedSubject from '../models/subjects/wallet-deleted-subject'
@@ -385,7 +385,7 @@ export default class WalletService {
 
     if (this.getAll().find(item => item.extendedKey === props.extendedKey)) {
       this.importedWallet = wallet
-      throw new ImportingExitingWallet(JSON.stringify({ extendedKey: props.extendedKey, id }))
+      throw new DuplicateImportWallet(JSON.stringify({ extendedKey: props.extendedKey, id }))
     }
 
     this.listStore.writeSync(this.walletsKey, [...this.getAll(), wallet.toJSON()])

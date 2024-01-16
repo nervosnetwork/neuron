@@ -50,7 +50,7 @@ const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (n
       importedWalletDialogShown.setStatus(res.result.id, true)
       navigate(RoutePath.Overview)
     } else if (res.status > 0) {
-      if (res.status === ErrorCode.ImportingExitingWallet) {
+      if (res.status === ErrorCode.DuplicateImportWallet) {
         throw res
       }
 
