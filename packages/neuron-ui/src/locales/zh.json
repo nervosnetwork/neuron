@@ -682,7 +682,8 @@
         "compensated-period": "补贴时间",
         "days-hours": "{{days}} 天 {{hours}} 小时",
         "no-deposit": "没有存入记录",
-        "no-completed": "没有解锁记录"
+        "no-completed": "没有解锁记录",
+        "insufficient-balance-to-unlock": "没有足够余额支付交易费用以解锁 DAO 存款"
       },
       "compensation-period": {
         "tooltip": {

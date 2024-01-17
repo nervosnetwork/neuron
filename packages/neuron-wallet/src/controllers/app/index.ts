@@ -132,6 +132,8 @@ export default class AppController {
         devTools: env.isDevMode,
         contextIsolation: false,
         preload: path.join(__dirname, './preload.js'),
+        // disable webSecurity for dev, do not set webSecurity as true, because electron has default set other value when webSecurity is not set by developer
+        ...(app.isPackaged ? {} : { webSecurity: false }),
       },
     })
 

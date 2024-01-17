@@ -689,7 +689,8 @@
         "compensated-period": "Compensation Period",
         "days-hours": "{{days}} days {{hours}} hours",
         "no-deposit": "No Deposit",
-        "no-completed": "No Completed"
+        "no-completed": "No Completed",
+        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit"
       },
       "compensation-period": {
         "tooltip": {

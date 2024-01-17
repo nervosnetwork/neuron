@@ -179,6 +179,7 @@ const NervosDAO = () => {
                 genesisBlockTimestamp,
                 connectionStatus,
                 isPrivacyMode,
+                hasCkbBalance: +wallet.balance > 0,
               }
               return <DAORecord key={key} {...props} />
             })}

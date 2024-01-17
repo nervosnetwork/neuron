@@ -19,6 +19,7 @@ import { Clock } from 'widgets/Icons/icon'
 import { Link } from 'react-router-dom'
 import { HIDE_BALANCE } from 'utils/const'
 
+import Tooltip from 'widgets/Tooltip'
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
 
@@ -42,6 +43,7 @@ export interface DAORecordProps extends State.NervosDAORecord {
   tipBlockTimestamp: number // tip block timestamp, used to calculate apc, dovetails with current epoch
   genesisBlockTimestamp: number | undefined // genesis block timestamp, used to calculate apc
   isPrivacyMode?: boolean
+  hasCkbBalance?: boolean
 }
 
 export const DAORecord = ({
@@ -62,6 +64,7 @@ export const DAORecord = ({
   withdrawInfo,
   unlockInfo,
   isPrivacyMode,
+  hasCkbBalance,
 }: DAORecordProps) => {
   const [t] = useTranslation()
   const [withdrawEpoch, setWithdrawEpoch] = useState('')
@@ -143,8 +146,11 @@ export const DAORecord = ({
   const compensatedPeriod =
     withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo.timestamp - +depositInfo.timestamp : undefined
 
+  const isWithdrawnDisabled = CellStatus.Deposited === cellStatus && !hasCkbBalance
   const isActionAvailable =
-    connectionStatus === 'online' && [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus)
+    connectionStatus === 'online' &&
+    [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus) &&
+    !isWithdrawnDisabled
 
   const depositOutPointKey = depositOutPoint
     ? `${depositOutPoint.txHash}-${depositOutPoint.index}`
@@ -277,14 +283,31 @@ export const DAORecord = ({
           </div>
 
           <div className={styles.action}>
-            <Button
-              type="primary"
-              data-tx-hash={txHash}
-              data-index={index}
-              onClick={onClick}
-              disabled={!isActionAvailable}
-              label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
-            />
+            {isWithdrawnDisabled ? (
+              <Tooltip
+                tip={<div>{t('nervos-dao.deposit-record.insufficient-balance-to-unlock')}</div>}
+                placement="top"
+                tipClassName={styles.tip}
+              >
+                <Button
+                  type="primary"
+                  data-tx-hash={txHash}
+                  data-index={index}
+                  onClick={onClick}
+                  disabled={!isActionAvailable}
+                  label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
+                />
+              </Tooltip>
+            ) : (
+              <Button
+                type="primary"
+                data-tx-hash={txHash}
+                data-index={index}
+                onClick={onClick}
+                disabled={!isActionAvailable}
+                label={t(`nervos-dao.deposit-record.${isWithdrawn ? 'unlock' : 'withdraw'}-action-label`)}
+              />
+            )}
           </div>
         </div>
       )}
