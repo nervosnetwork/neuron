@@ -64,6 +64,7 @@ import { resetSyncTaskQueue } from '../block-sync-renderer'
 import DataUpdateSubject from '../models/subjects/data-update'
 import CellManagement from './cell-management'
 import { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
+import { CKBLightRunner } from '../services/light-runner'
 
 export type Command = 'export-xpubkey' | 'import-xpubkey' | 'delete-wallet' | 'backup-wallet' | 'migrate-acp'
 // Handle channel messages from renderer process and user actions.
@@ -332,15 +333,41 @@ export default class ApiController {
     })
 
     handle(
+      'update-wallet-start-block-number',
+      async (
+        _,
+        params: {
+          id: string
+          startBlockNumber: string
+        }
+      ) => {
+        const res = this.#walletsController.update(params)
+        const network = NetworksService.getInstance().getCurrent()
+        if (network.type !== NetworkType.Light) {
+          throw new Error('Only Light client can set start block number')
+        }
+        const lastSetStartBlockNumber = WalletsService.getInstance().getCurrent()?.toJSON().startBlockNumber
+        if (lastSetStartBlockNumber && +params.startBlockNumber < +lastSetStartBlockNumber) {
+          await CKBLightRunner.getInstance().clearNodeCache()
+        } else {
+          resetSyncTaskQueue.asyncPush(true)
+        }
+        return res
+      }
+    )
+
+    handle(
       'update-wallet',
       async (
         _,
-        params: { id: string; password?: string; name?: string; newPassword?: string; startBlockNumber?: string }
+        params: {
+          id: string
+          password?: string
+          name?: string
+          newPassword?: string
+        }
       ) => {
         const res = this.#walletsController.update(params)
-        if (params.startBlockNumber) {
-          resetSyncTaskQueue.asyncPush(true)
-        }
         return res
       }
     )

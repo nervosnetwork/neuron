@@ -63,7 +63,7 @@
     font-size: 12px;
     font-weight: 400;
 
-    &:nth-child(2) {
+    &.setStartBlockNumber {
       &::before {
         content: '';
         display: block;
@@ -72,10 +72,6 @@
         background-color: var(--divide-line-color);
         margin: 12px 0;
       }
-    }
-
-    &:nth-child(3) {
-      margin-top: 12px;
     }
 
     & > div {
@@ -93,6 +89,19 @@
           fill: var(--primary-color);
         }
       }
+    }
+  }
+
+  .startBlockNumber {
+    margin-top: 8px;
+    .title {
+      font-size: 12px;
+      font-weight: 400;
+    }
+    .number {
+      color: var(--third-text-color);
+      font-family: D-DIN-PRO;
+      font-weight: 700;
     }
   }
 }

@@ -31,6 +31,7 @@
       "tooltip": {
         "block-synced": "Bloc synchronisé",
         "looking-valid-target": "Recherche de la cible valide présumée",
+        "start-block-number": "bloc de départ",
         "set-start-block-number": "Définir le numéro de bloc de départ"
       },
       "migrating": "migration en cours..."
@@ -1125,10 +1126,13 @@
     },
     "set-start-block-number": {
       "title": "Définir le numéro de bloc de départ",
+      "warn": "Veuillez noter que les transactions antérieures à la synchronisation du bloc initial ne seront pas synchronisées !",
       "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le noeud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
       "input-place-holder": "Veuillez entrer le numéro de bloc de départ pour la synchronisation, par exemple : 10, 100, 101",
       "locate-first-tx": "Localiser la première transaction",
-      "view-block": "Voir le bloc"
+      "view-block": "Voir le bloc",
+      "set-less-than-before": "Le numéro de bloc que vous avez défini est inférieur au bloc précédent. La synchronisation recommencera, veuillez procéder avec prudence.",
+      "reset-to-header-tip-number": "Impossible de définir un numéro de bloc supérieur au bloc le plus récent. Réinitialisation au numéro de bloc le plus récent."
     },
     "main": {
       "external-node-detected-dialog": {

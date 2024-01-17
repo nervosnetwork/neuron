@@ -31,6 +31,7 @@
       "tooltip": {
         "block-synced": "Block Synced",
         "looking-valid-target": "Looking for assumed valid target",
+        "start-block-number": "Start block number",
         "set-start-block-number": "Set start block number"
       },
       "migrating": "migrating..."
@@ -1125,10 +1126,13 @@
     },
     "set-start-block-number": {
       "title": "Set the start block number",
+      "warn": "Warning: Transactions before the start block of synchronization will not be synchronized",
       "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",
-      "view-block": "View the block"
+      "view-block": "View the block",
+      "set-less-than-before": "The block number you set is smaller than the previous set, the synchronization will restart, please proceed with caution.",
+      "reset-to-header-tip-number": "Unable to set a block number greater than the header tip block number, reset to the header tip block number."
     },
     "main": {
       "external-node-detected-dialog": {
