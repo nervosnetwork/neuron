@@ -27,13 +27,13 @@ export default class SyncProgressService {
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ delete: true })
-      .where({ walletId: Not(In(existWalletIds)) })
+      .where({ walletId: Not(In(existWalletIds)), addressType: SyncAddressType.Default })
       .execute()
     await getConnection()
       .createQueryBuilder()
       .update(SyncProgress)
       .set({ delete: false })
-      .where({ walletId: In(existWalletIds) })
+      .where({ walletId: In(existWalletIds), addressType: SyncAddressType.Default })
       .execute()
   }
 
