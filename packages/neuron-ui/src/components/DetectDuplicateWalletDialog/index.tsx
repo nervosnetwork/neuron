@@ -68,14 +68,12 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
       })
     }
 
-    let ids = [...duplicatedWallets]
-    if (duplicatedWallets.includes(currentID)) {
-      ids = ids.filter(item => item !== currentID)
-      ids.push(currentID)
-    }
+    const requestToDeleteIds = duplicatedWallets
+      .filter(item => item !== currentID)
+      .concat(duplicatedWallets.includes(currentID) ? [currentID] : [])
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const id of ids) {
+    for (const id of requestToDeleteIds) {
       // eslint-disable-next-line no-await-in-loop
       await getRequest(id)
     }
