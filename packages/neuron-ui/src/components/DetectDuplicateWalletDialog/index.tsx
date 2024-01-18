@@ -32,17 +32,16 @@ const DetectDuplicateWalletDialog = ({ onClose }: { onClose: () => void }) => {
 
   const handleGroupChange = useCallback(
     (checked: string) => {
-      const [extendedKey, id] = (checked as string).split('_')
-      const list: string[] = []
-      wallets.forEach(item => {
-        if (item.extendedKey === extendedKey) {
-          if (item.id !== id) {
-            list.push(item.id)
+      const [extendedKey, id] = checked.split('_')
+
+      const list = wallets
+        .filter(item => {
+          if (item.extendedKey === extendedKey) {
+            return item.id !== id
           }
-        } else if (duplicatedWallets.includes(item.id)) {
-          list.push(item.id)
-        }
-      })
+          return duplicatedWallets.includes(item.id)
+        })
+        .map(item => item.id)
 
       setDuplicatedWallets(list)
     },

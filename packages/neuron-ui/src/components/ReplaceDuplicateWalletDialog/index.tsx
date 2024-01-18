@@ -77,7 +77,7 @@ const ReplaceDuplicateWalletDialog = ({
     [setSelectedId]
   )
 
-  const onConfirm = useCallback(async () => {
+  const onConfirm = useCallback(() => {
     replaceWallet({
       existingWalletId: selectedId,
       importedWalletId,
