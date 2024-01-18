@@ -138,7 +138,7 @@ declare namespace State {
   type GlobalAlertDialog = {
     show?: boolean
     title?: string
-    message?: string
+    message?: React.ReactNode
     type: 'success' | 'failed' | 'warning'
     action?: 'ok' | 'cancel' | 'all'
     onClose?: () => void

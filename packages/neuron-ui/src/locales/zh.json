@@ -24,7 +24,8 @@
       "experimental-functions": "实验性功能",
       "s-udt": "资产账户",
       "update-neuron-with-ckb": "CKB 节点版本与 Neuron (v{{ version }}) 不匹配，可能导致兼容性问题。请更新到最新版 Neuron。",
-      "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。",
+      "learn-more": "了解更多",
+      "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。(<0>{{btnText}}</0>)",
       "ckb-without-indexer": "请添加 '--indexer' 参数来启动本地节点"
     },
     "network-status": {
