@@ -1187,6 +1187,18 @@
       "lock": "Bloquear",
       "unlock": "Desbloquear",
       "consume": "Consumir"
+    },
+    "send-tx-detail": {
+      "page-title": "Detalles de la transacción",
+      "basic-info": "Información Básica",
+      "topology": "Diagrama de topología",
+      "tx-basic": {
+        "tx-hash": "Hash de Transacción",
+        "capacity": "Cantidad",
+        "tx-fee": "Tarifa de transacción",
+        "size": "tamaño",
+        "lock-time": "Período de Bloqueo"
+      }
     }
   }
 }
