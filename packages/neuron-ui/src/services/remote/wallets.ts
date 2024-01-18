@@ -10,6 +10,9 @@ export const updateWallet = remoteApi<Controller.UpdateWalletParams>('update-wal
 export const deleteWallet = remoteApi<Controller.DeleteWalletParams>('delete-wallet')
 export const replaceWallet = remoteApi<Controller.ReplaceWalletParams>('replace-wallet')
 export const backupWallet = remoteApi<Controller.DeleteWalletParams>('backup-wallet')
+export const updateWalletStartBlockNumber = remoteApi<Controller.UpdateWalletStartBlockNumberParams>(
+  'update-wallet-start-block-number'
+)
 export const getAddressesByWalletID = remoteApi<Controller.GetAddressesByWalletIDParams>('get-all-addresses')
 export const updateAddressDescription =
   remoteApi<Controller.UpdateAddressDescriptionParams>('update-address-description')

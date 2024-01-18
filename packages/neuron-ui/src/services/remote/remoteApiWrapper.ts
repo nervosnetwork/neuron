@@ -61,6 +61,7 @@ type Action =
   | 'delete-wallet'
   | 'replace-wallet'
   | 'backup-wallet'
+  | 'update-wallet-start-block-number'
   | 'get-all-addresses'
   | 'update-address-description'
   | 'request-password'

@@ -28,10 +28,12 @@ import { ReactComponent as Edit } from 'widgets/Icons/Edit.svg'
 import { Download, Search } from 'widgets/Icons/icon'
 import { HIDE_BALANCE, NetworkType } from 'utils/const'
 import { onEnter } from 'utils/inputDevice'
+import getMultisigSignStatus from 'utils/getMultisigSignStatus'
 import { useSearch, useConfigManage, useExportConfig, useActions, useSubscription } from './hooks'
 
 import styles from './multisigAddress.module.scss'
 
+const ApproveKey = 'approve'
 const tableActions = [
   {
     key: 'info',
@@ -46,7 +48,7 @@ const tableActions = [
     icon: <Transfer />,
   },
   {
-    key: 'approve',
+    key: ApproveKey,
     icon: <Confirm />,
   },
 ]
@@ -56,7 +58,7 @@ const MultisigAddress = () => {
   useOnLocaleChange(i18n)
   useExitOnWalletChange()
   const {
-    wallet: { id: walletId },
+    wallet: { id: walletId, addresses },
     chain: { networkID },
     settings: { networks = [] },
   } = useGlobalState()
@@ -281,6 +283,7 @@ const MultisigAddress = () => {
                   dataIndex: 'action',
                   align: 'left',
                   render(_, __, item) {
+                    const { canSign } = getMultisigSignStatus({ multisigConfig: item, addresses })
                     return (
                       <div className={styles.action}>
                         <Tooltip
@@ -296,7 +299,7 @@ const MultisigAddress = () => {
                                   key={key}
                                   data-key={key}
                                   onClick={onClickItem(item)}
-                                  disabled={disabled}
+                                  disabled={key === ApproveKey ? !canSign || disabled : disabled}
                                 >
                                   {icon}
                                   <span>{t(label)}</span>

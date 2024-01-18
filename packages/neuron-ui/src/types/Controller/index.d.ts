@@ -35,7 +35,11 @@ declare namespace Controller {
     newPassword?: string
     name?: string
     device?: any
-    startBlockNumber?: string
+  }
+
+  interface UpdateWalletStartBlockNumberParams {
+    id: string
+    startBlockNumber: string
   }
 
   interface RequestPasswordParams {

@@ -8,7 +8,7 @@ import {
   getNetworkLabelI18nkey,
 } from 'utils'
 import Alert from 'widgets/Alert'
-import { Close, NewTab } from 'widgets/Icons/icon'
+import { Attention, Close, NewTab } from 'widgets/Icons/icon'
 import { ReactComponent as Sun } from 'widgets/Icons/Sun.svg'
 import { ReactComponent as Moon } from 'widgets/Icons/Moon.svg'
 import SyncStatusComponent from 'components/SyncStatus'
@@ -45,7 +45,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
       connectionStatus,
       networkID,
     },
-    wallet: { addresses, id },
+    wallet: { addresses, id, startBlockNumber: walletStartBlockNumber },
     settings: { networks },
   } = useGlobalState()
   const { children, head, notice, className, isHomePage } = props
@@ -93,12 +93,18 @@ const PageContainer: React.FC<ComponentProps> = props => {
     onOpenAddressInExplorer,
     onViewBlock,
     onConfirm,
+    countdown,
+    isSetLessThanBefore,
+    blockNumberErr,
   } = useSetBlockNumber({
     firstAddress: addresses[0]?.address,
     isMainnet,
     isLightClient,
     walletID: id,
     isHomePage,
+    initStartBlockNumber: walletStartBlockNumber ? Number(walletStartBlockNumber) : undefined,
+    headerTipNumber: bestKnownBlockNumber,
+    t,
   })
   return (
     <div className={`${styles.page} ${className || ''}`}>
@@ -134,6 +140,7 @@ const PageContainer: React.FC<ComponentProps> = props => {
               isMigrate={isMigrate}
               isLightClient={isLightClient}
               onOpenSetStartBlock={openDialog}
+              startBlockNumber={walletStartBlockNumber}
             />
           </div>
         </div>
@@ -148,31 +155,45 @@ const PageContainer: React.FC<ComponentProps> = props => {
       <div className={styles.body}>{children}</div>
       <Dialog
         title={t('set-start-block-number.title')}
+        confirmText={countdown ? `${t('common.confirm')}(${countdown})` : t('common.confirm')}
         show={isSetStartBlockShown}
         onCancel={closeDialog}
         onConfirm={onConfirm}
-        disabled={!startBlockNumber}
+        disabled={!startBlockNumber || !!countdown}
+        contentClassName={styles.setBlockContent}
       >
-        <p className={styles.startBlockTip}>{t('set-start-block-number.tip')}</p>
-        <TextField
-          field="startBlockNumber"
-          onChange={onChangeStartBlockNumber}
-          placeholder={t('set-start-block-number.input-place-holder')}
-          value={localNumberFormatter(startBlockNumber)}
-          suffix={
-            startBlockNumber ? (
-              <button type="button" className={styles.viewAction} onClick={onViewBlock}>
-                {t('set-start-block-number.view-block')}
-                <NewTab />
-              </button>
-            ) : (
-              <button type="button" className={styles.viewAction} onClick={onOpenAddressInExplorer}>
-                {t('set-start-block-number.locate-first-tx')}
-                <NewTab />
-              </button>
-            )
-          }
-        />
+        <div className={styles.setBlockWarn}>
+          <Attention />
+          {t('set-start-block-number.warn')}
+        </div>
+        <div className={styles.content}>
+          <p className={styles.startBlockTip}>{t('set-start-block-number.tip')}</p>
+          <TextField
+            field="startBlockNumber"
+            onChange={onChangeStartBlockNumber}
+            placeholder={t('set-start-block-number.input-place-holder')}
+            value={localNumberFormatter(startBlockNumber)}
+            error={blockNumberErr}
+            suffix={
+              startBlockNumber ? (
+                <button type="button" className={styles.viewAction} onClick={onViewBlock}>
+                  {t('set-start-block-number.view-block')}
+                  <NewTab />
+                </button>
+              ) : (
+                <button type="button" className={styles.viewAction} onClick={onOpenAddressInExplorer}>
+                  {t('set-start-block-number.locate-first-tx')}
+                  <NewTab />
+                </button>
+              )
+            }
+          />
+          {isSetLessThanBefore ? (
+            <Alert status="error" className={styles.errorMessage} withIcon={false}>
+              {t('set-start-block-number.set-less-than-before')}
+            </Alert>
+          ) : null}
+        </div>
       </Dialog>
     </div>
   )

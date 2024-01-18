@@ -24,13 +24,15 @@
       "experimental-functions": "實驗性功能",
       "s-udt": "資產賬戶",
       "update-neuron-with-ckb": "CKB 節點版本與 Neuron (v{{ version }}) 不匹配，可能導致兼容性問題。請更新到最新版 Neuron。",
-      "ckb-node-compatible": "CKB 節點版本與 Neuron (v{{ version }}) 不兼容，請謹慎使用。",
+      "learn-more": "了解更多",
+      "ckb-node-compatible": "CKB 節點版本與 Neuron (v{{ version }}) 不兼容，請謹慎使用。(<0>{{btnText}}</0>)",
       "ckb-without-indexer": "請添加 '--indexer' 參數來啟動本地節點"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "已同步區塊",
         "looking-valid-target": "尋找預設可信區塊",
+        "start-block-number": "起始區塊",
         "set-start-block-number": "設置同步起始區塊"
       },
       "migrating": "正在數據遷移..."
@@ -416,7 +418,8 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "節點配置和數據",
@@ -692,7 +695,8 @@
         "compensated-period": "補貼時間",
         "days-hours": "{{days}} 天 {{hours}} 小時",
         "no-deposit": "沒有存入記錄",
-        "no-completed": "沒有解鎖記錄"
+        "no-completed": "沒有解鎖記錄",
+        "insufficient-balance-to-unlock": "沒有足夠余額支付交易費用以解鎖 DAO 存款"
       },
       "compensation-period": {
         "tooltip": {
@@ -1105,10 +1109,13 @@
     },
     "set-start-block-number": {
       "title": "設置同步起始區塊",
+      "warn": "請註意，同步起始區塊之前的交易不會被同步！",
       "tip": "輕客戶端模式下的訂閱起始點是可配置的，因此您可以設置同步起始區塊以加快同步速度。",
       "input-place-holder": "輸入同步起始區塊高度，例如：10,100,101",
       "locate-first-tx": "定位第一筆交易",
-      "view-block": "查看區塊"
+      "view-block": "查看區塊",
+      "set-less-than-before": "您設置的區塊號小於之前區塊，同步將重新開始，請謹慎操作。",
+      "reset-to-header-tip-number": "無法設置比最新區塊更大的區塊號，已重置為最新區塊號。"
     },
     "main": {
       "external-node-detected-dialog": {

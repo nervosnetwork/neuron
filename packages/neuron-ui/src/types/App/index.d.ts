@@ -138,7 +138,7 @@ declare namespace State {
   type GlobalAlertDialog = {
     show?: boolean
     title?: string
-    message?: string
+    message?: React.ReactNode
     type: 'success' | 'failed' | 'warning'
     action?: 'ok' | 'cancel' | 'all'
     onClose?: () => void
@@ -202,6 +202,7 @@ declare namespace State {
     device?: DeviceInfo
     isHD?: boolean
     isWatchOnly?: boolean
+    startBlockNumber?: string
     extendedKey: string
   }
 

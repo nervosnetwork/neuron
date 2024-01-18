@@ -21,7 +21,7 @@ const AlertDialog = ({
 }: {
   show?: boolean
   title?: string
-  message?: string
+  message?: React.ReactNode
   type: AlertType
   onOk?: () => void
   onCancel?: () => void
