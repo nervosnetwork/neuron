@@ -111,7 +111,7 @@ const TxTopology: FC<{
             <TopologyCellItem
               // eslint-disable-next-line react/no-array-index-key
               key={idx.toString()}
-              label={v.isChangeCell ? 'Change' : 'Send'}
+              label={v.isChangeCell ? 'Change' : 'Receive'}
               address={scriptToAddress(v.lock, isMainnet)}
               amount={v.capacity}
             />
