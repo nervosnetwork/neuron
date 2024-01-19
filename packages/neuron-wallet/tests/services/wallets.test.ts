@@ -160,7 +160,7 @@ describe('wallet service', () => {
     wallet5 = {
       name: 'wallet-test5',
       id: '',
-      extendedKey: 'wallet1.extendedKey',
+      extendedKey: 'a',
       keystore: new Keystore(
         {
           cipher: 'wallet5',
@@ -528,7 +528,7 @@ describe('wallet service', () => {
       } catch (error) {
         const { extendedKey, id } = JSON.parse(error.message)
         await walletService.replace(createdWallet2.id, id)
-        expect(extendedKey).toBe('wallet1.extendedKey')
+        expect(extendedKey).toBe('a')
         expect(() => walletService.get(createdWallet2.id)).toThrowError()
         expect(walletService.get(id).name).toBe(wallet5.name)
       }
