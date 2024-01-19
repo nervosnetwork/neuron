@@ -704,7 +704,15 @@ describe('CellsService', () => {
         )
         const input = await getConnection().getRepository(MultisigOutput).createQueryBuilder('multisig_output').getOne()
         expect(res).toEqual({
-          inputs: [new Input(input!.outPoint(), '0', input!.capacity, input!.lockScript(), input!.lockHash)],
+          inputs: [
+            Input.fromObject({
+              previousOutput: input!.outPoint(),
+              capacity: input!.capacity,
+              lock: input!.lockScript(),
+              since: '0',
+              status: OutputStatus.Live,
+            }),
+          ],
           capacities: toShannon('1000'),
           finalFee: TransactionFee.fee(
             TransactionSize.input() +
@@ -1492,7 +1500,15 @@ describe('CellsService', () => {
             data: liveCell.data,
           }),
         ],
-        changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
+        changeInputs: [
+          Input.fromObject({
+            previousOutput: output.outPoint(),
+            since: '0',
+            capacity: output.capacity,
+            lock: output.lockScript(),
+            status: OutputStatus.Live,
+          }),
+        ],
         anyoneCanPayOutputs: [
           Output.fromObject({
             capacity: liveCell.capacity,
@@ -1559,7 +1575,15 @@ describe('CellsService', () => {
             data: liveCell.data,
           }),
         ],
-        changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
+        changeInputs: [
+          Input.fromObject({
+            previousOutput: output.outPoint(),
+            since: '0',
+            capacity: output.capacity,
+            lock: output.lockScript(),
+            status: OutputStatus.Live,
+          }),
+        ],
         anyoneCanPayOutputs: [
           Output.fromObject({
             capacity: liveCell.capacity,
@@ -1623,7 +1647,15 @@ describe('CellsService', () => {
             data: liveCell.data,
           }),
         ],
-        changeInputs: [new Input(output.outPoint(), '0', output.capacity, output.lockScript(), output.lockHash)],
+        changeInputs: [
+          Input.fromObject({
+            previousOutput: output.outPoint(),
+            since: '0',
+            capacity: output.capacity,
+            lock: output.lockScript(),
+            status: OutputStatus.Live,
+          }),
+        ],
         anyoneCanPayOutputs: [
           Output.fromObject({
             capacity: liveCell.capacity,

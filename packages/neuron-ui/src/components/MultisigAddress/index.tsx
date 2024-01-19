@@ -12,7 +12,6 @@ import MultisigAddressCreateDialog from 'components/MultisigAddressCreateDialog'
 import MultisigAddressInfo from 'components/MultisigAddressInfo'
 import SendFromMultisigDialog from 'components/SendFromMultisigDialog'
 import { MultisigConfig } from 'services/remote'
-import PasswordRequest from 'components/PasswordRequest'
 import ApproveMultisigTxDialog from 'components/ApproveMultisigTxDialog'
 import Dialog from 'widgets/Dialog'
 import Table from 'widgets/Table'
@@ -383,7 +382,6 @@ const MultisigAddress = () => {
           isMainnet={isMainnet}
         />
       ) : null}
-      <PasswordRequest />
     </div>
   )
 }
