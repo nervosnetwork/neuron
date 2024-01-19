@@ -1193,6 +1193,18 @@
       "lock": "Lock",
       "unlock": "Unlock",
       "consume": "Consume"
+    },
+    "send-tx-detail": {
+      "page-title": "Transaction Detail",
+      "basic-info": "Basic Information",
+      "topology": "Topology",
+      "tx-basic": {
+        "tx-hash": "Transaction Hash",
+        "capacity": "Capacity",
+        "tx-fee": "Transaction Fee",
+        "size": "Size",
+        "lock-time": "Lock Time"
+      }
     }
   }
 }

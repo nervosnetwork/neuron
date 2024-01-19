@@ -31,6 +31,7 @@ declare namespace State {
     lock: CKBComponents.Script | null
     type?: CKBComponents.Script
     data?: string
+    status?: string
   }
 
   interface DetailedOutput {
@@ -40,6 +41,7 @@ declare namespace State {
     outPoint: CKBComponents.OutPoint
     type?: CKBComponents.Script
     data?: string
+    isChangeCell?: boolean
   }
   interface DetailedTransaction extends Transaction {
     blockHash: string
@@ -50,7 +52,8 @@ declare namespace State {
     outputs: DetailedOutput[]
     outputsCount: string
     witnesses: string[]
-    size: number
+    size?: number
+    isLastChange?: boolean
   }
   interface Output {
     address: string | undefined
@@ -122,6 +125,7 @@ declare namespace State {
       blake160s: string[]
     }
     onSuccess?: () => void
+    showType?: 'Global' | ''
   }
 
   interface SUDTAccount {

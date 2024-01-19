@@ -1,47 +1,35 @@
-import React, { useCallback } from 'react'
-import { AppActions, useDispatch, useState as useGlobalState } from 'states'
-import { errorFormatter } from 'utils'
-import Dialog from 'widgets/Dialog'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useState as useGlobalState } from 'states'
+import { errorFormatter, useGoBack } from 'utils'
 import AlertDialog from 'widgets/AlertDialog'
 import Button from 'widgets/Button'
 import { Export, Sign } from 'widgets/Icons/icon'
-import { useTranslation } from 'react-i18next'
 import HDWalletSign from '../HDWalletSign'
-import styles from './hardwareSign.module.scss'
 import useHardwareSign, { HardwareSignProps } from './hooks'
+import styles from './hardwareSign.module.scss'
 
-const HardwareSign = ({
+const HardwareSignOnPage = ({
   signType,
   signMessage,
   wallet,
   onDismiss,
   offlineSignJSON,
   offlineSignType,
-}: HardwareSignProps) => {
+  walletID,
+  actionType,
+  multisigConfig,
+  onSuccess,
+}: HardwareSignProps & State.PasswordRequest) => {
   const {
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest,
     },
     experimental,
   } = useGlobalState()
   const [t] = useTranslation()
-  const dispatch = useDispatch()
-  const onCancel = useCallback(
-    (dismiss: boolean = true) => {
-      if (signType === 'transaction') {
-        dispatch({
-          type: AppActions.UpdateLoadings,
-          payload: { sending: false },
-        })
-      }
-      if (dismiss) {
-        onDismiss?.()
-      }
-    },
-    [dispatch, signType, onDismiss]
-  )
+  const onGoBack = useGoBack()
   const {
     offlineSignActionType,
     status,
@@ -62,24 +50,16 @@ const HardwareSign = ({
     description,
     generatedTx,
     isSending,
-    passwordRequest,
+    passwordRequest: { walletID, actionType, multisigConfig, onSuccess },
     experimental,
-    onCancel,
   })
+
   if (error) {
-    return <AlertDialog show message={errorFormatter(error, t)} type="failed" onCancel={onCancel} />
+    return <AlertDialog show message={errorFormatter(error, t)} type="failed" onCancel={onDismiss || onGoBack} />
   }
 
   return (
-    <Dialog
-      show
-      title={t('hardware-sign.title')}
-      onCancel={onCancel}
-      showConfirm={(passwordRequest.actionType || offlineSignActionType) !== 'send-from-multisig'}
-      confirmText={isNotAvailableToSign ? t('hardware-sign.actions.rescan') : t('sign-and-verify.sign')}
-      isLoading={isLoading}
-      onConfirm={isNotAvailableToSign ? reconnect : sign}
-    >
+    <div title={t('hardware-sign.title')} className={styles.hardwareSignInPage}>
       <div className={styles.container}>
         <p>
           {t('hardware-sign.device')}
@@ -110,10 +90,22 @@ const HardwareSign = ({
           </div>
         ) : null}
       </div>
-    </Dialog>
+      <div className={styles.actions}>
+        <Button type="cancel" onClick={onDismiss || onGoBack} label={t('common.cancel')} />
+        {(actionType || offlineSignActionType) !== 'send-from-multisig' ? (
+          <Button
+            type="submit"
+            label={isNotAvailableToSign ? t('hardware-sign.actions.rescan') : t('sign-and-verify.sign')}
+            loading={isLoading}
+            disabled={isLoading}
+            onClick={isNotAvailableToSign ? reconnect : sign}
+          />
+        ) : null}
+      </div>
+    </div>
   )
 }
 
-HardwareSign.displayName = 'HardwareSign'
+HardwareSignOnPage.displayName = 'HardwareSignOnPage'
 
-export default HardwareSign
+export default HardwareSignOnPage
