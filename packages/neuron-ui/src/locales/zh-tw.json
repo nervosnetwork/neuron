@@ -1165,6 +1165,18 @@
       "lock": "鎖定",
       "unlock": "解鎖",
       "consume": "消耗"
+    },
+    "send-tx-detail": {
+      "page-title": "交易詳情",
+      "basic-info": "基本信息",
+      "topology": "拓撲圖",
+      "tx-basic": {
+        "tx-hash": "交易哈希",
+        "capacity": "金額",
+        "tx-fee": "交易費",
+        "size": "大小",
+        "lock-time": "鎖定時間"
+      }
     }
   }
 }

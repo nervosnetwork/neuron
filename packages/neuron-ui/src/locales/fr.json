@@ -1194,6 +1194,18 @@
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "consume": "Consommer"
+    },
+    "send-tx-detail": {
+      "page-title": "Détail de l'historique",
+      "basic-info": "Informations de base",
+      "topology": "Schéma topologique",
+      "tx-basic": {
+        "tx-hash": "Hash de transaction",
+        "capacity": "Montant",
+        "tx-fee": "Frais de transaction",
+        "size": "taille",
+        "lock-time": "Période de verrouillage"
+      }
     }
   }
 }
