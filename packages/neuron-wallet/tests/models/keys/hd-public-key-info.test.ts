@@ -2,6 +2,7 @@ import { scriptToAddress } from '../../../src/utils/scriptAndAddress'
 import { AddressType } from '../../../src/models/keys/address'
 import KeyInfos from '../../setupAndTeardown/public-key-info.fixture'
 import { systemScripts } from '../../../src/utils/systemScripts'
+import { NetworkType } from '../../../src/models/network'
 
 const stubbedIsMainnet = jest.fn()
 
@@ -9,6 +10,9 @@ jest.mock('services/networks', () => {
   return {
     getInstance: () => ({
       isMainnet: stubbedIsMainnet,
+      getCurrent: () => ({
+        type: NetworkType.Normal,
+      }),
     }),
   }
 })

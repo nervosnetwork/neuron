@@ -1,4 +1,5 @@
-import { getConnection, In } from 'typeorm'
+import { In } from 'typeorm'
+import { getConnection } from '../../database/chain/connection'
 import OutputEntity from '../../database/chain/entities/output'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import { OutputStatus } from '../../models/chain/output'

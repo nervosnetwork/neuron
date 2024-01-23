@@ -1,4 +1,5 @@
-import { getConnection, In, QueryRunner } from 'typeorm'
+import { In, QueryRunner } from 'typeorm'
+import { getConnection } from '../../database/chain/connection'
 import InputEntity from '../../database/chain/entities/input'
 import OutputEntity from '../../database/chain/entities/output'
 import TransactionEntity from '../../database/chain/entities/transaction'
