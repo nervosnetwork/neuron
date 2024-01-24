@@ -1,5 +1,6 @@
-import { Brackets, getConnection, In, IsNull, type ObjectLiteral } from 'typeorm'
+import { Brackets, In, IsNull, type ObjectLiteral } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { getConnection } from '../database/chain/connection'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import {
   CapacityNotEnough,
@@ -744,7 +745,13 @@ export default class CellsService {
       {}
     )
     useCells.every(cell => {
-      const input: Input = new Input(cell.outPoint(), '0', cell.capacity, cell.lockScript(), cell.lockHash)
+      const input: Input = Input.fromObject({
+        previousOutput: cell.outPoint(),
+        since: '0',
+        capacity: cell.capacity,
+        lock: cell.lockScript(),
+        status: cell.status as OutputStatus,
+      })
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {

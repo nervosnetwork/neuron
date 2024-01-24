@@ -24,13 +24,15 @@
       "experimental-functions": "Experimental",
       "s-udt": "Asset Accounts",
       "update-neuron-with-ckb": "The version of the CKB node does not match Neuron (v{{ version }}), which may cause compatibility issues. Please update to the latest version of Neuron.",
-      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation.",
+      "learn-more": "Learn More",
+      "ckb-node-compatible": "CKB node is not compatible with Neuron (v{{ version }}), please check before further operation. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "Please add '--indexer' option to start local node"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "Block Synced",
         "looking-valid-target": "Looking for assumed valid target",
+        "start-block-number": "Start block number",
         "set-start-block-number": "Set start block number"
       },
       "migrating": "migrating..."
@@ -418,7 +420,8 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "CKB Node Config & Storage",
@@ -695,7 +698,8 @@
         "compensated-period": "Compensation Period",
         "days-hours": "{{days}} days {{hours}} hours",
         "no-deposit": "No Deposit",
-        "no-completed": "No Completed"
+        "no-completed": "No Completed",
+        "insufficient-balance-to-unlock": "Balance is not enough for transaction fee to unlock the deposit"
       },
       "compensation-period": {
         "tooltip": {
@@ -1130,10 +1134,13 @@
     },
     "set-start-block-number": {
       "title": "Set the start block number",
+      "warn": "Warning: Transactions before the start block of synchronization will not be synchronized",
       "tip": "The start sync block number is configuration when use light client ckb node, then you can set it and quick the sync",
       "input-place-holder": "Please enter the start sync block number, eg: 10,100,101",
       "locate-first-tx": "Locate the first transaction",
-      "view-block": "View the block"
+      "view-block": "View the block",
+      "set-less-than-before": "The block number you set is smaller than the previous set, the synchronization will restart, please proceed with caution.",
+      "reset-to-header-tip-number": "Unable to set a block number greater than the header tip block number, reset to the header tip block number."
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1192,6 +1199,18 @@
       "lock": "Lock",
       "unlock": "Unlock",
       "consume": "Consume"
+    },
+    "send-tx-detail": {
+      "page-title": "Transaction Detail",
+      "basic-info": "Basic Information",
+      "topology": "Topology",
+      "tx-basic": {
+        "tx-hash": "Transaction Hash",
+        "capacity": "Capacity",
+        "tx-fee": "Transaction Fee",
+        "size": "Size",
+        "lock-time": "Lock Time"
+      }
     }
   }
 }

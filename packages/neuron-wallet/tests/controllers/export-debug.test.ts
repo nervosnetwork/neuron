@@ -56,6 +56,7 @@ jest.mock('../../src/services/networks', () => {
         getCurrent() {
           return {
             remote: 'http://127.0.0.1:8114',
+            type: NetworkType.Normal,
           }
         },
       }
@@ -90,6 +91,7 @@ jest.mock('../../src/services/light-runner', () => {
 import { dialog } from 'electron'
 import logger from '../../src/utils/logger'
 import ExportDebugController from '../../src/controllers/export-debug'
+import { NetworkType } from '../../src/models/network'
 
 describe('Test ExportDebugController', () => {
   const exportDebugController: any = new ExportDebugController()

@@ -189,13 +189,7 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss, on
 
   if (wallet.device) {
     return (
-      <HardwareSign
-        signType="transaction"
-        navigate={navigate}
-        wallet={wallet}
-        onDismiss={onDismiss}
-        offlineSignJSON={offlineSignJSON}
-      />
+      <HardwareSign signType="transaction" wallet={wallet} onDismiss={onDismiss} offlineSignJSON={offlineSignJSON} />
     )
   }
 

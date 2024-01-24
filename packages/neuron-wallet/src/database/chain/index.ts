@@ -1,4 +1,3 @@
-import { getConnection } from 'typeorm'
 import MultisigOutputChangedSubject from '../../models/subjects/multisig-output-db-changed-subject'
 import SyncProgressService from '../../services/sync-progress'
 import InputEntity from './entities/input'
@@ -9,6 +8,7 @@ import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
 import MultisigOutput from './entities/multisig-output'
 import SyncProgress from './entities/sync-progress'
 import TxLock from './entities/tx-lock'
+import { getConnection } from '../../database/chain/connection'
 
 /*
  * Clean local sqlite storage

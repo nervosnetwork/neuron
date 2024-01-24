@@ -24,13 +24,15 @@
       "experimental-functions": "Expérimental",
       "s-udt": "Comptes d'actifs",
       "update-neuron-with-ckb": "La version du noeud CKB ne correspond pas à Neuron (v{{ version }}), ce qui peut entraîner des problèmes de compatibilité. Veuillez mettre à jour vers la dernière version de Neuron.",
-      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure.",
+      "learn-more": "En savoir plus",
+      "ckb-node-compatible": "Le noeud CKB n'est pas compatible avec Neuron (v{{ version }}), veuillez vérifier avant toute opération ultérieure. (<0>{{btnText}}</0>)",
       "ckb-without-indexer": "Veuillez ajouter l'option '--indexer' pour démarrer le noeud local"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "Bloc synchronisé",
         "looking-valid-target": "Recherche de la cible valide présumée",
+        "start-block-number": "bloc de départ",
         "set-start-block-number": "Définir le numéro de bloc de départ"
       },
       "migrating": "migration en cours..."
@@ -418,7 +420,8 @@
         "en-US": "Anglais (États-Unis)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "Configuration & stockage du noeud CKB",
@@ -695,7 +698,8 @@
         "compensated-period": "Période de compensation",
         "days-hours": "{{days}} jours {{hours}} heures",
         "no-deposit": "Aucun dépôt",
-        "no-completed": "Aucun terminé"
+        "no-completed": "Aucun terminé",
+        "insufficient-balance-to-unlock": "Le solde n'est pas suffisant pour payer les frais de transaction afin de débloquer le dépôt DAO."
       },
       "compensation-period": {
         "tooltip": {
@@ -1130,10 +1134,13 @@
     },
     "set-start-block-number": {
       "title": "Définir le numéro de bloc de départ",
+      "warn": "Veuillez noter que les transactions antérieures à la synchronisation du bloc initial ne seront pas synchronisées !",
       "tip": "Le numéro de bloc de départ est une configuration lorsque vous utilisez le noeud CKB en mode client léger. Vous pouvez le définir et accélérer la synchronisation.",
       "input-place-holder": "Veuillez entrer le numéro de bloc de départ pour la synchronisation, par exemple : 10, 100, 101",
       "locate-first-tx": "Localiser la première transaction",
-      "view-block": "Voir le bloc"
+      "view-block": "Voir le bloc",
+      "set-less-than-before": "Le numéro de bloc que vous avez défini est inférieur au bloc précédent. La synchronisation recommencera, veuillez procéder avec prudence.",
+      "reset-to-header-tip-number": "Impossible de définir un numéro de bloc supérieur au bloc le plus récent. Réinitialisation au numéro de bloc le plus récent."
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1192,6 +1199,18 @@
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "consume": "Consommer"
+    },
+    "send-tx-detail": {
+      "page-title": "Détail de l'historique",
+      "basic-info": "Informations de base",
+      "topology": "Schéma topologique",
+      "tx-basic": {
+        "tx-hash": "Hash de transaction",
+        "capacity": "Montant",
+        "tx-fee": "Frais de transaction",
+        "size": "taille",
+        "lock-time": "Période de verrouillage"
+      }
     }
   }
 }

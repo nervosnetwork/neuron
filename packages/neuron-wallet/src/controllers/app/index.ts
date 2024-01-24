@@ -15,6 +15,8 @@ import SyncApiController from '../../controllers/sync-api'
 import { SETTINGS_WINDOW_TITLE } from '../../utils/const'
 import { stopCkbNode } from '../../services/ckb-runner'
 import { CKBLightRunner } from '../../services/light-runner'
+import { migrateDBFile } from '../../database/chain/ormconfig'
+import { MAINNET_GENESIS_HASH, TESTNET_GENESIS_HASH } from '../../models/network'
 
 const app = electronApp
 
@@ -37,6 +39,8 @@ export default class AppController {
   }
 
   public start = async () => {
+    migrateDBFile(TESTNET_GENESIS_HASH)
+    migrateDBFile(MAINNET_GENESIS_HASH)
     registerListeners()
 
     if (!env.isTestMode) {
@@ -132,6 +136,8 @@ export default class AppController {
         devTools: env.isDevMode,
         contextIsolation: false,
         preload: path.join(__dirname, './preload.js'),
+        // disable webSecurity for dev, do not set webSecurity as true, because electron has default set other value when webSecurity is not set by developer
+        ...(app.isPackaged ? {} : { webSecurity: false }),
       },
     })
 

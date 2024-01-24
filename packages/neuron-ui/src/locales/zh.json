@@ -24,13 +24,15 @@
       "experimental-functions": "实验性功能",
       "s-udt": "资产账户",
       "update-neuron-with-ckb": "CKB 节点版本与 Neuron (v{{ version }}) 不匹配，可能导致兼容性问题。请更新到最新版 Neuron。",
-      "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。",
+      "learn-more": "了解更多",
+      "ckb-node-compatible": "CKB 节点版本与 Neuron (v{{ version }}) 不兼容，请谨慎使用。(<0>{{btnText}}</0>)",
       "ckb-without-indexer": "请添加 '--indexer' 参数来启动本地节点"
     },
     "network-status": {
       "tooltip": {
         "block-synced": "已同步区块",
         "looking-valid-target": "寻找预设可信区块",
+        "start-block-number": "起始区块",
         "set-start-block-number": "设置同步起始区块"
       },
       "migrating": "正在数据迁移..."
@@ -411,7 +413,8 @@
         "en-US": "English(United States)",
         "zh": "中文(简体)",
         "zh-TW": "中文(繁體)",
-        "fr": "Français"
+        "fr": "Français",
+        "es": "Español"
       },
       "data": {
         "ckb-node-data": "节点配置和数据",
@@ -688,7 +691,8 @@
         "compensated-period": "补贴时间",
         "days-hours": "{{days}} 天 {{hours}} 小时",
         "no-deposit": "没有存入记录",
-        "no-completed": "没有解锁记录"
+        "no-completed": "没有解锁记录",
+        "insufficient-balance-to-unlock": "没有足够余额支付交易费用以解锁 DAO 存款"
       },
       "compensation-period": {
         "tooltip": {
@@ -1122,10 +1126,13 @@
     },
     "set-start-block-number": {
       "title": "设置同步起始区块",
+      "warn": "请注意，同步起始区块之前的交易不会被同步！",
       "tip": "轻客户端模式下的订阅起始点是可配置的，因此您可以设置同步起始区块以加快同步速度。",
       "input-place-holder": "输入同步起始区块高度，例如：10,100,101",
       "locate-first-tx": "定位第一笔交易",
-      "view-block": "查看区块"
+      "view-block": "查看区块",
+      "set-less-than-before": "您设置的区块号小于之前的设定，同步将重新开始，请谨慎操作。",
+      "reset-to-header-tip-number": "无法设置比最新区块更大的区块号，已重置为最新区块号。"
     },
     "main": {
       "external-node-detected-dialog": {
@@ -1184,6 +1191,18 @@
       "lock": "锁定",
       "unlock": "解锁",
       "consume": "消耗"
+    },
+    "send-tx-detail": {
+      "page-title": "交易详情",
+      "basic-info": "基本信息",
+      "topology": "拓扑图",
+      "tx-basic": {
+        "tx-hash": "交易哈希",
+        "capacity": "金额",
+        "tx-fee": "交易费",
+        "size": "大小",
+        "lock-time": "锁定时间"
+      }
     }
   }
 }

@@ -1,12 +1,11 @@
 import os from 'os'
 import fs from 'fs'
 import path from 'path'
-import { initConnection, closeConnection, saveTransactions } from '../../setupAndTeardown/index'
+import { initConnection, closeConnection, saveTransactions, getConnection } from '../../setupAndTeardown/index'
 import transactions from '../../setupAndTeardown/transactions.fixture'
 import { keyInfos } from '../../setupAndTeardown/public-key-info.fixture'
 import i18n from '../../../src/locales/i18n'
 import exportHistory from '../../../src/utils/export-history'
-import { getConnection } from 'typeorm'
 import HdPublicKeyInfo from '../../../src/database/chain/entities/hd-public-key-info'
 
 describe('Test exporting history', () => {
