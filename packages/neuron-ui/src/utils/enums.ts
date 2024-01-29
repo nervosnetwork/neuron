@@ -29,6 +29,7 @@ export enum RoutePath {
   OfflineSign = 'offline-sign',
   SignVerify = 'sign-verify',
   MultisigAddress = 'multisig-address',
+  BroadcastTransaction = 'broadcast-transaction',
 }
 
 export enum CapacityUnit {

@@ -795,6 +795,10 @@ export default class ApiController {
       return this.#offlineSignController.broadcastTransaction(params)
     })
 
+    handle('broadcast-signed-transaction', async (_, params) => {
+      return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
+    })
+
     handle('sign-and-export-transaction', async (_, params) => {
       return this.#offlineSignController.signAndExportTransaction({
         ...params,

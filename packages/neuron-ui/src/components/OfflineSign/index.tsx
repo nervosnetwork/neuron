@@ -1,11 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { isSuccessResponse, RoutePath, useDidMount, useGoBack } from 'utils'
+import { isSuccessResponse, useDidMount, useGoBack } from 'utils'
 import Dialog from 'widgets/Dialog'
 import AlertDialog from 'widgets/AlertDialog'
-import { useDispatch, useState as useGlobalState } from 'states'
-import { broadcastTransaction, getCurrentWallet, OfflineSignStatus } from 'services/remote'
+import { useState as useGlobalState } from 'states'
+import { getCurrentWallet, OfflineSignStatus } from 'services/remote'
 import { ReactComponent as HardWalletIcon } from 'widgets/Icons/HardWallet.svg'
 import OfflineSignDialog from '../OfflineSignDialog'
 
@@ -18,9 +17,7 @@ const OfflineSign = () => {
 
   const [wallet, setWallet] = useState<State.Wallet | null>(null)
   const [isSigning, setIsSigning] = useState(false)
-  const [isBroadCasting, setIsBroadcasting] = useState(false)
   const [t] = useTranslation()
-  const dispatch = useDispatch()
   const [errMsg, setErrMsg] = useState('')
 
   const { filePath, json } = loadedTransaction
@@ -30,6 +27,8 @@ const OfflineSign = () => {
   }, [json])
 
   const signStatus: OfflineSignStatus = json.status
+
+  const isSigned = useMemo(() => signStatus === OfflineSignStatus.Signed, [signStatus])
 
   const status = useMemo(() => {
     switch (signStatus) {
@@ -48,24 +47,6 @@ const OfflineSign = () => {
     setIsSigning(true)
   }, [setIsSigning])
 
-  const navigate = useNavigate()
-  const onBroadcast = useCallback(async () => {
-    setIsBroadcasting(true)
-    try {
-      const res = await broadcastTransaction({
-        ...json,
-        walletID: wallet!.id,
-      })
-      if (isSuccessResponse(res)) {
-        navigate(RoutePath.History)
-      } else {
-        setErrMsg(typeof res.message === 'string' ? res.message : res.message.content || '')
-      }
-    } finally {
-      setIsBroadcasting(false)
-    }
-  }, [wallet, json, navigate, dispatch])
-
   useDidMount(() => {
     getCurrentWallet().then(res => {
       if (isSuccessResponse(res)) {
@@ -76,26 +57,29 @@ const OfflineSign = () => {
 
   const signDialogOnDismiss = useCallback(() => {
     setIsSigning(false)
-  }, [])
+  }, [setIsSigning])
 
   if (isSigning && wallet) {
     return (
-      <OfflineSignDialog isBroadcast={false} wallet={wallet} offlineSignJSON={json} onDismiss={signDialogOnDismiss} />
+      <OfflineSignDialog
+        isBroadcast={false}
+        wallet={wallet}
+        offlineSignJSON={json}
+        onDismiss={signDialogOnDismiss}
+        onCompleted={onBack}
+      />
     )
   }
 
   return (
     <>
       <Dialog
-        show={!isSigning}
+        show={!isSigned}
         title={t('offline-sign.title')}
         cancelText={t('offline-sign.actions.cancel')}
         onCancel={onBack}
-        confirmText={
-          signStatus === OfflineSignStatus.Signed ? t('offline-sign.actions.broadcast') : t('offline-sign.actions.sign')
-        }
-        isLoading={signStatus === OfflineSignStatus.Signed && isBroadCasting}
-        onConfirm={signStatus === OfflineSignStatus.Signed ? onBroadcast : onSign}
+        confirmText={t('offline-sign.actions.sign')}
+        onConfirm={onSign}
       >
         <div className={styles.main}>
           <table>
@@ -123,6 +107,18 @@ const OfflineSign = () => {
           <textarea disabled value={jsonContent} className={styles.textarea} />
         </div>
       </Dialog>
+
+      <Dialog
+        show={isSigned}
+        className={styles.warningDialog}
+        title={t('offline-sign.import-signed-transaction')}
+        cancelText={t('offline-sign.actions.cancel')}
+        onCancel={onBack}
+        onConfirm={onBack}
+      >
+        <div className={styles.content}>{t('offline-sign.import-signed-transaction-detail')}</div>
+      </Dialog>
+
       <AlertDialog
         show={!!errMsg}
         title={t('message-types.alert')}

@@ -134,6 +134,7 @@ type Action =
   | 'export-transaction-as-json'
   | 'sign-transaction-only'
   | 'broadcast-transaction-only'
+  | 'broadcast-signed-transaction'
   | 'sign-and-export-transaction'
   | 'sign-and-broadcast-transaction'
   // nft

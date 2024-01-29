@@ -108,6 +108,8 @@
         "partially-signed": "部分簽名",
         "signed": "已簽名"
       },
+      "import-signed-transaction": "導入已簽名交易",
+      "import-signed-transaction-detail": "您導入了一個已簽名交易，請確認並重試。",
       "wallet": "錢包：",
       "content": "內容：",
       "export": "導出交易",
@@ -116,8 +118,12 @@
       "actions": {
         "broadcast": "廣播交易",
         "sign": "簽名並導出",
-        "cancel": "取消"
-      }
+        "cancel": "取消",
+        "view-in-explorer": "在瀏覽器中查看"
+      },
+      "broadcast-transaction": "廣播交易",
+      "import-transaction-to-sign": "導入一筆交易以簽名",
+      "import-unsigned-transaction-detail": "您導入了一個未簽名交易，請確認並重試。"
     },
     "overview": {
       "date": "時間",

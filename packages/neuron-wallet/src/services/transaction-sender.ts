@@ -100,8 +100,10 @@ export default class TransactionSender {
     await TransactionPersistor.saveSentTx(tx, txHash)
     await MultisigService.saveSentMultisigOutput(tx)
 
-    const wallet = WalletService.getInstance().get(walletID)
-    await wallet.checkAndGenerateAddresses()
+    if (walletID) {
+      const wallet = WalletService.getInstance().get(walletID)
+      await wallet.checkAndGenerateAddresses()
+    }
     return txHash
   }
 
