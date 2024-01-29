@@ -1,5 +1,6 @@
-import { In, Not, getConnection } from 'typeorm'
+import { In, Not } from 'typeorm'
 import SudtTokenInfoEntity from '../database/chain/entities/sudt-token-info'
+import { getConnection } from '../database/chain/connection'
 
 export default class SudtTokenInfoService {
   static async findSudtTokenInfoByArgs(typeArgsList: string[]) {

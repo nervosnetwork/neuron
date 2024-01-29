@@ -1,7 +1,7 @@
 import AssetAccountInfo from '../models/asset-account-info'
 import AddressParser from '../models/address-parser'
 import { TransactionGenerator } from './tx'
-import { getConnection } from 'typeorm'
+import { getConnection } from '../database/chain/connection'
 import Output from '../models/chain/output'
 import LiveCell from '../models/chain/live-cell'
 import Transaction from '../models/chain/transaction'

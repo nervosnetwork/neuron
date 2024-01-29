@@ -1,5 +1,6 @@
-import { Brackets, getConnection, In, IsNull, type ObjectLiteral } from 'typeorm'
+import { Brackets, In, IsNull, type ObjectLiteral } from 'typeorm'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { getConnection } from '../database/chain/connection'
 import { scriptToAddress, addressToScript } from '../utils/scriptAndAddress'
 import {
   CapacityNotEnough,

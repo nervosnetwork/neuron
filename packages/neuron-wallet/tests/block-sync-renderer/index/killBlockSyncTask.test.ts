@@ -1,3 +1,5 @@
+import { NetworkType } from '../../../src/models/network'
+
 describe(`Kill block sync task`, () => {
   const stubbedQueryIndexer = jest.fn()
   const stubbedLoggerInfo = jest.fn()
@@ -8,7 +10,7 @@ describe(`Kill block sync task`, () => {
     throw new Error()
   })
   const stubbedChildProcessOnce = jest.fn()
-  const stubbedGetCurrentNetwork = jest.fn().mockReturnValue({ id: 'id', genesisHash: '0x' })
+  const stubbedGetCurrentNetwork = jest.fn().mockReturnValue({ id: 'id', genesisHash: '0x', type: NetworkType.Normal })
   const stubbedSyncTaskCtor = jest.fn().mockImplementation(() => ({ queryIndexer: stubbedQueryIndexer }))
 
   // jest.doMock('electron', () => ({ BrowserWindow: jest.fn() }))

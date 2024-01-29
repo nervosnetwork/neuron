@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { getConnection } from '../database/chain/connection'
 import CellLocalInfo, { UpdateCellLocalInfo } from '../database/chain/entities/cell-local-info'
 import CellsService from './cells'
 
