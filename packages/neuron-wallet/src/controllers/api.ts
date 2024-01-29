@@ -376,6 +376,10 @@ export default class ApiController {
       return this.#walletsController.delete({ id, password })
     })
 
+    handle('replace-wallet', async (_, { existingWalletId = '', importedWalletId = '' }) => {
+      return this.#walletsController.replaceWallet(existingWalletId, importedWalletId)
+    })
+
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
       return this.#walletsController.backup({ id, password })
     })
