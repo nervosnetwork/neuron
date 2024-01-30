@@ -115,9 +115,6 @@ export const startCkbNode = async () => {
   })
   const options = ['run', '-C', SettingsService.getInstance().getNodeDataPath(), '--indexer']
   const stdio: (StdioNull | StdioPipe)[] = ['ignore', 'pipe', 'pipe']
-  if (app.isPackaged && process.env.CKB_NODE_ASSUME_VALID_TARGET) {
-    options.push('--assume-valid-target', process.env.CKB_NODE_ASSUME_VALID_TARGET)
-  }
   logger.info(`CKB:\tckb full node will with rpc port ${rpcPort}, listen port ${listenPort}, with options`, options)
   const currentProcess = spawn(ckbBinary(), options, { stdio })
 
