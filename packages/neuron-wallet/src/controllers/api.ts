@@ -376,6 +376,10 @@ export default class ApiController {
       return this.#walletsController.delete({ id, password })
     })
 
+    handle('replace-wallet', async (_, { existingWalletId = '', importedWalletId = '' }) => {
+      return this.#walletsController.replaceWallet(existingWalletId, importedWalletId)
+    })
+
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
       return this.#walletsController.backup({ id, password })
     })
@@ -826,6 +830,10 @@ export default class ApiController {
 
     handle('broadcast-transaction-only', async (_, params) => {
       return this.#offlineSignController.broadcastTransaction(params)
+    })
+
+    handle('broadcast-signed-transaction', async (_, params) => {
+      return this.#offlineSignController.broadcastTransaction({ ...params, walletID: '' })
     })
 
     handle('sign-and-export-transaction', async (_, params) => {

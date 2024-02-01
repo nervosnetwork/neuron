@@ -39,6 +39,7 @@ export default {
         'multisig-address': '多簽地址',
         'offline-sign': '離線簽名',
         'clear-sync-data': '清除所有同步數據',
+        'broadcast-transaction': '廣播交易',
       },
       window: {
         label: '視窗',

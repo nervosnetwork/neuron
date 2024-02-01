@@ -43,6 +43,20 @@ export default class MultisigConfig {
     return multisigConfig
   }
 
+  public cloneIgnoreBlockNumber(): MultisigConfig {
+    const multisigConfig = new MultisigConfig()
+
+    multisigConfig.walletId = this.walletId
+    multisigConfig.r = this.r
+    multisigConfig.m = this.m
+    multisigConfig.n = this.n
+    multisigConfig.blake160s = this.blake160s
+    if (this.alias) {
+      multisigConfig.alias = this.alias
+    }
+    return multisigConfig
+  }
+
   @AfterInsert()
   emitInsert() {
     this.changed('AfterInsert')

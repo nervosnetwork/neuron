@@ -1,5 +1,3 @@
-import { getConnection } from 'typeorm'
-import { initConnection } from '../../src/database/chain/ormconfig'
 import MultisigConfig from '../../src/database/chain/entities/multisig-config'
 import MultisigConfigModel from '../../src/models/multisig-config'
 import MultisigService from '../../src/services/multisig'
@@ -9,6 +7,8 @@ import { keyInfos } from '../setupAndTeardown/public-key-info.fixture'
 import Multisig from '../../src/models/multisig'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import { computeScriptHash as scriptToHash } from '@ckb-lumos/base/lib/utils'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
+import { NetworkType } from '../../src/models/network'
 
 const [alice, bob, charlie] = keyInfos
 
@@ -23,6 +23,14 @@ jest.mock('../../src/models/subjects/multisig-output-db-changed-subject', () => 
       next: multisigOutputChangedSubjectNextMock,
     }
   },
+}))
+
+jest.mock('../../src/services/networks', () => ({
+  getInstance: () => ({
+    getCurrent: () => ({
+      type: NetworkType.Normal,
+    }),
+  }),
 }))
 
 describe('multisig service', () => {
@@ -66,7 +74,7 @@ describe('multisig service', () => {
   })
 
   afterAll(async () => {
-    await getConnection().close()
+    await closeConnection()
   })
 
   beforeEach(async () => {

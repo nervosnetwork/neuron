@@ -1,10 +1,11 @@
-import { In, getConnection } from 'typeorm'
+import { In } from 'typeorm'
 import { queue } from 'async'
 import AddressMeta from '../../database/address/meta'
 import IndexerTxHashCache from '../../database/chain/entities/indexer-tx-hash-cache'
 import RpcService from '../../services/rpc-service'
 import TransactionWithStatus from '../../models/chain/transaction-with-status'
 import SyncInfoEntity from '../../database/chain/entities/sync-info'
+import { getConnection } from '../../database/chain/connection'
 import { TransactionCollector, CellCollector, Indexer as CkbIndexer } from '@ckb-lumos/ckb-indexer'
 
 export default class IndexerCacheService {

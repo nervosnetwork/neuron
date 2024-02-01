@@ -1,4 +1,5 @@
-import { getConnection, In, Not } from 'typeorm'
+import { In, Not } from 'typeorm'
+import { getConnection } from '../database/chain/connection'
 import MultisigConfig from '../database/chain/entities/multisig-config'
 import MultisigOutput from '../database/chain/entities/multisig-output'
 import { MultisigConfigNotExistError, MultisigConfigExistError } from '../exceptions/multisig'

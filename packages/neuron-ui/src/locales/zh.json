@@ -107,6 +107,8 @@
         "partially-signed": "部分签名",
         "signed": "已签名"
       },
+      "import-signed-transaction": "导入已签名交易",
+      "import-signed-transaction-detail": "您导入了一个已签名交易，请确认并重试。",
       "wallet": "钱包：",
       "content": "内容：",
       "export": "导出交易",
@@ -115,8 +117,12 @@
       "actions": {
         "broadcast": "广播交易",
         "sign": "签名并导出",
-        "cancel": "取消"
-      }
+        "cancel": "取消",
+        "view-in-explorer": "在浏览器中查看"
+      },
+      "broadcast-transaction": "广播交易",
+      "import-transaction-to-sign": "导入一笔交易以签名",
+      "import-unsigned-transaction-detail": "您导入了一个未签名交易，请确认并重试。"
     },
     "overview": {
       "date": "时间",
@@ -180,7 +186,8 @@
       "repeat-password": "重复密码",
       "finish-create": "完成创建",
       "creating-wallet": "钱包准备中，请稍后",
-      "add-one": "添加钱包"
+      "add-one": "添加钱包",
+      "detect-duplicate-wallets": "检测重复钱包"
     },
     "import-keystore": {
       "title": "导入 Keystore 文件",
@@ -381,6 +388,15 @@
         "password": "密码",
         "wallet-detail": {
           "balance": "余额"
+        },
+        "importing-existing": {
+          "title": "导入已存在钱包",
+          "detail": "您导入了一个已经存在的钱包，请选择替换现有钱包或取消导入。",
+          "replace": "替换"
+        },
+        "detected-duplicate": {
+          "title": "检测到重复的钱包",
+          "detail": "您的账户中有重复的钱包，建议您选择保留需要独一无二的钱包，以便于更轻松地管理。"
         }
       },
       "network": {

@@ -1,7 +1,6 @@
-import { getConnection } from 'typeorm'
 import SudtTokenInfoEntity from '../../src/database/chain/entities/sudt-token-info'
 import SudtTokenInfoService from '../../src/services/sudt-token-info'
-import { closeConnection, initConnection } from '../setupAndTeardown'
+import { closeConnection, getConnection, initConnection } from '../setupAndTeardown'
 import HdPublicKeyInfo from '../../src/database/chain/entities/hd-public-key-info'
 import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
 import accounts from '../setupAndTeardown/accounts.fixture'

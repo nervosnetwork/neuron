@@ -23,9 +23,10 @@ interface SignDialogProps {
   wallet: State.Wallet
   offlineSignJSON: OfflineSignJSON
   onDismiss: () => void
+  onCompleted: () => void
 }
 
-const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: SignDialogProps) => {
+const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss, onCompleted }: SignDialogProps) => {
   const {
     app: {
       send: { description },
@@ -65,8 +66,8 @@ const OfflineSignDialog = ({ isBroadcast, wallet, offlineSignJSON, onDismiss }: 
       type: AppActions.UpdateLoadedTransaction,
       payload: res.result!,
     })
-    onDismiss()
-  }, [offlineSignJSON, dispatch, onDismiss, t, password, walletID])
+    onCompleted()
+  }, [offlineSignJSON, dispatch, onCompleted, t, password, walletID])
 
   const onSubmit = useCallback(
     async (e?: React.FormEvent) => {

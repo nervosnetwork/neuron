@@ -1,16 +1,20 @@
 import initDB from '../../src/database/chain/ormconfig'
-import { getConnection } from 'typeorm'
+import { getConnection as originGetConnection } from 'typeorm'
 import { TransactionPersistor } from '../../src/services/tx'
 import AssetAccount from '../../src/models/asset-account'
 import OutputEntity from '../../src/database/chain/entities/output'
 import AssetAccountEntity from '../../src/database/chain/entities/asset-account'
 
-export const initConnection = () => {
-  return initDB(':memory:')
+export const initConnection = (genesisBlockHash?: string) => {
+  return initDB(genesisBlockHash ?? ':memory:')
 }
 
 export const closeConnection = () => {
-  return getConnection().close()
+  return originGetConnection('full').close()
+}
+
+export const getConnection = () => {
+  return originGetConnection('full')
 }
 
 export const saveTransactions = async (txs: any) => {
