@@ -1,4 +1,5 @@
-import { getConnection, In } from 'typeorm'
+import { In } from 'typeorm'
+import { getConnection } from '../database/chain/connection'
 import BufferUtils from '../utils/buffer'
 import OutputEntity from '../database/chain/entities/output'
 import Transaction, { TransactionStatus } from '../models/chain/transaction'
@@ -341,7 +342,7 @@ export default class AssetAccountService {
       [assetAccount.tokenID, assetAccount.blake160]
     )
 
-    if (exists[0].exist === 1) {
+    if (exists[0].exist === 1 && walletID) {
       // For hardware wallet in ckb asset account:
       // 1. If a ckb account has been created, another one cannot be created;
       // 2. If a ckb account has been destroyed, ckb account can be created.

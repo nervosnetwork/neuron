@@ -15,23 +15,21 @@ const AlertDialog = ({
   title,
   message,
   type,
-  onClose,
   onOk,
   onCancel,
   action,
 }: {
   show?: boolean
   title?: string
-  message?: string
+  message?: React.ReactNode
   type: AlertType
-  onClose?: () => void
   onOk?: () => void
   onCancel?: () => void
   action?: Action
 }) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show, dialogRef, onClose: onClose || (() => {}) })
+  useDialog({ show, dialogRef, onClose: onCancel || (() => {}) })
   const actions = useMemo<('cancel' | 'ok')[]>(() => {
     if (action) {
       return action === 'all' ? ['cancel', 'ok'] : [action]

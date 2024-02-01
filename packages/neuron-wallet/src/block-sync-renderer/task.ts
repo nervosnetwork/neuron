@@ -1,4 +1,4 @@
-import type { LumosCellQuery } from './sync/connector'
+import type { LumosCellQuery } from './sync/synchronizer'
 import initConnection from '../database/chain/ormconfig'
 import { register as registerTxStatusListener } from './tx-status-listener'
 import SyncQueue from './sync/queue'

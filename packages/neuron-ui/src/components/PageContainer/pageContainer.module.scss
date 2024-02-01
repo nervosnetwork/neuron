@@ -144,9 +144,32 @@
   }
 }
 
-.startBlockTip {
-  font-weight: 400;
-  color: var(--secondary-text-color);
+.setBlockContent {
+  padding: 0 0 20px 0;
+  overflow-y: auto;
+
+  .content {
+    padding: 0 16px 0 16px;
+  }
+  .startBlockTip {
+    font-weight: 400;
+    color: var(--secondary-text-color);
+  }
+
+  .setBlockWarn {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--warn-background-color);
+    color: var(--warn-text-color);
+    font-size: 12px;
+    font-weight: 500;
+
+    & > svg {
+      margin-right: 4px;
+    }
+  }
 }
 
 .viewAction {

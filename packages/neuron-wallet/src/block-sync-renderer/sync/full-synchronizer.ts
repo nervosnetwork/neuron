@@ -3,11 +3,11 @@ import logger from '../../utils/logger'
 import CommonUtils from '../../utils/common'
 import RpcService from '../../services/rpc-service'
 import { Address } from '../../models/address'
-import { Connector } from './connector'
+import { Synchronizer } from './synchronizer'
 import { NetworkType } from '../../models/network'
 import IndexerCacheService from './indexer-cache-service'
 
-export default class IndexerConnector extends Connector {
+export default class FullSynchronizer extends Synchronizer {
   private rpcService: RpcService
 
   constructor(addresses: Address[], nodeUrl: string, indexerUrl: string, nodeType: NetworkType) {

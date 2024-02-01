@@ -35,7 +35,11 @@ declare namespace Controller {
     newPassword?: string
     name?: string
     device?: any
-    startBlockNumber?: string
+  }
+
+  interface UpdateWalletStartBlockNumberParams {
+    id: string
+    startBlockNumber: string
   }
 
   interface RequestPasswordParams {
@@ -46,6 +50,11 @@ declare namespace Controller {
   interface DeleteWalletParams {
     id: string
     password: string
+  }
+
+  interface ReplaceWalletParams {
+    existingWalletId: string
+    importedWalletId: string
   }
 
   interface BackupWalletParams {
@@ -311,14 +320,6 @@ declare namespace Controller {
     }
     type Response = TokenInfo[]
   }
-
-  namespace ClearCache {
-    interface Params {
-      resetIndexerData: boolean
-    }
-    type Response = boolean
-  }
-
   namespace GetSUDTTokenInfo {
     interface Params {
       tokenID: string

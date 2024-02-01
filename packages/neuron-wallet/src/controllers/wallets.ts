@@ -42,7 +42,7 @@ export default class WalletsController {
     }
     return {
       status: ResponseCode.Success,
-      result: wallets.map(({ name, id, device }) => ({ name, id, device })),
+      result: wallets.map(({ name, id, device, extendedKey }) => ({ name, id, device, extendedKey })),
     }
   }
 
@@ -626,6 +626,15 @@ export default class WalletsController {
   private async deleteWallet(id: string): Promise<Controller.Response<any>> {
     const walletsService = WalletsService.getInstance()
     await walletsService.delete(id)
+
+    return {
+      status: ResponseCode.Success,
+    }
+  }
+
+  public async replaceWallet(existingWalletId: string, importedWalletId: string): Promise<Controller.Response<any>> {
+    const walletsService = WalletsService.getInstance()
+    await walletsService.replace(existingWalletId, importedWalletId)
 
     return {
       status: ResponseCode.Success,

@@ -10,6 +10,7 @@
 
 .container {
   width: 680px;
+  padding-bottom: 24px;
 }
 
 .info {
@@ -75,18 +76,6 @@
   }
 }
 
-.copyContainer {
-  text-align: center;
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  margin-top: 16px;
-
-  .copyTransformWrapper {
-    width: 452px;
-  }
-}
-
 .qrCode {
   position: relative;
   @keyframes fade-away {
@@ -124,10 +113,4 @@
       color: #fff;
     }
   }
-}
-
-.actions {
-  margin: 16px 0 24px;
-  @include dialog-footer;
-  column-gap: 24px;
 }
