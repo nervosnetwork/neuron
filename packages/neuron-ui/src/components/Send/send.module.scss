@@ -1,18 +1,7 @@
 @import '../../styles/mixin.scss';
-$bottomHeight: 84px;
-$headerHeight: 104px;
-
-.content {
-  overflow-y: scroll;
-  margin-bottom: 60px;
-  height: calc(100vh - $headerHeight - $bottomHeight);
-}
-
-.withFullySynced {
-  .content {
-    height: calc(100vh - $headerHeight - $bottomHeight - 60px);
-  }
-}
+$bottomHeight: 24px;
+$headerHeight: 72px;
+$noticeHeight: 60px;
 
 .layout {
   display: flex;
@@ -51,15 +40,23 @@ $headerHeight: 104px;
     }
   }
 
+  &.withFullySynced {
+    .right {
+      height: calc(100vh - $headerHeight - $bottomHeight - $noticeHeight);
+    }
+  }
+
   .right {
     margin-left: 16px;
     flex: 1;
     position: relative;
     border-radius: 16px;
     background: var(--secondary-background-color);
-    min-height: 436px;
+    height: calc(100vh - $headerHeight - $bottomHeight);
+    $actionHeight: 108px;
 
     .content {
+      $contentPadding: 16px;
       padding: 16px;
       /**
         These styles are for showing the full tips, because of content needs to scroll on the y-axis.
@@ -70,6 +67,8 @@ $headerHeight: 104px;
       left: -48px;
       padding-left: 64px;
       width: calc(100% - 32px);
+      overflow-y: scroll;
+      height: calc(100% - $actionHeight - 2 * $contentPadding);
     }
 
     .rightFooter {
